@@ -1,0 +1,13 @@
+{
+  "profiles": {
+    "Sheaft.Functions": {
+      "commandName": "Project"
+    },
+    "Docker": {
+      "commandName": "Docker",
+      "launchUrl": "{Scheme}://{ServiceHost}:{ServicePort}",
+      "httpPort": 33683,
+      "useSSL": false
+    }
+  }
+}

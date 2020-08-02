@@ -1,0 +1,33 @@
+{
+    "name":"France",
+    "locked":false,    
+    "departmentsCount": 100,
+    "departmentsRequired": 1,
+    "currentDepartments": 8,
+    "progress":8,
+    "color":"#ffffff",
+    "regions": [
+    {
+      "id": 3,
+      "name": "Auvergne Rhône-Alpes",
+      "position": 1,
+      "departmentsCount": 10,
+      "departmentsRequired": 1,
+      "currentDepartments": 2,
+      "locked":false,
+      "color":"#ffffff",
+      "progress": 20,
+      "departments": [
+        {
+          "id": 1,
+          "name": "Ain",
+          "requiredProducers": 10,
+          "currentProducers": 3,
+          "locked":true,
+          "color":"#ffffff",
+          "progress": 30
+        }
+      ]
+    }
+  ]
+}

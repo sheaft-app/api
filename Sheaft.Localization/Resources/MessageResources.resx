@@ -1,0 +1,672 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="Address_Line1_Required" xml:space="preserve">
+    <value>La ligne d'adresse est requise</value>
+  </data>
+  <data name="Address_Zipcode_Required" xml:space="preserve">
+    <value>Le code postal est requis</value>
+  </data>
+  <data name="Address_City_Required" xml:space="preserve">
+    <value>La ville est requise</value>
+  </data>
+  <data name="Agreement_SelectedHour_NotFoundInDeliveryOpeningHours" xml:space="preserve">
+    <value>L'heure selectionnée pour l'accord est introuvable dans les horaires disponibles</value>
+  </data>
+  <data name="Agreement_CannotBeAccepted_NotInWaitingStatus" xml:space="preserve">
+    <value>L'accord ne peut pas être accepté, il n'est pas en attente d'acceptation</value>
+  </data>
+  <data name="Agreement_CannotBeCancelled_AlreadyCancelled" xml:space="preserve">
+    <value>L'accord ne peut pas être annulé, il a déjà été annulé</value>
+  </data>
+  <data name="Agreement_CannotBeCancelled_AlreadyRefused" xml:space="preserve">
+    <value>L'accord ne peut pas être annulé, il a déjà été refusé</value>
+  </data>
+  <data name="Agreement_CannotBeRefused_NotInWaitingStatus" xml:space="preserve">
+    <value>L'accord ne peut pas être refusé, il n'est pas en attente d'acceptation</value>
+  </data>
+  <data name="Company_Address_Required" xml:space="preserve">
+    <value>L'adresse de la société est requise</value>
+  </data>
+  <data name="Company_Name_Required" xml:space="preserve">
+    <value>Le nom de la société est requis</value>
+  </data>
+  <data name="Company_Email_Required" xml:space="preserve">
+    <value>L'adresse email de contact est requis</value>
+  </data>
+  <data name="Company_Siret_Required" xml:space="preserve">
+    <value>Le numéro de SIRET est requis</value>
+  </data>
+  <data name="Company_Vat_Required" xml:space="preserve">
+    <value>Le numéro de TVA est requis</value>
+  </data>
+  <data name="Company_TagNotFound" xml:space="preserve">
+    <value>Le tag spécifié pour la société est introuvable</value>
+  </data>
+  <data name="RegisterCompany_CannotContains_ProducerAndStoreRoles" xml:space="preserve">
+    <value>Un compte profesionnel ne peut pas être magasin et producteur en même temps</value>
+  </data>
+  <data name="EmailProvider_SendEmail_Failure" xml:space="preserve">
+    <value>L'envoi d'email a échoué</value>
+  </data>
+  <data name="EmailProvider_Newsletter_Email_Invalid" xml:space="preserve">
+    <value>L'adresse email pour l'enregistrement à la newsletter est invalide</value>
+  </data>
+  <data name="EmailProvider_Newsletter_RegisterFailure" xml:space="preserve">
+    <value>L'enregistrement à la newsletter a échoué</value>
+  </data>
+  <data name="Product_Producer_Required" xml:space="preserve">
+    <value>Le producteur est requis</value>
+  </data>
+  <data name="Product_Reference_Required" xml:space="preserve">
+    <value>La référence du produit est requise</value>
+  </data>
+  <data name="Product_Name_Required" xml:space="preserve">
+    <value>Le nom du produit est requis</value>
+  </data>
+  <data name="Product_WholeSalePrice_CannotBe_LowerOrEqualThan" xml:space="preserve">
+    <value>Le prix HT du produit ne peut pas être inférieur ou égal à {0}€</value>
+  </data>
+  <data name="Product_Weight_CannotBe_LowerOrEqualThan" xml:space="preserve">
+    <value>Le poids du produit ne peut pas être inférieur ou égale à {0}kg</value>
+  </data>
+  <data name="Product_Vat_CannotBe_LowerThan" xml:space="preserve">
+    <value>Le taux de TVA du produit ne peut pas être inférieur à {0}%</value>
+  </data>
+  <data name="Product_Vat_CannotBe_GreaterThan" xml:space="preserve">
+    <value>Le taux de TVA du produit ne peut pas être supérieur à {0}%</value>
+  </data>
+  <data name="Product_Description_TooLong" xml:space="preserve">
+    <value>La description du produit est trop longue, elle ne peut pas dépasser {0} caractères</value>
+  </data>
+  <data name="Product_QuantityPerUnit_CannotBe_LowerOrEqualThan" xml:space="preserve">
+    <value>La quantité par unité du produit ne peut pas être inférieur ou égale à {0}</value>
+  </data>
+  <data name="Product_TagNotFound" xml:space="preserve">
+    <value>Le tag spécifié pour le produit est introuvable</value>
+  </data>
+  <data name="CreateProduct_Reference_AlreadyExists" xml:space="preserve">
+    <value>La référence {0} existe déjà</value>
+  </data>
+  <data name="ImportProduct_Name_Required_Line" xml:space="preserve">
+    <value>Le nom du produit est requis, ligne {0}</value>
+  </data>
+  <data name="ImportProduct_WholeSalePrice_Invalid_Line" xml:space="preserve">
+    <value>Le prix HT du produit est invalide, ligne {0}</value>
+  </data>
+  <data name="ImportProduct_Vat_Invalid_Line" xml:space="preserve">
+    <value>Le taux de TVA du produit est invalide, ligne {0}</value>
+  </data>
+  <data name="ImportProduct_Reference_AlreadyExists" xml:space="preserve">
+    <value>La référence du produit existe déjà, ligne {0}</value>
+  </data>
+  <data name="ImportProduct_Missing_Tab" xml:space="preserve">
+    <value>Le fichier d'import de catalogue est invalide, il manque l'onglet principal des produits.</value>
+  </data>
+  <data name="User_Id_Invalid" xml:space="preserve">
+    <value>L'identifiant de l'utilisateur est invalide</value>
+  </data>
+  <data name="User_Firstname_Required" xml:space="preserve">
+    <value>Le prénom est requis</value>
+  </data>
+  <data name="User_Lastname_Required" xml:space="preserve">
+    <value>Le nom de famille est requis</value>
+  </data>
+  <data name="User_Email_Required" xml:space="preserve">
+    <value>L'adresse email est requise</value>
+  </data>
+  <data name="DeleteUser_Oidc_DeleteProfile_Error" xml:space="preserve">
+    <value>Une erreur est survenue lors de la suppression de l'identité unifiée du compte : {0}</value>
+  </data>
+  <data name="DeleteUser_CannotBeDeleted_CompanyHasActiveOrders" xml:space="preserve">
+    <value>Suppression impossible, le compte possède des commandes actives</value>
+  </data>
+  <data name="DeleteUser_CannotBeDeleted_HasActiveOrders" xml:space="preserve">
+    <value>Suppression impossible, vous possédez des commandes actives</value>
+  </data>
+  <data name="UpdateUser_Oidc_UpdatePicture_Error" xml:space="preserve">
+    <value>Une erreur est survenue lors de la mise à jour de l'image de l'identité du compte : {0}</value>
+  </data>
+  <data name="UpdateUser_Oidc_UpdateProfile_Error" xml:space="preserve">
+    <value>Une erreur est survenue lors de la mise à jour des informations de l'identité du compte : {0}</value>
+  </data>
+  <data name="RegisterConsumer_UserWithSponsorCode_NotFound" xml:space="preserve">
+    <value>Le code parain spécifié pour la création du compte est introuvable</value>
+  </data>
+  <data name="RegisterConsumer_Oidc_Register_Error" xml:space="preserve">
+    <value>Une erreur est survenue lors de l'association du compte à l'identité unifiée : {0}</value>
+  </data>
+  <data name="RegisterConsumer_User_AlreadyExists" xml:space="preserve">
+    <value>Un compte existe déjà avec l'adresse email renseignée</value>
+  </data>
+  <data name="RegisterOwner_UserWithSponsorCode_NotFound" xml:space="preserve">
+    <value>Le code parain spécifié pour la création du compte professionel est introuvable</value>
+  </data>
+  <data name="RegisterOwner_Oidc_Register_Error" xml:space="preserve">
+    <value>Une erreur est survenue lors de l'association du compte à l'identité unifiée : {0}</value>
+  </data>
+  <data name="RegisterOwner_User_CannotBe_ProducerAndStoreRoles" xml:space="preserve">
+    <value>Le compte ne peut pas être un magasin et un producteur en même temps</value>
+  </data>
+  <data name="RegisterOwner_User_AlreadyExists" xml:space="preserve">
+    <value>Un compte existe déjà avec l'adresse email renseignée</value>
+  </data>
+  <data name="DeliveryMode_LockOrderHoursBeforeDelivery_CannotBe_LowerThan" xml:space="preserve">
+    <value>La durée en heures du vérouillage de prise de commande avant la livraison ne peut pas être inférieur ou égal à {0}</value>
+  </data>
+  <data name="PurchaseOrder_Vendor_Required" xml:space="preserve">
+    <value>Le vendeur de la commande est requis</value>
+  </data>
+  <data name="PurchaseOrder_Sender_Required" xml:space="preserve">
+    <value>Le client de la commande est requis</value>
+  </data>
+  <data name="PurchaseOrder_Reference_Required" xml:space="preserve">
+    <value>La référence de commande est requise</value>
+  </data>
+  <data name="PurchaseOrder_CannotAccept_NotIn_WaitingStatus" xml:space="preserve">
+    <value>Impossible d'accepter la commande, elle n'est pas en attente d'acceptation</value>
+  </data>
+  <data name="PurchaseOrder_CannotComplete_NotIn_ProcessingStatus" xml:space="preserve">
+    <value>Impossible de compléter la commande, elle n'est pas en cours de traitement</value>
+  </data>
+  <data name="PurchaseOrder_CannotShip_NotIn_CompletedStatus" xml:space="preserve">
+    <value>Impossible de débuter la livraison de la commande, elle n'est pas prête</value>
+  </data>
+  <data name="PurchaseOrder_CannotDeliver_NotIn_CompletedOrShippingStatus" xml:space="preserve">
+    <value>Impossible de délivrer la commande, elle n'est pas prête ou pas encore en cours de livraison</value>
+  </data>
+  <data name="PurchaseOrder_CannotCancel_AlreadyIn_RefusedStatus" xml:space="preserve">
+    <value>Impossible d'annuler la commande, elle a déjà été refusée</value>
+  </data>
+  <data name="PurchaseOrder_CannotCancel_AlreadyIn_DeliveredStatus" xml:space="preserve">
+    <value>Impossible d'annuler la commande, elle a déjà été livrée</value>
+  </data>
+  <data name="PurchaseOrder_CannotRefuse_AlreadyIn_CancelledStatus" xml:space="preserve">
+    <value>Impossible de refuser la commande, elle a déjà été annulée</value>
+  </data>
+  <data name="PurchaseOrder_CannotRefuse_AlreadyIn_RefusedStatus" xml:space="preserve">
+    <value>Impossible de refuser la commande, elle a déjà été refusée</value>
+  </data>
+  <data name="PurchaseOrder_CannotRefuse_AlreadyIn_DeliveredStatus" xml:space="preserve">
+    <value>Impossible de refuser la commande, elle a déjà été livrée</value>
+  </data>
+  <data name="PurchaseOrder_CannotAddProduct_NotIn_WaitingStatus" xml:space="preserve">
+    <value>Impossible d'ajouter le produit à la commande, elle est en cours de traitement</value>
+  </data>
+  <data name="PurchaseOrder_CannotAddProduct_Product_NotFound" xml:space="preserve">
+    <value>Impossible d'ajouter le produit à la commande, il est introuvable</value>
+  </data>
+  <data name="PurchaseOrder_CannotChangeProductQuantity_NotIn_WaitingStatus" xml:space="preserve">
+    <value>Impossible de modifier la quantité du produit de la commande, elle est en cours de traitement</value>
+  </data>
+  <data name="PurchaseOrder_CannotChangeProductQuantity_Product_NotFound" xml:space="preserve">
+    <value>Impossible de modifier la quantité du produit de la commande, il est introuvable</value>
+  </data>
+  <data name="PurchaseOrder_CannotRemoveProduct_NotIn_WaitingStatus" xml:space="preserve">
+    <value>Impossible de supprimer le produit de la commande, elle est en cours de traitement</value>
+  </data>
+  <data name="PurchaseOrder_CannotRemoveProduct_Product_NotFound" xml:space="preserve">
+    <value>Impossible de supprimer le produit de la commande, il est introuvable</value>
+  </data>
+  <data name="PurchaseOrder_ProductQuantity_CannotBe_LowerOrEqualThan" xml:space="preserve">
+    <value>Impossible de modifier la quantité du produit de la commande, la quantité ne peut pas être inférieur ou égale à {0}</value>
+  </data>
+  <data name="ExpectedDelivery_ExpectedDate_CannotBe_BeforeNow" xml:space="preserve">
+    <value>La date de livraison sélectionnée ne peut pas être antérieure à la date du jour</value>
+  </data>
+  <data name="ExpectedDelivery_ExpectedDate_NotIn_DeliveryOpeningHours" xml:space="preserve">
+    <value>La date de livraison sélectionnée n'est pas située dans les horaires disponibles du producteur</value>
+  </data>
+  <data name="Identifier_Uuid_Error" xml:space="preserve">
+    <value>La génération de l'identifiant unique a échouée</value>
+  </data>
+  <data name="Identifier_SponsorCode_Error" xml:space="preserve">
+    <value>La génération du code de parainage a échouée</value>
+  </data>
+  <data name="Level_Name_Required" xml:space="preserve">
+    <value>Le nom du niveau est requis</value>
+  </data>
+  <data name="Notification_Require_Content" xml:space="preserve">
+    <value>Le contenu de la notification est requis</value>
+  </data>
+  <data name="Job_Name_Required" xml:space="preserve">
+    <value>Le nom de la tâche est requis</value>
+  </data>
+  <data name="Job_Queue_Required" xml:space="preserve">
+    <value>La nom de la file de traitement est requis</value>
+  </data>
+  <data name="Job_User_Required" xml:space="preserve">
+    <value>L'utilisateur de la tâche est requis</value>
+  </data>
+  <data name="Job_CannotRetry_NotIn_CanncelledOrFailedStatus" xml:space="preserve">
+    <value>Impossible de ré-éxecuter la tâche, elle n'est pas annulée ou échouée</value>
+  </data>
+  <data name="Job_CannotPause_NotIn_ProcessingStatus" xml:space="preserve">
+    <value>Impossible de mettre en pause la tâche, elle n'est pas en cours de traitement</value>
+  </data>
+  <data name="Job_CannotArchive_NotIn_TerminatedStatus" xml:space="preserve">
+    <value>Seule une tâche échouée, terminée ou annulée peut être archivée</value>
+  </data>
+  <data name="Job_CannotResume_NotIn_PausedStatus" xml:space="preserve">
+    <value>Impossible de reprendre la tâche, elle n'est pas en pause</value>
+  </data>
+  <data name="Job_CannotComplete_NotIn_ProcessingStatus" xml:space="preserve">
+    <value>Impossible de terminer la tâche, elle n'est pas en cours de traitement</value>
+  </data>
+  <data name="Job_CannotCancel_AlreadyDone" xml:space="preserve">
+    <value>Impossible d'annuler la tâche, elle est déjà terminée</value>
+  </data>
+  <data name="Job_CannotCancel_AlreadyCancelled" xml:space="preserve">
+    <value>Impossible d'annuler la tâche, elle a déjà été annulée</value>
+  </data>
+  <data name="Job_CannotFail_AlreadyDone" xml:space="preserve">
+    <value>Impossible de passer la tâche en échouée, elle est déjà terminée</value>
+  </data>
+  <data name="Job_CannotFail_AlreadyCancelled" xml:space="preserve">
+    <value>Impossible de passer la tâche en échouée, elle a déjà été annulée</value>
+  </data>
+  <data name="Job_Command_Required" xml:space="preserve">
+    <value>La commande pour la tâche est requise</value>
+  </data>
+  <data name="Packaging_WholeSalePrice_CannotBe_LowerThan" xml:space="preserve">
+    <value>Le prix HT de la consigne ne peut pas être inférieur ou égal à {0}%</value>
+  </data>
+  <data name="Packaging_Vat_CannotBe_LowerThan" xml:space="preserve">
+    <value>La TVA de la consigne ne peut pas être inférieur à {0}%</value>
+  </data>
+  <data name="Packaging_Vat_CannotBe_GreaterThan" xml:space="preserve">
+    <value>La TVA de la consigne ne peut pas être supérieur à {0}%</value>
+  </data>
+  <data name="Packaging_Name_Required" xml:space="preserve">
+    <value>Le nom de la consigne est requis</value>
+  </data>
+  <data name="QuickOrder_ProductQuantity_CannotBe_LowerOrEqualThan" xml:space="preserve">
+    <value>Impossible de modifier la quantité du produit de la commande rapide, elle ne peut pas être inférieur ou égale à {0}</value>
+  </data>
+  <data name="QuickOrder_User_Required" xml:space="preserve">
+    <value>L'utilisateur de la commande rapide est requis</value>
+  </data>
+  <data name="QuickOrder_Name_Required" xml:space="preserve">
+    <value>Le nom de la commande rapide est requis</value>
+  </data>
+  <data name="QuickOrder_CannotAddProduct_Product_AlreadyIn" xml:space="preserve">
+    <value>Impossible d'ajouter le produit à la commande rapide, il est déjà présent</value>
+  </data>
+  <data name="QuickOrder_CannotRemoveProduct_Product_NotFound" xml:space="preserve">
+    <value>Impossible de supprimer le produit de la commande rapide, il est introuvable</value>
+  </data>
+  <data name="Rating_User_Required" xml:space="preserve">
+    <value>L'utilisateur de la note est requis</value>
+  </data>
+  <data name="Rating_CannotBe_GreatherThan" xml:space="preserve">
+    <value>La note ne peut être supérieur à {0}</value>
+  </data>
+  <data name="Rating_CannotBe_LowerThan" xml:space="preserve">
+    <value>La note ne peut être inférieur ou égale à {0}</value>
+  </data>
+  <data name="Reward_Name_Required" xml:space="preserve">
+    <value>Le nom de la récompense est requis</value>
+  </data>
+  <data name="Sponsoring_Sponsor_Required" xml:space="preserve">
+    <value>Le parrain est requis</value>
+  </data>
+  <data name="Sponsoring_Sponsored_Required" xml:space="preserve">
+    <value>Le parrainé est requis</value>
+  </data>
+  <data name="Tag_Name_Required" xml:space="preserve">
+    <value>Le nom du tag est requis</value>
+  </data>
+  <data name="TimeSlot_From_CannotBe_GreaterOrEqualThan" xml:space="preserve">
+    <value>L'heure de début ne peut pas être supérieur ou égale à {0} heures</value>
+  </data>
+  <data name="TimeSlot_To_CannotBe_GreaterOrEqualThan" xml:space="preserve">
+    <value>L'heure de fin ne peut pas être supérieur ou égale à {0} heures</value>
+  </data>
+  <data name="TimeSlot_From_CannotBe_GreaterOrEqualThan_To" xml:space="preserve">
+    <value>L'heure de début ne peut pas être supérieur ou égale à l'heure de fin</value>
+  </data>
+  <data name="UserPoints_Quantity_CannotBe_LowerThan" xml:space="preserve">
+    <value>Le nombre de points pour l'utilisateur ne peut être inférieur ou égale à {0}</value>
+  </data>
+  <data name="UserPoints_User_Required" xml:space="preserve">
+    <value>L'utilisateur pour les points est requis</value>
+  </data>
+  <data name="UserPoints_Scoring_Matching_ActionPoints_NotFound" xml:space="preserve">
+    <value>La correspondance de niveau en fonction des points est introuvable</value>
+  </data>
+  <data name="Unauthorized" xml:space="preserve">
+    <value>L'accès n'est pas autorisé, votre session a peut-être expirée, ou vos droits ne sont pas suffisants</value>
+  </data>
+  <data name="Validation" xml:space="preserve">
+    <value>Les données reçues sont invalides ou invalides, veuillez vérifier les données saisies.</value>
+  </data>
+  <data name="BadRequest" xml:space="preserve">
+    <value>La requête reçue est invalide, veuillez rafraichir la page et réessayer votre demande.</value>
+  </data>
+  <data name="Conflict" xml:space="preserve">
+    <value>{0} a été modifié(e) depuis votre dernière requête, veuillez rafraichir la page et réexecuter votre demande.</value>
+  </data>
+  <data name="Forbidden" xml:space="preserve">
+    <value>Vous n'êtes pas autorisé a accéder à cette ressource</value>
+  </data>
+  <data name="Locked" xml:space="preserve">
+    <value>{0} est actuellement vérouillé(e)</value>
+  </data>
+  <data name="NotFound" xml:space="preserve">
+    <value>{0} est introuvable</value>
+  </data>
+  <data name="Gone" xml:space="preserve">
+    <value>{0} n'est plus accessible, elle a été supprimée</value>
+  </data>
+  <data name="Unexpected" xml:space="preserve">
+    <value>Une erreur innatendue est survenue, renouvellez votre demande. Si l'erreur persiste, contactez notre support.</value>
+  </data>
+  <data name="Address" xml:space="preserve">
+    <value>Adresse</value>
+  </data>
+  <data name="Address_NotFound" xml:space="preserve">
+    <value>L'adresse {0} est introuvable</value>
+  </data>
+  <data name="Address_Gone" xml:space="preserve">
+    <value>L'adresse {0} n'est plus disponible</value>
+  </data>
+  <data name="Agreement" xml:space="preserve">
+    <value>Accord</value>
+  </data>
+  <data name="Agreement_NotFound" xml:space="preserve">
+    <value>L'accord {0} est introuvable</value>
+  </data>
+  <data name="Agreement_Gone" xml:space="preserve">
+    <value>L'accord {0} n'est plus disponible</value>
+  </data>
+  <data name="Company" xml:space="preserve">
+    <value>Société</value>
+  </data>
+  <data name="Company_NotFound" xml:space="preserve">
+    <value>La société {0} est introuvable</value>
+  </data>
+  <data name="Company_Gone" xml:space="preserve">
+    <value>La société {0} n'est plus disponible</value>
+  </data>
+  <data name="DeliveryMode" xml:space="preserve">
+    <value>Mode de livraison</value>
+  </data>
+  <data name="DeliveryMode_NotFound" xml:space="preserve">
+    <value>Le mode de livraison {0} est introuvable</value>
+  </data>
+  <data name="DeliveryMode_Gone" xml:space="preserve">
+    <value>Le mode de livraison {0} n'est plus disponible</value>
+  </data>
+  <data name="Department" xml:space="preserve">
+    <value>Département</value>
+  </data>
+  <data name="Department_NotFound" xml:space="preserve">
+    <value>Le département {0} est introuvable</value>
+  </data>
+  <data name="Department_Gone" xml:space="preserve">
+    <value>Le département {0} n'est plus disponible</value>
+  </data>
+  <data name="ExpectedDelivery" xml:space="preserve">
+    <value>Livraison attendue</value>
+  </data>
+  <data name="ExpectedDelivery_NotFound" xml:space="preserve">
+    <value>La livraison attendue {0} est introuvable</value>
+  </data>
+  <data name="ExpectedDelivery_Gone" xml:space="preserve">
+    <value>La livraison attendue {0} n'est plus disponible</value>
+  </data>
+  <data name="Job" xml:space="preserve">
+    <value>Tâche</value>
+  </data>
+  <data name="Job_NotFound" xml:space="preserve">
+    <value>La tâche {0} est introuvable</value>
+  </data>
+  <data name="Job_Gone" xml:space="preserve">
+    <value>La tâche {0} n'est plus disponible</value>
+  </data>
+  <data name="Level" xml:space="preserve">
+    <value>Niveau</value>
+  </data>
+  <data name="Level_NotFound" xml:space="preserve">
+    <value>Le niveau {0} est introuvable</value>
+  </data>
+  <data name="Level_Gone" xml:space="preserve">
+    <value>Le niveau {0} n'est plus disponible</value>
+  </data>
+  <data name="Notification" xml:space="preserve">
+    <value>Notification</value>
+  </data>
+  <data name="Notification_NotFound" xml:space="preserve">
+    <value>La notification {0} est introuvable</value>
+  </data>
+  <data name="Notification_Gone" xml:space="preserve">
+    <value>La notification {0} n'est plus disponible</value>
+  </data>
+  <data name="TimeSlot" xml:space="preserve">
+    <value>Plage horaire</value>
+  </data>
+  <data name="TimeSlot_NotFound" xml:space="preserve">
+    <value>La plage horaire {0} est introuvable</value>
+  </data>
+  <data name="TimeSlot_Gone" xml:space="preserve">
+    <value>La plage horaire {0} n'est plus disponible</value>
+  </data>
+  <data name="Packaging" xml:space="preserve">
+    <value>Consigne</value>
+  </data>
+  <data name="Packaging_NotFound" xml:space="preserve">
+    <value>La consigne {0} est introuvable</value>
+  </data>
+  <data name="Packaging_Gone" xml:space="preserve">
+    <value>La consigne {0} n'est plus disponible</value>
+  </data>
+  <data name="Product" xml:space="preserve">
+    <value>Produit</value>
+  </data>
+  <data name="Product_NotFound" xml:space="preserve">
+    <value>Le produit {0} est introuvable</value>
+  </data>
+  <data name="Product_Gone" xml:space="preserve">
+    <value>Le produit {0} n'est plus disponible</value>
+  </data>
+  <data name="PurchaseOrder" xml:space="preserve">
+    <value>Commande</value>
+  </data>
+  <data name="PurchaseOrder_NotFound" xml:space="preserve">
+    <value>La commande {0} est introuvable</value>
+  </data>
+  <data name="PurchaseOrder_Gone" xml:space="preserve">
+    <value>La commande {0} n'est plus disponible</value>
+  </data>
+  <data name="QuickOrder" xml:space="preserve">
+    <value>Commande rapide</value>
+  </data>
+  <data name="QuickOrder_NotFound" xml:space="preserve">
+    <value>La commande rapide {0} n'est plus disponible</value>
+  </data>
+  <data name="QuickOrder_Gone" xml:space="preserve">
+    <value>La commande rapide {0} n'est plus disponible</value>
+  </data>
+  <data name="Rating" xml:space="preserve">
+    <value>Notation</value>
+  </data>
+  <data name="Rating_NotFound" xml:space="preserve">
+    <value>La notation {0} est introuvable</value>
+  </data>
+  <data name="Rating_Gone" xml:space="preserve">
+    <value>La notation {0} n'est plus disponible</value>
+  </data>
+  <data name="Region" xml:space="preserve">
+    <value>Région</value>
+  </data>
+  <data name="Region_NotFound" xml:space="preserve">
+    <value>La région {0} est introuvable</value>
+  </data>
+  <data name="Region_Gone" xml:space="preserve">
+    <value>La région {0} n'est plus disponible</value>
+  </data>
+  <data name="Reward" xml:space="preserve">
+    <value>Récompense</value>
+  </data>
+  <data name="Reward_NotFound" xml:space="preserve">
+    <value>La récompense {0} est introuvable</value>
+  </data>
+  <data name="Reward_Gone" xml:space="preserve">
+    <value>La récompense {0} n'est plus disponible</value>
+  </data>
+  <data name="Sponsoring" xml:space="preserve">
+    <value>Parainage</value>
+  </data>
+  <data name="Sponsoring_NotFound" xml:space="preserve">
+    <value>Le parainage {0} est introuvable</value>
+  </data>
+  <data name="Sponsoring_Gone" xml:space="preserve">
+    <value>Le parainage {0} n'est plus disponible</value>
+  </data>
+  <data name="Tag" xml:space="preserve">
+    <value>Tag</value>
+  </data>
+  <data name="Tag_NotFound" xml:space="preserve">
+    <value>Le tag {0} est introuvable</value>
+  </data>
+  <data name="Tag_Gone" xml:space="preserve">
+    <value>Le tag {0} n'est plus disponible</value>
+  </data>
+  <data name="User" xml:space="preserve">
+    <value>L'utilisateur</value>
+  </data>
+  <data name="User_NotFound" xml:space="preserve">
+    <value>L'utilisateur {0} est introuvable</value>
+  </data>
+  <data name="User_Gone" xml:space="preserve">
+    <value>L'utilisateur {0} n'est plus disponible</value>
+  </data>
+  <data name="UserPoints" xml:space="preserve">
+    <value>Score utilisateur</value>
+  </data>
+  <data name="UserPoints_NotFound" xml:space="preserve">
+    <value>Le score utilisateur {0} est introuvable</value>
+  </data>
+  <data name="UserPoints_Gone" xml:space="preserve">
+    <value>Le score utilisateur {0} n'est plus disponible</value>
+  </data>
+  <data name="Error" xml:space="preserve">
+    <value>Une erreur générique a été générée</value>
+  </data>
+</root>

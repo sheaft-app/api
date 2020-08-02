@@ -1,0 +1,29 @@
+# ASP.NET Core (.NET Framework)
+# Build and test ASP.NET Core projects targeting the full .NET Framework.
+# Add steps that publish symbols, save build artifacts, and more:
+# https://docs.microsoft.com/azure/devops/pipelines/languages/dotnet-core
+
+trigger:
+  batch: true
+  branches:  
+    include:
+      - refs/tags/publish-functions
+      - refs/tags/publish
+
+pool:
+  vmImage: "windows-latest"
+
+steps:
+  - script: |
+      dotnet restore $(System.DefaultWorkingDirectory)/Sheaft.sln
+      dotnet publish $(System.DefaultWorkingDirectory)/Sheaft.Functions/Sheaft.Functions.csproj --configuration Release --output publish_output/Sheaft.Functions/
+  - task: ArchiveFiles@2
+    displayName: "Archive files"
+    inputs:
+      rootFolderOrFile: "$(System.DefaultWorkingDirectory)/publish_output/Sheaft.Functions"
+      includeRootFolder: false
+      archiveFile: "$(System.DefaultWorkingDirectory)/publish_output/Sheaft.Functions/build$(Build.BuildId).zip"
+  - task: PublishBuildArtifacts@1
+    inputs:
+      PathtoPublish: '$(System.DefaultWorkingDirectory)/publish_output/Sheaft.Functions/build$(Build.BuildId).zip'
+      artifactName: 'sheaft-functions'

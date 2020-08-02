@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Sheaft.Core\Sheaft.Core.csproj" />
+    <ProjectReference Include="..\Sheaft.Interop\Sheaft.Interop.csproj" />
+  </ItemGroup>
+
+</Project>
