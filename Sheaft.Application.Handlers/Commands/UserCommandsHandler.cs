@@ -23,7 +23,6 @@ using SixLabors.ImageSharp.Formats.Jpeg;
 using SixLabors.ImageSharp.Processing;
 using SixLabors.Primitives;
 using Sheaft.Models.Inputs;
-using Sheaft.Core.Security;
 using Sheaft.Options;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Logging;
@@ -49,6 +48,7 @@ namespace Sheaft.Application.Handlers
         private readonly AuthOptions _authOptions;
         private readonly ScoringOptions _scoringOptions;
         private readonly HttpClient _httpClient;
+        private readonly RoleOptions _roleOptions;
 
         public UserCommandsHandler(
             IOptionsSnapshot<AuthOptions> authOptions,
@@ -59,8 +59,10 @@ namespace Sheaft.Application.Handlers
             IAppDbContext context,
             IQueueService queuesService,
             IBlobService blobsService,
-            ILogger<UserCommandsHandler> logger) : base(logger)
+            ILogger<UserCommandsHandler> logger, 
+            IOptionsSnapshot<RoleOptions> roleOptions):base(logger)
         {
+            _roleOptions = roleOptions.Value;            
             _authOptions = authOptions.Value;
             _scoringOptions = scoringOptions.Value;
             _context = context;
@@ -82,16 +84,27 @@ namespace Sheaft.Application.Handlers
                 if (entity != null)
                     return ConflictResult<Guid>(MessageKind.RegisterOwner_User_AlreadyExists);
 
-                if (request.Roles.Contains(RoleIds.PRODUCER) && request.Roles.Contains(RoleIds.STORE))
+                if (request.Roles.Contains(_roleOptions.Producer.Value) && request.Roles.Contains(_roleOptions.Store.Value))
                     return BadRequestResult<Guid>(MessageKind.RegisterOwner_User_CannotBe_ProducerAndStoreRoles);
 
-                var roles = request.Roles.ToList();
-                if (!request.Roles.Contains(RoleIds.OWNER))
+                var roles = new List<Guid>();
+
+                if (!request.Roles.Contains(_roleOptions.Owner.Value))
                 {
-                    roles.Add(RoleIds.OWNER);
+                    roles.Add(_roleOptions.Owner.Id);
                 }
 
-                var oidcUser = new IdentityUserInput(request.Id, request.Email, request.FirstName, request.LastName, roles.Select(Guid.Parse))
+                if (request.Roles.Contains(_roleOptions.Producer.Value))
+                {
+                    roles.Add(_roleOptions.Producer.Id);
+                }
+
+                if (request.Roles.Contains(_roleOptions.Store.Value))
+                {
+                    roles.Add(_roleOptions.Store.Id);
+                }
+
+                var oidcUser = new IdentityUserInput(request.Id, request.Email, request.FirstName, request.LastName, roles)
                 {
                     Phone = request.Phone,
                     Picture = request.Picture
@@ -130,11 +143,11 @@ namespace Sheaft.Application.Handlers
         {
             return await ExecuteAsync(async () =>
             {
-                var entity = await _context.FindByIdAsync<User>(request.Id, token);
+                var entity = await _context.FindSingleAsync<User>(r => r.Id == request.Id || r.Email == request.Email, token);
                 if (entity != null)
                     return ConflictResult<Guid>(MessageKind.RegisterConsumer_User_AlreadyExists);
 
-                var oidcUser = new IdentityUserInput(request.Id, request.Email, request.FirstName, request.LastName, new List<Guid> { Guid.Parse(RoleIds.CONSUMER) }) 
+                var oidcUser = new IdentityUserInput(request.Id, request.Email, request.FirstName, request.LastName, new List<Guid> { _roleOptions.Consumer.Id }) 
                 { 
                     Phone = request.Phone, 
                     Picture = request.Picture 

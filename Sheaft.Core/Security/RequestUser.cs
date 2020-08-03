@@ -18,7 +18,6 @@ namespace Sheaft.Core.Security
         {
         }
 
-
         public RequestUser(Guid? id, string name, string email, IEnumerable<string> roles, Guid? companyId = null, string requestId = null)
         {
             Id = id ?? Guid.Empty;

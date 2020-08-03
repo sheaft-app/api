@@ -24,11 +24,19 @@ namespace Sheaft.Application.Queries
         private readonly IAppDbContext _context;
         private readonly IDapperContext _dapper;
         private readonly ScoringOptions _scoringOptions; 
+        private readonly RoleOptions _roleOptions; 
         private readonly AutoMapper.IMapper _mapper;
         private readonly AutoMapper.IConfigurationProvider _configurationProvider;
 
-        public LeaderboardQueries(IOptionsSnapshot<ScoringOptions> scoringOptions, IAppDbContext context, IDapperContext dapper, AutoMapper.IMapper mapper, AutoMapper.IConfigurationProvider configurationProvider)
+        public LeaderboardQueries(
+            IOptionsSnapshot<ScoringOptions> scoringOptions,
+            IOptionsSnapshot<RoleOptions> roleOptions, 
+            IAppDbContext context, 
+            IDapperContext dapper, 
+            AutoMapper.IMapper mapper, 
+            AutoMapper.IConfigurationProvider configurationProvider)
         {
+            _roleOptions = roleOptions.Value;
             _mapper = mapper;
             _configurationProvider = configurationProvider;
             _scoringOptions = scoringOptions.Value;
@@ -40,7 +48,7 @@ namespace Sheaft.Application.Queries
         {
             try
             {
-                if (!currentUser.IsInRole(RoleNames.CONSUMER))
+                if (!currentUser.IsInRole(_roleOptions.Consumer.Value))
                     return null;
 
                 var user = await _context.FindByIdAsync<User>(id, token);

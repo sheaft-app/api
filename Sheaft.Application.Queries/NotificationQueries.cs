@@ -4,11 +4,12 @@ using System.Linq;
 using Sheaft.Infrastructure.Interop;
 using Sheaft.Models.Dto;
 using Sheaft.Interop;
-using Sheaft.Core.Security;
 using Sheaft.Core.Extensions;
 using Sheaft.Domain.Models;
 using AutoMapper.QueryableExtensions;
 using Sheaft.Infrastructure;
+using Microsoft.Extensions.Options;
+using Sheaft.Options;
 
 namespace Sheaft.Application.Queries
 {
@@ -16,9 +17,11 @@ namespace Sheaft.Application.Queries
     {
         private readonly IAppDbContext _context;
         private readonly AutoMapper.IConfigurationProvider _configurationProvider;
+        private readonly RoleOptions _roleOptions;
 
-        public NotificationQueries(IAppDbContext context, AutoMapper.IConfigurationProvider configurationProvider)
+        public NotificationQueries(IAppDbContext context, AutoMapper.IConfigurationProvider configurationProvider, IOptionsSnapshot<RoleOptions> roleOptions)
         {
+            _roleOptions = roleOptions.Value;
             _context = context;
             _configurationProvider = configurationProvider;
         }
@@ -27,7 +30,7 @@ namespace Sheaft.Application.Queries
         {
             try
             {
-                if (currentUser.IsInRole(RoleNames.CONSUMER))
+                if (currentUser.IsInRole(_roleOptions.Consumer.Value))
                     return _context.Notifications
                         .Get(c => c.Id == id && c.User.Id == currentUser.Id)
                         .ProjectTo<NotificationDto>(_configurationProvider);
@@ -46,7 +49,7 @@ namespace Sheaft.Application.Queries
         {
             try
             {
-                if (currentUser.IsInRole(RoleNames.CONSUMER))
+                if (currentUser.IsInRole(_roleOptions.Consumer.Value))
                     return _context.Notifications
                         .Get(c => c.User != null && c.User.Id == currentUser.Id)
                         .ProjectTo<NotificationDto>(_configurationProvider);

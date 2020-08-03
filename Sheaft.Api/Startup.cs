@@ -1,6 +1,4 @@
-﻿using IdentityServer4.AccessTokenValidation;
-using MediatR;
-using Microsoft.AspNetCore.Authorization;
+﻿﻿using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -13,8 +11,6 @@ using Microsoft.Extensions.Hosting;
 using Sheaft.Application.Commands;
 using Sheaft.Infrastructure;
 using Sheaft.Infrastructure.Interop;
-using System;
-using System.IdentityModel.Tokens.Jwt;
 using Sheaft.Services;
 using Microsoft.Azure.Search;
 using System.Reflection;
@@ -39,19 +35,25 @@ using System.Globalization;
 using Microsoft.AspNetCore.Localization;
 using AspNetCoreRateLimit;
 using Microsoft.Extensions.Logging;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using System;
+using IdentityModel;
+using System.IdentityModel.Tokens.Jwt;
 
 namespace Sheaft.Api
 {
     public class Startup
     {
-        readonly string MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
+        private readonly string MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
+        
+        public IConfiguration Configuration { get; }
+        public IWebHostEnvironment Env { get; }
 
-        public Startup(IConfiguration configuration)
+        public Startup(IWebHostEnvironment environment, IConfiguration configuration)
         {
+            Env = environment;
             Configuration = configuration;
         }
-
-        public IConfiguration Configuration { get; }
 
         public void ConfigureServices(IServiceCollection services)
         {
@@ -62,12 +64,14 @@ namespace Sheaft.Api
             var sendgridSettings = Configuration.GetSection(SendgridOptions.SETTING);
             var searchSettings = Configuration.GetSection(SearchOptions.SETTING);
             var databaseSettings = Configuration.GetSection(DatabaseOptions.SETTING);
+            var roleSettings = Configuration.GetSection(RoleOptions.SETTING);
 
             services.Configure<AuthOptions>(authSettings);
             services.Configure<CorsOptions>(corsSettings);
             services.Configure<SendgridOptions>(sendgridSettings);
             services.Configure<SearchOptions>(searchSettings);
             services.Configure<DatabaseOptions>(databaseSettings);
+            services.Configure<RoleOptions>(roleSettings);
 
             services.Configure<ApiOptions>(Configuration.GetSection(ApiOptions.SETTING));
             services.Configure<FreshdeskOptions>(Configuration.GetSection(FreshdeskOptions.SETTING));
@@ -83,13 +87,9 @@ namespace Sheaft.Api
 
             JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
 
+            var rolesOptions = roleSettings.Get<RoleOptions>();
             services.AddAuthorization(options =>
             {
-                options.AddPolicy(Policies.API, builder =>
-                {
-                    builder.RequireScope("api.all");
-                    builder.RequireAuthenticatedUser();
-                });
                 options.AddPolicy(Policies.AUTHENTICATED, builder =>
                 {
                     builder.RequireAuthenticatedUser();
@@ -97,37 +97,37 @@ namespace Sheaft.Api
                 options.AddPolicy(Policies.REGISTERED, builder =>
                 {
                     builder.RequireAuthenticatedUser();
-                    builder.RequireRole(RoleNames.PRODUCER, RoleNames.STORE, RoleNames.CONSUMER);
+                    builder.RequireRole(rolesOptions.Producer.Value, rolesOptions.Store.Value, rolesOptions.Consumer.Value);
                 });
                 options.AddPolicy(Policies.STORE_OR_PRODUCER, builder =>
                 {
                     builder.RequireAuthenticatedUser();
-                    builder.RequireRole(RoleNames.PRODUCER, RoleNames.STORE);
+                    builder.RequireRole(rolesOptions.Producer.Value, rolesOptions.Store.Value);
                 });
                 options.AddPolicy(Policies.UNREGISTERED, builder =>
                 {
                     builder.RequireAuthenticatedUser();
-                    builder.RequireRole(RoleNames.ANONYMOUS);
+                    builder.RequireRole(rolesOptions.Anonymous.Value);
                 });
                 options.AddPolicy(Policies.OWNER, builder =>
                 {
                     builder.RequireAuthenticatedUser();
-                    builder.RequireRole(RoleNames.OWNER);
+                    builder.RequireRole(rolesOptions.Owner.Value);
                 });
                 options.AddPolicy(Policies.PRODUCER, builder =>
                 {
                     builder.RequireAuthenticatedUser();
-                    builder.RequireRole(RoleNames.PRODUCER);
+                    builder.RequireRole(rolesOptions.Producer.Value);
                 });
                 options.AddPolicy(Policies.STORE, builder =>
                 {
                     builder.RequireAuthenticatedUser();
-                    builder.RequireRole(RoleNames.STORE);
+                    builder.RequireRole(rolesOptions.Store.Value);
                 });
                 options.AddPolicy(Policies.CONSUMER, builder =>
                 {
                     builder.RequireAuthenticatedUser();
-                    builder.RequireRole(RoleNames.CONSUMER);
+                    builder.RequireRole(rolesOptions.Consumer.Value);
                 });
             });
 
@@ -137,14 +137,14 @@ namespace Sheaft.Api
             });
 
             var authConfig = authSettings.Get<AuthOptions>();
-            services.AddAuthentication(IdentityServerAuthenticationDefaults.AuthenticationScheme)
-                .AddCookie()
-                .AddIdentityServerAuthentication(options =>
+            services
+                .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                .AddJwtBearer(options =>
                 {
                     options.Authority = authConfig.Url;
-                    options.ApiName = authConfig.ApiName;
-                    options.EnableCaching = authConfig.Caching;
-                    options.CacheDuration = TimeSpan.FromSeconds(authConfig.CacheDurationInSeconds);
+                    options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters {  RoleClaimType = JwtClaimTypes.Role, ValidateAudience = false };
+                    //options.EnableCaching = authConfig.Caching;
+                    //options.CacheDuration = TimeSpan.FromSeconds(authConfig.CacheDurationInSeconds);
                 });
 
             services.Configure<ApiBehaviorOptions>(options =>
@@ -257,7 +257,7 @@ namespace Sheaft.Api
                 config.AddEventSourceLogger();
                 config.AddApplicationInsights();
 
-                if (Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == Environments.Development)
+                if (Env.IsDevelopment())
                 {
                     config.AddConsole();
                 }

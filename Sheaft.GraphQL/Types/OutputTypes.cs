@@ -1,5 +1,6 @@
 using HotChocolate.Types;
 using HotChocolate.Types.Relay;
+using Microsoft.Extensions.Options;
 using Sheaft.Application.Queries;
 using Sheaft.Core.Extensions;
 using Sheaft.Core.Security;
@@ -7,6 +8,7 @@ using Sheaft.GraphQL.Types.Enums;
 using Sheaft.GraphQL.Types.Filters;
 using Sheaft.GraphQL.Types.Sorts;
 using Sheaft.Models.Dto;
+using Sheaft.Options;
 
 namespace Sheaft.GraphQL.Types
 {
@@ -792,11 +794,13 @@ namespace Sheaft.GraphQL.Types
                 .Type<NonNullType<BooleanType>>()
                 .Resolver(async c =>
                 {
+                    var roleOptions = c.Resolver<IOptionsSnapshot<RoleOptions>>();
+
                     var user = GetRequestUser(c.ContextData);
                     if (!user.IsAuthenticated)
                         return false;
 
-                    if (!user.IsInRole(RoleNames.CONSUMER))
+                    if (!user.IsInRole(roleOptions.Value.Consumer.Value))
                         return false;
 
                     return await c.Service<IProductQueries>().ProductIsRatedByUserAsync(c.Parent<ProductDto>().Id, user.Id, user, c.RequestAborted);

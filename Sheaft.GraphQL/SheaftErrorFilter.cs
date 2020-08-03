@@ -37,7 +37,7 @@ namespace Sheaft.GraphQL
                 {
                     foreach (var exError in exc.Errors)
                     {
-                        error = error.AddExtension(exc.Kind.ToString("G"), _localizer[exError.Key.ToString("G"), exError.Value]);
+                        error = error.AddExtension(exc.Kind.ToString("G"), _localizer[exError.Key.ToString("G"), exError.Value ?? new object[]{}]);
                     }
                 }
 

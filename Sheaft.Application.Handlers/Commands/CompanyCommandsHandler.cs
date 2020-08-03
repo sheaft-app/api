@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 using MediatR;
 using Sheaft.Core;
 using System.Linq;
-using Sheaft.Exceptions;
 using System.Collections.Generic;
 using Sheaft.Interop.Enums;
 using System.Text.RegularExpressions;
@@ -17,8 +16,9 @@ using SixLabors.ImageSharp.Processing;
 using SixLabors.ImageSharp.Formats.Jpeg;
 using SixLabors.Primitives;
 using Sheaft.Services.Interop;
-using Sheaft.Core.Security;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using Sheaft.Options;
 
 namespace Sheaft.Application.Handlers
 {
@@ -34,14 +34,17 @@ namespace Sheaft.Application.Handlers
         private readonly IAppDbContext _context;
         private readonly IQueueService _queuesService;
         private readonly IBlobService _blobsService;
+        private readonly RoleOptions _roleOptions;
 
         public CompanyCommandsHandler(
-            IMediator mediator, 
-            IAppDbContext context, 
-            IQueueService queuesService, 
+            IMediator mediator,
+            IAppDbContext context,
+            IQueueService queuesService,
             IBlobService blobsService,
-            ILogger<CompanyCommandsHandler> logger) : base(logger)
+            ILogger<CompanyCommandsHandler> logger,
+            IOptionsSnapshot<RoleOptions> roleOptions) : base(logger)
         {
+            _roleOptions = roleOptions.Value;
             _blobsService = blobsService;
             _queuesService = queuesService;
             _mediator = mediator;
@@ -54,11 +57,11 @@ namespace Sheaft.Application.Handlers
             {
                 using (var transaction = await _context.Database.BeginTransactionAsync(token))
                 {
-                    if (!request.Owner.Roles.Contains(RoleIds.PRODUCER) && !request.Owner.Roles.Contains(RoleIds.STORE))
+                    if (!request.Owner.Roles.Contains(_roleOptions.Producer.Value) && !request.Owner.Roles.Contains(_roleOptions.Store.Value))
                         return ValidationResult<Guid>(MessageKind.RegisterCompany_CannotContains_ProducerAndStoreRoles);
 
                     var kind = ProfileKind.Producer;
-                    if (request.Owner.Roles.Contains(RoleIds.STORE))
+                    if (request.Owner.Roles.Contains(_roleOptions.Store.Value))
                     {
                         kind = ProfileKind.Store;
                     }
@@ -196,7 +199,7 @@ namespace Sheaft.Application.Handlers
 
                 var base64Data = Regex.Match(request.Picture, @"data:image/(?<type>.+?),(?<data>.+)").Groups["data"].Value;
                 var bytes = Convert.FromBase64String(base64Data);
-                
+
                 using (Image image = Image.Load(bytes))
                 {
                     using (var blobStream = new MemoryStream())

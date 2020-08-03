@@ -8,12 +8,10 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using SendGrid;
 using Sheaft.Options;
 using Sheaft.Services;
 using Sheaft.Services.Interop;
 using Sheaft.Signalr.Controllers;
-using System;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -24,12 +22,14 @@ namespace Sheaft.Signalr
     {
         readonly string MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
 
-        public Startup(IConfiguration configuration)
+        public IConfiguration Configuration { get; }
+        public IWebHostEnvironment Env { get; }
+
+        public Startup(IWebHostEnvironment environment, IConfiguration configuration)
         {
+            Env = environment;
             Configuration = configuration;
         }
-
-        public IConfiguration Configuration { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
@@ -102,46 +102,6 @@ namespace Sheaft.Signalr
                     }
                 };
             });
-                //.AddIdentityServerAuthentication(options =>
-                //{
-                //    options.Authority = Configuration.GetValue<string>("Urls:Auth");
-                //    options.ApiName = "api";
-                //    options.EnableCaching = true;
-                //    options.CacheDuration = TimeSpan.FromMinutes(5);
-                //    options.Events = new JwtBearerEvents
-                //    {
-                //        OnMessageReceived = context =>
-                //        {
-                //            var accessToken = context.Request.Query["access_token"];
-
-                //            // If the request is for our hub...
-                //            var path = context.HttpContext.Request.Path;
-                //            if (!string.IsNullOrEmpty(accessToken) &&
-                //                (path.StartsWithSegments("/hubs/sheaft")))
-                //            {
-                //                // Read the token out of the query string
-                //                context.Token = accessToken;
-                //            }
-                //            return Task.CompletedTask;
-                //        },
-                //        OnAuthenticationFailed = context =>
-                //        {
-                //            return Task.CompletedTask;
-                //        },
-                //        OnChallenge = context =>
-                //        {
-                //            return Task.CompletedTask;
-                //        },
-                //        OnForbidden = context =>
-                //        {
-                //            return Task.CompletedTask;
-                //        },
-                //        OnTokenValidated = context =>
-                //        {
-                //            return Task.CompletedTask;
-                //        }
-                //    };
-                //});
 
             services.AddSingleton<IUserIdProvider, NameUserIdProvider>();
 
@@ -159,7 +119,7 @@ namespace Sheaft.Signalr
                 config.AddEventSourceLogger();
                 config.AddApplicationInsights();
 
-                if (Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == Environments.Development)
+                if (Env.IsDevelopment())
                 {
                     config.AddConsole();
                 }
@@ -167,9 +127,9 @@ namespace Sheaft.Signalr
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app)
         {
-            if (env.IsDevelopment())
+            if (Env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
             }
