@@ -128,10 +128,11 @@ namespace Sheaft.Application.Handlers
 
         protected CommandResult<T> CommandFailed<T>(SheaftException exception, MessageKind? message = null)
         {
+            Logger.LogTrace(nameof(CommandsHandler.CommandFailed), exception, message);
+
             if (message.HasValue)
                 return new CommandResult<T>(message.Value, exception);
 
-            Logger.LogTrace(nameof(CommandsHandler.CommandFailed), exception, message);
             return new CommandResult<T>(exception);
         }
 
@@ -166,7 +167,6 @@ namespace Sheaft.Application.Handlers
             Logger.LogTrace(nameof(CommandsHandler.AcceptedResult), result, message);
             return new CommandResult<IEnumerable<T>>(true, result, message);
         }
-
 
         protected async Task<CommandResult<T>> ExecuteAsync<T>(Func<Task<CommandResult<T>>> method)
         {
