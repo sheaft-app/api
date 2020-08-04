@@ -39,7 +39,7 @@ namespace Sheaft.Application.Handlers
         {
             return await ExecuteAsync(async () =>
             {                
-                var regex = new Regex(@"^[\w\.\-\+]+\@[\w\-]+\.\w{2,}+$");
+                var regex = new Regex(@"^[\w\.\-\+]+\@[\w\-]+\.\w{2,}$");
                 if (!regex.Match(request.Email).Success)
                     return ValidationResult<bool>(MessageKind.EmailProvider_Newsletter_Email_Invalid);
 
