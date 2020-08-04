@@ -128,7 +128,7 @@ namespace Sheaft.Application.Queries
                         {
                             Id = agreement.Delivery.Id,
                             Kind = agreement.Delivery.Kind,
-                            Address = new AddressDto
+                            Address = agreement.Delivery.Address != null ? new AddressDto
                             {
                                 City = agreement.Delivery.Address.City,
                                 Latitude = agreement.Delivery.Address.Latitude,
@@ -136,7 +136,7 @@ namespace Sheaft.Application.Queries
                                 Line2 = agreement.Delivery.Address.Line2,
                                 Longitude = agreement.Delivery.Address.Longitude,
                                 Zipcode = agreement.Delivery.Address.Zipcode
-                            },
+                            } : null,
                             Name = agreement.Delivery.Name,
                             DeliveryHours = GetAvailableDeliveryHours(agreement.SelectedHours, agreement.Delivery.LockOrderHoursBeforeDelivery, currentDate),
                         });
