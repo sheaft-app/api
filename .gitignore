@@ -7,3 +7,4 @@
 **/PublishProfiles/**
 Sheaft.Api/appsettings.Development.json
 Sheaft.Signalr/appsettings.Development.json
+Sheaft.Functions/appsettings.Development.json
