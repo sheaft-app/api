@@ -20,7 +20,7 @@ as
      , r.Phone as producer_phone
      , ra.Zipcode as producer_zipcode
      , ra.City as producer_city
-	 , dbo.GetProductImage(p.Id, p.image, r.Id, STRING_AGG(LOWER(t.Name), ',')) as product_image
+	 , dbo.GetProductImage(p.Id, p.image, r.Id, STRING_AGG(LOWER(case when t.Kind = 0 then t.Name end), ',')) as product_image
      , dbo.InlineMax(dbo.InlineMax(dbo.InlineMax(p.UpdatedOn, r.UpdatedOn), t.UpdatedOn), p.CreatedOn) as last_update
      , case when (dbo.InlineMax(p.RemovedOn, r.RemovedOn)) is null and p.Available = 1 then 0 else 1 end as removed
      , '[' + STRING_AGG('\"' + LOWER(t.Name) + '\"', ',') + ']' as product_tags     
