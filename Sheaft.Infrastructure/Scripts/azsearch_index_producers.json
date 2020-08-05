@@ -1,3 +1,4 @@
+POST https://sheaft.search.windows.net/indexes?api-version=2020-06-30
 {
   "name": "producers",
   "fields": [
@@ -243,6 +244,9 @@
     }
   ],
   "suggesters": [],
+  "similarity": {
+    "@odata.type": "#Microsoft.Azure.Search.BM25Similarity"
+  },
   "scoringProfiles": [],
   "defaultScoringProfile": "",
   "corsOptions": null,
@@ -280,4 +284,27 @@
     }
   ],
   "tokenizers": []
+}
+
+POST https://sheaft.search.windows.net/indexers?api-version=2020-06-30
+{
+  "name": "producers-indexer",
+  "description": "",
+  "dataSourceName": "producers",
+  "skillsetName": null,
+  "targetIndexName": "producers",
+  "disabled": null,
+  "schedule": {
+    "interval": "PT5M",
+    "startTime": "2020-08-05T12:04:04Z"
+  },
+  "parameters": {
+    "batchSize": null,
+    "maxFailedItems": 0,
+    "maxFailedItemsPerBatch": 0,
+    "base64EncodeKeys": false,
+    "configuration": {}
+  },
+  "fieldMappings": [],
+  "outputFieldMappings": []
 }
