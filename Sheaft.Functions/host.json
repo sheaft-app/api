@@ -1,7 +1,11 @@
 {
-  "Values": {
-    "AzureWebJobsStorage": "##REPLACE##",
-    "FUNCTIONS_WORKER_RUNTIME": "dotnet"
-  },
-  "version": "2.0"
+  "version": "2.0",
+  "logging": {
+    "applicationInsights": {
+      "samplingExcludedTypes": "Request",
+      "samplingSettings": {
+        "isEnabled": true
+      }
+    }
+  }
 }
