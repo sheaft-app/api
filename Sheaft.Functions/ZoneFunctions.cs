@@ -21,16 +21,16 @@ namespace Sheaft.Functions
             _mediatr = mediator;
         }
 
-        [FunctionName("UpdateZoneProgressCommand")]
-        public async Task UpdateZoneProgressCommandAsync([TimerTrigger("*/60 * * * *", RunOnStartup = true)] TimerInfo info, ILogger logger, CancellationToken token)
-        {
-            var results = await _mediatr.Send(new UpdateZoneProgressCommand(new RequestUser("zone-functions", Guid.NewGuid().ToString("N"))), token);
-            if (!results.Success)
-            {
-                throw results.Exception;
-            }
+        //[FunctionName("UpdateZoneProgressCommand")]
+        //public async Task UpdateZoneProgressCommandAsync([TimerTrigger("*/60 * * * *", RunOnStartup = true)] TimerInfo info, ILogger logger, CancellationToken token)
+        //{
+        //    var results = await _mediatr.Send(new UpdateZoneProgressCommand(new RequestUser("zone-functions", Guid.NewGuid().ToString("N"))), token);
+        //    if (!results.Success)
+        //    {
+        //        throw results.Exception;
+        //    }
 
-            logger.LogInformation(nameof(ZoneFunctions.UpdateZoneProgressCommandAsync), "successfully executed");
-        }
+        //    logger.LogInformation(nameof(ZoneFunctions.UpdateZoneProgressCommandAsync), "successfully executed");
+        //}
     }
 }
