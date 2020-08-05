@@ -105,7 +105,6 @@ namespace Sheaft.GraphQL
             return await deliveryQueries.GetStoreDeliveriesForProducersAsync(_currentUser.CompanyId, input.Ids, input.Kinds, DateTimeOffset.UtcNow, _currentUser, _cancellationToken);
         }
 
-        [Authorize(Policy = Policies.REGISTERED)]
         [GraphQLName("getDeliveriesForProducers")]
         [GraphQLType(typeof(ListType<ProducerDeliveriesType>))]
         [UseSorting(SortType = typeof(ProducerDeliveriesSortType))]
