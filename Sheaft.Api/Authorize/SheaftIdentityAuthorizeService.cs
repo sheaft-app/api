@@ -14,6 +14,9 @@ using IdentityModel.Client;
 using Microsoft.Extensions.Primitives;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Microsoft.Extensions.Caching.Distributed;
+using System.Runtime.Serialization.Formatters.Binary;
+using System.IO;
 
 namespace Sheaft.Api.Authorize
 {
@@ -29,6 +32,8 @@ namespace Sheaft.Api.Authorize
         private readonly IHttpClientFactory _httpClientFactory;
         private readonly IHttpContextAccessor _accessor;
         private readonly IOptions<AuthOptions> _authOptions;
+        private readonly IDistributedCache _cache;
+        private readonly IOptions<CacheOptions> _cacheOptions;
 
         public SheaftIdentityAuthorizeService(
             IHttpClientFactory httpClientFactory,
@@ -39,8 +44,11 @@ namespace Sheaft.Api.Authorize
             IAuthorizationHandlerContextFactory contextFactory,
             IAuthorizationEvaluator evaluator,
             IOptions<AuthorizationOptions> options,
-            IOptions<AuthOptions> authOptions)
+            IOptions<AuthOptions> authOptions,
+            IOptions<CacheOptions> cacheOptions,
+            IDistributedCache cache)
         {
+            _cache = cache;
             _accessor = accessor;
             _policyProvider = policyProvider;
             _handlers = handlers;
@@ -50,66 +58,103 @@ namespace Sheaft.Api.Authorize
             _options = options;
             _authOptions = authOptions;
             _httpClientFactory = httpClientFactory;
+            _cacheOptions = cacheOptions;
         }
 
         public async Task<AuthorizationResult> AuthorizeAsync(ClaimsPrincipal user, object resource, IEnumerable<IAuthorizationRequirement> requirements)
         {
-            var _httpClient = _httpClientFactory.CreateClient("identityServer");
-            _httpClient.BaseAddress = new Uri(_authOptions.Value.Url);
+            var claims = user.Claims.ToList();
+            var subClaim = claims.FirstOrDefault(c => c.Type == JwtClaimTypes.Subject);
 
-            _accessor.HttpContext.Request.Headers.TryGetValue("Authorization", out StringValues bearer);
-            if (bearer.Any())
+            var cachedUser = user.Identity.IsAuthenticated ? await _cache.GetAsync(user.Identity.Name) : null;
+            if (cachedUser != null)
             {
-                var tokens = bearer[0].Split(" ");
-                if (tokens.Length == 2)
+                List<UserClaim> userClaims = null;
+                using (var ms = new MemoryStream(cachedUser))
                 {
-                    _httpClient.SetToken(tokens[0], tokens[1]);
-                    var request = await _httpClient.GetAsync("/connect/userinfo");
-                    if (request.IsSuccessStatusCode)
+                    var formatter = new BinaryFormatter();
+                    userClaims = (List<UserClaim>)formatter.Deserialize(ms);
+                }
+
+                _accessor.HttpContext.User = new ClaimsPrincipal(new ClaimsIdentity(userClaims.Select(c => new Claim(c.ClaimType, c.ClaimValue, c.ClaimValueType, c.ClaimIssuer, c.ClaimOriginalIssuer, subClaim.Subject)), user.Identity.AuthenticationType, JwtClaimTypes.Subject, JwtClaimTypes.Role));
+            }
+            else
+            {
+                var _httpClient = _httpClientFactory.CreateClient("identityServer");
+                _httpClient.BaseAddress = new Uri(_authOptions.Value.Url);
+
+                _accessor.HttpContext.Request.Headers.TryGetValue("Authorization", out StringValues bearer);
+                if (bearer.Any())
+                {
+                    var tokens = bearer[0].Split(" ");
+                    if (tokens.Length == 2)
                     {
-                        var userInfo = JsonConvert.DeserializeObject<UserInfo>(await request.Content.ReadAsStringAsync());
-
-                        var claims = user.Claims.ToList();
-                        if (userInfo.role != null)
+                        _httpClient.SetToken(tokens[0], tokens[1]);
+                        var request = await _httpClient.GetAsync("/connect/userinfo");
+                        if (request.IsSuccessStatusCode)
                         {
-                            var roles = new List<string>();
-                            if (userInfo.role is string)
+                            var userInfo = JsonConvert.DeserializeObject<UserInfo>(await request.Content.ReadAsStringAsync());
+
+                            if (userInfo.role != null)
                             {
-                                roles.Add(userInfo.role as string);
-                            }
-                            else if(userInfo.role is JArray)
-                            {
-                                var jarr = (JArray)userInfo.role;
-                                foreach (var content in jarr.ToList())
+                                var roles = new List<string>();
+                                if (userInfo.role is string)
                                 {
-                                    roles.Add((string)content); 
+                                    roles.Add(userInfo.role as string);
                                 }
+                                else if (userInfo.role is JArray)
+                                {
+                                    var jarr = (JArray)userInfo.role;
+                                    foreach (var content in jarr.ToList())
+                                    {
+                                        roles.Add((string)content);
+                                    }
+                                }
+
+                                claims.AddRange(roles.Select(r => new Claim(JwtClaimTypes.Role, r)));
                             }
 
-                            claims.AddRange(roles.Select(r => new Claim(JwtClaimTypes.Role, r)));
+                            if (!string.IsNullOrWhiteSpace(userInfo.email))
+                                claims.Add(new Claim(JwtClaimTypes.Email, userInfo.email, null, subClaim.Issuer, subClaim.OriginalIssuer, subClaim.Subject));
+
+                            if (!string.IsNullOrWhiteSpace(userInfo.family_name))
+                                claims.Add(new Claim(JwtClaimTypes.FamilyName, userInfo.family_name, null, subClaim.Issuer, subClaim.OriginalIssuer, subClaim.Subject));
+
+                            if (!string.IsNullOrWhiteSpace(userInfo.given_name))
+                                claims.Add(new Claim(JwtClaimTypes.GivenName, userInfo.given_name, null, subClaim.Issuer, subClaim.OriginalIssuer, subClaim.Subject));
+
+                            if (!string.IsNullOrWhiteSpace(userInfo.name))
+                                claims.Add(new Claim(JwtClaimTypes.Name, userInfo.name, null, subClaim.Issuer, subClaim.OriginalIssuer, subClaim.Subject));
+
+                            if (!string.IsNullOrWhiteSpace(userInfo.picture))
+                                claims.Add(new Claim(JwtClaimTypes.Picture, userInfo.picture, null, subClaim.Issuer, subClaim.OriginalIssuer, subClaim.Subject));
+
+                            if (!string.IsNullOrWhiteSpace(userInfo.preferred_username))
+                                claims.Add(new Claim(JwtClaimTypes.PreferredUserName, userInfo.preferred_username, null, subClaim.Issuer, subClaim.OriginalIssuer, subClaim.Subject));
+
+                            if (!string.IsNullOrWhiteSpace(userInfo.company_id))
+                                claims.Add(new Claim("company_id", userInfo.company_id, null, subClaim.Issuer, subClaim.OriginalIssuer, subClaim.Subject));
+
+                            claims.Add(new Claim(JwtClaimTypes.EmailVerified, userInfo.email_verified.ToString().ToLower(), null, subClaim.Issuer, subClaim.OriginalIssuer, subClaim.Subject));
+
+                            byte[] buffer;
+                            using (var ms = new MemoryStream())
+                            {
+                                var formatter = new BinaryFormatter();
+                                formatter.Serialize(ms, claims.Select(c => new UserClaim
+                                {
+                                    ClaimIssuer = c.Issuer,
+                                    ClaimOriginalIssuer = c.OriginalIssuer,
+                                    ClaimType = c.Type,
+                                    ClaimValue = c.Value,
+                                    ClaimValueType = c.ValueType
+                                }).ToList());
+                                buffer = ms.ToArray();
+                            }
+
+                            await _cache.SetAsync(user.Identity.Name, buffer, new DistributedCacheEntryOptions { AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(_cacheOptions.Value.CacheExpirationInMinutes ?? 5), SlidingExpiration = TimeSpan.FromMinutes(_cacheOptions.Value.CacheExpirationInMinutes ?? 5) });
+                            _accessor.HttpContext.User = new ClaimsPrincipal(new ClaimsIdentity(claims, user.Identity.AuthenticationType, JwtClaimTypes.Subject, JwtClaimTypes.Role));
                         }
-
-                        if(!string.IsNullOrWhiteSpace(userInfo.email))
-                            claims.Add(new Claim(JwtClaimTypes.Email, userInfo.email));
-
-                        if (!string.IsNullOrWhiteSpace(userInfo.family_name))
-                            claims.Add(new Claim(JwtClaimTypes.FamilyName, userInfo.family_name));
-
-                        if (!string.IsNullOrWhiteSpace(userInfo.given_name))
-                            claims.Add(new Claim(JwtClaimTypes.GivenName, userInfo.given_name));
-
-                        if (!string.IsNullOrWhiteSpace(userInfo.name))
-                            claims.Add(new Claim(JwtClaimTypes.Name, userInfo.name));
-
-                        if (!string.IsNullOrWhiteSpace(userInfo.picture))
-                            claims.Add(new Claim(JwtClaimTypes.Picture, userInfo.picture));
-
-                        if (!string.IsNullOrWhiteSpace(userInfo.preferred_username))
-                            claims.Add(new Claim(JwtClaimTypes.PreferredUserName, userInfo.preferred_username));
-
-                        claims.Add(new Claim(JwtClaimTypes.EmailVerified, userInfo.email_verified.ToString().ToLower()));
-
-                        _accessor.HttpContext.User = new ClaimsPrincipal(new ClaimsIdentity(claims, user.Identity.AuthenticationType, JwtClaimTypes.Subject, JwtClaimTypes.Role));
                     }
                 }
             }
@@ -135,6 +180,18 @@ namespace Sheaft.Api.Authorize
             var policy = await _policyProvider.GetPolicyAsync(policyName);
             return await AuthorizeAsync(user, resource, policy.Requirements);
         }
+
+        [Serializable]
+        private class UserClaim
+        {
+            public string ClaimType { get; set; }
+            public string ClaimValue { get; set; }
+            public string ClaimValueType { get; set; }
+            public string ClaimIssuer { get; set; }
+            public string ClaimOriginalIssuer { get; set; }
+        }
+
+        [Serializable]
         private class UserInfo
         {
             public string email { get; set; }
@@ -146,6 +203,7 @@ namespace Sheaft.Api.Authorize
             public string preferred_username { get; set; }
             public object role { get; set; }
             public string sub { get; set; }
+            public string company_id { get; set; }
         }
     }
 }

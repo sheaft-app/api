@@ -1498,10 +1498,33 @@ namespace Sheaft.Infrastructure.Migrations
             migrationBuilder.Sql("CREATE PROCEDURE UserPositionInRegion @RegionId uniqueidentifier, @UserId uniqueidentifier AS  BEGIN    SELECT Points, Position    FROM (       SELECT u.Id, sum(TotalPoints) as Points, Rank()              over (ORDER BY sum(TotalPoints) DESC ) AS Position          FROM dbo.Users u           join dbo.Departments d on d.Uid = u.DepartmentUid          join dbo.Regions r on r.Uid = d.Uid          where r.Id = @RegionId          group by r.Id, u.Id       ) rs     WHERE Id = @UserId END");
             migrationBuilder.Sql("CREATE PROCEDURE UserPositionInCountry @UserId uniqueidentifier AS  BEGIN    SELECT Points, Position    FROM (       SELECT Id, TotalPoints as Points, Rank()              over (ORDER BY TotalPoints DESC ) AS Position          FROM dbo.Users        ) rs     WHERE Id = @UserId END");
 
+            migrationBuilder.Sql("CREATE SCHEMA Cache;");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.Sql("DROP SCHEMA Cache;");
+
+            migrationBuilder.Sql("DROP PROCEDURE UserPositionInCountry;");
+            migrationBuilder.Sql("DROP PROCEDURE UserPositionInRegion;");
+            migrationBuilder.Sql("DROP PROCEDURE UserPositionInDepartement;");
+            migrationBuilder.Sql("DROP PROCEDURE MarkUserNotificationsAsRead;");
+
+            migrationBuilder.Sql("DROP FUNCTION InlineMax;");
+            migrationBuilder.Sql("DROP FUNCTION GetProductImage;");
+
+            migrationBuilder.Sql("DROP VIEW StoresSearch");
+            migrationBuilder.Sql("DROP VIEW ProductsSearch");
+            migrationBuilder.Sql("DROP VIEW ProducersSearch");
+            migrationBuilder.Sql("DROP VIEW ProducersPerDepartment");
+            migrationBuilder.Sql("DROP VIEW StoresPerDepartment");
+            migrationBuilder.Sql("DROP VIEW UserPointsPerDepartment");
+            migrationBuilder.Sql("DROP VIEW UserPointsPerRegion");
+            migrationBuilder.Sql("DROP VIEW UserPointsPerCountry");
+            migrationBuilder.Sql("DROP VIEW PointsPerDepartment");
+            migrationBuilder.Sql("DROP VIEW PointsPerRegion");
+            migrationBuilder.Sql("DROP VIEW PointsPerCountry");
+
             migrationBuilder.DropTable(
                 name: "AgreementSelectedHours");
 

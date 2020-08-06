@@ -26,6 +26,7 @@ using Sheaft.Models.Inputs;
 using Sheaft.Options;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Caching.Distributed;
 
 namespace Sheaft.Application.Handlers
 {
@@ -49,6 +50,7 @@ namespace Sheaft.Application.Handlers
         private readonly ScoringOptions _scoringOptions;
         private readonly HttpClient _httpClient;
         private readonly RoleOptions _roleOptions;
+        private readonly IDistributedCache _cache;
 
         public UserCommandsHandler(
             IOptionsSnapshot<AuthOptions> authOptions,
@@ -60,7 +62,8 @@ namespace Sheaft.Application.Handlers
             IQueueService queuesService,
             IBlobService blobsService,
             ILogger<UserCommandsHandler> logger, 
-            IOptionsSnapshot<RoleOptions> roleOptions):base(logger)
+            IOptionsSnapshot<RoleOptions> roleOptions,
+            IDistributedCache cache) : base(logger)
         {
             _roleOptions = roleOptions.Value;            
             _authOptions = authOptions.Value;
@@ -74,6 +77,7 @@ namespace Sheaft.Application.Handlers
             _httpClient = httpClientFactory.CreateClient("identityServer");
             _httpClient.BaseAddress = new Uri(_authOptions.Url);
             _httpClient.SetToken(_authOptions.Scheme, _authOptions.ApiKey);
+            _cache = cache;
         }
 
         public async Task<CommandResult<Guid>> Handle(RegisterOwnerCommand request, CancellationToken token)
@@ -135,6 +139,7 @@ namespace Sheaft.Application.Handlers
                     await _queuesService.ProcessCommandAsync(CreateUserPointsCommand.QUEUE_NAME, new CreateUserPointsCommand(request.RequestUser) { CreatedOn = DateTimeOffset.UtcNow, Kind = PointKind.Sponsoring, UserId = sponsor.Id }, token);
                 }
 
+                await _cache.RemoveAsync(user.Id.ToString("N"));
                 return CreatedResult(user.Id);
             });
         }
@@ -180,6 +185,7 @@ namespace Sheaft.Application.Handlers
                     await _queuesService.ProcessCommandAsync(CreateUserPointsCommand.QUEUE_NAME, new CreateUserPointsCommand(request.RequestUser) { CreatedOn = DateTimeOffset.UtcNow, Kind = PointKind.Sponsoring, UserId = sponsor.Id }, token);
                 }
 
+                await _cache.RemoveAsync(user.Id.ToString("N"));
                 return CreatedResult(user.Id);
             });
         }
@@ -232,6 +238,7 @@ namespace Sheaft.Application.Handlers
                     return CommandFailed<bool>(new BadRequestException(MessageKind.UpdateUser_Oidc_UpdateProfile_Error, await oidcResult.Content.ReadAsStringAsync().ConfigureAwait(false)));
 
                 var entry = _context.Update(entity);
+                await _cache.RemoveAsync(entity.Id.ToString("N"));
 
                 return OkResult(await _context.SaveChangesAsync(token) > 0);
             });
@@ -293,6 +300,7 @@ namespace Sheaft.Application.Handlers
                     await _context.SaveChangesAsync(token);
                     await transaction.CommitAsync(token);
 
+                    await _cache.RemoveAsync(entity.Id.ToString("N"));
                     await _queuesService.ProcessCommandAsync(RemoveUserDataCommand.QUEUE_NAME, new RemoveUserDataCommand(request.RequestUser) { Id = request.Id, Email = email }, token);
                     return OkResult(true);
                 }

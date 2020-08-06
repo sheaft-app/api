@@ -68,6 +68,7 @@ namespace Sheaft.Api
             var searchSettings = Configuration.GetSection(SearchOptions.SETTING);
             var databaseSettings = Configuration.GetSection(DatabaseOptions.SETTING);
             var roleSettings = Configuration.GetSection(RoleOptions.SETTING);
+            var cacheSettings = Configuration.GetSection(CacheOptions.SETTING);
 
             services.Configure<AuthOptions>(authSettings);
             services.Configure<CorsOptions>(corsSettings);
@@ -75,6 +76,7 @@ namespace Sheaft.Api
             services.Configure<SearchOptions>(searchSettings);
             services.Configure<DatabaseOptions>(databaseSettings);
             services.Configure<RoleOptions>(roleSettings);
+            services.Configure<CacheOptions>(cacheSettings);
 
             services.Configure<ApiOptions>(Configuration.GetSection(ApiOptions.SETTING));
             services.Configure<FreshdeskOptions>(Configuration.GetSection(FreshdeskOptions.SETTING));
@@ -234,7 +236,15 @@ namespace Sheaft.Api
             services.AddErrorFilter<SheaftErrorFilter>();
 
             services.AddApplicationInsightsTelemetry();
-            services.AddDistributedMemoryCache();
+
+            var cacheConfig = cacheSettings.Get<CacheOptions>();
+            services.AddDistributedSqlServerCache(options =>
+            {
+                options.ConnectionString = databaseConfig.ConnectionString;
+                options.SchemaName = cacheConfig.SchemaName;
+                options.TableName = cacheConfig.TableName;
+            });
+
             services.AddOptions();
 
             services.AddLocalization(ops => ops.ResourcesPath = "Resources");
