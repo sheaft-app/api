@@ -76,7 +76,8 @@ namespace Sheaft.Api.Authorize
                     userClaims = (List<UserClaim>)formatter.Deserialize(ms);
                 }
 
-                _accessor.HttpContext.User = new ClaimsPrincipal(new ClaimsIdentity(userClaims.Select(c => new Claim(c.ClaimType, c.ClaimValue, c.ClaimValueType, c.ClaimIssuer, c.ClaimOriginalIssuer, subClaim.Subject)), user.Identity.AuthenticationType, JwtClaimTypes.Subject, JwtClaimTypes.Role));
+                claims.AddRange(userClaims.Select(c => new Claim(c.ClaimType, c.ClaimValue, c.ClaimValueType, c.ClaimIssuer, c.ClaimOriginalIssuer, subClaim.Subject)));
+                _accessor.HttpContext.User = new ClaimsPrincipal(new ClaimsIdentity(claims, user.Identity.AuthenticationType, JwtClaimTypes.Subject, JwtClaimTypes.Role));
             }
             else
             {
@@ -95,6 +96,7 @@ namespace Sheaft.Api.Authorize
                         {
                             var userInfo = JsonConvert.DeserializeObject<UserInfo>(await request.Content.ReadAsStringAsync());
 
+                            var uClaims = new List<Claim>();
                             if (userInfo.role != null)
                             {
                                 var roles = new List<string>();
@@ -111,37 +113,37 @@ namespace Sheaft.Api.Authorize
                                     }
                                 }
 
-                                claims.AddRange(roles.Select(r => new Claim(JwtClaimTypes.Role, r)));
+                                uClaims.AddRange(roles.Select(r => new Claim(JwtClaimTypes.Role, r)));
                             }
 
                             if (!string.IsNullOrWhiteSpace(userInfo.email))
-                                claims.Add(new Claim(JwtClaimTypes.Email, userInfo.email, null, subClaim.Issuer, subClaim.OriginalIssuer, subClaim.Subject));
+                                uClaims.Add(new Claim(JwtClaimTypes.Email, userInfo.email, null, subClaim.Issuer, subClaim.OriginalIssuer, subClaim.Subject));
 
                             if (!string.IsNullOrWhiteSpace(userInfo.family_name))
-                                claims.Add(new Claim(JwtClaimTypes.FamilyName, userInfo.family_name, null, subClaim.Issuer, subClaim.OriginalIssuer, subClaim.Subject));
+                                uClaims.Add(new Claim(JwtClaimTypes.FamilyName, userInfo.family_name, null, subClaim.Issuer, subClaim.OriginalIssuer, subClaim.Subject));
 
                             if (!string.IsNullOrWhiteSpace(userInfo.given_name))
-                                claims.Add(new Claim(JwtClaimTypes.GivenName, userInfo.given_name, null, subClaim.Issuer, subClaim.OriginalIssuer, subClaim.Subject));
+                                uClaims.Add(new Claim(JwtClaimTypes.GivenName, userInfo.given_name, null, subClaim.Issuer, subClaim.OriginalIssuer, subClaim.Subject));
 
                             if (!string.IsNullOrWhiteSpace(userInfo.name))
-                                claims.Add(new Claim(JwtClaimTypes.Name, userInfo.name, null, subClaim.Issuer, subClaim.OriginalIssuer, subClaim.Subject));
+                                uClaims.Add(new Claim(JwtClaimTypes.Name, userInfo.name, null, subClaim.Issuer, subClaim.OriginalIssuer, subClaim.Subject));
 
                             if (!string.IsNullOrWhiteSpace(userInfo.picture))
-                                claims.Add(new Claim(JwtClaimTypes.Picture, userInfo.picture, null, subClaim.Issuer, subClaim.OriginalIssuer, subClaim.Subject));
+                                uClaims.Add(new Claim(JwtClaimTypes.Picture, userInfo.picture, null, subClaim.Issuer, subClaim.OriginalIssuer, subClaim.Subject));
 
                             if (!string.IsNullOrWhiteSpace(userInfo.preferred_username))
-                                claims.Add(new Claim(JwtClaimTypes.PreferredUserName, userInfo.preferred_username, null, subClaim.Issuer, subClaim.OriginalIssuer, subClaim.Subject));
+                                uClaims.Add(new Claim(JwtClaimTypes.PreferredUserName, userInfo.preferred_username, null, subClaim.Issuer, subClaim.OriginalIssuer, subClaim.Subject));
 
                             if (!string.IsNullOrWhiteSpace(userInfo.company_id))
-                                claims.Add(new Claim("company_id", userInfo.company_id, null, subClaim.Issuer, subClaim.OriginalIssuer, subClaim.Subject));
+                                uClaims.Add(new Claim("company_id", userInfo.company_id, null, subClaim.Issuer, subClaim.OriginalIssuer, subClaim.Subject));
 
-                            claims.Add(new Claim(JwtClaimTypes.EmailVerified, userInfo.email_verified.ToString().ToLower(), null, subClaim.Issuer, subClaim.OriginalIssuer, subClaim.Subject));
+                            uClaims.Add(new Claim(JwtClaimTypes.EmailVerified, userInfo.email_verified.ToString().ToLower(), null, subClaim.Issuer, subClaim.OriginalIssuer, subClaim.Subject));
 
                             byte[] buffer;
                             using (var ms = new MemoryStream())
                             {
                                 var formatter = new BinaryFormatter();
-                                formatter.Serialize(ms, claims.Select(c => new UserClaim
+                                formatter.Serialize(ms, uClaims.Select(c => new UserClaim
                                 {
                                     ClaimIssuer = c.Issuer,
                                     ClaimOriginalIssuer = c.OriginalIssuer,
@@ -151,6 +153,8 @@ namespace Sheaft.Api.Authorize
                                 }).ToList());
                                 buffer = ms.ToArray();
                             }
+
+                            claims.AddRange(uClaims);
 
                             await _cache.SetAsync(user.Identity.Name, buffer, new DistributedCacheEntryOptions { AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(_cacheOptions.Value.CacheExpirationInMinutes ?? 5), SlidingExpiration = TimeSpan.FromMinutes(_cacheOptions.Value.CacheExpirationInMinutes ?? 5) });
                             _accessor.HttpContext.User = new ClaimsPrincipal(new ClaimsIdentity(claims, user.Identity.AuthenticationType, JwtClaimTypes.Subject, JwtClaimTypes.Role));
