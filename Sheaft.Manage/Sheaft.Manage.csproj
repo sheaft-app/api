@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <CopyRefAssembliesToPublishDirectory>false</CopyRefAssembliesToPublishDirectory>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" Version="3.1.6" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="3.1.6" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Proxies" Version="3.1.6" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="3.1.6" />
+    <PackageReference Include="SendGrid" Version="9.17.0" />
+    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="6.7.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Sheaft.Core\Sheaft.Core.csproj" />
+    <ProjectReference Include="..\Sheaft.Infrastructure\Sheaft.Infrastructure.csproj" />
+    <ProjectReference Include="..\Sheaft.Options\Sheaft.Options.csproj" />
+  </ItemGroup>
+
+</Project>
