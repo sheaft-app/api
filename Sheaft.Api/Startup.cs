@@ -1,4 +1,4 @@
-﻿﻿using MediatR;
+﻿using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -36,9 +36,11 @@ using Microsoft.AspNetCore.Localization;
 using AspNetCoreRateLimit;
 using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using System;
 using IdentityModel;
 using System.IdentityModel.Tokens.Jwt;
+using Microsoft.IdentityModel.Logging;
+using Microsoft.AspNetCore.Authorization;
+using Sheaft.Api.Authorize;
 
 namespace Sheaft.Api
 {
@@ -57,6 +59,7 @@ namespace Sheaft.Api
 
         public void ConfigureServices(IServiceCollection services)
         {
+            IdentityModelEventSource.ShowPII = true;
             services.AddSingleton<IConfiguration>(Configuration);
 
             var authSettings = Configuration.GetSection(AuthOptions.SETTING);
@@ -138,13 +141,31 @@ namespace Sheaft.Api
 
             var authConfig = authSettings.Get<AuthOptions>();
             services
-                .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                .AddAuthentication(options =>
+                {
+                    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                })
+                //.AddIdentityServerAuthentication(options =>
+                //{
+                //    options.Authority = authConfig.Url;
+                //    options.ApiName = authConfig.ApiName;
+                //    options.EnableCaching = authConfig.Caching;
+                //    options.CacheDuration = TimeSpan.FromSeconds(authConfig.CacheDurationInSeconds);
+                //});
                 .AddJwtBearer(options =>
                 {
                     options.Authority = authConfig.Url;
-                    options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters {  RoleClaimType = JwtClaimTypes.Role, ValidateAudience = false };
-                    //options.EnableCaching = authConfig.Caching;
-                    //options.CacheDuration = TimeSpan.FromSeconds(authConfig.CacheDurationInSeconds);
+                    options.Audience = authConfig.ApiName;
+                    options.RequireHttpsMetadata = false;
+                    options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
+                    {
+                        RequireExpirationTime = true,
+                        ValidateLifetime = true,
+                        RoleClaimType = JwtClaimTypes.Role,
+                        NameClaimType = JwtClaimTypes.Subject,
+                        AuthenticationType = JwtBearerDefaults.AuthenticationScheme
+                    };
                 });
 
             services.Configure<ApiBehaviorOptions>(options =>
@@ -215,14 +236,13 @@ namespace Sheaft.Api
                 .AddMutationType<SheaftMutationType>()
                 .AddQueryType<SheaftQueryType>()
                 .RegisterTypes()
-                .Create(), new QueryExecutionOptions {IncludeExceptionDetails = true});
+                .Create(), new QueryExecutionOptions { IncludeExceptionDetails = true });
 
             services.AddErrorFilter<SheaftErrorFilter>();
 
             services.AddApplicationInsightsTelemetry();
-
-            services.AddMvc(option => option.EnableEndpointRouting = false)
-                .SetCompatibilityVersion(CompatibilityVersion.Latest);
+            services.AddDistributedMemoryCache();
+            services.AddOptions();
 
             services.AddLocalization(ops => ops.ResourcesPath = "Resources");
             services.Configure<RequestLocalizationOptions>(
@@ -239,14 +259,13 @@ namespace Sheaft.Api
                     opts.SupportedUICultures = supportedCultures;
                 });
 
-            services.AddOptions();
-            services.AddMemoryCache();
-
             services.Configure<IpRateLimitOptions>(Configuration.GetSection("IpRateLimiting"));
             services.Configure<IpRateLimitPolicies>(Configuration.GetSection("IpRateLimitPolicies"));
             services.AddSingleton<IIpPolicyStore, MemoryCacheIpPolicyStore>();
             services.AddSingleton<IRateLimitCounterStore, MemoryCacheRateLimitCounterStore>();
             services.AddSingleton<IRateLimitConfiguration, RateLimitConfiguration>();
+
+            services.AddSingleton<IAuthorizationService, SheaftIdentityAuthorizeService>();
 
             services.AddLogging(config =>
             {
@@ -262,6 +281,9 @@ namespace Sheaft.Api
                     config.AddConsole();
                 }
             });
+
+            services.AddMvc(option => option.EnableEndpointRouting = false)
+                .SetCompatibilityVersion(CompatibilityVersion.Latest);
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
