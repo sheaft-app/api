@@ -146,13 +146,6 @@ namespace Sheaft.Api
                     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
                     options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
                 })
-                //.AddIdentityServerAuthentication(options =>
-                //{
-                //    options.Authority = authConfig.Url;
-                //    options.ApiName = authConfig.ApiName;
-                //    options.EnableCaching = authConfig.Caching;
-                //    options.CacheDuration = TimeSpan.FromSeconds(authConfig.CacheDurationInSeconds);
-                //});
                 .AddJwtBearer(options =>
                 {
                     options.Authority = authConfig.Url;
