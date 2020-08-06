@@ -83,8 +83,6 @@ namespace Sheaft.Api
             services.Configure<LandingOptions>(Configuration.GetSection(LandingOptions.SETTING));
             services.Configure<PortalOptions>(Configuration.GetSection(PortalOptions.SETTING));
             services.Configure<ScoringOptions>(Configuration.GetSection(ScoringOptions.SETTING));
-            services.Configure<SearchOptions>(Configuration.GetSection(SearchOptions.SETTING));
-            services.Configure<SendgridOptions>(Configuration.GetSection(SendgridOptions.SETTING));
             services.Configure<SignalrOptions>(Configuration.GetSection(SignalrOptions.SETTING));
             services.Configure<SireneOptions>(Configuration.GetSection(SireneOptions.SETTING));
             services.Configure<SponsoringOptions>(Configuration.GetSection(SponsoringOptions.SETTING));
@@ -151,7 +149,7 @@ namespace Sheaft.Api
                 .AddJwtBearer(options =>
                 {
                     options.Authority = authConfig.Url;
-                    options.Audience = authConfig.ApiName;
+                    options.Audience = authConfig.App.Audience;
                     options.RequireHttpsMetadata = false;
                     options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
                     {

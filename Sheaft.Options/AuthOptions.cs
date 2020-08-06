@@ -6,10 +6,18 @@
         public string Scheme { get; set; }
         public string Url { get; set; }
         public string ApiKey { get; set; }
-        public string ApiName { get; set; }
         public bool Caching { get; set; }
         public int CacheDurationInSeconds { get; set; }
         public AuthActions Actions { get; set; }
+        public AuthClient App { get; set; }
+        public AuthClient Manage { get; set; }
+    }
+
+    public class AuthClient
+    {
+        public string Id { get; set; }
+        public string Audience { get; set; }
+        public string Secret { get; set; }
     }
 
     public class AuthActions
