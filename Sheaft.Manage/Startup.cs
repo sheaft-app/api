@@ -33,6 +33,12 @@ namespace Sheaft.Manage
 
         public void ConfigureServices(IServiceCollection services)
         {
+            services.Configure<CookiePolicyOptions>(options =>
+            {
+                options.CheckConsentNeeded = context => true;
+                options.MinimumSameSitePolicy = SameSiteMode.None;
+            });
+
             var authSettings = Configuration.GetSection(AuthOptions.SETTING);
             var databaseSettings = Configuration.GetSection(DatabaseOptions.SETTING);
             var sendgridSettings = Configuration.GetSection(SendgridOptions.SETTING);
@@ -93,6 +99,7 @@ namespace Sheaft.Manage
                 .AddCookie("Cookies")
                 .AddOpenIdConnect("oidc", options =>
                 {
+                    options.SignInScheme = "Cookies";
                     options.Authority = authConfig.Url;
 
                     options.ClientId = authConfig.Manage.Id;
