@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.IdentityModel.Tokens.Jwt;
+using IdentityModel;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -35,16 +36,34 @@ namespace Sheaft.Manage
             var authSettings = Configuration.GetSection(AuthOptions.SETTING);
             var databaseSettings = Configuration.GetSection(DatabaseOptions.SETTING);
             var sendgridSettings = Configuration.GetSection(SendgridOptions.SETTING);
+            var roleSettings = Configuration.GetSection(RoleOptions.SETTING);
 
+            services.Configure<RoleOptions>(roleSettings);
             services.Configure<AuthOptions>(authSettings);
             services.Configure<DatabaseOptions>(databaseSettings);
             services.Configure<SendgridOptions>(sendgridSettings);
 
+            var rolesOptions = roleSettings.Get<RoleOptions>();
             services.AddAuthorization(options =>
             {
+                options.AddPolicy("Admin", o =>
+                {
+                    o.RequireAuthenticatedUser();
+                    o.RequireRole(rolesOptions.Admin.Value);
+                });
+                options.AddPolicy("Support", o =>
+                {
+                    o.RequireAuthenticatedUser();
+                    o.RequireRole(rolesOptions.Support.Value);
+                });
+                options.AddPolicy("AdminOrSupport", o =>
+                {
+                    o.RequireAuthenticatedUser();
+                    o.RequireRole(rolesOptions.Admin.Value, rolesOptions.Support.Value);
+                });
                 options.FallbackPolicy = new AuthorizationPolicyBuilder()
-                .RequireAuthenticatedUser()
-                .Build();
+                    .RequireAuthenticatedUser()
+                    .Build();
             });
 
             services.Configure<KestrelServerOptions>(options =>
@@ -79,13 +98,22 @@ namespace Sheaft.Manage
                     options.ClientId = authConfig.Manage.Id;
                     options.ClientSecret = authConfig.Manage.Secret;
 
+                    options.UsePkce = true;
                     options.ResponseType = "code";
                     options.SaveTokens = true;
 
-                    //options.Scope.Add("openid");
-                    //options.Scope.Add("offline_access");
+                    options.Scope.Add("openid");
+                    options.Scope.Add("offline_access");
                     options.Scope.Add("role");
                     options.Scope.Add("email");
+
+                    options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
+                    {
+                        RequireExpirationTime = true,
+                        ValidateLifetime = true,
+                        RoleClaimType = JwtClaimTypes.Role,
+                        NameClaimType = JwtClaimTypes.Subject
+                    };
                 });
 
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
@@ -140,6 +168,7 @@ namespace Sheaft.Manage
             app.UseStaticFiles();
 
             app.UseRouting();
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
