@@ -176,6 +176,13 @@ namespace Sheaft.Infrastructure
                         createdOnProperty.CurrentValue = DateTimeOffset.UtcNow;
                 }
 
+                if (entry.State == EntityState.Modified && entry.Entity is ITrackUpdate)
+                {
+                    var updatedOnProperty = entry.Property("UpdatedOn");
+                    if (updatedOnProperty != null)
+                        updatedOnProperty.CurrentValue = DateTimeOffset.UtcNow;
+                }
+
                 if (entry.State == EntityState.Deleted && entry.Entity is ITrackRemove)
                 {
                     var removedOnProperty = entry.Property("RemovedOn");

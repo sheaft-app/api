@@ -11,8 +11,8 @@ namespace Sheaft.Infrastructure
             entity.Property<long>("Uid");
             entity.Property<long>("ProducerUid");
 
-            entity.Property(c => c.CreatedOn).ValueGeneratedOnAdd();
-            entity.Property(c => c.UpdatedOn).IsConcurrencyToken().ValueGeneratedOnUpdate();
+            entity.Property(c => c.CreatedOn);
+            entity.Property(c => c.UpdatedOn).IsConcurrencyToken();
 
             entity.OwnsOne(c => c.Address, cb =>
             {

@@ -12,8 +12,9 @@ namespace Sheaft.Infrastructure
             entity.Property<long>("PurchaseOrderVendorUid");
             entity.Property<long>("PurchaseOrderSenderUid");
 
-            entity.Property(c => c.CreatedOn).ValueGeneratedOnAdd();
-            entity.Property(c => c.UpdatedOn).IsConcurrencyToken().ValueGeneratedOnUpdate();
+            entity.Property(c => c.CreatedOn);
+            entity.Property(c => c.UpdatedOn).IsConcurrencyToken();
+
             entity.Property(o => o.Reference).IsRequired();
             entity.Property(o => o.TotalWholeSalePrice).HasColumnType("decimal(10,2)");
             entity.Property(o => o.TotalVatPrice).HasColumnType("decimal(10,2)");

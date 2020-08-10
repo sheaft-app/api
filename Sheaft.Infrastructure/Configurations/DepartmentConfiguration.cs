@@ -13,8 +13,9 @@ namespace Sheaft.Infrastructure
             entity.Property<long>("RegionUid");
             entity.Property<long>("LevelUid");
 
-            entity.Property(c => c.CreatedOn).ValueGeneratedOnAdd();
-            entity.Property(c => c.UpdatedOn).IsConcurrencyToken().ValueGeneratedOnUpdate();
+            entity.Property(c => c.CreatedOn);
+            entity.Property(c => c.UpdatedOn).IsConcurrencyToken();
+
             entity.Property(c => c.Name).IsRequired();
             entity.Property(c => c.Code).IsRequired();
             entity.Property(c => c.ProducersCount).HasDefaultValue(0);

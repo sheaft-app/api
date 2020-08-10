@@ -12,8 +12,8 @@ namespace Sheaft.Infrastructure
             entity.Property<long>("ProductUid");
             entity.Property<long>("UserUid");
 
-            entity.Property(c => c.CreatedOn).ValueGeneratedOnAdd();
-            entity.Property(c => c.UpdatedOn).IsConcurrencyToken().ValueGeneratedOnUpdate();
+            entity.Property(c => c.CreatedOn);
+            entity.Property(c => c.UpdatedOn).IsConcurrencyToken();
 
             entity.Property(c => c.Value).IsRequired().HasColumnType("decimal(10,2)");
 

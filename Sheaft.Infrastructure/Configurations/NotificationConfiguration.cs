@@ -13,8 +13,8 @@ namespace Sheaft.Infrastructure
             entity.Property<long?>("UserUid");
             entity.Property<long?>("GroupUid");
 
-            entity.Property(c => c.CreatedOn).ValueGeneratedOnAdd();
-            entity.Property(c => c.UpdatedOn).IsConcurrencyToken().ValueGeneratedOnUpdate();
+            entity.Property(c => c.CreatedOn);
+            entity.Property(c => c.UpdatedOn).IsConcurrencyToken();
 
             entity.HasOne(c => c.User).WithMany().HasForeignKey("UserUid").OnDelete(DeleteBehavior.NoAction);
             entity.HasOne(c => c.Group).WithMany().HasForeignKey("GroupUid").OnDelete(DeleteBehavior.NoAction);

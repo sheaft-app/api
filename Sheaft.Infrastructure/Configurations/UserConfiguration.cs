@@ -13,8 +13,9 @@ namespace Sheaft.Infrastructure
             entity.Property<long?>("CompanyUid");
             entity.Property<long?>("DepartmentUid");
 
-            entity.Property(c => c.CreatedOn).ValueGeneratedOnAdd();
-            entity.Property(c => c.UpdatedOn).IsConcurrencyToken().ValueGeneratedOnUpdate();
+            entity.Property(c => c.CreatedOn);
+            entity.Property(c => c.UpdatedOn).IsConcurrencyToken();
+
             entity.Property(c => c.Email).IsRequired();
             entity.Property(c => c.TotalPoints).HasDefaultValue(0);
             entity.Property(c => c.UserType).HasDefaultValue(UserKind.Consumer);
