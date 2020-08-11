@@ -46,5 +46,11 @@ namespace Sheaft.Functions
             var url = origin + _landingOptions.NewsletterUrl;
             return new RedirectResult(url);
         }
+
+        [FunctionName("WarmupCommand")]
+        public async Task WarmupCommand([TimerTrigger("0 */15 * * * *")] TimerInfo info, ILogger logger, CancellationToken token)
+        {
+            logger.LogInformation("Warming functions successfully executed");
+        }
     }
 }
