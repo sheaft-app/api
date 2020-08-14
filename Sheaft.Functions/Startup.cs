@@ -48,6 +48,7 @@ namespace Sheaft.Functions
             builder.Services.Configure<SireneOptions>(configuration.GetSection(SireneOptions.SETTING));
             builder.Services.Configure<SponsoringOptions>(configuration.GetSection(SponsoringOptions.SETTING));
             builder.Services.Configure<StorageOptions>(configuration.GetSection(StorageOptions.SETTING));
+            builder.Services.Configure<ServiceBusOptions>(configuration.GetSection(ServiceBusOptions.SETTING));
 
             builder.Services.BuildServiceProvider();
 

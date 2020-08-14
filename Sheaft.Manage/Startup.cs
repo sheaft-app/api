@@ -49,6 +49,9 @@ namespace Sheaft.Manage
             services.Configure<DatabaseOptions>(databaseSettings);
             services.Configure<SendgridOptions>(sendgridSettings);
 
+            services.Configure<StorageOptions>(Configuration.GetSection(StorageOptions.SETTING));
+            services.Configure<ServiceBusOptions>(Configuration.GetSection(ServiceBusOptions.SETTING));
+
             var rolesOptions = roleSettings.Get<RoleOptions>();
             services.AddAuthorization(options =>
             {

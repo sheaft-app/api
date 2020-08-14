@@ -43,6 +43,7 @@ namespace Sheaft.Signalr
             services.Configure<CorsOptions>(corsSettings);
 
             services.Configure<StorageOptions>(Configuration.GetSection(StorageOptions.SETTING));
+            services.Configure<ServiceBusOptions>(Configuration.GetSection(ServiceBusOptions.SETTING));
 
             var corsConfig = corsSettings.Get<CorsOptions>();
             services.AddCors(options =>
