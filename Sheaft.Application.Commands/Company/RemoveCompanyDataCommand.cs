@@ -4,7 +4,7 @@ namespace Sheaft.Application.Commands
 {
     public class RemoveCompanyDataCommand : Command<string>
     {
-        public const string QUEUE_NAME = "removecompanydata";
+        public const string QUEUE_NAME = "command-companies-removedata";
 
         public RemoveCompanyDataCommand(Interop.IRequestUser user) : base(user)
         {

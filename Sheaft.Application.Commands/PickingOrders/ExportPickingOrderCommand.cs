@@ -5,7 +5,7 @@ namespace Sheaft.Application.Commands
 {
     public class ExportPickingOrderCommand : Command<bool>
     {
-        public const string QUEUE_NAME = "exportpickingorder";
+        public const string QUEUE_NAME = "command-pickingorders-export";
 
         public ExportPickingOrderCommand(Interop.IRequestUser user) : base(user)
         {

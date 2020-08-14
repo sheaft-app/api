@@ -5,7 +5,7 @@ namespace Sheaft.Application.Commands
 {
     public class CreateUserPointsCommand : Command<bool>
     {
-        public const string QUEUE_NAME = "createuserpoints";
+        public const string QUEUE_NAME = "command-users-points-create";
 
         public CreateUserPointsCommand(Interop.IRequestUser user) : base(user)
         {

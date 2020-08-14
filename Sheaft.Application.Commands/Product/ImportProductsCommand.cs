@@ -4,7 +4,7 @@ namespace Sheaft.Application.Commands
 {
     public class ImportProductsCommand : Command<bool>
     {
-        public const string QUEUE_NAME = "importproducts";
+        public const string QUEUE_NAME = "command-products-import";
 
         public ImportProductsCommand(Interop.IRequestUser user) : base(user)
         {

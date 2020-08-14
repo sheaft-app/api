@@ -5,7 +5,7 @@ namespace Sheaft.Application.Events
 {
     public class PurchaseOrderProcessingEvent : Event
     {
-        public const string QUEUE_NAME = "eventpurchaseorderprocessing";
+        public const string QUEUE_NAME = "event-purchaseorders-processing";
 
         public PurchaseOrderProcessingEvent(Interop.IRequestUser user) : base(user)
         {

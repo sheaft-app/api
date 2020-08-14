@@ -5,7 +5,7 @@ namespace Sheaft.Application.Events
 {
     public class UserSponsoredEvent : Event
     {
-        public const string QUEUE_NAME = "usersponsoredevent";
+        public const string QUEUE_NAME = "event-users-sponsored";
         public const string MAILING_TEMPLATE_ID = "";
 
         public UserSponsoredEvent(Interop.IRequestUser user) : base(user)

@@ -4,7 +4,7 @@ namespace Sheaft.Application.Commands
 {
     public class CreateGroupNotificationCommand : Command<Guid>
     {
-        public const string QUEUE_NAME = "creategroupnotification";
+        public const string QUEUE_NAME = "command-notify-group";
 
         public CreateGroupNotificationCommand(Interop.IRequestUser user) : base(user)
         {

@@ -1,14 +1,14 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 
 namespace Sheaft.Application.Commands
 {
-    public class ArchiveJobCommand : Command<bool>
+    public class ArchiveJobsCommand : Command<bool>
     {
-        public ArchiveJobCommand(Interop.IRequestUser user) : base(user)
+        public ArchiveJobsCommand(Interop.IRequestUser user) : base(user)
         {
         }
 
-        public Guid Id { get; set; }
+        public IEnumerable<Guid> Ids { get; set; }
     }
 }
