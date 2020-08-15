@@ -9,10 +9,25 @@
     <div class="container">
         <h1 class="display-4">Companies</h1>
         <br />
-        @if (ViewBag.Removed != null && ViewBag.Removed)
+
+        @if (ViewBag.Removed != null)
         {
             <div class="alert alert-success alert-dismissible fade show" role="alert">
-                <span>Removed successfully</span>
+                <span>Successfully removed company @ViewBag.Removed.Name</span>
+
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <br />
+        }
+
+        @if (ViewBag.Edited != null)
+        {
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                <span>Successfully updated company @ViewBag.Edited.Name</span>
+                <a asp-controller="Companies" asp-action="Edit" asp-route-id="@ViewBag.Edited.Id">View details</a>
+
                 <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>

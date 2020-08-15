@@ -18,15 +18,18 @@ namespace Sheaft.Manage.Controllers
     {
         private readonly ILogger<CompaniesController> _logger;
         private readonly IAppDbContext _context;
+        private readonly IMapper _mapper;
         private readonly IConfigurationProvider _configurationProvider;
 
         public CompaniesController(
             IAppDbContext context,
+            IMapper mapper,
             IConfigurationProvider configurationProvider,
             ILogger<CompaniesController> logger)
         {
             _logger = logger;
             _context = context;
+            _mapper = mapper;
             _configurationProvider = configurationProvider;
         }
 
@@ -52,6 +55,7 @@ namespace Sheaft.Manage.Controllers
                 .ToListAsync(token);
 
             ViewBag.Removed = TempData["Removed"];
+            ViewBag.Edited = TempData["Edited"];
             ViewBag.Page = page;
             ViewBag.Take = take;
             ViewBag.Kind = kind;
@@ -80,8 +84,8 @@ namespace Sheaft.Manage.Controllers
             _context.Update(entity);
             await _context.SaveChangesAsync(token);
 
-            ViewBag.Edited = true;
-            return View(model);
+            TempData["Edited"] = model;
+            return RedirectToAction("Index");
         }
 
         [HttpPost]
@@ -89,17 +93,12 @@ namespace Sheaft.Manage.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete(Guid id, CancellationToken token)
         {
-            var entity = await _context.Companies
-                .AsNoTracking()
-                .Where(c => c.Id == id)
-                .ProjectTo<CompanyDto>(_configurationProvider)
-                .SingleOrDefaultAsync(token);
+            var entity = await _context.Companies.SingleOrDefaultAsync(c => c.Id == id, token);
 
             _context.Remove(entity);
             await _context.SaveChangesAsync(token);
 
-            TempData["Removed"] = true;
-
+            TempData["Removed"] = _mapper.Map<CompanyDto>(entity);
             return RedirectToAction("Index");
         }
     }
