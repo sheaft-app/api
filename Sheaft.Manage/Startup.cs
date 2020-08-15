@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.IdentityModel.Tokens.Jwt;
+using AutoMapper;
 using IdentityModel;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
@@ -16,6 +17,7 @@ using Microsoft.Extensions.Logging;
 using SendGrid;
 using Sheaft.Infrastructure;
 using Sheaft.Infrastructure.Interop;
+using Sheaft.Mappers;
 using Sheaft.Options;
 
 namespace Sheaft.Manage
@@ -65,15 +67,13 @@ namespace Sheaft.Manage
                     o.RequireAuthenticatedUser();
                     o.RequireRole(rolesOptions.Support.Value);
                 });
-                options.AddPolicy("AdminOrSupport", o =>
-                {
-                    o.RequireAuthenticatedUser();
-                    o.RequireRole(rolesOptions.Admin.Value, rolesOptions.Support.Value);
-                });
                 options.FallbackPolicy = new AuthorizationPolicyBuilder()
                     .RequireAuthenticatedUser()
+                    .RequireRole(rolesOptions.Admin.Value, rolesOptions.Support.Value)
                     .Build();
             });
+
+            services.AddAutoMapper(typeof(ProductProfile).Assembly);
 
             services.Configure<KestrelServerOptions>(options =>
             {
@@ -171,7 +171,7 @@ namespace Sheaft.Manage
             }
             else
             {
-                app.UseExceptionHandler("/Home/Error");
+                app.UseExceptionHandler("/Error");
                 app.UseHsts();
             }
             app.UseHttpsRedirection();
@@ -185,7 +185,7 @@ namespace Sheaft.Manage
             {
                 endpoints.MapControllerRoute(
                     name: "default",
-                    pattern: "{controller=Home}/{action=Index}/{id?}");
+                    pattern: "{controller=Dashboard}/{action=Index}/{id?}");
             });
         }
     }

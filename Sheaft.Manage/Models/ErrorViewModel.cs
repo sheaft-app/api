@@ -1,5 +1,3 @@
-using System;
-
 namespace Sheaft.Manage.Models
 {
     public class ErrorViewModel

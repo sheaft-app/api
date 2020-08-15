@@ -1,0 +1,73 @@
+﻿@model IEnumerable<CompanyDto>
+@{
+    ViewData["Title"] = "Companies";
+    int take = ViewBag.Take;
+    int page = ViewBag.Page;
+}
+
+<div class="container">
+    <h1 class="display-4">Companies</h1>
+    <br />
+    @if (ViewBag.Removed != null && ViewBag.Removed)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <span>Removed successfully</span>
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        <br />
+    }
+    <table class="table table-hover">
+        <thead class="thead-dark">
+            <tr>
+                <th scope="col">Name</th>
+                <th scope="col">CreatedOn</th>
+                <th scope="col">Type</th>
+                <th scope="col"></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var entity in Model)
+            {
+                <tr>
+                    <th scope="row">@entity.Name</th>
+                    <td>@entity.CreatedOn</td>
+                    <td>@entity.Kind.ToString("G")</td>
+                    <td>
+                        <a asp-controller="Companies" asp-action="Edit" asp-route-id="@entity.Id" class="btn btn-info">
+                            <i class="fa fa-pen"></i>
+                        </a>
+                        @if (User.IsInRole("ADMIN"))
+                        {
+                            @using (Html.BeginForm("Delete", "Companies", new { id = entity.Id }, FormMethod.Post, true, new { @class = "form d-inline" }))
+                            {
+                                <button type="submit" class="btn btn-danger">
+                                    <i class="fa fa-trash"></i>
+                                </button>
+                            }
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+        <tfoot>
+            <tr>
+                <td colspan="3">
+                    @if (page > 1)
+                    {
+                        <a asp-controller="Companies" asp-action="Index" asp-route-take="@take" asp-route-page="@(page-1)" class="btn btn-info">
+                            <i class="fa fa-caret-left"></i>
+                        </a>
+                    }
+                    @if (take == Model.Count())
+                    {
+                        <a asp-controller="Companies" asp-action="Index" asp-route-take="@take" asp-route-page="@(page+1)" class="btn btn-info">
+                            <i class="fa fa-caret-right"></i>
+                        </a>
+                    }
+                </td>
+            </tr>
+        </tfoot>
+    </table>
+</div>
