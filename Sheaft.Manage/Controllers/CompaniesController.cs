@@ -4,8 +4,10 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using Sheaft.Infrastructure.Interop;
 using Sheaft.Interop.Enums;
+using Sheaft.Manage.Models;
 using Sheaft.Models.Dto;
 using System;
 using System.Linq;
@@ -54,8 +56,10 @@ namespace Sheaft.Manage.Controllers
                 .ProjectTo<CompanyDto>(_configurationProvider)
                 .ToListAsync(token);
 
+            var edited = (string)TempData["Edited"];
+            ViewBag.Edited = !string.IsNullOrWhiteSpace(edited) ? JsonConvert.DeserializeObject(edited) : null;
+
             ViewBag.Removed = TempData["Removed"];
-            ViewBag.Edited = TempData["Edited"];
             ViewBag.Page = page;
             ViewBag.Take = take;
             ViewBag.Kind = kind;
@@ -84,7 +88,7 @@ namespace Sheaft.Manage.Controllers
             _context.Update(entity);
             await _context.SaveChangesAsync(token);
 
-            TempData["Edited"] = model;
+            TempData["Edited"] = JsonConvert.SerializeObject(new EditViewModel { Id = model.Id, Name = entity.Name });
             return RedirectToAction("Index");
         }
 
@@ -98,7 +102,7 @@ namespace Sheaft.Manage.Controllers
             _context.Remove(entity);
             await _context.SaveChangesAsync(token);
 
-            TempData["Removed"] = _mapper.Map<CompanyDto>(entity);
+            TempData["Removed"] = entity.Name;
             return RedirectToAction("Index");
         }
     }
