@@ -2,9 +2,35 @@
     ViewData["Title"] = "Dashboard";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Dashboard</h1>
-    <div>
-
+    <div class="text-center">
+        <h1 class="display-4">Dashboard</h1>
+        <br/>
+        <div class="card w-25 d-inline-block">
+            <div class="card-body">
+                <h5 class="card-title">Consumers</h5>
+                <h6 class="card-subtitle mb-2 text-muted">@ViewBag.Consumers</h6>
+                <a asp-controller="users" asp-action="index" asp-route-kind="@ProfileKind.Consumer" class="card-link">Show</a>
+            </div>
+        </div>
+        <div class="card w-25 d-inline-block">
+            <div class="card-body">
+                <h5 class="card-title">Stores</h5>
+                <h6 class="card-subtitle mb-2 text-muted">@ViewBag.Stores</h6>
+                <a asp-controller="companies" asp-action="index" asp-route-kind="@ProfileKind.Store" class="card-link">Show</a>
+            </div>
+        </div>
+        <div class="card w-25 d-inline-block">
+            <div class="card-body">
+                <h5 class="card-title">Producers</h5>
+                <h6 class="card-subtitle mb-2 text-muted">@ViewBag.Producers</h6>
+                <a asp-controller="companies" asp-action="index" asp-route-kind="@ProfileKind.Producer" class="card-link">Show</a>
+            </div>
+        </div>
+        <div class="card w-25 d-inline-block">
+            <div class="card-body">
+                <h5 class="card-title">Products</h5>
+                <h6 class="card-subtitle mb-2 text-muted">@ViewBag.Products</h6>
+                <a asp-controller="products" asp-action="index" class="card-link">Show</a>
+            </div>
+        </div>
     </div>
-</div>

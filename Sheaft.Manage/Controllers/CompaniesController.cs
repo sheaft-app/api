@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Sheaft.Infrastructure.Interop;
+using Sheaft.Interop.Enums;
 using Sheaft.Models.Dto;
 using System;
 using System.Linq;
@@ -30,7 +31,7 @@ namespace Sheaft.Manage.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Index(CancellationToken token, int page = 0, int take = 10)
+        public async Task<IActionResult> Index(CancellationToken token, ProfileKind? kind = null, int page = 0, int take = 10)
         {
             if (page < 0)
                 page = 0;
@@ -38,17 +39,22 @@ namespace Sheaft.Manage.Controllers
             if (take > 100)
                 take = 100;
 
-            var entities = await _context.Companies
+            var query = _context.Companies.AsNoTracking();
+
+            if (kind != null)
+                query = query.Where(c => c.Kind == kind);
+
+            var entities = await query
                 .OrderByDescending(c => c.CreatedOn)
                 .Skip(page * take)
                 .Take(take)
-                .AsNoTracking()
                 .ProjectTo<CompanyDto>(_configurationProvider)
                 .ToListAsync(token);
 
             ViewBag.Removed = TempData["Removed"];
             ViewBag.Page = page;
             ViewBag.Take = take;
+            ViewBag.Kind = kind;
 
             return View(entities);
         }
