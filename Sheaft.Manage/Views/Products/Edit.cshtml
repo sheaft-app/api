@@ -1,0 +1,43 @@
+﻿@model ProductDto
+@{
+    ViewData["Title"] = "Product details";
+}
+
+    <div class="container">
+        <h1 class="display-4">Product details</h1>
+        <br />
+
+        @using (Html.BeginForm("Edit", "Products", FormMethod.Post, new { @class = "form" }))
+        {
+            @Html.AntiForgeryToken()
+            @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+            @Html.HiddenFor(model => model.Id)
+            <br />
+
+            <div class="form-group">
+                @Html.LabelFor(c => c.Name, "Nom", new { @class = "form-label" })
+                @Html.TextBoxFor(c => c.Name, null, new { @class = "form-control" })
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(c => c.Reference, "Reference", new { @class = "form-label" })
+                @Html.TextBoxFor(c => c.Reference, null, new { @class = "form-control" })
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(c => c.WholeSalePrice, "WholeSalePrice", new { @class = "form-label" })
+                @Html.TextBoxFor(c => c.WholeSalePrice, null, new { @class = "form-control" })
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(c => c.Description, "Description", new { @class = "form-label" })
+                @Html.TextAreaFor(c => c.Description, new { @class = "form-control" })
+            </div>
+
+            <br />
+            <a asp-controller="Products" asp-action="Index" class="btn btn-light">
+                Cancel
+            </a>
+            <button type="submit" class="btn btn-success">
+                <i class="fa fa-check"></i>
+            </button>
+        }
+
+    </div>

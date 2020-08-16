@@ -84,7 +84,7 @@
             <tfoot>
                 <tr class="text-center">
                     <td colspan="4">
-                        @if (currentPage > 1)
+                        @if (currentPage >= 1)
                         {
                             <a asp-controller="Companies" asp-action="Index" asp-route-take="@take" asp-route-page="@(currentPage-1)" class="btn btn-info">
                                 <i class="fa fa-caret-left"></i>
