@@ -1,8 +1,10 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.IdentityModel.Tokens.Jwt;
+using System.Reflection;
 using AutoMapper;
 using IdentityModel;
+using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -15,10 +17,15 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using SendGrid;
+using Sheaft.Application.Commands;
+using Sheaft.Application.Events;
+using Sheaft.Application.Handlers;
 using Sheaft.Infrastructure;
 using Sheaft.Infrastructure.Interop;
 using Sheaft.Mappers;
 using Sheaft.Options;
+using Sheaft.Services;
+using Sheaft.Services.Interop;
 
 namespace Sheaft.Manage
 {
@@ -126,8 +133,17 @@ namespace Sheaft.Manage
                     };
                 });
 
+            services.AddMediatR(new List<Assembly>() { typeof(RegisterCompanyCommand).Assembly, typeof(UserPointsCreatedEvent).Assembly, typeof(AccountCommandsHandler).Assembly }.ToArray());
+
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             services.AddHttpClient();
+
+            services.AddScoped<IDapperContext, DapperContext>();
+            services.AddScoped<IIdentifierService, IdentifierService>();
+            services.AddScoped<IQueueService, QueueService>();
+            services.AddScoped<IBlobService, BlobService>();
+            services.AddScoped<IEmailService, EmailService>();
+            services.AddScoped<ISignalrService, SignalrService>();
 
             services.AddOptions();
 

@@ -17,6 +17,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Sheaft.Application.Handlers\Sheaft.Application.Handlers.csproj" />
     <ProjectReference Include="..\Sheaft.Core\Sheaft.Core.csproj" />
     <ProjectReference Include="..\Sheaft.Infrastructure\Sheaft.Infrastructure.csproj" />
     <ProjectReference Include="..\Sheaft.Mappers\Sheaft.Mappers.csproj" />

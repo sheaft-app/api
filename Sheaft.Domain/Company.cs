@@ -56,6 +56,12 @@ namespace Sheaft.Domain.Models
 
         public void SetOpeningHours(IEnumerable<TimeSlotHour> openingHours)
         {
+            if (openingHours == null)
+                return;
+
+            if (!OpeningHours.Any())
+                _openingHours = new List<TimeSlotHour>();
+
             _openingHours = openingHours.ToList();
         }
 
@@ -124,40 +130,13 @@ namespace Sheaft.Domain.Models
 
         public void SetTags(IEnumerable<Tag> tags)
         {
+            if (tags == null)
+                return;
+
             if (!Tags.Any())
                 _tags = new List<CompanyTag>();
 
-            _tags.Clear();
-
-            if (tags != null && tags.Any())
-                AddTags(tags);
-        }
-
-        public void AddTags(IEnumerable<Tag> tags)
-        {
-            foreach (var tag in tags)
-            {
-                AddTag(tag);
-            }
-        }
-
-        public void AddTag(Tag tag)
-        {
-            _tags.Add(new CompanyTag(tag));
-        }
-
-        public void RemoveTags(IEnumerable<Guid> ids)
-        {
-            foreach (var id in ids)
-            {
-                RemoveTag(id);
-            }
-        }
-
-        public void RemoveTag(Guid id)
-        {
-            var tag = _tags.SingleOrDefault(r => r.Tag.Id == id);
-            _tags.Remove(tag);
+            _tags = tags.Select(t => new CompanyTag(t)).ToList();
         }
 
         public void CloseCompany(string reason)

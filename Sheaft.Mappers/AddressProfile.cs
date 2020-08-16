@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Sheaft.Domain.Models;
 using Sheaft.Models.Dto;
+using Sheaft.Models.Inputs;
 
 namespace Sheaft.Mappers
 {
@@ -9,6 +10,7 @@ namespace Sheaft.Mappers
         public AddressProfile()
         {
             CreateMap<Address, AddressDto>();
+            CreateMap<AddressDto, AddressInput>();
         }
     }
 }

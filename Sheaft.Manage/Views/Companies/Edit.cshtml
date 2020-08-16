@@ -1,26 +1,91 @@
 ﻿@model CompanyDto
 @{
     ViewData["Title"] = "Company details";
+    var kinds = new List<SelectListItem>
+{
+        new SelectListItem("Store", ((int)ProfileKind.Store).ToString()),
+        new SelectListItem("Producer", ((int)ProfileKind.Producer).ToString())
+    };
 }
 
-    <div class="container">
-        <h1 class="display-4">Company details</h1>
+<div class="container">
+    <h1 class="display-4">Company details</h1>
+    <br />
+
+    @using (Html.BeginForm("Edit", "Companies", FormMethod.Post, new { @class = "form" }))
+    {
+        @Html.AntiForgeryToken()
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+        @Html.HiddenFor(model => model.Id)
         <br />
 
-        @using (Html.BeginForm("Edit", "Companies", FormMethod.Post, new { @class = "form" }))
-        {
-            @Html.AntiForgeryToken()
-            @Html.ValidationSummary(true, "", new { @class = "text-danger" })
-            @Html.HiddenFor(model => model.Id)
-            <br />
+        <div class="form-group">
+            @Html.LabelFor(c => c.Name, "Nom", new { @class = "form-label" })
+            @Html.TextBoxFor(c => c.Name, null, new { @class = "form-control" })
+        </div>
+        <div class="form-group">
+            @Html.LabelFor(c => c.Kind, "Type", new { @class = "form-label" })
+            @Html.DropDownListFor(c => c.Kind, kinds, new { @class = "form-control" })
+        </div>
+        <div class="form-group">
+            @Html.LabelFor(c => c.Email, "Email", new { @class = "form-label" })
+            @Html.TextBoxFor(c => c.Email, null, new { @class = "form-control" })
+        </div>
+        <div class="form-group">
+            @Html.LabelFor(c => c.Phone, "Phone", new { @class = "form-label" })
+            @Html.TextBoxFor(c => c.Phone, null, new { @class = "form-control" })
+        </div>
+        <div class="form-group">
+            @Html.LabelFor(c => c.Siret, "SIRET", new { @class = "form-label" })
+            @Html.TextBoxFor(c => c.Siret, null, new { @class = "form-control" })
+        </div>
+        <div class="form-group">
+            @Html.LabelFor(c => c.VatIdentifier, "TVA", new { @class = "form-label" })
+            @Html.TextBoxFor(c => c.VatIdentifier, null, new { @class = "form-control" })
+        </div>
+        <div class="form-group">
+            @Html.LabelFor(c => c.AppearInBusinessSearchResults, "Appear in search results", new { @class = "form-label" })
+            @Html.CheckBoxFor(c => c.AppearInBusinessSearchResults, new { @class = "form-control" })
+        </div>
+        <div class="form-group">
+            @Html.LabelFor(c => c.Description, "Description", new { @class = "form-label" })
+            @Html.TextAreaFor(c => c.Description, new { @class = "form-control" })
+        </div>
+        <h3>Address</h3>
+        <div class="form-group">
+            @Html.LabelFor(c => c.Address.Line1, "Line1", new { @class = "form-label" })
+            @Html.TextBoxFor(c => c.Address.Line1, null, new { @class = "form-control" })
+        </div>
+        <div class="form-group">
+            @Html.LabelFor(c => c.Address.Line2, "Line2", new { @class = "form-label" })
+            @Html.TextBoxFor(c => c.Address.Line2, null, new { @class = "form-control" })
+        </div>
+        <div class="form-group">
+            @Html.LabelFor(c => c.Address.Zipcode, "Zipcode", new { @class = "form-label" })
+            @Html.TextBoxFor(c => c.Address.Zipcode, null, new { @class = "form-control" })
+        </div>
+        <div class="form-group">
+            @Html.LabelFor(c => c.Address.City, "City", new { @class = "form-label" })
+            @Html.TextBoxFor(c => c.Address.City, null, new { @class = "form-control" })
+        </div>
+        <div class="form-group">
+            @Html.LabelFor(c => c.Address.Latitude, "Latitude", new { @class = "form-label" })
+            @Html.TextBoxFor(c => c.Address.Latitude, null, new { @class = "form-control" })
+        </div>
+        <div class="form-group">
+            @Html.LabelFor(c => c.Address.Longitude, "Longitude", new { @class = "form-label" })
+            @Html.TextBoxFor(c => c.Address.Longitude, null, new { @class = "form-control" })
+        </div>
 
-            <br />
-            <a asp-controller="Companies" asp-action="Index" class="btn btn-light">
-                Cancel
-            </a>
-            <button type="submit" class="btn btn-success">
-                <i class="fa fa-check"></i>
-            </button>
-        }
 
-    </div>
+
+        <br />
+        <a asp-controller="Companies" asp-action="Index" class="btn btn-light">
+            Cancel
+        </a>
+        <button type="submit" class="btn btn-success">
+            <i class="fa fa-check"></i>
+        </button>
+    }
+
+</div>

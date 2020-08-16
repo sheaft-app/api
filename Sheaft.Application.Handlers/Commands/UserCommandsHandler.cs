@@ -39,7 +39,8 @@ namespace Sheaft.Application.Handlers
         IRequestHandler<DeleteUserCommand, CommandResult<bool>>,
         IRequestHandler<RemoveUserDataCommand, CommandResult<string>>,
         IRequestHandler<GenerateUserSponsoringCodeCommand, CommandResult<string>>,
-        IRequestHandler<CreateUserPointsCommand, CommandResult<bool>>
+        IRequestHandler<CreateUserPointsCommand, CommandResult<bool>>,
+        IRequestHandler<ChangeUserRolesCommand, CommandResult<bool>>
     {
         private readonly IAppDbContext _context;
         private readonly IMediator _mediatr;
@@ -206,6 +207,46 @@ namespace Sheaft.Application.Handlers
                     await transaction.CommitAsync(token);
                     return OkResult(true);
                 }
+            });
+        }
+
+        public async Task<CommandResult<bool>> Handle(ChangeUserRolesCommand request, CancellationToken token)
+        {
+            return await ExecuteAsync(async () =>
+            {
+                var entity = await _context.GetByIdAsync<User>(request.Id, token);
+
+                var roles = new List<Guid>();
+
+                if (request.Roles.Contains(_roleOptions.Producer.Value))
+                {
+                    roles.Add(_roleOptions.Producer.Id);
+                }
+
+                if (request.Roles.Contains(_roleOptions.Store.Value))
+                {
+                    roles.Add(_roleOptions.Store.Id);
+                }
+
+                if (request.Roles.Contains(_roleOptions.Consumer.Value))
+                {
+                    roles.Add(_roleOptions.Consumer.Id);
+                }
+
+                var oidcUser = new IdentityUserInput(request.Id, entity.Email, entity.FirstName, entity.LastName, roles)
+                {
+                    Phone = entity.Phone,
+                    Picture = entity.Picture
+                };
+
+                var oidcResult = await _httpClient.PutAsync(_authOptions.Actions.Profile, new StringContent(JsonConvert.SerializeObject(oidcUser), Encoding.UTF8, "application/json"), token);
+                if (!oidcResult.IsSuccessStatusCode)
+                    return CommandFailed<bool>(new BadRequestException(MessageKind.UpdateUser_Oidc_UpdateProfile_Error, await oidcResult.Content.ReadAsStringAsync().ConfigureAwait(false)));
+
+                var entry = _context.Update(entity);
+                await _cache.RemoveAsync(entity.Id.ToString("N"));
+
+                return OkResult(await _context.SaveChangesAsync(token) > 0);
             });
         }
 

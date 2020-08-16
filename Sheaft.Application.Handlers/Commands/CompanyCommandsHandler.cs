@@ -121,16 +121,6 @@ namespace Sheaft.Application.Handlers
                 var departmentCode = Address.GetDepartmentCode(request.Address.Zipcode);
                 var department = await _context.GetSingleAsync<Department>(d => d.Code == departmentCode, token);
 
-                var openingHours = new List<TimeSlotHour>();
-                if (request.OpeningHours != null)
-                {
-                    foreach (var oh in request.OpeningHours)
-                    {
-                        openingHours.AddRange(oh.Days.Select(c => new TimeSlotHour(c, oh.From, oh.To)));
-                    }
-                }
-
-                company.SetOpeningHours(openingHours);
                 company.SetName(request.Name);
                 company.SetEmail(request.Email);
                 company.SetPhone(request.Phone);
@@ -146,10 +136,22 @@ namespace Sheaft.Application.Handlers
                     company.SetTags(tags);
                 }
 
-                var entry = _context.Companies.Update(company);
+                if (request.OpeningHours != null)
+                {
+                    var openingHours = new List<TimeSlotHour>();
+                    foreach (var oh in request.OpeningHours)
+                    {
+                        openingHours.AddRange(oh.Days.Select(c => new TimeSlotHour(c, oh.From, oh.To)));
+                    }
+
+                    company.SetOpeningHours(openingHours);
+                }
+
+                _context.Update(company);
                 return OkResult(await _context.SaveChangesAsync(token) > 0);
             });
         }
+
 
         public async Task<CommandResult<bool>> Handle(DeleteCompaniesCommand request, CancellationToken token)
         {

@@ -1,15 +1,22 @@
 ﻿using AutoMapper;
 using AutoMapper.QueryableExtensions;
+using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
+using Sheaft.Application.Commands;
+using Sheaft.Core.Extensions;
 using Sheaft.Infrastructure.Interop;
 using Sheaft.Interop.Enums;
 using Sheaft.Manage.Models;
 using Sheaft.Models.Dto;
+using Sheaft.Models.Inputs;
+using Sheaft.Options;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -21,17 +28,23 @@ namespace Sheaft.Manage.Controllers
         private readonly ILogger<CompaniesController> _logger;
         private readonly IAppDbContext _context;
         private readonly IMapper _mapper;
+        private readonly IMediator _mediatr;
+        private readonly RoleOptions _roleOptions;
         private readonly IConfigurationProvider _configurationProvider;
 
         public CompaniesController(
             IAppDbContext context,
             IMapper mapper,
+            IMediator mediatr,
             IConfigurationProvider configurationProvider,
+            IOptionsSnapshot<RoleOptions> roleOptions,
             ILogger<CompaniesController> logger)
         {
             _logger = logger;
             _context = context;
             _mapper = mapper;
+            _mediatr = mediatr;
+            _roleOptions = roleOptions.Value;
             _configurationProvider = configurationProvider;
         }
 
@@ -83,12 +96,56 @@ namespace Sheaft.Manage.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(CompanyDto model, CancellationToken token)
         {
+            var requestUser = User.ToIdentityUser(HttpContext.TraceIdentifier);
+
+            var result = await _mediatr.Send(new UpdateCompanyCommand(requestUser)
+            {
+                Id = model.Id,
+                Address = _mapper.Map<AddressInput>(model.Address),
+                AppearInBusinessSearchResults = model.AppearInBusinessSearchResults,
+                Description = model.Description,
+                Email = model.Email,
+                Name = model.Name,
+                Phone = model.Phone,
+                Siret = model.Siret,
+                VatIdentifier = model.VatIdentifier
+            }, token);
+
+            if(!result.Success)
+            {
+                ModelState.AddModelError("", result.Exception.Message);
+                return View(model);
+            }
+
             var entity = await _context.Companies.SingleOrDefaultAsync(c => c.Id == model.Id, token);
+            if (entity.Kind != model.Kind)
+            {
+                var user = await _context.Users.SingleOrDefaultAsync(c => c.UserType == UserKind.Owner && c.Company.Id == entity.Id, token);
+                var roles = new List<string> { _roleOptions.Owner.Value };
+                switch (model.Kind)
+                {
+                    case ProfileKind.Producer:
+                        roles.Add(_roleOptions.Producer.Value);
+                        break;
+                    case ProfileKind.Store:
+                        roles.Add(_roleOptions.Store.Value);
+                        break;
+                }
 
-            _context.Update(entity);
-            await _context.SaveChangesAsync(token);
+                var res = await _mediatr.Send(new ChangeUserRolesCommand(requestUser)
+                {
+                    Id = user.Id,
+                    Roles = roles
+                }, token);
 
-            TempData["Edited"] = JsonConvert.SerializeObject(new EditViewModel { Id = model.Id, Name = entity.Name });
+                if (!res.Success)
+                {
+                    ModelState.AddModelError("", result.Exception.Message);
+                    return View(model);
+                }
+            }
+
+            TempData["Edited"] = JsonConvert.SerializeObject(new EditViewModel { Id = model.Id, Name = model.Name });
             return RedirectToAction("Index");
         }
 
