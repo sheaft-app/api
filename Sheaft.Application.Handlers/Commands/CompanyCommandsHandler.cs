@@ -14,7 +14,6 @@ using SixLabors.ImageSharp;
 using System.IO;
 using SixLabors.ImageSharp.Processing;
 using SixLabors.ImageSharp.Formats.Jpeg;
-using SixLabors.Primitives;
 using Sheaft.Services.Interop;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;

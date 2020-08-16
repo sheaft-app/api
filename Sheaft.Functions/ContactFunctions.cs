@@ -48,7 +48,7 @@ namespace Sheaft.Functions
         }
 
         [FunctionName("WarmupCommand")]
-        public async Task WarmupCommand([TimerTrigger("0 */15 * * * *")] TimerInfo info, ILogger logger, CancellationToken token)
+        public void WarmupCommand([TimerTrigger("0 */15 * * * *")] TimerInfo info, ILogger logger, CancellationToken token)
         {
             logger.LogInformation("Warming functions successfully executed");
         }

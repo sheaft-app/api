@@ -226,7 +226,6 @@ namespace Sheaft.Api
                 .AddServices(sp)
                 .AddAuthorizeDirectiveType()
                 .ModifyOptions(c => c.DefaultBindingBehavior = BindingBehavior.Explicit)
-                .AddType<TimeSpanType>()
                 .AddMutationType<SheaftMutationType>()
                 .AddQueryType<SheaftQueryType>()
                 .RegisterTypes()

@@ -15,17 +15,17 @@
     <Compile Include="Types\OutputTypes.cs" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="HotChocolate.AspNetCore.Authorization" Version="10.4.3" />
-    <PackageReference Include="HotChocolate.Types" Version="10.4.3" />
-    <PackageReference Include="HotChocolate.Types.Filters" Version="10.4.3" />
-    <PackageReference Include="HotChocolate.Types.Selections" Version="10.4.3" />
-    <PackageReference Include="HotChocolate.Types.Sorting" Version="10.4.3" />
+    <PackageReference Include="HotChocolate.AspNetCore.Authorization" Version="10.5.2" />
+    <PackageReference Include="HotChocolate.Types" Version="10.5.2" />
+    <PackageReference Include="HotChocolate.Types.Filters" Version="10.5.2" />
+    <PackageReference Include="HotChocolate.Types.Selections" Version="10.5.2" />
+    <PackageReference Include="HotChocolate.Types.Sorting" Version="10.5.2" />
     <PackageReference Include="AutoMapper" Version="10.0.0" />
-    <PackageReference Include="IdentityModel" Version="4.3.0" />
-    <PackageReference Include="MediatR" Version="8.0.2" />
-    <PackageReference Include="Microsoft.AspNetCore.Authorization" Version="3.1.5" />
+    <PackageReference Include="IdentityModel" Version="4.3.1" />
+    <PackageReference Include="MediatR" Version="8.1.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Authorization" Version="3.1.7" />
     <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.2.0" />
-    <PackageReference Include="Microsoft.Extensions.Localization.Abstractions" Version="3.1.6" />
+    <PackageReference Include="Microsoft.Extensions.Localization.Abstractions" Version="3.1.7" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Sheaft.Application.Commands\Sheaft.Application.Commands.csproj" />
