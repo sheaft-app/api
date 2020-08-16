@@ -152,6 +152,9 @@ namespace Sheaft.Domain.Models
             if (Ratings == null)
                 _ratings = new List<Rating>();
 
+            if (_ratings.Any(r => r.User.Id == user.Id))
+                throw new ValidationException(MessageKind.Product_CannotRate_AlreadyRated);
+
             _ratings.Add(new Rating(Guid.NewGuid(), value, user, comment));
             RefreshRatings();
         }

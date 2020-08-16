@@ -669,4 +669,7 @@
   <data name="Error" xml:space="preserve">
     <value>Une erreur générique a été générée</value>
   </data>
+  <data name="Product_CannotRate_AlreadyRated" xml:space="preserve">
+    <value>Vous avez déjà noté ce produit</value>
+  </data>
 </root>

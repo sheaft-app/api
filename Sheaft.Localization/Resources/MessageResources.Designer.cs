@@ -853,6 +853,15 @@ namespace Sheaft.Localization.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Vous avez déjà noté ce produit.
+        /// </summary>
+        internal static string Product_CannotRate_AlreadyRated {
+            get {
+                return ResourceManager.GetString("Product_CannotRate_AlreadyRated", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to La description du produit est trop longue, elle ne peut pas dépasser {0} caractères.
         /// </summary>
         internal static string Product_Description_TooLong {

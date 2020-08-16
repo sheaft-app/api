@@ -217,7 +217,7 @@ namespace Sheaft.Application.Handlers
             {
                 var entity = await _context.GetByIdAsync<Product>(request.Id, token);
 
-                entity.SetReference(DateTimeOffset.UtcNow.ToString("yyyyMMddHHmmss_" + entity.Reference));
+                entity.SetReference(DateTimeOffset.UtcNow.ToString("_" + entity.Reference));
                 _context.Products.Remove(entity);
 
                 return OkResult(await _context.SaveChangesAsync(token) > 0);
