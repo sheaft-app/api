@@ -794,13 +794,8 @@ namespace Sheaft.GraphQL.Types
                 .Type<NonNullType<BooleanType>>()
                 .Resolver(async c =>
                 {
-                    var roleOptions = c.Resolver<IOptionsSnapshot<RoleOptions>>();
-
                     var user = GetRequestUser(c.ContextData);
                     if (!user.IsAuthenticated)
-                        return false;
-
-                    if (!user.IsInRole(roleOptions.Value.Consumer.Value))
                         return false;
 
                     return await c.Service<IProductQueries>().ProductIsRatedByUserAsync(c.Parent<ProductDto>().Id, user.Id, user, c.RequestAborted);
