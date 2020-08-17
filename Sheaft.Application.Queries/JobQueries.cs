@@ -64,9 +64,8 @@ namespace Sheaft.Application.Queries
             {
                 return _context.Jobs
                         .Get(c =>
-                            c.Id == jobId &&
-                            c.User.Company != null &&
-                            c.User.Company.Id == currentUser.CompanyId)
+                            c.Id == jobId && ((c.User.Company == null && c.User.Id == currentUser.Id) ||
+                            (c.User.Company != null && c.User.Company.Id == currentUser.CompanyId)))
                         .ProjectTo<JobDto>(_configurationProvider);
             }
             catch (Exception e)
@@ -81,8 +80,8 @@ namespace Sheaft.Application.Queries
             {
                 return _context.Jobs
                         .Get(c =>
-                            c.User.Company != null &&
-                            c.User.Company.Id == currentUser.CompanyId)
+                            (c.User.Company == null && c.User.Id == currentUser.Id) ||
+                            (c.User.Company != null && c.User.Company.Id == currentUser.CompanyId))
                         .ProjectTo<JobDto>(_configurationProvider);
             }
             catch (Exception e)
