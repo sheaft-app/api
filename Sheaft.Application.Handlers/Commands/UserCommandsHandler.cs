@@ -328,7 +328,7 @@ namespace Sheaft.Application.Handlers
                             return CommandFailed<bool>(result.Exception);
                     }
 
-                    var oidcResult = await _httpClient.DeleteAsync(string.Format(_authOptions.Actions.Delete, entity.Id), token);
+                    var oidcResult = await _httpClient.DeleteAsync(string.Format(_authOptions.Actions.Delete, entity.Id.ToString("N")), token);
                     if (!oidcResult.IsSuccessStatusCode)
                         return CommandFailed<bool>(new BadRequestException(MessageKind.DeleteUser_Oidc_DeleteProfile_Error, await oidcResult.Content.ReadAsStringAsync().ConfigureAwait(false)));
 
@@ -385,7 +385,7 @@ namespace Sheaft.Application.Handlers
                     }
                 }
 
-                var oidcUser = new UpdatePictureInput { Id = request.Id, Picture = entity.Picture };
+                var oidcUser = new IdentityPictureInput(request.Id, entity.Picture);
 
                 var oidcResult = await _httpClient.PutAsync(_authOptions.Actions.Picture, new StringContent(JsonConvert.SerializeObject(oidcUser), Encoding.UTF8, "application/json"), token);
                 if (!oidcResult.IsSuccessStatusCode)
