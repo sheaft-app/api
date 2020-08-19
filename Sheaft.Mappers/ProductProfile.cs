@@ -5,6 +5,7 @@ using Sheaft.Core.Models;
 using Sheaft.Domain.Models;
 using Sheaft.Models.Dto;
 using Sheaft.Models.Inputs;
+using Sheaft.Models.ViewModels;
 using System.Linq;
 
 namespace Sheaft.Mappers
@@ -22,6 +23,12 @@ namespace Sheaft.Mappers
                 .ForMember(d => d.ImageLarge, opt => opt.MapFrom(r => CoreProductExtensions.GetImageUrl(r.Image, ImageSize.LARGE)))
                 .ForMember(d => d.ImageMedium, opt => opt.MapFrom(r => CoreProductExtensions.GetImageUrl(r.Image, ImageSize.MEDIUM)))
                 .ForMember(d => d.ImageSmall, opt => opt.MapFrom(r => CoreProductExtensions.GetImageUrl(r.Image, ImageSize.SMALL)));
+
+            CreateMap<Product, ProductViewModel>()
+                .ForMember(d => d.Producer, opt => opt.MapFrom(r => r.Producer))
+                .ForMember(d => d.Tags, opt => opt.MapFrom(r => r.Tags.Select(t => t.Tag.Id)))
+                .ForMember(d => d.PackagingId, opt => opt.MapFrom(r => r.Packaging.Id))
+                .ForMember(d => d.Picture, opt => opt.MapFrom(r => CoreProductExtensions.GetImageUrl(r.Image, ImageSize.LARGE)));
 
             CreateMap<CreateProductInput, CreateProductCommand>();
             CreateMap<UpdateProductInput, UpdateProductCommand>();

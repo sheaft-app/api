@@ -14,6 +14,7 @@ using Sheaft.Interop.Enums;
 using Sheaft.Manage.Models;
 using Sheaft.Models.Dto;
 using Sheaft.Models.Inputs;
+using Sheaft.Models.ViewModels;
 using Sheaft.Options;
 using System;
 using System.Collections.Generic;
@@ -23,14 +24,9 @@ using System.Threading.Tasks;
 
 namespace Sheaft.Manage.Controllers
 {
-    public class CompaniesController : Controller
+    public class CompaniesController : ManageController
     {
         private readonly ILogger<CompaniesController> _logger;
-        private readonly IAppDbContext _context;
-        private readonly IMapper _mapper;
-        private readonly IMediator _mediatr;
-        private readonly RoleOptions _roleOptions;
-        private readonly IConfigurationProvider _configurationProvider;
 
         public CompaniesController(
             IAppDbContext context,
@@ -38,14 +34,9 @@ namespace Sheaft.Manage.Controllers
             IMediator mediatr,
             IConfigurationProvider configurationProvider,
             IOptionsSnapshot<RoleOptions> roleOptions,
-            ILogger<CompaniesController> logger)
+            ILogger<CompaniesController> logger) : base(context, mapper, roleOptions, mediatr, configurationProvider)
         {
             _logger = logger;
-            _context = context;
-            _mapper = mapper;
-            _mediatr = mediatr;
-            _roleOptions = roleOptions.Value;
-            _configurationProvider = configurationProvider;
         }
 
         [HttpGet]
@@ -62,11 +53,17 @@ namespace Sheaft.Manage.Controllers
             if (kind != null)
                 query = query.Where(c => c.Kind == kind);
 
+            var requestUser = await GetRequestUser(token);
+            if (requestUser.IsImpersonating)
+            {
+                query = query.Where(p => p.Id == requestUser.CompanyId);
+            }
+
             var entities = await query
                 .OrderByDescending(c => c.CreatedOn)
                 .Skip(page * take)
                 .Take(take)
-                .ProjectTo<CompanyDto>(_configurationProvider)
+                .ProjectTo<CompanyViewModel>(_configurationProvider)
                 .ToListAsync(token);
 
             var edited = (string)TempData["Edited"];
@@ -86,17 +83,29 @@ namespace Sheaft.Manage.Controllers
             var entity = await _context.Companies
                 .AsNoTracking()
                 .Where(c => c.Id == id)
-                .ProjectTo<CompanyDto>(_configurationProvider)
+                .ProjectTo<CompanyViewModel>(_configurationProvider)
                 .SingleOrDefaultAsync(token);
+
+            ViewBag.Tags = await _context.Tags
+                .AsNoTracking()
+                .ProjectTo<TagViewModel>(_configurationProvider)
+                .ToListAsync(token);
 
             return View(entity);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(CompanyDto model, CancellationToken token)
+        public async Task<IActionResult> Edit(CompanyViewModel model, CancellationToken token)
         {
-            var requestUser = User.ToIdentityUser(HttpContext.TraceIdentifier);
+            var requestUser = await GetRequestUser(token);
+            if (!requestUser.IsImpersonating)
+            {
+                ViewBag.Tags = await GetTags(token);
+
+                ModelState.AddModelError("", "You must impersonate company's owner to edit it.");
+                return View(model);
+            }
 
             var result = await _mediatr.Send(new UpdateCompanyCommand(requestUser)
             {
@@ -108,11 +117,14 @@ namespace Sheaft.Manage.Controllers
                 Name = model.Name,
                 Phone = model.Phone,
                 Siret = model.Siret,
-                VatIdentifier = model.VatIdentifier
+                VatIdentifier = model.VatIdentifier,
+                Tags = model.Tags
             }, token);
 
-            if(!result.Success)
+            if (!result.Success)
             {
+                ViewBag.Tags = await GetTags(token);
+
                 ModelState.AddModelError("", result.Exception.Message);
                 return View(model);
             }
@@ -140,6 +152,8 @@ namespace Sheaft.Manage.Controllers
 
                 if (!res.Success)
                 {
+                    ViewBag.Tags = await GetTags(token);
+
                     ModelState.AddModelError("", result.Exception.Message);
                     return View(model);
                 }

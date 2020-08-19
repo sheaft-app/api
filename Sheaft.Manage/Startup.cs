@@ -129,7 +129,7 @@ namespace Sheaft.Manage
                         RequireExpirationTime = true,
                         ValidateLifetime = true,
                         RoleClaimType = JwtClaimTypes.Role,
-                        NameClaimType = JwtClaimTypes.Subject
+                        NameClaimType = JwtClaimTypes.Subject                        
                     };
                 });
 

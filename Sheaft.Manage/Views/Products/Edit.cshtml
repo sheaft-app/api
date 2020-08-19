@@ -1,13 +1,28 @@
-﻿@model ProductDto
+﻿@model ProductViewModel
 @{
     ViewData["Title"] = "Product details";
+    var vats = new List<SelectListItem> {
+        new SelectListItem("5.5%", "5.5"),
+        new SelectListItem("10%", "10"),
+        new SelectListItem("20%", "20"),
+    };
+
+    var units = new List<SelectListItem> {
+        new SelectListItem("mL", UnitKind.ml.ToString("G")),
+        new SelectListItem("L", UnitKind.l.ToString("G")),
+        new SelectListItem("gr", UnitKind.g.ToString("G")),
+        new SelectListItem("kg", UnitKind.kg.ToString("G")),
+        new SelectListItem("unité", UnitKind.unit.ToString("G")),
+    };
+
+    var availableTags = ((List<TagViewModel>)ViewBag.Tags).Select(c => new SelectListItem(c.Name, c.Id.ToString("D"))).ToList();
 }
 
     <div class="container">
         <h1 class="display-4">Product details</h1>
         <br />
 
-        @using (Html.BeginForm("Edit", "Products", FormMethod.Post, new { @class = "form" }))
+        @using (Html.BeginForm("Edit", "Products", FormMethod.Post, new { @class = "form", enctype = "multipart/form-data" }))
         {
             @Html.AntiForgeryToken()
             @Html.ValidationSummary(true, "", new { @class = "text-danger" })
@@ -15,7 +30,7 @@
             <br />
 
             <div class="form-group">
-                @Html.LabelFor(c => c.Name, "Nom", new { @class = "form-label" })
+                @Html.LabelFor(c => c.Name, "Name", new { @class = "form-label" })
                 @Html.TextBoxFor(c => c.Name, null, new { @class = "form-control" })
             </div>
             <div class="form-group">
@@ -23,12 +38,40 @@
                 @Html.TextBoxFor(c => c.Reference, null, new { @class = "form-control" })
             </div>
             <div class="form-group">
-                @Html.LabelFor(c => c.WholeSalePrice, "WholeSalePrice", new { @class = "form-label" })
-                @Html.TextBoxFor(c => c.WholeSalePrice, null, new { @class = "form-control" })
+                @Html.LabelFor(c => c.WholeSalePricePerUnit, "WholeSalePricePerUnit", new { @class = "form-label" })
+                @Html.TextBoxFor(c => c.WholeSalePricePerUnit, null, new { @class = "form-control" })
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(c => c.Vat, "TVA", new { @class = "form-label" })
+                @Html.DropDownListFor(c => c.Vat, vats, new { @class = "form-control" })
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(c => c.QuantityPerUnit, "QuantityPerUnit", new { @class = "form-label" })
+                @Html.TextBoxFor(c => c.QuantityPerUnit, null, new { @class = "form-control" })
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(c => c.Unit, "Unit", new { @class = "form-label" })
+                @Html.DropDownListFor(c => c.Unit, units, new { @class = "form-control" })
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(c => c.Available, "Available", new { @class = "form-label" })
+                @Html.CheckBoxFor(c => c.Available, new { @class = "form-control" })
             </div>
             <div class="form-group">
                 @Html.LabelFor(c => c.Description, "Description", new { @class = "form-label" })
                 @Html.TextAreaFor(c => c.Description, new { @class = "form-control" })
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(c => c.Picture, "Picture", new { @class = "form-label" })
+                @if (!string.IsNullOrWhiteSpace(Model.Picture))
+                {
+                    <img src="@Model.Picture" height="100" />
+                }
+                @Html.TextBoxFor(c => c.Picture, new { @class = "form-control", @type = "file" })
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(c => c.Tags, "Tags", new { @class = "form-label" })
+                @Html.ListBoxFor(c => c.Tags, availableTags, new { @class = "form-control", @style = "height:12rem;" })
             </div>
 
             <br />
@@ -36,7 +79,7 @@
                 Cancel
             </a>
             <button type="submit" class="btn btn-success">
-                <i class="fa fa-check"></i>
+                <i class="fa fa-check">&nbsp;Save</i>
             </button>
         }
 

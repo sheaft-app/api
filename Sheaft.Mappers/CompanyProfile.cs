@@ -3,6 +3,7 @@ using Sheaft.Application.Commands;
 using Sheaft.Domain.Models;
 using Sheaft.Models.Dto;
 using Sheaft.Models.Inputs;
+using Sheaft.Models.ViewModels;
 using System.Linq;
 
 namespace Sheaft.Mappers
@@ -11,6 +12,11 @@ namespace Sheaft.Mappers
     {
         public CompanyProfile()
         {
+            CreateMap<Company, CompanyViewModel>()
+                  .ForMember(d => d.Tags, opt => opt.MapFrom(r => r.Tags.Select(t => t.Tag.Id)))
+                  .ForMember(d => d.OpeningHours, opt => opt.MapFrom(r => r.OpeningHours))
+                  .ForMember(d => d.Address, opt => opt.MapFrom(r => r.Address));
+
             CreateMap<Company, CompanyDto>()
                   .ForMember(d => d.Tags, opt => opt.MapFrom(r => r.Tags.Select(t => t.Tag)))
                   .ForMember(d => d.OpeningHours, opt => opt.MapFrom(r => r.OpeningHours))

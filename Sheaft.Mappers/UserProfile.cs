@@ -3,6 +3,7 @@ using Sheaft.Application.Commands;
 using Sheaft.Domain.Models;
 using Sheaft.Models.Dto;
 using Sheaft.Models.Inputs;
+using Sheaft.Models.ViewModels;
 
 namespace Sheaft.Mappers
 {
@@ -10,6 +11,10 @@ namespace Sheaft.Mappers
     {
         public UserProfile()
         {
+            CreateMap<User, UserViewModel>()
+                .ForMember(c => c.Name, opt => opt.MapFrom(d => $"{d.FirstName} {d.LastName}"))
+                .ForMember(c => c.Company, opt => opt.MapFrom(d => d.Company.Name));
+
             CreateMap<User, UserProfileDto>()
                 .ForMember(c => c.Name, opt => opt.MapFrom(d => $"{d.FirstName} {d.LastName}"))
                 .ForMember(c => c.ShortName, opt => opt.MapFrom(d => $"{d.FirstName} {d.LastName.Substring(0, 1)}"))

@@ -2,42 +2,38 @@
 using AutoMapper.QueryableExtensions;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Sheaft.Application.Commands;
-using Sheaft.Core.Extensions;
 using Sheaft.Infrastructure.Interop;
 using Sheaft.Manage.Models;
-using Sheaft.Models.Dto;
+using Sheaft.Models.ViewModels;
+using Sheaft.Options;
 using System;
+using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace Sheaft.Manage.Controllers
 {
-    public class ProductsController : Controller
+    public class ProductsController : ManageController
     {
         private readonly ILogger<ProductsController> _logger;
-        private readonly IAppDbContext _context;
-        private readonly IMapper _mapper;
-        private readonly IMediator _mediatr;
-        private readonly IConfigurationProvider _configurationProvider;
 
         public ProductsController(
             IAppDbContext context,
             IMapper mapper,
             IMediator mediatr,
+            IOptionsSnapshot<RoleOptions> roleOptions,
             IConfigurationProvider configurationProvider,
-            ILogger<ProductsController> logger)
+            ILogger<ProductsController> logger) : base(context, mapper, roleOptions, mediatr, configurationProvider)
         {
             _logger = logger;
-            _context = context;
-            _mapper = mapper;
-            _mediatr = mediatr;
-            _configurationProvider = configurationProvider;
         }
 
         [HttpGet]
@@ -51,11 +47,17 @@ namespace Sheaft.Manage.Controllers
 
             var query = _context.Products.AsNoTracking();
 
+            var requestUser = await GetRequestUser(token);
+            if (requestUser.IsImpersonating)
+            {
+                query = query.Where(p => p.Producer.Id == requestUser.CompanyId);
+            }
+
             var entities = await query
                 .OrderByDescending(c => c.CreatedOn)
                 .Skip(page * take)
                 .Take(take)
-                .ProjectTo<ProductDto>(_configurationProvider)
+                .ProjectTo<ProductViewModel>(_configurationProvider)
                 .ToListAsync(token);
 
             var edited = (string)TempData["Edited"];
@@ -64,7 +66,6 @@ namespace Sheaft.Manage.Controllers
             ViewBag.Removed = TempData["Removed"];
             ViewBag.Page = page;
             ViewBag.Take = take;
-
 
             return View(entities);
         }
@@ -75,27 +76,57 @@ namespace Sheaft.Manage.Controllers
             var entity = await _context.Products
                 .AsNoTracking()
                 .Where(c => c.Id == id)
-                .ProjectTo<ProductDto>(_configurationProvider)
+                .ProjectTo<ProductViewModel>(_configurationProvider)
                 .SingleOrDefaultAsync(token);
+
+            ViewBag.Tags = await GetTags(token);
 
             return View(entity);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(ProductDto model, CancellationToken token)
+        public async Task<IActionResult> Edit(ProductViewModel model, IFormFile picture, CancellationToken token)
         {
-            var requestUser = User.ToIdentityUser(HttpContext.TraceIdentifier);
+            var requestUser = await GetRequestUser(token);
+            if(!requestUser.IsImpersonating)
+            {
+                ViewBag.Tags = await GetTags(token);
+
+                ModelState.AddModelError("", "You must impersonate product's producer to edit it.");
+                return View(model);
+            }
+
+            if (picture != null)
+            {
+                using (var ms = new MemoryStream())
+                {
+                    picture.CopyTo(ms);
+                    model.Picture = Convert.ToBase64String(ms.ToArray());
+                }
+            }
 
             var result = await _mediatr.Send(new UpdateProductCommand(requestUser)
             {
                 Id = model.Id,
                 Description = model.Description,
                 Name = model.Name,
+                Available = model.Available,
+                PackagingId = model.PackagingId,
+                Picture = model.Picture,
+                QuantityPerUnit = model.QuantityPerUnit,
+                Reference = model.Reference,
+                Tags = model.Tags,
+                Unit = model.Unit,
+                Vat = model.Vat,
+                Weight = model.Weight,
+                WholeSalePricePerUnit = model.WholeSalePricePerUnit
             }, token);
 
             if (!result.Success)
             {
+                ViewBag.Tags = await GetTags(token);
+
                 ModelState.AddModelError("", result.Exception.Message);
                 return View(model);
             }
