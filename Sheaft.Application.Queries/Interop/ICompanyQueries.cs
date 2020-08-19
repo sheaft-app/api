@@ -16,7 +16,7 @@ namespace Sheaft.Application.Queries
         IQueryable<CompanyDto> GetCompany(Guid id, IRequestUser currentUser);
         IQueryable<CompanyDto> GetCompanies(IRequestUser currentUser);
         Task<SirenCompanyDto> RetrieveSiretCompanyInfosAsync(string siret, IRequestUser currentUser, CancellationToken token);
-        Task<IEnumerable<ProducerDto>> SearchProducersAsync(Guid companyId, SearchTermsInput terms, IRequestUser currentUser, CancellationToken token);
+        Task<ProducersSearchDto> SearchProducersAsync(Guid companyId, SearchTermsInput terms, IRequestUser currentUser, CancellationToken token);
         Task<StoresSearchDto> SearchStoresAsync(Guid companyId, SearchTermsInput terms, IRequestUser currentUser, CancellationToken token);
     }
 }

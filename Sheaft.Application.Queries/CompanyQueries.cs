@@ -161,7 +161,7 @@ namespace Sheaft.Application.Queries
             }
         }
 
-        public async Task<IEnumerable<ProducerDto>> SearchProducersAsync(Guid companyId, SearchTermsInput terms, IRequestUser currentUser, CancellationToken token)
+        public async Task<ProducersSearchDto> SearchProducersAsync(Guid companyId, SearchTermsInput terms, IRequestUser currentUser, CancellationToken token)
         {
             try
             {
@@ -220,28 +220,32 @@ namespace Sheaft.Application.Queries
                     searchResults.Add(myobject);
                 }
 
-                return searchResults?.Select(p => new ProducerDto
+                return new ProducersSearchDto
                 {
-                    Id = p.Producer_id,
-                    Name = p.Producer_name,
-                    Email = p.Producer_email,
-                    Phone = p.Producer_phone,
-                    Picture = p.Producer_picture,
-                    Tags = p.Producer_tags?.Select(t => new TagDto { Name = t }) ?? new List<TagDto>(),
-                    Address = new AddressDto
+                    Count = results.Count ?? 0,
+                    Producers = searchResults?.Select(p => new ProducerDto
                     {
-                        Line1 = p.Producer_line1,
-                        Line2 = p.Producer_line2,
-                        City = p.Producer_city,
-                        Latitude = p.Producer_latitude,
-                        Longitude = p.Producer_longitude,
-                        Zipcode = p.Producer_zipcode
-                    }
-                }) ?? new List<ProducerDto>();
+                        Id = p.Producer_id,
+                        Name = p.Producer_name,
+                        Email = p.Producer_email,
+                        Phone = p.Producer_phone,
+                        Picture = p.Producer_picture,
+                        Tags = p.Producer_tags?.Select(t => new TagDto { Name = t }) ?? new List<TagDto>(),
+                        Address = new AddressDto
+                        {
+                            Line1 = p.Producer_line1,
+                            Line2 = p.Producer_line2,
+                            City = p.Producer_city,
+                            Latitude = p.Producer_latitude,
+                            Longitude = p.Producer_longitude,
+                            Zipcode = p.Producer_zipcode
+                        }
+                    })
+                };
             }
             catch (Exception ex)
             {
-                return new List<ProducerDto>();
+                return new ProducersSearchDto();
             }
         }
 
