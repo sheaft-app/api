@@ -3,7 +3,6 @@ using System;
 
 namespace Sheaft.Models.ViewModels
 {
-
     public class UserViewModel
     {
         public Guid Id { get; set; }

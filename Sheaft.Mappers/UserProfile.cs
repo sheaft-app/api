@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Sheaft.Application.Commands;
 using Sheaft.Domain.Models;
+using Sheaft.Interop.Enums;
 using Sheaft.Models.Dto;
 using Sheaft.Models.Inputs;
 using Sheaft.Models.ViewModels;
@@ -13,6 +14,7 @@ namespace Sheaft.Mappers
         {
             CreateMap<User, UserViewModel>()
                 .ForMember(c => c.Name, opt => opt.MapFrom(d => $"{d.FirstName} {d.LastName}"))
+                .ForMember(c => c.Kind, opt => opt.MapFrom(d => d.Company != null ? d.Company.Kind : (ProfileKind)d.UserType))
                 .ForMember(c => c.Company, opt => opt.MapFrom(d => d.Company.Name));
 
             CreateMap<User, UserProfileDto>()
@@ -29,6 +31,9 @@ namespace Sheaft.Mappers
                 .IncludeBase<PurchaseOrderUser, UserProfileDto>();
             CreateMap<PurchaseOrderVendor, UserProfileDto>()
                 .IncludeBase<PurchaseOrderUser, UserProfileDto>();
+
+            CreateMap<PurchaseOrderSender, UserViewModel>();
+            CreateMap<PurchaseOrderVendor, UserViewModel>();
 
             CreateMap<IdInput, GenerateUserSponsoringCodeCommand>();
             CreateMap<RegisterConsumerInput, RegisterConsumerCommand>();
