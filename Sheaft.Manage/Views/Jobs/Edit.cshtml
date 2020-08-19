@@ -1,0 +1,26 @@
+﻿@model JobViewModel
+@{
+    ViewData["Title"] = "Job details";
+}
+
+    <div class="container">
+        <h1 class="display-4">Job details</h1>
+        <br />
+
+        @using (Html.BeginForm("Edit", "Jobs", FormMethod.Post, new { @class = "form" }))
+        {
+            @Html.AntiForgeryToken()
+            @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+            @Html.HiddenFor(model => model.Id)
+            <br />            
+
+            <br />
+            <a asp-controller="Jobs" asp-action="Index" class="btn btn-light">
+                Cancel
+            </a>
+            <button type="submit" class="btn btn-success">
+                <i class="fa fa-check">&nbsp;Save</i>
+            </button>
+        }
+
+    </div>

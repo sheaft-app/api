@@ -3,6 +3,7 @@ using Sheaft.Application.Commands;
 using Sheaft.Domain.Models;
 using Sheaft.Models.Dto;
 using Sheaft.Models.Inputs;
+using Sheaft.Models.ViewModels;
 
 namespace Sheaft.Mappers
 {
@@ -11,6 +12,9 @@ namespace Sheaft.Mappers
         public JobProfile()
         {
             CreateMap<Job, JobDto>()
+                .ForMember(d => d.User, opt => opt.MapFrom(r => r.User));
+
+            CreateMap<Job, JobViewModel>()
                 .ForMember(d => d.User, opt => opt.MapFrom(r => r.User));
 
             CreateMap<IdsInput, ResumeJobsCommand>();
