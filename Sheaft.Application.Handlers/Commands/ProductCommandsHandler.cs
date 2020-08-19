@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Net.Http;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
@@ -45,6 +46,7 @@ namespace Sheaft.Application.Handlers
         private readonly IQueueService _queuesService;
         private readonly IBlobService _blobsService;
         private readonly StorageOptions _storageOptions;
+        private readonly HttpClient _httpClient;
 
         public ProductCommandsHandler(
             IOptionsSnapshot<StorageOptions> storageOptions,
@@ -53,6 +55,7 @@ namespace Sheaft.Application.Handlers
             IIdentifierService identifierService,
             IQueueService queuesService,
             IBlobService blobsService,
+            IHttpClientFactory httpFactory,
             ILogger<ProductCommandsHandler> logger) : base(logger)
         {
             _context = context;
@@ -60,6 +63,7 @@ namespace Sheaft.Application.Handlers
             _identifierService = identifierService;
             _queuesService = queuesService;
             _blobsService = blobsService;
+            _httpClient = httpFactory.CreateClient("products");
 
             _storageOptions = storageOptions.Value;
         }
@@ -334,8 +338,17 @@ namespace Sheaft.Application.Handlers
                 return;
             }
 
-            var base64Data = Regex.Match(picture, @"data:image/(?<type>.+?),(?<data>.+)").Groups["data"].Value;
-            var bytes = Convert.FromBase64String(base64Data);
+            byte[] bytes = null;
+            if (!picture.StartsWith("http"))
+            {
+                var base64Data = picture.StartsWith("data:image") ? Regex.Match(picture, @"data:image/(?<type>.+?),(?<data>.+)").Groups["data"].Value : picture;
+                bytes = Convert.FromBase64String(base64Data);
+            }
+            else
+            {
+                using (var response = await _httpClient.GetAsync(picture))
+                    bytes = await response.Content.ReadAsByteArrayAsync();
+            }
 
             var imageId = Guid.NewGuid().ToString("N");
 
