@@ -10,10 +10,12 @@ using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Sheaft.Application.Commands;
 using Sheaft.Infrastructure.Interop;
+using Sheaft.Interop;
 using Sheaft.Manage.Models;
 using Sheaft.Models.ViewModels;
 using Sheaft.Options;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading;
@@ -73,6 +75,10 @@ namespace Sheaft.Manage.Controllers
         [HttpGet]
         public async Task<IActionResult> Edit(Guid id, CancellationToken token)
         {
+            var requestUser = await GetRequestUser(token);
+            if (!requestUser.IsImpersonating)
+                throw new Exception("You must impersonate product's producer to edit it.");
+
             var entity = await _context.Products
                 .AsNoTracking()
                 .Where(c => c.Id == id)
@@ -80,6 +86,7 @@ namespace Sheaft.Manage.Controllers
                 .SingleOrDefaultAsync(token);
 
             ViewBag.Tags = await GetTags(token);
+            ViewBag.Packagings = await GetPackagings(requestUser, token);
 
             return View(entity);
         }
@@ -147,6 +154,14 @@ namespace Sheaft.Manage.Controllers
 
             TempData["Removed"] = entity.Name;
             return RedirectToAction("Index");
+        }
+
+        private async Task<List<PackagingViewModel>> GetPackagings(IRequestUser requestUser, CancellationToken token)
+        {
+            return await _context.Packagings
+                            .Where(c => c.Producer.Id == requestUser.CompanyId && !c.RemovedOn.HasValue)
+                            .ProjectTo<PackagingViewModel>(_configurationProvider)
+                            .ToListAsync(token);
         }
     }
 }

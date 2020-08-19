@@ -15,7 +15,8 @@
         new SelectListItem("unité", UnitKind.unit.ToString("G")),
     };
 
-    var availableTags = ((List<TagViewModel>)ViewBag.Tags).Select(c => new SelectListItem(c.Name, c.Id.ToString("D"))).ToList();
+    var tags = ((List<TagViewModel>)ViewBag.Tags).Select(c => new SelectListItem(c.Name, c.Id.ToString("D"))).ToList();
+    var packagings = ((List<PackagingViewModel>)ViewBag.Packagings).Select(c => new SelectListItem(c.Name, c.Id.ToString("D"))).ToList();
 }
 
     <div class="container">
@@ -70,8 +71,12 @@
                 @Html.TextBoxFor(c => c.Picture, new { @class = "form-control", @type = "file" })
             </div>
             <div class="form-group">
+                @Html.LabelFor(c => c.PackagingId, "Packaging", new { @class = "form-label" })
+                @Html.DropDownListFor(c => c.PackagingId, packagings, new { @class = "form-control" })
+            </div>
+            <div class="form-group">
                 @Html.LabelFor(c => c.Tags, "Tags", new { @class = "form-label" })
-                @Html.ListBoxFor(c => c.Tags, availableTags, new { @class = "form-control", @style = "height:12rem;" })
+                @Html.ListBoxFor(c => c.Tags, tags, new { @class = "form-control", @style = "height:12rem;" })
             </div>
 
             <br />
