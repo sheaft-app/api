@@ -339,12 +339,12 @@ namespace Sheaft.Application.Handlers
             }
 
             byte[] bytes = null;
-            if (!picture.StartsWith("http"))
+            if (!picture.StartsWith("http") && !picture.StartsWith("https"))
             {
                 var base64Data = picture.StartsWith("data:image") ? Regex.Match(picture, @"data:image/(?<type>.+?),(?<data>.+)").Groups["data"].Value : picture;
                 bytes = Convert.FromBase64String(base64Data);
             }
-            else
+            else if(!picture.StartsWith("https://blob.") && !picture.Contains("core.windows.net"))
             {
                 using (var response = await _httpClient.GetAsync(picture))
                     bytes = await response.Content.ReadAsByteArrayAsync();
