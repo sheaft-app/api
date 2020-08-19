@@ -73,7 +73,7 @@ namespace Sheaft.Application.Queries
             }
         }
 
-        public async Task<IEnumerable<StoreDto>> SearchStoresAsync(Guid companyId, SearchTermsInput terms, IRequestUser currentUser, CancellationToken token)
+        public async Task<StoresSearchDto> SearchStoresAsync(Guid companyId, SearchTermsInput terms, IRequestUser currentUser, CancellationToken token)
         {
             try
             {
@@ -132,28 +132,32 @@ namespace Sheaft.Application.Queries
                     searchResults.Add(myobject);
                 }
 
-                return searchResults?.Select(p => new StoreDto
+                return new StoresSearchDto
                 {
-                    Id = p.Store_id,
-                    Name = p.Store_name,
-                    Email = p.Store_email,
-                    Phone = p.Store_phone,
-                    Picture = p.Store_picture,
-                    Tags = p.Store_tags?.Select(t => new TagDto { Name = t }) ?? new List<TagDto>(),
-                    Address = new AddressDto
+                    Count = results.Count ?? 0,
+                    Stores = searchResults?.Select(p => new StoreDto
                     {
-                        Line1 = p.Store_line1,
-                        Line2 = p.Store_line2,
-                        City = p.Store_city,
-                        Latitude = p.Store_latitude,
-                        Longitude = p.Store_longitude,
-                        Zipcode = p.Store_zipcode
-                    }
-                }) ?? new List<StoreDto>();
+                        Id = p.Store_id,
+                        Name = p.Store_name,
+                        Email = p.Store_email,
+                        Phone = p.Store_phone,
+                        Picture = p.Store_picture,
+                        Tags = p.Store_tags?.Select(t => new TagDto { Name = t }) ?? new List<TagDto>(),
+                        Address = new AddressDto
+                        {
+                            Line1 = p.Store_line1,
+                            Line2 = p.Store_line2,
+                            City = p.Store_city,
+                            Latitude = p.Store_latitude,
+                            Longitude = p.Store_longitude,
+                            Zipcode = p.Store_zipcode
+                        }
+                    })
+                };
             }
             catch (Exception ex)
             {
-                return new List<StoreDto>();
+                return new StoresSearchDto();
             }
         }
 

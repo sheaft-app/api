@@ -131,8 +131,8 @@ namespace Sheaft.GraphQL
 
         [Authorize(Policy = Policies.PRODUCER)]
         [GraphQLName("searchStores")]
-        [GraphQLType(typeof(ListType<SearchStoreType>))]
-        public async Task<IEnumerable<StoreDto>> SearchStoresAsync(SearchTermsInput input, [Service] ICompanyQueries companyQueries)
+        [GraphQLType(typeof(StoresSearchType))]
+        public async Task<StoresSearchDto> SearchStoresAsync(SearchTermsInput input, [Service] ICompanyQueries companyQueries)
         {
             return await companyQueries.SearchStoresAsync(_currentUser.CompanyId, input, _currentUser, _cancellationToken);
         }
