@@ -33,7 +33,7 @@ namespace Sheaft.Application.Queries
             _indexClient = searchServiceClient.Indexes.GetClient(searchOptions.Value.Indexes.Products);
         }
 
-        public async Task<IEnumerable<ProductDto>> SearchAsync(SearchTermsInput terms, IRequestUser currentUser, CancellationToken token)
+        public async Task<ProductsSearchDto> SearchAsync(SearchTermsInput terms, IRequestUser currentUser, CancellationToken token)
         {
             try
             {
@@ -94,39 +94,41 @@ namespace Sheaft.Application.Queries
                     searchResults.Add(myobject);
                 }
 
-                return searchResults?.Select(p => new ProductDto
-                {
-                    Id = p.Product_id,
-                    Name = p.Product_name,
-                    ImageMedium = p.Product_image,
-                    Picture = p.Product_image,
-                    OnSalePrice = p.Product_onSalePrice ?? 0,
-                    OnSalePricePerUnit = p.Product_onSalePricePerUnit ?? 0,
-                    QuantityPerUnit = p.Product_quantityPerUnit ?? 0,
-                    Rating = p.Product_rating,
-                    Packaged = p.Packaged.HasValue ? p.Packaged.Value : false,
-                    RatingsCount = p.Product_ratings_count,
-                    Tags = p.Product_tags?.Select(t => new TagDto { Name = t }) ?? new List<TagDto>(),
-                    Unit = (UnitKind)Enum.Parse(typeof(UnitKind), p.Product_unit.ToLowerInvariant()),
-                    Producer = new CompanyProfileDto
+                return new ProductsSearchDto {
+                    Count = results.Count ?? 0,
+                    Products = searchResults?.Select(p => new ProductDto
                     {
-                        Id = p.Producer_id,
-                        Name = p.Producer_name,
-                        Email = p.Producer_email,
-                        Phone = p.Producer_phone,
-                        Address = new AddressDto
+                        Id = p.Product_id,
+                        Name = p.Product_name,
+                        ImageMedium = p.Product_image,
+                        Picture = p.Product_image,
+                        OnSalePrice = p.Product_onSalePrice ?? 0,
+                        OnSalePricePerUnit = p.Product_onSalePricePerUnit ?? 0,
+                        QuantityPerUnit = p.Product_quantityPerUnit ?? 0,
+                        Rating = p.Product_rating,
+                        Packaged = p.Packaged.HasValue ? p.Packaged.Value : false,
+                        RatingsCount = p.Product_ratings_count,
+                        Tags = p.Product_tags?.Select(t => new TagDto { Name = t }) ?? new List<TagDto>(),
+                        Unit = (UnitKind)Enum.Parse(typeof(UnitKind), p.Product_unit.ToLowerInvariant()),
+                        Producer = new CompanyProfileDto
                         {
-                            City = p.Producer_city,
-                            Latitude = p.Producer_latitude,
-                            Longitude = p.Producer_longitude,
-                            Zipcode = p.Producer_zipcode                            
-                        }                        
-                    }
-                }) ?? new List<ProductDto>();
+                            Id = p.Producer_id,
+                            Name = p.Producer_name,
+                            Email = p.Producer_email,
+                            Phone = p.Producer_phone,
+                            Address = new AddressDto
+                            {
+                                City = p.Producer_city,
+                                Latitude = p.Producer_latitude,
+                                Longitude = p.Producer_longitude,
+                                Zipcode = p.Producer_zipcode
+                            }
+                        }
+                    })} ?? new ProductsSearchDto();
             }
             catch (Exception ex)
             {
-                return new List<ProductDto>();
+                return new ProductsSearchDto();
             }
         }
 

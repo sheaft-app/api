@@ -11,7 +11,7 @@ namespace Sheaft.Application.Queries
 {
     public interface IProductQueries
     {
-        Task<IEnumerable<ProductDto>> SearchAsync(SearchTermsInput terms, IRequestUser currentUser, CancellationToken token);
+        Task<ProductsSearchDto> SearchAsync(SearchTermsInput terms, IRequestUser currentUser, CancellationToken token);
         Task<bool> ProductIsRatedByUserAsync(Guid id, Guid userId, IRequestUser user, CancellationToken token);
         IQueryable<ProductDto> GetStoreProducts(Guid storeId, IRequestUser currentUser);
         IQueryable<ProductDto> GetProducerProducts(Guid producerId, IRequestUser currentUser);

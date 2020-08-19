@@ -371,6 +371,14 @@ namespace Sheaft.GraphQL.Types
         }
     }
 
+    public class ProductsSearchType : SheaftOutputType<ProductsSearchDto>
+    {
+        protected override void Configure(IObjectTypeDescriptor<ProductsSearchDto> descriptor)
+        {
+            descriptor.Field(c => c.Count);
+            descriptor.Field(c => c.Products).Type<ListType<SearchProductType>>();
+        }
+    }
     public class SearchProducerType : SheaftOutputType<ProducerDto>
     {
         protected override void Configure(IObjectTypeDescriptor<ProducerDto> descriptor)

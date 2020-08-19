@@ -138,8 +138,8 @@ namespace Sheaft.GraphQL
         }
 
         [GraphQLName("searchProducts")]
-        [GraphQLType(typeof(ListType<SearchProductType>))]
-        public async Task<IEnumerable<ProductDto>> SearchProductsAsync(SearchTermsInput input, [Service] IProductQueries productQueries)
+        [GraphQLType(typeof(ProductsSearchType))]
+        public async Task<ProductsSearchDto> SearchProductsAsync(SearchTermsInput input, [Service] IProductQueries productQueries)
         {
             return await productQueries.SearchAsync(input, _currentUser, _cancellationToken);
         }
