@@ -1,7 +1,95 @@
-﻿@{
-    ViewData["Title"] = "";
+﻿@model IEnumerable<PurchaseOrderViewModel>
+@{
+    ViewData["Title"] = "Purchase Orders";
+    int take = ViewBag.Take;
+    int currentPage = ViewBag.Page;
 }
 
-<div class="text-center">
-    <h1 class="display-4"></h1>
+<div class="container">
+    <h1 class="display-4">Purchase Orders</h1>
+    <br />
+
+    @if (ViewBag.Removed != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <span>Successfully removed purchase order @ViewBag.Removed</span>
+
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        <br />
+    }
+
+    @if (ViewBag.Edited != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <span>Successfully updated purchase order @ViewBag.Edited.Name</span>
+            <a asp-controller="PurchaseOrders" asp-action="Edit" asp-route-id="@ViewBag.Edited.Id">View details</a>
+
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        <br />
+    }
+
+    <table class="table table-hover">
+        <thead class="thead-dark">
+            <tr>
+                <th scope="col">Reference</th>
+                <th scope="col">Status</th>
+                <th scope="col">TotalOnSalePrice</th>
+                <th scope="col">CreatedOn</th>
+                <th scope="col">Lines</th>
+                <th scope="col">Products</th>
+                <th scope="col"></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var entity in Model)
+            {
+                <tr>
+                    <th scope="row">@entity.Reference</th>
+                    <td>@entity.Status</td>
+                    <td>@entity.TotalOnSalePrice</td>
+                    <td>@entity.CreatedOn</td>
+                    <td>@entity.LinesCount</td>
+                    <td>@entity.ProductsCount</td>
+                    <td>
+                        <a asp-controller="PurchaseOrders" asp-action="Edit" asp-route-id="@entity.Id" class="btn btn-info">
+                            <i class="fa fa-pen"></i>
+                        </a>
+                        @if (User.IsInRole("ADMIN"))
+                        {
+                            @using (Html.BeginForm("Delete", "PurchaseOrders", new { id = entity.Id }, FormMethod.Post, true, new { @class = "form d-inline" }))
+                            {
+                                <button type="submit" class="btn btn-danger">
+                                    <i class="fa fa-trash"></i>
+                                </button>
+                            }
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+        <tfoot>
+            <tr class="text-center">
+                <td colspan="4">
+                    @if (currentPage >= 1)
+                    {
+                        <a asp-controller="PurchaseOrders" asp-action="Index" asp-route-take="@take" asp-route-page="@(currentPage-1)" class="btn btn-info">
+                            <i class="fa fa-caret-left"></i>
+                        </a>
+                    }
+                    @if (take == Model.Count())
+                    {
+                        <a asp-controller="PurchaseOrders" asp-action="Index" asp-route-take="@take" asp-route-page="@(currentPage+1)" class="btn btn-info">
+                            <i class="fa fa-caret-right"></i>
+                        </a>
+                    }
+                </td>
+            </tr>
+        </tfoot>
+    </table>
 </div>

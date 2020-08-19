@@ -1,0 +1,26 @@
+﻿@model PurchaseOrderViewModel
+@{
+    ViewData["Title"] = "Purchase Order details";
+}
+
+<div class="container">
+    <h1 class="display-4">Purchase Order details</h1>
+    <br />
+
+    @using (Html.BeginForm("Edit", "PurchaseOrders", FormMethod.Post, new { @class = "form" }))
+    {
+        @Html.AntiForgeryToken()
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+        @Html.HiddenFor(model => model.Id)
+        <br />
+
+        <br />
+        <a asp-controller="PurchaseOrders" asp-action="Index" class="btn btn-light">
+            Cancel
+        </a>
+        <button type="submit" class="btn btn-success">
+            <i class="fa fa-check">&nbsp;Save</i>
+        </button>
+    }
+
+</div>

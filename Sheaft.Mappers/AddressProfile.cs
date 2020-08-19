@@ -12,6 +12,8 @@ namespace Sheaft.Mappers
         {
             CreateMap<Address, AddressDto>();
             CreateMap<Address, AddressViewModel>();
+            CreateMap<SimpleAddress, AddressDto>();
+            CreateMap<SimpleAddress, AddressViewModel>();
 
             CreateMap<AddressDto, AddressInput>();
             CreateMap<AddressViewModel, AddressInput>();
