@@ -76,7 +76,7 @@ namespace Sheaft.Manage.Controllers
         public async Task<IActionResult> ImpersonateById(Guid id, CancellationToken token)
         {
             var user = await _context.Users.SingleOrDefaultAsync(c => c.Id == id, token);
-            Impersonate(user);
+            AddImpersonate(user.Id, user.Company != null ? user.Company.Name : $"{user.FirstName} {user.LastName}");
             return RedirectToAction("Index", "Dashboard");
         }
 
@@ -84,8 +84,7 @@ namespace Sheaft.Manage.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult RemoveImpersonification()
         {
-            HttpContext.Response.Cookies.Delete("Sheaft.Impersonating.Id");
-            HttpContext.Response.Cookies.Delete("Sheaft.Impersonating.Name");
+            RemoveImpersonate();
             return RedirectToAction("Index", "Dashboard");
         }
 
@@ -93,16 +92,21 @@ namespace Sheaft.Manage.Controllers
         [ValidateAntiForgeryToken]
         public async Task Logout()
         {
-            RemoveImpersonification();
+            RemoveImpersonate();
             await HttpContext.SignOutAsync("Cookies");
             await HttpContext.SignOutAsync("oidc");
         }
 
-        private void Impersonate(User user)
+        private void AddImpersonate(Guid id, string name)
         {
-            var name = user.Company != null ? user.Company.Name : $"{user.FirstName} {user.LastName}";
-            HttpContext.Response.Cookies.Append("Sheaft.Impersonating.Id", user.Id.ToString("N"), new CookieOptions { Secure = true, HttpOnly = true, SameSite = SameSiteMode.Strict });
+            HttpContext.Response.Cookies.Append("Sheaft.Impersonating.Id", id.ToString("N"), new CookieOptions { Secure = true, HttpOnly = true, SameSite = SameSiteMode.Strict });
             HttpContext.Response.Cookies.Append("Sheaft.Impersonating.Name", name, new CookieOptions { Secure = true, HttpOnly = true, SameSite = SameSiteMode.Strict });
+        }
+
+        private void RemoveImpersonate()
+        {
+            HttpContext.Response.Cookies.Delete("Sheaft.Impersonating.Id");
+            HttpContext.Response.Cookies.Delete("Sheaft.Impersonating.Name");
         }
     }
 }
