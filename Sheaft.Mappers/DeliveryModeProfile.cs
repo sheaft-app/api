@@ -3,6 +3,7 @@ using Sheaft.Application.Commands;
 using Sheaft.Domain.Models;
 using Sheaft.Models.Dto;
 using Sheaft.Models.Inputs;
+using Sheaft.Models.ViewModels;
 
 namespace Sheaft.Mappers
 {
@@ -11,6 +12,11 @@ namespace Sheaft.Mappers
         public DeliveryModeProfile()
         {
             CreateMap<DeliveryMode, DeliveryModeDto>()
+                .ForMember(d => d.Address, opt => opt.MapFrom(r => r.Address))
+                .ForMember(d => d.Producer, opt => opt.MapFrom(r => r.Producer))
+                .ForMember(d => d.OpeningHours, opt => opt.MapFrom(r => r.OpeningHours));
+
+            CreateMap<DeliveryMode, DeliveryModeViewModel>()
                 .ForMember(d => d.Address, opt => opt.MapFrom(r => r.Address))
                 .ForMember(d => d.Producer, opt => opt.MapFrom(r => r.Producer))
                 .ForMember(d => d.OpeningHours, opt => opt.MapFrom(r => r.OpeningHours));
