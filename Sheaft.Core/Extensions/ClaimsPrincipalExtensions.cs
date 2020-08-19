@@ -79,12 +79,12 @@ namespace Sheaft.Core.Extensions
             return userClaims.Select(uc => uc.Value);
         }
 
-        public static RequestUser ToIdentityUser(this ClaimsPrincipal user, string requestId)
+        public static RequestUser ToIdentityUser(this ClaimsPrincipal user, string requestId, Guid? impersonification = null)
         {
             var email = user.Claims?.FirstOrDefault(c => c.Type == JwtClaimTypes.Email)?.Value;
             var name = user.Claims?.FirstOrDefault(c => c.Type == JwtClaimTypes.Name)?.Value;
 
-            return new RequestUser(user.TryGetUserId(), user.GetName(), user.GetEmail(), user.GetRoles(), user.TryGetCompanyId(), requestId);
+            return new RequestUser(user.TryGetUserId(), user.GetName(), user.GetEmail(), user.GetRoles(), user.TryGetCompanyId(), requestId, impersonification);
         }
     }
 }
