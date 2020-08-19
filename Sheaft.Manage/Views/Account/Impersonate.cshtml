@@ -1,0 +1,79 @@
+﻿@model IEnumerable<UserViewModel>
+@{
+    ViewData["Title"] = "Impersonification";
+}
+
+<div class="text-center">
+    <h1 class="display-4">Impersonification</h1>
+</div>
+<br />
+
+@if (ViewBag.User != null)
+{
+    <div>
+        You are impersonating @ViewBag.User.Name
+        <br />
+        @using (Html.BeginForm("RemoveImpersonification", "Account", FormMethod.Post, new { @class = "form" }))
+        {
+            @Html.AntiForgeryToken()
+
+            <br />
+            <button class="btn btn-danger" type="submit">
+                Remove Impersonification
+            </button>
+        }
+    </div>
+}
+else
+{
+    @using (Html.BeginForm("ImpersonateByEmail", "Account", FormMethod.Post, new { @class = "form" }))
+    {
+        @Html.AntiForgeryToken()
+        <div class="input-group mb-3">
+            <input name="email" type="text" class="form-control" placeholder="User or company email" aria-label="User or company email">
+            <div class="input-group-append">
+                <button class="btn btn-outline-primary" type="submit">
+                    <i class="fa fa-search"></i>
+                </button>
+            </div>
+        </div>
+    }
+
+    <table class="table table-hover">
+        <thead class="thead-dark">
+            <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Company</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model != null && Model.Any())
+            {
+                @foreach (var user in Model)
+                {
+                    <tr>
+                        <td>@user.Name</td>
+                        <td>@user.Email</td>
+                        <td>@user.Company</td>
+                        <td>
+                            @using (Html.BeginForm("ImpersonateById", "Account", new { Id = user.Id }, FormMethod.Post, true, new { @class = "form" }))
+                            {
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fa fa-user-secret"></i>
+                                </button>
+                            }
+                        </td>
+                    </tr>
+                }
+            }
+            else
+            {
+                <tr>
+                    <td colspan="4">Search a user by email</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}

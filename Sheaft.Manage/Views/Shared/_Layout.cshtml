@@ -10,20 +10,66 @@
 </head>
 <body>
     <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
+        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3 justify-content-between">
             <div class="container">
                 <a class="navbar-brand" asp-area="" asp-controller="Dashboard" asp-action="Index">Sheaft</a>
                 <button class="navbar-toggler" type="button" data-toggle="collapse" data-target=".navbar-collapse" aria-controls="navbarSupportedContent"
                         aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
-                @*<div class="navbar-collapse collapse d-sm-inline-flex flex-sm-row-reverse">
-                    <ul class="navbar-nav flex-grow-1">
+                <div class="collapse navbar-collapse d-sm-inline-flex">
+                    <ul class="navbar-nav mr-auto">
+
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Dashboard" asp-action="Index">Home</a>
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Dashboard" asp-action="Index">Dashboard</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Companies" asp-action="Index">Companies</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Products" asp-action="Index">Products</a>
                         </li>
                     </ul>
-                </div>*@
+                        @if (Context.Request.ImpersonificationId().HasValue)
+                        {
+                            @using (Html.BeginForm("RemoveImpersonification", "Account", FormMethod.Post, new { @class = "form-inline" }))
+                            {
+                                @Html.AntiForgeryToken()
+
+                                <button class="btn btn-outline-danger" type="submit">Logout @Context.Request.ImpersonificationName()</button>
+                            }
+                        }
+                        else
+                        {
+                                @using (Html.BeginForm("ImpersonateByEmail", "Account", FormMethod.Post, new { @class = "form-inline" }))
+                                {
+                                    @Html.AntiForgeryToken()
+                                    <div class="input-group">
+                                        <input name="email" type="text" class="form-control" placeholder="User or company email" aria-label="User or company email">
+                                        <div class="input-group-append">
+                                            <button class="btn btn-outline-primary" type="submit">
+                                                <i class="fa fa-search"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                }
+                            <div class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    @User.GetName()
+                                </a>
+                                <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                    @using (Html.BeginForm("Logout", "Account", FormMethod.Post, new { @class = "form" }))
+                                    {
+                                        @Html.AntiForgeryToken()
+
+                                        <button class="btn btn-outline-primary dropdown-item" type="submit">
+                                            Déconnexion
+                                        </button>
+                                    }
+                                </div>
+                            </div>
+                        }
+                </div>
             </div>
         </nav>
     </header>
