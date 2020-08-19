@@ -39,8 +39,10 @@
                 <tr>
                     <th scope="col">Reference</th>
                     <th scope="col">Name</th>
+                    <th scope="col">WholeSalePrice</th>
+                    <th scope="col">Vat(%)</th>
                     <th scope="col">CreatedOn</th>
-                    <th scope="col">Company</th>
+                    <th scope="col">Producer</th>
                     <th scope="col"></th>
                 </tr>
             </thead>
@@ -50,6 +52,8 @@
                     <tr>
                         <th scope="row">@entity.Reference</th>
                         <th>@entity.Name</th>
+                        <th>@entity.WholeSalePricePerUnit</th>
+                        <th>@entity.Vat</th>
                         <td>@entity.CreatedOn</td>
                         <td>@entity.Producer.Name</td>
                         <td>

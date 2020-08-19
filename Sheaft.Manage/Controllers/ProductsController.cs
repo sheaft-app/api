@@ -99,6 +99,7 @@ namespace Sheaft.Manage.Controllers
             if(!requestUser.IsImpersonating)
             {
                 ViewBag.Tags = await GetTags(token);
+                ViewBag.Packagings = await GetPackagings(requestUser, token);
 
                 ModelState.AddModelError("", "You must impersonate product's producer to edit it.");
                 return View(model);
@@ -133,6 +134,7 @@ namespace Sheaft.Manage.Controllers
             if (!result.Success)
             {
                 ViewBag.Tags = await GetTags(token);
+                ViewBag.Packagings = await GetPackagings(requestUser, token);
 
                 ModelState.AddModelError("", result.Exception.Message);
                 return View(model);
