@@ -26,19 +26,6 @@
 }
 else
 {
-    @using (Html.BeginForm("ImpersonateByEmail", "Account", FormMethod.Post, new { @class = "form" }))
-    {
-        @Html.AntiForgeryToken()
-        <div class="input-group mb-3">
-            <input name="email" type="text" class="form-control" placeholder="User or company email" aria-label="User or company email">
-            <div class="input-group-append">
-                <button class="btn btn-outline-primary" type="submit">
-                    <i class="fa fa-search"></i>
-                </button>
-            </div>
-        </div>
-    }
-
     <table class="table table-hover">
         <thead class="thead-dark">
             <tr>
