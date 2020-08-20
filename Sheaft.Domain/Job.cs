@@ -91,6 +91,11 @@ namespace Sheaft.Domain.Models
             Archived = true;
         }
 
+        public void UnarchiveJob()
+        {
+            Archived = false;
+        }
+
         public void ResumeJob()
         {
             if (!StartedOn.HasValue || Status != ProcessStatusKind.Paused)
@@ -146,6 +151,22 @@ namespace Sheaft.Domain.Models
                 return default;
 
             return JsonConvert.DeserializeObject<T>(Command);
+        }
+
+        public void Remove()
+        {
+        }
+
+        public void Restore()
+        {
+            RemovedOn = null;
+        }
+
+        public void ResetJob()
+        {
+            Status = ProcessStatusKind.Waiting;
+            Retried = 0;
+            Message = null;
         }
     }
 }

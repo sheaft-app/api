@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Sheaft.Services.Interop;
 using Microsoft.Extensions.Logging;
+using Microsoft.EntityFrameworkCore;
 
 namespace Sheaft.Application.Handlers
 {
@@ -20,7 +21,9 @@ namespace Sheaft.Application.Handlers
         IRequestHandler<CancelAgreementsCommand, CommandResult<bool>>,
         IRequestHandler<CancelAgreementCommand, CommandResult<bool>>,
         IRequestHandler<RefuseAgreementsCommand, CommandResult<bool>>,
-        IRequestHandler<RefuseAgreementCommand, CommandResult<bool>>
+        IRequestHandler<RefuseAgreementCommand, CommandResult<bool>>,
+        IRequestHandler<DeleteAgreementCommand, CommandResult<bool>>,
+        IRequestHandler<RestoreAgreementCommand, CommandResult<bool>>
     {
         private readonly IMediator _mediatr;
         private readonly IAppDbContext _context;
@@ -173,6 +176,33 @@ namespace Sheaft.Application.Handlers
 
                 if (request.RequestUser.CompanyId == entity.Delivery.Producer.Id)
                     await _queuesService.ProcessEventAsync(AgreementRefusedByProducerEvent.QUEUE_NAME, new AgreementRefusedByProducerEvent(request.RequestUser) { Id = entity.Id }, token);
+
+                return OkResult(true);
+            });
+        }
+
+        public async Task<CommandResult<bool>> Handle(DeleteAgreementCommand request, CancellationToken token)
+        {
+            return await ExecuteAsync(async () =>
+            {
+                var entity = await _context.GetByIdAsync<Agreement>(request.Id, token);
+
+                _context.Agreements.Remove(entity);
+                await _context.SaveChangesAsync(token);
+
+                return OkResult(true);
+            });
+        }
+
+        public async Task<CommandResult<bool>> Handle(RestoreAgreementCommand request, CancellationToken token)
+        {
+            return await ExecuteAsync(async () =>
+            {
+                var entity = await _context.Agreements.SingleOrDefaultAsync(a => a.Id == request.Id && a.RemovedOn.HasValue, token);
+                entity.Restore();
+
+                _context.Update(entity);
+                await _context.SaveChangesAsync(token);
 
                 return OkResult(true);
             });

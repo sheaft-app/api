@@ -13,7 +13,8 @@ namespace Sheaft.Application.Handlers
     public class PackagingCommandsHandler : CommandsHandler,
         IRequestHandler<CreatePackagingCommand, CommandResult<Guid>>,
         IRequestHandler<UpdatePackagingCommand, CommandResult<bool>>,
-        IRequestHandler<DeletePackagingCommand, CommandResult<bool>>
+        IRequestHandler<DeletePackagingCommand, CommandResult<bool>>,
+        IRequestHandler<RestorePackagingCommand, CommandResult<bool>>
     {
         private readonly IAppDbContext _context;
 
@@ -57,10 +58,22 @@ namespace Sheaft.Application.Handlers
         {
             return await ExecuteAsync(async () =>
             {
-                var packaging = await _context.GetByIdAsync<Packaging>(request.Id, token);
+                var entity = await _context.GetByIdAsync<Packaging>(request.Id, token);
 
-                _context.Remove(packaging);
+                _context.Remove(entity);
 
+                return OkResult(await _context.SaveChangesAsync(token) > 0);
+            });
+        }
+
+        public async Task<CommandResult<bool>> Handle(RestorePackagingCommand request, CancellationToken token)
+        {
+            return await ExecuteAsync(async () =>
+            {
+                var entity = await _context.GetByIdAsync<Packaging>(request.Id, token);
+                entity.Restore();
+
+                _context.Remove(entity);
                 return OkResult(await _context.SaveChangesAsync(token) > 0);
             });
         }

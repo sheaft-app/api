@@ -8,6 +8,7 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using OfficeOpenXml;
@@ -38,7 +39,8 @@ namespace Sheaft.Application.Handlers
         IRequestHandler<DeleteProductCommand, CommandResult<bool>>,
         IRequestHandler<QueueImportProductsCommand, CommandResult<Guid>>,
         IRequestHandler<ImportProductsCommand, CommandResult<bool>>,
-        IRequestHandler<UpdateProductPictureCommand, CommandResult<bool>>
+        IRequestHandler<UpdateProductPictureCommand, CommandResult<bool>>,
+        IRequestHandler<RestoreProductCommand, CommandResult<bool>>
     {
         private readonly IAppDbContext _context;
         private readonly IMediator _mediatr;
@@ -221,10 +223,9 @@ namespace Sheaft.Application.Handlers
             return await ExecuteAsync(async () =>
             {
                 var entity = await _context.GetByIdAsync<Product>(request.Id, token);
+                entity.Remove();
 
-                entity.SetReference(DateTimeOffset.UtcNow.ToString("_" + entity.Reference));
-                _context.Products.Remove(entity);
-
+                _context.Remove(entity);
                 return OkResult(await _context.SaveChangesAsync(token) > 0);
             });
         }
@@ -431,6 +432,20 @@ namespace Sheaft.Application.Handlers
             createProductCommand.Tags = tags.Select(t => t.Id);
 
             return OkResult(createProductCommand);
+        }
+
+        public async Task<CommandResult<bool>> Handle(RestoreProductCommand request, CancellationToken token)
+        {
+            return await ExecuteAsync(async () =>
+            {
+                var entity = await _context.Products.SingleOrDefaultAsync(a => a.Id == request.Id && a.RemovedOn.HasValue, token);
+                entity.Restore();
+
+                _context.Update(entity);
+                await _context.SaveChangesAsync(token);
+
+                return OkResult(true);
+            });
         }
 
         #endregion

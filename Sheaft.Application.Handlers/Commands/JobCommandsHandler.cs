@@ -6,6 +6,7 @@ using Sheaft.Application.Commands;
 using Sheaft.Core;
 using Sheaft.Domain.Models;
 using Sheaft.Infrastructure.Interop;
+using Sheaft.Services.Interop;
 
 namespace Sheaft.Application.Handlers
 {
@@ -23,18 +24,25 @@ namespace Sheaft.Application.Handlers
         IRequestHandler<PauseJobCommand, CommandResult<bool>>,
         IRequestHandler<ResumeJobCommand, CommandResult<bool>>,
         IRequestHandler<ArchiveJobCommand, CommandResult<bool>>,
+        IRequestHandler<UnarchiveJobCommand, CommandResult<bool>>,
         IRequestHandler<StartJobCommand, CommandResult<bool>>,
         IRequestHandler<CompleteJobCommand, CommandResult<bool>>,
-        IRequestHandler<FailJobCommand, CommandResult<bool>>
+        IRequestHandler<FailJobCommand, CommandResult<bool>>,
+        IRequestHandler<ResetJobCommand, CommandResult<bool>>,
+        IRequestHandler<DeleteJobCommand, CommandResult<bool>>,
+        IRequestHandler<RestoreJobCommand, CommandResult<bool>>
     {
         private readonly IAppDbContext _context;
         private readonly IMediator _mediatr;
+        private readonly IQueueService _queuesService;
 
         public JobCommandsHandler(
             IMediator mediatr, 
             IAppDbContext context,
+            IQueueService queueService,
             ILogger<JobCommandsHandler> logger) : base(logger)
         {
+            _queuesService = queueService;
             _context = context;
             _mediatr = mediatr;
         }
@@ -204,10 +212,10 @@ namespace Sheaft.Application.Handlers
         {
             return await ExecuteAsync(async () =>
             {
-                var job = await _context.GetByIdAsync<Job>(request.Id, token);
+                var entity = await _context.GetByIdAsync<Job>(request.Id, token);
 
-                job.CancelJob(request.Reason);
-                _context.Update(job);
+                entity.CancelJob(request.Reason);
+                _context.Update(entity);
 
                 return OkResult(await _context.SaveChangesAsync(token) > 0);
             });
@@ -218,12 +226,15 @@ namespace Sheaft.Application.Handlers
         {
             return await ExecuteAsync(async () =>
             {
-                var job = await _context.GetByIdAsync<Job>(request.Id, token);
+                var entity = await _context.GetByIdAsync<Job>(request.Id, token);
 
-                job.RetryJob();
-                _context.Update(job);
+                entity.RetryJob();
+                _context.Update(entity);
 
-                return OkResult(await _context.SaveChangesAsync(token) > 0);
+                var result = await _context.SaveChangesAsync(token);
+                await _queuesService.InsertJobToProcessAsync(entity, token);
+
+                return OkResult(result > 0);
             });
         }
 
@@ -232,10 +243,10 @@ namespace Sheaft.Application.Handlers
         {
             return await ExecuteAsync(async () =>
             {
-                var job = await _context.GetByIdAsync<Job>(request.Id, token);
+                var entity = await _context.GetByIdAsync<Job>(request.Id, token);
 
-                job.PauseJob();
-                _context.Update(job);
+                entity.PauseJob();
+                _context.Update(entity);
 
                 return OkResult(await _context.SaveChangesAsync(token) > 0);
             });
@@ -246,10 +257,24 @@ namespace Sheaft.Application.Handlers
         {
             return await ExecuteAsync(async () =>
             {
-                var job = await _context.GetByIdAsync<Job>(request.Id, token);
+                var entity = await _context.GetByIdAsync<Job>(request.Id, token);
 
-                job.ArchiveJob();
-                _context.Update(job);
+                entity.ArchiveJob();
+                _context.Update(entity);
+
+                return OkResult(await _context.SaveChangesAsync(token) > 0);
+            });
+        }
+
+        public async Task<CommandResult<bool>> Handle(UnarchiveJobCommand request,
+            CancellationToken token)
+        {
+            return await ExecuteAsync(async () =>
+            {
+                var entity = await _context.GetByIdAsync<Job>(request.Id, token);
+
+                entity.UnarchiveJob();
+                _context.Update(entity);
 
                 return OkResult(await _context.SaveChangesAsync(token) > 0);
             });
@@ -260,10 +285,10 @@ namespace Sheaft.Application.Handlers
         {
             return await ExecuteAsync(async () =>
             {
-                var job = await _context.GetByIdAsync<Job>(request.Id, token);
+                var entity = await _context.GetByIdAsync<Job>(request.Id, token);
 
-                job.ResumeJob();
-                _context.Update(job);
+                entity.ResumeJob();
+                _context.Update(entity);
 
                 return OkResult(await _context.SaveChangesAsync(token) > 0);
             });
@@ -274,10 +299,10 @@ namespace Sheaft.Application.Handlers
         {
             return await ExecuteAsync(async () =>
             {
-                var job = await _context.GetByIdAsync<Job>(request.Id, token);
+                var entity = await _context.GetByIdAsync<Job>(request.Id, token);
 
-                job.StartJob();
-                _context.Update(job);
+                entity.StartJob();
+                _context.Update(entity);
 
                 return OkResult(await _context.SaveChangesAsync(token) > 0);
             });
@@ -288,12 +313,12 @@ namespace Sheaft.Application.Handlers
         {
             return await ExecuteAsync(async () =>
             {
-                var job = await _context.GetByIdAsync<Job>(request.Id, token);
+                var entity = await _context.GetByIdAsync<Job>(request.Id, token);
 
-                job.SetDownloadUrl(request.FileUrl);
-                job.CompleteJob();
+                entity.SetDownloadUrl(request.FileUrl);
+                entity.CompleteJob();
 
-                _context.Update(job);
+                _context.Update(entity);
 
                 return OkResult(await _context.SaveChangesAsync(token) > 0);
             });
@@ -304,11 +329,52 @@ namespace Sheaft.Application.Handlers
         {
             return await ExecuteAsync(async () =>
             {
-                var job = await _context.GetByIdAsync<Job>(request.Id, token);
+                var entity = await _context.GetByIdAsync<Job>(request.Id, token);
 
-                job.FailJob(request.Reason);
-                _context.Update(job);
+                entity.FailJob(request.Reason);
+                _context.Update(entity);
                 
+                return OkResult(await _context.SaveChangesAsync(token) > 0);
+            });
+        }
+
+        public async Task<CommandResult<bool>> Handle(ResetJobCommand request, CancellationToken token)
+        {
+            return await ExecuteAsync(async () =>
+            {
+                var entity = await _context.GetByIdAsync<Job>(request.Id, token);
+
+                entity.ResetJob();
+                _context.Update(entity);
+
+                var result = await _context.SaveChangesAsync(token);
+                await _queuesService.InsertJobToProcessAsync(entity, token);
+
+                return OkResult(result > 0);
+            });
+        }
+
+        public async Task<CommandResult<bool>> Handle(DeleteJobCommand request, CancellationToken token)
+        {
+            return await ExecuteAsync(async () =>
+            {
+                var entity = await _context.GetByIdAsync<Job>(request.Id, token);
+
+                _context.Remove(entity);
+
+                return OkResult(await _context.SaveChangesAsync(token) > 0);
+            });
+        }
+
+        public async Task<CommandResult<bool>> Handle(RestoreJobCommand request, CancellationToken token)
+        {
+            return await ExecuteAsync(async () =>
+            {
+                var entity = await _context.GetByIdAsync<Job>(request.Id, token);
+
+                entity.Restore();
+                _context.Update(entity);
+
                 return OkResult(await _context.SaveChangesAsync(token) > 0);
             });
         }

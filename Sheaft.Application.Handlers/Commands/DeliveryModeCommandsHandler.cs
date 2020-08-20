@@ -9,13 +9,15 @@ using Sheaft.Domain.Models;
 using System.Linq;
 using System.Collections.Generic;
 using Microsoft.Extensions.Logging;
+using Microsoft.EntityFrameworkCore;
 
 namespace Sheaft.Application.Handlers
 {
     public class DeliveryModeCommandsHandler : CommandsHandler,
         IRequestHandler<CreateDeliveryModeCommand, CommandResult<Guid>>,
         IRequestHandler<UpdateDeliveryModeCommand, CommandResult<bool>>,
-        IRequestHandler<DeleteDeliveryModeCommand, CommandResult<bool>>
+        IRequestHandler<DeleteDeliveryModeCommand, CommandResult<bool>>,
+        IRequestHandler<RestoreDeliveryModeCommand, CommandResult<bool>>
     {
         private readonly IAppDbContext _context;
 
@@ -94,6 +96,20 @@ namespace Sheaft.Application.Handlers
                 _context.DeliveryModes.Remove(entity);
 
                 return OkResult(await _context.SaveChangesAsync(token) > 0);
+            });
+        }
+
+        public async Task<CommandResult<bool>> Handle(RestoreDeliveryModeCommand request, CancellationToken token)
+        {
+            return await ExecuteAsync(async () =>
+            {
+                var entity = await _context.DeliveryModes.SingleOrDefaultAsync(a => a.Id == request.Id && a.RemovedOn.HasValue, token);
+                entity.Restore();
+
+                _context.Update(entity);
+                await _context.SaveChangesAsync(token);
+
+                return OkResult(true);
             });
         }
     }

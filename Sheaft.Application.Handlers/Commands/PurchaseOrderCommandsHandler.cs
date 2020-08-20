@@ -14,6 +14,7 @@ using Microsoft.Extensions.Configuration;
 using Sheaft.Services.Interop;
 using Sheaft.Models.Inputs;
 using Microsoft.Extensions.Logging;
+using Microsoft.EntityFrameworkCore;
 
 namespace Sheaft.Application.Handlers
 {
@@ -38,7 +39,8 @@ namespace Sheaft.Application.Handlers
         IRequestHandler<CompletePurchaseOrderCommand, CommandResult<bool>>,
         IRequestHandler<ShipPurchaseOrderCommand, CommandResult<bool>>,
         IRequestHandler<DeliverPurchaseOrderCommand, CommandResult<bool>>,
-        IRequestHandler<DeletePurchaseOrderCommand, CommandResult<bool>>
+        IRequestHandler<DeletePurchaseOrderCommand, CommandResult<bool>>,
+        IRequestHandler<RestorePurchaseOrderCommand, CommandResult<bool>>
     {
         private readonly IAppDbContext _context;
         private readonly IMediator _mediatr;
@@ -418,12 +420,25 @@ namespace Sheaft.Application.Handlers
         {
             return await ExecuteAsync(async () =>
             {
-                var purchaseOrder = await _context.GetByIdAsync<PurchaseOrder>(request.Id, token);
+                var entity = await _context.GetByIdAsync<PurchaseOrder>(request.Id, token);
+                entity.Remove();
 
-                purchaseOrder.SetReference(DateTimeOffset.UtcNow.ToString("yyyyMMddHHmmss_" + purchaseOrder.Reference));
-                _context.Remove(purchaseOrder);
-
+                _context.Remove(entity);
                 return OkResult(await _context.SaveChangesAsync(token) > 0);
+            });
+        }
+
+        public async Task<CommandResult<bool>> Handle(RestorePurchaseOrderCommand request, CancellationToken token)
+        {
+            return await ExecuteAsync(async () =>
+            {
+                var entity = await _context.PurchaseOrders.SingleOrDefaultAsync(a => a.Id == request.Id && a.RemovedOn.HasValue, token);
+                entity.Restore();
+
+                _context.Update(entity);
+                await _context.SaveChangesAsync(token);
+
+                return OkResult(true);
             });
         }
     }

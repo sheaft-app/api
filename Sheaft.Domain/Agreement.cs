@@ -80,5 +80,10 @@ namespace Sheaft.Domain.Models
             Status = AgreementStatusKind.Refused;
             Reason = reason;
         }
+
+        public void Restore()
+        {
+            RemovedOn = null;
+        }
     }
 }

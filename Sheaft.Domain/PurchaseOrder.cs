@@ -230,5 +230,16 @@ namespace Sheaft.Domain.Models
             TotalOnSalePrice = Math.Round(_products.Sum(p => p.TotalOnSalePrice), DIGITS_COUNT);
             TotalWeight = Math.Round(_products.Where(p => p.TotalWeight.HasValue).Sum(p => p.TotalWeight) ?? 0, DIGITS_COUNT);
         }
+
+        public void Remove()
+        {
+            Reference = $"___{Reference}";
+        }
+
+        public void Restore()
+        {
+            RemovedOn = null;
+            Reference = Reference.Replace("___", "");
+        }
     }
 }
