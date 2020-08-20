@@ -22,31 +22,31 @@
             <br />
 
             <div class="form-group">
-                @Html.LabelFor(c => c.Name, "Nom", new { @class = "form-label" })
+                @Html.LabelFor(c => c.Name, new { @class = "form-label" })
                 @Html.TextBoxFor(c => c.Name, null, new { @class = "form-control" })
             </div>
             <div class="form-group">
-                @Html.LabelFor(c => c.Kind, "Type", new { @class = "form-label" })
+                @Html.LabelFor(c => c.Kind, new { @class = "form-label" })
                 @Html.DropDownListFor(c => c.Kind, kinds, new { @class = "form-control", @disabled="disabled" })
             </div>
             <div class="form-group">
-                @Html.LabelFor(c => c.Email, "Email", new { @class = "form-label" })
+                @Html.LabelFor(c => c.Email, new { @class = "form-label" })
                 @Html.TextBoxFor(c => c.Email, null, new { @class = "form-control" })
             </div>
             <div class="form-group">
-                @Html.LabelFor(c => c.Phone, "Phone", new { @class = "form-label" })
+                @Html.LabelFor(c => c.Phone, new { @class = "form-label" })
                 @Html.TextBoxFor(c => c.Phone, null, new { @class = "form-control" })
             </div>
             <div class="form-group">
-                @Html.LabelFor(c => c.Siret, "SIRET", new { @class = "form-label" })
+                @Html.LabelFor(c => c.Siret, new { @class = "form-label" })
                 @Html.TextBoxFor(c => c.Siret, null, new { @class = "form-control" })
             </div>
             <div class="form-group">
-                @Html.LabelFor(c => c.VatIdentifier, "TVA", new { @class = "form-label" })
+                @Html.LabelFor(c => c.VatIdentifier, new { @class = "form-label" })
                 @Html.TextBoxFor(c => c.VatIdentifier, null, new { @class = "form-control" })
             </div>
             <div class="form-group">
-                @Html.LabelFor(c => c.Tags, "Tags", new { @class = "form-label" })
+                @Html.LabelFor(c => c.Tags, new { @class = "form-label" })
                 @Html.ListBoxFor(c => c.Tags, availableTags, new { @class = "form-control", @style = "height:12rem;" })
             </div>
             <div class="form-group">
@@ -58,7 +58,7 @@
                 @Html.TextBoxFor(c => c.Picture, new { @class = "form-control", @type = "file" })
             </div>
             <div class="form-group">
-                @Html.LabelFor(c => c.Description, "Description", new { @class = "form-label" })
+                @Html.LabelFor(c => c.Description, new { @class = "form-label" })
                 @Html.TextAreaFor(c => c.Description, new { @class = "form-control" })
             </div>
             <div class="form-check">
@@ -68,31 +68,29 @@
             <br/>
             <h4>Address</h4>
             <div class="form-group">
-                @Html.LabelFor(c => c.Address.Line1, "Line1", new { @class = "form-label" })
+                @Html.LabelFor(c => c.Address.Line1, new { @class = "form-label" })
                 @Html.TextBoxFor(c => c.Address.Line1, null, new { @class = "form-control" })
             </div>
             <div class="form-group">
-                @Html.LabelFor(c => c.Address.Line2, "Line2", new { @class = "form-label" })
+                @Html.LabelFor(c => c.Address.Line2, new { @class = "form-label" })
                 @Html.TextBoxFor(c => c.Address.Line2, null, new { @class = "form-control" })
             </div>
             <div class="form-group">
-                @Html.LabelFor(c => c.Address.Zipcode, "Zipcode", new { @class = "form-label" })
+                @Html.LabelFor(c => c.Address.Zipcode, new { @class = "form-label" })
                 @Html.TextBoxFor(c => c.Address.Zipcode, null, new { @class = "form-control" })
             </div>
             <div class="form-group">
-                @Html.LabelFor(c => c.Address.City, "City", new { @class = "form-label" })
+                @Html.LabelFor(c => c.Address.City, new { @class = "form-label" })
                 @Html.TextBoxFor(c => c.Address.City, null, new { @class = "form-control" })
             </div>
             <div class="form-group">
-                @Html.LabelFor(c => c.Address.Latitude, "Latitude", new { @class = "form-label" })
+                @Html.LabelFor(c => c.Address.Latitude, new { @class = "form-label" })
                 @Html.TextBoxFor(c => c.Address.Latitude, null, new { @class = "form-control" })
             </div>
             <div class="form-group">
-                @Html.LabelFor(c => c.Address.Longitude, "Longitude", new { @class = "form-label" })
+                @Html.LabelFor(c => c.Address.Longitude, new { @class = "form-label" })
                 @Html.TextBoxFor(c => c.Address.Longitude, null, new { @class = "form-control" })
             </div>
-
-
 
             <br />
             <a asp-controller="Companies" asp-action="Index" class="btn btn-light">
