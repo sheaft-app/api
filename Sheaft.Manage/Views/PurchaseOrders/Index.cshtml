@@ -40,37 +40,49 @@
                 <th scope="col">Reference</th>
                 <th scope="col">Status</th>
                 <th scope="col">TotalOnSalePrice</th>
-                <th scope="col">CreatedOn</th>
                 <th scope="col">Lines</th>
                 <th scope="col">Products</th>
+                <th scope="col">CreatedOn</th>
+                <th scope="col">Removed</th>
                 <th scope="col"></th>
             </tr>
         </thead>
         <tbody>
             @foreach (var entity in Model)
             {
-                <tr>
-                    <th scope="row">@entity.Reference</th>
-                    <td>@entity.Status</td>
-                    <td>@entity.TotalOnSalePrice</td>
-                    <td>@entity.CreatedOn</td>
-                    <td>@entity.LinesCount</td>
-                    <td>@entity.ProductsCount</td>
-                    <td>
-                        <a asp-controller="PurchaseOrders" asp-action="Edit" asp-route-id="@entity.Id" class="btn btn-info">
-                            <i class="fa fa-pen"></i>
-                        </a>
-                        @if (User.IsInRole("ADMIN"))
+            <tr>
+                <th scope="row">@entity.Reference</th>
+                <td>@entity.Status</td>
+                <td>@entity.TotalOnSalePrice</td>
+                <td>@entity.LinesCount</td>
+                <td>@entity.ProductsCount</td>
+                <td>@entity.CreatedOn</td>
+                <td>@entity.RemovedOn.HasValue</td>
+                <td>
+                    <a asp-controller="PurchaseOrders" asp-action="Edit" asp-route-id="@entity.Id" class="btn btn-info">
+                        <i class="fa fa-pen"></i>
+                    </a>
+
+                    @if (entity.RemovedOn.HasValue)
+                    {
+                        @using (Html.BeginForm("Restore", "PurchaseOrders", new { id = entity.Id }, FormMethod.Post, true, new { @class = "form d-inline" }))
                         {
-                            @using (Html.BeginForm("Delete", "PurchaseOrders", new { id = entity.Id }, FormMethod.Post, true, new { @class = "form d-inline" }))
-                            {
-                                <button type="submit" class="btn btn-danger">
-                                    <i class="fa fa-trash"></i>
-                                </button>
-                            }
+                            <button type="submit" class="btn btn-success">
+                                <i class="fa fa-trash-restore"></i>
+                            </button>
                         }
-                    </td>
-                </tr>
+                    }
+                    else
+                    {
+                        @using (Html.BeginForm("Delete", "PurchaseOrders", new { id = entity.Id }, FormMethod.Post, true, new { @class = "form d-inline" }))
+                        {
+                            <button type="submit" class="btn btn-danger">
+                                <i class="fa fa-trash"></i>
+                            </button>
+                        }
+                    }
+                </td>
+            </tr>
             }
         </tbody>
         <tfoot>

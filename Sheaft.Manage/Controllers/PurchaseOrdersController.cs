@@ -120,16 +120,48 @@ namespace Sheaft.Manage.Controllers
         }
 
         [HttpPost]
-        [Authorize(Policy = "Admin")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete(Guid id, CancellationToken token)
         {
             var entity = await _context.PurchaseOrders.SingleOrDefaultAsync(c => c.Id == id, token);
+            var reference = entity.Reference;
 
-            _context.Remove(entity);
-            await _context.SaveChangesAsync(token);
+            var requestUser = await GetRequestUser(token);
+            var result = await _mediatr.Send(new DeletePurchaseOrderCommand(requestUser)
+            {
+                Id = id
+            }, token);
 
-            TempData["Removed"] = entity.Reference;
+            if (!result.Success)
+            {
+                ModelState.AddModelError("", result.Exception.Message);
+                return RedirectToAction("Index");
+            }
+
+            TempData["Removed"] = reference;
+            return RedirectToAction("Index");
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Restore(Guid id, CancellationToken token)
+        {
+            var entity = await _context.PurchaseOrders.SingleOrDefaultAsync(c => c.Id == id, token);
+            var name = entity.Reference;
+
+            var requestUser = await GetRequestUser(token);
+            var result = await _mediatr.Send(new RestorePurchaseOrderCommand(requestUser)
+            {
+                Id = id
+            }, token);
+
+            if (!result.Success)
+            {
+                ModelState.AddModelError("", result.Exception.Message);
+                return RedirectToAction("Index");
+            }
+
+            TempData["Restored"] = name;
             return RedirectToAction("Index");
         }
     }
