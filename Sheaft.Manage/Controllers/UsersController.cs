@@ -10,6 +10,7 @@ using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Sheaft.Application.Commands;
 using Sheaft.Infrastructure.Interop;
+using Sheaft.Interop.Enums;
 using Sheaft.Manage.Models;
 using Sheaft.Models.ViewModels;
 using Sheaft.Options;
@@ -38,7 +39,7 @@ namespace Sheaft.Manage.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Index(CancellationToken token, int page = 0, int take = 10)
+        public async Task<IActionResult> Index(CancellationToken token, int page = 0, ProfileKind? kind = null, int take = 10)
         {
             if (page < 0)
                 page = 0;
@@ -51,7 +52,15 @@ namespace Sheaft.Manage.Controllers
             var requestUser = await GetRequestUser(token);
             if (requestUser.IsImpersonating)
             {
-                query = query.Where(p => p.Company.Id == requestUser.CompanyId);
+                query = query.Where(p => p.Id == requestUser.Id || (p.Company != null && p.Company.Id == requestUser.CompanyId));
+            }
+
+            if (kind.HasValue)
+            {
+                if(kind == ProfileKind.Consumer)
+                    query = query.Where(p => p.Company == null);
+                else
+                    query = query.Where(p => p.Company.Kind == kind);
             }
 
             var entities = await query
@@ -67,6 +76,7 @@ namespace Sheaft.Manage.Controllers
             ViewBag.Removed = TempData["Removed"];
             ViewBag.Page = page;
             ViewBag.Take = take;
+            ViewBag.Kind = kind;
 
             return View(entities);
         }
@@ -123,18 +133,25 @@ namespace Sheaft.Manage.Controllers
         }
 
         [HttpPost]
-        [Authorize(Policy = "Admin")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete(Guid id, CancellationToken token)
         {
             var entity = await _context.Users.SingleOrDefaultAsync(c => c.Id == id, token);
+            var name = $"{entity.FirstName} {entity.LastName}";
 
-            _context.Remove(entity);
-            await _context.SaveChangesAsync(token);
+            var requestUser = await GetRequestUser(token);
+            var result = await _mediatr.Send(new DeleteUserCommand(requestUser)
+            {
+                Id = id
+            }, token);
 
-            //Delete user on oidc
+            if (!result.Success)
+            {
+                ModelState.AddModelError("", result.Exception.Message);
+                return RedirectToAction("Index");
+            }
 
-            TempData["Removed"] = $"{entity.FirstName} {entity.LastName}";
+            TempData["Removed"] = name;
             return RedirectToAction("Index");
         }
 

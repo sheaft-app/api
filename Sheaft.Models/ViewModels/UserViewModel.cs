@@ -16,6 +16,7 @@ namespace Sheaft.Models.ViewModels
         public string Picture { get; set; }
         public DateTimeOffset CreatedOn { get; set; }
         public DateTimeOffset? UpdatedOn { get; set; }
+        public DateTimeOffset? RemovedOn { get; set; }
         public string Company { get; set; }
     }
 }
