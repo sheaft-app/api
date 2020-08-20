@@ -101,7 +101,8 @@ namespace Sheaft.Application.Handlers
                     entity.SetPackaging(packaging);
                 }
 
-                await HandleImageAsync(entity, request.Picture, token);
+                var picture = await HandleImageAsync(entity, request.Picture, token);
+                entity.SetImage(picture);
 
                 var tags = await _context.FindAsync<Tag>(t => request.Tags.Contains(t.Id), token);
                 entity.SetTags(tags);
@@ -139,7 +140,8 @@ namespace Sheaft.Application.Handlers
                     entity.SetPackaging(null);
                 }
 
-                await HandleImageAsync(entity, request.Picture, token);
+                var picture = await HandleImageAsync(entity, request.Picture, token);
+                entity.SetImage(picture);
 
                 var tags = await _context.FindAsync<Tag>(t => request.Tags.Contains(t.Id), token);
                 entity.SetTags(tags);
@@ -319,10 +321,12 @@ namespace Sheaft.Application.Handlers
         {
             return await ExecuteAsync(async () =>
             {
-                var product = await _context.GetByIdAsync<Product>(request.Id, token);
+                var entity = await _context.GetByIdAsync<Product>(request.Id, token);
 
-                await HandleImageAsync(product, request.Picture, token);
-                var entry = _context.Update(product);
+                var picture = await HandleImageAsync(entity, request.Picture, token);
+                entity.SetImage(picture);
+
+                var entry = _context.Update(entity);
 
                 return OkResult(await _context.SaveChangesAsync(token) > 0);
             });
@@ -330,13 +334,10 @@ namespace Sheaft.Application.Handlers
 
         #region Product implementation
 
-        private async Task HandleImageAsync(Product product, string picture, CancellationToken token)
+        private async Task<string> HandleImageAsync(Product product, string picture, CancellationToken token)
         {
             if (string.IsNullOrWhiteSpace(picture))
-            {
-                product.SetImage(null);
-                return;
-            }
+                return null;
 
             byte[] bytes = null;
             if (!picture.StartsWith("http") && !picture.StartsWith("https"))
@@ -344,10 +345,14 @@ namespace Sheaft.Application.Handlers
                 var base64Data = picture.StartsWith("data:image") ? Regex.Match(picture, @"data:image/(?<type>.+?),(?<data>.+)").Groups["data"].Value : picture;
                 bytes = Convert.FromBase64String(base64Data);
             }
-            else if(!picture.StartsWith("https://blob.") && !picture.Contains("core.windows.net"))
+            else if(!picture.StartsWith($"https://{_storageOptions.Account}.blob.{_storageOptions.Suffix}"))
             {
                 using (var response = await _httpClient.GetAsync(picture))
                     bytes = await response.Content.ReadAsByteArrayAsync();
+            }
+            else
+            {
+                return picture;
             }
 
             var imageId = Guid.NewGuid().ToString("N");
@@ -359,7 +364,7 @@ namespace Sheaft.Application.Handlers
                 await UploadImageAsync(image, product.Producer.Id, product.Id, imageId, ImageSize.SMALL, 64, 64, token, ResizeMode.Crop);
             }
 
-            product.SetImage($"https://{_storageOptions.Account}.blob.{_storageOptions.Suffix}/{_storageOptions.Containers.Pictures}/{CoreProductExtensions.GetImageUrl(product.Producer.Id, product.Id, imageId)}");
+            return $"https://{_storageOptions.Account}.blob.{_storageOptions.Suffix}/{_storageOptions.Containers.Pictures}/{CoreProductExtensions.GetImageUrl(product.Producer.Id, product.Id, imageId)}";
         }
 
         private async Task UploadImageAsync(Image image, Guid companyId, Guid productId, string filename, string size, int width, int height, CancellationToken token, ResizeMode mode = ResizeMode.Max, int quality = 100)

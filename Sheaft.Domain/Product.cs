@@ -100,6 +100,9 @@ namespace Sheaft.Domain.Models
 
         public void SetImage(string image)
         {
+            if (image == null)
+                return;
+
             Image = image;
         }
 
