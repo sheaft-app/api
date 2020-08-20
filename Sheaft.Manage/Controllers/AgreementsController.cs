@@ -75,10 +75,6 @@ namespace Sheaft.Manage.Controllers
         [HttpGet]
         public async Task<IActionResult> Edit(Guid id, CancellationToken token)
         {
-            var requestUser = await GetRequestUser(token);
-            if (!requestUser.IsImpersonating)
-                throw new Exception("You must impersonate agreement's owner to edit it.");
-
             var entity = await _context.Agreements
                 .AsNoTracking()
                 .Where(c => c.Id == id)
@@ -90,27 +86,21 @@ namespace Sheaft.Manage.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(AgreementViewModel model, CancellationToken token)
+        public async Task<IActionResult> Reset(AgreementViewModel model, CancellationToken token)
         {
             var requestUser = await GetRequestUser(token);
-            if (!requestUser.IsImpersonating)
+            var result = await _mediatr.Send(new ResetAgreementCommand(requestUser)
             {
-                ModelState.AddModelError("", "You must impersonate packaging's producer to edit it.");
+                Id = model.Id
+            }, token);
+
+            if (!result.Success)
+            {
+                ModelState.AddModelError("", result.Exception.Message);
                 return View(model);
             }
 
-            //var result = await _mediatr.Send(new UpdateAgreementCommand(requestUser)
-            //{
-            //    Id = model.Id,
-            //}, token);
-
-            //if (!result.Success)
-            //{
-            //    ModelState.AddModelError("", result.Exception.Message);
-            //    return View(model);
-            //}
-
-            TempData["Edited"] = JsonConvert.SerializeObject(new EditViewModel { Id = model.Id, Name = model.Id.ToString("N") });
+            TempData["Edited"] = JsonConvert.SerializeObject(new EditViewModel { Id = model.Id, Name = model.Delivery.Name });
             return RedirectToAction("Index");
         }
 
@@ -120,11 +110,12 @@ namespace Sheaft.Manage.Controllers
         public async Task<IActionResult> Delete(Guid id, CancellationToken token)
         {
             var entity = await _context.Agreements.SingleOrDefaultAsync(c => c.Id == id, token);
+            var name = entity.Delivery.Name;
 
             _context.Remove(entity);
             await _context.SaveChangesAsync(token);
 
-            TempData["Removed"] = entity.Id.ToString("N");
+            TempData["Removed"] = name;
             return RedirectToAction("Index");
         }
     }
