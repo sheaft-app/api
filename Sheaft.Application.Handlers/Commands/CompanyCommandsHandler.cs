@@ -191,6 +191,8 @@ namespace Sheaft.Application.Handlers
                 var email = entity.Email;
 
                 entity.CloseCompany(request.Reason);
+                _context.Update(entity);
+
                 var success = await _context.SaveChangesAsync(token) > 0;
 
                 await _queuesService.ProcessCommandAsync(RemoveCompanyDataCommand.QUEUE_NAME, new RemoveCompanyDataCommand(request.RequestUser) { Id = request.Id, Email = email }, token);
@@ -203,6 +205,9 @@ namespace Sheaft.Application.Handlers
             return await ExecuteAsync(async () =>
             {
                 var entity = await _context.GetByIdAsync<Company>(request.Id, token);
+
+                //TODO remove company data
+
                 return OkResult(request.Email);
             });
         }

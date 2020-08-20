@@ -4,7 +4,7 @@
 }
 
 <div class="container">
-    <h1 class="display-4">Purchase Order details</h1>
+    <h2 class="display-4">Purchase Order details @(Model.RemovedOn.HasValue ? "(removed)":"")</h2>
     <br />
 
     @using (Html.BeginForm("Edit", "PurchaseOrders", FormMethod.Post, new { @class = "form" }))

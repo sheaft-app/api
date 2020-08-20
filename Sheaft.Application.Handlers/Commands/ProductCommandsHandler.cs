@@ -148,7 +148,7 @@ namespace Sheaft.Application.Handlers
                 var tags = await _context.FindAsync<Tag>(t => request.Tags.Contains(t.Id), token);
                 entity.SetTags(tags);
 
-                var entry = _context.Update(entity);
+                _context.Update(entity);
                 return OkResult(await _context.SaveChangesAsync(token) > 0);
             });
         }
@@ -161,6 +161,8 @@ namespace Sheaft.Application.Handlers
                 var entity = await _context.GetByIdAsync<Product>(request.Id, token);
 
                 entity.AddRating(user, request.Value, request.Comment);
+                _context.Update(entity);
+
                 var result = await _context.SaveChangesAsync(token);
 
                 await _queuesService.ProcessCommandAsync(CreateUserPointsCommand.QUEUE_NAME, new CreateUserPointsCommand(request.RequestUser) { CreatedOn = DateTimeOffset.UtcNow, Kind = PointKind.RateProduct, UserId = request.RequestUser.Id }, token);
@@ -195,6 +197,7 @@ namespace Sheaft.Application.Handlers
                 var entity = await _context.GetByIdAsync<Product>(request.Id, token);
                 entity.SetAvailable(request.Available);
 
+                _context.Update(entity);
                 return OkResult(await _context.SaveChangesAsync(token) > 0);
             });
         }
@@ -327,8 +330,19 @@ namespace Sheaft.Application.Handlers
                 var picture = await HandleImageAsync(entity, request.Picture, token);
                 entity.SetImage(picture);
 
-                var entry = _context.Update(entity);
+                _context.Update(entity);
+                return OkResult(await _context.SaveChangesAsync(token) > 0);
+            });
+        }
 
+        public async Task<CommandResult<bool>> Handle(RestoreProductCommand request, CancellationToken token)
+        {
+            return await ExecuteAsync(async () =>
+            {
+                var entity = await _context.Products.SingleOrDefaultAsync(a => a.Id == request.Id && a.RemovedOn.HasValue, token);
+                entity.Restore();
+
+                _context.Update(entity);
                 return OkResult(await _context.SaveChangesAsync(token) > 0);
             });
         }
@@ -432,20 +446,6 @@ namespace Sheaft.Application.Handlers
             createProductCommand.Tags = tags.Select(t => t.Id);
 
             return OkResult(createProductCommand);
-        }
-
-        public async Task<CommandResult<bool>> Handle(RestoreProductCommand request, CancellationToken token)
-        {
-            return await ExecuteAsync(async () =>
-            {
-                var entity = await _context.Products.SingleOrDefaultAsync(a => a.Id == request.Id && a.RemovedOn.HasValue, token);
-                entity.Restore();
-
-                _context.Update(entity);
-                await _context.SaveChangesAsync(token);
-
-                return OkResult(true);
-            });
         }
 
         #endregion

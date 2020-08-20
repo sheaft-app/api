@@ -6,13 +6,26 @@
 }
 
     <div class="container">
-        <h1 class="display-4">Products</h1>
+        <h2 class="display-5">Products</h2>
         <br />
 
         @if (ViewBag.Removed != null)
         {
             <div class="alert alert-success alert-dismissible fade show" role="alert">
                 <span>Successfully removed product @ViewBag.Removed</span>
+
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <br />
+        }
+
+        @if (ViewBag.Restored != null)
+        {
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                <span>Successfully restored product @ViewBag.Restored.Name</span>
+                <a asp-controller="Products" asp-action="Edit" asp-route-id="@ViewBag.Restored.Id">View details</a>
 
                 <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
@@ -44,7 +57,11 @@
                     <th scope="col">Producer</th>
                     <th scope="col">CreatedOn</th>
                     <th scope="col">Removed</th>
-                    <th scope="col"></th>
+                    <th scope="col">
+                        <a asp-controller="Products" asp-action="Add" class="btn btn-success">
+                            <i class="fa fa-plus"></i>
+                        </a>
+                    </th>
                 </tr>
             </thead>
             <tbody>
@@ -52,11 +69,11 @@
                 {
                 <tr>
                     <th scope="row">@entity.Reference</th>
-                    <th>@entity.Name</th>
-                    <th>@entity.WholeSalePricePerUnit</th>
-                    <th>@(entity.Vat)%</th>
+                    <td>@entity.Name</td>
+                    <td>@entity.WholeSalePricePerUnit</td>
+                    <td>@(entity.Vat)%</td>
                     <td>@entity.Producer.Name</td>
-                    <td>@entity.CreatedOn</td>
+                    <td>@entity.CreatedOn.ToString("dd/MM/yy hh:mm")</td>
                     <td>@entity.RemovedOn.HasValue</td>
                     <td>
                         <a asp-controller="Products" asp-action="Edit" asp-route-id="@entity.Id" class="btn btn-info">
@@ -87,16 +104,16 @@
             </tbody>
             <tfoot>
                 <tr class="text-center">
-                    <td colspan="4">
+                    <td colspan="8">
                         @if (currentPage >= 1)
                         {
-                            <a asp-controller="Products" asp-action="Index" asp-route-take="@take" asp-route-page="@(currentPage-1)" class="btn btn-info">
+                            <a asp-controller="Products" asp-action="Index" asp-route-take="@take" asp-route-page="@(currentPage-1)" class="btn btn-outline-secondary">
                                 <i class="fa fa-caret-left"></i>
                             </a>
                         }
                         @if (take == Model.Count())
                         {
-                            <a asp-controller="Products" asp-action="Index" asp-route-take="@take" asp-route-page="@(currentPage+1)" class="btn btn-info">
+                            <a asp-controller="Products" asp-action="Index" asp-route-take="@take" asp-route-page="@(currentPage+1)" class="btn btn-outline-secondary">
                                 <i class="fa fa-caret-right"></i>
                             </a>
                         }

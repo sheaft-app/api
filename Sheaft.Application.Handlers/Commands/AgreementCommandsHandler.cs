@@ -129,7 +129,7 @@ namespace Sheaft.Application.Handlers
                 var entity = await _context.GetByIdAsync<Agreement>(request.Id, token);
                 entity.CancelAgreement(request.Reason);
 
-                _context.Agreements.Update(entity);
+                _context.Update(entity);
                 await _context.SaveChangesAsync(token);
 
                 if (request.RequestUser.CompanyId == entity.Store.Id)
@@ -168,7 +168,7 @@ namespace Sheaft.Application.Handlers
                 var entity = await _context.GetByIdAsync<Agreement>(request.Id, token);
                 entity.RefuseAgreement(request.Reason);
 
-                _context.Agreements.Update(entity);
+                _context.Update(entity);
                 await _context.SaveChangesAsync(token);
 
                 if (request.RequestUser.CompanyId == entity.Store.Id)
@@ -187,7 +187,7 @@ namespace Sheaft.Application.Handlers
             {
                 var entity = await _context.GetByIdAsync<Agreement>(request.Id, token);
 
-                _context.Agreements.Remove(entity);
+                _context.Remove(entity);
                 await _context.SaveChangesAsync(token);
 
                 return OkResult(true);

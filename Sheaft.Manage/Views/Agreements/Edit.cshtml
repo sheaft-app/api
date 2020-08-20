@@ -4,7 +4,7 @@
 }
 
     <div class="container">
-        <h1 class="display-4">Agreement details</h1>
+        <h2 class="display-4">Agreement details @(Model.RemovedOn.HasValue ? "(removed)":"")</h2>
         <br />
         <div class="form-group">
             @Html.LabelFor(m => m.Status)

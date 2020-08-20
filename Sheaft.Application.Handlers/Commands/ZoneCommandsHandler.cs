@@ -67,11 +67,14 @@ namespace Sheaft.Application.Handlers
                             storesCount += (storeCount.Created ?? 0);
                             department.SetStoresCount(storeCount.Created ?? 0);
                         }
+
+                        _context.Update(department);
                     }
 
                     region.SetProducersCount(producersCount);
                     region.SetStoresCount(storesCount);
 
+                    _context.Update(region);
                     await _context.SaveChangesAsync(token);
                 }
                 

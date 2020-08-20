@@ -153,7 +153,7 @@ namespace Sheaft.Application.Handlers
                     entity.AddProduct(product, newProduct.Quantity);
                 }
 
-                _context.PurchaseOrders.Update(entity);
+                _context.Update(entity);
 
                 return OkResult(await _context.SaveChangesAsync(token) > 0);
             });
@@ -436,9 +436,7 @@ namespace Sheaft.Application.Handlers
                 entity.Restore();
 
                 _context.Update(entity);
-                await _context.SaveChangesAsync(token);
-
-                return OkResult(true);
+                return OkResult(await _context.SaveChangesAsync(token) > 0);
             });
         }
     }

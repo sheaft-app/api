@@ -3,7 +3,7 @@
 namespace Sheaft.Manage.Models
 {
     [Serializable]
-    public class EditViewModel
+    public class EntityViewModel
     {
         public Guid Id { get; set; }
 

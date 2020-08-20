@@ -207,6 +207,9 @@ namespace Sheaft.Domain.Models
 
         public void SetPackaging(Packaging packaging)
         {
+            if (Packaging != null && Packaging.Id == packaging?.Id)
+                return;
+
             Packaging = packaging;
         }
 

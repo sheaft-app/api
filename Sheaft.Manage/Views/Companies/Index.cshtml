@@ -6,65 +6,78 @@
     ProfileKind? kind = ViewBag.Kind;
 }
 
-    <div class="container">
-        <h1 class="display-4">Companies</h1>
-        <br />
+<div class="container">
+    <h2 class="display-5">Companies</h2>
+    <br />
 
-        @if (ViewBag.Removed != null)
-        {
-            <div class="alert alert-success alert-dismissible fade show" role="alert">
-                <span>Successfully removed company @ViewBag.Removed</span>
+    @if (ViewBag.Removed != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <span>Successfully removed company @ViewBag.Removed</span>
 
-                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <br />
-        }
-
-        @if (ViewBag.Edited != null)
-        {
-            <div class="alert alert-success alert-dismissible fade show" role="alert">
-                <span>Successfully updated company @ViewBag.Edited.Name</span>
-                <a asp-controller="Companies" asp-action="Edit" asp-route-id="@ViewBag.Edited.Id">View details</a>
-
-                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <br />
-        }
-
-        <div class="btn-group">
-            <label class="btn btn-secondary @(kind == null ? "active": "")">
-                <a asp-controller="Companies" asp-action="Index" asp-route-kind="" asp-route-take="@take" asp-route-page="@currentPage" class="text-white">All</a>
-            </label>
-            <label class="btn btn-secondary @(kind == ProfileKind.Producer ? "active": "")">
-                <a asp-controller="Companies" asp-action="Index" asp-route-kind="@ProfileKind.Producer" asp-route-take="@take" asp-route-page="@currentPage" class="text-white">Producers</a>
-            </label>
-            <label class="btn btn-secondary @(kind == ProfileKind.Store ? "active": "")">
-                <a asp-controller="Companies" asp-action="Index" asp-route-kind="@ProfileKind.Store" asp-route-take="@take" asp-route-page="@currentPage" class="text-white">Stores</a>
-            </label>
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
         </div>
         <br />
+    }
 
-        <table class="table table-hover">
-            <thead class="thead-dark">
-                <tr>
-                    <th scope="col">Name</th>
-                    <th scope="col">Kind</th>
-                    <th scope="col">CreatedOn</th>
-                    <th scope="col">Removed</th>
-                    <th scope="col"></th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var entity in Model)
-                {
+    @if (ViewBag.Restored != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <span>Successfully restored company @ViewBag.Restored</span>
+            <a asp-controller="Companies" asp-action="Edit" asp-route-id="@ViewBag.Edited.Id">View details</a>
+
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        <br />
+    }
+
+    @if (ViewBag.Edited != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <span>Successfully updated company @ViewBag.Edited.Name</span>
+            <a asp-controller="Companies" asp-action="Edit" asp-route-id="@ViewBag.Edited.Id">View details</a>
+
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        <br />
+    }
+
+    <div class="btn-group">
+        <label class="btn btn-secondary @(kind == null ? "active": "")">
+            <a asp-controller="Companies" asp-action="Index" asp-route-kind="" asp-route-take="@take" asp-route-page="@currentPage" class="text-white">All</a>
+        </label>
+        <label class="btn btn-secondary @(kind == ProfileKind.Producer ? "active": "")">
+            <a asp-controller="Companies" asp-action="Index" asp-route-kind="@ProfileKind.Producer" asp-route-take="@take" asp-route-page="@currentPage" class="text-white">Producers</a>
+        </label>
+        <label class="btn btn-secondary @(kind == ProfileKind.Store ? "active": "")">
+            <a asp-controller="Companies" asp-action="Index" asp-route-kind="@ProfileKind.Store" asp-route-take="@take" asp-route-page="@currentPage" class="text-white">Stores</a>
+        </label>
+    </div>
+    <br />
+
+    <table class="table table-hover">
+        <thead class="thead-dark">
+            <tr>
+                <th scope="col">Name</th>
+                <th scope="col">Kind</th>
+                <th scope="col">CreatedOn</th>
+                <th scope="col">Removed</th>
+                <th scope="col"></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var entity in Model)
+            {
                 <tr>
                     <th scope="row">@entity.Name</th>
                     <td>@entity.Kind</td>
-                    <td>@entity.CreatedOn</td>
+                    <td>@entity.CreatedOn.ToString("dd/MM/yy hh:mm")</td>
                     <td>@entity.RemovedOn.HasValue</td>
                     <td>
                         <a asp-controller="Companies" asp-action="Edit" asp-route-id="@entity.Id" class="btn btn-info">
@@ -81,25 +94,25 @@
                         }
                     </td>
                 </tr>
-                }
-            </tbody>
-            <tfoot>
-                <tr class="text-center">
-                    <td colspan="4">
-                        @if (currentPage >= 1)
-                        {
-                            <a asp-controller="Companies" asp-action="Index" asp-route-take="@take" asp-route-page="@(currentPage-1)" class="btn btn-info">
-                                <i class="fa fa-caret-left"></i>
-                            </a>
-                        }
-                        @if (take == Model.Count())
-                        {
-                            <a asp-controller="Companies" asp-action="Index" asp-route-take="@take" asp-route-page="@(currentPage+1)" class="btn btn-info">
-                                <i class="fa fa-caret-right"></i>
-                            </a>
-                        }
-                    </td>
-                </tr>
-            </tfoot>
-        </table>
-    </div>
+            }
+        </tbody>
+        <tfoot>
+            <tr class="text-center">
+                <td colspan="5">
+                    @if (currentPage >= 1)
+                    {
+                        <a asp-controller="Companies" asp-action="Index" asp-route-take="@take" asp-route-page="@(currentPage-1)" class="btn btn-outline-secondary">
+                            <i class="fa fa-caret-left"></i>
+                        </a>
+                    }
+                    @if (take == Model.Count())
+                    {
+                        <a asp-controller="Companies" asp-action="Index" asp-route-take="@take" asp-route-page="@(currentPage+1)" class="btn btn-outline-secondary">
+                            <i class="fa fa-caret-right"></i>
+                        </a>
+                    }
+                </td>
+            </tr>
+        </tfoot>
+    </table>
+</div>

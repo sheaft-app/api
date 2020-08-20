@@ -6,13 +6,26 @@
 }
 
 <div class="container">
-    <h1 class="display-4">Agreements</h1>
+    <h2 class="display-5">Agreements</h2>
     <br />
 
     @if (ViewBag.Removed != null)
     {
         <div class="alert alert-success alert-dismissible fade show" role="alert">
             <span>Successfully removed agreement @ViewBag.Removed</span>
+
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        <br />
+    }
+
+    @if (ViewBag.Restored != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <span>Successfully restored agreement @ViewBag.Restored.Name</span>
+            <a asp-controller="Agreements" asp-action="Edit" asp-route-id="@ViewBag.Restored.Id">View details</a>
 
             <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                 <span aria-hidden="true">&times;</span>
@@ -54,7 +67,7 @@
                     <td>@entity.Delivery.Producer.Name</td>
                     <td>@entity.Store.Name</td>
                     <td>@entity.Status</td>
-                    <td>@entity.CreatedOn</td>
+                    <td>@entity.CreatedOn.ToString("dd/MM/yy hh:mm")</td>
                     <td>@entity.RemovedOn.HasValue</td>
                     <td>
                         <a asp-controller="Agreements" asp-action="Edit" asp-route-id="@entity.Id" class="btn btn-info">
@@ -84,18 +97,18 @@
         </tbody>
         <tfoot>
             <tr class="text-center">
-                <td colspan="4">
+                <td colspan="7">
                     @if (currentPage >= 1)
                     {
-                        <a asp-controller="Agreements" asp-action="Index" asp-route-take="@take" asp-route-page="@(currentPage-1)" class="btn btn-info">
-                            <i class="fa fa-caret-left"></i>
-                        </a>
+                    <a asp-controller="Agreements" asp-action="Index" asp-route-take="@take" asp-route-page="@(currentPage-1)" class="btn btn-outline-secondary">
+                        <i class="fa fa-caret-left"></i>
+                    </a>
                     }
                     @if (take == Model.Count())
                     {
-                        <a asp-controller="Agreements" asp-action="Index" asp-route-take="@take" asp-route-page="@(currentPage+1)" class="btn btn-info">
-                            <i class="fa fa-caret-right"></i>
-                        </a>
+                <a asp-controller="Agreements" asp-action="Index" asp-route-take="@take" asp-route-page="@(currentPage+1)" class="btn btn-outline-secondary">
+                    <i class="fa fa-caret-right"></i>
+                </a>
                     }
                 </td>
             </tr>

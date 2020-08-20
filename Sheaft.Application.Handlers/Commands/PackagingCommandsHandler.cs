@@ -7,6 +7,7 @@ using Sheaft.Core;
 using Sheaft.Application.Commands;
 using Sheaft.Domain.Models;
 using Microsoft.Extensions.Logging;
+using Microsoft.EntityFrameworkCore;
 
 namespace Sheaft.Application.Handlers
 {
@@ -60,8 +61,9 @@ namespace Sheaft.Application.Handlers
             {
                 var entity = await _context.GetByIdAsync<Packaging>(request.Id, token);
 
-                _context.Remove(entity);
+                //TODO remove packaging link
 
+                _context.Remove(entity);
                 return OkResult(await _context.SaveChangesAsync(token) > 0);
             });
         }
@@ -70,10 +72,10 @@ namespace Sheaft.Application.Handlers
         {
             return await ExecuteAsync(async () =>
             {
-                var entity = await _context.GetByIdAsync<Packaging>(request.Id, token);
+                var entity = await _context.Packagings.SingleOrDefaultAsync(a => a.Id == request.Id && a.RemovedOn.HasValue, token);
                 entity.Restore();
 
-                _context.Remove(entity);
+                _context.Update(entity);
                 return OkResult(await _context.SaveChangesAsync(token) > 0);
             });
         }

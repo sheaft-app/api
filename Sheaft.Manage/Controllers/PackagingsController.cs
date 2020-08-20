@@ -8,6 +8,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Sheaft.Application.Commands;
+using Sheaft.Exceptions;
 using Sheaft.Infrastructure.Interop;
 using Sheaft.Manage.Models;
 using Sheaft.Models.ViewModels;
@@ -61,11 +62,52 @@ namespace Sheaft.Manage.Controllers
             var edited = (string)TempData["Edited"];
             ViewBag.Edited = !string.IsNullOrWhiteSpace(edited) ? JsonConvert.DeserializeObject(edited) : null;
 
+            var restored = (string)TempData["Restored"];
+            ViewBag.Restored = !string.IsNullOrWhiteSpace(restored) ? JsonConvert.DeserializeObject(restored) : null;
+
             ViewBag.Removed = TempData["Removed"];
             ViewBag.Page = page;
             ViewBag.Take = take;
 
             return View(entities);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Add(CancellationToken token)
+        {
+            var requestUser = await GetRequestUser(token);
+            if (!requestUser.IsImpersonating)
+                throw new Exception("You must impersonate producer to create it.");
+
+            return View(new PackagingViewModel());
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Add(PackagingViewModel model, CancellationToken token)
+        {
+            var requestUser = await GetRequestUser(token);
+            if (!requestUser.IsImpersonating)
+            {
+                ModelState.AddModelError("", "You must impersonate producer to create it.");
+                return View(model);
+            }
+
+            var result = await _mediatr.Send(new CreatePackagingCommand(requestUser)
+            {
+                Description = model.Description,
+                Name = model.Name,
+                Vat = model.Vat,
+                WholeSalePrice = model.WholeSalePrice
+            }, token);
+
+            if (!result.Success)
+            {
+                ModelState.AddModelError("", result.Exception.Message);
+                return View(model);
+            }
+
+            return RedirectToAction("Edit", new { id = result.Result });
         }
 
         [HttpGet]
@@ -80,6 +122,9 @@ namespace Sheaft.Manage.Controllers
                 .Where(c => c.Id == id)
                 .ProjectTo<PackagingViewModel>(_configurationProvider)
                 .SingleOrDefaultAsync(token);
+
+            if (entity == null)
+                throw new NotFoundException();
 
             return View(entity);
         }
@@ -110,7 +155,7 @@ namespace Sheaft.Manage.Controllers
                 return View(model);
             }
 
-            TempData["Edited"] = JsonConvert.SerializeObject(new EditViewModel { Id = model.Id, Name = model.Name });
+            TempData["Edited"] = JsonConvert.SerializeObject(new EntityViewModel { Id = model.Id, Name = model.Name });
             return RedirectToAction("Index");
         }
 
@@ -156,7 +201,7 @@ namespace Sheaft.Manage.Controllers
                 return RedirectToAction("Index");
             }
 
-            TempData["Restored"] = name;
+            TempData["Restored"] = JsonConvert.SerializeObject(new EntityViewModel { Id = entity.Id, Name = name });
             return RedirectToAction("Index");
         }
     }

@@ -41,12 +41,16 @@ namespace Sheaft.Application.Handlers
                 }
 
                 var openingHours = new List<TimeSlotHour>();
-                foreach(var oh in request.OpeningHours)
+                if (request.OpeningHours != null)
                 {
-                    openingHours.AddRange(oh.Days.Select(c => new TimeSlotHour(c, oh.From, oh.To)));
+                    foreach (var oh in request.OpeningHours)
+                    {
+                        openingHours.AddRange(oh.Days.Select(c => new TimeSlotHour(c, oh.From, oh.To)));
+                    }
                 }
 
                 var entity = new DeliveryMode(Guid.NewGuid(), request.Kind, user.Company, request.LockOrderHoursBeforeDelivery, deliveryModeAddress, openingHours, request.Name, request.Description);
+                
                 await _context.AddAsync(entity, token);
                 await _context.SaveChangesAsync(token);
 
@@ -82,7 +86,7 @@ namespace Sheaft.Application.Handlers
                     entity.SetOpeningHours(openingHours);
                 }
 
-                _context.DeliveryModes.Update(entity);
+                _context.Update(entity);
 
                 return OkResult(await _context.SaveChangesAsync(token) > 0);
             });
@@ -93,8 +97,10 @@ namespace Sheaft.Application.Handlers
             return await ExecuteAsync(async () =>
             {
                 var entity = await _context.GetByIdAsync<DeliveryMode>(request.Id, token);
-                _context.DeliveryModes.Remove(entity);
 
+                //TODO remove deliverymode link
+
+                _context.Remove(entity);
                 return OkResult(await _context.SaveChangesAsync(token) > 0);
             });
         }

@@ -7,13 +7,26 @@
 }
 
     <div class="container">
-        <h1 class="display-4">Users</h1>
+        <h2 class="display-5">Users</h2>
         <br />
 
         @if (ViewBag.Removed != null)
         {
             <div class="alert alert-success alert-dismissible fade show" role="alert">
                 <span>Successfully removed user @ViewBag.Removed</span>
+
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <br />
+        }
+
+        @if (ViewBag.Restored != null)
+        {
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                <span>Successfully restored user @ViewBag.Restored.Name</span>
+                <a asp-controller="Users" asp-action="Edit" asp-route-id="@ViewBag.Restored.Id">View details</a>
 
                 <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
@@ -35,20 +48,20 @@
             <br />
         }
 
-    <div class="btn-group">
-        <label class="btn btn-secondary @(kind == null ? "active": "")">
-            <a asp-controller="Users" asp-action="Index" asp-route-kind="" asp-route-take="@take" asp-route-page="@currentPage" class="text-white">All</a>
-        </label>
-        <label class="btn btn-secondary @(kind == ProfileKind.Producer ? "active": "")">
-            <a asp-controller="Users" asp-action="Index" asp-route-kind="@ProfileKind.Producer" asp-route-take="@take" asp-route-page="@currentPage" class="text-white">Producers</a>
-        </label>
-        <label class="btn btn-secondary @(kind == ProfileKind.Store ? "active": "")">
-            <a asp-controller="Users" asp-action="Index" asp-route-kind="@ProfileKind.Store" asp-route-take="@take" asp-route-page="@currentPage" class="text-white">Stores</a>
-        </label>
-        <label class="btn btn-secondary @(kind == ProfileKind.Consumer ? "active": "")">
-            <a asp-controller="Users" asp-action="Index" asp-route-kind="@ProfileKind.Consumer" asp-route-take="@take" asp-route-page="@currentPage" class="text-white">Consumers</a>
-        </label>
-    </div>
+        <div class="btn-group">
+            <label class="btn btn-secondary @(kind == null ? "active": "")">
+                <a asp-controller="Users" asp-action="Index" asp-route-kind="" asp-route-take="@take" asp-route-page="@currentPage" class="text-white">All</a>
+            </label>
+            <label class="btn btn-secondary @(kind == ProfileKind.Producer ? "active": "")">
+                <a asp-controller="Users" asp-action="Index" asp-route-kind="@ProfileKind.Producer" asp-route-take="@take" asp-route-page="@currentPage" class="text-white">Producers</a>
+            </label>
+            <label class="btn btn-secondary @(kind == ProfileKind.Store ? "active": "")">
+                <a asp-controller="Users" asp-action="Index" asp-route-kind="@ProfileKind.Store" asp-route-take="@take" asp-route-page="@currentPage" class="text-white">Stores</a>
+            </label>
+            <label class="btn btn-secondary @(kind == ProfileKind.Consumer ? "active": "")">
+                <a asp-controller="Users" asp-action="Index" asp-route-kind="@ProfileKind.Consumer" asp-route-take="@take" asp-route-page="@currentPage" class="text-white">Consumers</a>
+            </label>
+        </div>
         <br />
 
         <table class="table table-hover">
@@ -71,7 +84,7 @@
                     <td>@entity.Kind</td>
                     <th>@entity.Email</th>
                     <td>@entity.Company</td>
-                    <td>@entity.CreatedOn</td>
+                    <td>@entity.CreatedOn.ToString("dd/MM/yy hh:mm")</td>
                     <td>@entity.RemovedOn.HasValue</td>
                     <td>
                         <a asp-controller="Users" asp-action="Edit" asp-route-id="@entity.Id" class="btn btn-info">
@@ -92,16 +105,16 @@
             </tbody>
             <tfoot>
                 <tr class="text-center">
-                    <td colspan="4">
+                    <td colspan="7">
                         @if (currentPage >= 1)
                         {
-                            <a asp-controller="Users" asp-action="Index" asp-route-take="@take" asp-route-page="@(currentPage-1)" class="btn btn-info">
+                            <a asp-controller="Users" asp-action="Index" asp-route-take="@take" asp-route-page="@(currentPage-1)" class="btn btn-outline-secondary">
                                 <i class="fa fa-caret-left"></i>
                             </a>
                         }
                         @if (take == Model.Count())
                         {
-                            <a asp-controller="Users" asp-action="Index" asp-route-take="@take" asp-route-page="@(currentPage+1)" class="btn btn-info">
+                            <a asp-controller="Users" asp-action="Index" asp-route-take="@take" asp-route-page="@(currentPage+1)" class="btn btn-outline-secondary">
                                 <i class="fa fa-caret-right"></i>
                             </a>
                         }

@@ -9,6 +9,7 @@ using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Sheaft.Application.Commands;
 using Sheaft.Core.Extensions;
+using Sheaft.Exceptions;
 using Sheaft.Infrastructure.Interop;
 using Sheaft.Manage.Models;
 using Sheaft.Models.ViewModels;
@@ -67,6 +68,9 @@ namespace Sheaft.Manage.Controllers
             var edited = (string)TempData["Edited"];
             ViewBag.Edited = !string.IsNullOrWhiteSpace(edited) ? JsonConvert.DeserializeObject(edited) : null;
 
+            var restored = (string)TempData["Restored"];
+            ViewBag.Restored = !string.IsNullOrWhiteSpace(restored) ? JsonConvert.DeserializeObject(restored) : null;
+
             ViewBag.Removed = TempData["Removed"];
             ViewBag.Page = page;
             ViewBag.Take = take;
@@ -86,6 +90,9 @@ namespace Sheaft.Manage.Controllers
                 .Where(c => c.Id == id)
                 .ProjectTo<PurchaseOrderViewModel>(_configurationProvider)
                 .SingleOrDefaultAsync(token);
+
+            if (entity == null)
+                throw new NotFoundException();
 
             return View(entity);
         }
@@ -115,7 +122,7 @@ namespace Sheaft.Manage.Controllers
             //    return View(model);
             //}
 
-            TempData["Edited"] = JsonConvert.SerializeObject(new EditViewModel { Id = model.Id, Name = model.Name });
+            TempData["Edited"] = JsonConvert.SerializeObject(new EntityViewModel { Id = model.Id, Name = model.Name });
             return RedirectToAction("Index");
         }
 
@@ -161,7 +168,7 @@ namespace Sheaft.Manage.Controllers
                 return RedirectToAction("Index");
             }
 
-            TempData["Restored"] = name;
+            TempData["Restored"] = JsonConvert.SerializeObject(new EntityViewModel { Id = entity.Id, Name = name });
             return RedirectToAction("Index");
         }
     }

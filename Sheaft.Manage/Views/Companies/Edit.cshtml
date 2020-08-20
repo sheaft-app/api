@@ -11,7 +11,7 @@
 }
 
     <div class="container">
-        <h1 class="display-4">Company details</h1>
+        <h2 class="display-4">Company details @(Model.RemovedOn.HasValue ? "(removed)":"")</h2>
         <br />
 
         @using (Html.BeginForm("Edit", "Companies", FormMethod.Post, new { @class = "form", enctype = "multipart/form-data" }))

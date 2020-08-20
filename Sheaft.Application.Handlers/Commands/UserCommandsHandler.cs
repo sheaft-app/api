@@ -249,7 +249,7 @@ namespace Sheaft.Application.Handlers
                 if (!oidcResult.IsSuccessStatusCode)
                     return CommandFailed<bool>(new BadRequestException(MessageKind.UpdateUser_Oidc_UpdateProfile_Error, await oidcResult.Content.ReadAsStringAsync().ConfigureAwait(false)));
 
-                var entry = _context.Update(entity);
+                _context.Update(entity);
                 await _cache.RemoveAsync(entity.Id.ToString("N"));
 
                 return OkResult(await _context.SaveChangesAsync(token) > 0);
@@ -287,7 +287,7 @@ namespace Sheaft.Application.Handlers
                 if (!oidcResult.IsSuccessStatusCode)
                     return CommandFailed<bool>(new BadRequestException(MessageKind.UpdateUser_Oidc_UpdateProfile_Error, await oidcResult.Content.ReadAsStringAsync().ConfigureAwait(false)));
 
-                var entry = _context.Update(entity);
+                _context.Update(entity);
                 await _cache.RemoveAsync(entity.Id.ToString("N"));
 
                 return OkResult(await _context.SaveChangesAsync(token) > 0);
@@ -398,6 +398,8 @@ namespace Sheaft.Application.Handlers
 
                 var user = await _context.GetByIdAsync<User>(request.UserId, token);
                 user.AddPoints(request.Kind, quantity, request.CreatedOn);
+
+                _context.Update(user);
                 await _context.SaveChangesAsync(token);
 
                 await _queuesService.ProcessEventAsync(UserPointsCreatedEvent.QUEUE_NAME, new UserPointsCreatedEvent(request.RequestUser) { UserId = user.Id, Kind = request.Kind, Points = quantity, CreatedOn = request.CreatedOn }, token);

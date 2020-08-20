@@ -1,7 +1,6 @@
 ﻿using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using MediatR;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -9,6 +8,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Sheaft.Application.Commands;
+using Sheaft.Exceptions;
 using Sheaft.Infrastructure.Interop;
 using Sheaft.Interop;
 using Sheaft.Manage.Models;
@@ -65,11 +65,78 @@ namespace Sheaft.Manage.Controllers
             var edited = (string)TempData["Edited"];
             ViewBag.Edited = !string.IsNullOrWhiteSpace(edited) ? JsonConvert.DeserializeObject(edited) : null;
 
+            var restored = (string)TempData["Restored"];
+            ViewBag.Restored = !string.IsNullOrWhiteSpace(restored) ? JsonConvert.DeserializeObject(restored) : null;
+
             ViewBag.Removed = TempData["Removed"];
             ViewBag.Page = page;
             ViewBag.Take = take;
 
             return View(entities);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Add(CancellationToken token)
+        {
+            var requestUser = await GetRequestUser(token);
+            if (!requestUser.IsImpersonating)
+                throw new Exception("You must impersonate producer to create it.");
+
+            ViewBag.Tags = await GetTags(token);
+            ViewBag.Packagings = await GetPackagings(requestUser, token);
+
+            return View(new ProductViewModel());
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Add(ProductViewModel model, IFormFile picture, CancellationToken token)
+        {
+            var requestUser = await GetRequestUser(token);
+            if (!requestUser.IsImpersonating)
+            {
+                ViewBag.Tags = await GetTags(token);
+                ViewBag.Packagings = await GetPackagings(requestUser, token);
+
+                ModelState.AddModelError("", "You must impersonate producer to create it.");
+                return View(model);
+            }
+
+            if (picture != null)
+            {
+                using (var ms = new MemoryStream())
+                {
+                    picture.CopyTo(ms);
+                    model.Picture = Convert.ToBase64String(ms.ToArray());
+                }
+            }
+
+            var result = await _mediatr.Send(new CreateProductCommand(requestUser)
+            {
+                Description = model.Description,
+                Name = model.Name,
+                Available = model.Available,
+                PackagingId = model.PackagingId,
+                Picture = model.Picture,
+                QuantityPerUnit = model.QuantityPerUnit,
+                Reference = model.Reference,
+                Tags = model.Tags,
+                Unit = model.Unit,
+                Vat = model.Vat,
+                Weight = model.Weight,
+                WholeSalePricePerUnit = model.WholeSalePricePerUnit
+            }, token);
+
+            if (!result.Success)
+            {
+                ViewBag.Tags = await GetTags(token);
+                ViewBag.Packagings = await GetPackagings(requestUser, token);
+
+                ModelState.AddModelError("", result.Exception.Message);
+                return View(model);
+            }
+
+            return RedirectToAction("Edit", new { id = result.Result });
         }
 
         [HttpGet]
@@ -84,6 +151,9 @@ namespace Sheaft.Manage.Controllers
                 .Where(c => c.Id == id)
                 .ProjectTo<ProductViewModel>(_configurationProvider)
                 .SingleOrDefaultAsync(token);
+
+            if (entity == null)
+                throw new NotFoundException();
 
             ViewBag.Tags = await GetTags(token);
             ViewBag.Packagings = await GetPackagings(requestUser, token);
@@ -140,7 +210,7 @@ namespace Sheaft.Manage.Controllers
                 return View(model);
             }
 
-            TempData["Edited"] = JsonConvert.SerializeObject(new EditViewModel { Id = model.Id, Name = model.Name });
+            TempData["Edited"] = JsonConvert.SerializeObject(new EntityViewModel { Id = model.Id, Name = model.Name });
             return RedirectToAction("Index");
         }
 
@@ -186,7 +256,7 @@ namespace Sheaft.Manage.Controllers
                 return RedirectToAction("Index");
             }
 
-            TempData["Restored"] = name;
+            TempData["Restored"] = JsonConvert.SerializeObject(new EntityViewModel { Id = entity.Id, Name = name });
             return RedirectToAction("Index");
         }
 

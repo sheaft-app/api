@@ -9,6 +9,7 @@ using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Sheaft.Application.Commands;
 using Sheaft.Core.Extensions;
+using Sheaft.Exceptions;
 using Sheaft.Infrastructure.Interop;
 using Sheaft.Manage.Models;
 using Sheaft.Models.ViewModels;
@@ -65,6 +66,9 @@ namespace Sheaft.Manage.Controllers
             var edited = (string)TempData["Edited"];
             ViewBag.Edited = !string.IsNullOrWhiteSpace(edited) ? JsonConvert.DeserializeObject(edited) : null;
 
+            var restored = (string)TempData["Restored"];
+            ViewBag.Restored = !string.IsNullOrWhiteSpace(restored) ? JsonConvert.DeserializeObject(restored) : null;
+
             ViewBag.Removed = TempData["Removed"];
             ViewBag.Page = page;
             ViewBag.Take = take;
@@ -80,6 +84,9 @@ namespace Sheaft.Manage.Controllers
                 .Where(c => c.Id == id)
                 .ProjectTo<AgreementViewModel>(_configurationProvider)
                 .SingleOrDefaultAsync(token);
+
+            if (entity == null)
+                throw new NotFoundException();
 
             return View(entity);
         }
@@ -100,7 +107,7 @@ namespace Sheaft.Manage.Controllers
                 return View(model);
             }
 
-            TempData["Edited"] = JsonConvert.SerializeObject(new EditViewModel { Id = model.Id, Name = model.Delivery.Name });
+            TempData["Edited"] = JsonConvert.SerializeObject(new EntityViewModel { Id = model.Id, Name = model.Delivery.Name });
             return RedirectToAction("Index");
         }
 
@@ -109,7 +116,6 @@ namespace Sheaft.Manage.Controllers
         public async Task<IActionResult> Delete(Guid id, CancellationToken token)
         {
             var entity = await _context.Agreements.SingleOrDefaultAsync(c => c.Id == id, token);
-            var name = entity.Delivery.Name;
 
             var requestUser = await GetRequestUser(token);
             var result = await _mediatr.Send(new DeleteAgreementCommand(requestUser)
@@ -123,7 +129,7 @@ namespace Sheaft.Manage.Controllers
                 return RedirectToAction("Index");
             }
 
-            TempData["Removed"] = name;
+            TempData["Removed"] = id.ToString("N");
             return RedirectToAction("Index");
         }
 
@@ -132,8 +138,6 @@ namespace Sheaft.Manage.Controllers
         public async Task<IActionResult> Restore(Guid id, CancellationToken token)
         {
             var entity = await _context.Agreements.SingleOrDefaultAsync(c => c.Id == id, token);
-            var name = entity.Delivery.Name;
-
             var requestUser = await GetRequestUser(token);
             var result = await _mediatr.Send(new RestoreAgreementCommand(requestUser)
             {
@@ -146,7 +150,7 @@ namespace Sheaft.Manage.Controllers
                 return RedirectToAction("Index");
             }
 
-            TempData["Restored"] = name;
+            TempData["Restored"] = JsonConvert.SerializeObject(new EntityViewModel { Id = entity.Id, Name = id.ToString("N") });
             return RedirectToAction("Index");
         }
     }

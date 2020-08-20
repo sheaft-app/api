@@ -6,14 +6,12 @@
         new SelectListItem("Farm", ((int)DeliveryKind.Farm).ToString()),
         new SelectListItem("Market", ((int)DeliveryKind.Market).ToString()),
         new SelectListItem("Collective", ((int)DeliveryKind.Collective).ToString()),
-        new SelectListItem("Withdrawal", ((int)DeliveryKind.Withdrawal).ToString()),
-        new SelectListItem("ProducerToConsumer", ((int)DeliveryKind.ProducerToConsumer).ToString()),
         new SelectListItem("ProducerToStore", ((int)DeliveryKind.ProducerToStore).ToString())
     };
 }
 
 <div class="container">
-    <h1 class="display-4">DeliveryMode details</h1>
+    <h2 class="display-4">DeliveryMode details @(Model.RemovedOn.HasValue ? "(removed)":"")</h2>
     <br />
 
     @using (Html.BeginForm("Edit", "DeliveryModes", FormMethod.Post, new { @class = "form" }))
