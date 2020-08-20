@@ -31,7 +31,8 @@ namespace Sheaft.Application.Handlers
         IRequestHandler<FailJobCommand, CommandResult<bool>>,
         IRequestHandler<ResetJobCommand, CommandResult<bool>>,
         IRequestHandler<DeleteJobCommand, CommandResult<bool>>,
-        IRequestHandler<RestoreJobCommand, CommandResult<bool>>
+        IRequestHandler<RestoreJobCommand, CommandResult<bool>>,
+        IRequestHandler<UpdateJobCommand, CommandResult<bool>>
     {
         private readonly IAppDbContext _context;
         private readonly IMediator _mediatr;
@@ -374,6 +375,19 @@ namespace Sheaft.Application.Handlers
                 var entity = await _context.Jobs.SingleOrDefaultAsync(a => a.Id == request.Id && a.RemovedOn.HasValue, token);
 
                 entity.Restore();
+                _context.Update(entity);
+
+                return OkResult(await _context.SaveChangesAsync(token) > 0);
+            });
+        }
+
+        public async Task<CommandResult<bool>> Handle(UpdateJobCommand request, CancellationToken token)
+        {
+            return await ExecuteAsync(async () =>
+            {
+                var entity = await _context.GetByIdAsync<Job>(request.Id, token);
+                entity.SetName(request.Name);
+
                 _context.Update(entity);
 
                 return OkResult(await _context.SaveChangesAsync(token) > 0);

@@ -57,6 +57,14 @@ namespace Sheaft.Domain.Models
             Status = ProcessStatusKind.Processing;
         }
 
+        public void SetName(string name)
+        {
+            if (name == null)
+                return;
+
+            Name = name;
+        }
+
         public void SetDownloadUrl(string url)
         {
             if (url == null)
@@ -164,8 +172,10 @@ namespace Sheaft.Domain.Models
 
         public void ResetJob()
         {
+            StartedOn = null;
+            CompletedOn = null;
             Status = ProcessStatusKind.Waiting;
-            Retried = 0;
+            Retried = null;
             Message = null;
         }
     }

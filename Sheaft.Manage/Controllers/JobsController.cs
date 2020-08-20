@@ -1,7 +1,6 @@
 ﻿using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using MediatR;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -93,62 +92,156 @@ namespace Sheaft.Manage.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Archive(PackagingViewModel model, CancellationToken token)
+        public async Task<IActionResult> Edit(PackagingViewModel model, CancellationToken token)
+        {
+            var requestUser = await GetRequestUser(token);
+            var result = await _mediatr.Send(new UpdateJobCommand(requestUser)
+            {
+                Id = model.Id,
+                Name = model.Name
+            }, token);
+
+            if (!result.Success)
+            {
+                ModelState.AddModelError("", result.Exception.Message);
+                return View(model);
+            }
+
+            TempData["Edited"] = JsonConvert.SerializeObject(new EntityViewModel { Id = model.Id, Name = model.Name });
+            return RedirectToAction("Index");
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Archive(Guid id, CancellationToken token)
         {
             var requestUser = await GetRequestUser(token);
             var result = await _mediatr.Send(new ArchiveJobCommand(requestUser)
             {
-                Id = model.Id
+                Id = id
             }, token);
 
             if (!result.Success)
             {
                 ModelState.AddModelError("", result.Exception.Message);
-                return View(model);
+                return RedirectToAction("Edit", new { id = id });
             }
 
-            TempData["Edited"] = JsonConvert.SerializeObject(new EntityViewModel { Id = model.Id, Name = model.Name });
-            return RedirectToAction("Index");
+            return RedirectToAction("Edit", new { id = id });
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> UnArchive(PackagingViewModel model, CancellationToken token)
+        public async Task<IActionResult> Pause(Guid id, CancellationToken token)
+        {
+            var requestUser = await GetRequestUser(token);
+            var result = await _mediatr.Send(new PauseJobCommand(requestUser)
+            {
+                Id = id
+            }, token);
+
+            if (!result.Success)
+            {
+                ModelState.AddModelError("", result.Exception.Message);
+                return RedirectToAction("Edit", new { id = id });
+            }
+
+            return RedirectToAction("Edit", new { id = id });
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Resume(Guid id, CancellationToken token)
+        {
+            var requestUser = await GetRequestUser(token);
+            var result = await _mediatr.Send(new ResumeJobCommand(requestUser)
+            {
+                Id = id
+            }, token);
+
+            if (!result.Success)
+            {
+                ModelState.AddModelError("", result.Exception.Message);
+                return RedirectToAction("Edit", new { id = id });
+            }
+
+            return RedirectToAction("Edit", new { id = id });
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Cancel(Guid id, CancellationToken token)
+        {
+            var requestUser = await GetRequestUser(token);
+            var result = await _mediatr.Send(new CancelJobCommand(requestUser)
+            {
+                Id = id
+            }, token);
+
+            if (!result.Success)
+            {
+                ModelState.AddModelError("", result.Exception.Message);
+                return RedirectToAction("Edit", new { id = id });
+            }
+
+            return RedirectToAction("Edit", new { id = id });
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Retry(Guid id, CancellationToken token)
+        {
+            var requestUser = await GetRequestUser(token);
+            var result = await _mediatr.Send(new RetryJobCommand(requestUser)
+            {
+                Id = id
+            }, token);
+
+            if (!result.Success)
+            {
+                ModelState.AddModelError("", result.Exception.Message);
+                return RedirectToAction("Edit", new { id = id });
+            }
+
+            return RedirectToAction("Edit", new { id = id });
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Unarchive(Guid id, CancellationToken token)
         {
             var requestUser = await GetRequestUser(token);
             var result = await _mediatr.Send(new UnarchiveJobCommand(requestUser)
             {
-                Id = model.Id
+                Id = id
             }, token);
 
             if (!result.Success)
             {
                 ModelState.AddModelError("", result.Exception.Message);
-                return View(model);
+                return RedirectToAction("Edit", new { id = id });
             }
 
-            TempData["Edited"] = JsonConvert.SerializeObject(new EntityViewModel { Id = model.Id, Name = model.Name });
-            return RedirectToAction("Index");
+            return RedirectToAction("Edit", new { id = id });
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> ResetJob(PackagingViewModel model, CancellationToken token)
+        public async Task<IActionResult> Reset(Guid id, CancellationToken token)
         {
             var requestUser = await GetRequestUser(token);
             var result = await _mediatr.Send(new ResetJobCommand(requestUser)
             {
-                Id = model.Id
+                Id = id
             }, token);
 
             if (!result.Success)
             {
                 ModelState.AddModelError("", result.Exception.Message);
-                return View(model);
+                return RedirectToAction("Edit", new { id = id });
             }
 
-            TempData["Edited"] = JsonConvert.SerializeObject(new EntityViewModel { Id = model.Id, Name = model.Name });
-            return RedirectToAction("Index");
+            return RedirectToAction("Edit", new { id = id });
         }
 
         [HttpPost]
