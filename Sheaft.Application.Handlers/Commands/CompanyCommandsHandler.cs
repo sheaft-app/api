@@ -18,6 +18,8 @@ using Sheaft.Services.Interop;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Sheaft.Options;
+using Sheaft.Exceptions;
+using System.Net.Http;
 
 namespace Sheaft.Application.Handlers
 {
@@ -34,20 +36,27 @@ namespace Sheaft.Application.Handlers
         private readonly IQueueService _queuesService;
         private readonly IBlobService _blobsService;
         private readonly RoleOptions _roleOptions;
+        private readonly StorageOptions _storageOptions;
+        private readonly HttpClient _httpClient;
 
         public CompanyCommandsHandler(
             IMediator mediator,
             IAppDbContext context,
             IQueueService queuesService,
             IBlobService blobsService,
+            IOptionsSnapshot<StorageOptions> storageOptions,
+            IHttpClientFactory httpClientFactory,
             ILogger<CompanyCommandsHandler> logger,
             IOptionsSnapshot<RoleOptions> roleOptions) : base(logger)
         {
+            _storageOptions = storageOptions.Value;
             _roleOptions = roleOptions.Value;
             _blobsService = blobsService;
             _queuesService = queuesService;
             _mediator = mediator;
             _context = context;
+
+            _httpClient = httpClientFactory.CreateClient("image");
         }
 
         public async Task<CommandResult<Guid>> Handle(RegisterCompanyCommand request, CancellationToken token)
@@ -84,6 +93,9 @@ namespace Sheaft.Application.Handlers
                         company.SetTags(tags);
                     }
 
+                    var picture = await HandleImageAsync(company.Id, request.Picture, token);
+                    company.SetPicture(picture);
+
                     await _context.AddAsync(company, token);
                     await _context.SaveChangesAsync(token);
 
@@ -115,24 +127,27 @@ namespace Sheaft.Application.Handlers
         {
             return await ExecuteAsync(async () =>
             {
-                var company = await _context.GetByIdAsync<Company>(request.Id, token);
+                var entity = await _context.GetByIdAsync<Company>(request.Id, token);
 
                 var departmentCode = Address.GetDepartmentCode(request.Address.Zipcode);
                 var department = await _context.GetSingleAsync<Department>(d => d.Code == departmentCode, token);
 
-                company.SetName(request.Name);
-                company.SetEmail(request.Email);
-                company.SetPhone(request.Phone);
-                company.SetDescription(request.Description);
-                company.SetSiret(request.Siret);
-                company.SetAddress(request.Address.Line1, request.Address.Line2, request.Address.Zipcode, request.Address.City, department, request.Address.Longitude, request.Address.Latitude);
-                company.SetVatIdentifier(request.VatIdentifier);
-                company.SetAppearInBusinessSearchResults(request.AppearInBusinessSearchResults);
+                entity.SetName(request.Name);
+                entity.SetEmail(request.Email);
+                entity.SetPhone(request.Phone);
+                entity.SetDescription(request.Description);
+                entity.SetSiret(request.Siret);
+                entity.SetAddress(request.Address.Line1, request.Address.Line2, request.Address.Zipcode, request.Address.City, department, request.Address.Longitude, request.Address.Latitude);
+                entity.SetVatIdentifier(request.VatIdentifier);
+                entity.SetAppearInBusinessSearchResults(request.AppearInBusinessSearchResults);
+
+                var picture = await HandleImageAsync(entity.Id, request.Picture, token);
+                entity.SetPicture(picture);
 
                 if (request.Tags != null)
                 {
                     var tags = await _context.FindAsync<Tag>(t => request.Tags.Contains(t.Id), token);
-                    company.SetTags(tags);
+                    entity.SetTags(tags);
                 }
 
                 if (request.OpeningHours != null)
@@ -143,10 +158,10 @@ namespace Sheaft.Application.Handlers
                         openingHours.AddRange(oh.Days.Select(c => new TimeSlotHour(c, oh.From, oh.To)));
                     }
 
-                    company.SetOpeningHours(openingHours);
+                    entity.SetOpeningHours(openingHours);
                 }
 
-                _context.Update(company);
+                _context.Update(entity);
                 return OkResult(await _context.SaveChangesAsync(token) > 0);
             });
         }
@@ -196,32 +211,55 @@ namespace Sheaft.Application.Handlers
         {
             return await ExecuteAsync(async () =>
             {
-                var company = await _context.GetByIdAsync<Company>(request.Id, token);
+                var entity = await _context.GetByIdAsync<Company>(request.Id, token);
 
-                var base64Data = Regex.Match(request.Picture, @"data:image/(?<type>.+?),(?<data>.+)").Groups["data"].Value;
-                var bytes = Convert.FromBase64String(base64Data);
+                var picture = await HandleImageAsync(entity.Id, request.Picture, token);
+                entity.SetPicture(picture);
 
-                using (Image image = Image.Load(bytes))
-                {
-                    using (var blobStream = new MemoryStream())
-                    {
-                        image.Clone(context => context.Resize(new ResizeOptions
-                        {
-                            Mode = ResizeMode.Max,
-                            Size = new Size(64, 64)
-                        })).Save(blobStream, new JpegEncoder { Quality = 100 });
-
-                        var compPicture = await _blobsService.UploadCompanyPictureAsync(company.Id, blobStream, token);
-                        if (!compPicture.Success)
-                            return CommandFailed<bool>(compPicture.Exception);
-
-                        company.SetPicture(compPicture.Result);
-                        var entry = _context.Update(company);
-                    }
-                }
+                _context.Update(entity);
 
                 return OkResult(await _context.SaveChangesAsync(token) > 0);
             });
+        }
+
+        private async Task<string> HandleImageAsync(Guid id, string picture, CancellationToken token)
+        {
+            if (string.IsNullOrWhiteSpace(picture))
+                return null;
+
+            byte[] bytes = null;
+            if (!picture.StartsWith("http") && !picture.StartsWith("https"))
+            {
+                var base64Data = picture.StartsWith("data:image") ? Regex.Match(picture, @"data:image/(?<type>.+?),(?<data>.+)").Groups["data"].Value : picture;
+                bytes = Convert.FromBase64String(base64Data);
+            }
+            else if (!picture.StartsWith($"https://{_storageOptions.Account}.blob.{_storageOptions.Suffix}"))
+            {
+                using (var response = await _httpClient.GetAsync(picture))
+                    bytes = await response.Content.ReadAsByteArrayAsync();
+            }
+            else
+                return picture;
+
+            var imageId = Guid.NewGuid().ToString("N");
+
+            using (var image = Image.Load(bytes))
+            {
+                using (var blobStream = new MemoryStream())
+                {
+                    image.Clone(context => context.Resize(new ResizeOptions
+                    {
+                        Mode = ResizeMode.Max,
+                        Size = new Size(64, 64)
+                    })).Save(blobStream, new JpegEncoder { Quality = 100 });
+
+                    var compImage = await _blobsService.UploadCompanyPictureAsync(id, blobStream, token);
+                    if (!compImage.Success)
+                        throw compImage.Exception ?? new BadRequestException();
+
+                    return compImage.Result;
+                }
+            }
         }
     }
 }

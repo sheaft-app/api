@@ -16,6 +16,7 @@ namespace Sheaft.Application.Commands
         public string Phone { get; set; }
         public string Description { get; set; }
         public string Siret { get; set; }
+        public string Picture { get; set; }
         public string VatIdentifier { get; set; }
         public bool AppearInBusinessSearchResults { get; set; }
         public AddressInput Address { get; set; }

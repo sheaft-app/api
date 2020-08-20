@@ -14,7 +14,7 @@
         <h1 class="display-4">Company details</h1>
         <br />
 
-        @using (Html.BeginForm("Edit", "Companies", FormMethod.Post, new { @class = "form" }))
+        @using (Html.BeginForm("Edit", "Companies", FormMethod.Post, new { @class = "form", enctype = "multipart/form-data" }))
         {
             @Html.AntiForgeryToken()
             @Html.ValidationSummary(true, "", new { @class = "text-danger" })
@@ -27,7 +27,7 @@
             </div>
             <div class="form-group">
                 @Html.LabelFor(c => c.Kind, "Type", new { @class = "form-label" })
-                @Html.DropDownListFor(c => c.Kind, kinds, new { @class = "form-control" })
+                @Html.DropDownListFor(c => c.Kind, kinds, new { @class = "form-control", @disabled="disabled" })
             </div>
             <div class="form-group">
                 @Html.LabelFor(c => c.Email, "Email", new { @class = "form-label" })
@@ -46,18 +46,27 @@
                 @Html.TextBoxFor(c => c.VatIdentifier, null, new { @class = "form-control" })
             </div>
             <div class="form-group">
-                @Html.LabelFor(c => c.AppearInBusinessSearchResults, "Appear in search results", new { @class = "form-label" })
-                @Html.CheckBoxFor(c => c.AppearInBusinessSearchResults, new { @class = "form-control" })
+                @Html.LabelFor(c => c.Tags, "Tags", new { @class = "form-label" })
+                @Html.ListBoxFor(c => c.Tags, availableTags, new { @class = "form-control", @style = "height:12rem;" })
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(c => c.Picture, new { @class = "form-label" })
+                @if (!string.IsNullOrWhiteSpace(Model.Picture))
+                {
+                    <img src="@Model.Picture" height="100" />
+                }
+                @Html.TextBoxFor(c => c.Picture, new { @class = "form-control", @type = "file" })
             </div>
             <div class="form-group">
                 @Html.LabelFor(c => c.Description, "Description", new { @class = "form-label" })
                 @Html.TextAreaFor(c => c.Description, new { @class = "form-control" })
             </div>
-            <div class="form-group">
-                @Html.LabelFor(c => c.Tags, "Tags", new { @class = "form-label" })
-                @Html.ListBoxFor(c => c.Tags, availableTags, new { @class = "form-control", @style = "height:12rem;" })
+            <div class="form-check">
+                @Html.CheckBoxFor(m => m.AppearInBusinessSearchResults, new { @class = "form-check-input" })
+                @Html.LabelFor(m => m.AppearInBusinessSearchResults, new { @class = "form-check-label" })
             </div>
-            <h3>Address</h3>
+            <br/>
+            <h4>Address</h4>
             <div class="form-group">
                 @Html.LabelFor(c => c.Address.Line1, "Line1", new { @class = "form-label" })
                 @Html.TextBoxFor(c => c.Address.Line1, null, new { @class = "form-control" })

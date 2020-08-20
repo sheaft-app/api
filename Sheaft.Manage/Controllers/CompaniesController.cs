@@ -2,22 +2,22 @@
 using AutoMapper.QueryableExtensions;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Sheaft.Application.Commands;
-using Sheaft.Core.Extensions;
 using Sheaft.Infrastructure.Interop;
 using Sheaft.Interop.Enums;
 using Sheaft.Manage.Models;
-using Sheaft.Models.Dto;
 using Sheaft.Models.Inputs;
 using Sheaft.Models.ViewModels;
 using Sheaft.Options;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -86,25 +86,23 @@ namespace Sheaft.Manage.Controllers
                 .ProjectTo<CompanyViewModel>(_configurationProvider)
                 .SingleOrDefaultAsync(token);
 
-            ViewBag.Tags = await _context.Tags
-                .AsNoTracking()
-                .ProjectTo<TagViewModel>(_configurationProvider)
-                .ToListAsync(token);
-
+            ViewBag.Tags = await GetTags(token);
             return View(entity);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(CompanyViewModel model, CancellationToken token)
+        public async Task<IActionResult> Edit(CompanyViewModel model, IFormFile picture, CancellationToken token)
         {
             var requestUser = await GetRequestUser(token);
-            if (!requestUser.IsImpersonating)
+            
+            if (picture != null)
             {
-                ViewBag.Tags = await GetTags(token);
-
-                ModelState.AddModelError("", "You must impersonate company's owner to edit it.");
-                return View(model);
+                using (var ms = new MemoryStream())
+                {
+                    picture.CopyTo(ms);
+                    model.Picture = Convert.ToBase64String(ms.ToArray());
+                }
             }
 
             var result = await _mediatr.Send(new UpdateCompanyCommand(requestUser)
@@ -118,7 +116,8 @@ namespace Sheaft.Manage.Controllers
                 Phone = model.Phone,
                 Siret = model.Siret,
                 VatIdentifier = model.VatIdentifier,
-                Tags = model.Tags
+                Tags = model.Tags,
+                Picture = model.Picture
             }, token);
 
             if (!result.Success)
