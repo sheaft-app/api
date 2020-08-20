@@ -32,12 +32,12 @@ namespace Sheaft.Application.Queries
             {
                 if (currentUser.IsInRole(_roleOptions.Store.Value))
                     return _context.Agreements
-                            .Get(c => c.Id == id && c.Store.Id == currentUser.CompanyId)
+                            .Get(c => c.Id == id && c.Store.Id == currentUser.CompanyId && !c.Delivery.RemovedOn.HasValue)
                             .ProjectTo<AgreementDto>(_configurationProvider);
 
                 if (currentUser.IsInRole(_roleOptions.Producer.Value))
                     return _context.Agreements
-                            .Get(c => c.Id == id && c.Delivery.Producer.Id == currentUser.CompanyId)
+                            .Get(c => c.Id == id && c.Delivery.Producer.Id == currentUser.CompanyId && !c.Delivery.RemovedOn.HasValue)
                             .ProjectTo<AgreementDto>(_configurationProvider);
 
                 return new List<AgreementDto>().AsQueryable();
@@ -54,12 +54,12 @@ namespace Sheaft.Application.Queries
             {
                 if (currentUser.IsInRole(_roleOptions.Store.Value))
                     return _context.Agreements
-                            .Get(c => c.Store.Id == currentUser.CompanyId)
+                            .Get(c => c.Store.Id == currentUser.CompanyId && !c.Delivery.RemovedOn.HasValue)
                             .ProjectTo<AgreementDto>(_configurationProvider);
 
                 if (currentUser.IsInRole(_roleOptions.Producer.Value))
                     return _context.Agreements
-                            .Get(c => c.Delivery.Producer.Id == currentUser.CompanyId)
+                            .Get(c => c.Delivery.Producer.Id == currentUser.CompanyId && !c.Delivery.RemovedOn.HasValue)
                             .ProjectTo<AgreementDto>(_configurationProvider);
 
                 return new List<AgreementDto>().AsQueryable();
@@ -76,7 +76,7 @@ namespace Sheaft.Application.Queries
             {
                 if (currentUser.IsInRole(_roleOptions.Producer.Value))
                     return _context.Agreements
-                            .Get(c => c.Store.Id == storeId && c.Delivery.Producer.Id == currentUser.CompanyId)
+                            .Get(c => c.Store.Id == storeId && c.Delivery.Producer.Id == currentUser.CompanyId && !c.Delivery.RemovedOn.HasValue)
                             .ProjectTo<AgreementDto>(_configurationProvider);
 
                 return new List<AgreementDto>().AsQueryable();
@@ -93,7 +93,7 @@ namespace Sheaft.Application.Queries
             {
                 if (currentUser.IsInRole(_roleOptions.Store.Value))
                     return _context.Agreements
-                            .Get(c => c.Store.Id == currentUser.CompanyId && c.Delivery.Producer.Id == producerId)
+                            .Get(c => c.Store.Id == currentUser.CompanyId && c.Delivery.Producer.Id == producerId && !c.Delivery.RemovedOn.HasValue)
                             .ProjectTo<AgreementDto>(_configurationProvider);
 
                 return new List<AgreementDto>().AsQueryable();

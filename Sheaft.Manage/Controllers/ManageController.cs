@@ -11,6 +11,7 @@ using Sheaft.Interop.Enums;
 using Sheaft.Models.ViewModels;
 using Sheaft.Options;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -42,6 +43,7 @@ namespace Sheaft.Manage.Controllers
         {
             return await _context.Tags
                 .AsNoTracking()
+                .Where(t => !t.RemovedOn.HasValue)
                 .ProjectTo<TagViewModel>(_configurationProvider)
                 .ToListAsync(token);
         }

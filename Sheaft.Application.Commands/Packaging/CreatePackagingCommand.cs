@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Sheaft.Interop.Enums;
+using System;
 
 namespace Sheaft.Application.Commands
 {

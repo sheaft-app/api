@@ -44,12 +44,14 @@ namespace Sheaft.Application.Handlers
         {
             return await ExecuteAsync(async () =>
             {
-                var packaging = await _context.GetByIdAsync<Packaging>(request.Id, token);
+                var entity = await _context.GetByIdAsync<Packaging>(request.Id, token);
 
-                packaging.SetName(request.Name);
-                packaging.SetDescription(request.Description);
-                packaging.SetWholeSalePrice(request.WholeSalePrice);
-                packaging.SetVat(request.Vat);
+                entity.SetName(request.Name);
+                entity.SetDescription(request.Description);
+                entity.SetWholeSalePrice(request.WholeSalePrice);
+                entity.SetVat(request.Vat);
+
+                _context.Update(entity);
 
                 return OkResult(await _context.SaveChangesAsync(token) > 0);
             });
@@ -61,10 +63,16 @@ namespace Sheaft.Application.Handlers
             {
                 var entity = await _context.GetByIdAsync<Packaging>(request.Id, token);
 
-                //TODO remove packaging link
-
                 _context.Remove(entity);
-                return OkResult(await _context.SaveChangesAsync(token) > 0);
+                var results = await _context.SaveChangesAsync(token);
+
+                using (var transaction = await _context.Database.BeginTransactionAsync(token))
+                {
+                    await _context.Database.ExecuteSqlRawAsync($"UPDATE [dbo].[Products] SET [PackagingId] = NULL WHERE [PackagingId] = '{entity.Id}';", token);
+                    await transaction.CommitAsync(token);
+                }
+
+                return OkResult(results > 0);
             });
         }
 
