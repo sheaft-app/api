@@ -101,6 +101,7 @@ namespace Sheaft.Manage.Controllers
                 Description = model.Description,
                 Name = model.Name,
                 Vat = model.Vat,
+                WholeSalePrice = model.WholeSalePrice
             }, token);
 
             if (!result.Success)

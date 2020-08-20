@@ -1,6 +1,12 @@
 ﻿@model PackagingViewModel
 @{
     ViewData["Title"] = "Packaging details";
+    var vats = new List<SelectListItem> {
+        new SelectListItem("5.5%", "5.5"),
+        new SelectListItem("10%", "10"),
+        new SelectListItem("20%", "20"),
+    };
+
 }
 
     <div class="container">
@@ -12,7 +18,32 @@
             @Html.AntiForgeryToken()
             @Html.ValidationSummary(true, "", new { @class = "text-danger" })
             @Html.HiddenFor(model => model.Id)
-            <br />            
+            <br />
+
+            <div class="form-group">
+                @Html.LabelFor(m => m.Name)
+                @Html.TextBoxFor(m => m.Name, null, new { @class = "form-control" })
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(m => m.WholeSalePrice)
+                @Html.TextBoxFor(m => m.WholeSalePrice, null, new { @class = "form-control" })
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(m => m.Vat)
+                @Html.DropDownListFor(c => c.Vat, vats, new { @class = "form-control" })
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(m => m.VatPrice)
+                @Html.TextBoxFor(m => m.VatPrice, null, new { @class = "form-control", @disabled = "disabled" })
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(m => m.OnSalePrice)
+                @Html.TextBoxFor(m => m.OnSalePrice, null, new { @class = "form-control", @disabled = "disabled" })
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(m => m.Description)
+                @Html.TextAreaFor(m => m.Description, new { @class = "form-control" })
+            </div>
 
             <br />
             <a asp-controller="Packagings" asp-action="Index" class="btn btn-light">
