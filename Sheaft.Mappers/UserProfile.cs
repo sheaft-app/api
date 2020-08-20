@@ -32,8 +32,8 @@ namespace Sheaft.Mappers
             CreateMap<PurchaseOrderVendor, UserProfileDto>()
                 .IncludeBase<PurchaseOrderUser, UserProfileDto>();
 
-            CreateMap<PurchaseOrderSender, UserViewModel>();
-            CreateMap<PurchaseOrderVendor, UserViewModel>();
+            CreateMap<PurchaseOrderSender, OrderUserViewModel>();
+            CreateMap<PurchaseOrderVendor, OrderUserViewModel>();
 
             CreateMap<IdInput, GenerateUserSponsoringCodeCommand>();
             CreateMap<RegisterConsumerInput, RegisterConsumerCommand>();

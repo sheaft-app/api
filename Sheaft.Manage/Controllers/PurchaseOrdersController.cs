@@ -81,9 +81,7 @@ namespace Sheaft.Manage.Controllers
         [HttpGet]
         public async Task<IActionResult> Edit(Guid id, CancellationToken token)
         {
-            var requestUser = await GetRequestUser(token);
-            if (!requestUser.IsImpersonating)
-                throw new Exception("You must impersonate purchaseOrder's vendor or sender to edit it.");
+            var requestUser = await GetRequestUser(token);            
 
             var entity = await _context.PurchaseOrders
                 .AsNoTracking()
@@ -99,30 +97,11 @@ namespace Sheaft.Manage.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(PackagingViewModel model, CancellationToken token)
+        public async Task<IActionResult> Edit(PurchaseOrderViewModel model, CancellationToken token)
         {
             var requestUser = await GetRequestUser(token);
-            if (!requestUser.IsImpersonating)
-            {
-                ModelState.AddModelError("", "You must impersonate purchaseOrder's vendor or sender to edit it.");
-                return View(model);
-            }
 
-            //var result = await _mediatr.Send(new UpdatePackagingCommand(requestUser)
-            //{
-            //    Id = model.Id,
-            //    Description = model.Description,
-            //    Name = model.Name,
-            //    Vat = model.Vat,
-            //}, token);
-
-            //if (!result.Success)
-            //{
-            //    ModelState.AddModelError("", result.Exception.Message);
-            //    return View(model);
-            //}
-
-            TempData["Edited"] = JsonConvert.SerializeObject(new EntityViewModel { Id = model.Id, Name = model.Name });
+            TempData["Edited"] = JsonConvert.SerializeObject(new EntityViewModel { Id = model.Id, Name = model.Reference });
             return RedirectToAction("Index");
         }
 
