@@ -39,34 +39,46 @@
             <tr>
                 <th scope="col">Name</th>
                 <th scope="col">Price</th>
-                <th scope="col">Vat (%)</th>
+                <th scope="col">Vat</th>
                 <th scope="col">CreatedOn</th>
+                <th scope="col">Removed</th>
                 <th scope="col"></th>
             </tr>
         </thead>
         <tbody>
             @foreach (var entity in Model)
             {
-                <tr>
-                    <th scope="row">@entity.Name</th>
-                    <td>@entity.WholeSalePrice</td>
-                    <td>@entity.Vat</td>
-                    <td>@entity.CreatedOn</td>
-                    <td>
-                        <a asp-controller="Packagings" asp-action="Edit" asp-route-id="@entity.Id" class="btn btn-info">
-                            <i class="fa fa-pen"></i>
-                        </a>
-                        @if (User.IsInRole("ADMIN"))
+            <tr>
+                <th scope="row">@entity.Name</th>
+                <td>@entity.WholeSalePrice</td>
+                <td>@(entity.Vat)%</td>
+                <td>@entity.CreatedOn</td>
+                <td>@entity.RemovedOn.HasValue</td>
+                <td>
+                    <a asp-controller="Packagings" asp-action="Edit" asp-route-id="@entity.Id" class="btn btn-info">
+                        <i class="fa fa-pen"></i>
+                    </a>
+
+                    @if (entity.RemovedOn.HasValue)
+                    {
+                        @using (Html.BeginForm("Restore", "Packagings", new { id = entity.Id }, FormMethod.Post, true, new { @class = "form d-inline" }))
                         {
-                            @using (Html.BeginForm("Delete", "Packagings", new { id = entity.Id }, FormMethod.Post, true, new { @class = "form d-inline" }))
-                            {
-                                <button type="submit" class="btn btn-danger">
-                                    <i class="fa fa-trash"></i>
-                                </button>
-                            }
+                            <button type="submit" class="btn btn-success">
+                                <i class="fa fa-trash-restore"></i>
+                            </button>
                         }
-                    </td>
-                </tr>
+                    }
+                    else
+                    {
+                        @using (Html.BeginForm("Delete", "Packagings", new { id = entity.Id }, FormMethod.Post, true, new { @class = "form d-inline" }))
+                        {
+                            <button type="submit" class="btn btn-danger">
+                                <i class="fa fa-trash"></i>
+                            </button>
+                        }
+                    }
+                </td>
+            </tr>
             }
         </tbody>
         <tfoot>
