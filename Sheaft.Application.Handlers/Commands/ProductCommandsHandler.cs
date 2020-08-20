@@ -103,11 +103,11 @@ namespace Sheaft.Application.Handlers
                     entity.SetPackaging(packaging);
                 }
 
-                var picture = await HandleImageAsync(entity, request.Picture, token);
-                entity.SetImage(picture);
-
                 var tags = await _context.FindAsync<Tag>(t => request.Tags.Contains(t.Id), token);
                 entity.SetTags(tags);
+
+                var picture = await HandleImageAsync(entity, request.Picture, token);                
+                entity.SetImage(picture);
 
                 await _context.AddAsync(entity, token);
                 await _context.SaveChangesAsync(token);
@@ -142,11 +142,11 @@ namespace Sheaft.Application.Handlers
                     entity.SetPackaging(null);
                 }
 
-                var picture = await HandleImageAsync(entity, request.Picture, token);
-                entity.SetImage(picture);
-
                 var tags = await _context.FindAsync<Tag>(t => request.Tags.Contains(t.Id), token);
                 entity.SetTags(tags);
+
+                var picture = await HandleImageAsync(entity, request.Picture, token);
+                entity.SetImage(picture);
 
                 _context.Update(entity);
                 return OkResult(await _context.SaveChangesAsync(token) > 0);
@@ -349,8 +349,13 @@ namespace Sheaft.Application.Handlers
 
         #region Product implementation
 
-        private async Task<string> HandleImageAsync(Product product, string picture, CancellationToken token)
+        private async Task<string> HandleImageAsync(Product entity, string picture, CancellationToken token)
         {
+            if (string.IsNullOrWhiteSpace(picture) && string.IsNullOrWhiteSpace(entity.Image))
+            {
+                return GetDefaultProductImage(entity.Tags?.Select(t => t.Tag));
+            }
+
             if (string.IsNullOrWhiteSpace(picture))
                 return null;
 
@@ -374,12 +379,21 @@ namespace Sheaft.Application.Handlers
 
             using (Image image = Image.Load(bytes))
             {
-                await UploadImageAsync(image, product.Producer.Id, product.Id, imageId, ImageSize.LARGE, 620, 256, token);
-                await UploadImageAsync(image, product.Producer.Id, product.Id, imageId, ImageSize.MEDIUM, 310, 128, token);
-                await UploadImageAsync(image, product.Producer.Id, product.Id, imageId, ImageSize.SMALL, 64, 64, token, ResizeMode.Crop);
+                await UploadImageAsync(image, entity.Producer.Id, entity.Id, imageId, ImageSize.LARGE, 620, 256, token);
+                await UploadImageAsync(image, entity.Producer.Id, entity.Id, imageId, ImageSize.MEDIUM, 310, 128, token);
+                await UploadImageAsync(image, entity.Producer.Id, entity.Id, imageId, ImageSize.SMALL, 64, 64, token, ResizeMode.Crop);
             }
 
-            return $"https://{_storageOptions.Account}.blob.{_storageOptions.Suffix}/{_storageOptions.Containers.Pictures}/{CoreProductExtensions.GetImageUrl(product.Producer.Id, product.Id, imageId)}";
+            return $"https://{_storageOptions.Account}.blob.{_storageOptions.Suffix}/{_storageOptions.Containers.Pictures}/{CoreProductExtensions.GetImageUrl(entity.Producer.Id, entity.Id, imageId)}";
+        }
+
+        private string GetDefaultProductImage(IEnumerable<Tag> tags)
+        {
+            var category = tags.FirstOrDefault(t => t.Kind == TagKind.Category);
+            if (category != null)
+                return $"https://{_storageOptions.Account}.blob.{_storageOptions.Suffix}/{_storageOptions.Containers.Pictures}/products/{category.Id}.png";
+
+            return $"https://{_storageOptions.Account}.blob.{_storageOptions.Suffix}/{_storageOptions.Containers.Pictures}/products/default.jpg";
         }
 
         private async Task UploadImageAsync(Image image, Guid companyId, Guid productId, string filename, string size, int width, int height, CancellationToken token, ResizeMode mode = ResizeMode.Max, int quality = 100)
