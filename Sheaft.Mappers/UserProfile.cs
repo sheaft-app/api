@@ -13,9 +13,9 @@ namespace Sheaft.Mappers
         public UserProfile()
         {
             CreateMap<User, UserViewModel>()
-                .ForMember(c => c.Name, opt => opt.MapFrom(d => $"{d.FirstName} {d.LastName}"))
                 .ForMember(c => c.Kind, opt => opt.MapFrom(d => d.Company != null ? d.Company.Kind : (ProfileKind)d.UserType))
-                .ForMember(c => c.Company, opt => opt.MapFrom(d => d.Company.Name));
+                .ForMember(c => c.Company, opt => opt.MapFrom(d => d.Company.Name))
+                .ForMember(c => c.DepartmentId, opt => opt.MapFrom(d => d.Department.Id));
 
             CreateMap<User, UserProfileDto>()
                 .ForMember(c => c.Name, opt => opt.MapFrom(d => $"{d.FirstName} {d.LastName}"))

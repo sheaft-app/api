@@ -48,27 +48,27 @@
         <tbody>
             @foreach (var entity in Model)
             {
-                <tr>
-                    <th scope="row">@entity.Name</th>
-                    <th>@entity.Email</th>
-                    <td>@entity.CreatedOn</td>
-                    <td>@entity.Kind</td>
-                    <td>@entity.Company</td>
-                    <td>
-                        <a asp-controller="Users" asp-action="Edit" asp-route-id="@entity.Id" class="btn btn-info">
-                            <i class="fa fa-pen"></i>
-                        </a>
-                        @if (User.IsInRole("ADMIN"))
+            <tr>
+                <td scope="row">@entity.Kind</td>
+                <th>@($"{entity.FirstName} {entity.LastName}")</th>
+                <th>@entity.Email</th>
+                <td>@entity.CreatedOn</td>
+                <td>@entity.Company</td>
+                <td>
+                    <a asp-controller="Users" asp-action="Edit" asp-route-id="@entity.Id" class="btn btn-info">
+                        <i class="fa fa-pen"></i>
+                    </a>
+                    @if (User.IsInRole("ADMIN"))
+                    {
+                        @using (Html.BeginForm("Delete", "Users", new { id = entity.Id }, FormMethod.Post, true, new { @class = "form d-inline" }))
                         {
-                            @using (Html.BeginForm("Delete", "Users", new { id = entity.Id }, FormMethod.Post, true, new { @class = "form d-inline" }))
-                            {
-                                <button type="submit" class="btn btn-danger">
-                                    <i class="fa fa-trash"></i>
-                                </button>
-                            }
+                            <button type="submit" class="btn btn-danger">
+                                <i class="fa fa-trash"></i>
+                            </button>
                         }
-                    </td>
-                </tr>
+                    }
+                </td>
+            </tr>
             }
         </tbody>
         <tfoot>

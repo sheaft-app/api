@@ -48,6 +48,7 @@ namespace Sheaft.Application.Handlers
         private readonly IBlobService _blobsService;
         private readonly AuthOptions _authOptions;
         private readonly ScoringOptions _scoringOptions;
+        private readonly StorageOptions _storageOptions;
         private readonly HttpClient _httpClient;
         private readonly RoleOptions _roleOptions;
         private readonly IDistributedCache _cache;
@@ -55,6 +56,7 @@ namespace Sheaft.Application.Handlers
         public UserCommandsHandler(
             IOptionsSnapshot<AuthOptions> authOptions,
             IOptionsSnapshot<ScoringOptions> scoringOptions,
+            IOptionsSnapshot<StorageOptions> storageOptions,
             IMediator mediatr,
             IHttpClientFactory httpClientFactory,
             IIdentifierService identifierService,
@@ -68,6 +70,7 @@ namespace Sheaft.Application.Handlers
             _roleOptions = roleOptions.Value;            
             _authOptions = authOptions.Value;
             _scoringOptions = scoringOptions.Value;
+            _storageOptions = storageOptions.Value;
             _context = context;
             _mediatr = mediatr;
             _identifierService = identifierService;
@@ -108,10 +111,12 @@ namespace Sheaft.Application.Handlers
                     roles.Add(_roleOptions.Store.Id);
                 }
 
+                var picture = await HandleImageAsync(entity.Id, request.Picture, token);
+
                 var oidcUser = new IdentityUserInput(request.Id, request.Email, request.FirstName, request.LastName, roles)
                 {
                     Phone = request.Phone,
-                    Picture = request.Picture
+                    Picture = picture
                 };
 
                 var oidcResult = await _httpClient.PutAsync(_authOptions.Actions.Profile, new StringContent(JsonConvert.SerializeObject(oidcUser), Encoding.UTF8, "application/json"), token);
@@ -120,10 +125,10 @@ namespace Sheaft.Application.Handlers
 
                 var company = await _context.GetByIdAsync<Company>(request.CompanyId, token);
 
-                var user = new User(request.Id, UserKind.Owner, request.Email, request.FirstName, request.LastName, request.Phone, company);
-                user.SetPicture(request.Picture);
+                entity = new User(request.Id, UserKind.Owner, request.Email, request.FirstName, request.LastName, request.Phone, company);
+                entity.SetPicture(picture);
 
-                await _context.AddAsync(user, token);
+                await _context.AddAsync(entity, token);
                 await _context.SaveChangesAsync(token);
 
                 if (!string.IsNullOrWhiteSpace(request.SponsoringCode))
@@ -132,15 +137,15 @@ namespace Sheaft.Application.Handlers
                     if (sponsor == null)
                         return NotFoundResult<Guid>(MessageKind.RegisterOwner_UserWithSponsorCode_NotFound);
 
-                    await _context.AddAsync(new Sponsoring(sponsor, user), token);
+                    await _context.AddAsync(new Sponsoring(sponsor, entity), token);
                     await _context.SaveChangesAsync(token);
 
-                    await _queuesService.ProcessEventAsync(UserSponsoredEvent.QUEUE_NAME, new UserSponsoredEvent(request.RequestUser) { SponsorId = sponsor.Id, SponsoredId = user.Id }, token);
+                    await _queuesService.ProcessEventAsync(UserSponsoredEvent.QUEUE_NAME, new UserSponsoredEvent(request.RequestUser) { SponsorId = sponsor.Id, SponsoredId = entity.Id }, token);
                     await _queuesService.ProcessCommandAsync(CreateUserPointsCommand.QUEUE_NAME, new CreateUserPointsCommand(request.RequestUser) { CreatedOn = DateTimeOffset.UtcNow, Kind = PointKind.Sponsoring, UserId = sponsor.Id }, token);
                 }
 
-                await _cache.RemoveAsync(user.Id.ToString("N"));
-                return CreatedResult(user.Id);
+                await _cache.RemoveAsync(entity.Id.ToString("N"));
+                return CreatedResult(entity.Id);
             });
         }
 
@@ -152,10 +157,12 @@ namespace Sheaft.Application.Handlers
                 if (entity != null)
                     return ConflictResult<Guid>(MessageKind.RegisterConsumer_User_AlreadyExists);
 
+                var picture = await HandleImageAsync(entity.Id, request.Picture, token);
+
                 var oidcUser = new IdentityUserInput(request.Id, request.Email, request.FirstName, request.LastName, new List<Guid> { _roleOptions.Consumer.Id }) 
                 { 
                     Phone = request.Phone, 
-                    Picture = request.Picture 
+                    Picture = picture 
                 };
 
                 var oidcResult = await _httpClient.PutAsync(_authOptions.Actions.Profile, new StringContent(JsonConvert.SerializeObject(oidcUser), Encoding.UTF8, "application/json"), token);
@@ -163,7 +170,7 @@ namespace Sheaft.Application.Handlers
                     return CommandFailed<Guid>(new BadRequestException(MessageKind.RegisterConsumer_Oidc_Register_Error, await oidcResult.Content.ReadAsStringAsync().ConfigureAwait(false)));
 
                 var user = new User(request.Id, UserKind.Consumer, request.Email, request.FirstName, request.LastName, request.Phone);
-                user.SetPicture(request.Picture);
+                user.SetPicture(picture);
                 user.SetAnonymous(request.Anonymous);
 
                 var dept = await _context.GetByIdAsync<Department>(request.DepartmentId, token);
@@ -266,11 +273,14 @@ namespace Sheaft.Application.Handlers
                     var dept = await _context.GetByIdAsync<Department>(request.DepartmentId.Value, token);
                     entity.SetDepartment(dept);
                 }
+                
+                var picture = await HandleImageAsync(entity.Id, request.Picture, token);
+                entity.SetPicture(picture);
 
                 var oidcUser = new IdentityUserInput(request.Id, request.Email, request.FirstName, request.LastName)
                 {
                     Phone = request.Phone,
-                    Picture = request.Picture
+                    Picture = entity.Picture
                 };
 
                 var oidcResult = await _httpClient.PutAsync(_authOptions.Actions.Profile, new StringContent(JsonConvert.SerializeObject(oidcUser), Encoding.UTF8, "application/json"), token);
@@ -364,26 +374,8 @@ namespace Sheaft.Application.Handlers
             {
                 var entity = await _context.GetByIdAsync<User>(request.Id, token);
 
-                var base64Data = Regex.Match(request.Picture, @"data:image/(?<type>.+?),(?<data>.+)").Groups["data"].Value;
-                var bytes = Convert.FromBase64String(base64Data);
-
-                using (Image image = Image.Load(bytes))
-                {
-                    using (var blobStream = new MemoryStream())
-                    {
-                        image.Clone(context => context.Resize(new ResizeOptions
-                        {
-                            Mode = ResizeMode.Max,
-                            Size = new Size(64, 64)
-                        })).Save(blobStream, new JpegEncoder { Quality = 100 });
-
-                        var compImage = await _blobsService.UploadUserPictureAsync(entity.Id, blobStream, token);
-                        if (!compImage.Success)
-                            return CommandFailed<bool>(compImage.Exception);
-
-                        entity.SetPicture(compImage.Result);
-                    }
-                }
+                var picture = await HandleImageAsync(entity.Id, request.Picture, token);
+                entity.SetPicture(picture);
 
                 var oidcUser = new IdentityPictureInput(request.Id, entity.Picture);
 
@@ -412,6 +404,46 @@ namespace Sheaft.Application.Handlers
 
                 return OkResult(true);
             });
+        }
+
+        private async Task<string> HandleImageAsync(Guid id, string picture, CancellationToken token)
+        {
+            if (string.IsNullOrWhiteSpace(picture))
+                return null;
+
+            byte[] bytes = null;
+            if (!picture.StartsWith("http") && !picture.StartsWith("https"))
+            {
+                var base64Data = picture.StartsWith("data:image") ? Regex.Match(picture, @"data:image/(?<type>.+?),(?<data>.+)").Groups["data"].Value : picture;
+                bytes = Convert.FromBase64String(base64Data);
+            }
+            else if (!picture.StartsWith($"https://{_storageOptions.Account}.blob.{_storageOptions.Suffix}"))
+            {
+                using (var response = await _httpClient.GetAsync(picture))
+                    bytes = await response.Content.ReadAsByteArrayAsync();
+            }
+            else
+                return picture;
+
+            var imageId = Guid.NewGuid().ToString("N");
+
+            using (var image = Image.Load(bytes))
+            {
+                using (var blobStream = new MemoryStream())
+                {
+                    image.Clone(context => context.Resize(new ResizeOptions
+                    {
+                        Mode = ResizeMode.Max,
+                        Size = new Size(64, 64)
+                    })).Save(blobStream, new JpegEncoder { Quality = 100 });
+
+                    var compImage = await _blobsService.UploadUserPictureAsync(id, blobStream, token);
+                    if (!compImage.Success)
+                        throw compImage.Exception ?? new BadRequestException();
+
+                    return compImage.Result;
+                }
+            }
         }
     }
 }

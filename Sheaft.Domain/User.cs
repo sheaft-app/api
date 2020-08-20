@@ -83,6 +83,9 @@ namespace Sheaft.Domain.Models
 
         public void SetPicture(string imageUrl)
         {
+            if (imageUrl == null)
+                return;
+
             Picture = imageUrl;
         }
 

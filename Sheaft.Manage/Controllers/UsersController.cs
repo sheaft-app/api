@@ -2,6 +2,7 @@
 using AutoMapper.QueryableExtensions;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -13,6 +14,8 @@ using Sheaft.Manage.Models;
 using Sheaft.Models.ViewModels;
 using Sheaft.Options;
 using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -71,42 +74,51 @@ namespace Sheaft.Manage.Controllers
         [HttpGet]
         public async Task<IActionResult> Edit(Guid id, CancellationToken token)
         {
-            var requestUser = await GetRequestUser(token);
-            if (!requestUser.IsImpersonating)
-                throw new Exception("You must impersonate product's producer to edit it.");
-
             var entity = await _context.Users
                 .AsNoTracking()
                 .Where(c => c.Id == id)
                 .ProjectTo<UserViewModel>(_configurationProvider)
                 .SingleOrDefaultAsync(token);
 
+            ViewBag.Departments = await GetDepartments(token);
             return View(entity);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(UserViewModel model, CancellationToken token)
+        public async Task<IActionResult> Edit(UserViewModel model, IFormFile picture, CancellationToken token)
         {
             var requestUser = await GetRequestUser(token);
-            if (!requestUser.IsImpersonating)
+
+            if (picture != null)
             {
-                ModelState.AddModelError("", "You must impersonate packaging's producer to edit it.");
-                return View(model);
+                using (var ms = new MemoryStream())
+                {
+                    picture.CopyTo(ms);
+                    model.Picture = Convert.ToBase64String(ms.ToArray());
+                }
             }
 
             var result = await _mediatr.Send(new UpdateUserCommand(requestUser)
             {
-                Id = model.Id
+                Id = model.Id,
+                Anonymous = model.Anonymous,
+                Email = model.Email,
+                FirstName = model.FirstName,
+                LastName = model.LastName,
+                Phone = model.Phone,
+                DepartmentId = model.DepartmentId,
+                Picture = model.Picture
             }, token);
 
             if (!result.Success)
             {
+                ViewBag.Departments = await GetDepartments(token);
                 ModelState.AddModelError("", result.Exception.Message);
                 return View(model);
             }
 
-            TempData["Edited"] = JsonConvert.SerializeObject(new EditViewModel { Id = model.Id, Name = model.Name });
+            TempData["Edited"] = JsonConvert.SerializeObject(new EditViewModel { Id = model.Id, Name = $"{model.FirstName} {model.LastName}" });
             return RedirectToAction("Index");
         }
 
@@ -124,6 +136,11 @@ namespace Sheaft.Manage.Controllers
 
             TempData["Removed"] = $"{entity.FirstName} {entity.LastName}";
             return RedirectToAction("Index");
+        }
+
+        private async Task<IEnumerable<DepartmentViewModel>> GetDepartments(CancellationToken token)
+        {
+            return await _context.Departments.AsNoTracking().ProjectTo<DepartmentViewModel>(_configurationProvider).ToListAsync(token);
         }
     }
 }

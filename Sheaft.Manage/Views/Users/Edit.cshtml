@@ -1,18 +1,75 @@
 ﻿@model UserViewModel
 @{
     ViewData["Title"] = "User details";
+    var departments = ((List<DepartmentViewModel>)ViewBag.Departments).Select(c => new SelectListItem(c.Name, c.Id.ToString("D"))).ToList();
 }
 
     <div class="container">
         <h1 class="display-4">User details</h1>
         <br />
 
-        @using (Html.BeginForm("Edit", "Users", FormMethod.Post, new { @class = "form" }))
+        @using (Html.BeginForm("Edit", "Users", FormMethod.Post, new { @class = "form", enctype = "multipart/form-data" }))
         {
             @Html.AntiForgeryToken()
             @Html.ValidationSummary(true, "", new { @class = "text-danger" })
             @Html.HiddenFor(model => model.Id)
-            <br />            
+            <br />
+
+            <div class="form-group">
+                @Html.LabelFor(m => m.Kind)
+                @Html.TextBoxFor(m => m.Kind, null, new { @class = "form-control", @disabled = "disabled" })
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(m => m.FirstName)
+                @Html.TextBoxFor(m => m.FirstName, null, new { @class = "form-control" })
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(m => m.LastName)
+                @Html.TextBoxFor(m => m.LastName, null, new { @class = "form-control" })
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(m => m.Email)
+                @Html.TextBoxFor(m => m.Email, null, new { @class = "form-control" })
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(m => m.Phone)
+                @Html.TextBoxFor(m => m.Phone, null, new { @class = "form-control" })
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(m => m.CreatedOn)
+                @Html.TextBoxFor(m => m.CreatedOn, null, new { @class = "form-control", @disabled = "disabled" })
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(m => m.UpdatedOn)
+                @Html.TextBoxFor(m => m.UpdatedOn, null, new { @class = "form-control", @disabled = "disabled" })
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(c => c.Picture, new { @class = "form-label" })
+                @if (!string.IsNullOrWhiteSpace(Model.Picture))
+                {
+                    <img src="@Model.Picture" height="100" />
+                }
+                @Html.TextBoxFor(c => c.Picture, new { @class = "form-control", @type = "file" })
+            </div>
+
+            @if (Model.Kind == ProfileKind.Consumer)
+            {
+                <div class="form-group">
+                    @Html.LabelFor(m => m.DepartmentId, "Department")
+                    @Html.DropDownListFor(c => c.DepartmentId, departments, new { @class = "form-control" })
+                </div>
+                <div class="form-check">
+                    @Html.CheckBoxFor(m => m.Anonymous, new { @class = "form-check-input" })
+                    @Html.LabelFor(m => m.Anonymous, new { @class = "form-check-label" })
+                </div>
+            }
+            else
+            {
+                <div class="form-group">
+                    @Html.LabelFor(m => m.Company)
+                    @Html.TextBoxFor(m => m.Company, null, new { @class = "form-control", @disabled = "disabled" })
+                </div>
+            }
 
             <br />
             <a asp-controller="Users" asp-action="Index" class="btn btn-light">

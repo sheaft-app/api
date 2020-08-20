@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Sheaft.Domain.Models;
 using Sheaft.Models.Dto;
+using Sheaft.Models.ViewModels;
 
 namespace Sheaft.Mappers
 {
@@ -11,6 +12,8 @@ namespace Sheaft.Mappers
         {
             CreateMap<Department, DepartmentDto>()
                 .ForMember(c => c.Level, opt => opt.MapFrom(o => o.Level));
+
+            CreateMap<Department, DepartmentViewModel>();
         }
     }
 }
