@@ -672,4 +672,7 @@
   <data name="Product_CannotRate_AlreadyRated" xml:space="preserve">
     <value>Vous avez déjà noté ce produit</value>
   </data>
+  <data name="DeliveryMode_CannotRemove_With_Active_Agreements" xml:space="preserve">
+    <value>Impossible de supprimer le mode de livraison {0}, {1} accords actif sont rattachés (annuler les accords avant de pouvoir supprimer ce mode de livraison, ou contactez notre support)</value>
+  </data>
 </root>

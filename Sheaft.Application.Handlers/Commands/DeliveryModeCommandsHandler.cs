@@ -10,6 +10,8 @@ using System.Linq;
 using System.Collections.Generic;
 using Microsoft.Extensions.Logging;
 using Microsoft.EntityFrameworkCore;
+using Sheaft.Exceptions;
+using Sheaft.Interop.Enums;
 
 namespace Sheaft.Application.Handlers
 {
@@ -97,8 +99,9 @@ namespace Sheaft.Application.Handlers
             return await ExecuteAsync(async () =>
             {
                 var entity = await _context.GetByIdAsync<DeliveryMode>(request.Id, token);
-
-                //TODO remove deliverymode link
+                var activeAgreements = await _context.Agreements.CountAsync(a => a.Delivery.Id == entity.Id && !a.RemovedOn.HasValue, token);
+                if (activeAgreements > 0)
+                    throw new BadRequestException(MessageKind.DeliveryMode_CannotRemove_With_Active_Agreements, entity.Name, activeAgreements);
 
                 _context.Remove(entity);
                 return OkResult(await _context.SaveChangesAsync(token) > 0);

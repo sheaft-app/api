@@ -331,6 +331,15 @@ namespace Sheaft.Localization.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Impossible de supprimer le mode de livraison {0}, {1} accords actif sont rattachés (annuler les accords avant de pouvoir supprimer ce mode de livraison, ou contactez notre support).
+        /// </summary>
+        internal static string DeliveryMode_CannotRemove_With_Active_Agreements {
+            get {
+                return ResourceManager.GetString("DeliveryMode_CannotRemove_With_Active_Agreements", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Le mode de livraison {0} n&apos;est plus disponible.
         /// </summary>
         internal static string DeliveryMode_Gone {

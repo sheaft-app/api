@@ -89,6 +89,7 @@
         DeliveryMode_LockOrderHoursBeforeDelivery_CannotBe_LowerThan = 0x007001,
         DeliveryMode_NotFound = 0x007002,
         DeliveryMode_Gone = 0x007003,
+        DeliveryMode_CannotRemove_With_Active_Agreements = 0x007004,
         //purchase order
         PurchaseOrder = 0x008000,
         PurchaseOrder_Vendor_Required = 0x008001,
