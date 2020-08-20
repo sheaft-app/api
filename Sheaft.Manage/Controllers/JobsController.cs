@@ -75,10 +75,6 @@ namespace Sheaft.Manage.Controllers
         [HttpGet]
         public async Task<IActionResult> Edit(Guid id, CancellationToken token)
         {
-            var requestUser = await GetRequestUser(token);
-            if (!requestUser.IsImpersonating)
-                throw new Exception("You must impersonate job's user to edit it.");
-
             var entity = await _context.Jobs
                 .AsNoTracking()
                 .Where(c => c.Id == id)
@@ -90,28 +86,59 @@ namespace Sheaft.Manage.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(PackagingViewModel model, CancellationToken token)
+        public async Task<IActionResult> Archive(PackagingViewModel model, CancellationToken token)
         {
             var requestUser = await GetRequestUser(token);
-            if (!requestUser.IsImpersonating)
+            var result = await _mediatr.Send(new ArchiveJobCommand(requestUser)
             {
-                ModelState.AddModelError("", "You must impersonate job's user to edit it.");
+                Id = model.Id
+            }, token);
+
+            if (!result.Success)
+            {
+                ModelState.AddModelError("", result.Exception.Message);
                 return View(model);
             }
 
-            //var result = await _mediatr.Send(new UpdatePackagingCommand(requestUser)
-            //{
-            //    Id = model.Id,
-            //    Description = model.Description,
-            //    Name = model.Name,
-            //    Vat = model.Vat,
-            //}, token);
+            TempData["Edited"] = JsonConvert.SerializeObject(new EditViewModel { Id = model.Id, Name = model.Name });
+            return RedirectToAction("Index");
+        }
 
-            //if (!result.Success)
-            //{
-            //    ModelState.AddModelError("", result.Exception.Message);
-            //    return View(model);
-            //}
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> UnArchive(PackagingViewModel model, CancellationToken token)
+        {
+            var requestUser = await GetRequestUser(token);
+            var result = await _mediatr.Send(new UnarchiveJobCommand(requestUser)
+            {
+                Id = model.Id
+            }, token);
+
+            if (!result.Success)
+            {
+                ModelState.AddModelError("", result.Exception.Message);
+                return View(model);
+            }
+
+            TempData["Edited"] = JsonConvert.SerializeObject(new EditViewModel { Id = model.Id, Name = model.Name });
+            return RedirectToAction("Index");
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ResetJob(PackagingViewModel model, CancellationToken token)
+        {
+            var requestUser = await GetRequestUser(token);
+            var result = await _mediatr.Send(new ResetJobCommand(requestUser)
+            {
+                Id = model.Id
+            }, token);
+
+            if (!result.Success)
+            {
+                ModelState.AddModelError("", result.Exception.Message);
+                return View(model);
+            }
 
             TempData["Edited"] = JsonConvert.SerializeObject(new EditViewModel { Id = model.Id, Name = model.Name });
             return RedirectToAction("Index");

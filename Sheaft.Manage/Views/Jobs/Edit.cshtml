@@ -12,7 +12,58 @@
             @Html.AntiForgeryToken()
             @Html.ValidationSummary(true, "", new { @class = "text-danger" })
             @Html.HiddenFor(model => model.Id)
-            <br />            
+            <br />
+            <div class="form-group">
+                @Html.LabelFor(m => m.Name)
+                @Html.TextBoxFor(m => m.Name, null, new { @class = "form-control" })
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(m => m.Kind)
+                @Html.TextBoxFor(m => m.Kind, null, new { @class = "form-control", @disabled = "disabled" })
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(m => m.Status)
+                @Html.TextBoxFor(m => m.Status, null, new { @class = "form-control", @disabled = "disabled" })
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(m => m.CreatedOn)
+                @Html.TextBoxFor(m => m.CreatedOn, null, new { @class = "form-control", @disabled = "disabled" })
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(m => m.UpdatedOn)
+                @Html.TextBoxFor(m => m.UpdatedOn, null, new { @class = "form-control", @disabled = "disabled" })
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(m => m.RemovedOn)
+                @Html.TextBoxFor(m => m.RemovedOn, null, new { @class = "form-control", @disabled = "disabled" })
+            </div>
+            <div class="form-check">
+                @Html.CheckBoxFor(m => m.Archived, new { @class = "form-check-input" })
+                @Html.LabelFor(m => m.Archived, new { @class = "form-check-label" })
+            </div>
+            <br/>
+            <h4>Execution</h4>
+            <div class="form-group">
+                @Html.LabelFor(m => m.StartedOn)
+                @Html.TextBoxFor(m => m.StartedOn, null, new { @class = "form-control", @disabled = "disabled" })
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(m => m.CompletedOn)
+                @Html.TextBoxFor(m => m.CompletedOn, null, new { @class = "form-control", @disabled = "disabled" })
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(m => m.Retried)
+                @Html.TextBoxFor(m => m.Retried, null, new { @class = "form-control", @disabled = "disabled" })
+            </div>
+            <h4>Result</h4>
+            <div class="form-group">
+                @Html.LabelFor(m => m.Message)
+                @Html.TextBoxFor(m => m.Message, null, new { @class = "form-control", @disabled = "disabled" })
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(m => m.File)
+                @Html.TextBoxFor(m => m.File, null, new { @class = "form-control", @disabled = "disabled" })
+            </div>
 
             <br />
             <a asp-controller="Jobs" asp-action="Index" class="btn btn-light">
