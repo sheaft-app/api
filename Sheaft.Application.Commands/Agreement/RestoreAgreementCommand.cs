@@ -3,9 +3,9 @@ using System.Collections.Generic;
 
 namespace Sheaft.Application.Commands
 {
-    public class ResetAgreementCommand : Command<bool>
+    public class RestoreAgreementCommand : Command<bool>
     {
-        public ResetAgreementCommand(Interop.IRequestUser user) : base(user)
+        public RestoreAgreementCommand(Interop.IRequestUser user) : base(user)
         {
         }
 

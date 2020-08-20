@@ -42,6 +42,7 @@
                 <th scope="col">Store</th>
                 <th scope="col">Status</th>
                 <th scope="col">CreatedOn</th>
+                <th scope="col">Removed</th>
                 <th scope="col"></th>
             </tr>
         </thead>
@@ -54,11 +55,21 @@
                     <td>@entity.Store.Name</td>
                     <td>@entity.Status</td>
                     <td>@entity.CreatedOn</td>
+                    <td>@entity.RemovedOn.HasValue</td>
                     <td>
                         <a asp-controller="Agreements" asp-action="Edit" asp-route-id="@entity.Id" class="btn btn-info">
                             <i class="fa fa-pen"></i>
                         </a>
-                        @if (User.IsInRole("ADMIN"))
+                        @if (entity.RemovedOn.HasValue)
+                        {
+                            @using (Html.BeginForm("Restore", "Agreements", new { id = entity.Id }, FormMethod.Post, true, new { @class = "form d-inline" }))
+                            {
+                                <button type="submit" class="btn btn-success">
+                                    <i class="fa fa-trash-restore"></i>
+                                </button>
+                            }
+                        }
+                        else
                         {
                             @using (Html.BeginForm("Delete", "Agreements", new { id = entity.Id }, FormMethod.Post, true, new { @class = "form d-inline" }))
                             {
