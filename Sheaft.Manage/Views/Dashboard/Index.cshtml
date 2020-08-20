@@ -29,6 +29,13 @@
                     <a asp-controller="companies" asp-action="index" asp-route-kind="@ProfileKind.Producer" class="card-link">Show</a>
                 </div>
             </div>
+            <div class="card w-25 d-inline-block">
+                <div class="card-body">
+                    <h5 class="card-title">Tags</h5>
+                    <h6 class="card-subtitle mb-2 text-muted">@ViewBag.Tags</h6>
+                    <a asp-controller="Tags" asp-action="index" class="card-link">Show</a>
+                </div>
+            </div>
         }
         @if (!user.IsInRole("STORE") && !user.IsInRole("CONSUMER"))
         {

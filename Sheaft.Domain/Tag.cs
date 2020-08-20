@@ -45,12 +45,20 @@ namespace Sheaft.Domain.Models
 
         public void SetImage(string image)
         {
+            if (image == null)
+                return;
+
             Image = image;
         }
 
         public void SetDescription(string description)
         {
             Description = description;
+        }
+
+        public void Restore()
+        {
+            RemovedOn = null;
         }
     }
 }

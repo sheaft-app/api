@@ -1,0 +1,59 @@
+﻿@model TagViewModel
+@{
+    ViewData["Title"] = "Tag details";
+    var kinds = new List<SelectListItem> {
+        new SelectListItem("Category", ((int)TagKind.Category).ToString()),
+        new SelectListItem("Diet", ((int)TagKind.Diet).ToString()),
+        new SelectListItem("Ingredient", ((int)TagKind.Ingredient).ToString()),
+        new SelectListItem("Label", ((int)TagKind.Label).ToString()),
+        new SelectListItem("Allergen", ((int)TagKind.Allergen).ToString()),
+    };
+
+}
+
+    <div class="container">
+        <h2 class="display-4">Tag details @(Model.RemovedOn.HasValue ? "(removed)":"")</h2>
+        <br />
+
+        @using (Html.BeginForm("Edit", "Tags", FormMethod.Post, new { @class = "form", enctype = "multipart/form-data" }))
+        {
+            @Html.AntiForgeryToken()
+            @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+            @Html.HiddenFor(model => model.Id)
+            <br />
+
+            <div class="form-group">
+                @Html.LabelFor(m => m.Name)
+                @Html.TextBoxFor(m => m.Name, null, new { @class = "form-control" })
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(m => m.Kind)
+                @Html.DropDownListFor(c => c.Kind, kinds, new { @class = "form-control" })
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(m => m.CreatedOn)
+                @Html.TextBoxFor(m => m.CreatedOn, null, new { @class = "form-control", @disabled = "disabled" })
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(c => c.Image, new { @class = "form-label" })
+                @if (!string.IsNullOrWhiteSpace(Model.Image))
+                {
+                    <img src="@Model.Image" height="100" />
+                }
+                @Html.TextBoxFor(c => c.Image, new { @class = "form-control", @type = "file" })
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(m => m.Description)
+                @Html.TextAreaFor(m => m.Description, new { @class = "form-control" })
+            </div>
+
+            <br />
+            <a asp-controller="Tags" asp-action="Index" class="btn btn-light">
+                Cancel
+            </a>
+            <button type="submit" class="btn btn-success">
+                <i class="fa fa-check">&nbsp;Save</i>
+            </button>
+        }
+
+    </div>

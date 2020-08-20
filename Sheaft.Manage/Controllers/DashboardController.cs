@@ -31,6 +31,7 @@ namespace Sheaft.Manage.Controllers
             var requestUser = await GetRequestUser(token);
 
             ViewBag.Consumers = await _context.Users.CountAsync(c => c.Company == null, token);
+            ViewBag.Tags = await _context.Tags.CountAsync(c => !c.RemovedOn.HasValue, token);
 
             if (requestUser.IsImpersonating)
             {

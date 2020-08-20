@@ -66,6 +66,27 @@ namespace Sheaft.Services
             }
         }
 
+        public async Task<CommandResult<string>> UploadTagPictureAsync(Guid tagId, Stream stream, CancellationToken token)
+        {
+            try
+            {
+                var containerClient = new BlobContainerClient(_storageOptions.ConnectionString, _storageOptions.Containers.Pictures);
+                await containerClient.CreateIfNotExistsAsync(cancellationToken: token);
+
+                var blobClient = containerClient.GetBlobClient($"tags/{tagId}/{Guid.NewGuid():N}.jpg");
+
+                stream.Position = 0;
+                await blobClient.UploadAsync(stream, token);
+
+                return new CommandResult<string>(true, blobClient.Uri.ToString());
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, $"{nameof(BlobService.UploadTagPictureAsync)} - {e.Message}");
+                return new CommandResult<string>(e);
+            }
+        }
+
         public async Task<CommandResult<string>> UploadProductPictureAsync(Guid companyId, Guid productId, string filename, string size, Stream stream, CancellationToken token)
         {
             try

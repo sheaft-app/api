@@ -25,7 +25,7 @@ namespace Sheaft.Models.ViewModels
         public decimal WholeSalePrice { get; set; }
         public decimal VatPrice { get; set; }
         public decimal Vat { get; set; }
-        public bool Available { get; set; }
+        public bool Available { get; set; } = true;
         public decimal? Rating { get; set; }
         public Guid? PackagingId { get; set; }
         public CompanyViewModel Producer { get; set; }

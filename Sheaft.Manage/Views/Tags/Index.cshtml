@@ -1,0 +1,118 @@
+﻿@model IEnumerable<TagViewModel>
+@{
+    ViewData["Title"] = "Tags";
+    int take = ViewBag.Take;
+    int currentPage = ViewBag.Page;
+}
+
+    <div class="container">
+        <h2 class="display-5">Tags</h2>
+        <br />
+
+        @if (ViewBag.Removed != null)
+        {
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                <span>Successfully removed tag @ViewBag.Removed</span>
+
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <br />
+        }
+
+        @if (ViewBag.Restored != null)
+        {
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                <span>Successfully restored tag @ViewBag.Restored.Name</span>
+                <a asp-controller="Tags" asp-action="Edit" asp-route-id="@ViewBag.Restored.Id">View details</a>
+
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <br />
+        }
+
+        @if (ViewBag.Edited != null)
+        {
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                <span>Successfully updated tag @ViewBag.Edited.Name</span>
+                <a asp-controller="Tags" asp-action="Edit" asp-route-id="@ViewBag.Edited.Id">View details</a>
+
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <br />
+        }
+
+        <table class="table table-hover">
+            <thead class="thead-dark">
+                <tr>
+                    <th scope="col">Name</th>
+                    <th scope="col">Kind</th>
+                    <th scope="col">CreatedOn</th>
+                    <th scope="col">Removed</th>
+                    <th scope="col">
+                        <a asp-controller="Tags" asp-action="Add" class="btn btn-success">
+                            <i class="fa fa-plus"></i>
+                        </a>
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var entity in Model)
+                {
+                <tr>
+                    <th scope="row">@entity.Name</th>
+                    <td>@entity.Kind</td>
+                    <td>@entity.CreatedOn.ToString("dd/MM/yy hh:mm")</td>
+                    <td>@entity.RemovedOn.HasValue</td>
+                    <td>
+                        <a asp-controller="Tags" asp-action="Edit" asp-route-id="@entity.Id" class="btn btn-info">
+                            <i class="fa fa-pen"></i>
+                        </a>
+
+                        @if (entity.RemovedOn.HasValue)
+                        {
+                            @using (Html.BeginForm("Restore", "Tags", new { id = entity.Id }, FormMethod.Post, true, new { @class = "form d-inline" }))
+                            {
+                                <button type="submit" class="btn btn-success">
+                                    <i class="fa fa-trash-restore"></i>
+                                </button>
+                            }
+                        }
+                        else
+                        {
+                            @using (Html.BeginForm("Delete", "Tags", new { id = entity.Id }, FormMethod.Post, true, new { @class = "form d-inline" }))
+                            {
+                                <button type="submit" class="btn btn-danger">
+                                    <i class="fa fa-trash"></i>
+                                </button>
+                            }
+                        }
+                    </td>
+                </tr>
+                }
+            </tbody>
+            <tfoot>
+                <tr class="text-center">
+                    <td colspan="6">
+                        @if (currentPage >= 1)
+                        {
+                            <a asp-controller="Tags" asp-action="Index" asp-route-take="@take" asp-route-page="@(currentPage-1)" class="btn btn-outline-secondary">
+                                <i class="fa fa-caret-left"></i>
+                            </a>
+                        }
+                        @if (take == Model.Count())
+                        {
+                            <a asp-controller="Tags" asp-action="Index" asp-route-take="@take" asp-route-page="@(currentPage+1)" class="btn btn-outline-secondary">
+                                <i class="fa fa-caret-right"></i>
+                            </a>
+                        }
+                    </td>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
