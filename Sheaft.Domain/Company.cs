@@ -150,5 +150,13 @@ namespace Sheaft.Domain.Models
             SetAddress("", "", Address.Zipcode, "", null, null);
             RemovedOn = DateTime.UtcNow;
         }
+
+        public void SetKind(ProfileKind? kind)
+        {
+            if (!kind.HasValue)
+                return;
+
+            Kind = kind.Value;
+        }
     }
 }

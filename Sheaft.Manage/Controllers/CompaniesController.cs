@@ -9,6 +9,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Sheaft.Application.Commands;
+using Sheaft.Domain.Models;
 using Sheaft.Exceptions;
 using Sheaft.Infrastructure.Interop;
 using Sheaft.Interop.Enums;
@@ -112,6 +113,7 @@ namespace Sheaft.Manage.Controllers
                 }
             }
 
+            var entity = await _context.Companies.SingleOrDefaultAsync(c => c.Id == model.Id, token);
             var result = await _mediatr.Send(new UpdateCompanyCommand(requestUser)
             {
                 Id = model.Id,
@@ -120,11 +122,13 @@ namespace Sheaft.Manage.Controllers
                 Description = model.Description,
                 Email = model.Email,
                 Name = model.Name,
+                Kind = model.Kind,
                 Phone = model.Phone,
                 Siret = model.Siret,
                 VatIdentifier = model.VatIdentifier,
                 Tags = model.Tags,
-                Picture = model.Picture
+                Picture = model.Picture,
+                OpeningHours = entity.OpeningHours?.GroupBy(oh => new { oh.From, oh.To }).Select(c => new TimeSlotGroupInput { From = c.Key.From, To = c.Key.To, Days = c.Select(o => o.Day) })
             }, token);
 
             if (!result.Success)
@@ -135,7 +139,6 @@ namespace Sheaft.Manage.Controllers
                 return View(model);
             }
 
-            var entity = await _context.Companies.SingleOrDefaultAsync(c => c.Id == model.Id, token);
             if (entity.Kind != model.Kind)
             {
                 var user = await _context.Users.SingleOrDefaultAsync(c => c.UserType == UserKind.Owner && c.Company.Id == entity.Id, token);

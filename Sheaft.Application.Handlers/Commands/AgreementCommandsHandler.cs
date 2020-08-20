@@ -23,6 +23,7 @@ namespace Sheaft.Application.Handlers
         IRequestHandler<RefuseAgreementsCommand, CommandResult<bool>>,
         IRequestHandler<RefuseAgreementCommand, CommandResult<bool>>,
         IRequestHandler<DeleteAgreementCommand, CommandResult<bool>>,
+        IRequestHandler<ResetAgreementStatusToCommand, CommandResult<bool>>,
         IRequestHandler<RestoreAgreementCommand, CommandResult<bool>>
     {
         private readonly IMediator _mediatr;
@@ -188,6 +189,20 @@ namespace Sheaft.Application.Handlers
                 var entity = await _context.GetByIdAsync<Agreement>(request.Id, token);
 
                 _context.Remove(entity);
+                await _context.SaveChangesAsync(token);
+
+                return OkResult(true);
+            });
+        }
+
+        public async Task<CommandResult<bool>> Handle(ResetAgreementStatusToCommand request, CancellationToken token)
+        {
+            return await ExecuteAsync(async () =>
+            {
+                var entity = await _context.Agreements.SingleOrDefaultAsync(a => a.Id == request.Id && a.RemovedOn.HasValue, token);
+                entity.Reset(request.Status);
+
+                _context.Update(entity);
                 await _context.SaveChangesAsync(token);
 
                 return OkResult(true);

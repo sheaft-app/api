@@ -85,5 +85,11 @@ namespace Sheaft.Domain.Models
         {
             RemovedOn = null;
         }
+
+        public void Reset(AgreementStatusKind status)
+        {
+            Status = status;
+            Reason = null;
+        }
     }
 }

@@ -93,13 +93,15 @@ namespace Sheaft.Manage.Controllers
                 return View(model);
             }
 
+            var entity = await _context.DeliveryModes.SingleOrDefaultAsync(t => t.Id == model.Id, token);
             var result = await _mediatr.Send(new CreateDeliveryModeCommand(requestUser)
             {
                 Description = model.Description,
                 Name = model.Name,
                 Address = _mapper.Map<AddressInput>(model.Address),
                 Kind = model.Kind,
-                LockOrderHoursBeforeDelivery = model.LockOrderHoursBeforeDelivery
+                LockOrderHoursBeforeDelivery = model.LockOrderHoursBeforeDelivery,
+                OpeningHours = entity.OpeningHours?.GroupBy(oh => new { oh.From, oh.To }).Select(c => new TimeSlotGroupInput { From = c.Key.From, To = c.Key.To, Days = c.Select(o => o.Day) })
             }, token);
 
             if (!result.Success)

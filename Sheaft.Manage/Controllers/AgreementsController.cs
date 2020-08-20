@@ -93,12 +93,13 @@ namespace Sheaft.Manage.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Reset(AgreementViewModel model, CancellationToken token)
+        public async Task<IActionResult> Edit(AgreementViewModel model, CancellationToken token)
         {
             var requestUser = await GetRequestUser(token);
-            var result = await _mediatr.Send(new ResetAgreementCommand(requestUser)
+            var result = await _mediatr.Send(new ResetAgreementStatusToCommand(requestUser)
             {
-                Id = model.Id
+                Id = model.Id,
+                Status = model.Status
             }, token);
 
             if (!result.Success)
@@ -107,7 +108,7 @@ namespace Sheaft.Manage.Controllers
                 return View(model);
             }
 
-            TempData["Edited"] = JsonConvert.SerializeObject(new EntityViewModel { Id = model.Id, Name = model.Delivery.Name });
+            TempData["Edited"] = JsonConvert.SerializeObject(new EntityViewModel { Id = model.Id, Name = model.Id.ToString("N") });
             return RedirectToAction("Index");
         }
 

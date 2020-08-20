@@ -1,64 +1,88 @@
 ﻿@model AgreementViewModel
 @{
     ViewData["Title"] = "Agreement details";
+
+    var kinds = new List<SelectListItem>
+{
+        new SelectListItem("WaitingForProducerApproval", ((int)AgreementStatusKind.WaitingForProducerApproval).ToString()),
+        new SelectListItem("WaitingForStoreApproval", ((int)AgreementStatusKind.WaitingForStoreApproval).ToString()),
+        new SelectListItem("Accepted", ((int)AgreementStatusKind.Accepted).ToString()),
+        new SelectListItem("Cancelled", ((int)AgreementStatusKind.Cancelled).ToString()),
+        new SelectListItem("Refused", ((int)AgreementStatusKind.Refused).ToString())
+    };
 }
 
     <div class="container">
         <h2 class="display-4">Agreement details @(Model.RemovedOn.HasValue ? "(removed)":"")</h2>
         <br />
-        <div class="form-group">
-            @Html.LabelFor(m => m.Status)
-            @Html.TextBoxFor(m => m.Status, null, new { @class = "form-control", @disabled = "disabled" })
-        </div>
-        <div class="form-group">
-            @Html.LabelFor(m => m.CreatedOn)
-            @Html.TextBoxFor(m => m.CreatedOn, null, new { @class = "form-control", @disabled = "disabled" })
-        </div>
-        <div class="form-group">
-            @Html.LabelFor(m => m.UpdatedOn)
-            @Html.TextBoxFor(m => m.UpdatedOn, null, new { @class = "form-control", @disabled = "disabled" })
-        </div>
-        <h4>Delivery</h4>
-        <div class="form-group">
-            @Html.LabelFor(m => m.Delivery.Name)
-            @Html.TextBoxFor(m => m.Delivery.Name, null, new { @class = "form-control", @disabled = "disabled" })
-        </div>
-        <div class="form-group">
-            @Html.LabelFor(m => m.Delivery.Kind)
-            @Html.TextBoxFor(m => m.Delivery.Kind, null, new { @class = "form-control", @disabled = "disabled" })
-        </div>
-        <div class="form-group">
-            @Html.LabelFor(m => m.Delivery.LockOrderHoursBeforeDelivery)
-            @Html.TextBoxFor(m => m.Delivery.LockOrderHoursBeforeDelivery, null, new { @class = "form-control", @disabled = "disabled" })
-        </div>
-        @if (Model.Delivery.Address != null)
+        @using (Html.BeginForm("Edit", "Agreements", FormMethod.Post, new { @class = "form" }))
         {
-            <h5>Delivery Address</h5>
+            @Html.AntiForgeryToken()
+            @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+            @Html.HiddenFor(model => model.Id)
+            <br />
             <div class="form-group">
-                @Html.LabelFor(m => m.Delivery.Address.Line1)
-                @Html.TextBoxFor(m => m.Delivery.Address.Line1, null, new { @class = "form-control", @disabled = "disabled" })
+                @Html.LabelFor(m => m.Status)
+                @Html.TextBoxFor(m => m.Status, null, new { @class = "form-control", @disabled = "disabled" })
             </div>
             <div class="form-group">
-                @Html.LabelFor(m => m.Delivery.Address.Line2)
-                @Html.TextBoxFor(m => m.Delivery.Address.Line2, null, new { @class = "form-control", @disabled = "disabled" })
+                @Html.LabelFor(m => m.CreatedOn)
+                @Html.TextBoxFor(m => m.CreatedOn, null, new { @class = "form-control", @disabled = "disabled" })
             </div>
             <div class="form-group">
-                @Html.LabelFor(m => m.Delivery.Address.Zipcode)
-                @Html.TextBoxFor(m => m.Delivery.Address.Zipcode, null, new { @class = "form-control", @disabled = "disabled" })
+                @Html.LabelFor(m => m.UpdatedOn)
+                @Html.TextBoxFor(m => m.UpdatedOn, null, new { @class = "form-control", @disabled = "disabled" })
+            </div>
+            <h4>Delivery</h4>
+            <div class="form-group">
+                @Html.LabelFor(m => m.Delivery.Name)
+                @Html.TextBoxFor(m => m.Delivery.Name, null, new { @class = "form-control", @disabled = "disabled" })
             </div>
             <div class="form-group">
-                @Html.LabelFor(m => m.Delivery.Address.City)
-                @Html.TextBoxFor(m => m.Delivery.Address.City, null, new { @class = "form-control", @disabled = "disabled" })
+                @Html.LabelFor(m => m.Delivery.Kind)
+                @Html.TextBoxFor(m => m.Delivery.Kind, null, new { @class = "form-control", @disabled = "disabled" })
             </div>
+            <div class="form-group">
+                @Html.LabelFor(m => m.Delivery.LockOrderHoursBeforeDelivery)
+                @Html.TextBoxFor(m => m.Delivery.LockOrderHoursBeforeDelivery, null, new { @class = "form-control", @disabled = "disabled" })
+            </div>
+            @if (Model.Delivery.Address != null)
+            {
+                <h5>Delivery Address</h5>
+                <div class="form-group">
+                    @Html.LabelFor(m => m.Delivery.Address.Line1)
+                    @Html.TextBoxFor(m => m.Delivery.Address.Line1, null, new { @class = "form-control", @disabled = "disabled" })
+                </div>
+                <div class="form-group">
+                    @Html.LabelFor(m => m.Delivery.Address.Line2)
+                    @Html.TextBoxFor(m => m.Delivery.Address.Line2, null, new { @class = "form-control", @disabled = "disabled" })
+                </div>
+                <div class="form-group">
+                    @Html.LabelFor(m => m.Delivery.Address.Zipcode)
+                    @Html.TextBoxFor(m => m.Delivery.Address.Zipcode, null, new { @class = "form-control", @disabled = "disabled" })
+                </div>
+                <div class="form-group">
+                    @Html.LabelFor(m => m.Delivery.Address.City)
+                    @Html.TextBoxFor(m => m.Delivery.Address.City, null, new { @class = "form-control", @disabled = "disabled" })
+                </div>
+            }
+            <h4>Producer</h4>
+            <div class="form-group">
+                @Html.LabelFor(m => m.Delivery.Producer.Name)
+                @Html.TextBoxFor(m => m.Delivery.Producer.Name, null, new { @class = "form-control", @disabled = "disabled" })
+            </div>
+            <h4>Store</h4>
+            <div class="form-group">
+                @Html.LabelFor(m => m.Store.Name)
+                @Html.TextBoxFor(m => m.Store.Name, null, new { @class = "form-control", @disabled = "disabled" })
+            </div>
+
+            <br />
+            <a asp-controller="Agreements" asp-action="Index" class="btn btn-light">
+                Cancel
+            </a>
+            <button type="submit" class="btn btn-success">
+                <i class="fa fa-check">&nbsp;Save</i>
+            </button>
         }
-        <h4>Producer</h4>
-        <div class="form-group">
-            @Html.LabelFor(m => m.Delivery.Producer.Name)
-            @Html.TextBoxFor(m => m.Delivery.Producer.Name, null, new { @class = "form-control", @disabled = "disabled" })
-        </div>
-        <h4>Store</h4>
-        <div class="form-group">
-            @Html.LabelFor(m => m.Store.Name)
-            @Html.TextBoxFor(m => m.Store.Name, null, new { @class = "form-control", @disabled = "disabled" })
-        </div>
     </div>

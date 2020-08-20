@@ -134,6 +134,7 @@ namespace Sheaft.Application.Handlers
 
                 entity.SetName(request.Name);
                 entity.SetEmail(request.Email);
+                entity.SetKind(request.Kind);
                 entity.SetPhone(request.Phone);
                 entity.SetDescription(request.Description);
                 entity.SetSiret(request.Siret);
