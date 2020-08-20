@@ -62,8 +62,8 @@ namespace Sheaft.Domain.Models
 
         protected void RefreshLine()
         {
-            TotalVatPrice = Math.Round(Quantity * (UnitWholeSalePrice * UnitVatPrice / 100), DIGITS_COUNT);
-            TotalWholeSalePrice = Math.Round(Quantity * UnitWholeSalePrice, DIGITS_COUNT);
+            TotalVatPrice = Math.Round(Quantity * ((UnitWholeSalePrice * UnitVatPrice / 100) + (PackagingWholeSalePrice ?? 0 * PackagingVatPrice ?? 0 / 100)), DIGITS_COUNT);
+            TotalWholeSalePrice = Math.Round(Quantity * (UnitWholeSalePrice + PackagingWholeSalePrice ?? 0), DIGITS_COUNT);
             TotalOnSalePrice = Math.Round(TotalWholeSalePrice + TotalVatPrice, DIGITS_COUNT);
             TotalWeight = UnitWeight.HasValue ? Math.Round(Quantity * UnitWeight.Value, DIGITS_COUNT) : (decimal?)null;
         }
