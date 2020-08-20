@@ -41,6 +41,7 @@ using System.IdentityModel.Tokens.Jwt;
 using Microsoft.IdentityModel.Logging;
 using Microsoft.AspNetCore.Authorization;
 using Sheaft.Api.Authorize;
+using System;
 
 namespace Sheaft.Api
 {
@@ -228,6 +229,7 @@ namespace Sheaft.Api
                 .ModifyOptions(c => c.DefaultBindingBehavior = BindingBehavior.Explicit)
                 .AddMutationType<SheaftMutationType>()
                 .AddQueryType<SheaftQueryType>()
+                .BindClrType<TimeSpan, SheaftTimeSpanType>()
                 .RegisterTypes()
                 .Create(), new QueryExecutionOptions { IncludeExceptionDetails = true });
 

@@ -243,6 +243,13 @@ namespace Sheaft.GraphQL.Types
                 .Type<NonNullType<CompanyProfileType>>();
         }
     }
+    public class SheaftTimeSpanType : TimeSpanType
+    {
+        public SheaftTimeSpanType() : base("TimeSpan", null, TimeSpanFormat.DotNet)
+        {
+        }
+    }
+
     public class TimeSlotType : ObjectType<TimeSlotDto>
     {
         protected override void Configure(IObjectTypeDescriptor<TimeSlotDto> descriptor)
