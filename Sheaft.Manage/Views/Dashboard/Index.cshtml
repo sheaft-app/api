@@ -1,36 +1,92 @@
 ﻿@{
     ViewData["Title"] = "Dashboard";
+    IRequestUser user = ViewBag.RequestUser;
 }
 
     <div class="text-center">
         <h1 class="display-4">Dashboard</h1>
-        <br/>
+        <br />
+        @if (user.IsInRole("ADMIN"))
+        {
+            <div class="card w-25 d-inline-block">
+                <div class="card-body">
+                    <h5 class="card-title">Consumers</h5>
+                    <h6 class="card-subtitle mb-2 text-muted">@ViewBag.Consumers</h6>
+                    <a asp-controller="users" asp-action="index" asp-route-kind="@ProfileKind.Consumer" class="card-link">Show</a>
+                </div>
+            </div>
+            <div class="card w-25 d-inline-block">
+                <div class="card-body">
+                    <h5 class="card-title">Stores</h5>
+                    <h6 class="card-subtitle mb-2 text-muted">@ViewBag.Stores</h6>
+                    <a asp-controller="companies" asp-action="index" asp-route-kind="@ProfileKind.Store" class="card-link">Show</a>
+                </div>
+            </div>
+            <div class="card w-25 d-inline-block">
+                <div class="card-body">
+                    <h5 class="card-title">Producers</h5>
+                    <h6 class="card-subtitle mb-2 text-muted">@ViewBag.Producers</h6>
+                    <a asp-controller="companies" asp-action="index" asp-route-kind="@ProfileKind.Producer" class="card-link">Show</a>
+                </div>
+            </div>
+        }
+        @if (!user.IsInRole("STORE") && !user.IsInRole("CONSUMER"))
+        {
+            <div class="card w-25 d-inline-block">
+                <div class="card-body">
+                    <h5 class="card-title">Products</h5>
+                    <h6 class="card-subtitle mb-2 text-muted">@ViewBag.Products</h6>
+                    <a asp-controller="products" asp-action="index" class="card-link">Show</a>
+                </div>
+            </div>
+            <div class="card w-25 d-inline-block">
+                <div class="card-body">
+                    <h5 class="card-title">Packagings</h5>
+                    <h6 class="card-subtitle mb-2 text-muted">@ViewBag.Packagings</h6>
+                    <a asp-controller="packagings" asp-action="index" class="card-link">Show</a>
+                </div>
+            </div>
+            <div class="card w-25 d-inline-block">
+                <div class="card-body">
+                    <h5 class="card-title">DeliveryModes</h5>
+                    <h6 class="card-subtitle mb-2 text-muted">@ViewBag.DeliveryModes</h6>
+                    <a asp-controller="deliveryModes" asp-action="index" class="card-link">Show</a>
+                </div>
+            </div>
+        }
+        @if (!user.IsInRole("CONSUMER"))
+        {
+            <div class="card w-25 d-inline-block">
+                <div class="card-body">
+                    <h5 class="card-title">Agreements</h5>
+                    <h6 class="card-subtitle mb-2 text-muted">@ViewBag.Agreements</h6>
+                    <a asp-controller="agreements" asp-action="index" class="card-link">Show</a>
+                </div>
+            </div>
+        }
+        @if (user.IsInRole("CONSUMER"))
+        {
+            <div class="card w-25 d-inline-block">
+                <div class="card-body">
+                    <h5 class="card-title">Profile</h5>
+                    <h6 class="card-subtitle mb-2 text-muted">1</h6>
+                    <a asp-controller="users" asp-action="Edit" asp-route-id="@user.Id" class="card-link">Show</a>
+                </div>
+            </div>
+
+        }
         <div class="card w-25 d-inline-block">
             <div class="card-body">
-                <h5 class="card-title">Consumers</h5>
-                <h6 class="card-subtitle mb-2 text-muted">@ViewBag.Consumers</h6>
-                <a asp-controller="users" asp-action="index" asp-route-kind="@ProfileKind.Consumer" class="card-link">Show</a>
+                <h5 class="card-title">Purchase Orders</h5>
+                <h6 class="card-subtitle mb-2 text-muted">@ViewBag.PurchaseOrders</h6>
+                <a asp-controller="purchaseOrders" asp-action="index" class="card-link">Show</a>
             </div>
         </div>
         <div class="card w-25 d-inline-block">
             <div class="card-body">
-                <h5 class="card-title">Stores</h5>
-                <h6 class="card-subtitle mb-2 text-muted">@ViewBag.Stores</h6>
-                <a asp-controller="companies" asp-action="index" asp-route-kind="@ProfileKind.Store" class="card-link">Show</a>
-            </div>
-        </div>
-        <div class="card w-25 d-inline-block">
-            <div class="card-body">
-                <h5 class="card-title">Producers</h5>
-                <h6 class="card-subtitle mb-2 text-muted">@ViewBag.Producers</h6>
-                <a asp-controller="companies" asp-action="index" asp-route-kind="@ProfileKind.Producer" class="card-link">Show</a>
-            </div>
-        </div>
-        <div class="card w-25 d-inline-block">
-            <div class="card-body">
-                <h5 class="card-title">Products</h5>
-                <h6 class="card-subtitle mb-2 text-muted">@ViewBag.Products</h6>
-                <a asp-controller="products" asp-action="index" class="card-link">Show</a>
+                <h5 class="card-title">Jobs</h5>
+                <h6 class="card-subtitle mb-2 text-muted">@ViewBag.Jobs</h6>
+                <a asp-controller="jobs" asp-action="index" class="card-link">Show</a>
             </div>
         </div>
     </div>
