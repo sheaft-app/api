@@ -18,6 +18,7 @@ namespace Sheaft.Domain.Models
             UnitOnSalePrice = product.OnSalePricePerUnit;
             UnitVatPrice = product.VatPricePerUnit;
             UnitWeight = product.Weight;
+            Vat = product.Vat;
 
             Id = product.Id;
             Name = product.Name;
@@ -62,8 +63,8 @@ namespace Sheaft.Domain.Models
 
         protected void RefreshLine()
         {
-            TotalVatPrice = Math.Round(Quantity * (UnitVatPrice + PackagingVatPrice ?? 0), DIGITS_COUNT);
-            TotalWholeSalePrice = Math.Round(Quantity * (UnitWholeSalePrice + PackagingWholeSalePrice ?? 0), DIGITS_COUNT);
+            TotalVatPrice = Math.Round(Quantity * (UnitVatPrice + (PackagingVatPrice ?? 0)), DIGITS_COUNT);
+            TotalWholeSalePrice = Math.Round(Quantity * (UnitWholeSalePrice + (PackagingWholeSalePrice ?? 0)), DIGITS_COUNT);
             TotalOnSalePrice = Math.Round(TotalWholeSalePrice + TotalVatPrice, DIGITS_COUNT);
             TotalWeight = UnitWeight.HasValue ? Math.Round(Quantity * UnitWeight.Value, DIGITS_COUNT) : (decimal?)null;
         }
