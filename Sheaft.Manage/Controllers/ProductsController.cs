@@ -216,6 +216,28 @@ namespace Sheaft.Manage.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Import(IEnumerable<IFormFile> products, CancellationToken token)
+        {
+            var requestUser = await GetRequestUser(token);
+            foreach (var formFile in products)
+            {
+                if (formFile.Length == 0)
+                    continue;
+
+                using (var stream = new MemoryStream())
+                {
+                    await formFile.CopyToAsync(stream);
+                    var result = await _mediatr.Send(new QueueImportProductsCommand(requestUser) { CompanyId = requestUser.CompanyId, FileName = formFile.FileName, FileStream = stream });
+                    if (!result.Success)
+                        return BadRequest(result);
+                }
+            }
+
+            return RedirectToAction("Index", "Jobs");
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete(Guid id, CancellationToken token)
         {
             var entity = await _context.Products.SingleOrDefaultAsync(c => c.Id == id, token);

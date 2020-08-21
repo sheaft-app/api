@@ -7,7 +7,6 @@
 
     <div class="container">
         <h2 class="display-5">Products</h2>
-        <br />
 
         @if (ViewBag.Removed != null)
         {
@@ -47,6 +46,24 @@
             <br />
         }
 
+        @if (Context.Request.ImpersonificationId().HasValue)
+        {
+            <a href="https://sheaftapp.blob.core.windows.net/resources/excel/sheaft_catalogue_produits.xlsx" target="_blank">Download sample products catalog</a>
+            <br />
+            <br />
+            @using (Html.BeginForm("Import", "Products", FormMethod.Post, new { @class = "form", enctype = "multipart/form-data" }))
+            {
+                @Html.AntiForgeryToken()
+                <input type="file" multiple name="products" />
+                <button type="submit" class="btn btn-outline-success">Import</button>
+            }
+            <br />
+        }
+        else
+        {
+            <div class="alert alert-info">To import products with a catalog file, you must impersonate a producer</div>
+        }
+
         <table class="table table-hover">
             <thead class="thead-dark">
                 <tr>
@@ -67,39 +84,39 @@
             <tbody>
                 @foreach (var entity in Model)
                 {
-                <tr>
-                    <th scope="row">@entity.Reference</th>
-                    <td>@entity.Name</td>
-                    <td>@entity.WholeSalePricePerUnit</td>
-                    <td>@(entity.Vat)%</td>
-                    <td>@entity.Producer.Name</td>
-                    <td>@entity.CreatedOn.ToString("dd/MM/yy hh:mm")</td>
-                    <td>@entity.RemovedOn.HasValue</td>
-                    <td>
-                        <a asp-controller="Products" asp-action="Edit" asp-route-id="@entity.Id" class="btn btn-info">
-                            <i class="fa fa-pen"></i>
-                        </a>
+                    <tr>
+                        <th scope="row">@entity.Reference</th>
+                        <td>@entity.Name</td>
+                        <td>@entity.WholeSalePricePerUnit</td>
+                        <td>@(entity.Vat)%</td>
+                        <td>@entity.Producer.Name</td>
+                        <td>@entity.CreatedOn.ToString("dd/MM/yy hh:mm")</td>
+                        <td>@entity.RemovedOn.HasValue</td>
+                        <td>
+                            <a asp-controller="Products" asp-action="Edit" asp-route-id="@entity.Id" class="btn btn-info">
+                                <i class="fa fa-pen"></i>
+                            </a>
 
-                        @if (entity.RemovedOn.HasValue)
-                        {
-                            @using (Html.BeginForm("Restore", "Products", new { id = entity.Id }, FormMethod.Post, true, new { @class = "form d-inline" }))
+                            @if (entity.RemovedOn.HasValue)
                             {
-                                <button type="submit" class="btn btn-success">
-                                    <i class="fa fa-trash-restore"></i>
-                                </button>
+                                @using (Html.BeginForm("Restore", "Products", new { id = entity.Id }, FormMethod.Post, true, new { @class = "form d-inline" }))
+                                {
+                                    <button type="submit" class="btn btn-success">
+                                        <i class="fa fa-trash-restore"></i>
+                                    </button>
+                                }
                             }
-                        }
-                        else
-                        {
-                            @using (Html.BeginForm("Delete", "Products", new { id = entity.Id }, FormMethod.Post, true, new { @class = "form d-inline" }))
+                            else
                             {
-                                <button type="submit" class="btn btn-danger">
-                                    <i class="fa fa-trash"></i>
-                                </button>
+                                @using (Html.BeginForm("Delete", "Products", new { id = entity.Id }, FormMethod.Post, true, new { @class = "form d-inline" }))
+                                {
+                                    <button type="submit" class="btn btn-danger">
+                                        <i class="fa fa-trash"></i>
+                                    </button>
+                                }
                             }
-                        }
-                    </td>
-                </tr>
+                        </td>
+                    </tr>
                 }
             </tbody>
             <tfoot>
