@@ -89,6 +89,7 @@ namespace Sheaft.Manage.Controllers
         }
 
         [HttpPost]
+        [Authorize]
         [ValidateAntiForgeryToken]
         public async Task Logout()
         {
