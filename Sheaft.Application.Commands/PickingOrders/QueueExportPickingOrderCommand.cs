@@ -1,11 +1,12 @@
 using System;
 using System.Collections.Generic;
+using Sheaft.Core;
 
 namespace Sheaft.Application.Commands
 {
     public class QueueExportPickingOrderCommand : Command<Guid>
     {
-        public QueueExportPickingOrderCommand(Interop.IRequestUser user) : base(user)
+        public QueueExportPickingOrderCommand(RequestUser user) : base(user)
         {
         }
 

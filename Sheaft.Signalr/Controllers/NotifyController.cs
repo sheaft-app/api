@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Primitives;
 using Sheaft.Application.Commands;
-using Sheaft.Core.Security;
+using Sheaft.Core;
 using Sheaft.Services.Interop;
 using System;
 using System.IO;

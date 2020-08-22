@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using Sheaft.Core;
 
 namespace Sheaft.Application.Commands
 {
     public class DeleteProductsCommand : Command<bool>
     {
-        public DeleteProductsCommand(Interop.IRequestUser user) : base(user)
+        public DeleteProductsCommand(RequestUser user) : base(user)
         {
         }
 

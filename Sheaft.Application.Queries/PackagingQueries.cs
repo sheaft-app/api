@@ -4,7 +4,7 @@ using System.Linq;
 using Sheaft.Domain.Models;
 using Sheaft.Infrastructure.Interop;
 using Sheaft.Models.Dto;
-using Sheaft.Interop;
+using Sheaft.Core;
 using AutoMapper.QueryableExtensions;
 using Sheaft.Infrastructure;
 
@@ -21,7 +21,7 @@ namespace Sheaft.Application.Queries
             _configurationProvider = configurationProvider;
         }
 
-        public IQueryable<PackagingDto> GetPackaging(Guid id, IRequestUser currentUser)
+        public IQueryable<PackagingDto> GetPackaging(Guid id, RequestUser currentUser)
         {
             try
             {
@@ -35,7 +35,7 @@ namespace Sheaft.Application.Queries
             }
         }
 
-        public IQueryable<PackagingDto> GetPackagings(IRequestUser currentUser)
+        public IQueryable<PackagingDto> GetPackagings(RequestUser currentUser)
         {
             try
             {

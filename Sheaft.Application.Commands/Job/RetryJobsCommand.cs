@@ -1,11 +1,12 @@
 using System;
 using System.Collections.Generic;
+using Sheaft.Core;
 
 namespace Sheaft.Application.Commands
 {
     public class RetryJobsCommand : Command<bool>
     {
-        public RetryJobsCommand(Interop.IRequestUser user) : base(user)
+        public RetryJobsCommand(RequestUser user) : base(user)
         {
         }
 

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Security.Claims;
 using IdentityModel;
 using Sheaft.Core.Security;
+using Sheaft.Interop;
 
 namespace Sheaft.Core.Extensions
 {
@@ -79,7 +80,7 @@ namespace Sheaft.Core.Extensions
             return userClaims.Select(uc => uc.Value);
         }
 
-        public static RequestUser ToIdentityUser(this ClaimsPrincipal user, string requestId, Guid? impersonification = null)
+        public static RequestUser ToIdentityUser(this ClaimsPrincipal user, string requestId, Impersonification impersonification = null)
         {
             var email = user.Claims?.FirstOrDefault(c => c.Type == JwtClaimTypes.Email)?.Value;
             var name = user.Claims?.FirstOrDefault(c => c.Type == JwtClaimTypes.Name)?.Value;

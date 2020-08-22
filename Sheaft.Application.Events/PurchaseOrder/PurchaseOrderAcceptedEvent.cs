@@ -1,4 +1,4 @@
-﻿using MediatR;
+﻿using Sheaft.Core;
 using System;
 
 namespace Sheaft.Application.Events
@@ -8,7 +8,7 @@ namespace Sheaft.Application.Events
         public const string QUEUE_NAME = "event-purchaseorders-accepted";
         public const string MAILING_TEMPLATE_ID = "d-63757e1bde1c4942b28e50053a430167";
 
-        public PurchaseOrderAcceptedEvent(Interop.IRequestUser user) : base(user)
+        public PurchaseOrderAcceptedEvent(RequestUser user) : base(user)
         {
         }
 

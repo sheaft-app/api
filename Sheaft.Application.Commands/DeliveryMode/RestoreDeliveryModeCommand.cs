@@ -1,10 +1,11 @@
 ﻿using System;
+using Sheaft.Core;
 
 namespace Sheaft.Application.Commands
 {
     public class RestoreDeliveryModeCommand : Command<bool>
     {
-        public RestoreDeliveryModeCommand(Interop.IRequestUser user) : base(user)
+        public RestoreDeliveryModeCommand(RequestUser user) : base(user)
         {
         }
 

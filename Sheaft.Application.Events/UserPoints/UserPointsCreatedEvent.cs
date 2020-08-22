@@ -1,4 +1,4 @@
-﻿using MediatR;
+﻿using Sheaft.Core;
 using Sheaft.Interop.Enums;
 using System;
 
@@ -8,7 +8,7 @@ namespace Sheaft.Application.Events
     {
         public const string QUEUE_NAME = "userpointscreatedevent";
 
-        public UserPointsCreatedEvent(Interop.IRequestUser user) : base(user)
+        public UserPointsCreatedEvent(RequestUser user) : base(user)
         {
         }
 

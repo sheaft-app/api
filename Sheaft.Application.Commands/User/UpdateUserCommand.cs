@@ -1,11 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
+using Sheaft.Core;
 
 namespace Sheaft.Application.Commands
 {
     public class UpdateUserCommand : UserCommand<bool>
     {
-        public UpdateUserCommand(Interop.IRequestUser user) : base(user)
+        public UpdateUserCommand(RequestUser user) : base(user)
         {
         }
 

@@ -1,10 +1,11 @@
 ﻿using System;
+using Sheaft.Core;
 
 namespace Sheaft.Application.Commands
 {
     public class RestorePackagingCommand : Command<bool>
     {
-        public RestorePackagingCommand(Interop.IRequestUser user) : base(user)
+        public RestorePackagingCommand(RequestUser user) : base(user)
         {
         }
 

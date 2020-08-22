@@ -1,4 +1,4 @@
-﻿using MediatR;
+﻿using Sheaft.Core;
 using System;
 
 namespace Sheaft.Application.Events
@@ -8,7 +8,7 @@ namespace Sheaft.Application.Events
         public const string QUEUE_NAME = "event-products-import-succeeded";
         public const string MAILING_TEMPLATE_ID = "d-e142a041f6de42779ed3e704df0026b6";
 
-        public ProductImportSucceededEvent(Interop.IRequestUser user) : base(user)
+        public ProductImportSucceededEvent(RequestUser user) : base(user)
         {
         }
 

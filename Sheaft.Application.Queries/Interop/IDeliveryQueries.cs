@@ -1,4 +1,4 @@
-﻿using Sheaft.Interop;
+﻿using Sheaft.Core;
 using Sheaft.Interop.Enums;
 using System;
 using System.Collections.Generic;
@@ -11,9 +11,9 @@ namespace Sheaft.Application.Queries
 {
     public interface IDeliveryQueries
     {
-        IQueryable<DeliveryModeDto> GetDelivery(Guid id, IRequestUser currentUser);
-        IQueryable<DeliveryModeDto> GetDeliveries(IRequestUser currentUser);
-        Task<IEnumerable<ProducerDeliveriesDto>> GetProducersDeliveriesAsync(IEnumerable<Guid> producerIds, IEnumerable<DeliveryKind> kinds, DateTimeOffset currentDate, IRequestUser currentUser, CancellationToken token);
-        Task<IEnumerable<ProducerDeliveriesDto>> GetStoreDeliveriesForProducersAsync(Guid storeId, IEnumerable<Guid> producerIds, IEnumerable<DeliveryKind> kinds, DateTimeOffset currentDate, IRequestUser currentUser, CancellationToken token);
+        IQueryable<DeliveryModeDto> GetDelivery(Guid id, RequestUser currentUser);
+        IQueryable<DeliveryModeDto> GetDeliveries(RequestUser currentUser);
+        Task<IEnumerable<ProducerDeliveriesDto>> GetProducersDeliveriesAsync(IEnumerable<Guid> producerIds, IEnumerable<DeliveryKind> kinds, DateTimeOffset currentDate, RequestUser currentUser, CancellationToken token);
+        Task<IEnumerable<ProducerDeliveriesDto>> GetStoreDeliveriesForProducersAsync(Guid storeId, IEnumerable<Guid> producerIds, IEnumerable<DeliveryKind> kinds, DateTimeOffset currentDate, RequestUser currentUser, CancellationToken token);
     }
 }

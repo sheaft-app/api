@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using Sheaft.Core;
 
 namespace Sheaft.Application.Commands
 {
     public class RegisterOwnerCommand : UserCommand<Guid>
     {
-        public RegisterOwnerCommand(Interop.IRequestUser user) : base(user)
+        public RegisterOwnerCommand(RequestUser user) : base(user)
         {
             Id = user.Id;
         }

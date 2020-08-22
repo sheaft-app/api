@@ -1,12 +1,13 @@
 ﻿using Sheaft.Models.Inputs;
 using System;
 using System.Collections.Generic;
+using Sheaft.Core;
 
 namespace Sheaft.Application.Commands
 {
     public class UpdatePurchaseOrderProductsCommand : Command<bool>
     {
-        public UpdatePurchaseOrderProductsCommand(Interop.IRequestUser user) : base(user)
+        public UpdatePurchaseOrderProductsCommand(RequestUser user) : base(user)
         {
         }
 

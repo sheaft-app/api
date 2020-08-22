@@ -1,4 +1,4 @@
-﻿using MediatR;
+﻿using Sheaft.Core;
 using System;
 
 namespace Sheaft.Application.Events
@@ -7,7 +7,7 @@ namespace Sheaft.Application.Events
     {
         public const string QUEUE_NAME = "event-pickingorders-export-processing";
 
-        public PickingOrderExportProcessingEvent(Interop.IRequestUser user) : base(user)
+        public PickingOrderExportProcessingEvent(RequestUser user) : base(user)
         {
         }
 

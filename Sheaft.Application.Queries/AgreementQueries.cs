@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Sheaft.Infrastructure.Interop;
 using Sheaft.Models.Dto;
-using Sheaft.Interop;
+using Sheaft.Core;
 using Sheaft.Core.Extensions;
 using Sheaft.Domain.Models;
 using AutoMapper.QueryableExtensions;
@@ -26,7 +26,7 @@ namespace Sheaft.Application.Queries
             _configurationProvider = configurationProvider;
         }
 
-        public IQueryable<AgreementDto> GetAgreement(Guid id, IRequestUser currentUser)
+        public IQueryable<AgreementDto> GetAgreement(Guid id, RequestUser currentUser)
         {
             try
             {
@@ -48,7 +48,7 @@ namespace Sheaft.Application.Queries
             }
         }
 
-        public IQueryable<AgreementDto> GetAgreements(IRequestUser currentUser)
+        public IQueryable<AgreementDto> GetAgreements(RequestUser currentUser)
         {
             try
             {
@@ -70,7 +70,7 @@ namespace Sheaft.Application.Queries
             }
         }
 
-        public IQueryable<AgreementDto> GetStoreAgreements(Guid storeId, IRequestUser currentUser)
+        public IQueryable<AgreementDto> GetStoreAgreements(Guid storeId, RequestUser currentUser)
         {
             try
             {
@@ -87,7 +87,7 @@ namespace Sheaft.Application.Queries
             }
         }
 
-        public IQueryable<AgreementDto> GetProducerAgreements(Guid producerId, IRequestUser currentUser)
+        public IQueryable<AgreementDto> GetProducerAgreements(Guid producerId, RequestUser currentUser)
         {
             try
             {

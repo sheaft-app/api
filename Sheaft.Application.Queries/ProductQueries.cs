@@ -8,7 +8,7 @@ using Microsoft.Azure.Search;
 using Microsoft.Azure.Search.Models;
 using Newtonsoft.Json;
 using Sheaft.Infrastructure.Interop;
-using Sheaft.Interop;
+using Sheaft.Core;
 using Sheaft.Interop.Enums;
 using Sheaft.Models.Inputs;
 using Sheaft.Models.Dto;
@@ -33,7 +33,7 @@ namespace Sheaft.Application.Queries
             _indexClient = searchServiceClient.Indexes.GetClient(searchOptions.Value.Indexes.Products);
         }
 
-        public async Task<ProductsSearchDto> SearchAsync(SearchTermsInput terms, IRequestUser currentUser, CancellationToken token)
+        public async Task<ProductsSearchDto> SearchAsync(SearchTermsInput terms, RequestUser currentUser, CancellationToken token)
         {
             try
             {
@@ -132,7 +132,7 @@ namespace Sheaft.Application.Queries
             }
         }
 
-        public IQueryable<ProductDto> GetStoreProducts(Guid storeId, IRequestUser currentUser)
+        public IQueryable<ProductDto> GetStoreProducts(Guid storeId, RequestUser currentUser)
         {
             try
             {
@@ -150,7 +150,7 @@ namespace Sheaft.Application.Queries
             }
         }
 
-        public IQueryable<ProductDto> GetProducerProducts(Guid producerId, IRequestUser currentUser)
+        public IQueryable<ProductDto> GetProducerProducts(Guid producerId, RequestUser currentUser)
         {
             try
             {
@@ -164,7 +164,7 @@ namespace Sheaft.Application.Queries
             }
         }
 
-        public IQueryable<ProductDto> GetProduct(Guid id, IRequestUser currentUser)
+        public IQueryable<ProductDto> GetProduct(Guid id, RequestUser currentUser)
         {
             try
             {
@@ -178,7 +178,7 @@ namespace Sheaft.Application.Queries
             }
         }
 
-        public IQueryable<ProductDto> GetProducts(IRequestUser currentUser)
+        public IQueryable<ProductDto> GetProducts(RequestUser currentUser)
         {
             try
             {
@@ -192,7 +192,7 @@ namespace Sheaft.Application.Queries
             }
         }
 
-        public async Task<bool> ProductIsRatedByUserAsync(Guid id, Guid userId, IRequestUser user, CancellationToken token)
+        public async Task<bool> ProductIsRatedByUserAsync(Guid id, Guid userId, RequestUser user, CancellationToken token)
         {
             try
             {

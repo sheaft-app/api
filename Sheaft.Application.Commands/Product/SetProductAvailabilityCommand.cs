@@ -1,11 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
+using Sheaft.Core;
 
 namespace Sheaft.Application.Commands
 {
     public class SetProductAvailabilityCommand : Command<bool>
     {
-        public SetProductAvailabilityCommand(Interop.IRequestUser user) : base(user)
+        public SetProductAvailabilityCommand(RequestUser user) : base(user)
         {
         }
 

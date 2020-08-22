@@ -1,12 +1,12 @@
 ﻿using Sheaft.Interop.Enums;
 using System;
-using System.Collections.Generic;
+using Sheaft.Core;
 
 namespace Sheaft.Application.Commands
 {
     public class ResetAgreementStatusToCommand : Command<bool>
     {
-        public ResetAgreementStatusToCommand(Interop.IRequestUser user) : base(user)
+        public ResetAgreementStatusToCommand(RequestUser user) : base(user)
         {
         }
 

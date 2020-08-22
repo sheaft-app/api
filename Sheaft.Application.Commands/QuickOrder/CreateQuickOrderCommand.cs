@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using Sheaft.Models.Inputs;
+using Sheaft.Core;
 
 namespace Sheaft.Application.Commands
 {
     public class CreateQuickOrderCommand : Command<Guid>
     {
-        public CreateQuickOrderCommand(Interop.IRequestUser user) : base(user)
+        public CreateQuickOrderCommand(RequestUser user) : base(user)
         {
         }
 

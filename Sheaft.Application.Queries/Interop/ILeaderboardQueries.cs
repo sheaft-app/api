@@ -1,8 +1,5 @@
-﻿using Sheaft.Domain.Models;
-using Sheaft.Domain.StoreProcedures;
-using Sheaft.Domain.Views;
-using Sheaft.Models.Dto;
-using Sheaft.Interop;
+﻿using Sheaft.Models.Dto;
+using Sheaft.Core;
 using System;
 using System.Linq;
 using System.Threading;
@@ -12,15 +9,15 @@ namespace Sheaft.Application.Queries
 {
     public interface ILeaderboardQueries
     {
-        IQueryable<CountryPointsDto> CountriesPoints(Guid? countryId, IRequestUser currentUser);
-        IQueryable<CountryUserPointsDto> CountryUsersPoints(Guid? countryId, IRequestUser currentUser);
-        IQueryable<DepartmentPointsDto> DepartmentsPoints(Guid? regionId, IRequestUser currentUser);
-        IQueryable<DepartmentUserPointsDto> DepartmentUsersPoints(Guid? departmentId, IRequestUser currentUser);
-        IQueryable<RegionPointsDto> RegionsPoints(Guid? countryId, IRequestUser currentUser);
-        IQueryable<RegionUserPointsDto> RegionUsersPoints(Guid? regionId, IRequestUser currentUser);
-        Task<UserPositionDto> UserPositionInCountryAsync(Guid userId, IRequestUser currentUser, CancellationToken token);
-        Task<UserPositionDto> UserPositionInDepartmentAsync(Guid userId, IRequestUser currentUser, CancellationToken token);
-        Task<UserPositionDto> UserPositionInRegionAsync(Guid userId, IRequestUser currentUser, CancellationToken token);
-        Task<RankInformationDto> UserRankInformationAsync(Guid userId, IRequestUser currentUser, CancellationToken token);
+        IQueryable<CountryPointsDto> CountriesPoints(Guid? countryId, RequestUser currentUser);
+        IQueryable<CountryUserPointsDto> CountryUsersPoints(Guid? countryId, RequestUser currentUser);
+        IQueryable<DepartmentPointsDto> DepartmentsPoints(Guid? regionId, RequestUser currentUser);
+        IQueryable<DepartmentUserPointsDto> DepartmentUsersPoints(Guid? departmentId, RequestUser currentUser);
+        IQueryable<RegionPointsDto> RegionsPoints(Guid? countryId, RequestUser currentUser);
+        IQueryable<RegionUserPointsDto> RegionUsersPoints(Guid? regionId, RequestUser currentUser);
+        Task<UserPositionDto> UserPositionInCountryAsync(Guid userId, RequestUser currentUser, CancellationToken token);
+        Task<UserPositionDto> UserPositionInDepartmentAsync(Guid userId, RequestUser currentUser, CancellationToken token);
+        Task<UserPositionDto> UserPositionInRegionAsync(Guid userId, RequestUser currentUser, CancellationToken token);
+        Task<RankInformationDto> UserRankInformationAsync(Guid userId, RequestUser currentUser, CancellationToken token);
     }
 }

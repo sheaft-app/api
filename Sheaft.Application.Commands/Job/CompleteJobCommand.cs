@@ -1,11 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
+using Sheaft.Core;
 
 namespace Sheaft.Application.Commands
 {
     public class CompleteJobCommand : Command<bool>
     {
-        public CompleteJobCommand(Interop.IRequestUser user) : base(user)
+        public CompleteJobCommand(RequestUser user) : base(user)
         {
         }
 

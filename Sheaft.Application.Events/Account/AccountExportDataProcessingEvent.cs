@@ -1,4 +1,4 @@
-﻿using MediatR;
+﻿using Sheaft.Core;
 using System;
 
 namespace Sheaft.Application.Events
@@ -8,7 +8,7 @@ namespace Sheaft.Application.Events
         public const string QUEUE_NAME = "event-accounts-export-processing";
         public const string MAILING_TEMPLATE_ID = "";
 
-        public AccountExportDataProcessingEvent(Interop.IRequestUser user) : base(user)
+        public AccountExportDataProcessingEvent(RequestUser user) : base(user)
         {
         }
 

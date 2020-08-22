@@ -1,13 +1,13 @@
 ﻿using Sheaft.Models.Inputs;
 using System;
 using System.Collections.Generic;
-using Sheaft.Interop;
+using Sheaft.Core;
 
 namespace Sheaft.Application.Commands
 {
     public class CreateAgreementCommand : Command<Guid>
     {
-        public CreateAgreementCommand(IRequestUser user) : base(user)
+        public CreateAgreementCommand(RequestUser user) : base(user)
         {
         }
 

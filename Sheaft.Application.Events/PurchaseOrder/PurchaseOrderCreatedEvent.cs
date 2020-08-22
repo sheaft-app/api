@@ -1,4 +1,4 @@
-﻿using MediatR;
+﻿using Sheaft.Core;
 using System;
 
 namespace Sheaft.Application.Events
@@ -9,7 +9,7 @@ namespace Sheaft.Application.Events
         public const string MAILING_TEMPLATE_ID_VENDOR = "d-2336303e2ec74491a3e76ab2b7c0a09f";
         public const string MAILING_TEMPLATE_ID_SENDER = "d-eba486af09404ea9b1601213be40cb67";
 
-        public PurchaseOrderCreatedEvent(Interop.IRequestUser user) : base(user)
+        public PurchaseOrderCreatedEvent(RequestUser user) : base(user)
         {
         }
 

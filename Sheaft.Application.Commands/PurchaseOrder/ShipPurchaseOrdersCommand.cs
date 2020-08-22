@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using Sheaft.Core;
 
 namespace Sheaft.Application.Commands
 {
     public class ShipPurchaseOrdersCommand : Command<bool>
     {
-        public ShipPurchaseOrdersCommand(Interop.IRequestUser user) : base(user)
+        public ShipPurchaseOrdersCommand(RequestUser user) : base(user)
         {
         }
 

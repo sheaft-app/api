@@ -6,6 +6,7 @@ using Microsoft.Extensions.Options;
 using Microsoft.Net.Http.Headers;
 using Sheaft.Application.Commands;
 using Sheaft.Core.Security;
+using Sheaft.Core;
 using Sheaft.Interop.Enums;
 using Sheaft.Models.Inputs;
 using Sheaft.Options;

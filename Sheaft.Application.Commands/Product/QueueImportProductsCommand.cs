@@ -1,11 +1,12 @@
 using System;
 using System.IO;
+using Sheaft.Core;
 
 namespace Sheaft.Application.Commands
 {
     public class QueueImportProductsCommand : Command<Guid>
     {
-        public QueueImportProductsCommand(Interop.IRequestUser user) : base(user)
+        public QueueImportProductsCommand(RequestUser user) : base(user)
         {
         }
 

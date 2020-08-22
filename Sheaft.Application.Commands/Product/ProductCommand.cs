@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using Sheaft.Interop.Enums;
+using Sheaft.Core;
 
 namespace Sheaft.Application.Commands
 {
     public abstract class ProductCommand<T> : Command<T>
     {
-        protected ProductCommand(Interop.IRequestUser user) : base(user)
+        protected ProductCommand(RequestUser user) : base(user)
         {
         }
 

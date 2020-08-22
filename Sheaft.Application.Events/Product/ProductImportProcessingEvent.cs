@@ -1,4 +1,4 @@
-﻿using MediatR;
+﻿using Sheaft.Core;
 using System;
 
 namespace Sheaft.Application.Events
@@ -7,7 +7,7 @@ namespace Sheaft.Application.Events
     {
         public const string QUEUE_NAME = "event-products-import-processing";
 
-        public ProductImportProcessingEvent(Interop.IRequestUser user) : base(user)
+        public ProductImportProcessingEvent(RequestUser user) : base(user)
         {
         }
 

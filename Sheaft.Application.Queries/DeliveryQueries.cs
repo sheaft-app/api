@@ -5,7 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Sheaft.Domain.Models;
 using Sheaft.Infrastructure.Interop;
-using Sheaft.Interop;
+using Sheaft.Core;
 using Sheaft.Interop.Enums;
 using Sheaft.Models.Dto;
 using AutoMapper.QueryableExtensions;
@@ -25,7 +25,7 @@ namespace Sheaft.Application.Queries
             _configurationProvider = configurationProvider;
         }
 
-        public IQueryable<DeliveryModeDto> GetDelivery(Guid id, IRequestUser currentUser)
+        public IQueryable<DeliveryModeDto> GetDelivery(Guid id, RequestUser currentUser)
         {
             try
             {
@@ -39,7 +39,7 @@ namespace Sheaft.Application.Queries
             }
         }
 
-        public IQueryable<DeliveryModeDto> GetDeliveries(IRequestUser currentUser)
+        public IQueryable<DeliveryModeDto> GetDeliveries(RequestUser currentUser)
         {
             try
             {
@@ -53,7 +53,7 @@ namespace Sheaft.Application.Queries
             }
         }
 
-        public async Task<IEnumerable<ProducerDeliveriesDto>> GetProducersDeliveriesAsync(IEnumerable<Guid> producerIds, IEnumerable<DeliveryKind> kinds, DateTimeOffset currentDate, IRequestUser currentUser, CancellationToken token)
+        public async Task<IEnumerable<ProducerDeliveriesDto>> GetProducersDeliveriesAsync(IEnumerable<Guid> producerIds, IEnumerable<DeliveryKind> kinds, DateTimeOffset currentDate, RequestUser currentUser, CancellationToken token)
         {
             try
             {
@@ -101,7 +101,7 @@ namespace Sheaft.Application.Queries
             }
         }
 
-        public async Task<IEnumerable<ProducerDeliveriesDto>> GetStoreDeliveriesForProducersAsync(Guid storeId, IEnumerable<Guid> producerIds, IEnumerable<DeliveryKind> kinds, DateTimeOffset currentDate, IRequestUser currentUser, CancellationToken token)
+        public async Task<IEnumerable<ProducerDeliveriesDto>> GetStoreDeliveriesForProducersAsync(Guid storeId, IEnumerable<Guid> producerIds, IEnumerable<DeliveryKind> kinds, DateTimeOffset currentDate, RequestUser currentUser, CancellationToken token)
         {
             try
             {

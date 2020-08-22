@@ -1,11 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
+using Sheaft.Core;
 
 namespace Sheaft.Application.Commands
 {
     public class FailJobCommand : Command<bool>
     {
-        public FailJobCommand(Interop.IRequestUser user) : base(user)
+        public FailJobCommand(RequestUser user) : base(user)
         {
         }
 

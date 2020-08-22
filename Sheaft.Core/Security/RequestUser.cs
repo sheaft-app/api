@@ -1,24 +1,28 @@
-using Sheaft.Interop;
 using System;
 using System.Collections.Generic;
 
-namespace Sheaft.Core.Security
+namespace Sheaft.Core
 {
-    public class RequestUser : IRequestUser
+    public interface ITrackedUser
     {
-        public RequestUser():this(Guid.NewGuid().ToString("N"))
+        public RequestUser RequestUser { get; }
+    }
+
+    public class RequestUser
+    {
+        public RequestUser() : this(Guid.NewGuid().ToString("N"))
         {
         }
 
-        public RequestUser(string requestId, Guid? impersonifiedById = null, string impersonifiedByName = null) : this(Guid.Empty, "Anonymous", null, null, null, requestId, impersonifiedById, impersonifiedByName)
+        public RequestUser(string requestId, Impersonification impersonification = null) : this(Guid.Empty, "Anonymous", null, null, null, requestId, impersonification)
         {
         }
 
-        public RequestUser(string name, string requestId, Guid? impersonifiedById = null, string impersonifiedByName = null) : this(Guid.Empty, name, null, null, null, requestId, impersonifiedById, impersonifiedByName)
+        public RequestUser(string name, string requestId, Impersonification impersonification = null) : this(Guid.Empty, name, null, null, null, requestId, impersonification)
         {
         }
 
-        public RequestUser(Guid? id, string name, string email, IEnumerable<string> roles, Guid? companyId = null, string requestId = null, Guid? impersonifiedById = null, string impersonifiedByName = null)
+        public RequestUser(Guid? id, string name, string email, IEnumerable<string> roles, Guid? companyId = null, string requestId = null, Impersonification impersonification = null)
         {
             Id = id ?? Guid.Empty;
             Name = name ?? string.Empty;
@@ -26,7 +30,7 @@ namespace Sheaft.Core.Security
             Roles = roles ?? new List<string>();
             CompanyId = companyId ?? Guid.Empty;
             RequestId = requestId ?? Guid.NewGuid().ToString("N");
-            ImpersonifiedBy = impersonifiedById.HasValue && impersonifiedById != Guid.Empty ? new Impersonification(impersonifiedById.Value, impersonifiedByName) : null;
+            ImpersonifiedBy = impersonification;
         }
 
         public Guid Id { get; }
@@ -34,7 +38,7 @@ namespace Sheaft.Core.Security
         public string Email { get; }
         public IEnumerable<string> Roles { get; }
         public Guid CompanyId { get; }
-        public IImpersonification ImpersonifiedBy { get; }
+        public Impersonification ImpersonifiedBy { get; }
         public string RequestId { get; }
 
         public bool IsAuthenticated => Id != Guid.Empty;
@@ -42,9 +46,9 @@ namespace Sheaft.Core.Security
         public bool IsImpersonating => ImpersonifiedBy != null;
     }
 
-    public class Impersonification : IImpersonification
+    public class Impersonification
     {
-        public Impersonification(Guid id, string name)
+        public Impersonification(Guid id, string name = null)
         {
             Id = id;
             Name = name;

@@ -1,5 +1,5 @@
 ﻿using MediatR;
-using Sheaft.Interop;
+using Sheaft.Core;
 
 namespace Sheaft.Application.Events
 {
@@ -9,11 +9,11 @@ namespace Sheaft.Application.Events
 
     public abstract class Event : IEvent
     {
-        protected Event(IRequestUser user)
+        protected Event(RequestUser user)
         {
             RequestUser = user;
         }
 
-        public IRequestUser RequestUser { get; }
+        public RequestUser RequestUser { get; }
     }
 }

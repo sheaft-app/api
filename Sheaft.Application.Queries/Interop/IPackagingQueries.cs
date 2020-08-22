@@ -1,5 +1,5 @@
 ﻿using Sheaft.Models.Dto;
-using Sheaft.Interop;
+using Sheaft.Core;
 using System;
 using System.Linq;
 
@@ -7,7 +7,7 @@ namespace Sheaft.Application.Queries
 {
     public interface IPackagingQueries
     {
-        IQueryable<PackagingDto> GetPackaging(Guid id, IRequestUser currentUser);
-        IQueryable<PackagingDto> GetPackagings(IRequestUser currentUser);
+        IQueryable<PackagingDto> GetPackaging(Guid id, RequestUser currentUser);
+        IQueryable<PackagingDto> GetPackagings(RequestUser currentUser);
     }
 }

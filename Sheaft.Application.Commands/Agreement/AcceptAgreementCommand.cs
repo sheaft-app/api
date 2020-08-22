@@ -1,13 +1,13 @@
 ﻿using Sheaft.Models.Inputs;
 using System;
 using System.Collections.Generic;
-using Sheaft.Interop;
+using Sheaft.Core;
 
 namespace Sheaft.Application.Commands
 {
     public class AcceptAgreementCommand : Command<bool>
     {
-        public AcceptAgreementCommand(IRequestUser user) : base(user)
+        public AcceptAgreementCommand(RequestUser user) : base(user)
         {
         }
 

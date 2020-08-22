@@ -1,10 +1,11 @@
 ﻿using System;
+using Sheaft.Core;
 
 namespace Sheaft.Application.Commands
 {
     public class DeleteUserCommand : Command<bool>
     {
-        public DeleteUserCommand(Interop.IRequestUser user) : base(user)
+        public DeleteUserCommand(RequestUser user) : base(user)
         {
         }
 

@@ -1,4 +1,5 @@
 ﻿using System;
+using Sheaft.Core;
 
 namespace Sheaft.Application.Commands
 {
@@ -6,7 +7,7 @@ namespace Sheaft.Application.Commands
     {
         public const string QUEUE_NAME = "command-companies-removedata";
 
-        public RemoveCompanyDataCommand(Interop.IRequestUser user) : base(user)
+        public RemoveCompanyDataCommand(RequestUser user) : base(user)
         {
         }
 

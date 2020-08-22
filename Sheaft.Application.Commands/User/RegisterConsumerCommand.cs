@@ -1,10 +1,11 @@
 using System;
+using Sheaft.Core;
 
 namespace Sheaft.Application.Commands
 {
     public class RegisterConsumerCommand : UserCommand<Guid>
     {
-        public RegisterConsumerCommand(Interop.IRequestUser user) : base(user)
+        public RegisterConsumerCommand(RequestUser user) : base(user)
         {
         }
 

@@ -10,7 +10,7 @@ using Newtonsoft.Json;
 using Sheaft.Application.Commands;
 using Sheaft.Exceptions;
 using Sheaft.Infrastructure.Interop;
-using Sheaft.Interop;
+using Sheaft.Core;
 using Sheaft.Manage.Models;
 using Sheaft.Models.ViewModels;
 using Sheaft.Options;
@@ -282,7 +282,7 @@ namespace Sheaft.Manage.Controllers
             return RedirectToAction("Index");
         }
 
-        private async Task<List<PackagingViewModel>> GetPackagings(IRequestUser requestUser, CancellationToken token)
+        private async Task<List<PackagingViewModel>> GetPackagings(RequestUser requestUser, CancellationToken token)
         {
             return await _context.Packagings
                             .Where(c => c.Producer.Id == requestUser.CompanyId && !c.RemovedOn.HasValue)

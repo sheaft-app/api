@@ -1,11 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
+using Sheaft.Core;
 
 namespace Sheaft.Application.Commands
 {
     public class RefuseAgreementCommand : Command<bool>
     {
-        public RefuseAgreementCommand(Interop.IRequestUser user) : base(user)
+        public RefuseAgreementCommand(RequestUser user) : base(user)
         {
         }
 

@@ -1,11 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
+using Sheaft.Core;
 
 namespace Sheaft.Application.Commands
 {
     public class UnarchiveJobCommand : Command<bool>
     {
-        public UnarchiveJobCommand(Interop.IRequestUser user) : base(user)
+        public UnarchiveJobCommand(RequestUser user) : base(user)
         {
         }
 

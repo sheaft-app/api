@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Sheaft.Infrastructure.Interop;
 using Sheaft.Models.Dto;
-using Sheaft.Interop;
+using Sheaft.Core;
 using Sheaft.Domain.Models;
 using Sheaft.Interop.Enums;
 using AutoMapper.QueryableExtensions;
@@ -22,7 +22,7 @@ namespace Sheaft.Application.Queries
             _configurationProvider = configurationProvider;
         }
 
-        public IQueryable<QuickOrderDto> GetUserDefaultQuickOrder(Guid userId, IRequestUser currentUser)
+        public IQueryable<QuickOrderDto> GetUserDefaultQuickOrder(Guid userId, RequestUser currentUser)
         {
             try
             {
@@ -36,7 +36,7 @@ namespace Sheaft.Application.Queries
             }
         }
 
-        public IQueryable<QuickOrderDto> GetQuickOrder(Guid quickOrderId, IRequestUser currentUser)
+        public IQueryable<QuickOrderDto> GetQuickOrder(Guid quickOrderId, RequestUser currentUser)
         {
             try
             {
@@ -50,7 +50,7 @@ namespace Sheaft.Application.Queries
             }
         }
 
-        public IQueryable<QuickOrderDto> GetQuickOrders(IRequestUser currentUser)
+        public IQueryable<QuickOrderDto> GetQuickOrders(RequestUser currentUser)
         {
             try
             {

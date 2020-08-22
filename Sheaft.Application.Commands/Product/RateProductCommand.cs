@@ -1,10 +1,11 @@
 using System;
+using Sheaft.Core;
 
 namespace Sheaft.Application.Commands
 {
     public class RateProductCommand : Command<bool>
     {
-        public RateProductCommand(Interop.IRequestUser user) : base(user)
+        public RateProductCommand(RequestUser user) : base(user)
         {
         }
 

@@ -1,12 +1,12 @@
-﻿using Sheaft.Interop.Enums;
+﻿using Sheaft.Core;
+using Sheaft.Interop.Enums;
 using System;
 
 namespace Sheaft.Application.Commands
 {
-
     public class UpdateTagCommand : Command<bool>
     {
-        public UpdateTagCommand(Interop.IRequestUser user) : base(user)
+        public UpdateTagCommand(RequestUser user) : base(user)
         {
         }
 

@@ -1,11 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
+using Sheaft.Core;
 
 namespace Sheaft.Application.Commands
 {
     public class DeleteQuickOrderCommand : Command<bool>
     {
-        public DeleteQuickOrderCommand(Interop.IRequestUser user) : base(user)
+        public DeleteQuickOrderCommand(RequestUser user) : base(user)
         {
         }
 

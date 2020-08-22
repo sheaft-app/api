@@ -1,8 +1,10 @@
-﻿namespace Sheaft.Application.Commands
+﻿using Sheaft.Core;
+
+namespace Sheaft.Application.Commands
 {
     public class UpdateZoneProgressCommand : Command<bool>
     {
-        public UpdateZoneProgressCommand(Interop.IRequestUser user) : base(user)
+        public UpdateZoneProgressCommand(RequestUser user) : base(user)
         {
         }
     }

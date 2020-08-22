@@ -1,11 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
+using Sheaft.Core;
 
 namespace Sheaft.Application.Commands
 {
     public class DeleteJobCommand : Command<bool>
     {
-        public DeleteJobCommand(Interop.IRequestUser user) : base(user)
+        public DeleteJobCommand(RequestUser user) : base(user)
         {
         }
 

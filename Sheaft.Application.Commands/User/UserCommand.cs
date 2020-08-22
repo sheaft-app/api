@@ -1,10 +1,11 @@
 ﻿using System;
+using Sheaft.Core;
 
 namespace Sheaft.Application.Commands
 {
     public abstract class UserCommand<T> : Command<T>
     {
-        protected UserCommand(Interop.IRequestUser user) : base(user)
+        protected UserCommand(RequestUser user) : base(user)
         {
         }
 

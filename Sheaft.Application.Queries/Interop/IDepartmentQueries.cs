@@ -1,5 +1,5 @@
 ﻿using Sheaft.Models.Dto;
-using Sheaft.Interop;
+using Sheaft.Core;
 using System;
 using System.Linq;
 
@@ -7,8 +7,8 @@ namespace Sheaft.Application.Queries
 {
     public interface IDepartmentQueries
     {
-        IQueryable<DepartmentDto> GetDepartment(Guid id, IRequestUser currentUser);
-        IQueryable<DepartmentDto> GetDepartments(IRequestUser currentUser);
-        IQueryable<DepartmentDto> GetRegionDepartments(Guid regionId, IRequestUser currentUser);
+        IQueryable<DepartmentDto> GetDepartment(Guid id, RequestUser currentUser);
+        IQueryable<DepartmentDto> GetDepartments(RequestUser currentUser);
+        IQueryable<DepartmentDto> GetRegionDepartments(Guid regionId, RequestUser currentUser);
     }
 }

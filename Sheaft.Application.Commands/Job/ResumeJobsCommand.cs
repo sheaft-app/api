@@ -1,11 +1,12 @@
 using System;
 using System.Collections.Generic;
+using Sheaft.Core;
 
 namespace Sheaft.Application.Commands
 {
     public class ResumeJobsCommand : Command<bool>
     {
-        public ResumeJobsCommand(Interop.IRequestUser user) : base(user)
+        public ResumeJobsCommand(RequestUser user) : base(user)
         {
         }
 

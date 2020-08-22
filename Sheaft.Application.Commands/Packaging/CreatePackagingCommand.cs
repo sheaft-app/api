@@ -1,11 +1,11 @@
-﻿using Sheaft.Interop.Enums;
-using System;
+﻿using System;
+using Sheaft.Core;
 
 namespace Sheaft.Application.Commands
 {
     public class CreatePackagingCommand : Command<Guid>
     {
-        public CreatePackagingCommand(Interop.IRequestUser user) : base(user)
+        public CreatePackagingCommand(RequestUser user) : base(user)
         {
         }
 

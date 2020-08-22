@@ -1,10 +1,11 @@
 ﻿using System;
+using Sheaft.Core;
 
 namespace Sheaft.Application.Commands
 {
     public class DeletePackagingCommand : Command<bool>
     {
-        public DeletePackagingCommand(Interop.IRequestUser user) : base(user)
+        public DeletePackagingCommand(RequestUser user) : base(user)
         {
         }
 

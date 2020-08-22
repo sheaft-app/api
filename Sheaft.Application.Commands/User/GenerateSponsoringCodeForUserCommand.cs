@@ -1,11 +1,11 @@
 ﻿using System;
-using Sheaft.Interop;
+using Sheaft.Core;
 
 namespace Sheaft.Application.Commands
 {
     public class GenerateUserSponsoringCodeCommand : Command<string>
     {
-        public GenerateUserSponsoringCodeCommand(IRequestUser user) : base(user)
+        public GenerateUserSponsoringCodeCommand(RequestUser user) : base(user)
         {
         }
 

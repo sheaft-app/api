@@ -4,8 +4,8 @@ using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using Sheaft.Core;
 using Sheaft.Core.Extensions;
-using Sheaft.Core.Security;
 using Sheaft.Infrastructure.Interop;
 using Sheaft.Interop.Enums;
 using Sheaft.Models.ViewModels;
@@ -71,7 +71,12 @@ namespace Sheaft.Manage.Controllers
                             _roleOptions.Consumer.Value
                         };
 
-                    requestUser = new RequestUser(user.Id, name, email, roles, user.Company?.Id, HttpContext.TraceIdentifier, User.TryGetUserId(), User.GetName());
+                    var uid = User.TryGetUserId();
+                    Impersonification impersonification = null;
+                    if(uid.HasValue)
+                        impersonification = new Impersonification(uid.Value, User.GetName());
+
+                    requestUser = new RequestUser(user.Id, name, email, roles, user.Company?.Id, HttpContext.TraceIdentifier, impersonification);
                 }
             }
 

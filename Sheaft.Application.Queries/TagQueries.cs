@@ -5,7 +5,7 @@ using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using Sheaft.Infrastructure.Interop;
 using Sheaft.Models.Dto;
-using Sheaft.Interop;
+using Sheaft.Core;
 using Sheaft.Domain.Models;
 using Sheaft.Infrastructure;
 
@@ -22,7 +22,7 @@ namespace Sheaft.Application.Queries
             _configurationProvider = configurationProvider;
         }
 
-        public IQueryable<TagDto> GetTag(Guid id, IRequestUser currentUser)
+        public IQueryable<TagDto> GetTag(Guid id, RequestUser currentUser)
         {
             try
             {
@@ -36,7 +36,7 @@ namespace Sheaft.Application.Queries
             }
         }
 
-        public IQueryable<TagDto> GetTags(IRequestUser currentUser)
+        public IQueryable<TagDto> GetTags(RequestUser currentUser)
         {
             try
             {

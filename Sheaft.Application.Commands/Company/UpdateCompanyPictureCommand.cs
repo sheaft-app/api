@@ -1,10 +1,11 @@
 ﻿using System;
+using Sheaft.Core;
 
 namespace Sheaft.Application.Commands
 {
     public class UpdateCompanyPictureCommand : Command<bool>
     {
-        public UpdateCompanyPictureCommand(Interop.IRequestUser user) : base(user)
+        public UpdateCompanyPictureCommand(RequestUser user) : base(user)
         {
         }
 

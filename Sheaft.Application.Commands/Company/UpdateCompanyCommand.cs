@@ -2,12 +2,13 @@
 using System.Collections.Generic;
 using Sheaft.Interop.Enums;
 using Sheaft.Models.Inputs;
+using Sheaft.Core;
 
 namespace Sheaft.Application.Commands
 {
     public class UpdateCompanyCommand : Command<bool>
     {
-        public UpdateCompanyCommand(Interop.IRequestUser user) : base(user)
+        public UpdateCompanyCommand(RequestUser user) : base(user)
         {
         }
 

@@ -1,5 +1,6 @@
 ﻿using Sheaft.Interop.Enums;
 using System;
+using Sheaft.Core;
 
 namespace Sheaft.Application.Commands
 {
@@ -7,7 +8,7 @@ namespace Sheaft.Application.Commands
     {
         public const string QUEUE_NAME = "command-users-points-create";
 
-        public CreateUserPointsCommand(Interop.IRequestUser user) : base(user)
+        public CreateUserPointsCommand(RequestUser user) : base(user)
         {
         }
 

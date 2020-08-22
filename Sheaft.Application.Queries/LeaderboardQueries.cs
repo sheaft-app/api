@@ -6,9 +6,8 @@ using System.Threading.Tasks;
 using Sheaft.Domain.StoreProcedures;
 using Sheaft.Infrastructure.Interop;
 using Sheaft.Models.Dto;
-using Sheaft.Interop;
+using Sheaft.Core;
 using Sheaft.Core.Extensions;
-using Sheaft.Core.Security;
 using Sheaft.Options;
 using Microsoft.Extensions.Options;
 using Sheaft.Domain.Views;
@@ -44,7 +43,7 @@ namespace Sheaft.Application.Queries
             _dapper = dapper;
         }
 
-        public async Task<RankInformationDto> UserRankInformationAsync(Guid id, IRequestUser currentUser, CancellationToken token)
+        public async Task<RankInformationDto> UserRankInformationAsync(Guid id, RequestUser currentUser, CancellationToken token)
         {
             try
             {
@@ -63,7 +62,7 @@ namespace Sheaft.Application.Queries
             }
         }
 
-        public async Task<UserPositionDto> UserPositionInDepartmentAsync(Guid userId, IRequestUser currentUser, CancellationToken token)
+        public async Task<UserPositionDto> UserPositionInDepartmentAsync(Guid userId, RequestUser currentUser, CancellationToken token)
         {
             try
             {
@@ -83,7 +82,7 @@ namespace Sheaft.Application.Queries
             }
         }
 
-        public async Task<UserPositionDto> UserPositionInRegionAsync(Guid userId, IRequestUser currentUser, CancellationToken token)
+        public async Task<UserPositionDto> UserPositionInRegionAsync(Guid userId, RequestUser currentUser, CancellationToken token)
         {
             try
             {
@@ -103,7 +102,7 @@ namespace Sheaft.Application.Queries
             }
         }
 
-        public async Task<UserPositionDto> UserPositionInCountryAsync(Guid userId, IRequestUser currentUser, CancellationToken token)
+        public async Task<UserPositionDto> UserPositionInCountryAsync(Guid userId, RequestUser currentUser, CancellationToken token)
         {
             try
             {
@@ -115,7 +114,7 @@ namespace Sheaft.Application.Queries
             }
         }
 
-        public IQueryable<RegionPointsDto> RegionsPoints(Guid? countryId, IRequestUser currentUser)
+        public IQueryable<RegionPointsDto> RegionsPoints(Guid? countryId, RequestUser currentUser)
         {
             try
             {
@@ -129,7 +128,7 @@ namespace Sheaft.Application.Queries
             }
         }
 
-        public IQueryable<DepartmentPointsDto> DepartmentsPoints(Guid? regionId, IRequestUser currentUser)
+        public IQueryable<DepartmentPointsDto> DepartmentsPoints(Guid? regionId, RequestUser currentUser)
         {
             try
             {
@@ -147,7 +146,7 @@ namespace Sheaft.Application.Queries
             }
         }
 
-        public IQueryable<CountryPointsDto> CountriesPoints(Guid? countryId, IRequestUser currentUser)
+        public IQueryable<CountryPointsDto> CountriesPoints(Guid? countryId, RequestUser currentUser)
         {
             try
             {
@@ -161,7 +160,7 @@ namespace Sheaft.Application.Queries
             }
         }
 
-        public IQueryable<CountryUserPointsDto> CountryUsersPoints(Guid? countryId, IRequestUser currentUser)
+        public IQueryable<CountryUserPointsDto> CountryUsersPoints(Guid? countryId, RequestUser currentUser)
         {
             try
             {
@@ -175,7 +174,7 @@ namespace Sheaft.Application.Queries
             }
         }
 
-        public IQueryable<RegionUserPointsDto> RegionUsersPoints(Guid? regionId, IRequestUser currentUser)
+        public IQueryable<RegionUserPointsDto> RegionUsersPoints(Guid? regionId, RequestUser currentUser)
         {
             try
             {
@@ -193,7 +192,7 @@ namespace Sheaft.Application.Queries
             }
         }
 
-        public IQueryable<DepartmentUserPointsDto> DepartmentUsersPoints(Guid? departmentId, IRequestUser currentUser)
+        public IQueryable<DepartmentUserPointsDto> DepartmentUsersPoints(Guid? departmentId, RequestUser currentUser)
         {
             try
             {

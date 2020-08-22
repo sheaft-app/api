@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 using System.Threading;
 using Sheaft.Application.Queries;
 using AutoMapper;
-using Sheaft.Interop;
 using Sheaft.Models.Inputs;
 using Sheaft.Models.Dto;
 using Sheaft.Core.Extensions;
@@ -22,6 +21,7 @@ using Sheaft.GraphQL.Types.Sorts;
 using Sheaft.GraphQL.Types;
 using Microsoft.Extensions.Logging;
 using Sheaft.Exceptions;
+using Sheaft.Core;
 
 namespace Sheaft.GraphQL
 {
@@ -32,7 +32,7 @@ namespace Sheaft.GraphQL
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly ILogger<SheaftMutation> _logger;
         private CancellationToken _cancellationToken => _httpContextAccessor.HttpContext.RequestAborted;
-        private IRequestUser _currentUser
+        private RequestUser _currentUser
         {
             get
             {

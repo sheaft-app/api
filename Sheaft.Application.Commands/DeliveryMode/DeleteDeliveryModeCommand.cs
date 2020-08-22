@@ -1,10 +1,11 @@
 ﻿using System;
+using Sheaft.Core;
 
 namespace Sheaft.Application.Commands
 {
     public class DeleteDeliveryModeCommand : Command<bool>
     {
-        public DeleteDeliveryModeCommand(Interop.IRequestUser user) : base(user)
+        public DeleteDeliveryModeCommand(RequestUser user) : base(user)
         {
         }
 

@@ -1,10 +1,11 @@
 using System;
+using Sheaft.Core;
 
 namespace Sheaft.Application.Commands
 {
     public class MarkUserNotificationAsReadCommand : Command<bool>
     {
-        public MarkUserNotificationAsReadCommand(Interop.IRequestUser user) : base(user)
+        public MarkUserNotificationAsReadCommand(RequestUser user) : base(user)
         {
         }
 

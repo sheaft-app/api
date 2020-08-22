@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using Sheaft.Models.Inputs;
+using Sheaft.Core;
 
 namespace Sheaft.Application.Commands
 {
     public class CreatePurchaseOrdersCommand : Command<IEnumerable<Guid>>
     {
-        public CreatePurchaseOrdersCommand(Interop.IRequestUser user) : base(user)
+        public CreatePurchaseOrdersCommand(RequestUser user) : base(user)
         {
         }
 

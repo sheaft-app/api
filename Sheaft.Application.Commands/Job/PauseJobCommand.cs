@@ -1,11 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
+using Sheaft.Core;
 
 namespace Sheaft.Application.Commands
 {
     public class PauseJobCommand : Command<bool>
     {
-        public PauseJobCommand(Interop.IRequestUser user) : base(user)
+        public PauseJobCommand(RequestUser user) : base(user)
         {
         }
 

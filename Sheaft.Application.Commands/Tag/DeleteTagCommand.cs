@@ -1,11 +1,11 @@
-﻿using Sheaft.Interop.Enums;
-using System;
+﻿using System;
+using Sheaft.Core;
 
 namespace Sheaft.Application.Commands
 {
     public class DeleteTagCommand : Command<bool>
     {
-        public DeleteTagCommand(Interop.IRequestUser user) : base(user)
+        public DeleteTagCommand(RequestUser user) : base(user)
         {
         }
 

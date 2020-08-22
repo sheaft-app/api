@@ -2,12 +2,13 @@
 using System.Collections.Generic;
 using Sheaft.Models.Inputs;
 using Sheaft.Interop.Enums;
+using Sheaft.Core;
 
 namespace Sheaft.Application.Commands
 {
     public class CreateDeliveryModeCommand : Command<Guid>
     {
-        public CreateDeliveryModeCommand(Interop.IRequestUser user) : base(user)
+        public CreateDeliveryModeCommand(RequestUser user) : base(user)
         {
         }
 

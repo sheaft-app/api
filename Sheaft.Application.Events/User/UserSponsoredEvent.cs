@@ -1,4 +1,4 @@
-﻿using MediatR;
+﻿using Sheaft.Core;
 using System;
 
 namespace Sheaft.Application.Events
@@ -8,7 +8,7 @@ namespace Sheaft.Application.Events
         public const string QUEUE_NAME = "event-users-sponsored";
         public const string MAILING_TEMPLATE_ID = "";
 
-        public UserSponsoredEvent(Interop.IRequestUser user) : base(user)
+        public UserSponsoredEvent(RequestUser user) : base(user)
         {
         }
 

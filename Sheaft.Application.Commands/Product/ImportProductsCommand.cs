@@ -1,4 +1,5 @@
 using System;
+using Sheaft.Core;
 
 namespace Sheaft.Application.Commands
 {
@@ -6,7 +7,7 @@ namespace Sheaft.Application.Commands
     {
         public const string QUEUE_NAME = "command-products-import";
 
-        public ImportProductsCommand(Interop.IRequestUser user) : base(user)
+        public ImportProductsCommand(RequestUser user) : base(user)
         {
         }
 

@@ -1,11 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
+using Sheaft.Core;
 
 namespace Sheaft.Application.Commands
 {
     public class StartJobCommand : Command<bool>
     {
-        public StartJobCommand(Interop.IRequestUser user) : base(user)
+        public StartJobCommand(RequestUser user) : base(user)
         {
         }
 

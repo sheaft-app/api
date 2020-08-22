@@ -1,10 +1,11 @@
 ﻿using System;
+using Sheaft.Core;
 
 namespace Sheaft.Application.Commands
 {
     public class UpdatePackagingCommand : Command<bool>
     {
-        public UpdatePackagingCommand(Interop.IRequestUser user) : base(user)
+        public UpdatePackagingCommand(RequestUser user) : base(user)
         {
         }
 

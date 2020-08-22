@@ -1,11 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
+using Sheaft.Core;
 
 namespace Sheaft.Application.Commands
 {
     public class DeleteAgreementCommand : Command<bool>
     {
-        public DeleteAgreementCommand(Interop.IRequestUser user) : base(user)
+        public DeleteAgreementCommand(RequestUser user) : base(user)
         {
         }
 

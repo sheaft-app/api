@@ -1,10 +1,11 @@
 ﻿using System;
+using Sheaft.Core;
 
 namespace Sheaft.Application.Commands
 {
     public class CreateContactCommand : Command<bool>
     {
-        public CreateContactCommand(Interop.IRequestUser user) : base(user)
+        public CreateContactCommand(RequestUser user) : base(user)
         {
         }
 

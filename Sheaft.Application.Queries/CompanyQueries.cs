@@ -10,7 +10,7 @@ using Microsoft.Azure.Search;
 using Microsoft.Azure.Search.Models;
 using Newtonsoft.Json;
 using Sheaft.Infrastructure.Interop;
-using Sheaft.Interop;
+using Sheaft.Core;
 using Sheaft.Interop.Enums;
 using Sheaft.Models.Dto;
 using Sheaft.Models.Inputs;
@@ -55,7 +55,7 @@ namespace Sheaft.Application.Queries
             _context = context;
         }
 
-        public async Task<SirenCompanyDto> RetrieveSiretCompanyInfosAsync(string siret, IRequestUser currentUser, CancellationToken token)
+        public async Task<SirenCompanyDto> RetrieveSiretCompanyInfosAsync(string siret, RequestUser currentUser, CancellationToken token)
         {
             try
             {
@@ -73,7 +73,7 @@ namespace Sheaft.Application.Queries
             }
         }
 
-        public async Task<StoresSearchDto> SearchStoresAsync(Guid companyId, SearchTermsInput terms, IRequestUser currentUser, CancellationToken token)
+        public async Task<StoresSearchDto> SearchStoresAsync(Guid companyId, SearchTermsInput terms, RequestUser currentUser, CancellationToken token)
         {
             try
             {
@@ -161,7 +161,7 @@ namespace Sheaft.Application.Queries
             }
         }
 
-        public async Task<ProducersSearchDto> SearchProducersAsync(Guid companyId, SearchTermsInput terms, IRequestUser currentUser, CancellationToken token)
+        public async Task<ProducersSearchDto> SearchProducersAsync(Guid companyId, SearchTermsInput terms, RequestUser currentUser, CancellationToken token)
         {
             try
             {
@@ -249,7 +249,7 @@ namespace Sheaft.Application.Queries
             }
         }
 
-        public IQueryable<CompanyDto> GetCompany(Guid id, IRequestUser currentUser)
+        public IQueryable<CompanyDto> GetCompany(Guid id, RequestUser currentUser)
         {
             try
             {
@@ -263,7 +263,7 @@ namespace Sheaft.Application.Queries
             }
         }
 
-        public IQueryable<CompanyDto> GetCompanies(IRequestUser currentUser)
+        public IQueryable<CompanyDto> GetCompanies(RequestUser currentUser)
         {
             try
             {
@@ -277,7 +277,7 @@ namespace Sheaft.Application.Queries
             }
         }
 
-        public IQueryable<ProducerDto> GetProducer(Guid id, IRequestUser currentUser)
+        public IQueryable<ProducerDto> GetProducer(Guid id, RequestUser currentUser)
         {
             try
             {
@@ -291,7 +291,7 @@ namespace Sheaft.Application.Queries
             }
         }
 
-        public IQueryable<StoreDto> GetStore(Guid id, IRequestUser currentUser)
+        public IQueryable<StoreDto> GetStore(Guid id, RequestUser currentUser)
         {
             try
             {

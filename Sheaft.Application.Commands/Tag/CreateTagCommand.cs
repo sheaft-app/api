@@ -1,11 +1,12 @@
 ﻿using Sheaft.Interop.Enums;
 using System;
+using Sheaft.Core;
 
 namespace Sheaft.Application.Commands
 {
     public class CreateTagCommand : Command<Guid>
     {
-        public CreateTagCommand(Interop.IRequestUser user) : base(user)
+        public CreateTagCommand(RequestUser user) : base(user)
         {
         }
 

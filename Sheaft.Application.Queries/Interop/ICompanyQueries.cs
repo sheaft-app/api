@@ -1,6 +1,6 @@
 ﻿using Sheaft.Models.Dto;
 using Sheaft.Models.Inputs;
-using Sheaft.Interop;
+using Sheaft.Core;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,12 +11,12 @@ namespace Sheaft.Application.Queries
 {
     public interface ICompanyQueries
     {
-        IQueryable<ProducerDto> GetProducer(Guid id, IRequestUser currentUser);
-        IQueryable<StoreDto> GetStore(Guid id, IRequestUser currentUser);
-        IQueryable<CompanyDto> GetCompany(Guid id, IRequestUser currentUser);
-        IQueryable<CompanyDto> GetCompanies(IRequestUser currentUser);
-        Task<SirenCompanyDto> RetrieveSiretCompanyInfosAsync(string siret, IRequestUser currentUser, CancellationToken token);
-        Task<ProducersSearchDto> SearchProducersAsync(Guid companyId, SearchTermsInput terms, IRequestUser currentUser, CancellationToken token);
-        Task<StoresSearchDto> SearchStoresAsync(Guid companyId, SearchTermsInput terms, IRequestUser currentUser, CancellationToken token);
+        IQueryable<ProducerDto> GetProducer(Guid id, RequestUser currentUser);
+        IQueryable<StoreDto> GetStore(Guid id, RequestUser currentUser);
+        IQueryable<CompanyDto> GetCompany(Guid id, RequestUser currentUser);
+        IQueryable<CompanyDto> GetCompanies(RequestUser currentUser);
+        Task<SirenCompanyDto> RetrieveSiretCompanyInfosAsync(string siret, RequestUser currentUser, CancellationToken token);
+        Task<ProducersSearchDto> SearchProducersAsync(Guid companyId, SearchTermsInput terms, RequestUser currentUser, CancellationToken token);
+        Task<StoresSearchDto> SearchStoresAsync(Guid companyId, SearchTermsInput terms, RequestUser currentUser, CancellationToken token);
     }
 }

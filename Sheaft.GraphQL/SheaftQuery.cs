@@ -7,7 +7,7 @@ using System.Linq;
 using System.Threading;
 using Sheaft.Models.Dto;
 using Sheaft.Models.Inputs;
-using Sheaft.Interop;
+using Sheaft.Core;
 using Sheaft.Core.Extensions;
 using Sheaft.Core.Security;
 using HotChocolate.Types.Relay;
@@ -26,7 +26,7 @@ namespace Sheaft.GraphQL
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly ILogger<SheaftQuery> _logger;
         private CancellationToken _cancellationToken => _httpContextAccessor.HttpContext.RequestAborted;
-        private IRequestUser _currentUser
+        private RequestUser _currentUser
         {
             get
             {

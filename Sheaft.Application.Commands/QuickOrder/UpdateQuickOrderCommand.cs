@@ -1,10 +1,11 @@
 ﻿using System;
+using Sheaft.Core;
 
 namespace Sheaft.Application.Commands
 {
     public class UpdateQuickOrderCommand : Command<bool>
     {
-        public UpdateQuickOrderCommand(Interop.IRequestUser user) : base(user)
+        public UpdateQuickOrderCommand(RequestUser user) : base(user)
         {
         }
 

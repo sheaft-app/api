@@ -1,11 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
+using Sheaft.Core;
 
 namespace Sheaft.Application.Commands
 {
     public class RestoreAgreementCommand : Command<bool>
     {
-        public RestoreAgreementCommand(Interop.IRequestUser user) : base(user)
+        public RestoreAgreementCommand(RequestUser user) : base(user)
         {
         }
 

@@ -1,11 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
+using Sheaft.Core;
 
 namespace Sheaft.Application.Commands
 {
     public class RestoreProductCommand : Command<bool>
     {
-        public RestoreProductCommand(Interop.IRequestUser user) : base(user)
+        public RestoreProductCommand(RequestUser user) : base(user)
         {
         }
 

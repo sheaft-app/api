@@ -4,7 +4,7 @@ using System.Linq;
 using AutoMapper.QueryableExtensions;
 using Sheaft.Infrastructure.Interop;
 using Sheaft.Models.Dto;
-using Sheaft.Interop;
+using Sheaft.Core;
 using Sheaft.Domain.Models;
 using Sheaft.Core.Extensions;
 using Sheaft.Infrastructure;
@@ -26,7 +26,7 @@ namespace Sheaft.Application.Queries
             _configurationProvider = configurationProvider;
         }
 
-        public IQueryable<PurchaseOrderDto> MyPurchaseOrders(IRequestUser currentUser)
+        public IQueryable<PurchaseOrderDto> MyPurchaseOrders(RequestUser currentUser)
         {
             try
             {
@@ -40,7 +40,7 @@ namespace Sheaft.Application.Queries
             }
         }
 
-        public IQueryable<PurchaseOrderDto> GetPurchaseOrder(Guid id, IRequestUser currentUser)
+        public IQueryable<PurchaseOrderDto> GetPurchaseOrder(Guid id, RequestUser currentUser)
         {
             try
             {
@@ -59,7 +59,7 @@ namespace Sheaft.Application.Queries
             }
         }
 
-        public IQueryable<PurchaseOrderDto> GetPurchaseOrders(IRequestUser currentUser)
+        public IQueryable<PurchaseOrderDto> GetPurchaseOrders(RequestUser currentUser)
         {
             try
             {

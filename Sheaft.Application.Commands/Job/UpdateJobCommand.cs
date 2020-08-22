@@ -1,11 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
+using Sheaft.Core;
 
 namespace Sheaft.Application.Commands
 {
     public class UpdateJobCommand : Command<bool>
     {
-        public UpdateJobCommand(Interop.IRequestUser user) : base(user)
+        public UpdateJobCommand(RequestUser user) : base(user)
         {
         }
 

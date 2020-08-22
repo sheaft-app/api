@@ -2,7 +2,7 @@
 using System.Linq;
 using Sheaft.Domain.Models;
 using Sheaft.Infrastructure.Interop;
-using Sheaft.Interop;
+using Sheaft.Core;
 using Sheaft.Interop.Enums;
 using System.Threading.Tasks;
 using System.Threading;
@@ -24,7 +24,7 @@ namespace Sheaft.Application.Queries
             _configurationProvider = configurationProvider;
         }
 
-        public Task<bool> HasProductsImportsInProgressAsync(Guid companyId, IRequestUser currentUser, CancellationToken token)
+        public Task<bool> HasProductsImportsInProgressAsync(Guid companyId, RequestUser currentUser, CancellationToken token)
         {
             try
             {
@@ -41,7 +41,7 @@ namespace Sheaft.Application.Queries
             }
         }
 
-        public Task<bool> HasPickingOrdersExportsInProgressAsync(Guid companyId, IRequestUser currentUser, CancellationToken token)
+        public Task<bool> HasPickingOrdersExportsInProgressAsync(Guid companyId, RequestUser currentUser, CancellationToken token)
         {
             try
             {
@@ -58,7 +58,7 @@ namespace Sheaft.Application.Queries
             }
         }
 
-        public IQueryable<JobDto> GetJob(Guid jobId, IRequestUser currentUser)
+        public IQueryable<JobDto> GetJob(Guid jobId, RequestUser currentUser)
         {
             try
             {
@@ -74,7 +74,7 @@ namespace Sheaft.Application.Queries
             }
         }
 
-        public IQueryable<JobDto> GetJobs(IRequestUser currentUser)
+        public IQueryable<JobDto> GetJobs(RequestUser currentUser)
         {
             try
             {

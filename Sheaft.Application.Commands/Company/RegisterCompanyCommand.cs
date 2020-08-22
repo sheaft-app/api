@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using Sheaft.Models.Inputs;
+using Sheaft.Core;
 
 namespace Sheaft.Application.Commands
 {
     public class RegisterCompanyCommand : Command<Guid>
     {
-        public RegisterCompanyCommand(Interop.IRequestUser user) : base(user)
+        public RegisterCompanyCommand(RequestUser user) : base(user)
         {
         }
 

@@ -1,11 +1,11 @@
-﻿using MediatR;
+﻿using Sheaft.Core;
 using System;
 
 namespace Sheaft.Application.Events
 {
     public abstract class AgreementEvent: Event
     {
-        protected AgreementEvent(Interop.IRequestUser user) : base(user)
+        protected AgreementEvent(RequestUser user) : base(user)
         {
         }
 

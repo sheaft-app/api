@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Sheaft.Infrastructure.Interop;
 using Sheaft.Models.Dto;
-using Sheaft.Interop;
+using Sheaft.Core;
 using Sheaft.Domain.Models;
 using AutoMapper.QueryableExtensions;
 using Sheaft.Infrastructure;
@@ -21,7 +21,7 @@ namespace Sheaft.Application.Queries
             _configurationProvider = configurationProvider;
         }
 
-        public IQueryable<DepartmentDto> GetDepartment(Guid id, IRequestUser currentUser)
+        public IQueryable<DepartmentDto> GetDepartment(Guid id, RequestUser currentUser)
         {
             try
             {
@@ -35,7 +35,7 @@ namespace Sheaft.Application.Queries
             }
         }
 
-        public IQueryable<DepartmentDto> GetDepartments(IRequestUser currentUser)
+        public IQueryable<DepartmentDto> GetDepartments(RequestUser currentUser)
         {
             try
             {
@@ -49,7 +49,7 @@ namespace Sheaft.Application.Queries
             }
         }
 
-        public IQueryable<DepartmentDto> GetRegionDepartments(Guid regionId, IRequestUser currentUser)
+        public IQueryable<DepartmentDto> GetRegionDepartments(Guid regionId, RequestUser currentUser)
         {
             try
             {

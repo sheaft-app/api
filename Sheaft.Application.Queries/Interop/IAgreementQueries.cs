@@ -1,5 +1,5 @@
 ﻿using Sheaft.Models.Dto;
-using Sheaft.Interop;
+using Sheaft.Core;
 using System;
 using System.Linq;
 
@@ -7,9 +7,9 @@ namespace Sheaft.Application.Queries
 {
     public interface IAgreementQueries
     {
-        IQueryable<AgreementDto> GetAgreement(Guid id, IRequestUser currentUser);
-        IQueryable<AgreementDto> GetAgreements(IRequestUser currentUser);
-        IQueryable<AgreementDto> GetStoreAgreements(Guid input, IRequestUser currentUser);
-        IQueryable<AgreementDto> GetProducerAgreements(Guid producerId, IRequestUser currentUser);
+        IQueryable<AgreementDto> GetAgreement(Guid id, RequestUser currentUser);
+        IQueryable<AgreementDto> GetAgreements(RequestUser currentUser);
+        IQueryable<AgreementDto> GetStoreAgreements(Guid input, RequestUser currentUser);
+        IQueryable<AgreementDto> GetProducerAgreements(Guid producerId, RequestUser currentUser);
     }
 }

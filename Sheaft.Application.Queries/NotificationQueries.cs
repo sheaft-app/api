@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Sheaft.Infrastructure.Interop;
 using Sheaft.Models.Dto;
-using Sheaft.Interop;
+using Sheaft.Core;
 using Sheaft.Core.Extensions;
 using Sheaft.Domain.Models;
 using AutoMapper.QueryableExtensions;
@@ -26,7 +26,7 @@ namespace Sheaft.Application.Queries
             _configurationProvider = configurationProvider;
         }
 
-        public IQueryable<NotificationDto> GetNotification(Guid id, IRequestUser currentUser)
+        public IQueryable<NotificationDto> GetNotification(Guid id, RequestUser currentUser)
         {
             try
             {
@@ -45,7 +45,7 @@ namespace Sheaft.Application.Queries
             }
         }
 
-        public IQueryable<NotificationDto> GetNotifications(IRequestUser currentUser)
+        public IQueryable<NotificationDto> GetNotifications(RequestUser currentUser)
         {
             try
             {

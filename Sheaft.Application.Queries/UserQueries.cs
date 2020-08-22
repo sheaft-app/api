@@ -7,7 +7,7 @@ using JWT.Algorithms;
 using JWT.Builder;
 using Sheaft.Infrastructure.Interop;
 using Sheaft.Models.Dto;
-using Sheaft.Interop;
+using Sheaft.Core;
 using Sheaft.Options;
 using Microsoft.Extensions.Options;
 using Sheaft.Domain.Models;
@@ -30,7 +30,7 @@ namespace Sheaft.Application.Queries
             _context = context;
         }
 
-        public IQueryable<UserDto> GetUserProfile(Guid id, IRequestUser currentUser)
+        public IQueryable<UserDto> GetUserProfile(Guid id, RequestUser currentUser)
         {
             try
             {
@@ -44,7 +44,7 @@ namespace Sheaft.Application.Queries
             }
         }
 
-        public async Task<string> GetFreshdeskTokenAsync(IRequestUser currentUser, CancellationToken token)
+        public async Task<string> GetFreshdeskTokenAsync(RequestUser currentUser, CancellationToken token)
         {
             try
             {
@@ -64,7 +64,7 @@ namespace Sheaft.Application.Queries
             }
         }
 
-        public IQueryable<UserDto> GetUser(Guid id, IRequestUser currentUser)
+        public IQueryable<UserDto> GetUser(Guid id, RequestUser currentUser)
         {
             try
             {
@@ -78,7 +78,7 @@ namespace Sheaft.Application.Queries
             }
         }
 
-        public IQueryable<UserDto> GetUsers(IRequestUser currentUser)
+        public IQueryable<UserDto> GetUsers(RequestUser currentUser)
         {
             try
             {
