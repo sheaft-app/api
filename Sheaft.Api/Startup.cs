@@ -38,7 +38,6 @@ using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using IdentityModel;
 using System.IdentityModel.Tokens.Jwt;
-using Microsoft.IdentityModel.Logging;
 using Microsoft.AspNetCore.Authorization;
 using Sheaft.Api.Authorize;
 using System;

@@ -1,4 +1,5 @@
-﻿using System.Threading;
+﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
 using Microsoft.Azure.WebJobs;
@@ -23,7 +24,7 @@ namespace Sheaft.Functions
         }
 
         [FunctionName("ExportAccountDataCommand")]
-        public async Task ExportAccountDataCommandAsync([QueueTrigger(ExportAccountDataCommand.QUEUE_NAME, Connection = "AzureWebJobsStorage")]string message, ILogger logger, CancellationToken token)
+        public async Task ExportAccountDataCommandAsync([ServiceBusTrigger(ExportAccountDataCommand.QUEUE_NAME, Connection = "AzureWebJobsServiceBus")]string message, ILogger logger, CancellationToken token)
         {
             var command = JsonConvert.DeserializeObject<ExportAccountDataCommand>(message);
             var results = await _mediatr.Send(command, token);
@@ -34,21 +35,21 @@ namespace Sheaft.Functions
         }
 
         [FunctionName("AccountExportDataSucceededEvent")]
-        public async Task AccountExportDataSucceededEventAsync([QueueTrigger(AccountExportDataSucceededEvent.QUEUE_NAME, Connection = "AzureWebJobsStorage")]string message, ILogger logger, CancellationToken token)
+        public async Task AccountExportDataSucceededEventAsync([ServiceBusTrigger(AccountExportDataSucceededEvent.QUEUE_NAME, Connection = "AzureWebJobsServiceBus")]string message, ILogger logger, CancellationToken token)
         {
             var appEvent = JsonConvert.DeserializeObject<AccountExportDataSucceededEvent>(message);
             await _mediatr.Publish(appEvent, token);
         }
 
         [FunctionName("AccountExportDataFailedEvent")]
-        public async Task AccountExportDataFailedEventAsync([QueueTrigger(AccountExportDataFailedEvent.QUEUE_NAME, Connection = "AzureWebJobsStorage")]string message, ILogger logger, CancellationToken token)
+        public async Task AccountExportDataFailedEventAsync([ServiceBusTrigger(AccountExportDataFailedEvent.QUEUE_NAME, Connection = "AzureWebJobsServiceBus")]string message, ILogger logger, CancellationToken token)
         {
             var appEvent = JsonConvert.DeserializeObject<AccountExportDataFailedEvent>(message);
             await _mediatr.Publish(appEvent, token);
         }
 
         [FunctionName("AccountExportDataProcessingEvent")]
-        public async Task AccountExportDataProcessingEventAsync([QueueTrigger(AccountExportDataProcessingEvent.QUEUE_NAME, Connection = "AzureWebJobsStorage")]string message, ILogger logger, CancellationToken token)
+        public async Task AccountExportDataProcessingEventAsync([ServiceBusTrigger(AccountExportDataProcessingEvent.QUEUE_NAME, Connection = "AzureWebJobsServiceBus")]string message, ILogger logger, CancellationToken token)
         {
             var appEvent = JsonConvert.DeserializeObject<AccountExportDataProcessingEvent>(message);
             await _mediatr.Publish(appEvent, token);

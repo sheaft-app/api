@@ -22,7 +22,7 @@ namespace Sheaft.Functions
         }
 
         [FunctionName("CreateUserPointsCommand")]
-        public async Task CreateUserPointsCommandAsync([QueueTrigger(CreateUserPointsCommand.QUEUE_NAME, Connection = "AzureWebJobsStorage")]string message, ILogger logger, CancellationToken token)
+        public async Task CreateUserPointsCommandAsync([ServiceBusTrigger(CreateUserPointsCommand.QUEUE_NAME, Connection = "AzureWebJobsServiceBus")]string message, ILogger logger, CancellationToken token)
         {
             var command = JsonConvert.DeserializeObject<CreateUserPointsCommand>(message);
             var results = await _mediatr.Send(command, token);
