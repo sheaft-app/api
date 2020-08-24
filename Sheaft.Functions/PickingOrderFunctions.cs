@@ -23,7 +23,7 @@ namespace Sheaft.Functions
         }
 
         [FunctionName("ExportPickingOrderCommand")]
-        public async Task ExportPickingOrderCommandAsync([QueueTrigger(ExportPickingOrderCommand.QUEUE_NAME, Connection = "AzureWebJobsStorage")]string message, ILogger logger, CancellationToken token)
+        public async Task ExportPickingOrderCommandAsync([ServiceBusTrigger(ExportPickingOrderCommand.QUEUE_NAME, Connection = "AzureWebJobsServiceBus")]string message, ILogger logger, CancellationToken token)
         {
             var command = JsonConvert.DeserializeObject<ExportPickingOrderCommand>(message);
             var results = await _mediatr.Send(command, token);
@@ -34,21 +34,21 @@ namespace Sheaft.Functions
         }
 
         [FunctionName("PickingOrderExportSucceededEvent")]
-        public async Task PickingOrderExportSucceededEventAsync([QueueTrigger(PickingOrderExportSucceededEvent.QUEUE_NAME, Connection = "AzureWebJobsStorage")]string message, ILogger logger, CancellationToken token)
+        public async Task PickingOrderExportSucceededEventAsync([ServiceBusTrigger(PickingOrderExportSucceededEvent.QUEUE_NAME, Connection = "AzureWebJobsServiceBus")]string message, ILogger logger, CancellationToken token)
         {
             var appEvent = JsonConvert.DeserializeObject<PickingOrderExportSucceededEvent>(message);
             await _mediatr.Publish(appEvent, token);
         }
 
         [FunctionName("PickingOrderExportFailedEvent")]
-        public async Task PickingOrderExportFailedEventAsync([QueueTrigger(PickingOrderExportFailedEvent.QUEUE_NAME, Connection = "AzureWebJobsStorage")]string message, ILogger logger, CancellationToken token)
+        public async Task PickingOrderExportFailedEventAsync([ServiceBusTrigger(PickingOrderExportFailedEvent.QUEUE_NAME, Connection = "AzureWebJobsServiceBus")]string message, ILogger logger, CancellationToken token)
         {
             var appEvent = JsonConvert.DeserializeObject<PickingOrderExportFailedEvent>(message);
             await _mediatr.Publish(appEvent, token);
         }
 
         [FunctionName("PickingOrderExportProcessingEvent")]
-        public async Task PickingOrderExportProcessingEventAsync([QueueTrigger(PickingOrderExportProcessingEvent.QUEUE_NAME, Connection = "AzureWebJobsStorage")]string message, ILogger logger, CancellationToken token)
+        public async Task PickingOrderExportProcessingEventAsync([ServiceBusTrigger(PickingOrderExportProcessingEvent.QUEUE_NAME, Connection = "AzureWebJobsServiceBus")]string message, ILogger logger, CancellationToken token)
         {
             var appEvent = JsonConvert.DeserializeObject<PickingOrderExportProcessingEvent>(message);
             await _mediatr.Publish(appEvent, token);

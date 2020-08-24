@@ -23,7 +23,7 @@ namespace Sheaft.Functions
         }
 
         [FunctionName("CreateUserNotificationCommand")]
-        public async Task CreateUserNotificationCommandAsync([QueueTrigger(CreateUserNotificationCommand.QUEUE_NAME, Connection = "AzureWebJobsStorage")]string message, ILogger logger, CancellationToken token)
+        public async Task CreateUserNotificationCommandAsync([ServiceBusTrigger(CreateUserNotificationCommand.QUEUE_NAME, Connection = "AzureWebJobsServiceBus")]string message, ILogger logger, CancellationToken token)
         {
             var command = JsonConvert.DeserializeObject<CreateUserNotificationCommand>(message);
             var results = await _mediatr.Send(command, token);
@@ -34,7 +34,7 @@ namespace Sheaft.Functions
         }
 
         [FunctionName("CreateGroupNotificationCommand")]
-        public async Task CreateGroupNotificationCommandAsync([QueueTrigger(CreateGroupNotificationCommand.QUEUE_NAME, Connection = "AzureWebJobsStorage")]string message, ILogger logger, CancellationToken token)
+        public async Task CreateGroupNotificationCommandAsync([ServiceBusTrigger(CreateGroupNotificationCommand.QUEUE_NAME, Connection = "AzureWebJobsServiceBus")]string message, ILogger logger, CancellationToken token)
         {
             var command = JsonConvert.DeserializeObject<CreateGroupNotificationCommand>(message);
             var results = await _mediatr.Send(command, token);

@@ -1,13 +1,14 @@
-﻿using Azure.Storage.Queues;
-using MediatR;
+﻿using MediatR;
+using Microsoft.Azure.ServiceBus;
+using Microsoft.Azure.ServiceBus.Management;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
-using Sheaft.Core.Extensions;
 using Sheaft.Domain.Models;
 using Sheaft.Options;
 using Sheaft.Services.Interop;
 using System;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -16,12 +17,17 @@ namespace Sheaft.Services
     public class QueueService : IQueueService
     {
         private readonly StorageOptions _storageOptions;
+        private readonly ServiceBusOptions _serviceBusOptions;
         private readonly ILogger<QueueService> _logger;
 
-        public QueueService(IOptionsSnapshot<StorageOptions> storageOptions, ILogger<QueueService> logger)
+        public QueueService(
+            IOptionsSnapshot<StorageOptions> storageOptions, 
+            IOptionsSnapshot<ServiceBusOptions> serviceBusOptions, 
+            ILogger<QueueService> logger)
         {
             _logger = logger;
             _storageOptions = storageOptions.Value;
+            _serviceBusOptions = serviceBusOptions.Value;
         }
 
         public async Task ProcessEventAsync<T>(string queueName, T item, CancellationToken token) where T : INotification
@@ -48,10 +54,14 @@ namespace Sheaft.Services
         {
             try
             {
-                var queueClient = new QueueClient(_storageOptions.ConnectionString, queueName);
+                var managementClient = new ManagementClient(_serviceBusOptions.ConnectionString);
+                if (!(await managementClient.QueueExistsAsync(queueName)))
+                {
+                    await managementClient.CreateQueueAsync(new QueueDescription(queueName));
+                }
 
-                await queueClient.CreateIfNotExistsAsync(cancellationToken: token);
-                await queueClient.SendMessageAsync(item.Base64Encode(), token);
+                var queueClient = new QueueClient(_serviceBusOptions.ConnectionString, queueName);
+                await queueClient.SendAsync(new Message(Encoding.UTF8.GetBytes(item)));
             }
             catch (Exception e)
             {

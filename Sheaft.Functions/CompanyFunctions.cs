@@ -22,7 +22,7 @@ namespace Sheaft.Functions
         }
 
         [FunctionName("RemoveCompanyDataCommand")]
-        public async Task RemoveCompanyDataCommandAsync([QueueTrigger(RemoveCompanyDataCommand.QUEUE_NAME, Connection = "AzureWebJobsStorage")]string message, ILogger logger, CancellationToken token)
+        public async Task RemoveCompanyDataCommandAsync([ServiceBusTrigger(RemoveCompanyDataCommand.QUEUE_NAME, Connection = "AzureWebJobsServiceBus")]string message, ILogger logger, CancellationToken token)
         {
             var command = JsonConvert.DeserializeObject<RemoveCompanyDataCommand>(message);
             var results = await _mediatr.Send(command, token);

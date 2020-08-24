@@ -23,7 +23,7 @@ namespace Sheaft.Functions
         }
 
         [FunctionName("ImportProductsCommand")]
-        public async Task ImportProductsCommandAsync([QueueTrigger(ImportProductsCommand.QUEUE_NAME, Connection = "AzureWebJobsStorage")]string message, ILogger logger, CancellationToken token)
+        public async Task ImportProductsCommandAsync([ServiceBusTrigger(ImportProductsCommand.QUEUE_NAME, Connection = "AzureWebJobsServiceBus")]string message, ILogger logger, CancellationToken token)
         {
             var command = JsonConvert.DeserializeObject<ImportProductsCommand>(message);
             var results = await _mediatr.Send(command, token);
@@ -34,21 +34,21 @@ namespace Sheaft.Functions
         }
 
         [FunctionName("ProductsImportSucceededEvent")]
-        public async Task ProductsImportSucceededEventAsync([QueueTrigger(ProductImportSucceededEvent.QUEUE_NAME, Connection = "AzureWebJobsStorage")]string message, ILogger logger, CancellationToken token)
+        public async Task ProductsImportSucceededEventAsync([ServiceBusTrigger(ProductImportSucceededEvent.QUEUE_NAME, Connection = "AzureWebJobsServiceBus")]string message, ILogger logger, CancellationToken token)
         {
             var appEvent = JsonConvert.DeserializeObject<ProductImportSucceededEvent>(message);
             await _mediatr.Publish(appEvent, token);
         }
 
         [FunctionName("ProductsImportFailedEvent")]
-        public async Task ProductsImportFailedEventAsync([QueueTrigger(ProductImportFailedEvent.QUEUE_NAME, Connection = "AzureWebJobsStorage")]string message, ILogger logger, CancellationToken token)
+        public async Task ProductsImportFailedEventAsync([ServiceBusTrigger(ProductImportFailedEvent.QUEUE_NAME, Connection = "AzureWebJobsServiceBus")]string message, ILogger logger, CancellationToken token)
         {
             var appEvent = JsonConvert.DeserializeObject<ProductImportFailedEvent>(message);
             await _mediatr.Publish(appEvent, token);
         }
 
         [FunctionName("ProductImportProcessingEvent")]
-        public async Task ProductImportProcessingEventAsync([QueueTrigger(ProductImportProcessingEvent.QUEUE_NAME, Connection = "AzureWebJobsStorage")]string message, ILogger logger, CancellationToken token)
+        public async Task ProductImportProcessingEventAsync([ServiceBusTrigger(ProductImportProcessingEvent.QUEUE_NAME, Connection = "AzureWebJobsServiceBus")]string message, ILogger logger, CancellationToken token)
         {
             var appEvent = JsonConvert.DeserializeObject<ProductImportProcessingEvent>(message);
             await _mediatr.Publish(appEvent, token);

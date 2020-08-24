@@ -23,7 +23,7 @@ namespace Sheaft.Functions
         }
 
         [FunctionName("PurchaseOrderAcceptedEvent")]
-        public async Task PurchaseOrderAcceptedEventAsync([QueueTrigger(PurchaseOrderAcceptedEvent.QUEUE_NAME, Connection = "AzureWebJobsStorage")]string message, ILogger logger, CancellationToken token)
+        public async Task PurchaseOrderAcceptedEventAsync([ServiceBusTrigger(PurchaseOrderAcceptedEvent.QUEUE_NAME, Connection = "AzureWebJobsServiceBus")]string message, ILogger logger, CancellationToken token)
         {
             var appEvent = JsonConvert.DeserializeObject<PurchaseOrderAcceptedEvent>(message);
             await _mediatr.Publish(appEvent, token);
@@ -31,7 +31,7 @@ namespace Sheaft.Functions
         }
 
         [FunctionName("PurchaseOrderCancelledBySenderEvent")]
-        public async Task PurchaseOrderCancelledBySenderEventAsync([QueueTrigger(PurchaseOrderCancelledBySenderEvent.QUEUE_NAME, Connection = "AzureWebJobsStorage")]string message, ILogger logger, CancellationToken token)
+        public async Task PurchaseOrderCancelledBySenderEventAsync([ServiceBusTrigger(PurchaseOrderCancelledBySenderEvent.QUEUE_NAME, Connection = "AzureWebJobsServiceBus")]string message, ILogger logger, CancellationToken token)
         {
             var appEvent = JsonConvert.DeserializeObject<PurchaseOrderCancelledBySenderEvent>(message);
             await _mediatr.Publish(appEvent, token);
@@ -40,7 +40,7 @@ namespace Sheaft.Functions
 
 
         [FunctionName("PurchaseOrderCancelledByVendorEvent")]
-        public async Task PurchaseOrderCancelledByVendorEventAsync([QueueTrigger(PurchaseOrderCancelledByVendorEvent.QUEUE_NAME, Connection = "AzureWebJobsStorage")]string message, ILogger logger, CancellationToken token)
+        public async Task PurchaseOrderCancelledByVendorEventAsync([ServiceBusTrigger(PurchaseOrderCancelledByVendorEvent.QUEUE_NAME, Connection = "AzureWebJobsServiceBus")]string message, ILogger logger, CancellationToken token)
         {
             var appEvent = JsonConvert.DeserializeObject<PurchaseOrderCancelledByVendorEvent>(message);
             await _mediatr.Publish(appEvent, token);
@@ -48,7 +48,7 @@ namespace Sheaft.Functions
         }
 
         [FunctionName("PurchaseOrderCompletedEvent")]
-        public async Task PurchaseOrderCompletedEventAsync([QueueTrigger(PurchaseOrderCompletedEvent.QUEUE_NAME, Connection = "AzureWebJobsStorage")]string message, ILogger logger, CancellationToken token)
+        public async Task PurchaseOrderCompletedEventAsync([ServiceBusTrigger(PurchaseOrderCompletedEvent.QUEUE_NAME, Connection = "AzureWebJobsServiceBus")]string message, ILogger logger, CancellationToken token)
         {
             var appEvent = JsonConvert.DeserializeObject<PurchaseOrderCompletedEvent>(message);
             await _mediatr.Publish(appEvent, token);
@@ -56,7 +56,7 @@ namespace Sheaft.Functions
         }
 
         [FunctionName("PurchaseOrderProcessingEvent")]
-        public async Task PurchaseOrderProcessingEventAsync([QueueTrigger(PurchaseOrderProcessingEvent.QUEUE_NAME, Connection = "AzureWebJobsStorage")]string message, ILogger logger, CancellationToken token)
+        public async Task PurchaseOrderProcessingEventAsync([ServiceBusTrigger(PurchaseOrderProcessingEvent.QUEUE_NAME, Connection = "AzureWebJobsServiceBus")]string message, ILogger logger, CancellationToken token)
         {
             var appEvent = JsonConvert.DeserializeObject<PurchaseOrderProcessingEvent>(message);
             await _mediatr.Publish(appEvent, token);
@@ -64,7 +64,7 @@ namespace Sheaft.Functions
         }
 
         [FunctionName("PurchaseOrderCreatedEvent")]
-        public async Task PurchaseOrderCreatedEventAsync([QueueTrigger(PurchaseOrderCreatedEvent.QUEUE_NAME, Connection = "AzureWebJobsStorage")]string message, ILogger logger, CancellationToken token)
+        public async Task PurchaseOrderCreatedEventAsync([ServiceBusTrigger(PurchaseOrderCreatedEvent.QUEUE_NAME, Connection = "AzureWebJobsServiceBus")]string message, ILogger logger, CancellationToken token)
         {
             var appEvent = JsonConvert.DeserializeObject<PurchaseOrderCreatedEvent>(message);
             await _mediatr.Publish(appEvent, token);
@@ -72,7 +72,7 @@ namespace Sheaft.Functions
         }
 
         [FunctionName("PurchaseOrderRefusedEvent")]
-        public async Task PurchaseOrderRefusedEventAsync([QueueTrigger(PurchaseOrderRefusedEvent.QUEUE_NAME, Connection = "AzureWebJobsStorage")]string message, ILogger logger, CancellationToken token)
+        public async Task PurchaseOrderRefusedEventAsync([ServiceBusTrigger(PurchaseOrderRefusedEvent.QUEUE_NAME, Connection = "AzureWebJobsServiceBus")]string message, ILogger logger, CancellationToken token)
         {
             var appEvent = JsonConvert.DeserializeObject<PurchaseOrderRefusedEvent>(message);
             await _mediatr.Publish(appEvent, token);
