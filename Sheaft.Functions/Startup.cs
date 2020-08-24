@@ -16,6 +16,7 @@ using Sheaft.Services.Interop;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 
 [assembly: FunctionsStartup(typeof(Sheaft.Functions.Startup))]
@@ -33,6 +34,12 @@ namespace Sheaft.Functions
             var databaseSettings = configuration.GetSection(DatabaseOptions.SETTING);
             builder.Services.Configure<DatabaseOptions>(databaseSettings);
 
+            var storageSettings = configuration.GetSection(StorageOptions.SETTING);
+            builder.Services.Configure<StorageOptions>(storageSettings);
+
+            var serviceBusSettings = configuration.GetSection(ServiceBusOptions.SETTING);
+            builder.Services.Configure<ServiceBusOptions>(serviceBusSettings);
+
             builder.Services.Configure<AuthOptions>(configuration.GetSection(AuthOptions.SETTING));
             builder.Services.Configure<CorsOptions>(configuration.GetSection(CorsOptions.SETTING));
             builder.Services.Configure<SearchOptions>(configuration.GetSection(SearchOptions.SETTING));
@@ -47,8 +54,6 @@ namespace Sheaft.Functions
             builder.Services.Configure<SignalrOptions>(configuration.GetSection(SignalrOptions.SETTING));
             builder.Services.Configure<SireneOptions>(configuration.GetSection(SireneOptions.SETTING));
             builder.Services.Configure<SponsoringOptions>(configuration.GetSection(SponsoringOptions.SETTING));
-            builder.Services.Configure<StorageOptions>(configuration.GetSection(StorageOptions.SETTING));
-            builder.Services.Configure<ServiceBusOptions>(configuration.GetSection(ServiceBusOptions.SETTING));
 
             builder.Services.BuildServiceProvider();
 
@@ -74,6 +79,59 @@ namespace Sheaft.Functions
                 options.UseLazyLoadingProxies();
                 options.UseSqlServer(databaseConfig.ConnectionString, x => x.UseNetTopologySuite());
             }, ServiceLifetime.Scoped);
+
+            var commandsInQueueType = typeof(RegisterCompanyCommand).Assembly.GetTypes().Where(t => t.GetFields(BindingFlags.Public | BindingFlags.Static |
+               BindingFlags.FlattenHierarchy).Any(c => c.Name == "QUEUE_NAME"));
+            var eventsInQueueType = typeof(AccountExportDataSucceededEvent).Assembly.GetTypes().Where(t => t.GetFields(BindingFlags.Public | BindingFlags.Static |
+               BindingFlags.FlattenHierarchy).Any(c => c.Name == "QUEUE_NAME"));
+
+            var queues = new List<string>();
+
+            foreach (var type in commandsInQueueType)
+            {
+                var prop = type.GetField("QUEUE_NAME").GetRawConstantValue();
+                queues.Add((string)prop);
+            }
+
+            foreach (var type in eventsInQueueType)
+            {
+                var prop = type.GetField("QUEUE_NAME").GetRawConstantValue();
+                queues.Add((string)prop);
+            }
+
+            var managementClient = new Microsoft.Azure.ServiceBus.Management.ManagementClient(serviceBusSettings.Get<ServiceBusOptions>().ConnectionString);
+
+            const int take = 100;
+            var skip = 0;
+
+            var query = true;
+            var existingQueues = new List<string>();
+            while (query)
+            {
+                var results = managementClient.GetQueuesAsync(take, skip).Result.Select(q => q.Path).ToList();
+                if (results.Any())
+                    existingQueues.AddRange(results);
+                else
+                    query = false;
+
+                skip += take;
+            }
+
+            foreach (var queue in queues)
+            {
+                if (existingQueues.Contains(queue))
+                    continue;
+
+                managementClient.CreateQueueAsync(queue).Wait();
+            }
+
+            foreach (var existingQueue in existingQueues)
+            {
+                if (queues.Contains(existingQueue))
+                    continue;
+
+                managementClient.DeleteQueueAsync(existingQueue).Wait();
+            }
         }
     }
 

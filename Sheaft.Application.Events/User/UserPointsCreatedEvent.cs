@@ -6,7 +6,7 @@ namespace Sheaft.Application.Events
 {
     public class UserPointsCreatedEvent : Event
     {
-        public const string QUEUE_NAME = "userpointscreatedevent";
+        public const string QUEUE_NAME = "event-users-created-points";
 
         public UserPointsCreatedEvent(RequestUser user) : base(user)
         {

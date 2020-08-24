@@ -8,6 +8,8 @@ using Sheaft.Domain.Models;
 using Sheaft.Options;
 using Sheaft.Services.Interop;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -43,6 +45,12 @@ namespace Sheaft.Services
         public async Task InsertJobToProcessAsync(Job entity, CancellationToken token)
         {
             await InsertIntoQueueAsync(entity.Queue, entity.Command, token);
+        }
+
+        public async Task<IEnumerable<string>> GetExistingQueues(int take, int skip, CancellationToken token)
+        {
+            var managementClient = new ManagementClient(_serviceBusOptions.ConnectionString);
+            return (await managementClient.GetQueuesAsync(take, skip, token)).Select(q => q.Path).ToList();
         }
 
         private async Task InsertIntoQueueAsync<T>(string queueName, T item, CancellationToken token)
