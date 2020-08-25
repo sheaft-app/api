@@ -391,9 +391,9 @@ namespace Sheaft.Application.Handlers
         {
             var category = tags.FirstOrDefault(t => t.Kind == TagKind.Category);
             if (category != null)
-                return $"https://{_storageOptions.Account}.blob.{_storageOptions.Suffix}/{_storageOptions.Containers.Pictures}/products/{category.Id}.png";
+                return $"https://{_storageOptions.Account}.blob.{_storageOptions.Suffix}/{_storageOptions.Containers.Pictures}/products/categories/{category.Id.ToString("D").ToUpperInvariant()}.jpg";
 
-            return $"https://{_storageOptions.Account}.blob.{_storageOptions.Suffix}/{_storageOptions.Containers.Pictures}/products/default.jpg";
+            return $"https://{_storageOptions.Account}.blob.{_storageOptions.Suffix}/{_storageOptions.Containers.Pictures}/products/categories/default.jpg";
         }
 
         private async Task UploadImageAsync(Image image, Guid companyId, Guid productId, string filename, string size, int width, int height, CancellationToken token, ResizeMode mode = ResizeMode.Max, int quality = 100)

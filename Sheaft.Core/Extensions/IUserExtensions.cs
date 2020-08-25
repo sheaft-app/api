@@ -47,6 +47,9 @@ namespace Sheaft.Core.Extensions
             if (string.IsNullOrWhiteSpace(image))
                 return null;
 
+            if (image.EndsWith(".jpg") || image.EndsWith(".jpeg") || image.EndsWith(".png"))
+                return image;
+
             return $"{image}_{size}.jpg";
         }
     }
