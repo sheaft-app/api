@@ -1498,12 +1498,16 @@ namespace Sheaft.Infrastructure.Migrations
             migrationBuilder.Sql("CREATE PROCEDURE UserPositionInRegion @RegionId uniqueidentifier, @UserId uniqueidentifier AS  BEGIN    SELECT Points, Position    FROM (       SELECT u.Id, sum(TotalPoints) as Points, Rank()              over (ORDER BY sum(TotalPoints) DESC ) AS Position          FROM dbo.Users u           join dbo.Departments d on d.Uid = u.DepartmentUid          join dbo.Regions r on r.Uid = d.Uid          where r.Id = @RegionId          group by r.Id, u.Id       ) rs     WHERE Id = @UserId END");
             migrationBuilder.Sql("CREATE PROCEDURE UserPositionInCountry @UserId uniqueidentifier AS  BEGIN    SELECT Points, Position    FROM (       SELECT Id, TotalPoints as Points, Rank()              over (ORDER BY TotalPoints DESC ) AS Position          FROM dbo.Users        ) rs     WHERE Id = @UserId END");
 
-            migrationBuilder.Sql("CREATE SCHEMA Cache;");
+            migrationBuilder.Sql("CREATE SCHEMA [Cache]");
+            migrationBuilder.Sql("CREATE TABLE [Cache].[CachedItems](	[Id] [nvarchar](449) NOT NULL,	[Value] [varbinary](max) NOT NULL,	[ExpiresAtTime] [datetimeoffset](7) NOT NULL,	[SlidingExpirationInSeconds] [bigint] NULL,	[AbsoluteExpiration] [datetimeoffset](7) NULL,PRIMARY KEY CLUSTERED(	[Id] ASC)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]");
+            migrationBuilder.Sql("CREATE NONCLUSTERED INDEX [Index_ExpiresAtTime] ON [Cache].[CachedItems](	[ExpiresAtTime] ASC)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.Sql("DROP SCHEMA Cache;");
+            migrationBuilder.Sql("DROP CONSTRAINT [Index_ExpiresAtTime];");
+            migrationBuilder.Sql("DROP TABLE [Cache].[CachedItems];");
 
             migrationBuilder.Sql("DROP PROCEDURE UserPositionInCountry;");
             migrationBuilder.Sql("DROP PROCEDURE UserPositionInRegion;");
