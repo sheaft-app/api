@@ -157,7 +157,7 @@ namespace Sheaft.Application.Handlers
                 if (entity != null)
                     return ConflictResult<Guid>(MessageKind.RegisterConsumer_User_AlreadyExists);
 
-                var picture = await HandleImageAsync(entity.Id, request.Picture, token);
+                var picture = await HandleImageAsync(request.Id, request.Picture, token);
 
                 var oidcUser = new IdentityUserInput(request.Id, request.Email, request.FirstName, request.LastName, new List<Guid> { _roleOptions.Consumer.Id }) 
                 { 
@@ -274,7 +274,7 @@ namespace Sheaft.Application.Handlers
                     entity.SetDepartment(dept);
                 }
                 
-                var picture = await HandleImageAsync(entity.Id, request.Picture, token);
+                var picture = await HandleImageAsync(request.Id, request.Picture, token);
                 entity.SetPicture(picture);
 
                 var oidcUser = new IdentityUserInput(request.Id, request.Email, request.FirstName, request.LastName)
@@ -374,7 +374,7 @@ namespace Sheaft.Application.Handlers
             {
                 var entity = await _context.GetByIdAsync<User>(request.Id, token);
 
-                var picture = await HandleImageAsync(entity.Id, request.Picture, token);
+                var picture = await HandleImageAsync(request.Id, request.Picture, token);
                 entity.SetPicture(picture);
 
                 var oidcUser = new IdentityPictureInput(request.Id, entity.Picture);
