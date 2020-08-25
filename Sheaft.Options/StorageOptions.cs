@@ -21,6 +21,7 @@
         public string Jobs { get; set; }
         public string Rgpd { get; set; }
         public string PickingOrders { get; set; }
+        public string Progress { get; set; }
     }
     public class StorageTables
     {

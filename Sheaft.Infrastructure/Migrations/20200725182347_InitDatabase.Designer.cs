@@ -243,6 +243,10 @@ namespace Sheaft.Infrastructure.Migrations
                         .HasColumnType("int")
                         .HasDefaultValue(0);
 
+                    b.Property<int?>("RequiredProducers")
+                        .HasColumnType("int")
+                        .HasDefaultValue(1000);
+
                     b.Property<long>("RegionUid")
                         .HasColumnType("bigint");
 
@@ -985,6 +989,10 @@ namespace Sheaft.Infrastructure.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
                         .HasDefaultValue(0);
+
+                    b.Property<int?>("RequiredProducers")
+                        .HasColumnType("int")
+                        .HasDefaultValue(1000);
 
                     b.Property<DateTimeOffset?>("RemovedOn")
                         .HasColumnType("datetimeoffset");

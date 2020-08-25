@@ -27,6 +27,7 @@ namespace Sheaft.Domain.Models
         public int ProducersCount { get; private set; }
         public int StoresCount { get; private set; }
         public int ConsumersCount { get; private set; }
+        public int? RequiredProducers { get; private set; }
         public virtual Region Region { get; private set; }
         public virtual Level Level { get; private set; }
 

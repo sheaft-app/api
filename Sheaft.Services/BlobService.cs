@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using Sheaft.Core.Extensions;
 using Microsoft.Extensions.Logging;
 using Sheaft.Core;
+using Azure.Storage.Blobs.Models;
 
 namespace Sheaft.Services
 {
@@ -266,6 +267,28 @@ namespace Sheaft.Services
             catch (Exception e)
             {
                 _logger.LogError(e, $"{nameof(BlobService.UploadPickingOrderFileAsync)} - {e.Message}");
+                return new CommandResult<string>(e);
+            }
+        }
+
+        public async Task<CommandResult<string>> UploadDepartmentsProgressAsync(Stream stream, CancellationToken token)
+        {
+            try
+            {
+                var containerClient = new BlobContainerClient(_storageOptions.ConnectionString, _storageOptions.Containers.Progress);
+                await containerClient.CreateIfNotExistsAsync(cancellationToken: token);
+
+                var blobClient = containerClient.GetBlobClient($"departments.json");
+                await blobClient.DeleteIfExistsAsync(DeleteSnapshotsOption.IncludeSnapshots);
+
+                stream.Position = 0;
+                await blobClient.UploadAsync(stream, new BlobUploadOptions(), token);
+
+                return new CommandResult<string>(true, blobClient.Uri.ToString());
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, $"{nameof(BlobService.UploadDepartmentsProgressAsync)} - {e.Message}");
                 return new CommandResult<string>(e);
             }
         }

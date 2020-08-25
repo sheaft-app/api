@@ -8,4 +8,10 @@ namespace Sheaft.Application.Commands
         {
         }
     }
+    public class GenerateZonesFileCommand : Command<bool>
+    {
+        public GenerateZonesFileCommand(RequestUser user) : base(user)
+        {
+        }
+    }
 }

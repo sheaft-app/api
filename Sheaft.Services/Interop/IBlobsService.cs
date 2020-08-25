@@ -18,5 +18,6 @@ namespace Sheaft.Services.Interop
         Task<CommandResult<string>> UploadProductPictureAsync(Guid companyId, Guid productId, string filename, string size, Stream blobStream, CancellationToken token);
         Task<CommandResult<bool>> CleanContainerFolderStorageAsync(string container, string folder, CancellationToken token);
         Task<CommandResult<bool>> CleanUserStorageAsync(Guid userId, CancellationToken token);
+        Task<CommandResult<string>> UploadDepartmentsProgressAsync(Stream stream, CancellationToken token);
     }
 }
