@@ -44,7 +44,9 @@ namespace Sheaft.Application.Handlers
 
                 region.SetPoints(request.Points);
                 region.SetPosition(request.Position);
-                region.SetConsumersCount(request.Users);
+                var users = await _context.Users.CountAsync(u => !u.RemovedOn.HasValue && u.UserType == Interop.Enums.UserKind.Consumer && u.Department != null && u.Department.Region != null && u.Department.Region.Id == request.Id, token);
+
+                region.SetConsumersCount(users);
 
                 region.SetProducersCount(request.Producers);
                 region.SetStoresCount(request.Stores);
@@ -66,7 +68,9 @@ namespace Sheaft.Application.Handlers
                 department.SetLevel(level);
                 department.SetPoints(request.Points);
                 department.SetPosition(request.Position);
-                department.SetConsumersCount(request.Users);
+                var users = await _context.Users.CountAsync(u => !u.RemovedOn.HasValue && u.UserType == Interop.Enums.UserKind.Consumer && u.Department != null && u.Department.Id == request.Id, token);
+
+                department.SetConsumersCount(users);
 
                 department.SetProducersCount(request.Producers);
                 department.SetStoresCount(request.Stores);
@@ -88,40 +92,42 @@ namespace Sheaft.Application.Handlers
                 var producersPerDepartments = await _context.DepartmentProducers.ToListAsync(token);
                 var storesPerDepartments = await _context.DepartmentStores.ToListAsync(token);
 
-                foreach (var pointsPerRegion in pointsPerRegions)
+                var departmentsPerRegions = producersPerDepartments.GroupBy(c => c.RegionId).Select(c => new { Id = c.Key, DepartmentIds = c.Select(d => d.DepartmentId) });
+
+                foreach (var region in departmentsPerRegions)
                 {
                     var producersCount = 0;
                     var storesCount = 0;
 
-                    foreach (var pointsPerDepartment in pointsPerDepartments.Where(d => d.RegionId == pointsPerRegion.RegionId))
-                    { 
-                        var producerCount = producersPerDepartments.FirstOrDefault(p => p.DepartmentCode == pointsPerDepartment.Code);
-                        if (producerCount != null)
-                            producersCount += (producerCount.Created ?? 0);
+                    foreach (var departmentId in region.DepartmentIds)
+                    {
+                        var producerPerDepartment = producersPerDepartments.First(p => p.DepartmentId == departmentId);
+                        producersCount += (producerPerDepartment.Created ?? 0);
 
-                        var storeCount = storesPerDepartments.FirstOrDefault(p => p.DepartmentCode == pointsPerDepartment.Code);
-                        if (storeCount != null)
-                            storesCount += (storeCount.Created ?? 0);
+                        var storePerDepartment = storesPerDepartments.First(p => p.DepartmentId == departmentId);
+                        storesCount += (storePerDepartment.Created ?? 0);
+
+                        var pointsPerDepartment = pointsPerDepartments.FirstOrDefault(pp => pp.DepartmentId == departmentId);
 
                         await _queueService.ProcessCommandAsync(UpdateDepartmentCommand.QUEUE_NAME, new UpdateDepartmentCommand(request.RequestUser) 
                             {
-                                Id = pointsPerDepartment.DepartmentId,
-                                Points = pointsPerDepartment.Points ?? 0,
-                                Position = (int)pointsPerDepartment.Position,
-                                Producers = producerCount.Created ?? 0,
-                                Stores = storeCount.Created ?? 0,
-                                Users = pointsPerDepartment.Users
+                                Id = departmentId,
+                                Points = pointsPerDepartment?.Points ?? 0,
+                                Position = (int)pointsPerDepartment?.Position,
+                                Producers = producerPerDepartment.Created ?? 0,
+                                Stores = storePerDepartment.Created ?? 0
                         }, token);
                     }
 
+                    var pointsPerRegion = pointsPerRegions.FirstOrDefault(pp => pp.RegionId == region.Id);
+
                     await _queueService.ProcessCommandAsync(UpdateRegionCommand.QUEUE_NAME, new UpdateRegionCommand(request.RequestUser)
                     {
-                        Id = pointsPerRegion.RegionId,
-                        Points = pointsPerRegion.Points ?? 0,
-                        Position = (int)pointsPerRegion.Position,
+                        Id = region.Id,
+                        Points = pointsPerRegion?.Points ?? 0,
+                        Position = (int)pointsPerRegion?.Position,
                         Producers = producersCount,
-                        Stores = storesCount,
-                        Users = pointsPerRegion.Users
+                        Stores = storesCount
                     }, token);
                 }
 
@@ -141,7 +147,10 @@ namespace Sheaft.Application.Handlers
                     Points = d.Points,
                     Position = d.Position,
                     ProducersCount = d.ProducersCount,
-                    ProducersRequired = d.RequiredProducers
+                    ProducersRequired = d.RequiredProducers,
+                    ConsumersCount = d.ConsumersCount,
+                    StoresCount = d.StoresCount
+
                 }).ToList();
 
                 using (var stream = new MemoryStream(Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(depts))))
@@ -161,6 +170,8 @@ namespace Sheaft.Application.Handlers
             public int Points { get; set; }
             public int ProducersCount { get; set; }
             public int? ProducersRequired { get; set; }
+            public int ConsumersCount { get; set; }
+            public int StoresCount { get; set; }
         }
     }
 }

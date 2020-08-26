@@ -14,7 +14,6 @@ namespace Sheaft.Application.Commands
         public Guid Id { get; set; }
         public int Points { get; set; }
         public int Position { get; set; }
-        public int Users { get; set; }
         public int Producers { get; set; }
         public int Stores { get; set; }
     }

@@ -1,9 +1,13 @@
-﻿namespace Sheaft.Domain.Views
+﻿using System;
+
+namespace Sheaft.Domain.Views
 {
     public class DepartmentProducers
     {
+        public Guid DepartmentId { get; set; }
         public string DepartmentCode { get; set; }
         public string DepartmentName { get; set; }
+        public Guid RegionId { get; set; }
         public string RegionCode { get; set; }
         public string RegionName { get; set; }
         public int? Active { get; set; }
