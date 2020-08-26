@@ -1,5 +1,8 @@
-﻿using MediatR;
+﻿using AutoMapper;
+using MediatR;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Localization;
 using Microsoft.Azure.Functions.Extensions.DependencyInjection;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -8,13 +11,16 @@ using SendGrid;
 using Sheaft.Application.Commands;
 using Sheaft.Application.Events;
 using Sheaft.Application.Handlers;
+using Sheaft.Application.Queries;
 using Sheaft.Infrastructure;
 using Sheaft.Infrastructure.Interop;
+using Sheaft.Mappers;
 using Sheaft.Options;
 using Sheaft.Services;
 using Sheaft.Services.Interop;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -57,9 +63,11 @@ namespace Sheaft.Functions
 
             builder.Services.BuildServiceProvider();
 
+            builder.Services.AddAutoMapper(typeof(ProductProfile).Assembly);
+            builder.Services.AddMediatR(new List<Assembly>() { typeof(RegisterCompanyCommand).Assembly, typeof(UserPointsCreatedEvent).Assembly, typeof(AccountCommandsHandler).Assembly }.ToArray());
+
             builder.Services.AddMemoryCache();
             builder.Services.AddHttpClient();
-            builder.Services.AddMediatR(new List<Assembly>() { typeof(RegisterCompanyCommand).Assembly, typeof(UserPointsCreatedEvent).Assembly, typeof(AccountCommandsHandler).Assembly }.ToArray());
 
             builder.Services.AddSingleton(configuration);
             builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
@@ -73,12 +81,46 @@ namespace Sheaft.Functions
             builder.Services.AddScoped<IEmailService, EmailService>();
             builder.Services.AddScoped<ISignalrService, SignalrService>();
 
+            builder.Services.AddScoped<IAgreementQueries, AgreementQueries>();
+            builder.Services.AddScoped<ICompanyQueries, CompanyQueries>();
+            builder.Services.AddScoped<IDeliveryQueries, DeliveryQueries>();
+            builder.Services.AddScoped<IDepartmentQueries, DepartmentQueries>();
+            builder.Services.AddScoped<IJobQueries, JobQueries>();
+            builder.Services.AddScoped<ILeaderboardQueries, LeaderboardQueries>();
+            builder.Services.AddScoped<INotificationQueries, NotificationQueries>();
+            builder.Services.AddScoped<IPackagingQueries, PackagingQueries>();
+            builder.Services.AddScoped<IProductQueries, ProductQueries>();
+            builder.Services.AddScoped<IPurchaseOrderQueries, PurchaseOrderQueries>();
+            builder.Services.AddScoped<IQuickOrderQueries, QuickOrderQueries>();
+            builder.Services.AddScoped<IRegionQueries, RegionQueries>();
+            builder.Services.AddScoped<ITagQueries, TagQueries>();
+            builder.Services.AddScoped<IUserQueries, UserQueries>();
+
+            builder.Services.AddScoped<IDapperContext, DapperContext>();
+
+            builder.Services.AddOptions();
+
             var databaseConfig = databaseSettings.Get<DatabaseOptions>();
             builder.Services.AddDbContext<IAppDbContext, AppDbContext>(options =>
             {
                 options.UseLazyLoadingProxies();
                 options.UseSqlServer(databaseConfig.ConnectionString, x => x.UseNetTopologySuite());
             }, ServiceLifetime.Scoped);
+
+            builder.Services.AddLocalization(ops => ops.ResourcesPath = "Resources");
+            builder.Services.Configure<RequestLocalizationOptions>(
+                opts =>
+                {
+                    var supportedCultures = new List<CultureInfo>
+                    {
+                        new CultureInfo("en"),
+                        new CultureInfo("fr")
+                    };
+
+                    opts.DefaultRequestCulture = new RequestCulture("en", "fr");
+                    opts.SupportedCultures = supportedCultures;
+                    opts.SupportedUICultures = supportedCultures;
+                });
 
             var commandsInQueueType = typeof(RegisterCompanyCommand).Assembly.GetTypes().Where(t => t.GetFields(BindingFlags.Public | BindingFlags.Static |
                BindingFlags.FlattenHierarchy).Any(c => c.Name == "QUEUE_NAME"));
