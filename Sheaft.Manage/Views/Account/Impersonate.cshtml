@@ -24,7 +24,7 @@
         }
     </div>
 }
-else
+else if (Model != null && Model.Any())
 {
     <table class="table table-hover">
         <thead class="thead-dark">
@@ -67,4 +67,18 @@ else
             }
         </tbody>
     </table>
+}
+else
+{
+    <h4 class="text-center">You must impersonate user to access this resource !</h4>
+    <br/>
+    @using (Html.BeginForm("ImpersonateByEmail", "Account", FormMethod.Post, new { @class = "form-inline" }))
+    {
+        @Html.AntiForgeryToken()
+        <input name="email" type="text" class="form-control  w-50 m-auto" placeholder="User or company email"/>
+        <br/>
+        <button class="btn btn-outline-primary" style="display:none" type="submit">
+            <i class="fa fa-search"></i>
+        </button>
+    }
 }

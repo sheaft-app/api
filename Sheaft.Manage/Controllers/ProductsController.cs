@@ -80,7 +80,7 @@ namespace Sheaft.Manage.Controllers
         {
             var requestUser = await GetRequestUser(token);
             if (!requestUser.IsImpersonating)
-                throw new Exception("You must impersonate producer to create it.");
+                return RedirectToAction("Impersonate", "Account");
 
             ViewBag.Tags = await GetTags(token);
             ViewBag.Packagings = await GetPackagings(requestUser, token);
@@ -144,7 +144,7 @@ namespace Sheaft.Manage.Controllers
         {
             var requestUser = await GetRequestUser(token);
             if (!requestUser.IsImpersonating)
-                throw new Exception("You must impersonate product's producer to edit it.");
+                return RedirectToAction("Impersonate", "Account");
 
             var entity = await _context.Products
                 .AsNoTracking()

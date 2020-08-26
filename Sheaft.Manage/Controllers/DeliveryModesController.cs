@@ -77,7 +77,7 @@ namespace Sheaft.Manage.Controllers
         {
             var requestUser = await GetRequestUser(token);
             if (!requestUser.IsImpersonating)
-                throw new Exception("You must impersonate producer to create it.");
+                return RedirectToAction("Impersonate", "Account");
 
             return View(new DeliveryModeViewModel());
         }
@@ -118,7 +118,7 @@ namespace Sheaft.Manage.Controllers
         {
             var requestUser = await GetRequestUser(token);
             if (!requestUser.IsImpersonating)
-                throw new Exception("You must impersonate delivery's producer to edit it.");
+                return RedirectToAction("Impersonate", "Account");
 
             var entity = await _context.DeliveryModes
                 .AsNoTracking()
