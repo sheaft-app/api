@@ -25,7 +25,7 @@ namespace Sheaft.Functions
         }
 
         [FunctionName("UpdateZoneProgressCommand")]
-        public async Task UpdateZoneProgressCommandAsync([TimerTrigger("0 0 */1 * * *", RunOnStartup = false)] TimerInfo info, ILogger logger, CancellationToken token)
+        public async Task UpdateZoneProgressCommandAsync([TimerTrigger("0 0 */6 * * *", RunOnStartup = true)] TimerInfo info, ILogger logger, CancellationToken token)
         {
             var results = await _mediatr.Send(new UpdateZoneProgressCommand(new RequestUser("zone-functions", Guid.NewGuid().ToString("N"))), token);
             if (!results.Success)
@@ -35,13 +35,13 @@ namespace Sheaft.Functions
         }
 
         [FunctionName("GenerateZonesFileCommand")]
-        public async Task GenerateZonesFileCommandAsync([TimerTrigger("0 0 */2 * * *", RunOnStartup = true)] TimerInfo info, ILogger logger, CancellationToken token)
+        public async Task GenerateZonesFileCommandAsync([TimerTrigger("0 0 */2 * * *", RunOnStartup = false)] TimerInfo info, ILogger logger, CancellationToken token)
         {
             var results = await _mediatr.Send(new GenerateZonesFileCommand(new RequestUser("zone-functions", Guid.NewGuid().ToString("N"))), token);
             if (!results.Success)
                 throw results.Exception;
 
-            logger.LogInformation(nameof(ZoneFunctions.UpdateZoneProgressCommandAsync), "successfully executed");
+            logger.LogInformation(nameof(ZoneFunctions.GenerateZonesFileCommandAsync), "successfully executed");
         }
 
         [FunctionName("UpdateDepartmentCommand")]
@@ -64,6 +64,8 @@ namespace Sheaft.Functions
 
             if (!results.Success)
                 throw results.Exception;
+
+            logger.LogInformation(nameof(ZoneFunctions.UpdateRegionCommandAsync), "successfully executed");
         }
     }
 }

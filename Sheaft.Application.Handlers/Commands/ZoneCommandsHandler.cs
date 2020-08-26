@@ -113,7 +113,7 @@ namespace Sheaft.Application.Handlers
                             {
                                 Id = departmentId,
                                 Points = pointsPerDepartment?.Points ?? 0,
-                                Position = (int)pointsPerDepartment?.Position,
+                                Position = pointsPerDepartment != null ? (int)pointsPerDepartment.Position : 0,
                                 Producers = producerPerDepartment.Created ?? 0,
                                 Stores = storePerDepartment.Created ?? 0
                         }, token);
@@ -125,7 +125,7 @@ namespace Sheaft.Application.Handlers
                     {
                         Id = region.Id,
                         Points = pointsPerRegion?.Points ?? 0,
-                        Position = (int)pointsPerRegion?.Position,
+                        Position = pointsPerRegion != null ? (int)pointsPerRegion.Position : 0,
                         Producers = producersCount,
                         Stores = storesCount
                     }, token);
@@ -150,7 +150,6 @@ namespace Sheaft.Application.Handlers
                     ProducersRequired = d.RequiredProducers,
                     ConsumersCount = d.ConsumersCount,
                     StoresCount = d.StoresCount
-
                 }).ToList();
 
                 using (var stream = new MemoryStream(Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(depts))))
