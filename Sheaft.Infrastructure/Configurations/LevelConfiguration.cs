@@ -15,7 +15,7 @@ namespace Sheaft.Infrastructure
 
             entity.Property(o => o.Name).IsRequired();
 
-            entity.HasMany(c => c.Rewards).WithOne().HasForeignKey("LevelUid").OnDelete(DeleteBehavior.Cascade);
+            entity.HasMany(c => c.Rewards).WithOne(c => c.Level).HasForeignKey("LevelUid").OnDelete(DeleteBehavior.Cascade);
 
             var rewards = entity.Metadata.FindNavigation(nameof(Level.Rewards));
             rewards.SetPropertyAccessMode(PropertyAccessMode.Field);

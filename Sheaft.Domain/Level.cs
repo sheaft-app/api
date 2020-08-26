@@ -36,15 +36,37 @@ namespace Sheaft.Domain.Models
 
         public void SetRewards(IEnumerable<Reward> rewards)
         {
-            _rewards = new List<Reward>();
+            if (!Rewards.Any())
+                _rewards = new List<Reward>();
+
+            _rewards.Clear();
 
             if (rewards != null && rewards.Any())
                 AddRewards(rewards);
         }
 
-        private void AddRewards(IEnumerable<Reward> rewards)
+        public void AddRewards(IEnumerable<Reward> rewards)
         {
-            _rewards.AddRange(rewards);
+            foreach(var reward in rewards)
+            {
+                AddReward(reward);
+            }
+        }
+
+        public void AddReward(Reward reward)
+        {
+            if (!Rewards.Any())
+                _rewards = new List<Reward>();
+
+            _rewards.Add(reward);
+        }
+
+        public void RemoveReward(Reward reward)
+        {
+            if (!Rewards.Any())
+                _rewards = new List<Reward>();
+
+            _rewards.Remove(reward);
         }
 
         public void SetName(string name)
@@ -53,6 +75,26 @@ namespace Sheaft.Domain.Models
                 throw new ValidationException(MessageKind.Level_Name_Required);
 
             Name = name;
+        }
+
+        public void SetNumber(int number)
+        {
+            Number = number;
+        }
+
+        public void SetRequiredPoints(int requiredPoints)
+        {
+            RequiredPoints = requiredPoints;
+        }
+
+        public void Remove()
+        {
+            SetNumber((int)CreatedOn.ToUnixTimeSeconds());
+        }
+
+        public void Restore()
+        {
+            RemovedOn = null;
         }
     }
 }

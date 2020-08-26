@@ -43,6 +43,20 @@
                     <a asp-controller="Departments" asp-action="index" class="card-link">Show</a>
                 </div>
             </div>
+            <div class="card w-25 d-inline-block">
+                <div class="card-body">
+                    <h5 class="card-title">Regions</h5>
+                    <h6 class="card-subtitle mb-2 text-muted">@ViewBag.Regions</h6>
+                    <a asp-controller="Regions" asp-action="index" class="card-link">Show</a>
+                </div>
+            </div>
+            <div class="card w-25 d-inline-block">
+                <div class="card-body">
+                    <h5 class="card-title">Levels</h5>
+                    <h6 class="card-subtitle mb-2 text-muted">@ViewBag.Levels</h6>
+                    <a asp-controller="Levels" asp-action="index" class="card-link">Show</a>
+                </div>
+            </div>
         }
         @if (!user.IsInRole("STORE") && !user.IsInRole("CONSUMER"))
         {
