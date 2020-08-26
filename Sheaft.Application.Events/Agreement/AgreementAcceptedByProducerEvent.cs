@@ -1,4 +1,5 @@
 ﻿using Sheaft.Core;
+using Newtonsoft.Json;
 
 namespace Sheaft.Application.Events
 {
@@ -7,7 +8,8 @@ namespace Sheaft.Application.Events
         public const string QUEUE_NAME = "event-agreements-accepted-producer";
         public const string MAILING_TEMPLATE_ID = "";
 
-        public AgreementAcceptedByProducerEvent(RequestUser user) : base(user)
+        [JsonConstructor]
+        public AgreementAcceptedByProducerEvent(RequestUser requestUser) : base(requestUser)
         {
         }
     }

@@ -1,5 +1,6 @@
 ﻿using Sheaft.Core;
 using System;
+using Newtonsoft.Json;
 
 namespace Sheaft.Application.Events
 {
@@ -8,7 +9,8 @@ namespace Sheaft.Application.Events
         public const string QUEUE_NAME = "event-purchaseorders-refused";
         public const string MAILING_TEMPLATE_ID = "d-05a0d138172d4e9ab46b30c139c5f72e";
 
-        public PurchaseOrderRefusedEvent(RequestUser user) : base(user)
+        [JsonConstructor]
+        public PurchaseOrderRefusedEvent(RequestUser requestUser) : base(requestUser)
         {
         }
 

@@ -1,5 +1,6 @@
 ﻿using Sheaft.Core;
 using System;
+using Newtonsoft.Json;
 
 namespace Sheaft.Application.Events
 {
@@ -8,7 +9,8 @@ namespace Sheaft.Application.Events
         public const string QUEUE_NAME = "event-accounts-export-processing";
         public const string MAILING_TEMPLATE_ID = "";
 
-        public AccountExportDataProcessingEvent(RequestUser user) : base(user)
+        [JsonConstructor]
+        public AccountExportDataProcessingEvent(RequestUser requestUser) : base(requestUser)
         {
         }
 

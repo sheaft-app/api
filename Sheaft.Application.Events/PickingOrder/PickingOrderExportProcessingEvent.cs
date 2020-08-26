@@ -1,5 +1,6 @@
 ﻿using Sheaft.Core;
 using System;
+using Newtonsoft.Json;
 
 namespace Sheaft.Application.Events
 {
@@ -7,7 +8,8 @@ namespace Sheaft.Application.Events
     {
         public const string QUEUE_NAME = "event-pickingorders-export-processing";
 
-        public PickingOrderExportProcessingEvent(RequestUser user) : base(user)
+        [JsonConstructor]
+        public PickingOrderExportProcessingEvent(RequestUser requestUser) : base(requestUser)
         {
         }
 

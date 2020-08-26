@@ -1,5 +1,6 @@
 ﻿using Sheaft.Core;
 using System;
+using Newtonsoft.Json;
 
 namespace Sheaft.Application.Events
 {
@@ -8,7 +9,8 @@ namespace Sheaft.Application.Events
         public const string QUEUE_NAME = "event-products-import-succeeded";
         public const string MAILING_TEMPLATE_ID = "d-e142a041f6de42779ed3e704df0026b6";
 
-        public ProductImportSucceededEvent(RequestUser user) : base(user)
+        [JsonConstructor]
+        public ProductImportSucceededEvent(RequestUser requestUser) : base(requestUser)
         {
         }
 

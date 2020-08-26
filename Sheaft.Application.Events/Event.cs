@@ -9,11 +9,11 @@ namespace Sheaft.Application.Events
 
     public abstract class Event : IEvent
     {
-        protected Event(RequestUser user)
+        protected Event(RequestUser requestUser)
         {
-            RequestUser = user;
+            RequestUser = requestUser;
         }
 
-        public RequestUser RequestUser { get; }
+        public RequestUser RequestUser { get; protected set; }
     }
 }

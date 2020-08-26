@@ -1,6 +1,7 @@
 ﻿using Sheaft.Core;
 using Sheaft.Interop.Enums;
 using System;
+using Newtonsoft.Json;
 
 namespace Sheaft.Application.Events
 {
@@ -8,7 +9,8 @@ namespace Sheaft.Application.Events
     {
         public const string QUEUE_NAME = "event-users-created-points";
 
-        public UserPointsCreatedEvent(RequestUser user) : base(user)
+        [JsonConstructor]
+        public UserPointsCreatedEvent(RequestUser requestUser) : base(requestUser)
         {
         }
 
