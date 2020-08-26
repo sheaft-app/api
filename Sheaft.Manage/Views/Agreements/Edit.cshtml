@@ -33,6 +33,13 @@
                 @Html.LabelFor(m => m.UpdatedOn)
                 @Html.TextBoxFor(m => m.UpdatedOn, null, new { @class = "form-control", @disabled = "disabled" })
             </div>
+            @if (Model.RemovedOn.HasValue)
+            {
+                <div class="form-group">
+                    @Html.LabelFor(m => m.RemovedOn)
+                    @Html.TextBoxFor(m => m.RemovedOn, null, new { @class = "form-control", @disabled = "disabled" })
+                </div>
+            }
             <h4>Delivery</h4>
             <div class="form-group">
                 @Html.LabelFor(m => m.Delivery.Name)

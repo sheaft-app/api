@@ -21,14 +21,22 @@
                 @Html.LabelFor(c => c.Status, new { @class = "form-label" })
                 @Html.TextBoxFor(c => c.Status, null, new { @class = "form-control", @disabled = "disabled" })
             </div>
+
             <div class="form-group">
-                @Html.LabelFor(c => c.CreatedOn, new { @class = "form-label" })
-                @Html.TextBoxFor(c => c.CreatedOn, null, new { @class = "form-control", @disabled = "disabled" })
+                @Html.LabelFor(m => m.CreatedOn)
+                @Html.TextBoxFor(m => m.CreatedOn, null, new { @class = "form-control", @disabled = "disabled" })
             </div>
             <div class="form-group">
-                @Html.LabelFor(c => c.UpdatedOn, new { @class = "form-label" })
-                @Html.TextBoxFor(c => c.UpdatedOn, null, new { @class = "form-control", @disabled = "disabled" })
+                @Html.LabelFor(m => m.UpdatedOn)
+                @Html.TextBoxFor(m => m.UpdatedOn, null, new { @class = "form-control", @disabled = "disabled" })
             </div>
+            @if (Model.RemovedOn.HasValue)
+            {
+                <div class="form-group">
+                    @Html.LabelFor(m => m.RemovedOn)
+                    @Html.TextBoxFor(m => m.RemovedOn, null, new { @class = "form-control", @disabled = "disabled" })
+                </div>
+            }
             <div class="form-group">
                 @Html.LabelFor(c => c.TotalWholeSalePrice, new { @class = "form-label" })
                 @Html.TextBoxFor(c => c.TotalWholeSalePrice, null, new { @class = "form-control", @disabled = "disabled" })

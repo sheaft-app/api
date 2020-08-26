@@ -44,6 +44,21 @@
                 @Html.LabelFor(m => m.Description)
                 @Html.TextAreaFor(m => m.Description, new { @class = "form-control" })
             </div>
+            <div class="form-group">
+                @Html.LabelFor(m => m.CreatedOn)
+                @Html.TextBoxFor(m => m.CreatedOn, null, new { @class = "form-control", @disabled = "disabled" })
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(m => m.UpdatedOn)
+                @Html.TextBoxFor(m => m.UpdatedOn, null, new { @class = "form-control", @disabled = "disabled" })
+            </div>
+            @if (Model.RemovedOn.HasValue)
+            {
+                <div class="form-group">
+                    @Html.LabelFor(m => m.RemovedOn)
+                    @Html.TextBoxFor(m => m.RemovedOn, null, new { @class = "form-control", @disabled = "disabled" })
+                </div>
+            }
 
             <br />
             <a asp-controller="Packagings" asp-action="Index" class="btn btn-light">

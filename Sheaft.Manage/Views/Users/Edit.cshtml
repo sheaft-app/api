@@ -36,14 +36,6 @@
                 @Html.TextBoxFor(m => m.Phone, null, new { @class = "form-control" })
             </div>
             <div class="form-group">
-                @Html.LabelFor(m => m.CreatedOn)
-                @Html.TextBoxFor(m => m.CreatedOn, null, new { @class = "form-control", @disabled = "disabled" })
-            </div>
-            <div class="form-group">
-                @Html.LabelFor(m => m.UpdatedOn)
-                @Html.TextBoxFor(m => m.UpdatedOn, null, new { @class = "form-control", @disabled = "disabled" })
-            </div>
-            <div class="form-group">
                 @Html.LabelFor(c => c.Picture, new { @class = "form-label" })
                 @if (!string.IsNullOrWhiteSpace(Model.Picture))
                 {
@@ -68,6 +60,21 @@
                 <div class="form-group">
                     @Html.LabelFor(m => m.Company)
                     @Html.TextBoxFor(m => m.Company, null, new { @class = "form-control", @disabled = "disabled" })
+                </div>
+            }
+            <div class="form-group">
+                @Html.LabelFor(m => m.CreatedOn)
+                @Html.TextBoxFor(m => m.CreatedOn, null, new { @class = "form-control", @disabled = "disabled" })
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(m => m.UpdatedOn)
+                @Html.TextBoxFor(m => m.UpdatedOn, null, new { @class = "form-control", @disabled = "disabled" })
+            </div>
+            @if (Model.RemovedOn.HasValue)
+            {
+                <div class="form-group">
+                    @Html.LabelFor(m => m.RemovedOn)
+                    @Html.TextBoxFor(m => m.RemovedOn, null, new { @class = "form-control", @disabled = "disabled" })
                 </div>
             }
 
