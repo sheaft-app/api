@@ -87,6 +87,7 @@ namespace Sheaft.Manage.Controllers
             {
                 Id = model.Id,
                 Name = model.Name,
+                RequiredProducers = model.RequiredProducers
             }, token);
 
             if (!result.Success)

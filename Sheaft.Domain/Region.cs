@@ -38,6 +38,11 @@ namespace Sheaft.Domain.Models
             Name = name;
         }
 
+        public void SetRequiredProducers(int? requiredProducers)
+        {
+            RequiredProducers = requiredProducers;
+        }
+
         public void SetPoints(int points)
         {
             Points = points;

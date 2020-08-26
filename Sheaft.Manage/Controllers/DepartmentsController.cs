@@ -86,7 +86,8 @@ namespace Sheaft.Manage.Controllers
             var result = await _mediatr.Send(new UpdateDepartmentCommand(requestUser)
             {
                 Id = model.Id,
-                Name = model.Name
+                Name = model.Name,
+                RequiredProducers = model.RequiredProducers
             }, token);
 
             if (!result.Success)

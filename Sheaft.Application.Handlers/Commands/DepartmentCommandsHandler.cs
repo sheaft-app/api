@@ -32,6 +32,8 @@ namespace Sheaft.Application.Handlers
                 var entity = await _context.GetByIdAsync<Department>(request.Id, token);
 
                 entity.SetName(request.Name);
+                entity.SetRequiredProducers(request.RequiredProducers);
+
                 _context.Update(entity);
 
                 return OkResult(await _context.SaveChangesAsync(token) > 0);
