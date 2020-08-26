@@ -1,11 +1,13 @@
 ﻿using System;
+using Newtonsoft.Json;
 using Sheaft.Core;
 
 namespace Sheaft.Application.Commands
 {
     public class UpdateQuickOrderCommand : Command<bool>
     {
-        public UpdateQuickOrderCommand(RequestUser user) : base(user)
+        [JsonConstructor]
+        public UpdateQuickOrderCommand(RequestUser requestUser) : base(requestUser)
         {
         }
 

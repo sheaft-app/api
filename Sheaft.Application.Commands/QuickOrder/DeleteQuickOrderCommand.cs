@@ -1,15 +1,16 @@
 ﻿using System;
-using System.Collections.Generic;
+using Newtonsoft.Json;
 using Sheaft.Core;
 
 namespace Sheaft.Application.Commands
 {
-    public class DeleteQuickOrdersCommand : Command<bool>
+    public class DeleteQuickOrderCommand : Command<bool>
     {
-        public DeleteQuickOrdersCommand(RequestUser user) : base(user)
+        [JsonConstructor]
+        public DeleteQuickOrderCommand(RequestUser requestUser) : base(requestUser)
         {
         }
 
-        public IEnumerable<Guid> Ids { get; set; }
+        public Guid Id { get; set; }
     }
 }

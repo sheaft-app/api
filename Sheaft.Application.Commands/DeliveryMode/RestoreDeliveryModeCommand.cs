@@ -1,11 +1,13 @@
 ﻿using System;
+using Newtonsoft.Json;
 using Sheaft.Core;
 
 namespace Sheaft.Application.Commands
 {
     public class RestoreDeliveryModeCommand : Command<bool>
     {
-        public RestoreDeliveryModeCommand(RequestUser user) : base(user)
+        [JsonConstructor]
+        public RestoreDeliveryModeCommand(RequestUser requestUser) : base(requestUser)
         {
         }
 

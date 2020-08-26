@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using Newtonsoft.Json;
 using Sheaft.Core;
 
 namespace Sheaft.Application.Commands
 {
     public class DeleteUsersCommand : Command<bool>
     {
-        public DeleteUsersCommand(RequestUser user) : base(user)
+        [JsonConstructor]
+        public DeleteUsersCommand(RequestUser requestUser) : base(requestUser)
         {
         }
 

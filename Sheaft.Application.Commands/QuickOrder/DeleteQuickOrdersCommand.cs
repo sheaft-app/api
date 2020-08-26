@@ -5,14 +5,13 @@ using Sheaft.Core;
 
 namespace Sheaft.Application.Commands
 {
-    public class DeleteCompaniesCommand : Command<bool>
+    public class DeleteQuickOrdersCommand : Command<bool>
     {
         [JsonConstructor]
-        public DeleteCompaniesCommand(RequestUser requestUser) : base(requestUser)
+        public DeleteQuickOrdersCommand(RequestUser requestUser) : base(requestUser)
         {
         }
 
         public IEnumerable<Guid> Ids { get; set; }
-        public string Reason { get; set; }
     }
 }

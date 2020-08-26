@@ -1,11 +1,13 @@
 ﻿using System;
+using Newtonsoft.Json;
 using Sheaft.Core;
 
 namespace Sheaft.Application.Commands
 {
     public class ResetJobCommand : Command<bool>
     {
-        public ResetJobCommand(RequestUser user) : base(user)
+        [JsonConstructor]
+        public ResetJobCommand(RequestUser requestUser) : base(requestUser)
         {
         }
 

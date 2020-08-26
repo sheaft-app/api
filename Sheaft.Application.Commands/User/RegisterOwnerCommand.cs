@@ -1,14 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
+using Newtonsoft.Json;
 using Sheaft.Core;
 
 namespace Sheaft.Application.Commands
 {
     public class RegisterOwnerCommand : UserCommand<Guid>
     {
-        public RegisterOwnerCommand(RequestUser user) : base(user)
+        [JsonConstructor]
+        public RegisterOwnerCommand(RequestUser requestUser) : base(requestUser)
         {
-            Id = user.Id;
+            Id = requestUser.Id;
         }
 
         public string SponsoringCode { get; set; }

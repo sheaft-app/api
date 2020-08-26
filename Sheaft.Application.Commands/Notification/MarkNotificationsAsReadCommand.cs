@@ -1,11 +1,13 @@
 using System;
+using Newtonsoft.Json;
 using Sheaft.Core;
 
 namespace Sheaft.Application.Commands
 {
     public class MarkUserNotificationsAsReadCommand : Command<bool>
     {
-        public MarkUserNotificationsAsReadCommand(RequestUser user) : base(user)
+        [JsonConstructor]
+        public MarkUserNotificationsAsReadCommand(RequestUser requestUser) : base(requestUser)
         {
         }
 

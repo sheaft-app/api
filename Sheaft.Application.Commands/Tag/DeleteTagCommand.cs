@@ -1,11 +1,13 @@
 ﻿using System;
+using Newtonsoft.Json;
 using Sheaft.Core;
 
 namespace Sheaft.Application.Commands
 {
     public class DeleteTagCommand : Command<bool>
     {
-        public DeleteTagCommand(RequestUser user) : base(user)
+        [JsonConstructor]
+        public DeleteTagCommand(RequestUser requestUser) : base(requestUser)
         {
         }
 

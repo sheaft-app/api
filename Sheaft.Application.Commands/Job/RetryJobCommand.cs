@@ -1,11 +1,13 @@
 ﻿using System;
+using Newtonsoft.Json;
 using Sheaft.Core;
 
 namespace Sheaft.Application.Commands
 {
     public class RetryJobCommand : Command<bool>
     {
-        public RetryJobCommand(RequestUser user) : base(user)
+        [JsonConstructor]
+        public RetryJobCommand(RequestUser requestUser) : base(requestUser)
         {
         }
 

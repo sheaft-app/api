@@ -1,11 +1,13 @@
 using System;
+using Newtonsoft.Json;
 using Sheaft.Core;
 
 namespace Sheaft.Application.Commands
 {
     public class RateProductCommand : Command<bool>
     {
-        public RateProductCommand(RequestUser user) : base(user)
+        [JsonConstructor]
+        public RateProductCommand(RequestUser requestUser) : base(requestUser)
         {
         }
 

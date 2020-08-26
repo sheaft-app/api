@@ -1,11 +1,13 @@
 ﻿using System;
+using Newtonsoft.Json;
 using Sheaft.Core;
 
 namespace Sheaft.Application.Commands
 {
     public class DeleteAgreementCommand : Command<bool>
     {
-        public DeleteAgreementCommand(RequestUser user) : base(user)
+        [JsonConstructor]
+        public DeleteAgreementCommand(RequestUser requestUser) : base(requestUser)
         {
         }
 

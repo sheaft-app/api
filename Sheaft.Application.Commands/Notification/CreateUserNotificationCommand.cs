@@ -1,4 +1,5 @@
 using System;
+using Newtonsoft.Json;
 using Sheaft.Core;
 
 namespace Sheaft.Application.Commands
@@ -7,7 +8,8 @@ namespace Sheaft.Application.Commands
     {
         public const string QUEUE_NAME = "command-notify-user";
 
-        public CreateUserNotificationCommand(RequestUser user) : base(user)
+        [JsonConstructor]
+        public CreateUserNotificationCommand(RequestUser requestUser) : base(requestUser)
         {
         }
 

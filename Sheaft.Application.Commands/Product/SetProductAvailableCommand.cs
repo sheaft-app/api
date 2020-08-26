@@ -1,12 +1,14 @@
 using System;
 using System.Collections.Generic;
+using Newtonsoft.Json;
 using Sheaft.Core;
 
 namespace Sheaft.Application.Commands
 {
     public class SetProductsAvailabilityCommand : Command<bool>
     {
-        public SetProductsAvailabilityCommand(RequestUser user) : base(user)
+        [JsonConstructor]
+        public SetProductsAvailabilityCommand(RequestUser requestUser) : base(requestUser)
         {
         }
 

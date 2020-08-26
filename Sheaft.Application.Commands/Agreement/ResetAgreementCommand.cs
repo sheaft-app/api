@@ -1,12 +1,14 @@
 ﻿using Sheaft.Interop.Enums;
 using System;
 using Sheaft.Core;
+using Newtonsoft.Json;
 
 namespace Sheaft.Application.Commands
 {
     public class ResetAgreementStatusToCommand : Command<bool>
     {
-        public ResetAgreementStatusToCommand(RequestUser user) : base(user)
+        [JsonConstructor]
+        public ResetAgreementStatusToCommand(RequestUser requestUser) : base(requestUser)
         {
         }
 

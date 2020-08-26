@@ -1,11 +1,13 @@
 ﻿using System;
+using Newtonsoft.Json;
 using Sheaft.Core;
 
 namespace Sheaft.Application.Commands
 {
     public class StartJobCommand : Command<bool>
     {
-        public StartJobCommand(RequestUser user) : base(user)
+        [JsonConstructor]
+        public StartJobCommand(RequestUser requestUser) : base(requestUser)
         {
         }
 

@@ -2,12 +2,14 @@
 using System.Collections.Generic;
 using Sheaft.Models.Inputs;
 using Sheaft.Core;
+using Newtonsoft.Json;
 
 namespace Sheaft.Application.Commands
 {
     public class CreateQuickOrderCommand : Command<Guid>
     {
-        public CreateQuickOrderCommand(RequestUser user) : base(user)
+        [JsonConstructor]
+        public CreateQuickOrderCommand(RequestUser requestUser) : base(requestUser)
         {
         }
 

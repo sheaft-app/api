@@ -1,11 +1,13 @@
 using System;
+using Newtonsoft.Json;
 using Sheaft.Core;
 
 namespace Sheaft.Application.Commands
 {
     public class CancelJobCommand : Command<bool>
     {
-        public CancelJobCommand(RequestUser user) : base(user)
+        [JsonConstructor]
+        public CancelJobCommand(RequestUser requestUser) : base(requestUser)
         {
         }
 

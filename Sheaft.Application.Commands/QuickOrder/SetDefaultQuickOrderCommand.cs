@@ -1,11 +1,13 @@
 ﻿using System;
+using Newtonsoft.Json;
 using Sheaft.Core;
 
 namespace Sheaft.Application.Commands
 {
     public class SetDefaultQuickOrderCommand : Command<bool>
     {
-        public SetDefaultQuickOrderCommand(RequestUser user) : base(user)
+        [JsonConstructor]
+        public SetDefaultQuickOrderCommand(RequestUser requestUser) : base(requestUser)
         {
         }
 

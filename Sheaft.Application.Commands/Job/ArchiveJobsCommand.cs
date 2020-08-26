@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using Newtonsoft.Json;
 using Sheaft.Core;
 
 namespace Sheaft.Application.Commands
 {
     public class ArchiveJobsCommand : Command<bool>
     {
-        public ArchiveJobsCommand(RequestUser user) : base(user)
+        [JsonConstructor]
+        public ArchiveJobsCommand(RequestUser requestUser) : base(requestUser)
         {
         }
 

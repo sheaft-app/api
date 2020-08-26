@@ -2,12 +2,14 @@
 using System.Collections.Generic;
 using Sheaft.Interop.Enums;
 using Sheaft.Core;
+using Newtonsoft.Json;
 
 namespace Sheaft.Application.Commands
 {
     public abstract class ProductCommand<T> : Command<T>
     {
-        protected ProductCommand(RequestUser user) : base(user)
+        [JsonConstructor]
+        protected ProductCommand(RequestUser requestUser) : base(requestUser)
         {
         }
 

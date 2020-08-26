@@ -1,11 +1,13 @@
-﻿using Sheaft.Core;
+﻿using Newtonsoft.Json;
+using Sheaft.Core;
 using System;
 
 namespace Sheaft.Application.Commands
 {
     public class RestoreTagCommand : Command<bool>
     {
-        public RestoreTagCommand(RequestUser user) : base(user)
+        [JsonConstructor]
+        public RestoreTagCommand(RequestUser requestUser) : base(requestUser)
         {
         }
 

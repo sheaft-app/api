@@ -1,11 +1,13 @@
 ﻿using System;
+using Newtonsoft.Json;
 using Sheaft.Core;
 
 namespace Sheaft.Application.Commands
 {
     public class CreatePackagingCommand : Command<Guid>
     {
-        public CreatePackagingCommand(RequestUser user) : base(user)
+        [JsonConstructor]
+        public CreatePackagingCommand(RequestUser requestUser) : base(requestUser)
         {
         }
 

@@ -1,4 +1,5 @@
-﻿using Sheaft.Core;
+﻿using Newtonsoft.Json;
+using Sheaft.Core;
 using Sheaft.Interop.Enums;
 using System;
 
@@ -6,7 +7,8 @@ namespace Sheaft.Application.Commands
 {
     public class UpdateTagCommand : Command<bool>
     {
-        public UpdateTagCommand(RequestUser user) : base(user)
+        [JsonConstructor]
+        public UpdateTagCommand(RequestUser requestUser) : base(requestUser)
         {
         }
 

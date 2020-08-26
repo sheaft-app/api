@@ -10,11 +10,11 @@ namespace Sheaft.Application.Commands
 
     public abstract class Command<T> : ICommand<T>
     {
-        protected Command(RequestUser user)
+        protected Command(RequestUser requestUser)
         {
-            RequestUser = user;
+            RequestUser = requestUser;
         }
 
-        public RequestUser RequestUser { get; private set; }
+        public RequestUser RequestUser { get; protected set; }
     }
 }

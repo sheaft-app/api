@@ -1,12 +1,14 @@
 ﻿using Sheaft.Interop.Enums;
 using System;
 using Sheaft.Core;
+using Newtonsoft.Json;
 
 namespace Sheaft.Application.Commands
 {
     public class CreateTagCommand : Command<Guid>
     {
-        public CreateTagCommand(RequestUser user) : base(user)
+        [JsonConstructor]
+        public CreateTagCommand(RequestUser requestUser) : base(requestUser)
         {
         }
 

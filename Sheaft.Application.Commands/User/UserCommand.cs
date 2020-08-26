@@ -1,11 +1,13 @@
 ﻿using System;
+using Newtonsoft.Json;
 using Sheaft.Core;
 
 namespace Sheaft.Application.Commands
 {
     public abstract class UserCommand<T> : Command<T>
     {
-        protected UserCommand(RequestUser user) : base(user)
+        [JsonConstructor]
+        protected UserCommand(RequestUser requestUser) : base(requestUser)
         {
         }
 

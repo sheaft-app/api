@@ -2,12 +2,14 @@
 using System.Collections.Generic;
 using Sheaft.Models.Inputs;
 using Sheaft.Core;
+using Newtonsoft.Json;
 
 namespace Sheaft.Application.Commands
 {
     public class CreatePurchaseOrdersCommand : Command<IEnumerable<Guid>>
     {
-        public CreatePurchaseOrdersCommand(RequestUser user) : base(user)
+        [JsonConstructor]
+        public CreatePurchaseOrdersCommand(RequestUser requestUser) : base(requestUser)
         {
         }
 

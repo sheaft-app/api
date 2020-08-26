@@ -1,11 +1,13 @@
 ﻿using System;
+using Newtonsoft.Json;
 using Sheaft.Core;
 
 namespace Sheaft.Application.Commands
 {
     public class GenerateUserSponsoringCodeCommand : Command<string>
     {
-        public GenerateUserSponsoringCodeCommand(RequestUser user) : base(user)
+        [JsonConstructor]
+        public GenerateUserSponsoringCodeCommand(RequestUser requestUser) : base(requestUser)
         {
         }
 

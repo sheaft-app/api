@@ -1,11 +1,13 @@
-﻿using Sheaft.Core;
+﻿using Newtonsoft.Json;
+using Sheaft.Core;
 using System;
 
 namespace Sheaft.Application.Commands
 {
     public class QueueExportAccountDataCommand : Command<Guid>
     {
-        public QueueExportAccountDataCommand(RequestUser user) : base(user)
+        [JsonConstructor]
+        public QueueExportAccountDataCommand(RequestUser requestUser) : base(requestUser)
         {
         }
 

@@ -1,11 +1,13 @@
 using System;
+using Newtonsoft.Json;
 using Sheaft.Core;
 
 namespace Sheaft.Application.Commands
 {
     public class RegisterConsumerCommand : UserCommand<Guid>
     {
-        public RegisterConsumerCommand(RequestUser user) : base(user)
+        [JsonConstructor]
+        public RegisterConsumerCommand(RequestUser requestUser) : base(requestUser)
         {
         }
 

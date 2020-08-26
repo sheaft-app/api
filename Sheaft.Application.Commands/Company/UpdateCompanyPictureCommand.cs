@@ -1,11 +1,13 @@
 ﻿using System;
+using Newtonsoft.Json;
 using Sheaft.Core;
 
 namespace Sheaft.Application.Commands
 {
     public class UpdateCompanyPictureCommand : Command<bool>
     {
-        public UpdateCompanyPictureCommand(RequestUser user) : base(user)
+        [JsonConstructor]
+        public UpdateCompanyPictureCommand(RequestUser requestUser) : base(requestUser)
         {
         }
 

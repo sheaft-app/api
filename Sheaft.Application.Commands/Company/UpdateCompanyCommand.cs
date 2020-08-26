@@ -3,12 +3,14 @@ using System.Collections.Generic;
 using Sheaft.Interop.Enums;
 using Sheaft.Models.Inputs;
 using Sheaft.Core;
+using Newtonsoft.Json;
 
 namespace Sheaft.Application.Commands
 {
     public class UpdateCompanyCommand : Command<bool>
     {
-        public UpdateCompanyCommand(RequestUser user) : base(user)
+        [JsonConstructor]
+        public UpdateCompanyCommand(RequestUser requestUser) : base(requestUser)
         {
         }
 

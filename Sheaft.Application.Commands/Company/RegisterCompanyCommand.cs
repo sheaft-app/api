@@ -2,12 +2,14 @@
 using System.Collections.Generic;
 using Sheaft.Models.Inputs;
 using Sheaft.Core;
+using Newtonsoft.Json;
 
 namespace Sheaft.Application.Commands
 {
     public class RegisterCompanyCommand : Command<Guid>
     {
-        public RegisterCompanyCommand(RequestUser user) : base(user)
+        [JsonConstructor]
+        public RegisterCompanyCommand(RequestUser requestUser) : base(requestUser)
         {
         }
 

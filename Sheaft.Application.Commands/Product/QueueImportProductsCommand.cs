@@ -1,12 +1,14 @@
 using System;
 using System.IO;
+using Newtonsoft.Json;
 using Sheaft.Core;
 
 namespace Sheaft.Application.Commands
 {
     public class QueueImportProductsCommand : Command<Guid>
     {
-        public QueueImportProductsCommand(RequestUser user) : base(user)
+        [JsonConstructor]
+        public QueueImportProductsCommand(RequestUser requestUser) : base(requestUser)
         {
         }
 

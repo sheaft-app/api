@@ -1,12 +1,14 @@
 using System;
 using System.Collections.Generic;
+using Newtonsoft.Json;
 using Sheaft.Core;
 
 namespace Sheaft.Application.Commands
 {
     public class PauseJobsCommand : Command<bool>
     {
-        public PauseJobsCommand(RequestUser user) : base(user)
+        [JsonConstructor]
+        public PauseJobsCommand(RequestUser requestUser) : base(requestUser)
         {
         }
 

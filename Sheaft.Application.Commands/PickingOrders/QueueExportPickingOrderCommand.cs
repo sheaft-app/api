@@ -1,12 +1,14 @@
 using System;
 using System.Collections.Generic;
+using Newtonsoft.Json;
 using Sheaft.Core;
 
 namespace Sheaft.Application.Commands
 {
     public class QueueExportPickingOrderCommand : Command<Guid>
     {
-        public QueueExportPickingOrderCommand(RequestUser user) : base(user)
+        [JsonConstructor]
+        public QueueExportPickingOrderCommand(RequestUser requestUser) : base(requestUser)
         {
         }
 

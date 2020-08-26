@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using Newtonsoft.Json;
 using Sheaft.Core;
 
 namespace Sheaft.Application.Commands
 {
     public class FailJobsCommand : Command<bool>
     {
-        public FailJobsCommand(RequestUser user) : base(user)
+        [JsonConstructor]
+        public FailJobsCommand(RequestUser requestUser) : base(requestUser)
         {
         }
 

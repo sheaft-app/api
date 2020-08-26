@@ -3,12 +3,14 @@ using System.Collections.Generic;
 using Sheaft.Models.Inputs;
 using Sheaft.Interop.Enums;
 using Sheaft.Core;
+using Newtonsoft.Json;
 
 namespace Sheaft.Application.Commands
 {
     public class UpdateDeliveryModeCommand : Command<bool>
     {
-        public UpdateDeliveryModeCommand(RequestUser user) : base(user)
+        [JsonConstructor]
+        public UpdateDeliveryModeCommand(RequestUser requestUser) : base(requestUser)
         {
         }
 

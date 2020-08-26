@@ -1,13 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using Newtonsoft.Json;
 using Sheaft.Core;
 
 namespace Sheaft.Application.Commands
 {
-
     public class ChangeUserRolesCommand : Command<bool>
     {
-        public ChangeUserRolesCommand(RequestUser user) : base(user)
+        [JsonConstructor]
+        public ChangeUserRolesCommand(RequestUser requestUser) : base(requestUser)
         {
         }
 

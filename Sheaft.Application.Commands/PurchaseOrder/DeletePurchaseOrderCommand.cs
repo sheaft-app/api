@@ -1,11 +1,13 @@
 ﻿using System;
+using Newtonsoft.Json;
 using Sheaft.Core;
 
 namespace Sheaft.Application.Commands
 {
     public class DeletePurchaseOrderCommand : Command<bool>
     {
-        public DeletePurchaseOrderCommand(RequestUser user) : base(user)
+        [JsonConstructor]
+        public DeletePurchaseOrderCommand(RequestUser requestUser) : base(requestUser)
         {
         }
 

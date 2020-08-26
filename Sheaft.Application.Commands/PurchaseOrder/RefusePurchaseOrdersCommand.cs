@@ -1,12 +1,14 @@
 using System;
 using System.Collections.Generic;
+using Newtonsoft.Json;
 using Sheaft.Core;
 
 namespace Sheaft.Application.Commands
 {
     public class RefusePurchaseOrdersCommand : Command<bool>
     {
-        public RefusePurchaseOrdersCommand(RequestUser user) : base(user)
+        [JsonConstructor]
+        public RefusePurchaseOrdersCommand(RequestUser requestUser) : base(requestUser)
         {
         }
 

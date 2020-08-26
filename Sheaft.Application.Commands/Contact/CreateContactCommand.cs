@@ -1,11 +1,13 @@
 ﻿using System;
+using Newtonsoft.Json;
 using Sheaft.Core;
 
 namespace Sheaft.Application.Commands
 {
     public class CreateContactCommand : Command<bool>
     {
-        public CreateContactCommand(RequestUser user) : base(user)
+        [JsonConstructor]
+        public CreateContactCommand(RequestUser requestUser) : base(requestUser)
         {
         }
 
