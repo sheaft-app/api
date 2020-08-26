@@ -13,7 +13,8 @@ namespace Sheaft.Domain.Models
         {
             Id = id;
             Code = code;
-            Name = name;
+
+            SetName(name);
         }
 
         public Guid Id { get; private set; }
@@ -28,6 +29,14 @@ namespace Sheaft.Domain.Models
         public int StoresCount { get; private set; }
         public int ConsumersCount { get; private set; }
         public int? RequiredProducers { get; private set; }
+
+        public void SetName(string name)
+        {
+            if (name == null)
+                return;
+
+            Name = name;
+        }
 
         public void SetPoints(int points)
         {

@@ -4,12 +4,12 @@ using System;
 
 namespace Sheaft.Application.Commands
 {
-    public class UpdateRegionCommand : Command<bool>
+    public class UpdateRegionStatsCommand : Command<bool>
     {
-        public const string QUEUE_NAME = "command-regions-update";
+        public const string QUEUE_NAME = "command-zones-region-stats";
 
         [JsonConstructor]
-        public UpdateRegionCommand(RequestUser requestUser) : base(requestUser)
+        public UpdateRegionStatsCommand(RequestUser requestUser) : base(requestUser)
         {
         }
 

@@ -33,6 +33,7 @@ namespace Sheaft.Manage.Controllers
             ViewBag.Consumers = await _context.Users.CountAsync(c => c.Company == null, token);
             ViewBag.Tags = await _context.Tags.CountAsync(c => !c.RemovedOn.HasValue, token);
             ViewBag.Departments = await _context.Departments.CountAsync(c => !c.RemovedOn.HasValue, token);
+            ViewBag.Regions = await _context.Regions.CountAsync(c => !c.RemovedOn.HasValue, token);
 
             if (requestUser.IsImpersonating)
             {
