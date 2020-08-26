@@ -13,7 +13,8 @@ namespace Sheaft.Domain.Models
         {
             Id = id;
             Code = code;
-            Name = name;
+
+            SetName(name);
         }
 
         public Guid Id { get; private set; }
@@ -30,6 +31,14 @@ namespace Sheaft.Domain.Models
         public int? RequiredProducers { get; private set; }
         public virtual Region Region { get; private set; }
         public virtual Level Level { get; private set; }
+
+        public void SetName(string name)
+        {
+            if (name == null)
+                return;
+
+            Name = name;
+        }
 
         public void SetLevel(Level level)
         {
@@ -54,6 +63,21 @@ namespace Sheaft.Domain.Models
         public void SetConsumersCount(int count)
         {
             ConsumersCount = count;
+        }
+
+        public void SetPosition(object position)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void SetProducersCount(object producers)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void SetStoresCount(object stores)
+        {
+            throw new NotImplementedException();
         }
     }
 }

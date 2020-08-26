@@ -17,9 +17,7 @@ namespace Sheaft.Application.Handlers
 {
     public class ZoneCommandsHandler : CommandsHandler,
         IRequestHandler<UpdateZoneProgressCommand, CommandResult<bool>>,
-        IRequestHandler<GenerateZonesFileCommand, CommandResult<bool>>,
-        IRequestHandler<UpdateDepartmentCommand, CommandResult<bool>>,
-        IRequestHandler<UpdateRegionCommand, CommandResult<bool>>
+        IRequestHandler<GenerateZonesFileCommand, CommandResult<bool>>
     {
         private readonly IAppDbContext _context;
         private readonly IQueueService _queueService;
@@ -34,52 +32,6 @@ namespace Sheaft.Application.Handlers
             _context = context;
             _queueService = queueService;
             _blobService = blobService;
-        }
-
-        public async Task<CommandResult<bool>> Handle(UpdateRegionCommand request, CancellationToken token)
-        {
-            return await ExecuteAsync(async () =>
-            {
-                var region = await _context.GetByIdAsync<Region>(request.Id, token);
-
-                region.SetPoints(request.Points);
-                region.SetPosition(request.Position);
-                var users = await _context.Users.CountAsync(u => !u.RemovedOn.HasValue && u.UserType == Interop.Enums.UserKind.Consumer && u.Department != null && u.Department.Region != null && u.Department.Region.Id == request.Id, token);
-
-                region.SetConsumersCount(users);
-
-                region.SetProducersCount(request.Producers);
-                region.SetStoresCount(request.Stores);
-
-                _context.Update(region);
-                await _context.SaveChangesAsync(token);
-
-                return OkResult(true);
-            });
-        }
-
-        public async Task<CommandResult<bool>> Handle(UpdateDepartmentCommand request, CancellationToken token)
-        {
-            return await ExecuteAsync(async () =>
-            {
-                var department = await _context.GetByIdAsync<Department>(request.Id, token);
-                var level = (await _context.GetAsync<Level>(c => c.RequiredPoints > request.Points, token)).OrderBy(c => c.RequiredPoints).FirstOrDefault();
-
-                department.SetLevel(level);
-                department.SetPoints(request.Points);
-                department.SetPosition(request.Position);
-                var users = await _context.Users.CountAsync(u => !u.RemovedOn.HasValue && u.UserType == Interop.Enums.UserKind.Consumer && u.Department != null && u.Department.Id == request.Id, token);
-
-                department.SetConsumersCount(users);
-
-                department.SetProducersCount(request.Producers);
-                department.SetStoresCount(request.Stores);
-
-                _context.Update(department);
-                await _context.SaveChangesAsync(token);
-
-                return OkResult(true);
-            });
         }
 
         public async Task<CommandResult<bool>> Handle(UpdateZoneProgressCommand request, CancellationToken token)
@@ -109,7 +61,7 @@ namespace Sheaft.Application.Handlers
 
                         var pointsPerDepartment = pointsPerDepartments.FirstOrDefault(pp => pp.DepartmentId == departmentId);
 
-                        await _queueService.ProcessCommandAsync(UpdateDepartmentCommand.QUEUE_NAME, new UpdateDepartmentCommand(request.RequestUser) 
+                        await _queueService.ProcessCommandAsync(UpdateDepartmentStatsCommand.QUEUE_NAME, new UpdateDepartmentStatsCommand(request.RequestUser) 
                             {
                                 Id = departmentId,
                                 Points = pointsPerDepartment?.Points ?? 0,
@@ -121,7 +73,7 @@ namespace Sheaft.Application.Handlers
 
                     var pointsPerRegion = pointsPerRegions.FirstOrDefault(pp => pp.RegionId == region.Id);
 
-                    await _queueService.ProcessCommandAsync(UpdateRegionCommand.QUEUE_NAME, new UpdateRegionCommand(request.RequestUser)
+                    await _queueService.ProcessCommandAsync(UpdateRegionStatsCommand.QUEUE_NAME, new UpdateRegionStatsCommand(request.RequestUser)
                     {
                         Id = region.Id,
                         Points = pointsPerRegion?.Points ?? 0,

@@ -1,0 +1,59 @@
+﻿@model DepartmentViewModel
+@{
+    ViewData["Title"] = "Department details";
+}
+
+    <div class="container">
+        <h2 class="display-4">Department details</h2>
+        <br />
+
+        @using (Html.BeginForm("Edit", "Departments", FormMethod.Post, new { @class = "form" }))
+        {
+            @Html.AntiForgeryToken()
+            @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+            @Html.HiddenFor(model => model.Id)
+            <br />
+
+            <div class="form-group">
+                @Html.LabelFor(m => m.Name)
+                @Html.TextBoxFor(m => m.Name, null, new { @class = "form-control" })
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(m => m.Code)
+                @Html.TextBoxFor(m => m.Code, null, new { @class = "form-control", @disabled = "disabled" })
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(m => m.Position)
+                @Html.TextBoxFor(c => c.Position, null, new { @class = "form-control", @disabled = "disabled" })
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(m => m.Points)
+                @Html.TextBoxFor(c => c.Points, null, new { @class = "form-control", @disabled = "disabled" })
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(m => m.Level)
+                @Html.TextBoxFor(m => m.Level, null, new { @class = "form-control", @disabled = "disabled" })
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(m => m.ProducersCount)
+                @Html.TextBoxFor(c => c.ProducersCount, null, new { @class = "form-control", @disabled = "disabled" })
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(m => m.StoresCount)
+                @Html.TextBoxFor(c => c.StoresCount, null, new { @class = "form-control", @disabled = "disabled" })
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(m => m.ConsumersCount)
+                @Html.TextBoxFor(c => c.ConsumersCount, null, new { @class = "form-control", @disabled = "disabled" })
+            </div>
+
+            <br />
+            <a asp-controller="Departments" asp-action="Index" class="btn btn-light">
+                Cancel
+            </a>
+            <button type="submit" class="btn btn-success">
+                <i class="fa fa-check">&nbsp;Save</i>
+            </button>
+        }
+
+    </div>

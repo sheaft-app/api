@@ -45,9 +45,9 @@ namespace Sheaft.Functions
         }
 
         [FunctionName("UpdateDepartmentCommand")]
-        public async Task UpdateDepartmentCommandAsync([ServiceBusTrigger(UpdateDepartmentCommand.QUEUE_NAME, Connection = "AzureWebJobsServiceBus")] string message, ILogger logger, CancellationToken token)
+        public async Task UpdateDepartmentCommandAsync([ServiceBusTrigger(UpdateDepartmentStatsCommand.QUEUE_NAME, Connection = "AzureWebJobsServiceBus")] string message, ILogger logger, CancellationToken token)
         {
-            var command = JsonConvert.DeserializeObject<UpdateDepartmentCommand>(message);
+            var command = JsonConvert.DeserializeObject<UpdateDepartmentStatsCommand>(message);
             var results = await _mediatr.Send(command, token);
             logger.LogCommand(results);
 
@@ -56,9 +56,9 @@ namespace Sheaft.Functions
         }
 
         [FunctionName("UpdateRegionCommand")]
-        public async Task UpdateRegionCommandAsync([ServiceBusTrigger(UpdateRegionCommand.QUEUE_NAME, Connection = "AzureWebJobsServiceBus")] string message, ILogger logger, CancellationToken token)
+        public async Task UpdateRegionCommandAsync([ServiceBusTrigger(UpdateRegionStatsCommand.QUEUE_NAME, Connection = "AzureWebJobsServiceBus")] string message, ILogger logger, CancellationToken token)
         {
-            var command = JsonConvert.DeserializeObject<UpdateRegionCommand>(message);
+            var command = JsonConvert.DeserializeObject<UpdateRegionStatsCommand>(message);
             var results = await _mediatr.Send(command, token);
             logger.LogCommand(results);
 

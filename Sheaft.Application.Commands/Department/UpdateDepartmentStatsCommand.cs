@@ -4,13 +4,12 @@ using System;
 
 namespace Sheaft.Application.Commands
 {
-
-    public class UpdateDepartmentCommand : Command<bool>
+    public class UpdateDepartmentStatsCommand : Command<bool>
     {
-        public const string QUEUE_NAME = "command-departments-update";
+        public const string QUEUE_NAME = "command-zones-department-stats";
 
         [JsonConstructor]
-        public UpdateDepartmentCommand(RequestUser requestUser) : base(requestUser)
+        public UpdateDepartmentStatsCommand(RequestUser requestUser) : base(requestUser)
         {
         }
 
