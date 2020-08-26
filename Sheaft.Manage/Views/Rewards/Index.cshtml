@@ -1,0 +1,101 @@
+﻿@model IEnumerable<RewardViewModel>
+@{
+    ViewData["Title"] = "Rewards";
+    int take = ViewBag.Take;
+    int currentPage = ViewBag.Page;
+}
+
+    <div class="container">
+        <h2 class="display-5">Rewards</h2>
+        <br />
+
+        @if (ViewBag.Removed != null)
+        {
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                <span>Successfully removed reward @ViewBag.Removed</span>
+
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <br />
+        }
+
+        @if (ViewBag.Edited != null)
+        {
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                <span>Successfully updated reward @ViewBag.Edited.Name</span>
+                <a asp-controller="Rewards" asp-action="Edit" asp-route-id="@ViewBag.Edited.Id">View details</a>
+
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <br />
+        }
+
+        <table class="table table-hover">
+            <thead class="thead-dark">
+                <tr>
+                    <th scope="col">Name</th>
+                    <th scope="col">CreatedOn</th>
+                    <th scope="col">
+                        <a asp-controller="Rewards" asp-action="Add" class="btn btn-success">
+                            <i class="fa fa-plus"></i>
+                        </a>
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var entity in Model)
+                {
+                <tr>
+                    <th scope="row">@entity.Name</th>
+                    <td>@entity.CreatedOn.ToString("dd/MM/yy hh:mm")</td>
+                    <td>
+                        <a asp-controller="Rewards" asp-action="Edit" asp-route-id="@entity.Id" class="btn btn-info">
+                            <i class="fa fa-pen"></i>
+                        </a>
+
+                        @if (entity.RemovedOn.HasValue)
+                        {
+                            @using (Html.BeginForm("Restore", "Rewards", new { id = entity.Id }, FormMethod.Post, true, new { @class = "form d-inline" }))
+                            {
+                                <button type="submit" class="btn btn-success">
+                                    <i class="fa fa-trash-restore"></i>
+                                </button>
+                            }
+                        }
+                        else
+                        {
+                            @using (Html.BeginForm("Delete", "Rewards", new { id = entity.Id }, FormMethod.Post, true, new { @class = "form d-inline" }))
+                            {
+                                <button type="submit" class="btn btn-danger">
+                                    <i class="fa fa-trash"></i>
+                                </button>
+                            }
+                        }
+                    </td>
+                </tr>
+                }
+            </tbody>
+            <tfoot>
+                <tr class="text-center">
+                    <td colspan="6">
+                        @if (currentPage >= 1)
+                        {
+                            <a asp-controller="Rewards" asp-action="Index" asp-route-take="@take" asp-route-page="@(currentPage-1)" class="btn btn-outline-secondary">
+                                <i class="fa fa-caret-left"></i>
+                            </a>
+                        }
+                        @if (take == Model.Count())
+                        {
+                            <a asp-controller="Rewards" asp-action="Index" asp-route-take="@take" asp-route-page="@(currentPage+1)" class="btn btn-outline-secondary">
+                                <i class="fa fa-caret-right"></i>
+                            </a>
+                        }
+                    </td>
+                </tr>
+            </tfoot>
+        </table>
+    </div>

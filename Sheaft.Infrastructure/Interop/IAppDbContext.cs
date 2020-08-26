@@ -22,7 +22,7 @@ namespace Sheaft.Infrastructure.Interop
         DbSet<Department> Departments { get; set; }
         DbSet<Job> Jobs { get; set; }
         DbSet<Level> Levels { get; set; }
-        DbSet<Reward> LevelRewards { get; set; }
+        DbSet<Reward> Rewards { get; set; }
         DbSet<Notification> Notifications { get; set; }
         DbSet<PurchaseOrder> PurchaseOrders { get; set; }
         DbSet<Packaging> Packagings { get; set; }

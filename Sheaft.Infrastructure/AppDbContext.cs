@@ -30,7 +30,7 @@ namespace Sheaft.Infrastructure
         public DbSet<Department> Departments { get; set; }
         public DbSet<Job> Jobs { get; set; }
         public DbSet<Level> Levels { get; set; }
-        public DbSet<Reward> LevelRewards { get; set; }
+        public DbSet<Reward> Rewards { get; set; }
         public DbSet<Notification> Notifications { get; set; }
         public DbSet<PurchaseOrder> PurchaseOrders { get; set; }
         public DbSet<Packaging> Packagings { get; set; }

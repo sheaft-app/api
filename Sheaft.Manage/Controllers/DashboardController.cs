@@ -35,6 +35,7 @@ namespace Sheaft.Manage.Controllers
             ViewBag.Departments = await _context.Departments.CountAsync(c => !c.RemovedOn.HasValue, token);
             ViewBag.Regions = await _context.Regions.CountAsync(c => !c.RemovedOn.HasValue, token);
             ViewBag.Levels = await _context.Levels.CountAsync(c => !c.RemovedOn.HasValue, token);
+            ViewBag.Rewards = await _context.Rewards.CountAsync(c => !c.RemovedOn.HasValue, token);
 
             if (requestUser.IsImpersonating)
             {
