@@ -12,6 +12,7 @@ using Sheaft.Services.Interop;
 using Newtonsoft.Json;
 using System.IO;
 using System.Text;
+using Sheaft.Domain.Views;
 
 namespace Sheaft.Application.Handlers
 {
@@ -38,8 +39,8 @@ namespace Sheaft.Application.Handlers
         {
             return await ExecuteAsync(async () =>
             {
-                var pointsPerRegions = await _context.RegionPoints.ToListAsync(token);
-                var pointsPerDepartments = await _context.DepartmentPoints.ToListAsync(token);
+                //var pointsPerRegions = await _context.RegionPoints.ToListAsync(token);
+                //var pointsPerDepartments = await _context.DepartmentPoints.ToListAsync(token);
 
                 var producersPerDepartments = await _context.DepartmentProducers.ToListAsync(token);
                 var storesPerDepartments = await _context.DepartmentStores.ToListAsync(token);
@@ -59,7 +60,7 @@ namespace Sheaft.Application.Handlers
                         var storePerDepartment = storesPerDepartments.First(p => p.DepartmentId == departmentId);
                         storesCount += (storePerDepartment.Created ?? 0);
 
-                        var pointsPerDepartment = pointsPerDepartments.FirstOrDefault(pp => pp.DepartmentId == departmentId);
+                        DepartmentPoints pointsPerDepartment = null;// pointsPerDepartments.FirstOrDefault(pp => pp.DepartmentId == departmentId);
 
                         await _queueService.ProcessCommandAsync(UpdateDepartmentStatsCommand.QUEUE_NAME, new UpdateDepartmentStatsCommand(request.RequestUser) 
                             {
@@ -71,7 +72,7 @@ namespace Sheaft.Application.Handlers
                         }, token);
                     }
 
-                    var pointsPerRegion = pointsPerRegions.FirstOrDefault(pp => pp.RegionId == region.Id);
+                    RegionPoints pointsPerRegion = null;//pointsPerRegions.FirstOrDefault(pp => pp.RegionId == region.Id);
 
                     await _queueService.ProcessCommandAsync(UpdateRegionStatsCommand.QUEUE_NAME, new UpdateRegionStatsCommand(request.RequestUser)
                     {

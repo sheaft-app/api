@@ -25,7 +25,7 @@ namespace Sheaft.Functions
         }
 
         [FunctionName("UpdateZoneProgressCommand")]
-        public async Task UpdateZoneProgressCommandAsync([TimerTrigger("0 0 */6 * * *", RunOnStartup = true)] TimerInfo info, ILogger logger, CancellationToken token)
+        public async Task UpdateZoneProgressCommandAsync([TimerTrigger("0 0 */6 * * *", RunOnStartup = false)] TimerInfo info, ILogger logger, CancellationToken token)
         {
             var results = await _mediatr.Send(new UpdateZoneProgressCommand(new RequestUser("zone-functions", Guid.NewGuid().ToString("N"))), token);
             if (!results.Success)
