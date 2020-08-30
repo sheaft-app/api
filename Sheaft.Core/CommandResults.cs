@@ -10,61 +10,39 @@ namespace Sheaft.Core
     {
         public T Result { get; }
 
-        public bool Success { get; }
+        public bool Success => Result != null;
         public SheaftException Exception { get; }
-        public KeyValuePair<MessageKind, object[]> Message { get; }
+        public MessageKind Message { get; }
+        public object[] Params { get; }
 
         // with result
         
-        public CommandResult(bool success, T result) : this(success, new KeyValuePair<MessageKind, object[]>(), null)
+        public CommandResult(T result)
         {
             Result = result;
         }
 
-        public CommandResult(bool success, T result, MessageKind message) : this(success, new KeyValuePair<MessageKind, object[]>(message, null))
+        public CommandResult(T result, MessageKind? message = null, params object[] objs) : this(message, objs)
         {
             Result = result;
-        }
-
-        public CommandResult(bool success, T result, KeyValuePair<MessageKind, object[]> message) : this(success, message, null)
-        {
-            Result = result;
-        }
-
-        // without result
-
-        public CommandResult(bool success, MessageKind message) : this(success, new KeyValuePair<MessageKind, object[]>(message, null))
-        {
-        }
-
-        public CommandResult(bool success, KeyValuePair<MessageKind, object[]> message) : this(success, message, null)
-        {
         }
 
         // exception result
 
-        public CommandResult(SheaftException exception) : this(false, new KeyValuePair<MessageKind, object[]>(), exception)
+        public CommandResult(Exception exception, MessageKind? message = null, params object[] objs) : this(new SheaftException(ExceptionKind.Unexpected, exception), message, objs)
         {
         }
-        public CommandResult(Exception exception) : this(false, new KeyValuePair<MessageKind, object[]>(), new SheaftException(ExceptionKind.Unexpected, exception))
+        public CommandResult(SheaftException exception, MessageKind? message = null, params object[] objs) : this(message ?? MessageKind.Unexpected, objs)
         {
-        }
-        public CommandResult(MessageKind message, Exception exception) : this(false, new KeyValuePair<MessageKind, object[]>(message, null), new SheaftException(ExceptionKind.Unexpected, exception))
-        {
-        }
-        public CommandResult(MessageKind message, SheaftException exception) : this(false, new KeyValuePair<MessageKind, object[]>(message, null), exception)
-        {
-        }
-        public CommandResult(KeyValuePair<MessageKind, object[]> message, SheaftException exception) : this(false, message, exception)
-        {
-        }
-
-
-        protected CommandResult(bool success, KeyValuePair<MessageKind, object[]> message, SheaftException exception)
-        {
-            Success = success;
-            Message = message;
             Exception = exception;
+        }
+
+        public CommandResult(MessageKind? message, params object[] objs)
+        {
+            if(message != null)
+                Message = message.Value;
+
+            Params = objs;
         }
     }
 }

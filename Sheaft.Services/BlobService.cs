@@ -37,7 +37,7 @@ namespace Sheaft.Services
                 stream.Position = 0;
                 await blobClient.UploadAsync(stream, token);
 
-                return new CommandResult<string>(true, blobClient.Uri.ToString());
+                return new CommandResult<string>(blobClient.Uri.ToString());
             }
             catch (Exception e)
             {
@@ -58,7 +58,7 @@ namespace Sheaft.Services
                 stream.Position = 0;
                 await blobClient.UploadAsync(stream, token);
 
-                return new CommandResult<string>(true, blobClient.Uri.ToString());
+                return new CommandResult<string>(blobClient.Uri.ToString());
             }
             catch (Exception e)
             {
@@ -79,7 +79,7 @@ namespace Sheaft.Services
                 stream.Position = 0;
                 await blobClient.UploadAsync(stream, token);
 
-                return new CommandResult<string>(true, blobClient.Uri.ToString());
+                return new CommandResult<string>(blobClient.Uri.ToString());
             }
             catch (Exception e)
             {
@@ -100,7 +100,7 @@ namespace Sheaft.Services
                 stream.Position = 0;
                 await blobClient.UploadAsync(stream, token);
 
-                return new CommandResult<string>(true, blobClient.Uri.ToString());
+                return new CommandResult<string>(blobClient.Uri.ToString());
             }
             catch (Exception e)
             {
@@ -131,7 +131,7 @@ namespace Sheaft.Services
             if (!response.Success)
                 return response;
 
-            return new CommandResult<bool>(true, true);
+            return new CommandResult<bool>(true);
         }
 
         public async Task<CommandResult<bool>> CleanContainerFolderStorageAsync(string container, string folder, CancellationToken token)
@@ -142,14 +142,14 @@ namespace Sheaft.Services
 
                 var blobClient = containerClient.GetBlobClient(folder);
                 if (!await blobClient.ExistsAsync(token))
-                    return new CommandResult<bool>(true, true);
+                    return new CommandResult<bool>(true);
 
                 await foreach (var blob in containerClient.GetBlobsAsync(prefix: folder, cancellationToken: token))
                 {
                     await containerClient.DeleteBlobAsync(blob.Name, cancellationToken: token);
                 }
 
-                return new CommandResult<bool>(true, true);
+                return new CommandResult<bool>(true);
             }
             catch (Exception e)
             {
@@ -170,7 +170,7 @@ namespace Sheaft.Services
                 stream.Position = 0;
                 await blobClient.UploadAsync(stream, token);
 
-                return new CommandResult<string>(true, blobClient.Uri.ToString());
+                return new CommandResult<string>(blobClient.Uri.ToString());
             }
             catch (Exception e)
             {
@@ -192,7 +192,7 @@ namespace Sheaft.Services
                 await blobClient.DownloadToAsync(stream, token);
 
                 stream.Position = 0;
-                return new CommandResult<MemoryStream>(true, stream);
+                return new CommandResult<MemoryStream>(stream);
             }
             catch (Exception e)
             {
@@ -227,7 +227,7 @@ namespace Sheaft.Services
 
                 sasBuilder.SetPermissions(BlobSasPermissions.Read);
 
-                return new CommandResult<string>(true, GetBlobUri(blobClient, blobServiceClient, key, sasBuilder, _storageOptions.Containers.Rgpd));
+                return new CommandResult<string>(GetBlobUri(blobClient, blobServiceClient, key, sasBuilder, _storageOptions.Containers.Rgpd));
             }
             catch (Exception e)
             {
@@ -262,7 +262,7 @@ namespace Sheaft.Services
 
                 sasBuilder.SetPermissions(BlobSasPermissions.Read);
 
-                return new CommandResult<string>(true, GetBlobUri(blobClient, blobServiceClient, key, sasBuilder, _storageOptions.Containers.PickingOrders));
+                return new CommandResult<string>(GetBlobUri(blobClient, blobServiceClient, key, sasBuilder, _storageOptions.Containers.PickingOrders));
             }
             catch (Exception e)
             {
@@ -284,7 +284,7 @@ namespace Sheaft.Services
                 stream.Position = 0;
                 await blobClient.UploadAsync(stream, new BlobUploadOptions(), token);
 
-                return new CommandResult<string>(true, blobClient.Uri.ToString());
+                return new CommandResult<string>(blobClient.Uri.ToString());
             }
             catch (Exception e)
             {

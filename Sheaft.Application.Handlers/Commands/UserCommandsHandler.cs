@@ -89,10 +89,10 @@ namespace Sheaft.Application.Handlers
             {
                 var entity = await _context.FindByIdAsync<User>(request.Id, token);
                 if (entity != null)
-                    return ConflictResult<Guid>(MessageKind.RegisterOwner_User_AlreadyExists);
+                    return Conflict<Guid>(MessageKind.RegisterOwner_User_AlreadyExists);
 
                 if (request.Roles.Contains(_roleOptions.Producer.Value) && request.Roles.Contains(_roleOptions.Store.Value))
-                    return BadRequestResult<Guid>(MessageKind.RegisterOwner_User_CannotBe_ProducerAndStoreRoles);
+                    return BadRequest<Guid>(MessageKind.RegisterOwner_User_CannotBe_ProducerAndStoreRoles);
 
                 var roles = new List<Guid>();
 
@@ -121,7 +121,7 @@ namespace Sheaft.Application.Handlers
 
                 var oidcResult = await _httpClient.PutAsync(_authOptions.Actions.Profile, new StringContent(JsonConvert.SerializeObject(oidcUser), Encoding.UTF8, "application/json"), token);
                 if (!oidcResult.IsSuccessStatusCode)
-                    return CommandFailed<Guid>(new BadRequestException(MessageKind.RegisterOwner_Oidc_Register_Error, await oidcResult.Content.ReadAsStringAsync().ConfigureAwait(false)));
+                    return Failed<Guid>(new BadRequestException(MessageKind.RegisterOwner_Oidc_Register_Error, await oidcResult.Content.ReadAsStringAsync().ConfigureAwait(false)));
 
                 var company = await _context.GetByIdAsync<Company>(request.CompanyId, token);
 
@@ -135,7 +135,7 @@ namespace Sheaft.Application.Handlers
                 {
                     var sponsor = await _context.FindSingleAsync<User>(u => u.Code == request.SponsoringCode, token);
                     if (sponsor == null)
-                        return NotFoundResult<Guid>(MessageKind.RegisterOwner_UserWithSponsorCode_NotFound);
+                        return NotFound<Guid>(MessageKind.RegisterOwner_UserWithSponsorCode_NotFound);
 
                     await _context.AddAsync(new Sponsoring(sponsor, entity), token);
                     await _context.SaveChangesAsync(token);
@@ -145,7 +145,7 @@ namespace Sheaft.Application.Handlers
                 }
 
                 await _cache.RemoveAsync(entity.Id.ToString("N"));
-                return CreatedResult(entity.Id);
+                return Created(entity.Id);
             });
         }
 
@@ -155,7 +155,7 @@ namespace Sheaft.Application.Handlers
             {
                 var entity = await _context.FindSingleAsync<User>(r => r.Id == request.Id || r.Email == request.Email, token);
                 if (entity != null)
-                    return ConflictResult<Guid>(MessageKind.RegisterConsumer_User_AlreadyExists);
+                    return Conflict<Guid>(MessageKind.RegisterConsumer_User_AlreadyExists);
 
                 var picture = await HandleImageAsync(request.Id, request.Picture, token);
 
@@ -167,7 +167,7 @@ namespace Sheaft.Application.Handlers
 
                 var oidcResult = await _httpClient.PutAsync(_authOptions.Actions.Profile, new StringContent(JsonConvert.SerializeObject(oidcUser), Encoding.UTF8, "application/json"), token);
                 if (!oidcResult.IsSuccessStatusCode)
-                    return CommandFailed<Guid>(new BadRequestException(MessageKind.RegisterConsumer_Oidc_Register_Error, await oidcResult.Content.ReadAsStringAsync().ConfigureAwait(false)));
+                    return Failed<Guid>(new BadRequestException(MessageKind.RegisterConsumer_Oidc_Register_Error, await oidcResult.Content.ReadAsStringAsync().ConfigureAwait(false)));
 
                 var user = new User(request.Id, UserKind.Consumer, request.Email, request.FirstName, request.LastName, request.Phone);
                 user.SetPicture(picture);
@@ -183,7 +183,7 @@ namespace Sheaft.Application.Handlers
                 {
                     var sponsor = await _context.FindSingleAsync<User>(u => u.Code == request.SponsoringCode, token);
                     if (sponsor == null)
-                        return NotFoundResult<Guid>(MessageKind.RegisterConsumer_UserWithSponsorCode_NotFound);
+                        return NotFound<Guid>(MessageKind.RegisterConsumer_UserWithSponsorCode_NotFound);
 
                     await _context.AddAsync(new Sponsoring(sponsor, user), token);
                     await _context.SaveChangesAsync(token);
@@ -193,7 +193,7 @@ namespace Sheaft.Application.Handlers
                 }
 
                 await _cache.RemoveAsync(user.Id.ToString("N"));
-                return CreatedResult(user.Id);
+                return Created(user.Id);
             });
         }
 
@@ -207,11 +207,11 @@ namespace Sheaft.Application.Handlers
                     {
                         var result = await _mediatr.Send(new DeleteUserCommand(request.RequestUser) { Id = id, Reason = request.Reason }, token);
                         if (!result.Success)
-                            return CommandFailed<bool>(result.Exception);
+                            return Failed<bool>(result.Exception);
                     }
 
                     await transaction.CommitAsync(token);
-                    return OkResult(true);
+                    return Ok(true);
                 }
             });
         }
@@ -247,12 +247,12 @@ namespace Sheaft.Application.Handlers
 
                 var oidcResult = await _httpClient.PutAsync(_authOptions.Actions.Profile, new StringContent(JsonConvert.SerializeObject(oidcUser), Encoding.UTF8, "application/json"), token);
                 if (!oidcResult.IsSuccessStatusCode)
-                    return CommandFailed<bool>(new BadRequestException(MessageKind.UpdateUser_Oidc_UpdateProfile_Error, await oidcResult.Content.ReadAsStringAsync().ConfigureAwait(false)));
+                    return Failed<bool>(new BadRequestException(MessageKind.UpdateUser_Oidc_UpdateProfile_Error, await oidcResult.Content.ReadAsStringAsync().ConfigureAwait(false)));
 
                 _context.Update(entity);
                 await _cache.RemoveAsync(entity.Id.ToString("N"));
 
-                return OkResult(await _context.SaveChangesAsync(token) > 0);
+                return Ok(await _context.SaveChangesAsync(token) > 0);
             });
         }
 
@@ -285,12 +285,12 @@ namespace Sheaft.Application.Handlers
 
                 var oidcResult = await _httpClient.PutAsync(_authOptions.Actions.Profile, new StringContent(JsonConvert.SerializeObject(oidcUser), Encoding.UTF8, "application/json"), token);
                 if (!oidcResult.IsSuccessStatusCode)
-                    return CommandFailed<bool>(new BadRequestException(MessageKind.UpdateUser_Oidc_UpdateProfile_Error, await oidcResult.Content.ReadAsStringAsync().ConfigureAwait(false)));
+                    return Failed<bool>(new BadRequestException(MessageKind.UpdateUser_Oidc_UpdateProfile_Error, await oidcResult.Content.ReadAsStringAsync().ConfigureAwait(false)));
 
                 _context.Update(entity);
                 await _cache.RemoveAsync(entity.Id.ToString("N"));
 
-                return OkResult(await _context.SaveChangesAsync(token) > 0);
+                return Ok(await _context.SaveChangesAsync(token) > 0);
             });
         }
 
@@ -301,17 +301,17 @@ namespace Sheaft.Application.Handlers
                 var entity = await _context.GetByIdAsync<User>(request.Id, token);
 
                 if (!string.IsNullOrWhiteSpace(entity.Code))
-                    return OkResult(entity.Code);
+                    return Ok(entity.Code);
 
                 var result = await _identifierService.GetNextSponsoringCode(token);
                 if (!result.Success)
-                    return CommandFailed<string>(result.Exception);
+                    return Failed<string>(result.Exception);
 
                 entity.SetSponsoringCode(result.Result);
                 _context.Update(entity);
 
                 await _context.SaveChangesAsync(token);
-                return CreatedResult(entity.Code);
+                return Created(entity.Code);
             });
         }
 
@@ -325,22 +325,22 @@ namespace Sheaft.Application.Handlers
 
                     var hasActiveOrders = await _context.AnyAsync<PurchaseOrder>(o => o.Sender.Id == entity.Id && (int)o.Status < 6, token);
                     if (hasActiveOrders)
-                        return ValidationResult<bool>(MessageKind.DeleteUser_CannotBeDeleted_HasActiveOrders);
+                        return ValidationError<bool>(MessageKind.DeleteUser_CannotBeDeleted_HasActiveOrders);
 
                     if (entity.UserType == UserKind.Owner && entity.Company != null && !entity.Company.RemovedOn.HasValue)
                     {
                         var hasOrders = await _context.AnyAsync<PurchaseOrder>(o => o.Vendor.Id == entity.Company.Id && (int)o.Status < 6, token);
                         if (hasOrders)
-                            return ValidationResult<bool>(MessageKind.DeleteUser_CannotBeDeleted_CompanyHasActiveOrders);
+                            return ValidationError<bool>(MessageKind.DeleteUser_CannotBeDeleted_CompanyHasActiveOrders);
 
                         var result = await _mediatr.Send(new DeleteCompanyCommand(request.RequestUser) { Id = entity.Company.Id, Reason = request.Reason });
                         if (!result.Success)
-                            return CommandFailed<bool>(result.Exception);
+                            return Failed<bool>(result.Exception);
                     }
 
                     var oidcResult = await _httpClient.DeleteAsync(string.Format(_authOptions.Actions.Delete, entity.Id.ToString("N")), token);
                     if (!oidcResult.IsSuccessStatusCode)
-                        return CommandFailed<bool>(new BadRequestException(MessageKind.DeleteUser_Oidc_DeleteProfile_Error, await oidcResult.Content.ReadAsStringAsync().ConfigureAwait(false)));
+                        return Failed<bool>(new BadRequestException(MessageKind.DeleteUser_Oidc_DeleteProfile_Error, await oidcResult.Content.ReadAsStringAsync().ConfigureAwait(false)));
 
                     var email = entity.Email;
 
@@ -352,7 +352,7 @@ namespace Sheaft.Application.Handlers
 
                     await _cache.RemoveAsync(entity.Id.ToString("N"));
                     await _queuesService.ProcessCommandAsync(RemoveUserDataCommand.QUEUE_NAME, new RemoveUserDataCommand(request.RequestUser) { Id = request.Id, Email = email }, token);
-                    return OkResult(true);
+                    return Ok(true);
                 }
             });
         }
@@ -364,7 +364,7 @@ namespace Sheaft.Application.Handlers
                 var entity = await _context.GetByIdAsync<User>(request.Id, token);
                 await _blobsService.CleanUserStorageAsync(request.Id, token);
 
-                return OkResult(request.Email);
+                return Ok(request.Email);
             });
         }
 
@@ -381,11 +381,11 @@ namespace Sheaft.Application.Handlers
 
                 var oidcResult = await _httpClient.PutAsync(_authOptions.Actions.Picture, new StringContent(JsonConvert.SerializeObject(oidcUser), Encoding.UTF8, "application/json"), token);
                 if (!oidcResult.IsSuccessStatusCode)
-                    return CommandFailed<bool>(new BadRequestException(MessageKind.UpdateUser_Oidc_UpdatePicture_Error, await oidcResult.Content.ReadAsStringAsync().ConfigureAwait(false)));
+                    return Failed<bool>(new BadRequestException(MessageKind.UpdateUser_Oidc_UpdatePicture_Error, await oidcResult.Content.ReadAsStringAsync().ConfigureAwait(false)));
 
                 _context.Update(entity);
 
-                return OkResult(await _context.SaveChangesAsync(token) > 0);
+                return Ok(await _context.SaveChangesAsync(token) > 0);
             });
         }
 
@@ -394,7 +394,7 @@ namespace Sheaft.Application.Handlers
             return await ExecuteAsync(async () =>
             {
                 if (!_scoringOptions.Points.TryGetValue(request.Kind.ToString("G"), out int quantity))
-                    return BadRequestResult<bool>(MessageKind.UserPoints_Scoring_Matching_ActionPoints_NotFound);
+                    return BadRequest<bool>(MessageKind.UserPoints_Scoring_Matching_ActionPoints_NotFound);
 
                 var user = await _context.GetByIdAsync<User>(request.UserId, token);
                 user.AddPoints(request.Kind, quantity, request.CreatedOn);
@@ -404,7 +404,7 @@ namespace Sheaft.Application.Handlers
 
                 await _queuesService.ProcessEventAsync(UserPointsCreatedEvent.QUEUE_NAME, new UserPointsCreatedEvent(request.RequestUser) { UserId = user.Id, Kind = request.Kind, Points = quantity, CreatedOn = request.CreatedOn }, token);
 
-                return OkResult(true);
+                return Ok(true);
             });
         }
 

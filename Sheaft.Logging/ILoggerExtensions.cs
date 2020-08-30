@@ -10,14 +10,14 @@ namespace Sheaft.Logging
     {
         public static void LogCommand<T>(this ILogger logger, CommandResult<T> command)
         {
-            var args = command.Message.Value?.ToList() ?? new List<object>();
+            var args = command.Params?.ToList() ?? new List<object>();
             args.Add(command.Result);
             var datas = args.ToArray();
 
             if (!command.Success)
                 logger.LogError(command.Exception.Message, command.Exception);
             else
-                logger.LogInformation(command.Message.Key, datas);
+                logger.LogInformation(command.Message, datas);
         }
 
         public static void LogInformation(this ILogger logger, Enum e, params object[] args)

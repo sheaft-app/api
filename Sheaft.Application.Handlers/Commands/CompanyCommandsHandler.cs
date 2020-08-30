@@ -66,7 +66,7 @@ namespace Sheaft.Application.Handlers
                 using (var transaction = await _context.Database.BeginTransactionAsync(token))
                 {
                     if (!request.Owner.Roles.Contains(_roleOptions.Producer.Value) && !request.Owner.Roles.Contains(_roleOptions.Store.Value))
-                        return ValidationResult<Guid>(MessageKind.RegisterCompany_CannotContains_ProducerAndStoreRoles);
+                        return ValidationError<Guid>(MessageKind.RegisterCompany_CannotContains_ProducerAndStoreRoles);
 
                     var kind = ProfileKind.Producer;
                     if (request.Owner.Roles.Contains(_roleOptions.Store.Value))
@@ -113,12 +113,12 @@ namespace Sheaft.Application.Handlers
                     }, token);
 
                     if (!owner.Success)
-                        return CommandFailed<Guid>(owner.Exception);
+                        return Failed<Guid>(owner.Exception);
 
                     await _context.SaveChangesAsync(token);
                     await transaction.CommitAsync(token);
 
-                    return CreatedResult(company.Id);
+                    return Created(company.Id);
                 }
             });
         }
@@ -163,7 +163,7 @@ namespace Sheaft.Application.Handlers
                 }
 
                 _context.Update(entity);
-                return OkResult(await _context.SaveChangesAsync(token) > 0);
+                return Ok(await _context.SaveChangesAsync(token) > 0);
             });
         }
 
@@ -176,10 +176,10 @@ namespace Sheaft.Application.Handlers
                 {
                     var result = await _mediator.Send(new DeleteCompanyCommand(request.RequestUser) { Id = id, Reason = request.Reason }, token);
                     if (!result.Success)
-                        return CommandFailed<bool>(result.Exception);
+                        return Failed<bool>(result.Exception);
                 }
 
-                return OkResult(await _context.SaveChangesAsync(token) > 0);
+                return Ok(await _context.SaveChangesAsync(token) > 0);
             });
         }
 
@@ -197,7 +197,7 @@ namespace Sheaft.Application.Handlers
                 var success = await _context.SaveChangesAsync(token) > 0;
 
                 await _queuesService.ProcessCommandAsync(RemoveCompanyDataCommand.QUEUE_NAME, new RemoveCompanyDataCommand(request.RequestUser) { Id = request.Id, Email = email }, token);
-                return OkResult(success);
+                return Ok(success);
             });
         }
 
@@ -209,7 +209,7 @@ namespace Sheaft.Application.Handlers
 
                 //TODO remove company data
 
-                return OkResult(request.Email);
+                return Ok(request.Email);
             });
         }
 
@@ -224,7 +224,7 @@ namespace Sheaft.Application.Handlers
 
                 _context.Update(entity);
 
-                return OkResult(await _context.SaveChangesAsync(token) > 0);
+                return Ok(await _context.SaveChangesAsync(token) > 0);
             });
         }
 

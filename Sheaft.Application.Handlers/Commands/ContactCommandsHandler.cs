@@ -41,7 +41,7 @@ namespace Sheaft.Application.Handlers
             {                
                 var regex = new Regex(@"^[\w\.\-\+]+\@[\w\-]+\.\w{2,}$");
                 if (!regex.Match(request.Email).Success)
-                    return ValidationResult<bool>(MessageKind.EmailProvider_Newsletter_Email_Invalid);
+                    return ValidationError<bool>(MessageKind.EmailProvider_Newsletter_Email_Invalid);
 
                 var obj = new Contact { ListIds = new List<string> { _sendgridOptions.Groups.Newsletter }.ToArray(), Contacts = new List<ContactElement> { new ContactElement { Email = request.Email.ToLowerInvariant(), FirstName = request.FirstName, CustomFields = new CustomFields { E1T = request.Role } } }.ToArray() };
                 var httpRequest = new HttpRequestMessage(HttpMethod.Put, "/v3/marketing/contacts" )
@@ -54,9 +54,9 @@ namespace Sheaft.Application.Handlers
 
                 var recipientResult = await _httpClient.SendAsync(httpRequest, token);
                 if((int)recipientResult.StatusCode >= 400)
-                    return BadRequestResult<bool>(MessageKind.EmailProvider_Newsletter_RegisterFailure);
+                    return BadRequest<bool>(MessageKind.EmailProvider_Newsletter_RegisterFailure);
 
-                return OkResult(true);
+                return Ok(true);
             });
         }
 

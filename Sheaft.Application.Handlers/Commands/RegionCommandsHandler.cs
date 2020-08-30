@@ -35,7 +35,7 @@ namespace Sheaft.Application.Handlers
 
                 _context.Update(entity);
 
-                return OkResult(await _context.SaveChangesAsync(token) > 0);
+                return Ok(await _context.SaveChangesAsync(token) > 0);
             });
         }
 
@@ -57,7 +57,7 @@ namespace Sheaft.Application.Handlers
                 _context.Update(region);
                 await _context.SaveChangesAsync(token);
 
-                return OkResult(true);
+                return Ok(true);
             });
         }
     }

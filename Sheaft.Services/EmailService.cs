@@ -47,9 +47,9 @@ namespace Sheaft.Services
 
                 var response = await _sendgrid.SendEmailAsync(msg);
                 if ((int)response.StatusCode >= 400)
-                    return new CommandResult<bool>(false, new KeyValuePair<MessageKind, object[]>(MessageKind.EmailProvider_SendEmail_Failure, new List<object>() { await response.Body.ReadAsStringAsync() }.ToArray()));
+                    return new CommandResult<bool>(false, MessageKind.EmailProvider_SendEmail_Failure, await response.Body.ReadAsStringAsync());
 
-                return new CommandResult<bool>(true, true);
+                return new CommandResult<bool>(true);
             }
             catch(Exception e)
             {

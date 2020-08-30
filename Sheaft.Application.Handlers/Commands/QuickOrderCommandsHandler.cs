@@ -51,7 +51,7 @@ namespace Sheaft.Application.Handlers
                 await _context.AddAsync(quickOrder, token);
                 await _context.SaveChangesAsync(token);
 
-                return CreatedResult(quickOrder.Id);
+                return Created(quickOrder.Id);
             });
         }
 
@@ -66,7 +66,7 @@ namespace Sheaft.Application.Handlers
 
                 _context.Update(entity);
 
-                return OkResult(await _context.SaveChangesAsync(token) > 0);
+                return Ok(await _context.SaveChangesAsync(token) > 0);
             });
         }
 
@@ -100,7 +100,7 @@ namespace Sheaft.Application.Handlers
 
                 _context.Update(entity);
 
-                return OkResult(await _context.SaveChangesAsync(token) > 0);
+                return Ok(await _context.SaveChangesAsync(token) > 0);
             });
         }
 
@@ -124,7 +124,7 @@ namespace Sheaft.Application.Handlers
 
                 _context.UpdateRange(quickOrders);
 
-                return OkResult(await _context.SaveChangesAsync(token) > 0);
+                return Ok(await _context.SaveChangesAsync(token) > 0);
             });
         }
 
@@ -136,10 +136,10 @@ namespace Sheaft.Application.Handlers
                 {
                     var result = await _mediatr.Send(new DeleteQuickOrderCommand(request.RequestUser) { Id = id });
                     if (!result.Success)
-                        return CommandFailed<bool>(result.Exception);
+                        return Failed<bool>(result.Exception);
                 }
 
-                return OkResult(true);
+                return Ok(true);
             });
         }
 
@@ -150,7 +150,7 @@ namespace Sheaft.Application.Handlers
                 var entity = await _context.GetByIdAsync<QuickOrder>(request.Id, token);
                 _context.Remove(entity);
 
-                return OkResult(await _context.SaveChangesAsync(token) > 0);
+                return Ok(await _context.SaveChangesAsync(token) > 0);
             });
         }
     }

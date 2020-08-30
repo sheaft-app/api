@@ -38,7 +38,7 @@ namespace Sheaft.Application.Handlers
                 await _context.AddAsync(entity, token);
                 await _context.SaveChangesAsync(token);
 
-                return CreatedResult(entity.Id);
+                return Created(entity.Id);
             });
         }
 
@@ -53,7 +53,7 @@ namespace Sheaft.Application.Handlers
                 entity.SetRequiredPoints(request.RequiredPoints);
 
                 _context.Update(entity);
-                return OkResult(await _context.SaveChangesAsync(token) > 0);
+                return Ok(await _context.SaveChangesAsync(token) > 0);
             });
         }
 
@@ -67,7 +67,7 @@ namespace Sheaft.Application.Handlers
                 _context.Remove(entity);
                 var results = await _context.SaveChangesAsync(token);
 
-                return OkResult(results > 0);
+                return Ok(results > 0);
             });
         }
 
@@ -81,7 +81,7 @@ namespace Sheaft.Application.Handlers
                 _context.Update(entity);
                 var results = await _context.SaveChangesAsync(token);
 
-                return OkResult(results > 0);
+                return Ok(results > 0);
             });
         }
     }

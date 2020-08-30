@@ -34,7 +34,7 @@ namespace Sheaft.Application.Handlers
             return await ExecuteAsync(async () =>
             {
                 var result = await _dapperContext.SetNotificationAsReadAsync(request.RequestUser.Id, request.RequestUser.CompanyId, request.ReadBefore, token);
-                return OkResult(result);
+                return Ok(result);
             });
         }
 
@@ -44,13 +44,13 @@ namespace Sheaft.Application.Handlers
             {
                 var notification = await _context.GetByIdAsync<Notification>(request.Id, token);
                 if(!notification.Unread)
-                    return OkResult(true);
+                    return Ok(true);
 
                 notification.SetAsRead();
                 _context.Update(notification);
 
                 await _context.SaveChangesAsync(token);
-                return OkResult(true);
+                return Ok(true);
             });
         }
 
@@ -64,7 +64,7 @@ namespace Sheaft.Application.Handlers
                 await _context.AddAsync(entity, token);
                 await _context.SaveChangesAsync(token);
 
-                return CreatedResult(entity.Id);
+                return Created(entity.Id);
             });
         }
 
@@ -78,7 +78,7 @@ namespace Sheaft.Application.Handlers
                 await _context.AddAsync(entity, token);
                 await _context.SaveChangesAsync(token);
 
-                return CreatedResult(entity.Id);
+                return Created(entity.Id);
             });
         }
     }

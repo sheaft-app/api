@@ -56,7 +56,7 @@ namespace Sheaft.Application.Handlers
                 await _context.AddAsync(entity, token);
                 await _context.SaveChangesAsync(token);
 
-                return OkResult(entity.Id);
+                return Ok(entity.Id);
             });
         }
 
@@ -90,7 +90,7 @@ namespace Sheaft.Application.Handlers
 
                 _context.Update(entity);
 
-                return OkResult(await _context.SaveChangesAsync(token) > 0);
+                return Ok(await _context.SaveChangesAsync(token) > 0);
             });
         }
 
@@ -104,7 +104,7 @@ namespace Sheaft.Application.Handlers
                     throw new BadRequestException(MessageKind.DeliveryMode_CannotRemove_With_Active_Agreements, entity.Name, activeAgreements);
 
                 _context.Remove(entity);
-                return OkResult(await _context.SaveChangesAsync(token) > 0);
+                return Ok(await _context.SaveChangesAsync(token) > 0);
             });
         }
 
@@ -118,7 +118,7 @@ namespace Sheaft.Application.Handlers
                 _context.Update(entity);
                 await _context.SaveChangesAsync(token);
 
-                return OkResult(true);
+                return Ok(true);
             });
         }
     }

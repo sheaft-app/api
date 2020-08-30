@@ -53,7 +53,7 @@ namespace Sheaft.Application.Handlers
                 {
                     var result = await _mediatr.Send(new AcceptPurchaseOrdersCommand(request.RequestUser) { Ids = orderIdsToAccept });
                     if (!result.Success)
-                        return CommandFailed<Guid>(result.Exception);
+                        return Failed<Guid>(result.Exception);
                 }
 
                 var entity = new Job(Guid.NewGuid(), JobKind.CreatePickingFromOrders, request.Name ?? $"Export bon préparation", sender, ExportPickingOrderCommand.QUEUE_NAME);
@@ -64,7 +64,7 @@ namespace Sheaft.Application.Handlers
 
                 await _queuesService.InsertJobToProcessAsync(entity, token);
 
-                return OkResult(entity.Id);
+                return Ok(entity.Id);
             });
         }
 

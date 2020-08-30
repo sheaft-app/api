@@ -52,7 +52,7 @@ namespace Sheaft.Application.Handlers
 
                 await _queuesService.InsertJobToProcessAsync(entity, token);
 
-                return OkResult(entity.Id);
+                return Ok(entity.Id);
             });
         }
 

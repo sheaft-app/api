@@ -60,11 +60,11 @@ namespace Sheaft.Application.Handlers
                    {
                        var result = await _mediatr.Send(new CancelJobCommand(request.RequestUser) { Id = jobId, Reason = request.Reason }, token);
                        if (!result.Success)
-                           return CommandFailed<bool>(result.Exception);
+                           return Failed<bool>(result.Exception);
                    }
 
                    await transaction.CommitAsync(token);
-                   return OkResult(true);
+                   return Ok(true);
                }
            });
         }
@@ -80,11 +80,11 @@ namespace Sheaft.Application.Handlers
                    {
                        var result = await _mediatr.Send(new RetryJobCommand(request.RequestUser) { Id = jobId }, token);
                        if (!result.Success)
-                           return CommandFailed<bool>(result.Exception);
+                           return Failed<bool>(result.Exception);
                    }
 
                    await transaction.CommitAsync(token);
-                   return OkResult(true);
+                   return Ok(true);
                }
            });
         }
@@ -100,11 +100,11 @@ namespace Sheaft.Application.Handlers
                    {
                        var result = await _mediatr.Send(new PauseJobCommand(request.RequestUser) { Id = jobId }, token);
                        if (!result.Success)
-                           return CommandFailed<bool>(result.Exception);
+                           return Failed<bool>(result.Exception);
                    }
 
                    await transaction.CommitAsync(token);
-                   return OkResult(true);
+                   return Ok(true);
                }
            });
         }
@@ -120,11 +120,11 @@ namespace Sheaft.Application.Handlers
                    {
                        var result = await _mediatr.Send(new ArchiveJobCommand(request.RequestUser) { Id = jobId }, token);
                        if (!result.Success)
-                           return CommandFailed<bool>(result.Exception);
+                           return Failed<bool>(result.Exception);
                    }
 
                    await transaction.CommitAsync(token);
-                   return OkResult(true);
+                   return Ok(true);
                }
            });
         }
@@ -140,11 +140,11 @@ namespace Sheaft.Application.Handlers
                    {
                        var result = await _mediatr.Send(new ResumeJobCommand(request.RequestUser) { Id = jobId }, token);
                        if (!result.Success)
-                           return CommandFailed<bool>(result.Exception);
+                           return Failed<bool>(result.Exception);
                    }
 
                    await transaction.CommitAsync(token);
-                   return OkResult(true);
+                   return Ok(true);
                }
            });
         }
@@ -160,11 +160,11 @@ namespace Sheaft.Application.Handlers
                     {
                         var result = await _mediatr.Send(new StartJobCommand(request.RequestUser) { Id = jobId }, token);
                         if (!result.Success)
-                            return CommandFailed<bool>(result.Exception);
+                            return Failed<bool>(result.Exception);
                     }
 
                     await transaction.CommitAsync(token);
-                    return OkResult(true);
+                    return Ok(true);
                 }
             });
         }
@@ -180,11 +180,11 @@ namespace Sheaft.Application.Handlers
                     {
                         var result = await _mediatr.Send(new CompleteJobCommand(request.RequestUser) { Id = jobId }, token);
                         if (!result.Success)
-                            return CommandFailed<bool>(result.Exception);
+                            return Failed<bool>(result.Exception);
                     }
 
                     await transaction.CommitAsync(token);
-                    return OkResult(true);
+                    return Ok(true);
                 }
             });
         }
@@ -200,11 +200,11 @@ namespace Sheaft.Application.Handlers
                     {
                         var result = await _mediatr.Send(new FailJobCommand(request.RequestUser) { Id = jobId, Reason = request.Reason }, token);
                         if (!result.Success)
-                            return CommandFailed<bool>(result.Exception);
+                            return Failed<bool>(result.Exception);
                     }
 
                     await transaction.CommitAsync(token);
-                    return OkResult(true);
+                    return Ok(true);
                 }
             });
         }
@@ -219,7 +219,7 @@ namespace Sheaft.Application.Handlers
                 entity.CancelJob(request.Reason);
                 _context.Update(entity);
 
-                return OkResult(await _context.SaveChangesAsync(token) > 0);
+                return Ok(await _context.SaveChangesAsync(token) > 0);
             });
         }
 
@@ -236,7 +236,7 @@ namespace Sheaft.Application.Handlers
                 var result = await _context.SaveChangesAsync(token);
                 await _queuesService.InsertJobToProcessAsync(entity, token);
 
-                return OkResult(result > 0);
+                return Ok(result > 0);
             });
         }
 
@@ -250,7 +250,7 @@ namespace Sheaft.Application.Handlers
                 entity.PauseJob();
                 _context.Update(entity);
 
-                return OkResult(await _context.SaveChangesAsync(token) > 0);
+                return Ok(await _context.SaveChangesAsync(token) > 0);
             });
         }
 
@@ -264,7 +264,7 @@ namespace Sheaft.Application.Handlers
                 entity.ArchiveJob();
                 _context.Update(entity);
 
-                return OkResult(await _context.SaveChangesAsync(token) > 0);
+                return Ok(await _context.SaveChangesAsync(token) > 0);
             });
         }
 
@@ -278,7 +278,7 @@ namespace Sheaft.Application.Handlers
                 entity.UnarchiveJob();
                 _context.Update(entity);
 
-                return OkResult(await _context.SaveChangesAsync(token) > 0);
+                return Ok(await _context.SaveChangesAsync(token) > 0);
             });
         }
 
@@ -292,7 +292,7 @@ namespace Sheaft.Application.Handlers
                 entity.ResumeJob();
                 _context.Update(entity);
 
-                return OkResult(await _context.SaveChangesAsync(token) > 0);
+                return Ok(await _context.SaveChangesAsync(token) > 0);
             });
         }
 
@@ -306,7 +306,7 @@ namespace Sheaft.Application.Handlers
                 entity.StartJob();
                 _context.Update(entity);
 
-                return OkResult(await _context.SaveChangesAsync(token) > 0);
+                return Ok(await _context.SaveChangesAsync(token) > 0);
             });
         }
 
@@ -322,7 +322,7 @@ namespace Sheaft.Application.Handlers
 
                 _context.Update(entity);
 
-                return OkResult(await _context.SaveChangesAsync(token) > 0);
+                return Ok(await _context.SaveChangesAsync(token) > 0);
             });
         }
 
@@ -336,7 +336,7 @@ namespace Sheaft.Application.Handlers
                 entity.FailJob(request.Reason);
                 _context.Update(entity);
                 
-                return OkResult(await _context.SaveChangesAsync(token) > 0);
+                return Ok(await _context.SaveChangesAsync(token) > 0);
             });
         }
 
@@ -352,7 +352,7 @@ namespace Sheaft.Application.Handlers
                 var result = await _context.SaveChangesAsync(token);
                 await _queuesService.InsertJobToProcessAsync(entity, token);
 
-                return OkResult(result > 0);
+                return Ok(result > 0);
             });
         }
 
@@ -364,7 +364,7 @@ namespace Sheaft.Application.Handlers
 
                 _context.Remove(entity);
 
-                return OkResult(await _context.SaveChangesAsync(token) > 0);
+                return Ok(await _context.SaveChangesAsync(token) > 0);
             });
         }
 
@@ -377,7 +377,7 @@ namespace Sheaft.Application.Handlers
                 entity.Restore();
                 _context.Update(entity);
 
-                return OkResult(await _context.SaveChangesAsync(token) > 0);
+                return Ok(await _context.SaveChangesAsync(token) > 0);
             });
         }
 
@@ -390,7 +390,7 @@ namespace Sheaft.Application.Handlers
 
                 _context.Update(entity);
 
-                return OkResult(await _context.SaveChangesAsync(token) > 0);
+                return Ok(await _context.SaveChangesAsync(token) > 0);
             });
         }
     }

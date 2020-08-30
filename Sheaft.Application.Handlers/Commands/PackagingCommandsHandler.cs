@@ -36,7 +36,7 @@ namespace Sheaft.Application.Handlers
                 await _context.AddAsync(packaging, token);
                 await _context.SaveChangesAsync(token);
 
-                return CreatedResult(packaging.Id);
+                return Created(packaging.Id);
             });
         }
 
@@ -53,7 +53,7 @@ namespace Sheaft.Application.Handlers
 
                 _context.Update(entity);
 
-                return OkResult(await _context.SaveChangesAsync(token) > 0);
+                return Ok(await _context.SaveChangesAsync(token) > 0);
             });
         }
 
@@ -72,7 +72,7 @@ namespace Sheaft.Application.Handlers
                     await transaction.CommitAsync(token);
                 }
 
-                return OkResult(results > 0);
+                return Ok(results > 0);
             });
         }
 
@@ -84,7 +84,7 @@ namespace Sheaft.Application.Handlers
                 entity.Restore();
 
                 _context.Update(entity);
-                return OkResult(await _context.SaveChangesAsync(token) > 0);
+                return Ok(await _context.SaveChangesAsync(token) > 0);
             });
         }
     }

@@ -78,7 +78,7 @@ namespace Sheaft.Application.Handlers
                         var expectedDelivery = request.ProducersExpectedDeliveries.SingleOrDefault(c => c.ProducerId == companyId);
                         var result = await _mediatr.Send(new CreatePurchaseOrderCommand(request.RequestUser) { SkipSendEmail = true, ProducerId = companyId, Comment = expectedDelivery.Comment, ExpectedDeliveryDate = expectedDelivery.ExpectedDeliveryDate, DeliveryModeId = expectedDelivery.DeliveryModeId, Products = cartProducts }, token);
                         if (!result.Success)
-                            return CommandFailed<IEnumerable<Guid>>(result.Exception);
+                            return Failed<IEnumerable<Guid>>(result.Exception);
 
                         createdOrders.Add(result.Result);
                     }
@@ -91,7 +91,7 @@ namespace Sheaft.Application.Handlers
 
                     await _queuesService.ProcessCommandAsync(CreateUserPointsCommand.QUEUE_NAME, new CreateUserPointsCommand(request.RequestUser) { CreatedOn = DateTimeOffset.UtcNow, Kind = PointKind.PurchaseOrder, UserId = request.RequestUser.Id }, token);
 
-                    return OkResult(createdOrders.AsEnumerable());
+                    return Ok(createdOrders.AsEnumerable());
                 }
             });
         }
@@ -113,7 +113,7 @@ namespace Sheaft.Application.Handlers
 
                 var result = await _identifierService.GetNextOrderReferenceAsync(request.ProducerId, token);
                 if (!result.Success)
-                    return CommandFailed<Guid>(result.Exception);
+                    return Failed<Guid>(result.Exception);
 
                 var entity = new PurchaseOrder(Guid.NewGuid(), result.Result, OrderStatusKind.Waiting, cartProducts, deliveryMode, request.ExpectedDeliveryDate, company, sender);
                 entity.SetComment(request.Comment);
@@ -124,7 +124,7 @@ namespace Sheaft.Application.Handlers
                 if (!request.SkipSendEmail)
                     await _queuesService.ProcessEventAsync(PurchaseOrderCreatedEvent.QUEUE_NAME, new PurchaseOrderCreatedEvent(request.RequestUser) { Id = entity.Id }, token);
 
-                return OkResult(entity.Id);
+                return Ok(entity.Id);
             });
         }
 
@@ -155,7 +155,7 @@ namespace Sheaft.Application.Handlers
 
                 _context.Update(entity);
 
-                return OkResult(await _context.SaveChangesAsync(token) > 0);
+                return Ok(await _context.SaveChangesAsync(token) > 0);
             });
         }
 
@@ -169,11 +169,11 @@ namespace Sheaft.Application.Handlers
                     {
                         var result = await _mediatr.Send(new ShipPurchaseOrderCommand(request.RequestUser) { Id = purchaseOrderId }, token);
                         if (!result.Success)
-                            return CommandFailed<bool>(result.Exception);
+                            return Failed<bool>(result.Exception);
                     }
 
                     await transaction.CommitAsync(token);
-                    return OkResult(true);
+                    return Ok(true);
                 }
             });
         }
@@ -188,11 +188,11 @@ namespace Sheaft.Application.Handlers
                     {
                         var result = await _mediatr.Send(new DeliverPurchaseOrderCommand(request.RequestUser) { Id = purchaseOrderId }, token);
                         if (!result.Success)
-                            return CommandFailed<bool>(result.Exception);
+                            return Failed<bool>(result.Exception);
                     }
 
                     await transaction.CommitAsync(token);
-                    return OkResult(true);
+                    return Ok(true);
                 }
             });
         }
@@ -207,11 +207,11 @@ namespace Sheaft.Application.Handlers
                     {
                         var result = await _mediatr.Send(new CancelPurchaseOrderCommand(request.RequestUser) { Id = purchaseOrderId, Reason = request.Reason }, token);
                         if (!result.Success)
-                            return CommandFailed<bool>(result.Exception);
+                            return Failed<bool>(result.Exception);
                     }
 
                     await transaction.CommitAsync(token);
-                    return OkResult(true);
+                    return Ok(true);
                 }
             });
         }
@@ -227,11 +227,11 @@ namespace Sheaft.Application.Handlers
                     {
                         var result = await _mediatr.Send(new RefusePurchaseOrderCommand(request.RequestUser) { Id = purchaseOrderId, Reason = request.Reason }, token);
                         if (!result.Success)
-                            return CommandFailed<bool>(result.Exception);
+                            return Failed<bool>(result.Exception);
                     }
 
                     await transaction.CommitAsync(token);
-                    return OkResult(true);
+                    return Ok(true);
                 }
             });
         }
@@ -246,11 +246,11 @@ namespace Sheaft.Application.Handlers
                     {
                         var result = await _mediatr.Send(new ProcessPurchaseOrderCommand(request.RequestUser) { Id = purchaseOrderId }, token);
                         if (!result.Success)
-                            return CommandFailed<bool>(result.Exception);
+                            return Failed<bool>(result.Exception);
                     }
 
                     await transaction.CommitAsync(token);
-                    return OkResult(true);
+                    return Ok(true);
                 }
             });
         }
@@ -265,11 +265,11 @@ namespace Sheaft.Application.Handlers
                     {
                         var result = await _mediatr.Send(new CompletePurchaseOrderCommand(request.RequestUser) { Id = purchaseOrderId }, token);
                         if (!result.Success)
-                            return CommandFailed<bool>(result.Exception);
+                            return Failed<bool>(result.Exception);
                     }
 
                     await transaction.CommitAsync(token);
-                    return OkResult(true);
+                    return Ok(true);
                 }
             });
         }
@@ -284,11 +284,11 @@ namespace Sheaft.Application.Handlers
                     {
                         var result = await _mediatr.Send(new AcceptPurchaseOrderCommand(request.RequestUser) { Id = purchaseOrderId }, token);
                         if (!result.Success)
-                            return CommandFailed<bool>(result.Exception);
+                            return Failed<bool>(result.Exception);
                     }
 
                     await transaction.CommitAsync(token);
-                    return OkResult(true);
+                    return Ok(true);
                 }
             });
         }
@@ -303,11 +303,11 @@ namespace Sheaft.Application.Handlers
                     {
                         var result = await _mediatr.Send(new DeletePurchaseOrderCommand(request.RequestUser) { Id = purchaseOrderId }, token);
                         if (!result.Success)
-                            return CommandFailed<bool>(result.Exception);
+                            return Failed<bool>(result.Exception);
                     }
 
                     await transaction.CommitAsync(token);
-                    return OkResult(true);
+                    return Ok(true);
                 }
             });
         }
@@ -321,7 +321,7 @@ namespace Sheaft.Application.Handlers
                 purchaseOrder.Ship();
                 _context.Update(purchaseOrder);
 
-                return OkResult(await _context.SaveChangesAsync(token) > 0);
+                return Ok(await _context.SaveChangesAsync(token) > 0);
             });
         }
 
@@ -334,7 +334,7 @@ namespace Sheaft.Application.Handlers
                 purchaseOrder.Deliver();
                 _context.Update(purchaseOrder);
 
-                return OkResult(await _context.SaveChangesAsync(token) > 0);
+                return Ok(await _context.SaveChangesAsync(token) > 0);
             });
         }
 
@@ -352,7 +352,7 @@ namespace Sheaft.Application.Handlers
                 else
                     await _queuesService.ProcessEventAsync(PurchaseOrderCancelledByVendorEvent.QUEUE_NAME, new PurchaseOrderCancelledByVendorEvent(request.RequestUser) { Id = purchaseOrder.Id }, token);
 
-                return OkResult(await _context.SaveChangesAsync(token) > 0);
+                return Ok(await _context.SaveChangesAsync(token) > 0);
             });
         }
 
@@ -367,7 +367,7 @@ namespace Sheaft.Application.Handlers
 
                 await _queuesService.ProcessEventAsync(PurchaseOrderRefusedEvent.QUEUE_NAME, new PurchaseOrderRefusedEvent(request.RequestUser) { Id = purchaseOrder.Id }, token);
 
-                return OkResult(await _context.SaveChangesAsync(token) > 0);
+                return Ok(await _context.SaveChangesAsync(token) > 0);
             });
         }
 
@@ -382,7 +382,7 @@ namespace Sheaft.Application.Handlers
 
                 await _queuesService.ProcessEventAsync(PurchaseOrderProcessingEvent.QUEUE_NAME, new PurchaseOrderProcessingEvent(request.RequestUser) { Id = purchaseOrder.Id }, token);
 
-                return OkResult(await _context.SaveChangesAsync(token) > 0);
+                return Ok(await _context.SaveChangesAsync(token) > 0);
             });
         }
 
@@ -397,7 +397,7 @@ namespace Sheaft.Application.Handlers
 
                 await _queuesService.ProcessEventAsync(PurchaseOrderCompletedEvent.QUEUE_NAME, new PurchaseOrderCompletedEvent(request.RequestUser) { Id = purchaseOrder.Id }, token);
 
-                return OkResult(await _context.SaveChangesAsync(token) > 0);
+                return Ok(await _context.SaveChangesAsync(token) > 0);
             });
         }
 
@@ -412,7 +412,7 @@ namespace Sheaft.Application.Handlers
 
                 await _queuesService.ProcessEventAsync(PurchaseOrderAcceptedEvent.QUEUE_NAME, new PurchaseOrderAcceptedEvent(request.RequestUser) { Id = purchaseOrder.Id }, token);
 
-                return OkResult(await _context.SaveChangesAsync(token) > 0);
+                return Ok(await _context.SaveChangesAsync(token) > 0);
             });
         }
 
@@ -424,7 +424,7 @@ namespace Sheaft.Application.Handlers
                 entity.Remove();
 
                 _context.Remove(entity);
-                return OkResult(await _context.SaveChangesAsync(token) > 0);
+                return Ok(await _context.SaveChangesAsync(token) > 0);
             });
         }
 
@@ -436,7 +436,7 @@ namespace Sheaft.Application.Handlers
                 entity.Restore();
 
                 _context.Update(entity);
-                return OkResult(await _context.SaveChangesAsync(token) > 0);
+                return Ok(await _context.SaveChangesAsync(token) > 0);
             });
         }
     }

@@ -80,13 +80,13 @@ namespace Sheaft.Application.Handlers
                 {
                     var existingEntity = await _context.FindSingleAsync<Product>(p => p.Reference == request.Reference && p.Producer.Id == company.Id, token);
                     if (existingEntity != null)
-                        return ValidationResult<Guid>(new KeyValuePair<MessageKind, object[]>(MessageKind.CreateProduct_Reference_AlreadyExists, new List<object> { request.Reference }.ToArray()));
+                        return ValidationError<Guid>(MessageKind.CreateProduct_Reference_AlreadyExists, request.Reference);
                 }
                 else
                 {
                     var result = await _identifierService.GetNextProductReferenceAsync(request.RequestUser.CompanyId, token);
                     if (!result.Success)
-                        return CommandFailed<Guid>(result.Exception);
+                        return Failed<Guid>(result.Exception);
 
                     request.Reference = result.Result;
                 }
@@ -112,7 +112,7 @@ namespace Sheaft.Application.Handlers
                 await _context.AddAsync(entity, token);
                 await _context.SaveChangesAsync(token);
 
-                return CreatedResult(entity.Id);
+                return Created(entity.Id);
             });
         }
 
@@ -149,7 +149,7 @@ namespace Sheaft.Application.Handlers
                 entity.SetImage(picture);
 
                 _context.Update(entity);
-                return OkResult(await _context.SaveChangesAsync(token) > 0);
+                return Ok(await _context.SaveChangesAsync(token) > 0);
             });
         }
 
@@ -167,7 +167,7 @@ namespace Sheaft.Application.Handlers
 
                 await _queuesService.ProcessCommandAsync(CreateUserPointsCommand.QUEUE_NAME, new CreateUserPointsCommand(request.RequestUser) { CreatedOn = DateTimeOffset.UtcNow, Kind = PointKind.RateProduct, UserId = request.RequestUser.Id }, token);
 
-                return OkResult(result > 0);
+                return Ok(result > 0);
             });
         }
 
@@ -181,11 +181,11 @@ namespace Sheaft.Application.Handlers
                     {
                         var result = await _mediatr.Send(new SetProductAvailabilityCommand(request.RequestUser) { Id = id, Available = request.Available });
                         if (!result.Success)
-                            return CommandFailed<bool>(result.Exception);
+                            return Failed<bool>(result.Exception);
                     }
 
                     await transaction.CommitAsync(token);
-                    return OkResult(true);
+                    return Ok(true);
                 }
             });
         }
@@ -198,7 +198,7 @@ namespace Sheaft.Application.Handlers
                 entity.SetAvailable(request.Available);
 
                 _context.Update(entity);
-                return OkResult(await _context.SaveChangesAsync(token) > 0);
+                return Ok(await _context.SaveChangesAsync(token) > 0);
             });
         }
 
@@ -212,11 +212,11 @@ namespace Sheaft.Application.Handlers
                     {
                         var result = await _mediatr.Send(new DeleteProductCommand(request.RequestUser) { Id = id });
                         if (!result.Success)
-                            return CommandFailed<bool>(result.Exception);
+                            return Failed<bool>(result.Exception);
                     }
 
                     await transaction.CommitAsync(token);
-                    return OkResult(true);
+                    return Ok(true);
                 }
             });
         }
@@ -229,7 +229,7 @@ namespace Sheaft.Application.Handlers
                 entity.Remove();
 
                 _context.Remove(entity);
-                return OkResult(await _context.SaveChangesAsync(token) > 0);
+                return Ok(await _context.SaveChangesAsync(token) > 0);
             });
         }
 
@@ -244,7 +244,7 @@ namespace Sheaft.Application.Handlers
 
                 var response = await _blobsService.UploadImportProductsFileAsync(company.Id, entity.Id, request.FileName, request.FileStream, token);
                 if (!response.Success)
-                    return CommandFailed<Guid>(response.Exception);
+                    return Failed<Guid>(response.Exception);
 
                 entity.SetCommand(new ImportProductsCommand(request.RequestUser) { Id = entity.Id, Uri = response.Result });
 
@@ -253,7 +253,7 @@ namespace Sheaft.Application.Handlers
 
                 await _queuesService.InsertJobToProcessAsync(entity, token);
 
-                return OkResult(entity.Id);
+                return Ok(entity.Id);
             });
         }
 
@@ -331,7 +331,7 @@ namespace Sheaft.Application.Handlers
                 entity.SetImage(picture);
 
                 _context.Update(entity);
-                return OkResult(await _context.SaveChangesAsync(token) > 0);
+                return Ok(await _context.SaveChangesAsync(token) > 0);
             });
         }
 
@@ -343,7 +343,7 @@ namespace Sheaft.Application.Handlers
                 entity.Restore();
 
                 _context.Update(entity);
-                return OkResult(await _context.SaveChangesAsync(token) > 0);
+                return Ok(await _context.SaveChangesAsync(token) > 0);
             });
         }
 
@@ -415,7 +415,7 @@ namespace Sheaft.Application.Handlers
         {
             var nameStr = worksheet.Cells[i, 2].GetValue<string>();
             if (string.IsNullOrWhiteSpace(nameStr))
-                return CommandFailed<CreateProductCommand>(new ValidationException(MessageKind.CreateProduct_Name_Required_Line, i));
+                return Failed<CreateProductCommand>(new ValidationException(MessageKind.CreateProduct_Name_Required_Line, i));
 
             var createProductCommand = new CreateProductCommand(request.RequestUser)
             {
@@ -431,12 +431,12 @@ namespace Sheaft.Application.Handlers
             var tagsStr = worksheet.Cells[i, 8].GetValue<string>()?.ToLowerInvariant().Replace("\"", "").Replace("'", "").Replace(".", ",").Split(",").Select(t => t.Trim());
 
             if (!decimal.TryParse(wholeSalePriceStr, NumberStyles.Any, new CultureInfo("en-US"), out decimal wholeSalePrice))
-                return CommandFailed<CreateProductCommand>(new ValidationException(MessageKind.CreateProduct_WholeSalePrice_Invalid_Line, i));
+                return Failed<CreateProductCommand>(new ValidationException(MessageKind.CreateProduct_WholeSalePrice_Invalid_Line, i));
             else
                 createProductCommand.WholeSalePricePerUnit = wholeSalePrice;
 
             if (!decimal.TryParse(vatStr, NumberStyles.Any, new CultureInfo("en-US"), out decimal vat))
-                return CommandFailed<CreateProductCommand>(new ValidationException(MessageKind.CreateProduct_Vat_Invalid_Line, i));
+                return Failed<CreateProductCommand>(new ValidationException(MessageKind.CreateProduct_Vat_Invalid_Line, i));
             else
                 createProductCommand.Vat = vat;
 
@@ -459,7 +459,7 @@ namespace Sheaft.Application.Handlers
             var tags = await _context.FindAsync<Tag>(t => tagsStr.Contains(t.Name), token);
             createProductCommand.Tags = tags.Select(t => t.Id);
 
-            return OkResult(createProductCommand);
+            return Ok(createProductCommand);
         }
 
         #endregion

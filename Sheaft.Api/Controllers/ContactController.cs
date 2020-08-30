@@ -40,7 +40,7 @@ namespace Sheaft.Api.Controllers
             if (!results.Success)
             {
                 if (results.Exception.Kind != ExceptionKind.Unexpected)
-                    return new RedirectResult(origin + "?error=" + results.Message.Value);
+                    return new RedirectResult(origin + "?error=" + results.Message);
 
                 return new RedirectResult(origin + "?error=Une%20erreur%20inattendue%20est%20survenue.");
             }

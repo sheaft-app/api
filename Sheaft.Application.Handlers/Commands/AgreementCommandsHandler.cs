@@ -69,7 +69,7 @@ namespace Sheaft.Application.Handlers
                 if (request.RequestUser.CompanyId == delivery.Producer.Id)
                     await _queuesService.ProcessEventAsync(AgreementCreatedByProducerEvent.QUEUE_NAME, new AgreementCreatedByProducerEvent(request.RequestUser) { Id = entity.Id }, token);
 
-                return OkResult(entity.Id);
+                return Ok(entity.Id);
             });
         }
 
@@ -100,7 +100,7 @@ namespace Sheaft.Application.Handlers
                 if (request.RequestUser.CompanyId == entity.Delivery.Producer.Id)
                     await _queuesService.ProcessEventAsync(AgreementAcceptedByProducerEvent.QUEUE_NAME, new AgreementAcceptedByProducerEvent(request.RequestUser) { Id = entity.Id }, token);
 
-                return OkResult(true);
+                return Ok(true);
             });
         }
 
@@ -114,11 +114,11 @@ namespace Sheaft.Application.Handlers
                     {
                         var result = await _mediatr.Send(new CancelAgreementCommand(request.RequestUser) { Id = agreementId, Reason = request.Reason }, token);
                         if (!result.Success)
-                            return CommandFailed<bool>(result.Exception);
+                            return Failed<bool>(result.Exception);
                     }
 
                     await transaction.CommitAsync(token);
-                    return OkResult(true);
+                    return Ok(true);
                 }
             });
         }
@@ -139,7 +139,7 @@ namespace Sheaft.Application.Handlers
                 if (request.RequestUser.CompanyId == entity.Delivery.Producer.Id)
                     await _queuesService.ProcessEventAsync(AgreementCancelledByProducerEvent.QUEUE_NAME, new AgreementCancelledByProducerEvent(request.RequestUser) { Id = entity.Id }, token);
 
-                return OkResult(true);
+                return Ok(true);
             });
         }
 
@@ -153,11 +153,11 @@ namespace Sheaft.Application.Handlers
                     {
                         var result = await _mediatr.Send(new RefuseAgreementCommand(request.RequestUser) { Id = agreementId, Reason = request.Reason }, token);
                         if (!result.Success)
-                            return CommandFailed<bool>(result.Exception);
+                            return Failed<bool>(result.Exception);
                     }
 
                     await transaction.CommitAsync(token);
-                    return OkResult(true);
+                    return Ok(true);
                 }
             });
         }
@@ -178,7 +178,7 @@ namespace Sheaft.Application.Handlers
                 if (request.RequestUser.CompanyId == entity.Delivery.Producer.Id)
                     await _queuesService.ProcessEventAsync(AgreementRefusedByProducerEvent.QUEUE_NAME, new AgreementRefusedByProducerEvent(request.RequestUser) { Id = entity.Id }, token);
 
-                return OkResult(true);
+                return Ok(true);
             });
         }
 
@@ -191,7 +191,7 @@ namespace Sheaft.Application.Handlers
                 _context.Remove(entity);
                 await _context.SaveChangesAsync(token);
 
-                return OkResult(true);
+                return Ok(true);
             });
         }
 
@@ -205,7 +205,7 @@ namespace Sheaft.Application.Handlers
                 _context.Update(entity);
                 await _context.SaveChangesAsync(token);
 
-                return OkResult(true);
+                return Ok(true);
             });
         }
 
@@ -219,7 +219,7 @@ namespace Sheaft.Application.Handlers
                 _context.Update(entity);
                 await _context.SaveChangesAsync(token);
 
-                return OkResult(true);
+                return Ok(true);
             });
         }
     }

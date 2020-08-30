@@ -84,7 +84,7 @@ namespace Sheaft.Application.Handlers
                     }, token);
                 }
 
-                return OkResult(true);
+                return Ok(true);
             });
         }
 
@@ -110,7 +110,7 @@ namespace Sheaft.Application.Handlers
                     await _blobService.UploadDepartmentsProgressAsync(stream, token);
                 }
 
-                return OkResult(true);
+                return Ok(true);
             });
         }
 

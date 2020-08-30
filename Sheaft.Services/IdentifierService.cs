@@ -72,7 +72,7 @@ namespace Sheaft.Services
                 return new CommandResult<string>(uuid.Exception);
 
             var identifier = GenerateEanIdentifier(uuid.Result, 13);
-            return new CommandResult<string>(true, identifier);
+            return new CommandResult<string>(identifier);
         }
 
         public async Task<CommandResult<string>> GetNextProductReferenceAsync(Guid serialNumber, CancellationToken token)
@@ -82,7 +82,7 @@ namespace Sheaft.Services
                 return new CommandResult<string>(uuid.Exception);
 
             var identifier = GenerateEanIdentifier(uuid.Result, 13);
-            return new CommandResult<string>(true, identifier);
+            return new CommandResult<string>(identifier);
         }
 
         public async Task<CommandResult<string>> GetNextSponsoringCode(CancellationToken token)
@@ -130,7 +130,7 @@ namespace Sheaft.Services
                     }
                 } while (concurrentUpdateError);
 
-                return new CommandResult<string>(true, code);
+                return new CommandResult<string>(code);
             }
             catch (Exception e)
             {
@@ -216,7 +216,7 @@ namespace Sheaft.Services
                     }
                 } while (concurrentUpdateError);
 
-                return new CommandResult<long>(true, id);
+                return new CommandResult<long>(id);
             }
             catch (Exception e)
             {
