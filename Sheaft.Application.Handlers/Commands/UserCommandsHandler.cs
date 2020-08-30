@@ -285,7 +285,7 @@ namespace Sheaft.Application.Handlers
 
                 var oidcResult = await _httpClient.PutAsync(_authOptions.Actions.Profile, new StringContent(JsonConvert.SerializeObject(oidcUser), Encoding.UTF8, "application/json"), token);
                 if (!oidcResult.IsSuccessStatusCode)
-                    return Failed<bool>(new BadRequestException(MessageKind.UpdateUser_Oidc_UpdateProfile_Error, await oidcResult.Content.ReadAsStringAsync().ConfigureAwait(false)));
+                    return BadRequest<bool>(MessageKind.UpdateUser_Oidc_UpdateProfile_Error, await oidcResult.Content.ReadAsStringAsync());
 
                 _context.Update(entity);
                 await _cache.RemoveAsync(entity.Id.ToString("N"));
@@ -381,7 +381,7 @@ namespace Sheaft.Application.Handlers
 
                 var oidcResult = await _httpClient.PutAsync(_authOptions.Actions.Picture, new StringContent(JsonConvert.SerializeObject(oidcUser), Encoding.UTF8, "application/json"), token);
                 if (!oidcResult.IsSuccessStatusCode)
-                    return Failed<bool>(new BadRequestException(MessageKind.UpdateUser_Oidc_UpdatePicture_Error, await oidcResult.Content.ReadAsStringAsync().ConfigureAwait(false)));
+                    return BadRequest<bool>(MessageKind.UpdateUser_Oidc_UpdatePicture_Error, await oidcResult.Content.ReadAsStringAsync());
 
                 _context.Update(entity);
 

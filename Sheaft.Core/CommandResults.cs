@@ -12,7 +12,7 @@ namespace Sheaft.Core
 
         public bool Success => Result != null;
         public SheaftException Exception { get; }
-        public MessageKind Message { get; }
+        public MessageKind? Message { get; }
         public object[] Params { get; }
 
         // with result
@@ -37,11 +37,9 @@ namespace Sheaft.Core
             Exception = exception;
         }
 
-        public CommandResult(MessageKind? message, params object[] objs)
+        protected CommandResult(MessageKind? message, params object[] objs)
         {
-            if(message != null)
-                Message = message.Value;
-
+            Message = message;
             Params = objs;
         }
     }

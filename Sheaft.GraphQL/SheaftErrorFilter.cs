@@ -5,7 +5,6 @@ using Microsoft.Extensions.Logging;
 using Sheaft.Exceptions;
 using Sheaft.Interop.Enums;
 using Sheaft.Localization;
-using System.Linq;
 
 namespace Sheaft.GraphQL
 {
@@ -33,12 +32,9 @@ namespace Sheaft.GraphQL
                 error = error.WithCode(exc.Kind.ToString("G"));
                 error = error.WithMessage(_localizer[exc.Kind.ToString("G")]);
 
-                if (exc.Errors != null && exc.Errors.Any())
+                if (exc.Error.HasValue)
                 {
-                    foreach (var exError in exc.Errors)
-                    {
-                        error = error.AddExtension(exc.Kind.ToString("G"), _localizer[exError.Key.ToString("G"), exError.Value ?? new object[]{}]);
-                    }
+                    error = error.AddExtension(exc.Kind.ToString("G"), _localizer[exc.Error.Value.ToString("G"), exc.Params ?? new object[] { }]);
                 }
 
                 _logger.LogError(exc, $"{error.Code} -  {error.Message}", error);

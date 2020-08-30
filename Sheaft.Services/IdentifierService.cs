@@ -134,7 +134,7 @@ namespace Sheaft.Services
             }
             catch (Exception e)
             {
-                return new CommandResult<string>(MessageKind.Identifier_SponsorCode_Error, e);
+                return new CommandResult<string>(e, MessageKind.Identifier_SponsorCode_Error);
             }
         }
         private static string GenerateEanIdentifier(long value, int length)
@@ -220,7 +220,7 @@ namespace Sheaft.Services
             }
             catch (Exception e)
             {
-                return new CommandResult<long>(MessageKind.Identifier_Uuid_Error, e);
+                return new CommandResult<long>(e, MessageKind.Identifier_Uuid_Error);
             }
         }
 

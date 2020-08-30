@@ -1,21 +1,14 @@
 using Sheaft.Interop.Enums;
 using System;
-using System.Collections.Generic;
-using System.Net;
 
 namespace Sheaft.Exceptions
 {
     public class ConflictException : SheaftException
     {
-        public ConflictException() : this(new KeyValuePair<MessageKind, object[]>())
+        public ConflictException(Exception exception, MessageKind? error = null, params object[] args) : base(ExceptionKind.Conflict, exception, error, args)
         {
         }
-
-        public ConflictException(MessageKind message, params object[] args) : this(new KeyValuePair<MessageKind, object[]>(message, args))
-        {
-        }
-
-        public ConflictException(KeyValuePair<MessageKind, object[]> message) : base(ExceptionKind.Conflict, message)
+        public ConflictException(MessageKind? error = null, params object[] args) : this(null, error, args)
         {
         }
     }

@@ -54,11 +54,17 @@ namespace Sheaft.Infrastructure
         {
             var item = await Set<T>().SingleOrDefaultAsync(c => c.Id == id, token);
             if (item == null)
-                throw new SheaftException(ExceptionKind.NotFound, GetExceptionDefaultMessage<T>(MessageKind.NotFound, id));
+            {
+                var message = GetExceptionDefaultMessage<T>(MessageKind.NotFound, id);
+                throw new SheaftException(ExceptionKind.NotFound, message.Key, message.Value);
+            }
 
             var itemAsRemoved = (ITrackRemove)item;
             if (itemAsRemoved.RemovedOn.HasValue)
-                throw new SheaftException(ExceptionKind.Gone, GetExceptionDefaultMessage<T>(MessageKind.Gone, id));
+            {
+                var message = GetExceptionDefaultMessage<T>(MessageKind.NotFound, id);
+                throw new SheaftException(ExceptionKind.Gone, message.Key, message.Value);
+            }
 
             return item;
         }
@@ -150,7 +156,7 @@ namespace Sheaft.Infrastructure
             return base.SaveChangesAsync(acceptAllChangesOnSuccess, cancellationToken);
         }
 
-        private KeyValuePair<MessageKind, object[]> GetExceptionDefaultMessage<T>(MessageKind kind, Guid id) where T : class, IIdEntity, ITrackRemove
+        private KeyValuePair<MessageKind, string> GetExceptionDefaultMessage<T>(MessageKind kind, Guid id) where T : class, IIdEntity, ITrackRemove
         {
             var messageKind = kind;
             var resource = id.ToString("N");
@@ -160,7 +166,7 @@ namespace Sheaft.Infrastructure
             else 
                 resource = $"{_localizer[typeof(T).Name, string.Empty]} ({id})";            
 
-            return new KeyValuePair<MessageKind, object[]>(messageKind, new List<object> { resource }.ToArray());
+            return new KeyValuePair<MessageKind, string>(messageKind, resource);
         }
 
         private void UpdateRelatedData()

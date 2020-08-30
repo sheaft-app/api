@@ -26,35 +26,35 @@ namespace Sheaft.Application.Handlers
         protected CommandResult<T> ValidationError<T>(MessageKind? message = null, params object[] objs)
         {
             Logger.LogTrace(nameof(CommandsHandler.ValidationError), message, objs);
-            return new CommandResult<T>(message, objs);
+            return new CommandResult<T>(new ValidationException(message, objs));
         }
         protected CommandResult<T> BadRequest<T>(MessageKind? message = null, params object[] objs)
         {
             Logger.LogTrace(nameof(CommandsHandler.BadRequest), message, objs);
-            return new CommandResult<T>(message, objs);
+            return new CommandResult<T>(new BadRequestException(message, objs));
         }
         protected CommandResult<T> Conflict<T>(MessageKind? message = null, params object[] objs)
         {
             Logger.LogTrace(nameof(CommandsHandler.Conflict), message, objs);
-            return new CommandResult<T>(message, objs);
+            return new CommandResult<T>(new ConflictException(message, objs));
         }
 
         protected CommandResult<T> Unauthorized<T>(MessageKind? message = null, params object[] objs)
         {
             Logger.LogTrace(nameof(CommandsHandler.Unauthorized), message, objs);
-            return new CommandResult<T>(message, objs);
+            return new CommandResult<T>(new UnauthorizedException(message, objs));
         }
 
         protected CommandResult<T> Forbidden<T>(MessageKind? message = null, params object[] objs)
         {
             Logger.LogTrace(nameof(CommandsHandler.Forbidden), message, objs);
-            return new CommandResult<T>(message, objs);
+            return new CommandResult<T>(new ForbiddenException(message, objs));
         }
 
         protected CommandResult<T> NotFound<T>(MessageKind? message = null, params object[] objs)
         {
             Logger.LogTrace(nameof(CommandsHandler.NotFound), message, objs);
-            return new CommandResult<T>(message, objs);
+            return new CommandResult<T>(new NotFoundException(message, objs));
         }
 
         protected CommandResult<T> Created<T>(T result, MessageKind? message = null, params object[] objs)
@@ -72,13 +72,13 @@ namespace Sheaft.Application.Handlers
         protected CommandResult<T> Locked<T>(MessageKind? message = null, params object[] objs)
         {
             Logger.LogTrace(nameof(CommandsHandler.Locked), message, objs);
-            return new CommandResult<T>(message, objs);
+            return new CommandResult<T>(new LockedException(message, objs));
         }
 
         protected CommandResult<T> InternalError<T>(MessageKind? message = null, params object[] objs)
         {
             Logger.LogTrace(nameof(CommandsHandler.InternalError), message, objs);
-            return new CommandResult<T>(message, objs);
+            return new CommandResult<T>(new UnexpectedException(message, objs));
         }
 
         protected CommandResult<T> Failed<T>(SheaftException exception, MessageKind? message = null, params object[] objs)

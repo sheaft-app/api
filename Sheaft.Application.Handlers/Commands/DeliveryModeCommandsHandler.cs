@@ -101,7 +101,7 @@ namespace Sheaft.Application.Handlers
                 var entity = await _context.GetByIdAsync<DeliveryMode>(request.Id, token);
                 var activeAgreements = await _context.Agreements.CountAsync(a => a.Delivery.Id == entity.Id && !a.RemovedOn.HasValue, token);
                 if (activeAgreements > 0)
-                    throw new BadRequestException(MessageKind.DeliveryMode_CannotRemove_With_Active_Agreements, entity.Name, activeAgreements);
+                    return BadRequest<bool>(MessageKind.DeliveryMode_CannotRemove_With_Active_Agreements, entity.Name, activeAgreements);
 
                 _context.Remove(entity);
                 return Ok(await _context.SaveChangesAsync(token) > 0);

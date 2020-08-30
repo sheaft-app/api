@@ -1,15 +1,14 @@
 ﻿using Sheaft.Interop.Enums;
-using System.Collections.Generic;
+using System;
 
 namespace Sheaft.Exceptions
 {
     public class ValidationException : SheaftException
     {
-        public ValidationException(MessageKind message, params object[] args) : this(new KeyValuePair<MessageKind, object[]>(message, args))
+        public ValidationException(Exception exception, MessageKind? error = null, params object[] args): base(ExceptionKind.Validation, exception, error, args)
         {
         }
-
-        public ValidationException(KeyValuePair<MessageKind, object[]> message) : base(ExceptionKind.Validation, message)
+        public ValidationException(MessageKind? error = null, params object[] args) : this(null, error, args)
         {
         }
     }

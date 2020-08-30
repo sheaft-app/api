@@ -567,8 +567,10 @@ namespace Sheaft.GraphQL
         {
             var commandName = typeof(U).Name;
             _logger.LogTrace($"{nameof(SheaftMutation.ExecuteCommandAsync)} - {commandName}");
+
             var result = await _mediator.Send(input, token);
             _logger.LogTrace($"{nameof(SheaftMutation.ExecuteCommandAsync)} - {commandName} - {result.Success}");
+
             if (result.Success)
                 return result.Result;
 
@@ -578,7 +580,7 @@ namespace Sheaft.GraphQL
                 throw result.Exception;
             }
 
-            throw new BadRequestException(result.Message);
+            throw new UnexpectedException(result.Message);
         }
     }
 }

@@ -7,15 +7,10 @@ namespace Sheaft.Exceptions
 {
     public class UnexpectedException : SheaftException
     {
-        public UnexpectedException(Exception exception = null) : this(new KeyValuePair<MessageKind, object[]>(), exception)
+        public UnexpectedException(Exception exception, MessageKind? error = null, params object[] args) : base(ExceptionKind.Unexpected, exception, error, args)
         {
         }
-
-        public UnexpectedException(MessageKind message, Exception exception = null, params object[] args) : this(new KeyValuePair<MessageKind, object[]>(message, args), exception)
-        {
-        }
-
-        public UnexpectedException(KeyValuePair<MessageKind, object[]> message, Exception exception = null) : base(ExceptionKind.Unexpected, exception, message)
+        public UnexpectedException(MessageKind? error = null, params object[] args) : this(null, error, args)
         {
         }
     }

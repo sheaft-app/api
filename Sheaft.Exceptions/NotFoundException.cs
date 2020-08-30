@@ -1,20 +1,14 @@
 using Sheaft.Interop.Enums;
-using System.Collections.Generic;
-using System.Net;
+using System;
 
 namespace Sheaft.Exceptions
 {
     public class NotFoundException : SheaftException
     {
-        public NotFoundException() : this(new KeyValuePair<MessageKind, object[]>())
+        public NotFoundException(Exception exception, MessageKind? error = null, params object[] args) : base(ExceptionKind.NotFound, exception, error, args)
         {
         }
-
-        public NotFoundException(MessageKind message, params object[] args) : this(new KeyValuePair<MessageKind, object[]>(message, args))
-        {
-        }
-
-        public NotFoundException(KeyValuePair<MessageKind, object[]> message) : base(ExceptionKind.NotFound, message)
+        public NotFoundException(MessageKind? error = null, params object[] args) : this(null, error, args)
         {
         }
     }
