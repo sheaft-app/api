@@ -51,6 +51,7 @@ namespace Sheaft.Application.Handlers
                 await _context.SaveChangesAsync(token);
 
                 await _queuesService.InsertJobToProcessAsync(entity, token);
+                Logger.LogInformation($"Account RGPD data export successfully initiated by {request.RequestUser.Id}");
 
                 return Ok(entity.Id);
             });
@@ -83,6 +84,8 @@ namespace Sheaft.Application.Handlers
                             throw response.Exception;
 
                         await _queuesService.ProcessEventAsync(AccountExportDataSucceededEvent.QUEUE_NAME, new AccountExportDataSucceededEvent(request.RequestUser) { Id = job.Id, JobId = job.Id }, token);
+                        
+                        Logger.LogInformation($"RGPD data for account {request.RequestUser.Id} successfully exported");
                         return await _mediatr.Send(new CompleteJobCommand(request.RequestUser) { Id = job.Id, FileUrl = response.Result });
                     }
                 }

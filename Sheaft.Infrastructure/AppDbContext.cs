@@ -13,14 +13,21 @@ using System.Linq;
 using System.Linq.Expressions;
 using Microsoft.Extensions.Localization;
 using Sheaft.Localization;
+using Microsoft.Extensions.Logging;
 
 namespace Sheaft.Infrastructure
 {
     public partial class AppDbContext : DbContext, IAppDbContext
     {
         private readonly IStringLocalizer<MessageResources> _localizer;
-        public AppDbContext(DbContextOptions<AppDbContext> options, IStringLocalizer<MessageResources> localizer) : base(options)
+        private readonly ILogger<AppDbContext> _logger;
+        public AppDbContext(
+            DbContextOptions<AppDbContext> options, 
+            IStringLocalizer<MessageResources> localizer, 
+            ILogger<AppDbContext> logger) 
+                : base(options)
         {
+            _logger = logger;
             _localizer = localizer;
         }
 
@@ -62,7 +69,7 @@ namespace Sheaft.Infrastructure
             var itemAsRemoved = (ITrackRemove)item;
             if (itemAsRemoved.RemovedOn.HasValue)
             {
-                var message = GetExceptionDefaultMessage<T>(MessageKind.NotFound, id);
+                var message = GetExceptionDefaultMessage<T>(MessageKind.Gone, id);
                 throw new SheaftException(ExceptionKind.Gone, message.Key, message.Value);
             }
 

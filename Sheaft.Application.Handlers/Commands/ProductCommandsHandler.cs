@@ -112,6 +112,7 @@ namespace Sheaft.Application.Handlers
                 await _context.AddAsync(entity, token);
                 await _context.SaveChangesAsync(token);
 
+                Logger.LogInformation($"Product {entity.Id} successfully created by {request.RequestUser.Id}");
                 return Created(entity.Id);
             });
         }
@@ -149,7 +150,10 @@ namespace Sheaft.Application.Handlers
                 entity.SetImage(picture);
 
                 _context.Update(entity);
-                return Ok(await _context.SaveChangesAsync(token) > 0);
+                var result = await _context.SaveChangesAsync(token);
+
+                Logger.LogInformation($"Product {entity.Id} successfully edited by {request.RequestUser.Id}");
+                return Ok(result > 0);
             });
         }
 
@@ -167,6 +171,7 @@ namespace Sheaft.Application.Handlers
 
                 await _queuesService.ProcessCommandAsync(CreateUserPointsCommand.QUEUE_NAME, new CreateUserPointsCommand(request.RequestUser) { CreatedOn = DateTimeOffset.UtcNow, Kind = PointKind.RateProduct, UserId = request.RequestUser.Id }, token);
 
+                Logger.LogInformation($"Product {entity.Id} successfully rated by {request.RequestUser.Id}");
                 return Ok(result > 0);
             });
         }
@@ -198,7 +203,10 @@ namespace Sheaft.Application.Handlers
                 entity.SetAvailable(request.Available);
 
                 _context.Update(entity);
-                return Ok(await _context.SaveChangesAsync(token) > 0);
+                var result = await _context.SaveChangesAsync(token);
+
+                Logger.LogInformation($"Product {entity.Id} successfully switched as available {request.Available} by {request.RequestUser.Id}");
+                return Ok(result > 0);
             });
         }
 
@@ -229,7 +237,10 @@ namespace Sheaft.Application.Handlers
                 entity.Remove();
 
                 _context.Remove(entity);
-                return Ok(await _context.SaveChangesAsync(token) > 0);
+                var result = await _context.SaveChangesAsync(token);
+
+                Logger.LogInformation($"Product {entity.Id} successfully deleted by {request.RequestUser.Id}");
+                return Ok(result > 0);
             });
         }
 
@@ -252,8 +263,9 @@ namespace Sheaft.Application.Handlers
                 await _context.SaveChangesAsync(token);
 
                 await _queuesService.InsertJobToProcessAsync(entity, token);
+                Logger.LogInformation($"Import products {entity.Id} successfully created by {request.RequestUser.Id}");
 
-                return Ok(entity.Id);
+                return Created(entity.Id);
             });
         }
 
@@ -311,6 +323,8 @@ namespace Sheaft.Application.Handlers
                         throw result.Exception;
 
                     await _queuesService.ProcessEventAsync(ProductImportSucceededEvent.QUEUE_NAME, new ProductImportSucceededEvent(request.RequestUser) { Id = job.Id }, token);
+                    
+                    Logger.LogInformation($"Products import Job {job.Id} successfully processed");
                     return result;
                 }
                 catch (Exception e)
@@ -331,7 +345,10 @@ namespace Sheaft.Application.Handlers
                 entity.SetImage(picture);
 
                 _context.Update(entity);
-                return Ok(await _context.SaveChangesAsync(token) > 0);
+                var result = await _context.SaveChangesAsync(token);
+
+                Logger.LogInformation($"Product {entity.Id} image, successfully updated by {request.RequestUser.Id}");
+                return Ok(result > 0);
             });
         }
 
@@ -343,7 +360,10 @@ namespace Sheaft.Application.Handlers
                 entity.Restore();
 
                 _context.Update(entity);
-                return Ok(await _context.SaveChangesAsync(token) > 0);
+                var result = await _context.SaveChangesAsync(token);
+
+                Logger.LogInformation($"Product {entity.Id} successfully restored by {request.RequestUser.Id}");
+                return Ok(result > 0);
             });
         }
 

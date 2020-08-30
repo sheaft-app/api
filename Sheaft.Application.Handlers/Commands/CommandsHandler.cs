@@ -111,22 +111,22 @@ namespace Sheaft.Application.Handlers
         {
             try
             {
-                Logger.LogTrace(nameof(CommandsHandler.ExecuteAsync), method);
+                Logger.LogTrace($"{nameof(CommandsHandler.ExecuteAsync)} - {method.Method.DeclaringType?.DeclaringType?.Name ?? method.Target.ToString().Split("+")[0]}");
                 return await method();
             }
             catch (SheaftException e)
             {
-                Logger.LogError(nameof(CommandsHandler.ExecuteAsync), e);
+                Logger.LogError($"{nameof(CommandsHandler.ExecuteAsync)} - {method.Method.DeclaringType?.DeclaringType?.Name ?? method.Target.ToString().Split("+")[0]}: exception: {{0}}", e);
                 return Failed<T>(e);
             }
             catch (DbUpdateConcurrencyException e)
             {
-                Logger.LogError(nameof(CommandsHandler.ExecuteAsync), e);
+                Logger.LogError($"{nameof(CommandsHandler.ExecuteAsync)} - {method.Method.DeclaringType?.DeclaringType?.Name ?? method.Target.ToString().Split("+")[0]}: exception: {{0}}", e);
                 return Conflict<T>();
             }
             catch (Exception e)
             {
-                Logger.LogError(nameof(CommandsHandler.ExecuteAsync), e);
+                Logger.LogCritical($"{nameof(CommandsHandler.ExecuteAsync)} - {method.Method.DeclaringType?.DeclaringType?.Name ?? method.Target.ToString().Split("+")[0]}: exception: {{0}}", e);
                 return InternalError<T>();
             }
         }
@@ -135,22 +135,22 @@ namespace Sheaft.Application.Handlers
         {
             try
             {
-                Logger.LogTrace(nameof(CommandsHandler.ExecuteAsync), method);
+                Logger.LogTrace($"{nameof(CommandsHandler.ExecuteAsync)} - {method.Method.DeclaringType?.DeclaringType?.Name ?? method.Target.ToString().Split("+")[0]}");
                 return await method();
             }
             catch (SheaftException e)
             {
-                Logger.LogError(nameof(CommandsHandler.ExecuteAsync), e);
+                Logger.LogError($"{nameof(CommandsHandler.ExecuteAsync)} - {method.Method.DeclaringType?.DeclaringType?.Name ?? method.Target.ToString().Split("+")[0]}: exception: {{0}}", e);
                 return Failed<IEnumerable<T>>(e);
             }
             catch (DbUpdateConcurrencyException e)
             {
-                Logger.LogError(nameof(CommandsHandler.ExecuteAsync), e);
+                Logger.LogError($"{nameof(CommandsHandler.ExecuteAsync)} - {method.Method.DeclaringType?.DeclaringType?.Name ?? method.Target.ToString().Split("+")[0]}: exception: {{0}}", e);
                 return Conflict<IEnumerable<T>>();
             }
             catch (Exception e)
             {
-                Logger.LogError(nameof(CommandsHandler.ExecuteAsync), e);
+                Logger.LogError($"{nameof(CommandsHandler.ExecuteAsync)} - {method.Method.DeclaringType?.DeclaringType?.Name ?? method.Target.ToString().Split("+")[0]}: exception: {{0}}", e);
                 return InternalError<IEnumerable<T>>();
             }
         }
