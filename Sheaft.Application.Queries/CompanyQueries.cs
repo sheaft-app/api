@@ -73,7 +73,7 @@ namespace Sheaft.Application.Queries
             }
         }
 
-        public async Task<StoresSearchDto> SearchStoresAsync(Guid companyId, SearchTermsInput terms, RequestUser currentUser, CancellationToken token)
+        public async Task<StoresSearchDto> SearchStoresAsync(Guid producerId, SearchTermsInput terms, RequestUser currentUser, CancellationToken token)
         {
             try
             {
@@ -93,7 +93,7 @@ namespace Sheaft.Application.Queries
                     HighlightPostTag = "</b>"
                 };
 
-                var producer = await _context.GetByIdAsync<Company>(companyId, token);
+                var producer = await _context.GetByIdAsync<Producer>(producerId, token);
                 if (!string.IsNullOrWhiteSpace(terms.Sort))
                 {
                     if (terms.Sort.Contains("store_geolocation"))
@@ -161,7 +161,7 @@ namespace Sheaft.Application.Queries
             }
         }
 
-        public async Task<ProducersSearchDto> SearchProducersAsync(Guid companyId, SearchTermsInput terms, RequestUser currentUser, CancellationToken token)
+        public async Task<ProducersSearchDto> SearchProducersAsync(Guid storeId, SearchTermsInput terms, RequestUser currentUser, CancellationToken token)
         {
             try
             {
@@ -181,7 +181,7 @@ namespace Sheaft.Application.Queries
                     HighlightPostTag = "</b>"
                 };
 
-                var store = await _context.GetByIdAsync<Company>(companyId, token);
+                var store = await _context.GetByIdAsync<Store>(storeId, token);
                 if (!string.IsNullOrWhiteSpace(terms.Sort))
                 {
                     if (terms.Sort.Contains("producer_geolocation"))
@@ -249,31 +249,17 @@ namespace Sheaft.Application.Queries
             }
         }
 
-        public IQueryable<CompanyDto> GetCompany(Guid id, RequestUser currentUser)
+        public IQueryable<CompanyProfileDto> GetProfile(Guid id, RequestUser currentUser)
         {
             try
             {
-                return _context.Companies
-                        .Get(c => c.Id == id && c.Id == currentUser.CompanyId)
-                        .ProjectTo<CompanyDto>(_configurationProvider);
+                return _context.Users.OfType<Company>()
+                        .Get(c => c.Id == id && c.Id == currentUser.Id)
+                        .ProjectTo<CompanyProfileDto>(_configurationProvider);
             }
             catch (Exception e)
             {
-                return new List<CompanyDto>().AsQueryable();
-            }
-        }
-
-        public IQueryable<CompanyDto> GetCompanies(RequestUser currentUser)
-        {
-            try
-            {
-                return _context.Companies
-                        .Get(c => c.Id == currentUser.CompanyId)
-                        .ProjectTo<CompanyDto>(_configurationProvider);
-            }
-            catch (Exception e)
-            {
-                return new List<CompanyDto>().AsQueryable();
+                return new List<CompanyProfileDto>().AsQueryable();
             }
         }
 
@@ -281,7 +267,7 @@ namespace Sheaft.Application.Queries
         {
             try
             {
-                return _context.Companies
+                return _context.Users.OfType<Producer>()
                         .Get(c => c.Id == id && c.Kind == ProfileKind.Producer)
                         .ProjectTo<ProducerDto>(_configurationProvider);
             }
@@ -295,7 +281,7 @@ namespace Sheaft.Application.Queries
         {
             try
             {
-                return _context.Companies
+                return _context.Users.OfType<Store>()
                         .Get(c => c.Id == id && c.Kind == ProfileKind.Store)
                         .ProjectTo<StoreDto>(_configurationProvider);
             }
@@ -303,125 +289,6 @@ namespace Sheaft.Application.Queries
             {
                 return new List<StoreDto>().AsQueryable();
             }
-        }
-
-        private static IQueryable<CompanyDto> GetAsDto(IQueryable<Company> query)
-        {
-            return query
-                .Select(c => new CompanyDto
-                {
-                    Id = c.Id,
-                    Address = new AddressDto
-                    {
-                        City = c.Address.City,
-                        Latitude = c.Address.Latitude,
-                        Line1 = c.Address.Line1,
-                        Line2 = c.Address.Line2,
-                        Longitude = c.Address.Longitude,
-                        Zipcode = c.Address.Zipcode
-                    },
-                    UpdatedOn = c.UpdatedOn,
-                    RemovedOn = c.RemovedOn,
-                    AppearInBusinessSearchResults = c.AppearInBusinessSearchResults,
-                    CreatedOn = c.CreatedOn,
-                    Description = c.Description,
-                    Email = c.Email,
-                    Kind = c.Kind,
-                    Name = c.Name,
-                    OpeningHours = c.OpeningHours.Select(oh => new TimeSlotDto
-                    {
-                        Day = oh.Day,
-                        From = oh.From,
-                        To = oh.To
-                    }),
-                    Phone = c.Phone,
-                    Picture = c.Picture,
-                    Tags = c.Tags.Select(st => new TagDto
-                    {
-                        Id = st.Tag.Id,
-                        Name = st.Tag.Name,
-                        Description = st.Tag.Description,
-                        Image = st.Tag.Image,
-                        Kind = st.Tag.Kind,
-                        UpdatedOn = st.Tag.UpdatedOn,
-                        CreatedOn = st.Tag.CreatedOn
-                    }),
-                    Reason = c.Reason,
-                    Siret = c.Siret,
-                    VatIdentifier = c.VatIdentifier
-                });
-        }
-
-        private static IQueryable<StoreDto> GetAsStoreDto(IQueryable<Company> query)
-        {
-            return query
-                .Select(c => new StoreDto
-                {
-                    Id = c.Id,
-                    Address = new AddressDto
-                    {
-                        City = c.Address.City,
-                        Latitude = c.Address.Latitude,
-                        Line1 = c.Address.Line1,
-                        Line2 = c.Address.Line2,
-                        Longitude = c.Address.Longitude,
-                        Zipcode = c.Address.Zipcode
-                    },
-                    Description = c.Description,
-                    Email = c.Email,
-                    Name = c.Name,
-                    OpeningHours = c.OpeningHours.Select(oh => new TimeSlotDto
-                    {
-                        Day = oh.Day,
-                        From = oh.From,
-                        To = oh.To
-                    }),
-                    Phone = c.Phone,
-                    Picture = c.Picture,
-                    Tags = c.Tags.Select(st => new TagDto
-                    {
-                        Id = st.Tag.Id,
-                        Name = st.Tag.Name,
-                        Description = st.Tag.Description,
-                        Image = st.Tag.Image,
-                        Kind = st.Tag.Kind,
-                        UpdatedOn = st.Tag.UpdatedOn,
-                        CreatedOn = st.Tag.CreatedOn
-                    })
-                });
-        }
-
-        private static IQueryable<ProducerDto> GetAsProducerDto(IQueryable<Company> query)
-        {
-            return query
-                .Select(c => new ProducerDto
-                {
-                    Id = c.Id,
-                    Address = new AddressDto
-                    {
-                        City = c.Address.City,
-                        Latitude = c.Address.Latitude,
-                        Line1 = c.Address.Line1,
-                        Line2 = c.Address.Line2,
-                        Longitude = c.Address.Longitude,
-                        Zipcode = c.Address.Zipcode
-                    },
-                    Description = c.Description,
-                    Email = c.Email,
-                    Name = c.Name,
-                    Phone = c.Phone,
-                    Picture = c.Picture,
-                    Tags = c.Tags.Select(st => new TagDto
-                    {
-                        Id = st.Tag.Id,
-                        Name = st.Tag.Name,
-                        Description = st.Tag.Description,
-                        Image = st.Tag.Image,
-                        Kind = st.Tag.Kind,
-                        UpdatedOn = st.Tag.UpdatedOn,
-                        CreatedOn = st.Tag.CreatedOn
-                    })
-                });
         }
 
         private class CompanySiretResult

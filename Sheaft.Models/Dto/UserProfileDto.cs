@@ -1,4 +1,4 @@
-using Sheaft.Interop.Enums;
+﻿using Sheaft.Interop.Enums;
 using System;
 
 namespace Sheaft.Models.Dto
@@ -9,9 +9,12 @@ namespace Sheaft.Models.Dto
         public ProfileKind Kind { get; set; }
         public string Email { get; set; }
         public string Name { get; set; }
-        public string ShortName { get; set; }
-        public string Initials { get; set; }
         public string Phone { get; set; }
         public string Picture { get; set; }
+        public string FirstName { get; set; }
+        public string LastName { get; set; }
+        public DateTimeOffset? Birthdate { get; set; }
+        public string Nationality { get; set; }
+        public string CountryOfResidence { get; set; }
     }
 }

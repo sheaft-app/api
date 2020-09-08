@@ -180,7 +180,7 @@ namespace Sheaft.Api
             });
 
             services.AddAutoMapper(typeof(ProductProfile).Assembly);
-            services.AddMediatR(new List<Assembly>() { typeof(RegisterCompanyCommand).Assembly, typeof(UserPointsCreatedEvent).Assembly, typeof(AccountCommandsHandler).Assembly }.ToArray());
+            services.AddMediatR(new List<Assembly>() { typeof(RegisterStoreCommand).Assembly, typeof(UserPointsCreatedEvent).Assembly, typeof(UserCommandsHandler).Assembly }.ToArray());
             services.AddHttpClient();
 
             var databaseConfig = databaseSettings.Get<DatabaseOptions>();
@@ -195,6 +195,7 @@ namespace Sheaft.Api
             services.AddScoped<IBlobService, BlobService>();
             services.AddScoped<IEmailService, EmailService>();
             services.AddScoped<ISignalrService, SignalrService>();
+            services.AddScoped<IImageService, ImageService>();
 
             services.AddScoped<IAgreementQueries, AgreementQueries>();
             services.AddScoped<ICompanyQueries, CompanyQueries>();
@@ -209,6 +210,7 @@ namespace Sheaft.Api
             services.AddScoped<IQuickOrderQueries, QuickOrderQueries>();
             services.AddScoped<IRegionQueries, RegionQueries>();
             services.AddScoped<ITagQueries, TagQueries>();
+            services.AddScoped<IConsumerQueries, ConsumerQueries>();
             services.AddScoped<IUserQueries, UserQueries>();
 
             services.AddScoped<IDapperContext, DapperContext>();

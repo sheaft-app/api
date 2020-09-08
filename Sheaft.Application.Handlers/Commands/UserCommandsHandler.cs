@@ -1,56 +1,51 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Net.Http;
-using System.Text;
-using System.Text.RegularExpressions;
+﻿using Sheaft.Application.Commands;
+using Sheaft.Infrastructure.Interop;
+using System;
 using System.Threading;
 using System.Threading.Tasks;
-using IdentityModel.Client;
 using MediatR;
-using Newtonsoft.Json;
-using Sheaft.Application.Commands;
-using Sheaft.Application.Events;
 using Sheaft.Core;
-using Sheaft.Exceptions;
+using Sheaft.Application.Events;
 using Sheaft.Domain.Models;
-using Sheaft.Infrastructure.Interop;
+using System.IO;
+using OfficeOpenXml;
 using Sheaft.Interop.Enums;
+using System.Linq;
 using Sheaft.Services.Interop;
-using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.Formats.Jpeg;
-using SixLabors.ImageSharp.Processing;
+using Microsoft.Extensions.Logging;
 using Sheaft.Models.Inputs;
+using System.Net.Http;
+using Newtonsoft.Json;
+using System.Text;
+using Sheaft.Exceptions;
 using Sheaft.Options;
 using Microsoft.Extensions.Options;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Caching.Distributed;
+using IdentityModel.Client;
+using System.Collections.Generic;
 
 namespace Sheaft.Application.Handlers
 {
     public class UserCommandsHandler : CommandsHandler,
-        IRequestHandler<RegisterOwnerCommand, CommandResult<Guid>>,
-        IRequestHandler<RegisterConsumerCommand, CommandResult<Guid>>,
-        IRequestHandler<UpdateUserCommand, CommandResult<bool>>,
-        IRequestHandler<UpdateUserPictureCommand, CommandResult<bool>>,
-        IRequestHandler<DeleteUsersCommand, CommandResult<bool>>,
-        IRequestHandler<DeleteUserCommand, CommandResult<bool>>,
-        IRequestHandler<RemoveUserDataCommand, CommandResult<string>>,
-        IRequestHandler<GenerateUserSponsoringCodeCommand, CommandResult<string>>,
+        IRequestHandler<QueueExportUserDataCommand, CommandResult<Guid>>,
+        IRequestHandler<ExportUserDataCommand, CommandResult<bool>>,
+        IRequestHandler<GenerateUserCodeCommand, CommandResult<string>>,
         IRequestHandler<CreateUserPointsCommand, CommandResult<bool>>,
-        IRequestHandler<ChangeUserRolesCommand, CommandResult<bool>>
+        IRequestHandler<ChangeUserRolesCommand, CommandResult<bool>>,
+        IRequestHandler<UpdateUserPictureCommand, CommandResult<bool>>,
+        IRequestHandler<RemoveUserDataCommand, CommandResult<string>>
     {
         private readonly IAppDbContext _context;
         private readonly IMediator _mediatr;
         private readonly IIdentifierService _identifierService;
         private readonly IQueueService _queuesService;
-        private readonly IBlobService _blobsService;
-        private readonly AuthOptions _authOptions;
+        private readonly IBlobService _blobService;
+        private readonly IImageService _imageService;
         private readonly ScoringOptions _scoringOptions;
         private readonly StorageOptions _storageOptions;
         private readonly HttpClient _httpClient;
         private readonly RoleOptions _roleOptions;
+        private readonly AuthOptions _authOptions;
         private readonly IDistributedCache _cache;
 
         public UserCommandsHandler(
@@ -62,12 +57,14 @@ namespace Sheaft.Application.Handlers
             IIdentifierService identifierService,
             IAppDbContext context,
             IQueueService queuesService,
-            IBlobService blobsService,
-            ILogger<UserCommandsHandler> logger, 
+            IBlobService blobService,
+            IImageService imageService,
+            ILogger<UserCommandsHandler> logger,
             IOptionsSnapshot<RoleOptions> roleOptions,
             IDistributedCache cache) : base(logger)
         {
-            _roleOptions = roleOptions.Value;            
+            _imageService = imageService;
+            _roleOptions = roleOptions.Value;
             _authOptions = authOptions.Value;
             _scoringOptions = scoringOptions.Value;
             _storageOptions = storageOptions.Value;
@@ -75,145 +72,12 @@ namespace Sheaft.Application.Handlers
             _mediatr = mediatr;
             _identifierService = identifierService;
             _queuesService = queuesService;
-            _blobsService = blobsService;
+            _blobService = blobService;
 
             _httpClient = httpClientFactory.CreateClient("identityServer");
             _httpClient.BaseAddress = new Uri(_authOptions.Url);
             _httpClient.SetToken(_authOptions.Scheme, _authOptions.ApiKey);
             _cache = cache;
-        }
-
-        public async Task<CommandResult<Guid>> Handle(RegisterOwnerCommand request, CancellationToken token)
-        {
-            return await ExecuteAsync(async () =>
-            {
-                var entity = await _context.FindByIdAsync<User>(request.Id, token);
-                if (entity != null)
-                    return Conflict<Guid>(MessageKind.RegisterOwner_User_AlreadyExists);
-
-                if (request.Roles.Contains(_roleOptions.Producer.Value) && request.Roles.Contains(_roleOptions.Store.Value))
-                    return BadRequest<Guid>(MessageKind.RegisterOwner_User_CannotBe_ProducerAndStoreRoles);
-
-                var roles = new List<Guid>();
-
-                if (!request.Roles.Contains(_roleOptions.Owner.Value))
-                {
-                    roles.Add(_roleOptions.Owner.Id);
-                }
-
-                if (request.Roles.Contains(_roleOptions.Producer.Value))
-                {
-                    roles.Add(_roleOptions.Producer.Id);
-                }
-
-                if (request.Roles.Contains(_roleOptions.Store.Value))
-                {
-                    roles.Add(_roleOptions.Store.Id);
-                }
-
-                var picture = await HandleImageAsync(entity.Id, request.Picture, token);
-
-                var oidcUser = new IdentityUserInput(request.Id, request.Email, request.FirstName, request.LastName, roles)
-                {
-                    Phone = request.Phone,
-                    Picture = picture
-                };
-
-                var oidcResult = await _httpClient.PutAsync(_authOptions.Actions.Profile, new StringContent(JsonConvert.SerializeObject(oidcUser), Encoding.UTF8, "application/json"), token);
-                if (!oidcResult.IsSuccessStatusCode)
-                    return Failed<Guid>(new BadRequestException(MessageKind.RegisterOwner_Oidc_Register_Error, await oidcResult.Content.ReadAsStringAsync().ConfigureAwait(false)));
-
-                var company = await _context.GetByIdAsync<Company>(request.CompanyId, token);
-
-                entity = new User(request.Id, UserKind.Owner, request.Email, request.FirstName, request.LastName, request.Phone, company);
-                entity.SetPicture(picture);
-
-                await _context.AddAsync(entity, token);
-                await _context.SaveChangesAsync(token);
-
-                if (!string.IsNullOrWhiteSpace(request.SponsoringCode))
-                {
-                    var sponsor = await _context.FindSingleAsync<User>(u => u.Code == request.SponsoringCode, token);
-                    if (sponsor == null)
-                        return NotFound<Guid>(MessageKind.RegisterOwner_UserWithSponsorCode_NotFound);
-
-                    await _context.AddAsync(new Sponsoring(sponsor, entity), token);
-                    await _context.SaveChangesAsync(token);
-
-                    await _queuesService.ProcessEventAsync(UserSponsoredEvent.QUEUE_NAME, new UserSponsoredEvent(request.RequestUser) { SponsorId = sponsor.Id, SponsoredId = entity.Id }, token);
-                    await _queuesService.ProcessCommandAsync(CreateUserPointsCommand.QUEUE_NAME, new CreateUserPointsCommand(request.RequestUser) { CreatedOn = DateTimeOffset.UtcNow, Kind = PointKind.Sponsoring, UserId = sponsor.Id }, token);
-                }
-
-                await _cache.RemoveAsync(entity.Id.ToString("N"));
-                return Created(entity.Id);
-            });
-        }
-
-        public async Task<CommandResult<Guid>> Handle(RegisterConsumerCommand request, CancellationToken token)
-        {
-            return await ExecuteAsync(async () =>
-            {
-                var entity = await _context.FindSingleAsync<User>(r => r.Id == request.Id || r.Email == request.Email, token);
-                if (entity != null)
-                    return Conflict<Guid>(MessageKind.RegisterConsumer_User_AlreadyExists);
-
-                var picture = await HandleImageAsync(request.Id, request.Picture, token);
-
-                var oidcUser = new IdentityUserInput(request.Id, request.Email, request.FirstName, request.LastName, new List<Guid> { _roleOptions.Consumer.Id }) 
-                { 
-                    Phone = request.Phone, 
-                    Picture = picture 
-                };
-
-                var oidcResult = await _httpClient.PutAsync(_authOptions.Actions.Profile, new StringContent(JsonConvert.SerializeObject(oidcUser), Encoding.UTF8, "application/json"), token);
-                if (!oidcResult.IsSuccessStatusCode)
-                    return Failed<Guid>(new BadRequestException(MessageKind.RegisterConsumer_Oidc_Register_Error, await oidcResult.Content.ReadAsStringAsync().ConfigureAwait(false)));
-
-                var user = new User(request.Id, UserKind.Consumer, request.Email, request.FirstName, request.LastName, request.Phone);
-                user.SetPicture(picture);
-                user.SetAnonymous(request.Anonymous);
-
-                var dept = await _context.GetByIdAsync<Department>(request.DepartmentId, token);
-                user.SetDepartment(dept);
-
-                await _context.AddAsync(user, token);
-                await _context.SaveChangesAsync(token);
-
-                if (!string.IsNullOrWhiteSpace(request.SponsoringCode))
-                {
-                    var sponsor = await _context.FindSingleAsync<User>(u => u.Code == request.SponsoringCode, token);
-                    if (sponsor == null)
-                        return NotFound<Guid>(MessageKind.RegisterConsumer_UserWithSponsorCode_NotFound);
-
-                    await _context.AddAsync(new Sponsoring(sponsor, user), token);
-                    await _context.SaveChangesAsync(token);
-
-                    await _queuesService.ProcessEventAsync(UserSponsoredEvent.QUEUE_NAME, new UserSponsoredEvent(request.RequestUser) { SponsorId = sponsor.Id, SponsoredId = user.Id }, token);
-                    await _queuesService.ProcessCommandAsync(CreateUserPointsCommand.QUEUE_NAME, new CreateUserPointsCommand(request.RequestUser) { CreatedOn = DateTimeOffset.UtcNow, Kind = PointKind.Sponsoring, UserId = sponsor.Id }, token);
-                }
-
-                await _cache.RemoveAsync(user.Id.ToString("N"));
-                return Created(user.Id);
-            });
-        }
-
-        public async Task<CommandResult<bool>> Handle(DeleteUsersCommand request, CancellationToken token)
-        {
-            return await ExecuteAsync(async () =>
-            {
-                using (var transaction = await _context.Database.BeginTransactionAsync(token))
-                {
-                    foreach (var id in request.Ids)
-                    {
-                        var result = await _mediatr.Send(new DeleteUserCommand(request.RequestUser) { Id = id, Reason = request.Reason }, token);
-                        if (!result.Success)
-                            return Failed<bool>(result.Exception);
-                    }
-
-                    await transaction.CommitAsync(token);
-                    return Ok(true);
-                }
-            });
         }
 
         public async Task<CommandResult<bool>> Handle(ChangeUserRolesCommand request, CancellationToken token)
@@ -231,15 +95,33 @@ namespace Sheaft.Application.Handlers
 
                 if (request.Roles.Contains(_roleOptions.Store.Value))
                 {
+                    roles.Add(_roleOptions.Owner.Id);
                     roles.Add(_roleOptions.Store.Id);
                 }
 
                 if (request.Roles.Contains(_roleOptions.Consumer.Value))
                 {
+                    roles.Add(_roleOptions.Owner.Id);
                     roles.Add(_roleOptions.Consumer.Id);
                 }
 
-                var oidcUser = new IdentityUserInput(request.Id, entity.Email, entity.FirstName, entity.LastName, roles)
+                string firstname = null;
+                string lastname = null;
+
+                if(entity.Kind == ProfileKind.Consumer)
+                {
+                    var consumer = await _context.GetByIdAsync<Consumer>(request.Id, token);
+                    firstname = consumer.FirstName;
+                    lastname = consumer.LastName;
+                }
+                else
+                {
+                    var company = await _context.GetByIdAsync<Company>(request.Id, token);
+                    firstname = company.Owner.FirstName;
+                    lastname = company.Owner.LastName;
+                }
+
+                var oidcUser = new IdentityUserInput(request.Id, entity.Email, entity.Name, firstname, lastname, roles)
                 {
                     Phone = entity.Phone,
                     Picture = entity.Picture
@@ -247,7 +129,7 @@ namespace Sheaft.Application.Handlers
 
                 var oidcResult = await _httpClient.PutAsync(_authOptions.Actions.Profile, new StringContent(JsonConvert.SerializeObject(oidcUser), Encoding.UTF8, "application/json"), token);
                 if (!oidcResult.IsSuccessStatusCode)
-                    return Failed<bool>(new BadRequestException(MessageKind.UpdateUser_Oidc_UpdateProfile_Error, await oidcResult.Content.ReadAsStringAsync().ConfigureAwait(false)));
+                    return Failed<bool>(new BadRequestException(MessageKind.Oidc_UpdateProfile_Error, await oidcResult.Content.ReadAsStringAsync().ConfigureAwait(false)));
 
                 _context.Update(entity);
                 await _cache.RemoveAsync(entity.Id.ToString("N"));
@@ -256,45 +138,7 @@ namespace Sheaft.Application.Handlers
             });
         }
 
-        public async Task<CommandResult<bool>> Handle(UpdateUserCommand request, CancellationToken token)
-        {
-            return await ExecuteAsync(async () =>
-            {
-                var entity = await _context.GetByIdAsync<User>(request.Id, token);
-
-                entity.SetEmail(request.Email);
-                entity.SetPhone(request.Phone);
-                entity.SetFirstname(request.FirstName);
-                entity.SetLastname(request.LastName);
-                entity.SetAnonymous(request.Anonymous);
-
-                if (request.DepartmentId.HasValue && request.DepartmentId != entity.Department?.Id)
-                {
-                    var dept = await _context.GetByIdAsync<Department>(request.DepartmentId.Value, token);
-                    entity.SetDepartment(dept);
-                }
-                
-                var picture = await HandleImageAsync(request.Id, request.Picture, token);
-                entity.SetPicture(picture);
-
-                var oidcUser = new IdentityUserInput(request.Id, request.Email, request.FirstName, request.LastName)
-                {
-                    Phone = request.Phone,
-                    Picture = entity.Picture
-                };
-
-                var oidcResult = await _httpClient.PutAsync(_authOptions.Actions.Profile, new StringContent(JsonConvert.SerializeObject(oidcUser), Encoding.UTF8, "application/json"), token);
-                if (!oidcResult.IsSuccessStatusCode)
-                    return BadRequest<bool>(MessageKind.UpdateUser_Oidc_UpdateProfile_Error, await oidcResult.Content.ReadAsStringAsync());
-
-                _context.Update(entity);
-                await _cache.RemoveAsync(entity.Id.ToString("N"));
-
-                return Ok(await _context.SaveChangesAsync(token) > 0);
-            });
-        }
-
-        public async Task<CommandResult<string>> Handle(GenerateUserSponsoringCodeCommand request, CancellationToken token)
+        public async Task<CommandResult<string>> Handle(GenerateUserCodeCommand request, CancellationToken token)
         {
             return await ExecuteAsync(async () =>
             {
@@ -314,55 +158,12 @@ namespace Sheaft.Application.Handlers
                 return Created(entity.Code);
             });
         }
-
-        public async Task<CommandResult<bool>> Handle(DeleteUserCommand request, CancellationToken token)
-        {
-            return await ExecuteAsync(async () =>
-            {
-                using (var transaction = await _context.Database.BeginTransactionAsync(token))
-                {
-                    var entity = await _context.GetByIdAsync<User>(request.Id, token);
-
-                    var hasActiveOrders = await _context.AnyAsync<PurchaseOrder>(o => o.Sender.Id == entity.Id && (int)o.Status < 6, token);
-                    if (hasActiveOrders)
-                        return ValidationError<bool>(MessageKind.DeleteUser_CannotBeDeleted_HasActiveOrders);
-
-                    if (entity.UserType == UserKind.Owner && entity.Company != null && !entity.Company.RemovedOn.HasValue)
-                    {
-                        var hasOrders = await _context.AnyAsync<PurchaseOrder>(o => o.Vendor.Id == entity.Company.Id && (int)o.Status < 6, token);
-                        if (hasOrders)
-                            return ValidationError<bool>(MessageKind.DeleteUser_CannotBeDeleted_CompanyHasActiveOrders);
-
-                        var result = await _mediatr.Send(new DeleteCompanyCommand(request.RequestUser) { Id = entity.Company.Id, Reason = request.Reason });
-                        if (!result.Success)
-                            return Failed<bool>(result.Exception);
-                    }
-
-                    var oidcResult = await _httpClient.DeleteAsync(string.Format(_authOptions.Actions.Delete, entity.Id.ToString("N")), token);
-                    if (!oidcResult.IsSuccessStatusCode)
-                        return Failed<bool>(new BadRequestException(MessageKind.DeleteUser_Oidc_DeleteProfile_Error, await oidcResult.Content.ReadAsStringAsync().ConfigureAwait(false)));
-
-                    var email = entity.Email;
-
-                    entity.CloseAccount(request.Reason);
-                    _context.Update(entity);
-
-                    await _context.SaveChangesAsync(token);
-                    await transaction.CommitAsync(token);
-
-                    await _cache.RemoveAsync(entity.Id.ToString("N"));
-                    await _queuesService.ProcessCommandAsync(RemoveUserDataCommand.QUEUE_NAME, new RemoveUserDataCommand(request.RequestUser) { Id = request.Id, Email = email }, token);
-                    return Ok(true);
-                }
-            });
-        }
-
         public async Task<CommandResult<string>> Handle(RemoveUserDataCommand request, CancellationToken token)
         {
             return await ExecuteAsync(async () =>
             {
                 var entity = await _context.GetByIdAsync<User>(request.Id, token);
-                await _blobsService.CleanUserStorageAsync(request.Id, token);
+                await _blobService.CleanUserStorageAsync(request.Id, token);
 
                 return Ok(request.Email);
             });
@@ -374,14 +175,14 @@ namespace Sheaft.Application.Handlers
             {
                 var entity = await _context.GetByIdAsync<User>(request.Id, token);
 
-                var picture = await HandleImageAsync(request.Id, request.Picture, token);
+                var picture = await _imageService.HandleUserImageAsync(request.Id, request.Picture, token);
                 entity.SetPicture(picture);
 
                 var oidcUser = new IdentityPictureInput(request.Id, entity.Picture);
 
                 var oidcResult = await _httpClient.PutAsync(_authOptions.Actions.Picture, new StringContent(JsonConvert.SerializeObject(oidcUser), Encoding.UTF8, "application/json"), token);
                 if (!oidcResult.IsSuccessStatusCode)
-                    return BadRequest<bool>(MessageKind.UpdateUser_Oidc_UpdatePicture_Error, await oidcResult.Content.ReadAsStringAsync());
+                    return BadRequest<bool>(MessageKind.Oidc_UpdatePicture_Error, await oidcResult.Content.ReadAsStringAsync());
 
                 _context.Update(entity);
 
@@ -408,44 +209,201 @@ namespace Sheaft.Application.Handlers
             });
         }
 
-        private async Task<string> HandleImageAsync(Guid id, string picture, CancellationToken token)
+        public async Task<CommandResult<Guid>> Handle(QueueExportUserDataCommand request, CancellationToken token)
         {
-            if (string.IsNullOrWhiteSpace(picture))
-                return null;
-
-            byte[] bytes = null;
-            if (!picture.StartsWith("http") && !picture.StartsWith("https"))
+            return await ExecuteAsync(async () =>
             {
-                var base64Data = picture.StartsWith("data:image") ? Regex.Match(picture, @"data:image/(?<type>.+?),(?<data>.+)").Groups["data"].Value : picture;
-                bytes = Convert.FromBase64String(base64Data);
-            }
-            else if (!picture.StartsWith($"https://{_storageOptions.Account}.blob.{_storageOptions.Suffix}"))
-            {
-                using (var response = await _httpClient.GetAsync(picture))
-                    bytes = await response.Content.ReadAsByteArrayAsync();
-            }
-            else
-                return picture;
+                var sender = await _context.GetByIdAsync<User>(request.RequestUser.Id, token);
 
-            var imageId = Guid.NewGuid().ToString("N");
+                var entity = new Job(Guid.NewGuid(), JobKind.ExportUserData, $"Export RGPD", sender, ExportUserDataCommand.QUEUE_NAME);
+                entity.SetCommand(new ExportUserDataCommand(request.RequestUser) { Id = entity.Id });
 
-            using (var image = Image.Load(bytes))
+                await _context.AddAsync(entity, token);
+                await _context.SaveChangesAsync(token);
+
+                await _queuesService.InsertJobToProcessAsync(entity, token);
+                Logger.LogInformation($"User RGPD data export successfully initiated by {request.RequestUser.Id}");
+
+                return Ok(entity.Id);
+            });
+        }
+
+        public async Task<CommandResult<bool>> Handle(ExportUserDataCommand request, CancellationToken token)
+        {
+            return await ExecuteAsync(async () =>
             {
-                using (var blobStream = new MemoryStream())
+                var job = await _context.GetByIdAsync<Job>(request.Id, token);
+                var user = await _context.GetByIdAsync<User>(request.RequestUser.Id, token);
+
+                try
                 {
-                    image.Clone(context => context.Resize(new ResizeOptions
+                    var startResult = await _mediatr.Send(new StartJobCommand(request.RequestUser) { Id = job.Id });
+                    if (!startResult.Success)
+                        throw startResult.Exception;
+
+                    await _queuesService.ProcessEventAsync(ExportUserDataProcessingEvent.QUEUE_NAME, new ExportUserDataProcessingEvent(request.RequestUser) { Id = request.Id, JobId = job.Id }, token);
+
+                    using (var stream = new MemoryStream())
                     {
-                        Mode = ResizeMode.Max,
-                        Size = new Size(64, 64)
-                    })).Save(blobStream, new JpegEncoder { Quality = 100 });
+                        using (var package = new ExcelPackage(stream))
+                        {
+                            await CreateExcelUserDataFileAsync(package, user, token);
+                        }
 
-                    var compImage = await _blobsService.UploadUserPictureAsync(id, blobStream, token);
-                    if (!compImage.Success)
-                        throw compImage.Exception ?? new BadRequestException();
+                        var response = await _blobService.UploadRgpdFileAsync(request.RequestUser.Id, job.Id, $"RGPD_{job.CreatedOn:dd-MM-yyyy}.xlsx", stream, token);
+                        if (!response.Success)
+                            throw response.Exception;
 
-                    return compImage.Result;
+                        await _queuesService.ProcessEventAsync(ExportUserDataSucceededEvent.QUEUE_NAME, new ExportUserDataSucceededEvent(request.RequestUser) { Id = job.Id, JobId = job.Id }, token);
+                        
+                        Logger.LogInformation($"RGPD data for user {request.RequestUser.Id} successfully exported");
+                        return await _mediatr.Send(new CompleteJobCommand(request.RequestUser) { Id = job.Id, FileUrl = response.Result });
+                    }
+                }
+                catch (Exception e)
+                {
+                    await _queuesService.ProcessEventAsync(ExportUserDataFailedEvent.QUEUE_NAME, new ExportUserDataFailedEvent(request.RequestUser) { Id = request.Id, JobId = job.Id }, token);
+                    return await _mediatr.Send(new FailJobCommand(request.RequestUser) { Id = job.Id, Reason = e.Message }, token);
+                }
+
+            });
+        }
+
+        private async Task CreateExcelUserDataFileAsync(ExcelPackage package, User user, CancellationToken token)
+        {
+            package = ProcessUserProfileData(package, user);
+            package = await ProcessUserOrdersDataAsync(package, user, token);
+            package = await ProcessUserRatingsDataAsync(package, user, token);
+            package = ProcessUserPointsData(package, user);
+
+            package.Save();
+        }
+
+        private ExcelPackage ProcessUserProfileData(ExcelPackage package, User user)
+        {
+            var profileWorksheet = package.Workbook.Worksheets.Add("Profil");
+
+            profileWorksheet.Cells[1, 1, 1, 2].Value = "Vos données";
+            profileWorksheet.Cells[1, 1, 1, 2].Merge = true;
+
+            profileWorksheet.Cells[2, 1].Value = "Nom";
+            //profileWorksheet.Cells[2, 2].Value = user.LastName;
+            profileWorksheet.Cells[3, 1].Value = "Prénom";
+            //profileWorksheet.Cells[3, 2].Value = user.FirstName;
+            profileWorksheet.Cells[4, 1].Value = "Adresse e-mail";
+            profileWorksheet.Cells[4, 2].Value = user.Email;
+            profileWorksheet.Cells[5, 1].Value = "Numéro de mobile";
+            profileWorksheet.Cells[5, 2].Value = user.Phone;
+            profileWorksheet.Cells[6, 1].Value = "Image de profil";
+            profileWorksheet.Cells[6, 2].Value = user.Picture;
+            profileWorksheet.Cells[7, 1].Value = "Date de création du compte";
+            profileWorksheet.Cells[7, 2].Value = user.CreatedOn.ToString("dd/MM/yyyy HH:mm");
+            profileWorksheet.Cells[8, 1].Value = "Date de dernière mise à jour";
+            profileWorksheet.Cells[8, 2].Value = (user.UpdatedOn.HasValue ? user.UpdatedOn.Value : user.CreatedOn).ToString("dd/MM/yyyy HH:mm");
+
+            return package;
+        }
+
+        private async Task<ExcelPackage> ProcessUserOrdersDataAsync(ExcelPackage package, User user, CancellationToken token)
+        {
+            var ordersWorksheet = package.Workbook.Worksheets.Add("Commandes");
+
+            ordersWorksheet.Cells[1, 1, 1, 9].Value = "Vos commandes";
+            ordersWorksheet.Cells[1, 1, 1, 9].Merge = true;
+
+            ordersWorksheet.Cells[2, 1, 2, 6].Value = "Information commande";
+            ordersWorksheet.Cells[2, 1, 2, 6].Merge = true;
+
+            ordersWorksheet.Cells[2, 7, 2, 9].Value = "Détails produits";
+            ordersWorksheet.Cells[2, 7, 2, 9].Merge = true;
+
+            ordersWorksheet.Cells[3, 1].Value = "Numéro de commande";
+            ordersWorksheet.Cells[3, 2].Value = "Destinataire";
+            ordersWorksheet.Cells[3, 3].Value = "Statut";
+            ordersWorksheet.Cells[3, 4].Value = "Date de création";
+            ordersWorksheet.Cells[3, 5].Value = "Date de livraison";
+            ordersWorksheet.Cells[3, 6].Value = "Total TTC";
+            ordersWorksheet.Cells[3, 7].Value = "Nom du produit";
+            ordersWorksheet.Cells[3, 8].Value = "Quantité";
+            ordersWorksheet.Cells[3, 9].Value = "Prix TTC";
+
+            var orders = await _context.FindAsync<PurchaseOrder>(o => o.Sender.Id == user.Id, token);
+            var i = 4;
+            foreach (var order in orders)
+            {
+                foreach (var product in order.Products)
+                {
+                    ordersWorksheet.Cells[i, 1].Value = order.Reference;
+                    ordersWorksheet.Cells[i, 2].Value = order.Vendor.Name;
+                    ordersWorksheet.Cells[i, 3].Value = order.Status.ToString("G");
+                    ordersWorksheet.Cells[i, 4].Value = order.CreatedOn.ToString("dd/MM/yyyy");
+                    ordersWorksheet.Cells[i, 5].Value = order.ExpectedDelivery.ExpectedDeliveryDate.ToString("dd/MM/yyyy");
+                    ordersWorksheet.Cells[i, 6].Value = order.TotalOnSalePrice;
+
+                    ordersWorksheet.Cells[i, 7].Value = product.Name;
+                    ordersWorksheet.Cells[i, 8].Value = product.Quantity;
+                    ordersWorksheet.Cells[i, 9].Value = product.TotalOnSalePrice;
+                    i++;
                 }
             }
+
+            return package;
+        }
+
+        private async Task<ExcelPackage> ProcessUserRatingsDataAsync(ExcelPackage package, User user, CancellationToken token)
+        {
+            var ratingsWorksheet = package.Workbook.Worksheets.Add("Avis");
+
+            ratingsWorksheet.Cells[1, 1, 1, 5].Value = "Vos avis";
+            ratingsWorksheet.Cells[1, 1, 1, 5].Merge = true;
+
+            ratingsWorksheet.Cells[2, 1].Value = "Nom du produit";
+            ratingsWorksheet.Cells[2, 2].Value = "Producteur";
+            ratingsWorksheet.Cells[2, 3].Value = "Date de création";
+            ratingsWorksheet.Cells[2, 4].Value = "Note";
+            ratingsWorksheet.Cells[2, 5].Value = "Commentaire";
+
+            var productsRated = await _context.FindAsync<Product>(o => o.Ratings.Any(r => r.User.Id == user.Id), token);
+            var i = 3;
+            foreach (var product in productsRated)
+            {
+                foreach (var rating in product.Ratings.Where(r => r.User.Id == user.Id))
+                {
+                    ratingsWorksheet.Cells[i, 1].Value = product.Name;
+                    ratingsWorksheet.Cells[i, 2].Value = product.Producer.Name;
+                    ratingsWorksheet.Cells[i, 3].Value = rating.CreatedOn.ToString("G");
+                    ratingsWorksheet.Cells[i, 4].Value = rating.Value;
+                    ratingsWorksheet.Cells[i, 5].Value = rating.Comment;
+
+                    i++;
+                }
+            }
+
+            return package;
+        }
+
+        private ExcelPackage ProcessUserPointsData(ExcelPackage package, User user)
+        {
+            var pointsWorksheet = package.Workbook.Worksheets.Add("Points");
+
+            pointsWorksheet.Cells[1, 1, 1, 3].Value = "Vos points";
+            pointsWorksheet.Cells[1, 1, 1, 3].Merge = true;
+
+            pointsWorksheet.Cells[2, 1].Value = "Date d'acquisition";
+            pointsWorksheet.Cells[2, 2].Value = "Raison";
+            pointsWorksheet.Cells[2, 3].Value = "Quantité";
+
+            var i = 3;
+            foreach (var userRating in user.Points)
+            {
+                pointsWorksheet.Cells[i, 1].Value = userRating.CreatedOn.ToString("dd/MM/yyyy HH:mm");
+                pointsWorksheet.Cells[i, 2].Value = userRating.Kind;
+                pointsWorksheet.Cells[i, 3].Value = userRating.Quantity;
+
+                i++;
+            }
+
+            return package;
         }
     }
 }

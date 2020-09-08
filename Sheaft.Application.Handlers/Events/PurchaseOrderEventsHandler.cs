@@ -55,8 +55,6 @@ namespace Sheaft.Application.Handlers
             var purchaseOrder = await _context.GetByIdAsync<PurchaseOrder>(orderEvent.Id, token);
             await _signalrService.SendNotificationToGroupAsync(purchaseOrder.Vendor.Id, nameof(PurchaseOrderCancelledBySenderEvent), GetPurchaseNotifModelAsString(purchaseOrder));
 
-            var cancelUser = await _context.GetByIdAsync<User>(orderEvent.RequestUser.Id, token);
-
             var url = $"{_configuration.GetValue<string>("Urls:Portal")}/#/orders/{purchaseOrder.Id}";
             await _emailService.SendTemplatedEmailAsync(
                 purchaseOrder.Vendor.Email,
@@ -71,15 +69,11 @@ namespace Sheaft.Application.Handlers
             var purchaseOrder = await _context.GetByIdAsync<PurchaseOrder>(orderEvent.Id, token);
             await _signalrService.SendNotificationToUserAsync(purchaseOrder.Sender.Id, nameof(PurchaseOrderCancelledByVendorEvent), GetPurchaseNotifModelAsString(purchaseOrder));
 
-            var cancelUser = await _context.GetByIdAsync<User>(orderEvent.RequestUser.Id, token);
-
-            var email = purchaseOrder.Sender.Email;
-            var name = purchaseOrder.Sender.Name;
             var url = $"{_configuration.GetValue<string>("Urls:Portal")}/#/my-orders/{purchaseOrder.Id}";
 
             await _emailService.SendTemplatedEmailAsync(
-                email,
-                name,
+                purchaseOrder.Sender.Email,
+                purchaseOrder.Sender.Name,
                 PurchaseOrderCancelledByVendorEvent.MAILING_TEMPLATE_ID,
                 GetTemplateDatas(purchaseOrder, url),
                 token);

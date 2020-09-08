@@ -51,9 +51,9 @@ namespace Sheaft.Manage.Controllers
             if (requestUser.IsImpersonating)
             {
                 if(requestUser.IsInRole(_roleOptions.Store.Value))
-                    query = query.Where(p => p.Store.Id == requestUser.CompanyId);
+                    query = query.Where(p => p.Store.Id == requestUser.Id);
                 else
-                    query = query.Where(p => p.Delivery.Producer.Id == requestUser.CompanyId);
+                    query = query.Where(p => p.Delivery.Producer.Id == requestUser.Id);
             }
 
             var entities = await query
@@ -93,13 +93,12 @@ namespace Sheaft.Manage.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(AgreementViewModel model, CancellationToken token)
+        public async Task<IActionResult> Reset(AgreementViewModel model, CancellationToken token)
         {
             var requestUser = await GetRequestUser(token);
             var result = await _mediatr.Send(new ResetAgreementStatusToCommand(requestUser)
             {
-                Id = model.Id,
-                Status = model.Status
+                Id = model.Id
             }, token);
 
             if (!result.Success)

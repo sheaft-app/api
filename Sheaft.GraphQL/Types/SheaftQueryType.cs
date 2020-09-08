@@ -1,6 +1,7 @@
 ﻿using HotChocolate.Types;
+using Sheaft.GraphQL.Types;
 
-namespace Sheaft.GraphQL.Types
+namespace Sheaft.GraphQL
 {
     public class SheaftQueryType : ObjectType<SheaftQuery>
     {
@@ -46,8 +47,6 @@ namespace Sheaft.GraphQL.Types
             descriptor.Field(c => c.GetStoreDeliveriesForProducersAsync(default, default));
             descriptor.Field(c => c.GetStoreProducts(default));
             descriptor.Field(c => c.GetTags(default));
-            descriptor.Field(c => c.GetUser(default, default)).Argument("input", c => c.Type<NonNullType<IdType>>());
-            descriptor.Field(c => c.GetUsers(default));
             descriptor.Field(c => c.HasPickingOrdersExportsInProgressAsync(default));
             descriptor.Field(c => c.HasProductsImportsInProgressAsync(default));
             descriptor.Field(c => c.Me(default));

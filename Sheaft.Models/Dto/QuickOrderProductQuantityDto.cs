@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 
 namespace Sheaft.Models.Dto
 {
@@ -15,6 +14,6 @@ namespace Sheaft.Models.Dto
         public decimal UnitVatPrice { get; set; }
         public decimal UnitOnSalePrice { get; set; }
         public decimal? UnitWeight { get; set; }
-        public CompanyProfileDto Producer { get; set; }
+        public UserDto Producer { get; set; }
     }
 }

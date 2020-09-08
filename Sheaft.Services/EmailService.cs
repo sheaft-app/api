@@ -53,7 +53,7 @@ namespace Sheaft.Services
             }
             catch(Exception e)
             {
-                _logger.LogError(e, $"{nameof(BlobService.UploadCompanyPictureAsync)} - {e.Message}");
+                _logger.LogError(e, $"{nameof(EmailService.SendTemplatedEmailAsync)} - {e.Message}");
                 return new CommandResult<bool>(e);
             }
         }

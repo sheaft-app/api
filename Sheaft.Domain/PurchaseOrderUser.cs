@@ -3,36 +3,20 @@ using System;
 
 namespace Sheaft.Domain.Models
 {
-    public class PurchaseOrderUser
+    public abstract class PurchaseOrderUser
     {
         protected PurchaseOrderUser()
         {
         }
 
-        protected PurchaseOrderUser(User user): this(user.Company)
+        protected PurchaseOrderUser(User user)
         {
-            if (user.Company != null)
-                return;
-
             Id = user.Id;
-            Name = user.FirstName + " " + user.LastName;
-            Kind = ProfileKind.Consumer;
+            Name = user.Name;
+            Kind = user.Kind;
             Email = user.Email;
             Phone = user.Phone;
             Picture = user.Picture;
-        }
-
-        protected PurchaseOrderUser(Company company)
-        {
-            if (company == null)
-                return;
-
-            Id = company.Id;
-            Name = company.Name;
-            Kind = company.Kind;
-            Email = company.Email;
-            Phone = company.Phone;
-            Picture = company.Picture;
         }
 
         public Guid Id { get; private set; }
@@ -47,10 +31,7 @@ namespace Sheaft.Domain.Models
     {
         protected PurchaseOrderVendor() { }
 
-        public PurchaseOrderVendor(User user) : base(user)
-        {
-        }
-        public PurchaseOrderVendor(Company company) : base(company)
+        public PurchaseOrderVendor(Producer vendor) : base(vendor)
         {
         }
     }

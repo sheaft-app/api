@@ -19,9 +19,9 @@ namespace Sheaft.Models.ViewModels
         public string Description { get; set; }
         public string VatIdentifier { get; set; }
         public string Siret { get; set; }
-        public bool AppearInBusinessSearchResults { get; set; }
+        public bool OpenForNewBusiness { get; set; }
         public AddressViewModel Address { get; set; }
+        public AddressViewModel BillingAddress { get; set; }
         public IEnumerable<Guid> Tags { get; set; }
-        public IEnumerable<TimeSlotViewModel> OpeningHours { get; set; }
     }
 }

@@ -11,15 +11,7 @@ namespace Sheaft.Domain.Models
         {
         }
 
-        public Notification(Guid id, NotificationKind kind, string method, string content, User user):this(id, kind, method, content, user, user?.Company)
-        {
-        }
-
-        public Notification(Guid id, NotificationKind kind, string method, string content, Company group):this(id, kind, method, content, null, group)
-        {
-        }
-
-        private Notification(Guid id, NotificationKind kind, string method, string content, User user, Company group)
+        public Notification(Guid id, NotificationKind kind, string method, string content, User user)
         {
             if (content == null)
                 throw new ValidationException(MessageKind.Notification_Require_Content);
@@ -28,7 +20,6 @@ namespace Sheaft.Domain.Models
             Kind = kind;
             Method = method;
             User = user;
-            Group = group;
             Content = content;
             Unread = true;
         }
@@ -41,7 +32,6 @@ namespace Sheaft.Domain.Models
         public DateTimeOffset? RemovedOn { get; private set; }
         public string Content { get; private set; }
         public string Method { get; set; }
-        public virtual Company Group { get; set; }
         public virtual User User { get; set; }
 
         public void SetAsRead()

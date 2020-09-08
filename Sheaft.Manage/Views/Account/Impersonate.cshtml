@@ -30,10 +30,8 @@ else if (Model != null && Model.Any())
         <thead class="thead-dark">
             <tr>
                 <th>Kind</th>
-                <th>FirstName</th>
-                <th>LastName</th>
+                <th>Name</th>
                 <th>Email</th>
-                <th>Company</th>
                 <th></th>
             </tr>
         </thead>
@@ -42,21 +40,19 @@ else if (Model != null && Model.Any())
             {
                 @foreach (var user in Model)
                 {
-                    <tr>
-                        <td>@user.Kind</td>
-                        <td>@user.FirstName</td>
-                        <td>@user.LastName</td>
-                        <td>@user.Email</td>
-                        <td>@user.Company</td>
-                        <td>
-                            @using (Html.BeginForm("ImpersonateById", "Account", new { Id = user.Id }, FormMethod.Post, true, new { @class = "form" }))
-                            {
-                                <button type="submit" class="btn btn-primary">
-                                    <i class="fa fa-user-secret"></i>
-                                </button>
-                            }
-                        </td>
-                    </tr>
+            <tr>
+                <td>@user.Kind</td>
+                <td>@user.Name</td>
+                <td>@user.Email</td>
+                <td>
+                    @using (Html.BeginForm("ImpersonateById", "Account", new { Id = user.Id }, FormMethod.Post, true, new { @class = "form" }))
+                    {
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fa fa-user-secret"></i>
+                        </button>
+                    }
+                </td>
+            </tr>
                 }
             }
             else

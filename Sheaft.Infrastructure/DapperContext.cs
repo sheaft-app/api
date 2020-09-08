@@ -48,11 +48,11 @@ namespace Sheaft.Infrastructure
             }
         }
 
-        public async Task<bool> SetNotificationAsReadAsync(Guid userId, Guid? groupId, DateTimeOffset readBefore, CancellationToken token)
+        public async Task<bool> SetNotificationAsReadAsync(Guid userId, DateTimeOffset readBefore, CancellationToken token)
         {
             using (var connection = new SqlConnection(_databaseOptions.ConnectionString))
             {
-                var result = await connection.ExecuteAsync("exec [dbo].[MarkUserNotificationsAsRead] @UserId, @GroupId, @ReadBefore", new { UserId = userId, GroupId = groupId, ReadBefore = readBefore });
+                var result = await connection.ExecuteAsync("exec [dbo].[MarkUserNotificationsAsRead] @UserUid, @ReadBefore", new { UserUid = userId, ReadBefore = readBefore });
                 return result > 0;
             }
         }

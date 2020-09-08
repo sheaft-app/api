@@ -134,9 +134,6 @@ namespace Sheaft.Api.Authorize
                             if (!string.IsNullOrWhiteSpace(userInfo.preferred_username))
                                 uClaims.Add(new Claim(JwtClaimTypes.PreferredUserName, userInfo.preferred_username, null, subClaim.Issuer, subClaim.OriginalIssuer, subClaim.Subject));
 
-                            if (!string.IsNullOrWhiteSpace(userInfo.company_id))
-                                uClaims.Add(new Claim("company_id", userInfo.company_id, null, subClaim.Issuer, subClaim.OriginalIssuer, subClaim.Subject));
-
                             uClaims.Add(new Claim(JwtClaimTypes.EmailVerified, userInfo.email_verified.ToString().ToLower(), null, subClaim.Issuer, subClaim.OriginalIssuer, subClaim.Subject));
 
                             byte[] buffer;
@@ -207,7 +204,6 @@ namespace Sheaft.Api.Authorize
             public string preferred_username { get; set; }
             public object role { get; set; }
             public string sub { get; set; }
-            public string company_id { get; set; }
         }
     }
 }

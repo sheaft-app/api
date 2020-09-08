@@ -50,9 +50,9 @@ namespace Sheaft.Application.Handlers
                 department.SetLevel(level);
                 department.SetPoints(request.Points);
                 department.SetPosition(request.Position);
-                var users = await _context.Users.CountAsync(u => !u.RemovedOn.HasValue && u.UserType == Interop.Enums.UserKind.Consumer && u.Department != null && u.Department.Id == request.Id, token);
+                var consumersCount = await _context.Users.OfType<Consumer>().CountAsync(u => !u.RemovedOn.HasValue && u.Address.Department.Id == request.Id, token);
 
-                department.SetConsumersCount(users);
+                department.SetConsumersCount(consumersCount);
 
                 department.SetProducersCount(request.Producers);
                 department.SetStoresCount(request.Stores);

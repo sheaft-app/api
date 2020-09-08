@@ -1,6 +1,6 @@
 ﻿using HotChocolate.Types;
 
-namespace Sheaft.GraphQL.Types
+namespace Sheaft.GraphQL
 {
     public class SheaftMutationType : ObjectType<SheaftMutation>
     {
@@ -27,7 +27,7 @@ namespace Sheaft.GraphQL.Types
             descriptor.Field(c => c.DeleteQuickOrdersAsync(default));
             descriptor.Field(c => c.DeleteUserAsync(default));
             descriptor.Field(c => c.DeliverPurchaseOrdersAsync(default, default));
-            descriptor.Field(c => c.ExportAccountDatasAsync(default, default));
+            descriptor.Field(c => c.ExportUserDataAsync(default, default));
             descriptor.Field(c => c.ExportPickingOrdersAsync(default, default));
             descriptor.Field(c => c.GenerateUserSponsoringCodeAsync(default));
             descriptor.Field(c => c.MarkMyNotificationsAsReadAsync());
@@ -37,15 +37,17 @@ namespace Sheaft.GraphQL.Types
             descriptor.Field(c => c.RateProductAsync(default, default));
             descriptor.Field(c => c.RefuseAgreementsAsync(default, default));
             descriptor.Field(c => c.RefusePurchaseOrdersAsync(default, default));
-            descriptor.Field(c => c.RegisterCompanyAsync(default, default));
+            descriptor.Field(c => c.RegisterProducerAsync(default, default));
+            descriptor.Field(c => c.RegisterStoreAsync(default, default));
             descriptor.Field(c => c.RegisterConsumerAsync(default, default));
             descriptor.Field(c => c.ResumeJobsAsync(default, default));
             descriptor.Field(c => c.RetryJobsAsync(default, default));
             descriptor.Field(c => c.SetDefaultQuickOrderAsync(default, default));
             descriptor.Field(c => c.SetProductsAvailabilityAsync(default, default));
             descriptor.Field(c => c.ShipPurchaseOrdersAsync(default, default));
-            descriptor.Field(c => c.UpdateCompanyAsync(default, default));
-            descriptor.Field(c => c.UpdateCompanyPictureAsync(default, default));
+            descriptor.Field(c => c.UpdateProducerAsync(default, default));
+            descriptor.Field(c => c.UpdateStoreAsync(default, default));
+            descriptor.Field(c => c.UpdateCompanyPictureAsync(default));
             descriptor.Field(c => c.UpdateDeliveryModeAsync(default, default));
             descriptor.Field(c => c.UpdatePackagingAsync(default, default));
             descriptor.Field(c => c.UpdateProductAsync(default, default));
@@ -53,7 +55,7 @@ namespace Sheaft.GraphQL.Types
             descriptor.Field(c => c.UpdatePurchaseOrderProductsAsync(default, default));
             descriptor.Field(c => c.UpdateQuickOrderAsync(default, default));
             descriptor.Field(c => c.UpdateQuickOrderProductsAsync(default, default));
-            descriptor.Field(c => c.UpdateUserAsync(default, default));
+            descriptor.Field(c => c.UpdateConsumerAsync(default, default));
             descriptor.Field(c => c.UpdateUserPictureAsync(default, default));
         }
     }

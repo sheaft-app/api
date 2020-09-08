@@ -30,8 +30,8 @@ namespace Sheaft.Application.Handlers
         {
             return await ExecuteAsync(async () =>
             {
-                var company = await _context.GetByIdAsync<Company>(request.RequestUser.CompanyId, token);
-                var packaging = new Packaging(Guid.NewGuid(), company, request.Name, request.WholeSalePrice, request.Vat, request.Description);
+                var producer = await _context.GetByIdAsync<Producer>(request.RequestUser.Id, token);
+                var packaging = new Packaging(Guid.NewGuid(), producer, request.Name, request.WholeSalePrice, request.Vat, request.Description);
 
                 await _context.AddAsync(packaging, token);
                 await _context.SaveChangesAsync(token);

@@ -9,6 +9,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Sheaft.Application.Commands;
+using Sheaft.Domain.Models;
 using Sheaft.Exceptions;
 using Sheaft.Infrastructure.Interop;
 using Sheaft.Interop.Enums;
@@ -48,20 +49,12 @@ namespace Sheaft.Manage.Controllers
             if (take > 100)
                 take = 100;
 
-            var query = _context.Users.AsNoTracking();
+            var query = _context.Users.OfType<User>().AsNoTracking();
 
             var requestUser = await GetRequestUser(token);
             if (requestUser.IsImpersonating)
             {
-                query = query.Where(p => p.Id == requestUser.Id || (p.Company != null && p.Company.Id == requestUser.CompanyId));
-            }
-
-            if (kind.HasValue)
-            {
-                if(kind == ProfileKind.Consumer)
-                    query = query.Where(p => p.Company == null);
-                else
-                    query = query.Where(p => p.Company.Kind == kind);
+                query = query.Where(p => p.Id == requestUser.Id);
             }
 
             var entities = await query
@@ -88,7 +81,7 @@ namespace Sheaft.Manage.Controllers
         [HttpGet]
         public async Task<IActionResult> Edit(Guid id, CancellationToken token)
         {
-            var entity = await _context.Users
+            var entity = await _context.Users.OfType<User>()
                 .AsNoTracking()
                 .Where(c => c.Id == id)
                 .ProjectTo<UserViewModel>(_configurationProvider)
@@ -116,7 +109,7 @@ namespace Sheaft.Manage.Controllers
                 }
             }
 
-            var result = await _mediatr.Send(new UpdateUserCommand(requestUser)
+            var result = await _mediatr.Send(new UpdateConsumerCommand(requestUser)
             {
                 Id = model.Id,
                 Anonymous = model.Anonymous,
@@ -124,7 +117,15 @@ namespace Sheaft.Manage.Controllers
                 FirstName = model.FirstName,
                 LastName = model.LastName,
                 Phone = model.Phone,
-                DepartmentId = model.DepartmentId,
+                Address = new Sheaft.Models.Inputs.AddressInput
+                {
+                    Line1 = model.Address.Line1,
+                    Line2 = model.Address.Line2,
+                    Zipcode = model.Address.Zipcode,
+                    City = model.Address.City,
+                    Latitude = model.Address.Latitude,
+                    Longitude = model.Address.Longitude,
+                },
                 Picture = model.Picture
             }, token);
 
@@ -143,11 +144,11 @@ namespace Sheaft.Manage.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete(Guid id, CancellationToken token)
         {
-            var entity = await _context.Users.SingleOrDefaultAsync(c => c.Id == id, token);
-            var name = $"{entity.FirstName} {entity.LastName}";
+            var entity = await _context.Users.OfType<User>().SingleOrDefaultAsync(c => c.Id == id, token);
+            var name = entity.Name;
 
             var requestUser = await GetRequestUser(token);
-            var result = await _mediatr.Send(new DeleteUserCommand(requestUser)
+            var result = await _mediatr.Send(new DeleteConsumerCommand(requestUser)
             {
                 Id = id
             }, token);

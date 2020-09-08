@@ -31,7 +31,7 @@ namespace Sheaft.Domain.Models
         public string Phone { get; private set; }
         public string Url { get; private set; }
 
-        public virtual User Winner { get; private set; }
+        public virtual Consumer Winner { get; private set; }
         public virtual Department Department { get; private set; }
         public virtual Level Level { get; private set; }
 
@@ -91,7 +91,7 @@ namespace Sheaft.Domain.Models
             Url = url;
         }
 
-        public void AssignRewardToUser(User user)
+        public void AssignRewardToUser(Consumer user)
         {
             Winner = user;
         }

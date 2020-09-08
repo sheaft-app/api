@@ -9,7 +9,7 @@ namespace Sheaft.Mappers
         public ExportProfile()
         {
             CreateMap<ExportPickingOrdersInput, QueueExportPickingOrderCommand>();
-            CreateMap<IdInput, QueueExportAccountDataCommand>();
+            CreateMap<IdInput, QueueExportUserDataCommand>();
         } 
     }
 }

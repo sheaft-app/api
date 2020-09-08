@@ -10,6 +10,6 @@ namespace Sheaft.Infrastructure.Interop
         Task<UserPosition> GetUserPositionAsync(Guid userId);
         Task<UserPosition> GetUserPositionInDepartmentAsync(Guid userId, Guid departmentId);
         Task<UserPosition> GetUserPositionInRegionAsync(Guid userId, Guid regionId);
-        Task<bool> SetNotificationAsReadAsync(Guid userId, Guid? groupId, DateTimeOffset readBefore, CancellationToken token);
+        Task<bool> SetNotificationAsReadAsync(Guid userId, DateTimeOffset readBefore, CancellationToken token);
     }
 }

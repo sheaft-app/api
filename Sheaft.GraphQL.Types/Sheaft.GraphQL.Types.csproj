@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="HotChocolate.Types" Version="10.5.2" />
+    <PackageReference Include="HotChocolate.Types.Filters" Version="10.5.2" />
+    <PackageReference Include="HotChocolate.Types.Sorting" Version="10.5.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Sheaft.Application.Queries\Sheaft.Application.Queries.csproj" />
+    <ProjectReference Include="..\Sheaft.GraphQL.Enums\Sheaft.GraphQL.Enums.csproj" />
+    <ProjectReference Include="..\Sheaft.GraphQL.Filters\Sheaft.GraphQL.Filters.csproj" />
+    <ProjectReference Include="..\Sheaft.GraphQL.Sorts\Sheaft.GraphQL.Sorts.csproj" />
+    <ProjectReference Include="..\Sheaft.Models\Sheaft.Models.csproj" />
+  </ItemGroup>
+
+</Project>

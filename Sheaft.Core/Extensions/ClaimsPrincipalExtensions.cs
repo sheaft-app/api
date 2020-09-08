@@ -58,19 +58,6 @@ namespace Sheaft.Core.Extensions
             return id;
         }
 
-        public static Guid? TryGetCompanyId(this ClaimsPrincipal user)
-        {
-            var userClaim = user.FindFirst(SheaftClaims.CompanyId)?.Value;
-            if (string.IsNullOrWhiteSpace(userClaim))
-                return null;
-
-            var id = Guid.Parse(userClaim);
-            if (id == Guid.Empty)
-                return null;
-
-            return id;
-        }
-
         public static IEnumerable<string> GetRoles(this ClaimsPrincipal user)
         {
             if (!user.Identity.IsAuthenticated)
@@ -85,7 +72,7 @@ namespace Sheaft.Core.Extensions
             var email = user.Claims?.FirstOrDefault(c => c.Type == JwtClaimTypes.Email)?.Value;
             var name = user.Claims?.FirstOrDefault(c => c.Type == JwtClaimTypes.Name)?.Value;
 
-            return new RequestUser(user.TryGetUserId(), user.GetName(), user.GetEmail(), user.GetRoles(), user.TryGetCompanyId(), requestId, impersonification);
+            return new RequestUser(user.TryGetUserId(), user.GetName(), user.GetEmail(), user.GetRoles(), requestId, impersonification);
         }
     }
 }

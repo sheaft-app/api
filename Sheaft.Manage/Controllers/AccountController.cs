@@ -48,7 +48,7 @@ namespace Sheaft.Manage.Controllers
             var id = HttpContext.Request.ImpersonificationId();
             if (id.HasValue)
             {
-                ViewBag.User = await _context.Users
+                ViewBag.User = await _context.Users.OfType<User>()
                     .Where(c => c.Id == id.Value)
                     .ProjectTo<UserViewModel>(_configurationProvider)
                     .SingleOrDefaultAsync(token);
@@ -62,9 +62,7 @@ namespace Sheaft.Manage.Controllers
         public async Task<IActionResult> ImpersonateByEmail(string email, CancellationToken token)
         {
             var users = await _context.Users
-                .Where(c => 
-                    (c.Email.Contains(email) && c.UserType == Interop.Enums.UserKind.Consumer) || 
-                    (c.Company != null && c.Company.Email.Contains(email) && c.UserType == Interop.Enums.UserKind.Owner))
+                .Where(c => c.Email.Contains(email))
                 .ProjectTo<UserViewModel>(_configurationProvider)
                 .ToListAsync(token);
 
@@ -75,8 +73,8 @@ namespace Sheaft.Manage.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> ImpersonateById(Guid id, CancellationToken token)
         {
-            var user = await _context.Users.SingleOrDefaultAsync(c => c.Id == id, token);
-            AddImpersonate(user.Id, user.Company != null ? user.Company.Name : $"{user.FirstName} {user.LastName}");
+            var user = await _context.Users.OfType<User>().SingleOrDefaultAsync(c => c.Id == id, token);
+            AddImpersonate(user.Id, user.Name);
             return RedirectToAction("Index", "Dashboard");
         }
 

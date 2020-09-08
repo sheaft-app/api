@@ -16,12 +16,12 @@ namespace Sheaft.Infrastructure
 
             entity.OwnsOne(c => c.Address, cb =>
             {
-                cb.ToTable("DeliveryAddresses");
+                cb.ToTable("DeliveryModeAddresses");
             });
 
             entity.OwnsMany(c => c.OpeningHours, cb =>
             {
-                cb.ToTable("DeliveryOpeningHours");
+                cb.ToTable("DeliveryModeOpeningHours");
             });
 
             var deliveryHours = entity.Metadata.FindNavigation(nameof(DeliveryMode.OpeningHours));

@@ -24,7 +24,7 @@ namespace Sheaft.Application.Queries
             _configurationProvider = configurationProvider;
         }
 
-        public Task<bool> HasProductsImportsInProgressAsync(Guid companyId, RequestUser currentUser, CancellationToken token)
+        public Task<bool> HasProductsImportsInProgressAsync(Guid producerId, RequestUser currentUser, CancellationToken token)
         {
             try
             {
@@ -32,8 +32,7 @@ namespace Sheaft.Application.Queries
                     !r.Archived &&
                     r.Kind == JobKind.ImportProducts &&
                     (r.Status == ProcessStatusKind.Paused || r.Status == ProcessStatusKind.Processing || r.Status == ProcessStatusKind.Waiting) &&
-                    r.User.Company != null &&
-                    r.User.Company.Id == companyId, token);
+                    r.User.Id == producerId, token);
             }
             catch (Exception e)
             {
@@ -41,16 +40,15 @@ namespace Sheaft.Application.Queries
             }
         }
 
-        public Task<bool> HasPickingOrdersExportsInProgressAsync(Guid companyId, RequestUser currentUser, CancellationToken token)
+        public Task<bool> HasPickingOrdersExportsInProgressAsync(Guid producerId, RequestUser currentUser, CancellationToken token)
         {
             try
             {
                 return _context.AnyAsync<Job>(r =>
                     !r.Archived &&
                     r.Kind == JobKind.CreatePickingFromOrders &&
-                    (r.Status == ProcessStatusKind.Paused || r.Status == ProcessStatusKind.Processing || r.Status == ProcessStatusKind.Waiting) &&
-                    r.User.Company != null &&
-                    r.User.Company.Id == companyId, token);
+                    (r.Status == ProcessStatusKind.Paused || r.Status == ProcessStatusKind.Processing || r.Status == ProcessStatusKind.Waiting) &&                    
+                    r.User.Id == producerId, token);
             }
             catch (Exception e)
             {
@@ -63,9 +61,7 @@ namespace Sheaft.Application.Queries
             try
             {
                 return _context.Jobs
-                        .Get(c =>
-                            c.Id == jobId && ((c.User.Company == null && c.User.Id == currentUser.Id) ||
-                            (c.User.Company != null && c.User.Company.Id == currentUser.CompanyId)))
+                        .Get(c => c.Id == jobId && c.User.Id == currentUser.Id)
                         .ProjectTo<JobDto>(_configurationProvider);
             }
             catch (Exception e)
@@ -79,47 +75,13 @@ namespace Sheaft.Application.Queries
             try
             {
                 return _context.Jobs
-                        .Get(c =>
-                            (c.User.Company == null && c.User.Id == currentUser.Id) ||
-                            (c.User.Company != null && c.User.Company.Id == currentUser.CompanyId))
+                        .Get(c => c.User.Id == currentUser.Id)
                         .ProjectTo<JobDto>(_configurationProvider);
             }
             catch (Exception e)
             {
                 return new List<JobDto>().AsQueryable();
             }
-        }
-
-        private static IQueryable<JobDto> GetAsDto(IQueryable<Job> query)
-        {
-            return query
-                .Select(c => new JobDto
-                {
-                    Id = c.Id,
-                    Archived = c.Archived,
-                    CompletedOn = c.CompletedOn,
-                    CreatedOn = c.CreatedOn,
-                    File = c.File,
-                    Message = c.Message,
-                    Name = c.Name,
-                    RemovedOn = c.RemovedOn,
-                    Retried = c.Retried,
-                    StartedOn = c.StartedOn,
-                    //Status = c.Status,
-                    //Kind = c.Kind,
-                    UpdatedOn = c.UpdatedOn,
-                    //User = new UserProfileDto
-                    //{
-                    //    Id = c.User.Id,
-                    //    Email = c.User.Email,
-                    //    Phone = c.User.Phone,
-                    //    Kind = c.User.Company == null ? ProfileKind.Consumer : (ProfileKind)c.User.Company.Kind,
-                    //    Name = c.User.FirstName + " " + c.User.LastName,
-                    //    ShortName = c.User.FirstName + " " + c.User.LastName.Substring(0, 1) + ".",
-                    //    Picture = c.User.Picture,
-                    //    Initials = c.User.FirstName.Substring(0, 1) + c.User.LastName.Substring(0, 1)
-                    //}
-                });
         }
     }
 }

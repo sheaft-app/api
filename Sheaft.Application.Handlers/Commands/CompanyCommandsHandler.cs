@@ -9,125 +9,144 @@ using Sheaft.Core;
 using System.Linq;
 using System.Collections.Generic;
 using Sheaft.Interop.Enums;
-using System.Text.RegularExpressions;
-using SixLabors.ImageSharp;
-using System.IO;
-using SixLabors.ImageSharp.Processing;
-using SixLabors.ImageSharp.Formats.Jpeg;
 using Sheaft.Services.Interop;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Sheaft.Options;
 using Sheaft.Exceptions;
 using System.Net.Http;
+using Sheaft.Models.Inputs;
+using Newtonsoft.Json;
+using System.Text;
+using Sheaft.Application.Events;
+using IdentityModel.Client;
+using Microsoft.Extensions.Caching.Distributed;
 
 namespace Sheaft.Application.Handlers
 {
     public class CompanyCommandsHandler : CommandsHandler,
-        IRequestHandler<RegisterCompanyCommand, CommandResult<Guid>>,
-        IRequestHandler<UpdateCompanyCommand, CommandResult<bool>>,
-        IRequestHandler<UpdateCompanyPictureCommand, CommandResult<bool>>,
-        IRequestHandler<DeleteCompaniesCommand, CommandResult<bool>>,
-        IRequestHandler<DeleteCompanyCommand, CommandResult<bool>>,
-        IRequestHandler<RemoveCompanyDataCommand, CommandResult<string>>
+        IRequestHandler<RegisterProducerCommand, CommandResult<Guid>>,
+        IRequestHandler<RegisterStoreCommand, CommandResult<Guid>>,
+        IRequestHandler<UpdateProducerCommand, CommandResult<bool>>,
+        IRequestHandler<UpdateStoreCommand, CommandResult<bool>>,
+        IRequestHandler<DeleteCompanyCommand, CommandResult<bool>>
     {
-        private readonly IMediator _mediator;
         private readonly IAppDbContext _context;
-        private readonly IQueueService _queuesService;
-        private readonly IBlobService _blobsService;
+        private readonly IQueueService _queueService;
+        private readonly IImageService _imageService;
         private readonly RoleOptions _roleOptions;
-        private readonly StorageOptions _storageOptions;
         private readonly HttpClient _httpClient;
+        private readonly AuthOptions _authOptions;
+        private readonly IDistributedCache _cache;
 
         public CompanyCommandsHandler(
-            IMediator mediator,
+            IOptionsSnapshot<AuthOptions> authOptions,
+            IDistributedCache cache,
             IAppDbContext context,
-            IQueueService queuesService,
-            IBlobService blobsService,
-            IOptionsSnapshot<StorageOptions> storageOptions,
+            IQueueService queueService,
+            IImageService imageService,
             IHttpClientFactory httpClientFactory,
             ILogger<CompanyCommandsHandler> logger,
             IOptionsSnapshot<RoleOptions> roleOptions) : base(logger)
         {
-            _storageOptions = storageOptions.Value;
+            _authOptions = authOptions.Value;
             _roleOptions = roleOptions.Value;
-            _blobsService = blobsService;
-            _queuesService = queuesService;
-            _mediator = mediator;
+            _imageService = imageService;
+            _queueService = queueService;
             _context = context;
+            _cache = cache;
 
-            _httpClient = httpClientFactory.CreateClient("image");
+            _httpClient = httpClientFactory.CreateClient("companies");
+            _httpClient.BaseAddress = new Uri(_authOptions.Url);
+            _httpClient.SetToken(_authOptions.Scheme, _authOptions.ApiKey);
         }
 
-        public async Task<CommandResult<Guid>> Handle(RegisterCompanyCommand request, CancellationToken token)
+        public async Task<CommandResult<Guid>> Handle(RegisterProducerCommand request, CancellationToken token)
         {
             return await ExecuteAsync(async () =>
             {
                 using (var transaction = await _context.Database.BeginTransactionAsync(token))
                 {
-                    if (!request.Owner.Roles.Contains(_roleOptions.Producer.Value) && !request.Owner.Roles.Contains(_roleOptions.Store.Value))
-                        return ValidationError<Guid>(MessageKind.RegisterCompany_CannotContains_ProducerAndStoreRoles);
-
-                    var kind = ProfileKind.Producer;
-                    if (request.Owner.Roles.Contains(_roleOptions.Store.Value))
-                    {
-                        kind = ProfileKind.Store;
-                    }
+                    var user = await _context.FindByIdAsync<User>(request.Owner.Id, token);
+                    if (user != null)
+                        return Conflict<Guid>(MessageKind.Register_User_AlreadyExists);
 
                     var departmentCode = Address.GetDepartmentCode(request.Address.Zipcode);
                     var department = await _context.GetSingleAsync<Department>(d => d.Code == departmentCode, token);
 
-                    var openingHours = new List<TimeSlotHour>();
-                    if (request.OpeningHours != null)
-                    {
-                        foreach (var oh in request.OpeningHours)
-                        {
-                            openingHours.AddRange(oh.Days.Select(c => new TimeSlotHour(c, oh.From, oh.To)));
-                        }
-                    }
+                    var address = request.Address != null ? new Address(request.Address.Line1, request.Address.Line2, request.Address.Zipcode, request.Address.City, department, request.Address.Longitude, request.Address.Latitude) : null;
+                   
+                    var producer = await CreateProducerAsync(request, address, token);
 
-                    var company = new Company(Guid.NewGuid(), request.Name, kind, request.Email, request.Siret, request.VatIdentifier, request.Address != null ? new Address(request.Address.Line1, request.Address.Line2, request.Address.Zipcode, request.Address.City, department, request.Address.Longitude, request.Address.Latitude) : null, openingHours, request.AppearInBusinessSearchResults, request.Phone, request.Description);
-                    if (request.Tags != null && request.Tags.Any())
-                    {
-                        var tags = await _context.FindAsync<Tag>(t => request.Tags.Contains(t.Id), token);
-                        company.SetTags(tags);
-                    }
-
-                    var picture = await HandleImageAsync(company.Id, request.Picture, token);
-                    company.SetPicture(picture);
-
-                    await _context.AddAsync(company, token);
+                    await _context.AddAsync(producer, token);
                     await _context.SaveChangesAsync(token);
 
-                    var owner = await _mediator.Send(new RegisterOwnerCommand(request.RequestUser)
+                    var roles = new List<Guid> { _roleOptions.Owner.Id, _roleOptions.Producer.Id };
+                    var oidcUser = new IdentityUserInput(producer.Id, producer.Email, producer.Name, producer.FirstName, producer.LastName, roles)
                     {
-                        CompanyId = company.Id,
-                        FirstName = request.Owner.FirstName,
-                        LastName = request.Owner.LastName,
-                        Email = request.Owner.Email,
-                        Roles = request.Owner.Roles,
-                        Phone = request.Owner.Phone,
-                        Picture = request.Owner.Picture,
-                        SponsoringCode = request.Owner.SponsoringCode,
-                        Id = request.RequestUser.Id
-                    }, token);
+                        Phone = request.Phone,
+                        Picture = producer.Picture
+                    };
 
-                    if (!owner.Success)
-                        return Failed<Guid>(owner.Exception);
+                    var oidcResult = await _httpClient.PutAsync(_authOptions.Actions.Profile, new StringContent(JsonConvert.SerializeObject(oidcUser), Encoding.UTF8, "application/json"), token);
+                    if (!oidcResult.IsSuccessStatusCode)
+                        return Failed<Guid>(new BadRequestException(MessageKind.Oidc_Register_Error, await oidcResult.Content.ReadAsStringAsync().ConfigureAwait(false)));
 
-                    await _context.SaveChangesAsync(token);
+                    await RegisterSponsorAsync(request.Owner.SponsoringCode, user, request.RequestUser, token);
                     await transaction.CommitAsync(token);
 
-                    return Created(company.Id);
+                    await _cache.RemoveAsync(user.Id.ToString("N"));
+                    return Created(request.Owner.Id);
                 }
             });
         }
 
-        public async Task<CommandResult<bool>> Handle(UpdateCompanyCommand request, CancellationToken token)
+        public async Task<CommandResult<Guid>> Handle(RegisterStoreCommand request, CancellationToken token)
         {
             return await ExecuteAsync(async () =>
             {
-                var entity = await _context.GetByIdAsync<Company>(request.Id, token);
+                using (var transaction = await _context.Database.BeginTransactionAsync(token))
+                {
+                    var user = await _context.FindByIdAsync<User>(request.Owner.Id, token);
+                    if (user != null)
+                        return Conflict<Guid>(MessageKind.Register_User_AlreadyExists);
+
+                    var departmentCode = Address.GetDepartmentCode(request.Address.Zipcode);
+                    var department = await _context.GetSingleAsync<Department>(d => d.Code == departmentCode, token);
+
+                    var address = request.Address != null ? new Address(request.Address.Line1, request.Address.Line2, request.Address.Zipcode, request.Address.City, department, request.Address.Longitude, request.Address.Latitude) : null;
+                    
+                    var store = await CreateStoreAsync(request, address, token);
+
+                    await _context.AddAsync(store, token);
+                    await _context.SaveChangesAsync(token);
+
+                    var roles = new List<Guid> { _roleOptions.Owner.Id, _roleOptions.Producer.Id };
+                    var oidcUser = new IdentityUserInput(store.Id, store.Email, store.Name, store.FirstName, store.LastName, roles)
+                    {
+                        Phone = request.Phone,
+                        Picture = store.Picture
+                    };
+
+                    var oidcResult = await _httpClient.PutAsync(_authOptions.Actions.Profile, new StringContent(JsonConvert.SerializeObject(oidcUser), Encoding.UTF8, "application/json"), token);
+                    if (!oidcResult.IsSuccessStatusCode)
+                        return Failed<Guid>(new BadRequestException(MessageKind.Oidc_Register_Error, await oidcResult.Content.ReadAsStringAsync().ConfigureAwait(false)));
+
+                    await RegisterSponsorAsync(request.Owner.SponsoringCode, user, request.RequestUser, token);
+
+                    await transaction.CommitAsync(token);
+
+                    await _cache.RemoveAsync(user.Id.ToString("N"));
+                    return Created(request.Owner.Id);
+                }
+            });
+        }
+
+        public async Task<CommandResult<bool>> Handle(UpdateStoreCommand request, CancellationToken token)
+        {
+            return await ExecuteAsync(async () =>
+            {
+                var entity = await _context.GetByIdAsync<Store>(request.Id, token);
 
                 var departmentCode = Address.GetDepartmentCode(request.Address.Zipcode);
                 var department = await _context.GetSingleAsync<Department>(d => d.Code == departmentCode, token);
@@ -140,9 +159,9 @@ namespace Sheaft.Application.Handlers
                 entity.SetSiret(request.Siret);
                 entity.SetAddress(request.Address.Line1, request.Address.Line2, request.Address.Zipcode, request.Address.City, department, request.Address.Longitude, request.Address.Latitude);
                 entity.SetVatIdentifier(request.VatIdentifier);
-                entity.SetAppearInBusinessSearchResults(request.AppearInBusinessSearchResults);
+                entity.SetOpenForNewBusiness(request.OpenForNewBusiness);
 
-                var picture = await HandleImageAsync(entity.Id, request.Picture, token);
+                var picture = await _imageService.HandleUserImageAsync(entity.Id, request.Picture, token);
                 entity.SetPicture(picture);
 
                 if (request.Tags != null)
@@ -167,22 +186,38 @@ namespace Sheaft.Application.Handlers
             });
         }
 
-
-        public async Task<CommandResult<bool>> Handle(DeleteCompaniesCommand request, CancellationToken token)
+        public async Task<CommandResult<bool>> Handle(UpdateProducerCommand request, CancellationToken token)
         {
             return await ExecuteAsync(async () =>
             {
-                foreach (var id in request.Ids)
+                var entity = await _context.GetByIdAsync<Producer>(request.Id, token);
+
+                var departmentCode = Address.GetDepartmentCode(request.Address.Zipcode);
+                var department = await _context.GetSingleAsync<Department>(d => d.Code == departmentCode, token);
+
+                entity.SetName(request.Name);
+                entity.SetEmail(request.Email);
+                entity.SetKind(request.Kind);
+                entity.SetPhone(request.Phone);
+                entity.SetDescription(request.Description);
+                entity.SetSiret(request.Siret);
+                entity.SetAddress(request.Address.Line1, request.Address.Line2, request.Address.Zipcode, request.Address.City, department, request.Address.Longitude, request.Address.Latitude);
+                entity.SetVatIdentifier(request.VatIdentifier);
+                entity.SetOpenForNewBusiness(request.OpenForNewBusiness);
+
+                var picture = await _imageService.HandleUserImageAsync(entity.Id, request.Picture, token);
+                entity.SetPicture(picture);
+
+                if (request.Tags != null)
                 {
-                    var result = await _mediator.Send(new DeleteCompanyCommand(request.RequestUser) { Id = id, Reason = request.Reason }, token);
-                    if (!result.Success)
-                        return Failed<bool>(result.Exception);
+                    var tags = await _context.FindAsync<Tag>(t => request.Tags.Contains(t.Id), token);
+                    entity.SetTags(tags);
                 }
 
+                _context.Update(entity);
                 return Ok(await _context.SaveChangesAsync(token) > 0);
             });
         }
-
 
         public async Task<CommandResult<bool>> Handle(DeleteCompanyCommand request, CancellationToken token)
         {
@@ -191,81 +226,69 @@ namespace Sheaft.Application.Handlers
                 var entity = await _context.GetByIdAsync<Company>(request.Id, token);
                 var email = entity.Email;
 
-                entity.CloseCompany(request.Reason);
+                entity.Close(request.Reason);
                 _context.Update(entity);
 
                 var success = await _context.SaveChangesAsync(token) > 0;
 
-                await _queuesService.ProcessCommandAsync(RemoveCompanyDataCommand.QUEUE_NAME, new RemoveCompanyDataCommand(request.RequestUser) { Id = request.Id, Email = email }, token);
+                await _queueService.ProcessCommandAsync(RemoveUserDataCommand.QUEUE_NAME, new RemoveUserDataCommand(request.RequestUser) { Id = request.Id, Email = email }, token);
                 return Ok(success);
             });
         }
 
-        public async Task<CommandResult<string>> Handle(RemoveCompanyDataCommand request, CancellationToken token)
+        private async Task RegisterSponsorAsync(string code, User user, RequestUser requestUser, CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
+            if (!string.IsNullOrWhiteSpace(code))
             {
-                var entity = await _context.GetByIdAsync<Company>(request.Id, token);
+                var sponsor = await _context.FindSingleAsync<User>(u => u.Code == code, token);
+                if (sponsor == null)
+                    throw new NotFoundException(MessageKind.Register_UserWithSponsorCode_NotFound);
 
-                //TODO remove company data
+                await _context.AddAsync(new Sponsoring(sponsor, user), token);
+                await _context.SaveChangesAsync(token);
 
-                return Ok(request.Email);
-            });
+                await _queueService.ProcessEventAsync(UserSponsoredEvent.QUEUE_NAME, new UserSponsoredEvent(requestUser) { SponsorId = sponsor.Id, SponsoredId = user.Id }, token);
+                await _queueService.ProcessCommandAsync(CreateUserPointsCommand.QUEUE_NAME, new CreateUserPointsCommand(requestUser) { CreatedOn = DateTimeOffset.UtcNow, Kind = PointKind.Sponsoring, UserId = sponsor.Id }, token);
+            }
         }
 
-        public async Task<CommandResult<bool>> Handle(UpdateCompanyPictureCommand request, CancellationToken token)
+        private async Task<Store> CreateStoreAsync(RegisterStoreCommand request, Address address, CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
+            var openingHours = new List<TimeSlotHour>();
+            if (request.OpeningHours != null)
             {
-                var entity = await _context.GetByIdAsync<Company>(request.Id, token);
-
-                var picture = await HandleImageAsync(entity.Id, request.Picture, token);
-                entity.SetPicture(picture);
-
-                _context.Update(entity);
-
-                return Ok(await _context.SaveChangesAsync(token) > 0);
-            });
-        }
-
-        private async Task<string> HandleImageAsync(Guid id, string picture, CancellationToken token)
-        {
-            if (string.IsNullOrWhiteSpace(picture))
-                return null;
-
-            byte[] bytes = null;
-            if (!picture.StartsWith("http") && !picture.StartsWith("https"))
-            {
-                var base64Data = picture.StartsWith("data:image") ? Regex.Match(picture, @"data:image/(?<type>.+?),(?<data>.+)").Groups["data"].Value : picture;
-                bytes = Convert.FromBase64String(base64Data);
-            }
-            else if (!picture.StartsWith($"https://{_storageOptions.Account}.blob.{_storageOptions.Suffix}"))
-            {
-                using (var response = await _httpClient.GetAsync(picture))
-                    bytes = await response.Content.ReadAsByteArrayAsync();
-            }
-            else
-                return picture;
-
-            var imageId = Guid.NewGuid().ToString("N");
-
-            using (var image = Image.Load(bytes))
-            {
-                using (var blobStream = new MemoryStream())
+                foreach (var oh in request.OpeningHours)
                 {
-                    image.Clone(context => context.Resize(new ResizeOptions
-                    {
-                        Mode = ResizeMode.Max,
-                        Size = new Size(64, 64)
-                    })).Save(blobStream, new JpegEncoder { Quality = 100 });
-
-                    var compImage = await _blobsService.UploadCompanyPictureAsync(id, blobStream, token);
-                    if (!compImage.Success)
-                        throw compImage.Exception ?? new BadRequestException();
-
-                    return compImage.Result;
+                    openingHours.AddRange(oh.Days.Select(c => new TimeSlotHour(c, oh.From, oh.To)));
                 }
             }
+
+            var store = new Store(Guid.NewGuid(), request.Name, request.Owner.FirstName, request.Owner.LastName, request.Email, request.Siret, request.VatIdentifier, address, openingHours, request.OpenForNewBusiness, request.Phone, request.Description);
+            if (request.Tags != null && request.Tags.Any())
+            {
+                var tags = await _context.FindAsync<Tag>(t => request.Tags.Contains(t.Id), token);
+                store.SetTags(tags);
+            }
+
+            var picture = await _imageService.HandleUserImageAsync(store.Id, request.Picture, token);
+            store.SetPicture(picture);
+
+            return store;
+        }
+
+        private async Task<Producer> CreateProducerAsync(RegisterProducerCommand request, Address address, CancellationToken token)
+        {
+            var producer = new Producer(Guid.NewGuid(), request.Name, request.Owner.FirstName, request.Owner.LastName, request.Email, request.Siret, request.VatIdentifier, address, request.OpenForNewBusiness, request.Phone, request.Description);
+            if (request.Tags != null && request.Tags.Any())
+            {
+                var tags = await _context.FindAsync<Tag>(t => request.Tags.Contains(t.Id), token);
+                producer.SetTags(tags);
+            }
+
+            var picture = await _imageService.HandleUserImageAsync(producer.Id, request.Picture, token);
+            producer.SetPicture(picture);
+
+            return producer;
         }
     }
 }

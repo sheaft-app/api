@@ -18,12 +18,12 @@ as
      , ra.Latitude as producer_latitude
      , geography::STGeomFromText('POINT('+convert(varchar(20),ra.Longitude)+' '+convert(varchar(20),ra.Latitude)+')',4326) as producer_geolocation
      , count(p.Id) as producer_products_count
-    from dbo.Companies r 
-    join dbo.CompanyAddresses ra on r.Uid = ra.CompanyUid
-    left join dbo.CompanyTags ct on r.Uid = ct.CompanyUid
+    from dbo.Users r 
+    join dbo.UserAddresses ra on r.Uid = ra.UserUid
+    left join dbo.ProducerTags ct on r.Uid = ct.ProducerUid
     left join dbo.Tags t on t.Uid = ct.TagUid
     left join dbo.Products p on p.ProducerUid = r.Uid	
-	where r.Kind = 0 and r.AppearInBusinessSearchResults = 1
+	where r.Kind = 0 and r.OpenForNewBusiness = 1
   group by
 	r.Id,
     r.Name,

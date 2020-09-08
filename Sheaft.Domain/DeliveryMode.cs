@@ -15,7 +15,7 @@ namespace Sheaft.Domain.Models
         {
         }
 
-        public DeliveryMode(Guid id, DeliveryKind kind, Company producer, int lockOrderHoursBeforeDelivery, SimpleAddress address, IEnumerable<TimeSlotHour> openingHours, string name, string description = null)
+        public DeliveryMode(Guid id, DeliveryKind kind, Producer producer, int lockOrderHoursBeforeDelivery, SimpleAddress address, IEnumerable<TimeSlotHour> openingHours, string name, string description = null)
         {
             Id = id;
             Name = name;
@@ -38,7 +38,7 @@ namespace Sheaft.Domain.Models
         public string Name { get; private set; }
         public string Description { get; private set; }
         public virtual SimpleAddress Address { get; private set; }
-        public virtual Company Producer { get; private set; }
+        public virtual Producer Producer { get; private set; }
         public virtual IReadOnlyCollection<TimeSlotHour> OpeningHours { get { return _openingHours.AsReadOnly(); } }
 
         public void SetOpeningHours(IEnumerable<TimeSlotHour> openingHours)

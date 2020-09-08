@@ -45,7 +45,7 @@ namespace Sheaft.Application.Handlers
         {
             return await ExecuteAsync(async () =>
             {
-                var sender = await _context.GetByIdAsync<User>(request.RequestUser.Id, token);
+                var producer = await _context.GetByIdAsync<Producer>(request.RequestUser.Id, token);
                 var purchaseOrders = await _context.GetByIdsAsync<PurchaseOrder>(request.PurchaseOrderIds, token);
 
                 var orderIdsToAccept = purchaseOrders.Where(c => c.Status == OrderStatusKind.Waiting).Select(c => c.Id);
@@ -56,7 +56,7 @@ namespace Sheaft.Application.Handlers
                         return Failed<Guid>(result.Exception);
                 }
 
-                var entity = new Job(Guid.NewGuid(), JobKind.CreatePickingFromOrders, request.Name ?? $"Export bon préparation", sender, ExportPickingOrderCommand.QUEUE_NAME);
+                var entity = new Job(Guid.NewGuid(), JobKind.CreatePickingFromOrders, request.Name ?? $"Export bon préparation", producer, ExportPickingOrderCommand.QUEUE_NAME);
                 entity.SetCommand(new ExportPickingOrderCommand(request.RequestUser) { JobId = entity.Id, PurchaseOrderIds = request.PurchaseOrderIds });
 
                 await _context.AddAsync(entity, token);

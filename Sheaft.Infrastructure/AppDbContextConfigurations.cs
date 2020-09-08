@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Sheaft.Domain.Models;
 using Sheaft.Domain.Views;
 
 namespace Sheaft.Infrastructure
@@ -57,9 +58,17 @@ namespace Sheaft.Infrastructure
                 eb.ToView("UserPointsPerDepartment");
             });
 
+            modelBuilder.Entity<Producer>().HasBaseType<User>();
+            modelBuilder.Entity<Store>().HasBaseType<User>();
+            modelBuilder.Entity<Consumer>().HasBaseType<User>();
+
+            modelBuilder.ApplyConfiguration(new UserConfiguration());
+            modelBuilder.ApplyConfiguration(new ProducerConfiguration());
+            modelBuilder.ApplyConfiguration(new StoreConfiguration());
+            modelBuilder.ApplyConfiguration(new StoreTagConfiguration());
+            modelBuilder.ApplyConfiguration(new ProducerTagConfiguration());
+            modelBuilder.ApplyConfiguration(new ConsumerConfiguration());
             modelBuilder.ApplyConfiguration(new AgreementConfiguration());
-            modelBuilder.ApplyConfiguration(new CompanyConfiguration());
-            modelBuilder.ApplyConfiguration(new CompanyTagConfiguration());
             modelBuilder.ApplyConfiguration(new DeliveryModeConfiguration());
             modelBuilder.ApplyConfiguration(new DepartmentConfiguration());
             modelBuilder.ApplyConfiguration(new JobConfiguration());
@@ -79,7 +88,6 @@ namespace Sheaft.Infrastructure
             modelBuilder.ApplyConfiguration(new RegionConfiguration());
             modelBuilder.ApplyConfiguration(new SponsoringConfiguration());
             modelBuilder.ApplyConfiguration(new TagConfiguration());
-            modelBuilder.ApplyConfiguration(new UserConfiguration());
         }
     }
 }

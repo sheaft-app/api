@@ -4,7 +4,6 @@ using System.Collections.Generic;
 
 namespace Sheaft.Models.Dto
 {
-
     public class DeliveryDto
     {
         public Guid Id { get; set; }

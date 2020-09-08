@@ -15,13 +15,14 @@ namespace Sheaft.Domain.Models
         {
         }
 
-        public Agreement(Guid id, Company store, DeliveryMode delivery, User createdBy, IEnumerable<TimeSlotHour> deliveryHours)
+        public Agreement(Guid id, Store store, DeliveryMode delivery, User createdBy, IEnumerable<TimeSlotHour> deliveryHours)
         {
             Id = id;
             Delivery = delivery;
             Store = store;
+            CreatedBy = createdBy;
 
-            if(createdBy.Company.Id == store.Id)
+            if(CreatedBy.Id == store.Id)
                 Status = AgreementStatusKind.WaitingForProducerApproval;
             else
                 Status = AgreementStatusKind.WaitingForStoreApproval;
@@ -36,7 +37,8 @@ namespace Sheaft.Domain.Models
         public DateTimeOffset? RemovedOn { get; private set; }
         public string Reason { get; private set; }
         public virtual DeliveryMode Delivery { get; private set; }
-        public virtual Company Store { get; private set; }
+        public virtual Store Store { get; private set; }
+        public virtual User CreatedBy { get; private set; }
         public virtual IReadOnlyCollection<TimeSlotHour> SelectedHours { get { return _selectedHours.AsReadOnly(); } private set { } }
 
         public void SetSelectedHours(IEnumerable<TimeSlotHour> selectedHours)
@@ -86,9 +88,13 @@ namespace Sheaft.Domain.Models
             RemovedOn = null;
         }
 
-        public void Reset(AgreementStatusKind status)
+        public void Reset()
         {
-            Status = status;
+            if (CreatedBy.Kind == ProfileKind.Producer)
+                Status = AgreementStatusKind.WaitingForStoreApproval;
+            else
+                Status = AgreementStatusKind.WaitingForProducerApproval;
+
             Reason = null;
         }
     }

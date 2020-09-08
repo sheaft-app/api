@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Sheaft.Domain.Models;
 using Sheaft.Infrastructure.Interop;
 using Sheaft.Models.Dto;
 using Sheaft.Core;
@@ -26,7 +25,7 @@ namespace Sheaft.Application.Queries
             try
             {
                 return _context.Packagings
-                        .Get(c => c.Id == id && c.Producer.Id == currentUser.CompanyId)
+                        .Get(c => c.Id == id && c.Producer.Id == currentUser.Id)
                         .ProjectTo<PackagingDto>(_configurationProvider);
             }
             catch (Exception e)
@@ -40,28 +39,13 @@ namespace Sheaft.Application.Queries
             try
             {
                 return _context.Packagings
-                        .Get(c => c.Producer.Id == currentUser.CompanyId)
+                        .Get(c => c.Producer.Id == currentUser.Id)
                         .ProjectTo<PackagingDto>(_configurationProvider);
             }
             catch (Exception e)
             {
                 return new List<PackagingDto>().AsQueryable();
             }
-        }
-        private static IQueryable<PackagingDto> GetAsDto(IQueryable<Packaging> query)
-        {
-            return query
-                .Select(c => new PackagingDto
-                {
-                    Id = c.Id,
-                    Name = c.Name,
-                    CreatedOn = c.CreatedOn,
-                    Description = c.Description,
-                    OnSalePrice = c.OnSalePrice,
-                    Vat = c.Vat,
-                    VatPrice = c.VatPrice,
-                    WholeSalePrice = c.WholeSalePrice
-                });
         }
     }
 }

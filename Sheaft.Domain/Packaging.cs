@@ -13,7 +13,7 @@ namespace Sheaft.Domain.Models
         {
         }
 
-        public Packaging(Guid id, Company producer, string name, decimal wholeSalePrice, decimal vat, string description = null)
+        public Packaging(Guid id, Producer producer, string name, decimal wholeSalePrice, decimal vat, string description = null)
         {
             Id = id;
             Description = description;
@@ -34,7 +34,7 @@ namespace Sheaft.Domain.Models
         public decimal Vat { get; private set; }
         public decimal VatPrice { get; private set; }
         public decimal OnSalePrice { get; private set; }
-        public virtual Company Producer { get; private set; }
+        public virtual Producer Producer { get; private set; }
 
         public void SetWholeSalePrice(decimal newPrice)
         {

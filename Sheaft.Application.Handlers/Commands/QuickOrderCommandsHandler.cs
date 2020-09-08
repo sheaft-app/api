@@ -37,7 +37,7 @@ namespace Sheaft.Application.Handlers
         {
             return await ExecuteAsync(async () =>
             {
-                var fromUser = await _context.GetByIdAsync<User>(request.RequestUser.Id, token);
+                var user = await _context.GetByIdAsync<User>(request.RequestUser.Id, token);
 
                 var productIds = request.Products.Select(p => p.Id);
                 var products = await _context.GetByIdsAsync<Product>(productIds, token);
@@ -46,7 +46,7 @@ namespace Sheaft.Application.Handlers
                                             .Select(c => new { Product = c, Quantity = request.Products.Where(p => p.Id == c.Id).Sum(c => c.Quantity) })
                                             .ToDictionary(d => d.Product, d => d.Quantity);
 
-                var quickOrder = new QuickOrder(Guid.NewGuid(), request.Name, cartProducts, fromUser);
+                var quickOrder = new QuickOrder(Guid.NewGuid(), request.Name, cartProducts, user);
 
                 await _context.AddAsync(quickOrder, token);
                 await _context.SaveChangesAsync(token);

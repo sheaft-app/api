@@ -1,3 +1,4 @@
+﻿using Sheaft.Domains.Extensions;
 using Sheaft.Exceptions;
 using Sheaft.Interop;
 using Sheaft.Interop.Enums;
@@ -7,27 +8,26 @@ using System.Linq;
 
 namespace Sheaft.Domain.Models
 {
-    public class User : IEntity
+    public abstract class User : IEntity
     {
-        private List<UserPoints> _points;
+        private List<Points> _points;
 
         protected User()
         {
         }
 
-        public User(Guid id, UserKind userType, string email, string firstname, string lastname, string phone = null, Company company = null)
+        protected User(Guid id, ProfileKind kind, string name, string firstname, string lastname, string email, string phone = null)
         {
             Id = id;
-            Company = company;
-            UserType = userType;
 
+            SetKind(kind);
+            SetUserName(name);
             SetEmail(email);
             SetPhone(phone);
             SetFirstname(firstname);
             SetLastname(lastname);
 
-            _points = new List<UserPoints>();
-
+            _points = new List<Points>();
             RefreshPoints();
         }
 
@@ -35,44 +35,107 @@ namespace Sheaft.Domain.Models
         public DateTimeOffset CreatedOn { get; private set; }
         public DateTimeOffset? UpdatedOn { get; private set; }
         public DateTimeOffset? RemovedOn { get; private set; }
-        public UserKind UserType { get; private set; }
+        public ProfileKind Kind { get; private set; }
+        public string Reason { get; private set; }
+        public string Name { get; private set; }
         public string Email { get; private set; }
-        public string FirstName { get; private set; }
-        public string LastName { get; private set; }
         public string Phone { get; private set; }
         public string Picture { get; private set; }
-        public string Reason { get; private set; }
+        public string FirstName { get; private set; }
+        public string LastName { get; private set; }
+        public DateTimeOffset? Birthdate { get; set; }
+        public string Nationality { get; set; }
+        public string CountryOfResidence { get; set; }
         public string Code { get; private set; }
         public int TotalPoints { get; private set; }
-        public bool Anonymous { get; private set; }
-        public virtual Department Department { get; private set; }
-        public virtual Company Company { get; private set; }
-        public virtual IReadOnlyCollection<UserPoints> Points { get { return _points.AsReadOnly(); } }
+        public virtual Address Address { get; private set; }
+        public virtual BillingAddress BillingAddress { get; private set; }
+        public virtual IReadOnlyCollection<Points> Points { get { return _points.AsReadOnly(); } }
 
         public void SetFirstname(string firstname)
         {
             if (string.IsNullOrWhiteSpace(firstname))
-                throw new ValidationException(MessageKind.User_Firstname_Required);
+                throw new ValidationException(MessageKind.Consumer_Firstname_Required);
 
             FirstName = firstname;
+
+            if(Kind == ProfileKind.Consumer)
+                SetUserName($"{FirstName} {LastName}");
+        }
+
+        public void SetNationality(string nationality)
+        {
+            if (nationality == null)
+                return;
+
+            Nationality = nationality;
+        }
+
+        public void SetCountryOfResidence(string country)
+        {
+            if (country == null)
+                return;
+
+            CountryOfResidence = country;
         }
 
         public void SetLastname(string lastname)
         {
             if (string.IsNullOrWhiteSpace(lastname))
-                throw new ValidationException(MessageKind.User_Lastname_Required);
+                throw new ValidationException(MessageKind.Consumer_Lastname_Required);
 
             LastName = lastname;
+
+            if (Kind == ProfileKind.Consumer)
+                SetUserName($"{FirstName} {LastName}");
+        }
+
+        public void SetAddress(Department department)
+        {
+            Address = new Address(department);
+        }
+        public void SetAddress(string line1, string line2, string zipcode, string city, Department department, double? longitude = null, double? latitude = null)
+        {
+            Address = new Address(line1, line2, zipcode, city, department, longitude, latitude);
+        }
+        public void SetBillingAddress(string line1, string line2, string zipcode, string city)
+        {
+            BillingAddress = new BillingAddress(line1, line2, zipcode, city);
+        }
+
+        protected void SetUserName(string name)
+        {
+            if (name.IsNotNullAndIsEmptyOrWhiteSpace())
+                throw new ValidationException(MessageKind.Company_Name_Required);
+
+            Name = name;
+        }
+
+        public virtual void Close(string reason)
+        {
+            FirstName = string.Empty;
+            LastName = string.Empty;
+            Email = $"{Guid.NewGuid():N}@a.c";
+            Phone = string.Empty;
+            Reason = reason;
+            RemovedOn = DateTime.UtcNow;
+        }
+
+        public void SetKind(ProfileKind? kind)
+        {
+            if (!kind.HasValue)
+                return;
+
+            Kind = kind.Value;
         }
 
         public void SetEmail(string email)
         {
-            if (string.IsNullOrWhiteSpace(email))
-                throw new ValidationException(MessageKind.User_Email_Required);
+            if (email.IsNotNullAndIsEmptyOrWhiteSpace())
+                throw new ValidationException(MessageKind.Company_Email_Required);
 
             Email = email;
         }
-
         public void SetPhone(string phone)
         {
             if (phone == null)
@@ -81,24 +144,14 @@ namespace Sheaft.Domain.Models
             Phone = phone;
         }
 
-        public void SetPicture(string imageUrl)
+        public void SetPicture(string picture)
         {
-            if (imageUrl == null)
+            if (picture == null)
                 return;
 
-            Picture = imageUrl;
+            Picture = picture;
         }
-
-        public void SetAnonymous(bool anonymous)
-        {
-            Anonymous = anonymous;
-        }
-
-        public void SetDepartment(Department department)
-        {
-            Department = department;
-        }
-
+        
         public void SetSponsoringCode(string code)
         {
             Code = code;
@@ -107,20 +160,10 @@ namespace Sheaft.Domain.Models
         public void AddPoints(PointKind kind, int quantity, DateTimeOffset? createdOn = null)
         {
             if (Points == null)
-                _points = new List<UserPoints>();
+                _points = new List<Points>();
 
-            _points.Add(new UserPoints(kind, quantity, createdOn ?? DateTimeOffset.UtcNow));
+            _points.Add(new Points(kind, quantity, createdOn ?? DateTimeOffset.UtcNow));
             RefreshPoints();
-        }
-
-        public void CloseAccount(string reason)
-        {
-            Email = string.Empty;
-            Phone = string.Empty;
-            FirstName = string.Empty;
-            LastName = string.Empty;
-            Reason = reason;
-            Picture = null;
         }
 
         private void RefreshPoints()

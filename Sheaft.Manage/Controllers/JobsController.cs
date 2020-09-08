@@ -49,10 +49,7 @@ namespace Sheaft.Manage.Controllers
             var requestUser = await GetRequestUser(token);
             if (requestUser.IsImpersonating)
             {
-                if (requestUser.IsInRole(_roleOptions.Consumer.Value))
-                    query = query.Where(p => p.User.Id == requestUser.Id);
-
-                query = query.Where(p => p.User.Company.Id == requestUser.CompanyId);
+                query = query.Where(p => p.User.Id == requestUser.Id);
             }
 
             var entities = await query

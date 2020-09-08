@@ -70,7 +70,6 @@
                     <th scope="col">Name</th>
                     <th scope="col">Kind</th>
                     <th scope="col">Email</th>
-                    <th scope="col">Company</th>
                     <th scope="col">CreatedOn</th>
                     <th scope="col">Removed</th>
                     <th scope="col"></th>
@@ -80,10 +79,9 @@
                 @foreach (var entity in Model)
                 {
                 <tr>
-                    <th scope="row">@($"{entity.FirstName} {entity.LastName}")</th>
+                    <th scope="row">@entity.Name</th>
                     <td>@entity.Kind</td>
                     <th>@entity.Email</th>
-                    <td>@entity.Company</td>
                     <td>@entity.CreatedOn.ToString("dd/MM/yy hh:mm")</td>
                     <td>@entity.RemovedOn.HasValue</td>
                     <td>

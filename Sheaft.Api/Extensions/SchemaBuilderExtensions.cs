@@ -1,6 +1,6 @@
 ﻿using HotChocolate;
+using Sheaft.GraphQL.Enums;
 using Sheaft.GraphQL.Types;
-using Sheaft.GraphQL.Types.Enums;
 
 namespace Sheaft.Api
 {
@@ -12,15 +12,14 @@ namespace Sheaft.Api
             services.AddType<AgreementType>();
             services.AddType<DeliveryModeType>();
             services.AddType<TimeSlotType>();
-            services.AddType<UserProfileType>();
+            services.AddType<UserType>();
             services.AddType<StoreType>();
             services.AddType<ProducerType>();
-            services.AddType<CompanyType>();
             services.AddType<DepartmentType>();
             services.AddType<RegionType>();
             services.AddType<LevelType>();
             services.AddType<RewardType>();
-            services.AddType<UserType>();
+            services.AddType<ConsumerType>();
             services.AddType<UserProfileType>();
             services.AddType<ExpectedDeliveryType>();
             services.AddType<RankInformationType>();
@@ -50,8 +49,8 @@ namespace Sheaft.Api
             services.AddType<AddressKindEnumType>();
             services.AddType<AgreementStatusEnumType>();
             services.AddType<OrderStatusEnumType>();
-            services.AddType<UserKindEnumType>();
             services.AddType<JobKindEnumType>();
+            services.AddType<OwnerKindEnumType>();
             services.AddType<TagKindEnumType>();
             services.AddType<ProcessStatusEnumType>();
             services.AddType<NotificationKindEnumType>();
@@ -80,21 +79,23 @@ namespace Sheaft.Api
             services.AddType<ProductInputType>();
             services.AddType<ProductQuantityInputType>();
             services.AddType<RateProductInputType>();
-            services.AddType<RegisterCompanyInputType>();
+            services.AddType<RegisterProducerInputType>();
+            services.AddType<RegisterStoreInputType>();
             services.AddType<RegisterConsumerInputType>();
             services.AddType<RegisterNewsletterInputType>();
             services.AddType<RegisterOwnerInputType>();
             services.AddType<SearchTermsInputType>();
             services.AddType<SetProductsAvailabilityInputType>();
             services.AddType<TimeSlotGroupInputType>();
-            services.AddType<UpdateCompanyInputType>();
+            services.AddType<UpdateStoreInputType>();
+            services.AddType<UpdateProducerInputType>();
             services.AddType<UpdateDeliveryModeInputType>();
             services.AddType<UpdateIdProductsQuantitiesInputType>();
             services.AddType<UpdatePackagingInputType>();
             services.AddType<UpdatePictureInputType>();
             services.AddType<UpdateProductInputType>();
             services.AddType<UpdateQuickOrderInputType>();
-            services.AddType<UpdateUserInputType>();
+            services.AddType<UpdateConsumerInputType>();
             services.AddType<AddressInputType>();
 
             return services;

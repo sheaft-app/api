@@ -110,7 +110,7 @@ namespace Sheaft.Application.Queries
                         RatingsCount = p.Product_ratings_count,
                         Tags = p.Product_tags?.Select(t => new TagDto { Name = t }) ?? new List<TagDto>(),
                         Unit = (UnitKind)Enum.Parse(typeof(UnitKind), p.Product_unit.ToLowerInvariant()),
-                        Producer = new CompanyProfileDto
+                        Producer = new UserDto
                         {
                             Id = p.Producer_id,
                             Name = p.Producer_name,
@@ -183,7 +183,7 @@ namespace Sheaft.Application.Queries
             try
             {
                 return _context.Products
-                        .Get(c => c.Producer.Id == currentUser.CompanyId)
+                        .Get(c => c.Producer.Id == currentUser.Id)
                         .ProjectTo<ProductDto>(_configurationProvider);
             }
             catch (Exception e)
@@ -202,92 +202,6 @@ namespace Sheaft.Application.Queries
             {
                 return false;
             }
-        }
-
-        private static IQueryable<ProductDto> GetAsDto(IQueryable<Product> query)
-        {
-            return query
-                .Select(c => new ProductDto
-                {
-                    Id = c.Id,
-                    Name = c.Name,
-                    Available = c.Available,
-                    CreatedOn = c.CreatedOn,
-                    Description = c.Description,
-                    OnSalePrice = c.OnSalePrice,
-                    OnSalePricePerUnit = c.OnSalePricePerUnit,
-                    Packaged = c.Packaging != null,
-                    Packaging = new PackagingDto
-                    {
-                        Id = c.Packaging.Id,
-                        Name = c.Packaging.Name,
-                        CreatedOn = c.Packaging.CreatedOn,
-                        Description = c.Packaging.Description,
-                        OnSalePrice = c.Packaging.OnSalePrice,
-                        Vat = c.Packaging.Vat,
-                        VatPrice = c.Packaging.VatPrice,
-                        WholeSalePrice = c.Packaging.WholeSalePrice
-                    },
-                    Producer = new CompanyProfileDto
-                    {
-                        Id = c.Producer.Id,
-                        Address = new AddressDto
-                        {
-                            City = c.Producer.Address.City,
-                            Latitude = c.Producer.Address.Latitude,
-                            Line1 = c.Producer.Address.Line1,
-                            Line2 = c.Producer.Address.Line2,
-                            Longitude = c.Producer.Address.Longitude,
-                            Zipcode = c.Producer.Address.Zipcode
-                        },
-                        Email = c.Producer.Email,
-                        Name = c.Producer.Name,
-                        Phone = c.Producer.Phone,
-                        Picture = c.Producer.Picture,
-                    },
-                    QuantityPerUnit = c.QuantityPerUnit,
-                    Rating = c.Rating,
-                    Ratings = c.Ratings.Select(c => new RatingDto
-                    {
-                        CreatedOn = c.CreatedOn,
-                        Id = c.Id,
-                        UpdatedOn = c.UpdatedOn,
-                        User = new UserProfileDto
-                        {
-                            Id = c.User.Id,
-                            Email = c.User.Email,
-                            Phone = c.User.Phone,
-                            Kind = c.User.Company == null ? ProfileKind.Consumer : (ProfileKind)c.User.Company.Kind,
-                            Name = c.User.FirstName + " " + c.User.LastName,
-                            ShortName = c.User.FirstName + " " + c.User.LastName.Substring(0, 1) + ".",
-                            Picture = c.User.Picture,
-                            Initials = c.User.FirstName.Substring(0, 1) + c.User.LastName.Substring(0, 1)
-                        },
-                        Comment = c.Comment,
-                        Value = c.Value
-                    }),
-                    RatingsCount = c.RatingsCount,
-                    Reference = c.Reference,
-                    RemovedOn = c.RemovedOn,
-                    Tags = c.Tags.Select(st => new TagDto
-                    {
-                        Id = st.Tag.Id,
-                        Name = st.Tag.Name,
-                        Description = st.Tag.Description,
-                        Image = st.Tag.Image,
-                        Kind = st.Tag.Kind,
-                        UpdatedOn = st.Tag.UpdatedOn,
-                        CreatedOn = st.Tag.CreatedOn
-                    }),
-                    Unit = c.Unit,
-                    UpdatedOn = c.UpdatedOn,
-                    Vat = c.Vat,
-                    VatPrice = c.VatPrice,
-                    VatPricePerUnit = c.VatPricePerUnit,
-                    Weight = c.Weight,
-                    WholeSalePrice = c.WholeSalePrice,
-                    WholeSalePricePerUnit = c.WholeSalePricePerUnit
-                });
         }
 
         private class SearchProduct
