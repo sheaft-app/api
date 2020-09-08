@@ -14,10 +14,10 @@ using HotChocolate.Types.Relay;
 using HotChocolate;
 using HotChocolate.Types;
 using HotChocolate.AspNetCore.Authorization;
-using Sheaft.GraphQL.Types.Filters;
-using Sheaft.GraphQL.Types.Sorts;
-using Sheaft.GraphQL.Types;
 using Microsoft.Extensions.Logging;
+using Sheaft.GraphQL.Types;
+using Sheaft.GraphQL.Sorts;
+using Sheaft.GraphQL.Filters;
 
 namespace Sheaft.GraphQL
 {
@@ -86,14 +86,14 @@ namespace Sheaft.GraphQL
         [GraphQLName("productsImportInProgress")]
         public async Task<bool> HasProductsImportsInProgressAsync([Service] IJobQueries jobQueries)
         {
-            return await jobQueries.HasProductsImportsInProgressAsync(_currentUser.CompanyId, _currentUser, _cancellationToken);
+            return await jobQueries.HasProductsImportsInProgressAsync(_currentUser.Id, _currentUser, _cancellationToken);
         }
 
         [Authorize(Policy = Policies.PRODUCER)]
         [GraphQLName("pickingOrdersExportInProgress")]
         public async Task<bool> HasPickingOrdersExportsInProgressAsync([Service] IJobQueries jobQueries)
         {
-            return await jobQueries.HasPickingOrdersExportsInProgressAsync(_currentUser.CompanyId, _currentUser, _cancellationToken);
+            return await jobQueries.HasPickingOrdersExportsInProgressAsync(_currentUser.Id, _currentUser, _cancellationToken);
         }
 
         [Authorize(Policy = Policies.STORE)]
@@ -102,7 +102,7 @@ namespace Sheaft.GraphQL
         [UseSorting(SortType = typeof(ProducerDeliveriesSortType))]
         public async Task<IEnumerable<ProducerDeliveriesDto>> GetStoreDeliveriesForProducersAsync(SearchProducersDeliveriesInput input, [Service] IDeliveryQueries deliveryQueries)
         {
-            return await deliveryQueries.GetStoreDeliveriesForProducersAsync(_currentUser.CompanyId, input.Ids, input.Kinds, DateTimeOffset.UtcNow, _currentUser, _cancellationToken);
+            return await deliveryQueries.GetStoreDeliveriesForProducersAsync(_currentUser.Id, input.Ids, input.Kinds, DateTimeOffset.UtcNow, _currentUser, _cancellationToken);
         }
 
         [GraphQLName("getDeliveriesForProducers")]
@@ -126,7 +126,7 @@ namespace Sheaft.GraphQL
         [GraphQLType(typeof(ProducersSearchType))]
         public async Task<ProducersSearchDto> SearchProducersAsync(SearchTermsInput input, [Service] ICompanyQueries companyQueries)
         {
-            return await companyQueries.SearchProducersAsync(_currentUser.CompanyId, input, _currentUser, _cancellationToken);
+            return await companyQueries.SearchProducersAsync(_currentUser.Id, input, _currentUser, _cancellationToken);
         }
 
         [Authorize(Policy = Policies.PRODUCER)]
@@ -134,7 +134,7 @@ namespace Sheaft.GraphQL
         [GraphQLType(typeof(StoresSearchType))]
         public async Task<StoresSearchDto> SearchStoresAsync(SearchTermsInput input, [Service] ICompanyQueries companyQueries)
         {
-            return await companyQueries.SearchStoresAsync(_currentUser.CompanyId, input, _currentUser, _cancellationToken);
+            return await companyQueries.SearchStoresAsync(_currentUser.Id, input, _currentUser, _cancellationToken);
         }
 
         [GraphQLName("searchProducts")]
@@ -150,7 +150,7 @@ namespace Sheaft.GraphQL
         [UseSelection]
         public IQueryable<UserDto> Me([Service] IUserQueries userQueries)
         {
-            return userQueries.GetUserProfile(_currentUser.Id, _currentUser);
+            return userQueries.GetUser(_currentUser);
         }
 
         [Authorize(Policy = Policies.STORE)]
@@ -161,7 +161,7 @@ namespace Sheaft.GraphQL
         [UseSelection]
         public IQueryable<ProductDto> GetStoreProducts([Service] IProductQueries productQueries)
         {
-            return productQueries.GetStoreProducts(_currentUser.CompanyId, _currentUser);
+            return productQueries.GetStoreProducts(_currentUser.Id, _currentUser);
         }
 
         [Authorize(Policy = Policies.STORE)]
@@ -407,26 +407,6 @@ namespace Sheaft.GraphQL
             return jobQueries.GetJobs(_currentUser);
         }
 
-        [Authorize(Policy = Policies.OWNER)]
-        [GraphQLName("user")]
-        [UseSingleOrDefault]
-        [UseSelection]
-        public IQueryable<UserDto> GetUser(Guid input, [Service] IUserQueries userQueries)
-        {
-            return userQueries.GetUser(input, _currentUser);
-        }
-
-        [Authorize(Policy = Policies.OWNER)]
-        [GraphQLName("users")]
-        [UsePaging]
-        [UseSorting(SortType = typeof(UserSortType))]
-        [UseFiltering(FilterType = typeof(UserFilterType))]
-        [UseSelection]
-        public IQueryable<UserDto> GetUsers([Service] IUserQueries userQueries)
-        {
-            return userQueries.GetUsers(_currentUser);
-        }
-
         [Authorize(Policy = Policies.PRODUCER)]
         [GraphQLName("delivery")]
         [UseSingleOrDefault]
@@ -482,9 +462,9 @@ namespace Sheaft.GraphQL
         [GraphQLName("myCompany")]
         [UseSingleOrDefault]
         [UseSelection]
-        public IQueryable<CompanyDto> GetMyCompany([Service] ICompanyQueries companyQueries)
+        public IQueryable<CompanyProfileDto> GetMyCompany([Service] ICompanyQueries companyQueries)
         {
-            return companyQueries.GetCompany(_currentUser.CompanyId, _currentUser);
+            return companyQueries.GetProfile(_currentUser.Id, _currentUser);
         }
     }
 }

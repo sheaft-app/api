@@ -8,6 +8,7 @@ using Sheaft.Application.Commands;
 using Sheaft.Domain.Models;
 using Microsoft.Extensions.Logging;
 using Microsoft.EntityFrameworkCore;
+using System.Linq;
 
 namespace Sheaft.Application.Handlers
 {
@@ -47,9 +48,9 @@ namespace Sheaft.Application.Handlers
 
                 region.SetPoints(request.Points);
                 region.SetPosition(request.Position);
-                var users = await _context.Users.CountAsync(u => !u.RemovedOn.HasValue && u.UserType == Interop.Enums.UserKind.Consumer && u.Department != null && u.Department.Region != null && u.Department.Region.Id == request.Id, token);
+                var consumersCount = await _context.Users.OfType<Consumer>().CountAsync(u => !u.RemovedOn.HasValue && u.Address.Department.Region.Id == request.Id, token);
 
-                region.SetConsumersCount(users);
+                region.SetConsumersCount(consumersCount);
 
                 region.SetProducersCount(request.Producers);
                 region.SetStoresCount(request.Stores);

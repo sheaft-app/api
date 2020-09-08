@@ -12,7 +12,7 @@ namespace Sheaft.Application.Commands
         {
         }
 
-        public Guid CompanyId { get; set; }
+        public Guid Id { get; set; }
         public string FileName { get; set; }
         public Stream FileStream { get; set; }
     }

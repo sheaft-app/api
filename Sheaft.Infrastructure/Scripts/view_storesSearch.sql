@@ -17,11 +17,11 @@ as
      , ra.Longitude as store_longitude
      , ra.Latitude as store_latitude
      , geography::STGeomFromText('POINT('+convert(varchar(20),ra.Longitude)+' '+convert(varchar(20),ra.Latitude)+')',4326) as store_geolocation
-   from dbo.Companies r 
-    join dbo.CompanyAddresses ra on r.Uid = ra.CompanyUid
-    left join dbo.CompanyTags ct on r.Uid = ct.CompanyUid
+   from dbo.Users r 
+    join dbo.UserAddresses ra on r.Uid = ra.UserUid
+    left join dbo.StoreTags ct on r.Uid = ct.StoreUid
     left join dbo.Tags t on t.Uid = ct.TagUid	
-	where r.Kind = 1 and r.AppearInBusinessSearchResults = 1
+	where r.Kind = 1 and r.OpenForNewBusiness = 1
    group by
 	r.Id,
     r.Name,

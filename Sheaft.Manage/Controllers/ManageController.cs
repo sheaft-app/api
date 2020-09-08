@@ -58,17 +58,15 @@ namespace Sheaft.Manage.Controllers
                 var user = await _context.Users.SingleOrDefaultAsync(u => u.Id == cookie.Value, token);
                 if(user != null)
                 {
-                    var name = user.Company != null ? user.Company.Name : $"{user.FirstName} {user.LastName}";
-                    var email = user.Company != null ? user.Company.Email : user.Email;
-                    var roles = user.Company != null ? 
-                        new List<string>()
-                        {
-                            _roleOptions.Owner.Value,
-                            user.Company.Kind == ProfileKind.Producer ? _roleOptions.Producer.Value : _roleOptions.Store.Value
-                        } :
+                    var roles = user.Kind == ProfileKind.Consumer ?
                         new List<string>()
                         {
                             _roleOptions.Consumer.Value
+                        } :
+                        new List<string>()
+                        {
+                            _roleOptions.Owner.Value,
+                            user.Kind == ProfileKind.Producer ? _roleOptions.Producer.Value : _roleOptions.Store.Value
                         };
 
                     var uid = User.TryGetUserId();
@@ -76,7 +74,7 @@ namespace Sheaft.Manage.Controllers
                     if(uid.HasValue)
                         impersonification = new Impersonification(uid.Value, User.GetName());
 
-                    requestUser = new RequestUser(user.Id, name, email, roles, user.Company?.Id, HttpContext.TraceIdentifier, impersonification);
+                    requestUser = new RequestUser(user.Id, user.Name, user.Email, roles, HttpContext.TraceIdentifier, impersonification);
                 }
             }
 

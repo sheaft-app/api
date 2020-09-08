@@ -3,18 +3,6 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Remove="Types\**" />
-    <EmbeddedResource Remove="Types\**" />
-    <None Remove="Types\**" />
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="Types\SheaftMutationType.cs" />
-    <Compile Include="Types\SheaftQueryType.cs" />
-    <Compile Include="Types\SheaftType.cs" />
-    <Compile Include="Types\InputTypes.cs" />
-    <Compile Include="Types\OutputTypes.cs" />
-  </ItemGroup>
-  <ItemGroup>
     <PackageReference Include="HotChocolate.AspNetCore.Authorization" Version="10.5.2" />
     <PackageReference Include="HotChocolate.Types" Version="10.5.2" />
     <PackageReference Include="HotChocolate.Types.Filters" Version="10.5.2" />
@@ -30,7 +18,9 @@
   <ItemGroup>
     <ProjectReference Include="..\Sheaft.Application.Commands\Sheaft.Application.Commands.csproj" />
     <ProjectReference Include="..\Sheaft.Application.Queries\Sheaft.Application.Queries.csproj" />
+    <ProjectReference Include="..\Sheaft.GraphQL.Filters\Sheaft.GraphQL.Filters.csproj" />
+    <ProjectReference Include="..\Sheaft.GraphQL.Sorts\Sheaft.GraphQL.Sorts.csproj" />
+    <ProjectReference Include="..\Sheaft.GraphQL.Types\Sheaft.GraphQL.Types.csproj" />
     <ProjectReference Include="..\Sheaft.Localization\Sheaft.Localization.csproj" />
-    <ProjectReference Include="..\Sheaft.Models\Sheaft.Models.csproj" />
   </ItemGroup>
 </Project>

@@ -9,6 +9,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Sheaft.Application.Commands;
+using Sheaft.Core;
 using Sheaft.Domain.Models;
 using Sheaft.Exceptions;
 using Sheaft.Infrastructure.Interop;
@@ -50,7 +51,7 @@ namespace Sheaft.Manage.Controllers
             if (take > 100)
                 take = 100;
 
-            var query = _context.Companies.AsNoTracking();
+            var query = _context.Users.OfType<Company>().AsNoTracking();
 
             if (kind != null)
                 query = query.Where(c => c.Kind == kind);
@@ -58,7 +59,7 @@ namespace Sheaft.Manage.Controllers
             var requestUser = await GetRequestUser(token);
             if (requestUser.IsImpersonating)
             {
-                query = query.Where(p => p.Id == requestUser.CompanyId);
+                query = query.Where(p => p.Id == requestUser.Id);
             }
 
             var entities = await query
@@ -85,7 +86,7 @@ namespace Sheaft.Manage.Controllers
         [HttpGet]
         public async Task<IActionResult> Edit(Guid id, CancellationToken token)
         {
-            var entity = await _context.Companies
+            var entity = await _context.Users.OfType<Company>()
                 .AsNoTracking()
                 .Where(c => c.Id == id)
                 .ProjectTo<CompanyViewModel>(_configurationProvider)
@@ -113,23 +114,46 @@ namespace Sheaft.Manage.Controllers
                 }
             }
 
-            var entity = await _context.Companies.SingleOrDefaultAsync(c => c.Id == model.Id, token);
-            var result = await _mediatr.Send(new UpdateCompanyCommand(requestUser)
+            var entity = await _context.Users.OfType<Company>().SingleOrDefaultAsync(c => c.Id == model.Id, token);
+            CommandResult<bool> result = null;
+            if (entity.Kind == ProfileKind.Producer)
             {
-                Id = model.Id,
-                Address = _mapper.Map<AddressInput>(model.Address),
-                AppearInBusinessSearchResults = model.AppearInBusinessSearchResults,
-                Description = model.Description,
-                Email = model.Email,
-                Name = model.Name,
-                Kind = model.Kind,
-                Phone = model.Phone,
-                Siret = model.Siret,
-                VatIdentifier = model.VatIdentifier,
-                Tags = model.Tags,
-                Picture = model.Picture,
-                OpeningHours = entity.OpeningHours?.GroupBy(oh => new { oh.From, oh.To }).Select(c => new TimeSlotGroupInput { From = c.Key.From, To = c.Key.To, Days = c.Select(o => o.Day) })
-            }, token);
+                result = await _mediatr.Send(new UpdateProducerCommand(requestUser)
+                {
+                    Id = model.Id,
+                    Address = _mapper.Map<AddressInput>(model.Address),
+                    OpenForNewBusiness = model.OpenForNewBusiness,
+                    Description = model.Description,
+                    Email = model.Email,
+                    Name = model.Name,
+                    Kind = model.Kind,
+                    Phone = model.Phone,
+                    Siret = model.Siret,
+                    VatIdentifier = model.VatIdentifier,
+                    Tags = model.Tags,
+                    Picture = model.Picture
+                }, token);
+            }
+            else
+            {
+                var store = await _context.Users.OfType<Store>().SingleOrDefaultAsync(c => c.Id == model.Id, token);
+                result = await _mediatr.Send(new UpdateStoreCommand(requestUser)
+                {
+                    Id = model.Id,
+                    Address = _mapper.Map<AddressInput>(model.Address),
+                    OpenForNewBusiness = model.OpenForNewBusiness,
+                    Description = model.Description,
+                    Email = model.Email,
+                    Name = model.Name,
+                    Kind = model.Kind,
+                    Phone = model.Phone,
+                    Siret = model.Siret,
+                    VatIdentifier = model.VatIdentifier,
+                    Tags = model.Tags,
+                    Picture = model.Picture,
+                    OpeningHours = store.OpeningHours?.GroupBy(oh => new { oh.From, oh.To }).Select(c => new TimeSlotGroupInput { From = c.Key.From, To = c.Key.To, Days = c.Select(o => o.Day) })
+                }, token);
+            }
 
             if (!result.Success)
             {
@@ -141,7 +165,6 @@ namespace Sheaft.Manage.Controllers
 
             if (entity.Kind != model.Kind)
             {
-                var user = await _context.Users.SingleOrDefaultAsync(c => c.UserType == UserKind.Owner && c.Company.Id == entity.Id, token);
                 var roles = new List<string> { _roleOptions.Owner.Value };
                 switch (model.Kind)
                 {
@@ -155,7 +178,7 @@ namespace Sheaft.Manage.Controllers
 
                 var res = await _mediatr.Send(new ChangeUserRolesCommand(requestUser)
                 {
-                    Id = user.Id,
+                    Id = entity.Id,
                     Roles = roles
                 }, token);
 
@@ -176,7 +199,7 @@ namespace Sheaft.Manage.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete(Guid id, CancellationToken token)
         {
-            var entity = await _context.Companies.SingleOrDefaultAsync(c => c.Id == id, token);
+            var entity = await _context.Users.OfType<Company>().SingleOrDefaultAsync(c => c.Id == id, token);
             var name = entity.Name;
 
             var requestUser = await GetRequestUser(token);

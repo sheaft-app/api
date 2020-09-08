@@ -19,7 +19,7 @@ namespace Sheaft.Domain.Models
         {
         }
 
-        public Product(Guid id, string reference, string name, decimal wholeSalePricePerUnit, UnitKind unit, decimal quantityPerUnit, decimal vat, Company producer)
+        public Product(Guid id, string reference, string name, decimal wholeSalePricePerUnit, UnitKind unit, decimal quantityPerUnit, decimal vat, Producer producer)
         {
             if (producer == null)
                 throw new ValidationException(MessageKind.Product_Producer_Required);
@@ -62,7 +62,7 @@ namespace Sheaft.Domain.Models
         public int RatingsCount { get; set; }
         public decimal? Rating { get; set; }
         public virtual Packaging Packaging { get; private set; }
-        public virtual Company Producer { get; private set; }
+        public virtual Producer Producer { get; private set; }
         public virtual IReadOnlyCollection<ProductTag> Tags { get { return _tags.AsReadOnly(); } }
         public virtual IReadOnlyCollection<Rating> Ratings { get { return _ratings.AsReadOnly(); } }
 

@@ -1,4 +1,5 @@
-﻿using System.Threading;
+﻿using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using AutoMapper;
 using MediatR;
@@ -6,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Sheaft.Domain.Models;
 using Sheaft.Infrastructure.Interop;
 using Sheaft.Options;
 
@@ -30,7 +32,7 @@ namespace Sheaft.Manage.Controllers
         {
             var requestUser = await GetRequestUser(token);
 
-            ViewBag.Consumers = await _context.Users.CountAsync(c => c.Company == null, token);
+            ViewBag.Consumers = await _context.Users.OfType<Consumer>().CountAsync(c => !c.RemovedOn.HasValue, token);
             ViewBag.Tags = await _context.Tags.CountAsync(c => !c.RemovedOn.HasValue, token);
             ViewBag.Departments = await _context.Departments.CountAsync(c => !c.RemovedOn.HasValue, token);
             ViewBag.Regions = await _context.Regions.CountAsync(c => !c.RemovedOn.HasValue, token);
@@ -39,20 +41,20 @@ namespace Sheaft.Manage.Controllers
 
             if (requestUser.IsImpersonating)
             {
-                ViewBag.Products = await _context.Products.CountAsync(c => c.Producer.Id == requestUser.CompanyId, token);
-                ViewBag.Stores = await _context.Companies.CountAsync(c => !c.RemovedOn.HasValue && c.Kind == Interop.Enums.ProfileKind.Store && c.Id == requestUser.CompanyId, token);
-                ViewBag.Producers = await _context.Companies.CountAsync(c => !c.RemovedOn.HasValue && c.Kind == Interop.Enums.ProfileKind.Producer && c.Id == requestUser.CompanyId, token);
-                ViewBag.Agreements = await _context.Agreements.CountAsync(c => !c.RemovedOn.HasValue && (c.Delivery.Producer.Id == requestUser.CompanyId || c.Store.Id == requestUser.CompanyId), token);
-                ViewBag.DeliveryModes = await _context.DeliveryModes.CountAsync(c => !c.RemovedOn.HasValue && c.Producer.Id == requestUser.CompanyId, token);
-                ViewBag.Jobs = await _context.Jobs.CountAsync(c => !c.RemovedOn.HasValue && (c.User.Id == requestUser.Id || (c.User.Company != null && c.User.Company.Id == requestUser.CompanyId)), token);
-                ViewBag.Packagings = await _context.Packagings.CountAsync(c => !c.RemovedOn.HasValue && c.Producer.Id == requestUser.CompanyId, token);
-                ViewBag.PurchaseOrders = await _context.PurchaseOrders.CountAsync(c => !c.RemovedOn.HasValue && (c.Vendor.Id == requestUser.CompanyId || c.Sender.Id == requestUser.Id || c.Sender.Id == requestUser.CompanyId), token);
+                ViewBag.Products = await _context.Products.CountAsync(c => c.Producer.Id == requestUser.Id, token);
+                ViewBag.Stores = await _context.Users.OfType<Store>().CountAsync(c => !c.RemovedOn.HasValue && c.Id == requestUser.Id, token);
+                ViewBag.Producers = await _context.Users.OfType<Producer>().CountAsync(c => !c.RemovedOn.HasValue && c.Id == requestUser.Id, token);
+                ViewBag.Agreements = await _context.Agreements.CountAsync(c => !c.RemovedOn.HasValue && (c.Delivery.Producer.Id == requestUser.Id || c.Store.Id == requestUser.Id), token);
+                ViewBag.DeliveryModes = await _context.DeliveryModes.CountAsync(c => !c.RemovedOn.HasValue && c.Producer.Id == requestUser.Id, token);
+                ViewBag.Jobs = await _context.Jobs.CountAsync(c => !c.RemovedOn.HasValue && c.User.Id == requestUser.Id, token);
+                ViewBag.Packagings = await _context.Packagings.CountAsync(c => !c.RemovedOn.HasValue && c.Producer.Id == requestUser.Id, token);
+                ViewBag.PurchaseOrders = await _context.PurchaseOrders.CountAsync(c => !c.RemovedOn.HasValue && (c.Vendor.Id == requestUser.Id || c.Sender.Id == requestUser.Id), token);
             }
             else
             {
                 ViewBag.Products = await _context.Products.CountAsync(token);
-                ViewBag.Stores = await _context.Companies.CountAsync(c => !c.RemovedOn.HasValue && c.Kind == Interop.Enums.ProfileKind.Store, token);
-                ViewBag.Producers = await _context.Companies.CountAsync(c => !c.RemovedOn.HasValue && c.Kind == Interop.Enums.ProfileKind.Producer, token);
+                ViewBag.Stores = await _context.Users.OfType<Store>().CountAsync(c => !c.RemovedOn.HasValue, token);
+                ViewBag.Producers = await _context.Users.OfType<Producer>().CountAsync(c => !c.RemovedOn.HasValue, token);
                 ViewBag.Agreements = await _context.Agreements.CountAsync(c => !c.RemovedOn.HasValue, token);
                 ViewBag.DeliveryModes = await _context.DeliveryModes.CountAsync(c => !c.RemovedOn.HasValue, token);
                 ViewBag.Jobs = await _context.Jobs.CountAsync(c => !c.RemovedOn.HasValue, token);

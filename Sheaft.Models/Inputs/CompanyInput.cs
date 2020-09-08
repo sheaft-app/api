@@ -13,9 +13,8 @@ namespace Sheaft.Models.Inputs
         public string Picture { get; set; }
         public string Siret { get; set; }
         public AddressInput Address { get; set; }
-        public bool AppearInBusinessSearchResults { get; set; }
+        public bool OpenForNewBusiness { get; set; }
         public IEnumerable<Guid> Tags { get; set; }
-        public IEnumerable<TimeSlotGroupInput> OpeningHours { get; set; }
 
     }
 }

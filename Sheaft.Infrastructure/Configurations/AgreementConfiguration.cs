@@ -22,6 +22,7 @@ namespace Sheaft.Infrastructure
             });
 
             entity.HasOne(c => c.Delivery).WithMany().HasForeignKey("DeliveryModeUid").OnDelete(DeleteBehavior.NoAction);
+            entity.HasOne(c => c.Store).WithMany().HasForeignKey("StoreUid").OnDelete(DeleteBehavior.Cascade);
 
             var hours = entity.Metadata.FindNavigation(nameof(Agreement.SelectedHours));
             hours.SetPropertyAccessMode(PropertyAccessMode.Field);

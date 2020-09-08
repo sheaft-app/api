@@ -30,37 +30,35 @@ namespace Sheaft.Application.Handlers
         public async Task Handle(PickingOrderExportSucceededEvent pickingOrderEvent, CancellationToken token)
         {
             var job = await _context.GetByIdAsync<Job>(pickingOrderEvent.Id, token);
-            await _signalrService.SendNotificationToGroupAsync(job.User.Company.Id, nameof(PickingOrderExportSucceededEvent), new { JobId = job.Id, Name = job.Name, UserId = job.User.Id, Url = job.File });
+            await _signalrService.SendNotificationToGroupAsync(job.User.Id, nameof(PickingOrderExportSucceededEvent), new { JobId = job.Id, Name = job.Name, UserId = job.User.Id, Url = job.File });
 
-            var userName = $"{job.User.FirstName} {job.User.LastName}";
             var url = $"{_configuration.GetValue<string>("Urls:Portal")}/#/jobs/{job.Id}";
             await _emailService.SendTemplatedEmailAsync(
                 job.User.Email,
-                userName,
+                job.User.Name,
                 PickingOrderExportSucceededEvent.MAILING_TEMPLATE_ID,
-                new { UserName = userName, Name = job.Name, job.CreatedOn, JobUrl = url, DownloadUrl = job.File },
+                new { UserName = job.User.Name, Name = job.Name, job.CreatedOn, JobUrl = url, DownloadUrl = job.File },
                 token);            
         }
 
         public async Task Handle(PickingOrderExportFailedEvent pickingOrderEvent, CancellationToken token)
         {
             var job = await _context.GetByIdAsync<Job>(pickingOrderEvent.Id, token);
-            await _signalrService.SendNotificationToGroupAsync(job.User.Company.Id, nameof(PickingOrderExportFailedEvent), new { JobId = job.Id, Name = job.Name, UserId = job.User.Id });
+            await _signalrService.SendNotificationToGroupAsync(job.User.Id, nameof(PickingOrderExportFailedEvent), new { JobId = job.Id, Name = job.Name, UserId = job.User.Id });
 
-            var userName = $"{job.User.FirstName} {job.User.LastName}";
             var url = $"{_configuration.GetValue<string>("Urls:Portal")}/#/jobs/{job.Id}";
             await _emailService.SendTemplatedEmailAsync(
                 job.User.Email,
-                userName,
+                job.User.Name,
                 PickingOrderExportFailedEvent.MAILING_TEMPLATE_ID,
-                new { UserName = userName, Name = job.Name, job.CreatedOn, JobUrl = url },
+                new { UserName = job.User.Name, Name = job.Name, job.CreatedOn, JobUrl = url },
                 token);            
         }
 
         public async Task Handle(PickingOrderExportProcessingEvent pickingOrderEvent, CancellationToken token)
         {
             var job = await _context.GetByIdAsync<Job>(pickingOrderEvent.Id, token);
-            await _signalrService.SendNotificationToGroupAsync(job.User.Company.Id, nameof(PickingOrderExportProcessingEvent), new { JobId = job.Id, Name = job.Name, UserId = job.User.Id });
+            await _signalrService.SendNotificationToGroupAsync(job.User.Id, nameof(PickingOrderExportProcessingEvent), new { JobId = job.Id, Name = job.Name, UserId = job.User.Id });
         }
     }
 }

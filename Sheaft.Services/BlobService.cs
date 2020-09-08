@@ -25,27 +25,6 @@ namespace Sheaft.Services
             _storageOptions = storageOptions.Value;
         }
 
-        public async Task<CommandResult<string>> UploadCompanyPictureAsync(Guid companyId, Stream stream, CancellationToken token)
-        {
-            try
-            {
-                var containerClient = new BlobContainerClient(_storageOptions.ConnectionString, _storageOptions.Containers.Pictures);
-                await containerClient.CreateIfNotExistsAsync(cancellationToken: token);
-
-                var blobClient = containerClient.GetBlobClient($"companies/{companyId}/profile_{Guid.NewGuid():N}.jpg");
-
-                stream.Position = 0;
-                await blobClient.UploadAsync(stream, token);
-
-                return new CommandResult<string>(blobClient.Uri.ToString());
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, $"{nameof(BlobService.UploadCompanyPictureAsync)} - {e.Message}");
-                return new CommandResult<string>(e);
-            }
-        }
-
         public async Task<CommandResult<string>> UploadUserPictureAsync(Guid userId, Stream stream, CancellationToken token)
         {
             try
@@ -53,7 +32,7 @@ namespace Sheaft.Services
                 var containerClient = new BlobContainerClient(_storageOptions.ConnectionString, _storageOptions.Containers.Pictures);
                 await containerClient.CreateIfNotExistsAsync(cancellationToken: token);
 
-                var blobClient = containerClient.GetBlobClient($"users/{userId}/profile_{Guid.NewGuid():N}.jpg");
+                var blobClient = containerClient.GetBlobClient($"users/{userId}/profile/{Guid.NewGuid():N}.jpg");
 
                 stream.Position = 0;
                 await blobClient.UploadAsync(stream, token);
@@ -74,7 +53,7 @@ namespace Sheaft.Services
                 var containerClient = new BlobContainerClient(_storageOptions.ConnectionString, _storageOptions.Containers.Pictures);
                 await containerClient.CreateIfNotExistsAsync(cancellationToken: token);
 
-                var blobClient = containerClient.GetBlobClient($"tags/{tagId}/{Guid.NewGuid():N}.jpg");
+                var blobClient = containerClient.GetBlobClient($"tags/{tagId:N}/{Guid.NewGuid():N}.jpg");
 
                 stream.Position = 0;
                 await blobClient.UploadAsync(stream, token);
@@ -88,14 +67,14 @@ namespace Sheaft.Services
             }
         }
 
-        public async Task<CommandResult<string>> UploadProductPictureAsync(Guid companyId, Guid productId, string filename, string size, Stream stream, CancellationToken token)
+        public async Task<CommandResult<string>> UploadProductPictureAsync(Guid userId, Guid productId, string filename, string size, Stream stream, CancellationToken token)
         {
             try
             {
                 var containerClient = new BlobContainerClient(_storageOptions.ConnectionString, _storageOptions.Containers.Pictures);
                 await containerClient.CreateIfNotExistsAsync(cancellationToken: token);
 
-                var blobClient = containerClient.GetBlobClient(CoreProductExtensions.GetImageUrl(companyId, productId, filename, size));
+                var blobClient = containerClient.GetBlobClient(CoreProductExtensions.GetImageUrl(userId, productId, filename, size));
 
                 stream.Position = 0;
                 await blobClient.UploadAsync(stream, token);
@@ -111,23 +90,23 @@ namespace Sheaft.Services
 
         public async Task<CommandResult<bool>> CleanUserStorageAsync(Guid userId, CancellationToken token)
         {
-            var response = await CleanContainerFolderStorageAsync(_storageOptions.Containers.Products, $"users/{userId}", token);
+            var response = await CleanContainerFolderStorageAsync(_storageOptions.Containers.Products, $"users/{userId:N}", token);
             if (!response.Success)
                 return response;
 
-            response = await CleanContainerFolderStorageAsync(_storageOptions.Containers.Pictures, $"users/{userId}", token);
+            response = await CleanContainerFolderStorageAsync(_storageOptions.Containers.Pictures, $"users/{userId:N}", token);
             if (!response.Success)
                 return response;
 
-            response = await CleanContainerFolderStorageAsync(_storageOptions.Containers.PickingOrders, $"users/{userId}", token);
+            response = await CleanContainerFolderStorageAsync(_storageOptions.Containers.PickingOrders, $"users/{userId:N}", token);
             if (!response.Success)
                 return response;
 
-            response = await CleanContainerFolderStorageAsync(_storageOptions.Containers.Jobs, $"users/{userId}", token);
+            response = await CleanContainerFolderStorageAsync(_storageOptions.Containers.Jobs, $"users/{userId:N}", token);
             if (!response.Success)
                 return response;
 
-            response = await CleanContainerFolderStorageAsync(_storageOptions.Containers.Rgpd, $"users/{userId}", token);
+            response = await CleanContainerFolderStorageAsync(_storageOptions.Containers.Rgpd, $"users/{userId:N}", token);
             if (!response.Success)
                 return response;
 
@@ -158,14 +137,14 @@ namespace Sheaft.Services
             }
         }
 
-        public async Task<CommandResult<string>> UploadImportProductsFileAsync(Guid companyId, Guid jobId, string filename, Stream stream, CancellationToken token)
+        public async Task<CommandResult<string>> UploadImportProductsFileAsync(Guid userId, Guid jobId, string filename, Stream stream, CancellationToken token)
         {
             try
             {
                 var containerClient = new BlobContainerClient(_storageOptions.ConnectionString, _storageOptions.Containers.Products);
                 await containerClient.CreateIfNotExistsAsync(cancellationToken: token);
 
-                var blobClient = containerClient.GetBlobClient($"companies/{companyId:N}/products/{jobId:N}/{filename}");
+                var blobClient = containerClient.GetBlobClient($"users/{userId:N}/products/{jobId:N}/{filename}");
 
                 stream.Position = 0;
                 await blobClient.UploadAsync(stream, token);

@@ -46,52 +46,47 @@ namespace Sheaft.Application.Handlers
         private readonly IMediator _mediatr;
         private readonly IIdentifierService _identifierService;
         private readonly IQueueService _queuesService;
-        private readonly IBlobService _blobsService;
-        private readonly StorageOptions _storageOptions;
-        private readonly HttpClient _httpClient;
+        private readonly IBlobService _blobService;
+        private readonly IImageService _imageService;
 
         public ProductCommandsHandler(
-            IOptionsSnapshot<StorageOptions> storageOptions,
             IMediator mediatr,
             IAppDbContext context,
             IIdentifierService identifierService,
             IQueueService queuesService,
-            IBlobService blobsService,
-            IHttpClientFactory httpFactory,
+            IBlobService blobService,
+            IImageService imageService,
             ILogger<ProductCommandsHandler> logger) : base(logger)
         {
             _context = context;
             _mediatr = mediatr;
             _identifierService = identifierService;
             _queuesService = queuesService;
-            _blobsService = blobsService;
-            _httpClient = httpFactory.CreateClient("products");
-
-            _storageOptions = storageOptions.Value;
+            _blobService = blobService;
+            _imageService = imageService;
         }
 
         public async Task<CommandResult<Guid>> Handle(CreateProductCommand request, CancellationToken token)
         {
             return await ExecuteAsync(async () =>
             {
-                var company = await _context.GetByIdAsync<Company>(request.RequestUser.CompanyId, token);
-
+                var producer = await _context.GetByIdAsync<Producer>(request.RequestUser.Id, token);
                 if (!string.IsNullOrWhiteSpace(request.Reference))
                 {
-                    var existingEntity = await _context.FindSingleAsync<Product>(p => p.Reference == request.Reference && p.Producer.Id == company.Id, token);
+                    var existingEntity = await _context.FindSingleAsync<Product>(p => p.Reference == request.Reference && p.Producer.Id == producer.Id, token);
                     if (existingEntity != null)
                         return ValidationError<Guid>(MessageKind.CreateProduct_Reference_AlreadyExists, request.Reference);
                 }
                 else
                 {
-                    var result = await _identifierService.GetNextProductReferenceAsync(request.RequestUser.CompanyId, token);
+                    var result = await _identifierService.GetNextProductReferenceAsync(request.RequestUser.Id, token);
                     if (!result.Success)
                         return Failed<Guid>(result.Exception);
 
                     request.Reference = result.Result;
                 }
 
-                var entity = new Product(Guid.NewGuid(), request.Reference, request.Name, request.WholeSalePricePerUnit, request.Unit, request.QuantityPerUnit, request.Vat, company);
+                var entity = new Product(Guid.NewGuid(), request.Reference, request.Name, request.WholeSalePricePerUnit, request.Unit, request.QuantityPerUnit, request.Vat, producer);
 
                 entity.SetWeight(request.Weight);
                 entity.SetDescription(request.Description);
@@ -106,7 +101,7 @@ namespace Sheaft.Application.Handlers
                 var tags = await _context.FindAsync<Tag>(t => request.Tags.Contains(t.Id), token);
                 entity.SetTags(tags);
 
-                var picture = await HandleImageAsync(entity, request.Picture, token);                
+                var picture = await _imageService.HandleProductImageAsync(entity, request.Picture, token);                
                 entity.SetImage(picture);
 
                 await _context.AddAsync(entity, token);
@@ -121,7 +116,7 @@ namespace Sheaft.Application.Handlers
         {
             return await ExecuteAsync(async () =>
             {
-                var user = await _context.GetByIdAsync<User>(request.RequestUser.Id, token);
+                var producer = await _context.GetByIdAsync<Producer>(request.RequestUser.Id, token);
                 var entity = await _context.GetByIdAsync<Product>(request.Id, token);
 
                 entity.SetName(request.Name);
@@ -146,7 +141,7 @@ namespace Sheaft.Application.Handlers
                 var tags = await _context.FindAsync<Tag>(t => request.Tags.Contains(t.Id), token);
                 entity.SetTags(tags);
 
-                var picture = await HandleImageAsync(entity, request.Picture, token);
+                var picture = await _imageService.HandleProductImageAsync(entity, request.Picture, token);
                 entity.SetImage(picture);
 
                 _context.Update(entity);
@@ -248,12 +243,10 @@ namespace Sheaft.Application.Handlers
         {
             return await ExecuteAsync(async () =>
             {
-                var user = await _context.GetByIdAsync<User>(request.RequestUser.Id, token);
-                var company = await _context.GetByIdAsync<Company>(request.RequestUser.CompanyId, token);
+                var producer = await _context.GetByIdAsync<Producer>(request.RequestUser.Id, token);
+                var entity = new Job(Guid.NewGuid(), JobKind.ImportProducts, $"Import produits", producer, ImportProductsCommand.QUEUE_NAME);
 
-                var entity = new Job(Guid.NewGuid(), JobKind.ImportProducts, $"Import produits", user, ImportProductsCommand.QUEUE_NAME);
-
-                var response = await _blobsService.UploadImportProductsFileAsync(company.Id, entity.Id, request.FileName, request.FileStream, token);
+                var response = await _blobService.UploadImportProductsFileAsync(producer.Id, entity.Id, request.FileName, request.FileStream, token);
                 if (!response.Success)
                     return Failed<Guid>(response.Exception);
 
@@ -286,7 +279,7 @@ namespace Sheaft.Application.Handlers
 
                     using (var stream = new MemoryStream())
                     {
-                        var data = await _blobsService.DownloadImportProductsFileAsync(request.Uri, token);
+                        var data = await _blobService.DownloadImportProductsFileAsync(request.Uri, token);
                         if (!data.Success)
                             throw data.Exception;
 
@@ -341,7 +334,7 @@ namespace Sheaft.Application.Handlers
             {
                 var entity = await _context.GetByIdAsync<Product>(request.Id, token);
 
-                var picture = await HandleImageAsync(entity, request.Picture, token);
+                var picture = await _imageService.HandleProductImageAsync(entity, request.Picture, token);
                 entity.SetImage(picture);
 
                 _context.Update(entity);
@@ -368,67 +361,6 @@ namespace Sheaft.Application.Handlers
         }
 
         #region Product implementation
-
-        private async Task<string> HandleImageAsync(Product entity, string picture, CancellationToken token)
-        {
-            if (string.IsNullOrWhiteSpace(picture) && string.IsNullOrWhiteSpace(entity.Image))
-            {
-                return GetDefaultProductImage(entity.Tags?.Select(t => t.Tag));
-            }
-
-            if (string.IsNullOrWhiteSpace(picture))
-                return null;
-
-            byte[] bytes = null;
-            if (!picture.StartsWith("http") && !picture.StartsWith("https"))
-            {
-                var base64Data = picture.StartsWith("data:image") ? Regex.Match(picture, @"data:image/(?<type>.+?),(?<data>.+)").Groups["data"].Value : picture;
-                bytes = Convert.FromBase64String(base64Data);
-            }
-            else if(!picture.StartsWith($"https://{_storageOptions.Account}.blob.{_storageOptions.Suffix}"))
-            {
-                using (var response = await _httpClient.GetAsync(picture))
-                    bytes = await response.Content.ReadAsByteArrayAsync();
-            }
-            else
-            {
-                return picture;
-            }
-
-            var imageId = Guid.NewGuid().ToString("N");
-
-            using (Image image = Image.Load(bytes))
-            {
-                await UploadImageAsync(image, entity.Producer.Id, entity.Id, imageId, ImageSize.LARGE, 620, 256, token);
-                await UploadImageAsync(image, entity.Producer.Id, entity.Id, imageId, ImageSize.MEDIUM, 310, 128, token);
-                await UploadImageAsync(image, entity.Producer.Id, entity.Id, imageId, ImageSize.SMALL, 64, 64, token, ResizeMode.Crop);
-            }
-
-            return $"https://{_storageOptions.Account}.blob.{_storageOptions.Suffix}/{_storageOptions.Containers.Pictures}/{CoreProductExtensions.GetImageUrl(entity.Producer.Id, entity.Id, imageId)}";
-        }
-
-        private string GetDefaultProductImage(IEnumerable<Tag> tags)
-        {
-            var category = tags.FirstOrDefault(t => t.Kind == TagKind.Category);
-            if (category != null)
-                return $"https://{_storageOptions.Account}.blob.{_storageOptions.Suffix}/{_storageOptions.Containers.Pictures}/products/categories/{category.Id.ToString("D").ToUpperInvariant()}.jpg";
-
-            return $"https://{_storageOptions.Account}.blob.{_storageOptions.Suffix}/{_storageOptions.Containers.Pictures}/products/categories/default.jpg";
-        }
-
-        private async Task UploadImageAsync(Image image, Guid companyId, Guid productId, string filename, string size, int width, int height, CancellationToken token, ResizeMode mode = ResizeMode.Max, int quality = 100)
-        {
-            using (var blobStream = new MemoryStream())
-            {
-                image.Clone(context => context.Resize(new ResizeOptions
-                {
-                    Mode = mode,
-                    Size = new Size(width, height)
-                })).Save(blobStream, new JpegEncoder { Quality = quality });
-
-                await _blobsService.UploadProductPictureAsync(companyId, productId, filename, size, blobStream, token);
-            }
-        }
 
         private async Task<CommandResult<CreateProductCommand>> CreateProductCommandFromRowDatasAsync(ExcelWorksheet worksheet,
             ImportProductsCommand request, int i, CancellationToken token)

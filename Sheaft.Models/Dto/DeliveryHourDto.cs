@@ -2,7 +2,6 @@
 
 namespace Sheaft.Models.Dto
 {
-
     public class DeliveryHourDto
     {
         public DateTimeOffset ExpectedDeliveryDate { get; set; }

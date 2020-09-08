@@ -1,10 +1,8 @@
 ﻿using Sheaft.Interop.Enums;
 using System;
-using System.Collections.Generic;
 
 namespace Sheaft.Models.Dto
 {
-
     public class AgreementDeliveryModeDto
     {
         public Guid Id { get; set; }
@@ -16,6 +14,6 @@ namespace Sheaft.Models.Dto
         public string Name { get; set; }
         public string Description { get; set; }
         public AddressDto Address { get; set; }
-        public CompanyProfileDto Producer { get; set; }
+        public UserDto Producer { get; set; }
     }
 }

@@ -28,19 +28,19 @@ namespace Sheaft.Core.Extensions
 
     public static class CoreProductExtensions
     {
-        public static string GetImageUrl(Guid companyId, Guid productId, string filename, string size)
+        public static string GetImageUrl(Guid userId, Guid productId, string filename, string size)
         {
             if (string.IsNullOrWhiteSpace(filename))
                 return null;
 
-            return $"companies/{companyId}/products/{productId}/{filename}_{size}.jpg";
+            return $"users/{userId:N}/products/{productId:N}/{filename}_{size}.jpg";
         }
-        public static string GetImageUrl(Guid companyId, Guid productId, string filename)
+        public static string GetImageUrl(Guid userId, Guid productId, string filename)
         {
             if (string.IsNullOrWhiteSpace(filename))
                 return null;
 
-            return $"companies/{companyId}/products/{productId}/{filename}";
+            return $"users/{userId:N}/products/{productId:N}/{filename}";
         }
         public static string GetImageUrl(string image, string size)
         {

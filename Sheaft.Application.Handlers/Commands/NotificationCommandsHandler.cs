@@ -33,7 +33,7 @@ namespace Sheaft.Application.Handlers
         {
             return await ExecuteAsync(async () =>
             {
-                var result = await _dapperContext.SetNotificationAsReadAsync(request.RequestUser.Id, request.RequestUser.CompanyId, request.ReadBefore, token);
+                var result = await _dapperContext.SetNotificationAsReadAsync(request.RequestUser.Id, request.ReadBefore, token);
                 return Ok(result);
             });
         }
@@ -72,8 +72,8 @@ namespace Sheaft.Application.Handlers
         {
             return await ExecuteAsync(async () =>
             {
-                var company = await _context.GetByIdAsync<Company>(request.Id, token);
-                var entity = new Notification(Guid.NewGuid(), NotificationKind.Business, request.Method, request.Content, company);
+                var user = await _context.GetByIdAsync<User>(request.Id, token);
+                var entity = new Notification(Guid.NewGuid(), NotificationKind.Business, request.Method, request.Content, user);
 
                 await _context.AddAsync(entity, token);
                 await _context.SaveChangesAsync(token);

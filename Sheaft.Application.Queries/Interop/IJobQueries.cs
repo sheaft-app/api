@@ -11,7 +11,7 @@ namespace Sheaft.Application.Queries
     {
         IQueryable<JobDto> GetJob(Guid jobId, RequestUser currentUser);
         IQueryable<JobDto> GetJobs(RequestUser currentUser);
-        Task<bool> HasPickingOrdersExportsInProgressAsync(Guid companyId, RequestUser currentUser, CancellationToken token);
-        Task<bool> HasProductsImportsInProgressAsync(Guid companyId, RequestUser currentUser, CancellationToken token);
+        Task<bool> HasPickingOrdersExportsInProgressAsync(Guid producerId, RequestUser currentUser, CancellationToken token);
+        Task<bool> HasProductsImportsInProgressAsync(Guid producerId, RequestUser currentUser, CancellationToken token);
     }
 }

@@ -30,7 +30,7 @@ namespace Sheaft.Application.Queries
             try
             {
                 return _context.DeliveryModes
-                        .Get(c => c.Id == id && c.Producer.Id == currentUser.CompanyId)
+                        .Get(c => c.Id == id && c.Producer.Id == currentUser.Id)
                         .ProjectTo<DeliveryModeDto>(_configurationProvider);
             }
             catch (Exception e)
@@ -44,7 +44,7 @@ namespace Sheaft.Application.Queries
             try
             {
                 return _context.DeliveryModes
-                        .Get(c => c.Producer.Id == currentUser.CompanyId)
+                        .Get(c => c.Producer.Id == currentUser.Id)
                         .ProjectTo<DeliveryModeDto>(_configurationProvider);
             }
             catch (Exception e)

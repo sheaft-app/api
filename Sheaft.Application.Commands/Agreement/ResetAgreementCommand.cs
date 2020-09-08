@@ -13,6 +13,5 @@ namespace Sheaft.Application.Commands
         }
 
         public Guid Id { get; set; }
-        public AgreementStatusKind Status { get; set; }
     }
 }

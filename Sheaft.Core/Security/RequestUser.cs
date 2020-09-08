@@ -14,21 +14,20 @@ namespace Sheaft.Core
         {
         }
 
-        public RequestUser(string requestId, Impersonification impersonification = null) : this(Guid.Empty, "Anonymous", null, null, null, requestId, impersonification)
+        public RequestUser(string requestId, Impersonification impersonification = null) : this(Guid.Empty, "Anonymous", null, null, requestId, impersonification)
         {
         }
 
-        public RequestUser(string name, string requestId, Impersonification impersonification = null) : this(Guid.Empty, name, null, null, null, requestId, impersonification)
+        public RequestUser(string name, string requestId, Impersonification impersonification = null) : this(Guid.Empty, name, null, null, requestId, impersonification)
         {
         }
 
-        public RequestUser(Guid? id, string name, string email, IEnumerable<string> roles, Guid? companyId = null, string requestId = null, Impersonification impersonification = null)
+        public RequestUser(Guid? id, string name, string email, IEnumerable<string> roles, string requestId = null, Impersonification impersonification = null)
         {
             Id = id ?? Guid.Empty;
             Name = name ?? string.Empty;
             Email = email ?? string.Empty;
             Roles = roles ?? new List<string>();
-            CompanyId = companyId ?? Guid.Empty;
             RequestId = requestId ?? Guid.NewGuid().ToString("N");
             ImpersonifiedBy = impersonification;
         }
@@ -37,12 +36,10 @@ namespace Sheaft.Core
         public string Name { get; }
         public string Email { get; }
         public IEnumerable<string> Roles { get; }
-        public Guid CompanyId { get; }
         public Impersonification ImpersonifiedBy { get; }
         public string RequestId { get; }
 
         public bool IsAuthenticated => Id != Guid.Empty;
-        public bool IsConsumer => CompanyId == Guid.Empty;
         public bool IsImpersonating => ImpersonifiedBy != null;
     }
 

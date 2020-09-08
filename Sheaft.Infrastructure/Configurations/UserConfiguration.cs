@@ -1,7 +1,7 @@
-using Sheaft.Domain.Models;
+﻿using Sheaft.Domain.Models;
 using Microsoft.EntityFrameworkCore;
-using Sheaft.Interop.Enums;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Sheaft.Interop.Enums;
 
 namespace Sheaft.Infrastructure
 {
@@ -10,18 +10,33 @@ namespace Sheaft.Infrastructure
         public void Configure(EntityTypeBuilder<User> entity)
         {
             entity.Property<long>("Uid");
-            entity.Property<long?>("CompanyUid");
-            entity.Property<long?>("DepartmentUid");
 
             entity.Property(c => c.CreatedOn);
             entity.Property(c => c.UpdatedOn).IsConcurrencyToken();
 
+            entity.Property(c => c.Name).IsRequired();
             entity.Property(c => c.Email).IsRequired();
+            entity.Property(c => c.FirstName).IsRequired();
+            entity.Property(c => c.LastName).IsRequired();
             entity.Property(c => c.TotalPoints).HasDefaultValue(0);
-            entity.Property(c => c.UserType).HasDefaultValue(UserKind.Consumer);
 
-            entity.HasOne(c => c.Company).WithMany().HasForeignKey("CompanyUid").OnDelete(DeleteBehavior.Cascade);
-            entity.HasOne(c => c.Department).WithMany().HasForeignKey("DepartmentUid").OnDelete(DeleteBehavior.NoAction);
+            entity.HasDiscriminator(c => c.Kind)
+                .HasValue<Producer>(ProfileKind.Producer)
+                .HasValue<Store>(ProfileKind.Store)
+                .HasValue<Consumer>(ProfileKind.Consumer);
+
+            entity.OwnsOne(c => c.Address, cb =>
+            {
+                cb.Property<long>("DepartmentUid");
+                cb.HasOne(c => c.Department).WithMany().HasForeignKey("DepartmentUid");
+                cb.ToTable("UserAddresses");
+            });
+
+            entity.OwnsOne(c => c.BillingAddress, cb =>
+            {
+                cb.ToTable("UserBillingAddresses");
+            });
+
             entity.HasMany<Sponsoring>().WithOne(c => c.Sponsor).HasForeignKey("SponsorUid").OnDelete(DeleteBehavior.NoAction);
 
             entity.OwnsMany(c => c.Points, p =>
@@ -31,16 +46,14 @@ namespace Sheaft.Infrastructure
                 p.ToTable("UserPoints");
             });
 
-            var points = entity.Metadata.FindNavigation(nameof(User.Points));
+            var points = entity.Metadata.FindNavigation(nameof(Consumer.Points));
             points.SetPropertyAccessMode(PropertyAccessMode.Field);
 
             entity.HasKey("Uid");
 
             entity.HasIndex(c => c.Id).IsUnique();
             entity.HasIndex(c => c.Email).IsUnique();
-            entity.HasIndex("CompanyUid");
-            entity.HasIndex("DepartmentUid");
-            entity.HasIndex("Uid", "Id", "CompanyUid", "DepartmentUid", "CreatedOn");
+            entity.HasIndex("Uid", "Id", "CreatedOn");
 
             entity.ToTable("Users");
         }

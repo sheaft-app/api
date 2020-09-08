@@ -45,7 +45,7 @@ namespace Sheaft.Api.Controllers
                 using (var stream = new MemoryStream())
                 {
                     await formFile.CopyToAsync(stream);
-                    var result = await _mediatr.Send(new QueueImportProductsCommand(requestUser) { CompanyId = requestUser.CompanyId, FileName = formFile.FileName, FileStream = stream });
+                    var result = await _mediatr.Send(new QueueImportProductsCommand(requestUser) { Id = requestUser.Id, FileName = formFile.FileName, FileStream = stream });
                     if (!result.Success)
                         return BadRequest(result);
 

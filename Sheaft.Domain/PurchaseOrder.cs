@@ -17,7 +17,7 @@ namespace Sheaft.Domain.Models
         {
         }
 
-        public PurchaseOrder(Guid id, string reference, OrderStatusKind status, IDictionary<Product, int> lines, DeliveryMode delivery, DateTimeOffset expectedDeliveryDate, Company vendor, User sender)
+        public PurchaseOrder(Guid id, string reference, OrderStatusKind status, IDictionary<Product, int> lines, DeliveryMode delivery, DateTimeOffset expectedDeliveryDate, Producer vendor, User sender)
         {
             if (vendor == null)
                 throw new ValidationException(MessageKind.PurchaseOrder_Vendor_Required);
@@ -211,12 +211,12 @@ namespace Sheaft.Domain.Models
             ExpectedDelivery = new ExpectedDelivery(delivery, expectedDate);
         }
 
-        public void SetSender(User user)
+        public void SetSender(User sender)
         {
-            Sender = new PurchaseOrderSender(user);
+            Sender = new PurchaseOrderSender(sender);
         }
 
-        public void SetVendor(Company vendor)
+        public void SetVendor(Producer vendor)
         {
             Vendor = new PurchaseOrderVendor(vendor);
         }

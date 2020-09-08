@@ -66,9 +66,9 @@ namespace Sheaft.Application.Queries
         {
             try
             {
-                var departement = await _context.Users
+                var departement = await _context.Users.OfType<User>()
                     .Get(u => u.Id == userId && !u.RemovedOn.HasValue)
-                    .Select(u => u.Department)
+                    .Select(u => u.Address.Department)
                     .SingleOrDefaultAsync(token);
 
                 if (departement == null)
@@ -86,9 +86,9 @@ namespace Sheaft.Application.Queries
         {
             try
             {
-                var departement = await _context.Users
+                var departement = await _context.Users.OfType<User>()
                     .Get(u => u.Id == userId && !u.RemovedOn.HasValue)
-                    .Select(u => u.Department)
+                    .Select(u => u.Address.Department)
                     .SingleOrDefaultAsync(token);
 
                 if (departement?.Region == null)
@@ -208,87 +208,6 @@ namespace Sheaft.Application.Queries
             {
                 return new List<DepartmentUserPointsDto>().AsQueryable();
             }
-        }
-        private static UserPositionDto GetAsDto(UserPosition query)
-        {
-            return new UserPositionDto
-                {
-                    Points = query.Points,
-                    Position = query.Position
-                };
-        }
-        private static IQueryable<CountryPointsDto> GetAsDto(IQueryable<CountryPoints> query)
-        {
-            return query
-                .Select(c => new CountryPointsDto
-                {
-                    Points = c.Points,
-                    Users = c.Users
-                });
-        }
-        private static IQueryable<RegionPointsDto> GetAsDto(IQueryable<RegionPoints> query)
-        {
-            return query
-                .Select(c => new RegionPointsDto
-                {
-                    Points = c.Points,
-                    Users = c.Users,
-                    RegionName = c.RegionName,
-                    Position = c.Position,
-                    RegionId = c.RegionId
-                });
-        }
-        private static IQueryable<DepartmentPointsDto> GetAsDto(IQueryable<DepartmentPoints> query)
-        {
-            return query
-                .Select(c => new DepartmentPointsDto
-                {
-                    Points = c.Points,
-                    Users = c.Users,
-                    DepartmentId = c.DepartmentId,
-                    DepartmentName = c.DepartmentName,
-                    RegionName = c.RegionName,
-                    Code = c.Code,
-                    Position = c.Position,
-                    RegionId = c.RegionId
-                });
-        }
-        private static IQueryable<CountryUserPointsDto> GetAsDto(IQueryable<CountryUserPoints> query)
-        {
-            return query
-                .Select(c => new CountryUserPointsDto
-                {
-                    Points = c.Points,
-                    Name = c.Name,
-                    Picture = c.Picture,
-                    Position = c.Position,
-                    UserId = c.UserId
-                });
-        }
-        private static IQueryable<RegionUserPointsDto> GetAsDto(IQueryable<RegionUserPoints> query)
-        {
-            return query
-                .Select(c => new RegionUserPointsDto
-                {
-                    Points = c.Points,
-                    Name = c.Name,
-                    Picture = c.Picture,
-                    Position = c.Position,
-                    UserId = c.UserId
-                });
-        }
-        private static IQueryable<DepartmentUserPointsDto> GetAsDto(IQueryable<DepartmentUserPoints> query)
-        {
-            return query
-                .Select(c => new DepartmentUserPointsDto
-                {
-                    Points = c.Points,
-                    Name = c.Name,
-                    Picture = c.Picture,
-                    Position = c.Position,
-                    UserId = c.UserId,
-                    DepartmentId = c.DepartmentId
-                });
         }
     }
 }

@@ -34,7 +34,7 @@ namespace Sheaft.Application.Handlers
         {
             return await ExecuteAsync(async () =>
             {
-                var user = await _context.GetByIdAsync<User>(request.RequestUser.Id, token);
+                var producer = await _context.GetByIdAsync<Producer>(request.RequestUser.Id, token);
 
                 SimpleAddress deliveryModeAddress = null;
                 if (request.Address != null)
@@ -51,7 +51,7 @@ namespace Sheaft.Application.Handlers
                     }
                 }
 
-                var entity = new DeliveryMode(Guid.NewGuid(), request.Kind, user.Company, request.LockOrderHoursBeforeDelivery, deliveryModeAddress, openingHours, request.Name, request.Description);
+                var entity = new DeliveryMode(Guid.NewGuid(), request.Kind, producer, request.LockOrderHoursBeforeDelivery, deliveryModeAddress, openingHours, request.Name, request.Description);
                 
                 await _context.AddAsync(entity, token);
                 await _context.SaveChangesAsync(token);
@@ -64,7 +64,7 @@ namespace Sheaft.Application.Handlers
         {
             return await ExecuteAsync(async () =>
             {
-                var user = await _context.GetByIdAsync<User>(request.RequestUser.Id, token);
+                var producer = await _context.GetByIdAsync<Producer>(request.RequestUser.Id, token);
                 var entity = await _context.GetByIdAsync<DeliveryMode>(request.Id, token);
 
                 entity.SetName(request.Name);

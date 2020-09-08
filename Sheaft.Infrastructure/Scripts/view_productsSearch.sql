@@ -28,8 +28,8 @@ as
      , ra.Latitude as producer_latitude
      , geography::STGeomFromText('POINT('+convert(varchar(20),ra.Longitude)+' '+convert(varchar(20),ra.Latitude)+')',4326) as producer_geolocation
   from dbo.Products p
-    join dbo.Companies r on r.Uid = p.ProducerUid
-    join dbo.CompanyAddresses ra on r.Uid = ra.CompanyUid
+    join dbo.Users r on r.Uid = p.ProducerUid and r.Kind = 0
+    join dbo.UserAddresses ra on r.Uid = ra.UserUid
 	join dbo.DeliveryModes dm on dm.ProducerUid = r.Uid and dm.Kind in (1, 2, 3, 4) 
     left join dbo.ProductTags pt on p.Uid = pt.ProductUid
     left join dbo.Packagings pa on pa.Uid = p.PackagingUid

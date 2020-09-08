@@ -133,7 +133,7 @@ namespace Sheaft.Manage
                     };
                 });
 
-            services.AddMediatR(new List<Assembly>() { typeof(RegisterCompanyCommand).Assembly, typeof(UserPointsCreatedEvent).Assembly, typeof(AccountCommandsHandler).Assembly }.ToArray());
+            services.AddMediatR(new List<Assembly>() { typeof(RegisterStoreCommand).Assembly, typeof(UserPointsCreatedEvent).Assembly, typeof(UserCommandsHandler).Assembly }.ToArray());
 
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             services.AddHttpClient();
@@ -144,6 +144,7 @@ namespace Sheaft.Manage
             services.AddScoped<IBlobService, BlobService>();
             services.AddScoped<IEmailService, EmailService>();
             services.AddScoped<ISignalrService, SignalrService>();
+            services.AddScoped<IImageService, ImageService>();
 
             services.AddOptions();
 

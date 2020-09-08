@@ -13,31 +13,40 @@ namespace Sheaft.Mappers
         public CompanyProfile()
         {
             CreateMap<Company, CompanyViewModel>()
-                  .ForMember(d => d.Tags, opt => opt.MapFrom(r => r.Tags.Select(t => t.Tag.Id)))
-                  .ForMember(d => d.OpeningHours, opt => opt.MapFrom(r => r.OpeningHours))
-                  .ForMember(d => d.Address, opt => opt.MapFrom(r => r.Address));
+                  .ForMember(d => d.Address, opt => opt.MapFrom(r => r.Address))
+                  .ForMember(d => d.BillingAddress, opt => opt.MapFrom(r => r.BillingAddress));
 
-            CreateMap<Company, CompanyDto>()
-                  .ForMember(d => d.Tags, opt => opt.MapFrom(r => r.Tags.Select(t => t.Tag)))
-                  .ForMember(d => d.OpeningHours, opt => opt.MapFrom(r => r.OpeningHours))
-                  .ForMember(d => d.Address, opt => opt.MapFrom(r => r.Address));
-
-            CreateMap<Company, ProducerDto>()
-                .ForMember(d => d.Tags, opt => opt.MapFrom(r => r.Tags.Select(t => t.Tag)))
-                .ForMember(d => d.Address, opt => opt.MapFrom(r => r.Address));
-
-            CreateMap<Company, StoreDto>()
-                .ForMember(d => d.Tags, opt => opt.MapFrom(r => r.Tags.Select(t => t.Tag)))
-                .ForMember(d => d.Address, opt => opt.MapFrom(r => r.Address));
+            CreateMap<Company, UserDto>()
+                .ForMember(d => d.Address, opt => opt.MapFrom(r => r.Address))
+                  .ForMember(d => d.BillingAddress, opt => opt.MapFrom(r => r.BillingAddress));
 
             CreateMap<Company, CompanyProfileDto>()
-                .ForMember(d => d.Address, opt => opt.MapFrom(r => r.Address));
+                .IncludeBase<Company, UserDto>();
 
-            CreateMap<Company, UserProfileDto>();
+            CreateMap<Producer, UserDto>()
+                .ForMember(d => d.Address, opt => opt.MapFrom(r => r.Address))
+                  .ForMember(d => d.BillingAddress, opt => opt.MapFrom(r => r.BillingAddress));
 
-            CreateMap<RegisterCompanyInput, RegisterCompanyCommand>();
-            CreateMap<UpdateCompanyInput, UpdateCompanyCommand>();
-            CreateMap<UpdatePictureInput, UpdateCompanyPictureCommand>();
+            CreateMap<Producer, ProducerDto>()
+                .ForMember(d => d.Address, opt => opt.MapFrom(r => r.Address))
+                  .ForMember(d => d.BillingAddress, opt => opt.MapFrom(r => r.BillingAddress))
+                .ForMember(d => d.Tags, opt => opt.MapFrom(r => r.Tags.Select(t => t.Tag)));
+
+            CreateMap<Store, UserDto>()
+                .ForMember(d => d.Address, opt => opt.MapFrom(r => r.Address))
+                  .ForMember(d => d.BillingAddress, opt => opt.MapFrom(r => r.BillingAddress));
+
+            CreateMap<Store, StoreDto>()
+                .ForMember(d => d.Address, opt => opt.MapFrom(r => r.Address))
+                  .ForMember(d => d.BillingAddress, opt => opt.MapFrom(r => r.BillingAddress))
+                .ForMember(d => d.Tags, opt => opt.MapFrom(r => r.Tags.Select(t => t.Tag)))
+                 .ForMember(d => d.OpeningHours, opt => opt.MapFrom(r => r.OpeningHours));
+
+            CreateMap<RegisterStoreInput, RegisterStoreCommand>();
+            CreateMap<RegisterProducerInput, RegisterProducerCommand>();
+            CreateMap<UpdateStoreInput, UpdateStoreCommand>();
+            CreateMap<UpdateProducerInput, UpdateProducerCommand>();
+            CreateMap<UpdatePictureInput, UpdateUserPictureCommand>();
             CreateMap<IdWithReasonInput, DeleteCompanyCommand>();
         }
     }

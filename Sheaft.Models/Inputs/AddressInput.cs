@@ -1,4 +1,6 @@
-﻿namespace Sheaft.Models.Inputs
+﻿using System;
+
+namespace Sheaft.Models.Inputs
 {
     public class AddressInput
     {

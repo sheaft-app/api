@@ -7,6 +7,6 @@ namespace Sheaft.Interop.Enums
         ImportProducts = 200,
         ExportProducts,
         OrderPicking = 300,
-        ExportAccountData = 400,
+        ExportUserData = 400,
     }
 }

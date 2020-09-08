@@ -46,7 +46,7 @@ namespace Sheaft.Application.Handlers
             return await ExecuteAsync(async () =>
             {
                 var user = await _context.GetByIdAsync<User>(request.RequestUser.Id, token);
-                var store = await _context.GetByIdAsync<Company>(request.StoreId, token);
+                var store = await _context.GetByIdAsync<Store>(request.StoreId, token);
                 var delivery = await _context.GetByIdAsync<DeliveryMode>(request.DeliveryModeId, token);
 
                 var selectedHours = new List<TimeSlotHour>();
@@ -63,10 +63,10 @@ namespace Sheaft.Application.Handlers
                 await _context.AddAsync(entity, token);
                 await _context.SaveChangesAsync(token);
 
-                if (request.RequestUser.CompanyId == store.Id)
+                if (request.RequestUser.Id == store.Id)
                     await _queuesService.ProcessEventAsync(AgreementCreatedByStoreEvent.QUEUE_NAME, new AgreementCreatedByStoreEvent(request.RequestUser) { Id = entity.Id }, token);
 
-                if (request.RequestUser.CompanyId == delivery.Producer.Id)
+                if (request.RequestUser.Id == delivery.Producer.Id)
                     await _queuesService.ProcessEventAsync(AgreementCreatedByProducerEvent.QUEUE_NAME, new AgreementCreatedByProducerEvent(request.RequestUser) { Id = entity.Id }, token);
 
                 return Ok(entity.Id);
@@ -94,10 +94,10 @@ namespace Sheaft.Application.Handlers
                 _context.Update(entity);
                 await _context.SaveChangesAsync(token);
 
-                if (request.RequestUser.CompanyId == entity.Store.Id)
+                if (request.RequestUser.Id == entity.Store.Id)
                     await _queuesService.ProcessEventAsync(AgreementAcceptedByStoreEvent.QUEUE_NAME, new AgreementAcceptedByStoreEvent(request.RequestUser) { Id = entity.Id }, token);
 
-                if (request.RequestUser.CompanyId == entity.Delivery.Producer.Id)
+                if (request.RequestUser.Id == entity.Delivery.Producer.Id)
                     await _queuesService.ProcessEventAsync(AgreementAcceptedByProducerEvent.QUEUE_NAME, new AgreementAcceptedByProducerEvent(request.RequestUser) { Id = entity.Id }, token);
 
                 return Ok(true);
@@ -133,10 +133,10 @@ namespace Sheaft.Application.Handlers
                 _context.Update(entity);
                 await _context.SaveChangesAsync(token);
 
-                if (request.RequestUser.CompanyId == entity.Store.Id)
+                if (request.RequestUser.Id == entity.Store.Id)
                     await _queuesService.ProcessEventAsync(AgreementCancelledByStoreEvent.QUEUE_NAME, new AgreementCancelledByStoreEvent(request.RequestUser) { Id = entity.Id }, token);
 
-                if (request.RequestUser.CompanyId == entity.Delivery.Producer.Id)
+                if (request.RequestUser.Id == entity.Delivery.Producer.Id)
                     await _queuesService.ProcessEventAsync(AgreementCancelledByProducerEvent.QUEUE_NAME, new AgreementCancelledByProducerEvent(request.RequestUser) { Id = entity.Id }, token);
 
                 return Ok(true);
@@ -172,10 +172,10 @@ namespace Sheaft.Application.Handlers
                 _context.Update(entity);
                 await _context.SaveChangesAsync(token);
 
-                if (request.RequestUser.CompanyId == entity.Store.Id)
+                if (request.RequestUser.Id == entity.Store.Id)
                     await _queuesService.ProcessEventAsync(AgreementRefusedByStoreEvent.QUEUE_NAME, new AgreementRefusedByStoreEvent(request.RequestUser) { Id = entity.Id }, token);
 
-                if (request.RequestUser.CompanyId == entity.Delivery.Producer.Id)
+                if (request.RequestUser.Id == entity.Delivery.Producer.Id)
                     await _queuesService.ProcessEventAsync(AgreementRefusedByProducerEvent.QUEUE_NAME, new AgreementRefusedByProducerEvent(request.RequestUser) { Id = entity.Id }, token);
 
                 return Ok(true);
@@ -200,7 +200,7 @@ namespace Sheaft.Application.Handlers
             return await ExecuteAsync(async () =>
             {
                 var entity = await _context.Agreements.SingleOrDefaultAsync(a => a.Id == request.Id && a.RemovedOn.HasValue, token);
-                entity.Reset(request.Status);
+                entity.Reset();
 
                 _context.Update(entity);
                 await _context.SaveChangesAsync(token);

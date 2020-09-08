@@ -64,7 +64,7 @@ namespace Sheaft.Functions
             builder.Services.BuildServiceProvider();
 
             builder.Services.AddAutoMapper(typeof(ProductProfile).Assembly);
-            builder.Services.AddMediatR(new List<Assembly>() { typeof(RegisterCompanyCommand).Assembly, typeof(UserPointsCreatedEvent).Assembly, typeof(AccountCommandsHandler).Assembly }.ToArray());
+            builder.Services.AddMediatR(new List<Assembly>() { typeof(RegisterStoreCommand).Assembly, typeof(UserPointsCreatedEvent).Assembly, typeof(UserCommandsHandler).Assembly }.ToArray());
 
             builder.Services.AddMemoryCache();
             builder.Services.AddHttpClient();
@@ -80,6 +80,7 @@ namespace Sheaft.Functions
             builder.Services.AddScoped<IBlobService, BlobService>();
             builder.Services.AddScoped<IEmailService, EmailService>();
             builder.Services.AddScoped<ISignalrService, SignalrService>();
+            builder.Services.AddScoped<IImageService, ImageService>();
 
             builder.Services.AddScoped<IAgreementQueries, AgreementQueries>();
             builder.Services.AddScoped<ICompanyQueries, CompanyQueries>();
@@ -94,6 +95,7 @@ namespace Sheaft.Functions
             builder.Services.AddScoped<IQuickOrderQueries, QuickOrderQueries>();
             builder.Services.AddScoped<IRegionQueries, RegionQueries>();
             builder.Services.AddScoped<ITagQueries, TagQueries>();
+            builder.Services.AddScoped<IConsumerQueries, ConsumerQueries>();
             builder.Services.AddScoped<IUserQueries, UserQueries>();
 
             builder.Services.AddScoped<IDapperContext, DapperContext>();
@@ -122,9 +124,9 @@ namespace Sheaft.Functions
                     opts.SupportedUICultures = supportedCultures;
                 });
 
-            var commandsInQueueType = typeof(RegisterCompanyCommand).Assembly.GetTypes().Where(t => t.GetFields(BindingFlags.Public | BindingFlags.Static |
+            var commandsInQueueType = typeof(RegisterStoreCommand).Assembly.GetTypes().Where(t => t.GetFields(BindingFlags.Public | BindingFlags.Static |
                BindingFlags.FlattenHierarchy).Any(c => c.Name == "QUEUE_NAME"));
-            var eventsInQueueType = typeof(AccountExportDataSucceededEvent).Assembly.GetTypes().Where(t => t.GetFields(BindingFlags.Public | BindingFlags.Static |
+            var eventsInQueueType = typeof(ExportUserDataSucceededEvent).Assembly.GetTypes().Where(t => t.GetFields(BindingFlags.Public | BindingFlags.Static |
                BindingFlags.FlattenHierarchy).Any(c => c.Name == "QUEUE_NAME"));
 
             var queues = new List<string>();

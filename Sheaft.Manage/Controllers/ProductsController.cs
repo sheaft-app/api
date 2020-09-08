@@ -52,7 +52,7 @@ namespace Sheaft.Manage.Controllers
             var requestUser = await GetRequestUser(token);
             if (requestUser.IsImpersonating)
             {
-                query = query.Where(p => p.Producer.Id == requestUser.CompanyId);
+                query = query.Where(p => p.Producer.Id == requestUser.Id);
             }
 
             var entities = await query
@@ -227,7 +227,7 @@ namespace Sheaft.Manage.Controllers
                 using (var stream = new MemoryStream())
                 {
                     await formFile.CopyToAsync(stream);
-                    var result = await _mediatr.Send(new QueueImportProductsCommand(requestUser) { CompanyId = requestUser.CompanyId, FileName = formFile.FileName, FileStream = stream });
+                    var result = await _mediatr.Send(new QueueImportProductsCommand(requestUser) { Id = requestUser.Id, FileName = formFile.FileName, FileStream = stream });
                     if (!result.Success)
                         return BadRequest(result);
                 }
@@ -285,7 +285,7 @@ namespace Sheaft.Manage.Controllers
         private async Task<List<PackagingViewModel>> GetPackagings(RequestUser requestUser, CancellationToken token)
         {
             return await _context.Packagings
-                            .Where(c => c.Producer.Id == requestUser.CompanyId && !c.RemovedOn.HasValue)
+                            .Where(c => c.Producer.Id == requestUser.Id && !c.RemovedOn.HasValue)
                             .ProjectTo<PackagingViewModel>(_configurationProvider)
                             .ToListAsync(token);
         }
