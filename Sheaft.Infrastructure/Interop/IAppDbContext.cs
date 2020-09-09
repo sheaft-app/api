@@ -21,13 +21,14 @@ namespace Sheaft.Infrastructure.Interop
         DbSet<Department> Departments { get; set; }
         DbSet<Job> Jobs { get; set; }
         DbSet<Level> Levels { get; set; }
-        DbSet<Reward> Rewards { get; set; }
         DbSet<Notification> Notifications { get; set; }
+        DbSet<Order> Orders { get; set; }
         DbSet<PurchaseOrder> PurchaseOrders { get; set; }
         DbSet<Packaging> Packagings { get; set; }
         DbSet<Product> Products { get; set; }
         DbSet<QuickOrder> QuickOrders { get; set; }
         DbSet<Region> Regions { get; set; }
+        DbSet<Reward> Rewards { get; set; }
         DbSet<Tag> Tags { get; set; }
         DbSet<User> Users { get; set; }
 

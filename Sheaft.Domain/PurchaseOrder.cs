@@ -55,14 +55,14 @@ namespace Sheaft.Domain.Models
         public virtual PurchaseOrderSender Sender { get; private set; }
         public virtual ExpectedDelivery ExpectedDelivery { get; private set; }
         public virtual PurchaseOrderVendor Vendor { get; private set; }
-        public virtual IEnumerable<PurchaseOrderProduct> Products
+        public virtual IReadOnlyCollection<PurchaseOrderProduct> Products
         {
             get => _products?.AsReadOnly();
         }
 
         public void SetReference(string newReference)
         {
-            if(string.IsNullOrWhiteSpace(newReference))
+            if (string.IsNullOrWhiteSpace(newReference))
                 throw new ValidationException(MessageKind.PurchaseOrder_Reference_Required);
 
             Reference = newReference;
@@ -85,7 +85,7 @@ namespace Sheaft.Domain.Models
                         throw new ValidationException(MessageKind.PurchaseOrder_CannotShip_NotIn_CompletedStatus);
                     break;
                 case OrderStatusKind.Delivered:
-                    if(Status != OrderStatusKind.Completed && Status != OrderStatusKind.Shipping)
+                    if (Status != OrderStatusKind.Completed && Status != OrderStatusKind.Shipping)
                         throw new ValidationException(MessageKind.PurchaseOrder_CannotDeliver_NotIn_CompletedOrShippingStatus);
                     break;
                 case OrderStatusKind.Cancelled:
@@ -99,9 +99,9 @@ namespace Sheaft.Domain.Models
                 case OrderStatusKind.Refused:
                     if (Status == OrderStatusKind.Cancelled)
                         throw new ValidationException(MessageKind.PurchaseOrder_CannotRefuse_AlreadyIn_CancelledStatus);
-                    if(Status == OrderStatusKind.Refused)                             
+                    if (Status == OrderStatusKind.Refused)
                         throw new ValidationException(MessageKind.PurchaseOrder_CannotRefuse_AlreadyIn_RefusedStatus);
-                    if(Status == OrderStatusKind.Delivered)                           
+                    if (Status == OrderStatusKind.Delivered)
                         throw new ValidationException(MessageKind.PurchaseOrder_CannotRefuse_AlreadyIn_DeliveredStatus);
                     break;
             }
@@ -233,13 +233,11 @@ namespace Sheaft.Domain.Models
 
         public void Remove()
         {
-            Reference = $"___{Reference}";
         }
 
         public void Restore()
         {
             RemovedOn = null;
-            Reference = Reference.Replace("___", "");
         }
     }
 }

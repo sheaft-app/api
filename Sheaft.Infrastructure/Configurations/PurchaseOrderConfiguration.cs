@@ -9,6 +9,7 @@ namespace Sheaft.Infrastructure
         public void Configure(EntityTypeBuilder<PurchaseOrder> entity)
         {
             entity.Property<long>("Uid");
+            entity.Property<long>("OrderUid");
             entity.Property<long>("PurchaseOrderVendorUid");
             entity.Property<long>("PurchaseOrderSenderUid");
 
@@ -42,10 +43,11 @@ namespace Sheaft.Infrastructure
 
             entity.HasIndex(c => c.Id).IsUnique();
             entity.HasIndex("PurchaseOrderVendorUid", "Reference").IsUnique();
+            entity.HasIndex("OrderUid");
             entity.HasIndex("PurchaseOrderVendorUid");
             entity.HasIndex("PurchaseOrderSenderUid");
 
-            entity.HasIndex("Uid", "Id", "PurchaseOrderVendorUid", "PurchaseOrderSenderUid", "CreatedOn");
+            entity.HasIndex("OrderUid", "Uid", "Id", "PurchaseOrderVendorUid", "PurchaseOrderSenderUid", "CreatedOn");
             entity.ToTable("PurchaseOrders");
         }
     }
