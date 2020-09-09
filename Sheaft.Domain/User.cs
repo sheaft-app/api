@@ -31,6 +31,10 @@ namespace Sheaft.Domain.Models
             SetLastname(lastname);
 
             _points = new List<Points>();
+            _paymentMethods = new List<PaymentMethod>();
+            _wallets = new List<Wallet>();
+            _documents = new List<Document>();
+
             RefreshPoints();
         }
 
@@ -38,6 +42,7 @@ namespace Sheaft.Domain.Models
         public DateTimeOffset CreatedOn { get; private set; }
         public DateTimeOffset? UpdatedOn { get; private set; }
         public DateTimeOffset? RemovedOn { get; private set; }
+        public string Identifier { get; private set; }
         public ProfileKind Kind { get; private set; }
         public string Reason { get; private set; }
         public string Name { get; private set; }
