@@ -116,6 +116,7 @@ namespace Sheaft.Infrastructure.Migrations
                     CreatedOn = table.Column<DateTimeOffset>(nullable: false),
                     UpdatedOn = table.Column<DateTimeOffset>(nullable: true),
                     RemovedOn = table.Column<DateTimeOffset>(nullable: true),
+                    Identifier = table.Column<string>(nullable: true),
                     Kind = table.Column<int>(nullable: false),
                     Reason = table.Column<string>(nullable: true),
                     Name = table.Column<string>(nullable: false),
@@ -138,46 +139,6 @@ namespace Sheaft.Infrastructure.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Users", x => x.Uid);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "PurchaseOrders",
-                columns: table => new
-                {
-                    Uid = table.Column<long>(nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Id = table.Column<Guid>(nullable: false),
-                    CreatedOn = table.Column<DateTimeOffset>(nullable: false),
-                    UpdatedOn = table.Column<DateTimeOffset>(nullable: true),
-                    RemovedOn = table.Column<DateTimeOffset>(nullable: true),
-                    Reference = table.Column<string>(nullable: false),
-                    Reason = table.Column<string>(nullable: true),
-                    Comment = table.Column<string>(nullable: true),
-                    LinesCount = table.Column<int>(nullable: false),
-                    ProductsCount = table.Column<int>(nullable: false),
-                    TotalWholeSalePrice = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
-                    TotalVatPrice = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
-                    TotalOnSalePrice = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
-                    TotalWeight = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
-                    Status = table.Column<int>(nullable: false),
-                    PurchaseOrderSenderUid = table.Column<long>(nullable: false),
-                    PurchaseOrderVendorUid = table.Column<long>(nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_PurchaseOrders", x => x.Uid);
-                    table.ForeignKey(
-                        name: "FK_PurchaseOrders_PurchaseOrderSenders_PurchaseOrderSenderUid",
-                        column: x => x.PurchaseOrderSenderUid,
-                        principalTable: "PurchaseOrderSenders",
-                        principalColumn: "Uid",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_PurchaseOrders_PurchaseOrderVendors_PurchaseOrderVendorUid",
-                        column: x => x.PurchaseOrderVendorUid,
-                        principalTable: "PurchaseOrderVendors",
-                        principalColumn: "Uid",
-                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -245,6 +206,35 @@ namespace Sheaft.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Documents",
+                columns: table => new
+                {
+                    Uid = table.Column<long>(nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Id = table.Column<Guid>(nullable: false),
+                    CreatedOn = table.Column<DateTimeOffset>(nullable: false),
+                    UpdatedOn = table.Column<DateTimeOffset>(nullable: true),
+                    RemovedOn = table.Column<DateTimeOffset>(nullable: true),
+                    ProcessedDate = table.Column<DateTimeOffset>(nullable: true),
+                    Identifier = table.Column<string>(nullable: true),
+                    Name = table.Column<string>(nullable: true),
+                    Reason = table.Column<string>(nullable: true),
+                    Status = table.Column<int>(nullable: false),
+                    Kind = table.Column<int>(nullable: false),
+                    UserUid = table.Column<long>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Documents", x => x.Uid);
+                    table.ForeignKey(
+                        name: "FK_Documents_Users_UserUid",
+                        column: x => x.UserUid,
+                        principalTable: "Users",
+                        principalColumn: "Uid",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Jobs",
                 columns: table => new
                 {
@@ -305,6 +295,34 @@ namespace Sheaft.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Orders",
+                columns: table => new
+                {
+                    Uid = table.Column<long>(nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Id = table.Column<Guid>(nullable: false),
+                    CreatedOn = table.Column<DateTimeOffset>(nullable: false),
+                    UpdatedOn = table.Column<DateTimeOffset>(nullable: true),
+                    RemovedOn = table.Column<DateTimeOffset>(nullable: true),
+                    TotalWholeSalePrice = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
+                    TotalVatPrice = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
+                    TotalOnSalePrice = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
+                    Donation = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
+                    Fees = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
+                    UserUid = table.Column<long>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Orders", x => x.Uid);
+                    table.ForeignKey(
+                        name: "FK_Orders_Users_UserUid",
+                        column: x => x.UserUid,
+                        principalTable: "Users",
+                        principalColumn: "Uid",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Packagings",
                 columns: table => new
                 {
@@ -328,6 +346,37 @@ namespace Sheaft.Infrastructure.Migrations
                     table.ForeignKey(
                         name: "FK_Packagings_Users_ProducerUid",
                         column: x => x.ProducerUid,
+                        principalTable: "Users",
+                        principalColumn: "Uid",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "PaymentMethods",
+                columns: table => new
+                {
+                    Uid = table.Column<long>(nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Id = table.Column<Guid>(nullable: false),
+                    CreatedOn = table.Column<DateTimeOffset>(nullable: false),
+                    UpdatedOn = table.Column<DateTimeOffset>(nullable: true),
+                    RemovedOn = table.Column<DateTimeOffset>(nullable: true),
+                    Identifier = table.Column<string>(nullable: false),
+                    Name = table.Column<string>(nullable: false),
+                    Kind = table.Column<int>(nullable: false),
+                    Owner = table.Column<string>(nullable: false),
+                    UserUid = table.Column<long>(nullable: false),
+                    Expired = table.Column<bool>(nullable: true),
+                    Validity = table.Column<DateTimeOffset>(nullable: true),
+                    IBAN = table.Column<string>(nullable: true),
+                    BIC = table.Column<string>(nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_PaymentMethods", x => x.Uid);
+                    table.ForeignKey(
+                        name: "FK_PaymentMethods_Users_UserUid",
+                        column: x => x.UserUid,
                         principalTable: "Users",
                         principalColumn: "Uid",
                         onDelete: ReferentialAction.Cascade);
@@ -551,60 +600,27 @@ namespace Sheaft.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "ExpectedDeliveries",
+                name: "Wallets",
                 columns: table => new
                 {
-                    PurchaseOrderUid = table.Column<long>(nullable: false),
-                    Kind = table.Column<int>(nullable: false),
-                    Name = table.Column<string>(nullable: true),
-                    ExpectedDeliveryDate = table.Column<DateTimeOffset>(nullable: false),
-                    DeliveryStartedOn = table.Column<DateTimeOffset>(nullable: true),
-                    DeliveredOn = table.Column<DateTimeOffset>(nullable: true),
-                    From = table.Column<TimeSpan>(nullable: false),
-                    To = table.Column<TimeSpan>(nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_ExpectedDeliveries", x => x.PurchaseOrderUid);
-                    table.ForeignKey(
-                        name: "FK_ExpectedDeliveries_PurchaseOrders_PurchaseOrderUid",
-                        column: x => x.PurchaseOrderUid,
-                        principalTable: "PurchaseOrders",
-                        principalColumn: "Uid",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "PurchaseOrderProducts",
-                columns: table => new
-                {
+                    Uid = table.Column<long>(nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
                     Id = table.Column<Guid>(nullable: false),
-                    PurchaseOrderUid = table.Column<long>(nullable: false),
+                    CreatedOn = table.Column<DateTimeOffset>(nullable: false),
+                    UpdatedOn = table.Column<DateTimeOffset>(nullable: true),
+                    RemovedOn = table.Column<DateTimeOffset>(nullable: true),
+                    Identifier = table.Column<string>(nullable: false),
                     Name = table.Column<string>(nullable: false),
-                    Reference = table.Column<string>(nullable: false),
-                    Quantity = table.Column<int>(nullable: false),
-                    Vat = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
-                    UnitWholeSalePrice = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
-                    UnitVatPrice = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
-                    UnitOnSalePrice = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
-                    UnitWeight = table.Column<decimal>(type: "decimal(10,2)", nullable: true),
-                    TotalWholeSalePrice = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
-                    TotalVatPrice = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
-                    TotalOnSalePrice = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
-                    TotalWeight = table.Column<decimal>(type: "decimal(10,2)", nullable: true),
-                    PackagingName = table.Column<string>(nullable: true),
-                    PackagingOnSalePrice = table.Column<decimal>(type: "decimal(10,2)", nullable: true),
-                    PackagingWholeSalePrice = table.Column<decimal>(type: "decimal(10,2)", nullable: true),
-                    PackagingVatPrice = table.Column<decimal>(type: "decimal(10,2)", nullable: true),
-                    PackagingVat = table.Column<decimal>(type: "decimal(10,2)", nullable: true)
+                    Kind = table.Column<int>(nullable: false),
+                    UserUid = table.Column<long>(nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_PurchaseOrderProducts", x => new { x.PurchaseOrderUid, x.Id });
+                    table.PrimaryKey("PK_Wallets", x => x.Uid);
                     table.ForeignKey(
-                        name: "FK_PurchaseOrderProducts_PurchaseOrders_PurchaseOrderUid",
-                        column: x => x.PurchaseOrderUid,
-                        principalTable: "PurchaseOrders",
+                        name: "FK_Wallets_Users_UserUid",
+                        column: x => x.UserUid,
+                        principalTable: "Users",
                         principalColumn: "Uid",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -766,6 +782,52 @@ namespace Sheaft.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "PurchaseOrders",
+                columns: table => new
+                {
+                    Uid = table.Column<long>(nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Id = table.Column<Guid>(nullable: false),
+                    CreatedOn = table.Column<DateTimeOffset>(nullable: false),
+                    UpdatedOn = table.Column<DateTimeOffset>(nullable: true),
+                    RemovedOn = table.Column<DateTimeOffset>(nullable: true),
+                    Reference = table.Column<string>(nullable: false),
+                    Reason = table.Column<string>(nullable: true),
+                    Comment = table.Column<string>(nullable: true),
+                    LinesCount = table.Column<int>(nullable: false),
+                    ProductsCount = table.Column<int>(nullable: false),
+                    TotalWholeSalePrice = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
+                    TotalVatPrice = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
+                    TotalOnSalePrice = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
+                    TotalWeight = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
+                    Status = table.Column<int>(nullable: false),
+                    PurchaseOrderSenderUid = table.Column<long>(nullable: false),
+                    PurchaseOrderVendorUid = table.Column<long>(nullable: false),
+                    OrderUid = table.Column<long>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_PurchaseOrders", x => x.Uid);
+                    table.ForeignKey(
+                        name: "FK_PurchaseOrders_Orders_OrderUid",
+                        column: x => x.OrderUid,
+                        principalTable: "Orders",
+                        principalColumn: "Uid");
+                    table.ForeignKey(
+                        name: "FK_PurchaseOrders_PurchaseOrderSenders_PurchaseOrderSenderUid",
+                        column: x => x.PurchaseOrderSenderUid,
+                        principalTable: "PurchaseOrderSenders",
+                        principalColumn: "Uid",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_PurchaseOrders_PurchaseOrderVendors_PurchaseOrderVendorUid",
+                        column: x => x.PurchaseOrderVendorUid,
+                        principalTable: "PurchaseOrderVendors",
+                        principalColumn: "Uid",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Products",
                 columns: table => new
                 {
@@ -812,29 +874,6 @@ namespace Sheaft.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "ExpectedDeliveryAddresses",
-                columns: table => new
-                {
-                    ExpectedDeliveryPurchaseOrderUid = table.Column<long>(nullable: false),
-                    Line1 = table.Column<string>(nullable: true),
-                    Line2 = table.Column<string>(nullable: true),
-                    Zipcode = table.Column<string>(nullable: true),
-                    City = table.Column<string>(nullable: true),
-                    Longitude = table.Column<double>(nullable: true),
-                    Latitude = table.Column<double>(nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_ExpectedDeliveryAddresses", x => x.ExpectedDeliveryPurchaseOrderUid);
-                    table.ForeignKey(
-                        name: "FK_ExpectedDeliveryAddresses_ExpectedDeliveries_ExpectedDeliveryPurchaseOrderUid",
-                        column: x => x.ExpectedDeliveryPurchaseOrderUid,
-                        principalTable: "ExpectedDeliveries",
-                        principalColumn: "PurchaseOrderUid",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "AgreementSelectedHours",
                 columns: table => new
                 {
@@ -854,6 +893,119 @@ namespace Sheaft.Infrastructure.Migrations
                         principalTable: "Agreements",
                         principalColumn: "Uid",
                         onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ExpectedDeliveries",
+                columns: table => new
+                {
+                    PurchaseOrderUid = table.Column<long>(nullable: false),
+                    Kind = table.Column<int>(nullable: false),
+                    Name = table.Column<string>(nullable: true),
+                    ExpectedDeliveryDate = table.Column<DateTimeOffset>(nullable: false),
+                    DeliveryStartedOn = table.Column<DateTimeOffset>(nullable: true),
+                    DeliveredOn = table.Column<DateTimeOffset>(nullable: true),
+                    From = table.Column<TimeSpan>(nullable: false),
+                    To = table.Column<TimeSpan>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ExpectedDeliveries", x => x.PurchaseOrderUid);
+                    table.ForeignKey(
+                        name: "FK_ExpectedDeliveries_PurchaseOrders_PurchaseOrderUid",
+                        column: x => x.PurchaseOrderUid,
+                        principalTable: "PurchaseOrders",
+                        principalColumn: "Uid",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "PurchaseOrderProducts",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(nullable: false),
+                    PurchaseOrderUid = table.Column<long>(nullable: false),
+                    Name = table.Column<string>(nullable: false),
+                    Reference = table.Column<string>(nullable: false),
+                    Quantity = table.Column<int>(nullable: false),
+                    Vat = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
+                    UnitWholeSalePrice = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
+                    UnitVatPrice = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
+                    UnitOnSalePrice = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
+                    UnitWeight = table.Column<decimal>(type: "decimal(10,2)", nullable: true),
+                    TotalWholeSalePrice = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
+                    TotalVatPrice = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
+                    TotalOnSalePrice = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
+                    TotalWeight = table.Column<decimal>(type: "decimal(10,2)", nullable: true),
+                    PackagingName = table.Column<string>(nullable: true),
+                    PackagingOnSalePrice = table.Column<decimal>(type: "decimal(10,2)", nullable: true),
+                    PackagingWholeSalePrice = table.Column<decimal>(type: "decimal(10,2)", nullable: true),
+                    PackagingVatPrice = table.Column<decimal>(type: "decimal(10,2)", nullable: true),
+                    PackagingVat = table.Column<decimal>(type: "decimal(10,2)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_PurchaseOrderProducts", x => new { x.PurchaseOrderUid, x.Id });
+                    table.ForeignKey(
+                        name: "FK_PurchaseOrderProducts_PurchaseOrders_PurchaseOrderUid",
+                        column: x => x.PurchaseOrderUid,
+                        principalTable: "PurchaseOrders",
+                        principalColumn: "Uid",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Transactions",
+                columns: table => new
+                {
+                    Uid = table.Column<long>(nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Id = table.Column<Guid>(nullable: false),
+                    CreatedOn = table.Column<DateTimeOffset>(nullable: false),
+                    UpdatedOn = table.Column<DateTimeOffset>(nullable: true),
+                    RemovedOn = table.Column<DateTimeOffset>(nullable: true),
+                    Identifier = table.Column<string>(nullable: true),
+                    Debited = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
+                    Credited = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
+                    Fees = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
+                    Nature = table.Column<int>(nullable: false),
+                    Kind = table.Column<int>(nullable: false),
+                    Status = table.Column<int>(nullable: false),
+                    ExecutedOn = table.Column<DateTimeOffset>(nullable: true),
+                    Code = table.Column<string>(nullable: true),
+                    Message = table.Column<string>(nullable: true),
+                    AuthorId = table.Column<string>(nullable: true),
+                    CreditedWalletUid = table.Column<long>(nullable: false),
+                    DebitedWalletUid = table.Column<long>(nullable: false),
+                    Discriminator = table.Column<string>(nullable: false),
+                    OrderUid = table.Column<long>(nullable: true),
+                    PurchaseOrderUid = table.Column<long>(nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Transactions", x => x.Uid);
+                    table.ForeignKey(
+                        name: "FK_Transactions_Orders_OrderUid",
+                        column: x => x.OrderUid,
+                        principalTable: "Orders",
+                        principalColumn: "Uid",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Transactions_PurchaseOrders_PurchaseOrderUid",
+                        column: x => x.PurchaseOrderUid,
+                        principalTable: "PurchaseOrders",
+                        principalColumn: "Uid",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Transactions_Wallets_CreditedWalletUid",
+                        column: x => x.CreditedWalletUid,
+                        principalTable: "Wallets",
+                        principalColumn: "Uid");
+                    table.ForeignKey(
+                        name: "FK_Transactions_Wallets_DebitedWalletUid",
+                        column: x => x.DebitedWalletUid,
+                        principalTable: "Wallets",
+                        principalColumn: "Uid");
                 });
 
             migrationBuilder.CreateTable(
@@ -935,6 +1087,29 @@ namespace Sheaft.Infrastructure.Migrations
                         principalColumn: "Uid");
                 });
 
+            migrationBuilder.CreateTable(
+                name: "ExpectedDeliveryAddresses",
+                columns: table => new
+                {
+                    ExpectedDeliveryPurchaseOrderUid = table.Column<long>(nullable: false),
+                    Line1 = table.Column<string>(nullable: true),
+                    Line2 = table.Column<string>(nullable: true),
+                    Zipcode = table.Column<string>(nullable: true),
+                    City = table.Column<string>(nullable: true),
+                    Longitude = table.Column<double>(nullable: true),
+                    Latitude = table.Column<double>(nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ExpectedDeliveryAddresses", x => x.ExpectedDeliveryPurchaseOrderUid);
+                    table.ForeignKey(
+                        name: "FK_ExpectedDeliveryAddresses_ExpectedDeliveries_ExpectedDeliveryPurchaseOrderUid",
+                        column: x => x.ExpectedDeliveryPurchaseOrderUid,
+                        principalTable: "ExpectedDeliveries",
+                        principalColumn: "PurchaseOrderUid",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
             migrationBuilder.CreateIndex(
                 name: "IX_Agreements_CreatedByUid",
                 table: "Agreements",
@@ -1005,6 +1180,29 @@ namespace Sheaft.Infrastructure.Migrations
                 columns: new[] { "Uid", "Id", "RegionUid", "LevelUid" });
 
             migrationBuilder.CreateIndex(
+                name: "IX_Documents_Id",
+                table: "Documents",
+                column: "Id",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Documents_Identifier",
+                table: "Documents",
+                column: "Identifier",
+                unique: true,
+                filter: "[Identifier] IS NOT NULL");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Documents_UserUid",
+                table: "Documents",
+                column: "UserUid");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Documents_Uid_Id_Identifier_UserUid_CreatedOn",
+                table: "Documents",
+                columns: new[] { "Uid", "Id", "Identifier", "UserUid", "CreatedOn" });
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Jobs_Id",
                 table: "Jobs",
                 column: "Id",
@@ -1048,6 +1246,22 @@ namespace Sheaft.Infrastructure.Migrations
                 columns: new[] { "Uid", "Id", "UserUid", "CreatedOn" });
 
             migrationBuilder.CreateIndex(
+                name: "IX_Orders_Id",
+                table: "Orders",
+                column: "Id",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Orders_UserUid",
+                table: "Orders",
+                column: "UserUid");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Orders_Uid_Id_UserUid_CreatedOn",
+                table: "Orders",
+                columns: new[] { "Uid", "Id", "UserUid", "CreatedOn" });
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Packagings_Id",
                 table: "Packagings",
                 column: "Id",
@@ -1062,6 +1276,28 @@ namespace Sheaft.Infrastructure.Migrations
                 name: "IX_Packagings_Uid_Id_CreatedOn",
                 table: "Packagings",
                 columns: new[] { "Uid", "Id", "CreatedOn" });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_PaymentMethods_Id",
+                table: "PaymentMethods",
+                column: "Id",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_PaymentMethods_Identifier",
+                table: "PaymentMethods",
+                column: "Identifier",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_PaymentMethods_UserUid",
+                table: "PaymentMethods",
+                column: "UserUid");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_PaymentMethods_Uid_Id_Identifier_UserUid_CreatedOn",
+                table: "PaymentMethods",
+                columns: new[] { "Uid", "Id", "Identifier", "UserUid", "CreatedOn" });
 
             migrationBuilder.CreateIndex(
                 name: "IX_ProducerTags_TagUid",
@@ -1107,6 +1343,11 @@ namespace Sheaft.Infrastructure.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
+                name: "IX_PurchaseOrders_OrderUid",
+                table: "PurchaseOrders",
+                column: "OrderUid");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_PurchaseOrders_PurchaseOrderSenderUid",
                 table: "PurchaseOrders",
                 column: "PurchaseOrderSenderUid",
@@ -1125,9 +1366,9 @@ namespace Sheaft.Infrastructure.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_PurchaseOrders_Uid_Id_PurchaseOrderVendorUid_PurchaseOrderSenderUid_CreatedOn",
+                name: "IX_PurchaseOrders_OrderUid_Uid_Id_PurchaseOrderVendorUid_PurchaseOrderSenderUid_CreatedOn",
                 table: "PurchaseOrders",
-                columns: new[] { "Uid", "Id", "PurchaseOrderVendorUid", "PurchaseOrderSenderUid", "CreatedOn" });
+                columns: new[] { "OrderUid", "Uid", "Id", "PurchaseOrderVendorUid", "PurchaseOrderSenderUid", "CreatedOn" });
 
             migrationBuilder.CreateIndex(
                 name: "IX_PurchaseOrderSenders_Id",
@@ -1246,6 +1487,44 @@ namespace Sheaft.Infrastructure.Migrations
                 columns: new[] { "Uid", "Id", "CreatedOn" });
 
             migrationBuilder.CreateIndex(
+                name: "IX_Transactions_OrderUid",
+                table: "Transactions",
+                column: "OrderUid");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Transactions_PurchaseOrderUid",
+                table: "Transactions",
+                column: "PurchaseOrderUid");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Transactions_CreditedWalletUid",
+                table: "Transactions",
+                column: "CreditedWalletUid");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Transactions_DebitedWalletUid",
+                table: "Transactions",
+                column: "DebitedWalletUid");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Transactions_Id",
+                table: "Transactions",
+                column: "Id",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Transactions_Identifier",
+                table: "Transactions",
+                column: "Identifier",
+                unique: true,
+                filter: "[Identifier] IS NOT NULL");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Transactions_Uid_Id_Identifier_CreditedWalletUid_DebitedWalletUid_CreatedOn",
+                table: "Transactions",
+                columns: new[] { "Uid", "Id", "Identifier", "CreditedWalletUid", "DebitedWalletUid", "CreatedOn" });
+
+            migrationBuilder.CreateIndex(
                 name: "IX_UserAddresses_DepartmentUid",
                 table: "UserAddresses",
                 column: "DepartmentUid");
@@ -1272,12 +1551,34 @@ namespace Sheaft.Infrastructure.Migrations
                 table: "Users",
                 columns: new[] { "Uid", "Id", "CreatedOn" });
 
-            migrationBuilder.InsertData("Levels", new List<string>() { "Uid", "Id", "CreatedOn", "Number", "RequiredPoints", "Name" }.ToArray(), new List<object>() { 1, "63b7d548-b8ae-43f6-bb9a-b47311ba57ed", "2020-05-01", "0", "1000", "Niveau 1" }.ToArray(), "dbo");
-            migrationBuilder.InsertData("Levels", new List<string>() { "Uid", "Id", "CreatedOn", "Number", "RequiredPoints", "Name" }.ToArray(), new List<object>() { 2, "a9193dc7-9508-4ab8-a1e3-0b72ee47589b", "2020-05-01", "1", "2000", "Niveau 1" }.ToArray(), "dbo");
-            migrationBuilder.InsertData("Levels", new List<string>() { "Uid", "Id", "CreatedOn", "Number", "RequiredPoints", "Name" }.ToArray(), new List<object>() { 3, "4817296a-94c7-4724-8de3-b58eca77ef5a", "2020-05-01", "2", "4000", "Niveau 2" }.ToArray(), "dbo");
-            migrationBuilder.InsertData("Levels", new List<string>() { "Uid", "Id", "CreatedOn", "Number", "RequiredPoints", "Name" }.ToArray(), new List<object>() { 4, "db209712-678f-4a49-8572-97cdb81aa6d7", "2020-05-01", "3", "8000", "Niveau 3" }.ToArray(), "dbo");
-            migrationBuilder.InsertData("Levels", new List<string>() { "Uid", "Id", "CreatedOn", "Number", "RequiredPoints", "Name" }.ToArray(), new List<object>() { 5, "874fb230-7423-4bfe-badb-508726501939", "2020-05-01", "4", "16000", "Niveau 4" }.ToArray(), "dbo");
-            migrationBuilder.InsertData("Levels", new List<string>() { "Uid", "Id", "CreatedOn", "Number", "RequiredPoints", "Name" }.ToArray(), new List<object>() { 6, "d09c810f-a11d-4e02-8ee7-4f231f615d63", "2020-05-01", "5", "32000", "Niveau 5" }.ToArray(), "dbo");
+            migrationBuilder.CreateIndex(
+                name: "IX_Wallets_Id",
+                table: "Wallets",
+                column: "Id",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Wallets_Identifier",
+                table: "Wallets",
+                column: "Identifier",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Wallets_UserUid",
+                table: "Wallets",
+                column: "UserUid");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Wallets_Uid_Id_Identifier_UserUid_CreatedOn",
+                table: "Wallets",
+                columns: new[] { "Uid", "Id", "Identifier", "UserUid", "CreatedOn" });
+
+            migrationBuilder.InsertData("Levels", new List<string>() { "Uid", "Id", "CreatedOn", "RequiredPoints", "Name" }.ToArray(), new List<object>() { 1, "63b7d548-b8ae-43f6-bb9a-b47311ba57ed", "2020-05-01", "1000", "Niveau 1" }.ToArray(), "dbo");
+            migrationBuilder.InsertData("Levels", new List<string>() { "Uid", "Id", "CreatedOn", "RequiredPoints", "Name" }.ToArray(), new List<object>() { 2, "a9193dc7-9508-4ab8-a1e3-0b72ee47589b", "2020-05-01", "2000", "Niveau 1" }.ToArray(), "dbo");
+            migrationBuilder.InsertData("Levels", new List<string>() { "Uid", "Id", "CreatedOn", "RequiredPoints", "Name" }.ToArray(), new List<object>() { 3, "4817296a-94c7-4724-8de3-b58eca77ef5a", "2020-05-01", "4000", "Niveau 2" }.ToArray(), "dbo");
+            migrationBuilder.InsertData("Levels", new List<string>() { "Uid", "Id", "CreatedOn", "RequiredPoints", "Name" }.ToArray(), new List<object>() { 4, "db209712-678f-4a49-8572-97cdb81aa6d7", "2020-05-01", "8000", "Niveau 3" }.ToArray(), "dbo");
+            migrationBuilder.InsertData("Levels", new List<string>() { "Uid", "Id", "CreatedOn", "RequiredPoints", "Name" }.ToArray(), new List<object>() { 5, "874fb230-7423-4bfe-badb-508726501939", "2020-05-01", "16000", "Niveau 4" }.ToArray(), "dbo");
+            migrationBuilder.InsertData("Levels", new List<string>() { "Uid", "Id", "CreatedOn", "RequiredPoints", "Name" }.ToArray(), new List<object>() { 6, "d09c810f-a11d-4e02-8ee7-4f231f615d63", "2020-05-01", "32000", "Niveau 5" }.ToArray(), "dbo");
 
             migrationBuilder.InsertData("Regions", new List<string>() { "Uid", "Id", "Code", "CreatedOn", "Name", "RequiredProducers" }.ToArray(), new List<object>() { 1, "1f287ca1-b079-46e7-a229-7f91fc6683d3", "1", "2020-05-01", "Guadeloupe", 1000 }.ToArray());
             migrationBuilder.InsertData("Regions", new List<string>() { "Uid", "Id", "Code", "CreatedOn", "Name", "RequiredProducers" }.ToArray(), new List<object>() { 2, "f8be8326-b276-4a7d-88fc-0f06f04f9178", "2", "2020-05-01", "Martinique", 1000 }.ToArray());
@@ -1583,6 +1884,9 @@ namespace Sheaft.Infrastructure.Migrations
                 name: "DeliveryModeOpeningHours");
 
             migrationBuilder.DropTable(
+                name: "Documents");
+
+            migrationBuilder.DropTable(
                 name: "ExpectedDeliveryAddresses");
 
             migrationBuilder.DropTable(
@@ -1590,6 +1894,9 @@ namespace Sheaft.Infrastructure.Migrations
 
             migrationBuilder.DropTable(
                 name: "Notifications");
+
+            migrationBuilder.DropTable(
+                name: "PaymentMethods");
 
             migrationBuilder.DropTable(
                 name: "ProducerOwners");
@@ -1625,6 +1932,9 @@ namespace Sheaft.Infrastructure.Migrations
                 name: "StoreTags");
 
             migrationBuilder.DropTable(
+                name: "Transactions");
+
+            migrationBuilder.DropTable(
                 name: "UserAddresses");
 
             migrationBuilder.DropTable(
@@ -1649,6 +1959,9 @@ namespace Sheaft.Infrastructure.Migrations
                 name: "Tags");
 
             migrationBuilder.DropTable(
+                name: "Wallets");
+
+            migrationBuilder.DropTable(
                 name: "Departments");
 
             migrationBuilder.DropTable(
@@ -1665,6 +1978,9 @@ namespace Sheaft.Infrastructure.Migrations
 
             migrationBuilder.DropTable(
                 name: "Regions");
+
+            migrationBuilder.DropTable(
+                name: "Orders");
 
             migrationBuilder.DropTable(
                 name: "PurchaseOrderSenders");
