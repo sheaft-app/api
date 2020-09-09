@@ -13,7 +13,7 @@ namespace Sheaft.Models.ViewModels
         public string Message { get; set; }
         public string File { get; set; }
         public JobKind Kind { get; set; }
-        public ProcessStatusKind Status { get; set; }
+        public ProcessStatus Status { get; set; }
         public DateTimeOffset? StartedOn { get; set; }
         public DateTimeOffset? CompletedOn { get; set; }
         public bool Archived { get; set; }

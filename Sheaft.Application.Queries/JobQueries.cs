@@ -31,7 +31,7 @@ namespace Sheaft.Application.Queries
                 return _context.AnyAsync<Job>(r =>
                     !r.Archived &&
                     r.Kind == JobKind.ImportProducts &&
-                    (r.Status == ProcessStatusKind.Paused || r.Status == ProcessStatusKind.Processing || r.Status == ProcessStatusKind.Waiting) &&
+                    (r.Status == ProcessStatus.Paused || r.Status == ProcessStatus.Processing || r.Status == ProcessStatus.Waiting) &&
                     r.User.Id == producerId, token);
             }
             catch (Exception e)
@@ -47,7 +47,7 @@ namespace Sheaft.Application.Queries
                 return _context.AnyAsync<Job>(r =>
                     !r.Archived &&
                     r.Kind == JobKind.CreatePickingFromOrders &&
-                    (r.Status == ProcessStatusKind.Paused || r.Status == ProcessStatusKind.Processing || r.Status == ProcessStatusKind.Waiting) &&                    
+                    (r.Status == ProcessStatus.Paused || r.Status == ProcessStatus.Processing || r.Status == ProcessStatus.Waiting) &&                    
                     r.User.Id == producerId, token);
             }
             catch (Exception e)
