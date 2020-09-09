@@ -11,7 +11,7 @@ using Sheaft.Interop.Enums;
 namespace Sheaft.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20200909133653_InitDatabase")]
+    [Migration("20200909181508_InitDatabase")]
     partial class InitDatabase
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -1330,9 +1330,6 @@ namespace Sheaft.Infrastructure.Migrations
                     b.Property<DateTimeOffset?>("Birthdate")
                         .HasColumnType("datetimeoffset");
 
-                    b.Property<string>("Code")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("CountryOfResidence")
                         .HasColumnType("nvarchar(max)");
 
@@ -1360,6 +1357,9 @@ namespace Sheaft.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("Legal")
+                        .HasColumnType("int");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -1378,6 +1378,9 @@ namespace Sheaft.Infrastructure.Migrations
 
                     b.Property<DateTimeOffset?>("RemovedOn")
                         .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("SponsorshipCode")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("TotalPoints")
                         .ValueGeneratedOnAdd()
@@ -1988,6 +1991,9 @@ namespace Sheaft.Infrastructure.Migrations
                             b1.Property<string>("City")
                                 .HasColumnType("nvarchar(max)");
 
+                            b1.Property<string>("Country")
+                                .HasColumnType("nvarchar(max)");
+
                             b1.Property<long>("DepartmentUid")
                                 .HasColumnType("bigint");
 
@@ -2028,6 +2034,9 @@ namespace Sheaft.Infrastructure.Migrations
                                 .HasColumnType("bigint");
 
                             b1.Property<string>("City")
+                                .HasColumnType("nvarchar(max)");
+
+                            b1.Property<string>("Country")
                                 .HasColumnType("nvarchar(max)");
 
                             b1.Property<string>("Line1")
@@ -2106,27 +2115,15 @@ namespace Sheaft.Infrastructure.Migrations
 
             modelBuilder.Entity("Sheaft.Domain.Models.Producer", b =>
                 {
-                    b.OwnsOne("Sheaft.Domain.Models.Owner", "Owner", b1 =>
+                    b.OwnsOne("Sheaft.Domain.Models.LegalAddress", "LegalAddress", b1 =>
                         {
                             b1.Property<long>("ProducerUid")
                                 .HasColumnType("bigint");
-
-                            b1.Property<DateTimeOffset?>("Birthdate")
-                                .HasColumnType("datetimeoffset");
 
                             b1.Property<string>("City")
                                 .HasColumnType("nvarchar(max)");
 
                             b1.Property<string>("Country")
-                                .HasColumnType("nvarchar(max)");
-
-                            b1.Property<string>("FirstName")
-                                .HasColumnType("nvarchar(max)");
-
-                            b1.Property<int>("Kind")
-                                .HasColumnType("int");
-
-                            b1.Property<string>("LastName")
                                 .HasColumnType("nvarchar(max)");
 
                             b1.Property<string>("Line1")
@@ -2135,15 +2132,12 @@ namespace Sheaft.Infrastructure.Migrations
                             b1.Property<string>("Line2")
                                 .HasColumnType("nvarchar(max)");
 
-                            b1.Property<string>("Nationality")
-                                .HasColumnType("nvarchar(max)");
-
                             b1.Property<string>("Zipcode")
                                 .HasColumnType("nvarchar(max)");
 
                             b1.HasKey("ProducerUid");
 
-                            b1.ToTable("ProducerOwners");
+                            b1.ToTable("ProducerLegalAddresses");
 
                             b1.WithOwner()
                                 .HasForeignKey("ProducerUid");
@@ -2152,27 +2146,15 @@ namespace Sheaft.Infrastructure.Migrations
 
             modelBuilder.Entity("Sheaft.Domain.Models.Store", b =>
                 {
-                    b.OwnsOne("Sheaft.Domain.Models.Owner", "Owner", b1 =>
+                    b.OwnsOne("Sheaft.Domain.Models.LegalAddress", "LegalAddress", b1 =>
                         {
                             b1.Property<long>("StoreUid")
                                 .HasColumnType("bigint");
-
-                            b1.Property<DateTimeOffset?>("Birthdate")
-                                .HasColumnType("datetimeoffset");
 
                             b1.Property<string>("City")
                                 .HasColumnType("nvarchar(max)");
 
                             b1.Property<string>("Country")
-                                .HasColumnType("nvarchar(max)");
-
-                            b1.Property<string>("FirstName")
-                                .HasColumnType("nvarchar(max)");
-
-                            b1.Property<int>("Kind")
-                                .HasColumnType("int");
-
-                            b1.Property<string>("LastName")
                                 .HasColumnType("nvarchar(max)");
 
                             b1.Property<string>("Line1")
@@ -2181,15 +2163,12 @@ namespace Sheaft.Infrastructure.Migrations
                             b1.Property<string>("Line2")
                                 .HasColumnType("nvarchar(max)");
 
-                            b1.Property<string>("Nationality")
-                                .HasColumnType("nvarchar(max)");
-
                             b1.Property<string>("Zipcode")
                                 .HasColumnType("nvarchar(max)");
 
                             b1.HasKey("StoreUid");
 
-                            b1.ToTable("StoreOwners");
+                            b1.ToTable("StoreLegalAddresses");
 
                             b1.WithOwner()
                                 .HasForeignKey("StoreUid");

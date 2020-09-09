@@ -11,8 +11,8 @@ namespace Sheaft.Domain.Models
         {
         }
 
-        protected Company(Guid id, ProfileKind kind, string name, string email, string firstname, string lastname, string siret, string vatIdentifier, Address address, bool openForBusiness = true, string phone = null, string description = null)
-            : base(id, kind, name, firstname, lastname, email, phone)
+        protected Company(Guid id, ProfileKind kind, LegalKind legal, string name, string email, string firstname, string lastname, string siret, string vatIdentifier, Address address, bool openForBusiness = true, string phone = null, string description = null)
+            : base(id, kind, legal, name, firstname, lastname, email, phone)
         {
             if (address == null)
                 throw new ValidationException(MessageKind.Company_Address_Required);
@@ -21,26 +21,23 @@ namespace Sheaft.Domain.Models
             SetSiret(siret);
             SetVatIdentifier(vatIdentifier);
             SetDescription(description);
-            SetAddress(address.Line1, address.Line2, address.Zipcode, address.City, address.Department, address.Longitude, address.Latitude);
+            SetAddress(address.Line1, address.Line2, address.Zipcode, address.City, address.Country, address.Department, address.Longitude, address.Latitude);
         }
 
         public bool OpenForNewBusiness { get; private set; }
         public string Description { get; private set; }
         public string VatIdentifier { get; private set; }
         public string Siret { get; private set; }
-        public virtual Owner Owner { get; private set; }
+        public virtual LegalAddress LegalAddress { get; private set; }
 
         public void SetName(string name)
         {
             SetUserName(name);
         }
 
-        public void SetOwner(Owner owner)
+        public void SetLegalAddress(string line1, string line2, string zipcode, string city, string country)
         {
-            if (owner == null)
-                return;
-
-            Owner = owner;
+            LegalAddress = new LegalAddress(line1, line2, zipcode, city, country);
         }
 
         public void SetOpenForNewBusiness(bool openForNewBusiness)

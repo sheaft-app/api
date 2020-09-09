@@ -10,7 +10,7 @@ namespace Sheaft.Domain.Models
         }
 
         public Consumer(Guid id, string email, string firstname, string lastname, string phone = null)
-            : base(id, ProfileKind.Consumer, $"{firstname} {lastname}", firstname, lastname, email, phone)
+            : base(id, ProfileKind.Consumer, LegalKind.Natural, $"{firstname} {lastname}", firstname, lastname, email, phone)
         {
         }
 

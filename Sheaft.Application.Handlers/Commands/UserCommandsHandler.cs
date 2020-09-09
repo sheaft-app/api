@@ -104,24 +104,8 @@ namespace Sheaft.Application.Handlers
                     roles.Add(_roleOptions.Owner.Id);
                     roles.Add(_roleOptions.Consumer.Id);
                 }
-
-                string firstname = null;
-                string lastname = null;
-
-                if(entity.Kind == ProfileKind.Consumer)
-                {
-                    var consumer = await _context.GetByIdAsync<Consumer>(request.Id, token);
-                    firstname = consumer.FirstName;
-                    lastname = consumer.LastName;
-                }
-                else
-                {
-                    var company = await _context.GetByIdAsync<Company>(request.Id, token);
-                    firstname = company.Owner.FirstName;
-                    lastname = company.Owner.LastName;
-                }
-
-                var oidcUser = new IdentityUserInput(request.Id, entity.Email, entity.Name, firstname, lastname, roles)
+                               
+                var oidcUser = new IdentityUserInput(request.Id, entity.Email, entity.Name, entity.FirstName, entity.LastName, roles)
                 {
                     Phone = entity.Phone,
                     Picture = entity.Picture
@@ -144,8 +128,8 @@ namespace Sheaft.Application.Handlers
             {
                 var entity = await _context.GetByIdAsync<User>(request.Id, token);
 
-                if (!string.IsNullOrWhiteSpace(entity.Code))
-                    return Ok(entity.Code);
+                if (!string.IsNullOrWhiteSpace(entity.SponsorshipCode))
+                    return Ok(entity.SponsorshipCode);
 
                 var result = await _identifierService.GetNextSponsoringCode(token);
                 if (!result.Success)
@@ -155,7 +139,7 @@ namespace Sheaft.Application.Handlers
                 _context.Update(entity);
 
                 await _context.SaveChangesAsync(token);
-                return Created(entity.Code);
+                return Created(entity.SponsorshipCode);
             });
         }
         public async Task<Result<string>> Handle(RemoveUserDataCommand request, CancellationToken token)
