@@ -16,7 +16,6 @@ namespace Sheaft.Infrastructure.Interop
 {
     public interface IAppDbContext : IDisposable, IAsyncDisposable, IInfrastructure<IServiceProvider>, IDbContextDependencies, IDbSetCache, IDbContextPoolable, IResettableService
     {
-        DbSet<User> Users { get; set; }
         DbSet<Agreement> Agreements { get; set; }
         DbSet<DeliveryMode> DeliveryModes { get; set; }
         DbSet<Department> Departments { get; set; }
@@ -25,11 +24,13 @@ namespace Sheaft.Infrastructure.Interop
         DbSet<Reward> Rewards { get; set; }
         DbSet<Notification> Notifications { get; set; }
         DbSet<PurchaseOrder> PurchaseOrders { get; set; }
+        DbSet<PaymentMethod> PaymentMethods { get; set; }
         DbSet<Packaging> Packagings { get; set; }
         DbSet<Product> Products { get; set; }
         DbSet<QuickOrder> QuickOrders { get; set; }
         DbSet<Region> Regions { get; set; }
         DbSet<Tag> Tags { get; set; }
+        DbSet<User> Users { get; set; }
 
         DbSet<CountryPoints> CountryPoints { get; set; }
         DbSet<CountryUserPoints> CountryUserPoints { get; set; }

@@ -62,11 +62,14 @@ namespace Sheaft.Infrastructure
             modelBuilder.Entity<Store>().HasBaseType<User>();
             modelBuilder.Entity<Consumer>().HasBaseType<User>();
 
+            modelBuilder.Entity<CardPayment>().HasBaseType<PaymentMethod>();
+            modelBuilder.Entity<TransferPayment>().HasBaseType<PaymentMethod>();
+
             modelBuilder.ApplyConfiguration(new UserConfiguration());
             modelBuilder.ApplyConfiguration(new ProducerConfiguration());
+            modelBuilder.ApplyConfiguration(new ProducerTagConfiguration());
             modelBuilder.ApplyConfiguration(new StoreConfiguration());
             modelBuilder.ApplyConfiguration(new StoreTagConfiguration());
-            modelBuilder.ApplyConfiguration(new ProducerTagConfiguration());
             modelBuilder.ApplyConfiguration(new ConsumerConfiguration());
             modelBuilder.ApplyConfiguration(new AgreementConfiguration());
             modelBuilder.ApplyConfiguration(new DeliveryModeConfiguration());
@@ -88,6 +91,9 @@ namespace Sheaft.Infrastructure
             modelBuilder.ApplyConfiguration(new RegionConfiguration());
             modelBuilder.ApplyConfiguration(new SponsoringConfiguration());
             modelBuilder.ApplyConfiguration(new TagConfiguration());
+            modelBuilder.ApplyConfiguration(new PaymentMethodConfiguration());
+            modelBuilder.ApplyConfiguration(new TransferPaymentConfiguration());
+            modelBuilder.ApplyConfiguration(new CardPaymentConfiguration());
         }
     }
 }

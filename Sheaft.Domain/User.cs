@@ -11,6 +11,7 @@ namespace Sheaft.Domain.Models
     public abstract class User : IEntity
     {
         private List<Points> _points;
+        private List<PaymentMethod> _paymentMethods;
 
         protected User()
         {
@@ -51,6 +52,7 @@ namespace Sheaft.Domain.Models
         public virtual Address Address { get; private set; }
         public virtual BillingAddress BillingAddress { get; private set; }
         public virtual IReadOnlyCollection<Points> Points { get { return _points.AsReadOnly(); } }
+        public virtual IReadOnlyCollection<PaymentMethod> PaymentMethods { get { return _paymentMethods.AsReadOnly(); } }
 
         public void SetFirstname(string firstname)
         {
