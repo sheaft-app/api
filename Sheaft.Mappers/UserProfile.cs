@@ -1,7 +1,6 @@
 ﻿using AutoMapper;
 using Sheaft.Application.Commands;
 using Sheaft.Domain.Models;
-using Sheaft.Interop.Enums;
 using Sheaft.Models.Dto;
 using Sheaft.Models.Inputs;
 using Sheaft.Models.ViewModels;
@@ -33,6 +32,7 @@ namespace Sheaft.Mappers
             CreateMap<RegisterConsumerInput, CreateConsumerCommand>();
             CreateMap<UpdateConsumerInput, UpdateConsumerCommand>();
             CreateMap<UpdatePictureInput, UpdateUserPictureCommand>();
+            CreateMap<SetConsumerLegalsInput, SetConsumerLegalsCommand>();
             CreateMap<IdWithReasonInput, DeleteConsumerCommand>();
         }
     }
