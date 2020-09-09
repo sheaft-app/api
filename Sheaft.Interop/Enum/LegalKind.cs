@@ -1,7 +1,8 @@
 ﻿namespace Sheaft.Interop.Enums
 {
-    public enum OwnerKind
+    public enum LegalKind
     {
+        Natural,
         Business,
         Organization,
         Individual

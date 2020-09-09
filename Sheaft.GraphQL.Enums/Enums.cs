@@ -106,13 +106,14 @@ namespace Sheaft.GraphQL.Enums
             descriptor.Value(JobKind.OrderPicking).Name("ORDER_PICKING");
         }
     }
-    public class OwnerKindEnumType : EnumType<OwnerKind>
+    public class LegalKindEnumType : EnumType<LegalKind>
     {
-        protected override void Configure(IEnumTypeDescriptor<OwnerKind> descriptor)
+        protected override void Configure(IEnumTypeDescriptor<LegalKind> descriptor)
         {
-            descriptor.Value(OwnerKind.Business).Name("BUSINESS");
-            descriptor.Value(OwnerKind.Individual).Name("INDIVIDUAL");
-            descriptor.Value(OwnerKind.Organization).Name("ORGANIZATION");
+            descriptor.Value(LegalKind.Natural).Name("NATURAL");
+            descriptor.Value(LegalKind.Business).Name("BUSINESS");
+            descriptor.Value(LegalKind.Individual).Name("INDIVIDUAL");
+            descriptor.Value(LegalKind.Organization).Name("ORGANIZATION");
         }
     }
     public class TagKindEnumType : EnumType<TagKind>

@@ -4,13 +4,13 @@ using System;
 
 namespace Sheaft.Domain.Models
 {
-    public class BillingAddress
+    public class LegalAddress
     {
-        protected BillingAddress()
+        protected LegalAddress()
         {
         }
 
-        public BillingAddress(string line1, string line2, string zipcode, string city, string country)
+        public LegalAddress(string line1, string line2, string zipcode, string city, string country)
         {
             if (string.IsNullOrWhiteSpace(line1))
                 throw new ValidationException(MessageKind.Address_Line1_Required);

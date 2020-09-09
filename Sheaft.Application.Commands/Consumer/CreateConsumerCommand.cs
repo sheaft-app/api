@@ -14,7 +14,6 @@ namespace Sheaft.Application.Commands
 
         public string SponsoringCode { get; set; }
         public bool Anonymous { get; set; }
-        public AddressInput Address { get; set; }
-        public Guid? DepartmentId { get; set; }
+        public Guid DepartmentId { get; set; }
     }
 }

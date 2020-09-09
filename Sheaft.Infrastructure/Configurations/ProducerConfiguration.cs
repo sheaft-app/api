@@ -10,9 +10,9 @@ namespace Sheaft.Infrastructure
         {
             entity.Property(c => c.Siret).IsRequired();
 
-            entity.OwnsOne(c => c.Owner, cb =>
+            entity.OwnsOne(c => c.LegalAddress, cb =>
             {
-                cb.ToTable("ProducerOwners");
+                cb.ToTable("ProducerLegalAddresses");
             });
 
             entity.HasMany(c => c.Tags).WithOne().HasForeignKey("ProducerUid").OnDelete(DeleteBehavior.Cascade);

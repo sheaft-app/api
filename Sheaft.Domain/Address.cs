@@ -1,6 +1,5 @@
 ﻿using Sheaft.Exceptions;
 using Sheaft.Interop.Enums;
-using System;
 
 namespace Sheaft.Domain.Models
 {
@@ -15,7 +14,7 @@ namespace Sheaft.Domain.Models
             Department = department;
         }
 
-        public Address(string line1, string line2, string zipcode, string city, Department department, double? longitude = null, double? latitude = null)
+        public Address(string line1, string line2, string zipcode, string city, string country, Department department, double? longitude = null, double? latitude = null)
         {
             if (string.IsNullOrWhiteSpace(line1))
                 throw new ValidationException(MessageKind.Address_Line1_Required);
@@ -30,6 +29,7 @@ namespace Sheaft.Domain.Models
             Line2 = line2;
             Zipcode = zipcode;
             City = city;
+            Country = country;
             Longitude = longitude;
             Latitude = latitude;
             Department = department;
@@ -39,6 +39,7 @@ namespace Sheaft.Domain.Models
         public string Line2 { get; private set; }
         public string Zipcode { get; private set; }
         public string City { get; private set; }
+        public string Country { get; private set; }
         public double? Longitude { get; private set; }
         public double? Latitude { get; private set; }
         public virtual Department Department { get; private set; }

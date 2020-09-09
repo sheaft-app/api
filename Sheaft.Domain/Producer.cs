@@ -14,7 +14,7 @@ namespace Sheaft.Domain.Models
         }
 
         public Producer(Guid id, string name, string firstname, string lastname, string email, string siret, string vatIdentifier, Address address, bool openForBusiness = true, string phone = null, string description = null)
-           : base(id, ProfileKind.Producer, name, firstname, lastname,  email, siret, vatIdentifier, address, openForBusiness, phone, description)
+           : base(id, ProfileKind.Producer, LegalKind.Individual, name, firstname, lastname,  email, siret, vatIdentifier, address, openForBusiness, phone, description)
         {
         }
 

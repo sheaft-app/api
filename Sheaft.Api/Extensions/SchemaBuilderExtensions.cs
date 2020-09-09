@@ -50,7 +50,7 @@ namespace Sheaft.Api
             services.AddType<AgreementStatusEnumType>();
             services.AddType<OrderStatusEnumType>();
             services.AddType<JobKindEnumType>();
-            services.AddType<OwnerKindEnumType>();
+            services.AddType<LegalKindEnumType>();
             services.AddType<TagKindEnumType>();
             services.AddType<ProcessStatusEnumType>();
             services.AddType<NotificationKindEnumType>();

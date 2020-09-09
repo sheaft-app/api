@@ -20,6 +20,7 @@ namespace Sheaft.Application.Commands
         public string VatIdentifier { get; set; }
         public string Picture { get; set; }
         public string Siret { get; set; }
+        public AddressInput BillingAddress { get; set; }
         public AddressInput Address { get; set; }
         public RegisterOwnerInput Owner { get; set; }
         public bool OpenForNewBusiness { get; set; }

@@ -156,7 +156,7 @@ namespace Sheaft.GraphQL.Types
             descriptor.Field(c => c.Nationality);
 
             descriptor.Field(c => c.Kind)
-                .Type<NonNullType<OwnerKindEnumType>>();
+                .Type<NonNullType<LegalKindEnumType>>();
         }
     }
 

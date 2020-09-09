@@ -118,6 +118,7 @@ namespace Sheaft.Infrastructure.Migrations
                     RemovedOn = table.Column<DateTimeOffset>(nullable: true),
                     Identifier = table.Column<string>(nullable: true),
                     Kind = table.Column<int>(nullable: false),
+                    Legal = table.Column<int>(nullable: false),
                     Reason = table.Column<string>(nullable: true),
                     Name = table.Column<string>(nullable: false),
                     Email = table.Column<string>(nullable: false),
@@ -128,7 +129,7 @@ namespace Sheaft.Infrastructure.Migrations
                     Birthdate = table.Column<DateTimeOffset>(nullable: true),
                     Nationality = table.Column<string>(nullable: true),
                     CountryOfResidence = table.Column<string>(nullable: true),
-                    Code = table.Column<string>(nullable: true),
+                    SponsorshipCode = table.Column<string>(nullable: true),
                     TotalPoints = table.Column<int>(nullable: false, defaultValue: 0),
                     Anonymous = table.Column<bool>(nullable: true),
                     OpenForNewBusiness = table.Column<bool>(nullable: true),
@@ -383,15 +384,10 @@ namespace Sheaft.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "ProducerOwners",
+                name: "ProducerLegalAddresses",
                 columns: table => new
                 {
                     ProducerUid = table.Column<long>(nullable: false),
-                    FirstName = table.Column<string>(nullable: true),
-                    LastName = table.Column<string>(nullable: true),
-                    Birthdate = table.Column<DateTimeOffset>(nullable: true),
-                    Kind = table.Column<int>(nullable: false),
-                    Nationality = table.Column<string>(nullable: true),
                     Line1 = table.Column<string>(nullable: true),
                     Line2 = table.Column<string>(nullable: true),
                     Zipcode = table.Column<string>(nullable: true),
@@ -400,9 +396,9 @@ namespace Sheaft.Infrastructure.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ProducerOwners", x => x.ProducerUid);
+                    table.PrimaryKey("PK_ProducerLegalAddresses", x => x.ProducerUid);
                     table.ForeignKey(
-                        name: "FK_ProducerOwners_Users_ProducerUid",
+                        name: "FK_ProducerLegalAddresses_Users_ProducerUid",
                         column: x => x.ProducerUid,
                         principalTable: "Users",
                         principalColumn: "Uid",
@@ -484,6 +480,28 @@ namespace Sheaft.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "StoreLegalAddresses",
+                columns: table => new
+                {
+                    StoreUid = table.Column<long>(nullable: false),
+                    Line1 = table.Column<string>(nullable: true),
+                    Line2 = table.Column<string>(nullable: true),
+                    Zipcode = table.Column<string>(nullable: true),
+                    City = table.Column<string>(nullable: true),
+                    Country = table.Column<string>(nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_StoreLegalAddresses", x => x.StoreUid);
+                    table.ForeignKey(
+                        name: "FK_StoreLegalAddresses_Users_StoreUid",
+                        column: x => x.StoreUid,
+                        principalTable: "Users",
+                        principalColumn: "Uid",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "StoreOpeningHours",
                 columns: table => new
                 {
@@ -499,33 +517,6 @@ namespace Sheaft.Infrastructure.Migrations
                     table.PrimaryKey("PK_StoreOpeningHours", x => new { x.StoreUid, x.Id });
                     table.ForeignKey(
                         name: "FK_StoreOpeningHours_Users_StoreUid",
-                        column: x => x.StoreUid,
-                        principalTable: "Users",
-                        principalColumn: "Uid",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "StoreOwners",
-                columns: table => new
-                {
-                    StoreUid = table.Column<long>(nullable: false),
-                    FirstName = table.Column<string>(nullable: true),
-                    LastName = table.Column<string>(nullable: true),
-                    Birthdate = table.Column<DateTimeOffset>(nullable: true),
-                    Kind = table.Column<int>(nullable: false),
-                    Nationality = table.Column<string>(nullable: true),
-                    Line1 = table.Column<string>(nullable: true),
-                    Line2 = table.Column<string>(nullable: true),
-                    Zipcode = table.Column<string>(nullable: true),
-                    City = table.Column<string>(nullable: true),
-                    Country = table.Column<string>(nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_StoreOwners", x => x.StoreUid);
-                    table.ForeignKey(
-                        name: "FK_StoreOwners_Users_StoreUid",
                         column: x => x.StoreUid,
                         principalTable: "Users",
                         principalColumn: "Uid",
@@ -564,7 +555,8 @@ namespace Sheaft.Infrastructure.Migrations
                     Line1 = table.Column<string>(nullable: true),
                     Line2 = table.Column<string>(nullable: true),
                     Zipcode = table.Column<string>(nullable: true),
-                    City = table.Column<string>(nullable: true)
+                    City = table.Column<string>(nullable: true),
+                    Country = table.Column<string>(nullable: true)
                 },
                 constraints: table =>
                 {
@@ -677,6 +669,7 @@ namespace Sheaft.Infrastructure.Migrations
                     Line2 = table.Column<string>(nullable: true),
                     Zipcode = table.Column<string>(nullable: true),
                     City = table.Column<string>(nullable: true),
+                    Country = table.Column<string>(nullable: true),
                     Longitude = table.Column<double>(nullable: true),
                     Latitude = table.Column<double>(nullable: true),
                     DepartmentUid = table.Column<long>(nullable: false)
@@ -1701,10 +1694,10 @@ namespace Sheaft.Infrastructure.Migrations
             migrationBuilder.InsertData("Departments", new List<string>() { "CreatedOn", "Uid", "Id", "Code", "Name", "RegionUid", "LevelUid", "RequiredProducers" }.ToArray(), new List<object>() { "2020-05-01", 100, "cfb4be72-e968-4855-8a44-da1ffd309959", "974", "La Réunion", 4, 1, 150 }.ToArray());
             migrationBuilder.InsertData("Departments", new List<string>() { "CreatedOn", "Uid", "Id", "Code", "Name", "RegionUid", "LevelUid", "RequiredProducers" }.ToArray(), new List<object>() { "2020-05-01", 101, "33e79704-405b-423f-88bc-db48475cc88a", "976", "Mayotte", 5, 1, 150 }.ToArray());
 
-            migrationBuilder.InsertData("Users", new List<string>() { "Uid", "Id", "CreatedOn", "FirstName", "LastName", "Name", "Email", "Siret", "VatIdentifier", "kind", "OpenForNewBusiness" }.ToArray(), new List<object>() { 1, "7DDB20AF-8EB1-4C18-E0BD-08D7A1AA1B08", "2020-01-25 15:23:10", "Benoit", "Mugnier", "GAEC La Ferme du Parquet", "contact@lfdp.xyz", "452121545", "FR11452121545", "0", "1" }.ToArray(), "dbo");
-            migrationBuilder.InsertData("Users", new List<string>() { "Uid", "Id", "CreatedOn", "FirstName", "LastName", "Name", "Email", "Siret", "VatIdentifier", "kind", "OpenForNewBusiness" }.ToArray(), new List<object>() { 2, "0F8F7CE8-9094-4269-8830-4FE111559802", "2020-01-30 22:45:41", "Ophélie", "Lulin", "Biocoop Semnoz", "contact@biocoop-semnoz.xyz", "342121545", "FR12342121545", "1", "1" }.ToArray(), "dbo");
-            migrationBuilder.InsertData("Users", new List<string>() { "Uid", "Id", "CreatedOn", "FirstName", "LastName", "Name", "Email", "Siret", "VatIdentifier", "kind", "OpenForNewBusiness" }.ToArray(), new List<object>() { 3, "56BFDF40-3288-4FDC-AF42-6A60D5C8752A", "2020-01-27 22:45:41", "John", "Syntax", "Biocoop Orky", "contact@biocoop-orky.xyz", "451201545", "FR13451201154", "1", "1" }.ToArray(), "dbo");
-            migrationBuilder.InsertData("Users", new List<string>() { "Uid", "Id", "CreatedOn", "FirstName", "LastName", "Name", "Email", "Siret", "VatIdentifier", "kind", "OpenForNewBusiness" }.ToArray(), new List<object>() { 4, "E2D7B8F9-ACCB-49AC-A341-A62725981F7C", "2020-01-29 22:45:41", "Peter", "Fotdakor", "GAEC La Ferme du Crêt Joli", "contact@lfdcj.xyz", "452981545", "FR14452981545", "0", "1" }.ToArray(), "dbo");
+            migrationBuilder.InsertData("Users", new List<string>() { "Uid", "Id", "Legal", "CreatedOn", "FirstName", "LastName", "Name", "Email", "Siret", "VatIdentifier", "kind", "OpenForNewBusiness" }.ToArray(), new List<object>() { 1, "7DDB20AF-8EB1-4C18-E0BD-08D7A1AA1B08", 3, "2020-01-25 15:23:10", "Benoit", "Mugnier", "GAEC La Ferme du Parquet", "contact@lfdp.xyz", "452121545", "FR11452121545", "0", "1" }.ToArray(), "dbo");
+            migrationBuilder.InsertData("Users", new List<string>() { "Uid", "Id", "Legal", "CreatedOn", "FirstName", "LastName", "Name", "Email", "Siret", "VatIdentifier", "kind", "OpenForNewBusiness" }.ToArray(), new List<object>() { 2, "0F8F7CE8-9094-4269-8830-4FE111559802", 1, "2020-01-30 22:45:41", "Ophélie", "Lulin", "Biocoop Semnoz", "contact@biocoop-semnoz.xyz", "342121545", "FR12342121545", "1", "1" }.ToArray(), "dbo");
+            migrationBuilder.InsertData("Users", new List<string>() { "Uid", "Id", "Legal", "CreatedOn", "FirstName", "LastName", "Name", "Email", "Siret", "VatIdentifier", "kind", "OpenForNewBusiness" }.ToArray(), new List<object>() { 3, "56BFDF40-3288-4FDC-AF42-6A60D5C8752A", 1, "2020-01-27 22:45:41", "John", "Syntax", "Biocoop Orky", "contact@biocoop-orky.xyz", "451201545", "FR13451201154", "1", "1" }.ToArray(), "dbo");
+            migrationBuilder.InsertData("Users", new List<string>() { "Uid", "Id", "Legal", "CreatedOn", "FirstName", "LastName", "Name", "Email", "Siret", "VatIdentifier", "kind", "OpenForNewBusiness" }.ToArray(), new List<object>() { 4, "E2D7B8F9-ACCB-49AC-A341-A62725981F7C", 3, "2020-01-29 22:45:41", "Peter", "Fotdakor", "GAEC La Ferme du Crêt Joli", "contact@lfdcj.xyz", "452981545", "FR14452981545", "0", "1" }.ToArray(), "dbo");
 
             migrationBuilder.InsertData("UserAddresses", new List<string>() { "UserUid", "Line1", "Line2", "Zipcode", "City", "Latitude", "Longitude", "DepartmentUid" }.ToArray(), new List<object>() { 1, "285 Route de Braille", null, "73410", "Entrelacs", "45.780181", "6.035638", 74 }.ToArray(), "dbo");
             migrationBuilder.InsertData("UserAddresses", new List<string>() { "UserUid", "Line1", "Line2", "Zipcode", "City", "Latitude", "Longitude", "DepartmentUid" }.ToArray(), new List<object>() { 2, "12 Avenue de Périaz", null, "74600", "Seynod", "45.877728", "6.0903743", 75 }.ToArray(), "dbo");
@@ -1899,7 +1892,7 @@ namespace Sheaft.Infrastructure.Migrations
                 name: "PaymentMethods");
 
             migrationBuilder.DropTable(
-                name: "ProducerOwners");
+                name: "ProducerLegalAddresses");
 
             migrationBuilder.DropTable(
                 name: "ProducerTags");
@@ -1923,10 +1916,10 @@ namespace Sheaft.Infrastructure.Migrations
                 name: "Sponsorings");
 
             migrationBuilder.DropTable(
-                name: "StoreOpeningHours");
+                name: "StoreLegalAddresses");
 
             migrationBuilder.DropTable(
-                name: "StoreOwners");
+                name: "StoreOpeningHours");
 
             migrationBuilder.DropTable(
                 name: "StoreTags");

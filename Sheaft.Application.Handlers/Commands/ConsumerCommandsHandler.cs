@@ -26,7 +26,8 @@ namespace Sheaft.Application.Handlers
     public class ConsumerCommandsHandler : CommandsHandler,
         IRequestHandler<CreateConsumerCommand, Result<Guid>>,
         IRequestHandler<UpdateConsumerCommand, Result<bool>>,
-        IRequestHandler<DeleteConsumerCommand, Result<bool>>
+        IRequestHandler<DeleteConsumerCommand, Result<bool>>,
+        IRequestHandler<SetConsumerLegalsCommand, Result<bool>>
     {
         private readonly IAppDbContext _context;
         private readonly IQueueService _queueService;
@@ -42,12 +43,12 @@ namespace Sheaft.Application.Handlers
             IAppDbContext context,
             IQueueService queueService,
             IImageService imageService,
-            ILogger<ConsumerCommandsHandler> logger, 
+            ILogger<ConsumerCommandsHandler> logger,
             IOptionsSnapshot<RoleOptions> roleOptions,
             IDistributedCache cache) : base(logger)
         {
             _imageService = imageService;
-            _roleOptions = roleOptions.Value;            
+            _roleOptions = roleOptions.Value;
             _authOptions = authOptions.Value;
             _context = context;
             _queueService = queueService;
@@ -72,17 +73,8 @@ namespace Sheaft.Application.Handlers
                 var picture = await _imageService.HandleUserImageAsync(request.Id, request.Picture, token);
                 entity.SetPicture(picture);
 
-                if (request.DepartmentId.HasValue)
-                {
-                    var department = await _context.GetSingleAsync<Department>(d => d.Id == request.DepartmentId, token);
-                    entity.SetAddress(department);
-                }
-                else if (request.Address != null && !string.IsNullOrWhiteSpace(request.Address.Zipcode))
-                {
-                    var departmentCode = Address.GetDepartmentCode(request.Address.Zipcode);
-                    var department = await _context.GetSingleAsync<Department>(d => d.Code == departmentCode, token);
-                    entity.SetAddress(request.Address.Line1, request.Address.Line2, request.Address.Zipcode, request.Address.City, department, request.Address.Longitude, request.Address.Latitude);
-                }
+                var department = await _context.GetSingleAsync<Department>(d => d.Id == request.DepartmentId, token);
+                entity.SetAddress(department);
 
                 await _context.AddAsync(entity, token);
                 await _context.SaveChangesAsync(token);
@@ -99,7 +91,7 @@ namespace Sheaft.Application.Handlers
 
                 if (!string.IsNullOrWhiteSpace(request.SponsoringCode))
                 {
-                    var sponsor = await _context.FindSingleAsync<User>(u => u.Code == request.SponsoringCode, token);
+                    var sponsor = await _context.FindSingleAsync<User>(u => u.SponsorshipCode == request.SponsoringCode, token);
                     if (sponsor == null)
                         return NotFound<Guid>(MessageKind.Register_UserWithSponsorCode_NotFound);
 
@@ -131,17 +123,15 @@ namespace Sheaft.Application.Handlers
                 var picture = await _imageService.HandleUserImageAsync(request.Id, request.Picture, token);
                 entity.SetPicture(picture);
 
-                if (request.DepartmentId.HasValue)
-                {
-                    var department = await _context.GetSingleAsync<Department>(d => d.Id == request.DepartmentId, token);
-                    entity.SetAddress(department);
-                }
-                else if(request.Address != null && !string.IsNullOrWhiteSpace(request.Address.Zipcode))
+                if (request.Address != null)
                 {
                     var departmentCode = Address.GetDepartmentCode(request.Address.Zipcode);
                     var department = await _context.GetSingleAsync<Department>(d => d.Code == departmentCode, token);
-                    entity.SetAddress(request.Address.Line1, request.Address.Line2, request.Address.Zipcode, request.Address.City, department, request.Address.Longitude, request.Address.Latitude);
+                    entity.SetAddress(request.Address.Line1, request.Address.Line2, request.Address.Zipcode, request.Address.City, request.Address.Country, department, request.Address.Longitude, request.Address.Latitude);                    
                 }
+
+                if(request.BillingAddress != null)
+                    entity.SetBillingAddress(request.BillingAddress.Line1, request.BillingAddress.Line2, request.BillingAddress.Zipcode, request.BillingAddress.City, request.BillingAddress.Country);
 
                 var oidcUser = new IdentityUserInput(request.Id, entity.Email, entity.Name, entity.FirstName, entity.LastName)
                 {
@@ -188,6 +178,32 @@ namespace Sheaft.Application.Handlers
                     await _queueService.ProcessCommandAsync(RemoveUserDataCommand.QUEUE_NAME, new RemoveUserDataCommand(request.RequestUser) { Id = request.Id, Email = email }, token);
                     return Ok(true);
                 }
+            });
+        }
+
+        public async Task<Result<bool>> Handle(SetConsumerLegalsCommand request, CancellationToken token)
+        {
+            return await ExecuteAsync(async () =>
+            {
+                var entity = await _context.GetByIdAsync<Consumer>(request.Id, token);
+                
+                entity.SetBillingAddress(request.BillingAddress.Line1, request.BillingAddress.Line2, request.BillingAddress.Zipcode, request.BillingAddress.City, request.BillingAddress.Country);
+
+                if (request.Address != null && string.IsNullOrWhiteSpace(entity.Address.Zipcode))
+                {
+                    var departmentCode = Address.GetDepartmentCode(request.Address.Zipcode);
+                    var department = await _context.GetSingleAsync<Department>(d => d.Code == departmentCode, token);
+                    entity.SetAddress(request.Address.Line1, request.Address.Line2, request.Address.Zipcode, request.Address.City, request.Address.Country, department);
+                }
+
+                entity.SetBirthdate(request.Birthdate);
+                entity.SetNationality(request.Nationality);
+                entity.SetCountryOfResidence(request.CountryOfResidence);
+
+                _context.Update(entity);
+
+                var success = await _context.SaveChangesAsync(token) > 0;
+                return Ok(success);
             });
         }
     }
