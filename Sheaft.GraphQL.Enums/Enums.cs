@@ -28,6 +28,28 @@ namespace Sheaft.GraphQL.Enums
             descriptor.Value(AddressKind.Shipping).Name("SHIPPING");
         }
     }
+    public class ValidationStatusEnumType : EnumType<ValidationStatus>
+    {
+        protected override void Configure(IEnumTypeDescriptor<ValidationStatus> descriptor)
+        {
+            descriptor.Value(ValidationStatus.Created).Name("CREATED");
+            descriptor.Value(ValidationStatus.OutOfDate).Name("OUT_OF_DATE");
+            descriptor.Value(ValidationStatus.Refused).Name("REFUSED");
+            descriptor.Value(ValidationStatus.Validated).Name("VALIDATED");
+            descriptor.Value(ValidationStatus.ValidationAsked).Name("VALIDATION_ASKED");
+        }
+    }
+    public class DocumentKindEnumType : EnumType<DocumentKind>
+    {
+        protected override void Configure(IEnumTypeDescriptor<DocumentKind> descriptor)
+        {
+            descriptor.Value(DocumentKind.AddressProof).Name("ADDRESS_PROOF");
+            descriptor.Value(DocumentKind.AssociationProof).Name("ASSOCIATION_PROOF");
+            descriptor.Value(DocumentKind.IdentityProof).Name("IDENTITY_PROOF");
+            descriptor.Value(DocumentKind.RegistrationProof).Name("REGISTRATION_PROOF");
+            descriptor.Value(DocumentKind.ShareholderProof).Name("SHAREHOLDER_PROOF");
+        }
+    }
     public class PaymentKindEnumType : EnumType<PaymentKind>
     {
         protected override void Configure(IEnumTypeDescriptor<PaymentKind> descriptor)
