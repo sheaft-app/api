@@ -105,7 +105,7 @@ namespace Sheaft.Application.Queries
         {
             try
             {
-                var agreements = await _context.GetAsync<Agreement>(d => producerIds.Contains(d.Delivery.Producer.Id) && d.Store.Id == storeId && d.Status == AgreementStatusKind.Accepted && kinds.Contains(d.Delivery.Kind), token);
+                var agreements = await _context.GetAsync<Agreement>(d => producerIds.Contains(d.Delivery.Producer.Id) && d.Store.Id == storeId && d.Status == AgreementStatus.Accepted && kinds.Contains(d.Delivery.Kind), token);
 
                 var list = new List<ProducerDeliveriesDto>();
                 kinds = kinds ?? new List<DeliveryKind> {

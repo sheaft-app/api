@@ -7,7 +7,7 @@ namespace Sheaft.Models.ViewModels
     public class AgreementViewModel
     {
         public Guid Id { get; set; }
-        public AgreementStatusKind Status { get; set; }
+        public AgreementStatus Status { get; set; }
         public DateTimeOffset CreatedOn { get; set; }
         public DateTimeOffset? UpdatedOn { get; set; }
         public DateTimeOffset? RemovedOn { get; set; }

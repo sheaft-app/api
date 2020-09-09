@@ -76,18 +76,18 @@ namespace Sheaft.GraphQL.Enums
             descriptor.Value(TagKind.Label).Name("LABEL");
         }
     }
-    public class ProcessStatusEnumType : EnumType<ProcessStatusKind>
+    public class ProcessStatusEnumType : EnumType<ProcessStatus>
     {
-        protected override void Configure(IEnumTypeDescriptor<ProcessStatusKind> descriptor)
+        protected override void Configure(IEnumTypeDescriptor<ProcessStatus> descriptor)
         {
-            descriptor.Value(ProcessStatusKind.Cancelled).Name("CANCELLED");
-            descriptor.Value(ProcessStatusKind.Done).Name("DONE");
-            descriptor.Value(ProcessStatusKind.Expired).Name("EXPIRED");
-            descriptor.Value(ProcessStatusKind.Failed).Name("FAILED");
-            descriptor.Value(ProcessStatusKind.Paused).Name("PAUSED");
-            descriptor.Value(ProcessStatusKind.Processing).Name("PROCESSING");
-            descriptor.Value(ProcessStatusKind.Rollbacked).Name("ROLLBACKED");
-            descriptor.Value(ProcessStatusKind.Waiting).Name("WAITING");
+            descriptor.Value(ProcessStatus.Cancelled).Name("CANCELLED");
+            descriptor.Value(ProcessStatus.Done).Name("DONE");
+            descriptor.Value(ProcessStatus.Expired).Name("EXPIRED");
+            descriptor.Value(ProcessStatus.Failed).Name("FAILED");
+            descriptor.Value(ProcessStatus.Paused).Name("PAUSED");
+            descriptor.Value(ProcessStatus.Processing).Name("PROCESSING");
+            descriptor.Value(ProcessStatus.Rollbacked).Name("ROLLBACKED");
+            descriptor.Value(ProcessStatus.Waiting).Name("WAITING");
         }
     }
     public class NotificationKindEnumType : EnumType<NotificationKind>
@@ -156,15 +156,15 @@ namespace Sheaft.GraphQL.Enums
             descriptor.Value(UnitKind.unit).Name("UNIT");
         }
     }
-    public class AgreementStatusEnumType : EnumType<AgreementStatusKind>
+    public class AgreementStatusEnumType : EnumType<AgreementStatus>
     {
-        protected override void Configure(IEnumTypeDescriptor<AgreementStatusKind> descriptor)
+        protected override void Configure(IEnumTypeDescriptor<AgreementStatus> descriptor)
         {
-            descriptor.Value(AgreementStatusKind.Accepted).Name("ACCEPTED");
-            descriptor.Value(AgreementStatusKind.Cancelled).Name("CANCELLED");
-            descriptor.Value(AgreementStatusKind.Refused).Name("REFUSED");
-            descriptor.Value(AgreementStatusKind.WaitingForProducerApproval).Name("WAITING_FOR_PRODUCER_APPROVAL");
-            descriptor.Value(AgreementStatusKind.WaitingForStoreApproval).Name("WAITING_FOR_STORE_APPROVAL");
+            descriptor.Value(AgreementStatus.Accepted).Name("ACCEPTED");
+            descriptor.Value(AgreementStatus.Cancelled).Name("CANCELLED");
+            descriptor.Value(AgreementStatus.Refused).Name("REFUSED");
+            descriptor.Value(AgreementStatus.WaitingForProducerApproval).Name("WAITING_FOR_PRODUCER_APPROVAL");
+            descriptor.Value(AgreementStatus.WaitingForStoreApproval).Name("WAITING_FOR_STORE_APPROVAL");
         }
     }
 }

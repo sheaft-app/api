@@ -137,7 +137,7 @@ namespace Sheaft.Application.Queries
             try
             {
                 var producerIds = _context.Agreements
-                        .Get(c => c.Store.Id == storeId && c.Status == AgreementStatusKind.Accepted)
+                        .Get(c => c.Store.Id == storeId && c.Status == AgreementStatus.Accepted)
                         .Select(a => a.Delivery.Producer.Id);
 
                 return _context.Products

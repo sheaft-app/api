@@ -27,7 +27,7 @@ namespace Sheaft.Domain.Models
             Name = name;
             User = user;
             Queue = queue;
-            Status = ProcessStatusKind.Waiting;
+            Status = ProcessStatus.Waiting;
             Kind = kind;
         }
 
@@ -41,7 +41,7 @@ namespace Sheaft.Domain.Models
         public string File { get; private set; }
         public string Queue { get; private set; }
         public JobKind Kind { get; private set; }
-        public ProcessStatusKind Status { get; private set; }
+        public ProcessStatus Status { get; private set; }
         public DateTimeOffset? StartedOn { get; private set; }
         public DateTimeOffset? CompletedOn { get; private set; }
         public bool Archived { get; private set; }
@@ -50,11 +50,11 @@ namespace Sheaft.Domain.Models
 
         public void StartJob()
         {
-            if (StartedOn.HasValue || Status == ProcessStatusKind.Processing)
+            if (StartedOn.HasValue || Status == ProcessStatus.Processing)
                 return;
 
             StartedOn = DateTimeOffset.UtcNow;
-            Status = ProcessStatusKind.Processing;
+            Status = ProcessStatus.Processing;
         }
 
         public void SetName(string name)
@@ -75,25 +75,25 @@ namespace Sheaft.Domain.Models
 
         public void RetryJob()
         {
-            if (Status != ProcessStatusKind.Cancelled && Status != ProcessStatusKind.Failed)
+            if (Status != ProcessStatus.Cancelled && Status != ProcessStatus.Failed)
                 throw new BadRequestException(MessageKind.Job_CannotRetry_NotIn_CanncelledOrFailedStatus);
 
             StartedOn = null;
             Retried = Retried.HasValue ? Retried + 1 : 1;
-            Status = ProcessStatusKind.Waiting;
+            Status = ProcessStatus.Waiting;
         }
 
         public void PauseJob()
         {
-            if (!StartedOn.HasValue || Status != ProcessStatusKind.Processing)
+            if (!StartedOn.HasValue || Status != ProcessStatus.Processing)
                 throw new BadRequestException(MessageKind.Job_CannotPause_NotIn_ProcessingStatus);
 
-            Status = ProcessStatusKind.Paused;
+            Status = ProcessStatus.Paused;
         }
 
         public void ArchiveJob()
         {
-            if (Status != ProcessStatusKind.Done && Status != ProcessStatusKind.Failed && Status != ProcessStatusKind.Cancelled)
+            if (Status != ProcessStatus.Done && Status != ProcessStatus.Failed && Status != ProcessStatus.Cancelled)
                 throw new BadRequestException(MessageKind.Job_CannotArchive_NotIn_TerminatedStatus);
 
             Archived = true;
@@ -106,42 +106,42 @@ namespace Sheaft.Domain.Models
 
         public void ResumeJob()
         {
-            if (!StartedOn.HasValue || Status != ProcessStatusKind.Paused)
+            if (!StartedOn.HasValue || Status != ProcessStatus.Paused)
                 throw new BadRequestException(MessageKind.Job_CannotResume_NotIn_PausedStatus);
 
-            Status = ProcessStatusKind.Processing;
+            Status = ProcessStatus.Processing;
         }
 
         public void CompleteJob()
         {
-            if (!StartedOn.HasValue || Status != ProcessStatusKind.Processing)
+            if (!StartedOn.HasValue || Status != ProcessStatus.Processing)
                 throw new BadRequestException(MessageKind.Job_CannotComplete_NotIn_ProcessingStatus);
 
             CompletedOn = DateTimeOffset.UtcNow;
-            Status = ProcessStatusKind.Done;
+            Status = ProcessStatus.Done;
         }
 
         public void CancelJob(string message)
         {
-            if (Status == ProcessStatusKind.Done)
+            if (Status == ProcessStatus.Done)
                 throw new BadRequestException(MessageKind.Job_CannotCancel_AlreadyDone);
 
-            if (Status == ProcessStatusKind.Cancelled)
+            if (Status == ProcessStatus.Cancelled)
                 throw new BadRequestException(MessageKind.Job_CannotCancel_AlreadyCancelled);
 
-            Status = ProcessStatusKind.Cancelled;
+            Status = ProcessStatus.Cancelled;
             Message = message;
         }
 
         public void FailJob(string message)
         {
-            if (Status == ProcessStatusKind.Done)
+            if (Status == ProcessStatus.Done)
                 throw new BadRequestException(MessageKind.Job_CannotFail_AlreadyDone);
 
-            if (Status == ProcessStatusKind.Cancelled)
+            if (Status == ProcessStatus.Cancelled)
                 throw new BadRequestException(MessageKind.Job_CannotFail_AlreadyCancelled);
 
-            Status = ProcessStatusKind.Failed;
+            Status = ProcessStatus.Failed;
             Message = message;
         }
 
@@ -174,7 +174,7 @@ namespace Sheaft.Domain.Models
         {
             StartedOn = null;
             CompletedOn = null;
-            Status = ProcessStatusKind.Waiting;
+            Status = ProcessStatus.Waiting;
             Retried = null;
             Message = null;
         }

@@ -1,6 +1,6 @@
 namespace Sheaft.Interop.Enums
 {
-    public enum ProcessStatusKind
+    public enum ProcessStatus
     {
         Rollbacked = -2,
         Failed,

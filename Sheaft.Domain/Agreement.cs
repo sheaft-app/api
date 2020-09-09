@@ -23,15 +23,15 @@ namespace Sheaft.Domain.Models
             CreatedBy = createdBy;
 
             if(CreatedBy.Id == store.Id)
-                Status = AgreementStatusKind.WaitingForProducerApproval;
+                Status = AgreementStatus.WaitingForProducerApproval;
             else
-                Status = AgreementStatusKind.WaitingForStoreApproval;
+                Status = AgreementStatus.WaitingForStoreApproval;
 
             SetSelectedHours(deliveryHours);
         }
 
         public Guid Id { get; private set; }
-        public AgreementStatusKind Status { get; set; }
+        public AgreementStatus Status { get; set; }
         public DateTimeOffset CreatedOn { get; private set; }
         public DateTimeOffset? UpdatedOn { get; private set; }
         public DateTimeOffset? RemovedOn { get; private set; }
@@ -56,30 +56,30 @@ namespace Sheaft.Domain.Models
 
         public void AcceptAgreement()
         {
-            if (Status != AgreementStatusKind.WaitingForProducerApproval && Status != AgreementStatusKind.WaitingForStoreApproval)
+            if (Status != AgreementStatus.WaitingForProducerApproval && Status != AgreementStatus.WaitingForStoreApproval)
                 throw new ValidationException(MessageKind.Agreement_CannotBeAccepted_NotInWaitingStatus);
 
-            Status = AgreementStatusKind.Accepted;
+            Status = AgreementStatus.Accepted;
         }
 
         public void CancelAgreement(string reason)
         {
-            if (Status == AgreementStatusKind.Cancelled)
+            if (Status == AgreementStatus.Cancelled)
                 throw new ValidationException(MessageKind.Agreement_CannotBeCancelled_AlreadyCancelled);
 
-            if (Status == AgreementStatusKind.Refused)
+            if (Status == AgreementStatus.Refused)
                 throw new ValidationException(MessageKind.Agreement_CannotBeCancelled_AlreadyRefused);
 
-            Status = AgreementStatusKind.Cancelled;
+            Status = AgreementStatus.Cancelled;
             Reason = reason;
         }
 
         public void RefuseAgreement(string reason)
         {
-            if (Status != AgreementStatusKind.WaitingForProducerApproval && Status != AgreementStatusKind.WaitingForStoreApproval)
+            if (Status != AgreementStatus.WaitingForProducerApproval && Status != AgreementStatus.WaitingForStoreApproval)
                 throw new ValidationException(MessageKind.Agreement_CannotBeRefused_NotInWaitingStatus);
 
-            Status = AgreementStatusKind.Refused;
+            Status = AgreementStatus.Refused;
             Reason = reason;
         }
 
@@ -95,9 +95,9 @@ namespace Sheaft.Domain.Models
         public void Reset()
         {
             if (CreatedBy.Kind == ProfileKind.Producer)
-                Status = AgreementStatusKind.WaitingForStoreApproval;
+                Status = AgreementStatus.WaitingForStoreApproval;
             else
-                Status = AgreementStatusKind.WaitingForProducerApproval;
+                Status = AgreementStatus.WaitingForProducerApproval;
 
             Reason = null;
         }

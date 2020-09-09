@@ -1,6 +1,6 @@
 ﻿namespace Sheaft.Interop.Enums
 {
-    public enum AgreementStatusKind
+    public enum AgreementStatus
     {
         WaitingForProducerApproval,
         WaitingForStoreApproval,
