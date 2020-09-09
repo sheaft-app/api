@@ -18,8 +18,9 @@ namespace Sheaft.Infrastructure
             entity.HasKey("Uid");
 
             entity.HasIndex(c => c.Id).IsUnique();
+            entity.HasIndex(c => c.Identifier).IsUnique();
             entity.HasIndex("UserUid");
-            entity.HasIndex("Uid", "Id", "UserUid", "CreatedOn");
+            entity.HasIndex("Uid", "Id", "Identifier", "UserUid", "CreatedOn");
 
             entity.ToTable("Documents");
         }

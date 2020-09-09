@@ -10,7 +10,7 @@ namespace Sheaft.Domain.Models
         {
         }
 
-        public Document(Guid id, DocumentKind kind, string name)
+        public Document(Guid id, DocumentKind kind, string identifier, string name)
         {
             Id = id;
             Name = name;
@@ -23,6 +23,7 @@ namespace Sheaft.Domain.Models
         public DateTimeOffset? UpdatedOn { get; private set; }
         public DateTimeOffset? RemovedOn { get; private set; }
         public DateTimeOffset? ProcessedDate { get; private set; }
+        public string Identifier { get; private set; }
         public string Name { get; private set; }
         public string Reason { get; private set; }
         public ValidationStatus Status { get; private set; }
