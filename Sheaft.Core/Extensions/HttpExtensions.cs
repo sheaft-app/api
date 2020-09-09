@@ -1,11 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Net;
-using System.Security.Claims;
-using IdentityModel;
 using Microsoft.AspNetCore.Http;
-using Sheaft.Core.Security;
 
 namespace Sheaft.Core.Extensions
 {

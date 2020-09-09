@@ -56,7 +56,7 @@ namespace Sheaft.Services
                     if (!compImage.Success)
                         throw compImage.Exception ?? new BadRequestException();
 
-                    return compImage.Result;
+                    return compImage.Data;
                 }
             }
         }

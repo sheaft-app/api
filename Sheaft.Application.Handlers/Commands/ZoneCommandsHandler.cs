@@ -17,8 +17,8 @@ using Sheaft.Domain.Views;
 namespace Sheaft.Application.Handlers
 {
     public class ZoneCommandsHandler : CommandsHandler,
-        IRequestHandler<UpdateZoneProgressCommand, CommandResult<bool>>,
-        IRequestHandler<GenerateZonesFileCommand, CommandResult<bool>>
+        IRequestHandler<UpdateZoneProgressCommand, Result<bool>>,
+        IRequestHandler<GenerateZonesFileCommand, Result<bool>>
     {
         private readonly IAppDbContext _context;
         private readonly IQueueService _queueService;
@@ -35,7 +35,7 @@ namespace Sheaft.Application.Handlers
             _blobService = blobService;
         }
 
-        public async Task<CommandResult<bool>> Handle(UpdateZoneProgressCommand request, CancellationToken token)
+        public async Task<Result<bool>> Handle(UpdateZoneProgressCommand request, CancellationToken token)
         {
             return await ExecuteAsync(async () =>
             {
@@ -88,7 +88,7 @@ namespace Sheaft.Application.Handlers
             });
         }
 
-        public async Task<CommandResult<bool>> Handle(GenerateZonesFileCommand request, CancellationToken token)
+        public async Task<Result<bool>> Handle(GenerateZonesFileCommand request, CancellationToken token)
         {
             return await ExecuteAsync(async () =>
             {

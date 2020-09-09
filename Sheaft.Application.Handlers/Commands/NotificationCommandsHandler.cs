@@ -12,10 +12,10 @@ using Microsoft.Extensions.Logging;
 namespace Sheaft.Application.Handlers
 {
     public class NotificationCommandsHandler : CommandsHandler,
-        IRequestHandler<MarkUserNotificationsAsReadCommand, CommandResult<bool>>,
-        IRequestHandler<MarkUserNotificationAsReadCommand, CommandResult<bool>>,
-        IRequestHandler<CreateUserNotificationCommand, CommandResult<Guid>>,
-        IRequestHandler<CreateGroupNotificationCommand, CommandResult<Guid>>
+        IRequestHandler<MarkUserNotificationsAsReadCommand, Result<bool>>,
+        IRequestHandler<MarkUserNotificationAsReadCommand, Result<bool>>,
+        IRequestHandler<CreateUserNotificationCommand, Result<Guid>>,
+        IRequestHandler<CreateGroupNotificationCommand, Result<Guid>>
     {
         private readonly IAppDbContext _context;
         private readonly IDapperContext _dapperContext;
@@ -29,7 +29,7 @@ namespace Sheaft.Application.Handlers
             _context = context;
         }
 
-        public async Task<CommandResult<bool>> Handle(MarkUserNotificationsAsReadCommand request, CancellationToken token)
+        public async Task<Result<bool>> Handle(MarkUserNotificationsAsReadCommand request, CancellationToken token)
         {
             return await ExecuteAsync(async () =>
             {
@@ -38,7 +38,7 @@ namespace Sheaft.Application.Handlers
             });
         }
 
-        public async Task<CommandResult<bool>> Handle(MarkUserNotificationAsReadCommand request, CancellationToken token)
+        public async Task<Result<bool>> Handle(MarkUserNotificationAsReadCommand request, CancellationToken token)
         {
             return await ExecuteAsync(async () =>
             {
@@ -54,7 +54,7 @@ namespace Sheaft.Application.Handlers
             });
         }
 
-        public async Task<CommandResult<Guid>> Handle(CreateUserNotificationCommand request, CancellationToken token)
+        public async Task<Result<Guid>> Handle(CreateUserNotificationCommand request, CancellationToken token)
         {
             return await ExecuteAsync(async () =>
             {
@@ -68,7 +68,7 @@ namespace Sheaft.Application.Handlers
             });
         }
 
-        public async Task<CommandResult<Guid>> Handle(CreateGroupNotificationCommand request, CancellationToken token)
+        public async Task<Result<Guid>> Handle(CreateGroupNotificationCommand request, CancellationToken token)
         {
             return await ExecuteAsync(async () =>
             {

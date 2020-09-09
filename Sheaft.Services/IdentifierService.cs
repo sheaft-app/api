@@ -65,27 +65,27 @@ namespace Sheaft.Services
             return result.Normalize(NormalizationForm.FormC).ToLowerInvariant();
         }
 
-        public async Task<CommandResult<string>> GetNextOrderReferenceAsync(Guid serialNumber, CancellationToken token)
+        public async Task<Result<string>> GetNextOrderReferenceAsync(Guid serialNumber, CancellationToken token)
         {
             var uuid = await GetNextUuidAsync(_storageOptions.Tables.OrdersReferences, serialNumber, token);
             if (!uuid.Success)
-                return new CommandResult<string>(uuid.Exception);
+                return new Result<string>(uuid.Exception);
 
-            var identifier = GenerateEanIdentifier(uuid.Result, 13);
-            return new CommandResult<string>(identifier);
+            var identifier = GenerateEanIdentifier(uuid.Data, 13);
+            return new Result<string>(identifier);
         }
 
-        public async Task<CommandResult<string>> GetNextProductReferenceAsync(Guid serialNumber, CancellationToken token)
+        public async Task<Result<string>> GetNextProductReferenceAsync(Guid serialNumber, CancellationToken token)
         {
             var uuid = await GetNextUuidAsync(_storageOptions.Tables.ProductsReferences, serialNumber, token);
             if (!uuid.Success)
-                return new CommandResult<string>(uuid.Exception);
+                return new Result<string>(uuid.Exception);
 
-            var identifier = GenerateEanIdentifier(uuid.Result, 13);
-            return new CommandResult<string>(identifier);
+            var identifier = GenerateEanIdentifier(uuid.Data, 13);
+            return new Result<string>(identifier);
         }
 
-        public async Task<CommandResult<string>> GetNextSponsoringCode(CancellationToken token)
+        public async Task<Result<string>> GetNextSponsoringCode(CancellationToken token)
         {
             try
             {
@@ -130,11 +130,11 @@ namespace Sheaft.Services
                     }
                 } while (concurrentUpdateError);
 
-                return new CommandResult<string>(code);
+                return new Result<string>(code);
             }
             catch (Exception e)
             {
-                return new CommandResult<string>(e, MessageKind.Identifier_SponsorCode_Error);
+                return new Result<string>(e, MessageKind.Identifier_SponsorCode_Error);
             }
         }
         private static string GenerateEanIdentifier(long value, int length)
@@ -170,7 +170,7 @@ namespace Sheaft.Services
             return check % 10;
         }
 
-        private async Task<CommandResult<long>> GetNextUuidAsync(string container, Guid companyIdentifier, CancellationToken token)
+        private async Task<Result<long>> GetNextUuidAsync(string container, Guid companyIdentifier, CancellationToken token)
         {
             try
             {
@@ -216,11 +216,11 @@ namespace Sheaft.Services
                     }
                 } while (concurrentUpdateError);
 
-                return new CommandResult<long>(id);
+                return new Result<long>(id);
             }
             catch (Exception e)
             {
-                return new CommandResult<long>(e, MessageKind.Identifier_Uuid_Error);
+                return new Result<long>(e, MessageKind.Identifier_Uuid_Error);
             }
         }
 

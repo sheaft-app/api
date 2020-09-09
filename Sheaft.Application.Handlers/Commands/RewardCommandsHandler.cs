@@ -12,10 +12,10 @@ using Microsoft.EntityFrameworkCore;
 namespace Sheaft.Application.Handlers
 {
     public class RewardCommandsHandler : CommandsHandler,
-        IRequestHandler<CreateRewardCommand, CommandResult<Guid>>,
-        IRequestHandler<UpdateRewardCommand, CommandResult<bool>>,
-        IRequestHandler<DeleteRewardCommand, CommandResult<bool>>,
-        IRequestHandler<RestoreRewardCommand, CommandResult<bool>>
+        IRequestHandler<CreateRewardCommand, Result<Guid>>,
+        IRequestHandler<UpdateRewardCommand, Result<bool>>,
+        IRequestHandler<DeleteRewardCommand, Result<bool>>,
+        IRequestHandler<RestoreRewardCommand, Result<bool>>
     {
         private readonly IAppDbContext _context;
 
@@ -26,7 +26,7 @@ namespace Sheaft.Application.Handlers
             _context = context;
         }
 
-        public async Task<CommandResult<Guid>> Handle(CreateRewardCommand request, CancellationToken token)
+        public async Task<Result<Guid>> Handle(CreateRewardCommand request, CancellationToken token)
         {
             return await ExecuteAsync(async () =>
             {
@@ -51,7 +51,7 @@ namespace Sheaft.Application.Handlers
             });
         }
 
-        public async Task<CommandResult<bool>> Handle(UpdateRewardCommand request, CancellationToken token)
+        public async Task<Result<bool>> Handle(UpdateRewardCommand request, CancellationToken token)
         {
             return await ExecuteAsync(async () =>
             {
@@ -86,7 +86,7 @@ namespace Sheaft.Application.Handlers
             });
         }
 
-        public async Task<CommandResult<bool>> Handle(DeleteRewardCommand request, CancellationToken token)
+        public async Task<Result<bool>> Handle(DeleteRewardCommand request, CancellationToken token)
         {
             return await ExecuteAsync(async () =>
             {
@@ -100,7 +100,7 @@ namespace Sheaft.Application.Handlers
             });
         }
 
-        public async Task<CommandResult<bool>> Handle(RestoreRewardCommand request, CancellationToken token)
+        public async Task<Result<bool>> Handle(RestoreRewardCommand request, CancellationToken token)
         {
             return await ExecuteAsync(async () =>
             {

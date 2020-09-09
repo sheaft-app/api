@@ -49,7 +49,7 @@ namespace Sheaft.Api.Controllers
                     if (!result.Success)
                         return BadRequest(result);
 
-                    ids.Add(result.Result);
+                    ids.Add(result.Data);
                 }
             }
 

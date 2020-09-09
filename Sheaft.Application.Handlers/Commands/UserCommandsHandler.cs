@@ -27,13 +27,13 @@ using System.Collections.Generic;
 namespace Sheaft.Application.Handlers
 {
     public class UserCommandsHandler : CommandsHandler,
-        IRequestHandler<QueueExportUserDataCommand, CommandResult<Guid>>,
-        IRequestHandler<ExportUserDataCommand, CommandResult<bool>>,
-        IRequestHandler<GenerateUserCodeCommand, CommandResult<string>>,
-        IRequestHandler<CreateUserPointsCommand, CommandResult<bool>>,
-        IRequestHandler<ChangeUserRolesCommand, CommandResult<bool>>,
-        IRequestHandler<UpdateUserPictureCommand, CommandResult<bool>>,
-        IRequestHandler<RemoveUserDataCommand, CommandResult<string>>
+        IRequestHandler<QueueExportUserDataCommand, Result<Guid>>,
+        IRequestHandler<ExportUserDataCommand, Result<bool>>,
+        IRequestHandler<GenerateUserCodeCommand, Result<string>>,
+        IRequestHandler<CreateUserPointsCommand, Result<bool>>,
+        IRequestHandler<ChangeUserRolesCommand, Result<bool>>,
+        IRequestHandler<UpdateUserPictureCommand, Result<bool>>,
+        IRequestHandler<RemoveUserDataCommand, Result<string>>
     {
         private readonly IAppDbContext _context;
         private readonly IMediator _mediatr;
@@ -80,7 +80,7 @@ namespace Sheaft.Application.Handlers
             _cache = cache;
         }
 
-        public async Task<CommandResult<bool>> Handle(ChangeUserRolesCommand request, CancellationToken token)
+        public async Task<Result<bool>> Handle(ChangeUserRolesCommand request, CancellationToken token)
         {
             return await ExecuteAsync(async () =>
             {
@@ -138,7 +138,7 @@ namespace Sheaft.Application.Handlers
             });
         }
 
-        public async Task<CommandResult<string>> Handle(GenerateUserCodeCommand request, CancellationToken token)
+        public async Task<Result<string>> Handle(GenerateUserCodeCommand request, CancellationToken token)
         {
             return await ExecuteAsync(async () =>
             {
@@ -151,14 +151,14 @@ namespace Sheaft.Application.Handlers
                 if (!result.Success)
                     return Failed<string>(result.Exception);
 
-                entity.SetSponsoringCode(result.Result);
+                entity.SetSponsoringCode(result.Data);
                 _context.Update(entity);
 
                 await _context.SaveChangesAsync(token);
                 return Created(entity.Code);
             });
         }
-        public async Task<CommandResult<string>> Handle(RemoveUserDataCommand request, CancellationToken token)
+        public async Task<Result<string>> Handle(RemoveUserDataCommand request, CancellationToken token)
         {
             return await ExecuteAsync(async () =>
             {
@@ -169,7 +169,7 @@ namespace Sheaft.Application.Handlers
             });
         }
 
-        public async Task<CommandResult<bool>> Handle(UpdateUserPictureCommand request, CancellationToken token)
+        public async Task<Result<bool>> Handle(UpdateUserPictureCommand request, CancellationToken token)
         {
             return await ExecuteAsync(async () =>
             {
@@ -190,7 +190,7 @@ namespace Sheaft.Application.Handlers
             });
         }
 
-        public async Task<CommandResult<bool>> Handle(CreateUserPointsCommand request, CancellationToken token)
+        public async Task<Result<bool>> Handle(CreateUserPointsCommand request, CancellationToken token)
         {
             return await ExecuteAsync(async () =>
             {
@@ -209,7 +209,7 @@ namespace Sheaft.Application.Handlers
             });
         }
 
-        public async Task<CommandResult<Guid>> Handle(QueueExportUserDataCommand request, CancellationToken token)
+        public async Task<Result<Guid>> Handle(QueueExportUserDataCommand request, CancellationToken token)
         {
             return await ExecuteAsync(async () =>
             {
@@ -228,7 +228,7 @@ namespace Sheaft.Application.Handlers
             });
         }
 
-        public async Task<CommandResult<bool>> Handle(ExportUserDataCommand request, CancellationToken token)
+        public async Task<Result<bool>> Handle(ExportUserDataCommand request, CancellationToken token)
         {
             return await ExecuteAsync(async () =>
             {
@@ -257,7 +257,7 @@ namespace Sheaft.Application.Handlers
                         await _queuesService.ProcessEventAsync(ExportUserDataSucceededEvent.QUEUE_NAME, new ExportUserDataSucceededEvent(request.RequestUser) { Id = job.Id, JobId = job.Id }, token);
                         
                         Logger.LogInformation($"RGPD data for user {request.RequestUser.Id} successfully exported");
-                        return await _mediatr.Send(new CompleteJobCommand(request.RequestUser) { Id = job.Id, FileUrl = response.Result });
+                        return await _mediatr.Send(new CompleteJobCommand(request.RequestUser) { Id = job.Id, FileUrl = response.Data });
                     }
                 }
                 catch (Exception e)

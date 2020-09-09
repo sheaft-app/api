@@ -1,11 +1,10 @@
-using Sheaft.Interop;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace Sheaft.Core.Extensions
 {
-    public static class IUserExtensions
+    public static class RequestUserExtensions
     {
         public static bool IsInRole(this RequestUser user, string roleName)
         {

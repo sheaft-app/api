@@ -16,10 +16,10 @@ using Sheaft.Interop.Enums;
 namespace Sheaft.Application.Handlers
 {
     public class DeliveryModeCommandsHandler : CommandsHandler,
-        IRequestHandler<CreateDeliveryModeCommand, CommandResult<Guid>>,
-        IRequestHandler<UpdateDeliveryModeCommand, CommandResult<bool>>,
-        IRequestHandler<DeleteDeliveryModeCommand, CommandResult<bool>>,
-        IRequestHandler<RestoreDeliveryModeCommand, CommandResult<bool>>
+        IRequestHandler<CreateDeliveryModeCommand, Result<Guid>>,
+        IRequestHandler<UpdateDeliveryModeCommand, Result<bool>>,
+        IRequestHandler<DeleteDeliveryModeCommand, Result<bool>>,
+        IRequestHandler<RestoreDeliveryModeCommand, Result<bool>>
     {
         private readonly IAppDbContext _context;
 
@@ -30,7 +30,7 @@ namespace Sheaft.Application.Handlers
             _context = context;
         }
 
-        public async Task<CommandResult<Guid>> Handle(CreateDeliveryModeCommand request, CancellationToken token)
+        public async Task<Result<Guid>> Handle(CreateDeliveryModeCommand request, CancellationToken token)
         {
             return await ExecuteAsync(async () =>
             {
@@ -60,7 +60,7 @@ namespace Sheaft.Application.Handlers
             });
         }
 
-        public async Task<CommandResult<bool>> Handle(UpdateDeliveryModeCommand request, CancellationToken token)
+        public async Task<Result<bool>> Handle(UpdateDeliveryModeCommand request, CancellationToken token)
         {
             return await ExecuteAsync(async () =>
             {
@@ -94,7 +94,7 @@ namespace Sheaft.Application.Handlers
             });
         }
 
-        public async Task<CommandResult<bool>> Handle(DeleteDeliveryModeCommand request, CancellationToken token)
+        public async Task<Result<bool>> Handle(DeleteDeliveryModeCommand request, CancellationToken token)
         {
             return await ExecuteAsync(async () =>
             {
@@ -108,7 +108,7 @@ namespace Sheaft.Application.Handlers
             });
         }
 
-        public async Task<CommandResult<bool>> Handle(RestoreDeliveryModeCommand request, CancellationToken token)
+        public async Task<Result<bool>> Handle(RestoreDeliveryModeCommand request, CancellationToken token)
         {
             return await ExecuteAsync(async () =>
             {

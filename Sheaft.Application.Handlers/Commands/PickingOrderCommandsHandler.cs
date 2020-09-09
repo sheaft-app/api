@@ -20,8 +20,8 @@ using Sheaft.Services.Interop;
 namespace Sheaft.Application.Handlers
 {
     public class PickingOrderCommandsHandler : CommandsHandler,
-        IRequestHandler<QueueExportPickingOrderCommand, CommandResult<Guid>>,
-        IRequestHandler<ExportPickingOrderCommand, CommandResult<bool>>
+        IRequestHandler<QueueExportPickingOrderCommand, Result<Guid>>,
+        IRequestHandler<ExportPickingOrderCommand, Result<bool>>
     {
         private readonly IAppDbContext _context;
         private readonly IMediator _mediatr;
@@ -41,7 +41,7 @@ namespace Sheaft.Application.Handlers
             _mediatr = mediatr;
         }
 
-        public async Task<CommandResult<Guid>> Handle(QueueExportPickingOrderCommand request, CancellationToken token)
+        public async Task<Result<Guid>> Handle(QueueExportPickingOrderCommand request, CancellationToken token)
         {
             return await ExecuteAsync(async () =>
             {
@@ -68,7 +68,7 @@ namespace Sheaft.Application.Handlers
             });
         }
 
-        public async Task<CommandResult<bool>> Handle(ExportPickingOrderCommand request, CancellationToken token)
+        public async Task<Result<bool>> Handle(ExportPickingOrderCommand request, CancellationToken token)
         {
             return await ExecuteAsync(async () =>
             {
@@ -99,7 +99,7 @@ namespace Sheaft.Application.Handlers
                             throw result.Exception;
 
                         await _queuesService.ProcessEventAsync(PickingOrderExportSucceededEvent.QUEUE_NAME, new PickingOrderExportSucceededEvent(request.RequestUser) { Id = job.Id }, token);
-                        return await _mediatr.Send(new CompleteJobCommand(request.RequestUser) { Id = job.Id, FileUrl = response.Result });
+                        return await _mediatr.Send(new CompleteJobCommand(request.RequestUser) { Id = job.Id, FileUrl = response.Data });
                     }
                 }
                 catch (Exception e)

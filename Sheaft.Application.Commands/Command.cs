@@ -4,7 +4,7 @@ using Sheaft.Interop;
 
 namespace Sheaft.Application.Commands
 {
-    public interface ICommand<T>: IRequest<CommandResult<T>>, ITrackedUser
+    public interface ICommand<T>: IRequest<Result<T>>, ITrackedUser
     {
     }
 

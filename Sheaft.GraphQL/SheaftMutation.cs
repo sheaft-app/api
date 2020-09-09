@@ -590,7 +590,7 @@ namespace Sheaft.GraphQL
             _logger.LogTrace($"{nameof(SheaftMutation.ExecuteCommandAsync)} - {commandName} - {result.Success}");
 
             if (result.Success)
-                return result.Result;
+                return result.Data;
 
             if (result.Exception != null)
             {

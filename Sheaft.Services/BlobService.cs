@@ -25,7 +25,7 @@ namespace Sheaft.Services
             _storageOptions = storageOptions.Value;
         }
 
-        public async Task<CommandResult<string>> UploadUserPictureAsync(Guid userId, Stream stream, CancellationToken token)
+        public async Task<Result<string>> UploadUserPictureAsync(Guid userId, Stream stream, CancellationToken token)
         {
             try
             {
@@ -37,16 +37,16 @@ namespace Sheaft.Services
                 stream.Position = 0;
                 await blobClient.UploadAsync(stream, token);
 
-                return new CommandResult<string>(blobClient.Uri.ToString());
+                return new Result<string>(blobClient.Uri.ToString());
             }
             catch (Exception e)
             {
                 _logger.LogError(e, $"{nameof(BlobService.UploadUserPictureAsync)} - {e.Message}");
-                return new CommandResult<string>(e);
+                return new Result<string>(e);
             }
         }
 
-        public async Task<CommandResult<string>> UploadTagPictureAsync(Guid tagId, Stream stream, CancellationToken token)
+        public async Task<Result<string>> UploadTagPictureAsync(Guid tagId, Stream stream, CancellationToken token)
         {
             try
             {
@@ -58,16 +58,16 @@ namespace Sheaft.Services
                 stream.Position = 0;
                 await blobClient.UploadAsync(stream, token);
 
-                return new CommandResult<string>(blobClient.Uri.ToString());
+                return new Result<string>(blobClient.Uri.ToString());
             }
             catch (Exception e)
             {
                 _logger.LogError(e, $"{nameof(BlobService.UploadTagPictureAsync)} - {e.Message}");
-                return new CommandResult<string>(e);
+                return new Result<string>(e);
             }
         }
 
-        public async Task<CommandResult<string>> UploadProductPictureAsync(Guid userId, Guid productId, string filename, string size, Stream stream, CancellationToken token)
+        public async Task<Result<string>> UploadProductPictureAsync(Guid userId, Guid productId, string filename, string size, Stream stream, CancellationToken token)
         {
             try
             {
@@ -79,16 +79,16 @@ namespace Sheaft.Services
                 stream.Position = 0;
                 await blobClient.UploadAsync(stream, token);
 
-                return new CommandResult<string>(blobClient.Uri.ToString());
+                return new Result<string>(blobClient.Uri.ToString());
             }
             catch (Exception e)
             {
                 _logger.LogError(e, $"{nameof(BlobService.UploadProductPictureAsync)} - {e.Message}");
-                return new CommandResult<string>(e);
+                return new Result<string>(e);
             }
         }
 
-        public async Task<CommandResult<bool>> CleanUserStorageAsync(Guid userId, CancellationToken token)
+        public async Task<Result<bool>> CleanUserStorageAsync(Guid userId, CancellationToken token)
         {
             var response = await CleanContainerFolderStorageAsync(_storageOptions.Containers.Products, $"users/{userId:N}", token);
             if (!response.Success)
@@ -110,10 +110,10 @@ namespace Sheaft.Services
             if (!response.Success)
                 return response;
 
-            return new CommandResult<bool>(true);
+            return new Result<bool>(true);
         }
 
-        public async Task<CommandResult<bool>> CleanContainerFolderStorageAsync(string container, string folder, CancellationToken token)
+        public async Task<Result<bool>> CleanContainerFolderStorageAsync(string container, string folder, CancellationToken token)
         {
             try
             {
@@ -121,23 +121,23 @@ namespace Sheaft.Services
 
                 var blobClient = containerClient.GetBlobClient(folder);
                 if (!await blobClient.ExistsAsync(token))
-                    return new CommandResult<bool>(true);
+                    return new Result<bool>(true);
 
                 await foreach (var blob in containerClient.GetBlobsAsync(prefix: folder, cancellationToken: token))
                 {
                     await containerClient.DeleteBlobAsync(blob.Name, cancellationToken: token);
                 }
 
-                return new CommandResult<bool>(true);
+                return new Result<bool>(true);
             }
             catch (Exception e)
             {
                 _logger.LogError(e, $"{nameof(BlobService.CleanContainerFolderStorageAsync)} - {container}/{folder}");
-                return new CommandResult<bool>(e);
+                return new Result<bool>(e);
             }
         }
 
-        public async Task<CommandResult<string>> UploadImportProductsFileAsync(Guid userId, Guid jobId, string filename, Stream stream, CancellationToken token)
+        public async Task<Result<string>> UploadImportProductsFileAsync(Guid userId, Guid jobId, string filename, Stream stream, CancellationToken token)
         {
             try
             {
@@ -149,16 +149,16 @@ namespace Sheaft.Services
                 stream.Position = 0;
                 await blobClient.UploadAsync(stream, token);
 
-                return new CommandResult<string>(blobClient.Uri.ToString());
+                return new Result<string>(blobClient.Uri.ToString());
             }
             catch (Exception e)
             {
                 _logger.LogError(e, $"{nameof(BlobService.UploadImportProductsFileAsync)} - {e.Message}");
-                return new CommandResult<string>(e);
+                return new Result<string>(e);
             }
         }
 
-        public async Task<CommandResult<MemoryStream>> DownloadImportProductsFileAsync(string file, CancellationToken token)
+        public async Task<Result<MemoryStream>> DownloadImportProductsFileAsync(string file, CancellationToken token)
         {
             try
             {
@@ -171,16 +171,16 @@ namespace Sheaft.Services
                 await blobClient.DownloadToAsync(stream, token);
 
                 stream.Position = 0;
-                return new CommandResult<MemoryStream>(stream);
+                return new Result<MemoryStream>(stream);
             }
             catch (Exception e)
             {
                 _logger.LogError(e, $"{nameof(BlobService.DownloadImportProductsFileAsync)} - {e.Message}");
-                return new CommandResult<MemoryStream>(e);
+                return new Result<MemoryStream>(e);
             }
         }
 
-        public async Task<CommandResult<string>> UploadRgpdFileAsync(Guid userId, Guid jobId, string filename, Stream stream, CancellationToken token)
+        public async Task<Result<string>> UploadRgpdFileAsync(Guid userId, Guid jobId, string filename, Stream stream, CancellationToken token)
         {
             try
             {
@@ -206,16 +206,16 @@ namespace Sheaft.Services
 
                 sasBuilder.SetPermissions(BlobSasPermissions.Read);
 
-                return new CommandResult<string>(GetBlobUri(blobClient, blobServiceClient, key, sasBuilder, _storageOptions.Containers.Rgpd));
+                return new Result<string>(GetBlobUri(blobClient, blobServiceClient, key, sasBuilder, _storageOptions.Containers.Rgpd));
             }
             catch (Exception e)
             {
                 _logger.LogError(e, $"{nameof(BlobService.UploadRgpdFileAsync)} - {e.Message}");
-                return new CommandResult<string>(e);
+                return new Result<string>(e);
             }
         }
 
-        public async Task<CommandResult<string>> UploadPickingOrderFileAsync(Guid userId, Guid jobId, string filename, Stream stream, CancellationToken token)
+        public async Task<Result<string>> UploadPickingOrderFileAsync(Guid userId, Guid jobId, string filename, Stream stream, CancellationToken token)
         {
             try
             {
@@ -241,16 +241,16 @@ namespace Sheaft.Services
 
                 sasBuilder.SetPermissions(BlobSasPermissions.Read);
 
-                return new CommandResult<string>(GetBlobUri(blobClient, blobServiceClient, key, sasBuilder, _storageOptions.Containers.PickingOrders));
+                return new Result<string>(GetBlobUri(blobClient, blobServiceClient, key, sasBuilder, _storageOptions.Containers.PickingOrders));
             }
             catch (Exception e)
             {
                 _logger.LogError(e, $"{nameof(BlobService.UploadPickingOrderFileAsync)} - {e.Message}");
-                return new CommandResult<string>(e);
+                return new Result<string>(e);
             }
         }
 
-        public async Task<CommandResult<string>> UploadDepartmentsProgressAsync(Stream stream, CancellationToken token)
+        public async Task<Result<string>> UploadDepartmentsProgressAsync(Stream stream, CancellationToken token)
         {
             try
             {
@@ -263,12 +263,12 @@ namespace Sheaft.Services
                 stream.Position = 0;
                 await blobClient.UploadAsync(stream, new BlobUploadOptions(), token);
 
-                return new CommandResult<string>(blobClient.Uri.ToString());
+                return new Result<string>(blobClient.Uri.ToString());
             }
             catch (Exception e)
             {
                 _logger.LogError(e, $"{nameof(BlobService.UploadDepartmentsProgressAsync)} - {e.Message}");
-                return new CommandResult<string>(e);
+                return new Result<string>(e);
             }
         }
 

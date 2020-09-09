@@ -110,7 +110,7 @@ namespace Sheaft.Manage.Controllers
                 return View(model);
             }
 
-            return RedirectToAction("Edit", new { id = result.Result });
+            return RedirectToAction("Edit", new { id = result.Data });
         }
 
         [HttpGet]

@@ -24,9 +24,9 @@ using Microsoft.Extensions.Caching.Distributed;
 namespace Sheaft.Application.Handlers
 {
     public class ConsumerCommandsHandler : CommandsHandler,
-        IRequestHandler<CreateConsumerCommand, CommandResult<Guid>>,
-        IRequestHandler<UpdateConsumerCommand, CommandResult<bool>>,
-        IRequestHandler<DeleteConsumerCommand, CommandResult<bool>>
+        IRequestHandler<CreateConsumerCommand, Result<Guid>>,
+        IRequestHandler<UpdateConsumerCommand, Result<bool>>,
+        IRequestHandler<DeleteConsumerCommand, Result<bool>>
     {
         private readonly IAppDbContext _context;
         private readonly IQueueService _queueService;
@@ -58,7 +58,7 @@ namespace Sheaft.Application.Handlers
             _cache = cache;
         }
 
-        public async Task<CommandResult<Guid>> Handle(CreateConsumerCommand request, CancellationToken token)
+        public async Task<Result<Guid>> Handle(CreateConsumerCommand request, CancellationToken token)
         {
             return await ExecuteAsync(async () =>
             {
@@ -116,7 +116,7 @@ namespace Sheaft.Application.Handlers
         }
 
 
-        public async Task<CommandResult<bool>> Handle(UpdateConsumerCommand request, CancellationToken token)
+        public async Task<Result<bool>> Handle(UpdateConsumerCommand request, CancellationToken token)
         {
             return await ExecuteAsync(async () =>
             {
@@ -160,7 +160,7 @@ namespace Sheaft.Application.Handlers
             });
         }
 
-        public async Task<CommandResult<bool>> Handle(DeleteConsumerCommand request, CancellationToken token)
+        public async Task<Result<bool>> Handle(DeleteConsumerCommand request, CancellationToken token)
         {
             return await ExecuteAsync(async () =>
             {

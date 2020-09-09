@@ -115,7 +115,7 @@ namespace Sheaft.Manage.Controllers
             }
 
             var entity = await _context.Users.OfType<Company>().SingleOrDefaultAsync(c => c.Id == model.Id, token);
-            CommandResult<bool> result = null;
+            Result<bool> result = null;
             if (entity.Kind == ProfileKind.Producer)
             {
                 result = await _mediatr.Send(new UpdateProducerCommand(requestUser)

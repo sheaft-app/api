@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using IdentityModel;
-using Sheaft.Core.Security;
-using Sheaft.Interop;
 
 namespace Sheaft.Core.Extensions
 {

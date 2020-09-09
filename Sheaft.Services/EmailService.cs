@@ -29,7 +29,7 @@ namespace Sheaft.Services
             _sendgrid = sendgrid;
         }
 
-        public async Task<CommandResult<bool>> SendTemplatedEmailAsync<T>(string toEmail, string toName, string templateId, T datas, CancellationToken token)
+        public async Task<Result<bool>> SendTemplatedEmailAsync<T>(string toEmail, string toName, string templateId, T datas, CancellationToken token)
         {
             try
             {
@@ -47,14 +47,14 @@ namespace Sheaft.Services
 
                 var response = await _sendgrid.SendEmailAsync(msg);
                 if ((int)response.StatusCode >= 400)
-                    return new CommandResult<bool>(false, MessageKind.EmailProvider_SendEmail_Failure, await response.Body.ReadAsStringAsync());
+                    return new Result<bool>(false, MessageKind.EmailProvider_SendEmail_Failure, await response.Body.ReadAsStringAsync());
 
-                return new CommandResult<bool>(true);
+                return new Result<bool>(true);
             }
             catch(Exception e)
             {
                 _logger.LogError(e, $"{nameof(EmailService.SendTemplatedEmailAsync)} - {e.Message}");
-                return new CommandResult<bool>(e);
+                return new Result<bool>(e);
             }
         }
     }
