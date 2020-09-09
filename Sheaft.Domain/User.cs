@@ -13,6 +13,7 @@ namespace Sheaft.Domain.Models
         private List<Points> _points;
         private List<PaymentMethod> _paymentMethods;
         private List<Wallet> _wallets;
+        private List<Document> _documents;
 
         protected User()
         {
@@ -55,6 +56,7 @@ namespace Sheaft.Domain.Models
         public virtual IReadOnlyCollection<Points> Points { get { return _points.AsReadOnly(); } }
         public virtual IReadOnlyCollection<PaymentMethod> PaymentMethods { get { return _paymentMethods.AsReadOnly(); } }
         public virtual IReadOnlyCollection<Wallet> Wallets { get { return _wallets.AsReadOnly(); } }
+        public virtual IReadOnlyCollection<Document> Documents { get { return _documents.AsReadOnly(); } }
 
         public void SetFirstname(string firstname)
         {

@@ -95,6 +95,7 @@ namespace Sheaft.Infrastructure
             modelBuilder.ApplyConfiguration(new TransferPaymentConfiguration());
             modelBuilder.ApplyConfiguration(new CardPaymentConfiguration());
             modelBuilder.ApplyConfiguration(new WalletConfiguration());
+            modelBuilder.ApplyConfiguration(new DocumentConfiguration());
         }
     }
 }
