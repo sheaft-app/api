@@ -17,8 +17,10 @@ namespace Sheaft.Infrastructure
             entity.Property(o => o.TotalWholeSalePrice).HasColumnType("decimal(10,2)");
             entity.Property(o => o.TotalVatPrice).HasColumnType("decimal(10,2)");
             entity.Property(o => o.TotalOnSalePrice).HasColumnType("decimal(10,2)");
+            entity.Property(o => o.Donation).HasColumnType("decimal(10,2)");
+            entity.Property(o => o.Fees).HasColumnType("decimal(10,2)");
 
-            entity.HasMany(o => o.PurchaseOrders).WithOne().HasForeignKey("OrderUid").OnDelete(DeleteBehavior.Cascade);
+            entity.HasMany(o => o.PurchaseOrders).WithOne().HasForeignKey("OrderUid").OnDelete(DeleteBehavior.NoAction);
             entity.HasMany(o => o.Transactions).WithOne().HasForeignKey("OrderUid").OnDelete(DeleteBehavior.Cascade);
             entity.HasOne(c => c.User).WithMany().HasForeignKey("UserUid").OnDelete(DeleteBehavior.Cascade);
 
