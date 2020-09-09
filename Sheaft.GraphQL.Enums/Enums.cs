@@ -36,6 +36,14 @@ namespace Sheaft.GraphQL.Enums
             descriptor.Value(PaymentKind.Transfer).Name("TRANSFER");
         }
     }
+    public class WalletKindEnumType : EnumType<WalletKind>
+    {
+        protected override void Configure(IEnumTypeDescriptor<WalletKind> descriptor)
+        {
+            descriptor.Value(WalletKind.Payments).Name("PAYMENTS");
+            descriptor.Value(WalletKind.Returnable).Name("RETURNABLE");
+        }
+    }
     public class JobKindEnumType : EnumType<JobKind>
     {
         protected override void Configure(IEnumTypeDescriptor<JobKind> descriptor)
