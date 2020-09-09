@@ -12,9 +12,11 @@ namespace Sheaft.Domain.Models
         public CardPayment(Guid id, string identifier, string name, string owner, DateTimeOffset validity)
             : base(id, identifier, name, owner, PaymentKind.Card)
         {
+            Expired = false;
             Validity = validity;
         }
 
-        public DateTimeOffset Validity { get; set; }
+        public bool Expired { get; private set; }
+        public DateTimeOffset Validity { get; private set; }
     }
 }

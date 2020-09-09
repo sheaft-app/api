@@ -28,6 +28,14 @@ namespace Sheaft.GraphQL.Enums
             descriptor.Value(AddressKind.Shipping).Name("SHIPPING");
         }
     }
+    public class PaymentKindEnumType : EnumType<PaymentKind>
+    {
+        protected override void Configure(IEnumTypeDescriptor<PaymentKind> descriptor)
+        {
+            descriptor.Value(PaymentKind.Card).Name("CARD");
+            descriptor.Value(PaymentKind.Transfer).Name("TRANSFER");
+        }
+    }
     public class JobKindEnumType : EnumType<JobKind>
     {
         protected override void Configure(IEnumTypeDescriptor<JobKind> descriptor)

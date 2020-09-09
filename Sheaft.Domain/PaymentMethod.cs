@@ -4,7 +4,6 @@ using System;
 
 namespace Sheaft.Domain.Models
 {
-
     public abstract class PaymentMethod : IEntity
     {
         protected PaymentMethod()
@@ -25,10 +24,10 @@ namespace Sheaft.Domain.Models
         public DateTimeOffset CreatedOn { get; private set; }
         public DateTimeOffset? UpdatedOn { get; private set; }
         public DateTimeOffset? RemovedOn { get; private set; }
-        public string Identifier { get; set; }
-        public string Name { get; set; }
-        public PaymentKind Kind { get; set; }
-        public string Owner { get; set; }
+        public string Identifier { get; private set; }
+        public string Name { get; private set; }
+        public PaymentKind Kind { get; private set; }
+        public string Owner { get; private set; }
 
         public void Remove()
         {

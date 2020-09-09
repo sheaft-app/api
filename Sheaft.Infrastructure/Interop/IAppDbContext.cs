@@ -24,7 +24,6 @@ namespace Sheaft.Infrastructure.Interop
         DbSet<Reward> Rewards { get; set; }
         DbSet<Notification> Notifications { get; set; }
         DbSet<PurchaseOrder> PurchaseOrders { get; set; }
-        DbSet<PaymentMethod> PaymentMethods { get; set; }
         DbSet<Packaging> Packagings { get; set; }
         DbSet<Product> Products { get; set; }
         DbSet<QuickOrder> QuickOrders { get; set; }
