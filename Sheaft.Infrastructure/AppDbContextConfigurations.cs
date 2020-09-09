@@ -79,6 +79,7 @@ namespace Sheaft.Infrastructure
             modelBuilder.ApplyConfiguration(new RewardConfiguration());
             modelBuilder.ApplyConfiguration(new NotificationConfiguration());
             modelBuilder.ApplyConfiguration(new PackagingConfiguration());
+            modelBuilder.ApplyConfiguration(new OrderConfiguration());
             modelBuilder.ApplyConfiguration(new PurchaseOrderConfiguration());
             modelBuilder.ApplyConfiguration(new PurchaseOrderProductConfiguration());
             modelBuilder.ApplyConfiguration(new PurchaseOrderVendorConfiguration());
