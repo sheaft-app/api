@@ -16,7 +16,7 @@ namespace Sheaft.Domain.Models
             BIC = bic;
         }
 
-        public string IBAN { get; set; }
-        public string BIC { get; set; }
+        public string IBAN { get; private set; }
+        public string BIC { get; private set; }
     }
 }
