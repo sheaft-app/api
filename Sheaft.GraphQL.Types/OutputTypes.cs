@@ -75,6 +75,7 @@ namespace Sheaft.GraphQL.Types
             descriptor.Field(c => c.Points);
             descriptor.Field(c => c.Position);
             descriptor.Field(c => c.UserId).Type<NonNullType<IdType>>();
+            descriptor.Field(c => c.Kind).Type<NonNullType<ProfileKindEnumType>>();
             descriptor.Field(c => c.Picture);
         }
     }
@@ -88,6 +89,7 @@ namespace Sheaft.GraphQL.Types
             descriptor.Field(c => c.Position);
             descriptor.Field(c => c.RegionId).Type<NonNullType<IdType>>();
             descriptor.Field(c => c.UserId).Type<NonNullType<IdType>>();
+            descriptor.Field(c => c.Kind).Type<NonNullType<ProfileKindEnumType>>();
             descriptor.Field(c => c.Picture);
         }
     }
@@ -101,6 +103,7 @@ namespace Sheaft.GraphQL.Types
             descriptor.Field(c => c.Position);
             descriptor.Field(c => c.DepartmentId).Type<NonNullType<IdType>>();
             descriptor.Field(c => c.UserId).Type<NonNullType<IdType>>();
+            descriptor.Field(c => c.Kind).Type<NonNullType<ProfileKindEnumType>>();
             descriptor.Field(c => c.Picture);
         }
     }
@@ -112,7 +115,7 @@ namespace Sheaft.GraphQL.Types
             descriptor.Field(c => c.Id).Type<NonNullType<IdType>>();
             descriptor.Field(c => c.CreatedOn);
             descriptor.Field(c => c.UpdatedOn);
-            descriptor.Field(c => c.Kind);
+            descriptor.Field(c => c.Kind).Type<NonNullType<TagKindEnumType>>();
             descriptor.Field(c => c.Description);
 
             descriptor.Field(c => c.Name)
@@ -140,6 +143,7 @@ namespace Sheaft.GraphQL.Types
             descriptor.Field(c => c.Latitude);
             descriptor.Field(c => c.Zipcode);
             descriptor.Field(c => c.City);
+            descriptor.Field(c => c.Country);
         }
     }
     public class OwnerType : ObjectType<OwnerDto>
@@ -148,14 +152,14 @@ namespace Sheaft.GraphQL.Types
         {
             descriptor.Field(c => c.FirstName);
             descriptor.Field(c => c.LastName);
-            descriptor.Field(c => c.Line1);
-            descriptor.Field(c => c.Line2);
-            descriptor.Field(c => c.Zipcode);
-            descriptor.Field(c => c.City);
-            descriptor.Field(c => c.Country);
+            descriptor.Field(c => c.Birthdate);
+            descriptor.Field(c => c.CountryOfResidence);
             descriptor.Field(c => c.Nationality);
 
-            descriptor.Field(c => c.Kind)
+            descriptor.Field(c => c.Address)
+                .Type<AddressType>();
+
+            descriptor.Field(c => c.Legal)
                 .Type<NonNullType<LegalKindEnumType>>();
         }
     }
@@ -611,6 +615,9 @@ namespace Sheaft.GraphQL.Types
             descriptor.Field(c => c.CreatedOn);
             descriptor.Field(c => c.UpdatedOn);
             descriptor.Field(c => c.Anonymous);
+            descriptor.Field(c => c.CountryOfResidence);
+            descriptor.Field(c => c.Nationality);
+            descriptor.Field(c => c.Birthdate);
 
             descriptor.Field(c => c.Address)
                 .Type<AddressType>();
@@ -747,7 +754,7 @@ namespace Sheaft.GraphQL.Types
                 .Type<NonNullType<StringType>>();
 
             descriptor.Field(c => c.User)
-                .Type<NonNullType<UserType>>();
+                .Type<NonNullType<UserProfileType>>();
         }
     }
     public class NotificationType : SheaftOutputType<NotificationDto>
@@ -934,10 +941,10 @@ namespace Sheaft.GraphQL.Types
                 .Type<NonNullType<ExpectedDeliveryType>>();
 
             descriptor.Field(c => c.Sender)
-                .Type<NonNullType<UserType>>();
+                .Type<NonNullType<UserProfileType>>();
 
             descriptor.Field(c => c.Vendor)
-                .Type<NonNullType<UserType>>();
+                .Type<NonNullType<UserProfileType>>();
 
             descriptor.Field(c => c.Products)
                 .Type<NonNullType<ListType<PurchaseOrderProductQuantityType>>>()
@@ -955,7 +962,7 @@ namespace Sheaft.GraphQL.Types
             descriptor.Field(c => c.Comment);
 
             descriptor.Field(c => c.User)
-                .Type<NonNullType<UserType>>();
+                .Type<NonNullType<UserProfileType>>();
         }
     }
     public class PurchaseOrderProductQuantityType : SheaftOutputType<PurchaseOrderProductQuantityDto>
@@ -1022,7 +1029,7 @@ namespace Sheaft.GraphQL.Types
                 .Type<NonNullType<StringType>>();
 
             descriptor.Field(c => c.User)
-                .Type<NonNullType<UserType>>();
+                .Type<NonNullType<UserProfileType>>();
 
             descriptor.Field(c => c.Products)
                 .Type<ListType<QuickOrderProductQuantityType>>()

@@ -238,6 +238,36 @@ namespace Sheaft.GraphQL.Types
                 .Type<NonNullType<IdType>>();
         }
     }
+    public class SetCompanyLegalsInputType : SheaftInputType<SetCompanyLegalsInput>
+    {
+        protected override void Configure(IInputObjectTypeDescriptor<SetCompanyLegalsInput> descriptor)
+        {
+            descriptor.Field(c => c.Birthdate);
+            descriptor.Field(c => c.CountryOfResidence);
+            descriptor.Field(c => c.Legal);
+            descriptor.Field(c => c.Id);
+            descriptor.Field(c => c.Nationality);
+
+            descriptor.Field(c => c.BillingAddress)
+                .Type<NonNullType<AddressInputType>>();
+
+            descriptor.Field(c => c.LegalAddress)
+                .Type<NonNullType<AddressInputType>>();
+        }
+    }
+    public class SetConsumerLegalsInputType : SheaftInputType<SetConsumerLegalsInput>
+    {
+        protected override void Configure(IInputObjectTypeDescriptor<SetConsumerLegalsInput> descriptor)
+        {
+            descriptor.Field(c => c.Birthdate);
+            descriptor.Field(c => c.CountryOfResidence);
+            descriptor.Field(c => c.Id);
+            descriptor.Field(c => c.Nationality);
+
+            descriptor.Field(c => c.BillingAddress)
+                .Type<NonNullType<AddressInputType>>();
+        }
+    }
     public class RegisterStoreInputType : SheaftInputType<RegisterStoreInput>
     {
         protected override void Configure(IInputObjectTypeDescriptor<RegisterStoreInput> descriptor)

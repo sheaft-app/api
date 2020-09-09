@@ -451,6 +451,20 @@ namespace Sheaft.GraphQL
             return consumerQueries.GetConsumer(result, _currentUser);
         }
 
+        [Authorize(Policy = Policies.CONSUMER)]
+        [GraphQLName("setConsumerLegals")]
+        public async Task<bool> SetConsumerLegalsAsync(SetConsumerLegalsInput input)
+        {
+            return await ExecuteCommandAsync<SetConsumerLegalsCommand, bool>(_mapper.Map(input, new SetConsumerLegalsCommand(_currentUser)), _cancellationToken);
+        }
+
+        [Authorize(Policy = Policies.STORE_OR_PRODUCER)]
+        [GraphQLName("setCompanyLegals")]
+        public async Task<bool> SetCompanyLegalsAsync(SetCompanyLegalsInput input)
+        {
+            return await ExecuteCommandAsync<SetCompanyLegalsCommand, bool>(_mapper.Map(input, new SetCompanyLegalsCommand(_currentUser)), _cancellationToken);
+        }
+
         [Authorize(Policy = Policies.REGISTERED)]
         [GraphQLName("updateConsumer")]
         [GraphQLType(typeof(ConsumerType))]

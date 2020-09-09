@@ -104,6 +104,8 @@ namespace Sheaft.Api
             services.AddType<UpdateQuickOrderInputType>();
             services.AddType<UpdateConsumerInputType>();
             services.AddType<AddressInputType>();
+            services.AddType<SetCompanyLegalsInputType>();
+            services.AddType<SetConsumerLegalsInputType>();
 
             return services;
         }

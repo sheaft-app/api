@@ -46,7 +46,6 @@ namespace Sheaft.Domain.Models
         public string Identifier { get; private set; }
         public ProfileKind Kind { get; private set; }
         public LegalKind Legal { get; private set; }
-        public string Reason { get; private set; }
         public string Name { get; private set; }
         public string Email { get; private set; }
         public string Phone { get; private set; }
@@ -76,6 +75,17 @@ namespace Sheaft.Domain.Models
                 SetUserName($"{FirstName} {LastName}");
         }
 
+        public void SetLastname(string lastname)
+        {
+            if (string.IsNullOrWhiteSpace(lastname))
+                throw new ValidationException(MessageKind.Consumer_Lastname_Required);
+
+            LastName = lastname;
+
+            if (Kind == ProfileKind.Consumer)
+                SetUserName($"{FirstName} {LastName}");
+        }
+
         public void SetBirthdate(DateTimeOffset? birthdate)
         {
             if (!birthdate.HasValue)
@@ -98,17 +108,6 @@ namespace Sheaft.Domain.Models
                 return;
 
             CountryOfResidence = country;
-        }
-
-        public void SetLastname(string lastname)
-        {
-            if (string.IsNullOrWhiteSpace(lastname))
-                throw new ValidationException(MessageKind.Consumer_Lastname_Required);
-
-            LastName = lastname;
-
-            if (Kind == ProfileKind.Consumer)
-                SetUserName($"{FirstName} {LastName}");
         }
 
         public void SetAddress(Department department)
@@ -140,7 +139,6 @@ namespace Sheaft.Domain.Models
             LastName = string.Empty;
             Email = $"{Guid.NewGuid():N}@a.c";
             Phone = string.Empty;
-            Reason = reason;
             RemovedOn = DateTime.UtcNow;
         }
 
