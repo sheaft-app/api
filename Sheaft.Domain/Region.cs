@@ -63,5 +63,14 @@ namespace Sheaft.Domain.Models
         {
             ConsumersCount = count;
         }
+
+        public void Remove()
+        {
+        }
+
+        public void Restore()
+        {
+            RemovedOn = null;
+        }
     }
 }

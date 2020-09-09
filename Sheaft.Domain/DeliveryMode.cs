@@ -74,6 +74,10 @@ namespace Sheaft.Domain.Models
             Kind = kind;
         }
 
+        public void Remove()
+        {
+        }
+
         public void Restore()
         {
             RemovedOn = null;

@@ -23,7 +23,6 @@ namespace Sheaft.Infrastructure
             entity.HasKey("Uid");
 
             entity.HasIndex(c => c.Id).IsUnique();
-            entity.HasIndex(c => c.Number).IsUnique();
             entity.HasIndex("Uid", "Id", "CreatedOn");
 
             entity.ToTable("Levels");

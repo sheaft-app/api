@@ -33,7 +33,7 @@ namespace Sheaft.Application.Handlers
         {
             return await ExecuteAsync(async () =>
             {
-                var entity = new Level(Guid.NewGuid(), request.Name, request.Number, request.RequiredPoints);
+                var entity = new Level(Guid.NewGuid(), request.Name, request.RequiredPoints);
                 
                 await _context.AddAsync(entity, token);
                 await _context.SaveChangesAsync(token);
@@ -49,7 +49,6 @@ namespace Sheaft.Application.Handlers
                 var entity = await _context.GetByIdAsync<Level>(request.Id, token);
 
                 entity.SetName(request.Name);
-                entity.SetNumber(request.Number);
                 entity.SetRequiredPoints(request.RequiredPoints);
 
                 _context.Update(entity);

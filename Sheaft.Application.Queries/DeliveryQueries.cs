@@ -154,36 +154,6 @@ namespace Sheaft.Application.Queries
             }
         }
 
-        private static IQueryable<DeliveryModeDto> GetAsDto(IQueryable<DeliveryMode> query)
-        {
-            return query
-                .Select(a => new DeliveryModeDto
-                {
-                    Address = new AddressDto
-                    {
-                        City = a.Address.City,
-                        Latitude = a.Address.Latitude,
-                        Line1 = a.Address.Line1,
-                        Line2 = a.Address.Line2,
-                        Longitude = a.Address.Longitude,
-                        Zipcode = a.Address.Zipcode
-                    },
-                    CreatedOn = a.CreatedOn,
-                    Description = a.Description,
-                    Id = a.Id,
-                    Kind = a.Kind,
-                    LockOrderHoursBeforeDelivery = a.LockOrderHoursBeforeDelivery,
-                    Name = a.Name,
-                    OpeningHours = a.OpeningHours.Select(oh => new TimeSlotDto
-                    {
-                        Day = oh.Day,
-                        From = oh.From,
-                        To = oh.To
-                    }),
-                    UpdatedOn = a.UpdatedOn
-                });
-        }
-
         private IEnumerable<DeliveryHourDto> GetAvailableDeliveryHours(IEnumerable<TimeSlotHour> openingHours, int lockOrderHoursBeforeDelivery, DateTimeOffset currentDate)
         {
             var list = new List<DeliveryHourDto>();

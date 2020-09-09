@@ -47,7 +47,7 @@ namespace Sheaft.Manage.Controllers
             var query = _context.Levels.AsNoTracking();
 
             var entities = await query
-                .OrderBy(c => c.Number)
+                .OrderBy(c => c.RequiredPoints)
                 .Skip(page * take)
                 .Take(take)
                 .ProjectTo<LevelViewModel>(_configurationProvider)
@@ -66,7 +66,7 @@ namespace Sheaft.Manage.Controllers
         [HttpGet]
         public async Task<IActionResult> Add(CancellationToken token)
         {
-            return View(new LevelViewModel { Number = await _context.Levels.CountAsync(token) });
+            return View(new LevelViewModel());
         }
 
         [HttpPost]
@@ -78,7 +78,6 @@ namespace Sheaft.Manage.Controllers
             var result = await _mediatr.Send(new CreateLevelCommand(requestUser)
             {
                 Name = model.Name,
-                Number = model.Number,
                 RequiredPoints = model.RequiredPoints,
             }, token);
 
@@ -118,7 +117,6 @@ namespace Sheaft.Manage.Controllers
             {
                 Id = model.Id,
                 Name = model.Name,
-                Number = model.Number,
                 RequiredPoints = model.RequiredPoints
             }, token);
 

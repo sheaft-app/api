@@ -15,11 +15,10 @@ namespace Sheaft.Domain.Models
         {
         }
 
-        public Level(Guid id, string name, int number, int requiredPoints)
+        public Level(Guid id, string name, int requiredPoints)
         {
 
             Id = id;
-            Number = number;
             RequiredPoints = requiredPoints;
 
             SetName(name);
@@ -30,7 +29,6 @@ namespace Sheaft.Domain.Models
         public DateTimeOffset? UpdatedOn { get; private set; }
         public DateTimeOffset? RemovedOn { get; private set; }
         public string Name { get; private set; }
-        public int Number { get; private set; }
         public int RequiredPoints { get; private set; }
         public virtual IReadOnlyCollection<Reward> Rewards { get { return _rewards.AsReadOnly(); } }
 
@@ -77,11 +75,6 @@ namespace Sheaft.Domain.Models
             Name = name;
         }
 
-        public void SetNumber(int number)
-        {
-            Number = number;
-        }
-
         public void SetRequiredPoints(int requiredPoints)
         {
             RequiredPoints = requiredPoints;
@@ -89,7 +82,6 @@ namespace Sheaft.Domain.Models
 
         public void Remove()
         {
-            SetNumber((int)CreatedOn.ToUnixTimeSeconds());
         }
 
         public void Restore()

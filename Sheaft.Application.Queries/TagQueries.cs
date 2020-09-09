@@ -49,20 +49,5 @@ namespace Sheaft.Application.Queries
                 return new List<TagDto>().AsQueryable();
             }
         }
-
-        private static IQueryable<TagDto> GetAsDto(IQueryable<Tag> query)
-        {
-            return query
-                .Select(c => new TagDto
-                {
-                    Id = c.Id,
-                    Name = c.Name,
-                    Description = c.Description,
-                    Image = c.Image,
-                    Kind = c.Kind,
-                    UpdatedOn = c.UpdatedOn,
-                    CreatedOn = c.CreatedOn
-                });
-        }
     }
 }

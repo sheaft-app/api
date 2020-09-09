@@ -14,7 +14,6 @@ namespace Sheaft.Application.Commands
         }
 
         public string Name { get; set; }
-        public int Number { get; set; }
         public int RequiredPoints { get; set; }
     }
 }

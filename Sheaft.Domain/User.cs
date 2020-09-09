@@ -166,6 +166,15 @@ namespace Sheaft.Domain.Models
             RefreshPoints();
         }
 
+        public void Remove()
+        {
+        }
+
+        public void Restore()
+        {
+            RemovedOn = null;
+        }
+
         private void RefreshPoints()
         {
             TotalPoints = _points.Sum(c => c.Quantity);

@@ -35,5 +35,14 @@ namespace Sheaft.Domain.Models
         public decimal Value { get; private set; }
         public string Comment { get; private set; }
         public virtual User User { get; private set; }
+
+        public void Remove()
+        {
+        }
+
+        public void Restore()
+        {
+            RemovedOn = null;
+        }
     }
 }

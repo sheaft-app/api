@@ -2,7 +2,7 @@
 @{
     ViewData["Title"] = "New Reward";
     var departments = ((List<DepartmentViewModel>)ViewBag.Departments).Select(c => new SelectListItem($"{c.Code} - {c.Name}", c.Id.ToString("D"))).ToList();
-    var levels = ((List<LevelViewModel>)ViewBag.Levels).Select(c => new SelectListItem($"{c.Number} - {c.Name}", c.Id.ToString("D"))).ToList();
+    var levels = ((List<LevelViewModel>)ViewBag.Levels).Select(c => new SelectListItem(c.Name, c.Id.ToString("D"))).ToList();
 }
 
     <div class="container">

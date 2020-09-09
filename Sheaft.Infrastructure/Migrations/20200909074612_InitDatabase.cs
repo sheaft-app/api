@@ -19,7 +19,6 @@ namespace Sheaft.Infrastructure.Migrations
                     UpdatedOn = table.Column<DateTimeOffset>(nullable: true),
                     RemovedOn = table.Column<DateTimeOffset>(nullable: true),
                     Name = table.Column<string>(nullable: false),
-                    Number = table.Column<int>(nullable: false),
                     RequiredPoints = table.Column<int>(nullable: false)
                 },
                 constraints: table =>
@@ -1028,12 +1027,6 @@ namespace Sheaft.Infrastructure.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_Levels_Number",
-                table: "Levels",
-                column: "Number",
-                unique: true);
-
-            migrationBuilder.CreateIndex(
                 name: "IX_Levels_Uid_Id_CreatedOn",
                 table: "Levels",
                 columns: new[] { "Uid", "Id", "CreatedOn" });
@@ -1278,6 +1271,7 @@ namespace Sheaft.Infrastructure.Migrations
                 name: "IX_Users_Uid_Id_CreatedOn",
                 table: "Users",
                 columns: new[] { "Uid", "Id", "CreatedOn" });
+
             migrationBuilder.InsertData("Levels", new List<string>() { "Uid", "Id", "CreatedOn", "Number", "RequiredPoints", "Name" }.ToArray(), new List<object>() { 1, "63b7d548-b8ae-43f6-bb9a-b47311ba57ed", "2020-05-01", "0", "1000", "Niveau 1" }.ToArray(), "dbo");
             migrationBuilder.InsertData("Levels", new List<string>() { "Uid", "Id", "CreatedOn", "Number", "RequiredPoints", "Name" }.ToArray(), new List<object>() { 2, "a9193dc7-9508-4ab8-a1e3-0b72ee47589b", "2020-05-01", "1", "2000", "Niveau 1" }.ToArray(), "dbo");
             migrationBuilder.InsertData("Levels", new List<string>() { "Uid", "Id", "CreatedOn", "Number", "RequiredPoints", "Name" }.ToArray(), new List<object>() { 3, "4817296a-94c7-4724-8de3-b58eca77ef5a", "2020-05-01", "2", "4000", "Niveau 2" }.ToArray(), "dbo");

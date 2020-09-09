@@ -70,19 +70,13 @@ namespace Sheaft.Domain.Models
             ConsumersCount = count;
         }
 
-        public void SetPosition(object position)
+        public void Remove()
         {
-            throw new NotImplementedException();
         }
 
-        public void SetProducersCount(object producers)
+        public void Restore()
         {
-            throw new NotImplementedException();
-        }
-
-        public void SetStoresCount(object stores)
-        {
-            throw new NotImplementedException();
+            RemovedOn = null;
         }
     }
 }
