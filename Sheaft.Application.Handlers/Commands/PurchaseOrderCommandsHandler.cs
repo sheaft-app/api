@@ -19,28 +19,28 @@ using Microsoft.EntityFrameworkCore;
 namespace Sheaft.Application.Handlers
 {
     public class PurchaseOrderCommandsHandler : CommandsHandler,
-        IRequestHandler<CreatePurchaseOrdersCommand, CommandResult<IEnumerable<Guid>>>,
-        IRequestHandler<CreatePurchaseOrderCommand, CommandResult<Guid>>,
-        IRequestHandler<UpdatePurchaseOrderProductsCommand, CommandResult<bool>>,
+        IRequestHandler<CreatePurchaseOrdersCommand, Result<IEnumerable<Guid>>>,
+        IRequestHandler<CreatePurchaseOrderCommand, Result<Guid>>,
+        IRequestHandler<UpdatePurchaseOrderProductsCommand, Result<bool>>,
 
-        IRequestHandler<AcceptPurchaseOrdersCommand, CommandResult<bool>>,
-        IRequestHandler<ProcessPurchaseOrdersCommand, CommandResult<bool>>,
-        IRequestHandler<CancelPurchaseOrdersCommand, CommandResult<bool>>,
-        IRequestHandler<RefusePurchaseOrdersCommand, CommandResult<bool>>,
-        IRequestHandler<CompletePurchaseOrdersCommand, CommandResult<bool>>,
-        IRequestHandler<ShipPurchaseOrdersCommand, CommandResult<bool>>,
-        IRequestHandler<DeliverPurchaseOrdersCommand, CommandResult<bool>>,
-        IRequestHandler<DeletePurchaseOrdersCommand, CommandResult<bool>>,
+        IRequestHandler<AcceptPurchaseOrdersCommand, Result<bool>>,
+        IRequestHandler<ProcessPurchaseOrdersCommand, Result<bool>>,
+        IRequestHandler<CancelPurchaseOrdersCommand, Result<bool>>,
+        IRequestHandler<RefusePurchaseOrdersCommand, Result<bool>>,
+        IRequestHandler<CompletePurchaseOrdersCommand, Result<bool>>,
+        IRequestHandler<ShipPurchaseOrdersCommand, Result<bool>>,
+        IRequestHandler<DeliverPurchaseOrdersCommand, Result<bool>>,
+        IRequestHandler<DeletePurchaseOrdersCommand, Result<bool>>,
 
-        IRequestHandler<AcceptPurchaseOrderCommand, CommandResult<bool>>,
-        IRequestHandler<ProcessPurchaseOrderCommand, CommandResult<bool>>,
-        IRequestHandler<CancelPurchaseOrderCommand, CommandResult<bool>>,
-        IRequestHandler<RefusePurchaseOrderCommand, CommandResult<bool>>,
-        IRequestHandler<CompletePurchaseOrderCommand, CommandResult<bool>>,
-        IRequestHandler<ShipPurchaseOrderCommand, CommandResult<bool>>,
-        IRequestHandler<DeliverPurchaseOrderCommand, CommandResult<bool>>,
-        IRequestHandler<DeletePurchaseOrderCommand, CommandResult<bool>>,
-        IRequestHandler<RestorePurchaseOrderCommand, CommandResult<bool>>
+        IRequestHandler<AcceptPurchaseOrderCommand, Result<bool>>,
+        IRequestHandler<ProcessPurchaseOrderCommand, Result<bool>>,
+        IRequestHandler<CancelPurchaseOrderCommand, Result<bool>>,
+        IRequestHandler<RefusePurchaseOrderCommand, Result<bool>>,
+        IRequestHandler<CompletePurchaseOrderCommand, Result<bool>>,
+        IRequestHandler<ShipPurchaseOrderCommand, Result<bool>>,
+        IRequestHandler<DeliverPurchaseOrderCommand, Result<bool>>,
+        IRequestHandler<DeletePurchaseOrderCommand, Result<bool>>,
+        IRequestHandler<RestorePurchaseOrderCommand, Result<bool>>
     {
         private readonly IAppDbContext _context;
         private readonly IMediator _mediatr;
@@ -60,7 +60,7 @@ namespace Sheaft.Application.Handlers
             _queuesService = queuesService;
         }
 
-        public async Task<CommandResult<IEnumerable<Guid>>> Handle(CreatePurchaseOrdersCommand request, CancellationToken token)
+        public async Task<Result<IEnumerable<Guid>>> Handle(CreatePurchaseOrdersCommand request, CancellationToken token)
         {
             return await ExecuteAsync(async () =>
             {
@@ -80,7 +80,7 @@ namespace Sheaft.Application.Handlers
                         if (!result.Success)
                             return Failed<IEnumerable<Guid>>(result.Exception);
 
-                        createdOrders.Add(result.Result);
+                        createdOrders.Add(result.Data);
                     }
 
                     await _context.SaveChangesAsync(token);
@@ -96,7 +96,7 @@ namespace Sheaft.Application.Handlers
             });
         }
 
-        public async Task<CommandResult<Guid>> Handle(CreatePurchaseOrderCommand request, CancellationToken token)
+        public async Task<Result<Guid>> Handle(CreatePurchaseOrderCommand request, CancellationToken token)
         {
             return await ExecuteAsync(async () =>
             {
@@ -115,7 +115,7 @@ namespace Sheaft.Application.Handlers
                 if (!result.Success)
                     return Failed<Guid>(result.Exception);
 
-                var entity = new PurchaseOrder(Guid.NewGuid(), result.Result, OrderStatusKind.Waiting, cartProducts, deliveryMode, request.ExpectedDeliveryDate, producer, sender);
+                var entity = new PurchaseOrder(Guid.NewGuid(), result.Data, OrderStatusKind.Waiting, cartProducts, deliveryMode, request.ExpectedDeliveryDate, producer, sender);
                 entity.SetComment(request.Comment);
 
                 await _context.AddAsync(entity, token);
@@ -128,7 +128,7 @@ namespace Sheaft.Application.Handlers
             });
         }
 
-        public async Task<CommandResult<bool>> Handle(UpdatePurchaseOrderProductsCommand request, CancellationToken token)
+        public async Task<Result<bool>> Handle(UpdatePurchaseOrderProductsCommand request, CancellationToken token)
         {
             return await ExecuteAsync(async () =>
             {
@@ -159,7 +159,7 @@ namespace Sheaft.Application.Handlers
             });
         }
 
-        public async Task<CommandResult<bool>> Handle(ShipPurchaseOrdersCommand request, CancellationToken token)
+        public async Task<Result<bool>> Handle(ShipPurchaseOrdersCommand request, CancellationToken token)
         {
             return await ExecuteAsync(async () =>
             {
@@ -178,7 +178,7 @@ namespace Sheaft.Application.Handlers
             });
         }
 
-        public async Task<CommandResult<bool>> Handle(DeliverPurchaseOrdersCommand request, CancellationToken token)
+        public async Task<Result<bool>> Handle(DeliverPurchaseOrdersCommand request, CancellationToken token)
         {
             return await ExecuteAsync(async () =>
             {
@@ -197,7 +197,7 @@ namespace Sheaft.Application.Handlers
             });
         }
 
-        public async Task<CommandResult<bool>> Handle(CancelPurchaseOrdersCommand request, CancellationToken token)
+        public async Task<Result<bool>> Handle(CancelPurchaseOrdersCommand request, CancellationToken token)
         {
             return await ExecuteAsync(async () =>
             {
@@ -216,7 +216,7 @@ namespace Sheaft.Application.Handlers
             });
         }
 
-        public async Task<CommandResult<bool>> Handle(RefusePurchaseOrdersCommand request, CancellationToken token)
+        public async Task<Result<bool>> Handle(RefusePurchaseOrdersCommand request, CancellationToken token)
         {
             return await ExecuteAsync(async () =>
             {
@@ -236,7 +236,7 @@ namespace Sheaft.Application.Handlers
             });
         }
 
-        public async Task<CommandResult<bool>> Handle(ProcessPurchaseOrdersCommand request, CancellationToken token)
+        public async Task<Result<bool>> Handle(ProcessPurchaseOrdersCommand request, CancellationToken token)
         {
             return await ExecuteAsync(async () =>
             {
@@ -255,7 +255,7 @@ namespace Sheaft.Application.Handlers
             });
         }
 
-        public async Task<CommandResult<bool>> Handle(CompletePurchaseOrdersCommand request, CancellationToken token)
+        public async Task<Result<bool>> Handle(CompletePurchaseOrdersCommand request, CancellationToken token)
         {
             return await ExecuteAsync(async () =>
             {
@@ -274,7 +274,7 @@ namespace Sheaft.Application.Handlers
             });
         }
 
-        public async Task<CommandResult<bool>> Handle(AcceptPurchaseOrdersCommand request, CancellationToken token)
+        public async Task<Result<bool>> Handle(AcceptPurchaseOrdersCommand request, CancellationToken token)
         {
             return await ExecuteAsync(async () =>
             {
@@ -293,7 +293,7 @@ namespace Sheaft.Application.Handlers
             });
         }
 
-        public async Task<CommandResult<bool>> Handle(DeletePurchaseOrdersCommand request, CancellationToken token)
+        public async Task<Result<bool>> Handle(DeletePurchaseOrdersCommand request, CancellationToken token)
         {
             return await ExecuteAsync(async () =>
             {
@@ -312,7 +312,7 @@ namespace Sheaft.Application.Handlers
             });
         }
 
-        public async Task<CommandResult<bool>> Handle(ShipPurchaseOrderCommand request, CancellationToken token)
+        public async Task<Result<bool>> Handle(ShipPurchaseOrderCommand request, CancellationToken token)
         {
             return await ExecuteAsync(async () =>
             {
@@ -325,7 +325,7 @@ namespace Sheaft.Application.Handlers
             });
         }
 
-        public async Task<CommandResult<bool>> Handle(DeliverPurchaseOrderCommand request, CancellationToken token)
+        public async Task<Result<bool>> Handle(DeliverPurchaseOrderCommand request, CancellationToken token)
         {
             return await ExecuteAsync(async () =>
             {
@@ -338,7 +338,7 @@ namespace Sheaft.Application.Handlers
             });
         }
 
-        public async Task<CommandResult<bool>> Handle(CancelPurchaseOrderCommand request, CancellationToken token)
+        public async Task<Result<bool>> Handle(CancelPurchaseOrderCommand request, CancellationToken token)
         {
             return await ExecuteAsync(async () =>
             {
@@ -356,7 +356,7 @@ namespace Sheaft.Application.Handlers
             });
         }
 
-        public async Task<CommandResult<bool>> Handle(RefusePurchaseOrderCommand request, CancellationToken token)
+        public async Task<Result<bool>> Handle(RefusePurchaseOrderCommand request, CancellationToken token)
         {
             return await ExecuteAsync(async () =>
             {
@@ -371,7 +371,7 @@ namespace Sheaft.Application.Handlers
             });
         }
 
-        public async Task<CommandResult<bool>> Handle(ProcessPurchaseOrderCommand request, CancellationToken token)
+        public async Task<Result<bool>> Handle(ProcessPurchaseOrderCommand request, CancellationToken token)
         {
             return await ExecuteAsync(async () =>
             {
@@ -386,7 +386,7 @@ namespace Sheaft.Application.Handlers
             });
         }
 
-        public async Task<CommandResult<bool>> Handle(CompletePurchaseOrderCommand request, CancellationToken token)
+        public async Task<Result<bool>> Handle(CompletePurchaseOrderCommand request, CancellationToken token)
         {
             return await ExecuteAsync(async () =>
             {
@@ -401,7 +401,7 @@ namespace Sheaft.Application.Handlers
             });
         }
 
-        public async Task<CommandResult<bool>> Handle(AcceptPurchaseOrderCommand request, CancellationToken token)
+        public async Task<Result<bool>> Handle(AcceptPurchaseOrderCommand request, CancellationToken token)
         {
             return await ExecuteAsync(async () =>
             {
@@ -416,7 +416,7 @@ namespace Sheaft.Application.Handlers
             });
         }
 
-        public async Task<CommandResult<bool>> Handle(DeletePurchaseOrderCommand request, CancellationToken token)
+        public async Task<Result<bool>> Handle(DeletePurchaseOrderCommand request, CancellationToken token)
         {
             return await ExecuteAsync(async () =>
             {
@@ -428,7 +428,7 @@ namespace Sheaft.Application.Handlers
             });
         }
 
-        public async Task<CommandResult<bool>> Handle(RestorePurchaseOrderCommand request, CancellationToken token)
+        public async Task<Result<bool>> Handle(RestorePurchaseOrderCommand request, CancellationToken token)
         {
             return await ExecuteAsync(async () =>
             {

@@ -13,8 +13,8 @@ using System.Linq;
 namespace Sheaft.Application.Handlers
 {
     public class DepartmentCommandsHandler : CommandsHandler,
-        IRequestHandler<UpdateDepartmentCommand, CommandResult<bool>>,
-        IRequestHandler<UpdateDepartmentStatsCommand, CommandResult<bool>>
+        IRequestHandler<UpdateDepartmentCommand, Result<bool>>,
+        IRequestHandler<UpdateDepartmentStatsCommand, Result<bool>>
     {
         private readonly IAppDbContext _context;
 
@@ -25,7 +25,7 @@ namespace Sheaft.Application.Handlers
             _context = context;
         }
 
-        public async Task<CommandResult<bool>> Handle(UpdateDepartmentCommand request, CancellationToken token)
+        public async Task<Result<bool>> Handle(UpdateDepartmentCommand request, CancellationToken token)
         {
             return await ExecuteAsync(async () =>
             {
@@ -40,7 +40,7 @@ namespace Sheaft.Application.Handlers
             });
         }
 
-        public async Task<CommandResult<bool>> Handle(UpdateDepartmentStatsCommand request, CancellationToken token)
+        public async Task<Result<bool>> Handle(UpdateDepartmentStatsCommand request, CancellationToken token)
         {
             return await ExecuteAsync(async () =>
             {

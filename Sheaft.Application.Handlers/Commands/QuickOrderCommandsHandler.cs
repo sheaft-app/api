@@ -13,13 +13,13 @@ using Sheaft.Infrastructure.Interop;
 namespace Sheaft.Application.Handlers
 {
     public class QuickOrderCommandsHandler : CommandsHandler,
-        IRequestHandler<CreateQuickOrderCommand, CommandResult<Guid>>,
-        IRequestHandler<UpdateQuickOrderCommand, CommandResult<bool>>,
-        IRequestHandler<UpdateQuickOrderProductsCommand, CommandResult<bool>>,
-        IRequestHandler<UpdateQuickOrderDeliveriesCommand, CommandResult<bool>>,
-        IRequestHandler<SetDefaultQuickOrderCommand, CommandResult<bool>>,
-        IRequestHandler<DeleteQuickOrderCommand, CommandResult<bool>>,
-        IRequestHandler<DeleteQuickOrdersCommand, CommandResult<bool>>
+        IRequestHandler<CreateQuickOrderCommand, Result<Guid>>,
+        IRequestHandler<UpdateQuickOrderCommand, Result<bool>>,
+        IRequestHandler<UpdateQuickOrderProductsCommand, Result<bool>>,
+        IRequestHandler<UpdateQuickOrderDeliveriesCommand, Result<bool>>,
+        IRequestHandler<SetDefaultQuickOrderCommand, Result<bool>>,
+        IRequestHandler<DeleteQuickOrderCommand, Result<bool>>,
+        IRequestHandler<DeleteQuickOrdersCommand, Result<bool>>
     {
         private readonly IAppDbContext _context;
         private readonly IMediator _mediatr;
@@ -33,7 +33,7 @@ namespace Sheaft.Application.Handlers
             _context = context;
         }
 
-        public async Task<CommandResult<Guid>> Handle(CreateQuickOrderCommand request, CancellationToken token)
+        public async Task<Result<Guid>> Handle(CreateQuickOrderCommand request, CancellationToken token)
         {
             return await ExecuteAsync(async () =>
             {
@@ -55,7 +55,7 @@ namespace Sheaft.Application.Handlers
             });
         }
 
-        public async Task<CommandResult<bool>> Handle(UpdateQuickOrderCommand request, CancellationToken token)
+        public async Task<Result<bool>> Handle(UpdateQuickOrderCommand request, CancellationToken token)
         {
             return await ExecuteAsync(async () =>
             {
@@ -70,7 +70,7 @@ namespace Sheaft.Application.Handlers
             });
         }
 
-        public async Task<CommandResult<bool>> Handle(UpdateQuickOrderProductsCommand request, CancellationToken token)
+        public async Task<Result<bool>> Handle(UpdateQuickOrderProductsCommand request, CancellationToken token)
         {
             return await ExecuteAsync(async () =>
             {
@@ -104,12 +104,12 @@ namespace Sheaft.Application.Handlers
             });
         }
 
-        public async Task<CommandResult<bool>> Handle(UpdateQuickOrderDeliveriesCommand request, CancellationToken token)
+        public async Task<Result<bool>> Handle(UpdateQuickOrderDeliveriesCommand request, CancellationToken token)
         {
             throw new NotImplementedException();
         }
 
-        public async Task<CommandResult<bool>> Handle(SetDefaultQuickOrderCommand request, CancellationToken token)
+        public async Task<Result<bool>> Handle(SetDefaultQuickOrderCommand request, CancellationToken token)
         {
             return await ExecuteAsync(async () =>
             {
@@ -128,7 +128,7 @@ namespace Sheaft.Application.Handlers
             });
         }
 
-        public async Task<CommandResult<bool>> Handle(DeleteQuickOrdersCommand request, CancellationToken token)
+        public async Task<Result<bool>> Handle(DeleteQuickOrdersCommand request, CancellationToken token)
         {
             return await ExecuteAsync(async () =>
             {
@@ -143,7 +143,7 @@ namespace Sheaft.Application.Handlers
             });
         }
 
-        public async Task<CommandResult<bool>> Handle(DeleteQuickOrderCommand request, CancellationToken token)
+        public async Task<Result<bool>> Handle(DeleteQuickOrderCommand request, CancellationToken token)
         {
             return await ExecuteAsync(async () =>
             {

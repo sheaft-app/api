@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Sheaft.Core.Extensions
+﻿namespace Sheaft.Core.Extensions
 {
     public static class Base64Extensions
     {

@@ -25,11 +25,11 @@ using Microsoft.Extensions.Caching.Distributed;
 namespace Sheaft.Application.Handlers
 {
     public class CompanyCommandsHandler : CommandsHandler,
-        IRequestHandler<RegisterProducerCommand, CommandResult<Guid>>,
-        IRequestHandler<RegisterStoreCommand, CommandResult<Guid>>,
-        IRequestHandler<UpdateProducerCommand, CommandResult<bool>>,
-        IRequestHandler<UpdateStoreCommand, CommandResult<bool>>,
-        IRequestHandler<DeleteCompanyCommand, CommandResult<bool>>
+        IRequestHandler<RegisterProducerCommand, Result<Guid>>,
+        IRequestHandler<RegisterStoreCommand, Result<Guid>>,
+        IRequestHandler<UpdateProducerCommand, Result<bool>>,
+        IRequestHandler<UpdateStoreCommand, Result<bool>>,
+        IRequestHandler<DeleteCompanyCommand, Result<bool>>
     {
         private readonly IAppDbContext _context;
         private readonly IQueueService _queueService;
@@ -61,7 +61,7 @@ namespace Sheaft.Application.Handlers
             _httpClient.SetToken(_authOptions.Scheme, _authOptions.ApiKey);
         }
 
-        public async Task<CommandResult<Guid>> Handle(RegisterProducerCommand request, CancellationToken token)
+        public async Task<Result<Guid>> Handle(RegisterProducerCommand request, CancellationToken token)
         {
             return await ExecuteAsync(async () =>
             {
@@ -101,7 +101,7 @@ namespace Sheaft.Application.Handlers
             });
         }
 
-        public async Task<CommandResult<Guid>> Handle(RegisterStoreCommand request, CancellationToken token)
+        public async Task<Result<Guid>> Handle(RegisterStoreCommand request, CancellationToken token)
         {
             return await ExecuteAsync(async () =>
             {
@@ -142,7 +142,7 @@ namespace Sheaft.Application.Handlers
             });
         }
 
-        public async Task<CommandResult<bool>> Handle(UpdateStoreCommand request, CancellationToken token)
+        public async Task<Result<bool>> Handle(UpdateStoreCommand request, CancellationToken token)
         {
             return await ExecuteAsync(async () =>
             {
@@ -186,7 +186,7 @@ namespace Sheaft.Application.Handlers
             });
         }
 
-        public async Task<CommandResult<bool>> Handle(UpdateProducerCommand request, CancellationToken token)
+        public async Task<Result<bool>> Handle(UpdateProducerCommand request, CancellationToken token)
         {
             return await ExecuteAsync(async () =>
             {
@@ -219,7 +219,7 @@ namespace Sheaft.Application.Handlers
             });
         }
 
-        public async Task<CommandResult<bool>> Handle(DeleteCompanyCommand request, CancellationToken token)
+        public async Task<Result<bool>> Handle(DeleteCompanyCommand request, CancellationToken token)
         {
             return await ExecuteAsync(async () =>
             {

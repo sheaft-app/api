@@ -12,10 +12,10 @@ using Microsoft.EntityFrameworkCore;
 namespace Sheaft.Application.Handlers
 {
     public class PackagingCommandsHandler : CommandsHandler,
-        IRequestHandler<CreatePackagingCommand, CommandResult<Guid>>,
-        IRequestHandler<UpdatePackagingCommand, CommandResult<bool>>,
-        IRequestHandler<DeletePackagingCommand, CommandResult<bool>>,
-        IRequestHandler<RestorePackagingCommand, CommandResult<bool>>
+        IRequestHandler<CreatePackagingCommand, Result<Guid>>,
+        IRequestHandler<UpdatePackagingCommand, Result<bool>>,
+        IRequestHandler<DeletePackagingCommand, Result<bool>>,
+        IRequestHandler<RestorePackagingCommand, Result<bool>>
     {
         private readonly IAppDbContext _context;
 
@@ -26,7 +26,7 @@ namespace Sheaft.Application.Handlers
             _context = context;
         }
 
-        public async Task<CommandResult<Guid>> Handle(CreatePackagingCommand request, CancellationToken token)
+        public async Task<Result<Guid>> Handle(CreatePackagingCommand request, CancellationToken token)
         {
             return await ExecuteAsync(async () =>
             {
@@ -40,7 +40,7 @@ namespace Sheaft.Application.Handlers
             });
         }
 
-        public async Task<CommandResult<bool>> Handle(UpdatePackagingCommand request, CancellationToken token)
+        public async Task<Result<bool>> Handle(UpdatePackagingCommand request, CancellationToken token)
         {
             return await ExecuteAsync(async () =>
             {
@@ -57,7 +57,7 @@ namespace Sheaft.Application.Handlers
             });
         }
 
-        public async Task<CommandResult<bool>> Handle(DeletePackagingCommand request, CancellationToken token)
+        public async Task<Result<bool>> Handle(DeletePackagingCommand request, CancellationToken token)
         {
             return await ExecuteAsync(async () =>
             {
@@ -76,7 +76,7 @@ namespace Sheaft.Application.Handlers
             });
         }
 
-        public async Task<CommandResult<bool>> Handle(RestorePackagingCommand request, CancellationToken token)
+        public async Task<Result<bool>> Handle(RestorePackagingCommand request, CancellationToken token)
         {
             return await ExecuteAsync(async () =>
             {

@@ -18,96 +18,96 @@ namespace Sheaft.Application.Handlers
             Logger = logger;
         }
 
-        protected CommandResult<T> Ok<T>(T result, MessageKind? message = null, params object[] objs)
+        protected Result<T> Ok<T>(T result, MessageKind? message = null, params object[] objs)
         {
             Logger.LogTrace(nameof(CommandsHandler.Ok), result, message, objs);
-            return new CommandResult<T>(result, message, objs);
+            return new Result<T>(result, message, objs);
         }
-        protected CommandResult<T> ValidationError<T>(MessageKind? message = null, params object[] objs)
+        protected Result<T> ValidationError<T>(MessageKind? message = null, params object[] objs)
         {
             Logger.LogTrace(nameof(CommandsHandler.ValidationError), message, objs);
-            return new CommandResult<T>(new ValidationException(message, objs));
+            return new Result<T>(new ValidationException(message, objs));
         }
-        protected CommandResult<T> BadRequest<T>(MessageKind? message = null, params object[] objs)
+        protected Result<T> BadRequest<T>(MessageKind? message = null, params object[] objs)
         {
             Logger.LogTrace(nameof(CommandsHandler.BadRequest), message, objs);
-            return new CommandResult<T>(new BadRequestException(message, objs));
+            return new Result<T>(new BadRequestException(message, objs));
         }
-        protected CommandResult<T> Conflict<T>(MessageKind? message = null, params object[] objs)
+        protected Result<T> Conflict<T>(MessageKind? message = null, params object[] objs)
         {
             Logger.LogTrace(nameof(CommandsHandler.Conflict), message, objs);
-            return new CommandResult<T>(new ConflictException(message, objs));
+            return new Result<T>(new ConflictException(message, objs));
         }
 
-        protected CommandResult<T> Unauthorized<T>(MessageKind? message = null, params object[] objs)
+        protected Result<T> Unauthorized<T>(MessageKind? message = null, params object[] objs)
         {
             Logger.LogTrace(nameof(CommandsHandler.Unauthorized), message, objs);
-            return new CommandResult<T>(new UnauthorizedException(message, objs));
+            return new Result<T>(new UnauthorizedException(message, objs));
         }
 
-        protected CommandResult<T> Forbidden<T>(MessageKind? message = null, params object[] objs)
+        protected Result<T> Forbidden<T>(MessageKind? message = null, params object[] objs)
         {
             Logger.LogTrace(nameof(CommandsHandler.Forbidden), message, objs);
-            return new CommandResult<T>(new ForbiddenException(message, objs));
+            return new Result<T>(new ForbiddenException(message, objs));
         }
 
-        protected CommandResult<T> NotFound<T>(MessageKind? message = null, params object[] objs)
+        protected Result<T> NotFound<T>(MessageKind? message = null, params object[] objs)
         {
             Logger.LogTrace(nameof(CommandsHandler.NotFound), message, objs);
-            return new CommandResult<T>(new NotFoundException(message, objs));
+            return new Result<T>(new NotFoundException(message, objs));
         }
 
-        protected CommandResult<T> Created<T>(T result, MessageKind? message = null, params object[] objs)
+        protected Result<T> Created<T>(T result, MessageKind? message = null, params object[] objs)
         {
             Logger.LogTrace(nameof(CommandsHandler.Created), result, message, objs);
-            return new CommandResult<T>(result, message, objs);
+            return new Result<T>(result, message, objs);
         }
 
-        protected CommandResult<T> Accepted<T>(T result, MessageKind? message = null, params object[] objs)
+        protected Result<T> Accepted<T>(T result, MessageKind? message = null, params object[] objs)
         {
             Logger.LogTrace(nameof(CommandsHandler.Accepted), result, message);
-            return new CommandResult<T>(result, message);
+            return new Result<T>(result, message);
         }
 
-        protected CommandResult<T> Locked<T>(MessageKind? message = null, params object[] objs)
+        protected Result<T> Locked<T>(MessageKind? message = null, params object[] objs)
         {
             Logger.LogTrace(nameof(CommandsHandler.Locked), message, objs);
-            return new CommandResult<T>(new LockedException(message, objs));
+            return new Result<T>(new LockedException(message, objs));
         }
 
-        protected CommandResult<T> InternalError<T>(MessageKind? message = null, params object[] objs)
+        protected Result<T> InternalError<T>(MessageKind? message = null, params object[] objs)
         {
             Logger.LogTrace(nameof(CommandsHandler.InternalError), message, objs);
-            return new CommandResult<T>(new UnexpectedException(message, objs));
+            return new Result<T>(new UnexpectedException(message, objs));
         }
 
-        protected CommandResult<T> Failed<T>(SheaftException exception, MessageKind? message = null, params object[] objs)
+        protected Result<T> Failed<T>(SheaftException exception, MessageKind? message = null, params object[] objs)
         {
             Logger.LogTrace(nameof(CommandsHandler.Failed), exception, message, objs);
-            return new CommandResult<T>(exception, message, objs);
+            return new Result<T>(exception, message, objs);
         }
 
         // IEnumerable
 
-        protected CommandResult<IEnumerable<T>> Ok<T>(IEnumerable<T> result, MessageKind? message = null, params object[] objs)
+        protected Result<IEnumerable<T>> Ok<T>(IEnumerable<T> result, MessageKind? message = null, params object[] objs)
         {
             Logger.LogTrace(nameof(CommandsHandler.Ok), result, message, objs);
-            return new CommandResult<IEnumerable<T>>(result, message, objs);
+            return new Result<IEnumerable<T>>(result, message, objs);
         }
 
-        protected CommandResult<IEnumerable<T>> Created<T>(IEnumerable<T> result, MessageKind? message = null, params object[] objs)
+        protected Result<IEnumerable<T>> Created<T>(IEnumerable<T> result, MessageKind? message = null, params object[] objs)
         {
             Logger.LogTrace(nameof(CommandsHandler.Created), result, message, objs);
-            return new CommandResult<IEnumerable<T>>(result, message, objs);
+            return new Result<IEnumerable<T>>(result, message, objs);
         }
 
-        protected CommandResult<IEnumerable<T>> Accepted<T>(IEnumerable<T> result, MessageKind? message = null, params object[] objs)
+        protected Result<IEnumerable<T>> Accepted<T>(IEnumerable<T> result, MessageKind? message = null, params object[] objs)
         {
             Logger.LogTrace(nameof(CommandsHandler.Accepted), result, message, objs);
-            return new CommandResult<IEnumerable<T>>(result, message, objs);
+            return new Result<IEnumerable<T>>(result, message, objs);
         }
 
-        protected async Task<CommandResult<T>> ExecuteAsync<T>(Func<Task<CommandResult<T>>> method)
+        protected async Task<Result<T>> ExecuteAsync<T>(Func<Task<Result<T>>> method)
         {
             try
             {
@@ -131,7 +131,7 @@ namespace Sheaft.Application.Handlers
             }
         }
 
-        protected async Task<CommandResult<IEnumerable<T>>> ExecuteAsync<T>(Func<Task<CommandResult<IEnumerable<T>>>> method)
+        protected async Task<Result<IEnumerable<T>>> ExecuteAsync<T>(Func<Task<Result<IEnumerable<T>>>> method)
         {
             try
             {

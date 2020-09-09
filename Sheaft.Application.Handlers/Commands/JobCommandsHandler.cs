@@ -12,27 +12,27 @@ using Sheaft.Services.Interop;
 namespace Sheaft.Application.Handlers
 {
     public class JobCommandsHandler : CommandsHandler,
-        IRequestHandler<CancelJobsCommand, CommandResult<bool>>,
-        IRequestHandler<RetryJobsCommand, CommandResult<bool>>,
-        IRequestHandler<PauseJobsCommand, CommandResult<bool>>,
-        IRequestHandler<ResumeJobsCommand, CommandResult<bool>>,
-        IRequestHandler<ArchiveJobsCommand, CommandResult<bool>>,
-        IRequestHandler<StartJobsCommand, CommandResult<bool>>,
-        IRequestHandler<CompleteJobsCommand, CommandResult<bool>>,
-        IRequestHandler<FailJobsCommand, CommandResult<bool>>,
-        IRequestHandler<CancelJobCommand, CommandResult<bool>>,
-        IRequestHandler<RetryJobCommand, CommandResult<bool>>,
-        IRequestHandler<PauseJobCommand, CommandResult<bool>>,
-        IRequestHandler<ResumeJobCommand, CommandResult<bool>>,
-        IRequestHandler<ArchiveJobCommand, CommandResult<bool>>,
-        IRequestHandler<UnarchiveJobCommand, CommandResult<bool>>,
-        IRequestHandler<StartJobCommand, CommandResult<bool>>,
-        IRequestHandler<CompleteJobCommand, CommandResult<bool>>,
-        IRequestHandler<FailJobCommand, CommandResult<bool>>,
-        IRequestHandler<ResetJobCommand, CommandResult<bool>>,
-        IRequestHandler<DeleteJobCommand, CommandResult<bool>>,
-        IRequestHandler<RestoreJobCommand, CommandResult<bool>>,
-        IRequestHandler<UpdateJobCommand, CommandResult<bool>>
+        IRequestHandler<CancelJobsCommand, Result<bool>>,
+        IRequestHandler<RetryJobsCommand, Result<bool>>,
+        IRequestHandler<PauseJobsCommand, Result<bool>>,
+        IRequestHandler<ResumeJobsCommand, Result<bool>>,
+        IRequestHandler<ArchiveJobsCommand, Result<bool>>,
+        IRequestHandler<StartJobsCommand, Result<bool>>,
+        IRequestHandler<CompleteJobsCommand, Result<bool>>,
+        IRequestHandler<FailJobsCommand, Result<bool>>,
+        IRequestHandler<CancelJobCommand, Result<bool>>,
+        IRequestHandler<RetryJobCommand, Result<bool>>,
+        IRequestHandler<PauseJobCommand, Result<bool>>,
+        IRequestHandler<ResumeJobCommand, Result<bool>>,
+        IRequestHandler<ArchiveJobCommand, Result<bool>>,
+        IRequestHandler<UnarchiveJobCommand, Result<bool>>,
+        IRequestHandler<StartJobCommand, Result<bool>>,
+        IRequestHandler<CompleteJobCommand, Result<bool>>,
+        IRequestHandler<FailJobCommand, Result<bool>>,
+        IRequestHandler<ResetJobCommand, Result<bool>>,
+        IRequestHandler<DeleteJobCommand, Result<bool>>,
+        IRequestHandler<RestoreJobCommand, Result<bool>>,
+        IRequestHandler<UpdateJobCommand, Result<bool>>
     {
         private readonly IAppDbContext _context;
         private readonly IMediator _mediatr;
@@ -49,7 +49,7 @@ namespace Sheaft.Application.Handlers
             _mediatr = mediatr;
         }
 
-        public async Task<CommandResult<bool>> Handle(CancelJobsCommand request,
+        public async Task<Result<bool>> Handle(CancelJobsCommand request,
             CancellationToken token)
         {
             return await ExecuteAsync(async () =>
@@ -69,7 +69,7 @@ namespace Sheaft.Application.Handlers
            });
         }
 
-        public async Task<CommandResult<bool>> Handle(RetryJobsCommand request,
+        public async Task<Result<bool>> Handle(RetryJobsCommand request,
             CancellationToken token)
         {
             return await ExecuteAsync(async () =>
@@ -89,7 +89,7 @@ namespace Sheaft.Application.Handlers
            });
         }
 
-        public async Task<CommandResult<bool>> Handle(PauseJobsCommand request,
+        public async Task<Result<bool>> Handle(PauseJobsCommand request,
             CancellationToken token)
         {
             return await ExecuteAsync(async () =>
@@ -109,7 +109,7 @@ namespace Sheaft.Application.Handlers
            });
         }
 
-        public async Task<CommandResult<bool>> Handle(ArchiveJobsCommand request,
+        public async Task<Result<bool>> Handle(ArchiveJobsCommand request,
             CancellationToken token)
         {
             return await ExecuteAsync(async () =>
@@ -129,7 +129,7 @@ namespace Sheaft.Application.Handlers
            });
         }
 
-        public async Task<CommandResult<bool>> Handle(ResumeJobsCommand request,
+        public async Task<Result<bool>> Handle(ResumeJobsCommand request,
             CancellationToken token)
         {
             return await ExecuteAsync(async () =>
@@ -149,7 +149,7 @@ namespace Sheaft.Application.Handlers
            });
         }
 
-        public async Task<CommandResult<bool>> Handle(StartJobsCommand request,
+        public async Task<Result<bool>> Handle(StartJobsCommand request,
             CancellationToken token)
         {
             return await ExecuteAsync(async () =>
@@ -169,7 +169,7 @@ namespace Sheaft.Application.Handlers
             });
         }
 
-        public async Task<CommandResult<bool>> Handle(CompleteJobsCommand request,
+        public async Task<Result<bool>> Handle(CompleteJobsCommand request,
             CancellationToken token)
         {
             return await ExecuteAsync(async () =>
@@ -189,7 +189,7 @@ namespace Sheaft.Application.Handlers
             });
         }
 
-        public async Task<CommandResult<bool>> Handle(FailJobsCommand request,
+        public async Task<Result<bool>> Handle(FailJobsCommand request,
             CancellationToken token)
         {
             return await ExecuteAsync(async () =>
@@ -209,7 +209,7 @@ namespace Sheaft.Application.Handlers
             });
         }
 
-        public async Task<CommandResult<bool>> Handle(CancelJobCommand request,
+        public async Task<Result<bool>> Handle(CancelJobCommand request,
             CancellationToken token)
         {
             return await ExecuteAsync(async () =>
@@ -223,7 +223,7 @@ namespace Sheaft.Application.Handlers
             });
         }
 
-        public async Task<CommandResult<bool>> Handle(RetryJobCommand request,
+        public async Task<Result<bool>> Handle(RetryJobCommand request,
             CancellationToken token)
         {
             return await ExecuteAsync(async () =>
@@ -240,7 +240,7 @@ namespace Sheaft.Application.Handlers
             });
         }
 
-        public async Task<CommandResult<bool>> Handle(PauseJobCommand request,
+        public async Task<Result<bool>> Handle(PauseJobCommand request,
             CancellationToken token)
         {
             return await ExecuteAsync(async () =>
@@ -254,7 +254,7 @@ namespace Sheaft.Application.Handlers
             });
         }
 
-        public async Task<CommandResult<bool>> Handle(ArchiveJobCommand request,
+        public async Task<Result<bool>> Handle(ArchiveJobCommand request,
             CancellationToken token)
         {
             return await ExecuteAsync(async () =>
@@ -268,7 +268,7 @@ namespace Sheaft.Application.Handlers
             });
         }
 
-        public async Task<CommandResult<bool>> Handle(UnarchiveJobCommand request,
+        public async Task<Result<bool>> Handle(UnarchiveJobCommand request,
             CancellationToken token)
         {
             return await ExecuteAsync(async () =>
@@ -282,7 +282,7 @@ namespace Sheaft.Application.Handlers
             });
         }
 
-        public async Task<CommandResult<bool>> Handle(ResumeJobCommand request,
+        public async Task<Result<bool>> Handle(ResumeJobCommand request,
             CancellationToken token)
         {
             return await ExecuteAsync(async () =>
@@ -296,7 +296,7 @@ namespace Sheaft.Application.Handlers
             });
         }
 
-        public async Task<CommandResult<bool>> Handle(StartJobCommand request,
+        public async Task<Result<bool>> Handle(StartJobCommand request,
             CancellationToken token)
         {
             return await ExecuteAsync(async () =>
@@ -310,7 +310,7 @@ namespace Sheaft.Application.Handlers
             });
         }
 
-        public async Task<CommandResult<bool>> Handle(CompleteJobCommand request,
+        public async Task<Result<bool>> Handle(CompleteJobCommand request,
             CancellationToken token)
         {
             return await ExecuteAsync(async () =>
@@ -326,7 +326,7 @@ namespace Sheaft.Application.Handlers
             });
         }
 
-        public async Task<CommandResult<bool>> Handle(FailJobCommand request,
+        public async Task<Result<bool>> Handle(FailJobCommand request,
             CancellationToken token)
         {
             return await ExecuteAsync(async () =>
@@ -340,7 +340,7 @@ namespace Sheaft.Application.Handlers
             });
         }
 
-        public async Task<CommandResult<bool>> Handle(ResetJobCommand request, CancellationToken token)
+        public async Task<Result<bool>> Handle(ResetJobCommand request, CancellationToken token)
         {
             return await ExecuteAsync(async () =>
             {
@@ -356,7 +356,7 @@ namespace Sheaft.Application.Handlers
             });
         }
 
-        public async Task<CommandResult<bool>> Handle(DeleteJobCommand request, CancellationToken token)
+        public async Task<Result<bool>> Handle(DeleteJobCommand request, CancellationToken token)
         {
             return await ExecuteAsync(async () =>
             {
@@ -368,7 +368,7 @@ namespace Sheaft.Application.Handlers
             });
         }
 
-        public async Task<CommandResult<bool>> Handle(RestoreJobCommand request, CancellationToken token)
+        public async Task<Result<bool>> Handle(RestoreJobCommand request, CancellationToken token)
         {
             return await ExecuteAsync(async () =>
             {
@@ -381,7 +381,7 @@ namespace Sheaft.Application.Handlers
             });
         }
 
-        public async Task<CommandResult<bool>> Handle(UpdateJobCommand request, CancellationToken token)
+        public async Task<Result<bool>> Handle(UpdateJobCommand request, CancellationToken token)
         {
             return await ExecuteAsync(async () =>
             {

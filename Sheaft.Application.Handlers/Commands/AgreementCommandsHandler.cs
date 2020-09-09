@@ -16,15 +16,15 @@ using Microsoft.EntityFrameworkCore;
 namespace Sheaft.Application.Handlers
 {
     public class AgreementCommandsHandler : CommandsHandler,
-        IRequestHandler<CreateAgreementCommand, CommandResult<Guid>>,
-        IRequestHandler<AcceptAgreementCommand, CommandResult<bool>>,
-        IRequestHandler<CancelAgreementsCommand, CommandResult<bool>>,
-        IRequestHandler<CancelAgreementCommand, CommandResult<bool>>,
-        IRequestHandler<RefuseAgreementsCommand, CommandResult<bool>>,
-        IRequestHandler<RefuseAgreementCommand, CommandResult<bool>>,
-        IRequestHandler<DeleteAgreementCommand, CommandResult<bool>>,
-        IRequestHandler<ResetAgreementStatusToCommand, CommandResult<bool>>,
-        IRequestHandler<RestoreAgreementCommand, CommandResult<bool>>
+        IRequestHandler<CreateAgreementCommand, Result<Guid>>,
+        IRequestHandler<AcceptAgreementCommand, Result<bool>>,
+        IRequestHandler<CancelAgreementsCommand, Result<bool>>,
+        IRequestHandler<CancelAgreementCommand, Result<bool>>,
+        IRequestHandler<RefuseAgreementsCommand, Result<bool>>,
+        IRequestHandler<RefuseAgreementCommand, Result<bool>>,
+        IRequestHandler<DeleteAgreementCommand, Result<bool>>,
+        IRequestHandler<ResetAgreementStatusToCommand, Result<bool>>,
+        IRequestHandler<RestoreAgreementCommand, Result<bool>>
     {
         private readonly IMediator _mediatr;
         private readonly IAppDbContext _context;
@@ -41,7 +41,7 @@ namespace Sheaft.Application.Handlers
             _context = context;
         }
 
-        public async Task<CommandResult<Guid>> Handle(CreateAgreementCommand request, CancellationToken token)
+        public async Task<Result<Guid>> Handle(CreateAgreementCommand request, CancellationToken token)
         {
             return await ExecuteAsync(async () =>
             {
@@ -73,7 +73,7 @@ namespace Sheaft.Application.Handlers
             });
         }
 
-        public async Task<CommandResult<bool>> Handle(AcceptAgreementCommand request, CancellationToken token)
+        public async Task<Result<bool>> Handle(AcceptAgreementCommand request, CancellationToken token)
         {
             return await ExecuteAsync(async () =>
             {
@@ -104,7 +104,7 @@ namespace Sheaft.Application.Handlers
             });
         }
 
-        public async Task<CommandResult<bool>> Handle(CancelAgreementsCommand request, CancellationToken token)
+        public async Task<Result<bool>> Handle(CancelAgreementsCommand request, CancellationToken token)
         {
             return await ExecuteAsync(async () =>
             {
@@ -123,7 +123,7 @@ namespace Sheaft.Application.Handlers
             });
         }
 
-        public async Task<CommandResult<bool>> Handle(CancelAgreementCommand request, CancellationToken token)
+        public async Task<Result<bool>> Handle(CancelAgreementCommand request, CancellationToken token)
         {
             return await ExecuteAsync(async () =>
             {
@@ -143,7 +143,7 @@ namespace Sheaft.Application.Handlers
             });
         }
 
-        public async Task<CommandResult<bool>> Handle(RefuseAgreementsCommand request, CancellationToken token)
+        public async Task<Result<bool>> Handle(RefuseAgreementsCommand request, CancellationToken token)
         {
             return await ExecuteAsync(async () =>
             {
@@ -162,7 +162,7 @@ namespace Sheaft.Application.Handlers
             });
         }
 
-        public async Task<CommandResult<bool>> Handle(RefuseAgreementCommand request, CancellationToken token)
+        public async Task<Result<bool>> Handle(RefuseAgreementCommand request, CancellationToken token)
         {
             return await ExecuteAsync(async () =>
             {
@@ -182,7 +182,7 @@ namespace Sheaft.Application.Handlers
             });
         }
 
-        public async Task<CommandResult<bool>> Handle(DeleteAgreementCommand request, CancellationToken token)
+        public async Task<Result<bool>> Handle(DeleteAgreementCommand request, CancellationToken token)
         {
             return await ExecuteAsync(async () =>
             {
@@ -195,7 +195,7 @@ namespace Sheaft.Application.Handlers
             });
         }
 
-        public async Task<CommandResult<bool>> Handle(ResetAgreementStatusToCommand request, CancellationToken token)
+        public async Task<Result<bool>> Handle(ResetAgreementStatusToCommand request, CancellationToken token)
         {
             return await ExecuteAsync(async () =>
             {
@@ -209,7 +209,7 @@ namespace Sheaft.Application.Handlers
             });
         }
 
-        public async Task<CommandResult<bool>> Handle(RestoreAgreementCommand request, CancellationToken token)
+        public async Task<Result<bool>> Handle(RestoreAgreementCommand request, CancellationToken token)
         {
             return await ExecuteAsync(async () =>
             {

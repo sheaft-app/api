@@ -22,10 +22,10 @@ using Microsoft.Extensions.Logging;
 namespace Sheaft.Application.Handlers
 {
     public class TagCommandsHandler : CommandsHandler,
-        IRequestHandler<CreateTagCommand, CommandResult<Guid>>,
-        IRequestHandler<UpdateTagCommand, CommandResult<bool>>,
-        IRequestHandler<DeleteTagCommand, CommandResult<bool>>,
-        IRequestHandler<RestoreTagCommand, CommandResult<bool>>
+        IRequestHandler<CreateTagCommand, Result<Guid>>,
+        IRequestHandler<UpdateTagCommand, Result<bool>>,
+        IRequestHandler<DeleteTagCommand, Result<bool>>,
+        IRequestHandler<RestoreTagCommand, Result<bool>>
     {
         private readonly IAppDbContext _context;
         private readonly IBlobService _blobsService;
@@ -45,7 +45,7 @@ namespace Sheaft.Application.Handlers
             _context = context;
         }
 
-        public async Task<CommandResult<Guid>> Handle(CreateTagCommand request, CancellationToken token)
+        public async Task<Result<Guid>> Handle(CreateTagCommand request, CancellationToken token)
         {
             return await ExecuteAsync(async () =>
             {
@@ -58,7 +58,7 @@ namespace Sheaft.Application.Handlers
             });
         }
 
-        public async Task<CommandResult<bool>> Handle(UpdateTagCommand request, CancellationToken token)
+        public async Task<Result<bool>> Handle(UpdateTagCommand request, CancellationToken token)
         {
             return await ExecuteAsync(async () =>
             {
@@ -77,7 +77,7 @@ namespace Sheaft.Application.Handlers
             });
         }
 
-        public async Task<CommandResult<bool>> Handle(DeleteTagCommand request, CancellationToken token)
+        public async Task<Result<bool>> Handle(DeleteTagCommand request, CancellationToken token)
         {
             return await ExecuteAsync(async () =>
             {
@@ -90,7 +90,7 @@ namespace Sheaft.Application.Handlers
             });
         }
 
-        public async Task<CommandResult<bool>> Handle(RestoreTagCommand request, CancellationToken token)
+        public async Task<Result<bool>> Handle(RestoreTagCommand request, CancellationToken token)
         {
             return await ExecuteAsync(async () =>
             {
@@ -137,7 +137,7 @@ namespace Sheaft.Application.Handlers
                     if (!compImage.Success)
                         throw compImage.Exception ?? new BadRequestException();
 
-                    return compImage.Result;
+                    return compImage.Data;
                 }
             }
         }

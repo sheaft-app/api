@@ -30,17 +30,17 @@ using SixLabors.ImageSharp.Processing;
 namespace Sheaft.Application.Handlers
 {
     public class ProductCommandsHandler : CommandsHandler,
-        IRequestHandler<CreateProductCommand, CommandResult<Guid>>,
-        IRequestHandler<UpdateProductCommand, CommandResult<bool>>,
-        IRequestHandler<SetProductAvailabilityCommand, CommandResult<bool>>,
-        IRequestHandler<SetProductsAvailabilityCommand, CommandResult<bool>>,
-        IRequestHandler<RateProductCommand, CommandResult<bool>>,
-        IRequestHandler<DeleteProductsCommand, CommandResult<bool>>,
-        IRequestHandler<DeleteProductCommand, CommandResult<bool>>,
-        IRequestHandler<QueueImportProductsCommand, CommandResult<Guid>>,
-        IRequestHandler<ImportProductsCommand, CommandResult<bool>>,
-        IRequestHandler<UpdateProductPictureCommand, CommandResult<bool>>,
-        IRequestHandler<RestoreProductCommand, CommandResult<bool>>
+        IRequestHandler<CreateProductCommand, Result<Guid>>,
+        IRequestHandler<UpdateProductCommand, Result<bool>>,
+        IRequestHandler<SetProductAvailabilityCommand, Result<bool>>,
+        IRequestHandler<SetProductsAvailabilityCommand, Result<bool>>,
+        IRequestHandler<RateProductCommand, Result<bool>>,
+        IRequestHandler<DeleteProductsCommand, Result<bool>>,
+        IRequestHandler<DeleteProductCommand, Result<bool>>,
+        IRequestHandler<QueueImportProductsCommand, Result<Guid>>,
+        IRequestHandler<ImportProductsCommand, Result<bool>>,
+        IRequestHandler<UpdateProductPictureCommand, Result<bool>>,
+        IRequestHandler<RestoreProductCommand, Result<bool>>
     {
         private readonly IAppDbContext _context;
         private readonly IMediator _mediatr;
@@ -66,7 +66,7 @@ namespace Sheaft.Application.Handlers
             _imageService = imageService;
         }
 
-        public async Task<CommandResult<Guid>> Handle(CreateProductCommand request, CancellationToken token)
+        public async Task<Result<Guid>> Handle(CreateProductCommand request, CancellationToken token)
         {
             return await ExecuteAsync(async () =>
             {
@@ -83,7 +83,7 @@ namespace Sheaft.Application.Handlers
                     if (!result.Success)
                         return Failed<Guid>(result.Exception);
 
-                    request.Reference = result.Result;
+                    request.Reference = result.Data;
                 }
 
                 var entity = new Product(Guid.NewGuid(), request.Reference, request.Name, request.WholeSalePricePerUnit, request.Unit, request.QuantityPerUnit, request.Vat, producer);
@@ -112,7 +112,7 @@ namespace Sheaft.Application.Handlers
             });
         }
 
-        public async Task<CommandResult<bool>> Handle(UpdateProductCommand request, CancellationToken token)
+        public async Task<Result<bool>> Handle(UpdateProductCommand request, CancellationToken token)
         {
             return await ExecuteAsync(async () =>
             {
@@ -152,7 +152,7 @@ namespace Sheaft.Application.Handlers
             });
         }
 
-        public async Task<CommandResult<bool>> Handle(RateProductCommand request, CancellationToken token)
+        public async Task<Result<bool>> Handle(RateProductCommand request, CancellationToken token)
         {
             return await ExecuteAsync(async () =>
             {
@@ -171,7 +171,7 @@ namespace Sheaft.Application.Handlers
             });
         }
 
-        public async Task<CommandResult<bool>> Handle(SetProductsAvailabilityCommand request, CancellationToken token)
+        public async Task<Result<bool>> Handle(SetProductsAvailabilityCommand request, CancellationToken token)
         {
             return await ExecuteAsync(async () =>
             {
@@ -190,7 +190,7 @@ namespace Sheaft.Application.Handlers
             });
         }
 
-        public async Task<CommandResult<bool>> Handle(SetProductAvailabilityCommand request, CancellationToken token)
+        public async Task<Result<bool>> Handle(SetProductAvailabilityCommand request, CancellationToken token)
         {
             return await ExecuteAsync(async () =>
             {
@@ -205,7 +205,7 @@ namespace Sheaft.Application.Handlers
             });
         }
 
-        public async Task<CommandResult<bool>> Handle(DeleteProductsCommand request, CancellationToken token)
+        public async Task<Result<bool>> Handle(DeleteProductsCommand request, CancellationToken token)
         {
             return await ExecuteAsync(async () =>
             {
@@ -224,7 +224,7 @@ namespace Sheaft.Application.Handlers
             });
         }
 
-        public async Task<CommandResult<bool>> Handle(DeleteProductCommand request, CancellationToken token)
+        public async Task<Result<bool>> Handle(DeleteProductCommand request, CancellationToken token)
         {
             return await ExecuteAsync(async () =>
             {
@@ -239,7 +239,7 @@ namespace Sheaft.Application.Handlers
             });
         }
 
-        public async Task<CommandResult<Guid>> Handle(QueueImportProductsCommand request, CancellationToken token)
+        public async Task<Result<Guid>> Handle(QueueImportProductsCommand request, CancellationToken token)
         {
             return await ExecuteAsync(async () =>
             {
@@ -250,7 +250,7 @@ namespace Sheaft.Application.Handlers
                 if (!response.Success)
                     return Failed<Guid>(response.Exception);
 
-                entity.SetCommand(new ImportProductsCommand(request.RequestUser) { Id = entity.Id, Uri = response.Result });
+                entity.SetCommand(new ImportProductsCommand(request.RequestUser) { Id = entity.Id, Uri = response.Data });
 
                 await _context.AddAsync(entity, token);
                 await _context.SaveChangesAsync(token);
@@ -262,7 +262,7 @@ namespace Sheaft.Application.Handlers
             });
         }
 
-        public async Task<CommandResult<bool>> Handle(ImportProductsCommand request, CancellationToken token)
+        public async Task<Result<bool>> Handle(ImportProductsCommand request, CancellationToken token)
         {
             return await ExecuteAsync(async () =>
             {
@@ -283,7 +283,7 @@ namespace Sheaft.Application.Handlers
                         if (!data.Success)
                             throw data.Exception;
 
-                        await data.Result.CopyToAsync(stream, token);
+                        await data.Data.CopyToAsync(stream, token);
                         stream.Position = 0;
 
                         using (var package = new ExcelPackage(stream))
@@ -300,7 +300,7 @@ namespace Sheaft.Application.Handlers
                                     if (!command.Success)
                                         throw command.Exception;
 
-                                    var productResult = await _mediatr.Send(command.Result, token);
+                                    var productResult = await _mediatr.Send(command.Data, token);
                                     if (!productResult.Success)
                                         throw productResult.Exception;
                                 }
@@ -328,7 +328,7 @@ namespace Sheaft.Application.Handlers
             });
         }
 
-        public async Task<CommandResult<bool>> Handle(UpdateProductPictureCommand request, CancellationToken token)
+        public async Task<Result<bool>> Handle(UpdateProductPictureCommand request, CancellationToken token)
         {
             return await ExecuteAsync(async () =>
             {
@@ -345,7 +345,7 @@ namespace Sheaft.Application.Handlers
             });
         }
 
-        public async Task<CommandResult<bool>> Handle(RestoreProductCommand request, CancellationToken token)
+        public async Task<Result<bool>> Handle(RestoreProductCommand request, CancellationToken token)
         {
             return await ExecuteAsync(async () =>
             {
@@ -362,7 +362,7 @@ namespace Sheaft.Application.Handlers
 
         #region Product implementation
 
-        private async Task<CommandResult<CreateProductCommand>> CreateProductCommandFromRowDatasAsync(ExcelWorksheet worksheet,
+        private async Task<Result<CreateProductCommand>> CreateProductCommandFromRowDatasAsync(ExcelWorksheet worksheet,
             ImportProductsCommand request, int i, CancellationToken token)
         {
             var nameStr = worksheet.Cells[i, 2].GetValue<string>();

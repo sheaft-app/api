@@ -15,10 +15,10 @@ namespace Sheaft.Application.Handlers
 {
 
     public class LevelCommandsHandler : CommandsHandler,
-        IRequestHandler<CreateLevelCommand, CommandResult<Guid>>,
-        IRequestHandler<UpdateLevelCommand, CommandResult<bool>>,
-        IRequestHandler<DeleteLevelCommand, CommandResult<bool>>,
-        IRequestHandler<RestoreLevelCommand, CommandResult<bool>>
+        IRequestHandler<CreateLevelCommand, Result<Guid>>,
+        IRequestHandler<UpdateLevelCommand, Result<bool>>,
+        IRequestHandler<DeleteLevelCommand, Result<bool>>,
+        IRequestHandler<RestoreLevelCommand, Result<bool>>
     {
         private readonly IAppDbContext _context;
 
@@ -29,7 +29,7 @@ namespace Sheaft.Application.Handlers
             _context = context;
         }
 
-        public async Task<CommandResult<Guid>> Handle(CreateLevelCommand request, CancellationToken token)
+        public async Task<Result<Guid>> Handle(CreateLevelCommand request, CancellationToken token)
         {
             return await ExecuteAsync(async () =>
             {
@@ -42,7 +42,7 @@ namespace Sheaft.Application.Handlers
             });
         }
 
-        public async Task<CommandResult<bool>> Handle(UpdateLevelCommand request, CancellationToken token)
+        public async Task<Result<bool>> Handle(UpdateLevelCommand request, CancellationToken token)
         {
             return await ExecuteAsync(async () =>
             {
@@ -57,7 +57,7 @@ namespace Sheaft.Application.Handlers
             });
         }
 
-        public async Task<CommandResult<bool>> Handle(DeleteLevelCommand request, CancellationToken token)
+        public async Task<Result<bool>> Handle(DeleteLevelCommand request, CancellationToken token)
         {
             return await ExecuteAsync(async () =>
             {
@@ -71,7 +71,7 @@ namespace Sheaft.Application.Handlers
             });
         }
 
-        public async Task<CommandResult<bool>> Handle(RestoreLevelCommand request, CancellationToken token)
+        public async Task<Result<bool>> Handle(RestoreLevelCommand request, CancellationToken token)
         {
             return await ExecuteAsync(async () =>
             {

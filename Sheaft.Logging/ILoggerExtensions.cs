@@ -8,10 +8,10 @@ namespace Sheaft.Logging
 {
     public static class ILoggerExtensions
     {
-        public static void LogCommand<T>(this ILogger logger, CommandResult<T> command)
+        public static void LogCommand<T>(this ILogger logger, Result<T> command)
         {
             var args = command.Params?.ToList() ?? new List<object>();
-            args.Add(command.Result);
+            args.Add(command.Data);
             var datas = args.ToArray();
 
             if (!command.Success)

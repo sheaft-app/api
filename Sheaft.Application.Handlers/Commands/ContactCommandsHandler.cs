@@ -18,7 +18,7 @@ using Microsoft.Extensions.Logging;
 namespace Sheaft.Application.Handlers
 {
     public class ContactCommandsHandler : CommandsHandler,
-        IRequestHandler<CreateContactCommand, CommandResult<bool>>
+        IRequestHandler<CreateContactCommand, Result<bool>>
     {
         private readonly SendgridOptions _sendgridOptions;
         private readonly HttpClient _httpClient;
@@ -35,7 +35,7 @@ namespace Sheaft.Application.Handlers
             _httpClient.SetToken("Bearer", _sendgridOptions.ApiKey);
         }
 
-        public async Task<CommandResult<bool>> Handle(CreateContactCommand request, CancellationToken token)
+        public async Task<Result<bool>> Handle(CreateContactCommand request, CancellationToken token)
         {
             return await ExecuteAsync(async () =>
             {                
