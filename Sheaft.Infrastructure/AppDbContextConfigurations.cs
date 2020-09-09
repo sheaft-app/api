@@ -65,6 +65,9 @@ namespace Sheaft.Infrastructure
             modelBuilder.Entity<CardPayment>().HasBaseType<PaymentMethod>();
             modelBuilder.Entity<TransferPayment>().HasBaseType<PaymentMethod>();
 
+            modelBuilder.Entity<OrderTransaction>().HasBaseType<Transaction>();
+            modelBuilder.Entity<PurchaseTransaction>().HasBaseType<Transaction>();
+
             modelBuilder.ApplyConfiguration(new UserConfiguration());
             modelBuilder.ApplyConfiguration(new ProducerConfiguration());
             modelBuilder.ApplyConfiguration(new ProducerTagConfiguration());
@@ -97,6 +100,9 @@ namespace Sheaft.Infrastructure
             modelBuilder.ApplyConfiguration(new CardPaymentConfiguration());
             modelBuilder.ApplyConfiguration(new WalletConfiguration());
             modelBuilder.ApplyConfiguration(new DocumentConfiguration());
+            modelBuilder.ApplyConfiguration(new TransactionConfiguration());
+            modelBuilder.ApplyConfiguration(new OrderTransactionConfiguration());
+            modelBuilder.ApplyConfiguration(new PurchaseTransactionConfiguration());
         }
     }
 }

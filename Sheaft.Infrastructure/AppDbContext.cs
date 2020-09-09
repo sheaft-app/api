@@ -45,6 +45,7 @@ namespace Sheaft.Infrastructure
         public DbSet<Region> Regions { get; set; }
         public DbSet<Reward> Rewards { get; set; }
         public DbSet<Tag> Tags { get; set; }
+        public DbSet<Transaction> Transactions { get; set; }
         public DbSet<User> Users { get; set; }
 
         public DbSet<DepartmentProducers> DepartmentProducers { get; set; }

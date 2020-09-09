@@ -12,6 +12,7 @@ namespace Sheaft.Domain.Models
         private const int DIGITS_COUNT = 2;
 
         private List<PurchaseOrderProduct> _products;
+        private List<PurchaseTransaction> _transactions;
 
         protected PurchaseOrder()
         {
@@ -28,6 +29,7 @@ namespace Sheaft.Domain.Models
             Id = id;
 
             _products = new List<PurchaseOrderProduct>();
+            _transactions = new List<PurchaseTransaction>();
 
             SetSender(sender);
             SetVendor(vendor);
@@ -58,6 +60,10 @@ namespace Sheaft.Domain.Models
         public virtual IReadOnlyCollection<PurchaseOrderProduct> Products
         {
             get => _products?.AsReadOnly();
+        }
+        public virtual IReadOnlyCollection<PurchaseTransaction> Transactions
+        {
+            get => _transactions?.AsReadOnly();
         }
 
         public void SetReference(string newReference)
