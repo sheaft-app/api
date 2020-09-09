@@ -14,7 +14,7 @@ namespace Sheaft.Mappers
                 .ForMember(c => c.Level, opt => opt.MapFrom(o => o.Level));
 
             CreateMap<Department, DepartmentViewModel>()
-                .ForMember(c => c.Level, opt => opt.MapFrom(o => $"{o.Level.Number} - {o.Level.Name}"));
+                .ForMember(c => c.Level, opt => opt.MapFrom(o => o.Level.Name));
         }
     }
 }

@@ -48,16 +48,5 @@ namespace Sheaft.Application.Queries
                 return new List<RegionDto>().AsQueryable();
             }
         }
-
-        private static IQueryable<RegionDto> GetAsDto(IQueryable<Region> query)
-        {
-            return query
-                .Select(c => new RegionDto
-                {
-                    Id = c.Id,
-                    Code = c.Code,
-                    Name = c.Name
-                });
-        }
     }
 }

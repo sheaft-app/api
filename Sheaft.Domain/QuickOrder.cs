@@ -93,5 +93,14 @@ namespace Sheaft.Domain.Models
 
             _products.Remove(productLine);
         }
+
+        public void Remove()
+        {
+        }
+
+        public void Restore()
+        {
+            RemovedOn = null;
+        }
     }
 }

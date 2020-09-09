@@ -76,6 +76,10 @@ namespace Sheaft.Domain.Models
             OnSalePrice = Math.Round(WholeSalePrice + VatPrice, DIGITS_COUNT);
         }
 
+        public void Remove()
+        {
+        }
+
         public void Restore()
         {
             RemovedOn = null;

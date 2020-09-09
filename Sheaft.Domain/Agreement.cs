@@ -83,6 +83,10 @@ namespace Sheaft.Domain.Models
             Reason = reason;
         }
 
+        public void Remove()
+        {
+        }
+
         public void Restore()
         {
             RemovedOn = null;

@@ -283,9 +283,6 @@ namespace Sheaft.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("Number")
-                        .HasColumnType("int");
-
                     b.Property<DateTimeOffset?>("RemovedOn")
                         .HasColumnType("datetimeoffset");
 
@@ -299,9 +296,6 @@ namespace Sheaft.Infrastructure.Migrations
                     b.HasKey("Uid");
 
                     b.HasIndex("Id")
-                        .IsUnique();
-
-                    b.HasIndex("Number")
                         .IsUnique();
 
                     b.HasIndex("Uid", "Id", "CreatedOn");

@@ -11,7 +11,7 @@ using Sheaft.Interop.Enums;
 namespace Sheaft.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20200908124503_InitDatabase")]
+    [Migration("20200909074612_InitDatabase")]
     partial class InitDatabase
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -285,9 +285,6 @@ namespace Sheaft.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("Number")
-                        .HasColumnType("int");
-
                     b.Property<DateTimeOffset?>("RemovedOn")
                         .HasColumnType("datetimeoffset");
 
@@ -301,9 +298,6 @@ namespace Sheaft.Infrastructure.Migrations
                     b.HasKey("Uid");
 
                     b.HasIndex("Id")
-                        .IsUnique();
-
-                    b.HasIndex("Number")
                         .IsUnique();
 
                     b.HasIndex("Uid", "Id", "CreatedOn");

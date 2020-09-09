@@ -62,39 +62,5 @@ namespace Sheaft.Application.Queries
                 return new List<DepartmentDto>().AsQueryable();
             }
         }
-
-        private static IQueryable<DepartmentDto> GetAsDto(IQueryable<Department> query)
-        {
-            return query
-                .Select(c => new DepartmentDto
-                {
-                    Id = c.Id,
-                    Code = c.Code,
-                    Name = c.Name,
-                    Level = new LevelDto
-                    {
-                        Id = c.Level.Id,
-                        UpdatedOn = c.Level.UpdatedOn,
-                        CreatedOn = c.Level.CreatedOn,
-                        Number = c.Level.Number,
-                        Name = c.Level.Name,
-                        RequiredPoints = c.Level.RequiredPoints,
-                        Rewards = c.Level.Rewards.Select(r =>
-                            new RewardDto
-                            {
-                                Id = r.Id,
-                                Contact = r.Contact,
-                                CreatedOn = r.CreatedOn,
-                                Description = r.Description,
-                                Email = r.Email,
-                                Image = r.Image,
-                                Name = r.Name,
-                                Phone = r.Phone,
-                                UpdatedOn = r.UpdatedOn,
-                                Url = r.Url
-                            })
-                    }
-                });
-        }
     }
 }

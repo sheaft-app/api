@@ -11,7 +11,6 @@ namespace Sheaft.Models.ViewModels
         public DateTimeOffset? UpdatedOn { get; set; }
         public DateTimeOffset? RemovedOn { get; set; }
         public string Name { get; set; }
-        public int Number { get; set; }
         public int RequiredPoints { get; set; }
         public IEnumerable<LevelRewardViewModel> Rewards { get; set; }
     }
