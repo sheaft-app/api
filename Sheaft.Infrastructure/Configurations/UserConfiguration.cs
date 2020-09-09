@@ -38,6 +38,7 @@ namespace Sheaft.Infrastructure
             });
 
             entity.HasMany<Sponsoring>().WithOne(c => c.Sponsor).HasForeignKey("SponsorUid").OnDelete(DeleteBehavior.NoAction);
+            entity.HasMany(c => c.PaymentMethods).WithOne().HasForeignKey("UserUid").OnDelete(DeleteBehavior.Cascade);
 
             entity.OwnsMany(c => c.Points, p =>
             {
@@ -46,8 +47,11 @@ namespace Sheaft.Infrastructure
                 p.ToTable("UserPoints");
             });
 
-            var points = entity.Metadata.FindNavigation(nameof(Consumer.Points));
+            var points = entity.Metadata.FindNavigation(nameof(User.Points));
             points.SetPropertyAccessMode(PropertyAccessMode.Field);
+
+            var payments = entity.Metadata.FindNavigation(nameof(User.PaymentMethods));
+            payments.SetPropertyAccessMode(PropertyAccessMode.Field);
 
             entity.HasKey("Uid");
 

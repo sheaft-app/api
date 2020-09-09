@@ -31,7 +31,6 @@ namespace Sheaft.Infrastructure
             _localizer = localizer;
         }
 
-        public DbSet<User> Users { get; set; }
         public DbSet<Agreement> Agreements { get; set; }
         public DbSet<DeliveryMode> DeliveryModes { get; set; }
         public DbSet<Department> Departments { get; set; }
@@ -41,10 +40,12 @@ namespace Sheaft.Infrastructure
         public DbSet<Notification> Notifications { get; set; }
         public DbSet<PurchaseOrder> PurchaseOrders { get; set; }
         public DbSet<Packaging> Packagings { get; set; }
+        public DbSet<PaymentMethod> PaymentMethods { get; set; }
         public DbSet<Product> Products { get; set; }
         public DbSet<QuickOrder> QuickOrders { get; set; }
         public DbSet<Region> Regions { get; set; }
         public DbSet<Tag> Tags { get; set; }
+        public DbSet<User> Users { get; set; }
 
         public DbSet<DepartmentProducers> DepartmentProducers { get; set; }
         public DbSet<DepartmentStores> DepartmentStores { get; set; }
