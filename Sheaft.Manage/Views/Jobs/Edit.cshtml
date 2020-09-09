@@ -7,7 +7,7 @@
         <h2 class="display-4">Job details @(Model.RemovedOn.HasValue ? "(removed)":"")</h2>
         <br />
 
-        @if (Model.Status == ProcessStatusKind.Expired)
+        @if (Model.Status == ProcessStatus.Expired)
         {
             @using (Html.BeginForm("Retry", "Jobs", new { id = Model.Id }, FormMethod.Post))
             {
@@ -15,7 +15,7 @@
                 <button type="submit" class="btn btn-outline-info">Retry</button>
             }
         }
-        @if (Model.Status == ProcessStatusKind.Done)
+        @if (Model.Status == ProcessStatus.Done)
         {
             @using (Html.BeginForm("Archive", "Jobs", new { id = Model.Id }, FormMethod.Post))
             {
@@ -31,7 +31,7 @@
                 <button type="submit" class="btn btn-outline-dark">Unarchive</button>
             }
         }
-        @if (Model.Status == ProcessStatusKind.Processing)
+        @if (Model.Status == ProcessStatus.Processing)
         {
             @using (Html.BeginForm("Pause", "Jobs", new { id = Model.Id }, FormMethod.Post))
             {
@@ -39,7 +39,7 @@
                 <button type="submit" class="btn btn-outline-warning">Pause</button>
             }
         }
-        @if (Model.Status == ProcessStatusKind.Paused)
+        @if (Model.Status == ProcessStatus.Paused)
         {
             @using (Html.BeginForm("Resume", "Jobs", new { id = Model.Id }, FormMethod.Post))
             {
@@ -47,7 +47,7 @@
                 <button type="submit" class="btn btn-outline-success">Resume</button>
             }
         }
-        @if (Model.Status != ProcessStatusKind.Waiting && Model.Status != ProcessStatusKind.Processing)
+        @if (Model.Status != ProcessStatus.Waiting && Model.Status != ProcessStatus.Processing)
         {
             @using (Html.BeginForm("Reset", "Jobs", new { id = Model.Id }, FormMethod.Post))
             {
@@ -55,7 +55,7 @@
                 <button type="submit" class="btn btn-outline-danger">Reset</button>
             }
         }
-        @if (Model.Status != ProcessStatusKind.Cancelled && Model.Status != ProcessStatusKind.Failed)
+        @if (Model.Status != ProcessStatus.Cancelled && Model.Status != ProcessStatus.Failed)
         {
             @using (Html.BeginForm("Cancel", "Jobs", new { id = Model.Id }, FormMethod.Post))
             {
