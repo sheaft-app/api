@@ -23,6 +23,7 @@ namespace Sheaft.Infrastructure
             entity.Property(o => o.TotalWeight).HasColumnType("decimal(10,2)");
 
             entity.HasMany(o => o.Products).WithOne().HasForeignKey("PurchaseOrderUid").OnDelete(DeleteBehavior.Cascade);
+            entity.HasMany(o => o.Transactions).WithOne().HasForeignKey("PurchaseOrderUid").OnDelete(DeleteBehavior.Cascade);
             entity.HasOne(c => c.Vendor).WithOne().HasForeignKey<PurchaseOrder>("PurchaseOrderVendorUid").OnDelete(DeleteBehavior.Cascade);
             entity.HasOne(c => c.Sender).WithOne().HasForeignKey<PurchaseOrder>("PurchaseOrderSenderUid").OnDelete(DeleteBehavior.Cascade);
 
@@ -38,6 +39,9 @@ namespace Sheaft.Infrastructure
 
             var products = entity.Metadata.FindNavigation(nameof(PurchaseOrder.Products));
             products.SetPropertyAccessMode(PropertyAccessMode.Field);
+
+            var transactions = entity.Metadata.FindNavigation(nameof(PurchaseOrder.Transactions));
+            transactions.SetPropertyAccessMode(PropertyAccessMode.Field);
 
             entity.HasKey("Uid");
 

@@ -50,6 +50,34 @@ namespace Sheaft.GraphQL.Enums
             descriptor.Value(DocumentKind.ShareholderProof).Name("SHAREHOLDER_PROOF");
         }
     }
+    public class TransactionKindEnumType : EnumType<TransactionKind>
+    {
+        protected override void Configure(IEnumTypeDescriptor<TransactionKind> descriptor)
+        {
+            descriptor.Value(TransactionKind.Payin).Name("PAYIN");
+            descriptor.Value(TransactionKind.Payout).Name("PAYOUT");
+            descriptor.Value(TransactionKind.Transfer).Name("TRANSFER");
+        }
+    }
+    public class TransactionStatusEnumType : EnumType<TransactionStatus>
+    {
+        protected override void Configure(IEnumTypeDescriptor<TransactionStatus> descriptor)
+        {
+            descriptor.Value(TransactionStatus.Created).Name("CREATED");
+            descriptor.Value(TransactionStatus.Failed).Name("FAILED");
+            descriptor.Value(TransactionStatus.Succeeded).Name("SUCCEEDED");
+        }
+    }
+    public class TransactionNatureEnumType : EnumType<TransactionNature>
+    {
+        protected override void Configure(IEnumTypeDescriptor<TransactionNature> descriptor)
+        {
+            descriptor.Value(TransactionNature.Refund).Name("REFUND");
+            descriptor.Value(TransactionNature.Regular).Name("REGULAR");
+            descriptor.Value(TransactionNature.Repudiation).Name("REPUDIATION");
+            descriptor.Value(TransactionNature.Settlement).Name("SETTLEMENT");
+        }
+    }
     public class PaymentKindEnumType : EnumType<PaymentKind>
     {
         protected override void Configure(IEnumTypeDescriptor<PaymentKind> descriptor)

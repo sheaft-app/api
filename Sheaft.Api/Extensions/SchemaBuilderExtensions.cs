@@ -64,6 +64,9 @@ namespace Sheaft.Api
             services.AddType<WalletKindEnumType>();
             services.AddType<ValidationStatusEnumType>();
             services.AddType<DocumentKindEnumType>();
+            services.AddType<TransactionKindEnumType>();
+            services.AddType<TransactionStatusEnumType>();
+            services.AddType<TransactionNatureEnumType>();
 
             services.AddType<CreateAgreementInputType>();
             services.AddType<CreatePurchaseOrderInputType>();

@@ -30,6 +30,7 @@ namespace Sheaft.Infrastructure.Interop
         DbSet<Region> Regions { get; set; }
         DbSet<Reward> Rewards { get; set; }
         DbSet<Tag> Tags { get; set; }
+        DbSet<Transaction> Transactions { get; set; }
         DbSet<User> Users { get; set; }
 
         DbSet<CountryPoints> CountryPoints { get; set; }

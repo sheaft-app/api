@@ -7,6 +7,7 @@ namespace Sheaft.Domain.Models
     public class Order : IEntity
     {
         private List<PurchaseOrder> _purchaseOrders;
+        private List<OrderTransaction> _transactions;
 
         protected Order()
         {
@@ -14,6 +15,10 @@ namespace Sheaft.Domain.Models
 
         public Order(Guid id)
         {
+            Id = id;
+
+            _purchaseOrders = new List<PurchaseOrder>();
+            _transactions = new List<OrderTransaction>();
         }
 
         public Guid Id { get; }
@@ -30,6 +35,11 @@ namespace Sheaft.Domain.Models
         public virtual IReadOnlyCollection<PurchaseOrder> PurchaseOrders
         {
             get => _purchaseOrders?.AsReadOnly();
+        }
+
+        public virtual IReadOnlyCollection<OrderTransaction> Transactions
+        {
+            get => _transactions?.AsReadOnly();
         }
 
         public void Remove()
