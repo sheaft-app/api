@@ -143,7 +143,8 @@ namespace Sheaft.GraphQL.Types
             descriptor.Field(c => c.Latitude);
             descriptor.Field(c => c.Zipcode);
             descriptor.Field(c => c.City);
-            descriptor.Field(c => c.Country);
+            descriptor.Field(c => c.Country)
+                .Type<NonNullType<CountryIsoCodeEnumType>>();
         }
     }
     public class OwnerType : ObjectType<OwnerDto>

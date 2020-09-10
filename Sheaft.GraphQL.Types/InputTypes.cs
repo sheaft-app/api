@@ -243,9 +243,10 @@ namespace Sheaft.GraphQL.Types
         protected override void Configure(IInputObjectTypeDescriptor<SetCompanyLegalsInput> descriptor)
         {
             descriptor.Field(c => c.Birthdate);
-            descriptor.Field(c => c.CountryOfResidence);
-            descriptor.Field(c => c.Legal);
             descriptor.Field(c => c.Id);
+
+            descriptor.Field(c => c.Legal)
+                .Type<NonNullType<LegalKindEnumType>>();
 
             descriptor.Field(c => c.CountryOfResidence)
                 .Type<NonNullType<CountryIsoCodeEnumType>>();
@@ -265,7 +266,6 @@ namespace Sheaft.GraphQL.Types
         protected override void Configure(IInputObjectTypeDescriptor<SetConsumerLegalsInput> descriptor)
         {
             descriptor.Field(c => c.Birthdate);
-            descriptor.Field(c => c.CountryOfResidence);
             descriptor.Field(c => c.Id);
 
             descriptor.Field(c => c.CountryOfResidence)
@@ -606,6 +606,9 @@ namespace Sheaft.GraphQL.Types
 
             descriptor.Field(c => c.City)
                 .Type<NonNullType<StringType>>();
+
+            descriptor.Field(c => c.Country)
+                .Type<NonNullType<CountryIsoCodeEnumType>>();
         }
     }
 }
