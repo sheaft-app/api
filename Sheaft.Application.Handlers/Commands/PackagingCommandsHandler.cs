@@ -62,8 +62,8 @@ namespace Sheaft.Application.Handlers
             return await ExecuteAsync(async () =>
             {
                 var entity = await _context.GetByIdAsync<Packaging>(request.Id, token);
-
                 _context.Remove(entity);
+
                 var results = await _context.SaveChangesAsync(token);
 
                 using (var transaction = await _context.Database.BeginTransactionAsync(token))
@@ -80,10 +80,9 @@ namespace Sheaft.Application.Handlers
         {
             return await ExecuteAsync(async () =>
             {
-                var entity = await _context.Packagings.SingleOrDefaultAsync(a => a.Id == request.Id && a.RemovedOn.HasValue, token);
-                entity.Restore();
+                var entity = await _context.Packagings.SingleOrDefaultAsync(a => a.Id == request.Id && a.RemovedOn.HasValue, token);                
+                _context.Restore(entity);
 
-                _context.Update(entity);
                 return Ok(await _context.SaveChangesAsync(token) > 0);
             });
         }

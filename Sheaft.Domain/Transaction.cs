@@ -33,14 +33,5 @@ namespace Sheaft.Domain.Models
         public virtual Wallet CreditedWallet { get; set; }
         public virtual Wallet DebitedWallet { get; set; }
         public virtual User Author { get; set; }
-
-        public void Remove()
-        {
-        }
-
-        public void Restore()
-        {
-            RemovedOn = null;
-        }
     }
 }

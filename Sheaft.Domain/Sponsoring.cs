@@ -25,14 +25,5 @@ namespace Sheaft.Domain.Models
         public DateTimeOffset? RemovedOn { get; private set; }
         public virtual User Sponsor { get; private set; }
         public virtual User Sponsored { get; private set; }
-
-        public void Remove()
-        {
-        }
-
-        public void Restore()
-        {
-            RemovedOn = null;
-        }
     }
 }

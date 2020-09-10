@@ -14,6 +14,7 @@ using System.Linq.Expressions;
 using Microsoft.Extensions.Localization;
 using Sheaft.Localization;
 using Microsoft.Extensions.Logging;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 
 namespace Sheaft.Infrastructure
 {
@@ -163,6 +164,18 @@ namespace Sheaft.Infrastructure
         {
             UpdateRelatedData();
             return base.SaveChangesAsync(acceptAllChangesOnSuccess, cancellationToken);
+        }
+
+        public EntityEntry<TEntity> Restore<TEntity>(TEntity entity) where TEntity: class, ITrackRemove
+        {
+            var entry = Attach(entity);
+
+            var removedOnProperty = entry.Property("RemovedOn");
+            if (removedOnProperty != null)
+                removedOnProperty.CurrentValue = null;
+
+            entry.State = EntityState.Modified;
+            return entry;
         }
 
         private KeyValuePair<MessageKind, string> GetExceptionDefaultMessage<T>(MessageKind kind, Guid id) where T : class, IIdEntity, ITrackRemove

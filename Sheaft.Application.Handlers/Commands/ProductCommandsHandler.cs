@@ -229,9 +229,8 @@ namespace Sheaft.Application.Handlers
             return await ExecuteAsync(async () =>
             {
                 var entity = await _context.GetByIdAsync<Product>(request.Id, token);
-                entity.Remove();
-
                 _context.Remove(entity);
+
                 var result = await _context.SaveChangesAsync(token);
 
                 Logger.LogInformation($"Product {entity.Id} successfully deleted by {request.RequestUser.Id}");
@@ -350,9 +349,8 @@ namespace Sheaft.Application.Handlers
             return await ExecuteAsync(async () =>
             {
                 var entity = await _context.Products.SingleOrDefaultAsync(a => a.Id == request.Id && a.RemovedOn.HasValue, token);
-                entity.Restore();
 
-                _context.Update(entity);
+                _context.Restore(entity);
                 var result = await _context.SaveChangesAsync(token);
 
                 Logger.LogInformation($"Product {entity.Id} successfully restored by {request.RequestUser.Id}");

@@ -29,14 +29,5 @@ namespace Sheaft.Domain.Models
         public string ResultMessage { get; private set; }
         public ValidationStatus Status { get; private set; }
         public DocumentKind Kind { get; private set; }
-
-        public void Remove()
-        {
-        }
-
-        public void Restore()
-        {
-            RemovedOn = null;
-        }
     }
 }

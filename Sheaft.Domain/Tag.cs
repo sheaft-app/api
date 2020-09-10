@@ -55,14 +55,5 @@ namespace Sheaft.Domain.Models
         {
             Description = description;
         }
-
-        public void Remove()
-        {
-        }
-
-        public void Restore()
-        {
-            RemovedOn = null;
-        }
     }
 }

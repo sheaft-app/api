@@ -112,12 +112,9 @@ namespace Sheaft.Application.Handlers
             return await ExecuteAsync(async () =>
             {
                 var entity = await _context.DeliveryModes.SingleOrDefaultAsync(a => a.Id == request.Id && a.RemovedOn.HasValue, token);
-                entity.Restore();
+                _context.Restore(entity);
 
-                _context.Update(entity);
-                await _context.SaveChangesAsync(token);
-
-                return Ok(true);
+                return Ok(await _context.SaveChangesAsync(token) > 0);
             });
         }
     }

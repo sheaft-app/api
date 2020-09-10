@@ -3,7 +3,6 @@ using System;
 
 namespace Sheaft.Domain.Models
 {
-
     public class Transfer : PaymentMethod
     {
         protected Transfer() { }
@@ -20,7 +19,7 @@ namespace Sheaft.Domain.Models
         public string IBAN { get; private set; }
         public string BIC { get; private set; }
         public string OwnerName { get; private set; }
-        public Address OwnerAddress { get; private set; }
+        public virtual Address OwnerAddress { get; private set; }
 
     }
 }

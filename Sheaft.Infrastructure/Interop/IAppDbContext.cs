@@ -66,5 +66,7 @@ namespace Sheaft.Infrastructure.Interop
         Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
         EntityEntry<TEntity> Update<TEntity>([NotNullAttribute] TEntity entity) where TEntity : class;
         void UpdateRange([NotNullAttribute] IEnumerable<object> entities);
+        EntityEntry<TEntity> Restore<TEntity>([NotNullAttribute] TEntity entity)
+            where TEntity : class, ITrackRemove;
     }
 }

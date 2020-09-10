@@ -38,14 +38,5 @@ namespace Sheaft.Domain.Models
         {
             Unread = false;
         }
-
-        public void Remove()
-        {
-        }
-
-        public void Restore()
-        {
-            RemovedOn = null;
-        }
     }
 }

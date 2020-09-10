@@ -254,16 +254,5 @@ namespace Sheaft.Domain.Models
             Rating = Ratings.Any() ? Ratings.Average(r => r.Value) : (decimal?)null;
             RatingsCount = Ratings.Count();
         }
-
-        public void Remove()
-        { 
-            Reference = $"___{Reference}";
-        }
-
-        public void Restore()
-        {
-            RemovedOn = null;
-            Reference = Reference.Replace("___", "");
-        }
     }
 }
