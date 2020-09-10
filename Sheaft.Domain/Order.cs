@@ -1,6 +1,7 @@
 ﻿using Sheaft.Interop;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Sheaft.Domain.Models
 {
@@ -13,9 +14,12 @@ namespace Sheaft.Domain.Models
         {
         }
 
-        public Order(Guid id)
+        public Order(Guid id, User user, decimal donation = 0)
         {
             Id = id;
+
+            Donation = donation;
+            User = user;
 
             _purchaseOrders = new List<PurchaseOrder>();
             _transactions = new List<OrderTransaction>();
@@ -29,7 +33,6 @@ namespace Sheaft.Domain.Models
         public decimal TotalVatPrice { get; set; }
         public decimal TotalOnSalePrice { get; set; }
         public decimal Donation { get; set; }
-        public decimal Fees { get; set; }
         public virtual User User { get; set; }
 
         public virtual IReadOnlyCollection<PurchaseOrder> PurchaseOrders
@@ -40,6 +43,22 @@ namespace Sheaft.Domain.Models
         public virtual IReadOnlyCollection<OrderTransaction> Transactions
         {
             get => _transactions?.AsReadOnly();
+        }
+
+        public void AddPurchaseOrder(PurchaseOrder entity)
+        {
+            if (PurchaseOrders == null)
+                _purchaseOrders = new List<PurchaseOrder>();
+
+            _purchaseOrders.Add(entity);
+            RefreshPrices();
+        }
+
+        private void RefreshPrices()
+        {
+            TotalWholeSalePrice = PurchaseOrders.Sum(c => c.TotalWholeSalePrice);
+            TotalVatPrice = PurchaseOrders.Sum(c => c.TotalVatPrice);
+            TotalOnSalePrice = PurchaseOrders.Sum(c => c.TotalOnSalePrice);
         }
     }
 }

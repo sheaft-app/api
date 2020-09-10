@@ -13,6 +13,7 @@ namespace Sheaft.Application.Commands
         {
         }
 
+        public decimal? Donation { get; set; }
         public IEnumerable<ProductQuantityInput> Products { get; set; }
         public IEnumerable<ProducerExpectedDeliveryInput> ProducersExpectedDeliveries { get; set; }
     }

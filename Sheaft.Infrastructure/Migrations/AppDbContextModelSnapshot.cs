@@ -471,9 +471,6 @@ namespace Sheaft.Infrastructure.Migrations
                     b.Property<decimal>("Donation")
                         .HasColumnType("decimal(10,2)");
 
-                    b.Property<decimal>("Fees")
-                        .HasColumnType("decimal(10,2)");
-
                     b.Property<Guid>("Id")
                         .HasColumnType("uniqueidentifier");
 

@@ -29,6 +29,7 @@ namespace Sheaft.Infrastructure
             {
                 cb.Property<long>("DepartmentUid");
                 cb.HasOne(c => c.Department).WithMany().HasForeignKey("DepartmentUid");
+
                 cb.ToTable("UserAddresses");
             });
 

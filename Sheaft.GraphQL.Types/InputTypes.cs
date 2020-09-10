@@ -39,6 +39,8 @@ namespace Sheaft.GraphQL.Types
     {
         protected override void Configure(IInputObjectTypeDescriptor<CreatePurchaseOrdersInput> descriptor)
         {
+            descriptor.Field(c => c.Donation);
+
             descriptor.Field(c => c.ProducersExpectedDeliveries)
                 .Type<NonNullType<ListType<ProducerExpectedDeliveryInputType>>>();
 

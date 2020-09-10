@@ -13,6 +13,7 @@ namespace Sheaft.Application.Commands
         {
         }
 
+        public Guid OrderId { get; set; }
         public Guid ProducerId { get; set; }
         public IEnumerable<ProductQuantityInput> Products { get; set; }
         public Guid DeliveryModeId { get; set; }

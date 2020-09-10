@@ -58,7 +58,7 @@ namespace Sheaft.Domain.Models
         public string SponsorshipCode { get; private set; }
         public int TotalPoints { get; private set; }
         public virtual FullAddress Address { get; private set; }
-        public virtual Address BillingAddress { get; private set; }
+        public virtual BillingAddress BillingAddress { get; private set; }
         public virtual IReadOnlyCollection<Points> Points { get { return _points.AsReadOnly(); } }
         public virtual IReadOnlyCollection<PaymentMethod> PaymentMethods { get { return _paymentMethods.AsReadOnly(); } }
         public virtual IReadOnlyCollection<Wallet> Wallets { get { return _wallets.AsReadOnly(); } }
@@ -122,7 +122,7 @@ namespace Sheaft.Domain.Models
 
         public void SetBillingAddress(string line1, string line2, string zipcode, string city, CountryIsoCode country)
         {
-            BillingAddress = new Address(line1, line2, zipcode, city, country);
+            BillingAddress = new BillingAddress(line1, line2, zipcode, city, country);
         }
 
         protected void SetUserName(string name)
