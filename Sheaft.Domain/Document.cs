@@ -25,7 +25,8 @@ namespace Sheaft.Domain.Models
         public DateTimeOffset? ProcessedDate { get; private set; }
         public string Identifier { get; private set; }
         public string Name { get; private set; }
-        public string Reason { get; private set; }
+        public string ResultCode { get; private set; }
+        public string ResultMessage { get; private set; }
         public ValidationStatus Status { get; private set; }
         public DocumentKind Kind { get; private set; }
 

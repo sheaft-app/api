@@ -4,13 +4,11 @@ using System;
 
 namespace Sheaft.Domain.Models
 {
-
     public class Wallet : IEntity
     {
-        public Wallet(Guid id, string identifier, string name, WalletKind kind)
+        public Wallet(Guid id, string name, WalletKind kind)
         {
             Id = id;
-            Identifier = identifier;
             Name = name;
             Kind = kind;
         }
@@ -31,6 +29,22 @@ namespace Sheaft.Domain.Models
         public void Restore()
         {
             RemovedOn = null;
+        }
+
+        public void SetName(string name)
+        {
+            if (name == null)
+                return;
+
+            Name = name;
+        }
+
+        public void SetIdentifier(string identifier)
+        {
+            if (identifier == null)
+                return;
+
+            Identifier = identifier;
         }
     }
 }

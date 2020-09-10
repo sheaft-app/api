@@ -61,6 +61,7 @@ namespace Sheaft.Infrastructure
 
             entity.HasIndex(c => c.Id).IsUnique();
             entity.HasIndex(c => c.Email).IsUnique();
+            entity.HasIndex(c => c.Identifier);
             entity.HasIndex("Uid", "Id", "CreatedOn");
 
             entity.ToTable("Users");

@@ -16,17 +16,15 @@ namespace Sheaft.Infrastructure
             entity.Property(c => c.UpdatedOn).IsConcurrencyToken();
 
             entity.Property(c => c.Name).IsRequired();
-            entity.Property(c => c.Identifier).IsRequired();
-            entity.Property(c => c.Owner).IsRequired();
 
             entity.HasDiscriminator(c => c.Kind)
-                .HasValue<TransferPayment>(PaymentKind.Transfer)
-                .HasValue<CardPayment>(PaymentKind.Card);
+                .HasValue<Transfer>(PaymentKind.Transfer)
+                .HasValue<Card>(PaymentKind.Card);
 
             entity.HasKey("Uid");
 
             entity.HasIndex(c => c.Id).IsUnique();
-            entity.HasIndex(c => c.Identifier).IsUnique();
+            entity.HasIndex(c => c.Identifier);
             entity.HasIndex("UserUid");
             entity.HasIndex("Uid", "Id", "Identifier", "UserUid", "CreatedOn");
 

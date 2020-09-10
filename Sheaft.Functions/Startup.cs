@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using MangoPay.SDK;
 using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
@@ -46,6 +47,9 @@ namespace Sheaft.Functions
             var serviceBusSettings = configuration.GetSection(ServiceBusOptions.SETTING);
             builder.Services.Configure<ServiceBusOptions>(serviceBusSettings);
 
+            var pspSettings = configuration.GetSection(PspOptions.SETTING);
+            builder.Services.Configure<PspOptions>(pspSettings);
+
             builder.Services.Configure<AuthOptions>(configuration.GetSection(AuthOptions.SETTING));
             builder.Services.Configure<CorsOptions>(configuration.GetSection(CorsOptions.SETTING));
             builder.Services.Configure<SearchOptions>(configuration.GetSection(SearchOptions.SETTING));
@@ -81,6 +85,7 @@ namespace Sheaft.Functions
             builder.Services.AddScoped<IEmailService, EmailService>();
             builder.Services.AddScoped<ISignalrService, SignalrService>();
             builder.Services.AddScoped<IImageService, ImageService>();
+            builder.Services.AddScoped<IPspService, PspService>();
 
             builder.Services.AddScoped<IAgreementQueries, AgreementQueries>();
             builder.Services.AddScoped<ICompanyQueries, CompanyQueries>();
@@ -108,6 +113,17 @@ namespace Sheaft.Functions
                 options.UseLazyLoadingProxies();
                 options.UseSqlServer(databaseConfig.ConnectionString, x => x.UseNetTopologySuite());
             }, ServiceLifetime.Scoped);
+
+            var pspOptions = pspSettings.Get<PspOptions>();
+            builder.Services.AddScoped<MangoPayApi>(c => new MangoPayApi
+            {
+                Config = new MangoPay.SDK.Core.Configuration
+                {
+                    BaseUrl = pspOptions.ApiUrl,
+                    ClientId = pspOptions.ClientId,
+                    ClientPassword = pspOptions.ApiKey
+                }
+            });
 
             builder.Services.AddLocalization(ops => ops.ResourcesPath = "Resources");
             builder.Services.Configure<RequestLocalizationOptions>(
