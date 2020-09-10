@@ -587,6 +587,32 @@ namespace Sheaft.GraphQL.Types
                 .Type<NonNullType<StringType>>();
         }
     }
+    public class CountryType : SheaftOutputType<CountryDto>
+    {
+        protected override void Configure(IObjectTypeDescriptor<CountryDto> descriptor)
+        {
+            descriptor.Field(c => c.Id).Type<NonNullType<IdType>>();
+
+            descriptor.Field(c => c.Code)
+                .Type<NonNullType<CountryIsoCodeEnumType>>();
+
+            descriptor.Field(c => c.Name)
+                .Type<NonNullType<StringType>>();
+        }
+    }
+    public class NationalityType : SheaftOutputType<NationalityDto>
+    {
+        protected override void Configure(IObjectTypeDescriptor<NationalityDto> descriptor)
+        {
+            descriptor.Field(c => c.Id).Type<NonNullType<IdType>>();
+
+            descriptor.Field(c => c.Code)
+                .Type<NonNullType<CountryIsoCodeEnumType>>();
+
+            descriptor.Field(c => c.Name)
+                .Type<NonNullType<StringType>>();
+        }
+    }
     public class LevelType : SheaftOutputType<LevelDto>
     {
         protected override void Configure(IObjectTypeDescriptor<LevelDto> descriptor)

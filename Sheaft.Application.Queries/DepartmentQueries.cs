@@ -4,9 +4,7 @@ using System.Linq;
 using Sheaft.Infrastructure.Interop;
 using Sheaft.Models.Dto;
 using Sheaft.Core;
-using Sheaft.Domain.Models;
 using AutoMapper.QueryableExtensions;
-using Sheaft.Infrastructure;
 
 namespace Sheaft.Application.Queries
 {

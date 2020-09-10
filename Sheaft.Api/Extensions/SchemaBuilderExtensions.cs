@@ -17,6 +17,8 @@ namespace Sheaft.Api
             services.AddType<ProducerType>();
             services.AddType<DepartmentType>();
             services.AddType<RegionType>();
+            services.AddType<NationalityType>();
+            services.AddType<CountryType>();
             services.AddType<LevelType>();
             services.AddType<RewardType>();
             services.AddType<ConsumerType>();
