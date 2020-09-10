@@ -103,6 +103,8 @@ namespace Sheaft.Infrastructure
             modelBuilder.ApplyConfiguration(new TransactionConfiguration());
             modelBuilder.ApplyConfiguration(new OrderTransactionConfiguration());
             modelBuilder.ApplyConfiguration(new PurchaseTransactionConfiguration());
+            modelBuilder.ApplyConfiguration(new CountryConfiguration());
+            modelBuilder.ApplyConfiguration(new NationalityConfiguration());
         }
     }
 }

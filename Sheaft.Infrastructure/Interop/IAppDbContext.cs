@@ -17,10 +17,12 @@ namespace Sheaft.Infrastructure.Interop
     public interface IAppDbContext : IDisposable, IAsyncDisposable, IInfrastructure<IServiceProvider>, IDbContextDependencies, IDbSetCache, IDbContextPoolable, IResettableService
     {
         DbSet<Agreement> Agreements { get; set; }
+        DbSet<Country> Countries { get; set; }
         DbSet<DeliveryMode> DeliveryModes { get; set; }
         DbSet<Department> Departments { get; set; }
         DbSet<Job> Jobs { get; set; }
         DbSet<Level> Levels { get; set; }
+        DbSet<Nationality> Nationalities { get; set; }
         DbSet<Notification> Notifications { get; set; }
         DbSet<Order> Orders { get; set; }
         DbSet<PurchaseOrder> PurchaseOrders { get; set; }
