@@ -83,15 +83,6 @@ namespace Sheaft.Domain.Models
             Reason = reason;
         }
 
-        public void Remove()
-        {
-        }
-
-        public void Restore()
-        {
-            RemovedOn = null;
-        }
-
         public void Reset()
         {
             if (CreatedBy.Kind == ProfileKind.Producer)

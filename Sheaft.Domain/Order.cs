@@ -41,14 +41,5 @@ namespace Sheaft.Domain.Models
         {
             get => _transactions?.AsReadOnly();
         }
-
-        public void Remove()
-        {
-        }
-
-        public void Restore()
-        {
-            RemovedOn = null;
-        }
     }
 }

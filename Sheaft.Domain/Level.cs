@@ -79,14 +79,5 @@ namespace Sheaft.Domain.Models
         {
             RequiredPoints = requiredPoints;
         }
-
-        public void Remove()
-        {
-        }
-
-        public void Restore()
-        {
-            RemovedOn = null;
-        }
     }
 }

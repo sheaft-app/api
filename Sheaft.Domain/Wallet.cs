@@ -21,16 +21,6 @@ namespace Sheaft.Domain.Models
         public string Name { get; private set; }
         public WalletKind Kind { get; private set; }
 
-        public void Remove()
-        {
-
-        }
-
-        public void Restore()
-        {
-            RemovedOn = null;
-        }
-
         public void SetName(string name)
         {
             if (name == null)

@@ -75,14 +75,5 @@ namespace Sheaft.Domain.Models
             VatPrice = Math.Round(WholeSalePrice * Vat / 100, DIGITS_COUNT);
             OnSalePrice = Math.Round(WholeSalePrice + VatPrice, DIGITS_COUNT);
         }
-
-        public void Remove()
-        {
-        }
-
-        public void Restore()
-        {
-            RemovedOn = null;
-        }
     }
 }

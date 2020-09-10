@@ -161,15 +161,6 @@ namespace Sheaft.Domain.Models
             return JsonConvert.DeserializeObject<T>(Command);
         }
 
-        public void Remove()
-        {
-        }
-
-        public void Restore()
-        {
-            RemovedOn = null;
-        }
-
         public void ResetJob()
         {
             StartedOn = null;

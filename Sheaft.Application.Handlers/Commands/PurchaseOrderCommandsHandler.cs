@@ -421,9 +421,8 @@ namespace Sheaft.Application.Handlers
             return await ExecuteAsync(async () =>
             {
                 var entity = await _context.GetByIdAsync<PurchaseOrder>(request.Id, token);
-                entity.Remove();
-
                 _context.Remove(entity);
+
                 return Ok(await _context.SaveChangesAsync(token) > 0);
             });
         }
@@ -433,9 +432,8 @@ namespace Sheaft.Application.Handlers
             return await ExecuteAsync(async () =>
             {
                 var entity = await _context.PurchaseOrders.SingleOrDefaultAsync(a => a.Id == request.Id && a.RemovedOn.HasValue, token);
-                entity.Restore();
+                _context.Restore(entity);
 
-                _context.Update(entity);
                 return Ok(await _context.SaveChangesAsync(token) > 0);
             });
         }

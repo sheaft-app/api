@@ -100,14 +100,5 @@ namespace Sheaft.Domain.Models
         {
             Department = department;
         }
-
-        public void Remove()
-        {
-        }
-
-        public void Restore()
-        {
-            RemovedOn = null;
-        }
     }
 }
