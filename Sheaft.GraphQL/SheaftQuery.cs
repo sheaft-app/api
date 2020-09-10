@@ -254,9 +254,6 @@ namespace Sheaft.GraphQL
         }
 
         [GraphQLName("departments")]
-        [UsePaging]
-        [UseSorting(SortType = typeof(DepartmentSortType))]
-        [UseFiltering(FilterType = typeof(DepartmentFilterType))]
         [UseSelection]
         public IQueryable<DepartmentDto> GetDepartments([Service] IDepartmentQueries departmentQueries)
         {
@@ -264,13 +261,24 @@ namespace Sheaft.GraphQL
         }
 
         [GraphQLName("regions")]
-        [UsePaging]
-        [UseSorting(SortType = typeof(RegionSortType))]
-        [UseFiltering(FilterType = typeof(RegionFilterType))]
         [UseSelection]
         public IQueryable<RegionDto> GetRegions([Service] IRegionQueries regionQueries)
         {
             return regionQueries.GetRegions(_currentUser);
+        }
+
+        [GraphQLName("nationalities")]
+        [UseSelection]
+        public IQueryable<NationalityDto> GetNationalities([Service] INationalityQueries nationalityQueries)
+        {
+            return nationalityQueries.GetNationalities(_currentUser);
+        }
+
+        [GraphQLName("countries")]
+        [UseSelection]
+        public IQueryable<CountryDto> GetCountries([Service] ICountryQueries countryQueries)
+        {
+            return countryQueries.GetCountries(_currentUser);
         }
 
         [Authorize(Policy = Policies.REGISTERED)]

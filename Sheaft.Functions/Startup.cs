@@ -87,22 +87,6 @@ namespace Sheaft.Functions
             builder.Services.AddScoped<IImageService, ImageService>();
             builder.Services.AddScoped<IPspService, PspService>();
 
-            builder.Services.AddScoped<IAgreementQueries, AgreementQueries>();
-            builder.Services.AddScoped<ICompanyQueries, CompanyQueries>();
-            builder.Services.AddScoped<IDeliveryQueries, DeliveryQueries>();
-            builder.Services.AddScoped<IDepartmentQueries, DepartmentQueries>();
-            builder.Services.AddScoped<IJobQueries, JobQueries>();
-            builder.Services.AddScoped<ILeaderboardQueries, LeaderboardQueries>();
-            builder.Services.AddScoped<INotificationQueries, NotificationQueries>();
-            builder.Services.AddScoped<IPackagingQueries, PackagingQueries>();
-            builder.Services.AddScoped<IProductQueries, ProductQueries>();
-            builder.Services.AddScoped<IPurchaseOrderQueries, PurchaseOrderQueries>();
-            builder.Services.AddScoped<IQuickOrderQueries, QuickOrderQueries>();
-            builder.Services.AddScoped<IRegionQueries, RegionQueries>();
-            builder.Services.AddScoped<ITagQueries, TagQueries>();
-            builder.Services.AddScoped<IConsumerQueries, ConsumerQueries>();
-            builder.Services.AddScoped<IUserQueries, UserQueries>();
-
             builder.Services.AddScoped<IDapperContext, DapperContext>();
 
             builder.Services.AddOptions();
