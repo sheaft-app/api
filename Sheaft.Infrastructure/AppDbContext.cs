@@ -32,10 +32,12 @@ namespace Sheaft.Infrastructure
         }
 
         public DbSet<Agreement> Agreements { get; set; }
+        public DbSet<Country> Countries { get; set; }
         public DbSet<DeliveryMode> DeliveryModes { get; set; }
         public DbSet<Department> Departments { get; set; }
         public DbSet<Job> Jobs { get; set; }
         public DbSet<Level> Levels { get; set; }
+        public DbSet<Nationality> Nationalities { get; set; }
         public DbSet<Notification> Notifications { get; set; }
         public DbSet<Order> Orders { get; set; }
         public DbSet<PurchaseOrder> PurchaseOrders { get; set; }
