@@ -14,7 +14,7 @@ namespace Sheaft.Domain.Models
         {
         }
 
-        public Store(Guid id, string name, string firstname, string lastname, string email, string siret, string vatIdentifier, Address address, IEnumerable<TimeSlotHour> openingHours = null, bool openForBusiness = true, string phone = null, string description = null)
+        public Store(Guid id, string name, string firstname, string lastname, string email, string siret, string vatIdentifier, FullAddress address, IEnumerable<TimeSlotHour> openingHours = null, bool openForBusiness = true, string phone = null, string description = null)
             : base(id, ProfileKind.Store, LegalKind.Business, name, firstname, lastname, email, siret, vatIdentifier, address, openForBusiness, phone, description)
         {
             SetOpeningHours(openingHours);

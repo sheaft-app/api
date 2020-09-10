@@ -15,8 +15,6 @@ namespace Sheaft.Interop
     public interface ITrackRemove
     {
         DateTimeOffset? RemovedOn { get; }
-        void Remove();
-        void Restore();
     }
 
     public interface IIdEntity

@@ -10,7 +10,6 @@ namespace Sheaft.Infrastructure
         {
             entity.Property<long>("Uid");
 
-            entity.Property(c => c.CreatedOn);
             entity.Property(c => c.UpdatedOn).IsConcurrencyToken();
 
             entity.Property(c => c.Name).IsRequired();

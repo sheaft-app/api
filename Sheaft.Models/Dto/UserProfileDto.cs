@@ -14,7 +14,7 @@ namespace Sheaft.Models.Dto
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public DateTimeOffset? Birthdate { get; set; }
-        public string Nationality { get; set; }
-        public string CountryOfResidence { get; set; }
+        public CountryIsoCode Nationality { get; set; }
+        public CountryIsoCode CountryOfResidence { get; set; }
     }
 }

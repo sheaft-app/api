@@ -53,12 +53,12 @@ namespace Sheaft.Domain.Models
         public string FirstName { get; private set; }
         public string LastName { get; private set; }
         public DateTimeOffset? Birthdate { get; set; }
-        public string Nationality { get; set; }
-        public string CountryOfResidence { get; set; }
+        public CountryIsoCode Nationality { get; set; }
+        public CountryIsoCode CountryOfResidence { get; set; }
         public string SponsorshipCode { get; private set; }
         public int TotalPoints { get; private set; }
-        public virtual Address Address { get; private set; }
-        public virtual BillingAddress BillingAddress { get; private set; }
+        public virtual FullAddress Address { get; private set; }
+        public virtual Address BillingAddress { get; private set; }
         public virtual IReadOnlyCollection<Points> Points { get { return _points.AsReadOnly(); } }
         public virtual IReadOnlyCollection<PaymentMethod> PaymentMethods { get { return _paymentMethods.AsReadOnly(); } }
         public virtual IReadOnlyCollection<Wallet> Wallets { get { return _wallets.AsReadOnly(); } }
@@ -94,35 +94,35 @@ namespace Sheaft.Domain.Models
             Birthdate = birthdate;
         }
 
-        public void SetNationality(string nationality)
+        public void SetNationality(CountryIsoCode? nationality)
         {
             if (nationality == null)
                 return;
 
-            Nationality = nationality;
+            Nationality = nationality.Value;
         }
 
-        public void SetCountryOfResidence(string country)
+        public void SetCountryOfResidence(CountryIsoCode? country)
         {
             if (country == null)
                 return;
 
-            CountryOfResidence = country;
+            CountryOfResidence = country.Value;
         }
 
         public void SetAddress(Department department)
         {
-            Address = new Address(department);
+            Address = new FullAddress(department);
         }
 
-        public void SetAddress(string line1, string line2, string zipcode, string city, string country, Department department, double? longitude = null, double? latitude = null)
+        public void SetAddress(string line1, string line2, string zipcode, string city, CountryIsoCode country, Department department, double? longitude = null, double? latitude = null)
         {
-            Address = new Address(line1, line2, zipcode, city, country, department, longitude, latitude);
+            Address = new FullAddress(line1, line2, zipcode, city, country, department, longitude, latitude);
         }
 
-        public void SetBillingAddress(string line1, string line2, string zipcode, string city, string country)
+        public void SetBillingAddress(string line1, string line2, string zipcode, string city, CountryIsoCode country)
         {
-            BillingAddress = new BillingAddress(line1, line2, zipcode, city, country);
+            BillingAddress = new Address(line1, line2, zipcode, city, country);
         }
 
         protected void SetUserName(string name)
@@ -131,15 +131,6 @@ namespace Sheaft.Domain.Models
                 throw new ValidationException(MessageKind.Company_Name_Required);
 
             Name = name;
-        }
-
-        public virtual void Close(string reason)
-        {
-            FirstName = string.Empty;
-            LastName = string.Empty;
-            Email = $"{Guid.NewGuid():N}@a.c";
-            Phone = string.Empty;
-            RemovedOn = DateTime.UtcNow;
         }
 
         public void SetProfileKind(ProfileKind? kind)
@@ -193,6 +184,31 @@ namespace Sheaft.Domain.Models
 
             _points.Add(new Points(kind, quantity, createdOn ?? DateTimeOffset.UtcNow));
             RefreshPoints();
+        }
+
+        public void AddWallet(Wallet wallet)
+        {
+            if (Wallets == null)
+                _wallets = new List<Wallet>();
+
+            _wallets.Add(wallet);
+        }
+
+        public void SetIdentifier(string identifier)
+        {
+            if (identifier == null)
+                return;
+
+            Identifier = identifier;
+        }
+
+        public virtual void Close(string reason)
+        {
+            FirstName = string.Empty;
+            LastName = string.Empty;
+            Email = $"{Guid.NewGuid():N}@a.c";
+            Phone = string.Empty;
+            RemovedOn = DateTime.UtcNow;
         }
 
         public void Remove()

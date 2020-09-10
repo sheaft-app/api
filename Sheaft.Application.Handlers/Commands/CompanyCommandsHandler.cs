@@ -21,6 +21,7 @@ using System.Text;
 using Sheaft.Application.Events;
 using IdentityModel.Client;
 using Microsoft.Extensions.Caching.Distributed;
+using Microsoft.EntityFrameworkCore;
 
 namespace Sheaft.Application.Handlers
 {
@@ -72,12 +73,12 @@ namespace Sheaft.Application.Handlers
                     if (user != null)
                         return Conflict<Guid>(MessageKind.Register_User_AlreadyExists);
 
-                    var departmentCode = Address.GetDepartmentCode(request.Address.Zipcode);
-                    var department = await _context.GetSingleAsync<Department>(d => d.Code == departmentCode, token);
+                    var departmentCode = FullAddress.GetDepartmentCode(request.Address.Zipcode);
+                    var department = await _context.Departments.SingleOrDefaultAsync(d => d.Code == departmentCode, token);
 
                     var address = request.Address != null ?
-                        new Address(request.Address.Line1, request.Address.Line2, request.Address.Zipcode, request.Address.Country,
-                            request.Address.City, department, request.Address.Longitude, request.Address.Latitude)
+                        new FullAddress(request.Address.Line1, request.Address.Line2, request.Address.Zipcode, request.Address.City,
+                        request.Address.Country, department, request.Address.Longitude, request.Address.Latitude)
                         : null;
 
                     var producer = await CreateProducerAsync(request, address, token);
@@ -117,11 +118,11 @@ namespace Sheaft.Application.Handlers
                     if (user != null)
                         return Conflict<Guid>(MessageKind.Register_User_AlreadyExists);
 
-                    var departmentCode = Address.GetDepartmentCode(request.Address.Zipcode);
-                    var department = await _context.GetSingleAsync<Department>(d => d.Code == departmentCode, token);
+                    var departmentCode = FullAddress.GetDepartmentCode(request.Address.Zipcode);
+                    var department = await _context.Departments.SingleOrDefaultAsync(d => d.Code == departmentCode, token);
 
                     var address = request.Address != null ?
-                        new Address(request.Address.Line1, request.Address.Line2, request.Address.Zipcode, request.Address.City, request.Address.Country,
+                        new FullAddress(request.Address.Line1, request.Address.Line2, request.Address.Zipcode, request.Address.City, request.Address.Country,
                             department, request.Address.Longitude, request.Address.Latitude)
                         : null;
 
@@ -168,8 +169,8 @@ namespace Sheaft.Application.Handlers
                 entity.SetVatIdentifier(request.VatIdentifier);
                 entity.SetOpenForNewBusiness(request.OpenForNewBusiness);
 
-                var departmentCode = Address.GetDepartmentCode(request.Address.Zipcode);
-                var department = await _context.GetSingleAsync<Department>(d => d.Code == departmentCode, token);
+                var departmentCode = FullAddress.GetDepartmentCode(request.Address.Zipcode);
+                var department = await _context.Departments.SingleOrDefaultAsync(d => d.Code == departmentCode, token);
 
                 entity.SetAddress(request.Address.Line1, request.Address.Line2, request.Address.Zipcode,
                     request.Address.City, request.Address.Country, department, request.Address.Longitude, request.Address.Latitude);
@@ -218,8 +219,8 @@ namespace Sheaft.Application.Handlers
                 entity.SetVatIdentifier(request.VatIdentifier);
                 entity.SetOpenForNewBusiness(request.OpenForNewBusiness);
 
-                var departmentCode = Address.GetDepartmentCode(request.Address.Zipcode);
-                var department = await _context.GetSingleAsync<Department>(d => d.Code == departmentCode, token);
+                var departmentCode = FullAddress.GetDepartmentCode(request.Address.Zipcode);
+                var department = await _context.Departments.SingleOrDefaultAsync(d => d.Code == departmentCode, token);
 
                 entity.SetAddress(request.Address.Line1, request.Address.Line2, request.Address.Zipcode,
                     request.Address.City, request.Address.Country, department, request.Address.Longitude, request.Address.Latitude);
@@ -316,7 +317,7 @@ namespace Sheaft.Application.Handlers
             }
         }
 
-        private async Task<Store> CreateStoreAsync(RegisterStoreCommand request, Address address, CancellationToken token)
+        private async Task<Store> CreateStoreAsync(RegisterStoreCommand request, FullAddress address, CancellationToken token)
         {
             var openingHours = new List<TimeSlotHour>();
             if (request.OpeningHours == null)
@@ -331,7 +332,7 @@ namespace Sheaft.Application.Handlers
                 request.Siret, request.VatIdentifier, address, openingHours, request.OpenForNewBusiness, request.Phone, request.Description);
 
             var billingAddress = request.BillingAddress == null ? address
-                : new Address(request.BillingAddress.Line1, request.BillingAddress.Line2, request.BillingAddress.Zipcode, request.BillingAddress.City, request.BillingAddress.Country, null);
+                : new FullAddress(request.BillingAddress.Line1, request.BillingAddress.Line2, request.BillingAddress.Zipcode, request.BillingAddress.City, request.BillingAddress.Country, null);
 
             store.SetBillingAddress(billingAddress.Line1, billingAddress.Line2, billingAddress.Zipcode,
                 billingAddress.City, billingAddress.Country);
@@ -348,13 +349,13 @@ namespace Sheaft.Application.Handlers
             return store;
         }
 
-        private async Task<Producer> CreateProducerAsync(RegisterProducerCommand request, Address address, CancellationToken token)
+        private async Task<Producer> CreateProducerAsync(RegisterProducerCommand request, FullAddress address, CancellationToken token)
         {
             var producer = new Producer(Guid.NewGuid(), request.Name, request.Owner.FirstName, request.Owner.LastName, request.Email,
                 request.Siret, request.VatIdentifier, address, request.OpenForNewBusiness, request.Phone, request.Description);
 
             var billingAddress = request.BillingAddress == null ? address
-                : new Address(request.BillingAddress.Line1, request.BillingAddress.Line2, request.BillingAddress.Zipcode, request.BillingAddress.City, request.BillingAddress.Country, null);
+                : new FullAddress(request.BillingAddress.Line1, request.BillingAddress.Line2, request.BillingAddress.Zipcode, request.BillingAddress.City, request.BillingAddress.Country, null);
 
             producer.SetBillingAddress(billingAddress.Line1, billingAddress.Line2, billingAddress.Zipcode,
                 billingAddress.City, billingAddress.Country);

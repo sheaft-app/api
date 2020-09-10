@@ -47,7 +47,7 @@ namespace Sheaft.Manage.Controllers
             var query = _context.Regions.AsNoTracking();
 
             var entities = await query
-                .OrderByDescending(c => c.CreatedOn)
+                .OrderByDescending(c => c.Code)
                 .Skip(page * take)
                 .Take(take)
                 .ProjectTo<RegionViewModel>(_configurationProvider)

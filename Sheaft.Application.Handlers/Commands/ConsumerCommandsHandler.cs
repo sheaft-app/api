@@ -20,6 +20,7 @@ using Sheaft.Options;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Caching.Distributed;
+using Microsoft.EntityFrameworkCore;
 
 namespace Sheaft.Application.Handlers
 {
@@ -73,7 +74,7 @@ namespace Sheaft.Application.Handlers
                 var picture = await _imageService.HandleUserImageAsync(request.Id, request.Picture, token);
                 entity.SetPicture(picture);
 
-                var department = await _context.GetSingleAsync<Department>(d => d.Id == request.DepartmentId, token);
+                var department = await _context.Departments.SingleOrDefaultAsync(d => d.Id == request.DepartmentId, token);
                 entity.SetAddress(department);
 
                 await _context.AddAsync(entity, token);
@@ -125,8 +126,8 @@ namespace Sheaft.Application.Handlers
 
                 if (request.Address != null)
                 {
-                    var departmentCode = Address.GetDepartmentCode(request.Address.Zipcode);
-                    var department = await _context.GetSingleAsync<Department>(d => d.Code == departmentCode, token);
+                    var departmentCode = FullAddress.GetDepartmentCode(request.Address.Zipcode);
+                    var department = await _context.Departments.SingleOrDefaultAsync(d => d.Code == departmentCode, token);
                     entity.SetAddress(request.Address.Line1, request.Address.Line2, request.Address.Zipcode, request.Address.City, request.Address.Country, department, request.Address.Longitude, request.Address.Latitude);                    
                 }
 
@@ -191,8 +192,8 @@ namespace Sheaft.Application.Handlers
 
                 if (request.Address != null && string.IsNullOrWhiteSpace(entity.Address.Zipcode))
                 {
-                    var departmentCode = Address.GetDepartmentCode(request.Address.Zipcode);
-                    var department = await _context.GetSingleAsync<Department>(d => d.Code == departmentCode, token);
+                    var departmentCode = FullAddress.GetDepartmentCode(request.Address.Zipcode);
+                    var department = await _context.Departments.SingleOrDefaultAsync(d => d.Code == departmentCode, token);
                     entity.SetAddress(request.Address.Line1, request.Address.Line2, request.Address.Zipcode, request.Address.City, request.Address.Country, department);
                 }
 

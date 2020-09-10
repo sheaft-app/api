@@ -153,8 +153,12 @@ namespace Sheaft.GraphQL.Types
             descriptor.Field(c => c.FirstName);
             descriptor.Field(c => c.LastName);
             descriptor.Field(c => c.Birthdate);
-            descriptor.Field(c => c.CountryOfResidence);
-            descriptor.Field(c => c.Nationality);
+
+            descriptor.Field(c => c.CountryOfResidence)
+                .Type<NonNullType<CountryIsoCodeEnumType>>();
+
+            descriptor.Field(c => c.Nationality)
+                .Type<NonNullType<CountryIsoCodeEnumType>>();
 
             descriptor.Field(c => c.Address)
                 .Type<AddressType>();
@@ -295,9 +299,13 @@ namespace Sheaft.GraphQL.Types
             descriptor.Field(c => c.Kind);
             descriptor.Field(c => c.Phone);
             descriptor.Field(c => c.Picture);
-            descriptor.Field(c => c.Nationality);
-            descriptor.Field(c => c.CountryOfResidence);
             descriptor.Field(c => c.Birthdate);
+
+            descriptor.Field(c => c.CountryOfResidence)
+                .Type<NonNullType<CountryIsoCodeEnumType>>();
+
+            descriptor.Field(c => c.Nationality)
+                .Type<NonNullType<CountryIsoCodeEnumType>>();
 
             descriptor.Field(c => c.Name)
                 .Type<NonNullType<StringType>>();
@@ -326,9 +334,13 @@ namespace Sheaft.GraphQL.Types
             descriptor.Field(c => c.Kind);
             descriptor.Field(c => c.Phone);
             descriptor.Field(c => c.Picture);
-            descriptor.Field(c => c.Nationality);
-            descriptor.Field(c => c.CountryOfResidence);
             descriptor.Field(c => c.Birthdate);
+
+            descriptor.Field(c => c.CountryOfResidence)
+                .Type<NonNullType<CountryIsoCodeEnumType>>();
+
+            descriptor.Field(c => c.Nationality)
+                .Type<NonNullType<CountryIsoCodeEnumType>>();
 
             descriptor.Field(c => c.Name)
                 .Type<NonNullType<StringType>>();
@@ -352,9 +364,13 @@ namespace Sheaft.GraphQL.Types
             descriptor.Field(c => c.Phone);
             descriptor.Field(c => c.Picture);
             descriptor.Field(c => c.Description);
-            descriptor.Field(c => c.Nationality);
-            descriptor.Field(c => c.CountryOfResidence);
             descriptor.Field(c => c.Birthdate);
+
+            descriptor.Field(c => c.CountryOfResidence)
+                .Type<NonNullType<CountryIsoCodeEnumType>>();
+
+            descriptor.Field(c => c.Nationality)
+                .Type<NonNullType<CountryIsoCodeEnumType>>();
 
             descriptor.Field(c => c.Name)
                 .Type<NonNullType<StringType>>();
@@ -615,9 +631,13 @@ namespace Sheaft.GraphQL.Types
             descriptor.Field(c => c.CreatedOn);
             descriptor.Field(c => c.UpdatedOn);
             descriptor.Field(c => c.Anonymous);
-            descriptor.Field(c => c.CountryOfResidence);
-            descriptor.Field(c => c.Nationality);
             descriptor.Field(c => c.Birthdate);
+
+            descriptor.Field(c => c.CountryOfResidence)
+                .Type<NonNullType<CountryIsoCodeEnumType>>();
+
+            descriptor.Field(c => c.Nationality)
+                .Type<NonNullType<CountryIsoCodeEnumType>>();
 
             descriptor.Field(c => c.Address)
                 .Type<AddressType>();

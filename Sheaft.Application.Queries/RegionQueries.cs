@@ -26,7 +26,7 @@ namespace Sheaft.Application.Queries
             try
             {
                 return _context.Regions
-                        .Get(d => d.Id == id)
+                        .Where(d => d.Id == id)
                         .ProjectTo<RegionDto>(_configurationProvider);
             }
             catch (Exception e)
@@ -40,7 +40,6 @@ namespace Sheaft.Application.Queries
             try
             {
                 return _context.Regions
-                        .Get()
                         .ProjectTo<RegionDto>(_configurationProvider);
             }
             catch (Exception e)

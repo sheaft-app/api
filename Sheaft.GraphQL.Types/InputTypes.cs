@@ -246,7 +246,12 @@ namespace Sheaft.GraphQL.Types
             descriptor.Field(c => c.CountryOfResidence);
             descriptor.Field(c => c.Legal);
             descriptor.Field(c => c.Id);
-            descriptor.Field(c => c.Nationality);
+
+            descriptor.Field(c => c.CountryOfResidence)
+                .Type<NonNullType<CountryIsoCodeEnumType>>();
+
+            descriptor.Field(c => c.Nationality)
+                .Type<NonNullType<CountryIsoCodeEnumType>>();
 
             descriptor.Field(c => c.BillingAddress)
                 .Type<NonNullType<AddressInputType>>();
@@ -262,7 +267,12 @@ namespace Sheaft.GraphQL.Types
             descriptor.Field(c => c.Birthdate);
             descriptor.Field(c => c.CountryOfResidence);
             descriptor.Field(c => c.Id);
-            descriptor.Field(c => c.Nationality);
+
+            descriptor.Field(c => c.CountryOfResidence)
+                .Type<NonNullType<CountryIsoCodeEnumType>>();
+
+            descriptor.Field(c => c.Nationality)
+                .Type<NonNullType<CountryIsoCodeEnumType>>();
 
             descriptor.Field(c => c.BillingAddress)
                 .Type<NonNullType<AddressInputType>>();

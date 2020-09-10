@@ -1,7 +1,6 @@
 using System;
 using Newtonsoft.Json;
 using Sheaft.Core;
-using Sheaft.Models.Inputs;
 
 namespace Sheaft.Application.Commands
 {
