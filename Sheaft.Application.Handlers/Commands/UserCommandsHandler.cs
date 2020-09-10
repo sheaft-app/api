@@ -84,7 +84,7 @@ namespace Sheaft.Application.Handlers
         {
             return await ExecuteAsync(async () =>
             {
-                var entity = await _context.GetByIdAsync<User>(request.Id, token);
+                var entity = await _context.GetByIdAsync<User>(request.UserId, token);
 
                 var roles = new List<Guid>();
 
@@ -105,7 +105,7 @@ namespace Sheaft.Application.Handlers
                     roles.Add(_roleOptions.Consumer.Id);
                 }
                                
-                var oidcUser = new IdentityUserInput(request.Id, entity.Email, entity.Name, entity.FirstName, entity.LastName, roles)
+                var oidcUser = new IdentityUserInput(request.UserId, entity.Email, entity.Name, entity.FirstName, entity.LastName, roles)
                 {
                     Phone = entity.Phone,
                     Picture = entity.Picture

@@ -12,7 +12,7 @@ namespace Sheaft.Application.Commands
         {
         }
 
-        public Guid Id { get; set; }
+        public Guid UserId { get; set; }
         public IEnumerable<string> Roles { get; set; }
     }
 }

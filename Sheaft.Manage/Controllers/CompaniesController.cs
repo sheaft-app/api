@@ -178,7 +178,7 @@ namespace Sheaft.Manage.Controllers
 
                 var res = await _mediatr.Send(new ChangeUserRolesCommand(requestUser)
                 {
-                    Id = entity.Id,
+                    UserId = entity.Id,
                     Roles = roles
                 }, token);
 
