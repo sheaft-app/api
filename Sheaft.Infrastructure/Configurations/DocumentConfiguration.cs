@@ -1,7 +1,6 @@
 ﻿using Sheaft.Domain.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using System;
 
 namespace Sheaft.Infrastructure
 {
@@ -18,9 +17,9 @@ namespace Sheaft.Infrastructure
             entity.HasKey("Uid");
 
             entity.HasIndex(c => c.Id).IsUnique();
-            entity.HasIndex(c => c.Identifier).IsUnique();
+            entity.HasIndex(c => c.Identifier);
             entity.HasIndex("UserUid");
-            entity.HasIndex("Uid", "Id", "Identifier", "UserUid", "CreatedOn");
+            entity.HasIndex("Uid", "Id", "UserUid", "CreatedOn");
 
             entity.ToTable("Documents");
         }

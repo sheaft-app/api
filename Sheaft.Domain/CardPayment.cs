@@ -1,22 +1,15 @@
-﻿using Sheaft.Exceptions;
-using Sheaft.Interop.Enums;
+﻿using Sheaft.Interop.Enums;
 using System;
 
 namespace Sheaft.Domain.Models
 {
-
-    public class CardPayment : PaymentMethod
+    public class Card : PaymentMethod
     {
-        protected CardPayment() { }
+        protected Card() { }
 
-        public CardPayment(Guid id, string identifier, string name, string owner, DateTimeOffset validity)
-            : base(id, identifier, name, owner, PaymentKind.Card)
+        public Card(Guid id, string name)
+            : base(id, name, PaymentKind.Card)
         {
-            Expired = false;
-            Validity = validity;
         }
-
-        public bool Expired { get; private set; }
-        public DateTimeOffset Validity { get; private set; }
     }
 }

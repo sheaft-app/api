@@ -15,14 +15,14 @@ namespace Sheaft.Infrastructure
             entity.Property(c => c.UpdatedOn).IsConcurrencyToken();
 
             entity.Property(c => c.Name).IsRequired();
-            entity.Property(c => c.Identifier).IsRequired();
 
             entity.HasKey("Uid");
 
             entity.HasIndex(c => c.Id).IsUnique();
-            entity.HasIndex(c => c.Identifier).IsUnique();
+            entity.HasIndex("UserUid", "Kind").IsUnique();
             entity.HasIndex("UserUid");
-            entity.HasIndex("Uid", "Id", "Identifier", "UserUid", "CreatedOn");
+            entity.HasIndex(c => c.Identifier);
+            entity.HasIndex("Uid", "Id", "UserUid", "CreatedOn");
 
             entity.ToTable("Wallets");
         }

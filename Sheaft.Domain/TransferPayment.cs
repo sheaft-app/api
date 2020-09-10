@@ -1,22 +1,26 @@
-﻿using Sheaft.Exceptions;
-using Sheaft.Interop.Enums;
+﻿using Sheaft.Interop.Enums;
 using System;
 
 namespace Sheaft.Domain.Models
 {
 
-    public class TransferPayment : PaymentMethod
+    public class Transfer : PaymentMethod
     {
-        protected TransferPayment() { }
+        protected Transfer() { }
 
-        public TransferPayment(Guid id, string identifier, string name, string owner, string iban, string bic)
-            : base(id, identifier, name, owner, PaymentKind.Transfer)
+        public Transfer(Guid id, string name, string owner, string iban, string bic, Address address)
+            : base(id, name, PaymentKind.Transfer)
         {
             IBAN = iban;
             BIC = bic;
+            OwnerName = owner;
+            OwnerAddress = address;
         }
 
         public string IBAN { get; private set; }
         public string BIC { get; private set; }
+        public string OwnerName { get; private set; }
+        public Address OwnerAddress { get; private set; }
+
     }
 }

@@ -41,6 +41,7 @@ using System.IdentityModel.Tokens.Jwt;
 using Microsoft.AspNetCore.Authorization;
 using Sheaft.Api.Authorize;
 using System;
+using MangoPay.SDK;
 
 namespace Sheaft.Api
 {
@@ -69,6 +70,7 @@ namespace Sheaft.Api
             var databaseSettings = Configuration.GetSection(DatabaseOptions.SETTING);
             var roleSettings = Configuration.GetSection(RoleOptions.SETTING);
             var cacheSettings = Configuration.GetSection(CacheOptions.SETTING);
+            var pspSettings = Configuration.GetSection(PspOptions.SETTING);
 
             services.Configure<AuthOptions>(authSettings);
             services.Configure<CorsOptions>(corsSettings);
@@ -77,6 +79,7 @@ namespace Sheaft.Api
             services.Configure<DatabaseOptions>(databaseSettings);
             services.Configure<RoleOptions>(roleSettings);
             services.Configure<CacheOptions>(cacheSettings);
+            services.Configure<PspOptions>(pspSettings);
 
             services.Configure<ApiOptions>(Configuration.GetSection(ApiOptions.SETTING));
             services.Configure<FreshdeskOptions>(Configuration.GetSection(FreshdeskOptions.SETTING));
@@ -179,6 +182,17 @@ namespace Sheaft.Api
                 });
             });
 
+            var pspOptions = pspSettings.Get<PspOptions>();
+            services.AddScoped<MangoPayApi>(c => new MangoPayApi
+            {
+                Config = new MangoPay.SDK.Core.Configuration
+                {
+                    BaseUrl = pspOptions.ApiUrl,
+                    ClientId = pspOptions.ClientId,
+                    ClientPassword = pspOptions.ApiKey
+                }
+            });
+
             services.AddAutoMapper(typeof(ProductProfile).Assembly);
             services.AddMediatR(new List<Assembly>() { typeof(RegisterStoreCommand).Assembly, typeof(UserPointsCreatedEvent).Assembly, typeof(UserCommandsHandler).Assembly }.ToArray());
             services.AddHttpClient();
@@ -196,6 +210,7 @@ namespace Sheaft.Api
             services.AddScoped<IEmailService, EmailService>();
             services.AddScoped<ISignalrService, SignalrService>();
             services.AddScoped<IImageService, ImageService>();
+            services.AddScoped<IPspService, PspService>();
 
             services.AddScoped<IAgreementQueries, AgreementQueries>();
             services.AddScoped<ICompanyQueries, CompanyQueries>();

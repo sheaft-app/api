@@ -1,14 +1,14 @@
 ﻿using Sheaft.Domain.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Sheaft.Interop.Enums;
 
 namespace Sheaft.Infrastructure
 {
-    public class CardPaymentConfiguration : IEntityTypeConfiguration<CardPayment>
+    public class CardConfiguration : IEntityTypeConfiguration<Card>
     {
-        public void Configure(EntityTypeBuilder<CardPayment> entity)
+        public void Configure(EntityTypeBuilder<Card> entity)
         {
+            entity.Property(c => c.IsActive).HasDefaultValue(true);
         }
     }
 }

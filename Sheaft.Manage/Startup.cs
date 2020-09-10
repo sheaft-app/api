@@ -4,6 +4,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Reflection;
 using AutoMapper;
 using IdentityModel;
+using MangoPay.SDK;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
@@ -52,11 +53,13 @@ namespace Sheaft.Manage
             var databaseSettings = Configuration.GetSection(DatabaseOptions.SETTING);
             var sendgridSettings = Configuration.GetSection(SendgridOptions.SETTING);
             var roleSettings = Configuration.GetSection(RoleOptions.SETTING);
+            var pspSettings = Configuration.GetSection(PspOptions.SETTING);
 
             services.Configure<RoleOptions>(roleSettings);
             services.Configure<AuthOptions>(authSettings);
             services.Configure<DatabaseOptions>(databaseSettings);
             services.Configure<SendgridOptions>(sendgridSettings);
+            services.Configure<PspOptions>(pspSettings);
 
             services.Configure<StorageOptions>(Configuration.GetSection(StorageOptions.SETTING));
             services.Configure<ServiceBusOptions>(Configuration.GetSection(ServiceBusOptions.SETTING));
@@ -138,6 +141,17 @@ namespace Sheaft.Manage
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             services.AddHttpClient();
 
+            var pspOptions = pspSettings.Get<PspOptions>();
+            services.AddScoped<MangoPayApi>(c => new MangoPayApi
+            {
+                Config = new MangoPay.SDK.Core.Configuration
+                {
+                    BaseUrl = pspOptions.ApiUrl,
+                    ClientId = pspOptions.ClientId,
+                    ClientPassword = pspOptions.ApiKey
+                }
+            });
+
             services.AddScoped<IDapperContext, DapperContext>();
             services.AddScoped<IIdentifierService, IdentifierService>();
             services.AddScoped<IQueueService, QueueService>();
@@ -145,6 +159,7 @@ namespace Sheaft.Manage
             services.AddScoped<IEmailService, EmailService>();
             services.AddScoped<ISignalrService, SignalrService>();
             services.AddScoped<IImageService, ImageService>();
+            services.AddScoped<IPspService, PspService>();
 
             services.AddOptions();
 

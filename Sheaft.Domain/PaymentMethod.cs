@@ -8,16 +8,14 @@ namespace Sheaft.Domain.Models
     {
         protected PaymentMethod()
         {
-
         }
 
-        protected PaymentMethod(Guid id, string identifier, string name, string owner, PaymentKind kind)
+        protected PaymentMethod(Guid id, string name, PaymentKind kind)
         {
             Id = id;
-            Identifier = identifier;
             Name = name;
-            Owner = owner;
             Kind = kind;
+            IsActive = true;
         }
 
         public Guid Id { get; private set; }
@@ -27,7 +25,20 @@ namespace Sheaft.Domain.Models
         public string Identifier { get; private set; }
         public string Name { get; private set; }
         public PaymentKind Kind { get; private set; }
-        public string Owner { get; private set; }
+        public bool IsActive { get; private set; }
+
+        public void SetIdentifier(string identifier)
+        {
+            if (identifier == null)
+                return;
+
+            Identifier = identifier;
+        }
+
+        public void SetIsActive(bool isActive)
+        {
+            IsActive = isActive;
+        }
 
         public void Remove()
         {

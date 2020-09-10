@@ -11,6 +11,7 @@ namespace Sheaft.Infrastructure
             entity.Property<long>("Uid");
             entity.Property<long>("CreditedWalletUid");
             entity.Property<long>("DebitedWalletUid");
+            entity.Property<long>("AuthorUid");
 
             entity.Property(o => o.Credited).HasColumnType("decimal(10,2)");
             entity.Property(o => o.Debited).HasColumnType("decimal(10,2)");
@@ -21,11 +22,12 @@ namespace Sheaft.Infrastructure
 
             entity.HasOne(c => c.CreditedWallet).WithMany().HasForeignKey("CreditedWalletUid").OnDelete(DeleteBehavior.NoAction);
             entity.HasOne(c => c.DebitedWallet).WithMany().HasForeignKey("DebitedWalletUid").OnDelete(DeleteBehavior.NoAction);
+            entity.HasOne(c => c.Author).WithMany().HasForeignKey("AuthorUid").OnDelete(DeleteBehavior.NoAction);
 
             entity.HasKey("Uid");
 
             entity.HasIndex(c => c.Id).IsUnique();
-            entity.HasIndex(c => c.Identifier).IsUnique();
+            entity.HasIndex(c => c.Identifier);
             entity.HasIndex("CreditedWalletUid");
             entity.HasIndex("DebitedWalletUid");
             entity.HasIndex("Uid", "Id", "Identifier", "CreditedWalletUid", "DebitedWalletUid", "CreatedOn");

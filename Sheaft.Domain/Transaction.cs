@@ -23,15 +23,16 @@ namespace Sheaft.Domain.Models
         public decimal Debited { get; set; }
         public decimal Credited { get; set; }
         public decimal Fees { get; set; }
+        public string Reference { get; set; }
         public TransactionNature Nature { get; set; }
         public TransactionKind Kind { get; set; }
         public TransactionStatus Status { get; set; }
         public DateTimeOffset? ExecutedOn { get; set; }
-        public string Code { get; set; }
-        public string Message { get; set; }
-        public string AuthorId { get; set; }
+        public string ResultCode { get; set; }
+        public string ResultMessage { get; set; }
         public virtual Wallet CreditedWallet { get; set; }
         public virtual Wallet DebitedWallet { get; set; }
+        public virtual User Author { get; set; }
 
         public void Remove()
         {
