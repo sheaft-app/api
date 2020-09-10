@@ -21,7 +21,7 @@ namespace Sheaft.Domain.Models
 
             Kind = mode.Kind;
             Name = mode.Name;
-            Address = new LocationAddress(mode.Address.Line1, mode.Address.Line2, mode.Address.Zipcode, mode.Address.City, mode.Address.Country, mode.Address.Longitude, mode.Address.Latitude);
+            Address = new DeliveryAddress(mode.Address.Line1, mode.Address.Line2, mode.Address.Zipcode, mode.Address.City, mode.Address.Country, mode.Address.Longitude, mode.Address.Latitude);
         }
 
         public DeliveryKind Kind { get; private set; }
@@ -31,7 +31,7 @@ namespace Sheaft.Domain.Models
         public DateTimeOffset? DeliveredOn { get; private set; }
         public TimeSpan From { get; private set; }
         public TimeSpan To { get; private set; }
-        public virtual LocationAddress Address { get; private set; }
+        public virtual DeliveryAddress Address { get; private set; }
 
         public void SetExpectedDate(DateTimeOffset date)
         {

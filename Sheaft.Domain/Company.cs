@@ -28,7 +28,7 @@ namespace Sheaft.Domain.Models
         public string Description { get; private set; }
         public string VatIdentifier { get; private set; }
         public string Siret { get; private set; }
-        public virtual Address LegalAddress { get; private set; }
+        public virtual LegalAddress LegalAddress { get; private set; }
 
         public void SetName(string name)
         {
@@ -37,7 +37,7 @@ namespace Sheaft.Domain.Models
 
         public void SetLegalAddress(string line1, string line2, string zipcode, string city, CountryIsoCode country)
         {
-            LegalAddress = new Address(line1, line2, zipcode, city, country);
+            LegalAddress = new LegalAddress(line1, line2, zipcode, city, country);
         }
 
         public void SetOpenForNewBusiness(bool openForNewBusiness)

@@ -69,6 +69,10 @@ namespace Sheaft.Application.Handlers
                     var productIds = request.Products.Select(p => p.Id);
                     var products = await _context.GetByIdsAsync<Product>(productIds, token);
 
+                    var orderResult = await _mediatr.Send(new CreateOrderCommand(request.RequestUser) { Donation = request.Donation ?? 0 }, token);
+                    if (!orderResult.Success)
+                        return Failed<IEnumerable<Guid>>(orderResult.Exception);
+
                     var createdOrders = new List<Guid>();
                     foreach (var producerId in products.GroupBy(c => c.Producer.Id).Select(c => c.Key))
                     {
@@ -76,7 +80,7 @@ namespace Sheaft.Application.Handlers
                             .Select(c => new ProductQuantityInput { Id = c.Id, Quantity = request.Products.Where(p => p.Id == c.Id).Sum(c => c.Quantity) });
 
                         var expectedDelivery = request.ProducersExpectedDeliveries.SingleOrDefault(c => c.ProducerId == producerId);
-                        var result = await _mediatr.Send(new CreatePurchaseOrderCommand(request.RequestUser) { SkipSendEmail = true, ProducerId = producerId, Comment = expectedDelivery.Comment, ExpectedDeliveryDate = expectedDelivery.ExpectedDeliveryDate, DeliveryModeId = expectedDelivery.DeliveryModeId, Products = cartProducts }, token);
+                        var result = await _mediatr.Send(new CreatePurchaseOrderCommand(request.RequestUser) { OrderId = orderResult.Data, SkipSendEmail = true, ProducerId = producerId, Comment = expectedDelivery.Comment, ExpectedDeliveryDate = expectedDelivery.ExpectedDeliveryDate, DeliveryModeId = expectedDelivery.DeliveryModeId, Products = cartProducts }, token);
                         if (!result.Success)
                             return Failed<IEnumerable<Guid>>(result.Exception);
 
@@ -103,6 +107,7 @@ namespace Sheaft.Application.Handlers
                 var sender = await _context.GetByIdAsync<User>(request.RequestUser.Id, token);
                 var producer = await _context.GetByIdAsync<Producer>(request.ProducerId, token);
                 var deliveryMode = await _context.GetByIdAsync<DeliveryMode>(request.DeliveryModeId, token);
+                var order = await _context.GetByIdAsync<Order>(request.OrderId, token);
 
                 var productIds = request.Products.Select(p => p.Id);
                 var products = await _context.GetByIdsAsync<Product>(productIds, token);
@@ -118,7 +123,8 @@ namespace Sheaft.Application.Handlers
                 var entity = new PurchaseOrder(Guid.NewGuid(), result.Data, OrderStatusKind.Waiting, cartProducts, deliveryMode, request.ExpectedDeliveryDate, producer, sender);
                 entity.SetComment(request.Comment);
 
-                await _context.AddAsync(entity, token);
+                order.AddPurchaseOrder(entity);
+
                 await _context.SaveChangesAsync(token);
 
                 if (!request.SkipSendEmail)
