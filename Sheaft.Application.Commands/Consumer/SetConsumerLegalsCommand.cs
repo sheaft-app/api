@@ -2,6 +2,7 @@
 using Sheaft.Models.Inputs;
 using Sheaft.Core;
 using Newtonsoft.Json;
+using Sheaft.Interop.Enums;
 
 namespace Sheaft.Application.Commands
 {
@@ -14,8 +15,8 @@ namespace Sheaft.Application.Commands
 
         public Guid Id { get; set; }
         public DateTimeOffset? Birthdate { get; set; }
-        public string Nationality { get; set; }
-        public string CountryOfResidence { get; set; }
+        public CountryIsoCode Nationality { get; set; }
+        public CountryIsoCode CountryOfResidence { get; set; }
         public AddressInput Address { get; set; }
         public AddressInput BillingAddress { get; set; }
     }

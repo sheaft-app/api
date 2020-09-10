@@ -27,13 +27,13 @@ using System.Collections.Generic;
 namespace Sheaft.Application.Handlers
 {
     public class UserCommandsHandler : CommandsHandler,
-        IRequestHandler<QueueExportUserDataCommand, Result<Guid>>,
-        IRequestHandler<ExportUserDataCommand, Result<bool>>,
-        IRequestHandler<GenerateUserCodeCommand, Result<string>>,
-        IRequestHandler<CreateUserPointsCommand, Result<bool>>,
-        IRequestHandler<ChangeUserRolesCommand, Result<bool>>,
-        IRequestHandler<UpdateUserPictureCommand, Result<bool>>,
-        IRequestHandler<RemoveUserDataCommand, Result<string>>
+            IRequestHandler<QueueExportUserDataCommand, Result<Guid>>,
+            IRequestHandler<ExportUserDataCommand, Result<bool>>,
+            IRequestHandler<GenerateUserCodeCommand, Result<string>>,
+            IRequestHandler<CreateUserPointsCommand, Result<bool>>,
+            IRequestHandler<ChangeUserRolesCommand, Result<bool>>,
+            IRequestHandler<UpdateUserPictureCommand, Result<bool>>,
+            IRequestHandler<RemoveUserDataCommand, Result<string>>
     {
         private readonly IAppDbContext _context;
         private readonly IMediator _mediatr;
@@ -104,7 +104,7 @@ namespace Sheaft.Application.Handlers
                     roles.Add(_roleOptions.Owner.Id);
                     roles.Add(_roleOptions.Consumer.Id);
                 }
-                               
+
                 var oidcUser = new IdentityUserInput(request.UserId, entity.Email, entity.Name, entity.FirstName, entity.LastName, roles)
                 {
                     Phone = entity.Phone,
@@ -239,7 +239,7 @@ namespace Sheaft.Application.Handlers
                             throw response.Exception;
 
                         await _queuesService.ProcessEventAsync(ExportUserDataSucceededEvent.QUEUE_NAME, new ExportUserDataSucceededEvent(request.RequestUser) { Id = job.Id, JobId = job.Id }, token);
-                        
+
                         Logger.LogInformation($"RGPD data for user {request.RequestUser.Id} successfully exported");
                         return await _mediatr.Send(new CompleteJobCommand(request.RequestUser) { Id = job.Id, FileUrl = response.Data });
                     }

@@ -1,9 +1,8 @@
-﻿using Sheaft.Interop;
-using System;
+﻿using System;
 
 namespace Sheaft.Domain.Models
 {
-    public class Region : IEntity
+    public class Region
     {
         protected Region()
         {
@@ -13,14 +12,11 @@ namespace Sheaft.Domain.Models
         {
             Id = id;
             Code = code;
-
-            SetName(name);
+            Name = name;
         }
 
         public Guid Id { get; private set; }
-        public DateTimeOffset CreatedOn { get; private set; }
         public DateTimeOffset? UpdatedOn { get; private set; }
-        public DateTimeOffset? RemovedOn { get; private set; }
         public string Code { get; private set; }
         public string Name { get; private set; }
         public int Points { get; private set; }
@@ -47,30 +43,25 @@ namespace Sheaft.Domain.Models
         {
             Points = points;
         }
+
         public void SetPosition(int position)
         {
             Position = position;
         }
+
         public void SetProducersCount(int count)
         {
             ProducersCount = count;
         }
+
         public void SetStoresCount(int count)
         {
             StoresCount = count;
         }
+
         public void SetConsumersCount(int count)
         {
             ConsumersCount = count;
-        }
-
-        public void Remove()
-        {
-        }
-
-        public void Restore()
-        {
-            RemovedOn = null;
         }
     }
 }

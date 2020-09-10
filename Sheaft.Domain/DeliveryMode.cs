@@ -15,7 +15,7 @@ namespace Sheaft.Domain.Models
         {
         }
 
-        public DeliveryMode(Guid id, DeliveryKind kind, Producer producer, int lockOrderHoursBeforeDelivery, SimpleAddress address, IEnumerable<TimeSlotHour> openingHours, string name, string description = null)
+        public DeliveryMode(Guid id, DeliveryKind kind, Producer producer, int lockOrderHoursBeforeDelivery, LocationAddress address, IEnumerable<TimeSlotHour> openingHours, string name, string description = null)
         {
             Id = id;
             Name = name;
@@ -37,7 +37,7 @@ namespace Sheaft.Domain.Models
         public int LockOrderHoursBeforeDelivery { get; private set; }
         public string Name { get; private set; }
         public string Description { get; private set; }
-        public virtual SimpleAddress Address { get; private set; }
+        public virtual LocationAddress Address { get; private set; }
         public virtual Producer Producer { get; private set; }
         public virtual IReadOnlyCollection<TimeSlotHour> OpeningHours { get { return _openingHours.AsReadOnly(); } }
 
@@ -54,9 +54,9 @@ namespace Sheaft.Domain.Models
             LockOrderHoursBeforeDelivery = lockOrderHoursBeforeDelivery;
         }
 
-        public void SetAddress(string line1, string line2, string zipcode, string city, double? longitude = null, double? latitude = null)
+        public void SetAddress(string line1, string line2, string zipcode, string city, CountryIsoCode country, double? longitude = null, double? latitude = null)
         {
-            Address = new SimpleAddress(line1, line2, zipcode, city, longitude, latitude);
+            Address = new LocationAddress(line1, line2, zipcode, city, country, longitude, latitude);
         }
 
         public void SetDescription(string description)

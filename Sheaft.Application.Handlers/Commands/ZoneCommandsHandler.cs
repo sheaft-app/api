@@ -92,7 +92,7 @@ namespace Sheaft.Application.Handlers
         {
             return await ExecuteAsync(async () =>
             {
-                var departments = await _context.Departments.Where(d => !d.RemovedOn.HasValue).ToListAsync(token);
+                var departments = await _context.Departments.ToListAsync(token);
                 var depts = departments.Select(d => new DepartmentProgress
                 {
                     Code = d.Code,

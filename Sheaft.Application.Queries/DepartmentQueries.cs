@@ -26,7 +26,7 @@ namespace Sheaft.Application.Queries
             try
             {
                 return _context.Departments
-                        .Get(d => d.Id == id)
+                        .Where(d => d.Id == id)
                         .ProjectTo<DepartmentDto>(_configurationProvider);
             }
             catch (Exception e)
@@ -40,7 +40,6 @@ namespace Sheaft.Application.Queries
             try
             {
                 return _context.Departments
-                        .Get()
                         .ProjectTo<DepartmentDto>(_configurationProvider);
             }
             catch (Exception e)
@@ -54,7 +53,7 @@ namespace Sheaft.Application.Queries
             try
             {
                 return _context.Departments
-                        .Get(d => d.Region.Id == regionId)
+                        .Where(d => d.Region.Id == regionId)
                         .ProjectTo<DepartmentDto>(_configurationProvider);
             }
             catch (Exception e)

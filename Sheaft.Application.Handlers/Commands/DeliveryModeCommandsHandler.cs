@@ -10,7 +10,6 @@ using System.Linq;
 using System.Collections.Generic;
 using Microsoft.Extensions.Logging;
 using Microsoft.EntityFrameworkCore;
-using Sheaft.Exceptions;
 using Sheaft.Interop.Enums;
 
 namespace Sheaft.Application.Handlers
@@ -36,10 +35,10 @@ namespace Sheaft.Application.Handlers
             {
                 var producer = await _context.GetByIdAsync<Producer>(request.RequestUser.Id, token);
 
-                SimpleAddress deliveryModeAddress = null;
+                LocationAddress deliveryModeAddress = null;
                 if (request.Address != null)
                 {
-                    deliveryModeAddress = new SimpleAddress(request.Address.Line1, request.Address.Line2, request.Address.Zipcode, request.Address.City, request.Address.Longitude, request.Address.Latitude);
+                    deliveryModeAddress = new LocationAddress(request.Address.Line1, request.Address.Line2, request.Address.Zipcode, request.Address.City, request.Address.Country, request.Address.Longitude, request.Address.Latitude);
                 }
 
                 var openingHours = new List<TimeSlotHour>();
@@ -74,7 +73,7 @@ namespace Sheaft.Application.Handlers
 
                 if (request.Address != null)
                 {
-                    entity.SetAddress(request.Address.Line1, request.Address.Line2, request.Address.Zipcode, request.Address.City, request.Address.Longitude, request.Address.Latitude);
+                    entity.SetAddress(request.Address.Line1, request.Address.Line2, request.Address.Zipcode, request.Address.City, request.Address.Country, request.Address.Longitude, request.Address.Latitude);
                 }
 
                 if (request.OpeningHours != null)

@@ -29,7 +29,7 @@ namespace Sheaft.Application.Handlers
         {
             return await ExecuteAsync(async () =>
             {
-                var entity = await _context.GetByIdAsync<Department>(request.Id, token);
+                var entity = await _context.Departments.SingleOrDefaultAsync(c => c.Id == request.Id, token);
 
                 entity.SetName(request.Name);
                 entity.SetRequiredProducers(request.RequiredProducers);
@@ -44,7 +44,7 @@ namespace Sheaft.Application.Handlers
         {
             return await ExecuteAsync(async () =>
             {
-                var department = await _context.GetByIdAsync<Department>(request.Id, token);
+                var department = await _context.Departments.SingleOrDefaultAsync(c => c.Id == request.Id, token);
                 var level = (await _context.GetAsync<Level>(c => c.RequiredPoints > request.Points, token)).OrderBy(c => c.RequiredPoints).FirstOrDefault();
 
                 department.SetLevel(level);
