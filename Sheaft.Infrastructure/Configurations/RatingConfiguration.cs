@@ -24,7 +24,7 @@ namespace Sheaft.Infrastructure
             entity.HasIndex(c => c.Id).IsUnique();
             entity.HasIndex("ProductUid");
             entity.HasIndex("UserUid");
-            entity.HasIndex("Uid", "Id", "ProductUid", "UserUid", "CreatedOn");
+            entity.HasIndex("Uid", "Id", "ProductUid", "UserUid", "RemovedOn");
 
             entity.ToTable("Ratings");
         }

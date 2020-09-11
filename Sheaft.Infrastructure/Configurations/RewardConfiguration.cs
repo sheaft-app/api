@@ -24,7 +24,7 @@ namespace Sheaft.Infrastructure
             entity.HasIndex(c => c.Id).IsUnique();
             entity.HasIndex("LevelUid");
             entity.HasIndex("DepartmentUid");
-            entity.HasIndex("Uid", "Id", "DepartmentUid", "LevelUid", "CreatedOn");
+            entity.HasIndex("Uid", "Id", "DepartmentUid", "LevelUid", "RemovedOn");
 
             entity.ToTable("Rewards");
         }

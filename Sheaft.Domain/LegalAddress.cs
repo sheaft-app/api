@@ -1,9 +1,8 @@
-﻿using Sheaft.Exceptions;
-using Sheaft.Interop.Enums;
+﻿using Sheaft.Interop.Enums;
 
 namespace Sheaft.Domain.Models
 {
-    public class LegalAddress : Address
+    public class LegalAddress : BaseAddress
     {
         protected LegalAddress()
         {

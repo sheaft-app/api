@@ -12,32 +12,35 @@ namespace Sheaft.Domain.Models
         private const int DIGITS_COUNT = 2;
 
         private List<PurchaseOrderProduct> _products;
-        private List<PurchaseTransaction> _transactions;
 
         protected PurchaseOrder()
         {
         }
 
-        public PurchaseOrder(Guid id, string reference, OrderStatusKind status, IDictionary<Product, int> lines, DeliveryMode delivery, DateTimeOffset expectedDeliveryDate, Producer vendor, User sender)
+        public PurchaseOrder(Guid id, string reference, OrderStatusKind status, Producer producer, Order order)
         {
-            if (vendor == null)
+            if (producer == null)
                 throw new ValidationException(MessageKind.PurchaseOrder_Vendor_Required);
-
-            if (sender == null)
-                throw new ValidationException(MessageKind.PurchaseOrder_Sender_Required);
 
             Id = id;
 
             _products = new List<PurchaseOrderProduct>();
-            _transactions = new List<PurchaseTransaction>();
 
-            SetSender(sender);
-            SetVendor(vendor);
-            SetExpectedDelivery(delivery, expectedDeliveryDate);
+            SetSender(order.User);
+            SetVendor(producer);
+
+            var delivery = order.Deliveries.FirstOrDefault(d => d.DeliveryMode.Producer.Id == producer.Id);
+            SetExpectedDelivery(delivery.DeliveryMode, delivery.ExpectedDeliveryDate);
+            SetComment(delivery.Comment);
 
             SetReference(reference);
             SetOrderStatus(status);
-            AddProducts(lines);
+
+            var orderProducts = order.Products.Where(p => p.Producer.Id == producer.Id);
+            foreach(var orderProduct in orderProducts)
+            {
+                AddProduct(orderProduct);
+            }
         }
 
         public Guid Id { get; }
@@ -54,16 +57,13 @@ namespace Sheaft.Domain.Models
         public decimal TotalOnSalePrice { get; private set; }
         public decimal TotalWeight { get; private set; }
         public OrderStatusKind Status { get; private set; }
+        public virtual Order Order { get; private set; }
         public virtual PurchaseOrderSender Sender { get; private set; }
         public virtual ExpectedDelivery ExpectedDelivery { get; private set; }
         public virtual PurchaseOrderVendor Vendor { get; private set; }
         public virtual IReadOnlyCollection<PurchaseOrderProduct> Products
         {
             get => _products?.AsReadOnly();
-        }
-        public virtual IReadOnlyCollection<PurchaseTransaction> Transactions
-        {
-            get => _transactions?.AsReadOnly();
         }
 
         public void SetReference(string newReference)
@@ -120,10 +120,21 @@ namespace Sheaft.Domain.Models
             Comment = comment;
         }
 
-        public void AddProducts(IDictionary<Product, int> products)
+        public void AddProduct(ProductRow product)
         {
-            foreach (var product in products)
-                AddProduct(product.Key, product.Value);
+            if (Status != OrderStatusKind.Waiting)
+                throw new ValidationException(MessageKind.PurchaseOrder_CannotAddProduct_NotIn_WaitingStatus);
+
+            if (product == null)
+                throw new ValidationException(MessageKind.PurchaseOrder_CannotAddProduct_Product_NotFound);
+
+            var productLine = _products.SingleOrDefault(p => p.Id == product.Id);
+            if (productLine == null)
+                _products.Add(new PurchaseOrderProduct(product));
+            else
+                productLine.SetQuantity(product.Quantity);
+
+            RefreshOrder();
         }
 
         public void AddProduct(Product product, int quantity)

@@ -35,17 +35,33 @@ namespace Sheaft.GraphQL.Types
                 .Type<NonNullType<ListType<ProductQuantityInputType>>>();
         }
     }
-    public class CreatePurchaseOrdersInputType : SheaftInputType<CreatePurchaseOrdersInput>
+    public class CreateOrderInputType : SheaftInputType<CreateOrderInput>
     {
-        protected override void Configure(IInputObjectTypeDescriptor<CreatePurchaseOrdersInput> descriptor)
+        protected override void Configure(IInputObjectTypeDescriptor<CreateOrderInput> descriptor)
         {
-            descriptor.Field(c => c.Donation);
-
             descriptor.Field(c => c.ProducersExpectedDeliveries)
                 .Type<NonNullType<ListType<ProducerExpectedDeliveryInputType>>>();
 
             descriptor.Field(c => c.Products)
                 .Type<NonNullType<ListType<ProductQuantityInputType>>>();
+        }
+    }
+    public class PayOrderInputType : SheaftInputType<PayOrderInput>
+    {
+        protected override void Configure(IInputObjectTypeDescriptor<PayOrderInput> descriptor)
+        {
+            descriptor.Field(c => c.Donation);
+
+            descriptor.Field(c => c.OrderId)
+                .Type<NonNullType<IdType>>();
+        }
+    }
+    public class ConfirmOrderInputType : SheaftInputType<ConfirmOrderInput>
+    {
+        protected override void Configure(IInputObjectTypeDescriptor<ConfirmOrderInput> descriptor)
+        {
+            descriptor.Field(c => c.OrderId)
+                .Type<NonNullType<IdType>>();
         }
     }
     public class CreateQuickOrderInputType : SheaftInputType<CreateQuickOrderInput>
@@ -162,9 +178,9 @@ namespace Sheaft.GraphQL.Types
                 .Type<NonNullType<IdType>>();
         }
     }
-    public class PackagingInputType : SheaftInputType<CreatePackagingInput>
+    public class ReturnableInputType : SheaftInputType<CreateReturnableInput>
     {
-        protected override void Configure(IInputObjectTypeDescriptor<CreatePackagingInput> descriptor)
+        protected override void Configure(IInputObjectTypeDescriptor<CreateReturnableInput> descriptor)
         {
             descriptor.Field(c => c.Vat);
             descriptor.Field(c => c.Description);
@@ -201,7 +217,7 @@ namespace Sheaft.GraphQL.Types
         {
             descriptor.Field(c => c.Available);
             descriptor.Field(c => c.Description);
-            descriptor.Field(c => c.PackagingId).Type<IdType>();
+            descriptor.Field(c => c.ReturnableId).Type<IdType>();
             descriptor.Field(c => c.Picture);
             descriptor.Field(c => c.QuantityPerUnit);
             descriptor.Field(c => c.Unit);
@@ -507,9 +523,9 @@ namespace Sheaft.GraphQL.Types
                 .Type<NonNullType<ListType<ProductQuantityInputType>>>();
         }
     }
-    public class UpdatePackagingInputType : SheaftInputType<UpdatePackagingInput>
+    public class UpdateReturnableInputType : SheaftInputType<UpdateReturnableInput>
     {
-        protected override void Configure(IInputObjectTypeDescriptor<UpdatePackagingInput> descriptor)
+        protected override void Configure(IInputObjectTypeDescriptor<UpdateReturnableInput> descriptor)
         {
             descriptor.Field(c => c.Description);
             descriptor.Field(c => c.Vat);
@@ -538,7 +554,7 @@ namespace Sheaft.GraphQL.Types
         {
             descriptor.Field(c => c.Available);
             descriptor.Field(c => c.Description);
-            descriptor.Field(c => c.PackagingId).Type<IdType>();
+            descriptor.Field(c => c.ReturnableId).Type<IdType>();
             descriptor.Field(c => c.Picture);
             descriptor.Field(c => c.QuantityPerUnit);
             descriptor.Field(c => c.Unit);

@@ -219,7 +219,7 @@ namespace Sheaft.Api
             services.AddScoped<IJobQueries, JobQueries>();
             services.AddScoped<ILeaderboardQueries, LeaderboardQueries>();
             services.AddScoped<INotificationQueries, NotificationQueries>();
-            services.AddScoped<IPackagingQueries, PackagingQueries>();
+            services.AddScoped<IReturnableQueries, ReturnableQueries>();
             services.AddScoped<IProductQueries, ProductQueries>();
             services.AddScoped<IPurchaseOrderQueries, PurchaseOrderQueries>();
             services.AddScoped<IQuickOrderQueries, QuickOrderQueries>();
@@ -229,6 +229,7 @@ namespace Sheaft.Api
             services.AddScoped<IUserQueries, UserQueries>();
             services.AddScoped<INationalityQueries, NationalityQueries>();
             services.AddScoped<ICountryQueries, CountryQueries>();
+            services.AddScoped<IOrderQueries, OrderQueries>();
 
             services.AddScoped<IDapperContext, DapperContext>();
             services.AddScoped<IAppDbContext>(c => c.GetRequiredService<AppDbContext>());

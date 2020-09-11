@@ -31,8 +31,8 @@ namespace Sheaft.GraphQL
             descriptor.Field(c => c.GetMyPositionInRegion(default));
             descriptor.Field(c => c.GetMyRankInformationAsync(default));
             descriptor.Field(c => c.GetNotifications(default));
-            descriptor.Field(c => c.GetPackaging(default, default)).Argument("input", c => c.Type<NonNullType<IdType>>());
-            descriptor.Field(c => c.GetPackagings(default));
+            descriptor.Field(c => c.GetReturnable(default, default)).Argument("input", c => c.Type<NonNullType<IdType>>());
+            descriptor.Field(c => c.GetReturnables(default));
             descriptor.Field(c => c.GetProducer(default, default)).Argument("input", c => c.Type<NonNullType<IdType>>());
             descriptor.Field(c => c.GetProducersDeliveriesAsync(default, default)).Argument("input", c => c.Type<SearchProducersDeliveriesInputType>());
             descriptor.Field(c => c.GetProduct(default, default)).Argument("input", c => c.Type<NonNullType<IdType>>());

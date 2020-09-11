@@ -1,10 +1,8 @@
-﻿using Sheaft.Exceptions;
-using Sheaft.Interop.Enums;
+﻿using Sheaft.Interop.Enums;
 
 namespace Sheaft.Domain.Models
 {
-
-    public class BillingAddress : Address
+    public class BillingAddress : BaseAddress
     {
         protected BillingAddress()
         {

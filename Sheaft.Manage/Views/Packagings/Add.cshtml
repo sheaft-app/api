@@ -1,6 +1,6 @@
-﻿@model PackagingViewModel
+﻿@model ReturnableViewModel
 @{
-    ViewData["Title"] = "New Packaging";
+    ViewData["Title"] = "New Returnable";
     var vats = new List<SelectListItem> {
         new SelectListItem("5.5%", "5.5"),
         new SelectListItem("10%", "10"),
@@ -10,10 +10,10 @@
 }
 
 <div class="container">
-    <h1 class="display-5">New Packaging</h1>
+    <h1 class="display-5">New Returnable</h1>
     <br />
 
-    @using (Html.BeginForm("Add", "Packagings", FormMethod.Post, new { @class = "form" }))
+    @using (Html.BeginForm("Add", "Returnables", FormMethod.Post, new { @class = "form" }))
     {
         @Html.AntiForgeryToken()
         @Html.ValidationSummary(true, "", new { @class = "text-danger" })
@@ -37,7 +37,7 @@
         </div>
 
         <br />
-        <a asp-controller="Packagings" asp-action="Index" class="btn btn-light">
+        <a asp-controller="Returnables" asp-action="Index" class="btn btn-light">
             Cancel
         </a>
         <button type="submit" class="btn btn-success">

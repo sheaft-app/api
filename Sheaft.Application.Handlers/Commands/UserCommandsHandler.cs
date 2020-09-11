@@ -182,9 +182,12 @@ namespace Sheaft.Application.Handlers
                     return BadRequest<bool>(MessageKind.UserPoints_Scoring_Matching_ActionPoints_NotFound);
 
                 var user = await _context.GetByIdAsync<User>(request.UserId, token);
-                user.AddPoints(request.Kind, quantity, request.CreatedOn);
+                var point = new Points(user, request.Kind, quantity, request.CreatedOn);
 
+                user.SetTotalPoints(user.TotalPoints + point.Quantity);
                 _context.Update(user);
+
+                await _context.AddAsync(point, token);
                 await _context.SaveChangesAsync(token);
 
                 await _queuesService.ProcessEventAsync(UserPointsCreatedEvent.QUEUE_NAME, new UserPointsCreatedEvent(request.RequestUser) { UserId = user.Id, Kind = request.Kind, Points = quantity, CreatedOn = request.CreatedOn }, token);
@@ -258,7 +261,6 @@ namespace Sheaft.Application.Handlers
             package = ProcessUserProfileData(package, user);
             package = await ProcessUserOrdersDataAsync(package, user, token);
             package = await ProcessUserRatingsDataAsync(package, user, token);
-            package = ProcessUserPointsData(package, user);
 
             package.Save();
         }
@@ -271,9 +273,9 @@ namespace Sheaft.Application.Handlers
             profileWorksheet.Cells[1, 1, 1, 2].Merge = true;
 
             profileWorksheet.Cells[2, 1].Value = "Nom";
-            //profileWorksheet.Cells[2, 2].Value = user.LastName;
+            profileWorksheet.Cells[2, 2].Value = user.LastName;
             profileWorksheet.Cells[3, 1].Value = "Prénom";
-            //profileWorksheet.Cells[3, 2].Value = user.FirstName;
+            profileWorksheet.Cells[3, 2].Value = user.FirstName;
             profileWorksheet.Cells[4, 1].Value = "Adresse e-mail";
             profileWorksheet.Cells[4, 2].Value = user.Email;
             profileWorksheet.Cells[5, 1].Value = "Numéro de mobile";
@@ -284,6 +286,8 @@ namespace Sheaft.Application.Handlers
             profileWorksheet.Cells[7, 2].Value = user.CreatedOn.ToString("dd/MM/yyyy HH:mm");
             profileWorksheet.Cells[8, 1].Value = "Date de dernière mise à jour";
             profileWorksheet.Cells[8, 2].Value = (user.UpdatedOn.HasValue ? user.UpdatedOn.Value : user.CreatedOn).ToString("dd/MM/yyyy HH:mm");
+            profileWorksheet.Cells[9, 1].Value = "Points";
+            profileWorksheet.Cells[9, 2].Value = user.TotalPoints;
 
             return package;
         }
@@ -361,30 +365,6 @@ namespace Sheaft.Application.Handlers
 
                     i++;
                 }
-            }
-
-            return package;
-        }
-
-        private ExcelPackage ProcessUserPointsData(ExcelPackage package, User user)
-        {
-            var pointsWorksheet = package.Workbook.Worksheets.Add("Points");
-
-            pointsWorksheet.Cells[1, 1, 1, 3].Value = "Vos points";
-            pointsWorksheet.Cells[1, 1, 1, 3].Merge = true;
-
-            pointsWorksheet.Cells[2, 1].Value = "Date d'acquisition";
-            pointsWorksheet.Cells[2, 2].Value = "Raison";
-            pointsWorksheet.Cells[2, 3].Value = "Quantité";
-
-            var i = 3;
-            foreach (var userRating in user.Points)
-            {
-                pointsWorksheet.Cells[i, 1].Value = userRating.CreatedOn.ToString("dd/MM/yyyy HH:mm");
-                pointsWorksheet.Cells[i, 2].Value = userRating.Kind;
-                pointsWorksheet.Cells[i, 3].Value = userRating.Quantity;
-
-                i++;
             }
 
             return package;

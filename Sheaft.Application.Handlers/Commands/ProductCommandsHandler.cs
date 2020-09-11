@@ -92,10 +92,10 @@ namespace Sheaft.Application.Handlers
                 entity.SetDescription(request.Description);
                 entity.SetAvailable(request.Available);
 
-                if (request.PackagingId.HasValue)
+                if (request.ReturnableId.HasValue)
                 {
-                    var packaging = await _context.GetByIdAsync<Packaging>(request.PackagingId.Value, token);
-                    entity.SetPackaging(packaging);
+                    var returnable = await _context.GetByIdAsync<Returnable>(request.ReturnableId.Value, token);
+                    entity.SetReturnable(returnable);
                 }
 
                 var tags = await _context.FindAsync<Tag>(t => request.Tags.Contains(t.Id), token);
@@ -128,14 +128,14 @@ namespace Sheaft.Application.Handlers
                 entity.SetAvailable(request.Available);
                 entity.SetUnit(request.QuantityPerUnit, request.Unit);
 
-                if (request.PackagingId.HasValue)
+                if (request.ReturnableId.HasValue)
                 {
-                    var packaging = await _context.GetByIdAsync<Packaging>(request.PackagingId.Value, token);
-                    entity.SetPackaging(packaging);
+                    var returnable = await _context.GetByIdAsync<Returnable>(request.ReturnableId.Value, token);
+                    entity.SetReturnable(returnable);
                 }
                 else
                 {
-                    entity.SetPackaging(null);
+                    entity.SetReturnable(null);
                 }
 
                 var tags = await _context.FindAsync<Tag>(t => request.Tags.Contains(t.Id), token);

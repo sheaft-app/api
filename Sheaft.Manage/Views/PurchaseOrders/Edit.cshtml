@@ -126,7 +126,7 @@
                         <th scope="col">WholeSalePrice</th>
                         <th scope="col">Vat</th>
                         <th scope="col">OnSalePrice</th>
-                        <th scope="col">Packaging</th>
+                        <th scope="col">Returnable</th>
                         <th scope="col">Total</th>
                     </tr>
                 </thead>
@@ -140,7 +140,7 @@
                             <td>@(product.UnitWholeSalePrice)€</td>
                             <td>@(product.UnitVatPrice)€ (@(product.Vat)%)</td>
                             <td>@(product.UnitOnSalePrice)€</td>
-                            <td>@(product.PackagingOnSalePrice ?? 0)€</td>
+                            <td>@(product.ReturnableOnSalePrice ?? 0)€</td>
                             <td>@(product.TotalOnSalePrice)€</td>
                         </tr>
                     }

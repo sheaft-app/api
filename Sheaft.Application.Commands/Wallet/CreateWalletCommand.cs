@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using Newtonsoft.Json;
 using Sheaft.Core;
 using Sheaft.Interop.Enums;

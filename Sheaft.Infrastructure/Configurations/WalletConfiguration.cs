@@ -13,16 +13,17 @@ namespace Sheaft.Infrastructure
 
             entity.Property(c => c.CreatedOn);
             entity.Property(c => c.UpdatedOn).IsConcurrencyToken();
-
             entity.Property(c => c.Name).IsRequired();
+            entity.Property(o => o.Amount).HasColumnType("decimal(10,2)");
+
+            entity.HasOne(c => c.User).WithMany().HasForeignKey("UserUid").OnDelete(DeleteBehavior.Cascade);
 
             entity.HasKey("Uid");
 
             entity.HasIndex(c => c.Id).IsUnique();
-            entity.HasIndex("UserUid", "Kind").IsUnique();
-            entity.HasIndex("UserUid");
             entity.HasIndex(c => c.Identifier);
-            entity.HasIndex("Uid", "Id", "UserUid", "CreatedOn");
+            entity.HasIndex("UserUid");
+            entity.HasIndex("Uid", "Id", "UserUid", "RemovedOn");
 
             entity.ToTable("Wallets");
         }

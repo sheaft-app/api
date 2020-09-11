@@ -61,7 +61,7 @@ namespace Sheaft.Domain.Models
         public bool Available { get; private set; }
         public int RatingsCount { get; set; }
         public decimal? Rating { get; set; }
-        public virtual Packaging Packaging { get; private set; }
+        public virtual Returnable Returnable { get; private set; }
         public virtual Producer Producer { get; private set; }
         public virtual IReadOnlyCollection<ProductTag> Tags { get { return _tags.AsReadOnly(); } }
         public virtual IReadOnlyCollection<Rating> Ratings { get { return _ratings.AsReadOnly(); } }
@@ -205,12 +205,12 @@ namespace Sheaft.Domain.Models
             _tags.Remove(tag);
         }
 
-        public void SetPackaging(Packaging packaging)
+        public void SetReturnable(Returnable returnable)
         {
-            if (Packaging != null && Packaging.Id == packaging?.Id)
+            if (Returnable != null && Returnable.Id == returnable?.Id)
                 return;
 
-            Packaging = packaging;
+            Returnable = returnable;
         }
 
         public void SetUnit(decimal quantityPerUnit, UnitKind unit)

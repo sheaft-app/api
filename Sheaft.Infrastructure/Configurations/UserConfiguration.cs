@@ -11,7 +11,6 @@ namespace Sheaft.Infrastructure
         {
             entity.Property<long>("Uid");
 
-            entity.Property(c => c.CreatedOn);
             entity.Property(c => c.UpdatedOn).IsConcurrencyToken();
 
             entity.Property(c => c.Name).IsRequired();
@@ -39,31 +38,13 @@ namespace Sheaft.Infrastructure
             });
 
             entity.HasMany<Sponsoring>().WithOne(c => c.Sponsor).HasForeignKey("SponsorUid").OnDelete(DeleteBehavior.NoAction);
-            entity.HasMany(c => c.PaymentMethods).WithOne().HasForeignKey("UserUid").OnDelete(DeleteBehavior.Cascade);
-            entity.HasMany(c => c.Wallets).WithOne().HasForeignKey("UserUid").OnDelete(DeleteBehavior.Cascade);
-
-            entity.OwnsMany(c => c.Points, p =>
-            {
-                p.Property<long>("Uid");
-                p.HasKey("Uid");
-                p.ToTable("UserPoints");
-            });
-
-            var points = entity.Metadata.FindNavigation(nameof(User.Points));
-            points.SetPropertyAccessMode(PropertyAccessMode.Field);
-
-            var payments = entity.Metadata.FindNavigation(nameof(User.PaymentMethods));
-            payments.SetPropertyAccessMode(PropertyAccessMode.Field);
-
-            var wallets = entity.Metadata.FindNavigation(nameof(User.Wallets));
-            wallets.SetPropertyAccessMode(PropertyAccessMode.Field);
 
             entity.HasKey("Uid");
 
             entity.HasIndex(c => c.Id).IsUnique();
             entity.HasIndex(c => c.Email).IsUnique();
             entity.HasIndex(c => c.Identifier);
-            entity.HasIndex("Uid", "Id", "CreatedOn");
+            entity.HasIndex("Uid", "Id", "RemovedOn");
 
             entity.ToTable("Users");
         }

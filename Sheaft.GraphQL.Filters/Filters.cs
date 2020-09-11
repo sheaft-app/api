@@ -132,9 +132,9 @@ namespace Sheaft.GraphQL.Filters
             descriptor.Filter(c => c.Unread).AllowEquals();
         }
     }
-    public class PackagingFilterType : FilterInputType<PackagingDto>
+    public class ReturnableFilterType : FilterInputType<ReturnableDto>
     {
-        protected override void Configure(IFilterInputTypeDescriptor<PackagingDto> descriptor)
+        protected override void Configure(IFilterInputTypeDescriptor<ReturnableDto> descriptor)
         {
             descriptor.BindFieldsExplicitly();
             descriptor.Filter(c => c.Id).AllowEquals();

@@ -106,7 +106,7 @@ namespace Sheaft.Application.Queries
                         OnSalePricePerUnit = p.Product_onSalePricePerUnit ?? 0,
                         QuantityPerUnit = p.Product_quantityPerUnit ?? 0,
                         Rating = p.Product_rating,
-                        Packaged = p.Packaged.HasValue ? p.Packaged.Value : false,
+                        IsReturnable = p.Packaged.HasValue ? p.Packaged.Value : false,
                         RatingsCount = p.Product_ratings_count,
                         Tags = p.Product_tags?.Select(t => new TagDto { Name = t }) ?? new List<TagDto>(),
                         Unit = (UnitKind)Enum.Parse(typeof(UnitKind), p.Product_unit.ToLowerInvariant()),

@@ -89,7 +89,7 @@ namespace Sheaft.Manage.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(PackagingViewModel model, CancellationToken token)
+        public async Task<IActionResult> Edit(ReturnableViewModel model, CancellationToken token)
         {
             var requestUser = await GetRequestUser(token);
             var result = await _mediatr.Send(new UpdateJobCommand(requestUser)

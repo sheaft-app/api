@@ -376,23 +376,23 @@ namespace Sheaft.GraphQL
         }
 
         [Authorize(Policy = Policies.PRODUCER)]
-        [GraphQLName("packaging")]
+        [GraphQLName("returnable")]
         [UseSingleOrDefault]
         [UseSelection]
-        public IQueryable<PackagingDto> GetPackaging(Guid input, [Service] IPackagingQueries packagingQueries)
+        public IQueryable<ReturnableDto> GetReturnable(Guid input, [Service] IReturnableQueries returnableQueries)
         {
-            return packagingQueries.GetPackaging(input, _currentUser);
+            return returnableQueries.GetReturnable(input, _currentUser);
         }
 
         [Authorize(Policy = Policies.PRODUCER)]
-        [GraphQLName("packagings")]
+        [GraphQLName("returnables")]
         [UsePaging]
-        [UseSorting(SortType = typeof(PackagingSortType))]
-        [UseFiltering(FilterType = typeof(PackagingFilterType))]
+        [UseSorting(SortType = typeof(ReturnableSortType))]
+        [UseFiltering(FilterType = typeof(ReturnableFilterType))]
         [UseSelection]
-        public IQueryable<PackagingDto> GetPackagings([Service] IPackagingQueries packagingQueries)
+        public IQueryable<ReturnableDto> GetReturnables([Service] IReturnableQueries returnableQueries)
         {
-            return packagingQueries.GetPackagings(_currentUser);
+            return returnableQueries.GetReturnables(_currentUser);
         }
 
         [Authorize(Policy = Policies.REGISTERED)]

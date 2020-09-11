@@ -16,8 +16,8 @@
     };
 
     var tags = ((List<TagViewModel>)ViewBag.Tags).Select(c => new SelectListItem(c.Name, c.Id.ToString("D"))).ToList();
-    var packagings = ((List<PackagingViewModel>)ViewBag.Packagings).Select(c => new SelectListItem(c.Name, c.Id.ToString("D"))).ToList();
-    packagings.Insert(0, new SelectListItem("None", null));
+    var returnables = ((List<ReturnableViewModel>)ViewBag.Returnables).Select(c => new SelectListItem(c.Name, c.Id.ToString("D"))).ToList();
+    returnables.Insert(0, new SelectListItem("None", null));
 }
 
     <div class="container">
@@ -63,8 +63,8 @@
                 @Html.TextBoxFor(c => c.Picture, new { @class = "form-control", @type = "file" })
             </div>
             <div class="form-group">
-                @Html.LabelFor(c => c.PackagingId, "Packaging", new { @class = "form-label" })
-                @Html.DropDownListFor(c => c.PackagingId, packagings, new { @class = "form-control" })
+                @Html.LabelFor(c => c.ReturnableId, "Returnable", new { @class = "form-label" })
+                @Html.DropDownListFor(c => c.ReturnableId, returnables, new { @class = "form-control" })
             </div>
             <div class="form-group">
                 @Html.LabelFor(c => c.Tags, new { @class = "form-label" })

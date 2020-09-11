@@ -31,7 +31,7 @@ namespace Sheaft.Infrastructure
 
             entity.HasIndex(c => c.Id).IsUnique();
             entity.HasIndex("ProducerUid");
-            entity.HasIndex("Uid", "Id", "ProducerUid", "CreatedOn");
+            entity.HasIndex("Uid", "Id", "ProducerUid", "RemovedOn");
 
             entity.ToTable("DeliveryModes");
         }

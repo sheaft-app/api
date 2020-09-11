@@ -42,7 +42,7 @@ namespace Sheaft.Infrastructure
         public DbSet<Notification> Notifications { get; set; }
         public DbSet<Order> Orders { get; set; }
         public DbSet<PurchaseOrder> PurchaseOrders { get; set; }
-        public DbSet<Packaging> Packagings { get; set; }
+        public DbSet<Returnable> Returnables { get; set; }
         public DbSet<Product> Products { get; set; }
         public DbSet<QuickOrder> QuickOrders { get; set; }
         public DbSet<Region> Regions { get; set; }

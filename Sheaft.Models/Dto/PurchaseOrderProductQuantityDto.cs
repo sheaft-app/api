@@ -18,10 +18,10 @@ namespace Sheaft.Models.Dto
         public decimal TotalVatPrice { get; set; }
         public decimal TotalOnSalePrice { get; set; }
         public decimal? TotalWeight { get; set; }
-        public string PackagingName { get; set; }
-        public decimal? PackagingVat { get; set; }
-        public decimal? PackagingVatPrice { get; set; }
-        public decimal? PackagingWholeSalePrice { get; set; }
-        public decimal? PackagingOnSalePrice { get; set; }
+        public string ReturnableName { get; set; }
+        public decimal? ReturnableVat { get; set; }
+        public decimal? ReturnableVatPrice { get; set; }
+        public decimal? ReturnableWholeSalePrice { get; set; }
+        public decimal? ReturnableOnSalePrice { get; set; }
     }
 }

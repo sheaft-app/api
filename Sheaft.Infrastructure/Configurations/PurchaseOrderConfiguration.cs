@@ -23,9 +23,10 @@ namespace Sheaft.Infrastructure
             entity.Property(o => o.TotalWeight).HasColumnType("decimal(10,2)");
 
             entity.HasMany(o => o.Products).WithOne().HasForeignKey("PurchaseOrderUid").OnDelete(DeleteBehavior.Cascade);
-            entity.HasMany(o => o.Transactions).WithOne().HasForeignKey("PurchaseOrderUid").OnDelete(DeleteBehavior.Cascade);
+
             entity.HasOne(c => c.Vendor).WithOne().HasForeignKey<PurchaseOrder>("PurchaseOrderVendorUid").OnDelete(DeleteBehavior.Cascade);
             entity.HasOne(c => c.Sender).WithOne().HasForeignKey<PurchaseOrder>("PurchaseOrderSenderUid").OnDelete(DeleteBehavior.Cascade);
+            entity.HasOne(c => c.Order).WithMany().HasForeignKey("OrderUid").OnDelete(DeleteBehavior.NoAction);
 
             entity.OwnsOne(c => c.ExpectedDelivery, cb =>
             {
@@ -40,9 +41,6 @@ namespace Sheaft.Infrastructure
             var products = entity.Metadata.FindNavigation(nameof(PurchaseOrder.Products));
             products.SetPropertyAccessMode(PropertyAccessMode.Field);
 
-            var transactions = entity.Metadata.FindNavigation(nameof(PurchaseOrder.Transactions));
-            transactions.SetPropertyAccessMode(PropertyAccessMode.Field);
-
             entity.HasKey("Uid");
 
             entity.HasIndex(c => c.Id).IsUnique();
@@ -51,7 +49,7 @@ namespace Sheaft.Infrastructure
             entity.HasIndex("PurchaseOrderVendorUid");
             entity.HasIndex("PurchaseOrderSenderUid");
 
-            entity.HasIndex("OrderUid", "Uid", "Id", "PurchaseOrderVendorUid", "PurchaseOrderSenderUid", "CreatedOn");
+            entity.HasIndex("OrderUid", "Uid", "Id", "PurchaseOrderVendorUid", "PurchaseOrderSenderUid", "RemovedOn");
             entity.ToTable("PurchaseOrders");
         }
     }

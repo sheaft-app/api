@@ -30,7 +30,7 @@ namespace Sheaft.Api
             services.AddType<SirenLegalsType>();
             services.AddType<JobType>();
             services.AddType<NotificationType>();
-            services.AddType<PackagingType>();
+            services.AddType<ReturnableType>();
             services.AddType<PurchaseOrderType>();
             services.AddType<RatingType>();
             services.AddType<PurchaseOrderProductQuantityType>();
@@ -70,9 +70,11 @@ namespace Sheaft.Api
             services.AddType<TransactionStatusEnumType>();
             services.AddType<TransactionNatureEnumType>();
 
+            services.AddType<CreateOrderInputType>();
+            services.AddType<PayOrderInputType>();
+            services.AddType<ConfirmOrderInputType>();
             services.AddType<CreateAgreementInputType>();
             services.AddType<CreatePurchaseOrderInputType>();
-            services.AddType<CreatePurchaseOrdersInputType>();
             services.AddType<CreateQuickOrderInputType>();
             services.AddType<CreateDeliveryModeInputType>();
             services.AddType<ExportPickingOrdersInputType>();
@@ -82,7 +84,7 @@ namespace Sheaft.Api
             services.AddType<IdsWithReasonInputType>();
             services.AddType<IdTimeSlotGroupInputType>();
             services.AddType<IdWithReasonInputType>();
-            services.AddType<PackagingInputType>();
+            services.AddType<ReturnableInputType>();
             services.AddType<ProducerExpectedDeliveryInputType>();
             services.AddType<SearchProducersDeliveriesInputType>();
             services.AddType<ProductInputType>();
@@ -100,7 +102,7 @@ namespace Sheaft.Api
             services.AddType<UpdateProducerInputType>();
             services.AddType<UpdateDeliveryModeInputType>();
             services.AddType<UpdateIdProductsQuantitiesInputType>();
-            services.AddType<UpdatePackagingInputType>();
+            services.AddType<UpdateReturnableInputType>();
             services.AddType<UpdatePictureInputType>();
             services.AddType<UpdateProductInputType>();
             services.AddType<UpdateQuickOrderInputType>();

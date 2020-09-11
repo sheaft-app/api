@@ -126,7 +126,7 @@ namespace Sheaft.Application.Handlers
 
                 if (request.Address != null)
                 {
-                    var departmentCode = FullAddress.GetDepartmentCode(request.Address.Zipcode);
+                    var departmentCode = UserAddress.GetDepartmentCode(request.Address.Zipcode);
                     var department = await _context.Departments.SingleOrDefaultAsync(d => d.Code == departmentCode, token);
                     entity.SetAddress(request.Address.Line1, request.Address.Line2, request.Address.Zipcode, request.Address.City, request.Address.Country, department, request.Address.Longitude, request.Address.Latitude);                    
                 }
@@ -192,7 +192,7 @@ namespace Sheaft.Application.Handlers
 
                 if (request.Address != null && string.IsNullOrWhiteSpace(entity.Address.Zipcode))
                 {
-                    var departmentCode = FullAddress.GetDepartmentCode(request.Address.Zipcode);
+                    var departmentCode = UserAddress.GetDepartmentCode(request.Address.Zipcode);
                     var department = await _context.Departments.SingleOrDefaultAsync(d => d.Code == departmentCode, token);
                     entity.SetAddress(request.Address.Line1, request.Address.Line2, request.Address.Zipcode, request.Address.City, request.Address.Country, department);
                 }

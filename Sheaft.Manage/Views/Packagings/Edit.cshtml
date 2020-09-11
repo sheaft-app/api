@@ -1,6 +1,6 @@
-﻿@model PackagingViewModel
+﻿@model ReturnableViewModel
 @{
-    ViewData["Title"] = "Packaging details";
+    ViewData["Title"] = "Returnable details";
     var vats = new List<SelectListItem> {
         new SelectListItem("5.5%", "5.5"),
         new SelectListItem("10%", "10"),
@@ -10,10 +10,10 @@
 }
 
     <div class="container">
-        <h2 class="display-4">Packaging details @(Model.RemovedOn.HasValue ? "(removed)":"")</h2>
+        <h2 class="display-4">Returnable details @(Model.RemovedOn.HasValue ? "(removed)":"")</h2>
         <br />
 
-        @using (Html.BeginForm("Edit", "Packagings", FormMethod.Post, new { @class = "form" }))
+        @using (Html.BeginForm("Edit", "Returnables", FormMethod.Post, new { @class = "form" }))
         {
             @Html.AntiForgeryToken()
             @Html.ValidationSummary(true, "", new { @class = "text-danger" })
@@ -61,7 +61,7 @@
             }
 
             <br />
-            <a asp-controller="Packagings" asp-action="Index" class="btn btn-light">
+            <a asp-controller="Returnables" asp-action="Index" class="btn btn-light">
                 Cancel
             </a>
             <button type="submit" class="btn btn-success">

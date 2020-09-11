@@ -47,7 +47,7 @@ namespace Sheaft.Manage.Controllers
                 ViewBag.Agreements = await _context.Agreements.CountAsync(c => !c.RemovedOn.HasValue && (c.Delivery.Producer.Id == requestUser.Id || c.Store.Id == requestUser.Id), token);
                 ViewBag.DeliveryModes = await _context.DeliveryModes.CountAsync(c => !c.RemovedOn.HasValue && c.Producer.Id == requestUser.Id, token);
                 ViewBag.Jobs = await _context.Jobs.CountAsync(c => !c.RemovedOn.HasValue && c.User.Id == requestUser.Id, token);
-                ViewBag.Packagings = await _context.Packagings.CountAsync(c => !c.RemovedOn.HasValue && c.Producer.Id == requestUser.Id, token);
+                ViewBag.Returnables = await _context.Returnables.CountAsync(c => !c.RemovedOn.HasValue && c.Producer.Id == requestUser.Id, token);
                 ViewBag.PurchaseOrders = await _context.PurchaseOrders.CountAsync(c => !c.RemovedOn.HasValue && (c.Vendor.Id == requestUser.Id || c.Sender.Id == requestUser.Id), token);
             }
             else
@@ -58,7 +58,7 @@ namespace Sheaft.Manage.Controllers
                 ViewBag.Agreements = await _context.Agreements.CountAsync(c => !c.RemovedOn.HasValue, token);
                 ViewBag.DeliveryModes = await _context.DeliveryModes.CountAsync(c => !c.RemovedOn.HasValue, token);
                 ViewBag.Jobs = await _context.Jobs.CountAsync(c => !c.RemovedOn.HasValue, token);
-                ViewBag.Packagings = await _context.Packagings.CountAsync(c => !c.RemovedOn.HasValue, token);
+                ViewBag.Returnables = await _context.Returnables.CountAsync(c => !c.RemovedOn.HasValue, token);
                 ViewBag.PurchaseOrders = await _context.PurchaseOrders.CountAsync(c => !c.RemovedOn.HasValue, token);
             }
 

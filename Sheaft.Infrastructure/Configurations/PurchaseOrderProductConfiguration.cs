@@ -26,10 +26,10 @@ namespace Sheaft.Infrastructure
             entity.Property(o => o.Name).IsRequired();
             entity.Property(o => o.Reference).IsRequired();
 
-            entity.Property(o => o.PackagingVat).HasColumnType("decimal(10,2)");
-            entity.Property(o => o.PackagingVatPrice).HasColumnType("decimal(10,2)");
-            entity.Property(o => o.PackagingWholeSalePrice).HasColumnType("decimal(10,2)");
-            entity.Property(o => o.PackagingOnSalePrice).HasColumnType("decimal(10,2)");
+            entity.Property(o => o.ReturnableVat).HasColumnType("decimal(10,2)");
+            entity.Property(o => o.ReturnableVatPrice).HasColumnType("decimal(10,2)");
+            entity.Property(o => o.ReturnableWholeSalePrice).HasColumnType("decimal(10,2)");
+            entity.Property(o => o.ReturnableOnSalePrice).HasColumnType("decimal(10,2)");
 
             entity.HasKey("PurchaseOrderUid", "Id");
 

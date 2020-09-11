@@ -10,18 +10,14 @@ using Sheaft.Domain.Models;
 using Sheaft.Infrastructure.Interop;
 using Sheaft.Interop.Enums;
 using Sheaft.Application.Events;
-using Microsoft.Extensions.Configuration;
 using Sheaft.Services.Interop;
-using Sheaft.Models.Inputs;
 using Microsoft.Extensions.Logging;
 using Microsoft.EntityFrameworkCore;
 
 namespace Sheaft.Application.Handlers
 {
     public class PurchaseOrderCommandsHandler : CommandsHandler,
-        IRequestHandler<CreatePurchaseOrdersCommand, Result<IEnumerable<Guid>>>,
         IRequestHandler<CreatePurchaseOrderCommand, Result<Guid>>,
-        IRequestHandler<UpdatePurchaseOrderProductsCommand, Result<bool>>,
 
         IRequestHandler<AcceptPurchaseOrdersCommand, Result<bool>>,
         IRequestHandler<ProcessPurchaseOrdersCommand, Result<bool>>,
@@ -60,108 +56,24 @@ namespace Sheaft.Application.Handlers
             _queuesService = queuesService;
         }
 
-        public async Task<Result<IEnumerable<Guid>>> Handle(CreatePurchaseOrdersCommand request, CancellationToken token)
-        {
-            return await ExecuteAsync(async () =>
-            {
-                using (var transaction = await _context.Database.BeginTransactionAsync(token))
-                {
-                    var productIds = request.Products.Select(p => p.Id);
-                    var products = await _context.GetByIdsAsync<Product>(productIds, token);
-
-                    var orderResult = await _mediatr.Send(new CreateOrderCommand(request.RequestUser) { Donation = request.Donation ?? 0 }, token);
-                    if (!orderResult.Success)
-                        return Failed<IEnumerable<Guid>>(orderResult.Exception);
-
-                    var createdOrders = new List<Guid>();
-                    foreach (var producerId in products.GroupBy(c => c.Producer.Id).Select(c => c.Key))
-                    {
-                        var cartProducts = products.Where(p => p.Producer.Id == producerId)
-                            .Select(c => new ProductQuantityInput { Id = c.Id, Quantity = request.Products.Where(p => p.Id == c.Id).Sum(c => c.Quantity) });
-
-                        var expectedDelivery = request.ProducersExpectedDeliveries.SingleOrDefault(c => c.ProducerId == producerId);
-                        var result = await _mediatr.Send(new CreatePurchaseOrderCommand(request.RequestUser) { OrderId = orderResult.Data, SkipSendEmail = true, ProducerId = producerId, Comment = expectedDelivery.Comment, ExpectedDeliveryDate = expectedDelivery.ExpectedDeliveryDate, DeliveryModeId = expectedDelivery.DeliveryModeId, Products = cartProducts }, token);
-                        if (!result.Success)
-                            return Failed<IEnumerable<Guid>>(result.Exception);
-
-                        createdOrders.Add(result.Data);
-                    }
-
-                    await _context.SaveChangesAsync(token);
-                    await transaction.CommitAsync(token);
-
-                    foreach (var orderId in createdOrders)
-                        await _queuesService.ProcessEventAsync(PurchaseOrderCreatedEvent.QUEUE_NAME, new PurchaseOrderCreatedEvent(request.RequestUser) { Id = orderId }, token);
-
-                    await _queuesService.ProcessCommandAsync(CreateUserPointsCommand.QUEUE_NAME, new CreateUserPointsCommand(request.RequestUser) { CreatedOn = DateTimeOffset.UtcNow, Kind = PointKind.PurchaseOrder, UserId = request.RequestUser.Id }, token);
-
-                    return Ok(createdOrders.AsEnumerable());
-                }
-            });
-        }
-
         public async Task<Result<Guid>> Handle(CreatePurchaseOrderCommand request, CancellationToken token)
         {
             return await ExecuteAsync(async () =>
             {
-                var sender = await _context.GetByIdAsync<User>(request.RequestUser.Id, token);
                 var producer = await _context.GetByIdAsync<Producer>(request.ProducerId, token);
-                var deliveryMode = await _context.GetByIdAsync<DeliveryMode>(request.DeliveryModeId, token);
                 var order = await _context.GetByIdAsync<Order>(request.OrderId, token);
-
-                var productIds = request.Products.Select(p => p.Id);
-                var products = await _context.GetByIdsAsync<Product>(productIds, token);
-
-                var cartProducts = products
-                            .Select(c => new { Product = c, Quantity = request.Products.Where(p => p.Id == c.Id).Sum(c => c.Quantity) })
-                            .ToDictionary(d => d.Product, d => d.Quantity);
 
                 var result = await _identifierService.GetNextOrderReferenceAsync(request.ProducerId, token);
                 if (!result.Success)
                     return Failed<Guid>(result.Exception);
 
-                var entity = new PurchaseOrder(Guid.NewGuid(), result.Data, OrderStatusKind.Waiting, cartProducts, deliveryMode, request.ExpectedDeliveryDate, producer, sender);
-                entity.SetComment(request.Comment);
-
-                order.AddPurchaseOrder(entity);
-
+                var entity = new PurchaseOrder(Guid.NewGuid(), result.Data, OrderStatusKind.Waiting, producer, order);
                 await _context.SaveChangesAsync(token);
 
                 if (!request.SkipSendEmail)
                     await _queuesService.ProcessEventAsync(PurchaseOrderCreatedEvent.QUEUE_NAME, new PurchaseOrderCreatedEvent(request.RequestUser) { Id = entity.Id }, token);
 
                 return Ok(entity.Id);
-            });
-        }
-
-        public async Task<Result<bool>> Handle(UpdatePurchaseOrderProductsCommand request, CancellationToken token)
-        {
-            return await ExecuteAsync(async () =>
-            {
-                var entity = await _context.GetByIdAsync<PurchaseOrder>(request.Id, token);
-
-                var products = request.Products.ToList();
-                foreach (var orderProduct in entity.Products.ToList())
-                {
-                    var productToUpdate = request.Products.SingleOrDefault(p => p.Id == orderProduct.Id);
-                    if (productToUpdate == null || productToUpdate.Quantity == 0)
-                        entity.RemoveProduct(orderProduct.Id);
-                    else
-                    {
-                        entity.ChangeProductQuantity(orderProduct.Id, productToUpdate.Quantity);
-                        products.Remove(productToUpdate);
-                    }
-                }
-
-                foreach (var newProduct in products)
-                {
-                    var product = await _context.FindByIdAsync<Product>(newProduct.Id, token);
-                    entity.AddProduct(product, newProduct.Quantity);
-                }
-
-                _context.Update(entity);
-
-                return Ok(await _context.SaveChangesAsync(token) > 0);
             });
         }
 

@@ -13,9 +13,9 @@ namespace Sheaft.Infrastructure
             entity.Property<long>("DebitedWalletUid");
             entity.Property<long>("AuthorUid");
 
+            entity.Property(o => o.Fees).HasColumnType("decimal(10,2)");
             entity.Property(o => o.Credited).HasColumnType("decimal(10,2)");
             entity.Property(o => o.Debited).HasColumnType("decimal(10,2)");
-            entity.Property(o => o.Fees).HasColumnType("decimal(10,2)");
 
             entity.Property(c => c.CreatedOn);
             entity.Property(c => c.UpdatedOn).IsConcurrencyToken();
@@ -30,7 +30,7 @@ namespace Sheaft.Infrastructure
             entity.HasIndex(c => c.Identifier);
             entity.HasIndex("CreditedWalletUid");
             entity.HasIndex("DebitedWalletUid");
-            entity.HasIndex("Uid", "Id", "Identifier", "CreditedWalletUid", "DebitedWalletUid", "CreatedOn");
+            entity.HasIndex("Uid", "Id", "CreditedWalletUid", "DebitedWalletUid", "AuthorUid", "RemovedOn");
 
             entity.ToTable("Transactions");
         }

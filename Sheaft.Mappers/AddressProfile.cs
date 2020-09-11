@@ -10,16 +10,16 @@ namespace Sheaft.Mappers
     {
         public AddressProfile()
         {
-            CreateMap<FullAddress, AddressDto>();
-            CreateMap<FullAddress, AddressViewModel>();
+            CreateMap<UserAddress, AddressDto>();
+            CreateMap<UserAddress, AddressViewModel>();
 
-            CreateMap<LocationAddress, AddressDto>();
-            CreateMap<LocationAddress, AddressViewModel>();
             CreateMap<DeliveryAddress, AddressDto>();
             CreateMap<DeliveryAddress, AddressViewModel>();
+            CreateMap<ExpectedAddress, AddressDto>();
+            CreateMap<ExpectedAddress, AddressViewModel>();
 
-            CreateMap<Address, AddressDto>();
-            CreateMap<Address, AddressViewModel>();
+            CreateMap<BankAddress, AddressDto>();
+            CreateMap<BankAddress, AddressViewModel>();
             CreateMap<BillingAddress, AddressDto>();
             CreateMap<BillingAddress, AddressViewModel>();
             CreateMap<LegalAddress, AddressDto>();

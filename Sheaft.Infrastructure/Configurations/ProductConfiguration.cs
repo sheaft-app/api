@@ -11,7 +11,7 @@ namespace Sheaft.Infrastructure
         {
             entity.Property<long>("Uid");
             entity.Property<long>("ProducerUid");
-            entity.Property<long?>("PackagingUid");
+            entity.Property<long?>("ReturnableUid");
 
             entity.Property(c => c.CreatedOn);
             entity.Property(c => c.UpdatedOn).IsConcurrencyToken();
@@ -33,7 +33,7 @@ namespace Sheaft.Infrastructure
             entity.HasOne(c => c.Producer).WithMany().HasForeignKey("ProducerUid").OnDelete(DeleteBehavior.Cascade);
             entity.HasMany(c => c.Ratings).WithOne().HasForeignKey("ProductUid").OnDelete(DeleteBehavior.Cascade);
             entity.HasMany(c => c.Tags).WithOne().HasForeignKey("ProductUid").OnDelete(DeleteBehavior.Cascade);
-            entity.HasOne(c => c.Packaging).WithMany().HasForeignKey("PackagingUid").OnDelete(DeleteBehavior.NoAction);
+            entity.HasOne(c => c.Returnable).WithMany().HasForeignKey("ReturnableUid").OnDelete(DeleteBehavior.NoAction);
 
             var productTags = entity.Metadata.FindNavigation(nameof(Product.Tags));
             productTags.SetPropertyAccessMode(PropertyAccessMode.Field);
@@ -45,9 +45,9 @@ namespace Sheaft.Infrastructure
 
             entity.HasIndex(c => c.Id).IsUnique();
             entity.HasIndex("ProducerUid");
-            entity.HasIndex("PackagingUid");
+            entity.HasIndex("ReturnableUid");
             entity.HasIndex("ProducerUid", "Reference").IsUnique();
-            entity.HasIndex("Uid", "Id", "ProducerUid", "PackagingUid", "CreatedOn");
+            entity.HasIndex("Uid", "Id", "ProducerUid", "ReturnableUid", "RemovedOn");
 
             entity.ToTable("Products");
         }

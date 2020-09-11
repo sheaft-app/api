@@ -817,9 +817,9 @@ namespace Sheaft.GraphQL.Types
             descriptor.Field(c => c.Content);
         }
     }
-    public class PackagingType : SheaftOutputType<PackagingDto>
+    public class ReturnableType : SheaftOutputType<ReturnableDto>
     {
-        protected override void Configure(IObjectTypeDescriptor<PackagingDto> descriptor)
+        protected override void Configure(IObjectTypeDescriptor<ReturnableDto> descriptor)
         {
             descriptor.Field(c => c.Id).Type<NonNullType<IdType>>();
             descriptor.Field(c => c.CreatedOn);
@@ -860,7 +860,7 @@ namespace Sheaft.GraphQL.Types
             descriptor.Field(c => c.ImageLarge);
             descriptor.Field(c => c.ImageMedium);
             descriptor.Field(c => c.ImageSmall);
-            descriptor.Field(c => c.Packaged);
+            descriptor.Field(c => c.IsReturnable);
 
             descriptor.Field(c => c.Name)
                 .Type<NonNullType<StringType>>();
@@ -868,8 +868,8 @@ namespace Sheaft.GraphQL.Types
             descriptor.Field(c => c.Reference)
                 .Type<NonNullType<StringType>>();
 
-            descriptor.Field(c => c.Packaging)
-                .Type<PackagingType>();
+            descriptor.Field(c => c.Returnable)
+                .Type<ReturnableType>();
 
             descriptor.Field(c => c.Producer)
                 .Type<NonNullType<CompanyProfileType>>();
@@ -890,7 +890,7 @@ namespace Sheaft.GraphQL.Types
             descriptor.Field(c => c.Rating);
             descriptor.Field(c => c.ImageMedium);
             descriptor.Field(c => c.Picture);
-            descriptor.Field(c => c.Packaged);
+            descriptor.Field(c => c.IsReturnable);
 
             descriptor.Field(c => c.Name)
                 .Type<NonNullType<StringType>>();
@@ -929,7 +929,7 @@ namespace Sheaft.GraphQL.Types
             descriptor.Field(c => c.ImageLarge);
             descriptor.Field(c => c.ImageMedium);
             descriptor.Field(c => c.ImageSmall);
-            descriptor.Field(c => c.Packaged);
+            descriptor.Field(c => c.IsReturnable);
             descriptor.Field("currentUserHasRatedProduct")
                 .Type<NonNullType<BooleanType>>()
                 .Resolver(async c =>
@@ -947,8 +947,8 @@ namespace Sheaft.GraphQL.Types
             descriptor.Field(c => c.Reference)
                 .Type<NonNullType<StringType>>();
 
-            descriptor.Field(c => c.Packaging)
-                .Type<PackagingType>();
+            descriptor.Field(c => c.Returnable)
+                .Type<ReturnableType>();
 
             descriptor.Field(c => c.Ratings)
                 .Type<ListType<RatingType>>()
@@ -1055,8 +1055,8 @@ namespace Sheaft.GraphQL.Types
             descriptor.Field(c => c.Reference)
                 .Type<NonNullType<StringType>>();
 
-            descriptor.Field(c => c.Packaging)
-                .Type<PackagingType>();
+            descriptor.Field(c => c.Returnable)
+                .Type<ReturnableType>();
 
             descriptor.Field(c => c.Producer)
                 .Type<NonNullType<CompanyProfileType>>();
