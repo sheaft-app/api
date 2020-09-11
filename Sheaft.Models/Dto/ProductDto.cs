@@ -30,8 +30,8 @@ namespace Sheaft.Models.Dto
         public bool Available { get; set; }
         public int RatingsCount { get; set; }
         public decimal? Rating { get; set; }
-        public bool Packaged { get; set; }
-        public PackagingDto Packaging { get; set; }
+        public bool IsReturnable { get; set; }
+        public ReturnableDto Returnable { get; set; }
         public CompanyProfileDto Producer { get; set; }
         public IEnumerable<TagDto> Tags { get; set; }
         public IEnumerable<RatingDto> Ratings { get; set; }

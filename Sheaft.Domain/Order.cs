@@ -1,64 +1,79 @@
 ﻿using Sheaft.Interop;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace Sheaft.Domain.Models
 {
     public class Order : IEntity
     {
-        private List<PurchaseOrder> _purchaseOrders;
-        private List<OrderTransaction> _transactions;
+        private List<OrderProduct> _products;
+        private List<OrderDelivery> _deliveries;
 
         protected Order()
         {
         }
 
-        public Order(Guid id, User user, decimal donation = 0)
+        public Order(Guid id, User user, IDictionary<Product, int> products, IEnumerable<Tuple<DeliveryMode, DateTimeOffset, string>> expectedDeliveries)
         {
             Id = id;
 
-            Donation = donation;
+            Donation = 0;
             User = user;
 
-            _purchaseOrders = new List<PurchaseOrder>();
-            _transactions = new List<OrderTransaction>();
+            foreach(var product in products)
+            {
+                AddProduct(product.Key, product.Value);
+            }
+
+            foreach (var expectedDelivery in expectedDeliveries)
+            {
+                AddDelivery(expectedDelivery.Item1, expectedDelivery.Item2, expectedDelivery.Item3);
+            }
+        }
+
+        private void AddDelivery(DeliveryMode deliveryMode, DateTimeOffset expectedDeliveryDate, string comment)
+        {
+            if (Deliveries == null)
+                _deliveries = new List<OrderDelivery>();
+
+            _deliveries.Add(new OrderDelivery(deliveryMode, expectedDeliveryDate, comment));
+        }
+
+        private void AddProduct(Product product, int quantity)
+        {
+            if (Products == null)
+                _products = new List<OrderProduct>();
+
+            _products.Add(new OrderProduct(product, quantity));
         }
 
         public Guid Id { get; }
         public DateTimeOffset CreatedOn { get; private set; }
         public DateTimeOffset? UpdatedOn { get; private set; }
         public DateTimeOffset? RemovedOn { get; private set; }
-        public decimal TotalWholeSalePrice { get; set; }
-        public decimal TotalVatPrice { get; set; }
-        public decimal TotalOnSalePrice { get; set; }
-        public decimal Donation { get; set; }
-        public virtual User User { get; set; }
-
-        public virtual IReadOnlyCollection<PurchaseOrder> PurchaseOrders
+        public decimal TotalWholeSalePrice { get; private set; }
+        public decimal TotalVatPrice { get; private set; }
+        public decimal TotalOnSalePrice { get; private set; }
+        public decimal Donation { get; private set; }
+        public decimal Fees { get; private set; }
+        public virtual User User { get; private set; }
+        public virtual IReadOnlyCollection<OrderProduct> Products
         {
-            get => _purchaseOrders?.AsReadOnly();
+            get => _products?.AsReadOnly();
+        }
+        public virtual IReadOnlyCollection<OrderDelivery> Deliveries
+        {
+            get => _deliveries?.AsReadOnly();
         }
 
-        public virtual IReadOnlyCollection<OrderTransaction> Transactions
+        public void SetDonation(decimal donation)
         {
-            get => _transactions?.AsReadOnly();
+            Donation = donation;
         }
 
-        public void AddPurchaseOrder(PurchaseOrder entity)
+        public void SetFees(decimal fees)
         {
-            if (PurchaseOrders == null)
-                _purchaseOrders = new List<PurchaseOrder>();
-
-            _purchaseOrders.Add(entity);
-            RefreshPrices();
-        }
-
-        private void RefreshPrices()
-        {
-            TotalWholeSalePrice = PurchaseOrders.Sum(c => c.TotalWholeSalePrice);
-            TotalVatPrice = PurchaseOrders.Sum(c => c.TotalVatPrice);
-            TotalOnSalePrice = PurchaseOrders.Sum(c => c.TotalOnSalePrice);
+            Fees = fees;
         }
     }
 }

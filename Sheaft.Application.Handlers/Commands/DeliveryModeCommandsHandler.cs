@@ -35,10 +35,10 @@ namespace Sheaft.Application.Handlers
             {
                 var producer = await _context.GetByIdAsync<Producer>(request.RequestUser.Id, token);
 
-                LocationAddress deliveryModeAddress = null;
+                DeliveryAddress deliveryModeAddress = null;
                 if (request.Address != null)
                 {
-                    deliveryModeAddress = new LocationAddress(request.Address.Line1, request.Address.Line2, request.Address.Zipcode, request.Address.City, request.Address.Country, request.Address.Longitude, request.Address.Latitude);
+                    deliveryModeAddress = new DeliveryAddress(request.Address.Line1, request.Address.Line2, request.Address.Zipcode, request.Address.City, request.Address.Country, request.Address.Longitude, request.Address.Latitude);
                 }
 
                 var openingHours = new List<TimeSlotHour>();

@@ -2,7 +2,7 @@
 {
     public enum PaymentKind
     {
-        Transfer,
+        BankAccount,
         Card
     }
 }

@@ -12,7 +12,7 @@ namespace Sheaft.Mappers
                 .ForMember(d => d.Id, opt => opt.MapFrom(r => r.Product.Id))
                 .ForMember(d => d.Reference, opt => opt.MapFrom(r => r.Product.Reference))
                 .ForMember(d => d.Name, opt => opt.MapFrom(r => r.Product.Name))
-                .ForMember(d => d.Packaging, opt => opt.MapFrom(r => r.Product.Packaging));
+                .ForMember(d => d.Returnable, opt => opt.MapFrom(r => r.Product.Returnable));
         }
     }
 }

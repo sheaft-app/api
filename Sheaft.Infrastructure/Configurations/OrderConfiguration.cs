@@ -18,23 +18,18 @@ namespace Sheaft.Infrastructure
             entity.Property(o => o.TotalVatPrice).HasColumnType("decimal(10,2)");
             entity.Property(o => o.TotalOnSalePrice).HasColumnType("decimal(10,2)");
             entity.Property(o => o.Donation).HasColumnType("decimal(10,2)");
+            entity.Property(o => o.Fees).HasColumnType("decimal(10,2)");
 
-            entity.HasMany(o => o.PurchaseOrders).WithOne().HasForeignKey("OrderUid").OnDelete(DeleteBehavior.NoAction);
-            entity.HasMany(o => o.Transactions).WithOne().HasForeignKey("OrderUid").OnDelete(DeleteBehavior.Cascade);
             entity.HasOne(c => c.User).WithMany().HasForeignKey("UserUid").OnDelete(DeleteBehavior.Cascade);
-
-            var purchaseOrders = entity.Metadata.FindNavigation(nameof(Order.PurchaseOrders));
-            purchaseOrders.SetPropertyAccessMode(PropertyAccessMode.Field);
-
-            var transactions = entity.Metadata.FindNavigation(nameof(Order.Transactions));
-            transactions.SetPropertyAccessMode(PropertyAccessMode.Field);
+            entity.HasMany(c => c.Products).WithOne().HasForeignKey("OrderUid").OnDelete(DeleteBehavior.Cascade);
+            entity.HasMany(c => c.Deliveries).WithOne().HasForeignKey("OrderUid").OnDelete(DeleteBehavior.Cascade);
 
             entity.HasKey("Uid");
 
             entity.HasIndex(c => c.Id).IsUnique();
             entity.HasIndex("UserUid");
 
-            entity.HasIndex("Uid", "Id", "UserUid", "CreatedOn");
+            entity.HasIndex("Uid", "Id", "UserUid", "RemovedOn");
             entity.ToTable("Orders");
         }
     }

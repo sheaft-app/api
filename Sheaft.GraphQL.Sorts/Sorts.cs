@@ -104,9 +104,9 @@ namespace Sheaft.GraphQL.Sorts
             descriptor.Sortable(c => c.CreatedOn);
         }
     }
-    public class PackagingSortType : SortInputType<PackagingDto>
+    public class ReturnableSortType : SortInputType<ReturnableDto>
     {
-        protected override void Configure(ISortInputTypeDescriptor<PackagingDto> descriptor)
+        protected override void Configure(ISortInputTypeDescriptor<ReturnableDto> descriptor)
         {
             descriptor.BindFieldsExplicitly();
             descriptor.Sortable(c => c.Name);

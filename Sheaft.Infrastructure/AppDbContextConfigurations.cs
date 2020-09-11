@@ -63,10 +63,13 @@ namespace Sheaft.Infrastructure
             modelBuilder.Entity<Consumer>().HasBaseType<User>();
 
             modelBuilder.Entity<Card>().HasBaseType<PaymentMethod>();
-            modelBuilder.Entity<Transfer>().HasBaseType<PaymentMethod>();
+            modelBuilder.Entity<BankAccount>().HasBaseType<PaymentMethod>();
 
-            modelBuilder.Entity<OrderTransaction>().HasBaseType<Transaction>();
-            modelBuilder.Entity<PurchaseTransaction>().HasBaseType<Transaction>();
+            modelBuilder.Entity<PayinTransaction>().HasBaseType<Transaction>();
+            modelBuilder.Entity<TransferTransaction>().HasBaseType<Transaction>();
+            modelBuilder.Entity<PayoutTransaction>().HasBaseType<Transaction>();
+            modelBuilder.Entity<RefundPayinTransaction>().HasBaseType<Transaction>();
+            modelBuilder.Entity<RefundTransferTransaction>().HasBaseType<Transaction>();
 
             modelBuilder.ApplyConfiguration(new UserConfiguration());
             modelBuilder.ApplyConfiguration(new ProducerConfiguration());
@@ -81,8 +84,10 @@ namespace Sheaft.Infrastructure
             modelBuilder.ApplyConfiguration(new LevelConfiguration());
             modelBuilder.ApplyConfiguration(new RewardConfiguration());
             modelBuilder.ApplyConfiguration(new NotificationConfiguration());
-            modelBuilder.ApplyConfiguration(new PackagingConfiguration());
+            modelBuilder.ApplyConfiguration(new ReturnableConfiguration());
             modelBuilder.ApplyConfiguration(new OrderConfiguration());
+            modelBuilder.ApplyConfiguration(new OrderProductConfiguration());
+            modelBuilder.ApplyConfiguration(new OrderDeliveryConfiguration());
             modelBuilder.ApplyConfiguration(new PurchaseOrderConfiguration());
             modelBuilder.ApplyConfiguration(new PurchaseOrderProductConfiguration());
             modelBuilder.ApplyConfiguration(new PurchaseOrderVendorConfiguration());
@@ -96,13 +101,16 @@ namespace Sheaft.Infrastructure
             modelBuilder.ApplyConfiguration(new SponsoringConfiguration());
             modelBuilder.ApplyConfiguration(new TagConfiguration());
             modelBuilder.ApplyConfiguration(new PaymentMethodConfiguration());
-            modelBuilder.ApplyConfiguration(new TransferConfiguration());
+            modelBuilder.ApplyConfiguration(new BankAccountConfiguration());
             modelBuilder.ApplyConfiguration(new CardConfiguration());
             modelBuilder.ApplyConfiguration(new WalletConfiguration());
             modelBuilder.ApplyConfiguration(new DocumentConfiguration());
             modelBuilder.ApplyConfiguration(new TransactionConfiguration());
-            modelBuilder.ApplyConfiguration(new OrderTransactionConfiguration());
-            modelBuilder.ApplyConfiguration(new PurchaseTransactionConfiguration());
+            modelBuilder.ApplyConfiguration(new PayinTransactionConfiguration());
+            modelBuilder.ApplyConfiguration(new TransferTransactionConfiguration());
+            modelBuilder.ApplyConfiguration(new PayoutTransactionConfiguration());
+            modelBuilder.ApplyConfiguration(new RefundPayinTransactionConfiguration());
+            modelBuilder.ApplyConfiguration(new RefundTransferTransactionConfiguration());
             modelBuilder.ApplyConfiguration(new CountryConfiguration());
             modelBuilder.ApplyConfiguration(new NationalityConfiguration());
         }

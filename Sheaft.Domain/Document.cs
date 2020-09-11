@@ -10,12 +10,13 @@ namespace Sheaft.Domain.Models
         {
         }
 
-        public Document(Guid id, DocumentKind kind, string identifier, string name)
+        public Document(Guid id, DocumentKind kind, string identifier, string name, User user)
         {
             Id = id;
             Name = name;
             Kind = kind;
             Status = ValidationStatus.Created;
+            User = user;
         }
 
         public Guid Id { get; private set; }
@@ -29,5 +30,6 @@ namespace Sheaft.Domain.Models
         public string ResultMessage { get; private set; }
         public ValidationStatus Status { get; private set; }
         public DocumentKind Kind { get; private set; }
+        public virtual User User { get; private set; }
     }
 }

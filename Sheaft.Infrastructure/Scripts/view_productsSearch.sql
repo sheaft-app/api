@@ -32,7 +32,7 @@ as
     join dbo.UserAddresses ra on r.Uid = ra.UserUid
 	join dbo.DeliveryModes dm on dm.ProducerUid = r.Uid and dm.Kind in (1, 2, 3, 4) 
     left join dbo.ProductTags pt on p.Uid = pt.ProductUid
-    left join dbo.Packagings pa on pa.Uid = p.PackagingUid
+    left join dbo.Returnables pa on pa.Uid = p.ReturnableUid
     left join dbo.Tags t on t.Uid = pt.TagUid
   group by
     p.Id,

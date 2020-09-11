@@ -3,18 +3,11 @@ using Sheaft.Exceptions;
 using Sheaft.Interop;
 using Sheaft.Interop.Enums;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace Sheaft.Domain.Models
 {
     public abstract class User : IEntity
     {
-        private List<Points> _points;
-        private List<PaymentMethod> _paymentMethods;
-        private List<Wallet> _wallets;
-        private List<Document> _documents;
-
         protected User()
         {
         }
@@ -30,13 +23,6 @@ namespace Sheaft.Domain.Models
             SetPhone(phone);
             SetFirstname(firstname);
             SetLastname(lastname);
-
-            _points = new List<Points>();
-            _paymentMethods = new List<PaymentMethod>();
-            _wallets = new List<Wallet>();
-            _documents = new List<Document>();
-
-            RefreshPoints();
         }
 
         public Guid Id { get; private set; }
@@ -52,17 +38,13 @@ namespace Sheaft.Domain.Models
         public string Picture { get; private set; }
         public string FirstName { get; private set; }
         public string LastName { get; private set; }
-        public DateTimeOffset? Birthdate { get; set; }
-        public CountryIsoCode Nationality { get; set; }
-        public CountryIsoCode CountryOfResidence { get; set; }
+        public DateTimeOffset? Birthdate { get; private set; }
+        public CountryIsoCode Nationality { get; private set; }
+        public CountryIsoCode CountryOfResidence { get; private set; }
         public string SponsorshipCode { get; private set; }
         public int TotalPoints { get; private set; }
-        public virtual FullAddress Address { get; private set; }
+        public virtual UserAddress Address { get; private set; }
         public virtual BillingAddress BillingAddress { get; private set; }
-        public virtual IReadOnlyCollection<Points> Points { get { return _points.AsReadOnly(); } }
-        public virtual IReadOnlyCollection<PaymentMethod> PaymentMethods { get { return _paymentMethods.AsReadOnly(); } }
-        public virtual IReadOnlyCollection<Wallet> Wallets { get { return _wallets.AsReadOnly(); } }
-        public virtual IReadOnlyCollection<Document> Documents { get { return _documents.AsReadOnly(); } }
 
         public void SetFirstname(string firstname)
         {
@@ -112,12 +94,12 @@ namespace Sheaft.Domain.Models
 
         public void SetAddress(Department department)
         {
-            Address = new FullAddress(department);
+            Address = new UserAddress(department);
         }
 
         public void SetAddress(string line1, string line2, string zipcode, string city, CountryIsoCode country, Department department, double? longitude = null, double? latitude = null)
         {
-            Address = new FullAddress(line1, line2, zipcode, city, country, department, longitude, latitude);
+            Address = new UserAddress(line1, line2, zipcode, city, country, department, longitude, latitude);
         }
 
         public void SetBillingAddress(string line1, string line2, string zipcode, string city, CountryIsoCode country)
@@ -177,23 +159,6 @@ namespace Sheaft.Domain.Models
             SponsorshipCode = code;
         }
 
-        public void AddPoints(PointKind kind, int quantity, DateTimeOffset? createdOn = null)
-        {
-            if (Points == null)
-                _points = new List<Points>();
-
-            _points.Add(new Points(kind, quantity, createdOn ?? DateTimeOffset.UtcNow));
-            RefreshPoints();
-        }
-
-        public void AddWallet(Wallet wallet)
-        {
-            if (Wallets == null)
-                _wallets = new List<Wallet>();
-
-            _wallets.Add(wallet);
-        }
-
         public void SetIdentifier(string identifier)
         {
             if (identifier == null)
@@ -211,9 +176,9 @@ namespace Sheaft.Domain.Models
             RemovedOn = DateTime.UtcNow;
         }
 
-        private void RefreshPoints()
+        public void SetTotalPoints(int points)
         {
-            TotalPoints = _points.Sum(c => c.Quantity);
+            TotalPoints = points;
         }
     }
 }

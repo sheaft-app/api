@@ -26,7 +26,7 @@ namespace Sheaft.Infrastructure.Interop
         DbSet<Notification> Notifications { get; set; }
         DbSet<Order> Orders { get; set; }
         DbSet<PurchaseOrder> PurchaseOrders { get; set; }
-        DbSet<Packaging> Packagings { get; set; }
+        DbSet<Returnable> Returnables { get; set; }
         DbSet<Product> Products { get; set; }
         DbSet<QuickOrder> QuickOrders { get; set; }
         DbSet<Region> Regions { get; set; }

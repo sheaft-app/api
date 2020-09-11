@@ -10,7 +10,7 @@ namespace Sheaft.Domain.Models
         {
         }
 
-        public Points(PointKind kind, int quantity, DateTimeOffset createdOn)
+        public Points(User user, PointKind kind, int quantity, DateTimeOffset createdOn)
         {
             if (quantity < 0)
                 throw new ValidationException(MessageKind.UserPoints_Quantity_CannotBe_LowerThan, 0);
@@ -18,10 +18,12 @@ namespace Sheaft.Domain.Models
             Kind = kind;
             Quantity = quantity;
             CreatedOn = createdOn;
+            User = user;
         }
 
         public DateTimeOffset CreatedOn { get; private set; }
         public PointKind Kind { get; private set; }
         public int Quantity { get; private set; }
+        public virtual User User { get; private set; }
     }
 }

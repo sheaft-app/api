@@ -83,7 +83,7 @@ namespace Sheaft.GraphQL.Enums
         protected override void Configure(IEnumTypeDescriptor<PaymentKind> descriptor)
         {
             descriptor.Value(PaymentKind.Card).Name("CARD");
-            descriptor.Value(PaymentKind.Transfer).Name("TRANSFER");
+            descriptor.Value(PaymentKind.BankAccount).Name("TRANSFER");
         }
     }
     public class WalletKindEnumType : EnumType<WalletKind>

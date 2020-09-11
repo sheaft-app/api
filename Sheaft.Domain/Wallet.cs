@@ -6,11 +6,16 @@ namespace Sheaft.Domain.Models
 {
     public class Wallet : IEntity
     {
-        public Wallet(Guid id, string name, WalletKind kind)
+        protected Wallet()
+        {
+        }
+
+        public Wallet(Guid id, string name, WalletKind kind, User user)
         {
             Id = id;
             Name = name;
             Kind = kind;
+            User = user;
         }
 
         public Guid Id { get; private set; }
@@ -20,6 +25,8 @@ namespace Sheaft.Domain.Models
         public string Identifier { get; private set; }
         public string Name { get; private set; }
         public WalletKind Kind { get; private set; }
+        public decimal? Amount { get; private set; }
+        public virtual User User { get; private set; }
 
         public void SetName(string name)
         {
@@ -27,6 +34,11 @@ namespace Sheaft.Domain.Models
                 return;
 
             Name = name;
+        }
+
+        public void SetAmount(decimal amount)
+        {
+            Amount = amount;
         }
 
         public void SetIdentifier(string identifier)

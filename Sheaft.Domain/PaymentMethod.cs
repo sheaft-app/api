@@ -10,12 +10,13 @@ namespace Sheaft.Domain.Models
         {
         }
 
-        protected PaymentMethod(Guid id, string name, PaymentKind kind)
+        protected PaymentMethod(Guid id, string name, PaymentKind kind, User user)
         {
             Id = id;
             Name = name;
             Kind = kind;
             IsActive = true;
+            User = user;
         }
 
         public Guid Id { get; private set; }
@@ -26,6 +27,7 @@ namespace Sheaft.Domain.Models
         public string Name { get; private set; }
         public PaymentKind Kind { get; private set; }
         public bool? IsActive { get; private set; }
+        public virtual User User { get; private set; }
 
         public void SetIdentifier(string identifier)
         {

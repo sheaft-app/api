@@ -24,8 +24,6 @@ namespace Sheaft.Mappers
                 .ForMember(d => d.Products, opt => opt.MapFrom(r => r.Products));
 
             CreateMap<CreatePurchaseOrderInput, CreatePurchaseOrderCommand>();
-            CreateMap<CreatePurchaseOrdersInput, CreatePurchaseOrdersCommand>();
-            CreateMap<UpdateIdProductsQuantitiesInput, UpdatePurchaseOrderProductsCommand>();
             CreateMap<IdsInput, AcceptPurchaseOrdersCommand>();
             CreateMap<IdsInput, ShipPurchaseOrdersCommand>();
             CreateMap<IdsInput, DeliverPurchaseOrdersCommand>();

@@ -63,9 +63,9 @@ namespace Sheaft.Services
             }
         }
 
-        public async Task<Result<string>> CreateWalletForUserAsync(Wallet wallet, User user, CancellationToken token)
+        public async Task<Result<string>> CreateWalletAsync(Wallet wallet, CancellationToken token)
         {
-            if (string.IsNullOrWhiteSpace(user.Identifier))
+            if (string.IsNullOrWhiteSpace(wallet.User.Identifier))
                 return new Result<string>(new SheaftException(ExceptionKind.BadRequest, MessageKind.PsP_CannotCreate_Wallet_User_Not_Exists));
 
             if (!string.IsNullOrWhiteSpace(wallet.Identifier))
@@ -75,7 +75,7 @@ namespace Sheaft.Services
             {
                 await EnsureAccessTokenIsValidAsync(token);
 
-                var result = await _api.Wallets.CreateAsync(wallet.Id.ToString("N"), new WalletPostDTO(new List<string> { user.Identifier }, wallet.Name, CurrencyIso.EUR));
+                var result = await _api.Wallets.CreateAsync(wallet.Id.ToString("N"), new WalletPostDTO(new List<string> { wallet.User.Identifier }, wallet.Name, CurrencyIso.EUR));
                 return new Result<string>(result.Id);
             }
             catch (Exception e)
@@ -84,9 +84,9 @@ namespace Sheaft.Services
             }
         }
 
-        public async Task<Result<string>> CreateBankIbanForUserAsync(Transfer payment, User user, CancellationToken token)
+        public async Task<Result<string>> CreateBankIbanAsync(BankAccount payment, CancellationToken token)
         {
-            if (string.IsNullOrWhiteSpace(user.Identifier))
+            if (string.IsNullOrWhiteSpace(payment.User.Identifier))
                 return new Result<string>(new SheaftException(ExceptionKind.BadRequest, MessageKind.PsP_CannotCreate_Transfer_User_Not_Exists));
 
             if (!string.IsNullOrWhiteSpace(payment.Identifier))
@@ -101,7 +101,7 @@ namespace Sheaft.Services
                     {
                         BIC = payment.BIC,
                         Type = BankAccountType.IBAN,
-                        UserId = user.Identifier
+                        UserId = payment.User.Identifier
                     });
 
                 return new Result<string>(result.Id);
@@ -112,9 +112,9 @@ namespace Sheaft.Services
             }
         }
 
-        public async Task<Result<KeyValuePair<string, string>>> CreateCardForUserAsync(Card payment, User user, CancellationToken token)
+        public async Task<Result<KeyValuePair<string, string>>> CreateCardAsync(Card payment, CancellationToken token)
         {
-            if (string.IsNullOrWhiteSpace(user.Identifier))
+            if (string.IsNullOrWhiteSpace(payment.User.Identifier))
                 return new Result<KeyValuePair<string, string>>(new SheaftException(ExceptionKind.BadRequest, MessageKind.PsP_CannotCreate_Card_User_Not_Exists));
 
             if (!string.IsNullOrWhiteSpace(payment.Identifier))
@@ -124,7 +124,7 @@ namespace Sheaft.Services
             {
                 await EnsureAccessTokenIsValidAsync(token);
 
-                var result = await _api.CardRegistrations.CreateAsync(payment.Id.ToString("N"), new CardRegistrationPostDTO(user.Identifier, CurrencyIso.EUR, CardType.CB_VISA_MASTERCARD));
+                var result = await _api.CardRegistrations.CreateAsync(payment.Id.ToString("N"), new CardRegistrationPostDTO(payment.User.Identifier, CurrencyIso.EUR, CardType.CB_VISA_MASTERCARD));
                 return new Result<KeyValuePair<string, string>>(new KeyValuePair<string, string>(result.Id, result.CardId));
             }
             catch (Exception e)
@@ -151,9 +151,9 @@ namespace Sheaft.Services
             }
         }
 
-        public async Task<Result<string>> CreateDocumentForUserAsync(Document document, User user, CancellationToken token)
+        public async Task<Result<string>> CreateDocumentAsync(Document document, CancellationToken token)
         {
-            if (string.IsNullOrWhiteSpace(user.Identifier))
+            if (string.IsNullOrWhiteSpace(document.User.Identifier))
                 return new Result<string>(new SheaftException(ExceptionKind.BadRequest, MessageKind.PsP_CannotCreate_Document_User_Not_Exists));
 
             if (!string.IsNullOrWhiteSpace(document.Identifier))
@@ -163,7 +163,7 @@ namespace Sheaft.Services
             {
                 await EnsureAccessTokenIsValidAsync(token);
 
-                var result = await _api.Users.CreateKycDocumentAsync(document.Id.ToString("N"), user.Identifier, document.Kind.GetDocumentType());
+                var result = await _api.Users.CreateKycDocumentAsync(document.Id.ToString("N"), document.User.Identifier, document.Kind.GetDocumentType());
                 return new Result<string>(result.Id);
             }
             catch (Exception e)
@@ -191,9 +191,9 @@ namespace Sheaft.Services
             }
         }
 
-        public async Task<Result<bool>> SubmitUserDocumentAsync(User user, Document document, CancellationToken token)
+        public async Task<Result<bool>> SubmitDocumentAsync(Document document, CancellationToken token)
         {
-            if (string.IsNullOrWhiteSpace(user.Identifier))
+            if (string.IsNullOrWhiteSpace(document.User.Identifier))
                 return new Result<bool>(new SheaftException(ExceptionKind.BadRequest, MessageKind.PsP_CannotSubmit_Document_User_Not_Exists));
 
             if (string.IsNullOrWhiteSpace(document.Identifier))
@@ -203,7 +203,7 @@ namespace Sheaft.Services
             {
                 await EnsureAccessTokenIsValidAsync(token);
 
-                var result = await _api.Users.UpdateKycDocumentAsync(user.Identifier, new KycDocumentPutDTO { Status = KycStatus.VALIDATION_ASKED }, document.Identifier);
+                var result = await _api.Users.UpdateKycDocumentAsync(document.User.Identifier, new KycDocumentPutDTO { Status = KycStatus.VALIDATION_ASKED }, document.Identifier);
                 return new Result<bool>(true);
             }
             catch (Exception e)
@@ -212,14 +212,8 @@ namespace Sheaft.Services
             }
         }
 
-        public async Task<Result<string>> CreateWebPayin(Transaction transaction, CancellationToken token)
+        public async Task<Result<string>> CreateWebPayinAsync(PayinTransaction transaction, CancellationToken token)
         {
-            if (transaction.Kind != TransactionKind.Payin)
-                return new Result<string>(new SheaftException(ExceptionKind.BadRequest, MessageKind.PsP_CannotCreate_WebPayin_TransactionKind_Mismatch));
-
-            if (transaction.Nature != Sheaft.Interop.Enums.TransactionNature.Regular)
-                return new Result<string>(new SheaftException(ExceptionKind.BadRequest, MessageKind.PsP_CannotCreate_WebPayin_TransactionNature_Mismatch));
-
             if (string.IsNullOrWhiteSpace(transaction.Author.Identifier))
                 return new Result<string>(new SheaftException(ExceptionKind.BadRequest, MessageKind.PsP_CannotCreate_WebPayin_Author_Not_Exists));
 
@@ -261,14 +255,8 @@ namespace Sheaft.Services
             }
         }
 
-        public async Task<Result<string>> CreateTransferForUser(Transaction transaction, User user, CancellationToken token)
+        public async Task<Result<string>> CreateTransferAsync(TransferTransaction transaction, CancellationToken token)
         {
-            if (transaction.Kind != TransactionKind.Transfer)
-                return new Result<string>(new SheaftException(ExceptionKind.BadRequest, MessageKind.PsP_CannotCreate_Transfer_TransactionKind_Mismatch));
-
-            if (transaction.Nature != Sheaft.Interop.Enums.TransactionNature.Regular)
-                return new Result<string>(new SheaftException(ExceptionKind.BadRequest, MessageKind.PsP_CannotCreate_Transfer_TransactionNature_Mismatch));
-
             if (string.IsNullOrWhiteSpace(transaction.Author.Identifier))
                 return new Result<string>(new SheaftException(ExceptionKind.BadRequest, MessageKind.PsP_CannotCreate_Transfer_Author_Not_Exists));
 
@@ -285,7 +273,7 @@ namespace Sheaft.Services
                 var result = await _api.Transfers.CreateAsync(transaction.Id.ToString("N"),
                     new TransferPostDTO(
                         transaction.Author.Identifier,
-                        user.Identifier,
+                        transaction.CreditedWallet.User.Identifier,
                         new Money
                         {
                             Amount = transaction.Debited.GetAmount(),
@@ -307,14 +295,8 @@ namespace Sheaft.Services
             }
         }
 
-        public async Task<Result<string>> CreatePayout(Transaction transaction, Transfer bankAccount, CancellationToken token)
+        public async Task<Result<string>> CreatePayoutAsync(PayoutTransaction transaction, CancellationToken token)
         {
-            if (transaction.Kind != TransactionKind.Payout)
-                return new Result<string>(new SheaftException(ExceptionKind.BadRequest, MessageKind.PsP_CannotCreate_Payout_TransactionKind_Mismatch));
-
-            if (transaction.Nature != Sheaft.Interop.Enums.TransactionNature.Regular)
-                return new Result<string>(new SheaftException(ExceptionKind.BadRequest, MessageKind.PsP_CannotCreate_Payout_TransactionNature_Mismatch));
-
             if (string.IsNullOrWhiteSpace(transaction.Author.Identifier))
                 return new Result<string>(new SheaftException(ExceptionKind.BadRequest, MessageKind.PsP_CannotCreate_Payout_Author_Not_Exists));
 
@@ -339,7 +321,7 @@ namespace Sheaft.Services
                             Amount = transaction.Fees.GetAmount(),
                             Currency = CurrencyIso.EUR
                         },
-                        bankAccount.Identifier,
+                        transaction.BankAccount.Identifier,
                         transaction.Reference));
 
                 return new Result<string>(result.Id);
@@ -350,25 +332,19 @@ namespace Sheaft.Services
             }
         }
 
-        public async Task<Result<string>> RefundPayin(string payinIdentifier, Transaction transaction, CancellationToken token)
+        public async Task<Result<string>> RefundPayinAsync(RefundPayinTransaction transaction, CancellationToken token)
         {
-            if (transaction.Kind != TransactionKind.Payin)
-                return new Result<string>(new SheaftException(ExceptionKind.BadRequest, MessageKind.PsP_CannotRefund_Payin_TransactionKind_Mismatch));
-
-            if (transaction.Nature != Sheaft.Interop.Enums.TransactionNature.Refund)
-                return new Result<string>(new SheaftException(ExceptionKind.BadRequest, MessageKind.PsP_CannotRefund_Payin_TransactionNature_Mismatch));
-
             if (string.IsNullOrWhiteSpace(transaction.Author.Identifier))
                 return new Result<string>(new SheaftException(ExceptionKind.BadRequest, MessageKind.PsP_CannotRefund_Payin_Author_Not_Exists));
 
-            if (string.IsNullOrWhiteSpace(payinIdentifier))
+            if (string.IsNullOrWhiteSpace(transaction.TransactionToRefundIdentifier))
                 return new Result<string>(new SheaftException(ExceptionKind.BadRequest, MessageKind.PsP_CannotRefund_Payin_PayinIdentifier_Missing));
 
             try
             {
                 await EnsureAccessTokenIsValidAsync(token);
 
-                var result = await _api.PayIns.CreateRefundAsync(transaction.Id.ToString("N"), payinIdentifier,
+                var result = await _api.PayIns.CreateRefundAsync(transaction.Id.ToString("N"), transaction.TransactionToRefundIdentifier,
                     new RefundPayInPostDTO(
                         transaction.Author.Identifier,
                         new Money
@@ -390,25 +366,19 @@ namespace Sheaft.Services
             }
         }
 
-        public async Task<Result<string>> RefundTransfer(string transferIdentifier, Transaction transaction, CancellationToken token)
+        public async Task<Result<string>> RefundTransferAsync(RefundTransferTransaction transaction, CancellationToken token)
         {
-            if (transaction.Kind != TransactionKind.Transfer)
-                return new Result<string>(new SheaftException(ExceptionKind.BadRequest, MessageKind.PsP_CannotRefund_Transfer_TransactionKind_Mismatch));
-
-            if (transaction.Nature != Sheaft.Interop.Enums.TransactionNature.Refund)
-                return new Result<string>(new SheaftException(ExceptionKind.BadRequest, MessageKind.PsP_CannotRefund_Transfer_TransactionNature_Mismatch));
-
             if (string.IsNullOrWhiteSpace(transaction.Author.Identifier))
                 return new Result<string>(new SheaftException(ExceptionKind.BadRequest, MessageKind.PsP_CannotRefund_Transfer_Author_Not_Exists));
 
-            if (string.IsNullOrWhiteSpace(transferIdentifier))
+            if (string.IsNullOrWhiteSpace(transaction.TransactionToRefundIdentifier))
                 return new Result<string>(new SheaftException(ExceptionKind.BadRequest, MessageKind.PsP_CannotRefund_Transfer_TransferIdentifier_Missing));
 
             try
             {
                 await EnsureAccessTokenIsValidAsync(token);
 
-                var result = await _api.Transfers.CreateRefundAsync(transaction.Id.ToString("N"), transferIdentifier, new RefundTransferPostDTO(transaction.Author.Identifier));
+                var result = await _api.Transfers.CreateRefundAsync(transaction.Id.ToString("N"), transaction.TransactionToRefundIdentifier, new RefundTransferPostDTO(transaction.Author.Identifier));
                 return new Result<string>(result.Id);
             }
             catch (Exception e)
@@ -471,7 +441,7 @@ namespace Sheaft.Services
                     return KycDocumentType.NotSpecified;
             }
         }
-        public static MangoPay.SDK.Entities.Address GetAddress(this Domain.Models.Address address)
+        public static MangoPay.SDK.Entities.Address GetAddress(this BaseAddress address)
         {
             return new MangoPay.SDK.Entities.Address
             {

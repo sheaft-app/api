@@ -34,12 +34,11 @@ namespace Sheaft.Application.Handlers
 
                 using (var transaction = await _context.Database.BeginTransactionAsync(token))
                 {
-                    var wallet = new Wallet(Guid.NewGuid(), request.Name, request.Kind);
-                    user.AddWallet(wallet);
-
+                    var wallet = new Wallet(Guid.NewGuid(), request.Name, request.Kind, user);
+                    await _context.AddAsync(wallet, token);
                     await _context.SaveChangesAsync(token);
 
-                    var result = await _pspService.CreateWalletForUserAsync(wallet, user, token);
+                    var result = await _pspService.CreateWalletAsync(wallet, token);
                     if (!result.Success)
                     {
                         await transaction.RollbackAsync(token);

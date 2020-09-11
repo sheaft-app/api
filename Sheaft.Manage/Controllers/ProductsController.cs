@@ -83,7 +83,7 @@ namespace Sheaft.Manage.Controllers
                 return RedirectToAction("Impersonate", "Account");
 
             ViewBag.Tags = await GetTags(token);
-            ViewBag.Packagings = await GetPackagings(requestUser, token);
+            ViewBag.Returnables = await GetReturnables(requestUser, token);
 
             return View(new ProductViewModel());
         }
@@ -96,7 +96,7 @@ namespace Sheaft.Manage.Controllers
             if (!requestUser.IsImpersonating)
             {
                 ViewBag.Tags = await GetTags(token);
-                ViewBag.Packagings = await GetPackagings(requestUser, token);
+                ViewBag.Returnables = await GetReturnables(requestUser, token);
 
                 ModelState.AddModelError("", "You must impersonate producer to create it.");
                 return View(model);
@@ -116,7 +116,7 @@ namespace Sheaft.Manage.Controllers
                 Description = model.Description,
                 Name = model.Name,
                 Available = model.Available,
-                PackagingId = model.PackagingId,
+                ReturnableId = model.ReturnableId,
                 Picture = model.Picture,
                 QuantityPerUnit = model.QuantityPerUnit,
                 Reference = model.Reference,
@@ -130,7 +130,7 @@ namespace Sheaft.Manage.Controllers
             if (!result.Success)
             {
                 ViewBag.Tags = await GetTags(token);
-                ViewBag.Packagings = await GetPackagings(requestUser, token);
+                ViewBag.Returnables = await GetReturnables(requestUser, token);
 
                 ModelState.AddModelError("", result.Exception.Message);
                 return View(model);
@@ -156,7 +156,7 @@ namespace Sheaft.Manage.Controllers
                 throw new NotFoundException();
 
             ViewBag.Tags = await GetTags(token);
-            ViewBag.Packagings = await GetPackagings(requestUser, token);
+            ViewBag.Returnables = await GetReturnables(requestUser, token);
 
             return View(entity);
         }
@@ -169,7 +169,7 @@ namespace Sheaft.Manage.Controllers
             if(!requestUser.IsImpersonating)
             {
                 ViewBag.Tags = await GetTags(token);
-                ViewBag.Packagings = await GetPackagings(requestUser, token);
+                ViewBag.Returnables = await GetReturnables(requestUser, token);
 
                 ModelState.AddModelError("", "You must impersonate product's producer to edit it.");
                 return View(model);
@@ -190,7 +190,7 @@ namespace Sheaft.Manage.Controllers
                 Description = model.Description,
                 Name = model.Name,
                 Available = model.Available,
-                PackagingId = model.PackagingId,
+                ReturnableId = model.ReturnableId,
                 Picture = model.Picture,
                 QuantityPerUnit = model.QuantityPerUnit,
                 Reference = model.Reference,
@@ -204,7 +204,7 @@ namespace Sheaft.Manage.Controllers
             if (!result.Success)
             {
                 ViewBag.Tags = await GetTags(token);
-                ViewBag.Packagings = await GetPackagings(requestUser, token);
+                ViewBag.Returnables = await GetReturnables(requestUser, token);
 
                 ModelState.AddModelError("", result.Exception.Message);
                 return View(model);
@@ -282,11 +282,11 @@ namespace Sheaft.Manage.Controllers
             return RedirectToAction("Index");
         }
 
-        private async Task<List<PackagingViewModel>> GetPackagings(RequestUser requestUser, CancellationToken token)
+        private async Task<List<ReturnableViewModel>> GetReturnables(RequestUser requestUser, CancellationToken token)
         {
-            return await _context.Packagings
+            return await _context.Returnables
                             .Where(c => c.Producer.Id == requestUser.Id && !c.RemovedOn.HasValue)
-                            .ProjectTo<PackagingViewModel>(_configurationProvider)
+                            .ProjectTo<ReturnableViewModel>(_configurationProvider)
                             .ToListAsync(token);
         }
     }

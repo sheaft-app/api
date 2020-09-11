@@ -17,8 +17,8 @@ namespace Sheaft.Mappers
             CreateMap<Product, ProductDto>()
                 .ForMember(d => d.Producer, opt => opt.MapFrom(r => r.Producer))
                 .ForMember(d => d.Tags, opt => opt.MapFrom(r => r.Tags.Select(t => t.Tag)))
-                .ForMember(d => d.Packaged, opt => opt.MapFrom(r => r.Packaging != null))
-                .ForMember(d => d.Packaging, opt => opt.MapFrom(r => r.Packaging))
+                .ForMember(d => d.IsReturnable, opt => opt.MapFrom(r => r.Returnable != null))
+                .ForMember(d => d.Returnable, opt => opt.MapFrom(r => r.Returnable))
                 .ForMember(d => d.Picture, opt => opt.MapFrom(r => CoreProductExtensions.GetImageUrl(r.Image, ImageSize.LARGE)))
                 .ForMember(d => d.ImageLarge, opt => opt.MapFrom(r => CoreProductExtensions.GetImageUrl(r.Image, ImageSize.LARGE)))
                 .ForMember(d => d.ImageMedium, opt => opt.MapFrom(r => CoreProductExtensions.GetImageUrl(r.Image, ImageSize.MEDIUM)))
@@ -27,7 +27,7 @@ namespace Sheaft.Mappers
             CreateMap<Product, ProductViewModel>()
                 .ForMember(d => d.Producer, opt => opt.MapFrom(r => r.Producer))
                 .ForMember(d => d.Tags, opt => opt.MapFrom(r => r.Tags.Select(t => t.Tag.Id)))
-                .ForMember(d => d.PackagingId, opt => opt.MapFrom(r => r.Packaging.Id))
+                .ForMember(d => d.ReturnableId, opt => opt.MapFrom(r => r.Returnable.Id))
                 .ForMember(d => d.Picture, opt => opt.MapFrom(r => CoreProductExtensions.GetImageUrl(r.Image, ImageSize.LARGE)));
 
             CreateMap<CreateProductInput, CreateProductCommand>();

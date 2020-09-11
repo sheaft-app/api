@@ -21,7 +21,7 @@ namespace Sheaft.Infrastructure
             companyTags.SetPropertyAccessMode(PropertyAccessMode.Field);
 
             entity.HasMany<DeliveryMode>().WithOne(c => c.Producer).HasForeignKey("ProducerUid").OnDelete(DeleteBehavior.Cascade);
-            entity.HasMany<Packaging>().WithOne(c => c.Producer).HasForeignKey("ProducerUid").OnDelete(DeleteBehavior.Cascade);
+            entity.HasMany<Returnable>().WithOne(c => c.Producer).HasForeignKey("ProducerUid").OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

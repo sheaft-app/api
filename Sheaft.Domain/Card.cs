@@ -7,8 +7,8 @@ namespace Sheaft.Domain.Models
     {
         protected Card() { }
 
-        public Card(Guid id, string name)
-            : base(id, name, PaymentKind.Card)
+        public Card(Guid id, string name, User user)
+            : base(id, name, PaymentKind.Card, user)
         {
         }
     }

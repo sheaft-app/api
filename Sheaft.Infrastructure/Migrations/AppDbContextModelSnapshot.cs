@@ -66,7 +66,7 @@ namespace Sheaft.Infrastructure.Migrations
 
                     b.HasIndex("StoreUid");
 
-                    b.HasIndex("Uid", "Id", "StoreUid", "DeliveryModeUid", "CreatedOn");
+                    b.HasIndex("Uid", "Id", "StoreUid", "DeliveryModeUid", "RemovedOn");
 
                     b.ToTable("Agreements");
                 });
@@ -141,7 +141,7 @@ namespace Sheaft.Infrastructure.Migrations
 
                     b.HasIndex("ProducerUid");
 
-                    b.HasIndex("Uid", "Id", "ProducerUid", "CreatedOn");
+                    b.HasIndex("Uid", "Id", "ProducerUid", "RemovedOn");
 
                     b.ToTable("DeliveryModes");
                 });
@@ -272,7 +272,7 @@ namespace Sheaft.Infrastructure.Migrations
 
                     b.HasIndex("UserUid");
 
-                    b.HasIndex("Uid", "Id", "UserUid", "CreatedOn");
+                    b.HasIndex("Uid", "Id", "UserUid", "RemovedOn");
 
                     b.ToTable("Documents");
                 });
@@ -341,7 +341,7 @@ namespace Sheaft.Infrastructure.Migrations
 
                     b.HasIndex("UserUid");
 
-                    b.HasIndex("Uid", "Id", "UserUid", "CreatedOn");
+                    b.HasIndex("Uid", "Id", "UserUid", "RemovedOn");
 
                     b.ToTable("Jobs");
                 });
@@ -378,7 +378,7 @@ namespace Sheaft.Infrastructure.Migrations
                     b.HasIndex("Id")
                         .IsUnique();
 
-                    b.HasIndex("Uid", "Id", "CreatedOn");
+                    b.HasIndex("Uid", "Id", "RemovedOn");
 
                     b.ToTable("Levels");
                 });
@@ -453,7 +453,7 @@ namespace Sheaft.Infrastructure.Migrations
 
                     b.HasIndex("UserUid");
 
-                    b.HasIndex("Uid", "Id", "UserUid", "CreatedOn");
+                    b.HasIndex("Uid", "Id", "UserUid", "RemovedOn");
 
                     b.ToTable("Notifications");
                 });
@@ -469,6 +469,9 @@ namespace Sheaft.Infrastructure.Migrations
                         .HasColumnType("datetimeoffset");
 
                     b.Property<decimal>("Donation")
+                        .HasColumnType("decimal(10,2)");
+
+                    b.Property<decimal>("Fees")
                         .HasColumnType("decimal(10,2)");
 
                     b.Property<Guid>("Id")
@@ -500,23 +503,39 @@ namespace Sheaft.Infrastructure.Migrations
 
                     b.HasIndex("UserUid");
 
-                    b.HasIndex("Uid", "Id", "UserUid", "CreatedOn");
+                    b.HasIndex("Uid", "Id", "UserUid", "RemovedOn");
 
                     b.ToTable("Orders");
                 });
 
-            modelBuilder.Entity("Sheaft.Domain.Models.Packaging", b =>
+            modelBuilder.Entity("Sheaft.Domain.Models.OrderDelivery", b =>
                 {
-                    b.Property<long>("Uid")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                    b.Property<long>("OrderUid")
+                        .HasColumnType("bigint");
 
-                    b.Property<DateTimeOffset>("CreatedOn")
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Comment")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<long?>("DeliveryModeUid")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTimeOffset>("ExpectedDeliveryDate")
                         .HasColumnType("datetimeoffset");
 
-                    b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)");
+                    b.HasKey("OrderUid", "Id");
+
+                    b.HasIndex("DeliveryModeUid");
+
+                    b.ToTable("OrderDeliveries");
+                });
+
+            modelBuilder.Entity("Sheaft.Domain.Models.OrderProduct", b =>
+                {
+                    b.Property<long>("OrderUid")
+                        .HasColumnType("bigint");
 
                     b.Property<Guid>("Id")
                         .HasColumnType("uniqueidentifier");
@@ -525,38 +544,64 @@ namespace Sheaft.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<decimal>("OnSalePrice")
-                        .HasColumnType("decimal(10,2)");
-
                     b.Property<long>("ProducerUid")
                         .HasColumnType("bigint");
 
-                    b.Property<DateTimeOffset?>("RemovedOn")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<DateTimeOffset?>("UpdatedOn")
+                    b.Property<int>("Quantity")
                         .IsConcurrencyToken()
-                        .HasColumnType("datetimeoffset");
+                        .HasColumnType("int");
+
+                    b.Property<string>("Reference")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ReturnableName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal?>("ReturnableOnSalePrice")
+                        .HasColumnType("decimal(10,2)");
+
+                    b.Property<decimal?>("ReturnableVat")
+                        .HasColumnType("decimal(10,2)");
+
+                    b.Property<decimal?>("ReturnableVatPrice")
+                        .HasColumnType("decimal(10,2)");
+
+                    b.Property<decimal?>("ReturnableWholeSalePrice")
+                        .HasColumnType("decimal(10,2)");
+
+                    b.Property<decimal>("TotalOnSalePrice")
+                        .HasColumnType("decimal(10,2)");
+
+                    b.Property<decimal>("TotalVatPrice")
+                        .HasColumnType("decimal(10,2)");
+
+                    b.Property<decimal?>("TotalWeight")
+                        .HasColumnType("decimal(10,2)");
+
+                    b.Property<decimal>("TotalWholeSalePrice")
+                        .HasColumnType("decimal(10,2)");
+
+                    b.Property<decimal>("UnitOnSalePrice")
+                        .HasColumnType("decimal(10,2)");
+
+                    b.Property<decimal>("UnitVatPrice")
+                        .HasColumnType("decimal(10,2)");
+
+                    b.Property<decimal?>("UnitWeight")
+                        .HasColumnType("decimal(10,2)");
+
+                    b.Property<decimal>("UnitWholeSalePrice")
+                        .HasColumnType("decimal(10,2)");
 
                     b.Property<decimal>("Vat")
                         .HasColumnType("decimal(10,2)");
 
-                    b.Property<decimal>("VatPrice")
-                        .HasColumnType("decimal(10,2)");
-
-                    b.Property<decimal>("WholeSalePrice")
-                        .HasColumnType("decimal(10,2)");
-
-                    b.HasKey("Uid");
-
-                    b.HasIndex("Id")
-                        .IsUnique();
+                    b.HasKey("OrderUid", "Id");
 
                     b.HasIndex("ProducerUid");
 
-                    b.HasIndex("Uid", "Id", "CreatedOn");
-
-                    b.ToTable("Packagings");
+                    b.ToTable("OrderProducts");
                 });
 
             modelBuilder.Entity("Sheaft.Domain.Models.PaymentMethod", b =>
@@ -606,7 +651,7 @@ namespace Sheaft.Infrastructure.Migrations
 
                     b.HasIndex("UserUid");
 
-                    b.HasIndex("Uid", "Id", "Identifier", "UserUid", "CreatedOn");
+                    b.HasIndex("Uid", "Id", "Identifier", "UserUid", "RemovedOn");
 
                     b.ToTable("PaymentMethods");
 
@@ -660,9 +705,6 @@ namespace Sheaft.Infrastructure.Migrations
                     b.Property<decimal>("OnSalePricePerUnit")
                         .HasColumnType("decimal(10,2)");
 
-                    b.Property<long?>("PackagingUid")
-                        .HasColumnType("bigint");
-
                     b.Property<long>("ProducerUid")
                         .HasColumnType("bigint");
 
@@ -683,6 +725,9 @@ namespace Sheaft.Infrastructure.Migrations
 
                     b.Property<DateTimeOffset?>("RemovedOn")
                         .HasColumnType("datetimeoffset");
+
+                    b.Property<long?>("ReturnableUid")
+                        .HasColumnType("bigint");
 
                     b.Property<int>("Unit")
                         .HasColumnType("int");
@@ -714,14 +759,14 @@ namespace Sheaft.Infrastructure.Migrations
                     b.HasIndex("Id")
                         .IsUnique();
 
-                    b.HasIndex("PackagingUid");
-
                     b.HasIndex("ProducerUid");
+
+                    b.HasIndex("ReturnableUid");
 
                     b.HasIndex("ProducerUid", "Reference")
                         .IsUnique();
 
-                    b.HasIndex("Uid", "Id", "ProducerUid", "PackagingUid", "CreatedOn");
+                    b.HasIndex("Uid", "Id", "ProducerUid", "ReturnableUid", "RemovedOn");
 
                     b.ToTable("Products");
                 });
@@ -817,7 +862,7 @@ namespace Sheaft.Infrastructure.Migrations
                     b.HasIndex("PurchaseOrderVendorUid", "Reference")
                         .IsUnique();
 
-                    b.HasIndex("OrderUid", "Uid", "Id", "PurchaseOrderVendorUid", "PurchaseOrderSenderUid", "CreatedOn");
+                    b.HasIndex("OrderUid", "Uid", "Id", "PurchaseOrderVendorUid", "PurchaseOrderSenderUid", "RemovedOn");
 
                     b.ToTable("PurchaseOrders");
                 });
@@ -834,21 +879,6 @@ namespace Sheaft.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("PackagingName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<decimal?>("PackagingOnSalePrice")
-                        .HasColumnType("decimal(10,2)");
-
-                    b.Property<decimal?>("PackagingVat")
-                        .HasColumnType("decimal(10,2)");
-
-                    b.Property<decimal?>("PackagingVatPrice")
-                        .HasColumnType("decimal(10,2)");
-
-                    b.Property<decimal?>("PackagingWholeSalePrice")
-                        .HasColumnType("decimal(10,2)");
-
                     b.Property<int>("Quantity")
                         .IsConcurrencyToken()
                         .HasColumnType("int");
@@ -856,6 +886,21 @@ namespace Sheaft.Infrastructure.Migrations
                     b.Property<string>("Reference")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ReturnableName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal?>("ReturnableOnSalePrice")
+                        .HasColumnType("decimal(10,2)");
+
+                    b.Property<decimal?>("ReturnableVat")
+                        .HasColumnType("decimal(10,2)");
+
+                    b.Property<decimal?>("ReturnableVatPrice")
+                        .HasColumnType("decimal(10,2)");
+
+                    b.Property<decimal?>("ReturnableWholeSalePrice")
+                        .HasColumnType("decimal(10,2)");
 
                     b.Property<decimal>("TotalOnSalePrice")
                         .HasColumnType("decimal(10,2)");
@@ -997,7 +1042,7 @@ namespace Sheaft.Infrastructure.Migrations
 
                     b.HasIndex("UserUid");
 
-                    b.HasIndex("Uid", "Id", "UserUid", "CreatedOn");
+                    b.HasIndex("Uid", "Id", "UserUid", "RemovedOn");
 
                     b.ToTable("QuickOrders");
                 });
@@ -1062,7 +1107,7 @@ namespace Sheaft.Infrastructure.Migrations
 
                     b.HasIndex("UserUid");
 
-                    b.HasIndex("Uid", "Id", "ProductUid", "UserUid", "CreatedOn");
+                    b.HasIndex("Uid", "Id", "ProductUid", "UserUid", "RemovedOn");
 
                     b.ToTable("Ratings");
                 });
@@ -1130,6 +1175,65 @@ namespace Sheaft.Infrastructure.Migrations
                     b.ToTable("Regions");
                 });
 
+            modelBuilder.Entity("Sheaft.Domain.Models.Returnable", b =>
+                {
+                    b.Property<long>("Uid")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<DateTimeOffset>("CreatedOn")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("Kind")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(0);
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal>("OnSalePrice")
+                        .HasColumnType("decimal(10,2)");
+
+                    b.Property<long>("ProducerUid")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTimeOffset?>("RemovedOn")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<DateTimeOffset?>("UpdatedOn")
+                        .IsConcurrencyToken()
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<decimal>("Vat")
+                        .HasColumnType("decimal(10,2)");
+
+                    b.Property<decimal>("VatPrice")
+                        .HasColumnType("decimal(10,2)");
+
+                    b.Property<decimal>("WholeSalePrice")
+                        .HasColumnType("decimal(10,2)");
+
+                    b.HasKey("Uid");
+
+                    b.HasIndex("Id")
+                        .IsUnique();
+
+                    b.HasIndex("ProducerUid");
+
+                    b.HasIndex("Uid", "Id", "RemovedOn");
+
+                    b.ToTable("Returnables");
+                });
+
             modelBuilder.Entity("Sheaft.Domain.Models.Reward", b =>
                 {
                     b.Property<long>("Uid")
@@ -1192,7 +1296,7 @@ namespace Sheaft.Infrastructure.Migrations
 
                     b.HasIndex("WinnerUid");
 
-                    b.HasIndex("Uid", "Id", "DepartmentUid", "LevelUid", "CreatedOn");
+                    b.HasIndex("Uid", "Id", "DepartmentUid", "LevelUid", "RemovedOn");
 
                     b.ToTable("Rewards");
                 });
@@ -1271,7 +1375,7 @@ namespace Sheaft.Infrastructure.Migrations
                     b.HasIndex("Id")
                         .IsUnique();
 
-                    b.HasIndex("Uid", "Id", "CreatedOn");
+                    b.HasIndex("Uid", "Id", "RemovedOn");
 
                     b.ToTable("Tags");
                 });
@@ -1355,7 +1459,7 @@ namespace Sheaft.Infrastructure.Migrations
 
                     b.HasIndex("Identifier");
 
-                    b.HasIndex("Uid", "Id", "Identifier", "CreditedWalletUid", "DebitedWalletUid", "CreatedOn");
+                    b.HasIndex("Uid", "Id", "CreditedWalletUid", "DebitedWalletUid", "AuthorUid", "RemovedOn");
 
                     b.ToTable("Transactions");
 
@@ -1440,7 +1544,7 @@ namespace Sheaft.Infrastructure.Migrations
 
                     b.HasIndex("Identifier");
 
-                    b.HasIndex("Uid", "Id", "CreatedOn");
+                    b.HasIndex("Uid", "Id", "RemovedOn");
 
                     b.ToTable("Users");
 
@@ -1453,6 +1557,9 @@ namespace Sheaft.Infrastructure.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bigint")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<decimal?>("Amount")
+                        .HasColumnType("decimal(10,2)");
 
                     b.Property<DateTimeOffset>("CreatedOn")
                         .HasColumnType("datetimeoffset");
@@ -1489,22 +1596,12 @@ namespace Sheaft.Infrastructure.Migrations
 
                     b.HasIndex("UserUid");
 
-                    b.HasIndex("UserUid", "Kind")
-                        .IsUnique();
-
-                    b.HasIndex("Uid", "Id", "UserUid", "CreatedOn");
+                    b.HasIndex("Uid", "Id", "UserUid", "RemovedOn");
 
                     b.ToTable("Wallets");
                 });
 
-            modelBuilder.Entity("Sheaft.Domain.Models.Card", b =>
-                {
-                    b.HasBaseType("Sheaft.Domain.Models.PaymentMethod");
-
-                    b.HasDiscriminator().HasValue(1);
-                });
-
-            modelBuilder.Entity("Sheaft.Domain.Models.Transfer", b =>
+            modelBuilder.Entity("Sheaft.Domain.Models.BankAccount", b =>
                 {
                     b.HasBaseType("Sheaft.Domain.Models.PaymentMethod");
 
@@ -1523,28 +1620,85 @@ namespace Sheaft.Infrastructure.Migrations
                     b.HasDiscriminator().HasValue(0);
                 });
 
-            modelBuilder.Entity("Sheaft.Domain.Models.OrderTransaction", b =>
+            modelBuilder.Entity("Sheaft.Domain.Models.Card", b =>
+                {
+                    b.HasBaseType("Sheaft.Domain.Models.PaymentMethod");
+
+                    b.HasDiscriminator().HasValue(1);
+                });
+
+            modelBuilder.Entity("Sheaft.Domain.Models.PayinTransaction", b =>
                 {
                     b.HasBaseType("Sheaft.Domain.Models.Transaction");
+
+                    b.Property<long?>("CardUid")
+                        .HasColumnType("bigint");
 
                     b.Property<long>("OrderUid")
                         .HasColumnType("bigint");
 
+                    b.HasIndex("CardUid");
+
                     b.HasIndex("OrderUid");
 
-                    b.HasDiscriminator().HasValue("OrderTransaction");
+                    b.HasDiscriminator().HasValue("PayinTransaction");
                 });
 
-            modelBuilder.Entity("Sheaft.Domain.Models.PurchaseTransaction", b =>
+            modelBuilder.Entity("Sheaft.Domain.Models.PayoutTransaction", b =>
+                {
+                    b.HasBaseType("Sheaft.Domain.Models.Transaction");
+
+                    b.Property<long>("BankAccountUid")
+                        .HasColumnType("bigint");
+
+                    b.HasIndex("BankAccountUid");
+
+                    b.HasDiscriminator().HasValue("PayoutTransaction");
+                });
+
+            modelBuilder.Entity("Sheaft.Domain.Models.RefundPayinTransaction", b =>
+                {
+                    b.HasBaseType("Sheaft.Domain.Models.Transaction");
+
+                    b.Property<long>("OrderUid")
+                        .HasColumnName("RefundPayinTransaction_OrderUid")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("TransactionToRefundIdentifier")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasIndex("OrderUid");
+
+                    b.HasDiscriminator().HasValue("RefundPayinTransaction");
+                });
+
+            modelBuilder.Entity("Sheaft.Domain.Models.RefundTransferTransaction", b =>
                 {
                     b.HasBaseType("Sheaft.Domain.Models.Transaction");
 
                     b.Property<long>("PurchaseOrderUid")
                         .HasColumnType("bigint");
 
+                    b.Property<string>("TransactionToRefundIdentifier")
+                        .HasColumnName("RefundTransferTransaction_TransactionToRefundIdentifier")
+                        .HasColumnType("nvarchar(max)");
+
                     b.HasIndex("PurchaseOrderUid");
 
-                    b.HasDiscriminator().HasValue("PurchaseTransaction");
+                    b.HasDiscriminator().HasValue("RefundTransferTransaction");
+                });
+
+            modelBuilder.Entity("Sheaft.Domain.Models.TransferTransaction", b =>
+                {
+                    b.HasBaseType("Sheaft.Domain.Models.Transaction");
+
+                    b.Property<long>("PurchaseOrderUid")
+                        .HasColumnName("TransferTransaction_PurchaseOrderUid")
+                        .HasColumnType("bigint");
+
+                    b.HasIndex("PurchaseOrderUid");
+
+                    b.HasDiscriminator().HasValue("TransferTransaction");
                 });
 
             modelBuilder.Entity("Sheaft.Domain.Models.Consumer", b =>
@@ -1651,7 +1805,7 @@ namespace Sheaft.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.OwnsOne("Sheaft.Domain.Models.LocationAddress", "Address", b1 =>
+                    b.OwnsOne("Sheaft.Domain.Models.DeliveryAddress", "Address", b1 =>
                         {
                             b1.Property<long>("DeliveryModeUid")
                                 .HasColumnType("bigint");
@@ -1730,8 +1884,8 @@ namespace Sheaft.Infrastructure.Migrations
 
             modelBuilder.Entity("Sheaft.Domain.Models.Document", b =>
                 {
-                    b.HasOne("Sheaft.Domain.Models.User", null)
-                        .WithMany("Documents")
+                    b.HasOne("Sheaft.Domain.Models.User", "User")
+                        .WithMany()
                         .HasForeignKey("UserUid")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -1764,19 +1918,38 @@ namespace Sheaft.Infrastructure.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Sheaft.Domain.Models.Packaging", b =>
+            modelBuilder.Entity("Sheaft.Domain.Models.OrderDelivery", b =>
                 {
-                    b.HasOne("Sheaft.Domain.Models.Producer", "Producer")
+                    b.HasOne("Sheaft.Domain.Models.DeliveryMode", "DeliveryMode")
+                        .WithMany()
+                        .HasForeignKey("DeliveryModeUid");
+
+                    b.HasOne("Sheaft.Domain.Models.Order", null)
+                        .WithMany("Deliveries")
+                        .HasForeignKey("OrderUid")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Sheaft.Domain.Models.OrderProduct", b =>
+                {
+                    b.HasOne("Sheaft.Domain.Models.Order", null)
+                        .WithMany("Products")
+                        .HasForeignKey("OrderUid")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Sheaft.Domain.Models.User", "Producer")
                         .WithMany()
                         .HasForeignKey("ProducerUid")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
                 });
 
             modelBuilder.Entity("Sheaft.Domain.Models.PaymentMethod", b =>
                 {
-                    b.HasOne("Sheaft.Domain.Models.User", null)
-                        .WithMany("PaymentMethods")
+                    b.HasOne("Sheaft.Domain.Models.User", "User")
+                        .WithMany()
                         .HasForeignKey("UserUid")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -1799,16 +1972,16 @@ namespace Sheaft.Infrastructure.Migrations
 
             modelBuilder.Entity("Sheaft.Domain.Models.Product", b =>
                 {
-                    b.HasOne("Sheaft.Domain.Models.Packaging", "Packaging")
-                        .WithMany()
-                        .HasForeignKey("PackagingUid")
-                        .OnDelete(DeleteBehavior.NoAction);
-
                     b.HasOne("Sheaft.Domain.Models.Producer", "Producer")
                         .WithMany()
                         .HasForeignKey("ProducerUid")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.HasOne("Sheaft.Domain.Models.Returnable", "Returnable")
+                        .WithMany()
+                        .HasForeignKey("ReturnableUid")
+                        .OnDelete(DeleteBehavior.NoAction);
                 });
 
             modelBuilder.Entity("Sheaft.Domain.Models.ProductTag", b =>
@@ -1828,8 +2001,8 @@ namespace Sheaft.Infrastructure.Migrations
 
             modelBuilder.Entity("Sheaft.Domain.Models.PurchaseOrder", b =>
                 {
-                    b.HasOne("Sheaft.Domain.Models.Order", null)
-                        .WithMany("PurchaseOrders")
+                    b.HasOne("Sheaft.Domain.Models.Order", "Order")
+                        .WithMany()
                         .HasForeignKey("OrderUid")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
@@ -1879,7 +2052,7 @@ namespace Sheaft.Infrastructure.Migrations
                             b1.WithOwner()
                                 .HasForeignKey("PurchaseOrderUid");
 
-                            b1.OwnsOne("Sheaft.Domain.Models.LocationAddress", "Address", b2 =>
+                            b1.OwnsOne("Sheaft.Domain.Models.ExpectedAddress", "Address", b2 =>
                                 {
                                     b2.Property<long>("ExpectedDeliveryPurchaseOrderUid")
                                         .HasColumnType("bigint");
@@ -1963,6 +2136,15 @@ namespace Sheaft.Infrastructure.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("Sheaft.Domain.Models.Returnable", b =>
+                {
+                    b.HasOne("Sheaft.Domain.Models.Producer", "Producer")
+                        .WithMany()
+                        .HasForeignKey("ProducerUid")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("Sheaft.Domain.Models.Reward", b =>
                 {
                     b.HasOne("Sheaft.Domain.Models.Department", "Department")
@@ -2035,7 +2217,7 @@ namespace Sheaft.Infrastructure.Migrations
 
             modelBuilder.Entity("Sheaft.Domain.Models.User", b =>
                 {
-                    b.OwnsOne("Sheaft.Domain.Models.Address", "BillingAddress", b1 =>
+                    b.OwnsOne("Sheaft.Domain.Models.BillingAddress", "BillingAddress", b1 =>
                         {
                             b1.Property<long>("UserUid")
                                 .HasColumnType("bigint");
@@ -2063,7 +2245,7 @@ namespace Sheaft.Infrastructure.Migrations
                                 .HasForeignKey("UserUid");
                         });
 
-                    b.OwnsOne("Sheaft.Domain.Models.FullAddress", "Address", b1 =>
+                    b.OwnsOne("Sheaft.Domain.Models.UserAddress", "Address", b1 =>
                         {
                             b1.Property<long>("UserUid")
                                 .HasColumnType("bigint");
@@ -2107,51 +2289,22 @@ namespace Sheaft.Infrastructure.Migrations
                             b1.WithOwner()
                                 .HasForeignKey("UserUid");
                         });
-
-                    b.OwnsMany("Sheaft.Domain.Models.Points", "Points", b1 =>
-                        {
-                            b1.Property<long>("Uid")
-                                .ValueGeneratedOnAdd()
-                                .HasColumnType("bigint")
-                                .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                            b1.Property<DateTimeOffset>("CreatedOn")
-                                .HasColumnType("datetimeoffset");
-
-                            b1.Property<int>("Kind")
-                                .HasColumnType("int");
-
-                            b1.Property<int>("Quantity")
-                                .HasColumnType("int");
-
-                            b1.Property<long>("UserUid")
-                                .HasColumnType("bigint");
-
-                            b1.HasKey("Uid");
-
-                            b1.HasIndex("UserUid");
-
-                            b1.ToTable("UserPoints");
-
-                            b1.WithOwner()
-                                .HasForeignKey("UserUid");
-                        });
                 });
 
             modelBuilder.Entity("Sheaft.Domain.Models.Wallet", b =>
                 {
-                    b.HasOne("Sheaft.Domain.Models.User", null)
-                        .WithMany("Wallets")
+                    b.HasOne("Sheaft.Domain.Models.User", "User")
+                        .WithMany()
                         .HasForeignKey("UserUid")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Sheaft.Domain.Models.Transfer", b =>
+            modelBuilder.Entity("Sheaft.Domain.Models.BankAccount", b =>
                 {
-                    b.OwnsOne("Sheaft.Domain.Models.Address", "OwnerAddress", b1 =>
+                    b.OwnsOne("Sheaft.Domain.Models.BankAddress", "OwnerAddress", b1 =>
                         {
-                            b1.Property<long>("TransferUid")
+                            b1.Property<long>("BankAccountUid")
                                 .HasColumnType("bigint");
 
                             b1.Property<string>("City")
@@ -2169,36 +2322,68 @@ namespace Sheaft.Infrastructure.Migrations
                             b1.Property<string>("Zipcode")
                                 .HasColumnType("nvarchar(max)");
 
-                            b1.HasKey("TransferUid");
+                            b1.HasKey("BankAccountUid");
 
-                            b1.ToTable("TransferOwnerAddresses");
+                            b1.ToTable("BankAccountOwnerAddresses");
 
                             b1.WithOwner()
-                                .HasForeignKey("TransferUid");
+                                .HasForeignKey("BankAccountUid");
                         });
                 });
 
-            modelBuilder.Entity("Sheaft.Domain.Models.OrderTransaction", b =>
+            modelBuilder.Entity("Sheaft.Domain.Models.PayinTransaction", b =>
                 {
-                    b.HasOne("Sheaft.Domain.Models.Order", null)
-                        .WithMany("Transactions")
+                    b.HasOne("Sheaft.Domain.Models.Card", "Card")
+                        .WithMany()
+                        .HasForeignKey("CardUid")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("Sheaft.Domain.Models.Order", "Order")
+                        .WithMany()
+                        .HasForeignKey("OrderUid")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Sheaft.Domain.Models.PayoutTransaction", b =>
+                {
+                    b.HasOne("Sheaft.Domain.Models.BankAccount", "BankAccount")
+                        .WithMany()
+                        .HasForeignKey("BankAccountUid")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Sheaft.Domain.Models.RefundPayinTransaction", b =>
+                {
+                    b.HasOne("Sheaft.Domain.Models.Order", "Order")
+                        .WithMany()
                         .HasForeignKey("OrderUid")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Sheaft.Domain.Models.PurchaseTransaction", b =>
+            modelBuilder.Entity("Sheaft.Domain.Models.RefundTransferTransaction", b =>
                 {
-                    b.HasOne("Sheaft.Domain.Models.PurchaseOrder", null)
-                        .WithMany("Transactions")
+                    b.HasOne("Sheaft.Domain.Models.PurchaseOrder", "PurchaseOrder")
+                        .WithMany()
                         .HasForeignKey("PurchaseOrderUid")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("Sheaft.Domain.Models.TransferTransaction", b =>
+                {
+                    b.HasOne("Sheaft.Domain.Models.PurchaseOrder", "PurchaseOrder")
+                        .WithMany()
+                        .HasForeignKey("PurchaseOrderUid")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("Sheaft.Domain.Models.Producer", b =>
                 {
-                    b.OwnsOne("Sheaft.Domain.Models.Address", "LegalAddress", b1 =>
+                    b.OwnsOne("Sheaft.Domain.Models.LegalAddress", "LegalAddress", b1 =>
                         {
                             b1.Property<long>("ProducerUid")
                                 .HasColumnType("bigint");
@@ -2229,7 +2414,7 @@ namespace Sheaft.Infrastructure.Migrations
 
             modelBuilder.Entity("Sheaft.Domain.Models.Store", b =>
                 {
-                    b.OwnsOne("Sheaft.Domain.Models.Address", "LegalAddress", b1 =>
+                    b.OwnsOne("Sheaft.Domain.Models.LegalAddress", "LegalAddress", b1 =>
                         {
                             b1.Property<long>("StoreUid")
                                 .HasColumnType("bigint");

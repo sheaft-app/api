@@ -1,18 +1,18 @@
-﻿@model IEnumerable<PackagingViewModel>
+﻿@model IEnumerable<ReturnableViewModel>
 @{
-    ViewData["Title"] = "Packagings";
+    ViewData["Title"] = "Returnables";
     int take = ViewBag.Take;
     int currentPage = ViewBag.Page;
 }
 
     <div class="container">
-        <h2 class="display-5">Packagings</h2>
+        <h2 class="display-5">Returnables</h2>
         <br />
 
         @if (ViewBag.Removed != null)
         {
             <div class="alert alert-success alert-dismissible fade show" role="alert">
-                <span>Successfully removed packaging @ViewBag.Removed</span>
+                <span>Successfully removed Returnable @ViewBag.Removed</span>
 
                 <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
@@ -24,8 +24,8 @@
         @if (ViewBag.Restored != null)
         {
             <div class="alert alert-success alert-dismissible fade show" role="alert">
-                <span>Successfully restored packaging @ViewBag.Restored.Name</span>
-                <a asp-controller="Packagings" asp-action="Edit" asp-route-id="@ViewBag.Restored.Id">View details</a>
+                <span>Successfully restored Returnable @ViewBag.Restored.Name</span>
+                <a asp-controller="Returnables" asp-action="Edit" asp-route-id="@ViewBag.Restored.Id">View details</a>
 
                 <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
@@ -37,8 +37,8 @@
         @if (ViewBag.Edited != null)
         {
             <div class="alert alert-success alert-dismissible fade show" role="alert">
-                <span>Successfully updated packaging @ViewBag.Edited.Name</span>
-                <a asp-controller="Packagings" asp-action="Edit" asp-route-id="@ViewBag.Edited.Id">View details</a>
+                <span>Successfully updated Returnable @ViewBag.Edited.Name</span>
+                <a asp-controller="Returnables" asp-action="Edit" asp-route-id="@ViewBag.Edited.Id">View details</a>
 
                 <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
@@ -56,7 +56,7 @@
                     <th scope="col">CreatedOn</th>
                     <th scope="col">Removed</th>
                     <th scope="col">
-                        <a asp-controller="Packagings" asp-action="Add" class="btn btn-success">
+                        <a asp-controller="Returnables" asp-action="Add" class="btn btn-success">
                             <i class="fa fa-plus"></i>
                         </a>
                     </th>
@@ -72,13 +72,13 @@
                     <td>@entity.CreatedOn.ToString("dd/MM/yy hh:mm")</td>
                     <td>@entity.RemovedOn.HasValue</td>
                     <td>
-                        <a asp-controller="Packagings" asp-action="Edit" asp-route-id="@entity.Id" class="btn btn-info">
+                        <a asp-controller="Returnables" asp-action="Edit" asp-route-id="@entity.Id" class="btn btn-info">
                             <i class="fa fa-pen"></i>
                         </a>
 
                         @if (entity.RemovedOn.HasValue)
                         {
-                            @using (Html.BeginForm("Restore", "Packagings", new { id = entity.Id }, FormMethod.Post, true, new { @class = "form d-inline" }))
+                            @using (Html.BeginForm("Restore", "Returnables", new { id = entity.Id }, FormMethod.Post, true, new { @class = "form d-inline" }))
                             {
                                 <button type="submit" class="btn btn-success">
                                     <i class="fa fa-trash-restore"></i>
@@ -87,7 +87,7 @@
                         }
                         else
                         {
-                            @using (Html.BeginForm("Delete", "Packagings", new { id = entity.Id }, FormMethod.Post, true, new { @class = "form d-inline" }))
+                            @using (Html.BeginForm("Delete", "Returnables", new { id = entity.Id }, FormMethod.Post, true, new { @class = "form d-inline" }))
                             {
                                 <button type="submit" class="btn btn-danger">
                                     <i class="fa fa-trash"></i>
@@ -103,13 +103,13 @@
                     <td colspan="6">
                         @if (currentPage >= 1)
                         {
-                            <a asp-controller="Packagings" asp-action="Index" asp-route-take="@take" asp-route-page="@(currentPage-1)" class="btn btn-outline-secondary">
+                            <a asp-controller="Returnables" asp-action="Index" asp-route-take="@take" asp-route-page="@(currentPage-1)" class="btn btn-outline-secondary">
                                 <i class="fa fa-caret-left"></i>
                             </a>
                         }
                         @if (take == Model.Count())
                         {
-                            <a asp-controller="Packagings" asp-action="Index" asp-route-take="@take" asp-route-page="@(currentPage+1)" class="btn btn-outline-secondary">
+                            <a asp-controller="Returnables" asp-action="Index" asp-route-take="@take" asp-route-page="@(currentPage+1)" class="btn btn-outline-secondary">
                                 <i class="fa fa-caret-right"></i>
                             </a>
                         }

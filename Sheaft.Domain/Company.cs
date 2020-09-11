@@ -11,7 +11,7 @@ namespace Sheaft.Domain.Models
         {
         }
 
-        protected Company(Guid id, ProfileKind kind, LegalKind legal, string name, string email, string firstname, string lastname, string siret, string vatIdentifier, FullAddress address, bool openForBusiness = true, string phone = null, string description = null)
+        protected Company(Guid id, ProfileKind kind, LegalKind legal, string name, string email, string firstname, string lastname, string siret, string vatIdentifier, UserAddress address, bool openForBusiness = true, string phone = null, string description = null)
             : base(id, kind, legal, name, firstname, lastname, email, phone)
         {
             if (address == null)

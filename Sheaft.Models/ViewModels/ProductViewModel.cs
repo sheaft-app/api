@@ -27,7 +27,7 @@ namespace Sheaft.Models.ViewModels
         public decimal Vat { get; set; }
         public bool Available { get; set; } = true;
         public decimal? Rating { get; set; }
-        public Guid? PackagingId { get; set; }
+        public Guid? ReturnableId { get; set; }
         public CompanyViewModel Producer { get; set; }
         public IEnumerable<Guid> Tags { get; set; }
     }

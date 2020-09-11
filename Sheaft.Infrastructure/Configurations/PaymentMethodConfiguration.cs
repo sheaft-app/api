@@ -19,15 +19,17 @@ namespace Sheaft.Infrastructure
             entity.Property(c => c.IsActive).HasDefaultValue(true);
 
             entity.HasDiscriminator(c => c.Kind)
-                .HasValue<Transfer>(PaymentKind.Transfer)
+                .HasValue<BankAccount>(PaymentKind.BankAccount)
                 .HasValue<Card>(PaymentKind.Card);
+
+            entity.HasOne(c => c.User).WithMany().HasForeignKey("UserUid").OnDelete(DeleteBehavior.Cascade);
 
             entity.HasKey("Uid");
 
             entity.HasIndex(c => c.Id).IsUnique();
             entity.HasIndex(c => c.Identifier);
             entity.HasIndex("UserUid");
-            entity.HasIndex("Uid", "Id", "Identifier", "UserUid", "CreatedOn");
+            entity.HasIndex("Uid", "Id", "Identifier", "UserUid", "RemovedOn");
 
             entity.ToTable("PaymentMethods");
         }
