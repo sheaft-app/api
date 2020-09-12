@@ -17,7 +17,8 @@ namespace Sheaft.GraphQL
             descriptor.Field(c => c.CreateDeliveryModeAsync(default, default));
             descriptor.Field(c => c.CreateReturnableAsync(default, default));
             descriptor.Field(c => c.CreateProductAsync(default, default));
-            descriptor.Field(c => c.CreateOrderAsync(default, default));
+            descriptor.Field(c => c.CreateConsumerOrderAsync(default, default));
+            descriptor.Field(c => c.CreateBusinessOrderAsync(default, default));
             descriptor.Field(c => c.PayOrderAsync(default, default));
             descriptor.Field(c => c.ConfirmOrderAsync(default, default));
             descriptor.Field(c => c.CreateQuickOrderAsync(default, default));
