@@ -11,7 +11,7 @@ using Sheaft.Interop.Enums;
 namespace Sheaft.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20200912162318_InitDatabase")]
+    [Migration("20200912164403_InitDatabase")]
     partial class InitDatabase
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -1919,6 +1919,9 @@ namespace Sheaft.Infrastructure.Migrations
 
                             b1.Property<decimal>("Size")
                                 .HasColumnType("decimal(10,2)");
+
+                            b1.Property<bool>("Uploaded")
+                                .HasColumnType("bit");
 
                             b1.HasKey("DocumentUid", "Id");
 

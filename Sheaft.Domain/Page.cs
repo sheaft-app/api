@@ -16,5 +16,11 @@ namespace Sheaft.Domain.Models
         public string Filename { get; private set; }
         public string Extension { get; private set; }
         public decimal Size { get; private set; }
+        public bool Uploaded { get; private set; }
+
+        public void SetUploaded()
+        {
+            Uploaded = true;
+        }
     }
 }

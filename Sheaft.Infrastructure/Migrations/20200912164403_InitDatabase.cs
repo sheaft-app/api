@@ -788,7 +788,8 @@ namespace Sheaft.Infrastructure.Migrations
                     DocumentUid = table.Column<long>(nullable: false),
                     Filename = table.Column<string>(nullable: false),
                     Extension = table.Column<string>(nullable: true),
-                    Size = table.Column<decimal>(type: "decimal(10,2)", nullable: false)
+                    Size = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
+                    Uploaded = table.Column<bool>(nullable: false)
                 },
                 constraints: table =>
                 {

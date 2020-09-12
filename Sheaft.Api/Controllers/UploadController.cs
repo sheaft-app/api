@@ -71,6 +71,8 @@ namespace Sheaft.Api.Controllers
                 DocumentId = documentId
             };
 
+            //TODO handle zip files !
+
             foreach (var formFile in files)
             {
                 if (formFile.Length == 0)

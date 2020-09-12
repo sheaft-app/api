@@ -1918,6 +1918,9 @@ namespace Sheaft.Infrastructure.Migrations
                             b1.Property<decimal>("Size")
                                 .HasColumnType("decimal(10,2)");
 
+                            b1.Property<bool>("Uploaded")
+                                .HasColumnType("bit");
+
                             b1.HasKey("DocumentUid", "Id");
 
                             b1.HasIndex("Id")
