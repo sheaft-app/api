@@ -54,9 +54,18 @@ namespace Sheaft.GraphQL.Enums
     {
         protected override void Configure(IEnumTypeDescriptor<TransactionKind> descriptor)
         {
-            descriptor.Value(TransactionKind.Payin).Name("PAYIN");
-            descriptor.Value(TransactionKind.Payout).Name("PAYOUT");
+            descriptor.Value(TransactionKind.PayinWeb).Name("PAYIN_WEB");
+            descriptor.Value(TransactionKind.PayinCard).Name("PAYIN_CARD");
+            descriptor.Value(TransactionKind.PayinCheck).Name("PAYIN_CHECK");
+            descriptor.Value(TransactionKind.PayinExternal).Name("PAYIN_EXTERNAL");
+            descriptor.Value(TransactionKind.PayinMoney).Name("PAYIN_MONEY");
             descriptor.Value(TransactionKind.Transfer).Name("TRANSFER");
+            descriptor.Value(TransactionKind.Payout).Name("PAYOUT");
+            descriptor.Value(TransactionKind.RefundPayin).Name("REFUND_PAYIN");
+            descriptor.Value(TransactionKind.RefundPayout).Name("REFUND_PAYOUT");
+            descriptor.Value(TransactionKind.RefundTransfer).Name("REFUND_TRANSFER");
+            descriptor.Value(TransactionKind.Repudiation).Name("REPUDIATION");
+            descriptor.Value(TransactionKind.Settlement).Name("SETTLEMENT");
         }
     }
     public class TransactionStatusEnumType : EnumType<TransactionStatus>
@@ -66,16 +75,6 @@ namespace Sheaft.GraphQL.Enums
             descriptor.Value(TransactionStatus.Created).Name("CREATED");
             descriptor.Value(TransactionStatus.Failed).Name("FAILED");
             descriptor.Value(TransactionStatus.Succeeded).Name("SUCCEEDED");
-        }
-    }
-    public class TransactionNatureEnumType : EnumType<TransactionNature>
-    {
-        protected override void Configure(IEnumTypeDescriptor<TransactionNature> descriptor)
-        {
-            descriptor.Value(TransactionNature.Refund).Name("REFUND");
-            descriptor.Value(TransactionNature.Regular).Name("REGULAR");
-            descriptor.Value(TransactionNature.Repudiation).Name("REPUDIATION");
-            descriptor.Value(TransactionNature.Settlement).Name("SETTLEMENT");
         }
     }
     public class PaymentKindEnumType : EnumType<PaymentKind>

@@ -3,14 +3,14 @@ using System;
 
 namespace Sheaft.Domain.Models
 {
-    public class PayinTransaction : Transaction
+    public class WebPayinTransaction : Transaction
     {
-        protected PayinTransaction()
+        protected WebPayinTransaction()
         {
         }
 
-        public PayinTransaction(Guid id, Wallet creditedWallet, Order order)
-            : base(id, TransactionKind.Payin, TransactionNature.Regular, creditedWallet.User)
+        public WebPayinTransaction(Guid id, Wallet creditedWallet, Order order)
+            : base(id, TransactionKind.PayinWeb, creditedWallet.User)
         {
             Order = order;
             Fees = order.Fees;
@@ -19,7 +19,12 @@ namespace Sheaft.Domain.Models
             Reference = $"SHEAFT_{DateTimeOffset.UtcNow:yyyyMMdd}";
         }
 
-        public virtual Card Card { get; private set; }
+        public string RedirectUrl { get; private set; }
         public virtual Order Order { get; private set; }
+
+        public void SetRedirectUrl(string url)
+        {
+            RedirectUrl = url;
+        }
     }
 }

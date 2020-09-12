@@ -216,6 +216,9 @@ namespace Sheaft.GraphQL
 
         [Authorize(Policy = Policies.REGISTERED)]
         [GraphQLName("createBusinessOrder")]
+        [UsePaging]
+        [UseSorting(SortType = typeof(PurchaseOrderSortType))]
+        [UseFiltering(FilterType = typeof(PurchaseOrderFilterType))]
         [UseSelection]
         public async Task<IQueryable<PurchaseOrderDto>> CreateBusinessOrderAsync(CreateOrderInput input, [Service] IPurchaseOrderQueries purchaseOrderQueries)
         {
@@ -226,10 +229,10 @@ namespace Sheaft.GraphQL
         [Authorize(Policy = Policies.REGISTERED)]
         [GraphQLName("payOrder")]
         [UseSelection]
-        public async Task<IQueryable<OrderDto>> PayOrderAsync(PayOrderInput input, [Service] IOrderQueries orderQueries)
+        public async Task<IQueryable<WebPayinTransactionDto>> PayOrderAsync(PayOrderInput input, [Service] ITransactionQueries transactionQueries)
         {
             var result = await ExecuteCommandAsync<PayOrderCommand, Guid>(_mapper.Map(input, new PayOrderCommand(_currentUser)), _cancellationToken);
-            return orderQueries.GetOrders(_currentUser).Where(j => result == j.Id);
+            return transactionQueries.GetTransactions<WebPayinTransactionDto>(_currentUser).Where(j => result == j.Id);
         }
 
         [Authorize(Policy = Policies.REGISTERED)]

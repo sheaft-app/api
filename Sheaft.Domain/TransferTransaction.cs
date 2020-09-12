@@ -10,7 +10,7 @@ namespace Sheaft.Domain.Models
         }
 
         public TransferTransaction(Guid id, Wallet debitedWallet, Wallet creditedWallet, PurchaseOrder purchaseOrder)
-            : base(id, TransactionKind.Transfer, TransactionNature.Regular, debitedWallet.User)
+            : base(id, TransactionKind.Transfer, debitedWallet.User)
         {
             PurchaseOrder = purchaseOrder;
             Debited = PurchaseOrder.TotalWholeSalePrice;

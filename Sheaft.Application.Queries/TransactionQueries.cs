@@ -1,0 +1,65 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using AutoMapper.QueryableExtensions;
+using Sheaft.Infrastructure.Interop;
+using Sheaft.Models.Dto;
+using Sheaft.Core;
+using Sheaft.Infrastructure;
+
+namespace Sheaft.Application.Queries
+{
+    public class TransactionQueries : ITransactionQueries
+    {
+        private readonly IAppDbContext _context;
+        private readonly AutoMapper.IConfigurationProvider _configurationProvider;
+
+        public TransactionQueries(IAppDbContext context, AutoMapper.IConfigurationProvider configurationProvider)
+        {
+            _context = context;
+            _configurationProvider = configurationProvider;
+        }
+
+        public IQueryable<TransactionDto> GetTransaction(Guid id, RequestUser currentUser)
+        {
+            try
+            {
+                return _context.Transactions
+                        .Get(c => c.Id == id && c.Author.Id == currentUser.Id)
+                        .ProjectTo<TransactionDto>(_configurationProvider);
+            }
+            catch (Exception e)
+            {
+                return new List<TransactionDto>().AsQueryable();
+            }
+        }
+
+        public IQueryable<TransactionDto> GetTransactions(RequestUser currentUser)
+        {
+            try
+            {
+                return _context.Transactions
+                        .Get(c => c.Author.Id == currentUser.Id)
+                        .ProjectTo<TransactionDto>(_configurationProvider);
+            }
+            catch (Exception e)
+            {
+                return new List<TransactionDto>().AsQueryable();
+            }
+        }
+
+        public IQueryable<T> GetTransactions<T>(RequestUser currentUser) where T : BaseTransactionDto
+        {
+            try
+            {
+                return _context.Transactions
+                        .Get(c => c.Author.Id == currentUser.Id)
+                        .ProjectTo<T>(_configurationProvider);
+            }
+            catch (Exception e)
+            {
+                return new List<T>().AsQueryable();
+            }
+        }
+    }
+}

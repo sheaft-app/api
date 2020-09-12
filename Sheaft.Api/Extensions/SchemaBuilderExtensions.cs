@@ -47,6 +47,9 @@ namespace Sheaft.Api
             services.AddType<SearchStoreType>();
             services.AddType<SearchProducerType>();
             services.AddType<ProductType>();
+            services.AddType<OrderType>();
+            services.AddType<TransactionType>();
+            services.AddType<WebPayinTransactionType>();
 
             services.AddType<AddressKindEnumType>();
             services.AddType<AgreementStatusEnumType>();
@@ -68,7 +71,6 @@ namespace Sheaft.Api
             services.AddType<DocumentKindEnumType>();
             services.AddType<TransactionKindEnumType>();
             services.AddType<TransactionStatusEnumType>();
-            services.AddType<TransactionNatureEnumType>();
 
             services.AddType<CreateOrderInputType>();
             services.AddType<PayOrderInputType>();

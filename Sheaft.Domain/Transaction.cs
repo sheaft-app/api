@@ -10,12 +10,12 @@ namespace Sheaft.Domain.Models
         {
         }
 
-        protected Transaction(Guid id, TransactionKind kind, TransactionNature nature, User author)
+        protected Transaction(Guid id, TransactionKind kind, User author)
         {
             Id = id;
             Kind = kind;
-            Nature = nature;
             Author = author;
+            Status = TransactionStatus.Waiting;
         }
 
         public Guid Id { get; private set; }
@@ -23,7 +23,6 @@ namespace Sheaft.Domain.Models
         public DateTimeOffset? UpdatedOn { get; private set; }
         public DateTimeOffset? RemovedOn { get; private set; }
         public string Identifier { get; private set; }
-        public TransactionNature Nature { get; private set; }
         public TransactionKind Kind { get; private set; }
         public TransactionStatus Status { get; private set; }
         public DateTimeOffset? ExecutedOn { get; private set; }
@@ -43,6 +42,21 @@ namespace Sheaft.Domain.Models
                 return;
 
             Identifier = identifier;
+        }
+
+        public void SetStatus(TransactionStatus status)
+        {
+            Status = status;
+        }
+
+        public void SetCreditedAmount(decimal amount)
+        {
+            Credited = amount;
+        }
+
+        public void SetDebitedAmount(decimal amount)
+        {
+            Debited = amount;
         }
 
         public void SetResult(string code, string message)
