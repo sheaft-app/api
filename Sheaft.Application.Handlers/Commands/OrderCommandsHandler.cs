@@ -23,18 +23,15 @@ namespace Sheaft.Application.Handlers
     {
         private readonly IAppDbContext _context;
         private readonly IMediator _mediatr;
-        private readonly IPspService _pspService;
         private readonly IQueueService _queuesService;
 
         public OrderCommandsHandler(
             IAppDbContext context,
             IMediator mediatr,
-            IPspService pspService,
             IQueueService queuesService,
             ILogger<OrderCommandsHandler> logger) : base(logger)
         {
             _context = context;
-            _pspService = pspService;
             _mediatr = mediatr;
             _queuesService = queuesService;
         }
@@ -142,27 +139,17 @@ namespace Sheaft.Application.Handlers
                     order.SetDonation(request.Donation);
 
                     _context.Update(order);
-
-                    var wallet = await _context.GetSingleAsync<Wallet>(c => c.User.Id == request.RequestUser.Id, token);
-                    var webPayin = new PayinTransaction(Guid.NewGuid(), wallet, order);
-
-                    await _context.AddAsync(webPayin, token);
                     await _context.SaveChangesAsync(token);
 
-                    var result = await _pspService.CreateWebPayinAsync(webPayin, token);
+                    var result = await _mediatr.Send(new CreateWebPayInTransactionCommand(request.RequestUser) { OrderId = order.Id }, token);
                     if (!result.Success)
                     {
                         await transaction.RollbackAsync(token);
                         return Failed<Guid>(result.Exception);
                     }
 
-                    webPayin.SetIdentifier(result.Data);
-
-                    _context.Update(webPayin);
-                    await _context.SaveChangesAsync(token);
-
                     await transaction.CommitAsync(token);
-                    return Ok(webPayin.Id);
+                    return Ok(result.Data);
                 }
             });
         }

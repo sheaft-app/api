@@ -10,6 +10,7 @@ using Sheaft.Core;
 using Sheaft.Domain.Models;
 using Sheaft.Exceptions;
 using Sheaft.Interop.Enums;
+using Sheaft.Models.Dto;
 using Sheaft.Options;
 using Sheaft.Services.Interop;
 using System;
@@ -212,13 +213,13 @@ namespace Sheaft.Services
             }
         }
 
-        public async Task<Result<string>> CreateWebPayinAsync(PayinTransaction transaction, CancellationToken token)
+        public async Task<Result<PspWebPaymentResultDto>> CreateWebPayinAsync(WebPayinTransaction transaction, CancellationToken token)
         {
             if (string.IsNullOrWhiteSpace(transaction.Author.Identifier))
-                return new Result<string>(new SheaftException(ExceptionKind.BadRequest, MessageKind.PsP_CannotCreate_WebPayin_Author_Not_Exists));
+                return new Result<PspWebPaymentResultDto>(new SheaftException(ExceptionKind.BadRequest, MessageKind.PsP_CannotCreate_WebPayin_Author_Not_Exists));
 
             if (string.IsNullOrWhiteSpace(transaction.CreditedWallet.Identifier))
-                return new Result<string>(new SheaftException(ExceptionKind.BadRequest, MessageKind.PsP_CannotCreate_WebPayin_CreditedWallet_Not_Exists));
+                return new Result<PspWebPaymentResultDto>(new SheaftException(ExceptionKind.BadRequest, MessageKind.PsP_CannotCreate_WebPayin_CreditedWallet_Not_Exists));
 
             try
             {
@@ -247,24 +248,91 @@ namespace Sheaft.Services
                         TemplateURLOptionsCard = new TemplateURLOptionsCard { PAYLINEV2 = _pspOptions.PaiementUrl }
                     });
 
-                return new Result<string>(result.Id);
+                return new Result<PspWebPaymentResultDto>(new PspWebPaymentResultDto
+                {
+                    Credited = result.CreditedFunds.Amount.GetAmount(),
+                    ExecutedOn = result.ExecutionDate,
+                    Identifier = result.Id,
+                    RedirectUrl = result.RedirectURL,
+                    ResultCode = result.ResultCode,
+                    ResultMessage = result.ResultMessage,
+                    Debited = result.DebitedFunds.Amount.GetAmount(),
+                    Fees = result.Fees.Amount.GetAmount(),
+                    Status = result.Status.GetStatus()
+                });
             }
             catch (Exception e)
             {
-                return new Result<string>(e);
+                return new Result<PspWebPaymentResultDto>(e);
             }
         }
 
-        public async Task<Result<string>> CreateTransferAsync(TransferTransaction transaction, CancellationToken token)
+        public async Task<Result<PspPaymentResultDto>> CreateCardPayinAsync(CardPayinTransaction transaction, CancellationToken token)
         {
             if (string.IsNullOrWhiteSpace(transaction.Author.Identifier))
-                return new Result<string>(new SheaftException(ExceptionKind.BadRequest, MessageKind.PsP_CannotCreate_Transfer_Author_Not_Exists));
+                return new Result<PspPaymentResultDto>(new SheaftException(ExceptionKind.BadRequest, MessageKind.PsP_CannotCreate_WebPayin_Author_Not_Exists));
 
             if (string.IsNullOrWhiteSpace(transaction.CreditedWallet.Identifier))
-                return new Result<string>(new SheaftException(ExceptionKind.BadRequest, MessageKind.PsP_CannotCreate_Transfer_CreditedWallet_Not_Exists));
+                return new Result<PspPaymentResultDto>(new SheaftException(ExceptionKind.BadRequest, MessageKind.PsP_CannotCreate_WebPayin_CreditedWallet_Not_Exists));
+
+            try
+            {
+                await EnsureAccessTokenIsValidAsync(token);
+
+                var result = await _api.PayIns.CreateCardDirectAsync(transaction.Id.ToString("N"),
+                    new PayInCardDirectPostDTO(
+                        transaction.Author.Identifier,
+                        transaction.CreditedWallet.User.Identifier,
+                        new Money
+                        {
+                            Amount = transaction.Debited.GetAmount(),
+                            Currency = CurrencyIso.EUR
+                        },
+                        new Money
+                        {
+                            Amount = transaction.Fees.GetAmount(),
+                            Currency = CurrencyIso.EUR
+                        },
+                        transaction.CreditedWallet.Identifier,
+                        _pspOptions.ReturnUrl,
+                        transaction.Card.Identifier,
+                        transaction.Reference,
+                        new Billing
+                        {
+                            Address = transaction.Author.BillingAddress.GetAddress()
+                        })
+                    {
+                        SecureMode = SecureMode.DEFAULT
+                    });
+
+                return new Result<PspPaymentResultDto>(new PspPaymentResultDto
+                {
+                    Credited = result.CreditedFunds.Amount.GetAmount(),
+                    ExecutedOn = result.ExecutionDate,
+                    Identifier = result.Id,
+                    ResultCode = result.ResultCode,
+                    ResultMessage = result.ResultMessage,
+                    Debited = result.DebitedFunds.Amount.GetAmount(),
+                    Fees = result.Fees.Amount.GetAmount(),
+                    Status = result.Status.GetStatus()
+                });
+            }
+            catch (Exception e)
+            {
+                return new Result<PspPaymentResultDto>(e);
+            }
+        }
+
+        public async Task<Result<PspPaymentResultDto>> CreateTransferAsync(TransferTransaction transaction, CancellationToken token)
+        {
+            if (string.IsNullOrWhiteSpace(transaction.Author.Identifier))
+                return new Result<PspPaymentResultDto>(new SheaftException(ExceptionKind.BadRequest, MessageKind.PsP_CannotCreate_Transfer_Author_Not_Exists));
+
+            if (string.IsNullOrWhiteSpace(transaction.CreditedWallet.Identifier))
+                return new Result<PspPaymentResultDto>(new SheaftException(ExceptionKind.BadRequest, MessageKind.PsP_CannotCreate_Transfer_CreditedWallet_Not_Exists));
 
             if (string.IsNullOrWhiteSpace(transaction.DebitedWallet.Identifier))
-                return new Result<string>(new SheaftException(ExceptionKind.BadRequest, MessageKind.PsP_CannotCreate_Transfer_DebitedWallet_Not_Exists));
+                return new Result<PspPaymentResultDto>(new SheaftException(ExceptionKind.BadRequest, MessageKind.PsP_CannotCreate_Transfer_DebitedWallet_Not_Exists));
 
             try
             {
@@ -287,21 +355,31 @@ namespace Sheaft.Services
                         transaction.DebitedWallet.Identifier,
                         transaction.CreditedWallet.Identifier));
 
-                return new Result<string>(result.Id);
+                return new Result<PspPaymentResultDto>(new PspPaymentResultDto
+                {
+                    Credited = result.CreditedFunds.Amount.GetAmount(),
+                    ExecutedOn = result.ExecutionDate,
+                    Identifier = result.Id,
+                    ResultCode = result.ResultCode,
+                    ResultMessage = result.ResultMessage,
+                    Debited = result.DebitedFunds.Amount.GetAmount(),
+                    Fees = result.Fees.Amount.GetAmount(),
+                    Status = result.Status.GetStatus()
+                });
             }
             catch (Exception e)
             {
-                return new Result<string>(e);
+                return new Result<PspPaymentResultDto>(e);
             }
         }
 
-        public async Task<Result<string>> CreatePayoutAsync(PayoutTransaction transaction, CancellationToken token)
+        public async Task<Result<PspPaymentResultDto>> CreatePayoutAsync(PayoutTransaction transaction, CancellationToken token)
         {
             if (string.IsNullOrWhiteSpace(transaction.Author.Identifier))
-                return new Result<string>(new SheaftException(ExceptionKind.BadRequest, MessageKind.PsP_CannotCreate_Payout_Author_Not_Exists));
+                return new Result<PspPaymentResultDto>(new SheaftException(ExceptionKind.BadRequest, MessageKind.PsP_CannotCreate_Payout_Author_Not_Exists));
 
             if (string.IsNullOrWhiteSpace(transaction.DebitedWallet.Identifier))
-                return new Result<string>(new SheaftException(ExceptionKind.BadRequest, MessageKind.PsP_CannotCreate_Payout_DebitedWallet_Not_Exists));
+                return new Result<PspPaymentResultDto>(new SheaftException(ExceptionKind.BadRequest, MessageKind.PsP_CannotCreate_Payout_DebitedWallet_Not_Exists));
 
             try
             {
@@ -324,21 +402,31 @@ namespace Sheaft.Services
                         transaction.BankAccount.Identifier,
                         transaction.Reference));
 
-                return new Result<string>(result.Id);
+                return new Result<PspPaymentResultDto>(new PspPaymentResultDto
+                {
+                    Credited = result.CreditedFunds.Amount.GetAmount(),
+                    ExecutedOn = result.ExecutionDate,
+                    Identifier = result.Id,
+                    ResultCode = result.ResultCode,
+                    ResultMessage = result.ResultMessage,
+                    Debited = result.DebitedFunds.Amount.GetAmount(),
+                    Fees = result.Fees.Amount.GetAmount(),
+                    Status = result.Status.GetStatus()
+                });
             }
             catch (Exception e)
             {
-                return new Result<string>(e);
+                return new Result<PspPaymentResultDto>(e);
             }
         }
 
-        public async Task<Result<string>> RefundPayinAsync(RefundPayinTransaction transaction, CancellationToken token)
+        public async Task<Result<PspPaymentResultDto>> RefundPayinAsync(RefundPayinTransaction transaction, CancellationToken token)
         {
             if (string.IsNullOrWhiteSpace(transaction.Author.Identifier))
-                return new Result<string>(new SheaftException(ExceptionKind.BadRequest, MessageKind.PsP_CannotRefund_Payin_Author_Not_Exists));
+                return new Result<PspPaymentResultDto>(new SheaftException(ExceptionKind.BadRequest, MessageKind.PsP_CannotRefund_Payin_Author_Not_Exists));
 
             if (string.IsNullOrWhiteSpace(transaction.TransactionToRefundIdentifier))
-                return new Result<string>(new SheaftException(ExceptionKind.BadRequest, MessageKind.PsP_CannotRefund_Payin_PayinIdentifier_Missing));
+                return new Result<PspPaymentResultDto>(new SheaftException(ExceptionKind.BadRequest, MessageKind.PsP_CannotRefund_Payin_PayinIdentifier_Missing));
 
             try
             {
@@ -358,32 +446,52 @@ namespace Sheaft.Services
                             Currency = CurrencyIso.EUR
                         }));
 
-                return new Result<string>(result.Id);
+                return new Result<PspPaymentResultDto>(new PspPaymentResultDto
+                {
+                    Credited = result.CreditedFunds.Amount.GetAmount(),
+                    ExecutedOn = result.ExecutionDate,
+                    Identifier = result.Id,
+                    ResultCode = result.ResultCode,
+                    ResultMessage = result.ResultMessage,
+                    Debited = result.DebitedFunds.Amount.GetAmount(),
+                    Fees = result.Fees.Amount.GetAmount(),
+                    Status = result.Status.GetStatus()
+                });
             }
             catch (Exception e)
             {
-                return new Result<string>(e);
+                return new Result<PspPaymentResultDto>(e);
             }
         }
 
-        public async Task<Result<string>> RefundTransferAsync(RefundTransferTransaction transaction, CancellationToken token)
+        public async Task<Result<PspPaymentResultDto>> RefundTransferAsync(RefundTransferTransaction transaction, CancellationToken token)
         {
             if (string.IsNullOrWhiteSpace(transaction.Author.Identifier))
-                return new Result<string>(new SheaftException(ExceptionKind.BadRequest, MessageKind.PsP_CannotRefund_Transfer_Author_Not_Exists));
+                return new Result<PspPaymentResultDto>(new SheaftException(ExceptionKind.BadRequest, MessageKind.PsP_CannotRefund_Transfer_Author_Not_Exists));
 
             if (string.IsNullOrWhiteSpace(transaction.TransactionToRefundIdentifier))
-                return new Result<string>(new SheaftException(ExceptionKind.BadRequest, MessageKind.PsP_CannotRefund_Transfer_TransferIdentifier_Missing));
+                return new Result<PspPaymentResultDto>(new SheaftException(ExceptionKind.BadRequest, MessageKind.PsP_CannotRefund_Transfer_TransferIdentifier_Missing));
 
             try
             {
                 await EnsureAccessTokenIsValidAsync(token);
 
                 var result = await _api.Transfers.CreateRefundAsync(transaction.Id.ToString("N"), transaction.TransactionToRefundIdentifier, new RefundTransferPostDTO(transaction.Author.Identifier));
-                return new Result<string>(result.Id);
+                return new Result<PspPaymentResultDto>(new PspPaymentResultDto
+                {
+                    Credited = result.CreditedFunds.Amount.GetAmount(),
+                    ExecutedOn = result.ExecutionDate,
+                    Identifier = result.Id,
+                    ResultCode = result.ResultCode,
+                    ResultMessage = result.ResultMessage,
+                    Debited = result.DebitedFunds.Amount.GetAmount(),
+                    Fees = result.Fees.Amount.GetAmount(),
+                    Status = result.Status.GetStatus()
+                });
             }
             catch (Exception e)
             {
-                return new Result<string>(e);
+                return new Result<PspPaymentResultDto>(e);
             }
         }
 
@@ -407,6 +515,16 @@ namespace Sheaft.Services
         public static long GetAmount(this decimal amount)
         {
             return (long)(amount * 100);
+        }
+
+        public static decimal GetAmount(this long amount)
+        {
+            return (decimal)(amount / 100.00);
+        }
+
+        public static Sheaft.Interop.Enums.TransactionStatus GetStatus(this MangoPay.SDK.Core.Enumerations.TransactionStatus status)
+        {
+            return (Sheaft.Interop.Enums.TransactionStatus)status;
         }
 
         public static LegalPersonType GetLegalPersonType(this LegalKind kind)

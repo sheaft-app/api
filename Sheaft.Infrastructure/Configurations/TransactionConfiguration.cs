@@ -1,6 +1,7 @@
 ﻿using Sheaft.Domain.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Sheaft.Interop.Enums;
 
 namespace Sheaft.Infrastructure
 {
@@ -23,6 +24,14 @@ namespace Sheaft.Infrastructure
             entity.HasOne(c => c.CreditedWallet).WithMany().HasForeignKey("CreditedWalletUid").OnDelete(DeleteBehavior.NoAction);
             entity.HasOne(c => c.DebitedWallet).WithMany().HasForeignKey("DebitedWalletUid").OnDelete(DeleteBehavior.NoAction);
             entity.HasOne(c => c.Author).WithMany().HasForeignKey("AuthorUid").OnDelete(DeleteBehavior.NoAction);
+
+            entity.HasDiscriminator(c => c.Kind)
+                .HasValue<WebPayinTransaction>(TransactionKind.PayinWeb)
+                .HasValue<CardPayinTransaction>(TransactionKind.PayinCard)
+                .HasValue<TransferTransaction>(TransactionKind.Transfer)
+                .HasValue<PayoutTransaction>(TransactionKind.Payout)
+                .HasValue<RefundPayinTransaction>(TransactionKind.RefundPayin)
+                .HasValue<RefundTransferTransaction>(TransactionKind.RefundTransfer);
 
             entity.HasKey("Uid");
 

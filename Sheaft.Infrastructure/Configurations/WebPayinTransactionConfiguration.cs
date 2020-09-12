@@ -4,18 +4,15 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Sheaft.Infrastructure
 {
-    public class PayinTransactionConfiguration : IEntityTypeConfiguration<PayinTransaction>
+    public class WebPayinTransactionConfiguration : IEntityTypeConfiguration<WebPayinTransaction>
     {
-        public void Configure(EntityTypeBuilder<PayinTransaction> entity)
+        public void Configure(EntityTypeBuilder<WebPayinTransaction> entity)
         {
             entity.Property<long>("OrderUid");
-            entity.Property<long?>("CardUid");
 
-            entity.HasOne(c => c.Card).WithMany().HasForeignKey("CardUid").OnDelete(DeleteBehavior.NoAction);
             entity.HasOne(c => c.Order).WithMany().HasForeignKey("OrderUid").OnDelete(DeleteBehavior.NoAction);
 
             entity.HasIndex("OrderUid");
-            entity.HasIndex("CardUid");
         }
     }
 }

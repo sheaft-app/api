@@ -1054,7 +1054,6 @@ namespace Sheaft.Infrastructure.Migrations
                     UpdatedOn = table.Column<DateTimeOffset>(nullable: true),
                     RemovedOn = table.Column<DateTimeOffset>(nullable: true),
                     Identifier = table.Column<string>(nullable: true),
-                    Nature = table.Column<int>(nullable: false),
                     Kind = table.Column<int>(nullable: false),
                     Status = table.Column<int>(nullable: false),
                     ExecutedOn = table.Column<DateTimeOffset>(nullable: true),
@@ -1067,7 +1066,6 @@ namespace Sheaft.Infrastructure.Migrations
                     CreditedWalletUid = table.Column<long>(nullable: false),
                     DebitedWalletUid = table.Column<long>(nullable: false),
                     AuthorUid = table.Column<long>(nullable: false),
-                    Discriminator = table.Column<string>(nullable: false),
                     CardUid = table.Column<long>(nullable: true),
                     OrderUid = table.Column<long>(nullable: true),
                     BankAccountUid = table.Column<long>(nullable: true),
@@ -1075,7 +1073,9 @@ namespace Sheaft.Infrastructure.Migrations
                     RefundPayinTransaction_OrderUid = table.Column<long>(nullable: true),
                     RefundTransferTransaction_TransactionToRefundIdentifier = table.Column<string>(nullable: true),
                     PurchaseOrderUid = table.Column<long>(nullable: true),
-                    TransferTransaction_PurchaseOrderUid = table.Column<long>(nullable: true)
+                    TransferTransaction_PurchaseOrderUid = table.Column<long>(nullable: true),
+                    RedirectUrl = table.Column<string>(nullable: true),
+                    WebPayinTransaction_OrderUid = table.Column<long>(nullable: true)
                 },
                 constraints: table =>
                 {
@@ -1126,6 +1126,11 @@ namespace Sheaft.Infrastructure.Migrations
                         name: "FK_Transactions_PurchaseOrders_TransferTransaction_PurchaseOrderUid",
                         column: x => x.TransferTransaction_PurchaseOrderUid,
                         principalTable: "PurchaseOrders",
+                        principalColumn: "Uid");
+                    table.ForeignKey(
+                        name: "FK_Transactions_Orders_WebPayinTransaction_OrderUid",
+                        column: x => x.WebPayinTransaction_OrderUid,
+                        principalTable: "Orders",
                         principalColumn: "Uid");
                 });
 
@@ -1697,6 +1702,11 @@ namespace Sheaft.Infrastructure.Migrations
                 name: "IX_Transactions_TransferTransaction_PurchaseOrderUid",
                 table: "Transactions",
                 column: "TransferTransaction_PurchaseOrderUid");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Transactions_WebPayinTransaction_OrderUid",
+                table: "Transactions",
+                column: "WebPayinTransaction_OrderUid");
 
             migrationBuilder.CreateIndex(
                 name: "IX_UserAddresses_DepartmentUid",

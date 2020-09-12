@@ -10,7 +10,7 @@ namespace Sheaft.Domain.Models
         }
 
         public RefundPayinTransaction(Guid id, RefundPayinTransaction transaction)
-            : base(id, TransactionKind.Payin, TransactionNature.Refund, transaction.Author)
+            : base(id, TransactionKind.RefundPayin, transaction.Author)
         {
             TransactionToRefundIdentifier = transaction.Identifier;
             Debited = transaction.Debited;

@@ -10,7 +10,7 @@ namespace Sheaft.Domain.Models
         }
 
         public PayoutTransaction(Guid id, decimal debited, Wallet debitedWallet, BankAccount bankAccount)
-            : base(id, TransactionKind.Payout, TransactionNature.Regular, debitedWallet.User)
+            : base(id, TransactionKind.Payout, debitedWallet.User)
         {
             BankAccount = bankAccount;
             Debited = debited;
