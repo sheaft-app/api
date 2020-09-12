@@ -2,9 +2,10 @@
 {
     public enum TransactionStatus
     {
-        Created = 0,
-        Succeeded = 1,
-        Failed = 2,
-        Waiting
+        NotSpecified = 0,
+        Created = 1,
+        Succeeded = 2,
+        Failed = 4,
+        Waiting = 100
     }
 }

@@ -160,7 +160,7 @@ namespace Sheaft.Application.Handlers
             {
                 using (var transaction = await _context.Database.BeginTransactionAsync(token))
                 {
-                    var order = await _context.GetByIdAsync<Order>(request.OrderId, token);
+                    var order = await _context.GetByIdAsync<Order>(request.Id, token);
                     var orderIds = new List<Guid>();
 
                     var producerIds = order.Products.Select(p => p.Producer.Id).Distinct();

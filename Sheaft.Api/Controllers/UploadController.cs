@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Sheaft.Api.Controllers
@@ -28,7 +29,7 @@ namespace Sheaft.Api.Controllers
 
         [HttpPost("products")]
         [Authorize(Policy = Policies.PRODUCER)]
-        public async Task<IActionResult> UploadProductsCatalog()
+        public async Task<IActionResult> UploadProductsCatalog(CancellationToken token)
         {
             var files = Request.Form.Files;
             if (!files.Any())
@@ -44,8 +45,8 @@ namespace Sheaft.Api.Controllers
 
                 using (var stream = new MemoryStream())
                 {
-                    await formFile.CopyToAsync(stream);
-                    var result = await _mediatr.Send(new QueueImportProductsCommand(requestUser) { Id = requestUser.Id, FileName = formFile.FileName, FileStream = stream });
+                    await formFile.CopyToAsync(stream, token);
+                    var result = await _mediatr.Send(new QueueImportProductsCommand(requestUser) { Id = requestUser.Id, FileName = formFile.FileName, FileStream = stream }, token);
                     if (!result.Success)
                         return BadRequest(result);
 
@@ -54,6 +55,47 @@ namespace Sheaft.Api.Controllers
             }
 
             return Ok(ids);
+        }
+
+        [HttpPost("kyc")]
+        [Authorize(Policy = Policies.STORE_OR_PRODUCER)]
+        public async Task<IActionResult> UploadKycDocuments(Guid documentId, CancellationToken token)
+        {
+            var files = Request.Form.Files;
+            if (!files.Any())
+                return BadRequest();
+
+            var requestUser = HttpContext.User.ToIdentityUser(HttpContext.TraceIdentifier);
+            var command = new UploadDocumentCommand(requestUser)
+            {
+                DocumentId = documentId
+            };
+
+            foreach (var formFile in files)
+            {
+                if (formFile.Length == 0)
+                    continue;
+
+                using (var stream = new MemoryStream())
+                {
+                    await formFile.CopyToAsync(stream, token);
+
+                    command.Pages.Add(new UploadPageCommand(requestUser)
+                    {
+                        DocumentId = documentId,
+                        Data = stream,
+                        Extension  = Path.GetExtension(formFile.FileName),
+                        FileName = Path.GetFileNameWithoutExtension(formFile.FileName),
+                        Size = formFile.Length
+                    });
+                }
+            }
+
+            var result = await _mediatr.Send(command, token);
+            if(!result.Success)
+                return BadRequest(result.Exception);
+
+            return Ok();
         }
     }
 }

@@ -42,6 +42,7 @@ namespace Sheaft.GraphQL
             descriptor.Field(c => c.GetPurchaseOrders(default));
             descriptor.Field(c => c.GetQuickOrder(default, default)).Argument("input", c => c.Type<NonNullType<IdType>>());
             descriptor.Field(c => c.GetQuickOrders(default));
+            descriptor.Field(c => c.GetDocuments(default));
             descriptor.Field(c => c.GetRegions(default));
             descriptor.Field(c => c.GetRegionsPoints(default, default)).Argument("input", c => c.Type<IdType>());
             descriptor.Field(c => c.GetRegionUsersPoints(default, default)).Argument("input", c => c.Type<IdType>());

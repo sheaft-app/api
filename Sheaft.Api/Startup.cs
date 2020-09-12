@@ -231,6 +231,7 @@ namespace Sheaft.Api
             services.AddScoped<ICountryQueries, CountryQueries>();
             services.AddScoped<IOrderQueries, OrderQueries>();
             services.AddScoped<ITransactionQueries, TransactionQueries>();
+            services.AddScoped<IDocumentQueries, DocumentQueries>();
 
             services.AddScoped<IDapperContext, DapperContext>();
             services.AddScoped<IAppDbContext>(c => c.GetRequiredService<AppDbContext>());

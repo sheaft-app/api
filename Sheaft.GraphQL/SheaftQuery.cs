@@ -262,6 +262,15 @@ namespace Sheaft.GraphQL
             return quickOrderQueries.GetQuickOrders(_currentUser);
         }
 
+        [Authorize(Policy = Policies.REGISTERED)]
+        [GraphQLName("documents")]
+        [UsePaging]
+        [UseSelection]
+        public IQueryable<DocumentDto> GetDocuments([Service] IDocumentQueries documentQueries)
+        {
+            return documentQueries.GetDocuments(_currentUser);
+        }
+
         [GraphQLName("departments")]
         [UseSelection]
         public IQueryable<DepartmentDto> GetDepartments([Service] IDepartmentQueries departmentQueries)

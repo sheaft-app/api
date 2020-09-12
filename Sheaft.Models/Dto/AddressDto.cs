@@ -1,5 +1,6 @@
 ﻿using Sheaft.Interop.Enums;
 using System;
+using System.Collections.Generic;
 
 namespace Sheaft.Models.Dto
 {

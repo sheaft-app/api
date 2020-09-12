@@ -53,6 +53,8 @@ namespace Sheaft.Api
             services.AddType<PayinTransactionType>();
             services.AddType<TransferTransactionType>();
             services.AddType<PayoutTransactionType>();
+            services.AddType<DocumentType>();
+            services.AddType<PageType>();
 
             services.AddType<AddressKindEnumType>();
             services.AddType<AgreementStatusEnumType>();
@@ -77,7 +79,7 @@ namespace Sheaft.Api
 
             services.AddType<CreateOrderInputType>();
             services.AddType<PayOrderInputType>();
-            services.AddType<ConfirmOrderInputType>();
+            services.AddType<CreateDocumentType>();
             services.AddType<CreateAgreementInputType>();
             services.AddType<CreatePurchaseOrderInputType>();
             services.AddType<CreateQuickOrderInputType>();

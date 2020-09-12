@@ -1,9 +1,12 @@
-﻿using System;
+﻿using Sheaft.Interop.Enums;
+using System;
 
 namespace Sheaft.Models.Inputs
 {
-    public class ConfirmOrderInput
+    public class CreateDocumentInput
     {
-        public Guid OrderId { get; set; }
+        public Guid UserId { get; set; }
+        public string Name { get; set; }
+        public DocumentKind Kind { get; set; }
     }
 }

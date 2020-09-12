@@ -12,8 +12,6 @@ namespace Sheaft.Infrastructure
             entity.Property(c => c.IBAN).IsRequired();
             entity.Property(c => c.BIC).IsRequired();
 
-            entity.Property(c => c.IsActive).HasDefaultValue(true);
-
             entity.OwnsOne(c => c.OwnerAddress, cb =>
             {
                 cb.ToTable("BankAccountOwnerAddresses");

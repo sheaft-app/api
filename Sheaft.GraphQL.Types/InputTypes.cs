@@ -46,20 +46,25 @@ namespace Sheaft.GraphQL.Types
                 .Type<NonNullType<ListType<ProductQuantityInputType>>>();
         }
     }
+    public class CreateDocumentType : SheaftInputType<CreateDocumentInput>
+    {
+        protected override void Configure(IInputObjectTypeDescriptor<CreateDocumentInput> descriptor)
+        {
+            descriptor.Field(c => c.Name);
+
+            descriptor.Field(c => c.UserId)
+                .Type<NonNullType<IdType>>();
+
+            descriptor.Field(c => c.Kind)
+                .Type<NonNullType<DocumentKindEnumType>>();
+        }
+    }
     public class PayOrderInputType : SheaftInputType<PayOrderInput>
     {
         protected override void Configure(IInputObjectTypeDescriptor<PayOrderInput> descriptor)
         {
             descriptor.Field(c => c.Donation);
 
-            descriptor.Field(c => c.OrderId)
-                .Type<NonNullType<IdType>>();
-        }
-    }
-    public class ConfirmOrderInputType : SheaftInputType<ConfirmOrderInput>
-    {
-        protected override void Configure(IInputObjectTypeDescriptor<ConfirmOrderInput> descriptor)
-        {
             descriptor.Field(c => c.OrderId)
                 .Type<NonNullType<IdType>>();
         }

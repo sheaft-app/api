@@ -207,6 +207,7 @@ namespace Sheaft.GraphQL
 
         [Authorize(Policy = Policies.REGISTERED)]
         [GraphQLName("createConsumerOrder")]
+        [UseSingleOrDefault]
         [UseSelection]
         public async Task<IQueryable<OrderDto>> CreateConsumerOrderAsync(CreateOrderInput input, [Service] IOrderQueries orderQueries)
         {
@@ -228,6 +229,7 @@ namespace Sheaft.GraphQL
 
         [Authorize(Policy = Policies.REGISTERED)]
         [GraphQLName("payOrder")]
+        [UseSingleOrDefault]
         [UseSelection]
         public async Task<IQueryable<WebPayinTransactionDto>> PayOrderAsync(PayOrderInput input, [Service] ITransactionQueries transactionQueries)
         {
@@ -236,12 +238,29 @@ namespace Sheaft.GraphQL
         }
 
         [Authorize(Policy = Policies.REGISTERED)]
+        [GraphQLName("createDocument")]
+        [UseSingleOrDefault]
+        [UseSelection]
+        public async Task<IQueryable<DocumentDto>> CreateDocumentAsync(CreateDocumentInput input, [Service] IDocumentQueries documentQueries)
+        {
+            var result = await ExecuteCommandAsync<CreateDocumentCommand, Guid>(_mapper.Map(input, new CreateDocumentCommand(_currentUser)), _cancellationToken);
+            return documentQueries.GetDocuments(_currentUser).Where(j => result == j.Id);
+        }
+
+        [Authorize(Policy = Policies.REGISTERED)]
+        [GraphQLName("removeDocument")]
+        public async Task<bool> RemoveDocumentAsync(IdInput input)
+        {
+            return await ExecuteCommandAsync<RemoveDocumentCommand, bool>(_mapper.Map(input, new RemoveDocumentCommand(_currentUser)), _cancellationToken);
+        }
+
+        [Authorize(Policy = Policies.REGISTERED)]
         [GraphQLName("confirmOrder")]
         [UsePaging]
         [UseSorting(SortType = typeof(PurchaseOrderSortType))]
         [UseFiltering(FilterType = typeof(PurchaseOrderFilterType))]
         [UseSelection]
-        public async Task<IQueryable<PurchaseOrderDto>> ConfirmOrderAsync(ConfirmOrderInput input, [Service] IPurchaseOrderQueries purchaseOrderQueries)
+        public async Task<IQueryable<PurchaseOrderDto>> ConfirmOrderAsync(IdInput input, [Service] IPurchaseOrderQueries purchaseOrderQueries)
         {
             var result = await ExecuteCommandAsync<ConfirmOrderCommand, IEnumerable<Guid>>(_mapper.Map(input, new ConfirmOrderCommand(_currentUser)), _cancellationToken);
             return purchaseOrderQueries.GetPurchaseOrders(_currentUser).Where(j => result.Contains(j.Id));

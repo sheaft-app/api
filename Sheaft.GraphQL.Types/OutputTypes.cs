@@ -16,6 +16,32 @@ namespace Sheaft.GraphQL.Types
             descriptor.Field(c => c.Position);
         }
     }
+    public class DocumentType : SheaftOutputType<DocumentDto>
+    {
+        protected override void Configure(IObjectTypeDescriptor<DocumentDto> descriptor)
+        {
+            descriptor.Field(c => c.Id).Type<NonNullType<IdType>>();
+            descriptor.Field(c => c.Name);
+            descriptor.Field(c => c.ReasonCode);
+            descriptor.Field(c => c.ReasonMessage);
+
+            descriptor.Field(c => c.Status)
+                .Type<NonNullType<ValidationStatusEnumType>>();
+
+            descriptor.Field(c => c.Pages)
+                .Type<ListType<PageType>>();
+        }
+    }
+    public class PageType : SheaftOutputType<PageDto>
+    {
+        protected override void Configure(IObjectTypeDescriptor<PageDto> descriptor)
+        {
+            descriptor.Field(c => c.Id).Type<NonNullType<IdType>>();
+            descriptor.Field(c => c.FileName);
+            descriptor.Field(c => c.Extension);
+            descriptor.Field(c => c.Size);
+        }
+    }
 
     public class ProducerDeliveriesType : SheaftOutputType<ProducerDeliveriesDto>
     {

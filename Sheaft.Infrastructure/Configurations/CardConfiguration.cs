@@ -8,7 +8,6 @@ namespace Sheaft.Infrastructure
     {
         public void Configure(EntityTypeBuilder<Card> entity)
         {
-            entity.Property(c => c.IsActive).HasDefaultValue(true);
         }
     }
 }

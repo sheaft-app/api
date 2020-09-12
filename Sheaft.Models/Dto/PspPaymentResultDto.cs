@@ -3,9 +3,8 @@ using System;
 
 namespace Sheaft.Models.Dto
 {
-    public class PspPaymentResultDto
+    public class PspPaymentResultDto: PspResultDto
     {
-        public string Identifier { get; set; }
         public TransactionStatus Status { get; set; }
         public string ResultCode { get; set; }
         public string ResultMessage { get; set; }
@@ -18,5 +17,18 @@ namespace Sheaft.Models.Dto
     public class PspWebPaymentResultDto : PspPaymentResultDto
     {
         public string RedirectUrl { get; set; }
+    }
+
+    public class PspResultDto
+    {
+        public string Identifier { get; set; }
+    }
+
+    public class PspDocumentResultDto: PspResultDto
+    {
+        public ValidationStatus Status { get; set; }
+        public string ResultCode { get; set; }
+        public string ResultMessage { get; set; }
+        public DateTimeOffset? ProcessedOn { get; set; }
     }
 }

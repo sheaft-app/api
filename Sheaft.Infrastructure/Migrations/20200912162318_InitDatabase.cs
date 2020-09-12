@@ -241,7 +241,7 @@ namespace Sheaft.Infrastructure.Migrations
                     CreatedOn = table.Column<DateTimeOffset>(nullable: false),
                     UpdatedOn = table.Column<DateTimeOffset>(nullable: true),
                     RemovedOn = table.Column<DateTimeOffset>(nullable: true),
-                    ProcessedDate = table.Column<DateTimeOffset>(nullable: true),
+                    ProcessedOn = table.Column<DateTimeOffset>(nullable: true),
                     Identifier = table.Column<string>(nullable: true),
                     Name = table.Column<string>(nullable: true),
                     ResultCode = table.Column<string>(nullable: true),
@@ -776,6 +776,27 @@ namespace Sheaft.Infrastructure.Migrations
                         name: "FK_DeliveryModeOpeningHours_DeliveryModes_DeliveryModeUid",
                         column: x => x.DeliveryModeUid,
                         principalTable: "DeliveryModes",
+                        principalColumn: "Uid",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "DocumentPages",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(nullable: false),
+                    DocumentUid = table.Column<long>(nullable: false),
+                    Filename = table.Column<string>(nullable: false),
+                    Extension = table.Column<string>(nullable: true),
+                    Size = table.Column<decimal>(type: "decimal(10,2)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_DocumentPages", x => new { x.DocumentUid, x.Id });
+                    table.ForeignKey(
+                        name: "FK_DocumentPages_Documents_DocumentUid",
+                        column: x => x.DocumentUid,
+                        principalTable: "Documents",
                         principalColumn: "Uid",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -1316,6 +1337,12 @@ namespace Sheaft.Infrastructure.Migrations
                 name: "IX_Departments_Uid_Id_RegionUid_LevelUid",
                 table: "Departments",
                 columns: new[] { "Uid", "Id", "RegionUid", "LevelUid" });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_DocumentPages_Id",
+                table: "DocumentPages",
+                column: "Id",
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_Documents_Id",
@@ -2522,7 +2549,7 @@ namespace Sheaft.Infrastructure.Migrations
                 name: "DeliveryModeOpeningHours");
 
             migrationBuilder.DropTable(
-                name: "Documents");
+                name: "DocumentPages");
 
             migrationBuilder.DropTable(
                 name: "ExpectedDeliveryAddresses");
@@ -2586,6 +2613,9 @@ namespace Sheaft.Infrastructure.Migrations
 
             migrationBuilder.DropTable(
                 name: "Agreements");
+
+            migrationBuilder.DropTable(
+                name: "Documents");
 
             migrationBuilder.DropTable(
                 name: "ExpectedDeliveries");

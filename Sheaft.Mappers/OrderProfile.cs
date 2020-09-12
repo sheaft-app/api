@@ -17,7 +17,7 @@ namespace Sheaft.Mappers
             CreateMap<CreateOrderInput, CreateConsumerOrderCommand>();
             CreateMap<CreateOrderInput, CreateBusinessOrderCommand>();
             CreateMap<PayOrderInput, PayOrderCommand>();
-            CreateMap<ConfirmOrderInput, ConfirmOrderCommand>();
+            CreateMap<IdInput, ConfirmOrderCommand>();
         }
     }
 }

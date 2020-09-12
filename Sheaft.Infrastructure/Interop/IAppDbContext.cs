@@ -20,6 +20,7 @@ namespace Sheaft.Infrastructure.Interop
         DbSet<Country> Countries { get; set; }
         DbSet<DeliveryMode> DeliveryModes { get; set; }
         DbSet<Department> Departments { get; set; }
+        DbSet<Document> Documents { get; set; }
         DbSet<Job> Jobs { get; set; }
         DbSet<Level> Levels { get; set; }
         DbSet<Nationality> Nationalities { get; set; }

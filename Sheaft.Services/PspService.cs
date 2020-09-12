@@ -152,28 +152,36 @@ namespace Sheaft.Services
             }
         }
 
-        public async Task<Result<string>> CreateDocumentAsync(Document document, CancellationToken token)
+        public async Task<Result<PspDocumentResultDto>> CreateDocumentAsync(Document document, CancellationToken token)
         {
             if (string.IsNullOrWhiteSpace(document.User.Identifier))
-                return new Result<string>(new SheaftException(ExceptionKind.BadRequest, MessageKind.PsP_CannotCreate_Document_User_Not_Exists));
+                return new Result<PspDocumentResultDto>(new SheaftException(ExceptionKind.BadRequest, MessageKind.PsP_CannotCreate_Document_User_Not_Exists));
 
             if (!string.IsNullOrWhiteSpace(document.Identifier))
-                return new Result<string>(new SheaftException(ExceptionKind.BadRequest, MessageKind.PsP_CannotCreate_Document_Document_Exists));
+                return new Result<PspDocumentResultDto>(new SheaftException(ExceptionKind.BadRequest, MessageKind.PsP_CannotCreate_Document_Document_Exists));
 
             try
             {
                 await EnsureAccessTokenIsValidAsync(token);
 
                 var result = await _api.Users.CreateKycDocumentAsync(document.Id.ToString("N"), document.User.Identifier, document.Kind.GetDocumentType());
-                return new Result<string>(result.Id);
+                
+                return new Result<PspDocumentResultDto>(new PspDocumentResultDto
+                {
+                    Identifier = result.Id,
+                    ProcessedOn = result.ProcessedDate,
+                    ResultCode = result.RefusedReasonType,
+                    ResultMessage = result.RefusedReasonMessage,
+                    Status = result.Status.GetValidationStatus()
+                });
             }
             catch (Exception e)
             {
-                return new Result<string>(e);
+                return new Result<PspDocumentResultDto>(e);
             }
         }
 
-        public async Task<Result<bool>> AddPageToDocumentAsync(Document document, int pageNumber, Stream page, CancellationToken token)
+        public async Task<Result<bool>> AddPageToDocumentAsync(Page page, Document document, Stream data, CancellationToken token)
         {
             if (string.IsNullOrWhiteSpace(document.Identifier))
                 return new Result<bool>(new SheaftException(ExceptionKind.BadRequest, MessageKind.PsP_CannotCreate_DocumentPage_Document_Not_Exists));
@@ -183,7 +191,7 @@ namespace Sheaft.Services
                 await EnsureAccessTokenIsValidAsync(token);
 
                 byte[] bytes = null;
-                await _api.Users.CreateKycPageAsync($"{document.Id:N}-{pageNumber}", document.Identifier, bytes);
+                await _api.Users.CreateKycPageAsync(page.Id.ToString("N"), document.User.Identifier, document.Identifier, bytes);
                 return new Result<bool>(true);
             }
             catch (Exception e)
@@ -192,24 +200,31 @@ namespace Sheaft.Services
             }
         }
 
-        public async Task<Result<bool>> SubmitDocumentAsync(Document document, CancellationToken token)
+        public async Task<Result<PspDocumentResultDto>> SubmitDocumentAsync(Document document, CancellationToken token)
         {
             if (string.IsNullOrWhiteSpace(document.User.Identifier))
-                return new Result<bool>(new SheaftException(ExceptionKind.BadRequest, MessageKind.PsP_CannotSubmit_Document_User_Not_Exists));
+                return new Result<PspDocumentResultDto>(new SheaftException(ExceptionKind.BadRequest, MessageKind.PsP_CannotSubmit_Document_User_Not_Exists));
 
             if (string.IsNullOrWhiteSpace(document.Identifier))
-                return new Result<bool>(new SheaftException(ExceptionKind.BadRequest, MessageKind.PsP_CannotSubmit_Document_Document_Not_Exists));
+                return new Result<PspDocumentResultDto>(new SheaftException(ExceptionKind.BadRequest, MessageKind.PsP_CannotSubmit_Document_Document_Not_Exists));
 
             try
             {
                 await EnsureAccessTokenIsValidAsync(token);
 
                 var result = await _api.Users.UpdateKycDocumentAsync(document.User.Identifier, new KycDocumentPutDTO { Status = KycStatus.VALIDATION_ASKED }, document.Identifier);
-                return new Result<bool>(true);
+                return new Result<PspDocumentResultDto>(new PspDocumentResultDto
+                {
+                    Identifier = result.Id,
+                    ProcessedOn = result.ProcessedDate,
+                    ResultCode = result.RefusedReasonType,
+                    ResultMessage = result.RefusedReasonMessage,
+                    Status = result.Status.GetValidationStatus()
+                });
             }
             catch (Exception e)
             {
-                return new Result<bool>(e);
+                return new Result<PspDocumentResultDto>(e);
             }
         }
 
@@ -258,7 +273,7 @@ namespace Sheaft.Services
                     ResultMessage = result.ResultMessage,
                     Debited = result.DebitedFunds.Amount.GetAmount(),
                     Fees = result.Fees.Amount.GetAmount(),
-                    Status = result.Status.GetStatus()
+                    Status = result.Status.GetTransactionStatus()
                 });
             }
             catch (Exception e)
@@ -314,7 +329,7 @@ namespace Sheaft.Services
                     ResultMessage = result.ResultMessage,
                     Debited = result.DebitedFunds.Amount.GetAmount(),
                     Fees = result.Fees.Amount.GetAmount(),
-                    Status = result.Status.GetStatus()
+                    Status = result.Status.GetTransactionStatus()
                 });
             }
             catch (Exception e)
@@ -364,7 +379,7 @@ namespace Sheaft.Services
                     ResultMessage = result.ResultMessage,
                     Debited = result.DebitedFunds.Amount.GetAmount(),
                     Fees = result.Fees.Amount.GetAmount(),
-                    Status = result.Status.GetStatus()
+                    Status = result.Status.GetTransactionStatus()
                 });
             }
             catch (Exception e)
@@ -411,7 +426,7 @@ namespace Sheaft.Services
                     ResultMessage = result.ResultMessage,
                     Debited = result.DebitedFunds.Amount.GetAmount(),
                     Fees = result.Fees.Amount.GetAmount(),
-                    Status = result.Status.GetStatus()
+                    Status = result.Status.GetTransactionStatus()
                 });
             }
             catch (Exception e)
@@ -455,7 +470,7 @@ namespace Sheaft.Services
                     ResultMessage = result.ResultMessage,
                     Debited = result.DebitedFunds.Amount.GetAmount(),
                     Fees = result.Fees.Amount.GetAmount(),
-                    Status = result.Status.GetStatus()
+                    Status = result.Status.GetTransactionStatus()
                 });
             }
             catch (Exception e)
@@ -486,7 +501,7 @@ namespace Sheaft.Services
                     ResultMessage = result.ResultMessage,
                     Debited = result.DebitedFunds.Amount.GetAmount(),
                     Fees = result.Fees.Amount.GetAmount(),
-                    Status = result.Status.GetStatus()
+                    Status = result.Status.GetTransactionStatus()
                 });
             }
             catch (Exception e)
@@ -522,7 +537,12 @@ namespace Sheaft.Services
             return (decimal)(amount / 100.00);
         }
 
-        public static Sheaft.Interop.Enums.TransactionStatus GetStatus(this MangoPay.SDK.Core.Enumerations.TransactionStatus status)
+        public static ValidationStatus GetValidationStatus(this KycStatus status)
+        {
+            return (ValidationStatus)status;
+        }
+
+        public static Sheaft.Interop.Enums.TransactionStatus GetTransactionStatus(this MangoPay.SDK.Core.Enumerations.TransactionStatus status)
         {
             return (Sheaft.Interop.Enums.TransactionStatus)status;
         }
@@ -559,9 +579,9 @@ namespace Sheaft.Services
                     return KycDocumentType.NotSpecified;
             }
         }
-        public static MangoPay.SDK.Entities.Address GetAddress(this BaseAddress address)
+        public static Address GetAddress(this BaseAddress address)
         {
-            return new MangoPay.SDK.Entities.Address
+            return new Address
             {
                 AddressLine1 = address.Line1,
                 AddressLine2 = address.Line2,

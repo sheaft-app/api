@@ -11,7 +11,7 @@ using Sheaft.Interop.Enums;
 namespace Sheaft.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20200912133605_InitDatabase")]
+    [Migration("20200912162318_InitDatabase")]
     partial class InitDatabase
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -243,7 +243,7 @@ namespace Sheaft.Infrastructure.Migrations
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTimeOffset?>("ProcessedDate")
+                    b.Property<DateTimeOffset?>("ProcessedOn")
                         .HasColumnType("datetimeoffset");
 
                     b.Property<DateTimeOffset?>("RemovedOn")
@@ -1900,6 +1900,36 @@ namespace Sheaft.Infrastructure.Migrations
                         .HasForeignKey("UserUid")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.OwnsMany("Sheaft.Domain.Models.Page", "Pages", b1 =>
+                        {
+                            b1.Property<long>("DocumentUid")
+                                .HasColumnType("bigint");
+
+                            b1.Property<Guid>("Id")
+                                .ValueGeneratedOnAdd()
+                                .HasColumnType("uniqueidentifier");
+
+                            b1.Property<string>("Extension")
+                                .HasColumnType("nvarchar(max)");
+
+                            b1.Property<string>("Filename")
+                                .IsRequired()
+                                .HasColumnType("nvarchar(max)");
+
+                            b1.Property<decimal>("Size")
+                                .HasColumnType("decimal(10,2)");
+
+                            b1.HasKey("DocumentUid", "Id");
+
+                            b1.HasIndex("Id")
+                                .IsUnique();
+
+                            b1.ToTable("DocumentPages");
+
+                            b1.WithOwner()
+                                .HasForeignKey("DocumentUid");
+                        });
                 });
 
             modelBuilder.Entity("Sheaft.Domain.Models.Job", b =>

@@ -36,6 +36,7 @@ namespace Sheaft.Infrastructure
         public DbSet<Country> Countries { get; set; }
         public DbSet<DeliveryMode> DeliveryModes { get; set; }
         public DbSet<Department> Departments { get; set; }
+        public DbSet<Document> Documents { get; set; }
         public DbSet<Job> Jobs { get; set; }
         public DbSet<Level> Levels { get; set; }
         public DbSet<Nationality> Nationalities { get; set; }
