@@ -6,10 +6,10 @@ using Newtonsoft.Json;
 
 namespace Sheaft.Application.Commands
 {
-    public class CreateOrderCommand : Command<Guid>
+    public class CreateConsumerOrderCommand : Command<Guid>
     {
         [JsonConstructor]
-        public CreateOrderCommand(RequestUser requestUser) : base(requestUser)
+        public CreateConsumerOrderCommand(RequestUser requestUser) : base(requestUser)
         {
         }
 

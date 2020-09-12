@@ -14,7 +14,8 @@ namespace Sheaft.Mappers
             CreateMap<Order, OrderDto>()
                 .ForMember(d => d.User, opt => opt.MapFrom(r => r.User));
 
-            CreateMap<CreateOrderInput, CreateOrderCommand>();
+            CreateMap<CreateOrderInput, CreateConsumerOrderCommand>();
+            CreateMap<CreateOrderInput, CreateBusinessOrderCommand>();
             CreateMap<PayOrderInput, PayOrderCommand>();
             CreateMap<ConfirmOrderInput, ConfirmOrderCommand>();
         }

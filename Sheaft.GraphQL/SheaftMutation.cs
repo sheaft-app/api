@@ -206,12 +206,21 @@ namespace Sheaft.GraphQL
         }
 
         [Authorize(Policy = Policies.REGISTERED)]
-        [GraphQLName("createOrder")]
+        [GraphQLName("createConsumerOrder")]
         [UseSelection]
-        public async Task<IQueryable<OrderDto>> CreateOrderAsync(CreateOrderInput input, [Service] IOrderQueries orderQueries)
+        public async Task<IQueryable<OrderDto>> CreateConsumerOrderAsync(CreateOrderInput input, [Service] IOrderQueries orderQueries)
         {
-            var result = await ExecuteCommandAsync<CreateOrderCommand, Guid>(_mapper.Map(input, new CreateOrderCommand(_currentUser)), _cancellationToken);
+            var result = await ExecuteCommandAsync<CreateConsumerOrderCommand, Guid>(_mapper.Map(input, new CreateConsumerOrderCommand(_currentUser)), _cancellationToken);
             return orderQueries.GetOrders(_currentUser).Where(j => result == j.Id);
+        }
+
+        [Authorize(Policy = Policies.REGISTERED)]
+        [GraphQLName("createBusinessOrder")]
+        [UseSelection]
+        public async Task<IQueryable<PurchaseOrderDto>> CreateBusinessOrderAsync(CreateOrderInput input, [Service] IPurchaseOrderQueries purchaseOrderQueries)
+        {
+            var result = await ExecuteCommandAsync<CreateBusinessOrderCommand, IEnumerable<Guid>>(_mapper.Map(input, new CreateBusinessOrderCommand(_currentUser)), _cancellationToken);
+            return purchaseOrderQueries.GetPurchaseOrders(_currentUser).Where(j => result.Contains(j.Id));
         }
 
         [Authorize(Policy = Policies.REGISTERED)]
