@@ -20,31 +20,31 @@ namespace Sheaft.Application.Queries
             _configurationProvider = configurationProvider;
         }
 
-        public IQueryable<TransactionDto> GetTransaction(Guid id, RequestUser currentUser)
+        public IQueryable<T> GetTransaction<T>(Guid id, RequestUser currentUser) where T : BaseTransactionDto
         {
             try
             {
                 return _context.Transactions
                         .Get(c => c.Id == id && c.Author.Id == currentUser.Id)
-                        .ProjectTo<TransactionDto>(_configurationProvider);
+                        .ProjectTo<T>(_configurationProvider);
             }
             catch (Exception e)
             {
-                return new List<TransactionDto>().AsQueryable();
+                return new List<T>().AsQueryable();
             }
         }
 
-        public IQueryable<TransactionDto> GetTransactions(RequestUser currentUser)
+        public IQueryable<T> GetTransaction<T>(string identifier, RequestUser currentUser) where T : BaseTransactionDto
         {
             try
             {
                 return _context.Transactions
-                        .Get(c => c.Author.Id == currentUser.Id)
-                        .ProjectTo<TransactionDto>(_configurationProvider);
+                        .Get(c => c.Identifier == identifier && c.Author.Id == currentUser.Id)
+                        .ProjectTo<T>(_configurationProvider);
             }
             catch (Exception e)
             {
-                return new List<TransactionDto>().AsQueryable();
+                return new List<T>().AsQueryable();
             }
         }
 

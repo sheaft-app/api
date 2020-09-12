@@ -1045,6 +1045,81 @@ namespace Sheaft.GraphQL.Types
         }
     }
 
+    public class PayinTransactionType : SheaftOutputType<PayinTransactionDto>
+    {
+        protected override void Configure(IObjectTypeDescriptor<PayinTransactionDto> descriptor)
+        {
+            descriptor.Field(c => c.Id).Type<NonNullType<IdType>>();
+            descriptor.Field(c => c.Status);
+            descriptor.Field(c => c.Fees);
+            descriptor.Field(c => c.Credited);
+            descriptor.Field(c => c.Identifier);
+            descriptor.Field(c => c.Reference);
+            descriptor.Field(c => c.ResultCode);
+            descriptor.Field(c => c.ResultMessage);
+
+            descriptor.Field(c => c.Kind)
+                .Type<NonNullType<TransactionKindEnumType>>();
+
+            descriptor.Field(c => c.Status)
+                .Type<NonNullType<TransactionStatusEnumType>>();
+
+            descriptor.Field(c => c.CreditedUser)
+                .Type<NonNullType<UserProfileType>>();
+        }
+    }
+
+    public class PayoutTransactionType : SheaftOutputType<PayoutTransactionDto>
+    {
+        protected override void Configure(IObjectTypeDescriptor<PayoutTransactionDto> descriptor)
+        {
+            descriptor.Field(c => c.Id).Type<NonNullType<IdType>>();
+            descriptor.Field(c => c.Status);
+            descriptor.Field(c => c.Fees);
+            descriptor.Field(c => c.Debited);
+            descriptor.Field(c => c.Identifier);
+            descriptor.Field(c => c.Reference);
+            descriptor.Field(c => c.ResultCode);
+            descriptor.Field(c => c.ResultMessage);
+
+            descriptor.Field(c => c.Kind)
+                .Type<NonNullType<TransactionKindEnumType>>();
+
+            descriptor.Field(c => c.Status)
+                .Type<NonNullType<TransactionStatusEnumType>>();
+
+            descriptor.Field(c => c.DebitedUser)
+                .Type<NonNullType<UserProfileType>>();
+        }
+    }
+    public class TransferTransactionType : SheaftOutputType<TransferTransactionDto>
+    {
+        protected override void Configure(IObjectTypeDescriptor<TransferTransactionDto> descriptor)
+        {
+            descriptor.Field(c => c.Id).Type<NonNullType<IdType>>();
+            descriptor.Field(c => c.Status);
+            descriptor.Field(c => c.Fees);
+            descriptor.Field(c => c.Credited);
+            descriptor.Field(c => c.Debited);
+            descriptor.Field(c => c.Identifier);
+            descriptor.Field(c => c.Reference);
+            descriptor.Field(c => c.ResultCode);
+            descriptor.Field(c => c.ResultMessage);
+
+            descriptor.Field(c => c.Kind)
+                .Type<NonNullType<TransactionKindEnumType>>();
+
+            descriptor.Field(c => c.Status)
+                .Type<NonNullType<TransactionStatusEnumType>>();
+
+            descriptor.Field(c => c.CreditedUser)
+                .Type<NonNullType<UserProfileType>>();
+
+            descriptor.Field(c => c.DebitedUser)
+                .Type<NonNullType<UserProfileType>>();
+        }
+    }
+
     public class WebPayinTransactionType : SheaftOutputType<WebPayinTransactionDto>
     {
         protected override void Configure(IObjectTypeDescriptor<WebPayinTransactionDto> descriptor)

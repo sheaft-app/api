@@ -12,5 +12,6 @@ namespace Sheaft.Models.Dto
         public string Reference { get; set; }
         public string ResultCode { get; set; }
         public string ResultMessage { get; set; }
+        public DateTimeOffset? ExecutedOn { get; set; }
     }
 }

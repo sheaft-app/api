@@ -50,6 +50,9 @@ namespace Sheaft.Api
             services.AddType<OrderType>();
             services.AddType<TransactionType>();
             services.AddType<WebPayinTransactionType>();
+            services.AddType<PayinTransactionType>();
+            services.AddType<TransferTransactionType>();
+            services.AddType<PayoutTransactionType>();
 
             services.AddType<AddressKindEnumType>();
             services.AddType<AgreementStatusEnumType>();

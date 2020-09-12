@@ -33,7 +33,22 @@ namespace Sheaft.Mappers
             CreateMap<RefundTransferTransaction, TransactionDto>()
                 .IncludeBase<Transaction, TransactionDto>();
 
-            CreateMap<WebPayinTransaction, WebPayinTransactionDto>();
+            CreateMap<WebPayinTransaction, PayinTransactionDto>()
+                .IncludeBase<Transaction, BaseTransactionDto>()
+                .ForMember(c => c.CreditedUser, opt => opt.MapFrom(e => e.CreditedWallet.User));
+
+            CreateMap<CardPayinTransaction, PayinTransactionDto>()
+                .IncludeBase<Transaction, BaseTransactionDto>()
+                .ForMember(c => c.CreditedUser, opt => opt.MapFrom(e => e.CreditedWallet.User));
+
+            CreateMap<TransferTransaction, TransferTransactionDto>()
+                .IncludeBase<Transaction, BaseTransactionDto>()
+                .ForMember(c => c.CreditedUser, opt => opt.MapFrom(e => e.CreditedWallet.User))
+                .ForMember(c => c.DebitedUser, opt => opt.MapFrom(e => e.DebitedWallet.User));
+
+            CreateMap<PayoutTransaction, PayoutTransactionDto>()
+                .IncludeBase<Transaction, BaseTransactionDto>()
+                .ForMember(c => c.DebitedUser, opt => opt.MapFrom(e => e.DebitedWallet.User));
         }
     }
 }

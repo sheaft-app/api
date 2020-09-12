@@ -182,6 +182,15 @@ namespace Sheaft.GraphQL
             return companyQueries.GetStore(input, _currentUser);
         }
 
+        [Authorize(Policy = Policies.REGISTERED)]
+        [GraphQLName("payinTransaction")]
+        [UseSingleOrDefault]
+        [UseSelection]
+        public IQueryable<PayinTransactionDto> GetPayinTransaction(string input, [Service] ITransactionQueries transactionQueries)
+        {
+            return transactionQueries.GetTransaction<PayinTransactionDto>(input, _currentUser);
+        }
+
         [GraphQLName("pointsPerCountry")]
         [UseSelection]
         public IQueryable<CountryPointsDto> GetCountryPoints(Guid? input, [Service] ILeaderboardQueries leaderboardQueries)
