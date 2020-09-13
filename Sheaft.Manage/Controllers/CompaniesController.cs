@@ -121,7 +121,7 @@ namespace Sheaft.Manage.Controllers
                 result = await _mediatr.Send(new UpdateProducerCommand(requestUser)
                 {
                     Id = model.Id,
-                    Address = _mapper.Map<AddressInput>(model.Address),
+                    Address = _mapper.Map<FullAddressInput>(model.Address),
                     OpenForNewBusiness = model.OpenForNewBusiness,
                     Description = model.Description,
                     Email = model.Email,
@@ -140,7 +140,7 @@ namespace Sheaft.Manage.Controllers
                 result = await _mediatr.Send(new UpdateStoreCommand(requestUser)
                 {
                     Id = model.Id,
-                    Address = _mapper.Map<AddressInput>(model.Address),
+                    Address = _mapper.Map<FullAddressInput>(model.Address),
                     OpenForNewBusiness = model.OpenForNewBusiness,
                     Description = model.Description,
                     Email = model.Email,

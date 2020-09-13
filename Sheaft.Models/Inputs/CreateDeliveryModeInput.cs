@@ -9,7 +9,7 @@ namespace Sheaft.Models.Inputs
         public string Description { get; set; }
         public DeliveryKind Kind { get; set; }
         public int? LockOrderHoursBeforeDelivery { get; set; }
-        public AddressInput Address { get; set; }
+        public LocationAddressInput Address { get; set; }
         public IEnumerable<TimeSlotGroupInput> OpeningHours { get; set; }
     }
 }

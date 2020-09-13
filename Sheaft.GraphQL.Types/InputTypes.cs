@@ -90,8 +90,7 @@ namespace Sheaft.GraphQL.Types
             descriptor.Field(c => c.LockOrderHoursBeforeDelivery);
 
             descriptor.Field(c => c.Address)
-                .Type<AddressInputType>();
-
+                .Type<LocationAddressInputType>();
 
             descriptor.Field(c => c.OpeningHours)
                 .Type<NonNullType<ListType<TimeSlotGroupInputType>>>();
@@ -109,7 +108,7 @@ namespace Sheaft.GraphQL.Types
                 .Type<NonNullType<IdType>>();
 
             descriptor.Field(c => c.Address)
-                .Type<AddressInputType>();
+                .Type<LocationAddressInputType>();
 
             descriptor.Field(c => c.Name)
                 .Type<NonNullType<StringType>>();
@@ -304,7 +303,7 @@ namespace Sheaft.GraphQL.Types
                 .Type<NonNullType<StringType>>();
 
             descriptor.Field(c => c.Address)
-                .Type<NonNullType<AddressInputType>>();
+                .Type<NonNullType<FullAddressInputType>>();
 
             descriptor.Field(c => c.Email)
                 .Type<NonNullType<StringType>>();
@@ -340,7 +339,7 @@ namespace Sheaft.GraphQL.Types
                 .Type<NonNullType<StringType>>();
 
             descriptor.Field(c => c.Address)
-                .Type<NonNullType<AddressInputType>>();
+                .Type<NonNullType<FullAddressInputType>>();
 
             descriptor.Field(c => c.Email)
                 .Type<NonNullType<StringType>>();
@@ -363,7 +362,6 @@ namespace Sheaft.GraphQL.Types
         protected override void Configure(IInputObjectTypeDescriptor<RegisterConsumerInput> descriptor)
         {
             descriptor.Field(c => c.Anonymous);
-            descriptor.Field(c => c.DepartmentId).Type<NonNullType<IdType>>();
             descriptor.Field(c => c.Phone);
             descriptor.Field(c => c.Picture);
             descriptor.Field(c => c.SponsoringCode);
@@ -379,6 +377,9 @@ namespace Sheaft.GraphQL.Types
 
             descriptor.Field(c => c.LastName)
                 .Type<NonNullType<StringType>>();
+
+            descriptor.Field(c => c.Address)
+                .Type<NonNullType<FullAddressInputType>>();
         }
     }
     public class RegisterNewsletterInputType : SheaftInputType<RegisterNewsletterInput>
@@ -408,6 +409,22 @@ namespace Sheaft.GraphQL.Types
 
             descriptor.Field(c => c.Address)
                 .Type<NonNullType<AddressInputType>>();
+        }
+    }
+    public class UboInputType : SheaftInputType<UboInput>
+    {
+        protected override void Configure(IInputObjectTypeDescriptor<UboInput> descriptor)
+        {
+            descriptor.Field(c => c.FirstName);
+            descriptor.Field(c => c.LastName);
+            descriptor.Field(c => c.Birthdate);
+            descriptor.Field(c => c.Nationality);
+
+            descriptor.Field(c => c.Address)
+                .Type<NonNullType<AddressInputType>>();
+
+            descriptor.Field(c => c.BirthAddress)
+                .Type<NonNullType<BirthAddressInputType>>();
         }
     }
     public class SearchTermsInputType : SheaftInputType<SearchTermsInput>
@@ -463,7 +480,7 @@ namespace Sheaft.GraphQL.Types
                 .Type<NonNullType<IdType>>();
 
             descriptor.Field(c => c.Address)
-                .Type<NonNullType<AddressInputType>>();
+                .Type<NonNullType<FullAddressInputType>>();
 
             descriptor.Field(c => c.Email)
                 .Type<NonNullType<StringType>>();
@@ -495,7 +512,7 @@ namespace Sheaft.GraphQL.Types
                 .Type<NonNullType<IdType>>();
 
             descriptor.Field(c => c.Address)
-                .Type<NonNullType<AddressInputType>>();
+                .Type<NonNullType<FullAddressInputType>>();
 
             descriptor.Field(c => c.Email)
                 .Type<NonNullType<StringType>>();
@@ -588,6 +605,7 @@ namespace Sheaft.GraphQL.Types
     {
         protected override void Configure(IInputObjectTypeDescriptor<UpdateConsumerInput> descriptor)
         {
+            descriptor.Field(c => c.Anonymous);
             descriptor.Field(c => c.Phone);
             descriptor.Field(c => c.Picture);
 
@@ -602,6 +620,62 @@ namespace Sheaft.GraphQL.Types
 
             descriptor.Field(c => c.Id)
                 .Type<NonNullType<IdType>>();
+
+            descriptor.Field(c => c.Address)
+                .Type<NonNullType<FullAddressInputType>>();
+        }
+    }
+    public class LocationAddressInputType : SheaftInputType<LocationAddressInput>
+    {
+        protected override void Configure(IInputObjectTypeDescriptor<LocationAddressInput> descriptor)
+        {
+            descriptor.Field(c => c.Line2);
+            descriptor.Field(c => c.Latitude);
+            descriptor.Field(c => c.Longitude);
+
+            descriptor.Field(c => c.Line1)
+                .Type<NonNullType<StringType>>();
+
+            descriptor.Field(c => c.Zipcode)
+                .Type<NonNullType<StringType>>();
+
+            descriptor.Field(c => c.City)
+                .Type<NonNullType<StringType>>();
+
+            descriptor.Field(c => c.Country)
+                .Type<NonNullType<CountryIsoCodeEnumType>>();
+        }
+    }
+    public class BirthAddressInputType : SheaftInputType<BirthAddressInput>
+    {
+        protected override void Configure(IInputObjectTypeDescriptor<BirthAddressInput> descriptor)
+        {
+            descriptor.Field(c => c.City)
+                .Type<NonNullType<StringType>>();
+
+            descriptor.Field(c => c.Country)
+                .Type<NonNullType<CountryIsoCodeEnumType>>();
+        }
+    }
+    public class FullAddressInputType : SheaftInputType<FullAddressInput>
+    {
+        protected override void Configure(IInputObjectTypeDescriptor<FullAddressInput> descriptor)
+        {
+            descriptor.Field(c => c.Line2);
+            descriptor.Field(c => c.Latitude);
+            descriptor.Field(c => c.Longitude);
+
+            descriptor.Field(c => c.Line1)
+                .Type<NonNullType<StringType>>();
+
+            descriptor.Field(c => c.Zipcode)
+                .Type<NonNullType<StringType>>();
+
+            descriptor.Field(c => c.City)
+                .Type<NonNullType<StringType>>();
+
+            descriptor.Field(c => c.Country)
+                .Type<NonNullType<CountryIsoCodeEnumType>>();
         }
     }
     public class AddressInputType : SheaftInputType<AddressInput>
@@ -609,8 +683,6 @@ namespace Sheaft.GraphQL.Types
         protected override void Configure(IInputObjectTypeDescriptor<AddressInput> descriptor)
         {
             descriptor.Field(c => c.Line2);
-            descriptor.Field(c => c.Latitude);
-            descriptor.Field(c => c.Longitude);
 
             descriptor.Field(c => c.Line1)
                 .Type<NonNullType<StringType>>();

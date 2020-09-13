@@ -22,9 +22,11 @@ namespace Sheaft.Domain.Models
 
             Line1 = line1;
             Line2 = line2;
-            Zipcode = zipcode;
             City = city;
             Country = country;
+
+            if(zipcode.Length == 5)
+                Zipcode = zipcode;
         }
 
         public string Line1 { get; private set; }

@@ -1,5 +1,6 @@
 ﻿using Sheaft.Interop.Enums;
 using System;
+using System.Collections.Generic;
 
 namespace Sheaft.Models.Inputs
 {
@@ -10,5 +11,6 @@ namespace Sheaft.Models.Inputs
         public LegalKind Kind { get; set; }
         public OwnerInput Owner { get; set; }
         public AddressInput Address { get; set; }
+        public IEnumerable<UboInput> Ubos { get; set; }
     }
 }

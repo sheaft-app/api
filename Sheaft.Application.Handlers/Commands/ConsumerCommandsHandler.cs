@@ -25,7 +25,7 @@ using Microsoft.EntityFrameworkCore;
 namespace Sheaft.Application.Handlers
 {
     public class ConsumerCommandsHandler : ResultsHandler,
-        IRequestHandler<CreateConsumerCommand, Result<Guid>>,
+        IRequestHandler<RegisterConsumerCommand, Result<Guid>>,
         IRequestHandler<UpdateConsumerCommand, Result<bool>>,
         IRequestHandler<SetConsumerLegalsCommand, Result<bool>>
     {
@@ -59,7 +59,7 @@ namespace Sheaft.Application.Handlers
             _cache = cache;
         }
 
-        public async Task<Result<Guid>> Handle(CreateConsumerCommand request, CancellationToken token)
+        public async Task<Result<Guid>> Handle(RegisterConsumerCommand request, CancellationToken token)
         {
             return await ExecuteAsync(async () =>
             {
@@ -67,7 +67,15 @@ namespace Sheaft.Application.Handlers
                 if (entity != null)
                     return Conflict<Guid>(MessageKind.Register_User_AlreadyExists);
 
-                entity = new Consumer(request.Id, request.Email, request.FirstName, request.LastName, request.Phone);
+                var departmentCode = UserAddress.GetDepartmentCode(request.Address.Zipcode);
+                var department = await _context.Departments.SingleOrDefaultAsync(d => d.Code == departmentCode, token);
+
+                var address = request.Address != null ?
+                    new UserAddress(request.Address.Line1, request.Address.Line2, request.Address.Zipcode, request.Address.City, request.Address.Country,
+                        department, request.Address.Longitude, request.Address.Latitude)
+                    : null;
+
+                entity = new Consumer(request.Id, request.Email, request.FirstName, request.LastName, address, request.Phone);
                 entity.SetAnonymous(request.Anonymous);
 
                 var resultImage = await _imageService.HandleUserImageAsync(request.Id, request.Picture, token);
@@ -75,9 +83,6 @@ namespace Sheaft.Application.Handlers
                     return Failed<Guid>(resultImage.Exception);
 
                 entity.SetPicture(resultImage.Data);
-
-                var department = await _context.Departments.SingleOrDefaultAsync(d => d.Id == request.DepartmentId, token);
-                entity.SetAddress(department);
 
                 await _context.AddAsync(entity, token);
                 await _context.SaveChangesAsync(token);
@@ -122,12 +127,15 @@ namespace Sheaft.Application.Handlers
 
                 entity.SetPicture(resultImage.Data);
 
-                if (request.Address != null)
-                {
-                    var departmentCode = UserAddress.GetDepartmentCode(request.Address.Zipcode);
-                    var department = await _context.Departments.SingleOrDefaultAsync(d => d.Code == departmentCode, token);
-                    entity.SetAddress(request.Address.Line1, request.Address.Line2, request.Address.Zipcode, request.Address.City, request.Address.Country, department, request.Address.Longitude, request.Address.Latitude);                    
-                }
+                var departmentCode = UserAddress.GetDepartmentCode(request.Address.Zipcode);
+                var department = await _context.Departments.SingleOrDefaultAsync(d => d.Code == departmentCode, token);
+
+                var address = request.Address != null ?
+                    new UserAddress(request.Address.Line1, request.Address.Line2, request.Address.Zipcode, request.Address.City, request.Address.Country,
+                        department, request.Address.Longitude, request.Address.Latitude)
+                    : null;
+
+                entity.SetAddress(address);
 
                 var oidcResult = await UpdateOidcUserAsync(entity, new List<Guid> { _roleOptions.Consumer.Id }, token);
                 if (!oidcResult.Success)

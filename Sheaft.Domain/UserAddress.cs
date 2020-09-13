@@ -1,4 +1,5 @@
 ﻿using Sheaft.Interop.Enums;
+using System.Text.RegularExpressions;
 
 namespace Sheaft.Domain.Models
 {
@@ -25,16 +26,27 @@ namespace Sheaft.Domain.Models
         public double? Latitude { get; private set; }
         public virtual Department Department { get; private set; }
 
-        public static string GetDepartmentCode(string zipcode)
+        public static string GetDepartmentCode(string code)
         {
-            var departmentCode = zipcode.Substring(0, 2);
-            if (departmentCode == "20" && int.Parse(zipcode) < 20200)
-                departmentCode = "2A";
+            if (code == null || code.Length < 2)
+                return null;
 
-            if (departmentCode == "20" && int.Parse(zipcode) >= 20200)
-                departmentCode = "2B";
+            var corsicaRegex = new Regex("^20[0-9]{3}");
+            if (corsicaRegex.Match(code).Success)
+            {
+                var departmentCode = int.Parse(code);
+                if (departmentCode < 20200)
+                    return "2A";
 
-            return departmentCode;
+                if (departmentCode >= 20200)
+                    return "2B";
+            }
+
+            var regex = new Regex("(^([2[A-B]{2})|^([0-9]{2}))([0-9]{0,3})");
+            if (regex.Match(code).Success)
+                return code.Substring(0, 2);
+            
+            return null;
         }
     }
 }

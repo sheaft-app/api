@@ -9,9 +9,10 @@ namespace Sheaft.Domain.Models
         {
         }
 
-        public Consumer(Guid id, string email, string firstname, string lastname, string phone = null)
+        public Consumer(Guid id, string email, string firstname, string lastname, UserAddress address, string phone = null)
             : base(id, ProfileKind.Consumer, $"{firstname} {lastname}", firstname, lastname, email, phone)
         {
+            SetAddress(address);
         }
 
         public bool Anonymous { get; private set; }

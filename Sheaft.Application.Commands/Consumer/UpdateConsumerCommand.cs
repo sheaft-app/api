@@ -1,7 +1,5 @@
-﻿using System;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using Sheaft.Core;
-using Sheaft.Models.Inputs;
 
 namespace Sheaft.Application.Commands
 {
@@ -11,8 +9,5 @@ namespace Sheaft.Application.Commands
         public UpdateConsumerCommand(RequestUser requestUser) : base(requestUser)
         {
         }
-
-        public AddressInput Address { get; set; }
-        public bool Anonymous { get; set; }
     }
 }

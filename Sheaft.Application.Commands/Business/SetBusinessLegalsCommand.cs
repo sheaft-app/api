@@ -3,6 +3,7 @@ using Sheaft.Interop.Enums;
 using Sheaft.Models.Inputs;
 using Sheaft.Core;
 using Newtonsoft.Json;
+using System.Collections.Generic;
 
 namespace Sheaft.Application.Commands
 {
@@ -18,5 +19,6 @@ namespace Sheaft.Application.Commands
         public string Email { get; set; }
         public OwnerInput Owner { get; set; }
         public AddressInput Address { get; set; }
+        public IEnumerable<UboInput> Ubos { get; set; }
     }
 }

@@ -21,7 +21,8 @@ namespace Sheaft.Domain.Models
             SetSiret(siret);
             SetVatIdentifier(vatIdentifier);
             SetDescription(description);
-            SetAddress(address.Line1, address.Line2, address.Zipcode, address.City, address.Country, address.Department, address.Longitude, address.Latitude);
+
+            SetAddress(address);            
         }
 
         public bool OpenForNewBusiness { get; private set; }

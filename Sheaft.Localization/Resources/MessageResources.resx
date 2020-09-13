@@ -454,7 +454,7 @@
     <value>L'accès n'est pas autorisé, votre session a peut-être expirée, ou vos droits ne sont pas suffisants</value>
   </data>
   <data name="Validation" xml:space="preserve">
-    <value>Les données reçues sont invalides ou invalides, veuillez vérifier les données saisies.</value>
+    <value>Les données reçues sont invalides ou manquantes, veuillez vérifier les données saisies.</value>
   </data>
   <data name="BadRequest" xml:space="preserve">
     <value>La requête reçue est invalide, veuillez rafraichir la page et réessayer votre demande.</value>

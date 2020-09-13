@@ -24,7 +24,7 @@ namespace Sheaft.Application.Commands
         public string Picture { get; set; }
         public string VatIdentifier { get; set; }
         public bool OpenForNewBusiness { get; set; }
-        public AddressInput Address { get; set; }
+        public FullAddressInput Address { get; set; }
         public IEnumerable<Guid> Tags { get; set; }
         public IEnumerable<TimeSlotGroupInput> OpeningHours { get; set; }
     }

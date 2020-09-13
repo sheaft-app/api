@@ -1,6 +1,7 @@
 ﻿using System;
 using Newtonsoft.Json;
 using Sheaft.Core;
+using Sheaft.Models.Inputs;
 
 namespace Sheaft.Application.Commands
 {
@@ -17,5 +18,7 @@ namespace Sheaft.Application.Commands
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public string Picture { get; set; }
+        public bool Anonymous { get; set; }
+        public FullAddressInput Address { get; set; }
     }
 }

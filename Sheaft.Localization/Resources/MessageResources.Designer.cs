@@ -1726,7 +1726,7 @@ namespace Sheaft.Localization.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Les données reçues sont invalides ou invalides, veuillez vérifier les données saisies..
+        ///   Looks up a localized string similar to Les données reçues sont invalides ou manquantes, veuillez vérifier les données saisies..
         /// </summary>
         internal static string Validation {
             get {

@@ -98,7 +98,7 @@ namespace Sheaft.Manage.Controllers
             {
                 Description = model.Description,
                 Name = model.Name,
-                Address = _mapper.Map<AddressInput>(model.Address),
+                Address = _mapper.Map<LocationAddressInput>(model.Address),
                 Kind = model.Kind,
                 LockOrderHoursBeforeDelivery = model.LockOrderHoursBeforeDelivery,
                 OpeningHours = entity.OpeningHours?.GroupBy(oh => new { oh.From, oh.To }).Select(c => new TimeSlotGroupInput { From = c.Key.From, To = c.Key.To, Days = c.Select(o => o.Day) })
@@ -148,7 +148,7 @@ namespace Sheaft.Manage.Controllers
                 Id = model.Id,
                 Description = model.Description,
                 Name = model.Name,
-                Address = _mapper.Map<AddressInput>(model.Address),
+                Address = _mapper.Map<LocationAddressInput>(model.Address),
                 Kind = model.Kind,
                 LockOrderHoursBeforeDelivery = model.LockOrderHoursBeforeDelivery     
             }, token);

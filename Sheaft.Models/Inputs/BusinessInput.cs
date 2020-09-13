@@ -14,7 +14,7 @@ namespace Sheaft.Models.Inputs
         public string VatIdentifier { get; set; }
         public string Picture { get; set; }
         public string Siret { get; set; }
-        public AddressInput Address { get; set; }
+        public FullAddressInput Address { get; set; }
         public bool OpenForNewBusiness { get; set; }
         public IEnumerable<Guid> Tags { get; set; }
 

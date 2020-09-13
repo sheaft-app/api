@@ -67,6 +67,11 @@ namespace Sheaft.Domain.Models
             Address = new UserAddress(department);
         }
 
+        public void SetAddress(UserAddress address)
+        {
+            Address = address;
+        }
+
         public void SetAddress(string line1, string line2, string zipcode, string city, CountryIsoCode country, Department department, double? longitude = null, double? latitude = null)
         {
             Address = new UserAddress(line1, line2, zipcode, city, country, department, longitude, latitude);

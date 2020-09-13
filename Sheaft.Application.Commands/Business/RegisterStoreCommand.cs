@@ -25,7 +25,7 @@ namespace Sheaft.Application.Commands
         public string Picture { get; set; }
         public string Siret { get; set; }
         public string SponsoringCode { get; set; }
-        public AddressInput Address { get; set; }
+        public FullAddressInput Address { get; set; }
         public bool OpenForNewBusiness { get; set; }
         public IEnumerable<Guid> Tags { get; set; }
         public IEnumerable<TimeSlotGroupInput> OpeningHours { get; set; }

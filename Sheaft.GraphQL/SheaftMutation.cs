@@ -486,7 +486,7 @@ namespace Sheaft.GraphQL
         [UseSelection]
         public async Task<IQueryable<ConsumerDto>> RegisterConsumerAsync(RegisterConsumerInput input, [Service] IConsumerQueries consumerQueries)
         {
-            var result = await ExecuteCommandAsync<CreateConsumerCommand, Guid>(_mapper.Map(input, new CreateConsumerCommand(_currentUser)), _cancellationToken);
+            var result = await ExecuteCommandAsync<RegisterConsumerCommand, Guid>(_mapper.Map(input, new RegisterConsumerCommand(_currentUser)), _cancellationToken);
             return consumerQueries.GetConsumer(result, _currentUser);
         }
 
