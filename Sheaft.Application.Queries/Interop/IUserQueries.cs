@@ -10,5 +10,6 @@ namespace Sheaft.Application.Queries
     {
         Task<string> GetFreshdeskTokenAsync(RequestUser currentUser, CancellationToken token);
         IQueryable<UserDto> GetUser(RequestUser currentUser);
+        IQueryable<UserProfileDto> GetUserProfile(RequestUser currentUser);
     }
 }

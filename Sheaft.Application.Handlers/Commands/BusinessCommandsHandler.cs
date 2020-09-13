@@ -150,6 +150,8 @@ namespace Sheaft.Application.Handlers
                 var entity = await _context.GetByIdAsync<Store>(request.Id, token);
 
                 entity.SetName(request.Name);
+                entity.SetFirstname(request.FirstName);
+                entity.SetLastname(request.LastName);
                 entity.SetEmail(request.Email);
                 entity.SetProfileKind(request.Kind);
                 entity.SetPhone(request.Phone);
@@ -207,6 +209,8 @@ namespace Sheaft.Application.Handlers
                 var entity = await _context.GetByIdAsync<Producer>(request.Id, token);
 
                 entity.SetName(request.Name);
+                entity.SetFirstname(request.FirstName);
+                entity.SetLastname(request.LastName);
                 entity.SetEmail(request.Email);
                 entity.SetProfileKind(request.Kind);
                 entity.SetPhone(request.Phone);

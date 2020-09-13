@@ -148,9 +148,9 @@ namespace Sheaft.GraphQL
         [GraphQLName("me")]
         [UseSingleOrDefault]
         [UseSelection]
-        public IQueryable<UserDto> Me([Service] IUserQueries userQueries)
+        public IQueryable<UserProfileDto> Me([Service] IUserQueries userQueries)
         {
-            return userQueries.GetUser(_currentUser);
+            return userQueries.GetUserProfile(_currentUser);
         }
 
         [Authorize(Policy = Policies.STORE)]
@@ -164,7 +164,7 @@ namespace Sheaft.GraphQL
             return productQueries.GetStoreProducts(_currentUser.Id, _currentUser);
         }
 
-        [Authorize(Policy = Policies.STORE)]
+        [Authorize(Policy = Policies.PRODUCER)]
         [GraphQLName("producer")]
         [UseSingleOrDefault]
         [UseSelection]
@@ -173,7 +173,16 @@ namespace Sheaft.GraphQL
             return businessQueries.GetProducer(input, _currentUser);
         }
 
-        [Authorize(Policy = Policies.PRODUCER)]
+        [Authorize(Policy = Policies.CONSUMER)]
+        [GraphQLName("consumer")]
+        [UseSingleOrDefault]
+        [UseSelection]
+        public IQueryable<ConsumerDto> GetConsumer(Guid input, [Service] IConsumerQueries consumerQueries)
+        {
+            return consumerQueries.GetConsumer(input, _currentUser);
+        }
+
+        [Authorize(Policy = Policies.STORE)]
         [GraphQLName("store")]
         [UseSingleOrDefault]
         [UseSelection]

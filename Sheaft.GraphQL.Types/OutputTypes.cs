@@ -450,6 +450,7 @@ namespace Sheaft.GraphQL.Types
             descriptor.Field(c => c.LastName);
             descriptor.Field(c => c.Email);
             descriptor.Field(c => c.Siret);
+            descriptor.Field(c => c.Name);
 
             descriptor.Field(c => c.Address)
                 .Type<NonNullType<AddressType>>();
@@ -548,6 +549,7 @@ namespace Sheaft.GraphQL.Types
             descriptor.Field(c => c.LastName);
             descriptor.Field(c => c.Email);
             descriptor.Field(c => c.Siret);
+            descriptor.Field(c => c.Name);
 
             descriptor.Field(c => c.Address)
                 .Type<NonNullType<AddressType>>();

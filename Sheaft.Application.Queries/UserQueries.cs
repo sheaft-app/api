@@ -62,5 +62,19 @@ namespace Sheaft.Application.Queries
                 return new List<UserDto>().AsQueryable();
             }
         }
+
+        public IQueryable<UserProfileDto> GetUserProfile(RequestUser currentUser)
+        {
+            try
+            {
+                return _context.Users.OfType<User>()
+                        .Get(c => c.Id == currentUser.Id)
+                        .ProjectTo<UserProfileDto>(_configurationProvider);
+            }
+            catch (Exception e)
+            {
+                return new List<UserProfileDto>().AsQueryable();
+            }
+        }
     }
 }

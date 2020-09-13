@@ -238,6 +238,7 @@ namespace Sheaft.GraphQL.Enums
     {
         protected override void Configure(IEnumTypeDescriptor<CountryIsoCode> descriptor)
         {
+            descriptor.Value(CountryIsoCode.NotSpecified);
             descriptor.Value(CountryIsoCode.AD);
             descriptor.Value(CountryIsoCode.AE);
             descriptor.Value(CountryIsoCode.AF);

@@ -488,6 +488,12 @@ namespace Sheaft.GraphQL.Types
             descriptor.Field(c => c.Name)
                 .Type<NonNullType<StringType>>();
 
+            descriptor.Field(c => c.FirstName)
+                .Type<NonNullType<StringType>>();
+
+            descriptor.Field(c => c.LastName)
+                .Type<NonNullType<StringType>>();
+
             descriptor.Field(c => c.Tags)
                 .Type<ListType<IdType>>();
 
@@ -518,6 +524,12 @@ namespace Sheaft.GraphQL.Types
                 .Type<NonNullType<StringType>>();
 
             descriptor.Field(c => c.Name)
+                .Type<NonNullType<StringType>>();
+
+            descriptor.Field(c => c.FirstName)
+                .Type<NonNullType<StringType>>();
+
+            descriptor.Field(c => c.LastName)
                 .Type<NonNullType<StringType>>();
 
             descriptor.Field(c => c.Tags)
