@@ -11,7 +11,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Sheaft.Application.Handlers
 {
-    public class NotificationCommandsHandler : CommandsHandler,
+    public class NotificationCommandsHandler : ResultsHandler,
         IRequestHandler<MarkUserNotificationsAsReadCommand, Result<bool>>,
         IRequestHandler<MarkUserNotificationAsReadCommand, Result<bool>>,
         IRequestHandler<CreateUserNotificationCommand, Result<Guid>>,

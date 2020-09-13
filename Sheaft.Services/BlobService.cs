@@ -14,20 +14,19 @@ using Azure.Storage.Blobs.Models;
 
 namespace Sheaft.Services
 {
-    public class BlobService : IBlobService
+    public class BlobService : ResultsHandler, IBlobService
     {
         private readonly StorageOptions _storageOptions;
-        private readonly ILogger<BlobService> _logger;
 
         public BlobService(IOptionsSnapshot<StorageOptions> storageOptions, ILogger<BlobService> logger)
+            : base(logger)
         {
-            _logger = logger;
             _storageOptions = storageOptions.Value;
         }
 
         public async Task<Result<string>> UploadUserPictureAsync(Guid userId, Stream stream, CancellationToken token)
         {
-            try
+            return await ExecuteAsync(async () =>
             {
                 var containerClient = new BlobContainerClient(_storageOptions.ConnectionString, _storageOptions.Containers.Pictures);
                 await containerClient.CreateIfNotExistsAsync(cancellationToken: token);
@@ -37,18 +36,13 @@ namespace Sheaft.Services
                 stream.Position = 0;
                 await blobClient.UploadAsync(stream, token);
 
-                return new Result<string>(blobClient.Uri.ToString());
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, $"{nameof(BlobService.UploadUserPictureAsync)} - {e.Message}");
-                return new Result<string>(e);
-            }
+                return Ok(blobClient.Uri.ToString());
+            });
         }
 
         public async Task<Result<string>> UploadTagPictureAsync(Guid tagId, Stream stream, CancellationToken token)
         {
-            try
+            return await ExecuteAsync(async () =>
             {
                 var containerClient = new BlobContainerClient(_storageOptions.ConnectionString, _storageOptions.Containers.Pictures);
                 await containerClient.CreateIfNotExistsAsync(cancellationToken: token);
@@ -58,18 +52,14 @@ namespace Sheaft.Services
                 stream.Position = 0;
                 await blobClient.UploadAsync(stream, token);
 
-                return new Result<string>(blobClient.Uri.ToString());
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, $"{nameof(BlobService.UploadTagPictureAsync)} - {e.Message}");
-                return new Result<string>(e);
-            }
+                return Ok(blobClient.Uri.ToString());
+            });
         }
 
         public async Task<Result<string>> UploadProductPictureAsync(Guid userId, Guid productId, string filename, string size, Stream stream, CancellationToken token)
         {
-            try
+
+            return await ExecuteAsync(async () =>
             {
                 var containerClient = new BlobContainerClient(_storageOptions.ConnectionString, _storageOptions.Containers.Pictures);
                 await containerClient.CreateIfNotExistsAsync(cancellationToken: token);
@@ -79,13 +69,8 @@ namespace Sheaft.Services
                 stream.Position = 0;
                 await blobClient.UploadAsync(stream, token);
 
-                return new Result<string>(blobClient.Uri.ToString());
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, $"{nameof(BlobService.UploadProductPictureAsync)} - {e.Message}");
-                return new Result<string>(e);
-            }
+                return Ok(blobClient.Uri.ToString());
+            });
         }
 
         public async Task<Result<bool>> CleanUserStorageAsync(Guid userId, CancellationToken token)
@@ -110,36 +95,31 @@ namespace Sheaft.Services
             if (!response.Success)
                 return response;
 
-            return new Result<bool>(true);
+            return Ok(true);
         }
 
         public async Task<Result<bool>> CleanContainerFolderStorageAsync(string container, string folder, CancellationToken token)
         {
-            try
+            return await ExecuteAsync(async () =>
             {
                 var containerClient = new BlobContainerClient(_storageOptions.ConnectionString, container);
 
                 var blobClient = containerClient.GetBlobClient(folder);
                 if (!await blobClient.ExistsAsync(token))
-                    return new Result<bool>(true);
+                    return Ok(true);
 
                 await foreach (var blob in containerClient.GetBlobsAsync(prefix: folder, cancellationToken: token))
                 {
                     await containerClient.DeleteBlobAsync(blob.Name, cancellationToken: token);
                 }
 
-                return new Result<bool>(true);
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, $"{nameof(BlobService.CleanContainerFolderStorageAsync)} - {container}/{folder}");
-                return new Result<bool>(e);
-            }
+                return Ok(true);
+            });
         }
 
         public async Task<Result<string>> UploadImportProductsFileAsync(Guid userId, Guid jobId, string filename, Stream stream, CancellationToken token)
         {
-            try
+            return await ExecuteAsync(async () =>
             {
                 var containerClient = new BlobContainerClient(_storageOptions.ConnectionString, _storageOptions.Containers.Products);
                 await containerClient.CreateIfNotExistsAsync(cancellationToken: token);
@@ -149,18 +129,13 @@ namespace Sheaft.Services
                 stream.Position = 0;
                 await blobClient.UploadAsync(stream, token);
 
-                return new Result<string>(blobClient.Uri.ToString());
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, $"{nameof(BlobService.UploadImportProductsFileAsync)} - {e.Message}");
-                return new Result<string>(e);
-            }
+                return Ok(blobClient.Uri.ToString());
+            });
         }
 
         public async Task<Result<MemoryStream>> DownloadImportProductsFileAsync(string file, CancellationToken token)
         {
-            try
+            return await ExecuteAsync(async () =>
             {
                 var containerClient = new BlobContainerClient(_storageOptions.ConnectionString, _storageOptions.Containers.Products);
                 await containerClient.CreateIfNotExistsAsync(cancellationToken: token);
@@ -171,18 +146,13 @@ namespace Sheaft.Services
                 await blobClient.DownloadToAsync(stream, token);
 
                 stream.Position = 0;
-                return new Result<MemoryStream>(stream);
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, $"{nameof(BlobService.DownloadImportProductsFileAsync)} - {e.Message}");
-                return new Result<MemoryStream>(e);
-            }
+                return Ok(stream);
+            });
         }
 
         public async Task<Result<string>> UploadRgpdFileAsync(Guid userId, Guid jobId, string filename, Stream stream, CancellationToken token)
         {
-            try
+            return await ExecuteAsync(async () =>
             {
                 var containerClient = new BlobContainerClient(_storageOptions.ConnectionString, _storageOptions.Containers.Rgpd);
                 await containerClient.CreateIfNotExistsAsync(cancellationToken: token);
@@ -206,18 +176,13 @@ namespace Sheaft.Services
 
                 sasBuilder.SetPermissions(BlobSasPermissions.Read);
 
-                return new Result<string>(GetBlobUri(blobClient, blobServiceClient, key, sasBuilder, _storageOptions.Containers.Rgpd));
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, $"{nameof(BlobService.UploadRgpdFileAsync)} - {e.Message}");
-                return new Result<string>(e);
-            }
+                return Ok(GetBlobUri(blobClient, blobServiceClient, key, sasBuilder, _storageOptions.Containers.Rgpd));
+            });
         }
 
         public async Task<Result<string>> UploadPickingOrderFileAsync(Guid userId, Guid jobId, string filename, Stream stream, CancellationToken token)
         {
-            try
+            return await ExecuteAsync(async () =>
             {
                 var containerClient = new BlobContainerClient(_storageOptions.ConnectionString, _storageOptions.Containers.PickingOrders);
                 await containerClient.CreateIfNotExistsAsync(cancellationToken: token);
@@ -241,18 +206,13 @@ namespace Sheaft.Services
 
                 sasBuilder.SetPermissions(BlobSasPermissions.Read);
 
-                return new Result<string>(GetBlobUri(blobClient, blobServiceClient, key, sasBuilder, _storageOptions.Containers.PickingOrders));
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, $"{nameof(BlobService.UploadPickingOrderFileAsync)} - {e.Message}");
-                return new Result<string>(e);
-            }
+                return Ok(GetBlobUri(blobClient, blobServiceClient, key, sasBuilder, _storageOptions.Containers.PickingOrders));
+            });
         }
 
         public async Task<Result<string>> UploadDepartmentsProgressAsync(Stream stream, CancellationToken token)
         {
-            try
+            return await ExecuteAsync(async () =>
             {
                 var containerClient = new BlobContainerClient(_storageOptions.ConnectionString, _storageOptions.Containers.Progress);
                 await containerClient.CreateIfNotExistsAsync(cancellationToken: token);
@@ -263,13 +223,8 @@ namespace Sheaft.Services
                 stream.Position = 0;
                 await blobClient.UploadAsync(stream, new BlobUploadOptions(), token);
 
-                return new Result<string>(blobClient.Uri.ToString());
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, $"{nameof(BlobService.UploadDepartmentsProgressAsync)} - {e.Message}");
-                return new Result<string>(e);
-            }
+                return Ok(blobClient.Uri.ToString());
+            });
         }
 
         private string GetBlobUri(BlobClient blobClient, BlobServiceClient blobServiceClient, Azure.Response<Azure.Storage.Blobs.Models.UserDelegationKey> key, BlobSasBuilder sasBuilder, string container)

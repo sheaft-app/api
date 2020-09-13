@@ -17,7 +17,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Sheaft.Application.Handlers
 {
-    public class ContactCommandsHandler : CommandsHandler,
+    public class ContactCommandsHandler : ResultsHandler,
         IRequestHandler<CreateContactCommand, Result<bool>>
     {
         private readonly SendgridOptions _sendgridOptions;

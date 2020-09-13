@@ -14,7 +14,7 @@ using System.Linq;
 namespace Sheaft.Application.Handlers
 {
 
-    public class LevelCommandsHandler : CommandsHandler,
+    public class LevelCommandsHandler : ResultsHandler,
         IRequestHandler<CreateLevelCommand, Result<Guid>>,
         IRequestHandler<UpdateLevelCommand, Result<bool>>,
         IRequestHandler<DeleteLevelCommand, Result<bool>>,

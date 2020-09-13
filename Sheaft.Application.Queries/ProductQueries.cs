@@ -109,7 +109,8 @@ namespace Sheaft.Application.Queries
                         IsReturnable = p.Packaged.HasValue ? p.Packaged.Value : false,
                         RatingsCount = p.Product_ratings_count,
                         Tags = p.Product_tags?.Select(t => new TagDto { Name = t }) ?? new List<TagDto>(),
-                        Unit = (UnitKind)Enum.Parse(typeof(UnitKind), p.Product_unit.ToLowerInvariant()),
+                        Unit = !string.IsNullOrWhiteSpace(p.Product_unit) ? (UnitKind)Enum.Parse(typeof(UnitKind), p.Product_unit.ToLowerInvariant()) : UnitKind.NotSpecified,
+                        Conditioning = !string.IsNullOrWhiteSpace(p.Product_conditioning) ? (ConditioningKind)Enum.Parse(typeof(ConditioningKind), p.Product_conditioning.ToLowerInvariant()) : ConditioningKind.Not_Specified,
                         Producer = new BusinessProfileDto
                         {
                             Id = p.Producer_id,
@@ -225,6 +226,8 @@ namespace Sheaft.Application.Queries
             public double Producer_longitude { get; set; }
             public double Producer_latitude { get; set; }
             public bool? Packaged { get; set; }
+            public string Product_conditioning { get; set; }
+            public string Product_weight { get; set; }
     }
     }
 }

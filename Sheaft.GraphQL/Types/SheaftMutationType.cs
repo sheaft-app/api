@@ -24,7 +24,6 @@ namespace Sheaft.GraphQL
             descriptor.Field(c => c.RemoveDocumentAsync(default));
             descriptor.Field(c => c.ConfirmOrderAsync(default, default));
             descriptor.Field(c => c.CreateQuickOrderAsync(default, default));
-            descriptor.Field(c => c.DeleteBusinessAsync(default));
             descriptor.Field(c => c.DeleteDeliveryModeAsync(default));
             descriptor.Field(c => c.DeleteReturnableAsync(default));
             descriptor.Field(c => c.DeleteProductsAsync(default));

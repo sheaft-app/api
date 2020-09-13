@@ -24,10 +24,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Sheaft.Application.Handlers
 {
-    public class ConsumerCommandsHandler : CommandsHandler,
+    public class ConsumerCommandsHandler : ResultsHandler,
         IRequestHandler<CreateConsumerCommand, Result<Guid>>,
         IRequestHandler<UpdateConsumerCommand, Result<bool>>,
-        IRequestHandler<DeleteConsumerCommand, Result<bool>>,
         IRequestHandler<SetConsumerLegalsCommand, Result<bool>>
     {
         private readonly IAppDbContext _context;
@@ -71,8 +70,11 @@ namespace Sheaft.Application.Handlers
                 entity = new Consumer(request.Id, request.Email, request.FirstName, request.LastName, request.Phone);
                 entity.SetAnonymous(request.Anonymous);
 
-                var picture = await _imageService.HandleUserImageAsync(request.Id, request.Picture, token);
-                entity.SetPicture(picture);
+                var resultImage = await _imageService.HandleUserImageAsync(request.Id, request.Picture, token);
+                if (!resultImage.Success)
+                    return Failed<Guid>(resultImage.Exception);
+
+                entity.SetPicture(resultImage.Data);
 
                 var department = await _context.Departments.SingleOrDefaultAsync(d => d.Id == request.DepartmentId, token);
                 entity.SetAddress(department);
@@ -80,15 +82,9 @@ namespace Sheaft.Application.Handlers
                 await _context.AddAsync(entity, token);
                 await _context.SaveChangesAsync(token);
 
-                var oidcUser = new IdentityUserInput(request.Id, entity.Email, entity.Name, entity.FirstName, entity.LastName, new List<Guid> { _roleOptions.Consumer.Id })
-                {
-                    Phone = request.Phone,
-                    Picture = picture
-                };
-
-                var oidcResult = await _httpClient.PutAsync(_authOptions.Actions.Profile, new StringContent(JsonConvert.SerializeObject(oidcUser), Encoding.UTF8, "application/json"), token);
-                if (!oidcResult.IsSuccessStatusCode)
-                    return Failed<Guid>(new BadRequestException(MessageKind.Oidc_Register_Error, await oidcResult.Content.ReadAsStringAsync().ConfigureAwait(false)));
+                var oidcResult = await UpdateOidcUserAsync(entity, new List<Guid> { _roleOptions.Consumer.Id }, token);
+                if (!oidcResult.Success)
+                    return Failed<Guid>(new BadRequestException(MessageKind.Oidc_Register_Error, oidcResult.Exception?.Message));
 
                 if (!string.IsNullOrWhiteSpace(request.SponsoringCode))
                 {
@@ -108,7 +104,6 @@ namespace Sheaft.Application.Handlers
             });
         }
 
-
         public async Task<Result<bool>> Handle(UpdateConsumerCommand request, CancellationToken token)
         {
             return await ExecuteAsync(async () =>
@@ -121,8 +116,11 @@ namespace Sheaft.Application.Handlers
                 entity.SetLastname(request.LastName);
                 entity.SetAnonymous(request.Anonymous);
 
-                var picture = await _imageService.HandleUserImageAsync(request.Id, request.Picture, token);
-                entity.SetPicture(picture);
+                var resultImage = await _imageService.HandleUserImageAsync(request.Id, request.Picture, token);
+                if (!resultImage.Success)
+                    return Failed<bool>(resultImage.Exception);
+
+                entity.SetPicture(resultImage.Data);
 
                 if (request.Address != null)
                 {
@@ -131,51 +129,15 @@ namespace Sheaft.Application.Handlers
                     entity.SetAddress(request.Address.Line1, request.Address.Line2, request.Address.Zipcode, request.Address.City, request.Address.Country, department, request.Address.Longitude, request.Address.Latitude);                    
                 }
 
-                var oidcUser = new IdentityUserInput(request.Id, entity.Email, entity.Name, entity.FirstName, entity.LastName)
-                {
-                    Phone = request.Phone,
-                    Picture = entity.Picture
-                };
-
-                var oidcResult = await _httpClient.PutAsync(_authOptions.Actions.Profile, new StringContent(JsonConvert.SerializeObject(oidcUser), Encoding.UTF8, "application/json"), token);
-                if (!oidcResult.IsSuccessStatusCode)
-                    return BadRequest<bool>(MessageKind.Oidc_UpdateProfile_Error, await oidcResult.Content.ReadAsStringAsync());
+                var oidcResult = await UpdateOidcUserAsync(entity, new List<Guid> { _roleOptions.Consumer.Id }, token);
+                if (!oidcResult.Success)
+                    return Failed<bool>(new BadRequestException(MessageKind.Oidc_UpdateProfile_Error, oidcResult.Exception?.Message));
 
                 _context.Update(entity);
+                var result = await _context.SaveChangesAsync(token);
+
                 await _cache.RemoveAsync(entity.Id.ToString("N"));
-
-                return Ok(await _context.SaveChangesAsync(token) > 0);
-            });
-        }
-
-        public async Task<Result<bool>> Handle(DeleteConsumerCommand request, CancellationToken token)
-        {
-            return await ExecuteAsync(async () =>
-            {
-                using (var transaction = await _context.Database.BeginTransactionAsync(token))
-                {
-                    var entity = await _context.GetByIdAsync<Consumer>(request.Id, token);
-
-                    var hasActiveOrders = await _context.AnyAsync<PurchaseOrder>(o => o.Sender.Id == entity.Id && (int)o.Status < 6, token);
-                    if (hasActiveOrders)
-                        return ValidationError<bool>(MessageKind.Consumer_CannotBeDeleted_HasActiveOrders);
-
-                    var oidcResult = await _httpClient.DeleteAsync(string.Format(_authOptions.Actions.Delete, entity.Id.ToString("N")), token);
-                    if (!oidcResult.IsSuccessStatusCode)
-                        return Failed<bool>(new BadRequestException(MessageKind.Oidc_DeleteProfile_Error, await oidcResult.Content.ReadAsStringAsync().ConfigureAwait(false)));
-
-                    var email = entity.Email;
-
-                    entity.Close(request.Reason);
-                    _context.Update(entity);
-
-                    await _context.SaveChangesAsync(token);
-                    await transaction.CommitAsync(token);
-
-                    await _cache.RemoveAsync(entity.Id.ToString("N"));
-                    await _queueService.ProcessCommandAsync(RemoveUserDataCommand.QUEUE_NAME, new RemoveUserDataCommand(request.RequestUser) { Id = request.Id, Email = email }, token);
-                    return Ok(true);
-                }
+                return Ok(result > 0);
             });
         }
 
@@ -190,6 +152,23 @@ namespace Sheaft.Application.Handlers
                 var success = await _context.SaveChangesAsync(token) > 0;
                 return Ok(success);
             });
+        }
+
+        private async Task<Result<bool>> UpdateOidcUserAsync(Consumer entity, List<Guid> roles, CancellationToken token)
+        {
+            var oidcUser = new IdentityUserInput(entity.Id, entity.Email, entity.Name, entity.FirstName, entity.LastName, roles)
+            {
+                Phone = entity.Phone,
+                Picture = entity.Picture
+            };
+
+            var oidcResult = await _httpClient.PutAsync(_authOptions.Actions.Profile,
+                new StringContent(JsonConvert.SerializeObject(oidcUser), Encoding.UTF8, "application/json"), token);
+
+            if (!oidcResult.IsSuccessStatusCode)
+                return Failed<bool>(new Exception(await oidcResult.Content.ReadAsStringAsync().ConfigureAwait(false)));
+
+            return Ok(true);
         }
     }
 }

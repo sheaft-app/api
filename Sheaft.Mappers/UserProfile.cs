@@ -27,11 +27,8 @@ namespace Sheaft.Mappers
             CreateMap<PurchaseOrderVendor, OrderUserViewModel>();
 
             CreateMap<IdInput, GenerateUserCodeCommand>();
-            CreateMap<RegisterConsumerInput, CreateConsumerCommand>();
-            CreateMap<UpdateConsumerInput, UpdateConsumerCommand>();
             CreateMap<UpdatePictureInput, UpdateUserPictureCommand>();
-            CreateMap<SetConsumerLegalsInput, SetConsumerLegalsCommand>();
-            CreateMap<IdWithReasonInput, DeleteConsumerCommand>();
+            CreateMap<IdWithReasonInput, DeleteUserCommand>();
         }
     }
 }

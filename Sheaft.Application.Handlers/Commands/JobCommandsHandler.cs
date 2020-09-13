@@ -11,7 +11,7 @@ using Sheaft.Services.Interop;
 
 namespace Sheaft.Application.Handlers
 {
-    public class JobCommandsHandler : CommandsHandler,
+    public class JobCommandsHandler : ResultsHandler,
         IRequestHandler<CancelJobsCommand, Result<bool>>,
         IRequestHandler<RetryJobsCommand, Result<bool>>,
         IRequestHandler<PauseJobsCommand, Result<bool>>,

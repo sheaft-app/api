@@ -11,7 +11,7 @@ using Sheaft.Services.Interop;
 
 namespace Sheaft.Application.Handlers
 {
-    public class TransactionCommandsHandler : CommandsHandler,
+    public class TransactionCommandsHandler : ResultsHandler,
         IRequestHandler<CreateWebPayInTransactionCommand, Result<Guid>>,
         IRequestHandler<CreateTransferTransactionCommand, Result<Guid>>,
         IRequestHandler<CreatePayoutTransactionCommand, Result<Guid>>

@@ -62,12 +62,5 @@ namespace Sheaft.Domain.Models
 
             VatIdentifier = vatNumber;
         }
-
-        public override void Close(string reason)
-        {
-            base.Close(reason);
-
-            SetAddress("", "", Address.Zipcode, "", Address.Country, Address.Department);
-        }
     }
 }

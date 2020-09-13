@@ -19,7 +19,7 @@ using Sheaft.Services.Interop;
 
 namespace Sheaft.Application.Handlers
 {
-    public class PickingOrderCommandsHandler : CommandsHandler,
+    public class PickingOrderCommandsHandler : ResultsHandler,
         IRequestHandler<QueueExportPickingOrderCommand, Result<Guid>>,
         IRequestHandler<ExportPickingOrderCommand, Result<bool>>
     {

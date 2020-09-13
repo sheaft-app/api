@@ -131,6 +131,7 @@ namespace Sheaft.Domain.Models
             Email = $"{Guid.NewGuid():N}@a.c";
             Phone = string.Empty;
             RemovedOn = DateTime.UtcNow;
+            SetAddress("", "", Address.Zipcode, "", Address.Country, Address.Department);
         }
 
         public void SetTotalPoints(int points)

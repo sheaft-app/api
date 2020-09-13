@@ -2,9 +2,10 @@
 {
     public enum ConditioningKind
     {
-        Bouquet,
+        Not_Specified,
         Box,
         Bulk,
+        Bouquet,
         Bunch,
         Piece,
     }

@@ -25,12 +25,11 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Sheaft.Application.Handlers
 {
-    public class BusinessCommandsHandler : CommandsHandler,
+    public class BusinessCommandsHandler : ResultsHandler,
         IRequestHandler<RegisterProducerCommand, Result<Guid>>,
         IRequestHandler<RegisterStoreCommand, Result<Guid>>,
         IRequestHandler<UpdateProducerCommand, Result<bool>>,
         IRequestHandler<UpdateStoreCommand, Result<bool>>,
-        IRequestHandler<DeleteBusinessCommand, Result<bool>>,
         IRequestHandler<SetBusinessLegalsCommand, Result<bool>>
     {
         private readonly IAppDbContext _context;
@@ -81,23 +80,18 @@ namespace Sheaft.Application.Handlers
                         request.Address.Country, department, request.Address.Longitude, request.Address.Latitude)
                         : null;
 
-                    var producer = await CreateProducerAsync(request, address, token);
+                    var producerResult = await CreateProducerAsync(request, address, token);
+                    if (!producerResult.Success)
+                        return Failed<Guid>(producerResult.Exception);
 
+                    var producer = producerResult.Data;
                     await _context.AddAsync(producer, token);
                     await _context.SaveChangesAsync(token);
 
-                    var roles = new List<Guid> { _roleOptions.Owner.Id, _roleOptions.Producer.Id };
-                    var oidcUser = new IdentityUserInput(producer.Id, producer.Email, producer.Name, producer.FirstName, producer.LastName, roles)
-                    {
-                        Phone = request.Phone,
-                        Picture = producer.Picture
-                    };
-
-                    var oidcResult = await _httpClient.PutAsync(_authOptions.Actions.Profile,
-                        new StringContent(JsonConvert.SerializeObject(oidcUser), Encoding.UTF8, "application/json"), token);
-
-                    if (!oidcResult.IsSuccessStatusCode)
-                        return Failed<Guid>(new BadRequestException(MessageKind.Oidc_Register_Error, await oidcResult.Content.ReadAsStringAsync()));
+                    var roles = new List<Guid> { _roleOptions.Owner.Id, _roleOptions.Store.Id };
+                    var oidcResult = await UpdateOidcUserAsync(producer, roles, token);
+                    if (!oidcResult.Success)
+                        return Failed<Guid>(new BadRequestException(MessageKind.Oidc_Register_Error, oidcResult.Exception?.Message));
 
                     await RegisterSponsorAsync(request.SponsoringCode, user, request.RequestUser, token);
                     await transaction.CommitAsync(token);
@@ -126,26 +120,21 @@ namespace Sheaft.Application.Handlers
                             department, request.Address.Longitude, request.Address.Latitude)
                         : null;
 
-                    var store = await CreateStoreAsync(request, address, token);
+                    var storeResult = await CreateStoreAsync(request, address, token);
+                    if (!storeResult.Success)
+                        return Failed<Guid>(storeResult.Exception);
 
-                    await _context.AddAsync(store, token);
+                    var store = storeResult.Data;
+
+                    await _context.AddAsync(storeResult, token);
                     await _context.SaveChangesAsync(token);
 
-                    var roles = new List<Guid> { _roleOptions.Owner.Id, _roleOptions.Producer.Id };
-                    var oidcUser = new IdentityUserInput(store.Id, store.Email, store.Name, store.FirstName, store.LastName, roles)
-                    {
-                        Phone = request.Phone,
-                        Picture = store.Picture
-                    };
-
-                    var oidcResult = await _httpClient.PutAsync(_authOptions.Actions.Profile,
-                        new StringContent(JsonConvert.SerializeObject(oidcUser), Encoding.UTF8, "application/json"), token);
-
-                    if (!oidcResult.IsSuccessStatusCode)
-                        return Failed<Guid>(new BadRequestException(MessageKind.Oidc_Register_Error, await oidcResult.Content.ReadAsStringAsync()));
+                    var roles = new List<Guid> { _roleOptions.Owner.Id, _roleOptions.Store.Id };
+                    var oidcResult = await UpdateOidcUserAsync(store, roles, token);
+                    if (!oidcResult.Success)
+                        return Failed<Guid>(new BadRequestException(MessageKind.Oidc_Register_Error, oidcResult.Exception?.Message));
 
                     await RegisterSponsorAsync(request.SponsoringCode, user, request.RequestUser, token);
-
                     await transaction.CommitAsync(token);
 
                     await _cache.RemoveAsync(user.Id.ToString("N"));
@@ -175,8 +164,11 @@ namespace Sheaft.Application.Handlers
                 entity.SetAddress(request.Address.Line1, request.Address.Line2, request.Address.Zipcode,
                     request.Address.City, request.Address.Country, department, request.Address.Longitude, request.Address.Latitude);
 
-                var picture = await _imageService.HandleUserImageAsync(entity.Id, request.Picture, token);
-                entity.SetPicture(picture);
+                var resultImage = await _imageService.HandleUserImageAsync(entity.Id, request.Picture, token);
+                if (!resultImage.Success)
+                    return Failed<bool>(resultImage.Exception);
+
+                entity.SetPicture(resultImage.Data);
 
                 if (request.Tags != null)
                 {
@@ -196,7 +188,15 @@ namespace Sheaft.Application.Handlers
                 }
 
                 _context.Update(entity);
-                return Ok(await _context.SaveChangesAsync(token) > 0);
+                var result = await _context.SaveChangesAsync(token);
+
+                var roles = new List<Guid> { _roleOptions.Owner.Id, _roleOptions.Store.Id };
+                var oidcResult = await UpdateOidcUserAsync(entity, roles, token);
+                if (!oidcResult.Success)
+                    return Failed<bool>(new BadRequestException(MessageKind.Oidc_UpdateProfile_Error, oidcResult.Exception?.Message));
+
+                await _cache.RemoveAsync(entity.Id.ToString("N"));
+                return Ok(result > 0);
             });
         }
 
@@ -221,8 +221,11 @@ namespace Sheaft.Application.Handlers
                 entity.SetAddress(request.Address.Line1, request.Address.Line2, request.Address.Zipcode,
                     request.Address.City, request.Address.Country, department, request.Address.Longitude, request.Address.Latitude);
                 
-                var picture = await _imageService.HandleUserImageAsync(entity.Id, request.Picture, token);
-                entity.SetPicture(picture);
+                var resultImage = await _imageService.HandleUserImageAsync(entity.Id, request.Picture, token);
+                if (!resultImage.Success)
+                    return Failed<bool>(resultImage.Exception);
+
+                entity.SetPicture(resultImage.Data);
 
                 if (request.Tags != null)
                 {
@@ -231,30 +234,15 @@ namespace Sheaft.Application.Handlers
                 }
 
                 _context.Update(entity);
-                return Ok(await _context.SaveChangesAsync(token) > 0);
-            });
-        }
+                var result = await _context.SaveChangesAsync(token);
 
-        public async Task<Result<bool>> Handle(DeleteBusinessCommand request, CancellationToken token)
-        {
-            return await ExecuteAsync(async () =>
-            {
-                var entity = await _context.GetByIdAsync<Business>(request.Id, token);
-                var email = entity.Email;
+                var roles = new List<Guid> { _roleOptions.Owner.Id, _roleOptions.Producer.Id };
+                var oidcResult = await UpdateOidcUserAsync(entity, roles, token);
+                if (!oidcResult.Success)
+                    return Failed<bool>(new BadRequestException(MessageKind.Oidc_UpdateProfile_Error, oidcResult.Exception?.Message));
 
-                entity.Close(request.Reason);
-                _context.Update(entity);
-
-                var success = await _context.SaveChangesAsync(token) > 0;
-
-                await _queueService.ProcessCommandAsync(RemoveUserDataCommand.QUEUE_NAME,
-                    new RemoveUserDataCommand(request.RequestUser)
-                    {
-                        Id = request.Id,
-                        Email = email
-                    }, token);
-
-                return Ok(success);
+                await _cache.RemoveAsync(entity.Id.ToString("N"));
+                return Ok(result > 0);
             });
         }
 
@@ -272,6 +260,23 @@ namespace Sheaft.Application.Handlers
                 var success = await _context.SaveChangesAsync(token) > 0;
                 return Ok(success);
             });
+        }
+
+        private async Task<Result<bool>> UpdateOidcUserAsync(Business entity, List<Guid> roles, CancellationToken token)
+        {
+            var oidcUser = new IdentityUserInput(entity.Id, entity.Email, entity.Name, entity.FirstName, entity.LastName, roles)
+            {
+                Phone = entity.Phone,
+                Picture = entity.Picture
+            };
+
+            var oidcResult = await _httpClient.PutAsync(_authOptions.Actions.Profile,
+                new StringContent(JsonConvert.SerializeObject(oidcUser), Encoding.UTF8, "application/json"), token);
+
+            if (!oidcResult.IsSuccessStatusCode)
+                return Failed<bool>(new Exception(await oidcResult.Content.ReadAsStringAsync().ConfigureAwait(false)));
+
+            return Ok(true);
         }
 
         private async Task RegisterSponsorAsync(string code, User user, RequestUser requestUser, CancellationToken token)
@@ -302,7 +307,7 @@ namespace Sheaft.Application.Handlers
             }
         }
 
-        private async Task<Store> CreateStoreAsync(RegisterStoreCommand request, UserAddress address, CancellationToken token)
+        private async Task<Result<Store>> CreateStoreAsync(RegisterStoreCommand request, UserAddress address, CancellationToken token)
         {
             var openingHours = new List<TimeSlotHour>();
             if (request.OpeningHours == null)
@@ -322,13 +327,16 @@ namespace Sheaft.Application.Handlers
                 store.SetTags(tags);
             }
 
-            var picture = await _imageService.HandleUserImageAsync(store.Id, request.Picture, token);
-            store.SetPicture(picture);
+            var resultImage = await _imageService.HandleUserImageAsync(store.Id, request.Picture, token);
+            if (!resultImage.Success)
+                return Failed<Store>(resultImage.Exception);
 
-            return store;
+            store.SetPicture(resultImage.Data);
+
+            return Ok(store);
         }
 
-        private async Task<Producer> CreateProducerAsync(RegisterProducerCommand request, UserAddress address, CancellationToken token)
+        private async Task<Result<Producer>> CreateProducerAsync(RegisterProducerCommand request, UserAddress address, CancellationToken token)
         {
             var producer = new Producer(Guid.NewGuid(), request.Name, request.FirstName, request.LastName, request.Email,
                 request.Siret, request.VatIdentifier, address, request.OpenForNewBusiness, request.Phone, request.Description);
@@ -339,10 +347,13 @@ namespace Sheaft.Application.Handlers
                 producer.SetTags(tags);
             }
 
-            var picture = await _imageService.HandleUserImageAsync(producer.Id, request.Picture, token);
-            producer.SetPicture(picture);
+            var resultImage = await _imageService.HandleUserImageAsync(producer.Id, request.Picture, token);
+            if (!resultImage.Success)
+                return Failed<Producer>(resultImage.Exception);
 
-            return producer;
+            producer.SetPicture(resultImage.Data);
+
+            return Ok(producer);
         }
     }
 }

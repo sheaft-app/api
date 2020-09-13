@@ -16,7 +16,7 @@ using Sheaft.Domain.Views;
 
 namespace Sheaft.Application.Handlers
 {
-    public class ZoneCommandsHandler : CommandsHandler,
+    public class ZoneCommandsHandler : ResultsHandler,
         IRequestHandler<UpdateZoneProgressCommand, Result<bool>>,
         IRequestHandler<GenerateZonesFileCommand, Result<bool>>
     {

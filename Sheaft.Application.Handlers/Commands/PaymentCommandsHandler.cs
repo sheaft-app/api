@@ -11,7 +11,7 @@ using Sheaft.Services.Interop;
 
 namespace Sheaft.Application.Handlers
 {
-    public class PaymentCommandsHandler : CommandsHandler,
+    public class PaymentCommandsHandler : ResultsHandler,
            IRequestHandler<CreateBankAccountCommand, Result<Guid>>
     {
         private readonly IAppDbContext _context;

@@ -12,7 +12,7 @@ using Sheaft.Interop.Enums;
 
 namespace Sheaft.Application.Handlers
 {
-    public class ReturnableCommandsHandler : CommandsHandler,
+    public class ReturnableCommandsHandler : ResultsHandler,
         IRequestHandler<CreateReturnableCommand, Result<Guid>>,
         IRequestHandler<UpdateReturnableCommand, Result<bool>>,
         IRequestHandler<DeleteReturnableCommand, Result<bool>>,

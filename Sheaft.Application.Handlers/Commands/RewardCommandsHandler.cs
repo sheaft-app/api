@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Sheaft.Application.Handlers
 {
-    public class RewardCommandsHandler : CommandsHandler,
+    public class RewardCommandsHandler : ResultsHandler,
         IRequestHandler<CreateRewardCommand, Result<Guid>>,
         IRequestHandler<UpdateRewardCommand, Result<bool>>,
         IRequestHandler<DeleteRewardCommand, Result<bool>>,

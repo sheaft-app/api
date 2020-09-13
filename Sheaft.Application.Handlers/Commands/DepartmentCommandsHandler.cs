@@ -12,7 +12,7 @@ using System.Linq;
 
 namespace Sheaft.Application.Handlers
 {
-    public class DepartmentCommandsHandler : CommandsHandler,
+    public class DepartmentCommandsHandler : ResultsHandler,
         IRequestHandler<UpdateDepartmentCommand, Result<bool>>,
         IRequestHandler<UpdateDepartmentStatsCommand, Result<bool>>
     {

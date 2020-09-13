@@ -26,19 +26,20 @@ using System.Collections.Generic;
 
 namespace Sheaft.Application.Handlers
 {
-    public class UserCommandsHandler : CommandsHandler,
+    public class UserCommandsHandler : ResultsHandler,
             IRequestHandler<QueueExportUserDataCommand, Result<Guid>>,
             IRequestHandler<ExportUserDataCommand, Result<bool>>,
             IRequestHandler<GenerateUserCodeCommand, Result<string>>,
             IRequestHandler<CreateUserPointsCommand, Result<bool>>,
             IRequestHandler<ChangeUserRolesCommand, Result<bool>>,
             IRequestHandler<UpdateUserPictureCommand, Result<bool>>,
+            IRequestHandler<DeleteUserCommand, Result<bool>>,
             IRequestHandler<RemoveUserDataCommand, Result<string>>
     {
         private readonly IAppDbContext _context;
         private readonly IMediator _mediatr;
         private readonly IIdentifierService _identifierService;
-        private readonly IQueueService _queuesService;
+        private readonly IQueueService _queueService;
         private readonly IBlobService _blobService;
         private readonly IImageService _imageService;
         private readonly ScoringOptions _scoringOptions;
@@ -56,7 +57,7 @@ namespace Sheaft.Application.Handlers
             IHttpClientFactory httpClientFactory,
             IIdentifierService identifierService,
             IAppDbContext context,
-            IQueueService queuesService,
+            IQueueService queueService,
             IBlobService blobService,
             IImageService imageService,
             ILogger<UserCommandsHandler> logger,
@@ -71,7 +72,7 @@ namespace Sheaft.Application.Handlers
             _context = context;
             _mediatr = mediatr;
             _identifierService = identifierService;
-            _queuesService = queuesService;
+            _queueService = queueService;
             _blobService = blobService;
 
             _httpClient = httpClientFactory.CreateClient("identityServer");
@@ -159,11 +160,13 @@ namespace Sheaft.Application.Handlers
             {
                 var entity = await _context.GetByIdAsync<User>(request.Id, token);
 
-                var picture = await _imageService.HandleUserImageAsync(request.Id, request.Picture, token);
-                entity.SetPicture(picture);
+                var resultImage = await _imageService.HandleUserImageAsync(request.Id, request.Picture, token);
+                if (!resultImage.Success)
+                    return Failed<bool>(resultImage.Exception);
+
+                entity.SetPicture(resultImage.Data);
 
                 var oidcUser = new IdentityPictureInput(request.Id, entity.Picture);
-
                 var oidcResult = await _httpClient.PutAsync(_authOptions.Actions.Picture, new StringContent(JsonConvert.SerializeObject(oidcUser), Encoding.UTF8, "application/json"), token);
                 if (!oidcResult.IsSuccessStatusCode)
                     return BadRequest<bool>(MessageKind.Oidc_UpdatePicture_Error, await oidcResult.Content.ReadAsStringAsync());
@@ -190,7 +193,7 @@ namespace Sheaft.Application.Handlers
                 await _context.AddAsync(point, token);
                 await _context.SaveChangesAsync(token);
 
-                await _queuesService.ProcessEventAsync(UserPointsCreatedEvent.QUEUE_NAME, new UserPointsCreatedEvent(request.RequestUser) { UserId = user.Id, Kind = request.Kind, Points = quantity, CreatedOn = request.CreatedOn }, token);
+                await _queueService.ProcessEventAsync(UserPointsCreatedEvent.QUEUE_NAME, new UserPointsCreatedEvent(request.RequestUser) { UserId = user.Id, Kind = request.Kind, Points = quantity, CreatedOn = request.CreatedOn }, token);
 
                 return Ok(true);
             });
@@ -208,7 +211,7 @@ namespace Sheaft.Application.Handlers
                 await _context.AddAsync(entity, token);
                 await _context.SaveChangesAsync(token);
 
-                await _queuesService.InsertJobToProcessAsync(entity, token);
+                await _queueService.InsertJobToProcessAsync(entity, token);
                 Logger.LogInformation($"User RGPD data export successfully initiated by {request.RequestUser.Id}");
 
                 return Ok(entity.Id);
@@ -228,7 +231,7 @@ namespace Sheaft.Application.Handlers
                     if (!startResult.Success)
                         throw startResult.Exception;
 
-                    await _queuesService.ProcessEventAsync(ExportUserDataProcessingEvent.QUEUE_NAME, new ExportUserDataProcessingEvent(request.RequestUser) { Id = request.Id, JobId = job.Id }, token);
+                    await _queueService.ProcessEventAsync(ExportUserDataProcessingEvent.QUEUE_NAME, new ExportUserDataProcessingEvent(request.RequestUser) { Id = request.Id, JobId = job.Id }, token);
 
                     using (var stream = new MemoryStream())
                     {
@@ -241,7 +244,7 @@ namespace Sheaft.Application.Handlers
                         if (!response.Success)
                             throw response.Exception;
 
-                        await _queuesService.ProcessEventAsync(ExportUserDataSucceededEvent.QUEUE_NAME, new ExportUserDataSucceededEvent(request.RequestUser) { Id = job.Id, JobId = job.Id }, token);
+                        await _queueService.ProcessEventAsync(ExportUserDataSucceededEvent.QUEUE_NAME, new ExportUserDataSucceededEvent(request.RequestUser) { Id = job.Id, JobId = job.Id }, token);
 
                         Logger.LogInformation($"RGPD data for user {request.RequestUser.Id} successfully exported");
                         return await _mediatr.Send(new CompleteJobCommand(request.RequestUser) { Id = job.Id, FileUrl = response.Data });
@@ -249,10 +252,42 @@ namespace Sheaft.Application.Handlers
                 }
                 catch (Exception e)
                 {
-                    await _queuesService.ProcessEventAsync(ExportUserDataFailedEvent.QUEUE_NAME, new ExportUserDataFailedEvent(request.RequestUser) { Id = request.Id, JobId = job.Id }, token);
+                    await _queueService.ProcessEventAsync(ExportUserDataFailedEvent.QUEUE_NAME, new ExportUserDataFailedEvent(request.RequestUser) { Id = request.Id, JobId = job.Id }, token);
                     return await _mediatr.Send(new FailJobCommand(request.RequestUser) { Id = job.Id, Reason = e.Message }, token);
                 }
 
+            });
+        }
+
+        public async Task<Result<bool>> Handle(DeleteUserCommand request, CancellationToken token)
+        {
+            return await ExecuteAsync(async () =>
+            {
+                using (var transaction = await _context.Database.BeginTransactionAsync(token))
+                {
+                    var entity = await _context.GetByIdAsync<User>(request.Id, token);
+
+                    var hasActiveOrders = await _context.AnyAsync<PurchaseOrder>(o => (o.Vendor.Id == entity.Id || o.Sender.Id == entity.Id) && (int)o.Status < 6, token);
+                    if (hasActiveOrders)
+                        return ValidationError<bool>(MessageKind.Consumer_CannotBeDeleted_HasActiveOrders);
+
+                    var oidcResult = await _httpClient.DeleteAsync(string.Format(_authOptions.Actions.Delete, entity.Id.ToString("N")), token);
+                    if (!oidcResult.IsSuccessStatusCode)
+                        return Failed<bool>(new BadRequestException(MessageKind.Oidc_DeleteProfile_Error, await oidcResult.Content.ReadAsStringAsync().ConfigureAwait(false)));
+
+                    var email = entity.Email;
+
+                    entity.Close(request.Reason);
+                    _context.Update(entity);
+
+                    var result = await _context.SaveChangesAsync(token);
+                    await transaction.CommitAsync(token);
+
+                    await _cache.RemoveAsync(entity.Id.ToString("N"));
+                    await _queueService.ProcessCommandAsync(RemoveUserDataCommand.QUEUE_NAME, new RemoveUserDataCommand(request.RequestUser) { Id = request.Id, Email = email }, token);
+
+                    return Ok(result > 0);
+                }
             });
         }
 

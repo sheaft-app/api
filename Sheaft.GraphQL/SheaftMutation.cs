@@ -472,13 +472,6 @@ namespace Sheaft.GraphQL
             return await ExecuteCommandAsync<UpdateUserPictureCommand, bool>(_mapper.Map(input, new UpdateUserPictureCommand(_currentUser)), _cancellationToken);
         }
 
-        [Authorize(Policy = Policies.OWNER)]
-        [GraphQLName("deleteBusiness")]
-        public async Task<bool> DeleteBusinessAsync(IdWithReasonInput input)
-        {
-            return await ExecuteCommandAsync<DeleteBusinessCommand, bool>(_mapper.Map(input, new DeleteBusinessCommand(_currentUser)), _cancellationToken);
-        }
-
         [Authorize(Policy = Policies.STORE_OR_PRODUCER)]
         [GraphQLName("setBusinessLegals")]
         public async Task<bool> SetBusinessLegalsAsync(SetBusinessLegalsInput input)
@@ -508,18 +501,18 @@ namespace Sheaft.GraphQL
             return consumerQueries.GetConsumer(input.Id, _currentUser);
         }
 
-        [Authorize(Policy = Policies.REGISTERED)]
-        [GraphQLName("deleteConsumer")]
-        public async Task<bool> DeleteUserAsync(IdWithReasonInput input)
-        {
-            return await ExecuteCommandAsync<DeleteConsumerCommand, bool>(_mapper.Map(input, new DeleteConsumerCommand(_currentUser)), _cancellationToken);
-        }
-
         [Authorize(Policy = Policies.CONSUMER)]
         [GraphQLName("setConsumerLegals")]
         public async Task<bool> SetConsumerLegalsAsync(SetConsumerLegalsInput input)
         {
             return await ExecuteCommandAsync<SetConsumerLegalsCommand, bool>(_mapper.Map(input, new SetConsumerLegalsCommand(_currentUser)), _cancellationToken);
+        }
+
+        [Authorize(Policy = Policies.REGISTERED)]
+        [GraphQLName("deleteUser")]
+        public async Task<bool> DeleteUserAsync(IdWithReasonInput input)
+        {
+            return await ExecuteCommandAsync<DeleteUserCommand, bool>(_mapper.Map(input, new DeleteUserCommand(_currentUser)), _cancellationToken);
         }
 
         [Authorize(Policy = Policies.STORE)]

@@ -16,7 +16,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Sheaft.Application.Handlers
 {
-    public class PurchaseOrderCommandsHandler : CommandsHandler,
+    public class PurchaseOrderCommandsHandler : ResultsHandler,
         IRequestHandler<CreatePurchaseOrderCommand, Result<Guid>>,
 
         IRequestHandler<AcceptPurchaseOrdersCommand, Result<bool>>,

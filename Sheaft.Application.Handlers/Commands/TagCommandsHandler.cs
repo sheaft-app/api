@@ -21,7 +21,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Sheaft.Application.Handlers
 {
-    public class TagCommandsHandler : CommandsHandler,
+    public class TagCommandsHandler : ResultsHandler,
         IRequestHandler<CreateTagCommand, Result<Guid>>,
         IRequestHandler<UpdateTagCommand, Result<bool>>,
         IRequestHandler<DeleteTagCommand, Result<bool>>,

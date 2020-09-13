@@ -15,7 +15,7 @@ using Sheaft.Application.Events;
 
 namespace Sheaft.Application.Handlers
 {
-    public class OrderCommandsHandler : CommandsHandler,
+    public class OrderCommandsHandler : ResultsHandler,
         IRequestHandler<CreateConsumerOrderCommand, Result<Guid>>,
         IRequestHandler<CreateBusinessOrderCommand, Result<IEnumerable<Guid>>>,
         IRequestHandler<PayOrderCommand, Result<Guid>>,

@@ -20,7 +20,7 @@ using Sheaft.Services.Interop;
 
 namespace Sheaft.Application.Handlers
 {
-    public class ProductCommandsHandler : CommandsHandler,
+    public class ProductCommandsHandler : ResultsHandler,
         IRequestHandler<CreateProductCommand, Result<Guid>>,
         IRequestHandler<UpdateProductCommand, Result<bool>>,
         IRequestHandler<SetProductAvailabilityCommand, Result<bool>>,
@@ -70,11 +70,11 @@ namespace Sheaft.Application.Handlers
                 }
                 else
                 {
-                    var result = await _identifierService.GetNextProductReferenceAsync(request.RequestUser.Id, token);
-                    if (!result.Success)
-                        return Failed<Guid>(result.Exception);
+                    var resultIdentifier = await _identifierService.GetNextProductReferenceAsync(request.RequestUser.Id, token);
+                    if (!resultIdentifier.Success)
+                        return Failed<Guid>(resultIdentifier.Exception);
 
-                    request.Reference = result.Data;
+                    request.Reference = resultIdentifier.Data;
                 }
 
                 var entity = new Product(Guid.NewGuid(), request.Reference, request.Name, request.WholeSalePricePerUnit, request.Conditioning, request.Unit, request.QuantityPerUnit, request.Vat, producer);
@@ -92,8 +92,11 @@ namespace Sheaft.Application.Handlers
                 var tags = await _context.FindAsync<Tag>(t => request.Tags.Contains(t.Id), token);
                 entity.SetTags(tags);
 
-                var picture = await _imageService.HandleProductImageAsync(entity, request.Picture, token);                
-                entity.SetImage(picture);
+                var resultImage = await _imageService.HandleProductImageAsync(entity, request.Picture, token);
+                if (!resultImage.Success)
+                    return Failed<Guid>(resultImage.Exception);
+
+                entity.SetImage(resultImage.Data);
 
                 await _context.AddAsync(entity, token);
                 await _context.SaveChangesAsync(token);
@@ -133,8 +136,11 @@ namespace Sheaft.Application.Handlers
                 var tags = await _context.FindAsync<Tag>(t => request.Tags.Contains(t.Id), token);
                 entity.SetTags(tags);
 
-                var picture = await _imageService.HandleProductImageAsync(entity, request.Picture, token);
-                entity.SetImage(picture);
+                var resultImage = await _imageService.HandleProductImageAsync(entity, request.Picture, token);
+                if (!resultImage.Success)
+                    return Failed<bool>(resultImage.Exception);
+
+                entity.SetImage(resultImage.Data);
 
                 _context.Update(entity);
                 var result = await _context.SaveChangesAsync(token);
@@ -325,8 +331,11 @@ namespace Sheaft.Application.Handlers
             {
                 var entity = await _context.GetByIdAsync<Product>(request.Id, token);
 
-                var picture = await _imageService.HandleProductImageAsync(entity, request.Picture, token);
-                entity.SetImage(picture);
+                var resultImage = await _imageService.HandleProductImageAsync(entity, request.Picture, token);
+                if (!resultImage.Success)
+                    return Failed<bool>(resultImage.Exception);
+
+                entity.SetImage(resultImage.Data);
 
                 _context.Update(entity);
                 var result = await _context.SaveChangesAsync(token);

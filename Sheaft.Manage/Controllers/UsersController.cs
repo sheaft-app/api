@@ -148,7 +148,7 @@ namespace Sheaft.Manage.Controllers
             var name = entity.Name;
 
             var requestUser = await GetRequestUser(token);
-            var result = await _mediatr.Send(new DeleteConsumerCommand(requestUser)
+            var result = await _mediatr.Send(new DeleteUserCommand(requestUser)
             {
                 Id = id
             }, token);

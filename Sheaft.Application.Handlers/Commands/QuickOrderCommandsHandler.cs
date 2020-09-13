@@ -12,7 +12,7 @@ using Sheaft.Infrastructure.Interop;
 
 namespace Sheaft.Application.Handlers
 {
-    public class QuickOrderCommandsHandler : CommandsHandler,
+    public class QuickOrderCommandsHandler : ResultsHandler,
         IRequestHandler<CreateQuickOrderCommand, Result<Guid>>,
         IRequestHandler<UpdateQuickOrderCommand, Result<bool>>,
         IRequestHandler<UpdateQuickOrderProductsCommand, Result<bool>>,

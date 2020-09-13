@@ -11,7 +11,7 @@ using Sheaft.Domain.Models;
 
 namespace Sheaft.Application.Handlers
 {
-    public class DocumentCommandsHandler : CommandsHandler,
+    public class DocumentCommandsHandler : ResultsHandler,
         IRequestHandler<CreateDocumentCommand, Result<Guid>>,
         IRequestHandler<UploadDocumentCommand, Result<bool>>,
         IRequestHandler<UploadPageCommand, Result<bool>>,

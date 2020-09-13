@@ -7,26 +7,27 @@ namespace Sheaft.Core
     public class Result<T>
     {
         public T Data { get; }
-
-        public bool Success => Data != null;
+        public bool Success { get; }
         public SheaftException Exception { get; }
         public MessageKind? Message { get; }
         public object[] Params { get; }
 
         // with result
-        
-        public Result(T data, MessageKind? message = null, params object[] objs) : this(message, objs)
+
+        protected Result(bool success, T data, MessageKind? message = null, params object[] objs) : this(message, objs)
         {
+            Success = success;
             Data = data;
         }
 
         // exception result
 
-        public Result(Exception exception, MessageKind? message = null, params object[] objs) : this(new SheaftException(ExceptionKind.Unexpected, exception), message, objs)
+        protected Result(Exception exception, MessageKind? message = null, params object[] objs) : this(new SheaftException(ExceptionKind.Unexpected, exception), message, objs)
         {
         }
-        public Result(SheaftException exception, MessageKind? message = null, params object[] objs) : this(message ?? MessageKind.Unexpected, objs)
+        protected Result(SheaftException exception, MessageKind? message = null, params object[] objs) : this(message ?? MessageKind.Unexpected, objs)
         {
+            Success = false;
             Exception = exception;
         }
 
@@ -34,6 +35,26 @@ namespace Sheaft.Core
         {
             Message = message;
             Params = objs;
+        }
+    }
+
+    public class SuccessResult<T> : Result<T>
+    {
+        public SuccessResult(T data, MessageKind? message = null, params object[] objs)
+            :base(true, data, message, objs)
+        {
+        }
+    }
+
+    public class FailedResult<T> : Result<T>
+    {
+        public FailedResult(Exception e, MessageKind? message = null, params object[] objs)
+            : base(e, message, objs)
+        {
+        }
+        public FailedResult(SheaftException e, MessageKind? message = null, params object[] objs)
+            : base(e, message, objs)
+        {
         }
     }
 }

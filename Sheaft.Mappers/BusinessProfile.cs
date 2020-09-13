@@ -48,7 +48,6 @@ namespace Sheaft.Mappers
             CreateMap<UpdateStoreInput, UpdateStoreCommand>();
             CreateMap<UpdateProducerInput, UpdateProducerCommand>();
             CreateMap<UpdatePictureInput, UpdateUserPictureCommand>();
-            CreateMap<IdWithReasonInput, DeleteBusinessCommand>();
         }
     }
 }

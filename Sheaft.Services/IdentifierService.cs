@@ -1,5 +1,6 @@
 ﻿using Microsoft.Azure.Cosmos.Table;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Powells.CouponCode;
 using Sheaft.Application.Commands;
@@ -18,13 +19,16 @@ using System.Threading.Tasks;
 
 namespace Sheaft.Services
 {
-    public class IdentifierService : IIdentifierService
+    public class IdentifierService : ResultsHandler, IIdentifierService
     {
         private readonly CloudTableClient _tableClient;
         private readonly StorageOptions _storageOptions;
-        private readonly SponsoringOptions _sponsoringOptions;
+        private readonly SponsoringOptions _sponsoringOptions;        
 
-        public IdentifierService(IOptionsSnapshot<StorageOptions> storageOptions, IOptionsSnapshot<SponsoringOptions> sponsoringOptions)
+        public IdentifierService(
+            IOptionsSnapshot<StorageOptions> storageOptions, 
+            IOptionsSnapshot<SponsoringOptions> sponsoringOptions,
+            ILogger<IdentifierService> logger) : base(logger)
         {
             _storageOptions = storageOptions.Value;
             _sponsoringOptions = sponsoringOptions.Value;
@@ -67,27 +71,33 @@ namespace Sheaft.Services
 
         public async Task<Result<string>> GetNextOrderReferenceAsync(Guid serialNumber, CancellationToken token)
         {
-            var uuid = await GetNextUuidAsync(_storageOptions.Tables.OrdersReferences, serialNumber, token);
-            if (!uuid.Success)
-                return new Result<string>(uuid.Exception);
+            return await ExecuteAsync(async () =>
+            {
+                var uuid = await GetNextUuidAsync(_storageOptions.Tables.OrdersReferences, serialNumber, token);
+                if (!uuid.Success)
+                    return Failed<string>(uuid.Exception);
 
-            var identifier = GenerateEanIdentifier(uuid.Data, 13);
-            return new Result<string>(identifier);
+                var identifier = GenerateEanIdentifier(uuid.Data, 13);
+                return Ok(identifier);
+            });
         }
 
         public async Task<Result<string>> GetNextProductReferenceAsync(Guid serialNumber, CancellationToken token)
         {
-            var uuid = await GetNextUuidAsync(_storageOptions.Tables.ProductsReferences, serialNumber, token);
-            if (!uuid.Success)
-                return new Result<string>(uuid.Exception);
+            return await ExecuteAsync(async () =>
+            {
+                var uuid = await GetNextUuidAsync(_storageOptions.Tables.ProductsReferences, serialNumber, token);
+                if (!uuid.Success)
+                    return Failed<string>(uuid.Exception);
 
-            var identifier = GenerateEanIdentifier(uuid.Data, 13);
-            return new Result<string>(identifier);
+                var identifier = GenerateEanIdentifier(uuid.Data, 13);
+                return Ok(identifier);
+            });
         }
 
         public async Task<Result<string>> GetNextSponsoringCode(CancellationToken token)
         {
-            try
+            return await ExecuteAsync(async () =>
             {
                 var table = _tableClient.GetTableReference(_storageOptions.Tables.SponsoringCodes);
                 await table.CreateIfNotExistsAsync(token);
@@ -130,12 +140,8 @@ namespace Sheaft.Services
                     }
                 } while (concurrentUpdateError);
 
-                return new Result<string>(code);
-            }
-            catch (Exception e)
-            {
-                return new Result<string>(e, MessageKind.Identifier_SponsorCode_Error);
-            }
+                return Ok(code);
+            });
         }
         private static string GenerateEanIdentifier(long value, int length)
         {
@@ -172,7 +178,7 @@ namespace Sheaft.Services
 
         private async Task<Result<long>> GetNextUuidAsync(string container, Guid identifier, CancellationToken token)
         {
-            try
+            return await ExecuteAsync(async () =>
             {
                 var table = _tableClient.GetTableReference(container);
                 await table.CreateIfNotExistsAsync(token);
@@ -216,12 +222,8 @@ namespace Sheaft.Services
                     }
                 } while (concurrentUpdateError);
 
-                return new Result<long>(id);
-            }
-            catch (Exception e)
-            {
-                return new Result<long>(e, MessageKind.Identifier_Uuid_Error);
-            }
+                return Ok(id);
+            });
         }
 
         private class IdentifierTableEntity : TableEntity

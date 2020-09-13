@@ -15,7 +15,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Sheaft.Application.Handlers
 {
-    public class AgreementCommandsHandler : CommandsHandler,
+    public class AgreementCommandsHandler : ResultsHandler,
         IRequestHandler<CreateAgreementCommand, Result<Guid>>,
         IRequestHandler<AcceptAgreementCommand, Result<bool>>,
         IRequestHandler<CancelAgreementsCommand, Result<bool>>,

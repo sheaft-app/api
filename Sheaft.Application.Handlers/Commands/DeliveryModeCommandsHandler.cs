@@ -14,7 +14,7 @@ using Sheaft.Interop.Enums;
 
 namespace Sheaft.Application.Handlers
 {
-    public class DeliveryModeCommandsHandler : CommandsHandler,
+    public class DeliveryModeCommandsHandler : ResultsHandler,
         IRequestHandler<CreateDeliveryModeCommand, Result<Guid>>,
         IRequestHandler<UpdateDeliveryModeCommand, Result<bool>>,
         IRequestHandler<DeleteDeliveryModeCommand, Result<bool>>,
