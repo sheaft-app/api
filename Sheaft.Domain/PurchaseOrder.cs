@@ -10,7 +10,6 @@ namespace Sheaft.Domain.Models
     public class PurchaseOrder : IEntity
     {
         private const int DIGITS_COUNT = 2;
-
         private List<PurchaseOrderProduct> _products;
 
         protected PurchaseOrder()
@@ -61,10 +60,7 @@ namespace Sheaft.Domain.Models
         public virtual PurchaseOrderSender Sender { get; private set; }
         public virtual ExpectedDelivery ExpectedDelivery { get; private set; }
         public virtual PurchaseOrderVendor Vendor { get; private set; }
-        public virtual IReadOnlyCollection<PurchaseOrderProduct> Products
-        {
-            get => _products?.AsReadOnly();
-        }
+        public virtual IReadOnlyCollection<PurchaseOrderProduct> Products => _products?.AsReadOnly();
 
         public void SetReference(string newReference)
         {
@@ -166,6 +162,7 @@ namespace Sheaft.Domain.Models
             productLine.SetQuantity(quantity);
             RefreshOrder();
         }
+
         public void RemoveProducts(IEnumerable<Product> products)
         {
             foreach (var product in products)
@@ -238,7 +235,7 @@ namespace Sheaft.Domain.Models
             Vendor = new PurchaseOrderVendor(vendor);
         }
 
-        protected void RefreshOrder()
+        private void RefreshOrder()
         {
             LinesCount = _products.Count;
             ProductsCount = _products.Sum(p => p.Quantity);

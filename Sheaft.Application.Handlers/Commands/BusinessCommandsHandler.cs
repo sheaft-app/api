@@ -25,13 +25,13 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Sheaft.Application.Handlers
 {
-    public class CompanyCommandsHandler : CommandsHandler,
+    public class BusinessCommandsHandler : CommandsHandler,
         IRequestHandler<RegisterProducerCommand, Result<Guid>>,
         IRequestHandler<RegisterStoreCommand, Result<Guid>>,
         IRequestHandler<UpdateProducerCommand, Result<bool>>,
         IRequestHandler<UpdateStoreCommand, Result<bool>>,
-        IRequestHandler<DeleteCompanyCommand, Result<bool>>,
-        IRequestHandler<SetCompanyLegalsCommand, Result<bool>>
+        IRequestHandler<DeleteBusinessCommand, Result<bool>>,
+        IRequestHandler<SetBusinessLegalsCommand, Result<bool>>
     {
         private readonly IAppDbContext _context;
         private readonly IQueueService _queueService;
@@ -41,14 +41,14 @@ namespace Sheaft.Application.Handlers
         private readonly AuthOptions _authOptions;
         private readonly IDistributedCache _cache;
 
-        public CompanyCommandsHandler(
+        public BusinessCommandsHandler(
             IOptionsSnapshot<AuthOptions> authOptions,
             IDistributedCache cache,
             IAppDbContext context,
             IQueueService queueService,
             IImageService imageService,
             IHttpClientFactory httpClientFactory,
-            ILogger<CompanyCommandsHandler> logger,
+            ILogger<BusinessCommandsHandler> logger,
             IOptionsSnapshot<RoleOptions> roleOptions) : base(logger)
         {
             _authOptions = authOptions.Value;
@@ -69,7 +69,7 @@ namespace Sheaft.Application.Handlers
             {
                 using (var transaction = await _context.Database.BeginTransactionAsync(token))
                 {
-                    var user = await _context.FindByIdAsync<User>(request.Owner.Id, token);
+                    var user = await _context.FindByIdAsync<User>(request.Id, token);
                     if (user != null)
                         return Conflict<Guid>(MessageKind.Register_User_AlreadyExists);
 
@@ -99,11 +99,11 @@ namespace Sheaft.Application.Handlers
                     if (!oidcResult.IsSuccessStatusCode)
                         return Failed<Guid>(new BadRequestException(MessageKind.Oidc_Register_Error, await oidcResult.Content.ReadAsStringAsync()));
 
-                    await RegisterSponsorAsync(request.Owner.SponsoringCode, user, request.RequestUser, token);
+                    await RegisterSponsorAsync(request.SponsoringCode, user, request.RequestUser, token);
                     await transaction.CommitAsync(token);
 
                     await _cache.RemoveAsync(user.Id.ToString("N"));
-                    return Created(request.Owner.Id);
+                    return Created(request.Id);
                 }
             });
         }
@@ -114,7 +114,7 @@ namespace Sheaft.Application.Handlers
             {
                 using (var transaction = await _context.Database.BeginTransactionAsync(token))
                 {
-                    var user = await _context.FindByIdAsync<User>(request.Owner.Id, token);
+                    var user = await _context.FindByIdAsync<User>(request.Id, token);
                     if (user != null)
                         return Conflict<Guid>(MessageKind.Register_User_AlreadyExists);
 
@@ -144,12 +144,12 @@ namespace Sheaft.Application.Handlers
                     if (!oidcResult.IsSuccessStatusCode)
                         return Failed<Guid>(new BadRequestException(MessageKind.Oidc_Register_Error, await oidcResult.Content.ReadAsStringAsync()));
 
-                    await RegisterSponsorAsync(request.Owner.SponsoringCode, user, request.RequestUser, token);
+                    await RegisterSponsorAsync(request.SponsoringCode, user, request.RequestUser, token);
 
                     await transaction.CommitAsync(token);
 
                     await _cache.RemoveAsync(user.Id.ToString("N"));
-                    return Created(request.Owner.Id);
+                    return Created(request.Id);
                 }
             });
         }
@@ -174,10 +174,6 @@ namespace Sheaft.Application.Handlers
 
                 entity.SetAddress(request.Address.Line1, request.Address.Line2, request.Address.Zipcode,
                     request.Address.City, request.Address.Country, department, request.Address.Longitude, request.Address.Latitude);
-
-                if (request.BillingAddress != null)
-                    entity.SetBillingAddress(request.Address.Line1, request.Address.Line2, request.Address.Zipcode,
-                        request.Address.City, request.Address.Country);
 
                 var picture = await _imageService.HandleUserImageAsync(entity.Id, request.Picture, token);
                 entity.SetPicture(picture);
@@ -225,10 +221,6 @@ namespace Sheaft.Application.Handlers
                 entity.SetAddress(request.Address.Line1, request.Address.Line2, request.Address.Zipcode,
                     request.Address.City, request.Address.Country, department, request.Address.Longitude, request.Address.Latitude);
                 
-                if(request.BillingAddress != null)
-                    entity.SetBillingAddress(request.Address.Line1, request.Address.Line2, request.Address.Zipcode,
-                        request.Address.City, request.Address.Country);
-
                 var picture = await _imageService.HandleUserImageAsync(entity.Id, request.Picture, token);
                 entity.SetPicture(picture);
 
@@ -243,11 +235,11 @@ namespace Sheaft.Application.Handlers
             });
         }
 
-        public async Task<Result<bool>> Handle(DeleteCompanyCommand request, CancellationToken token)
+        public async Task<Result<bool>> Handle(DeleteBusinessCommand request, CancellationToken token)
         {
             return await ExecuteAsync(async () =>
             {
-                var entity = await _context.GetByIdAsync<Company>(request.Id, token);
+                var entity = await _context.GetByIdAsync<Business>(request.Id, token);
                 var email = entity.Email;
 
                 entity.Close(request.Reason);
@@ -266,19 +258,12 @@ namespace Sheaft.Application.Handlers
             });
         }
 
-        public async Task<Result<bool>> Handle(SetCompanyLegalsCommand request, CancellationToken token)
+        public async Task<Result<bool>> Handle(SetBusinessLegalsCommand request, CancellationToken token)
         {
             return await ExecuteAsync(async () =>
             {
-                var entity = await _context.GetByIdAsync<Company>(request.Id, token);
+                var entity = await _context.GetByIdAsync<Business>(request.Id, token);
 
-                entity.SetLegalAddress(request.LegalAddress.Line1, request.LegalAddress.Line2, request.LegalAddress.Zipcode, request.LegalAddress.City, request.LegalAddress.Country);
-                entity.SetBillingAddress(request.BillingAddress.Line1, request.BillingAddress.Line2, request.BillingAddress.Zipcode, request.BillingAddress.City, request.BillingAddress.Country);
-                
-                entity.SetLegalKind(request.Legal);
-                entity.SetBirthdate(request.Birthdate);
-                entity.SetNationality(request.Nationality);
-                entity.SetCountryOfResidence(request.CountryOfResidence);
 
                 _context.Update(entity);
 
@@ -328,14 +313,8 @@ namespace Sheaft.Application.Handlers
                 }
             }
 
-            var store = new Store(Guid.NewGuid(), request.Name, request.Owner.FirstName, request.Owner.LastName, request.Email,
+            var store = new Store(Guid.NewGuid(), request.Name, request.FirstName, request.LastName, request.Email,
                 request.Siret, request.VatIdentifier, address, openingHours, request.OpenForNewBusiness, request.Phone, request.Description);
-
-            var billingAddress = request.BillingAddress == null ? address
-                : new UserAddress(request.BillingAddress.Line1, request.BillingAddress.Line2, request.BillingAddress.Zipcode, request.BillingAddress.City, request.BillingAddress.Country, null);
-
-            store.SetBillingAddress(billingAddress.Line1, billingAddress.Line2, billingAddress.Zipcode,
-                billingAddress.City, billingAddress.Country);
 
             if (request.Tags != null && request.Tags.Any())
             {
@@ -351,14 +330,8 @@ namespace Sheaft.Application.Handlers
 
         private async Task<Producer> CreateProducerAsync(RegisterProducerCommand request, UserAddress address, CancellationToken token)
         {
-            var producer = new Producer(Guid.NewGuid(), request.Name, request.Owner.FirstName, request.Owner.LastName, request.Email,
+            var producer = new Producer(Guid.NewGuid(), request.Name, request.FirstName, request.LastName, request.Email,
                 request.Siret, request.VatIdentifier, address, request.OpenForNewBusiness, request.Phone, request.Description);
-
-            var billingAddress = request.BillingAddress == null ? address
-                : new UserAddress(request.BillingAddress.Line1, request.BillingAddress.Line2, request.BillingAddress.Zipcode, request.BillingAddress.City, request.BillingAddress.Country, null);
-
-            producer.SetBillingAddress(billingAddress.Line1, billingAddress.Line2, billingAddress.Zipcode,
-                billingAddress.City, billingAddress.Country);
 
             if (request.Tags != null && request.Tags.Any())
             {

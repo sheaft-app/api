@@ -12,11 +12,10 @@ namespace Sheaft.Domain.Models
         {
         }
 
-        protected User(Guid id, ProfileKind kind, LegalKind legal, string name, string firstname, string lastname, string email, string phone = null)
+        protected User(Guid id, ProfileKind kind, string name, string firstname, string lastname, string email, string phone = null)
         {
             Id = id;
 
-            SetLegalKind(legal);
             SetProfileKind(kind);
             SetUserName(name);
             SetEmail(email);
@@ -31,20 +30,15 @@ namespace Sheaft.Domain.Models
         public DateTimeOffset? RemovedOn { get; private set; }
         public string Identifier { get; private set; }
         public ProfileKind Kind { get; private set; }
-        public LegalKind Legal { get; private set; }
         public string Name { get; private set; }
         public string Email { get; private set; }
         public string Phone { get; private set; }
         public string Picture { get; private set; }
         public string FirstName { get; private set; }
         public string LastName { get; private set; }
-        public DateTimeOffset? Birthdate { get; private set; }
-        public CountryIsoCode Nationality { get; private set; }
-        public CountryIsoCode CountryOfResidence { get; private set; }
         public string SponsorshipCode { get; private set; }
         public int TotalPoints { get; private set; }
         public virtual UserAddress Address { get; private set; }
-        public virtual BillingAddress BillingAddress { get; private set; }
 
         public void SetFirstname(string firstname)
         {
@@ -68,30 +62,6 @@ namespace Sheaft.Domain.Models
                 SetUserName($"{FirstName} {LastName}");
         }
 
-        public void SetBirthdate(DateTimeOffset? birthdate)
-        {
-            if (!birthdate.HasValue)
-                return;
-
-            Birthdate = birthdate;
-        }
-
-        public void SetNationality(CountryIsoCode? nationality)
-        {
-            if (nationality == null)
-                return;
-
-            Nationality = nationality.Value;
-        }
-
-        public void SetCountryOfResidence(CountryIsoCode? country)
-        {
-            if (country == null)
-                return;
-
-            CountryOfResidence = country.Value;
-        }
-
         public void SetAddress(Department department)
         {
             Address = new UserAddress(department);
@@ -100,11 +70,6 @@ namespace Sheaft.Domain.Models
         public void SetAddress(string line1, string line2, string zipcode, string city, CountryIsoCode country, Department department, double? longitude = null, double? latitude = null)
         {
             Address = new UserAddress(line1, line2, zipcode, city, country, department, longitude, latitude);
-        }
-
-        public void SetBillingAddress(string line1, string line2, string zipcode, string city, CountryIsoCode country)
-        {
-            BillingAddress = new BillingAddress(line1, line2, zipcode, city, country);
         }
 
         protected void SetUserName(string name)
@@ -121,14 +86,6 @@ namespace Sheaft.Domain.Models
                 return;
 
             Kind = kind.Value;
-        }
-
-        public void SetLegalKind(LegalKind? legal)
-        {
-            if (!legal.HasValue)
-                return;
-
-            Legal = legal.Value;
         }
 
         public void SetEmail(string email)

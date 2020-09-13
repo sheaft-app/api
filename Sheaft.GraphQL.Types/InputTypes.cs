@@ -226,6 +226,7 @@ namespace Sheaft.GraphQL.Types
             descriptor.Field(c => c.Picture);
             descriptor.Field(c => c.QuantityPerUnit);
             descriptor.Field(c => c.Unit);
+            descriptor.Field(c => c.Conditioning);
             descriptor.Field(c => c.Vat);
             descriptor.Field(c => c.Weight);
             descriptor.Field(c => c.WholeSalePricePerUnit);
@@ -261,26 +262,20 @@ namespace Sheaft.GraphQL.Types
                 .Type<NonNullType<IdType>>();
         }
     }
-    public class SetCompanyLegalsInputType : SheaftInputType<SetCompanyLegalsInput>
+    public class SetBusinessLegalsInputType : SheaftInputType<SetBusinessLegalsInput>
     {
-        protected override void Configure(IInputObjectTypeDescriptor<SetCompanyLegalsInput> descriptor)
+        protected override void Configure(IInputObjectTypeDescriptor<SetBusinessLegalsInput> descriptor)
         {
-            descriptor.Field(c => c.Birthdate);
             descriptor.Field(c => c.Id);
+            descriptor.Field(c => c.Email);
 
-            descriptor.Field(c => c.Legal)
+            descriptor.Field(c => c.Kind)
                 .Type<NonNullType<LegalKindEnumType>>();
 
-            descriptor.Field(c => c.CountryOfResidence)
-                .Type<NonNullType<CountryIsoCodeEnumType>>();
+            descriptor.Field(c => c.Owner)
+                .Type<NonNullType<OwnerInputType>>();
 
-            descriptor.Field(c => c.Nationality)
-                .Type<NonNullType<CountryIsoCodeEnumType>>();
-
-            descriptor.Field(c => c.BillingAddress)
-                .Type<NonNullType<AddressInputType>>();
-
-            descriptor.Field(c => c.LegalAddress)
+            descriptor.Field(c => c.Address)
                 .Type<NonNullType<AddressInputType>>();
         }
     }
@@ -288,17 +283,10 @@ namespace Sheaft.GraphQL.Types
     {
         protected override void Configure(IInputObjectTypeDescriptor<SetConsumerLegalsInput> descriptor)
         {
-            descriptor.Field(c => c.Birthdate);
             descriptor.Field(c => c.Id);
 
-            descriptor.Field(c => c.CountryOfResidence)
-                .Type<NonNullType<CountryIsoCodeEnumType>>();
-
-            descriptor.Field(c => c.Nationality)
-                .Type<NonNullType<CountryIsoCodeEnumType>>();
-
-            descriptor.Field(c => c.BillingAddress)
-                .Type<NonNullType<AddressInputType>>();
+            descriptor.Field(c => c.Owner)
+                .Type<NonNullType<OwnerInputType>>();
         }
     }
     public class RegisterStoreInputType : SheaftInputType<RegisterStoreInput>
@@ -310,6 +298,7 @@ namespace Sheaft.GraphQL.Types
             descriptor.Field(c => c.Phone);
             descriptor.Field(c => c.Picture);
             descriptor.Field(c => c.VatIdentifier);
+            descriptor.Field(c => c.SponsoringCode);
 
             descriptor.Field(c => c.Siret)
                 .Type<NonNullType<StringType>>();
@@ -320,17 +309,20 @@ namespace Sheaft.GraphQL.Types
             descriptor.Field(c => c.Email)
                 .Type<NonNullType<StringType>>();
 
-            descriptor.Field(c => c.Name)
+            descriptor.Field(c => c.FirstName)
                 .Type<NonNullType<StringType>>();
 
-            descriptor.Field(c => c.OpeningHours)
-                .Type<ListType<TimeSlotGroupInputType>>();
+            descriptor.Field(c => c.LastName)
+                .Type<NonNullType<StringType>>();
+
+            descriptor.Field(c => c.Name)
+                .Type<NonNullType<StringType>>();
 
             descriptor.Field(c => c.Tags)
                 .Type<ListType<IdType>>();
 
-            descriptor.Field(c => c.Owner)
-                .Type<NonNullType<RegisterOwnerInputType>>();
+            descriptor.Field(c => c.OpeningHours)
+                .Type<ListType<TimeSlotGroupInputType>>();
         }
     }
     public class RegisterProducerInputType : SheaftInputType<RegisterProducerInput>
@@ -342,6 +334,7 @@ namespace Sheaft.GraphQL.Types
             descriptor.Field(c => c.Phone);
             descriptor.Field(c => c.Picture);
             descriptor.Field(c => c.VatIdentifier);
+            descriptor.Field(c => c.SponsoringCode);
 
             descriptor.Field(c => c.Siret)
                 .Type<NonNullType<StringType>>();
@@ -352,14 +345,17 @@ namespace Sheaft.GraphQL.Types
             descriptor.Field(c => c.Email)
                 .Type<NonNullType<StringType>>();
 
+            descriptor.Field(c => c.FirstName)
+                .Type<NonNullType<StringType>>();
+
+            descriptor.Field(c => c.LastName)
+                .Type<NonNullType<StringType>>();
+
             descriptor.Field(c => c.Name)
                 .Type<NonNullType<StringType>>();
 
             descriptor.Field(c => c.Tags)
                 .Type<ListType<IdType>>();
-
-            descriptor.Field(c => c.Owner)
-                .Type<NonNullType<RegisterOwnerInputType>>();
         }
     }
     public class RegisterConsumerInputType : SheaftInputType<RegisterConsumerInput>
@@ -399,25 +395,19 @@ namespace Sheaft.GraphQL.Types
                 .Type<NonNullType<StringType>>();
         }
     }
-    public class RegisterOwnerInputType : SheaftInputType<RegisterOwnerInput>
+    public class OwnerInputType : SheaftInputType<OwnerInput>
     {
-        protected override void Configure(IInputObjectTypeDescriptor<RegisterOwnerInput> descriptor)
+        protected override void Configure(IInputObjectTypeDescriptor<OwnerInput> descriptor)
         {
-            descriptor.Field(c => c.Phone);
-            descriptor.Field(c => c.Picture);
-            descriptor.Field(c => c.SponsoringCode);
+            descriptor.Field(c => c.FirstName);
+            descriptor.Field(c => c.LastName);
+            descriptor.Field(c => c.Email);
+            descriptor.Field(c => c.Birthdate);
+            descriptor.Field(c => c.Nationality);
+            descriptor.Field(c => c.CountryOfResidence);
 
-            descriptor.Field(c => c.Id)
-                .Type<NonNullType<IdType>>();
-
-            descriptor.Field(c => c.Email)
-                .Type<NonNullType<StringType>>();
-
-            descriptor.Field(c => c.FirstName)
-                .Type<NonNullType<StringType>>();
-
-            descriptor.Field(c => c.LastName)
-                .Type<NonNullType<StringType>>();
+            descriptor.Field(c => c.Address)
+                .Type<NonNullType<AddressInputType>>();
         }
     }
     public class SearchTermsInputType : SheaftInputType<SearchTermsInput>
@@ -563,6 +553,7 @@ namespace Sheaft.GraphQL.Types
             descriptor.Field(c => c.Picture);
             descriptor.Field(c => c.QuantityPerUnit);
             descriptor.Field(c => c.Unit);
+            descriptor.Field(c => c.Conditioning);
             descriptor.Field(c => c.Vat);
             descriptor.Field(c => c.Weight);
             descriptor.Field(c => c.WholeSalePricePerUnit);

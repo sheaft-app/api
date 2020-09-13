@@ -2,9 +2,9 @@
 
 namespace Sheaft.Models.Inputs
 {
-    public class RegisterStoreInput : CompanyInput
+    public class RegisterStoreInput : BusinessInput
     {
+        public string SponsoringCode { get; set; }
         public IEnumerable<TimeSlotGroupInput> OpeningHours { get; set; }
-        public RegisterOwnerInput Owner { get; set; }
     }
 }

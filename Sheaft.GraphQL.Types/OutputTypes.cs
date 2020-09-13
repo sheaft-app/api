@@ -179,6 +179,7 @@ namespace Sheaft.GraphQL.Types
         {
             descriptor.Field(c => c.FirstName);
             descriptor.Field(c => c.LastName);
+            descriptor.Field(c => c.Email);
             descriptor.Field(c => c.Birthdate);
 
             descriptor.Field(c => c.CountryOfResidence)
@@ -189,9 +190,6 @@ namespace Sheaft.GraphQL.Types
 
             descriptor.Field(c => c.Address)
                 .Type<AddressType>();
-
-            descriptor.Field(c => c.Legal)
-                .Type<NonNullType<LegalKindEnumType>>();
         }
     }
 
@@ -239,7 +237,7 @@ namespace Sheaft.GraphQL.Types
             descriptor.Field(c => c.Status);
 
             descriptor.Field(c => c.Store)
-                .Type<NonNullType<CompanyProfileType>>();
+                .Type<NonNullType<BusinessProfileType>>();
 
             descriptor.Field(c => c.Delivery)
                 .Type<NonNullType<AgreementDeliveryModeType>>();
@@ -265,7 +263,7 @@ namespace Sheaft.GraphQL.Types
                 .Type<AddressType>();
 
             descriptor.Field(c => c.Producer)
-                .Type<NonNullType<CompanyProfileType>>();
+                .Type<NonNullType<BusinessProfileType>>();
 
             descriptor.Field(c => c.OpeningHours)
                 .Type<ListType<TimeSlotType>>()
@@ -288,7 +286,7 @@ namespace Sheaft.GraphQL.Types
                 .Type<AddressType>();
 
             descriptor.Field(c => c.Producer)
-                .Type<NonNullType<CompanyProfileType>>();
+                .Type<NonNullType<BusinessProfileType>>();
         }
     }
     public class SheaftTimeSpanType : TimeSpanType
@@ -348,9 +346,6 @@ namespace Sheaft.GraphQL.Types
 
             descriptor.Field(c => c.Address)
                 .Type<NonNullType<AddressType>>();
-
-            descriptor.Field(c => c.BillingAddress)
-                .Type<AddressType>();
         }
     }
     public class UserProfileType : SheaftOutputType<UserProfileDto>
@@ -383,15 +378,17 @@ namespace Sheaft.GraphQL.Types
         }
     }
 
-    public class CompanyProfileType : SheaftOutputType<CompanyProfileDto>
+    public class BusinessProfileType : SheaftOutputType<BusinessProfileDto>
     {
-        protected override void Configure(IObjectTypeDescriptor<CompanyProfileDto> descriptor)
+        protected override void Configure(IObjectTypeDescriptor<BusinessProfileDto> descriptor)
         {
             descriptor.Field(c => c.Id).Type<NonNullType<IdType>>();
             descriptor.Field(c => c.Phone);
             descriptor.Field(c => c.Picture);
             descriptor.Field(c => c.Description);
             descriptor.Field(c => c.Birthdate);
+            descriptor.Field(c => c.VatIdentifier);
+            descriptor.Field(c => c.Siret);
 
             descriptor.Field(c => c.CountryOfResidence)
                 .Type<NonNullType<CountryIsoCodeEnumType>>();
@@ -413,9 +410,6 @@ namespace Sheaft.GraphQL.Types
 
             descriptor.Field(c => c.Address)
                 .Type<NonNullType<AddressType>>();
-
-            descriptor.Field(c => c.BillingAddress)
-                .Type<AddressType>();
         }
     }
 
@@ -452,23 +446,12 @@ namespace Sheaft.GraphQL.Types
             descriptor.Field(c => c.Description);
             descriptor.Field(c => c.VatIdentifier);
             descriptor.Field(c => c.OpenForNewBusiness);
-
-            descriptor.Field(c => c.Owner)
-                .Type<NonNullType<OwnerType>>();
-
-            descriptor.Field(c => c.Name)
-                .Type<NonNullType<StringType>>();
-
-            descriptor.Field(c => c.Email)
-                .Type<NonNullType<StringType>>();
-
-            descriptor.Field(c => c.Siret)
-                .Type<NonNullType<StringType>>();
+            descriptor.Field(c => c.FirstName);
+            descriptor.Field(c => c.LastName);
+            descriptor.Field(c => c.Email);
+            descriptor.Field(c => c.Siret);
 
             descriptor.Field(c => c.Address)
-                .Type<NonNullType<AddressType>>();
-
-            descriptor.Field(c => c.BillingAddress)
                 .Type<NonNullType<AddressType>>();
 
             descriptor.Field(c => c.Tags)
@@ -561,23 +544,12 @@ namespace Sheaft.GraphQL.Types
             descriptor.Field(c => c.Description);
             descriptor.Field(c => c.VatIdentifier);
             descriptor.Field(c => c.OpenForNewBusiness);
-
-            descriptor.Field(c => c.Owner)
-                .Type<NonNullType<OwnerType>>();
-
-            descriptor.Field(c => c.Name)
-                .Type<NonNullType<StringType>>();
-
-            descriptor.Field(c => c.Email)
-                .Type<NonNullType<StringType>>();
-
-            descriptor.Field(c => c.Siret)
-                .Type<NonNullType<StringType>>();
+            descriptor.Field(c => c.FirstName);
+            descriptor.Field(c => c.LastName);
+            descriptor.Field(c => c.Email);
+            descriptor.Field(c => c.Siret);
 
             descriptor.Field(c => c.Address)
-                .Type<NonNullType<AddressType>>();
-
-            descriptor.Field(c => c.BillingAddress)
                 .Type<NonNullType<AddressType>>();
 
             descriptor.Field(c => c.Tags)
@@ -695,9 +667,6 @@ namespace Sheaft.GraphQL.Types
             descriptor.Field(c => c.Address)
                 .Type<AddressType>();
 
-            descriptor.Field(c => c.BillingAddress)
-                .Type<AddressType>();
-
             descriptor.Field(c => c.FirstName)
                 .Type<NonNullType<StringType>>();
 
@@ -756,16 +725,16 @@ namespace Sheaft.GraphQL.Types
                 .Type<NonNullType<StringType>>();
         }
     }
-    public class SirenCompanyType : ObjectType<SirenCompanyDto>
+    public class SirenBusinessType : ObjectType<SirenBusinessDto>
     {
-        protected override void Configure(IObjectTypeDescriptor<SirenCompanyDto> descriptor)
+        protected override void Configure(IObjectTypeDescriptor<SirenBusinessDto> descriptor)
         {
             descriptor.Field(c => c.Siren);
             descriptor.Field(c => c.Nic);
             descriptor.Field(c => c.Siret);
 
             descriptor.Field("name")
-                .Resolver(c => c.Parent<SirenCompanyDto>().UniteLegale.DenominationUsuelle1UniteLegale);
+                .Resolver(c => c.Parent<SirenBusinessDto>().UniteLegale.DenominationUsuelle1UniteLegale);
 
             descriptor.Field(c => c.AdresseEtablissement)
                 .Name("address")
@@ -878,6 +847,7 @@ namespace Sheaft.GraphQL.Types
             descriptor.Field(c => c.RatingsCount);
             descriptor.Field(c => c.QuantityPerUnit);
             descriptor.Field(c => c.Unit);
+            descriptor.Field(c => c.Conditioning);
             descriptor.Field(c => c.UpdatedOn);
             descriptor.Field(c => c.Description);
             descriptor.Field(c => c.Weight);
@@ -898,7 +868,7 @@ namespace Sheaft.GraphQL.Types
                 .Type<ReturnableType>();
 
             descriptor.Field(c => c.Producer)
-                .Type<NonNullType<CompanyProfileType>>();
+                .Type<NonNullType<BusinessProfileType>>();
         }
     }    
     public class SearchProductType : SheaftOutputType<ProductDto>
@@ -947,6 +917,7 @@ namespace Sheaft.GraphQL.Types
             descriptor.Field(c => c.RatingsCount);
             descriptor.Field(c => c.QuantityPerUnit);
             descriptor.Field(c => c.Unit);
+            descriptor.Field(c => c.Conditioning);
             descriptor.Field(c => c.UpdatedOn);
             descriptor.Field(c => c.Description);
             descriptor.Field(c => c.Weight);
@@ -987,7 +958,7 @@ namespace Sheaft.GraphQL.Types
                 .UseFiltering<TagFilterType>();
 
             descriptor.Field(c => c.Producer)
-                .Type<NonNullType<CompanyProfileType>>();
+                .Type<NonNullType<BusinessProfileType>>();
         }
     }
     public class PurchaseOrderType : SheaftOutputType<PurchaseOrderDto>
@@ -1226,7 +1197,7 @@ namespace Sheaft.GraphQL.Types
                 .Type<ReturnableType>();
 
             descriptor.Field(c => c.Producer)
-                .Type<NonNullType<CompanyProfileType>>();
+                .Type<NonNullType<BusinessProfileType>>();
         }
     }
     public class QuickOrderType : SheaftOutputType<QuickOrderDto>

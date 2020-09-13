@@ -8,14 +8,10 @@ namespace Sheaft.Infrastructure
     {
         public void Configure(EntityTypeBuilder<BankAccount> entity)
         {
-            entity.Property(c => c.OwnerName).IsRequired();
+            entity.Property(c => c.Owner).IsRequired();
             entity.Property(c => c.IBAN).IsRequired();
             entity.Property(c => c.BIC).IsRequired();
-
-            entity.OwnsOne(c => c.OwnerAddress, cb =>
-            {
-                cb.ToTable("BankAccountOwnerAddresses");
-            });
+            entity.Property(c => c.BIC).IsRequired();
         }
     }
 }

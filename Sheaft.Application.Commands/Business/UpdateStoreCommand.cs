@@ -7,10 +7,10 @@ using Newtonsoft.Json;
 
 namespace Sheaft.Application.Commands
 {
-    public class UpdateProducerCommand : Command<bool>
+    public class UpdateStoreCommand : Command<bool>
     {
         [JsonConstructor]
-        public UpdateProducerCommand(RequestUser requestUser) : base(requestUser)
+        public UpdateStoreCommand(RequestUser requestUser) : base(requestUser)
         {
         }
 
@@ -25,7 +25,7 @@ namespace Sheaft.Application.Commands
         public string VatIdentifier { get; set; }
         public bool OpenForNewBusiness { get; set; }
         public AddressInput Address { get; set; }
-        public AddressInput BillingAddress { get; set; }
         public IEnumerable<Guid> Tags { get; set; }
+        public IEnumerable<TimeSlotGroupInput> OpeningHours { get; set; }
     }
 }

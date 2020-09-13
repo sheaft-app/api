@@ -1,11 +1,13 @@
 ﻿using Sheaft.Interop;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Sheaft.Domain.Models
 {
     public class Order : IEntity
     {
+        private const int DIGITS_COUNT = 2;
         private List<OrderProduct> _products;
         private List<OrderDelivery> _deliveries;
 
@@ -13,38 +15,14 @@ namespace Sheaft.Domain.Models
         {
         }
 
-        public Order(Guid id, User user, IDictionary<Product, int> products, IEnumerable<Tuple<DeliveryMode, DateTimeOffset, string>> expectedDeliveries)
+        public Order(Guid id, User user, IDictionary<Product, int> orderProducts, IEnumerable<Tuple<DeliveryMode, DateTimeOffset, string>> orderDeliveries)
         {
             Id = id;
-
             Donation = 0;
             User = user;
 
-            foreach(var product in products)
-            {
-                AddProduct(product.Key, product.Value);
-            }
-
-            foreach (var expectedDelivery in expectedDeliveries)
-            {
-                AddDelivery(expectedDelivery.Item1, expectedDelivery.Item2, expectedDelivery.Item3);
-            }
-        }
-
-        private void AddDelivery(DeliveryMode deliveryMode, DateTimeOffset expectedDeliveryDate, string comment)
-        {
-            if (Deliveries == null)
-                _deliveries = new List<OrderDelivery>();
-
-            _deliveries.Add(new OrderDelivery(deliveryMode, expectedDeliveryDate, comment));
-        }
-
-        private void AddProduct(Product product, int quantity)
-        {
-            if (Products == null)
-                _products = new List<OrderProduct>();
-
-            _products.Add(new OrderProduct(product, quantity));
+            SetProducts(orderProducts);
+            SetDeliveries(orderDeliveries);
         }
 
         public Guid Id { get; }
@@ -57,13 +35,31 @@ namespace Sheaft.Domain.Models
         public decimal Donation { get; private set; }
         public decimal Fees { get; private set; }
         public virtual User User { get; private set; }
-        public virtual IReadOnlyCollection<OrderProduct> Products
+        public virtual IReadOnlyCollection<OrderProduct> Products => _products?.AsReadOnly();
+        public virtual IReadOnlyCollection<OrderDelivery> Deliveries => _deliveries?.AsReadOnly();
+
+        public void SetProducts(IDictionary<Product, int> orderProducts)
         {
-            get => _products?.AsReadOnly();
+            if (Products != null)
+                _products = new List<OrderProduct>();
+
+            foreach (var orderProduct in orderProducts)
+            {
+                _products.Add(new OrderProduct(orderProduct.Key, orderProduct.Value));
+            }
+
+            RefreshOrder();
         }
-        public virtual IReadOnlyCollection<OrderDelivery> Deliveries
+
+        public void SetDeliveries(IEnumerable<Tuple<DeliveryMode, DateTimeOffset, string>> orderDeliveries)
         {
-            get => _deliveries?.AsReadOnly();
+            if (Deliveries != null)
+                _deliveries = new List<OrderDelivery>();
+
+            foreach (var orderDelivery in orderDeliveries)
+            {
+                _deliveries.Add(new OrderDelivery(orderDelivery.Item1, orderDelivery.Item2, orderDelivery.Item3));
+            }
         }
 
         public void SetDonation(decimal donation)
@@ -74,6 +70,13 @@ namespace Sheaft.Domain.Models
         public void SetFees(decimal fees)
         {
             Fees = fees;
+        }
+
+        private void RefreshOrder()
+        {
+            TotalWholeSalePrice = Math.Round(_products.Sum(p => p.TotalWholeSalePrice), DIGITS_COUNT);
+            TotalVatPrice = Math.Round(_products.Sum(p => p.TotalVatPrice), DIGITS_COUNT);
+            TotalOnSalePrice = Math.Round(_products.Sum(p => p.TotalOnSalePrice), DIGITS_COUNT);
         }
     }
 }

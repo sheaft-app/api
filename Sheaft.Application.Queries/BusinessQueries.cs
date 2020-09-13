@@ -22,7 +22,7 @@ using Sheaft.Infrastructure;
 
 namespace Sheaft.Application.Queries
 {
-    public class CompanyQueries : ICompanyQueries
+    public class BusinessQueries : IBusinessQueries
     {
         private readonly HttpClient _httpClient;
         private readonly ISearchIndexClient _producersIndex;
@@ -32,7 +32,7 @@ namespace Sheaft.Application.Queries
         private readonly SearchOptions _searchOptions;
         private readonly AutoMapper.IConfigurationProvider _configurationProvider;
 
-        public CompanyQueries(
+        public BusinessQueries(
             IOptionsSnapshot<SireneOptions> sireneOptions,
             IOptionsSnapshot<SearchOptions> searchOptions,
             IHttpClientFactory httpClientFactory,
@@ -55,7 +55,7 @@ namespace Sheaft.Application.Queries
             _context = context;
         }
 
-        public async Task<SirenCompanyDto> RetrieveSiretCompanyInfosAsync(string siret, RequestUser currentUser, CancellationToken token)
+        public async Task<SirenBusinessDto> RetrieveSiretInfosAsync(string siret, RequestUser currentUser, CancellationToken token)
         {
             try
             {
@@ -64,7 +64,7 @@ namespace Sheaft.Application.Queries
                     return null;
 
                 var content = await result.Content.ReadAsStringAsync();
-                var contentObj = JsonConvert.DeserializeObject<CompanySiretResult>(content);
+                var contentObj = JsonConvert.DeserializeObject<SirenBusinessResult>(content);
                 return contentObj.Etablissement;
             }
             catch (Exception ex)
@@ -152,7 +152,7 @@ namespace Sheaft.Application.Queries
                             Longitude = p.Store_longitude,
                             Zipcode = p.Store_zipcode
                         }
-                    })
+                    }) ?? new List<StoreDto>()
                 };
             }
             catch (Exception ex)
@@ -240,7 +240,7 @@ namespace Sheaft.Application.Queries
                             Longitude = p.Producer_longitude,
                             Zipcode = p.Producer_zipcode
                         }
-                    })
+                    }) ?? new List<ProducerDto>()
                 };
             }
             catch (Exception ex)
@@ -249,17 +249,17 @@ namespace Sheaft.Application.Queries
             }
         }
 
-        public IQueryable<CompanyProfileDto> GetProfile(Guid id, RequestUser currentUser)
+        public IQueryable<BusinessProfileDto> GetProfile(Guid id, RequestUser currentUser)
         {
             try
             {
-                return _context.Users.OfType<Company>()
+                return _context.Users.OfType<Business>()
                         .Get(c => c.Id == id && c.Id == currentUser.Id)
-                        .ProjectTo<CompanyProfileDto>(_configurationProvider);
+                        .ProjectTo<BusinessProfileDto>(_configurationProvider);
             }
             catch (Exception e)
             {
-                return new List<CompanyProfileDto>().AsQueryable();
+                return new List<BusinessProfileDto>().AsQueryable();
             }
         }
 
@@ -291,9 +291,9 @@ namespace Sheaft.Application.Queries
             }
         }
 
-        private class CompanySiretResult
+        private class SirenBusinessResult
         {
-            public SirenCompanyDto Etablissement { get; set; }
+            public SirenBusinessDto Etablissement { get; set; }
         }
 
         private class SearchProducer

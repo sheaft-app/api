@@ -15,7 +15,7 @@ namespace Sheaft.Models.ViewModels
         public string Name { get; set; }
         public string Description { get; set; }
         public AddressViewModel Address { get; set; }
-        public CompanyViewModel Producer { get; set; }
+        public BusinessViewModel Producer { get; set; }
         public IEnumerable<TimeSlotViewModel> OpeningHours { get; set; }
     }
 }

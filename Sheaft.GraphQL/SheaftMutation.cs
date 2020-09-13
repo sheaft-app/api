@@ -426,32 +426,10 @@ namespace Sheaft.GraphQL
         [GraphQLType(typeof(StoreType))]
         [UseSingleOrDefault]
         [UseSelection]
-        public async Task<IQueryable<StoreDto>> RegisterStoreAsync(RegisterStoreInput input, [Service] ICompanyQueries companyQueries)
+        public async Task<IQueryable<StoreDto>> RegisterStoreAsync(RegisterStoreInput input, [Service] IBusinessQueries businessQueries)
         {
             var result = await ExecuteCommandAsync<RegisterStoreCommand, Guid>(_mapper.Map(input, new RegisterStoreCommand(_currentUser)), _cancellationToken);
-            return companyQueries.GetStore(result, _currentUser);
-        }
-
-        [Authorize(Policy = Policies.AUTHENTICATED)]
-        [GraphQLName("registerProducer")]
-        [GraphQLType(typeof(ProducerType))]
-        [UseSingleOrDefault]
-        [UseSelection]
-        public async Task<IQueryable<ProducerDto>> RegisterProducerAsync(RegisterProducerInput input, [Service] ICompanyQueries companyQueries)
-        {
-            var result = await ExecuteCommandAsync<RegisterProducerCommand, Guid>(_mapper.Map(input, new RegisterProducerCommand(_currentUser)), _cancellationToken);
-            return companyQueries.GetProducer(result, _currentUser);
-        }
-
-        [Authorize(Policy = Policies.OWNER)]
-        [GraphQLName("updateProducer")]
-        [GraphQLType(typeof(ProducerType))]
-        [UseSingleOrDefault]
-        [UseSelection]
-        public async Task<IQueryable<ProducerDto>> UpdateProducerAsync(UpdateProducerInput input, [Service] ICompanyQueries companyQueries)
-        {
-            await ExecuteCommandAsync<UpdateProducerCommand, bool>(_mapper.Map(input, new UpdateProducerCommand(_currentUser)), _cancellationToken);
-            return companyQueries.GetProducer(input.Id, _currentUser);
+            return businessQueries.GetStore(result, _currentUser);
         }
 
         [Authorize(Policy = Policies.OWNER)]
@@ -459,24 +437,53 @@ namespace Sheaft.GraphQL
         [GraphQLType(typeof(StoreType))]
         [UseSingleOrDefault]
         [UseSelection]
-        public async Task<IQueryable<ProducerDto>> UpdateStoreAsync(UpdateStoreInput input, [Service] ICompanyQueries companyQueries)
+        public async Task<IQueryable<ProducerDto>> UpdateStoreAsync(UpdateStoreInput input, [Service] IBusinessQueries businessQueries)
         {
             await ExecuteCommandAsync<UpdateStoreCommand, bool>(_mapper.Map(input, new UpdateStoreCommand(_currentUser)), _cancellationToken);
-            return companyQueries.GetStore(input.Id, _currentUser);
+            return businessQueries.GetStore(input.Id, _currentUser);
+        }
+
+        [Authorize(Policy = Policies.AUTHENTICATED)]
+        [GraphQLName("registerProducer")]
+        [GraphQLType(typeof(ProducerType))]
+        [UseSingleOrDefault]
+        [UseSelection]
+        public async Task<IQueryable<ProducerDto>> RegisterProducerAsync(RegisterProducerInput input, [Service] IBusinessQueries businessQueries)
+        {
+            var result = await ExecuteCommandAsync<RegisterProducerCommand, Guid>(_mapper.Map(input, new RegisterProducerCommand(_currentUser)), _cancellationToken);
+            return businessQueries.GetProducer(result, _currentUser);
         }
 
         [Authorize(Policy = Policies.OWNER)]
-        [GraphQLName("updateCompanyPicture")]
-        public async Task<bool> UpdateCompanyPictureAsync(UpdatePictureInput input)
+        [GraphQLName("updateProducer")]
+        [GraphQLType(typeof(ProducerType))]
+        [UseSingleOrDefault]
+        [UseSelection]
+        public async Task<IQueryable<ProducerDto>> UpdateProducerAsync(UpdateProducerInput input, [Service] IBusinessQueries businessQueries)
+        {
+            await ExecuteCommandAsync<UpdateProducerCommand, bool>(_mapper.Map(input, new UpdateProducerCommand(_currentUser)), _cancellationToken);
+            return businessQueries.GetProducer(input.Id, _currentUser);
+        }
+
+        [Authorize(Policy = Policies.REGISTERED)]
+        [GraphQLName("updateUserPicture")]
+        public async Task<bool> UpdateUserPictureAsync(UpdatePictureInput input)
         {
             return await ExecuteCommandAsync<UpdateUserPictureCommand, bool>(_mapper.Map(input, new UpdateUserPictureCommand(_currentUser)), _cancellationToken);
         }
 
         [Authorize(Policy = Policies.OWNER)]
-        [GraphQLName("deleteCompany")]
-        public async Task<bool> DeleteCompanyAsync(IdWithReasonInput input)
+        [GraphQLName("deleteBusiness")]
+        public async Task<bool> DeleteBusinessAsync(IdWithReasonInput input)
         {
-            return await ExecuteCommandAsync<DeleteCompanyCommand, bool>(_mapper.Map(input, new DeleteCompanyCommand(_currentUser)), _cancellationToken);
+            return await ExecuteCommandAsync<DeleteBusinessCommand, bool>(_mapper.Map(input, new DeleteBusinessCommand(_currentUser)), _cancellationToken);
+        }
+
+        [Authorize(Policy = Policies.STORE_OR_PRODUCER)]
+        [GraphQLName("setBusinessLegals")]
+        public async Task<bool> SetBusinessLegalsAsync(SetBusinessLegalsInput input)
+        {
+            return await ExecuteCommandAsync<SetBusinessLegalsCommand, bool>(_mapper.Map(input, new SetBusinessLegalsCommand(_currentUser)), _cancellationToken);
         }
 
         [Authorize(Policy = Policies.AUTHENTICATED)]
@@ -488,20 +495,6 @@ namespace Sheaft.GraphQL
         {
             var result = await ExecuteCommandAsync<CreateConsumerCommand, Guid>(_mapper.Map(input, new CreateConsumerCommand(_currentUser)), _cancellationToken);
             return consumerQueries.GetConsumer(result, _currentUser);
-        }
-
-        [Authorize(Policy = Policies.CONSUMER)]
-        [GraphQLName("setConsumerLegals")]
-        public async Task<bool> SetConsumerLegalsAsync(SetConsumerLegalsInput input)
-        {
-            return await ExecuteCommandAsync<SetConsumerLegalsCommand, bool>(_mapper.Map(input, new SetConsumerLegalsCommand(_currentUser)), _cancellationToken);
-        }
-
-        [Authorize(Policy = Policies.STORE_OR_PRODUCER)]
-        [GraphQLName("setCompanyLegals")]
-        public async Task<bool> SetCompanyLegalsAsync(SetCompanyLegalsInput input)
-        {
-            return await ExecuteCommandAsync<SetCompanyLegalsCommand, bool>(_mapper.Map(input, new SetCompanyLegalsCommand(_currentUser)), _cancellationToken);
         }
 
         [Authorize(Policy = Policies.REGISTERED)]
@@ -516,21 +509,17 @@ namespace Sheaft.GraphQL
         }
 
         [Authorize(Policy = Policies.REGISTERED)]
-        [GraphQLName("updateUserPicture")]
-        [GraphQLType(typeof(ConsumerType))]
-        [UseSingleOrDefault]
-        [UseSelection]
-        public async Task<IQueryable<ConsumerDto>> UpdateUserPictureAsync(UpdatePictureInput input, [Service] IConsumerQueries consumerQueries)
-        {
-            await ExecuteCommandAsync<UpdateUserPictureCommand, bool>(_mapper.Map(input, new UpdateUserPictureCommand(_currentUser)), _cancellationToken);
-            return consumerQueries.GetConsumer(input.Id, _currentUser);
-        }
-
-        [Authorize(Policy = Policies.REGISTERED)]
         [GraphQLName("deleteConsumer")]
         public async Task<bool> DeleteUserAsync(IdWithReasonInput input)
         {
             return await ExecuteCommandAsync<DeleteConsumerCommand, bool>(_mapper.Map(input, new DeleteConsumerCommand(_currentUser)), _cancellationToken);
+        }
+
+        [Authorize(Policy = Policies.CONSUMER)]
+        [GraphQLName("setConsumerLegals")]
+        public async Task<bool> SetConsumerLegalsAsync(SetConsumerLegalsInput input)
+        {
+            return await ExecuteCommandAsync<SetConsumerLegalsCommand, bool>(_mapper.Map(input, new SetConsumerLegalsCommand(_currentUser)), _cancellationToken);
         }
 
         [Authorize(Policy = Policies.STORE)]

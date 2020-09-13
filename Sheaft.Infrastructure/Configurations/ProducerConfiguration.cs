@@ -8,17 +8,10 @@ namespace Sheaft.Infrastructure
     {
         public void Configure(EntityTypeBuilder<Producer> entity)
         {
-            entity.Property(c => c.Siret).IsRequired();
-
-            entity.OwnsOne(c => c.LegalAddress, cb =>
-            {
-                cb.ToTable("ProducerLegalAddresses");
-            });
-
             entity.HasMany(c => c.Tags).WithOne().HasForeignKey("ProducerUid").OnDelete(DeleteBehavior.Cascade);
 
-            var companyTags = entity.Metadata.FindNavigation(nameof(Producer.Tags));
-            companyTags.SetPropertyAccessMode(PropertyAccessMode.Field);
+            var businessTags = entity.Metadata.FindNavigation(nameof(Producer.Tags));
+            businessTags.SetPropertyAccessMode(PropertyAccessMode.Field);
 
             entity.HasMany<DeliveryMode>().WithOne(c => c.Producer).HasForeignKey("ProducerUid").OnDelete(DeleteBehavior.Cascade);
             entity.HasMany<Returnable>().WithOne(c => c.Producer).HasForeignKey("ProducerUid").OnDelete(DeleteBehavior.Cascade);

@@ -13,7 +13,6 @@ namespace Sheaft.Application.Commands
         }
 
         public AddressInput Address { get; set; }
-        public AddressInput BillingAddress { get; set; }
         public bool Anonymous { get; set; }
     }
 }

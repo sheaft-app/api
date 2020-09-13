@@ -2,8 +2,8 @@
 
 namespace Sheaft.Models.Inputs
 {
-    public class RegisterProducerInput : CompanyInput
+    public class RegisterProducerInput : BusinessInput
     {
-        public RegisterOwnerInput Owner { get; set; }
+        public string SponsoringCode { get; set; }
     }
 }

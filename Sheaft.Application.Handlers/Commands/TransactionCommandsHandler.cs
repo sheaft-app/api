@@ -33,14 +33,15 @@ namespace Sheaft.Application.Handlers
             return await ExecuteAsync(async () =>
             {
                 var order = await _context.GetByIdAsync<Order>(request.OrderId, token);
-
                 var wallet = await _context.GetSingleAsync<Wallet>(c => c.User.Id == request.RequestUser.Id, token);
+
                 var webPayin = new WebPayinTransaction(Guid.NewGuid(), wallet, order);
 
                 await _context.AddAsync(webPayin, token);
                 await _context.SaveChangesAsync(token);
 
-                var result = await _pspService.CreateWebPayinAsync(webPayin, token);
+                var legal = await _context.GetSingleAsync<Legal>(c => c.Owner.Id == request.RequestUser.Id, token);
+                var result = await _pspService.CreateWebPayinAsync(webPayin, legal.Owner, token);
                 if (!result.Success)
                 {
                     return Failed<Guid>(result.Exception);
@@ -65,7 +66,7 @@ namespace Sheaft.Application.Handlers
             {
                 var debitedWallet = await _context.GetSingleAsync<Wallet>(c => c.User.Id == request.FromUserId, token);
                 var creditedWallet = await _context.GetSingleAsync<Wallet>(c => c.User.Id == request.ToUserId, token);
-                var purchaseOrder = await _context.GetSingleAsync<PurchaseOrder>(c => c.Id == request.PurchaseOrderId, token);
+                var purchaseOrder = await _context.GetByIdAsync<PurchaseOrder>(request.PurchaseOrderId, token);
 
                 var transfer = new TransferTransaction(Guid.NewGuid(), debitedWallet, creditedWallet, purchaseOrder);
 
@@ -95,7 +96,7 @@ namespace Sheaft.Application.Handlers
             return await ExecuteAsync(async () =>
             {
                 var debitedWallet = await _context.GetSingleAsync<Wallet>(c => c.User.Id == request.FromUserId, token);
-                var bankAccount = await _context.GetSingleAsync<BankAccount>(c => c.Id == request.BankAccountId, token);
+                var bankAccount = await _context.GetSingleAsync<BankAccount>(c => c.Id == request.BankAccountId && c.IsActive, token);
 
                 var payout = new PayoutTransaction(Guid.NewGuid(), request.Amount, debitedWallet, bankAccount);
 

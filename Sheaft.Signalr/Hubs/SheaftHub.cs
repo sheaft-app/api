@@ -18,10 +18,6 @@ namespace Sheaft.Signalr.Controllers
                 await Groups.AddToGroupAsync(Context.ConnectionId, role.Value);
             }
 
-            var company = Context.User.Claims.FirstOrDefault(c => c.Type == "company_id")?.Value;
-            if(company != null)
-                await Groups.AddToGroupAsync(Context.ConnectionId, company);
-
             await base.OnConnectedAsync();
         }
 
@@ -32,10 +28,6 @@ namespace Sheaft.Signalr.Controllers
             {
                 await Groups.RemoveFromGroupAsync(Context.ConnectionId, role.Value);
             }
-
-            var company = Context.User.Claims.FirstOrDefault(c => c.Type == "company_id")?.Value;
-            if (company != null)
-                await Groups.RemoveFromGroupAsync(Context.ConnectionId, company);
 
             await base.OnDisconnectedAsync(exception);
         }

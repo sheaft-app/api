@@ -32,11 +32,6 @@ namespace Sheaft.Infrastructure
                 cb.ToTable("UserAddresses");
             });
 
-            entity.OwnsOne(c => c.BillingAddress, cb =>
-            {
-                cb.ToTable("UserBillingAddresses");
-            });
-
             entity.HasMany<Sponsoring>().WithOne(c => c.Sponsor).HasForeignKey("SponsorUid").OnDelete(DeleteBehavior.NoAction);
 
             entity.HasKey("Uid");

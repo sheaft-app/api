@@ -114,27 +114,27 @@ namespace Sheaft.GraphQL
         }
 
         [Authorize(Policy = Policies.UNREGISTERED)]
-        [GraphQLName("searchCompanyWithSiret")]
-        [GraphQLType(typeof(SirenCompanyType))]
-        public async Task<SirenCompanyDto> RetrieveSiretCompanyInfosAsync(string input, [Service] ICompanyQueries companyQueries)
+        [GraphQLName("searchBusinessWithSiret")]
+        [GraphQLType(typeof(SirenBusinessType))]
+        public async Task<SirenBusinessDto> SearchBusinessWithSiretAsync(string input, [Service] IBusinessQueries businessQueries)
         {
-            return await companyQueries.RetrieveSiretCompanyInfosAsync(input, _currentUser, _cancellationToken);
+            return await businessQueries.RetrieveSiretInfosAsync(input, _currentUser, _cancellationToken);
         }
 
         [Authorize(Policy = Policies.STORE)]
         [GraphQLName("searchProducers")]
         [GraphQLType(typeof(ProducersSearchType))]
-        public async Task<ProducersSearchDto> SearchProducersAsync(SearchTermsInput input, [Service] ICompanyQueries companyQueries)
+        public async Task<ProducersSearchDto> SearchProducersAsync(SearchTermsInput input, [Service] IBusinessQueries businessQueries)
         {
-            return await companyQueries.SearchProducersAsync(_currentUser.Id, input, _currentUser, _cancellationToken);
+            return await businessQueries.SearchProducersAsync(_currentUser.Id, input, _currentUser, _cancellationToken);
         }
 
         [Authorize(Policy = Policies.PRODUCER)]
         [GraphQLName("searchStores")]
         [GraphQLType(typeof(StoresSearchType))]
-        public async Task<StoresSearchDto> SearchStoresAsync(SearchTermsInput input, [Service] ICompanyQueries companyQueries)
+        public async Task<StoresSearchDto> SearchStoresAsync(SearchTermsInput input, [Service] IBusinessQueries businessQueries)
         {
-            return await companyQueries.SearchStoresAsync(_currentUser.Id, input, _currentUser, _cancellationToken);
+            return await businessQueries.SearchStoresAsync(_currentUser.Id, input, _currentUser, _cancellationToken);
         }
 
         [GraphQLName("searchProducts")]
@@ -168,18 +168,18 @@ namespace Sheaft.GraphQL
         [GraphQLName("producer")]
         [UseSingleOrDefault]
         [UseSelection]
-        public IQueryable<ProducerDto> GetProducer(Guid input, [Service] ICompanyQueries companyQueries)
+        public IQueryable<ProducerDto> GetProducer(Guid input, [Service] IBusinessQueries businessQueries)
         {
-            return companyQueries.GetProducer(input, _currentUser);
+            return businessQueries.GetProducer(input, _currentUser);
         }
 
         [Authorize(Policy = Policies.PRODUCER)]
         [GraphQLName("store")]
         [UseSingleOrDefault]
         [UseSelection]
-        public IQueryable<StoreDto> GetStore(Guid input, [Service] ICompanyQueries companyQueries)
+        public IQueryable<StoreDto> GetStore(Guid input, [Service] IBusinessQueries businessQueries)
         {
-            return companyQueries.GetStore(input, _currentUser);
+            return businessQueries.GetStore(input, _currentUser);
         }
 
         [Authorize(Policy = Policies.REGISTERED)]
@@ -485,12 +485,12 @@ namespace Sheaft.GraphQL
         }
 
         [Authorize(Policy = Policies.OWNER)]
-        [GraphQLName("myCompany")]
+        [GraphQLName("myBusiness")]
         [UseSingleOrDefault]
         [UseSelection]
-        public IQueryable<CompanyProfileDto> GetMyCompany([Service] ICompanyQueries companyQueries)
+        public IQueryable<BusinessProfileDto> GetMyBusiness([Service] IBusinessQueries businessQueries)
         {
-            return companyQueries.GetProfile(_currentUser.Id, _currentUser);
+            return businessQueries.GetProfile(_currentUser.Id, _currentUser);
         }
     }
 }

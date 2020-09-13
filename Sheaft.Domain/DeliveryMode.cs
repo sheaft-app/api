@@ -39,7 +39,7 @@ namespace Sheaft.Domain.Models
         public string Description { get; private set; }
         public virtual DeliveryAddress Address { get; private set; }
         public virtual Producer Producer { get; private set; }
-        public virtual IReadOnlyCollection<TimeSlotHour> OpeningHours { get { return _openingHours.AsReadOnly(); } }
+        public virtual IReadOnlyCollection<TimeSlotHour> OpeningHours => _openingHours.AsReadOnly(); 
 
         public void SetOpeningHours(IEnumerable<TimeSlotHour> openingHours)
         {

@@ -5,14 +5,14 @@ using System;
 
 namespace Sheaft.Domain.Models
 {
-    public abstract class Company : User
+    public abstract class Business : User
     {
-        protected Company()
+        protected Business()
         {
         }
 
-        protected Company(Guid id, ProfileKind kind, LegalKind legal, string name, string email, string firstname, string lastname, string siret, string vatIdentifier, UserAddress address, bool openForBusiness = true, string phone = null, string description = null)
-            : base(id, kind, legal, name, firstname, lastname, email, phone)
+        protected Business(Guid id, ProfileKind kind, string name, string email, string firstname, string lastname, string siret, string vatIdentifier, UserAddress address, bool openForBusiness = true, string phone = null, string description = null)
+            : base(id, kind, name, firstname, lastname, email, phone)
         {
             if (address == null)
                 throw new ValidationException(MessageKind.Company_Address_Required);
@@ -28,16 +28,10 @@ namespace Sheaft.Domain.Models
         public string Description { get; private set; }
         public string VatIdentifier { get; private set; }
         public string Siret { get; private set; }
-        public virtual LegalAddress LegalAddress { get; private set; }
 
         public void SetName(string name)
         {
             SetUserName(name);
-        }
-
-        public void SetLegalAddress(string line1, string line2, string zipcode, string city, CountryIsoCode country)
-        {
-            LegalAddress = new LegalAddress(line1, line2, zipcode, city, country);
         }
 
         public void SetOpenForNewBusiness(bool openForNewBusiness)

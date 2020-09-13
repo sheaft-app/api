@@ -170,7 +170,7 @@ namespace Sheaft.Services
             return check % 10;
         }
 
-        private async Task<Result<long>> GetNextUuidAsync(string container, Guid companyIdentifier, CancellationToken token)
+        private async Task<Result<long>> GetNextUuidAsync(string container, Guid identifier, CancellationToken token)
         {
             try
             {
@@ -186,7 +186,7 @@ namespace Sheaft.Services
                 {
                     try
                     {
-                        var tableResults = await table.ExecuteAsync(TableOperation.Retrieve<IdentifierTableEntity>(companyIdentifier.ToString("N"), key), token);
+                        var tableResults = await table.ExecuteAsync(TableOperation.Retrieve<IdentifierTableEntity>(identifier.ToString("N"), key), token);
                         var results = (IdentifierTableEntity)tableResults.Result;
                         if (results != null)
                         {
@@ -199,7 +199,7 @@ namespace Sheaft.Services
                             id = 1;
                             await table.ExecuteAsync(TableOperation.Insert(new IdentifierTableEntity
                             {
-                                PartitionKey = companyIdentifier.ToString("N"),
+                                PartitionKey = identifier.ToString("N"),
                                 RowKey = key,
                                 Id = id
                             }), token);

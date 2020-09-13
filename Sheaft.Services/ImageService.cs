@@ -108,7 +108,7 @@ namespace Sheaft.Services
             return $"https://{_storageOptions.Account}.blob.{_storageOptions.Suffix}/{_storageOptions.Containers.Pictures}/products/categories/default.jpg";
         }
 
-        private async Task UploadImageAsync(Image image, Guid companyId, Guid productId, string filename, string size, int width, int height, CancellationToken token, ResizeMode mode = ResizeMode.Max, int quality = 100)
+        private async Task UploadImageAsync(Image image, Guid userId, Guid productId, string filename, string size, int width, int height, CancellationToken token, ResizeMode mode = ResizeMode.Max, int quality = 100)
         {
             using (var blobStream = new MemoryStream())
             {
@@ -118,7 +118,7 @@ namespace Sheaft.Services
                     Size = new Size(width, height)
                 })).Save(blobStream, new JpegEncoder { Quality = quality });
 
-                await _blobService.UploadProductPictureAsync(companyId, productId, filename, size, blobStream, token);
+                await _blobService.UploadProductPictureAsync(userId, productId, filename, size, blobStream, token);
             }
         }
 

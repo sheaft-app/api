@@ -22,6 +22,7 @@ namespace Sheaft.Infrastructure.Interop
         DbSet<Department> Departments { get; set; }
         DbSet<Document> Documents { get; set; }
         DbSet<Job> Jobs { get; set; }
+        DbSet<Legal> Legals { get; set; }
         DbSet<Level> Levels { get; set; }
         DbSet<Nationality> Nationalities { get; set; }
         DbSet<Notification> Notifications { get; set; }

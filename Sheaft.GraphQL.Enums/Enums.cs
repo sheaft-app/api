@@ -32,11 +32,14 @@ namespace Sheaft.GraphQL.Enums
     {
         protected override void Configure(IEnumTypeDescriptor<ValidationStatus> descriptor)
         {
+            descriptor.Value(ValidationStatus.NotSpecified).Name("NOT_SPECIFIED");
             descriptor.Value(ValidationStatus.Created).Name("CREATED");
             descriptor.Value(ValidationStatus.OutOfDate).Name("OUT_OF_DATE");
             descriptor.Value(ValidationStatus.Refused).Name("REFUSED");
             descriptor.Value(ValidationStatus.Validated).Name("VALIDATED");
             descriptor.Value(ValidationStatus.ValidationAsked).Name("VALIDATION_ASKED");
+            descriptor.Value(ValidationStatus.WaitingForCreation).Name("WAITING_FOR_CREATION");
+            descriptor.Value(ValidationStatus.WaitingForFirstOrder).Name("WAITING_FOR_FIRST_ORDER");
         }
     }
     public class DocumentKindEnumType : EnumType<DocumentKind>
@@ -72,9 +75,11 @@ namespace Sheaft.GraphQL.Enums
     {
         protected override void Configure(IEnumTypeDescriptor<TransactionStatus> descriptor)
         {
+            descriptor.Value(TransactionStatus.NotSpecified).Name("NOT_SPECIFIED");
             descriptor.Value(TransactionStatus.Created).Name("CREATED");
             descriptor.Value(TransactionStatus.Failed).Name("FAILED");
             descriptor.Value(TransactionStatus.Succeeded).Name("SUCCEEDED");
+            descriptor.Value(TransactionStatus.Waiting).Name("WAITING");
         }
     }
     public class PaymentKindEnumType : EnumType<PaymentKind>
@@ -82,7 +87,7 @@ namespace Sheaft.GraphQL.Enums
         protected override void Configure(IEnumTypeDescriptor<PaymentKind> descriptor)
         {
             descriptor.Value(PaymentKind.Card).Name("CARD");
-            descriptor.Value(PaymentKind.BankAccount).Name("TRANSFER");
+            descriptor.Value(PaymentKind.BankAccount).Name("BANK_ACCOUNT");
         }
     }
     public class WalletKindEnumType : EnumType<WalletKind>
@@ -199,11 +204,22 @@ namespace Sheaft.GraphQL.Enums
     {
         protected override void Configure(IEnumTypeDescriptor<UnitKind> descriptor)
         {
+            descriptor.Value(UnitKind.NotSpecified).Name("NOT_SPECIFIED");
             descriptor.Value(UnitKind.g).Name("G");
             descriptor.Value(UnitKind.kg).Name("KG");
             descriptor.Value(UnitKind.l).Name("L");
             descriptor.Value(UnitKind.ml).Name("ML");
-            descriptor.Value(UnitKind.unit).Name("UNIT");
+        }
+    }
+    public class ConditioningKindEnumType : EnumType<ConditioningKind>
+    {
+        protected override void Configure(IEnumTypeDescriptor<ConditioningKind> descriptor)
+        {
+            descriptor.Value(ConditioningKind.Bouquet).Name("BOUQUET");
+            descriptor.Value(ConditioningKind.Bulk).Name("BULK");
+            descriptor.Value(ConditioningKind.Box).Name("BOX");
+            descriptor.Value(ConditioningKind.Bunch).Name("BUNCH");
+            descriptor.Value(ConditioningKind.Piece).Name("PIECE");
         }
     }
     public class AgreementStatusEnumType : EnumType<AgreementStatus>

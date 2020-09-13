@@ -131,9 +131,6 @@ namespace Sheaft.Application.Handlers
                     entity.SetAddress(request.Address.Line1, request.Address.Line2, request.Address.Zipcode, request.Address.City, request.Address.Country, department, request.Address.Longitude, request.Address.Latitude);                    
                 }
 
-                if(request.BillingAddress != null)
-                    entity.SetBillingAddress(request.BillingAddress.Line1, request.BillingAddress.Line2, request.BillingAddress.Zipcode, request.BillingAddress.City, request.BillingAddress.Country);
-
                 var oidcUser = new IdentityUserInput(request.Id, entity.Email, entity.Name, entity.FirstName, entity.LastName)
                 {
                     Phone = request.Phone,
@@ -188,19 +185,6 @@ namespace Sheaft.Application.Handlers
             {
                 var entity = await _context.GetByIdAsync<Consumer>(request.Id, token);
                 
-                entity.SetBillingAddress(request.BillingAddress.Line1, request.BillingAddress.Line2, request.BillingAddress.Zipcode, request.BillingAddress.City, request.BillingAddress.Country);
-
-                if (request.Address != null && string.IsNullOrWhiteSpace(entity.Address.Zipcode))
-                {
-                    var departmentCode = UserAddress.GetDepartmentCode(request.Address.Zipcode);
-                    var department = await _context.Departments.SingleOrDefaultAsync(d => d.Code == departmentCode, token);
-                    entity.SetAddress(request.Address.Line1, request.Address.Line2, request.Address.Zipcode, request.Address.City, request.Address.Country, department);
-                }
-
-                entity.SetBirthdate(request.Birthdate);
-                entity.SetNationality(request.Nationality);
-                entity.SetCountryOfResidence(request.CountryOfResidence);
-
                 _context.Update(entity);
 
                 var success = await _context.SaveChangesAsync(token) > 0;

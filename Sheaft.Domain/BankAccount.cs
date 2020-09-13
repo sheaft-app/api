@@ -12,14 +12,21 @@ namespace Sheaft.Domain.Models
         {
             IBAN = iban;
             BIC = bic;
-            OwnerName = owner;
-            OwnerAddress = address;
+            Owner = owner;
+            Line1 = address.Line1;
+            Line2 = address.Line2;
+            Zipcode = address.Zipcode;
+            City = address.City;
+            Country = address.Country;
         }
 
         public string IBAN { get; private set; }
         public string BIC { get; private set; }
-        public string OwnerName { get; private set; }
-        public virtual BankAddress OwnerAddress { get; private set; }
-
+        public string Owner { get; private set; }
+        public string Line1 { get; private set; }
+        public string Line2 { get; private set; }
+        public string Zipcode { get; private set; }
+        public string City { get; private set; }
+        public CountryIsoCode Country { get; private set; }
     }
 }

@@ -13,7 +13,6 @@ namespace Sheaft.Models.ViewModels
         public string LastName { get; set; }
         public bool Anonymous { get; set; }
         public AddressViewModel Address { get; set; }
-        public AddressViewModel BillingAddress { get; set; }
         public string Phone { get; set; }
         public string Picture { get; set; }
         public DateTimeOffset CreatedOn { get; set; }

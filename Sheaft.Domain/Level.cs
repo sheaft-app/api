@@ -30,7 +30,7 @@ namespace Sheaft.Domain.Models
         public DateTimeOffset? RemovedOn { get; private set; }
         public string Name { get; private set; }
         public int RequiredPoints { get; private set; }
-        public virtual IReadOnlyCollection<Reward> Rewards { get { return _rewards.AsReadOnly(); } }
+        public virtual IReadOnlyCollection<Reward> Rewards => _rewards.AsReadOnly();
 
         public void SetRewards(IEnumerable<Reward> rewards)
         {

@@ -3,29 +3,20 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Net.Http;
-using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using OfficeOpenXml;
 using Sheaft.Application.Commands;
 using Sheaft.Application.Events;
 using Sheaft.Core;
-using Sheaft.Core.Extensions;
-using Sheaft.Core.Models;
 using Sheaft.Domain.Models;
 using Sheaft.Exceptions;
 using Sheaft.Infrastructure.Interop;
 using Sheaft.Interop.Enums;
-using Sheaft.Options;
 using Sheaft.Services.Interop;
-using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.Formats.Jpeg;
-using SixLabors.ImageSharp.Processing;
 
 namespace Sheaft.Application.Handlers
 {
@@ -86,11 +77,11 @@ namespace Sheaft.Application.Handlers
                     request.Reference = result.Data;
                 }
 
-                var entity = new Product(Guid.NewGuid(), request.Reference, request.Name, request.WholeSalePricePerUnit, request.Unit, request.QuantityPerUnit, request.Vat, producer);
+                var entity = new Product(Guid.NewGuid(), request.Reference, request.Name, request.WholeSalePricePerUnit, request.Conditioning, request.Unit, request.QuantityPerUnit, request.Vat, producer);
 
-                entity.SetWeight(request.Weight);
                 entity.SetDescription(request.Description);
                 entity.SetAvailable(request.Available);
+                entity.SetWeight(request.Weight);
 
                 if (request.ReturnableId.HasValue)
                 {
@@ -126,7 +117,8 @@ namespace Sheaft.Application.Handlers
                 entity.SetReference(request.Reference);
                 entity.SetWeight(request.Weight);
                 entity.SetAvailable(request.Available);
-                entity.SetUnit(request.QuantityPerUnit, request.Unit);
+                entity.SetConditioning(request.Conditioning, request.QuantityPerUnit, request.Unit);
+                entity.SetWeight(request.Weight);
 
                 if (request.ReturnableId.HasValue)
                 {

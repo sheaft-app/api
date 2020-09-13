@@ -24,7 +24,7 @@ namespace Sheaft.GraphQL
             descriptor.Field(c => c.RemoveDocumentAsync(default));
             descriptor.Field(c => c.ConfirmOrderAsync(default, default));
             descriptor.Field(c => c.CreateQuickOrderAsync(default, default));
-            descriptor.Field(c => c.DeleteCompanyAsync(default));
+            descriptor.Field(c => c.DeleteBusinessAsync(default));
             descriptor.Field(c => c.DeleteDeliveryModeAsync(default));
             descriptor.Field(c => c.DeleteReturnableAsync(default));
             descriptor.Field(c => c.DeleteProductsAsync(default));
@@ -52,7 +52,7 @@ namespace Sheaft.GraphQL
             descriptor.Field(c => c.ShipPurchaseOrdersAsync(default, default));
             descriptor.Field(c => c.UpdateProducerAsync(default, default));
             descriptor.Field(c => c.UpdateStoreAsync(default, default));
-            descriptor.Field(c => c.UpdateCompanyPictureAsync(default));
+            descriptor.Field(c => c.UpdateUserPictureAsync(default));
             descriptor.Field(c => c.UpdateDeliveryModeAsync(default, default));
             descriptor.Field(c => c.UpdateReturnableAsync(default, default));
             descriptor.Field(c => c.UpdateProductAsync(default, default));
@@ -60,8 +60,7 @@ namespace Sheaft.GraphQL
             descriptor.Field(c => c.UpdateQuickOrderAsync(default, default));
             descriptor.Field(c => c.UpdateQuickOrderProductsAsync(default, default));
             descriptor.Field(c => c.UpdateConsumerAsync(default, default));
-            descriptor.Field(c => c.UpdateUserPictureAsync(default, default));
-            descriptor.Field(c => c.SetCompanyLegalsAsync(default));
+            descriptor.Field(c => c.SetBusinessLegalsAsync(default));
             descriptor.Field(c => c.SetConsumerLegalsAsync(default));
         }
     }

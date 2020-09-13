@@ -30,11 +30,7 @@ namespace Sheaft.Infrastructure
 
             entity.OwnsOne(c => c.ExpectedDelivery, cb =>
             {
-                cb.OwnsOne(ca => ca.Address, a =>
-                {
-                    a.ToTable("ExpectedDeliveryAddresses");
-                });
-
+                cb.OwnsOne(ca => ca.Address);
                 cb.ToTable("ExpectedDeliveries");
             });
 

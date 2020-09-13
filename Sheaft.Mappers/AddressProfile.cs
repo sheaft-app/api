@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using Sheaft.Application.Commands;
 using Sheaft.Domain.Models;
 using Sheaft.Models.Dto;
 using Sheaft.Models.Inputs;
@@ -21,10 +20,15 @@ namespace Sheaft.Mappers
 
             CreateMap<BankAddress, AddressDto>();
             CreateMap<BankAddress, AddressViewModel>();
-            CreateMap<BillingAddress, AddressDto>();
-            CreateMap<BillingAddress, AddressViewModel>();
+            CreateMap<OwnerAddress, AddressDto>();
+            CreateMap<OwnerAddress, AddressViewModel>();
             CreateMap<LegalAddress, AddressDto>();
             CreateMap<LegalAddress, AddressViewModel>();
+            CreateMap<UboAddress, AddressDto>();
+            CreateMap<UboAddress, AddressViewModel>();
+
+            CreateMap<BirthAddress, AddressDto>();
+            CreateMap<BirthAddress, AddressViewModel>();
 
             CreateMap<AddressDto, AddressInput>();
             CreateMap<AddressViewModel, AddressInput>();

@@ -71,7 +71,7 @@ else
     @using (Html.BeginForm("ImpersonateByEmail", "Account", FormMethod.Post, new { @class = "form-inline" }))
     {
         @Html.AntiForgeryToken()
-        <input name="email" type="text" class="form-control  w-50 m-auto" placeholder="User or company email"/>
+        <input name="email" type="text" class="form-control  w-50 m-auto" placeholder="consumer or business email"/>
         <br/>
         <button class="btn btn-outline-primary" style="display:none" type="submit">
             <i class="fa fa-search"></i>

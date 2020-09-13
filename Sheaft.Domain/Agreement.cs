@@ -39,7 +39,7 @@ namespace Sheaft.Domain.Models
         public virtual DeliveryMode Delivery { get; private set; }
         public virtual Store Store { get; private set; }
         public virtual User CreatedBy { get; private set; }
-        public virtual IReadOnlyCollection<TimeSlotHour> SelectedHours { get { return _selectedHours.AsReadOnly(); } private set { } }
+        public virtual IReadOnlyCollection<TimeSlotHour> SelectedHours => _selectedHours.AsReadOnly();
 
         public void SetSelectedHours(IEnumerable<TimeSlotHour> selectedHours)
         {

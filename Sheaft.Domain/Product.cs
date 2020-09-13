@@ -19,7 +19,7 @@ namespace Sheaft.Domain.Models
         {
         }
 
-        public Product(Guid id, string reference, string name, decimal wholeSalePricePerUnit, UnitKind unit, decimal quantityPerUnit, decimal vat, Producer producer)
+        public Product(Guid id, string reference, string name, decimal price, ConditioningKind conditioning, UnitKind unit, decimal quantityPerUnit, decimal vat, Producer producer)
         {
             if (producer == null)
                 throw new ValidationException(MessageKind.Product_Producer_Required);
@@ -29,8 +29,8 @@ namespace Sheaft.Domain.Models
 
             SetName(name);
             SetReference(reference);
-            SetUnit(quantityPerUnit, unit);
-            SetWholeSalePricePerUnit(wholeSalePricePerUnit);
+            SetConditioning(conditioning, quantityPerUnit, unit);
+            SetWholeSalePricePerUnit(price);
             SetVat(vat);
 
             _tags = new List<ProductTag>();
@@ -52,8 +52,9 @@ namespace Sheaft.Domain.Models
         public decimal OnSalePricePerUnit { get; private set; }
         public string Description { get; private set; }
         public string Image { get; private set; }
-        public decimal QuantityPerUnit { get; private set; }
         public UnitKind Unit { get; private set; }
+        public decimal QuantityPerUnit { get; private set; }
+        public ConditioningKind Conditioning { get; private set; }
         public decimal OnSalePrice { get; set; }
         public decimal WholeSalePrice { get; set; }
         public decimal VatPrice { get; set; }
@@ -63,8 +64,8 @@ namespace Sheaft.Domain.Models
         public decimal? Rating { get; set; }
         public virtual Returnable Returnable { get; private set; }
         public virtual Producer Producer { get; private set; }
-        public virtual IReadOnlyCollection<ProductTag> Tags { get { return _tags.AsReadOnly(); } }
-        public virtual IReadOnlyCollection<Rating> Ratings { get { return _ratings.AsReadOnly(); } }
+        public virtual IReadOnlyCollection<ProductTag> Tags => _tags.AsReadOnly();
+        public virtual IReadOnlyCollection<Rating> Ratings => _ratings.AsReadOnly();
 
         public void SetReference(string reference)
         {
@@ -135,7 +136,6 @@ namespace Sheaft.Domain.Models
                 throw new ValidationException(MessageKind.Product_Vat_CannotBe_GreaterThan, 100);
 
             Vat = newVat;
-            VatPricePerUnit = Math.Round(Vat, DIGITS_COUNT);
             RefreshPrices();
         }
 
@@ -213,12 +213,16 @@ namespace Sheaft.Domain.Models
             Returnable = returnable;
         }
 
-        public void SetUnit(decimal quantityPerUnit, UnitKind unit)
+        public void SetConditioning(ConditioningKind conditioning, decimal quantity, UnitKind unit = UnitKind.NotSpecified)
         {
-            if (quantityPerUnit <= 0)
+            if (quantity <= 0)
                 throw new ValidationException(MessageKind.Product_QuantityPerUnit_CannotBe_LowerOrEqualThan, 0);
 
-            QuantityPerUnit = quantityPerUnit;
+            if (conditioning == ConditioningKind.Bulk && unit == UnitKind.NotSpecified)
+                throw new ValidationException(MessageKind.Product_BulkConditioning_Requires_Unit_ToBe_Specified);
+
+            Conditioning = conditioning;
+            QuantityPerUnit = quantity;
             Unit = unit;
 
             RefreshPrices();
@@ -243,13 +247,16 @@ namespace Sheaft.Domain.Models
                 case UnitKind.kg:
                     WholeSalePrice = Math.Round((WholeSalePricePerUnit / QuantityPerUnit), DIGITS_COUNT);
                     break;
+                default:
+                    WholeSalePrice = WholeSalePricePerUnit;
+                    break;
             }
 
             VatPrice = Math.Round(WholeSalePrice * Vat / 100, DIGITS_COUNT);
             OnSalePrice = Math.Round(WholeSalePrice + VatPrice, DIGITS_COUNT);
         }
 
-        protected void RefreshRatings()
+        private void RefreshRatings()
         {
             Rating = Ratings.Any() ? Ratings.Average(r => r.Value) : (decimal?)null;
             RatingsCount = Ratings.Count();

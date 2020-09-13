@@ -51,7 +51,7 @@ namespace Sheaft.Manage.Controllers
             if (take > 100)
                 take = 100;
 
-            var query = _context.Users.OfType<Company>().AsNoTracking();
+            var query = _context.Users.OfType<Business>().AsNoTracking();
 
             if (kind != null)
                 query = query.Where(c => c.Kind == kind);
@@ -66,7 +66,7 @@ namespace Sheaft.Manage.Controllers
                 .OrderByDescending(c => c.CreatedOn)
                 .Skip(page * take)
                 .Take(take)
-                .ProjectTo<CompanyViewModel>(_configurationProvider)
+                .ProjectTo<BusinessViewModel>(_configurationProvider)
                 .ToListAsync(token);
 
             var edited = (string)TempData["Edited"];
@@ -86,10 +86,10 @@ namespace Sheaft.Manage.Controllers
         [HttpGet]
         public async Task<IActionResult> Edit(Guid id, CancellationToken token)
         {
-            var entity = await _context.Users.OfType<Company>()
+            var entity = await _context.Users.OfType<Business>()
                 .AsNoTracking()
                 .Where(c => c.Id == id)
-                .ProjectTo<CompanyViewModel>(_configurationProvider)
+                .ProjectTo<BusinessViewModel>(_configurationProvider)
                 .SingleOrDefaultAsync(token);
 
             if (entity == null)
@@ -101,7 +101,7 @@ namespace Sheaft.Manage.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(CompanyViewModel model, IFormFile picture, CancellationToken token)
+        public async Task<IActionResult> Edit(BusinessViewModel model, IFormFile picture, CancellationToken token)
         {
             var requestUser = await GetRequestUser(token);
             
@@ -114,7 +114,7 @@ namespace Sheaft.Manage.Controllers
                 }
             }
 
-            var entity = await _context.Users.OfType<Company>().SingleOrDefaultAsync(c => c.Id == model.Id, token);
+            var entity = await _context.Users.OfType<Business>().SingleOrDefaultAsync(c => c.Id == model.Id, token);
             Result<bool> result = null;
             if (entity.Kind == ProfileKind.Producer)
             {
@@ -199,11 +199,11 @@ namespace Sheaft.Manage.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete(Guid id, CancellationToken token)
         {
-            var entity = await _context.Users.OfType<Company>().SingleOrDefaultAsync(c => c.Id == id, token);
+            var entity = await _context.Users.OfType<Business>().SingleOrDefaultAsync(c => c.Id == id, token);
             var name = entity.Name;
 
             var requestUser = await GetRequestUser(token);
-            var result = await _mediatr.Send(new DeleteCompanyCommand(requestUser)
+            var result = await _mediatr.Send(new DeleteBusinessCommand(requestUser)
             {
                 Id = id
             }, token);

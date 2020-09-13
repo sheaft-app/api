@@ -23,7 +23,7 @@ namespace Sheaft.GraphQL
             descriptor.Field(c => c.GetFreshdeskTokenAsync(default));
             descriptor.Field(c => c.GetJob(default, default)).Argument("input", c => c.Type<NonNullType<IdType>>());
             descriptor.Field(c => c.GetJobs(default));
-            descriptor.Field(c => c.GetMyCompany(default));
+            descriptor.Field(c => c.GetMyBusiness(default));
             descriptor.Field(c => c.GetMyDefaultQuickOrder(default));
             descriptor.Field(c => c.GetMyOrders(default));
             descriptor.Field(c => c.GetMyPositionAsync(default));
@@ -54,7 +54,7 @@ namespace Sheaft.GraphQL
             descriptor.Field(c => c.HasPickingOrdersExportsInProgressAsync(default));
             descriptor.Field(c => c.HasProductsImportsInProgressAsync(default));
             descriptor.Field(c => c.Me(default));
-            descriptor.Field(c => c.RetrieveSiretCompanyInfosAsync(default, default)).Argument("input", c => c.Type<NonNullType<StringType>>());
+            descriptor.Field(c => c.SearchBusinessWithSiretAsync(default, default)).Argument("input", c => c.Type<NonNullType<StringType>>());
             descriptor.Field(c => c.SearchProducersAsync(default, default)).Argument("input", c => c.Type<SearchTermsInputType>());
             descriptor.Field(c => c.SearchProductsAsync(default, default)).Argument("input", c => c.Type<SearchTermsInputType>());
             descriptor.Field(c => c.SearchStoresAsync(default, default)).Argument("input", c => c.Type<SearchTermsInputType>());

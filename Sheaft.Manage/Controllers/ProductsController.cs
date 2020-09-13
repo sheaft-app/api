@@ -122,6 +122,7 @@ namespace Sheaft.Manage.Controllers
                 Reference = model.Reference,
                 Tags = model.Tags,
                 Unit = model.Unit,
+                Conditioning = model.Conditioning,
                 Vat = model.Vat,
                 Weight = model.Weight,
                 WholeSalePricePerUnit = model.WholeSalePricePerUnit

@@ -1,4 +1,4 @@
-﻿@model IEnumerable<CompanyViewModel>
+﻿@model IEnumerable<BusinessViewModel>
 @{
     ViewData["Title"] = "Companies";
     int take = ViewBag.Take;
@@ -13,7 +13,7 @@
     @if (ViewBag.Removed != null)
     {
         <div class="alert alert-success alert-dismissible fade show" role="alert">
-            <span>Successfully removed company @ViewBag.Removed</span>
+            <span>Successfully removed business @ViewBag.Removed</span>
 
             <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                 <span aria-hidden="true">&times;</span>
@@ -25,7 +25,7 @@
     @if (ViewBag.Restored != null)
     {
         <div class="alert alert-success alert-dismissible fade show" role="alert">
-            <span>Successfully restored company @ViewBag.Restored</span>
+            <span>Successfully restored business @ViewBag.Restored</span>
             <a asp-controller="Companies" asp-action="Edit" asp-route-id="@ViewBag.Edited.Id">View details</a>
 
             <button type="button" class="close" data-dismiss="alert" aria-label="Close">
@@ -38,7 +38,7 @@
     @if (ViewBag.Edited != null)
     {
         <div class="alert alert-success alert-dismissible fade show" role="alert">
-            <span>Successfully updated company @ViewBag.Edited.Name</span>
+            <span>Successfully updated business @ViewBag.Edited.Name</span>
             <a asp-controller="Companies" asp-action="Edit" asp-route-id="@ViewBag.Edited.Id">View details</a>
 
             <button type="button" class="close" data-dismiss="alert" aria-label="Close">

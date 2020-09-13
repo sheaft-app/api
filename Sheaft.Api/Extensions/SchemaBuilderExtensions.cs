@@ -25,7 +25,7 @@ namespace Sheaft.Api
             services.AddType<UserProfileType>();
             services.AddType<ExpectedDeliveryType>();
             services.AddType<RankInformationType>();
-            services.AddType<SirenCompanyType>();
+            services.AddType<SirenBusinessType>();
             services.AddType<SirenAddressType>();
             services.AddType<SirenLegalsType>();
             services.AddType<JobType>();
@@ -69,6 +69,7 @@ namespace Sheaft.Api
             services.AddType<DayOfWeekEnumType>();
             services.AddType<ProfileKindEnumType>();
             services.AddType<UnitKindEnumType>();
+            services.AddType<ConditioningKindEnumType>();
             services.AddType<ProfileKindEnumType>();
             services.AddType<PaymentKindEnumType>();
             services.AddType<WalletKindEnumType>();
@@ -101,7 +102,7 @@ namespace Sheaft.Api
             services.AddType<RegisterStoreInputType>();
             services.AddType<RegisterConsumerInputType>();
             services.AddType<RegisterNewsletterInputType>();
-            services.AddType<RegisterOwnerInputType>();
+            services.AddType<OwnerInputType>();
             services.AddType<SearchTermsInputType>();
             services.AddType<SetProductsAvailabilityInputType>();
             services.AddType<TimeSlotGroupInputType>();
@@ -115,7 +116,7 @@ namespace Sheaft.Api
             services.AddType<UpdateQuickOrderInputType>();
             services.AddType<UpdateConsumerInputType>();
             services.AddType<AddressInputType>();
-            services.AddType<SetCompanyLegalsInputType>();
+            services.AddType<SetBusinessLegalsInputType>();
             services.AddType<SetConsumerLegalsInputType>();
 
             return services;

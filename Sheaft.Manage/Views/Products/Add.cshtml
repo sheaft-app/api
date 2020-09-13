@@ -12,7 +12,7 @@
         new SelectListItem("L", UnitKind.l.ToString("G")),
         new SelectListItem("gr", UnitKind.g.ToString("G")),
         new SelectListItem("kg", UnitKind.kg.ToString("G")),
-        new SelectListItem("unit", UnitKind.unit.ToString("G")),
+        new SelectListItem("NotSpecified", UnitKind.NotSpecified.ToString("G")),
     };
 
     var tags = ((List<TagViewModel>)ViewBag.Tags).Select(c => new SelectListItem(c.Name, c.Id.ToString("D"))).ToList();

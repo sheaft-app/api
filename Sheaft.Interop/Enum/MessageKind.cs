@@ -57,12 +57,14 @@
         Product_NotFound = 0x005011,
         Product_Gone = 0x005012,
         Product_CannotRate_AlreadyRated = 0x005013,
+        Product_BulkConditioning_Requires_Unit_ToBe_Specified = 0x005014,
         CreateProduct_Name_Required_Line = 0x005101,
         CreateProduct_WholeSalePrice_Invalid_Line = 0x005102,
         CreateProduct_Vat_Invalid_Line = 0x005103,
         CreateProduct_Reference_AlreadyExists = 0x005104,
         ImportProduct_Missing_Tab = 0x005201,
         ImportProduct_Reference_AlreadyExists = 0x005202,
+
         //Consumer 
         Consumer = 0x006000,
         Consumer_Id_Invalid = 0x006001,

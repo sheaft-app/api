@@ -16,7 +16,6 @@ namespace Sheaft.Infrastructure
             entity.Property(c => c.UpdatedOn).IsConcurrencyToken();
 
             entity.Property(c => c.Name).IsRequired();
-            entity.Property(c => c.IsActive).HasDefaultValue(true);
 
             entity.HasDiscriminator(c => c.Kind)
                 .HasValue<BankAccount>(PaymentKind.BankAccount)

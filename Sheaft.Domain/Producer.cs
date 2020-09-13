@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace Sheaft.Domain.Models
 {
-    public class Producer : Company
+    public class Producer : Business
     {
         private List<ProducerTag> _tags;
 
@@ -14,11 +14,11 @@ namespace Sheaft.Domain.Models
         }
 
         public Producer(Guid id, string name, string firstname, string lastname, string email, string siret, string vatIdentifier, UserAddress address, bool openForBusiness = true, string phone = null, string description = null)
-           : base(id, ProfileKind.Producer, LegalKind.Individual, name, firstname, lastname,  email, siret, vatIdentifier, address, openForBusiness, phone, description)
+           : base(id, ProfileKind.Producer, name, firstname, lastname,  email, siret, vatIdentifier, address, openForBusiness, phone, description)
         {
         }
 
-        public virtual IReadOnlyCollection<ProducerTag> Tags { get { return _tags.AsReadOnly(); } }
+        public virtual IReadOnlyCollection<ProducerTag> Tags => _tags.AsReadOnly(); 
 
         public void SetTags(IEnumerable<Tag> tags)
         {

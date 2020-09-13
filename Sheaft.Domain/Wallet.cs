@@ -22,10 +22,11 @@ namespace Sheaft.Domain.Models
         public DateTimeOffset CreatedOn { get; private set; }
         public DateTimeOffset? UpdatedOn { get; private set; }
         public DateTimeOffset? RemovedOn { get; private set; }
+        public DateTimeOffset? ExternalUpdatedOn { get; private set; }
         public string Identifier { get; private set; }
         public string Name { get; private set; }
         public WalletKind Kind { get; private set; }
-        public decimal? Amount { get; private set; }
+        public decimal Balance { get; private set; }
         public virtual User User { get; private set; }
 
         public void SetName(string name)
@@ -36,9 +37,9 @@ namespace Sheaft.Domain.Models
             Name = name;
         }
 
-        public void SetAmount(decimal amount)
+        public void SetAmount(decimal balance)
         {
-            Amount = amount;
+            Balance = balance;
         }
 
         public void SetIdentifier(string identifier)

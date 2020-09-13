@@ -12,15 +12,13 @@ namespace Sheaft.Mappers
         public UserProfile()
         {
             CreateMap<User, UserViewModel>()
-                .ForMember(c => c.Address, opt => opt.MapFrom(d => d.Address))
-                .ForMember(c => c.BillingAddress, opt => opt.MapFrom(d => d.BillingAddress));
+                .ForMember(c => c.Address, opt => opt.MapFrom(d => d.Address));
 
             CreateMap<User, UserProfileDto>();
 
             CreateMap<User, UserDto>()
                 .IncludeBase<User, UserProfileDto>()
-                .ForMember(c => c.Address, opt => opt.MapFrom(d => d.Address))
-                .ForMember(c => c.BillingAddress, opt => opt.MapFrom(d => d.BillingAddress));
+                .ForMember(c => c.Address, opt => opt.MapFrom(d => d.Address));
 
             CreateMap<PurchaseOrderSender, UserProfileDto>();
             CreateMap<PurchaseOrderVendor, UserProfileDto>();

@@ -21,6 +21,7 @@ namespace Sheaft.Models.ViewModels
         public string Picture { get; set; }
         public decimal QuantityPerUnit { get; set; }
         public UnitKind Unit { get; set; }
+        public ConditioningKind Conditioning { get; set; }
         public decimal OnSalePrice { get; set; }
         public decimal WholeSalePrice { get; set; }
         public decimal VatPrice { get; set; }
@@ -28,7 +29,7 @@ namespace Sheaft.Models.ViewModels
         public bool Available { get; set; } = true;
         public decimal? Rating { get; set; }
         public Guid? ReturnableId { get; set; }
-        public CompanyViewModel Producer { get; set; }
+        public BusinessViewModel Producer { get; set; }
         public IEnumerable<Guid> Tags { get; set; }
     }
 }

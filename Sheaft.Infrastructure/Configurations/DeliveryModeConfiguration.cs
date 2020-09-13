@@ -1,6 +1,7 @@
 ﻿using Sheaft.Domain.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Sheaft.Interop.Enums;
 
 namespace Sheaft.Infrastructure
 {
@@ -14,11 +15,7 @@ namespace Sheaft.Infrastructure
             entity.Property(c => c.CreatedOn);
             entity.Property(c => c.UpdatedOn).IsConcurrencyToken();
 
-            entity.OwnsOne(c => c.Address, cb =>
-            {
-                cb.ToTable("DeliveryModeAddresses");
-            });
-
+            entity.OwnsOne(c => c.Address);
             entity.OwnsMany(c => c.OpeningHours, cb =>
             {
                 cb.ToTable("DeliveryModeOpeningHours");

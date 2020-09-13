@@ -64,7 +64,7 @@ namespace Sheaft.Manage.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Add(CancellationToken token)
+        public IActionResult Add()
         {
             return View(new LevelViewModel());
         }

@@ -23,6 +23,7 @@ namespace Sheaft.Models.Dto
         public string ImageSmall { get; set; }
         public decimal QuantityPerUnit { get; set; }
         public UnitKind Unit { get; set; }
+        public ConditioningKind Conditioning { get; set; }
         public decimal OnSalePrice { get; set; }
         public decimal WholeSalePrice { get; set; }
         public decimal VatPrice { get; set; }
@@ -32,7 +33,7 @@ namespace Sheaft.Models.Dto
         public decimal? Rating { get; set; }
         public bool IsReturnable { get; set; }
         public ReturnableDto Returnable { get; set; }
-        public CompanyProfileDto Producer { get; set; }
+        public BusinessProfileDto Producer { get; set; }
         public IEnumerable<TagDto> Tags { get; set; }
         public IEnumerable<RatingDto> Ratings { get; set; }
     }

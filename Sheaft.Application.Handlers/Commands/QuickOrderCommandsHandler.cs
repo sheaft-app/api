@@ -16,7 +16,6 @@ namespace Sheaft.Application.Handlers
         IRequestHandler<CreateQuickOrderCommand, Result<Guid>>,
         IRequestHandler<UpdateQuickOrderCommand, Result<bool>>,
         IRequestHandler<UpdateQuickOrderProductsCommand, Result<bool>>,
-        IRequestHandler<UpdateQuickOrderDeliveriesCommand, Result<bool>>,
         IRequestHandler<SetDefaultQuickOrderCommand, Result<bool>>,
         IRequestHandler<DeleteQuickOrderCommand, Result<bool>>,
         IRequestHandler<DeleteQuickOrdersCommand, Result<bool>>
@@ -102,11 +101,6 @@ namespace Sheaft.Application.Handlers
 
                 return Ok(await _context.SaveChangesAsync(token) > 0);
             });
-        }
-
-        public async Task<Result<bool>> Handle(UpdateQuickOrderDeliveriesCommand request, CancellationToken token)
-        {
-            throw new NotImplementedException();
         }
 
         public async Task<Result<bool>> Handle(SetDefaultQuickOrderCommand request, CancellationToken token)

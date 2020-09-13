@@ -36,7 +36,7 @@ namespace Sheaft.Domain.Models
         public ValidationStatus Status { get; private set; }
         public DocumentKind Kind { get; private set; }
         public virtual User User { get; private set; }
-        public virtual IReadOnlyCollection<Page> Pages { get { return _pages.AsReadOnly(); } private set { } }
+        public virtual IReadOnlyCollection<Page> Pages => _pages.AsReadOnly();
 
         public void SetIdentifier(string identifier)
         {

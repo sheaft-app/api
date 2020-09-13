@@ -14,7 +14,7 @@ namespace Sheaft.Infrastructure
             entity.Property(c => c.CreatedOn);
             entity.Property(c => c.UpdatedOn).IsConcurrencyToken();
             entity.Property(c => c.Name).IsRequired();
-            entity.Property(o => o.Amount).HasColumnType("decimal(10,2)");
+            entity.Property(o => o.Balance).HasColumnType("decimal(10,2)");
 
             entity.HasOne(c => c.User).WithMany().HasForeignKey("UserUid").OnDelete(DeleteBehavior.Cascade);
 

@@ -213,7 +213,7 @@ namespace Sheaft.Api
             services.AddScoped<IPspService, PspService>();
 
             services.AddScoped<IAgreementQueries, AgreementQueries>();
-            services.AddScoped<ICompanyQueries, CompanyQueries>();
+            services.AddScoped<IBusinessQueries, BusinessQueries>();
             services.AddScoped<IDeliveryQueries, DeliveryQueries>();
             services.AddScoped<IDepartmentQueries, DepartmentQueries>();
             services.AddScoped<IJobQueries, JobQueries>();

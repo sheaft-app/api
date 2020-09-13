@@ -38,6 +38,7 @@ namespace Sheaft.Infrastructure
         public DbSet<Department> Departments { get; set; }
         public DbSet<Document> Documents { get; set; }
         public DbSet<Job> Jobs { get; set; }
+        public DbSet<Legal> Legals { get; set; }
         public DbSet<Level> Levels { get; set; }
         public DbSet<Nationality> Nationalities { get; set; }
         public DbSet<Notification> Notifications { get; set; }

@@ -110,7 +110,7 @@ namespace Sheaft.Application.Queries
                         RatingsCount = p.Product_ratings_count,
                         Tags = p.Product_tags?.Select(t => new TagDto { Name = t }) ?? new List<TagDto>(),
                         Unit = (UnitKind)Enum.Parse(typeof(UnitKind), p.Product_unit.ToLowerInvariant()),
-                        Producer = new CompanyProfileDto
+                        Producer = new BusinessProfileDto
                         {
                             Id = p.Producer_id,
                             Name = p.Producer_name,

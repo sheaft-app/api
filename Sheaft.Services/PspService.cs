@@ -39,24 +39,60 @@ namespace Sheaft.Services
 
         }
 
-        public async Task<Result<string>> CreateUserAsync(User user, CancellationToken token)
+        public async Task<Result<string>> CreateConsumerAsync(ConsumerLegal consumerLegal, CancellationToken token)
         {
-            if (!string.IsNullOrWhiteSpace(user.Identifier))
+            if (!string.IsNullOrWhiteSpace(consumerLegal.Consumer.Identifier))
                 return new Result<string>(new SheaftException(ExceptionKind.BadRequest, MessageKind.PsP_CannotCreate_User_User_Exists));
 
             try
             {
                 await EnsureAccessTokenIsValidAsync(token);
 
-                switch (user.Kind)
-                {
-                    case ProfileKind.Consumer:
-                        var consumer = await _api.Users.CreateAsync(user.Id.ToString("N"), new UserNaturalPostDTO(user.Email, user.FirstName, user.LastName, user.Birthdate.Value.DateTime, user.Nationality.GetCountry(), user.CountryOfResidence.GetCountry()));
-                        return new Result<string>(consumer.Id);
-                    default:
-                        var business = await _api.Users.CreateAsync(user.Id.ToString("N"), new UserLegalPostDTO(user.Email, user.Name, user.Legal.GetLegalPersonType(), user.FirstName, user.LastName, user.Birthdate.Value.DateTime, user.Nationality.GetCountry(), user.CountryOfResidence.GetCountry()));
-                        return new Result<string>(business.Id);
-                }
+                var result = await _api.Users.CreateAsync(consumerLegal.Id.ToString("N"), 
+                    new UserNaturalPostDTO(
+                        consumerLegal.Owner.Email,
+                        consumerLegal.Owner.FirstName,
+                        consumerLegal.Owner.LastName,
+                        consumerLegal.Owner.Birthdate.DateTime,
+                        consumerLegal.Owner.Nationality.GetCountry(),
+                        consumerLegal.Owner.CountryOfResidence.GetCountry())
+                    {
+                        Address = consumerLegal.Owner.Address.GetAddress()  
+                    });
+                return new Result<string>(result.Id);
+            }
+            catch (Exception e)
+            {
+                return new Result<string>(e);
+            }
+        }
+
+        public async Task<Result<string>> CreateBusinessAsync(BusinessLegal businessLegal, CancellationToken token)
+        {
+            if (!string.IsNullOrWhiteSpace(businessLegal.Business.Identifier))
+                return new Result<string>(new SheaftException(ExceptionKind.BadRequest, MessageKind.PsP_CannotCreate_User_User_Exists));
+
+            try
+            {
+                await EnsureAccessTokenIsValidAsync(token);
+
+                var result = await _api.Users.CreateAsync(businessLegal.Id.ToString("N"),
+                    new UserLegalPostDTO(
+                        businessLegal.Email,
+                        businessLegal.Business.Name,
+                        businessLegal.Kind.GetLegalPersonType(),
+                        businessLegal.Owner.FirstName,
+                        businessLegal.Owner.LastName,
+                        businessLegal.Owner.Birthdate.DateTime,
+                        businessLegal.Owner.Nationality.GetCountry(),
+                        businessLegal.Owner.CountryOfResidence.GetCountry())
+                    {
+                        CompanyNumber = businessLegal.Business.Siret,
+                        HeadquartersAddress = businessLegal.Address.GetAddress(),
+                        LegalRepresentativeAddress = businessLegal.Owner.Address.GetAddress(),
+                        LegalRepresentativeEmail = businessLegal.Owner.Email
+                    });
+                return new Result<string>(result.Id);
             }
             catch (Exception e)
             {
@@ -98,7 +134,17 @@ namespace Sheaft.Services
                 await EnsureAccessTokenIsValidAsync(token);
 
                 var result = await _api.Users.CreateBankAccountIbanAsync(payment.Id.ToString("N"),
-                    new BankAccountIbanPostDTO(payment.OwnerName, payment.OwnerAddress.GetAddress(), payment.IBAN)
+                    new BankAccountIbanPostDTO(
+                        payment.Owner, 
+                        new Address
+                            {
+                                AddressLine1 = payment.Line1,
+                                AddressLine2 = payment.Line2,
+                                PostalCode = payment.Zipcode,
+                                City = payment.City,
+                                Country = payment.Country.GetCountry()
+                            }, 
+                        payment.IBAN)
                     {
                         BIC = payment.BIC,
                         Type = BankAccountType.IBAN,
@@ -165,7 +211,7 @@ namespace Sheaft.Services
                 await EnsureAccessTokenIsValidAsync(token);
 
                 var result = await _api.Users.CreateKycDocumentAsync(document.Id.ToString("N"), document.User.Identifier, document.Kind.GetDocumentType());
-                
+
                 return new Result<PspDocumentResultDto>(new PspDocumentResultDto
                 {
                     Identifier = result.Id,
@@ -228,7 +274,7 @@ namespace Sheaft.Services
             }
         }
 
-        public async Task<Result<PspWebPaymentResultDto>> CreateWebPayinAsync(WebPayinTransaction transaction, CancellationToken token)
+        public async Task<Result<PspWebPaymentResultDto>> CreateWebPayinAsync(WebPayinTransaction transaction, Owner owner, CancellationToken token)
         {
             if (string.IsNullOrWhiteSpace(transaction.Author.Identifier))
                 return new Result<PspWebPaymentResultDto>(new SheaftException(ExceptionKind.BadRequest, MessageKind.PsP_CannotCreate_WebPayin_Author_Not_Exists));
@@ -282,7 +328,7 @@ namespace Sheaft.Services
             }
         }
 
-        public async Task<Result<PspPaymentResultDto>> CreateCardPayinAsync(CardPayinTransaction transaction, CancellationToken token)
+        public async Task<Result<PspPaymentResultDto>> CreateCardPayinAsync(CardPayinTransaction transaction, Owner owner, CancellationToken token)
         {
             if (string.IsNullOrWhiteSpace(transaction.Author.Identifier))
                 return new Result<PspPaymentResultDto>(new SheaftException(ExceptionKind.BadRequest, MessageKind.PsP_CannotCreate_WebPayin_Author_Not_Exists));
@@ -314,7 +360,7 @@ namespace Sheaft.Services
                         transaction.Reference,
                         new Billing
                         {
-                            Address = transaction.Author.BillingAddress.GetAddress()
+                            Address = owner.Address.GetAddress()
                         })
                     {
                         SecureMode = SecureMode.DEFAULT

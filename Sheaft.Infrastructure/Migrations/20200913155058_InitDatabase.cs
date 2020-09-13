@@ -146,23 +146,19 @@ namespace Sheaft.Infrastructure.Migrations
                     RemovedOn = table.Column<DateTimeOffset>(nullable: true),
                     Identifier = table.Column<string>(nullable: true),
                     Kind = table.Column<int>(nullable: false),
-                    Legal = table.Column<int>(nullable: false),
                     Name = table.Column<string>(nullable: false),
                     Email = table.Column<string>(nullable: false),
                     Phone = table.Column<string>(nullable: true),
                     Picture = table.Column<string>(nullable: true),
                     FirstName = table.Column<string>(nullable: false),
                     LastName = table.Column<string>(nullable: false),
-                    Birthdate = table.Column<DateTimeOffset>(nullable: true),
-                    Nationality = table.Column<int>(nullable: false),
-                    CountryOfResidence = table.Column<int>(nullable: false),
                     SponsorshipCode = table.Column<string>(nullable: true),
                     TotalPoints = table.Column<int>(nullable: false, defaultValue: 0),
-                    Anonymous = table.Column<bool>(nullable: true),
                     OpenForNewBusiness = table.Column<bool>(nullable: true),
                     Description = table.Column<string>(nullable: true),
                     VatIdentifier = table.Column<string>(nullable: true),
-                    Siret = table.Column<string>(nullable: true)
+                    Siret = table.Column<string>(nullable: true),
+                    Anonymous = table.Column<bool>(nullable: true, defaultValue: false)
                 },
                 constraints: table =>
                 {
@@ -218,6 +214,13 @@ namespace Sheaft.Infrastructure.Migrations
                     LockOrderHoursBeforeDelivery = table.Column<int>(nullable: false),
                     Name = table.Column<string>(nullable: true),
                     Description = table.Column<string>(nullable: true),
+                    Address_Line1 = table.Column<string>(nullable: true),
+                    Address_Line2 = table.Column<string>(nullable: true),
+                    Address_Zipcode = table.Column<string>(nullable: true),
+                    Address_City = table.Column<string>(nullable: true),
+                    Address_Country = table.Column<int>(nullable: true),
+                    Address_Longitude = table.Column<double>(nullable: true),
+                    Address_Latitude = table.Column<double>(nullable: true),
                     ProducerUid = table.Column<long>(nullable: false)
                 },
                 constraints: table =>
@@ -296,6 +299,48 @@ namespace Sheaft.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Legals",
+                columns: table => new
+                {
+                    Uid = table.Column<long>(nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Id = table.Column<Guid>(nullable: false),
+                    CreatedOn = table.Column<DateTimeOffset>(nullable: false),
+                    UpdatedOn = table.Column<DateTimeOffset>(nullable: true),
+                    RemovedOn = table.Column<DateTimeOffset>(nullable: true),
+                    Kind = table.Column<int>(nullable: false),
+                    Owner_Id = table.Column<Guid>(nullable: true),
+                    Owner_FirstName = table.Column<string>(nullable: true),
+                    Owner_LastName = table.Column<string>(nullable: true),
+                    Owner_Email = table.Column<string>(nullable: true),
+                    Owner_Birthdate = table.Column<DateTimeOffset>(nullable: true),
+                    Owner_Nationality = table.Column<int>(nullable: true),
+                    Owner_CountryOfResidence = table.Column<int>(nullable: true),
+                    Owner_Address_Line1 = table.Column<string>(nullable: true),
+                    Owner_Address_Line2 = table.Column<string>(nullable: true),
+                    Owner_Address_Zipcode = table.Column<string>(nullable: true),
+                    Owner_Address_City = table.Column<string>(nullable: true),
+                    Owner_Address_Country = table.Column<int>(nullable: true),
+                    Email = table.Column<string>(nullable: true),
+                    BusinessUid = table.Column<long>(nullable: true),
+                    ConsumerUid = table.Column<long>(nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Legals", x => x.Uid);
+                    table.ForeignKey(
+                        name: "FK_Legals_Users_BusinessUid",
+                        column: x => x.BusinessUid,
+                        principalTable: "Users",
+                        principalColumn: "Uid");
+                    table.ForeignKey(
+                        name: "FK_Legals_Users_ConsumerUid",
+                        column: x => x.ConsumerUid,
+                        principalTable: "Users",
+                        principalColumn: "Uid");
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Notifications",
                 columns: table => new
                 {
@@ -362,11 +407,16 @@ namespace Sheaft.Infrastructure.Migrations
                     Identifier = table.Column<string>(nullable: true),
                     Name = table.Column<string>(nullable: false),
                     Kind = table.Column<int>(nullable: false),
-                    IsActive = table.Column<bool>(nullable: true, defaultValue: true),
+                    IsActive = table.Column<bool>(nullable: false),
                     UserUid = table.Column<long>(nullable: false),
                     IBAN = table.Column<string>(nullable: true),
                     BIC = table.Column<string>(nullable: true),
-                    OwnerName = table.Column<string>(nullable: true)
+                    Owner = table.Column<string>(nullable: true),
+                    Line1 = table.Column<string>(nullable: true),
+                    Line2 = table.Column<string>(nullable: true),
+                    Zipcode = table.Column<string>(nullable: true),
+                    City = table.Column<string>(nullable: true),
+                    Country = table.Column<int>(nullable: true)
                 },
                 constraints: table =>
                 {
@@ -374,28 +424,6 @@ namespace Sheaft.Infrastructure.Migrations
                     table.ForeignKey(
                         name: "FK_PaymentMethods_Users_UserUid",
                         column: x => x.UserUid,
-                        principalTable: "Users",
-                        principalColumn: "Uid",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "ProducerLegalAddresses",
-                columns: table => new
-                {
-                    ProducerUid = table.Column<long>(nullable: false),
-                    Line1 = table.Column<string>(nullable: true),
-                    Line2 = table.Column<string>(nullable: true),
-                    Zipcode = table.Column<string>(nullable: true),
-                    City = table.Column<string>(nullable: true),
-                    Country = table.Column<int>(nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_ProducerLegalAddresses", x => x.ProducerUid);
-                    table.ForeignKey(
-                        name: "FK_ProducerLegalAddresses_Users_ProducerUid",
-                        column: x => x.ProducerUid,
                         principalTable: "Users",
                         principalColumn: "Uid",
                         onDelete: ReferentialAction.Cascade);
@@ -506,28 +534,6 @@ namespace Sheaft.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "StoreLegalAddresses",
-                columns: table => new
-                {
-                    StoreUid = table.Column<long>(nullable: false),
-                    Line1 = table.Column<string>(nullable: true),
-                    Line2 = table.Column<string>(nullable: true),
-                    Zipcode = table.Column<string>(nullable: true),
-                    City = table.Column<string>(nullable: true),
-                    Country = table.Column<int>(nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_StoreLegalAddresses", x => x.StoreUid);
-                    table.ForeignKey(
-                        name: "FK_StoreLegalAddresses_Users_StoreUid",
-                        column: x => x.StoreUid,
-                        principalTable: "Users",
-                        principalColumn: "Uid",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "StoreOpeningHours",
                 columns: table => new
                 {
@@ -574,28 +580,6 @@ namespace Sheaft.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "UserBillingAddresses",
-                columns: table => new
-                {
-                    UserUid = table.Column<long>(nullable: false),
-                    Line1 = table.Column<string>(nullable: true),
-                    Line2 = table.Column<string>(nullable: true),
-                    Zipcode = table.Column<string>(nullable: true),
-                    City = table.Column<string>(nullable: true),
-                    Country = table.Column<int>(nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_UserBillingAddresses", x => x.UserUid);
-                    table.ForeignKey(
-                        name: "FK_UserBillingAddresses_Users_UserUid",
-                        column: x => x.UserUid,
-                        principalTable: "Users",
-                        principalColumn: "Uid",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Wallets",
                 columns: table => new
                 {
@@ -605,10 +589,11 @@ namespace Sheaft.Infrastructure.Migrations
                     CreatedOn = table.Column<DateTimeOffset>(nullable: false),
                     UpdatedOn = table.Column<DateTimeOffset>(nullable: true),
                     RemovedOn = table.Column<DateTimeOffset>(nullable: true),
+                    ExternalUpdatedOn = table.Column<DateTimeOffset>(nullable: true),
                     Identifier = table.Column<string>(nullable: true),
                     Name = table.Column<string>(nullable: false),
                     Kind = table.Column<int>(nullable: false),
-                    Amount = table.Column<decimal>(type: "decimal(10,2)", nullable: true),
+                    Balance = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
                     UserUid = table.Column<long>(nullable: false)
                 },
                 constraints: table =>
@@ -735,30 +720,6 @@ namespace Sheaft.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "DeliveryModeAddresses",
-                columns: table => new
-                {
-                    DeliveryModeUid = table.Column<long>(nullable: false),
-                    Line1 = table.Column<string>(nullable: true),
-                    Line2 = table.Column<string>(nullable: true),
-                    Zipcode = table.Column<string>(nullable: true),
-                    City = table.Column<string>(nullable: true),
-                    Country = table.Column<int>(nullable: false),
-                    Longitude = table.Column<double>(nullable: true),
-                    Latitude = table.Column<double>(nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_DeliveryModeAddresses", x => x.DeliveryModeUid);
-                    table.ForeignKey(
-                        name: "FK_DeliveryModeAddresses_DeliveryModes_DeliveryModeUid",
-                        column: x => x.DeliveryModeUid,
-                        principalTable: "DeliveryModes",
-                        principalColumn: "Uid",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "DeliveryModeOpeningHours",
                 columns: table => new
                 {
@@ -798,6 +759,57 @@ namespace Sheaft.Infrastructure.Migrations
                         name: "FK_DocumentPages_Documents_DocumentUid",
                         column: x => x.DocumentUid,
                         principalTable: "Documents",
+                        principalColumn: "Uid",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "BusinessLegalAddresses",
+                columns: table => new
+                {
+                    BusinessLegalUid = table.Column<long>(nullable: false),
+                    Line1 = table.Column<string>(nullable: true),
+                    Line2 = table.Column<string>(nullable: true),
+                    Zipcode = table.Column<string>(nullable: true),
+                    City = table.Column<string>(nullable: true),
+                    Country = table.Column<int>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_BusinessLegalAddresses", x => x.BusinessLegalUid);
+                    table.ForeignKey(
+                        name: "FK_BusinessLegalAddresses_Legals_BusinessLegalUid",
+                        column: x => x.BusinessLegalUid,
+                        principalTable: "Legals",
+                        principalColumn: "Uid",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "BusinessUbos",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(nullable: false),
+                    BusinessLegalUid = table.Column<long>(nullable: false),
+                    FirstName = table.Column<string>(nullable: true),
+                    LastName = table.Column<string>(nullable: true),
+                    Birthdate = table.Column<DateTimeOffset>(nullable: false),
+                    Nationality = table.Column<int>(nullable: false),
+                    Address_Line1 = table.Column<string>(nullable: true),
+                    Address_Line2 = table.Column<string>(nullable: true),
+                    Address_Zipcode = table.Column<string>(nullable: true),
+                    Address_City = table.Column<string>(nullable: true),
+                    Address_Country = table.Column<int>(nullable: true),
+                    BirthAddress_City = table.Column<string>(nullable: true),
+                    BirthAddress_Country = table.Column<int>(nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_BusinessUbos", x => new { x.BusinessLegalUid, x.Id });
+                    table.ForeignKey(
+                        name: "FK_BusinessUbos_Legals_BusinessLegalUid",
+                        column: x => x.BusinessLegalUid,
+                        principalTable: "Legals",
                         principalColumn: "Uid",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -917,28 +929,6 @@ namespace Sheaft.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "BankAccountOwnerAddresses",
-                columns: table => new
-                {
-                    BankAccountUid = table.Column<long>(nullable: false),
-                    Line1 = table.Column<string>(nullable: true),
-                    Line2 = table.Column<string>(nullable: true),
-                    Zipcode = table.Column<string>(nullable: true),
-                    City = table.Column<string>(nullable: true),
-                    Country = table.Column<int>(nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_BankAccountOwnerAddresses", x => x.BankAccountUid);
-                    table.ForeignKey(
-                        name: "FK_BankAccountOwnerAddresses_PaymentMethods_BankAccountUid",
-                        column: x => x.BankAccountUid,
-                        principalTable: "PaymentMethods",
-                        principalColumn: "Uid",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Products",
                 columns: table => new
                 {
@@ -956,8 +946,9 @@ namespace Sheaft.Infrastructure.Migrations
                     OnSalePricePerUnit = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
                     Description = table.Column<string>(nullable: true),
                     Image = table.Column<string>(nullable: true),
-                    QuantityPerUnit = table.Column<decimal>(type: "decimal(10,3)", nullable: false),
                     Unit = table.Column<int>(nullable: false),
+                    QuantityPerUnit = table.Column<decimal>(type: "decimal(10,3)", nullable: false),
+                    Conditioning = table.Column<int>(nullable: false),
                     OnSalePrice = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
                     WholeSalePrice = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
                     VatPrice = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
@@ -1017,7 +1008,14 @@ namespace Sheaft.Infrastructure.Migrations
                     DeliveryStartedOn = table.Column<DateTimeOffset>(nullable: true),
                     DeliveredOn = table.Column<DateTimeOffset>(nullable: true),
                     From = table.Column<TimeSpan>(nullable: false),
-                    To = table.Column<TimeSpan>(nullable: false)
+                    To = table.Column<TimeSpan>(nullable: false),
+                    Address_Line1 = table.Column<string>(nullable: true),
+                    Address_Line2 = table.Column<string>(nullable: true),
+                    Address_Zipcode = table.Column<string>(nullable: true),
+                    Address_City = table.Column<string>(nullable: true),
+                    Address_Country = table.Column<int>(nullable: true),
+                    Address_Longitude = table.Column<double>(nullable: true),
+                    Address_Latitude = table.Column<double>(nullable: true)
                 },
                 constraints: table =>
                 {
@@ -1235,30 +1233,6 @@ namespace Sheaft.Infrastructure.Migrations
                         principalColumn: "Uid");
                 });
 
-            migrationBuilder.CreateTable(
-                name: "ExpectedDeliveryAddresses",
-                columns: table => new
-                {
-                    ExpectedDeliveryPurchaseOrderUid = table.Column<long>(nullable: false),
-                    Line1 = table.Column<string>(nullable: true),
-                    Line2 = table.Column<string>(nullable: true),
-                    Zipcode = table.Column<string>(nullable: true),
-                    City = table.Column<string>(nullable: true),
-                    Country = table.Column<int>(nullable: false),
-                    Longitude = table.Column<double>(nullable: true),
-                    Latitude = table.Column<double>(nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_ExpectedDeliveryAddresses", x => x.ExpectedDeliveryPurchaseOrderUid);
-                    table.ForeignKey(
-                        name: "FK_ExpectedDeliveryAddresses_ExpectedDeliveries_ExpectedDeliveryPurchaseOrderUid",
-                        column: x => x.ExpectedDeliveryPurchaseOrderUid,
-                        principalTable: "ExpectedDeliveries",
-                        principalColumn: "PurchaseOrderUid",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
             migrationBuilder.CreateIndex(
                 name: "IX_Agreements_CreatedByUid",
                 table: "Agreements",
@@ -1381,6 +1355,31 @@ namespace Sheaft.Infrastructure.Migrations
                 name: "IX_Jobs_Uid_Id_UserUid_RemovedOn",
                 table: "Jobs",
                 columns: new[] { "Uid", "Id", "UserUid", "RemovedOn" });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Legals_BusinessUid",
+                table: "Legals",
+                column: "BusinessUid",
+                unique: true,
+                filter: "[BusinessUid] IS NOT NULL");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Legals_ConsumerUid",
+                table: "Legals",
+                column: "ConsumerUid",
+                unique: true,
+                filter: "[ConsumerUid] IS NOT NULL");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Legals_Id",
+                table: "Legals",
+                column: "Id",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Legals_Uid_Id",
+                table: "Legals",
+                columns: new[] { "Uid", "Id" });
 
             migrationBuilder.CreateIndex(
                 name: "IX_Levels_Id",
@@ -2395,23 +2394,20 @@ namespace Sheaft.Infrastructure.Migrations
             migrationBuilder.Sql("CREATE NONCLUSTERED INDEX [Index_ExpiresAtTime] ON [Cache].[CachedItems](	[ExpiresAtTime] ASC)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]");
 
 
-            migrationBuilder.InsertData("Users", new List<string>() { "Uid", "Id", "Legal", "Nationality", "CountryOfResidence", "CreatedOn", "FirstName", "LastName", "Name", "Email", "Siret", "VatIdentifier", "kind", "OpenForNewBusiness" }.ToArray(), new List<object>() { 1, "28491432-1754-4285-9F67-5386A898A48F", 3, 76, 76, "2020-01-25 15:23:10", "Benoit", "Mugnier", "GAEC La Ferme du Parquet", "contact@lfdp.xyz", "452121545", "FR11452121545", "0", "1" }.ToArray(), "dbo");
-            migrationBuilder.InsertData("Users", new List<string>() { "Uid", "Id", "Legal", "Nationality", "CountryOfResidence", "CreatedOn", "FirstName", "LastName", "Name", "Email", "Siret", "VatIdentifier", "kind", "OpenForNewBusiness" }.ToArray(), new List<object>() { 2, "5A8F0AE2-B701-47F0-A8EF-E7C2365A72EB", 1, 76, 76, "2020-01-30 22:45:41", "Ophélie", "Lulin", "Biocoop Semnoz", "contact@biocoop-semnoz.xyz", "342121545", "FR12342121545", "1", "1" }.ToArray(), "dbo");
-            migrationBuilder.InsertData("Users", new List<string>() { "Uid", "Id", "Legal", "Nationality", "CountryOfResidence", "CreatedOn", "FirstName", "LastName", "Name", "Email", "Siret", "VatIdentifier", "kind", "OpenForNewBusiness" }.ToArray(), new List<object>() { 3, "0EAFD299-D0E6-4A63-AF8D-6D154DB96F55", 1, 76, 76, "2020-01-27 22:45:41", "John", "Syntax", "Biocoop Orky", "contact@biocoop-orky.xyz", "451201545", "FR13451201154", "1", "1" }.ToArray(), "dbo");
-            migrationBuilder.InsertData("Users", new List<string>() { "Uid", "Id", "Legal", "Nationality", "CountryOfResidence", "CreatedOn", "FirstName", "LastName", "Name", "Email", "Siret", "VatIdentifier", "kind", "OpenForNewBusiness" }.ToArray(), new List<object>() { 4, "442E31E3-EEA9-4AA0-B741-3245ED1C6F2F", 3, 76, 76, "2020-01-29 22:45:41", "Peter", "Fotdakor", "GAEC La Ferme du Crêt Joli", "contact@lfdcj.xyz", "452981545", "FR14452981545", "0", "1" }.ToArray(), "dbo");
+            migrationBuilder.InsertData("Users", new List<string>() { "Uid", "Id", "CreatedOn", "FirstName", "LastName", "Name", "Email", "Siret", "VatIdentifier", "kind", "OpenForNewBusiness" }.ToArray(), new List<object>() { 1, "28491432-1754-4285-9F67-5386A898A48F", "2020-01-25 15:23:10", "Benoit", "Mugnier", "GAEC La Ferme du Parquet", "contact@lfdp.xyz", "452121545", "FR11452121545", "0", "1" }.ToArray(), "dbo");
+            migrationBuilder.InsertData("Users", new List<string>() { "Uid", "Id", "CreatedOn", "FirstName", "LastName", "Name", "Email", "Siret", "VatIdentifier", "kind", "OpenForNewBusiness" }.ToArray(), new List<object>() { 2, "5A8F0AE2-B701-47F0-A8EF-E7C2365A72EB", "2020-01-30 22:45:41", "Ophélie", "Lulin", "Biocoop Semnoz", "contact@biocoop-semnoz.xyz", "342121545", "FR12342121545", "1", "1" }.ToArray(), "dbo");
+            migrationBuilder.InsertData("Users", new List<string>() { "Uid", "Id", "CreatedOn", "FirstName", "LastName", "Name", "Email", "Siret", "VatIdentifier", "kind", "OpenForNewBusiness" }.ToArray(), new List<object>() { 3, "0EAFD299-D0E6-4A63-AF8D-6D154DB96F55", "2020-01-27 22:45:41", "John", "Syntax", "Biocoop Orky", "contact@biocoop-orky.xyz", "451201545", "FR13451201154", "1", "1" }.ToArray(), "dbo");
+            migrationBuilder.InsertData("Users", new List<string>() { "Uid", "Id", "CreatedOn", "FirstName", "LastName", "Name", "Email", "Siret", "VatIdentifier", "kind", "OpenForNewBusiness" }.ToArray(), new List<object>() { 4, "442E31E3-EEA9-4AA0-B741-3245ED1C6F2F", "2020-01-29 22:45:41", "Peter", "Fotdakor", "GAEC La Ferme du Crêt Joli", "contact@lfdcj.xyz", "452981545", "FR14452981545", "0", "1" }.ToArray(), "dbo");
 
             migrationBuilder.InsertData("UserAddresses", new List<string>() { "UserUid", "Country", "Line1", "Line2", "Zipcode", "City", "Latitude", "Longitude", "DepartmentUid" }.ToArray(), new List<object>() { 1, 76, "285 Route de Braille", null, "73410", "Entrelacs", "45.780181", "6.035638", 74 }.ToArray(), "dbo");
             migrationBuilder.InsertData("UserAddresses", new List<string>() { "UserUid", "Country", "Line1", "Line2", "Zipcode", "City", "Latitude", "Longitude", "DepartmentUid" }.ToArray(), new List<object>() { 2, 76, "12 Avenue de Périaz", null, "74600", "Seynod", "45.877728", "6.0903743", 75 }.ToArray(), "dbo");
             migrationBuilder.InsertData("UserAddresses", new List<string>() { "UserUid", "Country", "Line1", "Line2", "Zipcode", "City", "Latitude", "Longitude", "DepartmentUid" }.ToArray(), new List<object>() { 3, 76, "6 Rue Boucher de la Rupelle", null, "73100", "Grésy-sur-Aix", "45.7170696", "5.9194119", 74 }.ToArray(), "dbo");
             migrationBuilder.InsertData("UserAddresses", new List<string>() { "UserUid", "Country", "Line1", "Line2", "Zipcode", "City", "Latitude", "Longitude", "DepartmentUid" }.ToArray(), new List<object>() { 4, 76, "584 Route du Cret", null, "74270", "Minzier", "45.80604", "5.954202", 75 }.ToArray(), "dbo");
 
-            migrationBuilder.InsertData("DeliveryModes", new List<string>() { "Uid", "Id", "Kind", "CreatedOn", "LockOrderHoursBeforeDelivery", "Name", "ProducerUid" }.ToArray(), new List<object>() { 1, "3eb2c6c7-291b-4c25-b9fa-41dca5053784", "1", "2020-05-01", "12", "Vente à la ferme", 1 }.ToArray(), "dbo");
+            migrationBuilder.InsertData("DeliveryModes", new List<string>() { "Uid", "Id", "Kind", "CreatedOn", "LockOrderHoursBeforeDelivery", "Name", "ProducerUid", "Address_Country", "Address_Line1", "Address_Line2", "Address_Zipcode", "Address_City", "Address_Latitude", "Address_Longitude" }.ToArray(), new List<object>() { 1, "3eb2c6c7-291b-4c25-b9fa-41dca5053784", "1", "2020-05-01", "12", "Vente à la ferme", 1, 76, "285 Route de Braille", null, "73410", "Entrelacs", "45.780181", "6.035638" }.ToArray(), "dbo");
             migrationBuilder.InsertData("DeliveryModes", new List<string>() { "Uid", "Id", "Kind", "CreatedOn", "LockOrderHoursBeforeDelivery", "Name", "ProducerUid" }.ToArray(), new List<object>() { 2, "0f22e42a-de89-485e-9dd9-214da8248b10", "5", "2020-05-01", "48", "Livraison magasins", 1 }.ToArray(), "dbo");
-            migrationBuilder.InsertData("DeliveryModes", new List<string>() { "Uid", "Id", "Kind", "CreatedOn", "LockOrderHoursBeforeDelivery", "Name", "ProducerUid" }.ToArray(), new List<object>() { 3, "c3440c83-2123-488d-85a0-24394d67a56b", "2", "2020-05-01", "24", "Marché de Seyssel", 4 }.ToArray(), "dbo");
+            migrationBuilder.InsertData("DeliveryModes", new List<string>() { "Uid", "Id", "Kind", "CreatedOn", "LockOrderHoursBeforeDelivery", "Name", "ProducerUid", "Address_Country", "Address_Line1", "Address_Line2", "Address_Zipcode", "Address_City", "Address_Latitude", "Address_Longitude" }.ToArray(), new List<object>() { 3, "c3440c83-2123-488d-85a0-24394d67a56b", "2", "2020-05-01", "24", "Marché de Seyssel", 4, 76, "Place de l'Orme", null, "74910", "Seyssel", "45.9590069", "5.833168" }.ToArray(), "dbo");
             migrationBuilder.InsertData("DeliveryModes", new List<string>() { "Uid", "Id", "Kind", "CreatedOn", "LockOrderHoursBeforeDelivery", "Name", "ProducerUid" }.ToArray(), new List<object>() { 4, "1f24e42a-de89-485e-9dd9-214da8248b10", "5", "2020-05-01", "48", "Livraison magasins", 4 }.ToArray(), "dbo");
-
-            migrationBuilder.InsertData("DeliveryModeAddresses", new List<string>() { "DeliveryModeUid", "Country", "Line1", "Line2", "Zipcode", "City", "Latitude", "Longitude" }.ToArray(), new List<object>() { 1, 76, "285 Route de Braille", null, "73410", "Entrelacs", "45.780181", "6.035638" }.ToArray(), "dbo");
-            migrationBuilder.InsertData("DeliveryModeAddresses", new List<string>() { "DeliveryModeUid", "Country", "Line1", "Line2", "Zipcode", "City", "Latitude", "Longitude" }.ToArray(), new List<object>() { 3, 76, "Place de l'Orme", null, "74910", "Seyssel", "45.9590069", "5.833168" }.ToArray(), "dbo");
 
             migrationBuilder.InsertData("DeliveryModeOpeningHours", new List<string>() { "Id", "DeliveryModeUid", "Day", "From", "To" }.ToArray(), new List<object>() { 1, 1, "1", TimeSpan.FromHours(8), TimeSpan.FromHours(18) }.ToArray(), "dbo");
             migrationBuilder.InsertData("DeliveryModeOpeningHours", new List<string>() { "Id", "DeliveryModeUid", "Day", "From", "To" }.ToArray(), new List<object>() { 2, 1, "3", TimeSpan.FromHours(8), TimeSpan.FromHours(18) }.ToArray(), "dbo");
@@ -2429,25 +2425,25 @@ namespace Sheaft.Infrastructure.Migrations
             migrationBuilder.InsertData("AgreementSelectedHours", new List<string>() { "Id", "AgreementUid", "Day", "From", "To" }.ToArray(), new List<object>() { 2, 2, "4", TimeSpan.FromHours(12), TimeSpan.FromHours(18) }.ToArray(), "dbo");
             migrationBuilder.InsertData("AgreementSelectedHours", new List<string>() { "Id", "AgreementUid", "Day", "From", "To" }.ToArray(), new List<object>() { 3, 3, "2", TimeSpan.FromHours(8), TimeSpan.FromHours(18) }.ToArray(), "dbo");
 
-            migrationBuilder.InsertData("Products", new List<string>() { "Uid", "Id", "CreatedOn", "UpdatedOn", "Reference", "Name", "Description", "WholeSalePrice", "Vat", "VatPrice", "OnSalePrice", "WholeSalePricePerUnit", "VatPricePerUnit", "OnSalePricePerUnit", "QuantityPerUnit", "Unit", "Image", "Available", "ProducerUid", "Weight" }.ToArray(), new List<object>() { 1, "4FF642DE-40A6-427B-8101-08D7A1B89D07", "2018-11-12 21:01:53", "2020-04-03 23:00:47", "20011234", "Miel d'acacia", "Pot de miel de fleurs d'acacia - 500g", "6.00", "1.30", "0.08", "6.08", "6.00", "1.30", "0.08", "1", "3", null, "1", 1, "0" }.ToArray(), "dbo");
-            migrationBuilder.InsertData("Products", new List<string>() { "Uid", "Id", "CreatedOn", "UpdatedOn", "Reference", "Name", "Description", "WholeSalePrice", "Vat", "VatPrice", "OnSalePrice", "WholeSalePricePerUnit", "VatPricePerUnit", "OnSalePricePerUnit", "QuantityPerUnit", "Unit", "Image", "Available", "ProducerUid", "Weight" }.ToArray(), new List<object>() { 2, "10631DB6-91A1-4E37-8102-08D7A1B89D07", "2019-12-21 21:01:53", "2020-04-03 23:12:13", "19023491", "Butternutt", "Butternut à la pièce", "2.00", "5.00", "0.10", "2.10", "6.00", "1.30", "0.08", "1", "3", null, "1", 1, "0" }.ToArray(), "dbo");
-            migrationBuilder.InsertData("Products", new List<string>() { "Uid", "Id", "CreatedOn", "UpdatedOn", "Reference", "Name", "Description", "WholeSalePrice", "Vat", "VatPrice", "OnSalePrice", "WholeSalePricePerUnit", "VatPricePerUnit", "OnSalePricePerUnit", "QuantityPerUnit", "Unit", "Image", "Available", "ProducerUid", "Weight" }.ToArray(), new List<object>() { 3, "46D5F178-B68C-4082-8103-08D7A1B89D07", "2019-04-06 21:01:53", "2020-04-03 23:00:47", "20013469", "Yaourt à la confiture d'abricot", "Yaourt à la confiture d'abricot, pot de 420g", "2.85", "0.10", "0.00", "2.85", "6.00", "1.30", "0.08", "1", "3", null, "1", 1, "0" }.ToArray(), "dbo");
-            migrationBuilder.InsertData("Products", new List<string>() { "Uid", "Id", "CreatedOn", "UpdatedOn", "Reference", "Name", "Description", "WholeSalePrice", "Vat", "VatPrice", "OnSalePrice", "WholeSalePricePerUnit", "VatPricePerUnit", "OnSalePricePerUnit", "QuantityPerUnit", "Unit", "Image", "Available", "ProducerUid", "Weight" }.ToArray(), new List<object>() { 4, "7CCAEC7A-1262-4AE8-8104-08D7A1B89D07", "2018-09-10 21:01:53", "2020-04-03 23:00:47", "19016470", "Courgettes jaunes", "1kg de courgettes jaunes", "3.20", "0.05", "0.00", "3.20", "6.00", "1.30", "0.08", "1", "3", null, "1", 1, "0" }.ToArray(), "dbo");
-            migrationBuilder.InsertData("Products", new List<string>() { "Uid", "Id", "CreatedOn", "UpdatedOn", "Reference", "Name", "Description", "WholeSalePrice", "Vat", "VatPrice", "OnSalePrice", "WholeSalePricePerUnit", "VatPricePerUnit", "OnSalePricePerUnit", "QuantityPerUnit", "Unit", "Image", "Available", "ProducerUid", "Weight" }.ToArray(), new List<object>() { 5, "61427915-DCD7-4578-8105-08D7A1B89D07", "2017-10-16 21:01:53", "2020-04-03 23:00:47", "19051342", "Tomates anciennes", "Tomates anciennes, 500g", "4.15", "0.05", "0.00", "4.15", "6.00", "1.30", "0.08", "1", "3", null, "1", 1, "0" }.ToArray(), "dbo");
-            migrationBuilder.InsertData("Products", new List<string>() { "Uid", "Id", "CreatedOn", "UpdatedOn", "Reference", "Name", "Description", "WholeSalePrice", "Vat", "VatPrice", "OnSalePrice", "WholeSalePricePerUnit", "VatPricePerUnit", "OnSalePricePerUnit", "QuantityPerUnit", "Unit", "Image", "Available", "ProducerUid", "Weight" }.ToArray(), new List<object>() { 6, "6ADAB553-A678-4612-8106-08D7A1B89D07", "2017-12-16 21:01:53", "2020-04-03 23:00:47", "20478123", "Oranges à jus", "1kg d'oranges à jus", "5.15", "0.05", "0.00", "5.15", "6.00", "1.30", "0.08", "1", "3", null, "1", 1, "0" }.ToArray(), "dbo");
-            migrationBuilder.InsertData("Products", new List<string>() { "Uid", "Id", "CreatedOn", "UpdatedOn", "Reference", "Name", "Description", "WholeSalePrice", "Vat", "VatPrice", "OnSalePrice", "WholeSalePricePerUnit", "VatPricePerUnit", "OnSalePricePerUnit", "QuantityPerUnit", "Unit", "Image", "Available", "ProducerUid", "Weight" }.ToArray(), new List<object>() { 7, "1BD5BD83-4056-472C-8107-08D7A1B89D07", "2018-03-07 21:01:53", "2020-04-03 23:00:47", "19635248", "Pâte à tartiner Crunchy", "Pâte à tartiner aux noisettes entières - 250g", "4.80", "0.10", "0.00", "4.80", "6.00", "1.30", "0.08", "1", "3", null, "1", 1, "0" }.ToArray(), "dbo");
-            migrationBuilder.InsertData("Products", new List<string>() { "Uid", "Id", "CreatedOn", "UpdatedOn", "Reference", "Name", "Description", "WholeSalePrice", "Vat", "VatPrice", "OnSalePrice", "WholeSalePricePerUnit", "VatPricePerUnit", "OnSalePricePerUnit", "QuantityPerUnit", "Unit", "Image", "Available", "ProducerUid", "Weight" }.ToArray(), new List<object>() { 8, "8CEE4B98-EFF3-4FBA-8108-08D7A1B89D07", "2020-03-31 21:01:53", "2020-04-03 23:00:47", "19100235", "Pain grillé au blé complet", "1 paquet de pain grillé au blé complet", "1.85", "0.10", "0.00", "1.85", "6.00", "1.30", "0.08", "1", "3", null, "1", 1, "0" }.ToArray(), "dbo");
-            migrationBuilder.InsertData("Products", new List<string>() { "Uid", "Id", "CreatedOn", "UpdatedOn", "Reference", "Name", "Description", "WholeSalePrice", "Vat", "VatPrice", "OnSalePrice", "WholeSalePricePerUnit", "VatPricePerUnit", "OnSalePricePerUnit", "QuantityPerUnit", "Unit", "Image", "Available", "ProducerUid", "Weight" }.ToArray(), new List<object>() { 9, "2548FF9E-D160-4F1F-8109-08D7A1B89D07", "2018-11-25 21:01:53", "2020-04-03 23:00:47", "20369041", "Soupe de potiron", "Une brique de soupe de potiron", "1.95", "0.10", "0.00", "1.95", "6.00", "1.30", "0.08", "1", "1", null, "1", 1, "0" }.ToArray(), "dbo");
-            migrationBuilder.InsertData("Products", new List<string>() { "Uid", "Id", "CreatedOn", "UpdatedOn", "Reference", "Name", "Description", "WholeSalePrice", "Vat", "VatPrice", "OnSalePrice", "WholeSalePricePerUnit", "VatPricePerUnit", "OnSalePricePerUnit", "QuantityPerUnit", "Unit", "Image", "Available", "ProducerUid", "Weight" }.ToArray(), new List<object>() { 10, "8FD6F87C-0726-4B22-810A-08D7A1B89D07", "2019-09-29 21:01:53", "2020-04-03 23:10:30", "19447520", "Carottes bio", "1kg de carottes - bio", "0.95", "0.05", "0.00", "0.95", "6.00", "1.30", "0.08", "1", "3", null, "1", 1, "0" }.ToArray(), "dbo");
-            migrationBuilder.InsertData("Products", new List<string>() { "Uid", "Id", "CreatedOn", "UpdatedOn", "Reference", "Name", "Description", "WholeSalePrice", "Vat", "VatPrice", "OnSalePrice", "WholeSalePricePerUnit", "VatPricePerUnit", "OnSalePricePerUnit", "QuantityPerUnit", "Unit", "Image", "Available", "ProducerUid", "Weight" }.ToArray(), new List<object>() { 11, "1CD371A0-8C03-429A-810B-08D7A1B89D07", "2019-01-08 21:01:53", "2020-04-03 23:00:47", "20000142", "Salade batavia", "Salade batavia à la pièce", "1.00", "0.05", "0.00", "1.00", "6.00", "1.30", "0.08", "1", "3", null, "1", 1, "0" }.ToArray(), "dbo");
-            migrationBuilder.InsertData("Products", new List<string>() { "Uid", "Id", "CreatedOn", "UpdatedOn", "Reference", "Name", "Description", "WholeSalePrice", "Vat", "VatPrice", "OnSalePrice", "WholeSalePricePerUnit", "VatPricePerUnit", "OnSalePricePerUnit", "QuantityPerUnit", "Unit", "Image", "Available", "ProducerUid", "Weight" }.ToArray(), new List<object>() { 12, "55E66328-5DAA-4A61-810C-08D7A1B89D07", "2019-01-28 21:01:53", "2020-04-03 23:00:47", "19036658", "Yaourts brassés à la vanille", "Un pack de 4 yaourts brassés à la vanille", "1.65", "0.10", "0.00", "1.65", "6.00", "1.30", "0.08", "1", "3", null, "1", 1, "0" }.ToArray(), "dbo");
-            migrationBuilder.InsertData("Products", new List<string>() { "Uid", "Id", "CreatedOn", "UpdatedOn", "Reference", "Name", "Description", "WholeSalePrice", "Vat", "VatPrice", "OnSalePrice", "WholeSalePricePerUnit", "VatPricePerUnit", "OnSalePricePerUnit", "QuantityPerUnit", "Unit", "Image", "Available", "ProducerUid", "Weight" }.ToArray(), new List<object>() { 13, "6789434A-E8B6-444A-810D-08D7A1B89D07", "2018-09-22 21:01:53", "2020-04-03 23:00:47", "20111258", "Jus de pomme", "Une bouteille de 75cl de jus de pomme", "1.30", "0.10", "0.00", "1.30", "6.00", "1.30", "0.08", "1", "1", null, "1", 1, "0" }.ToArray(), "dbo");
-            migrationBuilder.InsertData("Products", new List<string>() { "Uid", "Id", "CreatedOn", "UpdatedOn", "Reference", "Name", "Description", "WholeSalePrice", "Vat", "VatPrice", "OnSalePrice", "WholeSalePricePerUnit", "VatPricePerUnit", "OnSalePricePerUnit", "QuantityPerUnit", "Unit", "Image", "Available", "ProducerUid", "Weight" }.ToArray(), new List<object>() { 14, "F851420E-BA14-486A-810E-08D7A1B89D07", "2019-02-22 21:01:53", "2020-04-03 23:00:47", "19887742", "Compote de bananes", "Un bocal de 650g de compote de bananes", "4.20", "0.10", "0.00", "4.20", "6.00", "1.30", "0.08", "1", "3", null, "1", 1, "0" }.ToArray(), "dbo");
-            migrationBuilder.InsertData("Products", new List<string>() { "Uid", "Id", "CreatedOn", "UpdatedOn", "Reference", "Name", "Description", "WholeSalePrice", "Vat", "VatPrice", "OnSalePrice", "WholeSalePricePerUnit", "VatPricePerUnit", "OnSalePricePerUnit", "QuantityPerUnit", "Unit", "Image", "Available", "ProducerUid", "Weight" }.ToArray(), new List<object>() { 15, "738727A2-ED2F-4FA6-810F-08D7A1B89D07", "2019-06-29 21:01:53", "2020-04-03 23:11:17", "203312501", "Barres de céréales aux fruits secs", "Un paquet de 6 barres de céréales aux fruits secs", "2.50", "0.10", "0.00", "2.50", "6.00", "1.30", "0.08", "1", "3", null, "1", 1, "0" }.ToArray(), "dbo");
-            migrationBuilder.InsertData("Products", new List<string>() { "Uid", "Id", "CreatedOn", "UpdatedOn", "Reference", "Name", "Description", "WholeSalePrice", "Vat", "VatPrice", "OnSalePrice", "WholeSalePricePerUnit", "VatPricePerUnit", "OnSalePricePerUnit", "QuantityPerUnit", "Unit", "Image", "Available", "ProducerUid", "Weight" }.ToArray(), new List<object>() { 16, "c8c32a96-dffe-431d-92cd-bbb5e37063c1", "2019-06-29 21:01:53", "2020-04-03 23:11:17", "453312501", "Steack haché 150gr", "Un steack haché pur boeuf", "2.50", "0.10", "0.00", "2.50", "6.00", "1.30", "0.08", "1", "3", null, "1", 4, "0" }.ToArray(), "dbo");
-            migrationBuilder.InsertData("Products", new List<string>() { "Uid", "Id", "CreatedOn", "UpdatedOn", "Reference", "Name", "Description", "WholeSalePrice", "Vat", "VatPrice", "OnSalePrice", "WholeSalePricePerUnit", "VatPricePerUnit", "OnSalePricePerUnit", "QuantityPerUnit", "Unit", "Image", "Available", "ProducerUid", "Weight" }.ToArray(), new List<object>() { 17, "a3970033-b5c7-4c01-8b43-e11ee1ebdc45", "2019-06-29 21:01:53", "2020-04-03 23:11:17", "245312501", "Cuisse de poulet", "Une cuisse de poulet fermier", "3.40", "0.15", "0.00", "3.40", "6.00", "1.30", "0.08", "1", "3", null, "1", 4, "0" }.ToArray(), "dbo");
-            migrationBuilder.InsertData("Products", new List<string>() { "Uid", "Id", "CreatedOn", "UpdatedOn", "Reference", "Name", "Description", "WholeSalePrice", "Vat", "VatPrice", "OnSalePrice", "WholeSalePricePerUnit", "VatPricePerUnit", "OnSalePricePerUnit", "QuantityPerUnit", "Unit", "Image", "Available", "ProducerUid", "Weight" }.ToArray(), new List<object>() { 18, "218cb379-fb0e-4755-84ef-e2b6414f1cc3", "2019-06-29 21:01:53", "2020-04-03 23:11:17", "667812501", "Perche", "Une perche du nil", "2.50", "0.10", "0.00", "2.50", "6.00", "1.30", "0.08", "1", "3", null, "1", 4, "0" }.ToArray(), "dbo");
-            migrationBuilder.InsertData("Products", new List<string>() { "Uid", "Id", "CreatedOn", "UpdatedOn", "Reference", "Name", "Description", "WholeSalePrice", "Vat", "VatPrice", "OnSalePrice", "WholeSalePricePerUnit", "VatPricePerUnit", "OnSalePricePerUnit", "QuantityPerUnit", "Unit", "Image", "Available", "ProducerUid", "Weight" }.ToArray(), new List<object>() { 19, "de7de3b5-5184-4150-9b10-a0ff11bcf5d7", "2019-06-29 21:01:53", "2020-04-03 23:11:17", "754112501", "Pigeon bio", "Un super pigeon bio", "12.50", "2.10", "0.00", "12.50", "6.00", "1.30", "0.08", "1", "3", null, "1", 4, "0" }.ToArray(), "dbo");
+            migrationBuilder.InsertData("Products", new List<string>() { "Uid", "Id", "CreatedOn", "UpdatedOn", "Reference", "Conditioning", "Name", "Description", "WholeSalePrice", "Vat", "VatPrice", "OnSalePrice", "WholeSalePricePerUnit", "VatPricePerUnit", "OnSalePricePerUnit", "QuantityPerUnit", "Unit", "Image", "Available", "ProducerUid", "Weight" }.ToArray(), new List<object>() { 1, "4FF642DE-40A6-427B-8101-08D7A1B89D07", "2018-11-12 21:01:53", "2020-04-03 23:00:47", "20011234", 2, "Miel d'acacia", "Pot de miel de fleurs d'acacia - 500g", "6.00", "1.30", "0.08", "6.08", "6.00", "1.30", "0.08", "1", "3", null, "1", 1, "0" }.ToArray(), "dbo");
+            migrationBuilder.InsertData("Products", new List<string>() { "Uid", "Id", "CreatedOn", "UpdatedOn", "Reference", "Conditioning", "Name", "Description", "WholeSalePrice", "Vat", "VatPrice", "OnSalePrice", "WholeSalePricePerUnit", "VatPricePerUnit", "OnSalePricePerUnit", "QuantityPerUnit", "Unit", "Image", "Available", "ProducerUid", "Weight" }.ToArray(), new List<object>() { 2, "10631DB6-91A1-4E37-8102-08D7A1B89D07", "2019-12-21 21:01:53", "2020-04-03 23:12:13", "19023491", 2, "Butternutt", "Butternut à la pièce", "2.00", "5.00", "0.10", "2.10", "6.00", "1.30", "0.08", "1", "3", null, "1", 1, "0" }.ToArray(), "dbo");
+            migrationBuilder.InsertData("Products", new List<string>() { "Uid", "Id", "CreatedOn", "UpdatedOn", "Reference", "Conditioning", "Name", "Description", "WholeSalePrice", "Vat", "VatPrice", "OnSalePrice", "WholeSalePricePerUnit", "VatPricePerUnit", "OnSalePricePerUnit", "QuantityPerUnit", "Unit", "Image", "Available", "ProducerUid", "Weight" }.ToArray(), new List<object>() { 3, "46D5F178-B68C-4082-8103-08D7A1B89D07", "2019-04-06 21:01:53", "2020-04-03 23:00:47", "20013469", 2, "Yaourt à la confiture d'abricot", "Yaourt à la confiture d'abricot, pot de 420g", "2.85", "0.10", "0.00", "2.85", "6.00", "1.30", "0.08", "1", "3", null, "1", 1, "0" }.ToArray(), "dbo");
+            migrationBuilder.InsertData("Products", new List<string>() { "Uid", "Id", "CreatedOn", "UpdatedOn", "Reference", "Conditioning", "Name", "Description", "WholeSalePrice", "Vat", "VatPrice", "OnSalePrice", "WholeSalePricePerUnit", "VatPricePerUnit", "OnSalePricePerUnit", "QuantityPerUnit", "Unit", "Image", "Available", "ProducerUid", "Weight" }.ToArray(), new List<object>() { 4, "7CCAEC7A-1262-4AE8-8104-08D7A1B89D07", "2018-09-10 21:01:53", "2020-04-03 23:00:47", "19016470", 2, "Courgettes jaunes", "1kg de courgettes jaunes", "3.20", "0.05", "0.00", "3.20", "6.00", "1.30", "0.08", "1", "3", null, "1", 1, "0" }.ToArray(), "dbo");
+            migrationBuilder.InsertData("Products", new List<string>() { "Uid", "Id", "CreatedOn", "UpdatedOn", "Reference", "Conditioning", "Name", "Description", "WholeSalePrice", "Vat", "VatPrice", "OnSalePrice", "WholeSalePricePerUnit", "VatPricePerUnit", "OnSalePricePerUnit", "QuantityPerUnit", "Unit", "Image", "Available", "ProducerUid", "Weight" }.ToArray(), new List<object>() { 5, "61427915-DCD7-4578-8105-08D7A1B89D07", "2017-10-16 21:01:53", "2020-04-03 23:00:47", "19051342", 2, "Tomates anciennes", "Tomates anciennes, 500g", "4.15", "0.05", "0.00", "4.15", "6.00", "1.30", "0.08", "1", "3", null, "1", 1, "0" }.ToArray(), "dbo");
+            migrationBuilder.InsertData("Products", new List<string>() { "Uid", "Id", "CreatedOn", "UpdatedOn", "Reference", "Conditioning", "Name", "Description", "WholeSalePrice", "Vat", "VatPrice", "OnSalePrice", "WholeSalePricePerUnit", "VatPricePerUnit", "OnSalePricePerUnit", "QuantityPerUnit", "Unit", "Image", "Available", "ProducerUid", "Weight" }.ToArray(), new List<object>() { 6, "6ADAB553-A678-4612-8106-08D7A1B89D07", "2017-12-16 21:01:53", "2020-04-03 23:00:47", "20478123", 2, "Oranges à jus", "1kg d'oranges à jus", "5.15", "0.05", "0.00", "5.15", "6.00", "1.30", "0.08", "1", "3", null, "1", 1, "0" }.ToArray(), "dbo");
+            migrationBuilder.InsertData("Products", new List<string>() { "Uid", "Id", "CreatedOn", "UpdatedOn", "Reference", "Conditioning", "Name", "Description", "WholeSalePrice", "Vat", "VatPrice", "OnSalePrice", "WholeSalePricePerUnit", "VatPricePerUnit", "OnSalePricePerUnit", "QuantityPerUnit", "Unit", "Image", "Available", "ProducerUid", "Weight" }.ToArray(), new List<object>() { 7, "1BD5BD83-4056-472C-8107-08D7A1B89D07", "2018-03-07 21:01:53", "2020-04-03 23:00:47", "19635248", 2, "Pâte à tartiner Crunchy", "Pâte à tartiner aux noisettes entières - 250g", "4.80", "0.10", "0.00", "4.80", "6.00", "1.30", "0.08", "1", "3", null, "1", 1, "0" }.ToArray(), "dbo");
+            migrationBuilder.InsertData("Products", new List<string>() { "Uid", "Id", "CreatedOn", "UpdatedOn", "Reference", "Conditioning", "Name", "Description", "WholeSalePrice", "Vat", "VatPrice", "OnSalePrice", "WholeSalePricePerUnit", "VatPricePerUnit", "OnSalePricePerUnit", "QuantityPerUnit", "Unit", "Image", "Available", "ProducerUid", "Weight" }.ToArray(), new List<object>() { 8, "8CEE4B98-EFF3-4FBA-8108-08D7A1B89D07", "2020-03-31 21:01:53", "2020-04-03 23:00:47", "19100235", 2, "Pain grillé au blé complet", "1 paquet de pain grillé au blé complet", "1.85", "0.10", "0.00", "1.85", "6.00", "1.30", "0.08", "1", "3", null, "1", 1, "0" }.ToArray(), "dbo");
+            migrationBuilder.InsertData("Products", new List<string>() { "Uid", "Id", "CreatedOn", "UpdatedOn", "Reference", "Conditioning", "Name", "Description", "WholeSalePrice", "Vat", "VatPrice", "OnSalePrice", "WholeSalePricePerUnit", "VatPricePerUnit", "OnSalePricePerUnit", "QuantityPerUnit", "Unit", "Image", "Available", "ProducerUid", "Weight" }.ToArray(), new List<object>() { 9, "2548FF9E-D160-4F1F-8109-08D7A1B89D07", "2018-11-25 21:01:53", "2020-04-03 23:00:47", "20369041", 2, "Soupe de potiron", "Une brique de soupe de potiron", "1.95", "0.10", "0.00", "1.95", "6.00", "1.30", "0.08", "1", "1", null, "1", 1, "0" }.ToArray(), "dbo");
+            migrationBuilder.InsertData("Products", new List<string>() { "Uid", "Id", "CreatedOn", "UpdatedOn", "Reference", "Conditioning", "Name", "Description", "WholeSalePrice", "Vat", "VatPrice", "OnSalePrice", "WholeSalePricePerUnit", "VatPricePerUnit", "OnSalePricePerUnit", "QuantityPerUnit", "Unit", "Image", "Available", "ProducerUid", "Weight" }.ToArray(), new List<object>() { 10, "8FD6F87C-0726-4B22-810A-08D7A1B89D07", "2019-09-29 21:01:53", "2020-04-03 23:10:30", "19447520", 2, "Carottes bio", "1kg de carottes - bio", "0.95", "0.05", "0.00", "0.95", "6.00", "1.30", "0.08", "1", "3", null, "1", 1, "0" }.ToArray(), "dbo");
+            migrationBuilder.InsertData("Products", new List<string>() { "Uid", "Id", "CreatedOn", "UpdatedOn", "Reference", "Conditioning", "Name", "Description", "WholeSalePrice", "Vat", "VatPrice", "OnSalePrice", "WholeSalePricePerUnit", "VatPricePerUnit", "OnSalePricePerUnit", "QuantityPerUnit", "Unit", "Image", "Available", "ProducerUid", "Weight" }.ToArray(), new List<object>() { 11, "1CD371A0-8C03-429A-810B-08D7A1B89D07", "2019-01-08 21:01:53", "2020-04-03 23:00:47", "20000142", 2, "Salade batavia", "Salade batavia à la pièce", "1.00", "0.05", "0.00", "1.00", "6.00", "1.30", "0.08", "1", "3", null, "1", 1, "0" }.ToArray(), "dbo");
+            migrationBuilder.InsertData("Products", new List<string>() { "Uid", "Id", "CreatedOn", "UpdatedOn", "Reference", "Conditioning", "Name", "Description", "WholeSalePrice", "Vat", "VatPrice", "OnSalePrice", "WholeSalePricePerUnit", "VatPricePerUnit", "OnSalePricePerUnit", "QuantityPerUnit", "Unit", "Image", "Available", "ProducerUid", "Weight" }.ToArray(), new List<object>() { 12, "55E66328-5DAA-4A61-810C-08D7A1B89D07", "2019-01-28 21:01:53", "2020-04-03 23:00:47", "19036658", 2, "Yaourts brassés à la vanille", "Un pack de 4 yaourts brassés à la vanille", "1.65", "0.10", "0.00", "1.65", "6.00", "1.30", "0.08", "1", "3", null, "1", 1, "0" }.ToArray(), "dbo");
+            migrationBuilder.InsertData("Products", new List<string>() { "Uid", "Id", "CreatedOn", "UpdatedOn", "Reference", "Conditioning", "Name", "Description", "WholeSalePrice", "Vat", "VatPrice", "OnSalePrice", "WholeSalePricePerUnit", "VatPricePerUnit", "OnSalePricePerUnit", "QuantityPerUnit", "Unit", "Image", "Available", "ProducerUid", "Weight" }.ToArray(), new List<object>() { 13, "6789434A-E8B6-444A-810D-08D7A1B89D07", "2018-09-22 21:01:53", "2020-04-03 23:00:47", "20111258", 2, "Jus de pomme", "Une bouteille de 75cl de jus de pomme", "1.30", "0.10", "0.00", "1.30", "6.00", "1.30", "0.08", "1", "1", null, "1", 1, "0" }.ToArray(), "dbo");
+            migrationBuilder.InsertData("Products", new List<string>() { "Uid", "Id", "CreatedOn", "UpdatedOn", "Reference", "Conditioning", "Name", "Description", "WholeSalePrice", "Vat", "VatPrice", "OnSalePrice", "WholeSalePricePerUnit", "VatPricePerUnit", "OnSalePricePerUnit", "QuantityPerUnit", "Unit", "Image", "Available", "ProducerUid", "Weight" }.ToArray(), new List<object>() { 14, "F851420E-BA14-486A-810E-08D7A1B89D07", "2019-02-22 21:01:53", "2020-04-03 23:00:47", "19887742", 2, "Compote de bananes", "Un bocal de 650g de compote de bananes", "4.20", "0.10", "0.00", "4.20", "6.00", "1.30", "0.08", "1", "3", null, "1", 1, "0" }.ToArray(), "dbo");
+            migrationBuilder.InsertData("Products", new List<string>() { "Uid", "Id", "CreatedOn", "UpdatedOn", "Reference", "Conditioning", "Name", "Description", "WholeSalePrice", "Vat", "VatPrice", "OnSalePrice", "WholeSalePricePerUnit", "VatPricePerUnit", "OnSalePricePerUnit", "QuantityPerUnit", "Unit", "Image", "Available", "ProducerUid", "Weight" }.ToArray(), new List<object>() { 15, "738727A2-ED2F-4FA6-810F-08D7A1B89D07", "2019-06-29 21:01:53", "2020-04-03 23:11:17", "20332501", 2, "Barres de céréales aux fruits secs", "Un paquet de 6 barres de céréales aux fruits secs", "2.50", "0.10", "0.00", "2.50", "6.00", "1.30", "0.08", "1", "3", null, "1", 1, "0" }.ToArray(), "dbo");
+            migrationBuilder.InsertData("Products", new List<string>() { "Uid", "Id", "CreatedOn", "UpdatedOn", "Reference", "Conditioning", "Name", "Description", "WholeSalePrice", "Vat", "VatPrice", "OnSalePrice", "WholeSalePricePerUnit", "VatPricePerUnit", "OnSalePricePerUnit", "QuantityPerUnit", "Unit", "Image", "Available", "ProducerUid", "Weight" }.ToArray(), new List<object>() { 16, "c8c32a96-dffe-431d-92cd-bbb5e37063c1", "2019-06-29 21:01:53", "2020-04-03 23:11:17", "45332501", 2, "Steack haché 150gr", "Un steack haché pur boeuf", "2.50", "0.10", "0.00", "2.50", "6.00", "1.30", "0.08", "1", "3", null, "1", 4, "0" }.ToArray(), "dbo");
+            migrationBuilder.InsertData("Products", new List<string>() { "Uid", "Id", "CreatedOn", "UpdatedOn", "Reference", "Conditioning", "Name", "Description", "WholeSalePrice", "Vat", "VatPrice", "OnSalePrice", "WholeSalePricePerUnit", "VatPricePerUnit", "OnSalePricePerUnit", "QuantityPerUnit", "Unit", "Image", "Available", "ProducerUid", "Weight" }.ToArray(), new List<object>() { 17, "a3970033-b5c7-4c01-8b43-e11ee1ebdc45", "2019-06-29 21:01:53", "2020-04-03 23:11:17", "24532501", 2, "Cuisse de poulet", "Une cuisse de poulet fermier", "3.40", "0.15", "0.00", "3.40", "6.00", "1.30", "0.08", "1", "3", null, "1", 4, "0" }.ToArray(), "dbo");
+            migrationBuilder.InsertData("Products", new List<string>() { "Uid", "Id", "CreatedOn", "UpdatedOn", "Reference", "Conditioning", "Name", "Description", "WholeSalePrice", "Vat", "VatPrice", "OnSalePrice", "WholeSalePricePerUnit", "VatPricePerUnit", "OnSalePricePerUnit", "QuantityPerUnit", "Unit", "Image", "Available", "ProducerUid", "Weight" }.ToArray(), new List<object>() { 18, "218cb379-fb0e-4755-84ef-e2b6414f1cc3", "2019-06-29 21:01:53", "2020-04-03 23:11:17", "66782501", 2, "Perche", "Une perche du nil", "2.50", "0.10", "0.00", "2.50", "6.00", "1.30", "0.08", "1", "3", null, "1", 4, "0" }.ToArray(), "dbo");
+            migrationBuilder.InsertData("Products", new List<string>() { "Uid", "Id", "CreatedOn", "UpdatedOn", "Reference", "Conditioning", "Name", "Description", "WholeSalePrice", "Vat", "VatPrice", "OnSalePrice", "WholeSalePricePerUnit", "VatPricePerUnit", "OnSalePricePerUnit", "QuantityPerUnit", "Unit", "Image", "Available", "ProducerUid", "Weight" }.ToArray(), new List<object>() { 19, "de7de3b5-5184-4150-9b10-a0ff11bcf5d7", "2019-06-29 21:01:53", "2020-04-03 23:11:17", "75412501", 2, "Pigeon bio", "Un super pigeon bio", "12.50", "2.10", "0.00", "12.50", "6.00", "1.30", "0.08", "1", "3", null, "1", 4, "0" }.ToArray(), "dbo");
 
             migrationBuilder.InsertData("QuickOrders", new List<string>() { "Uid", "Id", "Name", "IsDefault", "CreatedOn", "UserUid" }.ToArray(), new List<object>() { 1, "151653C4-1311-4F08-9222-256F35CA2A16", "Commande rapide", "1", "2020-04-04", 3 }.ToArray(), "dbo");
 
@@ -2538,13 +2534,13 @@ namespace Sheaft.Infrastructure.Migrations
                 name: "AgreementSelectedHours");
 
             migrationBuilder.DropTable(
-                name: "BankAccountOwnerAddresses");
+                name: "BusinessLegalAddresses");
+
+            migrationBuilder.DropTable(
+                name: "BusinessUbos");
 
             migrationBuilder.DropTable(
                 name: "Countries");
-
-            migrationBuilder.DropTable(
-                name: "DeliveryModeAddresses");
 
             migrationBuilder.DropTable(
                 name: "DeliveryModeOpeningHours");
@@ -2553,7 +2549,7 @@ namespace Sheaft.Infrastructure.Migrations
                 name: "DocumentPages");
 
             migrationBuilder.DropTable(
-                name: "ExpectedDeliveryAddresses");
+                name: "ExpectedDeliveries");
 
             migrationBuilder.DropTable(
                 name: "Jobs");
@@ -2569,9 +2565,6 @@ namespace Sheaft.Infrastructure.Migrations
 
             migrationBuilder.DropTable(
                 name: "OrderProducts");
-
-            migrationBuilder.DropTable(
-                name: "ProducerLegalAddresses");
 
             migrationBuilder.DropTable(
                 name: "ProducerTags");
@@ -2595,9 +2588,6 @@ namespace Sheaft.Infrastructure.Migrations
                 name: "Sponsorings");
 
             migrationBuilder.DropTable(
-                name: "StoreLegalAddresses");
-
-            migrationBuilder.DropTable(
                 name: "StoreOpeningHours");
 
             migrationBuilder.DropTable(
@@ -2610,16 +2600,13 @@ namespace Sheaft.Infrastructure.Migrations
                 name: "UserAddresses");
 
             migrationBuilder.DropTable(
-                name: "UserBillingAddresses");
-
-            migrationBuilder.DropTable(
                 name: "Agreements");
 
             migrationBuilder.DropTable(
-                name: "Documents");
+                name: "Legals");
 
             migrationBuilder.DropTable(
-                name: "ExpectedDeliveries");
+                name: "Documents");
 
             migrationBuilder.DropTable(
                 name: "QuickOrders");
@@ -2634,6 +2621,9 @@ namespace Sheaft.Infrastructure.Migrations
                 name: "PaymentMethods");
 
             migrationBuilder.DropTable(
+                name: "PurchaseOrders");
+
+            migrationBuilder.DropTable(
                 name: "Wallets");
 
             migrationBuilder.DropTable(
@@ -2643,16 +2633,7 @@ namespace Sheaft.Infrastructure.Migrations
                 name: "DeliveryModes");
 
             migrationBuilder.DropTable(
-                name: "PurchaseOrders");
-
-            migrationBuilder.DropTable(
                 name: "Returnables");
-
-            migrationBuilder.DropTable(
-                name: "Levels");
-
-            migrationBuilder.DropTable(
-                name: "Regions");
 
             migrationBuilder.DropTable(
                 name: "Orders");
@@ -2662,6 +2643,12 @@ namespace Sheaft.Infrastructure.Migrations
 
             migrationBuilder.DropTable(
                 name: "PurchaseOrderVendors");
+
+            migrationBuilder.DropTable(
+                name: "Levels");
+
+            migrationBuilder.DropTable(
+                name: "Regions");
 
             migrationBuilder.DropTable(
                 name: "Users");

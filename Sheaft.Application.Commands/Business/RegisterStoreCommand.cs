@@ -6,13 +6,17 @@ using Newtonsoft.Json;
 
 namespace Sheaft.Application.Commands
 {
-    public class RegisterProducerCommand : Command<Guid>
+
+    public class RegisterStoreCommand : Command<Guid>
     {
         [JsonConstructor]
-        public RegisterProducerCommand(RequestUser requestUser) : base(requestUser)
+        public RegisterStoreCommand(RequestUser requestUser) : base(requestUser)
         {
         }
 
+        public Guid Id { get; set; }
+        public string FirstName { get; set; }
+        public string LastName { get; set; }
         public string Name { get; set; }
         public string Email { get; set; }
         public string Phone { get; set; }
@@ -20,10 +24,10 @@ namespace Sheaft.Application.Commands
         public string VatIdentifier { get; set; }
         public string Picture { get; set; }
         public string Siret { get; set; }
-        public AddressInput BillingAddress { get; set; }
+        public string SponsoringCode { get; set; }
         public AddressInput Address { get; set; }
-        public RegisterOwnerInput Owner { get; set; }
         public bool OpenForNewBusiness { get; set; }
         public IEnumerable<Guid> Tags { get; set; }
+        public IEnumerable<TimeSlotGroupInput> OpeningHours { get; set; }
     }
 }

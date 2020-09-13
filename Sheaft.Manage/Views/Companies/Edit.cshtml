@@ -1,6 +1,6 @@
-﻿@model CompanyViewModel
+﻿@model BusinessViewModel
 @{
-    ViewData["Title"] = "Company details";
+    ViewData["Title"] = "Business details";
     var kinds = new List<SelectListItem>
 {
         new SelectListItem("Store", ((int)ProfileKind.Store).ToString()),
@@ -11,7 +11,7 @@
 }
 
     <div class="container">
-        <h2 class="display-4">Company details @(Model.RemovedOn.HasValue ? "(removed)":"")</h2>
+        <h2 class="display-4">Business details @(Model.RemovedOn.HasValue ? "(removed)":"")</h2>
         <br />
 
         @using (Html.BeginForm("Edit", "Companies", FormMethod.Post, new { @class = "form", enctype = "multipart/form-data" }))

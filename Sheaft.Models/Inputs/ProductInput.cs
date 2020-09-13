@@ -12,6 +12,7 @@ namespace Sheaft.Models.Inputs
         public decimal WholeSalePricePerUnit { get; set; }
         public decimal QuantityPerUnit { get; set; }
         public UnitKind Unit { get; set; }
+        public ConditioningKind Conditioning { get; set; }
         public decimal Vat { get; set; }
         public decimal? Weight { get; set; }
         public string Description { get; set; }

@@ -58,9 +58,11 @@ namespace Sheaft.Infrastructure
                 eb.ToView("UserPointsPerDepartment");
             });
 
-            modelBuilder.Entity<Producer>().HasBaseType<User>();
-            modelBuilder.Entity<Store>().HasBaseType<User>();
             modelBuilder.Entity<Consumer>().HasBaseType<User>();
+            modelBuilder.Entity<Business>().HasBaseType<User>();
+
+            modelBuilder.Entity<Producer>().HasBaseType<Business>();
+            modelBuilder.Entity<Store>().HasBaseType<Business>();
 
             modelBuilder.Entity<Card>().HasBaseType<PaymentMethod>();
             modelBuilder.Entity<BankAccount>().HasBaseType<PaymentMethod>();
@@ -72,7 +74,11 @@ namespace Sheaft.Infrastructure
             modelBuilder.Entity<RefundPayinTransaction>().HasBaseType<Transaction>();
             modelBuilder.Entity<RefundTransferTransaction>().HasBaseType<Transaction>();
 
+            modelBuilder.Entity<BusinessLegal>().HasBaseType<Legal>();
+            modelBuilder.Entity<ConsumerLegal>().HasBaseType<Legal>();
+
             modelBuilder.ApplyConfiguration(new UserConfiguration());
+            modelBuilder.ApplyConfiguration(new BusinessConfiguration());
             modelBuilder.ApplyConfiguration(new ProducerConfiguration());
             modelBuilder.ApplyConfiguration(new ProducerTagConfiguration());
             modelBuilder.ApplyConfiguration(new StoreConfiguration());
@@ -115,6 +121,9 @@ namespace Sheaft.Infrastructure
             modelBuilder.ApplyConfiguration(new RefundTransferTransactionConfiguration());
             modelBuilder.ApplyConfiguration(new CountryConfiguration());
             modelBuilder.ApplyConfiguration(new NationalityConfiguration());
+            modelBuilder.ApplyConfiguration(new LegalConfiguration());
+            modelBuilder.ApplyConfiguration(new ConsumerLegalConfiguration());
+            modelBuilder.ApplyConfiguration(new BusinessLegalConfiguration());
         }
     }
 }

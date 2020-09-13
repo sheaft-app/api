@@ -8,25 +8,18 @@ namespace Sheaft.Infrastructure
     {
         public void Configure(EntityTypeBuilder<Store> entity)
         {
-            entity.Property(c => c.Siret).IsRequired();
-
-            entity.OwnsOne(c => c.LegalAddress, cb =>
-            {
-                cb.ToTable("StoreLegalAddresses");
-            });
-
-            entity.HasMany(c => c.Tags).WithOne().HasForeignKey("StoreUid").OnDelete(DeleteBehavior.Cascade);
-
-            var companyTags = entity.Metadata.FindNavigation(nameof(Store.Tags));
-            companyTags.SetPropertyAccessMode(PropertyAccessMode.Field);
-
             entity.OwnsMany(c => c.OpeningHours, cb =>
             {
                 cb.ToTable("StoreOpeningHours");
             });
 
-            var companyHours = entity.Metadata.FindNavigation(nameof(Store.OpeningHours));
-            companyHours.SetPropertyAccessMode(PropertyAccessMode.Field);
+            entity.HasMany(c => c.Tags).WithOne().HasForeignKey("StoreUid").OnDelete(DeleteBehavior.Cascade);
+
+            var businessTags = entity.Metadata.FindNavigation(nameof(Store.Tags));
+            businessTags.SetPropertyAccessMode(PropertyAccessMode.Field);
+
+            var businessHours = entity.Metadata.FindNavigation(nameof(Store.OpeningHours));
+            businessHours.SetPropertyAccessMode(PropertyAccessMode.Field);
         }
     }
 }
