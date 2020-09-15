@@ -35,6 +35,7 @@ namespace Sheaft.Infrastructure.Interop
         DbSet<Reward> Rewards { get; set; }
         DbSet<Tag> Tags { get; set; }
         DbSet<Transaction> Transactions { get; set; }
+        DbSet<Ubo> Ubos { get; set; }
         DbSet<User> Users { get; set; }
 
         DbSet<CountryPoints> CountryPoints { get; set; }
@@ -56,6 +57,8 @@ namespace Sheaft.Infrastructure.Interop
         Task<IEnumerable<T>> GetAsync<T>(Expression<Func<T, bool>> where, CancellationToken token) where T : class, ITrackRemove;
         Task<IEnumerable<T>> FindAsync<T>(Expression<Func<T, bool>> where, CancellationToken token) where T : class, ITrackRemove;
         Task<bool> AnyAsync<T>(Expression<Func<T, bool>> where, CancellationToken token) where T : class, ITrackRemove;
+        Task EnsureNotExists<T>(Guid id, CancellationToken token) where T : class, IIdEntity, ITrackRemove;
+        Task EnsureNotExists<T>(Expression<Func<T, bool>> where, CancellationToken token) where T : class, IIdEntity, ITrackRemove;
 
         DatabaseFacade Database { get; }
         ValueTask<EntityEntry<TEntity>> AddAsync<TEntity>([NotNullAttribute] TEntity entity, CancellationToken cancellationToken = default) where TEntity : class;        

@@ -1,25 +1,24 @@
 ﻿using Sheaft.Interop.Enums;
+using System;
 using System.Collections.Generic;
 
 namespace Sheaft.Models.Dto
 {
-    public class LegalProfileDto
+    public class BaseLegalDto
     {
-        public LegalKind Kind { get; set; }
+        public Guid Id { get; set; }
         public OwnerDto Owner { get; set; }
     }
 
-    public class ConsumerLegalDto : LegalProfileDto
+    public class ConsumerLegalDto : BaseLegalDto
     {
-
     }
 
-    public class BusinessLegalDto : LegalProfileDto
+    public class BusinessLegalDto : BaseLegalDto
     {
+        public LegalKind Kind { get; set; }
         public string Email { get; set; }
-        public string Name { get; set; }
-        public string Identifier { get; set; }
         public AddressDto Address { get; set; }
-        public IEnumerable<UboDto> Ubos { get; set; }
+        public UboDeclarationDto UboDeclaration { get; set; }
     }
 }

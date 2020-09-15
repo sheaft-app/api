@@ -9,6 +9,7 @@ namespace Sheaft.Api
         public static ISchemaBuilder RegisterTypes(this ISchemaBuilder services)
         {
             services.AddType<AddressType>();
+            services.AddType<BirthAddressType>();
             services.AddType<AgreementType>();
             services.AddType<DeliveryModeType>();
             services.AddType<TimeSlotType>();
@@ -55,6 +56,10 @@ namespace Sheaft.Api
             services.AddType<PayoutTransactionType>();
             services.AddType<DocumentType>();
             services.AddType<PageType>();
+            services.AddType<BusinessLegalType>();
+            services.AddType<ConsumerLegalType>();
+            services.AddType<UboDeclarationType>();
+            services.AddType<UboType>();
 
             services.AddType<AddressKindEnumType>();
             services.AddType<AgreementStatusEnumType>();
@@ -73,7 +78,8 @@ namespace Sheaft.Api
             services.AddType<ProfileKindEnumType>();
             services.AddType<PaymentKindEnumType>();
             services.AddType<WalletKindEnumType>();
-            services.AddType<ValidationStatusEnumType>();
+            services.AddType<DocumentStatusEnumType>();
+            services.AddType<DeclarationStatusEnumType>();
             services.AddType<DocumentKindEnumType>();
             services.AddType<TransactionKindEnumType>();
             services.AddType<TransactionStatusEnumType>();
@@ -119,8 +125,12 @@ namespace Sheaft.Api
             services.AddType<FullAddressInputType>();
             services.AddType<LocationAddressInputType>();
             services.AddType<BirthAddressInputType>();
-            services.AddType<SetBusinessLegalsInputType>();
-            services.AddType<SetConsumerLegalsInputType>();
+            services.AddType<CreateBusinessLegalsInputType>();
+            services.AddType<UpdateBusinessLegalsInputType>();
+            services.AddType<CreateConsumerLegalsInputType>();
+            services.AddType<UpdateConsumerLegalsInputType>();
+            services.AddType<CreateUboInputType>();
+            services.AddType<UpdateUboInputType>();
 
             return services;
         }

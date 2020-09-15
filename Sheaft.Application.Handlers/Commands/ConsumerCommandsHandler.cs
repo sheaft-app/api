@@ -26,8 +26,7 @@ namespace Sheaft.Application.Handlers
 {
     public class ConsumerCommandsHandler : ResultsHandler,
         IRequestHandler<RegisterConsumerCommand, Result<Guid>>,
-        IRequestHandler<UpdateConsumerCommand, Result<bool>>,
-        IRequestHandler<SetConsumerLegalsCommand, Result<bool>>
+        IRequestHandler<UpdateConsumerCommand, Result<bool>>
     {
         private readonly IAppDbContext _context;
         private readonly IQueueService _queueService;
@@ -146,19 +145,6 @@ namespace Sheaft.Application.Handlers
 
                 await _cache.RemoveAsync(entity.Id.ToString("N"));
                 return Ok(result > 0);
-            });
-        }
-
-        public async Task<Result<bool>> Handle(SetConsumerLegalsCommand request, CancellationToken token)
-        {
-            return await ExecuteAsync(async () =>
-            {
-                var entity = await _context.GetByIdAsync<Consumer>(request.Id, token);
-                
-                _context.Update(entity);
-
-                var success = await _context.SaveChangesAsync(token) > 0;
-                return Ok(success);
             });
         }
 

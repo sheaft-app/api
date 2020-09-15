@@ -135,6 +135,26 @@ namespace Sheaft.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "UboDeclaration",
+                columns: table => new
+                {
+                    Uid = table.Column<long>(nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Id = table.Column<Guid>(nullable: false),
+                    CreatedOn = table.Column<DateTimeOffset>(nullable: false),
+                    UpdatedOn = table.Column<DateTimeOffset>(nullable: true),
+                    RemovedOn = table.Column<DateTimeOffset>(nullable: true),
+                    Identifier = table.Column<string>(nullable: true),
+                    Status = table.Column<int>(nullable: false),
+                    ReasonCode = table.Column<string>(nullable: true),
+                    ReasonMessage = table.Column<string>(nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_UboDeclaration", x => x.Uid);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Users",
                 columns: table => new
                 {
@@ -196,6 +216,41 @@ namespace Sheaft.Infrastructure.Migrations
                         name: "FK_Departments_Regions_RegionUid",
                         column: x => x.RegionUid,
                         principalTable: "Regions",
+                        principalColumn: "Uid",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Ubos",
+                columns: table => new
+                {
+                    Uid = table.Column<long>(nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Id = table.Column<Guid>(nullable: false),
+                    CreatedOn = table.Column<DateTimeOffset>(nullable: false),
+                    UpdatedOn = table.Column<DateTimeOffset>(nullable: true),
+                    RemovedOn = table.Column<DateTimeOffset>(nullable: true),
+                    FirstName = table.Column<string>(nullable: true),
+                    LastName = table.Column<string>(nullable: true),
+                    Identifier = table.Column<string>(nullable: true),
+                    BirthDate = table.Column<DateTimeOffset>(nullable: false),
+                    Nationality = table.Column<int>(nullable: false),
+                    Address_Line1 = table.Column<string>(nullable: true),
+                    Address_Line2 = table.Column<string>(nullable: true),
+                    Address_Zipcode = table.Column<string>(nullable: true),
+                    Address_City = table.Column<string>(nullable: true),
+                    Address_Country = table.Column<int>(nullable: true),
+                    BirthPlace_City = table.Column<string>(nullable: true),
+                    BirthPlace_Country = table.Column<int>(nullable: true),
+                    UboDeclarationUid = table.Column<long>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Ubos", x => x.Uid);
+                    table.ForeignKey(
+                        name: "FK_Ubos_UboDeclaration_UboDeclarationUid",
+                        column: x => x.UboDeclarationUid,
+                        principalTable: "UboDeclaration",
                         principalColumn: "Uid",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -313,7 +368,7 @@ namespace Sheaft.Infrastructure.Migrations
                     Owner_FirstName = table.Column<string>(nullable: true),
                     Owner_LastName = table.Column<string>(nullable: true),
                     Owner_Email = table.Column<string>(nullable: true),
-                    Owner_Birthdate = table.Column<DateTimeOffset>(nullable: true),
+                    Owner_BirthDate = table.Column<DateTimeOffset>(nullable: true),
                     Owner_Nationality = table.Column<int>(nullable: true),
                     Owner_CountryOfResidence = table.Column<int>(nullable: true),
                     Owner_Address_Line1 = table.Column<string>(nullable: true),
@@ -323,6 +378,7 @@ namespace Sheaft.Infrastructure.Migrations
                     Owner_Address_Country = table.Column<int>(nullable: true),
                     Email = table.Column<string>(nullable: true),
                     BusinessUid = table.Column<long>(nullable: true),
+                    UboDeclarationUid = table.Column<long>(nullable: true),
                     ConsumerUid = table.Column<long>(nullable: true)
                 },
                 constraints: table =>
@@ -333,6 +389,12 @@ namespace Sheaft.Infrastructure.Migrations
                         column: x => x.BusinessUid,
                         principalTable: "Users",
                         principalColumn: "Uid");
+                    table.ForeignKey(
+                        name: "FK_Legals_UboDeclaration_UboDeclarationUid",
+                        column: x => x.UboDeclarationUid,
+                        principalTable: "UboDeclaration",
+                        principalColumn: "Uid",
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Legals_Users_ConsumerUid",
                         column: x => x.ConsumerUid,
@@ -779,35 +841,6 @@ namespace Sheaft.Infrastructure.Migrations
                     table.PrimaryKey("PK_BusinessLegalAddresses", x => x.BusinessLegalUid);
                     table.ForeignKey(
                         name: "FK_BusinessLegalAddresses_Legals_BusinessLegalUid",
-                        column: x => x.BusinessLegalUid,
-                        principalTable: "Legals",
-                        principalColumn: "Uid",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "BusinessUbos",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(nullable: false),
-                    BusinessLegalUid = table.Column<long>(nullable: false),
-                    FirstName = table.Column<string>(nullable: true),
-                    LastName = table.Column<string>(nullable: true),
-                    Birthdate = table.Column<DateTimeOffset>(nullable: false),
-                    Nationality = table.Column<int>(nullable: false),
-                    Address_Line1 = table.Column<string>(nullable: true),
-                    Address_Line2 = table.Column<string>(nullable: true),
-                    Address_Zipcode = table.Column<string>(nullable: true),
-                    Address_City = table.Column<string>(nullable: true),
-                    Address_Country = table.Column<int>(nullable: true),
-                    BirthAddress_City = table.Column<string>(nullable: true),
-                    BirthAddress_Country = table.Column<int>(nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_BusinessUbos", x => new { x.BusinessLegalUid, x.Id });
-                    table.ForeignKey(
-                        name: "FK_BusinessUbos_Legals_BusinessLegalUid",
                         column: x => x.BusinessLegalUid,
                         principalTable: "Legals",
                         principalColumn: "Uid",
@@ -1364,6 +1397,13 @@ namespace Sheaft.Infrastructure.Migrations
                 filter: "[BusinessUid] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Legals_UboDeclarationUid",
+                table: "Legals",
+                column: "UboDeclarationUid",
+                unique: true,
+                filter: "[UboDeclarationUid] IS NOT NULL");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Legals_ConsumerUid",
                 table: "Legals",
                 column: "ConsumerUid",
@@ -1734,6 +1774,43 @@ namespace Sheaft.Infrastructure.Migrations
                 name: "IX_Transactions_WebPayinTransaction_OrderUid",
                 table: "Transactions",
                 column: "WebPayinTransaction_OrderUid");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_UboDeclaration_Id",
+                table: "UboDeclaration",
+                column: "Id",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_UboDeclaration_Identifier",
+                table: "UboDeclaration",
+                column: "Identifier");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_UboDeclaration_Uid_Id_Identifier_RemovedOn",
+                table: "UboDeclaration",
+                columns: new[] { "Uid", "Id", "Identifier", "RemovedOn" });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Ubos_Id",
+                table: "Ubos",
+                column: "Id",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Ubos_Identifier",
+                table: "Ubos",
+                column: "Identifier");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Ubos_UboDeclarationUid",
+                table: "Ubos",
+                column: "UboDeclarationUid");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Ubos_Uid_UboDeclarationUid_Id_Identifier_RemovedOn",
+                table: "Ubos",
+                columns: new[] { "Uid", "UboDeclarationUid", "Id", "Identifier", "RemovedOn" });
 
             migrationBuilder.CreateIndex(
                 name: "IX_UserAddresses_DepartmentUid",
@@ -2537,9 +2614,6 @@ namespace Sheaft.Infrastructure.Migrations
                 name: "BusinessLegalAddresses");
 
             migrationBuilder.DropTable(
-                name: "BusinessUbos");
-
-            migrationBuilder.DropTable(
                 name: "Countries");
 
             migrationBuilder.DropTable(
@@ -2597,6 +2671,9 @@ namespace Sheaft.Infrastructure.Migrations
                 name: "Transactions");
 
             migrationBuilder.DropTable(
+                name: "Ubos");
+
+            migrationBuilder.DropTable(
                 name: "UserAddresses");
 
             migrationBuilder.DropTable(
@@ -2631,6 +2708,9 @@ namespace Sheaft.Infrastructure.Migrations
 
             migrationBuilder.DropTable(
                 name: "DeliveryModes");
+
+            migrationBuilder.DropTable(
+                name: "UboDeclaration");
 
             migrationBuilder.DropTable(
                 name: "Returnables");

@@ -261,12 +261,14 @@ namespace Sheaft.GraphQL.Types
                 .Type<NonNullType<IdType>>();
         }
     }
-    public class SetBusinessLegalsInputType : SheaftInputType<SetBusinessLegalsInput>
+    public class CreateBusinessLegalsInputType : SheaftInputType<CreateBusinessLegalInput>
     {
-        protected override void Configure(IInputObjectTypeDescriptor<SetBusinessLegalsInput> descriptor)
+        protected override void Configure(IInputObjectTypeDescriptor<CreateBusinessLegalInput> descriptor)
         {
-            descriptor.Field(c => c.Id);
             descriptor.Field(c => c.Email);
+
+            descriptor.Field(c => c.UserId)
+                .Type<NonNullType<IdType>>();
 
             descriptor.Field(c => c.Kind)
                 .Type<NonNullType<LegalKindEnumType>>();
@@ -278,14 +280,94 @@ namespace Sheaft.GraphQL.Types
                 .Type<NonNullType<AddressInputType>>();
         }
     }
-    public class SetConsumerLegalsInputType : SheaftInputType<SetConsumerLegalsInput>
+    public class UpdateBusinessLegalsInputType : SheaftInputType<UpdateBusinessLegalInput>
     {
-        protected override void Configure(IInputObjectTypeDescriptor<SetConsumerLegalsInput> descriptor)
+        protected override void Configure(IInputObjectTypeDescriptor<UpdateBusinessLegalInput> descriptor)
         {
-            descriptor.Field(c => c.Id);
+            descriptor.Field(c => c.Email);
+
+            descriptor.Field(c => c.Id)
+                .Type<NonNullType<IdType>>();
+
+            descriptor.Field(c => c.Kind)
+                .Type<NonNullType<LegalKindEnumType>>();
 
             descriptor.Field(c => c.Owner)
                 .Type<NonNullType<OwnerInputType>>();
+
+            descriptor.Field(c => c.Address)
+                .Type<NonNullType<AddressInputType>>();
+        }
+    }
+    public class CreateConsumerLegalsInputType : SheaftInputType<CreateConsumerLegalInput>
+    {
+        protected override void Configure(IInputObjectTypeDescriptor<CreateConsumerLegalInput> descriptor)
+        {
+            descriptor.Field(c => c.FirstName);
+            descriptor.Field(c => c.LastName);
+            descriptor.Field(c => c.Email);
+            descriptor.Field(c => c.BirthDate);
+            descriptor.Field(c => c.Nationality);
+            descriptor.Field(c => c.CountryOfResidence);
+
+            descriptor.Field(c => c.Address)
+                .Type<NonNullType<AddressInputType>>();
+        }
+    }
+
+    public class UpdateConsumerLegalsInputType : SheaftInputType<UpdateConsumerLegalInput>
+    {
+        protected override void Configure(IInputObjectTypeDescriptor<UpdateConsumerLegalInput> descriptor)
+        {
+            descriptor.Field(c => c.Id)
+                .Type<NonNullType<IdType>>();
+
+            descriptor.Field(c => c.FirstName);
+            descriptor.Field(c => c.LastName);
+            descriptor.Field(c => c.Email);
+            descriptor.Field(c => c.BirthDate);
+            descriptor.Field(c => c.Nationality);
+            descriptor.Field(c => c.CountryOfResidence);
+
+            descriptor.Field(c => c.Address)
+                .Type<NonNullType<AddressInputType>>();
+        }
+    }
+
+    public class CreateUboInputType : SheaftInputType<CreateUboInput>
+    {
+        protected override void Configure(IInputObjectTypeDescriptor<CreateUboInput> descriptor)
+        {
+            descriptor.Field(c => c.FirstName);
+            descriptor.Field(c => c.LastName);
+            descriptor.Field(c => c.BirthDate);
+            descriptor.Field(c => c.Nationality);
+
+            descriptor.Field(c => c.Address)
+                .Type<NonNullType<AddressInputType>>();
+
+            descriptor.Field(c => c.BirthPlace)
+                .Type<NonNullType<BirthAddressInputType>>();
+        }
+    }
+
+    public class UpdateUboInputType : SheaftInputType<UpdateUboInput>
+    {
+        protected override void Configure(IInputObjectTypeDescriptor<UpdateUboInput> descriptor)
+        {
+            descriptor.Field(c => c.Id)
+                .Type<NonNullType<IdType>>();
+
+            descriptor.Field(c => c.FirstName);
+            descriptor.Field(c => c.LastName);
+            descriptor.Field(c => c.BirthDate);
+            descriptor.Field(c => c.Nationality);
+
+            descriptor.Field(c => c.Address)
+                .Type<NonNullType<AddressInputType>>();
+
+            descriptor.Field(c => c.BirthPlace)
+                .Type<NonNullType<BirthAddressInputType>>();
         }
     }
     public class RegisterStoreInputType : SheaftInputType<RegisterStoreInput>
@@ -403,7 +485,7 @@ namespace Sheaft.GraphQL.Types
             descriptor.Field(c => c.FirstName);
             descriptor.Field(c => c.LastName);
             descriptor.Field(c => c.Email);
-            descriptor.Field(c => c.Birthdate);
+            descriptor.Field(c => c.BirthDate);
             descriptor.Field(c => c.Nationality);
             descriptor.Field(c => c.CountryOfResidence);
 
@@ -411,19 +493,19 @@ namespace Sheaft.GraphQL.Types
                 .Type<NonNullType<AddressInputType>>();
         }
     }
-    public class UboInputType : SheaftInputType<UboInput>
+    public class UboInputType : SheaftInputType<CreateUboInput>
     {
-        protected override void Configure(IInputObjectTypeDescriptor<UboInput> descriptor)
+        protected override void Configure(IInputObjectTypeDescriptor<CreateUboInput> descriptor)
         {
             descriptor.Field(c => c.FirstName);
             descriptor.Field(c => c.LastName);
-            descriptor.Field(c => c.Birthdate);
+            descriptor.Field(c => c.BirthDate);
             descriptor.Field(c => c.Nationality);
 
             descriptor.Field(c => c.Address)
                 .Type<NonNullType<AddressInputType>>();
 
-            descriptor.Field(c => c.BirthAddress)
+            descriptor.Field(c => c.BirthPlace)
                 .Type<NonNullType<BirthAddressInputType>>();
         }
     }

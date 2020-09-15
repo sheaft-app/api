@@ -247,5 +247,11 @@
         PsP_CannotRefund_Transfer_TransactionNature_Mismatch = 0x025031,
         PsP_CannotRefund_Transfer_Author_Not_Exists = 0x025032,
         PsP_CannotRefund_Transfer_TransferIdentifier_Missing = 0x025033,
+        PsP_CannotCreate_Declaration_User_Not_Exists = 0x025034,
+        PsP_CannotUpdate_Declaration_Not_Exists = 0x025035,
+        PsP_CannotSubmit_Declaration_Not_Exists = 0x025036,
+        PsP_CannotAddUbo_Declaration_Not_Exists = 0x025037,
+        PsP_CannotUpdateUbo_Declaration_Not_Exists = 0x025038,
+        PsP_CannotUpdateUbo_Ubo_Not_Exists = 0x025039,
     }
 }

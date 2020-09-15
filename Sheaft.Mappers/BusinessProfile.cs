@@ -44,7 +44,7 @@ namespace Sheaft.Mappers
 
             CreateMap<RegisterStoreInput, RegisterStoreCommand>();
             CreateMap<RegisterProducerInput, RegisterProducerCommand>();
-            CreateMap<SetBusinessLegalsInput, SetBusinessLegalsCommand>();
+            CreateMap<CreateBusinessLegalInput, CreateBusinessLegalCommand>();
             CreateMap<UpdateStoreInput, UpdateStoreCommand>();
             CreateMap<UpdateProducerInput, UpdateProducerCommand>();
             CreateMap<UpdatePictureInput, UpdateUserPictureCommand>();

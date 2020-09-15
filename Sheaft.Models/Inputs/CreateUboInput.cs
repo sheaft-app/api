@@ -7,9 +7,18 @@ namespace Sheaft.Models.Inputs
     {
         public string FirstName { get; set; }
         public string LastName { get; set; }
-        public DateTimeOffset Birthdate { get; set; }
+        public DateTimeOffset BirthDate { get; set; }
         public CountryIsoCode Nationality { get; set; }
         public AddressInput Address { get; set; }
-        public BirthAddressInput BirthAddress { get; set; }
+        public BirthAddressInput BirthPlace { get; set; }
+    }
+
+    public class CreateUboInput : UboInput
+    {
+    }
+
+    public class UpdateUboInput: UboInput
+    {
+        public Guid Id { get; set; }
     }
 }

@@ -23,7 +23,7 @@ namespace Sheaft.Mappers
 
             CreateMap<RegisterConsumerInput, RegisterConsumerCommand>();
             CreateMap<UpdateConsumerInput, UpdateConsumerCommand>();
-            CreateMap<SetConsumerLegalsInput, SetConsumerLegalsCommand>();
+            CreateMap<CreateConsumerLegalInput, CreateConsumerLegalCommand>();
         }
     }
 }

@@ -64,9 +64,7 @@ namespace Sheaft.Services
             {
                 var managementClient = new ManagementClient(_serviceBusOptions.ConnectionString);
                 if (!(await managementClient.QueueExistsAsync(queueName)))
-                {
-                    await managementClient.CreateQueueAsync(new QueueDescription(queueName));
-                }
+                    await managementClient.CreateQueueAsync(new QueueDescription(queueName), token);
 
                 var queueClient = new QueueClient(_serviceBusOptions.ConnectionString, queueName);
                 await queueClient.SendAsync(new Message(Encoding.UTF8.GetBytes(item)));

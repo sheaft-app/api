@@ -10,21 +10,17 @@ namespace Sheaft.Infrastructure
         {
             entity.Property<long>("Uid");
             entity.Property<long>("BusinessUid");
+            entity.Property<long>("UboDeclarationUid");
 
             entity.OwnsOne(c => c.Address, e => {
                 e.ToTable("BusinessLegalAddresses");
             });
 
-            entity.OwnsMany(c => c.Ubos, e => {
-                e.OwnsOne(a => a.Address);
-                e.OwnsOne(a => a.BirthAddress);
-
-                e.ToTable("BusinessUbos");
-            });
-
+            entity.HasOne(c => c.UboDeclaration).WithOne().HasForeignKey<BusinessLegal>("UboDeclarationUid").OnDelete(DeleteBehavior.Cascade);
             entity.HasOne(c => c.Business).WithOne().HasForeignKey<BusinessLegal>("BusinessUid").OnDelete(DeleteBehavior.NoAction);
 
             entity.HasIndex("BusinessUid");
+            entity.HasIndex("UboDeclarationUid");
         }
     }
 }

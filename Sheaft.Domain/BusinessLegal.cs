@@ -1,44 +1,57 @@
 ﻿using Sheaft.Interop.Enums;
 using System;
-using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace Sheaft.Domain.Models
 {
     public class BusinessLegal : Legal
     {
-        private List<Ubo> _ubos;
         
         protected BusinessLegal()
         {
         }
 
-        public BusinessLegal(Guid id, Business business, LegalKind legalKind, string email, LegalAddress address, Owner owner)
-            : base(id, legalKind, owner)
+        public BusinessLegal(Guid id, Business business, LegalKind kind, string email, LegalAddress address, Owner owner)
+            : base(id, kind, owner)
         {
-            Address = address;
-            Email = email;
+            SetEmail(email);
+            SetAddress(address);
+
             Business = business;
         }
 
         public string Email { get; private set; }
         public virtual LegalAddress Address { get; private set; }
         public virtual Business Business { get; private set; }
-        public virtual IReadOnlyCollection<Ubo> Ubos => _ubos?.AsReadOnly();
+        public virtual UboDeclaration UboDeclaration { get; private set; }
 
-        public void SetLegalKind(LegalKind legal)
+        public void SetUboDeclaration(UboDeclaration declaration)
         {
-            Kind = legal;
+            if (UboDeclaration != null)
+                UboDeclaration = null;
+
+            UboDeclaration = declaration;
         }
 
-        public void SetUbos(IEnumerable<Ubo> ubos)
+        public void SetKind(LegalKind kind)
         {
-            if (Ubos != null)
-                _ubos = new List<Ubo>();
+            if (kind == LegalKind.Natural)
+                throw new ValidationException();
 
-            foreach(var ubo in ubos)
-            {
-                _ubos.Add(ubo);
-            }
+            Kind = kind;
+        }
+
+        public void SetAddress(LegalAddress legalAddress)
+        {
+            Address = legalAddress;
+        }
+
+        public void SetEmail(string email)
+        {
+            if (string.IsNullOrWhiteSpace(email))
+                throw new ValidationException();
+
+            Email = email;
         }
     }
 }

@@ -1,11 +1,11 @@
 ﻿using Sheaft.Interop.Enums;
 using System;
+using System.Collections.Generic;
 
 namespace Sheaft.Models.Inputs
 {
-    public class SetConsumerLegalsInput
+    public class UpdateBusinessLegalInput : BusinessLegalInput
     {
         public Guid Id { get; set; }
-        public OwnerInput Owner { get; set; }
     }
 }

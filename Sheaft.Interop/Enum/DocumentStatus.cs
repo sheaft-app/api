@@ -1,6 +1,6 @@
 ﻿namespace Sheaft.Interop.Enums
 {
-    public enum ValidationStatus
+    public enum DocumentStatus
     {
         NotSpecified = 0,
         Created = 1,

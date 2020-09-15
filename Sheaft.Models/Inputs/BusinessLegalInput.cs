@@ -4,13 +4,12 @@ using System.Collections.Generic;
 
 namespace Sheaft.Models.Inputs
 {
-    public class SetBusinessLegalsInput
+    public class BusinessLegalInput
     {
-        public Guid Id { get; set; }
         public string Email { get; set; }
         public LegalKind Kind { get; set; }
         public OwnerInput Owner { get; set; }
         public AddressInput Address { get; set; }
-        public IEnumerable<UboInput> Ubos { get; set; }
+
     }
 }

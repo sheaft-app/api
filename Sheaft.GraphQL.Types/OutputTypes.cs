@@ -26,7 +26,7 @@ namespace Sheaft.GraphQL.Types
             descriptor.Field(c => c.ReasonMessage);
 
             descriptor.Field(c => c.Status)
-                .Type<NonNullType<ValidationStatusEnumType>>();
+                .Type<NonNullType<DocumentStatusEnumType>>();
 
             descriptor.Field(c => c.Pages)
                 .Type<ListType<PageType>>();
@@ -40,6 +40,59 @@ namespace Sheaft.GraphQL.Types
             descriptor.Field(c => c.FileName);
             descriptor.Field(c => c.Extension);
             descriptor.Field(c => c.Size);
+        }
+    }
+    public class BusinessLegalType : SheaftOutputType<BusinessLegalDto>
+    {
+        protected override void Configure(IObjectTypeDescriptor<BusinessLegalDto> descriptor)
+        {
+            descriptor.Field(c => c.Id).Type<NonNullType<IdType>>();
+            descriptor.Field(c => c.Kind);
+            descriptor.Field(c => c.Email);
+            descriptor.Field(c => c.Address).Type<AddressType>();
+            descriptor.Field(c => c.UboDeclaration).Type<UboDeclarationType>();
+            descriptor.Field(c => c.Owner).Type<OwnerType>();
+        }
+    }
+    public class ConsumerLegalType : SheaftOutputType<ConsumerLegalDto>
+    {
+        protected override void Configure(IObjectTypeDescriptor<ConsumerLegalDto> descriptor)
+        {
+            descriptor.Field(c => c.Id).Type<NonNullType<IdType>>();
+            descriptor.Field(c => c.Owner).Type<OwnerType>();
+        }
+    }
+    public class UboDeclarationType : SheaftOutputType<UboDeclarationDto>
+    {
+        protected override void Configure(IObjectTypeDescriptor<UboDeclarationDto> descriptor)
+        {
+            descriptor.Field(c => c.Id).Type<NonNullType<IdType>>();
+            descriptor.Field(c => c.Status);
+            descriptor.Field(c => c.ReasonCode);
+            descriptor.Field(c => c.ReasonMessage);
+
+            descriptor.Field(c => c.Ubos)
+                .Type<ListType<UboType>>();
+        }
+    }
+    public class UboType : SheaftOutputType<UboDto>
+    {
+        protected override void Configure(IObjectTypeDescriptor<UboDto> descriptor)
+        {
+            descriptor.Field(c => c.Id).Type<NonNullType<IdType>>();
+
+            descriptor.Field(c => c.FirstName);
+            descriptor.Field(c => c.LastName);
+            descriptor.Field(c => c.BirthDate);
+
+            descriptor.Field(c => c.Nationality)
+                .Type<NonNullType<CountryIsoCodeEnumType>>();
+
+            descriptor.Field(c => c.Address)
+                .Type<AddressType>();
+
+            descriptor.Field(c => c.BirthPlace)
+                .Type<BirthAddressType>();
         }
     }
 
@@ -173,6 +226,16 @@ namespace Sheaft.GraphQL.Types
                 .Type<NonNullType<CountryIsoCodeEnumType>>();
         }
     }
+
+    public class BirthAddressType : ObjectType<BirthAddressDto>
+    {
+        protected override void Configure(IObjectTypeDescriptor<BirthAddressDto> descriptor)
+        {
+            descriptor.Field(c => c.City);
+            descriptor.Field(c => c.Country)
+                .Type<NonNullType<CountryIsoCodeEnumType>>();
+        }
+    }
     public class OwnerType : ObjectType<OwnerDto>
     {
         protected override void Configure(IObjectTypeDescriptor<OwnerDto> descriptor)
@@ -180,7 +243,7 @@ namespace Sheaft.GraphQL.Types
             descriptor.Field(c => c.FirstName);
             descriptor.Field(c => c.LastName);
             descriptor.Field(c => c.Email);
-            descriptor.Field(c => c.Birthdate);
+            descriptor.Field(c => c.BirthDate);
 
             descriptor.Field(c => c.CountryOfResidence)
                 .Type<NonNullType<CountryIsoCodeEnumType>>();
@@ -324,13 +387,6 @@ namespace Sheaft.GraphQL.Types
             descriptor.Field(c => c.Kind);
             descriptor.Field(c => c.Phone);
             descriptor.Field(c => c.Picture);
-            descriptor.Field(c => c.Birthdate);
-
-            descriptor.Field(c => c.CountryOfResidence)
-                .Type<NonNullType<CountryIsoCodeEnumType>>();
-
-            descriptor.Field(c => c.Nationality)
-                .Type<NonNullType<CountryIsoCodeEnumType>>();
 
             descriptor.Field(c => c.Name)
                 .Type<NonNullType<StringType>>();
@@ -356,13 +412,6 @@ namespace Sheaft.GraphQL.Types
             descriptor.Field(c => c.Kind);
             descriptor.Field(c => c.Phone);
             descriptor.Field(c => c.Picture);
-            descriptor.Field(c => c.Birthdate);
-
-            descriptor.Field(c => c.CountryOfResidence)
-                .Type<NonNullType<CountryIsoCodeEnumType>>();
-
-            descriptor.Field(c => c.Nationality)
-                .Type<NonNullType<CountryIsoCodeEnumType>>();
 
             descriptor.Field(c => c.Name)
                 .Type<NonNullType<StringType>>();
@@ -386,15 +435,8 @@ namespace Sheaft.GraphQL.Types
             descriptor.Field(c => c.Phone);
             descriptor.Field(c => c.Picture);
             descriptor.Field(c => c.Description);
-            descriptor.Field(c => c.Birthdate);
             descriptor.Field(c => c.VatIdentifier);
             descriptor.Field(c => c.Siret);
-
-            descriptor.Field(c => c.CountryOfResidence)
-                .Type<NonNullType<CountryIsoCodeEnumType>>();
-
-            descriptor.Field(c => c.Nationality)
-                .Type<NonNullType<CountryIsoCodeEnumType>>();
 
             descriptor.Field(c => c.Name)
                 .Type<NonNullType<StringType>>();
@@ -658,13 +700,6 @@ namespace Sheaft.GraphQL.Types
             descriptor.Field(c => c.CreatedOn);
             descriptor.Field(c => c.UpdatedOn);
             descriptor.Field(c => c.Anonymous);
-            descriptor.Field(c => c.Birthdate);
-
-            descriptor.Field(c => c.CountryOfResidence)
-                .Type<NonNullType<CountryIsoCodeEnumType>>();
-
-            descriptor.Field(c => c.Nationality)
-                .Type<NonNullType<CountryIsoCodeEnumType>>();
 
             descriptor.Field(c => c.Address)
                 .Type<AddressType>();

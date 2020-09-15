@@ -124,6 +124,8 @@ namespace Sheaft.Infrastructure
             modelBuilder.ApplyConfiguration(new LegalConfiguration());
             modelBuilder.ApplyConfiguration(new ConsumerLegalConfiguration());
             modelBuilder.ApplyConfiguration(new BusinessLegalConfiguration());
+            modelBuilder.ApplyConfiguration(new UboDeclarationConfiguration());
+            modelBuilder.ApplyConfiguration(new UboConfiguration());
         }
     }
 }

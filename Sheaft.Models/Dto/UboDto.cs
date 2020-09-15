@@ -8,9 +8,9 @@ namespace Sheaft.Models.Dto
         public Guid Id { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
-        public DateTimeOffset Birthdate { get; set; }
+        public DateTimeOffset BirthDate { get; set; }
         public CountryIsoCode Nationality { get; set; }
         public AddressDto Address { get; set; }
-        public BirthAddressDto BirthAddress { get; set; }
+        public BirthAddressDto BirthPlace { get; set; }
     }
 }

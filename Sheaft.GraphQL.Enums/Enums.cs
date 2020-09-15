@@ -28,18 +28,29 @@ namespace Sheaft.GraphQL.Enums
             descriptor.Value(AddressKind.Shipping).Name("SHIPPING");
         }
     }
-    public class ValidationStatusEnumType : EnumType<ValidationStatus>
+    public class DocumentStatusEnumType : EnumType<DocumentStatus>
     {
-        protected override void Configure(IEnumTypeDescriptor<ValidationStatus> descriptor)
+        protected override void Configure(IEnumTypeDescriptor<DocumentStatus> descriptor)
         {
-            descriptor.Value(ValidationStatus.NotSpecified).Name("NOT_SPECIFIED");
-            descriptor.Value(ValidationStatus.Created).Name("CREATED");
-            descriptor.Value(ValidationStatus.OutOfDate).Name("OUT_OF_DATE");
-            descriptor.Value(ValidationStatus.Refused).Name("REFUSED");
-            descriptor.Value(ValidationStatus.Validated).Name("VALIDATED");
-            descriptor.Value(ValidationStatus.ValidationAsked).Name("VALIDATION_ASKED");
-            descriptor.Value(ValidationStatus.WaitingForCreation).Name("WAITING_FOR_CREATION");
-            descriptor.Value(ValidationStatus.WaitingForFirstOrder).Name("WAITING_FOR_FIRST_ORDER");
+            descriptor.Value(DocumentStatus.NotSpecified).Name("NOT_SPECIFIED");
+            descriptor.Value(DocumentStatus.Created).Name("CREATED");
+            descriptor.Value(DocumentStatus.OutOfDate).Name("OUT_OF_DATE");
+            descriptor.Value(DocumentStatus.Refused).Name("REFUSED");
+            descriptor.Value(DocumentStatus.Validated).Name("VALIDATED");
+            descriptor.Value(DocumentStatus.ValidationAsked).Name("VALIDATION_ASKED");
+            descriptor.Value(DocumentStatus.WaitingForCreation).Name("WAITING_FOR_CREATION");
+            descriptor.Value(DocumentStatus.WaitingForFirstOrder).Name("WAITING_FOR_FIRST_ORDER");
+        }
+    }
+    public class DeclarationStatusEnumType : EnumType<DeclarationStatus>
+    {
+        protected override void Configure(IEnumTypeDescriptor<DeclarationStatus> descriptor)
+        {
+            descriptor.Value(DeclarationStatus.Created).Name("CREATED");
+            descriptor.Value(DeclarationStatus.Incomplete).Name("INCOMPLETE");
+            descriptor.Value(DeclarationStatus.Refused).Name("REFUSED");
+            descriptor.Value(DeclarationStatus.Validated).Name("VALIDATED");
+            descriptor.Value(DeclarationStatus.ValidationAsked).Name("VALIDATION_ASKED");
         }
     }
     public class DocumentKindEnumType : EnumType<DocumentKind>

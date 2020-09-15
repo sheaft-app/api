@@ -59,8 +59,13 @@ namespace Sheaft.GraphQL
             descriptor.Field(c => c.UpdateQuickOrderAsync(default, default));
             descriptor.Field(c => c.UpdateQuickOrderProductsAsync(default, default));
             descriptor.Field(c => c.UpdateConsumerAsync(default, default));
-            descriptor.Field(c => c.SetBusinessLegalsAsync(default));
-            descriptor.Field(c => c.SetConsumerLegalsAsync(default));
+            descriptor.Field(c => c.CreateBusinessLegalsAsync(default, default));
+            descriptor.Field(c => c.UpdateBusinessLegalsAsync(default, default));
+            descriptor.Field(c => c.CreateConsumerLegalsAsync(default, default));
+            descriptor.Field(c => c.UpdateConsumerLegalsAsync(default, default));
+            descriptor.Field(c => c.CreateUboAsync(default, default));
+            descriptor.Field(c => c.UpdateUboAsync(default, default));
+            descriptor.Field(c => c.RemoveUboAsync(default));
         }
     }
 }

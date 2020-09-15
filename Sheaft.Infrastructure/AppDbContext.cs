@@ -51,6 +51,7 @@ namespace Sheaft.Infrastructure
         public DbSet<Reward> Rewards { get; set; }
         public DbSet<Tag> Tags { get; set; }
         public DbSet<Transaction> Transactions { get; set; }
+        public DbSet<Ubo> Ubos { get; set; }
         public DbSet<User> Users { get; set; }
 
         public DbSet<DepartmentProducers> DepartmentProducers { get; set; }
@@ -111,7 +112,7 @@ namespace Sheaft.Infrastructure
         {
             var items = await Set<T>().Where(c => !c.RemovedOn.HasValue).Where(where).ToListAsync(token);
             if (items == null || !items.Any())
-                throw new SheaftException(ExceptionKind.NotFound);
+                throw new NotFoundException();
 
             return items;
         }
@@ -129,7 +130,7 @@ namespace Sheaft.Infrastructure
         {
             var item = await Set<T>().Where(c => !c.RemovedOn.HasValue).Where(where).SingleOrDefaultAsync(token);
             if (item == null)
-                throw new SheaftException(ExceptionKind.NotFound);
+                throw new NotFoundException();
 
             return item;
         }
@@ -142,6 +143,20 @@ namespace Sheaft.Infrastructure
         public async Task<bool> AnyAsync<T>(Expression<Func<T, bool>> where, CancellationToken token) where T : class, ITrackRemove
         {
             return await Set<T>().Where(c => !c.RemovedOn.HasValue).AnyAsync(where, token);
+        }
+
+        public async Task EnsureNotExists<T>(Guid id, CancellationToken token) where T : class, IIdEntity, ITrackRemove
+        {
+            var result = await Set<T>().SingleOrDefaultAsync(c => !c.RemovedOn.HasValue && c.Id == id, token);
+            if (result != null)
+                throw new ConflictException();
+        }
+
+        public async Task EnsureNotExists<T>(Expression<Func<T, bool>> where, CancellationToken token) where T : class, IIdEntity, ITrackRemove
+        {
+            var result = await Set<T>().Where(c => !c.RemovedOn.HasValue).Where(where).ToListAsync(token);
+            if(result != null)
+                throw new ConflictException();
         }
 
         public override int SaveChanges()

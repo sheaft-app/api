@@ -7,18 +7,17 @@ using System.Collections.Generic;
 
 namespace Sheaft.Application.Commands
 {
-    public class SetBusinessLegalsCommand : Command<bool>
+    public class UpdateBusinessLegalCommand : Command<bool>
     {
         [JsonConstructor]
-        public SetBusinessLegalsCommand(RequestUser requestUser) : base(requestUser)
+        public UpdateBusinessLegalCommand(RequestUser requestUser) : base(requestUser)
         {
         }
 
         public Guid Id { get; set; }
-        public LegalKind Legal { get; set; }
+        public LegalKind Kind { get; set; }
         public string Email { get; set; }
         public OwnerInput Owner { get; set; }
         public AddressInput Address { get; set; }
-        public IEnumerable<UboInput> Ubos { get; set; }
     }
 }

@@ -2,6 +2,7 @@
 using MangoPay.SDK.Core;
 using MangoPay.SDK.Core.Enumerations;
 using MangoPay.SDK.Entities;
+using MangoPay.SDK.Entities.GET;
 using MangoPay.SDK.Entities.POST;
 using MangoPay.SDK.Entities.PUT;
 using Microsoft.Extensions.Logging;
@@ -16,6 +17,7 @@ using Sheaft.Services.Interop;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -49,7 +51,7 @@ namespace Sheaft.Services
                         consumerLegal.Owner.Email,
                         consumerLegal.Owner.FirstName,
                         consumerLegal.Owner.LastName,
-                        consumerLegal.Owner.Birthdate.DateTime,
+                        consumerLegal.Owner.BirthDate.DateTime,
                         consumerLegal.Owner.Nationality.GetCountry(),
                         consumerLegal.Owner.CountryOfResidence.GetCountry())
                     {
@@ -76,7 +78,7 @@ namespace Sheaft.Services
                         businessLegal.Kind.GetLegalPersonType(),
                         businessLegal.Owner.FirstName,
                         businessLegal.Owner.LastName,
-                        businessLegal.Owner.Birthdate.DateTime,
+                        businessLegal.Owner.BirthDate.DateTime,
                         businessLegal.Owner.Nationality.GetCountry(),
                         businessLegal.Owner.CountryOfResidence.GetCountry())
                     {
@@ -102,7 +104,12 @@ namespace Sheaft.Services
 
                 await EnsureAccessTokenIsValidAsync(token);
 
-                var result = await _api.Wallets.CreateAsync(wallet.Id.ToString("N"), new WalletPostDTO(new List<string> { wallet.User.Identifier }, wallet.Name, CurrencyIso.EUR));
+                var result = await _api.Wallets.CreateAsync(
+                    wallet.Id.ToString("N"), 
+                    new WalletPostDTO(new List<string> { wallet.User.Identifier }, 
+                    wallet.Name, 
+                    CurrencyIso.EUR));
+
                 return Ok(result.Id);
             });
         }
@@ -153,7 +160,10 @@ namespace Sheaft.Services
 
                 await EnsureAccessTokenIsValidAsync(token);
 
-                var result = await _api.CardRegistrations.CreateAsync(payment.Id.ToString("N"), new CardRegistrationPostDTO(payment.User.Identifier, CurrencyIso.EUR, CardType.CB_VISA_MASTERCARD));
+                var result = await _api.CardRegistrations.CreateAsync(
+                    payment.Id.ToString("N"), 
+                    new CardRegistrationPostDTO(payment.User.Identifier, CurrencyIso.EUR, CardType.CB_VISA_MASTERCARD));
+
                 return Ok(new KeyValuePair<string, string>(result.Id, result.CardId));
             });
         }
@@ -162,8 +172,8 @@ namespace Sheaft.Services
         {
             return await ExecuteAsync(async () =>
             {
-            if (string.IsNullOrWhiteSpace(payment.Identifier))
-                return Failed<string>(new SheaftException(ExceptionKind.BadRequest, MessageKind.PsP_CannotValidate_Card_Card_Not_Exists));
+                if (string.IsNullOrWhiteSpace(payment.Identifier))
+                    return Failed<string>(new SheaftException(ExceptionKind.BadRequest, MessageKind.PsP_CannotValidate_Card_Card_Not_Exists));
 
                 await EnsureAccessTokenIsValidAsync(token);
 
@@ -224,7 +234,11 @@ namespace Sheaft.Services
 
                 await EnsureAccessTokenIsValidAsync(token);
 
-                var result = await _api.Users.UpdateKycDocumentAsync(document.User.Identifier, new KycDocumentPutDTO { Status = KycStatus.VALIDATION_ASKED }, document.Identifier);
+                var result = await _api.Users.UpdateKycDocumentAsync(
+                    document.User.Identifier, 
+                    new KycDocumentPutDTO { Status = KycStatus.VALIDATION_ASKED }, 
+                    document.Identifier);
+
                 return Ok(new PspDocumentResultDto
                 {
                     Identifier = result.Id,
@@ -233,6 +247,113 @@ namespace Sheaft.Services
                     ResultMessage = result.RefusedReasonMessage,
                     Status = result.Status.GetValidationStatus()
                 });
+            });
+        }
+
+        public async Task<Result<PspDeclarationResultDto>> CreateUboDeclarationAsync(UboDeclaration declaration, Business business, CancellationToken token)
+        {
+            return await ExecuteAsync(async () =>
+            {
+                if (string.IsNullOrWhiteSpace(business.Identifier))
+                    return Failed<PspDeclarationResultDto>(new SheaftException(ExceptionKind.BadRequest, MessageKind.PsP_CannotCreate_Declaration_User_Not_Exists));
+
+                await EnsureAccessTokenIsValidAsync(token);
+
+                var result = await _api.UboDeclarations.CreateUboDeclarationAsync(declaration.Id.ToString("N"), business.Identifier);
+                return Ok(new PspDeclarationResultDto
+                {
+                    Identifier = result.Id,
+                    Status = result.Status.GetDeclarationStatus(),
+                    ResultMessage = result.Message,
+                    ProcessedOn = result.ProcessedDate,
+                    ResultCode = result.Reason.ToString("G")
+                });
+            });
+        }
+
+        public async Task<Result<PspDeclarationResultDto>> SubmitUboDeclarationAsync(UboDeclaration declaration, Business business, CancellationToken token)
+        {
+            return await ExecuteAsync(async () =>
+            {
+                if (string.IsNullOrWhiteSpace(declaration.Identifier))
+                    return Failed<PspDeclarationResultDto>(new SheaftException(ExceptionKind.BadRequest, MessageKind.PsP_CannotSubmit_Declaration_Not_Exists));
+
+                await EnsureAccessTokenIsValidAsync(token);
+
+                var result = await _api.UboDeclarations.UpdateUboDeclarationAsync(
+                    new UboDeclarationPutDTO(
+                        declaration.Ubos.Select(u => new UboDTO {
+                            Id = u.Identifier,  
+                            FirstName = u.FirstName,
+                            LastName = u.LastName,
+                            Address = u.Address.GetAddress(),
+                            Nationality = u.Nationality.GetCountry(),
+                            Birthday = u.BirthDate.DateTime,
+                            Birthplace = u.BirthPlace.GetBirthplace()
+                        }).ToArray(), 
+                        UboDeclarationType.VALIDATION_ASKED), 
+                    business.Identifier, 
+                    declaration.Identifier);
+                return Ok(new PspDeclarationResultDto
+                {
+                    Identifier = result.Id,
+                    Status = result.Status.GetDeclarationStatus(),
+                    ResultMessage = result.Message,
+                    ProcessedOn = result.ProcessedDate,
+                    ResultCode = result.Reason.ToString("G")
+                });
+            });
+        }
+
+        public async Task<Result<string>> CreateUboAsync(Ubo ubo, UboDeclaration declaration, Business business, CancellationToken token)
+        {
+            return await ExecuteAsync(async () =>
+            {
+                if (string.IsNullOrWhiteSpace(declaration.Identifier))
+                    return Failed<string>(new SheaftException(ExceptionKind.BadRequest, MessageKind.PsP_CannotAddUbo_Declaration_Not_Exists));
+
+                await EnsureAccessTokenIsValidAsync(token);
+
+                var result = await _api.UboDeclarations.CreateUboAsync(ubo.Id.ToString("N"), 
+                    new UboPostDTO(ubo.FirstName, 
+                        ubo.LastName, 
+                        ubo.Address.GetAddress(), 
+                        ubo.Nationality.GetCountry(), 
+                        ubo.BirthDate.DateTime, 
+                        ubo.BirthPlace.GetBirthplace()
+                    ),
+                    business.Identifier,
+                    declaration.Identifier);
+
+                return Ok(result.Id);
+            });
+        }
+
+        public async Task<Result<bool>> UpdateUboAsync(Ubo ubo, UboDeclaration declaration, Business business, CancellationToken token)
+        {
+            return await ExecuteAsync(async () =>
+            {
+                if (string.IsNullOrWhiteSpace(declaration.Identifier))
+                    return Failed<bool>(new SheaftException(ExceptionKind.BadRequest, MessageKind.PsP_CannotUpdateUbo_Declaration_Not_Exists));
+
+                if (string.IsNullOrWhiteSpace(ubo.Identifier))
+                    return Failed<bool>(new SheaftException(ExceptionKind.BadRequest, MessageKind.PsP_CannotUpdateUbo_Ubo_Not_Exists));
+
+                await EnsureAccessTokenIsValidAsync(token);
+
+                var result = await _api.UboDeclarations.UpdateUboAsync(
+                    new UboPutDTO(ubo.FirstName, 
+                        ubo.LastName, 
+                        ubo.Address.GetAddress(), 
+                        ubo.Nationality.GetCountry(), 
+                        ubo.BirthDate.DateTime, 
+                        ubo.BirthPlace.GetBirthplace()
+                    ),
+                    business.Identifier,
+                    declaration.Identifier,
+                    ubo.Identifier);
+
+                return Ok(true);
             });
         }
 
@@ -479,7 +600,11 @@ namespace Sheaft.Services
 
                 await EnsureAccessTokenIsValidAsync(token);
 
-                var result = await _api.Transfers.CreateRefundAsync(transaction.Id.ToString("N"), transaction.TransactionToRefundIdentifier, new RefundTransferPostDTO(transaction.Author.Identifier));
+                var result = await _api.Transfers.CreateRefundAsync(
+                    transaction.Id.ToString("N"), 
+                    transaction.TransactionToRefundIdentifier, 
+                    new RefundTransferPostDTO(transaction.Author.Identifier));
+
                 return Ok(new PspPaymentResultDto
                 {
                     Credited = result.CreditedFunds.Amount.GetAmount(),
@@ -521,9 +646,14 @@ namespace Sheaft.Services
             return (decimal)(amount / 100.00);
         }
 
-        public static ValidationStatus GetValidationStatus(this KycStatus status)
+        public static DocumentStatus GetValidationStatus(this KycStatus status)
         {
-            return (ValidationStatus)status;
+            return (DocumentStatus)status;
+        }
+
+        public static DeclarationStatus GetDeclarationStatus(this UboDeclarationType status)
+        {
+            return (DeclarationStatus)status;
         }
 
         public static Sheaft.Interop.Enums.TransactionStatus GetTransactionStatus(this MangoPay.SDK.Core.Enumerations.TransactionStatus status)
@@ -572,6 +702,14 @@ namespace Sheaft.Services
                 City = address.City,
                 Country = address.Country.GetCountry(),
                 PostalCode = address.Zipcode
+            };
+        }
+        public static Birthplace GetBirthplace(this BirthAddress address)
+        {
+            return new Birthplace
+            {
+                City = address.City,
+                Country = address.Country.GetCountry()
             };
         }
         public static CountryIso GetCountry(this CountryIsoCode countryCode)

@@ -26,7 +26,15 @@ namespace Sheaft.Models.Dto
 
     public class PspDocumentResultDto: PspResultDto
     {
-        public ValidationStatus Status { get; set; }
+        public DocumentStatus Status { get; set; }
+        public string ResultCode { get; set; }
+        public string ResultMessage { get; set; }
+        public DateTimeOffset? ProcessedOn { get; set; }
+    }
+
+    public class PspDeclarationResultDto : PspResultDto
+    {
+        public DeclarationStatus Status { get; set; }
         public string ResultCode { get; set; }
         public string ResultMessage { get; set; }
         public DateTimeOffset? ProcessedOn { get; set; }

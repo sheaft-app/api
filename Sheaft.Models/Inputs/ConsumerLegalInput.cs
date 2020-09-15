@@ -3,7 +3,7 @@ using System;
 
 namespace Sheaft.Models.Inputs
 {
-    public class OwnerInput
+    public class ConsumerLegalInput
     {
         public string FirstName { get; set; }
         public string LastName { get; set; }

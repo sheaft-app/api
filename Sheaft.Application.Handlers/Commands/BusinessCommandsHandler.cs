@@ -29,8 +29,7 @@ namespace Sheaft.Application.Handlers
         IRequestHandler<RegisterProducerCommand, Result<Guid>>,
         IRequestHandler<RegisterStoreCommand, Result<Guid>>,
         IRequestHandler<UpdateProducerCommand, Result<bool>>,
-        IRequestHandler<UpdateStoreCommand, Result<bool>>,
-        IRequestHandler<SetBusinessLegalsCommand, Result<bool>>
+        IRequestHandler<UpdateStoreCommand, Result<bool>>
     {
         private readonly IAppDbContext _context;
         private readonly IQueueService _queueService;
@@ -247,22 +246,6 @@ namespace Sheaft.Application.Handlers
 
                 await _cache.RemoveAsync(entity.Id.ToString("N"));
                 return Ok(result > 0);
-            });
-        }
-
-        public async Task<Result<bool>> Handle(SetBusinessLegalsCommand request, CancellationToken token)
-        {
-            return await ExecuteAsync(async () =>
-            {
-                var entity = await _context.GetByIdAsync<Business>(request.Id, token);
-
-
-                _context.Update(entity);
-
-                //TODO If Changes detected -> revalidation of KYC required
-
-                var success = await _context.SaveChangesAsync(token) > 0;
-                return Ok(success);
             });
         }
 

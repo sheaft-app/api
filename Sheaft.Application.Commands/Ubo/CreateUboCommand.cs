@@ -1,0 +1,25 @@
+﻿using System;
+using Sheaft.Interop.Enums;
+using Sheaft.Models.Inputs;
+using Sheaft.Core;
+using Newtonsoft.Json;
+
+namespace Sheaft.Application.Commands
+{
+        public class CreateUboCommand : Command<Guid>
+    {
+        [JsonConstructor]
+        public CreateUboCommand(RequestUser requestUser) : base(requestUser)
+        {
+        }
+
+        public Guid LegalId { get; set; }
+        public string FirstName { get; set; }
+        public string LastName { get; set; }
+        public string Email { get; set; }
+        public DateTimeOffset BirthDate { get; set; }
+        public CountryIsoCode Nationality { get; set; }
+        public AddressInput Address { get; set; }
+        public BirthAddressInput BirthPlace { get; set; }
+    }
+}

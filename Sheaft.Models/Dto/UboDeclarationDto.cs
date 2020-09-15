@@ -4,13 +4,12 @@ using System.Collections.Generic;
 
 namespace Sheaft.Models.Dto
 {
-    public class DocumentDto
+    public class UboDeclarationDto
     {
-        public Guid Id { get; set; }
-        public string Name { get; set; }
-        public DocumentStatus Status { get; set; }
+        public Guid Id { get; private set; }
+        public DeclarationStatus Status { get; set; }
         public string ReasonCode { get; set; }
         public string ReasonMessage { get; set; }
-        public IEnumerable<PageDto> Pages { get; set; }
+        public IEnumerable<UboDto> Ubos { get; set; }
     }
 }

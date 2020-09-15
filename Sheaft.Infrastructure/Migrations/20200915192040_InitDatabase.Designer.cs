@@ -11,7 +11,7 @@ using Sheaft.Interop.Enums;
 namespace Sheaft.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20200913155058_InitDatabase")]
+    [Migration("20200915192040_InitDatabase")]
     partial class InitDatabase
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -1497,6 +1497,100 @@ namespace Sheaft.Infrastructure.Migrations
                     b.HasDiscriminator<int>("Kind");
                 });
 
+            modelBuilder.Entity("Sheaft.Domain.Models.Ubo", b =>
+                {
+                    b.Property<long>("Uid")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<DateTimeOffset>("BirthDate")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<DateTimeOffset>("CreatedOn")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("FirstName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Identifier")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("LastName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Nationality")
+                        .HasColumnType("int");
+
+                    b.Property<DateTimeOffset?>("RemovedOn")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<long>("UboDeclarationUid")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTimeOffset?>("UpdatedOn")
+                        .HasColumnType("datetimeoffset");
+
+                    b.HasKey("Uid");
+
+                    b.HasIndex("Id")
+                        .IsUnique();
+
+                    b.HasIndex("Identifier");
+
+                    b.HasIndex("UboDeclarationUid");
+
+                    b.HasIndex("Uid", "UboDeclarationUid", "Id", "Identifier", "RemovedOn");
+
+                    b.ToTable("Ubos");
+                });
+
+            modelBuilder.Entity("Sheaft.Domain.Models.UboDeclaration", b =>
+                {
+                    b.Property<long>("Uid")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<DateTimeOffset>("CreatedOn")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Identifier")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("ReasonCode")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ReasonMessage")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTimeOffset?>("RemovedOn")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<DateTimeOffset?>("UpdatedOn")
+                        .HasColumnType("datetimeoffset");
+
+                    b.HasKey("Uid");
+
+                    b.HasIndex("Id")
+                        .IsUnique();
+
+                    b.HasIndex("Identifier");
+
+                    b.HasIndex("Uid", "Id", "Identifier", "RemovedOn");
+
+                    b.ToTable("UboDeclaration");
+                });
+
             modelBuilder.Entity("Sheaft.Domain.Models.User", b =>
                 {
                     b.Property<long>("Uid")
@@ -1633,9 +1727,16 @@ namespace Sheaft.Infrastructure.Migrations
                     b.Property<string>("Email")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<long>("UboDeclarationUid")
+                        .HasColumnType("bigint");
+
                     b.HasIndex("BusinessUid")
                         .IsUnique()
                         .HasFilter("[BusinessUid] IS NOT NULL");
+
+                    b.HasIndex("UboDeclarationUid")
+                        .IsUnique()
+                        .HasFilter("[UboDeclarationUid] IS NOT NULL");
 
                     b.HasDiscriminator().HasValue(2);
                 });
@@ -2024,7 +2125,7 @@ namespace Sheaft.Infrastructure.Migrations
                                 .HasColumnType("bigint")
                                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                            b1.Property<DateTimeOffset>("Birthdate")
+                            b1.Property<DateTimeOffset>("BirthDate")
                                 .HasColumnType("datetimeoffset");
 
                             b1.Property<int>("CountryOfResidence")
@@ -2399,6 +2500,66 @@ namespace Sheaft.Infrastructure.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("Sheaft.Domain.Models.Ubo", b =>
+                {
+                    b.HasOne("Sheaft.Domain.Models.UboDeclaration", null)
+                        .WithMany("Ubos")
+                        .HasForeignKey("UboDeclarationUid")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.OwnsOne("Sheaft.Domain.Models.BirthAddress", "BirthPlace", b1 =>
+                        {
+                            b1.Property<long>("UboUid")
+                                .ValueGeneratedOnAdd()
+                                .HasColumnType("bigint")
+                                .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                            b1.Property<string>("City")
+                                .HasColumnType("nvarchar(max)");
+
+                            b1.Property<int>("Country")
+                                .HasColumnType("int");
+
+                            b1.HasKey("UboUid");
+
+                            b1.ToTable("Ubos");
+
+                            b1.WithOwner()
+                                .HasForeignKey("UboUid");
+                        });
+
+                    b.OwnsOne("Sheaft.Domain.Models.UboAddress", "Address", b1 =>
+                        {
+                            b1.Property<long>("UboUid")
+                                .ValueGeneratedOnAdd()
+                                .HasColumnType("bigint")
+                                .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                            b1.Property<string>("City")
+                                .HasColumnType("nvarchar(max)");
+
+                            b1.Property<int>("Country")
+                                .HasColumnType("int");
+
+                            b1.Property<string>("Line1")
+                                .HasColumnType("nvarchar(max)");
+
+                            b1.Property<string>("Line2")
+                                .HasColumnType("nvarchar(max)");
+
+                            b1.Property<string>("Zipcode")
+                                .HasColumnType("nvarchar(max)");
+
+                            b1.HasKey("UboUid");
+
+                            b1.ToTable("Ubos");
+
+                            b1.WithOwner()
+                                .HasForeignKey("UboUid");
+                        });
+                });
+
             modelBuilder.Entity("Sheaft.Domain.Models.User", b =>
                 {
                     b.OwnsOne("Sheaft.Domain.Models.UserAddress", "Address", b1 =>
@@ -2464,6 +2625,12 @@ namespace Sheaft.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
+                    b.HasOne("Sheaft.Domain.Models.UboDeclaration", "UboDeclaration")
+                        .WithOne()
+                        .HasForeignKey("Sheaft.Domain.Models.BusinessLegal", "UboDeclarationUid")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.OwnsOne("Sheaft.Domain.Models.LegalAddress", "Address", b1 =>
                         {
                             b1.Property<long>("BusinessLegalUid")
@@ -2490,88 +2657,6 @@ namespace Sheaft.Infrastructure.Migrations
 
                             b1.WithOwner()
                                 .HasForeignKey("BusinessLegalUid");
-                        });
-
-                    b.OwnsMany("Sheaft.Domain.Models.Ubo", "Ubos", b1 =>
-                        {
-                            b1.Property<long>("BusinessLegalUid")
-                                .HasColumnType("bigint");
-
-                            b1.Property<Guid>("Id")
-                                .ValueGeneratedOnAdd()
-                                .HasColumnType("uniqueidentifier");
-
-                            b1.Property<DateTimeOffset>("Birthdate")
-                                .HasColumnType("datetimeoffset");
-
-                            b1.Property<string>("FirstName")
-                                .HasColumnType("nvarchar(max)");
-
-                            b1.Property<string>("LastName")
-                                .HasColumnType("nvarchar(max)");
-
-                            b1.Property<int>("Nationality")
-                                .HasColumnType("int");
-
-                            b1.HasKey("BusinessLegalUid", "Id");
-
-                            b1.ToTable("BusinessUbos");
-
-                            b1.WithOwner()
-                                .HasForeignKey("BusinessLegalUid");
-
-                            b1.OwnsOne("Sheaft.Domain.Models.BirthAddress", "BirthAddress", b2 =>
-                                {
-                                    b2.Property<long>("UboBusinessLegalUid")
-                                        .HasColumnType("bigint");
-
-                                    b2.Property<Guid>("UboId")
-                                        .HasColumnType("uniqueidentifier");
-
-                                    b2.Property<string>("City")
-                                        .HasColumnType("nvarchar(max)");
-
-                                    b2.Property<int>("Country")
-                                        .HasColumnType("int");
-
-                                    b2.HasKey("UboBusinessLegalUid", "UboId");
-
-                                    b2.ToTable("BusinessUbos");
-
-                                    b2.WithOwner()
-                                        .HasForeignKey("UboBusinessLegalUid", "UboId");
-                                });
-
-                            b1.OwnsOne("Sheaft.Domain.Models.UboAddress", "Address", b2 =>
-                                {
-                                    b2.Property<long>("UboBusinessLegalUid")
-                                        .HasColumnType("bigint");
-
-                                    b2.Property<Guid>("UboId")
-                                        .HasColumnType("uniqueidentifier");
-
-                                    b2.Property<string>("City")
-                                        .HasColumnType("nvarchar(max)");
-
-                                    b2.Property<int>("Country")
-                                        .HasColumnType("int");
-
-                                    b2.Property<string>("Line1")
-                                        .HasColumnType("nvarchar(max)");
-
-                                    b2.Property<string>("Line2")
-                                        .HasColumnType("nvarchar(max)");
-
-                                    b2.Property<string>("Zipcode")
-                                        .HasColumnType("nvarchar(max)");
-
-                                    b2.HasKey("UboBusinessLegalUid", "UboId");
-
-                                    b2.ToTable("BusinessUbos");
-
-                                    b2.WithOwner()
-                                        .HasForeignKey("UboBusinessLegalUid", "UboId");
-                                });
                         });
                 });
 

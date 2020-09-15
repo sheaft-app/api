@@ -18,7 +18,7 @@ namespace Sheaft.Domain.Models
             Id = id;
             Name = name;
             Kind = kind;
-            Status = ValidationStatus.WaitingForCreation;
+            Status = DocumentStatus.WaitingForCreation;
             User = user;
 
             _pages = new List<Page>();
@@ -33,7 +33,7 @@ namespace Sheaft.Domain.Models
         public string Name { get; private set; }
         public string ResultCode { get; private set; }
         public string ResultMessage { get; private set; }
-        public ValidationStatus Status { get; private set; }
+        public DocumentStatus Status { get; private set; }
         public DocumentKind Kind { get; private set; }
         public virtual User User { get; private set; }
         public virtual IReadOnlyCollection<Page> Pages => _pages.AsReadOnly();
@@ -46,7 +46,7 @@ namespace Sheaft.Domain.Models
             Identifier = identifier;
         }
 
-        public void SetValidationStatus(ValidationStatus status)
+        public void SetValidationStatus(DocumentStatus status)
         {
             Status = status;
         }
