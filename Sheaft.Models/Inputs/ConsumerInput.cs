@@ -1,4 +1,6 @@
-﻿namespace Sheaft.Models.Inputs
+﻿using System;
+
+namespace Sheaft.Models.Inputs
 {
     public class ConsumerInput
     {
@@ -8,6 +10,6 @@
         public string LastName { get; set; }
         public string Picture { get; set; }
         public bool Anonymous { get; set; }
-        public FullAddressInput Address { get; set; }
+        public Guid DepartmentId { get; set; }
     }
 }

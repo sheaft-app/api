@@ -117,15 +117,7 @@ namespace Sheaft.Manage.Controllers
                 FirstName = model.FirstName,
                 LastName = model.LastName,
                 Phone = model.Phone,
-                Address = new Sheaft.Models.Inputs.FullAddressInput
-                {
-                    Line1 = model.Address.Line1,
-                    Line2 = model.Address.Line2,
-                    Zipcode = model.Address.Zipcode,
-                    City = model.Address.City,
-                    Latitude = model.Address.Latitude,
-                    Longitude = model.Address.Longitude,
-                },
+                DepartmentId = model.DepartmentId,
                 Picture = model.Picture
             }, token);
 

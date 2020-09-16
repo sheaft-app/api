@@ -12,7 +12,7 @@ namespace Sheaft.Mappers
         public UserProfile()
         {
             CreateMap<User, UserViewModel>()
-                .ForMember(c => c.Address, opt => opt.MapFrom(d => d.Address));
+                .ForMember(c => c.DepartmentId, opt => opt.MapFrom(d => d.Address.Department.Id));
 
             CreateMap<User, UserProfileDto>();
 

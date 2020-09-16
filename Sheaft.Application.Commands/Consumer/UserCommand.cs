@@ -19,6 +19,6 @@ namespace Sheaft.Application.Commands
         public string LastName { get; set; }
         public string Picture { get; set; }
         public bool Anonymous { get; set; }
-        public FullAddressInput Address { get; set; }
+        public Guid DepartmentId { get; set; }
     }
 }
