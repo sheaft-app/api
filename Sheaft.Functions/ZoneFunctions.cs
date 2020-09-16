@@ -7,6 +7,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Sheaft.Application.Commands;
+using Sheaft.Application.Events;
 using Sheaft.Core;
 using Sheaft.Core.Security;
 using Sheaft.Logging;

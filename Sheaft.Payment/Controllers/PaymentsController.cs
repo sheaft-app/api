@@ -8,12 +8,14 @@ using Sheaft.Payment.Models;
 
 namespace Sheaft.Payment.Controllers
 {
-    public class HomeController : Controller
+    public class PaymentsController : Controller
     {
-        private readonly ILogger<HomeController> _logger;
+        private readonly ILogger<PaymentsController> _logger;
         private readonly PspOptions _pspOptions;
 
-        public HomeController(IOptionsSnapshot<PspOptions> options, ILogger<HomeController> logger)
+        public PaymentsController(
+            IOptionsSnapshot<PspOptions> options,
+            ILogger<PaymentsController> logger)
         {
             _logger = logger;
             _pspOptions = options.Value;
@@ -23,14 +25,22 @@ namespace Sheaft.Payment.Controllers
         public IActionResult Index(string transactionId, string token)
         {
             if (string.IsNullOrWhiteSpace(transactionId))
+            {
+                _logger.LogError($"Missing transaction id at {DateTimeOffset.UtcNow:yyyyMMddHHmmss}");
                 throw new Exception("L'identifiant de transaction est requis");
+            }
 
             if (string.IsNullOrWhiteSpace(token))
+            {
+                _logger.LogError($"Missing token at {DateTimeOffset.UtcNow:yyyyMMddHHmmss}");
                 throw new Exception("Le token de transaction est requis");
+            }
 
             ViewBag.TransactionId = transactionId;
             ViewBag.Token = token;
             ViewBag.PaylineUrl = _pspOptions.PaylineUrl;
+
+            _logger.LogInformation($"Displaying {transactionId} with token {token} at {DateTimeOffset.UtcNow:yyyyMMddHHmmss}");
 
             return View();
         }
