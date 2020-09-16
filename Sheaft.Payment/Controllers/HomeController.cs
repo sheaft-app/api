@@ -1,10 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using Sheaft.Options;
 using Sheaft.Payment.Models;
 
 namespace Sheaft.Payment.Controllers
@@ -12,19 +11,27 @@ namespace Sheaft.Payment.Controllers
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
+        private readonly PspOptions _pspOptions;
 
-        public HomeController(ILogger<HomeController> logger)
+        public HomeController(IOptionsSnapshot<PspOptions> options, ILogger<HomeController> logger)
         {
             _logger = logger;
+            _pspOptions = options.Value;
         }
 
-        public IActionResult Index()
+        [HttpGet, HttpPost]
+        public IActionResult Index(string transactionId, string token)
         {
-            return View();
-        }
+            if (string.IsNullOrWhiteSpace(transactionId))
+                throw new Exception("L'identifiant de transaction est requis");
 
-        public IActionResult Privacy()
-        {
+            if (string.IsNullOrWhiteSpace(token))
+                throw new Exception("Le token de transaction est requis");
+
+            ViewBag.TransactionId = transactionId;
+            ViewBag.Token = token;
+            ViewBag.PaylineUrl = _pspOptions.PaylineUrl;
+
             return View();
         }
 

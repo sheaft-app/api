@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Globalization;
 using System.Reflection;
 using AutoMapper;
 using MangoPay.SDK;
@@ -6,6 +7,7 @@ using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.EntityFrameworkCore;
@@ -18,6 +20,7 @@ using Sheaft.Application.Commands;
 using Sheaft.Application.Events;
 using Sheaft.Application.Handlers;
 using Sheaft.Infrastructure;
+using Sheaft.Infrastructure.Interop;
 using Sheaft.Mappers;
 using Sheaft.Options;
 using Sheaft.Services;
@@ -78,11 +81,13 @@ namespace Sheaft.Payment
             services.AddHttpClient();
 
             var databaseConfig = databaseSettings.Get<DatabaseOptions>();
-            services.AddDbContext<AppDbContext>(options =>
+            services.AddDbContext<IAppDbContext, AppDbContext>(options =>
             {
                 options.UseLazyLoadingProxies();
-                options.UseSqlServer(databaseConfig.ConnectionString, x => x.UseNetTopologySuite());//.EnableRetryOnFailure(5, TimeSpan.FromSeconds(5), null));
+                options.UseSqlServer(databaseConfig.ConnectionString, x => x.UseNetTopologySuite());
             }, ServiceLifetime.Scoped);
+
+            services.AddScoped<IDapperContext, DapperContext>();
 
             var sendgridConfig = sendgridSettings.Get<SendgridOptions>();
             services.AddScoped<ISendGridClient, SendGridClient>(c => new SendGridClient(sendgridConfig.ApiKey));
@@ -95,6 +100,20 @@ namespace Sheaft.Payment
             services.AddScoped<IImageService, ImageService>();
             services.AddScoped<IPspService, PspService>();
 
+            services.AddLocalization(ops => ops.ResourcesPath = "Resources");
+            services.Configure<RequestLocalizationOptions>(
+                opts =>
+                {
+                    var supportedCultures = new List<CultureInfo>
+                    {
+                        new CultureInfo("en"),
+                        new CultureInfo("fr")
+                    };
+
+                    opts.DefaultRequestCulture = new RequestCulture("en", "fr");
+                    opts.SupportedCultures = supportedCultures;
+                    opts.SupportedUICultures = supportedCultures;
+                });
 
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             services.AddApplicationInsightsTelemetry();
@@ -133,11 +152,11 @@ namespace Sheaft.Payment
             app.UseHttpsRedirection();
 
             app.UseStaticFiles();
-            app.UseEndpoints(endpoints =>
+            app.UseMvc(endpoints =>
                 {
-                    endpoints.MapControllerRoute(
+                    endpoints.MapRoute(
                         name: "default",
-                        pattern: "{controller=Home}/{action=Index}/{id?}");
+                        template: "{controller=Home}/{action=Index}/{id?}");
                 });
         }
     }
