@@ -46,6 +46,20 @@ namespace Sheaft.GraphQL.Types
                 .Type<NonNullType<ListType<ProductQuantityInputType>>>();
         }
     }
+    public class UpdateOrderInputType : SheaftInputType<UpdateOrderInput>
+    {
+        protected override void Configure(IInputObjectTypeDescriptor<UpdateOrderInput> descriptor)
+        {
+            descriptor.Field(c => c.Id)
+                .Type<NonNullType<IdType>>();
+
+            descriptor.Field(c => c.ProducersExpectedDeliveries)
+                .Type<NonNullType<ListType<ProducerExpectedDeliveryInputType>>>();
+
+            descriptor.Field(c => c.Products)
+                .Type<NonNullType<ListType<ProductQuantityInputType>>>();
+        }
+    }
     public class CreateDocumentType : SheaftInputType<CreateDocumentInput>
     {
         protected override void Configure(IInputObjectTypeDescriptor<CreateDocumentInput> descriptor)

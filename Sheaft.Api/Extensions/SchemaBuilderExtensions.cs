@@ -86,6 +86,7 @@ namespace Sheaft.Api
             services.AddType<TransactionStatusEnumType>();
 
             services.AddType<CreateOrderInputType>();
+            services.AddType<UpdateOrderInputType>();
             services.AddType<PayOrderInputType>();
             services.AddType<CreateDocumentType>();
             services.AddType<CreateAgreementInputType>();
