@@ -3,7 +3,8 @@ using System.Collections.Generic;
 
 namespace Sheaft.Models.Inputs
 {
-    public class CreateOrderInput : OrderInput
+    public class UpdateOrderInput : OrderInput
     {
+        public Guid Id { get; set; } 
     }
 }

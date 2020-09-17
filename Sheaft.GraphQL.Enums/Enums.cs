@@ -8,14 +8,26 @@ namespace Sheaft.GraphQL.Enums
     {
         protected override void Configure(IEnumTypeDescriptor<OrderStatusKind> descriptor)
         {
-            descriptor.Value(OrderStatusKind.Accepted).Name("ACCEPTED");
-            descriptor.Value(OrderStatusKind.Cancelled).Name("CANCELLED");
-            descriptor.Value(OrderStatusKind.Completed).Name("COMPLETED");
-            descriptor.Value(OrderStatusKind.Delivered).Name("DELIVERED");
-            descriptor.Value(OrderStatusKind.Processing).Name("PROCESSING");
-            descriptor.Value(OrderStatusKind.Refused).Name("REFUSED");
-            descriptor.Value(OrderStatusKind.Shipping).Name("SHIPPING");
+            descriptor.Value(OrderStatusKind.Created).Name("CREATED");
             descriptor.Value(OrderStatusKind.Waiting).Name("WAITING");
+            descriptor.Value(OrderStatusKind.Validated).Name("VALIDATED");
+            descriptor.Value(OrderStatusKind.Refused).Name("REFUSED");
+            descriptor.Value(OrderStatusKind.Cancelled).Name("CANCELLED");
+            descriptor.Value(OrderStatusKind.Expired).Name("EXPIRED");
+        }
+    }
+    public class PurchaseOrderStatusEnumType : EnumType<PurchaseOrderStatusKind>
+    {
+        protected override void Configure(IEnumTypeDescriptor<PurchaseOrderStatusKind> descriptor)
+        {
+            descriptor.Value(PurchaseOrderStatusKind.Accepted).Name("ACCEPTED");
+            descriptor.Value(PurchaseOrderStatusKind.Cancelled).Name("CANCELLED");
+            descriptor.Value(PurchaseOrderStatusKind.Completed).Name("COMPLETED");
+            descriptor.Value(PurchaseOrderStatusKind.Delivered).Name("DELIVERED");
+            descriptor.Value(PurchaseOrderStatusKind.Processing).Name("PROCESSING");
+            descriptor.Value(PurchaseOrderStatusKind.Refused).Name("REFUSED");
+            descriptor.Value(PurchaseOrderStatusKind.Shipping).Name("SHIPPING");
+            descriptor.Value(PurchaseOrderStatusKind.Waiting).Name("WAITING");
         }
     }
     public class AddressKindEnumType : EnumType<AddressKind>

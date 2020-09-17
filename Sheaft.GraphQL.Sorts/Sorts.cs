@@ -11,6 +11,15 @@ namespace Sheaft.GraphQL.Sorts
             descriptor.Sortable(c => c.Name);
         }
     }
+    public class OrderSortType : SortInputType<OrderDto>
+    {
+        protected override void Configure(ISortInputTypeDescriptor<OrderDto> descriptor)
+        {
+            descriptor.BindFieldsExplicitly();
+            descriptor.Sortable(c => c.Status);
+            descriptor.Sortable(c => c.CreatedOn);
+        }
+    }
     public class AgreementSortType : SortInputType<AgreementDto>
     {
         protected override void Configure(ISortInputTypeDescriptor<AgreementDto> descriptor)

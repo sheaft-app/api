@@ -23,7 +23,7 @@ namespace Sheaft.Models.Dto
         public decimal TotalReturnableVatPrice { get; set; }
         public decimal TotalWeight { get; set; }
         public int ReturnablesCount { get; set; }
-        public OrderStatusKind Status { get; set; }
+        public PurchaseOrderStatusKind Status { get; set; }
         public UserProfileDto Sender { get; set; }
         public ExpectedDeliveryDto ExpectedDelivery { get; set; }
         public UserProfileDto Vendor { get; set; }

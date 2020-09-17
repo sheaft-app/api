@@ -347,6 +347,26 @@ namespace Sheaft.GraphQL
             return tagQueries.GetTags(_currentUser);
         }
 
+        [Authorize(Policy = Policies.REGISTERED)]
+        [GraphQLName("order")]
+        [UseSingleOrDefault]
+        [UseSelection]
+        public IQueryable<OrderDto> GetOrderAsync(Guid input, [Service] IOrderQueries orderQueries)
+        {
+            return orderQueries.GetOrder(input, _currentUser);
+        }
+
+        [Authorize(Policy = Policies.REGISTERED)]
+        [GraphQLName("orders")]
+        [UsePaging(SchemaType = typeof(OrderType))]
+        [UseSorting(SortType = typeof(OrderSortType))]
+        [UseFiltering(FilterType = typeof(OrderFilterType))]
+        [UseSelection]
+        public IQueryable<OrderDto> GetOrdersAsync([Service] IOrderQueries orderQueries)
+        {
+            return orderQueries.GetOrders(_currentUser);
+        }
+
         [Authorize(Policy = Policies.STORE_OR_PRODUCER)]
         [GraphQLName("agreement")]
         [UseSingleOrDefault]

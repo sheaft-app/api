@@ -205,18 +205,28 @@ namespace Sheaft.GraphQL
             return notificationQueries.GetNotification(input.Id, _currentUser);
         }
 
-        [Authorize(Policy = Policies.REGISTERED)]
-        [GraphQLName("createConsumerOrder")]
+        [Authorize(Policy = Policies.CONSUMER)]
+        [GraphQLName("createOrder")]
         [UseSingleOrDefault]
         [UseSelection]
-        public async Task<IQueryable<OrderDto>> CreateConsumerOrderAsync(CreateOrderInput input, [Service] IOrderQueries orderQueries)
+        public async Task<IQueryable<OrderDto>> CreateOrderAsync(CreateOrderInput input, [Service] IOrderQueries orderQueries)
         {
             var result = await ExecuteCommandAsync<CreateConsumerOrderCommand, Guid>(_mapper.Map(input, new CreateConsumerOrderCommand(_currentUser)), _cancellationToken);
             return orderQueries.GetOrder(result, _currentUser);
         }
 
-        [Authorize(Policy = Policies.REGISTERED)]
-        [GraphQLName("createBusinessOrder")]
+        [Authorize(Policy = Policies.CONSUMER)]
+        [GraphQLName("updateOrder")]
+        [UseSingleOrDefault]
+        [UseSelection]
+        public async Task<IQueryable<OrderDto>> UpdateOrderAsync(UpdateOrderInput input, [Service] IOrderQueries orderQueries)
+        {
+            var result = await ExecuteCommandAsync<UpdateConsumerOrderCommand, bool>(_mapper.Map(input, new UpdateConsumerOrderCommand(_currentUser)), _cancellationToken);
+            return orderQueries.GetOrder(input.Id, _currentUser);
+        }
+
+        [Authorize(Policy = Policies.STORE)]
+        [GraphQLName("createPurchaseOrders")]
         [UsePaging]
         [UseSorting(SortType = typeof(PurchaseOrderSortType))]
         [UseFiltering(FilterType = typeof(PurchaseOrderFilterType))]
@@ -227,7 +237,7 @@ namespace Sheaft.GraphQL
             return purchaseOrderQueries.GetPurchaseOrders(_currentUser).Where(j => result.Contains(j.Id));
         }
 
-        [Authorize(Policy = Policies.REGISTERED)]
+        [Authorize(Policy = Policies.CONSUMER)]
         [GraphQLName("payOrder")]
         [UseSingleOrDefault]
         [UseSelection]
@@ -237,7 +247,7 @@ namespace Sheaft.GraphQL
             return transactionQueries.GetWebPayinTransaction(result, _currentUser);
         }
 
-        [Authorize(Policy = Policies.REGISTERED)]
+        [Authorize(Policy = Policies.PRODUCER)]
         [GraphQLName("createDocument")]
         [UseSingleOrDefault]
         [UseSelection]
@@ -247,23 +257,11 @@ namespace Sheaft.GraphQL
             return documentQueries.GetDocument(result, _currentUser);
         }
 
-        [Authorize(Policy = Policies.REGISTERED)]
+        [Authorize(Policy = Policies.PRODUCER)]
         [GraphQLName("removeDocument")]
         public async Task<bool> RemoveDocumentAsync(IdInput input)
         {
             return await ExecuteCommandAsync<RemoveDocumentCommand, bool>(_mapper.Map(input, new RemoveDocumentCommand(_currentUser)), _cancellationToken);
-        }
-
-        [Authorize(Policy = Policies.REGISTERED)]
-        [GraphQLName("confirmOrder")]
-        [UsePaging]
-        [UseSorting(SortType = typeof(PurchaseOrderSortType))]
-        [UseFiltering(FilterType = typeof(PurchaseOrderFilterType))]
-        [UseSelection]
-        public async Task<IQueryable<PurchaseOrderDto>> ConfirmOrderAsync(IdInput input, [Service] IPurchaseOrderQueries purchaseOrderQueries)
-        {
-            var result = await ExecuteCommandAsync<ConfirmOrderCommand, IEnumerable<Guid>>(_mapper.Map(input, new ConfirmOrderCommand(_currentUser)), _cancellationToken);
-            return purchaseOrderQueries.GetPurchaseOrders(_currentUser).Where(j => result.Contains(j.Id));
         }
 
         [Authorize(Policy = Policies.PRODUCER)]
@@ -379,7 +377,7 @@ namespace Sheaft.GraphQL
             return productQueries.GetProduct(input.Id, _currentUser);
         }
 
-        [Authorize(Policy = Policies.CONSUMER)]
+        [Authorize(Policy = Policies.REGISTERED)]
         [GraphQLName("rateProduct")]
         [GraphQLType(typeof(ProductDetailsType))]
         [UseSingleOrDefault]
@@ -432,7 +430,7 @@ namespace Sheaft.GraphQL
             return businessQueries.GetStore(result, _currentUser);
         }
 
-        [Authorize(Policy = Policies.OWNER)]
+        [Authorize(Policy = Policies.STORE)]
         [GraphQLName("updateStore")]
         [GraphQLType(typeof(StoreType))]
         [UseSingleOrDefault]
@@ -454,7 +452,7 @@ namespace Sheaft.GraphQL
             return businessQueries.GetProducer(result, _currentUser);
         }
 
-        [Authorize(Policy = Policies.OWNER)]
+        [Authorize(Policy = Policies.PRODUCER)]
         [GraphQLName("updateProducer")]
         [GraphQLType(typeof(ProducerType))]
         [UseSingleOrDefault]
@@ -465,7 +463,7 @@ namespace Sheaft.GraphQL
             return businessQueries.GetProducer(input.Id, _currentUser);
         }
 
-        [Authorize(Policy = Policies.STORE_OR_PRODUCER)]
+        [Authorize(Policy = Policies.PRODUCER)]
         [GraphQLName("createBusinessLegals")]
         [GraphQLType(typeof(BusinessLegalType))]
         [UseSingleOrDefault]
@@ -476,7 +474,7 @@ namespace Sheaft.GraphQL
             return legalQueries.GetBusinessLegals(result, _currentUser);
         }
 
-        [Authorize(Policy = Policies.STORE_OR_PRODUCER)]
+        [Authorize(Policy = Policies.PRODUCER)]
         [GraphQLName("updateBusinessLegals")]
         [GraphQLType(typeof(BusinessLegalType))]
         [UseSingleOrDefault]
@@ -486,7 +484,6 @@ namespace Sheaft.GraphQL
             await ExecuteCommandAsync<UpdateBusinessLegalCommand, bool>(_mapper.Map(input, new UpdateBusinessLegalCommand(_currentUser)), _cancellationToken);
             return legalQueries.GetBusinessLegals(input.Id, _currentUser);
         }
-
 
         [Authorize(Policy = Policies.PRODUCER)]
         [GraphQLName("createUbo")]

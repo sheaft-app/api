@@ -19,7 +19,7 @@ namespace Sheaft.Models.ViewModels
         public decimal TotalVatPrice { get; set; }
         public decimal TotalOnSalePrice { get; set; }
         public decimal TotalWeight { get; set; }
-        public OrderStatusKind Status { get; set; }
+        public PurchaseOrderStatusKind Status { get; set; }
         public OrderUserViewModel Sender { get; set; }
         public ExpectedDeliveryViewModel ExpectedDelivery { get; set; }
         public OrderUserViewModel Vendor { get; set; }

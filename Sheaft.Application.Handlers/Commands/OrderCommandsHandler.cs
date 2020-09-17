@@ -18,6 +18,7 @@ namespace Sheaft.Application.Handlers
     public class OrderCommandsHandler : ResultsHandler,
         IRequestHandler<CreateConsumerOrderCommand, Result<Guid>>,
         IRequestHandler<CreateBusinessOrderCommand, Result<IEnumerable<Guid>>>,
+        IRequestHandler<UpdateConsumerOrderCommand, Result<bool>>,
         IRequestHandler<PayOrderCommand, Result<Guid>>,
         IRequestHandler<ConfirmOrderCommand, Result<IEnumerable<Guid>>>
     {
@@ -129,6 +130,40 @@ namespace Sheaft.Application.Handlers
             });
         }
 
+        public async Task<Result<bool>> Handle(UpdateConsumerOrderCommand request, CancellationToken token)
+        {
+            return await ExecuteAsync(async () =>
+            {
+                var productIds = request.Products.Select(p => p.Id);
+                var deliveryIds = request.ProducersExpectedDeliveries.Select(p => p.DeliveryModeId);
+                var products = await _context.GetByIdsAsync<Product>(productIds, token);
+                var deliveries = await _context.GetByIdsAsync<DeliveryMode>(deliveryIds, token);
+
+                var cartProducts = new Dictionary<Product, int>();
+                foreach (var product in products)
+                {
+                    cartProducts.Add(product, request.Products.Where(p => p.Id == product.Id).Sum(c => c.Quantity));
+                }
+
+                var cartDeliveries = new List<Tuple<DeliveryMode, DateTimeOffset, string>>();
+                foreach (var delivery in deliveries)
+                {
+                    var cartDelivery = request.ProducersExpectedDeliveries.FirstOrDefault(ped => ped.DeliveryModeId == delivery.Id);
+                    cartDeliveries.Add(new Tuple<DeliveryMode, DateTimeOffset, string>(delivery, cartDelivery.ExpectedDeliveryDate, cartDelivery.Comment));
+                }
+
+                var user = await _context.GetByIdAsync<User>(request.RequestUser.Id, token);
+                var entity = await _context.GetByIdAsync<Order>(request.Id, token);
+
+                entity.SetProducts(cartProducts);
+                entity.SetDeliveries(cartDeliveries);
+
+                _context.Update(entity);
+
+                return Ok(await _context.SaveChangesAsync(token) > 0);
+            });
+        }
+
         public async Task<Result<Guid>> Handle(PayOrderCommand request, CancellationToken token)
         {
             return await ExecuteAsync(async () =>
@@ -137,6 +172,7 @@ namespace Sheaft.Application.Handlers
                 {
                     var order = await _context.GetByIdAsync<Order>(request.OrderId, token);
                     order.SetDonation(request.Donation);
+                    order.SetStatus(OrderStatusKind.Waiting);
 
                     _context.Update(order);
                     await _context.SaveChangesAsync(token);
@@ -162,6 +198,8 @@ namespace Sheaft.Application.Handlers
                 {
                     var order = await _context.GetByIdAsync<Order>(request.Id, token);
                     var orderIds = new List<Guid>();
+
+                    order.SetStatus(OrderStatusKind.Validated);
 
                     var producerIds = order.Products.Select(p => p.Producer.Id).Distinct();
                     foreach(var producerId in producerIds)

@@ -1,4 +1,5 @@
 ﻿using Sheaft.Interop;
+using Sheaft.Interop.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -23,15 +24,17 @@ namespace Sheaft.Domain.Models
 
             _products = new List<OrderProduct>();
             _deliveries = new List<OrderDelivery>();
+            Status = OrderStatusKind.Created;
 
             SetProducts(orderProducts);
             SetDeliveries(orderDeliveries);
         }
 
-        public Guid Id { get; }
+        public Guid Id { get; private set; }
         public DateTimeOffset CreatedOn { get; private set; }
         public DateTimeOffset? UpdatedOn { get; private set; }
         public DateTimeOffset? RemovedOn { get; private set; }
+        public OrderStatusKind Status { get; private set; }
         public decimal TotalWholeSalePrice { get; private set; }
         public decimal TotalVatPrice { get; private set; }
         public decimal TotalOnSalePrice { get; private set; }
@@ -47,6 +50,11 @@ namespace Sheaft.Domain.Models
         public virtual User User { get; private set; }
         public virtual IReadOnlyCollection<OrderProduct> Products => _products?.AsReadOnly();
         public virtual IReadOnlyCollection<OrderDelivery> Deliveries => _deliveries?.AsReadOnly();
+
+        public void SetStatus(OrderStatusKind status)
+        {
+            Status = status;
+        }
 
         public void SetProducts(IDictionary<Product, int> orderProducts)
         {

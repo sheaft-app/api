@@ -48,7 +48,7 @@ namespace Sheaft.Application.Handlers
                 var producer = await _context.GetByIdAsync<Producer>(request.RequestUser.Id, token);
                 var purchaseOrders = await _context.GetByIdsAsync<PurchaseOrder>(request.PurchaseOrderIds, token);
 
-                var orderIdsToAccept = purchaseOrders.Where(c => c.Status == OrderStatusKind.Waiting).Select(c => c.Id);
+                var orderIdsToAccept = purchaseOrders.Where(c => c.Status == PurchaseOrderStatusKind.Waiting).Select(c => c.Id);
                 if (orderIdsToAccept.Any())
                 {
                     var result = await _mediatr.Send(new AcceptPurchaseOrdersCommand(request.RequestUser) { Ids = orderIdsToAccept });

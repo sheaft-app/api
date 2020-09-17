@@ -1045,6 +1045,7 @@ namespace Sheaft.GraphQL.Types
         protected override void Configure(IObjectTypeDescriptor<OrderDto> descriptor)
         {
             descriptor.Field(c => c.Id).Type<NonNullType<IdType>>();
+            descriptor.Field(c => c.Status);
             descriptor.Field(c => c.CreatedOn);
             descriptor.Field(c => c.TotalWholeSalePrice);
             descriptor.Field(c => c.TotalVatPrice);

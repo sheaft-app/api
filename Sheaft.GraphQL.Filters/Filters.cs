@@ -13,6 +13,15 @@ namespace Sheaft.GraphQL.Filters
             descriptor.Filter(c => c.Name).AllowContains();
         }
     }
+    public class OrderFilterType : FilterInputType<OrderDto>
+    {
+        protected override void Configure(IFilterInputTypeDescriptor<OrderDto> descriptor)
+        {
+            descriptor.BindFieldsExplicitly();
+            descriptor.Filter(c => c.Id).AllowEquals();
+            descriptor.Filter(c => c.Status).AllowIn();
+        }
+    }
     public class AgreementFilterType : FilterInputType<AgreementDto>
     {
         protected override void Configure(IFilterInputTypeDescriptor<AgreementDto> descriptor)

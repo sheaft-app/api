@@ -63,6 +63,7 @@ namespace Sheaft.Api
 
             services.AddType<AddressKindEnumType>();
             services.AddType<AgreementStatusEnumType>();
+            services.AddType<PurchaseOrderStatusEnumType>();
             services.AddType<OrderStatusEnumType>();
             services.AddType<JobKindEnumType>();
             services.AddType<LegalKindEnumType>();
