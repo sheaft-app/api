@@ -6,6 +6,7 @@ using Sheaft.Infrastructure.Interop;
 using Sheaft.Models.Dto;
 using Sheaft.Core;
 using Sheaft.Infrastructure;
+using Sheaft.Domain.Models;
 
 namespace Sheaft.Application.Queries
 {
@@ -20,45 +21,33 @@ namespace Sheaft.Application.Queries
             _configurationProvider = configurationProvider;
         }
 
-        public IQueryable<T> GetTransaction<T>(Guid id, RequestUser currentUser) where T : BaseTransactionDto
+        public IQueryable<WebPayinTransactionDto> GetWebPayinTransaction(string identifier, RequestUser currentUser)
         {
             try
             {
                 return _context.Transactions
-                        .Get(c => c.Id == id && c.Author.Id == currentUser.Id)
-                        .ProjectTo<T>(_configurationProvider);
-            }
-            catch (Exception e)
-            {
-                return new List<T>().AsQueryable();
-            }
-        }
-
-        public IQueryable<T> GetTransaction<T>(string identifier, RequestUser currentUser) where T : BaseTransactionDto
-        {
-            try
-            {
-                return _context.Transactions
+                        .OfType<WebPayinTransaction>()
                         .Get(c => c.Identifier == identifier && c.Author.Id == currentUser.Id)
-                        .ProjectTo<T>(_configurationProvider);
+                        .ProjectTo<WebPayinTransactionDto>(_configurationProvider);
             }
             catch (Exception e)
             {
-                return new List<T>().AsQueryable();
+                return new List<WebPayinTransactionDto>().AsQueryable();
             }
         }
 
-        public IQueryable<T> GetTransactions<T>(RequestUser currentUser) where T : BaseTransactionDto
+        public IQueryable<WebPayinTransactionDto> GetWebPayinTransaction(Guid id, RequestUser currentUser)
         {
             try
             {
                 return _context.Transactions
-                        .Get(c => c.Author.Id == currentUser.Id)
-                        .ProjectTo<T>(_configurationProvider);
+                        .OfType<WebPayinTransaction>()
+                        .Get(c => c.Id == id && c.Author.Id == currentUser.Id)
+                        .ProjectTo<WebPayinTransactionDto>(_configurationProvider);
             }
             catch (Exception e)
             {
-                return new List<T>().AsQueryable();
+                return new List<WebPayinTransactionDto>().AsQueryable();
             }
         }
     }

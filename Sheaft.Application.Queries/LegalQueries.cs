@@ -6,6 +6,7 @@ using Sheaft.Infrastructure.Interop;
 using Sheaft.Models.Dto;
 using Sheaft.Core;
 using Sheaft.Infrastructure;
+using Sheaft.Domain.Models;
 
 namespace Sheaft.Application.Queries
 {
@@ -20,31 +21,64 @@ namespace Sheaft.Application.Queries
             _configurationProvider = configurationProvider;
         }
 
-        public IQueryable<T> GetLegal<T>(Guid id, RequestUser currentUser) where T : BaseLegalDto
+        public IQueryable<ConsumerLegalDto> GetMyConsumerLegals(RequestUser currentUser)
         {
             try
             {
                 return _context.Legals
-                        .Get(c => c.Id == id && c.Owner.Id == currentUser.Id)
-                        .ProjectTo<T>(_configurationProvider);
+                        .OfType<ConsumerLegal>()
+                        .Get(c => c.Consumer.Id == currentUser.Id)
+                        .ProjectTo<ConsumerLegalDto>(_configurationProvider);
             }
             catch (Exception e)
             {
-                return new List<T>().AsQueryable();
+                return new List<ConsumerLegalDto>().AsQueryable();
             }
         }
 
-        public IQueryable<T> GetLegals<T>(RequestUser currentUser) where T : BaseLegalDto
+        public IQueryable<BusinessLegalDto> GetMyBusinessLegals(RequestUser currentUser)
         {
             try
             {
                 return _context.Legals
-                        .Get(c => c.Owner.Id == currentUser.Id)
-                        .ProjectTo<T>(_configurationProvider);
+                        .OfType<BusinessLegal>()
+                        .Get(c => c.Business.Id == currentUser.Id)
+                        .ProjectTo<BusinessLegalDto>(_configurationProvider);
             }
             catch (Exception e)
             {
-                return new List<T>().AsQueryable();
+                return new List<BusinessLegalDto>().AsQueryable();
+            }
+        }
+
+
+        public IQueryable<ConsumerLegalDto> GetConsumerLegals(Guid id, RequestUser currentUser)
+        {
+            try
+            {
+                return _context.Legals
+                        .OfType<ConsumerLegal>()
+                        .Get(c => c.Id == id && c.Consumer.Id == currentUser.Id)
+                        .ProjectTo<ConsumerLegalDto>(_configurationProvider);
+            }
+            catch (Exception e)
+            {
+                return new List<ConsumerLegalDto>().AsQueryable();
+            }
+        }
+
+        public IQueryable<BusinessLegalDto> GetBusinessLegals(Guid id, RequestUser currentUser)
+        {
+            try
+            {
+                return _context.Legals
+                        .OfType<BusinessLegal>()
+                        .Get(c => c.Id == id && c.Business.Id == currentUser.Id)
+                        .ProjectTo<BusinessLegalDto>(_configurationProvider);
+            }
+            catch (Exception e)
+            {
+                return new List<BusinessLegalDto>().AsQueryable();
             }
         }
     }

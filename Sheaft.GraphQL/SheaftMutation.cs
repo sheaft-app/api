@@ -212,7 +212,7 @@ namespace Sheaft.GraphQL
         public async Task<IQueryable<OrderDto>> CreateConsumerOrderAsync(CreateOrderInput input, [Service] IOrderQueries orderQueries)
         {
             var result = await ExecuteCommandAsync<CreateConsumerOrderCommand, Guid>(_mapper.Map(input, new CreateConsumerOrderCommand(_currentUser)), _cancellationToken);
-            return orderQueries.GetOrders(_currentUser).Where(j => result == j.Id);
+            return orderQueries.GetOrder(result, _currentUser);
         }
 
         [Authorize(Policy = Policies.REGISTERED)]
@@ -234,7 +234,7 @@ namespace Sheaft.GraphQL
         public async Task<IQueryable<WebPayinTransactionDto>> PayOrderAsync(PayOrderInput input, [Service] ITransactionQueries transactionQueries)
         {
             var result = await ExecuteCommandAsync<PayOrderCommand, Guid>(_mapper.Map(input, new PayOrderCommand(_currentUser)), _cancellationToken);
-            return transactionQueries.GetTransactions<WebPayinTransactionDto>(_currentUser).Where(j => result == j.Id);
+            return transactionQueries.GetWebPayinTransaction(result, _currentUser);
         }
 
         [Authorize(Policy = Policies.REGISTERED)]
@@ -244,7 +244,7 @@ namespace Sheaft.GraphQL
         public async Task<IQueryable<DocumentDto>> CreateDocumentAsync(CreateDocumentInput input, [Service] IDocumentQueries documentQueries)
         {
             var result = await ExecuteCommandAsync<CreateDocumentCommand, Guid>(_mapper.Map(input, new CreateDocumentCommand(_currentUser)), _cancellationToken);
-            return documentQueries.GetDocuments(_currentUser).Where(j => result == j.Id);
+            return documentQueries.GetDocument(result, _currentUser);
         }
 
         [Authorize(Policy = Policies.REGISTERED)]
@@ -473,7 +473,7 @@ namespace Sheaft.GraphQL
         public async Task<IQueryable<BusinessLegalDto>> CreateBusinessLegalsAsync(CreateBusinessLegalInput input, [Service] ILegalQueries legalQueries)
         {
             var result = await ExecuteCommandAsync<CreateBusinessLegalCommand, Guid>(_mapper.Map(input, new CreateBusinessLegalCommand(_currentUser)), _cancellationToken);
-            return legalQueries.GetLegal<BusinessLegalDto>(result, _currentUser);
+            return legalQueries.GetBusinessLegals(result, _currentUser);
         }
 
         [Authorize(Policy = Policies.STORE_OR_PRODUCER)]
@@ -484,7 +484,7 @@ namespace Sheaft.GraphQL
         public async Task<IQueryable<BusinessLegalDto>> UpdateBusinessLegalsAsync(UpdateBusinessLegalInput input, [Service] ILegalQueries legalQueries)
         {
             await ExecuteCommandAsync<UpdateBusinessLegalCommand, bool>(_mapper.Map(input, new UpdateBusinessLegalCommand(_currentUser)), _cancellationToken);
-            return legalQueries.GetLegal<BusinessLegalDto>(input.Id, _currentUser);
+            return legalQueries.GetBusinessLegals(input.Id, _currentUser);
         }
 
 
@@ -547,7 +547,7 @@ namespace Sheaft.GraphQL
         public async Task<IQueryable<ConsumerLegalDto>> CreateConsumerLegalsAsync(CreateConsumerLegalInput input, [Service] ILegalQueries legalQueries)
         {
             var result = await ExecuteCommandAsync<CreateConsumerLegalCommand, Guid>(_mapper.Map(input, new CreateConsumerLegalCommand(_currentUser)), _cancellationToken);
-            return legalQueries.GetLegal<ConsumerLegalDto>(result, _currentUser);
+            return legalQueries.GetConsumerLegals(result, _currentUser);
         }
 
         [Authorize(Policy = Policies.CONSUMER)]
@@ -558,7 +558,7 @@ namespace Sheaft.GraphQL
         public async Task<IQueryable<ConsumerLegalDto>> UpdateConsumerLegalsAsync(UpdateConsumerLegalInput input, [Service] ILegalQueries legalQueries)
         {
             await ExecuteCommandAsync<UpdateConsumerLegalCommand, bool>(_mapper.Map(input, new UpdateConsumerLegalCommand(_currentUser)), _cancellationToken);
-            return legalQueries.GetLegal<ConsumerLegalDto>(input.Id, _currentUser);
+            return legalQueries.GetConsumerLegals(input.Id, _currentUser);
         }
 
         [Authorize(Policy = Policies.REGISTERED)]

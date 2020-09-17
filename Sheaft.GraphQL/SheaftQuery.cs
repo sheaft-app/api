@@ -191,13 +191,31 @@ namespace Sheaft.GraphQL
             return businessQueries.GetStore(input, _currentUser);
         }
 
-        [Authorize(Policy = Policies.REGISTERED)]
-        [GraphQLName("payinTransaction")]
+        [Authorize(Policy = Policies.CONSUMER)]
+        [GraphQLName("getMyConsumerLegals")]
         [UseSingleOrDefault]
         [UseSelection]
-        public IQueryable<PayinTransactionDto> GetPayinTransaction(string input, [Service] ITransactionQueries transactionQueries)
+        public IQueryable<ConsumerLegalDto> GetConsumerLegals([Service] ILegalQueries legalQueries)
         {
-            return transactionQueries.GetTransaction<PayinTransactionDto>(input, _currentUser);
+            return legalQueries.GetMyConsumerLegals(_currentUser);
+        }
+
+        [Authorize(Policy = Policies.STORE_OR_PRODUCER)]
+        [GraphQLName("getMyBusinessLegals")]
+        [UseSingleOrDefault]
+        [UseSelection]
+        public IQueryable<BusinessLegalDto> GetBusinessLegals([Service] ILegalQueries legalQueries)
+        {
+            return legalQueries.GetMyBusinessLegals(_currentUser);
+        }
+
+        [Authorize(Policy = Policies.REGISTERED)]
+        [GraphQLName("webPayinTransaction")]
+        [UseSingleOrDefault]
+        [UseSelection]
+        public IQueryable<WebPayinTransactionDto> GetPayinTransaction(string input, [Service] ITransactionQueries transactionQueries)
+        {
+            return transactionQueries.GetWebPayinTransaction(input, _currentUser);
         }
 
         [GraphQLName("pointsPerCountry")]
@@ -499,7 +517,7 @@ namespace Sheaft.GraphQL
         [UseSelection]
         public IQueryable<BusinessProfileDto> GetMyBusiness([Service] IBusinessQueries businessQueries)
         {
-            return businessQueries.GetProfile(_currentUser.Id, _currentUser);
+            return businessQueries.GetMyProfile(_currentUser);
         }
     }
 }

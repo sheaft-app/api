@@ -12,7 +12,7 @@ namespace Sheaft.Application.Queries
     {
         IQueryable<ProducerDto> GetProducer(Guid id, RequestUser currentUser);
         IQueryable<StoreDto> GetStore(Guid id, RequestUser currentUser);
-        IQueryable<BusinessProfileDto> GetProfile(Guid id, RequestUser currentUser);
+        IQueryable<BusinessProfileDto> GetMyProfile(RequestUser currentUser);
         Task<SirenBusinessDto> RetrieveSiretInfosAsync(string siret, RequestUser currentUser, CancellationToken token);
         Task<ProducersSearchDto> SearchProducersAsync(Guid storeId, SearchTermsInput terms, RequestUser currentUser, CancellationToken token);
         Task<StoresSearchDto> SearchStoresAsync(Guid producerId, SearchTermsInput terms, RequestUser currentUser, CancellationToken token);

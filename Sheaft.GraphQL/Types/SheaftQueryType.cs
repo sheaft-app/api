@@ -50,6 +50,8 @@ namespace Sheaft.GraphQL
             descriptor.Field(c => c.GetPayinTransaction(default, default)).Argument("input", c => c.Type<NonNullType<StringType>>());
             descriptor.Field(c => c.GetStoreDeliveriesForProducersAsync(default, default));
             descriptor.Field(c => c.GetStoreProducts(default));
+            descriptor.Field(c => c.GetConsumerLegals(default));
+            descriptor.Field(c => c.GetBusinessLegals(default));
             descriptor.Field(c => c.GetTags(default));
             descriptor.Field(c => c.HasPickingOrdersExportsInProgressAsync(default));
             descriptor.Field(c => c.HasProductsImportsInProgressAsync(default));

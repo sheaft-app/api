@@ -249,12 +249,12 @@ namespace Sheaft.Application.Queries
             }
         }
 
-        public IQueryable<BusinessProfileDto> GetProfile(Guid id, RequestUser currentUser)
+        public IQueryable<BusinessProfileDto> GetMyProfile(RequestUser currentUser)
         {
             try
             {
                 return _context.Users.OfType<Business>()
-                        .Get(c => c.Id == id && c.Id == currentUser.Id)
+                        .Get(c => c.Id == currentUser.Id)
                         .ProjectTo<BusinessProfileDto>(_configurationProvider);
             }
             catch (Exception e)
@@ -268,7 +268,7 @@ namespace Sheaft.Application.Queries
             try
             {
                 return _context.Users.OfType<Producer>()
-                        .Get(c => c.Id == id && c.Kind == ProfileKind.Producer)
+                        .Get(c => c.Id == id)
                         .ProjectTo<ProducerDto>(_configurationProvider);
             }
             catch (Exception e)
@@ -282,7 +282,7 @@ namespace Sheaft.Application.Queries
             try
             {
                 return _context.Users.OfType<Store>()
-                        .Get(c => c.Id == id && c.Kind == ProfileKind.Store)
+                        .Get(c => c.Id == id)
                         .ProjectTo<StoreDto>(_configurationProvider);
             }
             catch (Exception e)
