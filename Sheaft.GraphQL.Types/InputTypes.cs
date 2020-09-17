@@ -461,7 +461,7 @@ namespace Sheaft.GraphQL.Types
                 .Type<NonNullType<StringType>>();
 
             descriptor.Field(c => c.DepartmentId)
-                .Type<NonNullType<IdType>>();
+                .Type<IdType>();
         }
     }
     public class RegisterNewsletterInputType : SheaftInputType<RegisterNewsletterInput>
@@ -716,7 +716,7 @@ namespace Sheaft.GraphQL.Types
                 .Type<NonNullType<IdType>>();
 
             descriptor.Field(c => c.DepartmentId)
-                .Type<NonNullType<IdType>>();
+                .Type<IdType>();
         }
     }
     public class LocationAddressInputType : SheaftInputType<LocationAddressInput>

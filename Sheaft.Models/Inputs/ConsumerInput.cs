@@ -9,7 +9,7 @@ namespace Sheaft.Models.Inputs
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public string Picture { get; set; }
-        public bool Anonymous { get; set; }
-        public Guid DepartmentId { get; set; }
+        public bool? Anonymous { get; set; }
+        public Guid? DepartmentId { get; set; }
     }
 }

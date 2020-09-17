@@ -66,10 +66,16 @@ namespace Sheaft.Application.Handlers
                 if (entity != null)
                     return Conflict<Guid>(MessageKind.Register_User_AlreadyExists);
 
-                var department = await _context.Departments.SingleOrDefaultAsync(d => d.Id == request.DepartmentId, token);
+                entity = new Consumer(request.Id, request.Email, request.FirstName, request.LastName, request.Phone);
 
-                entity = new Consumer(request.Id, request.Email, request.FirstName, request.LastName, new UserAddress(department), request.Phone);
-                entity.SetAnonymous(request.Anonymous);
+                if (request.DepartmentId.HasValue)
+                {
+                    var department = await _context.Departments.SingleOrDefaultAsync(d => d.Id == request.DepartmentId, token);
+                    entity.SetAddress(new UserAddress(department));
+                }
+
+                if (request.Anonymous.HasValue)
+                    entity.SetAnonymous(request.Anonymous.Value);
 
                 var resultImage = await _imageService.HandleUserImageAsync(request.Id, request.Picture, token);
                 if (!resultImage.Success)
@@ -112,7 +118,9 @@ namespace Sheaft.Application.Handlers
                 entity.SetPhone(request.Phone);
                 entity.SetFirstname(request.FirstName);
                 entity.SetLastname(request.LastName);
-                entity.SetAnonymous(request.Anonymous);
+
+                if (request.Anonymous.HasValue)
+                    entity.SetAnonymous(request.Anonymous.Value);
 
                 var resultImage = await _imageService.HandleUserImageAsync(request.Id, request.Picture, token);
                 if (!resultImage.Success)
@@ -120,8 +128,11 @@ namespace Sheaft.Application.Handlers
 
                 entity.SetPicture(resultImage.Data);
 
-                var department = await _context.Departments.SingleOrDefaultAsync(d => d.Id == request.DepartmentId, token);
-                entity.SetAddress(new UserAddress(department));
+                if (request.DepartmentId.HasValue)
+                {
+                    var department = await _context.Departments.SingleOrDefaultAsync(d => d.Id == request.DepartmentId, token);
+                    entity.SetAddress(new UserAddress(department));
+                }
 
                 var oidcResult = await UpdateOidcUserAsync(entity, new List<Guid> { _roleOptions.Consumer.Id }, token);
                 if (!oidcResult.Success)
