@@ -21,6 +21,8 @@ namespace Sheaft.Domain.Models
             Donation = 0;
             User = user;
 
+            _products = new List<OrderProduct>();
+            _deliveries = new List<OrderDelivery>();
             SetProducts(orderProducts);
             SetDeliveries(orderDeliveries);
         }
