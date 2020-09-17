@@ -17,7 +17,11 @@ namespace Sheaft.Application.Handlers
         IRequestHandler<UploadPageCommand, Result<bool>>,
         IRequestHandler<SubmitDocumentsCommand, Result<bool>>,
         IRequestHandler<SubmitDocumentCommand, Result<bool>>,
-        IRequestHandler<RemoveDocumentCommand, Result<bool>>
+        IRequestHandler<RemoveDocumentCommand, Result<bool>>,
+        IRequestHandler<SetDocumentFailedCommand, Result<bool>>,
+        IRequestHandler<SetDocumentOutDatedCommand, Result<bool>>,
+        IRequestHandler<SetDocumentSucceededCommand, Result<bool>>,
+        IRequestHandler<SetDocumentValidationCommand, Result<bool>>
     {
         private readonly IAppDbContext _context;
         private readonly IPspService _pspService;
@@ -152,6 +156,26 @@ namespace Sheaft.Application.Handlers
 
                 return Ok(await _context.SaveChangesAsync(token) > 0);
             });
+        }
+
+        public Task<Result<bool>> Handle(SetDocumentFailedCommand request, CancellationToken cancellationToken)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<Result<bool>> Handle(SetDocumentOutDatedCommand request, CancellationToken cancellationToken)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<Result<bool>> Handle(SetDocumentSucceededCommand request, CancellationToken cancellationToken)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<Result<bool>> Handle(SetDocumentValidationCommand request, CancellationToken cancellationToken)
+        {
+            throw new NotImplementedException();
         }
     }
 }

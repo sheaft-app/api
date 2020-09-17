@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Sheaft.Models.Inputs;
 using Sheaft.Core;
 using Newtonsoft.Json;
+using Sheaft.Interop.Enums;
 
 namespace Sheaft.Application.Commands
 {
