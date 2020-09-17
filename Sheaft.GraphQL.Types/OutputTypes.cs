@@ -1009,8 +1009,14 @@ namespace Sheaft.GraphQL.Types
             descriptor.Field(c => c.TotalVatPrice);
             descriptor.Field(c => c.TotalOnSalePrice);
             descriptor.Field(c => c.TotalWeight);
+
+            descriptor.Field(c => c.TotalReturnableWholeSalePrice);
+            descriptor.Field(c => c.TotalReturnableVatPrice);
+            descriptor.Field(c => c.TotalReturnableOnSalePrice);
+            descriptor.Field(c => c.ReturnablesCount);
             descriptor.Field(c => c.LinesCount);
             descriptor.Field(c => c.ProductsCount);
+
             descriptor.Field(c => c.Status);
             descriptor.Field(c => c.UpdatedOn);
             descriptor.Field(c => c.Reason);
@@ -1043,6 +1049,13 @@ namespace Sheaft.GraphQL.Types
             descriptor.Field(c => c.TotalWholeSalePrice);
             descriptor.Field(c => c.TotalVatPrice);
             descriptor.Field(c => c.TotalOnSalePrice);
+            descriptor.Field(c => c.TotalReturnableWholeSalePrice);
+            descriptor.Field(c => c.TotalReturnableVatPrice);
+            descriptor.Field(c => c.TotalReturnableOnSalePrice);
+            descriptor.Field(c => c.TotalWeight);
+            descriptor.Field(c => c.ReturnablesCount);
+            descriptor.Field(c => c.LinesCount);
+            descriptor.Field(c => c.ProductsCount);
             descriptor.Field(c => c.Fees);
             descriptor.Field(c => c.Donation);
 

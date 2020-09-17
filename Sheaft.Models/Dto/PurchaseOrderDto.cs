@@ -18,7 +18,11 @@ namespace Sheaft.Models.Dto
         public decimal TotalWholeSalePrice { get; set; }
         public decimal TotalVatPrice { get; set; }
         public decimal TotalOnSalePrice { get; set; }
+        public decimal TotalReturnableOnSalePrice { get; set; }
+        public decimal TotalReturnableWholeSalePrice { get; set; }
+        public decimal TotalReturnableVatPrice { get; set; }
         public decimal TotalWeight { get; set; }
+        public int ReturnablesCount { get; set; }
         public OrderStatusKind Status { get; set; }
         public UserProfileDto Sender { get; set; }
         public ExpectedDeliveryDto ExpectedDelivery { get; set; }

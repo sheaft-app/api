@@ -23,6 +23,7 @@ namespace Sheaft.Domain.Models
 
             _products = new List<OrderProduct>();
             _deliveries = new List<OrderDelivery>();
+
             SetProducts(orderProducts);
             SetDeliveries(orderDeliveries);
         }
@@ -34,6 +35,13 @@ namespace Sheaft.Domain.Models
         public decimal TotalWholeSalePrice { get; private set; }
         public decimal TotalVatPrice { get; private set; }
         public decimal TotalOnSalePrice { get; private set; }
+        public decimal TotalReturnableWholeSalePrice { get; private set; }
+        public decimal TotalReturnableVatPrice { get; private set; }
+        public decimal TotalReturnableOnSalePrice { get; private set; }
+        public decimal TotalWeight { get; private set; }
+        public int ReturnablesCount { get; private set; }
+        public int LinesCount { get; private set; }
+        public int ProductsCount { get; private set; }
         public decimal Donation { get; private set; }
         public decimal Fees { get; private set; }
         public virtual User User { get; private set; }
@@ -79,6 +87,16 @@ namespace Sheaft.Domain.Models
             TotalWholeSalePrice = Math.Round(_products.Sum(p => p.TotalWholeSalePrice), DIGITS_COUNT);
             TotalVatPrice = Math.Round(_products.Sum(p => p.TotalVatPrice), DIGITS_COUNT);
             TotalOnSalePrice = Math.Round(_products.Sum(p => p.TotalOnSalePrice), DIGITS_COUNT);
+
+            TotalWeight = Math.Round(_products.Where(p => p.TotalWeight.HasValue).Sum(p => p.TotalWeight) ?? 0, DIGITS_COUNT);
+
+            LinesCount = _products.Count();
+            ProductsCount = _products.Sum(p => p.Quantity);
+            ReturnablesCount = _products.Sum(p => p.ReturnablesCount);
+
+            TotalReturnableWholeSalePrice = Math.Round(_products.Sum(p => p.ReturnablesCount > 0 ? p.TotalReturnableWholeSalePrice.Value : 0), DIGITS_COUNT);
+            TotalReturnableVatPrice = Math.Round(_products.Sum(p => p.ReturnablesCount > 0 ? p.TotalReturnableVatPrice.Value : 0), DIGITS_COUNT);
+            TotalReturnableOnSalePrice = Math.Round(_products.Sum(p => p.ReturnablesCount > 0 ? p.TotalReturnableOnSalePrice.Value : 0), DIGITS_COUNT);
         }
     }
 }

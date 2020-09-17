@@ -31,6 +31,10 @@ namespace Sheaft.Infrastructure
             entity.Property(o => o.ReturnableWholeSalePrice).HasColumnType("decimal(10,2)");
             entity.Property(o => o.ReturnableOnSalePrice).HasColumnType("decimal(10,2)");
 
+            entity.Property(o => o.TotalReturnableOnSalePrice).HasColumnType("decimal(10,2)");
+            entity.Property(o => o.TotalReturnableVatPrice).HasColumnType("decimal(10,2)");
+            entity.Property(o => o.TotalReturnableWholeSalePrice).HasColumnType("decimal(10,2)");
+
             entity.HasKey("PurchaseOrderUid", "Id");
 
             entity.ToTable("PurchaseOrderProducts");

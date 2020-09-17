@@ -81,12 +81,23 @@ namespace Sheaft.Domain.Models
         public decimal? ReturnableWholeSalePrice { get; private set; }
         public decimal? ReturnableVatPrice { get; private set; }
         public decimal? ReturnableVat { get; private set; }
+        public decimal? TotalReturnableWholeSalePrice { get; private set; }
+        public decimal? TotalReturnableVatPrice { get; private set; }
+        public decimal? TotalReturnableOnSalePrice { get; private set; }
+        public int ReturnablesCount { get; private set; }
 
         protected void RefreshLine()
         {
             TotalVatPrice = Math.Round(Quantity * (UnitVatPrice + (ReturnableVatPrice ?? 0)), DIGITS_COUNT);
             TotalWholeSalePrice = Math.Round(Quantity * (UnitWholeSalePrice + (ReturnableWholeSalePrice ?? 0)), DIGITS_COUNT);
             TotalOnSalePrice = Math.Round(TotalWholeSalePrice + TotalVatPrice, DIGITS_COUNT);
+
+            ReturnablesCount = ReturnableVat.HasValue ? Quantity : 0;
+
+            TotalReturnableVatPrice = ReturnablesCount > 0 ? Math.Round(Quantity * ReturnableVatPrice.Value, DIGITS_COUNT) : (decimal?)null;
+            TotalReturnableWholeSalePrice = ReturnablesCount > 0 ? Math.Round(Quantity * ReturnableWholeSalePrice.Value, DIGITS_COUNT) : (decimal?)null;
+            TotalReturnableOnSalePrice = ReturnablesCount > 0 ? Math.Round(Quantity * ReturnableOnSalePrice.Value, DIGITS_COUNT) : (decimal?)null;
+
             TotalWeight = UnitWeight.HasValue ? Math.Round(Quantity * UnitWeight.Value, DIGITS_COUNT) : (decimal?)null;
         }
     }

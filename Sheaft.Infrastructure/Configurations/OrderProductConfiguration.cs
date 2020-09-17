@@ -32,6 +32,10 @@ namespace Sheaft.Infrastructure
             entity.Property(o => o.ReturnableWholeSalePrice).HasColumnType("decimal(10,2)");
             entity.Property(o => o.ReturnableOnSalePrice).HasColumnType("decimal(10,2)");
 
+            entity.Property(o => o.TotalReturnableOnSalePrice).HasColumnType("decimal(10,2)");
+            entity.Property(o => o.TotalReturnableVatPrice).HasColumnType("decimal(10,2)");
+            entity.Property(o => o.TotalReturnableWholeSalePrice).HasColumnType("decimal(10,2)");
+
             entity.HasOne(c => c.Producer).WithMany().HasForeignKey("ProducerUid").OnDelete(DeleteBehavior.NoAction);
 
             entity.HasKey("OrderUid", "Id");

@@ -17,6 +17,13 @@ namespace Sheaft.Infrastructure
             entity.Property(o => o.TotalWholeSalePrice).HasColumnType("decimal(10,2)");
             entity.Property(o => o.TotalVatPrice).HasColumnType("decimal(10,2)");
             entity.Property(o => o.TotalOnSalePrice).HasColumnType("decimal(10,2)");
+
+            entity.Property(o => o.TotalWeight).HasColumnType("decimal(10,2)");
+
+            entity.Property(o => o.TotalReturnableOnSalePrice).HasColumnType("decimal(10,2)");
+            entity.Property(o => o.TotalReturnableVatPrice).HasColumnType("decimal(10,2)");
+            entity.Property(o => o.TotalReturnableWholeSalePrice).HasColumnType("decimal(10,2)");
+
             entity.Property(o => o.Donation).HasColumnType("decimal(10,2)");
             entity.Property(o => o.Fees).HasColumnType("decimal(10,2)");
 

@@ -12,7 +12,7 @@ namespace Sheaft.Models.Inputs
             Picture = picture;
         }
 
-        public string Id { get; }
-        public string Picture { get; }
+        public string Id { get; set; }
+        public string Picture { get; set; }
     }
 }
