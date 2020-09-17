@@ -155,7 +155,7 @@ namespace Sheaft.Infrastructure
         public async Task EnsureNotExists<T>(Expression<Func<T, bool>> where, CancellationToken token) where T : class, IIdEntity, ITrackRemove
         {
             var result = await Set<T>().Where(c => !c.RemovedOn.HasValue).Where(where).ToListAsync(token);
-            if(result != null)
+            if(result != null && result.Any())
                 throw new ConflictException();
         }
 
