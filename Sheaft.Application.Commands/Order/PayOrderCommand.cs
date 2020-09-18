@@ -11,7 +11,6 @@ namespace Sheaft.Application.Commands
         {
         }
 
-        public Guid OrderId { get; set; }
-        public decimal Donation { get; set; }
+        public Guid Id { get; set; }
     }
 }

@@ -13,7 +13,6 @@ using System.Linq;
 using System.Linq.Expressions;
 using Microsoft.Extensions.Localization;
 using Sheaft.Localization;
-using Microsoft.Extensions.Logging;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 
 namespace Sheaft.Infrastructure
@@ -22,7 +21,7 @@ namespace Sheaft.Infrastructure
     {
         private readonly IStringLocalizer<MessageResources> _localizer;
 
-        public AppDbContext(DbContextOptions<AppDbContext> options, StringLocalizer<MessageResources> localizer)
+        public AppDbContext(DbContextOptions<AppDbContext> options, IStringLocalizer<MessageResources> localizer)
             : base(options)
         {
             _localizer = localizer;

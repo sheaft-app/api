@@ -11,6 +11,8 @@ namespace Sheaft.Options
         public string PaylineUrl { get; set; }
         public string ClientId { get; set; }
         public string ApiKey { get; set; }
+        public int FixedAmount { get; set; }
+        public decimal Percent { get; set; }
         public string Token
         {
             get

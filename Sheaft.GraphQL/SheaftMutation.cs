@@ -241,7 +241,7 @@ namespace Sheaft.GraphQL
         [GraphQLName("payOrder")]
         [UseSingleOrDefault]
         [UseSelection]
-        public async Task<IQueryable<WebPayinTransactionDto>> PayOrderAsync(PayOrderInput input, [Service] ITransactionQueries transactionQueries)
+        public async Task<IQueryable<WebPayinTransactionDto>> PayOrderAsync(IdInput input, [Service] ITransactionQueries transactionQueries)
         {
             var result = await ExecuteCommandAsync<PayOrderCommand, Guid>(_mapper.Map(input, new PayOrderCommand(_currentUser)), _cancellationToken);
             return transactionQueries.GetWebPayinTransaction(result, _currentUser);

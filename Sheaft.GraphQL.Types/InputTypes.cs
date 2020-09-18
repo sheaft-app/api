@@ -39,6 +39,8 @@ namespace Sheaft.GraphQL.Types
     {
         protected override void Configure(IInputObjectTypeDescriptor<CreateOrderInput> descriptor)
         {
+            descriptor.Field(c => c.Donation);
+
             descriptor.Field(c => c.ProducersExpectedDeliveries)
                 .Type<NonNullType<ListType<ProducerExpectedDeliveryInputType>>>();
 
@@ -52,6 +54,8 @@ namespace Sheaft.GraphQL.Types
         {
             descriptor.Field(c => c.Id)
                 .Type<NonNullType<IdType>>();
+
+            descriptor.Field(c => c.Donation);
 
             descriptor.Field(c => c.ProducersExpectedDeliveries)
                 .Type<NonNullType<ListType<ProducerExpectedDeliveryInputType>>>();
@@ -71,16 +75,6 @@ namespace Sheaft.GraphQL.Types
 
             descriptor.Field(c => c.Kind)
                 .Type<NonNullType<DocumentKindEnumType>>();
-        }
-    }
-    public class PayOrderInputType : SheaftInputType<PayOrderInput>
-    {
-        protected override void Configure(IInputObjectTypeDescriptor<PayOrderInput> descriptor)
-        {
-            descriptor.Field(c => c.Donation);
-
-            descriptor.Field(c => c.OrderId)
-                .Type<NonNullType<IdType>>();
         }
     }
     public class CreateQuickOrderInputType : SheaftInputType<CreateQuickOrderInput>

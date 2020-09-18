@@ -12,6 +12,8 @@ using System.Collections.Generic;
 using Sheaft.Services.Interop;
 using Sheaft.Interop.Enums;
 using Sheaft.Application.Events;
+using Sheaft.Options;
+using Microsoft.Extensions.Options;
 
 namespace Sheaft.Application.Handlers
 {
@@ -25,16 +27,19 @@ namespace Sheaft.Application.Handlers
         private readonly IAppDbContext _context;
         private readonly IMediator _mediatr;
         private readonly IQueueService _queuesService;
+        private readonly PspOptions _pspOptions;
 
         public OrderCommandsHandler(
             IAppDbContext context,
             IMediator mediatr,
             IQueueService queuesService,
+            IOptionsSnapshot<PspOptions> pspOptions,
             ILogger<OrderCommandsHandler> logger) : base(logger)
         {
             _context = context;
             _mediatr = mediatr;
             _queuesService = queuesService;
+            _pspOptions = pspOptions.Value;
         }
 
         public async Task<Result<Guid>> Handle(CreateConsumerOrderCommand request, CancellationToken token)
@@ -61,6 +66,8 @@ namespace Sheaft.Application.Handlers
 
                 var user = await _context.GetByIdAsync<User>(request.RequestUser.Id, token);
                 var order = new Order(Guid.NewGuid(), user, cartProducts, cartDeliveries);
+                order.SetDonation(request.Donation);
+                order.RefreshFees(_pspOptions.FixedAmount, _pspOptions.Percent);
 
                 await _context.AddAsync(order, token);
                 await _context.SaveChangesAsync(token);
@@ -157,6 +164,8 @@ namespace Sheaft.Application.Handlers
 
                 entity.SetProducts(cartProducts);
                 entity.SetDeliveries(cartDeliveries);
+                entity.SetDonation(request.Donation);
+                entity.RefreshFees(_pspOptions.FixedAmount, _pspOptions.Percent);
 
                 _context.Update(entity);
 
@@ -170,8 +179,7 @@ namespace Sheaft.Application.Handlers
             {
                 using (var transaction = await _context.Database.BeginTransactionAsync(token))
                 {
-                    var order = await _context.GetByIdAsync<Order>(request.OrderId, token);
-                    order.SetDonation(request.Donation);
+                    var order = await _context.GetByIdAsync<Order>(request.Id, token);
                     order.SetStatus(OrderStatusKind.Waiting);
 
                     _context.Update(order);
