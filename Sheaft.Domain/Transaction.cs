@@ -36,6 +36,14 @@ namespace Sheaft.Domain.Models
         public virtual Wallet DebitedWallet { get; protected set; }
         public virtual User Author { get; private set; }
 
+        public void SetProcessedOn(DateTimeOffset? processedOn)
+        {
+            if (ExecutedOn.HasValue)
+                return;
+
+            ExecutedOn = processedOn;
+        }
+
         public void SetIdentifier(string identifier)
         {
             if (identifier == null)

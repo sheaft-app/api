@@ -5,6 +5,7 @@ using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Sheaft.Application.Commands;
+using Sheaft.Application.Events;
 using Sheaft.Logging;
 
 namespace Sheaft.Functions
@@ -18,10 +19,10 @@ namespace Sheaft.Functions
             _mediatr = mediator;
         }
 
-        [FunctionName("SetPayoutFailedCommand")]
-        public async Task SetPayoutFailedCommandAsync([ServiceBusTrigger(SetPayoutFailedCommand.QUEUE_NAME, Connection = "AzureWebJobsServiceBus")] string message, ILogger logger, CancellationToken token)
+        [FunctionName("SetPayoutStatusCommand")]
+        public async Task SetPayoutStatusCommandAsync([ServiceBusTrigger(SetPayoutStatusCommand.QUEUE_NAME, Connection = "AzureWebJobsServiceBus")] string message, ILogger logger, CancellationToken token)
         {
-            var command = JsonConvert.DeserializeObject<SetPayoutFailedCommand>(message);
+            var command = JsonConvert.DeserializeObject<SetPayoutStatusCommand>(message);
             var results = await _mediatr.Send(command, token);
             logger.LogCommand(results);
 
@@ -29,15 +30,20 @@ namespace Sheaft.Functions
                 throw results.Exception;
         }
 
-        [FunctionName("SetPayoutSucceededCommand")]
-        public async Task SetPayoutSucceededCommandAsync([ServiceBusTrigger(SetPayoutSucceededCommand.QUEUE_NAME, Connection = "AzureWebJobsServiceBus")] string message, ILogger logger, CancellationToken token)
+        [FunctionName("PayoutFailedEvent")]
+        public async Task PayoutFailedEventAsync([ServiceBusTrigger(PayoutFailedEvent.QUEUE_NAME, Connection = "AzureWebJobsServiceBus")] string message, ILogger logger, CancellationToken token)
         {
-            var command = JsonConvert.DeserializeObject<SetPayoutSucceededCommand>(message);
-            var results = await _mediatr.Send(command, token);
-            logger.LogCommand(results);
+            var appEvent = JsonConvert.DeserializeObject<PayoutFailedEvent>(message);
+            await _mediatr.Publish(appEvent, token);
+            logger.LogInformation(appEvent.TransactionId.ToString("N"));
+        }
 
-            if (!results.Success)
-                throw results.Exception;
+        [FunctionName("PayoutSucceededEvent")]
+        public async Task PayoutSucceededEventAsync([ServiceBusTrigger(PayoutSucceededEvent.QUEUE_NAME, Connection = "AzureWebJobsServiceBus")] string message, ILogger logger, CancellationToken token)
+        {
+            var appEvent = JsonConvert.DeserializeObject<PayoutSucceededEvent>(message);
+            await _mediatr.Publish(appEvent, token);
+            logger.LogInformation(appEvent.TransactionId.ToString("N"));
         }
     }
 }

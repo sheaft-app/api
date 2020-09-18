@@ -60,7 +60,7 @@ namespace Sheaft.Application.Handlers
 
                 if (business.Kind == ProfileKind.Producer)
                 {
-                    var result = await _mediatr.Send(new CreateUboDeclarationCommand(request.RequestUser)
+                    var result = await _mediatr.Send(new CreateDeclarationCommand(request.RequestUser)
                     {
                         LegalId = legal.Id
                     }, token);

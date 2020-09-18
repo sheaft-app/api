@@ -18,7 +18,6 @@ namespace Sheaft.Application.Handlers
 {
     public class PurchaseOrderCommandsHandler : ResultsHandler,
         IRequestHandler<CreatePurchaseOrderCommand, Result<Guid>>,
-
         IRequestHandler<AcceptPurchaseOrdersCommand, Result<bool>>,
         IRequestHandler<ProcessPurchaseOrdersCommand, Result<bool>>,
         IRequestHandler<CancelPurchaseOrdersCommand, Result<bool>>,
@@ -27,7 +26,6 @@ namespace Sheaft.Application.Handlers
         IRequestHandler<ShipPurchaseOrdersCommand, Result<bool>>,
         IRequestHandler<DeliverPurchaseOrdersCommand, Result<bool>>,
         IRequestHandler<DeletePurchaseOrdersCommand, Result<bool>>,
-
         IRequestHandler<AcceptPurchaseOrderCommand, Result<bool>>,
         IRequestHandler<ProcessPurchaseOrderCommand, Result<bool>>,
         IRequestHandler<CancelPurchaseOrderCommand, Result<bool>>,

@@ -25,6 +25,7 @@ namespace Sheaft.Domain.Models
         public DateTimeOffset CreatedOn { get; private set; }
         public DateTimeOffset? UpdatedOn { get; private set; }
         public DateTimeOffset? RemovedOn { get; private set; }
+        public DateTimeOffset? ExecutedOn { get; private set; }
         public string Identifier { get; set; }
         public DeclarationStatus Status { get; set; }
         public string ReasonCode { get; set; }
@@ -70,6 +71,14 @@ namespace Sheaft.Domain.Models
         {
             ReasonCode = code;
             ReasonMessage = message;
+        }
+
+        public void SetProcessedOn(DateTimeOffset? processedOn)
+        {
+            if (ExecutedOn.HasValue)
+                return;
+
+            ExecutedOn = processedOn;
         }
     }
 }

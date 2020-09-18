@@ -619,6 +619,114 @@ namespace Sheaft.Services
             });
         }
 
+        public async Task<Result<PspDocumentResultDto>> GetDocumentAsync(string identifier, CancellationToken token)
+        {
+            return await ExecuteAsync(async () =>
+            {
+                await EnsureAccessTokenIsValidAsync(token);
+                var result = await _api.Kyc.GetAsync(identifier);
+
+                return Ok(new PspDocumentResultDto
+                {
+                    Identifier = result.Id,
+                    ResultCode = result.RefusedReasonType,
+                    ResultMessage = result.RefusedReasonMessage,
+                    Status = result.Status.GetValidationStatus(),
+                    ProcessedOn = result.ProcessedDate
+                });
+            });
+        }
+
+        public async Task<Result<PspDeclarationResultDto>> GetDeclarationAsync(string identifier, CancellationToken token)
+        {
+            return await ExecuteAsync(async () =>
+            {
+                await EnsureAccessTokenIsValidAsync(token);
+                var result = await _api.UboDeclarations.GetUboDeclarationByIdAsync(identifier);
+
+                return Ok(new PspDeclarationResultDto
+                {
+                    Identifier = result.Id,
+                    ResultCode = result.Reason.ToString("G"),
+                    ResultMessage = result.Message,
+                    Status = result.Status.GetDeclarationStatus(),
+                    ProcessedOn = result.ProcessedDate
+                });
+            });
+        }
+
+        public async Task<Result<PspTransactionResultDto>> GetPayinAsync(string identifier, CancellationToken token)
+        {
+            return await ExecuteAsync(async () =>
+            {
+                await EnsureAccessTokenIsValidAsync(token);
+                var result = await _api.PayIns.GetAsync(identifier);
+
+                return Ok(new PspTransactionResultDto
+                {
+                    Identifier = result.Id,
+                    ResultCode = result.ResultCode,
+                    ResultMessage = result.ResultMessage,
+                    Status = result.Status.GetTransactionStatus(),
+                    ProcessedOn = result.ExecutionDate
+                });
+            });
+        }
+
+        public async Task<Result<PspTransactionResultDto>> GetTransferAsync(string identifier, CancellationToken token)
+        {
+            return await ExecuteAsync(async () =>
+            {
+                await EnsureAccessTokenIsValidAsync(token);
+                var result = await _api.Transfers.GetAsync(identifier);
+
+                return Ok(new PspTransactionResultDto
+                {
+                    Identifier = result.Id,
+                    ResultCode = result.ResultCode,
+                    ResultMessage = result.ResultMessage,
+                    Status = result.Status.GetTransactionStatus(),
+                    ProcessedOn = result.ExecutionDate
+                });
+            });
+        }
+
+        public async Task<Result<PspTransactionResultDto>> GetRefundAsync(string identifier, CancellationToken token)
+        {
+            return await ExecuteAsync(async () =>
+            {
+                await EnsureAccessTokenIsValidAsync(token);
+                var result = await _api.Refunds.GetAsync(identifier);
+
+                return Ok(new PspTransactionResultDto
+                {
+                    Identifier = result.Id,
+                    ResultCode = result.ResultCode,
+                    ResultMessage = result.ResultMessage,
+                    Status = result.Status.GetTransactionStatus(),
+                    ProcessedOn = result.ExecutionDate
+                });
+            });
+        }
+
+        public async Task<Result<PspTransactionResultDto>> GetPayoutAsync(string identifier, CancellationToken token)
+        {
+            return await ExecuteAsync(async () =>
+            {
+                await EnsureAccessTokenIsValidAsync(token);
+                var result = await _api.PayOuts.GetAsync(identifier);
+
+                return Ok(new PspTransactionResultDto
+                {
+                    Identifier = result.Id,
+                    ResultCode = result.ResultCode,
+                    ResultMessage = result.ResultMessage,
+                    Status = result.Status.GetTransactionStatus(),
+                    ProcessedOn = result.ExecutionDate
+                });
+            });
+        }
+
         private async Task EnsureAccessTokenIsValidAsync(CancellationToken token)
         {
             var oauthToken = await _api.OAuthTokenManager.GetTokenAsync();

@@ -64,5 +64,13 @@ namespace Sheaft.Domain.Models
 
             _pages.Add(page);
         }
+
+        public void SetProcessedOn(DateTimeOffset? processedOn)
+        {
+            if (ProcessedOn.HasValue)
+                return;
+
+            ProcessedOn = processedOn;
+        }
     }
 }

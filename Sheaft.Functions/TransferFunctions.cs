@@ -5,6 +5,7 @@ using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Sheaft.Application.Commands;
+using Sheaft.Application.Events;
 using Sheaft.Logging;
 
 namespace Sheaft.Functions
@@ -18,10 +19,10 @@ namespace Sheaft.Functions
             _mediatr = mediator;
         }
 
-        [FunctionName("SetTransferFailedCommand")]
-        public async Task SetTransferFailedCommandAsync([ServiceBusTrigger(SetTransferFailedCommand.QUEUE_NAME, Connection = "AzureWebJobsServiceBus")] string message, ILogger logger, CancellationToken token)
+        [FunctionName("SetTransferStatusCommand")]
+        public async Task SetTransferStatusCommandAsync([ServiceBusTrigger(SetTransferStatusCommand.QUEUE_NAME, Connection = "AzureWebJobsServiceBus")] string message, ILogger logger, CancellationToken token)
         {
-            var command = JsonConvert.DeserializeObject<SetTransferFailedCommand>(message);
+            var command = JsonConvert.DeserializeObject<SetTransferStatusCommand>(message);
             var results = await _mediatr.Send(command, token);
             logger.LogCommand(results);
 
@@ -29,10 +30,10 @@ namespace Sheaft.Functions
                 throw results.Exception;
         }
 
-        [FunctionName("SetTransferRefundFailedCommand")]
-        public async Task SetTransferRefundFailedCommandAsync([ServiceBusTrigger(SetTransferRefundFailedCommand.QUEUE_NAME, Connection = "AzureWebJobsServiceBus")] string message, ILogger logger, CancellationToken token)
+        [FunctionName("SetRefundTransferStatusCommand")]
+        public async Task SetRefundTransferStatusCommandAsync([ServiceBusTrigger(SetRefundTransferStatusCommand.QUEUE_NAME, Connection = "AzureWebJobsServiceBus")] string message, ILogger logger, CancellationToken token)
         {
-            var command = JsonConvert.DeserializeObject<SetTransferRefundFailedCommand>(message);
+            var command = JsonConvert.DeserializeObject<SetRefundTransferStatusCommand>(message);
             var results = await _mediatr.Send(command, token);
             logger.LogCommand(results);
 
@@ -40,26 +41,36 @@ namespace Sheaft.Functions
                 throw results.Exception;
         }
 
-        [FunctionName("SetTransferRefundSucceededCommand")]
-        public async Task SetTransferRefundSucceededCommandAsync([ServiceBusTrigger(SetTransferRefundSucceededCommand.QUEUE_NAME, Connection = "AzureWebJobsServiceBus")] string message, ILogger logger, CancellationToken token)
+        [FunctionName("TransferFailedEvent")]
+        public async Task TransferFailedEventAsync([ServiceBusTrigger(TransferFailedEvent.QUEUE_NAME, Connection = "AzureWebJobsServiceBus")] string message, ILogger logger, CancellationToken token)
         {
-            var command = JsonConvert.DeserializeObject<SetTransferRefundSucceededCommand>(message);
-            var results = await _mediatr.Send(command, token);
-            logger.LogCommand(results);
-
-            if (!results.Success)
-                throw results.Exception;
+            var appEvent = JsonConvert.DeserializeObject<TransferFailedEvent>(message);
+            await _mediatr.Publish(appEvent, token);
+            logger.LogInformation(appEvent.TransactionId.ToString("N"));
         }
 
-        [FunctionName("SetTransferSucceededCommand")]
-        public async Task SetTransferSucceededCommandAsync([ServiceBusTrigger(SetTransferSucceededCommand.QUEUE_NAME, Connection = "AzureWebJobsServiceBus")] string message, ILogger logger, CancellationToken token)
+        [FunctionName("TransferSucceededEvent")]
+        public async Task TransferSucceededEventAsync([ServiceBusTrigger(TransferSucceededEvent.QUEUE_NAME, Connection = "AzureWebJobsServiceBus")] string message, ILogger logger, CancellationToken token)
         {
-            var command = JsonConvert.DeserializeObject<SetTransferSucceededCommand>(message);
-            var results = await _mediatr.Send(command, token);
-            logger.LogCommand(results);
+            var appEvent = JsonConvert.DeserializeObject<TransferSucceededEvent>(message);
+            await _mediatr.Publish(appEvent, token);
+            logger.LogInformation(appEvent.TransactionId.ToString("N"));
+        }
 
-            if (!results.Success)
-                throw results.Exception;
+        [FunctionName("RefundTransferFailedEvent")]
+        public async Task RefundTransferFailedEventAsync([ServiceBusTrigger(RefundTransferFailedEvent.QUEUE_NAME, Connection = "AzureWebJobsServiceBus")] string message, ILogger logger, CancellationToken token)
+        {
+            var appEvent = JsonConvert.DeserializeObject<RefundTransferFailedEvent>(message);
+            await _mediatr.Publish(appEvent, token);
+            logger.LogInformation(appEvent.TransactionId.ToString("N"));
+        }
+
+        [FunctionName("RefundTransferSucceededEvent")]
+        public async Task RefundTransferSucceededEventAsync([ServiceBusTrigger(RefundTransferSucceededEvent.QUEUE_NAME, Connection = "AzureWebJobsServiceBus")] string message, ILogger logger, CancellationToken token)
+        {
+            var appEvent = JsonConvert.DeserializeObject<RefundTransferSucceededEvent>(message);
+            await _mediatr.Publish(appEvent, token);
+            logger.LogInformation(appEvent.TransactionId.ToString("N"));
         }
     }
 }

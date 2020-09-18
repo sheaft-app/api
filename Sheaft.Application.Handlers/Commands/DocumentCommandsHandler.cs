@@ -8,6 +8,8 @@ using Sheaft.Infrastructure.Interop;
 using Microsoft.Extensions.Logging;
 using Sheaft.Services.Interop;
 using Sheaft.Domain.Models;
+using Sheaft.Interop.Enums;
+using Sheaft.Application.Events;
 
 namespace Sheaft.Application.Handlers
 {
@@ -18,10 +20,7 @@ namespace Sheaft.Application.Handlers
         IRequestHandler<SubmitDocumentsCommand, Result<bool>>,
         IRequestHandler<SubmitDocumentCommand, Result<bool>>,
         IRequestHandler<RemoveDocumentCommand, Result<bool>>,
-        IRequestHandler<SetDocumentFailedCommand, Result<bool>>,
-        IRequestHandler<SetDocumentOutDatedCommand, Result<bool>>,
-        IRequestHandler<SetDocumentSucceededCommand, Result<bool>>,
-        IRequestHandler<SetDocumentValidationCommand, Result<bool>>
+        IRequestHandler<SetDocumentStatusCommand, Result<bool>>
     {
         private readonly IAppDbContext _context;
         private readonly IPspService _pspService;
@@ -158,24 +157,37 @@ namespace Sheaft.Application.Handlers
             });
         }
 
-        public Task<Result<bool>> Handle(SetDocumentFailedCommand request, CancellationToken cancellationToken)
+        public async Task<Result<bool>> Handle(SetDocumentStatusCommand request, CancellationToken token)
         {
-            throw new NotImplementedException();
-        }
+            return await ExecuteAsync(async () =>
+            {
+                var document = await _context.GetSingleAsync<Document>(c => c.Identifier == request.Identifier, token);
+                var pspResult = await _pspService.GetDocumentAsync(document.Identifier, token);
+                if (!pspResult.Success)
+                    return Failed<bool>(pspResult.Exception);
 
-        public Task<Result<bool>> Handle(SetDocumentOutDatedCommand request, CancellationToken cancellationToken)
-        {
-            throw new NotImplementedException();
-        }
+                document.SetValidationStatus(pspResult.Data.Status);
+                document.SetResult(pspResult.Data.ResultCode, pspResult.Data.ResultMessage);
+                document.SetProcessedOn(pspResult.Data.ProcessedOn);
 
-        public Task<Result<bool>> Handle(SetDocumentSucceededCommand request, CancellationToken cancellationToken)
-        {
-            throw new NotImplementedException();
-        }
+                _context.Update(document);
+                var success = await _context.SaveChangesAsync(token) > 0;
 
-        public Task<Result<bool>> Handle(SetDocumentValidationCommand request, CancellationToken cancellationToken)
-        {
-            throw new NotImplementedException();
+                switch (request.Kind)
+                {
+                    case PspEventKind.KYC_FAILED:
+                        await _mediatr.Publish(new DocumentFailedEvent(request.RequestUser) { DocumentId = document.Id }, token);
+                        break;
+                    case PspEventKind.KYC_OUTDATED:
+                        await _mediatr.Publish(new DocumentOutdatedEvent(request.RequestUser) { DocumentId = document.Id }, token);
+                        break;
+                    case PspEventKind.KYC_SUCCEEDED:
+                        await _mediatr.Publish(new DocumentSucceededEvent(request.RequestUser) { DocumentId = document.Id }, token);
+                        break;
+                }
+
+                return Ok(success);
+            });
         }
     }
 }

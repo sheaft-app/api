@@ -4,10 +4,10 @@ using Newtonsoft.Json;
 
 namespace Sheaft.Application.Commands
 {
-    public class CreateUboDeclarationCommand : Command<Guid>
+    public class CreateDeclarationCommand : Command<Guid>
     {
         [JsonConstructor]
-        public CreateUboDeclarationCommand(RequestUser requestUser) : base(requestUser)
+        public CreateDeclarationCommand(RequestUser requestUser) : base(requestUser)
         {
         }
 

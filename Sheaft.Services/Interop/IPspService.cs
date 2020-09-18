@@ -29,5 +29,11 @@ namespace Sheaft.Services.Interop
         Task<Result<PspDeclarationResultDto>> SubmitUboDeclarationAsync(UboDeclaration declaration, Business business, CancellationToken token);
         Task<Result<string>> CreateUboAsync(Ubo ubo, UboDeclaration declaration, Business business, CancellationToken token);
         Task<Result<bool>> UpdateUboAsync(Ubo ubo, UboDeclaration declaration, Business business, CancellationToken token);
+        Task<Result<PspDocumentResultDto>> GetDocumentAsync(string identifier, CancellationToken token);
+        Task<Result<PspDeclarationResultDto>> GetDeclarationAsync(string identifier, CancellationToken token);
+        Task<Result<PspTransactionResultDto>> GetPayinAsync(string identifier, CancellationToken token);
+        Task<Result<PspTransactionResultDto>> GetTransferAsync(string identifier, CancellationToken token);
+        Task<Result<PspTransactionResultDto>> GetPayoutAsync(string identifier, CancellationToken token);
+        Task<Result<PspTransactionResultDto>> GetRefundAsync(string identifier, CancellationToken token);
     }
 }

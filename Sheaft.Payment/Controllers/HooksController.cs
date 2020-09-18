@@ -39,76 +39,48 @@ namespace Sheaft.Payment.Controllers
             switch (EventType)
             {
                 case PspEventKind.KYC_SUCCEEDED:
-                    queue = SetDocumentSucceededCommand.QUEUE_NAME;
-                    hook = new SetDocumentSucceededCommand(requestUser, identifier, GetExecutedOn(date));
-                    break;
                 case PspEventKind.KYC_FAILED:
-                    queue = SetDocumentFailedCommand.QUEUE_NAME;
-                    hook = new SetDocumentFailedCommand(requestUser, identifier, GetExecutedOn(date));
-                    break;
                 case PspEventKind.KYC_OUTDATED:
-                    queue = SetDocumentOutDatedCommand.QUEUE_NAME;
-                    hook = new SetDocumentOutDatedCommand(requestUser, identifier, GetExecutedOn(date));
-                    break;
                 case PspEventKind.KYC_VALIDATION_ASKED:
-                    queue = SetDocumentValidationCommand.QUEUE_NAME;
-                    hook = new SetDocumentValidationCommand(requestUser, identifier, GetExecutedOn(date));
+                    queue = SetDocumentStatusCommand.QUEUE_NAME;
+                    hook = new SetDocumentStatusCommand(requestUser, EventType, identifier, GetExecutedOn(date));
                     break;
                 case PspEventKind.UBO_DECLARATION_REFUSED:
-                    queue = SetUboDeclarationRefusedCommand.QUEUE_NAME;
-                    hook = new SetUboDeclarationRefusedCommand(requestUser, identifier, GetExecutedOn(date));
-                    break;
                 case PspEventKind.UBO_DECLARATION_VALIDATED:
-                    queue = SetUboDeclarationValidatedCommand.QUEUE_NAME;
-                    hook = new SetUboDeclarationValidatedCommand(requestUser, identifier, GetExecutedOn(date));
-                    break;
                 case PspEventKind.UBO_DECLARATION_INCOMPLETE:
-                    queue = SetUboDeclarationIncompleteCommand.QUEUE_NAME;
-                    hook = new SetUboDeclarationIncompleteCommand(requestUser, identifier, GetExecutedOn(date));
-                    break;
                 case PspEventKind.UBO_DECLARATION_VALIDATION_ASKED:
-                    queue = SetUboDeclarationValidationCommand.QUEUE_NAME;
-                    hook = new SetUboDeclarationValidationCommand(requestUser, identifier, GetExecutedOn(date));
+                    queue = SetDeclarationStatusCommand.QUEUE_NAME;
+                    hook = new SetDeclarationStatusCommand(requestUser, EventType, identifier, GetExecutedOn(date));
                     break;
                 case PspEventKind.PAYIN_NORMAL_SUCCEEDED:
-                    queue = SetPayinSucceededCommand.QUEUE_NAME;
-                    hook = new SetPayinSucceededCommand(requestUser, identifier, GetExecutedOn(date));
-                    break;
                 case PspEventKind.PAYIN_NORMAL_FAILED:
-                    queue = SetPayinFailedCommand.QUEUE_NAME;
-                    hook = new SetPayinFailedCommand(requestUser, identifier, GetExecutedOn(date));
+                    queue = SetPayinStatusCommand.QUEUE_NAME;
+                    hook = new SetPayinStatusCommand(requestUser, EventType, identifier, GetExecutedOn(date));
                     break;
                 case PspEventKind.TRANSFER_NORMAL_SUCCEEDED:
-                    queue = SetTransferSucceededCommand.QUEUE_NAME;
-                    hook = new SetTransferSucceededCommand(requestUser, identifier, GetExecutedOn(date));
-                    break;
                 case PspEventKind.TRANSFER_NORMAL_FAILED:
-                    queue = SetTransferFailedCommand.QUEUE_NAME;
-                    hook = new SetTransferFailedCommand(requestUser, identifier, GetExecutedOn(date));
+                    queue = SetTransferStatusCommand.QUEUE_NAME;
+                    hook = new SetTransferStatusCommand(requestUser, EventType, identifier, GetExecutedOn(date));
                     break;
                 case PspEventKind.PAYOUT_NORMAL_SUCCEEDED:
-                    queue = SetPayoutSucceededCommand.QUEUE_NAME;
-                    hook = new SetPayoutSucceededCommand(requestUser, identifier, GetExecutedOn(date));
-                    break;
                 case PspEventKind.PAYOUT_NORMAL_FAILED:
-                    queue = SetPayoutFailedCommand.QUEUE_NAME;
-                    hook = new SetPayoutFailedCommand(requestUser, identifier, GetExecutedOn(date));
+                    queue = SetPayoutStatusCommand.QUEUE_NAME;
+                    hook = new SetPayoutStatusCommand(requestUser, EventType, identifier, GetExecutedOn(date));
                     break;
                 case PspEventKind.PAYIN_REFUND_SUCCEEDED:
-                    queue = SetPayinRefundSucceededCommand.QUEUE_NAME;
-                    hook = new SetPayinRefundSucceededCommand(requestUser, identifier, GetExecutedOn(date));
-                    break;
                 case PspEventKind.PAYIN_REFUND_FAILED:
-                    queue = SetPayinRefundFailedCommand.QUEUE_NAME;
-                    hook = new SetPayinRefundFailedCommand(requestUser, identifier, GetExecutedOn(date));
+                    queue = SetRefundPayinStatusCommand.QUEUE_NAME;
+                    hook = new SetRefundPayinStatusCommand(requestUser, EventType, identifier, GetExecutedOn(date));
                     break;
                 case PspEventKind.TRANSFER_REFUND_SUCCEEDED:
-                    queue = SetTransferRefundSucceededCommand.QUEUE_NAME;
-                    hook = new SetTransferRefundSucceededCommand(requestUser, identifier, GetExecutedOn(date));
-                    break;
                 case PspEventKind.TRANSFER_REFUND_FAILED:
-                    queue = SetTransferRefundFailedCommand.QUEUE_NAME;
-                    hook = new SetTransferRefundFailedCommand(requestUser, identifier, GetExecutedOn(date));
+                    queue = SetRefundTransferStatusCommand.QUEUE_NAME;
+                    hook = new SetRefundTransferStatusCommand(requestUser, EventType, identifier, GetExecutedOn(date));
+                    break;
+                case PspEventKind.PAYOUT_REFUND_SUCCEEDED:
+                case PspEventKind.PAYOUT_REFUND_FAILED:
+                    queue = SetRefundTransferStatusCommand.QUEUE_NAME;
+                    hook = new SetRefundTransferStatusCommand(requestUser, EventType, identifier, GetExecutedOn(date));
                     break;
                 default:
                     _logger.LogInformation($"{EventType:G)} is not a supported Psp EventType for resource: {identifier} executed on: {GetExecutedOn(date)}.");

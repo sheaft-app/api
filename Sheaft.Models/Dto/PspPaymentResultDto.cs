@@ -39,4 +39,12 @@ namespace Sheaft.Models.Dto
         public string ResultMessage { get; set; }
         public DateTimeOffset? ProcessedOn { get; set; }
     }
+
+    public class PspTransactionResultDto : PspResultDto
+    {
+        public TransactionStatus Status { get; set; }
+        public string ResultCode { get; set; }
+        public string ResultMessage { get; set; }
+        public DateTimeOffset? ProcessedOn { get; set; }
+    }
 }

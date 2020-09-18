@@ -8,24 +8,27 @@ using Sheaft.Infrastructure.Interop;
 using Microsoft.Extensions.Logging;
 using Sheaft.Domain.Models;
 using Sheaft.Services.Interop;
+using Sheaft.Interop.Enums;
+using Sheaft.Application.Events;
 
 namespace Sheaft.Application.Handlers
 {
     public class PayinTransactionCommandsHandler : ResultsHandler,
         IRequestHandler<CreateWebPayInTransactionCommand, Result<Guid>>,
-        IRequestHandler<SetPayinSucceededCommand, Result<bool>>,
-        IRequestHandler<SetPayinFailedCommand, Result<bool>>,
-        IRequestHandler<SetPayinRefundSucceededCommand, Result<bool>>,
-        IRequestHandler<SetPayinRefundFailedCommand, Result<bool>>
+        IRequestHandler<SetPayinStatusCommand, Result<bool>>,
+        IRequestHandler<SetRefundPayinStatusCommand, Result<bool>>
     {
         private readonly IAppDbContext _context;
         private readonly IPspService _pspService;
+        private readonly IMediator _mediatr;
 
         public PayinTransactionCommandsHandler(
             IAppDbContext context,
             IPspService pspService,
+            IMediator mediatr,
             ILogger<PayinTransactionCommandsHandler> logger) : base(logger)
         {
+            _mediatr = mediatr;
             _context = context;
             _pspService = pspService;
         }
@@ -61,25 +64,64 @@ namespace Sheaft.Application.Handlers
                 return Ok(webPayin.Id);
             });
         }
-
-        public Task<Result<bool>> Handle(SetPayinSucceededCommand request, CancellationToken cancellationToken)
+        public async Task<Result<bool>> Handle(SetPayinStatusCommand request, CancellationToken token)
         {
-            throw new NotImplementedException();
+            return await ExecuteAsync(async () =>
+            {
+                var transaction = await _context.GetSingleAsync<Transaction>(c => c.Identifier == request.Identifier, token);
+                var pspResult = await _pspService.GetPayinAsync(transaction.Identifier, token);
+                if (!pspResult.Success)
+                    return Failed<bool>(pspResult.Exception);
+
+                transaction.SetStatus(pspResult.Data.Status);
+                transaction.SetResult(pspResult.Data.ResultCode, pspResult.Data.ResultMessage);
+                transaction.SetProcessedOn(pspResult.Data.ProcessedOn);
+
+                _context.Update(transaction);
+                var success = await _context.SaveChangesAsync(token) > 0;
+
+                switch (request.Kind)
+                {
+                    case PspEventKind.PAYIN_NORMAL_FAILED:
+                        await _mediatr.Publish(new PayinFailedEvent(request.RequestUser) { TransactionId = transaction.Id }, token);
+                        break;
+                    case PspEventKind.PAYIN_NORMAL_SUCCEEDED:
+                        await _mediatr.Publish(new PayinSucceededEvent(request.RequestUser) { TransactionId = transaction.Id }, token);
+                        break;
+                }
+
+                return Ok(success);
+            });
         }
 
-        public Task<Result<bool>> Handle(SetPayinFailedCommand request, CancellationToken cancellationToken)
+        public async Task<Result<bool>> Handle(SetRefundPayinStatusCommand request, CancellationToken token)
         {
-            throw new NotImplementedException();
-        }
+            return await ExecuteAsync(async () =>
+            {
+                var transaction = await _context.GetSingleAsync<RefundPayinTransaction>(c => c.Identifier == request.Identifier, token);
+                var pspResult = await _pspService.GetRefundAsync(transaction.Identifier, token);
+                if (!pspResult.Success)
+                    return Failed<bool>(pspResult.Exception);
 
-        public Task<Result<bool>> Handle(SetPayinRefundSucceededCommand request, CancellationToken cancellationToken)
-        {
-            throw new NotImplementedException();
-        }
+                transaction.SetStatus(pspResult.Data.Status);
+                transaction.SetResult(pspResult.Data.ResultCode, pspResult.Data.ResultMessage);
+                transaction.SetProcessedOn(pspResult.Data.ProcessedOn);
 
-        public Task<Result<bool>> Handle(SetPayinRefundFailedCommand request, CancellationToken cancellationToken)
-        {
-            throw new NotImplementedException();
+                _context.Update(transaction);
+                var success = await _context.SaveChangesAsync(token) > 0;
+
+                switch (request.Kind)
+                {
+                    case PspEventKind.PAYIN_REFUND_FAILED:
+                        await _mediatr.Publish(new RefundPayinFailedEvent(request.RequestUser) { TransactionId = transaction.Id }, token);
+                        break;
+                    case PspEventKind.PAYIN_REFUND_SUCCEEDED:
+                        await _mediatr.Publish(new RefundPayinSucceededEvent(request.RequestUser) { TransactionId = transaction.Id }, token);
+                        break;
+                }
+
+                return Ok(success);
+            });
         }
     }
 }

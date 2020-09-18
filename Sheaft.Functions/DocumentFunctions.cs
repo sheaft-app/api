@@ -5,6 +5,7 @@ using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Sheaft.Application.Commands;
+using Sheaft.Application.Events;
 using Sheaft.Logging;
 
 namespace Sheaft.Functions
@@ -18,10 +19,10 @@ namespace Sheaft.Functions
             _mediatr = mediator;
         }
 
-        [FunctionName("SetDocumentFailedCommand")]
-        public async Task SetDocumentFailedCommandAsync([ServiceBusTrigger(SetDocumentFailedCommand.QUEUE_NAME, Connection = "AzureWebJobsServiceBus")] string message, ILogger logger, CancellationToken token)
+        [FunctionName("SetDocumentStatusCommand")]
+        public async Task SetDocumentStatusCommandAsync([ServiceBusTrigger(SetDocumentStatusCommand.QUEUE_NAME, Connection = "AzureWebJobsServiceBus")] string message, ILogger logger, CancellationToken token)
         {
-            var command = JsonConvert.DeserializeObject<SetDocumentFailedCommand>(message);
+            var command = JsonConvert.DeserializeObject<SetDocumentStatusCommand>(message);
             var results = await _mediatr.Send(command, token);
             logger.LogCommand(results);
 
@@ -29,37 +30,28 @@ namespace Sheaft.Functions
                 throw results.Exception;
         }
 
-        [FunctionName("SetDocumentOutDatedCommand")]
-        public async Task SetDocumentOutDatedCommandAsync([ServiceBusTrigger(SetDocumentOutDatedCommand.QUEUE_NAME, Connection = "AzureWebJobsServiceBus")] string message, ILogger logger, CancellationToken token)
+        [FunctionName("DocumentFailedEvent")]
+        public async Task DocumentFailedEventAsync([ServiceBusTrigger(DocumentFailedEvent.QUEUE_NAME, Connection = "AzureWebJobsServiceBus")] string message, ILogger logger, CancellationToken token)
         {
-            var command = JsonConvert.DeserializeObject<SetDocumentOutDatedCommand>(message);
-            var results = await _mediatr.Send(command, token);
-            logger.LogCommand(results);
-
-            if (!results.Success)
-                throw results.Exception;
+            var appEvent = JsonConvert.DeserializeObject<DocumentFailedEvent>(message);
+            await _mediatr.Publish(appEvent, token);
+            logger.LogInformation(appEvent.DocumentId.ToString("N"));
         }
 
-        [FunctionName("SetDocumentSucceededCommand")]
-        public async Task SetDocumentSucceededCommandAsync([ServiceBusTrigger(SetDocumentSucceededCommand.QUEUE_NAME, Connection = "AzureWebJobsServiceBus")] string message, ILogger logger, CancellationToken token)
+        [FunctionName("DocumentOutdatedEvent")]
+        public async Task DocumentOutdatedEventAsync([ServiceBusTrigger(DocumentOutdatedEvent.QUEUE_NAME, Connection = "AzureWebJobsServiceBus")] string message, ILogger logger, CancellationToken token)
         {
-            var command = JsonConvert.DeserializeObject<SetDocumentSucceededCommand>(message);
-            var results = await _mediatr.Send(command, token);
-            logger.LogCommand(results);
-
-            if (!results.Success)
-                throw results.Exception;
+            var appEvent = JsonConvert.DeserializeObject<DocumentOutdatedEvent>(message);
+            await _mediatr.Publish(appEvent, token);
+            logger.LogInformation(appEvent.DocumentId.ToString("N"));
         }
 
-        [FunctionName("SetDocumentValidationCommand")]
-        public async Task SetDocumentValidationCommandAsync([ServiceBusTrigger(SetDocumentValidationCommand.QUEUE_NAME, Connection = "AzureWebJobsServiceBus")] string message, ILogger logger, CancellationToken token)
+        [FunctionName("DocumentSucceededEvent")]
+        public async Task DocumentSucceededEventAsync([ServiceBusTrigger(DocumentSucceededEvent.QUEUE_NAME, Connection = "AzureWebJobsServiceBus")] string message, ILogger logger, CancellationToken token)
         {
-            var command = JsonConvert.DeserializeObject<SetDocumentValidationCommand>(message);
-            var results = await _mediatr.Send(command, token);
-            logger.LogCommand(results);
-
-            if (!results.Success)
-                throw results.Exception;
+            var appEvent = JsonConvert.DeserializeObject<DocumentSucceededEvent>(message);
+            await _mediatr.Publish(appEvent, token);
+            logger.LogInformation(appEvent.DocumentId.ToString("N"));
         }
     }
 }
