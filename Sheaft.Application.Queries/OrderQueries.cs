@@ -22,30 +22,16 @@ namespace Sheaft.Application.Queries
 
         public IQueryable<OrderDto> GetOrder(Guid id, RequestUser currentUser)
         {
-            try
-            {
-                return _context.Orders
-                        .Get(c => c.Id == id && c.User.Id == currentUser.Id)
-                        .ProjectTo<OrderDto>(_configurationProvider);
-            }
-            catch (Exception e)
-            {
-                return new List<OrderDto>().AsQueryable();
-            }
+            return _context.Orders
+                    .Get(c => c.Id == id && c.User.Id == currentUser.Id)
+                    .ProjectTo<OrderDto>(_configurationProvider);
         }
 
         public IQueryable<OrderDto> GetOrders(RequestUser currentUser)
         {
-            try
-            {
-                return _context.Orders
-                        .Get(c => c.User.Id == currentUser.Id)
-                        .ProjectTo<OrderDto>(_configurationProvider);
-            }
-            catch (Exception e)
-            {
-                return new List<OrderDto>().AsQueryable();
-            }
+            return _context.Orders
+                    .Get(c => c.User.Id == currentUser.Id)
+                    .ProjectTo<OrderDto>(_configurationProvider);
         }
     }
 }

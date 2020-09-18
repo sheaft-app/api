@@ -24,9 +24,8 @@ namespace Sheaft.GraphQL
     public class SheaftQuery
     {
         private readonly IHttpContextAccessor _httpContextAccessor;
-        private readonly ILogger<SheaftQuery> _logger;
-        private CancellationToken _cancellationToken => _httpContextAccessor.HttpContext.RequestAborted;
-        private RequestUser _currentUser
+        private CancellationToken Token => _httpContextAccessor.HttpContext.RequestAborted;
+        private RequestUser CurrentUser
         {
             get
             {
@@ -37,17 +36,16 @@ namespace Sheaft.GraphQL
             }
         }
 
-        public SheaftQuery(IHttpContextAccessor httpContextAccessor, ILogger<SheaftQuery> logger)
+        public SheaftQuery(IHttpContextAccessor httpContextAccessor)
         {
             _httpContextAccessor = httpContextAccessor;
-            _logger = logger;
         }
 
         [Authorize(Policy = Policies.AUTHENTICATED)]
         [GraphQLName("generateFreshdeskToken")]
         public async Task<string> GetFreshdeskTokenAsync([Service] IUserQueries userQueries)
         {
-            return await userQueries.GetFreshdeskTokenAsync(_currentUser, _cancellationToken);
+            return await userQueries.GetFreshdeskTokenAsync(CurrentUser, Token);
         }
 
         [Authorize(Policy = Policies.CONSUMER)]
@@ -55,7 +53,7 @@ namespace Sheaft.GraphQL
         [GraphQLType(typeof(RankInformationType))]
         public async Task<RankInformationDto> GetMyRankInformationAsync([Service] ILeaderboardQueries leaderboardQueries)
         {
-            return await leaderboardQueries.UserRankInformationAsync(_currentUser.Id, _currentUser, _cancellationToken);
+            return await leaderboardQueries.UserRankInformationAsync(CurrentUser.Id, CurrentUser, Token);
         }
 
         [Authorize(Policy = Policies.CONSUMER)]
@@ -63,7 +61,7 @@ namespace Sheaft.GraphQL
         [GraphQLType(typeof(UserPositionType))]
         public async Task<UserPositionDto> GetMyPositionInDepartment([Service] ILeaderboardQueries leaderboardQueries)
         {
-            return await leaderboardQueries.UserPositionInDepartmentAsync(_currentUser.Id, _currentUser, _cancellationToken);
+            return await leaderboardQueries.UserPositionInDepartmentAsync(CurrentUser.Id, CurrentUser, Token);
         }
 
         [Authorize(Policy = Policies.CONSUMER)]
@@ -71,7 +69,7 @@ namespace Sheaft.GraphQL
         [GraphQLType(typeof(UserPositionType))]
         public async Task<UserPositionDto> GetMyPositionInRegion([Service] ILeaderboardQueries leaderboardQueries)
         {
-            return await leaderboardQueries.UserPositionInRegionAsync(_currentUser.Id, _currentUser, _cancellationToken);
+            return await leaderboardQueries.UserPositionInRegionAsync(CurrentUser.Id, CurrentUser, Token);
         }
 
         [Authorize(Policy = Policies.CONSUMER)]
@@ -79,21 +77,21 @@ namespace Sheaft.GraphQL
         [GraphQLType(typeof(UserPositionType))]
         public async Task<UserPositionDto> GetMyPositionAsync([Service] ILeaderboardQueries leaderboardQueries)
         {
-            return await leaderboardQueries.UserPositionInCountryAsync(_currentUser.Id, _currentUser, _cancellationToken);
+            return await leaderboardQueries.UserPositionInCountryAsync(CurrentUser.Id, CurrentUser, Token);
         }
 
         [Authorize(Policy = Policies.PRODUCER)]
         [GraphQLName("productsImportInProgress")]
         public async Task<bool> HasProductsImportsInProgressAsync([Service] IJobQueries jobQueries)
         {
-            return await jobQueries.HasProductsImportsInProgressAsync(_currentUser.Id, _currentUser, _cancellationToken);
+            return await jobQueries.HasProductsImportsInProgressAsync(CurrentUser.Id, CurrentUser, Token);
         }
 
         [Authorize(Policy = Policies.PRODUCER)]
         [GraphQLName("pickingOrdersExportInProgress")]
         public async Task<bool> HasPickingOrdersExportsInProgressAsync([Service] IJobQueries jobQueries)
         {
-            return await jobQueries.HasPickingOrdersExportsInProgressAsync(_currentUser.Id, _currentUser, _cancellationToken);
+            return await jobQueries.HasPickingOrdersExportsInProgressAsync(CurrentUser.Id, CurrentUser, Token);
         }
 
         [Authorize(Policy = Policies.STORE)]
@@ -102,7 +100,7 @@ namespace Sheaft.GraphQL
         [UseSorting(SortType = typeof(ProducerDeliveriesSortType))]
         public async Task<IEnumerable<ProducerDeliveriesDto>> GetStoreDeliveriesForProducersAsync(SearchProducersDeliveriesInput input, [Service] IDeliveryQueries deliveryQueries)
         {
-            return await deliveryQueries.GetStoreDeliveriesForProducersAsync(_currentUser.Id, input.Ids, input.Kinds, DateTimeOffset.UtcNow, _currentUser, _cancellationToken);
+            return await deliveryQueries.GetStoreDeliveriesForProducersAsync(CurrentUser.Id, input.Ids, input.Kinds, DateTimeOffset.UtcNow, CurrentUser, Token);
         }
 
         [GraphQLName("getDeliveriesForProducers")]
@@ -110,7 +108,7 @@ namespace Sheaft.GraphQL
         [UseSorting(SortType = typeof(ProducerDeliveriesSortType))]
         public async Task<IEnumerable<ProducerDeliveriesDto>> GetProducersDeliveriesAsync(SearchProducersDeliveriesInput input, [Service] IDeliveryQueries deliveryQueries)
         {
-            return await deliveryQueries.GetProducersDeliveriesAsync(input.Ids, input.Kinds, DateTimeOffset.UtcNow, _currentUser, _cancellationToken);
+            return await deliveryQueries.GetProducersDeliveriesAsync(input.Ids, input.Kinds, DateTimeOffset.UtcNow, CurrentUser, Token);
         }
 
         [Authorize(Policy = Policies.UNREGISTERED)]
@@ -118,7 +116,7 @@ namespace Sheaft.GraphQL
         [GraphQLType(typeof(SirenBusinessType))]
         public async Task<SirenBusinessDto> SearchBusinessWithSiretAsync(string input, [Service] IBusinessQueries businessQueries)
         {
-            return await businessQueries.RetrieveSiretInfosAsync(input, _currentUser, _cancellationToken);
+            return await businessQueries.RetrieveSiretInfosAsync(input, CurrentUser, Token);
         }
 
         [Authorize(Policy = Policies.STORE)]
@@ -126,7 +124,7 @@ namespace Sheaft.GraphQL
         [GraphQLType(typeof(ProducersSearchType))]
         public async Task<ProducersSearchDto> SearchProducersAsync(SearchTermsInput input, [Service] IBusinessQueries businessQueries)
         {
-            return await businessQueries.SearchProducersAsync(_currentUser.Id, input, _currentUser, _cancellationToken);
+            return await businessQueries.SearchProducersAsync(CurrentUser.Id, input, CurrentUser, Token);
         }
 
         [Authorize(Policy = Policies.PRODUCER)]
@@ -134,14 +132,14 @@ namespace Sheaft.GraphQL
         [GraphQLType(typeof(StoresSearchType))]
         public async Task<StoresSearchDto> SearchStoresAsync(SearchTermsInput input, [Service] IBusinessQueries businessQueries)
         {
-            return await businessQueries.SearchStoresAsync(_currentUser.Id, input, _currentUser, _cancellationToken);
+            return await businessQueries.SearchStoresAsync(CurrentUser.Id, input, CurrentUser, Token);
         }
 
         [GraphQLName("searchProducts")]
         [GraphQLType(typeof(ProductsSearchType))]
         public async Task<ProductsSearchDto> SearchProductsAsync(SearchTermsInput input, [Service] IProductQueries productQueries)
         {
-            return await productQueries.SearchAsync(input, _currentUser, _cancellationToken);
+            return await productQueries.SearchAsync(input, CurrentUser, Token);
         }
 
         [Authorize(Policy = Policies.AUTHENTICATED)]
@@ -150,7 +148,7 @@ namespace Sheaft.GraphQL
         [UseSelection]
         public IQueryable<UserProfileDto> Me([Service] IUserQueries userQueries)
         {
-            return userQueries.GetUserProfile(_currentUser);
+            return userQueries.GetUserProfile(CurrentUser);
         }
 
         [Authorize(Policy = Policies.STORE)]
@@ -161,7 +159,7 @@ namespace Sheaft.GraphQL
         [UseSelection]
         public IQueryable<ProductDto> GetStoreProducts([Service] IProductQueries productQueries)
         {
-            return productQueries.GetStoreProducts(_currentUser.Id, _currentUser);
+            return productQueries.GetStoreProducts(CurrentUser.Id, CurrentUser);
         }
 
         [Authorize(Policy = Policies.PRODUCER)]
@@ -170,7 +168,7 @@ namespace Sheaft.GraphQL
         [UseSelection]
         public IQueryable<ProducerDto> GetProducer(Guid input, [Service] IBusinessQueries businessQueries)
         {
-            return businessQueries.GetProducer(input, _currentUser);
+            return businessQueries.GetProducer(input, CurrentUser);
         }
 
         [Authorize(Policy = Policies.CONSUMER)]
@@ -179,7 +177,7 @@ namespace Sheaft.GraphQL
         [UseSelection]
         public IQueryable<ConsumerDto> GetConsumer(Guid input, [Service] IConsumerQueries consumerQueries)
         {
-            return consumerQueries.GetConsumer(input, _currentUser);
+            return consumerQueries.GetConsumer(input, CurrentUser);
         }
 
         [Authorize(Policy = Policies.STORE)]
@@ -188,7 +186,7 @@ namespace Sheaft.GraphQL
         [UseSelection]
         public IQueryable<StoreDto> GetStore(Guid input, [Service] IBusinessQueries businessQueries)
         {
-            return businessQueries.GetStore(input, _currentUser);
+            return businessQueries.GetStore(input, CurrentUser);
         }
 
         [Authorize(Policy = Policies.CONSUMER)]
@@ -197,7 +195,7 @@ namespace Sheaft.GraphQL
         [UseSelection]
         public IQueryable<ConsumerLegalDto> GetConsumerLegals([Service] ILegalQueries legalQueries)
         {
-            return legalQueries.GetMyConsumerLegals(_currentUser);
+            return legalQueries.GetMyConsumerLegals(CurrentUser);
         }
 
         [Authorize(Policy = Policies.STORE_OR_PRODUCER)]
@@ -206,7 +204,7 @@ namespace Sheaft.GraphQL
         [UseSelection]
         public IQueryable<BusinessLegalDto> GetBusinessLegals([Service] ILegalQueries legalQueries)
         {
-            return legalQueries.GetMyBusinessLegals(_currentUser);
+            return legalQueries.GetMyBusinessLegals(CurrentUser);
         }
 
         [Authorize(Policy = Policies.REGISTERED)]
@@ -215,49 +213,49 @@ namespace Sheaft.GraphQL
         [UseSelection]
         public IQueryable<WebPayinTransactionDto> GetPayinTransaction(string input, [Service] ITransactionQueries transactionQueries)
         {
-            return transactionQueries.GetWebPayinTransaction(input, _currentUser);
+            return transactionQueries.GetWebPayinTransaction(input, CurrentUser);
         }
 
         [GraphQLName("pointsPerCountry")]
         [UseSelection]
         public IQueryable<CountryPointsDto> GetCountryPoints(Guid? input, [Service] ILeaderboardQueries leaderboardQueries)
         {
-            return leaderboardQueries.CountriesPoints(input, _currentUser);
+            return leaderboardQueries.CountriesPoints(input, CurrentUser);
         }
 
         [GraphQLName("pointsPerRegion")]
         [UseSelection]
         public IQueryable<RegionPointsDto> GetRegionsPoints(Guid? input, [Service] ILeaderboardQueries leaderboardQueries)
         {
-            return leaderboardQueries.RegionsPoints(input, _currentUser);
+            return leaderboardQueries.RegionsPoints(input, CurrentUser);
         }
 
         [GraphQLName("pointsPerDepartment")]
         [UseSelection]
         public IQueryable<DepartmentPointsDto> GetDepartmentsPoints(Guid? input, [Service] ILeaderboardQueries leaderboardQueries)
         {
-            return leaderboardQueries.DepartmentsPoints(input, _currentUser);
+            return leaderboardQueries.DepartmentsPoints(input, CurrentUser);
         }
 
         [GraphQLName("userPointsPerCountry")]
         [UseSelection]
         public IQueryable<CountryUserPointsDto> GetCountryUsersPoints(Guid? input, [Service] ILeaderboardQueries leaderboardQueries)
         {
-            return leaderboardQueries.CountryUsersPoints(input, _currentUser);
+            return leaderboardQueries.CountryUsersPoints(input, CurrentUser);
         }
 
         [GraphQLName("userPointsPerRegion")]
         [UseSelection]
         public IQueryable<RegionUserPointsDto> GetRegionUsersPoints(Guid? input, [Service] ILeaderboardQueries leaderboardQueries)
         {
-            return leaderboardQueries.RegionUsersPoints(input, _currentUser);
+            return leaderboardQueries.RegionUsersPoints(input, CurrentUser);
         }
 
         [GraphQLName("userPointsPerDepartment")]
         [UseSelection]
         public IQueryable<DepartmentUserPointsDto> GetDepartmentUsersPoints(Guid? input, [Service] ILeaderboardQueries leaderboardQueries)
         {
-            return leaderboardQueries.DepartmentUsersPoints(input, _currentUser);
+            return leaderboardQueries.DepartmentUsersPoints(input, CurrentUser);
         }
 
         [Authorize(Policy = Policies.STORE)]
@@ -266,7 +264,7 @@ namespace Sheaft.GraphQL
         [UseSelection]
         public IQueryable<QuickOrderDto> GetMyDefaultQuickOrder([Service] IQuickOrderQueries quickOrderQueries)
         {
-            return quickOrderQueries.GetUserDefaultQuickOrder(_currentUser.Id, _currentUser);
+            return quickOrderQueries.GetUserDefaultQuickOrder(CurrentUser.Id, CurrentUser);
         }
 
         [Authorize(Policy = Policies.STORE)]
@@ -275,7 +273,7 @@ namespace Sheaft.GraphQL
         [UseSelection]
         public IQueryable<QuickOrderDto> GetQuickOrder(Guid input, [Service] IQuickOrderQueries quickOrderQueries)
         {
-            return quickOrderQueries.GetQuickOrder(input, _currentUser);
+            return quickOrderQueries.GetQuickOrder(input, CurrentUser);
         }
 
         [Authorize(Policy = Policies.STORE)]
@@ -286,7 +284,7 @@ namespace Sheaft.GraphQL
         [UseSelection]
         public IQueryable<QuickOrderDto> GetQuickOrders([Service] IQuickOrderQueries quickOrderQueries)
         {
-            return quickOrderQueries.GetQuickOrders(_currentUser);
+            return quickOrderQueries.GetQuickOrders(CurrentUser);
         }
 
         [Authorize(Policy = Policies.REGISTERED)]
@@ -295,35 +293,35 @@ namespace Sheaft.GraphQL
         [UseSelection]
         public IQueryable<DocumentDto> GetDocuments([Service] IDocumentQueries documentQueries)
         {
-            return documentQueries.GetDocuments(_currentUser);
+            return documentQueries.GetDocuments(CurrentUser);
         }
 
         [GraphQLName("departments")]
         [UseSelection]
         public IQueryable<DepartmentDto> GetDepartments([Service] IDepartmentQueries departmentQueries)
         {
-            return departmentQueries.GetDepartments(_currentUser);
+            return departmentQueries.GetDepartments(CurrentUser);
         }
 
         [GraphQLName("regions")]
         [UseSelection]
         public IQueryable<RegionDto> GetRegions([Service] IRegionQueries regionQueries)
         {
-            return regionQueries.GetRegions(_currentUser);
+            return regionQueries.GetRegions(CurrentUser);
         }
 
         [GraphQLName("nationalities")]
         [UseSelection]
         public IQueryable<NationalityDto> GetNationalities([Service] INationalityQueries nationalityQueries)
         {
-            return nationalityQueries.GetNationalities(_currentUser);
+            return nationalityQueries.GetNationalities(CurrentUser);
         }
 
         [GraphQLName("countries")]
         [UseSelection]
         public IQueryable<CountryDto> GetCountries([Service] ICountryQueries countryQueries)
         {
-            return countryQueries.GetCountries(_currentUser);
+            return countryQueries.GetCountries(CurrentUser);
         }
 
         [Authorize(Policy = Policies.REGISTERED)]
@@ -334,7 +332,7 @@ namespace Sheaft.GraphQL
         [UseSelection]
         public IQueryable<NotificationDto> GetNotifications([Service] INotificationQueries notificationQueries)
         {
-            return notificationQueries.GetNotifications(_currentUser);
+            return notificationQueries.GetNotifications(CurrentUser);
         }
 
         [GraphQLName("tags")]
@@ -344,16 +342,16 @@ namespace Sheaft.GraphQL
         [UseSelection]
         public IQueryable<TagDto> GetTags([Service] ITagQueries tagQueries)
         {
-            return tagQueries.GetTags(_currentUser);
+            return tagQueries.GetTags(CurrentUser);
         }
 
         [Authorize(Policy = Policies.REGISTERED)]
         [GraphQLName("order")]
         [UseSingleOrDefault]
         [UseSelection]
-        public IQueryable<OrderDto> GetOrderAsync(Guid input, [Service] IOrderQueries orderQueries)
+        public IQueryable<OrderDto> GetOrder(Guid input, [Service] IOrderQueries orderQueries)
         {
-            return orderQueries.GetOrder(input, _currentUser);
+            return orderQueries.GetOrder(input, CurrentUser);
         }
 
         [Authorize(Policy = Policies.REGISTERED)]
@@ -362,9 +360,9 @@ namespace Sheaft.GraphQL
         [UseSorting(SortType = typeof(OrderSortType))]
         [UseFiltering(FilterType = typeof(OrderFilterType))]
         [UseSelection]
-        public IQueryable<OrderDto> GetOrdersAsync([Service] IOrderQueries orderQueries)
+        public IQueryable<OrderDto> GetOrders([Service] IOrderQueries orderQueries)
         {
-            return orderQueries.GetOrders(_currentUser);
+            return orderQueries.GetOrders(CurrentUser);
         }
 
         [Authorize(Policy = Policies.STORE_OR_PRODUCER)]
@@ -373,7 +371,7 @@ namespace Sheaft.GraphQL
         [UseSelection]
         public IQueryable<AgreementDto> GetAgreement(Guid input, [Service] IAgreementQueries agreementQueries)
         {
-            return agreementQueries.GetAgreement(input, _currentUser);
+            return agreementQueries.GetAgreement(input, CurrentUser);
         }
 
         [Authorize(Policy = Policies.STORE_OR_PRODUCER)]
@@ -384,7 +382,7 @@ namespace Sheaft.GraphQL
         [UseSelection]
         public IQueryable<AgreementDto> GetAgreements([Service] IAgreementQueries agreementQueries)
         {
-            return agreementQueries.GetAgreements(_currentUser);
+            return agreementQueries.GetAgreements(CurrentUser);
         }
 
         [Authorize(Policy = Policies.PRODUCER)]
@@ -395,7 +393,7 @@ namespace Sheaft.GraphQL
         [UseSelection]
         public IQueryable<AgreementDto> GetStoreAgreements(Guid input, [Service] IAgreementQueries agreementQueries)
         {
-            return agreementQueries.GetStoreAgreements(input, _currentUser);
+            return agreementQueries.GetStoreAgreements(input, CurrentUser);
         }
 
         [Authorize(Policy = Policies.STORE)]
@@ -406,7 +404,7 @@ namespace Sheaft.GraphQL
         [UseSelection]
         public IQueryable<AgreementDto> GetProducerAgreements(Guid input, [Service] IAgreementQueries agreementQueries)
         {
-            return agreementQueries.GetProducerAgreements(input, _currentUser);
+            return agreementQueries.GetProducerAgreements(input, CurrentUser);
         }
 
         [GraphQLName("product")]
@@ -415,7 +413,7 @@ namespace Sheaft.GraphQL
         [UseSelection]
         public IQueryable<ProductDto> GetProduct(Guid input, [Service] IProductQueries productQueries)
         {
-            return productQueries.GetProduct(input, _currentUser);
+            return productQueries.GetProduct(input, CurrentUser);
         }
 
         [Authorize(Policy = Policies.STORE)]
@@ -426,7 +424,7 @@ namespace Sheaft.GraphQL
         [UseSelection]
         public IQueryable<ProductDto> GetProducerProducts(Guid input, [Service] IProductQueries productQueries)
         {
-            return productQueries.GetProducerProducts(input, _currentUser);
+            return productQueries.GetProducerProducts(input, CurrentUser);
         }
 
         [Authorize(Policy = Policies.PRODUCER)]
@@ -437,7 +435,7 @@ namespace Sheaft.GraphQL
         [UseSelection]
         public IQueryable<ProductDto> GetProducts([Service] IProductQueries productQueries)
         {
-            return productQueries.GetProducts(_currentUser);
+            return productQueries.GetProducts(CurrentUser);
         }
 
         [Authorize(Policy = Policies.PRODUCER)]
@@ -446,7 +444,7 @@ namespace Sheaft.GraphQL
         [UseSelection]
         public IQueryable<ReturnableDto> GetReturnable(Guid input, [Service] IReturnableQueries returnableQueries)
         {
-            return returnableQueries.GetReturnable(input, _currentUser);
+            return returnableQueries.GetReturnable(input, CurrentUser);
         }
 
         [Authorize(Policy = Policies.PRODUCER)]
@@ -457,7 +455,7 @@ namespace Sheaft.GraphQL
         [UseSelection]
         public IQueryable<ReturnableDto> GetReturnables([Service] IReturnableQueries returnableQueries)
         {
-            return returnableQueries.GetReturnables(_currentUser);
+            return returnableQueries.GetReturnables(CurrentUser);
         }
 
         [Authorize(Policy = Policies.REGISTERED)]
@@ -466,7 +464,7 @@ namespace Sheaft.GraphQL
         [UseSelection]
         public IQueryable<JobDto> GetJob(Guid input, [Service] IJobQueries jobQueries)
         {
-            return jobQueries.GetJob(input, _currentUser);
+            return jobQueries.GetJob(input, CurrentUser);
         }
 
         [Authorize(Policy = Policies.REGISTERED)]
@@ -477,7 +475,7 @@ namespace Sheaft.GraphQL
         [UseSelection]
         public IQueryable<JobDto> GetJobs([Service] IJobQueries jobQueries)
         {
-            return jobQueries.GetJobs(_currentUser);
+            return jobQueries.GetJobs(CurrentUser);
         }
 
         [Authorize(Policy = Policies.PRODUCER)]
@@ -486,7 +484,7 @@ namespace Sheaft.GraphQL
         [UseSelection]
         public IQueryable<DeliveryModeDto> GetDelivery(Guid input, [Service] IDeliveryQueries deliveryQueries)
         {
-            return deliveryQueries.GetDelivery(input, _currentUser);
+            return deliveryQueries.GetDelivery(input, CurrentUser);
         }
 
         [Authorize(Policy = Policies.PRODUCER)]
@@ -497,7 +495,7 @@ namespace Sheaft.GraphQL
         [UseSelection]
         public IQueryable<DeliveryModeDto> GetDeliveries([Service] IDeliveryQueries deliveryQueries)
         {
-            return deliveryQueries.GetDeliveries(_currentUser);
+            return deliveryQueries.GetDeliveries(CurrentUser);
         }
 
         [Authorize(Policy = Policies.REGISTERED)]
@@ -506,7 +504,7 @@ namespace Sheaft.GraphQL
         [UseSelection]
         public IQueryable<PurchaseOrderDto> GetPurchaseOrder(Guid input, [Service] IPurchaseOrderQueries purchaseOrderQueries)
         {
-            return purchaseOrderQueries.GetPurchaseOrder(input, _currentUser);
+            return purchaseOrderQueries.GetPurchaseOrder(input, CurrentUser);
         }
 
         [Authorize(Policy = Policies.PRODUCER)]
@@ -517,7 +515,7 @@ namespace Sheaft.GraphQL
         [UseSelection]
         public IQueryable<PurchaseOrderDto> GetPurchaseOrders([Service] IPurchaseOrderQueries purchaseOrderQueries)
         {
-            return purchaseOrderQueries.GetPurchaseOrders(_currentUser);
+            return purchaseOrderQueries.GetPurchaseOrders(CurrentUser);
         }
 
         [Authorize(Policy = Policies.REGISTERED)]
@@ -528,7 +526,7 @@ namespace Sheaft.GraphQL
         [UseSelection]
         public IQueryable<PurchaseOrderDto> GetMyOrders([Service] IPurchaseOrderQueries purchaseOrderQueries)
         {
-            return purchaseOrderQueries.MyPurchaseOrders(_currentUser);
+            return purchaseOrderQueries.MyPurchaseOrders(CurrentUser);
         }
 
         [Authorize(Policy = Policies.OWNER)]
@@ -537,7 +535,7 @@ namespace Sheaft.GraphQL
         [UseSelection]
         public IQueryable<BusinessProfileDto> GetMyBusiness([Service] IBusinessQueries businessQueries)
         {
-            return businessQueries.GetMyProfile(_currentUser);
+            return businessQueries.GetMyProfile(CurrentUser);
         }
     }
 }

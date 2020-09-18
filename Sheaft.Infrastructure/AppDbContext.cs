@@ -21,14 +21,10 @@ namespace Sheaft.Infrastructure
     public partial class AppDbContext : DbContext, IAppDbContext
     {
         private readonly IStringLocalizer<MessageResources> _localizer;
-        private readonly ILogger<AppDbContext> _logger;
-        public AppDbContext(
-            DbContextOptions<AppDbContext> options, 
-            IStringLocalizer<MessageResources> localizer, 
-            ILogger<AppDbContext> logger) 
-                : base(options)
+
+        public AppDbContext(DbContextOptions<AppDbContext> options, StringLocalizer<MessageResources> localizer)
+            : base(options)
         {
-            _logger = logger;
             _localizer = localizer;
         }
 
@@ -90,11 +86,17 @@ namespace Sheaft.Infrastructure
         public async Task<IEnumerable<T>> GetByIdsAsync<T>(IEnumerable<Guid> ids, CancellationToken token) where T : class, IIdEntity, ITrackRemove
         {
             var items = await Set<T>().Where(c => ids.Contains(c.Id) && !c.RemovedOn.HasValue).ToListAsync(token);
-            if (items == null || !items.Any())
-                throw new SheaftException(ExceptionKind.NotFound, new Exception(ids.ToString()));
+            if (items?.Any() != true)
+            {
+                var message = GetExceptionDefaultMessage<T>(MessageKind.NotFound, ids);
+                throw new SheaftException(ExceptionKind.NotFound, message.Key, message.Value);
+            }
 
-            if(items.Count() != ids.Count())
-                throw new SheaftException(ExceptionKind.NotFound, new Exception(ids.Except(items.Select(i => i.Id)).ToString()));
+            if (items.Count != ids.Count())
+            {
+                var message = GetExceptionDefaultMessage<T>(MessageKind.NotFound, ids.Except(items.Select(i => i.Id)));
+                throw new SheaftException(ExceptionKind.NotFound, message.Key, message.Value);
+            }
 
             return items;
         }
@@ -102,7 +104,7 @@ namespace Sheaft.Infrastructure
         public async Task<IEnumerable<T>> FindByIdsAsync<T>(IEnumerable<Guid> ids, CancellationToken token) where T : class, IIdEntity, ITrackRemove
         {
             var items = await Set<T>().Where(c => ids.Contains(c.Id) && !c.RemovedOn.HasValue).ToListAsync(token);
-            if (items == null || !items.Any())
+            if (items?.Any() != true)
                 return new List<T>();
 
             return items;
@@ -111,8 +113,11 @@ namespace Sheaft.Infrastructure
         public async Task<IEnumerable<T>> GetAsync<T>(Expression<Func<T, bool>> where, CancellationToken token) where T : class, ITrackRemove
         {
             var items = await Set<T>().Where(c => !c.RemovedOn.HasValue).Where(where).ToListAsync(token);
-            if (items == null || !items.Any())
-                throw new NotFoundException();
+            if (items?.Any() != true)
+            {
+                var message = GetExceptionDefaultMessage<T>(MessageKind.NotFound);
+                throw new SheaftException(ExceptionKind.NotFound, message.Key, message.Value);
+            }
 
             return items;
         }
@@ -120,7 +125,7 @@ namespace Sheaft.Infrastructure
         public async Task<IEnumerable<T>> FindAsync<T>(Expression<Func<T, bool>> where, CancellationToken token) where T : class, ITrackRemove
         {
             var items = await Set<T>().Where(c => !c.RemovedOn.HasValue).Where(where).ToListAsync(token);
-            if (items == null || !items.Any())
+            if (items?.Any() != true)
                 return new List<T>();
 
             return items;
@@ -130,7 +135,10 @@ namespace Sheaft.Infrastructure
         {
             var item = await Set<T>().Where(c => !c.RemovedOn.HasValue).Where(where).SingleOrDefaultAsync(token);
             if (item == null)
-                throw new NotFoundException();
+            {
+                var message = GetExceptionDefaultMessage<T>(MessageKind.NotFound);
+                throw new SheaftException(ExceptionKind.NotFound, message.Key, message.Value);
+            }
 
             return item;
         }
@@ -149,14 +157,20 @@ namespace Sheaft.Infrastructure
         {
             var result = await Set<T>().SingleOrDefaultAsync(c => !c.RemovedOn.HasValue && c.Id == id, token);
             if (result != null)
-                throw new BadRequestException(MessageKind.Resource_Already_Exists);
+            {
+                var message = GetExceptionDefaultMessage<T>(MessageKind.AlreadyExists, id);
+                throw new SheaftException(ExceptionKind.NotFound, message.Key, message.Value);
+            }
         }
 
         public async Task EnsureNotExists<T>(Expression<Func<T, bool>> where, CancellationToken token) where T : class, IIdEntity, ITrackRemove
         {
             var result = await Set<T>().Where(c => !c.RemovedOn.HasValue).Where(where).ToListAsync(token);
-            if(result != null && result.Any())
-                throw new BadRequestException(MessageKind.Resource_Already_Exists);
+            if (result?.Any() == true)
+            {
+                var message = GetExceptionDefaultMessage<T>(MessageKind.AlreadyExists);
+                throw new SheaftException(ExceptionKind.NotFound, message.Key, message.Value);
+            }
         }
 
         public override int SaveChanges()
@@ -183,7 +197,7 @@ namespace Sheaft.Infrastructure
             return base.SaveChangesAsync(acceptAllChangesOnSuccess, cancellationToken);
         }
 
-        public EntityEntry<TEntity> Restore<TEntity>(TEntity entity) where TEntity: class, ITrackRemove
+        public EntityEntry<TEntity> Restore<TEntity>(TEntity entity) where TEntity : class, ITrackRemove
         {
             var entry = Attach(entity);
 
@@ -197,13 +211,41 @@ namespace Sheaft.Infrastructure
 
         private KeyValuePair<MessageKind, string> GetExceptionDefaultMessage<T>(MessageKind kind, Guid id) where T : class, IIdEntity, ITrackRemove
         {
-            var messageKind = kind;
-            var resource = id.ToString("N");
+            var type = typeof(T);
+            var resource = $"{_localizer[type.Name, type.Name]} ({id})";
+            return GetFormattedDefaultMessage(kind, type, resource);
+        }
 
-            if (Enum.TryParse(typeof(MessageKind), $"{nameof(T)}_{kind}", out object parsedKind))
+        private KeyValuePair<MessageKind, string> GetExceptionDefaultMessage<T>(MessageKind kind) where T : class, ITrackRemove
+        {
+            var type = typeof(T);
+            var resource = $"{_localizer[type.Name, type.Name]}";
+            return GetFormattedDefaultMessage(kind, type, resource);
+        }
+
+        private KeyValuePair<MessageKind, string> GetExceptionDefaultMessage<T>(MessageKind kind, IEnumerable<Guid> ids) where T : class, ITrackRemove
+        {
+            var type = typeof(T);
+            var identifiers = string.Empty;
+
+            foreach (var id in ids)
+            {
+                if (identifiers.Length > 0)
+                    identifiers += ", ";
+
+                identifiers += id.ToString("N");
+            }
+
+            var resource = $"{_localizer[type.Name, type.Name]} ({identifiers})";
+            return GetFormattedDefaultMessage(kind, type, resource);
+        }
+
+        private KeyValuePair<MessageKind, string> GetFormattedDefaultMessage(MessageKind kind, Type type, string resource)
+        {
+            var messageKind = kind;
+
+            if (Enum.TryParse(typeof(MessageKind), $"{type.Name}_{kind}", out object parsedKind))
                 messageKind = (MessageKind)parsedKind;
-            else 
-                resource = $"{_localizer[typeof(T).Name, string.Empty]} ({id})";            
 
             return new KeyValuePair<MessageKind, string>(messageKind, resource);
         }

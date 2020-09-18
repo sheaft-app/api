@@ -94,7 +94,7 @@ namespace Sheaft.Application.Handlers
                 {
                     var sponsor = await _context.FindSingleAsync<User>(u => u.SponsorshipCode == request.SponsoringCode, token);
                     if (sponsor == null)
-                        return NotFound<Guid>(MessageKind.Register_UserWithSponsorCode_NotFound);
+                        return NotFound<Guid>(MessageKind.Register_User_SponsorCode_NotFound);
 
                     await _context.AddAsync(new Sponsoring(sponsor, entity), token);
                     await _context.SaveChangesAsync(token);

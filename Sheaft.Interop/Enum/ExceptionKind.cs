@@ -10,6 +10,7 @@
         Locked,
         NotFound,
         Gone,
-        Unexpected
+        Unexpected,
+        AlreadyExists,
     }
 }

@@ -22,30 +22,16 @@ namespace Sheaft.Application.Queries
 
         public IQueryable<ReturnableDto> GetReturnable(Guid id, RequestUser currentUser)
         {
-            try
-            {
-                return _context.Returnables
-                        .Get(c => c.Id == id && c.Producer.Id == currentUser.Id)
-                        .ProjectTo<ReturnableDto>(_configurationProvider);
-            }
-            catch (Exception e)
-            {
-                return new List<ReturnableDto>().AsQueryable();
-            }
+            return _context.Returnables
+                    .Get(c => c.Id == id && c.Producer.Id == currentUser.Id)
+                    .ProjectTo<ReturnableDto>(_configurationProvider);
         }
 
         public IQueryable<ReturnableDto> GetReturnables(RequestUser currentUser)
         {
-            try
-            {
-                return _context.Returnables
-                        .Get(c => c.Producer.Id == currentUser.Id)
-                        .ProjectTo<ReturnableDto>(_configurationProvider);
-            }
-            catch (Exception e)
-            {
-                return new List<ReturnableDto>().AsQueryable();
-            }
+            return _context.Returnables
+                    .Get(c => c.Producer.Id == currentUser.Id)
+                    .ProjectTo<ReturnableDto>(_configurationProvider);
         }
     }
 }

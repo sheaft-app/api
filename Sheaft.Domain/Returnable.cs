@@ -41,7 +41,7 @@ namespace Sheaft.Domain.Models
         public void SetWholeSalePrice(decimal newPrice)
         {
             if (newPrice < 0)
-                throw new ValidationException(MessageKind.Packaging_WholeSalePrice_CannotBe_LowerThan, 0);
+                throw new ValidationException(MessageKind.Returnable_WholeSalePrice_CannotBe_LowerThan, 0);
 
             WholeSalePrice = Math.Round(newPrice, DIGITS_COUNT);
             RefreshPrices();
@@ -50,10 +50,10 @@ namespace Sheaft.Domain.Models
         public void SetVat(decimal newVat)
         {
             if (newVat < 0)
-                throw new ValidationException(MessageKind.Packaging_Vat_CannotBe_LowerThan, 0);
+                throw new ValidationException(MessageKind.Returnable_Vat_CannotBe_LowerThan, 0);
 
             if (newVat > 100)
-                throw new ValidationException(MessageKind.Packaging_Vat_CannotBe_GreaterThan, 100);
+                throw new ValidationException(MessageKind.Returnable_Vat_CannotBe_GreaterThan, 100);
 
             Vat = newVat;
             RefreshPrices();
@@ -62,7 +62,7 @@ namespace Sheaft.Domain.Models
         public void SetName(string name)
         {
             if (string.IsNullOrWhiteSpace(name))
-                throw new ValidationException(MessageKind.Packaging_Name_Required);
+                throw new ValidationException(MessageKind.Returnable_Name_Required);
 
             Name = name;
         }

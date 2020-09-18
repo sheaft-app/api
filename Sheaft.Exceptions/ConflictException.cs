@@ -3,7 +3,9 @@ using System;
 
 namespace Sheaft.Exceptions
 {
+#pragma warning disable RCS1194 // Implement exception constructors.
     public class ConflictException : SheaftException
+#pragma warning restore RCS1194 // Implement exception constructors.
     {
         public ConflictException(Exception exception, MessageKind? error = null, params object[] args) : base(ExceptionKind.Conflict, exception, error, args)
         {

@@ -23,29 +23,15 @@ namespace Sheaft.Application.Queries
 
         public IQueryable<RegionDto> GetRegion(Guid id, RequestUser currentUser)
         {
-            try
-            {
-                return _context.Regions
-                        .Where(d => d.Id == id)
-                        .ProjectTo<RegionDto>(_configurationProvider);
-            }
-            catch (Exception e)
-            {
-                return new List<RegionDto>().AsQueryable();
-            }
+            return _context.Regions
+                    .Where(d => d.Id == id)
+                    .ProjectTo<RegionDto>(_configurationProvider);
         }
 
         public IQueryable<RegionDto> GetRegions(RequestUser currentUser)
         {
-            try
-            {
-                return _context.Regions
-                        .ProjectTo<RegionDto>(_configurationProvider);
-            }
-            catch (Exception e)
-            {
-                return new List<RegionDto>().AsQueryable();
-            }
+            return _context.Regions
+                    .ProjectTo<RegionDto>(_configurationProvider);
         }
     }
 }

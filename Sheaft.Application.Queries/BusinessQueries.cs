@@ -57,238 +57,196 @@ namespace Sheaft.Application.Queries
 
         public async Task<SirenBusinessDto> RetrieveSiretInfosAsync(string siret, RequestUser currentUser, CancellationToken token)
         {
-            try
-            {
-                var result = await _httpClient.GetAsync(string.Format(_sireneOptions.SearchSiretUrl, siret), token);
-                if (!result.IsSuccessStatusCode)
-                    return null;
-
-                var content = await result.Content.ReadAsStringAsync();
-                var contentObj = JsonConvert.DeserializeObject<SirenBusinessResult>(content);
-                return contentObj.Etablissement;
-            }
-            catch (Exception ex)
-            {
+            var result = await _httpClient.GetAsync(string.Format(_sireneOptions.SearchSiretUrl, siret), token);
+            if (!result.IsSuccessStatusCode)
                 return null;
-            }
+
+            var content = await result.Content.ReadAsStringAsync();
+            var contentObj = JsonConvert.DeserializeObject<SirenBusinessResult>(content);
+            return contentObj.Etablissement;
         }
 
         public async Task<StoresSearchDto> SearchStoresAsync(Guid producerId, SearchTermsInput terms, RequestUser currentUser, CancellationToken token)
         {
-            try
+            var sp = new SearchParameters()
             {
-                var sp = new SearchParameters()
-                {
-                    SearchMode = SearchMode.Any,
-                    Top = terms.Take,
-                    Skip = (terms.Page - 1) * terms.Take,
-                    SearchFields = new List<string> { "partialStoreName" },
-                    Select = new List<string>()
+                SearchMode = SearchMode.Any,
+                Top = terms.Take,
+                Skip = (terms.Page - 1) * terms.Take,
+                SearchFields = new List<string> { "partialStoreName" },
+                Select = new List<string>()
                     {
                         "store_id", "store_name", "store_email", "store_phone",  "store_picture", "store_tags", "store_line1", "store_line2", "store_zipcode", "store_city", "store_longitude", "store_latitude"
                     },
-                    IncludeTotalResultCount = true,
-                    HighlightFields = new List<string>() { "store_name" },
-                    HighlightPreTag = "<b>",
-                    HighlightPostTag = "</b>"
-                };
+                IncludeTotalResultCount = true,
+                HighlightFields = new List<string>() { "store_name" },
+                HighlightPreTag = "<b>",
+                HighlightPostTag = "</b>"
+            };
 
-                var producer = await _context.GetByIdAsync<Producer>(producerId, token);
-                if (!string.IsNullOrWhiteSpace(terms.Sort))
-                {
-                    if (terms.Sort.Contains("store_geolocation"))
-                    {
-                        sp.OrderBy = new List<string>(){  "geo.distance(store_geolocation, geography'POINT(" + producer.Address.Longitude.Value.ToString(new CultureInfo("en-US")) + " " + producer.Address.Latitude.Value.ToString(new CultureInfo("en-US")) +
-                              ")')" };
-                    }
-                    else if (!terms.Sort.Contains("store_geolocation"))
-                    {
-                        sp.OrderBy = new List<string>() { terms.Sort };
-                    }
-                }
-
-                var filter = "removed eq 0";
-                if (terms.Tags != null)
-                {
-                    foreach (var tag in terms.Tags)
-                    {
-                        filter += " and ";
-                        filter += "store_tags/any(p: p eq '" + tag.ToLowerInvariant() + "')";
-                    }
-                }
-
-                filter += " and ";
-                filter += "geo.distance(store_geolocation, geography'POINT(" + producer.Address.Longitude.Value.ToString(new CultureInfo("en-US")) + " " + producer.Address.Latitude.Value.ToString(new CultureInfo("en-US")) +
-                          ")') le " + (terms.MaxDistance ?? 200);
-
-                sp.Filter = filter;
-
-                var results = await _storesIndex.Documents.SearchAsync(terms.Text, sp, cancellationToken: token);
-                var searchResults = new List<SearchStore>();
-                foreach (var result in results.Results)
-                {
-                    var json = JsonConvert.SerializeObject(result.Document, Newtonsoft.Json.Formatting.Indented);
-                    var myobject = JsonConvert.DeserializeObject<SearchStore>(json);
-                    searchResults.Add(myobject);
-                }
-
-                return new StoresSearchDto
-                {
-                    Count = results.Count ?? 0,
-                    Stores = searchResults?.Select(p => new StoreDto
-                    {
-                        Id = p.Store_id,
-                        Name = p.Store_name,
-                        Email = p.Store_email,
-                        Phone = p.Store_phone,
-                        Picture = p.Store_picture,
-                        Tags = p.Store_tags?.Select(t => new TagDto { Name = t }) ?? new List<TagDto>(),
-                        Address = new AddressDto
-                        {
-                            Line1 = p.Store_line1,
-                            Line2 = p.Store_line2,
-                            City = p.Store_city,
-                            Latitude = p.Store_latitude,
-                            Longitude = p.Store_longitude,
-                            Zipcode = p.Store_zipcode
-                        }
-                    }) ?? new List<StoreDto>()
-                };
-            }
-            catch (Exception ex)
+            var producer = await _context.GetByIdAsync<Producer>(producerId, token);
+            if (!string.IsNullOrWhiteSpace(terms.Sort))
             {
-                return new StoresSearchDto();
+                if (terms.Sort.Contains("store_geolocation"))
+                {
+                    sp.OrderBy = new List<string>(){  "geo.distance(store_geolocation, geography'POINT(" + producer.Address.Longitude.Value.ToString(new CultureInfo("en-US")) + " " + producer.Address.Latitude.Value.ToString(new CultureInfo("en-US")) +
+                              ")')" };
+                }
+                else if (!terms.Sort.Contains("store_geolocation"))
+                {
+                    sp.OrderBy = new List<string>() { terms.Sort };
+                }
             }
+
+            var filter = "removed eq 0";
+            if (terms.Tags != null)
+            {
+                foreach (var tag in terms.Tags)
+                {
+                    filter += " and ";
+                    filter += "store_tags/any(p: p eq '" + tag.ToLowerInvariant() + "')";
+                }
+            }
+
+            filter += " and ";
+            filter += "geo.distance(store_geolocation, geography'POINT(" + producer.Address.Longitude.Value.ToString(new CultureInfo("en-US")) + " " + producer.Address.Latitude.Value.ToString(new CultureInfo("en-US")) +
+                      ")') le " + (terms.MaxDistance ?? 200);
+
+            sp.Filter = filter;
+
+            var results = await _storesIndex.Documents.SearchAsync(terms.Text, sp, cancellationToken: token);
+            var searchResults = new List<SearchStore>();
+            foreach (var result in results.Results)
+            {
+                var json = JsonConvert.SerializeObject(result.Document, Newtonsoft.Json.Formatting.Indented);
+                var myobject = JsonConvert.DeserializeObject<SearchStore>(json);
+                searchResults.Add(myobject);
+            }
+
+            return new StoresSearchDto
+            {
+                Count = results.Count ?? 0,
+                Stores = searchResults?.Select(p => new StoreDto
+                {
+                    Id = p.Store_id,
+                    Name = p.Store_name,
+                    Email = p.Store_email,
+                    Phone = p.Store_phone,
+                    Picture = p.Store_picture,
+                    Tags = p.Store_tags?.Select(t => new TagDto { Name = t }) ?? new List<TagDto>(),
+                    Address = new AddressDto
+                    {
+                        Line1 = p.Store_line1,
+                        Line2 = p.Store_line2,
+                        City = p.Store_city,
+                        Latitude = p.Store_latitude,
+                        Longitude = p.Store_longitude,
+                        Zipcode = p.Store_zipcode
+                    }
+                }) ?? new List<StoreDto>()
+            };
         }
 
         public async Task<ProducersSearchDto> SearchProducersAsync(Guid storeId, SearchTermsInput terms, RequestUser currentUser, CancellationToken token)
         {
-            try
+            var sp = new SearchParameters()
             {
-                var sp = new SearchParameters()
-                {
-                    SearchMode = SearchMode.Any,
-                    Top = terms.Take,
-                    Skip = (terms.Page - 1) * terms.Take,
-                    SearchFields = new List<string> { "partialProducerName" },
-                    Select = new List<string>()
+                SearchMode = SearchMode.Any,
+                Top = terms.Take,
+                Skip = (terms.Page - 1) * terms.Take,
+                SearchFields = new List<string> { "partialProducerName" },
+                Select = new List<string>()
                     {
                         "producer_id", "producer_name", "producer_email", "producer_phone",  "producer_picture", "producer_tags", "producer_line1", "producer_line2", "producer_zipcode", "producer_city", "producer_longitude", "producer_latitude", "producer_products_count"
                     },
-                    IncludeTotalResultCount = true,
-                    HighlightFields = new List<string>() { "producer_name" },
-                    HighlightPreTag = "<b>",
-                    HighlightPostTag = "</b>"
-                };
+                IncludeTotalResultCount = true,
+                HighlightFields = new List<string>() { "producer_name" },
+                HighlightPreTag = "<b>",
+                HighlightPostTag = "</b>"
+            };
 
-                var store = await _context.GetByIdAsync<Store>(storeId, token);
-                if (!string.IsNullOrWhiteSpace(terms.Sort))
-                {
-                    if (terms.Sort.Contains("producer_geolocation"))
-                    {
-                        sp.OrderBy = new List<string>(){  "geo.distance(producer_geolocation, geography'POINT(" + store.Address.Longitude.Value.ToString(new CultureInfo("en-US")) + " " + store.Address.Latitude.Value.ToString(new CultureInfo("en-US")) +
-                              ")')" };
-                    }
-                    else if (!terms.Sort.Contains("producer_geolocation"))
-                    {
-                        sp.OrderBy = new List<string>() { terms.Sort };
-                    }
-                }
-
-                var filter = "removed eq 0";
-                if (terms.Tags != null)
-                {
-                    foreach (var tag in terms.Tags)
-                    {
-                        filter += " and ";
-                        filter += "producer_tags/any(p: p eq '" + tag.ToLowerInvariant() + "')";
-                    }
-                }
-
-                filter += " and ";
-                filter += "geo.distance(producer_geolocation, geography'POINT(" + store.Address.Longitude.Value.ToString(new CultureInfo("en-US")) + " " + store.Address.Latitude.Value.ToString(new CultureInfo("en-US")) +
-                          ")') le " + (terms.MaxDistance ?? 200);
-
-                sp.Filter = filter;
-
-                var results = await _producersIndex.Documents.SearchAsync(terms.Text, sp, cancellationToken: token);
-                var searchResults = new List<SearchProducer>();
-                foreach (var result in results.Results)
-                {
-                    var json = JsonConvert.SerializeObject(result.Document, Formatting.Indented);
-                    var myobject = JsonConvert.DeserializeObject<SearchProducer>(json);
-                    searchResults.Add(myobject);
-                }
-
-                return new ProducersSearchDto
-                {
-                    Count = results.Count ?? 0,
-                    Producers = searchResults?.Select(p => new ProducerDto
-                    {
-                        Id = p.Producer_id,
-                        Name = p.Producer_name,
-                        Email = p.Producer_email,
-                        Phone = p.Producer_phone,
-                        Picture = p.Producer_picture,
-                        Tags = p.Producer_tags?.Select(t => new TagDto { Name = t }) ?? new List<TagDto>(),
-                        Address = new AddressDto
-                        {
-                            Line1 = p.Producer_line1,
-                            Line2 = p.Producer_line2,
-                            City = p.Producer_city,
-                            Latitude = p.Producer_latitude,
-                            Longitude = p.Producer_longitude,
-                            Zipcode = p.Producer_zipcode
-                        }
-                    }) ?? new List<ProducerDto>()
-                };
-            }
-            catch (Exception ex)
+            var store = await _context.GetByIdAsync<Store>(storeId, token);
+            if (!string.IsNullOrWhiteSpace(terms.Sort))
             {
-                return new ProducersSearchDto();
+                if (terms.Sort.Contains("producer_geolocation"))
+                {
+                    sp.OrderBy = new List<string>(){  "geo.distance(producer_geolocation, geography'POINT(" + store.Address.Longitude.Value.ToString(new CultureInfo("en-US")) + " " + store.Address.Latitude.Value.ToString(new CultureInfo("en-US")) +
+                              ")')" };
+                }
+                else if (!terms.Sort.Contains("producer_geolocation"))
+                {
+                    sp.OrderBy = new List<string>() { terms.Sort };
+                }
             }
+
+            var filter = "removed eq 0";
+            if (terms.Tags != null)
+            {
+                foreach (var tag in terms.Tags)
+                {
+                    filter += " and ";
+                    filter += "producer_tags/any(p: p eq '" + tag.ToLowerInvariant() + "')";
+                }
+            }
+
+            filter += " and ";
+            filter += "geo.distance(producer_geolocation, geography'POINT(" + store.Address.Longitude.Value.ToString(new CultureInfo("en-US")) + " " + store.Address.Latitude.Value.ToString(new CultureInfo("en-US")) +
+                      ")') le " + (terms.MaxDistance ?? 200);
+
+            sp.Filter = filter;
+
+            var results = await _producersIndex.Documents.SearchAsync(terms.Text, sp, cancellationToken: token);
+            var searchResults = new List<SearchProducer>();
+            foreach (var result in results.Results)
+            {
+                var json = JsonConvert.SerializeObject(result.Document, Formatting.Indented);
+                var myobject = JsonConvert.DeserializeObject<SearchProducer>(json);
+                searchResults.Add(myobject);
+            }
+
+            return new ProducersSearchDto
+            {
+                Count = results.Count ?? 0,
+                Producers = searchResults?.Select(p => new ProducerDto
+                {
+                    Id = p.Producer_id,
+                    Name = p.Producer_name,
+                    Email = p.Producer_email,
+                    Phone = p.Producer_phone,
+                    Picture = p.Producer_picture,
+                    Tags = p.Producer_tags?.Select(t => new TagDto { Name = t }) ?? new List<TagDto>(),
+                    Address = new AddressDto
+                    {
+                        Line1 = p.Producer_line1,
+                        Line2 = p.Producer_line2,
+                        City = p.Producer_city,
+                        Latitude = p.Producer_latitude,
+                        Longitude = p.Producer_longitude,
+                        Zipcode = p.Producer_zipcode
+                    }
+                }) ?? new List<ProducerDto>()
+            };
         }
 
         public IQueryable<BusinessProfileDto> GetMyProfile(RequestUser currentUser)
         {
-            try
-            {
-                return _context.Users.OfType<Business>()
-                        .Get(c => c.Id == currentUser.Id)
-                        .ProjectTo<BusinessProfileDto>(_configurationProvider);
-            }
-            catch (Exception e)
-            {
-                return new List<BusinessProfileDto>().AsQueryable();
-            }
+            return _context.Users.OfType<Business>()
+                    .Get(c => c.Id == currentUser.Id)
+                    .ProjectTo<BusinessProfileDto>(_configurationProvider);
         }
 
         public IQueryable<ProducerDto> GetProducer(Guid id, RequestUser currentUser)
         {
-            try
-            {
-                return _context.Users.OfType<Producer>()
-                        .Get(c => c.Id == id)
-                        .ProjectTo<ProducerDto>(_configurationProvider);
-            }
-            catch (Exception e)
-            {
-                return new List<ProducerDto>().AsQueryable();
-            }
+            return _context.Users.OfType<Producer>()
+                    .Get(c => c.Id == id)
+                    .ProjectTo<ProducerDto>(_configurationProvider);
         }
 
         public IQueryable<StoreDto> GetStore(Guid id, RequestUser currentUser)
         {
-            try
-            {
-                return _context.Users.OfType<Store>()
-                        .Get(c => c.Id == id)
-                        .ProjectTo<StoreDto>(_configurationProvider);
-            }
-            catch (Exception e)
-            {
-                return new List<StoreDto>().AsQueryable();
-            }
+            return _context.Users.OfType<Store>()
+                    .Get(c => c.Id == id)
+                    .ProjectTo<StoreDto>(_configurationProvider);
         }
 
         private class SirenBusinessResult

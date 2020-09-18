@@ -21,29 +21,15 @@ namespace Sheaft.Application.Queries
 
         public IQueryable<NationalityDto> GetNationality(Guid id, RequestUser currentUser)
         {
-            try
-            {
-                return _context.Nationalities
-                        .Where(d => d.Id == id)
-                        .ProjectTo<NationalityDto>(_configurationProvider);
-            }
-            catch (Exception e)
-            {
-                return new List<NationalityDto>().AsQueryable();
-            }
+            return _context.Nationalities
+                    .Where(d => d.Id == id)
+                    .ProjectTo<NationalityDto>(_configurationProvider);
         }
 
         public IQueryable<NationalityDto> GetNationalities(RequestUser currentUser)
         {
-            try
-            {
-                return _context.Nationalities
-                        .ProjectTo<NationalityDto>(_configurationProvider);
-            }
-            catch (Exception e)
-            {
-                return new List<NationalityDto>().AsQueryable();
-            }
+            return _context.Nationalities
+                    .ProjectTo<NationalityDto>(_configurationProvider);
         }
     }
 }

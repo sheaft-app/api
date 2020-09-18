@@ -15,7 +15,7 @@ namespace Sheaft.Domain.Models
             : base(id, kind, name, firstname, lastname, email, phone)
         {
             if (address == null)
-                throw new ValidationException(MessageKind.Company_Address_Required);
+                throw new ValidationException(MessageKind.Business_Address_Required);
 
             SetOpenForNewBusiness(openForBusiness);
             SetSiret(siret);
@@ -43,7 +43,7 @@ namespace Sheaft.Domain.Models
         public void SetSiret(string siret)
         {
             if (siret.IsNotNullAndIsEmptyOrWhiteSpace())
-                throw new ValidationException(MessageKind.Company_Siret_Required);
+                throw new ValidationException(MessageKind.Business_Siret_Required);
 
             Siret = siret;
         }
@@ -59,7 +59,7 @@ namespace Sheaft.Domain.Models
         public void SetVatIdentifier(string vatNumber)
         {
             if (vatNumber.IsNotNullAndIsEmptyOrWhiteSpace())
-                throw new ValidationException(MessageKind.Company_Vat_Required);
+                throw new ValidationException(MessageKind.Business_Vat_Required);
 
             VatIdentifier = vatNumber;
         }

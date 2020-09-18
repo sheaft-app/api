@@ -656,7 +656,7 @@ namespace Sheaft.GraphQL.Types
 
             descriptor.Field(c => c.Id)
                 .Type<NonNullType<IdType>>();
-            
+
             descriptor.Field(c => c.Name)
                 .Type<NonNullType<StringType>>();
         }

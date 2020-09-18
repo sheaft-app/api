@@ -23,30 +23,16 @@ namespace Sheaft.Application.Queries
 
         public IQueryable<DocumentDto> GetDocument(Guid id, RequestUser currentUser)
         {
-            try
-            {
-                return _context.Documents
-                        .Get(d => d.Id == id, true)
-                        .ProjectTo<DocumentDto>(_configurationProvider);
-            }
-            catch (Exception e)
-            {
-                return new List<DocumentDto>().AsQueryable();
-            }
+            return _context.Documents
+                    .Get(d => d.Id == id, true)
+                    .ProjectTo<DocumentDto>(_configurationProvider);
         }
 
         public IQueryable<DocumentDto> GetDocuments(RequestUser currentUser)
         {
-            try
-            {
-                return _context.Documents
-                        .Get(null, true)
-                        .ProjectTo<DocumentDto>(_configurationProvider);
-            }
-            catch (Exception e)
-            {
-                return new List<DocumentDto>().AsQueryable();
-            }
+            return _context.Documents
+                    .Get(null, true)
+                    .ProjectTo<DocumentDto>(_configurationProvider);
         }
     }
 }

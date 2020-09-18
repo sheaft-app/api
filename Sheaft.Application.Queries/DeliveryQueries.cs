@@ -27,131 +27,103 @@ namespace Sheaft.Application.Queries
 
         public IQueryable<DeliveryModeDto> GetDelivery(Guid id, RequestUser currentUser)
         {
-            try
-            {
-                return _context.DeliveryModes
-                        .Get(c => c.Id == id && c.Producer.Id == currentUser.Id)
-                        .ProjectTo<DeliveryModeDto>(_configurationProvider);
-            }
-            catch (Exception e)
-            {
-                return new List<DeliveryModeDto>().AsQueryable();
-            }
+            return _context.DeliveryModes
+                    .Get(c => c.Id == id && c.Producer.Id == currentUser.Id)
+                    .ProjectTo<DeliveryModeDto>(_configurationProvider);
         }
 
         public IQueryable<DeliveryModeDto> GetDeliveries(RequestUser currentUser)
         {
-            try
-            {
-                return _context.DeliveryModes
-                        .Get(c => c.Producer.Id == currentUser.Id)
-                        .ProjectTo<DeliveryModeDto>(_configurationProvider);
-            }
-            catch (Exception e)
-            {
-                return new List<DeliveryModeDto>().AsQueryable();
-            }
+            return _context.DeliveryModes
+                    .Get(c => c.Producer.Id == currentUser.Id)
+                    .ProjectTo<DeliveryModeDto>(_configurationProvider);
         }
 
         public async Task<IEnumerable<ProducerDeliveriesDto>> GetProducersDeliveriesAsync(IEnumerable<Guid> producerIds, IEnumerable<DeliveryKind> kinds, DateTimeOffset currentDate, RequestUser currentUser, CancellationToken token)
         {
-            try
+            var list = new List<ProducerDeliveriesDto>();
+            var deliveriesMode = await _context.GetAsync<DeliveryMode>(d => producerIds.Contains(d.Producer.Id) && kinds.Contains(d.Kind), token);
+
+            foreach (var deliveriesGroup in deliveriesMode.GroupBy(c => c.Producer.Id))
             {
-                var list = new List<ProducerDeliveriesDto>();
-                var deliveriesMode = await _context.GetAsync<DeliveryMode>(d => producerIds.Contains(d.Producer.Id) && kinds.Contains(d.Kind), token);
-
-                foreach (var deliveriesGroup in deliveriesMode.GroupBy(c => c.Producer.Id))
+                var deliveries = new List<DeliveryDto>();
+                var producer = new ProducerDeliveriesDto
                 {
-                    var deliveries = new List<DeliveryDto>();
-                    var producer = new ProducerDeliveriesDto
-                    {
-                        Id = deliveriesGroup.Key,
-                        Name = deliveriesGroup.First().Producer.Name
-                    };
+                    Id = deliveriesGroup.Key,
+                    Name = deliveriesGroup.First().Producer.Name
+                };
 
-                    foreach (var deliveryMode in deliveriesGroup)
+                foreach (var deliveryMode in deliveriesGroup)
+                {
+                    deliveries.Add(new DeliveryDto
                     {
-                        deliveries.Add(new DeliveryDto
+                        Id = deliveryMode.Id,
+                        Kind = deliveryMode.Kind,
+                        Address = deliveryMode.Address != null ? new AddressDto
                         {
-                            Id = deliveryMode.Id,
-                            Kind = deliveryMode.Kind,
-                            Address = deliveryMode.Address != null ? new AddressDto
-                            {
-                                City = deliveryMode.Address.City,
-                                Latitude = deliveryMode.Address.Latitude,
-                                Line1 = deliveryMode.Address.Line1,
-                                Line2 = deliveryMode.Address.Line2,
-                                Longitude = deliveryMode.Address.Longitude,
-                                Zipcode = deliveryMode.Address.Zipcode
-                            } : null,
-                            Name = deliveryMode.Name,
-                            DeliveryHours = GetAvailableDeliveryHours(deliveryMode.OpeningHours, deliveryMode.LockOrderHoursBeforeDelivery, currentDate),
-                        });
-                    }
-
-                    producer.Deliveries = deliveries;
-                    list.Add(producer);
+                            City = deliveryMode.Address.City,
+                            Latitude = deliveryMode.Address.Latitude,
+                            Line1 = deliveryMode.Address.Line1,
+                            Line2 = deliveryMode.Address.Line2,
+                            Longitude = deliveryMode.Address.Longitude,
+                            Zipcode = deliveryMode.Address.Zipcode
+                        } : null,
+                        Name = deliveryMode.Name,
+                        DeliveryHours = GetAvailableDeliveryHours(deliveryMode.OpeningHours, deliveryMode.LockOrderHoursBeforeDelivery, currentDate),
+                    });
                 }
 
-                return list;
+                producer.Deliveries = deliveries;
+                list.Add(producer);
             }
-            catch (Exception e)
-            {
-                return new List<ProducerDeliveriesDto>().AsQueryable();
-            }
+
+            return list;
         }
 
         public async Task<IEnumerable<ProducerDeliveriesDto>> GetStoreDeliveriesForProducersAsync(Guid storeId, IEnumerable<Guid> producerIds, IEnumerable<DeliveryKind> kinds, DateTimeOffset currentDate, RequestUser currentUser, CancellationToken token)
         {
-            try
-            {
-                var agreements = await _context.GetAsync<Agreement>(d => producerIds.Contains(d.Delivery.Producer.Id) && d.Store.Id == storeId && d.Status == AgreementStatus.Accepted && kinds.Contains(d.Delivery.Kind), token);
+            var agreements = await _context.GetAsync<Agreement>(d => producerIds.Contains(d.Delivery.Producer.Id) && d.Store.Id == storeId && d.Status == AgreementStatus.Accepted && kinds.Contains(d.Delivery.Kind), token);
 
-                var list = new List<ProducerDeliveriesDto>();
-                kinds = kinds ?? new List<DeliveryKind> {
+            var list = new List<ProducerDeliveriesDto>();
+            kinds ??= new List<DeliveryKind> {
                     DeliveryKind.ProducerToStore,
                     DeliveryKind.ExternalToStore
                 };
 
-                foreach (var agreementGroups in agreements.GroupBy(c => c.Delivery.Producer.Id))
+            foreach (var agreementGroups in agreements.GroupBy(c => c.Delivery.Producer.Id))
+            {
+                var deliveries = new List<DeliveryDto>();
+                var producer = new ProducerDeliveriesDto
                 {
-                    var deliveries = new List<DeliveryDto>();
-                    var producer = new ProducerDeliveriesDto
-                    {
-                        Id = agreementGroups.Key,
-                        Name = agreementGroups.First().Delivery.Producer.Name
-                    };
+                    Id = agreementGroups.Key,
+                    Name = agreementGroups.First().Delivery.Producer.Name
+                };
 
-                    foreach (var agreement in agreementGroups)
+                foreach (var agreement in agreementGroups)
+                {
+                    deliveries.Add(new DeliveryDto
                     {
-                        deliveries.Add(new DeliveryDto
+                        Id = agreement.Delivery.Id,
+                        Kind = agreement.Delivery.Kind,
+                        Address = agreement.Delivery.Address != null ? new AddressDto
                         {
-                            Id = agreement.Delivery.Id,
-                            Kind = agreement.Delivery.Kind,
-                            Address = agreement.Delivery.Address != null ? new AddressDto
-                            {
-                                City = agreement.Delivery.Address.City,
-                                Latitude = agreement.Delivery.Address.Latitude,
-                                Line1 = agreement.Delivery.Address.Line1,
-                                Line2 = agreement.Delivery.Address.Line2,
-                                Longitude = agreement.Delivery.Address.Longitude,
-                                Zipcode = agreement.Delivery.Address.Zipcode
-                            } : null,
-                            Name = agreement.Delivery.Name,
-                            DeliveryHours = GetAvailableDeliveryHours(agreement.SelectedHours, agreement.Delivery.LockOrderHoursBeforeDelivery, currentDate),
-                        });
-                    }
-
-                    producer.Deliveries = deliveries;
-                    list.Add(producer);
+                            City = agreement.Delivery.Address.City,
+                            Latitude = agreement.Delivery.Address.Latitude,
+                            Line1 = agreement.Delivery.Address.Line1,
+                            Line2 = agreement.Delivery.Address.Line2,
+                            Longitude = agreement.Delivery.Address.Longitude,
+                            Zipcode = agreement.Delivery.Address.Zipcode
+                        } : null,
+                        Name = agreement.Delivery.Name,
+                        DeliveryHours = GetAvailableDeliveryHours(agreement.SelectedHours, agreement.Delivery.LockOrderHoursBeforeDelivery, currentDate),
+                    });
                 }
 
-                return list;
+                producer.Deliveries = deliveries;
+                list.Add(producer);
             }
-            catch (Exception e)
-            {
-                return new List<ProducerDeliveriesDto>().AsQueryable();
-            }
+
+            return list;
         }
 
         private IEnumerable<DeliveryHourDto> GetAvailableDeliveryHours(IEnumerable<TimeSlotHour> openingHours, int lockOrderHoursBeforeDelivery, DateTimeOffset currentDate)

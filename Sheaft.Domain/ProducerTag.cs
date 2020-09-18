@@ -13,7 +13,7 @@ namespace Sheaft.Domain.Models
         public ProducerTag(Tag tag)
         {
             if (tag == null)
-                throw new ValidationException(MessageKind.Company_TagNotFound);
+                throw new ValidationException(MessageKind.Business_TagNotFound);
 
             Tag = tag;
         }

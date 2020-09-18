@@ -21,29 +21,15 @@ namespace Sheaft.Application.Queries
 
         public IQueryable<CountryDto> GetCountry(Guid id, RequestUser currentUser)
         {
-            try
-            {
-                return _context.Countries
-                        .Where(d => d.Id == id)
-                        .ProjectTo<CountryDto>(_configurationProvider);
-            }
-            catch (Exception e)
-            {
-                return new List<CountryDto>().AsQueryable();
-            }
+            return _context.Countries
+                    .Where(d => d.Id == id)
+                    .ProjectTo<CountryDto>(_configurationProvider);
         }
 
         public IQueryable<CountryDto> GetCountries(RequestUser currentUser)
         {
-            try
-            {
-                return _context.Countries
-                        .ProjectTo<CountryDto>(_configurationProvider);
-            }
-            catch (Exception e)
-            {
-                return new List<CountryDto>().AsQueryable();
-            }
+            return _context.Countries
+                    .ProjectTo<CountryDto>(_configurationProvider);
         }
     }
 }

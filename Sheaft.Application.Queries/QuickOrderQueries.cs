@@ -24,44 +24,23 @@ namespace Sheaft.Application.Queries
 
         public IQueryable<QuickOrderDto> GetUserDefaultQuickOrder(Guid userId, RequestUser currentUser)
         {
-            try
-            {
-                return _context.QuickOrders
-                        .Get(c => c.User.Id == userId && c.IsDefault)
-                        .ProjectTo<QuickOrderDto>(_configurationProvider);
-            }
-            catch (Exception e)
-            {
-                return new List<QuickOrderDto>().AsQueryable();
-            }
+            return _context.QuickOrders
+                    .Get(c => c.User.Id == userId && c.IsDefault)
+                    .ProjectTo<QuickOrderDto>(_configurationProvider);
         }
 
         public IQueryable<QuickOrderDto> GetQuickOrder(Guid quickOrderId, RequestUser currentUser)
         {
-            try
-            {
-                return _context.QuickOrders
-                        .Get(c => c.Id == quickOrderId && c.User.Id == currentUser.Id)
-                        .ProjectTo<QuickOrderDto>(_configurationProvider);
-            }
-            catch (Exception e)
-            {
-                return new List<QuickOrderDto>().AsQueryable();
-            }
+            return _context.QuickOrders
+                    .Get(c => c.Id == quickOrderId && c.User.Id == currentUser.Id)
+                    .ProjectTo<QuickOrderDto>(_configurationProvider);
         }
 
         public IQueryable<QuickOrderDto> GetQuickOrders(RequestUser currentUser)
         {
-            try
-            {
-                return _context.QuickOrders
-                        .Get(c => c.User.Id == currentUser.Id)
-                        .ProjectTo<QuickOrderDto>(_configurationProvider);
-            }
-            catch (Exception e)
-            {
-                return new List<QuickOrderDto>().AsQueryable();
-            }
+            return _context.QuickOrders
+                    .Get(c => c.User.Id == currentUser.Id)
+                    .ProjectTo<QuickOrderDto>(_configurationProvider);
         }
     }
 }

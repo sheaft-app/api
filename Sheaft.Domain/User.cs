@@ -80,7 +80,7 @@ namespace Sheaft.Domain.Models
         protected void SetUserName(string name)
         {
             if (name.IsNotNullAndIsEmptyOrWhiteSpace())
-                throw new ValidationException(MessageKind.Company_Name_Required);
+                throw new ValidationException(MessageKind.Business_Name_Required);
 
             Name = name;
         }
@@ -96,7 +96,7 @@ namespace Sheaft.Domain.Models
         public void SetEmail(string email)
         {
             if (email.IsNotNullAndIsEmptyOrWhiteSpace())
-                throw new ValidationException(MessageKind.Company_Email_Required);
+                throw new ValidationException(MessageKind.Business_Email_Required);
 
             Email = email;
         }

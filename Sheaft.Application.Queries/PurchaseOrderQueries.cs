@@ -28,54 +28,37 @@ namespace Sheaft.Application.Queries
 
         public IQueryable<PurchaseOrderDto> MyPurchaseOrders(RequestUser currentUser)
         {
-            try
-            {
-                return _context.PurchaseOrders
-                        .Get(c => c.Sender.Id == currentUser.Id)
-                        .ProjectTo<PurchaseOrderDto>(_configurationProvider);
-            }
-            catch (Exception e)
-            {
-                return new List<PurchaseOrderDto>().AsQueryable();
-            }
+            return _context.PurchaseOrders
+                    .Get(c => c.Sender.Id == currentUser.Id)
+                    .ProjectTo<PurchaseOrderDto>(_configurationProvider);
         }
 
         public IQueryable<PurchaseOrderDto> GetPurchaseOrder(Guid id, RequestUser currentUser)
         {
-            try
+            if (currentUser.IsInRole(_roleOptions.Producer.Value))
             {
-                if (currentUser.IsInRole(_roleOptions.Producer.Value))
-                    return _context.PurchaseOrders
+                return _context.PurchaseOrders
                             .Get(c => c.Id == id && c.Vendor.Id == currentUser.Id)
                             .ProjectTo<PurchaseOrderDto>(_configurationProvider);
+            }
 
-                return _context.PurchaseOrders
+            return _context.PurchaseOrders
                         .Get(c => c.Id == id && c.Sender.Id == currentUser.Id)
                         .ProjectTo<PurchaseOrderDto>(_configurationProvider);
-            }
-            catch (Exception e)
-            {
-                return new List<PurchaseOrderDto>().AsQueryable();
-            }
         }
 
         public IQueryable<PurchaseOrderDto> GetPurchaseOrders(RequestUser currentUser)
         {
-            try
+            if (currentUser.IsInRole(_roleOptions.Producer.Value))
             {
-                if (currentUser.IsInRole(_roleOptions.Producer.Value))
-                    return _context.PurchaseOrders
+                return _context.PurchaseOrders
                             .Get(c => c.Vendor.Id == currentUser.Id)
                             .ProjectTo<PurchaseOrderDto>(_configurationProvider);
+            }
 
-                return _context.PurchaseOrders
+            return _context.PurchaseOrders
                         .Get(c => c.Sender.Id == currentUser.Id)
                         .ProjectTo<PurchaseOrderDto>(_configurationProvider);
-            }
-            catch (Exception e)
-            {
-                return new List<PurchaseOrderDto>().AsQueryable();
-            }
         }
     }
 }

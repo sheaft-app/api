@@ -33,55 +33,53 @@ namespace Sheaft.Application.Handlers
         {
             return await ExecuteAsync(async () =>
             {
-                using (var transaction = await _context.Database.BeginTransactionAsync(token))
+                using var transaction = await _context.Database.BeginTransactionAsync(token);
+                await _context.EnsureNotExists<BusinessLegal>(c => c.Business.Id == request.UserId, token);
+
+                var legalAddress = new LegalAddress(request.Address.Line1, request.Address.Line2, request.Address.Zipcode, request.Address.City, request.Address.Country);
+                var ownerAddress = new OwnerAddress(request.Owner.Address.Line1, request.Owner.Address.Line2, request.Owner.Address.Zipcode, request.Owner.Address.City, request.Owner.Address.Country);
+
+                var business = await _context.GetByIdAsync<Business>(request.UserId, token);
+                var legal = new BusinessLegal(Guid.NewGuid(),
+                    business,
+                    request.Kind,
+                    request.Email,
+                    legalAddress,
+                    new Owner(business.Id,
+                        request.Owner.FirstName,
+                        request.Owner.LastName,
+                        request.Owner.Email,
+                        request.Owner.BirthDate,
+                        ownerAddress,
+                        request.Owner.Nationality,
+                        request.Owner.CountryOfResidence
+                    ));
+
+                await _context.AddAsync(legal, token);
+                await _context.SaveChangesAsync(token);
+
+                if (business.Kind == ProfileKind.Producer)
                 {
-                    await _context.EnsureNotExists<BusinessLegal>(c => c.Business.Id == request.UserId, token);
-
-                    var legalAddress = new LegalAddress(request.Address.Line1, request.Address.Line2, request.Address.Zipcode, request.Address.City, request.Address.Country);
-                    var ownerAddress = new OwnerAddress(request.Owner.Address.Line1, request.Owner.Address.Line2, request.Owner.Address.Zipcode, request.Owner.Address.City, request.Owner.Address.Country);
-
-                    var business = await _context.GetByIdAsync<Business>(request.UserId, token);
-                    var legal = new BusinessLegal(Guid.NewGuid(),
-                        business,
-                        request.Kind,
-                        request.Email,
-                        legalAddress,
-                        new Owner(business.Id,
-                            request.Owner.FirstName,
-                            request.Owner.LastName,
-                            request.Owner.Email,
-                            request.Owner.BirthDate,
-                            ownerAddress,
-                            request.Owner.Nationality,
-                            request.Owner.CountryOfResidence
-                        ));
-
-                    await _context.AddAsync(legal, token);
-                    await _context.SaveChangesAsync(token);
-
-                    if (business.Kind == ProfileKind.Producer)
+                    var result = await _mediatr.Send(new CreateUboDeclarationCommand(request.RequestUser)
                     {
-                        var result = await _mediatr.Send(new CreateUboDeclarationCommand(request.RequestUser)
-                        {
-                            LegalId = legal.Id
-                        }, token);
+                        LegalId = legal.Id
+                    }, token);
 
-                        if (!result.Success)
-                        {
-                            await transaction.RollbackAsync(token);
-                            return Failed<Guid>(result.Exception);
-                        }
-
-                        var uboDeclaration = await _context.GetByIdAsync<UboDeclaration>(result.Data, token);
-                        legal.SetUboDeclaration(uboDeclaration);
-
-                        _context.Update(legal);
-                        await _context.SaveChangesAsync(token);
+                    if (!result.Success)
+                    {
+                        await transaction.RollbackAsync(token);
+                        return Failed<Guid>(result.Exception);
                     }
 
-                    await transaction.CommitAsync(token);
-                    return Ok(legal.Id);
+                    var uboDeclaration = await _context.GetByIdAsync<UboDeclaration>(result.Data, token);
+                    legal.SetUboDeclaration(uboDeclaration);
+
+                    _context.Update(legal);
+                    await _context.SaveChangesAsync(token);
                 }
+
+                await transaction.CommitAsync(token);
+                return Ok(legal.Id);
             });
         }
 
@@ -122,10 +120,10 @@ namespace Sheaft.Application.Handlers
         {
             return await ExecuteAsync(async () =>
             {
-                var legalAddress = new LegalAddress(request.Address.Line1, 
-                    request.Address.Line2, 
-                    request.Address.Zipcode, 
-                    request.Address.City, 
+                var legalAddress = new LegalAddress(request.Address.Line1,
+                    request.Address.Line2,
+                    request.Address.Zipcode,
+                    request.Address.City,
                     request.Address.Country);
 
                 var ownerAddress = new OwnerAddress(request.Address.Line1,

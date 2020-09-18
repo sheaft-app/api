@@ -22,29 +22,15 @@ namespace Sheaft.Application.Queries
 
         public IQueryable<UboDto> GetUbo(Guid id, RequestUser currentUser)
         {
-            try
-            {
-                return _context.Ubos
-                        .Get(c => c.Id == id)
-                        .ProjectTo<UboDto>(_configurationProvider);
-            }
-            catch (Exception e)
-            {
-                return new List<UboDto>().AsQueryable();
-            }
+            return _context.Ubos
+                    .Get(c => c.Id == id)
+                    .ProjectTo<UboDto>(_configurationProvider);
         }
 
         public IQueryable<UboDto> GetUbos(RequestUser currentUser)
         {
-            try
-            {
-                return _context.Ubos.Get(null)
-                        .ProjectTo<UboDto>(_configurationProvider);
-            }
-            catch (Exception e)
-            {
-                return new List<UboDto>().AsQueryable();
-            }
+            return _context.Ubos.Get(null)
+                    .ProjectTo<UboDto>(_configurationProvider);
         }
     }
 }

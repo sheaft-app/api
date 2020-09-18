@@ -19,5 +19,4 @@ namespace Sheaft.Application.Commands
         public OwnerInput Owner { get; set; }
         public AddressInput Address { get; set; }
     }
-
 }

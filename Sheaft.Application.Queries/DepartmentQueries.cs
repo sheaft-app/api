@@ -21,43 +21,22 @@ namespace Sheaft.Application.Queries
 
         public IQueryable<DepartmentDto> GetDepartment(Guid id, RequestUser currentUser)
         {
-            try
-            {
-                return _context.Departments
-                        .Where(d => d.Id == id)
-                        .ProjectTo<DepartmentDto>(_configurationProvider);
-            }
-            catch (Exception e)
-            {
-                return new List<DepartmentDto>().AsQueryable();
-            }
+            return _context.Departments
+                    .Where(d => d.Id == id)
+                    .ProjectTo<DepartmentDto>(_configurationProvider);
         }
 
         public IQueryable<DepartmentDto> GetDepartments(RequestUser currentUser)
         {
-            try
-            {
-                return _context.Departments
-                        .ProjectTo<DepartmentDto>(_configurationProvider);
-            }
-            catch (Exception e)
-            {
-                return new List<DepartmentDto>().AsQueryable();
-            }
+            return _context.Departments
+                    .ProjectTo<DepartmentDto>(_configurationProvider);
         }
 
         public IQueryable<DepartmentDto> GetRegionDepartments(Guid regionId, RequestUser currentUser)
         {
-            try
-            {
-                return _context.Departments
-                        .Where(d => d.Region.Id == regionId)
-                        .ProjectTo<DepartmentDto>(_configurationProvider);
-            }
-            catch (Exception e)
-            {
-                return new List<DepartmentDto>().AsQueryable();
-            }
+            return _context.Departments
+                    .Where(d => d.Region.Id == regionId)
+                    .ProjectTo<DepartmentDto>(_configurationProvider);
         }
     }
 }

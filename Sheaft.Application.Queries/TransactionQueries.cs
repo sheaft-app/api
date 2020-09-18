@@ -23,32 +23,18 @@ namespace Sheaft.Application.Queries
 
         public IQueryable<WebPayinTransactionDto> GetWebPayinTransaction(string identifier, RequestUser currentUser)
         {
-            try
-            {
-                return _context.Transactions
-                        .OfType<WebPayinTransaction>()
-                        .Get(c => c.Identifier == identifier && c.Author.Id == currentUser.Id)
-                        .ProjectTo<WebPayinTransactionDto>(_configurationProvider);
-            }
-            catch (Exception e)
-            {
-                return new List<WebPayinTransactionDto>().AsQueryable();
-            }
+            return _context.Transactions
+                    .OfType<WebPayinTransaction>()
+                    .Get(c => c.Identifier == identifier && c.Author.Id == currentUser.Id)
+                    .ProjectTo<WebPayinTransactionDto>(_configurationProvider);
         }
 
         public IQueryable<WebPayinTransactionDto> GetWebPayinTransaction(Guid id, RequestUser currentUser)
         {
-            try
-            {
-                return _context.Transactions
-                        .OfType<WebPayinTransaction>()
-                        .Get(c => c.Id == id && c.Author.Id == currentUser.Id)
-                        .ProjectTo<WebPayinTransactionDto>(_configurationProvider);
-            }
-            catch (Exception e)
-            {
-                return new List<WebPayinTransactionDto>().AsQueryable();
-            }
+            return _context.Transactions
+                    .OfType<WebPayinTransaction>()
+                    .Get(c => c.Id == id && c.Author.Id == currentUser.Id)
+                    .ProjectTo<WebPayinTransactionDto>(_configurationProvider);
         }
     }
 }

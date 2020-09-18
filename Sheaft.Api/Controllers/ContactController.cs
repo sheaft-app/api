@@ -5,7 +5,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Microsoft.Net.Http.Headers;
 using Sheaft.Application.Commands;
-using Sheaft.Core.Security;
 using Sheaft.Core;
 using Sheaft.Interop.Enums;
 using Sheaft.Models.Inputs;
@@ -34,9 +33,8 @@ namespace Sheaft.Api.Controllers
         [Consumes("application/x-www-form-urlencoded")]
         public async Task<IActionResult> RegisterNewsletter([FromForm] RegisterNewsletterInput model, CancellationToken token)
         {
-            var results = await _mediatr.Send(new CreateContactCommand(new RequestUser("contact-user", HttpContext.TraceIdentifier)) { FirstName = model.FirstName, Role = model.Role, Email = model.Email }, token);
             var origin = Request.Headers.FirstOrDefault(c => c.Key == HeaderNames.Origin).Value;
-
+            var results = await _mediatr.Send(new CreateContactCommand(new RequestUser("contact-user", HttpContext.TraceIdentifier)) { FirstName = model.FirstName, Role = model.Role, Email = model.Email }, token);
             if (!results.Success)
             {
                 if (results.Exception.Kind != ExceptionKind.Unexpected)

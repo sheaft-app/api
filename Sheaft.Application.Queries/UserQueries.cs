@@ -31,50 +31,29 @@ namespace Sheaft.Application.Queries
 
         public async Task<string> GetFreshdeskTokenAsync(RequestUser currentUser, CancellationToken token)
         {
-            try
-            {
-                var jwtToken = new JwtBuilder()
-                 .WithAlgorithm(new HMACSHA256Algorithm())
-                 .WithSecret(_freshdeskOptions.ApiKey)
-                 .AddClaim("exp", DateTimeOffset.UtcNow.AddHours(1).ToUnixTimeSeconds())
-                 .AddClaim("name", currentUser.Name)
-                 .AddClaim("email", currentUser.Email)
-                 .Encode();
+            var jwtToken = new JwtBuilder()
+             .WithAlgorithm(new HMACSHA256Algorithm())
+             .WithSecret(_freshdeskOptions.ApiKey)
+             .AddClaim("exp", DateTimeOffset.UtcNow.AddHours(1).ToUnixTimeSeconds())
+             .AddClaim("name", currentUser.Name)
+             .AddClaim("email", currentUser.Email)
+             .Encode();
 
-                return await Task.FromResult(jwtToken);
-            }
-            catch (Exception e)
-            {
-                return null;
-            }
+            return await Task.FromResult(jwtToken);
         }
 
         public IQueryable<UserDto> GetUser(RequestUser currentUser)
         {
-            try
-            {
-                return _context.Users.OfType<User>()
-                        .Get(c => c.Id == currentUser.Id)
-                        .ProjectTo<UserDto>(_configurationProvider);
-            }
-            catch (Exception e)
-            {
-                return new List<UserDto>().AsQueryable();
-            }
+            return _context.Users.OfType<User>()
+                    .Get(c => c.Id == currentUser.Id)
+                    .ProjectTo<UserDto>(_configurationProvider);
         }
 
         public IQueryable<UserProfileDto> GetUserProfile(RequestUser currentUser)
         {
-            try
-            {
-                return _context.Users.OfType<User>()
-                        .Get(c => c.Id == currentUser.Id)
-                        .ProjectTo<UserProfileDto>(_configurationProvider);
-            }
-            catch (Exception e)
-            {
-                return new List<UserProfileDto>().AsQueryable();
-            }
+            return _context.Users.OfType<User>()
+                    .Get(c => c.Id == currentUser.Id)
+                    .ProjectTo<UserProfileDto>(_configurationProvider);
         }
     }
 }

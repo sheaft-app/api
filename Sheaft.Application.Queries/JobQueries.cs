@@ -26,62 +26,34 @@ namespace Sheaft.Application.Queries
 
         public Task<bool> HasProductsImportsInProgressAsync(Guid producerId, RequestUser currentUser, CancellationToken token)
         {
-            try
-            {
-                return _context.AnyAsync<Job>(r =>
-                    !r.Archived &&
-                    r.Kind == JobKind.ImportProducts &&
-                    (r.Status == ProcessStatus.Paused || r.Status == ProcessStatus.Processing || r.Status == ProcessStatus.Waiting) &&
-                    r.User.Id == producerId, token);
-            }
-            catch (Exception e)
-            {
-                return Task.FromResult(false);
-            }
+            return _context.AnyAsync<Job>(r =>
+                !r.Archived &&
+                r.Kind == JobKind.ImportProducts &&
+                (r.Status == ProcessStatus.Paused || r.Status == ProcessStatus.Processing || r.Status == ProcessStatus.Waiting) &&
+                r.User.Id == producerId, token);
         }
 
         public Task<bool> HasPickingOrdersExportsInProgressAsync(Guid producerId, RequestUser currentUser, CancellationToken token)
         {
-            try
-            {
-                return _context.AnyAsync<Job>(r =>
-                    !r.Archived &&
-                    r.Kind == JobKind.CreatePickingFromOrders &&
-                    (r.Status == ProcessStatus.Paused || r.Status == ProcessStatus.Processing || r.Status == ProcessStatus.Waiting) &&                    
-                    r.User.Id == producerId, token);
-            }
-            catch (Exception e)
-            {
-                return Task.FromResult(false);
-            }
+            return _context.AnyAsync<Job>(r =>
+                !r.Archived &&
+                r.Kind == JobKind.CreatePickingFromOrders &&
+                (r.Status == ProcessStatus.Paused || r.Status == ProcessStatus.Processing || r.Status == ProcessStatus.Waiting) &&
+                r.User.Id == producerId, token);
         }
 
         public IQueryable<JobDto> GetJob(Guid jobId, RequestUser currentUser)
         {
-            try
-            {
-                return _context.Jobs
-                        .Get(c => c.Id == jobId && c.User.Id == currentUser.Id)
-                        .ProjectTo<JobDto>(_configurationProvider);
-            }
-            catch (Exception e)
-            {
-                return new List<JobDto>().AsQueryable();
-            }
+            return _context.Jobs
+                    .Get(c => c.Id == jobId && c.User.Id == currentUser.Id)
+                    .ProjectTo<JobDto>(_configurationProvider);
         }
 
         public IQueryable<JobDto> GetJobs(RequestUser currentUser)
         {
-            try
-            {
-                return _context.Jobs
-                        .Get(c => c.User.Id == currentUser.Id)
-                        .ProjectTo<JobDto>(_configurationProvider);
-            }
-            catch (Exception e)
-            {
-                return new List<JobDto>().AsQueryable();
-            }
+            return _context.Jobs
+                    .Get(c => c.User.Id == currentUser.Id)
+                    .ProjectTo<JobDto>(_configurationProvider);
         }
     }
 }

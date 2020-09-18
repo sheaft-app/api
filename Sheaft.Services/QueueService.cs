@@ -18,17 +18,14 @@ namespace Sheaft.Services
 {
     public class QueueService : IQueueService
     {
-        private readonly StorageOptions _storageOptions;
         private readonly ServiceBusOptions _serviceBusOptions;
         private readonly ILogger<QueueService> _logger;
 
         public QueueService(
-            IOptionsSnapshot<StorageOptions> storageOptions, 
-            IOptionsSnapshot<ServiceBusOptions> serviceBusOptions, 
+            IOptionsSnapshot<ServiceBusOptions> serviceBusOptions,
             ILogger<QueueService> logger)
         {
             _logger = logger;
-            _storageOptions = storageOptions.Value;
             _serviceBusOptions = serviceBusOptions.Value;
         }
 

@@ -47,7 +47,6 @@ namespace Sheaft.Infrastructure.Interop
         DbSet<DepartmentProducers> DepartmentProducers { get; set; }
         DbSet<DepartmentStores> DepartmentStores { get; set; }
 
-
         Task<T> GetByIdAsync<T>(Guid id, CancellationToken token) where T : class, IIdEntity, ITrackRemove;
         Task<T> FindByIdAsync<T>(Guid id, CancellationToken token) where T : class, IIdEntity, ITrackRemove;
         Task<T> GetSingleAsync<T>(Expression<Func<T, bool>> where, CancellationToken token) where T : class, ITrackRemove;
@@ -61,7 +60,7 @@ namespace Sheaft.Infrastructure.Interop
         Task EnsureNotExists<T>(Expression<Func<T, bool>> where, CancellationToken token) where T : class, IIdEntity, ITrackRemove;
 
         DatabaseFacade Database { get; }
-        ValueTask<EntityEntry<TEntity>> AddAsync<TEntity>([NotNullAttribute] TEntity entity, CancellationToken cancellationToken = default) where TEntity : class;        
+        ValueTask<EntityEntry<TEntity>> AddAsync<TEntity>([NotNullAttribute] TEntity entity, CancellationToken cancellationToken = default) where TEntity : class;
         Task AddRangeAsync([NotNullAttribute] IEnumerable<object> entities, CancellationToken cancellationToken = default);
         EntityEntry<TEntity> Remove<TEntity>([NotNullAttribute] TEntity entity) where TEntity : class;
         void RemoveRange([NotNullAttribute] IEnumerable<object> entities);
