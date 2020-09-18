@@ -114,10 +114,9 @@ namespace Sheaft.Domain.Models
 
         public decimal GetFees(decimal total, decimal fixedAmount, decimal percent)
         {
-            var increment = 0m;
-
-            var fees = CalculateFees(total + increment, percent) + fixedAmount;
+            var fees = CalculateFees(total, percent) + fixedAmount;
             var mangofees = CalculateFees(total + fees, percent) + fixedAmount;
+            var increment = fees;
 
             while (total + mangofees > total + fees)
             {
