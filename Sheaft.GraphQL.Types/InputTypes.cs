@@ -324,6 +324,9 @@ namespace Sheaft.GraphQL.Types
             descriptor.Field(c => c.Nationality);
             descriptor.Field(c => c.CountryOfResidence);
 
+            descriptor.Field(c => c.UserId)
+                .Type<NonNullType<IdType>>();
+
             descriptor.Field(c => c.Address)
                 .Type<NonNullType<AddressInputType>>();
         }

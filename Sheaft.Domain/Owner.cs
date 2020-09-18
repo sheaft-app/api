@@ -53,7 +53,7 @@ namespace Sheaft.Domain.Models
             if (string.IsNullOrWhiteSpace(lastName))
                 throw new ValidationException();
 
-            FirstName = lastName;
+            LastName = lastName;
         }
 
         public void SetBirthDate(DateTimeOffset birthdate)

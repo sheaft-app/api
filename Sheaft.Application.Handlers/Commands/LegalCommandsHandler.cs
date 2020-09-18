@@ -57,6 +57,7 @@ namespace Sheaft.Application.Handlers
                         ));
 
                     await _context.AddAsync(legal, token);
+                    await _context.SaveChangesAsync(token);
 
                     if (business.Kind == ProfileKind.Producer)
                     {
@@ -79,7 +80,6 @@ namespace Sheaft.Application.Handlers
                     }
 
                     await transaction.CommitAsync(token);
-
                     return Ok(legal.Id);
                 }
             });
@@ -111,7 +111,9 @@ namespace Sheaft.Application.Handlers
                         request.CountryOfResidence
                     ));
 
+                await _context.AddAsync(legal, token);
                 await _context.SaveChangesAsync(token);
+
                 return Ok(legal.Id);
             });
         }

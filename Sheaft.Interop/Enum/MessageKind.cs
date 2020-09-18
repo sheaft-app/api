@@ -253,5 +253,8 @@
         PsP_CannotAddUbo_Declaration_Not_Exists = 0x025037,
         PsP_CannotUpdateUbo_Declaration_Not_Exists = 0x025038,
         PsP_CannotUpdateUbo_Ubo_Not_Exists = 0x025039,
+        //resource 0x026000
+        Resource = 0x026000,
+        Resource_Already_Exists = 0x026001,
     }
 }

@@ -149,14 +149,14 @@ namespace Sheaft.Infrastructure
         {
             var result = await Set<T>().SingleOrDefaultAsync(c => !c.RemovedOn.HasValue && c.Id == id, token);
             if (result != null)
-                throw new ConflictException();
+                throw new BadRequestException(MessageKind.Resource_Already_Exists);
         }
 
         public async Task EnsureNotExists<T>(Expression<Func<T, bool>> where, CancellationToken token) where T : class, IIdEntity, ITrackRemove
         {
             var result = await Set<T>().Where(c => !c.RemovedOn.HasValue).Where(where).ToListAsync(token);
             if(result != null && result.Any())
-                throw new ConflictException();
+                throw new BadRequestException(MessageKind.Resource_Already_Exists);
         }
 
         public override int SaveChanges()
