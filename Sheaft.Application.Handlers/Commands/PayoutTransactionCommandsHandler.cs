@@ -19,15 +19,15 @@ namespace Sheaft.Application.Handlers
     {
         private readonly IAppDbContext _context;
         private readonly IPspService _pspService;
-        private readonly IMediator _mediatr;
+        private readonly IQueueService _queueService;
 
         public PayoutTransactionCommandsHandler(
             IAppDbContext context,
             IPspService pspService,
-            IMediator mediatr,
+            IQueueService queueService,
             ILogger<PayoutTransactionCommandsHandler> logger) : base(logger)
         {
-            _mediatr = mediatr;
+            _queueService = queueService;
             _context = context;
             _pspService = pspService;
         }
@@ -80,10 +80,10 @@ namespace Sheaft.Application.Handlers
                 switch (request.Kind)
                 {
                     case PspEventKind.PAYOUT_NORMAL_FAILED:
-                        await _mediatr.Publish(new PayoutFailedEvent(request.RequestUser) { TransactionId = transaction.Id }, token);
+                        await _queueService.ProcessEventAsync(PayoutFailedEvent.QUEUE_NAME, new PayoutFailedEvent(request.RequestUser) { TransactionId = transaction.Id }, token);
                         break;
                     case PspEventKind.PAYOUT_NORMAL_SUCCEEDED:
-                        await _mediatr.Publish(new PayoutSucceededEvent(request.RequestUser) { TransactionId = transaction.Id }, token);
+                        await _queueService.ProcessEventAsync(PayoutSucceededEvent.QUEUE_NAME, new PayoutSucceededEvent(request.RequestUser) { TransactionId = transaction.Id }, token);
                         break;
                 }
 

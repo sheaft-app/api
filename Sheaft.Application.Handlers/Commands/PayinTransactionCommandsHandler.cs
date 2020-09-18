@@ -20,15 +20,18 @@ namespace Sheaft.Application.Handlers
     {
         private readonly IAppDbContext _context;
         private readonly IPspService _pspService;
+        private readonly IQueueService _queueService;
         private readonly IMediator _mediatr;
 
         public PayinTransactionCommandsHandler(
             IAppDbContext context,
             IPspService pspService,
+            IQueueService queueService,
             IMediator mediatr,
             ILogger<PayinTransactionCommandsHandler> logger) : base(logger)
         {
             _mediatr = mediatr;
+            _queueService = queueService;
             _context = context;
             _pspService = pspService;
         }
@@ -68,7 +71,7 @@ namespace Sheaft.Application.Handlers
         {
             return await ExecuteAsync(async () =>
             {
-                var transaction = await _context.GetSingleAsync<Transaction>(c => c.Identifier == request.Identifier, token);
+                var transaction = await _context.GetSingleAsync<WebPayinTransaction>(c => c.Identifier == request.Identifier, token);
                 var pspResult = await _pspService.GetPayinAsync(transaction.Identifier, token);
                 if (!pspResult.Success)
                     return Failed<bool>(pspResult.Exception);
@@ -83,10 +86,14 @@ namespace Sheaft.Application.Handlers
                 switch (request.Kind)
                 {
                     case PspEventKind.PAYIN_NORMAL_FAILED:
-                        await _mediatr.Publish(new PayinFailedEvent(request.RequestUser) { TransactionId = transaction.Id }, token);
+                        await _queueService.ProcessEventAsync(PayinFailedEvent.QUEUE_NAME, new PayinFailedEvent(request.RequestUser) { TransactionId = transaction.Id }, token);
                         break;
                     case PspEventKind.PAYIN_NORMAL_SUCCEEDED:
-                        await _mediatr.Publish(new PayinSucceededEvent(request.RequestUser) { TransactionId = transaction.Id }, token);
+                        var result = await _mediatr.Send(new ConfirmOrderCommand(request.RequestUser) { Id = transaction.Order.Id }, token);
+                        if (!result.Success)
+                            return Failed<bool>(result.Exception);
+
+                        await _queueService.ProcessEventAsync(PayinSucceededEvent.QUEUE_NAME, new PayinSucceededEvent(request.RequestUser) { TransactionId = transaction.Id }, token);
                         break;
                 }
 
@@ -113,10 +120,10 @@ namespace Sheaft.Application.Handlers
                 switch (request.Kind)
                 {
                     case PspEventKind.PAYIN_REFUND_FAILED:
-                        await _mediatr.Publish(new RefundPayinFailedEvent(request.RequestUser) { TransactionId = transaction.Id }, token);
+                        await _queueService.ProcessEventAsync(RefundPayinFailedEvent.QUEUE_NAME, new RefundPayinFailedEvent(request.RequestUser) { TransactionId = transaction.Id }, token);
                         break;
                     case PspEventKind.PAYIN_REFUND_SUCCEEDED:
-                        await _mediatr.Publish(new RefundPayinSucceededEvent(request.RequestUser) { TransactionId = transaction.Id }, token);
+                        await _queueService.ProcessEventAsync(RefundPayinSucceededEvent.QUEUE_NAME, new RefundPayinSucceededEvent(request.RequestUser) { TransactionId = transaction.Id }, token);
                         break;
                 }
 

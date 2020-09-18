@@ -19,18 +19,19 @@ namespace Sheaft.Application.Handlers
     {
         private readonly IAppDbContext _context;
         private readonly IPspService _pspService;
-        private readonly IMediator _mediatr;
+        private readonly IQueueService _queueService;
 
         public TransferTransactionCommandsHandler(
             IAppDbContext context,
             IPspService pspService,
-            IMediator mediatr,
+            IQueueService queueService,
             ILogger<TransferTransactionCommandsHandler> logger) : base(logger)
         {
+            _queueService = queueService;
             _context = context;
             _pspService = pspService;
-            _mediatr = mediatr;
         }
+
         public async Task<Result<Guid>> Handle(CreateTransferTransactionCommand request, CancellationToken token)
         {
             return await ExecuteAsync(async () =>
@@ -81,10 +82,10 @@ namespace Sheaft.Application.Handlers
                 switch (request.Kind)
                 {
                     case PspEventKind.TRANSFER_NORMAL_FAILED:
-                        await _mediatr.Publish(new TransferFailedEvent(request.RequestUser) { TransactionId = transaction.Id }, token);
+                        await _queueService.ProcessEventAsync(TransferFailedEvent.QUEUE_NAME, new TransferFailedEvent(request.RequestUser) { TransactionId = transaction.Id }, token);
                         break;
                     case PspEventKind.TRANSFER_NORMAL_SUCCEEDED:
-                        await _mediatr.Publish(new TransferSucceededEvent(request.RequestUser) { TransactionId = transaction.Id }, token);
+                        await _queueService.ProcessEventAsync(TransferSucceededEvent.QUEUE_NAME, new TransferSucceededEvent(request.RequestUser) { TransactionId = transaction.Id }, token);
                         break;
                 }
 
@@ -111,10 +112,10 @@ namespace Sheaft.Application.Handlers
                 switch (request.Kind)
                 {
                     case PspEventKind.TRANSFER_REFUND_FAILED:
-                        await _mediatr.Publish(new RefundTransferFailedEvent(request.RequestUser) { TransactionId = transaction.Id }, token);
+                        await _queueService.ProcessEventAsync(RefundTransferFailedEvent.QUEUE_NAME, new RefundTransferFailedEvent(request.RequestUser) { TransactionId = transaction.Id }, token);
                         break;
                     case PspEventKind.TRANSFER_REFUND_SUCCEEDED:
-                        await _mediatr.Publish(new RefundTransferSucceededEvent(request.RequestUser) { TransactionId = transaction.Id }, token);
+                        await _queueService.ProcessEventAsync(RefundTransferSucceededEvent.QUEUE_NAME, new RefundTransferSucceededEvent(request.RequestUser) { TransactionId = transaction.Id }, token);
                         break;
                 }
 

@@ -8,7 +8,6 @@ using System.Threading.Tasks;
 using System.Threading;
 using Sheaft.Domain.Models;
 using Sheaft.Services.Interop;
-using System.Linq;
 using Sheaft.Interop.Enums;
 using Sheaft.Application.Events;
 
@@ -21,15 +20,15 @@ namespace Sheaft.Application.Handlers
     {
         private readonly IAppDbContext _context;
         private readonly IPspService _pspService;
-        private readonly IMediator _mediatr;
+        private readonly IQueueService _queueService;
 
         public DeclarationCommandsHandler(
             IAppDbContext context,
             IPspService pspService,
-            IMediator mediatr,
+            IQueueService queueService,
             ILogger<DeclarationCommandsHandler> logger) : base(logger)
         {
-            _mediatr = mediatr;
+            _queueService = queueService;
             _context = context;
             _pspService = pspService;
         }
@@ -95,13 +94,13 @@ namespace Sheaft.Application.Handlers
                 switch (request.Kind)
                 {
                     case PspEventKind.UBO_DECLARATION_INCOMPLETE:
-                        await _mediatr.Publish(new DeclarationIncompleteEvent(request.RequestUser) { DeclarationId = declaration.Id }, token);
+                        await _queueService.ProcessEventAsync(DeclarationIncompleteEvent.QUEUE_NAME, new DeclarationIncompleteEvent(request.RequestUser) { DeclarationId = declaration.Id }, token);
                         break;
                     case PspEventKind.UBO_DECLARATION_REFUSED:
-                        await _mediatr.Publish(new DeclarationRefusedEvent(request.RequestUser) { DeclarationId = declaration.Id }, token);
+                        await _queueService.ProcessEventAsync(DeclarationRefusedEvent.QUEUE_NAME, new DeclarationRefusedEvent(request.RequestUser) { DeclarationId = declaration.Id }, token);
                         break;
                     case PspEventKind.UBO_DECLARATION_VALIDATED:
-                        await _mediatr.Publish(new DeclarationValidatedEvent(request.RequestUser) { DeclarationId = declaration.Id }, token);
+                        await _queueService.ProcessEventAsync(DeclarationValidatedEvent.QUEUE_NAME, new DeclarationValidatedEvent(request.RequestUser) { DeclarationId = declaration.Id }, token);
                         break;
                 }
 

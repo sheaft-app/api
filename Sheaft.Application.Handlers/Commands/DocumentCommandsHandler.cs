@@ -24,17 +24,20 @@ namespace Sheaft.Application.Handlers
     {
         private readonly IAppDbContext _context;
         private readonly IPspService _pspService;
+        private readonly IQueueService _queueService;
         private readonly IMediator _mediatr;
 
         public DocumentCommandsHandler(
             IAppDbContext context,
             IPspService pspService,
+            IQueueService queueService,
             IMediator mediatr,
             ILogger<DocumentCommandsHandler> logger) : base(logger)
         {
+            _mediatr = mediatr;
+            _queueService = queueService;
             _context = context;
             _pspService = pspService;
-            _mediatr = mediatr;
         }
 
         public async Task<Result<Guid>> Handle(CreateDocumentCommand request, CancellationToken token)
@@ -176,13 +179,13 @@ namespace Sheaft.Application.Handlers
                 switch (request.Kind)
                 {
                     case PspEventKind.KYC_FAILED:
-                        await _mediatr.Publish(new DocumentFailedEvent(request.RequestUser) { DocumentId = document.Id }, token);
+                        await _queueService.ProcessEventAsync(DocumentFailedEvent.QUEUE_NAME, new DocumentFailedEvent(request.RequestUser) { DocumentId = document.Id }, token);
                         break;
                     case PspEventKind.KYC_OUTDATED:
-                        await _mediatr.Publish(new DocumentOutdatedEvent(request.RequestUser) { DocumentId = document.Id }, token);
+                        await _queueService.ProcessEventAsync(DocumentOutdatedEvent.QUEUE_NAME, new DocumentOutdatedEvent(request.RequestUser) { DocumentId = document.Id }, token);
                         break;
                     case PspEventKind.KYC_SUCCEEDED:
-                        await _mediatr.Publish(new DocumentSucceededEvent(request.RequestUser) { DocumentId = document.Id }, token);
+                        await _queueService.ProcessEventAsync(DocumentSucceededEvent.QUEUE_NAME, new DocumentSucceededEvent(request.RequestUser) { DocumentId = document.Id }, token);
                         break;
                 }
 
