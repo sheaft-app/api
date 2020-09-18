@@ -82,7 +82,7 @@ namespace Sheaft.Domain.Models
 
         public void RefreshFees(decimal fixedAmount, decimal percent)
         {
-            Fees = Math.Round(fixedAmount + percent * TotalWholeSalePrice, DIGITS_COUNT);
+            Fees = GetFees(TotalOnSalePrice, fixedAmount, percent);
         }
 
         public void SetDonation(decimal donation)
@@ -110,6 +110,28 @@ namespace Sheaft.Domain.Models
             TotalReturnableWholeSalePrice = Math.Round(_products.Sum(p => p.ReturnablesCount > 0 ? p.TotalReturnableWholeSalePrice.Value : 0), DIGITS_COUNT);
             TotalReturnableVatPrice = Math.Round(_products.Sum(p => p.ReturnablesCount > 0 ? p.TotalReturnableVatPrice.Value : 0), DIGITS_COUNT);
             TotalReturnableOnSalePrice = Math.Round(_products.Sum(p => p.ReturnablesCount > 0 ? p.TotalReturnableOnSalePrice.Value : 0), DIGITS_COUNT);
+        }
+
+        public decimal GetFees(decimal total, decimal fixedAmount, decimal percent)
+        {
+            var increment = 0m;
+
+            var fees = CalculateFees(total + increment, percent) + fixedAmount;
+            var mangofees = CalculateFees(total + fees, percent) + fixedAmount;
+
+            while (total + mangofees > total + fees)
+            {
+                increment += 0.01m;
+                fees = CalculateFees(total + increment, percent) + fixedAmount;
+                mangofees = CalculateFees(total + fees, percent) + fixedAmount;
+            }
+
+            return Math.Round(fees, 2);
+        }
+
+        public decimal CalculateFees(decimal total, decimal percent)
+        {
+            return percent * total;
         }
     }
 }
