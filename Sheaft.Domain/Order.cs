@@ -80,7 +80,7 @@ namespace Sheaft.Domain.Models
             }
         }
 
-        public void RefreshFees(int fixedAmount, decimal percent)
+        public void RefreshFees(decimal fixedAmount, decimal percent)
         {
             Fees = Math.Round(fixedAmount + percent * TotalWholeSalePrice, DIGITS_COUNT);
         }
