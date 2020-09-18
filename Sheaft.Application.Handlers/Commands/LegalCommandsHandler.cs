@@ -7,7 +7,6 @@ using Microsoft.Extensions.Logging;
 using System.Threading.Tasks;
 using System.Threading;
 using Sheaft.Domain.Models;
-using Sheaft.Interop.Enums;
 using Sheaft.Services.Interop;
 
 namespace Sheaft.Application.Handlers
@@ -38,74 +37,28 @@ namespace Sheaft.Application.Handlers
             return await ExecuteAsync(async () =>
             {
                 var business = await _context.GetByIdAsync<Business>(request.UserId, token);
-                var legal = await _context.FindSingleAsync<BusinessLegal>(c => c.Business.Id == business.Id, token);
+                await _context.EnsureNotExists<BusinessLegal>(c => c.Business.Id == business.Id, token);
 
-                if (legal == null)
-                {
-                    var legalAddress = new LegalAddress(request.Address.Line1, request.Address.Line2, request.Address.Zipcode, request.Address.City, request.Address.Country);
-                    var ownerAddress = new OwnerAddress(request.Owner.Address.Line1, request.Owner.Address.Line2, request.Owner.Address.Zipcode, request.Owner.Address.City, request.Owner.Address.Country);
+                var legalAddress = new LegalAddress(request.Address.Line1, request.Address.Line2, request.Address.Zipcode, request.Address.City, request.Address.Country);
+                var ownerAddress = new OwnerAddress(request.Owner.Address.Line1, request.Owner.Address.Line2, request.Owner.Address.Zipcode, request.Owner.Address.City, request.Owner.Address.Country);
 
-                    legal = new BusinessLegal(Guid.NewGuid(),
-                        business,
-                        request.Kind,
-                        request.Email,
-                        legalAddress,
-                        new Owner(business.Id,
-                            request.Owner.FirstName,
-                            request.Owner.LastName,
-                            request.Owner.Email,
-                            request.Owner.BirthDate,
-                            ownerAddress,
-                            request.Owner.Nationality,
-                            request.Owner.CountryOfResidence
-                        ));
+                var legal = new BusinessLegal(Guid.NewGuid(),
+                    business,
+                    request.Kind,
+                    request.Email,
+                    legalAddress,
+                    new Owner(business.Id,
+                        request.Owner.FirstName,
+                        request.Owner.LastName,
+                        request.Owner.Email,
+                        request.Owner.BirthDate,
+                        ownerAddress,
+                        request.Owner.Nationality,
+                        request.Owner.CountryOfResidence
+                    ));
 
-                    await _context.AddAsync(legal, token);
-                    await _context.SaveChangesAsync(token);
-                }
-
-                if (string.IsNullOrWhiteSpace(legal.Business.Identifier))
-                {
-                    var userResult = await _pspService.CreateBusinessAsync(legal, token);
-                    if (!userResult.Success)
-                        return Failed<Guid>(userResult.Exception);
-
-                    business.SetIdentifier(userResult.Data);
-                    _context.Update(business);
-
-                    await _context.SaveChangesAsync(token);
-                }
-
-                var wallet = await _context.FindSingleAsync<Wallet>(c => c.User.Id == business.Id && c.Kind == WalletKind.Payments, token);
-                if (wallet == null)
-                {
-                    var walletResult = await _mediatr.Send(new CreateWalletCommand(request.RequestUser)
-                    {
-                        Name = "Paiement",
-                        Kind = WalletKind.Payments,
-                        UserId = business.Id
-                    }, token);
-
-                    if (!walletResult.Success)
-                        return Failed<Guid>(walletResult.Exception);
-                }
-
-                if (business.Kind == ProfileKind.Producer)
-                {
-                    var result = await _mediatr.Send(new CreateDeclarationCommand(request.RequestUser)
-                    {
-                        LegalId = legal.Id
-                    }, token);
-
-                    if (!result.Success)
-                        return Failed<Guid>(result.Exception);
-
-                    var uboDeclaration = await _context.GetByIdAsync<UboDeclaration>(result.Data, token);
-                    legal.SetUboDeclaration(uboDeclaration);
-
-                    _context.Update(legal);
-                    await _context.SaveChangesAsync(token);
-                }
+                await _context.AddAsync(legal, token);
+                await _context.SaveChangesAsync(token);
 
                 return Ok(legal.Id);
             });
@@ -116,58 +69,30 @@ namespace Sheaft.Application.Handlers
             return await ExecuteAsync(async () =>
             {
                 var consumer = await _context.GetByIdAsync<Consumer>(request.UserId, token);
-                var legal = await _context.FindSingleAsync<ConsumerLegal>(c => c.Consumer.Id == consumer.Id, token);
+                await _context.EnsureNotExists<ConsumerLegal>(c => c.Consumer.Id == consumer.Id, token);
 
-                if (legal == null)
-                {
-                    var ownerAddress = new OwnerAddress(request.Address.Line1,
-                        request.Address.Line2,
-                        request.Address.Zipcode,
-                        request.Address.City,
-                        request.Address.Country
-                    );
 
-                    legal = new ConsumerLegal(Guid.NewGuid(),
-                        consumer,
-                        new Owner(consumer.Id,
-                            request.FirstName,
-                            request.LastName,
-                            request.Email,
-                            request.BirthDate,
-                            ownerAddress,
-                            request.Nationality,
-                            request.CountryOfResidence
-                        ));
+                var ownerAddress = new OwnerAddress(request.Address.Line1,
+                    request.Address.Line2,
+                    request.Address.Zipcode,
+                    request.Address.City,
+                    request.Address.Country
+                );
 
-                    await _context.AddAsync(legal, token);
-                    await _context.SaveChangesAsync(token);
-                }
+                var legal = new ConsumerLegal(Guid.NewGuid(),
+                    consumer,
+                    new Owner(consumer.Id,
+                        request.FirstName,
+                        request.LastName,
+                        request.Email,
+                        request.BirthDate,
+                        ownerAddress,
+                        request.Nationality,
+                        request.CountryOfResidence
+                    ));
 
-                if (string.IsNullOrWhiteSpace(legal.Consumer.Identifier))
-                {
-                    var userResult = await _pspService.CreateConsumerAsync(legal, token);
-                    if (!userResult.Success)
-                        return Failed<Guid>(userResult.Exception);
-
-                    consumer.SetIdentifier(userResult.Data);
-                    _context.Update(consumer);
-
-                    await _context.SaveChangesAsync(token);
-                }
-
-                var wallet = await _context.FindSingleAsync<Wallet>(c => c.User.Id == consumer.Id && c.Kind == WalletKind.Payments, token);
-                if (wallet == null)
-                {
-                    var walletResult = await _mediatr.Send(new CreateWalletCommand(request.RequestUser)
-                    {
-                        Name = "Paiement",
-                        Kind = WalletKind.Payments,
-                        UserId = consumer.Id
-                    }, token);
-
-                    if (!walletResult.Success)
-                        return Failed<Guid>(walletResult.Exception);
-                }
+                await _context.AddAsync(legal, token);
+                await _context.SaveChangesAsync(token);
 
                 return Ok(legal.Id);
             });
@@ -204,9 +129,9 @@ namespace Sheaft.Application.Handlers
                 legal.Owner.SetCountryOfResidence(request.Owner.CountryOfResidence);
                 legal.Owner.SetAddress(ownerAddress);
 
-            //TODO update PSP Data
+                //TODO update PSP Data
 
-            return Ok(await _context.SaveChangesAsync(token) > 0);
+                return Ok(await _context.SaveChangesAsync(token) > 0);
             });
         }
 
@@ -231,9 +156,9 @@ namespace Sheaft.Application.Handlers
                 legal.Owner.SetCountryOfResidence(request.CountryOfResidence);
                 legal.Owner.SetAddress(ownerAddress);
 
-            //TODO update PSP Data
+                //TODO update PSP Data
 
-            return Ok(await _context.SaveChangesAsync(token) > 0);
+                return Ok(await _context.SaveChangesAsync(token) > 0);
             });
         }
     }

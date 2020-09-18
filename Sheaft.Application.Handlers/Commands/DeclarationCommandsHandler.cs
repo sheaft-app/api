@@ -39,9 +39,13 @@ namespace Sheaft.Application.Handlers
             {
                 var uboDeclaration = new UboDeclaration(Guid.NewGuid());
                 await _context.AddAsync(uboDeclaration);
-                await _context.SaveChangesAsync(token);
 
                 var legal = await _context.GetByIdAsync<BusinessLegal>(request.LegalId, token);
+                legal.SetUboDeclaration(uboDeclaration);
+
+                _context.Update(legal);
+                await _context.SaveChangesAsync(token);
+
                 var result = await _pspService.CreateUboDeclarationAsync(uboDeclaration, legal.Business, token);
                 if (!result.Success)
                     return Failed<Guid>(result.Exception);

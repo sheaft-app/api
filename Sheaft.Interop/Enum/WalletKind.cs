@@ -3,6 +3,7 @@
     public enum WalletKind
     {
         Payments,
-        Returnable
+        Returnable,
+        Refunds
     }
 }

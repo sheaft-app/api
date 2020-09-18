@@ -177,6 +177,10 @@ namespace Sheaft.Application.Handlers
         {
             return await ExecuteAsync(async () =>
             {
+                var checkResult = await _mediatr.Send(new EnsureConsumerConfiguredCommand(request.RequestUser) { Id = request.RequestUser.Id }, token);
+                if (!checkResult.Success)
+                    return Failed<Guid>(checkResult.Exception);
+
                 using (var transaction = await _context.Database.BeginTransactionAsync(token))
                 {
                     var order = await _context.GetByIdAsync<Order>(request.Id, token);
