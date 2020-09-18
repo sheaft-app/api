@@ -22,6 +22,6 @@ namespace Sheaft.Models.Dto
         public int ProductsCount { get; set; }
         public decimal Donation { get; set; }
         public decimal Fees { get; set; }
-        public virtual UserDto User { get; set; }
+        public virtual UserProfileDto User { get; set; }
     }
 }

@@ -27,11 +27,8 @@ namespace Sheaft.Mappers
             CreateMap<BirthAddress, AddressDto>();
             CreateMap<BirthAddress, AddressViewModel>();
 
-            CreateMap<UserAddress, AddressDto>()
-                .ForMember(c => c.Zipcode, opt => opt.MapFrom(e => e.Zipcode == null ? e.Department.Code : e.Zipcode));
-
-            CreateMap<UserAddress, AddressViewModel>()
-                .ForMember(c => c.Zipcode, opt => opt.MapFrom(e => e.Zipcode == null ? e.Department.Code : e.Zipcode));
+            CreateMap<UserAddress, AddressDto>();
+            CreateMap<UserAddress, AddressViewModel>();
 
             CreateMap<AddressDto, AddressInput>();
             CreateMap<AddressInput, AddressDto>();

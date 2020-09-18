@@ -4,6 +4,7 @@ using Sheaft.Domain.Models;
 using Sheaft.Models.Dto;
 using Sheaft.Models.Inputs;
 using Sheaft.Models.ViewModels;
+using System;
 
 namespace Sheaft.Mappers
 {
@@ -12,7 +13,7 @@ namespace Sheaft.Mappers
         public UserProfile()
         {
             CreateMap<User, UserViewModel>()
-                .ForMember(c => c.DepartmentId, opt => opt.MapFrom(d => d.Address.Department.Id));
+                .ForMember(c => c.DepartmentId, opt => opt.MapFrom(d => d.Address != null ? d.Address.Department.Id : (Guid?)null));
 
             CreateMap<User, UserProfileDto>();
 
