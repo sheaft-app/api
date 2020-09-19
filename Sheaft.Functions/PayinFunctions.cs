@@ -1,4 +1,5 @@
-﻿using System.Threading;
+﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
 using Microsoft.Azure.WebJobs;
@@ -6,6 +7,7 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Sheaft.Application.Commands;
 using Sheaft.Application.Events;
+using Sheaft.Core;
 using Sheaft.Logging;
 
 namespace Sheaft.Functions
@@ -34,6 +36,38 @@ namespace Sheaft.Functions
         public async Task SetRefundPayinStatusCommandAsync([ServiceBusTrigger(SetRefundPayinStatusCommand.QUEUE_NAME, Connection = "AzureWebJobsServiceBus")] string message, ILogger logger, CancellationToken token)
         {
             var command = JsonConvert.DeserializeObject<SetRefundPayinStatusCommand>(message);
+            var results = await _mediatr.Send(command, token);
+            logger.LogCommand(results);
+
+            if (!results.Success)
+                throw results.Exception;
+        }
+
+        [FunctionName("CheckPayinTransactionsCommand")]
+        public async Task CheckPayinTransactionsCommandAsync([TimerTrigger("0 */10 * * * *", RunOnStartup = false)] TimerInfo info, ILogger logger, CancellationToken token)
+        {
+            var results = await _mediatr.Send(new CheckPayinTransactionsCommand(new RequestUser("payin-functions", Guid.NewGuid().ToString("N"))), token);
+            if (!results.Success)
+                throw results.Exception;
+
+            logger.LogInformation(nameof(CheckPayinTransactionsCommandAsync), "successfully executed");
+        }
+
+        [FunctionName("CheckWaitingPayinTransactionCommand")]
+        public async Task CheckWaitingPayinTransactionCommandAsync([ServiceBusTrigger(CheckWaitingPayinTransactionCommand.QUEUE_NAME, Connection = "AzureWebJobsServiceBus")] string message, ILogger logger, CancellationToken token)
+        {
+            var command = JsonConvert.DeserializeObject<CheckWaitingPayinTransactionCommand>(message);
+            var results = await _mediatr.Send(command, token);
+            logger.LogCommand(results);
+
+            if (!results.Success)
+                throw results.Exception;
+        }
+
+        [FunctionName("CheckCreatedPayinTransactionCommand")]
+        public async Task CheckCreatedPayinTransactionCommandAsync([ServiceBusTrigger(CheckCreatedPayinTransactionCommand.QUEUE_NAME, Connection = "AzureWebJobsServiceBus")] string message, ILogger logger, CancellationToken token)
+        {
+            var command = JsonConvert.DeserializeObject<CheckCreatedPayinTransactionCommand>(message);
             var results = await _mediatr.Send(command, token);
             logger.LogCommand(results);
 
