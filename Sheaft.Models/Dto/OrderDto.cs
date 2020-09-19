@@ -9,7 +9,7 @@ namespace Sheaft.Models.Dto
         public DateTimeOffset CreatedOn { get; set; }
         public DateTimeOffset? UpdatedOn { get; set; }
         public DateTimeOffset? RemovedOn { get; set; }
-        public OrderStatusKind Status { get; set; }
+        public OrderStatus Status { get; set; }
         public decimal TotalWholeSalePrice { get; set; }
         public decimal TotalVatPrice { get; set; }
         public decimal TotalOnSalePrice { get; set; }

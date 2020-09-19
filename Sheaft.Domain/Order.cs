@@ -24,7 +24,7 @@ namespace Sheaft.Domain.Models
 
             _products = new List<OrderProduct>();
             _deliveries = new List<OrderDelivery>();
-            Status = OrderStatusKind.Created;
+            Status = OrderStatus.Created;
 
             SetProducts(orderProducts);
             SetDeliveries(orderDeliveries);
@@ -34,7 +34,7 @@ namespace Sheaft.Domain.Models
         public DateTimeOffset CreatedOn { get; private set; }
         public DateTimeOffset? UpdatedOn { get; private set; }
         public DateTimeOffset? RemovedOn { get; private set; }
-        public OrderStatusKind Status { get; private set; }
+        public OrderStatus Status { get; private set; }
         public decimal TotalWholeSalePrice { get; private set; }
         public decimal TotalVatPrice { get; private set; }
         public decimal TotalOnSalePrice { get; private set; }
@@ -51,7 +51,7 @@ namespace Sheaft.Domain.Models
         public virtual IReadOnlyCollection<OrderProduct> Products => _products?.AsReadOnly();
         public virtual IReadOnlyCollection<OrderDelivery> Deliveries => _deliveries?.AsReadOnly();
 
-        public void SetStatus(OrderStatusKind status)
+        public void SetStatus(OrderStatus status)
         {
             Status = status;
         }

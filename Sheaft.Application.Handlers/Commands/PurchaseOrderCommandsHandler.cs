@@ -65,7 +65,7 @@ namespace Sheaft.Application.Handlers
                 if (!result.Success)
                     return Failed<Guid>(result.Exception);
 
-                var entity = new PurchaseOrder(Guid.NewGuid(), result.Data, PurchaseOrderStatusKind.Waiting, producer, order);
+                var entity = new PurchaseOrder(Guid.NewGuid(), result.Data, PurchaseOrderStatus.Waiting, producer, order);
                 await _context.SaveChangesAsync(token);
 
                 if (!request.SkipSendEmail)

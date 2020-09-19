@@ -184,7 +184,7 @@ namespace Sheaft.Application.Handlers
                 using (var transaction = await _context.Database.BeginTransactionAsync(token))
                 {
                     var order = await _context.GetByIdAsync<Order>(request.Id, token);
-                    order.SetStatus(OrderStatusKind.Waiting);
+                    order.SetStatus(OrderStatus.Waiting);
 
                     _context.Update(order);
                     await _context.SaveChangesAsync(token);
@@ -211,7 +211,7 @@ namespace Sheaft.Application.Handlers
                     var order = await _context.GetByIdAsync<Order>(request.Id, token);
                     var orderIds = new List<Guid>();
 
-                    order.SetStatus(OrderStatusKind.Validated);
+                    order.SetStatus(OrderStatus.Validated);
 
                     var producerIds = order.Products.Select(p => p.Producer.Id).Distinct();
                     foreach(var producerId in producerIds)

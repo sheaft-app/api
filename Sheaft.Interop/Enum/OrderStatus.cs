@@ -1,12 +1,12 @@
 ﻿namespace Sheaft.Interop.Enums
 {
-    public enum OrderStatusKind
+    public enum OrderStatus
     {
         Created,
         Waiting,
         Validated,
         Refused,
-        Cancelled,
         Expired,
+        Archived,
     }
 }

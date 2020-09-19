@@ -4,30 +4,30 @@ using System;
 
 namespace Sheaft.GraphQL.Enums
 {
-    public class OrderStatusEnumType : EnumType<OrderStatusKind>
+    public class OrderStatusEnumType : EnumType<OrderStatus>
     {
-        protected override void Configure(IEnumTypeDescriptor<OrderStatusKind> descriptor)
+        protected override void Configure(IEnumTypeDescriptor<OrderStatus> descriptor)
         {
-            descriptor.Value(OrderStatusKind.Created).Name("CREATED");
-            descriptor.Value(OrderStatusKind.Waiting).Name("WAITING");
-            descriptor.Value(OrderStatusKind.Validated).Name("VALIDATED");
-            descriptor.Value(OrderStatusKind.Refused).Name("REFUSED");
-            descriptor.Value(OrderStatusKind.Cancelled).Name("CANCELLED");
-            descriptor.Value(OrderStatusKind.Expired).Name("EXPIRED");
+            descriptor.Value(OrderStatus.Created).Name("CREATED");
+            descriptor.Value(OrderStatus.Waiting).Name("WAITING");
+            descriptor.Value(OrderStatus.Validated).Name("VALIDATED");
+            descriptor.Value(OrderStatus.Refused).Name("REFUSED");
+            descriptor.Value(OrderStatus.Cancelled).Name("CANCELLED");
+            descriptor.Value(OrderStatus.Expired).Name("EXPIRED");
         }
     }
-    public class PurchaseOrderStatusEnumType : EnumType<PurchaseOrderStatusKind>
+    public class PurchaseOrderStatusEnumType : EnumType<PurchaseOrderStatus>
     {
-        protected override void Configure(IEnumTypeDescriptor<PurchaseOrderStatusKind> descriptor)
+        protected override void Configure(IEnumTypeDescriptor<PurchaseOrderStatus> descriptor)
         {
-            descriptor.Value(PurchaseOrderStatusKind.Accepted).Name("ACCEPTED");
-            descriptor.Value(PurchaseOrderStatusKind.Cancelled).Name("CANCELLED");
-            descriptor.Value(PurchaseOrderStatusKind.Completed).Name("COMPLETED");
-            descriptor.Value(PurchaseOrderStatusKind.Delivered).Name("DELIVERED");
-            descriptor.Value(PurchaseOrderStatusKind.Processing).Name("PROCESSING");
-            descriptor.Value(PurchaseOrderStatusKind.Refused).Name("REFUSED");
-            descriptor.Value(PurchaseOrderStatusKind.Shipping).Name("SHIPPING");
-            descriptor.Value(PurchaseOrderStatusKind.Waiting).Name("WAITING");
+            descriptor.Value(PurchaseOrderStatus.Accepted).Name("ACCEPTED");
+            descriptor.Value(PurchaseOrderStatus.Cancelled).Name("CANCELLED");
+            descriptor.Value(PurchaseOrderStatus.Completed).Name("COMPLETED");
+            descriptor.Value(PurchaseOrderStatus.Delivered).Name("DELIVERED");
+            descriptor.Value(PurchaseOrderStatus.Processing).Name("PROCESSING");
+            descriptor.Value(PurchaseOrderStatus.Refused).Name("REFUSED");
+            descriptor.Value(PurchaseOrderStatus.Shipping).Name("SHIPPING");
+            descriptor.Value(PurchaseOrderStatus.Waiting).Name("WAITING");
         }
     }
     public class AddressKindEnumType : EnumType<AddressKind>

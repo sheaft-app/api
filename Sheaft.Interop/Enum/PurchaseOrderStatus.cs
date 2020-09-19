@@ -1,6 +1,6 @@
 namespace Sheaft.Interop.Enums
 {
-    public enum PurchaseOrderStatusKind
+    public enum PurchaseOrderStatus
     {
         Waiting = 1,
         Accepted,
