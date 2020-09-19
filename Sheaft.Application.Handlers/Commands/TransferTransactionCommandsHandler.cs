@@ -26,23 +26,30 @@ namespace Sheaft.Application.Handlers
     {
         private readonly IAppDbContext _context;
         private readonly IPspService _pspService;
+        private readonly IMediator _mediatr;
         private readonly IQueueService _queueService;
 
         public TransferTransactionCommandsHandler(
             IAppDbContext context,
             IPspService pspService,
+            IMediator mediatr,
             IQueueService queueService,
             ILogger<TransferTransactionCommandsHandler> logger) : base(logger)
         {
             _queueService = queueService;
             _context = context;
             _pspService = pspService;
+            _mediatr = mediatr;
         }
 
         public async Task<Result<Guid>> Handle(CreateTransferTransactionCommand request, CancellationToken token)
         {
             return await ExecuteAsync(async () =>
             {
+                var checkResult = await _mediatr.Send(new EnsureProducerConfiguredCommand(request.RequestUser) { Id = request.ToUserId }, token);
+                if (!checkResult.Success)
+                    return Failed<Guid>(checkResult.Exception);
+
                 var debitedWallet = await _context.GetSingleAsync<Wallet>(c => c.User.Id == request.FromUserId, token);
                 var creditedWallet = await _context.GetSingleAsync<Wallet>(c => c.User.Id == request.ToUserId, token);
                 var purchaseOrder = await _context.GetByIdAsync<PurchaseOrder>(request.PurchaseOrderId, token);
