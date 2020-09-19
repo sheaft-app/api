@@ -16,6 +16,16 @@ namespace Sheaft.GraphQL.Enums
             descriptor.Value(OrderStatus.Expired).Name("EXPIRED");
         }
     }
+    public class DonationKindEnumType : EnumType<DonationKind>
+    {
+        protected override void Configure(IEnumTypeDescriptor<DonationKind> descriptor)
+        {
+            descriptor.Value(DonationKind.None).Name("NONE");
+            descriptor.Value(DonationKind.Euro).Name("EURO");
+            descriptor.Value(DonationKind.Rounded).Name("ROUNDED");
+            descriptor.Value(DonationKind.Free).Name("FREE");
+        }
+    }
     public class PurchaseOrderStatusEnumType : EnumType<PurchaseOrderStatus>
     {
         protected override void Configure(IEnumTypeDescriptor<PurchaseOrderStatus> descriptor)

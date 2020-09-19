@@ -86,6 +86,7 @@ namespace Sheaft.Functions
             builder.Services.AddScoped<ISignalrService, SignalrService>();
             builder.Services.AddScoped<IImageService, ImageService>();
             builder.Services.AddScoped<IPspService, PspService>();
+            builder.Services.AddScoped<IFeesService, FeesService>();
 
             builder.Services.AddScoped<IDapperContext, DapperContext>();
 

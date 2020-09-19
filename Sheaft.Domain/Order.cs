@@ -83,14 +83,30 @@ namespace Sheaft.Domain.Models
             }
         }
 
-        public void RefreshFees(decimal fixedAmount, decimal percent)
+        private void RefreshFees(decimal fixedAmount, decimal percent)
         {
-            Fees = GetFees(TotalOnSalePrice, fixedAmount, percent);
+            Fees = GetFees(TotalOnSalePrice + Donation, fixedAmount, percent);
         }
 
-        public void SetDonation(decimal donation)
+        public void SetDonation(DonationKind kind, decimal fixedAmount, decimal percent)
         {
-            Donation = donation;
+            switch (kind)
+            {
+                case DonationKind.Rounded:
+                    Donation = 0;
+                    RefreshFees(fixedAmount, percent);
+                    Donation = TotalOnSalePrice + Fees;
+                    Donation = Math.Ceiling(Donation) - Donation;
+                    //adjust fees
+                    break;
+                case DonationKind.Euro:
+                    Donation = 1;
+                    RefreshFees(fixedAmount, percent);
+                    break;
+                default:
+                    Donation = 0;
+                    break;
+            }
         }
 
         public void SetFees(decimal fees)

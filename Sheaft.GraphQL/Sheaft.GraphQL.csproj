@@ -22,5 +22,6 @@
     <ProjectReference Include="..\Sheaft.GraphQL.Sorts\Sheaft.GraphQL.Sorts.csproj" />
     <ProjectReference Include="..\Sheaft.GraphQL.Types\Sheaft.GraphQL.Types.csproj" />
     <ProjectReference Include="..\Sheaft.Localization\Sheaft.Localization.csproj" />
+    <ProjectReference Include="..\Sheaft.Services\Sheaft.Services.csproj" />
   </ItemGroup>
 </Project>

@@ -66,8 +66,8 @@ namespace Sheaft.Application.Handlers
 
                 var user = await _context.GetByIdAsync<User>(request.RequestUser.Id, token);
                 var order = new Order(Guid.NewGuid(), user, cartProducts, cartDeliveries);
-                order.SetDonation(request.Donation);
-                order.RefreshFees(_pspOptions.FixedAmount, _pspOptions.Percent);
+
+                order.SetDonation(request.Donation, _pspOptions.FixedAmount, _pspOptions.Percent);
 
                 await _context.AddAsync(order, token);
                 await _context.SaveChangesAsync(token);
@@ -164,8 +164,8 @@ namespace Sheaft.Application.Handlers
 
                 entity.SetProducts(cartProducts);
                 entity.SetDeliveries(cartDeliveries);
-                entity.SetDonation(request.Donation);
-                entity.RefreshFees(_pspOptions.FixedAmount, _pspOptions.Percent);
+
+                entity.SetDonation(request.Donation, _pspOptions.FixedAmount, _pspOptions.Percent);
 
                 _context.Update(entity);
 
