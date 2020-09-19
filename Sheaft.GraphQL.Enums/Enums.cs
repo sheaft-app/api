@@ -12,7 +12,7 @@ namespace Sheaft.GraphQL.Enums
             descriptor.Value(OrderStatus.Waiting).Name("WAITING");
             descriptor.Value(OrderStatus.Validated).Name("VALIDATED");
             descriptor.Value(OrderStatus.Refused).Name("REFUSED");
-            descriptor.Value(OrderStatus.Cancelled).Name("CANCELLED");
+            descriptor.Value(OrderStatus.Archived).Name("ARCHIVED");
             descriptor.Value(OrderStatus.Expired).Name("EXPIRED");
         }
     }
@@ -118,7 +118,7 @@ namespace Sheaft.GraphQL.Enums
         protected override void Configure(IEnumTypeDescriptor<WalletKind> descriptor)
         {
             descriptor.Value(WalletKind.Payments).Name("PAYMENTS");
-            descriptor.Value(WalletKind.Returnable).Name("RETURNABLE");
+            descriptor.Value(WalletKind.Returnables).Name("RETURNABLE");
         }
     }
     public class JobKindEnumType : EnumType<JobKind>

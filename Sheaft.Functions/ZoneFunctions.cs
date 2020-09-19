@@ -7,9 +7,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Sheaft.Application.Commands;
-using Sheaft.Application.Events;
 using Sheaft.Core;
-using Sheaft.Core.Security;
 using Sheaft.Logging;
 
 namespace Sheaft.Functions
@@ -32,7 +30,7 @@ namespace Sheaft.Functions
             if (!results.Success)
                 throw results.Exception;
 
-            logger.LogInformation(nameof(ZoneFunctions.UpdateZoneProgressCommandAsync), "successfully executed");
+            logger.LogInformation(nameof(UpdateZoneProgressCommandAsync), "successfully executed");
         }
 
         [FunctionName("GenerateZonesFileCommand")]
@@ -42,7 +40,7 @@ namespace Sheaft.Functions
             if (!results.Success)
                 throw results.Exception;
 
-            logger.LogInformation(nameof(ZoneFunctions.GenerateZonesFileCommandAsync), "successfully executed");
+            logger.LogInformation(nameof(GenerateZonesFileCommandAsync), "successfully executed");
         }
 
         [FunctionName("UpdateDepartmentCommand")]
@@ -54,6 +52,8 @@ namespace Sheaft.Functions
 
             if (!results.Success)
                 throw results.Exception;
+
+            logger.LogInformation(nameof(UpdateDepartmentCommandAsync), "successfully executed");
         }
 
         [FunctionName("UpdateRegionCommand")]
@@ -66,7 +66,7 @@ namespace Sheaft.Functions
             if (!results.Success)
                 throw results.Exception;
 
-            logger.LogInformation(nameof(ZoneFunctions.UpdateRegionCommandAsync), "successfully executed");
+            logger.LogInformation(nameof(UpdateRegionCommandAsync), "successfully executed");
         }
     }
 }
