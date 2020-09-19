@@ -19,7 +19,10 @@ namespace Sheaft.Application.Handlers
 {
     public class TransferTransactionCommandsHandler : ResultsHandler,
         IRequestHandler<CreateTransferTransactionCommand, Result<Guid>>,
-        IRequestHandler<SetTransferStatusCommand, Result<bool>>
+        IRequestHandler<SetTransferStatusCommand, Result<bool>>,
+        IRequestHandler<CheckTransferTransactionsCommand, Result<bool>>,
+        IRequestHandler<CheckWaitingTransferTransactionCommand, Result<bool>>,
+        IRequestHandler<CheckCreatedTransferTransactionCommand, Result<bool>>
     {
         private readonly IAppDbContext _context;
         private readonly IPspService _pspService;
