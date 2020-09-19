@@ -13,6 +13,7 @@ using Sheaft.Application.Events;
 using Sheaft.Services.Interop;
 using Microsoft.Extensions.Logging;
 using Microsoft.EntityFrameworkCore;
+using Sheaft.Infrastructure;
 
 namespace Sheaft.Application.Handlers
 {
@@ -34,7 +35,9 @@ namespace Sheaft.Application.Handlers
         IRequestHandler<ShipPurchaseOrderCommand, Result<bool>>,
         IRequestHandler<DeliverPurchaseOrderCommand, Result<bool>>,
         IRequestHandler<DeletePurchaseOrderCommand, Result<bool>>,
-        IRequestHandler<RestorePurchaseOrderCommand, Result<bool>>
+        IRequestHandler<RestorePurchaseOrderCommand, Result<bool>>,
+        IRequestHandler<CreatePurchaseOrderTransfersCommand, Result<bool>>,
+        IRequestHandler<CreatePurchaseOrderTransferCommand, Result<bool>>
     {
         private readonly IAppDbContext _context;
         private readonly IMediator _mediatr;
@@ -352,6 +355,87 @@ namespace Sheaft.Application.Handlers
 
                 return Ok(await _context.SaveChangesAsync(token) > 0);
             });
+        }
+
+        public async Task<Result<bool>> Handle(CreatePurchaseOrderTransfersCommand request, CancellationToken token)
+        {
+            return await ExecuteAsync(async () =>
+            {
+                var skip = 0;
+                const int take = 100;
+
+                var expiredDate = DateTimeOffset.UtcNow.AddMinutes(-15);
+                var purchaseOrders = await GetNextAcceptedPurchaseOrders(expiredDate, skip, take, token);
+
+                while (purchaseOrders.Any())
+                {
+                    foreach (var purchaseOrder in purchaseOrders)
+                    {
+                        await _queuesService.ProcessCommandAsync(
+                            CreatePurchaseOrderTransferCommand.QUEUE_NAME,
+                            new CreatePurchaseOrderTransferCommand(request.RequestUser)
+                            {
+                                PurchaseOrderId = purchaseOrder.Id
+                            }, token);
+                    }
+
+                    skip += take;
+                    purchaseOrders = await GetNextAcceptedPurchaseOrders(expiredDate, skip, take, token);
+                }
+
+                return Ok(true);
+            });
+        }
+
+        public async Task<Result<bool>> Handle(CreatePurchaseOrderTransferCommand request, CancellationToken token)
+        {
+            return await ExecuteAsync(async () =>
+            {
+                var purchaseOrder = await _context.GetByIdAsync<PurchaseOrder>(request.PurchaseOrderId, token);
+                if (purchaseOrder.Status < PurchaseOrderStatus.Accepted || purchaseOrder.Status > PurchaseOrderStatus.Delivered)
+                    return Ok(true);
+
+                var transactions = purchaseOrder.Transactions.ToList();
+                if (transactions.Any(c => c.Status != TransactionStatus.Failed && c.Status != TransactionStatus.Expired))
+                    return Ok(false);
+
+                if (transactions.Count(c => c.Status == TransactionStatus.Failed) >= 3)
+                {
+                    await _mediatr.Publish(new CreatePurchaseOrderTransferFailedEvent(request.RequestUser)
+                    {
+                        PurchaseOrderId = purchaseOrder.Id
+                    }, token);
+
+                    return TooManyRetries<bool>();
+                }
+
+                var result = await _mediatr.Send(new CreateTransferTransactionCommand(request.RequestUser)
+                {
+                    PurchaseOrderId = purchaseOrder.Id,
+                    FromUserId = purchaseOrder.Sender.Id,
+                    ToUserId = purchaseOrder.Vendor.Id
+                }, token);
+
+                if (!result.Success)
+                    return Failed<bool>(result.Exception);
+
+                return Ok(true);
+            });
+        }
+
+        private async Task<IEnumerable<PurchaseOrder>> GetNextAcceptedPurchaseOrders(DateTimeOffset expiredDate, int skip, int take, CancellationToken token)
+        {
+            return await _context.PurchaseOrders
+                .Get(c => c.Status > PurchaseOrderStatus.Waiting 
+                            && c.Status < PurchaseOrderStatus.Refused 
+                            && c.UpdatedOn.Value < expiredDate 
+                            && (!c.Transactions.Any() 
+                                || c.Transactions.All(t => t.Status == TransactionStatus.Failed || t.Status == TransactionStatus.Expired)
+                            ), true)
+                .OrderBy(c => c.Id)
+                .Skip(skip)
+                .Take(take)
+                .ToListAsync(token);
         }
     }
 }

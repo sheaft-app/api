@@ -61,7 +61,6 @@ namespace Sheaft.Application.Handlers
                 transfer.SetResult(result.Data.ResultCode, result.Data.ResultMessage);
                 transfer.SetIdentifier(result.Data.Identifier);
                 transfer.SetStatus(result.Data.Status);
-                transfer.SetCreditedAmount(result.Data.Credited);
 
                 _context.Update(transfer);
 
@@ -206,8 +205,8 @@ namespace Sheaft.Application.Handlers
                 transaction.SetProcessedOn(pspResult.Data.ProcessedOn);
 
                 //TODO validate this !
-                if (!transaction.ExecutedOn.HasValue)
-                    transaction.SetStatus(TransactionStatus.Expired);
+                //if (!transaction.ExecutedOn.HasValue)
+                    //transaction.SetStatus(TransactionStatus.Expired);
 
                 _context.Update(transaction);
                 await _context.SaveChangesAsync(token);

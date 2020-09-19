@@ -11,6 +11,7 @@ namespace Sheaft.Domain.Models
         private const int DIGITS_COUNT = 2;
         private List<OrderProduct> _products;
         private List<OrderDelivery> _deliveries;
+        private List<PayinTransaction> _transactions;
 
         protected Order()
         {
@@ -24,6 +25,7 @@ namespace Sheaft.Domain.Models
 
             _products = new List<OrderProduct>();
             _deliveries = new List<OrderDelivery>();
+            _transactions = new List<PayinTransaction>();
             Status = OrderStatus.Created;
 
             SetProducts(orderProducts);
@@ -50,6 +52,7 @@ namespace Sheaft.Domain.Models
         public virtual User User { get; private set; }
         public virtual IReadOnlyCollection<OrderProduct> Products => _products?.AsReadOnly();
         public virtual IReadOnlyCollection<OrderDelivery> Deliveries => _deliveries?.AsReadOnly();
+        public virtual IReadOnlyCollection<PayinTransaction> Transactions => _transactions?.AsReadOnly();
 
         public void SetStatus(OrderStatus status)
         {

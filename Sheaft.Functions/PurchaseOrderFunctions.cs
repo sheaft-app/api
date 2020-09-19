@@ -8,6 +8,8 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Sheaft.Application.Commands;
 using Sheaft.Application.Events;
+using Sheaft.Core;
+using Sheaft.Logging;
 
 namespace Sheaft.Functions
 {
@@ -20,6 +22,27 @@ namespace Sheaft.Functions
         {
             _config = config;
             _mediatr = mediator;
+        }
+
+        [FunctionName("CreatePurchaseOrderTransfersCommand")]
+        public async Task CreatePurchaseOrderTransfersCommandAsync([TimerTrigger("0 * */1 * * *", RunOnStartup = false)] TimerInfo info, ILogger logger, CancellationToken token)
+        {
+            var results = await _mediatr.Send(new CreatePurchaseOrderTransfersCommand(new RequestUser("purchaseorders-functions", Guid.NewGuid().ToString("N"))), token);
+            if (!results.Success)
+                throw results.Exception;
+
+            logger.LogInformation(nameof(CreatePurchaseOrderTransfersCommand), "successfully executed");
+        }
+
+        [FunctionName("CreatePurchaseOrderTransferCommand")]
+        public async Task CreatePurchaseOrderTransferCommandAsync([ServiceBusTrigger(CreatePurchaseOrderTransferCommand.QUEUE_NAME, Connection = "AzureWebJobsServiceBus")] string message, ILogger logger, CancellationToken token)
+        {
+            var command = JsonConvert.DeserializeObject<CreatePurchaseOrderTransferCommand>(message);
+            var results = await _mediatr.Send(command, token);
+            logger.LogCommand(results);
+
+            if (!results.Success)
+                throw results.Exception;
         }
 
         [FunctionName("PurchaseOrderAcceptedEvent")]
@@ -79,5 +102,12 @@ namespace Sheaft.Functions
             logger.LogInformation(appEvent.Id.ToString("N"));
         }
 
+        [FunctionName("CreatePurchaseOrderTransferFailedEvent")]
+        public async Task CreatePurchaseOrderTransferFailedEventAsync([ServiceBusTrigger(CreatePurchaseOrderTransferFailedEvent.QUEUE_NAME, Connection = "AzureWebJobsServiceBus")]string message, ILogger logger, CancellationToken token)
+        {
+            var appEvent = JsonConvert.DeserializeObject<CreatePurchaseOrderTransferFailedEvent>(message);
+            await _mediatr.Publish(appEvent, token);
+            logger.LogInformation(appEvent.PurchaseOrderId.ToString("N"));
+        }
     }
 }

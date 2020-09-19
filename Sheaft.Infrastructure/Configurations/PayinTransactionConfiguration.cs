@@ -10,7 +10,7 @@ namespace Sheaft.Infrastructure
         {
             entity.Property<long>("OrderUid");
 
-            entity.HasOne(c => c.Order).WithMany().HasForeignKey("OrderUid").OnDelete(DeleteBehavior.NoAction);
+            entity.HasOne(c => c.Order).WithMany(c => c.Transactions).HasForeignKey("OrderUid").OnDelete(DeleteBehavior.NoAction);
 
             entity.HasIndex("OrderUid");
         }

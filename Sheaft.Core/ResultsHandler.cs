@@ -74,6 +74,12 @@ namespace Sheaft.Core
             return new FailedResult<T>(new LockedException(message, objs));
         }
 
+        protected Result<T> TooManyRetries<T>(MessageKind? message = null, params object[] objs)
+        {
+            Logger.LogTrace(nameof(ResultsHandler.Locked), message, objs);
+            return new FailedResult<T>(new TooManyRetriesException(message, objs));
+        }
+
         protected Result<T> InternalError<T>(MessageKind? message = null, params object[] objs)
         {
             Logger.LogTrace(nameof(ResultsHandler.InternalError), message, objs);

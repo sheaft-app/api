@@ -43,6 +43,9 @@ namespace Sheaft.Infrastructure
             var products = entity.Metadata.FindNavigation(nameof(PurchaseOrder.Products));
             products.SetPropertyAccessMode(PropertyAccessMode.Field);
 
+            var transactions = entity.Metadata.FindNavigation(nameof(PurchaseOrder.Transactions));
+            transactions.SetPropertyAccessMode(PropertyAccessMode.Field);
+
             entity.HasKey("Uid");
 
             entity.HasIndex(c => c.Id).IsUnique();

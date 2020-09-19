@@ -27,9 +27,11 @@ namespace Sheaft.Infrastructure
             entity.Property(o => o.Donation).HasColumnType("decimal(10,2)");
             entity.Property(o => o.Fees).HasColumnType("decimal(10,2)");
 
-            entity.HasOne(c => c.User).WithMany().HasForeignKey("UserUid").OnDelete(DeleteBehavior.Cascade);
             entity.HasMany(c => c.Products).WithOne().HasForeignKey("OrderUid").OnDelete(DeleteBehavior.Cascade);
             entity.HasMany(c => c.Deliveries).WithOne().HasForeignKey("OrderUid").OnDelete(DeleteBehavior.Cascade);
+
+            var transactions = entity.Metadata.FindNavigation(nameof(Order.Transactions));
+            transactions.SetPropertyAccessMode(PropertyAccessMode.Field);
 
             entity.HasKey("Uid");
 

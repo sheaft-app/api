@@ -1,7 +1,6 @@
 ﻿using Sheaft.Domain.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using System;
 
 namespace Sheaft.Infrastructure
 {
@@ -11,7 +10,7 @@ namespace Sheaft.Infrastructure
         {
             entity.Property<long>("PurchaseOrderUid");
 
-            entity.HasOne(c => c.PurchaseOrder).WithMany().HasForeignKey("PurchaseOrderUid").OnDelete(DeleteBehavior.NoAction);
+            entity.HasOne(c => c.PurchaseOrder).WithMany(c => c.Transactions).HasForeignKey("PurchaseOrderUid").OnDelete(DeleteBehavior.NoAction);
 
             entity.HasIndex("PurchaseOrderUid");
         }

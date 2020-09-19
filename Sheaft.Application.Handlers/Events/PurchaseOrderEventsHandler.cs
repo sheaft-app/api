@@ -18,7 +18,8 @@ namespace Sheaft.Application.Handlers
         INotificationHandler<PurchaseOrderCompletedEvent>,
         INotificationHandler<PurchaseOrderProcessingEvent>,
         INotificationHandler<PurchaseOrderCreatedEvent>,
-        INotificationHandler<PurchaseOrderRefusedEvent>
+        INotificationHandler<PurchaseOrderRefusedEvent>,
+        INotificationHandler<CreatePurchaseOrderTransferFailedEvent>
     {
         private readonly IAppDbContext _context;
         private readonly IEmailService _emailService;
@@ -144,19 +145,30 @@ namespace Sheaft.Application.Handlers
             await _signalrService.SendNotificationToUserAsync(purchaseOrder.Sender.Id, nameof(PurchaseOrderProcessingEvent), GetPurchaseNotifModelAsString(purchaseOrder));
         }
 
-        private object GetTemplateDatas(Domain.Models.PurchaseOrder purchaseOrder, string url)
+        public async Task Handle(CreatePurchaseOrderTransferFailedEvent orderEvent, CancellationToken token)
+        {
+            var purchaseOrder = await _context.GetByIdAsync<PurchaseOrder>(orderEvent.PurchaseOrderId, token);
+            await _emailService.SendTemplatedEmailAsync(
+                "support@sheaft.com",
+                "Support",
+                CreatePurchaseOrderTransferFailedEvent.MAILING_TEMPLATE_ID,
+                GetTemplateDatas(purchaseOrder, null),
+                token);
+        }
+
+        private object GetTemplateDatas(PurchaseOrder purchaseOrder, string url)
         {
             var senderName = purchaseOrder.Sender.Name;
             var lines = purchaseOrder.Products.Select(o => new { Line_Name = o.Name, Line_Quantity = o.Quantity, Line_Price = o.TotalOnSalePrice }).ToList();
             return new { Lines = lines, SenderName = senderName, purchaseOrder.Reference, VendorName = purchaseOrder.Vendor.Name, purchaseOrder.CreatedOn, purchaseOrder.ExpectedDelivery.ExpectedDeliveryDate, purchaseOrder.TotalOnSalePrice, PurchaseOrderUrl = url };
         }
 
-        private static string GetPurchaseNotifModelAsString(Domain.Models.PurchaseOrder purchaseOrder)
+        private static string GetPurchaseNotifModelAsString(PurchaseOrder purchaseOrder)
         {
             return JsonConvert.SerializeObject(GetPurchaseNotifModel(purchaseOrder));
         }
 
-        private static object GetPurchaseNotifModel(Domain.Models.PurchaseOrder purchaseOrder)
+        private static object GetPurchaseNotifModel(PurchaseOrder purchaseOrder)
         {
             return new
             {
@@ -169,6 +181,5 @@ namespace Sheaft.Application.Handlers
                 ExpectedDeliveryDate = purchaseOrder.ExpectedDelivery.ExpectedDeliveryDate
             };
         }
-
     }
 }

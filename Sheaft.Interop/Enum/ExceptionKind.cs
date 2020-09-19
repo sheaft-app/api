@@ -12,5 +12,6 @@
         Gone,
         Unexpected,
         AlreadyExists,
+        TooManyRetries,
     }
 }
