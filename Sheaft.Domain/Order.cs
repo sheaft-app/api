@@ -17,7 +17,7 @@ namespace Sheaft.Domain.Models
         {
         }
 
-        public Order(Guid id, User user, IDictionary<Product, int> orderProducts, IEnumerable<Tuple<DeliveryMode, DateTimeOffset, string>> orderDeliveries)
+        public Order(Guid id, User user, IDictionary<Product, int> orderProducts)
         {
             Id = id;
             Donation = 0;
@@ -29,7 +29,6 @@ namespace Sheaft.Domain.Models
             Status = OrderStatus.Created;
 
             SetProducts(orderProducts);
-            SetDeliveries(orderDeliveries);
         }
 
         public Guid Id { get; private set; }

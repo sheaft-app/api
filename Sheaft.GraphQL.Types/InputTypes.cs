@@ -42,7 +42,7 @@ namespace Sheaft.GraphQL.Types
             descriptor.Field(c => c.Donation);
 
             descriptor.Field(c => c.ProducersExpectedDeliveries)
-                .Type<NonNullType<ListType<ProducerExpectedDeliveryInputType>>>();
+                .Type<ListType<ProducerExpectedDeliveryInputType>>();
 
             descriptor.Field(c => c.Products)
                 .Type<NonNullType<ListType<ProductQuantityInputType>>>();
@@ -58,7 +58,7 @@ namespace Sheaft.GraphQL.Types
             descriptor.Field(c => c.Donation);
 
             descriptor.Field(c => c.ProducersExpectedDeliveries)
-                .Type<NonNullType<ListType<ProducerExpectedDeliveryInputType>>>();
+                .Type<ListType<ProducerExpectedDeliveryInputType>>();
 
             descriptor.Field(c => c.Products)
                 .Type<NonNullType<ListType<ProductQuantityInputType>>>();

@@ -14,6 +14,7 @@ using Sheaft.Interop.Enums;
 using Sheaft.Application.Events;
 using Sheaft.Options;
 using Microsoft.Extensions.Options;
+using Sheaft.Exceptions;
 
 namespace Sheaft.Application.Handlers
 {
@@ -47,16 +48,18 @@ namespace Sheaft.Application.Handlers
             return await ExecuteAsync(async () =>
             {
                 var productIds = request.Products.Select(p => p.Id);
-                var deliveryIds = request.ProducersExpectedDeliveries.Select(p => p.DeliveryModeId);
                 var products = await _context.GetByIdsAsync<Product>(productIds, token);
-                var deliveries = await _context.GetByIdsAsync<DeliveryMode>(deliveryIds, token);
-
                 var cartProducts = new Dictionary<Product, int>();
                 foreach (var product in products)
                 {
                     cartProducts.Add(product, request.Products.Where(p => p.Id == product.Id).Sum(c => c.Quantity));
                 }
 
+                var user = await _context.GetByIdAsync<User>(request.RequestUser.Id, token);
+                var order = new Order(Guid.NewGuid(), user, cartProducts);
+
+                var deliveryIds = request.ProducersExpectedDeliveries?.Select(p => p.DeliveryModeId) ?? new List<Guid>();
+                var deliveries = deliveryIds.Any() ? await _context.GetByIdsAsync<DeliveryMode>(deliveryIds, token) : new List<DeliveryMode>();
                 var cartDeliveries = new List<Tuple<DeliveryMode, DateTimeOffset, string>>();
                 foreach (var delivery in deliveries)
                 {
@@ -64,9 +67,7 @@ namespace Sheaft.Application.Handlers
                     cartDeliveries.Add(new Tuple<DeliveryMode, DateTimeOffset, string>(delivery, cartDelivery.ExpectedDeliveryDate, cartDelivery.Comment));
                 }
 
-                var user = await _context.GetByIdAsync<User>(request.RequestUser.Id, token);
-                var order = new Order(Guid.NewGuid(), user, cartProducts, cartDeliveries);
-
+                order.SetDeliveries(cartDeliveries);
                 order.SetDonation(request.Donation, _pspOptions.FixedAmount, _pspOptions.Percent);
 
                 await _context.AddAsync(order, token);
@@ -83,25 +84,25 @@ namespace Sheaft.Application.Handlers
                 using (var transaction = await _context.Database.BeginTransactionAsync(token))
                 {
                     var productIds = request.Products.Select(p => p.Id);
-                    var deliveryIds = request.ProducersExpectedDeliveries.Select(p => p.DeliveryModeId);
                     var products = await _context.GetByIdsAsync<Product>(productIds, token);
-                    var deliveries = await _context.GetByIdsAsync<DeliveryMode>(deliveryIds, token);
-
                     var cartProducts = new Dictionary<Product, int>();
                     foreach (var product in products)
                     {
                         cartProducts.Add(product, request.Products.Where(p => p.Id == product.Id).Sum(c => c.Quantity));
                     }
 
+                    var user = await _context.GetByIdAsync<User>(request.RequestUser.Id, token);
+                    var order = new Order(Guid.NewGuid(), user, cartProducts);
+
+                    var deliveryIds = request.ProducersExpectedDeliveries?.Select(p => p.DeliveryModeId) ?? new List<Guid>();
+                    var deliveries = deliveryIds.Any() ? await _context.GetByIdsAsync<DeliveryMode>(deliveryIds, token) : new List<DeliveryMode>();
                     var cartDeliveries = new List<Tuple<DeliveryMode, DateTimeOffset, string>>();
                     foreach (var delivery in deliveries)
                     {
                         var cartDelivery = request.ProducersExpectedDeliveries.FirstOrDefault(ped => ped.DeliveryModeId == delivery.Id);
                         cartDeliveries.Add(new Tuple<DeliveryMode, DateTimeOffset, string>(delivery, cartDelivery.ExpectedDeliveryDate, cartDelivery.Comment));
                     }
-
-                    var user = await _context.GetByIdAsync<User>(request.RequestUser.Id, token);
-                    var order = new Order(Guid.NewGuid(), user, cartProducts, cartDeliveries);
+                    order.SetDeliveries(cartDeliveries);
 
                     await _context.AddAsync(order, token);
                     await _context.SaveChangesAsync(token);
@@ -141,32 +142,29 @@ namespace Sheaft.Application.Handlers
         {
             return await ExecuteAsync(async () =>
             {
-                var productIds = request.Products.Select(p => p.Id);
-                var deliveryIds = request.ProducersExpectedDeliveries.Select(p => p.DeliveryModeId);
-                var products = await _context.GetByIdsAsync<Product>(productIds, token);
-                var deliveries = await _context.GetByIdsAsync<DeliveryMode>(deliveryIds, token);
+                var user = await _context.GetByIdAsync<User>(request.RequestUser.Id, token);
+                var entity = await _context.GetByIdAsync<Order>(request.Id, token);
 
+                var productIds = request.Products.Select(p => p.Id);
+                var products = await _context.GetByIdsAsync<Product>(productIds, token);
                 var cartProducts = new Dictionary<Product, int>();
                 foreach (var product in products)
                 {
                     cartProducts.Add(product, request.Products.Where(p => p.Id == product.Id).Sum(c => c.Quantity));
                 }
+                entity.SetProducts(cartProducts);
 
+                var deliveryIds = request.ProducersExpectedDeliveries?.Select(p => p.DeliveryModeId) ?? new List<Guid>();
+                var deliveries = deliveryIds.Any() ? await _context.GetByIdsAsync<DeliveryMode>(deliveryIds, token) : new List<DeliveryMode>();
                 var cartDeliveries = new List<Tuple<DeliveryMode, DateTimeOffset, string>>();
                 foreach (var delivery in deliveries)
                 {
                     var cartDelivery = request.ProducersExpectedDeliveries.FirstOrDefault(ped => ped.DeliveryModeId == delivery.Id);
                     cartDeliveries.Add(new Tuple<DeliveryMode, DateTimeOffset, string>(delivery, cartDelivery.ExpectedDeliveryDate, cartDelivery.Comment));
                 }
-
-                var user = await _context.GetByIdAsync<User>(request.RequestUser.Id, token);
-                var entity = await _context.GetByIdAsync<Order>(request.Id, token);
-
-                entity.SetProducts(cartProducts);
                 entity.SetDeliveries(cartDeliveries);
 
                 entity.SetDonation(request.Donation, _pspOptions.FixedAmount, _pspOptions.Percent);
-
                 _context.Update(entity);
 
                 return Ok(await _context.SaveChangesAsync(token) > 0);
@@ -184,6 +182,9 @@ namespace Sheaft.Application.Handlers
                 using (var transaction = await _context.Database.BeginTransactionAsync(token))
                 {
                     var order = await _context.GetByIdAsync<Order>(request.Id, token);
+                    if (!order.Deliveries.Any())
+                        return Failed<Guid>(new ValidationException());
+
                     order.SetStatus(OrderStatus.Waiting);
 
                     _context.Update(order);
