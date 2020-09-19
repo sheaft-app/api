@@ -15,7 +15,7 @@ namespace Sheaft.Logging
             var datas = args.ToArray();
 
             if (!command.Success)
-                logger.LogError(command.Exception.Message, command.Exception);
+                logger.LogError(command.Exception?.Message, command.Exception, datas);
             else
                 logger.LogInformation(command.Message, datas);
         }
