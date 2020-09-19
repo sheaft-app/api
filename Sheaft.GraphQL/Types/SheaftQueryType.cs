@@ -47,7 +47,7 @@ namespace Sheaft.GraphQL
             descriptor.Field(c => c.GetRegionsPoints(default, default)).Argument("input", c => c.Type<IdType>());
             descriptor.Field(c => c.GetRegionUsersPoints(default, default)).Argument("input", c => c.Type<IdType>());
             descriptor.Field(c => c.GetStore(default, default)).Argument("input", c => c.Type<NonNullType<IdType>>());
-            descriptor.Field(c => c.GetPayinTransaction(default, default)).Argument("input", c => c.Type<NonNullType<StringType>>());
+            descriptor.Field(c => c.GetWebPayinTransaction(default, default)).Argument("input", c => c.Type<NonNullType<StringType>>());
             descriptor.Field(c => c.GetStoreDeliveriesForProducersAsync(default, default));
             descriptor.Field(c => c.GetStoreProducts(default));
             descriptor.Field(c => c.GetConsumerLegals(default));

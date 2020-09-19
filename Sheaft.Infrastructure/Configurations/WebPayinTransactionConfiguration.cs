@@ -8,11 +8,6 @@ namespace Sheaft.Infrastructure
     {
         public void Configure(EntityTypeBuilder<WebPayinTransaction> entity)
         {
-            entity.Property<long>("OrderUid");
-
-            entity.HasOne(c => c.Order).WithMany().HasForeignKey("OrderUid").OnDelete(DeleteBehavior.NoAction);
-
-            entity.HasIndex("OrderUid");
         }
     }
 }

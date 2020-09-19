@@ -67,12 +67,14 @@ namespace Sheaft.Infrastructure
             modelBuilder.Entity<Card>().HasBaseType<PaymentMethod>();
             modelBuilder.Entity<BankAccount>().HasBaseType<PaymentMethod>();
 
-            modelBuilder.Entity<CardPayinTransaction>().HasBaseType<Transaction>();
-            modelBuilder.Entity<WebPayinTransaction>().HasBaseType<Transaction>();
+            modelBuilder.Entity<PayinTransaction>().HasBaseType<Transaction>();
             modelBuilder.Entity<TransferTransaction>().HasBaseType<Transaction>();
             modelBuilder.Entity<PayoutTransaction>().HasBaseType<Transaction>();
             modelBuilder.Entity<RefundPayinTransaction>().HasBaseType<Transaction>();
             modelBuilder.Entity<RefundTransferTransaction>().HasBaseType<Transaction>();
+
+            modelBuilder.Entity<CardPayinTransaction>().HasBaseType<PayinTransaction>();
+            modelBuilder.Entity<WebPayinTransaction>().HasBaseType<PayinTransaction>();
 
             modelBuilder.Entity<BusinessLegal>().HasBaseType<Legal>();
             modelBuilder.Entity<ConsumerLegal>().HasBaseType<Legal>();
@@ -113,6 +115,7 @@ namespace Sheaft.Infrastructure
             modelBuilder.ApplyConfiguration(new WalletConfiguration());
             modelBuilder.ApplyConfiguration(new DocumentConfiguration());
             modelBuilder.ApplyConfiguration(new TransactionConfiguration());
+            modelBuilder.ApplyConfiguration(new PayinTransactionConfiguration());
             modelBuilder.ApplyConfiguration(new WebPayinTransactionConfiguration());
             modelBuilder.ApplyConfiguration(new CardPayinTransactionConfiguration());
             modelBuilder.ApplyConfiguration(new TransferTransactionConfiguration());

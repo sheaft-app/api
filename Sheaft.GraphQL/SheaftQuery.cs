@@ -211,7 +211,7 @@ namespace Sheaft.GraphQL
         [GraphQLName("webPayinTransaction")]
         [UseSingleOrDefault]
         [UseSelection]
-        public IQueryable<WebPayinTransactionDto> GetPayinTransaction(string input, [Service] ITransactionQueries transactionQueries)
+        public IQueryable<WebPayinTransactionDto> GetWebPayinTransaction(string input, [Service] ITransactionQueries transactionQueries)
         {
             return transactionQueries.GetWebPayinTransaction(input, CurrentUser);
         }
