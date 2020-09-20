@@ -142,7 +142,7 @@ namespace Sheaft.Domain.Models
             }
 
             UpdateFees();
-            TotalPrice = Math.Round(TotalOnSalePrice + Donation + FeesPrice, DIGITS_COUNT);
+            TotalPrice = Math.Round(TotalOnSalePrice + Donation + FeesPrice - InternalFeesPrice, DIGITS_COUNT);
         }
 
         private decimal GetRoundedDonation()
