@@ -104,6 +104,7 @@ namespace Sheaft.Domain.Models
                     break;
                 default:
                     Donation = 0;
+                    RefreshFees(fixedAmount, percent);
                     break;
             }
         }
