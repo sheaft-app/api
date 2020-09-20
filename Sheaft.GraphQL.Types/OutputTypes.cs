@@ -636,10 +636,10 @@ namespace Sheaft.GraphQL.Types
         {
             descriptor.Field(c => c.Id).Type<NonNullType<IdType>>();
 
-            descriptor.Field(c => c.Code)
-                .Type<NonNullType<CountryIsoCodeEnumType>>();
-
             descriptor.Field(c => c.Name)
+                .Type<NonNullType<StringType>>();
+
+            descriptor.Field(c => c.Code)
                 .Type<NonNullType<StringType>>();
         }
     }
@@ -649,10 +649,10 @@ namespace Sheaft.GraphQL.Types
         {
             descriptor.Field(c => c.Id).Type<NonNullType<IdType>>();
 
-            descriptor.Field(c => c.Code)
-                .Type<NonNullType<CountryIsoCodeEnumType>>();
-
             descriptor.Field(c => c.Name)
+                .Type<NonNullType<StringType>>();
+
+            descriptor.Field(c => c.Code)
                 .Type<NonNullType<StringType>>();
         }
     }
@@ -1005,14 +1005,18 @@ namespace Sheaft.GraphQL.Types
         {
             descriptor.Field(c => c.Id).Type<NonNullType<IdType>>();
             descriptor.Field(c => c.CreatedOn);
+            descriptor.Field(c => c.TotalWeight);
+
             descriptor.Field(c => c.TotalWholeSalePrice);
             descriptor.Field(c => c.TotalVatPrice);
             descriptor.Field(c => c.TotalOnSalePrice);
-            descriptor.Field(c => c.TotalWeight);
-
             descriptor.Field(c => c.TotalReturnableWholeSalePrice);
             descriptor.Field(c => c.TotalReturnableVatPrice);
             descriptor.Field(c => c.TotalReturnableOnSalePrice);
+            descriptor.Field(c => c.TotalProductWholeSalePrice);
+            descriptor.Field(c => c.TotalProductVatPrice);
+            descriptor.Field(c => c.TotalProductOnSalePrice);
+
             descriptor.Field(c => c.ReturnablesCount);
             descriptor.Field(c => c.LinesCount);
             descriptor.Field(c => c.ProductsCount);
@@ -1046,19 +1050,32 @@ namespace Sheaft.GraphQL.Types
         {
             descriptor.Field(c => c.Id).Type<NonNullType<IdType>>();
             descriptor.Field(c => c.Status);
+            descriptor.Field(c => c.DonationKind);
             descriptor.Field(c => c.CreatedOn);
+
             descriptor.Field(c => c.TotalWholeSalePrice);
             descriptor.Field(c => c.TotalVatPrice);
             descriptor.Field(c => c.TotalOnSalePrice);
             descriptor.Field(c => c.TotalReturnableWholeSalePrice);
             descriptor.Field(c => c.TotalReturnableVatPrice);
             descriptor.Field(c => c.TotalReturnableOnSalePrice);
-            descriptor.Field(c => c.TotalWeight);
+            descriptor.Field(c => c.TotalProductWholeSalePrice);
+            descriptor.Field(c => c.TotalProductVatPrice);
+            descriptor.Field(c => c.TotalProductOnSalePrice);
+            descriptor.Field(c => c.TotalPrice);
+
+            descriptor.Field(c => c.Donation);
+
+            descriptor.Field(c => c.FeesPrice);
+            descriptor.Field(c => c.InternalFeesPrice);
+            descriptor.Field(c => c.FeesFixedAmount);
+            descriptor.Field(c => c.FeesPercent);
+
             descriptor.Field(c => c.ReturnablesCount);
             descriptor.Field(c => c.LinesCount);
             descriptor.Field(c => c.ProductsCount);
-            descriptor.Field(c => c.Fees);
-            descriptor.Field(c => c.Donation);
+
+            descriptor.Field(c => c.TotalWeight);
 
             descriptor.Field(c => c.User)
                 .Type<NonNullType<UserProfileType>>();
@@ -1210,15 +1227,22 @@ namespace Sheaft.GraphQL.Types
             descriptor.Field(c => c.Id).Type<NonNullType<IdType>>();
             descriptor.Field(c => c.Quantity);
             descriptor.Field(c => c.Vat);
-            descriptor.Field(c => c.TotalVatPrice);
-            descriptor.Field(c => c.TotalOnSalePrice);
-            descriptor.Field(c => c.TotalWholeSalePrice);
             descriptor.Field(c => c.TotalWeight);
             descriptor.Field(c => c.UnitOnSalePrice);
             descriptor.Field(c => c.UnitVatPrice);
             descriptor.Field(c => c.UnitWholeSalePrice);
             descriptor.Field(c => c.UnitVatPrice);
             descriptor.Field(c => c.UnitWeight);
+
+            descriptor.Field(c => c.TotalWholeSalePrice);
+            descriptor.Field(c => c.TotalVatPrice);
+            descriptor.Field(c => c.TotalOnSalePrice);
+            descriptor.Field(c => c.TotalReturnableWholeSalePrice);
+            descriptor.Field(c => c.TotalReturnableVatPrice);
+            descriptor.Field(c => c.TotalReturnableOnSalePrice);
+            descriptor.Field(c => c.TotalProductWholeSalePrice);
+            descriptor.Field(c => c.TotalProductVatPrice);
+            descriptor.Field(c => c.TotalProductOnSalePrice);
 
             descriptor.Field(c => c.Name)
                 .Type<NonNullType<StringType>>();

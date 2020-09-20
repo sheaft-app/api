@@ -8,7 +8,8 @@ namespace Sheaft.Mappers
     {
         public CountryProfile()
         {
-            CreateMap<Country, CountryDto>();
+            CreateMap<Country, CountryDto>()
+                .ForMember(c => c.Code, opt => opt.MapFrom(t => t.Alpha2));
         }
     }
 }
