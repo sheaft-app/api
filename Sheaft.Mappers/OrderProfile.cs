@@ -12,8 +12,7 @@ namespace Sheaft.Mappers
         {
             CreateMap<Order, OrderDto>()
                 .ForMember(d => d.User, opt => opt.MapFrom(r => r.User))
-                .ForMember(d => d.TotalFees, opt => opt.MapFrom(r => r.FeesPrice + r.InternalFeesPrice))
-                .ForMember(d => d.FeesPercent, opt => opt.MapFrom(r => r.FeesPercent * 100));
+                .ForMember(d => d.TotalFees, opt => opt.MapFrom(r => r.FeesPrice + r.InternalFeesPrice));
 
             CreateMap<CreateOrderInput, CreateConsumerOrderCommand>();
             CreateMap<CreateOrderInput, CreateBusinessOrderCommand>();

@@ -513,7 +513,7 @@ namespace Sheaft.Infrastructure.Migrations
                         .HasColumnType("decimal(10,2)");
 
                     b.Property<decimal>("FeesPercent")
-                        .HasColumnType("decimal(10,2)");
+                        .HasColumnType("decimal(10,4)");
 
                     b.Property<decimal>("FeesPrice")
                         .HasColumnType("decimal(10,2)");

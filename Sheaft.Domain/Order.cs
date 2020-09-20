@@ -154,25 +154,23 @@ namespace Sheaft.Domain.Models
         private void UpdateFees()
         {
             var total = TotalOnSalePrice + FeesPrice + Donation;
-            total -= FeesFixedAmount;
-            total *= (1 - FeesPercent);
-            total -= TotalOnSalePrice;
+            var newFees = CalculateFees(total);
 
-            InternalFeesPrice = Math.Round(Donation - total, DIGITS_COUNT);
-            FeesPrice = Math.Round(InternalFeesPrice + FeesFixedAmount, DIGITS_COUNT);
+            InternalFeesPrice = Math.Round(newFees - FeesPrice, DIGITS_COUNT);
+            FeesPrice = Math.Round(newFees, DIGITS_COUNT);
         }
 
         public decimal GetFees(decimal total)
         {
-            var fees = CalculateFees(total) + FeesFixedAmount;
-            var mangofees = CalculateFees(total + fees) + FeesFixedAmount;
+            var fees = CalculateFees(total);
+            var mangofees = CalculateFees(total + fees);
             var increment = fees;
 
             while (total + mangofees > total + fees)
             {
                 increment += 0.01m;
-                fees = CalculateFees(total + increment) + FeesFixedAmount;
-                mangofees = CalculateFees(total + fees) + FeesFixedAmount;
+                fees = CalculateFees(total + increment);
+                mangofees = CalculateFees(total + fees);
             }
 
             return Math.Round(fees, 2);
@@ -180,7 +178,7 @@ namespace Sheaft.Domain.Models
 
         private decimal CalculateFees(decimal total)
         {
-            return FeesPercent * total;
+            return (FeesPercent * total) + FeesFixedAmount;
         }
     }
 }

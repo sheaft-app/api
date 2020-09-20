@@ -32,7 +32,7 @@ namespace Sheaft.Infrastructure
             entity.Property(o => o.Donation).HasColumnType("decimal(10,2)");
             entity.Property(o => o.FeesPrice).HasColumnType("decimal(10,2)");
             entity.Property(o => o.FeesFixedAmount).HasColumnType("decimal(10,2)");
-            entity.Property(o => o.FeesPercent).HasColumnType("decimal(10,2)");
+            entity.Property(o => o.FeesPercent).HasColumnType("decimal(10,4)");
             entity.Property(o => o.InternalFeesPrice).HasColumnType("decimal(10,2)");
 
             entity.HasMany(c => c.Products).WithOne().HasForeignKey("OrderUid").OnDelete(DeleteBehavior.Cascade);

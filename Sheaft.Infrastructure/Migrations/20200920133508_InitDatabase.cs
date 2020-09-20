@@ -453,7 +453,7 @@ namespace Sheaft.Infrastructure.Migrations
                     TotalPrice = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
                     TotalWeight = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
                     FeesFixedAmount = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
-                    FeesPercent = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
+                    FeesPercent = table.Column<decimal>(type: "decimal(10,4)", nullable: false),
                     ReturnablesCount = table.Column<int>(nullable: false),
                     LinesCount = table.Column<int>(nullable: false),
                     ProductsCount = table.Column<int>(nullable: false),
