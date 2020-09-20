@@ -61,7 +61,6 @@ namespace Sheaft.Functions
             logger.LogInformation(appEvent.Id.ToString("N"));
         }
 
-
         [FunctionName("PurchaseOrderCancelledByVendorEvent")]
         public async Task PurchaseOrderCancelledByVendorEventAsync([ServiceBusTrigger(PurchaseOrderCancelledByVendorEvent.QUEUE_NAME, Connection = "AzureWebJobsServiceBus")]string message, ILogger logger, CancellationToken token)
         {

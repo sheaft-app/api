@@ -105,9 +105,9 @@ namespace Sheaft.Services
                 await EnsureAccessTokenIsValidAsync(token);
 
                 var result = await _api.Wallets.CreateAsync(
-                    wallet.Id.ToString("N"), 
-                    new WalletPostDTO(new List<string> { wallet.User.Identifier }, 
-                    wallet.Name, 
+                    wallet.Id.ToString("N"),
+                    new WalletPostDTO(new List<string> { wallet.User.Identifier },
+                    wallet.Name,
                     CurrencyIso.EUR));
 
                 return Ok(result.Id);
@@ -161,7 +161,7 @@ namespace Sheaft.Services
                 await EnsureAccessTokenIsValidAsync(token);
 
                 var result = await _api.CardRegistrations.CreateAsync(
-                    payment.Id.ToString("N"), 
+                    payment.Id.ToString("N"),
                     new CardRegistrationPostDTO(payment.User.Identifier, CurrencyIso.EUR, CardType.CB_VISA_MASTERCARD));
 
                 return Ok(new KeyValuePair<string, string>(result.Id, result.CardId));
@@ -235,8 +235,8 @@ namespace Sheaft.Services
                 await EnsureAccessTokenIsValidAsync(token);
 
                 var result = await _api.Users.UpdateKycDocumentAsync(
-                    document.User.Identifier, 
-                    new KycDocumentPutDTO { Status = KycStatus.VALIDATION_ASKED }, 
+                    document.User.Identifier,
+                    new KycDocumentPutDTO { Status = KycStatus.VALIDATION_ASKED },
                     document.Identifier);
 
                 return Ok(new PspDocumentResultDto
@@ -283,16 +283,16 @@ namespace Sheaft.Services
                 var result = await _api.UboDeclarations.UpdateUboDeclarationAsync(
                     new UboDeclarationPutDTO(
                         declaration.Ubos.Select(u => new UboDTO {
-                            Id = u.Identifier,  
+                            Id = u.Identifier,
                             FirstName = u.FirstName,
                             LastName = u.LastName,
                             Address = u.Address.GetAddress(),
                             Nationality = u.Nationality.GetCountry(),
                             Birthday = u.BirthDate.DateTime,
                             Birthplace = u.BirthPlace.GetBirthplace()
-                        }).ToArray(), 
-                        UboDeclarationType.VALIDATION_ASKED), 
-                    business.Identifier, 
+                        }).ToArray(),
+                        UboDeclarationType.VALIDATION_ASKED),
+                    business.Identifier,
                     declaration.Identifier);
                 return Ok(new PspDeclarationResultDto
                 {
@@ -314,12 +314,12 @@ namespace Sheaft.Services
 
                 await EnsureAccessTokenIsValidAsync(token);
 
-                var result = await _api.UboDeclarations.CreateUboAsync(ubo.Id.ToString("N"), 
-                    new UboPostDTO(ubo.FirstName, 
-                        ubo.LastName, 
-                        ubo.Address.GetAddress(), 
-                        ubo.Nationality.GetCountry(), 
-                        ubo.BirthDate.DateTime, 
+                var result = await _api.UboDeclarations.CreateUboAsync(ubo.Id.ToString("N"),
+                    new UboPostDTO(ubo.FirstName,
+                        ubo.LastName,
+                        ubo.Address.GetAddress(),
+                        ubo.Nationality.GetCountry(),
+                        ubo.BirthDate.DateTime,
                         ubo.BirthPlace.GetBirthplace()
                     ),
                     business.Identifier,
@@ -342,11 +342,11 @@ namespace Sheaft.Services
                 await EnsureAccessTokenIsValidAsync(token);
 
                 var result = await _api.UboDeclarations.UpdateUboAsync(
-                    new UboPutDTO(ubo.FirstName, 
-                        ubo.LastName, 
-                        ubo.Address.GetAddress(), 
-                        ubo.Nationality.GetCountry(), 
-                        ubo.BirthDate.DateTime, 
+                    new UboPutDTO(ubo.FirstName,
+                        ubo.LastName,
+                        ubo.Address.GetAddress(),
+                        ubo.Nationality.GetCountry(),
+                        ubo.BirthDate.DateTime,
                         ubo.BirthPlace.GetBirthplace()
                     ),
                     business.Identifier,
@@ -601,8 +601,8 @@ namespace Sheaft.Services
                 await EnsureAccessTokenIsValidAsync(token);
 
                 var result = await _api.Transfers.CreateRefundAsync(
-                    transaction.Id.ToString("N"), 
-                    transaction.TransactionToRefundIdentifier, 
+                    transaction.Id.ToString("N"),
+                    transaction.TransactionToRefundIdentifier,
                     new RefundTransferPostDTO(transaction.Author.Identifier));
 
                 return Ok(new PspPaymentResultDto
@@ -779,6 +779,7 @@ namespace Sheaft.Services
                     return LegalPersonType.SOLETRADER;
                 case LegalKind.Organization:
                     return LegalPersonType.ORGANIZATION;
+                case LegalKind.Natural:
                 default:
                     return LegalPersonType.NotSpecified;
             }

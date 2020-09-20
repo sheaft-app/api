@@ -77,7 +77,7 @@ namespace Sheaft.Functions
             builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
             var sendgridConfig = sendgridSettings.Get<SendgridOptions>();
-            builder.Services.AddScoped<ISendGridClient, SendGridClient>(c => new SendGridClient(sendgridConfig.ApiKey));
+            builder.Services.AddScoped<ISendGridClient, SendGridClient>(_ => new SendGridClient(sendgridConfig.ApiKey));
 
             builder.Services.AddScoped<IIdentifierService, IdentifierService>();
             builder.Services.AddScoped<IQueueService, QueueService>();
@@ -100,7 +100,7 @@ namespace Sheaft.Functions
             }, ServiceLifetime.Scoped);
 
             var pspOptions = pspSettings.Get<PspOptions>();
-            builder.Services.AddScoped<MangoPayApi>(c => new MangoPayApi
+            builder.Services.AddScoped<MangoPayApi>(_ => new MangoPayApi
             {
                 Config = new MangoPay.SDK.Core.Configuration
                 {

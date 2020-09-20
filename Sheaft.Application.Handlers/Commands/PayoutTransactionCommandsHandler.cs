@@ -98,7 +98,6 @@ namespace Sheaft.Application.Handlers
             });
         }
 
-
         public async Task<Result<bool>> Handle(CheckPayoutTransactionsCommand request, CancellationToken token)
         {
             return await ExecuteAsync(async () =>
@@ -132,7 +131,6 @@ namespace Sheaft.Application.Handlers
                                     }, token);
                                 break;
                         }
-
                     }
 
                     skip += take;
@@ -189,7 +187,8 @@ namespace Sheaft.Application.Handlers
         {
             return await _context.Transactions
                                 .OfType<PayoutTransaction>()
-                                .Get(c => c.Status == TransactionStatus.Waiting && c.CreatedOn < expiredDate || c.Status == TransactionStatus.Created && c.UpdatedOn.HasValue && c.UpdatedOn.Value < expiredDate, true)
+                                .Get(c => (c.Status == TransactionStatus.Waiting && c.CreatedOn < expiredDate)
+                                        || (c.Status == TransactionStatus.Created && c.UpdatedOn.HasValue && c.UpdatedOn.Value < expiredDate), true)
                                 .OrderBy(c => c.Id)
                                 .Skip(skip)
                                 .Take(take)

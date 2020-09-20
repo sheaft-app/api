@@ -15,6 +15,6 @@ namespace Sheaft.Domain.Models
             Card = card;
         }
 
-        public virtual Card Card { get; private set; }
+        public virtual Card Card { get; }
     }
 }

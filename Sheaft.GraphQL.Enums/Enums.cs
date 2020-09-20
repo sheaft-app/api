@@ -524,5 +524,4 @@ namespace Sheaft.GraphQL.Enums
             descriptor.Value(CountryIsoCode.ZW);
         }
     }
-    
 }

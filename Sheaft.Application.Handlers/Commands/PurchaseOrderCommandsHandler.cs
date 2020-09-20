@@ -426,10 +426,10 @@ namespace Sheaft.Application.Handlers
         private async Task<IEnumerable<PurchaseOrder>> GetNextAcceptedPurchaseOrders(DateTimeOffset expiredDate, int skip, int take, CancellationToken token)
         {
             return await _context.PurchaseOrders
-                .Get(c => c.Status > PurchaseOrderStatus.Waiting 
-                            && c.Status < PurchaseOrderStatus.Refused 
-                            && c.UpdatedOn.Value < expiredDate 
-                            && (!c.Transactions.Any() 
+                .Get(c => c.Status > PurchaseOrderStatus.Waiting
+                            && c.Status < PurchaseOrderStatus.Refused
+                            && c.UpdatedOn.Value < expiredDate
+                            && (!c.Transactions.Any()
                                 || c.Transactions.All(t => t.Status == TransactionStatus.Failed || t.Status == TransactionStatus.Expired)
                             ), true)
                 .OrderBy(c => c.Id)

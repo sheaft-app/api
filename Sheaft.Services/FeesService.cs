@@ -14,7 +14,7 @@ namespace Sheaft.Services
 
         public decimal GetFees(decimal amount)
         {
-            return amount * _pspOptions.Percent + _pspOptions.FixedAmount;
+            return (amount * _pspOptions.Percent) + _pspOptions.FixedAmount;
         }
     }
 }

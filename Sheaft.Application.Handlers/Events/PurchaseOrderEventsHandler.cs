@@ -113,7 +113,7 @@ namespace Sheaft.Application.Handlers
 
             var senderMail = purchaseOrder.Sender.Email;
             var senderName = purchaseOrder.Sender.Name;
-            
+           
             await _emailService.SendTemplatedEmailAsync(
                 senderMail,
                 senderName,

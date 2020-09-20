@@ -731,7 +731,7 @@ namespace Sheaft.GraphQL.Types
             descriptor.Field(c => c.Name);
 
             descriptor.Field(c => c.Address)
-                .Type<NonNullType<AddressType>>();            
+                .Type<NonNullType<AddressType>>();
         }
     }
     public class DeliveryType : ObjectType<DeliveryDto>
@@ -907,7 +907,7 @@ namespace Sheaft.GraphQL.Types
             descriptor.Field(c => c.Producer)
                 .Type<NonNullType<BusinessProfileType>>();
         }
-    }    
+    }
     public class SearchProductType : SheaftOutputType<ProductDto>
     {
         protected override void Configure(IObjectTypeDescriptor<ProductDto> descriptor)

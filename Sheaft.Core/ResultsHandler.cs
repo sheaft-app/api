@@ -64,7 +64,7 @@ namespace Sheaft.Core
 
         protected Result<T> Accepted<T>(T result, MessageKind? message = null, params object[] objs)
         {
-            Logger.LogTrace(nameof(ResultsHandler.Accepted), result, message);
+            Logger.LogTrace(nameof(ResultsHandler.Accepted), result, message, objs);
             return new SuccessResult<T>(result, message);
         }
 

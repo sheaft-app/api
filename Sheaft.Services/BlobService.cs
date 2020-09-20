@@ -58,7 +58,6 @@ namespace Sheaft.Services
 
         public async Task<Result<string>> UploadProductPictureAsync(Guid userId, Guid productId, string filename, string size, Stream stream, CancellationToken token)
         {
-
             return await ExecuteAsync(async () =>
             {
                 var containerClient = new BlobContainerClient(_storageOptions.ConnectionString, _storageOptions.Containers.Pictures);
@@ -217,7 +216,7 @@ namespace Sheaft.Services
                 var containerClient = new BlobContainerClient(_storageOptions.ConnectionString, _storageOptions.Containers.Progress);
                 await containerClient.CreateIfNotExistsAsync(cancellationToken: token);
 
-                var blobClient = containerClient.GetBlobClient($"departments.json");
+                var blobClient = containerClient.GetBlobClient("departments.json");
                 await blobClient.DeleteIfExistsAsync(DeleteSnapshotsOption.IncludeSnapshots);
 
                 stream.Position = 0;

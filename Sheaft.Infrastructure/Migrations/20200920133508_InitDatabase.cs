@@ -1887,7 +1887,6 @@ namespace Sheaft.Infrastructure.Migrations
                 table: "Wallets",
                 columns: new[] { "Uid", "Id", "UserUid", "RemovedOn" });
 
-
             migrationBuilder.InsertData("Levels", new List<string>() { "Uid", "Id", "CreatedOn", "RequiredPoints", "Name" }.ToArray(), new List<object>() { 1, "63b7d548-b8ae-43f6-bb9a-b47311ba57ed", "2020-05-01", "1000", "Niveau 1" }.ToArray(), "dbo");
             migrationBuilder.InsertData("Levels", new List<string>() { "Uid", "Id", "CreatedOn", "RequiredPoints", "Name" }.ToArray(), new List<object>() { 2, "a9193dc7-9508-4ab8-a1e3-0b72ee47589b", "2020-05-01", "2000", "Niveau 1" }.ToArray(), "dbo");
             migrationBuilder.InsertData("Levels", new List<string>() { "Uid", "Id", "CreatedOn", "RequiredPoints", "Name" }.ToArray(), new List<object>() { 3, "4817296a-94c7-4724-8de3-b58eca77ef5a", "2020-05-01", "4000", "Niveau 2" }.ToArray(), "dbo");
@@ -2498,7 +2497,6 @@ namespace Sheaft.Infrastructure.Migrations
             migrationBuilder.Sql("CREATE TABLE [Cache].[CachedItems](	[Id] [nvarchar](449) NOT NULL,	[Value] [varbinary](max) NOT NULL,	[ExpiresAtTime] [datetimeoffset](7) NOT NULL,	[SlidingExpirationInSeconds] [bigint] NULL,	[AbsoluteExpiration] [datetimeoffset](7) NULL,PRIMARY KEY CLUSTERED(	[Id] ASC)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]");
             migrationBuilder.Sql("CREATE NONCLUSTERED INDEX [Index_ExpiresAtTime] ON [Cache].[CachedItems](	[ExpiresAtTime] ASC)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]");
 
-
             migrationBuilder.InsertData("Users", new List<string>() { "Uid", "Id", "CreatedOn", "FirstName", "LastName", "Name", "Email", "Siret", "VatIdentifier", "kind", "OpenForNewBusiness" }.ToArray(), new List<object>() { 1, "28491432-1754-4285-9F67-5386A898A48F", "2020-01-25 15:23:10", "Benoit", "Mugnier", "GAEC La Ferme du Parquet", "contact@lfdp.xyz", "452121545", "FR11452121545", "0", "1" }.ToArray(), "dbo");
             migrationBuilder.InsertData("Users", new List<string>() { "Uid", "Id", "CreatedOn", "FirstName", "LastName", "Name", "Email", "Siret", "VatIdentifier", "kind", "OpenForNewBusiness" }.ToArray(), new List<object>() { 2, "5A8F0AE2-B701-47F0-A8EF-E7C2365A72EB", "2020-01-30 22:45:41", "Ophélie", "Lulin", "Biocoop Semnoz", "contact@biocoop-semnoz.xyz", "342121545", "FR12342121545", "1", "1" }.ToArray(), "dbo");
             migrationBuilder.InsertData("Users", new List<string>() { "Uid", "Id", "CreatedOn", "FirstName", "LastName", "Name", "Email", "Siret", "VatIdentifier", "kind", "OpenForNewBusiness" }.ToArray(), new List<object>() { 3, "0EAFD299-D0E6-4A63-AF8D-6D154DB96F55", "2020-01-27 22:45:41", "John", "Syntax", "Biocoop Orky", "contact@biocoop-orky.xyz", "451201545", "FR13451201154", "1", "1" }.ToArray(), "dbo");
@@ -2607,7 +2605,6 @@ namespace Sheaft.Infrastructure.Migrations
             migrationBuilder.Sql("update dbo.products set Image = 'https://sheaftapp.blob.core.windows.net/pictures/products/categories/0F3C3AA9-DA8F-4EEE-AC77-F41C93CBAC72.jpg', Vat = 5.50, OnSalePrice = 8.91, WholeSalePrice = 8.45, VatPrice = 0.46, WholeSalePricePerUnit = 8.45, VatPricePerUnit = 0.46, OnSalePricePerUnit =	8.91, UpdatedOn = GetUtcDate() where id = 'DE7DE3B5-5184-4150-9B10-A0FF11BCF5D7'");
             migrationBuilder.Sql("update dbo.products set Image = 'https://sheaftapp.blob.core.windows.net/pictures/products/categories/6A30A69D-FFC2-411A-84DE-BCE8B9BA86F8.jpg', Vat = 20.00, OnSalePrice = 6.00, WholeSalePrice = 5.00, VatPrice = 1.00, WholeSalePricePerUnit = 5.00, VatPricePerUnit = 1.00, OnSalePricePerUnit = 6.00, UpdatedOn = GetUtcDate() where id = '738727A2-ED2F-4FA6-810F-08D7A1B89D07'");
             migrationBuilder.Sql("update dbo.products set Image = 'https://sheaftapp.blob.core.windows.net/pictures/products/categories/6A30A69D-FFC2-411A-84DE-BCE8B9BA86F8.jpg', Vat = 5.50, OnSalePrice = 12.66, WholeSalePrice = 12.00, VatPrice = 0.66, WholeSalePricePerUnit = 12.00, VatPricePerUnit =	0.66, OnSalePricePerUnit = 12.66, UpdatedOn = GetUtcDate() where id = '1BD5BD83-4056-472C-8107-08D7A1B89D07'");
-
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)

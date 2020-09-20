@@ -31,8 +31,8 @@ namespace Sheaft.GraphQL
         private readonly IMapper _mapper;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly ILogger<SheaftMutation> _logger;
-        private CancellationToken _cancellationToken => _httpContextAccessor.HttpContext.RequestAborted;
-        private RequestUser _currentUser
+        private CancellationToken Token => _httpContextAccessor.HttpContext.RequestAborted;
+        private RequestUser CurrentUser
         {
             get
             {
@@ -44,9 +44,9 @@ namespace Sheaft.GraphQL
         }
 
         public SheaftMutation(
-            IMediator mediator, 
-            IMapper mapper, 
-            IHttpContextAccessor httpContextAccessor, 
+            IMediator mediator,
+            IMapper mapper,
+            IHttpContextAccessor httpContextAccessor,
             ILogger<SheaftMutation> logger)
         {
             _mediator = mediator;
@@ -59,7 +59,7 @@ namespace Sheaft.GraphQL
         [GraphQLName("generateUserSponsoringCode")]
         public async Task<string> GenerateUserSponsoringCodeAsync(IdInput input)
         {
-            return await ExecuteCommandAsync<GenerateUserCodeCommand, string>(_mapper.Map(input, new GenerateUserCodeCommand(_currentUser)), _cancellationToken);            
+            return await ExecuteCommandAsync<GenerateUserCodeCommand, string>(_mapper.Map(input, new GenerateUserCodeCommand(CurrentUser)), Token);
         }
 
         [Authorize(Policy = Policies.PRODUCER)]
@@ -68,8 +68,8 @@ namespace Sheaft.GraphQL
         [UseSelection]
         public async Task<IQueryable<JobDto>> ExportPickingOrdersAsync(ExportPickingOrdersInput input, [Service] IJobQueries jobQueries)
         {
-            var result = await ExecuteCommandAsync<QueueExportPickingOrderCommand, Guid>(_mapper.Map(input, new QueueExportPickingOrderCommand(_currentUser)), _cancellationToken);
-            return jobQueries.GetJob(result, _currentUser);
+            var result = await ExecuteCommandAsync<QueueExportPickingOrderCommand, Guid>(_mapper.Map(input, new QueueExportPickingOrderCommand(CurrentUser)), Token);
+            return jobQueries.GetJob(result, CurrentUser);
         }
 
         [Authorize(Policy = Policies.REGISTERED)]
@@ -78,8 +78,8 @@ namespace Sheaft.GraphQL
         [UseSelection]
         public async Task<IQueryable<JobDto>> ExportUserDataAsync(IdInput input, [Service] IJobQueries jobQueries)
         {
-            var result = await ExecuteCommandAsync<QueueExportUserDataCommand, Guid>(_mapper.Map(input, new QueueExportUserDataCommand(_currentUser)), _cancellationToken);
-            return jobQueries.GetJob(result, _currentUser);
+            var result = await ExecuteCommandAsync<QueueExportUserDataCommand, Guid>(_mapper.Map(input, new QueueExportUserDataCommand(CurrentUser)), Token);
+            return jobQueries.GetJob(result, CurrentUser);
         }
 
         [Authorize(Policy = Policies.REGISTERED)]
@@ -90,8 +90,8 @@ namespace Sheaft.GraphQL
         [UseSelection]
         public async Task<IQueryable<JobDto>> ResumeJobsAsync(IdsInput input, [Service] IJobQueries jobQueries)
         {
-            var result = await ExecuteCommandAsync<ResumeJobsCommand, bool>(_mapper.Map(input, new ResumeJobsCommand(_currentUser)), _cancellationToken);
-            return jobQueries.GetJobs(_currentUser).Where(j => input.Ids.Contains(j.Id));
+            var result = await ExecuteCommandAsync<ResumeJobsCommand, bool>(_mapper.Map(input, new ResumeJobsCommand(CurrentUser)), Token);
+            return jobQueries.GetJobs(CurrentUser).Where(j => input.Ids.Contains(j.Id));
         }
 
         [Authorize(Policy = Policies.REGISTERED)]
@@ -102,8 +102,8 @@ namespace Sheaft.GraphQL
         [UseSelection]
         public async Task<IQueryable<JobDto>> PauseJobsAsync(IdsInput input, [Service] IJobQueries jobQueries)
         {
-            var result = await ExecuteCommandAsync<PauseJobsCommand, bool>(_mapper.Map(input, new PauseJobsCommand(_currentUser)), _cancellationToken);
-            return jobQueries.GetJobs(_currentUser).Where(j => input.Ids.Contains(j.Id));
+            var result = await ExecuteCommandAsync<PauseJobsCommand, bool>(_mapper.Map(input, new PauseJobsCommand(CurrentUser)), Token);
+            return jobQueries.GetJobs(CurrentUser).Where(j => input.Ids.Contains(j.Id));
         }
 
         [Authorize(Policy = Policies.REGISTERED)]
@@ -114,8 +114,8 @@ namespace Sheaft.GraphQL
         [UseSelection]
         public async Task<IQueryable<JobDto>> RetryJobsAsync(IdsInput input, [Service] IJobQueries jobQueries)
         {
-            var result = await ExecuteCommandAsync<RetryJobsCommand, bool>(_mapper.Map(input, new RetryJobsCommand(_currentUser)), _cancellationToken);
-            return jobQueries.GetJobs(_currentUser).Where(j => input.Ids.Contains(j.Id));
+            var result = await ExecuteCommandAsync<RetryJobsCommand, bool>(_mapper.Map(input, new RetryJobsCommand(CurrentUser)), Token);
+            return jobQueries.GetJobs(CurrentUser).Where(j => input.Ids.Contains(j.Id));
         }
 
         [Authorize(Policy = Policies.REGISTERED)]
@@ -126,8 +126,8 @@ namespace Sheaft.GraphQL
         [UseSelection]
         public async Task<IQueryable<JobDto>> CancelJobsAsync(IdsWithReasonInput input, [Service] IJobQueries jobQueries)
         {
-            var result = await ExecuteCommandAsync<CancelJobsCommand, bool>(_mapper.Map(input, new CancelJobsCommand(_currentUser)), _cancellationToken);
-            return jobQueries.GetJobs(_currentUser).Where(j => input.Ids.Contains(j.Id));
+            var result = await ExecuteCommandAsync<CancelJobsCommand, bool>(_mapper.Map(input, new CancelJobsCommand(CurrentUser)), Token);
+            return jobQueries.GetJobs(CurrentUser).Where(j => input.Ids.Contains(j.Id));
         }
 
         [Authorize(Policy = Policies.REGISTERED)]
@@ -138,30 +138,30 @@ namespace Sheaft.GraphQL
         [UseSelection]
         public async Task<IQueryable<JobDto>> ArchiveJobsAsync(IdsInput input, [Service] IJobQueries jobQueries)
         {
-            var result = await ExecuteCommandAsync<ArchiveJobsCommand, bool>(_mapper.Map(input, new ArchiveJobsCommand(_currentUser)), _cancellationToken);
-            return jobQueries.GetJobs(_currentUser).Where(j => input.Ids.Contains(j.Id));
+            var result = await ExecuteCommandAsync<ArchiveJobsCommand, bool>(_mapper.Map(input, new ArchiveJobsCommand(CurrentUser)), Token);
+            return jobQueries.GetJobs(CurrentUser).Where(j => input.Ids.Contains(j.Id));
         }
-        
+
         [Authorize(Policy = Policies.STORE_OR_PRODUCER)]
         [GraphQLName("createAgreement")]
         [UseSingleOrDefault]
         [UseSelection]
         public async Task<IQueryable<AgreementDto>> CreateAgreementAsync(CreateAgreementInput input, [Service] IAgreementQueries agreementQueries)
         {
-            var result = await ExecuteCommandAsync<CreateAgreementCommand, Guid>(_mapper.Map(input, new CreateAgreementCommand(_currentUser)), _cancellationToken);
-            return agreementQueries.GetAgreement(result, _currentUser);
+            var result = await ExecuteCommandAsync<CreateAgreementCommand, Guid>(_mapper.Map(input, new CreateAgreementCommand(CurrentUser)), Token);
+            return agreementQueries.GetAgreement(result, CurrentUser);
         }
-        
+
         [Authorize(Policy = Policies.STORE_OR_PRODUCER)]
         [GraphQLName("acceptAgreement")]
         [UseSingleOrDefault]
         [UseSelection]
         public async Task<IQueryable<AgreementDto>> AcceptAgreementAsync(IdTimeSlotGroupInput input, [Service] IAgreementQueries agreementQueries)
         {
-            await ExecuteCommandAsync<AcceptAgreementCommand, bool>(_mapper.Map(input, new AcceptAgreementCommand(_currentUser)), _cancellationToken);
-            return agreementQueries.GetAgreement(input.Id, _currentUser);
+            await ExecuteCommandAsync<AcceptAgreementCommand, bool>(_mapper.Map(input, new AcceptAgreementCommand(CurrentUser)), Token);
+            return agreementQueries.GetAgreement(input.Id, CurrentUser);
         }
-        
+
         [Authorize(Policy = Policies.STORE_OR_PRODUCER)]
         [GraphQLName("cancelAgreements")]
         [UsePaging]
@@ -170,10 +170,10 @@ namespace Sheaft.GraphQL
         [UseSelection]
         public async Task<IQueryable<AgreementDto>> CancelAgreementsAsync(IdsWithReasonInput input, [Service] IAgreementQueries agreementQueries)
         {
-            await ExecuteCommandAsync<CancelAgreementsCommand, bool>(_mapper.Map(input, new CancelAgreementsCommand(_currentUser)), _cancellationToken);
-            return agreementQueries.GetAgreements(_currentUser).Where(j => input.Ids.Contains(j.Id));
+            await ExecuteCommandAsync<CancelAgreementsCommand, bool>(_mapper.Map(input, new CancelAgreementsCommand(CurrentUser)), Token);
+            return agreementQueries.GetAgreements(CurrentUser).Where(j => input.Ids.Contains(j.Id));
         }
-        
+
         [Authorize(Policy = Policies.STORE_OR_PRODUCER)]
         [GraphQLName("refuseAgreements")]
         [UsePaging]
@@ -182,16 +182,16 @@ namespace Sheaft.GraphQL
         [UseSelection]
         public async Task<IQueryable<AgreementDto>> RefuseAgreementsAsync(IdsWithReasonInput input, [Service] IAgreementQueries agreementQueries)
         {
-            await ExecuteCommandAsync<RefuseAgreementsCommand, bool>(_mapper.Map(input, new RefuseAgreementsCommand(_currentUser)), _cancellationToken);
-            return agreementQueries.GetAgreements(_currentUser).Where(j => input.Ids.Contains(j.Id));
+            await ExecuteCommandAsync<RefuseAgreementsCommand, bool>(_mapper.Map(input, new RefuseAgreementsCommand(CurrentUser)), Token);
+            return agreementQueries.GetAgreements(CurrentUser).Where(j => input.Ids.Contains(j.Id));
         }
 
         [Authorize(Policy = Policies.REGISTERED)]
         [GraphQLName("markUserNotificationsAsRead")]
         public async Task<DateTimeOffset> MarkMyNotificationsAsReadAsync()
         {
-            var input = new MarkUserNotificationsAsReadCommand(_currentUser) { ReadBefore = DateTimeOffset.UtcNow };
-            await ExecuteCommandAsync<MarkUserNotificationsAsReadCommand, bool>(input, _cancellationToken);
+            var input = new MarkUserNotificationsAsReadCommand(CurrentUser) { ReadBefore = DateTimeOffset.UtcNow };
+            await ExecuteCommandAsync<MarkUserNotificationsAsReadCommand, bool>(input, Token);
             return input.ReadBefore;
         }
 
@@ -201,8 +201,8 @@ namespace Sheaft.GraphQL
         [UseSelection]
         public async Task<IQueryable<NotificationDto>> MarkNotificationAsReadAsync(IdInput input, [Service] INotificationQueries notificationQueries)
         {
-            await ExecuteCommandAsync<MarkUserNotificationAsReadCommand, bool>(_mapper.Map(input, new MarkUserNotificationAsReadCommand(_currentUser)), _cancellationToken);
-            return notificationQueries.GetNotification(input.Id, _currentUser);
+            await ExecuteCommandAsync<MarkUserNotificationAsReadCommand, bool>(_mapper.Map(input, new MarkUserNotificationAsReadCommand(CurrentUser)), Token);
+            return notificationQueries.GetNotification(input.Id, CurrentUser);
         }
 
         [Authorize(Policy = Policies.CONSUMER)]
@@ -211,8 +211,8 @@ namespace Sheaft.GraphQL
         [UseSelection]
         public async Task<IQueryable<OrderDto>> CreateOrderAsync(CreateOrderInput input, [Service] IOrderQueries orderQueries)
         {
-            var result = await ExecuteCommandAsync<CreateConsumerOrderCommand, Guid>(_mapper.Map(input, new CreateConsumerOrderCommand(_currentUser)), _cancellationToken);
-            return orderQueries.GetOrder(result, _currentUser);
+            var result = await ExecuteCommandAsync<CreateConsumerOrderCommand, Guid>(_mapper.Map(input, new CreateConsumerOrderCommand(CurrentUser)), Token);
+            return orderQueries.GetOrder(result, CurrentUser);
         }
 
         [Authorize(Policy = Policies.CONSUMER)]
@@ -221,8 +221,8 @@ namespace Sheaft.GraphQL
         [UseSelection]
         public async Task<IQueryable<OrderDto>> UpdateOrderAsync(UpdateOrderInput input, [Service] IOrderQueries orderQueries)
         {
-            var result = await ExecuteCommandAsync<UpdateConsumerOrderCommand, bool>(_mapper.Map(input, new UpdateConsumerOrderCommand(_currentUser)), _cancellationToken);
-            return orderQueries.GetOrder(input.Id, _currentUser);
+            await ExecuteCommandAsync<UpdateConsumerOrderCommand, bool>(_mapper.Map(input, new UpdateConsumerOrderCommand(CurrentUser)), Token);
+            return orderQueries.GetOrder(input.Id, CurrentUser);
         }
 
         [Authorize(Policy = Policies.STORE)]
@@ -233,8 +233,8 @@ namespace Sheaft.GraphQL
         [UseSelection]
         public async Task<IQueryable<PurchaseOrderDto>> CreateBusinessOrderAsync(CreateOrderInput input, [Service] IPurchaseOrderQueries purchaseOrderQueries)
         {
-            var result = await ExecuteCommandAsync<CreateBusinessOrderCommand, IEnumerable<Guid>>(_mapper.Map(input, new CreateBusinessOrderCommand(_currentUser)), _cancellationToken);
-            return purchaseOrderQueries.GetPurchaseOrders(_currentUser).Where(j => result.Contains(j.Id));
+            var result = await ExecuteCommandAsync<CreateBusinessOrderCommand, IEnumerable<Guid>>(_mapper.Map(input, new CreateBusinessOrderCommand(CurrentUser)), Token);
+            return purchaseOrderQueries.GetPurchaseOrders(CurrentUser).Where(j => result.Contains(j.Id));
         }
 
         [Authorize(Policy = Policies.CONSUMER)]
@@ -243,8 +243,8 @@ namespace Sheaft.GraphQL
         [UseSelection]
         public async Task<IQueryable<WebPayinTransactionDto>> PayOrderAsync(IdInput input, [Service] ITransactionQueries transactionQueries)
         {
-            var result = await ExecuteCommandAsync<PayOrderCommand, Guid>(_mapper.Map(input, new PayOrderCommand(_currentUser)), _cancellationToken);
-            return transactionQueries.GetWebPayinTransaction(result, _currentUser);
+            var result = await ExecuteCommandAsync<PayOrderCommand, Guid>(_mapper.Map(input, new PayOrderCommand(CurrentUser)), Token);
+            return transactionQueries.GetWebPayinTransaction(result, CurrentUser);
         }
 
         [Authorize(Policy = Policies.PRODUCER)]
@@ -253,15 +253,15 @@ namespace Sheaft.GraphQL
         [UseSelection]
         public async Task<IQueryable<DocumentDto>> CreateDocumentAsync(CreateDocumentInput input, [Service] IDocumentQueries documentQueries)
         {
-            var result = await ExecuteCommandAsync<CreateDocumentCommand, Guid>(_mapper.Map(input, new CreateDocumentCommand(_currentUser)), _cancellationToken);
-            return documentQueries.GetDocument(result, _currentUser);
+            var result = await ExecuteCommandAsync<CreateDocumentCommand, Guid>(_mapper.Map(input, new CreateDocumentCommand(CurrentUser)), Token);
+            return documentQueries.GetDocument(result, CurrentUser);
         }
 
         [Authorize(Policy = Policies.PRODUCER)]
         [GraphQLName("removeDocument")]
         public async Task<bool> RemoveDocumentAsync(IdInput input)
         {
-            return await ExecuteCommandAsync<RemoveDocumentCommand, bool>(_mapper.Map(input, new RemoveDocumentCommand(_currentUser)), _cancellationToken);
+            return await ExecuteCommandAsync<RemoveDocumentCommand, bool>(_mapper.Map(input, new RemoveDocumentCommand(CurrentUser)), Token);
         }
 
         [Authorize(Policy = Policies.PRODUCER)]
@@ -272,8 +272,8 @@ namespace Sheaft.GraphQL
         [UseSelection]
         public async Task<IQueryable<PurchaseOrderDto>> AcceptPurchaseOrdersAsync(IdsInput input, [Service] IPurchaseOrderQueries purchaseOrderQueries)
         {
-            await ExecuteCommandAsync<AcceptPurchaseOrdersCommand, bool>(_mapper.Map(input, new AcceptPurchaseOrdersCommand(_currentUser)), _cancellationToken);
-            return purchaseOrderQueries.GetPurchaseOrders(_currentUser).Where(j => input.Ids.Contains(j.Id));
+            await ExecuteCommandAsync<AcceptPurchaseOrdersCommand, bool>(_mapper.Map(input, new AcceptPurchaseOrdersCommand(CurrentUser)), Token);
+            return purchaseOrderQueries.GetPurchaseOrders(CurrentUser).Where(j => input.Ids.Contains(j.Id));
         }
 
         [Authorize(Policy = Policies.PRODUCER)]
@@ -284,8 +284,8 @@ namespace Sheaft.GraphQL
         [UseSelection]
         public async Task<IQueryable<PurchaseOrderDto>> ShipPurchaseOrdersAsync(IdsInput input, [Service] IPurchaseOrderQueries purchaseOrderQueries)
         {
-            await ExecuteCommandAsync<ShipPurchaseOrdersCommand, bool>(_mapper.Map(input, new ShipPurchaseOrdersCommand(_currentUser)), _cancellationToken);
-            return purchaseOrderQueries.GetPurchaseOrders(_currentUser).Where(j => input.Ids.Contains(j.Id));
+            await ExecuteCommandAsync<ShipPurchaseOrdersCommand, bool>(_mapper.Map(input, new ShipPurchaseOrdersCommand(CurrentUser)), Token);
+            return purchaseOrderQueries.GetPurchaseOrders(CurrentUser).Where(j => input.Ids.Contains(j.Id));
         }
 
         [Authorize(Policy = Policies.PRODUCER)]
@@ -296,8 +296,8 @@ namespace Sheaft.GraphQL
         [UseSelection]
         public async Task<IQueryable<PurchaseOrderDto>> DeliverPurchaseOrdersAsync(IdsInput input, [Service] IPurchaseOrderQueries purchaseOrderQueries)
         {
-            await ExecuteCommandAsync<DeliverPurchaseOrdersCommand, bool>(_mapper.Map(input, new DeliverPurchaseOrdersCommand(_currentUser)), _cancellationToken);
-            return purchaseOrderQueries.GetPurchaseOrders(_currentUser).Where(j => input.Ids.Contains(j.Id));
+            await ExecuteCommandAsync<DeliverPurchaseOrdersCommand, bool>(_mapper.Map(input, new DeliverPurchaseOrdersCommand(CurrentUser)), Token);
+            return purchaseOrderQueries.GetPurchaseOrders(CurrentUser).Where(j => input.Ids.Contains(j.Id));
         }
 
         [Authorize(Policy = Policies.PRODUCER)]
@@ -308,8 +308,8 @@ namespace Sheaft.GraphQL
         [UseSelection]
         public async Task<IQueryable<PurchaseOrderDto>> ProcessPurchaseOrdersAsync(IdsInput input, [Service] IPurchaseOrderQueries purchaseOrderQueries)
         {
-            await ExecuteCommandAsync<ProcessPurchaseOrdersCommand, bool>(_mapper.Map(input, new ProcessPurchaseOrdersCommand(_currentUser)), _cancellationToken);
-            return purchaseOrderQueries.GetPurchaseOrders(_currentUser).Where(j => input.Ids.Contains(j.Id));
+            await ExecuteCommandAsync<ProcessPurchaseOrdersCommand, bool>(_mapper.Map(input, new ProcessPurchaseOrdersCommand(CurrentUser)), Token);
+            return purchaseOrderQueries.GetPurchaseOrders(CurrentUser).Where(j => input.Ids.Contains(j.Id));
         }
 
         [Authorize(Policy = Policies.PRODUCER)]
@@ -320,8 +320,8 @@ namespace Sheaft.GraphQL
         [UseSelection]
         public async Task<IQueryable<PurchaseOrderDto>> CompletePurchaseOrdersAsync(IdsInput input, [Service] IPurchaseOrderQueries purchaseOrderQueries)
         {
-            await ExecuteCommandAsync<CompletePurchaseOrdersCommand, bool>(_mapper.Map(input, new CompletePurchaseOrdersCommand(_currentUser)), _cancellationToken);
-            return purchaseOrderQueries.GetPurchaseOrders(_currentUser).Where(j => input.Ids.Contains(j.Id));
+            await ExecuteCommandAsync<CompletePurchaseOrdersCommand, bool>(_mapper.Map(input, new CompletePurchaseOrdersCommand(CurrentUser)), Token);
+            return purchaseOrderQueries.GetPurchaseOrders(CurrentUser).Where(j => input.Ids.Contains(j.Id));
         }
 
         [Authorize(Policy = Policies.REGISTERED)]
@@ -332,8 +332,8 @@ namespace Sheaft.GraphQL
         [UseSelection]
         public async Task<IQueryable<PurchaseOrderDto>> CancelPurchaseOrdersAsync(IdsWithReasonInput input, [Service] IPurchaseOrderQueries purchaseOrderQueries)
         {
-            await ExecuteCommandAsync<CancelPurchaseOrdersCommand, bool>(_mapper.Map(input, new CancelPurchaseOrdersCommand(_currentUser)), _cancellationToken);
-            return purchaseOrderQueries.GetPurchaseOrders(_currentUser).Where(j => input.Ids.Contains(j.Id));
+            await ExecuteCommandAsync<CancelPurchaseOrdersCommand, bool>(_mapper.Map(input, new CancelPurchaseOrdersCommand(CurrentUser)), Token);
+            return purchaseOrderQueries.GetPurchaseOrders(CurrentUser).Where(j => input.Ids.Contains(j.Id));
         }
 
         [Authorize(Policy = Policies.PRODUCER)]
@@ -344,15 +344,15 @@ namespace Sheaft.GraphQL
         [UseSelection]
         public async Task<IQueryable<PurchaseOrderDto>> RefusePurchaseOrdersAsync(IdsWithReasonInput input, [Service] IPurchaseOrderQueries purchaseOrderQueries)
         {
-            await ExecuteCommandAsync<RefusePurchaseOrdersCommand, bool>(_mapper.Map(input, new RefusePurchaseOrdersCommand(_currentUser)), _cancellationToken);
-            return purchaseOrderQueries.GetPurchaseOrders(_currentUser).Where(j => input.Ids.Contains(j.Id));
+            await ExecuteCommandAsync<RefusePurchaseOrdersCommand, bool>(_mapper.Map(input, new RefusePurchaseOrdersCommand(CurrentUser)), Token);
+            return purchaseOrderQueries.GetPurchaseOrders(CurrentUser).Where(j => input.Ids.Contains(j.Id));
         }
 
         [Authorize(Policy = Policies.REGISTERED)]
         [GraphQLName("deletePurchaseOrders")]
         public async Task<bool> DeletePurchaseOrdersAsync(IdsInput input)
         {
-            return await ExecuteCommandAsync<DeletePurchaseOrdersCommand, bool>(_mapper.Map(input, new DeletePurchaseOrdersCommand(_currentUser)), _cancellationToken);
+            return await ExecuteCommandAsync<DeletePurchaseOrdersCommand, bool>(_mapper.Map(input, new DeletePurchaseOrdersCommand(CurrentUser)), Token);
         }
 
         [Authorize(Policy = Policies.PRODUCER)]
@@ -362,8 +362,8 @@ namespace Sheaft.GraphQL
         [UseSelection]
         public async Task<IQueryable<ProductDto>> CreateProductAsync(CreateProductInput input, [Service] IProductQueries productQueries)
         {
-            var result = await ExecuteCommandAsync<CreateProductCommand, Guid>(_mapper.Map(input, new CreateProductCommand(_currentUser)), _cancellationToken);
-            return productQueries.GetProduct(result, _currentUser);
+            var result = await ExecuteCommandAsync<CreateProductCommand, Guid>(_mapper.Map(input, new CreateProductCommand(CurrentUser)), Token);
+            return productQueries.GetProduct(result, CurrentUser);
         }
 
         [Authorize(Policy = Policies.PRODUCER)]
@@ -373,8 +373,8 @@ namespace Sheaft.GraphQL
         [UseSelection]
         public async Task<IQueryable<ProductDto>> UpdateProductAsync(UpdateProductInput input, [Service] IProductQueries productQueries)
         {
-            await ExecuteCommandAsync<UpdateProductCommand, bool>(_mapper.Map(input, new UpdateProductCommand(_currentUser)), _cancellationToken);
-            return productQueries.GetProduct(input.Id, _currentUser);
+            await ExecuteCommandAsync<UpdateProductCommand, bool>(_mapper.Map(input, new UpdateProductCommand(CurrentUser)), Token);
+            return productQueries.GetProduct(input.Id, CurrentUser);
         }
 
         [Authorize(Policy = Policies.REGISTERED)]
@@ -384,8 +384,8 @@ namespace Sheaft.GraphQL
         [UseSelection]
         public async Task<IQueryable<ProductDto>> RateProductAsync(RateProductInput input, [Service] IProductQueries productQueries)
         {
-            await ExecuteCommandAsync<RateProductCommand, bool>(_mapper.Map(input, new RateProductCommand(_currentUser)), _cancellationToken);
-            return productQueries.GetProduct(input.Id, _currentUser);
+            await ExecuteCommandAsync<RateProductCommand, bool>(_mapper.Map(input, new RateProductCommand(CurrentUser)), Token);
+            return productQueries.GetProduct(input.Id, CurrentUser);
         }
 
         [Authorize(Policy = Policies.PRODUCER)]
@@ -395,8 +395,8 @@ namespace Sheaft.GraphQL
         [UseSelection]
         public async Task<IQueryable<ProductDto>> UpdateProductPictureAsync(UpdatePictureInput input, [Service] IProductQueries productQueries)
         {
-            await ExecuteCommandAsync<UpdateProductPictureCommand, bool>(_mapper.Map(input, new UpdateProductPictureCommand(_currentUser)), _cancellationToken);
-            return productQueries.GetProduct(input.Id, _currentUser);
+            await ExecuteCommandAsync<UpdateProductPictureCommand, bool>(_mapper.Map(input, new UpdateProductPictureCommand(CurrentUser)), Token);
+            return productQueries.GetProduct(input.Id, CurrentUser);
         }
 
         [Authorize(Policy = Policies.PRODUCER)]
@@ -408,15 +408,15 @@ namespace Sheaft.GraphQL
         [UseSelection]
         public async Task<IQueryable<ProductDto>> SetProductsAvailabilityAsync(SetProductsAvailabilityInput input, [Service] IProductQueries productQueries)
         {
-            await ExecuteCommandAsync<SetProductsAvailabilityCommand, bool>(_mapper.Map(input, new SetProductsAvailabilityCommand(_currentUser)), _cancellationToken);
-            return productQueries.GetProducts(_currentUser).Where(j => input.Ids.Contains(j.Id));
+            await ExecuteCommandAsync<SetProductsAvailabilityCommand, bool>(_mapper.Map(input, new SetProductsAvailabilityCommand(CurrentUser)), Token);
+            return productQueries.GetProducts(CurrentUser).Where(j => input.Ids.Contains(j.Id));
         }
 
         [Authorize(Policy = Policies.PRODUCER)]
         [GraphQLName("deleteProducts")]
         public async Task<bool> DeleteProductsAsync(IdsInput input)
         {
-            return await ExecuteCommandAsync<DeleteProductsCommand, bool>(_mapper.Map(input, new DeleteProductsCommand(_currentUser)), _cancellationToken);
+            return await ExecuteCommandAsync<DeleteProductsCommand, bool>(_mapper.Map(input, new DeleteProductsCommand(CurrentUser)), Token);
         }
 
         [Authorize(Policy = Policies.AUTHENTICATED)]
@@ -426,8 +426,8 @@ namespace Sheaft.GraphQL
         [UseSelection]
         public async Task<IQueryable<StoreDto>> RegisterStoreAsync(RegisterStoreInput input, [Service] IBusinessQueries businessQueries)
         {
-            var result = await ExecuteCommandAsync<RegisterStoreCommand, Guid>(_mapper.Map(input, new RegisterStoreCommand(_currentUser)), _cancellationToken);
-            return businessQueries.GetStore(result, _currentUser);
+            var result = await ExecuteCommandAsync<RegisterStoreCommand, Guid>(_mapper.Map(input, new RegisterStoreCommand(CurrentUser)), Token);
+            return businessQueries.GetStore(result, CurrentUser);
         }
 
         [Authorize(Policy = Policies.STORE)]
@@ -437,8 +437,8 @@ namespace Sheaft.GraphQL
         [UseSelection]
         public async Task<IQueryable<ProducerDto>> UpdateStoreAsync(UpdateStoreInput input, [Service] IBusinessQueries businessQueries)
         {
-            await ExecuteCommandAsync<UpdateStoreCommand, bool>(_mapper.Map(input, new UpdateStoreCommand(_currentUser)), _cancellationToken);
-            return businessQueries.GetStore(input.Id, _currentUser);
+            await ExecuteCommandAsync<UpdateStoreCommand, bool>(_mapper.Map(input, new UpdateStoreCommand(CurrentUser)), Token);
+            return businessQueries.GetStore(input.Id, CurrentUser);
         }
 
         [Authorize(Policy = Policies.AUTHENTICATED)]
@@ -448,8 +448,8 @@ namespace Sheaft.GraphQL
         [UseSelection]
         public async Task<IQueryable<ProducerDto>> RegisterProducerAsync(RegisterProducerInput input, [Service] IBusinessQueries businessQueries)
         {
-            var result = await ExecuteCommandAsync<RegisterProducerCommand, Guid>(_mapper.Map(input, new RegisterProducerCommand(_currentUser)), _cancellationToken);
-            return businessQueries.GetProducer(result, _currentUser);
+            var result = await ExecuteCommandAsync<RegisterProducerCommand, Guid>(_mapper.Map(input, new RegisterProducerCommand(CurrentUser)), Token);
+            return businessQueries.GetProducer(result, CurrentUser);
         }
 
         [Authorize(Policy = Policies.PRODUCER)]
@@ -459,8 +459,8 @@ namespace Sheaft.GraphQL
         [UseSelection]
         public async Task<IQueryable<ProducerDto>> UpdateProducerAsync(UpdateProducerInput input, [Service] IBusinessQueries businessQueries)
         {
-            await ExecuteCommandAsync<UpdateProducerCommand, bool>(_mapper.Map(input, new UpdateProducerCommand(_currentUser)), _cancellationToken);
-            return businessQueries.GetProducer(input.Id, _currentUser);
+            await ExecuteCommandAsync<UpdateProducerCommand, bool>(_mapper.Map(input, new UpdateProducerCommand(CurrentUser)), Token);
+            return businessQueries.GetProducer(input.Id, CurrentUser);
         }
 
         [Authorize(Policy = Policies.PRODUCER)]
@@ -470,8 +470,8 @@ namespace Sheaft.GraphQL
         [UseSelection]
         public async Task<IQueryable<BusinessLegalDto>> CreateBusinessLegalsAsync(CreateBusinessLegalInput input, [Service] ILegalQueries legalQueries)
         {
-            var result = await ExecuteCommandAsync<CreateBusinessLegalCommand, Guid>(_mapper.Map(input, new CreateBusinessLegalCommand(_currentUser)), _cancellationToken);
-            return legalQueries.GetBusinessLegals(result, _currentUser);
+            var result = await ExecuteCommandAsync<CreateBusinessLegalCommand, Guid>(_mapper.Map(input, new CreateBusinessLegalCommand(CurrentUser)), Token);
+            return legalQueries.GetBusinessLegals(result, CurrentUser);
         }
 
         [Authorize(Policy = Policies.PRODUCER)]
@@ -481,8 +481,8 @@ namespace Sheaft.GraphQL
         [UseSelection]
         public async Task<IQueryable<BusinessLegalDto>> UpdateBusinessLegalsAsync(UpdateBusinessLegalInput input, [Service] ILegalQueries legalQueries)
         {
-            await ExecuteCommandAsync<UpdateBusinessLegalCommand, bool>(_mapper.Map(input, new UpdateBusinessLegalCommand(_currentUser)), _cancellationToken);
-            return legalQueries.GetBusinessLegals(input.Id, _currentUser);
+            await ExecuteCommandAsync<UpdateBusinessLegalCommand, bool>(_mapper.Map(input, new UpdateBusinessLegalCommand(CurrentUser)), Token);
+            return legalQueries.GetBusinessLegals(input.Id, CurrentUser);
         }
 
         [Authorize(Policy = Policies.PRODUCER)]
@@ -492,8 +492,8 @@ namespace Sheaft.GraphQL
         [UseSelection]
         public async Task<IQueryable<UboDto>> CreateUboAsync(CreateUboInput input, [Service] IUboQueries uboQueries)
         {
-            var result = await ExecuteCommandAsync<CreateUboCommand, Guid>(_mapper.Map(input, new CreateUboCommand(_currentUser)), _cancellationToken);
-            return uboQueries.GetUbo(result, _currentUser);
+            var result = await ExecuteCommandAsync<CreateUboCommand, Guid>(_mapper.Map(input, new CreateUboCommand(CurrentUser)), Token);
+            return uboQueries.GetUbo(result, CurrentUser);
         }
 
         [Authorize(Policy = Policies.PRODUCER)]
@@ -503,15 +503,15 @@ namespace Sheaft.GraphQL
         [UseSelection]
         public async Task<IQueryable<UboDto>> UpdateUboAsync(UpdateUboInput input, [Service] IUboQueries uboQueries)
         {
-            await ExecuteCommandAsync<UpdateUboCommand, bool>(_mapper.Map(input, new UpdateUboCommand(_currentUser)), _cancellationToken);
-            return uboQueries.GetUbo(input.Id, _currentUser);
+            await ExecuteCommandAsync<UpdateUboCommand, bool>(_mapper.Map(input, new UpdateUboCommand(CurrentUser)), Token);
+            return uboQueries.GetUbo(input.Id, CurrentUser);
         }
 
         [Authorize(Policy = Policies.PRODUCER)]
         [GraphQLName("removeUbo")]
         public async Task<bool> RemoveUboAsync(IdInput input)
         {
-            return await ExecuteCommandAsync<RemoveUboCommand, bool>(_mapper.Map(input, new RemoveUboCommand(_currentUser)), _cancellationToken);
+            return await ExecuteCommandAsync<RemoveUboCommand, bool>(_mapper.Map(input, new RemoveUboCommand(CurrentUser)), Token);
         }
 
         [Authorize(Policy = Policies.AUTHENTICATED)]
@@ -521,8 +521,8 @@ namespace Sheaft.GraphQL
         [UseSelection]
         public async Task<IQueryable<ConsumerDto>> RegisterConsumerAsync(RegisterConsumerInput input, [Service] IConsumerQueries consumerQueries)
         {
-            var result = await ExecuteCommandAsync<RegisterConsumerCommand, Guid>(_mapper.Map(input, new RegisterConsumerCommand(_currentUser)), _cancellationToken);
-            return consumerQueries.GetConsumer(result, _currentUser);
+            var result = await ExecuteCommandAsync<RegisterConsumerCommand, Guid>(_mapper.Map(input, new RegisterConsumerCommand(CurrentUser)), Token);
+            return consumerQueries.GetConsumer(result, CurrentUser);
         }
 
         [Authorize(Policy = Policies.REGISTERED)]
@@ -532,8 +532,8 @@ namespace Sheaft.GraphQL
         [UseSelection]
         public async Task<IQueryable<ConsumerDto>> UpdateConsumerAsync(UpdateConsumerInput input, [Service] IConsumerQueries consumerQueries)
         {
-            await ExecuteCommandAsync<UpdateConsumerCommand, bool>(_mapper.Map(input, new UpdateConsumerCommand(_currentUser)), _cancellationToken);
-            return consumerQueries.GetConsumer(input.Id, _currentUser);
+            await ExecuteCommandAsync<UpdateConsumerCommand, bool>(_mapper.Map(input, new UpdateConsumerCommand(CurrentUser)), Token);
+            return consumerQueries.GetConsumer(input.Id, CurrentUser);
         }
 
         [Authorize(Policy = Policies.CONSUMER)]
@@ -543,8 +543,8 @@ namespace Sheaft.GraphQL
         [UseSelection]
         public async Task<IQueryable<ConsumerLegalDto>> CreateConsumerLegalsAsync(CreateConsumerLegalInput input, [Service] ILegalQueries legalQueries)
         {
-            var result = await ExecuteCommandAsync<CreateConsumerLegalCommand, Guid>(_mapper.Map(input, new CreateConsumerLegalCommand(_currentUser)), _cancellationToken);
-            return legalQueries.GetConsumerLegals(result, _currentUser);
+            var result = await ExecuteCommandAsync<CreateConsumerLegalCommand, Guid>(_mapper.Map(input, new CreateConsumerLegalCommand(CurrentUser)), Token);
+            return legalQueries.GetConsumerLegals(result, CurrentUser);
         }
 
         [Authorize(Policy = Policies.CONSUMER)]
@@ -554,22 +554,22 @@ namespace Sheaft.GraphQL
         [UseSelection]
         public async Task<IQueryable<ConsumerLegalDto>> UpdateConsumerLegalsAsync(UpdateConsumerLegalInput input, [Service] ILegalQueries legalQueries)
         {
-            await ExecuteCommandAsync<UpdateConsumerLegalCommand, bool>(_mapper.Map(input, new UpdateConsumerLegalCommand(_currentUser)), _cancellationToken);
-            return legalQueries.GetConsumerLegals(input.Id, _currentUser);
+            await ExecuteCommandAsync<UpdateConsumerLegalCommand, bool>(_mapper.Map(input, new UpdateConsumerLegalCommand(CurrentUser)), Token);
+            return legalQueries.GetConsumerLegals(input.Id, CurrentUser);
         }
 
         [Authorize(Policy = Policies.REGISTERED)]
         [GraphQLName("updateUserPicture")]
         public async Task<bool> UpdateUserPictureAsync(UpdatePictureInput input)
         {
-            return await ExecuteCommandAsync<UpdateUserPictureCommand, bool>(_mapper.Map(input, new UpdateUserPictureCommand(_currentUser)), _cancellationToken);
+            return await ExecuteCommandAsync<UpdateUserPictureCommand, bool>(_mapper.Map(input, new UpdateUserPictureCommand(CurrentUser)), Token);
         }
 
         [Authorize(Policy = Policies.REGISTERED)]
         [GraphQLName("deleteUser")]
         public async Task<bool> DeleteUserAsync(IdWithReasonInput input)
         {
-            return await ExecuteCommandAsync<DeleteUserCommand, bool>(_mapper.Map(input, new DeleteUserCommand(_currentUser)), _cancellationToken);
+            return await ExecuteCommandAsync<DeleteUserCommand, bool>(_mapper.Map(input, new DeleteUserCommand(CurrentUser)), Token);
         }
 
         [Authorize(Policy = Policies.STORE)]
@@ -578,8 +578,8 @@ namespace Sheaft.GraphQL
         [UseSelection]
         public async Task<IQueryable<QuickOrderDto>> CreateQuickOrderAsync(CreateQuickOrderInput input, [Service] IQuickOrderQueries quickOrderQueries)
         {
-            var result = await ExecuteCommandAsync<CreateQuickOrderCommand, Guid>(_mapper.Map(input, new CreateQuickOrderCommand(_currentUser)), _cancellationToken);
-            return quickOrderQueries.GetQuickOrder(result, _currentUser);
+            var result = await ExecuteCommandAsync<CreateQuickOrderCommand, Guid>(_mapper.Map(input, new CreateQuickOrderCommand(CurrentUser)), Token);
+            return quickOrderQueries.GetQuickOrder(result, CurrentUser);
         }
 
         [Authorize(Policy = Policies.STORE)]
@@ -588,8 +588,8 @@ namespace Sheaft.GraphQL
         [UseSelection]
         public async Task<IQueryable<QuickOrderDto>> SetDefaultQuickOrderAsync(IdInput input, [Service] IQuickOrderQueries quickOrderQueries)
         {
-            await ExecuteCommandAsync<SetDefaultQuickOrderCommand, bool>(_mapper.Map(input, new SetDefaultQuickOrderCommand(_currentUser)), _cancellationToken);
-            return quickOrderQueries.GetQuickOrder(input.Id, _currentUser);
+            await ExecuteCommandAsync<SetDefaultQuickOrderCommand, bool>(_mapper.Map(input, new SetDefaultQuickOrderCommand(CurrentUser)), Token);
+            return quickOrderQueries.GetQuickOrder(input.Id, CurrentUser);
         }
 
         [Authorize(Policy = Policies.STORE)]
@@ -598,8 +598,8 @@ namespace Sheaft.GraphQL
         [UseSelection]
         public async Task<IQueryable<QuickOrderDto>> UpdateQuickOrderAsync(UpdateQuickOrderInput input, [Service] IQuickOrderQueries quickOrderQueries)
         {
-            await ExecuteCommandAsync<UpdateQuickOrderCommand, bool>(_mapper.Map(input, new UpdateQuickOrderCommand(_currentUser)), _cancellationToken);
-            return quickOrderQueries.GetQuickOrder(input.Id, _currentUser);
+            await ExecuteCommandAsync<UpdateQuickOrderCommand, bool>(_mapper.Map(input, new UpdateQuickOrderCommand(CurrentUser)), Token);
+            return quickOrderQueries.GetQuickOrder(input.Id, CurrentUser);
         }
 
         [Authorize(Policy = Policies.STORE)]
@@ -608,15 +608,15 @@ namespace Sheaft.GraphQL
         [UseSelection]
         public async Task<IQueryable<QuickOrderDto>> UpdateQuickOrderProductsAsync(UpdateIdProductsQuantitiesInput input, [Service] IQuickOrderQueries quickOrderQueries)
         {
-            await ExecuteCommandAsync<UpdateQuickOrderProductsCommand, bool>(_mapper.Map(input, new UpdateQuickOrderProductsCommand(_currentUser)), _cancellationToken);
-            return quickOrderQueries.GetQuickOrder(input.Id, _currentUser);
+            await ExecuteCommandAsync<UpdateQuickOrderProductsCommand, bool>(_mapper.Map(input, new UpdateQuickOrderProductsCommand(CurrentUser)), Token);
+            return quickOrderQueries.GetQuickOrder(input.Id, CurrentUser);
         }
 
         [Authorize(Policy = Policies.STORE)]
         [GraphQLName("deleteQuickOrders")]
         public async Task<bool> DeleteQuickOrdersAsync(IdsWithReasonInput input)
         {
-            return await ExecuteCommandAsync<DeleteQuickOrdersCommand, bool>(_mapper.Map(input, new DeleteQuickOrdersCommand(_currentUser)), _cancellationToken);
+            return await ExecuteCommandAsync<DeleteQuickOrdersCommand, bool>(_mapper.Map(input, new DeleteQuickOrdersCommand(CurrentUser)), Token);
         }
 
         [Authorize(Policy = Policies.PRODUCER)]
@@ -625,8 +625,8 @@ namespace Sheaft.GraphQL
         [UseSelection]
         public async Task<IQueryable<DeliveryModeDto>> CreateDeliveryModeAsync(CreateDeliveryModeInput input, [Service] IDeliveryQueries deliveryQueries)
         {
-            var result = await ExecuteCommandAsync<CreateDeliveryModeCommand, Guid>(_mapper.Map(input, new CreateDeliveryModeCommand(_currentUser)), _cancellationToken);
-            return deliveryQueries.GetDelivery(result, _currentUser);
+            var result = await ExecuteCommandAsync<CreateDeliveryModeCommand, Guid>(_mapper.Map(input, new CreateDeliveryModeCommand(CurrentUser)), Token);
+            return deliveryQueries.GetDelivery(result, CurrentUser);
         }
 
         [Authorize(Policy = Policies.PRODUCER)]
@@ -635,15 +635,15 @@ namespace Sheaft.GraphQL
         [UseSelection]
         public async Task<IQueryable<DeliveryModeDto>>UpdateDeliveryModeAsync(UpdateDeliveryModeInput input, [Service] IDeliveryQueries deliveryQueries)
         {
-            await ExecuteCommandAsync<UpdateDeliveryModeCommand, bool>(_mapper.Map(input, new UpdateDeliveryModeCommand(_currentUser)), _cancellationToken);
-            return deliveryQueries.GetDelivery(input.Id, _currentUser);
+            await ExecuteCommandAsync<UpdateDeliveryModeCommand, bool>(_mapper.Map(input, new UpdateDeliveryModeCommand(CurrentUser)), Token);
+            return deliveryQueries.GetDelivery(input.Id, CurrentUser);
         }
 
         [Authorize(Policy = Policies.PRODUCER)]
         [GraphQLName("deleteDeliveryMode")]
         public async Task<bool> DeleteDeliveryModeAsync(IdInput input)
         {
-            return await ExecuteCommandAsync<DeleteDeliveryModeCommand, bool>(_mapper.Map(input, new DeleteDeliveryModeCommand(_currentUser)), _cancellationToken);
+            return await ExecuteCommandAsync<DeleteDeliveryModeCommand, bool>(_mapper.Map(input, new DeleteDeliveryModeCommand(CurrentUser)), Token);
         }
 
         [Authorize(Policy = Policies.PRODUCER)]
@@ -652,8 +652,8 @@ namespace Sheaft.GraphQL
         [UseSelection]
         public async Task<IQueryable<ReturnableDto>> CreateReturnableAsync(CreateReturnableInput input, [Service] IReturnableQueries returnableQueries)
         {
-            var result = await ExecuteCommandAsync<CreateReturnableCommand, Guid>(_mapper.Map(input, new CreateReturnableCommand(_currentUser)), _cancellationToken);
-            return returnableQueries.GetReturnable(result, _currentUser);
+            var result = await ExecuteCommandAsync<CreateReturnableCommand, Guid>(_mapper.Map(input, new CreateReturnableCommand(CurrentUser)), Token);
+            return returnableQueries.GetReturnable(result, CurrentUser);
         }
 
         [Authorize(Policy = Policies.PRODUCER)]
@@ -662,15 +662,15 @@ namespace Sheaft.GraphQL
         [UseSelection]
         public async Task<IQueryable<ReturnableDto>> UpdateReturnableAsync(UpdateReturnableInput input, [Service] IReturnableQueries returnableQueries)
         {
-            await ExecuteCommandAsync<UpdateReturnableCommand, bool>(_mapper.Map(input, new UpdateReturnableCommand(_currentUser)), _cancellationToken);
-            return returnableQueries.GetReturnable(input.Id, _currentUser);
+            await ExecuteCommandAsync<UpdateReturnableCommand, bool>(_mapper.Map(input, new UpdateReturnableCommand(CurrentUser)), Token);
+            return returnableQueries.GetReturnable(input.Id, CurrentUser);
         }
 
         [Authorize(Policy = Policies.PRODUCER)]
         [GraphQLName("deleteReturnable")]
         public async Task<bool> DeleteReturnableAsync(IdInput input)
         {
-            return await ExecuteCommandAsync<DeleteReturnableCommand, bool>(_mapper.Map(input, new DeleteReturnableCommand(_currentUser)), _cancellationToken);
+            return await ExecuteCommandAsync<DeleteReturnableCommand, bool>(_mapper.Map(input, new DeleteReturnableCommand(CurrentUser)), Token);
         }
 
         private async Task<T> ExecuteCommandAsync<U, T>(U input, CancellationToken token) where U : Command<T>

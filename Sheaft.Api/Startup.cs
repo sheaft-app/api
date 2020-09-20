@@ -48,7 +48,6 @@ namespace Sheaft.Api
     public class Startup
     {
         private readonly string MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
-        
         public IConfiguration Configuration { get; }
         public IWebHostEnvironment Env { get; }
 
@@ -97,10 +96,7 @@ namespace Sheaft.Api
             var rolesOptions = roleSettings.Get<RoleOptions>();
             services.AddAuthorization(options =>
             {
-                options.AddPolicy(Policies.AUTHENTICATED, builder =>
-                {
-                    builder.RequireAuthenticatedUser();
-                });
+                options.AddPolicy(Policies.AUTHENTICATED, builder => builder.RequireAuthenticatedUser());
                 options.AddPolicy(Policies.REGISTERED, builder =>
                 {
                     builder.RequireAuthenticatedUser();
@@ -138,10 +134,7 @@ namespace Sheaft.Api
                 });
             });
 
-            services.Configure<KestrelServerOptions>(options =>
-            {
-                options.AllowSynchronousIO = true;
-            });
+            services.Configure<KestrelServerOptions>(options => options.AllowSynchronousIO = true);
 
             var authConfig = authSettings.Get<AuthOptions>();
             services
@@ -165,10 +158,7 @@ namespace Sheaft.Api
                     };
                 });
 
-            services.Configure<ApiBehaviorOptions>(options =>
-            {
-                options.SuppressModelStateInvalidFilter = true;
-            });
+            services.Configure<ApiBehaviorOptions>(options => options.SuppressModelStateInvalidFilter = true);
 
             var corsConfig = corsSettings.Get<CorsOptions>();
             services.AddCors(options =>
@@ -183,7 +173,7 @@ namespace Sheaft.Api
             });
 
             var pspOptions = pspSettings.Get<PspOptions>();
-            services.AddScoped<MangoPayApi>(c => new MangoPayApi
+            services.AddScoped<MangoPayApi>(_ => new MangoPayApi
             {
                 Config = new MangoPay.SDK.Core.Configuration
                 {
@@ -240,10 +230,10 @@ namespace Sheaft.Api
             services.AddScoped<IAppDbContext>(c => c.GetRequiredService<AppDbContext>());
 
             var searchConfig = searchSettings.Get<SearchOptions>();
-            services.AddScoped<ISearchServiceClient, SearchServiceClient>(c => new SearchServiceClient(searchConfig.Name, new SearchCredentials(searchConfig.ApiKey)));
+            services.AddScoped<ISearchServiceClient, SearchServiceClient>(_ => new SearchServiceClient(searchConfig.Name, new SearchCredentials(searchConfig.ApiKey)));
 
             var sendgridConfig = sendgridSettings.Get<SendgridOptions>();
-            services.AddScoped<ISendGridClient, SendGridClient>(c => new SendGridClient(sendgridConfig.ApiKey));
+            services.AddScoped<ISendGridClient, SendGridClient>(_ => new SendGridClient(sendgridConfig.ApiKey));
 
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
