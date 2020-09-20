@@ -506,11 +506,23 @@ namespace Sheaft.Infrastructure.Migrations
                     b.Property<decimal>("Donation")
                         .HasColumnType("decimal(10,2)");
 
-                    b.Property<decimal>("Fees")
+                    b.Property<int>("DonationKind")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("FeesFixedAmount")
+                        .HasColumnType("decimal(10,2)");
+
+                    b.Property<decimal>("FeesPercent")
+                        .HasColumnType("decimal(10,2)");
+
+                    b.Property<decimal>("FeesPrice")
                         .HasColumnType("decimal(10,2)");
 
                     b.Property<Guid>("Id")
                         .HasColumnType("uniqueidentifier");
+
+                    b.Property<decimal>("InternalFeesPrice")
+                        .HasColumnType("decimal(10,2)");
 
                     b.Property<int>("LinesCount")
                         .HasColumnType("int");
@@ -528,6 +540,18 @@ namespace Sheaft.Infrastructure.Migrations
                         .HasColumnType("int");
 
                     b.Property<decimal>("TotalOnSalePrice")
+                        .HasColumnType("decimal(10,2)");
+
+                    b.Property<decimal>("TotalPrice")
+                        .HasColumnType("decimal(10,2)");
+
+                    b.Property<decimal>("TotalProductOnSalePrice")
+                        .HasColumnType("decimal(10,2)");
+
+                    b.Property<decimal>("TotalProductVatPrice")
+                        .HasColumnType("decimal(10,2)");
+
+                    b.Property<decimal>("TotalProductWholeSalePrice")
                         .HasColumnType("decimal(10,2)");
 
                     b.Property<decimal>("TotalReturnableOnSalePrice")
@@ -633,6 +657,15 @@ namespace Sheaft.Infrastructure.Migrations
                         .HasColumnType("int");
 
                     b.Property<decimal>("TotalOnSalePrice")
+                        .HasColumnType("decimal(10,2)");
+
+                    b.Property<decimal>("TotalProductOnSalePrice")
+                        .HasColumnType("decimal(10,2)");
+
+                    b.Property<decimal>("TotalProductVatPrice")
+                        .HasColumnType("decimal(10,2)");
+
+                    b.Property<decimal>("TotalProductWholeSalePrice")
                         .HasColumnType("decimal(10,2)");
 
                     b.Property<decimal?>("TotalReturnableOnSalePrice")
@@ -908,6 +941,15 @@ namespace Sheaft.Infrastructure.Migrations
                     b.Property<decimal>("TotalOnSalePrice")
                         .HasColumnType("decimal(10,2)");
 
+                    b.Property<decimal>("TotalProductOnSalePrice")
+                        .HasColumnType("decimal(10,2)");
+
+                    b.Property<decimal>("TotalProductVatPrice")
+                        .HasColumnType("decimal(10,2)");
+
+                    b.Property<decimal>("TotalProductWholeSalePrice")
+                        .HasColumnType("decimal(10,2)");
+
                     b.Property<decimal>("TotalReturnableOnSalePrice")
                         .HasColumnType("decimal(10,2)");
 
@@ -990,6 +1032,15 @@ namespace Sheaft.Infrastructure.Migrations
                         .HasColumnType("int");
 
                     b.Property<decimal>("TotalOnSalePrice")
+                        .HasColumnType("decimal(10,2)");
+
+                    b.Property<decimal>("TotalProductOnSalePrice")
+                        .HasColumnType("decimal(10,2)");
+
+                    b.Property<decimal>("TotalProductVatPrice")
+                        .HasColumnType("decimal(10,2)");
+
+                    b.Property<decimal>("TotalProductWholeSalePrice")
                         .HasColumnType("decimal(10,2)");
 
                     b.Property<decimal?>("TotalReturnableOnSalePrice")
@@ -1857,21 +1908,16 @@ namespace Sheaft.Infrastructure.Migrations
                     b.HasDiscriminator().HasValue(1);
                 });
 
-            modelBuilder.Entity("Sheaft.Domain.Models.CardPayinTransaction", b =>
+            modelBuilder.Entity("Sheaft.Domain.Models.PayinTransaction", b =>
                 {
                     b.HasBaseType("Sheaft.Domain.Models.Transaction");
-
-                    b.Property<long>("CardUid")
-                        .HasColumnType("bigint");
 
                     b.Property<long>("OrderUid")
                         .HasColumnType("bigint");
 
-                    b.HasIndex("CardUid");
-
                     b.HasIndex("OrderUid");
 
-                    b.HasDiscriminator().HasValue(1);
+                    b.HasDiscriminator();
                 });
 
             modelBuilder.Entity("Sheaft.Domain.Models.PayoutTransaction", b =>
@@ -1931,22 +1977,6 @@ namespace Sheaft.Infrastructure.Migrations
                     b.HasDiscriminator().HasValue(100);
                 });
 
-            modelBuilder.Entity("Sheaft.Domain.Models.WebPayinTransaction", b =>
-                {
-                    b.HasBaseType("Sheaft.Domain.Models.Transaction");
-
-                    b.Property<long>("OrderUid")
-                        .HasColumnName("WebPayinTransaction_OrderUid")
-                        .HasColumnType("bigint");
-
-                    b.Property<string>("RedirectUrl")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasIndex("OrderUid");
-
-                    b.HasDiscriminator().HasValue(0);
-                });
-
             modelBuilder.Entity("Sheaft.Domain.Models.Business", b =>
                 {
                     b.HasBaseType("Sheaft.Domain.Models.User");
@@ -1977,6 +2007,28 @@ namespace Sheaft.Infrastructure.Migrations
                         .HasDefaultValue(false);
 
                     b.HasDiscriminator().HasValue(2);
+                });
+
+            modelBuilder.Entity("Sheaft.Domain.Models.CardPayinTransaction", b =>
+                {
+                    b.HasBaseType("Sheaft.Domain.Models.PayinTransaction");
+
+                    b.Property<long>("CardUid")
+                        .HasColumnType("bigint");
+
+                    b.HasIndex("CardUid");
+
+                    b.HasDiscriminator().HasValue(1);
+                });
+
+            modelBuilder.Entity("Sheaft.Domain.Models.WebPayinTransaction", b =>
+                {
+                    b.HasBaseType("Sheaft.Domain.Models.PayinTransaction");
+
+                    b.Property<string>("RedirectUrl")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasDiscriminator().HasValue(0);
                 });
 
             modelBuilder.Entity("Sheaft.Domain.Models.Producer", b =>
@@ -2730,16 +2782,10 @@ namespace Sheaft.Infrastructure.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Sheaft.Domain.Models.CardPayinTransaction", b =>
+            modelBuilder.Entity("Sheaft.Domain.Models.PayinTransaction", b =>
                 {
-                    b.HasOne("Sheaft.Domain.Models.Card", "Card")
-                        .WithMany()
-                        .HasForeignKey("CardUid")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
                     b.HasOne("Sheaft.Domain.Models.Order", "Order")
-                        .WithMany()
+                        .WithMany("Transactions")
                         .HasForeignKey("OrderUid")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
@@ -2775,17 +2821,17 @@ namespace Sheaft.Infrastructure.Migrations
             modelBuilder.Entity("Sheaft.Domain.Models.TransferTransaction", b =>
                 {
                     b.HasOne("Sheaft.Domain.Models.PurchaseOrder", "PurchaseOrder")
-                        .WithMany()
+                        .WithMany("Transactions")
                         .HasForeignKey("PurchaseOrderUid")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Sheaft.Domain.Models.WebPayinTransaction", b =>
+            modelBuilder.Entity("Sheaft.Domain.Models.CardPayinTransaction", b =>
                 {
-                    b.HasOne("Sheaft.Domain.Models.Order", "Order")
+                    b.HasOne("Sheaft.Domain.Models.Card", "Card")
                         .WithMany()
-                        .HasForeignKey("OrderUid")
+                        .HasForeignKey("CardUid")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
                 });

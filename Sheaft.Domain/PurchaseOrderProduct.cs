@@ -6,10 +6,6 @@
         {
         }
 
-        public PurchaseOrderProduct(Product product, int quantity)
-            : base(product, quantity)
-        {
-        }
         public PurchaseOrderProduct(ProductRow product)
             : base(product)
         {

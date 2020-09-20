@@ -18,6 +18,8 @@ namespace Sheaft.Infrastructure
 
             entity.Property(o => o.Reference).IsRequired();
 
+            entity.Property(o => o.TotalWeight).HasColumnType("decimal(10,2)");
+
             entity.Property(o => o.TotalWholeSalePrice).HasColumnType("decimal(10,2)");
             entity.Property(o => o.TotalVatPrice).HasColumnType("decimal(10,2)");
             entity.Property(o => o.TotalOnSalePrice).HasColumnType("decimal(10,2)");
@@ -26,7 +28,9 @@ namespace Sheaft.Infrastructure
             entity.Property(o => o.TotalReturnableVatPrice).HasColumnType("decimal(10,2)");
             entity.Property(o => o.TotalReturnableWholeSalePrice).HasColumnType("decimal(10,2)");
 
-            entity.Property(o => o.TotalWeight).HasColumnType("decimal(10,2)");
+            entity.Property(o => o.TotalProductOnSalePrice).HasColumnType("decimal(10,2)");
+            entity.Property(o => o.TotalProductVatPrice).HasColumnType("decimal(10,2)");
+            entity.Property(o => o.TotalProductWholeSalePrice).HasColumnType("decimal(10,2)");
 
             entity.HasMany(o => o.Products).WithOne().HasForeignKey("PurchaseOrderUid").OnDelete(DeleteBehavior.Cascade);
 

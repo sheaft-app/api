@@ -144,6 +144,7 @@ namespace Sheaft.Infrastructure.Migrations
                     CreatedOn = table.Column<DateTimeOffset>(nullable: false),
                     UpdatedOn = table.Column<DateTimeOffset>(nullable: true),
                     RemovedOn = table.Column<DateTimeOffset>(nullable: true),
+                    ExecutedOn = table.Column<DateTimeOffset>(nullable: true),
                     Identifier = table.Column<string>(nullable: true),
                     Status = table.Column<int>(nullable: false),
                     ReasonCode = table.Column<string>(nullable: true),
@@ -438,11 +439,27 @@ namespace Sheaft.Infrastructure.Migrations
                     CreatedOn = table.Column<DateTimeOffset>(nullable: false),
                     UpdatedOn = table.Column<DateTimeOffset>(nullable: true),
                     RemovedOn = table.Column<DateTimeOffset>(nullable: true),
+                    Status = table.Column<int>(nullable: false),
+                    DonationKind = table.Column<int>(nullable: false),
+                    TotalProductWholeSalePrice = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
+                    TotalProductVatPrice = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
+                    TotalProductOnSalePrice = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
+                    TotalReturnableWholeSalePrice = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
+                    TotalReturnableVatPrice = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
+                    TotalReturnableOnSalePrice = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
                     TotalWholeSalePrice = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
                     TotalVatPrice = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
                     TotalOnSalePrice = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
+                    TotalPrice = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
+                    TotalWeight = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
+                    FeesFixedAmount = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
+                    FeesPercent = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
+                    ReturnablesCount = table.Column<int>(nullable: false),
+                    LinesCount = table.Column<int>(nullable: false),
+                    ProductsCount = table.Column<int>(nullable: false),
                     Donation = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
-                    Fees = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
+                    FeesPrice = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
+                    InternalFeesPrice = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
                     UserUid = table.Column<long>(nullable: false)
                 },
                 constraints: table =>
@@ -888,15 +905,22 @@ namespace Sheaft.Infrastructure.Migrations
                     UnitVatPrice = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
                     UnitOnSalePrice = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
                     UnitWeight = table.Column<decimal>(type: "decimal(10,2)", nullable: true),
-                    TotalWholeSalePrice = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
-                    TotalVatPrice = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
-                    TotalOnSalePrice = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
+                    TotalProductWholeSalePrice = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
+                    TotalProductVatPrice = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
+                    TotalProductOnSalePrice = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
                     TotalWeight = table.Column<decimal>(type: "decimal(10,2)", nullable: true),
+                    ReturnablesCount = table.Column<int>(nullable: false),
                     ReturnableName = table.Column<string>(nullable: true),
                     ReturnableOnSalePrice = table.Column<decimal>(type: "decimal(10,2)", nullable: true),
                     ReturnableWholeSalePrice = table.Column<decimal>(type: "decimal(10,2)", nullable: true),
                     ReturnableVatPrice = table.Column<decimal>(type: "decimal(10,2)", nullable: true),
                     ReturnableVat = table.Column<decimal>(type: "decimal(10,2)", nullable: true),
+                    TotalReturnableWholeSalePrice = table.Column<decimal>(type: "decimal(10,2)", nullable: true),
+                    TotalReturnableVatPrice = table.Column<decimal>(type: "decimal(10,2)", nullable: true),
+                    TotalReturnableOnSalePrice = table.Column<decimal>(type: "decimal(10,2)", nullable: true),
+                    TotalWholeSalePrice = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
+                    TotalVatPrice = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
+                    TotalOnSalePrice = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
                     ProducerUid = table.Column<long>(nullable: false)
                 },
                 constraints: table =>
@@ -930,6 +954,13 @@ namespace Sheaft.Infrastructure.Migrations
                     Comment = table.Column<string>(nullable: true),
                     LinesCount = table.Column<int>(nullable: false),
                     ProductsCount = table.Column<int>(nullable: false),
+                    ReturnablesCount = table.Column<int>(nullable: false),
+                    TotalProductWholeSalePrice = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
+                    TotalProductVatPrice = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
+                    TotalProductOnSalePrice = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
+                    TotalReturnableOnSalePrice = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
+                    TotalReturnableWholeSalePrice = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
+                    TotalReturnableVatPrice = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
                     TotalWholeSalePrice = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
                     TotalVatPrice = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
                     TotalOnSalePrice = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
@@ -1075,15 +1106,22 @@ namespace Sheaft.Infrastructure.Migrations
                     UnitVatPrice = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
                     UnitOnSalePrice = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
                     UnitWeight = table.Column<decimal>(type: "decimal(10,2)", nullable: true),
-                    TotalWholeSalePrice = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
-                    TotalVatPrice = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
-                    TotalOnSalePrice = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
+                    TotalProductWholeSalePrice = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
+                    TotalProductVatPrice = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
+                    TotalProductOnSalePrice = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
                     TotalWeight = table.Column<decimal>(type: "decimal(10,2)", nullable: true),
+                    ReturnablesCount = table.Column<int>(nullable: false),
                     ReturnableName = table.Column<string>(nullable: true),
                     ReturnableOnSalePrice = table.Column<decimal>(type: "decimal(10,2)", nullable: true),
                     ReturnableWholeSalePrice = table.Column<decimal>(type: "decimal(10,2)", nullable: true),
                     ReturnableVatPrice = table.Column<decimal>(type: "decimal(10,2)", nullable: true),
-                    ReturnableVat = table.Column<decimal>(type: "decimal(10,2)", nullable: true)
+                    ReturnableVat = table.Column<decimal>(type: "decimal(10,2)", nullable: true),
+                    TotalReturnableWholeSalePrice = table.Column<decimal>(type: "decimal(10,2)", nullable: true),
+                    TotalReturnableVatPrice = table.Column<decimal>(type: "decimal(10,2)", nullable: true),
+                    TotalReturnableOnSalePrice = table.Column<decimal>(type: "decimal(10,2)", nullable: true),
+                    TotalWholeSalePrice = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
+                    TotalVatPrice = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
+                    TotalOnSalePrice = table.Column<decimal>(type: "decimal(10,2)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -1119,16 +1157,15 @@ namespace Sheaft.Infrastructure.Migrations
                     CreditedWalletUid = table.Column<long>(nullable: false),
                     DebitedWalletUid = table.Column<long>(nullable: false),
                     AuthorUid = table.Column<long>(nullable: false),
-                    CardUid = table.Column<long>(nullable: true),
                     OrderUid = table.Column<long>(nullable: true),
+                    CardUid = table.Column<long>(nullable: true),
+                    RedirectUrl = table.Column<string>(nullable: true),
                     BankAccountUid = table.Column<long>(nullable: true),
                     TransactionToRefundIdentifier = table.Column<string>(nullable: true),
                     RefundPayinTransaction_OrderUid = table.Column<long>(nullable: true),
                     RefundTransferTransaction_TransactionToRefundIdentifier = table.Column<string>(nullable: true),
                     PurchaseOrderUid = table.Column<long>(nullable: true),
-                    TransferTransaction_PurchaseOrderUid = table.Column<long>(nullable: true),
-                    RedirectUrl = table.Column<string>(nullable: true),
-                    WebPayinTransaction_OrderUid = table.Column<long>(nullable: true)
+                    TransferTransaction_PurchaseOrderUid = table.Column<long>(nullable: true)
                 },
                 constraints: table =>
                 {
@@ -1179,11 +1216,6 @@ namespace Sheaft.Infrastructure.Migrations
                         name: "FK_Transactions_PurchaseOrders_TransferTransaction_PurchaseOrderUid",
                         column: x => x.TransferTransaction_PurchaseOrderUid,
                         principalTable: "PurchaseOrders",
-                        principalColumn: "Uid");
-                    table.ForeignKey(
-                        name: "FK_Transactions_Orders_WebPayinTransaction_OrderUid",
-                        column: x => x.WebPayinTransaction_OrderUid,
-                        principalTable: "Orders",
                         principalColumn: "Uid");
                 });
 
@@ -1771,11 +1803,6 @@ namespace Sheaft.Infrastructure.Migrations
                 column: "TransferTransaction_PurchaseOrderUid");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Transactions_WebPayinTransaction_OrderUid",
-                table: "Transactions",
-                column: "WebPayinTransaction_OrderUid");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_UboDeclaration_Id",
                 table: "UboDeclaration",
                 column: "Id",
@@ -1859,6 +1886,7 @@ namespace Sheaft.Infrastructure.Migrations
                 name: "IX_Wallets_Uid_Id_UserUid_RemovedOn",
                 table: "Wallets",
                 columns: new[] { "Uid", "Id", "UserUid", "RemovedOn" });
+
 
             migrationBuilder.InsertData("Levels", new List<string>() { "Uid", "Id", "CreatedOn", "RequiredPoints", "Name" }.ToArray(), new List<object>() { 1, "63b7d548-b8ae-43f6-bb9a-b47311ba57ed", "2020-05-01", "1000", "Niveau 1" }.ToArray(), "dbo");
             migrationBuilder.InsertData("Levels", new List<string>() { "Uid", "Id", "CreatedOn", "RequiredPoints", "Name" }.ToArray(), new List<object>() { 2, "a9193dc7-9508-4ab8-a1e3-0b72ee47589b", "2020-05-01", "2000", "Niveau 1" }.ToArray(), "dbo");

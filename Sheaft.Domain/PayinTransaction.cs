@@ -13,8 +13,8 @@ namespace Sheaft.Domain.Models
             : base(id, kind, creditedWallet.User)
         {
             Order = order;
-            Fees = order.Fees + order.Donation;
-            Debited = order.TotalWholeSalePrice + order.Fees + order.Donation;
+            Fees = order.FeesPrice + order.Donation;
+            Debited = order.TotalWholeSalePrice + order.FeesPrice + order.Donation;
             CreditedWallet = creditedWallet;
             Reference = $"SHEAFT_{DateTimeOffset.UtcNow:yyyyMMdd}";
         }

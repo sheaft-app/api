@@ -14,6 +14,9 @@ namespace Sheaft.Models.Dto
         public decimal UnitVatPrice { get; set; }
         public decimal UnitOnSalePrice { get; set; }
         public decimal? UnitWeight { get; set; }
+        public decimal TotalProductWholeSalePrice { get; set; }
+        public decimal TotalProductVatPrice { get; set; }
+        public decimal TotalProductOnSalePrice { get; set; }
         public decimal TotalWholeSalePrice { get; set; }
         public decimal TotalVatPrice { get; set; }
         public decimal TotalOnSalePrice { get; set; }

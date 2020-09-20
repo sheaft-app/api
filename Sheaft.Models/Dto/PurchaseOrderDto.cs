@@ -15,14 +15,17 @@ namespace Sheaft.Models.Dto
         public string Comment { get; set; }
         public int LinesCount { get; set; }
         public int ProductsCount { get; set; }
-        public decimal TotalWholeSalePrice { get; set; }
-        public decimal TotalVatPrice { get; set; }
-        public decimal TotalOnSalePrice { get; set; }
+        public int ReturnablesCount { get; set; }
+        public decimal TotalProductWholeSalePrice { get; set; }
+        public decimal TotalProductVatPrice { get; set; }
+        public decimal TotalProductOnSalePrice { get; set; }
         public decimal TotalReturnableOnSalePrice { get; set; }
         public decimal TotalReturnableWholeSalePrice { get; set; }
         public decimal TotalReturnableVatPrice { get; set; }
+        public decimal TotalWholeSalePrice { get; set; }
+        public decimal TotalVatPrice { get; set; }
+        public decimal TotalOnSalePrice { get; set; }
         public decimal TotalWeight { get; set; }
-        public int ReturnablesCount { get; set; }
         public PurchaseOrderStatus Status { get; set; }
         public UserProfileDto Sender { get; set; }
         public ExpectedDeliveryDto ExpectedDelivery { get; set; }

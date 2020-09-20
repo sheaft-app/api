@@ -29,8 +29,22 @@ namespace Sheaft.Domain.Models
             ReturnableVatPrice = product.ReturnableVatPrice;
             ReturnableWholeSalePrice = product.ReturnableWholeSalePrice;
             ReturnableOnSalePrice = product.ReturnableOnSalePrice;
+            ReturnablesCount = product.ReturnablesCount;
 
-            SetQuantity(product.Quantity);
+            Quantity = product.Quantity;
+            TotalWeight = product.TotalWeight;
+
+            TotalProductVatPrice = product.TotalProductVatPrice;
+            TotalProductWholeSalePrice = product.TotalProductWholeSalePrice;
+            TotalProductOnSalePrice = product.TotalProductOnSalePrice;
+
+            TotalReturnableVatPrice = product.TotalReturnableVatPrice;
+            TotalReturnableWholeSalePrice = product.TotalReturnableWholeSalePrice;
+            TotalReturnableOnSalePrice = product.TotalReturnableOnSalePrice;
+
+            TotalVatPrice = product.TotalVatPrice;
+            TotalWholeSalePrice = product.TotalWholeSalePrice;
+            TotalOnSalePrice = product.TotalOnSalePrice;
         }
 
         protected ProductRow(Product product, int quantity)
@@ -54,7 +68,7 @@ namespace Sheaft.Domain.Models
             SetQuantity(quantity);
         }
 
-        public void SetQuantity(int quantity)
+        private void SetQuantity(int quantity)
         {
             if (quantity <= 0)
                 throw new ValidationException(MessageKind.PurchaseOrder_ProductQuantity_CannotBe_LowerOrEqualThan, 0);
@@ -72,10 +86,11 @@ namespace Sheaft.Domain.Models
         public decimal UnitVatPrice { get; private set; }
         public decimal UnitOnSalePrice { get; private set; }
         public decimal? UnitWeight { get; private set; }
-        public decimal TotalWholeSalePrice { get; private set; }
-        public decimal TotalVatPrice { get; private set; }
-        public decimal TotalOnSalePrice { get; private set; }
+        public decimal TotalProductWholeSalePrice { get; private set; }
+        public decimal TotalProductVatPrice { get; private set; }
+        public decimal TotalProductOnSalePrice { get; private set; }
         public decimal? TotalWeight { get; private set; }
+        public int ReturnablesCount { get; private set; }
         public string ReturnableName { get; private set; }
         public decimal? ReturnableOnSalePrice { get; private set; }
         public decimal? ReturnableWholeSalePrice { get; private set; }
@@ -84,21 +99,27 @@ namespace Sheaft.Domain.Models
         public decimal? TotalReturnableWholeSalePrice { get; private set; }
         public decimal? TotalReturnableVatPrice { get; private set; }
         public decimal? TotalReturnableOnSalePrice { get; private set; }
-        public int ReturnablesCount { get; private set; }
+        public decimal TotalWholeSalePrice { get; private set; }
+        public decimal TotalVatPrice { get; private set; }
+        public decimal TotalOnSalePrice { get; private set; }
 
         protected void RefreshLine()
         {
-            TotalVatPrice = Math.Round(Quantity * (UnitVatPrice + (ReturnableVatPrice ?? 0)), DIGITS_COUNT);
-            TotalWholeSalePrice = Math.Round(Quantity * (UnitWholeSalePrice + (ReturnableWholeSalePrice ?? 0)), DIGITS_COUNT);
-            TotalOnSalePrice = Math.Round(TotalWholeSalePrice + TotalVatPrice, DIGITS_COUNT);
+            TotalProductVatPrice = Math.Round(Quantity * UnitVatPrice, DIGITS_COUNT);
+            TotalProductWholeSalePrice = Math.Round(Quantity * UnitWholeSalePrice, DIGITS_COUNT);
+            TotalProductOnSalePrice = Math.Round(TotalWholeSalePrice + TotalVatPrice, DIGITS_COUNT);
 
             ReturnablesCount = ReturnableVat.HasValue ? Quantity : 0;
 
-            TotalReturnableVatPrice = ReturnablesCount > 0 ? Math.Round(Quantity * ReturnableVatPrice.Value, DIGITS_COUNT) : (decimal?)null;
-            TotalReturnableWholeSalePrice = ReturnablesCount > 0 ? Math.Round(Quantity * ReturnableWholeSalePrice.Value, DIGITS_COUNT) : (decimal?)null;
-            TotalReturnableOnSalePrice = ReturnablesCount > 0 ? Math.Round(Quantity * ReturnableOnSalePrice.Value, DIGITS_COUNT) : (decimal?)null;
+            TotalReturnableVatPrice = ReturnablesCount > 0 ? Math.Round(ReturnablesCount * ReturnableVatPrice.Value, DIGITS_COUNT) : (decimal?)null;
+            TotalReturnableWholeSalePrice = ReturnablesCount > 0 ? Math.Round(ReturnablesCount * ReturnableWholeSalePrice.Value, DIGITS_COUNT) : (decimal?)null;
+            TotalReturnableOnSalePrice = ReturnablesCount > 0 ? Math.Round(ReturnablesCount * ReturnableOnSalePrice.Value, DIGITS_COUNT) : (decimal?)null;
 
             TotalWeight = UnitWeight.HasValue ? Math.Round(Quantity * UnitWeight.Value, DIGITS_COUNT) : (decimal?)null;
+
+            TotalVatPrice = Math.Round(TotalProductVatPrice + (TotalReturnableVatPrice ?? 0), DIGITS_COUNT);
+            TotalWholeSalePrice = Math.Round(TotalProductWholeSalePrice + (TotalReturnableWholeSalePrice ?? 0), DIGITS_COUNT);
+            TotalOnSalePrice = Math.Round(TotalProductOnSalePrice + (TotalReturnableOnSalePrice ?? 0), DIGITS_COUNT);
         }
     }
 }

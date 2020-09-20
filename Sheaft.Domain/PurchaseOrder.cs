@@ -35,7 +35,7 @@ namespace Sheaft.Domain.Models
             SetComment(delivery.Comment);
 
             SetReference(reference);
-            SetOrderStatus(status);
+            SetStatus(status);
 
             var orderProducts = order.Products.Where(p => p.Producer.Id == producer.Id);
             foreach(var orderProduct in orderProducts)
@@ -54,13 +54,16 @@ namespace Sheaft.Domain.Models
         public int LinesCount { get; private set; }
         public int ProductsCount { get; private set; }
         public int ReturnablesCount { get; private set; }
+        public decimal TotalProductWholeSalePrice { get; private set; }
+        public decimal TotalProductVatPrice { get; private set; }
+        public decimal TotalProductOnSalePrice { get; private set; }
+        public decimal TotalReturnableOnSalePrice { get; set; }
+        public decimal TotalReturnableWholeSalePrice { get; set; }
+        public decimal TotalReturnableVatPrice { get; set; }
         public decimal TotalWholeSalePrice { get; private set; }
         public decimal TotalVatPrice { get; private set; }
         public decimal TotalOnSalePrice { get; private set; }
         public decimal TotalWeight { get; private set; }
-        public decimal TotalReturnableOnSalePrice { get; set; }
-        public decimal TotalReturnableWholeSalePrice { get; set; }
-        public decimal TotalReturnableVatPrice { get; set; }
         public PurchaseOrderStatus Status { get; private set; }
         public virtual Order Order { get; private set; }
         public virtual PurchaseOrderSender Sender { get; private set; }
@@ -77,7 +80,7 @@ namespace Sheaft.Domain.Models
             Reference = newReference;
         }
 
-        private void SetOrderStatus(PurchaseOrderStatus newStatus)
+        private void SetStatus(PurchaseOrderStatus newStatus)
         {
             switch (newStatus)
             {
@@ -123,113 +126,42 @@ namespace Sheaft.Domain.Models
             Comment = comment;
         }
 
-        public void AddProduct(ProductRow product)
-        {
-            if (Status != PurchaseOrderStatus.Waiting)
-                throw new ValidationException(MessageKind.PurchaseOrder_CannotAddProduct_NotIn_WaitingStatus);
-
-            if (product == null)
-                throw new ValidationException(MessageKind.PurchaseOrder_CannotAddProduct_Product_NotFound);
-
-            var productLine = _products.SingleOrDefault(p => p.Id == product.Id);
-            if (productLine == null)
-                _products.Add(new PurchaseOrderProduct(product));
-            else
-                productLine.SetQuantity(product.Quantity);
-
-            RefreshOrder();
-        }
-
-        public void AddProduct(Product product, int quantity)
-        {
-            if (Status != PurchaseOrderStatus.Waiting)
-                throw new ValidationException(MessageKind.PurchaseOrder_CannotAddProduct_NotIn_WaitingStatus);
-
-            if (product == null)
-                throw new ValidationException(MessageKind.PurchaseOrder_CannotAddProduct_Product_NotFound);
-
-            var productLine = _products.SingleOrDefault(p => p.Id == product.Id);
-            if (productLine == null)
-                _products.Add(new PurchaseOrderProduct(product, quantity));
-            else
-                productLine.SetQuantity(quantity);
-
-            RefreshOrder();
-        }
-
-        public void ChangeProductQuantity(Guid productId, int quantity)
-        {
-            if (Status != PurchaseOrderStatus.Waiting)
-                throw new ValidationException(MessageKind.PurchaseOrder_CannotChangeProductQuantity_NotIn_WaitingStatus);
-
-            var productLine = _products.SingleOrDefault(p => p.Id == productId);
-            if (productLine == null)
-                throw new ValidationException(MessageKind.PurchaseOrder_CannotChangeProductQuantity_Product_NotFound);
-
-            productLine.SetQuantity(quantity);
-            RefreshOrder();
-        }
-
-        public void RemoveProducts(IEnumerable<Product> products)
-        {
-            foreach (var product in products)
-                RemoveProduct(product.Id);
-        }
-
-        public void RemoveProduct(Guid productId)
-        {
-            if (Status != PurchaseOrderStatus.Waiting)
-                throw new ValidationException(MessageKind.PurchaseOrder_CannotRemoveProduct_NotIn_WaitingStatus);
-
-            var productLine = _products.SingleOrDefault(p => p.Id == productId);
-            if (productLine == null)
-                throw new ValidationException(MessageKind.PurchaseOrder_CannotRemoveProduct_Product_NotFound);
-
-            _products.Remove(productLine);
-            RefreshOrder();
-        }
-
         public void Ship()
         {
-            SetOrderStatus(PurchaseOrderStatus.Shipping);
+            SetStatus(PurchaseOrderStatus.Shipping);
         }
 
         public void Deliver()
         {
-            SetOrderStatus(PurchaseOrderStatus.Delivered);
+            SetStatus(PurchaseOrderStatus.Delivered);
             ExpectedDelivery.SetDeliveredDate(DateTimeOffset.UtcNow);
         }
 
         public void Cancel(string reason)
         {
-            SetOrderStatus(PurchaseOrderStatus.Cancelled);
+            SetStatus(PurchaseOrderStatus.Cancelled);
             Reason = reason;
         }
 
         public void Refuse(string reason)
         {
-            SetOrderStatus(PurchaseOrderStatus.Refused);
+            SetStatus(PurchaseOrderStatus.Refused);
             Reason = reason;
         }
 
         public void Process()
         {
-            SetOrderStatus(PurchaseOrderStatus.Processing);
+            SetStatus(PurchaseOrderStatus.Processing);
         }
 
         public void Complete()
         {
-            SetOrderStatus(PurchaseOrderStatus.Completed);
+            SetStatus(PurchaseOrderStatus.Completed);
         }
 
         public void Accept()
         {
-            SetOrderStatus(PurchaseOrderStatus.Accepted);
-        }
-
-        private void SetExpectedDelivery(DeliveryMode delivery, DateTimeOffset expectedDate)
-        {
-            ExpectedDelivery = new ExpectedDelivery(delivery, expectedDate);
+            SetStatus(PurchaseOrderStatus.Accepted);
         }
 
         public void SetSender(User sender)
@@ -242,11 +174,32 @@ namespace Sheaft.Domain.Models
             Vendor = new PurchaseOrderVendor(vendor);
         }
 
+        private void SetExpectedDelivery(DeliveryMode delivery, DateTimeOffset expectedDate)
+        {
+            ExpectedDelivery = new ExpectedDelivery(delivery, expectedDate);
+        }
+
+        private void AddProduct(ProductRow product)
+        {
+            if (Status != PurchaseOrderStatus.Waiting)
+                throw new ValidationException(MessageKind.PurchaseOrder_CannotAddProduct_NotIn_WaitingStatus);
+
+            if (product == null)
+                throw new ValidationException(MessageKind.PurchaseOrder_CannotAddProduct_Product_NotFound);
+
+            var productLine = _products.SingleOrDefault(p => p.Id == product.Id);
+            if (productLine != null)
+                _products.Remove(productLine);
+
+            _products.Add(new PurchaseOrderProduct(product));
+            RefreshOrder();
+        }
+
         private void RefreshOrder()
         {
-            TotalWholeSalePrice = Math.Round(_products.Sum(p => p.TotalWholeSalePrice), DIGITS_COUNT);
-            TotalVatPrice = Math.Round(_products.Sum(p => p.TotalVatPrice), DIGITS_COUNT);
-            TotalOnSalePrice = Math.Round(_products.Sum(p => p.TotalOnSalePrice), DIGITS_COUNT);
+            TotalProductWholeSalePrice = Math.Round(_products.Sum(p => p.TotalWholeSalePrice), DIGITS_COUNT);
+            TotalProductVatPrice = Math.Round(_products.Sum(p => p.TotalVatPrice), DIGITS_COUNT);
+            TotalProductOnSalePrice = Math.Round(_products.Sum(p => p.TotalOnSalePrice), DIGITS_COUNT);
 
             TotalWeight = Math.Round(_products.Where(p => p.TotalWeight.HasValue).Sum(p => p.TotalWeight) ?? 0, DIGITS_COUNT);
 
@@ -257,6 +210,10 @@ namespace Sheaft.Domain.Models
             TotalReturnableWholeSalePrice = Math.Round(_products.Sum(p => p.ReturnablesCount > 0 ? p.TotalReturnableWholeSalePrice.Value : 0), DIGITS_COUNT);
             TotalReturnableVatPrice = Math.Round(_products.Sum(p => p.ReturnablesCount > 0 ? p.TotalReturnableVatPrice.Value : 0), DIGITS_COUNT);
             TotalReturnableOnSalePrice = Math.Round(_products.Sum(p => p.ReturnablesCount > 0 ? p.TotalReturnableOnSalePrice.Value : 0), DIGITS_COUNT);
+
+            TotalWholeSalePrice = TotalProductWholeSalePrice + TotalReturnableWholeSalePrice;
+            TotalVatPrice = TotalProductVatPrice + TotalReturnableVatPrice;
+            TotalOnSalePrice = TotalProductOnSalePrice + TotalReturnableOnSalePrice;
         }
     }
 }

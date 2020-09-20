@@ -56,7 +56,7 @@ namespace Sheaft.Application.Handlers
                 }
 
                 var user = await _context.GetByIdAsync<User>(request.RequestUser.Id, token);
-                var order = new Order(Guid.NewGuid(), user, cartProducts);
+                var order = new Order(Guid.NewGuid(), request.Donation, user, cartProducts, _pspOptions.FixedAmount, _pspOptions.Percent);
 
                 var deliveryIds = request.ProducersExpectedDeliveries?.Select(p => p.DeliveryModeId) ?? new List<Guid>();
                 var deliveries = deliveryIds.Any() ? await _context.GetByIdsAsync<DeliveryMode>(deliveryIds, token) : new List<DeliveryMode>();
@@ -68,7 +68,6 @@ namespace Sheaft.Application.Handlers
                 }
 
                 order.SetDeliveries(cartDeliveries);
-                order.SetDonation(request.Donation, _pspOptions.FixedAmount, _pspOptions.Percent);
 
                 await _context.AddAsync(order, token);
                 await _context.SaveChangesAsync(token);
@@ -92,7 +91,7 @@ namespace Sheaft.Application.Handlers
                     }
 
                     var user = await _context.GetByIdAsync<User>(request.RequestUser.Id, token);
-                    var order = new Order(Guid.NewGuid(), user, cartProducts);
+                    var order = new Order(Guid.NewGuid(), DonationKind.None, user, cartProducts, _pspOptions.FixedAmount, _pspOptions.Percent);
 
                     var deliveryIds = request.ProducersExpectedDeliveries?.Select(p => p.DeliveryModeId) ?? new List<Guid>();
                     var deliveries = deliveryIds.Any() ? await _context.GetByIdsAsync<DeliveryMode>(deliveryIds, token) : new List<DeliveryMode>();
@@ -164,7 +163,7 @@ namespace Sheaft.Application.Handlers
                 }
                 entity.SetDeliveries(cartDeliveries);
 
-                entity.SetDonation(request.Donation, _pspOptions.FixedAmount, _pspOptions.Percent);
+                entity.SetDonation(request.Donation);
                 _context.Update(entity);
 
                 return Ok(await _context.SaveChangesAsync(token) > 0);
