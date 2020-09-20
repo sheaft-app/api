@@ -1068,6 +1068,8 @@ namespace Sheaft.GraphQL.Types
 
             descriptor.Field(c => c.FeesPrice);
             descriptor.Field(c => c.InternalFeesPrice);
+            descriptor.Field(c => c.TotalFees);
+
             descriptor.Field(c => c.FeesFixedAmount);
             descriptor.Field(c => c.FeesPercent);
 

@@ -20,6 +20,7 @@ namespace Sheaft.Models.Dto
         public decimal TotalWholeSalePrice { get; set; }
         public decimal TotalVatPrice { get; set; }
         public decimal TotalOnSalePrice { get; set; }
+        public decimal TotalFees { get; set; }
         public decimal TotalPrice { get; set; }
         public decimal TotalWeight { get; set; }
         public int ReturnablesCount { get; set; }
