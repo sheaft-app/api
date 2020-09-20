@@ -102,21 +102,21 @@ namespace Sheaft.Domain.Models
         {
             TotalProductWholeSalePrice = Math.Round(_products.Sum(p => p.TotalWholeSalePrice), DIGITS_COUNT);
             TotalProductVatPrice = Math.Round(_products.Sum(p => p.TotalVatPrice), DIGITS_COUNT);
-            TotalProductOnSalePrice = Math.Round(_products.Sum(p => p.TotalOnSalePrice), DIGITS_COUNT);
+            TotalProductOnSalePrice = Math.Round(TotalProductWholeSalePrice + TotalProductVatPrice, DIGITS_COUNT);
 
             TotalWeight = Math.Round(_products.Where(p => p.TotalWeight.HasValue).Sum(p => p.TotalWeight) ?? 0, DIGITS_COUNT);
 
-            LinesCount = _products.Count();
+            LinesCount = _products.Count;
             ProductsCount = _products.Sum(p => p.Quantity);
             ReturnablesCount = _products.Sum(p => p.ReturnablesCount);
 
             TotalReturnableWholeSalePrice = Math.Round(_products.Sum(p => p.ReturnablesCount > 0 ? p.TotalReturnableWholeSalePrice.Value : 0), DIGITS_COUNT);
             TotalReturnableVatPrice = Math.Round(_products.Sum(p => p.ReturnablesCount > 0 ? p.TotalReturnableVatPrice.Value : 0), DIGITS_COUNT);
-            TotalReturnableOnSalePrice = Math.Round(_products.Sum(p => p.ReturnablesCount > 0 ? p.TotalReturnableOnSalePrice.Value : 0), DIGITS_COUNT);
+            TotalReturnableOnSalePrice = Math.Round(TotalReturnableWholeSalePrice + TotalReturnableVatPrice, DIGITS_COUNT);
 
             TotalWholeSalePrice = TotalProductWholeSalePrice + TotalReturnableWholeSalePrice;
             TotalVatPrice = TotalProductVatPrice + TotalReturnableVatPrice;
-            TotalOnSalePrice = TotalProductOnSalePrice + TotalReturnableOnSalePrice;
+            TotalOnSalePrice = Math.Round(TotalWholeSalePrice + TotalVatPrice, DIGITS_COUNT);
 
             RefreshFees();
         }
@@ -134,6 +134,8 @@ namespace Sheaft.Domain.Models
                 case DonationKind.Euro:
                     Donation = 1;
                     break;
+                case DonationKind.None:
+                case DonationKind.Free:
                 default:
                     Donation = 0;
                     break;

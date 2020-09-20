@@ -107,19 +107,19 @@ namespace Sheaft.Domain.Models
         {
             TotalProductVatPrice = Math.Round(Quantity * UnitVatPrice, DIGITS_COUNT);
             TotalProductWholeSalePrice = Math.Round(Quantity * UnitWholeSalePrice, DIGITS_COUNT);
-            TotalProductOnSalePrice = Math.Round(TotalWholeSalePrice + TotalVatPrice, DIGITS_COUNT);
+            TotalProductOnSalePrice = Math.Round(TotalProductVatPrice + TotalProductWholeSalePrice, DIGITS_COUNT);
 
             ReturnablesCount = ReturnableVat.HasValue ? Quantity : 0;
 
             TotalReturnableVatPrice = ReturnablesCount > 0 ? Math.Round(ReturnablesCount * ReturnableVatPrice.Value, DIGITS_COUNT) : (decimal?)null;
             TotalReturnableWholeSalePrice = ReturnablesCount > 0 ? Math.Round(ReturnablesCount * ReturnableWholeSalePrice.Value, DIGITS_COUNT) : (decimal?)null;
-            TotalReturnableOnSalePrice = ReturnablesCount > 0 ? Math.Round(ReturnablesCount * ReturnableOnSalePrice.Value, DIGITS_COUNT) : (decimal?)null;
+            TotalReturnableOnSalePrice = ReturnablesCount > 0 ? Math.Round(TotalReturnableVatPrice.Value  + TotalReturnableWholeSalePrice.Value, DIGITS_COUNT) : (decimal?)null;
 
             TotalWeight = UnitWeight.HasValue ? Math.Round(Quantity * UnitWeight.Value, DIGITS_COUNT) : (decimal?)null;
 
             TotalVatPrice = Math.Round(TotalProductVatPrice + (TotalReturnableVatPrice ?? 0), DIGITS_COUNT);
             TotalWholeSalePrice = Math.Round(TotalProductWholeSalePrice + (TotalReturnableWholeSalePrice ?? 0), DIGITS_COUNT);
-            TotalOnSalePrice = Math.Round(TotalProductOnSalePrice + (TotalReturnableOnSalePrice ?? 0), DIGITS_COUNT);
+            TotalOnSalePrice = Math.Round(TotalVatPrice + TotalWholeSalePrice, DIGITS_COUNT);
         }
     }
 }
