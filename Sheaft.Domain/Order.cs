@@ -20,18 +20,17 @@ namespace Sheaft.Domain.Models
         public Order(Guid id, DonationKind kind, User user, IDictionary<Product, int> orderProducts, decimal fixedAmount, decimal percent)
         {
             Id = id;
-            Donation = 0;
             User = user;
             FeesFixedAmount = fixedAmount;
             FeesPercent = percent;
+            DonationKind = kind;
+            Status = OrderStatus.Created;
 
             _products = new List<OrderProduct>();
             _deliveries = new List<OrderDelivery>();
             _transactions = new List<PayinTransaction>();
-            Status = OrderStatus.Created;
 
             SetProducts(orderProducts);
-            SetDonation(kind);
         }
 
         public Guid Id { get; private set; }
@@ -124,11 +123,13 @@ namespace Sheaft.Domain.Models
 
         private void RefreshFees()
         {
+            Donation = 0;
+            FeesPrice = GetFees(TotalOnSalePrice);
+
             switch (DonationKind)
             {
                 case DonationKind.Rounded:
-                    var value = TotalOnSalePrice + GetFees(TotalOnSalePrice);
-                    Donation = Math.Ceiling(value) - value;
+                    Donation = GetRoundedDonation();
                     break;
                 case DonationKind.Euro:
                     Donation = 1;
@@ -138,8 +139,25 @@ namespace Sheaft.Domain.Models
                     break;
             }
 
-            FeesPrice = GetFees(TotalOnSalePrice + Donation);
-            TotalPrice = TotalOnSalePrice + Donation + FeesPrice + InternalFeesPrice;
+            UpdateFees();
+            TotalPrice = Math.Round(TotalOnSalePrice + Donation + FeesPrice, DIGITS_COUNT);
+        }
+
+        private decimal GetRoundedDonation()
+        {
+            var value = TotalOnSalePrice + FeesPrice;
+            return Math.Ceiling(value) - value;
+        }
+
+        private void UpdateFees()
+        {
+            var total = TotalOnSalePrice + FeesPrice + Donation;
+            total -= FeesFixedAmount;
+            total *= (1 - FeesPercent);
+            total -= TotalOnSalePrice;
+
+            InternalFeesPrice = Math.Round(Donation - total, DIGITS_COUNT);
+            FeesPrice = Math.Round(InternalFeesPrice + FeesFixedAmount, DIGITS_COUNT);
         }
 
         public decimal GetFees(decimal total)
