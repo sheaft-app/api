@@ -5,8 +5,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="HotChocolate.AspNetCore.Authorization" Version="10.5.2" />
     <PackageReference Include="HotChocolate.Types" Version="10.5.2" />
     <PackageReference Include="HotChocolate.Types.Filters" Version="10.5.2" />
+    <PackageReference Include="HotChocolate.Types.Selections" Version="10.5.2" />
     <PackageReference Include="HotChocolate.Types.Sorting" Version="10.5.2" />
   </ItemGroup>
 
@@ -14,6 +16,7 @@
     <ProjectReference Include="..\Sheaft.Application.Queries\Sheaft.Application.Queries.csproj" />
     <ProjectReference Include="..\Sheaft.GraphQL.Enums\Sheaft.GraphQL.Enums.csproj" />
     <ProjectReference Include="..\Sheaft.GraphQL.Filters\Sheaft.GraphQL.Filters.csproj" />
+    <ProjectReference Include="..\Sheaft.GraphQL.Services\Sheaft.GraphQL.Services.csproj" />
     <ProjectReference Include="..\Sheaft.GraphQL.Sorts\Sheaft.GraphQL.Sorts.csproj" />
     <ProjectReference Include="..\Sheaft.Application.Models\Sheaft.Application.Models.csproj" />
   </ItemGroup>

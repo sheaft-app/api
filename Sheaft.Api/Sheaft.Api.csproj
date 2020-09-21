@@ -35,7 +35,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Sheaft.Application.Events\Sheaft.Application.Events.csproj" />
     <ProjectReference Include="..\Sheaft.Application.Handlers\Sheaft.Application.Handlers.csproj" />
-    <ProjectReference Include="..\Sheaft.GraphQL\Sheaft.GraphQL.csproj" />
+    <ProjectReference Include="..\Sheaft.GraphQL.Types\Sheaft.GraphQL.Types.csproj" />
     <ProjectReference Include="..\Sheaft.Infrastructure.Persistence\Sheaft.Infrastructure.Persistence.csproj" />
     <ProjectReference Include="..\Sheaft.Application.Mappers\Sheaft.Application.Mappers.csproj" />
   </ItemGroup>
