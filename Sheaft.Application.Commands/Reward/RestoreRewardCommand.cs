@@ -1,4 +1,4 @@
-﻿using Sheaft.Interop.Enums;
+﻿using Sheaft.Domain.Enums;
 using System;
 using Sheaft.Core;
 using Newtonsoft.Json;

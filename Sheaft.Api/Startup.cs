@@ -10,21 +10,19 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Sheaft.Application.Commands;
 using Sheaft.Infrastructure;
-using Sheaft.Infrastructure.Interop;
-using Sheaft.Services;
+using Sheaft.Application.Interop;
 using Microsoft.Azure.Search;
 using System.Reflection;
 using System.Collections.Generic;
 using Sheaft.Application.Events;
 using Sheaft.Application.Handlers;
 using Sheaft.Application.Queries;
-using Sheaft.Services.Interop;
 using HotChocolate;
 using HotChocolate.AspNetCore;
 using HotChocolate.Types;
 using HotChocolate.Execution.Configuration;
 using AutoMapper;
-using Sheaft.Mappers;
+using Sheaft.Application.Mappers;
 using Sheaft.Core.Security;
 using SendGrid;
 using Sheaft.Options;
@@ -42,6 +40,8 @@ using Microsoft.AspNetCore.Authorization;
 using Sheaft.Api.Authorize;
 using System;
 using MangoPay.SDK;
+using Sheaft.Infrastructure.Services;
+using Sheaft.Infrastructure.Persistence;
 
 namespace Sheaft.Api
 {

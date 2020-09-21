@@ -5,8 +5,7 @@ using Sheaft.Application.Queries;
 using Microsoft.AspNetCore.Http;
 using System.Linq;
 using System.Threading;
-using Sheaft.Models.Dto;
-using Sheaft.Models.Inputs;
+using Sheaft.Application.Models;
 using Sheaft.Core;
 using Sheaft.Core.Extensions;
 using Sheaft.Core.Security;
@@ -17,7 +16,6 @@ using HotChocolate.AspNetCore.Authorization;
 using Sheaft.GraphQL.Types;
 using Sheaft.GraphQL.Sorts;
 using Sheaft.GraphQL.Filters;
-using Sheaft.Services;
 
 namespace Sheaft.GraphQL
 {
@@ -47,13 +45,6 @@ namespace Sheaft.GraphQL
         public async Task<string> GetFreshdeskTokenAsync([Service] IUserQueries userQueries)
         {
             return await userQueries.GetFreshdeskTokenAsync(CurrentUser, Token);
-        }
-
-        [Authorize(Policy = Policies.AUTHENTICATED)]
-        [GraphQLName("getFees")]
-        public decimal GetFees(decimal amount, [Service] IFeesService feesService)
-        {
-            return feesService.GetFees(amount);
         }
 
         [Authorize(Policy = Policies.CONSUMER)]

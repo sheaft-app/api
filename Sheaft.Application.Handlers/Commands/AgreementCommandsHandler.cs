@@ -1,4 +1,4 @@
-﻿using Sheaft.Infrastructure.Interop;
+﻿using Sheaft.Application.Interop;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
@@ -9,7 +9,6 @@ using System;
 using Sheaft.Domain.Models;
 using System.Collections.Generic;
 using System.Linq;
-using Sheaft.Services.Interop;
 using Microsoft.Extensions.Logging;
 using Microsoft.EntityFrameworkCore;
 

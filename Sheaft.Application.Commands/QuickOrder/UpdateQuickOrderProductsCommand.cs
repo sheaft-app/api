@@ -1,4 +1,4 @@
-using Sheaft.Models.Inputs;
+using Sheaft.Application.Models;
 using System;
 using System.Collections.Generic;
 using Sheaft.Core;

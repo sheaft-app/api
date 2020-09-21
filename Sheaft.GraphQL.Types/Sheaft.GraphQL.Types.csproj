@@ -15,7 +15,7 @@
     <ProjectReference Include="..\Sheaft.GraphQL.Enums\Sheaft.GraphQL.Enums.csproj" />
     <ProjectReference Include="..\Sheaft.GraphQL.Filters\Sheaft.GraphQL.Filters.csproj" />
     <ProjectReference Include="..\Sheaft.GraphQL.Sorts\Sheaft.GraphQL.Sorts.csproj" />
-    <ProjectReference Include="..\Sheaft.Models\Sheaft.Models.csproj" />
+    <ProjectReference Include="..\Sheaft.Application.Models\Sheaft.Application.Models.csproj" />
   </ItemGroup>
 
 </Project>

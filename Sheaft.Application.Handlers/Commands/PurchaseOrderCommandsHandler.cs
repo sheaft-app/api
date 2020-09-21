@@ -7,13 +7,11 @@ using MediatR;
 using Sheaft.Application.Commands;
 using Sheaft.Core;
 using Sheaft.Domain.Models;
-using Sheaft.Infrastructure.Interop;
-using Sheaft.Interop.Enums;
+using Sheaft.Application.Interop;
+using Sheaft.Domain.Enums;
 using Sheaft.Application.Events;
-using Sheaft.Services.Interop;
 using Microsoft.Extensions.Logging;
 using Microsoft.EntityFrameworkCore;
-using Sheaft.Infrastructure;
 
 namespace Sheaft.Application.Handlers
 {

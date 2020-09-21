@@ -1,5 +1,5 @@
 ﻿using Sheaft.Core;
-using Sheaft.Models.Dto;
+using Sheaft.Application.Models;
 using System;
 using System.Linq;
 

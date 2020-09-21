@@ -6,8 +6,7 @@ using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using Sheaft.Application.Events;
 using Sheaft.Domain.Models;
-using Sheaft.Infrastructure.Interop;
-using Sheaft.Services.Interop;
+using Sheaft.Application.Interop;
 
 namespace Sheaft.Application.Handlers
 {

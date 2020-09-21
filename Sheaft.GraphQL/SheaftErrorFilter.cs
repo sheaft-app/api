@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
 using Sheaft.Exceptions;
-using Sheaft.Interop.Enums;
+using Sheaft.Domain.Enums;
 using Sheaft.Localization;
 
 namespace Sheaft.GraphQL

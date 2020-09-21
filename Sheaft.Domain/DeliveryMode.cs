@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using Sheaft.Exceptions;
-using Sheaft.Interop;
-using Sheaft.Interop.Enums;
+using Sheaft.Domain.Enums;
+using Sheaft.Domain.Interop;
 
 namespace Sheaft.Domain.Models
 {

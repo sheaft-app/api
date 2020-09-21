@@ -4,13 +4,12 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Sheaft.Domain.Models;
-using Sheaft.Infrastructure.Interop;
 using Sheaft.Core;
-using Sheaft.Interop.Enums;
-using Sheaft.Models.Dto;
+using Sheaft.Domain.Enums;
+using Sheaft.Application.Models;
 using AutoMapper.QueryableExtensions;
 using AutoMapper;
-using Sheaft.Infrastructure;
+using Sheaft.Application.Interop;
 
 namespace Sheaft.Application.Queries
 {

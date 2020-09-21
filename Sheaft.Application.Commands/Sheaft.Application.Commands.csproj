@@ -9,9 +9,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Sheaft.Core\Sheaft.Core.csproj" />
-    <ProjectReference Include="..\Sheaft.Interop\Sheaft.Interop.csproj" />
-    <ProjectReference Include="..\Sheaft.Models\Sheaft.Models.csproj" />
+    <ProjectReference Include="..\Sheaft.Application.Models\Sheaft.Application.Models.csproj" />
   </ItemGroup>
 
 </Project>

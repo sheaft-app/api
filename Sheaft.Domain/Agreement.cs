@@ -1,6 +1,6 @@
 ﻿using Sheaft.Exceptions;
-using Sheaft.Interop;
-using Sheaft.Interop.Enums;
+using Sheaft.Domain.Enums;
+using Sheaft.Domain.Interop;
 using System;
 using System.Collections.Generic;
 using System.Linq;

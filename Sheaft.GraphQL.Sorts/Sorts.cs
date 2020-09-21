@@ -1,5 +1,5 @@
 ﻿using HotChocolate.Types.Sorting;
-using Sheaft.Models.Dto;
+using Sheaft.Application.Models;
 
 namespace Sheaft.GraphQL.Sorts
 {

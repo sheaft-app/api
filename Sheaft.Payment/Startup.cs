@@ -19,12 +19,11 @@ using SendGrid;
 using Sheaft.Application.Commands;
 using Sheaft.Application.Events;
 using Sheaft.Application.Handlers;
-using Sheaft.Infrastructure;
-using Sheaft.Infrastructure.Interop;
-using Sheaft.Mappers;
+using Sheaft.Application.Interop;
+using Sheaft.Application.Mappers;
+using Sheaft.Infrastructure.Persistence;
+using Sheaft.Infrastructure.Services;
 using Sheaft.Options;
-using Sheaft.Services;
-using Sheaft.Services.Interop;
 
 namespace Sheaft.Payment
 {

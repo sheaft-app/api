@@ -1,11 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using AutoMapper.QueryableExtensions;
-using Sheaft.Infrastructure.Interop;
-using Sheaft.Models.Dto;
+using Sheaft.Application.Interop;
+using Sheaft.Application.Models;
 using Sheaft.Core;
-using Sheaft.Infrastructure;
 using Sheaft.Domain.Models;
 
 namespace Sheaft.Application.Queries

@@ -4,14 +4,12 @@ using System.Threading.Tasks;
 using MediatR;
 using Sheaft.Application.Commands;
 using Sheaft.Core;
-using Sheaft.Infrastructure.Interop;
+using Sheaft.Application.Interop;
 using Microsoft.Extensions.Logging;
 using Sheaft.Domain.Models;
-using Sheaft.Services.Interop;
-using Sheaft.Interop.Enums;
+using Sheaft.Domain.Enums;
 using Sheaft.Application.Events;
 using System.Linq;
-using Sheaft.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 

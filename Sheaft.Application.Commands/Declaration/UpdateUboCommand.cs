@@ -1,6 +1,6 @@
 ﻿using System;
-using Sheaft.Interop.Enums;
-using Sheaft.Models.Inputs;
+using Sheaft.Domain.Enums;
+using Sheaft.Application.Models;
 using Sheaft.Core;
 using Newtonsoft.Json;
 

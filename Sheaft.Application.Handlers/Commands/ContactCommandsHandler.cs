@@ -12,8 +12,8 @@ using IdentityModel.Client;
 using System.Net.Http.Headers;
 using Sheaft.Options;
 using Microsoft.Extensions.Options;
-using Sheaft.Interop.Enums;
 using Microsoft.Extensions.Logging;
+using Sheaft.Exceptions;
 
 namespace Sheaft.Application.Handlers
 {

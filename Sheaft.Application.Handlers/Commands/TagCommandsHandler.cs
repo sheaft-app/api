@@ -1,4 +1,4 @@
-﻿using Sheaft.Infrastructure.Interop;
+﻿using Sheaft.Application.Interop;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
@@ -12,7 +12,6 @@ using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Formats.Jpeg;
 using Sheaft.Exceptions;
 using System.Net.Http;
-using Sheaft.Services.Interop;
 using Sheaft.Options;
 using SixLabors.ImageSharp.Processing;
 using System.IO;

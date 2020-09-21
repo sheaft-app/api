@@ -21,7 +21,6 @@ namespace Sheaft.GraphQL
             descriptor.Field(c => c.GetDepartmentsPoints(default, default)).Argument("input", c => c.Type<IdType>());
             descriptor.Field(c => c.GetDepartmentUsersPoints(default, default)).Argument("input", c => c.Type<IdType>());
             descriptor.Field(c => c.GetFreshdeskTokenAsync(default));
-            descriptor.Field(c => c.GetFees(default, default)).Argument("input", c => c.Type<DecimalType>());
             descriptor.Field(c => c.GetOrder(default, default)).Argument("input", c => c.Type<IdType>());
             descriptor.Field(c => c.GetJob(default, default)).Argument("input", c => c.Type<NonNullType<IdType>>());
             descriptor.Field(c => c.GetJobs(default));

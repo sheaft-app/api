@@ -26,12 +26,10 @@
     <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.10.8" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Sheaft.Application.Commands\Sheaft.Application.Commands.csproj" />
     <ProjectReference Include="..\Sheaft.Application.Events\Sheaft.Application.Events.csproj" />
     <ProjectReference Include="..\Sheaft.Application.Handlers\Sheaft.Application.Handlers.csproj" />
-    <ProjectReference Include="..\Sheaft.Application.Queries\Sheaft.Application.Queries.csproj" />
-    <ProjectReference Include="..\Sheaft.Logging\Sheaft.Logging.csproj" />
-    <ProjectReference Include="..\Sheaft.Mappers\Sheaft.Mappers.csproj" />
+    <ProjectReference Include="..\Sheaft.Infrastructure.Persistence\Sheaft.Infrastructure.Persistence.csproj" />
+    <ProjectReference Include="..\Sheaft.Application.Mappers\Sheaft.Application.Mappers.csproj" />
   </ItemGroup>
   <ItemGroup>
     <None Update="appsettings.Development.json">

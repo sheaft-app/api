@@ -1,15 +1,13 @@
 ﻿using System;
 using System.Linq;
 using Sheaft.Domain.Models;
-using Sheaft.Infrastructure.Interop;
+using Sheaft.Application.Interop;
 using Sheaft.Core;
-using Sheaft.Interop.Enums;
+using Sheaft.Domain.Enums;
 using System.Threading.Tasks;
 using System.Threading;
-using System.Collections.Generic;
-using Sheaft.Models.Dto;
+using Sheaft.Application.Models;
 using AutoMapper.QueryableExtensions;
-using Sheaft.Infrastructure;
 
 namespace Sheaft.Application.Queries
 {

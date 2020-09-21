@@ -6,8 +6,7 @@ using Microsoft.Extensions.Logging;
 using Sheaft.Application.Commands;
 using Sheaft.Core;
 using Sheaft.Domain.Models;
-using Sheaft.Infrastructure.Interop;
-using Sheaft.Services.Interop;
+using Sheaft.Application.Interop;
 
 namespace Sheaft.Application.Handlers
 {

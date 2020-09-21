@@ -1,14 +1,12 @@
 ﻿using Sheaft.Application.Commands;
-using Sheaft.Infrastructure.Interop;
+using Sheaft.Application.Interop;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
 using Sheaft.Core;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
-using Sheaft.Domain.Models;
 using Microsoft.Extensions.Logging;
-using Sheaft.Services.Interop;
 using Newtonsoft.Json;
 using System.IO;
 using System.Text;

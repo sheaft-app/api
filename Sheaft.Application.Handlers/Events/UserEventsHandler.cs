@@ -2,9 +2,8 @@
 using System.Threading.Tasks;
 using MediatR;
 using Sheaft.Application.Events;
+using Sheaft.Application.Interop;
 using Sheaft.Domain.Models;
-using Sheaft.Infrastructure.Interop;
-using Sheaft.Services.Interop;
 
 namespace Sheaft.Application.Handlers
 {

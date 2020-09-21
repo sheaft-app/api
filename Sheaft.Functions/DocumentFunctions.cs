@@ -6,7 +6,7 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Sheaft.Application.Commands;
 using Sheaft.Application.Events;
-using Sheaft.Logging;
+using Sheaft.Core.Extensions;
 
 namespace Sheaft.Functions
 {

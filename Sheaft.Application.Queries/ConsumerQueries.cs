@@ -1,17 +1,10 @@
 ﻿using System;
 using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-using JWT.Algorithms;
-using JWT.Builder;
-using Sheaft.Infrastructure.Interop;
-using Sheaft.Models.Dto;
 using Sheaft.Core;
-using Sheaft.Options;
-using Microsoft.Extensions.Options;
 using Sheaft.Domain.Models;
 using AutoMapper.QueryableExtensions;
-using Sheaft.Infrastructure;
+using Sheaft.Application.Models;
+using Sheaft.Application.Interop;
 
 namespace Sheaft.Application.Queries
 {

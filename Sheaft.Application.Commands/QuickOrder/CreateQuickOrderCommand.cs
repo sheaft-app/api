@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using Sheaft.Models.Inputs;
+using Sheaft.Application.Models;
 using Sheaft.Core;
 using Newtonsoft.Json;
-using Sheaft.Interop.Enums;
+using Sheaft.Domain.Enums;
 
 namespace Sheaft.Application.Commands
 {

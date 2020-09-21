@@ -1,5 +1,4 @@
-﻿using Sheaft.Interop.Enums;
-using System;
+﻿using System;
 
 namespace Sheaft.Exceptions
 {

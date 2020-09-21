@@ -1,7 +1,7 @@
 ﻿using Sheaft.Core;
 using Newtonsoft.Json;
 using System;
-using Sheaft.Interop.Enums;
+using Sheaft.Domain.Enums;
 
 namespace Sheaft.Application.Commands
 {

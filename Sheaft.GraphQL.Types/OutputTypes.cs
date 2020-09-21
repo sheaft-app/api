@@ -1,10 +1,10 @@
 using HotChocolate.Types;
 using HotChocolate.Types.Relay;
+using Sheaft.Application.Models;
 using Sheaft.Application.Queries;
 using Sheaft.GraphQL.Enums;
 using Sheaft.GraphQL.Filters;
 using Sheaft.GraphQL.Sorts;
-using Sheaft.Models.Dto;
 
 namespace Sheaft.GraphQL.Types
 {

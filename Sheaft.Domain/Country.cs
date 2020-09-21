@@ -1,6 +1,4 @@
-﻿using Sheaft.Interop;
-using Sheaft.Interop.Enums;
-using System;
+﻿using System;
 
 namespace Sheaft.Domain.Models
 {

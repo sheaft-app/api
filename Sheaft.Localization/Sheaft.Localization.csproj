@@ -5,10 +5,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Sheaft.Interop\Sheaft.Interop.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
     <Compile Update="Resources\MessageResources.Designer.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>

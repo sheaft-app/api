@@ -6,8 +6,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Sheaft.Core\Sheaft.Core.csproj" />
-    <ProjectReference Include="..\Sheaft.Exceptions\Sheaft.Exceptions.csproj" />
-    <ProjectReference Include="..\Sheaft.Interop\Sheaft.Interop.csproj" />
   </ItemGroup>
 
 </Project>

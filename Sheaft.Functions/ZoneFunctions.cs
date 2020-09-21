@@ -8,7 +8,7 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Sheaft.Application.Commands;
 using Sheaft.Core;
-using Sheaft.Logging;
+using Sheaft.Core.Extensions;
 
 namespace Sheaft.Functions
 {

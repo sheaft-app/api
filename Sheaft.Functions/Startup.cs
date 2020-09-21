@@ -12,19 +12,18 @@ using SendGrid;
 using Sheaft.Application.Commands;
 using Sheaft.Application.Events;
 using Sheaft.Application.Handlers;
-using Sheaft.Application.Queries;
+using Sheaft.Application.Interop;
 using Sheaft.Infrastructure;
-using Sheaft.Infrastructure.Interop;
-using Sheaft.Mappers;
+using Sheaft.Application.Mappers;
 using Sheaft.Options;
-using Sheaft.Services;
-using Sheaft.Services.Interop;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using Sheaft.Infrastructure.Services;
+using Sheaft.Infrastructure.Persistence;
 
 [assembly: FunctionsStartup(typeof(Sheaft.Functions.Startup))]
 namespace Sheaft.Functions

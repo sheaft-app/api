@@ -4,11 +4,10 @@ using System.Threading.Tasks;
 using MediatR;
 using Sheaft.Application.Commands;
 using Sheaft.Core;
-using Sheaft.Infrastructure.Interop;
+using Sheaft.Application.Interop;
 using Microsoft.Extensions.Logging;
-using Sheaft.Services.Interop;
 using Sheaft.Domain.Models;
-using Sheaft.Interop.Enums;
+using Sheaft.Domain.Enums;
 using Sheaft.Application.Events;
 
 namespace Sheaft.Application.Handlers

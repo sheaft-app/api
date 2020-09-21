@@ -1,11 +1,11 @@
 ﻿using Sheaft.Core;
-using Sheaft.Interop.Enums;
+using Sheaft.Domain.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Sheaft.Models.Dto;
+using Sheaft.Application.Models;
 
 namespace Sheaft.Application.Queries
 {

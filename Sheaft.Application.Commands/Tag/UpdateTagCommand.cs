@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 using Sheaft.Core;
-using Sheaft.Interop.Enums;
+using Sheaft.Domain.Enums;
 using System;
 
 namespace Sheaft.Application.Commands

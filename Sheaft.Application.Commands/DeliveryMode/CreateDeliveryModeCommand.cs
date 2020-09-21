@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using Sheaft.Models.Inputs;
-using Sheaft.Interop.Enums;
+using Sheaft.Application.Models;
+using Sheaft.Domain.Enums;
 using Sheaft.Core;
 using Newtonsoft.Json;
 

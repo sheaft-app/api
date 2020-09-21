@@ -1,4 +1,4 @@
-﻿using Sheaft.Models.Dto;
+﻿using Sheaft.Application.Models;
 using Sheaft.Core;
 using System;
 using System.Linq;

@@ -36,9 +36,8 @@
     <ProjectReference Include="..\Sheaft.Application.Events\Sheaft.Application.Events.csproj" />
     <ProjectReference Include="..\Sheaft.Application.Handlers\Sheaft.Application.Handlers.csproj" />
     <ProjectReference Include="..\Sheaft.GraphQL\Sheaft.GraphQL.csproj" />
-    <ProjectReference Include="..\Sheaft.Infrastructure\Sheaft.Infrastructure.csproj" />
-    <ProjectReference Include="..\Sheaft.Mappers\Sheaft.Mappers.csproj" />
-    <ProjectReference Include="..\Sheaft.Services\Sheaft.Services.csproj" />
+    <ProjectReference Include="..\Sheaft.Infrastructure.Persistence\Sheaft.Infrastructure.Persistence.csproj" />
+    <ProjectReference Include="..\Sheaft.Application.Mappers\Sheaft.Application.Mappers.csproj" />
   </ItemGroup>
   <ItemGroup>
     <Content Update="appsettings.Development.json">

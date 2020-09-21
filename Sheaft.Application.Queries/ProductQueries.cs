@@ -7,16 +7,14 @@ using System.Threading.Tasks;
 using Microsoft.Azure.Search;
 using Microsoft.Azure.Search.Models;
 using Newtonsoft.Json;
-using Sheaft.Infrastructure.Interop;
+using Sheaft.Application.Interop;
 using Sheaft.Core;
-using Sheaft.Interop.Enums;
-using Sheaft.Models.Inputs;
-using Sheaft.Models.Dto;
+using Sheaft.Domain.Enums;
+using Sheaft.Application.Models;
 using Sheaft.Options;
 using Microsoft.Extensions.Options;
 using Sheaft.Domain.Models;
 using AutoMapper.QueryableExtensions;
-using Sheaft.Infrastructure;
 
 namespace Sheaft.Application.Queries
 {

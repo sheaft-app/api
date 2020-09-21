@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Sheaft.Core.Extensions;
 using Sheaft.Domain.Models;
-using Sheaft.Infrastructure.Interop;
-using Sheaft.Models.ViewModels;
+using Sheaft.Application.Interop;
+using Sheaft.Application.Models;
 
 namespace Sheaft.Manage.Controllers
 {

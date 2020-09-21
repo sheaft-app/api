@@ -1,6 +1,6 @@
-﻿using Sheaft.Interop.Enums;
+﻿using Sheaft.Domain.Enums;
+using Sheaft.Exceptions;
 using System;
-using System.ComponentModel.DataAnnotations;
 
 namespace Sheaft.Domain.Models
 {

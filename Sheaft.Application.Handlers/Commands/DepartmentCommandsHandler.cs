@@ -1,5 +1,4 @@
-﻿using Sheaft.Infrastructure.Interop;
-using System;
+﻿using Sheaft.Application.Interop;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;

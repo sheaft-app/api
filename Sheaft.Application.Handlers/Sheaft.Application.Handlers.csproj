@@ -14,9 +14,9 @@
   <ItemGroup>
     <ProjectReference Include="..\Sheaft.Application.Commands\Sheaft.Application.Commands.csproj" />
     <ProjectReference Include="..\Sheaft.Application.Events\Sheaft.Application.Events.csproj" />
+    <ProjectReference Include="..\Sheaft.Application.Interop\Sheaft.Application.Interop.csproj" />
     <ProjectReference Include="..\Sheaft.Core\Sheaft.Core.csproj" />
-    <ProjectReference Include="..\Sheaft.Infrastructure\Sheaft.Infrastructure.csproj" />
     <ProjectReference Include="..\Sheaft.Options\Sheaft.Options.csproj" />
-    <ProjectReference Include="..\Sheaft.Services\Sheaft.Services.csproj" />
+    <ProjectReference Include="..\Sheaft.Infrastructure.Services\Sheaft.Infrastructure.Services.csproj" />
   </ItemGroup>
 </Project>

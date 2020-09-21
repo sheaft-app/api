@@ -1,4 +1,4 @@
-﻿using Sheaft.Infrastructure.Interop;
+﻿using Sheaft.Application.Interop;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
@@ -8,8 +8,6 @@ using Sheaft.Application.Commands;
 using Sheaft.Domain.Models;
 using Microsoft.Extensions.Logging;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Internal;
-using System.Linq;
 
 namespace Sheaft.Application.Handlers
 {

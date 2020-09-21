@@ -1,6 +1,5 @@
 using Sheaft.Exceptions;
-using Sheaft.Interop;
-using Sheaft.Interop.Enums;
+using Sheaft.Domain.Interop;
 using System;
 
 namespace Sheaft.Domain.Models

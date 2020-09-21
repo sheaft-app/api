@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using Sheaft.Interop.Enums;
 using Sheaft.Core;
 using Newtonsoft.Json;
+using Sheaft.Domain.Enums;
 
 namespace Sheaft.Application.Commands
 {

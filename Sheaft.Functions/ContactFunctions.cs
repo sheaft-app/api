@@ -11,8 +11,8 @@ using Microsoft.Extensions.Options;
 using Microsoft.Net.Http.Headers;
 using Sheaft.Application.Commands;
 using Sheaft.Core;
-using Sheaft.Interop.Enums;
-using Sheaft.Logging;
+using Sheaft.Core.Extensions;
+using Sheaft.Exceptions;
 using Sheaft.Options;
 
 namespace Sheaft.Functions

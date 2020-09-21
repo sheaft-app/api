@@ -1,18 +1,14 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Sheaft.Domain.StoreProcedures;
-using Sheaft.Infrastructure.Interop;
-using Sheaft.Models.Dto;
+using Sheaft.Application.Interop;
+using Sheaft.Application.Models;
 using Sheaft.Core;
 using Sheaft.Core.Extensions;
 using Sheaft.Options;
 using Microsoft.Extensions.Options;
-using Sheaft.Domain.Views;
 using AutoMapper.QueryableExtensions;
-using Sheaft.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Sheaft.Domain.Models;
 

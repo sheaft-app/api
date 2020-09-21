@@ -1,7 +1,7 @@
 ﻿using Sheaft.Core;
-using Sheaft.Interop.Enums;
 using System;
 using Newtonsoft.Json;
+using Sheaft.Domain.Enums;
 
 namespace Sheaft.Application.Events
 {

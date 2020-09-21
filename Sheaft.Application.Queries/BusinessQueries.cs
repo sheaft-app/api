@@ -9,16 +9,13 @@ using IdentityModel.Client;
 using Microsoft.Azure.Search;
 using Microsoft.Azure.Search.Models;
 using Newtonsoft.Json;
-using Sheaft.Infrastructure.Interop;
 using Sheaft.Core;
-using Sheaft.Interop.Enums;
-using Sheaft.Models.Dto;
-using Sheaft.Models.Inputs;
+using Sheaft.Application.Models;
 using Sheaft.Options;
 using Microsoft.Extensions.Options;
 using Sheaft.Domain.Models;
 using AutoMapper.QueryableExtensions;
-using Sheaft.Infrastructure;
+using Sheaft.Application.Interop;
 
 namespace Sheaft.Application.Queries
 {

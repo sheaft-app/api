@@ -1,5 +1,5 @@
 ﻿using HotChocolate.Types;
-using Sheaft.Interop.Enums;
+using Sheaft.Domain.Enums;
 using System;
 
 namespace Sheaft.GraphQL.Enums

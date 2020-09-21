@@ -2,8 +2,7 @@ using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Sheaft.Models.Dto;
-using Sheaft.Models.Inputs;
+using Sheaft.Application.Models;
 using Sheaft.Core;
 
 namespace Sheaft.Application.Queries

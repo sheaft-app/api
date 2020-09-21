@@ -1,5 +1,4 @@
-﻿using Sheaft.Interop;
-using System;
+﻿using System;
 
 namespace Sheaft.Domain.Models
 {

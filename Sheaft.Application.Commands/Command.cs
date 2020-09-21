@@ -1,6 +1,5 @@
 ﻿using MediatR;
 using Sheaft.Core;
-using Sheaft.Interop;
 
 namespace Sheaft.Application.Commands
 {

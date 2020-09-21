@@ -1,8 +1,8 @@
 using System;
 using Newtonsoft.Json;
 using Sheaft.Exceptions;
-using Sheaft.Interop;
-using Sheaft.Interop.Enums;
+using Sheaft.Domain.Interop;
+using Sheaft.Domain.Enums;
 
 namespace Sheaft.Domain.Models
 {

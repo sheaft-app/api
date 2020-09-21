@@ -14,9 +14,8 @@ using Sheaft.Application.Events;
 using Sheaft.Core;
 using Sheaft.Domain.Models;
 using Sheaft.Exceptions;
-using Sheaft.Infrastructure.Interop;
-using Sheaft.Interop.Enums;
-using Sheaft.Services.Interop;
+using Sheaft.Application.Interop;
+using Sheaft.Domain.Enums;
 
 namespace Sheaft.Application.Handlers
 {

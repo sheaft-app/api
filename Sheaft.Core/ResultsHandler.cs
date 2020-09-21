@@ -2,9 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using Sheaft.Core;
 using Sheaft.Exceptions;
-using Sheaft.Interop.Enums;
 
 namespace Sheaft.Core
 {
