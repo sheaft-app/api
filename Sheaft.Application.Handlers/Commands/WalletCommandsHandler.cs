@@ -63,6 +63,9 @@ namespace Sheaft.Application.Handlers
 
                 wallet.SetIdentifier(result.Data);
 
+                _context.Update(wallet);
+                await _context.SaveChangesAsync(token);
+
                 await transaction.CommitAsync(token);
                 return Ok(wallet.Id);
             }

@@ -185,8 +185,7 @@ namespace Sheaft.Application.Handlers
 
         private async Task<IEnumerable<PayoutTransaction>> GetNextPayoutTransactions(DateTimeOffset expiredDate, int skip, int take, CancellationToken token)
         {
-            return await _context.Transactions
-                                .OfType<PayoutTransaction>()
+            return await _context.PayoutTransactions
                                 .Get(c => (c.Status == TransactionStatus.Waiting && c.CreatedOn < expiredDate)
                                         || (c.Status == TransactionStatus.Created && c.UpdatedOn.HasValue && c.UpdatedOn.Value < expiredDate), true)
                                 .OrderBy(c => c.Id)

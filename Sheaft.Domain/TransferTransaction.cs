@@ -17,9 +17,11 @@ namespace Sheaft.Domain.Models
             Credited = PurchaseOrder.TotalWholeSalePrice;
             CreditedWallet = creditedWallet;
             DebitedWallet = debitedWallet;
-            Reference = $"SHEAFT_{purchaseOrder.Reference}_{DateTimeOffset.UtcNow:yyyyMMdd}";
+            Reference = "SHEAFT";
         }
 
         public virtual PurchaseOrder PurchaseOrder { get; private set; }
+        public virtual Wallet CreditedWallet { get; private set; }
+        public virtual Wallet DebitedWallet { get; private set; }
     }
 }

@@ -223,8 +223,7 @@ namespace Sheaft.Application.Handlers
 
         private async Task<IEnumerable<TransferTransaction>> GetNextTransferTransactions(DateTimeOffset expiredDate, int skip, int take, CancellationToken token)
         {
-            return await _context.Transactions
-                                .OfType<TransferTransaction>()
+            return await _context.TransferTransactions
                                 .Get(c => (c.Status == TransactionStatus.Waiting && c.CreatedOn < expiredDate)
                                     || (c.Status == TransactionStatus.Created && c.UpdatedOn.HasValue && c.UpdatedOn.Value < expiredDate), true)
                                 .OrderBy(c => c.Id)

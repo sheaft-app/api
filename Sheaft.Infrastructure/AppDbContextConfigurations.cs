@@ -67,14 +67,11 @@ namespace Sheaft.Infrastructure
             modelBuilder.Entity<Card>().HasBaseType<PaymentMethod>();
             modelBuilder.Entity<BankAccount>().HasBaseType<PaymentMethod>();
 
-            modelBuilder.Entity<PayinTransaction>().HasBaseType<Transaction>();
-            modelBuilder.Entity<TransferTransaction>().HasBaseType<Transaction>();
-            modelBuilder.Entity<PayoutTransaction>().HasBaseType<Transaction>();
-            modelBuilder.Entity<RefundPayinTransaction>().HasBaseType<Transaction>();
-            modelBuilder.Entity<RefundTransferTransaction>().HasBaseType<Transaction>();
-
             modelBuilder.Entity<CardPayinTransaction>().HasBaseType<PayinTransaction>();
             modelBuilder.Entity<WebPayinTransaction>().HasBaseType<PayinTransaction>();
+
+            modelBuilder.Entity<RefundPayinTransaction>().HasBaseType<RefundTransaction>();
+            modelBuilder.Entity<RefundTransferTransaction>().HasBaseType<RefundTransaction>();
 
             modelBuilder.Entity<BusinessLegal>().HasBaseType<Legal>();
             modelBuilder.Entity<ConsumerLegal>().HasBaseType<Legal>();
@@ -114,12 +111,12 @@ namespace Sheaft.Infrastructure
             modelBuilder.ApplyConfiguration(new CardConfiguration());
             modelBuilder.ApplyConfiguration(new WalletConfiguration());
             modelBuilder.ApplyConfiguration(new DocumentConfiguration());
-            modelBuilder.ApplyConfiguration(new TransactionConfiguration());
             modelBuilder.ApplyConfiguration(new PayinTransactionConfiguration());
             modelBuilder.ApplyConfiguration(new WebPayinTransactionConfiguration());
             modelBuilder.ApplyConfiguration(new CardPayinTransactionConfiguration());
             modelBuilder.ApplyConfiguration(new TransferTransactionConfiguration());
             modelBuilder.ApplyConfiguration(new PayoutTransactionConfiguration());
+            modelBuilder.ApplyConfiguration(new RefundTransactionConfiguration());
             modelBuilder.ApplyConfiguration(new RefundPayinTransactionConfiguration());
             modelBuilder.ApplyConfiguration(new RefundTransferTransactionConfiguration());
             modelBuilder.ApplyConfiguration(new CountryConfiguration());

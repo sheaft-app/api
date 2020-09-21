@@ -18,6 +18,7 @@ namespace Sheaft.Domain.Models
             Reference = $"SHEAFT_{DateTimeOffset.UtcNow:yyyyMMdd}";
         }
 
+        public virtual Wallet DebitedWallet { get; private set; }
         public virtual BankAccount BankAccount { get; private set; }
     }
 }

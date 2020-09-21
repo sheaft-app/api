@@ -34,7 +34,10 @@ namespace Sheaft.Infrastructure.Interop
         DbSet<Region> Regions { get; set; }
         DbSet<Reward> Rewards { get; set; }
         DbSet<Tag> Tags { get; set; }
-        DbSet<Transaction> Transactions { get; set; }
+        DbSet<PayinTransaction> PayinTransactions { get; set; }
+        DbSet<TransferTransaction> TransferTransactions { get; set; }
+        DbSet<PayoutTransaction> PayoutTransactions { get; set; }
+        DbSet<RefundTransaction> RefundTransactions { get; set; }
         DbSet<Ubo> Ubos { get; set; }
         DbSet<User> Users { get; set; }
 

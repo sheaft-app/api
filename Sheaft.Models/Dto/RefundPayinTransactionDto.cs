@@ -2,7 +2,8 @@
 
 namespace Sheaft.Models.Dto
 {
-    public class PayoutTransactionDto : TransactionDto
+
+    public class RefundPayinTransactionDto : RefundTransactionDto
     {
         public UserProfileDto DebitedUser { get; set; }
     }

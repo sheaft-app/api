@@ -16,8 +16,10 @@ namespace Sheaft.Domain.Models
             Fees = order.FeesPrice + order.Donation;
             Debited = order.TotalWholeSalePrice + order.FeesPrice + order.Donation;
             CreditedWallet = creditedWallet;
-            Reference = $"SHEAFT_{DateTimeOffset.UtcNow:yyyyMMdd}";
+            Reference = "SHEAFT";
         }
+
+        public virtual Wallet CreditedWallet { get; private set; }
         public virtual Order Order { get; private set; }
     }
 }

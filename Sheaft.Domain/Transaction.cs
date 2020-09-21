@@ -32,8 +32,6 @@ namespace Sheaft.Domain.Models
         public string Reference { get; protected set; }
         public decimal Debited { get; protected set; }
         public decimal Credited { get; protected set; }
-        public virtual Wallet CreditedWallet { get; protected set; }
-        public virtual Wallet DebitedWallet { get; protected set; }
         public virtual User Author { get; private set; }
 
         public void SetProcessedOn(DateTimeOffset? processedOn)

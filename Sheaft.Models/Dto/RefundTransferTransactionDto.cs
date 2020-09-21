@@ -2,10 +2,10 @@
 
 namespace Sheaft.Models.Dto
 {
-    public class TransferTransactionDto : TransactionDto
+
+    public class RefundTransferTransactionDto : RefundTransactionDto
     {
         public UserProfileDto DebitedUser { get; set; }
         public UserProfileDto CreditedUser { get; set; }
-        public PurchaseOrderDto PurchaseOrder { get; set; }
     }
 }

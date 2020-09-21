@@ -23,7 +23,7 @@ namespace Sheaft.Application.Queries
 
         public IQueryable<WebPayinTransactionDto> GetWebPayinTransaction(string identifier, RequestUser currentUser)
         {
-            return _context.Transactions
+            return _context.PayinTransactions
                     .OfType<WebPayinTransaction>()
                     .Get(c => c.Identifier == identifier && c.Author.Id == currentUser.Id)
                     .ProjectTo<WebPayinTransactionDto>(_configurationProvider);
@@ -31,7 +31,7 @@ namespace Sheaft.Application.Queries
 
         public IQueryable<WebPayinTransactionDto> GetWebPayinTransaction(Guid id, RequestUser currentUser)
         {
-            return _context.Transactions
+            return _context.PayinTransactions
                     .OfType<WebPayinTransaction>()
                     .Get(c => c.Id == id && c.Author.Id == currentUser.Id)
                     .ProjectTo<WebPayinTransactionDto>(_configurationProvider);

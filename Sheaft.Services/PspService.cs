@@ -359,6 +359,7 @@ namespace Sheaft.Services
 
         public async Task<Result<PspWebPaymentResultDto>> CreateWebPayinAsync(WebPayinTransaction transaction, Owner owner, CancellationToken token)
         {
+#pragma warning disable RCS1090 // Call 'ConfigureAwait(false)'.
             return await ExecuteAsync(async () =>
             {
                 if (string.IsNullOrWhiteSpace(transaction.Author.Identifier))
@@ -389,7 +390,9 @@ namespace Sheaft.Services
                         transaction.Reference)
                     {
                         SecureMode = SecureMode.DEFAULT,
-                        TemplateURLOptionsCard = new TemplateURLOptionsCard { PAYLINEV2 = _pspOptions.PaiementUrl }
+                        TemplateURLOptionsCard = new TemplateURLOptionsCard {
+                            PAYLINEV2 = _pspOptions.PaymentUrl 
+                        }
                     });
 
                 return Ok(new PspWebPaymentResultDto
@@ -405,6 +408,7 @@ namespace Sheaft.Services
                     Status = result.Status.GetTransactionStatus()
                 });
             });
+#pragma warning restore RCS1090 // Call 'ConfigureAwait(false)'.
         }
 
         public async Task<Result<PspPaymentResultDto>> CreateCardPayinAsync(CardPayinTransaction transaction, Owner owner, CancellationToken token)
@@ -555,12 +559,12 @@ namespace Sheaft.Services
                 if (string.IsNullOrWhiteSpace(transaction.Author.Identifier))
                     return Failed<PspPaymentResultDto>(new SheaftException(ExceptionKind.BadRequest, MessageKind.PsP_CannotRefund_Payin_Author_Not_Exists));
 
-                if (string.IsNullOrWhiteSpace(transaction.TransactionToRefundIdentifier))
+                if (string.IsNullOrWhiteSpace(transaction.PayinTransaction.Identifier))
                     return Failed<PspPaymentResultDto>(new SheaftException(ExceptionKind.BadRequest, MessageKind.PsP_CannotRefund_Payin_PayinIdentifier_Missing));
 
                 await EnsureAccessTokenIsValidAsync(token);
 
-                var result = await _api.PayIns.CreateRefundAsync(transaction.Id.ToString("N"), transaction.TransactionToRefundIdentifier,
+                var result = await _api.PayIns.CreateRefundAsync(transaction.Id.ToString("N"), transaction.PayinTransaction.Identifier,
                     new RefundPayInPostDTO(
                         transaction.Author.Identifier,
                         new Money
@@ -595,14 +599,14 @@ namespace Sheaft.Services
                 if (string.IsNullOrWhiteSpace(transaction.Author.Identifier))
                     return Failed<PspPaymentResultDto>(new SheaftException(ExceptionKind.BadRequest, MessageKind.PsP_CannotRefund_Transfer_Author_Not_Exists));
 
-                if (string.IsNullOrWhiteSpace(transaction.TransactionToRefundIdentifier))
+                if (string.IsNullOrWhiteSpace(transaction.TransferTransaction.Identifier))
                     return Failed<PspPaymentResultDto>(new SheaftException(ExceptionKind.BadRequest, MessageKind.PsP_CannotRefund_Transfer_TransferIdentifier_Missing));
 
                 await EnsureAccessTokenIsValidAsync(token);
 
                 var result = await _api.Transfers.CreateRefundAsync(
                     transaction.Id.ToString("N"),
-                    transaction.TransactionToRefundIdentifier,
+                    transaction.TransferTransaction.Identifier,
                     new RefundTransferPostDTO(transaction.Author.Identifier));
 
                 return Ok(new PspPaymentResultDto

@@ -2,10 +2,8 @@
 
 namespace Sheaft.Models.Dto
 {
-    public class PayinTransactionDto : BaseTransactionDto
+    public class PayinTransactionDto : TransactionDto
     {
-        public decimal Fees { get; set; }
-        public decimal Credited { get; set; }
         public UserProfileDto CreditedUser { get; set; }
         public OrderDto Order { get; set; }
     }

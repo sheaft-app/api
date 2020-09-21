@@ -3,21 +3,19 @@ using System;
 
 namespace Sheaft.Domain.Models
 {
-    public class RefundPayinTransaction : Transaction
+    public class RefundPayinTransaction : RefundTransaction
     {
         protected RefundPayinTransaction()
         {
         }
 
-        public RefundPayinTransaction(Guid id, RefundPayinTransaction transaction)
-            : base(id, TransactionKind.RefundPayin, transaction.Author)
+        public RefundPayinTransaction(Guid id, PayinTransaction transaction, User author)
+            : base(id, TransactionKind.RefundPayin, transaction, author)
         {
-            TransactionToRefundIdentifier = transaction.Identifier;
-            Debited = transaction.Debited;
-            Order = transaction.Order;
+            Credited = transaction.Debited;
+            PayinTransaction = transaction;
         }
 
-        public string TransactionToRefundIdentifier { get; private set; }
-        public virtual Order Order { get; private set; }
+        public virtual PayinTransaction PayinTransaction { get; private set; }
     }
 }
