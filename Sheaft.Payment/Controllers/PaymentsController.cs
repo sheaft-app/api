@@ -14,11 +14,11 @@ namespace Sheaft.Payment.Controllers
         private readonly PspOptions _pspOptions;
 
         public PaymentsController(
-            IOptionsSnapshot<PspOptions> options,
+            IOptionsSnapshot<PspOptions> pspOptions,
             ILogger<PaymentsController> logger)
         {
             _logger = logger;
-            _pspOptions = options.Value;
+            _pspOptions = pspOptions.Value;
         }
 
         [HttpGet, HttpPost]
@@ -49,6 +49,11 @@ namespace Sheaft.Payment.Controllers
         public IActionResult Error()
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+        }
+
+        public IActionResult Transaction(string transactionId)
+        {
+            return RedirectPreserveMethod(_pspOptions.AppRedirectUrl.Replace("{transactionId}", transactionId));
         }
     }
 }
