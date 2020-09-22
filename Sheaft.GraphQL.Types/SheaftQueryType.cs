@@ -22,7 +22,7 @@ namespace Sheaft.GraphQL.Types
             descriptor.Field(c => c.GetMyUserProfile(default))
                 .Name("me")
                 .Authorize(Policies.AUTHENTICATED)
-                .Type<NonNullType<UserProfileType>>()
+                .Type<UserProfileType>()
                 .UseSingleOrDefault()
                 .UseSelection();
 
@@ -228,7 +228,7 @@ namespace Sheaft.GraphQL.Types
                 .Type<NonNullType<ProducerType>>()
                 .UseSingleOrDefault()
                 .UseSelection();
-            
+
             descriptor.Field(c => c.GetProducerProducts(default, default))
                 .Name("producerProducts")
                 .Authorize(Policies.STORE)

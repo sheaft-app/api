@@ -15,7 +15,7 @@ namespace Sheaft.GraphQL.Types
                 .Name("generateUserSponsoringCode")
                 .Authorize(Policies.REGISTERED)
                 .Type<NonNullType<StringType>>();
-            
+
             //PURCHASE ORDERS
             descriptor.Field(c => c.AcceptPurchaseOrdersAsync(default, default))
                 .Name("acceptPurchaseOrders")
@@ -378,7 +378,6 @@ namespace Sheaft.GraphQL.Types
                 .Type<NonNullType<ProducerType>>()
                 .UseSingleOrDefault()
                 .UseSelection();
-
 
             //STORE
             descriptor.Field(c => c.RegisterStoreAsync(default, default))
