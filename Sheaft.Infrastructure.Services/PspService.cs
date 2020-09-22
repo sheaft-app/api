@@ -201,7 +201,7 @@ namespace Sheaft.Infrastructure.Services
                     Identifier = result.Id,
                     ProcessedOn = result.ProcessedDate,
                     ResultCode = result.RefusedReasonType,
-                    ResultMessage = result.RefusedReasonMessage,
+                    ResultMessage = MangoExtensions.GetOperationMessage(result.RefusedReasonType, result.RefusedReasonMessage),
                     Status = result.Status.GetValidationStatus()
                 });
             });
@@ -244,7 +244,7 @@ namespace Sheaft.Infrastructure.Services
                     Identifier = result.Id,
                     ProcessedOn = result.ProcessedDate,
                     ResultCode = result.RefusedReasonType,
-                    ResultMessage = result.RefusedReasonMessage,
+                    ResultMessage = MangoExtensions.GetOperationMessage(result.RefusedReasonType, result.RefusedReasonMessage),
                     Status = result.Status.GetValidationStatus()
                 });
             });
@@ -264,7 +264,7 @@ namespace Sheaft.Infrastructure.Services
                 {
                     Identifier = result.Id,
                     Status = result.Status.GetDeclarationStatus(),
-                    ResultMessage = result.Message,
+                    ResultMessage = MangoExtensions.GetOperationMessage(result.Reason.ToString("G"), result.Message),
                     ProcessedOn = result.ProcessedDate,
                     ResultCode = result.Reason.ToString("G")
                 });
@@ -298,7 +298,7 @@ namespace Sheaft.Infrastructure.Services
                 {
                     Identifier = result.Id,
                     Status = result.Status.GetDeclarationStatus(),
-                    ResultMessage = result.Message,
+                    ResultMessage = MangoExtensions.GetOperationMessage(result.Reason.ToString("G"), result.Message),
                     ProcessedOn = result.ProcessedDate,
                     ResultCode = result.Reason.ToString("G")
                 });
@@ -401,7 +401,7 @@ namespace Sheaft.Infrastructure.Services
                     Identifier = result.Id,
                     RedirectUrl = result.RedirectURL,
                     ResultCode = result.ResultCode,
-                    ResultMessage = result.ResultMessage,
+                    ResultMessage = MangoExtensions.GetOperationMessage(result.ResultCode, result.ResultMessage),
                     Debited = result.DebitedFunds.Amount.GetAmount(),
                     Fees = result.Fees.Amount.GetAmount(),
                     Status = result.Status.GetTransactionStatus()
@@ -453,7 +453,7 @@ namespace Sheaft.Infrastructure.Services
                     ExecutedOn = result.ExecutionDate,
                     Identifier = result.Id,
                     ResultCode = result.ResultCode,
-                    ResultMessage = result.ResultMessage,
+                    ResultMessage = MangoExtensions.GetOperationMessage(result.ResultCode, result.ResultMessage),
                     Debited = result.DebitedFunds.Amount.GetAmount(),
                     Fees = result.Fees.Amount.GetAmount(),
                     Status = result.Status.GetTransactionStatus()
@@ -499,7 +499,7 @@ namespace Sheaft.Infrastructure.Services
                     ExecutedOn = result.ExecutionDate,
                     Identifier = result.Id,
                     ResultCode = result.ResultCode,
-                    ResultMessage = result.ResultMessage,
+                    ResultMessage = MangoExtensions.GetOperationMessage(result.ResultCode, result.ResultMessage),
                     Debited = result.DebitedFunds.Amount.GetAmount(),
                     Fees = result.Fees.Amount.GetAmount(),
                     Status = result.Status.GetTransactionStatus()
@@ -542,7 +542,7 @@ namespace Sheaft.Infrastructure.Services
                     ExecutedOn = result.ExecutionDate,
                     Identifier = result.Id,
                     ResultCode = result.ResultCode,
-                    ResultMessage = result.ResultMessage,
+                    ResultMessage = MangoExtensions.GetOperationMessage(result.ResultCode, result.ResultMessage),
                     Debited = result.DebitedFunds.Amount.GetAmount(),
                     Fees = result.Fees.Amount.GetAmount(),
                     Status = result.Status.GetTransactionStatus()
@@ -582,7 +582,7 @@ namespace Sheaft.Infrastructure.Services
                     ExecutedOn = result.ExecutionDate,
                     Identifier = result.Id,
                     ResultCode = result.ResultCode,
-                    ResultMessage = result.ResultMessage,
+                    ResultMessage = MangoExtensions.GetOperationMessage(result.ResultCode, result.ResultMessage),
                     Debited = result.DebitedFunds.Amount.GetAmount(),
                     Fees = result.Fees.Amount.GetAmount(),
                     Status = result.Status.GetTransactionStatus()
@@ -613,7 +613,7 @@ namespace Sheaft.Infrastructure.Services
                     ExecutedOn = result.ExecutionDate,
                     Identifier = result.Id,
                     ResultCode = result.ResultCode,
-                    ResultMessage = result.ResultMessage,
+                    ResultMessage = MangoExtensions.GetOperationMessage(result.ResultCode, result.ResultMessage),
                     Debited = result.DebitedFunds.Amount.GetAmount(),
                     Fees = result.Fees.Amount.GetAmount(),
                     Status = result.Status.GetTransactionStatus()
@@ -632,7 +632,7 @@ namespace Sheaft.Infrastructure.Services
                 {
                     Identifier = result.Id,
                     ResultCode = result.RefusedReasonType,
-                    ResultMessage = result.RefusedReasonMessage,
+                    ResultMessage = MangoExtensions.GetOperationMessage(result.RefusedReasonType, result.RefusedReasonMessage),
                     Status = result.Status.GetValidationStatus(),
                     ProcessedOn = result.ProcessedDate
                 });
@@ -650,7 +650,7 @@ namespace Sheaft.Infrastructure.Services
                 {
                     Identifier = result.Id,
                     ResultCode = result.Reason.ToString("G"),
-                    ResultMessage = result.Message,
+                    ResultMessage = MangoExtensions.GetOperationMessage(result.Reason.ToString("G"), result.Message),
                     Status = result.Status.GetDeclarationStatus(),
                     ProcessedOn = result.ProcessedDate
                 });
@@ -668,7 +668,7 @@ namespace Sheaft.Infrastructure.Services
                 {
                     Identifier = result.Id,
                     ResultCode = result.ResultCode,
-                    ResultMessage = result.ResultMessage,
+                    ResultMessage = MangoExtensions.GetOperationMessage(result.ResultCode, result.ResultMessage),
                     Status = result.Status.GetTransactionStatus(),
                     ProcessedOn = result.ExecutionDate
                 });
@@ -686,7 +686,7 @@ namespace Sheaft.Infrastructure.Services
                 {
                     Identifier = result.Id,
                     ResultCode = result.ResultCode,
-                    ResultMessage = result.ResultMessage,
+                    ResultMessage = MangoExtensions.GetOperationMessage(result.ResultCode, result.ResultMessage),
                     Status = result.Status.GetTransactionStatus(),
                     ProcessedOn = result.ExecutionDate
                 });
@@ -704,7 +704,7 @@ namespace Sheaft.Infrastructure.Services
                 {
                     Identifier = result.Id,
                     ResultCode = result.ResultCode,
-                    ResultMessage = result.ResultMessage,
+                    ResultMessage = MangoExtensions.GetOperationMessage(result.ResultCode, result.ResultMessage),
                     Status = result.Status.GetTransactionStatus(),
                     ProcessedOn = result.ExecutionDate
                 });
@@ -722,7 +722,7 @@ namespace Sheaft.Infrastructure.Services
                 {
                     Identifier = result.Id,
                     ResultCode = result.ResultCode,
-                    ResultMessage = result.ResultMessage,
+                    ResultMessage = MangoExtensions.GetOperationMessage(result.ResultCode, result.ResultMessage),
                     Status = result.Status.GetTransactionStatus(),
                     ProcessedOn = result.ExecutionDate
                 });
@@ -826,6 +826,50 @@ namespace Sheaft.Infrastructure.Services
         public static CountryIso GetCountry(this CountryIsoCode countryCode)
         {
             return (CountryIso)countryCode;
+        }
+
+        public static string GetOperationMessage(string code, string message)
+        {
+            switch (code)
+            {
+                case "001030":
+                case "001033":
+                    return "La redirection vers la page de paiement ne s'est pas déroulée correctement et a expirée, veuillez renouveler votre demande.";
+                case "001031":
+                case "101002":
+                    return "Le processus de paiement a été annulé à votre initiative, vous pouvez renouveler votre demande.";
+                case "001034":
+                case "101001":
+                    return "La page de paiement a expirée, veuillez renouveler votre demande.";
+                case "101399":
+                    return "Le mode 3DSecure n'est pas disponible, veuillez contacter notre support.";
+                case "101304":
+                    return "La validation 3DSecure a expirée.";
+                case "101303":
+                    return "Votre carte n'est pas compatible avec 3DSecure.";
+                case "101302":
+                    return "Votre carte ne supporte pas le mode 3DSecure.";
+                case "101301":
+                    return "L'authentification 3DSecure a échouée.";
+                case "001999":
+                    return "Un incident ou un problème de connexion a annulé l'opération.";
+                case "001001":
+                    return "Fond insuffisant dans le porte-monnaie numérique.";
+                case "001002":
+                    return "L'utilisateur renseigné, n'est pas le propriétaire du porte-monnaie numérique";
+                case "001011":
+                    return "Le montant de la transaction est trop elevé.";
+                case "001012":
+                    return "Le montant de la transaction est trop faible.";
+                case "001013":
+                    return "Le montant de la transaction est invalide.";
+                case "101302":
+                    return "Votre carte ne supporte pas le mode 3DSecure.";
+                case "001014":
+                    return "Le montant crédité doit être supérieur à 0.";
+                default:
+                    return message;
+            }
         }
     }
 }

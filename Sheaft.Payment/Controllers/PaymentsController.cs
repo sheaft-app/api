@@ -69,26 +69,6 @@ namespace Sheaft.Payment.Controllers
                     return RedirectPreserveMethod(_pspOptions.AppRedirectPendingUrl.Replace("{transactionId}", transactionId));
                 }
 
-                var message = "";
-                switch (payin.Data.ResultCode)
-                {
-                    case "001030":
-                    case "001033":
-                        message = "La redirection vers la page de paiement ne s'est pas déroulée correctement et a expirée, veuillez renouveler votre demande.";
-                        break;
-                    case "001031":
-                    case "101002":
-                        message = "Le processus de paiement a été annulé à votre initiative, vous pouvez renouveler votre demande.";
-                        break;
-                    case "001034":
-                    case "101001":
-                        message = "La page de paiement a expirée, veuillez renouveler votre demande.";
-                        break;
-                    default:
-                        message = "Une erreur est survenue pendant le traitement de la demande de paiement, contactez notre support pour obtenir plus d'informations.";
-                        break;
-                }
-
                 if (payin.Data.Status == TransactionStatus.Created)
                 {
                     _logger.LogInformation($"Transaction {transactionId} is still in created status, redirecting to pending page.");
@@ -104,7 +84,7 @@ namespace Sheaft.Payment.Controllers
                 if (payin.Data.Status == TransactionStatus.Failed)
                 {
                     _logger.LogInformation($"Transaction {transactionId} failed, redirecting to failed page.");
-                    return RedirectPreserveMethod(_pspOptions.AppRedirectFailedUrl.Replace("{transactionId}", transactionId).Replace("{message}", message));
+                    return RedirectPreserveMethod(_pspOptions.AppRedirectFailedUrl.Replace("{transactionId}", transactionId).Replace("{message}", payin.Data.ResultMessage));
                 }
             }
             catch(Exception e)
