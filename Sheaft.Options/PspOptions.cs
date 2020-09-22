@@ -6,7 +6,9 @@ namespace Sheaft.Options
     {
         public const string SETTING = "Psp";
         public string ApiUrl { get; set; }
-        public string AppRedirectUrl { get; set; }
+        public string AppRedirectPendingUrl { get; set; }
+        public string AppRedirectSuccessUrl { get; set; }
+        public string AppRedirectFailedUrl { get; set; }
         public string ReturnUrl { get; set; }
         public string PaymentUrl { get; set; }
         public string PaylineUrl { get; set; }
