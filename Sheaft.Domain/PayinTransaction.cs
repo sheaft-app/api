@@ -13,8 +13,8 @@ namespace Sheaft.Domain.Models
             : base(id, kind, creditedWallet.User)
         {
             Order = order;
-            Fees = order.FeesPrice + order.Donation;
-            Debited = order.TotalWholeSalePrice + order.FeesPrice + order.Donation;
+            Fees = order.FeesPrice;
+            Debited = order.TotalPrice;
             CreditedWallet = creditedWallet;
             Reference = "SHEAFT";
         }
