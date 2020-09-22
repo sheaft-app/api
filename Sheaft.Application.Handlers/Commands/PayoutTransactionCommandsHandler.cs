@@ -20,7 +20,9 @@ namespace Sheaft.Application.Handlers
         IRequestHandler<SetPayoutStatusCommand, Result<bool>>,
         IRequestHandler<CheckPayoutTransactionsCommand, Result<bool>>,
         IRequestHandler<CheckWaitingPayoutTransactionCommand, Result<bool>>,
-        IRequestHandler<CheckCreatedPayoutTransactionCommand, Result<bool>>
+        IRequestHandler<CheckCreatedPayoutTransactionCommand, Result<bool>>,
+        IRequestHandler<CheckForNewPayoutsCommand, Result<bool>>,
+        IRequestHandler<CreatePayoutForTransfersCommand, Result<bool>>
     {
         private readonly IAppDbContext _context;
         private readonly IPspService _pspService;
@@ -179,6 +181,16 @@ namespace Sheaft.Application.Handlers
 
                 return Ok(true);
             });
+        }
+
+        public Task<Result<bool>> Handle(CheckForNewPayoutsCommand request, CancellationToken cancellationToken)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<Result<bool>> Handle(CreatePayoutForTransfersCommand request, CancellationToken cancellationToken)
+        {
+            throw new NotImplementedException();
         }
 
         private async Task<IEnumerable<PayoutTransaction>> GetNextPayoutTransactions(DateTimeOffset expiredDate, int skip, int take, CancellationToken token)

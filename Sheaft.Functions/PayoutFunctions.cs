@@ -33,13 +33,34 @@ namespace Sheaft.Functions
         }
 
         [FunctionName("CheckPayoutTransactionsCommand")]
-        public async Task CheckPayoutTransactionsCommandAsync([TimerTrigger("0 */10 * * * *", RunOnStartup = false)] TimerInfo info, ILogger logger, CancellationToken token)
+        public async Task CheckPayoutTransactionsCommandAsync([TimerTrigger("0 * * */1 * *", RunOnStartup = false)] TimerInfo info, ILogger logger, CancellationToken token)
         {
-            var results = await _mediatr.Send(new CheckPayoutTransactionsCommand(new RequestUser("transfer-functions", Guid.NewGuid().ToString("N"))), token);
+            var results = await _mediatr.Send(new CheckPayoutTransactionsCommand(new RequestUser("payout-functions", Guid.NewGuid().ToString("N"))), token);
             if (!results.Success)
                 throw results.Exception;
 
             logger.LogInformation(nameof(CheckPayoutTransactionsCommand), "successfully executed");
+        }
+
+        [FunctionName("CheckForNewPayoutsCommand")]
+        public async Task CheckForNewPayoutsCommandAsync([TimerTrigger("0 */10 * * * *", RunOnStartup = false)] TimerInfo info, ILogger logger, CancellationToken token)
+        {
+            var results = await _mediatr.Send(new CheckForNewPayoutsCommand(new RequestUser("payout-functions", Guid.NewGuid().ToString("N"))), token);
+            if (!results.Success)
+                throw results.Exception;
+
+            logger.LogInformation(nameof(CheckForNewPayoutsCommandAsync), "successfully executed");
+        }
+
+        [FunctionName("CreatePayoutForTransfersCommand")]
+        public async Task CreatePayoutForTransfersCommandAsync([ServiceBusTrigger(CreatePayoutForTransfersCommand.QUEUE_NAME, Connection = "AzureWebJobsServiceBus")] string message, ILogger logger, CancellationToken token)
+        {
+            var command = JsonConvert.DeserializeObject<CreatePayoutForTransfersCommand>(message);
+            var results = await _mediatr.Send(command, token);
+            logger.LogCommand(results);
+
+            if (!results.Success)
+                throw results.Exception;
         }
 
         [FunctionName("CheckCreatedPayoutTransactionCommand")]

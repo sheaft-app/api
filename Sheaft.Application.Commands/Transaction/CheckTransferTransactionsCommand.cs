@@ -1,5 +1,4 @@
-﻿using System;
-using Sheaft.Core;
+﻿using Sheaft.Core;
 using Newtonsoft.Json;
 
 namespace Sheaft.Application.Commands
