@@ -13,6 +13,7 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
             entity.Property<long>("PurchaseOrderUid");
             entity.Property<long>("CreditedWalletUid");
             entity.Property<long>("DebitedWalletUid");
+            entity.Property<long?>("PayoutTransactionUid");
 
             entity.Property(o => o.Fees).HasColumnType("decimal(10,2)");
             entity.Property(o => o.Credited).HasColumnType("decimal(10,2)");
@@ -34,6 +35,7 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
             entity.HasIndex("PurchaseOrderUid");
             entity.HasIndex("CreditedWalletUid");
             entity.HasIndex("DebitedWalletUid");
+            entity.HasIndex("PayoutTransactionUid");
             entity.HasIndex("Uid", "Id", "AuthorUid", "PurchaseOrderUid", "CreditedWalletUid", "DebitedWalletUid", "RemovedOn");
 
             entity.ToTable("TransferTransactions");

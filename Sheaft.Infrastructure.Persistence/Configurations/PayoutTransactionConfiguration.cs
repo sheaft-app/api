@@ -23,6 +23,10 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
             entity.HasOne(c => c.Author).WithMany().HasForeignKey("AuthorUid").OnDelete(DeleteBehavior.NoAction);
             entity.HasOne(c => c.DebitedWallet).WithMany().HasForeignKey("DebitedWalletUid").OnDelete(DeleteBehavior.NoAction);
             entity.HasOne(c => c.BankAccount).WithMany().HasForeignKey("BankAccountUid").OnDelete(DeleteBehavior.NoAction);
+            entity.HasMany(c => c.Transfers).WithOne(c => c.Payout).HasForeignKey("PayoutTransactionUid").OnDelete(DeleteBehavior.NoAction);
+
+            var transfers = entity.Metadata.FindNavigation(nameof(PayoutTransaction.Transfers));
+            transfers.SetPropertyAccessMode(PropertyAccessMode.Field);
 
             entity.HasKey("Uid");
 

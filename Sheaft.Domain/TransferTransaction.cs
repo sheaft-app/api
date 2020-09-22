@@ -21,6 +21,7 @@ namespace Sheaft.Domain.Models
         }
 
         public virtual PurchaseOrder PurchaseOrder { get; private set; }
+        public virtual PayoutTransaction Payout { get; private set; }
         public virtual Wallet CreditedWallet { get; private set; }
         public virtual Wallet DebitedWallet { get; private set; }
     }
