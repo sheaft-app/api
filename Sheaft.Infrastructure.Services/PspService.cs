@@ -863,8 +863,6 @@ namespace Sheaft.Infrastructure.Services
                     return "Le montant de la transaction est trop faible.";
                 case "001013":
                     return "Le montant de la transaction est invalide.";
-                case "101302":
-                    return "Votre carte ne supporte pas le mode 3DSecure.";
                 case "001014":
                     return "Le montant crédité doit être supérieur à 0.";
                 default:
