@@ -84,7 +84,7 @@ namespace Sheaft.Payment.Controllers
                 if (payin.Data.Status == TransactionStatus.Failed)
                 {
                     _logger.LogInformation($"Transaction {transactionId} failed, redirecting to failed page.");
-                    return RedirectPreserveMethod(_pspOptions.AppRedirectFailedUrl.Replace("{transactionId}", transactionId));
+                    return RedirectPreserveMethod(_pspOptions.AppRedirectFailedUrl.Replace("{transactionId}", transactionId).Replace("{message}", payin.Data.ResultMessage));
                 }
             }
             catch(Exception e)
