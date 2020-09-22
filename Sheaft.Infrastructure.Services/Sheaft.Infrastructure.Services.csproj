@@ -5,6 +5,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Interop\**" />
+    <EmbeddedResource Remove="Interop\**" />
+    <None Remove="Interop\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Azure.Storage.Blobs" Version="12.6.0" />
     <PackageReference Include="Azure.Storage.Queues" Version="12.4.2" />
     <PackageReference Include="mangopay2-sdk" Version="2.1.1" />
@@ -24,10 +30,6 @@
     <ProjectReference Include="..\Sheaft.Application.Interop\Sheaft.Application.Interop.csproj" />
     <ProjectReference Include="..\Sheaft.Exceptions\Sheaft.Exceptions.csproj" />
     <ProjectReference Include="..\Sheaft.Options\Sheaft.Options.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Interop\" />
   </ItemGroup>
 
 </Project>
