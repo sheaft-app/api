@@ -394,7 +394,6 @@ namespace Sheaft.GraphQL.Types
             descriptor.Field(c => c.GetConsumerLegals(default))
                 .Name("getMyConsumerLegals")
                 .Authorize(Policies.CONSUMER)
-                .Argument("input", c => c.Type<NonNullType<IdType>>())
                 .Type<ConsumerLegalType>()
                 .UseSingleOrDefault()
                 .UseSelection();
@@ -402,7 +401,6 @@ namespace Sheaft.GraphQL.Types
             descriptor.Field(c => c.GetBusinessLegals(default))
                 .Name("getMyBusinessLegals")
                 .Authorize(Policies.STORE_OR_PRODUCER)
-                .Argument("input", c => c.Type<NonNullType<IdType>>())
                 .Type<BusinessLegalType>()
                 .UseSingleOrDefault()
                 .UseSelection();
