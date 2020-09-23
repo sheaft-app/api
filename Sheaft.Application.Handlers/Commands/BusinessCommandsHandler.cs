@@ -30,6 +30,7 @@ namespace Sheaft.Application.Handlers
         IRequestHandler<UpdateProducerCommand, Result<bool>>,
         IRequestHandler<UpdateStoreCommand, Result<bool>>
     {
+        private readonly IMediator _mediatr;
         private readonly IAppDbContext _context;
         private readonly IQueueService _queueService;
         private readonly IImageService _imageService;
@@ -42,6 +43,7 @@ namespace Sheaft.Application.Handlers
             IOptionsSnapshot<AuthOptions> authOptions,
             IDistributedCache cache,
             IAppDbContext context,
+            IMediator mediatr,
             IQueueService queueService,
             IImageService imageService,
             IHttpClientFactory httpClientFactory,
@@ -54,6 +56,7 @@ namespace Sheaft.Application.Handlers
             _queueService = queueService;
             _context = context;
             _cache = cache;
+            _mediatr = mediatr;
 
             _httpClient = httpClientFactory.CreateClient("companies");
             _httpClient.BaseAddress = new Uri(_authOptions.Url);
@@ -90,6 +93,10 @@ namespace Sheaft.Application.Handlers
                     var oidcResult = await UpdateOidcUserAsync(producer, roles, token);
                     if (!oidcResult.Success)
                         return Failed<Guid>(new BadRequestException(MessageKind.Oidc_Register_Error, oidcResult.Exception?.Message));
+
+                    var result = await CreateBusinessLegalsAsync(request.Legals, request.RequestUser, token);
+                    if (!result.Success)
+                        return result;
 
                     await RegisterSponsorAsync(request.SponsoringCode, user, request.RequestUser, token);
                     await transaction.CommitAsync(token);
@@ -132,6 +139,10 @@ namespace Sheaft.Application.Handlers
                     if (!oidcResult.Success)
                         return Failed<Guid>(new BadRequestException(MessageKind.Oidc_Register_Error, oidcResult.Exception?.Message));
 
+                    var result = await CreateBusinessLegalsAsync(request.Legals, request.RequestUser, token);
+                    if (!result.Success)
+                        return result;
+
                     await RegisterSponsorAsync(request.SponsoringCode, user, request.RequestUser, token);
                     await transaction.CommitAsync(token);
 
@@ -154,8 +165,6 @@ namespace Sheaft.Application.Handlers
                 entity.SetProfileKind(request.Kind);
                 entity.SetPhone(request.Phone);
                 entity.SetDescription(request.Description);
-                entity.SetSiret(request.Siret);
-                entity.SetVatIdentifier(request.VatIdentifier);
                 entity.SetOpenForNewBusiness(request.OpenForNewBusiness);
 
                 var departmentCode = UserAddress.GetDepartmentCode(request.Address.Zipcode);
@@ -213,8 +222,6 @@ namespace Sheaft.Application.Handlers
                 entity.SetProfileKind(request.Kind);
                 entity.SetPhone(request.Phone);
                 entity.SetDescription(request.Description);
-                entity.SetSiret(request.Siret);
-                entity.SetVatIdentifier(request.VatIdentifier);
                 entity.SetOpenForNewBusiness(request.OpenForNewBusiness);
 
                 var departmentCode = UserAddress.GetDepartmentCode(request.Address.Zipcode);
@@ -222,7 +229,7 @@ namespace Sheaft.Application.Handlers
 
                 entity.SetAddress(request.Address.Line1, request.Address.Line2, request.Address.Zipcode,
                     request.Address.City, request.Address.Country, department, request.Address.Longitude, request.Address.Latitude);
-                
+
                 var resultImage = await _imageService.HandleUserImageAsync(entity.Id, request.Picture, token);
                 if (!resultImage.Success)
                     return Failed<bool>(resultImage.Exception);
@@ -246,6 +253,20 @@ namespace Sheaft.Application.Handlers
                 await _cache.RemoveAsync(entity.Id.ToString("N"));
                 return Ok(result > 0);
             });
+        }
+
+        private async Task<Result<Guid>> CreateBusinessLegalsAsync(BusinessLegalInput legals, RequestUser requestUser, CancellationToken token)
+        {
+            return await _mediatr.Send(new CreateBusinessLegalCommand(requestUser)
+            {
+                Address = legals.Address,
+                Email = legals.Email,
+                Siret = legals.Siret,
+                Kind = legals.Kind,
+                VatIdentifier = legals.VatIdentifier,
+                UserId = requestUser.Id,
+                Owner = legals.Owner
+            }, token);
         }
 
         private async Task<Result<bool>> UpdateOidcUserAsync(Business entity, List<Guid> roles, CancellationToken token)
@@ -305,7 +326,7 @@ namespace Sheaft.Application.Handlers
             }
 
             var store = new Store(Guid.NewGuid(), request.Name, request.FirstName, request.LastName, request.Email,
-                request.Siret, request.VatIdentifier, address, openingHours, request.OpenForNewBusiness, request.Phone, request.Description);
+                address, openingHours, request.OpenForNewBusiness, request.Phone, request.Description);
 
             if (request.Tags != null && request.Tags.Any())
             {
@@ -325,7 +346,7 @@ namespace Sheaft.Application.Handlers
         private async Task<Result<Producer>> CreateProducerAsync(RegisterProducerCommand request, UserAddress address, CancellationToken token)
         {
             var producer = new Producer(Guid.NewGuid(), request.Name, request.FirstName, request.LastName, request.Email,
-                request.Siret, request.VatIdentifier, address, request.OpenForNewBusiness, request.Phone, request.Description);
+                address, request.OpenForNewBusiness, request.Phone, request.Description);
 
             if (request.Tags != null && request.Tags.Any())
             {

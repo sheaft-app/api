@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore.Migrations;
 
-namespace Sheaft.Infrastructure.Migrations
+namespace Sheaft.Infrastructure.Persistence.Migrations
 {
     public partial class InitDatabase : Migration
     {
@@ -177,8 +177,6 @@ namespace Sheaft.Infrastructure.Migrations
                     TotalPoints = table.Column<int>(nullable: false, defaultValue: 0),
                     OpenForNewBusiness = table.Column<bool>(nullable: true),
                     Description = table.Column<string>(nullable: true),
-                    VatIdentifier = table.Column<string>(nullable: true),
-                    Siret = table.Column<string>(nullable: true),
                     Anonymous = table.Column<bool>(nullable: true, defaultValue: false)
                 },
                 constraints: table =>
@@ -378,6 +376,8 @@ namespace Sheaft.Infrastructure.Migrations
                     Owner_Address_City = table.Column<string>(nullable: true),
                     Owner_Address_Country = table.Column<int>(nullable: true),
                     Email = table.Column<string>(nullable: true),
+                    Siret = table.Column<string>(nullable: true),
+                    VatIdentifier = table.Column<string>(nullable: true),
                     BusinessUid = table.Column<long>(nullable: true),
                     UboDeclarationUid = table.Column<long>(nullable: true),
                     ConsumerUid = table.Column<long>(nullable: true)
@@ -1230,56 +1230,6 @@ namespace Sheaft.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "TransferTransactions",
-                columns: table => new
-                {
-                    Uid = table.Column<long>(nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Id = table.Column<Guid>(nullable: false),
-                    CreatedOn = table.Column<DateTimeOffset>(nullable: false),
-                    UpdatedOn = table.Column<DateTimeOffset>(nullable: true),
-                    RemovedOn = table.Column<DateTimeOffset>(nullable: true),
-                    Identifier = table.Column<string>(nullable: true),
-                    Kind = table.Column<int>(nullable: false),
-                    Status = table.Column<int>(nullable: false),
-                    ExecutedOn = table.Column<DateTimeOffset>(nullable: true),
-                    ResultCode = table.Column<string>(nullable: true),
-                    ResultMessage = table.Column<string>(nullable: true),
-                    Fees = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
-                    Reference = table.Column<string>(nullable: true),
-                    Debited = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
-                    Credited = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
-                    AuthorUid = table.Column<long>(nullable: false),
-                    PurchaseOrderUid = table.Column<long>(nullable: false),
-                    CreditedWalletUid = table.Column<long>(nullable: false),
-                    DebitedWalletUid = table.Column<long>(nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_TransferTransactions", x => x.Uid);
-                    table.ForeignKey(
-                        name: "FK_TransferTransactions_Users_AuthorUid",
-                        column: x => x.AuthorUid,
-                        principalTable: "Users",
-                        principalColumn: "Uid");
-                    table.ForeignKey(
-                        name: "FK_TransferTransactions_Wallets_CreditedWalletUid",
-                        column: x => x.CreditedWalletUid,
-                        principalTable: "Wallets",
-                        principalColumn: "Uid");
-                    table.ForeignKey(
-                        name: "FK_TransferTransactions_Wallets_DebitedWalletUid",
-                        column: x => x.DebitedWalletUid,
-                        principalTable: "Wallets",
-                        principalColumn: "Uid");
-                    table.ForeignKey(
-                        name: "FK_TransferTransactions_PurchaseOrders_PurchaseOrderUid",
-                        column: x => x.PurchaseOrderUid,
-                        principalTable: "PurchaseOrders",
-                        principalColumn: "Uid");
-                });
-
-            migrationBuilder.CreateTable(
                 name: "ProductTags",
                 columns: table => new
                 {
@@ -1355,6 +1305,62 @@ namespace Sheaft.Infrastructure.Migrations
                         name: "FK_Ratings_Users_UserUid",
                         column: x => x.UserUid,
                         principalTable: "Users",
+                        principalColumn: "Uid");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "TransferTransactions",
+                columns: table => new
+                {
+                    Uid = table.Column<long>(nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Id = table.Column<Guid>(nullable: false),
+                    CreatedOn = table.Column<DateTimeOffset>(nullable: false),
+                    UpdatedOn = table.Column<DateTimeOffset>(nullable: true),
+                    RemovedOn = table.Column<DateTimeOffset>(nullable: true),
+                    Identifier = table.Column<string>(nullable: true),
+                    Kind = table.Column<int>(nullable: false),
+                    Status = table.Column<int>(nullable: false),
+                    ExecutedOn = table.Column<DateTimeOffset>(nullable: true),
+                    ResultCode = table.Column<string>(nullable: true),
+                    ResultMessage = table.Column<string>(nullable: true),
+                    Fees = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
+                    Reference = table.Column<string>(nullable: true),
+                    Debited = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
+                    Credited = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
+                    AuthorUid = table.Column<long>(nullable: false),
+                    PurchaseOrderUid = table.Column<long>(nullable: false),
+                    PayoutTransactionUid = table.Column<long>(nullable: true),
+                    CreditedWalletUid = table.Column<long>(nullable: false),
+                    DebitedWalletUid = table.Column<long>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_TransferTransactions", x => x.Uid);
+                    table.ForeignKey(
+                        name: "FK_TransferTransactions_Users_AuthorUid",
+                        column: x => x.AuthorUid,
+                        principalTable: "Users",
+                        principalColumn: "Uid");
+                    table.ForeignKey(
+                        name: "FK_TransferTransactions_Wallets_CreditedWalletUid",
+                        column: x => x.CreditedWalletUid,
+                        principalTable: "Wallets",
+                        principalColumn: "Uid");
+                    table.ForeignKey(
+                        name: "FK_TransferTransactions_Wallets_DebitedWalletUid",
+                        column: x => x.DebitedWalletUid,
+                        principalTable: "Wallets",
+                        principalColumn: "Uid");
+                    table.ForeignKey(
+                        name: "FK_TransferTransactions_PayoutTransactions_PayoutTransactionUid",
+                        column: x => x.PayoutTransactionUid,
+                        principalTable: "PayoutTransactions",
+                        principalColumn: "Uid");
+                    table.ForeignKey(
+                        name: "FK_TransferTransactions_PurchaseOrders_PurchaseOrderUid",
+                        column: x => x.PurchaseOrderUid,
+                        principalTable: "PurchaseOrders",
                         principalColumn: "Uid");
                 });
 
@@ -1990,6 +1996,11 @@ namespace Sheaft.Infrastructure.Migrations
                 name: "IX_TransferTransactions_Identifier",
                 table: "TransferTransactions",
                 column: "Identifier");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_TransferTransactions_PayoutTransactionUid",
+                table: "TransferTransactions",
+                column: "PayoutTransactionUid");
 
             migrationBuilder.CreateIndex(
                 name: "IX_TransferTransactions_PurchaseOrderUid",
@@ -2696,10 +2707,15 @@ namespace Sheaft.Infrastructure.Migrations
             migrationBuilder.Sql("CREATE TABLE [Cache].[CachedItems](	[Id] [nvarchar](449) NOT NULL,	[Value] [varbinary](max) NOT NULL,	[ExpiresAtTime] [datetimeoffset](7) NOT NULL,	[SlidingExpirationInSeconds] [bigint] NULL,	[AbsoluteExpiration] [datetimeoffset](7) NULL,PRIMARY KEY CLUSTERED(	[Id] ASC)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]");
             migrationBuilder.Sql("CREATE NONCLUSTERED INDEX [Index_ExpiresAtTime] ON [Cache].[CachedItems](	[ExpiresAtTime] ASC)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]");
 
-            migrationBuilder.InsertData("Users", new List<string>() { "Uid", "Id", "CreatedOn", "FirstName", "LastName", "Name", "Email", "Siret", "VatIdentifier", "kind", "OpenForNewBusiness" }.ToArray(), new List<object>() { 1, "28491432-1754-4285-9F67-5386A898A48F", "2020-01-25 15:23:10", "Benoit", "Mugnier", "GAEC La Ferme du Parquet", "contact@lfdp.xyz", "452121545", "FR11452121545", "0", "1" }.ToArray(), "dbo");
-            migrationBuilder.InsertData("Users", new List<string>() { "Uid", "Id", "CreatedOn", "FirstName", "LastName", "Name", "Email", "Siret", "VatIdentifier", "kind", "OpenForNewBusiness" }.ToArray(), new List<object>() { 2, "5A8F0AE2-B701-47F0-A8EF-E7C2365A72EB", "2020-01-30 22:45:41", "Ophélie", "Lulin", "Biocoop Semnoz", "contact@biocoop-semnoz.xyz", "342121545", "FR12342121545", "1", "1" }.ToArray(), "dbo");
-            migrationBuilder.InsertData("Users", new List<string>() { "Uid", "Id", "CreatedOn", "FirstName", "LastName", "Name", "Email", "Siret", "VatIdentifier", "kind", "OpenForNewBusiness" }.ToArray(), new List<object>() { 3, "0EAFD299-D0E6-4A63-AF8D-6D154DB96F55", "2020-01-27 22:45:41", "John", "Syntax", "Biocoop Orky", "contact@biocoop-orky.xyz", "451201545", "FR13451201154", "1", "1" }.ToArray(), "dbo");
-            migrationBuilder.InsertData("Users", new List<string>() { "Uid", "Id", "CreatedOn", "FirstName", "LastName", "Name", "Email", "Siret", "VatIdentifier", "kind", "OpenForNewBusiness" }.ToArray(), new List<object>() { 4, "442E31E3-EEA9-4AA0-B741-3245ED1C6F2F", "2020-01-29 22:45:41", "Peter", "Fotdakor", "GAEC La Ferme du Crêt Joli", "contact@lfdcj.xyz", "452981545", "FR14452981545", "0", "1" }.ToArray(), "dbo");
+            migrationBuilder.InsertData("Users", new List<string>() { "Uid", "Id", "CreatedOn", "FirstName", "LastName", "Name", "Email", "kind", "OpenForNewBusiness" }.ToArray(), new List<object>() { 1, "28491432-1754-4285-9F67-5386A898A48F", "2020-01-25 15:23:10", "Benoit", "Mugnier", "GAEC La Ferme du Parquet", "contact@lfdp.xyz", "0", "1" }.ToArray(), "dbo");
+            migrationBuilder.InsertData("Users", new List<string>() { "Uid", "Id", "CreatedOn", "FirstName", "LastName", "Name", "Email", "kind", "OpenForNewBusiness" }.ToArray(), new List<object>() { 2, "5A8F0AE2-B701-47F0-A8EF-E7C2365A72EB", "2020-01-30 22:45:41", "Ophélie", "Lulin", "Biocoop Semnoz", "contact@biocoop-semnoz.xyz", "1", "1" }.ToArray(), "dbo");
+            migrationBuilder.InsertData("Users", new List<string>() { "Uid", "Id", "CreatedOn", "FirstName", "LastName", "Name", "Email", "kind", "OpenForNewBusiness" }.ToArray(), new List<object>() { 3, "0EAFD299-D0E6-4A63-AF8D-6D154DB96F55", "2020-01-27 22:45:41", "John", "Syntax", "Biocoop Orky", "contact@biocoop-orky.xyz", "1", "1" }.ToArray(), "dbo");
+            migrationBuilder.InsertData("Users", new List<string>() { "Uid", "Id", "CreatedOn", "FirstName", "LastName", "Name", "Email", "kind", "OpenForNewBusiness" }.ToArray(), new List<object>() { 4, "442E31E3-EEA9-4AA0-B741-3245ED1C6F2F", "2020-01-29 22:45:41", "Peter", "Fotdakor", "GAEC La Ferme du Crêt Joli", "contact@lfdcj.xyz", "0", "1" }.ToArray(), "dbo");
+
+            migrationBuilder.InsertData("Legals", new List<string>() { "Uid", "Id", "CreatedOn", "Email", "Siret", "VatIdentifier", "kind", "Owner_Id", "Owner_FirstName", "Owner_LastName", "Owner_Email", "Owner_BirthDate", "Owner_Nationality", "Owner_CountryOfResidence", "Owner_Address_Line1", "Owner_Address_Zipcode", "Owner_Address_City", "Owner_Address_Country" }.ToArray(), new List<object>() { 1, "9CDC2CC0-5BDE-4FCE-A875-90DDA3CE6F5B", "2020-01-25 15:23:10", "contact@lfdp.xyz", "999999999999", "FR12154545", 0, "28491432-1754-4285-9F67-5386A898A48F", "Benoit", "Mugnier", "contact@lfdp.xyz", "1990-01-01", 76, 76, "285 Route de Braille", "73410", "Entrelacs", 76 }.ToArray(), "dbo");
+            migrationBuilder.InsertData("Legals", new List<string>() { "Uid", "Id", "CreatedOn", "Email", "Siret", "VatIdentifier", "kind", "Owner_Id", "Owner_FirstName", "Owner_LastName", "Owner_Email", "Owner_BirthDate", "Owner_Nationality", "Owner_CountryOfResidence", "Owner_Address_Line1", "Owner_Address_Zipcode", "Owner_Address_City", "Owner_Address_Country" }.ToArray(), new List<object>() { 2, "B6100B20-E8B6-4670-BAD8-6363F614B352", "2020-01-30 22:45:41", "contact@biocoop-semnoz.xyz", "999999999999", "FR12154545", 1, "5A8F0AE2-B701-47F0-A8EF-E7C2365A72EB", "Ophélie", "Lulin", "contact@biocoop-semnoz.xyz", "1990-01-01", 76, 76, "12 Avenue de Périaz", "74600", "Seynod", 76 }.ToArray(), "dbo");
+            migrationBuilder.InsertData("Legals", new List<string>() { "Uid", "Id", "CreatedOn", "Email", "Siret", "VatIdentifier", "kind", "Owner_Id", "Owner_FirstName", "Owner_LastName", "Owner_Email", "Owner_BirthDate", "Owner_Nationality", "Owner_CountryOfResidence", "Owner_Address_Line1", "Owner_Address_Zipcode", "Owner_Address_City", "Owner_Address_Country" }.ToArray(), new List<object>() { 3, "72474939-ECF8-4FE0-AD17-A21611CB75ED", "2020-01-27 22:45:41", "contact@biocoop-orky.xyz", "999999999999", "FR12154545", 1, "0EAFD299-D0E6-4A63-AF8D-6D154DB96F55", "John", "Syntax", "contact@biocoop-orky.xyz", "1990-01-01", 76, 76, "6 Rue Boucher de la Rupelle", "73100", "Grésy-sur-Aix", 76 }.ToArray(), "dbo");
+            migrationBuilder.InsertData("Legals", new List<string>() { "Uid", "Id", "CreatedOn", "Email", "Siret", "VatIdentifier", "kind", "Owner_Id", "Owner_FirstName", "Owner_LastName", "Owner_Email", "Owner_BirthDate", "Owner_Nationality", "Owner_CountryOfResidence", "Owner_Address_Line1", "Owner_Address_Zipcode", "Owner_Address_City", "Owner_Address_Country" }.ToArray(), new List<object>() { 4, "3D858360-A7B4-4E32-A899-514F8A666EF8", "2020-01-29 22:45:41", "contact@lfdcj.xyz", "999999999999", "FR12154545", 0, "442E31E3-EEA9-4AA0-B741-3245ED1C6F2F", "Peter", "Fotdakor", "contact@lfdcj.xyz", "1990-01-01", 76, 76, "584 Route du Cret", "74270", "Minzier", 76 }.ToArray(), "dbo");
 
             migrationBuilder.InsertData("UserAddresses", new List<string>() { "UserUid", "Country", "Line1", "Line2", "Zipcode", "City", "Latitude", "Longitude", "DepartmentUid" }.ToArray(), new List<object>() { 1, 76, "285 Route de Braille", null, "73410", "Entrelacs", "45.780181", "6.035638", 74 }.ToArray(), "dbo");
             migrationBuilder.InsertData("UserAddresses", new List<string>() { "UserUid", "Country", "Line1", "Line2", "Zipcode", "City", "Latitude", "Longitude", "DepartmentUid" }.ToArray(), new List<object>() { 2, 76, "12 Avenue de Périaz", null, "74600", "Seynod", "45.877728", "6.0903743", 75 }.ToArray(), "dbo");
@@ -2865,9 +2881,6 @@ namespace Sheaft.Infrastructure.Migrations
                 name: "OrderProducts");
 
             migrationBuilder.DropTable(
-                name: "PayoutTransactions");
-
-            migrationBuilder.DropTable(
                 name: "ProducerTags");
 
             migrationBuilder.DropTable(
@@ -2940,10 +2953,7 @@ namespace Sheaft.Infrastructure.Migrations
                 name: "Returnables");
 
             migrationBuilder.DropTable(
-                name: "PaymentMethods");
-
-            migrationBuilder.DropTable(
-                name: "Wallets");
+                name: "PayoutTransactions");
 
             migrationBuilder.DropTable(
                 name: "PurchaseOrders");
@@ -2953,6 +2963,12 @@ namespace Sheaft.Infrastructure.Migrations
 
             migrationBuilder.DropTable(
                 name: "Regions");
+
+            migrationBuilder.DropTable(
+                name: "PaymentMethods");
+
+            migrationBuilder.DropTable(
+                name: "Wallets");
 
             migrationBuilder.DropTable(
                 name: "Orders");

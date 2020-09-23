@@ -17,8 +17,6 @@ namespace Sheaft.Application.Models
         public string Reason { get; set; }
         public string Picture { get; set; }
         public string Description { get; set; }
-        public string VatIdentifier { get; set; }
-        public string Siret { get; set; }
         public bool OpenForNewBusiness { get; set; }
         public AddressViewModel Address { get; set; }
         public IEnumerable<Guid> Tags { get; set; }

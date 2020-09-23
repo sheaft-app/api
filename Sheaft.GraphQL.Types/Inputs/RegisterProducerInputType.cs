@@ -11,11 +11,7 @@ namespace Sheaft.GraphQL.Types
             descriptor.Field(c => c.Description);
             descriptor.Field(c => c.Phone);
             descriptor.Field(c => c.Picture);
-            descriptor.Field(c => c.VatIdentifier);
             descriptor.Field(c => c.SponsoringCode);
-
-            descriptor.Field(c => c.Siret)
-                .Type<NonNullType<StringType>>();
 
             descriptor.Field(c => c.Address)
                 .Type<NonNullType<FullAddressInputType>>();
@@ -34,6 +30,9 @@ namespace Sheaft.GraphQL.Types
 
             descriptor.Field(c => c.Tags)
                 .Type<ListType<IdType>>();
+
+            descriptor.Field(c => c.Legals)
+                .Type<ListType<CreateBusinessLegalsInputType>>();
         }
     }
 }

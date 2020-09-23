@@ -12,6 +12,9 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
             entity.Property<long>("BusinessUid");
             entity.Property<long>("UboDeclarationUid");
 
+            entity.Property(c => c.Siret).IsRequired();
+            entity.Property(c => c.VatIdentifier).IsRequired();
+
             entity.OwnsOne(c => c.Address, e => {
                 e.ToTable("BusinessLegalAddresses");
             });

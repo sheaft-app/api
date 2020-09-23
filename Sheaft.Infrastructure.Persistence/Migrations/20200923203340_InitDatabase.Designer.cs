@@ -4,12 +4,14 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using Sheaft.Domain.Enums;
 using Sheaft.Infrastructure.Persistence;
 
-namespace Sheaft.Infrastructure.Migrations
+namespace Sheaft.Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20200921153458_InitDatabase")]
+    [Migration("20200923203340_InitDatabase")]
     partial class InitDatabase
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -1797,6 +1799,9 @@ namespace Sheaft.Infrastructure.Migrations
                     b.Property<int>("Kind")
                         .HasColumnType("int");
 
+                    b.Property<long?>("PayoutTransactionUid")
+                        .HasColumnType("bigint");
+
                     b.Property<long>("PurchaseOrderUid")
                         .HasColumnType("bigint");
 
@@ -1831,6 +1836,8 @@ namespace Sheaft.Infrastructure.Migrations
                         .IsUnique();
 
                     b.HasIndex("Identifier");
+
+                    b.HasIndex("PayoutTransactionUid");
 
                     b.HasIndex("PurchaseOrderUid");
 
@@ -2072,8 +2079,16 @@ namespace Sheaft.Infrastructure.Migrations
                     b.Property<string>("Email")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("Siret")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<long>("UboDeclarationUid")
                         .HasColumnType("bigint");
+
+                    b.Property<string>("VatIdentifier")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasIndex("BusinessUid")
                         .IsUnique()
@@ -2201,13 +2216,6 @@ namespace Sheaft.Infrastructure.Migrations
 
                     b.Property<bool>("OpenForNewBusiness")
                         .HasColumnType("bit");
-
-                    b.Property<string>("Siret")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("VatIdentifier")
-                        .HasColumnType("nvarchar(max)");
 
                     b.HasDiscriminator();
                 });
@@ -2861,6 +2869,11 @@ namespace Sheaft.Infrastructure.Migrations
                         .HasForeignKey("DebitedWalletUid")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
+
+                    b.HasOne("Sheaft.Domain.Models.PayoutTransaction", "Payout")
+                        .WithMany("Transfers")
+                        .HasForeignKey("PayoutTransactionUid")
+                        .OnDelete(DeleteBehavior.NoAction);
 
                     b.HasOne("Sheaft.Domain.Models.PurchaseOrder", "PurchaseOrder")
                         .WithMany("Transactions")

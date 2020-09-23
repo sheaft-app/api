@@ -8,7 +8,6 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
     {
         public void Configure(EntityTypeBuilder<Business> entity)
         {
-            entity.Property(c => c.Siret).IsRequired();
         }
     }
 }

@@ -3,11 +3,10 @@ using Sheaft.Application.Models;
 
 namespace Sheaft.GraphQL.Types
 {
-    public class UpdateConsumerInputType : SheaftInputType<UpdateConsumerInput>
+    public class ConsumerInputType : SheaftInputType<ConsumerInput>
     {
-        protected override void Configure(IInputObjectTypeDescriptor<UpdateConsumerInput> descriptor)
+        protected override void Configure(IInputObjectTypeDescriptor<ConsumerInput> descriptor)
         {
-            descriptor.Field(c => c.Anonymous);
             descriptor.Field(c => c.Phone);
             descriptor.Field(c => c.Picture);
 
@@ -22,9 +21,6 @@ namespace Sheaft.GraphQL.Types
 
             descriptor.Field(c => c.Id)
                 .Type<NonNullType<IdType>>();
-
-            descriptor.Field(c => c.DepartmentId)
-                .Type<IdType>();
         }
     }
 }

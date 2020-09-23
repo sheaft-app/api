@@ -47,6 +47,8 @@ namespace Sheaft.Application.Handlers
                     business,
                     request.Kind,
                     request.Email,
+                    request.Siret,
+                    request.VatIdentifier,
                     legalAddress,
                     new Owner(business.Id,
                         request.Owner.FirstName,
@@ -58,7 +60,7 @@ namespace Sheaft.Application.Handlers
                         request.Owner.CountryOfResidence
                     ));
 
-                await _context.AddAsync(legal, token);
+                await _context.AddAsync(legal);
                 await _context.SaveChangesAsync(token);
 
                 return Ok(legal.Id);
@@ -71,7 +73,6 @@ namespace Sheaft.Application.Handlers
             {
                 var consumer = await _context.GetByIdAsync<Consumer>(request.UserId, token);
                 await _context.EnsureNotExists<ConsumerLegal>(c => c.Consumer.Id == consumer.Id, token);
-
 
                 var ownerAddress = new OwnerAddress(request.Address.Line1,
                     request.Address.Line2,
@@ -121,6 +122,8 @@ namespace Sheaft.Application.Handlers
                 legal.SetKind(request.Kind);
                 legal.SetEmail(request.Email);
                 legal.SetAddress(legalAddress);
+                legal.SetSiret(request.Siret);
+                legal.SetVatIdentifier(request.VatIdentifier);
 
                 legal.Owner.SetFirstname(request.Owner.FirstName);
                 legal.Owner.SetLastname(request.Owner.LastName);

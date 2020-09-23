@@ -7,7 +7,6 @@ namespace Sheaft.GraphQL.Types
     {
         protected override void Configure(IInputObjectTypeDescriptor<RegisterConsumerInput> descriptor)
         {
-            descriptor.Field(c => c.Anonymous);
             descriptor.Field(c => c.Phone);
             descriptor.Field(c => c.Picture);
             descriptor.Field(c => c.SponsoringCode);
@@ -23,9 +22,6 @@ namespace Sheaft.GraphQL.Types
 
             descriptor.Field(c => c.LastName)
                 .Type<NonNullType<StringType>>();
-
-            descriptor.Field(c => c.DepartmentId)
-                .Type<IdType>();
         }
     }
 }

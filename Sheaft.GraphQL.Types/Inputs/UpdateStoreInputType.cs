@@ -11,11 +11,7 @@ namespace Sheaft.GraphQL.Types
             descriptor.Field(c => c.Description);
             descriptor.Field(c => c.OpeningHours);
             descriptor.Field(c => c.Phone);
-            descriptor.Field(c => c.VatIdentifier);
             descriptor.Field(c => c.Picture);
-
-            descriptor.Field(c => c.Siret)
-                .Type<NonNullType<StringType>>();
 
             descriptor.Field(c => c.Id)
                 .Type<NonNullType<IdType>>();

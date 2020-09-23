@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Sheaft.Domain.Enums;
 using Sheaft.Infrastructure.Persistence;
 
-namespace Sheaft.Infrastructure.Migrations
+namespace Sheaft.Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(AppDbContext))]
     partial class AppDbContextModelSnapshot : ModelSnapshot
@@ -2077,8 +2077,16 @@ namespace Sheaft.Infrastructure.Migrations
                     b.Property<string>("Email")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("Siret")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<long>("UboDeclarationUid")
                         .HasColumnType("bigint");
+
+                    b.Property<string>("VatIdentifier")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasIndex("BusinessUid")
                         .IsUnique()
@@ -2206,13 +2214,6 @@ namespace Sheaft.Infrastructure.Migrations
 
                     b.Property<bool>("OpenForNewBusiness")
                         .HasColumnType("bit");
-
-                    b.Property<string>("Siret")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("VatIdentifier")
-                        .HasColumnType("nvarchar(max)");
 
                     b.HasDiscriminator();
                 });

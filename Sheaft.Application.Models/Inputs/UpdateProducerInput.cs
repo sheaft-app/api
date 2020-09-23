@@ -5,6 +5,5 @@ namespace Sheaft.Application.Models
 {
     public class UpdateProducerInput : BusinessInput
     {
-        public Guid Id { get; set; }
     }
 }

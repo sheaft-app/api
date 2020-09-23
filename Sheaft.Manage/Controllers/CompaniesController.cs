@@ -126,8 +126,6 @@ namespace Sheaft.Manage.Controllers
                     Name = model.Name,
                     Kind = model.Kind,
                     Phone = model.Phone,
-                    Siret = model.Siret,
-                    VatIdentifier = model.VatIdentifier,
                     Tags = model.Tags,
                     Picture = model.Picture
                 }, token);
@@ -145,8 +143,6 @@ namespace Sheaft.Manage.Controllers
                     Name = model.Name,
                     Kind = model.Kind,
                     Phone = model.Phone,
-                    Siret = model.Siret,
-                    VatIdentifier = model.VatIdentifier,
                     Tags = model.Tags,
                     Picture = model.Picture,
                     OpeningHours = store.OpeningHours?.GroupBy(oh => new { oh.From, oh.To }).Select(c => new TimeSlotGroupInput { From = c.Key.From, To = c.Key.To, Days = c.Select(o => o.Day) })

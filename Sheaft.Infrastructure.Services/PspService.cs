@@ -82,7 +82,7 @@ namespace Sheaft.Infrastructure.Services
                         businessLegal.Owner.Nationality.GetCountry(),
                         businessLegal.Owner.CountryOfResidence.GetCountry())
                     {
-                        CompanyNumber = businessLegal.Business.Siret,
+                        CompanyNumber = businessLegal.Siret,
                         HeadquartersAddress = businessLegal.Address.GetAddress(),
                         LegalRepresentativeAddress = businessLegal.Owner.Address.GetAddress(),
                         LegalRepresentativeEmail = businessLegal.Owner.Email
