@@ -6,7 +6,6 @@ using Sheaft.Application.Interop;
 
 namespace Sheaft.Application.Handlers
 {
-
     public class DocumentEventsHandler :
         INotificationHandler<DocumentFailedEvent>,
         INotificationHandler<DocumentOutdatedEvent>,
@@ -23,17 +22,17 @@ namespace Sheaft.Application.Handlers
 
         public Task Handle(DocumentFailedEvent docEvent, CancellationToken token)
         {
-            return Task.CompletedTask;
+            throw new System.NotImplementedException();
         }
 
         public Task Handle(DocumentOutdatedEvent docEvent, CancellationToken token)
         {
-            return Task.CompletedTask;
+            throw new System.NotImplementedException();
         }
 
         public Task Handle(DocumentSucceededEvent docEvent, CancellationToken token)
         {
-            return Task.CompletedTask;
+            throw new System.NotImplementedException();
         }
     }
 }

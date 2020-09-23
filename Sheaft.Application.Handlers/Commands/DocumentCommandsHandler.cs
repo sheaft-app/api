@@ -13,13 +13,16 @@ using Sheaft.Application.Events;
 namespace Sheaft.Application.Handlers
 {
     public class DocumentCommandsHandler : ResultsHandler,
-        IRequestHandler<CreateDocumentCommand, Result<Guid>>,
-        IRequestHandler<UploadDocumentCommand, Result<bool>>,
-        IRequestHandler<UploadPageCommand, Result<bool>>,
-        IRequestHandler<SubmitDocumentsCommand, Result<bool>>,
-        IRequestHandler<SubmitDocumentCommand, Result<bool>>,
-        IRequestHandler<RemoveDocumentCommand, Result<bool>>,
-        IRequestHandler<SetDocumentStatusCommand, Result<bool>>
+            IRequestHandler<CreateDocumentCommand, Result<Guid>>,
+            IRequestHandler<UploadDocumentCommand, Result<bool>>,
+            IRequestHandler<UploadPageCommand, Result<bool>>,
+            IRequestHandler<SubmitDocumentsCommand, Result<bool>>,
+            IRequestHandler<SubmitDocumentCommand, Result<bool>>,
+            IRequestHandler<RemoveDocumentCommand, Result<bool>>,
+            IRequestHandler<SetDocumentStatusCommand, Result<bool>>,
+            IRequestHandler<EnsureProducerDocumentsCreatedCommand, Result<bool>>,
+            IRequestHandler<EnsureProducerDocumentsReviewedCommand, Result<bool>>,
+            IRequestHandler<EnsureProducerDocumentsValidatedCommand, Result<bool>>
     {
         private readonly IAppDbContext _context;
         private readonly IPspService _pspService;
@@ -52,7 +55,7 @@ namespace Sheaft.Application.Handlers
                     await _context.SaveChangesAsync(token);
 
                     var result = await _pspService.CreateDocumentAsync(document, token);
-                    if(!result.Success)
+                    if (!result.Success)
                     {
                         await transaction.RollbackAsync(token);
                         return Failed<Guid>(result.Exception);
@@ -75,7 +78,7 @@ namespace Sheaft.Application.Handlers
             return await ExecuteAsync(async () =>
             {
                 var success = true;
-                foreach(var page in request.Pages)
+                foreach (var page in request.Pages)
                 {
                     var result = await _mediatr.Send(page, token);
                     if (!result.Success)
@@ -116,7 +119,7 @@ namespace Sheaft.Application.Handlers
             {
                 var documents = await _context.GetAsync<Document>(c => c.User.Id == request.RequestUser.Id, token);
                 var success = true;
-                foreach(var document in documents)
+                foreach (var document in documents)
                 {
                     var result = await _mediatr.Send(new SubmitDocumentCommand(request.RequestUser)
                     {
@@ -190,6 +193,21 @@ namespace Sheaft.Application.Handlers
 
                 return Ok(success);
             });
+        }
+
+        public Task<Result<bool>> Handle(EnsureProducerDocumentsCreatedCommand request, CancellationToken cancellationToken)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<Result<bool>> Handle(EnsureProducerDocumentsReviewedCommand request, CancellationToken cancellationToken)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<Result<bool>> Handle(EnsureProducerDocumentsValidatedCommand request, CancellationToken cancellationToken)
+        {
+            throw new NotImplementedException();
         }
     }
 }
