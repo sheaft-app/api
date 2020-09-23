@@ -15,18 +15,22 @@ namespace Sheaft.Application.Handlers
     public class DeclarationCommandsHandler : ResultsHandler,
            IRequestHandler<CreateDeclarationCommand, Result<Guid>>,
            IRequestHandler<SubmitDeclarationCommand, Result<bool>>,
-           IRequestHandler<SetDeclarationStatusCommand, Result<bool>>
+           IRequestHandler<SetDeclarationStatusCommand, Result<bool>>,
+           IRequestHandler<EnsureDeclarationConfiguredCommand, Result<bool>>
     {
+        private readonly IMediator _mediatr;
         private readonly IAppDbContext _context;
         private readonly IPspService _pspService;
         private readonly IQueueService _queueService;
 
         public DeclarationCommandsHandler(
+            IMediator mediatr,
             IAppDbContext context,
             IPspService pspService,
             IQueueService queueService,
             ILogger<DeclarationCommandsHandler> logger) : base(logger)
         {
+            _mediatr = mediatr;
             _queueService = queueService;
             _context = context;
             _pspService = pspService;
@@ -108,6 +112,39 @@ namespace Sheaft.Application.Handlers
                 }
 
                 return Ok(success);
+            });
+        }
+
+        public async Task<Result<bool>> Handle(EnsureDeclarationConfiguredCommand request, CancellationToken token)
+        {
+            return await ExecuteAsync(async () =>
+            {
+                var legal = await _context.GetSingleAsync<BusinessLegal>(bl => bl.Business.Id == request.UserId, token);
+                if (legal.UboDeclaration == null)
+                {
+                    var result = await _mediatr.Send(new CreateDeclarationCommand(request.RequestUser)
+                    {
+                        LegalId = legal.Id
+                    }, token);
+
+                    if (!result.Success)
+                        return Failed<bool>(result.Exception);
+                }
+                else if (string.IsNullOrWhiteSpace(legal.UboDeclaration.Identifier))
+                {
+                    var result = await _pspService.CreateUboDeclarationAsync(legal.UboDeclaration, legal.Business, token);
+                    if (!result.Success)
+                        return Failed<bool>(result.Exception);
+
+                    legal.UboDeclaration.SetIdentifier(result.Data.Identifier);
+                    legal.UboDeclaration.SetStatus(result.Data.Status);
+                    legal.UboDeclaration.SetResult(result.Data.ResultCode, result.Data.ResultMessage);
+
+                    _context.Update(legal.UboDeclaration);
+                    await _context.SaveChangesAsync(token);
+                }
+
+                return Ok(true);
             });
         }
     }

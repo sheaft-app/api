@@ -18,7 +18,7 @@ namespace Sheaft.Domain.Models
         public UboDeclaration(Guid id)
         {
             Id = id;
-            Status = DeclarationStatus.WaitingForCreation;
+            Status = DeclarationStatus.WaitingForReview;
         }
 
         public Guid Id { get; private set; }

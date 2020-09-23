@@ -44,7 +44,7 @@ namespace Sheaft.Application.Handlers
         {
             return await ExecuteAsync(async () =>
             {
-                var checkResult = await _mediatr.Send(new EnsureProducerConfiguredCommand(request.RequestUser) { Id = request.ToUserId }, token);
+                var checkResult = await _mediatr.Send(new EnsureProducerConfiguredCommand(request.RequestUser) { UserId = request.ToUserId }, token);
                 if (!checkResult.Success)
                     return Failed<Guid>(checkResult.Exception);
 
@@ -224,7 +224,7 @@ namespace Sheaft.Application.Handlers
             return await _context.TransferTransactions
                                 .Get(c => (c.Status == TransactionStatus.Waiting && c.CreatedOn < expiredDate)
                                     || (c.Status == TransactionStatus.Created && c.UpdatedOn.HasValue && c.UpdatedOn.Value < expiredDate), true)
-                                .OrderBy(c => c.Id)
+                                .OrderBy(c => c.CreatedOn)
                                 .Skip(skip)
                                 .Take(take)
                                 .ToListAsync(token);

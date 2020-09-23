@@ -18,7 +18,7 @@ namespace Sheaft.Domain.Models
             Id = id;
             Name = name;
             Kind = kind;
-            Status = DocumentStatus.WaitingForCreation;
+            Status = DocumentStatus.WaitingForReview;
             User = user;
 
             _pages = new List<Page>();

@@ -233,7 +233,7 @@ namespace Sheaft.Application.Handlers
             return await _context.PayinTransactions
                                 .Get(c => (c.Status == TransactionStatus.Waiting && c.CreatedOn < expiredDate)
                                             || (c.Status == TransactionStatus.Created && c.UpdatedOn.HasValue && c.UpdatedOn.Value < expiredDate), true)
-                                .OrderBy(c => c.Id)
+                                .OrderBy(c => c.CreatedOn)
                                 .Skip(skip)
                                 .Take(take)
                                 .ToListAsync(token);

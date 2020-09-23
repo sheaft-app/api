@@ -14,7 +14,9 @@ namespace Sheaft.Application.Handlers
            IRequestHandler<CreateBusinessLegalCommand, Result<Guid>>,
            IRequestHandler<CreateConsumerLegalCommand, Result<Guid>>,
            IRequestHandler<UpdateBusinessLegalCommand, Result<bool>>,
-           IRequestHandler<UpdateConsumerLegalCommand, Result<bool>>
+           IRequestHandler<UpdateConsumerLegalCommand, Result<bool>>,
+           IRequestHandler<EnsureBusinessLegalConfiguredCommand, Result<bool>>,
+           IRequestHandler<EnsureConsumerLegalConfiguredCommand, Result<bool>>
     {
         private readonly IMediator _mediatr;
         private readonly IAppDbContext _context;
@@ -158,6 +160,48 @@ namespace Sheaft.Application.Handlers
                 //TODO update PSP Data
 
                 return Ok(await _context.SaveChangesAsync(token) > 0);
+            });
+        }
+
+        public async Task<Result<bool>> Handle(EnsureBusinessLegalConfiguredCommand request, CancellationToken token)
+        {
+            return await ExecuteAsync(async () =>
+            {
+                var legal = await _context.GetSingleAsync<BusinessLegal>(b => b.Business.Id == request.UserId, token);
+                if (string.IsNullOrWhiteSpace(legal.Business.Identifier))
+                {
+                    var userResult = await _pspService.CreateBusinessAsync(legal, token);
+                    if (!userResult.Success)
+                        return Failed<bool>(userResult.Exception);
+
+                    legal.Business.SetIdentifier(userResult.Data);
+                    _context.Update(legal.Business);
+
+                    await _context.SaveChangesAsync(token);
+                }
+
+                return Ok(true);
+            });
+        }
+
+        public async Task<Result<bool>> Handle(EnsureConsumerLegalConfiguredCommand request, CancellationToken token)
+        {
+            return await ExecuteAsync(async () =>
+            {
+                var legal = await _context.GetSingleAsync<ConsumerLegal>(b => b.Consumer.Id == request.UserId, token);
+                if (string.IsNullOrWhiteSpace(legal.Consumer.Identifier))
+                {
+                    var userResult = await _pspService.CreateConsumerAsync(legal, token);
+                    if (!userResult.Success)
+                        return Failed<bool>(userResult.Exception);
+
+                    legal.Consumer.SetIdentifier(userResult.Data);
+                    _context.Update(legal.Consumer);
+
+                    await _context.SaveChangesAsync(token);
+                }
+
+                return Ok(true);
             });
         }
     }

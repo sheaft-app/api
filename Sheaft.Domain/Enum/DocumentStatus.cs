@@ -9,6 +9,6 @@
         Refused = 8,
         OutOfDate = 16,
         WaitingForCreation = 100,
-        WaitingForFirstOrder,
+        WaitingForReview,
     }
 }

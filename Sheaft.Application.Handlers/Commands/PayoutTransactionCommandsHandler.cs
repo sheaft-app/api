@@ -12,6 +12,8 @@ using Sheaft.Application.Events;
 using System.Linq;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
+using Sheaft.Options;
+using Microsoft.Extensions.Options;
 
 namespace Sheaft.Application.Handlers
 {
@@ -24,19 +26,25 @@ namespace Sheaft.Application.Handlers
         IRequestHandler<CheckForNewPayoutsCommand, Result<bool>>,
         IRequestHandler<CreatePayoutForTransfersCommand, Result<bool>>
     {
+        private readonly PspOptions _pspOptions;
         private readonly IAppDbContext _context;
         private readonly IPspService _pspService;
         private readonly IQueueService _queueService;
+        private readonly IMediator _mediatr;
 
         public PayoutTransactionCommandsHandler(
+            IMediator mediatr,
             IAppDbContext context,
             IPspService pspService,
             IQueueService queueService,
+            IOptionsSnapshot<PspOptions> pspOptions,
             ILogger<PayoutTransactionCommandsHandler> logger) : base(logger)
         {
+            _mediatr = mediatr;
             _queueService = queueService;
             _context = context;
             _pspService = pspService;
+            _pspOptions = pspOptions.Value;
         }
 
         public async Task<Result<Guid>> Handle(CreatePayoutTransactionCommand request, CancellationToken token)
@@ -173,8 +181,8 @@ namespace Sheaft.Application.Handlers
                 transaction.SetProcessedOn(pspResult.Data.ProcessedOn);
 
                 //TODO validate this !
-                if (!transaction.ExecutedOn.HasValue)
-                    transaction.SetStatus(TransactionStatus.Expired);
+                //if (!transaction.ExecutedOn.HasValue)
+                //    transaction.SetStatus(TransactionStatus.Expired);
 
                 _context.Update(transaction);
                 await _context.SaveChangesAsync(token);
@@ -183,14 +191,136 @@ namespace Sheaft.Application.Handlers
             });
         }
 
-        public Task<Result<bool>> Handle(CheckForNewPayoutsCommand request, CancellationToken cancellationToken)
+        public async Task<Result<bool>> Handle(CheckForNewPayoutsCommand request, CancellationToken token)
         {
-            throw new NotImplementedException();
+            return await ExecuteAsync(async () =>
+            {
+                var expiredDate = DateTimeOffset.UtcNow.AddDays(-7);
+
+                var userIds = await _context.TransferTransactions
+                    .Get(t => t.Payout == null
+                            && t.Status == TransactionStatus.Succeeded
+                            && t.PurchaseOrder.Status == PurchaseOrderStatus.Completed
+                            && t.UpdatedOn.HasValue && t.UpdatedOn.Value < expiredDate)
+                    .Select(t => t.CreditedWallet.User.Id)
+                    .Distinct()
+                    .ToListAsync(token);
+
+                foreach (var userId in userIds)
+                {
+                    await _queueService.ProcessCommandAsync(CreatePayoutForTransfersCommand.QUEUE_NAME,
+                        new CreatePayoutForTransfersCommand(request.RequestUser)
+                        {
+                            UserId = userId
+                        }, token);
+                }
+
+                return Ok(true);
+            });
         }
 
-        public Task<Result<bool>> Handle(CreatePayoutForTransfersCommand request, CancellationToken cancellationToken)
+        public async Task<Result<bool>> Handle(CreatePayoutForTransfersCommand request, CancellationToken token)
         {
-            throw new NotImplementedException();
+            return await ExecuteAsync(async () =>
+            {
+                var checkResult = await _mediatr.Send(new EnsureProducerConfiguredCommand(request.RequestUser) { UserId = request.UserId }, token);
+                if (!checkResult.Success)
+                {
+                    await _queueService.ProcessEventAsync(ProducerNotConfiguredEvent.QUEUE_NAME,
+                        new ProducerNotConfiguredEvent(request.RequestUser)
+                        {
+                            UserId = request.UserId
+                        }, token);
+
+                    return Failed<bool>(checkResult.Exception);
+                }
+
+                //CHECK KYC created
+                var checkKycCreatedResult = await _mediatr.Send(new EnsureProducerDocumentsCreatedCommand(request.RequestUser) { UserId = request.UserId }, token);
+                if (!checkKycCreatedResult.Success)
+                {
+                    await _queueService.ProcessEventAsync(ProducerDocumentsNotCreatedEvent.QUEUE_NAME,
+                        new ProducerDocumentsNotCreatedEvent(request.RequestUser)
+                        {
+                            UserId = request.UserId
+                        }, token);
+
+                    return Failed<bool>(checkKycCreatedResult.Exception);
+                }
+
+                var expiredDate = DateTimeOffset.UtcNow.AddMinutes(-10080);
+                var transfers = await _context.TransferTransactions
+                    .Get(t => t.Payout == null
+                            && t.CreditedWallet.User.Id == request.UserId
+                            && t.Status == TransactionStatus.Succeeded
+                            && t.PurchaseOrder.Status == PurchaseOrderStatus.Completed
+                            && t.UpdatedOn.HasValue && t.UpdatedOn.Value < expiredDate)
+                    .ToListAsync(token);
+
+                var amount = transfers.Sum(t => t.Credited);
+
+                //CHECK KYC created
+                var checkKycReviewedResult = await _mediatr.Send(new EnsureProducerDocumentsReviewedCommand(request.RequestUser) { UserId = request.UserId }, token);
+                if (!checkKycReviewedResult.Success)
+                {
+                    await _queueService.ProcessEventAsync(ProducerDocumentsNotReviewedEvent.QUEUE_NAME,
+                        new ProducerDocumentsNotReviewedEvent(request.RequestUser)
+                        {
+                            UserId = request.UserId
+                        }, token);
+
+                    return Failed<bool>(checkKycReviewedResult.Exception);
+                }
+
+                //CHECK KYC validated
+                var checkKycValidatedResult = await _mediatr.Send(new EnsureProducerDocumentsValidatedCommand(request.RequestUser) { UserId = request.UserId }, token);
+                if (!checkKycValidatedResult.Success)
+                {
+                    await _queueService.ProcessEventAsync(ProducerDocumentsNotValidatedEvent.QUEUE_NAME,
+                        new ProducerDocumentsNotValidatedEvent(request.RequestUser)
+                        {
+                            UserId = request.UserId
+                        }, token);
+
+                    return Failed<bool>(checkKycValidatedResult.Exception);
+                }
+
+                var wallet = await _context.GetSingleAsync<Wallet>(w => w.User.Id == request.UserId && w.Kind == WalletKind.Payments, token);
+                var bankAccount = await _context.GetSingleAsync<BankAccount>(b => b.User.Id == request.UserId, token);
+
+                var fees = await _context.AnyAsync<PayoutTransaction>(p => p.DebitedWallet.User.Id == request.UserId
+                    && (p.Status == TransactionStatus.Created || p.Status == TransactionStatus.Succeeded), token) ? 0m : _pspOptions.ProducerFees;
+
+                using (var transaction = await _context.Database.BeginTransactionAsync(token))
+                {
+                    var payout = new PayoutTransaction(Guid.NewGuid(), amount, wallet, bankAccount, fees);
+                    foreach (var transfer in transfers)
+                    {
+                        payout.AddTransfer(transfer);
+                    }
+
+                    await _context.AddAsync(payout);
+                    await _context.SaveChangesAsync(token);
+
+                    var result = await _pspService.CreatePayoutAsync(payout, token);
+                    if (!result.Success)
+                    {
+                        await transaction.RollbackAsync(token);
+                        return Failed<bool>(result.Exception);
+                    }
+
+                    payout.SetIdentifier(result.Data.Identifier);
+                    payout.SetStatus(result.Data.Status);
+                    payout.SetResult(result.Data.ResultCode, result.Data.ResultMessage);
+                    payout.SetProcessedOn(result.Data.ExecutedOn);
+
+                    _context.Update(payout);
+                    await _context.SaveChangesAsync(token);
+
+                    await transaction.CommitAsync(token);
+                    return Ok(true);
+                }
+            });
         }
 
         private async Task<IEnumerable<PayoutTransaction>> GetNextPayoutTransactions(DateTimeOffset expiredDate, int skip, int take, CancellationToken token)
@@ -198,7 +328,7 @@ namespace Sheaft.Application.Handlers
             return await _context.PayoutTransactions
                                 .Get(c => (c.Status == TransactionStatus.Waiting && c.CreatedOn < expiredDate)
                                         || (c.Status == TransactionStatus.Created && c.UpdatedOn.HasValue && c.UpdatedOn.Value < expiredDate), true)
-                                .OrderBy(c => c.Id)
+                                .OrderBy(c => c.CreatedOn)
                                 .Skip(skip)
                                 .Take(take)
                                 .ToListAsync(token);
