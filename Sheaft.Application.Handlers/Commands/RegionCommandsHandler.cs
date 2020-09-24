@@ -17,11 +17,10 @@ namespace Sheaft.Application.Handlers
         IRequestHandler<UpdateRegionStatsCommand, Result<bool>>
     {
         public RegionCommandsHandler(
-            IMediator mediatr,
+            ISheaftMediatr mediatr,
             IAppDbContext context,
-            IQueueService queueService,
             ILogger<RegionCommandsHandler> logger)
-            : base(mediatr, context, queueService, logger)
+            : base(mediatr, context, logger)
         {
         }
 

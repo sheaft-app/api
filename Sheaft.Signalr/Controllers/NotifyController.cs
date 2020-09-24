@@ -65,7 +65,7 @@ namespace Sheaft.Signalr.Controllers
                 await _context.Clients.User(userId).SendAsync("event", new { Method = method, UserId = userId, Content = body }, token);
 
                 if (Guid.TryParse(userId, out Guid id))
-                    await _queuesService.ProcessCommandAsync(CreateUserNotificationCommand.QUEUE_NAME, new CreateUserNotificationCommand(new RequestUser("signalr-user", HttpContext.TraceIdentifier)) { Id = id, Method = method, Content = body }, token);
+                    await _queuesService.ProcessCommandAsync(new CreateUserNotificationCommand(new RequestUser("signalr-user", HttpContext.TraceIdentifier)) { Id = id, Method = method, Content = body }, token);
             }
 
             return Ok();
@@ -85,7 +85,7 @@ namespace Sheaft.Signalr.Controllers
                 await _context.Clients.Group(groupName).SendAsync("event", new { Method = method, GroupName = groupName, Content = body }, token);
 
                 if (Guid.TryParse(groupName, out Guid id))
-                    await _queuesService.ProcessCommandAsync(CreateGroupNotificationCommand.QUEUE_NAME, new CreateGroupNotificationCommand(new RequestUser("signalr-group", HttpContext.TraceIdentifier)) { Id = id, Method = method, Content = body }, token);
+                    await _queuesService.ProcessCommandAsync(new CreateGroupNotificationCommand(new RequestUser("signalr-group", HttpContext.TraceIdentifier)) { Id = id, Method = method, Content = body }, token);
             }
 
             return Ok();

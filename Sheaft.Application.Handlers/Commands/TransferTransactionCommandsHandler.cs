@@ -27,10 +27,9 @@ namespace Sheaft.Application.Handlers
         public TransferTransactionCommandsHandler(
             IAppDbContext context,
             IPspService pspService,
-            IMediator mediatr,
-            IQueueService queueService,
+            ISheaftMediatr mediatr,
             ILogger<TransferTransactionCommandsHandler> logger)
-            : base(mediatr, context, queueService, logger)
+            : base(mediatr, context, logger)
         {
             _pspService = pspService;
         }
@@ -39,7 +38,7 @@ namespace Sheaft.Application.Handlers
         {
             return await ExecuteAsync(async () =>
             {
-                var checkResult = await _mediatr.Send(new EnsureProducerConfiguredCommand(request.RequestUser) { UserId = request.ToUserId }, token);
+                var checkResult = await _mediatr.Process(new EnsureProducerConfiguredCommand(request.RequestUser) { UserId = request.ToUserId }, token);
                 if (!checkResult.Success)
                     return Failed<Guid>(checkResult.Exception);
 
@@ -88,10 +87,10 @@ namespace Sheaft.Application.Handlers
                 switch (request.Kind)
                 {
                     case PspEventKind.TRANSFER_NORMAL_FAILED:
-                        await _queueService.ProcessEventAsync(TransferFailedEvent.QUEUE_NAME, new TransferFailedEvent(request.RequestUser) { TransactionId = transaction.Id }, token);
+                        await _mediatr.Post(new TransferFailedEvent(request.RequestUser) { TransactionId = transaction.Id }, token);
                         break;
                     case PspEventKind.TRANSFER_NORMAL_SUCCEEDED:
-                        await _queueService.ProcessEventAsync(TransferSucceededEvent.QUEUE_NAME, new TransferSucceededEvent(request.RequestUser) { TransactionId = transaction.Id }, token);
+                        await _mediatr.Post(new TransferSucceededEvent(request.RequestUser) { TransactionId = transaction.Id }, token);
                         break;
                 }
 
@@ -118,10 +117,10 @@ namespace Sheaft.Application.Handlers
                 switch (request.Kind)
                 {
                     case PspEventKind.TRANSFER_REFUND_FAILED:
-                        await _queueService.ProcessEventAsync(RefundTransferFailedEvent.QUEUE_NAME, new RefundTransferFailedEvent(request.RequestUser) { TransactionId = transaction.Id }, token);
+                        await _mediatr.Post(new RefundTransferFailedEvent(request.RequestUser) { TransactionId = transaction.Id }, token);
                         break;
                     case PspEventKind.TRANSFER_REFUND_SUCCEEDED:
-                        await _queueService.ProcessEventAsync(RefundTransferSucceededEvent.QUEUE_NAME, new RefundTransferSucceededEvent(request.RequestUser) { TransactionId = transaction.Id }, token);
+                        await _mediatr.Post(new RefundTransferSucceededEvent(request.RequestUser) { TransactionId = transaction.Id }, token);
                         break;
                 }
 
@@ -146,17 +145,13 @@ namespace Sheaft.Application.Handlers
                         switch (transaction.Status)
                         {
                             case TransactionStatus.Waiting:
-                                await _queueService.ProcessCommandAsync(
-                                    CheckWaitingTransferTransactionCommand.QUEUE_NAME,
-                                    new CheckWaitingTransferTransactionCommand(request.RequestUser)
+                                await _mediatr.Post(new CheckWaitingTransferTransactionCommand(request.RequestUser)
                                     {
                                         TransactionId = transaction.Id
                                     }, token);
                                 break;
                             case TransactionStatus.Created:
-                                await _queueService.ProcessCommandAsync(
-                                    CheckCreatedTransferTransactionCommand.QUEUE_NAME,
-                                    new CheckCreatedTransferTransactionCommand(request.RequestUser)
+                                await _mediatr.Post(new CheckCreatedTransferTransactionCommand(request.RequestUser)
                                     {
                                         TransactionId = transaction.Id
                                     }, token);

@@ -25,12 +25,11 @@ namespace Sheaft.Application.Handlers
         private readonly IBlobService _blobsService;
 
         public PickingOrderCommandsHandler(
-            IMediator mediatr, 
+            ISheaftMediatr mediatr, 
             IAppDbContext context, 
-            IQueueService queueService, 
             IBlobService blobsService,
             ILogger<PickingOrderCommandsHandler> logger)
-            : base(mediatr, context, queueService, logger)
+            : base(mediatr, context, logger)
         {
             _blobsService = blobsService;
         }
@@ -45,7 +44,7 @@ namespace Sheaft.Application.Handlers
                 var orderIdsToAccept = purchaseOrders.Where(c => c.Status == PurchaseOrderStatus.Waiting).Select(c => c.Id);
                 if (orderIdsToAccept.Any())
                 {
-                    var result = await _mediatr.Send(new AcceptPurchaseOrdersCommand(request.RequestUser) { Ids = orderIdsToAccept });
+                    var result = await _mediatr.Process(new AcceptPurchaseOrdersCommand(request.RequestUser) { Ids = orderIdsToAccept }, token);
                     if (!result.Success)
                         return Failed<Guid>(result.Exception);
                 }
@@ -56,7 +55,7 @@ namespace Sheaft.Application.Handlers
                 await _context.AddAsync(entity, token);
                 await _context.SaveChangesAsync(token);
 
-                await _queueService.InsertJobToProcessAsync(entity, token);
+                await _mediatr.Post(entity, token);
 
                 return Ok(entity.Id);
             });
@@ -70,12 +69,12 @@ namespace Sheaft.Application.Handlers
 
                 try
                 {
-                    var startResult = await _mediatr.Send(new StartJobCommand(request.RequestUser) { Id = job.Id });
+                    var startResult = await _mediatr.Process(new StartJobCommand(request.RequestUser) { Id = job.Id }, token);
                     if (!startResult.Success)
                         throw startResult.Exception;
 
                     var purchaseOrders = await _context.GetByIdsAsync<PurchaseOrder>(request.PurchaseOrderIds, token);
-                    await _queueService.ProcessEventAsync(PickingOrderExportProcessingEvent.QUEUE_NAME, new PickingOrderExportProcessingEvent(request.RequestUser) { Id = job.Id }, token);
+                    await _mediatr.Post(new PickingOrderExportProcessingEvent(request.RequestUser) { Id = job.Id }, token);
 
                     using (var stream = new MemoryStream())
                     {
@@ -88,18 +87,18 @@ namespace Sheaft.Application.Handlers
                         if (!response.Success)
                             throw response.Exception;
 
-                        var result = await _mediatr.Send(new ProcessPurchaseOrdersCommand(request.RequestUser) { Ids = request.PurchaseOrderIds });
+                        var result = await _mediatr.Process(new ProcessPurchaseOrdersCommand(request.RequestUser) { Ids = request.PurchaseOrderIds }, token);
                         if (!result.Success)
                             throw result.Exception;
 
-                        await _queueService.ProcessEventAsync(PickingOrderExportSucceededEvent.QUEUE_NAME, new PickingOrderExportSucceededEvent(request.RequestUser) { Id = job.Id }, token);
-                        return await _mediatr.Send(new CompleteJobCommand(request.RequestUser) { Id = job.Id, FileUrl = response.Data });
+                        await _mediatr.Post(new PickingOrderExportSucceededEvent(request.RequestUser) { Id = job.Id }, token);
+                        return await _mediatr.Process(new CompleteJobCommand(request.RequestUser) { Id = job.Id, FileUrl = response.Data }, token);
                     }
                 }
                 catch (Exception e)
                 {
-                    await _queueService.ProcessEventAsync(PickingOrderExportFailedEvent.QUEUE_NAME, new PickingOrderExportFailedEvent(request.RequestUser) { Id = job.Id }, token);
-                    return await _mediatr.Send(new FailJobCommand(request.RequestUser) { Id = request.JobId, Reason = e.Message });
+                    await _mediatr.Post(new PickingOrderExportFailedEvent(request.RequestUser) { Id = job.Id }, token);
+                    return await _mediatr.Process(new FailJobCommand(request.RequestUser) { Id = request.JobId, Reason = e.Message }, token);
                 }
             });
         }

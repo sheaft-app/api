@@ -14,11 +14,10 @@ namespace Sheaft.Application.Handlers
            IRequestHandler<EnsureConsumerConfiguredCommand, Result<bool>>
     {
         public PspCommandsHandler(
-            IMediator mediatr,
+            ISheaftMediatr mediatr,
             IAppDbContext context,
-            IQueueService queueService,
             ILogger<LegalCommandsHandler> logger)
-            : base(mediatr, context, queueService, logger)
+            : base(mediatr, context, logger)
         {
         }
 
@@ -26,15 +25,15 @@ namespace Sheaft.Application.Handlers
         {
             return await ExecuteAsync(async () =>
             {
-                var business = await _mediatr.Send(new EnsureBusinessLegalConfiguredCommand(request.RequestUser) { UserId = request.UserId }, token);
+                var business = await _mediatr.Process(new EnsureBusinessLegalConfiguredCommand(request.RequestUser) { UserId = request.UserId }, token);
                 if (!business.Success)
                     return Failed<bool>(business.Exception);
 
-                var wallet = await _mediatr.Send(new EnsurePaymentsWalletConfiguredCommand(request.RequestUser) { UserId = request.UserId }, token);
+                var wallet = await _mediatr.Process(new EnsurePaymentsWalletConfiguredCommand(request.RequestUser) { UserId = request.UserId }, token);
                 if (!wallet.Success)
                     return Failed<bool>(wallet.Exception);
 
-                var declaration = await _mediatr.Send(new EnsureDeclarationConfiguredCommand(request.RequestUser) { UserId = request.UserId }, token);
+                var declaration = await _mediatr.Process(new EnsureDeclarationConfiguredCommand(request.RequestUser) { UserId = request.UserId }, token);
                 if (!declaration.Success)
                     return Failed<bool>(declaration.Exception);
 
@@ -46,11 +45,11 @@ namespace Sheaft.Application.Handlers
         {
             return await ExecuteAsync(async () =>
             {
-                var business = await _mediatr.Send(new EnsureBusinessLegalConfiguredCommand(request.RequestUser) { UserId = request.Id }, token);
+                var business = await _mediatr.Process(new EnsureBusinessLegalConfiguredCommand(request.RequestUser) { UserId = request.Id }, token);
                 if (!business.Success)
                     return Failed<bool>(business.Exception);
 
-                var wallet = await _mediatr.Send(new EnsurePaymentsWalletConfiguredCommand(request.RequestUser) { UserId = request.Id }, token);
+                var wallet = await _mediatr.Process(new EnsurePaymentsWalletConfiguredCommand(request.RequestUser) { UserId = request.Id }, token);
                 if (!wallet.Success)
                     return Failed<bool>(wallet.Exception);
 
@@ -62,11 +61,11 @@ namespace Sheaft.Application.Handlers
         {
             return await ExecuteAsync(async () =>
             {
-                var business = await _mediatr.Send(new EnsureConsumerLegalConfiguredCommand(request.RequestUser) { UserId = request.Id }, token);
+                var business = await _mediatr.Process(new EnsureConsumerLegalConfiguredCommand(request.RequestUser) { UserId = request.Id }, token);
                 if (!business.Success)
                     return Failed<bool>(business.Exception);
 
-                var wallet = await _mediatr.Send(new EnsurePaymentsWalletConfiguredCommand(request.RequestUser) { UserId = request.Id }, token);
+                var wallet = await _mediatr.Process(new EnsurePaymentsWalletConfiguredCommand(request.RequestUser) { UserId = request.Id }, token);
                 if (!wallet.Success)
                     return Failed<bool>(wallet.Exception);
 

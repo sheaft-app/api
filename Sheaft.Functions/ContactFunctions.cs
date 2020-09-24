@@ -10,6 +10,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.Net.Http.Headers;
 using Sheaft.Application.Commands;
+using Sheaft.Application.Interop;
 using Sheaft.Core;
 using Sheaft.Core.Extensions;
 using Sheaft.Exceptions;
@@ -20,21 +21,25 @@ namespace Sheaft.Functions
     public class ContactFunctions
     {
         private readonly LandingOptions _landingOptions;
-        private readonly IMediator _mediatr;
+        private readonly ISheaftMediatr _mediatr;
 
-        public ContactFunctions(IOptionsSnapshot<LandingOptions> landingOptions, IMediator mediator)
+        public ContactFunctions(IOptionsSnapshot<LandingOptions> landingOptions, ISheaftMediatr mediator)
         {
             _landingOptions = landingOptions.Value;
             _mediatr = mediator;
         }
 
         [FunctionName("CreateContactCommand")]
-        public async Task<IActionResult> CreateContactCommandAsync([HttpTrigger(AuthorizationLevel.Function, "post", Route = null)] HttpRequest req, ILogger logger, CancellationToken token)
+        public async Task<IActionResult> CreateContactCommandAsync([HttpTrigger(AuthorizationLevel.Function, "post", Route = null)] HttpRequest request, CancellationToken token)
         {
-            var results = await _mediatr.Send(new CreateContactCommand(new RequestUser("contact-functions", req.HttpContext.TraceIdentifier)) { FirstName = req.Form["FirstName"], Role = req.Form["Role"], Email = req.Form["Email"] }, token);
-            var origin = req.Headers.FirstOrDefault(c => c.Key == HeaderNames.Origin).Value;
-            logger.LogCommand(results);
-
+            var origin = request.Headers.FirstOrDefault(c => c.Key == HeaderNames.Origin).Value;
+            var results = await _mediatr.Process(
+                new CreateContactCommand(new RequestUser("contact-functions", request.HttpContext.TraceIdentifier)) {
+                    FirstName = request.Form["FirstName"],
+                    Role = request.Form["Role"],
+                    Email = request.Form["Email"]
+                }, token);
+            
             if (!results.Success)
             {
                 if (results.Exception.Kind != ExceptionKind.Unexpected)
@@ -45,12 +50,6 @@ namespace Sheaft.Functions
 
             var url = origin + _landingOptions.NewsletterUrl;
             return new RedirectResult(url);
-        }
-
-        [FunctionName("WarmupCommand")]
-        public void WarmupCommand([TimerTrigger("0 */15 * * * *")] TimerInfo info, ILogger logger, CancellationToken token)
-        {
-            logger.LogInformation("Warming functions successfully executed");
         }
     }
 }

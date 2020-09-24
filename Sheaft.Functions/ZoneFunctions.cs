@@ -1,72 +1,52 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using MediatR;
 using Microsoft.Azure.WebJobs;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
 using Sheaft.Application.Commands;
+using Sheaft.Application.Interop;
 using Sheaft.Core;
-using Sheaft.Core.Extensions;
 
 namespace Sheaft.Functions
 {
     public class ZoneFunctions
     {
-        private readonly IConfiguration _config;
-        private readonly IMediator _mediatr;
+        private readonly ISheaftMediatr _mediatr;
 
-        public ZoneFunctions(IConfiguration config, IMediator mediator)
+        public ZoneFunctions(ISheaftMediatr mediator)
         {
-            _config = config;
             _mediatr = mediator;
         }
 
         [FunctionName("UpdateZoneProgressCommand")]
-        public async Task UpdateZoneProgressCommandAsync([TimerTrigger("0 0 */6 * * *", RunOnStartup = false)] TimerInfo info, ILogger logger, CancellationToken token)
+        public async Task UpdateZoneProgressCommandAsync([TimerTrigger("0 0 */6 * * *", RunOnStartup = false)] TimerInfo info, CancellationToken token)
         {
-            var results = await _mediatr.Send(new UpdateZoneProgressCommand(new RequestUser("zone-functions", Guid.NewGuid().ToString("N"))), token);
+            var results = await _mediatr.Process(new UpdateZoneProgressCommand(new RequestUser("zone-functions", Guid.NewGuid().ToString("N"))), token);
             if (!results.Success)
                 throw results.Exception;
-
-            logger.LogInformation(nameof(UpdateZoneProgressCommandAsync), "successfully executed");
         }
 
         [FunctionName("GenerateZonesFileCommand")]
-        public async Task GenerateZonesFileCommandAsync([TimerTrigger("0 0 */2 * * *", RunOnStartup = false)] TimerInfo info, ILogger logger, CancellationToken token)
+        public async Task GenerateZonesFileCommandAsync([TimerTrigger("0 0 */2 * * *", RunOnStartup = false)] TimerInfo info, CancellationToken token)
         {
-            var results = await _mediatr.Send(new GenerateZonesFileCommand(new RequestUser("zone-functions", Guid.NewGuid().ToString("N"))), token);
+            var results = await _mediatr.Process(new GenerateZonesFileCommand(new RequestUser("zone-functions", Guid.NewGuid().ToString("N"))), token);
             if (!results.Success)
                 throw results.Exception;
-
-            logger.LogInformation(nameof(GenerateZonesFileCommandAsync), "successfully executed");
         }
 
         [FunctionName("UpdateDepartmentCommand")]
-        public async Task UpdateDepartmentCommandAsync([ServiceBusTrigger(UpdateDepartmentStatsCommand.QUEUE_NAME, Connection = "AzureWebJobsServiceBus")] string message, ILogger logger, CancellationToken token)
+        public async Task UpdateDepartmentCommandAsync([ServiceBusTrigger(UpdateDepartmentStatsCommand.QUEUE_NAME, Connection = "AzureWebJobsServiceBus")] string message, CancellationToken token)
         {
-            var command = JsonConvert.DeserializeObject<UpdateDepartmentStatsCommand>(message);
-            var results = await _mediatr.Send(command, token);
-            logger.LogCommand(results);
-
+            var results = await _mediatr.Process<UpdateDepartmentStatsCommand, bool>(message, token);
             if (!results.Success)
                 throw results.Exception;
-
-            logger.LogInformation(nameof(UpdateDepartmentCommandAsync), "successfully executed");
         }
 
         [FunctionName("UpdateRegionCommand")]
-        public async Task UpdateRegionCommandAsync([ServiceBusTrigger(UpdateRegionStatsCommand.QUEUE_NAME, Connection = "AzureWebJobsServiceBus")] string message, ILogger logger, CancellationToken token)
+        public async Task UpdateRegionCommandAsync([ServiceBusTrigger(UpdateRegionStatsCommand.QUEUE_NAME, Connection = "AzureWebJobsServiceBus")] string message, CancellationToken token)
         {
-            var command = JsonConvert.DeserializeObject<UpdateRegionStatsCommand>(message);
-            var results = await _mediatr.Send(command, token);
-            logger.LogCommand(results);
-
+            var results = await _mediatr.Process<UpdateRegionStatsCommand, bool>(message, token);
             if (!results.Success)
                 throw results.Exception;
-
-            logger.LogInformation(nameof(UpdateRegionCommandAsync), "successfully executed");
         }
     }
 }

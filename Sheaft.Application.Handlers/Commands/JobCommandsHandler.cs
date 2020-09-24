@@ -36,13 +36,11 @@ namespace Sheaft.Application.Handlers
         private readonly IQueueService _queuesService;
 
         public JobCommandsHandler(
-            IMediator mediatr, 
+            ISheaftMediatr mediatr, 
             IAppDbContext context,
-            IQueueService queueService,
             ILogger<JobCommandsHandler> logger)
-            : base(mediatr, context, queueService, logger)
+            : base(mediatr, context, logger)
         {
-            _queuesService = queueService;
         }
 
         public async Task<Result<bool>> Handle(CancelJobsCommand request,
@@ -54,7 +52,7 @@ namespace Sheaft.Application.Handlers
                {
                    foreach (var jobId in request.Ids)
                    {
-                       var result = await _mediatr.Send(new CancelJobCommand(request.RequestUser) { Id = jobId, Reason = request.Reason }, token);
+                       var result = await _mediatr.Process(new CancelJobCommand(request.RequestUser) { Id = jobId, Reason = request.Reason }, token);
                        if (!result.Success)
                            return Failed<bool>(result.Exception);
                    }
@@ -74,7 +72,7 @@ namespace Sheaft.Application.Handlers
                {
                    foreach (var jobId in request.Ids)
                    {
-                       var result = await _mediatr.Send(new RetryJobCommand(request.RequestUser) { Id = jobId }, token);
+                       var result = await _mediatr.Process(new RetryJobCommand(request.RequestUser) { Id = jobId }, token);
                        if (!result.Success)
                            return Failed<bool>(result.Exception);
                    }
@@ -94,7 +92,7 @@ namespace Sheaft.Application.Handlers
                {
                    foreach (var jobId in request.Ids)
                    {
-                       var result = await _mediatr.Send(new PauseJobCommand(request.RequestUser) { Id = jobId }, token);
+                       var result = await _mediatr.Process(new PauseJobCommand(request.RequestUser) { Id = jobId }, token);
                        if (!result.Success)
                            return Failed<bool>(result.Exception);
                    }
@@ -114,7 +112,7 @@ namespace Sheaft.Application.Handlers
                {
                    foreach (var jobId in request.Ids)
                    {
-                       var result = await _mediatr.Send(new ArchiveJobCommand(request.RequestUser) { Id = jobId }, token);
+                       var result = await _mediatr.Process(new ArchiveJobCommand(request.RequestUser) { Id = jobId }, token);
                        if (!result.Success)
                            return Failed<bool>(result.Exception);
                    }
@@ -134,7 +132,7 @@ namespace Sheaft.Application.Handlers
                {
                    foreach (var jobId in request.Ids)
                    {
-                       var result = await _mediatr.Send(new ResumeJobCommand(request.RequestUser) { Id = jobId }, token);
+                       var result = await _mediatr.Process(new ResumeJobCommand(request.RequestUser) { Id = jobId }, token);
                        if (!result.Success)
                            return Failed<bool>(result.Exception);
                    }
@@ -154,7 +152,7 @@ namespace Sheaft.Application.Handlers
                 {
                     foreach (var jobId in request.Ids)
                     {
-                        var result = await _mediatr.Send(new StartJobCommand(request.RequestUser) { Id = jobId }, token);
+                        var result = await _mediatr.Process(new StartJobCommand(request.RequestUser) { Id = jobId }, token);
                         if (!result.Success)
                             return Failed<bool>(result.Exception);
                     }
@@ -174,7 +172,7 @@ namespace Sheaft.Application.Handlers
                 {
                     foreach (var jobId in request.Ids)
                     {
-                        var result = await _mediatr.Send(new CompleteJobCommand(request.RequestUser) { Id = jobId }, token);
+                        var result = await _mediatr.Process(new CompleteJobCommand(request.RequestUser) { Id = jobId }, token);
                         if (!result.Success)
                             return Failed<bool>(result.Exception);
                     }
@@ -194,7 +192,7 @@ namespace Sheaft.Application.Handlers
                 {
                     foreach (var jobId in request.Ids)
                     {
-                        var result = await _mediatr.Send(new FailJobCommand(request.RequestUser) { Id = jobId, Reason = request.Reason }, token);
+                        var result = await _mediatr.Process(new FailJobCommand(request.RequestUser) { Id = jobId, Reason = request.Reason }, token);
                         if (!result.Success)
                             return Failed<bool>(result.Exception);
                     }

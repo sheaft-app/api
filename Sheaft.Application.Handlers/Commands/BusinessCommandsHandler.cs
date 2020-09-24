@@ -40,13 +40,12 @@ namespace Sheaft.Application.Handlers
             IOptionsSnapshot<AuthOptions> authOptions,
             IDistributedCache cache,
             IAppDbContext context,
-            IMediator mediatr,
-            IQueueService queueService,
+            ISheaftMediatr mediatr,
             IImageService imageService,
             IHttpClientFactory httpClientFactory,
             ILogger<BusinessCommandsHandler> logger,
             IOptionsSnapshot<RoleOptions> roleOptions)
-            : base(mediatr, context, queueService, logger)
+            : base(mediatr, context, logger)
         {
             _authOptions = authOptions.Value;
             _roleOptions = roleOptions.Value;
@@ -252,7 +251,7 @@ namespace Sheaft.Application.Handlers
 
         private async Task<Result<Guid>> CreateBusinessLegalsAsync(BusinessLegalInput legals, RequestUser requestUser, CancellationToken token)
         {
-            return await _mediatr.Send(new CreateBusinessLegalCommand(requestUser)
+            return await _mediatr.Process(new CreateBusinessLegalCommand(requestUser)
             {
                 Address = legals.Address,
                 Email = legals.Email,
@@ -292,15 +291,13 @@ namespace Sheaft.Application.Handlers
                 await _context.AddAsync(new Sponsoring(sponsor, user), token);
                 await _context.SaveChangesAsync(token);
 
-                await _queueService.ProcessEventAsync(UserSponsoredEvent.QUEUE_NAME,
-                    new UserSponsoredEvent(requestUser)
+                await _mediatr.Post(new UserSponsoredEvent(requestUser)
                     {
                         SponsorId = sponsor.Id,
                         SponsoredId = user.Id
                     }, token);
 
-                await _queueService.ProcessCommandAsync(CreateUserPointsCommand.QUEUE_NAME,
-                    new CreateUserPointsCommand(requestUser)
+                await _mediatr.Post(new CreateUserPointsCommand(requestUser)
                     {
                         CreatedOn = DateTimeOffset.UtcNow,
                         Kind = PointKind.Sponsoring,

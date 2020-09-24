@@ -29,10 +29,9 @@ namespace Sheaft.Application.Handlers
         public DocumentCommandsHandler(
             IAppDbContext context,
             IPspService pspService,
-            IQueueService queueService,
-            IMediator mediatr,
+            ISheaftMediatr mediatr,
             ILogger<DocumentCommandsHandler> logger)
-            : base(mediatr, context, queueService, logger)
+            : base(mediatr, context, logger)
         {
             _pspService = pspService;
         }
@@ -75,7 +74,7 @@ namespace Sheaft.Application.Handlers
                 var success = true;
                 foreach (var page in request.Pages)
                 {
-                    var result = await _mediatr.Send(page, token);
+                    var result = await _mediatr.Process(page, token);
                     if (!result.Success)
                         success = false;
                 }
@@ -116,7 +115,7 @@ namespace Sheaft.Application.Handlers
                 var success = true;
                 foreach (var document in documents)
                 {
-                    var result = await _mediatr.Send(new SubmitDocumentCommand(request.RequestUser)
+                    var result = await _mediatr.Process(new SubmitDocumentCommand(request.RequestUser)
                     {
                         DocumentId = document.Id
                     }, token);
@@ -176,13 +175,13 @@ namespace Sheaft.Application.Handlers
                 switch (request.Kind)
                 {
                     case PspEventKind.KYC_FAILED:
-                        await _queueService.ProcessEventAsync(DocumentFailedEvent.QUEUE_NAME, new DocumentFailedEvent(request.RequestUser) { DocumentId = document.Id }, token);
+                        await _mediatr.Post(new DocumentFailedEvent(request.RequestUser) { DocumentId = document.Id }, token);
                         break;
                     case PspEventKind.KYC_OUTDATED:
-                        await _queueService.ProcessEventAsync(DocumentOutdatedEvent.QUEUE_NAME, new DocumentOutdatedEvent(request.RequestUser) { DocumentId = document.Id }, token);
+                        await _mediatr.Post(new DocumentOutdatedEvent(request.RequestUser) { DocumentId = document.Id }, token);
                         break;
                     case PspEventKind.KYC_SUCCEEDED:
-                        await _queueService.ProcessEventAsync(DocumentSucceededEvent.QUEUE_NAME, new DocumentSucceededEvent(request.RequestUser) { DocumentId = document.Id }, token);
+                        await _mediatr.Post(new DocumentSucceededEvent(request.RequestUser) { DocumentId = document.Id }, token);
                         break;
                 }
 

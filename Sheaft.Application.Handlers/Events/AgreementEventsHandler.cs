@@ -12,14 +12,10 @@ using Sheaft.Application.Interop;
 namespace Sheaft.Application.Handlers
 {
     public class AgreementEventsHandler :
-        INotificationHandler<AgreementCreatedByStoreEvent>,
-        INotificationHandler<AgreementCreatedByProducerEvent>,
-        INotificationHandler<AgreementAcceptedByStoreEvent>,
-        INotificationHandler<AgreementAcceptedByProducerEvent>,
-        INotificationHandler<AgreementCancelledByStoreEvent>,
-        INotificationHandler<AgreementCancelledByProducerEvent>,
-        INotificationHandler<AgreementRefusedByStoreEvent>,
-        INotificationHandler<AgreementRefusedByProducerEvent>
+        INotificationHandler<AgreementCreatedEvent>,
+        INotificationHandler<AgreementAcceptedEvent>,
+        INotificationHandler<AgreementCancelledEvent>,
+        INotificationHandler<AgreementRefusedEvent>
     {
         private readonly IAppDbContext _context;
         private readonly ISignalrService _signalrService;
@@ -34,105 +30,53 @@ namespace Sheaft.Application.Handlers
             _signalrService = signalrService;
         }
 
-        public async Task Handle(AgreementCreatedByStoreEvent agreementEvent, CancellationToken token)
+        public async Task Handle(AgreementCreatedEvent agreementEvent, CancellationToken token)
         {
             var agreement = await _context.GetByIdAsync<Agreement>(agreementEvent.Id, token);
-            await _signalrService.SendNotificationToGroupAsync(agreement.Delivery.Producer.Id, nameof(AgreementCreatedByStoreEvent), GetNotificationContent(agreement));
+            await _signalrService.SendNotificationToGroupAsync(agreement.Delivery.Producer.Id, nameof(AgreementCreatedEvent), GetNotificationContent(agreement));
 
             await _emailService.SendTemplatedEmailAsync(
                 agreement.Delivery.Producer.Email, 
                 agreement.Delivery.Producer.Name, 
-                AgreementCreatedByStoreEvent.MAILING_TEMPLATE_ID, 
+                AgreementCreatedEvent.MAILING_TEMPLATE_ID, 
                 GetNotificationDatas(agreement), 
                 token);
         }
 
-        public async Task Handle(AgreementCreatedByProducerEvent agreementEvent, CancellationToken token)
+        public async Task Handle(AgreementAcceptedEvent agreementEvent, CancellationToken token)
         {
             var agreement = await _context.GetByIdAsync<Agreement>(agreementEvent.Id, token);
-            await _signalrService.SendNotificationToGroupAsync(agreement.Store.Id, nameof(AgreementCreatedByProducerEvent), GetNotificationContent(agreement));
-
-            await _emailService.SendTemplatedEmailAsync(
-                agreement.Store.Email,
-                agreement.Store.Name,
-                AgreementCreatedByProducerEvent.MAILING_TEMPLATE_ID,
-                GetNotificationDatas(agreement),
-                token); 
-        }
-
-        public async Task Handle(AgreementAcceptedByStoreEvent agreementEvent, CancellationToken token)
-        {
-            var agreement = await _context.GetByIdAsync<Agreement>(agreementEvent.Id, token);
-            await _signalrService.SendNotificationToGroupAsync(agreement.Delivery.Producer.Id, nameof(AgreementAcceptedByStoreEvent), GetNotificationContent(agreement));
+            await _signalrService.SendNotificationToGroupAsync(agreement.Delivery.Producer.Id, nameof(AgreementAcceptedEvent), GetNotificationContent(agreement));
 
             await _emailService.SendTemplatedEmailAsync(
                 agreement.Delivery.Producer.Email,
                 agreement.Delivery.Producer.Name,
-                AgreementAcceptedByStoreEvent.MAILING_TEMPLATE_ID,
+                AgreementAcceptedEvent.MAILING_TEMPLATE_ID,
                 GetNotificationDatas(agreement),
                 token);
         }
 
-        public async Task Handle(AgreementAcceptedByProducerEvent agreementEvent, CancellationToken token)
+        public async Task Handle(AgreementCancelledEvent agreementEvent, CancellationToken token)
         {
             var agreement = await _context.GetByIdAsync<Agreement>(agreementEvent.Id, token);
-            await _signalrService.SendNotificationToGroupAsync(agreement.Store.Id, nameof(AgreementAcceptedByProducerEvent), GetNotificationContent(agreement));
-
-            await _emailService.SendTemplatedEmailAsync(
-                agreement.Store.Email,
-                agreement.Store.Name,
-                AgreementAcceptedByProducerEvent.MAILING_TEMPLATE_ID,
-                GetNotificationDatas(agreement),
-                token);
-        }
-
-        public async Task Handle(AgreementCancelledByStoreEvent agreementEvent, CancellationToken token)
-        {
-            var agreement = await _context.GetByIdAsync<Agreement>(agreementEvent.Id, token);
-            await _signalrService.SendNotificationToGroupAsync(agreement.Delivery.Producer.Id, nameof(AgreementCancelledByStoreEvent), GetNotificationContent(agreement));
+            await _signalrService.SendNotificationToGroupAsync(agreement.Delivery.Producer.Id, nameof(AgreementCancelledEvent), GetNotificationContent(agreement));
 
             await _emailService.SendTemplatedEmailAsync(
                 agreement.Delivery.Producer.Email,
                 agreement.Delivery.Producer.Name,
-                AgreementCancelledByStoreEvent.MAILING_TEMPLATE_ID,
-                GetNotificationDatas(agreement),
-                token);
-        }
-        
-        public async Task Handle(AgreementCancelledByProducerEvent agreementEvent, CancellationToken token)
-        {
-            var agreement = await _context.GetByIdAsync<Agreement>(agreementEvent.Id, token);
-            await _signalrService.SendNotificationToGroupAsync(agreement.Delivery.Producer.Id, nameof(AgreementCancelledByProducerEvent), GetNotificationContent(agreement));
-
-            await _emailService.SendTemplatedEmailAsync(
-                agreement.Store.Email,
-                agreement.Store.Name,
-                AgreementCancelledByProducerEvent.MAILING_TEMPLATE_ID,
+                AgreementCancelledEvent.MAILING_TEMPLATE_ID,
                 GetNotificationDatas(agreement),
                 token);
         }
 
-        public async Task Handle(AgreementRefusedByStoreEvent agreementEvent, CancellationToken token)
+        public async Task Handle(AgreementRefusedEvent agreementEvent, CancellationToken token)
         {
             var agreement = await _context.GetByIdAsync<Agreement>(agreementEvent.Id, token);
-            await _signalrService.SendNotificationToGroupAsync(agreement.Delivery.Producer.Id, nameof(AgreementRefusedByStoreEvent), GetNotificationContent(agreement));
+            await _signalrService.SendNotificationToGroupAsync(agreement.Delivery.Producer.Id, nameof(AgreementRefusedEvent), GetNotificationContent(agreement));
             await _emailService.SendTemplatedEmailAsync(
                 agreement.Delivery.Producer.Email,
                 agreement.Delivery.Producer.Name,
-                AgreementRefusedByStoreEvent.MAILING_TEMPLATE_ID,
-                GetNotificationDatas(agreement),
-                token);
-        }
-
-        public async Task Handle(AgreementRefusedByProducerEvent agreementEvent, CancellationToken token)
-        {
-            var agreement = await _context.GetByIdAsync<Agreement>(agreementEvent.Id, token);
-            await _signalrService.SendNotificationToGroupAsync(agreement.Delivery.Producer.Id, nameof(AgreementRefusedByProducerEvent), GetNotificationContent(agreement));
-
-            await _emailService.SendTemplatedEmailAsync(
-                agreement.Store.Email,
-                agreement.Store.Name,
-                AgreementRefusedByProducerEvent.MAILING_TEMPLATE_ID,
+                AgreementRefusedEvent.MAILING_TEMPLATE_ID,
                 GetNotificationDatas(agreement),
                 token);
         }

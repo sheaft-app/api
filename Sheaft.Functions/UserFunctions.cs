@@ -1,80 +1,62 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
-using MediatR;
 using Microsoft.Azure.WebJobs;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
 using Sheaft.Application.Commands;
 using Sheaft.Application.Events;
-using Sheaft.Core.Extensions;
+using Sheaft.Application.Interop;
 
 namespace Sheaft.Functions
 {
     public class UserFunctions
     {
-        private readonly IConfiguration _config;
-        private readonly IMediator _mediatr;
+        private readonly ISheaftMediatr _mediatr;
 
-        public UserFunctions(IConfiguration config, IMediator mediator)
+        public UserFunctions(ISheaftMediatr mediator)
         {
-            _config = config;
             _mediatr = mediator;
         }
 
         [FunctionName("ExportUserDataCommand")]
-        public async Task ExportUserDataCommandAsync([ServiceBusTrigger(ExportUserDataCommand.QUEUE_NAME, Connection = "AzureWebJobsServiceBus")]string message, ILogger logger, CancellationToken token)
+        public async Task ExportUserDataCommandAsync([ServiceBusTrigger(ExportUserDataCommand.QUEUE_NAME, Connection = "AzureWebJobsServiceBus")] string message, CancellationToken token)
         {
-            var command = JsonConvert.DeserializeObject<ExportUserDataCommand>(message);
-            var results = await _mediatr.Send(command, token);
-            logger.LogCommand(results);
-
+            var results = await _mediatr.Process<ExportUserDataCommand, bool>(message, token);
             if (!results.Success)
                 throw results.Exception;
         }
 
         [FunctionName("RemoveUserDataCommand")]
-        public async Task RemoveUserDataCommandAsync([ServiceBusTrigger(RemoveUserDataCommand.QUEUE_NAME, Connection = "AzureWebJobsServiceBus")] string message, ILogger logger, CancellationToken token)
+        public async Task RemoveUserDataCommandAsync([ServiceBusTrigger(RemoveUserDataCommand.QUEUE_NAME, Connection = "AzureWebJobsServiceBus")] string message, CancellationToken token)
         {
-            var command = JsonConvert.DeserializeObject<RemoveUserDataCommand>(message);
-            var results = await _mediatr.Send(command, token);
-            logger.LogCommand(results);
-
+            var results = await _mediatr.Process<RemoveUserDataCommand, string>(message, token);
             if (!results.Success)
                 throw results.Exception;
         }
 
 
         [FunctionName("CreateUserPointsCommand")]
-        public async Task CreateUserPointsCommandAsync([ServiceBusTrigger(CreateUserPointsCommand.QUEUE_NAME, Connection = "AzureWebJobsServiceBus")] string message, ILogger logger, CancellationToken token)
+        public async Task CreateUserPointsCommandAsync([ServiceBusTrigger(CreateUserPointsCommand.QUEUE_NAME, Connection = "AzureWebJobsServiceBus")] string message, CancellationToken token)
         {
-            var command = JsonConvert.DeserializeObject<CreateUserPointsCommand>(message);
-            var results = await _mediatr.Send(command, token);
-            logger.LogCommand(results);
-
+            var results = await _mediatr.Process<CreateUserPointsCommand, bool>(message, token);
             if (!results.Success)
                 throw results.Exception;
         }
 
         [FunctionName("ExportUserDataSucceededEvent")]
-        public async Task ExportUserDataSucceededEventAsync([ServiceBusTrigger(ExportUserDataSucceededEvent.QUEUE_NAME, Connection = "AzureWebJobsServiceBus")]string message, ILogger logger, CancellationToken token)
+        public async Task ExportUserDataSucceededEventAsync([ServiceBusTrigger(ExportUserDataSucceededEvent.QUEUE_NAME, Connection = "AzureWebJobsServiceBus")] string message, CancellationToken token)
         {
-            var appEvent = JsonConvert.DeserializeObject<ExportUserDataSucceededEvent>(message);
-            await _mediatr.Publish(appEvent, token);
+            await _mediatr.Process<ExportUserDataSucceededEvent>(message, token);
         }
 
         [FunctionName("ExportUserDataFailedEvent")]
-        public async Task ExportUserDataFailedEventAsync([ServiceBusTrigger(ExportUserDataFailedEvent.QUEUE_NAME, Connection = "AzureWebJobsServiceBus")]string message, ILogger logger, CancellationToken token)
+        public async Task ExportUserDataFailedEventAsync([ServiceBusTrigger(ExportUserDataFailedEvent.QUEUE_NAME, Connection = "AzureWebJobsServiceBus")] string message, CancellationToken token)
         {
-            var appEvent = JsonConvert.DeserializeObject<ExportUserDataFailedEvent>(message);
-            await _mediatr.Publish(appEvent, token);
+            await _mediatr.Process<ExportUserDataFailedEvent>(message, token);
         }
 
         [FunctionName("ExportUserDataProcessingEvent")]
-        public async Task ExportUserDataProcessingEventAsync([ServiceBusTrigger(ExportUserDataProcessingEvent.QUEUE_NAME, Connection = "AzureWebJobsServiceBus")]string message, ILogger logger, CancellationToken token)
+        public async Task ExportUserDataProcessingEventAsync([ServiceBusTrigger(ExportUserDataProcessingEvent.QUEUE_NAME, Connection = "AzureWebJobsServiceBus")] string message, CancellationToken token)
         {
-            var appEvent = JsonConvert.DeserializeObject<ExportUserDataProcessingEvent>(message);
-            await _mediatr.Publish(appEvent, token);
+            await _mediatr.Process<ExportUserDataProcessingEvent>(message, token);
         }
     }
 }

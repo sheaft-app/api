@@ -21,12 +21,11 @@ namespace Sheaft.Application.Handlers
         private readonly IPspService _pspService;
 
         public DeclarationCommandsHandler(
-            IMediator mediatr,
+            ISheaftMediatr mediatr,
             IAppDbContext context,
             IPspService pspService,
-            IQueueService queueService,
             ILogger<DeclarationCommandsHandler> logger)
-            : base(mediatr, context, queueService, logger)
+            : base(mediatr, context, logger)
         {
             _pspService = pspService;
         }
@@ -96,13 +95,13 @@ namespace Sheaft.Application.Handlers
                 switch (request.Kind)
                 {
                     case PspEventKind.UBO_DECLARATION_INCOMPLETE:
-                        await _queueService.ProcessEventAsync(DeclarationIncompleteEvent.QUEUE_NAME, new DeclarationIncompleteEvent(request.RequestUser) { DeclarationId = declaration.Id }, token);
+                        await _mediatr.Post(new DeclarationIncompleteEvent(request.RequestUser) { DeclarationId = declaration.Id }, token);
                         break;
                     case PspEventKind.UBO_DECLARATION_REFUSED:
-                        await _queueService.ProcessEventAsync(DeclarationRefusedEvent.QUEUE_NAME, new DeclarationRefusedEvent(request.RequestUser) { DeclarationId = declaration.Id }, token);
+                        await _mediatr.Post(new DeclarationRefusedEvent(request.RequestUser) { DeclarationId = declaration.Id }, token);
                         break;
                     case PspEventKind.UBO_DECLARATION_VALIDATED:
-                        await _queueService.ProcessEventAsync(DeclarationValidatedEvent.QUEUE_NAME, new DeclarationValidatedEvent(request.RequestUser) { DeclarationId = declaration.Id }, token);
+                        await _mediatr.Post(new DeclarationValidatedEvent(request.RequestUser) { DeclarationId = declaration.Id }, token);
                         break;
                 }
 
@@ -117,7 +116,7 @@ namespace Sheaft.Application.Handlers
                 var legal = await _context.GetSingleAsync<BusinessLegal>(bl => bl.Business.Id == request.UserId, token);
                 if (legal.UboDeclaration == null)
                 {
-                    var result = await _mediatr.Send(new CreateDeclarationCommand(request.RequestUser)
+                    var result = await _mediatr.Process(new CreateDeclarationCommand(request.RequestUser)
                     {
                         LegalId = legal.Id
                     }, token);

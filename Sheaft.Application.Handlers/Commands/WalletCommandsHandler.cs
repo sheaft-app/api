@@ -20,12 +20,11 @@ namespace Sheaft.Application.Handlers
         private readonly IPspService _pspService;
 
         public WalletCommandsHandler(
-            IMediator mediatr,
+            ISheaftMediatr mediatr,
             IAppDbContext context,
-            IQueueService queueService,
             IPspService pspService,
             ILogger<WalletCommandsHandler> logger)
-            : base(mediatr, context, queueService, logger)
+            : base(mediatr, context, logger)
         {
             _pspService = pspService;
         }
@@ -52,7 +51,7 @@ namespace Sheaft.Application.Handlers
                 var wallet = await _context.FindSingleAsync<Wallet>(c => c.User.Id == request.UserId && c.Kind == WalletKind.Payments, token);
                 if (wallet == null)
                 {
-                    var walletResult = await _mediatr.Send(new CreatePaymentsWalletCommand(request.RequestUser)
+                    var walletResult = await _mediatr.Process(new CreatePaymentsWalletCommand(request.RequestUser)
                     {
                         UserId = request.UserId
                     }, token);

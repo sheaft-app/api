@@ -21,11 +21,10 @@ namespace Sheaft.Application.Handlers
 
         public NotificationCommandsHandler(
             IDapperContext dapperContext,
-            IMediator mediatr,
+            ISheaftMediatr mediatr,
             IAppDbContext context,
-            IQueueService queueService,
             ILogger<NotificationCommandsHandler> logger)
-            : base(mediatr, context, queueService, logger)
+            : base(mediatr, context, logger)
         {
             _dapperContext = dapperContext;
         }

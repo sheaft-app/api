@@ -14,12 +14,13 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Sheaft.Exceptions;
 using Sheaft.Core;
+using Sheaft.Application.Interop;
 
 namespace Sheaft.GraphQL.Services
 {
     public class SheaftMutation
     {
-        private readonly IMediator _mediator;
+        private readonly ISheaftMediatr _mediator;
         private readonly IMapper _mapper;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly ILogger<SheaftMutation> _logger;
@@ -36,7 +37,7 @@ namespace Sheaft.GraphQL.Services
         }
 
         public SheaftMutation(
-            IMediator mediator,
+            ISheaftMediatr mediator,
             IMapper mapper,
             IHttpContextAccessor httpContextAccessor,
             ILogger<SheaftMutation> logger)
@@ -403,7 +404,7 @@ namespace Sheaft.GraphQL.Services
             var commandName = typeof(U).Name;
             _logger.LogTrace($"{nameof(SheaftMutation.ExecuteCommandAsync)} - {commandName}");
 
-            var result = await _mediator.Send(input, token);
+            var result = await _mediator.Process(input, token);
             _logger.LogTrace($"{nameof(SheaftMutation.ExecuteCommandAsync)} - {commandName} - {result.Success}");
 
             if (result.Success)

@@ -20,6 +20,7 @@ namespace Sheaft.Application.Handlers
     public class PayoutTransactionCommandsHandler : ResultsHandler,
         IRequestHandler<CreatePayoutTransactionCommand, Result<Guid>>,
         IRequestHandler<SetPayoutStatusCommand, Result<bool>>,
+        IRequestHandler<SetRefundPayoutStatusCommand, Result<bool>>,
         IRequestHandler<CheckPayoutTransactionsCommand, Result<bool>>,
         IRequestHandler<CheckWaitingPayoutTransactionCommand, Result<bool>>,
         IRequestHandler<CheckCreatedPayoutTransactionCommand, Result<bool>>,
@@ -30,13 +31,12 @@ namespace Sheaft.Application.Handlers
         private readonly IPspService _pspService;
 
         public PayoutTransactionCommandsHandler(
-            IMediator mediatr,
+            ISheaftMediatr mediatr,
             IAppDbContext context,
-            IQueueService queueService,
             IPspService pspService,
             IOptionsSnapshot<PspOptions> pspOptions,
             ILogger<PayoutTransactionCommandsHandler> logger)
-            : base(mediatr, context, queueService, logger)
+            : base(mediatr, context, logger)
         {
             _pspService = pspService;
             _pspOptions = pspOptions.Value;
@@ -90,15 +90,20 @@ namespace Sheaft.Application.Handlers
                 switch (request.Kind)
                 {
                     case PspEventKind.PAYOUT_NORMAL_FAILED:
-                        await _queueService.ProcessEventAsync(PayoutFailedEvent.QUEUE_NAME, new PayoutFailedEvent(request.RequestUser) { TransactionId = transaction.Id }, token);
+                        await _mediatr.Post(new PayoutFailedEvent(request.RequestUser) { TransactionId = transaction.Id }, token);
                         break;
                     case PspEventKind.PAYOUT_NORMAL_SUCCEEDED:
-                        await _queueService.ProcessEventAsync(PayoutSucceededEvent.QUEUE_NAME, new PayoutSucceededEvent(request.RequestUser) { TransactionId = transaction.Id }, token);
+                        await _mediatr.Post(new PayoutSucceededEvent(request.RequestUser) { TransactionId = transaction.Id }, token);
                         break;
                 }
 
                 return Ok(success);
             });
+        }
+
+        public Task<Result<bool>> Handle(SetRefundPayoutStatusCommand request, CancellationToken cancellationToken)
+        {
+            throw new NotImplementedException();
         }
 
         public async Task<Result<bool>> Handle(CheckPayoutTransactionsCommand request, CancellationToken token)
@@ -118,17 +123,13 @@ namespace Sheaft.Application.Handlers
                         switch (transaction.Status)
                         {
                             case TransactionStatus.Waiting:
-                                await _queueService.ProcessCommandAsync(
-                                    CheckWaitingPayoutTransactionCommand.QUEUE_NAME,
-                                    new CheckWaitingPayoutTransactionCommand(request.RequestUser)
+                                await _mediatr.Post(new CheckWaitingPayoutTransactionCommand(request.RequestUser)
                                     {
                                         TransactionId = transaction.Id
                                     }, token);
                                 break;
                             case TransactionStatus.Created:
-                                await _queueService.ProcessCommandAsync(
-                                    CheckCreatedPayoutTransactionCommand.QUEUE_NAME,
-                                    new CheckCreatedPayoutTransactionCommand(request.RequestUser)
+                                await _mediatr.Post(new CheckCreatedPayoutTransactionCommand(request.RequestUser)
                                     {
                                         TransactionId = transaction.Id
                                     }, token);
@@ -203,8 +204,7 @@ namespace Sheaft.Application.Handlers
 
                 foreach (var userId in userIds)
                 {
-                    await _queueService.ProcessCommandAsync(CreatePayoutForTransfersCommand.QUEUE_NAME,
-                        new CreatePayoutForTransfersCommand(request.RequestUser)
+                    await _mediatr.Post(new CreatePayoutForTransfersCommand(request.RequestUser)
                         {
                             UserId = userId
                         }, token);
@@ -218,11 +218,10 @@ namespace Sheaft.Application.Handlers
         {
             return await ExecuteAsync(async () =>
             {
-                var checkResult = await _mediatr.Send(new EnsureProducerConfiguredCommand(request.RequestUser) { UserId = request.UserId }, token);
+                var checkResult = await _mediatr.Process(new EnsureProducerConfiguredCommand(request.RequestUser) { UserId = request.UserId }, token);
                 if (!checkResult.Success)
                 {
-                    await _queueService.ProcessEventAsync(ProducerNotConfiguredEvent.QUEUE_NAME,
-                        new ProducerNotConfiguredEvent(request.RequestUser)
+                    await _mediatr.Post(new ProducerNotConfiguredEvent(request.RequestUser)
                         {
                             UserId = request.UserId
                         }, token);
@@ -231,11 +230,10 @@ namespace Sheaft.Application.Handlers
                 }
 
                 //CHECK KYC created
-                var checkKycCreatedResult = await _mediatr.Send(new EnsureProducerDocumentsCreatedCommand(request.RequestUser) { UserId = request.UserId }, token);
+                var checkKycCreatedResult = await _mediatr.Process(new EnsureProducerDocumentsCreatedCommand(request.RequestUser) { UserId = request.UserId }, token);
                 if (!checkKycCreatedResult.Success)
                 {
-                    await _queueService.ProcessEventAsync(ProducerDocumentsNotCreatedEvent.QUEUE_NAME,
-                        new ProducerDocumentsNotCreatedEvent(request.RequestUser)
+                    await _mediatr.Post(new ProducerDocumentsNotCreatedEvent(request.RequestUser)
                         {
                             UserId = request.UserId
                         }, token);
@@ -255,11 +253,10 @@ namespace Sheaft.Application.Handlers
                 var amount = transfers.Sum(t => t.Credited);
 
                 //CHECK KYC created
-                var checkKycReviewedResult = await _mediatr.Send(new EnsureProducerDocumentsReviewedCommand(request.RequestUser) { UserId = request.UserId }, token);
+                var checkKycReviewedResult = await _mediatr.Process(new EnsureProducerDocumentsReviewedCommand(request.RequestUser) { UserId = request.UserId }, token);
                 if (!checkKycReviewedResult.Success)
                 {
-                    await _queueService.ProcessEventAsync(ProducerDocumentsNotReviewedEvent.QUEUE_NAME,
-                        new ProducerDocumentsNotReviewedEvent(request.RequestUser)
+                    await _mediatr.Post(new ProducerDocumentsNotReviewedEvent(request.RequestUser)
                         {
                             UserId = request.UserId
                         }, token);
@@ -268,11 +265,10 @@ namespace Sheaft.Application.Handlers
                 }
 
                 //CHECK KYC validated
-                var checkKycValidatedResult = await _mediatr.Send(new EnsureProducerDocumentsValidatedCommand(request.RequestUser) { UserId = request.UserId }, token);
+                var checkKycValidatedResult = await _mediatr.Process(new EnsureProducerDocumentsValidatedCommand(request.RequestUser) { UserId = request.UserId }, token);
                 if (!checkKycValidatedResult.Success)
                 {
-                    await _queueService.ProcessEventAsync(ProducerDocumentsNotValidatedEvent.QUEUE_NAME,
-                        new ProducerDocumentsNotValidatedEvent(request.RequestUser)
+                    await _mediatr.Post(new ProducerDocumentsNotValidatedEvent(request.RequestUser)
                         {
                             UserId = request.UserId
                         }, token);

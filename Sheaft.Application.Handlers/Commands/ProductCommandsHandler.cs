@@ -37,14 +37,13 @@ namespace Sheaft.Application.Handlers
         private readonly IImageService _imageService;
 
         public ProductCommandsHandler(
-            IMediator mediatr,
+            ISheaftMediatr mediatr,
             IAppDbContext context,
             IIdentifierService identifierService,
-            IQueueService queueService,
             IBlobService blobService,
             IImageService imageService,
             ILogger<ProductCommandsHandler> logger)
-            : base(mediatr, context, queueService, logger)
+            : base(mediatr, context, logger)
         {
             _identifierService = identifierService;
             _blobService = blobService;
@@ -156,7 +155,7 @@ namespace Sheaft.Application.Handlers
 
                 var result = await _context.SaveChangesAsync(token);
 
-                await _queueService.ProcessCommandAsync(CreateUserPointsCommand.QUEUE_NAME, new CreateUserPointsCommand(request.RequestUser) { CreatedOn = DateTimeOffset.UtcNow, Kind = PointKind.RateProduct, UserId = request.RequestUser.Id }, token);
+                await _mediatr.Post(new CreateUserPointsCommand(request.RequestUser) { CreatedOn = DateTimeOffset.UtcNow, Kind = PointKind.RateProduct, UserId = request.RequestUser.Id }, token);
 
                 _logger.LogInformation($"Product {entity.Id} successfully rated by {request.RequestUser.Id}");
                 return Ok(result > 0);
@@ -171,7 +170,7 @@ namespace Sheaft.Application.Handlers
                 {
                     foreach (var id in request.Ids)
                     {
-                        var result = await _mediatr.Send(new SetProductAvailabilityCommand(request.RequestUser) { Id = id, Available = request.Available });
+                        var result = await _mediatr.Process(new SetProductAvailabilityCommand(request.RequestUser) { Id = id, Available = request.Available }, token);
                         if (!result.Success)
                             return Failed<bool>(result.Exception);
                     }
@@ -205,7 +204,7 @@ namespace Sheaft.Application.Handlers
                 {
                     foreach (var id in request.Ids)
                     {
-                        var result = await _mediatr.Send(new DeleteProductCommand(request.RequestUser) { Id = id });
+                        var result = await _mediatr.Process(new DeleteProductCommand(request.RequestUser) { Id = id }, token);
                         if (!result.Success)
                             return Failed<bool>(result.Exception);
                     }
@@ -246,7 +245,7 @@ namespace Sheaft.Application.Handlers
                 await _context.AddAsync(entity, token);
                 await _context.SaveChangesAsync(token);
 
-                await _queueService.InsertJobToProcessAsync(entity, token);
+                await _mediatr.Post(entity, token);
                 _logger.LogInformation($"Import products {entity.Id} successfully created by {request.RequestUser.Id}");
 
                 return Created(entity.Id);
@@ -262,11 +261,11 @@ namespace Sheaft.Application.Handlers
 
                 try
                 {
-                    var startResult = await _mediatr.Send(new StartJobCommand(request.RequestUser) { Id = job.Id });
+                    var startResult = await _mediatr.Process(new StartJobCommand(request.RequestUser) { Id = job.Id }, token);
                     if (!startResult.Success)
                         throw startResult.Exception;
 
-                    await _queueService.ProcessEventAsync(ProductImportProcessingEvent.QUEUE_NAME, new ProductImportProcessingEvent(request.RequestUser) { Id = job.Id }, token);
+                    await _mediatr.Post(new ProductImportProcessingEvent(request.RequestUser) { Id = job.Id }, token);
 
                     using (var stream = new MemoryStream())
                     {
@@ -291,7 +290,7 @@ namespace Sheaft.Application.Handlers
                                     if (!command.Success)
                                         throw command.Exception;
 
-                                    var productResult = await _mediatr.Send(command.Data, token);
+                                    var productResult = await _mediatr.Process(command.Data, token);
                                     if (!productResult.Success)
                                         throw productResult.Exception;
                                 }
@@ -302,19 +301,19 @@ namespace Sheaft.Application.Handlers
                         }
                     }
 
-                    var result = await _mediatr.Send(new CompleteJobCommand(request.RequestUser) { Id = job.Id }, token);
+                    var result = await _mediatr.Process(new CompleteJobCommand(request.RequestUser) { Id = job.Id }, token);
                     if (!result.Success)
                         throw result.Exception;
 
-                    await _queueService.ProcessEventAsync(ProductImportSucceededEvent.QUEUE_NAME, new ProductImportSucceededEvent(request.RequestUser) { Id = job.Id }, token);
+                    await _mediatr.Post(new ProductImportSucceededEvent(request.RequestUser) { Id = job.Id }, token);
 
                     _logger.LogInformation($"Products import Job {job.Id} successfully processed");
                     return result;
                 }
                 catch (Exception e)
                 {
-                    await _queueService.ProcessEventAsync(ProductImportFailedEvent.QUEUE_NAME, new ProductImportFailedEvent(request.RequestUser) { Id = job.Id }, token);
-                    return await _mediatr.Send(new FailJobCommand(request.RequestUser) { Id = job.Id, Reason = e.Message }, token);
+                    await _mediatr.Post(new ProductImportFailedEvent(request.RequestUser) { Id = job.Id }, token);
+                    return await _mediatr.Process(new FailJobCommand(request.RequestUser) { Id = job.Id, Reason = e.Message }, token);
                 }
             });
         }

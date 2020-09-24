@@ -1,57 +1,46 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
-using MediatR;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
 using Sheaft.Application.Commands;
 using Sheaft.Application.Events;
-using Sheaft.Core.Extensions;
+using Sheaft.Application.Interop;
 
 namespace Sheaft.Functions
 {
     public class DocumentFunctions
     {
-        private readonly IMediator _mediatr;
+        private readonly ISheaftMediatr _mediatr;
 
-        public DocumentFunctions(IMediator mediator)
+        public DocumentFunctions(ISheaftMediatr mediator)
         {
             _mediatr = mediator;
         }
 
         [FunctionName("SetDocumentStatusCommand")]
-        public async Task SetDocumentStatusCommandAsync([ServiceBusTrigger(SetDocumentStatusCommand.QUEUE_NAME, Connection = "AzureWebJobsServiceBus")] string message, ILogger logger, CancellationToken token)
+        public async Task SetDocumentStatusCommandAsync([ServiceBusTrigger(SetDocumentStatusCommand.QUEUE_NAME, Connection = "AzureWebJobsServiceBus")] string message, CancellationToken token)
         {
-            var command = JsonConvert.DeserializeObject<SetDocumentStatusCommand>(message);
-            var results = await _mediatr.Send(command, token);
-            logger.LogCommand(results);
-
+            var results = await _mediatr.Process<SetDocumentStatusCommand, bool>(message, token);
             if (!results.Success)
                 throw results.Exception;
         }
 
         [FunctionName("DocumentFailedEvent")]
-        public async Task DocumentFailedEventAsync([ServiceBusTrigger(DocumentFailedEvent.QUEUE_NAME, Connection = "AzureWebJobsServiceBus")] string message, ILogger logger, CancellationToken token)
+        public async Task DocumentFailedEventAsync([ServiceBusTrigger(DocumentFailedEvent.QUEUE_NAME, Connection = "AzureWebJobsServiceBus")] string message, CancellationToken token)
         {
-            var appEvent = JsonConvert.DeserializeObject<DocumentFailedEvent>(message);
-            await _mediatr.Publish(appEvent, token);
-            logger.LogInformation(appEvent.DocumentId.ToString("N"));
+            await _mediatr.Process<DocumentFailedEvent>(message, token);
         }
 
         [FunctionName("DocumentOutdatedEvent")]
-        public async Task DocumentOutdatedEventAsync([ServiceBusTrigger(DocumentOutdatedEvent.QUEUE_NAME, Connection = "AzureWebJobsServiceBus")] string message, ILogger logger, CancellationToken token)
+        public async Task DocumentOutdatedEventAsync([ServiceBusTrigger(DocumentOutdatedEvent.QUEUE_NAME, Connection = "AzureWebJobsServiceBus")] string message, CancellationToken token)
         {
-            var appEvent = JsonConvert.DeserializeObject<DocumentOutdatedEvent>(message);
-            await _mediatr.Publish(appEvent, token);
-            logger.LogInformation(appEvent.DocumentId.ToString("N"));
+            await _mediatr.Process<DocumentOutdatedEvent>(message, token);
         }
 
         [FunctionName("DocumentSucceededEvent")]
-        public async Task DocumentSucceededEventAsync([ServiceBusTrigger(DocumentSucceededEvent.QUEUE_NAME, Connection = "AzureWebJobsServiceBus")] string message, ILogger logger, CancellationToken token)
+        public async Task DocumentSucceededEventAsync([ServiceBusTrigger(DocumentSucceededEvent.QUEUE_NAME, Connection = "AzureWebJobsServiceBus")] string message, CancellationToken token)
         {
-            var appEvent = JsonConvert.DeserializeObject<DocumentSucceededEvent>(message);
-            await _mediatr.Publish(appEvent, token);
-            logger.LogInformation(appEvent.DocumentId.ToString("N"));
+            await _mediatr.Process<DocumentSucceededEvent>(message, token);
         }
     }
 }

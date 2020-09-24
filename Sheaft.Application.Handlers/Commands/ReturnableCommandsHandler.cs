@@ -19,11 +19,10 @@ namespace Sheaft.Application.Handlers
         IRequestHandler<RestoreReturnableCommand, Result<bool>>
     {
         public ReturnableCommandsHandler(
-            IMediator mediatr,
+            ISheaftMediatr mediatr,
             IAppDbContext context,
-            IQueueService queueService,
             ILogger<ReturnableCommandsHandler> logger)
-            : base(mediatr, context, queueService, logger)
+            : base(mediatr, context, logger)
         {
         }
 

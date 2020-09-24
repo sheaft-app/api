@@ -26,11 +26,10 @@ namespace Sheaft.Application.Handlers
         IRequestHandler<RestoreAgreementCommand, Result<bool>>
     {
         public AgreementCommandsHandler(
-            IMediator mediatr,
+            ISheaftMediatr mediatr,
             IAppDbContext context,
-            IQueueService queueService,
             ILogger<AgreementCommandsHandler> logger)
-            : base(mediatr, context, queueService, logger)
+            : base(mediatr, context, logger)
         {
         }
 
@@ -56,11 +55,7 @@ namespace Sheaft.Application.Handlers
                 await _context.AddAsync(entity, token);
                 await _context.SaveChangesAsync(token);
 
-                if (request.RequestUser.Id == store.Id)
-                    await _queueService.ProcessEventAsync(AgreementCreatedByStoreEvent.QUEUE_NAME, new AgreementCreatedByStoreEvent(request.RequestUser) { Id = entity.Id }, token);
-
-                if (request.RequestUser.Id == delivery.Producer.Id)
-                    await _queueService.ProcessEventAsync(AgreementCreatedByProducerEvent.QUEUE_NAME, new AgreementCreatedByProducerEvent(request.RequestUser) { Id = entity.Id }, token);
+                await _mediatr.Post(new AgreementCreatedEvent(request.RequestUser) { Id = entity.Id }, token);
 
                 return Ok(entity.Id);
             });
@@ -87,12 +82,7 @@ namespace Sheaft.Application.Handlers
                 _context.Update(entity);
                 await _context.SaveChangesAsync(token);
 
-                if (request.RequestUser.Id == entity.Store.Id)
-                    await _queueService.ProcessEventAsync(AgreementAcceptedByStoreEvent.QUEUE_NAME, new AgreementAcceptedByStoreEvent(request.RequestUser) { Id = entity.Id }, token);
-
-                if (request.RequestUser.Id == entity.Delivery.Producer.Id)
-                    await _queueService.ProcessEventAsync(AgreementAcceptedByProducerEvent.QUEUE_NAME, new AgreementAcceptedByProducerEvent(request.RequestUser) { Id = entity.Id }, token);
-
+                await _mediatr.Post(new AgreementAcceptedEvent(request.RequestUser) { Id = entity.Id }, token);
                 return Ok(true);
             });
         }
@@ -105,7 +95,7 @@ namespace Sheaft.Application.Handlers
                 {
                     foreach (var agreementId in request.Ids)
                     {
-                        var result = await _mediatr.Send(new CancelAgreementCommand(request.RequestUser) { Id = agreementId, Reason = request.Reason }, token);
+                        var result = await _mediatr.Process(new CancelAgreementCommand(request.RequestUser) { Id = agreementId, Reason = request.Reason }, token);
                         if (!result.Success)
                             return Failed<bool>(result.Exception);
                     }
@@ -126,12 +116,7 @@ namespace Sheaft.Application.Handlers
                 _context.Update(entity);
                 await _context.SaveChangesAsync(token);
 
-                if (request.RequestUser.Id == entity.Store.Id)
-                    await _queueService.ProcessEventAsync(AgreementCancelledByStoreEvent.QUEUE_NAME, new AgreementCancelledByStoreEvent(request.RequestUser) { Id = entity.Id }, token);
-
-                if (request.RequestUser.Id == entity.Delivery.Producer.Id)
-                    await _queueService.ProcessEventAsync(AgreementCancelledByProducerEvent.QUEUE_NAME, new AgreementCancelledByProducerEvent(request.RequestUser) { Id = entity.Id }, token);
-
+                await _mediatr.Post(new AgreementCancelledEvent(request.RequestUser) { Id = entity.Id }, token);
                 return Ok(true);
             });
         }
@@ -144,7 +129,7 @@ namespace Sheaft.Application.Handlers
                 {
                     foreach (var agreementId in request.Ids)
                     {
-                        var result = await _mediatr.Send(new RefuseAgreementCommand(request.RequestUser) { Id = agreementId, Reason = request.Reason }, token);
+                        var result = await _mediatr.Process(new RefuseAgreementCommand(request.RequestUser) { Id = agreementId, Reason = request.Reason }, token);
                         if (!result.Success)
                             return Failed<bool>(result.Exception);
                     }
@@ -165,12 +150,7 @@ namespace Sheaft.Application.Handlers
                 _context.Update(entity);
                 await _context.SaveChangesAsync(token);
 
-                if (request.RequestUser.Id == entity.Store.Id)
-                    await _queueService.ProcessEventAsync(AgreementRefusedByStoreEvent.QUEUE_NAME, new AgreementRefusedByStoreEvent(request.RequestUser) { Id = entity.Id }, token);
-
-                if (request.RequestUser.Id == entity.Delivery.Producer.Id)
-                    await _queueService.ProcessEventAsync(AgreementRefusedByProducerEvent.QUEUE_NAME, new AgreementRefusedByProducerEvent(request.RequestUser) { Id = entity.Id }, token);
-
+                await _mediatr.Post(new AgreementRefusedEvent(request.RequestUser) { Id = entity.Id }, token);
                 return Ok(true);
             });
         }

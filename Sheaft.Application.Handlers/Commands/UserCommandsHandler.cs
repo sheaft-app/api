@@ -49,17 +49,16 @@ namespace Sheaft.Application.Handlers
             IOptionsSnapshot<AuthOptions> authOptions,
             IOptionsSnapshot<ScoringOptions> scoringOptions,
             IOptionsSnapshot<StorageOptions> storageOptions,
-            IMediator mediatr,
+            ISheaftMediatr mediatr,
             IHttpClientFactory httpClientFactory,
             IIdentifierService identifierService,
             IAppDbContext context,
-            IQueueService queueService,
             IBlobService blobService,
             IImageService imageService,
             ILogger<UserCommandsHandler> logger,
             IOptionsSnapshot<RoleOptions> roleOptions,
             IDistributedCache cache)
-            : base(mediatr, context, queueService, logger)
+            : base(mediatr, context, logger)
         {
             _imageService = imageService;
             _roleOptions = roleOptions.Value;
@@ -187,7 +186,7 @@ namespace Sheaft.Application.Handlers
                 await _context.AddAsync(point, token);
                 await _context.SaveChangesAsync(token);
 
-                await _queueService.ProcessEventAsync(UserPointsCreatedEvent.QUEUE_NAME, new UserPointsCreatedEvent(request.RequestUser) { UserId = user.Id, Kind = request.Kind, Points = quantity, CreatedOn = request.CreatedOn }, token);
+                await _mediatr.Post(new UserPointsCreatedEvent(request.RequestUser) { UserId = user.Id, Kind = request.Kind, Points = quantity, CreatedOn = request.CreatedOn }, token);
 
                 return Ok(true);
             });
@@ -205,7 +204,7 @@ namespace Sheaft.Application.Handlers
                 await _context.AddAsync(entity, token);
                 await _context.SaveChangesAsync(token);
 
-                await _queueService.InsertJobToProcessAsync(entity, token);
+                await _mediatr.Post(entity, token);
                 _logger.LogInformation($"User RGPD data export successfully initiated by {request.RequestUser.Id}");
 
                 return Ok(entity.Id);
@@ -221,11 +220,11 @@ namespace Sheaft.Application.Handlers
 
                 try
                 {
-                    var startResult = await _mediatr.Send(new StartJobCommand(request.RequestUser) { Id = job.Id });
+                    var startResult = await _mediatr.Process(new StartJobCommand(request.RequestUser) { Id = job.Id }, token);
                     if (!startResult.Success)
                         throw startResult.Exception;
 
-                    await _queueService.ProcessEventAsync(ExportUserDataProcessingEvent.QUEUE_NAME, new ExportUserDataProcessingEvent(request.RequestUser) { Id = request.Id, JobId = job.Id }, token);
+                    await _mediatr.Post(new ExportUserDataProcessingEvent(request.RequestUser) { Id = request.Id, JobId = job.Id }, token);
 
                     using (var stream = new MemoryStream())
                     {
@@ -238,16 +237,16 @@ namespace Sheaft.Application.Handlers
                         if (!response.Success)
                             throw response.Exception;
 
-                        await _queueService.ProcessEventAsync(ExportUserDataSucceededEvent.QUEUE_NAME, new ExportUserDataSucceededEvent(request.RequestUser) { Id = job.Id, JobId = job.Id }, token);
+                        await _mediatr.Post(new ExportUserDataSucceededEvent(request.RequestUser) { Id = job.Id, JobId = job.Id }, token);
 
                         _logger.LogInformation($"RGPD data for user {request.RequestUser.Id} successfully exported");
-                        return await _mediatr.Send(new CompleteJobCommand(request.RequestUser) { Id = job.Id, FileUrl = response.Data });
+                        return await _mediatr.Process(new CompleteJobCommand(request.RequestUser) { Id = job.Id, FileUrl = response.Data }, token);
                     }
                 }
                 catch (Exception e)
                 {
-                    await _queueService.ProcessEventAsync(ExportUserDataFailedEvent.QUEUE_NAME, new ExportUserDataFailedEvent(request.RequestUser) { Id = request.Id, JobId = job.Id }, token);
-                    return await _mediatr.Send(new FailJobCommand(request.RequestUser) { Id = job.Id, Reason = e.Message }, token);
+                    await _mediatr.Post(new ExportUserDataFailedEvent(request.RequestUser) { Id = request.Id, JobId = job.Id }, token);
+                    return await _mediatr.Process(new FailJobCommand(request.RequestUser) { Id = job.Id, Reason = e.Message }, token);
                 }
 
             });
@@ -278,7 +277,7 @@ namespace Sheaft.Application.Handlers
                     await transaction.CommitAsync(token);
 
                     await _cache.RemoveAsync(entity.Id.ToString("N"));
-                    await _queueService.ProcessCommandAsync(RemoveUserDataCommand.QUEUE_NAME, new RemoveUserDataCommand(request.RequestUser) { Id = request.Id, Email = email }, token);
+                    await _mediatr.Post(new RemoveUserDataCommand(request.RequestUser) { Id = request.Id, Email = email }, token);
 
                     return Ok(result > 0);
                 }

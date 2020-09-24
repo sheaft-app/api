@@ -21,11 +21,10 @@ namespace Sheaft.Application.Handlers
         IRequestHandler<DeleteQuickOrdersCommand, Result<bool>>
     {
         public QuickOrderCommandsHandler(
-            IMediator mediatr,
+            ISheaftMediatr mediatr,
             IAppDbContext context,
-            IQueueService queueService,
             ILogger<QuickOrderCommandsHandler> logger)
-            : base(mediatr, context, queueService, logger)
+            : base(mediatr, context, logger)
         {
         }
 
@@ -125,7 +124,7 @@ namespace Sheaft.Application.Handlers
             {
                 foreach (var id in request.Ids)
                 {
-                    var result = await _mediatr.Send(new DeleteQuickOrderCommand(request.RequestUser) { Id = id });
+                    var result = await _mediatr.Process(new DeleteQuickOrderCommand(request.RequestUser) { Id = id }, token);
                     if (!result.Success)
                         return Failed<bool>(result.Exception);
                 }

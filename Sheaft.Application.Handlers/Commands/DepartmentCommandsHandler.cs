@@ -16,11 +16,10 @@ namespace Sheaft.Application.Handlers
         IRequestHandler<UpdateDepartmentStatsCommand, Result<bool>>
     {
         public DepartmentCommandsHandler(
-            IMediator mediatr,
+            ISheaftMediatr mediatr,
             IAppDbContext context,
-            IQueueService queueService,
             ILogger<DepartmentCommandsHandler> logger)
-            : base(mediatr, context, queueService, logger)
+            : base(mediatr, context, logger)
         {
         }
 

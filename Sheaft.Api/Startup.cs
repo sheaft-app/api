@@ -202,6 +202,7 @@ namespace Sheaft.Api
             services.AddScoped<IImageService, ImageService>();
             services.AddScoped<IPspService, PspService>();
             services.AddScoped<IFeesService, FeesService>();
+            services.AddScoped<ISheaftMediatr, SheaftMediatr>();
 
             services.AddScoped<IAgreementQueries, AgreementQueries>();
             services.AddScoped<IBusinessQueries, BusinessQueries>();

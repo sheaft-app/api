@@ -26,12 +26,11 @@ namespace Sheaft.Application.Handlers
 
         public ContactCommandsHandler(
             IOptionsSnapshot<SendgridOptions> sendgridOptions,
-            IMediator mediatr,
+            ISheaftMediatr mediatr,
             IAppDbContext context,
-            IQueueService queueService,
             IHttpClientFactory httpClientFactory,
             ILogger<ContactCommandsHandler> logger)
-            : base(mediatr, context, queueService, logger)
+            : base(mediatr, context, logger)
         {
             _sendgridOptions = sendgridOptions.Value;
 

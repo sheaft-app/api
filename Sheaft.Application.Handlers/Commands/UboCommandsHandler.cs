@@ -19,12 +19,11 @@ namespace Sheaft.Application.Handlers
         private readonly IPspService _pspService;
 
         public UboCommandsHandler(
-            IMediator mediatr,
+            ISheaftMediatr mediatr,
             IAppDbContext context,
-            IQueueService queueService,
             IPspService pspService,
             ILogger<UboCommandsHandler> logger)
-            : base(mediatr, context, queueService, logger)
+            : base(mediatr, context, logger)
         {
             _pspService = pspService;
         }

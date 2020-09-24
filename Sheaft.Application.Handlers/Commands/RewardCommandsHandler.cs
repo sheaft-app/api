@@ -18,11 +18,10 @@ namespace Sheaft.Application.Handlers
         IRequestHandler<RestoreRewardCommand, Result<bool>>
     {
         public RewardCommandsHandler(
-            IMediator mediatr,
+            ISheaftMediatr mediatr,
             IAppDbContext context,
-            IQueueService queueService,
             ILogger<RewardCommandsHandler> logger)
-            : base(mediatr, context, queueService, logger)
+            : base(mediatr, context, logger)
         {
         }
 

@@ -31,14 +31,13 @@ namespace Sheaft.Application.Handlers
         private readonly HttpClient _httpClient;
 
         public TagCommandsHandler(
-            IMediator mediatr,
+            ISheaftMediatr mediatr,
             IAppDbContext context,
-            IQueueService queueService,
             IBlobService blobsService,
             IOptionsSnapshot<StorageOptions> storageOptions,
             IHttpClientFactory httpClientFactory,
             ILogger<TagCommandsHandler> logger)
-            : base(mediatr, context, queueService, logger)
+            : base(mediatr, context, logger)
         {
             _blobsService = blobsService;
             _httpClient = httpClientFactory.CreateClient("picture");

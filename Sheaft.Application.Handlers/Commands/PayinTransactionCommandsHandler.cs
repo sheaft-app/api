@@ -28,10 +28,9 @@ namespace Sheaft.Application.Handlers
         public PayinTransactionCommandsHandler(
             IAppDbContext context,
             IPspService pspService,
-            IQueueService queueService,
-            IMediator mediatr,
+            ISheaftMediatr mediatr,
             ILogger<PayinTransactionCommandsHandler> logger)
-            : base(mediatr, context, queueService, logger)
+            : base(mediatr, context, logger)
         {
             _pspService = pspService;
         }
@@ -86,7 +85,7 @@ namespace Sheaft.Application.Handlers
                 switch (request.Kind)
                 {
                     case PspEventKind.PAYIN_NORMAL_FAILED:
-                        await _queueService.ProcessEventAsync(PayinFailedEvent.QUEUE_NAME, new PayinFailedEvent(request.RequestUser) { TransactionId = transaction.Id }, token);
+                        await _mediatr.Post(new PayinFailedEvent(request.RequestUser) { TransactionId = transaction.Id }, token);
                         break;
                     case PspEventKind.PAYIN_NORMAL_SUCCEEDED:
                         return await ConfirmPayinTransactionAsync(transaction, request.RequestUser, token);
@@ -115,10 +114,10 @@ namespace Sheaft.Application.Handlers
                 switch (request.Kind)
                 {
                     case PspEventKind.PAYIN_REFUND_FAILED:
-                        await _queueService.ProcessEventAsync(RefundPayinFailedEvent.QUEUE_NAME, new RefundPayinFailedEvent(request.RequestUser) { TransactionId = transaction.Id }, token);
+                        await _mediatr.Post(new RefundPayinFailedEvent(request.RequestUser) { TransactionId = transaction.Id }, token);
                         break;
                     case PspEventKind.PAYIN_REFUND_SUCCEEDED:
-                        await _queueService.ProcessEventAsync(RefundPayinSucceededEvent.QUEUE_NAME, new RefundPayinSucceededEvent(request.RequestUser) { TransactionId = transaction.Id }, token);
+                        await _mediatr.Post(new RefundPayinSucceededEvent(request.RequestUser) { TransactionId = transaction.Id }, token);
                         break;
                 }
 
@@ -143,17 +142,13 @@ namespace Sheaft.Application.Handlers
                         switch (transaction.Status)
                         {
                             case TransactionStatus.Waiting:
-                                await _queueService.ProcessCommandAsync(
-                                    CheckWaitingPayinTransactionCommand.QUEUE_NAME,
-                                    new CheckWaitingPayinTransactionCommand(request.RequestUser)
+                                await _mediatr.Post(new CheckWaitingPayinTransactionCommand(request.RequestUser)
                                     {
                                         TransactionId = transaction.Id
                                     }, token);
                                 break;
                             case TransactionStatus.Created:
-                                await _queueService.ProcessCommandAsync(
-                                    CheckCreatedPayinTransactionCommand.QUEUE_NAME,
-                                    new CheckCreatedPayinTransactionCommand(request.RequestUser)
+                                await _mediatr.Post(new CheckCreatedPayinTransactionCommand(request.RequestUser)
                                     {
                                         TransactionId = transaction.Id
                                     }, token);
@@ -215,11 +210,11 @@ namespace Sheaft.Application.Handlers
 
         private async Task<Result<bool>> ConfirmPayinTransactionAsync(PayinTransaction transaction, RequestUser requestUser, CancellationToken token)
         {
-            var orderResult = await _mediatr.Send(new ConfirmOrderCommand(requestUser) { Id = transaction.Order.Id }, token);
+            var orderResult = await _mediatr.Process(new ConfirmOrderCommand(requestUser) { Id = transaction.Order.Id }, token);
             if (!orderResult.Success)
                 return Failed<bool>(orderResult.Exception);
 
-            await _queueService.ProcessEventAsync(PayinSucceededEvent.QUEUE_NAME, new PayinSucceededEvent(requestUser) { TransactionId = transaction.Id }, token);
+            await _mediatr.Post(new PayinSucceededEvent(requestUser) { TransactionId = transaction.Id }, token);
             return Ok(true);
         }
 

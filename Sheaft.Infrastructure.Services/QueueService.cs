@@ -29,13 +29,21 @@ namespace Sheaft.Infrastructure.Services
             _serviceBusOptions = serviceBusOptions.Value;
         }
 
-        public async Task ProcessEventAsync<T>(string queueName, T item, CancellationToken token) where T : INotification
+        public async Task ProcessEventAsync<T>(T item, CancellationToken token) where T : INotification
         {
+            var queueName = (string)typeof(T).GetField("QUEUE_NAME").GetRawConstantValue();
+            if (string.IsNullOrWhiteSpace(queueName))
+                throw new ArgumentException("Event must implement public const string QUEUE_NAME; to be queued.");
+
             await InsertIntoQueueAsync(queueName, item, token);
         }
 
-        public async Task ProcessCommandAsync<T>(string queueName, T item, CancellationToken token) where T : IBaseRequest
+        public async Task ProcessCommandAsync<T>(T item, CancellationToken token) where T : IBaseRequest
         {
+            var queueName = (string)typeof(T).GetField("QUEUE_NAME").GetRawConstantValue();
+            if (string.IsNullOrWhiteSpace(queueName))
+                throw new ArgumentException("Event must implement public const string QUEUE_NAME; to be queued.");
+
             await InsertIntoQueueAsync(queueName, item, token);
         }
 

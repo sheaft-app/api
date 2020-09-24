@@ -18,11 +18,10 @@ namespace Sheaft.Application.Handlers
         IRequestHandler<RestoreLevelCommand, Result<bool>>
     {
         public LevelCommandsHandler(
-            IMediator mediatr,
+            ISheaftMediatr mediatr,
             IAppDbContext context,
-            IQueueService queueService,
             ILogger<LevelCommandsHandler> logger)
-            : base(mediatr, context, queueService, logger)
+            : base(mediatr, context, logger)
         {
         }
 

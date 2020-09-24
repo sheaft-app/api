@@ -36,14 +36,13 @@ namespace Sheaft.Application.Handlers
         public ConsumerCommandsHandler(
             IOptionsSnapshot<AuthOptions> authOptions,
             IHttpClientFactory httpClientFactory,
-            IMediator mediatr,
+            ISheaftMediatr mediatr,
             IAppDbContext context,
-            IQueueService queueService,
             IImageService imageService,
             ILogger<ConsumerCommandsHandler> logger,
             IOptionsSnapshot<RoleOptions> roleOptions,
             IDistributedCache cache)
-            : base(mediatr, context, queueService, logger)
+            : base(mediatr, context, logger)
         {
             _imageService = imageService;
             _roleOptions = roleOptions.Value;
@@ -96,8 +95,8 @@ namespace Sheaft.Application.Handlers
                     await _context.AddAsync(new Sponsoring(sponsor, entity), token);
                     await _context.SaveChangesAsync(token);
 
-                    await _queueService.ProcessEventAsync(UserSponsoredEvent.QUEUE_NAME, new UserSponsoredEvent(request.RequestUser) { SponsorId = sponsor.Id, SponsoredId = entity.Id }, token);
-                    await _queueService.ProcessCommandAsync(CreateUserPointsCommand.QUEUE_NAME, new CreateUserPointsCommand(request.RequestUser) { CreatedOn = DateTimeOffset.UtcNow, Kind = PointKind.Sponsoring, UserId = sponsor.Id }, token);
+                    await _mediatr.Post(new UserSponsoredEvent(request.RequestUser) { SponsorId = sponsor.Id, SponsoredId = entity.Id }, token);
+                    await _mediatr.Post(new CreateUserPointsCommand(request.RequestUser) { CreatedOn = DateTimeOffset.UtcNow, Kind = PointKind.Sponsoring, UserId = sponsor.Id }, token);
                 }
 
                 await _cache.RemoveAsync(entity.Id.ToString("N"));

@@ -21,11 +21,10 @@ namespace Sheaft.Application.Handlers
         IRequestHandler<RestoreDeliveryModeCommand, Result<bool>>
     {
         public DeliveryModeCommandsHandler(
-            IMediator mediatr,
+            ISheaftMediatr mediatr,
             IAppDbContext context,
-            IQueueService queueService,
             ILogger<DeliveryModeCommandsHandler> logger)
-            : base(mediatr, context, queueService, logger)
+            : base(mediatr, context, logger)
         {
         }
 

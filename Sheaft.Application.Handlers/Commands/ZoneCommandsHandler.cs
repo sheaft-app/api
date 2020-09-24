@@ -21,12 +21,11 @@ namespace Sheaft.Application.Handlers
         private readonly IBlobService _blobService;
 
         public ZoneCommandsHandler(
-            IMediator mediatr,
+            ISheaftMediatr mediatr,
             IAppDbContext context,
-            IQueueService queueService,
             IBlobService blobService,
             ILogger<ZoneCommandsHandler> logger)
-            : base(mediatr, context, queueService, logger)
+            : base(mediatr, context, logger)
         {
             _blobService = blobService;
         }
@@ -58,7 +57,7 @@ namespace Sheaft.Application.Handlers
 
                         DepartmentPoints pointsPerDepartment = null;// pointsPerDepartments.FirstOrDefault(pp => pp.DepartmentId == departmentId);
 
-                        await _queueService.ProcessCommandAsync(UpdateDepartmentStatsCommand.QUEUE_NAME, new UpdateDepartmentStatsCommand(request.RequestUser) 
+                        await _mediatr.Post(new UpdateDepartmentStatsCommand(request.RequestUser) 
                             {
                                 Id = departmentId,
                                 Points = pointsPerDepartment?.Points ?? 0,
@@ -70,7 +69,7 @@ namespace Sheaft.Application.Handlers
 
                     RegionPoints pointsPerRegion = null;//pointsPerRegions.FirstOrDefault(pp => pp.RegionId == region.Id);
 
-                    await _queueService.ProcessCommandAsync(UpdateRegionStatsCommand.QUEUE_NAME, new UpdateRegionStatsCommand(request.RequestUser)
+                    await _mediatr.Post(new UpdateRegionStatsCommand(request.RequestUser)
                     {
                         Id = region.Id,
                         Points = pointsPerRegion?.Points ?? 0,

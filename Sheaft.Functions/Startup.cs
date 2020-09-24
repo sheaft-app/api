@@ -13,7 +13,6 @@ using Sheaft.Application.Commands;
 using Sheaft.Application.Events;
 using Sheaft.Application.Handlers;
 using Sheaft.Application.Interop;
-using Sheaft.Infrastructure;
 using Sheaft.Application.Mappers;
 using Sheaft.Options;
 using System;
@@ -86,6 +85,7 @@ namespace Sheaft.Functions
             builder.Services.AddScoped<IImageService, ImageService>();
             builder.Services.AddScoped<IPspService, PspService>();
             builder.Services.AddScoped<IFeesService, FeesService>();
+            builder.Services.AddScoped<ISheaftMediatr, SheaftMediatr>();
 
             builder.Services.AddScoped<IDapperContext, DapperContext>();
 

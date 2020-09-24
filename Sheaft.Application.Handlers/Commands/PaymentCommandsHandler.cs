@@ -16,12 +16,11 @@ namespace Sheaft.Application.Handlers
         private readonly IPspService _pspService;
 
         public PaymentCommandsHandler(
-            IMediator mediatr,
+            ISheaftMediatr mediatr,
             IAppDbContext context,
-            IQueueService queueService,
             IPspService pspService,
             ILogger<PaymentCommandsHandler> logger)
-            : base(mediatr, context, queueService, logger)
+            : base(mediatr, context, logger)
         {
             _pspService = pspService;
         }

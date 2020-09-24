@@ -1,57 +1,46 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
-using MediatR;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
 using Sheaft.Application.Commands;
 using Sheaft.Application.Events;
-using Sheaft.Core.Extensions;
+using Sheaft.Application.Interop;
 
 namespace Sheaft.Functions
 {
     public class DeclarationFunctions
     {
-        private readonly IMediator _mediatr;
+        private readonly ISheaftMediatr _mediatr;
 
-        public DeclarationFunctions(IMediator mediator)
+        public DeclarationFunctions(ISheaftMediatr mediator)
         {
             _mediatr = mediator;
         }
 
         [FunctionName("SetDeclarationStatusCommand")]
-        public async Task SetDeclarationStatusCommandAsync([ServiceBusTrigger(SetDeclarationStatusCommand.QUEUE_NAME, Connection = "AzureWebJobsServiceBus")] string message, ILogger logger, CancellationToken token)
+        public async Task SetDeclarationStatusCommandAsync([ServiceBusTrigger(SetDeclarationStatusCommand.QUEUE_NAME, Connection = "AzureWebJobsServiceBus")] string message, CancellationToken token)
         {
-            var command = JsonConvert.DeserializeObject<SetDeclarationStatusCommand>(message);
-            var results = await _mediatr.Send(command, token);
-            logger.LogCommand(results);
-
+            var results = await _mediatr.Process<SetDeclarationStatusCommand, bool>(message, token);
             if (!results.Success)
                 throw results.Exception;
         }
 
         [FunctionName("DeclarationIncompleteEvent")]
-        public async Task DeclarationIncompleteEventAsync([ServiceBusTrigger(DeclarationIncompleteEvent.QUEUE_NAME, Connection = "AzureWebJobsServiceBus")] string message, ILogger logger, CancellationToken token)
+        public async Task DeclarationIncompleteEventAsync([ServiceBusTrigger(DeclarationIncompleteEvent.QUEUE_NAME, Connection = "AzureWebJobsServiceBus")] string message, CancellationToken token)
         {
-            var appEvent = JsonConvert.DeserializeObject<DeclarationIncompleteEvent>(message);
-            await _mediatr.Publish(appEvent, token);
-            logger.LogInformation(appEvent.DeclarationId.ToString("N"));
+            await _mediatr.Process<DeclarationIncompleteEvent>(message, token);
         }
 
         [FunctionName("DeclarationRefusedEvent")]
-        public async Task DeclarationRefusedEventAsync([ServiceBusTrigger(DeclarationRefusedEvent.QUEUE_NAME, Connection = "AzureWebJobsServiceBus")] string message, ILogger logger, CancellationToken token)
+        public async Task DeclarationRefusedEventAsync([ServiceBusTrigger(DeclarationRefusedEvent.QUEUE_NAME, Connection = "AzureWebJobsServiceBus")] string message, CancellationToken token)
         {
-            var appEvent = JsonConvert.DeserializeObject<DeclarationRefusedEvent>(message);
-            await _mediatr.Publish(appEvent, token);
-            logger.LogInformation(appEvent.DeclarationId.ToString("N"));
+            await _mediatr.Process<DeclarationRefusedEvent>(message, token);
         }
 
         [FunctionName("DeclarationValidatedEvent")]
-        public async Task DeclarationValidatedEventAsync([ServiceBusTrigger(DeclarationValidatedEvent.QUEUE_NAME, Connection = "AzureWebJobsServiceBus")] string message, ILogger logger, CancellationToken token)
+        public async Task DeclarationValidatedEventAsync([ServiceBusTrigger(DeclarationValidatedEvent.QUEUE_NAME, Connection = "AzureWebJobsServiceBus")] string message, CancellationToken token)
         {
-            var appEvent = JsonConvert.DeserializeObject<DeclarationValidatedEvent>(message);
-            await _mediatr.Publish(appEvent, token);
-            logger.LogInformation(appEvent.DeclarationId.ToString("N"));
+            await _mediatr.Process<DeclarationValidatedEvent>(message, token);
         }
     }
 }
