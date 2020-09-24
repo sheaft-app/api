@@ -419,7 +419,7 @@ namespace Sheaft.GraphQL.Types
                 .Name("searchBusinessWithSiret")
                 .Authorize(Policies.UNREGISTERED)
                 .Argument("input", c => c.Type<NonNullType<StringType>>())
-                .Type<NonNullType<SirenBusinessType>>();
+                .Type<SirenBusinessType>();
 
             descriptor.Field(c => c.SearchProducersAsync(default, default))
                 .Name("searchProducers")
