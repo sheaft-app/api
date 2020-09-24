@@ -63,16 +63,7 @@ namespace Sheaft.Application.Handlers
                     return Conflict<Guid>(MessageKind.Register_User_AlreadyExists);
 
                 entity = new Consumer(request.Id, request.Email, request.FirstName, request.LastName, request.Phone);
-
-                if (request.DepartmentId.HasValue)
-                {
-                    var department = await _context.Departments.SingleOrDefaultAsync(d => d.Id == request.DepartmentId, token);
-                    entity.SetAddress(new UserAddress(department));
-                }
-
-                if (request.Anonymous.HasValue)
-                    entity.SetAnonymous(request.Anonymous.Value);
-
+                
                 var resultImage = await _imageService.HandleUserImageAsync(request.Id, request.Picture, token);
                 if (!resultImage.Success)
                     return Failed<Guid>(resultImage.Exception);
@@ -115,20 +106,11 @@ namespace Sheaft.Application.Handlers
                 entity.SetFirstname(request.FirstName);
                 entity.SetLastname(request.LastName);
 
-                if (request.Anonymous.HasValue)
-                    entity.SetAnonymous(request.Anonymous.Value);
-
                 var resultImage = await _imageService.HandleUserImageAsync(request.Id, request.Picture, token);
                 if (!resultImage.Success)
                     return Failed<bool>(resultImage.Exception);
 
                 entity.SetPicture(resultImage.Data);
-
-                if (request.DepartmentId.HasValue)
-                {
-                    var department = await _context.Departments.SingleOrDefaultAsync(d => d.Id == request.DepartmentId, token);
-                    entity.SetAddress(new UserAddress(department));
-                }
 
                 var oidcResult = await UpdateOidcUserAsync(entity, new List<Guid> { _roleOptions.Consumer.Id }, token);
                 if (!oidcResult.Success)
