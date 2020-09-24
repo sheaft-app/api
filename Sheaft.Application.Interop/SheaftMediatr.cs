@@ -1,7 +1,7 @@
-﻿using System.Text.Json;
-using System.Threading;
+﻿using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
+using Newtonsoft.Json;
 using Sheaft.Core;
 using Sheaft.Domain.Models;
 
@@ -47,13 +47,13 @@ namespace Sheaft.Application.Interop
 
         public async Task<Result<U>> Process<T, U>(string data, CancellationToken token) where T : IRequest<Result<U>>
         {
-            var command = JsonSerializer.Deserialize<T>(data);
+            var command = JsonConvert.DeserializeObject<T>(data);
             return await Process(command, token);
         }
 
         public async Task Process<T>(string data, CancellationToken token) where T : INotification
         {
-            var command = JsonSerializer.Deserialize<T>(data);
+            var command = JsonConvert.DeserializeObject<T>(data);
             await Process(command, token);
         }
     }
