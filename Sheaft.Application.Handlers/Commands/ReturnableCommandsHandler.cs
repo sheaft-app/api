@@ -18,13 +18,13 @@ namespace Sheaft.Application.Handlers
         IRequestHandler<DeleteReturnableCommand, Result<bool>>,
         IRequestHandler<RestoreReturnableCommand, Result<bool>>
     {
-        private readonly IAppDbContext _context;
-
         public ReturnableCommandsHandler(
+            IMediator mediatr,
             IAppDbContext context,
-            ILogger<ReturnableCommandsHandler> logger) : base(logger)
+            IQueueService queueService,
+            ILogger<ReturnableCommandsHandler> logger)
+            : base(mediatr, context, queueService, logger)
         {
-            _context = context;
         }
 
         public async Task<Result<Guid>> Handle(CreateReturnableCommand request, CancellationToken token)

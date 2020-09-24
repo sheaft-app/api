@@ -24,21 +24,16 @@ namespace Sheaft.Application.Handlers
         IRequestHandler<PayOrderCommand, Result<Guid>>,
         IRequestHandler<ConfirmOrderCommand, Result<IEnumerable<Guid>>>
     {
-        private readonly IAppDbContext _context;
-        private readonly IMediator _mediatr;
-        private readonly IQueueService _queuesService;
         private readonly PspOptions _pspOptions;
 
         public OrderCommandsHandler(
             IAppDbContext context,
             IMediator mediatr,
-            IQueueService queuesService,
+            IQueueService queueService,
             IOptionsSnapshot<PspOptions> pspOptions,
-            ILogger<OrderCommandsHandler> logger) : base(logger)
+            ILogger<OrderCommandsHandler> logger)
+            : base(mediatr, context, queueService, logger)
         {
-            _context = context;
-            _mediatr = mediatr;
-            _queuesService = queuesService;
             _pspOptions = pspOptions.Value;
         }
 
@@ -126,9 +121,9 @@ namespace Sheaft.Application.Handlers
                     await transaction.CommitAsync(token);
 
                     foreach (var orderId in orderIds)
-                        await _queuesService.ProcessEventAsync(PurchaseOrderCreatedEvent.QUEUE_NAME, new PurchaseOrderCreatedEvent(request.RequestUser) { Id = orderId }, token);
+                        await _queueService.ProcessEventAsync(PurchaseOrderCreatedEvent.QUEUE_NAME, new PurchaseOrderCreatedEvent(request.RequestUser) { Id = orderId }, token);
 
-                    await _queuesService.ProcessCommandAsync(CreateUserPointsCommand.QUEUE_NAME, new CreateUserPointsCommand(request.RequestUser) { CreatedOn = DateTimeOffset.UtcNow, Kind = PointKind.PurchaseOrder, UserId = request.RequestUser.Id }, token);
+                    await _queueService.ProcessCommandAsync(CreateUserPointsCommand.QUEUE_NAME, new CreateUserPointsCommand(request.RequestUser) { CreatedOn = DateTimeOffset.UtcNow, Kind = PointKind.PurchaseOrder, UserId = request.RequestUser.Id }, token);
 
                     await transaction.CommitAsync(token);
                     return Ok(orderIds.AsEnumerable());
@@ -232,9 +227,9 @@ namespace Sheaft.Application.Handlers
                     await transaction.CommitAsync(token);
 
                     foreach (var orderId in orderIds)
-                        await _queuesService.ProcessEventAsync(PurchaseOrderCreatedEvent.QUEUE_NAME, new PurchaseOrderCreatedEvent(request.RequestUser) { Id = orderId }, token);
+                        await _queueService.ProcessEventAsync(PurchaseOrderCreatedEvent.QUEUE_NAME, new PurchaseOrderCreatedEvent(request.RequestUser) { Id = orderId }, token);
 
-                    await _queuesService.ProcessCommandAsync(CreateUserPointsCommand.QUEUE_NAME, new CreateUserPointsCommand(request.RequestUser) { CreatedOn = DateTimeOffset.UtcNow, Kind = PointKind.PurchaseOrder, UserId = request.RequestUser.Id }, token);
+                    await _queueService.ProcessCommandAsync(CreateUserPointsCommand.QUEUE_NAME, new CreateUserPointsCommand(request.RequestUser) { CreatedOn = DateTimeOffset.UtcNow, Kind = PointKind.PurchaseOrder, UserId = request.RequestUser.Id }, token);
 
                     return Ok(orderIds.AsEnumerable());
                 }

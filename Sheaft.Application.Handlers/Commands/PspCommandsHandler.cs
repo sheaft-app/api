@@ -13,13 +13,13 @@ namespace Sheaft.Application.Handlers
            IRequestHandler<EnsureStoreConfiguredCommand, Result<bool>>,
            IRequestHandler<EnsureConsumerConfiguredCommand, Result<bool>>
     {
-        private readonly IMediator _mediatr;
-
         public PspCommandsHandler(
             IMediator mediatr,
-            ILogger<LegalCommandsHandler> logger) : base(logger)
+            IAppDbContext context,
+            IQueueService queueService,
+            ILogger<LegalCommandsHandler> logger)
+            : base(mediatr, context, queueService, logger)
         {
-            _mediatr = mediatr;
         }
 
         public async Task<Result<bool>> Handle(EnsureProducerConfiguredCommand request, CancellationToken token)

@@ -16,13 +16,13 @@ namespace Sheaft.Application.Handlers
         IRequestHandler<UpdateRegionCommand, Result<bool>>,
         IRequestHandler<UpdateRegionStatsCommand, Result<bool>>
     {
-        private readonly IAppDbContext _context;
-
         public RegionCommandsHandler(
+            IMediator mediatr,
             IAppDbContext context,
-            ILogger<RegionCommandsHandler> logger) : base(logger)
+            IQueueService queueService,
+            ILogger<RegionCommandsHandler> logger)
+            : base(mediatr, context, queueService, logger)
         {
-            _context = context;
         }
 
         public async Task<Result<bool>> Handle(UpdateRegionCommand request, CancellationToken token)

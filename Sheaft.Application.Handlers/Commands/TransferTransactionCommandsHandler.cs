@@ -22,22 +22,17 @@ namespace Sheaft.Application.Handlers
         IRequestHandler<CheckWaitingTransferTransactionCommand, Result<bool>>,
         IRequestHandler<CheckCreatedTransferTransactionCommand, Result<bool>>
     {
-        private readonly IAppDbContext _context;
         private readonly IPspService _pspService;
-        private readonly IMediator _mediatr;
-        private readonly IQueueService _queueService;
 
         public TransferTransactionCommandsHandler(
             IAppDbContext context,
             IPspService pspService,
             IMediator mediatr,
             IQueueService queueService,
-            ILogger<TransferTransactionCommandsHandler> logger) : base(logger)
+            ILogger<TransferTransactionCommandsHandler> logger)
+            : base(mediatr, context, queueService, logger)
         {
-            _queueService = queueService;
-            _context = context;
             _pspService = pspService;
-            _mediatr = mediatr;
         }
 
         public async Task<Result<Guid>> Handle(CreateTransferTransactionCommand request, CancellationToken token)

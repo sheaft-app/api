@@ -15,7 +15,7 @@ using System.Threading.Tasks;
 
 namespace Sheaft.Infrastructure.Services
 {
-    public class IdentifierService : ResultsHandler, IIdentifierService
+    public class IdentifierService : BaseService, IIdentifierService
     {
         private readonly CloudTableClient _tableClient;
         private readonly StorageOptions _storageOptions;

@@ -14,6 +14,7 @@ using Sheaft.Options;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Logging;
 using Sheaft.Exceptions;
+using Sheaft.Application.Interop;
 
 namespace Sheaft.Application.Handlers
 {
@@ -24,9 +25,13 @@ namespace Sheaft.Application.Handlers
         private readonly HttpClient _httpClient;
 
         public ContactCommandsHandler(
-            IOptionsSnapshot<SendgridOptions> sendgridOptions, 
+            IOptionsSnapshot<SendgridOptions> sendgridOptions,
+            IMediator mediatr,
+            IAppDbContext context,
+            IQueueService queueService,
             IHttpClientFactory httpClientFactory,
-            ILogger<ContactCommandsHandler> logger) : base(logger)
+            ILogger<ContactCommandsHandler> logger)
+            : base(mediatr, context, queueService, logger)
         {
             _sendgridOptions = sendgridOptions.Value;
 

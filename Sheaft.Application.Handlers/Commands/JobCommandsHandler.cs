@@ -33,19 +33,16 @@ namespace Sheaft.Application.Handlers
         IRequestHandler<RestoreJobCommand, Result<bool>>,
         IRequestHandler<UpdateJobCommand, Result<bool>>
     {
-        private readonly IAppDbContext _context;
-        private readonly IMediator _mediatr;
         private readonly IQueueService _queuesService;
 
         public JobCommandsHandler(
             IMediator mediatr, 
             IAppDbContext context,
             IQueueService queueService,
-            ILogger<JobCommandsHandler> logger) : base(logger)
+            ILogger<JobCommandsHandler> logger)
+            : base(mediatr, context, queueService, logger)
         {
             _queuesService = queueService;
-            _context = context;
-            _mediatr = mediatr;
         }
 
         public async Task<Result<bool>> Handle(CancelJobsCommand request,

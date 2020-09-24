@@ -18,21 +18,16 @@ namespace Sheaft.Application.Handlers
            IRequestHandler<SetDeclarationStatusCommand, Result<bool>>,
            IRequestHandler<EnsureDeclarationConfiguredCommand, Result<bool>>
     {
-        private readonly IMediator _mediatr;
-        private readonly IAppDbContext _context;
         private readonly IPspService _pspService;
-        private readonly IQueueService _queueService;
 
         public DeclarationCommandsHandler(
             IMediator mediatr,
             IAppDbContext context,
             IPspService pspService,
             IQueueService queueService,
-            ILogger<DeclarationCommandsHandler> logger) : base(logger)
+            ILogger<DeclarationCommandsHandler> logger)
+            : base(mediatr, context, queueService, logger)
         {
-            _mediatr = mediatr;
-            _queueService = queueService;
-            _context = context;
             _pspService = pspService;
         }
 

@@ -17,16 +17,17 @@ namespace Sheaft.Application.Handlers
         IRequestHandler<CreateUserNotificationCommand, Result<Guid>>,
         IRequestHandler<CreateGroupNotificationCommand, Result<Guid>>
     {
-        private readonly IAppDbContext _context;
         private readonly IDapperContext _dapperContext;
 
         public NotificationCommandsHandler(
-            IDapperContext dapperContext, 
+            IDapperContext dapperContext,
+            IMediator mediatr,
             IAppDbContext context,
-            ILogger<NotificationCommandsHandler> logger) : base(logger)
+            IQueueService queueService,
+            ILogger<NotificationCommandsHandler> logger)
+            : base(mediatr, context, queueService, logger)
         {
             _dapperContext = dapperContext;
-            _context = context;
         }
 
         public async Task<Result<bool>> Handle(MarkUserNotificationsAsReadCommand request, CancellationToken token)

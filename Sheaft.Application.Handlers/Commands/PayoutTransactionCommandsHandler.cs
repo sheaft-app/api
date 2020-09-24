@@ -27,22 +27,17 @@ namespace Sheaft.Application.Handlers
         IRequestHandler<CreatePayoutForTransfersCommand, Result<bool>>
     {
         private readonly PspOptions _pspOptions;
-        private readonly IAppDbContext _context;
         private readonly IPspService _pspService;
-        private readonly IQueueService _queueService;
-        private readonly IMediator _mediatr;
 
         public PayoutTransactionCommandsHandler(
             IMediator mediatr,
             IAppDbContext context,
-            IPspService pspService,
             IQueueService queueService,
+            IPspService pspService,
             IOptionsSnapshot<PspOptions> pspOptions,
-            ILogger<PayoutTransactionCommandsHandler> logger) : base(logger)
+            ILogger<PayoutTransactionCommandsHandler> logger)
+            : base(mediatr, context, queueService, logger)
         {
-            _mediatr = mediatr;
-            _queueService = queueService;
-            _context = context;
             _pspService = pspService;
             _pspOptions = pspOptions.Value;
         }

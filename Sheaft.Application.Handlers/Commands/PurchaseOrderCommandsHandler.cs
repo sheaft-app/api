@@ -37,22 +37,17 @@ namespace Sheaft.Application.Handlers
         IRequestHandler<CreatePurchaseOrderTransfersCommand, Result<bool>>,
         IRequestHandler<CreatePurchaseOrderTransferCommand, Result<bool>>
     {
-        private readonly IAppDbContext _context;
-        private readonly IMediator _mediatr;
         private readonly IIdentifierService _identifierService;
-        private readonly IQueueService _queueService;
 
         public PurchaseOrderCommandsHandler(
             IAppDbContext context,
             IIdentifierService identifierService,
             IMediator mediatr,
-            IQueueService queuesService,
-            ILogger<PurchaseOrderCommandsHandler> logger) : base(logger)
+            IQueueService queueService,
+            ILogger<PurchaseOrderCommandsHandler> logger)
+            : base(mediatr, context, queueService, logger)
         {
-            _context = context;
-            _mediatr = mediatr;
             _identifierService = identifierService;
-            _queueService = queuesService;
         }
 
         public async Task<Result<Guid>> Handle(CreatePurchaseOrderCommand request, CancellationToken token)

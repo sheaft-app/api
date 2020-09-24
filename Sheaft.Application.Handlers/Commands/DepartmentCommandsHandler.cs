@@ -15,13 +15,13 @@ namespace Sheaft.Application.Handlers
         IRequestHandler<UpdateDepartmentCommand, Result<bool>>,
         IRequestHandler<UpdateDepartmentStatsCommand, Result<bool>>
     {
-        private readonly IAppDbContext _context;
-
         public DepartmentCommandsHandler(
+            IMediator mediatr,
             IAppDbContext context,
-            ILogger<DepartmentCommandsHandler> logger) : base(logger)
+            IQueueService queueService,
+            ILogger<DepartmentCommandsHandler> logger)
+            : base(mediatr, context, queueService, logger)
         {
-            _context = context;
         }
 
         public async Task<Result<bool>> Handle(UpdateDepartmentCommand request, CancellationToken token)

@@ -32,10 +32,7 @@ namespace Sheaft.Application.Handlers
         IRequestHandler<UpdateProductPictureCommand, Result<bool>>,
         IRequestHandler<RestoreProductCommand, Result<bool>>
     {
-        private readonly IAppDbContext _context;
-        private readonly IMediator _mediatr;
         private readonly IIdentifierService _identifierService;
-        private readonly IQueueService _queuesService;
         private readonly IBlobService _blobService;
         private readonly IImageService _imageService;
 
@@ -43,15 +40,13 @@ namespace Sheaft.Application.Handlers
             IMediator mediatr,
             IAppDbContext context,
             IIdentifierService identifierService,
-            IQueueService queuesService,
+            IQueueService queueService,
             IBlobService blobService,
             IImageService imageService,
-            ILogger<ProductCommandsHandler> logger) : base(logger)
+            ILogger<ProductCommandsHandler> logger)
+            : base(mediatr, context, queueService, logger)
         {
-            _context = context;
-            _mediatr = mediatr;
             _identifierService = identifierService;
-            _queuesService = queuesService;
             _blobService = blobService;
             _imageService = imageService;
         }
@@ -100,7 +95,7 @@ namespace Sheaft.Application.Handlers
                 await _context.AddAsync(entity, token);
                 await _context.SaveChangesAsync(token);
 
-                Logger.LogInformation($"Product {entity.Id} successfully created by {request.RequestUser.Id}");
+                _logger.LogInformation($"Product {entity.Id} successfully created by {request.RequestUser.Id}");
                 return Created(entity.Id);
             });
         }
@@ -144,7 +139,7 @@ namespace Sheaft.Application.Handlers
                 _context.Update(entity);
                 var result = await _context.SaveChangesAsync(token);
 
-                Logger.LogInformation($"Product {entity.Id} successfully edited by {request.RequestUser.Id}");
+                _logger.LogInformation($"Product {entity.Id} successfully edited by {request.RequestUser.Id}");
                 return Ok(result > 0);
             });
         }
@@ -161,9 +156,9 @@ namespace Sheaft.Application.Handlers
 
                 var result = await _context.SaveChangesAsync(token);
 
-                await _queuesService.ProcessCommandAsync(CreateUserPointsCommand.QUEUE_NAME, new CreateUserPointsCommand(request.RequestUser) { CreatedOn = DateTimeOffset.UtcNow, Kind = PointKind.RateProduct, UserId = request.RequestUser.Id }, token);
+                await _queueService.ProcessCommandAsync(CreateUserPointsCommand.QUEUE_NAME, new CreateUserPointsCommand(request.RequestUser) { CreatedOn = DateTimeOffset.UtcNow, Kind = PointKind.RateProduct, UserId = request.RequestUser.Id }, token);
 
-                Logger.LogInformation($"Product {entity.Id} successfully rated by {request.RequestUser.Id}");
+                _logger.LogInformation($"Product {entity.Id} successfully rated by {request.RequestUser.Id}");
                 return Ok(result > 0);
             });
         }
@@ -197,7 +192,7 @@ namespace Sheaft.Application.Handlers
                 _context.Update(entity);
                 var result = await _context.SaveChangesAsync(token);
 
-                Logger.LogInformation($"Product {entity.Id} successfully switched as available {request.Available} by {request.RequestUser.Id}");
+                _logger.LogInformation($"Product {entity.Id} successfully switched as available {request.Available} by {request.RequestUser.Id}");
                 return Ok(result > 0);
             });
         }
@@ -230,7 +225,7 @@ namespace Sheaft.Application.Handlers
 
                 var result = await _context.SaveChangesAsync(token);
 
-                Logger.LogInformation($"Product {entity.Id} successfully deleted by {request.RequestUser.Id}");
+                _logger.LogInformation($"Product {entity.Id} successfully deleted by {request.RequestUser.Id}");
                 return Ok(result > 0);
             });
         }
@@ -251,8 +246,8 @@ namespace Sheaft.Application.Handlers
                 await _context.AddAsync(entity, token);
                 await _context.SaveChangesAsync(token);
 
-                await _queuesService.InsertJobToProcessAsync(entity, token);
-                Logger.LogInformation($"Import products {entity.Id} successfully created by {request.RequestUser.Id}");
+                await _queueService.InsertJobToProcessAsync(entity, token);
+                _logger.LogInformation($"Import products {entity.Id} successfully created by {request.RequestUser.Id}");
 
                 return Created(entity.Id);
             });
@@ -271,7 +266,7 @@ namespace Sheaft.Application.Handlers
                     if (!startResult.Success)
                         throw startResult.Exception;
 
-                    await _queuesService.ProcessEventAsync(ProductImportProcessingEvent.QUEUE_NAME, new ProductImportProcessingEvent(request.RequestUser) { Id = job.Id }, token);
+                    await _queueService.ProcessEventAsync(ProductImportProcessingEvent.QUEUE_NAME, new ProductImportProcessingEvent(request.RequestUser) { Id = job.Id }, token);
 
                     using (var stream = new MemoryStream())
                     {
@@ -311,14 +306,14 @@ namespace Sheaft.Application.Handlers
                     if (!result.Success)
                         throw result.Exception;
 
-                    await _queuesService.ProcessEventAsync(ProductImportSucceededEvent.QUEUE_NAME, new ProductImportSucceededEvent(request.RequestUser) { Id = job.Id }, token);
-                    
-                    Logger.LogInformation($"Products import Job {job.Id} successfully processed");
+                    await _queueService.ProcessEventAsync(ProductImportSucceededEvent.QUEUE_NAME, new ProductImportSucceededEvent(request.RequestUser) { Id = job.Id }, token);
+
+                    _logger.LogInformation($"Products import Job {job.Id} successfully processed");
                     return result;
                 }
                 catch (Exception e)
                 {
-                    await _queuesService.ProcessEventAsync(ProductImportFailedEvent.QUEUE_NAME, new ProductImportFailedEvent(request.RequestUser) { Id = job.Id }, token);
+                    await _queueService.ProcessEventAsync(ProductImportFailedEvent.QUEUE_NAME, new ProductImportFailedEvent(request.RequestUser) { Id = job.Id }, token);
                     return await _mediatr.Send(new FailJobCommand(request.RequestUser) { Id = job.Id, Reason = e.Message }, token);
                 }
             });
@@ -339,7 +334,7 @@ namespace Sheaft.Application.Handlers
                 _context.Update(entity);
                 var result = await _context.SaveChangesAsync(token);
 
-                Logger.LogInformation($"Product {entity.Id} image, successfully updated by {request.RequestUser.Id}");
+                _logger.LogInformation($"Product {entity.Id} image, successfully updated by {request.RequestUser.Id}");
                 return Ok(result > 0);
             });
         }
@@ -353,7 +348,7 @@ namespace Sheaft.Application.Handlers
                 _context.Restore(entity);
                 var result = await _context.SaveChangesAsync(token);
 
-                Logger.LogInformation($"Product {entity.Id} successfully restored by {request.RequestUser.Id}");
+                _logger.LogInformation($"Product {entity.Id} successfully restored by {request.RequestUser.Id}");
                 return Ok(result > 0);
             });
         }

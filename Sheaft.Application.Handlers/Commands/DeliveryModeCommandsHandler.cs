@@ -20,13 +20,13 @@ namespace Sheaft.Application.Handlers
         IRequestHandler<DeleteDeliveryModeCommand, Result<bool>>,
         IRequestHandler<RestoreDeliveryModeCommand, Result<bool>>
     {
-        private readonly IAppDbContext _context;
-
         public DeliveryModeCommandsHandler(
-            IAppDbContext context, 
-            ILogger<DeliveryModeCommandsHandler> logger) : base(logger)
+            IMediator mediatr,
+            IAppDbContext context,
+            IQueueService queueService,
+            ILogger<DeliveryModeCommandsHandler> logger)
+            : base(mediatr, context, queueService, logger)
         {
-            _context = context;
         }
 
         public async Task<Result<Guid>> Handle(CreateDeliveryModeCommand request, CancellationToken token)

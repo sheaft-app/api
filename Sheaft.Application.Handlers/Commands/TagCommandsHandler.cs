@@ -26,22 +26,23 @@ namespace Sheaft.Application.Handlers
         IRequestHandler<DeleteTagCommand, Result<bool>>,
         IRequestHandler<RestoreTagCommand, Result<bool>>
     {
-        private readonly IAppDbContext _context;
         private readonly IBlobService _blobsService;
         private readonly StorageOptions _storageOptions;
         private readonly HttpClient _httpClient;
 
         public TagCommandsHandler(
+            IMediator mediatr,
             IAppDbContext context,
+            IQueueService queueService,
+            IBlobService blobsService,
             IOptionsSnapshot<StorageOptions> storageOptions,
             IHttpClientFactory httpClientFactory,
-            IBlobService blobsService,
-            ILogger<TagCommandsHandler> logger) : base(logger)
+            ILogger<TagCommandsHandler> logger)
+            : base(mediatr, context, queueService, logger)
         {
             _blobsService = blobsService;
             _httpClient = httpClientFactory.CreateClient("picture");
             _storageOptions = storageOptions.Value;
-            _context = context;
         }
 
         public async Task<Result<Guid>> Handle(CreateTagCommand request, CancellationToken token)

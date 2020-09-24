@@ -11,10 +11,12 @@ using Microsoft.Extensions.Logging;
 using Sheaft.Core;
 using Azure.Storage.Blobs.Models;
 using Sheaft.Application.Interop;
+using Sheaft.Exceptions;
+using System.Collections.Generic;
 
 namespace Sheaft.Infrastructure.Services
 {
-    public class BlobService : ResultsHandler, IBlobService
+    public class BlobService : BaseService, IBlobService
     {
         private readonly StorageOptions _storageOptions;
 

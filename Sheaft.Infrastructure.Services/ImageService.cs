@@ -22,7 +22,7 @@ using System.Threading.Tasks;
 
 namespace Sheaft.Infrastructure.Services
 {
-    public class ImageService : ResultsHandler, IImageService
+    public class ImageService : BaseService, IImageService
     {
         private readonly HttpClient _httpClient;
         private readonly StorageOptions _storageOptions;

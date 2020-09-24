@@ -27,8 +27,6 @@ namespace Sheaft.Application.Handlers
         IRequestHandler<RegisterConsumerCommand, Result<Guid>>,
         IRequestHandler<UpdateConsumerCommand, Result<bool>>
     {
-        private readonly IAppDbContext _context;
-        private readonly IQueueService _queueService;
         private readonly IImageService _imageService;
         private readonly HttpClient _httpClient;
         private readonly RoleOptions _roleOptions;
@@ -38,18 +36,18 @@ namespace Sheaft.Application.Handlers
         public ConsumerCommandsHandler(
             IOptionsSnapshot<AuthOptions> authOptions,
             IHttpClientFactory httpClientFactory,
+            IMediator mediatr,
             IAppDbContext context,
             IQueueService queueService,
             IImageService imageService,
             ILogger<ConsumerCommandsHandler> logger,
             IOptionsSnapshot<RoleOptions> roleOptions,
-            IDistributedCache cache) : base(logger)
+            IDistributedCache cache)
+            : base(mediatr, context, queueService, logger)
         {
             _imageService = imageService;
             _roleOptions = roleOptions.Value;
             _authOptions = authOptions.Value;
-            _context = context;
-            _queueService = queueService;
 
             _httpClient = httpClientFactory.CreateClient("identityServer");
             _httpClient.BaseAddress = new Uri(_authOptions.Url);

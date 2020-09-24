@@ -17,18 +17,16 @@ namespace Sheaft.Application.Handlers
            IRequestHandler<CreateReturnablesWalletCommand, Result<Guid>>,
            IRequestHandler<EnsurePaymentsWalletConfiguredCommand, Result<bool>>
     {
-        private readonly IMediator _mediatr;
-        private readonly IAppDbContext _context;
         private readonly IPspService _pspService;
 
         public WalletCommandsHandler(
             IMediator mediatr,
             IAppDbContext context,
+            IQueueService queueService,
             IPspService pspService,
-            ILogger<WalletCommandsHandler> logger) : base(logger)
+            ILogger<WalletCommandsHandler> logger)
+            : base(mediatr, context, queueService, logger)
         {
-            _mediatr = mediatr;
-            _context = context;
             _pspService = pspService;
         }
 

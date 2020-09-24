@@ -35,10 +35,7 @@ namespace Sheaft.Application.Handlers
             IRequestHandler<DeleteUserCommand, Result<bool>>,
             IRequestHandler<RemoveUserDataCommand, Result<string>>
     {
-        private readonly IAppDbContext _context;
-        private readonly IMediator _mediatr;
         private readonly IIdentifierService _identifierService;
-        private readonly IQueueService _queueService;
         private readonly IBlobService _blobService;
         private readonly IImageService _imageService;
         private readonly ScoringOptions _scoringOptions;
@@ -61,17 +58,15 @@ namespace Sheaft.Application.Handlers
             IImageService imageService,
             ILogger<UserCommandsHandler> logger,
             IOptionsSnapshot<RoleOptions> roleOptions,
-            IDistributedCache cache) : base(logger)
+            IDistributedCache cache)
+            : base(mediatr, context, queueService, logger)
         {
             _imageService = imageService;
             _roleOptions = roleOptions.Value;
             _authOptions = authOptions.Value;
             _scoringOptions = scoringOptions.Value;
             _storageOptions = storageOptions.Value;
-            _context = context;
-            _mediatr = mediatr;
             _identifierService = identifierService;
-            _queueService = queueService;
             _blobService = blobService;
 
             _httpClient = httpClientFactory.CreateClient("identityServer");
@@ -211,7 +206,7 @@ namespace Sheaft.Application.Handlers
                 await _context.SaveChangesAsync(token);
 
                 await _queueService.InsertJobToProcessAsync(entity, token);
-                Logger.LogInformation($"User RGPD data export successfully initiated by {request.RequestUser.Id}");
+                _logger.LogInformation($"User RGPD data export successfully initiated by {request.RequestUser.Id}");
 
                 return Ok(entity.Id);
             });
@@ -245,7 +240,7 @@ namespace Sheaft.Application.Handlers
 
                         await _queueService.ProcessEventAsync(ExportUserDataSucceededEvent.QUEUE_NAME, new ExportUserDataSucceededEvent(request.RequestUser) { Id = job.Id, JobId = job.Id }, token);
 
-                        Logger.LogInformation($"RGPD data for user {request.RequestUser.Id} successfully exported");
+                        _logger.LogInformation($"RGPD data for user {request.RequestUser.Id} successfully exported");
                         return await _mediatr.Send(new CompleteJobCommand(request.RequestUser) { Id = job.Id, FileUrl = response.Data });
                     }
                 }

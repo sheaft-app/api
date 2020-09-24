@@ -17,13 +17,13 @@ namespace Sheaft.Application.Handlers
         IRequestHandler<DeleteRewardCommand, Result<bool>>,
         IRequestHandler<RestoreRewardCommand, Result<bool>>
     {
-        private readonly IAppDbContext _context;
-
         public RewardCommandsHandler(
+            IMediator mediatr,
             IAppDbContext context,
-            ILogger<RewardCommandsHandler> logger) : base(logger)
+            IQueueService queueService,
+            ILogger<RewardCommandsHandler> logger)
+            : base(mediatr, context, queueService, logger)
         {
-            _context = context;
         }
 
         public async Task<Result<Guid>> Handle(CreateRewardCommand request, CancellationToken token)

@@ -30,9 +30,6 @@ namespace Sheaft.Application.Handlers
         IRequestHandler<UpdateProducerCommand, Result<bool>>,
         IRequestHandler<UpdateStoreCommand, Result<bool>>
     {
-        private readonly IMediator _mediatr;
-        private readonly IAppDbContext _context;
-        private readonly IQueueService _queueService;
         private readonly IImageService _imageService;
         private readonly RoleOptions _roleOptions;
         private readonly HttpClient _httpClient;
@@ -48,15 +45,13 @@ namespace Sheaft.Application.Handlers
             IImageService imageService,
             IHttpClientFactory httpClientFactory,
             ILogger<BusinessCommandsHandler> logger,
-            IOptionsSnapshot<RoleOptions> roleOptions) : base(logger)
+            IOptionsSnapshot<RoleOptions> roleOptions)
+            : base(mediatr, context, queueService, logger)
         {
             _authOptions = authOptions.Value;
             _roleOptions = roleOptions.Value;
             _imageService = imageService;
-            _queueService = queueService;
-            _context = context;
             _cache = cache;
-            _mediatr = mediatr;
 
             _httpClient = httpClientFactory.CreateClient("companies");
             _httpClient.BaseAddress = new Uri(_authOptions.Url);

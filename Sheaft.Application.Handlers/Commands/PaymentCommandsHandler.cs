@@ -13,15 +13,16 @@ namespace Sheaft.Application.Handlers
     public class PaymentCommandsHandler : ResultsHandler,
            IRequestHandler<CreateBankAccountCommand, Result<Guid>>
     {
-        private readonly IAppDbContext _context;
         private readonly IPspService _pspService;
 
         public PaymentCommandsHandler(
+            IMediator mediatr,
             IAppDbContext context,
+            IQueueService queueService,
             IPspService pspService,
-            ILogger<PaymentCommandsHandler> logger) : base(logger)
+            ILogger<PaymentCommandsHandler> logger)
+            : base(mediatr, context, queueService, logger)
         {
-            _context = context;
             _pspService = pspService;
         }
 

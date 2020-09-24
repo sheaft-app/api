@@ -11,20 +11,19 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Sheaft.Application.Handlers
 {
-
     public class LevelCommandsHandler : ResultsHandler,
         IRequestHandler<CreateLevelCommand, Result<Guid>>,
         IRequestHandler<UpdateLevelCommand, Result<bool>>,
         IRequestHandler<DeleteLevelCommand, Result<bool>>,
         IRequestHandler<RestoreLevelCommand, Result<bool>>
     {
-        private readonly IAppDbContext _context;
-
         public LevelCommandsHandler(
+            IMediator mediatr,
             IAppDbContext context,
-            ILogger<LevelCommandsHandler> logger) : base(logger)
+            IQueueService queueService,
+            ILogger<LevelCommandsHandler> logger)
+            : base(mediatr, context, queueService, logger)
         {
-            _context = context;
         }
 
         public async Task<Result<Guid>> Handle(CreateLevelCommand request, CancellationToken token)

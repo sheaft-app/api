@@ -18,18 +18,16 @@ namespace Sheaft.Application.Handlers
         IRequestHandler<UpdateZoneProgressCommand, Result<bool>>,
         IRequestHandler<GenerateZonesFileCommand, Result<bool>>
     {
-        private readonly IAppDbContext _context;
-        private readonly IQueueService _queueService;
         private readonly IBlobService _blobService;
 
         public ZoneCommandsHandler(
+            IMediator mediatr,
             IAppDbContext context,
             IQueueService queueService,
             IBlobService blobService,
-            ILogger<ZoneCommandsHandler> logger) : base(logger)
+            ILogger<ZoneCommandsHandler> logger)
+            : base(mediatr, context, queueService, logger)
         {
-            _context = context;
-            _queueService = queueService;
             _blobService = blobService;
         }
 

@@ -20,16 +20,13 @@ namespace Sheaft.Application.Handlers
         IRequestHandler<DeleteQuickOrderCommand, Result<bool>>,
         IRequestHandler<DeleteQuickOrdersCommand, Result<bool>>
     {
-        private readonly IAppDbContext _context;
-        private readonly IMediator _mediatr;
-
         public QuickOrderCommandsHandler(
-            IMediator mediatr, 
+            IMediator mediatr,
             IAppDbContext context,
-            ILogger<QuickOrderCommandsHandler> logger) : base(logger)
+            IQueueService queueService,
+            ILogger<QuickOrderCommandsHandler> logger)
+            : base(mediatr, context, queueService, logger)
         {
-            _mediatr = mediatr;
-            _context = context;
         }
 
         public async Task<Result<Guid>> Handle(CreateQuickOrderCommand request, CancellationToken token)

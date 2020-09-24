@@ -22,22 +22,17 @@ namespace Sheaft.Application.Handlers
         IRequestHandler<QueueExportPickingOrderCommand, Result<Guid>>,
         IRequestHandler<ExportPickingOrderCommand, Result<bool>>
     {
-        private readonly IAppDbContext _context;
-        private readonly IMediator _mediatr;
-        private readonly IQueueService _queuesService;
         private readonly IBlobService _blobsService;
 
         public PickingOrderCommandsHandler(
             IMediator mediatr, 
             IAppDbContext context, 
-            IQueueService queuesService, 
+            IQueueService queueService, 
             IBlobService blobsService,
-            ILogger<PickingOrderCommandsHandler> logger) : base(logger)
+            ILogger<PickingOrderCommandsHandler> logger)
+            : base(mediatr, context, queueService, logger)
         {
             _blobsService = blobsService;
-            _queuesService = queuesService;
-            _context = context;
-            _mediatr = mediatr;
         }
 
         public async Task<Result<Guid>> Handle(QueueExportPickingOrderCommand request, CancellationToken token)
@@ -61,7 +56,7 @@ namespace Sheaft.Application.Handlers
                 await _context.AddAsync(entity, token);
                 await _context.SaveChangesAsync(token);
 
-                await _queuesService.InsertJobToProcessAsync(entity, token);
+                await _queueService.InsertJobToProcessAsync(entity, token);
 
                 return Ok(entity.Id);
             });
@@ -80,7 +75,7 @@ namespace Sheaft.Application.Handlers
                         throw startResult.Exception;
 
                     var purchaseOrders = await _context.GetByIdsAsync<PurchaseOrder>(request.PurchaseOrderIds, token);
-                    await _queuesService.ProcessEventAsync(PickingOrderExportProcessingEvent.QUEUE_NAME, new PickingOrderExportProcessingEvent(request.RequestUser) { Id = job.Id }, token);
+                    await _queueService.ProcessEventAsync(PickingOrderExportProcessingEvent.QUEUE_NAME, new PickingOrderExportProcessingEvent(request.RequestUser) { Id = job.Id }, token);
 
                     using (var stream = new MemoryStream())
                     {
@@ -97,13 +92,13 @@ namespace Sheaft.Application.Handlers
                         if (!result.Success)
                             throw result.Exception;
 
-                        await _queuesService.ProcessEventAsync(PickingOrderExportSucceededEvent.QUEUE_NAME, new PickingOrderExportSucceededEvent(request.RequestUser) { Id = job.Id }, token);
+                        await _queueService.ProcessEventAsync(PickingOrderExportSucceededEvent.QUEUE_NAME, new PickingOrderExportSucceededEvent(request.RequestUser) { Id = job.Id }, token);
                         return await _mediatr.Send(new CompleteJobCommand(request.RequestUser) { Id = job.Id, FileUrl = response.Data });
                     }
                 }
                 catch (Exception e)
                 {
-                    await _queuesService.ProcessEventAsync(PickingOrderExportFailedEvent.QUEUE_NAME, new PickingOrderExportFailedEvent(request.RequestUser) { Id = job.Id }, token);
+                    await _queueService.ProcessEventAsync(PickingOrderExportFailedEvent.QUEUE_NAME, new PickingOrderExportFailedEvent(request.RequestUser) { Id = job.Id }, token);
                     return await _mediatr.Send(new FailJobCommand(request.RequestUser) { Id = request.JobId, Reason = e.Message });
                 }
             });

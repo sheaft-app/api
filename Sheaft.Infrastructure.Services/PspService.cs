@@ -23,7 +23,7 @@ using System.Threading.Tasks;
 
 namespace Sheaft.Infrastructure.Services
 {
-    public class PspService : ResultsHandler, IPspService
+    public class PspService : BaseService, IPspService
     {
         private readonly MangoPayApi _api;
         private readonly PspOptions _pspOptions;

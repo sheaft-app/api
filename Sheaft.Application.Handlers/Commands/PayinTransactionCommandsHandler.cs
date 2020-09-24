@@ -23,21 +23,16 @@ namespace Sheaft.Application.Handlers
         IRequestHandler<CheckWaitingPayinTransactionCommand, Result<bool>>,
         IRequestHandler<SetRefundPayinStatusCommand, Result<bool>>
     {
-        private readonly IAppDbContext _context;
         private readonly IPspService _pspService;
-        private readonly IQueueService _queueService;
-        private readonly IMediator _mediatr;
 
         public PayinTransactionCommandsHandler(
             IAppDbContext context,
             IPspService pspService,
             IQueueService queueService,
             IMediator mediatr,
-            ILogger<PayinTransactionCommandsHandler> logger) : base(logger)
+            ILogger<PayinTransactionCommandsHandler> logger)
+            : base(mediatr, context, queueService, logger)
         {
-            _mediatr = mediatr;
-            _queueService = queueService;
-            _context = context;
             _pspService = pspService;
         }
 

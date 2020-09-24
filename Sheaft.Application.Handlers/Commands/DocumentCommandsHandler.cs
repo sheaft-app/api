@@ -24,21 +24,16 @@ namespace Sheaft.Application.Handlers
             IRequestHandler<EnsureProducerDocumentsReviewedCommand, Result<bool>>,
             IRequestHandler<EnsureProducerDocumentsValidatedCommand, Result<bool>>
     {
-        private readonly IAppDbContext _context;
         private readonly IPspService _pspService;
-        private readonly IQueueService _queueService;
-        private readonly IMediator _mediatr;
 
         public DocumentCommandsHandler(
             IAppDbContext context,
             IPspService pspService,
             IQueueService queueService,
             IMediator mediatr,
-            ILogger<DocumentCommandsHandler> logger) : base(logger)
+            ILogger<DocumentCommandsHandler> logger)
+            : base(mediatr, context, queueService, logger)
         {
-            _mediatr = mediatr;
-            _queueService = queueService;
-            _context = context;
             _pspService = pspService;
         }
 

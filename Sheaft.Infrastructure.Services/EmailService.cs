@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace Sheaft.Infrastructure.Services
 {
-    public class EmailService : ResultsHandler, IEmailService
+    public class EmailService : BaseService, IEmailService
     {
         private readonly SendgridOptions _sendgridOptions;
         private readonly ISendGridClient _sendgrid;

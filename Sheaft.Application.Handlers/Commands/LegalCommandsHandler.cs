@@ -18,19 +18,17 @@ namespace Sheaft.Application.Handlers
            IRequestHandler<EnsureBusinessLegalConfiguredCommand, Result<bool>>,
            IRequestHandler<EnsureConsumerLegalConfiguredCommand, Result<bool>>
     {
-        private readonly IMediator _mediatr;
-        private readonly IAppDbContext _context;
         private readonly IPspService _pspService;
 
         public LegalCommandsHandler(
             IMediator mediatr,
             IAppDbContext context,
+            IQueueService queueService,
             IPspService pspService,
-            ILogger<LegalCommandsHandler> logger) : base(logger)
+            ILogger<LegalCommandsHandler> logger)
+            : base(mediatr, context, queueService, logger)
         {
             _pspService = pspService;
-            _mediatr = mediatr;
-            _context = context;
         }
 
         public async Task<Result<Guid>> Handle(CreateBusinessLegalCommand request, CancellationToken token)

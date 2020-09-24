@@ -16,15 +16,16 @@ namespace Sheaft.Application.Handlers
            IRequestHandler<UpdateUboCommand, Result<bool>>,
            IRequestHandler<RemoveUboCommand, Result<bool>>
     {
-        private readonly IAppDbContext _context;
         private readonly IPspService _pspService;
 
         public UboCommandsHandler(
+            IMediator mediatr,
             IAppDbContext context,
+            IQueueService queueService,
             IPspService pspService,
-            ILogger<UboCommandsHandler> logger) : base(logger)
+            ILogger<UboCommandsHandler> logger)
+            : base(mediatr, context, queueService, logger)
         {
-            _context = context;
             _pspService = pspService;
         }
 
