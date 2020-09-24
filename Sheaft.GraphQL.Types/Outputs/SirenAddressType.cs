@@ -10,7 +10,7 @@ namespace Sheaft.GraphQL.Types
             descriptor.Field("line1").Resolver(c =>
             {
                 var source = c.Parent<SirenAddressDto>();
-                return $"{source.NumeroVoieEtablissement} {source.LibelleVoieEtablissement}";
+                return $"{source.NumeroVoieEtablissement} {source.TypeVoieEtablissement} {source.LibelleVoieEtablissement}";
             });
 
             descriptor.Field(c => c.ComplementAdresseEtablissement)
