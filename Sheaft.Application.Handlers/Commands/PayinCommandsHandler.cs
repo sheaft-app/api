@@ -19,7 +19,7 @@ namespace Sheaft.Application.Handlers
         IRequestHandler<CreateWebPayinCommand, Result<Guid>>,
         IRequestHandler<CheckPayinsCommand, Result<bool>>,
         IRequestHandler<CheckPayinCommand, Result<bool>>,
-        IRequestHandler<RefreshPayinStatusCommand, Result<bool>>,
+        IRequestHandler<RefreshPayinStatusCommand, Result<TransactionStatus>>,
         IRequestHandler<ExpirePayinCommand, Result<bool>>
     {
         private readonly IPspService _pspService;
@@ -100,13 +100,19 @@ namespace Sheaft.Application.Handlers
             {
                 var payin = await _context.GetByIdAsync<Payin>(request.PayinId, token);
                 if (payin.Status == TransactionStatus.Succeeded
-                    && payin.Status == TransactionStatus.Failed)
+                    || payin.Status == TransactionStatus.Failed
+                    || payin.Status == TransactionStatus.Expired)
                     return Ok(true);
 
-                if (payin.CreatedOn.AddMinutes(10080) > DateTimeOffset.UtcNow)
+                var result = await _mediatr.Process(new RefreshPayinStatusCommand(request.RequestUser, payin.Identifier), token);
+                if (!result.Success)
+                    return Failed<bool>(result.Exception);
+
+                if (payin.CreatedOn.AddMinutes(10080) > DateTimeOffset.UtcNow
+                    && (result.Data == TransactionStatus.Created || result.Data == TransactionStatus.Waiting))
                     return await _mediatr.Process(new ExpirePayinCommand(request.RequestUser) { PayinId = request.PayinId }, token);
 
-                return await _mediatr.Process(new RefreshPayinStatusCommand(request.RequestUser, payin.Identifier), token);
+                return Ok(true);
             });
         }
 
@@ -122,14 +128,14 @@ namespace Sheaft.Application.Handlers
             });
         }
 
-        public async Task<Result<bool>> Handle(RefreshPayinStatusCommand request, CancellationToken token)
+        public async Task<Result<TransactionStatus>> Handle(RefreshPayinStatusCommand request, CancellationToken token)
         {
             return await ExecuteAsync(async () =>
             {
                 var payin = await _context.GetSingleAsync<Payin>(c => c.Identifier == request.Identifier, token);
                 var pspResult = await _pspService.GetPayinAsync(payin.Identifier, token);
                 if (!pspResult.Success)
-                    return Failed<bool>(pspResult.Exception);
+                    return Failed<TransactionStatus>(pspResult.Exception);
 
                 payin.SetStatus(pspResult.Data.Status);
                 payin.SetResult(pspResult.Data.ResultCode, pspResult.Data.ResultMessage);
@@ -146,13 +152,13 @@ namespace Sheaft.Application.Handlers
                     case TransactionStatus.Succeeded:
                         var orderResult = await _mediatr.Process(new ConfirmOrderCommand(request.RequestUser) { Id = payin.Order.Id }, token);
                         if (!orderResult.Success)
-                            return Failed<bool>(orderResult.Exception);
+                            return Failed<TransactionStatus>(orderResult.Exception);
 
                         await _mediatr.Post(new PayinSucceededEvent(request.RequestUser) { PayinId = payin.Id }, token);
                         break;
                 }
 
-                return Ok(success);
+                return Ok(payin.Status);
             });
         }
 

@@ -6,19 +6,14 @@ using Sheaft.Application.Commands;
 using Sheaft.Core;
 using Sheaft.Application.Interop;
 using Microsoft.Extensions.Logging;
-using Sheaft.Domain.Models;
 using Sheaft.Domain.Enums;
-using Sheaft.Application.Events;
-using System.Collections.Generic;
-using System.Linq;
-using Microsoft.EntityFrameworkCore;
 
 namespace Sheaft.Application.Handlers
 {
     public class RefundCommandsHandler : ResultsHandler,
-        IRequestHandler<RefreshPayinRefundStatusCommand, Result<bool>>,
-        IRequestHandler<RefreshTransferRefundStatusCommand, Result<bool>>,
-        IRequestHandler<RefreshPayoutRefundStatusCommand, Result<bool>>
+        IRequestHandler<RefreshPayinRefundStatusCommand, Result<TransactionStatus>>,
+        IRequestHandler<RefreshTransferRefundStatusCommand, Result<TransactionStatus>>,
+        IRequestHandler<RefreshPayoutRefundStatusCommand, Result<TransactionStatus>>
     {
         private readonly IPspService _pspService;
 
@@ -32,17 +27,17 @@ namespace Sheaft.Application.Handlers
             _pspService = pspService;
         }
 
-        public Task<Result<bool>> Handle(RefreshPayinRefundStatusCommand request, CancellationToken cancellationToken)
+        public Task<Result<TransactionStatus>> Handle(RefreshPayinRefundStatusCommand request, CancellationToken cancellationToken)
         {
             throw new NotImplementedException();
         }
 
-        public Task<Result<bool>> Handle(RefreshTransferRefundStatusCommand request, CancellationToken cancellationToken)
+        public Task<Result<TransactionStatus>> Handle(RefreshTransferRefundStatusCommand request, CancellationToken cancellationToken)
         {
             throw new NotImplementedException();
         }
 
-        public Task<Result<bool>> Handle(RefreshPayoutRefundStatusCommand request, CancellationToken cancellationToken)
+        public Task<Result<TransactionStatus>> Handle(RefreshPayoutRefundStatusCommand request, CancellationToken cancellationToken)
         {
             throw new NotImplementedException();
         }

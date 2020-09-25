@@ -6,6 +6,7 @@ using Sheaft.Application.Commands;
 using Sheaft.Application.Events;
 using Sheaft.Application.Interop;
 using Sheaft.Core;
+using Sheaft.Domain.Enums;
 
 namespace Sheaft.Functions
 {
@@ -21,7 +22,7 @@ namespace Sheaft.Functions
         [FunctionName("RefreshPayinRefundStatusCommand")]
         public async Task RefreshPayinRefundStatusCommandAsync([ServiceBusTrigger(RefreshPayinRefundStatusCommand.QUEUE_NAME, Connection = "AzureWebJobsServiceBus")] string message, CancellationToken token)
         {
-            var results = await _mediatr.Process<RefreshPayinRefundStatusCommand, bool>(message, token);
+            var results = await _mediatr.Process<RefreshPayinRefundStatusCommand, TransactionStatus>(message, token);
             if (!results.Success)
                 throw results.Exception;
         }
@@ -41,7 +42,7 @@ namespace Sheaft.Functions
         [FunctionName("RefreshPayoutRefundStatusCommand")]
         public async Task RefreshPayoutRefundStatusCommandAsync([ServiceBusTrigger(RefreshPayoutRefundStatusCommand.QUEUE_NAME, Connection = "AzureWebJobsServiceBus")] string message, CancellationToken token)
         {
-            var results = await _mediatr.Process<RefreshPayoutRefundStatusCommand, bool>(message, token);
+            var results = await _mediatr.Process<RefreshPayoutRefundStatusCommand, TransactionStatus>(message, token);
             if (!results.Success)
                 throw results.Exception;
         }
@@ -61,7 +62,7 @@ namespace Sheaft.Functions
         [FunctionName("RefreshTransferRefundStatusCommand")]
         public async Task RefreshTransferRefundStatusCommandAsync([ServiceBusTrigger(RefreshTransferRefundStatusCommand.QUEUE_NAME, Connection = "AzureWebJobsServiceBus")] string message, CancellationToken token)
         {
-            var results = await _mediatr.Process<RefreshPayoutRefundStatusCommand, bool>(message, token);
+            var results = await _mediatr.Process<RefreshPayoutRefundStatusCommand, TransactionStatus>(message, token);
             if (!results.Success)
                 throw results.Exception;
         }

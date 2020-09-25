@@ -19,7 +19,7 @@ namespace Sheaft.Application.Handlers
         IRequestHandler<CheckTransfersCommand, Result<bool>>,
         IRequestHandler<CheckTransferCommand, Result<bool>>,
         IRequestHandler<ExpireTransferCommand, Result<bool>>,
-        IRequestHandler<RefreshTransferStatusCommand, Result<bool>>,
+        IRequestHandler<RefreshTransferStatusCommand, Result<TransactionStatus>>,
         IRequestHandler<CheckNewTransfersCommand, Result<bool>>,
         IRequestHandler<CreatePurchaseOrderTransferCommand, Result<Guid>>
     {
@@ -35,33 +35,33 @@ namespace Sheaft.Application.Handlers
             _pspService = pspService;
         }
 
-        public async Task<Result<bool>> Handle(RefreshTransferStatusCommand request, CancellationToken token)
+        public async Task<Result<TransactionStatus>> Handle(RefreshTransferStatusCommand request, CancellationToken token)
         {
             return await ExecuteAsync(async () =>
             {
-                var transaction = await _context.GetSingleAsync<Transfer>(c => c.Identifier == request.Identifier, token);
-                var pspResult = await _pspService.GetTransferAsync(transaction.Identifier, token);
+                var transfer = await _context.GetSingleAsync<Transfer>(c => c.Identifier == request.Identifier, token);
+                var pspResult = await _pspService.GetTransferAsync(transfer.Identifier, token);
                 if (!pspResult.Success)
-                    return Failed<bool>(pspResult.Exception);
+                    return Failed<TransactionStatus>(pspResult.Exception);
 
-                transaction.SetStatus(pspResult.Data.Status);
-                transaction.SetResult(pspResult.Data.ResultCode, pspResult.Data.ResultMessage);
-                transaction.SetProcessedOn(pspResult.Data.ProcessedOn);
+                transfer.SetStatus(pspResult.Data.Status);
+                transfer.SetResult(pspResult.Data.ResultCode, pspResult.Data.ResultMessage);
+                transfer.SetProcessedOn(pspResult.Data.ProcessedOn);
 
-                _context.Update(transaction);
+                _context.Update(transfer);
                 var success = await _context.SaveChangesAsync(token) > 0;
 
-                switch (transaction.Status)
+                switch (transfer.Status)
                 {
                     case TransactionStatus.Failed:
-                        await _mediatr.Post(new TransferFailedEvent(request.RequestUser) { TransferId = transaction.Id }, token);
+                        await _mediatr.Post(new TransferFailedEvent(request.RequestUser) { TransferId = transfer.Id }, token);
                         break;
                     case TransactionStatus.Succeeded:
-                        await _mediatr.Post(new TransferSucceededEvent(request.RequestUser) { TransferId = transaction.Id }, token);
+                        await _mediatr.Post(new TransferSucceededEvent(request.RequestUser) { TransferId = transfer.Id }, token);
                         break;
                 }
 
-                return Ok(success);
+                return Ok(transfer.Status);
             });
         }
 
@@ -100,13 +100,19 @@ namespace Sheaft.Application.Handlers
             {
                 var transfer = await _context.GetByIdAsync<Transfer>(request.TransferId, token);
                 if (transfer.Status == TransactionStatus.Succeeded
-                    && transfer.Status == TransactionStatus.Failed)
+                    || transfer.Status == TransactionStatus.Failed
+                    || transfer.Status == TransactionStatus.Expired)
                     return Ok(true);
 
-                if (transfer.CreatedOn.AddMinutes(10080) > DateTimeOffset.UtcNow)
+                var result = await _mediatr.Process(new RefreshTransferStatusCommand(request.RequestUser, transfer.Identifier), token);
+                if (!result.Success)
+                    return Failed<bool>(result.Exception);
+
+                if (transfer.CreatedOn.AddMinutes(10080) > DateTimeOffset.UtcNow
+                    && (result.Data == TransactionStatus.Created || result.Data == TransactionStatus.Waiting))
                     return await _mediatr.Process(new ExpireTransferCommand(request.RequestUser) { TransferId = request.TransferId }, token);
 
-                return await _mediatr.Process(new RefreshTransferStatusCommand(request.RequestUser, transfer.Identifier), token);
+                return Ok(true);
             });
         }
 

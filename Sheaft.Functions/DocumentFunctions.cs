@@ -5,6 +5,7 @@ using Microsoft.Extensions.Logging;
 using Sheaft.Application.Commands;
 using Sheaft.Application.Events;
 using Sheaft.Application.Interop;
+using Sheaft.Domain.Enums;
 
 namespace Sheaft.Functions
 {
@@ -20,7 +21,7 @@ namespace Sheaft.Functions
         [FunctionName("RefreshDocumentStatusCommand")]
         public async Task RefreshDocumentStatusCommandAsync([ServiceBusTrigger(RefreshDocumentStatusCommand.QUEUE_NAME, Connection = "AzureWebJobsServiceBus")] string message, CancellationToken token)
         {
-            var results = await _mediatr.Process<RefreshDocumentStatusCommand, bool>(message, token);
+            var results = await _mediatr.Process<RefreshDocumentStatusCommand, DocumentStatus>(message, token);
             if (!results.Success)
                 throw results.Exception;
         }

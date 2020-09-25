@@ -19,7 +19,7 @@ namespace Sheaft.Application.Handlers
             IRequestHandler<SubmitDocumentsCommand, Result<bool>>,
             IRequestHandler<SubmitDocumentCommand, Result<bool>>,
             IRequestHandler<RemoveDocumentCommand, Result<bool>>,
-            IRequestHandler<RefreshDocumentStatusCommand, Result<bool>>
+            IRequestHandler<RefreshDocumentStatusCommand, Result<DocumentStatus>>
     {
         private readonly IPspService _pspService;
 
@@ -153,14 +153,14 @@ namespace Sheaft.Application.Handlers
             });
         }
 
-        public async Task<Result<bool>> Handle(RefreshDocumentStatusCommand request, CancellationToken token)
+        public async Task<Result<DocumentStatus>> Handle(RefreshDocumentStatusCommand request, CancellationToken token)
         {
             return await ExecuteAsync(async () =>
             {
                 var document = await _context.GetSingleAsync<Document>(c => c.Identifier == request.Identifier, token);
                 var pspResult = await _pspService.GetDocumentAsync(document.Identifier, token);
                 if (!pspResult.Success)
-                    return Failed<bool>(pspResult.Exception);
+                    return Failed<DocumentStatus>(pspResult.Exception);
 
                 document.SetValidationStatus(pspResult.Data.Status);
                 document.SetResult(pspResult.Data.ResultCode, pspResult.Data.ResultMessage);
@@ -182,7 +182,7 @@ namespace Sheaft.Application.Handlers
                         break;
                 }
 
-                return Ok(success);
+                return Ok(document.Status);
             });
         }
     }

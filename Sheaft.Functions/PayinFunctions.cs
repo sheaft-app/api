@@ -6,6 +6,7 @@ using Sheaft.Application.Commands;
 using Sheaft.Application.Events;
 using Sheaft.Application.Interop;
 using Sheaft.Core;
+using Sheaft.Domain.Enums;
 
 namespace Sheaft.Functions
 {
@@ -37,7 +38,7 @@ namespace Sheaft.Functions
         [FunctionName("RefreshPayinStatusCommand")]
         public async Task RefreshPayinStatusCommandAsync([ServiceBusTrigger(RefreshPayinStatusCommand.QUEUE_NAME, Connection = "AzureWebJobsServiceBus")] string message, CancellationToken token)
         {
-            var results = await _mediatr.Process<RefreshPayinStatusCommand, bool>(message, token);
+            var results = await _mediatr.Process<RefreshPayinStatusCommand, TransactionStatus>(message, token);
             if (!results.Success)
                 throw results.Exception;
         }

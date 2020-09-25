@@ -1,9 +1,10 @@
 ﻿using Sheaft.Core;
 using Newtonsoft.Json;
+using Sheaft.Domain.Enums;
 
 namespace Sheaft.Application.Commands
 {
-    public class RefreshTransferStatusCommand : Command<bool>
+    public class RefreshTransferStatusCommand : Command<TransactionStatus>
     {
         public const string QUEUE_NAME = "command-refresh-transfer-status";
 

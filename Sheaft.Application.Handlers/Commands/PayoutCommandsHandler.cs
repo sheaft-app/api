@@ -21,7 +21,7 @@ namespace Sheaft.Application.Handlers
         IRequestHandler<CheckPayoutsCommand, Result<bool>>,
         IRequestHandler<CheckPayoutCommand, Result<bool>>,
         IRequestHandler<ExpirePayoutCommand, Result<bool>>,
-        IRequestHandler<RefreshPayoutStatusCommand, Result<bool>>,
+        IRequestHandler<RefreshPayoutStatusCommand, Result<TransactionStatus>>,
         IRequestHandler<CheckForNewPayoutsCommand, Result<bool>>,
         IRequestHandler<CreatePayoutForTransfersCommand, Result<Guid>>,
         IRequestHandler<CreatePayoutCommand, Result<Guid>>
@@ -75,13 +75,19 @@ namespace Sheaft.Application.Handlers
             {
                 var payout = await _context.GetByIdAsync<Payout>(request.PayoutId, token);
                 if (payout.Status == TransactionStatus.Succeeded
-                    && payout.Status == TransactionStatus.Failed)
+                    || payout.Status == TransactionStatus.Failed
+                    || payout.Status == TransactionStatus.Expired)
                     return Ok(true);
 
-                if (payout.CreatedOn.AddMinutes(10080) > DateTimeOffset.UtcNow)
+                var result = await _mediatr.Process(new RefreshPayoutStatusCommand(request.RequestUser, payout.Identifier), token);
+                if (!result.Success)
+                    return Failed<bool>(result.Exception);
+
+                if (payout.CreatedOn.AddMinutes(10080) > DateTimeOffset.UtcNow 
+                    && (result.Data == TransactionStatus.Created || result.Data == TransactionStatus.Waiting))
                     return await _mediatr.Process(new ExpirePayoutCommand(request.RequestUser) { PayoutId = request.PayoutId }, token);
 
-                return await _mediatr.Process(new RefreshPayoutStatusCommand(request.RequestUser, payout.Identifier), token);
+                return Ok(true);
             });
         }
 
@@ -97,33 +103,33 @@ namespace Sheaft.Application.Handlers
             });
         }
 
-        public async Task<Result<bool>> Handle(RefreshPayoutStatusCommand request, CancellationToken token)
+        public async Task<Result<TransactionStatus>> Handle(RefreshPayoutStatusCommand request, CancellationToken token)
         {
             return await ExecuteAsync(async () =>
             {
-                var transaction = await _context.GetSingleAsync<Payout>(c => c.Identifier == request.Identifier, token);
-                var pspResult = await _pspService.GetPayoutAsync(transaction.Identifier, token);
+                var payout = await _context.GetSingleAsync<Payout>(c => c.Identifier == request.Identifier, token);
+                var pspResult = await _pspService.GetPayoutAsync(payout.Identifier, token);
                 if (!pspResult.Success)
-                    return Failed<bool>(pspResult.Exception);
+                    return Failed<TransactionStatus>(pspResult.Exception);
 
-                transaction.SetStatus(pspResult.Data.Status);
-                transaction.SetResult(pspResult.Data.ResultCode, pspResult.Data.ResultMessage);
-                transaction.SetProcessedOn(pspResult.Data.ProcessedOn);
+                payout.SetStatus(pspResult.Data.Status);
+                payout.SetResult(pspResult.Data.ResultCode, pspResult.Data.ResultMessage);
+                payout.SetProcessedOn(pspResult.Data.ProcessedOn);
 
-                _context.Update(transaction);
+                _context.Update(payout);
                 var success = await _context.SaveChangesAsync(token) > 0;
 
-                switch (transaction.Status)
+                switch (payout.Status)
                 {
                     case TransactionStatus.Failed:
-                        await _mediatr.Post(new PayoutFailedEvent(request.RequestUser) { PayoutId = transaction.Id }, token);
+                        await _mediatr.Post(new PayoutFailedEvent(request.RequestUser) { PayoutId = payout.Id }, token);
                         break;
                     case TransactionStatus.Succeeded:
-                        await _mediatr.Post(new PayoutSucceededEvent(request.RequestUser) { PayoutId = transaction.Id }, token);
+                        await _mediatr.Post(new PayoutSucceededEvent(request.RequestUser) { PayoutId = payout.Id }, token);
                         break;
                 }
 
-                return Ok(success);
+                return Ok(payout.Status);
             });
         }
 

@@ -15,7 +15,7 @@ namespace Sheaft.Application.Handlers
     public class DeclarationCommandsHandler : ResultsHandler,
            IRequestHandler<CreateDeclarationCommand, Result<Guid>>,
            IRequestHandler<SubmitDeclarationCommand, Result<bool>>,
-           IRequestHandler<RefreshDeclarationStatusCommand, Result<bool>>,
+           IRequestHandler<RefreshDeclarationStatusCommand, Result<DeclarationStatus>>,
            IRequestHandler<CheckDeclarationConfigurationCommand, Result<bool>>
     {
         private readonly IPspService _pspService;
@@ -76,14 +76,14 @@ namespace Sheaft.Application.Handlers
             });
         }
 
-        public async Task<Result<bool>> Handle(RefreshDeclarationStatusCommand request, CancellationToken token)
+        public async Task<Result<DeclarationStatus>> Handle(RefreshDeclarationStatusCommand request, CancellationToken token)
         {
             return await ExecuteAsync(async () =>
             {
                 var declaration = await _context.GetSingleAsync<UboDeclaration>(c => c.Identifier == request.Identifier, token);
                 var pspResult = await _pspService.GetDeclarationAsync(declaration.Identifier, token);
                 if (!pspResult.Success)
-                    return Failed<bool>(pspResult.Exception);
+                    return Failed<DeclarationStatus>(pspResult.Exception);
 
                 declaration.SetStatus(pspResult.Data.Status);
                 declaration.SetResult(pspResult.Data.ResultCode, pspResult.Data.ResultMessage);
@@ -105,7 +105,7 @@ namespace Sheaft.Application.Handlers
                         break;
                 }
 
-                return Ok(success);
+                return Ok(declaration.Status);
             });
         }
 
