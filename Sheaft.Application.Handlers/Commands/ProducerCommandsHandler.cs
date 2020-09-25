@@ -99,7 +99,7 @@ namespace Sheaft.Application.Handlers
                         Siret = request.Legals.Siret,
                         Kind = request.Legals.Kind,
                         VatIdentifier = request.Legals.VatIdentifier,
-                        UserId = request.RequestUser.Id,
+                        UserId = producer.Id,
                         Owner = request.Legals.Owner
                     }, token);
 
