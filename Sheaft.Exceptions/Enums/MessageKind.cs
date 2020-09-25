@@ -275,5 +275,8 @@
         PsP_CannotUpdateUbo_Declaration_Not_Exists = 0x025038,
         PsP_CannotUpdateUbo_Ubo_Not_Exists = 0x025039,
         PsP_CannotCreate_User_User_Exists = 0x025040,
+        // Order 0x026000,
+        Order = 0x026000,
+        Order_Total_CannotBe_LowerThan = 0x026001
     }
 }

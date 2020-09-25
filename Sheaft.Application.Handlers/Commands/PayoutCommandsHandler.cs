@@ -23,7 +23,6 @@ namespace Sheaft.Application.Handlers
         IRequestHandler<ExpirePayoutCommand, Result<bool>>,
         IRequestHandler<RefreshPayoutStatusCommand, Result<TransactionStatus>>,
         IRequestHandler<CheckForNewPayoutsCommand, Result<bool>>,
-        IRequestHandler<CreatePayoutForTransfersCommand, Result<Guid>>,
         IRequestHandler<CreatePayoutCommand, Result<Guid>>
     {
         private readonly PspOptions _pspOptions;
@@ -48,7 +47,7 @@ namespace Sheaft.Application.Handlers
                 var skip = 0;
                 const int take = 100;
 
-                var expiredDate = DateTimeOffset.UtcNow.AddMinutes(-15);
+                var expiredDate = DateTimeOffset.UtcNow.AddMinutes(-60);
                 var payoutIds = await GetNextPayoutIdsAsync(expiredDate, skip, take, token);
 
                 while (payoutIds.Any())
@@ -74,18 +73,15 @@ namespace Sheaft.Application.Handlers
             return await ExecuteAsync(async () =>
             {
                 var payout = await _context.GetByIdAsync<Payout>(request.PayoutId, token);
-                if (payout.Status == TransactionStatus.Succeeded
-                    || payout.Status == TransactionStatus.Failed
-                    || payout.Status == TransactionStatus.Expired)
+                if (payout.Status != TransactionStatus.Created && payout.Status != TransactionStatus.Waiting)
                     return Ok(false);
+
+                if (payout.CreatedOn.AddMinutes(10080) < DateTimeOffset.UtcNow && payout.Status == TransactionStatus.Waiting)
+                    return await _mediatr.Process(new ExpirePayoutCommand(request.RequestUser) { PayoutId = request.PayoutId }, token);
 
                 var result = await _mediatr.Process(new RefreshPayoutStatusCommand(request.RequestUser, payout.Identifier), token);
                 if (!result.Success)
                     return Failed<bool>(result.Exception);
-
-                if (payout.CreatedOn.AddMinutes(10080) > DateTimeOffset.UtcNow 
-                    && (result.Data == TransactionStatus.Created || result.Data == TransactionStatus.Waiting))
-                    return await _mediatr.Process(new ExpirePayoutCommand(request.RequestUser) { PayoutId = request.PayoutId }, token);
 
                 return Ok(true);
             });
@@ -97,9 +93,11 @@ namespace Sheaft.Application.Handlers
             {
                 var transaction = await _context.GetByIdAsync<Payout>(request.PayoutId, token);
                 transaction.SetStatus(TransactionStatus.Expired);
-                _context.Update(transaction);
 
-                return Ok(await _context.SaveChangesAsync(token) > 0);
+                _context.Update(transaction);
+                await _context.SaveChangesAsync(token);
+
+                return Ok(true);
             });
         }
 
@@ -139,20 +137,21 @@ namespace Sheaft.Application.Handlers
             {
                 var expiredDate = DateTimeOffset.UtcNow.AddMinutes(-10080);
 
-                var producerIds = await _context.Transfers
+                var producersTransfers = await _context.Transfers
                     .Get(t => t.Payout == null
                             && t.Status == TransactionStatus.Succeeded
                             && t.PurchaseOrder.Status == PurchaseOrderStatus.Completed
-                            && t.UpdatedOn.HasValue && t.UpdatedOn.Value < expiredDate)
-                    .Select(t => t.CreditedWallet.User.Id)
-                    .Distinct()
+                            && t.ExecutedOn.HasValue && t.ExecutedOn.Value < expiredDate)
+                    .Select(t => new { ProducerId = t.CreditedWallet.User.Id, TransferId = t.Id })
+                    .GroupBy(t => t.ProducerId)
                     .ToListAsync(token);
 
-                foreach (var producerId in producerIds)
+                foreach (var producerTransfers in producersTransfers)
                 {
-                    await _mediatr.Post(new CreatePayoutForTransfersCommand(request.RequestUser)
+                    await _mediatr.Post(new CreatePayoutCommand(request.RequestUser)
                     {
-                        ProducerId = producerId
+                        ProducerId = producerTransfers.Key,
+                        TransferIds = producerTransfers.Select(pt => pt.TransferId)
                     }, token);
                 }
 
@@ -160,7 +159,7 @@ namespace Sheaft.Application.Handlers
             });
         }
 
-        public async Task<Result<Guid>> Handle(CreatePayoutForTransfersCommand request, CancellationToken token)
+        public async Task<Result<Guid>> Handle(CreatePayoutCommand request, CancellationToken token)
         {
             return await ExecuteAsync(async () =>
             {
@@ -172,61 +171,49 @@ namespace Sheaft.Application.Handlers
                 if (!checkDocumentsValidatedResult.Success)
                     return Failed<Guid>(checkDocumentsValidatedResult.Exception);
 
-                var expiredDate = DateTimeOffset.UtcNow.AddMinutes(-10080);
-                var transferIds = await _context.Transfers
-                    .Get(t => t.Payout == null
-                            && t.CreditedWallet.User.Id == request.ProducerId
-                            && t.Status == TransactionStatus.Succeeded
-                            && t.PurchaseOrder.Status == PurchaseOrderStatus.Completed
-                            && t.UpdatedOn.HasValue && t.UpdatedOn.Value < expiredDate)
-                    .Select(t => t.Id)
-                    .ToListAsync(token);
-
-                return await _mediatr.Process(new CreatePayoutCommand(request.RequestUser) { ProducerId = request.ProducerId, TransferIds = transferIds }, token);
-            });
-        }
-
-        public async Task<Result<Guid>> Handle(CreatePayoutCommand request, CancellationToken token)
-        {
-            return await ExecuteAsync(async () =>
-            {
                 var wallet = await _context.GetSingleAsync<Wallet>(c => c.User.Id == request.ProducerId, token);
                 var bankAccount = await _context.GetSingleAsync<BankAccount>(c => c.User.Id == request.ProducerId && c.IsActive, token);
 
-                var transfers = await _context.GetAsync<Transfer>(t => request.TransferIds.Contains(t.Id), token);
+                var transfers = await _context.GetAsync<Transfer>(t => request.TransferIds.Contains(t.Id) && t.PurchaseOrder.Status == PurchaseOrderStatus.Completed, token);
+
+                var hasAlreadyPaidComission = await _context.AnyAsync<Payout>(p => p.Fees > 0 && p.DebitedWallet.User.Id == request.ProducerId
+                    && (p.Status == TransactionStatus.Waiting || p.Status == TransactionStatus.Created || p.Status == TransactionStatus.Succeeded), token);
 
                 var amount = transfers.Sum(t => t.Credited);
-                var fees = await _context.AnyAsync<Payout>(p => p.DebitedWallet.User.Id == request.ProducerId
-                    && (p.Status == TransactionStatus.Created || p.Status == TransactionStatus.Succeeded), token) ? 0m : _pspOptions.ProducerFees;
+                var fees = hasAlreadyPaidComission || amount < _pspOptions.ProducerFees ? 0m : _pspOptions.ProducerFees;
 
-                var payout = new Payout(Guid.NewGuid(), amount, wallet, bankAccount, fees);
-                foreach (var transfer in transfers)
-                    payout.AddTransfer(transfer);
+                using (var transaction = await _context.Database.BeginTransactionAsync(token))
+                {
+                    var payout = new Payout(Guid.NewGuid(), amount, wallet, bankAccount, fees);
+                    foreach (var transfer in transfers)
+                        payout.AddTransfer(transfer);
 
-                await _context.AddAsync(payout);
-                await _context.SaveChangesAsync(token);
+                    await _context.AddAsync(payout);
+                    await _context.SaveChangesAsync(token);
 
-                var result = await _pspService.CreatePayoutAsync(payout, token);
-                if (!result.Success)
-                    return Failed<Guid>(result.Exception);
+                    var result = await _pspService.CreatePayoutAsync(payout, token);
+                    if (!result.Success)
+                        return Failed<Guid>(result.Exception);
 
-                payout.SetIdentifier(result.Data.Identifier);
-                payout.SetStatus(result.Data.Status);
-                payout.SetResult(result.Data.ResultCode, result.Data.ResultMessage);
-                payout.SetProcessedOn(result.Data.ExecutedOn);
+                    payout.SetIdentifier(result.Data.Identifier);
+                    payout.SetStatus(result.Data.Status);
+                    payout.SetResult(result.Data.ResultCode, result.Data.ResultMessage);
+                    payout.SetProcessedOn(result.Data.ExecutedOn);
 
-                _context.Update(payout);
-                await _context.SaveChangesAsync(token);
+                    _context.Update(payout);
+                    await _context.SaveChangesAsync(token);
+                    await transaction.CommitAsync(token);
 
-                return Ok(payout.Id);
+                    return Ok(payout.Id);
+                }
             });
         }
 
         private async Task<IEnumerable<Guid>> GetNextPayoutIdsAsync(DateTimeOffset expiredDate, int skip, int take, CancellationToken token)
         {
             return await _context.Payouts
-                .Get(c => (c.Status == TransactionStatus.Waiting && c.CreatedOn < expiredDate)
-                        || (c.Status == TransactionStatus.Created && c.UpdatedOn.HasValue && c.UpdatedOn.Value < expiredDate), true)
+                .Get(c => c.CreatedOn < expiredDate
+                      && (c.Status == TransactionStatus.Waiting || c.Status == TransactionStatus.Created), true)
                 .OrderBy(c => c.CreatedOn)
                 .Select(c => c.Id)
                 .Skip(skip)

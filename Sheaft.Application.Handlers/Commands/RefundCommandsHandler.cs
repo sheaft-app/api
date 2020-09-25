@@ -27,17 +27,17 @@ namespace Sheaft.Application.Handlers
             _pspService = pspService;
         }
 
-        public Task<Result<TransactionStatus>> Handle(RefreshPayinRefundStatusCommand request, CancellationToken cancellationToken)
+        public Task<Result<TransactionStatus>> Handle(RefreshPayinRefundStatusCommand request, CancellationToken token)
         {
             throw new NotImplementedException();
         }
 
-        public Task<Result<TransactionStatus>> Handle(RefreshTransferRefundStatusCommand request, CancellationToken cancellationToken)
+        public Task<Result<TransactionStatus>> Handle(RefreshTransferRefundStatusCommand request, CancellationToken token)
         {
             throw new NotImplementedException();
         }
 
-        public Task<Result<TransactionStatus>> Handle(RefreshPayoutRefundStatusCommand request, CancellationToken cancellationToken)
+        public Task<Result<TransactionStatus>> Handle(RefreshPayoutRefundStatusCommand request, CancellationToken token)
         {
             throw new NotImplementedException();
         }

@@ -12,6 +12,7 @@ using Sheaft.Application.Events;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
+using Sheaft.Exceptions;
 
 namespace Sheaft.Application.Handlers
 {
@@ -40,6 +41,9 @@ namespace Sheaft.Application.Handlers
             {
                 var order = await _context.GetByIdAsync<Order>(request.OrderId, token);
                 var wallet = await _context.GetSingleAsync<Wallet>(c => c.User.Id == request.RequestUser.Id, token);
+
+                if (order.TotalOnSalePrice < 1)
+                    return Failed<Guid>(new ValidationException(MessageKind.Order_Total_CannotBe_LowerThan, 1));
 
                 var webPayin = new WebPayin(Guid.NewGuid(), wallet, order);
 
@@ -71,7 +75,7 @@ namespace Sheaft.Application.Handlers
                 var skip = 0;
                 const int take = 100;
 
-                var expiredDate = DateTimeOffset.UtcNow.AddMinutes(-15);
+                var expiredDate = DateTimeOffset.UtcNow.AddMinutes(-60);
                 var payinIds = await GetNextPayinIdsAsync(expiredDate, skip, take, token);
 
                 while (payinIds.Any())
@@ -97,18 +101,15 @@ namespace Sheaft.Application.Handlers
             return await ExecuteAsync(async () =>
             {
                 var payin = await _context.GetByIdAsync<Payin>(request.PayinId, token);
-                if (payin.Status == TransactionStatus.Succeeded
-                    || payin.Status == TransactionStatus.Failed
-                    || payin.Status == TransactionStatus.Expired)
+                if (payin.Status != TransactionStatus.Created && payin.Status != TransactionStatus.Waiting)
                     return Ok(false);
+
+                if (payin.CreatedOn.AddMinutes(1440) < DateTimeOffset.UtcNow && payin.Status == TransactionStatus.Waiting)
+                    return await _mediatr.Process(new ExpirePayinCommand(request.RequestUser) { PayinId = request.PayinId }, token);
 
                 var result = await _mediatr.Process(new RefreshPayinStatusCommand(request.RequestUser, payin.Identifier), token);
                 if (!result.Success)
                     return Failed<bool>(result.Exception);
-
-                if (payin.CreatedOn.AddMinutes(10080) > DateTimeOffset.UtcNow
-                    && (result.Data == TransactionStatus.Created || result.Data == TransactionStatus.Waiting))
-                    return await _mediatr.Process(new ExpirePayinCommand(request.RequestUser) { PayinId = request.PayinId }, token);
 
                 return Ok(true);
             });
@@ -120,9 +121,11 @@ namespace Sheaft.Application.Handlers
             {
                 var payin = await _context.GetByIdAsync<Payin>(request.PayinId, token);
                 payin.SetStatus(TransactionStatus.Expired);
-                _context.Update(payin);
 
-                return Ok(await _context.SaveChangesAsync(token) > 0);
+                _context.Update(payin);
+                await _context.SaveChangesAsync(token);
+
+                return Ok(true);
             });
         }
 
@@ -140,7 +143,7 @@ namespace Sheaft.Application.Handlers
                 payin.SetProcessedOn(pspResult.Data.ProcessedOn);
 
                 _context.Update(payin);
-                var success = await _context.SaveChangesAsync(token) > 0;
+                await _context.SaveChangesAsync(token);
 
                 switch (payin.Status)
                 {
@@ -163,8 +166,8 @@ namespace Sheaft.Application.Handlers
         private async Task<IEnumerable<Guid>> GetNextPayinIdsAsync(DateTimeOffset expiredDate, int skip, int take, CancellationToken token)
         {
             return await _context.Payins
-                .Get(c => (c.Status == TransactionStatus.Waiting && c.CreatedOn < expiredDate)
-                            || (c.Status == TransactionStatus.Created && c.UpdatedOn.HasValue && c.UpdatedOn.Value < expiredDate), true)
+                .Get(c => c.CreatedOn < expiredDate 
+                      && (c.Status == TransactionStatus.Waiting || c.Status == TransactionStatus.Created), true)
                 .OrderBy(c => c.CreatedOn)
                 .Select(c => c.Id)
                 .Skip(skip)

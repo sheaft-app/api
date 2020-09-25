@@ -99,18 +99,15 @@ namespace Sheaft.Application.Handlers
             return await ExecuteAsync(async () =>
             {
                 var transfer = await _context.GetByIdAsync<Transfer>(request.TransferId, token);
-                if (transfer.Status == TransactionStatus.Succeeded
-                    || transfer.Status == TransactionStatus.Failed
-                    || transfer.Status == TransactionStatus.Expired)
+                if (transfer.Status != TransactionStatus.Created && transfer.Status != TransactionStatus.Waiting)
                     return Ok(false);
+
+                if (transfer.CreatedOn.AddMinutes(1440) < DateTimeOffset.UtcNow && transfer.Status == TransactionStatus.Waiting)
+                    return await _mediatr.Process(new ExpireTransferCommand(request.RequestUser) { TransferId = request.TransferId }, token);
 
                 var result = await _mediatr.Process(new RefreshTransferStatusCommand(request.RequestUser, transfer.Identifier), token);
                 if (!result.Success)
                     return Failed<bool>(result.Exception);
-
-                if (transfer.CreatedOn.AddMinutes(10080) < DateTimeOffset.UtcNow
-                    && (result.Data == TransactionStatus.Created || result.Data == TransactionStatus.Waiting))
-                    return await _mediatr.Process(new ExpireTransferCommand(request.RequestUser) { TransferId = request.TransferId }, token);
 
                 return Ok(true);
             });
@@ -122,9 +119,10 @@ namespace Sheaft.Application.Handlers
             {
                 var transfer = await _context.GetByIdAsync<Transfer>(request.TransferId, token);
                 transfer.SetStatus(TransactionStatus.Expired);
-                _context.Update(transfer);
 
+                _context.Update(transfer);
                 await _context.SaveChangesAsync(token);
+
                 return Ok(true);
             });
         }
