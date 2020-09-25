@@ -1,9 +1,11 @@
-﻿using System.Threading;
+﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Azure.WebJobs;
 using Sheaft.Application.Commands;
 using Sheaft.Application.Events;
 using Sheaft.Application.Interop;
+using Sheaft.Core;
 using Sheaft.Domain.Enums;
 
 namespace Sheaft.Functions
@@ -15,6 +17,14 @@ namespace Sheaft.Functions
         public PayinRefundFunctions(ISheaftMediatr mediator)
         {
             _mediatr = mediator;
+        }
+
+        [FunctionName("CheckPayinRefundsCommand")]
+        public async Task CheckPayinRefundsCommandAsync([TimerTrigger("0 */10 * * * *", RunOnStartup = false)] TimerInfo info, CancellationToken token)
+        {
+            var results = await _mediatr.Process(new CheckPayinRefundsCommand(new RequestUser("payin-refund-functions", Guid.NewGuid().ToString("N"))), token);
+            if (!results.Success)
+                throw results.Exception;
         }
 
         [FunctionName("RefreshPayinRefundStatusCommand")]

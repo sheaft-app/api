@@ -35,39 +35,6 @@ namespace Sheaft.Application.Handlers
             _pspService = pspService;
         }
 
-        public async Task<Result<TransactionStatus>> Handle(RefreshTransferStatusCommand request, CancellationToken token)
-        {
-            return await ExecuteAsync(async () =>
-            {
-                var transfer = await _context.GetSingleAsync<Transfer>(c => c.Identifier == request.Identifier, token);
-                if (transfer.Status == TransactionStatus.Succeeded || transfer.Status == TransactionStatus.Failed)
-                    return Failed<TransactionStatus>(new InvalidOperationException());
-
-                var pspResult = await _pspService.GetTransferAsync(transfer.Identifier, token);
-                if (!pspResult.Success)
-                    return Failed<TransactionStatus>(pspResult.Exception);
-
-                transfer.SetStatus(pspResult.Data.Status);
-                transfer.SetResult(pspResult.Data.ResultCode, pspResult.Data.ResultMessage);
-                transfer.SetProcessedOn(pspResult.Data.ProcessedOn);
-
-                _context.Update(transfer);
-                var success = await _context.SaveChangesAsync(token) > 0;
-
-                switch (transfer.Status)
-                {
-                    case TransactionStatus.Failed:
-                        await _mediatr.Post(new TransferFailedEvent(request.RequestUser) { TransferId = transfer.Id }, token);
-                        break;
-                    case TransactionStatus.Succeeded:
-                        await _mediatr.Post(new TransferSucceededEvent(request.RequestUser) { TransferId = transfer.Id }, token);
-                        break;
-                }
-
-                return Ok(transfer.Status);
-            });
-        }
-
         public async Task<Result<bool>> Handle(CheckTransfersCommand request, CancellationToken token)
         {
             return await ExecuteAsync(async () =>
@@ -155,6 +122,39 @@ namespace Sheaft.Application.Handlers
                 }
 
                 return Ok(true);
+            });
+        }
+
+        public async Task<Result<TransactionStatus>> Handle(RefreshTransferStatusCommand request, CancellationToken token)
+        {
+            return await ExecuteAsync(async () =>
+            {
+                var transfer = await _context.GetSingleAsync<Transfer>(c => c.Identifier == request.Identifier, token);
+                if (transfer.Status == TransactionStatus.Succeeded || transfer.Status == TransactionStatus.Failed)
+                    return Failed<TransactionStatus>(new InvalidOperationException());
+
+                var pspResult = await _pspService.GetTransferAsync(transfer.Identifier, token);
+                if (!pspResult.Success)
+                    return Failed<TransactionStatus>(pspResult.Exception);
+
+                transfer.SetStatus(pspResult.Data.Status);
+                transfer.SetResult(pspResult.Data.ResultCode, pspResult.Data.ResultMessage);
+                transfer.SetProcessedOn(pspResult.Data.ProcessedOn);
+
+                _context.Update(transfer);
+                var success = await _context.SaveChangesAsync(token) > 0;
+
+                switch (transfer.Status)
+                {
+                    case TransactionStatus.Failed:
+                        await _mediatr.Post(new TransferFailedEvent(request.RequestUser) { TransferId = transfer.Id }, token);
+                        break;
+                    case TransactionStatus.Succeeded:
+                        await _mediatr.Post(new TransferSucceededEvent(request.RequestUser) { TransferId = transfer.Id }, token);
+                        break;
+                }
+
+                return Ok(transfer.Status);
             });
         }
 

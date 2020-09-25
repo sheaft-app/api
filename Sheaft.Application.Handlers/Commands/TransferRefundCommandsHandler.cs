@@ -9,10 +9,16 @@ using Sheaft.Domain.Enums;
 using Sheaft.Domain.Models;
 using Sheaft.Application.Events;
 using System;
+using System.Linq;
+using System.Collections.Generic;
+using Microsoft.EntityFrameworkCore;
 
 namespace Sheaft.Application.Handlers
 {
     public class TransferRefundCommandsHandler : ResultsHandler,
+        IRequestHandler<CheckTransferRefundsCommand, Result<bool>>,
+        IRequestHandler<CheckTransferRefundCommand, Result<bool>>,
+        IRequestHandler<ExpireTransferRefundCommand, Result<bool>>,
         IRequestHandler<RefreshTransferRefundStatusCommand, Result<TransactionStatus>>
     {
         private readonly IPspService _pspService;
@@ -25,6 +31,67 @@ namespace Sheaft.Application.Handlers
             : base(mediatr, context, logger)
         {
             _pspService = pspService;
+        }
+
+        public async Task<Result<bool>> Handle(CheckTransferRefundsCommand request, CancellationToken token)
+        {
+            return await ExecuteAsync(async () =>
+            {
+                var skip = 0;
+                const int take = 100;
+
+                var expiredDate = DateTimeOffset.UtcNow.AddMinutes(-60);
+                var transferRefundIds = await GetNextTransferRefundIdsAsync(expiredDate, skip, take, token);
+
+                while (transferRefundIds.Any())
+                {
+                    foreach (var transferRefundId in transferRefundIds)
+                    {
+                        await _mediatr.Post(new CheckTransferRefundCommand(request.RequestUser)
+                        {
+                            TransferRefundId = transferRefundId
+                        }, token);
+                    }
+
+                    skip += take;
+                    transferRefundIds = await GetNextTransferRefundIdsAsync(expiredDate, skip, take, token);
+                }
+
+                return Ok(true);
+            });
+        }
+
+        public async Task<Result<bool>> Handle(CheckTransferRefundCommand request, CancellationToken token)
+        {
+            return await ExecuteAsync(async () =>
+            {
+                var transfer = await _context.GetByIdAsync<TransferRefund>(request.TransferRefundId, token);
+                if (transfer.Status != TransactionStatus.Created && transfer.Status != TransactionStatus.Waiting)
+                    return Ok(false);
+
+                if (transfer.CreatedOn.AddMinutes(1440) < DateTimeOffset.UtcNow && transfer.Status == TransactionStatus.Waiting)
+                    return await _mediatr.Process(new ExpireTransferRefundCommand(request.RequestUser) { TransferRefundId = request.TransferRefundId }, token);
+
+                var result = await _mediatr.Process(new RefreshTransferRefundStatusCommand(request.RequestUser, transfer.Identifier), token);
+                if (!result.Success)
+                    return Failed<bool>(result.Exception);
+
+                return Ok(true);
+            });
+        }
+
+        public async Task<Result<bool>> Handle(ExpireTransferRefundCommand request, CancellationToken token)
+        {
+            return await ExecuteAsync(async () =>
+            {
+                var transferRefund = await _context.GetByIdAsync<TransferRefund>(request.TransferRefundId, token);
+                transferRefund.SetStatus(TransactionStatus.Expired);
+
+                _context.Update(transferRefund);
+                await _context.SaveChangesAsync(token);
+
+                return Ok(true);
+            });
         }
 
         public async Task<Result<TransactionStatus>> Handle(RefreshTransferRefundStatusCommand request, CancellationToken token)
@@ -58,6 +125,19 @@ namespace Sheaft.Application.Handlers
 
                 return Ok(transferRefund.Status);
             });
+        }
+
+        private async Task<IEnumerable<Guid>> GetNextTransferRefundIdsAsync(DateTimeOffset expiredDate, int skip, int take, CancellationToken token)
+        {
+            return await _context.Refunds
+                .OfType<TransferRefund>()
+                .Get(c => c.CreatedOn < expiredDate
+                      && (c.Status == TransactionStatus.Waiting || c.Status == TransactionStatus.Created), true)
+                .OrderBy(c => c.CreatedOn)
+                .Select(c => c.Id)
+                .Skip(skip)
+                .Take(take)
+                .ToListAsync(token);
         }
     }
 }
