@@ -112,12 +112,10 @@ namespace Sheaft.Manage.Controllers
             var result = await _mediatr.Send(new UpdateConsumerCommand(requestUser)
             {
                 Id = model.Id,
-                Anonymous = model.Anonymous,
                 Email = model.Email,
                 FirstName = model.FirstName,
                 LastName = model.LastName,
                 Phone = model.Phone,
-                DepartmentId = model.DepartmentId,
                 Picture = model.Picture
             }, token);
 

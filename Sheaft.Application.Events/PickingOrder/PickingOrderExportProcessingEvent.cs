@@ -6,13 +6,13 @@ namespace Sheaft.Application.Events
 {
     public class PickingOrderExportProcessingEvent : Event
     {
-        public const string QUEUE_NAME = "event-pickingorders-export-processing";
+        public const string QUEUE_NAME = "event-pickingorder-export-processing";
 
         [JsonConstructor]
         public PickingOrderExportProcessingEvent(RequestUser requestUser) : base(requestUser)
         {
         }
 
-        public Guid Id { get; set; }
+        public Guid JobId { get; set; }
     }
 }

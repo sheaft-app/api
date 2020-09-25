@@ -13,6 +13,6 @@ namespace Sheaft.Application.Events
         {
         }
 
-        public Guid UserId { get; set; }
+        public Guid ProducerId { get; set; }
     }
 }

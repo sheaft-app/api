@@ -4,7 +4,7 @@ using System;
 
 namespace Sheaft.Application.Commands
 {
-    public class CreatePayoutForTransfersCommand : Command<bool>
+    public class CreatePayoutForTransfersCommand : Command<Guid>
     {
         public const string QUEUE_NAME = "command-create-payout-for-transfers";
 
@@ -13,6 +13,6 @@ namespace Sheaft.Application.Commands
         {
         }
 
-        public Guid UserId { get; set; }
+        public Guid ProducerId { get; set; }
     }
 }

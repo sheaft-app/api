@@ -2,7 +2,7 @@
 
 namespace Sheaft.Domain.Models
 {
-    public class ExpectedAddress : BaseAddress
+    public class ExpectedAddress : Address
     {
         protected ExpectedAddress()
         {

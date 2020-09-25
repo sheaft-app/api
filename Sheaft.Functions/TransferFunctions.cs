@@ -18,42 +18,42 @@ namespace Sheaft.Functions
             _mediatr = mediator;
         }
 
-        [FunctionName("CheckTransferTransactionsCommand")]
-        public async Task CheckPayinTransactionsCommandAsync([TimerTrigger("0 */10 * * * *", RunOnStartup = false)] TimerInfo info, CancellationToken token)
+        [FunctionName("CheckTransfersCommand")]
+        public async Task CheckTransfersCommandAsync([TimerTrigger("0 */10 * * * *", RunOnStartup = false)] TimerInfo info, CancellationToken token)
         {
-            var results = await _mediatr.Process(new CheckTransferTransactionsCommand(new RequestUser("transfer-functions", Guid.NewGuid().ToString("N"))), token);
+            var results = await _mediatr.Process(new CheckTransfersCommand(new RequestUser("transfer-functions", Guid.NewGuid().ToString("N"))), token);
             if (!results.Success)
                 throw results.Exception;
         }
 
-        [FunctionName("SetTransferStatusCommand")]
-        public async Task SetTransferStatusCommandAsync([ServiceBusTrigger(SetTransferStatusCommand.QUEUE_NAME, Connection = "AzureWebJobsServiceBus")] string message, CancellationToken token)
+        [FunctionName("CheckNewTransfersCommand")]
+        public async Task CheckNewTransfersCommandAsync([TimerTrigger("0 * */1 * * *", RunOnStartup = false)] TimerInfo info, CancellationToken token)
         {
-            var results = await _mediatr.Process<SetTransferStatusCommand, bool>(message, token);
+            var results = await _mediatr.Process(new CheckNewTransfersCommand(new RequestUser("transfer-functions", Guid.NewGuid().ToString("N"))), token);
             if (!results.Success)
                 throw results.Exception;
         }
 
-        [FunctionName("SetRefundTransferStatusCommand")]
-        public async Task SetRefundTransferStatusCommandAsync([ServiceBusTrigger(SetRefundTransferStatusCommand.QUEUE_NAME, Connection = "AzureWebJobsServiceBus")] string message, CancellationToken token)
+        [FunctionName("CreatePurchaseOrderTransferCommand")]
+        public async Task CreatePurchaseOrderTransferCommandAsync([ServiceBusTrigger(CreatePurchaseOrderTransferCommand.QUEUE_NAME, Connection = "AzureWebJobsServiceBus")] string message, CancellationToken token)
         {
-            var results = await _mediatr.Process<SetRefundTransferStatusCommand, bool>(message, token);
+            var results = await _mediatr.Process<CreatePurchaseOrderTransferCommand, Guid>(message, token);
             if (!results.Success)
                 throw results.Exception;
         }
 
-        [FunctionName("CheckCreatedTransferTransactionCommand")]
-        public async Task CheckCreatedTransferTransactionCommandAsync([ServiceBusTrigger(CheckCreatedTransferTransactionCommand.QUEUE_NAME, Connection = "AzureWebJobsServiceBus")] string message, CancellationToken token)
+        [FunctionName("RefreshTransferStatusCommand")]
+        public async Task RefreshTransferStatusCommandAsync([ServiceBusTrigger(RefreshTransferStatusCommand.QUEUE_NAME, Connection = "AzureWebJobsServiceBus")] string message, CancellationToken token)
         {
-            var results = await _mediatr.Process<CheckCreatedTransferTransactionCommand, bool>(message, token);
+            var results = await _mediatr.Process<RefreshTransferStatusCommand, bool>(message, token);
             if (!results.Success)
                 throw results.Exception;
         }
 
-        [FunctionName("CheckWaitingTransferTransactionCommand")]
-        public async Task CheckWaitingTransferTransactionCommandAsync([ServiceBusTrigger(CheckWaitingTransferTransactionCommand.QUEUE_NAME, Connection = "AzureWebJobsServiceBus")] string message, CancellationToken token)
+        [FunctionName("CheckTransferCommand")]
+        public async Task CheckTransferCommandAsync([ServiceBusTrigger(CheckTransferCommand.QUEUE_NAME, Connection = "AzureWebJobsServiceBus")] string message, CancellationToken token)
         {
-            var results = await _mediatr.Process<CheckWaitingTransferTransactionCommand, bool>(message, token);
+            var results = await _mediatr.Process<CheckTransferCommand, bool>(message, token);
             if (!results.Success)
                 throw results.Exception;
         }
@@ -70,16 +70,10 @@ namespace Sheaft.Functions
             await _mediatr.Process<TransferSucceededEvent>(message, token);
         }
 
-        [FunctionName("RefundTransferFailedEvent")]
-        public async Task RefundTransferFailedEventAsync([ServiceBusTrigger(RefundTransferFailedEvent.QUEUE_NAME, Connection = "AzureWebJobsServiceBus")] string message, CancellationToken token)
+        [FunctionName("CreatePurchaseOrderTransferFailedEvent")]
+        public async Task CreatePurchaseOrderTransferFailedEventAsync([ServiceBusTrigger(CreatePurchaseOrderTransferFailedEvent.QUEUE_NAME, Connection = "AzureWebJobsServiceBus")] string message, CancellationToken token)
         {
-            await _mediatr.Process<RefundTransferFailedEvent>(message, token);
-        }
-
-        [FunctionName("RefundTransferSucceededEvent")]
-        public async Task RefundTransferSucceededEventAsync([ServiceBusTrigger(RefundTransferSucceededEvent.QUEUE_NAME, Connection = "AzureWebJobsServiceBus")] string message, CancellationToken token)
-        {
-            await _mediatr.Process<RefundTransferSucceededEvent>(message, token);
+            await _mediatr.Process<CreatePurchaseOrderTransferFailedEvent>(message, token);
         }
     }
 }

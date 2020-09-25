@@ -6,7 +6,7 @@ namespace Sheaft.Application.Events
 {
     public class PickingOrderExportSucceededEvent : Event
     {
-        public const string QUEUE_NAME = "event-pickingorders-export-succeeded";
+        public const string QUEUE_NAME = "event-pickingorder-export-succeeded";
         public const string MAILING_TEMPLATE_ID = "d-45f0c494fa0f48a9a7024b667cea16a0";
 
         [JsonConstructor]
@@ -14,6 +14,6 @@ namespace Sheaft.Application.Events
         {
         }
 
-        public Guid Id { get; set; }
+        public Guid JobId { get; set; }
     }
 }

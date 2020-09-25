@@ -265,7 +265,7 @@ namespace Sheaft.Application.Handlers
                     if (!startResult.Success)
                         throw startResult.Exception;
 
-                    await _mediatr.Post(new ProductImportProcessingEvent(request.RequestUser) { Id = job.Id }, token);
+                    await _mediatr.Post(new ProductImportProcessingEvent(request.RequestUser) { JobId = job.Id }, token);
 
                     using (var stream = new MemoryStream())
                     {
@@ -305,14 +305,14 @@ namespace Sheaft.Application.Handlers
                     if (!result.Success)
                         throw result.Exception;
 
-                    await _mediatr.Post(new ProductImportSucceededEvent(request.RequestUser) { Id = job.Id }, token);
+                    await _mediatr.Post(new ProductImportSucceededEvent(request.RequestUser) { JobId = job.Id }, token);
 
                     _logger.LogInformation($"Products import Job {job.Id} successfully processed");
                     return result;
                 }
                 catch (Exception e)
                 {
-                    await _mediatr.Post(new ProductImportFailedEvent(request.RequestUser) { Id = job.Id }, token);
+                    await _mediatr.Post(new ProductImportFailedEvent(request.RequestUser) { JobId = job.Id }, token);
                     return await _mediatr.Process(new FailJobCommand(request.RequestUser) { Id = job.Id, Reason = e.Message }, token);
                 }
             });

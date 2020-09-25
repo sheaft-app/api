@@ -29,15 +29,15 @@ namespace Sheaft.Application.Interop
         DbSet<Order> Orders { get; set; }
         DbSet<PurchaseOrder> PurchaseOrders { get; set; }
         DbSet<Returnable> Returnables { get; set; }
+        DbSet<Payin> Payins { get; set; }
+        DbSet<Payout> Payouts { get; set; }
         DbSet<Product> Products { get; set; }
         DbSet<QuickOrder> QuickOrders { get; set; }
+        DbSet<Refund> Refunds { get; set; }
         DbSet<Region> Regions { get; set; }
         DbSet<Reward> Rewards { get; set; }
         DbSet<Tag> Tags { get; set; }
-        DbSet<PayinTransaction> PayinTransactions { get; set; }
-        DbSet<TransferTransaction> TransferTransactions { get; set; }
-        DbSet<PayoutTransaction> PayoutTransactions { get; set; }
-        DbSet<RefundTransaction> RefundTransactions { get; set; }
+        DbSet<Transfer> Transfers { get; set; }
         DbSet<Ubo> Ubos { get; set; }
         DbSet<User> Users { get; set; }
 

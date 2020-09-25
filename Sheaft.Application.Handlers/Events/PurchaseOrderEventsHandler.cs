@@ -35,7 +35,7 @@ namespace Sheaft.Application.Handlers
 
         public async Task Handle(PurchaseOrderAcceptedEvent orderEvent, CancellationToken token)
         {
-            var purchaseOrder = await _context.GetByIdAsync<PurchaseOrder>(orderEvent.Id, token);
+            var purchaseOrder = await _context.GetByIdAsync<PurchaseOrder>(orderEvent.PurchaseOrderId, token);
             await _signalrService.SendNotificationToUserAsync(purchaseOrder.Sender.Id, nameof(PurchaseOrderAcceptedEvent), GetPurchaseNotifModelAsString(purchaseOrder));
 
             var email = purchaseOrder.Sender.Email;
@@ -52,7 +52,7 @@ namespace Sheaft.Application.Handlers
 
         public async Task Handle(PurchaseOrderCancelledBySenderEvent orderEvent, CancellationToken token)
         {
-            var purchaseOrder = await _context.GetByIdAsync<PurchaseOrder>(orderEvent.Id, token);
+            var purchaseOrder = await _context.GetByIdAsync<PurchaseOrder>(orderEvent.PurchaseOrderId, token);
             await _signalrService.SendNotificationToGroupAsync(purchaseOrder.Vendor.Id, nameof(PurchaseOrderCancelledBySenderEvent), GetPurchaseNotifModelAsString(purchaseOrder));
 
             var url = $"{_configuration.GetValue<string>("Urls:Portal")}/#/orders/{purchaseOrder.Id}";
@@ -66,7 +66,7 @@ namespace Sheaft.Application.Handlers
 
         public async Task Handle(PurchaseOrderCancelledByVendorEvent orderEvent, CancellationToken token)
         {
-            var purchaseOrder = await _context.GetByIdAsync<PurchaseOrder>(orderEvent.Id, token);
+            var purchaseOrder = await _context.GetByIdAsync<PurchaseOrder>(orderEvent.PurchaseOrderId, token);
             await _signalrService.SendNotificationToUserAsync(purchaseOrder.Sender.Id, nameof(PurchaseOrderCancelledByVendorEvent), GetPurchaseNotifModelAsString(purchaseOrder));
 
             var url = $"{_configuration.GetValue<string>("Urls:Portal")}/#/my-orders/{purchaseOrder.Id}";
@@ -81,7 +81,7 @@ namespace Sheaft.Application.Handlers
 
         public async Task Handle(PurchaseOrderCompletedEvent orderEvent, CancellationToken token)
         {
-            var purchaseOrder = await _context.GetByIdAsync<PurchaseOrder>(orderEvent.Id, token);
+            var purchaseOrder = await _context.GetByIdAsync<PurchaseOrder>(orderEvent.PurchaseOrderId, token);
             await _signalrService.SendNotificationToUserAsync(purchaseOrder.Sender.Id, nameof(PurchaseOrderCompletedEvent), GetPurchaseNotifModelAsString(purchaseOrder));
 
             var email = purchaseOrder.Sender.Email;
@@ -98,7 +98,7 @@ namespace Sheaft.Application.Handlers
 
         public async Task Handle(PurchaseOrderCreatedEvent orderEvent, CancellationToken token)
         {
-            var purchaseOrder = await _context.GetByIdAsync<PurchaseOrder>(orderEvent.Id, token);
+            var purchaseOrder = await _context.GetByIdAsync<PurchaseOrder>(orderEvent.PurchaseOrderId, token);
             await _signalrService.SendNotificationToGroupAsync(purchaseOrder.Vendor.Id, nameof(PurchaseOrderCreatedEvent), GetPurchaseNotifModelAsString(purchaseOrder));
             await _signalrService.SendNotificationToUserAsync(purchaseOrder.Sender.Id, nameof(PurchaseOrderCreatedEvent), GetPurchaseNotifModelAsString(purchaseOrder));
 
@@ -123,7 +123,7 @@ namespace Sheaft.Application.Handlers
 
         public async Task Handle(PurchaseOrderRefusedEvent orderEvent, CancellationToken token)
         {
-            var purchaseOrder = await _context.GetByIdAsync<PurchaseOrder>(orderEvent.Id, token);
+            var purchaseOrder = await _context.GetByIdAsync<PurchaseOrder>(orderEvent.PurchaseOrderId, token);
             await _signalrService.SendNotificationToUserAsync(purchaseOrder.Sender.Id, nameof(PurchaseOrderRefusedEvent), GetPurchaseNotifModelAsString(purchaseOrder));
 
             var email = purchaseOrder.Sender.Email;
@@ -140,7 +140,7 @@ namespace Sheaft.Application.Handlers
 
         public async Task Handle(PurchaseOrderProcessingEvent orderEvent, CancellationToken token)
         {
-            var purchaseOrder = await _context.GetByIdAsync<PurchaseOrder>(orderEvent.Id, token);
+            var purchaseOrder = await _context.GetByIdAsync<PurchaseOrder>(orderEvent.PurchaseOrderId, token);
             await _signalrService.SendNotificationToUserAsync(purchaseOrder.Sender.Id, nameof(PurchaseOrderProcessingEvent), GetPurchaseNotifModelAsString(purchaseOrder));
         }
 

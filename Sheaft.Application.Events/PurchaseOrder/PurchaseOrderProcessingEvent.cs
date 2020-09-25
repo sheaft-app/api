@@ -6,13 +6,13 @@ namespace Sheaft.Application.Events
 {
     public class PurchaseOrderProcessingEvent : Event
     {
-        public const string QUEUE_NAME = "event-purchaseorders-processing";
+        public const string QUEUE_NAME = "event-purchaseorder-processing";
 
         [JsonConstructor]
         public PurchaseOrderProcessingEvent(RequestUser requestUser) : base(requestUser)
         {
         }
 
-        public Guid Id { get; set; }
+        public Guid PurchaseOrderId { get; set; }
     }
 }

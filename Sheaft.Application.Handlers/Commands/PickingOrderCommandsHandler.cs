@@ -74,7 +74,7 @@ namespace Sheaft.Application.Handlers
                         throw startResult.Exception;
 
                     var purchaseOrders = await _context.GetByIdsAsync<PurchaseOrder>(request.PurchaseOrderIds, token);
-                    await _mediatr.Post(new PickingOrderExportProcessingEvent(request.RequestUser) { Id = job.Id }, token);
+                    await _mediatr.Post(new PickingOrderExportProcessingEvent(request.RequestUser) { JobId = job.Id }, token);
 
                     using (var stream = new MemoryStream())
                     {
@@ -91,13 +91,13 @@ namespace Sheaft.Application.Handlers
                         if (!result.Success)
                             throw result.Exception;
 
-                        await _mediatr.Post(new PickingOrderExportSucceededEvent(request.RequestUser) { Id = job.Id }, token);
+                        await _mediatr.Post(new PickingOrderExportSucceededEvent(request.RequestUser) { JobId = job.Id }, token);
                         return await _mediatr.Process(new CompleteJobCommand(request.RequestUser) { Id = job.Id, FileUrl = response.Data }, token);
                     }
                 }
                 catch (Exception e)
                 {
-                    await _mediatr.Post(new PickingOrderExportFailedEvent(request.RequestUser) { Id = job.Id }, token);
+                    await _mediatr.Post(new PickingOrderExportFailedEvent(request.RequestUser) { JobId = job.Id }, token);
                     return await _mediatr.Process(new FailJobCommand(request.RequestUser) { Id = request.JobId, Reason = e.Message }, token);
                 }
             });

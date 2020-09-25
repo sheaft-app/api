@@ -15,8 +15,8 @@ namespace Sheaft.Application.Handlers
     public class DeclarationCommandsHandler : ResultsHandler,
            IRequestHandler<CreateDeclarationCommand, Result<Guid>>,
            IRequestHandler<SubmitDeclarationCommand, Result<bool>>,
-           IRequestHandler<SetDeclarationStatusCommand, Result<bool>>,
-           IRequestHandler<EnsureDeclarationConfiguredCommand, Result<bool>>
+           IRequestHandler<RefreshDeclarationStatusCommand, Result<bool>>,
+           IRequestHandler<CheckDeclarationConfigurationCommand, Result<bool>>
     {
         private readonly IPspService _pspService;
 
@@ -76,7 +76,7 @@ namespace Sheaft.Application.Handlers
             });
         }
 
-        public async Task<Result<bool>> Handle(SetDeclarationStatusCommand request, CancellationToken token)
+        public async Task<Result<bool>> Handle(RefreshDeclarationStatusCommand request, CancellationToken token)
         {
             return await ExecuteAsync(async () =>
             {
@@ -92,15 +92,15 @@ namespace Sheaft.Application.Handlers
                 _context.Update(declaration);
                 var success = await _context.SaveChangesAsync(token) > 0;
 
-                switch (request.Kind)
+                switch (declaration.Status)
                 {
-                    case PspEventKind.UBO_DECLARATION_INCOMPLETE:
+                    case DeclarationStatus.Incomplete:
                         await _mediatr.Post(new DeclarationIncompleteEvent(request.RequestUser) { DeclarationId = declaration.Id }, token);
                         break;
-                    case PspEventKind.UBO_DECLARATION_REFUSED:
+                    case DeclarationStatus.Refused:
                         await _mediatr.Post(new DeclarationRefusedEvent(request.RequestUser) { DeclarationId = declaration.Id }, token);
                         break;
-                    case PspEventKind.UBO_DECLARATION_VALIDATED:
+                    case DeclarationStatus.Validated:
                         await _mediatr.Post(new DeclarationValidatedEvent(request.RequestUser) { DeclarationId = declaration.Id }, token);
                         break;
                 }
@@ -109,7 +109,7 @@ namespace Sheaft.Application.Handlers
             });
         }
 
-        public async Task<Result<bool>> Handle(EnsureDeclarationConfiguredCommand request, CancellationToken token)
+        public async Task<Result<bool>> Handle(CheckDeclarationConfigurationCommand request, CancellationToken token)
         {
             return await ExecuteAsync(async () =>
             {

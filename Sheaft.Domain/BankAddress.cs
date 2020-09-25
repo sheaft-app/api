@@ -2,7 +2,7 @@
 
 namespace Sheaft.Domain.Models
 {
-    public class BankAddress : BaseAddress
+    public class BankAddress : Address
     {
         protected BankAddress()
         {

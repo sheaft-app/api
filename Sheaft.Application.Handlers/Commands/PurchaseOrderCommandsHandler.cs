@@ -33,9 +33,7 @@ namespace Sheaft.Application.Handlers
         IRequestHandler<ShipPurchaseOrderCommand, Result<bool>>,
         IRequestHandler<DeliverPurchaseOrderCommand, Result<bool>>,
         IRequestHandler<DeletePurchaseOrderCommand, Result<bool>>,
-        IRequestHandler<RestorePurchaseOrderCommand, Result<bool>>,
-        IRequestHandler<CreatePurchaseOrderTransfersCommand, Result<bool>>,
-        IRequestHandler<CreatePurchaseOrderTransferCommand, Result<bool>>
+        IRequestHandler<RestorePurchaseOrderCommand, Result<bool>>
     {
         private readonly IIdentifierService _identifierService;
 
@@ -64,7 +62,7 @@ namespace Sheaft.Application.Handlers
                 await _context.SaveChangesAsync(token);
 
                 if (!request.SkipSendEmail)
-                    await _mediatr.Post(new PurchaseOrderCreatedEvent(request.RequestUser) { Id = entity.Id }, token);
+                    await _mediatr.Post(new PurchaseOrderCreatedEvent(request.RequestUser) { PurchaseOrderId = entity.Id }, token);
 
                 return Ok(entity.Id);
             });
@@ -259,9 +257,9 @@ namespace Sheaft.Application.Handlers
                 _context.Update(purchaseOrder);
 
                 if (request.RequestUser.Id == purchaseOrder.Sender.Id)
-                    await _mediatr.Post(new PurchaseOrderCancelledBySenderEvent(request.RequestUser) { Id = purchaseOrder.Id }, token);
+                    await _mediatr.Post(new PurchaseOrderCancelledBySenderEvent(request.RequestUser) { PurchaseOrderId = purchaseOrder.Id }, token);
                 else
-                    await _mediatr.Post(new PurchaseOrderCancelledByVendorEvent(request.RequestUser) { Id = purchaseOrder.Id }, token);
+                    await _mediatr.Post(new PurchaseOrderCancelledByVendorEvent(request.RequestUser) { PurchaseOrderId = purchaseOrder.Id }, token);
 
                 return Ok(await _context.SaveChangesAsync(token) > 0);
             });
@@ -276,7 +274,7 @@ namespace Sheaft.Application.Handlers
                 purchaseOrder.Refuse(request.Reason);
                 _context.Update(purchaseOrder);
 
-                await _mediatr.Post(new PurchaseOrderRefusedEvent(request.RequestUser) { Id = purchaseOrder.Id }, token);
+                await _mediatr.Post(new PurchaseOrderRefusedEvent(request.RequestUser) { PurchaseOrderId = purchaseOrder.Id }, token);
 
                 return Ok(await _context.SaveChangesAsync(token) > 0);
             });
@@ -291,7 +289,7 @@ namespace Sheaft.Application.Handlers
                 purchaseOrder.Process();
                 _context.Update(purchaseOrder);
 
-                await _mediatr.Post(new PurchaseOrderProcessingEvent(request.RequestUser) { Id = purchaseOrder.Id }, token);
+                await _mediatr.Post(new PurchaseOrderProcessingEvent(request.RequestUser) { PurchaseOrderId = purchaseOrder.Id }, token);
 
                 return Ok(await _context.SaveChangesAsync(token) > 0);
             });
@@ -306,7 +304,7 @@ namespace Sheaft.Application.Handlers
                 purchaseOrder.Complete();
                 _context.Update(purchaseOrder);
 
-                await _mediatr.Post(new PurchaseOrderCompletedEvent(request.RequestUser) { Id = purchaseOrder.Id }, token);
+                await _mediatr.Post(new PurchaseOrderCompletedEvent(request.RequestUser) { PurchaseOrderId = purchaseOrder.Id }, token);
 
                 return Ok(await _context.SaveChangesAsync(token) > 0);
             });
@@ -321,7 +319,7 @@ namespace Sheaft.Application.Handlers
                 purchaseOrder.Accept();
                 _context.Update(purchaseOrder);
 
-                await _mediatr.Post(new PurchaseOrderAcceptedEvent(request.RequestUser) { Id = purchaseOrder.Id }, token);
+                await _mediatr.Post(new PurchaseOrderAcceptedEvent(request.RequestUser) { PurchaseOrderId = purchaseOrder.Id }, token);
 
                 return Ok(await _context.SaveChangesAsync(token) > 0);
             });
@@ -347,96 +345,6 @@ namespace Sheaft.Application.Handlers
 
                 return Ok(await _context.SaveChangesAsync(token) > 0);
             });
-        }
-
-        public async Task<Result<bool>> Handle(CreatePurchaseOrderTransfersCommand request, CancellationToken token)
-        {
-            return await ExecuteAsync(async () =>
-            {
-                var skip = 0;
-                const int take = 100;
-
-                var expiredDate = DateTimeOffset.UtcNow.AddMinutes(-15);
-                var purchaseOrders = await GetNextAcceptedPurchaseOrders(expiredDate, skip, take, token);
-
-                while (purchaseOrders.Any())
-                {
-                    foreach (var purchaseOrder in purchaseOrders)
-                    {
-                        await _mediatr.Post(new CreatePurchaseOrderTransferCommand(request.RequestUser)
-                            {
-                                PurchaseOrderId = purchaseOrder.Id
-                            }, token);
-                    }
-
-                    skip += take;
-                    purchaseOrders = await GetNextAcceptedPurchaseOrders(expiredDate, skip, take, token);
-                }
-
-                return Ok(true);
-            });
-        }
-
-        public async Task<Result<bool>> Handle(CreatePurchaseOrderTransferCommand request, CancellationToken token)
-        {
-            return await ExecuteAsync(async () =>
-            {
-                var purchaseOrder = await _context.GetByIdAsync<PurchaseOrder>(request.PurchaseOrderId, token);
-                if (purchaseOrder.Status < PurchaseOrderStatus.Accepted || purchaseOrder.Status > PurchaseOrderStatus.Delivered)
-                    return Ok(true);
-
-                var checkResult = await _mediatr.Process(new EnsureProducerConfiguredCommand(request.RequestUser) { UserId = purchaseOrder.Vendor.Id }, token);
-                if (!checkResult.Success)
-                {
-                    await _mediatr.Post(new ProducerNotConfiguredEvent(request.RequestUser)
-                        {
-                            UserId = purchaseOrder.Vendor.Id
-                        }, token);
-
-                    return Failed<bool>(checkResult.Exception);
-                }
-
-                var transactions = purchaseOrder.Transactions.ToList();
-                if (transactions.Any(c => c.Status != TransactionStatus.Failed && c.Status != TransactionStatus.Expired))
-                    return Ok(false);
-
-                if (transactions.Count(c => c.Status == TransactionStatus.Failed) >= 3)
-                {
-                    await _mediatr.Post(new CreatePurchaseOrderTransferFailedEvent(request.RequestUser)
-                    {
-                        PurchaseOrderId = purchaseOrder.Id
-                    }, token);
-
-                    return TooManyRetries<bool>();
-                }
-
-                var result = await _mediatr.Process(new CreateTransferTransactionCommand(request.RequestUser)
-                {
-                    PurchaseOrderId = purchaseOrder.Id,
-                    FromUserId = purchaseOrder.Sender.Id,
-                    ToUserId = purchaseOrder.Vendor.Id
-                }, token);
-
-                if (!result.Success)
-                    return Failed<bool>(result.Exception);
-
-                return Ok(true);
-            });
-        }
-
-        private async Task<IEnumerable<PurchaseOrder>> GetNextAcceptedPurchaseOrders(DateTimeOffset expiredDate, int skip, int take, CancellationToken token)
-        {
-            return await _context.PurchaseOrders
-                .Get(c => c.Status > PurchaseOrderStatus.Waiting
-                            && c.Status < PurchaseOrderStatus.Refused
-                            && c.UpdatedOn.Value < expiredDate
-                            && (!c.Transactions.Any()
-                                || c.Transactions.All(t => t.Status == TransactionStatus.Failed || t.Status == TransactionStatus.Expired)
-                            ), true)
-                .OrderBy(c => c.CreatedOn)
-                .Skip(skip)
-                .Take(take)
-                .ToListAsync(token);
         }
     }
 }

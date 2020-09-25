@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
-using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -33,7 +32,6 @@ namespace Sheaft.Payment.Controllers
         {
             var requestUser = new RequestUser("hook", _httpContextAccessor.HttpContext.TraceIdentifier);
             var identifier = ressourceId ?? resourceId;
-            IBaseRequest hook = null;
 
             switch (EventType)
             {
@@ -41,44 +39,43 @@ namespace Sheaft.Payment.Controllers
                 case PspEventKind.KYC_FAILED:
                 case PspEventKind.KYC_OUTDATED:
                 case PspEventKind.KYC_VALIDATION_ASKED:
-                    hook = new SetDocumentStatusCommand(requestUser, EventType, identifier, GetExecutedOn(date));
+                    await _queueService.ProcessCommandAsync(new RefreshDocumentStatusCommand(requestUser, identifier), token);
                     break;
                 case PspEventKind.UBO_DECLARATION_REFUSED:
                 case PspEventKind.UBO_DECLARATION_VALIDATED:
                 case PspEventKind.UBO_DECLARATION_INCOMPLETE:
                 case PspEventKind.UBO_DECLARATION_VALIDATION_ASKED:
-                    hook = new SetDeclarationStatusCommand(requestUser, EventType, identifier, GetExecutedOn(date));
+                    await _queueService.ProcessCommandAsync(new RefreshDeclarationStatusCommand(requestUser, identifier), token);
                     break;
                 case PspEventKind.PAYIN_NORMAL_SUCCEEDED:
                 case PspEventKind.PAYIN_NORMAL_FAILED:
-                    hook = new SetPayinStatusCommand(requestUser, EventType, identifier, GetExecutedOn(date));
+                    await _queueService.ProcessCommandAsync(new RefreshPayinStatusCommand(requestUser, identifier), token);
                     break;
                 case PspEventKind.TRANSFER_NORMAL_SUCCEEDED:
                 case PspEventKind.TRANSFER_NORMAL_FAILED:
-                    hook = new SetTransferStatusCommand(requestUser, EventType, identifier, GetExecutedOn(date));
+                    await _queueService.ProcessCommandAsync(new RefreshTransferStatusCommand(requestUser, identifier), token);
                     break;
                 case PspEventKind.PAYOUT_NORMAL_SUCCEEDED:
                 case PspEventKind.PAYOUT_NORMAL_FAILED:
-                    hook = new SetPayoutStatusCommand(requestUser, EventType, identifier, GetExecutedOn(date));
+                    await _queueService.ProcessCommandAsync(new RefreshPayoutStatusCommand(requestUser, identifier), token);
                     break;
                 case PspEventKind.PAYIN_REFUND_SUCCEEDED:
                 case PspEventKind.PAYIN_REFUND_FAILED:
-                    hook = new SetRefundPayinStatusCommand(requestUser, EventType, identifier, GetExecutedOn(date));
+                    await _queueService.ProcessCommandAsync(new RefreshPayinRefundStatusCommand(requestUser, identifier), token);
                     break;
                 case PspEventKind.TRANSFER_REFUND_SUCCEEDED:
                 case PspEventKind.TRANSFER_REFUND_FAILED:
-                    hook = new SetRefundTransferStatusCommand(requestUser, EventType, identifier, GetExecutedOn(date));
+                    await _queueService.ProcessCommandAsync(new RefreshTransferRefundStatusCommand(requestUser, identifier), token);
                     break;
                 case PspEventKind.PAYOUT_REFUND_SUCCEEDED:
                 case PspEventKind.PAYOUT_REFUND_FAILED:
-                    hook = new SetRefundPayoutStatusCommand(requestUser, EventType, identifier, GetExecutedOn(date));
+                    await _queueService.ProcessCommandAsync(new RefreshPayoutRefundStatusCommand(requestUser, identifier), token);
                     break;
                 default:
                     _logger.LogInformation($"{EventType:G)} is not a supported Psp EventType for resource: {identifier} executed on: {GetExecutedOn(date)}.");
                     return BadRequest();
             }
-
-            await _queueService.ProcessCommandAsync(hook, token);
+            
             return Ok();
         }
 

@@ -18,10 +18,10 @@ namespace Sheaft.Functions
             _mediatr = mediator;
         }
 
-        [FunctionName("CheckPayoutTransactionsCommand")]
-        public async Task CheckPayoutTransactionsCommandAsync([TimerTrigger("0 * * */1 * *", RunOnStartup = false)] TimerInfo info, CancellationToken token)
+        [FunctionName("CheckPayoutsCommand")]
+        public async Task CheckPayoutsCommandAsync([TimerTrigger("0 * * */1 * *", RunOnStartup = false)] TimerInfo info, CancellationToken token)
         {
-            var results = await _mediatr.Process(new CheckPayoutTransactionsCommand(new RequestUser("payout-functions", Guid.NewGuid().ToString("N"))), token);
+            var results = await _mediatr.Process(new CheckPayoutsCommand(new RequestUser("payout-functions", Guid.NewGuid().ToString("N"))), token);
             if (!results.Success)
                 throw results.Exception;
         }
@@ -37,39 +37,23 @@ namespace Sheaft.Functions
         [FunctionName("CreatePayoutForTransfersCommand")]
         public async Task CreatePayoutForTransfersCommandAsync([ServiceBusTrigger(CreatePayoutForTransfersCommand.QUEUE_NAME, Connection = "AzureWebJobsServiceBus")] string message, CancellationToken token)
         {
-            var results = await _mediatr.Process<CreatePayoutForTransfersCommand, bool>(message, token);
+            var results = await _mediatr.Process<CreatePayoutForTransfersCommand, Guid>(message, token);
             if (!results.Success)
                 throw results.Exception;
         }
 
-        [FunctionName("CheckCreatedPayoutTransactionCommand")]
-        public async Task CheckCreatedPayoutTransactionCommandAsync([ServiceBusTrigger(CheckCreatedPayoutTransactionCommand.QUEUE_NAME, Connection = "AzureWebJobsServiceBus")] string message, CancellationToken token)
+        [FunctionName("CheckPayoutCommand")]
+        public async Task CheckPayoutCommandAsync([ServiceBusTrigger(CheckPayoutCommand.QUEUE_NAME, Connection = "AzureWebJobsServiceBus")] string message, CancellationToken token)
         {
-            var results = await _mediatr.Process<CheckCreatedPayoutTransactionCommand, bool>(message, token);
+            var results = await _mediatr.Process<CheckPayoutCommand, bool>(message, token);
             if (!results.Success)
                 throw results.Exception;
         }
 
-        [FunctionName("CheckWaitingPayoutTransactionCommand")]
-        public async Task CheckWaitingPayoutTransactionCommandAsync([ServiceBusTrigger(CheckWaitingPayoutTransactionCommand.QUEUE_NAME, Connection = "AzureWebJobsServiceBus")] string message, CancellationToken token)
+        [FunctionName("RefreshPayoutStatusCommand")]
+        public async Task RefreshPayoutStatusCommandAsync([ServiceBusTrigger(RefreshPayoutStatusCommand.QUEUE_NAME, Connection = "AzureWebJobsServiceBus")] string message, CancellationToken token)
         {
-            var results = await _mediatr.Process<CheckWaitingPayoutTransactionCommand, bool>(message, token);
-            if (!results.Success)
-                throw results.Exception;
-        }
-
-        [FunctionName("SetPayoutStatusCommand")]
-        public async Task SetPayoutStatusCommandAsync([ServiceBusTrigger(SetPayoutStatusCommand.QUEUE_NAME, Connection = "AzureWebJobsServiceBus")] string message, CancellationToken token)
-        {
-            var results = await _mediatr.Process<SetPayoutStatusCommand, bool>(message, token);
-            if (!results.Success)
-                throw results.Exception;
-        }
-
-        [FunctionName("SetRefundPayoutStatusCommand")]
-        public async Task SetRefundPayoutStatusCommandAsync([ServiceBusTrigger(SetRefundPayoutStatusCommand.QUEUE_NAME, Connection = "AzureWebJobsServiceBus")] string message, CancellationToken token)
-        {
-            var results = await _mediatr.Process<SetRefundPayoutStatusCommand, bool>(message, token);
+            var results = await _mediatr.Process<RefreshPayoutStatusCommand, bool>(message, token);
             if (!results.Success)
                 throw results.Exception;
         }

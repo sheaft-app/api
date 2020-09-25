@@ -3,7 +3,7 @@ using Sheaft.Domain.Enums;
 
 namespace Sheaft.Domain.Models
 {
-    public class UboAddress : BaseAddress
+    public class UboAddress : Address
     {
         protected UboAddress()
         {

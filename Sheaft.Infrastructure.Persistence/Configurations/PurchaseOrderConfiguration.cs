@@ -47,7 +47,7 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
             var products = entity.Metadata.FindNavigation(nameof(PurchaseOrder.Products));
             products.SetPropertyAccessMode(PropertyAccessMode.Field);
 
-            var transactions = entity.Metadata.FindNavigation(nameof(PurchaseOrder.Transactions));
+            var transactions = entity.Metadata.FindNavigation(nameof(PurchaseOrder.Transfers));
             transactions.SetPropertyAccessMode(PropertyAccessMode.Field);
 
             entity.HasKey("Uid");

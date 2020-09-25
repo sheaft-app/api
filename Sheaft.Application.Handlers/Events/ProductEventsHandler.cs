@@ -28,7 +28,7 @@ namespace Sheaft.Application.Handlers
 
         public async Task Handle(ProductImportSucceededEvent productEvent, CancellationToken token)
         {
-            var job = await _context.GetByIdAsync<Job>(productEvent.Id, token);
+            var job = await _context.GetByIdAsync<Job>(productEvent.JobId, token);
             await _signalrService.SendNotificationToGroupAsync(job.User.Id, nameof(ProductImportSucceededEvent), new { JobId = job.Id, UserId = job.User.Id });
 
             var url = $"{_configuration.GetValue<string>("Urls:Portal")}/#/jobs/{job.Id}";
@@ -42,7 +42,7 @@ namespace Sheaft.Application.Handlers
 
         public async Task Handle(ProductImportFailedEvent productEvent, CancellationToken token)
         {
-            var job = await _context.GetByIdAsync<Job>(productEvent.Id, token);
+            var job = await _context.GetByIdAsync<Job>(productEvent.JobId, token);
             await _signalrService.SendNotificationToGroupAsync(job.User.Id, nameof(ProductImportFailedEvent), new { JobId = job.Id, UserId = job.User.Id });
 
             var url = $"{_configuration.GetValue<string>("Urls:Portal")}/#/jobs/{job.Id}";
@@ -56,7 +56,7 @@ namespace Sheaft.Application.Handlers
 
         public async Task Handle(ProductImportProcessingEvent productEvent, CancellationToken token)
         {
-            var job = await _context.GetByIdAsync<Job>(productEvent.Id, token);
+            var job = await _context.GetByIdAsync<Job>(productEvent.JobId, token);
             await _signalrService.SendNotificationToGroupAsync(job.User.Id, nameof(ProductImportProcessingEvent), new { JobId = job.Id, UserId = job.User.Id });
         }
     }

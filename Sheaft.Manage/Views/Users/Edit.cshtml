@@ -44,15 +44,8 @@
                 @Html.TextBoxFor(c => c.Picture, new { @class = "form-control", @type = "file" })
             </div>
 
-            @if (Model.Kind == ProfileKind.Consumer)
-            {               
-                <div class="form-check">
-                    @Html.CheckBoxFor(m => m.Anonymous, new { @class = "form-check-input" })
-                    @Html.LabelFor(m => m.Anonymous, new { @class = "form-check-label" })
-                </div>
-            }
-            else
-            {
+            @if (Model.Kind != ProfileKind.Consumer)
+            {              
                 <div class="form-group">
                     @Html.LabelFor(m => m.Name)
                     @Html.TextBoxFor(m => m.Name, null, new { @class = "form-control", @disabled = "disabled" })

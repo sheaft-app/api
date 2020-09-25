@@ -17,10 +17,10 @@ namespace Sheaft.Functions
             _mediatr = mediator;
         }
 
-        [FunctionName("SetDeclarationStatusCommand")]
-        public async Task SetDeclarationStatusCommandAsync([ServiceBusTrigger(SetDeclarationStatusCommand.QUEUE_NAME, Connection = "AzureWebJobsServiceBus")] string message, CancellationToken token)
+        [FunctionName("RefreshDeclarationStatusCommand")]
+        public async Task RefreshDeclarationStatusCommandAsync([ServiceBusTrigger(RefreshDeclarationStatusCommand.QUEUE_NAME, Connection = "AzureWebJobsServiceBus")] string message, CancellationToken token)
         {
-            var results = await _mediatr.Process<SetDeclarationStatusCommand, bool>(message, token);
+            var results = await _mediatr.Process<RefreshDeclarationStatusCommand, bool>(message, token);
             if (!results.Success)
                 throw results.Exception;
         }

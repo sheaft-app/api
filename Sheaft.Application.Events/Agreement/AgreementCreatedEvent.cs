@@ -1,16 +1,19 @@
 ﻿using Sheaft.Core;
 using Newtonsoft.Json;
+using System;
 
 namespace Sheaft.Application.Events
 {
-    public class AgreementCreatedEvent : AgreementEvent
+    public class AgreementCreatedEvent : Event
     {
-        public const string QUEUE_NAME = "event-agreements-created";
+        public const string QUEUE_NAME = "event-agreement-created";
         public const string MAILING_TEMPLATE_ID = "";
 
         [JsonConstructor]
         public AgreementCreatedEvent(RequestUser requestUser) : base(requestUser)
         {
         }
+
+        public Guid AgreementId { get; set; }
     }
 }

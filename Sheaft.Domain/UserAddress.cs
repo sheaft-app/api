@@ -3,7 +3,7 @@ using System.Text.RegularExpressions;
 
 namespace Sheaft.Domain.Models
 {
-    public class UserAddress : BaseAddress
+    public class UserAddress : Address
     {
         protected UserAddress()
         {

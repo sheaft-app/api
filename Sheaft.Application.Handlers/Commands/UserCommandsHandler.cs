@@ -224,7 +224,7 @@ namespace Sheaft.Application.Handlers
                     if (!startResult.Success)
                         throw startResult.Exception;
 
-                    await _mediatr.Post(new ExportUserDataProcessingEvent(request.RequestUser) { Id = request.Id, JobId = job.Id }, token);
+                    await _mediatr.Post(new ExportUserDataProcessingEvent(request.RequestUser) { JobId = job.Id }, token);
 
                     using (var stream = new MemoryStream())
                     {
@@ -237,7 +237,7 @@ namespace Sheaft.Application.Handlers
                         if (!response.Success)
                             throw response.Exception;
 
-                        await _mediatr.Post(new ExportUserDataSucceededEvent(request.RequestUser) { Id = job.Id, JobId = job.Id }, token);
+                        await _mediatr.Post(new ExportUserDataSucceededEvent(request.RequestUser) { JobId = job.Id }, token);
 
                         _logger.LogInformation($"RGPD data for user {request.RequestUser.Id} successfully exported");
                         return await _mediatr.Process(new CompleteJobCommand(request.RequestUser) { Id = job.Id, FileUrl = response.Data }, token);
@@ -245,7 +245,7 @@ namespace Sheaft.Application.Handlers
                 }
                 catch (Exception e)
                 {
-                    await _mediatr.Post(new ExportUserDataFailedEvent(request.RequestUser) { Id = request.Id, JobId = job.Id }, token);
+                    await _mediatr.Post(new ExportUserDataFailedEvent(request.RequestUser) { JobId = job.Id }, token);
                     return await _mediatr.Process(new FailJobCommand(request.RequestUser) { Id = job.Id, Reason = e.Message }, token);
                 }
 

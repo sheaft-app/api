@@ -7,9 +7,9 @@ using Sheaft.Application.Interop;
 namespace Sheaft.Application.Handlers
 {
     public class DocumentEventsHandler :
-        INotificationHandler<DocumentFailedEvent>,
+        INotificationHandler<DocumentRefusedEvent>,
         INotificationHandler<DocumentOutdatedEvent>,
-        INotificationHandler<DocumentSucceededEvent>
+        INotificationHandler<DocumentValidatedEvent>
     {
         private readonly IAppDbContext _context;
         private readonly IEmailService _emailService;
@@ -20,7 +20,7 @@ namespace Sheaft.Application.Handlers
             _emailService = emailService;
         }
 
-        public Task Handle(DocumentFailedEvent docEvent, CancellationToken token)
+        public Task Handle(DocumentRefusedEvent docEvent, CancellationToken token)
         {
             throw new System.NotImplementedException();
         }
@@ -30,7 +30,7 @@ namespace Sheaft.Application.Handlers
             throw new System.NotImplementedException();
         }
 
-        public Task Handle(DocumentSucceededEvent docEvent, CancellationToken token)
+        public Task Handle(DocumentValidatedEvent docEvent, CancellationToken token)
         {
             throw new System.NotImplementedException();
         }

@@ -86,7 +86,7 @@ namespace Sheaft.Application.Interop
 
         protected Result<T> TooManyRetries<T>(MessageKind? message = null, params object[] objs)
         {
-            _logger.LogTrace(nameof(ResultsHandler.Locked), message, objs);
+            _logger.LogTrace(nameof(ResultsHandler.TooManyRetries), message, objs);
             return new FailedResult<T>(new TooManyRetriesException(message, objs));
         }
 

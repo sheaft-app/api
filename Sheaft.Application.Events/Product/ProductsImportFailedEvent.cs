@@ -6,7 +6,7 @@ namespace Sheaft.Application.Events
 {
     public class ProductImportFailedEvent : Event
     {
-        public const string QUEUE_NAME = "event-products-import-failed";
+        public const string QUEUE_NAME = "event-product-import-failed";
         public const string MAILING_TEMPLATE_ID = "d-b4a25a1730da4f358fc390ad4b179913";
 
         [JsonConstructor]
@@ -14,6 +14,6 @@ namespace Sheaft.Application.Events
         {
         }
 
-        public Guid Id { get; set; }
+        public Guid JobId { get; set; }
     }
 }

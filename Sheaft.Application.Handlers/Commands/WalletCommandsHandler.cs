@@ -12,10 +12,10 @@ using Sheaft.Domain.Models;
 namespace Sheaft.Application.Handlers
 {
     public class WalletCommandsHandler : ResultsHandler,
-           IRequestHandler<CreatePaymentsWalletCommand, Result<Guid>>,
-           IRequestHandler<CreateRefundsWalletCommand, Result<Guid>>,
-           IRequestHandler<CreateReturnablesWalletCommand, Result<Guid>>,
-           IRequestHandler<EnsurePaymentsWalletConfiguredCommand, Result<bool>>
+           IRequestHandler<CreateWalletPaymentsCommand, Result<Guid>>,
+           IRequestHandler<CreateWalletRefundsCommand, Result<Guid>>,
+           IRequestHandler<CreateWalletReturnablesCommand, Result<Guid>>,
+           IRequestHandler<CheckWalletPaymentsConfigurationCommand, Result<bool>>
     {
         private readonly IPspService _pspService;
 
@@ -29,29 +29,29 @@ namespace Sheaft.Application.Handlers
             _pspService = pspService;
         }
 
-        public async Task<Result<Guid>> Handle(CreatePaymentsWalletCommand request, CancellationToken token)
+        public async Task<Result<Guid>> Handle(CreateWalletPaymentsCommand request, CancellationToken token)
         {
             return await CreateWalletAsync(request.UserId, "Paiements", WalletKind.Payments, token);
         }
 
-        public async Task<Result<Guid>> Handle(CreateRefundsWalletCommand request, CancellationToken token)
+        public async Task<Result<Guid>> Handle(CreateWalletRefundsCommand request, CancellationToken token)
         {
             return await CreateWalletAsync(request.UserId, "Remboursements", WalletKind.Refunds, token);
         }
 
-        public async Task<Result<Guid>> Handle(CreateReturnablesWalletCommand request, CancellationToken token)
+        public async Task<Result<Guid>> Handle(CreateWalletReturnablesCommand request, CancellationToken token)
         {
             return await CreateWalletAsync(request.UserId, "Consignes", WalletKind.Returnables, token);
         }
 
-        public async Task<Result<bool>> Handle(EnsurePaymentsWalletConfiguredCommand request, CancellationToken token)
+        public async Task<Result<bool>> Handle(CheckWalletPaymentsConfigurationCommand request, CancellationToken token)
         {
             return await ExecuteAsync(async () =>
             {
                 var wallet = await _context.FindSingleAsync<Wallet>(c => c.User.Id == request.UserId && c.Kind == WalletKind.Payments, token);
                 if (wallet == null)
                 {
-                    var walletResult = await _mediatr.Process(new CreatePaymentsWalletCommand(request.RequestUser)
+                    var walletResult = await _mediatr.Process(new CreateWalletPaymentsCommand(request.RequestUser)
                     {
                         UserId = request.UserId
                     }, token);

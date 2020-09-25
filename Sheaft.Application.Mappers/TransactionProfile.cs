@@ -8,56 +8,56 @@ namespace Sheaft.Application.Mappers
     {
         public TransactionProfile()
         {
-            CreateMap<PayinTransaction, TransactionDto>()
+            CreateMap<Payin, TransactionDto>()
                 .ForMember(m => m.Author, opt => opt.MapFrom(t => t.Author));
 
-            CreateMap<PayinTransaction, PayinTransactionDto>()
-                .IncludeBase<PayinTransaction, TransactionDto>()
+            CreateMap<Payin, PayinTransactionDto>()
+                .IncludeBase<Payin, TransactionDto>()
                 .ForMember(m => m.CreditedUser, opt => opt.MapFrom(t => t.CreditedWallet.User))
                 .ForMember(m => m.Order, opt => opt.MapFrom(t => t.Order));
 
-            CreateMap<CardPayinTransaction,TransactionDto>()
-                .IncludeBase<PayinTransaction, TransactionDto>();
+            CreateMap<CardPayin,TransactionDto>()
+                .IncludeBase<Payin, TransactionDto>();
 
-            CreateMap<WebPayinTransaction, WebPayinTransactionDto>()
-                .IncludeBase<PayinTransaction, TransactionDto>();
+            CreateMap<WebPayin, WebPayinTransactionDto>()
+                .IncludeBase<Payin, TransactionDto>();
 
-            CreateMap<TransferTransaction, TransactionDto>()
+            CreateMap<Transfer, TransactionDto>()
                 .ForMember(m => m.Author, opt => opt.MapFrom(t => t.Author));
 
-            CreateMap<TransferTransaction, TransferTransactionDto>()
-                .IncludeBase<TransferTransaction, TransactionDto>()
+            CreateMap<Transfer, TransferTransactionDto>()
+                .IncludeBase<Transfer, TransactionDto>()
                 .ForMember(m => m.CreditedUser, opt => opt.MapFrom(t => t.CreditedWallet.User))
                 .ForMember(m => m.DebitedUser, opt => opt.MapFrom(t => t.DebitedWallet.User))
                 .ForMember(m => m.PurchaseOrder, opt => opt.MapFrom(t => t.PurchaseOrder));
 
-            CreateMap<PayoutTransaction, TransactionDto>()
+            CreateMap<Payout, TransactionDto>()
                 .ForMember(m => m.Author, opt => opt.MapFrom(t => t.Author));
 
-            CreateMap<PayoutTransaction, PayoutTransactionDto>()
-                .IncludeBase<PayoutTransaction, TransactionDto>()
+            CreateMap<Payout, PayoutTransactionDto>()
+                .IncludeBase<Payout, TransactionDto>()
                 .ForMember(m => m.DebitedUser, opt => opt.MapFrom(t => t.DebitedWallet.User));
 
-            CreateMap<RefundTransaction, TransactionDto>()
+            CreateMap<Refund, TransactionDto>()
                 .ForMember(m => m.Author, opt => opt.MapFrom(t => t.Author));
 
-            CreateMap<RefundTransaction, RefundTransactionDto>()
-                .IncludeBase<RefundTransaction, TransactionDto>();
+            CreateMap<Refund, RefundTransactionDto>()
+                .IncludeBase<Refund, TransactionDto>();
 
-            CreateMap<RefundPayinTransaction, RefundTransactionDto>()
-                .IncludeBase<RefundTransaction, RefundTransactionDto>()
-                .ForMember(m => m.RefundedTransaction, opt => opt.MapFrom(t => t.PayinTransaction));
+            CreateMap<PayinRefund, RefundTransactionDto>()
+                .IncludeBase<Refund, RefundTransactionDto>()
+                .ForMember(m => m.RefundedTransaction, opt => opt.MapFrom(t => t.Payin));
 
-            CreateMap<RefundPayinTransaction, RefundPayinTransactionDto>()
-                .IncludeBase<RefundPayinTransaction, RefundTransactionDto>()
+            CreateMap<PayinRefund, RefundPayinTransactionDto>()
+                .IncludeBase<PayinRefund, RefundTransactionDto>()
                 .ForMember(m => m.DebitedUser, opt => opt.MapFrom(t => t.DebitedWallet.User));
 
-            CreateMap<RefundTransferTransaction, RefundTransactionDto>()
-                .IncludeBase<RefundTransaction, RefundTransactionDto>()
-                .ForMember(m => m.RefundedTransaction, opt => opt.MapFrom(t => t.TransferTransaction));
+            CreateMap<TransferRefund, RefundTransactionDto>()
+                .IncludeBase<Refund, RefundTransactionDto>()
+                .ForMember(m => m.RefundedTransaction, opt => opt.MapFrom(t => t.Transfer));
 
-            CreateMap<RefundTransferTransaction, RefundTransferTransactionDto>()
-                .IncludeBase<RefundTransferTransaction, RefundTransactionDto>()
+            CreateMap<TransferRefund, RefundTransferTransactionDto>()
+                .IncludeBase<TransferRefund, RefundTransactionDto>()
                 .ForMember(m => m.CreditedUser, opt => opt.MapFrom(t => t.CreditedWallet.User))
                 .ForMember(m => m.DebitedUser, opt => opt.MapFrom(t => t.DebitedWallet.User));
         }

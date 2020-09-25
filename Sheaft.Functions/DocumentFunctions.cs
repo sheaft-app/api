@@ -17,18 +17,18 @@ namespace Sheaft.Functions
             _mediatr = mediator;
         }
 
-        [FunctionName("SetDocumentStatusCommand")]
-        public async Task SetDocumentStatusCommandAsync([ServiceBusTrigger(SetDocumentStatusCommand.QUEUE_NAME, Connection = "AzureWebJobsServiceBus")] string message, CancellationToken token)
+        [FunctionName("RefreshDocumentStatusCommand")]
+        public async Task RefreshDocumentStatusCommandAsync([ServiceBusTrigger(RefreshDocumentStatusCommand.QUEUE_NAME, Connection = "AzureWebJobsServiceBus")] string message, CancellationToken token)
         {
-            var results = await _mediatr.Process<SetDocumentStatusCommand, bool>(message, token);
+            var results = await _mediatr.Process<RefreshDocumentStatusCommand, bool>(message, token);
             if (!results.Success)
                 throw results.Exception;
         }
 
-        [FunctionName("DocumentFailedEvent")]
-        public async Task DocumentFailedEventAsync([ServiceBusTrigger(DocumentFailedEvent.QUEUE_NAME, Connection = "AzureWebJobsServiceBus")] string message, CancellationToken token)
+        [FunctionName("DocumentRefusedEvent")]
+        public async Task DocumentRefusedEventAsync([ServiceBusTrigger(DocumentRefusedEvent.QUEUE_NAME, Connection = "AzureWebJobsServiceBus")] string message, CancellationToken token)
         {
-            await _mediatr.Process<DocumentFailedEvent>(message, token);
+            await _mediatr.Process<DocumentRefusedEvent>(message, token);
         }
 
         [FunctionName("DocumentOutdatedEvent")]
@@ -37,10 +37,10 @@ namespace Sheaft.Functions
             await _mediatr.Process<DocumentOutdatedEvent>(message, token);
         }
 
-        [FunctionName("DocumentSucceededEvent")]
-        public async Task DocumentSucceededEventAsync([ServiceBusTrigger(DocumentSucceededEvent.QUEUE_NAME, Connection = "AzureWebJobsServiceBus")] string message, CancellationToken token)
+        [FunctionName("DocumentValidatedEvent")]
+        public async Task DocumentValidatedEventAsync([ServiceBusTrigger(DocumentValidatedEvent.QUEUE_NAME, Connection = "AzureWebJobsServiceBus")] string message, CancellationToken token)
         {
-            await _mediatr.Process<DocumentSucceededEvent>(message, token);
+            await _mediatr.Process<DocumentValidatedEvent>(message, token);
         }
     }
 }

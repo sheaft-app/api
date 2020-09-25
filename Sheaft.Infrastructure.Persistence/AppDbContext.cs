@@ -39,15 +39,15 @@ namespace Sheaft.Infrastructure.Persistence
         public DbSet<Order> Orders { get; set; }
         public DbSet<PurchaseOrder> PurchaseOrders { get; set; }
         public DbSet<Returnable> Returnables { get; set; }
+        public DbSet<Payin> Payins { get; set; }
+        public DbSet<Payout> Payouts { get; set; }
         public DbSet<Product> Products { get; set; }
         public DbSet<QuickOrder> QuickOrders { get; set; }
+        public DbSet<Refund> Refunds { get; set; }
         public DbSet<Region> Regions { get; set; }
         public DbSet<Reward> Rewards { get; set; }
         public DbSet<Tag> Tags { get; set; }
-        public DbSet<PayinTransaction> PayinTransactions { get; set; }
-        public DbSet<TransferTransaction> TransferTransactions { get; set; }
-        public DbSet<PayoutTransaction> PayoutTransactions { get; set; }
-        public DbSet<RefundTransaction> RefundTransactions { get; set; }
+        public DbSet<Transfer> Transfers { get; set; }
         public DbSet<Ubo> Ubos { get; set; }
         public DbSet<User> Users { get; set; }
 

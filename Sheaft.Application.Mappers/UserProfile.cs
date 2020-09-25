@@ -10,9 +10,7 @@ namespace Sheaft.Application.Mappers
     {
         public UserProfile()
         {
-            CreateMap<User, UserViewModel>()
-                .ForMember(c => c.DepartmentId, opt => opt.MapFrom(d => d.Address != null ? d.Address.Department.Id : (Guid?)null));
-
+            CreateMap<User, UserViewModel>();
             CreateMap<User, UserProfileDto>();
 
             CreateMap<User, UserDto>()

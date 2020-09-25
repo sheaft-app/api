@@ -129,7 +129,7 @@ namespace Sheaft.Infrastructure.Services
                 var result = await _api.Users.CreateBankAccountIbanAsync(payment.Id.ToString("N"),
                     new BankAccountIbanPostDTO(
                         payment.Owner,
-                        new Address
+                        new MangoPay.SDK.Entities.Address
                         {
                             AddressLine1 = payment.Line1,
                             AddressLine2 = payment.Line2,
@@ -357,7 +357,7 @@ namespace Sheaft.Infrastructure.Services
             });
         }
 
-        public async Task<Result<PspWebPaymentResultDto>> CreateWebPayinAsync(WebPayinTransaction transaction, Owner owner, CancellationToken token)
+        public async Task<Result<PspWebPaymentResultDto>> CreateWebPayinAsync(WebPayin transaction, Owner owner, CancellationToken token)
         {
             return await ExecuteAsync(async () =>
             {
@@ -409,7 +409,7 @@ namespace Sheaft.Infrastructure.Services
             });
         }
 
-        public async Task<Result<PspPaymentResultDto>> CreateCardPayinAsync(CardPayinTransaction transaction, Owner owner, CancellationToken token)
+        public async Task<Result<PspPaymentResultDto>> CreateCardPayinAsync(CardPayin transaction, Owner owner, CancellationToken token)
         {
             return await ExecuteAsync(async () =>
             {
@@ -461,7 +461,7 @@ namespace Sheaft.Infrastructure.Services
             });
         }
 
-        public async Task<Result<PspPaymentResultDto>> CreateTransferAsync(TransferTransaction transaction, CancellationToken token)
+        public async Task<Result<PspPaymentResultDto>> CreateTransferAsync(Transfer transaction, CancellationToken token)
         {
             return await ExecuteAsync(async () =>
             {
@@ -507,7 +507,7 @@ namespace Sheaft.Infrastructure.Services
             });
         }
 
-        public async Task<Result<PspPaymentResultDto>> CreatePayoutAsync(PayoutTransaction transaction, CancellationToken token)
+        public async Task<Result<PspPaymentResultDto>> CreatePayoutAsync(Payout transaction, CancellationToken token)
         {
             return await ExecuteAsync(async () =>
             {
@@ -550,19 +550,19 @@ namespace Sheaft.Infrastructure.Services
             });
         }
 
-        public async Task<Result<PspPaymentResultDto>> RefundPayinAsync(RefundPayinTransaction transaction, CancellationToken token)
+        public async Task<Result<PspPaymentResultDto>> RefundPayinAsync(PayinRefund transaction, CancellationToken token)
         {
             return await ExecuteAsync(async () =>
             {
                 if (string.IsNullOrWhiteSpace(transaction.Author.Identifier))
                     return Failed<PspPaymentResultDto>(new SheaftException(ExceptionKind.BadRequest, MessageKind.PsP_CannotRefund_Payin_Author_Not_Exists));
 
-                if (string.IsNullOrWhiteSpace(transaction.PayinTransaction.Identifier))
+                if (string.IsNullOrWhiteSpace(transaction.Payin.Identifier))
                     return Failed<PspPaymentResultDto>(new SheaftException(ExceptionKind.BadRequest, MessageKind.PsP_CannotRefund_Payin_PayinIdentifier_Missing));
 
                 await EnsureAccessTokenIsValidAsync(token);
 
-                var result = await _api.PayIns.CreateRefundAsync(transaction.Id.ToString("N"), transaction.PayinTransaction.Identifier,
+                var result = await _api.PayIns.CreateRefundAsync(transaction.Id.ToString("N"), transaction.Payin.Identifier,
                     new RefundPayInPostDTO(
                         transaction.Author.Identifier,
                         new Money
@@ -590,21 +590,21 @@ namespace Sheaft.Infrastructure.Services
             });
         }
 
-        public async Task<Result<PspPaymentResultDto>> RefundTransferAsync(RefundTransferTransaction transaction, CancellationToken token)
+        public async Task<Result<PspPaymentResultDto>> RefundTransferAsync(TransferRefund transaction, CancellationToken token)
         {
             return await ExecuteAsync(async () =>
             {
                 if (string.IsNullOrWhiteSpace(transaction.Author.Identifier))
                     return Failed<PspPaymentResultDto>(new SheaftException(ExceptionKind.BadRequest, MessageKind.PsP_CannotRefund_Transfer_Author_Not_Exists));
 
-                if (string.IsNullOrWhiteSpace(transaction.TransferTransaction.Identifier))
+                if (string.IsNullOrWhiteSpace(transaction.Transfer.Identifier))
                     return Failed<PspPaymentResultDto>(new SheaftException(ExceptionKind.BadRequest, MessageKind.PsP_CannotRefund_Transfer_TransferIdentifier_Missing));
 
                 await EnsureAccessTokenIsValidAsync(token);
 
                 var result = await _api.Transfers.CreateRefundAsync(
                     transaction.Id.ToString("N"),
-                    transaction.TransferTransaction.Identifier,
+                    transaction.Transfer.Identifier,
                     new RefundTransferPostDTO(transaction.Author.Identifier));
 
                 return Ok(new PspPaymentResultDto
@@ -804,9 +804,9 @@ namespace Sheaft.Infrastructure.Services
                     return KycDocumentType.NotSpecified;
             }
         }
-        public static Address GetAddress(this BaseAddress address)
+        public static MangoPay.SDK.Entities.Address GetAddress(this Domain.Models.Address address)
         {
-            return new Address
+            return new MangoPay.SDK.Entities.Address
             {
                 AddressLine1 = address.Line1,
                 AddressLine2 = address.Line2,

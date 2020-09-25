@@ -18,22 +18,6 @@ namespace Sheaft.Functions
             _mediatr = mediator;
         }
 
-        [FunctionName("CreatePurchaseOrderTransfersCommand")]
-        public async Task CreatePurchaseOrderTransfersCommandAsync([TimerTrigger("0 * */1 * * *", RunOnStartup = false)] TimerInfo info, CancellationToken token)
-        {
-            var results = await _mediatr.Process(new CreatePurchaseOrderTransfersCommand(new RequestUser("purchaseorders-functions", Guid.NewGuid().ToString("N"))), token);
-            if (!results.Success)
-                throw results.Exception;
-        }
-
-        [FunctionName("CreatePurchaseOrderTransferCommand")]
-        public async Task CreatePurchaseOrderTransferCommandAsync([ServiceBusTrigger(CreatePurchaseOrderTransferCommand.QUEUE_NAME, Connection = "AzureWebJobsServiceBus")] string message, CancellationToken token)
-        {
-            var results = await _mediatr.Process< CreatePurchaseOrderTransferCommand, bool>(message, token);
-            if (!results.Success)
-                throw results.Exception;
-        }
-
         [FunctionName("PurchaseOrderAcceptedEvent")]
         public async Task PurchaseOrderAcceptedEventAsync([ServiceBusTrigger(PurchaseOrderAcceptedEvent.QUEUE_NAME, Connection = "AzureWebJobsServiceBus")] string message, CancellationToken token)
         {
@@ -74,12 +58,6 @@ namespace Sheaft.Functions
         public async Task PurchaseOrderRefusedEventAsync([ServiceBusTrigger(PurchaseOrderRefusedEvent.QUEUE_NAME, Connection = "AzureWebJobsServiceBus")] string message, CancellationToken token)
         {
             await _mediatr.Process<PurchaseOrderRefusedEvent>(message, token);
-        }
-
-        [FunctionName("CreatePurchaseOrderTransferFailedEvent")]
-        public async Task CreatePurchaseOrderTransferFailedEventAsync([ServiceBusTrigger(CreatePurchaseOrderTransferFailedEvent.QUEUE_NAME, Connection = "AzureWebJobsServiceBus")] string message, CancellationToken token)
-        {
-            await _mediatr.Process<CreatePurchaseOrderTransferFailedEvent>(message, token);
         }
     }
 }

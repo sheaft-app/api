@@ -19,10 +19,7 @@ namespace Sheaft.Application.Handlers
             IRequestHandler<SubmitDocumentsCommand, Result<bool>>,
             IRequestHandler<SubmitDocumentCommand, Result<bool>>,
             IRequestHandler<RemoveDocumentCommand, Result<bool>>,
-            IRequestHandler<SetDocumentStatusCommand, Result<bool>>,
-            IRequestHandler<EnsureProducerDocumentsCreatedCommand, Result<bool>>,
-            IRequestHandler<EnsureProducerDocumentsReviewedCommand, Result<bool>>,
-            IRequestHandler<EnsureProducerDocumentsValidatedCommand, Result<bool>>
+            IRequestHandler<RefreshDocumentStatusCommand, Result<bool>>
     {
         private readonly IPspService _pspService;
 
@@ -156,7 +153,7 @@ namespace Sheaft.Application.Handlers
             });
         }
 
-        public async Task<Result<bool>> Handle(SetDocumentStatusCommand request, CancellationToken token)
+        public async Task<Result<bool>> Handle(RefreshDocumentStatusCommand request, CancellationToken token)
         {
             return await ExecuteAsync(async () =>
             {
@@ -172,36 +169,21 @@ namespace Sheaft.Application.Handlers
                 _context.Update(document);
                 var success = await _context.SaveChangesAsync(token) > 0;
 
-                switch (request.Kind)
+                switch (document.Status)
                 {
-                    case PspEventKind.KYC_FAILED:
-                        await _mediatr.Post(new DocumentFailedEvent(request.RequestUser) { DocumentId = document.Id }, token);
+                    case DocumentStatus.Refused:
+                        await _mediatr.Post(new DocumentRefusedEvent(request.RequestUser) { DocumentId = document.Id }, token);
                         break;
-                    case PspEventKind.KYC_OUTDATED:
+                    case DocumentStatus.OutOfDate:
                         await _mediatr.Post(new DocumentOutdatedEvent(request.RequestUser) { DocumentId = document.Id }, token);
                         break;
-                    case PspEventKind.KYC_SUCCEEDED:
-                        await _mediatr.Post(new DocumentSucceededEvent(request.RequestUser) { DocumentId = document.Id }, token);
+                    case DocumentStatus.Validated:
+                        await _mediatr.Post(new DocumentValidatedEvent(request.RequestUser) { DocumentId = document.Id }, token);
                         break;
                 }
 
                 return Ok(success);
             });
-        }
-
-        public Task<Result<bool>> Handle(EnsureProducerDocumentsCreatedCommand request, CancellationToken cancellationToken)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<Result<bool>> Handle(EnsureProducerDocumentsReviewedCommand request, CancellationToken cancellationToken)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<Result<bool>> Handle(EnsureProducerDocumentsValidatedCommand request, CancellationToken cancellationToken)
-        {
-            throw new NotImplementedException();
         }
     }
 }

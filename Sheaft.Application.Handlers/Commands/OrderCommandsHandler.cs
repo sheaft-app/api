@@ -120,7 +120,7 @@ namespace Sheaft.Application.Handlers
                     await transaction.CommitAsync(token);
 
                     foreach (var orderId in orderIds)
-                        await _mediatr.Post(new PurchaseOrderCreatedEvent(request.RequestUser) { Id = orderId }, token);
+                        await _mediatr.Post(new PurchaseOrderCreatedEvent(request.RequestUser) { PurchaseOrderId = orderId }, token);
 
                     await _mediatr.Post(new CreateUserPointsCommand(request.RequestUser) { CreatedOn = DateTimeOffset.UtcNow, Kind = PointKind.PurchaseOrder, UserId = request.RequestUser.Id }, token);
 
@@ -167,7 +167,7 @@ namespace Sheaft.Application.Handlers
         {
             return await ExecuteAsync(async () =>
             {
-                var checkResult = await _mediatr.Process(new EnsureConsumerConfiguredCommand(request.RequestUser) { Id = request.RequestUser.Id }, token);
+                var checkResult = await _mediatr.Process(new CheckConsumerConfigurationCommand(request.RequestUser) { Id = request.RequestUser.Id }, token);
                 if (!checkResult.Success)
                     return Failed<Guid>(checkResult.Exception);
 
@@ -182,7 +182,7 @@ namespace Sheaft.Application.Handlers
                     _context.Update(order);
                     await _context.SaveChangesAsync(token);
 
-                    var result = await _mediatr.Process(new CreateWebPayInTransactionCommand(request.RequestUser) { OrderId = order.Id }, token);
+                    var result = await _mediatr.Process(new CreateWebPayinCommand(request.RequestUser) { OrderId = order.Id }, token);
                     if (!result.Success)
                     {
                         await transaction.RollbackAsync(token);
@@ -226,7 +226,7 @@ namespace Sheaft.Application.Handlers
                     await transaction.CommitAsync(token);
 
                     foreach (var orderId in orderIds)
-                        await _mediatr.Post(new PurchaseOrderCreatedEvent(request.RequestUser) { Id = orderId }, token);
+                        await _mediatr.Post(new PurchaseOrderCreatedEvent(request.RequestUser) { PurchaseOrderId = orderId }, token);
 
                     await _mediatr.Post(new CreateUserPointsCommand(request.RequestUser) { CreatedOn = DateTimeOffset.UtcNow, Kind = PointKind.PurchaseOrder, UserId = request.RequestUser.Id }, token);
                     return Ok(orderIds.AsEnumerable());

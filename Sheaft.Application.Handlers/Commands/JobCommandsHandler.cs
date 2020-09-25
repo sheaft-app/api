@@ -33,8 +33,6 @@ namespace Sheaft.Application.Handlers
         IRequestHandler<RestoreJobCommand, Result<bool>>,
         IRequestHandler<UpdateJobCommand, Result<bool>>
     {
-        private readonly IQueueService _queuesService;
-
         public JobCommandsHandler(
             ISheaftMediatr mediatr, 
             IAppDbContext context,
@@ -228,7 +226,7 @@ namespace Sheaft.Application.Handlers
                 _context.Update(entity);
 
                 var result = await _context.SaveChangesAsync(token);
-                await _queuesService.InsertJobToProcessAsync(entity, token);
+                await _mediatr.Post(entity, token);
 
                 return Ok(result > 0);
             });
@@ -344,7 +342,7 @@ namespace Sheaft.Application.Handlers
                 _context.Update(entity);
 
                 var result = await _context.SaveChangesAsync(token);
-                await _queuesService.InsertJobToProcessAsync(entity, token);
+                await _mediatr.Post(entity, token);
 
                 return Ok(result > 0);
             });

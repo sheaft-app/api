@@ -19,13 +19,13 @@ using Sheaft.Options;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Caching.Distributed;
-using Microsoft.EntityFrameworkCore;
 
 namespace Sheaft.Application.Handlers
 {
     public class ConsumerCommandsHandler : ResultsHandler,
         IRequestHandler<RegisterConsumerCommand, Result<Guid>>,
-        IRequestHandler<UpdateConsumerCommand, Result<bool>>
+        IRequestHandler<UpdateConsumerCommand, Result<bool>>,
+        IRequestHandler<CheckConsumerConfigurationCommand, Result<bool>>
     {
         private readonly IImageService _imageService;
         private readonly HttpClient _httpClient;
@@ -121,6 +121,22 @@ namespace Sheaft.Application.Handlers
 
                 await _cache.RemoveAsync(entity.Id.ToString("N"));
                 return Ok(result > 0);
+            });
+        }
+
+        public async Task<Result<bool>> Handle(CheckConsumerConfigurationCommand request, CancellationToken token)
+        {
+            return await ExecuteAsync(async () =>
+            {
+                var business = await _mediatr.Process(new CheckConsumerLegalConfigurationCommand(request.RequestUser) { UserId = request.Id }, token);
+                if (!business.Success)
+                    return Failed<bool>(business.Exception);
+
+                var wallet = await _mediatr.Process(new CheckWalletPaymentsConfigurationCommand(request.RequestUser) { UserId = request.Id }, token);
+                if (!wallet.Success)
+                    return Failed<bool>(wallet.Exception);
+
+                return Ok(true);
             });
         }
 

@@ -15,8 +15,8 @@ namespace Sheaft.Application.Handlers
            IRequestHandler<CreateConsumerLegalCommand, Result<Guid>>,
            IRequestHandler<UpdateBusinessLegalCommand, Result<bool>>,
            IRequestHandler<UpdateConsumerLegalCommand, Result<bool>>,
-           IRequestHandler<EnsureBusinessLegalConfiguredCommand, Result<bool>>,
-           IRequestHandler<EnsureConsumerLegalConfiguredCommand, Result<bool>>
+           IRequestHandler<CheckBusinessLegalConfigurationCommand, Result<bool>>,
+           IRequestHandler<CheckConsumerLegalConfigurationCommand, Result<bool>>
     {
         private readonly IPspService _pspService;
 
@@ -163,7 +163,7 @@ namespace Sheaft.Application.Handlers
             });
         }
 
-        public async Task<Result<bool>> Handle(EnsureBusinessLegalConfiguredCommand request, CancellationToken token)
+        public async Task<Result<bool>> Handle(CheckBusinessLegalConfigurationCommand request, CancellationToken token)
         {
             return await ExecuteAsync(async () =>
             {
@@ -184,7 +184,7 @@ namespace Sheaft.Application.Handlers
             });
         }
 
-        public async Task<Result<bool>> Handle(EnsureConsumerLegalConfiguredCommand request, CancellationToken token)
+        public async Task<Result<bool>> Handle(CheckConsumerLegalConfigurationCommand request, CancellationToken token)
         {
             return await ExecuteAsync(async () =>
             {

@@ -68,11 +68,11 @@ namespace Sheaft.Infrastructure.Persistence
             modelBuilder.Entity<Card>().HasBaseType<PaymentMethod>();
             modelBuilder.Entity<BankAccount>().HasBaseType<PaymentMethod>();
 
-            modelBuilder.Entity<CardPayinTransaction>().HasBaseType<PayinTransaction>();
-            modelBuilder.Entity<WebPayinTransaction>().HasBaseType<PayinTransaction>();
+            modelBuilder.Entity<CardPayin>().HasBaseType<Payin>();
+            modelBuilder.Entity<WebPayin>().HasBaseType<Payin>();
 
-            modelBuilder.Entity<RefundPayinTransaction>().HasBaseType<RefundTransaction>();
-            modelBuilder.Entity<RefundTransferTransaction>().HasBaseType<RefundTransaction>();
+            modelBuilder.Entity<PayinRefund>().HasBaseType<Refund>();
+            modelBuilder.Entity<TransferRefund>().HasBaseType<Refund>();
 
             modelBuilder.Entity<BusinessLegal>().HasBaseType<Legal>();
             modelBuilder.Entity<ConsumerLegal>().HasBaseType<Legal>();
@@ -112,14 +112,14 @@ namespace Sheaft.Infrastructure.Persistence
             modelBuilder.ApplyConfiguration(new CardConfiguration());
             modelBuilder.ApplyConfiguration(new WalletConfiguration());
             modelBuilder.ApplyConfiguration(new DocumentConfiguration());
-            modelBuilder.ApplyConfiguration(new PayinTransactionConfiguration());
-            modelBuilder.ApplyConfiguration(new WebPayinTransactionConfiguration());
-            modelBuilder.ApplyConfiguration(new CardPayinTransactionConfiguration());
-            modelBuilder.ApplyConfiguration(new TransferTransactionConfiguration());
-            modelBuilder.ApplyConfiguration(new PayoutTransactionConfiguration());
-            modelBuilder.ApplyConfiguration(new RefundTransactionConfiguration());
-            modelBuilder.ApplyConfiguration(new RefundPayinTransactionConfiguration());
-            modelBuilder.ApplyConfiguration(new RefundTransferTransactionConfiguration());
+            modelBuilder.ApplyConfiguration(new PayinConfiguration());
+            modelBuilder.ApplyConfiguration(new WebPayinConfiguration());
+            modelBuilder.ApplyConfiguration(new CardPayinConfiguration());
+            modelBuilder.ApplyConfiguration(new TransferConfiguration());
+            modelBuilder.ApplyConfiguration(new PayoutConfiguration());
+            modelBuilder.ApplyConfiguration(new RefundConfiguration());
+            modelBuilder.ApplyConfiguration(new PayinRefundConfiguration());
+            modelBuilder.ApplyConfiguration(new TransferRefundConfiguration());
             modelBuilder.ApplyConfiguration(new CountryConfiguration());
             modelBuilder.ApplyConfiguration(new NationalityConfiguration());
             modelBuilder.ApplyConfiguration(new LegalConfiguration());

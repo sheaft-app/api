@@ -28,7 +28,7 @@ namespace Sheaft.Application.Handlers
 
         public async Task Handle(PickingOrderExportSucceededEvent pickingOrderEvent, CancellationToken token)
         {
-            var job = await _context.GetByIdAsync<Job>(pickingOrderEvent.Id, token);
+            var job = await _context.GetByIdAsync<Job>(pickingOrderEvent.JobId, token);
             await _signalrService.SendNotificationToGroupAsync(job.User.Id, nameof(PickingOrderExportSucceededEvent), new { JobId = job.Id, Name = job.Name, UserId = job.User.Id, Url = job.File });
 
             var url = $"{_configuration.GetValue<string>("Urls:Portal")}/#/jobs/{job.Id}";
@@ -42,7 +42,7 @@ namespace Sheaft.Application.Handlers
 
         public async Task Handle(PickingOrderExportFailedEvent pickingOrderEvent, CancellationToken token)
         {
-            var job = await _context.GetByIdAsync<Job>(pickingOrderEvent.Id, token);
+            var job = await _context.GetByIdAsync<Job>(pickingOrderEvent.JobId, token);
             await _signalrService.SendNotificationToGroupAsync(job.User.Id, nameof(PickingOrderExportFailedEvent), new { JobId = job.Id, Name = job.Name, UserId = job.User.Id });
 
             var url = $"{_configuration.GetValue<string>("Urls:Portal")}/#/jobs/{job.Id}";
@@ -56,7 +56,7 @@ namespace Sheaft.Application.Handlers
 
         public async Task Handle(PickingOrderExportProcessingEvent pickingOrderEvent, CancellationToken token)
         {
-            var job = await _context.GetByIdAsync<Job>(pickingOrderEvent.Id, token);
+            var job = await _context.GetByIdAsync<Job>(pickingOrderEvent.JobId, token);
             await _signalrService.SendNotificationToGroupAsync(job.User.Id, nameof(PickingOrderExportProcessingEvent), new { JobId = job.Id, Name = job.Name, UserId = job.User.Id });
         }
     }
