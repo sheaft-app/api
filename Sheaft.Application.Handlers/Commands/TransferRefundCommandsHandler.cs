@@ -71,11 +71,13 @@ namespace Sheaft.Application.Handlers
                 if (!purchaseOrder.AcceptedOn.HasValue || purchaseOrder.WithdrawnOn.HasValue)
                     return Failed<Guid>(new InvalidOperationException());
 
-                var purchaseOrderTransfers = purchaseOrder.Transfers.ToList();
+                var purchaseOrderTransfers = await _context.FindAsync<Transfer>(c => c.PurchaseOrder.Id == purchaseOrder.Id, token);
                 if (!purchaseOrderTransfers.Any(c => c.Status != TransactionStatus.Succeeded))
                     return Failed<Guid>(new InvalidOperationException());
 
-                var purchaseOrderTransferRefunds = purchaseOrder.TransferRefunds.ToList();
+                var transferIds = purchaseOrderTransfers.Select(c => c.Id);
+
+                var purchaseOrderTransferRefunds = await _context.FindAsync<TransferRefund>(c => transferIds.Contains(c.Transfer.Id), token);
                 if (purchaseOrderTransferRefunds.Any(c => c.Status != TransactionStatus.Failed && c.Status != TransactionStatus.Expired))
                     return Failed<Guid>(new InvalidOperationException());
 
@@ -217,10 +219,7 @@ namespace Sheaft.Application.Handlers
         private async Task<IEnumerable<Guid>> GetNextPurchaseOrderIdsAsync(DateTimeOffset expiredDate, int skip, int take, CancellationToken token)
         {
             return await _context.PurchaseOrders
-                .Get(c => c.AcceptedOn.HasValue && c.WithdrawnOn.HasValue && c.WithdrawnOn.Value < expiredDate)
-                .Get(c => c.Transfers.Any(t => t.Status == TransactionStatus.Succeeded)
-                     && (!c.TransferRefunds.Any() 
-                        || c.TransferRefunds.All(t => t.Status == TransactionStatus.Failed || t.Status == TransactionStatus.Expired)), true)
+                .Get(c => c.AcceptedOn.HasValue && c.WithdrawnOn.HasValue && c.PayedOn.HasValue && !c.RefundedOn.HasValue && c.PayedOn.Value < expiredDate, true)
                 .OrderBy(c => c.CreatedOn)
                 .Select(c => c.Id)
                 .Skip(skip)

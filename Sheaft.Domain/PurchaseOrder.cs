@@ -11,8 +11,6 @@ namespace Sheaft.Domain.Models
     {
         private const int DIGITS_COUNT = 2;
         private List<PurchaseOrderProduct> _products;
-        private List<Transfer> _transfers;
-        private List<TransferRefund> _transferRefunds;
 
         protected PurchaseOrder()
         {
@@ -26,7 +24,6 @@ namespace Sheaft.Domain.Models
             Id = id;
 
             _products = new List<PurchaseOrderProduct>();
-            _transfers = new List<Transfer>();
 
             SetSender(order.User);
             SetVendor(producer);
@@ -53,6 +50,8 @@ namespace Sheaft.Domain.Models
         public DateTimeOffset? CompletedOn { get; private set; }
         public DateTimeOffset? DeliveredOn { get; private set; }
         public DateTimeOffset? WithdrawnOn { get; private set; }
+        public DateTimeOffset? PayedOn { get; private set; }
+        public DateTimeOffset? RefundedOn { get; private set; }
         public string Reference { get; private set; }
         public string Reason { get; private set; }
         public string Comment { get; private set; }
@@ -75,8 +74,6 @@ namespace Sheaft.Domain.Models
         public virtual ExpectedDelivery ExpectedDelivery { get; private set; }
         public virtual PurchaseOrderVendor Vendor { get; private set; }
         public virtual IReadOnlyCollection<PurchaseOrderProduct> Products => _products?.AsReadOnly();
-        public virtual IReadOnlyCollection<Transfer> Transfers => _transfers?.AsReadOnly();
-        public virtual IReadOnlyCollection<TransferRefund> TransferRefunds => _transferRefunds?.AsReadOnly();
 
         public void SetReference(string newReference)
         {

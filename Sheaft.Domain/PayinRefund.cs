@@ -9,8 +9,8 @@ namespace Sheaft.Domain.Models
         {
         }
 
-        public PayinRefund(Guid id, Payin transaction, User author)
-            : base(id, TransactionKind.RefundPayin, transaction, author)
+        public PayinRefund(Guid id, Payin transaction, decimal amount)
+            : base(id, TransactionKind.RefundPayin, amount, transaction.CreditedWallet, transaction.Author)
         {
             Credited = transaction.Debited;
             Payin = transaction;

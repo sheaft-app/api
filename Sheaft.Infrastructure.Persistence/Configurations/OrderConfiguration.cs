@@ -38,9 +38,6 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
             entity.HasMany(c => c.Products).WithOne().HasForeignKey("OrderUid").OnDelete(DeleteBehavior.Cascade);
             entity.HasMany(c => c.Deliveries).WithOne().HasForeignKey("OrderUid").OnDelete(DeleteBehavior.Cascade);
 
-            var transactions = entity.Metadata.FindNavigation(nameof(Order.Payins));
-            transactions.SetPropertyAccessMode(PropertyAccessMode.Field);
-
             entity.HasKey("Uid");
 
             entity.HasIndex(c => c.Id).IsUnique();

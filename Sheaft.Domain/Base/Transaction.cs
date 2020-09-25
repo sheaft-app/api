@@ -57,9 +57,6 @@ namespace Sheaft.Domain.Models
             switch (status)
             {
                 case TransactionStatus.Expired:
-                    if (Status == TransactionStatus.Failed || Status == TransactionStatus.Succeeded || Status == TransactionStatus.Expired)
-                        throw new ValidationException();
-
                     ExpiredOn = DateTimeOffset.UtcNow;
                     break;
                 default:

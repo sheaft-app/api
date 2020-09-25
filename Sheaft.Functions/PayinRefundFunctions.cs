@@ -35,6 +35,14 @@ namespace Sheaft.Functions
                 throw results.Exception;
         }
 
+        [FunctionName("CreatePayinRefundCommand")]
+        public async Task CreatePayinRefundCommandAsync([ServiceBusTrigger(CreatePayinRefundCommand.QUEUE_NAME, Connection = "AzureWebJobsServiceBus")] string message, CancellationToken token)
+        {
+            var results = await _mediatr.Process<CreatePayinRefundCommand, Guid>(message, token);
+            if (!results.Success)
+                throw results.Exception;
+        }
+
         [FunctionName("PayinRefundFailedEvent")]
         public async Task PayinRefundFailedEventAsync([ServiceBusTrigger(PayinRefundFailedEvent.QUEUE_NAME, Connection = "AzureWebJobsServiceBus")] string message, CancellationToken token)
         {

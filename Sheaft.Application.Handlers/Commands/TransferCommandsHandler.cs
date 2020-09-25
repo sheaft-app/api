@@ -163,10 +163,10 @@ namespace Sheaft.Application.Handlers
             return await ExecuteAsync(async () =>
             {
                 var purchaseOrder = await _context.GetByIdAsync<PurchaseOrder>(request.PurchaseOrderId, token);
-                if (!purchaseOrder.AcceptedOn.HasValue || purchaseOrder.WithdrawnOn.HasValue)
+                if (!purchaseOrder.AcceptedOn.HasValue || purchaseOrder.WithdrawnOn.HasValue || purchaseOrder.PayedOn.HasValue)
                     return Failed<Guid>(new InvalidOperationException());
 
-                var purchaseOrderTransfers = purchaseOrder.Transfers.ToList();
+                var purchaseOrderTransfers = await _context.FindAsync<Transfer>(c => c.PurchaseOrder.Id == purchaseOrder.Id, token);
                 if (purchaseOrderTransfers.Any(c => c.Status != TransactionStatus.Failed && c.Status != TransactionStatus.Expired))
                     return Failed<Guid>(new InvalidOperationException());
 
@@ -190,7 +190,6 @@ namespace Sheaft.Application.Handlers
                 using (var transaction = await _context.Database.BeginTransactionAsync(token))
                 {
                     var transfer = new Transfer(Guid.NewGuid(), debitedWallet, creditedWallet, purchaseOrder);
-
                     await _context.AddAsync(transfer, token);
                     await _context.SaveChangesAsync(token);
 
@@ -215,9 +214,7 @@ namespace Sheaft.Application.Handlers
         private async Task<IEnumerable<Guid>> GetNextPurchaseOrderIdsAsync(DateTimeOffset expiredDate, int skip, int take, CancellationToken token)
         {
             return await _context.PurchaseOrders
-                .Get(c => c.AcceptedOn.HasValue && !c.WithdrawnOn.HasValue && c.AcceptedOn.Value < expiredDate)
-                .Get(c => !c.Transfers.Any()
-                        || c.Transfers.All(t => t.Status == TransactionStatus.Failed || t.Status == TransactionStatus.Expired), true)
+                .Get(c => !c.PayedOn.HasValue && c.AcceptedOn.HasValue && !c.WithdrawnOn.HasValue && c.AcceptedOn.Value < expiredDate, true)
                 .OrderBy(c => c.CreatedOn)
                 .Select(c => c.Id)
                 .Skip(skip)

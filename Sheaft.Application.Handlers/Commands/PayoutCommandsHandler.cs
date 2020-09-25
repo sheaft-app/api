@@ -141,7 +141,7 @@ namespace Sheaft.Application.Handlers
                 var expiredDate = DateTimeOffset.UtcNow.AddMinutes(-10080);
 
                 var producersTransfers = await _context.Transfers
-                    .Get(t => t.Payout == null
+                    .Get(t => !t.PayedOutOn.HasValue
                             && t.Status == TransactionStatus.Succeeded
                             && t.PurchaseOrder.Status == PurchaseOrderStatus.Delivered
                             && t.ExecutedOn.HasValue && t.ExecutedOn.Value < expiredDate)
@@ -187,10 +187,7 @@ namespace Sheaft.Application.Handlers
 
                 using (var transaction = await _context.Database.BeginTransactionAsync(token))
                 {
-                    var payout = new Payout(Guid.NewGuid(), amount, wallet, bankAccount, fees);
-                    foreach (var transfer in transfers)
-                        payout.AddTransfer(transfer);
-
+                    var payout = new Payout(Guid.NewGuid(), amount, wallet, bankAccount, transfers, fees);
                     await _context.AddAsync(payout);
                     await _context.SaveChangesAsync(token);
 

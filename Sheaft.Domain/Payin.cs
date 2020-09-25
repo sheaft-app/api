@@ -19,6 +19,7 @@ namespace Sheaft.Domain.Models
             Reference = "SHEAFT";
         }
 
+        public DateTimeOffset? RefundedOn { get; private set; }
         public virtual Wallet CreditedWallet { get; private set; }
         public virtual Order Order { get; private set; }
     }

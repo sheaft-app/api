@@ -19,7 +19,8 @@ namespace Sheaft.Application.Handlers
         IRequestHandler<CheckPayinRefundsCommand, Result<bool>>,
         IRequestHandler<CheckPayinRefundCommand, Result<bool>>,
         IRequestHandler<ExpirePayinRefundCommand, Result<bool>>,
-        IRequestHandler<RefreshPayinRefundStatusCommand, Result<TransactionStatus>>
+        IRequestHandler<RefreshPayinRefundStatusCommand, Result<TransactionStatus>>,
+        IRequestHandler<CreatePayinRefundCommand, Result<Guid>>
     {
         private readonly IPspService _pspService;
 
@@ -125,6 +126,11 @@ namespace Sheaft.Application.Handlers
 
                 return Ok(payinRefund.Status);
             });
+        }
+
+        public Task<Result<Guid>> Handle(CreatePayinRefundCommand request, CancellationToken token)
+        {
+            throw new NotImplementedException();
         }
 
         private async Task<IEnumerable<Guid>> GetNextPayinRefundIdsAsync(DateTimeOffset expiredDate, int skip, int take, CancellationToken token)
