@@ -6,7 +6,7 @@ namespace Sheaft.Application.Events
 {
     public class PayoutRefundSucceededEvent : Event
     {
-        public const string QUEUE_NAME = "event-psp-payout-refund-succeeded";
+        public const string QUEUE_NAME = "event-payout-refund-succeeded";
         public const string MAILING_TEMPLATE_ID = "";
 
         [JsonConstructor]
@@ -14,6 +14,6 @@ namespace Sheaft.Application.Events
         {
         }
 
-        public Guid RefundId { get; set; }
+        public string RefundIdentifier { get; set; }
     }
 }

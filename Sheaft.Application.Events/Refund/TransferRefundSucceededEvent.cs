@@ -6,7 +6,7 @@ namespace Sheaft.Application.Events
 {
     public class TransferRefundSucceededEvent : Event
     {
-        public const string QUEUE_NAME = "event-psp-transfer-refund-succeeded";
+        public const string QUEUE_NAME = "event-transfer-refund-succeeded";
         public const string MAILING_TEMPLATE_ID = "";
 
         [JsonConstructor]

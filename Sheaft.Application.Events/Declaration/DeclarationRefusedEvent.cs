@@ -6,7 +6,7 @@ namespace Sheaft.Application.Events
 {
     public class DeclarationRefusedEvent : Event
     {
-        public const string QUEUE_NAME = "event-psp-declaration-refused";
+        public const string QUEUE_NAME = "event-declaration-refused";
         public const string MAILING_TEMPLATE_ID = "";
 
         [JsonConstructor]

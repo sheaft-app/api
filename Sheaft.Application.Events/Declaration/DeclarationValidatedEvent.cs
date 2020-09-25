@@ -6,7 +6,7 @@ namespace Sheaft.Application.Events
 {
     public class DeclarationValidatedEvent : Event
     {
-        public const string QUEUE_NAME = "event-psp-declaration-validated";
+        public const string QUEUE_NAME = "event-declaration-validated";
         public const string MAILING_TEMPLATE_ID = "";
 
         [JsonConstructor]
