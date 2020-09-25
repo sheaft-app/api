@@ -25,7 +25,7 @@ namespace Sheaft.Application.Mappers
 
             CreateMap<IdInput, GenerateUserCodeCommand>();
             CreateMap<UpdatePictureInput, UpdateUserPictureCommand>();
-            CreateMap<IdWithReasonInput, DeleteUserCommand>();
+            CreateMap<IdWithReasonInput, RemoveUserCommand>();
         }
     }
 }

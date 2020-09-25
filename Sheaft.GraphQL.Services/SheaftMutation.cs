@@ -333,7 +333,7 @@ namespace Sheaft.GraphQL.Services
 
         public async Task<bool> RemoveUserAsync(IdWithReasonInput input)
         {
-            return await ExecuteCommandAsync<DeleteUserCommand, bool>(_mapper.Map(input, new DeleteUserCommand(CurrentUser)), Token);
+            return await ExecuteCommandAsync<RemoveUserCommand, bool>(_mapper.Map(input, new RemoveUserCommand(CurrentUser)), Token);
         }
 
         public async Task<IQueryable<QuickOrderDto>> CreateQuickOrderAsync(CreateQuickOrderInput input, [Service] IQuickOrderQueries quickOrderQueries)

@@ -49,9 +49,7 @@ namespace Sheaft.Application.Handlers
                 var legal = await _context.GetSingleAsync<Legal>(c => c.Owner.Id == request.RequestUser.Id, token);
                 var result = await _pspService.CreateWebPayinAsync(webPayin, legal.Owner, token);
                 if (!result.Success)
-                {
                     return Failed<Guid>(result.Exception);
-                }
 
                 webPayin.SetResult(result.Data.ResultCode, result.Data.ResultMessage);
                 webPayin.SetIdentifier(result.Data.Identifier);
@@ -102,7 +100,7 @@ namespace Sheaft.Application.Handlers
                 if (payin.Status == TransactionStatus.Succeeded
                     || payin.Status == TransactionStatus.Failed
                     || payin.Status == TransactionStatus.Expired)
-                    return Ok(true);
+                    return Ok(false);
 
                 var result = await _mediatr.Process(new RefreshPayinStatusCommand(request.RequestUser, payin.Identifier), token);
                 if (!result.Success)
@@ -165,13 +163,13 @@ namespace Sheaft.Application.Handlers
         private async Task<IEnumerable<Guid>> GetNextPayinIdsAsync(DateTimeOffset expiredDate, int skip, int take, CancellationToken token)
         {
             return await _context.Payins
-                                .Get(c => (c.Status == TransactionStatus.Waiting && c.CreatedOn < expiredDate)
-                                            || (c.Status == TransactionStatus.Created && c.UpdatedOn.HasValue && c.UpdatedOn.Value < expiredDate), true)
-                                .OrderBy(c => c.CreatedOn)
-                                .Select(c => c.Id)
-                                .Skip(skip)
-                                .Take(take)
-                                .ToListAsync(token);
+                .Get(c => (c.Status == TransactionStatus.Waiting && c.CreatedOn < expiredDate)
+                            || (c.Status == TransactionStatus.Created && c.UpdatedOn.HasValue && c.UpdatedOn.Value < expiredDate), true)
+                .OrderBy(c => c.CreatedOn)
+                .Select(c => c.Id)
+                .Skip(skip)
+                .Take(take)
+                .ToListAsync(token);
         }
     }
 }

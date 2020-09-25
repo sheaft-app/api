@@ -4,10 +4,10 @@ using Sheaft.Core;
 
 namespace Sheaft.Application.Commands
 {
-    public class DeleteUserCommand : Command<bool>
+    public class RemoveUserCommand : Command<bool>
     {
         [JsonConstructor]
-        public DeleteUserCommand(RequestUser requestUser) : base(requestUser)
+        public RemoveUserCommand(RequestUser requestUser) : base(requestUser)
         {
         }
 

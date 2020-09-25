@@ -77,7 +77,7 @@ namespace Sheaft.Application.Handlers
                 if (payout.Status == TransactionStatus.Succeeded
                     || payout.Status == TransactionStatus.Failed
                     || payout.Status == TransactionStatus.Expired)
-                    return Ok(true);
+                    return Ok(false);
 
                 var result = await _mediatr.Process(new RefreshPayoutStatusCommand(request.RequestUser, payout.Identifier), token);
                 if (!result.Success)
@@ -201,9 +201,7 @@ namespace Sheaft.Application.Handlers
 
                 var payout = new Payout(Guid.NewGuid(), amount, wallet, bankAccount, fees);
                 foreach (var transfer in transfers)
-                {
                     payout.AddTransfer(transfer);
-                }
 
                 await _context.AddAsync(payout);
                 await _context.SaveChangesAsync(token);
@@ -227,13 +225,13 @@ namespace Sheaft.Application.Handlers
         private async Task<IEnumerable<Guid>> GetNextPayoutIdsAsync(DateTimeOffset expiredDate, int skip, int take, CancellationToken token)
         {
             return await _context.Payouts
-                                .Get(c => (c.Status == TransactionStatus.Waiting && c.CreatedOn < expiredDate)
-                                        || (c.Status == TransactionStatus.Created && c.UpdatedOn.HasValue && c.UpdatedOn.Value < expiredDate), true)
-                                .OrderBy(c => c.CreatedOn)
-                                .Select(c => c.Id)
-                                .Skip(skip)
-                                .Take(take)
-                                .ToListAsync(token);
+                .Get(c => (c.Status == TransactionStatus.Waiting && c.CreatedOn < expiredDate)
+                        || (c.Status == TransactionStatus.Created && c.UpdatedOn.HasValue && c.UpdatedOn.Value < expiredDate), true)
+                .OrderBy(c => c.CreatedOn)
+                .Select(c => c.Id)
+                .Skip(skip)
+                .Take(take)
+                .ToListAsync(token);
         }
     }
 }

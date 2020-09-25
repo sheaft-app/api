@@ -282,7 +282,8 @@ namespace Sheaft.Infrastructure.Services
 
                 var result = await _api.UboDeclarations.UpdateUboDeclarationAsync(
                     new UboDeclarationPutDTO(
-                        declaration.Ubos.Select(u => new UboDTO {
+                        declaration.Ubos.Select(u => new UboDTO
+                        {
                             Id = u.Identifier,
                             FirstName = u.FirstName,
                             LastName = u.LastName,
@@ -389,8 +390,9 @@ namespace Sheaft.Infrastructure.Services
                         transaction.Reference)
                     {
                         SecureMode = SecureMode.DEFAULT,
-                        TemplateURLOptionsCard = new TemplateURLOptionsCard {
-                            PAYLINEV2 = _pspOptions.PaymentUrl 
+                        TemplateURLOptionsCard = new TemplateURLOptionsCard
+                        {
+                            PAYLINEV2 = _pspOptions.PaymentUrl
                         }
                     });
 

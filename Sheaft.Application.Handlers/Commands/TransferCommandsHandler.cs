@@ -102,7 +102,7 @@ namespace Sheaft.Application.Handlers
                 if (transfer.Status == TransactionStatus.Succeeded
                     || transfer.Status == TransactionStatus.Failed
                     || transfer.Status == TransactionStatus.Expired)
-                    return Ok(true);
+                    return Ok(false);
 
                 var result = await _mediatr.Process(new RefreshTransferStatusCommand(request.RequestUser, transfer.Identifier), token);
                 if (!result.Success)

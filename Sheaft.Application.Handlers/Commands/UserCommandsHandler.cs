@@ -12,15 +12,10 @@ using OfficeOpenXml;
 using Sheaft.Domain.Enums;
 using System.Linq;
 using Microsoft.Extensions.Logging;
-using Sheaft.Application.Models;
-using System.Net.Http;
-using Newtonsoft.Json;
-using System.Text;
 using Sheaft.Exceptions;
 using Sheaft.Options;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Caching.Distributed;
-using IdentityModel.Client;
 using System.Collections.Generic;
 
 namespace Sheaft.Application.Handlers
@@ -32,25 +27,19 @@ namespace Sheaft.Application.Handlers
             IRequestHandler<CreateUserPointsCommand, Result<bool>>,
             IRequestHandler<ChangeUserRolesCommand, Result<bool>>,
             IRequestHandler<UpdateUserPictureCommand, Result<bool>>,
-            IRequestHandler<DeleteUserCommand, Result<bool>>,
+            IRequestHandler<RemoveUserCommand, Result<bool>>,
             IRequestHandler<RemoveUserDataCommand, Result<string>>
     {
         private readonly IIdentifierService _identifierService;
         private readonly IBlobService _blobService;
         private readonly IImageService _imageService;
         private readonly ScoringOptions _scoringOptions;
-        private readonly StorageOptions _storageOptions;
-        private readonly HttpClient _httpClient;
         private readonly RoleOptions _roleOptions;
-        private readonly AuthOptions _authOptions;
         private readonly IDistributedCache _cache;
 
         public UserCommandsHandler(
-            IOptionsSnapshot<AuthOptions> authOptions,
             IOptionsSnapshot<ScoringOptions> scoringOptions,
-            IOptionsSnapshot<StorageOptions> storageOptions,
             ISheaftMediatr mediatr,
-            IHttpClientFactory httpClientFactory,
             IIdentifierService identifierService,
             IAppDbContext context,
             IBlobService blobService,
@@ -62,15 +51,9 @@ namespace Sheaft.Application.Handlers
         {
             _imageService = imageService;
             _roleOptions = roleOptions.Value;
-            _authOptions = authOptions.Value;
             _scoringOptions = scoringOptions.Value;
-            _storageOptions = storageOptions.Value;
             _identifierService = identifierService;
             _blobService = blobService;
-
-            _httpClient = httpClientFactory.CreateClient("identityServer");
-            _httpClient.BaseAddress = new Uri(_authOptions.Url);
-            _httpClient.SetToken(_authOptions.Scheme, _authOptions.ApiKey);
             _cache = cache;
         }
 
@@ -99,15 +82,20 @@ namespace Sheaft.Application.Handlers
                     roles.Add(_roleOptions.Consumer.Id);
                 }
 
-                var oidcUser = new IdentityUserInput(request.UserId, entity.Email, entity.Name, entity.FirstName, entity.LastName, roles)
+                var result = await _mediatr.Process(new UpdateAuthUserCommand(request.RequestUser)
                 {
+                    Email = entity.Email,
+                    FirstName = entity.FirstName,
+                    LastName = entity.LastName,
+                    Name = entity.Name,
                     Phone = entity.Phone,
-                    Picture = entity.Picture
-                };
+                    Picture = entity.Picture,
+                    Roles = roles,
+                    UserId = entity.Id
+                }, token);
 
-                var oidcResult = await _httpClient.PutAsync(_authOptions.Actions.Profile, new StringContent(JsonConvert.SerializeObject(oidcUser), Encoding.UTF8, "application/json"), token);
-                if (!oidcResult.IsSuccessStatusCode)
-                    return Failed<bool>(new BadRequestException(MessageKind.Oidc_UpdateProfile_Error, await oidcResult.Content.ReadAsStringAsync().ConfigureAwait(false)));
+                if (!result.Success)
+                    return result;
 
                 _context.Update(entity);
                 await _cache.RemoveAsync(entity.Id.ToString("N"));
@@ -136,6 +124,7 @@ namespace Sheaft.Application.Handlers
                 return Created(entity.SponsorshipCode);
             });
         }
+
         public async Task<Result<string>> Handle(RemoveUserDataCommand request, CancellationToken token)
         {
             return await ExecuteAsync(async () =>
@@ -159,10 +148,14 @@ namespace Sheaft.Application.Handlers
 
                 entity.SetPicture(resultImage.Data);
 
-                var oidcUser = new IdentityPictureInput(request.Id, entity.Picture);
-                var oidcResult = await _httpClient.PutAsync(_authOptions.Actions.Picture, new StringContent(JsonConvert.SerializeObject(oidcUser), Encoding.UTF8, "application/json"), token);
-                if (!oidcResult.IsSuccessStatusCode)
-                    return BadRequest<bool>(MessageKind.Oidc_UpdatePicture_Error, await oidcResult.Content.ReadAsStringAsync());
+                var result = await _mediatr.Process(new UpdateAuthUserPictureCommand(request.RequestUser)
+                {
+                    Picture = entity.Picture,
+                    UserId = entity.Id
+                }, token);
+
+                if (!result.Success)
+                    return result;
 
                 _context.Update(entity);
 
@@ -252,7 +245,7 @@ namespace Sheaft.Application.Handlers
             });
         }
 
-        public async Task<Result<bool>> Handle(DeleteUserCommand request, CancellationToken token)
+        public async Task<Result<bool>> Handle(RemoveUserCommand request, CancellationToken token)
         {
             return await ExecuteAsync(async () =>
             {
@@ -264,22 +257,24 @@ namespace Sheaft.Application.Handlers
                     if (hasActiveOrders)
                         return ValidationError<bool>(MessageKind.Consumer_CannotBeDeleted_HasActiveOrders);
 
-                    var oidcResult = await _httpClient.DeleteAsync(string.Format(_authOptions.Actions.Delete, entity.Id.ToString("N")), token);
-                    if (!oidcResult.IsSuccessStatusCode)
-                        return Failed<bool>(new BadRequestException(MessageKind.Oidc_DeleteProfile_Error, await oidcResult.Content.ReadAsStringAsync().ConfigureAwait(false)));
+                    var result = await _mediatr.Process(new RemoveAuthUserCommand(request.RequestUser)
+                    {
+                        UserId = entity.Id
+                    }, token);
 
-                    var email = entity.Email;
+                    if (!result.Success)
+                        return Failed<bool>(result.Exception);
 
                     entity.Close(request.Reason);
                     _context.Update(entity);
 
-                    var result = await _context.SaveChangesAsync(token);
+                    await _context.SaveChangesAsync(token);
                     await transaction.CommitAsync(token);
 
                     await _cache.RemoveAsync(entity.Id.ToString("N"));
-                    await _mediatr.Post(new RemoveUserDataCommand(request.RequestUser) { Id = request.Id, Email = email }, token);
+                    await _mediatr.Post(new RemoveUserDataCommand(request.RequestUser) { Id = request.Id, Email = entity.Email }, token);
 
-                    return Ok(result > 0);
+                    return Ok(true);
                 }
             });
         }
