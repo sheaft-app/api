@@ -3,6 +3,7 @@ using Sheaft.Domain.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Sheaft.Exceptions;
 
 namespace Sheaft.Domain.Models
 {
@@ -11,6 +12,7 @@ namespace Sheaft.Domain.Models
         private const int DIGITS_COUNT = 2;
         private List<OrderProduct> _products;
         private List<OrderDelivery> _deliveries;
+        private List<PurchaseOrder> _purchaseOrders;
 
         protected Order()
         {
@@ -36,8 +38,6 @@ namespace Sheaft.Domain.Models
         public DateTimeOffset? UpdatedOn { get; private set; }
         public DateTimeOffset? RemovedOn { get; private set; }
         public DateTimeOffset? ExpiredOn { get; private set; }
-        public DateTimeOffset? RefundedOn { get; private set; }
-        public DateTimeOffset? ProcessedOn { get; private set; }
         public OrderStatus Status { get; private set; }
         public DonationKind DonationKind { get; private set; }
         public decimal TotalProductWholeSalePrice { get; private set; }
@@ -60,8 +60,29 @@ namespace Sheaft.Domain.Models
         public decimal FeesPrice { get; private set; }
         public decimal InternalFeesPrice { get; private set; }
         public virtual User User { get; private set; }
+        public virtual Payin Payin { get; private set; }
         public virtual IReadOnlyCollection<OrderProduct> Products => _products?.AsReadOnly();
         public virtual IReadOnlyCollection<OrderDelivery> Deliveries => _deliveries?.AsReadOnly();
+        public virtual IReadOnlyCollection<PurchaseOrder> PurchaseOrders => _purchaseOrders?.AsReadOnly();
+
+        public Guid AddPurchaseOrder(string reference, Producer producer)
+        {
+            if (PurchaseOrders == null)
+                _purchaseOrders = new List<PurchaseOrder>();
+
+            var purchaseOrder = new PurchaseOrder(Guid.NewGuid(), reference, PurchaseOrderStatus.Waiting, producer, this);
+            _purchaseOrders.Add(purchaseOrder);
+
+            return purchaseOrder.Id;
+        }
+
+        public void SetPayin(Payin payin)
+        {
+            if(Payin != null && Payin.Status == TransactionStatus.Succeeded)
+                throw new ValidationException();
+
+            Payin = payin;
+        }
 
         public void SetStatus(OrderStatus status)
         {
@@ -69,18 +90,12 @@ namespace Sheaft.Domain.Models
             {
                 case OrderStatus.Waiting:
                     ExpiredOn = null;
-                    ProcessedOn = null;
                     break;
                 case OrderStatus.Expired:
                     ExpiredOn = DateTimeOffset.UtcNow;
                     break;
-                case OrderStatus.Refunded:
-                    RefundedOn = DateTimeOffset.UtcNow;
-                    ExpiredOn = null;
-                    break;
                 case OrderStatus.Validated:
                 case OrderStatus.Refused:
-                    ProcessedOn = DateTimeOffset.UtcNow;
                     ExpiredOn = null;
                     break;
             }

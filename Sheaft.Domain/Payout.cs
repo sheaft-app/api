@@ -1,4 +1,5 @@
 ﻿using Sheaft.Domain.Enums;
+using Sheaft.Exceptions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -24,7 +25,6 @@ namespace Sheaft.Domain.Models
             _transfers = transfers.ToList();
         }
 
-        public DateTimeOffset? RefundedOn { get; private set; }
         public virtual Wallet DebitedWallet { get; private set; }
         public virtual BankAccount BankAccount { get; private set; }
         public virtual IReadOnlyCollection<Transfer> Transfers => _transfers?.AsReadOnly();

@@ -182,15 +182,15 @@ namespace Sheaft.Application.Handlers
         {
             return await ExecuteAsync(async () =>
             {
-                var business = await _mediatr.Process(new CheckBusinessLegalConfigurationCommand(request.RequestUser) { UserId = request.UserId }, token);
+                var business = await _mediatr.Process(new CheckBusinessLegalConfigurationCommand(request.RequestUser) { UserId = request.ProducerId }, token);
                 if (!business.Success)
                     return Failed<bool>(business.Exception);
 
-                var wallet = await _mediatr.Process(new CheckWalletPaymentsConfigurationCommand(request.RequestUser) { UserId = request.UserId }, token);
+                var wallet = await _mediatr.Process(new CheckWalletPaymentsConfigurationCommand(request.RequestUser) { UserId = request.ProducerId }, token);
                 if (!wallet.Success)
                     return Failed<bool>(wallet.Exception);
 
-                var declaration = await _mediatr.Process(new CheckDeclarationConfigurationCommand(request.RequestUser) { UserId = request.UserId }, token);
+                var declaration = await _mediatr.Process(new CheckDeclarationConfigurationCommand(request.RequestUser) { UserId = request.ProducerId }, token);
                 if (!declaration.Success)
                     return Failed<bool>(declaration.Exception);
 

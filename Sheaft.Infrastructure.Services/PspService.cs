@@ -399,7 +399,7 @@ namespace Sheaft.Infrastructure.Services
                 return Ok(new PspWebPaymentResultDto
                 {
                     Credited = result.CreditedFunds.Amount.GetAmount(),
-                    ExecutedOn = result.ExecutionDate,
+                    ProcessedOn = result.ExecutionDate,
                     Identifier = result.Id,
                     RedirectUrl = result.RedirectURL,
                     ResultCode = result.ResultCode,
@@ -452,7 +452,7 @@ namespace Sheaft.Infrastructure.Services
                 return Ok(new PspPaymentResultDto
                 {
                     Credited = result.CreditedFunds.Amount.GetAmount(),
-                    ExecutedOn = result.ExecutionDate,
+                    ProcessedOn = result.ExecutionDate,
                     Identifier = result.Id,
                     ResultCode = result.ResultCode,
                     ResultMessage = MangoExtensions.GetOperationMessage(result.ResultCode, result.ResultMessage),
@@ -498,7 +498,7 @@ namespace Sheaft.Infrastructure.Services
                 return Ok(new PspPaymentResultDto
                 {
                     Credited = result.CreditedFunds.Amount.GetAmount(),
-                    ExecutedOn = result.ExecutionDate,
+                    ProcessedOn = result.ExecutionDate,
                     Identifier = result.Id,
                     ResultCode = result.ResultCode,
                     ResultMessage = MangoExtensions.GetOperationMessage(result.ResultCode, result.ResultMessage),
@@ -541,7 +541,7 @@ namespace Sheaft.Infrastructure.Services
                 return Ok(new PspPaymentResultDto
                 {
                     Credited = result.CreditedFunds.Amount.GetAmount(),
-                    ExecutedOn = result.ExecutionDate,
+                    ProcessedOn = result.ExecutionDate,
                     Identifier = result.Id,
                     ResultCode = result.ResultCode,
                     ResultMessage = MangoExtensions.GetOperationMessage(result.ResultCode, result.ResultMessage),
@@ -581,7 +581,7 @@ namespace Sheaft.Infrastructure.Services
                 return Ok(new PspPaymentResultDto
                 {
                     Credited = result.CreditedFunds.Amount.GetAmount(),
-                    ExecutedOn = result.ExecutionDate,
+                    ProcessedOn = result.ExecutionDate,
                     Identifier = result.Id,
                     ResultCode = result.ResultCode,
                     ResultMessage = MangoExtensions.GetOperationMessage(result.ResultCode, result.ResultMessage),
@@ -612,7 +612,7 @@ namespace Sheaft.Infrastructure.Services
                 return Ok(new PspPaymentResultDto
                 {
                     Credited = result.CreditedFunds.Amount.GetAmount(),
-                    ExecutedOn = result.ExecutionDate,
+                    ProcessedOn = result.ExecutionDate,
                     Identifier = result.Id,
                     ResultCode = result.ResultCode,
                     ResultMessage = MangoExtensions.GetOperationMessage(result.ResultCode, result.ResultMessage),

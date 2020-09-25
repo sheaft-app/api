@@ -1,4 +1,5 @@
 ﻿using Sheaft.Domain.Enums;
+using Sheaft.Exceptions;
 using System;
 
 namespace Sheaft.Domain.Models
@@ -19,8 +20,23 @@ namespace Sheaft.Domain.Models
             Reference = "SHEAFT";
         }
 
-        public DateTimeOffset? RefundedOn { get; private set; }
+        public bool SkipBackgroundProcessing { get; private set; }
         public virtual Wallet CreditedWallet { get; private set; }
         public virtual Order Order { get; private set; }
+        public virtual PayinRefund Refund { get; private set; }
+
+        public void SetRefund(PayinRefund refund)
+        {
+            if (Refund != null && Refund.Status == TransactionStatus.Succeeded)
+                throw new ValidationException();
+
+            Refund = null;
+            Refund = refund;
+        }
+
+        public void SetSkipBackgroundProcessing(bool value)
+        {
+            SkipBackgroundProcessing = value;
+        }
     }
 }

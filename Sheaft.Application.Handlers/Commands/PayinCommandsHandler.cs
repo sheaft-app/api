@@ -50,6 +50,8 @@ namespace Sheaft.Application.Handlers
                 await _context.AddAsync(webPayin, token);
                 await _context.SaveChangesAsync(token);
 
+                order.SetPayin(webPayin);
+
                 var legal = await _context.GetSingleAsync<Legal>(c => c.Owner.Id == request.RequestUser.Id, token);
                 var result = await _pspService.CreateWebPayinAsync(webPayin, legal.Owner, token);
                 if (!result.Success)
@@ -143,7 +145,7 @@ namespace Sheaft.Application.Handlers
 
                 payin.SetStatus(pspResult.Data.Status);
                 payin.SetResult(pspResult.Data.ResultCode, pspResult.Data.ResultMessage);
-                payin.SetProcessedOn(pspResult.Data.ProcessedOn);
+                payin.SetExecutedOn(pspResult.Data.ProcessedOn);
 
                 _context.Update(payin);
                 await _context.SaveChangesAsync(token);

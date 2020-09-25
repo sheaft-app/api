@@ -11,7 +11,7 @@ using Sheaft.Infrastructure.Persistence;
 namespace Sheaft.Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20200925131155_InitDatabase")]
+    [Migration("20200925225819_InitDatabase")]
     partial class InitDatabase
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -511,6 +511,9 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                     b.Property<int>("DonationKind")
                         .HasColumnType("int");
 
+                    b.Property<DateTimeOffset?>("ExpiredOn")
+                        .HasColumnType("datetimeoffset");
+
                     b.Property<decimal>("FeesFixedAmount")
                         .HasColumnType("decimal(10,2)");
 
@@ -528,6 +531,9 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
 
                     b.Property<int>("LinesCount")
                         .HasColumnType("int");
+
+                    b.Property<long?>("PayinUid")
+                        .HasColumnType("bigint");
 
                     b.Property<int>("ProductsCount")
                         .HasColumnType("int");
@@ -585,6 +591,10 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
 
                     b.HasIndex("Id")
                         .IsUnique();
+
+                    b.HasIndex("PayinUid")
+                        .IsUnique()
+                        .HasFilter("[PayinUid] IS NOT NULL");
 
                     b.HasIndex("UserUid");
 
@@ -735,6 +745,9 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                     b.Property<DateTimeOffset?>("ExecutedOn")
                         .HasColumnType("datetimeoffset");
 
+                    b.Property<DateTimeOffset?>("ExpiredOn")
+                        .HasColumnType("datetimeoffset");
+
                     b.Property<decimal>("Fees")
                         .HasColumnType("decimal(10,2)");
 
@@ -753,6 +766,9 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                     b.Property<string>("Reference")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<long?>("RefundUid")
+                        .HasColumnType("bigint");
+
                     b.Property<DateTimeOffset?>("RemovedOn")
                         .HasColumnType("datetimeoffset");
 
@@ -761,6 +777,9 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
 
                     b.Property<string>("ResultMessage")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("SkipBackgroundProcessing")
+                        .HasColumnType("bit");
 
                     b.Property<int>("Status")
                         .HasColumnType("int");
@@ -781,6 +800,10 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                     b.HasIndex("Identifier");
 
                     b.HasIndex("OrderUid");
+
+                    b.HasIndex("RefundUid")
+                        .IsUnique()
+                        .HasFilter("[RefundUid] IS NOT NULL");
 
                     b.HasIndex("Uid", "Id", "AuthorUid", "OrderUid", "CreditedWalletUid", "RemovedOn");
 
@@ -867,6 +890,9 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                         .HasColumnType("bigint");
 
                     b.Property<DateTimeOffset?>("ExecutedOn")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<DateTimeOffset?>("ExpiredOn")
                         .HasColumnType("datetimeoffset");
 
                     b.Property<decimal>("Fees")
@@ -1056,10 +1082,19 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                         .HasColumnType("bigint")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
+                    b.Property<DateTimeOffset?>("AcceptedOn")
+                        .HasColumnType("datetimeoffset");
+
                     b.Property<string>("Comment")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<DateTimeOffset?>("CompletedOn")
+                        .HasColumnType("datetimeoffset");
+
                     b.Property<DateTimeOffset>("CreatedOn")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<DateTimeOffset?>("DeliveredOn")
                         .HasColumnType("datetimeoffset");
 
                     b.Property<Guid>("Id")
@@ -1092,6 +1127,9 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
 
                     b.Property<int>("ReturnablesCount")
                         .HasColumnType("int");
+
+                    b.Property<bool>("SkipBackgroundProcessing")
+                        .HasColumnType("bit");
 
                     b.Property<int>("Status")
                         .HasColumnType("int");
@@ -1126,8 +1164,14 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                     b.Property<decimal>("TotalWholeSalePrice")
                         .HasColumnType("decimal(10,2)");
 
+                    b.Property<long?>("TransferUid")
+                        .HasColumnType("bigint");
+
                     b.Property<DateTimeOffset?>("UpdatedOn")
                         .IsConcurrencyToken()
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<DateTimeOffset?>("WithdrawnOn")
                         .HasColumnType("datetimeoffset");
 
                     b.HasKey("Uid");
@@ -1142,6 +1186,10 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
 
                     b.HasIndex("PurchaseOrderVendorUid")
                         .IsUnique();
+
+                    b.HasIndex("TransferUid")
+                        .IsUnique()
+                        .HasFilter("[TransferUid] IS NOT NULL");
 
                     b.HasIndex("PurchaseOrderVendorUid", "Reference")
                         .IsUnique();
@@ -1440,6 +1488,9 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                         .HasColumnType("bigint");
 
                     b.Property<DateTimeOffset?>("ExecutedOn")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<DateTimeOffset?>("ExpiredOn")
                         .HasColumnType("datetimeoffset");
 
                     b.Property<decimal>("Fees")
@@ -1787,6 +1838,9 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                     b.Property<DateTimeOffset?>("ExecutedOn")
                         .HasColumnType("datetimeoffset");
 
+                    b.Property<DateTimeOffset?>("ExpiredOn")
+                        .HasColumnType("datetimeoffset");
+
                     b.Property<decimal>("Fees")
                         .HasColumnType("decimal(10,2)");
 
@@ -1808,6 +1862,9 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                     b.Property<string>("Reference")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<long?>("RefundUid")
+                        .HasColumnType("bigint");
+
                     b.Property<DateTimeOffset?>("RemovedOn")
                         .HasColumnType("datetimeoffset");
 
@@ -1816,6 +1873,9 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
 
                     b.Property<string>("ResultMessage")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("SkipBackgroundProcessing")
+                        .HasColumnType("bit");
 
                     b.Property<int>("Status")
                         .HasColumnType("int");
@@ -1840,6 +1900,10 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                     b.HasIndex("PayoutUid");
 
                     b.HasIndex("PurchaseOrderUid");
+
+                    b.HasIndex("RefundUid")
+                        .IsUnique()
+                        .HasFilter("[RefundUid] IS NOT NULL");
 
                     b.HasIndex("Uid", "Id", "AuthorUid", "PurchaseOrderUid", "CreditedWalletUid", "DebitedWalletUid", "RemovedOn");
 
@@ -2510,6 +2574,11 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
 
             modelBuilder.Entity("Sheaft.Domain.Models.Order", b =>
                 {
+                    b.HasOne("Sheaft.Domain.Models.Payin", "Payin")
+                        .WithOne()
+                        .HasForeignKey("Sheaft.Domain.Models.Order", "PayinUid")
+                        .OnDelete(DeleteBehavior.NoAction);
+
                     b.HasOne("Sheaft.Domain.Models.User", "User")
                         .WithMany()
                         .HasForeignKey("UserUid")
@@ -2560,10 +2629,15 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                         .IsRequired();
 
                     b.HasOne("Sheaft.Domain.Models.Order", "Order")
-                        .WithMany("Payins")
+                        .WithMany()
                         .HasForeignKey("OrderUid")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
+
+                    b.HasOne("Sheaft.Domain.Models.PayinRefund", "Refund")
+                        .WithOne()
+                        .HasForeignKey("Sheaft.Domain.Models.Payin", "RefundUid")
+                        .OnDelete(DeleteBehavior.NoAction);
                 });
 
             modelBuilder.Entity("Sheaft.Domain.Models.PaymentMethod", b =>
@@ -2642,8 +2716,8 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
 
             modelBuilder.Entity("Sheaft.Domain.Models.PurchaseOrder", b =>
                 {
-                    b.HasOne("Sheaft.Domain.Models.Order", "Order")
-                        .WithMany()
+                    b.HasOne("Sheaft.Domain.Models.Order", null)
+                        .WithMany("PurchaseOrders")
                         .HasForeignKey("OrderUid")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
@@ -2659,6 +2733,11 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                         .HasForeignKey("Sheaft.Domain.Models.PurchaseOrder", "PurchaseOrderVendorUid")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.HasOne("Sheaft.Domain.Models.Transfer", "Transfer")
+                        .WithOne()
+                        .HasForeignKey("Sheaft.Domain.Models.PurchaseOrder", "TransferUid")
+                        .OnDelete(DeleteBehavior.NoAction);
 
                     b.OwnsOne("Sheaft.Domain.Models.ExpectedDelivery", "ExpectedDelivery", b1 =>
                         {
@@ -2876,10 +2955,15 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                         .OnDelete(DeleteBehavior.NoAction);
 
                     b.HasOne("Sheaft.Domain.Models.PurchaseOrder", "PurchaseOrder")
-                        .WithMany("Transfers")
+                        .WithMany()
                         .HasForeignKey("PurchaseOrderUid")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
+
+                    b.HasOne("Sheaft.Domain.Models.TransferRefund", "Refund")
+                        .WithOne()
+                        .HasForeignKey("Sheaft.Domain.Models.Transfer", "RefundUid")
+                        .OnDelete(DeleteBehavior.NoAction);
                 });
 
             modelBuilder.Entity("Sheaft.Domain.Models.Ubo", b =>

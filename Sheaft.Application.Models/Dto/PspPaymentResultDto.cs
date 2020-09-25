@@ -11,6 +11,6 @@ namespace Sheaft.Application.Models
         public decimal Credited { get; set; }
         public decimal Debited { get; set; }
         public decimal Fees { get; set; }
-        public DateTimeOffset? ExecutedOn { get; set; }
+        public DateTimeOffset? ProcessedOn { get; set; }
     }
 }

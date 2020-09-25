@@ -115,10 +115,10 @@ namespace Sheaft.Application.Handlers
 
                 payout.SetStatus(pspResult.Data.Status);
                 payout.SetResult(pspResult.Data.ResultCode, pspResult.Data.ResultMessage);
-                payout.SetProcessedOn(pspResult.Data.ProcessedOn);
+                payout.SetExecutedOn(pspResult.Data.ProcessedOn);
 
                 _context.Update(payout);
-                var success = await _context.SaveChangesAsync(token) > 0;
+                await _context.SaveChangesAsync(token);
 
                 switch (payout.Status)
                 {
@@ -141,10 +141,11 @@ namespace Sheaft.Application.Handlers
                 var expiredDate = DateTimeOffset.UtcNow.AddMinutes(-10080);
 
                 var producersTransfers = await _context.Transfers
-                    .Get(t => !t.PayedOutOn.HasValue
+                    .Get(t => t.Refund == null
                             && t.Status == TransactionStatus.Succeeded
+                            && (t.Payout == null || t.Payout.Status == TransactionStatus.Expired)
                             && t.PurchaseOrder.Status == PurchaseOrderStatus.Delivered
-                            && t.ExecutedOn.HasValue && t.ExecutedOn.Value < expiredDate)
+                            && t.PurchaseOrder.DeliveredOn.HasValue && t.PurchaseOrder.DeliveredOn.Value < expiredDate)
                     .Select(t => new { ProducerId = t.CreditedWallet.User.Id, TransferId = t.Id })
                     .GroupBy(t => t.ProducerId)
                     .ToListAsync(token);
@@ -166,7 +167,7 @@ namespace Sheaft.Application.Handlers
         {
             return await ExecuteAsync(async () =>
             {
-                var checkConfigurationResult = await _mediatr.Process(new CheckProducerConfigurationCommand(request.RequestUser) { UserId = request.ProducerId }, token);
+                var checkConfigurationResult = await _mediatr.Process(new CheckProducerConfigurationCommand(request.RequestUser) { ProducerId = request.ProducerId }, token);
                 if (!checkConfigurationResult.Success)
                     return Failed<Guid>(checkConfigurationResult.Exception);
 
@@ -177,7 +178,9 @@ namespace Sheaft.Application.Handlers
                 var wallet = await _context.GetSingleAsync<Wallet>(c => c.User.Id == request.ProducerId, token);
                 var bankAccount = await _context.GetSingleAsync<BankAccount>(c => c.User.Id == request.ProducerId && c.IsActive, token);
 
-                var transfers = await _context.GetAsync<Transfer>(t => request.TransferIds.Contains(t.Id) && t.PurchaseOrder.Status == PurchaseOrderStatus.Completed, token);
+                var transfers = await _context.GetAsync<Transfer>(t => request.TransferIds.Contains(t.Id)
+                                                            && t.PurchaseOrder.Status == PurchaseOrderStatus.Delivered
+                                                            && (t.Payout == null || t.Payout.Status == TransactionStatus.Expired), token);
 
                 var hasAlreadyPaidComission = await _context.AnyAsync<Payout>(p => p.Fees > 0 && p.DebitedWallet.User.Id == request.ProducerId
                     && (p.Status == TransactionStatus.Waiting || p.Status == TransactionStatus.Created || p.Status == TransactionStatus.Succeeded), token);
@@ -198,7 +201,7 @@ namespace Sheaft.Application.Handlers
                     payout.SetIdentifier(result.Data.Identifier);
                     payout.SetStatus(result.Data.Status);
                     payout.SetResult(result.Data.ResultCode, result.Data.ResultMessage);
-                    payout.SetProcessedOn(result.Data.ExecutedOn);
+                    payout.SetExecutedOn(result.Data.ProcessedOn);
 
                     _context.Update(payout);
                     await _context.SaveChangesAsync(token);

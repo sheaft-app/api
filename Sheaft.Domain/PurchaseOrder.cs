@@ -50,8 +50,6 @@ namespace Sheaft.Domain.Models
         public DateTimeOffset? CompletedOn { get; private set; }
         public DateTimeOffset? DeliveredOn { get; private set; }
         public DateTimeOffset? WithdrawnOn { get; private set; }
-        public DateTimeOffset? PayedOn { get; private set; }
-        public DateTimeOffset? RefundedOn { get; private set; }
         public string Reference { get; private set; }
         public string Reason { get; private set; }
         public string Comment { get; private set; }
@@ -68,12 +66,18 @@ namespace Sheaft.Domain.Models
         public decimal TotalVatPrice { get; private set; }
         public decimal TotalOnSalePrice { get; private set; }
         public decimal TotalWeight { get; private set; }
+        public bool SkipBackgroundProcessing { get; private set; }
         public PurchaseOrderStatus Status { get; private set; }
-        public virtual Order Order { get; private set; }
         public virtual PurchaseOrderSender Sender { get; private set; }
         public virtual ExpectedDelivery ExpectedDelivery { get; private set; }
         public virtual PurchaseOrderVendor Vendor { get; private set; }
+        public virtual Transfer Transfer { get; private set; }
         public virtual IReadOnlyCollection<PurchaseOrderProduct> Products => _products?.AsReadOnly();
+
+        public void SetSkipBackgroundProcessing(bool value)
+        {
+            SkipBackgroundProcessing = value;
+        }
 
         public void SetReference(string newReference)
         {
@@ -81,6 +85,14 @@ namespace Sheaft.Domain.Models
                 throw new ValidationException(MessageKind.PurchaseOrder_Reference_Required);
 
             Reference = newReference;
+        }
+
+        public void SetTransfer(Transfer transfer)
+        {
+            if (Transfer != null && Transfer.Status == TransactionStatus.Succeeded)
+                throw new ValidationException();
+
+            Transfer = transfer;
         }
 
         private void SetStatus(PurchaseOrderStatus newStatus)

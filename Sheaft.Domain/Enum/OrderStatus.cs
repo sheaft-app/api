@@ -7,7 +7,6 @@
         Validated,
         Refused,
         Expired,
-        Archived,
-        Refunded
+        Archived
     }
 }

@@ -8,7 +8,8 @@ namespace Sheaft.Application.Handlers
 {
     public class PayinRefundEventsHandler :
         INotificationHandler<PayinRefundFailedEvent>,
-        INotificationHandler<PayinRefundSucceededEvent>
+        INotificationHandler<PayinRefundSucceededEvent>,
+        INotificationHandler<CreatePayinRefundFailedEvent>
     {
         private readonly IAppDbContext _context;
         private readonly IEmailService _emailService;
@@ -25,6 +26,11 @@ namespace Sheaft.Application.Handlers
         }
 
         public Task Handle(PayinRefundSucceededEvent notification, CancellationToken cancellationToken)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public Task Handle(CreatePayinRefundFailedEvent notification, CancellationToken cancellationToken)
         {
             throw new System.NotImplementedException();
         }

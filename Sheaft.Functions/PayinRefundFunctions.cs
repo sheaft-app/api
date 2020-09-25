@@ -27,6 +27,14 @@ namespace Sheaft.Functions
                 throw results.Exception;
         }
 
+        [FunctionName("CheckNewPayinRefundsCommand")]
+        public async Task CheckNewPayinRefundsCommandAsync([TimerTrigger("0 */10 * * * *", RunOnStartup = false)] TimerInfo info, CancellationToken token)
+        {
+            var results = await _mediatr.Process(new CheckNewPayinRefundsCommand(new RequestUser("payin-refund-functions", Guid.NewGuid().ToString("N"))), token);
+            if (!results.Success)
+                throw results.Exception;
+        }
+
         [FunctionName("RefreshPayinRefundStatusCommand")]
         public async Task RefreshPayinRefundStatusCommandAsync([ServiceBusTrigger(RefreshPayinRefundStatusCommand.QUEUE_NAME, Connection = "AzureWebJobsServiceBus")] string message, CancellationToken token)
         {
@@ -53,6 +61,12 @@ namespace Sheaft.Functions
         public async Task PayinRefundSucceededEventAsync([ServiceBusTrigger(PayinRefundSucceededEvent.QUEUE_NAME, Connection = "AzureWebJobsServiceBus")] string message, CancellationToken token)
         {
             await _mediatr.Process<PayinRefundSucceededEvent>(message, token);
+        }
+
+        [FunctionName("CreatePayinRefundFailedEvent")]
+        public async Task CreatePayinRefundFailedEventAsync([ServiceBusTrigger(CreatePayinRefundFailedEvent.QUEUE_NAME, Connection = "AzureWebJobsServiceBus")] string message, CancellationToken token)
+        {
+            await _mediatr.Process<CreatePayinRefundFailedEvent>(message, token);
         }
     }
 }

@@ -1,7 +1,6 @@
 ﻿using System;
 using Sheaft.Domain.Interop;
 using Sheaft.Domain.Enums;
-using Sheaft.Exceptions;
 
 namespace Sheaft.Domain.Models
 {
@@ -36,12 +35,12 @@ namespace Sheaft.Domain.Models
         public decimal Credited { get; protected set; }
         public virtual User Author { get; private set; }
 
-        public void SetProcessedOn(DateTimeOffset? processedOn)
+        public void SetExecutedOn(DateTimeOffset? executedOn)
         {
             if (ExecutedOn.HasValue)
                 return;
 
-            ExecutedOn = processedOn;
+            ExecutedOn = executedOn;
         }
 
         public void SetIdentifier(string identifier)
@@ -52,7 +51,7 @@ namespace Sheaft.Domain.Models
             Identifier = identifier;
         }
 
-        public void SetStatus(TransactionStatus status)
+        public virtual void SetStatus(TransactionStatus status)
         {
             switch (status)
             {

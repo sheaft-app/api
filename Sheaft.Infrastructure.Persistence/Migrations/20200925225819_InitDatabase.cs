@@ -430,50 +430,6 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Orders",
-                columns: table => new
-                {
-                    Uid = table.Column<long>(nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Id = table.Column<Guid>(nullable: false),
-                    CreatedOn = table.Column<DateTimeOffset>(nullable: false),
-                    UpdatedOn = table.Column<DateTimeOffset>(nullable: true),
-                    RemovedOn = table.Column<DateTimeOffset>(nullable: true),
-                    Status = table.Column<int>(nullable: false),
-                    DonationKind = table.Column<int>(nullable: false),
-                    TotalProductWholeSalePrice = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
-                    TotalProductVatPrice = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
-                    TotalProductOnSalePrice = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
-                    TotalReturnableWholeSalePrice = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
-                    TotalReturnableVatPrice = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
-                    TotalReturnableOnSalePrice = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
-                    TotalWholeSalePrice = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
-                    TotalVatPrice = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
-                    TotalOnSalePrice = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
-                    TotalPrice = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
-                    TotalWeight = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
-                    FeesFixedAmount = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
-                    FeesPercent = table.Column<decimal>(type: "decimal(10,4)", nullable: false),
-                    ReturnablesCount = table.Column<int>(nullable: false),
-                    LinesCount = table.Column<int>(nullable: false),
-                    ProductsCount = table.Column<int>(nullable: false),
-                    Donation = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
-                    FeesPrice = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
-                    InternalFeesPrice = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
-                    UserUid = table.Column<long>(nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Orders", x => x.Uid);
-                    table.ForeignKey(
-                        name: "FK_Orders_Users_UserUid",
-                        column: x => x.UserUid,
-                        principalTable: "Users",
-                        principalColumn: "Uid",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "PaymentMethods",
                 columns: table => new
                 {
@@ -865,134 +821,6 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "OrderDeliveries",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(nullable: false),
-                    OrderUid = table.Column<long>(nullable: false),
-                    ExpectedDeliveryDate = table.Column<DateTimeOffset>(nullable: false),
-                    DeliveryModeUid = table.Column<long>(nullable: true),
-                    Comment = table.Column<string>(nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_OrderDeliveries", x => new { x.OrderUid, x.Id });
-                    table.ForeignKey(
-                        name: "FK_OrderDeliveries_DeliveryModes_DeliveryModeUid",
-                        column: x => x.DeliveryModeUid,
-                        principalTable: "DeliveryModes",
-                        principalColumn: "Uid",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_OrderDeliveries_Orders_OrderUid",
-                        column: x => x.OrderUid,
-                        principalTable: "Orders",
-                        principalColumn: "Uid",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "OrderProducts",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(nullable: false),
-                    OrderUid = table.Column<long>(nullable: false),
-                    Name = table.Column<string>(nullable: false),
-                    Reference = table.Column<string>(nullable: false),
-                    Quantity = table.Column<int>(nullable: false),
-                    Vat = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
-                    UnitWholeSalePrice = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
-                    UnitVatPrice = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
-                    UnitOnSalePrice = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
-                    UnitWeight = table.Column<decimal>(type: "decimal(10,2)", nullable: true),
-                    TotalProductWholeSalePrice = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
-                    TotalProductVatPrice = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
-                    TotalProductOnSalePrice = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
-                    TotalWeight = table.Column<decimal>(type: "decimal(10,2)", nullable: true),
-                    ReturnablesCount = table.Column<int>(nullable: false),
-                    ReturnableName = table.Column<string>(nullable: true),
-                    ReturnableOnSalePrice = table.Column<decimal>(type: "decimal(10,2)", nullable: true),
-                    ReturnableWholeSalePrice = table.Column<decimal>(type: "decimal(10,2)", nullable: true),
-                    ReturnableVatPrice = table.Column<decimal>(type: "decimal(10,2)", nullable: true),
-                    ReturnableVat = table.Column<decimal>(type: "decimal(10,2)", nullable: true),
-                    TotalReturnableWholeSalePrice = table.Column<decimal>(type: "decimal(10,2)", nullable: true),
-                    TotalReturnableVatPrice = table.Column<decimal>(type: "decimal(10,2)", nullable: true),
-                    TotalReturnableOnSalePrice = table.Column<decimal>(type: "decimal(10,2)", nullable: true),
-                    TotalWholeSalePrice = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
-                    TotalVatPrice = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
-                    TotalOnSalePrice = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
-                    ProducerUid = table.Column<long>(nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_OrderProducts", x => new { x.OrderUid, x.Id });
-                    table.ForeignKey(
-                        name: "FK_OrderProducts_Orders_OrderUid",
-                        column: x => x.OrderUid,
-                        principalTable: "Orders",
-                        principalColumn: "Uid",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_OrderProducts_Users_ProducerUid",
-                        column: x => x.ProducerUid,
-                        principalTable: "Users",
-                        principalColumn: "Uid");
-                });
-
-            migrationBuilder.CreateTable(
-                name: "PurchaseOrders",
-                columns: table => new
-                {
-                    Uid = table.Column<long>(nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Id = table.Column<Guid>(nullable: false),
-                    CreatedOn = table.Column<DateTimeOffset>(nullable: false),
-                    UpdatedOn = table.Column<DateTimeOffset>(nullable: true),
-                    RemovedOn = table.Column<DateTimeOffset>(nullable: true),
-                    Reference = table.Column<string>(nullable: false),
-                    Reason = table.Column<string>(nullable: true),
-                    Comment = table.Column<string>(nullable: true),
-                    LinesCount = table.Column<int>(nullable: false),
-                    ProductsCount = table.Column<int>(nullable: false),
-                    ReturnablesCount = table.Column<int>(nullable: false),
-                    TotalProductWholeSalePrice = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
-                    TotalProductVatPrice = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
-                    TotalProductOnSalePrice = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
-                    TotalReturnableOnSalePrice = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
-                    TotalReturnableWholeSalePrice = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
-                    TotalReturnableVatPrice = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
-                    TotalWholeSalePrice = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
-                    TotalVatPrice = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
-                    TotalOnSalePrice = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
-                    TotalWeight = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
-                    Status = table.Column<int>(nullable: false),
-                    OrderUid = table.Column<long>(nullable: false),
-                    PurchaseOrderSenderUid = table.Column<long>(nullable: false),
-                    PurchaseOrderVendorUid = table.Column<long>(nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_PurchaseOrders", x => x.Uid);
-                    table.ForeignKey(
-                        name: "FK_PurchaseOrders_Orders_OrderUid",
-                        column: x => x.OrderUid,
-                        principalTable: "Orders",
-                        principalColumn: "Uid");
-                    table.ForeignKey(
-                        name: "FK_PurchaseOrders_PurchaseOrderSenders_PurchaseOrderSenderUid",
-                        column: x => x.PurchaseOrderSenderUid,
-                        principalTable: "PurchaseOrderSenders",
-                        principalColumn: "Uid",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_PurchaseOrders_PurchaseOrderVendors_PurchaseOrderVendorUid",
-                        column: x => x.PurchaseOrderVendorUid,
-                        principalTable: "PurchaseOrderVendors",
-                        principalColumn: "Uid",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Products",
                 columns: table => new
                 {
@@ -1040,57 +868,6 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Payins",
-                columns: table => new
-                {
-                    Uid = table.Column<long>(nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Id = table.Column<Guid>(nullable: false),
-                    CreatedOn = table.Column<DateTimeOffset>(nullable: false),
-                    UpdatedOn = table.Column<DateTimeOffset>(nullable: true),
-                    RemovedOn = table.Column<DateTimeOffset>(nullable: true),
-                    Identifier = table.Column<string>(nullable: true),
-                    Kind = table.Column<int>(nullable: false),
-                    Status = table.Column<int>(nullable: false),
-                    ExecutedOn = table.Column<DateTimeOffset>(nullable: true),
-                    ResultCode = table.Column<string>(nullable: true),
-                    ResultMessage = table.Column<string>(nullable: true),
-                    Fees = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
-                    Reference = table.Column<string>(nullable: true),
-                    Debited = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
-                    Credited = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
-                    AuthorUid = table.Column<long>(nullable: false),
-                    CreditedWalletUid = table.Column<long>(nullable: false),
-                    OrderUid = table.Column<long>(nullable: false),
-                    CardUid = table.Column<long>(nullable: true),
-                    RedirectUrl = table.Column<string>(nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Payins", x => x.Uid);
-                    table.ForeignKey(
-                        name: "FK_Payins_PaymentMethods_CardUid",
-                        column: x => x.CardUid,
-                        principalTable: "PaymentMethods",
-                        principalColumn: "Uid");
-                    table.ForeignKey(
-                        name: "FK_Payins_Users_AuthorUid",
-                        column: x => x.AuthorUid,
-                        principalTable: "Users",
-                        principalColumn: "Uid");
-                    table.ForeignKey(
-                        name: "FK_Payins_Wallets_CreditedWalletUid",
-                        column: x => x.CreditedWalletUid,
-                        principalTable: "Wallets",
-                        principalColumn: "Uid");
-                    table.ForeignKey(
-                        name: "FK_Payins_Orders_OrderUid",
-                        column: x => x.OrderUid,
-                        principalTable: "Orders",
-                        principalColumn: "Uid");
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Payouts",
                 columns: table => new
                 {
@@ -1104,6 +881,7 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                     Kind = table.Column<int>(nullable: false),
                     Status = table.Column<int>(nullable: false),
                     ExecutedOn = table.Column<DateTimeOffset>(nullable: true),
+                    ExpiredOn = table.Column<DateTimeOffset>(nullable: true),
                     ResultCode = table.Column<string>(nullable: true),
                     ResultMessage = table.Column<string>(nullable: true),
                     Fees = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
@@ -1152,79 +930,6 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                         name: "FK_AgreementSelectedHours_Agreements_AgreementUid",
                         column: x => x.AgreementUid,
                         principalTable: "Agreements",
-                        principalColumn: "Uid",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "ExpectedDeliveries",
-                columns: table => new
-                {
-                    PurchaseOrderUid = table.Column<long>(nullable: false),
-                    Kind = table.Column<int>(nullable: false),
-                    Name = table.Column<string>(nullable: true),
-                    ExpectedDeliveryDate = table.Column<DateTimeOffset>(nullable: false),
-                    DeliveryStartedOn = table.Column<DateTimeOffset>(nullable: true),
-                    DeliveredOn = table.Column<DateTimeOffset>(nullable: true),
-                    From = table.Column<TimeSpan>(nullable: false),
-                    To = table.Column<TimeSpan>(nullable: false),
-                    Address_Line1 = table.Column<string>(nullable: true),
-                    Address_Line2 = table.Column<string>(nullable: true),
-                    Address_Zipcode = table.Column<string>(nullable: true),
-                    Address_City = table.Column<string>(nullable: true),
-                    Address_Country = table.Column<int>(nullable: true),
-                    Address_Longitude = table.Column<double>(nullable: true),
-                    Address_Latitude = table.Column<double>(nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_ExpectedDeliveries", x => x.PurchaseOrderUid);
-                    table.ForeignKey(
-                        name: "FK_ExpectedDeliveries_PurchaseOrders_PurchaseOrderUid",
-                        column: x => x.PurchaseOrderUid,
-                        principalTable: "PurchaseOrders",
-                        principalColumn: "Uid",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "PurchaseOrderProducts",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(nullable: false),
-                    PurchaseOrderUid = table.Column<long>(nullable: false),
-                    Name = table.Column<string>(nullable: false),
-                    Reference = table.Column<string>(nullable: false),
-                    Quantity = table.Column<int>(nullable: false),
-                    Vat = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
-                    UnitWholeSalePrice = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
-                    UnitVatPrice = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
-                    UnitOnSalePrice = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
-                    UnitWeight = table.Column<decimal>(type: "decimal(10,2)", nullable: true),
-                    TotalProductWholeSalePrice = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
-                    TotalProductVatPrice = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
-                    TotalProductOnSalePrice = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
-                    TotalWeight = table.Column<decimal>(type: "decimal(10,2)", nullable: true),
-                    ReturnablesCount = table.Column<int>(nullable: false),
-                    ReturnableName = table.Column<string>(nullable: true),
-                    ReturnableOnSalePrice = table.Column<decimal>(type: "decimal(10,2)", nullable: true),
-                    ReturnableWholeSalePrice = table.Column<decimal>(type: "decimal(10,2)", nullable: true),
-                    ReturnableVatPrice = table.Column<decimal>(type: "decimal(10,2)", nullable: true),
-                    ReturnableVat = table.Column<decimal>(type: "decimal(10,2)", nullable: true),
-                    TotalReturnableWholeSalePrice = table.Column<decimal>(type: "decimal(10,2)", nullable: true),
-                    TotalReturnableVatPrice = table.Column<decimal>(type: "decimal(10,2)", nullable: true),
-                    TotalReturnableOnSalePrice = table.Column<decimal>(type: "decimal(10,2)", nullable: true),
-                    TotalWholeSalePrice = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
-                    TotalVatPrice = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
-                    TotalOnSalePrice = table.Column<decimal>(type: "decimal(10,2)", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_PurchaseOrderProducts", x => new { x.PurchaseOrderUid, x.Id });
-                    table.ForeignKey(
-                        name: "FK_PurchaseOrderProducts_PurchaseOrders_PurchaseOrderUid",
-                        column: x => x.PurchaseOrderUid,
-                        principalTable: "PurchaseOrders",
                         principalColumn: "Uid",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -1309,7 +1014,70 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Transfers",
+                name: "OrderDeliveries",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(nullable: false),
+                    OrderUid = table.Column<long>(nullable: false),
+                    ExpectedDeliveryDate = table.Column<DateTimeOffset>(nullable: false),
+                    DeliveryModeUid = table.Column<long>(nullable: true),
+                    Comment = table.Column<string>(nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_OrderDeliveries", x => new { x.OrderUid, x.Id });
+                    table.ForeignKey(
+                        name: "FK_OrderDeliveries_DeliveryModes_DeliveryModeUid",
+                        column: x => x.DeliveryModeUid,
+                        principalTable: "DeliveryModes",
+                        principalColumn: "Uid",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "OrderProducts",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(nullable: false),
+                    OrderUid = table.Column<long>(nullable: false),
+                    Name = table.Column<string>(nullable: false),
+                    Reference = table.Column<string>(nullable: false),
+                    Quantity = table.Column<int>(nullable: false),
+                    Vat = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
+                    UnitWholeSalePrice = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
+                    UnitVatPrice = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
+                    UnitOnSalePrice = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
+                    UnitWeight = table.Column<decimal>(type: "decimal(10,2)", nullable: true),
+                    TotalProductWholeSalePrice = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
+                    TotalProductVatPrice = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
+                    TotalProductOnSalePrice = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
+                    TotalWeight = table.Column<decimal>(type: "decimal(10,2)", nullable: true),
+                    ReturnablesCount = table.Column<int>(nullable: false),
+                    ReturnableName = table.Column<string>(nullable: true),
+                    ReturnableOnSalePrice = table.Column<decimal>(type: "decimal(10,2)", nullable: true),
+                    ReturnableWholeSalePrice = table.Column<decimal>(type: "decimal(10,2)", nullable: true),
+                    ReturnableVatPrice = table.Column<decimal>(type: "decimal(10,2)", nullable: true),
+                    ReturnableVat = table.Column<decimal>(type: "decimal(10,2)", nullable: true),
+                    TotalReturnableWholeSalePrice = table.Column<decimal>(type: "decimal(10,2)", nullable: true),
+                    TotalReturnableVatPrice = table.Column<decimal>(type: "decimal(10,2)", nullable: true),
+                    TotalReturnableOnSalePrice = table.Column<decimal>(type: "decimal(10,2)", nullable: true),
+                    TotalWholeSalePrice = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
+                    TotalVatPrice = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
+                    TotalOnSalePrice = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
+                    ProducerUid = table.Column<long>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_OrderProducts", x => new { x.OrderUid, x.Id });
+                    table.ForeignKey(
+                        name: "FK_OrderProducts_Users_ProducerUid",
+                        column: x => x.ProducerUid,
+                        principalTable: "Users",
+                        principalColumn: "Uid");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Payins",
                 columns: table => new
                 {
                     Uid = table.Column<long>(nullable: false)
@@ -1322,6 +1090,7 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                     Kind = table.Column<int>(nullable: false),
                     Status = table.Column<int>(nullable: false),
                     ExecutedOn = table.Column<DateTimeOffset>(nullable: true),
+                    ExpiredOn = table.Column<DateTimeOffset>(nullable: true),
                     ResultCode = table.Column<string>(nullable: true),
                     ResultMessage = table.Column<string>(nullable: true),
                     Fees = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
@@ -1329,39 +1098,214 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                     Debited = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
                     Credited = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
                     AuthorUid = table.Column<long>(nullable: false),
-                    PurchaseOrderUid = table.Column<long>(nullable: false),
+                    SkipBackgroundProcessing = table.Column<bool>(nullable: false),
                     CreditedWalletUid = table.Column<long>(nullable: false),
-                    DebitedWalletUid = table.Column<long>(nullable: false),
-                    PayoutUid = table.Column<long>(nullable: true)
+                    OrderUid = table.Column<long>(nullable: false),
+                    RefundUid = table.Column<long>(nullable: true),
+                    CardUid = table.Column<long>(nullable: true),
+                    RedirectUrl = table.Column<string>(nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Transfers", x => x.Uid);
+                    table.PrimaryKey("PK_Payins", x => x.Uid);
                     table.ForeignKey(
-                        name: "FK_Transfers_Users_AuthorUid",
+                        name: "FK_Payins_PaymentMethods_CardUid",
+                        column: x => x.CardUid,
+                        principalTable: "PaymentMethods",
+                        principalColumn: "Uid");
+                    table.ForeignKey(
+                        name: "FK_Payins_Users_AuthorUid",
                         column: x => x.AuthorUid,
                         principalTable: "Users",
                         principalColumn: "Uid");
                     table.ForeignKey(
-                        name: "FK_Transfers_Wallets_CreditedWalletUid",
+                        name: "FK_Payins_Wallets_CreditedWalletUid",
                         column: x => x.CreditedWalletUid,
                         principalTable: "Wallets",
                         principalColumn: "Uid");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Orders",
+                columns: table => new
+                {
+                    Uid = table.Column<long>(nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Id = table.Column<Guid>(nullable: false),
+                    CreatedOn = table.Column<DateTimeOffset>(nullable: false),
+                    UpdatedOn = table.Column<DateTimeOffset>(nullable: true),
+                    RemovedOn = table.Column<DateTimeOffset>(nullable: true),
+                    ExpiredOn = table.Column<DateTimeOffset>(nullable: true),
+                    Status = table.Column<int>(nullable: false),
+                    DonationKind = table.Column<int>(nullable: false),
+                    TotalProductWholeSalePrice = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
+                    TotalProductVatPrice = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
+                    TotalProductOnSalePrice = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
+                    TotalReturnableWholeSalePrice = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
+                    TotalReturnableVatPrice = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
+                    TotalReturnableOnSalePrice = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
+                    TotalWholeSalePrice = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
+                    TotalVatPrice = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
+                    TotalOnSalePrice = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
+                    TotalPrice = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
+                    TotalWeight = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
+                    FeesFixedAmount = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
+                    FeesPercent = table.Column<decimal>(type: "decimal(10,4)", nullable: false),
+                    ReturnablesCount = table.Column<int>(nullable: false),
+                    LinesCount = table.Column<int>(nullable: false),
+                    ProductsCount = table.Column<int>(nullable: false),
+                    Donation = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
+                    FeesPrice = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
+                    InternalFeesPrice = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
+                    UserUid = table.Column<long>(nullable: false),
+                    PayinUid = table.Column<long>(nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Orders", x => x.Uid);
                     table.ForeignKey(
-                        name: "FK_Transfers_Wallets_DebitedWalletUid",
-                        column: x => x.DebitedWalletUid,
-                        principalTable: "Wallets",
+                        name: "FK_Orders_Payins_PayinUid",
+                        column: x => x.PayinUid,
+                        principalTable: "Payins",
                         principalColumn: "Uid");
                     table.ForeignKey(
-                        name: "FK_Transfers_Payouts_PayoutUid",
-                        column: x => x.PayoutUid,
-                        principalTable: "Payouts",
+                        name: "FK_Orders_Users_UserUid",
+                        column: x => x.UserUid,
+                        principalTable: "Users",
+                        principalColumn: "Uid",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "PurchaseOrders",
+                columns: table => new
+                {
+                    Uid = table.Column<long>(nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Id = table.Column<Guid>(nullable: false),
+                    CreatedOn = table.Column<DateTimeOffset>(nullable: false),
+                    UpdatedOn = table.Column<DateTimeOffset>(nullable: true),
+                    RemovedOn = table.Column<DateTimeOffset>(nullable: true),
+                    AcceptedOn = table.Column<DateTimeOffset>(nullable: true),
+                    CompletedOn = table.Column<DateTimeOffset>(nullable: true),
+                    DeliveredOn = table.Column<DateTimeOffset>(nullable: true),
+                    WithdrawnOn = table.Column<DateTimeOffset>(nullable: true),
+                    Reference = table.Column<string>(nullable: false),
+                    Reason = table.Column<string>(nullable: true),
+                    Comment = table.Column<string>(nullable: true),
+                    LinesCount = table.Column<int>(nullable: false),
+                    ProductsCount = table.Column<int>(nullable: false),
+                    ReturnablesCount = table.Column<int>(nullable: false),
+                    TotalProductWholeSalePrice = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
+                    TotalProductVatPrice = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
+                    TotalProductOnSalePrice = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
+                    TotalReturnableOnSalePrice = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
+                    TotalReturnableWholeSalePrice = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
+                    TotalReturnableVatPrice = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
+                    TotalWholeSalePrice = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
+                    TotalVatPrice = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
+                    TotalOnSalePrice = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
+                    TotalWeight = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
+                    SkipBackgroundProcessing = table.Column<bool>(nullable: false),
+                    Status = table.Column<int>(nullable: false),
+                    PurchaseOrderSenderUid = table.Column<long>(nullable: false),
+                    PurchaseOrderVendorUid = table.Column<long>(nullable: false),
+                    TransferUid = table.Column<long>(nullable: true),
+                    OrderUid = table.Column<long>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_PurchaseOrders", x => x.Uid);
+                    table.ForeignKey(
+                        name: "FK_PurchaseOrders_Orders_OrderUid",
+                        column: x => x.OrderUid,
+                        principalTable: "Orders",
                         principalColumn: "Uid");
                     table.ForeignKey(
-                        name: "FK_Transfers_PurchaseOrders_PurchaseOrderUid",
+                        name: "FK_PurchaseOrders_PurchaseOrderSenders_PurchaseOrderSenderUid",
+                        column: x => x.PurchaseOrderSenderUid,
+                        principalTable: "PurchaseOrderSenders",
+                        principalColumn: "Uid",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_PurchaseOrders_PurchaseOrderVendors_PurchaseOrderVendorUid",
+                        column: x => x.PurchaseOrderVendorUid,
+                        principalTable: "PurchaseOrderVendors",
+                        principalColumn: "Uid",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ExpectedDeliveries",
+                columns: table => new
+                {
+                    PurchaseOrderUid = table.Column<long>(nullable: false),
+                    Kind = table.Column<int>(nullable: false),
+                    Name = table.Column<string>(nullable: true),
+                    ExpectedDeliveryDate = table.Column<DateTimeOffset>(nullable: false),
+                    DeliveryStartedOn = table.Column<DateTimeOffset>(nullable: true),
+                    DeliveredOn = table.Column<DateTimeOffset>(nullable: true),
+                    From = table.Column<TimeSpan>(nullable: false),
+                    To = table.Column<TimeSpan>(nullable: false),
+                    Address_Line1 = table.Column<string>(nullable: true),
+                    Address_Line2 = table.Column<string>(nullable: true),
+                    Address_Zipcode = table.Column<string>(nullable: true),
+                    Address_City = table.Column<string>(nullable: true),
+                    Address_Country = table.Column<int>(nullable: true),
+                    Address_Longitude = table.Column<double>(nullable: true),
+                    Address_Latitude = table.Column<double>(nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ExpectedDeliveries", x => x.PurchaseOrderUid);
+                    table.ForeignKey(
+                        name: "FK_ExpectedDeliveries_PurchaseOrders_PurchaseOrderUid",
                         column: x => x.PurchaseOrderUid,
                         principalTable: "PurchaseOrders",
-                        principalColumn: "Uid");
+                        principalColumn: "Uid",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "PurchaseOrderProducts",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(nullable: false),
+                    PurchaseOrderUid = table.Column<long>(nullable: false),
+                    Name = table.Column<string>(nullable: false),
+                    Reference = table.Column<string>(nullable: false),
+                    Quantity = table.Column<int>(nullable: false),
+                    Vat = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
+                    UnitWholeSalePrice = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
+                    UnitVatPrice = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
+                    UnitOnSalePrice = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
+                    UnitWeight = table.Column<decimal>(type: "decimal(10,2)", nullable: true),
+                    TotalProductWholeSalePrice = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
+                    TotalProductVatPrice = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
+                    TotalProductOnSalePrice = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
+                    TotalWeight = table.Column<decimal>(type: "decimal(10,2)", nullable: true),
+                    ReturnablesCount = table.Column<int>(nullable: false),
+                    ReturnableName = table.Column<string>(nullable: true),
+                    ReturnableOnSalePrice = table.Column<decimal>(type: "decimal(10,2)", nullable: true),
+                    ReturnableWholeSalePrice = table.Column<decimal>(type: "decimal(10,2)", nullable: true),
+                    ReturnableVatPrice = table.Column<decimal>(type: "decimal(10,2)", nullable: true),
+                    ReturnableVat = table.Column<decimal>(type: "decimal(10,2)", nullable: true),
+                    TotalReturnableWholeSalePrice = table.Column<decimal>(type: "decimal(10,2)", nullable: true),
+                    TotalReturnableVatPrice = table.Column<decimal>(type: "decimal(10,2)", nullable: true),
+                    TotalReturnableOnSalePrice = table.Column<decimal>(type: "decimal(10,2)", nullable: true),
+                    TotalWholeSalePrice = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
+                    TotalVatPrice = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
+                    TotalOnSalePrice = table.Column<decimal>(type: "decimal(10,2)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_PurchaseOrderProducts", x => new { x.PurchaseOrderUid, x.Id });
+                    table.ForeignKey(
+                        name: "FK_PurchaseOrderProducts_PurchaseOrders_PurchaseOrderUid",
+                        column: x => x.PurchaseOrderUid,
+                        principalTable: "PurchaseOrders",
+                        principalColumn: "Uid",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -1378,6 +1322,7 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                     Kind = table.Column<int>(nullable: false),
                     Status = table.Column<int>(nullable: false),
                     ExecutedOn = table.Column<DateTimeOffset>(nullable: true),
+                    ExpiredOn = table.Column<DateTimeOffset>(nullable: true),
                     ResultCode = table.Column<string>(nullable: true),
                     ResultMessage = table.Column<string>(nullable: true),
                     Fees = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
@@ -1413,10 +1358,69 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                         column: x => x.CreditedWalletUid,
                         principalTable: "Wallets",
                         principalColumn: "Uid");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Transfers",
+                columns: table => new
+                {
+                    Uid = table.Column<long>(nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Id = table.Column<Guid>(nullable: false),
+                    CreatedOn = table.Column<DateTimeOffset>(nullable: false),
+                    UpdatedOn = table.Column<DateTimeOffset>(nullable: true),
+                    RemovedOn = table.Column<DateTimeOffset>(nullable: true),
+                    Identifier = table.Column<string>(nullable: true),
+                    Kind = table.Column<int>(nullable: false),
+                    Status = table.Column<int>(nullable: false),
+                    ExecutedOn = table.Column<DateTimeOffset>(nullable: true),
+                    ExpiredOn = table.Column<DateTimeOffset>(nullable: true),
+                    ResultCode = table.Column<string>(nullable: true),
+                    ResultMessage = table.Column<string>(nullable: true),
+                    Fees = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
+                    Reference = table.Column<string>(nullable: true),
+                    Debited = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
+                    Credited = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
+                    AuthorUid = table.Column<long>(nullable: false),
+                    SkipBackgroundProcessing = table.Column<bool>(nullable: false),
+                    PurchaseOrderUid = table.Column<long>(nullable: false),
+                    CreditedWalletUid = table.Column<long>(nullable: false),
+                    DebitedWalletUid = table.Column<long>(nullable: false),
+                    RefundUid = table.Column<long>(nullable: true),
+                    PayoutUid = table.Column<long>(nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Transfers", x => x.Uid);
                     table.ForeignKey(
-                        name: "FK_Refunds_Transfers_TransferUid",
-                        column: x => x.TransferUid,
-                        principalTable: "Transfers",
+                        name: "FK_Transfers_Users_AuthorUid",
+                        column: x => x.AuthorUid,
+                        principalTable: "Users",
+                        principalColumn: "Uid");
+                    table.ForeignKey(
+                        name: "FK_Transfers_Wallets_CreditedWalletUid",
+                        column: x => x.CreditedWalletUid,
+                        principalTable: "Wallets",
+                        principalColumn: "Uid");
+                    table.ForeignKey(
+                        name: "FK_Transfers_Wallets_DebitedWalletUid",
+                        column: x => x.DebitedWalletUid,
+                        principalTable: "Wallets",
+                        principalColumn: "Uid");
+                    table.ForeignKey(
+                        name: "FK_Transfers_Payouts_PayoutUid",
+                        column: x => x.PayoutUid,
+                        principalTable: "Payouts",
+                        principalColumn: "Uid");
+                    table.ForeignKey(
+                        name: "FK_Transfers_PurchaseOrders_PurchaseOrderUid",
+                        column: x => x.PurchaseOrderUid,
+                        principalTable: "PurchaseOrders",
+                        principalColumn: "Uid");
+                    table.ForeignKey(
+                        name: "FK_Transfers_Refunds_RefundUid",
+                        column: x => x.RefundUid,
+                        principalTable: "Refunds",
                         principalColumn: "Uid");
                 });
 
@@ -1630,6 +1634,13 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
+                name: "IX_Orders_PayinUid",
+                table: "Orders",
+                column: "PayinUid",
+                unique: true,
+                filter: "[PayinUid] IS NOT NULL");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Orders_UserUid",
                 table: "Orders",
                 column: "UserUid");
@@ -1669,6 +1680,13 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                 name: "IX_Payins_OrderUid",
                 table: "Payins",
                 column: "OrderUid");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Payins_RefundUid",
+                table: "Payins",
+                column: "RefundUid",
+                unique: true,
+                filter: "[RefundUid] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Payins_Uid_Id_AuthorUid_OrderUid_CreditedWalletUid_RemovedOn",
@@ -1786,6 +1804,13 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                 table: "PurchaseOrders",
                 column: "PurchaseOrderVendorUid",
                 unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_PurchaseOrders_TransferUid",
+                table: "PurchaseOrders",
+                column: "TransferUid",
+                unique: true,
+                filter: "[TransferUid] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
                 name: "IX_PurchaseOrders_PurchaseOrderVendorUid_Reference",
@@ -2008,6 +2033,13 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                 column: "PurchaseOrderUid");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Transfers_RefundUid",
+                table: "Transfers",
+                column: "RefundUid",
+                unique: true,
+                filter: "[RefundUid] IS NOT NULL");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Transfers_Uid_Id_AuthorUid_PurchaseOrderUid_CreditedWalletUid_DebitedWalletUid_RemovedOn",
                 table: "Transfers",
                 columns: new[] { "Uid", "Id", "AuthorUid", "PurchaseOrderUid", "CreditedWalletUid", "DebitedWalletUid", "RemovedOn" });
@@ -2096,6 +2128,50 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                 name: "IX_Wallets_Uid_Id_UserUid_RemovedOn",
                 table: "Wallets",
                 columns: new[] { "Uid", "Id", "UserUid", "RemovedOn" });
+
+            migrationBuilder.AddForeignKey(
+                name: "FK_OrderDeliveries_Orders_OrderUid",
+                table: "OrderDeliveries",
+                column: "OrderUid",
+                principalTable: "Orders",
+                principalColumn: "Uid",
+                onDelete: ReferentialAction.Cascade);
+
+            migrationBuilder.AddForeignKey(
+                name: "FK_OrderProducts_Orders_OrderUid",
+                table: "OrderProducts",
+                column: "OrderUid",
+                principalTable: "Orders",
+                principalColumn: "Uid",
+                onDelete: ReferentialAction.Cascade);
+
+            migrationBuilder.AddForeignKey(
+                name: "FK_Payins_Orders_OrderUid",
+                table: "Payins",
+                column: "OrderUid",
+                principalTable: "Orders",
+                principalColumn: "Uid");
+
+            migrationBuilder.AddForeignKey(
+                name: "FK_Payins_Refunds_RefundUid",
+                table: "Payins",
+                column: "RefundUid",
+                principalTable: "Refunds",
+                principalColumn: "Uid");
+
+            migrationBuilder.AddForeignKey(
+                name: "FK_PurchaseOrders_Transfers_TransferUid",
+                table: "PurchaseOrders",
+                column: "TransferUid",
+                principalTable: "Transfers",
+                principalColumn: "Uid");
+
+            migrationBuilder.AddForeignKey(
+                name: "FK_Refunds_Transfers_TransferUid",
+                table: "Refunds",
+                column: "TransferUid",
+                principalTable: "Transfers",
+                principalColumn: "Uid");
 
             migrationBuilder.InsertData("Levels", new List<string>() { "Uid", "Id", "CreatedOn", "RequiredPoints", "Name" }.ToArray(), new List<object>() { 1, "63b7d548-b8ae-43f6-bb9a-b47311ba57ed", "2020-05-01", "1000", "Niveau 1" }.ToArray(), "dbo");
             migrationBuilder.InsertData("Levels", new List<string>() { "Uid", "Id", "CreatedOn", "RequiredPoints", "Name" }.ToArray(), new List<object>() { 2, "a9193dc7-9508-4ab8-a1e3-0b72ee47589b", "2020-05-01", "2000", "Niveau 1" }.ToArray(), "dbo");
@@ -2847,6 +2923,74 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
             migrationBuilder.Sql("DROP VIEW PointsPerRegion");
             migrationBuilder.Sql("DROP VIEW PointsPerCountry");
 
+            migrationBuilder.DropForeignKey(
+                name: "FK_Orders_Users_UserUid",
+                table: "Orders");
+
+            migrationBuilder.DropForeignKey(
+                name: "FK_Payins_Users_AuthorUid",
+                table: "Payins");
+
+            migrationBuilder.DropForeignKey(
+                name: "FK_PaymentMethods_Users_UserUid",
+                table: "PaymentMethods");
+
+            migrationBuilder.DropForeignKey(
+                name: "FK_Payouts_Users_AuthorUid",
+                table: "Payouts");
+
+            migrationBuilder.DropForeignKey(
+                name: "FK_Refunds_Users_AuthorUid",
+                table: "Refunds");
+
+            migrationBuilder.DropForeignKey(
+                name: "FK_Transfers_Users_AuthorUid",
+                table: "Transfers");
+
+            migrationBuilder.DropForeignKey(
+                name: "FK_Wallets_Users_UserUid",
+                table: "Wallets");
+
+            migrationBuilder.DropForeignKey(
+                name: "FK_Transfers_PurchaseOrders_PurchaseOrderUid",
+                table: "Transfers");
+
+            migrationBuilder.DropForeignKey(
+                name: "FK_Payins_Orders_OrderUid",
+                table: "Payins");
+
+            migrationBuilder.DropForeignKey(
+                name: "FK_Refunds_Payins_PayinUid",
+                table: "Refunds");
+
+            migrationBuilder.DropForeignKey(
+                name: "FK_Payouts_PaymentMethods_BankAccountUid",
+                table: "Payouts");
+
+            migrationBuilder.DropForeignKey(
+                name: "FK_Payouts_Wallets_DebitedWalletUid",
+                table: "Payouts");
+
+            migrationBuilder.DropForeignKey(
+                name: "FK_Refunds_Wallets_DebitedWalletUid",
+                table: "Refunds");
+
+            migrationBuilder.DropForeignKey(
+                name: "FK_Refunds_Wallets_CreditedWalletUid",
+                table: "Refunds");
+
+            migrationBuilder.DropForeignKey(
+                name: "FK_Transfers_Wallets_CreditedWalletUid",
+                table: "Transfers");
+
+            migrationBuilder.DropForeignKey(
+                name: "FK_Transfers_Wallets_DebitedWalletUid",
+                table: "Transfers");
+
+            migrationBuilder.DropForeignKey(
+                name: "FK_Transfers_Refunds_RefundUid",
+                table: "Transfers");
+
             migrationBuilder.DropTable(
                 name: "AgreementSelectedHours");
 
@@ -2896,9 +3040,6 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                 name: "Ratings");
 
             migrationBuilder.DropTable(
-                name: "Refunds");
-
-            migrationBuilder.DropTable(
                 name: "Rewards");
 
             migrationBuilder.DropTable(
@@ -2932,12 +3073,6 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                 name: "Products");
 
             migrationBuilder.DropTable(
-                name: "Payins");
-
-            migrationBuilder.DropTable(
-                name: "Transfers");
-
-            migrationBuilder.DropTable(
                 name: "Tags");
 
             migrationBuilder.DropTable(
@@ -2953,25 +3088,16 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                 name: "Returnables");
 
             migrationBuilder.DropTable(
-                name: "Payouts");
-
-            migrationBuilder.DropTable(
-                name: "PurchaseOrders");
-
-            migrationBuilder.DropTable(
                 name: "Levels");
 
             migrationBuilder.DropTable(
                 name: "Regions");
 
             migrationBuilder.DropTable(
-                name: "PaymentMethods");
+                name: "Users");
 
             migrationBuilder.DropTable(
-                name: "Wallets");
-
-            migrationBuilder.DropTable(
-                name: "Orders");
+                name: "PurchaseOrders");
 
             migrationBuilder.DropTable(
                 name: "PurchaseOrderSenders");
@@ -2980,7 +3106,25 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                 name: "PurchaseOrderVendors");
 
             migrationBuilder.DropTable(
-                name: "Users");
+                name: "Orders");
+
+            migrationBuilder.DropTable(
+                name: "Payins");
+
+            migrationBuilder.DropTable(
+                name: "PaymentMethods");
+
+            migrationBuilder.DropTable(
+                name: "Wallets");
+
+            migrationBuilder.DropTable(
+                name: "Refunds");
+
+            migrationBuilder.DropTable(
+                name: "Transfers");
+
+            migrationBuilder.DropTable(
+                name: "Payouts");
         }
     }
 }

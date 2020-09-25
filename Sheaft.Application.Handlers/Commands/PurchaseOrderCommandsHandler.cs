@@ -7,7 +7,6 @@ using Sheaft.Application.Commands;
 using Sheaft.Core;
 using Sheaft.Domain.Models;
 using Sheaft.Application.Interop;
-using Sheaft.Domain.Enums;
 using Sheaft.Application.Events;
 using Microsoft.Extensions.Logging;
 using Microsoft.EntityFrameworkCore;
@@ -53,13 +52,15 @@ namespace Sheaft.Application.Handlers
                 if (!resultIdentifier.Success)
                     return Failed<Guid>(resultIdentifier.Exception);
 
-                var entity = new PurchaseOrder(Guid.NewGuid(), resultIdentifier.Data, PurchaseOrderStatus.Waiting, producer, order);
+                var purchaseOrderId = order.AddPurchaseOrder(resultIdentifier.Data, producer);
+                _context.Update(order);
+
                 await _context.SaveChangesAsync(token);
 
                 if (!request.SkipSendEmail)
-                    await _mediatr.Post(new PurchaseOrderCreatedEvent(request.RequestUser) { PurchaseOrderId = entity.Id }, token);
+                    await _mediatr.Post(new PurchaseOrderCreatedEvent(request.RequestUser) { PurchaseOrderId = purchaseOrderId }, token);
 
-                return Ok(entity.Id);
+                return Ok(purchaseOrderId);
             });
         }
 
