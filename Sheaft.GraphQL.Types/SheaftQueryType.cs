@@ -410,7 +410,7 @@ namespace Sheaft.GraphQL.Types
                 .Name("webPayinTransaction")
                 .Authorize(Policies.REGISTERED)
                 .Argument("input", c => c.Type<NonNullType<StringType>>())
-                .Type<NonNullType<WebPayinTransactionType>>()
+                .Type<NonNullType<WebPayinType>>()
                 .UseSingleOrDefault()
                 .UseSelection();
 

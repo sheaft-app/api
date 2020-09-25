@@ -35,10 +35,10 @@ namespace Sheaft.Functions
                 throw results.Exception;
         }
 
-        [FunctionName("CreatePayoutForTransfersCommand")]
-        public async Task CreatePayoutForTransfersCommandAsync([ServiceBusTrigger(CreatePayoutForTransfersCommand.QUEUE_NAME, Connection = "AzureWebJobsServiceBus")] string message, CancellationToken token)
+        [FunctionName("CreatePayoutCommand")]
+        public async Task CreatePayoutCommandAsync([ServiceBusTrigger(CreatePayoutCommand.QUEUE_NAME, Connection = "AzureWebJobsServiceBus")] string message, CancellationToken token)
         {
-            var results = await _mediatr.Process<CreatePayoutForTransfersCommand, Guid>(message, token);
+            var results = await _mediatr.Process<CreatePayoutCommand, Guid>(message, token);
             if (!results.Success)
                 throw results.Exception;
         }

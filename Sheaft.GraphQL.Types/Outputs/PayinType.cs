@@ -4,9 +4,9 @@ using Sheaft.GraphQL.Enums;
 
 namespace Sheaft.GraphQL.Types
 {
-    public class PayinTransactionType : SheaftOutputType<PayinTransactionDto>
+    public class PayinType : SheaftOutputType<PayinDto>
     {
-        protected override void Configure(IObjectTypeDescriptor<PayinTransactionDto> descriptor)
+        protected override void Configure(IObjectTypeDescriptor<PayinDto> descriptor)
         {
             descriptor.Field(c => c.Id).Type<NonNullType<IdType>>();
             descriptor.Field(c => c.Status);

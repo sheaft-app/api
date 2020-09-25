@@ -151,12 +151,16 @@ namespace Sheaft.Application.Handlers
                 switch (payin.Status)
                 {
                     case TransactionStatus.Failed:
+                        var failOrderResult = await _mediatr.Process(new FailOrderCommand(request.RequestUser) { OrderId = payin.Order.Id }, token);
+                        if (!failOrderResult.Success)
+                            return Failed<TransactionStatus>(failOrderResult.Exception);
+
                         await _mediatr.Post(new PayinFailedEvent(request.RequestUser) { PayinId = payin.Id }, token);
                         break;
                     case TransactionStatus.Succeeded:
-                        var orderResult = await _mediatr.Process(new ConfirmOrderCommand(request.RequestUser) { Id = payin.Order.Id }, token);
-                        if (!orderResult.Success)
-                            return Failed<TransactionStatus>(orderResult.Exception);
+                        var confirmOrderResult = await _mediatr.Process(new ConfirmOrderCommand(request.RequestUser) { OrderId = payin.Order.Id }, token);
+                        if (!confirmOrderResult.Success)
+                            return Failed<TransactionStatus>(confirmOrderResult.Exception);
 
                         await _mediatr.Post(new PayinSucceededEvent(request.RequestUser) { PayinId = payin.Id }, token);
                         break;

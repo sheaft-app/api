@@ -132,7 +132,7 @@ namespace Sheaft.GraphQL.Services
             return legalQueries.GetMyBusinessLegals(CurrentUser);
         }
 
-        public IQueryable<WebPayinTransactionDto> GetWebPayinTransaction(string input, [Service] ITransactionQueries transactionQueries)
+        public IQueryable<WebPayinDto> GetWebPayinTransaction(string input, [Service] ITransactionQueries transactionQueries)
         {
             return transactionQueries.GetWebPayinTransaction(input, CurrentUser);
         }

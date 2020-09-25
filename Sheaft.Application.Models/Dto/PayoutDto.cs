@@ -1,6 +1,6 @@
 ﻿namespace Sheaft.Application.Models
 {
-    public class PayoutTransactionDto : TransactionDto
+    public class PayoutDto : TransactionDto
     {
         public UserProfileDto DebitedUser { get; set; }
     }

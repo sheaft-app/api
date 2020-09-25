@@ -1,6 +1,6 @@
 ﻿namespace Sheaft.Application.Models
 {
-    public class WebPayinTransactionDto : TransactionDto
+    public class WebPayinDto : PayinDto
     {
         public string RedirectUrl { get; set; }
     }

@@ -37,6 +37,9 @@ namespace Sheaft.Domain.Models
         public DateTimeOffset CreatedOn { get; private set; }
         public DateTimeOffset? UpdatedOn { get; private set; }
         public DateTimeOffset? RemovedOn { get; private set; }
+        public DateTimeOffset? ExpiredOn { get; private set; }
+        public DateTimeOffset? RefundedOn { get; private set; }
+        public DateTimeOffset? ProcessedOn { get; private set; }
         public OrderStatus Status { get; private set; }
         public DonationKind DonationKind { get; private set; }
         public decimal TotalProductWholeSalePrice { get; private set; }
@@ -65,6 +68,26 @@ namespace Sheaft.Domain.Models
 
         public void SetStatus(OrderStatus status)
         {
+            switch (status)
+            {
+                case OrderStatus.Waiting:
+                    ExpiredOn = null;
+                    ProcessedOn = null;
+                    break;
+                case OrderStatus.Expired:
+                    ExpiredOn = DateTimeOffset.UtcNow;
+                    break;
+                case OrderStatus.Refunded:
+                    RefundedOn = DateTimeOffset.UtcNow;
+                    ExpiredOn = null;
+                    break;
+                case OrderStatus.Validated:
+                case OrderStatus.Refused:
+                    ProcessedOn = DateTimeOffset.UtcNow;
+                    ExpiredOn = null;
+                    break;
+            }
+
             Status = status;
         }
 

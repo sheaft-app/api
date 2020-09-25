@@ -19,20 +19,20 @@ namespace Sheaft.Application.Queries
             _configurationProvider = configurationProvider;
         }
 
-        public IQueryable<WebPayinTransactionDto> GetWebPayinTransaction(string identifier, RequestUser currentUser)
+        public IQueryable<WebPayinDto> GetWebPayinTransaction(string identifier, RequestUser currentUser)
         {
             return _context.Payins
                     .OfType<WebPayin>()
                     .Get(c => c.Identifier == identifier && c.Author.Id == currentUser.Id)
-                    .ProjectTo<WebPayinTransactionDto>(_configurationProvider);
+                    .ProjectTo<WebPayinDto>(_configurationProvider);
         }
 
-        public IQueryable<WebPayinTransactionDto> GetWebPayinTransaction(Guid id, RequestUser currentUser)
+        public IQueryable<WebPayinDto> GetWebPayinTransaction(Guid id, RequestUser currentUser)
         {
             return _context.Payins
                     .OfType<WebPayin>()
                     .Get(c => c.Id == id && c.Author.Id == currentUser.Id)
-                    .ProjectTo<WebPayinTransactionDto>(_configurationProvider);
+                    .ProjectTo<WebPayinDto>(_configurationProvider);
         }
     }
 }

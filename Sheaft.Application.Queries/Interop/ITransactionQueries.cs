@@ -7,7 +7,7 @@ namespace Sheaft.Application.Queries
 {
     public interface ITransactionQueries
     {
-        IQueryable<WebPayinTransactionDto> GetWebPayinTransaction(Guid id, RequestUser currentUser);
-        IQueryable<WebPayinTransactionDto> GetWebPayinTransaction(string identifier, RequestUser currentUser);
+        IQueryable<WebPayinDto> GetWebPayinTransaction(Guid id, RequestUser currentUser);
+        IQueryable<WebPayinDto> GetWebPayinTransaction(string identifier, RequestUser currentUser);
     }
 }

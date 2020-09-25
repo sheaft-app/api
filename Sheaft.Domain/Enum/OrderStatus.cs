@@ -8,5 +8,6 @@
         Refused,
         Expired,
         Archived,
+        Refunded
     }
 }

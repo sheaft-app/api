@@ -10,6 +10,10 @@ namespace Sheaft.Application.Models
         public DateTimeOffset CreatedOn { get; set; }
         public DateTimeOffset? UpdatedOn { get; set; }
         public DateTimeOffset? RemovedOn { get; set; }
+        public DateTimeOffset? AcceptedOn { get; set; }
+        public DateTimeOffset? CompletedOn { get; set; }
+        public DateTimeOffset? DeliveredOn { get; set; }
+        public DateTimeOffset? WithdrawnOn { get; set; }
         public string Reference { get; set; }
         public string Reason { get; set; }
         public string Comment { get; set; }

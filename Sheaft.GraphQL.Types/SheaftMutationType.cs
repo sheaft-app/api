@@ -265,7 +265,7 @@ namespace Sheaft.GraphQL.Types
             descriptor.Field(c => c.PayOrderAsync(default, default))
                 .Name("payOrder")
                 .Authorize(Policies.CONSUMER)
-                .Type<NonNullType<WebPayinTransactionType>>()
+                .Type<NonNullType<WebPayinType>>()
                 .UseSingleOrDefault()
                 .UseSelection();
 

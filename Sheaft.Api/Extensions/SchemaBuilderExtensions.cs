@@ -50,10 +50,10 @@ namespace Sheaft.Api
             services.AddType<ProductType>();
             services.AddType<OrderType>();
             services.AddType<TransactionType>();
-            services.AddType<WebPayinTransactionType>();
-            services.AddType<PayinTransactionType>();
-            services.AddType<TransferTransactionType>();
-            services.AddType<PayoutTransactionType>();
+            services.AddType<WebPayinType>();
+            services.AddType<PayinType>();
+            services.AddType<TransferType>();
+            services.AddType<PayoutType>();
             services.AddType<DocumentType>();
             services.AddType<PageType>();
             services.AddType<BusinessLegalType>();

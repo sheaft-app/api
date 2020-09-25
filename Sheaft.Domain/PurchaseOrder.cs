@@ -49,6 +49,8 @@ namespace Sheaft.Domain.Models
         public DateTimeOffset? UpdatedOn { get; private set; }
         public DateTimeOffset? RemovedOn { get; private set; }
         public DateTimeOffset? AcceptedOn { get; private set; }
+        public DateTimeOffset? CompletedOn { get; private set; }
+        public DateTimeOffset? DeliveredOn { get; private set; }
         public DateTimeOffset? WithdrawnOn { get; private set; }
         public string Reference { get; private set; }
         public string Reason { get; private set; }
@@ -94,6 +96,7 @@ namespace Sheaft.Domain.Models
                 case PurchaseOrderStatus.Completed:
                     if (Status != PurchaseOrderStatus.Processing)
                         throw new ValidationException(MessageKind.PurchaseOrder_CannotComplete_NotIn_ProcessingStatus);
+                    CompletedOn = DateTimeOffset.UtcNow;
                     break;
                 case PurchaseOrderStatus.Shipping:
                     if (Status != PurchaseOrderStatus.Completed)
@@ -102,6 +105,7 @@ namespace Sheaft.Domain.Models
                 case PurchaseOrderStatus.Delivered:
                     if (Status != PurchaseOrderStatus.Completed && Status != PurchaseOrderStatus.Shipping)
                         throw new ValidationException(MessageKind.PurchaseOrder_CannotDeliver_NotIn_CompletedOrShippingStatus);
+                    DeliveredOn = DateTimeOffset.UtcNow;
                     break;
                 case PurchaseOrderStatus.Cancelled:
                     if (Status == PurchaseOrderStatus.Cancelled)

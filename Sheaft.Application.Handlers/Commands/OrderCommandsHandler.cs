@@ -22,7 +22,9 @@ namespace Sheaft.Application.Handlers
         IRequestHandler<CreateBusinessOrderCommand, Result<IEnumerable<Guid>>>,
         IRequestHandler<UpdateConsumerOrderCommand, Result<bool>>,
         IRequestHandler<PayOrderCommand, Result<Guid>>,
-        IRequestHandler<ConfirmOrderCommand, Result<IEnumerable<Guid>>>
+        IRequestHandler<ConfirmOrderCommand, Result<IEnumerable<Guid>>>,
+        IRequestHandler<FailOrderCommand, Result<bool>>,
+        IRequestHandler<ExpireOrderCommand, Result<bool>>
     {
         private readonly PspOptions _pspOptions;
 
@@ -201,13 +203,13 @@ namespace Sheaft.Application.Handlers
             {
                 using (var transaction = await _context.Database.BeginTransactionAsync(token))
                 {
-                    var order = await _context.GetByIdAsync<Order>(request.Id, token);
+                    var order = await _context.GetByIdAsync<Order>(request.OrderId, token);
                     var orderIds = new List<Guid>();
 
                     order.SetStatus(OrderStatus.Validated);
 
                     var producerIds = order.Products.Select(p => p.Producer.Id).Distinct();
-                    foreach(var producerId in producerIds)
+                    foreach (var producerId in producerIds)
                     {
                         var result = await _mediatr.Process(new CreatePurchaseOrderCommand(request.RequestUser)
                         {
@@ -231,6 +233,34 @@ namespace Sheaft.Application.Handlers
                     await _mediatr.Post(new CreateUserPointsCommand(request.RequestUser) { CreatedOn = DateTimeOffset.UtcNow, Kind = PointKind.PurchaseOrder, UserId = request.RequestUser.Id }, token);
                     return Ok(orderIds.AsEnumerable());
                 }
+            });
+        }
+
+        public async Task<Result<bool>> Handle(FailOrderCommand request, CancellationToken token)
+        {
+            return await ExecuteAsync(async () =>
+            {
+                var order = await _context.GetByIdAsync<Order>(request.OrderId, token);
+                order.SetStatus(OrderStatus.Refused);
+
+                _context.Update(order);
+                await _context.SaveChangesAsync(token);
+
+                return Ok(true);
+            });
+        }
+
+        public async Task<Result<bool>> Handle(ExpireOrderCommand request, CancellationToken token)
+        {
+            return await ExecuteAsync(async () =>
+            {
+                var order = await _context.GetByIdAsync<Order>(request.OrderId, token);
+                order.SetStatus(OrderStatus.Expired);
+
+                _context.Update(order);
+                await _context.SaveChangesAsync(token);
+
+                return Ok(true);
             });
         }
     }

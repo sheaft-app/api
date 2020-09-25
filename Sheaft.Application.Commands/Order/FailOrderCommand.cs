@@ -5,10 +5,10 @@ using System.Collections.Generic;
 
 namespace Sheaft.Application.Commands
 {
-    public class ConfirmOrderCommand : Command<IEnumerable<Guid>>
+    public class FailOrderCommand : Command<bool>
     {
         [JsonConstructor]
-        public ConfirmOrderCommand(RequestUser requestUser) : base(requestUser)
+        public FailOrderCommand(RequestUser requestUser) : base(requestUser)
         {
         }
 

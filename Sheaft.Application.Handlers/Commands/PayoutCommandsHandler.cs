@@ -143,7 +143,7 @@ namespace Sheaft.Application.Handlers
                 var producersTransfers = await _context.Transfers
                     .Get(t => t.Payout == null
                             && t.Status == TransactionStatus.Succeeded
-                            && t.PurchaseOrder.Status == PurchaseOrderStatus.Completed
+                            && t.PurchaseOrder.Status == PurchaseOrderStatus.Delivered
                             && t.ExecutedOn.HasValue && t.ExecutedOn.Value < expiredDate)
                     .Select(t => new { ProducerId = t.CreditedWallet.User.Id, TransferId = t.Id })
                     .GroupBy(t => t.ProducerId)

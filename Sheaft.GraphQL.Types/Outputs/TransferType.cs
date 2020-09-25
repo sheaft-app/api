@@ -4,13 +4,14 @@ using Sheaft.GraphQL.Enums;
 
 namespace Sheaft.GraphQL.Types
 {
-    public class PayoutTransactionType : SheaftOutputType<PayoutTransactionDto>
+    public class TransferType : SheaftOutputType<TransferDto>
     {
-        protected override void Configure(IObjectTypeDescriptor<PayoutTransactionDto> descriptor)
+        protected override void Configure(IObjectTypeDescriptor<TransferDto> descriptor)
         {
             descriptor.Field(c => c.Id).Type<NonNullType<IdType>>();
             descriptor.Field(c => c.Status);
             descriptor.Field(c => c.Fees);
+            descriptor.Field(c => c.Credited);
             descriptor.Field(c => c.Debited);
             descriptor.Field(c => c.Identifier);
             descriptor.Field(c => c.Reference);
@@ -22,6 +23,9 @@ namespace Sheaft.GraphQL.Types
 
             descriptor.Field(c => c.Status)
                 .Type<NonNullType<TransactionStatusEnumType>>();
+
+            descriptor.Field(c => c.CreditedUser)
+                .Type<NonNullType<UserProfileType>>();
 
             descriptor.Field(c => c.DebitedUser)
                 .Type<NonNullType<UserProfileType>>();
