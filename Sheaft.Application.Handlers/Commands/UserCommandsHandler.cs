@@ -28,7 +28,6 @@ namespace Sheaft.Application.Handlers
         IRequestHandler<RemoveUserCommand, Result<bool>>,
         IRequestHandler<RemoveUserDataCommand, Result<string>>
     {
-        private readonly IIdentifierService _identifierService;
         private readonly IBlobService _blobService;
         private readonly ScoringOptions _scoringOptions;
         private readonly RoleOptions _roleOptions;
@@ -36,7 +35,6 @@ namespace Sheaft.Application.Handlers
         public UserCommandsHandler(
             IOptionsSnapshot<ScoringOptions> scoringOptions,
             ISheaftMediatr mediatr,
-            IIdentifierService identifierService,
             IAppDbContext context,
             IBlobService blobService,
             ILogger<UserCommandsHandler> logger,
@@ -45,7 +43,6 @@ namespace Sheaft.Application.Handlers
         {
             _roleOptions = roleOptions.Value;
             _scoringOptions = scoringOptions.Value;
-            _identifierService = identifierService;
             _blobService = blobService;
         }
 
@@ -105,7 +102,7 @@ namespace Sheaft.Application.Handlers
                 if (!string.IsNullOrWhiteSpace(entity.SponsorshipCode))
                     return Ok(entity.SponsorshipCode);
 
-                var result = await _identifierService.GetNextSponsoringCode(token);
+                var result = await _mediatr.Process(new CreateSponsoringCodeCommand(request.RequestUser), token);
                 if (!result.Success)
                     return Failed<string>(result.Exception);
 

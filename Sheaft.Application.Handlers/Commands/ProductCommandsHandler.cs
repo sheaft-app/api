@@ -31,18 +31,15 @@ namespace Sheaft.Application.Handlers
         IRequestHandler<ImportProductsCommand, Result<bool>>,
         IRequestHandler<RestoreProductCommand, Result<bool>>
     {
-        private readonly IIdentifierService _identifierService;
         private readonly IBlobService _blobService;
 
         public ProductCommandsHandler(
             ISheaftMediatr mediatr,
             IAppDbContext context,
-            IIdentifierService identifierService,
             IBlobService blobService,
             ILogger<ProductCommandsHandler> logger)
             : base(mediatr, context, logger)
         {
-            _identifierService = identifierService;
             _blobService = blobService;
         }
 
@@ -58,7 +55,7 @@ namespace Sheaft.Application.Handlers
                 }
                 else
                 {
-                    var resultIdentifier = await _identifierService.GetNextProductReferenceAsync(request.RequestUser.Id, token);
+                    var resultIdentifier = await _mediatr.Process(new CreateProductIdentifierCommand(request.RequestUser) { ProducerId = request.RequestUser.Id }, token);
                     if (!resultIdentifier.Success)
                         return Failed<Guid>(resultIdentifier.Exception);
 

@@ -10,8 +10,8 @@ using Microsoft.Extensions.Logging;
 namespace Sheaft.Application.Handlers
 {
     public class PictureCommandsHandler : ResultsHandler,
-            IRequestHandler<UpdateUserPictureCommand, Result<string>>,
-            IRequestHandler<UpdateProductPictureCommand, Result<string>>
+        IRequestHandler<UpdateUserPictureCommand, Result<string>>,
+        IRequestHandler<UpdateProductPictureCommand, Result<string>>
     {
         private readonly IPictureService _imageService;
 

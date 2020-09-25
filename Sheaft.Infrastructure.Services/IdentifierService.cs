@@ -6,10 +6,6 @@ using Sheaft.Core;
 using Sheaft.Options;
 using Sheaft.Application.Interop;
 using System;
-using System.Globalization;
-using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -31,38 +27,6 @@ namespace Sheaft.Infrastructure.Services
 
             var cloudStorageAccount = CloudStorageAccount.Parse(_storageOptions.ConnectionString);
             _tableClient = cloudStorageAccount.CreateCloudTableClient();
-        }
-
-        public string RemoveDiacritics(string value)
-        {
-            if (value == null)
-                throw new ArgumentNullException(nameof(value));
-
-            var formD = value.Normalize(NormalizationForm.FormD);
-            var chars = new char[formD.Length];
-            var count = 0;
-
-            foreach (var c in formD.Where(c => CharUnicodeInfo.GetUnicodeCategory(c) != UnicodeCategory.NonSpacingMark))
-            {
-                chars[count++] = c;
-            }
-
-            var noDiacriticsFormD = new string(chars, 0, count);
-            return noDiacriticsFormD.Normalize(NormalizationForm.FormC);
-        }
-
-        public string NormalizeIdentifier(string name, string pattern = "[^[a-zA-Z0-9]]*")
-        {
-            var sourceInFormD = name.Normalize(NormalizationForm.FormD);
-            var strBuilder = new StringBuilder();
-            foreach (var c in from c in sourceInFormD
-                              let uc = CharUnicodeInfo.GetUnicodeCategory(c)
-                              where uc != UnicodeCategory.NonSpacingMark
-                              select c)
-                strBuilder.Append(c);
-
-            var result = new Regex(pattern).Replace(strBuilder.ToString(), "");
-            return result.Normalize(NormalizationForm.FormC).ToLowerInvariant();
         }
 
         public async Task<Result<string>> GetNextOrderReferenceAsync(Guid serialNumber, CancellationToken token)

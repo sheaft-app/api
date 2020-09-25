@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
@@ -35,16 +34,12 @@ namespace Sheaft.Application.Handlers
         IRequestHandler<DeletePurchaseOrderCommand, Result<bool>>,
         IRequestHandler<RestorePurchaseOrderCommand, Result<bool>>
     {
-        private readonly IIdentifierService _identifierService;
-
         public PurchaseOrderCommandsHandler(
             IAppDbContext context,
-            IIdentifierService identifierService,
             ISheaftMediatr mediatr,
             ILogger<PurchaseOrderCommandsHandler> logger)
             : base(mediatr, context, logger)
         {
-            _identifierService = identifierService;
         }
 
         public async Task<Result<Guid>> Handle(CreatePurchaseOrderCommand request, CancellationToken token)
@@ -54,11 +49,11 @@ namespace Sheaft.Application.Handlers
                 var producer = await _context.GetByIdAsync<Producer>(request.ProducerId, token);
                 var order = await _context.GetByIdAsync<Order>(request.OrderId, token);
 
-                var result = await _identifierService.GetNextOrderReferenceAsync(request.ProducerId, token);
-                if (!result.Success)
-                    return Failed<Guid>(result.Exception);
+                var resultIdentifier = await _mediatr.Process(new CreateProductIdentifierCommand(request.RequestUser) { ProducerId = request.ProducerId }, token);
+                if (!resultIdentifier.Success)
+                    return Failed<Guid>(resultIdentifier.Exception);
 
-                var entity = new PurchaseOrder(Guid.NewGuid(), result.Data, PurchaseOrderStatus.Waiting, producer, order);
+                var entity = new PurchaseOrder(Guid.NewGuid(), resultIdentifier.Data, PurchaseOrderStatus.Waiting, producer, order);
                 await _context.SaveChangesAsync(token);
 
                 if (!request.SkipSendEmail)
