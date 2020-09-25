@@ -9,8 +9,8 @@ namespace Sheaft.Domain.Models
         {
         }
 
-        public TransferRefund(Guid id, Transfer transaction, User author)
-            : base(id, TransactionKind.RefundTransfer, transaction, author)
+        public TransferRefund(Guid id, Transfer transaction)
+            : base(id, TransactionKind.RefundTransfer, transaction)
         {
             CreditedWallet = transaction.DebitedWallet;
             Credited = transaction.Debited;

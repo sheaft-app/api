@@ -35,6 +35,22 @@ namespace Sheaft.Functions
                 throw results.Exception;
         }
 
+        [FunctionName("CheckNewTransferRefundsCommand")]
+        public async Task CheckNewTransferRefundsCommandAsync([TimerTrigger("0 */10 * * * *", RunOnStartup = false)] TimerInfo info, CancellationToken token)
+        {
+            var results = await _mediatr.Process(new CheckNewTransferRefundsCommand(new RequestUser("transfer-refund-functions", Guid.NewGuid().ToString("N"))), token);
+            if (!results.Success)
+                throw results.Exception;
+        }
+
+        [FunctionName("CreateTransferRefundCommand")]
+        public async Task CreateTransferRefundCommandAsync([ServiceBusTrigger(CreateTransferRefundCommand.QUEUE_NAME, Connection = "AzureWebJobsServiceBus")] string message, CancellationToken token)
+        {
+            var results = await _mediatr.Process<CreateTransferRefundCommand, Guid>(message, token);
+            if (!results.Success)
+                throw results.Exception;
+        }
+
         [FunctionName("TransferRefundFailedEvent")]
         public async Task TransferRefundFailedEventAsync([ServiceBusTrigger(TransferRefundFailedEvent.QUEUE_NAME, Connection = "AzureWebJobsServiceBus")] string message, CancellationToken token)
         {
@@ -45,6 +61,12 @@ namespace Sheaft.Functions
         public async Task TransferRefundSucceededEventAsync([ServiceBusTrigger(TransferRefundSucceededEvent.QUEUE_NAME, Connection = "AzureWebJobsServiceBus")] string message, CancellationToken token)
         {
             await _mediatr.Process<TransferRefundSucceededEvent>(message, token);
+        }
+
+        [FunctionName("CreateTransferRefundFailedEvent")]
+        public async Task CreateTransferRefundFailedEventAsync([ServiceBusTrigger(CreateTransferRefundFailedEvent.QUEUE_NAME, Connection = "AzureWebJobsServiceBus")] string message, CancellationToken token)
+        {
+            await _mediatr.Process<CreateTransferRefundFailedEvent>(message, token);
         }
     }
 }

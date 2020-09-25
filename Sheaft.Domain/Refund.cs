@@ -7,13 +7,13 @@ namespace Sheaft.Domain.Models
     {
         protected Refund() { }
 
-        protected Refund(Guid id, TransactionKind kind, Payin transaction, User author)
-            : this(id, kind, transaction.Credited, transaction.CreditedWallet, author)
+        protected Refund(Guid id, TransactionKind kind, Payin transaction)
+            : this(id, kind, transaction.Credited, transaction.CreditedWallet, transaction.Author)
         {
         }
 
-        protected Refund(Guid id, TransactionKind kind, Transfer transaction, User author)
-            : this(id, kind, transaction.Credited, transaction.CreditedWallet, author)
+        protected Refund(Guid id, TransactionKind kind, Transfer transaction)
+            : this(id, kind, transaction.Credited, transaction.CreditedWallet, transaction.Author)
         {
         }
 

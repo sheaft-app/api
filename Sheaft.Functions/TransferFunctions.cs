@@ -35,10 +35,10 @@ namespace Sheaft.Functions
                 throw results.Exception;
         }
 
-        [FunctionName("CreatePurchaseOrderTransferCommand")]
-        public async Task CreatePurchaseOrderTransferCommandAsync([ServiceBusTrigger(CreatePurchaseOrderTransferCommand.QUEUE_NAME, Connection = "AzureWebJobsServiceBus")] string message, CancellationToken token)
+        [FunctionName("CreateTransferCommand")]
+        public async Task CreateTransferCommandAsync([ServiceBusTrigger(CreateTransferCommand.QUEUE_NAME, Connection = "AzureWebJobsServiceBus")] string message, CancellationToken token)
         {
-            var results = await _mediatr.Process<CreatePurchaseOrderTransferCommand, Guid>(message, token);
+            var results = await _mediatr.Process<CreateTransferCommand, Guid>(message, token);
             if (!results.Success)
                 throw results.Exception;
         }
@@ -71,10 +71,10 @@ namespace Sheaft.Functions
             await _mediatr.Process<TransferSucceededEvent>(message, token);
         }
 
-        [FunctionName("CreatePurchaseOrderTransferFailedEvent")]
-        public async Task CreatePurchaseOrderTransferFailedEventAsync([ServiceBusTrigger(CreatePurchaseOrderTransferFailedEvent.QUEUE_NAME, Connection = "AzureWebJobsServiceBus")] string message, CancellationToken token)
+        [FunctionName("CreateTransferFailedEvent")]
+        public async Task CreateTransferFailedEventAsync([ServiceBusTrigger(CreateTransferFailedEvent.QUEUE_NAME, Connection = "AzureWebJobsServiceBus")] string message, CancellationToken token)
         {
-            await _mediatr.Process<CreatePurchaseOrderTransferFailedEvent>(message, token);
+            await _mediatr.Process<CreateTransferFailedEvent>(message, token);
         }
     }
 }

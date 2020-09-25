@@ -65,14 +65,14 @@ namespace Sheaft.Application.Handlers
         {
             return await ExecuteAsync(async () =>
             {
-                var transfer = await _context.GetByIdAsync<PayinRefund>(request.PayinRefundId, token);
-                if (transfer.Status != TransactionStatus.Created && transfer.Status != TransactionStatus.Waiting)
+                var payinRefund = await _context.GetByIdAsync<PayinRefund>(request.PayinRefundId, token);
+                if (payinRefund.Status != TransactionStatus.Created && payinRefund.Status != TransactionStatus.Waiting)
                     return Ok(false);
 
-                if (transfer.CreatedOn.AddMinutes(1440) < DateTimeOffset.UtcNow && transfer.Status == TransactionStatus.Waiting)
+                if (payinRefund.CreatedOn.AddMinutes(1440) < DateTimeOffset.UtcNow && payinRefund.Status == TransactionStatus.Waiting)
                     return await _mediatr.Process(new ExpirePayinRefundCommand(request.RequestUser) { PayinRefundId = request.PayinRefundId }, token);
 
-                var result = await _mediatr.Process(new RefreshPayinRefundStatusCommand(request.RequestUser, transfer.Identifier), token);
+                var result = await _mediatr.Process(new RefreshPayinRefundStatusCommand(request.RequestUser, payinRefund.Identifier), token);
                 if (!result.Success)
                     return Failed<bool>(result.Exception);
 

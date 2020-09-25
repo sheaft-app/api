@@ -18,7 +18,7 @@ namespace Sheaft.Application.Handlers
         INotificationHandler<PurchaseOrderProcessingEvent>,
         INotificationHandler<PurchaseOrderCreatedEvent>,
         INotificationHandler<PurchaseOrderRefusedEvent>,
-        INotificationHandler<CreatePurchaseOrderTransferFailedEvent>
+        INotificationHandler<CreateTransferFailedEvent>
     {
         private readonly IAppDbContext _context;
         private readonly IEmailService _emailService;
@@ -144,13 +144,13 @@ namespace Sheaft.Application.Handlers
             await _signalrService.SendNotificationToUserAsync(purchaseOrder.Sender.Id, nameof(PurchaseOrderProcessingEvent), GetPurchaseNotifModelAsString(purchaseOrder));
         }
 
-        public async Task Handle(CreatePurchaseOrderTransferFailedEvent orderEvent, CancellationToken token)
+        public async Task Handle(CreateTransferFailedEvent orderEvent, CancellationToken token)
         {
             var purchaseOrder = await _context.GetByIdAsync<PurchaseOrder>(orderEvent.PurchaseOrderId, token);
             await _emailService.SendTemplatedEmailAsync(
                 "support@sheaft.com",
                 "Support",
-                CreatePurchaseOrderTransferFailedEvent.MAILING_TEMPLATE_ID,
+                CreateTransferFailedEvent.MAILING_TEMPLATE_ID,
                 GetTemplateDatas(purchaseOrder, null),
                 token);
         }

@@ -4,13 +4,13 @@ using Newtonsoft.Json;
 
 namespace Sheaft.Application.Events
 {
-    public class CreatePurchaseOrderTransferFailedEvent : Event
+    public class CreateTransferFailedEvent : Event
     {
-        public const string QUEUE_NAME = "event-create-purchaseorder-transfer-failed";
+        public const string QUEUE_NAME = "event-create-transfer-failed";
         public const string MAILING_TEMPLATE_ID = "";
 
         [JsonConstructor]
-        public CreatePurchaseOrderTransferFailedEvent(RequestUser requestUser) : base(requestUser)
+        public CreateTransferFailedEvent(RequestUser requestUser) : base(requestUser)
         {
         }
 

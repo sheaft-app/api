@@ -19,7 +19,9 @@ namespace Sheaft.Application.Handlers
         IRequestHandler<CheckTransferRefundsCommand, Result<bool>>,
         IRequestHandler<CheckTransferRefundCommand, Result<bool>>,
         IRequestHandler<ExpireTransferRefundCommand, Result<bool>>,
-        IRequestHandler<RefreshTransferRefundStatusCommand, Result<TransactionStatus>>
+        IRequestHandler<RefreshTransferRefundStatusCommand, Result<TransactionStatus>>,
+        IRequestHandler<CheckNewTransferRefundsCommand, Result<bool>>,
+        IRequestHandler<CreateTransferRefundCommand, Result<Guid>>
     {
         private readonly IPspService _pspService;
 
@@ -31,6 +33,91 @@ namespace Sheaft.Application.Handlers
             : base(mediatr, context, logger)
         {
             _pspService = pspService;
+        }
+
+        public async Task<Result<bool>> Handle(CheckNewTransferRefundsCommand request, CancellationToken token)
+        {
+            return await ExecuteAsync(async () =>
+            {
+                var skip = 0;
+                const int take = 100;
+
+                var expiredDate = DateTimeOffset.UtcNow.AddMinutes(-60);
+                var purchaseOrderIds = await GetNextPurchaseOrderIdsAsync(expiredDate, skip, take, token);
+
+                while (purchaseOrderIds.Any())
+                {
+                    foreach (var purchaseOrderId in purchaseOrderIds)
+                    {
+                        await _mediatr.Post(new CreateTransferRefundCommand(request.RequestUser)
+                        {
+                            PurchaseOrderId = purchaseOrderId
+                        }, token);
+                    }
+
+                    skip += take;
+                    purchaseOrderIds = await GetNextPurchaseOrderIdsAsync(expiredDate, skip, take, token);
+                }
+
+                return Ok(true);
+            });
+        }
+
+        public async Task<Result<Guid>> Handle(CreateTransferRefundCommand request, CancellationToken token)
+        {
+            return await ExecuteAsync(async () =>
+            {
+                var purchaseOrder = await _context.GetByIdAsync<PurchaseOrder>(request.PurchaseOrderId, token);
+                if (!purchaseOrder.AcceptedOn.HasValue || purchaseOrder.WithdrawnOn.HasValue)
+                    return Failed<Guid>(new InvalidOperationException());
+
+                var purchaseOrderTransfers = purchaseOrder.Transfers.ToList();
+                if (!purchaseOrderTransfers.Any(c => c.Status != TransactionStatus.Succeeded))
+                    return Failed<Guid>(new InvalidOperationException());
+
+                var purchaseOrderTransferRefunds = purchaseOrder.TransferRefunds.ToList();
+                if (purchaseOrderTransferRefunds.Any(c => c.Status != TransactionStatus.Failed && c.Status != TransactionStatus.Expired))
+                    return Failed<Guid>(new InvalidOperationException());
+
+                var checkResult = await _mediatr.Process(new CheckProducerConfigurationCommand(request.RequestUser) { UserId = purchaseOrder.Vendor.Id }, token);
+                if (!checkResult.Success)
+                    return Failed<Guid>(checkResult.Exception);
+
+                if (purchaseOrderTransferRefunds.Count(c => c.Status == TransactionStatus.Failed) >= 3)
+                {
+                    await _mediatr.Post(new CreateTransferRefundFailedEvent(request.RequestUser)
+                    {
+                        PurchaseOrderId = purchaseOrder.Id
+                    }, token);
+
+                    return TooManyRetries<Guid>();
+                }
+
+                var transferToRefund = purchaseOrderTransfers.FirstOrDefault(t => t.Status == TransactionStatus.Succeeded);
+
+                using (var transaction = await _context.Database.BeginTransactionAsync(token))
+                {
+                    var transferRefund = new TransferRefund(Guid.NewGuid(), transferToRefund);
+
+                    await _context.AddAsync(transferRefund, token);
+                    await _context.SaveChangesAsync(token);
+
+                    var result = await _pspService.RefundTransferAsync(transferRefund, token);
+                    if (!result.Success)
+                        return Failed<Guid>(result.Exception);
+
+                    transferRefund.SetResult(result.Data.ResultCode, result.Data.ResultMessage);
+                    transferRefund.SetIdentifier(result.Data.Identifier);
+                    transferRefund.SetStatus(result.Data.Status);
+
+                    _context.Update(transferRefund);
+
+                    await _context.SaveChangesAsync(token);
+                    await transaction.CommitAsync(token);
+
+                    return Ok(transferRefund.Id);
+                }
+            });
         }
 
         public async Task<Result<bool>> Handle(CheckTransferRefundsCommand request, CancellationToken token)
@@ -65,14 +152,14 @@ namespace Sheaft.Application.Handlers
         {
             return await ExecuteAsync(async () =>
             {
-                var transfer = await _context.GetByIdAsync<TransferRefund>(request.TransferRefundId, token);
-                if (transfer.Status != TransactionStatus.Created && transfer.Status != TransactionStatus.Waiting)
+                var transferRefund = await _context.GetByIdAsync<TransferRefund>(request.TransferRefundId, token);
+                if (transferRefund.Status != TransactionStatus.Created && transferRefund.Status != TransactionStatus.Waiting)
                     return Ok(false);
 
-                if (transfer.CreatedOn.AddMinutes(1440) < DateTimeOffset.UtcNow && transfer.Status == TransactionStatus.Waiting)
+                if (transferRefund.CreatedOn.AddMinutes(1440) < DateTimeOffset.UtcNow && transferRefund.Status == TransactionStatus.Waiting)
                     return await _mediatr.Process(new ExpireTransferRefundCommand(request.RequestUser) { TransferRefundId = request.TransferRefundId }, token);
 
-                var result = await _mediatr.Process(new RefreshTransferRefundStatusCommand(request.RequestUser, transfer.Identifier), token);
+                var result = await _mediatr.Process(new RefreshTransferRefundStatusCommand(request.RequestUser, transferRefund.Identifier), token);
                 if (!result.Success)
                     return Failed<bool>(result.Exception);
 
@@ -125,6 +212,20 @@ namespace Sheaft.Application.Handlers
 
                 return Ok(transferRefund.Status);
             });
+        }
+
+        private async Task<IEnumerable<Guid>> GetNextPurchaseOrderIdsAsync(DateTimeOffset expiredDate, int skip, int take, CancellationToken token)
+        {
+            return await _context.PurchaseOrders
+                .Get(c => c.AcceptedOn.HasValue && c.WithdrawnOn.HasValue && c.WithdrawnOn.Value < expiredDate)
+                .Get(c => c.Transfers.Any(t => t.Status == TransactionStatus.Succeeded)
+                     && (!c.TransferRefunds.Any() 
+                        || c.TransferRefunds.All(t => t.Status == TransactionStatus.Failed || t.Status == TransactionStatus.Expired)), true)
+                .OrderBy(c => c.CreatedOn)
+                .Select(c => c.Id)
+                .Skip(skip)
+                .Take(take)
+                .ToListAsync(token);
         }
 
         private async Task<IEnumerable<Guid>> GetNextTransferRefundIdsAsync(DateTimeOffset expiredDate, int skip, int take, CancellationToken token)
