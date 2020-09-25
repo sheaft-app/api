@@ -32,7 +32,7 @@ namespace Sheaft.GraphQL.Types
                 .Type<ListType<IdType>>();
 
             descriptor.Field(c => c.Legals)
-                .Type<ListType<CreateBusinessLegalsInputType>>();
+                .Type<CreateBusinessLegalsInputType>();
         }
     }
 }

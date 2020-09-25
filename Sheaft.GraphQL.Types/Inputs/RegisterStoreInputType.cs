@@ -35,7 +35,7 @@ namespace Sheaft.GraphQL.Types
                 .Type<ListType<TimeSlotGroupInputType>>();
 
             descriptor.Field(c => c.Legals)
-                .Type<ListType<CreateBusinessLegalsInputType>>();
+                .Type<CreateBusinessLegalsInputType>();
         }
     }
 }
