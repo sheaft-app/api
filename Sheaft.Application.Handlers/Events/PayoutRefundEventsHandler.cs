@@ -6,25 +6,25 @@ using Sheaft.Application.Interop;
 
 namespace Sheaft.Application.Handlers
 {
-    public class PayinRefundEventsHandler :
-        INotificationHandler<PayinRefundFailedEvent>,
-        INotificationHandler<PayinRefundSucceededEvent>
+    public class PayoutRefundEventsHandler :
+        INotificationHandler<PayoutRefundFailedEvent>,
+        INotificationHandler<PayoutRefundSucceededEvent>
     {
         private readonly IAppDbContext _context;
         private readonly IEmailService _emailService;
 
-        public PayinRefundEventsHandler(IAppDbContext context, IEmailService emailService)
+        public PayoutRefundEventsHandler(IAppDbContext context, IEmailService emailService)
         {
             _context = context;
             _emailService = emailService;
         }
 
-        public Task Handle(PayinRefundFailedEvent notification, CancellationToken cancellationToken)
+        public Task Handle(PayoutRefundFailedEvent notification, CancellationToken cancellationToken)
         {
             throw new System.NotImplementedException();
         }
 
-        public Task Handle(PayinRefundSucceededEvent notification, CancellationToken cancellationToken)
+        public Task Handle(PayoutRefundSucceededEvent notification, CancellationToken cancellationToken)
         {
             throw new System.NotImplementedException();
         }
