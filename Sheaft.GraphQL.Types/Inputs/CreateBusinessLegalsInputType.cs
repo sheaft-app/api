@@ -8,13 +8,12 @@ namespace Sheaft.GraphQL.Types
     {
         protected override void Configure(IInputObjectTypeDescriptor<CreateBusinessLegalInput> descriptor)
         {
+            descriptor.Field(c => c.VatIdentifier);
+
             descriptor.Field(c => c.Email)
                 .Type<NonNullType<StringType>>();
 
             descriptor.Field(c => c.Siret)
-                .Type<NonNullType<StringType>>();
-
-            descriptor.Field(c => c.VatIdentifier)
                 .Type<NonNullType<StringType>>();
 
             descriptor.Field(c => c.Kind)
