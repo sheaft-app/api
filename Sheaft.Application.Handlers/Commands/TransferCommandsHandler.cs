@@ -40,6 +40,9 @@ namespace Sheaft.Application.Handlers
             return await ExecuteAsync(async () =>
             {
                 var transfer = await _context.GetSingleAsync<Transfer>(c => c.Identifier == request.Identifier, token);
+                if (transfer.Status == TransactionStatus.Succeeded || transfer.Status == TransactionStatus.Failed)
+                    return Failed<TransactionStatus>(new InvalidOperationException());
+
                 var pspResult = await _pspService.GetTransferAsync(transfer.Identifier, token);
                 if (!pspResult.Success)
                     return Failed<TransactionStatus>(pspResult.Exception);

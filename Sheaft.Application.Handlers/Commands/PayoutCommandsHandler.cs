@@ -106,6 +106,9 @@ namespace Sheaft.Application.Handlers
             return await ExecuteAsync(async () =>
             {
                 var payout = await _context.GetSingleAsync<Payout>(c => c.Identifier == request.Identifier, token);
+                if (payout.Status == TransactionStatus.Succeeded || payout.Status == TransactionStatus.Failed)
+                    return Failed<TransactionStatus>(new InvalidOperationException());
+
                 var pspResult = await _pspService.GetPayoutAsync(payout.Identifier, token);
                 if (!pspResult.Success)
                     return Failed<TransactionStatus>(pspResult.Exception);

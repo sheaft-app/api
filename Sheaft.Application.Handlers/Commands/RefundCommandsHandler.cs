@@ -8,6 +8,7 @@ using Microsoft.Extensions.Logging;
 using Sheaft.Domain.Enums;
 using Sheaft.Domain.Models;
 using Sheaft.Application.Events;
+using System;
 
 namespace Sheaft.Application.Handlers
 {
@@ -33,6 +34,9 @@ namespace Sheaft.Application.Handlers
             return await ExecuteAsync(async () =>
             {
                 var payinRefund = await _context.GetSingleAsync<PayinRefund>(c => c.Identifier == request.Identifier, token);
+                if (payinRefund.Status == TransactionStatus.Succeeded || payinRefund.Status == TransactionStatus.Failed)
+                    return Failed<TransactionStatus>(new InvalidOperationException());
+
                 var pspResult = await _pspService.GetRefundAsync(payinRefund.Identifier, token);
                 if (!pspResult.Success)
                     return Failed<TransactionStatus>(pspResult.Exception);
@@ -63,6 +67,9 @@ namespace Sheaft.Application.Handlers
             return await ExecuteAsync(async () =>
             {
                 var transferRefund = await _context.GetSingleAsync<TransferRefund>(c => c.Identifier == request.Identifier, token);
+                if (transferRefund.Status == TransactionStatus.Succeeded || transferRefund.Status == TransactionStatus.Failed)
+                    return Failed<TransactionStatus>(new InvalidOperationException());
+
                 var pspResult = await _pspService.GetRefundAsync(transferRefund.Identifier, token);
                 if (!pspResult.Success)
                     return Failed<TransactionStatus>(pspResult.Exception);
