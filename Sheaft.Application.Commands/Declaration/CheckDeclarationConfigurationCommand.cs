@@ -12,6 +12,5 @@ namespace Sheaft.Application.Commands
         }
 
         public Guid UserId { get; set; }
-
     }
 }

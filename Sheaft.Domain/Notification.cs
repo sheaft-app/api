@@ -13,14 +13,11 @@ namespace Sheaft.Domain.Models
 
         public Notification(Guid id, NotificationKind kind, string method, string content, User user)
         {
-            if (content == null)
-                throw new ValidationException(MessageKind.Notification_Require_Content);
-
-            Id = id;            
+            Id = id;
             Kind = kind;
             Method = method;
             User = user;
-            Content = content;
+            Content = content ?? throw new ValidationException(MessageKind.Notification_Require_Content);
             Unread = true;
         }
 

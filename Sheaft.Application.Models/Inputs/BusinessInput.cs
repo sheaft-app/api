@@ -16,6 +16,5 @@ namespace Sheaft.Application.Models
         public FullAddressInput Address { get; set; }
         public bool OpenForNewBusiness { get; set; }
         public IEnumerable<Guid> Tags { get; set; }
-
     }
 }

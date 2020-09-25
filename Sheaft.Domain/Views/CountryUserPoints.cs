@@ -10,6 +10,6 @@ namespace Sheaft.Domain.Views
         public string Name { get; set; }
         public string Picture { get; set; }
         public int? Points { get; set; }
-        public long Position { get; set; }        
+        public long Position { get; set; }
     }
 }

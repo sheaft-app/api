@@ -1,8 +1,6 @@
 using System;
 using System.Collections.Generic;
-using System.Threading;
 using System.Threading.Tasks;
-using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Sheaft.Core;
@@ -10,7 +8,6 @@ using Sheaft.Exceptions;
 
 namespace Sheaft.Application.Interop
 {
-
     public class ResultsHandler
     {
         protected readonly ILogger _logger;
@@ -18,8 +15,8 @@ namespace Sheaft.Application.Interop
         protected readonly IAppDbContext _context;
 
         public ResultsHandler(
-            ISheaftMediatr mediatr, 
-            IAppDbContext context, 
+            ISheaftMediatr mediatr,
+            IAppDbContext context,
             ILogger logger)
         {
             _mediatr = mediatr;

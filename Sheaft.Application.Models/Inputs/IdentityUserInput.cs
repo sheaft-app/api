@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Sheaft.Application.Models
 {
-    public class IdentityUserInput 
+    public class IdentityUserInput
     {
         public IdentityUserInput(Guid id, string email, string name, string firstname, string lastname, IEnumerable<Guid> roles = null)
         {

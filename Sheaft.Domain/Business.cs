@@ -20,7 +20,7 @@ namespace Sheaft.Domain.Models
             SetOpenForNewBusiness(openForBusiness);
             SetDescription(description);
 
-            SetAddress(address);            
+            SetAddress(address);
         }
 
         public bool OpenForNewBusiness { get; private set; }

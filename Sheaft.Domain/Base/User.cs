@@ -115,7 +115,7 @@ namespace Sheaft.Domain.Models
 
             Picture = picture;
         }
-        
+
         public void SetSponsoringCode(string code)
         {
             SponsorshipCode = code;

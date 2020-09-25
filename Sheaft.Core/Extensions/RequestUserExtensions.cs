@@ -8,12 +8,12 @@ namespace Sheaft.Core.Extensions
     {
         public static bool IsInRole(this RequestUser user, string roleName)
         {
-            if (user == null || user.Roles == null || !user.Roles.Any())
+            if (user == null || user.Roles?.Any() != true)
                 return false;
 
             return user.Roles.Contains(roleName);
         }
-        
+
         public static bool IsInRoles(this RequestUser user, IEnumerable<string> roleNames)
         {
             return roleNames.All(user.IsInRole);

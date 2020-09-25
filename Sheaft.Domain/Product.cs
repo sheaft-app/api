@@ -21,11 +21,8 @@ namespace Sheaft.Domain.Models
 
         public Product(Guid id, string reference, string name, decimal price, ConditioningKind conditioning, UnitKind unit, decimal quantityPerUnit, decimal vat, Producer producer)
         {
-            if (producer == null)
-                throw new ValidationException(MessageKind.Product_Producer_Required);
-
             Id = id;
-            Producer = producer;
+            Producer = producer ?? throw new ValidationException(MessageKind.Product_Producer_Required);
 
             SetName(name);
             SetReference(reference);
@@ -95,7 +92,7 @@ namespace Sheaft.Domain.Models
 
             _tags.Clear();
 
-            if (tags != null && tags.Any())
+            if (tags?.Any() == true)
                 AddTags(tags);
         }
 
@@ -245,7 +242,7 @@ namespace Sheaft.Domain.Models
                     WholeSalePrice = Math.Round((WholeSalePricePerUnit / QuantityPerUnit) * 1000, DIGITS_COUNT);
                     break;
                 case UnitKind.kg:
-                    WholeSalePrice = Math.Round((WholeSalePricePerUnit / QuantityPerUnit), DIGITS_COUNT);
+                    WholeSalePrice = Math.Round(WholeSalePricePerUnit / QuantityPerUnit, DIGITS_COUNT);
                     break;
                 default:
                     WholeSalePrice = WholeSalePricePerUnit;
@@ -259,7 +256,7 @@ namespace Sheaft.Domain.Models
         private void RefreshRatings()
         {
             Rating = Ratings.Any() ? Ratings.Average(r => r.Value) : (decimal?)null;
-            RatingsCount = Ratings.Count();
+            RatingsCount = Ratings.Count;
         }
     }
 }
