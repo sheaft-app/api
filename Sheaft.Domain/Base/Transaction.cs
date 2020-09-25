@@ -1,6 +1,7 @@
 ﻿using System;
 using Sheaft.Domain.Interop;
 using Sheaft.Domain.Enums;
+using Sheaft.Exceptions;
 
 namespace Sheaft.Domain.Models
 {
@@ -26,6 +27,7 @@ namespace Sheaft.Domain.Models
         public TransactionKind Kind { get; private set; }
         public TransactionStatus Status { get; private set; }
         public DateTimeOffset? ExecutedOn { get; private set; }
+        public DateTimeOffset? ExpiredOn { get; private set; }
         public string ResultCode { get; private set; }
         public string ResultMessage { get; private set; }
         public decimal Fees { get; protected set; }
@@ -52,6 +54,19 @@ namespace Sheaft.Domain.Models
 
         public void SetStatus(TransactionStatus status)
         {
+            switch (status)
+            {
+                case TransactionStatus.Expired:
+                    if (Status == TransactionStatus.Failed || Status == TransactionStatus.Succeeded || Status == TransactionStatus.Expired)
+                        throw new ValidationException();
+
+                    ExpiredOn = DateTimeOffset.UtcNow;
+                    break;
+                default:
+                    ExpiredOn = null;
+                    break;
+            }
+
             Status = status;
         }
 

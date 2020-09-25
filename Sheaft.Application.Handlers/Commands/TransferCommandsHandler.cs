@@ -72,7 +72,7 @@ namespace Sheaft.Application.Handlers
                 var skip = 0;
                 const int take = 100;
 
-                var expiredDate = DateTimeOffset.UtcNow.AddMinutes(-15);
+                var expiredDate = DateTimeOffset.UtcNow.AddMinutes(-60);
                 var transferIds = await GetNextTransferIdsAsync(expiredDate, skip, take, token);
 
                 while (transferIds.Any())
@@ -108,7 +108,7 @@ namespace Sheaft.Application.Handlers
                 if (!result.Success)
                     return Failed<bool>(result.Exception);
 
-                if (transfer.CreatedOn.AddMinutes(10080) > DateTimeOffset.UtcNow
+                if (transfer.CreatedOn.AddMinutes(10080) < DateTimeOffset.UtcNow
                     && (result.Data == TransactionStatus.Created || result.Data == TransactionStatus.Waiting))
                     return await _mediatr.Process(new ExpireTransferCommand(request.RequestUser) { TransferId = request.TransferId }, token);
 
@@ -136,7 +136,7 @@ namespace Sheaft.Application.Handlers
                 var skip = 0;
                 const int take = 100;
 
-                var expiredDate = DateTimeOffset.UtcNow.AddMinutes(-15);
+                var expiredDate = DateTimeOffset.UtcNow.AddMinutes(-60);
                 var purchaseOrders = await GetNextPurchaseOrdersForNewTransferAsync(expiredDate, skip, take, token);
 
                 while (purchaseOrders.Any())
@@ -162,7 +162,7 @@ namespace Sheaft.Application.Handlers
             return await ExecuteAsync(async () =>
             {
                 var purchaseOrder = await _context.GetByIdAsync<PurchaseOrder>(request.PurchaseOrderId, token);
-                if (purchaseOrder.Status < PurchaseOrderStatus.Accepted || purchaseOrder.Status > PurchaseOrderStatus.Delivered)
+                if (!purchaseOrder.AcceptedOn.HasValue || purchaseOrder.WithdrawnOn.HasValue)
                     return Failed<Guid>(new InvalidOperationException());
 
                 var transactions = purchaseOrder.Transfers.ToList();
@@ -214,12 +214,9 @@ namespace Sheaft.Application.Handlers
         private async Task<IEnumerable<PurchaseOrder>> GetNextPurchaseOrdersForNewTransferAsync(DateTimeOffset expiredDate, int skip, int take, CancellationToken token)
         {
             return await _context.PurchaseOrders
-                .Get(c => c.Status > PurchaseOrderStatus.Waiting
-                            && c.Status < PurchaseOrderStatus.Refused
-                            && c.UpdatedOn.Value < expiredDate
-                            && (!c.Transfers.Any()
-                                || c.Transfers.All(t => t.Status == TransactionStatus.Failed || t.Status == TransactionStatus.Expired)
-                            ), true)
+                .Get(c => c.AcceptedOn.HasValue && !c.WithdrawnOn.HasValue && c.AcceptedOn.Value < expiredDate)
+                .Get(c => !c.Transfers.Any()
+                        || c.Transfers.All(t => t.Status == TransactionStatus.Failed || t.Status == TransactionStatus.Expired), true)
                 .OrderBy(c => c.CreatedOn)
                 .Skip(skip)
                 .Take(take)
@@ -229,8 +226,8 @@ namespace Sheaft.Application.Handlers
         private async Task<IEnumerable<Guid>> GetNextTransferIdsAsync(DateTimeOffset expiredDate, int skip, int take, CancellationToken token)
         {
             return await _context.Transfers
-                .Get(c => (c.Status == TransactionStatus.Waiting && c.CreatedOn < expiredDate)
-                    || (c.Status == TransactionStatus.Created && c.UpdatedOn.HasValue && c.UpdatedOn.Value < expiredDate), true)
+                .Get(c => c.CreatedOn < expiredDate
+                      && (c.Status == TransactionStatus.Waiting || c.Status == TransactionStatus.Created), true)
                 .OrderBy(c => c.CreatedOn)
                 .Select(c => c.Id)
                 .Skip(skip)

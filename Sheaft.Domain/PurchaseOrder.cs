@@ -48,6 +48,8 @@ namespace Sheaft.Domain.Models
         public DateTimeOffset CreatedOn { get; private set; }
         public DateTimeOffset? UpdatedOn { get; private set; }
         public DateTimeOffset? RemovedOn { get; private set; }
+        public DateTimeOffset? AcceptedOn { get; private set; }
+        public DateTimeOffset? WithdrawnOn { get; private set; }
         public string Reference { get; private set; }
         public string Reason { get; private set; }
         public string Comment { get; private set; }
@@ -87,6 +89,7 @@ namespace Sheaft.Domain.Models
                 case PurchaseOrderStatus.Accepted:
                     if (Status != PurchaseOrderStatus.Waiting)
                         throw new ValidationException(MessageKind.PurchaseOrder_CannotAccept_NotIn_WaitingStatus);
+                        AcceptedOn = DateTimeOffset.UtcNow;
                     break;
                 case PurchaseOrderStatus.Completed:
                     if (Status != PurchaseOrderStatus.Processing)
@@ -107,6 +110,7 @@ namespace Sheaft.Domain.Models
                         throw new ValidationException(MessageKind.PurchaseOrder_CannotCancel_AlreadyIn_RefusedStatus);
                     if (Status == PurchaseOrderStatus.Delivered)
                         throw new ValidationException(MessageKind.PurchaseOrder_CannotCancel_AlreadyIn_DeliveredStatus);
+                    WithdrawnOn = DateTimeOffset.UtcNow;
                     break;
                 case PurchaseOrderStatus.Refused:
                     if (Status == PurchaseOrderStatus.Cancelled)
@@ -115,6 +119,7 @@ namespace Sheaft.Domain.Models
                         throw new ValidationException(MessageKind.PurchaseOrder_CannotRefuse_AlreadyIn_RefusedStatus);
                     if (Status == PurchaseOrderStatus.Delivered)
                         throw new ValidationException(MessageKind.PurchaseOrder_CannotRefuse_AlreadyIn_DeliveredStatus);
+                    WithdrawnOn = DateTimeOffset.UtcNow;
                     break;
             }
 
