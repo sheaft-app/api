@@ -234,7 +234,7 @@ namespace Sheaft.GraphQL.Services
 
         public async Task<IQueryable<ProductDto>> UpdateProductPictureAsync(UpdatePictureInput input, [Service] IProductQueries productQueries)
         {
-            await ExecuteCommandAsync<UpdateProductPictureCommand, bool>(_mapper.Map(input, new UpdateProductPictureCommand(CurrentUser)), Token);
+            await ExecuteCommandAsync<UpdateProductPictureCommand, string>(_mapper.Map(input, new UpdateProductPictureCommand(CurrentUser)), Token);
             return productQueries.GetProduct(input.Id, CurrentUser);
         }
 
@@ -326,9 +326,10 @@ namespace Sheaft.GraphQL.Services
             return legalQueries.GetConsumerLegals(input.Id, CurrentUser);
         }
 
-        public async Task<bool> UpdateUserPictureAsync(UpdatePictureInput input)
+        public async Task<IQueryable<UserProfileDto>> UpdateUserPictureAsync(UpdatePictureInput input, [Service] IUserQueries userQueries)
         {
-            return await ExecuteCommandAsync<UpdateUserPictureCommand, bool>(_mapper.Map(input, new UpdateUserPictureCommand(CurrentUser)), Token);
+            await ExecuteCommandAsync<UpdateUserPictureCommand, string>(_mapper.Map(input, new UpdateUserPictureCommand(CurrentUser)), Token);
+            return userQueries.GetUser(input.Id, CurrentUser);
         }
 
         public async Task<bool> RemoveUserAsync(IdWithReasonInput input)

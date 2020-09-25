@@ -7,15 +7,6 @@ using Sheaft.Core;
 using Sheaft.Application.Commands;
 using Sheaft.Domain.Models;
 using Microsoft.EntityFrameworkCore;
-using System.Text.RegularExpressions;
-using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.Formats.Jpeg;
-using Sheaft.Exceptions;
-using System.Net.Http;
-using Sheaft.Options;
-using SixLabors.ImageSharp.Processing;
-using System.IO;
-using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Logging;
 
 namespace Sheaft.Application.Handlers
@@ -26,29 +17,19 @@ namespace Sheaft.Application.Handlers
         IRequestHandler<DeleteTagCommand, Result<bool>>,
         IRequestHandler<RestoreTagCommand, Result<bool>>
     {
-        private readonly IBlobService _blobsService;
-        private readonly StorageOptions _storageOptions;
-        private readonly HttpClient _httpClient;
-
         public TagCommandsHandler(
             ISheaftMediatr mediatr,
             IAppDbContext context,
-            IBlobService blobsService,
-            IOptionsSnapshot<StorageOptions> storageOptions,
-            IHttpClientFactory httpClientFactory,
             ILogger<TagCommandsHandler> logger)
             : base(mediatr, context, logger)
         {
-            _blobsService = blobsService;
-            _httpClient = httpClientFactory.CreateClient("picture");
-            _storageOptions = storageOptions.Value;
         }
 
         public async Task<Result<Guid>> Handle(CreateTagCommand request, CancellationToken token)
         {
             return await ExecuteAsync(async () =>
             {
-                var entity = new Tag(Guid.NewGuid(), request.Kind, request.Name, request.Description, request.Image);
+                var entity = new Tag(Guid.NewGuid(), request.Kind, request.Name, request.Description, request.Picture);
 
                 await _context.AddAsync(entity, token);
                 await _context.SaveChangesAsync(token);
@@ -67,12 +48,14 @@ namespace Sheaft.Application.Handlers
                 entity.SetDescription(request.Description);
                 entity.SetKind(request.Kind);
 
-                var image = await HandleImageAsync(entity.Id, request.Image, token);
-                entity.SetImage(image);
-
                 _context.Update(entity);
+                await _context.SaveChangesAsync(token);
 
-                return Ok(await _context.SaveChangesAsync(token) > 0);
+                var imageResult = await _mediatr.Process(new UpdateTagPictureCommand(request.RequestUser) { TagId = entity.Id, Picture = request.Picture }, token);
+                if (!imageResult.Success)
+                    return Failed<bool>(imageResult.Exception);
+
+                return Ok(true);
             });
         }
 
@@ -81,11 +64,10 @@ namespace Sheaft.Application.Handlers
             return await ExecuteAsync(async () =>
             {
                 var entity = await _context.GetByIdAsync<Tag>(request.Id, token);
-
                 _context.Remove(entity);
-                var results = await _context.SaveChangesAsync(token);
 
-                return Ok(results > 0);
+                await _context.SaveChangesAsync(token);
+                return Ok(true);
             });
         }
 
@@ -96,48 +78,9 @@ namespace Sheaft.Application.Handlers
                 var entity = await _context.Tags.SingleOrDefaultAsync(a => a.Id == request.Id && a.RemovedOn.HasValue, token);
                 _context.Restore(entity);
 
-                return Ok(await _context.SaveChangesAsync(token) > 0);
+                await _context.SaveChangesAsync(token);
+                return Ok(true);
             });
-        }
-
-        private async Task<string> HandleImageAsync(Guid id, string picture, CancellationToken token)
-        {
-            if (string.IsNullOrWhiteSpace(picture))
-                return null;
-
-            byte[] bytes = null;
-            if (!picture.StartsWith("http") && !picture.StartsWith("https"))
-            {
-                var base64Data = picture.StartsWith("data:image") ? Regex.Match(picture, @"data:image/(?<type>.+?),(?<data>.+)").Groups["data"].Value : picture;
-                bytes = Convert.FromBase64String(base64Data);
-            }
-            else if (!picture.StartsWith($"https://{_storageOptions.Account}.blob.{_storageOptions.Suffix}"))
-            {
-                using (var response = await _httpClient.GetAsync(picture))
-                    bytes = await response.Content.ReadAsByteArrayAsync();
-            }
-            else
-                return picture;
-
-            var imageId = Guid.NewGuid().ToString("N");
-
-            using (var image = Image.Load(bytes))
-            {
-                using (var blobStream = new MemoryStream())
-                {
-                    image.Clone(context => context.Resize(new ResizeOptions
-                    {
-                        Mode = ResizeMode.Max,
-                        Size = new Size(64, 64)
-                    })).Save(blobStream, new JpegEncoder { Quality = 100 });
-
-                    var compImage = await _blobsService.UploadTagPictureAsync(id, blobStream, token);
-                    if (!compImage.Success)
-                        throw compImage.Exception ?? new BadRequestException();
-
-                    return compImage.Data;
-                }
-            }
         }
     }
 }

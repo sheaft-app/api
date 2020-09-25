@@ -22,24 +22,24 @@ using System.Threading.Tasks;
 
 namespace Sheaft.Infrastructure.Services
 {
-    public class ImageService : BaseService, IImageService
+    public class PictureService : BaseService, IPictureService
     {
         private readonly HttpClient _httpClient;
         private readonly StorageOptions _storageOptions;
         private readonly IBlobService _blobService;
 
-        public ImageService(
+        public PictureService(
             IHttpClientFactory httpClientFactory,
             IOptionsSnapshot<StorageOptions> storageOptions,
             IBlobService blobService,
-            ILogger<ImageService> logger) : base(logger)
+            ILogger<PictureService> logger) : base(logger)
         {
-            _httpClient = httpClientFactory.CreateClient("images");
+            _httpClient = httpClientFactory.CreateClient("pictures");
             _storageOptions = storageOptions.Value;
             _blobService = blobService;
         }
 
-        public async Task<Result<string>> HandleUserImageAsync(Guid id, string picture, CancellationToken token)
+        public async Task<Result<string>> HandleUserPictureAsync(User user, string picture, CancellationToken token)
         {
             return await ExecuteAsync(async () =>
             {
@@ -57,7 +57,7 @@ namespace Sheaft.Infrastructure.Services
                             Size = new Size(64, 64)
                         })).Save(blobStream, new JpegEncoder { Quality = 100 });
 
-                        var compImage = await _blobService.UploadUserPictureAsync(id, blobStream, token);
+                        var compImage = await _blobService.UploadUserPictureAsync(user.Id, blobStream, token);
                         if (!compImage.Success)
                             throw compImage.Exception ?? new BadRequestException();
 
@@ -67,47 +67,63 @@ namespace Sheaft.Infrastructure.Services
             });
         }
 
-        public async Task<Result<string>> HandleProductImageAsync(Product entity, string picture, CancellationToken token)
+        public async Task<Result<string>> HandleTagPictureAsync(Tag tag, string picture, CancellationToken token)
         {
             return await ExecuteAsync(async () =>
             {
-                if (string.IsNullOrWhiteSpace(picture) && string.IsNullOrWhiteSpace(entity.Image))
+                var bytes = await RetrievePictureBytesAsync(picture);
+                if (bytes == null)
+                    return Ok(picture);
+
+                using (var image = Image.Load(bytes))
                 {
-                    return Ok(GetDefaultProductImage(entity.Tags?.Select(t => t.Tag)));
+                    using (var blobStream = new MemoryStream())
+                    {
+                        image.Clone(context => context.Resize(new ResizeOptions
+                        {
+                            Mode = ResizeMode.Crop,
+                            Size = new Size(64, 64)
+                        })).Save(blobStream, new JpegEncoder { Quality = 100 });
+
+                        var compImage = await _blobService.UploadTagPictureAsync(tag.Id, blobStream, token);
+                        if (!compImage.Success)
+                            throw compImage.Exception ?? new BadRequestException();
+
+                        return compImage;
+                    }
+                }
+            });
+        }
+
+        public async Task<Result<string>> HandleProductPictureAsync(Product entity, string picture, CancellationToken token)
+        {
+            return await ExecuteAsync(async () =>
+            {
+                if (string.IsNullOrWhiteSpace(picture) && string.IsNullOrWhiteSpace(entity.Picture))
+                {
+                    return Ok(GetDefaultProductPicture(entity.Tags?.Select(t => t.Tag)));
                 }
 
                 if (string.IsNullOrWhiteSpace(picture))
-                    return Ok((string)null);
+                    return Ok(entity.Picture);
 
-                byte[] bytes = null;
-                if (!picture.StartsWith("http") && !picture.StartsWith("https"))
-                {
-                    var base64Data = picture.StartsWith("data:image") ? Regex.Match(picture, @"data:image/(?<type>.+?),(?<data>.+)").Groups["data"].Value : picture;
-                    bytes = Convert.FromBase64String(base64Data);
-                }
-                else if (!picture.StartsWith($"https://{_storageOptions.Account}.blob.{_storageOptions.Suffix}"))
-                {
-                    using (var response = await _httpClient.GetAsync(picture))
-                        bytes = await response.Content.ReadAsByteArrayAsync();
-                }
-                else
-                {
-                    return Ok(picture);
-                }
+                var bytes = await RetrievePictureBytesAsync(picture);
+                if (bytes == null)
+                    return Ok(entity.Picture);
 
                 var imageId = Guid.NewGuid().ToString("N");
                 using (Image image = Image.Load(bytes))
                 {
-                    await UploadImageAsync(image, entity.Producer.Id, entity.Id, imageId, ImageSize.LARGE, 620, 256, token);
-                    await UploadImageAsync(image, entity.Producer.Id, entity.Id, imageId, ImageSize.MEDIUM, 310, 128, token);
-                    await UploadImageAsync(image, entity.Producer.Id, entity.Id, imageId, ImageSize.SMALL, 64, 64, token, ResizeMode.Crop);
+                    await UploadPictureAsync(image, entity.Producer.Id, entity.Id, imageId, PictureSize.LARGE, 620, 256, token);
+                    await UploadPictureAsync(image, entity.Producer.Id, entity.Id, imageId, PictureSize.MEDIUM, 310, 128, token);
+                    await UploadPictureAsync(image, entity.Producer.Id, entity.Id, imageId, PictureSize.SMALL, 64, 64, token, ResizeMode.Crop);
                 }
 
-                return Ok($"https://{_storageOptions.Account}.blob.{_storageOptions.Suffix}/{_storageOptions.Containers.Pictures}/{CoreProductExtensions.GetImageUrl(entity.Producer.Id, entity.Id, imageId)}");
+                return Ok($"https://{_storageOptions.Account}.blob.{_storageOptions.Suffix}/{_storageOptions.Containers.Pictures}/{CoreProductExtensions.GetPictureUrl(entity.Producer.Id, entity.Id, imageId)}");
             });
         }
 
-        private string GetDefaultProductImage(IEnumerable<Tag> tags)
+        private string GetDefaultProductPicture(IEnumerable<Tag> tags)
         {
             var category = tags.FirstOrDefault(t => t.Kind == TagKind.Category);
             if (category != null)
@@ -116,7 +132,7 @@ namespace Sheaft.Infrastructure.Services
             return $"https://{_storageOptions.Account}.blob.{_storageOptions.Suffix}/{_storageOptions.Containers.Pictures}/products/categories/default.jpg";
         }
 
-        private async Task UploadImageAsync(Image image, Guid userId, Guid productId, string filename, string size, int width, int height, CancellationToken token, ResizeMode mode = ResizeMode.Max, int quality = 100)
+        private async Task UploadPictureAsync(Image image, Guid userId, Guid productId, string filename, string size, int width, int height, CancellationToken token, ResizeMode mode = ResizeMode.Max, int quality = 100)
         {
             using (var blobStream = new MemoryStream())
             {

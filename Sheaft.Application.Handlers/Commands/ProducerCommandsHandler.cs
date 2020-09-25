@@ -12,7 +12,6 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Sheaft.Options;
 using Sheaft.Exceptions;
-using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.EntityFrameworkCore;
 
 namespace Sheaft.Application.Handlers
@@ -25,22 +24,16 @@ namespace Sheaft.Application.Handlers
         IRequestHandler<CheckProducerDocumentsReviewedCommand, Result<bool>>,
         IRequestHandler<CheckProducerDocumentsValidatedCommand, Result<bool>>
     {
-        private readonly IImageService _imageService;
         private readonly RoleOptions _roleOptions;
-        private readonly IDistributedCache _cache;
 
         public ProducerCommandsHandler(
-            IDistributedCache cache,
             IAppDbContext context,
             ISheaftMediatr mediatr,
-            IImageService imageService,
             ILogger<ProducerCommandsHandler> logger,
             IOptionsSnapshot<RoleOptions> roleOptions)
             : base(mediatr, context, logger)
         {
             _roleOptions = roleOptions.Value;
-            _imageService = imageService;
-            _cache = cache;
         }
 
         public async Task<Result<Guid>> Handle(RegisterProducerCommand request, CancellationToken token)
@@ -70,14 +63,18 @@ namespace Sheaft.Application.Handlers
                         producer.SetTags(tags);
                     }
 
-                    var resultImage = await _imageService.HandleUserImageAsync(producer.Id, request.Picture, token);
-                    if (!resultImage.Success)
-                        return Failed<Guid>(resultImage.Exception);
-
-                    producer.SetPicture(resultImage.Data);
-
                     await _context.AddAsync(producer, token);
                     await _context.SaveChangesAsync(token);
+
+                    var resultImage = await _mediatr.Process(new UpdateUserPictureCommand(request.RequestUser)
+                    {
+                        UserId = producer.Id,
+                        Picture = request.Picture,
+                        SkipAuthUpdate = true
+                    }, token);
+
+                    if (!resultImage.Success)
+                        return Failed<Guid>(resultImage.Exception);
 
                     var roles = new List<Guid> { _roleOptions.Owner.Id, _roleOptions.Store.Id };
                     var authResult = await _mediatr.Process(new UpdateAuthUserCommand(request.RequestUser)
@@ -110,7 +107,6 @@ namespace Sheaft.Application.Handlers
                         return result;
 
                     await transaction.CommitAsync(token);
-                    await _cache.RemoveAsync(producer.Id.ToString("N"));
 
                     if (!string.IsNullOrWhiteSpace(request.SponsoringCode))
                     {
@@ -142,13 +138,7 @@ namespace Sheaft.Application.Handlers
 
                 producer.SetAddress(request.Address.Line1, request.Address.Line2, request.Address.Zipcode,
                     request.Address.City, request.Address.Country, department, request.Address.Longitude, request.Address.Latitude);
-
-                var resultImage = await _imageService.HandleUserImageAsync(producer.Id, request.Picture, token);
-                if (!resultImage.Success)
-                    return Failed<bool>(resultImage.Exception);
-
-                producer.SetPicture(resultImage.Data);
-
+                                
                 if (request.Tags != null)
                 {
                     var tags = await _context.FindAsync<Tag>(t => request.Tags.Contains(t.Id), token);
@@ -156,7 +146,17 @@ namespace Sheaft.Application.Handlers
                 }
 
                 _context.Update(producer);
-                var result = await _context.SaveChangesAsync(token);
+                await _context.SaveChangesAsync(token);
+
+                var resultImage = await _mediatr.Process(new UpdateUserPictureCommand(request.RequestUser)
+                {
+                    UserId = producer.Id,
+                    Picture = request.Picture,
+                    SkipAuthUpdate = true
+                }, token);
+
+                if (!resultImage.Success)
+                    return Failed<bool>(resultImage.Exception);
 
                 var roles = new List<Guid> { _roleOptions.Owner.Id, _roleOptions.Producer.Id };
                 var authResult = await _mediatr.Process(new UpdateAuthUserCommand(request.RequestUser)
@@ -174,8 +174,7 @@ namespace Sheaft.Application.Handlers
                 if (!authResult.Success)
                     return authResult;
 
-                await _cache.RemoveAsync(producer.Id.ToString("N"));
-                return Ok(result > 0);
+                return Ok(true);
             });
         }
 

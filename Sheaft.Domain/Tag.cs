@@ -11,13 +11,13 @@ namespace Sheaft.Domain.Models
         {
         }
 
-        public Tag(Guid id, TagKind kind, string name, string description = null, string image = null)
+        public Tag(Guid id, TagKind kind, string name, string description = null, string picture = null)
         {
             Id = id;
 
             SetKind(kind);
             SetName(name);
-            SetImage(image);
+            SetPicture(picture);
             SetDescription(description);
         }
 
@@ -28,7 +28,7 @@ namespace Sheaft.Domain.Models
         public DateTimeOffset? RemovedOn { get; private set; }
         public string Name { get; private set; }
         public string Description { get; private set; }
-        public string Image { get; private set; }
+        public string Picture { get; private set; }
 
         public void SetName(string name)
         {
@@ -43,12 +43,12 @@ namespace Sheaft.Domain.Models
             Kind = kind;
         }
 
-        public void SetImage(string image)
+        public void SetPicture(string picture)
         {
-            if (image == null)
+            if (picture == null)
                 return;
 
-            Image = image;
+            Picture = picture;
         }
 
         public void SetDescription(string description)

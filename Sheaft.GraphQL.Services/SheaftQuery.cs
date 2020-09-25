@@ -99,7 +99,7 @@ namespace Sheaft.GraphQL.Services
 
         public IQueryable<UserProfileDto> GetMyUserProfile([Service] IUserQueries userQueries)
         {
-            return userQueries.GetUserProfile(CurrentUser);
+            return userQueries.GetUserProfile(CurrentUser.Id, CurrentUser);
         }
 
         public IQueryable<ProductDto> GetStoreProducts([Service] IProductQueries productQueries)

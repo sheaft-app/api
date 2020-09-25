@@ -199,7 +199,7 @@ namespace Sheaft.Api
             services.AddScoped<IBlobService, BlobService>();
             services.AddScoped<IEmailService, EmailService>();
             services.AddScoped<ISignalrService, SignalrService>();
-            services.AddScoped<IImageService, ImageService>();
+            services.AddScoped<IPictureService, PictureService>();
             services.AddScoped<IPspService, PspService>();
             services.AddScoped<IFeesService, FeesService>();
             services.AddScoped<ISheaftMediatr, SheaftMediatr>();

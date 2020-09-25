@@ -75,16 +75,16 @@ namespace Sheaft.Manage.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Add(TagViewModel model, IFormFile image, CancellationToken token)
+        public async Task<IActionResult> Add(TagViewModel model, IFormFile picture, CancellationToken token)
         {
             var requestUser = await GetRequestUser(token);
 
-            if (image != null)
+            if (picture != null)
             {
                 using (var ms = new MemoryStream())
                 {
-                    image.CopyTo(ms);
-                    model.Image = Convert.ToBase64String(ms.ToArray());
+                    picture.CopyTo(ms);
+                    model.Picture = Convert.ToBase64String(ms.ToArray());
                 }
             }
 
@@ -92,7 +92,7 @@ namespace Sheaft.Manage.Controllers
             {
                 Description = model.Description,
                 Name = model.Name,
-                Image = model.Image,
+                Picture = model.Picture,
                 Kind = model.Kind
             }, token);
 
@@ -122,16 +122,16 @@ namespace Sheaft.Manage.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(TagViewModel model, IFormFile image, CancellationToken token)
+        public async Task<IActionResult> Edit(TagViewModel model, IFormFile picture, CancellationToken token)
         {
             var requestUser = await GetRequestUser(token);
 
-            if (image != null)
+            if (picture != null)
             {
                 using (var ms = new MemoryStream())
                 {
-                    image.CopyTo(ms);
-                    model.Image = Convert.ToBase64String(ms.ToArray());
+                    picture.CopyTo(ms);
+                    model.Picture = Convert.ToBase64String(ms.ToArray());
                 }
             }
 
@@ -140,7 +140,7 @@ namespace Sheaft.Manage.Controllers
                 Id = model.Id,
                 Description = model.Description,
                 Name = model.Name,
-                Image = model.Image,
+                Picture = model.Picture,
                 Kind = model.Kind
             }, token);
 

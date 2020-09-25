@@ -4,14 +4,14 @@ using Sheaft.Core;
 
 namespace Sheaft.Application.Commands
 {
-    public class UpdateUserPictureCommand : Command<bool>
+    public class UpdateProductPictureCommand : Command<string>
     {
         [JsonConstructor]
-        public UpdateUserPictureCommand(RequestUser requestUser) : base(requestUser)
+        public UpdateProductPictureCommand(RequestUser requestUser) : base(requestUser)
         {
         }
 
-        public Guid Id { get; set; }
+        public Guid ProductId { get; set; }
         public string Picture { get; set; }
     }
 }

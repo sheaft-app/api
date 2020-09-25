@@ -34,7 +34,7 @@ namespace Sheaft.Application.Handlers
 
                 entity.SetName(request.Name);
                 entity.SetDescription(request.Description);
-                entity.SetImage(request.Image);
+                entity.SetPicture(request.Picture);
                 entity.SetEmail(request.Email);
                 entity.SetPhone(request.Phone);
                 entity.SetContact(request.Contact);
@@ -58,7 +58,7 @@ namespace Sheaft.Application.Handlers
 
                 entity.SetName(request.Name);
                 entity.SetDescription(request.Description);
-                entity.SetImage(request.Image);
+                entity.SetPicture(request.Picture);
                 entity.SetEmail(request.Email);
                 entity.SetPhone(request.Phone);
                 entity.SetContact(request.Contact);

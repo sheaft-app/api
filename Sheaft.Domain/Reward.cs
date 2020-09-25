@@ -24,7 +24,7 @@ namespace Sheaft.Domain.Models
         public DateTimeOffset? RemovedOn { get; private set; }
         public string Name { get; private set; }
         public string Description { get; private set; }
-        public string Image { get; private set; }
+        public string Picture { get; private set; }
         public string Contact { get; private set; }
         public string Email { get; private set; }
         public string Phone { get; private set; }
@@ -50,12 +50,12 @@ namespace Sheaft.Domain.Models
             Description = description;
         }
 
-        public void SetImage(string image)
+        public void SetPicture(string picture)
         {
-            if (image == null)
+            if (picture == null)
                 return;
 
-            Image = image;
+            Picture = picture;
         }
 
         public void SetContact(string contact)

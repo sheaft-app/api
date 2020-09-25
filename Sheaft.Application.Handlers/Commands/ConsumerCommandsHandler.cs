@@ -11,7 +11,6 @@ using Sheaft.Application.Interop;
 using Sheaft.Options;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Caching.Distributed;
 
 namespace Sheaft.Application.Handlers
 {
@@ -20,23 +19,16 @@ namespace Sheaft.Application.Handlers
         IRequestHandler<UpdateConsumerCommand, Result<bool>>,
         IRequestHandler<CheckConsumerConfigurationCommand, Result<bool>>
     {
-        private readonly IImageService _imageService;
         private readonly RoleOptions _roleOptions;
-        private readonly IDistributedCache _cache;
 
         public ConsumerCommandsHandler(
             ISheaftMediatr mediatr,
             IAppDbContext context,
-            IImageService imageService,
             ILogger<ConsumerCommandsHandler> logger,
-            IOptionsSnapshot<RoleOptions> roleOptions,
-            IDistributedCache cache)
+            IOptionsSnapshot<RoleOptions> roleOptions)
             : base(mediatr, context, logger)
         {
-            _imageService = imageService;
             _roleOptions = roleOptions.Value;
-
-            _cache = cache;
         }
 
         public async Task<Result<Guid>> Handle(RegisterConsumerCommand request, CancellationToken token)
@@ -50,33 +42,34 @@ namespace Sheaft.Application.Handlers
                         return Conflict<Guid>(MessageKind.Register_User_AlreadyExists);
 
                     consumer = new Consumer(request.Id, request.Email, request.FirstName, request.LastName, request.Phone);
-
-                    var resultImage = await _imageService.HandleUserImageAsync(request.Id, request.Picture, token);
-                    if (!resultImage.Success)
-                        return Failed<Guid>(resultImage.Exception);
-
-                    consumer.SetPicture(resultImage.Data);
-
                     await _context.AddAsync(consumer, token);
                     await _context.SaveChangesAsync(token);
 
-                    var result = await _mediatr.Process(new UpdateAuthUserCommand(request.RequestUser)
+                    var resultImage = await _mediatr.Process(new UpdateUserPictureCommand(request.RequestUser) { 
+                            UserId = consumer.Id, 
+                            Picture = request.Picture, 
+                            SkipAuthUpdate = true 
+                        }, token);
+
+                    if (!resultImage.Success)
+                        return Failed<Guid>(resultImage.Exception);
+
+                    var authResult = await _mediatr.Process(new UpdateAuthUserCommand(request.RequestUser)
                     {
                         Email = consumer.Email,
                         FirstName = consumer.FirstName,
                         LastName = consumer.LastName,
                         Name = consumer.Name,
                         Phone = consumer.Phone,
-                        Picture = consumer.Picture,
+                        Picture = resultImage.Data,
                         Roles = new List<Guid> { _roleOptions.Consumer.Id },
                         UserId = consumer.Id
                     }, token);
 
-                    if (!result.Success)
-                        return Failed<Guid>(result.Exception);
+                    if (!authResult.Success)
+                        return Failed<Guid>(authResult.Exception);
 
                     await transaction.CommitAsync(token);
-                    await _cache.RemoveAsync(consumer.Id.ToString("N"));
 
                     if (!string.IsNullOrWhiteSpace(request.SponsoringCode))
                     {
@@ -99,14 +92,18 @@ namespace Sheaft.Application.Handlers
                 consumer.SetFirstname(request.FirstName);
                 consumer.SetLastname(request.LastName);
 
-                var resultImage = await _imageService.HandleUserImageAsync(request.Id, request.Picture, token);
-                if (!resultImage.Success)
-                    return Failed<bool>(resultImage.Exception);
-
-                consumer.SetPicture(resultImage.Data);
-
                 _context.Update(consumer);
                 await _context.SaveChangesAsync(token);
+
+                var resultImage = await _mediatr.Process(new UpdateUserPictureCommand(request.RequestUser)
+                {
+                    UserId = consumer.Id,
+                    Picture = request.Picture,
+                    SkipAuthUpdate = true
+                }, token);
+
+                if (!resultImage.Success)
+                    return Failed<bool>(resultImage.Exception);
 
                 var authResult = await _mediatr.Process(new UpdateAuthUserCommand(request.RequestUser)
                 {
@@ -123,7 +120,6 @@ namespace Sheaft.Application.Handlers
                 if (!authResult.Success)
                     return authResult;
 
-                await _cache.RemoveAsync(consumer.Id.ToString("N"));
                 return Ok(true);
             });
         }

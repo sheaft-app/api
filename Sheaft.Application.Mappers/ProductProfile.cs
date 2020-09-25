@@ -17,16 +17,16 @@ namespace Sheaft.Application.Mappers
                 .ForMember(d => d.Tags, opt => opt.MapFrom(r => r.Tags.Select(t => t.Tag)))
                 .ForMember(d => d.IsReturnable, opt => opt.MapFrom(r => r.Returnable != null))
                 .ForMember(d => d.Returnable, opt => opt.MapFrom(r => r.Returnable))
-                .ForMember(d => d.Picture, opt => opt.MapFrom(r => CoreProductExtensions.GetImageUrl(r.Image, ImageSize.LARGE)))
-                .ForMember(d => d.ImageLarge, opt => opt.MapFrom(r => CoreProductExtensions.GetImageUrl(r.Image, ImageSize.LARGE)))
-                .ForMember(d => d.ImageMedium, opt => opt.MapFrom(r => CoreProductExtensions.GetImageUrl(r.Image, ImageSize.MEDIUM)))
-                .ForMember(d => d.ImageSmall, opt => opt.MapFrom(r => CoreProductExtensions.GetImageUrl(r.Image, ImageSize.SMALL)));
+                .ForMember(d => d.Picture, opt => opt.MapFrom(r => CoreProductExtensions.GetPictureUrl(r.Picture, PictureSize.LARGE)))
+                .ForMember(d => d.ImageLarge, opt => opt.MapFrom(r => CoreProductExtensions.GetPictureUrl(r.Picture, PictureSize.LARGE)))
+                .ForMember(d => d.ImageMedium, opt => opt.MapFrom(r => CoreProductExtensions.GetPictureUrl(r.Picture, PictureSize.MEDIUM)))
+                .ForMember(d => d.ImageSmall, opt => opt.MapFrom(r => CoreProductExtensions.GetPictureUrl(r.Picture, PictureSize.SMALL)));
 
             CreateMap<Product, ProductViewModel>()
                 .ForMember(d => d.Producer, opt => opt.MapFrom(r => r.Producer))
                 .ForMember(d => d.Tags, opt => opt.MapFrom(r => r.Tags.Select(t => t.Tag.Id)))
                 .ForMember(d => d.ReturnableId, opt => opt.MapFrom(r => r.Returnable.Id))
-                .ForMember(d => d.Picture, opt => opt.MapFrom(r => CoreProductExtensions.GetImageUrl(r.Image, ImageSize.LARGE)));
+                .ForMember(d => d.Picture, opt => opt.MapFrom(r => CoreProductExtensions.GetPictureUrl(r.Picture, PictureSize.LARGE)));
 
             CreateMap<CreateProductInput, CreateProductCommand>();
             CreateMap<UpdateProductInput, UpdateProductCommand>();

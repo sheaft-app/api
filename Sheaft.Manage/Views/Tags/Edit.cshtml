@@ -31,12 +31,12 @@
                 @Html.DropDownListFor(c => c.Kind, kinds, new { @class = "form-control" })
             </div>
             <div class="form-group">
-                @Html.LabelFor(c => c.Image, new { @class = "form-label" })
-                @if (!string.IsNullOrWhiteSpace(Model.Image))
+                @Html.LabelFor(c => c.Picture, new { @class = "form-label" })
+                @if (!string.IsNullOrWhiteSpace(Model.Picture))
                 {
-                    <img src="@Model.Image" height="100" />
+                    <img src="@Model.Picture" height="100" />
                 }
-                @Html.TextBoxFor(c => c.Image, new { @class = "form-control", @type = "file" })
+                @Html.TextBoxFor(c => c.Picture, new { @class = "form-control", @type = "file" })
             </div>
             <div class="form-group">
                 @Html.LabelFor(m => m.Description)

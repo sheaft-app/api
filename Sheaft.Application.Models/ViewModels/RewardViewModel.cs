@@ -12,7 +12,7 @@ namespace Sheaft.Application.Models
         public DateTimeOffset? RemovedOn { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
-        public string Image { get; set; }
+        public string Picture { get; set; }
         public string Contact { get; set; }
         public string Email { get; set; }
         public string Phone { get; set; }

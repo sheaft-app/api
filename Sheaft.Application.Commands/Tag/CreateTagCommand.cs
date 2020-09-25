@@ -15,6 +15,6 @@ namespace Sheaft.Application.Commands
         public string Name { get; set; }
         public string Description { get; set; }
         public TagKind Kind { get; set; }
-        public string Image { get; set; }
+        public string Picture { get; set; }
     }
 }

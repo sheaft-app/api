@@ -326,10 +326,10 @@ namespace Sheaft.GraphQL.Types
                 .Type<NonNullType<BooleanType>>();
 
             //USER
-            descriptor.Field(c => c.UpdateUserPictureAsync(default))
+            descriptor.Field(c => c.UpdateUserPictureAsync(default, default))
                 .Name("updateUserPicture")
                 .Authorize(Policies.REGISTERED)
-                .Type<NonNullType<BooleanType>>();
+                .Type<NonNullType<UserProfileType>>();
 
             descriptor.Field(c => c.RemoveUserAsync(default))
                 .Name("removeUser")

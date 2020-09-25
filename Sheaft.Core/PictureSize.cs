@@ -1,6 +1,6 @@
 ﻿namespace Sheaft.Core.Models
 {
-    public static class ImageSize
+    public static class PictureSize
     {
         public const string LARGE = "large";
         public const string MEDIUM = "medium";

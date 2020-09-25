@@ -65,7 +65,7 @@ namespace Sheaft.Infrastructure.Services
                 var containerClient = new BlobContainerClient(_storageOptions.ConnectionString, _storageOptions.Containers.Pictures);
                 await containerClient.CreateIfNotExistsAsync(cancellationToken: token);
 
-                var blobClient = containerClient.GetBlobClient(CoreProductExtensions.GetImageUrl(userId, productId, filename, size));
+                var blobClient = containerClient.GetBlobClient(CoreProductExtensions.GetPictureUrl(userId, productId, filename, size));
 
                 stream.Position = 0;
                 await blobClient.UploadAsync(stream, token);

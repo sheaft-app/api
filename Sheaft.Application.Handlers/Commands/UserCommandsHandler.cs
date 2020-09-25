@@ -15,27 +15,23 @@ using Microsoft.Extensions.Logging;
 using Sheaft.Exceptions;
 using Sheaft.Options;
 using Microsoft.Extensions.Options;
-using Microsoft.Extensions.Caching.Distributed;
 using System.Collections.Generic;
 
 namespace Sheaft.Application.Handlers
 {
     public class UserCommandsHandler : ResultsHandler,
-            IRequestHandler<QueueExportUserDataCommand, Result<Guid>>,
-            IRequestHandler<ExportUserDataCommand, Result<bool>>,
-            IRequestHandler<GenerateUserCodeCommand, Result<string>>,
-            IRequestHandler<CreateUserPointsCommand, Result<bool>>,
-            IRequestHandler<ChangeUserRolesCommand, Result<bool>>,
-            IRequestHandler<UpdateUserPictureCommand, Result<bool>>,
-            IRequestHandler<RemoveUserCommand, Result<bool>>,
-            IRequestHandler<RemoveUserDataCommand, Result<string>>
+        IRequestHandler<QueueExportUserDataCommand, Result<Guid>>,
+        IRequestHandler<ExportUserDataCommand, Result<bool>>,
+        IRequestHandler<GenerateUserCodeCommand, Result<string>>,
+        IRequestHandler<CreateUserPointsCommand, Result<bool>>,
+        IRequestHandler<ChangeUserRolesCommand, Result<bool>>,
+        IRequestHandler<RemoveUserCommand, Result<bool>>,
+        IRequestHandler<RemoveUserDataCommand, Result<string>>
     {
         private readonly IIdentifierService _identifierService;
         private readonly IBlobService _blobService;
-        private readonly IImageService _imageService;
         private readonly ScoringOptions _scoringOptions;
         private readonly RoleOptions _roleOptions;
-        private readonly IDistributedCache _cache;
 
         public UserCommandsHandler(
             IOptionsSnapshot<ScoringOptions> scoringOptions,
@@ -43,18 +39,14 @@ namespace Sheaft.Application.Handlers
             IIdentifierService identifierService,
             IAppDbContext context,
             IBlobService blobService,
-            IImageService imageService,
             ILogger<UserCommandsHandler> logger,
-            IOptionsSnapshot<RoleOptions> roleOptions,
-            IDistributedCache cache)
+            IOptionsSnapshot<RoleOptions> roleOptions)
             : base(mediatr, context, logger)
         {
-            _imageService = imageService;
             _roleOptions = roleOptions.Value;
             _scoringOptions = scoringOptions.Value;
             _identifierService = identifierService;
             _blobService = blobService;
-            _cache = cache;
         }
 
         public async Task<Result<bool>> Handle(ChangeUserRolesCommand request, CancellationToken token)
@@ -98,9 +90,9 @@ namespace Sheaft.Application.Handlers
                     return result;
 
                 _context.Update(entity);
-                await _cache.RemoveAsync(entity.Id.ToString("N"));
+                await _context.SaveChangesAsync(token);
 
-                return Ok(await _context.SaveChangesAsync(token) > 0);
+                return Ok(true);
             });
         }
 
@@ -133,33 +125,6 @@ namespace Sheaft.Application.Handlers
                 await _blobService.CleanUserStorageAsync(request.Id, token);
 
                 return Ok(request.Email);
-            });
-        }
-
-        public async Task<Result<bool>> Handle(UpdateUserPictureCommand request, CancellationToken token)
-        {
-            return await ExecuteAsync(async () =>
-            {
-                var entity = await _context.GetByIdAsync<User>(request.Id, token);
-
-                var resultImage = await _imageService.HandleUserImageAsync(request.Id, request.Picture, token);
-                if (!resultImage.Success)
-                    return Failed<bool>(resultImage.Exception);
-
-                entity.SetPicture(resultImage.Data);
-
-                var result = await _mediatr.Process(new UpdateAuthUserPictureCommand(request.RequestUser)
-                {
-                    Picture = entity.Picture,
-                    UserId = entity.Id
-                }, token);
-
-                if (!result.Success)
-                    return result;
-
-                _context.Update(entity);
-
-                return Ok(await _context.SaveChangesAsync(token) > 0);
             });
         }
 
@@ -271,7 +236,6 @@ namespace Sheaft.Application.Handlers
                     await _context.SaveChangesAsync(token);
                     await transaction.CommitAsync(token);
 
-                    await _cache.RemoveAsync(entity.Id.ToString("N"));
                     await _mediatr.Post(new RemoveUserDataCommand(request.RequestUser) { Id = request.Id, Email = entity.Email }, token);
 
                     return Ok(true);

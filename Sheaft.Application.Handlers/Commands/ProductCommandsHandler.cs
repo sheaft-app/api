@@ -29,35 +29,30 @@ namespace Sheaft.Application.Handlers
         IRequestHandler<DeleteProductCommand, Result<bool>>,
         IRequestHandler<QueueImportProductsCommand, Result<Guid>>,
         IRequestHandler<ImportProductsCommand, Result<bool>>,
-        IRequestHandler<UpdateProductPictureCommand, Result<bool>>,
         IRequestHandler<RestoreProductCommand, Result<bool>>
     {
         private readonly IIdentifierService _identifierService;
         private readonly IBlobService _blobService;
-        private readonly IImageService _imageService;
 
         public ProductCommandsHandler(
             ISheaftMediatr mediatr,
             IAppDbContext context,
             IIdentifierService identifierService,
             IBlobService blobService,
-            IImageService imageService,
             ILogger<ProductCommandsHandler> logger)
             : base(mediatr, context, logger)
         {
             _identifierService = identifierService;
             _blobService = blobService;
-            _imageService = imageService;
         }
 
         public async Task<Result<Guid>> Handle(CreateProductCommand request, CancellationToken token)
         {
             return await ExecuteAsync(async () =>
             {
-                var producer = await _context.GetByIdAsync<Producer>(request.RequestUser.Id, token);
                 if (!string.IsNullOrWhiteSpace(request.Reference))
                 {
-                    var existingEntity = await _context.FindSingleAsync<Product>(p => p.Reference == request.Reference && p.Producer.Id == producer.Id, token);
+                    var existingEntity = await _context.FindSingleAsync<Product>(p => p.Reference == request.Reference && p.Producer.Id == request.RequestUser.Id, token);
                     if (existingEntity != null)
                         return ValidationError<Guid>(MessageKind.CreateProduct_Reference_AlreadyExists, request.Reference);
                 }
@@ -70,6 +65,7 @@ namespace Sheaft.Application.Handlers
                     request.Reference = resultIdentifier.Data;
                 }
 
+                var producer = await _context.GetByIdAsync<Producer>(request.RequestUser.Id, token);
                 var entity = new Product(Guid.NewGuid(), request.Reference, request.Name, request.WholeSalePricePerUnit, request.Conditioning, request.Unit, request.QuantityPerUnit, request.Vat, producer);
 
                 entity.SetDescription(request.Description);
@@ -85,16 +81,13 @@ namespace Sheaft.Application.Handlers
                 var tags = await _context.FindAsync<Tag>(t => request.Tags.Contains(t.Id), token);
                 entity.SetTags(tags);
 
-                var resultImage = await _imageService.HandleProductImageAsync(entity, request.Picture, token);
-                if (!resultImage.Success)
-                    return Failed<Guid>(resultImage.Exception);
-
-                entity.SetImage(resultImage.Data);
-
                 await _context.AddAsync(entity, token);
                 await _context.SaveChangesAsync(token);
 
-                _logger.LogInformation($"Product {entity.Id} successfully created by {request.RequestUser.Id}");
+                var imageResult = await _mediatr.Process(new UpdateProductPictureCommand(request.RequestUser) { ProductId = entity.Id, Picture = request.Picture }, token);
+                if (!imageResult.Success)
+                    return Failed<Guid>(imageResult.Exception);
+
                 return Created(entity.Id);
             });
         }
@@ -103,7 +96,6 @@ namespace Sheaft.Application.Handlers
         {
             return await ExecuteAsync(async () =>
             {
-                var producer = await _context.GetByIdAsync<Producer>(request.RequestUser.Id, token);
                 var entity = await _context.GetByIdAsync<Product>(request.Id, token);
 
                 entity.SetName(request.Name);
@@ -129,17 +121,14 @@ namespace Sheaft.Application.Handlers
                 var tags = await _context.FindAsync<Tag>(t => request.Tags.Contains(t.Id), token);
                 entity.SetTags(tags);
 
-                var resultImage = await _imageService.HandleProductImageAsync(entity, request.Picture, token);
-                if (!resultImage.Success)
-                    return Failed<bool>(resultImage.Exception);
-
-                entity.SetImage(resultImage.Data);
-
                 _context.Update(entity);
-                var result = await _context.SaveChangesAsync(token);
+                await _context.SaveChangesAsync(token);
 
-                _logger.LogInformation($"Product {entity.Id} successfully edited by {request.RequestUser.Id}");
-                return Ok(result > 0);
+                var imageResult = await _mediatr.Process(new UpdateProductPictureCommand(request.RequestUser) { ProductId = entity.Id, Picture = request.Picture }, token);
+                if (!imageResult.Success)
+                    return Failed<bool>(imageResult.Exception);
+
+                return Ok(true);
             });
         }
 
@@ -153,12 +142,10 @@ namespace Sheaft.Application.Handlers
                 entity.AddRating(user, request.Value, request.Comment);
                 _context.Update(entity);
 
-                var result = await _context.SaveChangesAsync(token);
-
+                await _context.SaveChangesAsync(token);
                 await _mediatr.Post(new CreateUserPointsCommand(request.RequestUser) { CreatedOn = DateTimeOffset.UtcNow, Kind = PointKind.RateProduct, UserId = request.RequestUser.Id }, token);
 
-                _logger.LogInformation($"Product {entity.Id} successfully rated by {request.RequestUser.Id}");
-                return Ok(result > 0);
+                return Ok(true);
             });
         }
 
@@ -189,10 +176,9 @@ namespace Sheaft.Application.Handlers
                 entity.SetAvailable(request.Available);
 
                 _context.Update(entity);
-                var result = await _context.SaveChangesAsync(token);
+                await _context.SaveChangesAsync(token);
 
-                _logger.LogInformation($"Product {entity.Id} successfully switched as available {request.Available} by {request.RequestUser.Id}");
-                return Ok(result > 0);
+                return Ok(true);
             });
         }
 
@@ -222,10 +208,8 @@ namespace Sheaft.Application.Handlers
                 var entity = await _context.GetByIdAsync<Product>(request.Id, token);
                 _context.Remove(entity);
 
-                var result = await _context.SaveChangesAsync(token);
-
-                _logger.LogInformation($"Product {entity.Id} successfully deleted by {request.RequestUser.Id}");
-                return Ok(result > 0);
+                await _context.SaveChangesAsync(token);
+                return Ok(true);
             });
         }
 
@@ -246,8 +230,6 @@ namespace Sheaft.Application.Handlers
                 await _context.SaveChangesAsync(token);
 
                 await _mediatr.Post(entity, token);
-                _logger.LogInformation($"Import products {entity.Id} successfully created by {request.RequestUser.Id}");
-
                 return Created(entity.Id);
             });
         }
@@ -306,8 +288,6 @@ namespace Sheaft.Application.Handlers
                         throw result.Exception;
 
                     await _mediatr.Post(new ProductImportSucceededEvent(request.RequestUser) { JobId = job.Id }, token);
-
-                    _logger.LogInformation($"Products import Job {job.Id} successfully processed");
                     return result;
                 }
                 catch (Exception e)
@@ -318,37 +298,15 @@ namespace Sheaft.Application.Handlers
             });
         }
 
-        public async Task<Result<bool>> Handle(UpdateProductPictureCommand request, CancellationToken token)
-        {
-            return await ExecuteAsync(async () =>
-            {
-                var entity = await _context.GetByIdAsync<Product>(request.Id, token);
-
-                var resultImage = await _imageService.HandleProductImageAsync(entity, request.Picture, token);
-                if (!resultImage.Success)
-                    return Failed<bool>(resultImage.Exception);
-
-                entity.SetImage(resultImage.Data);
-
-                _context.Update(entity);
-                var result = await _context.SaveChangesAsync(token);
-
-                _logger.LogInformation($"Product {entity.Id} image, successfully updated by {request.RequestUser.Id}");
-                return Ok(result > 0);
-            });
-        }
-
         public async Task<Result<bool>> Handle(RestoreProductCommand request, CancellationToken token)
         {
             return await ExecuteAsync(async () =>
             {
                 var entity = await _context.Products.SingleOrDefaultAsync(a => a.Id == request.Id && a.RemovedOn.HasValue, token);
-
                 _context.Restore(entity);
-                var result = await _context.SaveChangesAsync(token);
 
-                _logger.LogInformation($"Product {entity.Id} successfully restored by {request.RequestUser.Id}");
-                return Ok(result > 0);
+                await _context.SaveChangesAsync(token);
+                return Ok(true);
             });
         }
 

@@ -51,7 +51,7 @@ namespace Sheaft.Domain.Models
         public decimal VatPricePerUnit { get; private set; }
         public decimal OnSalePricePerUnit { get; private set; }
         public string Description { get; private set; }
-        public string Image { get; private set; }
+        public string Picture { get; private set; }
         public UnitKind Unit { get; private set; }
         public decimal QuantityPerUnit { get; private set; }
         public ConditioningKind Conditioning { get; private set; }
@@ -99,12 +99,12 @@ namespace Sheaft.Domain.Models
                 AddTags(tags);
         }
 
-        public void SetImage(string image)
+        public void SetPicture(string picture)
         {
-            if (image == null)
+            if (picture == null)
                 return;
 
-            Image = image;
+            Picture = picture;
         }
 
         public void SetWholeSalePricePerUnit(decimal newPrice)

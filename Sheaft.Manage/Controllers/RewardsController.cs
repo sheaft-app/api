@@ -84,7 +84,7 @@ namespace Sheaft.Manage.Controllers
                 Description = model.Description,
                 Url = model.Url,
                 Email = model.Email,
-                Image = model.Image,
+                Picture = model.Picture,
                 Phone = model.Phone,
                 DepartmentId = model.DepartmentId,
                 LevelId = model.LevelId
@@ -134,7 +134,7 @@ namespace Sheaft.Manage.Controllers
                 Description = model.Description,
                 Url = model.Url,
                 Email = model.Email,
-                Image = model.Image,
+                Picture = model.Picture,
                 Phone = model.Phone,
                 DepartmentId = model.DepartmentId,
                 LevelId = model.LevelId

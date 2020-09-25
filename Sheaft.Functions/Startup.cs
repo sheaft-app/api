@@ -82,7 +82,7 @@ namespace Sheaft.Functions
             builder.Services.AddScoped<IBlobService, BlobService>();
             builder.Services.AddScoped<IEmailService, EmailService>();
             builder.Services.AddScoped<ISignalrService, SignalrService>();
-            builder.Services.AddScoped<IImageService, ImageService>();
+            builder.Services.AddScoped<IPictureService, PictureService>();
             builder.Services.AddScoped<IPspService, PspService>();
             builder.Services.AddScoped<IFeesService, FeesService>();
             builder.Services.AddScoped<ISheaftMediatr, SheaftMediatr>();

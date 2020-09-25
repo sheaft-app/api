@@ -40,17 +40,17 @@ namespace Sheaft.Application.Queries
             return await Task.FromResult(jwtToken);
         }
 
-        public IQueryable<UserDto> GetUser(RequestUser currentUser)
+        public IQueryable<UserDto> GetUser(Guid id, RequestUser currentUser)
         {
             return _context.Users.OfType<User>()
-                    .Get(c => c.Id == currentUser.Id)
+                    .Get(c => c.Id == id)
                     .ProjectTo<UserDto>(_configurationProvider);
         }
 
-        public IQueryable<UserProfileDto> GetUserProfile(RequestUser currentUser)
+        public IQueryable<UserProfileDto> GetUserProfile(Guid id, RequestUser currentUser)
         {
             return _context.Users.OfType<User>()
-                    .Get(c => c.Id == currentUser.Id)
+                    .Get(c => c.Id == id)
                     .ProjectTo<UserProfileDto>(_configurationProvider);
         }
     }

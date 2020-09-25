@@ -10,7 +10,7 @@ namespace Sheaft.GraphQL.Types
             descriptor.Field(c => c.Id).Type<NonNullType<IdType>>();
             descriptor.Field(c => c.CreatedOn);
             descriptor.Field(c => c.UpdatedOn);
-            descriptor.Field(c => c.Image);
+            descriptor.Field(c => c.Picture);
             descriptor.Field(c => c.Contact);
             descriptor.Field(c => c.Email);
             descriptor.Field(c => c.Phone);

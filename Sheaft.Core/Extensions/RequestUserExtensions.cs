@@ -27,21 +27,21 @@ namespace Sheaft.Core.Extensions
 
     public static class CoreProductExtensions
     {
-        public static string GetImageUrl(Guid userId, Guid productId, string filename, string size)
+        public static string GetPictureUrl(Guid userId, Guid productId, string filename, string size)
         {
             if (string.IsNullOrWhiteSpace(filename))
                 return null;
 
             return $"users/{userId:N}/products/{productId:N}/{filename}_{size}.jpg";
         }
-        public static string GetImageUrl(Guid userId, Guid productId, string filename)
+        public static string GetPictureUrl(Guid userId, Guid productId, string filename)
         {
             if (string.IsNullOrWhiteSpace(filename))
                 return null;
 
             return $"users/{userId:N}/products/{productId:N}/{filename}";
         }
-        public static string GetImageUrl(string image, string size)
+        public static string GetPictureUrl(string image, string size)
         {
             if (string.IsNullOrWhiteSpace(image))
                 return null;
