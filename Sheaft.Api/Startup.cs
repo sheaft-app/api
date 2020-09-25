@@ -203,6 +203,7 @@ namespace Sheaft.Api
             services.AddScoped<IPspService, PspService>();
             services.AddScoped<IFeesService, FeesService>();
             services.AddScoped<ISheaftMediatr, SheaftMediatr>();
+            services.AddScoped<IAuthService, AuthService>();
 
             services.AddScoped<IAgreementQueries, AgreementQueries>();
             services.AddScoped<IBusinessQueries, BusinessQueries>();

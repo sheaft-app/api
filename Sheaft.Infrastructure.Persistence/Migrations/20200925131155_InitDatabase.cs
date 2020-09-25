@@ -127,7 +127,7 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                     RemovedOn = table.Column<DateTimeOffset>(nullable: true),
                     Name = table.Column<string>(nullable: false),
                     Description = table.Column<string>(nullable: true),
-                    Image = table.Column<string>(nullable: true)
+                    Picture = table.Column<string>(nullable: true)
                 },
                 constraints: table =>
                 {
@@ -698,7 +698,7 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                     RemovedOn = table.Column<DateTimeOffset>(nullable: true),
                     Name = table.Column<string>(nullable: false),
                     Description = table.Column<string>(nullable: true),
-                    Image = table.Column<string>(nullable: true),
+                    Picture = table.Column<string>(nullable: true),
                     Contact = table.Column<string>(nullable: true),
                     Email = table.Column<string>(nullable: true),
                     Phone = table.Column<string>(nullable: true),
@@ -1009,7 +1009,7 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                     VatPricePerUnit = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
                     OnSalePricePerUnit = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
                     Description = table.Column<string>(nullable: true),
-                    Image = table.Column<string>(nullable: true),
+                    Picture = table.Column<string>(nullable: true),
                     Unit = table.Column<int>(nullable: false),
                     QuantityPerUnit = table.Column<decimal>(type: "decimal(10,3)", nullable: false),
                     Conditioning = table.Column<int>(nullable: false),
@@ -1040,7 +1040,7 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "PayinTransactions",
+                name: "Payins",
                 columns: table => new
                 {
                     Uid = table.Column<long>(nullable: false)
@@ -1067,31 +1067,31 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_PayinTransactions", x => x.Uid);
+                    table.PrimaryKey("PK_Payins", x => x.Uid);
                     table.ForeignKey(
-                        name: "FK_PayinTransactions_PaymentMethods_CardUid",
+                        name: "FK_Payins_PaymentMethods_CardUid",
                         column: x => x.CardUid,
                         principalTable: "PaymentMethods",
                         principalColumn: "Uid");
                     table.ForeignKey(
-                        name: "FK_PayinTransactions_Users_AuthorUid",
+                        name: "FK_Payins_Users_AuthorUid",
                         column: x => x.AuthorUid,
                         principalTable: "Users",
                         principalColumn: "Uid");
                     table.ForeignKey(
-                        name: "FK_PayinTransactions_Wallets_CreditedWalletUid",
+                        name: "FK_Payins_Wallets_CreditedWalletUid",
                         column: x => x.CreditedWalletUid,
                         principalTable: "Wallets",
                         principalColumn: "Uid");
                     table.ForeignKey(
-                        name: "FK_PayinTransactions_Orders_OrderUid",
+                        name: "FK_Payins_Orders_OrderUid",
                         column: x => x.OrderUid,
                         principalTable: "Orders",
                         principalColumn: "Uid");
                 });
 
             migrationBuilder.CreateTable(
-                name: "PayoutTransactions",
+                name: "Payouts",
                 columns: table => new
                 {
                     Uid = table.Column<long>(nullable: false)
@@ -1116,19 +1116,19 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_PayoutTransactions", x => x.Uid);
+                    table.PrimaryKey("PK_Payouts", x => x.Uid);
                     table.ForeignKey(
-                        name: "FK_PayoutTransactions_Users_AuthorUid",
+                        name: "FK_Payouts_Users_AuthorUid",
                         column: x => x.AuthorUid,
                         principalTable: "Users",
                         principalColumn: "Uid");
                     table.ForeignKey(
-                        name: "FK_PayoutTransactions_PaymentMethods_BankAccountUid",
+                        name: "FK_Payouts_PaymentMethods_BankAccountUid",
                         column: x => x.BankAccountUid,
                         principalTable: "PaymentMethods",
                         principalColumn: "Uid");
                     table.ForeignKey(
-                        name: "FK_PayoutTransactions_Wallets_DebitedWalletUid",
+                        name: "FK_Payouts_Wallets_DebitedWalletUid",
                         column: x => x.DebitedWalletUid,
                         principalTable: "Wallets",
                         principalColumn: "Uid");
@@ -1309,7 +1309,7 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "TransferTransactions",
+                name: "Transfers",
                 columns: table => new
                 {
                     Uid = table.Column<long>(nullable: false)
@@ -1330,42 +1330,42 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                     Credited = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
                     AuthorUid = table.Column<long>(nullable: false),
                     PurchaseOrderUid = table.Column<long>(nullable: false),
-                    PayoutTransactionUid = table.Column<long>(nullable: true),
                     CreditedWalletUid = table.Column<long>(nullable: false),
-                    DebitedWalletUid = table.Column<long>(nullable: false)
+                    DebitedWalletUid = table.Column<long>(nullable: false),
+                    PayoutUid = table.Column<long>(nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_TransferTransactions", x => x.Uid);
+                    table.PrimaryKey("PK_Transfers", x => x.Uid);
                     table.ForeignKey(
-                        name: "FK_TransferTransactions_Users_AuthorUid",
+                        name: "FK_Transfers_Users_AuthorUid",
                         column: x => x.AuthorUid,
                         principalTable: "Users",
                         principalColumn: "Uid");
                     table.ForeignKey(
-                        name: "FK_TransferTransactions_Wallets_CreditedWalletUid",
+                        name: "FK_Transfers_Wallets_CreditedWalletUid",
                         column: x => x.CreditedWalletUid,
                         principalTable: "Wallets",
                         principalColumn: "Uid");
                     table.ForeignKey(
-                        name: "FK_TransferTransactions_Wallets_DebitedWalletUid",
+                        name: "FK_Transfers_Wallets_DebitedWalletUid",
                         column: x => x.DebitedWalletUid,
                         principalTable: "Wallets",
                         principalColumn: "Uid");
                     table.ForeignKey(
-                        name: "FK_TransferTransactions_PayoutTransactions_PayoutTransactionUid",
-                        column: x => x.PayoutTransactionUid,
-                        principalTable: "PayoutTransactions",
+                        name: "FK_Transfers_Payouts_PayoutUid",
+                        column: x => x.PayoutUid,
+                        principalTable: "Payouts",
                         principalColumn: "Uid");
                     table.ForeignKey(
-                        name: "FK_TransferTransactions_PurchaseOrders_PurchaseOrderUid",
+                        name: "FK_Transfers_PurchaseOrders_PurchaseOrderUid",
                         column: x => x.PurchaseOrderUid,
                         principalTable: "PurchaseOrders",
                         principalColumn: "Uid");
                 });
 
             migrationBuilder.CreateTable(
-                name: "RefundTransactions",
+                name: "Refunds",
                 columns: table => new
                 {
                     Uid = table.Column<long>(nullable: false)
@@ -1386,37 +1386,37 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                     Credited = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
                     AuthorUid = table.Column<long>(nullable: false),
                     DebitedWalletUid = table.Column<long>(nullable: false),
-                    PayinTransactionUid = table.Column<long>(nullable: true),
+                    PayinUid = table.Column<long>(nullable: true),
                     CreditedWalletUid = table.Column<long>(nullable: true),
-                    TransferTransactionUid = table.Column<long>(nullable: true)
+                    TransferUid = table.Column<long>(nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_RefundTransactions", x => x.Uid);
+                    table.PrimaryKey("PK_Refunds", x => x.Uid);
                     table.ForeignKey(
-                        name: "FK_RefundTransactions_PayinTransactions_PayinTransactionUid",
-                        column: x => x.PayinTransactionUid,
-                        principalTable: "PayinTransactions",
+                        name: "FK_Refunds_Payins_PayinUid",
+                        column: x => x.PayinUid,
+                        principalTable: "Payins",
                         principalColumn: "Uid");
                     table.ForeignKey(
-                        name: "FK_RefundTransactions_Users_AuthorUid",
+                        name: "FK_Refunds_Users_AuthorUid",
                         column: x => x.AuthorUid,
                         principalTable: "Users",
                         principalColumn: "Uid");
                     table.ForeignKey(
-                        name: "FK_RefundTransactions_Wallets_DebitedWalletUid",
+                        name: "FK_Refunds_Wallets_DebitedWalletUid",
                         column: x => x.DebitedWalletUid,
                         principalTable: "Wallets",
                         principalColumn: "Uid");
                     table.ForeignKey(
-                        name: "FK_RefundTransactions_Wallets_CreditedWalletUid",
+                        name: "FK_Refunds_Wallets_CreditedWalletUid",
                         column: x => x.CreditedWalletUid,
                         principalTable: "Wallets",
                         principalColumn: "Uid");
                     table.ForeignKey(
-                        name: "FK_RefundTransactions_TransferTransactions_TransferTransactionUid",
-                        column: x => x.TransferTransactionUid,
-                        principalTable: "TransferTransactions",
+                        name: "FK_Refunds_Transfers_TransferUid",
+                        column: x => x.TransferUid,
+                        principalTable: "Transfers",
                         principalColumn: "Uid");
                 });
 
@@ -1640,39 +1640,39 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                 columns: new[] { "Uid", "Id", "UserUid", "RemovedOn" });
 
             migrationBuilder.CreateIndex(
-                name: "IX_PayinTransactions_CardUid",
-                table: "PayinTransactions",
+                name: "IX_Payins_CardUid",
+                table: "Payins",
                 column: "CardUid");
 
             migrationBuilder.CreateIndex(
-                name: "IX_PayinTransactions_AuthorUid",
-                table: "PayinTransactions",
+                name: "IX_Payins_AuthorUid",
+                table: "Payins",
                 column: "AuthorUid");
 
             migrationBuilder.CreateIndex(
-                name: "IX_PayinTransactions_CreditedWalletUid",
-                table: "PayinTransactions",
+                name: "IX_Payins_CreditedWalletUid",
+                table: "Payins",
                 column: "CreditedWalletUid");
 
             migrationBuilder.CreateIndex(
-                name: "IX_PayinTransactions_Id",
-                table: "PayinTransactions",
+                name: "IX_Payins_Id",
+                table: "Payins",
                 column: "Id",
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_PayinTransactions_Identifier",
-                table: "PayinTransactions",
+                name: "IX_Payins_Identifier",
+                table: "Payins",
                 column: "Identifier");
 
             migrationBuilder.CreateIndex(
-                name: "IX_PayinTransactions_OrderUid",
-                table: "PayinTransactions",
+                name: "IX_Payins_OrderUid",
+                table: "Payins",
                 column: "OrderUid");
 
             migrationBuilder.CreateIndex(
-                name: "IX_PayinTransactions_Uid_Id_AuthorUid_OrderUid_CreditedWalletUid_RemovedOn",
-                table: "PayinTransactions",
+                name: "IX_Payins_Uid_Id_AuthorUid_OrderUid_CreditedWalletUid_RemovedOn",
+                table: "Payins",
                 columns: new[] { "Uid", "Id", "AuthorUid", "OrderUid", "CreditedWalletUid", "RemovedOn" });
 
             migrationBuilder.CreateIndex(
@@ -1697,34 +1697,34 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                 columns: new[] { "Uid", "Id", "Identifier", "UserUid", "RemovedOn" });
 
             migrationBuilder.CreateIndex(
-                name: "IX_PayoutTransactions_AuthorUid",
-                table: "PayoutTransactions",
+                name: "IX_Payouts_AuthorUid",
+                table: "Payouts",
                 column: "AuthorUid");
 
             migrationBuilder.CreateIndex(
-                name: "IX_PayoutTransactions_BankAccountUid",
-                table: "PayoutTransactions",
+                name: "IX_Payouts_BankAccountUid",
+                table: "Payouts",
                 column: "BankAccountUid");
 
             migrationBuilder.CreateIndex(
-                name: "IX_PayoutTransactions_DebitedWalletUid",
-                table: "PayoutTransactions",
+                name: "IX_Payouts_DebitedWalletUid",
+                table: "Payouts",
                 column: "DebitedWalletUid");
 
             migrationBuilder.CreateIndex(
-                name: "IX_PayoutTransactions_Id",
-                table: "PayoutTransactions",
+                name: "IX_Payouts_Id",
+                table: "Payouts",
                 column: "Id",
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_PayoutTransactions_Identifier",
-                table: "PayoutTransactions",
+                name: "IX_Payouts_Identifier",
+                table: "Payouts",
                 column: "Identifier");
 
             migrationBuilder.CreateIndex(
-                name: "IX_PayoutTransactions_Uid_Id_AuthorUid_BankAccountUid_DebitedWalletUid_RemovedOn",
-                table: "PayoutTransactions",
+                name: "IX_Payouts_Uid_Id_AuthorUid_BankAccountUid_DebitedWalletUid_RemovedOn",
+                table: "Payouts",
                 columns: new[] { "Uid", "Id", "AuthorUid", "BankAccountUid", "DebitedWalletUid", "RemovedOn" });
 
             migrationBuilder.CreateIndex(
@@ -1851,45 +1851,45 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                 columns: new[] { "Uid", "Id", "ProductUid", "UserUid", "RemovedOn" });
 
             migrationBuilder.CreateIndex(
-                name: "IX_RefundTransactions_PayinTransactionUid",
-                table: "RefundTransactions",
-                column: "PayinTransactionUid");
+                name: "IX_Refunds_PayinUid",
+                table: "Refunds",
+                column: "PayinUid");
 
             migrationBuilder.CreateIndex(
-                name: "IX_RefundTransactions_AuthorUid",
-                table: "RefundTransactions",
+                name: "IX_Refunds_AuthorUid",
+                table: "Refunds",
                 column: "AuthorUid");
 
             migrationBuilder.CreateIndex(
-                name: "IX_RefundTransactions_DebitedWalletUid",
-                table: "RefundTransactions",
+                name: "IX_Refunds_DebitedWalletUid",
+                table: "Refunds",
                 column: "DebitedWalletUid");
 
             migrationBuilder.CreateIndex(
-                name: "IX_RefundTransactions_Id",
-                table: "RefundTransactions",
+                name: "IX_Refunds_Id",
+                table: "Refunds",
                 column: "Id",
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_RefundTransactions_Identifier",
-                table: "RefundTransactions",
+                name: "IX_Refunds_Identifier",
+                table: "Refunds",
                 column: "Identifier");
 
             migrationBuilder.CreateIndex(
-                name: "IX_RefundTransactions_Uid_Id_AuthorUid_DebitedWalletUid_RemovedOn",
-                table: "RefundTransactions",
+                name: "IX_Refunds_Uid_Id_AuthorUid_DebitedWalletUid_RemovedOn",
+                table: "Refunds",
                 columns: new[] { "Uid", "Id", "AuthorUid", "DebitedWalletUid", "RemovedOn" });
 
             migrationBuilder.CreateIndex(
-                name: "IX_RefundTransactions_CreditedWalletUid",
-                table: "RefundTransactions",
+                name: "IX_Refunds_CreditedWalletUid",
+                table: "Refunds",
                 column: "CreditedWalletUid");
 
             migrationBuilder.CreateIndex(
-                name: "IX_RefundTransactions_TransferTransactionUid",
-                table: "RefundTransactions",
-                column: "TransferTransactionUid");
+                name: "IX_Refunds_TransferUid",
+                table: "Refunds",
+                column: "TransferUid");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Regions_Code",
@@ -1972,44 +1972,44 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                 columns: new[] { "Uid", "Id", "RemovedOn" });
 
             migrationBuilder.CreateIndex(
-                name: "IX_TransferTransactions_AuthorUid",
-                table: "TransferTransactions",
+                name: "IX_Transfers_AuthorUid",
+                table: "Transfers",
                 column: "AuthorUid");
 
             migrationBuilder.CreateIndex(
-                name: "IX_TransferTransactions_CreditedWalletUid",
-                table: "TransferTransactions",
+                name: "IX_Transfers_CreditedWalletUid",
+                table: "Transfers",
                 column: "CreditedWalletUid");
 
             migrationBuilder.CreateIndex(
-                name: "IX_TransferTransactions_DebitedWalletUid",
-                table: "TransferTransactions",
+                name: "IX_Transfers_DebitedWalletUid",
+                table: "Transfers",
                 column: "DebitedWalletUid");
 
             migrationBuilder.CreateIndex(
-                name: "IX_TransferTransactions_Id",
-                table: "TransferTransactions",
+                name: "IX_Transfers_Id",
+                table: "Transfers",
                 column: "Id",
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_TransferTransactions_Identifier",
-                table: "TransferTransactions",
+                name: "IX_Transfers_Identifier",
+                table: "Transfers",
                 column: "Identifier");
 
             migrationBuilder.CreateIndex(
-                name: "IX_TransferTransactions_PayoutTransactionUid",
-                table: "TransferTransactions",
-                column: "PayoutTransactionUid");
+                name: "IX_Transfers_PayoutUid",
+                table: "Transfers",
+                column: "PayoutUid");
 
             migrationBuilder.CreateIndex(
-                name: "IX_TransferTransactions_PurchaseOrderUid",
-                table: "TransferTransactions",
+                name: "IX_Transfers_PurchaseOrderUid",
+                table: "Transfers",
                 column: "PurchaseOrderUid");
 
             migrationBuilder.CreateIndex(
-                name: "IX_TransferTransactions_Uid_Id_AuthorUid_PurchaseOrderUid_CreditedWalletUid_DebitedWalletUid_RemovedOn",
-                table: "TransferTransactions",
+                name: "IX_Transfers_Uid_Id_AuthorUid_PurchaseOrderUid_CreditedWalletUid_DebitedWalletUid_RemovedOn",
+                table: "Transfers",
                 columns: new[] { "Uid", "Id", "AuthorUid", "PurchaseOrderUid", "CreditedWalletUid", "DebitedWalletUid", "RemovedOn" });
 
             migrationBuilder.CreateIndex(
@@ -2700,7 +2700,7 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
             migrationBuilder.Sql("CREATE VIEW StoresPerDepartment AS select DepartmentId, DepartmentCode, DepartmentName, RegionId, RegionCode, RegionName, sum(Active) AS Active, sum(Created) as Created from ( select d.Id as DepartmentId, d.Code as DepartmentCode, d.Name as DepartmentName, r.Id as RegionId, r.Code as RegionCode, r.Name as RegionName, case when count(p.Uid) > 0 then 1 else 0 end as Active, count(distinct(c.Uid)) as Created from dbo.Departments d join dbo.Regions r on r.Uid = d.RegionUid left join dbo.UserAddresses ca on d.Uid = ca.DepartmentUid left join dbo.Users c on c.Uid = ca.UserUid and c.Kind = 1 left join dbo.Products p on c.Uid = p.ProducerUid group by c.Kind, d.Id, d.Code, d.Name, r.Id, r.Code, r.Name, c.RemovedOn ) cc group by DepartmentId, DepartmentCode, DepartmentName, RegionId, RegionCode, RegionName");
 
             migrationBuilder.Sql("CREATE VIEW ProducersSearch as 	select      r.Id as producer_id      , r.Name as producer_name         , r.Name as partialProducerName      , r.Email as producer_email      , r.Picture as producer_picture      , r.Phone as producer_phone      , ra.Line1 as producer_line1      , ra.Line2 as producer_line2      , ra.Zipcode as producer_zipcode      , ra.City as producer_city      , dbo.InlineMax(r.CreatedOn, dbo.InlineMax(r.UpdatedOn, t.UpdatedOn)) as last_update      , case when r.RemovedOn is null then 0 else 1 end as removed      , '[' + STRING_AGG('\"' + LOWER(t.Name) + '\"', ',') + ']' as producer_tags           , ra.Longitude as producer_longitude      , ra.Latitude as producer_latitude      , geography::STGeomFromText('POINT('+convert(varchar(20),ra.Longitude)+' '+convert(varchar(20),ra.Latitude)+')',4326) as producer_geolocation      , count(p.Id) as producer_products_count     from dbo.Users r      join dbo.UserAddresses ra on r.Uid = ra.UserUid     left join dbo.ProducerTags ct on r.Uid = ct.ProducerUid     left join dbo.Tags t on t.Uid = ct.TagUid     left join dbo.Products p on p.ProducerUid = r.Uid	 	where r.Kind = 0 and r.OpenForNewBusiness = 1   group by 	r.Id,     r.Name,     r.Email, 	r.Picture,     r.Phone,     ra.Line1,     ra.Line2,     ra.Zipcode,     ra.City,     dbo.InlineMax(r.CreatedOn, dbo.InlineMax(r.UpdatedOn, t.UpdatedOn)),     case when r.RemovedOn is null then 0 else 1 end,     ra.Longitude,     ra.Latitude");
-            migrationBuilder.Sql("CREATE VIEW ProductsSearch as     select     p.Id as product_id      , p.Name as product_name      , p.Name as partialProductName 	 , CAST(p.QuantityPerUnit as float) as product_quantityPerUnit	      , case when p.Unit = 0 then 'mL' 			when p.Unit = 1 then 'L' 			when p.Unit = 2 then 'g' 			when p.Unit = 3 then 'kg' end as product_unit														      , CAST(p.OnSalePricePerUnit as float) as product_onSalePricePerUnit      , CAST(p.OnSalePrice as float) as product_onSalePrice      , CAST(p.Rating as float) as product_rating      , p.RatingsCount as product_ratings_count      , case when pa.Uid is not null then cast(1 as bit) else cast(0 as bit) end as packaged      , r.Id as producer_id      , r.Name as producer_name      , r.Email as producer_email      , r.Phone as producer_phone      , ra.Zipcode as producer_zipcode      , ra.City as producer_city 	 , dbo.GetProductImage(p.Id, p.Picture, r.Id, STRING_AGG(LOWER(case when t.Kind = 0 then t.Name end), ',')) as product_image      , dbo.InlineMax(dbo.InlineMax(dbo.InlineMax(p.UpdatedOn, r.UpdatedOn), t.UpdatedOn), p.CreatedOn) as last_update      , case when (dbo.InlineMax(p.RemovedOn, r.RemovedOn)) is null and p.Available = 1 then 0 else 1 end as removed      , '[' + STRING_AGG('\"' + LOWER(t.Name) + '\"', ',') + ']' as product_tags           , ra.Longitude as producer_longitude      , ra.Latitude as producer_latitude      , geography::STGeomFromText('POINT('+convert(varchar(20),ra.Longitude)+' '+convert(varchar(20),ra.Latitude)+')',4326) as producer_geolocation   from dbo.Products p     join dbo.Users r on r.Uid = p.ProducerUid and r.Kind = 0     join dbo.UserAddresses ra on r.Uid = ra.UserUid 	join dbo.DeliveryModes dm on dm.ProducerUid = r.Uid and dm.Kind in (1, 2, 3, 4)      left join dbo.ProductTags pt on p.Uid = pt.ProductUid     left join dbo.Returnables pa on pa.Uid = p.ReturnableUid     left join dbo.Tags t on t.Uid = pt.TagUid   group by     p.Id,     p.Name,    case when p.Unit = 0 then 'mL' 			when p.Unit = 1 then 'L' 			when p.Unit = 2 then 'g' 			when p.Unit = 3 then 'kg' end, 	CAST(p.QuantityPerUnit as float),	 	CAST(p.OnSalePricePerUnit as float),     CAST(p.OnSalePrice as float),     CAST(p.WholeSalePrice as float),     CAST(p.Rating as float),     p.RatingsCount, 	case when pa.Uid is not null then cast(1 as bit) else cast(0 as bit) end, 	r.Id,     r.Name,     r.Email, 	p.Image, 	r.Id,     r.Phone,     ra.Zipcode,     ra.City,     dbo.InlineMax(dbo.InlineMax(dbo.InlineMax(p.UpdatedOn, r.UpdatedOn), t.UpdatedOn), p.CreatedOn),     case when (dbo.InlineMax(p.RemovedOn, r.RemovedOn)) is null and p.Available = 1 then 0 else 1 end,     ra.Longitude,     ra.Latitude");
+            migrationBuilder.Sql("CREATE VIEW ProductsSearch as     select     p.Id as product_id      , p.Name as product_name      , p.Name as partialProductName 	 , CAST(p.QuantityPerUnit as float) as product_quantityPerUnit	      , case when p.Unit = 0 then 'mL' 			when p.Unit = 1 then 'L' 			when p.Unit = 2 then 'g' 			when p.Unit = 3 then 'kg' end as product_unit														      , CAST(p.OnSalePricePerUnit as float) as product_onSalePricePerUnit      , CAST(p.OnSalePrice as float) as product_onSalePrice      , CAST(p.Rating as float) as product_rating      , p.RatingsCount as product_ratings_count      , case when pa.Uid is not null then cast(1 as bit) else cast(0 as bit) end as packaged      , r.Id as producer_id      , r.Name as producer_name      , r.Email as producer_email      , r.Phone as producer_phone      , ra.Zipcode as producer_zipcode      , ra.City as producer_city 	 , dbo.GetProductImage(p.Id, p.Picture, r.Id, STRING_AGG(LOWER(case when t.Kind = 0 then t.Name end), ',')) as product_image      , dbo.InlineMax(dbo.InlineMax(dbo.InlineMax(p.UpdatedOn, r.UpdatedOn), t.UpdatedOn), p.CreatedOn) as last_update      , case when (dbo.InlineMax(p.RemovedOn, r.RemovedOn)) is null and p.Available = 1 then 0 else 1 end as removed      , '[' + STRING_AGG('\"' + LOWER(t.Name) + '\"', ',') + ']' as product_tags           , ra.Longitude as producer_longitude      , ra.Latitude as producer_latitude      , geography::STGeomFromText('POINT('+convert(varchar(20),ra.Longitude)+' '+convert(varchar(20),ra.Latitude)+')',4326) as producer_geolocation   from dbo.Products p     join dbo.Users r on r.Uid = p.ProducerUid and r.Kind = 0     join dbo.UserAddresses ra on r.Uid = ra.UserUid 	join dbo.DeliveryModes dm on dm.ProducerUid = r.Uid and dm.Kind in (1, 2, 3, 4)      left join dbo.ProductTags pt on p.Uid = pt.ProductUid     left join dbo.Returnables pa on pa.Uid = p.ReturnableUid     left join dbo.Tags t on t.Uid = pt.TagUid   group by     p.Id,     p.Name,    case when p.Unit = 0 then 'mL' 			when p.Unit = 1 then 'L' 			when p.Unit = 2 then 'g' 			when p.Unit = 3 then 'kg' end, 	CAST(p.QuantityPerUnit as float),	 	CAST(p.OnSalePricePerUnit as float),     CAST(p.OnSalePrice as float),     CAST(p.WholeSalePrice as float),     CAST(p.Rating as float),     p.RatingsCount, 	case when pa.Uid is not null then cast(1 as bit) else cast(0 as bit) end, 	r.Id,     r.Name,     r.Email, 	p.Picture, 	r.Id,     r.Phone,     ra.Zipcode,     ra.City,     dbo.InlineMax(dbo.InlineMax(dbo.InlineMax(p.UpdatedOn, r.UpdatedOn), t.UpdatedOn), p.CreatedOn),     case when (dbo.InlineMax(p.RemovedOn, r.RemovedOn)) is null and p.Available = 1 then 0 else 1 end,     ra.Longitude,     ra.Latitude");
             migrationBuilder.Sql("CREATE VIEW StoresSearch as     select      r.Id as store_id      , r.Name as store_name       , r.Name as partialStoreName      , r.Email as store_email      , r.Picture as store_picture      , r.Phone as store_phone      , ra.Line1 as store_line1      , ra.Line2 as store_line2      , ra.Zipcode as store_zipcode      , ra.City as store_city      , dbo.InlineMax(r.CreatedOn, dbo.InlineMax(r.UpdatedOn, t.UpdatedOn)) as last_update      , case when r.RemovedOn is null then 0 else 1 end as removed      , '[' + STRING_AGG('\"' + LOWER(t.Name) + '\"', ',') + ']' as store_tags           , ra.Longitude as store_longitude      , ra.Latitude as store_latitude      , geography::STGeomFromText('POINT('+convert(varchar(20),ra.Longitude)+' '+convert(varchar(20),ra.Latitude)+')',4326) as store_geolocation    from dbo.Users r      join dbo.UserAddresses ra on r.Uid = ra.UserUid     left join dbo.StoreTags ct on r.Uid = ct.StoreUid     left join dbo.Tags t on t.Uid = ct.TagUid	 	where r.Kind = 1 and r.OpenForNewBusiness = 1    group by 	r.Id,     r.Name,     r.Email, 	r.Picture,     r.Phone,     ra.Line1,     ra.Line2,     ra.Zipcode,     ra.City,     dbo.InlineMax(r.CreatedOn, dbo.InlineMax(r.UpdatedOn, t.UpdatedOn)),     case when r.RemovedOn is null then 0 else 1 end,     ra.Longitude,     ra.Latitude");
 
             migrationBuilder.Sql("CREATE SCHEMA [Cache]");
@@ -2896,7 +2896,7 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                 name: "Ratings");
 
             migrationBuilder.DropTable(
-                name: "RefundTransactions");
+                name: "Refunds");
 
             migrationBuilder.DropTable(
                 name: "Rewards");
@@ -2932,10 +2932,10 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                 name: "Products");
 
             migrationBuilder.DropTable(
-                name: "PayinTransactions");
+                name: "Payins");
 
             migrationBuilder.DropTable(
-                name: "TransferTransactions");
+                name: "Transfers");
 
             migrationBuilder.DropTable(
                 name: "Tags");
@@ -2953,7 +2953,7 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                 name: "Returnables");
 
             migrationBuilder.DropTable(
-                name: "PayoutTransactions");
+                name: "Payouts");
 
             migrationBuilder.DropTable(
                 name: "PurchaseOrders");

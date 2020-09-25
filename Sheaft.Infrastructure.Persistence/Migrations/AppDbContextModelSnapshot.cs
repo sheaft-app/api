@@ -708,7 +708,7 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                     b.ToTable("OrderProducts");
                 });
 
-            modelBuilder.Entity("Sheaft.Domain.Models.PayinTransaction", b =>
+            modelBuilder.Entity("Sheaft.Domain.Models.Payin", b =>
                 {
                     b.Property<long>("Uid")
                         .ValueGeneratedOnAdd()
@@ -782,7 +782,7 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
 
                     b.HasIndex("Uid", "Id", "AuthorUid", "OrderUid", "CreditedWalletUid", "RemovedOn");
 
-                    b.ToTable("PayinTransactions");
+                    b.ToTable("Payins");
 
                     b.HasDiscriminator<int>("Kind");
                 });
@@ -839,7 +839,7 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                     b.HasDiscriminator<int>("Kind");
                 });
 
-            modelBuilder.Entity("Sheaft.Domain.Models.PayoutTransaction", b =>
+            modelBuilder.Entity("Sheaft.Domain.Models.Payout", b =>
                 {
                     b.Property<long>("Uid")
                         .ValueGeneratedOnAdd()
@@ -913,7 +913,7 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
 
                     b.HasIndex("Uid", "Id", "AuthorUid", "BankAccountUid", "DebitedWalletUid", "RemovedOn");
 
-                    b.ToTable("PayoutTransactions");
+                    b.ToTable("Payouts");
                 });
 
             modelBuilder.Entity("Sheaft.Domain.Models.ProducerTag", b =>
@@ -953,9 +953,6 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                     b.Property<Guid>("Id")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("Image")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -965,6 +962,9 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
 
                     b.Property<decimal>("OnSalePricePerUnit")
                         .HasColumnType("decimal(10,2)");
+
+                    b.Property<string>("Picture")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<long>("ProducerUid")
                         .HasColumnType("bigint");
@@ -1415,7 +1415,7 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                     b.ToTable("Ratings");
                 });
 
-            modelBuilder.Entity("Sheaft.Domain.Models.RefundTransaction", b =>
+            modelBuilder.Entity("Sheaft.Domain.Models.Refund", b =>
                 {
                     b.Property<long>("Uid")
                         .ValueGeneratedOnAdd()
@@ -1484,7 +1484,7 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
 
                     b.HasIndex("Uid", "Id", "AuthorUid", "DebitedWalletUid", "RemovedOn");
 
-                    b.ToTable("RefundTransactions");
+                    b.ToTable("Refunds");
 
                     b.HasDiscriminator<int>("Kind");
                 });
@@ -1636,9 +1636,6 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                     b.Property<Guid>("Id")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("Image")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<long>("LevelUid")
                         .HasColumnType("bigint");
 
@@ -1647,6 +1644,9 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Phone")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Picture")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTimeOffset?>("RemovedOn")
@@ -1730,14 +1730,14 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                     b.Property<Guid>("Id")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("Image")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<int>("Kind")
                         .HasColumnType("int");
 
                     b.Property<string>("Name")
                         .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Picture")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTimeOffset?>("RemovedOn")
@@ -1757,7 +1757,7 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                     b.ToTable("Tags");
                 });
 
-            modelBuilder.Entity("Sheaft.Domain.Models.TransferTransaction", b =>
+            modelBuilder.Entity("Sheaft.Domain.Models.Transfer", b =>
                 {
                     b.Property<long>("Uid")
                         .ValueGeneratedOnAdd()
@@ -1797,7 +1797,7 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                     b.Property<int>("Kind")
                         .HasColumnType("int");
 
-                    b.Property<long?>("PayoutTransactionUid")
+                    b.Property<long?>("PayoutUid")
                         .HasColumnType("bigint");
 
                     b.Property<long>("PurchaseOrderUid")
@@ -1835,13 +1835,13 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
 
                     b.HasIndex("Identifier");
 
-                    b.HasIndex("PayoutTransactionUid");
+                    b.HasIndex("PayoutUid");
 
                     b.HasIndex("PurchaseOrderUid");
 
                     b.HasIndex("Uid", "Id", "AuthorUid", "PurchaseOrderUid", "CreditedWalletUid", "DebitedWalletUid", "RemovedOn");
 
-                    b.ToTable("TransferTransactions");
+                    b.ToTable("Transfers");
                 });
 
             modelBuilder.Entity("Sheaft.Domain.Models.Ubo", b =>
@@ -2113,9 +2113,9 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                     b.HasDiscriminator().HasValue(0);
                 });
 
-            modelBuilder.Entity("Sheaft.Domain.Models.CardPayinTransaction", b =>
+            modelBuilder.Entity("Sheaft.Domain.Models.CardPayin", b =>
                 {
-                    b.HasBaseType("Sheaft.Domain.Models.PayinTransaction");
+                    b.HasBaseType("Sheaft.Domain.Models.Payin");
 
                     b.Property<long>("CardUid")
                         .HasColumnType("bigint");
@@ -2125,9 +2125,9 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                     b.HasDiscriminator().HasValue(1);
                 });
 
-            modelBuilder.Entity("Sheaft.Domain.Models.WebPayinTransaction", b =>
+            modelBuilder.Entity("Sheaft.Domain.Models.WebPayin", b =>
                 {
-                    b.HasBaseType("Sheaft.Domain.Models.PayinTransaction");
+                    b.HasBaseType("Sheaft.Domain.Models.Payin");
 
                     b.Property<string>("RedirectUrl")
                         .HasColumnType("nvarchar(max)");
@@ -2176,31 +2176,31 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                     b.HasDiscriminator().HasValue(1);
                 });
 
-            modelBuilder.Entity("Sheaft.Domain.Models.RefundPayinTransaction", b =>
+            modelBuilder.Entity("Sheaft.Domain.Models.PayinRefund", b =>
                 {
-                    b.HasBaseType("Sheaft.Domain.Models.RefundTransaction");
+                    b.HasBaseType("Sheaft.Domain.Models.Refund");
 
-                    b.Property<long>("PayinTransactionUid")
+                    b.Property<long>("PayinUid")
                         .HasColumnType("bigint");
 
-                    b.HasIndex("PayinTransactionUid");
+                    b.HasIndex("PayinUid");
 
                     b.HasDiscriminator().HasValue(300);
                 });
 
-            modelBuilder.Entity("Sheaft.Domain.Models.RefundTransferTransaction", b =>
+            modelBuilder.Entity("Sheaft.Domain.Models.TransferRefund", b =>
                 {
-                    b.HasBaseType("Sheaft.Domain.Models.RefundTransaction");
+                    b.HasBaseType("Sheaft.Domain.Models.Refund");
 
                     b.Property<long>("CreditedWalletUid")
                         .HasColumnType("bigint");
 
-                    b.Property<long>("TransferTransactionUid")
+                    b.Property<long>("TransferUid")
                         .HasColumnType("bigint");
 
                     b.HasIndex("CreditedWalletUid");
 
-                    b.HasIndex("TransferTransactionUid");
+                    b.HasIndex("TransferUid");
 
                     b.HasDiscriminator().HasValue(301);
                 });
@@ -2543,7 +2543,7 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Sheaft.Domain.Models.PayinTransaction", b =>
+            modelBuilder.Entity("Sheaft.Domain.Models.Payin", b =>
                 {
                     b.HasOne("Sheaft.Domain.Models.User", "Author")
                         .WithMany()
@@ -2558,7 +2558,7 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                         .IsRequired();
 
                     b.HasOne("Sheaft.Domain.Models.Order", "Order")
-                        .WithMany("Transactions")
+                        .WithMany("Payins")
                         .HasForeignKey("OrderUid")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
@@ -2573,7 +2573,7 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Sheaft.Domain.Models.PayoutTransaction", b =>
+            modelBuilder.Entity("Sheaft.Domain.Models.Payout", b =>
                 {
                     b.HasOne("Sheaft.Domain.Models.User", "Author")
                         .WithMany()
@@ -2775,7 +2775,7 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Sheaft.Domain.Models.RefundTransaction", b =>
+            modelBuilder.Entity("Sheaft.Domain.Models.Refund", b =>
                 {
                     b.HasOne("Sheaft.Domain.Models.User", "Author")
                         .WithMany()
@@ -2848,7 +2848,7 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Sheaft.Domain.Models.TransferTransaction", b =>
+            modelBuilder.Entity("Sheaft.Domain.Models.Transfer", b =>
                 {
                     b.HasOne("Sheaft.Domain.Models.User", "Author")
                         .WithMany()
@@ -2868,13 +2868,13 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
-                    b.HasOne("Sheaft.Domain.Models.PayoutTransaction", "Payout")
+                    b.HasOne("Sheaft.Domain.Models.Payout", "Payout")
                         .WithMany("Transfers")
-                        .HasForeignKey("PayoutTransactionUid")
+                        .HasForeignKey("PayoutUid")
                         .OnDelete(DeleteBehavior.NoAction);
 
                     b.HasOne("Sheaft.Domain.Models.PurchaseOrder", "PurchaseOrder")
-                        .WithMany("Transactions")
+                        .WithMany("Transfers")
                         .HasForeignKey("PurchaseOrderUid")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
@@ -3049,7 +3049,7 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Sheaft.Domain.Models.CardPayinTransaction", b =>
+            modelBuilder.Entity("Sheaft.Domain.Models.CardPayin", b =>
                 {
                     b.HasOne("Sheaft.Domain.Models.Card", "Card")
                         .WithMany()
@@ -3058,16 +3058,16 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Sheaft.Domain.Models.RefundPayinTransaction", b =>
+            modelBuilder.Entity("Sheaft.Domain.Models.PayinRefund", b =>
                 {
-                    b.HasOne("Sheaft.Domain.Models.PayinTransaction", "PayinTransaction")
+                    b.HasOne("Sheaft.Domain.Models.Payin", "Payin")
                         .WithMany()
-                        .HasForeignKey("PayinTransactionUid")
+                        .HasForeignKey("PayinUid")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Sheaft.Domain.Models.RefundTransferTransaction", b =>
+            modelBuilder.Entity("Sheaft.Domain.Models.TransferRefund", b =>
                 {
                     b.HasOne("Sheaft.Domain.Models.Wallet", "CreditedWallet")
                         .WithMany()
@@ -3075,9 +3075,9 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
-                    b.HasOne("Sheaft.Domain.Models.TransferTransaction", "TransferTransaction")
+                    b.HasOne("Sheaft.Domain.Models.Transfer", "Transfer")
                         .WithMany()
-                        .HasForeignKey("TransferTransactionUid")
+                        .HasForeignKey("TransferUid")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
                 });
