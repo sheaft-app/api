@@ -235,7 +235,7 @@ namespace Sheaft.Application.Handlers
                         && c.Payin.Status == TransactionStatus.Succeeded
                         && (c.Payin.Refund == null || c.Payin.Status == TransactionStatus.Expired)
                         && c.PurchaseOrders.All(po => po.Status >= PurchaseOrderStatus.Delivered) 
-                        && c.PurchaseOrders.Any(po => po.Status == PurchaseOrderStatus.Cancelled || po.Status == PurchaseOrderStatus.Refused)
+                        && c.PurchaseOrders.Any(po => po.WithdrawnOn.HasValue)
                         && c.PurchaseOrders.Max(po => po.WithdrawnOn) < expiredDate, true)
                 .OrderBy(c => c.CreatedOn)
                 .Select(c => c.Id)

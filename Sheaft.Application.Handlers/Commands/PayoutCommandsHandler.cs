@@ -171,10 +171,6 @@ namespace Sheaft.Application.Handlers
                 if (!checkConfigurationResult.Success)
                     return Failed<Guid>(checkConfigurationResult.Exception);
 
-                var checkDocumentsValidatedResult = await _mediatr.Process(new CheckProducerDocumentsValidatedCommand(request.RequestUser) { ProducerId = request.ProducerId }, token);
-                if (!checkDocumentsValidatedResult.Success)
-                    return Failed<Guid>(checkDocumentsValidatedResult.Exception);
-
                 var wallet = await _context.GetSingleAsync<Wallet>(c => c.User.Id == request.ProducerId, token);
                 var bankAccount = await _context.GetSingleAsync<BankAccount>(c => c.User.Id == request.ProducerId && c.IsActive, token);
 
@@ -187,6 +183,12 @@ namespace Sheaft.Application.Handlers
 
                 var amount = transfers.Sum(t => t.Credited);
                 var fees = hasAlreadyPaidComission || amount < _pspOptions.ProducerFees ? 0m : _pspOptions.ProducerFees;
+                if (!hasAlreadyPaidComission && fees == 0m)
+                    return Failed<Guid>(new InvalidCastException());
+
+                var checkDocumentsValidatedResult = await _mediatr.Process(new CheckProducerDocumentsValidatedCommand(request.RequestUser) { ProducerId = request.ProducerId }, token);
+                if (!checkDocumentsValidatedResult.Success)
+                    return Failed<Guid>(checkDocumentsValidatedResult.Exception);
 
                 using (var transaction = await _context.Database.BeginTransactionAsync(token))
                 {
