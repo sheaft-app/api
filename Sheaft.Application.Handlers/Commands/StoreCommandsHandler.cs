@@ -55,7 +55,7 @@ namespace Sheaft.Application.Handlers
             {
                 using (var transaction = await _context.Database.BeginTransactionAsync(token))
                 {
-                    var store = await _context.FindByIdAsync<Store>(request.Id, token);
+                    var store = await _context.FindByIdAsync<Store>(request.RequestUser.Id, token);
                     if (store != null)
                         return Conflict<Guid>(MessageKind.Register_User_AlreadyExists);
 
@@ -135,7 +135,7 @@ namespace Sheaft.Application.Handlers
                         await _mediatr.Post(new CreateSponsoringCommand(request.RequestUser) { Code = request.SponsoringCode, UserId = store.Id }, token);
                     }
 
-                    return Created(request.Id);
+                    return Created(store.Id);
                 }
             });
         }
