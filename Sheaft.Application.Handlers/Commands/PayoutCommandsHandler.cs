@@ -26,18 +26,21 @@ namespace Sheaft.Application.Handlers
         IRequestHandler<CreatePayoutCommand, Result<Guid>>
     {
         private readonly PspOptions _pspOptions;
+        private readonly RoutineOptions _routineOptions;
         private readonly IPspService _pspService;
 
         public PayoutCommandsHandler(
             ISheaftMediatr mediatr,
             IAppDbContext context,
             IPspService pspService,
+            IOptionsSnapshot<RoutineOptions> routineOptions,
             IOptionsSnapshot<PspOptions> pspOptions,
             ILogger<PayoutCommandsHandler> logger)
             : base(mediatr, context, logger)
         {
             _pspService = pspService;
             _pspOptions = pspOptions.Value;
+            _routineOptions = routineOptions.Value;
         }
 
         public async Task<Result<bool>> Handle(CheckPayoutsCommand request, CancellationToken token)
@@ -47,7 +50,7 @@ namespace Sheaft.Application.Handlers
                 var skip = 0;
                 const int take = 100;
 
-                var expiredDate = DateTimeOffset.UtcNow.AddMinutes(-60);
+                var expiredDate = DateTimeOffset.UtcNow.AddMinutes(-_routineOptions.CheckPayoutsFromMinutes);
                 var payoutIds = await GetNextPayoutIdsAsync(expiredDate, skip, take, token);
 
                 while (payoutIds.Any())
@@ -76,7 +79,7 @@ namespace Sheaft.Application.Handlers
                 if (payout.Status != TransactionStatus.Created && payout.Status != TransactionStatus.Waiting)
                     return Ok(false);
 
-                if (payout.CreatedOn.AddMinutes(10080) < DateTimeOffset.UtcNow && payout.Status == TransactionStatus.Waiting)
+                if (payout.CreatedOn.AddMinutes(_routineOptions.CheckPayoutExpiredFromMinutes) < DateTimeOffset.UtcNow && payout.Status == TransactionStatus.Waiting)
                     return await _mediatr.Process(new ExpirePayoutCommand(request.RequestUser) { PayoutId = request.PayoutId }, token);
 
                 var result = await _mediatr.Process(new RefreshPayoutStatusCommand(request.RequestUser, payout.Identifier), token);
@@ -138,7 +141,7 @@ namespace Sheaft.Application.Handlers
         {
             return await ExecuteAsync(async () =>
             {
-                var expiredDate = DateTimeOffset.UtcNow.AddMinutes(-10080);
+                var expiredDate = DateTimeOffset.UtcNow.AddMinutes(-_routineOptions.CheckNewPayoutsFromMinutes);
 
                 var producersTransfers = await _context.Transfers
                     .Get(t => t.Refund == null

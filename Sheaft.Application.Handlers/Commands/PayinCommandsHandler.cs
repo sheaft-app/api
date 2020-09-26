@@ -13,6 +13,8 @@ using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using Sheaft.Exceptions;
+using Microsoft.Extensions.Options;
+using Sheaft.Options;
 
 namespace Sheaft.Application.Handlers
 {
@@ -24,15 +26,18 @@ namespace Sheaft.Application.Handlers
         IRequestHandler<ExpirePayinCommand, Result<bool>>
     {
         private readonly IPspService _pspService;
+        private readonly RoutineOptions _routineOptions;
 
         public PayinCommandsHandler(
             IAppDbContext context,
             IPspService pspService,
             ISheaftMediatr mediatr,
+            IOptionsSnapshot<RoutineOptions> routineOptions,
             ILogger<PayinCommandsHandler> logger)
             : base(mediatr, context, logger)
         {
             _pspService = pspService;
+            _routineOptions = routineOptions.Value;
         }
 
         public async Task<Result<Guid>> Handle(CreateWebPayinCommand request, CancellationToken token)
@@ -77,7 +82,7 @@ namespace Sheaft.Application.Handlers
                 var skip = 0;
                 const int take = 100;
 
-                var expiredDate = DateTimeOffset.UtcNow.AddMinutes(-60);
+                var expiredDate = DateTimeOffset.UtcNow.AddMinutes(-_routineOptions.CheckPayinsFromMinutes);
                 var payinIds = await GetNextPayinIdsAsync(expiredDate, skip, take, token);
 
                 while (payinIds.Any())
@@ -106,7 +111,7 @@ namespace Sheaft.Application.Handlers
                 if (payin.Status != TransactionStatus.Created && payin.Status != TransactionStatus.Waiting)
                     return Ok(false);
 
-                if (payin.CreatedOn.AddMinutes(1440) < DateTimeOffset.UtcNow && payin.Status == TransactionStatus.Waiting)
+                if (payin.CreatedOn.AddMinutes(_routineOptions.CheckPayinExpiredFromMinutes) < DateTimeOffset.UtcNow && payin.Status == TransactionStatus.Waiting)
                     return await _mediatr.Process(new ExpirePayinCommand(request.RequestUser) { PayinId = request.PayinId }, token);
 
                 var result = await _mediatr.Process(new RefreshPayinStatusCommand(request.RequestUser, payin.Identifier), token);

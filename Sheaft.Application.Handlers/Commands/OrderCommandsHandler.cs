@@ -30,15 +30,18 @@ namespace Sheaft.Application.Handlers
         IRequestHandler<CheckOrderCommand, Result<bool>>
     {
         private readonly PspOptions _pspOptions;
+        private readonly RoutineOptions _routineOptions;
 
         public OrderCommandsHandler(
             IAppDbContext context,
             ISheaftMediatr mediatr,
             IOptionsSnapshot<PspOptions> pspOptions,
+            IOptionsSnapshot<RoutineOptions> routineOptions,
             ILogger<OrderCommandsHandler> logger)
             : base(mediatr, context, logger)
         {
             _pspOptions = pspOptions.Value;
+            _routineOptions = routineOptions.Value;
         }
 
         public async Task<Result<Guid>> Handle(CreateConsumerOrderCommand request, CancellationToken token)
@@ -274,7 +277,7 @@ namespace Sheaft.Application.Handlers
                 var skip = 0;
                 const int take = 100;
 
-                var expiredDate = DateTimeOffset.UtcNow.AddMinutes(-1440);
+                var expiredDate = DateTimeOffset.UtcNow.AddMinutes(-_routineOptions.CheckOrdersFromMinutes);
                 var orderIds = await GetNextOrderIdsAsync(expiredDate, skip, take, token);
 
                 while (orderIds.Any())
@@ -303,7 +306,7 @@ namespace Sheaft.Application.Handlers
                 if (payinRefund.Status != OrderStatus.Created && payinRefund.Status != OrderStatus.Waiting)
                     return Ok(false);
 
-                if (payinRefund.CreatedOn.AddMinutes(1440) < DateTimeOffset.UtcNow)
+                if (payinRefund.CreatedOn.AddMinutes(_routineOptions.CheckOrderExpiredFromMinutes) < DateTimeOffset.UtcNow)
                     return await _mediatr.Process(new ExpireOrderCommand(request.RequestUser) { OrderId = request.OrderId }, token);
 
                 return Ok(true);

@@ -62,6 +62,7 @@ namespace Sheaft.Functions
             builder.Services.Configure<SignalrOptions>(configuration.GetSection(SignalrOptions.SETTING));
             builder.Services.Configure<SireneOptions>(configuration.GetSection(SireneOptions.SETTING));
             builder.Services.Configure<SponsoringOptions>(configuration.GetSection(SponsoringOptions.SETTING));
+            builder.Services.Configure<RoutineOptions>(configuration.GetSection(RoutineOptions.SETTING));
 
             builder.Services.BuildServiceProvider();
 

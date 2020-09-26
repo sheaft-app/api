@@ -12,6 +12,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
+using Sheaft.Options;
+using Microsoft.Extensions.Options;
 
 namespace Sheaft.Application.Handlers
 {
@@ -24,15 +26,18 @@ namespace Sheaft.Application.Handlers
         IRequestHandler<CreatePayinRefundCommand, Result<Guid>>
     {
         private readonly IPspService _pspService;
+        private readonly RoutineOptions _routineOptions;
 
         public PayinRefundCommandsHandler(
             IAppDbContext context,
             IPspService pspService,
             ISheaftMediatr mediatr,
+            IOptionsSnapshot<RoutineOptions> routineOptions,
             ILogger<PayinRefundCommandsHandler> logger)
             : base(mediatr, context, logger)
         {
             _pspService = pspService;
+            _routineOptions = routineOptions.Value;
         }
 
         public async Task<Result<bool>> Handle(CheckPayinRefundsCommand request, CancellationToken token)
@@ -42,7 +47,7 @@ namespace Sheaft.Application.Handlers
                 var skip = 0;
                 const int take = 100;
 
-                var expiredDate = DateTimeOffset.UtcNow.AddMinutes(-60);
+                var expiredDate = DateTimeOffset.UtcNow.AddMinutes(-_routineOptions.CheckPayinRefundsFromMinutes);
                 var payinRefundIds = await GetNextPayinRefundIdsAsync(expiredDate, skip, take, token);
 
                 while (payinRefundIds.Any())
@@ -71,7 +76,7 @@ namespace Sheaft.Application.Handlers
                 if (payinRefund.Status != TransactionStatus.Created && payinRefund.Status != TransactionStatus.Waiting)
                     return Ok(false);
 
-                if (payinRefund.CreatedOn.AddMinutes(1440) < DateTimeOffset.UtcNow && payinRefund.Status == TransactionStatus.Waiting)
+                if (payinRefund.CreatedOn.AddMinutes(_routineOptions.CheckPayinRefundExpiredFromMinutes) < DateTimeOffset.UtcNow && payinRefund.Status == TransactionStatus.Waiting)
                     return await _mediatr.Process(new ExpirePayinRefundCommand(request.RequestUser) { PayinRefundId = request.PayinRefundId }, token);
 
                 var result = await _mediatr.Process(new RefreshPayinRefundStatusCommand(request.RequestUser, payinRefund.Identifier), token);
@@ -136,7 +141,7 @@ namespace Sheaft.Application.Handlers
                 var skip = 0;
                 const int take = 100;
 
-                var expiredDate = DateTimeOffset.UtcNow.AddMinutes(-10080);
+                var expiredDate = DateTimeOffset.UtcNow.AddMinutes(-_routineOptions.CheckNewPayinRefundsFromMinutes);
                 var orderIds = await GetNextOrderToRefundIdsAsync(expiredDate, skip, take, token);
 
                 while (orderIds.Any())

@@ -12,6 +12,8 @@ using Sheaft.Application.Events;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
+using Sheaft.Options;
+using Microsoft.Extensions.Options;
 
 namespace Sheaft.Application.Handlers
 {
@@ -24,15 +26,18 @@ namespace Sheaft.Application.Handlers
         IRequestHandler<CreateTransferCommand, Result<Guid>>
     {
         private readonly IPspService _pspService;
+        private readonly RoutineOptions _routineOptions;
 
         public TransferCommandsHandler(
             IAppDbContext context,
             IPspService pspService,
             ISheaftMediatr mediatr,
+            IOptionsSnapshot<RoutineOptions> routineOptions,
             ILogger<TransferCommandsHandler> logger)
             : base(mediatr, context, logger)
         {
             _pspService = pspService;
+            _routineOptions = routineOptions.Value;
         }
 
         public async Task<Result<bool>> Handle(CheckTransfersCommand request, CancellationToken token)
@@ -42,7 +47,7 @@ namespace Sheaft.Application.Handlers
                 var skip = 0;
                 const int take = 100;
 
-                var expiredDate = DateTimeOffset.UtcNow.AddMinutes(-60);
+                var expiredDate = DateTimeOffset.UtcNow.AddMinutes(-_routineOptions.CheckTransfersFromMinutes);
                 var transferIds = await GetNextTransferIdsAsync(expiredDate, skip, take, token);
 
                 while (transferIds.Any())
@@ -72,7 +77,7 @@ namespace Sheaft.Application.Handlers
                 if (transfer.Status != TransactionStatus.Created && transfer.Status != TransactionStatus.Waiting)
                     return Ok(false);
 
-                if (transfer.CreatedOn.AddMinutes(1440) < DateTimeOffset.UtcNow && transfer.Status == TransactionStatus.Waiting)
+                if (transfer.CreatedOn.AddMinutes(_routineOptions.CheckTransferExpiredFromMinutes) < DateTimeOffset.UtcNow && transfer.Status == TransactionStatus.Waiting)
                     return await _mediatr.Process(new ExpireTransferCommand(request.RequestUser) { TransferId = request.TransferId }, token);
 
                 var result = await _mediatr.Process(new RefreshTransferStatusCommand(request.RequestUser, transfer.Identifier), token);
@@ -104,7 +109,7 @@ namespace Sheaft.Application.Handlers
                 var skip = 0;
                 const int take = 100;
 
-                var expiredDate = DateTimeOffset.UtcNow.AddMinutes(-60);
+                var expiredDate = DateTimeOffset.UtcNow.AddMinutes(-_routineOptions.CheckNewTransfersFromMinutes);
                 var purchaseOrderIds = await GetNextPurchaseOrderIdsAsync(expiredDate, skip, take, token);
 
                 while (purchaseOrderIds.Any())

@@ -12,6 +12,8 @@ using System;
 using System.Linq;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
+using Sheaft.Options;
+using Microsoft.Extensions.Options;
 
 namespace Sheaft.Application.Handlers
 {
@@ -24,15 +26,18 @@ namespace Sheaft.Application.Handlers
         IRequestHandler<CreateTransferRefundCommand, Result<Guid>>
     {
         private readonly IPspService _pspService;
+        private readonly RoutineOptions _routineOptions;
 
         public TransferRefundCommandsHandler(
             IAppDbContext context,
             IPspService pspService,
             ISheaftMediatr mediatr,
+            IOptionsSnapshot<RoutineOptions> routineOptions,
             ILogger<TransferRefundCommandsHandler> logger)
             : base(mediatr, context, logger)
         {
             _pspService = pspService;
+            _routineOptions = routineOptions.Value;
         }
 
         public async Task<Result<bool>> Handle(CheckNewTransferRefundsCommand request, CancellationToken token)
@@ -42,7 +47,7 @@ namespace Sheaft.Application.Handlers
                 var skip = 0;
                 const int take = 100;
 
-                var expiredDate = DateTimeOffset.UtcNow.AddMinutes(-60);
+                var expiredDate = DateTimeOffset.UtcNow.AddMinutes(-_routineOptions.CheckNewTransferRefundsFromMinutes);
                 var purchaseOrderIds = await GetNextPurchaseOrderIdsAsync(expiredDate, skip, take, token);
 
                 while (purchaseOrderIds.Any())
@@ -127,7 +132,7 @@ namespace Sheaft.Application.Handlers
                 var skip = 0;
                 const int take = 100;
 
-                var expiredDate = DateTimeOffset.UtcNow.AddMinutes(-60);
+                var expiredDate = DateTimeOffset.UtcNow.AddMinutes(-_routineOptions.CheckTransferRefundsFromMinutes);
                 var transferRefundIds = await GetNextTransferRefundIdsAsync(expiredDate, skip, take, token);
 
                 while (transferRefundIds.Any())
@@ -156,7 +161,7 @@ namespace Sheaft.Application.Handlers
                 if (transferRefund.Status != TransactionStatus.Created && transferRefund.Status != TransactionStatus.Waiting)
                     return Ok(false);
 
-                if (transferRefund.CreatedOn.AddMinutes(1440) < DateTimeOffset.UtcNow && transferRefund.Status == TransactionStatus.Waiting)
+                if (transferRefund.CreatedOn.AddMinutes(_routineOptions.CheckTransferRefundExpiredFromMinutes) < DateTimeOffset.UtcNow && transferRefund.Status == TransactionStatus.Waiting)
                     return await _mediatr.Process(new ExpireTransferRefundCommand(request.RequestUser) { TransferRefundId = request.TransferRefundId }, token);
 
                 var result = await _mediatr.Process(new RefreshTransferRefundStatusCommand(request.RequestUser, transferRefund.Identifier), token);

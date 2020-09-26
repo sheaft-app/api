@@ -90,6 +90,7 @@ namespace Sheaft.Api
             services.Configure<SponsoringOptions>(Configuration.GetSection(SponsoringOptions.SETTING));
             services.Configure<StorageOptions>(Configuration.GetSection(StorageOptions.SETTING));
             services.Configure<ServiceBusOptions>(Configuration.GetSection(ServiceBusOptions.SETTING));
+            services.Configure<RoutineOptions>(Configuration.GetSection(RoutineOptions.SETTING));
 
             JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
 
