@@ -276,8 +276,7 @@ namespace Sheaft.GraphQL.Types
             descriptor.Field(c => c.HasProductsImportsInProgressAsync(default))
                 .Name("productsImportInProgress")
                 .Authorize(Policies.PRODUCER)
-                .Type<NonNullType<BooleanType>>()
-                .UseSelection();
+                .Type<NonNullType<BooleanType>>();
 
             //PURCHASE ORDER
             descriptor.Field(c => c.GetMyPurchaseOrders(default))
@@ -309,8 +308,7 @@ namespace Sheaft.GraphQL.Types
             descriptor.Field(c => c.HasPickingOrdersExportsInProgressAsync(default))
                 .Name("pickingOrdersExportInProgress")
                 .Authorize(Policies.PRODUCER)
-                .Type<NonNullType<BooleanType>>()
-                .UseSelection();
+                .Type<NonNullType<BooleanType>>();
 
             //QUICKORDER
             descriptor.Field(c => c.GetQuickOrder(default, default))
