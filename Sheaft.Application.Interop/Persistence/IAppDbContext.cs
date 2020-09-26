@@ -21,6 +21,7 @@ namespace Sheaft.Application.Interop
         DbSet<DeliveryMode> DeliveryModes { get; set; }
         DbSet<Department> Departments { get; set; }
         DbSet<Document> Documents { get; set; }
+        DbSet<Donation> Donations { get; set; }
         DbSet<Job> Jobs { get; set; }
         DbSet<Legal> Legals { get; set; }
         DbSet<Level> Levels { get; set; }

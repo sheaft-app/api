@@ -127,6 +127,7 @@ namespace Sheaft.Infrastructure.Persistence
             modelBuilder.ApplyConfiguration(new BusinessLegalConfiguration());
             modelBuilder.ApplyConfiguration(new UboDeclarationConfiguration());
             modelBuilder.ApplyConfiguration(new UboConfiguration());
+            modelBuilder.ApplyConfiguration(new DonationConfiguration());
         }
     }
 }

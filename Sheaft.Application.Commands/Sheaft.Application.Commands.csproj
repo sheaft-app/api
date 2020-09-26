@@ -12,4 +12,8 @@
     <ProjectReference Include="..\Sheaft.Application.Models\Sheaft.Application.Models.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Donation\" />
+  </ItemGroup>
+
 </Project>

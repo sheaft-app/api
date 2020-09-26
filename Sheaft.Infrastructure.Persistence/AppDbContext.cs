@@ -31,6 +31,7 @@ namespace Sheaft.Infrastructure.Persistence
         public DbSet<DeliveryMode> DeliveryModes { get; set; }
         public DbSet<Department> Departments { get; set; }
         public DbSet<Document> Documents { get; set; }
+        public DbSet<Donation> Donations { get; set; }
         public DbSet<Job> Jobs { get; set; }
         public DbSet<Legal> Legals { get; set; }
         public DbSet<Level> Levels { get; set; }
