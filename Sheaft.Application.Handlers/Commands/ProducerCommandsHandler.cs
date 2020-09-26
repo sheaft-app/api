@@ -54,7 +54,7 @@ namespace Sheaft.Application.Handlers
                         request.Address.Country, department, request.Address.Longitude, request.Address.Latitude)
                         : null;
 
-                    producer = new Producer(Guid.NewGuid(), request.Name, request.FirstName, request.LastName, request.Email,
+                    producer = new Producer(request.RequestUser.Id, request.Name, request.FirstName, request.LastName, request.Email,
                         address, request.OpenForNewBusiness, request.Phone, request.Description);
 
                     if (request.Tags != null && request.Tags.Any())

@@ -76,7 +76,7 @@ namespace Sheaft.Application.Handlers
                         }
                     }
 
-                    store = new Store(Guid.NewGuid(), request.Name, request.FirstName, request.LastName, request.Email,
+                    store = new Store(request.RequestUser.Id, request.Name, request.FirstName, request.LastName, request.Email,
                         address, openingHours, request.OpenForNewBusiness, request.Phone, request.Description);
 
                     if (request.Tags != null && request.Tags.Any())

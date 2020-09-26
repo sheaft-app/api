@@ -37,11 +37,11 @@ namespace Sheaft.Application.Handlers
             {
                 using (var transaction = await _context.Database.BeginTransactionAsync(token))
                 {
-                    var consumer = await _context.FindSingleAsync<Consumer>(r => r.Id == request.Id || r.Email == request.Email, token);
+                    var consumer = await _context.FindSingleAsync<Consumer>(r => r.Id == request.RequestUser.Id || r.Email == request.Email, token);
                     if (consumer != null)
                         return Conflict<Guid>(MessageKind.Register_User_AlreadyExists);
 
-                    consumer = new Consumer(request.Id, request.Email, request.FirstName, request.LastName, request.Phone);
+                    consumer = new Consumer(request.RequestUser.Id, request.Email, request.FirstName, request.LastName, request.Phone);
                     await _context.AddAsync(consumer, token);
                     await _context.SaveChangesAsync(token);
 
