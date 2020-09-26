@@ -11,7 +11,7 @@ using Sheaft.Infrastructure.Persistence;
 namespace Sheaft.Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20200925225819_InitDatabase")]
+    [Migration("20200926130930_InitDatabase")]
     partial class InitDatabase
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -371,16 +371,25 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                         .IsConcurrencyToken()
                         .HasColumnType("datetimeoffset");
 
+                    b.Property<int>("UserKind")
+                        .HasColumnType("int");
+
+                    b.Property<long>("UserUid")
+                        .HasColumnType("bigint");
+
                     b.HasKey("Uid");
 
                     b.HasIndex("Id")
+                        .IsUnique();
+
+                    b.HasIndex("UserUid")
                         .IsUnique();
 
                     b.HasIndex("Uid", "Id");
 
                     b.ToTable("Legals");
 
-                    b.HasDiscriminator<int>("Kind");
+                    b.HasDiscriminator<int>("UserKind");
                 });
 
             modelBuilder.Entity("Sheaft.Domain.Models.Level", b =>
@@ -1956,7 +1965,7 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
 
                     b.HasIndex("UboDeclarationUid");
 
-                    b.HasIndex("Uid", "UboDeclarationUid", "Id", "Identifier", "RemovedOn");
+                    b.HasIndex("Uid", "UboDeclarationUid", "Id", "RemovedOn");
 
                     b.ToTable("Ubos");
                 });
@@ -1967,6 +1976,9 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bigint")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<long>("BusinessLegalUid")
+                        .HasColumnType("bigint");
 
                     b.Property<DateTimeOffset>("CreatedOn")
                         .HasColumnType("datetimeoffset");
@@ -1997,12 +2009,14 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
 
                     b.HasKey("Uid");
 
+                    b.HasIndex("BusinessLegalUid");
+
                     b.HasIndex("Id")
                         .IsUnique();
 
                     b.HasIndex("Identifier");
 
-                    b.HasIndex("Uid", "Id", "Identifier", "RemovedOn");
+                    b.HasIndex("Uid", "BusinessLegalUid", "Id", "RemovedOn");
 
                     b.ToTable("UboDeclaration");
                 });
@@ -2137,9 +2151,6 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                 {
                     b.HasBaseType("Sheaft.Domain.Models.Legal");
 
-                    b.Property<long>("BusinessUid")
-                        .HasColumnType("bigint");
-
                     b.Property<string>("Email")
                         .HasColumnType("nvarchar(max)");
 
@@ -2147,34 +2158,22 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<long>("UboDeclarationUid")
+                    b.Property<long?>("UboDeclarationUid")
                         .HasColumnType("bigint");
 
                     b.Property<string>("VatIdentifier")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
-
-                    b.HasIndex("BusinessUid")
-                        .IsUnique()
-                        .HasFilter("[BusinessUid] IS NOT NULL");
 
                     b.HasIndex("UboDeclarationUid")
                         .IsUnique()
                         .HasFilter("[UboDeclarationUid] IS NOT NULL");
 
-                    b.HasDiscriminator().HasValue(2);
+                    b.HasDiscriminator().HasValue(1);
                 });
 
             modelBuilder.Entity("Sheaft.Domain.Models.ConsumerLegal", b =>
                 {
                     b.HasBaseType("Sheaft.Domain.Models.Legal");
-
-                    b.Property<long>("ConsumerUid")
-                        .HasColumnType("bigint");
-
-                    b.HasIndex("ConsumerUid")
-                        .IsUnique()
-                        .HasFilter("[ConsumerUid] IS NOT NULL");
 
                     b.HasDiscriminator().HasValue(0);
                 });
@@ -2496,6 +2495,12 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
 
             modelBuilder.Entity("Sheaft.Domain.Models.Legal", b =>
                 {
+                    b.HasOne("Sheaft.Domain.Models.User", "User")
+                        .WithOne()
+                        .HasForeignKey("Sheaft.Domain.Models.Legal", "UserUid")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.OwnsOne("Sheaft.Domain.Models.Owner", "Owner", b1 =>
                         {
                             b1.Property<long>("LegalUid")
@@ -3026,6 +3031,15 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                         });
                 });
 
+            modelBuilder.Entity("Sheaft.Domain.Models.UboDeclaration", b =>
+                {
+                    b.HasOne("Sheaft.Domain.Models.BusinessLegal", "Legal")
+                        .WithMany()
+                        .HasForeignKey("BusinessLegalUid")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("Sheaft.Domain.Models.User", b =>
                 {
                     b.OwnsOne("Sheaft.Domain.Models.UserAddress", "Address", b1 =>
@@ -3085,17 +3099,10 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
 
             modelBuilder.Entity("Sheaft.Domain.Models.BusinessLegal", b =>
                 {
-                    b.HasOne("Sheaft.Domain.Models.Business", "Business")
-                        .WithOne()
-                        .HasForeignKey("Sheaft.Domain.Models.BusinessLegal", "BusinessUid")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
                     b.HasOne("Sheaft.Domain.Models.UboDeclaration", "UboDeclaration")
                         .WithOne()
                         .HasForeignKey("Sheaft.Domain.Models.BusinessLegal", "UboDeclarationUid")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.NoAction);
 
                     b.OwnsOne("Sheaft.Domain.Models.LegalAddress", "Address", b1 =>
                         {
@@ -3124,15 +3131,6 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                             b1.WithOwner()
                                 .HasForeignKey("BusinessLegalUid");
                         });
-                });
-
-            modelBuilder.Entity("Sheaft.Domain.Models.ConsumerLegal", b =>
-                {
-                    b.HasOne("Sheaft.Domain.Models.Consumer", "Consumer")
-                        .WithOne()
-                        .HasForeignKey("Sheaft.Domain.Models.ConsumerLegal", "ConsumerUid")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
                 });
 
             modelBuilder.Entity("Sheaft.Domain.Models.CardPayin", b =>

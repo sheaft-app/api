@@ -23,7 +23,7 @@ namespace Sheaft.Application.Queries
         {
             return _context.Legals
                     .OfType<ConsumerLegal>()
-                    .Get(c => c.Consumer.Id == currentUser.Id)
+                    .Get(c => c.User.Id == currentUser.Id)
                     .ProjectTo<ConsumerLegalDto>(_configurationProvider);
         }
 
@@ -31,7 +31,7 @@ namespace Sheaft.Application.Queries
         {
             return _context.Legals
                     .OfType<BusinessLegal>()
-                    .Get(c => c.Business.Id == currentUser.Id)
+                    .Get(c => c.User.Id == currentUser.Id)
                     .ProjectTo<BusinessLegalDto>(_configurationProvider);
         }
 
@@ -39,7 +39,7 @@ namespace Sheaft.Application.Queries
         {
             return _context.Legals
                     .OfType<ConsumerLegal>()
-                    .Get(c => c.Id == id && c.Consumer.Id == currentUser.Id)
+                    .Get(c => c.Id == id && c.User.Id == currentUser.Id)
                     .ProjectTo<ConsumerLegalDto>(_configurationProvider);
         }
 
@@ -47,7 +47,7 @@ namespace Sheaft.Application.Queries
         {
             return _context.Legals
                     .OfType<BusinessLegal>()
-                    .Get(c => c.Id == id && c.Business.Id == currentUser.Id)
+                    .Get(c => c.Id == id && c.User.Id == currentUser.Id)
                     .ProjectTo<BusinessLegalDto>(_configurationProvider);
         }
     }

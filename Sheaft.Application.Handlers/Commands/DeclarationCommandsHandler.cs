@@ -34,16 +34,13 @@ namespace Sheaft.Application.Handlers
         {
             return await ExecuteAsync(async () =>
             {
-                var uboDeclaration = new UboDeclaration(Guid.NewGuid());
-                await _context.AddAsync(uboDeclaration);
-
                 var legal = await _context.GetByIdAsync<BusinessLegal>(request.LegalId, token);
-                legal.SetUboDeclaration(uboDeclaration);
+                var uboDeclaration = new UboDeclaration(Guid.NewGuid(), legal);
 
-                _context.Update(legal);
+                await _context.AddAsync(uboDeclaration);
                 await _context.SaveChangesAsync(token);
 
-                var result = await _pspService.CreateUboDeclarationAsync(uboDeclaration, legal.Business, token);
+                var result = await _pspService.CreateUboDeclarationAsync(uboDeclaration, legal.User, token);
                 if (!result.Success)
                     return Failed<Guid>(result.Exception);
 
@@ -63,7 +60,7 @@ namespace Sheaft.Application.Handlers
             return await ExecuteAsync(async () =>
             {
                 var legal = await _context.GetByIdAsync<BusinessLegal>(request.LegalId, token);
-                var result = await _pspService.SubmitUboDeclarationAsync(legal.UboDeclaration, legal.Business, token);
+                var result = await _pspService.SubmitUboDeclarationAsync(legal.UboDeclaration, legal.User, token);
                 if (!result.Success)
                     return Failed<bool>(result.Exception);
 
@@ -113,7 +110,7 @@ namespace Sheaft.Application.Handlers
         {
             return await ExecuteAsync(async () =>
             {
-                var legal = await _context.GetSingleAsync<BusinessLegal>(bl => bl.Business.Id == request.UserId, token);
+                var legal = await _context.GetSingleAsync<BusinessLegal>(bl => bl.User.Id == request.UserId, token);
                 if (legal.UboDeclaration == null)
                 {
                     var result = await _mediatr.Process(new CreateDeclarationCommand(request.RequestUser)
@@ -126,7 +123,7 @@ namespace Sheaft.Application.Handlers
                 }
                 else if (string.IsNullOrWhiteSpace(legal.UboDeclaration.Identifier))
                 {
-                    var result = await _pspService.CreateUboDeclarationAsync(legal.UboDeclaration, legal.Business, token);
+                    var result = await _pspService.CreateUboDeclarationAsync(legal.UboDeclaration, legal.User, token);
                     if (!result.Success)
                         return Failed<bool>(result.Exception);
 

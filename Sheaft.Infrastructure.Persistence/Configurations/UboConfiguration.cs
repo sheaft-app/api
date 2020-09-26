@@ -18,7 +18,7 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
             entity.HasIndex("UboDeclarationUid");
             entity.HasIndex(c => c.Identifier);
             entity.HasIndex(c => c.Id).IsUnique();
-            entity.HasIndex("Uid", "UboDeclarationUid", "Id", "Identifier", "RemovedOn");
+            entity.HasIndex("Uid", "UboDeclarationUid", "Id", "RemovedOn");
         }
     }
 }

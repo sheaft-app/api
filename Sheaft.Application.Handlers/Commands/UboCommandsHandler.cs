@@ -44,7 +44,7 @@ namespace Sheaft.Application.Handlers
                 await _context.AddAsync(ubo);
                 await _context.SaveChangesAsync(token);
 
-                var result = await _pspService.CreateUboAsync(ubo, legal.UboDeclaration, legal.Business, token);
+                var result = await _pspService.CreateUboAsync(ubo, legal.UboDeclaration, legal.User, token);
                 if (!result.Success)
                     return Failed<Guid>(result.Exception);
 
@@ -74,7 +74,7 @@ namespace Sheaft.Application.Handlers
                 var birthPlace = new BirthAddress(request.BirthPlace.City, request.BirthPlace.Country);
                 ubo.SetBirthPlace(birthPlace);
 
-                var result = await _pspService.UpdateUboAsync(ubo, legal.UboDeclaration, legal.Business, token);
+                var result = await _pspService.UpdateUboAsync(ubo, legal.UboDeclaration, legal.User, token);
                 if (!result.Success)
                     return Failed<bool>(result.Exception);
 

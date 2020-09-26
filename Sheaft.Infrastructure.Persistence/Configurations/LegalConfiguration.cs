@@ -10,6 +10,7 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
         public void Configure(EntityTypeBuilder<Legal> entity)
         {
             entity.Property<long>("Uid");
+            entity.Property<long>("UserUid");
 
             entity.Property(c => c.CreatedOn);
             entity.Property(c => c.UpdatedOn).IsConcurrencyToken();
@@ -18,16 +19,17 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
                 e.OwnsOne(a => a.Address);
             });
 
-            entity.HasDiscriminator(c => c.Kind)
-                .HasValue<ConsumerLegal>(LegalKind.Natural)
-                .HasValue<BusinessLegal>(LegalKind.Business)
-                .HasValue<BusinessLegal>(LegalKind.Individual)
-                .HasValue<BusinessLegal>(LegalKind.Organization);
+            entity.HasOne(c => c.User).WithOne().HasForeignKey<Legal>("UserUid").OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasDiscriminator<UserKind>("UserKind")
+                .HasValue<ConsumerLegal>(UserKind.Consumer)
+                .HasValue<BusinessLegal>(UserKind.Business);
 
             entity.HasKey("Uid");
 
             entity.HasIndex(c => c.Id).IsUnique();
             entity.HasIndex("Uid", "Id");
+            entity.HasIndex("UserUid");
 
             entity.ToTable("Legals");
         }

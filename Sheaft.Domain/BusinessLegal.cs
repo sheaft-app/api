@@ -13,21 +13,18 @@ namespace Sheaft.Domain.Models
         }
 
         public BusinessLegal(Guid id, Business business, LegalKind kind, string email, string siret, string vatIdentifier, LegalAddress address, Owner owner)
-            : base(id, kind, owner)
+            : base(id, kind, business, owner)
         {
             SetEmail(email);
             SetAddress(address);
             SetSiret(siret);
             SetVatIdentifier(vatIdentifier);
-
-            Business = business;
         }
 
         public string Email { get; private set; }
         public string Siret { get; private set; }
         public string VatIdentifier { get; private set; }
         public virtual LegalAddress Address { get; private set; }
-        public virtual Business Business { get; private set; }
         public virtual UboDeclaration UboDeclaration { get; private set; }
 
         public void SetUboDeclaration(UboDeclaration declaration)

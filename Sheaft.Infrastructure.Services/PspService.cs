@@ -41,7 +41,7 @@ namespace Sheaft.Infrastructure.Services
         {
             return await ExecuteAsync(async () =>
             {
-                if (!string.IsNullOrWhiteSpace(consumerLegal.Consumer.Identifier))
+                if (!string.IsNullOrWhiteSpace(consumerLegal.User.Identifier))
                     return Failed<string>(new SheaftException(ExceptionKind.BadRequest, MessageKind.PsP_CannotCreate_User_User_Exists));
 
                 await EnsureAccessTokenIsValidAsync(token);
@@ -66,7 +66,7 @@ namespace Sheaft.Infrastructure.Services
         {
             return await ExecuteAsync(async () =>
             {
-                if (!string.IsNullOrWhiteSpace(businessLegal.Business.Identifier))
+                if (!string.IsNullOrWhiteSpace(businessLegal.User.Identifier))
                     return Failed<string>(new SheaftException(ExceptionKind.BadRequest, MessageKind.PsP_CannotCreate_User_User_Exists));
 
                 await EnsureAccessTokenIsValidAsync(token);
@@ -74,7 +74,7 @@ namespace Sheaft.Infrastructure.Services
                 var result = await _api.Users.CreateAsync(businessLegal.Id.ToString("N"),
                     new UserLegalPostDTO(
                         businessLegal.Email,
-                        businessLegal.Business.Name,
+                        businessLegal.User.Name,
                         businessLegal.Kind.GetLegalPersonType(),
                         businessLegal.Owner.FirstName,
                         businessLegal.Owner.LastName,
@@ -250,7 +250,7 @@ namespace Sheaft.Infrastructure.Services
             });
         }
 
-        public async Task<Result<PspDeclarationResultDto>> CreateUboDeclarationAsync(UboDeclaration declaration, Business business, CancellationToken token)
+        public async Task<Result<PspDeclarationResultDto>> CreateUboDeclarationAsync(UboDeclaration declaration, User business, CancellationToken token)
         {
             return await ExecuteAsync(async () =>
             {
@@ -271,7 +271,7 @@ namespace Sheaft.Infrastructure.Services
             });
         }
 
-        public async Task<Result<PspDeclarationResultDto>> SubmitUboDeclarationAsync(UboDeclaration declaration, Business business, CancellationToken token)
+        public async Task<Result<PspDeclarationResultDto>> SubmitUboDeclarationAsync(UboDeclaration declaration, User business, CancellationToken token)
         {
             return await ExecuteAsync(async () =>
             {
@@ -306,7 +306,7 @@ namespace Sheaft.Infrastructure.Services
             });
         }
 
-        public async Task<Result<string>> CreateUboAsync(Ubo ubo, UboDeclaration declaration, Business business, CancellationToken token)
+        public async Task<Result<string>> CreateUboAsync(Ubo ubo, UboDeclaration declaration, User business, CancellationToken token)
         {
             return await ExecuteAsync(async () =>
             {
@@ -330,7 +330,7 @@ namespace Sheaft.Infrastructure.Services
             });
         }
 
-        public async Task<Result<bool>> UpdateUboAsync(Ubo ubo, UboDeclaration declaration, Business business, CancellationToken token)
+        public async Task<Result<bool>> UpdateUboAsync(Ubo ubo, UboDeclaration declaration, User business, CancellationToken token)
         {
             return await ExecuteAsync(async () =>
             {

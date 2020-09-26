@@ -15,10 +15,11 @@ namespace Sheaft.Domain.Models
         {
         }
 
-        public UboDeclaration(Guid id)
+        public UboDeclaration(Guid id, BusinessLegal legals)
         {
             Id = id;
             Status = DeclarationStatus.WaitingForReview;
+            Legal = legals;
         }
 
         public Guid Id { get; private set; }
@@ -26,10 +27,11 @@ namespace Sheaft.Domain.Models
         public DateTimeOffset? UpdatedOn { get; private set; }
         public DateTimeOffset? RemovedOn { get; private set; }
         public DateTimeOffset? ExecutedOn { get; private set; }
-        public string Identifier { get; set; }
-        public DeclarationStatus Status { get; set; }
-        public string ReasonCode { get; set; }
-        public string ReasonMessage { get; set; }
+        public string Identifier { get; private set; }
+        public DeclarationStatus Status { get; private set; }
+        public string ReasonCode { get; private set; }
+        public string ReasonMessage { get; private set; }
+        public virtual BusinessLegal Legal { get; private set; }
         public virtual IReadOnlyCollection<Ubo> Ubos => _ubos?.AsReadOnly();
 
         public void AddUbo(Ubo ubo)

@@ -7,6 +7,7 @@ using Microsoft.Extensions.Logging;
 using System.Threading.Tasks;
 using System.Threading;
 using Sheaft.Domain.Models;
+using Sheaft.Domain.Enums;
 
 namespace Sheaft.Application.Handlers
 {
@@ -35,30 +36,49 @@ namespace Sheaft.Application.Handlers
             return await ExecuteAsync(async () =>
             {
                 var business = await _context.GetByIdAsync<Business>(request.UserId, token);
-                await _context.EnsureNotExists<BusinessLegal>(c => c.Business.Id == business.Id, token);
+                await _context.EnsureNotExists<BusinessLegal>(c => c.User.Id == business.Id, token);
 
-                var legalAddress = new LegalAddress(request.Address.Line1, request.Address.Line2, request.Address.Zipcode, request.Address.City, request.Address.Country);
-                var ownerAddress = new OwnerAddress(request.Owner.Address.Line1, request.Owner.Address.Line2, request.Owner.Address.Zipcode, request.Owner.Address.City, request.Owner.Address.Country);
-
-                var legal = new BusinessLegal(Guid.NewGuid(),
+                var legal = new BusinessLegal(
+                    Guid.NewGuid(),
                     business,
                     request.Kind,
                     request.Email,
                     request.Siret,
                     request.VatIdentifier,
-                    legalAddress,
+                    new LegalAddress(request.Address.Line1, request.Address.Line2, request.Address.Zipcode, request.Address.City, request.Address.Country),
                     new Owner(business.Id,
                         request.Owner.FirstName,
                         request.Owner.LastName,
                         request.Owner.Email,
                         request.Owner.BirthDate,
-                        ownerAddress,
+                        new OwnerAddress(request.Owner.Address.Line1, request.Owner.Address.Line2, request.Owner.Address.Zipcode, request.Owner.Address.City, request.Owner.Address.Country),
                         request.Owner.Nationality,
                         request.Owner.CountryOfResidence
                     ));
 
-                await _context.AddAsync(legal);
+                await _context.AddAsync(legal, token);
                 await _context.SaveChangesAsync(token);
+
+                var userResult = await _pspService.CreateBusinessAsync(legal, token);
+                if (!userResult.Success)
+                    return Failed<Guid>(userResult.Exception);
+
+                legal.User.SetIdentifier(userResult.Data);
+                _context.Update(legal.User);
+                await _context.SaveChangesAsync(token);
+
+                if (request.Kind == LegalKind.Business)
+                {
+                    var result = await _mediatr.Process(new CreateDeclarationCommand(request.RequestUser) { LegalId = legal.Id }, token);
+                    if (result.Success)
+                    {
+                        var uboDeclaration = await _context.GetByIdAsync<UboDeclaration>(result.Data, token);
+                        legal.SetUboDeclaration(uboDeclaration);
+
+                        _context.Update(legal);
+                        await _context.SaveChangesAsync(token);
+                    }
+                }
 
                 return Ok(legal.Id);
             });
@@ -69,7 +89,7 @@ namespace Sheaft.Application.Handlers
             return await ExecuteAsync(async () =>
             {
                 var consumer = await _context.GetByIdAsync<Consumer>(request.UserId, token);
-                await _context.EnsureNotExists<ConsumerLegal>(c => c.Consumer.Id == consumer.Id, token);
+                await _context.EnsureNotExists<ConsumerLegal>(c => c.User.Id == consumer.Id, token);
 
                 var ownerAddress = new OwnerAddress(request.Address.Line1,
                     request.Address.Line2,
@@ -167,15 +187,15 @@ namespace Sheaft.Application.Handlers
         {
             return await ExecuteAsync(async () =>
             {
-                var legal = await _context.GetSingleAsync<BusinessLegal>(b => b.Business.Id == request.UserId, token);
-                if (string.IsNullOrWhiteSpace(legal.Business.Identifier))
+                var legal = await _context.GetSingleAsync<BusinessLegal>(b => b.User.Id == request.UserId, token);
+                if (string.IsNullOrWhiteSpace(legal.User.Identifier))
                 {
                     var userResult = await _pspService.CreateBusinessAsync(legal, token);
                     if (!userResult.Success)
                         return Failed<bool>(userResult.Exception);
 
-                    legal.Business.SetIdentifier(userResult.Data);
-                    _context.Update(legal.Business);
+                    legal.User.SetIdentifier(userResult.Data);
+                    _context.Update(legal.User);
 
                     await _context.SaveChangesAsync(token);
                 }
@@ -188,15 +208,15 @@ namespace Sheaft.Application.Handlers
         {
             return await ExecuteAsync(async () =>
             {
-                var legal = await _context.GetSingleAsync<ConsumerLegal>(b => b.Consumer.Id == request.UserId, token);
-                if (string.IsNullOrWhiteSpace(legal.Consumer.Identifier))
+                var legal = await _context.GetSingleAsync<ConsumerLegal>(b => b.User.Id == request.UserId, token);
+                if (string.IsNullOrWhiteSpace(legal.User.Identifier))
                 {
                     var userResult = await _pspService.CreateConsumerAsync(legal, token);
                     if (!userResult.Success)
                         return Failed<bool>(userResult.Exception);
 
-                    legal.Consumer.SetIdentifier(userResult.Data);
-                    _context.Update(legal.Consumer);
+                    legal.User.SetIdentifier(userResult.Data);
+                    _context.Update(legal.User);
 
                     await _context.SaveChangesAsync(token);
                 }

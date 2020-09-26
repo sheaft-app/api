@@ -135,27 +135,6 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "UboDeclaration",
-                columns: table => new
-                {
-                    Uid = table.Column<long>(nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Id = table.Column<Guid>(nullable: false),
-                    CreatedOn = table.Column<DateTimeOffset>(nullable: false),
-                    UpdatedOn = table.Column<DateTimeOffset>(nullable: true),
-                    RemovedOn = table.Column<DateTimeOffset>(nullable: true),
-                    ExecutedOn = table.Column<DateTimeOffset>(nullable: true),
-                    Identifier = table.Column<string>(nullable: true),
-                    Status = table.Column<int>(nullable: false),
-                    ReasonCode = table.Column<string>(nullable: true),
-                    ReasonMessage = table.Column<string>(nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_UboDeclaration", x => x.Uid);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Users",
                 columns: table => new
                 {
@@ -215,41 +194,6 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                         name: "FK_Departments_Regions_RegionUid",
                         column: x => x.RegionUid,
                         principalTable: "Regions",
-                        principalColumn: "Uid",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Ubos",
-                columns: table => new
-                {
-                    Uid = table.Column<long>(nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Id = table.Column<Guid>(nullable: false),
-                    CreatedOn = table.Column<DateTimeOffset>(nullable: false),
-                    UpdatedOn = table.Column<DateTimeOffset>(nullable: true),
-                    RemovedOn = table.Column<DateTimeOffset>(nullable: true),
-                    FirstName = table.Column<string>(nullable: true),
-                    LastName = table.Column<string>(nullable: true),
-                    Identifier = table.Column<string>(nullable: true),
-                    BirthDate = table.Column<DateTimeOffset>(nullable: false),
-                    Nationality = table.Column<int>(nullable: false),
-                    Address_Line1 = table.Column<string>(nullable: true),
-                    Address_Line2 = table.Column<string>(nullable: true),
-                    Address_Zipcode = table.Column<string>(nullable: true),
-                    Address_City = table.Column<string>(nullable: true),
-                    Address_Country = table.Column<int>(nullable: true),
-                    BirthPlace_City = table.Column<string>(nullable: true),
-                    BirthPlace_Country = table.Column<int>(nullable: true),
-                    UboDeclarationUid = table.Column<long>(nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Ubos", x => x.Uid);
-                    table.ForeignKey(
-                        name: "FK_Ubos_UboDeclaration_UboDeclarationUid",
-                        column: x => x.UboDeclarationUid,
-                        principalTable: "UboDeclaration",
                         principalColumn: "Uid",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -350,57 +294,6 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                         principalTable: "Users",
                         principalColumn: "Uid",
                         onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Legals",
-                columns: table => new
-                {
-                    Uid = table.Column<long>(nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Id = table.Column<Guid>(nullable: false),
-                    CreatedOn = table.Column<DateTimeOffset>(nullable: false),
-                    UpdatedOn = table.Column<DateTimeOffset>(nullable: true),
-                    RemovedOn = table.Column<DateTimeOffset>(nullable: true),
-                    Kind = table.Column<int>(nullable: false),
-                    Owner_Id = table.Column<Guid>(nullable: true),
-                    Owner_FirstName = table.Column<string>(nullable: true),
-                    Owner_LastName = table.Column<string>(nullable: true),
-                    Owner_Email = table.Column<string>(nullable: true),
-                    Owner_BirthDate = table.Column<DateTimeOffset>(nullable: true),
-                    Owner_Nationality = table.Column<int>(nullable: true),
-                    Owner_CountryOfResidence = table.Column<int>(nullable: true),
-                    Owner_Address_Line1 = table.Column<string>(nullable: true),
-                    Owner_Address_Line2 = table.Column<string>(nullable: true),
-                    Owner_Address_Zipcode = table.Column<string>(nullable: true),
-                    Owner_Address_City = table.Column<string>(nullable: true),
-                    Owner_Address_Country = table.Column<int>(nullable: true),
-                    Email = table.Column<string>(nullable: true),
-                    Siret = table.Column<string>(nullable: true),
-                    VatIdentifier = table.Column<string>(nullable: true),
-                    BusinessUid = table.Column<long>(nullable: true),
-                    UboDeclarationUid = table.Column<long>(nullable: true),
-                    ConsumerUid = table.Column<long>(nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Legals", x => x.Uid);
-                    table.ForeignKey(
-                        name: "FK_Legals_Users_BusinessUid",
-                        column: x => x.BusinessUid,
-                        principalTable: "Users",
-                        principalColumn: "Uid");
-                    table.ForeignKey(
-                        name: "FK_Legals_UboDeclaration_UboDeclarationUid",
-                        column: x => x.UboDeclarationUid,
-                        principalTable: "UboDeclaration",
-                        principalColumn: "Uid",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_Legals_Users_ConsumerUid",
-                        column: x => x.ConsumerUid,
-                        principalTable: "Users",
-                        principalColumn: "Uid");
                 });
 
             migrationBuilder.CreateTable(
@@ -799,28 +692,6 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "BusinessLegalAddresses",
-                columns: table => new
-                {
-                    BusinessLegalUid = table.Column<long>(nullable: false),
-                    Line1 = table.Column<string>(nullable: true),
-                    Line2 = table.Column<string>(nullable: true),
-                    Zipcode = table.Column<string>(nullable: true),
-                    City = table.Column<string>(nullable: true),
-                    Country = table.Column<int>(nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_BusinessLegalAddresses", x => x.BusinessLegalUid);
-                    table.ForeignKey(
-                        name: "FK_BusinessLegalAddresses_Legals_BusinessLegalUid",
-                        column: x => x.BusinessLegalUid,
-                        principalTable: "Legals",
-                        principalColumn: "Uid",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Products",
                 columns: table => new
                 {
@@ -1032,6 +903,125 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                         principalTable: "DeliveryModes",
                         principalColumn: "Uid",
                         onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "BusinessLegalAddresses",
+                columns: table => new
+                {
+                    BusinessLegalUid = table.Column<long>(nullable: false),
+                    Line1 = table.Column<string>(nullable: true),
+                    Line2 = table.Column<string>(nullable: true),
+                    Zipcode = table.Column<string>(nullable: true),
+                    City = table.Column<string>(nullable: true),
+                    Country = table.Column<int>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_BusinessLegalAddresses", x => x.BusinessLegalUid);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "UboDeclaration",
+                columns: table => new
+                {
+                    Uid = table.Column<long>(nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Id = table.Column<Guid>(nullable: false),
+                    CreatedOn = table.Column<DateTimeOffset>(nullable: false),
+                    UpdatedOn = table.Column<DateTimeOffset>(nullable: true),
+                    RemovedOn = table.Column<DateTimeOffset>(nullable: true),
+                    ExecutedOn = table.Column<DateTimeOffset>(nullable: true),
+                    Identifier = table.Column<string>(nullable: true),
+                    Status = table.Column<int>(nullable: false),
+                    ReasonCode = table.Column<string>(nullable: true),
+                    ReasonMessage = table.Column<string>(nullable: true),
+                    BusinessLegalUid = table.Column<long>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_UboDeclaration", x => x.Uid);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Legals",
+                columns: table => new
+                {
+                    Uid = table.Column<long>(nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Id = table.Column<Guid>(nullable: false),
+                    CreatedOn = table.Column<DateTimeOffset>(nullable: false),
+                    UpdatedOn = table.Column<DateTimeOffset>(nullable: true),
+                    RemovedOn = table.Column<DateTimeOffset>(nullable: true),
+                    Kind = table.Column<int>(nullable: false),
+                    UserUid = table.Column<long>(nullable: false),
+                    Owner_Id = table.Column<Guid>(nullable: true),
+                    Owner_FirstName = table.Column<string>(nullable: true),
+                    Owner_LastName = table.Column<string>(nullable: true),
+                    Owner_Email = table.Column<string>(nullable: true),
+                    Owner_BirthDate = table.Column<DateTimeOffset>(nullable: true),
+                    Owner_Nationality = table.Column<int>(nullable: true),
+                    Owner_CountryOfResidence = table.Column<int>(nullable: true),
+                    Owner_Address_Line1 = table.Column<string>(nullable: true),
+                    Owner_Address_Line2 = table.Column<string>(nullable: true),
+                    Owner_Address_Zipcode = table.Column<string>(nullable: true),
+                    Owner_Address_City = table.Column<string>(nullable: true),
+                    Owner_Address_Country = table.Column<int>(nullable: true),
+                    UserKind = table.Column<int>(nullable: false),
+                    Email = table.Column<string>(nullable: true),
+                    Siret = table.Column<string>(nullable: true),
+                    VatIdentifier = table.Column<string>(nullable: true),
+                    UboDeclarationUid = table.Column<long>(nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Legals", x => x.Uid);
+                    table.ForeignKey(
+                        name: "FK_Legals_UboDeclaration_UboDeclarationUid",
+                        column: x => x.UboDeclarationUid,
+                        principalTable: "UboDeclaration",
+                        principalColumn: "Uid");
+                    table.ForeignKey(
+                        name: "FK_Legals_Users_UserUid",
+                        column: x => x.UserUid,
+                        principalTable: "Users",
+                        principalColumn: "Uid",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Ubos",
+                columns: table => new
+                {
+                    Uid = table.Column<long>(nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Id = table.Column<Guid>(nullable: false),
+                    CreatedOn = table.Column<DateTimeOffset>(nullable: false),
+                    UpdatedOn = table.Column<DateTimeOffset>(nullable: true),
+                    RemovedOn = table.Column<DateTimeOffset>(nullable: true),
+                    FirstName = table.Column<string>(nullable: true),
+                    LastName = table.Column<string>(nullable: true),
+                    Identifier = table.Column<string>(nullable: true),
+                    BirthDate = table.Column<DateTimeOffset>(nullable: false),
+                    Nationality = table.Column<int>(nullable: false),
+                    Address_Line1 = table.Column<string>(nullable: true),
+                    Address_Line2 = table.Column<string>(nullable: true),
+                    Address_Zipcode = table.Column<string>(nullable: true),
+                    Address_City = table.Column<string>(nullable: true),
+                    Address_Country = table.Column<int>(nullable: true),
+                    BirthPlace_City = table.Column<string>(nullable: true),
+                    BirthPlace_Country = table.Column<int>(nullable: true),
+                    UboDeclarationUid = table.Column<long>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Ubos", x => x.Uid);
+                    table.ForeignKey(
+                        name: "FK_Ubos_UboDeclaration_UboDeclarationUid",
+                        column: x => x.UboDeclarationUid,
+                        principalTable: "UboDeclaration",
+                        principalColumn: "Uid",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -1548,13 +1538,6 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                 columns: new[] { "Uid", "Id", "UserUid", "RemovedOn" });
 
             migrationBuilder.CreateIndex(
-                name: "IX_Legals_BusinessUid",
-                table: "Legals",
-                column: "BusinessUid",
-                unique: true,
-                filter: "[BusinessUid] IS NOT NULL");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_Legals_UboDeclarationUid",
                 table: "Legals",
                 column: "UboDeclarationUid",
@@ -1562,16 +1545,15 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                 filter: "[UboDeclarationUid] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Legals_ConsumerUid",
-                table: "Legals",
-                column: "ConsumerUid",
-                unique: true,
-                filter: "[ConsumerUid] IS NOT NULL");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_Legals_Id",
                 table: "Legals",
                 column: "Id",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Legals_UserUid",
+                table: "Legals",
+                column: "UserUid",
                 unique: true);
 
             migrationBuilder.CreateIndex(
@@ -2045,6 +2027,11 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                 columns: new[] { "Uid", "Id", "AuthorUid", "PurchaseOrderUid", "CreditedWalletUid", "DebitedWalletUid", "RemovedOn" });
 
             migrationBuilder.CreateIndex(
+                name: "IX_UboDeclaration_BusinessLegalUid",
+                table: "UboDeclaration",
+                column: "BusinessLegalUid");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_UboDeclaration_Id",
                 table: "UboDeclaration",
                 column: "Id",
@@ -2056,9 +2043,9 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                 column: "Identifier");
 
             migrationBuilder.CreateIndex(
-                name: "IX_UboDeclaration_Uid_Id_Identifier_RemovedOn",
+                name: "IX_UboDeclaration_Uid_BusinessLegalUid_Id_RemovedOn",
                 table: "UboDeclaration",
-                columns: new[] { "Uid", "Id", "Identifier", "RemovedOn" });
+                columns: new[] { "Uid", "BusinessLegalUid", "Id", "RemovedOn" });
 
             migrationBuilder.CreateIndex(
                 name: "IX_Ubos_Id",
@@ -2077,9 +2064,9 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                 column: "UboDeclarationUid");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Ubos_Uid_UboDeclarationUid_Id_Identifier_RemovedOn",
+                name: "IX_Ubos_Uid_UboDeclarationUid_Id_RemovedOn",
                 table: "Ubos",
-                columns: new[] { "Uid", "UboDeclarationUid", "Id", "Identifier", "RemovedOn" });
+                columns: new[] { "Uid", "UboDeclarationUid", "Id", "RemovedOn" });
 
             migrationBuilder.CreateIndex(
                 name: "IX_UserAddresses_DepartmentUid",
@@ -2134,6 +2121,22 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                 table: "OrderDeliveries",
                 column: "OrderUid",
                 principalTable: "Orders",
+                principalColumn: "Uid",
+                onDelete: ReferentialAction.Cascade);
+
+            migrationBuilder.AddForeignKey(
+                name: "FK_BusinessLegalAddresses_Legals_BusinessLegalUid",
+                table: "BusinessLegalAddresses",
+                column: "BusinessLegalUid",
+                principalTable: "Legals",
+                principalColumn: "Uid",
+                onDelete: ReferentialAction.Cascade);
+
+            migrationBuilder.AddForeignKey(
+                name: "FK_UboDeclaration_Legals_BusinessLegalUid",
+                table: "UboDeclaration",
+                column: "BusinessLegalUid",
+                principalTable: "Legals",
                 principalColumn: "Uid",
                 onDelete: ReferentialAction.Cascade);
 
@@ -2788,10 +2791,10 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
             migrationBuilder.InsertData("Users", new List<string>() { "Uid", "Id", "CreatedOn", "FirstName", "LastName", "Name", "Email", "kind", "OpenForNewBusiness" }.ToArray(), new List<object>() { 3, "0EAFD299-D0E6-4A63-AF8D-6D154DB96F55", "2020-01-27 22:45:41", "John", "Syntax", "Biocoop Orky", "contact@biocoop-orky.xyz", "1", "1" }.ToArray(), "dbo");
             migrationBuilder.InsertData("Users", new List<string>() { "Uid", "Id", "CreatedOn", "FirstName", "LastName", "Name", "Email", "kind", "OpenForNewBusiness" }.ToArray(), new List<object>() { 4, "442E31E3-EEA9-4AA0-B741-3245ED1C6F2F", "2020-01-29 22:45:41", "Peter", "Fotdakor", "GAEC La Ferme du Crêt Joli", "contact@lfdcj.xyz", "0", "1" }.ToArray(), "dbo");
 
-            migrationBuilder.InsertData("Legals", new List<string>() { "Uid", "Id", "CreatedOn", "Email", "Siret", "VatIdentifier", "kind", "Owner_Id", "Owner_FirstName", "Owner_LastName", "Owner_Email", "Owner_BirthDate", "Owner_Nationality", "Owner_CountryOfResidence", "Owner_Address_Line1", "Owner_Address_Zipcode", "Owner_Address_City", "Owner_Address_Country" }.ToArray(), new List<object>() { 1, "9CDC2CC0-5BDE-4FCE-A875-90DDA3CE6F5B", "2020-01-25 15:23:10", "contact@lfdp.xyz", "999999999999", "FR12154545", 0, "28491432-1754-4285-9F67-5386A898A48F", "Benoit", "Mugnier", "contact@lfdp.xyz", "1990-01-01", 76, 76, "285 Route de Braille", "73410", "Entrelacs", 76 }.ToArray(), "dbo");
-            migrationBuilder.InsertData("Legals", new List<string>() { "Uid", "Id", "CreatedOn", "Email", "Siret", "VatIdentifier", "kind", "Owner_Id", "Owner_FirstName", "Owner_LastName", "Owner_Email", "Owner_BirthDate", "Owner_Nationality", "Owner_CountryOfResidence", "Owner_Address_Line1", "Owner_Address_Zipcode", "Owner_Address_City", "Owner_Address_Country" }.ToArray(), new List<object>() { 2, "B6100B20-E8B6-4670-BAD8-6363F614B352", "2020-01-30 22:45:41", "contact@biocoop-semnoz.xyz", "999999999999", "FR12154545", 1, "5A8F0AE2-B701-47F0-A8EF-E7C2365A72EB", "Ophélie", "Lulin", "contact@biocoop-semnoz.xyz", "1990-01-01", 76, 76, "12 Avenue de Périaz", "74600", "Seynod", 76 }.ToArray(), "dbo");
-            migrationBuilder.InsertData("Legals", new List<string>() { "Uid", "Id", "CreatedOn", "Email", "Siret", "VatIdentifier", "kind", "Owner_Id", "Owner_FirstName", "Owner_LastName", "Owner_Email", "Owner_BirthDate", "Owner_Nationality", "Owner_CountryOfResidence", "Owner_Address_Line1", "Owner_Address_Zipcode", "Owner_Address_City", "Owner_Address_Country" }.ToArray(), new List<object>() { 3, "72474939-ECF8-4FE0-AD17-A21611CB75ED", "2020-01-27 22:45:41", "contact@biocoop-orky.xyz", "999999999999", "FR12154545", 1, "0EAFD299-D0E6-4A63-AF8D-6D154DB96F55", "John", "Syntax", "contact@biocoop-orky.xyz", "1990-01-01", 76, 76, "6 Rue Boucher de la Rupelle", "73100", "Grésy-sur-Aix", 76 }.ToArray(), "dbo");
-            migrationBuilder.InsertData("Legals", new List<string>() { "Uid", "Id", "CreatedOn", "Email", "Siret", "VatIdentifier", "kind", "Owner_Id", "Owner_FirstName", "Owner_LastName", "Owner_Email", "Owner_BirthDate", "Owner_Nationality", "Owner_CountryOfResidence", "Owner_Address_Line1", "Owner_Address_Zipcode", "Owner_Address_City", "Owner_Address_Country" }.ToArray(), new List<object>() { 4, "3D858360-A7B4-4E32-A899-514F8A666EF8", "2020-01-29 22:45:41", "contact@lfdcj.xyz", "999999999999", "FR12154545", 0, "442E31E3-EEA9-4AA0-B741-3245ED1C6F2F", "Peter", "Fotdakor", "contact@lfdcj.xyz", "1990-01-01", 76, 76, "584 Route du Cret", "74270", "Minzier", 76 }.ToArray(), "dbo");
+            migrationBuilder.InsertData("Legals", new List<string>() { "Uid", "Id", "CreatedOn", "UserUid", "UserKind", "Email", "Siret", "VatIdentifier", "kind", "Owner_Id", "Owner_FirstName", "Owner_LastName", "Owner_Email", "Owner_BirthDate", "Owner_Nationality", "Owner_CountryOfResidence", "Owner_Address_Line1", "Owner_Address_Zipcode", "Owner_Address_City", "Owner_Address_Country" }.ToArray(), new List<object>() { 1, "9CDC2CC0-5BDE-4FCE-A875-90DDA3CE6F5B", "2020-01-25 15:23:10", 1, 1, "contact@lfdp.xyz", "999999999999", "FR12154545", 0, "28491432-1754-4285-9F67-5386A898A48F", "Benoit", "Mugnier", "contact@lfdp.xyz", "1990-01-01", 76, 76, "285 Route de Braille", "73410", "Entrelacs", 76 }.ToArray(), "dbo");
+            migrationBuilder.InsertData("Legals", new List<string>() { "Uid", "Id", "CreatedOn", "UserUid", "UserKind", "Email", "Siret", "VatIdentifier", "kind", "Owner_Id", "Owner_FirstName", "Owner_LastName", "Owner_Email", "Owner_BirthDate", "Owner_Nationality", "Owner_CountryOfResidence", "Owner_Address_Line1", "Owner_Address_Zipcode", "Owner_Address_City", "Owner_Address_Country" }.ToArray(), new List<object>() { 2, "B6100B20-E8B6-4670-BAD8-6363F614B352", "2020-01-30 22:45:41", 2, 1, "contact@biocoop-semnoz.xyz", "999999999999", "FR12154545", 1, "5A8F0AE2-B701-47F0-A8EF-E7C2365A72EB", "Ophélie", "Lulin", "contact@biocoop-semnoz.xyz", "1990-01-01", 76, 76, "12 Avenue de Périaz", "74600", "Seynod", 76 }.ToArray(), "dbo");
+            migrationBuilder.InsertData("Legals", new List<string>() { "Uid", "Id", "CreatedOn", "UserUid", "UserKind", "Email", "Siret", "VatIdentifier", "kind", "Owner_Id", "Owner_FirstName", "Owner_LastName", "Owner_Email", "Owner_BirthDate", "Owner_Nationality", "Owner_CountryOfResidence", "Owner_Address_Line1", "Owner_Address_Zipcode", "Owner_Address_City", "Owner_Address_Country" }.ToArray(), new List<object>() { 3, "72474939-ECF8-4FE0-AD17-A21611CB75ED", "2020-01-27 22:45:41", 3, 1, "contact@biocoop-orky.xyz", "999999999999", "FR12154545", 1, "0EAFD299-D0E6-4A63-AF8D-6D154DB96F55", "John", "Syntax", "contact@biocoop-orky.xyz", "1990-01-01", 76, 76, "6 Rue Boucher de la Rupelle", "73100", "Grésy-sur-Aix", 76 }.ToArray(), "dbo");
+            migrationBuilder.InsertData("Legals", new List<string>() { "Uid", "Id", "CreatedOn", "UserUid", "UserKind", "Email", "Siret", "VatIdentifier", "kind", "Owner_Id", "Owner_FirstName", "Owner_LastName", "Owner_Email", "Owner_BirthDate", "Owner_Nationality", "Owner_CountryOfResidence", "Owner_Address_Line1", "Owner_Address_Zipcode", "Owner_Address_City", "Owner_Address_Country" }.ToArray(), new List<object>() { 4, "3D858360-A7B4-4E32-A899-514F8A666EF8", "2020-01-29 22:45:41", 4, 1, "contact@lfdcj.xyz", "999999999999", "FR12154545", 0, "442E31E3-EEA9-4AA0-B741-3245ED1C6F2F", "Peter", "Fotdakor", "contact@lfdcj.xyz", "1990-01-01", 76, 76, "584 Route du Cret", "74270", "Minzier", 76 }.ToArray(), "dbo");
 
             migrationBuilder.InsertData("UserAddresses", new List<string>() { "UserUid", "Country", "Line1", "Line2", "Zipcode", "City", "Latitude", "Longitude", "DepartmentUid" }.ToArray(), new List<object>() { 1, 76, "285 Route de Braille", null, "73410", "Entrelacs", "45.780181", "6.035638", 74 }.ToArray(), "dbo");
             migrationBuilder.InsertData("UserAddresses", new List<string>() { "UserUid", "Country", "Line1", "Line2", "Zipcode", "City", "Latitude", "Longitude", "DepartmentUid" }.ToArray(), new List<object>() { 2, 76, "12 Avenue de Périaz", null, "74600", "Seynod", "45.877728", "6.0903743", 75 }.ToArray(), "dbo");
@@ -2924,6 +2927,10 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
             migrationBuilder.Sql("DROP VIEW PointsPerCountry");
 
             migrationBuilder.DropForeignKey(
+                name: "FK_Legals_Users_UserUid",
+                table: "Legals");
+
+            migrationBuilder.DropForeignKey(
                 name: "FK_Orders_Users_UserUid",
                 table: "Orders");
 
@@ -2950,6 +2957,10 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
             migrationBuilder.DropForeignKey(
                 name: "FK_Wallets_Users_UserUid",
                 table: "Wallets");
+
+            migrationBuilder.DropForeignKey(
+                name: "FK_UboDeclaration_Legals_BusinessLegalUid",
+                table: "UboDeclaration");
 
             migrationBuilder.DropForeignKey(
                 name: "FK_Transfers_PurchaseOrders_PurchaseOrderUid",
@@ -3061,9 +3072,6 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                 name: "Agreements");
 
             migrationBuilder.DropTable(
-                name: "Legals");
-
-            migrationBuilder.DropTable(
                 name: "Documents");
 
             migrationBuilder.DropTable(
@@ -3082,9 +3090,6 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                 name: "DeliveryModes");
 
             migrationBuilder.DropTable(
-                name: "UboDeclaration");
-
-            migrationBuilder.DropTable(
                 name: "Returnables");
 
             migrationBuilder.DropTable(
@@ -3095,6 +3100,12 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
 
             migrationBuilder.DropTable(
                 name: "Users");
+
+            migrationBuilder.DropTable(
+                name: "Legals");
+
+            migrationBuilder.DropTable(
+                name: "UboDeclaration");
 
             migrationBuilder.DropTable(
                 name: "PurchaseOrders");

@@ -25,10 +25,10 @@ namespace Sheaft.Application.Interop
         Task<Result<PspPaymentResultDto>> RefundTransferAsync(TransferRefund transaction, CancellationToken token);
         Task<Result<PspDocumentResultDto>> SubmitDocumentAsync(Document document, CancellationToken token);
         Task<Result<string>> ValidateCardAsync(Card payment, string registrationId, string registrationData, CancellationToken token);
-        Task<Result<PspDeclarationResultDto>> CreateUboDeclarationAsync(UboDeclaration declaration, Business business, CancellationToken token);
-        Task<Result<PspDeclarationResultDto>> SubmitUboDeclarationAsync(UboDeclaration declaration, Business business, CancellationToken token);
-        Task<Result<string>> CreateUboAsync(Ubo ubo, UboDeclaration declaration, Business business, CancellationToken token);
-        Task<Result<bool>> UpdateUboAsync(Ubo ubo, UboDeclaration declaration, Business business, CancellationToken token);
+        Task<Result<PspDeclarationResultDto>> CreateUboDeclarationAsync(UboDeclaration declaration, User business, CancellationToken token);
+        Task<Result<PspDeclarationResultDto>> SubmitUboDeclarationAsync(UboDeclaration declaration, User business, CancellationToken token);
+        Task<Result<string>> CreateUboAsync(Ubo ubo, UboDeclaration declaration, User business, CancellationToken token);
+        Task<Result<bool>> UpdateUboAsync(Ubo ubo, UboDeclaration declaration, User business, CancellationToken token);
         Task<Result<PspDocumentResultDto>> GetDocumentAsync(string identifier, CancellationToken token);
         Task<Result<PspDeclarationResultDto>> GetDeclarationAsync(string identifier, CancellationToken token);
         Task<Result<PspTransactionResultDto>> GetPayinAsync(string identifier, CancellationToken token);

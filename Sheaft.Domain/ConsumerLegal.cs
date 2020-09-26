@@ -10,11 +10,8 @@ namespace Sheaft.Domain.Models
         }
 
         public ConsumerLegal(Guid id, Consumer consumer, Owner owner)
-            : base(id, LegalKind.Natural, owner)
+            : base(id, LegalKind.Natural, consumer, owner)
         {
-            Consumer = consumer;
         }
-
-        public virtual Consumer Consumer { get; private set; }
     }
 }
