@@ -76,7 +76,7 @@ namespace Sheaft.Application.Handlers
                     if (!resultImage.Success)
                         return Failed<Guid>(resultImage.Exception);
 
-                    var roles = new List<Guid> { _roleOptions.Owner.Id, _roleOptions.Store.Id };
+                    var roles = new List<Guid> { _roleOptions.Owner.Id, _roleOptions.Producer.Id };
                     var authResult = await _mediatr.Process(new UpdateAuthUserCommand(request.RequestUser)
                     {
                         Email = producer.Email,
