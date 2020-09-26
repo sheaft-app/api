@@ -20,6 +20,22 @@ namespace Sheaft.Functions
             _mediatr = mediator;
         }
 
+        [FunctionName("CheckOrdersCommand")]
+        public async Task CheckOrdersCommandAsync([TimerTrigger("0 */10 * * * *", RunOnStartup = false)] TimerInfo info, CancellationToken token)
+        {
+            var results = await _mediatr.Process(new CheckOrdersCommand(new RequestUser("orders-functions", Guid.NewGuid().ToString("N"))), token);
+            if (!results.Success)
+                throw results.Exception;
+        }
+
+        [FunctionName("CheckOrderCommand")]
+        public async Task CheckOrderCommandAsync([ServiceBusTrigger(CheckOrderCommand.QUEUE_NAME, Connection = "AzureWebJobsServiceBus")] string message, CancellationToken token)
+        {
+            var results = await _mediatr.Process<CheckOrderCommand, bool>(message, token);
+            if (!results.Success)
+                throw results.Exception;
+        }
+
         [FunctionName("ConfirmOrderCommand")]
         public async Task ConfirmOrderCommandAsync([ServiceBusTrigger(ConfirmOrderCommand.QUEUE_NAME, Connection = "AzureWebJobsServiceBus")] string message, CancellationToken token)
         {
@@ -32,6 +48,14 @@ namespace Sheaft.Functions
         public async Task FailOrderCommandAsync([ServiceBusTrigger(FailOrderCommand.QUEUE_NAME, Connection = "AzureWebJobsServiceBus")] string message, CancellationToken token)
         {
             var results = await _mediatr.Process<FailOrderCommand, bool>(message, token);
+            if (!results.Success)
+                throw results.Exception;
+        }
+
+        [FunctionName("ExpireOrderCommand")]
+        public async Task ExpireOrderCommandAsync([ServiceBusTrigger(ExpireOrderCommand.QUEUE_NAME, Connection = "AzureWebJobsServiceBus")] string message, CancellationToken token)
+        {
+            var results = await _mediatr.Process<ExpireOrderCommand, bool>(message, token);
             if (!results.Success)
                 throw results.Exception;
         }

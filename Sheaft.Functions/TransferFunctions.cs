@@ -28,7 +28,7 @@ namespace Sheaft.Functions
         }
 
         [FunctionName("CheckNewTransfersCommand")]
-        public async Task CheckNewTransfersCommandAsync([TimerTrigger("0 * */1 * * *", RunOnStartup = false)] TimerInfo info, CancellationToken token)
+        public async Task CheckNewTransfersCommandAsync([TimerTrigger("0 */10 * * * *", RunOnStartup = false)] TimerInfo info, CancellationToken token)
         {
             var results = await _mediatr.Process(new CheckNewTransfersCommand(new RequestUser("transfer-functions", Guid.NewGuid().ToString("N"))), token);
             if (!results.Success)

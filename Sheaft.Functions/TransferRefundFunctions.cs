@@ -27,18 +27,18 @@ namespace Sheaft.Functions
                 throw results.Exception;
         }
 
-        [FunctionName("RefreshTransferRefundStatusCommand")]
-        public async Task RefreshTransferRefundStatusCommandAsync([ServiceBusTrigger(RefreshTransferRefundStatusCommand.QUEUE_NAME, Connection = "AzureWebJobsServiceBus")] string message, CancellationToken token)
-        {
-            var results = await _mediatr.Process<RefreshPayoutRefundStatusCommand, TransactionStatus>(message, token);
-            if (!results.Success)
-                throw results.Exception;
-        }
-
         [FunctionName("CheckNewTransferRefundsCommand")]
         public async Task CheckNewTransferRefundsCommandAsync([TimerTrigger("0 */10 * * * *", RunOnStartup = false)] TimerInfo info, CancellationToken token)
         {
             var results = await _mediatr.Process(new CheckNewTransferRefundsCommand(new RequestUser("transfer-refund-functions", Guid.NewGuid().ToString("N"))), token);
+            if (!results.Success)
+                throw results.Exception;
+        }
+
+        [FunctionName("RefreshTransferRefundStatusCommand")]
+        public async Task RefreshTransferRefundStatusCommandAsync([ServiceBusTrigger(RefreshTransferRefundStatusCommand.QUEUE_NAME, Connection = "AzureWebJobsServiceBus")] string message, CancellationToken token)
+        {
+            var results = await _mediatr.Process<RefreshPayoutRefundStatusCommand, TransactionStatus>(message, token);
             if (!results.Success)
                 throw results.Exception;
         }

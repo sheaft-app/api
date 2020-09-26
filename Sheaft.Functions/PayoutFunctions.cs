@@ -20,7 +20,7 @@ namespace Sheaft.Functions
         }
 
         [FunctionName("CheckPayoutsCommand")]
-        public async Task CheckPayoutsCommandAsync([TimerTrigger("0 * * */1 * *", RunOnStartup = false)] TimerInfo info, CancellationToken token)
+        public async Task CheckPayoutsCommandAsync([TimerTrigger("0 */10 * * * *", RunOnStartup = false)] TimerInfo info, CancellationToken token)
         {
             var results = await _mediatr.Process(new CheckPayoutsCommand(new RequestUser("payout-functions", Guid.NewGuid().ToString("N"))), token);
             if (!results.Success)

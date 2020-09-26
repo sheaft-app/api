@@ -14,6 +14,7 @@ using Sheaft.Application.Events;
 using Sheaft.Options;
 using Microsoft.Extensions.Options;
 using Sheaft.Exceptions;
+using Microsoft.EntityFrameworkCore;
 
 namespace Sheaft.Application.Handlers
 {
@@ -24,7 +25,9 @@ namespace Sheaft.Application.Handlers
         IRequestHandler<PayOrderCommand, Result<Guid>>,
         IRequestHandler<ConfirmOrderCommand, Result<IEnumerable<Guid>>>,
         IRequestHandler<FailOrderCommand, Result<bool>>,
-        IRequestHandler<ExpireOrderCommand, Result<bool>>
+        IRequestHandler<ExpireOrderCommand, Result<bool>>,
+        IRequestHandler<CheckOrdersCommand, Result<bool>>,
+        IRequestHandler<CheckOrderCommand, Result<bool>>
     {
         private readonly PspOptions _pspOptions;
 
@@ -262,6 +265,61 @@ namespace Sheaft.Application.Handlers
 
                 return Ok(true);
             });
+        }
+
+        public async Task<Result<bool>> Handle(CheckOrdersCommand request, CancellationToken token)
+        {
+            return await ExecuteAsync(async () =>
+            {
+                var skip = 0;
+                const int take = 100;
+
+                var expiredDate = DateTimeOffset.UtcNow.AddMinutes(-1440);
+                var orderIds = await GetNextOrderIdsAsync(expiredDate, skip, take, token);
+
+                while (orderIds.Any())
+                {
+                    foreach (var orderId in orderIds)
+                    {
+                        await _mediatr.Post(new CheckOrderCommand(request.RequestUser)
+                        {
+                            OrderId = orderId
+                        }, token);
+                    }
+
+                    skip += take;
+                    orderIds = await GetNextOrderIdsAsync(expiredDate, skip, take, token);
+                }
+
+                return Ok(true);
+            });
+        }
+
+        public async Task<Result<bool>> Handle(CheckOrderCommand request, CancellationToken token)
+        {
+            return await ExecuteAsync(async () =>
+            {
+                var payinRefund = await _context.GetByIdAsync<Order>(request.OrderId, token);
+                if (payinRefund.Status != OrderStatus.Created && payinRefund.Status != OrderStatus.Waiting)
+                    return Ok(false);
+
+                if (payinRefund.CreatedOn.AddMinutes(1440) < DateTimeOffset.UtcNow)
+                    return await _mediatr.Process(new ExpireOrderCommand(request.RequestUser) { OrderId = request.OrderId }, token);
+
+                return Ok(true);
+            });
+        }
+
+        private async Task<IEnumerable<Guid>> GetNextOrderIdsAsync(DateTimeOffset expiredDate, int skip, int take, CancellationToken token)
+        {
+            return await _context.Orders
+                .Get(c => c.CreatedOn < expiredDate
+                      && (c.Status == OrderStatus.Waiting || c.Status == OrderStatus.Created), true)
+                .OrderBy(c => c.CreatedOn)
+                .Select(c => c.Id)
+                .Skip(skip)
+                .Take(take)
+                .ToListAsync(token);
         }
     }
 }
