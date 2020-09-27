@@ -13,7 +13,7 @@
         {
             <div class="alert alert-success alert-dismissible fade show" role="alert">
                 <span>Successfully updated transfer @ViewBag.Edited.Name</span>
-                <a asp-controller="Levels" asp-action="Edit" asp-route-id="@ViewBag.Edited.Id">View details</a>
+                <a asp-controller="Transfers" asp-action="Details" asp-route-id="@ViewBag.Edited.Id">View details</a>
 
                 <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
@@ -35,9 +35,6 @@
                     <th scope="col">ExecutedOn</th>
                     <th scope="col">Code</th>
                     <th scope="col">
-                        <a asp-controller="Levels" asp-action="Add" class="btn btn-success">
-                            <i class="fa fa-plus"></i>
-                        </a>
                     </th>
                 </tr>
             </thead>
