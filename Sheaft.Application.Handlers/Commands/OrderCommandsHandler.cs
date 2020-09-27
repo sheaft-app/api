@@ -23,6 +23,7 @@ namespace Sheaft.Application.Handlers
         IRequestHandler<CreateBusinessOrderCommand, Result<IEnumerable<Guid>>>,
         IRequestHandler<UpdateConsumerOrderCommand, Result<bool>>,
         IRequestHandler<PayOrderCommand, Result<Guid>>,
+        IRequestHandler<RetryOrderCommand, Result<Guid>>,
         IRequestHandler<ConfirmOrderCommand, Result<IEnumerable<Guid>>>,
         IRequestHandler<FailOrderCommand, Result<bool>>,
         IRequestHandler<ExpireOrderCommand, Result<bool>>,
@@ -185,6 +186,38 @@ namespace Sheaft.Application.Handlers
                     if (!order.Deliveries.Any())
                         return Failed<Guid>(new ValidationException());
 
+                    order.SetStatus(OrderStatus.Waiting);
+
+                    _context.Update(order);
+                    await _context.SaveChangesAsync(token);
+
+                    var result = await _mediatr.Process(new CreateWebPayinCommand(request.RequestUser) { OrderId = order.Id }, token);
+                    if (!result.Success)
+                    {
+                        await transaction.RollbackAsync(token);
+                        return Failed<Guid>(result.Exception);
+                    }
+
+                    await transaction.CommitAsync(token);
+                    return Ok(result.Data);
+                }
+            });
+        }
+
+        public async Task<Result<Guid>> Handle(RetryOrderCommand request, CancellationToken token)
+        {
+            return await ExecuteAsync(async () =>
+            {
+                var order = await _context.GetByIdAsync<Order>(request.OrderId, token);
+                if (order.Status != OrderStatus.Refused)
+                    return Failed<Guid>(new InvalidOperationException());
+
+                var checkResult = await _mediatr.Process(new CheckConsumerConfigurationCommand(request.RequestUser) { Id = request.RequestUser.Id }, token);
+                if (!checkResult.Success)
+                    return Failed<Guid>(checkResult.Exception);
+
+                using (var transaction = await _context.Database.BeginTransactionAsync(token))
+                {
                     order.SetStatus(OrderStatus.Waiting);
 
                     _context.Update(order);
