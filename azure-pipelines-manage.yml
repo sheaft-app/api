@@ -15,15 +15,15 @@ pool:
 
 steps:
   - script: |
-      dotnet restore $(System.DefaultWorkingDirectory)/Sheaft.Manage/Sheaft.Manage.csproj
-      dotnet publish $(System.DefaultWorkingDirectory)/Sheaft.Manage/Sheaft.Manage.csproj --configuration Release --output publish_output/Sheaft.Manage/
+      dotnet restore $(System.DefaultWorkingDirectory)/Sheaft.Web.Manage/Sheaft.Web.Manage.csproj
+      dotnet publish $(System.DefaultWorkingDirectory)/Sheaft.Web.Manage/Sheaft.Web.Manage.csproj --configuration Release --output publish_output/Sheaft.Web.Manage/
   - task: ArchiveFiles@2
     displayName: "Archive files"
     inputs:
-      rootFolderOrFile: "$(System.DefaultWorkingDirectory)/publish_output/Sheaft.Manage"
+      rootFolderOrFile: "$(System.DefaultWorkingDirectory)/publish_output/Sheaft.Web.Manage"
       includeRootFolder: false
-      archiveFile: "$(System.DefaultWorkingDirectory)/publish_output/Sheaft.Manage/build$(Build.BuildId).zip"
+      archiveFile: "$(System.DefaultWorkingDirectory)/publish_output/Sheaft.Web.Manage/build$(Build.BuildId).zip"
   - task: PublishBuildArtifacts@1
     inputs:
-      PathtoPublish: '$(System.DefaultWorkingDirectory)/publish_output/Sheaft.Manage/build$(Build.BuildId).zip'
+      PathtoPublish: '$(System.DefaultWorkingDirectory)/publish_output/Sheaft.Web.Manage/build$(Build.BuildId).zip'
       artifactName: 'sheaft-manage'
