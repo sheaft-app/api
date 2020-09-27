@@ -182,7 +182,7 @@ namespace Sheaft.Application.Handlers
 
                 using (var transaction = await _context.Database.BeginTransactionAsync(token))
                 {
-                    var order = await _context.GetByIdAsync<Order>(request.Id, token);
+                    var order = await _context.GetByIdAsync<Order>(request.OrderId, token);
                     if (!order.Deliveries.Any())
                         return Failed<Guid>(new ValidationException());
 
@@ -350,7 +350,8 @@ namespace Sheaft.Application.Handlers
         {
             return await _context.Orders
                 .Get(c => c.CreatedOn < expiredDate
-                      && (c.Status == OrderStatus.Waiting || c.Status == OrderStatus.Created), true)
+                        && (c.Payin == null || c.Payin.Status == TransactionStatus.Failed || c.Payin.Status == TransactionStatus.Expired)
+                        && (c.Status == OrderStatus.Waiting || c.Status == OrderStatus.Created), true)
                 .OrderBy(c => c.CreatedOn)
                 .Select(c => c.Id)
                 .Skip(skip)
