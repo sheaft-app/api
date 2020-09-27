@@ -22,8 +22,8 @@ namespace Sheaft.Application.Mappers
             CreateMap<PurchaseOrderSender, UserProfileDto>();
             CreateMap<PurchaseOrderVendor, UserProfileDto>();
 
-            CreateMap<PurchaseOrderSender, OrderUserViewModel>();
-            CreateMap<PurchaseOrderVendor, OrderUserViewModel>();
+            CreateMap<PurchaseOrderSender, UserProfileViewModel>();
+            CreateMap<PurchaseOrderVendor, UserProfileViewModel>();
 
             CreateMap<IdInput, GenerateUserCodeCommand>();
             CreateMap<UpdatePictureInput, UpdateUserPictureCommand>();

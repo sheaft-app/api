@@ -33,6 +33,6 @@ namespace Sheaft.Application.Models
         public decimal FeesPercent { get; set; }
         //public virtual DonationViewModel Donation { get; set; }
         public virtual PayinViewModel Payin { get; set; }
-        public virtual OrderUserViewModel User { get; set; }
+        public virtual UserProfileViewModel User { get; set; }
     }
 }
