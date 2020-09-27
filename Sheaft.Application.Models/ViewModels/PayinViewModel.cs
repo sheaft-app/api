@@ -19,6 +19,6 @@ namespace Sheaft.Application.Models
         public DateTimeOffset? ExecutedOn { get; set; }
         public UserProfileViewModel Author { get; set; }
         public UserProfileViewModel CreditedUser { get; set; }
-        public Guid OrderId { get; set; }
+        public OrderShortViewModel Order { get; set; }
     }
 }

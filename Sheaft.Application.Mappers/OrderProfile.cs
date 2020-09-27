@@ -19,6 +19,8 @@ namespace Sheaft.Application.Mappers
                 .ForMember(d => d.Payin, opt => opt.MapFrom(r => r.Payin))
                 .ForMember(d => d.TotalFees, opt => opt.MapFrom(r => r.FeesPrice - r.InternalFeesPrice));
 
+            CreateMap<Order, OrderShortViewModel>();
+
             CreateMap<CreateOrderInput, CreateConsumerOrderCommand>();
             CreateMap<CreateOrderInput, CreateBusinessOrderCommand>();
 
