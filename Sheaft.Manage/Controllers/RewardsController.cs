@@ -27,7 +27,7 @@ namespace Sheaft.Manage.Controllers
         public RewardsController(
             IAppDbContext context,
             IMapper mapper,
-            IMediator mediatr,
+            ISheaftMediatr mediatr,
             IOptionsSnapshot<RoleOptions> roleOptions,
             IConfigurationProvider configurationProvider,
             ILogger<RewardsController> logger) : base(context, mapper, roleOptions, mediatr, configurationProvider)
@@ -77,7 +77,7 @@ namespace Sheaft.Manage.Controllers
         {
             var requestUser = await GetRequestUser(token);
 
-            var result = await _mediatr.Send(new CreateRewardCommand(requestUser)
+            var result = await _mediatr.Process(new CreateRewardCommand(requestUser)
             {
                 Name = model.Name,
                 Contact = model.Contact,
@@ -126,7 +126,7 @@ namespace Sheaft.Manage.Controllers
         {
             var requestUser = await GetRequestUser(token);
 
-            var result = await _mediatr.Send(new UpdateRewardCommand(requestUser)
+            var result = await _mediatr.Process(new UpdateRewardCommand(requestUser)
             {
                 Id = model.Id,
                 Name = model.Name,
@@ -160,7 +160,7 @@ namespace Sheaft.Manage.Controllers
             var name = entity.Name;
 
             var requestUser = await GetRequestUser(token);
-            var result = await _mediatr.Send(new DeleteRewardCommand(requestUser)
+            var result = await _mediatr.Process(new DeleteRewardCommand(requestUser)
             {
                 Id = id
             }, token);
@@ -183,7 +183,7 @@ namespace Sheaft.Manage.Controllers
             var name = entity.Name;
 
             var requestUser = await GetRequestUser(token);
-            var result = await _mediatr.Send(new RestoreRewardCommand(requestUser)
+            var result = await _mediatr.Process(new RestoreRewardCommand(requestUser)
             {
                 Id = id
             }, token);

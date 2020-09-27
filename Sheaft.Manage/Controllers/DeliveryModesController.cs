@@ -26,7 +26,7 @@ namespace Sheaft.Manage.Controllers
         public DeliveryModesController(
             IAppDbContext context,
             IMapper mapper,
-            IMediator mediatr,
+            ISheaftMediatr mediatr,
             IOptionsSnapshot<RoleOptions> roleOptions,
             IConfigurationProvider configurationProvider,
             ILogger<DeliveryModesController> logger) : base(context, mapper, roleOptions, mediatr, configurationProvider)
@@ -93,7 +93,7 @@ namespace Sheaft.Manage.Controllers
             }
 
             var entity = await _context.DeliveryModes.SingleOrDefaultAsync(t => t.Id == model.Id, token);
-            var result = await _mediatr.Send(new CreateDeliveryModeCommand(requestUser)
+            var result = await _mediatr.Process(new CreateDeliveryModeCommand(requestUser)
             {
                 Description = model.Description,
                 Name = model.Name,
@@ -142,7 +142,7 @@ namespace Sheaft.Manage.Controllers
                 return View(model);
             }
 
-            var result = await _mediatr.Send(new UpdateDeliveryModeCommand(requestUser)
+            var result = await _mediatr.Process(new UpdateDeliveryModeCommand(requestUser)
             {
                 Id = model.Id,
                 Description = model.Description,
@@ -170,7 +170,7 @@ namespace Sheaft.Manage.Controllers
             var name = entity.Name;
 
             var requestUser = await GetRequestUser(token);
-            var result = await _mediatr.Send(new DeleteDeliveryModeCommand(requestUser)
+            var result = await _mediatr.Process(new DeleteDeliveryModeCommand(requestUser)
             {
                 Id = id
             }, token);
@@ -193,7 +193,7 @@ namespace Sheaft.Manage.Controllers
             var name = entity.Name;
 
             var requestUser = await GetRequestUser(token);
-            var result = await _mediatr.Send(new RestoreDeliveryModeCommand(requestUser)
+            var result = await _mediatr.Process(new RestoreDeliveryModeCommand(requestUser)
             {
                 Id = id
             }, token);

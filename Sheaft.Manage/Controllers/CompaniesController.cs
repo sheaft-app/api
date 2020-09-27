@@ -32,7 +32,7 @@ namespace Sheaft.Manage.Controllers
         public CompaniesController(
             IAppDbContext context,
             IMapper mapper,
-            IMediator mediatr,
+            ISheaftMediatr mediatr,
             IConfigurationProvider configurationProvider,
             IOptionsSnapshot<RoleOptions> roleOptions,
             ILogger<CompaniesController> logger) : base(context, mapper, roleOptions, mediatr, configurationProvider)
@@ -116,7 +116,7 @@ namespace Sheaft.Manage.Controllers
             Result<bool> result = null;
             if (entity.Kind == ProfileKind.Producer)
             {
-                result = await _mediatr.Send(new UpdateProducerCommand(requestUser)
+                result = await _mediatr.Process(new UpdateProducerCommand(requestUser)
                 {
                     Id = model.Id,
                     Address = _mapper.Map<FullAddressInput>(model.Address),
@@ -133,7 +133,7 @@ namespace Sheaft.Manage.Controllers
             else
             {
                 var store = await _context.Users.OfType<Store>().SingleOrDefaultAsync(c => c.Id == model.Id, token);
-                result = await _mediatr.Send(new UpdateStoreCommand(requestUser)
+                result = await _mediatr.Process(new UpdateStoreCommand(requestUser)
                 {
                     Id = model.Id,
                     Address = _mapper.Map<FullAddressInput>(model.Address),
@@ -170,7 +170,7 @@ namespace Sheaft.Manage.Controllers
                         break;
                 }
 
-                var res = await _mediatr.Send(new ChangeUserRolesCommand(requestUser)
+                var res = await _mediatr.Process(new ChangeUserRolesCommand(requestUser)
                 {
                     UserId = entity.Id,
                     Roles = roles
@@ -196,8 +196,7 @@ namespace Sheaft.Manage.Controllers
             var entity = await _context.Users.OfType<Business>().SingleOrDefaultAsync(c => c.Id == id, token);
             var name = entity.Name;
 
-            var requestUser = await GetRequestUser(token);
-            var result = await _mediatr.Send(new RemoveUserCommand(requestUser)
+            var result = await _mediatr.Process(new RemoveUserCommand(await GetRequestUser(token))
             {
                 Id = id
             }, token);

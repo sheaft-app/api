@@ -21,7 +21,7 @@ namespace Sheaft.Manage.Controllers
     {
         protected readonly IAppDbContext _context;
         protected readonly IMapper _mapper;
-        protected readonly IMediator _mediatr;
+        protected readonly ISheaftMediatr _mediatr;
         protected readonly RoleOptions _roleOptions;
         protected readonly IConfigurationProvider _configurationProvider;
 
@@ -29,7 +29,7 @@ namespace Sheaft.Manage.Controllers
             IAppDbContext context,
             IMapper mapper,
             IOptionsSnapshot<RoleOptions> roleOptions,
-            IMediator mediatr,
+            ISheaftMediatr mediatr,
             IConfigurationProvider configurationProvider)
         {
             _context = context;

@@ -27,7 +27,7 @@ namespace Sheaft.Manage.Controllers
         public AgreementsController(
             IAppDbContext context,
             IMapper mapper,
-            IMediator mediatr,
+            ISheaftMediatr mediatr,
             IOptionsSnapshot<RoleOptions> roleOptions,
             IConfigurationProvider configurationProvider,
             ILogger<AgreementsController> logger) : base(context, mapper, roleOptions, mediatr, configurationProvider)
@@ -94,8 +94,7 @@ namespace Sheaft.Manage.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Reset(AgreementViewModel model, CancellationToken token)
         {
-            var requestUser = await GetRequestUser(token);
-            var result = await _mediatr.Send(new ResetAgreementStatusToCommand(requestUser)
+            var result = await _mediatr.Process(new ResetAgreementStatusToCommand(await GetRequestUser(token))
             {
                 Id = model.Id
             }, token);
@@ -114,10 +113,7 @@ namespace Sheaft.Manage.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete(Guid id, CancellationToken token)
         {
-            var entity = await _context.Agreements.SingleOrDefaultAsync(c => c.Id == id, token);
-
-            var requestUser = await GetRequestUser(token);
-            var result = await _mediatr.Send(new DeleteAgreementCommand(requestUser)
+            var result = await _mediatr.Process(new DeleteAgreementCommand(await GetRequestUser(token))
             {
                 Id = id
             }, token);
@@ -136,9 +132,7 @@ namespace Sheaft.Manage.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Restore(Guid id, CancellationToken token)
         {
-            var entity = await _context.Agreements.SingleOrDefaultAsync(c => c.Id == id, token);
-            var requestUser = await GetRequestUser(token);
-            var result = await _mediatr.Send(new RestoreAgreementCommand(requestUser)
+            var result = await _mediatr.Process(new RestoreAgreementCommand(await GetRequestUser(token))
             {
                 Id = id
             }, token);
@@ -149,7 +143,7 @@ namespace Sheaft.Manage.Controllers
                 return RedirectToAction("Index");
             }
 
-            TempData["Restored"] = JsonConvert.SerializeObject(new EntityViewModel { Id = entity.Id, Name = id.ToString("N") });
+            TempData["Restored"] = JsonConvert.SerializeObject(new EntityViewModel { Id = id, Name = id.ToString("N") });
             return RedirectToAction("Index");
         }
     }

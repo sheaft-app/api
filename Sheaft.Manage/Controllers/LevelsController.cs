@@ -26,7 +26,7 @@ namespace Sheaft.Manage.Controllers
         public LevelsController(
             IAppDbContext context,
             IMapper mapper,
-            IMediator mediatr,
+            ISheaftMediatr mediatr,
             IOptionsSnapshot<RoleOptions> roleOptions,
             IConfigurationProvider configurationProvider,
             ILogger<LevelsController> logger) : base(context, mapper, roleOptions, mediatr, configurationProvider)
@@ -73,8 +73,7 @@ namespace Sheaft.Manage.Controllers
         public async Task<IActionResult> Add(LevelViewModel model, CancellationToken token)
         {
             var requestUser = await GetRequestUser(token);
-
-            var result = await _mediatr.Send(new CreateLevelCommand(requestUser)
+            var result = await _mediatr.Process(new CreateLevelCommand(requestUser)
             {
                 Name = model.Name,
                 RequiredPoints = model.RequiredPoints,
@@ -112,7 +111,7 @@ namespace Sheaft.Manage.Controllers
         {
             var requestUser = await GetRequestUser(token);
 
-            var result = await _mediatr.Send(new UpdateLevelCommand(requestUser)
+            var result = await _mediatr.Process(new UpdateLevelCommand(requestUser)
             {
                 Id = model.Id,
                 Name = model.Name,
@@ -137,7 +136,7 @@ namespace Sheaft.Manage.Controllers
             var name = entity.Name;
 
             var requestUser = await GetRequestUser(token);
-            var result = await _mediatr.Send(new DeleteLevelCommand(requestUser)
+            var result = await _mediatr.Process(new DeleteLevelCommand(requestUser)
             {
                 Id = id
             }, token);
@@ -160,7 +159,7 @@ namespace Sheaft.Manage.Controllers
             var name = entity.Name;
 
             var requestUser = await GetRequestUser(token);
-            var result = await _mediatr.Send(new RestoreLevelCommand(requestUser)
+            var result = await _mediatr.Process(new RestoreLevelCommand(requestUser)
             {
                 Id = id
             }, token);

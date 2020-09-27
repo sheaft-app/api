@@ -26,7 +26,7 @@ namespace Sheaft.Manage.Controllers
         public ReturnablesController(
             IAppDbContext context,
             IMapper mapper,
-            IMediator mediatr,
+            ISheaftMediatr mediatr,
             IOptionsSnapshot<RoleOptions> roleOptions,
             IConfigurationProvider configurationProvider,
             ILogger<ReturnablesController> logger) : base(context, mapper, roleOptions, mediatr, configurationProvider)
@@ -92,7 +92,7 @@ namespace Sheaft.Manage.Controllers
                 return View(model);
             }
 
-            var result = await _mediatr.Send(new CreateReturnableCommand(requestUser)
+            var result = await _mediatr.Process(new CreateReturnableCommand(requestUser)
             {
                 Description = model.Description,
                 Name = model.Name,
@@ -139,7 +139,7 @@ namespace Sheaft.Manage.Controllers
                 return View(model);
             }
 
-            var result = await _mediatr.Send(new UpdateReturnableCommand(requestUser)
+            var result = await _mediatr.Process(new UpdateReturnableCommand(requestUser)
             {
                 Id = model.Id,
                 Description = model.Description,
@@ -166,7 +166,7 @@ namespace Sheaft.Manage.Controllers
             var name = entity.Name;
 
             var requestUser = await GetRequestUser(token);
-            var result = await _mediatr.Send(new DeleteReturnableCommand(requestUser)
+            var result = await _mediatr.Process(new DeleteReturnableCommand(requestUser)
             {
                 Id = id
             }, token);
@@ -189,7 +189,7 @@ namespace Sheaft.Manage.Controllers
             var name = entity.Name;
 
             var requestUser = await GetRequestUser(token);
-            var result = await _mediatr.Send(new RestoreReturnableCommand(requestUser)
+            var result = await _mediatr.Process(new RestoreReturnableCommand(requestUser)
             {
                 Id = id
             }, token);

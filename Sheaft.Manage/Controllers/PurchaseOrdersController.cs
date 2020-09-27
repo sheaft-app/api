@@ -27,7 +27,7 @@ namespace Sheaft.Manage.Controllers
         public PurchaseOrdersController(
             IAppDbContext context,
             IMapper mapper,
-            IMediator mediatr,
+            ISheaftMediatr mediatr,
             IOptionsSnapshot<RoleOptions> roleOptions,
             IConfigurationProvider configurationProvider,
             ILogger<PurchaseOrdersController> logger) : base(context, mapper, roleOptions, mediatr, configurationProvider)
@@ -110,7 +110,7 @@ namespace Sheaft.Manage.Controllers
             var reference = entity.Reference;
 
             var requestUser = await GetRequestUser(token);
-            var result = await _mediatr.Send(new DeletePurchaseOrderCommand(requestUser)
+            var result = await _mediatr.Process(new DeletePurchaseOrderCommand(requestUser)
             {
                 Id = id
             }, token);
@@ -133,7 +133,7 @@ namespace Sheaft.Manage.Controllers
             var name = entity.Reference;
 
             var requestUser = await GetRequestUser(token);
-            var result = await _mediatr.Send(new RestorePurchaseOrderCommand(requestUser)
+            var result = await _mediatr.Process(new RestorePurchaseOrderCommand(requestUser)
             {
                 Id = id
             }, token);

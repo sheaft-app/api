@@ -28,7 +28,7 @@ namespace Sheaft.Manage.Controllers
         public TagsController(
             IAppDbContext context,
             IMapper mapper,
-            IMediator mediatr,
+            ISheaftMediatr mediatr,
             IOptionsSnapshot<RoleOptions> roleOptions,
             IConfigurationProvider configurationProvider,
             ILogger<TagsController> logger) : base(context, mapper, roleOptions, mediatr, configurationProvider)
@@ -88,7 +88,7 @@ namespace Sheaft.Manage.Controllers
                 }
             }
 
-            var result = await _mediatr.Send(new CreateTagCommand(requestUser)
+            var result = await _mediatr.Process(new CreateTagCommand(requestUser)
             {
                 Description = model.Description,
                 Name = model.Name,
@@ -135,7 +135,7 @@ namespace Sheaft.Manage.Controllers
                 }
             }
 
-            var result = await _mediatr.Send(new UpdateTagCommand(requestUser)
+            var result = await _mediatr.Process(new UpdateTagCommand(requestUser)
             {
                 Id = model.Id,
                 Description = model.Description,
@@ -162,7 +162,7 @@ namespace Sheaft.Manage.Controllers
             var name = entity.Name;
 
             var requestUser = await GetRequestUser(token);
-            var result = await _mediatr.Send(new DeleteTagCommand(requestUser)
+            var result = await _mediatr.Process(new DeleteTagCommand(requestUser)
             {
                 Id = id
             }, token);
@@ -185,7 +185,7 @@ namespace Sheaft.Manage.Controllers
             var name = entity.Name;
 
             var requestUser = await GetRequestUser(token);
-            var result = await _mediatr.Send(new RestoreTagCommand(requestUser)
+            var result = await _mediatr.Process(new RestoreTagCommand(requestUser)
             {
                 Id = id
             }, token);

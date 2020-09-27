@@ -20,7 +20,7 @@ namespace Sheaft.Manage.Controllers
         public DashboardController(
             IAppDbContext context,
             IMapper mapper,
-            IMediator mediatr,
+            ISheaftMediatr mediatr,
             IConfigurationProvider configurationProvider,
             IOptionsSnapshot<RoleOptions> roleOptions,
             ILogger<DashboardController> logger) : base(context, mapper, roleOptions, mediatr, configurationProvider)

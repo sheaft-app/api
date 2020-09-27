@@ -32,7 +32,7 @@ namespace Sheaft.Manage.Controllers
         public UsersController(
             IAppDbContext context,
             IMapper mapper,
-            IMediator mediatr,
+            ISheaftMediatr mediatr,
             IOptionsSnapshot<RoleOptions> roleOptions,
             IConfigurationProvider configurationProvider,
             ILogger<UsersController> logger) : base(context, mapper, roleOptions, mediatr, configurationProvider)
@@ -109,7 +109,7 @@ namespace Sheaft.Manage.Controllers
                 }
             }
 
-            var result = await _mediatr.Send(new UpdateConsumerCommand(requestUser)
+            var result = await _mediatr.Process(new UpdateConsumerCommand(requestUser)
             {
                 Id = model.Id,
                 Email = model.Email,
@@ -138,7 +138,7 @@ namespace Sheaft.Manage.Controllers
             var name = entity.Name;
 
             var requestUser = await GetRequestUser(token);
-            var result = await _mediatr.Send(new RemoveUserCommand(requestUser)
+            var result = await _mediatr.Process(new RemoveUserCommand(requestUser)
             {
                 Id = id
             }, token);

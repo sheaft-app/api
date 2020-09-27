@@ -30,7 +30,7 @@ namespace Sheaft.Manage.Controllers
         public ProductsController(
             IAppDbContext context,
             IMapper mapper,
-            IMediator mediatr,
+            ISheaftMediatr mediatr,
             IOptionsSnapshot<RoleOptions> roleOptions,
             IConfigurationProvider configurationProvider,
             ILogger<ProductsController> logger) : base(context, mapper, roleOptions, mediatr, configurationProvider)
@@ -111,7 +111,7 @@ namespace Sheaft.Manage.Controllers
                 }
             }
 
-            var result = await _mediatr.Send(new CreateProductCommand(requestUser)
+            var result = await _mediatr.Process(new CreateProductCommand(requestUser)
             {
                 Description = model.Description,
                 Name = model.Name,
@@ -185,7 +185,7 @@ namespace Sheaft.Manage.Controllers
                 }
             }
 
-            var result = await _mediatr.Send(new UpdateProductCommand(requestUser)
+            var result = await _mediatr.Process(new UpdateProductCommand(requestUser)
             {
                 Id = model.Id,
                 Description = model.Description,
@@ -228,7 +228,7 @@ namespace Sheaft.Manage.Controllers
                 using (var stream = new MemoryStream())
                 {
                     await formFile.CopyToAsync(stream);
-                    var result = await _mediatr.Send(new QueueImportProductsCommand(requestUser) { Id = requestUser.Id, FileName = formFile.FileName, FileStream = stream });
+                    var result = await _mediatr.Process(new QueueImportProductsCommand(requestUser) { Id = requestUser.Id, FileName = formFile.FileName, FileStream = stream }, token);
                     if (!result.Success)
                         return BadRequest(result);
                 }
@@ -245,7 +245,7 @@ namespace Sheaft.Manage.Controllers
             var name = entity.Name;
 
             var requestUser = await GetRequestUser(token);
-            var result = await _mediatr.Send(new DeleteProductCommand(requestUser)
+            var result = await _mediatr.Process(new DeleteProductCommand(requestUser)
             {
                 Id = id
             }, token);
@@ -268,7 +268,7 @@ namespace Sheaft.Manage.Controllers
             var name = entity.Name;
 
             var requestUser = await GetRequestUser(token);
-            var result = await _mediatr.Send(new RestoreProductCommand(requestUser)
+            var result = await _mediatr.Process(new RestoreProductCommand(requestUser)
             {
                 Id = id
             }, token);

@@ -26,7 +26,7 @@ namespace Sheaft.Manage.Controllers
         public DepartmentsController(
             IAppDbContext context,
             IMapper mapper,
-            IMediator mediatr,
+            ISheaftMediatr mediatr,
             IOptionsSnapshot<RoleOptions> roleOptions,
             IConfigurationProvider configurationProvider,
             ILogger<DepartmentsController> logger) : base(context, mapper, roleOptions, mediatr, configurationProvider)
@@ -82,7 +82,7 @@ namespace Sheaft.Manage.Controllers
         public async Task<IActionResult> Edit(DepartmentViewModel model, CancellationToken token)
         {
             var requestUser = await GetRequestUser(token);
-            var result = await _mediatr.Send(new UpdateDepartmentCommand(requestUser)
+            var result = await _mediatr.Process(new UpdateDepartmentCommand(requestUser)
             {
                 Id = model.Id,
                 Name = model.Name,

@@ -26,7 +26,7 @@ namespace Sheaft.Manage.Controllers
         public JobsController(
             IAppDbContext context,
             IMapper mapper,
-            IMediator mediatr,
+            ISheaftMediatr mediatr,
             IOptionsSnapshot<RoleOptions> roleOptions,
             IConfigurationProvider configurationProvider,
             ILogger<JobsController> logger) : base(context, mapper, roleOptions, mediatr, configurationProvider)
@@ -88,10 +88,10 @@ namespace Sheaft.Manage.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(ReturnableViewModel model, CancellationToken token)
+        public async Task<IActionResult> Edit(JobViewModel model, CancellationToken token)
         {
             var requestUser = await GetRequestUser(token);
-            var result = await _mediatr.Send(new UpdateJobCommand(requestUser)
+            var result = await _mediatr.Process(new UpdateJobCommand(requestUser)
             {
                 Id = model.Id,
                 Name = model.Name
@@ -112,7 +112,7 @@ namespace Sheaft.Manage.Controllers
         public async Task<IActionResult> Archive(Guid id, CancellationToken token)
         {
             var requestUser = await GetRequestUser(token);
-            var result = await _mediatr.Send(new ArchiveJobCommand(requestUser)
+            var result = await _mediatr.Process(new ArchiveJobCommand(requestUser)
             {
                 Id = id
             }, token);
@@ -131,7 +131,7 @@ namespace Sheaft.Manage.Controllers
         public async Task<IActionResult> Pause(Guid id, CancellationToken token)
         {
             var requestUser = await GetRequestUser(token);
-            var result = await _mediatr.Send(new PauseJobCommand(requestUser)
+            var result = await _mediatr.Process(new PauseJobCommand(requestUser)
             {
                 Id = id
             }, token);
@@ -150,7 +150,7 @@ namespace Sheaft.Manage.Controllers
         public async Task<IActionResult> Resume(Guid id, CancellationToken token)
         {
             var requestUser = await GetRequestUser(token);
-            var result = await _mediatr.Send(new ResumeJobCommand(requestUser)
+            var result = await _mediatr.Process(new ResumeJobCommand(requestUser)
             {
                 Id = id
             }, token);
@@ -169,7 +169,7 @@ namespace Sheaft.Manage.Controllers
         public async Task<IActionResult> Cancel(Guid id, CancellationToken token)
         {
             var requestUser = await GetRequestUser(token);
-            var result = await _mediatr.Send(new CancelJobCommand(requestUser)
+            var result = await _mediatr.Process(new CancelJobCommand(requestUser)
             {
                 Id = id
             }, token);
@@ -188,7 +188,7 @@ namespace Sheaft.Manage.Controllers
         public async Task<IActionResult> Retry(Guid id, CancellationToken token)
         {
             var requestUser = await GetRequestUser(token);
-            var result = await _mediatr.Send(new RetryJobCommand(requestUser)
+            var result = await _mediatr.Process(new RetryJobCommand(requestUser)
             {
                 Id = id
             }, token);
@@ -207,7 +207,7 @@ namespace Sheaft.Manage.Controllers
         public async Task<IActionResult> Unarchive(Guid id, CancellationToken token)
         {
             var requestUser = await GetRequestUser(token);
-            var result = await _mediatr.Send(new UnarchiveJobCommand(requestUser)
+            var result = await _mediatr.Process(new UnarchiveJobCommand(requestUser)
             {
                 Id = id
             }, token);
@@ -226,7 +226,7 @@ namespace Sheaft.Manage.Controllers
         public async Task<IActionResult> Reset(Guid id, CancellationToken token)
         {
             var requestUser = await GetRequestUser(token);
-            var result = await _mediatr.Send(new ResetJobCommand(requestUser)
+            var result = await _mediatr.Process(new ResetJobCommand(requestUser)
             {
                 Id = id
             }, token);
@@ -248,7 +248,7 @@ namespace Sheaft.Manage.Controllers
             var name = entity.Name;
 
             var requestUser = await GetRequestUser(token);
-            var result = await _mediatr.Send(new DeleteJobCommand(requestUser)
+            var result = await _mediatr.Process(new DeleteJobCommand(requestUser)
             {
                 Id = id
             }, token);
@@ -271,7 +271,7 @@ namespace Sheaft.Manage.Controllers
             var name = entity.Name;
 
             var requestUser = await GetRequestUser(token);
-            var result = await _mediatr.Send(new RestoreJobCommand(requestUser)
+            var result = await _mediatr.Process(new RestoreJobCommand(requestUser)
             {
                 Id = id
             }, token);
