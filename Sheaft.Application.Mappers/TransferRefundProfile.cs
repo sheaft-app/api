@@ -9,7 +9,6 @@ namespace Sheaft.Application.Mappers
         public TransferRefundProfile()
         {
             CreateMap<TransferRefund, TransferRefundDto>()
-                .IncludeBase<Refund, TransactionDto>()
                 .ForMember(m => m.Author, opt => opt.MapFrom(t => t.Author))
                 .ForMember(m => m.CreditedUser, opt => opt.MapFrom(t => t.CreditedWallet.User))
                 .ForMember(m => m.DebitedUser, opt => opt.MapFrom(t => t.DebitedWallet.User))
