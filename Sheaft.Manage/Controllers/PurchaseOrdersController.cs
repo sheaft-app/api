@@ -17,6 +17,7 @@ using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Sheaft.Domain.Enums;
 
 namespace Sheaft.Manage.Controllers
 {
@@ -36,7 +37,7 @@ namespace Sheaft.Manage.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Index(CancellationToken token, int page = 0, int take = 10)
+        public async Task<IActionResult> Index(CancellationToken token, PurchaseOrderStatus? status = null, int page = 0, int take = 10)
         {
             if (page < 0)
                 page = 0;
@@ -55,6 +56,9 @@ namespace Sheaft.Manage.Controllers
                     query = query.Where(p => p.Sender.Id == requestUser.Id);
             }
 
+            if (status != null)
+                query = query.Where(p => p.Status == status);
+
             var entities = await query
                 .OrderByDescending(c => c.CreatedOn)
                 .Skip(page * take)
@@ -71,6 +75,7 @@ namespace Sheaft.Manage.Controllers
             ViewBag.Removed = TempData["Removed"];
             ViewBag.Page = page;
             ViewBag.Take = take;
+            ViewBag.Status = status;
 
             return View(entities);
         }

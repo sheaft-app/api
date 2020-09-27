@@ -3,6 +3,7 @@
     ViewData["Title"] = "Payouts";
     int take = ViewBag.Take;
     int currentPage = ViewBag.Page;
+    string status = ((TransactionStatus?)ViewBag.Status)?.ToString("G");
 }
 
     <div class="container">
@@ -22,6 +23,19 @@
             <br />
         }
 
+        <div class="btn-group">
+            <label class="btn btn-secondary @(status == null ? "active": "")">
+                <a asp-controller="Payouts" asp-action="Index" asp-route-kind="" asp-route-take="@take" asp-route-page="@currentPage" class="text-white">All</a>
+            </label>
+            @foreach (var existingStatus in Enum.GetNames(typeof(TransactionStatus)))
+            {
+                <label class="btn btn-secondary @(status == existingStatus ? "active": "")">
+                    <a asp-controller="Payouts" asp-action="Index" asp-route-kind="existingStatus" asp-route-take="@take" asp-route-page="@currentPage" class="text-white">@existingStatus</a>
+                </label>
+            }
+        </div>
+        <br />
+
         <table class="table table-hover">
             <thead class="thead-dark">
                 <tr>
@@ -33,29 +47,29 @@
                     <th scope="col">To</th>
                     <th scope="col">ExecutedOn</th>
                     <th scope="col">Code</th>
-                    <th scope="col">                        
+                    <th scope="col">
                     </th>
                 </tr>
             </thead>
             <tbody>
                 @foreach (var entity in Model)
                 {
-                <tr>
-                    <th scope="row">@entity.Identifier</th>
-                    <td>@entity.CreatedOn.ToString("dd/MM/yy hh:mm")</td>
-                    <td>@entity.Debited€</td>
-                    <td>@entity.DebitedUser.Name</td>
-                    <td>@entity.Credited€</td>
-                    <td>@entity.BankAccount.Owner</td>
-                    <td>@entity.Status.ToString("G")</td>
-                    <td>@entity.ExecutedOn?.ToString("dd/MM/yy hh:mm")</td>
-                    <td>@entity.ResultCode</td>
-                    <td>
-                        <a asp-controller="Payouts" asp-action="Details" asp-route-id="@entity.Id" class="btn btn-info">
-                            <i class="fa fa-eye"></i>
-                        </a>
-                    </td>
-                </tr>
+                    <tr>
+                        <th scope="row">@entity.Identifier</th>
+                        <td>@entity.CreatedOn.ToString("dd/MM/yy hh:mm")</td>
+                        <td>@entity.Debited€</td>
+                        <td>@entity.DebitedUser.Name</td>
+                        <td>@entity.Credited€</td>
+                        <td>@entity.BankAccount.Owner</td>
+                        <td>@entity.Status.ToString("G")</td>
+                        <td>@entity.ExecutedOn?.ToString("dd/MM/yy hh:mm")</td>
+                        <td>@entity.ResultCode</td>
+                        <td>
+                            <a asp-controller="Payouts" asp-action="Details" asp-route-id="@entity.Id" class="btn btn-info">
+                                <i class="fa fa-eye"></i>
+                            </a>
+                        </td>
+                    </tr>
                 }
             </tbody>
             <tfoot>
