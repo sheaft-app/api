@@ -21,63 +21,63 @@ namespace Sheaft.GraphQL.Types
                 .Name("acceptPurchaseOrders")
                 .Authorize(Policies.PRODUCER)
                 .Type<NonNullType<ListType<PurchaseOrderType>>>()
-                .UseSorting<PurchaseOrderSortType>()
-                .UseFiltering<PurchaseOrderFilterType>()
                 .UsePaging<PurchaseOrderType>()
+                .UseFiltering<PurchaseOrderFilterType>()
+                .UseSorting<PurchaseOrderSortType>()
                 .UseSelection();
 
             descriptor.Field(c => c.CompletePurchaseOrdersAsync(default, default))
                 .Name("completePurchaseOrders")
                 .Authorize(Policies.PRODUCER)
                 .Type<NonNullType<ListType<PurchaseOrderType>>>()
-                .UseSorting<PurchaseOrderSortType>()
-                .UseFiltering<PurchaseOrderFilterType>()
                 .UsePaging<PurchaseOrderType>()
+                .UseFiltering<PurchaseOrderFilterType>()
+                .UseSorting<PurchaseOrderSortType>()
                 .UseSelection();
 
             descriptor.Field(c => c.DeliverPurchaseOrdersAsync(default, default))
                 .Name("deliverPurchaseOrders")
                 .Authorize(Policies.PRODUCER)
                 .Type<NonNullType<ListType<PurchaseOrderType>>>()
-                .UseSorting<PurchaseOrderSortType>()
-                .UseFiltering<PurchaseOrderFilterType>()
                 .UsePaging<PurchaseOrderType>()
+                .UseFiltering<PurchaseOrderFilterType>()
+                .UseSorting<PurchaseOrderSortType>()
                 .UseSelection();
 
             descriptor.Field(c => c.ProcessPurchaseOrdersAsync(default, default))
                 .Name("processPurchaseOrders")
                 .Authorize(Policies.PRODUCER)
                 .Type<NonNullType<ListType<PurchaseOrderType>>>()
-                .UseSorting<PurchaseOrderSortType>()
-                .UseFiltering<PurchaseOrderFilterType>()
                 .UsePaging<PurchaseOrderType>()
+                .UseFiltering<PurchaseOrderFilterType>()
+                .UseSorting<PurchaseOrderSortType>()
                 .UseSelection();
 
             descriptor.Field(c => c.ShipPurchaseOrdersAsync(default, default))
                 .Name("shipPurchaseOrders")
                 .Authorize(Policies.PRODUCER)
                 .Type<NonNullType<ListType<PurchaseOrderType>>>()
-                .UseSorting<PurchaseOrderSortType>()
-                .UseFiltering<PurchaseOrderFilterType>()
                 .UsePaging<PurchaseOrderType>()
+                .UseFiltering<PurchaseOrderFilterType>()
+                .UseSorting<PurchaseOrderSortType>()
                 .UseSelection();
 
             descriptor.Field(c => c.RefusePurchaseOrdersAsync(default, default))
                 .Name("refusePurchaseOrders")
                 .Authorize(Policies.PRODUCER)
                 .Type<NonNullType<ListType<PurchaseOrderType>>>()
-                .UseSorting<PurchaseOrderSortType>()
-                .UseFiltering<PurchaseOrderFilterType>()
                 .UsePaging<PurchaseOrderType>()
+                .UseFiltering<PurchaseOrderFilterType>()
+                .UseSorting<PurchaseOrderSortType>()
                 .UseSelection();
 
             descriptor.Field(c => c.CancelPurchaseOrdersAsync(default, default))
                 .Name("cancelPurchaseOrders")
                 .Authorize(Policies.REGISTERED)
                 .Type<NonNullType<ListType<PurchaseOrderType>>>()
-                .UseSorting<PurchaseOrderSortType>()
-                .UseFiltering<PurchaseOrderFilterType>()
                 .UsePaging<PurchaseOrderType>()
+                .UseFiltering<PurchaseOrderFilterType>()
+                .UseSorting<PurchaseOrderSortType>()
                 .UseSelection();
 
             descriptor.Field(c => c.DeletePurchaseOrdersAsync(default))
@@ -104,18 +104,18 @@ namespace Sheaft.GraphQL.Types
                 .Name("refuseAgreements")
                 .Authorize(Policies.STORE_OR_PRODUCER)
                 .Type<NonNullType<ListType<AgreementType>>>()
-                .UseSorting<AgreementSortType>()
-                .UseFiltering<AgreementFilterType>()
                 .UsePaging<AgreementType>()
+                .UseFiltering<AgreementFilterType>()
+                .UseSorting<AgreementSortType>()
                 .UseSelection();
 
             descriptor.Field(c => c.CancelAgreementsAsync(default, default))
                 .Name("cancelAgreements")
                 .Authorize(Policies.STORE_OR_PRODUCER)
                 .Type<NonNullType<ListType<AgreementType>>>()
-                .UseSorting<AgreementSortType>()
-                .UseFiltering<AgreementFilterType>()
                 .UsePaging<AgreementType>()
+                .UseFiltering<AgreementFilterType>()
+                .UseSorting<AgreementSortType>()
                 .UseSelection();
 
             //JOBS
@@ -123,45 +123,45 @@ namespace Sheaft.GraphQL.Types
                 .Name("pauseJobs")
                 .Authorize(Policies.REGISTERED)
                 .Type<NonNullType<ListType<JobType>>>()
-                .UseSorting<JobSortType>()
-                .UseFiltering<JobFilterType>()
                 .UsePaging<JobType>()
+                .UseFiltering<JobFilterType>()
+                .UseSorting<JobSortType>()
                 .UseSelection();
 
             descriptor.Field(c => c.ResumeJobsAsync(default, default))
                 .Name("resumeJobs")
                 .Authorize(Policies.REGISTERED)
                 .Type<NonNullType<ListType<JobType>>>()
-                .UseSorting<JobSortType>()
-                .UseFiltering<JobFilterType>()
                 .UsePaging<JobType>()
+                .UseFiltering<JobFilterType>()
+                .UseSorting<JobSortType>()
                 .UseSelection();
 
             descriptor.Field(c => c.RetryJobsAsync(default, default))
                 .Name("retryJobs")
                 .Authorize(Policies.REGISTERED)
                 .Type<NonNullType<ListType<JobType>>>()
-                .UseSorting<JobSortType>()
-                .UseFiltering<JobFilterType>()
                 .UsePaging<JobType>()
+                .UseFiltering<JobFilterType>()
+                .UseSorting<JobSortType>()
                 .UseSelection();
 
             descriptor.Field(c => c.CancelJobsAsync(default, default))
                 .Name("cancelJobs")
                 .Authorize(Policies.REGISTERED)
                 .Type<NonNullType<ListType<JobType>>>()
-                .UseSorting<JobSortType>()
-                .UseFiltering<JobFilterType>()
                 .UsePaging<JobType>()
+                .UseFiltering<JobFilterType>()
+                .UseSorting<JobSortType>()
                 .UseSelection();
 
             descriptor.Field(c => c.ArchiveJobsAsync(default, default))
                 .Name("archiveJobs")
                 .Authorize(Policies.REGISTERED)
                 .Type<NonNullType<ListType<JobType>>>()
-                .UseSorting<JobSortType>()
-                .UseFiltering<JobFilterType>()
                 .UsePaging<JobType>()
+                .UseFiltering<JobFilterType>()
+                .UseSorting<JobSortType>()
                 .UseSelection();
 
             //PRODUCTS
@@ -197,9 +197,9 @@ namespace Sheaft.GraphQL.Types
                 .Name("setProductsAvailability")
                 .Authorize(Policies.PRODUCER)
                 .Type<NonNullType<ListType<ProductType>>>()
-                .UseSorting<ProductSortType>()
-                .UseFiltering<ProductFilterType>()
                 .UsePaging<ProductType>()
+                .UseFiltering<ProductFilterType>()
+                .UseSorting<ProductSortType>()
                 .UseSelection();
 
             descriptor.Field(c => c.DeleteProductsAsync(default))
@@ -273,9 +273,9 @@ namespace Sheaft.GraphQL.Types
                 .Name("createPurchaseOrders")
                 .Authorize(Policies.STORE)
                 .Type<NonNullType<ListType<PurchaseOrderType>>>()
-                .UseSorting<PurchaseOrderSortType>()
-                .UseFiltering<PurchaseOrderFilterType>()
                 .UsePaging<PurchaseOrderType>()
+                .UseFiltering<PurchaseOrderFilterType>()
+                .UseSorting<PurchaseOrderSortType>()
                 .UseSelection();
 
             //QUICKORDER

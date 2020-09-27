@@ -44,9 +44,9 @@ namespace Sheaft.GraphQL.Types
                 .Name("agreements")
                 .Authorize(Policies.STORE_OR_PRODUCER)
                 .Type<NonNullType<ListType<AgreementType>>>()
-                .UseSorting<AgreementSortType>()
-                .UseFiltering<AgreementFilterType>()
                 .UsePaging<AgreementType>()
+                .UseFiltering<AgreementFilterType>()
+                .UseSorting<AgreementSortType>()
                 .UseSelection();
 
             //LEADERBOARD
@@ -115,9 +115,9 @@ namespace Sheaft.GraphQL.Types
                 .Name("deliveries")
                 .Authorize(Policies.PRODUCER)
                 .Type<NonNullType<ListType<DeliveryModeType>>>()
-                .UseSorting<DeliveryModeSortType>()
-                .UseFiltering<DeliveryModeFilterType>()
                 .UsePaging<DeliveryModeType>()
+                .UseFiltering<DeliveryModeFilterType>()
+                .UseSorting<DeliveryModeSortType>()
                 .UseSelection();
 
             descriptor.Field(c => c.GetDelivery(default, default))
@@ -169,9 +169,9 @@ namespace Sheaft.GraphQL.Types
                 .Name("orders")
                 .Authorize(Policies.REGISTERED)
                 .Type<NonNullType<ListType<OrderType>>>()
-                .UseSorting<OrderSortType>()
-                .UseFiltering<OrderFilterType>()
                 .UsePaging<OrderType>()
+                .UseFiltering<OrderFilterType>()
+                .UseSorting<OrderSortType>()
                 .UseSelection();
 
             //JOB
@@ -187,9 +187,9 @@ namespace Sheaft.GraphQL.Types
                 .Name("jobs")
                 .Authorize(Policies.REGISTERED)
                 .Type<NonNullType<ListType<JobType>>>()
-                .UseSorting<JobSortType>()
-                .UseFiltering<JobFilterType>()
                 .UsePaging<JobType>()
+                .UseFiltering<JobFilterType>()
+                .UseSorting<JobSortType>()
                 .UseSelection();
 
             //NOTIFICATION
@@ -197,9 +197,9 @@ namespace Sheaft.GraphQL.Types
                 .Name("notifications")
                 .Authorize(Policies.REGISTERED)
                 .Type<NonNullType<ListType<NotificationType>>>()
-                .UseSorting<NotificationSortType>()
-                .UseFiltering<NotificationFilterType>()
                 .UsePaging<NotificationType>()
+                .UseFiltering<NotificationFilterType>()
+                .UseSorting<NotificationSortType>()
                 .UseSelection();
 
             //RETURNABLE
@@ -215,9 +215,9 @@ namespace Sheaft.GraphQL.Types
                 .Name("returnables")
                 .Authorize(Policies.PRODUCER)
                 .Type<NonNullType<ListType<ReturnableType>>>()
-                .UseSorting<ReturnableSortType>()
-                .UseFiltering<ReturnableFilterType>()
                 .UsePaging<ReturnableType>()
+                .UseFiltering<ReturnableFilterType>()
+                .UseSorting<ReturnableSortType>()
                 .UseSelection();
 
             //PRODUCER
@@ -234,9 +234,9 @@ namespace Sheaft.GraphQL.Types
                 .Authorize(Policies.STORE)
                 .Argument("input", c => c.Type<NonNullType<IdType>>())
                 .Type<NonNullType<ListType<ProductType>>>()
-                .UseSorting<ProductSortType>()
-                .UseFiltering<ProductFilterType>()
                 .UsePaging<ProductType>()
+                .UseFiltering<ProductFilterType>()
+                .UseSorting<ProductSortType>()
                 .UseSelection();
 
             descriptor.Field(c => c.GetProducerAgreements(default, default))
@@ -244,9 +244,9 @@ namespace Sheaft.GraphQL.Types
                 .Authorize(Policies.STORE)
                 .Argument("input", c => c.Type<NonNullType<IdType>>())
                 .Type<NonNullType<ListType<AgreementType>>>()
-                .UseSorting<AgreementSortType>()
-                .UseFiltering<AgreementFilterType>()
                 .UsePaging<AgreementType>()
+                .UseFiltering<AgreementFilterType>()
+                .UseSorting<AgreementSortType>()
                 .UseSelection();
 
             descriptor.Field(c => c.GetProducersDeliveriesAsync(default, default))
@@ -268,9 +268,9 @@ namespace Sheaft.GraphQL.Types
                 .Name("products")
                 .Authorize(Policies.PRODUCER)
                 .Type<NonNullType<ListType<ProductType>>>()
-                .UseSorting<ProductSortType>()
-                .UseFiltering<ProductFilterType>()
                 .UsePaging<ProductType>()
+                .UseFiltering<ProductFilterType>()
+                .UseSorting<ProductSortType>()
                 .UseSelection();
 
             descriptor.Field(c => c.HasProductsImportsInProgressAsync(default))
@@ -283,9 +283,9 @@ namespace Sheaft.GraphQL.Types
                 .Name("myOrders")
                 .Authorize(Policies.REGISTERED)
                 .Type<NonNullType<ListType<PurchaseOrderType>>>()
-                .UseSorting<PurchaseOrderSortType>()
-                .UseFiltering<PurchaseOrderFilterType>()
                 .UsePaging<PurchaseOrderType>()
+                .UseFiltering<PurchaseOrderFilterType>()
+                .UseSorting<PurchaseOrderSortType>()
                 .UseSelection();
 
             descriptor.Field(c => c.GetPurchaseOrder(default, default))
@@ -300,9 +300,9 @@ namespace Sheaft.GraphQL.Types
                 .Name("purchaseOrders")
                 .Authorize(Policies.PRODUCER)
                 .Type<NonNullType<ListType<PurchaseOrderType>>>()
-                .UseSorting<PurchaseOrderSortType>()
-                .UseFiltering<PurchaseOrderFilterType>()
                 .UsePaging<PurchaseOrderType>()
+                .UseFiltering<PurchaseOrderFilterType>()
+                .UseSorting<PurchaseOrderSortType>()
                 .UseSelection();
 
             descriptor.Field(c => c.HasPickingOrdersExportsInProgressAsync(default))
@@ -323,9 +323,9 @@ namespace Sheaft.GraphQL.Types
                 .Name("quickOrders")
                 .Authorize(Policies.STORE)
                 .Type<NonNullType<ListType<QuickOrderType>>>()
-                .UseSorting<QuickOrderSortType>()
-                .UseFiltering<QuickOrderFilterType>()
                 .UsePaging<QuickOrderType>()
+                .UseFiltering<QuickOrderFilterType>()
+                .UseSorting<QuickOrderSortType>()
                 .UseSelection();
 
             descriptor.Field(c => c.GetMyDefaultQuickOrder(default))
@@ -365,9 +365,9 @@ namespace Sheaft.GraphQL.Types
                 .Name("storeAgreementsProducts")
                 .Authorize(Policies.STORE)
                 .Type<NonNullType<ListType<ProductType>>>()
-                .UseSorting<ProductSortType>()
-                .UseFiltering<ProductFilterType>()
                 .UsePaging<ProductType>()
+                .UseFiltering<ProductFilterType>()
+                .UseSorting<ProductSortType>()
                 .UseSelection();
 
             descriptor.Field(c => c.GetStoreAgreements(default, default))
@@ -375,9 +375,9 @@ namespace Sheaft.GraphQL.Types
                 .Authorize(Policies.PRODUCER)
                 .Argument("input", c => c.Type<NonNullType<IdType>>())
                 .Type<NonNullType<ListType<AgreementType>>>()
-                .UseSorting<AgreementSortType>()
-                .UseFiltering<AgreementFilterType>()
                 .UsePaging<AgreementType>()
+                .UseFiltering<AgreementFilterType>()
+                .UseSorting<AgreementSortType>()
                 .UseSelection();
 
             descriptor.Field(c => c.GetStoreDeliveriesForProducersAsync(default, default))
