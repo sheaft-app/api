@@ -150,10 +150,9 @@ namespace Sheaft.Application.Handlers
                             && t.PurchaseOrder.Status == PurchaseOrderStatus.Delivered
                             && t.PurchaseOrder.DeliveredOn.HasValue && t.PurchaseOrder.DeliveredOn.Value < expiredDate)
                     .Select(t => new { ProducerId = t.CreditedWallet.User.Id, TransferId = t.Id })
-                    .GroupBy(t => t.ProducerId)
                     .ToListAsync(token);
 
-                foreach (var producerTransfers in producersTransfers)
+                foreach (var producerTransfers in producersTransfers.GroupBy(t => t.ProducerId))
                 {
                     await _mediatr.Post(new CreatePayoutCommand(request.RequestUser)
                     {
