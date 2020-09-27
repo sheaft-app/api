@@ -21,6 +21,7 @@ namespace Sheaft.Application.Handlers
         IRequestHandler<CheckTransfersCommand, Result<bool>>,
         IRequestHandler<CheckTransferCommand, Result<bool>>,
         IRequestHandler<ExpireTransferCommand, Result<bool>>,
+        IRequestHandler<UnblockTransferCommand, Result<bool>>,
         IRequestHandler<RefreshTransferStatusCommand, Result<TransactionStatus>>,
         IRequestHandler<CheckNewTransfersCommand, Result<bool>>,
         IRequestHandler<CreateTransferCommand, Result<Guid>>
@@ -94,6 +95,20 @@ namespace Sheaft.Application.Handlers
             {
                 var transfer = await _context.GetByIdAsync<Transfer>(request.TransferId, token);
                 transfer.SetStatus(TransactionStatus.Expired);
+
+                _context.Update(transfer);
+                await _context.SaveChangesAsync(token);
+
+                return Ok(true);
+            });
+        }
+
+        public async Task<Result<bool>> Handle(UnblockTransferCommand request, CancellationToken token)
+        {
+            return await ExecuteAsync(async () =>
+            {
+                var transfer = await _context.GetByIdAsync<Transfer>(request.TransferId, token);
+                transfer.SetSkipBackgroundProcessing(false);
 
                 _context.Update(transfer);
                 await _context.SaveChangesAsync(token);

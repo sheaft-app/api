@@ -59,6 +59,22 @@ namespace Sheaft.Functions
                 throw results.Exception;
         }
 
+        [FunctionName("ExpireTransferCommand")]
+        public async Task ExpireTransferCommandAsync([ServiceBusTrigger(ExpireTransferCommand.QUEUE_NAME, Connection = "AzureWebJobsServiceBus")] string message, CancellationToken token)
+        {
+            var results = await _mediatr.Process<ExpireTransferCommand, bool>(message, token);
+            if (!results.Success)
+                throw results.Exception;
+        }
+
+        [FunctionName("UnblockTransferCommand")]
+        public async Task UnblockTransferCommandAsync([ServiceBusTrigger(UnblockTransferCommand.QUEUE_NAME, Connection = "AzureWebJobsServiceBus")] string message, CancellationToken token)
+        {
+            var results = await _mediatr.Process<UnblockTransferCommand, bool>(message, token);
+            if (!results.Success)
+                throw results.Exception;
+        }
+
         [FunctionName("TransferFailedEvent")]
         public async Task TransferFailedEventAsync([ServiceBusTrigger(TransferFailedEvent.QUEUE_NAME, Connection = "AzureWebJobsServiceBus")] string message, CancellationToken token)
         {

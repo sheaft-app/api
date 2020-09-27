@@ -3,7 +3,7 @@ using System;
 
 namespace Sheaft.Application.Models
 {
-    public class TransactionDto
+    public class TransferViewModel
     {
         public Guid Id { get; set; }
         public string Identifier { get; set; }
@@ -18,6 +18,9 @@ namespace Sheaft.Application.Models
         public string ResultCode { get; set; }
         public string ResultMessage { get; set; }
         public DateTimeOffset? ExecutedOn { get; set; }
-        public UserProfileDto Author { get; set; }
+        public UserViewModel Author { get; set; }
+        public UserViewModel DebitedUser { get; set; }
+        public UserViewModel CreditedUser { get; set; }
+        public PurchaseOrderViewModel PurchaseOrder { get; set; }
     }
 }
