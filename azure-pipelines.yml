@@ -15,8 +15,8 @@ pool:
 
 steps:
   - script: |
-      dotnet restore $(System.DefaultWorkingDirectory)/Sheaft.Payment/Sheaft.Web.Payment.csproj
-      dotnet publish $(System.DefaultWorkingDirectory)/Sheaft.Payment/Sheaft.Web.Payment.csproj --configuration Release --output publish_output/Sheaft.Web.Payment/
+      dotnet restore $(System.DefaultWorkingDirectory)/Sheaft.Web.Payment/Sheaft.Web.Payment.csproj
+      dotnet publish $(System.DefaultWorkingDirectory)/Sheaft.Web.Payment/Sheaft.Web.Payment.csproj --configuration Release --output publish_output/Sheaft.Web.Payment/
   - task: ArchiveFiles@2
     displayName: "Archive files"
     inputs:
