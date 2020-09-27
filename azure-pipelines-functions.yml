@@ -16,14 +16,14 @@ pool:
 steps:
   - script: |
       dotnet restore $(System.DefaultWorkingDirectory)/Sheaft.sln
-      dotnet publish $(System.DefaultWorkingDirectory)/Sheaft.Functions/Sheaft.Functions.csproj --configuration Release --output publish_output/Sheaft.Functions/
+      dotnet publish $(System.DefaultWorkingDirectory)/Sheaft.Web.Functions/Sheaft.Web.Functions.csproj --configuration Release --output publish_output/Sheaft.Web.Functions/
   - task: ArchiveFiles@2
     displayName: "Archive files"
     inputs:
-      rootFolderOrFile: "$(System.DefaultWorkingDirectory)/publish_output/Sheaft.Functions"
+      rootFolderOrFile: "$(System.DefaultWorkingDirectory)/publish_output/Sheaft.Web.Functions"
       includeRootFolder: false
-      archiveFile: "$(System.DefaultWorkingDirectory)/publish_output/Sheaft.Functions/build$(Build.BuildId).zip"
+      archiveFile: "$(System.DefaultWorkingDirectory)/publish_output/Sheaft.Web.Functions/build$(Build.BuildId).zip"
   - task: PublishBuildArtifacts@1
     inputs:
-      PathtoPublish: '$(System.DefaultWorkingDirectory)/publish_output/Sheaft.Functions/build$(Build.BuildId).zip'
+      PathtoPublish: '$(System.DefaultWorkingDirectory)/publish_output/Sheaft.Web.Functions/build$(Build.BuildId).zip'
       artifactName: 'sheaft-functions'
