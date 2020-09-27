@@ -15,7 +15,6 @@ using Sheaft.Application.Handlers;
 using Sheaft.Application.Interop;
 using Sheaft.Application.Mappers;
 using Sheaft.Options;
-using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
@@ -31,77 +30,79 @@ namespace Sheaft.Functions
     {
         public override void Configure(IFunctionsHostBuilder builder)
         {
-            var configuration = ConfigurationManager.BuildConfiguration(builder.Services);
+            var context = builder.GetContext();
+            var Configuration = context.Configuration;
+            var services = builder.Services;
 
-            var sendgridSettings = configuration.GetSection(SendgridOptions.SETTING);
-            builder.Services.Configure<SendgridOptions>(sendgridSettings);
+            var sendgridSettings = Configuration.GetSection(SendgridOptions.SETTING);
+            services.Configure<SendgridOptions>(sendgridSettings);
 
-            var databaseSettings = configuration.GetSection(DatabaseOptions.SETTING);
-            builder.Services.Configure<DatabaseOptions>(databaseSettings);
+            var databaseSettings = Configuration.GetSection(DatabaseOptions.SETTING);
+            services.Configure<DatabaseOptions>(databaseSettings);
 
-            var storageSettings = configuration.GetSection(StorageOptions.SETTING);
-            builder.Services.Configure<StorageOptions>(storageSettings);
+            var storageSettings = Configuration.GetSection(StorageOptions.SETTING);
+            services.Configure<StorageOptions>(storageSettings);
 
-            var serviceBusSettings = configuration.GetSection(ServiceBusOptions.SETTING);
-            builder.Services.Configure<ServiceBusOptions>(serviceBusSettings);
+            var serviceBusSettings = Configuration.GetSection(ServiceBusOptions.SETTING);
+            services.Configure<ServiceBusOptions>(serviceBusSettings);
 
-            var pspSettings = configuration.GetSection(PspOptions.SETTING);
-            builder.Services.Configure<PspOptions>(pspSettings);
+            var pspSettings = Configuration.GetSection(PspOptions.SETTING);
+            services.Configure<PspOptions>(pspSettings);
 
-            builder.Services.Configure<AuthOptions>(configuration.GetSection(AuthOptions.SETTING));
-            builder.Services.Configure<CorsOptions>(configuration.GetSection(CorsOptions.SETTING));
-            builder.Services.Configure<SearchOptions>(configuration.GetSection(SearchOptions.SETTING));
-            builder.Services.Configure<ApiOptions>(configuration.GetSection(ApiOptions.SETTING));
-            builder.Services.Configure<DatabaseOptions>(configuration.GetSection(DatabaseOptions.SETTING));
-            builder.Services.Configure<FreshdeskOptions>(configuration.GetSection(FreshdeskOptions.SETTING));
-            builder.Services.Configure<LandingOptions>(configuration.GetSection(LandingOptions.SETTING));
-            builder.Services.Configure<PortalOptions>(configuration.GetSection(PortalOptions.SETTING));
-            builder.Services.Configure<ScoringOptions>(configuration.GetSection(ScoringOptions.SETTING));
-            builder.Services.Configure<SearchOptions>(configuration.GetSection(SearchOptions.SETTING));
-            builder.Services.Configure<SendgridOptions>(configuration.GetSection(SendgridOptions.SETTING));
-            builder.Services.Configure<SignalrOptions>(configuration.GetSection(SignalrOptions.SETTING));
-            builder.Services.Configure<SireneOptions>(configuration.GetSection(SireneOptions.SETTING));
-            builder.Services.Configure<SponsoringOptions>(configuration.GetSection(SponsoringOptions.SETTING));
-            builder.Services.Configure<RoutineOptions>(configuration.GetSection(RoutineOptions.SETTING));
+            services.Configure<AuthOptions>(Configuration.GetSection(AuthOptions.SETTING));
+            services.Configure<CorsOptions>(Configuration.GetSection(CorsOptions.SETTING));
+            services.Configure<SearchOptions>(Configuration.GetSection(SearchOptions.SETTING));
+            services.Configure<ApiOptions>(Configuration.GetSection(ApiOptions.SETTING));
+            services.Configure<DatabaseOptions>(Configuration.GetSection(DatabaseOptions.SETTING));
+            services.Configure<FreshdeskOptions>(Configuration.GetSection(FreshdeskOptions.SETTING));
+            services.Configure<LandingOptions>(Configuration.GetSection(LandingOptions.SETTING));
+            services.Configure<PortalOptions>(Configuration.GetSection(PortalOptions.SETTING));
+            services.Configure<ScoringOptions>(Configuration.GetSection(ScoringOptions.SETTING));
+            services.Configure<SearchOptions>(Configuration.GetSection(SearchOptions.SETTING));
+            services.Configure<SendgridOptions>(Configuration.GetSection(SendgridOptions.SETTING));
+            services.Configure<SignalrOptions>(Configuration.GetSection(SignalrOptions.SETTING));
+            services.Configure<SireneOptions>(Configuration.GetSection(SireneOptions.SETTING));
+            services.Configure<SponsoringOptions>(Configuration.GetSection(SponsoringOptions.SETTING));
+            services.Configure<RoutineOptions>(Configuration.GetSection(RoutineOptions.SETTING));
 
-            builder.Services.BuildServiceProvider();
-
-            builder.Services.AddAutoMapper(typeof(ProductProfile).Assembly);
-            builder.Services.AddMediatR(new List<Assembly>() { typeof(RegisterStoreCommand).Assembly, typeof(UserPointsCreatedEvent).Assembly, typeof(UserCommandsHandler).Assembly }.ToArray());
-
-            builder.Services.AddMemoryCache();
-            builder.Services.AddHttpClient();
-
-            builder.Services.AddSingleton(configuration);
-            builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+            services.BuildServiceProvider();
+            
+            services.AddAutoMapper(typeof(ProductProfile).Assembly);
+            services.AddMediatR(new List<Assembly>() { typeof(RegisterStoreCommand).Assembly, typeof(UserPointsCreatedEvent).Assembly, typeof(UserCommandsHandler).Assembly }.ToArray());
+            
+            services.AddMemoryCache();
+            services.AddHttpClient();
+            
+            services.AddSingleton(Configuration);
+            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
             var sendgridConfig = sendgridSettings.Get<SendgridOptions>();
-            builder.Services.AddScoped<ISendGridClient, SendGridClient>(_ => new SendGridClient(sendgridConfig.ApiKey));
+            services.AddScoped<ISendGridClient, SendGridClient>(_ => new SendGridClient(sendgridConfig.ApiKey));
 
-            builder.Services.AddScoped<IIdentifierService, IdentifierService>();
-            builder.Services.AddScoped<IQueueService, QueueService>();
-            builder.Services.AddScoped<IBlobService, BlobService>();
-            builder.Services.AddScoped<IEmailService, EmailService>();
-            builder.Services.AddScoped<ISignalrService, SignalrService>();
-            builder.Services.AddScoped<IPictureService, PictureService>();
-            builder.Services.AddScoped<IPspService, PspService>();
-            builder.Services.AddScoped<IFeesService, FeesService>();
-            builder.Services.AddScoped<ISheaftMediatr, SheaftMediatr>();
-            builder.Services.AddScoped<IAuthService, AuthService>();
+            services.AddScoped<IIdentifierService, IdentifierService>();
+            services.AddScoped<IQueueService, QueueService>();
+            services.AddScoped<IBlobService, BlobService>();
+            services.AddScoped<IEmailService, EmailService>();
+            services.AddScoped<ISignalrService, SignalrService>();
+            services.AddScoped<IPictureService, PictureService>();
+            services.AddScoped<IPspService, PspService>();
+            services.AddScoped<IFeesService, FeesService>();
+            services.AddScoped<ISheaftMediatr, SheaftMediatr>();
+            services.AddScoped<IAuthService, AuthService>();
 
-            builder.Services.AddScoped<IDapperContext, DapperContext>();
+            services.AddScoped<IDapperContext, DapperContext>();
 
-            builder.Services.AddOptions();
+            services.AddOptions();
 
             var databaseConfig = databaseSettings.Get<DatabaseOptions>();
-            builder.Services.AddDbContext<IAppDbContext, AppDbContext>(options =>
+            services.AddDbContext<IAppDbContext, AppDbContext>(options =>
             {
                 options.UseLazyLoadingProxies();
                 options.UseSqlServer(databaseConfig.ConnectionString, x => x.UseNetTopologySuite());
             }, ServiceLifetime.Scoped);
 
             var pspOptions = pspSettings.Get<PspOptions>();
-            builder.Services.AddScoped<MangoPayApi>(_ => new MangoPayApi
+            services.AddScoped<MangoPayApi>(_ => new MangoPayApi
             {
                 Config = new MangoPay.SDK.Core.Configuration
                 {
@@ -111,8 +112,8 @@ namespace Sheaft.Functions
                 }
             });
 
-            builder.Services.AddLocalization(ops => ops.ResourcesPath = "Resources");
-            builder.Services.Configure<RequestLocalizationOptions>(
+            services.AddLocalization(ops => ops.ResourcesPath = "Resources");
+            services.Configure<RequestLocalizationOptions>(
                 opts =>
                 {
                     var supportedCultures = new List<CultureInfo>
@@ -179,20 +180,14 @@ namespace Sheaft.Functions
                 managementClient.DeleteQueueAsync(existingQueue).Wait();
             }
         }
-    }
-
-    internal static class ConfigurationManager
-    {
-        public static IConfiguration BuildConfiguration(IServiceCollection services)
+        public override void ConfigureAppConfiguration(IFunctionsConfigurationBuilder builder)
         {
-            var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
+            var context = builder.GetContext();
 
-            return new ConfigurationBuilder()
-                .SetBasePath(Directory.GetCurrentDirectory())
-                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
-                .AddJsonFile($"appsettings.{environment}.json", optional: true, reloadOnChange: true)
-                .AddEnvironmentVariables()
-                .Build();
+            builder.ConfigurationBuilder
+                .AddJsonFile(Path.Combine(context.ApplicationRootPath, "appsettings.json"), optional: true, reloadOnChange: false)
+                .AddJsonFile(Path.Combine(context.ApplicationRootPath, $"appsettings.{context.EnvironmentName}.json"), optional: true, reloadOnChange: true)
+                .AddEnvironmentVariables();
         }
     }
 }
