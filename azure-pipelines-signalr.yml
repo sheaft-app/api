@@ -15,15 +15,15 @@ pool:
 
 steps:
   - script: |
-      dotnet restore $(System.DefaultWorkingDirectory)/Sheaft.Signalr/Sheaft.Signalr.csproj
-      dotnet publish $(System.DefaultWorkingDirectory)/Sheaft.Signalr/Sheaft.Signalr.csproj --configuration Release --output publish_output/Sheaft.Signalr/
+      dotnet restore $(System.DefaultWorkingDirectory)/Sheaft.Web.Signalr/Sheaft.Web.Signalr.csproj
+      dotnet publish $(System.DefaultWorkingDirectory)/Sheaft.Web.Signalr/Sheaft.Web.Signalr.csproj --configuration Release --output publish_output/Sheaft.Web.Signalr/
   - task: ArchiveFiles@2
     displayName: "Archive files"
     inputs:
-      rootFolderOrFile: "$(System.DefaultWorkingDirectory)/publish_output/Sheaft.Signalr"
+      rootFolderOrFile: "$(System.DefaultWorkingDirectory)/publish_output/Sheaft.Web.Signalr"
       includeRootFolder: false
-      archiveFile: "$(System.DefaultWorkingDirectory)/publish_output/Sheaft.Signalr/build$(Build.BuildId).zip"
+      archiveFile: "$(System.DefaultWorkingDirectory)/publish_output/Sheaft.Web.Signalr/build$(Build.BuildId).zip"
   - task: PublishBuildArtifacts@1
     inputs:
-      PathtoPublish: '$(System.DefaultWorkingDirectory)/publish_output/Sheaft.Signalr/build$(Build.BuildId).zip'
+      PathtoPublish: '$(System.DefaultWorkingDirectory)/publish_output/Sheaft.Web.Signalr/build$(Build.BuildId).zip'
       artifactName: 'sheaft-signalr'
