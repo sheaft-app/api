@@ -17,6 +17,8 @@ namespace Sheaft.Application.Mappers
                 .ForMember(m => m.DebitedUser, opt => opt.MapFrom(t => t.DebitedWallet.User))
                 .ForMember(m => m.PurchaseOrder, opt => opt.MapFrom(t => t.PurchaseOrder));
 
+            CreateMap<Transfer, TransferInfoViewModel>();
+
             CreateMap<Transfer, TransferShortViewModel>()
                 .ForMember(m => m.PurchaseOrder, opt => opt.MapFrom(t => t.PurchaseOrder));
 

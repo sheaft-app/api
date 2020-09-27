@@ -33,6 +33,7 @@ namespace Sheaft.Application.Models
         public decimal FeesFixedAmount { get; set; }
         public decimal FeesPercent { get; set; }
         public bool SkipBackgroundProcessing { get; set; }
+        public DonationShortViewModel Donation { get; set; }
         public PayinShortViewModel Payin { get; set; }
         public UserProfileViewModel User { get; set; }
         public IEnumerable<PurchaseOrderShortViewModel> PurchaseOrders { get; set; }

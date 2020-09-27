@@ -23,7 +23,7 @@ namespace Sheaft.Application.Models
         public UserProfileViewModel Sender { get; set; }
         public ExpectedDeliveryViewModel ExpectedDelivery { get; set; }
         public UserProfileViewModel Vendor { get; set; }
-        public TransferShortViewModel Transfer { get; set; }
+        public TransferInfoViewModel Transfer { get; set; }
         public IEnumerable<PurchaseOrderProductViewModel> Products { get; set; }
 
     }
