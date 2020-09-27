@@ -31,7 +31,7 @@ namespace Sheaft.Infrastructure.Services
 
         public async Task ProcessEventAsync<T>(T item, CancellationToken token) where T : INotification
         {
-            var queueName = (string)typeof(T).GetField("QUEUE_NAME").GetRawConstantValue();
+            var queueName = (string)item.GetType().GetField("QUEUE_NAME")?.GetRawConstantValue();
             if (string.IsNullOrWhiteSpace(queueName))
                 throw new ArgumentException("Event must implement public const string QUEUE_NAME; to be queued.");
 
@@ -40,7 +40,7 @@ namespace Sheaft.Infrastructure.Services
 
         public async Task ProcessCommandAsync<T>(T item, CancellationToken token) where T : IBaseRequest
         {
-            var queueName = (string)typeof(T).GetField("QUEUE_NAME").GetRawConstantValue();
+            var queueName = (string)item.GetType().GetField("QUEUE_NAME")?.GetRawConstantValue();
             if (string.IsNullOrWhiteSpace(queueName))
                 throw new ArgumentException("Event must implement public const string QUEUE_NAME; to be queued.");
 
