@@ -107,6 +107,27 @@
                 @Html.TextAreaFor(c => c.Comment, new { @class = "form-control", @disabled = "disabled" })
             </div>
 
+            @if (Model.Transfer != null)
+            {
+                <h4>Transfer</h4>
+                <div class="form-group">
+                    @Html.LabelFor(c => c.Transfer.Identifier, new { @class = "form-label" })
+                    @Html.TextAreaFor(c => c.Transfer.Identifier, new { @class = "form-control", @disabled = "disabled" })
+                </div>
+                <div class="form-group">
+                    @Html.LabelFor(c => c.Transfer.Credited, new { @class = "form-label" })
+                    @Html.TextAreaFor(c => c.Transfer.Credited, new { @class = "form-control", @disabled = "disabled" })
+                </div>
+                <div class="form-group">
+                    @Html.LabelFor(c => c.Transfer.Status, new { @class = "form-label" })
+                    @Html.TextAreaFor(c => c.Transfer.Status.ToString("G"), new { @class = "form-control", @disabled = "disabled" })
+                </div>
+                <br />
+                <a asp-controller="Transfers" asp-action="Details" asp-route-id="@Model.Transfer.Id" class="btn btn-info">
+                    User details
+                </a>
+            }
+
             <h4>Products</h4>
 
             <table class="table table-hover">

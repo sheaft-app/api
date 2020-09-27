@@ -81,7 +81,7 @@ namespace Sheaft.Manage.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Edit(Guid id, CancellationToken token)
+        public async Task<IActionResult> Details(Guid id, CancellationToken token)
         {
             var requestUser = await GetRequestUser(token);            
 
@@ -99,7 +99,7 @@ namespace Sheaft.Manage.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(PurchaseOrderViewModel model, CancellationToken token)
+        public async Task<IActionResult> Details(PurchaseOrderViewModel model, CancellationToken token)
         {
             var requestUser = await GetRequestUser(token);
 
