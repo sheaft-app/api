@@ -3,64 +3,65 @@
     ViewData["Title"] = "Transfer details";
 }
 
-<div class="container">
-    <h2 class="display-4">Transfer details</h2>
-    <br />
-    <br />
-    <div class="form-group">
-        @Html.LabelFor(m => m.Identifier)
-        @Html.TextBoxFor(m => m.Identifier, null, new { @class = "form-control", @disabled = "disabled" })
+    <div class="container">
+        <h2 class="display-4">Transfer details</h2>
+        <br />
+        <br />
+        <div class="form-group">
+            @Html.LabelFor(m => m.Identifier)
+            @Html.TextBoxFor(m => m.Identifier, null, new { @class = "form-control", @disabled = "disabled" })
+        </div>
+        <div class="form-group">
+            @Html.LabelFor(m => m.CreatedOn)
+            @Html.TextBoxFor(m => m.CreatedOn, null, new { @class = "form-control", @disabled = "disabled" })
+        </div>
+        <div class="form-group">
+            @Html.LabelFor(m => m.UpdatedOn)
+            @Html.TextBoxFor(m => m.UpdatedOn, null, new { @class = "form-control", @disabled = "disabled" })
+        </div>
+        <h4>From</h4>
+        <div class="form-group">
+            @Html.LabelFor(m => m.DebitedUser.Name)
+            @Html.TextBoxFor(m => m.DebitedUser.Name, null, new { @class = "form-control", @disabled = "disabled" })
+        </div>
+        <div class="form-group">
+            @Html.LabelFor(m => m.Debited)
+            @Html.TextBoxFor(m => m.Debited, null, new { @class = "form-control", @disabled = "disabled" })
+        </div>
+        <h4>To</h4>
+        <div class="form-group">
+            @Html.LabelFor(m => m.CreditedUser.Name)
+            @Html.TextBoxFor(m => m.CreditedUser.Name, null, new { @class = "form-control", @disabled = "disabled" })
+        </div>
+        <div class="form-group">
+            @Html.LabelFor(m => m.Credited)
+            @Html.TextBoxFor(m => m.Credited, null, new { @class = "form-control", @disabled = "disabled" })
+        </div>
+        <h4>Operation</h4>
+        <div class="form-group">
+            @Html.LabelFor(m => m.Status)
+            @Html.TextBoxFor(m => m.Status.ToString("G"), null, new { @class = "form-control", @disabled = "disabled" })
+        </div>
+        <div class="form-group">
+            @Html.LabelFor(m => m.ExecutedOn)
+            @Html.TextBoxFor(m => m.ExecutedOn, null, new { @class = "form-control", @disabled = "disabled" })
+        </div>
+        <div class="form-group">
+            @Html.LabelFor(m => m.ResultCode)
+            @Html.TextBoxFor(m => m.ResultCode, null, new { @class = "form-control", @disabled = "disabled" })
+        </div>
+        <div class="form-group">
+            @Html.LabelFor(m => m.ResultMessage)
+            @Html.TextBoxFor(m => m.ResultMessage, null, new { @class = "form-control", @disabled = "disabled" })
+        </div>
+        <h4>Purchase Order</h4>
+        <div class="form-group">
+            <a asp-controller="Orders" asp-action="Details" asp-route-id="@Model.PurchaseOrderId" class="btn btn-info">
+                Related Purchase Order
+            </a>
+        </div>
+        <br />
+        <a asp-controller="Transfers" asp-action="Index" class="btn btn-light">
+            Go Back
+        </a>
     </div>
-    <div class="form-group">
-        @Html.LabelFor(m => m.CreatedOn)
-        @Html.TextBoxFor(m => m.CreatedOn, null, new { @class = "form-control", @disabled = "disabled" })
-    </div>
-    <div class="form-group">
-        @Html.LabelFor(m => m.UpdatedOn)
-        @Html.TextBoxFor(m => m.UpdatedOn, null, new { @class = "form-control", @disabled = "disabled" })
-    </div>
-    <h4>From</h4>
-    <div class="form-group">
-        @Html.LabelFor(m => m.DebitedUser.Name)
-        @Html.TextBoxFor(m => m.DebitedUser.Name, null, new { @class = "form-control", @disabled = "disabled" })
-    </div>
-    <div class="form-group">
-        @Html.LabelFor(m => m.Debited)
-        @Html.TextBoxFor(m => m.Debited, null, new { @class = "form-control", @disabled = "disabled" })
-    </div>
-    <h4>To</h4>
-    <div class="form-group">
-        @Html.LabelFor(m => m.CreditedUser.Name)
-        @Html.TextBoxFor(m => m.CreditedUser.Name, null, new { @class = "form-control", @disabled = "disabled" })
-    </div>
-    <div class="form-group">
-        @Html.LabelFor(m => m.Credited)
-        @Html.TextBoxFor(m => m.Credited, null, new { @class = "form-control", @disabled = "disabled" })
-    </div>
-    <h4>Operation</h4>
-    <div class="form-group">
-        @Html.LabelFor(m => m.Status)
-        @Html.TextBoxFor(m => m.Status.ToString("G"), null, new { @class = "form-control", @disabled = "disabled" })
-    </div>
-    <div class="form-group">
-        @Html.LabelFor(m => m.ExecutedOn)
-        @Html.TextBoxFor(m => m.ExecutedOn, null, new { @class = "form-control", @disabled = "disabled" })
-    </div>
-    <div class="form-group">
-        @Html.LabelFor(m => m.ResultCode)
-        @Html.TextBoxFor(m => m.ResultCode, null, new { @class = "form-control", @disabled = "disabled" })
-    </div>
-    <div class="form-group">
-        @Html.LabelFor(m => m.ResultMessage)
-        @Html.TextBoxFor(m => m.ResultMessage, null, new { @class = "form-control", @disabled = "disabled" })
-    </div>
-    <h4>PurchaseOrder</h4>
-    <div class="form-group">
-        @Html.LabelFor(m => m.PurchaseOrder.Reference)
-        @Html.TextBoxFor(m => m.PurchaseOrder.Reference, null, new { @class = "form-control", @disabled = "disabled" })
-    </div>
-    <br />
-    <a asp-controller="Transfers" asp-action="Index" class="btn btn-light">
-        Go Back
-    </a>
-</div>

@@ -74,7 +74,7 @@ namespace Sheaft.Manage.Controllers
         [HttpGet]
         public async Task<IActionResult> Details(Guid id, CancellationToken token)
         {
-            var entity = await _context.Departments
+            var entity = await _context.Transfers
                 .AsNoTracking()
                 .Where(c => c.Id == id)
                 .ProjectTo<TransferViewModel>(_configurationProvider)

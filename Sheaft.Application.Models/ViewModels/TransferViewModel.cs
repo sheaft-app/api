@@ -18,9 +18,9 @@ namespace Sheaft.Application.Models
         public string ResultCode { get; set; }
         public string ResultMessage { get; set; }
         public DateTimeOffset? ExecutedOn { get; set; }
-        public UserViewModel Author { get; set; }
-        public UserViewModel DebitedUser { get; set; }
-        public UserViewModel CreditedUser { get; set; }
-        public PurchaseOrderViewModel PurchaseOrder { get; set; }
+        public UserProfileViewModel Author { get; set; }
+        public UserProfileViewModel DebitedUser { get; set; }
+        public UserProfileViewModel CreditedUser { get; set; }
+        public Guid PurchaseOrderId { get; set; }
     }
 }

@@ -22,7 +22,7 @@ namespace Sheaft.Application.Mappers
                 .ForMember(m => m.Author, opt => opt.MapFrom(t => t.Author))
                 .ForMember(m => m.CreditedUser, opt => opt.MapFrom(t => t.CreditedWallet.User))
                 .ForMember(m => m.DebitedUser, opt => opt.MapFrom(t => t.DebitedWallet.User))
-                .ForMember(m => m.PurchaseOrder, opt => opt.MapFrom(t => t.PurchaseOrder));
+                .ForMember(m => m.PurchaseOrderId, opt => opt.MapFrom(t => t.PurchaseOrder.Id));
         }
     }
 }
