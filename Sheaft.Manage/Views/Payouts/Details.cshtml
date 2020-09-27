@@ -1,0 +1,99 @@
+﻿@model PayoutViewModel
+@{
+    ViewData["Title"] = "Payout details";
+}
+
+    <div class="container">
+        <h2 class="display-4">Payout details</h2>
+        <br />
+        <br />
+        <div class="form-group">
+            @Html.LabelFor(m => m.Identifier)
+            @Html.TextBoxFor(m => m.Identifier, null, new { @class = "form-control", @disabled = "disabled" })
+        </div>
+        <div class="form-group">
+            @Html.LabelFor(m => m.CreatedOn)
+            @Html.TextBoxFor(m => m.CreatedOn, null, new { @class = "form-control", @disabled = "disabled" })
+        </div>
+        <div class="form-group">
+            @Html.LabelFor(m => m.UpdatedOn)
+            @Html.TextBoxFor(m => m.UpdatedOn, null, new { @class = "form-control", @disabled = "disabled" })
+        </div>
+        <h4>From</h4>
+        <div class="form-group">
+            @Html.LabelFor(m => m.DebitedUser.Name)
+            @Html.TextBoxFor(m => m.DebitedUser.Name, null, new { @class = "form-control", @disabled = "disabled" })
+        </div>
+        <div class="form-group">
+            @Html.LabelFor(m => m.Debited)
+            @Html.TextBoxFor(m => m.Debited, null, new { @class = "form-control", @disabled = "disabled" })
+        </div>
+        <h4>To</h4>
+        <div class="form-group">
+            @Html.LabelFor(m => m.BankAccount.Owner)
+            @Html.TextBoxFor(m => m.BankAccount.Owner, null, new { @class = "form-control", @disabled = "disabled" })
+        </div>
+        <div class="form-group">
+            @Html.LabelFor(m => m.BankAccount.IBAN)
+            @Html.TextBoxFor(m => m.BankAccount.IBAN, null, new { @class = "form-control", @disabled = "disabled" })
+        </div>
+        <div class="form-group">
+            @Html.LabelFor(m => m.Credited)
+            @Html.TextBoxFor(m => m.Credited, null, new { @class = "form-control", @disabled = "disabled" })
+        </div>
+        <h4>Operation</h4>
+        <div class="form-group">
+            @Html.LabelFor(m => m.Status)
+            @Html.TextBoxFor(m => m.Status.ToString("G"), null, new { @class = "form-control", @disabled = "disabled" })
+        </div>
+        <div class="form-group">
+            @Html.LabelFor(m => m.ExecutedOn)
+            @Html.TextBoxFor(m => m.ExecutedOn, null, new { @class = "form-control", @disabled = "disabled" })
+        </div>
+        <div class="form-group">
+            @Html.LabelFor(m => m.ResultCode)
+            @Html.TextBoxFor(m => m.ResultCode, null, new { @class = "form-control", @disabled = "disabled" })
+        </div>
+        <div class="form-group">
+            @Html.LabelFor(m => m.ResultMessage)
+            @Html.TextBoxFor(m => m.ResultMessage, null, new { @class = "form-control", @disabled = "disabled" })
+        </div>
+        <h4>Related Transfers</h4>
+        <table class="table table-hover">
+            <thead class="thead-dark">
+                <tr>
+                    <th scope="col">Name</th>
+                    <th scope="col">Contact</th>
+                    <th scope="col">Email</th>
+                    <th scope="col">Department</th>
+                    <th scope="col">Url</th>
+                    <th scope="col"></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var transfer in Model.Transfers)
+                {
+                    <tr>
+                        <th scope="row">@transfer.Identifier</th>
+                        <td>@transfer.Credited</td>
+                        <td>@transfer.Status</td>
+                        <td>@transfer.PurchaseOrder.Identifier</td>
+                        <td>@transfer.PurchaseOrder.Status</td>
+                        <td>@transfer.PurchaseOrder.TotalOnSalePrice</td>
+                        <td>
+                            <a asp-controller="Transfer" asp-action="Details" asp-route-id="@transfer.Id" class="btn btn-info">
+                                <i class="fa fa-eye"></i>
+                            </a>
+                            <a asp-controller="PurchaseOrders" asp-action="Edit" asp-route-id="@transfer.PurchaseOrder.Id" class="btn btn-info">
+                                <i class="fa fa-money-bill"></i>
+                            </a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+        <br />
+        <a asp-controller="Payouts" asp-action="Index" class="btn btn-light">
+            Go Back
+        </a>
+    </div>

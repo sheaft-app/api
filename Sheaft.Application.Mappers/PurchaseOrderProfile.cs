@@ -15,11 +15,14 @@ namespace Sheaft.Application.Mappers
                 .ForMember(d => d.ExpectedDelivery, opt => opt.MapFrom(r => r.ExpectedDelivery))
                 .ForMember(d => d.Products, opt => opt.MapFrom(r => r.Products));
 
+            CreateMap<PurchaseOrder, PurchaseOrderShortViewModel>();
+
             CreateMap<PurchaseOrder, PurchaseOrderViewModel>()
                 .ForMember(d => d.Sender, opt => opt.MapFrom(r => r.Sender))
                 .ForMember(d => d.Vendor, opt => opt.MapFrom(r => r.Vendor))
                 .ForMember(d => d.ExpectedDelivery, opt => opt.MapFrom(r => r.ExpectedDelivery))
                 .ForMember(d => d.Products, opt => opt.MapFrom(r => r.Products));
+
 
             CreateMap<CreatePurchaseOrderInput, CreatePurchaseOrderCommand>();
             CreateMap<IdsInput, AcceptPurchaseOrdersCommand>();
