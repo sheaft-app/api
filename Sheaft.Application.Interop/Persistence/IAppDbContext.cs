@@ -51,17 +51,17 @@ namespace Sheaft.Application.Interop
         DbSet<DepartmentProducers> DepartmentProducers { get; set; }
         DbSet<DepartmentStores> DepartmentStores { get; set; }
 
-        Task<T> GetByIdAsync<T>(Guid id, CancellationToken token) where T : class, IIdEntity, ITrackRemove;
-        Task<T> FindByIdAsync<T>(Guid id, CancellationToken token) where T : class, IIdEntity, ITrackRemove;
-        Task<T> GetSingleAsync<T>(Expression<Func<T, bool>> where, CancellationToken token) where T : class, ITrackRemove;
-        Task<T> FindSingleAsync<T>(Expression<Func<T, bool>> where, CancellationToken token) where T : class, ITrackRemove;
-        Task<IEnumerable<T>> GetByIdsAsync<T>(IEnumerable<Guid> ids, CancellationToken token) where T : class, IIdEntity, ITrackRemove;
-        Task<IEnumerable<T>> FindByIdsAsync<T>(IEnumerable<Guid> ids, CancellationToken token) where T : class, IIdEntity, ITrackRemove;
-        Task<IEnumerable<T>> GetAsync<T>(Expression<Func<T, bool>> where, CancellationToken token) where T : class, ITrackRemove;
-        Task<IEnumerable<T>> FindAsync<T>(Expression<Func<T, bool>> where, CancellationToken token) where T : class, ITrackRemove;
-        Task<bool> AnyAsync<T>(Expression<Func<T, bool>> where, CancellationToken token) where T : class, ITrackRemove;
-        Task EnsureNotExists<T>(Guid id, CancellationToken token) where T : class, IIdEntity, ITrackRemove;
-        Task EnsureNotExists<T>(Expression<Func<T, bool>> where, CancellationToken token) where T : class, IIdEntity, ITrackRemove;
+        Task<T> GetByIdAsync<T>(Guid id, CancellationToken token, bool asNoTracking = false) where T : class, IIdEntity, ITrackRemove;
+        Task<T> FindByIdAsync<T>(Guid id, CancellationToken token, bool asNoTracking = false) where T : class, IIdEntity, ITrackRemove;
+        Task<T> GetSingleAsync<T>(Expression<Func<T, bool>> where, CancellationToken token, bool asNoTracking = false) where T : class, ITrackRemove;
+        Task<T> FindSingleAsync<T>(Expression<Func<T, bool>> where, CancellationToken token, bool asNoTracking = false) where T : class, ITrackRemove;
+        Task<IEnumerable<T>> GetByIdsAsync<T>(IEnumerable<Guid> ids, CancellationToken token, bool asNoTracking = false) where T : class, IIdEntity, ITrackRemove;
+        Task<IEnumerable<T>> FindByIdsAsync<T>(IEnumerable<Guid> ids, CancellationToken token, bool asNoTracking = false) where T : class, IIdEntity, ITrackRemove;
+        Task<IEnumerable<T>> GetAsync<T>(Expression<Func<T, bool>> where, CancellationToken token, bool asNoTracking = false) where T : class, ITrackRemove;
+        Task<IEnumerable<T>> FindAsync<T>(Expression<Func<T, bool>> where, CancellationToken token, bool asNoTracking = false) where T : class, ITrackRemove;
+        Task<bool> AnyAsync<T>(Expression<Func<T, bool>> where, CancellationToken token, bool asNoTracking = false) where T : class, ITrackRemove;
+        Task EnsureNotExists<T>(Guid id, CancellationToken token, bool asNoTracking = false) where T : class, IIdEntity, ITrackRemove;
+        Task EnsureNotExists<T>(Expression<Func<T, bool>> where, CancellationToken token, bool asNoTracking = false) where T : class, IIdEntity, ITrackRemove;
 
         DatabaseFacade Database { get; }
         ValueTask<EntityEntry<TEntity>> AddAsync<TEntity>([NotNullAttribute] TEntity entity, CancellationToken cancellationToken = default) where TEntity : class;
