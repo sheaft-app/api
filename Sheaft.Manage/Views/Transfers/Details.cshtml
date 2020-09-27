@@ -56,7 +56,20 @@
         </div>
         <h4>Purchase Order</h4>
         <div class="form-group">
-            <a asp-controller="Orders" asp-action="Details" asp-route-id="@Model.PurchaseOrderId" class="btn btn-info">
+            @Html.LabelFor(m => m.PurchaseOrder.Identifier)
+            @Html.TextBoxFor(m => m.PurchaseOrder.Identifier, null, new { @class = "form-control", @disabled = "disabled" })
+        </div>
+        <div class="form-group">
+            @Html.LabelFor(m => m.PurchaseOrder.TotalOnSalePrice)
+            @Html.TextBoxFor(m => m.PurchaseOrder.TotalOnSalePrice, null, new { @class = "form-control", @disabled = "disabled" })
+        </div>
+        <div class="form-group">
+            @Html.LabelFor(m => m.PurchaseOrder.Status.ToString("G"))
+            @Html.TextBoxFor(m => m.PurchaseOrder.Status.ToString("G"), null, new { @class = "form-control", @disabled = "disabled" })
+        </div>
+        <h4>Purchase Order</h4>
+        <div class="form-group">
+            <a asp-controller="Orders" asp-action="Details" asp-route-id="@Model.PurchaseOrder.Id" class="btn btn-info">
                 Related Purchase Order
             </a>
         </div>
