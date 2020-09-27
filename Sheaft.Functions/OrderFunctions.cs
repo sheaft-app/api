@@ -59,5 +59,13 @@ namespace Sheaft.Functions
             if (!results.Success)
                 throw results.Exception;
         }
+
+        [FunctionName("UnblockOrderCommand")]
+        public async Task UnblockOrderCommandAsync([ServiceBusTrigger(UnblockOrderCommand.QUEUE_NAME, Connection = "AzureWebJobsServiceBus")] string message, CancellationToken token)
+        {
+            var results = await _mediatr.Process<UnblockOrderCommand, bool>(message, token);
+            if (!results.Success)
+                throw results.Exception;
+        }
     }
 }

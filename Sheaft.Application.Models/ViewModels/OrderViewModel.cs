@@ -1,5 +1,6 @@
 ﻿using Sheaft.Domain.Enums;
 using System;
+using System.Collections.Generic;
 
 namespace Sheaft.Application.Models
 {
@@ -31,7 +32,9 @@ namespace Sheaft.Application.Models
         public decimal InternalFeesPrice { get; set; }
         public decimal FeesFixedAmount { get; set; }
         public decimal FeesPercent { get; set; }
-        public virtual PayinShortViewModel Payin { get; set; }
-        public virtual UserProfileViewModel User { get; set; }
+        public bool SkipBackgroundProcessing { get; set; }
+        public PayinShortViewModel Payin { get; set; }
+        public UserProfileViewModel User { get; set; }
+        public IEnumerable<PurchaseOrderShortViewModel> PurchaseOrders { get; set; }
     }
 }

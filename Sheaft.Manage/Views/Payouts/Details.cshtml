@@ -62,33 +62,34 @@
         <table class="table table-hover">
             <thead class="thead-dark">
                 <tr>
-                    <th scope="col">Name</th>
-                    <th scope="col">Contact</th>
-                    <th scope="col">Email</th>
-                    <th scope="col">Department</th>
-                    <th scope="col">Url</th>
+                    <th scope="col">Identifier</th>
+                    <th scope="col">Credited</th>
+                    <th scope="col">Status</th>
+                    <th scope="col">PO Reference</th>
+                    <th scope="col">PO Total</th>
+                    <th scope="col">PO Status</th>
                     <th scope="col"></th>
                 </tr>
             </thead>
             <tbody>
                 @foreach (var transfer in Model.Transfers)
                 {
-                    <tr>
-                        <th scope="row">@transfer.Identifier</th>
-                        <td>@transfer.Credited</td>
-                        <td>@transfer.Status</td>
-                        <td>@transfer.PurchaseOrder.Identifier</td>
-                        <td>@transfer.PurchaseOrder.Status</td>
-                        <td>@transfer.PurchaseOrder.TotalOnSalePrice</td>
-                        <td>
-                            <a asp-controller="Transfer" asp-action="Details" asp-route-id="@transfer.Id" class="btn btn-info">
-                                <i class="fa fa-eye"></i>
-                            </a>
-                            <a asp-controller="PurchaseOrders" asp-action="Edit" asp-route-id="@transfer.PurchaseOrder.Id" class="btn btn-info">
-                                <i class="fa fa-money-bill"></i>
-                            </a>
-                        </td>
-                    </tr>
+                <tr>
+                    <th scope="row">@transfer.Identifier</th>
+                    <td>@transfer.Credited</td>
+                    <td>@transfer.Status</td>
+                    <td>@transfer.PurchaseOrder.Reference</td>
+                    <td>@transfer.PurchaseOrder.TotalOnSalePrice€</td>
+                    <td>@transfer.PurchaseOrder.Status</td>
+                    <td>
+                        <a asp-controller="Transfer" asp-action="Details" asp-route-id="@transfer.Id" class="btn btn-info">
+                            <i class="fa fa-eye"></i>
+                        </a>
+                        <a asp-controller="PurchaseOrders" asp-action="Edit" asp-route-id="@transfer.PurchaseOrder.Id" class="btn btn-info">
+                            <i class="fa fa-money-bill"></i>
+                        </a>
+                    </td>
+                </tr>
                 }
             </tbody>
         </table>

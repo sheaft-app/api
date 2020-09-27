@@ -27,6 +27,7 @@ namespace Sheaft.Application.Handlers
         IRequestHandler<ConfirmOrderCommand, Result<IEnumerable<Guid>>>,
         IRequestHandler<FailOrderCommand, Result<bool>>,
         IRequestHandler<ExpireOrderCommand, Result<bool>>,
+        IRequestHandler<UnblockOrderCommand, Result<bool>>,
         IRequestHandler<CheckOrdersCommand, Result<bool>>,
         IRequestHandler<CheckOrderCommand, Result<bool>>
     {
@@ -295,6 +296,20 @@ namespace Sheaft.Application.Handlers
             {
                 var order = await _context.GetByIdAsync<Order>(request.OrderId, token);
                 order.SetStatus(OrderStatus.Expired);
+
+                _context.Update(order);
+                await _context.SaveChangesAsync(token);
+
+                return Ok(true);
+            });
+        }
+
+        public async Task<Result<bool>> Handle(UnblockOrderCommand request, CancellationToken token)
+        {
+            return await ExecuteAsync(async () =>
+            {
+                var order = await _context.GetByIdAsync<Order>(request.OrderId, token);
+                order.SetSkipBackgroundProcessing(false);
 
                 _context.Update(order);
                 await _context.SaveChangesAsync(token);

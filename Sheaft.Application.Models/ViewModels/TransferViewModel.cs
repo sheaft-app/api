@@ -17,6 +17,7 @@ namespace Sheaft.Application.Models
         public string Reference { get; set; }
         public string ResultCode { get; set; }
         public string ResultMessage { get; set; }
+        public bool SkipBackgroundProcessing { get; set; }
         public DateTimeOffset? ExecutedOn { get; set; }
         public UserProfileViewModel Author { get; set; }
         public UserProfileViewModel DebitedUser { get; set; }

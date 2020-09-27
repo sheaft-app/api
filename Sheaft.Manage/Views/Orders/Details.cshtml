@@ -1,0 +1,121 @@
+﻿@model OrderViewModel
+@{
+    ViewData["Title"] = "Order details";
+}
+
+    <div class="container">
+        <h2 class="display-4">Order details</h2>
+        <br />
+        <br />
+        <div class="form-group">
+            @Html.LabelFor(m => m.User.Name)
+            @Html.TextBoxFor(m => m.User.Name, null, new { @class = "form-control", @disabled = "disabled" })
+        </div>
+        <div class="form-group">
+            @Html.LabelFor(m => m.User.Email)
+            @Html.TextBoxFor(m => m.User.Email, null, new { @class = "form-control", @disabled = "disabled" })
+        </div>
+        <div class="form-group">
+            @Html.LabelFor(m => m.CreatedOn)
+            @Html.TextBoxFor(m => m.CreatedOn, null, new { @class = "form-control", @disabled = "disabled" })
+        </div>
+        <div class="form-group">
+            @Html.LabelFor(m => m.UpdatedOn)
+            @Html.TextBoxFor(m => m.UpdatedOn, null, new { @class = "form-control", @disabled = "disabled" })
+        </div>
+        <h4>Fees</h4>
+        <div class="form-group">
+            @Html.LabelFor(m => m.FeesFixedAmount)
+            @Html.TextBoxFor(m => m.FeesFixedAmount, null, new { @class = "form-control", @disabled = "disabled" })
+        </div>
+        <div class="form-group">
+            @Html.LabelFor(m => m.FeesPercent)
+            @Html.TextBoxFor(m => m.FeesPercent, null, new { @class = "form-control", @disabled = "disabled" })
+        </div>
+        <div class="form-group">
+            @Html.LabelFor(m => m.FeesPrice)
+            @Html.TextBoxFor(m => m.FeesPrice, null, new { @class = "form-control", @disabled = "disabled" })
+        </div>
+        <div class="form-group">
+            @Html.LabelFor(m => m.InternalFeesPrice)
+            @Html.TextBoxFor(m => m.InternalFeesPrice, null, new { @class = "form-control", @disabled = "disabled" })
+        </div>
+        <h4>Donation</h4>
+        <div class="form-group">
+            @Html.LabelFor(m => m.Donate)
+            @Html.TextBoxFor(m => m.Donate, null, new { @class = "form-control", @disabled = "disabled" })
+        </div>
+        <div class="form-group">
+            @Html.LabelFor(m => m.DonationKind)
+            @Html.TextBoxFor(m => m.DonationKind.ToString("G"), null, new { @class = "form-control", @disabled = "disabled" })
+        </div>
+        <h4>Products</h4>
+        <div class="form-group">
+            @Html.LabelFor(m => m.LinesCount)
+            @Html.TextBoxFor(m => m.LinesCount, null, new { @class = "form-control", @disabled = "disabled" })
+        </div>
+        <div class="form-group">
+            @Html.LabelFor(m => m.ProductsCount)
+            @Html.TextBoxFor(m => m.ProductsCount, null, new { @class = "form-control", @disabled = "disabled" })
+        </div>
+        <div class="form-group">
+            @Html.LabelFor(m => m.TotalProductOnSalePrice)
+            @Html.TextBoxFor(m => m.TotalProductOnSalePrice, null, new { @class = "form-control", @disabled = "disabled" })
+        </div>
+        <h4>Returnables</h4>
+        <div class="form-group">
+            @Html.LabelFor(m => m.ReturnablesCount)
+            @Html.TextBoxFor(m => m.ReturnablesCount, null, new { @class = "form-control", @disabled = "disabled" })
+        </div>
+        <div class="form-group">
+            @Html.LabelFor(m => m.TotalReturnableOnSalePrice)
+            @Html.TextBoxFor(m => m.TotalReturnableOnSalePrice, null, new { @class = "form-control", @disabled = "disabled" })
+        </div>
+        @if (Model.Payin != null)
+        {
+            <h4>Paiement</h4>
+            <div class="form-group">
+                @Html.LabelFor(m => m.Payin.Identifier)
+                @Html.TextBoxFor(m => m.Payin.Identifier, null, new { @class = "form-control", @disabled = "disabled" })
+
+                <div class="form-group">
+                    @Html.LabelFor(m => m.Payin.Status)
+                    @Html.TextBoxFor(m => m.Payin.Status.ToString("G"), null, new { @class = "form-control", @disabled = "disabled" })
+                </div>
+            </div>
+        }
+
+        @if (Model.PurchaseOrders != null)
+        {
+            <h4>Related Purchase Orders</h4>
+            <table class="table table-hover">
+                <thead class="thead-dark">
+                    <tr>
+                        <th scope="col">Reference</th>
+                        <th scope="col">Total</th>
+                        <th scope="col">Status</th>
+                        <th scope="col"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var purchaseOrder in Model.PurchaseOrders)
+                    {
+                        <tr>
+                            <th scope="row">@purchaseOrder.Reference</th>
+                            <td>@purchaseOrder.TotalOnSalePrice€</td>
+                            <td>@purchaseOrder.Status</td>
+                            <td>
+                                <a asp-controller="PurchaseOrders" asp-action="Edit" asp-route-id="@purchaseOrder.Id" class="btn btn-info">
+                                    <i class="fa fa-eye"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+        <br />
+        <a asp-controller="Orders" asp-action="Index" class="btn btn-light">
+            Go Back
+        </a>
+    </div>

@@ -1,0 +1,79 @@
+﻿@model IEnumerable<OrderViewModel>
+@{
+    ViewData["Title"] = "Orders";
+    int take = ViewBag.Take;
+    int currentPage = ViewBag.Page;
+}
+
+    <div class="container">
+        <h2 class="display-5">Orders</h2>
+        <br />
+
+        @if (ViewBag.Edited != null)
+        {
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                <span>Successfully updated order @ViewBag.Edited.Name</span>
+                <a asp-controller="Orders" asp-action="Details" asp-route-id="@ViewBag.Edited.Id">View details</a>
+
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <br />
+        }
+
+        <table class="table table-hover">
+            <thead class="thead-dark">
+                <tr>
+                    <th scope="col">User</th>
+                    <th scope="col">CreatedOn</th>
+                    <th scope="col">Status</th>
+                    <th scope="col">Lines</th>
+                    <th scope="col">Products</th>
+                    <th scope="col">TotalPrice</th>
+                    <th scope="col">Donation</th>
+                    <th scope="col">Fees</th>
+                    <th scope="col">                        
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var entity in Model)
+                {
+                <tr>
+                    <th scope="row">@entity.User.Name</th>
+                    <td>@entity.CreatedOn.ToString("dd/MM/yy hh:mm")</td>
+                    <td>@entity.Status.ToString("G")</td>
+                    <td>@entity.LinesCount</td>
+                    <td>@entity.ProductsCount</td>
+                    <td>@entity.TotalPrice€</td>
+                    <td>@entity.Donate€</td>
+                    <td>@entity.FeesPrice€</td>
+                    <td>
+                        <a asp-controller="Orders" asp-action="Details" asp-route-id="@entity.Id" class="btn btn-info">
+                            <i class="fa fa-eye"></i>
+                        </a>
+                    </td>
+                </tr>
+                }
+            </tbody>
+            <tfoot>
+                <tr class="text-center">
+                    <td colspan="6">
+                        @if (currentPage >= 1)
+                        {
+                            <a asp-controller="Orders" asp-action="Index" asp-route-take="@take" asp-route-page="@(currentPage-1)" class="btn btn-outline-secondary">
+                                <i class="fa fa-caret-left"></i>
+                            </a>
+                        }
+                        @if (take == Model.Count())
+                        {
+                            <a asp-controller="Orders" asp-action="Index" asp-route-take="@take" asp-route-page="@(currentPage+1)" class="btn btn-outline-secondary">
+                                <i class="fa fa-caret-right"></i>
+                            </a>
+                        }
+                    </td>
+                </tr>
+            </tfoot>
+        </table>
+    </div>

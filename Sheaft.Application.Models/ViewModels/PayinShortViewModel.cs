@@ -8,7 +8,5 @@ namespace Sheaft.Application.Models
         public Guid Id { get; set; }
         public string Identifier { get; set; }
         public TransactionStatus Status { get; set; }
-        public decimal Fees { get; set; }
-        public decimal Credited { get; set; }
     }
 }
