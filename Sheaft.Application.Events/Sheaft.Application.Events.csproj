@@ -12,8 +12,4 @@
     <ProjectReference Include="..\Sheaft.Domain\Sheaft.Domain.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Donation\" />
-  </ItemGroup>
-
 </Project>

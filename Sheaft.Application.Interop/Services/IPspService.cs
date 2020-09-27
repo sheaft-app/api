@@ -16,6 +16,7 @@ namespace Sheaft.Application.Interop
         Task<Result<PspDocumentResultDto>> CreateDocumentAsync(Document document, CancellationToken token);
         Task<Result<PspPaymentResultDto>> CreatePayoutAsync(Payout transaction, CancellationToken token);
         Task<Result<PspPaymentResultDto>> CreateTransferAsync(Transfer transaction, CancellationToken token);
+        Task<Result<PspPaymentResultDto>> CreateDonationAsync(Donation transaction, CancellationToken token);
         Task<Result<string>> CreateConsumerAsync(ConsumerLegal user, CancellationToken token);
         Task<Result<string>> CreateBusinessAsync(BusinessLegal user, CancellationToken token);
         Task<Result<string>> CreateWalletAsync(Wallet wallet,  CancellationToken token);

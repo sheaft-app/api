@@ -15,21 +15,15 @@ namespace Sheaft.Domain.Models
         {
             Order = order;
             Fees = 0;
-            Debited = Math.Round(order.Donation - order.InternalFeesPrice, 2);
+            Debited = Math.Round(order.Donate - order.InternalFeesPrice, 2);
             CreditedWallet = creditedWallet;
             DebitedWallet = debitedWallet;
             Credited = Debited;
             Reference = "DONATION";
         }
 
-        public bool SkipBackgroundProcessing { get; private set; }
         public virtual Wallet CreditedWallet { get; private set; }
         public virtual Wallet DebitedWallet { get; private set; }
         public virtual Order Order { get; private set; }
-
-        public void SetSkipBackgroundProcessing(bool value)
-        {
-            SkipBackgroundProcessing = value;
-        }
     }
 }

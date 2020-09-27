@@ -22,5 +22,7 @@ namespace Sheaft.Options
         public int CheckNewTransferRefundsFromMinutes { get; set; }
         public int CheckTransferRefundsFromMinutes { get; set; }
         public int CheckTransferRefundExpiredFromMinutes { get; set; }
+        public int CheckDonationsFromMinutes { get; set; }
+        public int CheckDonationExpiredFromMinutes { get; set; }
     }
 }

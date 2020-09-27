@@ -56,14 +56,21 @@ namespace Sheaft.Domain.Models
         public int ReturnablesCount { get; private set; }
         public int LinesCount { get; private set; }
         public int ProductsCount { get; private set; }
-        public decimal Donation { get; private set; }
+        public decimal Donate { get; private set; }
         public decimal FeesPrice { get; private set; }
         public decimal InternalFeesPrice { get; private set; }
+        public bool SkipBackgroundProcessing { get; private set; }
         public virtual User User { get; private set; }
         public virtual Payin Payin { get; private set; }
+        public virtual Donation Donation { get; private set; }
         public virtual IReadOnlyCollection<OrderProduct> Products => _products?.AsReadOnly();
         public virtual IReadOnlyCollection<OrderDelivery> Deliveries => _deliveries?.AsReadOnly();
         public virtual IReadOnlyCollection<PurchaseOrder> PurchaseOrders => _purchaseOrders?.AsReadOnly();
+
+        public void SetSkipBackgroundProcessing(bool value)
+        {
+            SkipBackgroundProcessing = value;
+        }
 
         public Guid AddPurchaseOrder(string reference, Producer producer)
         {
@@ -82,6 +89,14 @@ namespace Sheaft.Domain.Models
                 throw new ValidationException();
 
             Payin = payin;
+        }
+
+        public void SetDonation(Donation donation)
+        {
+            if (Donation != null && Donation.Status == TransactionStatus.Succeeded)
+                throw new ValidationException();
+
+            Donation = donation;
         }
 
         public void SetStatus(OrderStatus status)
@@ -158,26 +173,26 @@ namespace Sheaft.Domain.Models
 
         private void RefreshFees()
         {
-            Donation = 0;
+            Donate = 0;
             FeesPrice = GetFees(TotalOnSalePrice);
 
             switch (DonationKind)
             {
                 case DonationKind.Rounded:
-                    Donation = GetRoundedDonation();
+                    Donate = GetRoundedDonation();
                     break;
                 case DonationKind.Euro:
-                    Donation = 1;
+                    Donate = 1;
                     break;
                 case DonationKind.None:
                 case DonationKind.Free:
                 default:
-                    Donation = 0;
+                    Donate = 0;
                     break;
             }
 
             UpdateFees();
-            TotalPrice = Math.Round(TotalOnSalePrice + Donation + FeesPrice - InternalFeesPrice, DIGITS_COUNT);
+            TotalPrice = Math.Round(TotalOnSalePrice + Donate + FeesPrice - InternalFeesPrice, DIGITS_COUNT);
         }
 
         private decimal GetRoundedDonation()
@@ -188,7 +203,7 @@ namespace Sheaft.Domain.Models
 
         private void UpdateFees()
         {
-            var total = TotalOnSalePrice + FeesPrice + Donation;
+            var total = TotalOnSalePrice + FeesPrice + Donate;
             var newFees = CalculateFees(total);
 
             InternalFeesPrice = Math.Round(newFees - FeesPrice, DIGITS_COUNT);

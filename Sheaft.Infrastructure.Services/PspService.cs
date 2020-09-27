@@ -465,48 +465,26 @@ namespace Sheaft.Infrastructure.Services
 
         public async Task<Result<PspPaymentResultDto>> CreateTransferAsync(Transfer transaction, CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
-            {
-                if (string.IsNullOrWhiteSpace(transaction.Author.Identifier))
-                    return Failed<PspPaymentResultDto>(new SheaftException(ExceptionKind.BadRequest, MessageKind.PsP_CannotCreate_Transfer_Author_Not_Exists));
+            return await CreatePspTransferAsync(transaction.Id,
+                transaction.Debited,
+                transaction.Fees,
+                transaction.Author.Identifier,
+                transaction.CreditedWallet.Identifier,
+                transaction.CreditedWallet.User.Identifier,
+                transaction.DebitedWallet.Identifier,
+                token);
+        }
 
-                if (string.IsNullOrWhiteSpace(transaction.CreditedWallet.Identifier))
-                    return Failed<PspPaymentResultDto>(new SheaftException(ExceptionKind.BadRequest, MessageKind.PsP_CannotCreate_Transfer_CreditedWallet_Not_Exists));
-
-                if (string.IsNullOrWhiteSpace(transaction.DebitedWallet.Identifier))
-                    return Failed<PspPaymentResultDto>(new SheaftException(ExceptionKind.BadRequest, MessageKind.PsP_CannotCreate_Transfer_DebitedWallet_Not_Exists));
-
-                await EnsureAccessTokenIsValidAsync(token);
-
-                var result = await _api.Transfers.CreateAsync(transaction.Id.ToString("N"),
-                    new TransferPostDTO(
-                        transaction.Author.Identifier,
-                        transaction.CreditedWallet.User.Identifier,
-                        new Money
-                        {
-                            Amount = transaction.Debited.GetAmount(),
-                            Currency = CurrencyIso.EUR
-                        },
-                        new Money
-                        {
-                            Amount = transaction.Fees.GetAmount(),
-                            Currency = CurrencyIso.EUR
-                        },
-                        transaction.DebitedWallet.Identifier,
-                        transaction.CreditedWallet.Identifier));
-
-                return Ok(new PspPaymentResultDto
-                {
-                    Credited = result.CreditedFunds.Amount.GetAmount(),
-                    ProcessedOn = result.ExecutionDate,
-                    Identifier = result.Id,
-                    ResultCode = result.ResultCode,
-                    ResultMessage = MangoExtensions.GetOperationMessage(result.ResultCode, result.ResultMessage),
-                    Debited = result.DebitedFunds.Amount.GetAmount(),
-                    Fees = result.Fees.Amount.GetAmount(),
-                    Status = result.Status.GetTransactionStatus()
-                });
-            });
+        public async Task<Result<PspPaymentResultDto>> CreateDonationAsync(Donation transaction, CancellationToken token)
+        {
+            return await CreatePspTransferAsync(transaction.Id, 
+                transaction.Debited, 
+                transaction.Fees, 
+                transaction.Author.Identifier, 
+                transaction.CreditedWallet.Identifier, 
+                transaction.CreditedWallet.User.Identifier, 
+                transaction.DebitedWallet.Identifier, 
+                token);
         }
 
         public async Task<Result<PspPaymentResultDto>> CreatePayoutAsync(Payout transaction, CancellationToken token)
@@ -727,6 +705,52 @@ namespace Sheaft.Infrastructure.Services
                     ResultMessage = MangoExtensions.GetOperationMessage(result.ResultCode, result.ResultMessage),
                     Status = result.Status.GetTransactionStatus(),
                     ProcessedOn = result.ExecutionDate
+                });
+            });
+        }
+
+        private async Task<Result<PspPaymentResultDto>> CreatePspTransferAsync(Guid idempotencyKey, decimal debited, decimal fees, string author, string creditedWalletIdentifier, string creditedUserIdentifier, string debitedWalletIdentifier, CancellationToken token)
+        {
+            return await ExecuteAsync(async () =>
+            {
+                if (string.IsNullOrWhiteSpace(author))
+                    return Failed<PspPaymentResultDto>(new SheaftException(ExceptionKind.BadRequest, MessageKind.PsP_CannotCreate_Transfer_Author_Not_Exists));
+
+                if (string.IsNullOrWhiteSpace(creditedWalletIdentifier))
+                    return Failed<PspPaymentResultDto>(new SheaftException(ExceptionKind.BadRequest, MessageKind.PsP_CannotCreate_Transfer_CreditedWallet_Not_Exists));
+
+                if (string.IsNullOrWhiteSpace(debitedWalletIdentifier))
+                    return Failed<PspPaymentResultDto>(new SheaftException(ExceptionKind.BadRequest, MessageKind.PsP_CannotCreate_Transfer_DebitedWallet_Not_Exists));
+
+                await EnsureAccessTokenIsValidAsync(token);
+
+                var result = await _api.Transfers.CreateAsync(idempotencyKey.ToString("N"),
+                    new TransferPostDTO(
+                        author,
+                        creditedUserIdentifier,
+                        new Money
+                        {
+                            Amount = debited.GetAmount(),
+                            Currency = CurrencyIso.EUR
+                        },
+                        new Money
+                        {
+                            Amount = fees.GetAmount(),
+                            Currency = CurrencyIso.EUR
+                        },
+                        debitedWalletIdentifier,
+                        creditedWalletIdentifier));
+
+                return Ok(new PspPaymentResultDto
+                {
+                    Credited = result.CreditedFunds.Amount.GetAmount(),
+                    ProcessedOn = result.ExecutionDate,
+                    Identifier = result.Id,
+                    ResultCode = result.ResultCode,
+                    ResultMessage = MangoExtensions.GetOperationMessage(result.ResultCode, result.ResultMessage),
+                    Debited = result.DebitedFunds.Amount.GetAmount(),
+                    Fees = result.Fees.Amount.GetAmount(),
+                    Status = result.Status.GetTransactionStatus()
                 });
             });
         }
