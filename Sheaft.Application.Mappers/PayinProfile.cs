@@ -21,6 +21,11 @@ namespace Sheaft.Application.Mappers
 
             CreateMap<WebPayin, WebPayinDto>()
                 .IncludeBase<Payin, TransactionDto>();
+
+            CreateMap<Payin, PayinViewModel>()
+                .ForMember(m => m.Author, opt => opt.MapFrom(t => t.Author))
+                .ForMember(m => m.CreditedUser, opt => opt.MapFrom(t => t.CreditedWallet.User))
+                .ForMember(m => m.OrderId, opt => opt.MapFrom(t => t.Order.Id));
         }
     }
 }

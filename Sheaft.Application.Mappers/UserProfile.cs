@@ -11,6 +11,8 @@ namespace Sheaft.Application.Mappers
         public UserProfile()
         {
             CreateMap<User, UserViewModel>();
+            CreateMap<User, UserProfileViewModel>();
+
             CreateMap<User, UserProfileDto>();
 
             CreateMap<User, UserDto>()
