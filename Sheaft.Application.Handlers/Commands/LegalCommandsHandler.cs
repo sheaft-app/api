@@ -67,7 +67,7 @@ namespace Sheaft.Application.Handlers
                 _context.Update(legal.User);
                 await _context.SaveChangesAsync(token);
 
-                if (request.Kind == LegalKind.Business)
+                if (request.Kind == LegalKind.Business && business.Kind == ProfileKind.Producer)
                 {
                     var result = await _mediatr.Process(new CreateDeclarationCommand(request.RequestUser) { LegalId = legal.Id }, token);
                     if (result.Success)
