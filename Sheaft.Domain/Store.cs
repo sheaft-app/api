@@ -20,15 +20,15 @@ namespace Sheaft.Domain.Models
             SetOpeningHours(openingHours);
         }
 
-        public virtual IReadOnlyCollection<StoreTag> Tags => _tags.AsReadOnly();
-        public virtual IReadOnlyCollection<TimeSlotHour> OpeningHours => _openingHours.AsReadOnly();
+        public virtual IReadOnlyCollection<StoreTag> Tags => _tags?.AsReadOnly();
+        public virtual IReadOnlyCollection<TimeSlotHour> OpeningHours => _openingHours?.AsReadOnly();
 
         public void SetOpeningHours(IEnumerable<TimeSlotHour> openingHours)
         {
             if (openingHours == null)
                 return;
 
-            if (!OpeningHours.Any())
+            if (OpeningHours == null)
                 _openingHours = new List<TimeSlotHour>();
 
             _openingHours = openingHours.ToList();

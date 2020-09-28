@@ -68,7 +68,7 @@ namespace Sheaft.Application.Handlers
                         : null;
 
                     var openingHours = new List<TimeSlotHour>();
-                    if (request.OpeningHours == null)
+                    if (request.OpeningHours != null)
                     {
                         foreach (var oh in request.OpeningHours)
                         {

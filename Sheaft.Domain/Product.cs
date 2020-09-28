@@ -61,8 +61,8 @@ namespace Sheaft.Domain.Models
         public decimal? Rating { get; set; }
         public virtual Returnable Returnable { get; private set; }
         public virtual Producer Producer { get; private set; }
-        public virtual IReadOnlyCollection<ProductTag> Tags => _tags.AsReadOnly();
-        public virtual IReadOnlyCollection<Rating> Ratings => _ratings.AsReadOnly();
+        public virtual IReadOnlyCollection<ProductTag> Tags => _tags?.AsReadOnly();
+        public virtual IReadOnlyCollection<Rating> Ratings => _ratings?.AsReadOnly();
 
         public void SetReference(string reference)
         {

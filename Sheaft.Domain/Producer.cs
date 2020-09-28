@@ -18,7 +18,7 @@ namespace Sheaft.Domain.Models
         {
         }
 
-        public virtual IReadOnlyCollection<ProducerTag> Tags => _tags.AsReadOnly(); 
+        public virtual IReadOnlyCollection<ProducerTag> Tags => _tags?.AsReadOnly(); 
 
         public void SetTags(IEnumerable<Tag> tags)
         {
