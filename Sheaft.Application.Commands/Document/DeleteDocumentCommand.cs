@@ -4,10 +4,10 @@ using Newtonsoft.Json;
 
 namespace Sheaft.Application.Commands
 {
-    public class RemoveDocumentCommand : Command<bool>
+    public class DeleteDocumentCommand : Command<bool>
     {
         [JsonConstructor]
-        public RemoveDocumentCommand(RequestUser requestUser) : base(requestUser)
+        public DeleteDocumentCommand(RequestUser requestUser) : base(requestUser)
         {
         }
 

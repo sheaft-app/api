@@ -9,17 +9,19 @@ using Microsoft.Extensions.Logging;
 using Sheaft.Domain.Models;
 using Sheaft.Domain.Enums;
 using Sheaft.Application.Events;
+using System.IO;
 
 namespace Sheaft.Application.Handlers
 {
     public class DocumentCommandsHandler : ResultsHandler,
             IRequestHandler<CreateDocumentCommand, Result<Guid>>,
+            IRequestHandler<UpdateDocumentCommand, Result<bool>>,
             IRequestHandler<UploadDocumentCommand, Result<bool>>,
             IRequestHandler<UploadPageCommand, Result<bool>>,
             IRequestHandler<SubmitDocumentsCommand, Result<bool>>,
             IRequestHandler<SubmitDocumentCommand, Result<bool>>,
             IRequestHandler<ReviewDocumentCommand, Result<bool>>,
-            IRequestHandler<RemoveDocumentCommand, Result<bool>>,
+            IRequestHandler<DeleteDocumentCommand, Result<bool>>,
             IRequestHandler<RefreshDocumentStatusCommand, Result<DocumentStatus>>
     {
         private readonly IPspService _pspService;
@@ -40,7 +42,7 @@ namespace Sheaft.Application.Handlers
             {
                 using (var transaction = await _context.Database.BeginTransactionAsync(token))
                 {
-                    var legal = await _context.GetSingleAsync<Legal>(r => r.User.Id == request.RequestUser.Id, token);
+                    var legal = await _context.GetSingleAsync<Legal>(r => r.Id == request.LegalId, token);
                     var document = new Document(Guid.NewGuid(), request.Kind, request.Name, legal);
 
                     await _context.AddAsync(document, token);
@@ -62,6 +64,31 @@ namespace Sheaft.Application.Handlers
 
                     return Ok(document.Id);
                 }
+            });
+        }
+
+        public async Task<Result<bool>> Handle(UpdateDocumentCommand request, CancellationToken token)
+        {
+            return await ExecuteAsync(async () =>
+            {
+                var document = await _context.GetByIdAsync<Document>(request.Id, token);
+                document.SetKind(request.Kind);
+                document.SetName(request.Name);
+
+                if (string.IsNullOrWhiteSpace(document.Identifier))
+                {
+                    var result = await _pspService.CreateDocumentAsync(document, token);
+                    if (!result.Success)
+                        return Failed<bool>(result.Exception);
+
+                    document.SetIdentifier(result.Data.Identifier);
+                    document.SetStatus(result.Data.Status);
+                }
+
+                _context.Update(document);
+                await _context.SaveChangesAsync(token);
+
+                return Ok(true);
             });
         }
 
@@ -92,15 +119,22 @@ namespace Sheaft.Application.Handlers
                 _context.Update(document);
                 await _context.SaveChangesAsync(token);
 
-                var result = await _pspService.AddPageToDocumentAsync(page, document, request.Data, token);
-                if (result.Success)
+                var bytes = Convert.FromBase64String(request.Data);
+                using (var stream = new MemoryStream(bytes))
                 {
+                    stream.Position = 0;
+
+                    var result = await _pspService.AddPageToDocumentAsync(page, document, stream, token);
+                    if (!result.Success)
+                        return result;
+
                     page.SetUploaded();
                     _context.Update(page);
                     await _context.SaveChangesAsync(token);
+
+                    return result;
                 }
 
-                return result;
             });
         }
 
@@ -156,7 +190,7 @@ namespace Sheaft.Application.Handlers
             });
         }
 
-        public async Task<Result<bool>> Handle(RemoveDocumentCommand request, CancellationToken token)
+        public async Task<Result<bool>> Handle(DeleteDocumentCommand request, CancellationToken token)
         {
             return await ExecuteAsync(async () =>
             {

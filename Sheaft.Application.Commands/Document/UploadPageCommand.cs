@@ -16,6 +16,6 @@ namespace Sheaft.Application.Commands
         public string FileName { get; set; }
         public string Extension { get; set; }
         public long Size { get; set; }
-        public Stream Data { get; set; }
+        public string Data { get; set; }
     }
 }

@@ -49,6 +49,12 @@
             @Html.LabelFor(m => m.OpenForNewBusiness, new { @class = "form-check-label" })
         </div>
         <br />
+        <h4>Legals</h4>
+        <a asp-controller="Producers" asp-action="UpdateLegal" asp-route-userId="@Model.Id" class="btn btn-info">
+            Legals details
+        </a>
+        <br />
+        <br />
         <h4>Address</h4>
         <div class="form-group">
             @Html.LabelFor(c => c.Address.Line1, new { @class = "form-label" })
@@ -75,12 +81,6 @@
             @Html.TextBoxFor(c => c.Address.Longitude, null, new { @class = "form-control" })
         </div>
 
-        <h4>Legals</h4>
-        <a asp-controller="Producers" asp-action="UpdateLegal" asp-route-userId="@Model.Id" class="btn btn-info">
-            Legals details
-        </a>
-        <br/>
-        <br/>
         <div class="form-group">
             @Html.LabelFor(m => m.CreatedOn)
             @Html.TextBoxFor(m => m.CreatedOn, null, new { @class = "form-control", @disabled = "disabled" })

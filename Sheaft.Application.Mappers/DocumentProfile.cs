@@ -18,7 +18,7 @@ namespace Sheaft.Application.Mappers
                 .ForMember(m => m.Legal, opt => opt.MapFrom(e => e.Legal));
 
             CreateMap<CreateDocumentInput, CreateDocumentCommand>();
-            CreateMap<IdInput, RemoveDocumentCommand>();
+            CreateMap<IdInput, DeleteDocumentCommand>();
         }
     }
 }

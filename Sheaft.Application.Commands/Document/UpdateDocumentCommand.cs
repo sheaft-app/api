@@ -5,14 +5,14 @@ using Sheaft.Domain.Enums;
 
 namespace Sheaft.Application.Commands
 {
-    public class CreateDocumentCommand : Command<Guid>
+    public class UpdateDocumentCommand : Command<bool>
     {
         [JsonConstructor]
-        public CreateDocumentCommand(RequestUser requestUser) : base(requestUser)
+        public UpdateDocumentCommand(RequestUser requestUser) : base(requestUser)
         {
         }
 
-        public Guid LegalId { get; set; }
+        public Guid Id { get; set; }
         public string Name { get; set; }
         public DocumentKind Kind { get; set; }
     }

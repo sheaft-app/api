@@ -164,7 +164,7 @@ namespace Sheaft.GraphQL.Services
 
         public async Task<bool> RemoveDocumentAsync(IdInput input)
         {
-            return await ExecuteCommandAsync<RemoveDocumentCommand, bool>(_mapper.Map(input, new RemoveDocumentCommand(CurrentUser)), Token);
+            return await ExecuteCommandAsync<DeleteDocumentCommand, bool>(_mapper.Map(input, new DeleteDocumentCommand(CurrentUser)), Token);
         }
 
         public async Task<IQueryable<PurchaseOrderDto>> AcceptPurchaseOrdersAsync(IdsInput input, [Service] IPurchaseOrderQueries purchaseOrderQueries)

@@ -4,6 +4,12 @@
     var countries = ((List<CountryViewModel>)ViewBag.Countries).Select(c => new SelectListItem(c.Name, c.Alpha2)).ToList();
     var nationalities = ((List<NationalityViewModel>)ViewBag.Nationalities).Select(c => new SelectListItem(c.Name, c.Alpha2)).ToList();
     var documents = (List<DocumentShortViewModel>)ViewBag.Documents;
+
+    var kinds = new List<SelectListItem> {
+        new SelectListItem("Business", LegalKind.Business.ToString("G")),
+        new SelectListItem("Individual", LegalKind.Individual.ToString("G")),
+        new SelectListItem("Organization", LegalKind.Organization.ToString("G"))
+    };
 }
 
 <div class="container">
@@ -19,10 +25,14 @@
         @Html.HiddenFor(model => model.UboDeclaration.Id)
         <br />
 
-        <h3>Company</h3>        
+        <h3>Company</h3>
         <div class="form-group">
             @Html.LabelFor(m => m.Email)
             @Html.TextBoxFor(m => m.Email, null, new { @class = "form-control" })
+        </div>
+        <div class="form-group">
+            @Html.LabelFor(m => m.Kind)
+            @Html.DropDownListFor(m => m.Kind, kinds, new { @class = "form-control" })
         </div>
         <div class="form-group">
             @Html.LabelFor(m => m.Siret)
@@ -145,8 +155,8 @@
                         <td>@document.Kind</td>
                         <td>@document.Status</td>
                         <td>
-                            <a asp-controller="Documents" asp-action="Details" asp-route-id="@document.Id" class="btn btn-info">
-                                <i class="fa fa-eye"></i>
+                            <a asp-controller="Documents" asp-action="Edit" asp-route-id="@document.Id" class="btn btn-info">
+                                <i class="fa fa-pencil"></i>
                             </a>
                         </td>
                     </tr>

@@ -3,6 +3,11 @@
     ViewData["Title"] = "New producer legals";
     var countries = ((List<CountryViewModel>)ViewBag.Countries).Select(c => new SelectListItem(c.Name, c.Alpha2)).ToList();
     var nationalities = ((List<NationalityViewModel>)ViewBag.Nationalities).Select(c => new SelectListItem(c.Name, c.Alpha2)).ToList();
+    var kinds = new List<SelectListItem> {
+        new SelectListItem("Business", LegalKind.Business.ToString("G")),
+        new SelectListItem("Individual", LegalKind.Individual.ToString("G")),
+        new SelectListItem("Organization", LegalKind.Organization.ToString("G"))
+    };
 }
 
 <div class="container">
@@ -17,12 +22,12 @@
         <br />
         <h3>Company</h3>
         <div class="form-group">
-            @Html.LabelFor(m => m.Name)
-            @Html.TextBoxFor(m => m.Name, null, new { @class = "form-control", @disabled="disabled" })
-        </div>
-        <div class="form-group">
             @Html.LabelFor(m => m.Email)
             @Html.TextBoxFor(m => m.Email, null, new { @class = "form-control" })
+        </div>
+        <div class="form-group">
+            @Html.LabelFor(m => m.Kind)
+            @Html.DropDownListFor(m => m.Kind, kinds, new { @class = "form-control" })
         </div>
         <div class="form-group">
             @Html.LabelFor(m => m.Siret)

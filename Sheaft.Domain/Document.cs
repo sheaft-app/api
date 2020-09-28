@@ -72,5 +72,18 @@ namespace Sheaft.Domain.Models
 
             ProcessedOn = processedOn;
         }
+
+        public void SetKind(DocumentKind kind)
+        {
+            Kind = kind;
+        }
+
+        public void SetName(string name)
+        {
+            if (name == null)
+                return;
+
+            Name = name;
+        }
     }
 }
