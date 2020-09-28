@@ -4,14 +4,16 @@ using System.Collections.Generic;
 
 namespace Sheaft.Application.Models
 {
-
-    public class BusinessLegalDto : BaseLegalDto
+    public class BusinessLegalViewModel
     {
+        public Guid Id { get; set; }
         public LegalKind Kind { get; set; }
+        public string Name { get; set; }
         public string Email { get; set; }
         public string Siret { get; set; }
         public string VatIdentifier { get; set; }
-        public AddressDto Address { get; set; }
-        public UboDeclarationDto UboDeclaration { get; set; }
+        public OwnerViewModel Owner { get; set; }
+        public AddressViewModel Address { get; set; }
+        public UboDeclarationViewModel UboDeclaration { get; set; }
     }
 }

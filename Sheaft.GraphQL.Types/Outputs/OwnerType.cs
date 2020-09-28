@@ -8,6 +8,7 @@ namespace Sheaft.GraphQL.Types
     {
         protected override void Configure(IObjectTypeDescriptor<OwnerDto> descriptor)
         {
+            descriptor.Field(c => c.Id).Type<IdType>();
             descriptor.Field(c => c.FirstName);
             descriptor.Field(c => c.LastName);
             descriptor.Field(c => c.Email);

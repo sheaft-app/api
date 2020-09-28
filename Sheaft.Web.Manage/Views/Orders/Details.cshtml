@@ -24,7 +24,7 @@
         @Html.LabelFor(m => m.User.Email)
         @Html.TextBoxFor(m => m.User.Email, null, new { @class = "form-control", @disabled = "disabled" })
     </div>
-    <a asp-controller="Users" asp-action="Details" asp-route-id="@Model.User.Id" class="btn btn-info">
+    <a asp-controller="Users" asp-action="Edit" asp-route-id="@Model.User.Id" class="btn btn-info">
         User details
     </a>
     <br />

@@ -3,7 +3,6 @@ using Sheaft.Domain.Enums;
 
 namespace Sheaft.Domain.Models
 {
-
     public class ProducerTag
     {
         protected ProducerTag()

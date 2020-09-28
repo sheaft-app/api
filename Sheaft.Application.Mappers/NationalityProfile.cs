@@ -8,6 +8,8 @@ namespace Sheaft.Application.Mappers
     {
         public NationalityProfile()
         {
+            CreateMap<Nationality, NationalityViewModel>();
+
             CreateMap<Nationality, NationalityDto>()
                 .ForMember(c => c.Code, opt => opt.MapFrom(t => t.Alpha2));
         }

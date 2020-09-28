@@ -4,6 +4,7 @@
     int take = ViewBag.Take;
     int currentPage = ViewBag.Page;
     string status = ((AgreementStatus?)ViewBag.Status)?.ToString("G");
+    Guid? imperonatingId = Context.Request.ImpersonificationId();
 }
 
 <div class="container">
@@ -78,8 +79,33 @@
             {
                 <tr>
                     <th scope="row">@entity.Id</th>
-                    <td>@entity.Delivery.Producer.Name</td>
-                    <td>@entity.Store.Name</td>
+                    <td>
+                        @entity.Delivery.Producer.Name
+
+                        @if (!imperonatingId.HasValue)
+                        {
+                            @using (Html.BeginForm("ImpersonateById", "Account", new { id = entity.Delivery.Producer.Id }, FormMethod.Post, true, new { @class = "form d-inline" }))
+                            {
+                                <button type="submit" class="btn btn-info">
+                                    <i class="fa fa-user-secret"></i>
+                                </button>
+                            }
+                        }
+                    </td>
+                    <td>
+                        @entity.Store.Name
+
+                        @if (!imperonatingId.HasValue)
+                        {
+                            @using (Html.BeginForm("ImpersonateById", "Account", new { id = entity.Store.Id }, FormMethod.Post, true, new { @class = "form d-inline" }))
+                            {
+                                <button type="submit" class="btn btn-info">
+                                    <i class="fa fa-user-secret"></i>
+                                </button>
+                            }
+                        }
+                    </td>
+
                     <td>@entity.Status</td>
                     <td>@entity.CreatedOn.ToString("dd/MM/yy hh:mm")</td>
                     <td>@entity.RemovedOn.HasValue</td>

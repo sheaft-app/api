@@ -23,12 +23,14 @@ namespace Sheaft.Application.Mappers
             CreateMap<UboAddress, AddressViewModel>();
 
             CreateMap<BirthAddress, AddressDto>();
-            CreateMap<BirthAddress, AddressViewModel>();
+            CreateMap<BirthAddress, BirthAddressViewModel>();
+            CreateMap<BirthAddressViewModel, BirthAddressInput>();
 
             CreateMap<UserAddress, AddressDto>();
             CreateMap<UserAddress, AddressViewModel>();
 
             CreateMap<AddressDto, AddressInput>();
+            CreateMap<AddressViewModel, AddressInput>();
             CreateMap<AddressInput, AddressDto>();
             CreateMap<AddressDto, FullAddressInput>();
             CreateMap<FullAddressInput, AddressDto>();

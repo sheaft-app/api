@@ -3,139 +3,154 @@
     ViewData["Title"] = "Products";
     int take = ViewBag.Take;
     int currentPage = ViewBag.Page;
+    Guid? imperonatingId = Context.Request.ImpersonificationId();
 }
 
-    <div class="container">
-        <h2 class="display-5">Products</h2>
+<div class="container">
+    <h2 class="display-5">Products</h2>
 
-        @if (ViewBag.Removed != null)
+    @if (ViewBag.Removed != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <span>Successfully removed product @ViewBag.Removed</span>
+
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        <br />
+    }
+
+    @if (ViewBag.Restored != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <span>Successfully restored product @ViewBag.Restored.Name</span>
+            <a asp-controller="Products" asp-action="Edit" asp-route-id="@ViewBag.Restored.Id">View details</a>
+
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        <br />
+    }
+
+    @if (ViewBag.Edited != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <span>Successfully updated product @ViewBag.Edited.Name</span>
+            <a asp-controller="Products" asp-action="Edit" asp-route-id="@ViewBag.Edited.Id">View details</a>
+
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        <br />
+    }
+
+    @if (Context.Request.ImpersonificationId().HasValue)
+    {
+        <a href="https://sheaftapp.blob.core.windows.net/resources/excel/sheaft_catalogue_produits.xlsx" target="_blank">Download sample products catalog</a>
+        <br />
+        <br />
+        @using (Html.BeginForm("Import", "Products", FormMethod.Post, new { @class = "form", enctype = "multipart/form-data" }))
         {
-            <div class="alert alert-success alert-dismissible fade show" role="alert">
-                <span>Successfully removed product @ViewBag.Removed</span>
-
-                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <br />
+            @Html.AntiForgeryToken()
+            <input type="file" multiple name="products" />
+            <button type="submit" class="btn btn-outline-success">Import</button>
         }
+        <br />
+    }
+    else
+    {
+        <div class="alert alert-info">To import products with a catalog file, you must impersonate a producer</div>
+    }
 
-        @if (ViewBag.Restored != null)
-        {
-            <div class="alert alert-success alert-dismissible fade show" role="alert">
-                <span>Successfully restored product @ViewBag.Restored.Name</span>
-                <a asp-controller="Products" asp-action="Edit" asp-route-id="@ViewBag.Restored.Id">View details</a>
-
-                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <br />
-        }
-
-        @if (ViewBag.Edited != null)
-        {
-            <div class="alert alert-success alert-dismissible fade show" role="alert">
-                <span>Successfully updated product @ViewBag.Edited.Name</span>
-                <a asp-controller="Products" asp-action="Edit" asp-route-id="@ViewBag.Edited.Id">View details</a>
-
-                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <br />
-        }
-
-        @if (Context.Request.ImpersonificationId().HasValue)
-        {
-            <a href="https://sheaftapp.blob.core.windows.net/resources/excel/sheaft_catalogue_produits.xlsx" target="_blank">Download sample products catalog</a>
-            <br />
-            <br />
-            @using (Html.BeginForm("Import", "Products", FormMethod.Post, new { @class = "form", enctype = "multipart/form-data" }))
-            {
-                @Html.AntiForgeryToken()
-                <input type="file" multiple name="products" />
-                <button type="submit" class="btn btn-outline-success">Import</button>
-            }
-            <br />
-        }
-        else
-        {
-            <div class="alert alert-info">To import products with a catalog file, you must impersonate a producer</div>
-        }
-
-        <table class="table table-hover">
-            <thead class="thead-dark">
-                <tr>
-                    <th scope="col">Reference</th>
-                    <th scope="col">Name</th>
-                    <th scope="col">WholeSalePrice</th>
-                    <th scope="col">Vat</th>
-                    <th scope="col">Producer</th>
-                    <th scope="col">CreatedOn</th>
-                    <th scope="col">Removed</th>
-                    <th scope="col">
-                        <a asp-controller="Products" asp-action="Add" class="btn btn-success">
-                            <i class="fa fa-plus"></i>
-                        </a>
-                    </th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var entity in Model)
+    <table class="table table-hover">
+        <thead class="thead-dark">
+            <tr>
+                <th scope="col">Reference</th>
+                <th scope="col">Name</th>
+                <th scope="col">WholeSalePrice</th>
+                <th scope="col">Vat</th>
+                @if (!imperonatingId.HasValue)
                 {
-                    <tr>
-                        <th scope="row">@entity.Reference</th>
-                        <td>@entity.Name</td>
-                        <td>@entity.WholeSalePricePerUnit</td>
-                        <td>@(entity.Vat)%</td>
-                        <td>@entity.Producer.Name</td>
-                        <td>@entity.CreatedOn.ToString("dd/MM/yy hh:mm")</td>
-                        <td>@entity.RemovedOn.HasValue</td>
+                    <th scope="col">Producer</th>
+                }
+                <th scope="col">CreatedOn</th>
+                <th scope="col">Removed</th>
+                <th scope="col">
+                    <a asp-controller="Products" asp-action="Add" class="btn btn-success">
+                        <i class="fa fa-plus"></i>
+                    </a>
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var entity in Model)
+            {
+                <tr>
+                    <th scope="row">@entity.Reference</th>
+                    <td>@entity.Name</td>
+                    <td>@entity.WholeSalePricePerUnit</td>
+                    <td>@(entity.Vat)%</td>
+                    @if (!imperonatingId.HasValue)
+                    {
                         <td>
-                            <a asp-controller="Products" asp-action="Edit" asp-route-id="@entity.Id" class="btn btn-info">
-                                <i class="fa fa-pen"></i>
-                            </a>
-
-                            @if (entity.RemovedOn.HasValue)
+                            @entity.Producer.Name
+                            @using (Html.BeginForm("ImpersonateById", "Account", new { id = entity.Producer.Id }, FormMethod.Post, true, new { @class = "form d-inline" }))
                             {
-                                @using (Html.BeginForm("Restore", "Products", new { id = entity.Id }, FormMethod.Post, true, new { @class = "form d-inline" }))
-                                {
-                                    <button type="submit" class="btn btn-success">
-                                        <i class="fa fa-trash-restore"></i>
-                                    </button>
-                                }
-                            }
-                            else
-                            {
-                                @using (Html.BeginForm("Delete", "Products", new { id = entity.Id }, FormMethod.Post, true, new { @class = "form d-inline" }))
-                                {
-                                    <button type="submit" class="btn btn-danger">
-                                        <i class="fa fa-trash"></i>
-                                    </button>
-                                }
+                                <button type="submit" class="btn btn-info">
+                                    <i class="fa fa-user-secret"></i>
+                                </button>
                             }
                         </td>
-                    </tr>
-                }
-            </tbody>
-            <tfoot>
-                <tr class="text-center">
-                    <td colspan="8">
-                        @if (currentPage >= 1)
+                    }
+                    <td>@entity.CreatedOn.ToString("dd/MM/yy hh:mm")</td>
+                    <td>@entity.RemovedOn.HasValue</td>
+                    <td>
+                        <a asp-controller="Products" asp-action="Edit" asp-route-id="@entity.Id" class="btn btn-info">
+                            <i class="fa fa-pen"></i>
+                        </a>
+
+                        @if (entity.RemovedOn.HasValue)
                         {
-                            <a asp-controller="Products" asp-action="Index" asp-route-take="@take" asp-route-page="@(currentPage-1)" class="btn btn-outline-secondary">
-                                <i class="fa fa-caret-left"></i>
-                            </a>
+                            @using (Html.BeginForm("Restore", "Products", new { id = entity.Id }, FormMethod.Post, true, new { @class = "form d-inline" }))
+                            {
+                                <button type="submit" class="btn btn-success">
+                                    <i class="fa fa-trash-restore"></i>
+                                </button>
+                            }
                         }
-                        @if (take == Model.Count())
+                        else
                         {
-                            <a asp-controller="Products" asp-action="Index" asp-route-take="@take" asp-route-page="@(currentPage+1)" class="btn btn-outline-secondary">
-                                <i class="fa fa-caret-right"></i>
-                            </a>
+                            @using (Html.BeginForm("Delete", "Products", new { id = entity.Id }, FormMethod.Post, true, new { @class = "form d-inline" }))
+                            {
+                                <button type="submit" class="btn btn-danger">
+                                    <i class="fa fa-trash"></i>
+                                </button>
+                            }
                         }
                     </td>
                 </tr>
-            </tfoot>
-        </table>
-    </div>
+            }
+        </tbody>
+        <tfoot>
+            <tr class="text-center">
+                <td colspan="8">
+                    @if (currentPage >= 1)
+                    {
+                        <a asp-controller="Products" asp-action="Index" asp-route-take="@take" asp-route-page="@(currentPage-1)" class="btn btn-outline-secondary">
+                            <i class="fa fa-caret-left"></i>
+                        </a>
+                    }
+                    @if (take == Model.Count())
+                    {
+                        <a asp-controller="Products" asp-action="Index" asp-route-take="@take" asp-route-page="@(currentPage+1)" class="btn btn-outline-secondary">
+                            <i class="fa fa-caret-right"></i>
+                        </a>
+                    }
+                </td>
+            </tr>
+        </tfoot>
+    </table>
+</div>

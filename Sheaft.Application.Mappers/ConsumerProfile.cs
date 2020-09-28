@@ -10,6 +10,7 @@ namespace Sheaft.Application.Mappers
         public ConsumerProfile()
         {
             CreateMap<Consumer, UserViewModel>();
+            CreateMap<Consumer, ConsumerViewModel>();
 
             CreateMap<Consumer, UserDto>()
                 .ForMember(c => c.Address, opt => opt.MapFrom(d => d.Address));

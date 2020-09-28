@@ -13,7 +13,7 @@ namespace Sheaft.Application.Models
         public DateTimeOffset? RemovedOn { get; set; }
         public string Reason { get; set; }
         public DeliveryModeViewModel Delivery { get; set; }
-        public BusinessViewModel Store { get; set; }
+        public StoreViewModel Store { get; set; }
         public IEnumerable<TimeSlotViewModel> SelectedHours { get; set; }
     }
 }

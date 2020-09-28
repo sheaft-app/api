@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace Sheaft.Application.Models
 {
-    public class ProducerViewModel
+    public class StoreViewModel
     {
         public Guid Id { get; set; }
         public DateTimeOffset CreatedOn { get; set; }
@@ -20,5 +20,6 @@ namespace Sheaft.Application.Models
         public bool OpenForNewBusiness { get; set; }
         public AddressViewModel Address { get; set; }
         public IEnumerable<Guid> Tags { get; set; }
+        public IEnumerable<TimeSlotViewModel> OpeningHours { get; set; }
     }
 }

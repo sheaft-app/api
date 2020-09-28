@@ -9,7 +9,13 @@ namespace Sheaft.Application.Mappers
     {
         public UboProfile()
         {
-            CreateMap<Ubo, UboDto>();
+            CreateMap<Ubo, UboDto>()
+                .ForMember(d => d.Address, opt => opt.MapFrom(r => r.Address))
+                .ForMember(d => d.BirthPlace, opt => opt.MapFrom(r => r.BirthPlace));
+
+            CreateMap<Ubo, UboViewModel>()
+                .ForMember(d => d.Address, opt => opt.MapFrom(r => r.Address))
+                .ForMember(d => d.BirthPlace, opt => opt.MapFrom(r => r.BirthPlace));
 
             CreateMap<CreateUboInput, CreateUboCommand>();
             CreateMap<UpdateUboInput, UpdateUboCommand>();

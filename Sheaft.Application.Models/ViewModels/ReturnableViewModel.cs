@@ -14,5 +14,6 @@ namespace Sheaft.Application.Models
         public decimal Vat { get; set; }
         public decimal VatPrice { get; set; }
         public decimal OnSalePrice { get; set; }
+        public UserProfileViewModel Producer { get; set; }
     }
 }

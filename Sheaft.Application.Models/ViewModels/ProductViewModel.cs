@@ -29,7 +29,7 @@ namespace Sheaft.Application.Models
         public bool Available { get; set; } = true;
         public decimal? Rating { get; set; }
         public Guid? ReturnableId { get; set; }
-        public BusinessViewModel Producer { get; set; }
+        public ProducerViewModel Producer { get; set; }
         public IEnumerable<Guid> Tags { get; set; }
     }
 }

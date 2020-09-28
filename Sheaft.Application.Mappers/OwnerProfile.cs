@@ -9,6 +9,9 @@ namespace Sheaft.Application.Mappers
         public OwnerProfile()
         {
             CreateMap<Owner, OwnerDto>();
+            CreateMap<Owner, OwnerViewModel>();
+
+            CreateMap<OwnerViewModel, OwnerInput>();
         }
     }
 }

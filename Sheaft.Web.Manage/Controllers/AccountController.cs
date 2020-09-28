@@ -66,6 +66,14 @@ namespace Sheaft.Manage.Controllers
                 .ProjectTo<UserViewModel>(_configurationProvider)
                 .ToListAsync(token);
 
+            if (users.Count == 1)
+            {
+                var user = users.First();
+                AddImpersonate(user.Id, user.Name);
+                var origin = Request.Headers.FirstOrDefault(c => c.Key.ToLower() == "referer").Value;
+                return Redirect(origin);
+            }
+
             return View("Impersonate", users);
         }
 
@@ -75,7 +83,9 @@ namespace Sheaft.Manage.Controllers
         {
             var user = await _context.Users.OfType<User>().SingleOrDefaultAsync(c => c.Id == id, token);
             AddImpersonate(user.Id, user.Name);
-            return RedirectToAction("Index", "Dashboard");
+
+            var origin = Request.Headers.FirstOrDefault(c => c.Key.ToLower() == "referer").Value;
+            return Redirect(origin);
         }
 
         [HttpPost]
@@ -83,7 +93,8 @@ namespace Sheaft.Manage.Controllers
         public IActionResult RemoveImpersonification()
         {
             RemoveImpersonate();
-            return RedirectToAction("Index", "Dashboard");
+            var origin = Request.Headers.FirstOrDefault(c => c.Key.ToLower() == "referer").Value;
+            return Redirect(origin);
         }
 
         [HttpPost]

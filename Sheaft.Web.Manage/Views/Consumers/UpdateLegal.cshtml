@@ -1,0 +1,71 @@
+﻿@model ConsumerLegalViewModel
+@{
+    ViewData["Title"] = "Consumer billing details";
+    var countries = ((List<CountryViewModel>)ViewBag.Countries).Select(c => new SelectListItem(c.Name, c.Alpha2)).ToList();
+    var nationalities = ((List<NationalityViewModel>)ViewBag.Nationalities).Select(c => new SelectListItem(c.Name, c.Alpha2)).ToList();
+}
+
+<div class="container">
+    <h2 class="display-4">Consumer billing details</h2>
+    <br />
+
+    @using (Html.BeginForm("UpdateLegal", "Users", FormMethod.Post))
+    {
+        @Html.AntiForgeryToken()
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+        @Html.HiddenFor(model => model.Id)
+        @Html.HiddenFor(model => model.Owner.Id)
+        <br />
+
+        <div class="form-group">
+            @Html.LabelFor(m => m.Owner.FirstName)
+            @Html.TextBoxFor(m => m.Owner.FirstName, null, new { @class = "form-control" })
+        </div>
+        <div class="form-group">
+            @Html.LabelFor(m => m.Owner.LastName)
+            @Html.TextBoxFor(m => m.Owner.LastName, null, new { @class = "form-control" })
+        </div>
+        <div class="form-group">
+            @Html.LabelFor(m => m.Owner.Email)
+            @Html.TextBoxFor(m => m.Owner.Email, null, new { @class = "form-control" })
+        </div>
+        <div class="form-group">
+            @Html.LabelFor(m => m.Owner.BirthDate)
+            @Html.TextBoxFor(m => m.Owner.BirthDate, null, new { @class = "form-control" })
+        </div>
+        <div class="form-group">
+            @Html.LabelFor(m => m.Owner.Nationality)
+            @Html.DropDownListFor(m => m.Owner.Nationality, nationalities, new { @class = "form-control" })
+        </div>
+        <h4>Address</h4>
+        <div class="form-group">
+            @Html.LabelFor(m => m.Owner.Address.Line1)
+            @Html.TextBoxFor(m => m.Owner.Address.Line1, null, new { @class = "form-control" })
+        </div>
+        <div class="form-group">
+            @Html.LabelFor(m => m.Owner.Address.Line2)
+            @Html.TextBoxFor(m => m.Owner.Address.Line2, null, new { @class = "form-control" })
+        </div>
+        <div class="form-group">
+            @Html.LabelFor(m => m.Owner.Address.Zipcode)
+            @Html.TextBoxFor(m => m.Owner.Address.Zipcode, null, new { @class = "form-control" })
+        </div>
+        <div class="form-group">
+            @Html.LabelFor(m => m.Owner.Address.City)
+            @Html.TextBoxFor(m => m.Owner.Address.City, null, new { @class = "form-control" })
+        </div>
+        <div class="form-group">
+            @Html.LabelFor(m => m.Owner.CountryOfResidence)
+            @Html.DropDownListFor(m => m.Owner.CountryOfResidence, countries, new { @class = "form-control" })
+        </div>
+
+        <br />
+        <a asp-controller="Consumers" asp-action="Edit" asp-route-id="@Model.Owner.Id" class="btn btn-light">
+            Cancel
+        </a>
+        <button type="submit" class="btn btn-success">
+            <i class="fa fa-check">&nbsp;Save</i>
+        </button>
+    }
+
+</div>

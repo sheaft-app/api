@@ -3,7 +3,6 @@ using System;
 
 namespace Sheaft.Application.Models
 {
-
     public class DepartmentViewModel
     {
         public Guid Id { get; set; }

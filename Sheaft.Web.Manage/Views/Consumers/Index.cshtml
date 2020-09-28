@@ -1,19 +1,19 @@
-﻿@model IEnumerable<UserViewModel>
+﻿@model IEnumerable<ConsumerViewModel>
 @{
-    ViewData["Title"] = "Users";
+    ViewData["Title"] = "Consumers";
     int take = ViewBag.Take;
     int currentPage = ViewBag.Page;
     ProfileKind? kind = ViewBag.Kind;
 }
 
     <div class="container">
-        <h2 class="display-5">Users</h2>
+        <h2 class="display-5">Consumers</h2>
         <br />
 
         @if (ViewBag.Removed != null)
         {
             <div class="alert alert-success alert-dismissible fade show" role="alert">
-                <span>Successfully removed user @ViewBag.Removed</span>
+                <span>Successfully removed consumer @ViewBag.Removed</span>
 
                 <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
@@ -25,8 +25,8 @@
         @if (ViewBag.Restored != null)
         {
             <div class="alert alert-success alert-dismissible fade show" role="alert">
-                <span>Successfully restored user @ViewBag.Restored.Name</span>
-                <a asp-controller="Users" asp-action="Edit" asp-route-id="@ViewBag.Restored.Id">View details</a>
+                <span>Successfully restored consumer @ViewBag.Restored.Name</span>
+                <a asp-controller="Consumers" asp-action="Edit" asp-route-id="@ViewBag.Restored.Id">View details</a>
 
                 <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
@@ -38,7 +38,7 @@
         @if (ViewBag.Edited != null)
         {
             <div class="alert alert-success alert-dismissible fade show" role="alert">
-                <span>Successfully updated user @ViewBag.Edited.Name</span>
+                <span>Successfully updated consumer @ViewBag.Edited.Name</span>
                 <a asp-controller="Users" asp-action="Edit" asp-route-id="@ViewBag.Edited.Id">View details</a>
 
                 <button type="button" class="close" data-dismiss="alert" aria-label="Close">
@@ -48,30 +48,13 @@
             <br />
         }
 
-        <div class="btn-group">
-            <label class="btn btn-secondary @(kind == null ? "active": "")">
-                <a asp-controller="Users" asp-action="Index" asp-route-kind="" asp-route-take="@take" asp-route-page="@currentPage" class="text-white">All</a>
-            </label>
-            <label class="btn btn-secondary @(kind == ProfileKind.Producer ? "active": "")">
-                <a asp-controller="Users" asp-action="Index" asp-route-kind="@ProfileKind.Producer" asp-route-take="@take" asp-route-page="@currentPage" class="text-white">Producers</a>
-            </label>
-            <label class="btn btn-secondary @(kind == ProfileKind.Store ? "active": "")">
-                <a asp-controller="Users" asp-action="Index" asp-route-kind="@ProfileKind.Store" asp-route-take="@take" asp-route-page="@currentPage" class="text-white">Stores</a>
-            </label>
-            <label class="btn btn-secondary @(kind == ProfileKind.Consumer ? "active": "")">
-                <a asp-controller="Users" asp-action="Index" asp-route-kind="@ProfileKind.Consumer" asp-route-take="@take" asp-route-page="@currentPage" class="text-white">Consumers</a>
-            </label>
-        </div>
-        <br />
-
         <table class="table table-hover">
             <thead class="thead-dark">
                 <tr>
-                    <th scope="col">Name</th>
-                    <th scope="col">Kind</th>
+                    <th scope="col">FirstName</th>
+                    <th scope="col">LastName</th>
                     <th scope="col">Email</th>
                     <th scope="col">CreatedOn</th>
-                    <th scope="col">Removed</th>
                     <th scope="col"></th>
                 </tr>
             </thead>
@@ -79,18 +62,17 @@
                 @foreach (var entity in Model)
                 {
                 <tr>
-                    <th scope="row">@entity.Name</th>
-                    <td>@entity.Kind</td>
+                    <th scope="row">@entity.FirstName</th>
+                    <th scope="row">@entity.LastName</th>
                     <th>@entity.Email</th>
                     <td>@entity.CreatedOn.ToString("dd/MM/yy hh:mm")</td>
-                    <td>@entity.RemovedOn.HasValue</td>
                     <td>
-                        <a asp-controller="Users" asp-action="Edit" asp-route-id="@entity.Id" class="btn btn-info">
+                        <a asp-controller="Consumers" asp-action="Edit" asp-route-id="@entity.Id" class="btn btn-info">
                             <i class="fa fa-pen"></i>
                         </a>
                         @if (!entity.RemovedOn.HasValue)
                         {
-                            @using (Html.BeginForm("Delete", "Users", new { id = entity.Id }, FormMethod.Post, true, new { @class = "form d-inline" }))
+                            @using (Html.BeginForm("Delete", "Consumers", new { id = entity.Id }, FormMethod.Post, true, new { @class = "form d-inline" }))
                             {
                                 <button type="submit" class="btn btn-danger">
                                     <i class="fa fa-trash"></i>
@@ -106,13 +88,13 @@
                     <td colspan="7">
                         @if (currentPage >= 1)
                         {
-                            <a asp-controller="Users" asp-action="Index" asp-route-take="@take" asp-route-page="@(currentPage-1)" class="btn btn-outline-secondary">
+                            <a asp-controller="Consumers" asp-action="Index" asp-route-take="@take" asp-route-page="@(currentPage-1)" class="btn btn-outline-secondary">
                                 <i class="fa fa-caret-left"></i>
                             </a>
                         }
                         @if (take == Model.Count())
                         {
-                            <a asp-controller="Users" asp-action="Index" asp-route-take="@take" asp-route-page="@(currentPage+1)" class="btn btn-outline-secondary">
+                            <a asp-controller="Consumers" asp-action="Index" asp-route-take="@take" asp-route-page="@(currentPage+1)" class="btn btn-outline-secondary">
                                 <i class="fa fa-caret-right"></i>
                             </a>
                         }
