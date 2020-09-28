@@ -49,6 +49,11 @@ namespace Sheaft.Manage.Controllers
                 ViewBag.Jobs = await _context.Jobs.CountAsync(c => !c.RemovedOn.HasValue && c.User.Id == requestUser.Id, token);
                 ViewBag.Returnables = await _context.Returnables.CountAsync(c => !c.RemovedOn.HasValue && c.Producer.Id == requestUser.Id, token);
                 ViewBag.PurchaseOrders = await _context.PurchaseOrders.CountAsync(c => !c.RemovedOn.HasValue && (c.Vendor.Id == requestUser.Id || c.Sender.Id == requestUser.Id), token);
+                ViewBag.Orders = await _context.Orders.CountAsync(c => !c.RemovedOn.HasValue && c.User.Id == requestUser.Id, token);
+                ViewBag.Payins = await _context.Payins.CountAsync(c => !c.RemovedOn.HasValue && c.Author.Id == requestUser.Id, token);
+                ViewBag.Transfers = await _context.Transfers.CountAsync(c => !c.RemovedOn.HasValue && c.Author.Id == requestUser.Id, token);
+                ViewBag.Payouts = await _context.Payouts.CountAsync(c => !c.RemovedOn.HasValue && c.Author.Id == requestUser.Id, token);
+                ViewBag.Donations = await _context.Donations.CountAsync(c => !c.RemovedOn.HasValue && c.Author.Id == requestUser.Id, token);
             }
             else
             {
@@ -60,6 +65,11 @@ namespace Sheaft.Manage.Controllers
                 ViewBag.Jobs = await _context.Jobs.CountAsync(c => !c.RemovedOn.HasValue, token);
                 ViewBag.Returnables = await _context.Returnables.CountAsync(c => !c.RemovedOn.HasValue, token);
                 ViewBag.PurchaseOrders = await _context.PurchaseOrders.CountAsync(c => !c.RemovedOn.HasValue, token);
+                ViewBag.Orders = await _context.Orders.CountAsync(c => !c.RemovedOn.HasValue, token);
+                ViewBag.Payins = await _context.Payins.CountAsync(c => !c.RemovedOn.HasValue, token);
+                ViewBag.Transfers = await _context.Transfers.CountAsync(c => !c.RemovedOn.HasValue, token);
+                ViewBag.Payouts = await _context.Payouts.CountAsync(c => !c.RemovedOn.HasValue, token);
+                ViewBag.Donations = await _context.Donations.CountAsync(c => !c.RemovedOn.HasValue, token);
             }
 
             ViewBag.RequestUser = requestUser;

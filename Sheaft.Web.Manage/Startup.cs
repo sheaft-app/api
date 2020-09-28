@@ -160,6 +160,9 @@ namespace Sheaft.Manage
             services.AddScoped<ISignalrService, SignalrService>();
             services.AddScoped<IPictureService, PictureService>();
             services.AddScoped<IPspService, PspService>();
+            services.AddScoped<ISheaftMediatr, SheaftMediatr>();
+            services.AddScoped<IAuthService, AuthService>();
+            services.AddScoped<IFeesService, FeesService>();
 
             services.AddOptions();
 

@@ -25,12 +25,12 @@
 
         <div class="btn-group">
             <label class="btn btn-secondary @(status == null ? "active": "")">
-                <a asp-controller="Payins" asp-action="Index" asp-route-kind="" asp-route-take="@take" asp-route-page="@currentPage" class="text-white">All</a>
+                <a asp-controller="Payins" asp-action="Index" asp-route-status="" asp-route-take="@take" asp-route-page="@currentPage" class="text-white">All</a>
             </label>
             @foreach (var existingStatus in Enum.GetNames(typeof(TransactionStatus)))
             {
                 <label class="btn btn-secondary @(status == existingStatus ? "active": "")">
-                    <a asp-controller="Payins" asp-action="Index" asp-route-kind="existingStatus" asp-route-take="@take" asp-route-page="@currentPage" class="text-white">@existingStatus</a>
+                    <a asp-controller="Payins" asp-action="Index" asp-route-status="@existingStatus" asp-route-take="@take" asp-route-page="@currentPage" class="text-white">@existingStatus</a>
                 </label>
             }
         </div>

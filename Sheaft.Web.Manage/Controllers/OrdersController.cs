@@ -50,7 +50,7 @@ namespace Sheaft.Manage.Controllers
                 query = query.Where(p => p.User.Id == requestUser.Id);
 
             if (status != null)
-                query.Where(q => q.Status == status);
+                query = query.Where(q => q.Status == status);
 
             var entities = await query
                 .OrderByDescending(c => c.CreatedOn)

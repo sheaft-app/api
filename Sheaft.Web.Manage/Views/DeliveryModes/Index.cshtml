@@ -52,9 +52,9 @@
             <tr>
                 <th scope="col">Name</th>
                 <th scope="col">Kind</th>
+                <th scope="col">Producer</th>
                 <th scope="col">Lock</th>
                 <th scope="col">CreatedOn</th>
-                <th scope="col">Removed</th>
                 <th scope="col">
                     <a asp-controller="DeliveryModes" asp-action="Add" class="btn btn-success">
                         <i class="fa fa-plus"></i>
@@ -68,9 +68,9 @@
             <tr>
                 <th scope="row">@entity.Name</th>
                 <td>@entity.Kind</td>
+                <td>@entity.Producer.Name</td>
                 <td>@(entity.LockOrderHoursBeforeDelivery)h</td>
                 <td>@entity.CreatedOn.ToString("dd/MM/yy hh:mm")</td>
-                <td>@entity.RemovedOn.HasValue</td>
                 <td>
                     <a asp-controller="DeliveryModes" asp-action="Edit" asp-route-id="@entity.Id" class="btn btn-info">
                         <i class="fa fa-pen"></i>

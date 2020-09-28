@@ -30,7 +30,7 @@
         @foreach (var existingStatus in Enum.GetNames(typeof(OrderStatus)))
         {
             <label class="btn btn-secondary @(status == existingStatus ? "active": "")">
-                <a asp-controller="Orders" asp-action="Index" asp-route-kind="existingStatus" asp-route-take="@take" asp-route-page="@currentPage" class="text-white">@existingStatus</a>
+                <a asp-controller="Orders" asp-action="Index" asp-route-status="@existingStatus" asp-route-take="@take" asp-route-page="@currentPage" class="text-white">@existingStatus</a>
             </label>
         }
     </div>
