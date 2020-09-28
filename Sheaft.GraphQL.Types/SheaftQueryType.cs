@@ -223,7 +223,7 @@ namespace Sheaft.GraphQL.Types
             //PRODUCER
             descriptor.Field(c => c.GetProducer(default, default))
                 .Name("producer")
-                .Authorize(Policies.PRODUCER)
+                .Authorize(Policies.OWNER)
                 .Argument("input", c => c.Type<NonNullType<IdType>>())
                 .Type<NonNullType<ProducerType>>()
                 .UseSingleOrDefault()
@@ -355,7 +355,7 @@ namespace Sheaft.GraphQL.Types
             //STORE
             descriptor.Field(c => c.GetStore(default, default))
                 .Name("store")
-                .Authorize(Policies.STORE)
+                .Authorize(Policies.OWNER)
                 .Argument("input", c => c.Type<NonNullType<IdType>>())
                 .Type<NonNullType<StoreType>>()
                 .UseSingleOrDefault()
