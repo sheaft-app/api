@@ -186,7 +186,7 @@ namespace Sheaft.Infrastructure.Services
         {
             return await ExecuteAsync(async () =>
             {
-                if (string.IsNullOrWhiteSpace(document.User.Identifier))
+                if (string.IsNullOrWhiteSpace(document.Legal.User.Identifier))
                     return Failed<PspDocumentResultDto>(new SheaftException(ExceptionKind.BadRequest, MessageKind.PsP_CannotCreate_Document_User_Not_Exists));
 
                 if (!string.IsNullOrWhiteSpace(document.Identifier))
@@ -194,7 +194,7 @@ namespace Sheaft.Infrastructure.Services
 
                 await EnsureAccessTokenIsValidAsync(token);
 
-                var result = await _api.Users.CreateKycDocumentAsync(document.Id.ToString("N"), document.User.Identifier, document.Kind.GetDocumentType());
+                var result = await _api.Users.CreateKycDocumentAsync(document.Id.ToString("N"), document.Legal.User.Identifier, document.Kind.GetDocumentType());
 
                 return Ok(new PspDocumentResultDto
                 {
@@ -217,7 +217,7 @@ namespace Sheaft.Infrastructure.Services
                 await EnsureAccessTokenIsValidAsync(token);
 
                 byte[] bytes = null;
-                await _api.Users.CreateKycPageAsync(page.Id.ToString("N"), document.User.Identifier, document.Identifier, bytes);
+                await _api.Users.CreateKycPageAsync(page.Id.ToString("N"), document.Legal.User.Identifier, document.Identifier, bytes);
                 return Ok(true);
             });
         }
@@ -226,7 +226,7 @@ namespace Sheaft.Infrastructure.Services
         {
             return await ExecuteAsync(async () =>
             {
-                if (string.IsNullOrWhiteSpace(document.User.Identifier))
+                if (string.IsNullOrWhiteSpace(document.Legal.User.Identifier))
                     return Failed<PspDocumentResultDto>(new SheaftException(ExceptionKind.BadRequest, MessageKind.PsP_CannotSubmit_Document_User_Not_Exists));
 
                 if (string.IsNullOrWhiteSpace(document.Identifier))
@@ -235,7 +235,7 @@ namespace Sheaft.Infrastructure.Services
                 await EnsureAccessTokenIsValidAsync(token);
 
                 var result = await _api.Users.UpdateKycDocumentAsync(
-                    document.User.Identifier,
+                    document.Legal.User.Identifier,
                     new KycDocumentPutDTO { Status = KycStatus.VALIDATION_ASKED },
                     document.Identifier);
 

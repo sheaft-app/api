@@ -2,12 +2,12 @@
 using Sheaft.Domains.Extensions;
 using Sheaft.Exceptions;
 using System;
+using System.Collections.Generic;
 
 namespace Sheaft.Domain.Models
 {
     public class BusinessLegal : Legal
     {
-        
         protected BusinessLegal()
         {
         }

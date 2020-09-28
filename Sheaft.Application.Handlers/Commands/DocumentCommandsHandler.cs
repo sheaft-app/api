@@ -18,6 +18,7 @@ namespace Sheaft.Application.Handlers
             IRequestHandler<UploadPageCommand, Result<bool>>,
             IRequestHandler<SubmitDocumentsCommand, Result<bool>>,
             IRequestHandler<SubmitDocumentCommand, Result<bool>>,
+            IRequestHandler<ReviewDocumentCommand, Result<bool>>,
             IRequestHandler<RemoveDocumentCommand, Result<bool>>,
             IRequestHandler<RefreshDocumentStatusCommand, Result<DocumentStatus>>
     {
@@ -39,8 +40,8 @@ namespace Sheaft.Application.Handlers
             {
                 using (var transaction = await _context.Database.BeginTransactionAsync(token))
                 {
-                    var user = await _context.GetByIdAsync<User>(request.RequestUser.Id, token);
-                    var document = new Document(Guid.NewGuid(), request.Kind, request.Name, user);
+                    var legal = await _context.GetSingleAsync<Legal>(r => r.User.Id == request.RequestUser.Id, token);
+                    var document = new Document(Guid.NewGuid(), request.Kind, request.Name, legal);
 
                     await _context.AddAsync(document, token);
                     await _context.SaveChangesAsync(token);
@@ -53,7 +54,7 @@ namespace Sheaft.Application.Handlers
                     }
 
                     document.SetIdentifier(result.Data.Identifier);
-                    document.SetValidationStatus(result.Data.Status);
+                    document.SetStatus(result.Data.Status);
 
                     _context.Update(document);
                     await _context.SaveChangesAsync(token);
@@ -85,7 +86,6 @@ namespace Sheaft.Application.Handlers
             return await ExecuteAsync(async () =>
             {
                 var document = await _context.GetByIdAsync<Document>(request.DocumentId, token);
-
                 var page = new Page(Guid.NewGuid(), request.FileName, request.Extension, request.Size);
 
                 document.AddPage(page);
@@ -104,11 +104,25 @@ namespace Sheaft.Application.Handlers
             });
         }
 
+        public async Task<Result<bool>> Handle(ReviewDocumentCommand request, CancellationToken token)
+        {
+            return await ExecuteAsync(async () =>
+            {
+                var document = await _context.GetByIdAsync<Document>(request.DocumentId, token);
+                document.SetStatus(DocumentStatus.WaitingForCreation);
+
+                _context.Update(document);
+                await _context.SaveChangesAsync(token);
+
+                return Ok(true);
+            });
+        }
+
         public async Task<Result<bool>> Handle(SubmitDocumentsCommand request, CancellationToken token)
         {
             return await ExecuteAsync(async () =>
             {
-                var documents = await _context.GetAsync<Document>(c => c.User.Id == request.RequestUser.Id, token);
+                var documents = await _context.GetAsync<Document>(c => c.Legal.User.Id == request.RequestUser.Id && c.Status == DocumentStatus.WaitingForCreation, token);
                 var success = true;
                 foreach (var document in documents)
                 {
@@ -135,7 +149,7 @@ namespace Sheaft.Application.Handlers
                 if (!result.Success)
                     return Failed<bool>(result.Exception);
 
-                document.SetValidationStatus(result.Data.Status);
+                document.SetStatus(result.Data.Status);
                 document.SetResult(result.Data.ResultCode, result.Data.ResultMessage);
 
                 return Ok(true);
@@ -162,7 +176,7 @@ namespace Sheaft.Application.Handlers
                 if (!pspResult.Success)
                     return Failed<DocumentStatus>(pspResult.Exception);
 
-                document.SetValidationStatus(pspResult.Data.Status);
+                document.SetStatus(pspResult.Data.Status);
                 document.SetResult(pspResult.Data.ResultCode, pspResult.Data.ResultMessage);
                 document.SetProcessedOn(pspResult.Data.ProcessedOn);
 

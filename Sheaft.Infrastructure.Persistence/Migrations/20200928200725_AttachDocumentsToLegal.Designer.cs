@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Sheaft.Domain.Enums;
 using Sheaft.Infrastructure.Persistence;
@@ -10,9 +11,10 @@ using Sheaft.Infrastructure.Persistence;
 namespace Sheaft.Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20200928200725_AttachDocumentsToLegal")]
+    partial class AttachDocumentsToLegal
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -2565,8 +2567,8 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                             b1.Property<decimal>("Size")
                                 .HasColumnType("decimal(10,2)");
 
-                            b1.Property<DateTimeOffset?>("UploadedOn")
-                                .HasColumnType("datetimeoffset");
+                            b1.Property<bool>("Uploaded")
+                                .HasColumnType("bit");
 
                             b1.HasKey("DocumentUid", "Id");
 

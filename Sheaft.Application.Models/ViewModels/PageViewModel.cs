@@ -1,8 +1,10 @@
-﻿using System;
+﻿using Sheaft.Domain.Enums;
+using System;
+using System.Collections.Generic;
 
 namespace Sheaft.Application.Models
 {
-    public class PageDto
+    public class PageViewModel
     {
         public Guid Id { get; set; }
         public DateTimeOffset CreatedOn { get; set; }

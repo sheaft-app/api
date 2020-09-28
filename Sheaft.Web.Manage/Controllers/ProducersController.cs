@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
 using AutoMapper.QueryableExtensions;
-using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -8,11 +7,9 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Sheaft.Application.Commands;
-using Sheaft.Core;
 using Sheaft.Domain.Models;
 using Sheaft.Exceptions;
 using Sheaft.Application.Interop;
-using Sheaft.Domain.Enums;
 using Sheaft.Manage.Models;
 using Sheaft.Application.Models;
 using Sheaft.Options;
@@ -198,6 +195,7 @@ namespace Sheaft.Manage.Controllers
 
             ViewBag.Countries = await GetCountries(token);
             ViewBag.Nationalities = await GetNationalities(token);
+            ViewBag.Documents = await GetDocuments(entity.Id, token);
             return View(entity);
         }
 
@@ -221,6 +219,7 @@ namespace Sheaft.Manage.Controllers
             {
                 ViewBag.Countries = await GetCountries(token);
                 ViewBag.Nationalities = await GetNationalities(token);
+                ViewBag.Documents = await GetDocuments(model.Id, token);
                 ModelState.AddModelError("", result.Exception.Message);
                 return View(model);
             }
@@ -253,12 +252,25 @@ namespace Sheaft.Manage.Controllers
 
         private async Task<IEnumerable<CountryViewModel>> GetCountries(CancellationToken token)
         {
-            return await _context.Countries.AsNoTracking().ProjectTo<CountryViewModel>(_configurationProvider).ToListAsync(token);
+            return await _context.Countries
+                .AsNoTracking()
+                .ProjectTo<CountryViewModel>(_configurationProvider)
+                .ToListAsync(token);
         }
 
         private async Task<IEnumerable<NationalityViewModel>> GetNationalities(CancellationToken token)
         {
-            return await _context.Nationalities.AsNoTracking().ProjectTo<NationalityViewModel>(_configurationProvider).ToListAsync(token);
+            return await _context.Nationalities
+                .AsNoTracking()
+                .ProjectTo<NationalityViewModel>(_configurationProvider)
+                .ToListAsync(token);
+        }
+
+        private async Task<IEnumerable<DocumentShortViewModel>> GetDocuments(Guid legalId, CancellationToken token)
+        {
+            return await _context.Documents.AsNoTracking().Where(c => c.Legal.Id == legalId)
+                .ProjectTo<DocumentShortViewModel>(_configurationProvider)
+                .ToListAsync(token);
         }
     }
 }

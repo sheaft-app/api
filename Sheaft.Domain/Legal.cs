@@ -1,6 +1,7 @@
 ﻿using Sheaft.Domain.Interop;
 using Sheaft.Domain.Enums;
 using System;
+using System.Collections.Generic;
 
 namespace Sheaft.Domain.Models
 {

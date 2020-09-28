@@ -13,13 +13,13 @@ namespace Sheaft.Domain.Models
         {
         }
 
-        public Document(Guid id, DocumentKind kind, string name, User user)
+        public Document(Guid id, DocumentKind kind, string name, Legal legal)
         {
             Id = id;
             Name = name;
             Kind = kind;
             Status = DocumentStatus.WaitingForReview;
-            User = user;
+            Legal = legal;
 
             _pages = new List<Page>();
         }
@@ -35,7 +35,7 @@ namespace Sheaft.Domain.Models
         public string ResultMessage { get; private set; }
         public DocumentStatus Status { get; private set; }
         public DocumentKind Kind { get; private set; }
-        public virtual User User { get; private set; }
+        public virtual Legal Legal { get; private set; }
         public virtual IReadOnlyCollection<Page> Pages => _pages?.AsReadOnly();
 
         public void SetIdentifier(string identifier)
@@ -46,7 +46,7 @@ namespace Sheaft.Domain.Models
             Identifier = identifier;
         }
 
-        public void SetValidationStatus(DocumentStatus status)
+        public void SetStatus(DocumentStatus status)
         {
             Status = status;
         }

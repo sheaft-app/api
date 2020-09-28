@@ -29,7 +29,7 @@
                 <a asp-controller="producers" asp-action="index" class="card-link">Show</a>
             </div>
         </div>
-        <div class="card w-25 d-inline-block">
+        @*<div class="card w-25 d-inline-block">
             <div class="card-body">
                 <h5 class="card-title">Tags</h5>
                 <h6 class="card-subtitle mb-2 text-muted">@ViewBag.Tags</h6>
@@ -63,7 +63,7 @@
                 <h6 class="card-subtitle mb-2 text-muted">@ViewBag.Rewards</h6>
                 <a asp-controller="Rewards" asp-action="index" class="card-link">Show</a>
             </div>
-        </div>
+        </div>*@
     }
     @if (!user.IsInRole("STORE") && !user.IsInRole("CONSUMER"))
     {

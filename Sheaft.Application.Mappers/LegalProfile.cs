@@ -10,6 +10,9 @@ namespace Sheaft.Application.Mappers
         public LegalProfile()
         {
             CreateMap<Legal, BaseLegalDto>();
+            CreateMap<Legal, LegalViewModel>();
+            CreateMap<BusinessLegal, LegalViewModel>();
+            CreateMap<ConsumerLegal, LegalViewModel>();
 
             CreateMap<BusinessLegal, BusinessLegalViewModel>()
                 .ForMember(c => c.Address, opt => opt.MapFrom(e => e.Address))

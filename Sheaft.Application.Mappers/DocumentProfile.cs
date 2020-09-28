@@ -12,6 +12,11 @@ namespace Sheaft.Application.Mappers
             CreateMap<Document, DocumentDto>()
                 .ForMember(m => m.Pages, opt => opt.MapFrom(e => e.Pages));
 
+            CreateMap<Document, DocumentShortViewModel>();
+            CreateMap<Document, DocumentViewModel>()
+                .ForMember(m => m.Pages, opt => opt.MapFrom(e => e.Pages))
+                .ForMember(m => m.Legal, opt => opt.MapFrom(e => e.Legal));
+
             CreateMap<CreateDocumentInput, CreateDocumentCommand>();
             CreateMap<IdInput, RemoveDocumentCommand>();
         }

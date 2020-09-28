@@ -9,6 +9,7 @@ namespace Sheaft.Application.Mappers
         public PageProfile()
         {
             CreateMap<Page, PageDto>();
+            CreateMap<Page, PageViewModel>();
         }
     }
 }

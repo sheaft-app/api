@@ -13,14 +13,15 @@ namespace Sheaft.Domain.Models
         }
 
         public Guid Id { get; private set; }
+        public DateTimeOffset CreatedOn { get; set; }
+        public DateTimeOffset? UploadedOn { get; set; }
         public string Filename { get; private set; }
         public string Extension { get; private set; }
         public decimal Size { get; private set; }
-        public bool Uploaded { get; private set; }
 
         public void SetUploaded()
         {
-            Uploaded = true;
+            UploadedOn = DateTimeOffset.UtcNow;
         }
     }
 }
