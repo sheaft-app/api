@@ -78,23 +78,27 @@ namespace Sheaft.Api.Controllers
                 if (formFile.Length == 0)
                     continue;
 
+                var data = string.Empty;
                 using (var stream = new MemoryStream())
                 {
                     await formFile.CopyToAsync(stream, token);
+                    stream.Position = 0;
 
-                    command.Pages.Add(new UploadPageCommand(requestUser)
-                    {
-                        DocumentId = documentId,
-                        Data = stream,
-                        Extension  = Path.GetExtension(formFile.FileName),
-                        FileName = Path.GetFileNameWithoutExtension(formFile.FileName),
-                        Size = formFile.Length
-                    });
+                    data = Convert.ToBase64String(stream.ToArray());
                 }
+
+                command.Pages.Add(new UploadPageCommand(requestUser)
+                {
+                    DocumentId = documentId,
+                    Data = data,
+                    Extension = Path.GetExtension(formFile.FileName),
+                    FileName = Path.GetFileNameWithoutExtension(formFile.FileName),
+                    Size = formFile.Length
+                });
             }
 
             var result = await _mediatr.Send(command, token);
-            if(!result.Success)
+            if (!result.Success)
                 return BadRequest(result.Exception);
 
             return Ok();

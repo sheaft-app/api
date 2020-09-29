@@ -134,6 +134,8 @@ namespace Sheaft.Manage.Controllers
             using (var ms = new MemoryStream())
             {
                 page.CopyTo(ms);
+                ms.Position = 0;
+
                 data = Convert.ToBase64String(ms.ToArray());
             }
 
