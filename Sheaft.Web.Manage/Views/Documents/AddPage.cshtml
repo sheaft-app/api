@@ -14,10 +14,6 @@
         @Html.HiddenFor(model => model.Id)
 
         <div class="form-group">
-            @Html.LabelFor(c => c.Name, new { @class = "form-label" })
-            @Html.TextBoxFor(c => c.Name, null, new { @class = "form-control", @disabled = "disabled" })
-        </div>
-        <div class="form-group">
             @Html.LabelFor(c => c.Kind, new { @class = "form-label" })
             @Html.TextBoxFor(c => c.Kind, null, new { @class = "form-control", @disabled = "disabled" })
         </div>

@@ -207,7 +207,7 @@ namespace Sheaft.Infrastructure.Services
             });
         }
 
-        public async Task<Result<bool>> AddPageToDocumentAsync(Page page, Document document, Stream data, CancellationToken token)
+        public async Task<Result<bool>> AddPageToDocumentAsync(Page page, Document document, byte[] bytes, CancellationToken token)
         {
             return await ExecuteAsync(async () =>
             {
@@ -216,7 +216,6 @@ namespace Sheaft.Infrastructure.Services
 
                 await EnsureAccessTokenIsValidAsync(token);
 
-                byte[] bytes = null;
                 await _api.Users.CreateKycPageAsync(page.Id.ToString("N"), document.Legal.User.Identifier, document.Identifier, bytes);
                 return Ok(true);
             });

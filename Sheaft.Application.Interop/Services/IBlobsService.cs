@@ -18,5 +18,8 @@ namespace Sheaft.Application.Interop
         Task<Result<bool>> CleanContainerFolderStorageAsync(string container, string folder, CancellationToken token);
         Task<Result<bool>> CleanUserStorageAsync(Guid userId, CancellationToken token);
         Task<Result<string>> UploadDepartmentsProgressAsync(Stream stream, CancellationToken token);
+        Task<Result<byte[]>> DownloadDocumentPageAsync(Guid documentId, Guid pageId, Guid userId, CancellationToken token);
+        Task<Result<bool>> UploadDocumentPageAsync(Guid documentId, Guid pageId, byte[] data, Guid userId, CancellationToken token);
+        Task<Result<bool>> DeleteDocumentPageAsync(Guid documentId, Guid pageId, Guid userId, CancellationToken token);
     }
 }

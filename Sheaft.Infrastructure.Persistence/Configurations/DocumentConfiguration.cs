@@ -16,9 +16,7 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
 
             entity.OwnsMany(c => c.Pages, cb =>
             {
-                cb.Property(o => o.Size).HasColumnType("decimal(10,2)");
                 cb.Property(o => o.Filename).IsRequired();
-
                 cb.HasIndex(c => c.Id).IsUnique();
 
                 cb.ToTable("DocumentPages");

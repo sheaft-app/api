@@ -5,7 +5,7 @@ using System.IO;
 
 namespace Sheaft.Application.Commands
 {
-    public class UploadPageCommand : Command<bool>
+    public class UploadPageCommand : Command<Guid>
     {
         [JsonConstructor]
         public UploadPageCommand(RequestUser requestUser) : base(requestUser)
@@ -16,6 +16,6 @@ namespace Sheaft.Application.Commands
         public string FileName { get; set; }
         public string Extension { get; set; }
         public long Size { get; set; }
-        public string Data { get; set; }
+        public byte[] Data { get; set; }
     }
 }

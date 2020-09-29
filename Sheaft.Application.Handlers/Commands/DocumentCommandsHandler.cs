@@ -10,16 +10,16 @@ using Sheaft.Domain.Models;
 using Sheaft.Domain.Enums;
 using Sheaft.Application.Events;
 using System.IO;
+using System.Linq;
 
 namespace Sheaft.Application.Handlers
 {
     public class DocumentCommandsHandler : ResultsHandler,
             IRequestHandler<CreateDocumentCommand, Result<Guid>>,
             IRequestHandler<UpdateDocumentCommand, Result<bool>>,
-            IRequestHandler<UploadDocumentCommand, Result<bool>>,
-            IRequestHandler<UploadPageCommand, Result<bool>>,
             IRequestHandler<SubmitDocumentsCommand, Result<bool>>,
             IRequestHandler<SubmitDocumentCommand, Result<bool>>,
+            IRequestHandler<ReviewDocumentsCommand, Result<bool>>,
             IRequestHandler<ReviewDocumentCommand, Result<bool>>,
             IRequestHandler<DeleteDocumentCommand, Result<bool>>,
             IRequestHandler<RefreshDocumentStatusCommand, Result<DocumentStatus>>
@@ -92,14 +92,19 @@ namespace Sheaft.Application.Handlers
             });
         }
 
-        public async Task<Result<bool>> Handle(UploadDocumentCommand request, CancellationToken token)
+        public async Task<Result<bool>> Handle(ReviewDocumentsCommand request, CancellationToken token)
         {
             return await ExecuteAsync(async () =>
             {
+                var documents = await _context.GetAsync<Document>(c => c.Legal.User.Id == request.RequestUser.Id && c.Status == DocumentStatus.Created, token);
                 var success = true;
-                foreach (var page in request.Pages)
+                foreach (var document in documents)
                 {
-                    var result = await _mediatr.Process(page, token);
+                    var result = await _mediatr.Process(new ReviewDocumentCommand(request.RequestUser)
+                    {
+                        DocumentId = document.Id
+                    }, token);
+
                     if (!result.Success)
                         success = false;
                 }
@@ -108,42 +113,12 @@ namespace Sheaft.Application.Handlers
             });
         }
 
-        public async Task<Result<bool>> Handle(UploadPageCommand request, CancellationToken token)
-        {
-            return await ExecuteAsync(async () =>
-            {
-                var document = await _context.GetByIdAsync<Document>(request.DocumentId, token);
-                var page = new Page(Guid.NewGuid(), request.FileName, request.Extension, request.Size);
-
-                document.AddPage(page);
-                _context.Update(document);
-                await _context.SaveChangesAsync(token);
-
-                var bytes = Convert.FromBase64String(request.Data);
-                using (var stream = new MemoryStream(bytes))
-                {
-                    stream.Position = 0;
-
-                    var result = await _pspService.AddPageToDocumentAsync(page, document, stream, token);
-                    if (!result.Success)
-                        return result;
-
-                    page.SetUploaded();
-                    _context.Update(page);
-                    await _context.SaveChangesAsync(token);
-
-                    return result;
-                }
-
-            });
-        }
-
         public async Task<Result<bool>> Handle(ReviewDocumentCommand request, CancellationToken token)
         {
             return await ExecuteAsync(async () =>
             {
                 var document = await _context.GetByIdAsync<Document>(request.DocumentId, token);
-                document.SetStatus(DocumentStatus.WaitingForCreation);
+                document.SetStatus(DocumentStatus.Reviewed);
 
                 _context.Update(document);
                 await _context.SaveChangesAsync(token);
@@ -156,7 +131,7 @@ namespace Sheaft.Application.Handlers
         {
             return await ExecuteAsync(async () =>
             {
-                var documents = await _context.GetAsync<Document>(c => c.Legal.User.Id == request.RequestUser.Id && c.Status == DocumentStatus.WaitingForCreation, token);
+                var documents = await _context.GetAsync<Document>(c => c.Legal.User.Id == request.RequestUser.Id && c.Status == DocumentStatus.Reviewed, token);
                 var success = true;
                 foreach (var document in documents)
                 {
@@ -215,7 +190,7 @@ namespace Sheaft.Application.Handlers
                 document.SetProcessedOn(pspResult.Data.ProcessedOn);
 
                 _context.Update(document);
-                var success = await _context.SaveChangesAsync(token) > 0;
+                await _context.SaveChangesAsync(token);
 
                 switch (document.Status)
                 {

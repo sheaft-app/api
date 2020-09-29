@@ -27,6 +27,8 @@ using Sheaft.Application.Mappers;
 using Sheaft.Options;
 using Sheaft.Infrastructure.Persistence;
 using Sheaft.Infrastructure.Services;
+using Sheaft.Application.Queries;
+using Microsoft.Azure.Search;
 
 namespace Sheaft.Manage
 {
@@ -54,6 +56,7 @@ namespace Sheaft.Manage
             var sendgridSettings = Configuration.GetSection(SendgridOptions.SETTING);
             var roleSettings = Configuration.GetSection(RoleOptions.SETTING);
             var pspSettings = Configuration.GetSection(PspOptions.SETTING);
+            var searchSettings = Configuration.GetSection(SearchOptions.SETTING);
 
             services.Configure<RoleOptions>(roleSettings);
             services.Configure<AuthOptions>(authSettings);
@@ -163,6 +166,32 @@ namespace Sheaft.Manage
             services.AddScoped<ISheaftMediatr, SheaftMediatr>();
             services.AddScoped<IAuthService, AuthService>();
             services.AddScoped<IFeesService, FeesService>();
+
+            services.AddScoped<IAgreementQueries, AgreementQueries>();
+            services.AddScoped<IBusinessQueries, BusinessQueries>();
+            services.AddScoped<IDeliveryQueries, DeliveryQueries>();
+            services.AddScoped<IDepartmentQueries, DepartmentQueries>();
+            services.AddScoped<IJobQueries, JobQueries>();
+            services.AddScoped<ILeaderboardQueries, LeaderboardQueries>();
+            services.AddScoped<INotificationQueries, NotificationQueries>();
+            services.AddScoped<IReturnableQueries, ReturnableQueries>();
+            services.AddScoped<IProductQueries, ProductQueries>();
+            services.AddScoped<IPurchaseOrderQueries, PurchaseOrderQueries>();
+            services.AddScoped<IQuickOrderQueries, QuickOrderQueries>();
+            services.AddScoped<IRegionQueries, RegionQueries>();
+            services.AddScoped<ITagQueries, TagQueries>();
+            services.AddScoped<IConsumerQueries, ConsumerQueries>();
+            services.AddScoped<IUserQueries, UserQueries>();
+            services.AddScoped<INationalityQueries, NationalityQueries>();
+            services.AddScoped<ICountryQueries, CountryQueries>();
+            services.AddScoped<IOrderQueries, OrderQueries>();
+            services.AddScoped<ITransactionQueries, TransactionQueries>();
+            services.AddScoped<IDocumentQueries, DocumentQueries>();
+            services.AddScoped<ILegalQueries, LegalQueries>();
+            services.AddScoped<IUboQueries, UboQueries>();
+
+            var searchConfig = searchSettings.Get<SearchOptions>();
+            services.AddScoped<ISearchServiceClient, SearchServiceClient>(_ => new SearchServiceClient(searchConfig.Name, new SearchCredentials(searchConfig.ApiKey)));
 
             services.AddOptions();
 

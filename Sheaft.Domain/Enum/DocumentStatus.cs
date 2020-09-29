@@ -8,7 +8,7 @@
         Validated = 4,
         Refused = 8,
         OutOfDate = 16,
-        WaitingForCreation = 100,
-        WaitingForReview,
+        WaitingForReview = 100,
+        Reviewed,
     }
 }

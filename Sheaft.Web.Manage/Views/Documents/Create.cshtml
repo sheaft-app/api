@@ -3,12 +3,14 @@
     ViewData["Title"] = "Create Document";
 
     var kinds = new List<SelectListItem> {
-        new SelectListItem("Address", DocumentKind.AddressProof.ToString("G")),
         new SelectListItem("Association", DocumentKind.AssociationProof.ToString("G")),
         new SelectListItem("Identity", DocumentKind.IdentityProof.ToString("G")),
         new SelectListItem("Registration", DocumentKind.RegistrationProof.ToString("G")),
         new SelectListItem("Shareholder", DocumentKind.ShareholderProof.ToString("G")),
     };
+
+    if (Model.Legal.Kind != LegalKind.Business)
+        kinds.Add(new SelectListItem("Address", DocumentKind.AddressProof.ToString("G")));
 }
 
 <div class="container">

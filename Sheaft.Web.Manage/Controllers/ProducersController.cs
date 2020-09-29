@@ -268,7 +268,7 @@ namespace Sheaft.Manage.Controllers
 
         private async Task<IEnumerable<DocumentShortViewModel>> GetDocuments(Guid legalId, CancellationToken token)
         {
-            return await _context.Documents.AsNoTracking().Where(c => c.Legal.Id == legalId)
+            return await _context.Documents.AsNoTracking().Where(c => !c.RemovedOn.HasValue && c.Legal.Id == legalId)
                 .ProjectTo<DocumentShortViewModel>(_configurationProvider)
                 .ToListAsync(token);
         }

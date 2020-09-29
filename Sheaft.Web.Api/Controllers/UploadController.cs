@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Sheaft.Application.Commands;
+using Sheaft.Application.Interop;
 using Sheaft.Core.Extensions;
 using Sheaft.Core.Security;
 using System;
@@ -14,15 +15,14 @@ using System.Threading.Tasks;
 
 namespace Sheaft.Api.Controllers
 {
-
     [Authorize]
     [ApiController]
     [Route("upload")]
     public class UploadController : ControllerBase
     {
-        private readonly IMediator _mediatr;
+        private readonly ISheaftMediatr _mediatr;
 
-        public UploadController(IMediator mediatr)
+        public UploadController(ISheaftMediatr mediatr)
         {
             _mediatr = mediatr;
         }
@@ -46,7 +46,7 @@ namespace Sheaft.Api.Controllers
                 using (var stream = new MemoryStream())
                 {
                     await formFile.CopyToAsync(stream, token);
-                    var result = await _mediatr.Send(new QueueImportProductsCommand(requestUser) { Id = requestUser.Id, FileName = formFile.FileName, FileStream = stream }, token);
+                    var result = await _mediatr.Process(new QueueImportProductsCommand(requestUser) { Id = requestUser.Id, FileName = formFile.FileName, FileStream = stream }, token);
                     if (!result.Success)
                         return BadRequest(result);
 
@@ -66,28 +66,24 @@ namespace Sheaft.Api.Controllers
                 return BadRequest();
 
             var requestUser = HttpContext.User.ToIdentityUser(HttpContext.TraceIdentifier);
-            var command = new UploadDocumentCommand(requestUser)
-            {
-                DocumentId = documentId
-            };
 
             //TODO handle zip files !
-
+            var commands = new List<UploadPageCommand>();
             foreach (var formFile in files)
             {
                 if (formFile.Length == 0)
                     continue;
 
-                var data = string.Empty;
+                byte[] data = null;
                 using (var stream = new MemoryStream())
                 {
                     await formFile.CopyToAsync(stream, token);
                     stream.Position = 0;
 
-                    data = Convert.ToBase64String(stream.ToArray());
+                    data = stream.ToArray();
                 }
 
-                command.Pages.Add(new UploadPageCommand(requestUser)
+                commands.Add(new UploadPageCommand(requestUser)
                 {
                     DocumentId = documentId,
                     Data = data,
@@ -97,9 +93,12 @@ namespace Sheaft.Api.Controllers
                 });
             }
 
-            var result = await _mediatr.Send(command, token);
-            if (!result.Success)
-                return BadRequest(result.Exception);
+            foreach (var command in commands)
+            {
+                var result = await _mediatr.Process(command, token);
+                if (!result.Success)
+                    return BadRequest(result.Exception);
+            }
 
             return Ok();
         }

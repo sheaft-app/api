@@ -4,7 +4,7 @@ namespace Sheaft.Domain.Models
 {
     public class Page
     {
-        public Page(Guid id, string filename, string extension, decimal size)
+        public Page(Guid id, string filename, string extension, long size)
         {
             Id = id;
             Filename = filename;
@@ -17,7 +17,7 @@ namespace Sheaft.Domain.Models
         public DateTimeOffset? UploadedOn { get; set; }
         public string Filename { get; private set; }
         public string Extension { get; private set; }
-        public decimal Size { get; private set; }
+        public long Size { get; private set; }
 
         public void SetUploaded()
         {

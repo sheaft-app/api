@@ -2,6 +2,7 @@
 using Sheaft.Domain.Enums;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Sheaft.Domain.Models
 {
@@ -84,6 +85,15 @@ namespace Sheaft.Domain.Models
                 return;
 
             Name = name;
+        }
+
+        public void DeletePage(Guid pageId)
+        {
+            if (Pages == null)
+                return;
+
+            var page = Pages.FirstOrDefault(p => p.Id == pageId);
+            _pages.Remove(page);
         }
     }
 }

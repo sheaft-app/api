@@ -10,7 +10,7 @@ namespace Sheaft.Application.Interop
 {
     public interface IPspService
     {
-        Task<Result<bool>> AddPageToDocumentAsync(Page page, Document document, Stream data, CancellationToken token);
+        Task<Result<bool>> AddPageToDocumentAsync(Page page, Document document, byte[] bytes, CancellationToken token);
         Task<Result<string>> CreateBankIbanAsync(BankAccount payment, CancellationToken token);
         Task<Result<KeyValuePair<string, string>>> CreateCardAsync(Card payment, CancellationToken token);
         Task<Result<PspDocumentResultDto>> CreateDocumentAsync(Document document, CancellationToken token);

@@ -11,8 +11,6 @@ using Microsoft.Extensions.Logging;
 using Sheaft.Core;
 using Azure.Storage.Blobs.Models;
 using Sheaft.Application.Interop;
-using Sheaft.Exceptions;
-using System.Collections.Generic;
 
 namespace Sheaft.Infrastructure.Services
 {
@@ -96,6 +94,10 @@ namespace Sheaft.Infrastructure.Services
             if (!response.Success)
                 return response;
 
+            response = await CleanContainerFolderStorageAsync(_storageOptions.Containers.Documents, $"users/{userId:N}", token);
+            if (!response.Success)
+                return response;
+
             return Ok(true);
         }
 
@@ -148,6 +150,57 @@ namespace Sheaft.Infrastructure.Services
 
                 stream.Position = 0;
                 return Ok(stream);
+            });
+        }
+
+        public async Task<Result<byte[]>> DownloadDocumentPageAsync(Guid documentId, Guid pageId, Guid userId, CancellationToken token)
+        {
+            return await ExecuteAsync(async () =>
+            {
+                var containerClient = new BlobContainerClient(_storageOptions.ConnectionString, _storageOptions.Containers.Documents);
+                await containerClient.CreateIfNotExistsAsync(cancellationToken: token);
+
+                var blobClient = containerClient.GetBlobClient($"users/{userId:N}/documents/{documentId:N}/{pageId:N}");
+
+                byte[] bytes = null;
+                using (var stream = new MemoryStream())
+                {
+                    await blobClient.DownloadToAsync(stream, token);
+                    stream.Position = 0;
+                    bytes = stream.ToArray();
+                }
+
+                return Ok(bytes);
+            });
+        }
+
+        public async Task<Result<bool>> UploadDocumentPageAsync(Guid documentId, Guid pageId, byte[] data, Guid userId, CancellationToken token)
+        {
+            return await ExecuteAsync(async () =>
+            {
+                var containerClient = new BlobContainerClient(_storageOptions.ConnectionString, _storageOptions.Containers.Documents);
+                await containerClient.CreateIfNotExistsAsync(cancellationToken: token);
+
+                var blobClient = containerClient.GetBlobClient($"users/{userId:N}/documents/{documentId:N}/{pageId:N}");
+
+                using (var ms = new MemoryStream(data))
+                    await blobClient.UploadAsync(ms, token);
+
+                return Ok(true);
+            });
+        }
+
+        public async Task<Result<bool>> DeleteDocumentPageAsync(Guid documentId, Guid pageId, Guid userId, CancellationToken token)
+        {
+            return await ExecuteAsync(async () =>
+            {
+                var containerClient = new BlobContainerClient(_storageOptions.ConnectionString, _storageOptions.Containers.Documents);
+                await containerClient.CreateIfNotExistsAsync(cancellationToken: token);
+
+                var blobClient = containerClient.GetBlobClient($"users/{userId:N}/documents/{documentId:N}/{pageId:N}");
+                await blobClient.DeleteIfExistsAsync(cancellationToken: token);
+
+                return Ok(true);
             });
         }
 

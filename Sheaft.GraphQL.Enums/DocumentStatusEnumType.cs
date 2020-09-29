@@ -13,8 +13,8 @@ namespace Sheaft.GraphQL.Enums
             descriptor.Value(DocumentStatus.Refused).Name("REFUSED");
             descriptor.Value(DocumentStatus.Validated).Name("VALIDATED");
             descriptor.Value(DocumentStatus.ValidationAsked).Name("VALIDATION_ASKED");
-            descriptor.Value(DocumentStatus.WaitingForCreation).Name("WAITING_FOR_CREATION");
             descriptor.Value(DocumentStatus.WaitingForReview).Name("WAITING_FOR_REVIEW");
+            descriptor.Value(DocumentStatus.Reviewed).Name("REVIEWED");
         }
     }
 }

@@ -16,12 +16,13 @@
 
     public class StorageContainers
     {
-        public string Pictures { get; set; }
-        public string Products { get; set; }
-        public string Jobs { get; set; }
-        public string Rgpd { get; set; }
-        public string PickingOrders { get; set; }
-        public string Progress { get; set; }
+        public string Pictures { get; set; } = "pictures";
+        public string Products { get; set; } = "products";
+        public string Jobs { get; set; } = "jobs";
+        public string Rgpd { get; set; } = "rgpd";
+        public string PickingOrders { get; set; } = "pickingorders";
+        public string Progress { get; set; } = "progress";
+        public string Documents { get; set; } = "documents";
     }
     public class StorageTables
     {

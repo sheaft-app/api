@@ -3,58 +3,126 @@
     ViewData["Title"] = "Edit Document";
 
     var kinds = new List<SelectListItem> {
-        new SelectListItem("Address", DocumentKind.AddressProof.ToString("G")),
         new SelectListItem("Association", DocumentKind.AssociationProof.ToString("G")),
         new SelectListItem("Identity", DocumentKind.IdentityProof.ToString("G")),
         new SelectListItem("Registration", DocumentKind.RegistrationProof.ToString("G")),
         new SelectListItem("Shareholder", DocumentKind.ShareholderProof.ToString("G")),
     };
+
+    if (Model.Legal.Kind != LegalKind.Business)
+        kinds.Add(new SelectListItem("Address", DocumentKind.AddressProof.ToString("G")));
 }
 
 <div class="container">
     <h2 class="display-4">Edit Document</h2>
     <br />
 
-    @using (Html.BeginForm("Edit", "Documents", FormMethod.Post, new { @class = "form", enctype = "multipart/form-data" }))
+    @if (Model.Status == DocumentStatus.WaitingForReview)
     {
-        @Html.AntiForgeryToken()
-        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
-        @Html.HiddenFor(model => model.Id)
-        <br />
-        <div class="form-group">
-            @Html.LabelFor(c => c.Name, new { @class = "form-label" })
-            @Html.TextBoxFor(c => c.Name, null, new { @class = "form-control" })
-        </div>
-        <div class="form-group">
-            @Html.LabelFor(c => c.Kind, new { @class = "form-label" })
-            @Html.DropDownListFor(c => c.Kind, kinds, new { @class = "form-control" })
-        </div>
-        <div class="form-group">
-            @Html.LabelFor(m => m.CreatedOn)
-            @Html.TextBoxFor(m => m.CreatedOn, null, new { @class = "form-control", @disabled = "disabled" })
-        </div>
-        <div class="form-group">
-            @Html.LabelFor(m => m.UpdatedOn)
-            @Html.TextBoxFor(m => m.UpdatedOn, null, new { @class = "form-control", @disabled = "disabled" })
-        </div>
-        <h4>Operation</h4>
-        <div class="form-group">
-            @Html.LabelFor(m => m.ProcessedOn)
-            @Html.TextBoxFor(m => m.ProcessedOn, null, new { @class = "form-control", @disabled = "disabled" })
-        </div>
-        <div class="form-group">
-            @Html.LabelFor(m => m.Status)
-            @Html.TextBoxFor(m => m.Status, null, new { @class = "form-control", @disabled = "disabled" })
-        </div>
-        <div class="form-group">
-            @Html.LabelFor(m => m.ReasonCode)
-            @Html.TextBoxFor(m => m.ReasonCode, null, new { @class = "form-control", @disabled = "disabled" })
-        </div>
-        <div class="form-group">
-            @Html.LabelFor(m => m.ReasonMessage)
-            @Html.TextAreaFor(m => m.ReasonMessage, new { @class = "form-control", @disabled = "disabled" })
-        </div>
-        <br />
+        @using (Html.BeginForm("Validate", "Documents", new { id = Model.Id }, FormMethod.Post, true, new { @class = "form d-inline" }))
+        {
+            <button type="submit" class="btn btn-success">
+                <i class="fa fa-check"></i> Send for Mango validation (2.5€)
+            </button>
+        }
+        @using (Html.BeginForm("Unlock", "Documents", new { id = Model.Id }, FormMethod.Post, true, new { @class = "form d-inline" }))
+        {
+            <button type="submit" class="btn btn-outline-warning">
+                <i class="fa fa-unlock"></i> Unlock
+            </button>
+        }
+    }
+
+    @if (Model.Pages.Any() && (Model.Status == DocumentStatus.Created || Model.Status == DocumentStatus.OutOfDate))
+    {
+        @using (Html.BeginForm("Lock", "Documents", new { id = Model.Id }, FormMethod.Post, true, new { @class = "form d-inline" }))
+        {
+            <button type="submit" class="btn btn-outline-warning">
+                <i class="fa fa-lock"></i> Lock
+            </button>
+        }
+    }
+
+    @if (Model.Status == DocumentStatus.Reviewed || Model.Status == DocumentStatus.WaitingForReview || Model.Status == DocumentStatus.Created)
+    {
+        @using (Html.BeginForm("Delete", "Documents", new { id = Model.Id }, FormMethod.Post, true, new { @class = "form d-inline" }))
+        {
+            <button type="submit" class="btn btn-danger">
+                <i class="fa fa-trash"></i> Delete
+            </button>
+        }
+    }
+
+    @using (Html.BeginForm("Download", "Documents", new { id = Model.Id }, FormMethod.Post, true, new { @class = "form d-inline" }))
+    {
+        <button type="submit" class="btn btn-outline-info">
+            <i class="fa fa-download"></i>
+        </button>
+    }
+
+<div class="row">
+    <div class="col-md-6">
+        @using (Html.BeginForm("Edit", "Documents", FormMethod.Post, new { @class = "form", enctype = "multipart/form-data" }))
+        {
+            @Html.AntiForgeryToken()
+            @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+            @Html.HiddenFor(model => model.Id)
+            <br />
+            <div class="form-group">
+                @Html.LabelFor(c => c.Name, new { @class = "form-label" })
+                @Html.TextBoxFor(c => c.Name, null, new { @class = "form-control" })
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(c => c.Kind, new { @class = "form-label" })
+                @Html.DropDownListFor(c => c.Kind, kinds, new { @class = "form-control" })
+            </div><div class="form-group">
+                @Html.LabelFor(m => m.CreatedOn)
+                @Html.TextBoxFor(m => m.CreatedOn, null, new { @class = "form-control", @disabled = "disabled" })
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(m => m.UpdatedOn)
+                @Html.TextBoxFor(m => m.UpdatedOn, null, new { @class = "form-control", @disabled = "disabled" })
+            </div>
+            @if (Model.RemovedOn.HasValue)
+            {
+                <div class="form-group">
+                    @Html.LabelFor(m => m.RemovedOn)
+                    @Html.TextBoxFor(m => m.RemovedOn, null, new { @class = "form-control", @disabled = "disabled" })
+                </div>
+            }
+            <h4>Operation</h4>
+            <div class="form-group">
+                @Html.LabelFor(m => m.Status)
+                @Html.TextBoxFor(m => m.Status, null, new { @class = "form-control", @disabled = "disabled" })
+            </div>
+            @if (Model.ProcessedOn.HasValue)
+            {
+                <div class="form-group">
+                    @Html.LabelFor(m => m.ProcessedOn)
+                    @Html.TextBoxFor(m => m.ProcessedOn, null, new { @class = "form-control", @disabled = "disabled" })
+                </div>
+                <div class="form-group">
+                    @Html.LabelFor(m => m.ReasonCode)
+                    @Html.TextBoxFor(m => m.ReasonCode, null, new { @class = "form-control", @disabled = "disabled" })
+                </div>
+                <div class="form-group">
+                    @Html.LabelFor(m => m.ReasonMessage)
+                    @Html.TextAreaFor(m => m.ReasonMessage, new { @class = "form-control", @disabled = "disabled" })
+                </div>
+            }
+            <br />
+            <a asp-controller="Producers" asp-action="UpdateLegal" asp-route-userid="@Model.Legal.Owner.Id" class="btn btn-light">
+                Go back
+            </a>
+            @if (Model.Status == DocumentStatus.Created || Model.Status == DocumentStatus.WaitingForReview || Model.Status == DocumentStatus.OutOfDate)
+            {
+                <button type="submit" class="btn btn-success">
+                    <i class="fa fa-check">&nbsp;Save</i>
+                </button>
+            }
+        }
+    </div>
+    <div class="col-md-6">
         <h3>Pages</h3>
         <table class="table table-hover">
             <thead class="thead-dark">
@@ -67,12 +135,6 @@
                         <a asp-controller="Documents" asp-action="AddPage" asp-route-documentid="@Model.Id" class="btn btn-info">
                             <i class="fa fa-plus"></i>
                         </a>
-                        @using (Html.BeginForm("DownloadDocument", "Documents", new { id = Model.Id }, FormMethod.Post, true, new { @class = "form d-inline" }))
-                        {
-                            <button type="submit" class="btn btn-info">
-                                <i class="fa fa-download"></i>
-                            </button>
-                        }
                     </th>
                 </tr>
             </thead>
@@ -82,13 +144,19 @@
                     <tr>
                         <th scope="row">@docPage.FileName</th>
                         <td>@docPage.Extension</td>
-                        <td>@docPage.Size</td>
+                        <td>@(docPage.Size)kb</td>
                         <td>@docPage.UploadedOn</td>
                         <td>
-                            @using (Html.BeginForm("DownloadPage", "Documents", new { id = docPage.Id }, FormMethod.Post, true, new { @class = "form d-inline" }))
+                            @using (Html.BeginForm("DownloadPage", "Documents", new { documentId = Model.Id, pageId = docPage.Id }, FormMethod.Post, true, new { @class = "form d-inline" }))
                             {
                                 <button type="submit" class="btn btn-info">
                                     <i class="fa fa-download"></i>
+                                </button>
+                            }
+                            @using (Html.BeginForm("DeletePage", "Documents", new { documentId = Model.Id, pageId = docPage.Id }, FormMethod.Post, true, new { @class = "form d-inline" }))
+                            {
+                                <button type="submit" class="btn btn-danger">
+                                    <i class="fa fa-trash"></i>
                                 </button>
                             }
                         </td>
@@ -96,12 +164,6 @@
                 }
             </tbody>
         </table>
-        <br />
-        <a asp-controller="Producers" asp-action="UpdateLegal" asp-route-id="@Model.Legal.Id" class="btn btn-light">
-            Go back
-        </a>
-        <button type="submit" class="btn btn-success">
-            <i class="fa fa-check">&nbsp;Save</i>
-        </button>
-    }
+    </div>
+</div>
 </div>
