@@ -59,13 +59,12 @@ namespace Sheaft.Application.Handlers
                 await _context.AddAsync(legal, token);
                 await _context.SaveChangesAsync(token);
 
-                var userResult = await _pspService.CreateBusinessAsync(legal, token);
-                if (!userResult.Success)
-                    return Failed<Guid>(userResult.Exception);
-
-                legal.User.SetIdentifier(userResult.Data);
-                _context.Update(legal.User);
-                await _context.SaveChangesAsync(token);
+                if (string.IsNullOrWhiteSpace(legal.User.Identifier))
+                {
+                    var userResult = await _mediatr.Process(new CheckBusinessLegalConfigurationCommand(request.RequestUser) { UserId = legal.User.Id }, token);
+                    if (!userResult.Success)
+                        return Failed<Guid>(userResult.Exception);
+                }
 
                 if (request.Kind == LegalKind.Business && business.Kind == ProfileKind.Producer)
                 {
@@ -113,6 +112,13 @@ namespace Sheaft.Application.Handlers
                 await _context.AddAsync(legal, token);
                 await _context.SaveChangesAsync(token);
 
+                if (string.IsNullOrWhiteSpace(legal.User.Identifier))
+                {
+                    var userResult = await _mediatr.Process(new CheckConsumerLegalConfigurationCommand(request.RequestUser) { UserId = legal.User.Id }, token);
+                    if (!userResult.Success)
+                        return Failed<Guid>(userResult.Exception);
+                }
+
                 return Ok(legal.Id);
             });
         }
@@ -150,9 +156,16 @@ namespace Sheaft.Application.Handlers
                 legal.Owner.SetCountryOfResidence(request.Owner.CountryOfResidence);
                 legal.Owner.SetAddress(ownerAddress);
 
-                //TODO update PSP Data
+                await _context.SaveChangesAsync(token);
 
-                return Ok(await _context.SaveChangesAsync(token) > 0);
+                if (string.IsNullOrWhiteSpace(legal.User.Identifier))
+                {
+                    var userResult = await _mediatr.Process(new CheckBusinessLegalConfigurationCommand(request.RequestUser) { UserId = legal.User.Id }, token);
+                    if (!userResult.Success)
+                        return Failed<bool>(userResult.Exception);
+                }
+
+                return Ok(true);
             });
         }
 
@@ -177,9 +190,16 @@ namespace Sheaft.Application.Handlers
                 legal.Owner.SetCountryOfResidence(request.CountryOfResidence);
                 legal.Owner.SetAddress(ownerAddress);
 
-                //TODO update PSP Data
+                await _context.SaveChangesAsync(token);
 
-                return Ok(await _context.SaveChangesAsync(token) > 0);
+                if (string.IsNullOrWhiteSpace(legal.User.Identifier))
+                {
+                    var userResult = await _mediatr.Process(new CheckConsumerLegalConfigurationCommand(request.RequestUser) { UserId = legal.User.Id }, token);
+                    if (!userResult.Success)
+                        return Failed<bool>(userResult.Exception);
+                }
+
+                return Ok(true);
             });
         }
 
