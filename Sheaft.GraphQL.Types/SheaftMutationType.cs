@@ -437,26 +437,6 @@ namespace Sheaft.GraphQL.Types
                 .Type<NonNullType<ConsumerLegalType>>()
                 .UseSingleOrDefault()
                 .UseSelection();
-
-            //UBO
-            descriptor.Field(c => c.CreateUboAsync(default, default))
-                .Name("createUbo")
-                .Authorize(Policies.PRODUCER)
-                .Type<NonNullType<UboType>>()
-                .UseSingleOrDefault()
-                .UseSelection();
-
-            descriptor.Field(c => c.UpdateUboAsync(default, default))
-                .Name("updateUbo")
-                .Authorize(Policies.PRODUCER)
-                .Type<NonNullType<UboType>>()
-                .UseSingleOrDefault()
-                .UseSelection();
-
-            descriptor.Field(c => c.RemoveUboAsync(default))
-                .Name("removeUbo")
-                .Authorize(Policies.PRODUCER)
-                .Type<NonNullType<BooleanType>>();
         }
     }
 }

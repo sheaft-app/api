@@ -1,0 +1,105 @@
+﻿@model DeclarationViewModel
+@{
+    ViewData["Title"] = "Edit Ubo Declaration";
+}
+
+<div class="container">
+    <h2 class="display-4">Edit Ubo Declaration</h2>
+    <br />
+
+    @if (Model.Status == DeclarationStatus.Locked)
+    {
+        @using (Html.BeginForm("Validate", "Declarations", new { declarationId = Model.Id }, FormMethod.Post, true, new { @class = "form d-inline" }))
+        {
+            <button type="submit" class="btn btn-success">
+                <i class="fa fa-check"></i> Send for Mango validation (2.5€)
+            </button>
+        }
+    }
+
+    @if (Model.Status == DeclarationStatus.Locked || Model.Status == DeclarationStatus.Refused || Model.Status == DeclarationStatus.Incomplete)
+    {
+        @using (Html.BeginForm("Unlock", "Declarations", new { declarationId = Model.Id }, FormMethod.Post, true, new { @class = "form d-inline" }))
+        {
+            <button type="submit" class="btn btn-outline-warning">
+                <i class="fa fa-unlock"></i> UnLock
+            </button>
+        }
+    }
+
+    @if (Model.Ubos.Any() && (Model.Status == DeclarationStatus.UnLocked || Model.Status == DeclarationStatus.Created || Model.Status == DeclarationStatus.Incomplete))
+    {
+        @using (Html.BeginForm("Lock", "Declarations", new { declarationId = Model.Id }, FormMethod.Post, true, new { @class = "form d-inline" }))
+        {
+            <button type="submit" class="btn btn-outline-warning">
+                <i class="fa fa-lock"></i> Lock
+            </button>
+        }
+    }
+
+    <div class="row">
+        <br />
+        <div class="col-md-6">
+            <div class="form-group">
+                @Html.LabelFor(m => m.Status, new { @class = "form-label" })
+                @Html.TextBoxFor(m => m.Status, null, new { @class = "form-control", @disabled = "disabled" })
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(m => m.ReasonCode, new { @class = "form-label" })
+                @Html.TextBoxFor(m => m.ReasonCode, null, new { @class = "form-control", @disabled = "disabled" })
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(m => m.ReasonMessage, new { @class = "form-label" })
+                @Html.TextAreaFor(m => m.ReasonMessage, new { @class = "form-control", @disabled = "disabled" })
+            </div>
+        </div>
+        <div class="col-md-6">
+            <h3>Ubos</h3>
+            <table class="table table-hover">
+                <thead class="thead-dark">
+                    <tr>
+                        <th scope="col">Firstname</th>
+                        <th scope="col">Lastname</th>
+                        <th scope="col">CreatedOn</th>
+                        <th scope="col">
+                            @if (Model.Status != DeclarationStatus.Locked && Model.Status != DeclarationStatus.Validated && Model.Status != DeclarationStatus.ValidationAsked)
+                            {
+                                <a asp-controller="Declarations" asp-action="AddUbo" asp-route-declarationId="@Model.Id" class="btn btn-info">
+                                    <i class="fa fa-plus"></i>
+                                </a>
+                            }
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var ubo in Model.Ubos)
+                    {
+                        <tr>
+                            <td scope="row">@ubo.FirstName</td>
+                            <td>@ubo.LastName</td>
+                            <td>@ubo.CreatedOn</td>
+                            <td>
+                                @if (Model.Status != DeclarationStatus.Locked && Model.Status != DeclarationStatus.Validated && Model.Status != DeclarationStatus.ValidationAsked)
+                                {
+                                    <a asp-controller="Declarations" asp-action="EditUbo" asp-route-declarationid="@Model.Id" asp-route-uboid="@ubo.Id" class="btn btn-info">
+                                        <i class="fa fa-pencil-alt "></i>
+                                    </a>
+                                    @using (Html.BeginForm("DeleteUbo", "Declarations", new { declarationId = Model.Id, uboId = ubo.Id }, FormMethod.Post, true, new { @class = "form d-inline" }))
+                                    {
+                                        <button type="submit" class="btn btn-danger">
+                                            <i class="fa fa-trash"></i>
+                                        </button>
+                                    }
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <br />
+    <a asp-controller="Producers" asp-action="UpdateLegal" asp-route-userid="@ViewBag.UserId" class="btn btn-light">
+        Go back
+    </a>
+</div>

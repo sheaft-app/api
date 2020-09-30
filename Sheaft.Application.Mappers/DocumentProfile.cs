@@ -2,6 +2,7 @@
 using Sheaft.Application.Commands;
 using Sheaft.Domain.Models;
 using Sheaft.Application.Models;
+using System.Linq;
 
 namespace Sheaft.Application.Mappers
 {
@@ -14,8 +15,7 @@ namespace Sheaft.Application.Mappers
 
             CreateMap<Document, DocumentShortViewModel>();
             CreateMap<Document, DocumentViewModel>()
-                .ForMember(m => m.Pages, opt => opt.MapFrom(e => e.Pages))
-                .ForMember(m => m.Legal, opt => opt.MapFrom(e => e.Legal));
+                .ForMember(m => m.Pages, opt => opt.MapFrom(e => e.Pages));
 
             CreateMap<CreateDocumentInput, CreateDocumentCommand>();
             CreateMap<IdInput, DeleteDocumentCommand>();

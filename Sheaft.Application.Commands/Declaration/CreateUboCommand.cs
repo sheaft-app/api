@@ -13,10 +13,9 @@ namespace Sheaft.Application.Commands
         {
         }
 
-        public Guid LegalId { get; set; }
+        public Guid DeclarationId { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
-        public string Email { get; set; }
         public DateTimeOffset BirthDate { get; set; }
         public CountryIsoCode Nationality { get; set; }
         public AddressInput Address { get; set; }

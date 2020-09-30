@@ -14,7 +14,7 @@ namespace Sheaft.Application.Handlers
     public class UboCommandsHandler : ResultsHandler,
            IRequestHandler<CreateUboCommand, Result<Guid>>,
            IRequestHandler<UpdateUboCommand, Result<bool>>,
-           IRequestHandler<RemoveUboCommand, Result<bool>>
+           IRequestHandler<DeleteUboCommand, Result<bool>>
     {
         private readonly IPspService _pspService;
 
@@ -32,7 +32,7 @@ namespace Sheaft.Application.Handlers
         {
             return await ExecuteAsync(async () =>
             {
-                var legal = await _context.GetByIdAsync<BusinessLegal>(request.LegalId, token);
+                var legal = await _context.GetSingleAsync<BusinessLegal>(c => c.Declaration.Id == request.DeclarationId, token);
                 var ubo = new Ubo(Guid.NewGuid(), 
                     request.FirstName, 
                     request.LastName, 
@@ -41,10 +41,12 @@ namespace Sheaft.Application.Handlers
                     new BirthAddress(request.BirthPlace.City, request.BirthPlace.Country), 
                     request.Nationality);
 
-                await _context.AddAsync(ubo);
+                legal.Declaration.AddUbo(ubo);
+
+                _context.Update(legal.Declaration);
                 await _context.SaveChangesAsync(token);
 
-                var result = await _pspService.CreateUboAsync(ubo, legal.UboDeclaration, legal.User, token);
+                var result = await _pspService.CreateUboAsync(ubo, legal.Declaration, legal.User, token);
                 if (!result.Success)
                     return Failed<Guid>(result.Exception);
 
@@ -61,8 +63,8 @@ namespace Sheaft.Application.Handlers
         {
             return await ExecuteAsync(async () =>
             {
-                var legal = await _context.GetSingleAsync<BusinessLegal>(c => c.UboDeclaration.Ubos.Any(u => u.Id == request.Id), token);
-                var ubo = await _context.GetByIdAsync<Ubo>(request.Id, token);
+                var legal = await _context.GetSingleAsync<BusinessLegal>(c => c.Declaration.Ubos.Any(u => u.Id == request.Id), token);
+                var ubo = legal.Declaration.Ubos.FirstOrDefault(u => u.Id == request.Id);
 
                 ubo.SetFirstName(request.FirstName);
                 ubo.SetLastName(request.LastName);
@@ -74,25 +76,28 @@ namespace Sheaft.Application.Handlers
                 var birthPlace = new BirthAddress(request.BirthPlace.City, request.BirthPlace.Country);
                 ubo.SetBirthPlace(birthPlace);
 
-                var result = await _pspService.UpdateUboAsync(ubo, legal.UboDeclaration, legal.User, token);
+                var result = await _pspService.UpdateUboAsync(ubo, legal.Declaration, legal.User, token);
                 if (!result.Success)
                     return Failed<bool>(result.Exception);
 
                 _context.Update(ubo);
-                var success = await _context.SaveChangesAsync(token) > 0;
+                await _context.SaveChangesAsync(token);
 
-                return Ok(success);
+                return Ok(true);
             });
         }
 
-        public async Task<Result<bool>> Handle(RemoveUboCommand request, CancellationToken token)
+        public async Task<Result<bool>> Handle(DeleteUboCommand request, CancellationToken token)
         {
             return await ExecuteAsync(async () =>
             {
-                var ubo = await _context.GetByIdAsync<Ubo>(request.Id, token);
-                _context.Remove(ubo);
+                var legal = await _context.GetSingleAsync<BusinessLegal>(c => c.Declaration.Ubos.Any(u => u.Id == request.Id), token);
+                legal.Declaration.RemoveUbo(request.Id);
 
-                return Ok(await _context.SaveChangesAsync(token) > 0);
+                _context.Update(legal.Declaration);
+                await _context.SaveChangesAsync(token);
+
+                return Ok(true);
             });
         }
     }

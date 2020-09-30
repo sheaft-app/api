@@ -10,5 +10,7 @@ namespace Sheaft.Application.Commands
         public SubmitDocumentsCommand(RequestUser requestUser) : base(requestUser)
         {
         }
+
+        public Guid LegalId { get; set; }
     }
 }

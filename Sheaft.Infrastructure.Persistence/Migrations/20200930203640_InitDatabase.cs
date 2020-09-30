@@ -1,6 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore.Migrations;
+using System.Collections.Generic;
 
 namespace Sheaft.Infrastructure.Persistence.Migrations
 {
@@ -233,36 +233,6 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Documents",
-                columns: table => new
-                {
-                    Uid = table.Column<long>(nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Id = table.Column<Guid>(nullable: false),
-                    CreatedOn = table.Column<DateTimeOffset>(nullable: false),
-                    UpdatedOn = table.Column<DateTimeOffset>(nullable: true),
-                    RemovedOn = table.Column<DateTimeOffset>(nullable: true),
-                    ProcessedOn = table.Column<DateTimeOffset>(nullable: true),
-                    Identifier = table.Column<string>(nullable: true),
-                    Name = table.Column<string>(nullable: true),
-                    ResultCode = table.Column<string>(nullable: true),
-                    ResultMessage = table.Column<string>(nullable: true),
-                    Status = table.Column<int>(nullable: false),
-                    Kind = table.Column<int>(nullable: false),
-                    UserUid = table.Column<long>(nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Documents", x => x.Uid);
-                    table.ForeignKey(
-                        name: "FK_Documents_Users_UserUid",
-                        column: x => x.UserUid,
-                        principalTable: "Users",
-                        principalColumn: "Uid",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Jobs",
                 columns: table => new
                 {
@@ -290,6 +260,46 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                     table.PrimaryKey("PK_Jobs", x => x.Uid);
                     table.ForeignKey(
                         name: "FK_Jobs_Users_UserUid",
+                        column: x => x.UserUid,
+                        principalTable: "Users",
+                        principalColumn: "Uid",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Legals",
+                columns: table => new
+                {
+                    Uid = table.Column<long>(nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Id = table.Column<Guid>(nullable: false),
+                    CreatedOn = table.Column<DateTimeOffset>(nullable: false),
+                    UpdatedOn = table.Column<DateTimeOffset>(nullable: true),
+                    RemovedOn = table.Column<DateTimeOffset>(nullable: true),
+                    Kind = table.Column<int>(nullable: false),
+                    UserUid = table.Column<long>(nullable: false),
+                    Owner_Id = table.Column<Guid>(nullable: true),
+                    Owner_FirstName = table.Column<string>(nullable: true),
+                    Owner_LastName = table.Column<string>(nullable: true),
+                    Owner_Email = table.Column<string>(nullable: true),
+                    Owner_BirthDate = table.Column<DateTimeOffset>(nullable: true),
+                    Owner_Nationality = table.Column<int>(nullable: true),
+                    Owner_CountryOfResidence = table.Column<int>(nullable: true),
+                    Owner_Address_Line1 = table.Column<string>(nullable: true),
+                    Owner_Address_Line2 = table.Column<string>(nullable: true),
+                    Owner_Address_Zipcode = table.Column<string>(nullable: true),
+                    Owner_Address_City = table.Column<string>(nullable: true),
+                    Owner_Address_Country = table.Column<int>(nullable: true),
+                    UserKind = table.Column<int>(nullable: false),
+                    Email = table.Column<string>(nullable: true),
+                    Siret = table.Column<string>(nullable: true),
+                    VatIdentifier = table.Column<string>(nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Legals", x => x.Uid);
+                    table.ForeignKey(
+                        name: "FK_Legals_Users_UserUid",
                         column: x => x.UserUid,
                         principalTable: "Users",
                         principalColumn: "Uid",
@@ -670,23 +680,75 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "DocumentPages",
+                name: "BusinessLegalAddresses",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(nullable: false),
-                    DocumentUid = table.Column<long>(nullable: false),
-                    Filename = table.Column<string>(nullable: false),
-                    Extension = table.Column<string>(nullable: true),
-                    Size = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
-                    Uploaded = table.Column<bool>(nullable: false)
+                    BusinessLegalUid = table.Column<long>(nullable: false),
+                    Line1 = table.Column<string>(nullable: true),
+                    Line2 = table.Column<string>(nullable: true),
+                    Zipcode = table.Column<string>(nullable: true),
+                    City = table.Column<string>(nullable: true),
+                    Country = table.Column<int>(nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_DocumentPages", x => new { x.DocumentUid, x.Id });
+                    table.PrimaryKey("PK_BusinessLegalAddresses", x => x.BusinessLegalUid);
                     table.ForeignKey(
-                        name: "FK_DocumentPages_Documents_DocumentUid",
-                        column: x => x.DocumentUid,
-                        principalTable: "Documents",
+                        name: "FK_BusinessLegalAddresses_Legals_BusinessLegalUid",
+                        column: x => x.BusinessLegalUid,
+                        principalTable: "Legals",
+                        principalColumn: "Uid",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Declarations",
+                columns: table => new
+                {
+                    BusinessLegalUid = table.Column<long>(nullable: false),
+                    Id = table.Column<Guid>(nullable: false),
+                    CreatedOn = table.Column<DateTimeOffset>(nullable: false),
+                    UpdatedOn = table.Column<DateTimeOffset>(nullable: true),
+                    ProcessedOn = table.Column<DateTimeOffset>(nullable: true),
+                    Identifier = table.Column<string>(nullable: true),
+                    Status = table.Column<int>(nullable: false),
+                    ReasonCode = table.Column<string>(nullable: true),
+                    ReasonMessage = table.Column<string>(nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Declarations", x => x.BusinessLegalUid);
+                    table.ForeignKey(
+                        name: "FK_Declarations_Legals_BusinessLegalUid",
+                        column: x => x.BusinessLegalUid,
+                        principalTable: "Legals",
+                        principalColumn: "Uid",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Documents",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(nullable: false),
+                    LegalUid = table.Column<long>(nullable: false),
+                    Kind = table.Column<int>(nullable: false),
+                    Status = table.Column<int>(nullable: false),
+                    CreatedOn = table.Column<DateTimeOffset>(nullable: false),
+                    UpdatedOn = table.Column<DateTimeOffset>(nullable: true),
+                    ProcessedOn = table.Column<DateTimeOffset>(nullable: true),
+                    Identifier = table.Column<string>(nullable: true),
+                    Name = table.Column<string>(nullable: true),
+                    ResultCode = table.Column<string>(nullable: true),
+                    ResultMessage = table.Column<string>(nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Documents", x => new { x.LegalUid, x.Id });
+                    table.ForeignKey(
+                        name: "FK_Documents_Legals_LegalUid",
+                        column: x => x.LegalUid,
+                        principalTable: "Legals",
                         principalColumn: "Uid",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -806,6 +868,62 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "DeclarationUbos",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(nullable: false),
+                    DeclarationBusinessLegalUid = table.Column<long>(nullable: false),
+                    CreatedOn = table.Column<DateTimeOffset>(nullable: false),
+                    UpdatedOn = table.Column<DateTimeOffset>(nullable: true),
+                    FirstName = table.Column<string>(nullable: true),
+                    LastName = table.Column<string>(nullable: true),
+                    Identifier = table.Column<string>(nullable: true),
+                    BirthDate = table.Column<DateTimeOffset>(nullable: false),
+                    Nationality = table.Column<int>(nullable: false),
+                    Address_Line1 = table.Column<string>(nullable: true),
+                    Address_Line2 = table.Column<string>(nullable: true),
+                    Address_Zipcode = table.Column<string>(nullable: true),
+                    Address_City = table.Column<string>(nullable: true),
+                    Address_Country = table.Column<int>(nullable: true),
+                    BirthPlace_City = table.Column<string>(nullable: true),
+                    BirthPlace_Country = table.Column<int>(nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_DeclarationUbos", x => new { x.DeclarationBusinessLegalUid, x.Id });
+                    table.ForeignKey(
+                        name: "FK_DeclarationUbos_Declarations_DeclarationBusinessLegalUid",
+                        column: x => x.DeclarationBusinessLegalUid,
+                        principalTable: "Declarations",
+                        principalColumn: "BusinessLegalUid",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "DocumentPages",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(nullable: false),
+                    DocumentLegalUid = table.Column<long>(nullable: false),
+                    DocumentId = table.Column<Guid>(nullable: false),
+                    CreatedOn = table.Column<DateTimeOffset>(nullable: false),
+                    UploadedOn = table.Column<DateTimeOffset>(nullable: true),
+                    Filename = table.Column<string>(nullable: false),
+                    Extension = table.Column<string>(nullable: true),
+                    Size = table.Column<long>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_DocumentPages", x => new { x.DocumentLegalUid, x.DocumentId, x.Id });
+                    table.ForeignKey(
+                        name: "FK_DocumentPages_Documents_DocumentLegalUid_DocumentId",
+                        columns: x => new { x.DocumentLegalUid, x.DocumentId },
+                        principalTable: "Documents",
+                        principalColumns: new[] { "LegalUid", "Id" },
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "ProductTags",
                 columns: table => new
                 {
@@ -906,23 +1024,7 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "BusinessLegalAddresses",
-                columns: table => new
-                {
-                    BusinessLegalUid = table.Column<long>(nullable: false),
-                    Line1 = table.Column<string>(nullable: true),
-                    Line2 = table.Column<string>(nullable: true),
-                    Zipcode = table.Column<string>(nullable: true),
-                    City = table.Column<string>(nullable: true),
-                    Country = table.Column<int>(nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_BusinessLegalAddresses", x => x.BusinessLegalUid);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "UboDeclaration",
+                name: "Orders",
                 columns: table => new
                 {
                     Uid = table.Column<long>(nullable: false)
@@ -931,58 +1033,38 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                     CreatedOn = table.Column<DateTimeOffset>(nullable: false),
                     UpdatedOn = table.Column<DateTimeOffset>(nullable: true),
                     RemovedOn = table.Column<DateTimeOffset>(nullable: true),
-                    ExecutedOn = table.Column<DateTimeOffset>(nullable: true),
-                    Identifier = table.Column<string>(nullable: true),
+                    ExpiredOn = table.Column<DateTimeOffset>(nullable: true),
                     Status = table.Column<int>(nullable: false),
-                    ReasonCode = table.Column<string>(nullable: true),
-                    ReasonMessage = table.Column<string>(nullable: true),
-                    BusinessLegalUid = table.Column<long>(nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_UboDeclaration", x => x.Uid);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Legals",
-                columns: table => new
-                {
-                    Uid = table.Column<long>(nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Id = table.Column<Guid>(nullable: false),
-                    CreatedOn = table.Column<DateTimeOffset>(nullable: false),
-                    UpdatedOn = table.Column<DateTimeOffset>(nullable: true),
-                    RemovedOn = table.Column<DateTimeOffset>(nullable: true),
-                    Kind = table.Column<int>(nullable: false),
+                    DonationKind = table.Column<int>(nullable: false),
+                    TotalProductWholeSalePrice = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
+                    TotalProductVatPrice = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
+                    TotalProductOnSalePrice = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
+                    TotalReturnableWholeSalePrice = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
+                    TotalReturnableVatPrice = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
+                    TotalReturnableOnSalePrice = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
+                    TotalWholeSalePrice = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
+                    TotalVatPrice = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
+                    TotalOnSalePrice = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
+                    TotalPrice = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
+                    TotalWeight = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
+                    FeesFixedAmount = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
+                    FeesPercent = table.Column<decimal>(type: "decimal(10,4)", nullable: false),
+                    ReturnablesCount = table.Column<int>(nullable: false),
+                    LinesCount = table.Column<int>(nullable: false),
+                    ProductsCount = table.Column<int>(nullable: false),
+                    Donate = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
+                    FeesPrice = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
+                    InternalFeesPrice = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
+                    SkipBackgroundProcessing = table.Column<bool>(nullable: false),
                     UserUid = table.Column<long>(nullable: false),
-                    Owner_Id = table.Column<Guid>(nullable: true),
-                    Owner_FirstName = table.Column<string>(nullable: true),
-                    Owner_LastName = table.Column<string>(nullable: true),
-                    Owner_Email = table.Column<string>(nullable: true),
-                    Owner_BirthDate = table.Column<DateTimeOffset>(nullable: true),
-                    Owner_Nationality = table.Column<int>(nullable: true),
-                    Owner_CountryOfResidence = table.Column<int>(nullable: true),
-                    Owner_Address_Line1 = table.Column<string>(nullable: true),
-                    Owner_Address_Line2 = table.Column<string>(nullable: true),
-                    Owner_Address_Zipcode = table.Column<string>(nullable: true),
-                    Owner_Address_City = table.Column<string>(nullable: true),
-                    Owner_Address_Country = table.Column<int>(nullable: true),
-                    UserKind = table.Column<int>(nullable: false),
-                    Email = table.Column<string>(nullable: true),
-                    Siret = table.Column<string>(nullable: true),
-                    VatIdentifier = table.Column<string>(nullable: true),
-                    UboDeclarationUid = table.Column<long>(nullable: true)
+                    PayinUid = table.Column<long>(nullable: true),
+                    DonationUid = table.Column<long>(nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Legals", x => x.Uid);
+                    table.PrimaryKey("PK_Orders", x => x.Uid);
                     table.ForeignKey(
-                        name: "FK_Legals_UboDeclaration_UboDeclarationUid",
-                        column: x => x.UboDeclarationUid,
-                        principalTable: "UboDeclaration",
-                        principalColumn: "Uid");
-                    table.ForeignKey(
-                        name: "FK_Legals_Users_UserUid",
+                        name: "FK_Orders_Users_UserUid",
                         column: x => x.UserUid,
                         principalTable: "Users",
                         principalColumn: "Uid",
@@ -990,7 +1072,7 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Ubos",
+                name: "Donations",
                 columns: table => new
                 {
                     Uid = table.Column<long>(nullable: false)
@@ -999,29 +1081,45 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                     CreatedOn = table.Column<DateTimeOffset>(nullable: false),
                     UpdatedOn = table.Column<DateTimeOffset>(nullable: true),
                     RemovedOn = table.Column<DateTimeOffset>(nullable: true),
-                    FirstName = table.Column<string>(nullable: true),
-                    LastName = table.Column<string>(nullable: true),
                     Identifier = table.Column<string>(nullable: true),
-                    BirthDate = table.Column<DateTimeOffset>(nullable: false),
-                    Nationality = table.Column<int>(nullable: false),
-                    Address_Line1 = table.Column<string>(nullable: true),
-                    Address_Line2 = table.Column<string>(nullable: true),
-                    Address_Zipcode = table.Column<string>(nullable: true),
-                    Address_City = table.Column<string>(nullable: true),
-                    Address_Country = table.Column<int>(nullable: true),
-                    BirthPlace_City = table.Column<string>(nullable: true),
-                    BirthPlace_Country = table.Column<int>(nullable: true),
-                    UboDeclarationUid = table.Column<long>(nullable: false)
+                    Kind = table.Column<int>(nullable: false),
+                    Status = table.Column<int>(nullable: false),
+                    ExecutedOn = table.Column<DateTimeOffset>(nullable: true),
+                    ExpiredOn = table.Column<DateTimeOffset>(nullable: true),
+                    ResultCode = table.Column<string>(nullable: true),
+                    ResultMessage = table.Column<string>(nullable: true),
+                    Fees = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
+                    Reference = table.Column<string>(nullable: true),
+                    Debited = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
+                    Credited = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
+                    AuthorUid = table.Column<long>(nullable: false),
+                    CreditedWalletUid = table.Column<long>(nullable: false),
+                    DebitedWalletUid = table.Column<long>(nullable: false),
+                    OrderUid = table.Column<long>(nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Ubos", x => x.Uid);
+                    table.PrimaryKey("PK_Donations", x => x.Uid);
                     table.ForeignKey(
-                        name: "FK_Ubos_UboDeclaration_UboDeclarationUid",
-                        column: x => x.UboDeclarationUid,
-                        principalTable: "UboDeclaration",
-                        principalColumn: "Uid",
-                        onDelete: ReferentialAction.Cascade);
+                        name: "FK_Donations_Users_AuthorUid",
+                        column: x => x.AuthorUid,
+                        principalTable: "Users",
+                        principalColumn: "Uid");
+                    table.ForeignKey(
+                        name: "FK_Donations_Wallets_CreditedWalletUid",
+                        column: x => x.CreditedWalletUid,
+                        principalTable: "Wallets",
+                        principalColumn: "Uid");
+                    table.ForeignKey(
+                        name: "FK_Donations_Wallets_DebitedWalletUid",
+                        column: x => x.DebitedWalletUid,
+                        principalTable: "Wallets",
+                        principalColumn: "Uid");
+                    table.ForeignKey(
+                        name: "FK_Donations_Orders_OrderUid",
+                        column: x => x.OrderUid,
+                        principalTable: "Orders",
+                        principalColumn: "Uid");
                 });
 
             migrationBuilder.CreateTable(
@@ -1059,6 +1157,12 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_OrderProducts", x => new { x.OrderUid, x.Id });
+                    table.ForeignKey(
+                        name: "FK_OrderProducts_Orders_OrderUid",
+                        column: x => x.OrderUid,
+                        principalTable: "Orders",
+                        principalColumn: "Uid",
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_OrderProducts_Users_ProducerUid",
                         column: x => x.ProducerUid,
@@ -1113,57 +1217,11 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                         column: x => x.CreditedWalletUid,
                         principalTable: "Wallets",
                         principalColumn: "Uid");
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Orders",
-                columns: table => new
-                {
-                    Uid = table.Column<long>(nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Id = table.Column<Guid>(nullable: false),
-                    CreatedOn = table.Column<DateTimeOffset>(nullable: false),
-                    UpdatedOn = table.Column<DateTimeOffset>(nullable: true),
-                    RemovedOn = table.Column<DateTimeOffset>(nullable: true),
-                    ExpiredOn = table.Column<DateTimeOffset>(nullable: true),
-                    Status = table.Column<int>(nullable: false),
-                    DonationKind = table.Column<int>(nullable: false),
-                    TotalProductWholeSalePrice = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
-                    TotalProductVatPrice = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
-                    TotalProductOnSalePrice = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
-                    TotalReturnableWholeSalePrice = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
-                    TotalReturnableVatPrice = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
-                    TotalReturnableOnSalePrice = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
-                    TotalWholeSalePrice = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
-                    TotalVatPrice = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
-                    TotalOnSalePrice = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
-                    TotalPrice = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
-                    TotalWeight = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
-                    FeesFixedAmount = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
-                    FeesPercent = table.Column<decimal>(type: "decimal(10,4)", nullable: false),
-                    ReturnablesCount = table.Column<int>(nullable: false),
-                    LinesCount = table.Column<int>(nullable: false),
-                    ProductsCount = table.Column<int>(nullable: false),
-                    Donation = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
-                    FeesPrice = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
-                    InternalFeesPrice = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
-                    UserUid = table.Column<long>(nullable: false),
-                    PayinUid = table.Column<long>(nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Orders", x => x.Uid);
                     table.ForeignKey(
-                        name: "FK_Orders_Payins_PayinUid",
-                        column: x => x.PayinUid,
-                        principalTable: "Payins",
+                        name: "FK_Payins_Orders_OrderUid",
+                        column: x => x.OrderUid,
+                        principalTable: "Orders",
                         principalColumn: "Uid");
-                    table.ForeignKey(
-                        name: "FK_Orders_Users_UserUid",
-                        column: x => x.UserUid,
-                        principalTable: "Users",
-                        principalColumn: "Uid",
-                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -1452,6 +1510,17 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                 columns: new[] { "Uid", "Id", "Alpha2" });
 
             migrationBuilder.CreateIndex(
+                name: "IX_DeclarationUbos_Id",
+                table: "DeclarationUbos",
+                column: "Id",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_DeclarationUbos_Identifier",
+                table: "DeclarationUbos",
+                column: "Identifier");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_DeliveryModes_Id",
                 table: "DeliveryModes",
                 column: "Id",
@@ -1512,14 +1581,40 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                 column: "Identifier");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Documents_UserUid",
-                table: "Documents",
-                column: "UserUid");
+                name: "IX_Donations_AuthorUid",
+                table: "Donations",
+                column: "AuthorUid");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Documents_Uid_Id_UserUid_RemovedOn",
-                table: "Documents",
-                columns: new[] { "Uid", "Id", "UserUid", "RemovedOn" });
+                name: "IX_Donations_CreditedWalletUid",
+                table: "Donations",
+                column: "CreditedWalletUid");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Donations_DebitedWalletUid",
+                table: "Donations",
+                column: "DebitedWalletUid");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Donations_Id",
+                table: "Donations",
+                column: "Id",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Donations_Identifier",
+                table: "Donations",
+                column: "Identifier");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Donations_OrderUid",
+                table: "Donations",
+                column: "OrderUid");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Donations_Uid_Id_AuthorUid_OrderUid_CreditedWalletUid_DebitedWalletUid_RemovedOn",
+                table: "Donations",
+                columns: new[] { "Uid", "Id", "AuthorUid", "OrderUid", "CreditedWalletUid", "DebitedWalletUid", "RemovedOn" });
 
             migrationBuilder.CreateIndex(
                 name: "IX_Jobs_Id",
@@ -1536,13 +1631,6 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                 name: "IX_Jobs_Uid_Id_UserUid_RemovedOn",
                 table: "Jobs",
                 columns: new[] { "Uid", "Id", "UserUid", "RemovedOn" });
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Legals_UboDeclarationUid",
-                table: "Legals",
-                column: "UboDeclarationUid",
-                unique: true,
-                filter: "[UboDeclarationUid] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Legals_Id",
@@ -1608,6 +1696,13 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                 name: "IX_OrderProducts_ProducerUid",
                 table: "OrderProducts",
                 column: "ProducerUid");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Orders_DonationUid",
+                table: "Orders",
+                column: "DonationUid",
+                unique: true,
+                filter: "[DonationUid] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Orders_Id",
@@ -2027,48 +2122,6 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                 columns: new[] { "Uid", "Id", "AuthorUid", "PurchaseOrderUid", "CreditedWalletUid", "DebitedWalletUid", "RemovedOn" });
 
             migrationBuilder.CreateIndex(
-                name: "IX_UboDeclaration_BusinessLegalUid",
-                table: "UboDeclaration",
-                column: "BusinessLegalUid");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_UboDeclaration_Id",
-                table: "UboDeclaration",
-                column: "Id",
-                unique: true);
-
-            migrationBuilder.CreateIndex(
-                name: "IX_UboDeclaration_Identifier",
-                table: "UboDeclaration",
-                column: "Identifier");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_UboDeclaration_Uid_BusinessLegalUid_Id_RemovedOn",
-                table: "UboDeclaration",
-                columns: new[] { "Uid", "BusinessLegalUid", "Id", "RemovedOn" });
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Ubos_Id",
-                table: "Ubos",
-                column: "Id",
-                unique: true);
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Ubos_Identifier",
-                table: "Ubos",
-                column: "Identifier");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Ubos_UboDeclarationUid",
-                table: "Ubos",
-                column: "UboDeclarationUid");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Ubos_Uid_UboDeclarationUid_Id_RemovedOn",
-                table: "Ubos",
-                columns: new[] { "Uid", "UboDeclarationUid", "Id", "RemovedOn" });
-
-            migrationBuilder.CreateIndex(
                 name: "IX_UserAddresses_DepartmentUid",
                 table: "UserAddresses",
                 column: "DepartmentUid");
@@ -2125,34 +2178,17 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                 onDelete: ReferentialAction.Cascade);
 
             migrationBuilder.AddForeignKey(
-                name: "FK_BusinessLegalAddresses_Legals_BusinessLegalUid",
-                table: "BusinessLegalAddresses",
-                column: "BusinessLegalUid",
-                principalTable: "Legals",
-                principalColumn: "Uid",
-                onDelete: ReferentialAction.Cascade);
+                name: "FK_Orders_Donations_DonationUid",
+                table: "Orders",
+                column: "DonationUid",
+                principalTable: "Donations",
+                principalColumn: "Uid");
 
             migrationBuilder.AddForeignKey(
-                name: "FK_UboDeclaration_Legals_BusinessLegalUid",
-                table: "UboDeclaration",
-                column: "BusinessLegalUid",
-                principalTable: "Legals",
-                principalColumn: "Uid",
-                onDelete: ReferentialAction.Cascade);
-
-            migrationBuilder.AddForeignKey(
-                name: "FK_OrderProducts_Orders_OrderUid",
-                table: "OrderProducts",
-                column: "OrderUid",
-                principalTable: "Orders",
-                principalColumn: "Uid",
-                onDelete: ReferentialAction.Cascade);
-
-            migrationBuilder.AddForeignKey(
-                name: "FK_Payins_Orders_OrderUid",
-                table: "Payins",
-                column: "OrderUid",
-                principalTable: "Orders",
+                name: "FK_Orders_Payins_PayinUid",
+                table: "Orders",
+                column: "PayinUid",
+                principalTable: "Payins",
                 principalColumn: "Uid");
 
             migrationBuilder.AddForeignKey(
@@ -2927,8 +2963,8 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
             migrationBuilder.Sql("DROP VIEW PointsPerCountry");
 
             migrationBuilder.DropForeignKey(
-                name: "FK_Legals_Users_UserUid",
-                table: "Legals");
+                name: "FK_Donations_Users_AuthorUid",
+                table: "Donations");
 
             migrationBuilder.DropForeignKey(
                 name: "FK_Orders_Users_UserUid",
@@ -2959,24 +2995,16 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                 table: "Wallets");
 
             migrationBuilder.DropForeignKey(
-                name: "FK_UboDeclaration_Legals_BusinessLegalUid",
-                table: "UboDeclaration");
+                name: "FK_Donations_Wallets_CreditedWalletUid",
+                table: "Donations");
 
             migrationBuilder.DropForeignKey(
-                name: "FK_Transfers_PurchaseOrders_PurchaseOrderUid",
-                table: "Transfers");
+                name: "FK_Donations_Wallets_DebitedWalletUid",
+                table: "Donations");
 
             migrationBuilder.DropForeignKey(
-                name: "FK_Payins_Orders_OrderUid",
+                name: "FK_Payins_Wallets_CreditedWalletUid",
                 table: "Payins");
-
-            migrationBuilder.DropForeignKey(
-                name: "FK_Refunds_Payins_PayinUid",
-                table: "Refunds");
-
-            migrationBuilder.DropForeignKey(
-                name: "FK_Payouts_PaymentMethods_BankAccountUid",
-                table: "Payouts");
 
             migrationBuilder.DropForeignKey(
                 name: "FK_Payouts_Wallets_DebitedWalletUid",
@@ -2999,6 +3027,30 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                 table: "Transfers");
 
             migrationBuilder.DropForeignKey(
+                name: "FK_Donations_Orders_OrderUid",
+                table: "Donations");
+
+            migrationBuilder.DropForeignKey(
+                name: "FK_Payins_Orders_OrderUid",
+                table: "Payins");
+
+            migrationBuilder.DropForeignKey(
+                name: "FK_PurchaseOrders_Orders_OrderUid",
+                table: "PurchaseOrders");
+
+            migrationBuilder.DropForeignKey(
+                name: "FK_Transfers_PurchaseOrders_PurchaseOrderUid",
+                table: "Transfers");
+
+            migrationBuilder.DropForeignKey(
+                name: "FK_Refunds_Payins_PayinUid",
+                table: "Refunds");
+
+            migrationBuilder.DropForeignKey(
+                name: "FK_Payouts_PaymentMethods_BankAccountUid",
+                table: "Payouts");
+
+            migrationBuilder.DropForeignKey(
                 name: "FK_Transfers_Refunds_RefundUid",
                 table: "Transfers");
 
@@ -3010,6 +3062,9 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
 
             migrationBuilder.DropTable(
                 name: "Countries");
+
+            migrationBuilder.DropTable(
+                name: "DeclarationUbos");
 
             migrationBuilder.DropTable(
                 name: "DeliveryModeOpeningHours");
@@ -3063,13 +3118,13 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                 name: "StoreTags");
 
             migrationBuilder.DropTable(
-                name: "Ubos");
-
-            migrationBuilder.DropTable(
                 name: "UserAddresses");
 
             migrationBuilder.DropTable(
                 name: "Agreements");
+
+            migrationBuilder.DropTable(
+                name: "Declarations");
 
             migrationBuilder.DropTable(
                 name: "Documents");
@@ -3090,6 +3145,9 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                 name: "DeliveryModes");
 
             migrationBuilder.DropTable(
+                name: "Legals");
+
+            migrationBuilder.DropTable(
                 name: "Returnables");
 
             migrationBuilder.DropTable(
@@ -3102,10 +3160,13 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                 name: "Users");
 
             migrationBuilder.DropTable(
-                name: "Legals");
+                name: "Wallets");
 
             migrationBuilder.DropTable(
-                name: "UboDeclaration");
+                name: "Orders");
+
+            migrationBuilder.DropTable(
+                name: "Donations");
 
             migrationBuilder.DropTable(
                 name: "PurchaseOrders");
@@ -3117,16 +3178,10 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                 name: "PurchaseOrderVendors");
 
             migrationBuilder.DropTable(
-                name: "Orders");
-
-            migrationBuilder.DropTable(
                 name: "Payins");
 
             migrationBuilder.DropTable(
                 name: "PaymentMethods");
-
-            migrationBuilder.DropTable(
-                name: "Wallets");
 
             migrationBuilder.DropTable(
                 name: "Refunds");

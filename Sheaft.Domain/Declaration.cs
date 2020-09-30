@@ -7,31 +7,28 @@ using System.Linq;
 
 namespace Sheaft.Domain.Models
 {
-    public class UboDeclaration : IEntity
+    public class Declaration : IIdEntity, ITrackCreation, ITrackUpdate
     {
         private List<Ubo> _ubos;
 
-        protected UboDeclaration()
+        protected Declaration()
         {
         }
 
-        public UboDeclaration(Guid id, BusinessLegal legals)
+        public Declaration(Guid id)
         {
             Id = id;
-            Status = DeclarationStatus.WaitingForReview;
-            Legal = legals;
+            Status = DeclarationStatus.UnLocked;
         }
 
         public Guid Id { get; private set; }
         public DateTimeOffset CreatedOn { get; private set; }
         public DateTimeOffset? UpdatedOn { get; private set; }
-        public DateTimeOffset? RemovedOn { get; private set; }
-        public DateTimeOffset? ExecutedOn { get; private set; }
+        public DateTimeOffset? ProcessedOn { get; private set; }
         public string Identifier { get; private set; }
         public DeclarationStatus Status { get; private set; }
         public string ReasonCode { get; private set; }
         public string ReasonMessage { get; private set; }
-        public virtual BusinessLegal Legal { get; private set; }
         public virtual IReadOnlyCollection<Ubo> Ubos => _ubos?.AsReadOnly();
 
         public void AddUbo(Ubo ubo)
@@ -40,18 +37,18 @@ namespace Sheaft.Domain.Models
                 _ubos = new List<Ubo>();
 
             var existingUbo = _ubos.FirstOrDefault(u => u.Id == ubo.Id);
-            if (existingUbo == null)
+            if (existingUbo != null)
                 throw new ConflictException();
 
             _ubos.Add(ubo);
         }
 
-        public void RemoveUbo(Ubo ubo)
+        public void RemoveUbo(Guid id)
         {
             if (Ubos == null)
                 throw new NotFoundException();
 
-            var existingUbo = _ubos.FirstOrDefault(u => u.Id == ubo.Id);
+            var existingUbo = _ubos.FirstOrDefault(u => u.Id == id);
             if(existingUbo == null)
                 throw new NotFoundException();
 
@@ -77,10 +74,10 @@ namespace Sheaft.Domain.Models
 
         public void SetProcessedOn(DateTimeOffset? processedOn)
         {
-            if (ExecutedOn.HasValue)
+            if (ProcessedOn.HasValue)
                 return;
 
-            ExecutedOn = processedOn;
+            ProcessedOn = processedOn;
         }
     }
 }

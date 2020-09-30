@@ -4,7 +4,7 @@ using System;
 
 namespace Sheaft.Domain.Models
 {
-    public class Ubo: IEntity
+    public class Ubo: IIdEntity, ITrackCreation, ITrackUpdate
     {
         protected Ubo() { }
 
@@ -22,7 +22,6 @@ namespace Sheaft.Domain.Models
         public Guid Id { get; private set; }
         public DateTimeOffset CreatedOn { get; private set; }
         public DateTimeOffset? UpdatedOn { get; private set; }
-        public DateTimeOffset? RemovedOn { get; private set; }
         public string FirstName { get; private set; }
         public string LastName { get; private set; }
         public string Identifier { get; private set; }

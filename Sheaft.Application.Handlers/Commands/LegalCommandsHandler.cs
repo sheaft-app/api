@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using System.Threading;
 using Sheaft.Domain.Models;
 using Sheaft.Domain.Enums;
+using Microsoft.EntityFrameworkCore;
 
 namespace Sheaft.Application.Handlers
 {
@@ -69,14 +70,8 @@ namespace Sheaft.Application.Handlers
                 if (request.Kind == LegalKind.Business && business.Kind == ProfileKind.Producer)
                 {
                     var result = await _mediatr.Process(new CreateDeclarationCommand(request.RequestUser) { LegalId = legal.Id }, token);
-                    if (result.Success)
-                    {
-                        var uboDeclaration = await _context.GetByIdAsync<UboDeclaration>(result.Data, token);
-                        legal.SetUboDeclaration(uboDeclaration);
-
-                        _context.Update(legal);
-                        await _context.SaveChangesAsync(token);
-                    }
+                    if (!result.Success)
+                        return result;
                 }
 
                 return Ok(legal.Id);

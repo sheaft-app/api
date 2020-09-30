@@ -31,21 +31,25 @@ namespace Sheaft.Application.Queries
 
         public IQueryable<DocumentDto> GetDocument(Guid id, RequestUser currentUser)
         {
-            return _context.Documents
-                    .Get(d => d.Id == id, true)
+            return _context.Legals
+                    .Where(l => l.Documents.Any(d => d.Id == id))
+                    .SelectMany(l => l.Documents)
                     .ProjectTo<DocumentDto>(_configurationProvider);
         }
 
         public IQueryable<DocumentDto> GetDocuments(RequestUser currentUser)
         {
-            return _context.Documents
-                    .Get(null, true)
+            return _context.Legals
+                    .SelectMany(l => l.Documents)
                     .ProjectTo<DocumentDto>(_configurationProvider);
         }
 
         public async Task<byte[]> DownloadDocumentAsync(Guid documentId, RequestUser currentUser, CancellationToken token)
         {
-            var document = await _context.Documents.SingleOrDefaultAsync(c => c.Id == documentId, token);
+            var legal = await _context.Legals
+                    .SingleOrDefaultAsync(l => l.Documents.Any(d => d.Id == documentId), token);
+
+            var document = legal.Documents.FirstOrDefault(d => d.Id == documentId);
             if (document == null)
                 return null;
 
@@ -56,7 +60,7 @@ namespace Sheaft.Application.Queries
                 {
                     foreach (var page in document.Pages)
                     {
-                        var result = await _blobService.DownloadDocumentPageAsync(document.Id, page.Id, document.Legal.User.Id, token);
+                        var result = await _blobService.DownloadDocumentPageAsync(document.Id, page.Id, legal.User.Id, token);
                         if (!result.Success)
                             continue;
 
@@ -74,11 +78,14 @@ namespace Sheaft.Application.Queries
 
         public async Task<byte[]> DownloadDocumentPageAsync(Guid documentId, Guid pageId, RequestUser currentUser, CancellationToken token)
         {
-            var document = await _context.Documents.SingleOrDefaultAsync(c => c.Id == documentId, token);
+            var legal = await _context.Legals
+                    .SingleOrDefaultAsync(l => l.Documents.Any(d => d.Id == documentId), token);
+
+            var document = legal.Documents.FirstOrDefault(d => d.Id == documentId);
             if (document == null)
                 return null;
 
-            var result = await _blobService.DownloadDocumentPageAsync(document.Id, pageId, document.Legal.User.Id, token);
+            var result = await _blobService.DownloadDocumentPageAsync(document.Id, pageId, legal.User.Id, token);
             if (!result.Success)
                 return null;
 

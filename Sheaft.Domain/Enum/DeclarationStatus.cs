@@ -7,7 +7,7 @@
         ValidationAsked = 2,
         Validated = 3,
         Refused = 4,
-        WaitingForCreation = 100,
-        WaitingForReview
+        Locked = 100,
+        UnLocked
     }
 }

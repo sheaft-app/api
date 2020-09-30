@@ -3,9 +3,9 @@ using Sheaft.Application.Models;
 
 namespace Sheaft.GraphQL.Types
 {
-    public class UboDeclarationType : SheaftOutputType<UboDeclarationDto>
+    public class UboDeclarationType : SheaftOutputType<DeclarationDto>
     {
-        protected override void Configure(IObjectTypeDescriptor<UboDeclarationDto> descriptor)
+        protected override void Configure(IObjectTypeDescriptor<DeclarationDto> descriptor)
         {
             descriptor.Field(c => c.Id).Type<NonNullType<IdType>>();
             descriptor.Field(c => c.Status);

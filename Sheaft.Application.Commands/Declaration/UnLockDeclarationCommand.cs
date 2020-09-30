@@ -4,10 +4,10 @@ using Newtonsoft.Json;
 
 namespace Sheaft.Application.Commands
 {
-    public class SubmitDeclarationCommand : Command<bool>
+    public class UnLockDeclarationCommand : Command<bool>
     {
         [JsonConstructor]
-        public SubmitDeclarationCommand(RequestUser requestUser) : base(requestUser)
+        public UnLockDeclarationCommand(RequestUser requestUser) : base(requestUser)
         {
         }
         public Guid DeclarationId { get; set; }

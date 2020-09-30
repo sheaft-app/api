@@ -8,8 +8,6 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
     {
         public void Configure(EntityTypeBuilder<BusinessLegal> entity)
         {
-            entity.Property<long?>("UboDeclarationUid");
-
             entity.Property(c => c.Siret).IsRequired();
             entity.Property(c => c.VatIdentifier);
 
@@ -17,9 +15,21 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
                 e.ToTable("BusinessLegalAddresses");
             });
 
-            entity.HasOne(c => c.UboDeclaration).WithOne().HasForeignKey<BusinessLegal>("UboDeclarationUid").OnDelete(DeleteBehavior.NoAction);
+            entity.OwnsOne(c => c.Declaration, d =>
+            {
+                d.OwnsMany(c => c.Ubos, e =>
+                {
+                    e.OwnsOne(c => c.Address);
+                    e.OwnsOne(c => c.BirthPlace);
 
-            entity.HasIndex("UboDeclarationUid");
+                    e.HasIndex(c => c.Identifier);
+                    e.HasIndex(c => c.Id).IsUnique();
+
+                    e.ToTable("DeclarationUbos");
+                });
+
+                d.ToTable("Declarations");
+            });
         }
     }
 }

@@ -9,12 +9,15 @@ using System.Threading;
 using Sheaft.Domain.Models;
 using Sheaft.Domain.Enums;
 using Sheaft.Application.Events;
+using Microsoft.EntityFrameworkCore;
 
 namespace Sheaft.Application.Handlers
 {
     public class DeclarationCommandsHandler : ResultsHandler,
            IRequestHandler<CreateDeclarationCommand, Result<Guid>>,
            IRequestHandler<SubmitDeclarationCommand, Result<bool>>,
+           IRequestHandler<LockDeclarationCommand, Result<bool>>,
+           IRequestHandler<UnLockDeclarationCommand, Result<bool>>,
            IRequestHandler<RefreshDeclarationStatusCommand, Result<DeclarationStatus>>,
            IRequestHandler<CheckDeclarationConfigurationCommand, Result<bool>>
     {
@@ -35,23 +38,24 @@ namespace Sheaft.Application.Handlers
             return await ExecuteAsync(async () =>
             {
                 var legal = await _context.GetByIdAsync<BusinessLegal>(request.LegalId, token);
-                var uboDeclaration = new UboDeclaration(Guid.NewGuid(), legal);
+                legal.SetDeclaration();
 
-                await _context.AddAsync(uboDeclaration);
+                _context.Update(legal);
+
                 await _context.SaveChangesAsync(token);
 
-                var result = await _pspService.CreateUboDeclarationAsync(uboDeclaration, legal.User, token);
+                var result = await _pspService.CreateUboDeclarationAsync(legal.Declaration, legal.User, token);
                 if (!result.Success)
                     return Failed<Guid>(result.Exception);
 
-                uboDeclaration.SetIdentifier(result.Data.Identifier);
-                uboDeclaration.SetStatus(result.Data.Status);
-                uboDeclaration.SetResult(result.Data.ResultCode, result.Data.ResultMessage);
+                legal.Declaration.SetIdentifier(result.Data.Identifier);
+                legal.Declaration.SetStatus(result.Data.Status);
+                legal.Declaration.SetResult(result.Data.ResultCode, result.Data.ResultMessage);
 
-                _context.Update(uboDeclaration);
+                _context.Update(legal.Declaration);
                 await _context.SaveChangesAsync(token);
 
-                return Ok(uboDeclaration.Id);
+                return Ok(legal.Declaration.Id);
             });
         }
 
@@ -59,17 +63,49 @@ namespace Sheaft.Application.Handlers
         {
             return await ExecuteAsync(async () =>
             {
-                var legal = await _context.GetByIdAsync<BusinessLegal>(request.LegalId, token);
-                var result = await _pspService.SubmitUboDeclarationAsync(legal.UboDeclaration, legal.User, token);
+                var legal = await _context.GetSingleAsync<BusinessLegal>(r => r.Declaration.Id == request.DeclarationId, token);
+                if (legal.Declaration.Status != DeclarationStatus.Locked)
+                    return Failed<bool>(new InvalidOperationException());
+
+                var result = await _pspService.SubmitUboDeclarationAsync(legal.Declaration, legal.User, token);
                 if (!result.Success)
                     return Failed<bool>(result.Exception);
 
-                legal.UboDeclaration.SetStatus(result.Data.Status);
-                legal.UboDeclaration.SetResult(result.Data.ResultCode, result.Data.ResultMessage);
+                legal.Declaration.SetStatus(result.Data.Status);
+                legal.Declaration.SetResult(result.Data.ResultCode, result.Data.ResultMessage);
 
-                _context.Update(legal);
+                _context.Update(legal.Declaration);
+                await _context.SaveChangesAsync(token);
 
-                return Ok(await _context.SaveChangesAsync(token) > 0);
+                return Ok(true);
+            });
+        }
+
+        public async Task<Result<bool>> Handle(LockDeclarationCommand request, CancellationToken token)
+        {
+            return await ExecuteAsync(async () =>
+            {
+                var legal = await _context.GetSingleAsync<BusinessLegal>(r => r.Declaration.Id == request.DeclarationId, token);
+                legal.Declaration.SetStatus(DeclarationStatus.Locked);
+
+                _context.Update(legal.Declaration);
+                await _context.SaveChangesAsync(token);
+
+                return Ok(true);
+            });
+        }
+
+        public async Task<Result<bool>> Handle(UnLockDeclarationCommand request, CancellationToken token)
+        {
+            return await ExecuteAsync(async () =>
+            {
+                var legal = await _context.GetSingleAsync<BusinessLegal>(r => r.Declaration.Id == request.DeclarationId, token);
+                legal.Declaration.SetStatus(DeclarationStatus.UnLocked);
+
+                _context.Update(legal.Declaration);
+                await _context.SaveChangesAsync(token);
+
+                return Ok(true);
             });
         }
 
@@ -77,32 +113,32 @@ namespace Sheaft.Application.Handlers
         {
             return await ExecuteAsync(async () =>
             {
-                var declaration = await _context.GetSingleAsync<UboDeclaration>(c => c.Identifier == request.Identifier, token);
-                var pspResult = await _pspService.GetDeclarationAsync(declaration.Identifier, token);
+                var legal = await _context.GetSingleAsync<BusinessLegal>(c => c.Declaration.Identifier == request.Identifier, token);
+                var pspResult = await _pspService.GetDeclarationAsync(legal.Declaration.Identifier, token);
                 if (!pspResult.Success)
                     return Failed<DeclarationStatus>(pspResult.Exception);
 
-                declaration.SetStatus(pspResult.Data.Status);
-                declaration.SetResult(pspResult.Data.ResultCode, pspResult.Data.ResultMessage);
-                declaration.SetProcessedOn(pspResult.Data.ProcessedOn);
+                legal.Declaration.SetStatus(pspResult.Data.Status);
+                legal.Declaration.SetResult(pspResult.Data.ResultCode, pspResult.Data.ResultMessage);
+                legal.Declaration.SetProcessedOn(pspResult.Data.ProcessedOn);
 
-                _context.Update(declaration);
+                _context.Update(legal.Declaration);
                 var success = await _context.SaveChangesAsync(token) > 0;
 
-                switch (declaration.Status)
+                switch (legal.Declaration.Status)
                 {
                     case DeclarationStatus.Incomplete:
-                        await _mediatr.Post(new DeclarationIncompleteEvent(request.RequestUser) { DeclarationId = declaration.Id }, token);
+                        await _mediatr.Post(new DeclarationIncompleteEvent(request.RequestUser) { DeclarationId = legal.Declaration.Id }, token);
                         break;
                     case DeclarationStatus.Refused:
-                        await _mediatr.Post(new DeclarationRefusedEvent(request.RequestUser) { DeclarationId = declaration.Id }, token);
+                        await _mediatr.Post(new DeclarationRefusedEvent(request.RequestUser) { DeclarationId = legal.Declaration.Id }, token);
                         break;
                     case DeclarationStatus.Validated:
-                        await _mediatr.Post(new DeclarationValidatedEvent(request.RequestUser) { DeclarationId = declaration.Id }, token);
+                        await _mediatr.Post(new DeclarationValidatedEvent(request.RequestUser) { DeclarationId = legal.Declaration.Id }, token);
                         break;
                 }
 
-                return Ok(declaration.Status);
+                return Ok(legal.Declaration.Status);
             });
         }
 
@@ -111,7 +147,7 @@ namespace Sheaft.Application.Handlers
             return await ExecuteAsync(async () =>
             {
                 var legal = await _context.GetSingleAsync<BusinessLegal>(bl => bl.User.Id == request.UserId, token);
-                if (legal.UboDeclaration == null)
+                if (legal.Declaration == null)
                 {
                     var result = await _mediatr.Process(new CreateDeclarationCommand(request.RequestUser)
                     {
@@ -121,17 +157,17 @@ namespace Sheaft.Application.Handlers
                     if (!result.Success)
                         return Failed<bool>(result.Exception);
                 }
-                else if (string.IsNullOrWhiteSpace(legal.UboDeclaration.Identifier))
+                else if (string.IsNullOrWhiteSpace(legal.Declaration.Identifier))
                 {
-                    var result = await _pspService.CreateUboDeclarationAsync(legal.UboDeclaration, legal.User, token);
+                    var result = await _pspService.CreateUboDeclarationAsync(legal.Declaration, legal.User, token);
                     if (!result.Success)
                         return Failed<bool>(result.Exception);
 
-                    legal.UboDeclaration.SetIdentifier(result.Data.Identifier);
-                    legal.UboDeclaration.SetStatus(result.Data.Status);
-                    legal.UboDeclaration.SetResult(result.Data.ResultCode, result.Data.ResultMessage);
+                    legal.Declaration.SetIdentifier(result.Data.Identifier);
+                    legal.Declaration.SetStatus(result.Data.Status);
+                    legal.Declaration.SetResult(result.Data.ResultCode, result.Data.ResultMessage);
 
-                    _context.Update(legal.UboDeclaration);
+                    _context.Update(legal.Declaration);
                     await _context.SaveChangesAsync(token);
                 }
 

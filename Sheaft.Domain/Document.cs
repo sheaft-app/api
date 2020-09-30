@@ -6,7 +6,7 @@ using System.Linq;
 
 namespace Sheaft.Domain.Models
 {
-    public class Document : IEntity
+    public class Document : IIdEntity, ITrackCreation, ITrackUpdate
     {
         private List<Page> _pages;
 
@@ -14,29 +14,26 @@ namespace Sheaft.Domain.Models
         {
         }
 
-        public Document(Guid id, DocumentKind kind, string name, Legal legal)
+        public Document(Guid id, DocumentKind kind, string name)
         {
             Id = id;
             Name = name;
             Kind = kind;
             Status = DocumentStatus.UnLocked;
-            Legal = legal;
 
             _pages = new List<Page>();
         }
 
         public Guid Id { get; private set; }
+        public DocumentKind Kind { get; private set; }
+        public DocumentStatus Status { get; private set; }
         public DateTimeOffset CreatedOn { get; private set; }
         public DateTimeOffset? UpdatedOn { get; private set; }
-        public DateTimeOffset? RemovedOn { get; private set; }
         public DateTimeOffset? ProcessedOn { get; private set; }
         public string Identifier { get; private set; }
         public string Name { get; private set; }
         public string ResultCode { get; private set; }
         public string ResultMessage { get; private set; }
-        public DocumentStatus Status { get; private set; }
-        public DocumentKind Kind { get; private set; }
-        public virtual Legal Legal { get; private set; }
         public virtual IReadOnlyCollection<Page> Pages => _pages?.AsReadOnly();
 
         public void SetIdentifier(string identifier)

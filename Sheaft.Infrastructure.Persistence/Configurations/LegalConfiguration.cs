@@ -19,6 +19,24 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
                 e.OwnsOne(a => a.Address);
             });
 
+            entity.OwnsMany(c => c.Documents, d => {
+                d.Property(c => c.CreatedOn);
+                d.Property(c => c.UpdatedOn).IsConcurrencyToken();
+
+                d.OwnsMany(c => c.Pages, cb =>
+                {
+                    cb.Property(o => o.Filename).IsRequired();
+                    cb.HasIndex(c => c.Id).IsUnique();
+
+                    cb.ToTable("DocumentPages");
+                });
+
+                d.HasIndex(c => c.Id).IsUnique();
+                d.HasIndex(c => c.Identifier);
+
+                d.ToTable("Documents");
+            });
+
             entity.HasOne(c => c.User).WithOne().HasForeignKey<Legal>("UserUid").OnDelete(DeleteBehavior.Cascade);
 
             entity.HasDiscriminator<UserKind>("UserKind")

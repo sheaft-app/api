@@ -182,11 +182,11 @@ namespace Sheaft.Infrastructure.Services
             });
         }
 
-        public async Task<Result<PspDocumentResultDto>> CreateDocumentAsync(Document document, CancellationToken token)
+        public async Task<Result<PspDocumentResultDto>> CreateDocumentAsync(Document document, string userIdentifier, CancellationToken token)
         {
             return await ExecuteAsync(async () =>
             {
-                if (string.IsNullOrWhiteSpace(document.Legal.User.Identifier))
+                if (string.IsNullOrWhiteSpace(userIdentifier))
                     return Failed<PspDocumentResultDto>(new SheaftException(ExceptionKind.BadRequest, MessageKind.PsP_CannotCreate_Document_User_Not_Exists));
 
                 if (!string.IsNullOrWhiteSpace(document.Identifier))
@@ -194,7 +194,7 @@ namespace Sheaft.Infrastructure.Services
 
                 await EnsureAccessTokenIsValidAsync(token);
 
-                var result = await _api.Users.CreateKycDocumentAsync(document.Id.ToString("N"), document.Legal.User.Identifier, document.Kind.GetDocumentType());
+                var result = await _api.Users.CreateKycDocumentAsync(document.Id.ToString("N"), userIdentifier, document.Kind.GetDocumentType());
 
                 return Ok(new PspDocumentResultDto
                 {
@@ -207,7 +207,7 @@ namespace Sheaft.Infrastructure.Services
             });
         }
 
-        public async Task<Result<bool>> AddPageToDocumentAsync(Page page, Document document, byte[] bytes, CancellationToken token)
+        public async Task<Result<bool>> AddPageToDocumentAsync(Page page, Document document, string userIdentifier, byte[] bytes, CancellationToken token)
         {
             return await ExecuteAsync(async () =>
             {
@@ -216,16 +216,16 @@ namespace Sheaft.Infrastructure.Services
 
                 await EnsureAccessTokenIsValidAsync(token);
 
-                await _api.Users.CreateKycPageAsync(page.Id.ToString("N"), document.Legal.User.Identifier, document.Identifier, bytes);
+                await _api.Users.CreateKycPageAsync(page.Id.ToString("N"), userIdentifier, document.Identifier, bytes);
                 return Ok(true);
             });
         }
 
-        public async Task<Result<PspDocumentResultDto>> SubmitDocumentAsync(Document document, CancellationToken token)
+        public async Task<Result<PspDocumentResultDto>> SubmitDocumentAsync(Document document, string userIdentifier, CancellationToken token)
         {
             return await ExecuteAsync(async () =>
             {
-                if (string.IsNullOrWhiteSpace(document.Legal.User.Identifier))
+                if (string.IsNullOrWhiteSpace(userIdentifier))
                     return Failed<PspDocumentResultDto>(new SheaftException(ExceptionKind.BadRequest, MessageKind.PsP_CannotSubmit_Document_User_Not_Exists));
 
                 if (string.IsNullOrWhiteSpace(document.Identifier))
@@ -234,7 +234,7 @@ namespace Sheaft.Infrastructure.Services
                 await EnsureAccessTokenIsValidAsync(token);
 
                 var result = await _api.Users.UpdateKycDocumentAsync(
-                    document.Legal.User.Identifier,
+                    userIdentifier,
                     new KycDocumentPutDTO { Status = KycStatus.VALIDATION_ASKED },
                     document.Identifier);
 
@@ -249,7 +249,7 @@ namespace Sheaft.Infrastructure.Services
             });
         }
 
-        public async Task<Result<PspDeclarationResultDto>> CreateUboDeclarationAsync(UboDeclaration declaration, User business, CancellationToken token)
+        public async Task<Result<PspDeclarationResultDto>> CreateUboDeclarationAsync(Declaration declaration, User business, CancellationToken token)
         {
             return await ExecuteAsync(async () =>
             {
@@ -270,7 +270,7 @@ namespace Sheaft.Infrastructure.Services
             });
         }
 
-        public async Task<Result<PspDeclarationResultDto>> SubmitUboDeclarationAsync(UboDeclaration declaration, User business, CancellationToken token)
+        public async Task<Result<PspDeclarationResultDto>> SubmitUboDeclarationAsync(Declaration declaration, User business, CancellationToken token)
         {
             return await ExecuteAsync(async () =>
             {
@@ -305,7 +305,7 @@ namespace Sheaft.Infrastructure.Services
             });
         }
 
-        public async Task<Result<string>> CreateUboAsync(Ubo ubo, UboDeclaration declaration, User business, CancellationToken token)
+        public async Task<Result<string>> CreateUboAsync(Ubo ubo, Declaration declaration, User business, CancellationToken token)
         {
             return await ExecuteAsync(async () =>
             {
@@ -329,7 +329,7 @@ namespace Sheaft.Infrastructure.Services
             });
         }
 
-        public async Task<Result<bool>> UpdateUboAsync(Ubo ubo, UboDeclaration declaration, User business, CancellationToken token)
+        public async Task<Result<bool>> UpdateUboAsync(Ubo ubo, Declaration declaration, User business, CancellationToken token)
         {
             return await ExecuteAsync(async () =>
             {

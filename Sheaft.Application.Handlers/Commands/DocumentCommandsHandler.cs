@@ -12,6 +12,8 @@ using Sheaft.Application.Events;
 using System.IO;
 using System.Linq;
 using System.Collections.Generic;
+using Sheaft.Exceptions;
+using Microsoft.EntityFrameworkCore;
 
 namespace Sheaft.Application.Handlers
 {
@@ -44,15 +46,16 @@ namespace Sheaft.Application.Handlers
             {
                 using (var transaction = await _context.Database.BeginTransactionAsync(token))
                 {
-                    await _context.EnsureNotExists<Document>(d => d.Legal.Id == request.LegalId && d.Kind == request.Kind, token);
-
                     var legal = await _context.GetSingleAsync<Legal>(r => r.Id == request.LegalId, token);
-                    var document = new Document(Guid.NewGuid(), request.Kind, request.Name, legal);
+                    if (legal.Documents.Any(d => d.Kind == request.Kind))
+                        throw new ValidationException();
 
-                    await _context.AddAsync(document, token);
+                    var document = legal.AddDocument(request.Kind, request.Name);
+
+                    _context.Update(legal);
                     await _context.SaveChangesAsync(token);
 
-                    var result = await _pspService.CreateDocumentAsync(document, token);
+                    var result = await _pspService.CreateDocumentAsync(document, legal.User.Identifier, token);
                     if (!result.Success)
                     {
                         await transaction.RollbackAsync(token);
@@ -75,19 +78,17 @@ namespace Sheaft.Application.Handlers
         {
             return await ExecuteAsync(async () =>
             {
-                var document = await _context.GetByIdAsync<Document>(request.Id, token);
+                var legal = await _context.GetSingleAsync<Legal>(r => r.Documents.Any(d => d.Id == request.Id), token);
+                var document = legal.Documents.FirstOrDefault(c => c.Id == request.Id);
+                if (document.Kind != request.Kind && legal.Documents.Any(d => d.Kind == request.Kind))
+                    throw new ValidationException();
 
-                if (document.Kind != request.Kind)
-                {
-                    await _context.EnsureNotExists<Document>(d => d.Legal.Id == document.Legal.Id && d.Kind == request.Kind, token);
-                    document.SetKind(request.Kind);
-                }
-
+                document.SetKind(request.Kind);
                 document.SetName(request.Name);
 
                 if (string.IsNullOrWhiteSpace(document.Identifier))
                 {
-                    var result = await _pspService.CreateDocumentAsync(document, token);
+                    var result = await _pspService.CreateDocumentAsync(document, legal.User.Identifier, token);
                     if (!result.Success)
                         return Failed<bool>(result.Exception);
 
@@ -106,9 +107,9 @@ namespace Sheaft.Application.Handlers
         {
             return await ExecuteAsync(async () =>
             {
-                var documents = await _context.GetAsync<Document>(c => c.Legal.User.Id == request.RequestUser.Id && c.Status == DocumentStatus.Created, token);
+                var legal = await _context.GetSingleAsync<Legal>(r => r.Id == request.LegalId, token);
                 var success = true;
-                foreach (var document in documents)
+                foreach (var document in legal.Documents.Where(d => d.Status == DocumentStatus.UnLocked || d.Status == DocumentStatus.Created))
                 {
                     var result = await _mediatr.Process(new LockDocumentCommand(request.RequestUser)
                     {
@@ -127,8 +128,9 @@ namespace Sheaft.Application.Handlers
         {
             return await ExecuteAsync(async () =>
             {
-                var document = await _context.GetByIdAsync<Document>(request.DocumentId, token);
-                if (document.Status != DocumentStatus.Created || document.Status != DocumentStatus.UnLocked)
+                var legal = await _context.GetSingleAsync<Legal>(r => r.Documents.Any(d => d.Id == request.DocumentId), token);
+                var document = legal.Documents.FirstOrDefault(c => c.Id == request.DocumentId);
+                if (document.Status != DocumentStatus.Created && document.Status != DocumentStatus.UnLocked)
                     return Failed<bool>(new InvalidOperationException());
 
                 document.SetStatus(DocumentStatus.Locked);
@@ -144,7 +146,8 @@ namespace Sheaft.Application.Handlers
         {
             return await ExecuteAsync(async () =>
             {
-                var document = await _context.GetByIdAsync<Document>(request.DocumentId, token);
+                var legal = await _context.GetSingleAsync<Legal>(r => r.Documents.Any(d => d.Id == request.DocumentId), token);
+                var document = legal.Documents.FirstOrDefault(c => c.Id == request.DocumentId);
                 document.SetStatus(DocumentStatus.UnLocked);
 
                 _context.Update(document);
@@ -158,9 +161,9 @@ namespace Sheaft.Application.Handlers
         {
             return await ExecuteAsync(async () =>
             {
-                var documents = await _context.GetAsync<Document>(c => c.Legal.User.Id == request.RequestUser.Id && c.Status == DocumentStatus.Locked, token);
+                var legal = await _context.GetSingleAsync<Legal>(r => r.Id == request.LegalId, token);
                 var success = true;
-                foreach (var document in documents)
+                foreach (var document in legal.Documents.Where(d => d.Status == DocumentStatus.Locked))
                 {
                     var result = await _mediatr.Process(new SubmitDocumentCommand(request.RequestUser)
                     {
@@ -179,12 +182,13 @@ namespace Sheaft.Application.Handlers
         {
             return await ExecuteAsync(async () =>
             {
-                var document = await _context.GetByIdAsync<Document>(request.DocumentId, token);
+                var legal = await _context.GetSingleAsync<Legal>(r => r.Documents.Any(d => d.Id == request.DocumentId), token);
+                var document = legal.Documents.FirstOrDefault(c => c.Id == request.DocumentId);
                 if (document.Status != DocumentStatus.Locked)
                     return Failed<bool>(new InvalidOperationException());
 
                 var results = new List<Result<bool>>();
-                foreach(var page in document.Pages.Where(p => !p.UploadedOn.HasValue))
+                foreach (var page in document.Pages.Where(p => !p.UploadedOn.HasValue))
                 {
                     results.Add(await _mediatr.Process(new SendPageCommand(request.RequestUser)
                     {
@@ -196,12 +200,15 @@ namespace Sheaft.Application.Handlers
                 if (results.Any(r => !r.Success))
                     return Failed<bool>(new InvalidOperationException());
 
-                var result = await _pspService.SubmitDocumentAsync(document, token);
+                var result = await _pspService.SubmitDocumentAsync(document, legal.User.Identifier, token);
                 if (!result.Success)
                     return Failed<bool>(result.Exception);
 
                 document.SetStatus(result.Data.Status);
                 document.SetResult(result.Data.ResultCode, result.Data.ResultMessage);
+
+                _context.Update(document);
+                await _context.SaveChangesAsync(token);
 
                 return Ok(true);
             });
@@ -211,10 +218,13 @@ namespace Sheaft.Application.Handlers
         {
             return await ExecuteAsync(async () =>
             {
-                var document = await _context.GetByIdAsync<Document>(request.Id, token);
-                _context.Remove(document);
+                var legal = await _context.GetSingleAsync<Legal>(r => r.Documents.Any(d => d.Id == request.Id), token);
+                legal.DeleteDocument(request.Id);
 
-                return Ok(await _context.SaveChangesAsync(token) > 0);
+                _context.Update(legal);
+                await _context.SaveChangesAsync(token);
+
+                return Ok(true);
             });
         }
 
@@ -222,7 +232,9 @@ namespace Sheaft.Application.Handlers
         {
             return await ExecuteAsync(async () =>
             {
-                var document = await _context.GetSingleAsync<Document>(c => c.Identifier == request.Identifier, token);
+                var legal = await _context.GetSingleAsync<Legal>(r => r.Documents.Any(d => d.Identifier == request.Identifier), token);
+                var document = legal.Documents.FirstOrDefault(c => c.Identifier == request.Identifier);
+
                 var pspResult = await _pspService.GetDocumentAsync(document.Identifier, token);
                 if (!pspResult.Success)
                     return Failed<DocumentStatus>(pspResult.Exception);

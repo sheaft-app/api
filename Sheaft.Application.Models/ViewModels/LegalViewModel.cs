@@ -9,5 +9,6 @@ namespace Sheaft.Application.Models
         public Guid Id { get; set; }
         public LegalKind Kind { get; set; }
         public OwnerViewModel Owner { get; set; }
+        public IEnumerable<DocumentViewModel> Documents { get; set; }
     }
 }

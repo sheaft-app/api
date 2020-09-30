@@ -76,7 +76,6 @@ namespace Sheaft.Manage.Controllers
         public async Task<IActionResult> Edit(Guid id, CancellationToken token)
         {
             var entity = await _context.Users.OfType<Producer>()
-                .AsNoTracking()
                 .Where(c => c.Id == id)
                 .ProjectTo<ProducerViewModel>(_configurationProvider)
                 .SingleOrDefaultAsync(token);
@@ -185,7 +184,6 @@ namespace Sheaft.Manage.Controllers
         public async Task<IActionResult> UpdateLegal(Guid userId, CancellationToken token)
         {
             var entity = await _context.Legals.OfType<BusinessLegal>()
-                .AsNoTracking()
                 .Where(c => c.User.Id == userId)
                 .ProjectTo<BusinessLegalViewModel>(_configurationProvider)
                 .SingleOrDefaultAsync(token);
@@ -195,7 +193,6 @@ namespace Sheaft.Manage.Controllers
 
             ViewBag.Countries = await GetCountries(token);
             ViewBag.Nationalities = await GetNationalities(token);
-            ViewBag.Documents = await GetDocuments(entity.Id, token);
             return View(entity);
         }
 
@@ -219,7 +216,6 @@ namespace Sheaft.Manage.Controllers
             {
                 ViewBag.Countries = await GetCountries(token);
                 ViewBag.Nationalities = await GetNationalities(token);
-                ViewBag.Documents = await GetDocuments(model.Id, token);
                 ModelState.AddModelError("", result.Exception.Message);
                 return View(model);
             }
@@ -263,13 +259,6 @@ namespace Sheaft.Manage.Controllers
             return await _context.Nationalities
                 .AsNoTracking()
                 .ProjectTo<NationalityViewModel>(_configurationProvider)
-                .ToListAsync(token);
-        }
-
-        private async Task<IEnumerable<DocumentShortViewModel>> GetDocuments(Guid legalId, CancellationToken token)
-        {
-            return await _context.Documents.AsNoTracking().Where(c => !c.RemovedOn.HasValue && c.Legal.Id == legalId)
-                .ProjectTo<DocumentShortViewModel>(_configurationProvider)
                 .ToListAsync(token);
         }
     }

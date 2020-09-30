@@ -10,5 +10,7 @@ namespace Sheaft.Application.Commands
         public LockDocumentsCommand(RequestUser requestUser) : base(requestUser)
         {
         }
+
+        public Guid LegalId { get; set; }
     }
 }

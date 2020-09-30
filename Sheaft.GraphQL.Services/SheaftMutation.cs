@@ -285,21 +285,9 @@ namespace Sheaft.GraphQL.Services
             return legalQueries.GetBusinessLegals(input.Id, CurrentUser);
         }
 
-        public async Task<IQueryable<UboDto>> CreateUboAsync(CreateUboInput input, [Service] IUboQueries uboQueries)
-        {
-            var result = await ExecuteCommandAsync<CreateUboCommand, Guid>(_mapper.Map(input, new CreateUboCommand(CurrentUser)), Token);
-            return uboQueries.GetUbo(result, CurrentUser);
-        }
-
-        public async Task<IQueryable<UboDto>> UpdateUboAsync(UpdateUboInput input, [Service] IUboQueries uboQueries)
-        {
-            await ExecuteCommandAsync<UpdateUboCommand, bool>(_mapper.Map(input, new UpdateUboCommand(CurrentUser)), Token);
-            return uboQueries.GetUbo(input.Id, CurrentUser);
-        }
-
         public async Task<bool> RemoveUboAsync(IdInput input)
         {
-            return await ExecuteCommandAsync<RemoveUboCommand, bool>(_mapper.Map(input, new RemoveUboCommand(CurrentUser)), Token);
+            return await ExecuteCommandAsync<DeleteUboCommand, bool>(_mapper.Map(input, new DeleteUboCommand(CurrentUser)), Token);
         }
 
         public async Task<IQueryable<ConsumerDto>> RegisterConsumerAsync(RegisterConsumerInput input, [Service] IConsumerQueries consumerQueries)

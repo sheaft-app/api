@@ -10,6 +10,8 @@
         new SelectListItem("Individual", LegalKind.Individual.ToString("G")),
         new SelectListItem("Organization", LegalKind.Organization.ToString("G"))
     };
+
+    var uboCount = Model.Declaration.Ubos?.Count() ?? 0;
 }
 
 <div class="container">
@@ -22,7 +24,7 @@
         @Html.ValidationSummary(true, "", new { @class = "text-danger" })
         @Html.HiddenFor(model => model.Id)
         @Html.HiddenFor(model => model.Owner.Id)
-        @Html.HiddenFor(model => model.UboDeclaration.Id)
+        @Html.HiddenFor(model => model.Declaration.Id)
         <br />
 
         <div class="row">
@@ -151,28 +153,31 @@
     @if (Model.Kind == LegalKind.Business)
     {
         <h3>UBO Declaration</h3>
-        @if (Model.UboDeclaration != null)
+        @if (Model.Declaration != null)
         {
             <div class="form-group">
-                @Html.LabelFor(m => m.UboDeclaration.Status)
-                @Html.TextBoxFor(m => m.UboDeclaration.Status, null, new { @class = "form-control" })
+                @Html.LabelFor(m => m.Declaration.Status)
+                @Html.TextBoxFor(m => m.Declaration.Status, null, new { @class = "form-control", @disabled = "disabled" })
             </div>
             <div class="form-group">
-                @Html.LabelFor(m => m.UboDeclaration.ReasonCode)
-                @Html.TextBoxFor(m => m.UboDeclaration.ReasonCode, null, new { @class = "form-control" })
+                @Html.LabelFor(m => m.Declaration.ReasonCode)
+                @Html.TextBoxFor(m => m.Declaration.ReasonCode, null, new { @class = "form-control", @disabled = "disabled" })
             </div>
             <div class="form-group">
-                @Html.LabelFor(m => m.UboDeclaration.ReasonMessage)
-                @Html.TextBoxFor(m => m.UboDeclaration.ReasonMessage, null, new { @class = "form-control" })
+                @Html.LabelFor(m => m.Declaration.ReasonMessage)
+                @Html.TextBoxFor(m => m.Declaration.ReasonMessage, null, new { @class = "form-control", @disabled = "disabled" })
             </div>
-            <br />
-            <a asp-controller="Declaration" asp-action="Edit" asp-route-id="@Model.UboDeclaration.Id" class="btn btn-info">
+            <div class="form-group">
+                @Html.Label("ubos", "Ubos")
+                @Html.TextBox("ubos", uboCount, null, new { @class = "form-control", @disabled = "disabled" })
+            </div>
+            <a asp-controller="Declarations" asp-action="Details" asp-route-declarationid="@Model.Declaration.Id" class="btn btn-info">
                 Edit declaration
             </a>
         }
         else
         {
-            <a asp-controller="Declaration" asp-action="Create" asp-route-legalid="@Model.Id" class="btn btn-info">
+            <a asp-controller="Declarations" asp-action="Create" asp-route-legalid="@Model.Id" class="btn btn-info">
                 Create declaration
             </a>
         }
@@ -194,10 +199,10 @@
             </tr>
         </thead>
         <tbody>
-            @foreach (var document in documents)
+            @foreach (var document in Model.Documents)
             {
                 <tr>
-                    <th scope="row">@document.Name</th>
+                    <td scope="row">@document.Name</td>
                     <td>@document.Kind</td>
                     <td>@document.Status</td>
                     <td>
@@ -211,7 +216,8 @@
                                 <i class="fa fa-download"></i>
                             </button>
                         }
-                        @if (document.Status != DocumentStatus.ValidationAsked && document.Status != DocumentStatus.Validated && document.Status != DocumentStatus.Refused && document.Status != DocumentStatus.OutOfDate)
+
+                        @if (document.Status != DocumentStatus.ValidationAsked && document.Status != DocumentStatus.Validated)
                         {
                             @using (Html.BeginForm("Delete", "Documents", new { id = document.Id }, FormMethod.Post, true, new { @class = "form d-inline" }))
                             {

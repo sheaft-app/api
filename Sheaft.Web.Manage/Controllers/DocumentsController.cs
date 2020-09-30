@@ -5,11 +5,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Newtonsoft.Json;
 using Sheaft.Application.Commands;
 using Sheaft.Exceptions;
 using Sheaft.Application.Interop;
-using Sheaft.Manage.Models;
 using Sheaft.Application.Models;
 using Sheaft.Options;
 using System;
@@ -42,16 +40,20 @@ namespace Sheaft.Manage.Controllers
         [HttpGet]
         public async Task<IActionResult> Edit(Guid id, CancellationToken token)
         {
-            var entity = await _context.Documents
-                .AsNoTracking()
-                .Where(c => c.Id == id)
-                .ProjectTo<DocumentViewModel>(_configurationProvider)
+            var entity = await _context.Legals
+                .Where(c => c.Documents.Any(d => d.Id == id))
+                .ProjectTo<LegalViewModel>(_configurationProvider)
                 .SingleOrDefaultAsync(token);
 
             if (entity == null)
                 throw new NotFoundException();
 
-            return View(entity);
+            ViewBag.Kind = entity.Kind;
+            ViewBag.UserId = entity.Owner.Id;
+            ViewBag.LegalId = entity.Id;
+
+            var document = entity.Documents.FirstOrDefault(d => d.Id == id);
+            return View(document);
         }
 
         [HttpPost]
@@ -66,10 +68,7 @@ namespace Sheaft.Manage.Controllers
             }, token);
 
             if (!result.Success)
-            {
-                ModelState.AddModelError("", result.Exception.Message);
-                return View(model);
-            }
+                throw result.Exception;
 
             return RedirectToAction("Edit", new { id = model.Id });
         }
@@ -78,7 +77,6 @@ namespace Sheaft.Manage.Controllers
         public async Task<IActionResult> Create(Guid legalId, CancellationToken token)
         {
             var entity = await _context.Legals
-                .AsNoTracking()
                 .Where(c => c.Id == legalId)
                 .ProjectTo<LegalViewModel>(_configurationProvider)
                 .SingleOrDefaultAsync(token);
@@ -86,25 +84,26 @@ namespace Sheaft.Manage.Controllers
             if (entity == null)
                 throw new NotFoundException();
 
-            return View(new DocumentViewModel { Legal = new LegalViewModel { Id = legalId } });
+            ViewBag.Kind = entity.Kind;
+            ViewBag.UserId = entity.Owner.Id;
+            ViewBag.LegalId = entity.Id;
+
+            return View(new DocumentViewModel());
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(DocumentViewModel model, CancellationToken token)
+        public async Task<IActionResult> Create(Guid legalId, DocumentViewModel model, CancellationToken token)
         {
             var result = await _mediatr.Process(new CreateDocumentCommand(await GetRequestUser(token))
             {
                 Name = model.Name,
                 Kind = model.Kind,
-                LegalId = model.Legal.Id
+                LegalId = legalId
             }, token);
 
             if (!result.Success)
-            {
-                ModelState.AddModelError("", result.Exception.Message);
-                return View(model);
-            }
+                throw result.Exception;
 
             return RedirectToAction("Edit", new { id = result.Data });
         }
@@ -112,16 +111,19 @@ namespace Sheaft.Manage.Controllers
         [HttpGet]
         public async Task<IActionResult> AddPage(Guid documentId, CancellationToken token)
         {
-            var entity = await _context.Documents
-                .AsNoTracking()
-                .Where(c => c.Id == documentId)
-                .ProjectTo<DocumentViewModel>(_configurationProvider)
+            var entity = await _context.Legals
+                .Where(c => c.Documents.Any(d => d.Id == documentId))
+                .ProjectTo<LegalViewModel>(_configurationProvider)
                 .SingleOrDefaultAsync(token);
 
             if (entity == null)
                 throw new NotFoundException();
 
-            return View(entity);
+            ViewBag.Kind = entity.Kind;
+            ViewBag.UserId = entity.Owner.Id;
+
+            var document = entity.Documents.FirstOrDefault(d => d.Id == documentId);
+            return View(document);
         }
 
         [HttpPost]
@@ -129,10 +131,7 @@ namespace Sheaft.Manage.Controllers
         public async Task<IActionResult> AddPage(DocumentViewModel model, IFormFile page, CancellationToken token)
         {
             if (page == null)
-            {
-                ModelState.AddModelError("", "Page document is required.");
-                return View(model);
-            }
+                throw new ArgumentNullException("page");
 
             byte[] data = null;
             using (var ms = new MemoryStream())
@@ -153,12 +152,8 @@ namespace Sheaft.Manage.Controllers
             }, token);
 
             if (!result.Success)
-            {
-                ModelState.AddModelError("", result.Exception.Message);
-                return View(model);
-            }
+                throw result.Exception;
 
-            TempData["Edited"] = JsonConvert.SerializeObject(new EntityViewModel { Id = model.Id, Name = model.Name });
             return RedirectToAction("Edit", new { id = model.Id });
         }
 
@@ -172,11 +167,9 @@ namespace Sheaft.Manage.Controllers
             }, token);
 
             if (!result.Success)
-            {
-                ModelState.AddModelError("", result.Exception.Message);
-            }
+                throw result.Exception;
 
-            return View("Edit", new { id = id });
+            return RedirectToAction("Edit", new { id = id });
         }
 
         [HttpPost]
@@ -189,11 +182,9 @@ namespace Sheaft.Manage.Controllers
             }, token);
 
             if (!result.Success)
-            {
-                ModelState.AddModelError("", result.Exception.Message);
-            }
+                throw result.Exception;
 
-            return View("Edit", new { id = id });
+            return RedirectToAction("Edit", new { id = id });
         }
 
         [HttpPost]
@@ -206,22 +197,22 @@ namespace Sheaft.Manage.Controllers
             }, token);
 
             if (!result.Success)
-            {
-                ModelState.AddModelError("", result.Exception.Message);
-            }
+                throw result.Exception;
 
-            return View("Edit", new { id = id });
+            return RedirectToAction("Edit", new { id = id });
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Download(Guid id, CancellationToken token)
         {
-            var entity = await _context.Documents
-                .AsNoTracking()
-                .Where(c => c.Id == id)
+            var entity = await _context.Legals
+                .SelectMany(c => c.Documents)
                 .ProjectTo<DocumentViewModel>(_configurationProvider)
-                .SingleOrDefaultAsync(token);
+                .SingleOrDefaultAsync(c => c.Id == id, token);
+
+            if (entity == null)
+                throw new NotFoundException();
 
             var data = await _documentQueries.DownloadDocumentAsync(id, await GetRequestUser(token), token);
             return File(data, "application/octet-stream", entity.Name + ".zip");
@@ -231,11 +222,13 @@ namespace Sheaft.Manage.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DownloadPage(Guid documentId, Guid pageId, CancellationToken token)
         {
-            var entity = await _context.Documents
-                .AsNoTracking()
-                .Where(c => c.Id == documentId)
+            var entity = await _context.Legals
+                .SelectMany(c => c.Documents)
                 .ProjectTo<DocumentViewModel>(_configurationProvider)
-                .SingleOrDefaultAsync(token);
+                .SingleOrDefaultAsync(c => c.Id == documentId && c.Pages.Any(p => p.Id == pageId), token);
+
+            if (entity == null)
+                throw new NotFoundException();
 
             var page = entity.Pages.Single(p => p.Id == pageId);
             var data = await _documentQueries.DownloadDocumentPageAsync(documentId, pageId, await GetRequestUser(token), token);
@@ -254,12 +247,8 @@ namespace Sheaft.Manage.Controllers
             }, token);
 
             if (!result.Success)
-            {
-                ModelState.AddModelError("", result.Exception.Message);
-                return View("Edit", new { id = documentId });
-            }
+                throw result.Exception;
 
-            TempData["Edited"] = JsonConvert.SerializeObject(new EntityViewModel { Id = pageId, Name = pageId.ToString("N") });
             return RedirectToAction("Edit", new { id = documentId });
         }
 
@@ -267,8 +256,8 @@ namespace Sheaft.Manage.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete(Guid id, CancellationToken token)
         {
-            var entity = await _context.Documents.SingleOrDefaultAsync(c => c.Id == id, token);
-            var name = entity.Name;
+            var entity = await _context.Legals
+                .SingleOrDefaultAsync(c => c.Documents.Any(d => d.Id == id), token);
 
             var requestUser = await GetRequestUser(token);
             var result = await _mediatr.Process(new DeleteDocumentCommand(requestUser)
@@ -277,12 +266,9 @@ namespace Sheaft.Manage.Controllers
             }, token);
 
             if (!result.Success)
-            {
-                ModelState.AddModelError("", result.Exception.Message);
-                return RedirectToAction("Edit", new { id });
-            }
+                throw result.Exception;
 
-            return RedirectToAction("UpdateLegal", "Producers", new { id = entity.Legal.Id });
+            return RedirectToAction("Index", "Producers", new { userid = entity.User.Id });
         }
     }
 }

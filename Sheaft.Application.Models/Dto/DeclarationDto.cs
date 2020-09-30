@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace Sheaft.Application.Models
 {
-    public class UboDeclarationDto
+    public class DeclarationDto
     {
         public Guid Id { get; private set; }
         public DeclarationStatus Status { get; set; }

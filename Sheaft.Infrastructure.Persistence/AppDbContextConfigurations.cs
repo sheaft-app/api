@@ -111,7 +111,6 @@ namespace Sheaft.Infrastructure.Persistence
             modelBuilder.ApplyConfiguration(new BankAccountConfiguration());
             modelBuilder.ApplyConfiguration(new CardConfiguration());
             modelBuilder.ApplyConfiguration(new WalletConfiguration());
-            modelBuilder.ApplyConfiguration(new DocumentConfiguration());
             modelBuilder.ApplyConfiguration(new PayinConfiguration());
             modelBuilder.ApplyConfiguration(new WebPayinConfiguration());
             modelBuilder.ApplyConfiguration(new CardPayinConfiguration());
@@ -125,8 +124,6 @@ namespace Sheaft.Infrastructure.Persistence
             modelBuilder.ApplyConfiguration(new LegalConfiguration());
             modelBuilder.ApplyConfiguration(new ConsumerLegalConfiguration());
             modelBuilder.ApplyConfiguration(new BusinessLegalConfiguration());
-            modelBuilder.ApplyConfiguration(new UboDeclarationConfiguration());
-            modelBuilder.ApplyConfiguration(new UboConfiguration());
             modelBuilder.ApplyConfiguration(new DonationConfiguration());
         }
     }

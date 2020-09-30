@@ -6,11 +6,10 @@ using Newtonsoft.Json;
 
 namespace Sheaft.Application.Commands
 {
-
-    public class RemoveUboCommand : Command<bool>
+    public class DeleteUboCommand : Command<bool>
     {
         [JsonConstructor]
-        public RemoveUboCommand(RequestUser requestUser) : base(requestUser)
+        public DeleteUboCommand(RequestUser requestUser) : base(requestUser)
         {
         }
 

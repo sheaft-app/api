@@ -76,7 +76,6 @@ namespace Sheaft.Manage.Controllers
         public async Task<IActionResult> Edit(Guid id, CancellationToken token)
         {
             var entity = await _context.Users.OfType<Consumer>()
-                .AsNoTracking()
                 .Where(c => c.Id == id)
                 .ProjectTo<ConsumerViewModel>(_configurationProvider)
                 .SingleOrDefaultAsync(token);
@@ -175,7 +174,6 @@ namespace Sheaft.Manage.Controllers
         public async Task<IActionResult> UpdateLegal(Guid userId, CancellationToken token)
         {
             var entity = await _context.Legals.OfType<ConsumerLegal>()
-                .AsNoTracking()
                 .Where(c => c.User.Id == userId)
                 .ProjectTo<ConsumerLegalViewModel>(_configurationProvider)
                 .SingleOrDefaultAsync(token);

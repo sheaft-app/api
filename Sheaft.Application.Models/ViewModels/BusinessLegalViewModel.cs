@@ -4,19 +4,16 @@ using System.Collections.Generic;
 
 namespace Sheaft.Application.Models
 {
-    public class BusinessLegalViewModel
+    public class BusinessLegalViewModel : LegalViewModel
     {
-        public Guid Id { get; set; }
         public DateTimeOffset CreatedOn { get; set; }
         public DateTimeOffset? UpdatedOn { get; set; }
         public DateTimeOffset? RemovedOn { get; set; }
-        public LegalKind Kind { get; set; }
         public string Name { get; set; }
         public string Email { get; set; }
         public string Siret { get; set; }
         public string VatIdentifier { get; set; }
-        public OwnerViewModel Owner { get; set; }
         public AddressViewModel Address { get; set; }
-        public UboDeclarationViewModel UboDeclaration { get; set; }
+        public DeclarationViewModel Declaration { get; set; }
     }
 }

@@ -25,14 +25,14 @@ namespace Sheaft.Domain.Models
         public string Siret { get; private set; }
         public string VatIdentifier { get; private set; }
         public virtual LegalAddress Address { get; private set; }
-        public virtual UboDeclaration UboDeclaration { get; private set; }
+        public virtual Declaration Declaration { get; private set; }
 
-        public void SetUboDeclaration(UboDeclaration declaration)
+        public void SetDeclaration()
         {
-            if (UboDeclaration != null)
-                UboDeclaration = null;
+            if (Declaration != null)
+                Declaration = null;
 
-            UboDeclaration = declaration;
+            Declaration = new Declaration(Guid.NewGuid());
         }
 
         public void SetSiret(string siret)

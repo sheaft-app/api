@@ -12,6 +12,6 @@ namespace Sheaft.Application.Models
         public string Siret { get; set; }
         public string VatIdentifier { get; set; }
         public AddressDto Address { get; set; }
-        public UboDeclarationDto UboDeclaration { get; set; }
+        public DeclarationDto UboDeclaration { get; set; }
     }
 }

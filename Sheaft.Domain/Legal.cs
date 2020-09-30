@@ -2,11 +2,15 @@
 using Sheaft.Domain.Enums;
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using Sheaft.Exceptions;
 
 namespace Sheaft.Domain.Models
 {
     public abstract class Legal : IEntity
     {
+        private List<Document> _documents;
+
         protected Legal()
         {
         }
@@ -26,5 +30,29 @@ namespace Sheaft.Domain.Models
         public LegalKind Kind { get; protected set; }
         public virtual User User { get; private set; }
         public virtual Owner Owner { get; private set; }
+        public virtual IReadOnlyCollection<Document> Documents => _documents?.AsReadOnly();
+
+        public Document AddDocument(DocumentKind kind, string name)
+        {
+            if (Documents == null)
+                _documents = new List<Document>();
+
+            var document = new Document(Guid.NewGuid(), kind, name);
+            _documents.Add(document);
+
+            return document;
+        }
+
+        public void DeleteDocument(Guid id)
+        {
+            if (Documents == null)
+                throw new NotFoundException();
+
+            var document = _documents.FirstOrDefault(d => d.Id == id);
+            if (document == null)
+                throw new NotFoundException();
+
+            _documents.Remove(document);
+        }
     }
 }

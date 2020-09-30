@@ -1,0 +1,77 @@
+﻿@model UboViewModel
+@{
+    ViewData["Title"] = "Add ubo to declaration";
+    var countries = ((List<CountryViewModel>)ViewBag.Countries).Select(c => new SelectListItem(c.Name, c.Alpha2)).ToList();
+    var nationalities = ((List<NationalityViewModel>)ViewBag.Nationalities).Select(c => new SelectListItem(c.Name, c.Alpha2)).ToList();
+}
+
+<div class="container">
+    <h2 class="display-4">Add ubo to declaration</h2>
+    <br />
+    @using (Html.BeginForm("AddUbo", "Declarations", new { declarationid = ViewBag.DeclarationId }, FormMethod.Post))
+    {
+        <br />
+        @Html.AntiForgeryToken()
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+        <div class="row">
+            <div class="col-md-6">
+                <h4>Ubo info</h4>
+                <div class="form-group">
+                    @Html.LabelFor(c => c.FirstName, new { @class = "form-label" })
+                    @Html.TextBoxFor(c => c.FirstName, null, new { @class = "form-control" })
+                </div>
+                <div class="form-group">
+                    @Html.LabelFor(c => c.LastName, new { @class = "form-label" })
+                    @Html.TextBoxFor(c => c.LastName, null, new { @class = "form-control" })
+                </div>
+                <div class="form-group">
+                    @Html.LabelFor(c => c.Nationality, new { @class = "form-label" })
+                    @Html.DropDownListFor(c => c.Nationality, nationalities, new { @class = "form-control" })
+                </div>
+                <h4>Birth info</h4>
+                <div class="form-group">
+                    @Html.LabelFor(c => c.BirthDate, new { @class = "form-label" })
+                    @Html.TextBoxFor(c => c.BirthDate, null, new { @class = "form-control" })
+                </div>
+                <div class="form-group">
+                    @Html.LabelFor(c => c.BirthPlace.City, new { @class = "form-label" })
+                    @Html.TextBoxFor(c => c.BirthPlace.City, null, new { @class = "form-control" })
+                </div>
+                <div class="form-group">
+                    @Html.LabelFor(c => c.BirthPlace.Country, new { @class = "form-label" })
+                    @Html.DropDownListFor(c => c.BirthPlace.Country, countries, new { @class = "form-control" })
+                </div>
+            </div>
+            <div class="col-md-6">
+                <h4>Address</h4>
+                <div class="form-group">
+                    @Html.LabelFor(c => c.Address.Line1, new { @class = "form-label" })
+                    @Html.TextBoxFor(c => c.Address.Line1, null, new { @class = "form-control" })
+                </div>
+                <div class="form-group">
+                    @Html.LabelFor(c => c.Address.Line2, new { @class = "form-label" })
+                    @Html.TextBoxFor(c => c.Address.Line2, null, new { @class = "form-control" })
+                </div>
+                <div class="form-group">
+                    @Html.LabelFor(c => c.Address.Zipcode, new { @class = "form-label" })
+                    @Html.TextBoxFor(c => c.Address.Zipcode, null, new { @class = "form-control" })
+                </div>
+                <div class="form-group">
+                    @Html.LabelFor(c => c.Address.City, new { @class = "form-label" })
+                    @Html.TextBoxFor(c => c.Address.City, null, new { @class = "form-control" })
+                </div>
+                <div class="form-group">
+                    @Html.LabelFor(c => c.Address.Country, new { @class = "form-label" })
+                    @Html.DropDownListFor(c => c.Address.Country, countries, new { @class = "form-control" })
+                </div>
+            </div>
+        </div>
+        <br />
+        <a asp-controller="Declarations" asp-action="Details" asp-route-id="@ViewBag.DeclarationId" class="btn btn-light">
+            Go back
+        </a>
+        <button type="submit" class="btn btn-success">
+            <i class="fa fa-plus">&nbsp;Create</i>
+        </button>
+    }
+</div>

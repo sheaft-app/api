@@ -9,7 +9,7 @@
         new SelectListItem("Shareholder", DocumentKind.ShareholderProof.ToString("G")),
     };
 
-    if (Model.Legal.Kind != LegalKind.Business)
+    if (ViewBag.Kind != LegalKind.Business)
         kinds.Add(new SelectListItem("Address", DocumentKind.AddressProof.ToString("G")));
 }
 
@@ -22,7 +22,7 @@
         @Html.AntiForgeryToken()
         @Html.ValidationSummary(true, "", new { @class = "text-danger" })
         @Html.HiddenFor(model => model.Id)
-        @Html.HiddenFor(model => model.Legal.Id)
+        @Html.Hidden("LegalId", (Guid)ViewBag.LegalId)
         <br />
         <div class="form-group">
             @Html.LabelFor(c => c.Name, new { @class = "form-label" })
@@ -34,7 +34,7 @@
         </div>
 
         <br />
-        <a asp-controller="Producers" asp-action="UpdateLegal" asp-route-id="@Model.Legal.Id" class="btn btn-light">
+        <a asp-controller="Producers" asp-action="UpdateLegal" asp-route-id="@ViewBag.LegalId" class="btn btn-light">
             Go back
         </a>
         <button type="submit" class="btn btn-success">

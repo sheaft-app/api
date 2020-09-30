@@ -19,7 +19,7 @@ namespace Sheaft.Application.Mappers
 
             CreateMap<CreateUboInput, CreateUboCommand>();
             CreateMap<UpdateUboInput, UpdateUboCommand>();
-            CreateMap<IdInput, RemoveUboCommand>();
+            CreateMap<IdInput, DeleteUboCommand>();
         }
     }
 }

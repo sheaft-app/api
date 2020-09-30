@@ -11,7 +11,6 @@ using System.Linq;
 
 namespace Sheaft.Application.Handlers
 {
-
     public class PageCommandsHandler : ResultsHandler,
             IRequestHandler<UploadPageCommand, Result<Guid>>,
             IRequestHandler<SendPageCommand, Result<bool>>,
@@ -38,13 +37,14 @@ namespace Sheaft.Application.Handlers
             {
                 var page = new Page(Guid.NewGuid(), request.FileName, request.Extension, request.Size);
 
-                var document = await _context.GetByIdAsync<Document>(request.DocumentId, token);
+                var legal = await _context.GetSingleAsync<Legal>(r => r.Documents.Any(d => d.Id == request.DocumentId), token);
+                var document = legal.Documents.FirstOrDefault(d => d.Id == request.DocumentId);
                 document.AddPage(page);
 
                 _context.Update(document);
                 await _context.SaveChangesAsync(token);
 
-                var result = await _blobService.UploadDocumentPageAsync(document.Id, page.Id, request.Data, document.Legal.User.Id, token);
+                var result = await _blobService.UploadDocumentPageAsync(document.Id, page.Id, request.Data, legal.User.Id, token);
                 if (!result.Success)
                     return Failed<Guid>(result.Exception);
 
@@ -56,14 +56,16 @@ namespace Sheaft.Application.Handlers
         {
             return await ExecuteAsync(async () =>
             {
-                var document = await _context.GetByIdAsync<Document>(request.DocumentId, token);
+                var legal = await _context.GetSingleAsync<Legal>(r => r.Documents.Any(d => d.Id == request.DocumentId), token);
+                var document = legal.Documents.FirstOrDefault(d => d.Id == request.DocumentId);
+
                 var page = document.Pages.SingleOrDefault(p => p.Id == request.PageId);
 
-                var downloadResult = await _blobService.DownloadDocumentPageAsync(document.Id, page.Id, document.Legal.User.Id, token);
+                var downloadResult = await _blobService.DownloadDocumentPageAsync(document.Id, page.Id, legal.User.Id, token);
                 if (!downloadResult.Success)
                     return Failed<bool>(downloadResult.Exception);
 
-                var result = await _pspService.AddPageToDocumentAsync(page, document, downloadResult.Data, token);
+                var result = await _pspService.AddPageToDocumentAsync(page, document, legal.User.Identifier, downloadResult.Data, token);
                 if (!result.Success)
                     return result;
 
@@ -79,8 +81,10 @@ namespace Sheaft.Application.Handlers
         {
             return await ExecuteAsync(async () =>
             {
-                var document = await _context.GetByIdAsync<Document>(request.DocumentId, token);
-                var deleteResult = await _blobService.DeleteDocumentPageAsync(document.Id, request.PageId, document.Legal.User.Id, token);
+                var legal = await _context.GetSingleAsync<Legal>(r => r.Documents.Any(d => d.Id == request.DocumentId), token);
+                var document = legal.Documents.FirstOrDefault(d => d.Id == request.DocumentId);
+
+                var deleteResult = await _blobService.DeleteDocumentPageAsync(document.Id, request.PageId, legal.User.Id, token);
                 if (!deleteResult.Success)
                     return Failed<bool>(deleteResult.Exception);
 

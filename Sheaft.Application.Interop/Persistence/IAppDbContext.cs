@@ -20,7 +20,6 @@ namespace Sheaft.Application.Interop
         DbSet<Country> Countries { get; set; }
         DbSet<DeliveryMode> DeliveryModes { get; set; }
         DbSet<Department> Departments { get; set; }
-        DbSet<Document> Documents { get; set; }
         DbSet<Donation> Donations { get; set; }
         DbSet<Job> Jobs { get; set; }
         DbSet<Legal> Legals { get; set; }
@@ -39,7 +38,6 @@ namespace Sheaft.Application.Interop
         DbSet<Reward> Rewards { get; set; }
         DbSet<Tag> Tags { get; set; }
         DbSet<Transfer> Transfers { get; set; }
-        DbSet<Ubo> Ubos { get; set; }
         DbSet<User> Users { get; set; }
 
         DbSet<CountryPoints> CountryPoints { get; set; }

@@ -188,7 +188,6 @@ namespace Sheaft.Manage
             services.AddScoped<ITransactionQueries, TransactionQueries>();
             services.AddScoped<IDocumentQueries, DocumentQueries>();
             services.AddScoped<ILegalQueries, LegalQueries>();
-            services.AddScoped<IUboQueries, UboQueries>();
 
             var searchConfig = searchSettings.Get<SearchOptions>();
             services.AddScoped<ISearchServiceClient, SearchServiceClient>(_ => new SearchServiceClient(searchConfig.Name, new SearchCredentials(searchConfig.ApiKey)));
