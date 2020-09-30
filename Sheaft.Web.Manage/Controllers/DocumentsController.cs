@@ -166,39 +166,51 @@ namespace Sheaft.Manage.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Lock(Guid id, CancellationToken token)
         {
-            var entity = await _context.Documents
-                .AsNoTracking()
-                .Where(c => c.Id == id)
-                .ProjectTo<DocumentViewModel>(_configurationProvider)
-                .SingleOrDefaultAsync(token);
+            var result = await _mediatr.Process(new LockDocumentCommand(await GetRequestUser(token))
+            {
+                DocumentId = id
+            }, token);
 
-            return View("Edit", new { id = entity.Id });
+            if (!result.Success)
+            {
+                ModelState.AddModelError("", result.Exception.Message);
+            }
+
+            return View("Edit", new { id = id });
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Unlock(Guid id, CancellationToken token)
         {
-            var entity = await _context.Documents
-                .AsNoTracking()
-                .Where(c => c.Id == id)
-                .ProjectTo<DocumentViewModel>(_configurationProvider)
-                .SingleOrDefaultAsync(token);
+            var result = await _mediatr.Process(new UnLockDocumentCommand(await GetRequestUser(token))
+            {
+                DocumentId = id
+            }, token);
 
-            return View("Edit", new { id = entity.Id });
+            if (!result.Success)
+            {
+                ModelState.AddModelError("", result.Exception.Message);
+            }
+
+            return View("Edit", new { id = id });
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Validate(Guid id, CancellationToken token)
         {
-            var entity = await _context.Documents
-                .AsNoTracking()
-                .Where(c => c.Id == id)
-                .ProjectTo<DocumentViewModel>(_configurationProvider)
-                .SingleOrDefaultAsync(token);
+            var result = await _mediatr.Process(new SubmitDocumentCommand(await GetRequestUser(token))
+            {
+                DocumentId = id
+            }, token);
 
-            return View("Edit", new { id = entity.Id });
+            if (!result.Success)
+            {
+                ModelState.AddModelError("", result.Exception.Message);
+            }
+
+            return View("Edit", new { id = id });
         }
 
         [HttpPost]

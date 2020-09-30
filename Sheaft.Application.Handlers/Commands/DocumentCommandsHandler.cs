@@ -11,6 +11,7 @@ using Sheaft.Domain.Enums;
 using Sheaft.Application.Events;
 using System.IO;
 using System.Linq;
+using System.Collections.Generic;
 
 namespace Sheaft.Application.Handlers
 {
@@ -19,8 +20,9 @@ namespace Sheaft.Application.Handlers
             IRequestHandler<UpdateDocumentCommand, Result<bool>>,
             IRequestHandler<SubmitDocumentsCommand, Result<bool>>,
             IRequestHandler<SubmitDocumentCommand, Result<bool>>,
-            IRequestHandler<ReviewDocumentsCommand, Result<bool>>,
-            IRequestHandler<ReviewDocumentCommand, Result<bool>>,
+            IRequestHandler<LockDocumentsCommand, Result<bool>>,
+            IRequestHandler<LockDocumentCommand, Result<bool>>,
+            IRequestHandler<UnLockDocumentCommand, Result<bool>>,
             IRequestHandler<DeleteDocumentCommand, Result<bool>>,
             IRequestHandler<RefreshDocumentStatusCommand, Result<DocumentStatus>>
     {
@@ -42,6 +44,8 @@ namespace Sheaft.Application.Handlers
             {
                 using (var transaction = await _context.Database.BeginTransactionAsync(token))
                 {
+                    await _context.EnsureNotExists<Document>(d => d.Legal.Id == request.LegalId && d.Kind == request.Kind, token);
+
                     var legal = await _context.GetSingleAsync<Legal>(r => r.Id == request.LegalId, token);
                     var document = new Document(Guid.NewGuid(), request.Kind, request.Name, legal);
 
@@ -72,7 +76,13 @@ namespace Sheaft.Application.Handlers
             return await ExecuteAsync(async () =>
             {
                 var document = await _context.GetByIdAsync<Document>(request.Id, token);
-                document.SetKind(request.Kind);
+
+                if (document.Kind != request.Kind)
+                {
+                    await _context.EnsureNotExists<Document>(d => d.Legal.Id == document.Legal.Id && d.Kind == request.Kind, token);
+                    document.SetKind(request.Kind);
+                }
+
                 document.SetName(request.Name);
 
                 if (string.IsNullOrWhiteSpace(document.Identifier))
@@ -92,7 +102,7 @@ namespace Sheaft.Application.Handlers
             });
         }
 
-        public async Task<Result<bool>> Handle(ReviewDocumentsCommand request, CancellationToken token)
+        public async Task<Result<bool>> Handle(LockDocumentsCommand request, CancellationToken token)
         {
             return await ExecuteAsync(async () =>
             {
@@ -100,7 +110,7 @@ namespace Sheaft.Application.Handlers
                 var success = true;
                 foreach (var document in documents)
                 {
-                    var result = await _mediatr.Process(new ReviewDocumentCommand(request.RequestUser)
+                    var result = await _mediatr.Process(new LockDocumentCommand(request.RequestUser)
                     {
                         DocumentId = document.Id
                     }, token);
@@ -113,12 +123,29 @@ namespace Sheaft.Application.Handlers
             });
         }
 
-        public async Task<Result<bool>> Handle(ReviewDocumentCommand request, CancellationToken token)
+        public async Task<Result<bool>> Handle(LockDocumentCommand request, CancellationToken token)
         {
             return await ExecuteAsync(async () =>
             {
                 var document = await _context.GetByIdAsync<Document>(request.DocumentId, token);
-                document.SetStatus(DocumentStatus.Reviewed);
+                if (document.Status != DocumentStatus.Created || document.Status != DocumentStatus.UnLocked)
+                    return Failed<bool>(new InvalidOperationException());
+
+                document.SetStatus(DocumentStatus.Locked);
+
+                _context.Update(document);
+                await _context.SaveChangesAsync(token);
+
+                return Ok(true);
+            });
+        }
+
+        public async Task<Result<bool>> Handle(UnLockDocumentCommand request, CancellationToken token)
+        {
+            return await ExecuteAsync(async () =>
+            {
+                var document = await _context.GetByIdAsync<Document>(request.DocumentId, token);
+                document.SetStatus(DocumentStatus.UnLocked);
 
                 _context.Update(document);
                 await _context.SaveChangesAsync(token);
@@ -131,7 +158,7 @@ namespace Sheaft.Application.Handlers
         {
             return await ExecuteAsync(async () =>
             {
-                var documents = await _context.GetAsync<Document>(c => c.Legal.User.Id == request.RequestUser.Id && c.Status == DocumentStatus.Reviewed, token);
+                var documents = await _context.GetAsync<Document>(c => c.Legal.User.Id == request.RequestUser.Id && c.Status == DocumentStatus.Locked, token);
                 var success = true;
                 foreach (var document in documents)
                 {
@@ -153,6 +180,21 @@ namespace Sheaft.Application.Handlers
             return await ExecuteAsync(async () =>
             {
                 var document = await _context.GetByIdAsync<Document>(request.DocumentId, token);
+                if (document.Status != DocumentStatus.Locked)
+                    return Failed<bool>(new InvalidOperationException());
+
+                var results = new List<Result<bool>>();
+                foreach(var page in document.Pages.Where(p => !p.UploadedOn.HasValue))
+                {
+                    results.Add(await _mediatr.Process(new SendPageCommand(request.RequestUser)
+                    {
+                        DocumentId = request.DocumentId,
+                        PageId = page.Id
+                    }, token));
+                }
+
+                if (results.Any(r => !r.Success))
+                    return Failed<bool>(new InvalidOperationException());
 
                 var result = await _pspService.SubmitDocumentAsync(document, token);
                 if (!result.Success)

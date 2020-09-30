@@ -4,10 +4,10 @@ using Newtonsoft.Json;
 
 namespace Sheaft.Application.Commands
 {
-    public class ReviewDocumentsCommand : Command<bool>
+    public class LockDocumentsCommand : Command<bool>
     {
         [JsonConstructor]
-        public ReviewDocumentsCommand(RequestUser requestUser) : base(requestUser)
+        public LockDocumentsCommand(RequestUser requestUser) : base(requestUser)
         {
         }
     }

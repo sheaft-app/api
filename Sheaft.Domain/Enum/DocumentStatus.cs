@@ -8,7 +8,7 @@
         Validated = 4,
         Refused = 8,
         OutOfDate = 16,
-        WaitingForReview = 100,
-        Reviewed,
+        Locked = 100,
+        UnLocked = 101,
     }
 }

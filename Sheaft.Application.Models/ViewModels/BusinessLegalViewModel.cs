@@ -7,6 +7,9 @@ namespace Sheaft.Application.Models
     public class BusinessLegalViewModel
     {
         public Guid Id { get; set; }
+        public DateTimeOffset CreatedOn { get; set; }
+        public DateTimeOffset? UpdatedOn { get; set; }
+        public DateTimeOffset? RemovedOn { get; set; }
         public LegalKind Kind { get; set; }
         public string Name { get; set; }
         public string Email { get; set; }

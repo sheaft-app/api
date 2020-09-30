@@ -5,10 +5,10 @@ using System.Collections.Generic;
 
 namespace Sheaft.Application.Commands
 {
-    public class ReviewDocumentCommand : Command<bool>
+    public class LockDocumentCommand : Command<bool>
     {
         [JsonConstructor]
-        public ReviewDocumentCommand(RequestUser requestUser) : base(requestUser)
+        public LockDocumentCommand(RequestUser requestUser) : base(requestUser)
         {
         }
 

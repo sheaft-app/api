@@ -17,7 +17,7 @@
     <h2 class="display-4">Edit Document</h2>
     <br />
 
-    @if (Model.Status == DocumentStatus.WaitingForReview)
+    @if (Model.Status == DocumentStatus.Locked)
     {
         @using (Html.BeginForm("Validate", "Documents", new { id = Model.Id }, FormMethod.Post, true, new { @class = "form d-inline" }))
         {
@@ -33,7 +33,7 @@
         }
     }
 
-    @if (Model.Pages.Any() && (Model.Status == DocumentStatus.Created || Model.Status == DocumentStatus.OutOfDate))
+    @if (Model.Pages.Any() && (Model.Status == DocumentStatus.UnLocked || Model.Status == DocumentStatus.Created || Model.Status == DocumentStatus.OutOfDate))
     {
         @using (Html.BeginForm("Lock", "Documents", new { id = Model.Id }, FormMethod.Post, true, new { @class = "form d-inline" }))
         {
@@ -43,7 +43,7 @@
         }
     }
 
-    @if (Model.Status == DocumentStatus.Reviewed || Model.Status == DocumentStatus.WaitingForReview || Model.Status == DocumentStatus.Created)
+    @if (Model.Status == DocumentStatus.Locked || Model.Status == DocumentStatus.UnLocked || Model.Status == DocumentStatus.Created)
     {
         @using (Html.BeginForm("Delete", "Documents", new { id = Model.Id }, FormMethod.Post, true, new { @class = "form d-inline" }))
         {
@@ -114,7 +114,7 @@
             <a asp-controller="Producers" asp-action="UpdateLegal" asp-route-userid="@Model.Legal.Owner.Id" class="btn btn-light">
                 Go back
             </a>
-            @if (Model.Status == DocumentStatus.Created || Model.Status == DocumentStatus.WaitingForReview || Model.Status == DocumentStatus.OutOfDate)
+            @if (Model.Status == DocumentStatus.Created || Model.Status == DocumentStatus.UnLocked || Model.Status == DocumentStatus.OutOfDate)
             {
                 <button type="submit" class="btn btn-success">
                     <i class="fa fa-check">&nbsp;Save</i>

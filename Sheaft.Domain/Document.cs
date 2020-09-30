@@ -19,7 +19,7 @@ namespace Sheaft.Domain.Models
             Id = id;
             Name = name;
             Kind = kind;
-            Status = DocumentStatus.WaitingForReview;
+            Status = DocumentStatus.UnLocked;
             Legal = legal;
 
             _pages = new List<Page>();
