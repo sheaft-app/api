@@ -7,24 +7,22 @@ namespace Sheaft.Options
     public class RoutineOptions
     {
         public const string SETTING = "Routines";
-        public int CheckOrdersFromMinutes { get; set; }
-        public int CheckOrderExpiredFromMinutes { get; set; }
-        public int CheckPayinsFromMinutes { get; set; }
-        public int CheckPayinExpiredFromMinutes { get; set; }
-        public int CheckNewPayinRefundsFromMinutes { get; set; }
-        public int CheckPayinRefundsFromMinutes { get; set; }
-        public int CheckPayinRefundExpiredFromMinutes { get; set; }
-        public int CheckNewPayoutsFromMinutes { get; set; }
-        public int CheckPayoutsFromMinutes { get; set; }
-        public int CheckPayoutExpiredFromMinutes { get; set; }
-        public int CheckNewTransfersFromMinutes { get; set; }
-        public int CheckTransfersFromMinutes { get; set; }
-        public int CheckTransferExpiredFromMinutes { get; set; }
-        public int CheckNewTransferRefundsFromMinutes { get; set; }
-        public int CheckTransferRefundsFromMinutes { get; set; }
-        public int CheckTransferRefundExpiredFromMinutes { get; set; }
-        public int CheckDonationsFromMinutes { get; set; }
-        public int CheckDonationExpiredFromMinutes { get; set; }
+        public int CheckOrdersFromMinutes { get; set; } = 60;
+        public int CheckOrderExpiredFromMinutes { get; set; } = 1440;
+        public int CheckPayinsFromMinutes { get; set; } = 60;
+        public int CheckPayinExpiredFromMinutes { get; set; } = 1440;
+        public int CheckNewPayinRefundsFromMinutes { get; set; } = 10080;
+        public int CheckPayinRefundsFromMinutes { get; set; } = 60;
+        public int CheckPayinRefundExpiredFromMinutes { get; set; } = 1440;
+        public int CheckNewPayoutsFromMinutes { get; set; } = 10080;
+        public int CheckPayoutsFromMinutes { get; set; } = 60;
+        public int CheckPayoutExpiredFromMinutes { get; set; } = 1440;
+        public int CheckTransfersFromMinutes { get; set; } = 60;
+        public int CheckTransferExpiredFromMinutes { get; set; } = 1440;
+        public int CheckTransferRefundsFromMinutes { get; set; } = 60;
+        public int CheckTransferRefundExpiredFromMinutes { get; set; } = 1440;
+        public int CheckDonationsFromMinutes { get; set; } = 60;
+        public int CheckDonationExpiredFromMinutes { get; set; } = 1440;
         public string CheckOrdersCron { get; set; } = "*/10 * * * *";
         public string CheckPayinsCron { get; set; } = "*/10 * * * *";
         public string CheckPayinRefundsCron { get; set; } = "*/10 * * * *";
