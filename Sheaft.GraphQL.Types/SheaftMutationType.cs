@@ -172,13 +172,6 @@ namespace Sheaft.GraphQL.Types
                 .UseSingleOrDefault()
                 .UseSelection();
 
-            descriptor.Field(c => c.RateProductAsync(default, default))
-                .Name("rateProduct")
-                .Authorize(Policies.PRODUCER)
-                .Type<NonNullType<ProductDetailsType>>()
-                .UseSingleOrDefault()
-                .UseSelection();
-
             descriptor.Field(c => c.UpdateProductAsync(default, default))
                 .Name("updateProduct")
                 .Authorize(Policies.PRODUCER)
@@ -206,6 +199,13 @@ namespace Sheaft.GraphQL.Types
                 .Name("deleteProducts")
                 .Authorize(Policies.PRODUCER)
                 .Type<NonNullType<BooleanType>>();
+
+            descriptor.Field(c => c.RateProductAsync(default, default))
+                .Name("rateProduct")
+                .Authorize(Policies.REGISTERED)
+                .Type<NonNullType<ProductDetailsType>>()
+                .UseSingleOrDefault()
+                .UseSelection();
 
             //DELIVERY
             descriptor.Field(c => c.CreateDeliveryModeAsync(default, default))
