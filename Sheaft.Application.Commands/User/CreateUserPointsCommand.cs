@@ -7,8 +7,6 @@ namespace Sheaft.Application.Commands
 {
     public class CreateUserPointsCommand : Command<bool>
     {
-        public const string QUEUE_NAME = "command-create-user-points";
-
         [JsonConstructor]
         public CreateUserPointsCommand(RequestUser requestUser) : base(requestUser)
         {

@@ -8,8 +8,6 @@ using Sheaft.Domain.Models;
 using Sheaft.Options;
 using Sheaft.Application.Interop;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -31,31 +29,12 @@ namespace Sheaft.Infrastructure.Services
 
         public async Task ProcessEventAsync<T>(T item, CancellationToken token) where T : INotification
         {
-            var queueName = (string)item.GetType().GetField("QUEUE_NAME")?.GetRawConstantValue();
-            if (string.IsNullOrWhiteSpace(queueName))
-                throw new ArgumentException("Event must implement public const string QUEUE_NAME; to be queued.");
-
-            await InsertIntoQueueAsync(queueName, item, token);
+            await InsertIntoQueueAsync("events", item, token);
         }
 
         public async Task ProcessCommandAsync<T>(T item, CancellationToken token) where T : IBaseRequest
         {
-            var queueName = (string)item.GetType().GetField("QUEUE_NAME")?.GetRawConstantValue();
-            if (string.IsNullOrWhiteSpace(queueName))
-                throw new ArgumentException("Event must implement public const string QUEUE_NAME; to be queued.");
-
-            await InsertIntoQueueAsync(queueName, item, token);
-        }
-
-        public async Task InsertJobToProcessAsync(Job entity, CancellationToken token)
-        {
-            await InsertIntoQueueAsync(entity.Queue, entity.Command, token);
-        }
-
-        public async Task<IEnumerable<string>> GetExistingQueues(int take, int skip, CancellationToken token)
-        {
-            var managementClient = new ManagementClient(_serviceBusOptions.ConnectionString);
-            return (await managementClient.GetQueuesAsync(take, skip, token)).Select(q => q.Path).ToList();
+            await InsertIntoQueueAsync("commands", item, token);
         }
 
         private async Task InsertIntoQueueAsync<T>(string queueName, T item, CancellationToken token)

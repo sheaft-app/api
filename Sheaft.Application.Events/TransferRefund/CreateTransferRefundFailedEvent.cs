@@ -6,7 +6,6 @@ namespace Sheaft.Application.Events
 {
     public class CreateTransferRefundFailedEvent : Event
     {
-        public const string QUEUE_NAME = "event-create-transfer-refund-failed";
         public const string MAILING_TEMPLATE_ID = "";
 
         [JsonConstructor]

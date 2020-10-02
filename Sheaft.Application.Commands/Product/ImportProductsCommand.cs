@@ -6,8 +6,6 @@ namespace Sheaft.Application.Commands
 {
     public class ImportProductsCommand : Command<bool>
     {
-        public const string QUEUE_NAME = "command-products-import";
-
         [JsonConstructor]
         public ImportProductsCommand(RequestUser requestUser) : base(requestUser)
         {

@@ -6,7 +6,6 @@ namespace Sheaft.Application.Events
 {
     public class DeclarationIncompleteEvent : Event
     {
-        public const string QUEUE_NAME = "event-declaration-incomplete";
         public const string MAILING_TEMPLATE_ID = "";
 
         [JsonConstructor]

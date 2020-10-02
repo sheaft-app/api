@@ -6,8 +6,6 @@ namespace Sheaft.Application.Commands
 {
     public class UpdateRegionStatsCommand : Command<bool>
     {
-        public const string QUEUE_NAME = "command-zones-region-stats";
-
         [JsonConstructor]
         public UpdateRegionStatsCommand(RequestUser requestUser) : base(requestUser)
         {

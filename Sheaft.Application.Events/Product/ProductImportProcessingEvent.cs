@@ -6,8 +6,6 @@ namespace Sheaft.Application.Events
 {
     public class ProductImportProcessingEvent : Event
     {
-        public const string QUEUE_NAME = "event-product-import-processing";
-
         [JsonConstructor]
         public ProductImportProcessingEvent(RequestUser requestUser) : base(requestUser)
         {

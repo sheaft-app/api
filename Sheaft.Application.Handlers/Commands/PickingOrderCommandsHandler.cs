@@ -49,7 +49,7 @@ namespace Sheaft.Application.Handlers
                         return Failed<Guid>(result.Exception);
                 }
 
-                var entity = new Job(Guid.NewGuid(), JobKind.CreatePickingFromOrders, request.Name ?? $"Export bon préparation", producer, ExportPickingOrderCommand.QUEUE_NAME);
+                var entity = new Job(Guid.NewGuid(), JobKind.CreatePickingFromOrders, request.Name ?? $"Export bon préparation", producer);
 
                 await _context.AddAsync(entity, token);
                 await _context.SaveChangesAsync(token);

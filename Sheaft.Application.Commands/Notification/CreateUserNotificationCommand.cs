@@ -6,8 +6,6 @@ namespace Sheaft.Application.Commands
 {
     public class CreateUserNotificationCommand : Command<Guid>
     {
-        public const string QUEUE_NAME = "command-notify-user";
-
         [JsonConstructor]
         public CreateUserNotificationCommand(RequestUser requestUser) : base(requestUser)
         {

@@ -6,7 +6,6 @@ namespace Sheaft.Application.Events
 {
     public class TransferSucceededEvent : Event
     {
-        public const string QUEUE_NAME = "event-transfer-succeeded";
         public const string MAILING_TEMPLATE_ID = "";
 
         [JsonConstructor]

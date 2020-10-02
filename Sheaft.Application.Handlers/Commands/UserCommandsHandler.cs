@@ -153,7 +153,7 @@ namespace Sheaft.Application.Handlers
             {
                 var sender = await _context.GetByIdAsync<User>(request.RequestUser.Id, token);
 
-                var entity = new Job(Guid.NewGuid(), JobKind.ExportUserData, $"Export RGPD", sender, ExportUserDataCommand.QUEUE_NAME);
+                var entity = new Job(Guid.NewGuid(), JobKind.ExportUserData, $"Export RGPD", sender);
 
                 await _context.AddAsync(entity, token);
                 await _context.SaveChangesAsync(token);

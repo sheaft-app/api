@@ -215,7 +215,7 @@ namespace Sheaft.Application.Handlers
             return await ExecuteAsync(async () =>
             {
                 var producer = await _context.GetByIdAsync<Producer>(request.RequestUser.Id, token);
-                var entity = new Job(Guid.NewGuid(), JobKind.ImportProducts, $"Import produits", producer, ImportProductsCommand.QUEUE_NAME);
+                var entity = new Job(Guid.NewGuid(), JobKind.ImportProducts, $"Import produits", producer);
 
                 var response = await _blobService.UploadImportProductsFileAsync(producer.Id, entity.Id, request.FileName, request.FileStream, token);
                 if (!response.Success)

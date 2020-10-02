@@ -7,8 +7,6 @@ namespace Sheaft.Application.Commands
 {
     public class RefreshPayinRefundStatusCommand : Command<TransactionStatus>
     {
-        public const string QUEUE_NAME = "command-refresh-payin-refund-status";
-
         [JsonConstructor]
         public RefreshPayinRefundStatusCommand(RequestUser requestUser, string identifier)
             : base(requestUser)

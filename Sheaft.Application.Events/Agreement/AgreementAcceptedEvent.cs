@@ -6,7 +6,6 @@ namespace Sheaft.Application.Events
 {
     public class AgreementAcceptedEvent : Event
     {
-        public const string QUEUE_NAME = "event-agreement-accepted";
         public const string MAILING_TEMPLATE_ID = "";
 
         [JsonConstructor]

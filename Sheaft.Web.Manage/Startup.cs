@@ -21,7 +21,6 @@ using SendGrid;
 using Sheaft.Application.Commands;
 using Sheaft.Application.Events;
 using Sheaft.Application.Handlers;
-using Sheaft.Infrastructure;
 using Sheaft.Application.Interop;
 using Sheaft.Application.Mappers;
 using Sheaft.Options;

@@ -12,13 +12,10 @@ namespace Sheaft.Domain.Models
         {
         }
 
-        public Job(Guid id, JobKind kind, string name, User user, string queue)
+        public Job(Guid id, JobKind kind, string name, User user)
         {
             if (string.IsNullOrWhiteSpace(name))
                 throw new ValidationException(MessageKind.Job_Name_Required);
-
-            if (string.IsNullOrWhiteSpace(queue))
-                throw new ValidationException(MessageKind.Job_Queue_Required);
 
             if (user == null)
                 throw new ValidationException(MessageKind.Job_User_Required);
@@ -26,7 +23,6 @@ namespace Sheaft.Domain.Models
             Id = id;
             Name = name;
             User = user;
-            Queue = queue;
             Status = ProcessStatus.Waiting;
             Kind = kind;
         }

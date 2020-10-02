@@ -6,7 +6,6 @@ namespace Sheaft.Application.Events
 {
     public class PayoutSucceededEvent : Event
     {
-        public const string QUEUE_NAME = "event-payout-succeeded";
         public const string MAILING_TEMPLATE_ID = "";
 
         [JsonConstructor]

@@ -6,7 +6,6 @@ namespace Sheaft.Application.Events
 {
     public class DocumentOutdatedEvent : Event
     {
-        public const string QUEUE_NAME = "event-document-outdated";
         public const string MAILING_TEMPLATE_ID = "";
 
         [JsonConstructor]

@@ -7,8 +7,6 @@ namespace Sheaft.Application.Commands
 {
     public class CheckPayinRefundCommand : Command<bool>
     {
-        public const string QUEUE_NAME = "command-check-payin-refund";
-
         [JsonConstructor]
         public CheckPayinRefundCommand(RequestUser requestUser)
             : base(requestUser)

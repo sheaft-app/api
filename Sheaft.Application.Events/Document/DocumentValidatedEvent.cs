@@ -6,7 +6,6 @@ namespace Sheaft.Application.Events
 {
     public class DocumentValidatedEvent : Event
     {
-        public const string QUEUE_NAME = "event-document-validated";
         public const string MAILING_TEMPLATE_ID = "";
 
         [JsonConstructor]

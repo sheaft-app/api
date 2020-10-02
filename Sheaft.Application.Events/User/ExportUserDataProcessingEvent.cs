@@ -6,7 +6,6 @@ namespace Sheaft.Application.Events
 {
     public class ExportUserDataProcessingEvent : Event
     {
-        public const string QUEUE_NAME = "event-user-export-data-processing";
         public const string MAILING_TEMPLATE_ID = "";
 
         [JsonConstructor]

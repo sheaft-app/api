@@ -1,8 +1,6 @@
-﻿using System;
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using System.Threading;
 using System.Threading.Tasks;
-using Hangfire;
 using MediatR;
 using Sheaft.Core;
 
@@ -20,7 +18,11 @@ namespace Sheaft.Application.Interop
         [DisplayName("{0}")]
         public async Task<Result<T>> Execute<T>(string jobname, IRequest<Result<T>> data, CancellationToken token)
         {
-            return await _mediatr.Send(data, token);
+            var result = await _mediatr.Send(data, token);
+            if (!result.Success)
+                throw result.Exception;
+
+            return result;
         }
 
         [DisplayName("{0}")]
