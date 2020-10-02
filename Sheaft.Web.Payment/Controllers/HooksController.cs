@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Threading;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -14,21 +12,21 @@ namespace Sheaft.Payment.Controllers
     public class HooksController : Controller
     {
         private readonly IHttpContextAccessor _httpContextAccessor;
-        private readonly IQueueService _queueService;
         private readonly ILogger<HooksController> _logger;
+        private readonly ISheaftMediatr _sheaftMediatr;
 
         public HooksController(
-            IQueueService queueService,
+            ISheaftMediatr sheaftMediatr,
             IHttpContextAccessor httpContextAccessor,
             ILogger<HooksController> logger)
         {
             _httpContextAccessor = httpContextAccessor;
-            _queueService = queueService;
+            _sheaftMediatr = sheaftMediatr;
             _logger = logger;
         }
 
         [HttpGet, HttpPost]
-        public async Task<IActionResult> Notify(PspEventKind EventType, long date, CancellationToken token, string resourceId = null, string ressourceId = null)
+        public IActionResult Notify(PspEventKind EventType, long date, string resourceId = null, string ressourceId = null)
         {
             var requestUser = new RequestUser("hook", _httpContextAccessor.HttpContext.TraceIdentifier);
             var identifier = ressourceId ?? resourceId;
@@ -39,37 +37,37 @@ namespace Sheaft.Payment.Controllers
                 case PspEventKind.KYC_FAILED:
                 case PspEventKind.KYC_OUTDATED:
                 case PspEventKind.KYC_VALIDATION_ASKED:
-                    await _queueService.ProcessCommandAsync(new RefreshDocumentStatusCommand(requestUser, identifier), token);
+                    _sheaftMediatr.Post(new RefreshDocumentStatusCommand(requestUser, identifier));
                     break;
                 case PspEventKind.UBO_DECLARATION_REFUSED:
                 case PspEventKind.UBO_DECLARATION_VALIDATED:
                 case PspEventKind.UBO_DECLARATION_INCOMPLETE:
                 case PspEventKind.UBO_DECLARATION_VALIDATION_ASKED:
-                    await _queueService.ProcessCommandAsync(new RefreshDeclarationStatusCommand(requestUser, identifier), token);
+                    _sheaftMediatr.Post(new RefreshDeclarationStatusCommand(requestUser, identifier));
                     break;
                 case PspEventKind.PAYIN_NORMAL_SUCCEEDED:
                 case PspEventKind.PAYIN_NORMAL_FAILED:
-                    await _queueService.ProcessCommandAsync(new RefreshPayinStatusCommand(requestUser, identifier), token);
+                    _sheaftMediatr.Post(new RefreshPayinStatusCommand(requestUser, identifier));
                     break;
                 case PspEventKind.TRANSFER_NORMAL_SUCCEEDED:
                 case PspEventKind.TRANSFER_NORMAL_FAILED:
-                    await _queueService.ProcessCommandAsync(new RefreshTransferStatusCommand(requestUser, identifier), token);
+                    _sheaftMediatr.Post(new RefreshTransferStatusCommand(requestUser, identifier));
                     break;
                 case PspEventKind.PAYOUT_NORMAL_SUCCEEDED:
                 case PspEventKind.PAYOUT_NORMAL_FAILED:
-                    await _queueService.ProcessCommandAsync(new RefreshPayoutStatusCommand(requestUser, identifier), token);
+                    _sheaftMediatr.Post(new RefreshPayoutStatusCommand(requestUser, identifier));
                     break;
                 case PspEventKind.PAYIN_REFUND_SUCCEEDED:
                 case PspEventKind.PAYIN_REFUND_FAILED:
-                    await _queueService.ProcessCommandAsync(new RefreshPayinRefundStatusCommand(requestUser, identifier), token);
+                    _sheaftMediatr.Post(new RefreshPayinRefundStatusCommand(requestUser, identifier));
                     break;
                 case PspEventKind.TRANSFER_REFUND_SUCCEEDED:
                 case PspEventKind.TRANSFER_REFUND_FAILED:
-                    await _queueService.ProcessCommandAsync(new RefreshTransferRefundStatusCommand(requestUser, identifier), token);
+                    _sheaftMediatr.Post(new RefreshTransferRefundStatusCommand(requestUser, identifier));
                     break;
                 case PspEventKind.PAYOUT_REFUND_SUCCEEDED:
                 case PspEventKind.PAYOUT_REFUND_FAILED:
-                    await _queueService.ProcessCommandAsync(new RefreshPayoutRefundStatusCommand(requestUser, identifier), token);
+                    _sheaftMediatr.Post(new RefreshPayoutRefundStatusCommand(requestUser, identifier));
                     break;
                 default:
                     _logger.LogInformation($"{EventType:G)} is not a supported Psp EventType for resource: {identifier} executed on: {GetExecutedOn(date)}.");
