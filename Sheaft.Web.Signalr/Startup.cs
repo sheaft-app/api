@@ -136,21 +136,6 @@ namespace Sheaft.Signalr
                 }
             });
 
-            services.AddLogging(config =>
-            {
-                config.ClearProviders();
-
-                config.AddConfiguration(Configuration.GetSection("Logging"));
-                config.AddDebug();
-                config.AddEventSourceLogger();
-                config.AddApplicationInsights();
-
-                if (Env.IsDevelopment())
-                {
-                    config.AddConsole();
-                }
-            });
-
             var jobsDatabaseConfig = jobsDatabaseSettings.Get<JobsDatabaseOptions>();
             services.AddHangfire(configuration =>
             {

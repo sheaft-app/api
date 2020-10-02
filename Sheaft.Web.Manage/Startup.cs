@@ -29,6 +29,8 @@ using Sheaft.Infrastructure.Persistence;
 using Sheaft.Infrastructure.Services;
 using Sheaft.Application.Queries;
 using Microsoft.Azure.Search;
+using Hangfire;
+using Sheaft.Web.Manage;
 
 namespace Sheaft.Manage
 {
@@ -53,6 +55,7 @@ namespace Sheaft.Manage
 
             var authSettings = Configuration.GetSection(AuthOptions.SETTING);
             var databaseSettings = Configuration.GetSection(AppDatabaseOptions.SETTING);
+            var jobsDatabaseSettings = Configuration.GetSection(JobsDatabaseOptions.SETTING);
             var sendgridSettings = Configuration.GetSection(SendgridOptions.SETTING);
             var roleSettings = Configuration.GetSection(RoleOptions.SETTING);
             var pspSettings = Configuration.GetSection(PspOptions.SETTING);
@@ -61,6 +64,7 @@ namespace Sheaft.Manage
             services.Configure<RoleOptions>(roleSettings);
             services.Configure<AuthOptions>(authSettings);
             services.Configure<AppDatabaseOptions>(databaseSettings);
+            services.Configure<JobsDatabaseOptions>(jobsDatabaseSettings);
             services.Configure<SendgridOptions>(sendgridSettings);
             services.Configure<PspOptions>(pspSettings);
 
@@ -140,6 +144,16 @@ namespace Sheaft.Manage
                 });
 
             services.AddMediatR(new List<Assembly>() { typeof(RegisterStoreCommand).Assembly, typeof(UserPointsCreatedEvent).Assembly, typeof(UserCommandsHandler).Assembly }.ToArray());
+            
+            services.AddScoped<IBackgroundJobClient, BackgroundJobClient>();
+            services.AddScoped<ISheaftHangfireBridge, SheaftHangfireBridge>();
+
+            var jobsDatabaseConfig = jobsDatabaseSettings.Get<JobsDatabaseOptions>();
+            services.AddHangfire(configuration =>
+            {
+                configuration.UseSqlServerStorage(jobsDatabaseConfig.ConnectionString);
+                configuration.UseMediatR();
+            });
 
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             services.AddHttpClient();
