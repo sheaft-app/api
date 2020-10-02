@@ -11,6 +11,7 @@
         public AuthActions Actions { get; set; }
         public AuthClient App { get; set; }
         public AuthClient Manage { get; set; }
+        public AuthClient Jobs { get; set; }
     }
 
     public class AuthClient

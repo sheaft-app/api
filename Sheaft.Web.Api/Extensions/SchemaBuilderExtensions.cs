@@ -2,7 +2,7 @@
 using Sheaft.GraphQL.Enums;
 using Sheaft.GraphQL.Types;
 
-namespace Sheaft.Api
+namespace Sheaft.Web.Api
 {
     public static class SchemaBuilderExtensions
     {

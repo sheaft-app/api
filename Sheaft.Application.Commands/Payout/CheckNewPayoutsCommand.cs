@@ -4,10 +4,10 @@ using System;
 
 namespace Sheaft.Application.Commands
 {
-    public class CheckForNewPayoutsCommand : Command<bool>
+    public class CheckNewPayoutsCommand : Command<bool>
     {
         [JsonConstructor]
-        public CheckForNewPayoutsCommand(RequestUser requestUser) : base(requestUser)
+        public CheckNewPayoutsCommand(RequestUser requestUser) : base(requestUser)
         {
         }
     }

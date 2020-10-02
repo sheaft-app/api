@@ -249,13 +249,13 @@ namespace Sheaft.Application.Handlers
                 switch (document.Status)
                 {
                     case DocumentStatus.Refused:
-                        await _mediatr.Post(new DocumentRefusedEvent(request.RequestUser) { DocumentId = document.Id }, token);
+                        _mediatr.Post(new DocumentRefusedEvent(request.RequestUser) { DocumentId = document.Id });
                         break;
                     case DocumentStatus.OutOfDate:
-                        await _mediatr.Post(new DocumentOutdatedEvent(request.RequestUser) { DocumentId = document.Id }, token);
+                        _mediatr.Post(new DocumentOutdatedEvent(request.RequestUser) { DocumentId = document.Id });
                         break;
                     case DocumentStatus.Validated:
-                        await _mediatr.Post(new DocumentValidatedEvent(request.RequestUser) { DocumentId = document.Id }, token);
+                        _mediatr.Post(new DocumentValidatedEvent(request.RequestUser) { DocumentId = document.Id });
                         break;
                 }
 

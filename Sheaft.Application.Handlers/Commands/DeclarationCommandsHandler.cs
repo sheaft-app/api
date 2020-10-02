@@ -128,13 +128,13 @@ namespace Sheaft.Application.Handlers
                 switch (legal.Declaration.Status)
                 {
                     case DeclarationStatus.Incomplete:
-                        await _mediatr.Post(new DeclarationIncompleteEvent(request.RequestUser) { DeclarationId = legal.Declaration.Id }, token);
+                        _mediatr.Post(new DeclarationIncompleteEvent(request.RequestUser) { DeclarationId = legal.Declaration.Id });
                         break;
                     case DeclarationStatus.Refused:
-                        await _mediatr.Post(new DeclarationRefusedEvent(request.RequestUser) { DeclarationId = legal.Declaration.Id }, token);
+                        _mediatr.Post(new DeclarationRefusedEvent(request.RequestUser) { DeclarationId = legal.Declaration.Id });
                         break;
                     case DeclarationStatus.Validated:
-                        await _mediatr.Post(new DeclarationValidatedEvent(request.RequestUser) { DeclarationId = legal.Declaration.Id }, token);
+                        _mediatr.Post(new DeclarationValidatedEvent(request.RequestUser) { DeclarationId = legal.Declaration.Id });
                         break;
                 }
 

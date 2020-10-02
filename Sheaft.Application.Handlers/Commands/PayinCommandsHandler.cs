@@ -89,10 +89,10 @@ namespace Sheaft.Application.Handlers
                 {
                     foreach (var payinId in payinIds)
                     {
-                        await _mediatr.Post(new CheckPayinCommand(request.RequestUser)
+                        _mediatr.Post(new CheckPayinCommand(request.RequestUser)
                         {
                             PayinId = payinId
-                        }, token);
+                        });
                     }
 
                     skip += take;
@@ -158,12 +158,12 @@ namespace Sheaft.Application.Handlers
                 switch (payin.Status)
                 {
                     case TransactionStatus.Failed:
-                        await _mediatr.Post(new FailOrderCommand(request.RequestUser) { OrderId = payin.Order.Id }, token);
-                        await _mediatr.Post(new PayinFailedEvent(request.RequestUser) { PayinId = payin.Id }, token);
+                        _mediatr.Post(new FailOrderCommand(request.RequestUser) { OrderId = payin.Order.Id });
+                        _mediatr.Post(new PayinFailedEvent(request.RequestUser) { PayinId = payin.Id });
                         break;
                     case TransactionStatus.Succeeded:
-                        await _mediatr.Post(new ConfirmOrderCommand(request.RequestUser) { OrderId = payin.Order.Id }, token);
-                        await _mediatr.Post(new PayinSucceededEvent(request.RequestUser) { PayinId = payin.Id }, token);
+                        _mediatr.Post(new ConfirmOrderCommand(request.RequestUser) { OrderId = payin.Order.Id });
+                        _mediatr.Post(new PayinSucceededEvent(request.RequestUser) { PayinId = payin.Id });
                         break;
                 }
 

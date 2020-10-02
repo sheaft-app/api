@@ -3,10 +3,10 @@ using Sheaft.Core;
 
 namespace Sheaft.Application.Commands
 {
-    public class UpdateZoneProgressCommand : Command<bool>
+    public class UpdateZonesProgressCommand : Command<bool>
     {
         [JsonConstructor]
-        public UpdateZoneProgressCommand(RequestUser requestUser) : base(requestUser)
+        public UpdateZonesProgressCommand(RequestUser requestUser) : base(requestUser)
         {
         }
     }

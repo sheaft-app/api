@@ -54,10 +54,10 @@ namespace Sheaft.Application.Handlers
                 {
                     foreach (var payinRefundId in payinRefundIds)
                     {
-                        await _mediatr.Post(new CheckPayinRefundCommand(request.RequestUser)
+                        _mediatr.Post(new CheckPayinRefundCommand(request.RequestUser)
                         {
                             PayinRefundId = payinRefundId
-                        }, token);
+                        });
                     }
 
                     skip += take;
@@ -123,10 +123,10 @@ namespace Sheaft.Application.Handlers
                 switch (payinRefund.Status)
                 {
                     case TransactionStatus.Failed:
-                        await _mediatr.Post(new PayinRefundFailedEvent(request.RequestUser) { RefundId = payinRefund.Id }, token);
+                        _mediatr.Post(new PayinRefundFailedEvent(request.RequestUser) { RefundId = payinRefund.Id });
                         break;
                     case TransactionStatus.Succeeded:
-                        await _mediatr.Post(new PayinRefundSucceededEvent(request.RequestUser) { RefundId = payinRefund.Id }, token);
+                        _mediatr.Post(new PayinRefundSucceededEvent(request.RequestUser) { RefundId = payinRefund.Id });
                         break;
                 }
 
@@ -148,10 +148,10 @@ namespace Sheaft.Application.Handlers
                 {
                     foreach (var orderId in orderIds)
                     {
-                        await _mediatr.Post(new CreatePayinRefundCommand(request.RequestUser)
+                        _mediatr.Post(new CreatePayinRefundCommand(request.RequestUser)
                         {
                             OrderId = orderId
-                        }, token);
+                        });
                     }
 
                     skip += take;
@@ -182,10 +182,10 @@ namespace Sheaft.Application.Handlers
                     _context.Update(order.Payin);
                     await _context.SaveChangesAsync(token);
 
-                    await _mediatr.Post(new CreatePayinRefundFailedEvent(request.RequestUser)
+                    _mediatr.Post(new CreatePayinRefundFailedEvent(request.RequestUser)
                     {
                         OrderId = order.Id
-                    }, token);
+                    });
 
                     return TooManyRetries<Guid>();
                 }

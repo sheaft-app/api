@@ -37,8 +37,8 @@ namespace Sheaft.Functions
             var sendgridSettings = Configuration.GetSection(SendgridOptions.SETTING);
             services.Configure<SendgridOptions>(sendgridSettings);
 
-            var databaseSettings = Configuration.GetSection(DatabaseOptions.SETTING);
-            services.Configure<DatabaseOptions>(databaseSettings);
+            var databaseSettings = Configuration.GetSection(AppDatabaseOptions.SETTING);
+            services.Configure<AppDatabaseOptions>(databaseSettings);
 
             var storageSettings = Configuration.GetSection(StorageOptions.SETTING);
             services.Configure<StorageOptions>(storageSettings);
@@ -53,7 +53,7 @@ namespace Sheaft.Functions
             services.Configure<CorsOptions>(Configuration.GetSection(CorsOptions.SETTING));
             services.Configure<SearchOptions>(Configuration.GetSection(SearchOptions.SETTING));
             services.Configure<ApiOptions>(Configuration.GetSection(ApiOptions.SETTING));
-            services.Configure<DatabaseOptions>(Configuration.GetSection(DatabaseOptions.SETTING));
+            services.Configure<AppDatabaseOptions>(Configuration.GetSection(AppDatabaseOptions.SETTING));
             services.Configure<FreshdeskOptions>(Configuration.GetSection(FreshdeskOptions.SETTING));
             services.Configure<LandingOptions>(Configuration.GetSection(LandingOptions.SETTING));
             services.Configure<PortalOptions>(Configuration.GetSection(PortalOptions.SETTING));
@@ -94,7 +94,7 @@ namespace Sheaft.Functions
 
             services.AddOptions();
 
-            var databaseConfig = databaseSettings.Get<DatabaseOptions>();
+            var databaseConfig = databaseSettings.Get<AppDatabaseOptions>();
             services.AddDbContext<IAppDbContext, AppDbContext>(options =>
             {
                 options.UseLazyLoadingProxies();

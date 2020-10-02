@@ -1,11 +1,16 @@
-﻿using Microsoft.AspNetCore.Hosting;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 
-namespace Sheaft.Web.Api
+namespace Sheaft.Web.Jobs
 {
     public class Program
     {
-        public int MyProperty { get; set; }
         public static void Main(string[] args)
         {
             CreateHostBuilder(args).Build().Run();

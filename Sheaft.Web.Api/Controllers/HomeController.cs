@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 
-namespace Sheaft.Api.Controllers
+namespace Sheaft.Web.Api.Controllers
 {
     [ApiController]
     [Route("")]

@@ -1,5 +1,7 @@
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Sheaft.Core
 {
@@ -22,20 +24,21 @@ namespace Sheaft.Core
         {
         }
 
-        public RequestUser(Guid? id, string name, string email, IEnumerable<string> roles, string requestId = null, Impersonification impersonification = null)
+        [JsonConstructor]
+        public RequestUser(Guid? id, string name, string email, List<string> roles, string requestId = null, Impersonification impersonifiedBy = null)
         {
             Id = id ?? Guid.Empty;
             Name = name ?? string.Empty;
             Email = email ?? string.Empty;
-            Roles = roles ?? new List<string>();
+            Roles = roles?.ToList() ?? new List<string>();
             RequestId = requestId ?? Guid.NewGuid().ToString("N");
-            ImpersonifiedBy = impersonification;
+            ImpersonifiedBy = impersonifiedBy;
         }
 
         public Guid Id { get; }
         public string Name { get; }
         public string Email { get; }
-        public IEnumerable<string> Roles { get; }
+        public List<string> Roles { get; }
         public Impersonification ImpersonifiedBy { get; }
         public string RequestId { get; }
 

@@ -15,7 +15,7 @@ using Sheaft.Domain.Views;
 namespace Sheaft.Application.Handlers
 {
     public class ZoneCommandsHandler : ResultsHandler,
-        IRequestHandler<UpdateZoneProgressCommand, Result<bool>>,
+        IRequestHandler<UpdateZonesProgressCommand, Result<bool>>,
         IRequestHandler<GenerateZonesFileCommand, Result<bool>>
     {
         private readonly IBlobService _blobService;
@@ -30,7 +30,7 @@ namespace Sheaft.Application.Handlers
             _blobService = blobService;
         }
 
-        public async Task<Result<bool>> Handle(UpdateZoneProgressCommand request, CancellationToken token)
+        public async Task<Result<bool>> Handle(UpdateZonesProgressCommand request, CancellationToken token)
         {
             return await ExecuteAsync(async () =>
             {
@@ -57,26 +57,26 @@ namespace Sheaft.Application.Handlers
 
                         DepartmentPoints pointsPerDepartment = null;// pointsPerDepartments.FirstOrDefault(pp => pp.DepartmentId == departmentId);
 
-                        await _mediatr.Post(new UpdateDepartmentStatsCommand(request.RequestUser) 
+                        _mediatr.Post(new UpdateDepartmentStatsCommand(request.RequestUser) 
                             {
                                 Id = departmentId,
                                 Points = pointsPerDepartment?.Points ?? 0,
                                 Position = pointsPerDepartment != null ? (int)pointsPerDepartment.Position : 0,
                                 Producers = producerPerDepartment.Created ?? 0,
                                 Stores = storePerDepartment.Created ?? 0
-                        }, token);
+                        });
                     }
 
                     RegionPoints pointsPerRegion = null;//pointsPerRegions.FirstOrDefault(pp => pp.RegionId == region.Id);
 
-                    await _mediatr.Post(new UpdateRegionStatsCommand(request.RequestUser)
+                    _mediatr.Post(new UpdateRegionStatsCommand(request.RequestUser)
                     {
                         Id = region.Id,
                         Points = pointsPerRegion?.Points ?? 0,
                         Position = pointsPerRegion != null ? (int)pointsPerRegion.Position : 0,
                         Producers = producersCount,
                         Stores = storesCount
-                    }, token);
+                    });
                 }
 
                 return Ok(true);

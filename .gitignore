@@ -10,3 +10,4 @@ Sheaft.Web.Signalr/appsettings.Development.json
 Sheaft.Web.Functions/appsettings.Development.json
 Sheaft.Web.Manage/appsettings.Development.json
 Sheaft.Web.Payment/appsettings.Development.json
+Sheaft.Web.Jobs/appsettings.Development.json

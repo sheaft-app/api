@@ -1,6 +1,6 @@
 ﻿using MediatR;
 using Sheaft.Core;
-using Sheaft.Domain.Models;
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -8,14 +8,11 @@ namespace Sheaft.Application.Interop
 {
     public interface ISheaftMediatr
     {
-        Task Post<T>(IRequest<Result<T>> data, CancellationToken token);
-        Task Post(INotification data, CancellationToken token);
-        Task Post(Job job, CancellationToken token);
+        void Post<T>(IRequest<Result<T>> data, string jobname = null);
+        void Post(INotification data, string jobname = null);
+        void Schedule<T>(IRequest<Result<T>> data, TimeSpan delay, string jobname = null);
+        void Schedule(INotification data, TimeSpan delay, string jobname = null);
         Task<Result<T>> Process<T>(IRequest<Result<T>> data, CancellationToken token);
-        Task<Result<U>> Process<T, U>(string data, CancellationToken token)
-            where T : IRequest<Result<U>>;
-        Task Process<T>(string data, CancellationToken token)
-            where T : INotification;
         Task Process(INotification data, CancellationToken token);
     }
 }

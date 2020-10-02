@@ -1,5 +1,6 @@
 ﻿using AspNetCoreRateLimit;
 using AutoMapper;
+using Hangfire;
 using HotChocolate;
 using HotChocolate.AspNetCore;
 using HotChocolate.Execution.Configuration;
@@ -22,7 +23,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using SendGrid;
-using Sheaft.Api.Authorize;
 using Sheaft.Application.Commands;
 using Sheaft.Application.Events;
 using Sheaft.Application.Handlers;
@@ -36,6 +36,7 @@ using Sheaft.Infrastructure;
 using Sheaft.Infrastructure.Persistence;
 using Sheaft.Infrastructure.Services;
 using Sheaft.Options;
+using Sheaft.Web.Api.Authorize;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -43,7 +44,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Reflection;
 
-namespace Sheaft.Api
+namespace Sheaft.Web.Api
 {
     public class Startup
     {
@@ -66,7 +67,8 @@ namespace Sheaft.Api
             var corsSettings = Configuration.GetSection(CorsOptions.SETTING);
             var sendgridSettings = Configuration.GetSection(SendgridOptions.SETTING);
             var searchSettings = Configuration.GetSection(SearchOptions.SETTING);
-            var databaseSettings = Configuration.GetSection(DatabaseOptions.SETTING);
+            var appDatabaseSettings = Configuration.GetSection(AppDatabaseOptions.SETTING);
+            var jobsDatabaseSettings = Configuration.GetSection(JobsDatabaseOptions.SETTING);
             var roleSettings = Configuration.GetSection(RoleOptions.SETTING);
             var cacheSettings = Configuration.GetSection(CacheOptions.SETTING);
             var pspSettings = Configuration.GetSection(PspOptions.SETTING);
@@ -75,7 +77,8 @@ namespace Sheaft.Api
             services.Configure<CorsOptions>(corsSettings);
             services.Configure<SendgridOptions>(sendgridSettings);
             services.Configure<SearchOptions>(searchSettings);
-            services.Configure<DatabaseOptions>(databaseSettings);
+            services.Configure<AppDatabaseOptions>(appDatabaseSettings);
+            services.Configure<JobsDatabaseOptions>(jobsDatabaseSettings);
             services.Configure<RoleOptions>(roleSettings);
             services.Configure<CacheOptions>(cacheSettings);
             services.Configure<PspOptions>(pspSettings);
@@ -188,7 +191,7 @@ namespace Sheaft.Api
             services.AddMediatR(new List<Assembly>() { typeof(RegisterStoreCommand).Assembly, typeof(UserPointsCreatedEvent).Assembly, typeof(UserCommandsHandler).Assembly }.ToArray());
             services.AddHttpClient();
 
-            var databaseConfig = databaseSettings.Get<DatabaseOptions>();
+            var databaseConfig = appDatabaseSettings.Get<AppDatabaseOptions>();
             services.AddDbContext<AppDbContext>(options =>
             {
                 options.UseLazyLoadingProxies();
@@ -238,6 +241,8 @@ namespace Sheaft.Api
             services.AddScoped<ISendGridClient, SendGridClient>(_ => new SendGridClient(sendgridConfig.ApiKey));
 
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+            services.AddScoped<IBackgroundJobClient, BackgroundJobClient>();
+            services.AddScoped<ISheaftHangfireBridge, SheaftHangfireBridge>();
 
             services.AddGraphQL(sp => SchemaBuilder.New()
                 .AddServices(sp)
@@ -299,6 +304,13 @@ namespace Sheaft.Api
                 {
                     config.AddConsole();
                 }
+            });
+
+            var jobsDatabaseConfig = jobsDatabaseSettings.Get<JobsDatabaseOptions>();
+            services.AddHangfire(configuration =>
+            {
+                configuration.UseSqlServerStorage(jobsDatabaseConfig.ConnectionString);
+                configuration.UseMediatR();
             });
 
             services.AddMvc(option => option.EnableEndpointRouting = false)

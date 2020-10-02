@@ -1,20 +1,16 @@
-﻿using MediatR;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Microsoft.Net.Http.Headers;
 using Sheaft.Application.Commands;
 using Sheaft.Core;
-using Sheaft.Domain.Enums;
-using Sheaft.Exceptions;
 using Sheaft.Application.Models;
 using Sheaft.Options;
 using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
+using Sheaft.Application.Interop;
 
-namespace Sheaft.Api.Controllers
+namespace Sheaft.Web.Api.Controllers
 {
     [AllowAnonymous]
     [ApiController]
@@ -22,9 +18,9 @@ namespace Sheaft.Api.Controllers
     public class ContactController : ControllerBase
     {
         private readonly LandingOptions _landingOptions;
-        private readonly IMediator _mediatr;
+        private readonly ISheaftMediatr _mediatr;
 
-        public ContactController(IOptionsSnapshot<LandingOptions> landingOptions, IMediator mediator)
+        public ContactController(IOptionsSnapshot<LandingOptions> landingOptions, ISheaftMediatr mediator)
         {
             _landingOptions = landingOptions.Value;
             _mediatr = mediator;
@@ -32,18 +28,10 @@ namespace Sheaft.Api.Controllers
 
         [HttpPost("newsletter")]
         [Consumes("application/x-www-form-urlencoded")]
-        public async Task<IActionResult> RegisterNewsletter([FromForm] RegisterNewsletterInput model, CancellationToken token)
+        public IActionResult RegisterNewsletter([FromForm] RegisterNewsletterInput model)
         {
             var origin = Request.Headers.FirstOrDefault(c => c.Key == HeaderNames.Origin).Value;
-            var results = await _mediatr.Send(new CreateContactCommand(new RequestUser("contact-user", HttpContext.TraceIdentifier)) { FirstName = model.FirstName, Role = model.Role, Email = model.Email }, token);
-            if (!results.Success)
-            {
-                if (results.Exception.Kind != ExceptionKind.Unexpected)
-                    return new RedirectResult(origin + "?error=" + results.Message);
-
-                return new RedirectResult(origin + "?error=Une%20erreur%20inattendue%20est%20survenue.");
-            }
-
+            _mediatr.Post(new CreateContactCommand(new RequestUser("contact-user", HttpContext.TraceIdentifier)) { FirstName = model.FirstName, Role = model.Role, Email = model.Email });            
             var url = origin + _landingOptions.NewsletterUrl;
             return new RedirectResult(url);
         }

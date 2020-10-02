@@ -56,13 +56,13 @@ namespace Sheaft.Core.Extensions
             return id;
         }
 
-        public static IEnumerable<string> GetRoles(this ClaimsPrincipal user)
+        public static List<string> GetRoles(this ClaimsPrincipal user)
         {
             if (!user.Identity.IsAuthenticated)
                 return new List<string>();
 
             var userClaims = user.FindAll(JwtClaimTypes.Role);
-            return userClaims.Select(uc => uc.Value);
+            return userClaims.Select(uc => uc.Value)?.ToList();
         }
 
         public static RequestUser ToIdentityUser(this ClaimsPrincipal user, string requestId, Impersonification impersonification = null)

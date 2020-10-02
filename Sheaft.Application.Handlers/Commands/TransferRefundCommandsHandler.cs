@@ -54,10 +54,10 @@ namespace Sheaft.Application.Handlers
                 {
                     foreach (var purchaseOrderId in purchaseOrderIds)
                     {
-                        await _mediatr.Post(new CreateTransferRefundCommand(request.RequestUser)
+                        _mediatr.Post(new CreateTransferRefundCommand(request.RequestUser)
                         {
                             PurchaseOrderId = purchaseOrderId
-                        }, token);
+                        });
                     }
 
                     skip += take;
@@ -88,10 +88,10 @@ namespace Sheaft.Application.Handlers
                     _context.Update(purchaseOrder.Transfer);
                     await _context.SaveChangesAsync(token);
 
-                    await _mediatr.Post(new CreateTransferRefundFailedEvent(request.RequestUser)
+                    _mediatr.Post(new CreateTransferRefundFailedEvent(request.RequestUser)
                     {
                         PurchaseOrderId = purchaseOrder.Id
-                    }, token);
+                    });
 
                     return TooManyRetries<Guid>();
                 }
@@ -139,10 +139,10 @@ namespace Sheaft.Application.Handlers
                 {
                     foreach (var transferRefundId in transferRefundIds)
                     {
-                        await _mediatr.Post(new CheckTransferRefundCommand(request.RequestUser)
+                        _mediatr.Post(new CheckTransferRefundCommand(request.RequestUser)
                         {
                             TransferRefundId = transferRefundId
-                        }, token);
+                        });
                     }
 
                     skip += take;
@@ -208,10 +208,10 @@ namespace Sheaft.Application.Handlers
                 switch (transferRefund.Status)
                 {
                     case TransactionStatus.Failed:
-                        await _mediatr.Post(new TransferRefundFailedEvent(request.RequestUser) { RefundId = transferRefund.Id }, token);
+                        _mediatr.Post(new TransferRefundFailedEvent(request.RequestUser) { RefundId = transferRefund.Id });
                         break;
                     case TransactionStatus.Succeeded:
-                        await _mediatr.Post(new TransferRefundSucceededEvent(request.RequestUser) { RefundId = transferRefund.Id }, token);
+                        _mediatr.Post(new TransferRefundSucceededEvent(request.RequestUser) { RefundId = transferRefund.Id });
                         break;
                 }
 

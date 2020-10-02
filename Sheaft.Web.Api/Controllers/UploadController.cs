@@ -13,7 +13,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Sheaft.Api.Controllers
+namespace Sheaft.Web.Api.Controllers
 {
     [Authorize]
     [ApiController]
@@ -55,52 +55,6 @@ namespace Sheaft.Api.Controllers
             }
 
             return Ok(ids);
-        }
-
-        [HttpPost("kyc")]
-        [Authorize(Policy = Policies.STORE_OR_PRODUCER)]
-        public async Task<IActionResult> UploadKycDocuments(Guid documentId, CancellationToken token)
-        {
-            var files = Request.Form.Files;
-            if (!files.Any())
-                return BadRequest();
-
-            var requestUser = HttpContext.User.ToIdentityUser(HttpContext.TraceIdentifier);
-
-            //TODO handle zip files !
-            var commands = new List<UploadPageCommand>();
-            foreach (var formFile in files)
-            {
-                if (formFile.Length == 0)
-                    continue;
-
-                byte[] data = null;
-                using (var stream = new MemoryStream())
-                {
-                    await formFile.CopyToAsync(stream, token);
-                    stream.Position = 0;
-
-                    data = stream.ToArray();
-                }
-
-                commands.Add(new UploadPageCommand(requestUser)
-                {
-                    DocumentId = documentId,
-                    Data = data,
-                    Extension = Path.GetExtension(formFile.FileName),
-                    FileName = Path.GetFileNameWithoutExtension(formFile.FileName),
-                    Size = formFile.Length
-                });
-            }
-
-            foreach (var command in commands)
-            {
-                var result = await _mediatr.Process(command, token);
-                if (!result.Success)
-                    return BadRequest(result.Exception);
-            }
-
-            return Ok();
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using Sheaft.Core.Extensions;
+using System;
 
 namespace Sheaft.Options
 {
@@ -24,5 +25,17 @@ namespace Sheaft.Options
         public int CheckTransferRefundExpiredFromMinutes { get; set; }
         public int CheckDonationsFromMinutes { get; set; }
         public int CheckDonationExpiredFromMinutes { get; set; }
+        public string CheckOrdersCron { get; set; } = "*/10 * * * *";
+        public string CheckPayinsCron { get; set; } = "*/10 * * * *";
+        public string CheckPayinRefundsCron { get; set; } = "*/10 * * * *";
+        public string CheckNewPayinRefundsCron { get; set; } = "*/10 * * * *";
+        public string CheckPayoutsCron { get; set; } = "*/10 * * * *";
+        public string CheckNewPayoutsCron { get; set; } = "*/10 * * * *";
+        public string CheckTransfersCron { get; set; } = "*/10 * * * *";
+        public string CheckNewTransfersCron { get; set; } = "*/10 * * * *";
+        public string CheckTransferRefundsCron { get; set; } = "*/10 * * * *";
+        public string CheckNewTransferRefundsCron { get; set; } = "*/10 * * * *";
+        public string CheckZonesProgressCron { get; set; } = "*/10 * * * *";
+        public string CheckZonesFileCron { get; set; } = "*/10 * * * *";
     }
 }

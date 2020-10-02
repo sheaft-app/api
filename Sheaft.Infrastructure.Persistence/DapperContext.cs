@@ -13,9 +13,9 @@ namespace Sheaft.Infrastructure.Persistence
 {
     public class DapperContext : IDapperContext
     {
-        private readonly DatabaseOptions _databaseOptions;
+        private readonly AppDatabaseOptions _databaseOptions;
 
-        public DapperContext(IOptionsSnapshot<DatabaseOptions> databaseOptions)
+        public DapperContext(IOptionsSnapshot<AppDatabaseOptions> databaseOptions)
         {
             _databaseOptions = databaseOptions.Value;
         }

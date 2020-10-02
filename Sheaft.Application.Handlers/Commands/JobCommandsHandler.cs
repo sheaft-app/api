@@ -7,6 +7,7 @@ using Sheaft.Application.Commands;
 using Sheaft.Core;
 using Sheaft.Domain.Models;
 using Sheaft.Application.Interop;
+using System;
 
 namespace Sheaft.Application.Handlers
 {
@@ -215,21 +216,9 @@ namespace Sheaft.Application.Handlers
             });
         }
 
-        public async Task<Result<bool>> Handle(RetryJobCommand request,
-            CancellationToken token)
+        public async Task<Result<bool>> Handle(RetryJobCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
-            {
-                var entity = await _context.GetByIdAsync<Job>(request.Id, token);
-
-                entity.RetryJob();
-                _context.Update(entity);
-
-                var result = await _context.SaveChangesAsync(token);
-                await _mediatr.Post(entity, token);
-
-                return Ok(result > 0);
-            });
+            throw new NotImplementedException();
         }
 
         public async Task<Result<bool>> Handle(PauseJobCommand request,
@@ -332,20 +321,9 @@ namespace Sheaft.Application.Handlers
             });
         }
 
-        public async Task<Result<bool>> Handle(ResetJobCommand request, CancellationToken token)
+        public Task<Result<bool>> Handle(ResetJobCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
-            {
-                var entity = await _context.GetByIdAsync<Job>(request.Id, token);
-
-                entity.ResetJob();
-                _context.Update(entity);
-
-                var result = await _context.SaveChangesAsync(token);
-                await _mediatr.Post(entity, token);
-
-                return Ok(result > 0);
-            });
+            throw new NotImplementedException();
         }
 
         public async Task<Result<bool>> Handle(DeleteJobCommand request, CancellationToken token)

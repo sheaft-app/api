@@ -50,12 +50,11 @@ namespace Sheaft.Application.Handlers
                 }
 
                 var entity = new Job(Guid.NewGuid(), JobKind.CreatePickingFromOrders, request.Name ?? $"Export bon préparation", producer, ExportPickingOrderCommand.QUEUE_NAME);
-                entity.SetCommand(new ExportPickingOrderCommand(request.RequestUser) { JobId = entity.Id, PurchaseOrderIds = request.PurchaseOrderIds });
 
                 await _context.AddAsync(entity, token);
                 await _context.SaveChangesAsync(token);
 
-                await _mediatr.Post(entity, token);
+                _mediatr.Post(new ExportPickingOrderCommand(request.RequestUser) { JobId = entity.Id, PurchaseOrderIds = request.PurchaseOrderIds });
 
                 return Ok(entity.Id);
             });
@@ -74,7 +73,7 @@ namespace Sheaft.Application.Handlers
                         throw startResult.Exception;
 
                     var purchaseOrders = await _context.GetByIdsAsync<PurchaseOrder>(request.PurchaseOrderIds, token);
-                    await _mediatr.Post(new PickingOrderExportProcessingEvent(request.RequestUser) { JobId = job.Id }, token);
+                    _mediatr.Post(new PickingOrderExportProcessingEvent(request.RequestUser) { JobId = job.Id });
 
                     using (var stream = new MemoryStream())
                     {
@@ -91,13 +90,13 @@ namespace Sheaft.Application.Handlers
                         if (!result.Success)
                             throw result.Exception;
 
-                        await _mediatr.Post(new PickingOrderExportSucceededEvent(request.RequestUser) { JobId = job.Id }, token);
+                        _mediatr.Post(new PickingOrderExportSucceededEvent(request.RequestUser) { JobId = job.Id });
                         return await _mediatr.Process(new CompleteJobCommand(request.RequestUser) { Id = job.Id, FileUrl = response.Data }, token);
                     }
                 }
                 catch (Exception e)
                 {
-                    await _mediatr.Post(new PickingOrderExportFailedEvent(request.RequestUser) { JobId = job.Id }, token);
+                    _mediatr.Post(new PickingOrderExportFailedEvent(request.RequestUser) { JobId = job.Id });
                     return await _mediatr.Process(new FailJobCommand(request.RequestUser) { Id = request.JobId, Reason = e.Message }, token);
                 }
             });

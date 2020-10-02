@@ -140,7 +140,7 @@ namespace Sheaft.Application.Handlers
                 _context.Update(entity);
 
                 await _context.SaveChangesAsync(token);
-                await _mediatr.Post(new CreateUserPointsCommand(request.RequestUser) { CreatedOn = DateTimeOffset.UtcNow, Kind = PointKind.RateProduct, UserId = request.RequestUser.Id }, token);
+                _mediatr.Post(new CreateUserPointsCommand(request.RequestUser) { CreatedOn = DateTimeOffset.UtcNow, Kind = PointKind.RateProduct, UserId = request.RequestUser.Id });
 
                 return Ok(true);
             });
@@ -221,12 +221,10 @@ namespace Sheaft.Application.Handlers
                 if (!response.Success)
                     return Failed<Guid>(response.Exception);
 
-                entity.SetCommand(new ImportProductsCommand(request.RequestUser) { Id = entity.Id, Uri = response.Data });
-
                 await _context.AddAsync(entity, token);
                 await _context.SaveChangesAsync(token);
 
-                await _mediatr.Post(entity, token);
+                _mediatr.Post(new ImportProductsCommand(request.RequestUser) { Id = entity.Id, Uri = response.Data });
                 return Created(entity.Id);
             });
         }
@@ -244,7 +242,7 @@ namespace Sheaft.Application.Handlers
                     if (!startResult.Success)
                         throw startResult.Exception;
 
-                    await _mediatr.Post(new ProductImportProcessingEvent(request.RequestUser) { JobId = job.Id }, token);
+                    _mediatr.Post(new ProductImportProcessingEvent(request.RequestUser) { JobId = job.Id });
 
                     using (var stream = new MemoryStream())
                     {
@@ -284,12 +282,12 @@ namespace Sheaft.Application.Handlers
                     if (!result.Success)
                         throw result.Exception;
 
-                    await _mediatr.Post(new ProductImportSucceededEvent(request.RequestUser) { JobId = job.Id }, token);
+                    _mediatr.Post(new ProductImportSucceededEvent(request.RequestUser) { JobId = job.Id });
                     return result;
                 }
                 catch (Exception e)
                 {
-                    await _mediatr.Post(new ProductImportFailedEvent(request.RequestUser) { JobId = job.Id }, token);
+                    _mediatr.Post(new ProductImportFailedEvent(request.RequestUser) { JobId = job.Id });
                     return await _mediatr.Process(new FailJobCommand(request.RequestUser) { Id = job.Id, Reason = e.Message }, token);
                 }
             });

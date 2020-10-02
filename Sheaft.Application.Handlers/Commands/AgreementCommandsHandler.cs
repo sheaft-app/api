@@ -55,7 +55,7 @@ namespace Sheaft.Application.Handlers
                 await _context.AddAsync(entity, token);
                 await _context.SaveChangesAsync(token);
 
-                await _mediatr.Post(new AgreementCreatedEvent(request.RequestUser) { AgreementId = entity.Id }, token);
+                _mediatr.Post(new AgreementCreatedEvent(request.RequestUser) { AgreementId = entity.Id });
 
                 return Ok(entity.Id);
             });
@@ -82,7 +82,7 @@ namespace Sheaft.Application.Handlers
                 _context.Update(entity);
                 await _context.SaveChangesAsync(token);
 
-                await _mediatr.Post(new AgreementAcceptedEvent(request.RequestUser) { AgreementId = entity.Id }, token);
+                _mediatr.Post(new AgreementAcceptedEvent(request.RequestUser) { AgreementId = entity.Id });
                 return Ok(true);
             });
         }
@@ -116,7 +116,7 @@ namespace Sheaft.Application.Handlers
                 _context.Update(entity);
                 await _context.SaveChangesAsync(token);
 
-                await _mediatr.Post(new AgreementCancelledEvent(request.RequestUser) { AgreementId = entity.Id }, token);
+                _mediatr.Post(new AgreementCancelledEvent(request.RequestUser) { AgreementId = entity.Id });
                 return Ok(true);
             });
         }
@@ -150,7 +150,7 @@ namespace Sheaft.Application.Handlers
                 _context.Update(entity);
                 await _context.SaveChangesAsync(token);
 
-                await _mediatr.Post(new AgreementRefusedEvent(request.RequestUser) { AgreementId = entity.Id }, token);
+                _mediatr.Post(new AgreementRefusedEvent(request.RequestUser) { AgreementId = entity.Id });
                 return Ok(true);
             });
         }

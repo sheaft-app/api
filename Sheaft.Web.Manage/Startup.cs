@@ -52,7 +52,7 @@ namespace Sheaft.Manage
             });
 
             var authSettings = Configuration.GetSection(AuthOptions.SETTING);
-            var databaseSettings = Configuration.GetSection(DatabaseOptions.SETTING);
+            var databaseSettings = Configuration.GetSection(AppDatabaseOptions.SETTING);
             var sendgridSettings = Configuration.GetSection(SendgridOptions.SETTING);
             var roleSettings = Configuration.GetSection(RoleOptions.SETTING);
             var pspSettings = Configuration.GetSection(PspOptions.SETTING);
@@ -60,7 +60,7 @@ namespace Sheaft.Manage
 
             services.Configure<RoleOptions>(roleSettings);
             services.Configure<AuthOptions>(authSettings);
-            services.Configure<DatabaseOptions>(databaseSettings);
+            services.Configure<AppDatabaseOptions>(databaseSettings);
             services.Configure<SendgridOptions>(sendgridSettings);
             services.Configure<PspOptions>(pspSettings);
 
@@ -93,7 +93,7 @@ namespace Sheaft.Manage
                 options.AllowSynchronousIO = true;
             });
 
-            var databaseConfig = databaseSettings.Get<DatabaseOptions>();
+            var databaseConfig = databaseSettings.Get<AppDatabaseOptions>();
             services.AddDbContext<IAppDbContext, AppDbContext>(options =>
             {
                 options.UseLazyLoadingProxies();

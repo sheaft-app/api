@@ -9,6 +9,8 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="AspNetCoreRateLimit" Version="3.0.5" />
+    <PackageReference Include="Hangfire.AspNetCore" Version="1.7.14" />
+    <PackageReference Include="Hangfire.SqlServer" Version="1.7.14" />
     <PackageReference Include="HotChocolate" Version="10.5.2" />
     <PackageReference Include="HotChocolate.AspNetCore" Version="10.5.2" />
     <PackageReference Include="HotChocolate.Server" Version="10.5.2" />

@@ -36,18 +36,18 @@ namespace Sheaft.Application.Handlers
                 await _context.AddAsync(new Sponsoring(sponsor, user), token);
                 await _context.SaveChangesAsync(token);
 
-                await _mediatr.Post(new CreateUserPointsCommand(request.RequestUser)
+                _mediatr.Post(new CreateUserPointsCommand(request.RequestUser)
                 {
                     CreatedOn = DateTimeOffset.UtcNow,
                     Kind = PointKind.Sponsoring,
                     UserId = sponsor.Id
-                }, token);
+                });
 
-                await _mediatr.Post(new UserSponsoredEvent(request.RequestUser)
+                _mediatr.Post(new UserSponsoredEvent(request.RequestUser)
                 {
                     SponsorId = sponsor.Id,
                     SponsoredId = user.Id
-                }, token);
+                });
 
                 return Ok(true);
             });

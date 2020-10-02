@@ -18,7 +18,7 @@ using Microsoft.Extensions.Caching.Distributed;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.IO;
 
-namespace Sheaft.Api.Authorize
+namespace Sheaft.Web.Api.Authorize
 {
 
     public class SheaftIdentityAuthorizeService : IAuthorizationService

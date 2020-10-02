@@ -130,9 +130,9 @@ namespace Sheaft.Application.Handlers
                     await transaction.CommitAsync(token);
 
                     foreach (var orderId in orderIds)
-                        await _mediatr.Post(new PurchaseOrderCreatedEvent(request.RequestUser) { PurchaseOrderId = orderId }, token);
+                        _mediatr.Post(new PurchaseOrderCreatedEvent(request.RequestUser) { PurchaseOrderId = orderId });
 
-                    await _mediatr.Post(new CreateUserPointsCommand(request.RequestUser) { CreatedOn = DateTimeOffset.UtcNow, Kind = PointKind.PurchaseOrder, UserId = request.RequestUser.Id }, token);
+                    _mediatr.Post(new CreateUserPointsCommand(request.RequestUser) { CreatedOn = DateTimeOffset.UtcNow, Kind = PointKind.PurchaseOrder, UserId = request.RequestUser.Id });
 
                     await transaction.CommitAsync(token);
                     return Ok(orderIds.AsEnumerable());
@@ -268,9 +268,9 @@ namespace Sheaft.Application.Handlers
                     await transaction.CommitAsync(token);
 
                     foreach (var orderId in orderIds)
-                        await _mediatr.Post(new PurchaseOrderCreatedEvent(request.RequestUser) { PurchaseOrderId = orderId }, token);
+                        _mediatr.Post(new PurchaseOrderCreatedEvent(request.RequestUser) { PurchaseOrderId = orderId });
 
-                    await _mediatr.Post(new CreateUserPointsCommand(request.RequestUser) { CreatedOn = DateTimeOffset.UtcNow, Kind = PointKind.PurchaseOrder, UserId = request.RequestUser.Id }, token);
+                    _mediatr.Post(new CreateUserPointsCommand(request.RequestUser) { CreatedOn = DateTimeOffset.UtcNow, Kind = PointKind.PurchaseOrder, UserId = request.RequestUser.Id });
                     return Ok(orderIds.AsEnumerable());
                 }
             });
@@ -332,10 +332,10 @@ namespace Sheaft.Application.Handlers
                 {
                     foreach (var orderId in orderIds)
                     {
-                        await _mediatr.Post(new CheckOrderCommand(request.RequestUser)
+                        _mediatr.Post(new CheckOrderCommand(request.RequestUser)
                         {
                             OrderId = orderId
-                        }, token);
+                        });
                     }
 
                     skip += take;

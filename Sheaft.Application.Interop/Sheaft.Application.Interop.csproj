@@ -5,6 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Hangfire.Core" Version="1.7.14" />
     <PackageReference Include="MediatR" Version="8.1.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="3.1.8" />
   </ItemGroup>

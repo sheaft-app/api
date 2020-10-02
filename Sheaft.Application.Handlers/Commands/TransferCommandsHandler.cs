@@ -55,11 +55,10 @@ namespace Sheaft.Application.Handlers
                 {
                     foreach (var transferId in transferIds)
                     {
-                        await _mediatr.Post(new CheckTransferCommand(request.RequestUser)
+                        _mediatr.Post(new CheckTransferCommand(request.RequestUser)
                         {
                             TransferId = transferId
-                        }, token);
-                        break;
+                        });
                     }
 
                     skip += take;
@@ -131,10 +130,10 @@ namespace Sheaft.Application.Handlers
                 {
                     foreach (var purchaseOrderId in purchaseOrderIds)
                     {
-                        await _mediatr.Post(new CreateTransferCommand(request.RequestUser)
+                        _mediatr.Post(new CreateTransferCommand(request.RequestUser)
                         {
                             PurchaseOrderId = purchaseOrderId
-                        }, token);
+                        });
                     }
 
                     skip += take;
@@ -167,10 +166,10 @@ namespace Sheaft.Application.Handlers
                 switch (transfer.Status)
                 {
                     case TransactionStatus.Failed:
-                        await _mediatr.Post(new TransferFailedEvent(request.RequestUser) { TransferId = transfer.Id }, token);
+                        _mediatr.Post(new TransferFailedEvent(request.RequestUser) { TransferId = transfer.Id });
                         break;
                     case TransactionStatus.Succeeded:
-                        await _mediatr.Post(new TransferSucceededEvent(request.RequestUser) { TransferId = transfer.Id }, token);
+                        _mediatr.Post(new TransferSucceededEvent(request.RequestUser) { TransferId = transfer.Id });
                         break;
                 }
 
@@ -202,10 +201,10 @@ namespace Sheaft.Application.Handlers
                     _context.Update(purchaseOrder);
                     await _context.SaveChangesAsync(token);
 
-                    await _mediatr.Post(new CreateTransferFailedEvent(request.RequestUser)
+                    _mediatr.Post(new CreateTransferFailedEvent(request.RequestUser)
                     {
                         PurchaseOrderId = purchaseOrder.Id
-                    }, token);
+                    });
 
                     return TooManyRetries<Guid>();
                 }

@@ -22,7 +22,7 @@ namespace Sheaft.Application.Handlers
         IRequestHandler<CheckPayoutCommand, Result<bool>>,
         IRequestHandler<ExpirePayoutCommand, Result<bool>>,
         IRequestHandler<RefreshPayoutStatusCommand, Result<TransactionStatus>>,
-        IRequestHandler<CheckForNewPayoutsCommand, Result<bool>>,
+        IRequestHandler<CheckNewPayoutsCommand, Result<bool>>,
         IRequestHandler<CreatePayoutCommand, Result<Guid>>
     {
         private readonly PspOptions _pspOptions;
@@ -57,10 +57,10 @@ namespace Sheaft.Application.Handlers
                 {
                     foreach (var payoutId in payoutIds)
                     {
-                        await _mediatr.Post(new CheckPayoutCommand(request.RequestUser)
+                        _mediatr.Post(new CheckPayoutCommand(request.RequestUser)
                         {
                             PayoutId = payoutId
-                        }, token);
+                        });
                     }
 
                     skip += take;
@@ -126,10 +126,10 @@ namespace Sheaft.Application.Handlers
                 switch (payout.Status)
                 {
                     case TransactionStatus.Failed:
-                        await _mediatr.Post(new PayoutFailedEvent(request.RequestUser) { PayoutId = payout.Id }, token);
+                        _mediatr.Post(new PayoutFailedEvent(request.RequestUser) { PayoutId = payout.Id });
                         break;
                     case TransactionStatus.Succeeded:
-                        await _mediatr.Post(new PayoutSucceededEvent(request.RequestUser) { PayoutId = payout.Id }, token);
+                        _mediatr.Post(new PayoutSucceededEvent(request.RequestUser) { PayoutId = payout.Id });
                         break;
                 }
 
@@ -137,7 +137,7 @@ namespace Sheaft.Application.Handlers
             });
         }
 
-        public async Task<Result<bool>> Handle(CheckForNewPayoutsCommand request, CancellationToken token)
+        public async Task<Result<bool>> Handle(CheckNewPayoutsCommand request, CancellationToken token)
         {
             return await ExecuteAsync(async () =>
             {
@@ -154,11 +154,11 @@ namespace Sheaft.Application.Handlers
 
                 foreach (var producerTransfers in producersTransfers.GroupBy(t => t.ProducerId))
                 {
-                    await _mediatr.Post(new CreatePayoutCommand(request.RequestUser)
+                    _mediatr.Post(new CreatePayoutCommand(request.RequestUser)
                     {
                         ProducerId = producerTransfers.Key,
                         TransferIds = producerTransfers.Select(pt => pt.TransferId)
-                    }, token);
+                    });
                 }
 
                 return Ok(true);

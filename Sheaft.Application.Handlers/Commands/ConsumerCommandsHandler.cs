@@ -73,7 +73,7 @@ namespace Sheaft.Application.Handlers
 
                     if (!string.IsNullOrWhiteSpace(request.SponsoringCode))
                     {
-                        await _mediatr.Post(new CreateSponsoringCommand(request.RequestUser) { Code = request.SponsoringCode, UserId = consumer.Id }, token);
+                        _mediatr.Post(new CreateSponsoringCommand(request.RequestUser) { Code = request.SponsoringCode, UserId = consumer.Id });
                     }
 
                     return Created(consumer.Id);

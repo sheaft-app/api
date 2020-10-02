@@ -55,10 +55,10 @@ namespace Sheaft.Application.Handlers
                 {
                     foreach (var orderId in orderIds)
                     {
-                        await _mediatr.Post(new CreateDonationCommand(request.RequestUser)
+                        _mediatr.Post(new CreateDonationCommand(request.RequestUser)
                         {
                             OrderId = orderId
-                        }, token);
+                        });
                     }
 
                     skip += take;
@@ -89,10 +89,10 @@ namespace Sheaft.Application.Handlers
                     _context.Update(order);
                     await _context.SaveChangesAsync(token);
 
-                    await _mediatr.Post(new CreateDonationFailedEvent(request.RequestUser)
+                    _mediatr.Post(new CreateDonationFailedEvent(request.RequestUser)
                     {
                         OrderId = order.Id
-                    }, token);
+                    });
 
                     return TooManyRetries<Guid>();
                 }
@@ -139,11 +139,10 @@ namespace Sheaft.Application.Handlers
                 {
                     foreach (var transferId in transferIds)
                     {
-                        await _mediatr.Post(new CheckTransferCommand(request.RequestUser)
+                        _mediatr.Post(new CheckTransferCommand(request.RequestUser)
                         {
                             TransferId = transferId
-                        }, token);
-                        break;
+                        });
                     }
 
                     skip += take;
@@ -209,10 +208,10 @@ namespace Sheaft.Application.Handlers
                 switch (donation.Status)
                 {
                     case TransactionStatus.Failed:
-                        await _mediatr.Post(new DonationFailedEvent(request.RequestUser) { DonationId = donation.Id }, token);
+                        _mediatr.Post(new DonationFailedEvent(request.RequestUser) { DonationId = donation.Id });
                         break;
                     case TransactionStatus.Succeeded:
-                        await _mediatr.Post(new DonationSucceededEvent(request.RequestUser) { DonationId = donation.Id }, token);
+                        _mediatr.Post(new DonationSucceededEvent(request.RequestUser) { DonationId = donation.Id });
                         break;
                 }
 
