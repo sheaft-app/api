@@ -25,8 +25,10 @@ namespace Sheaft.Application.Mappers
             CreateMap<PurchaseOrderSender, UserProfileViewModel>();
             CreateMap<PurchaseOrderVendor, UserProfileViewModel>();
 
+            CreateMap<UpdatePictureInput, UpdateUserPictureCommand>()
+                .ForMember(c => c.UserId, opt => opt.MapFrom(d => d.Id));
+
             CreateMap<IdInput, GenerateUserCodeCommand>();
-            CreateMap<UpdatePictureInput, UpdateUserPictureCommand>();
             CreateMap<IdWithReasonInput, RemoveUserCommand>();
         }
     }
