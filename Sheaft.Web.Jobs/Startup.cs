@@ -272,33 +272,17 @@ namespace Sheaft.Web.Jobs
                 mediatr.Execute(nameof(CheckPayinRefundsCommand), new CheckPayinRefundsCommand(new RequestUser("eaf648de5fe54fc1980c093fd78bb2f7", Guid.NewGuid().ToString("N"), null)), CancellationToken.None),
                     options.CheckPayinRefundsCron);
 
-            RecurringJob.AddOrUpdate<SheaftHangfireBridge>("fe666f440c084453997b529d3e08851a", mediatr =>
-                mediatr.Execute(nameof(CheckNewPayinRefundsCommand), new CheckNewPayinRefundsCommand(new RequestUser("fe666f440c084453997b529d3e08851a", Guid.NewGuid().ToString("N"), null)), CancellationToken.None),
-                    options.CheckNewPayinRefundsCron);
-
             RecurringJob.AddOrUpdate<SheaftHangfireBridge>("dddd91a8fa494da3af1477d1b537fd95", mediatr =>
                 mediatr.Execute(nameof(CheckPayoutsCommand), new CheckPayoutsCommand(new RequestUser("dddd91a8fa494da3af1477d1b537fd95", Guid.NewGuid().ToString("N"), null)), CancellationToken.None),
                     options.CheckPayoutsCron);
-
-            RecurringJob.AddOrUpdate<SheaftHangfireBridge>("b6238863804e4af8919db36d81f9ce3b", mediatr =>
-                mediatr.Execute(nameof(CheckNewPayoutsCommand), new CheckNewPayoutsCommand(new RequestUser("b6238863804e4af8919db36d81f9ce3b", Guid.NewGuid().ToString("N"), null)), CancellationToken.None),
-                    options.CheckNewPayoutsCron);
 
             RecurringJob.AddOrUpdate<SheaftHangfireBridge>("50a160aac50f480a872b04a509ef202c", mediatr =>
                 mediatr.Execute(nameof(CheckTransfersCommand), new CheckTransfersCommand(new RequestUser("50a160aac50f480a872b04a509ef202c", Guid.NewGuid().ToString("N"), null)), CancellationToken.None),
                     options.CheckTransfersCron);
 
-            RecurringJob.AddOrUpdate<SheaftHangfireBridge>("1bc8610c2fa7475ebf78b71fa7a068ac", mediatr =>
-                mediatr.Execute(nameof(CheckNewTransfersCommand), new CheckNewTransfersCommand(new RequestUser("1bc8610c2fa7475ebf78b71fa7a068ac", Guid.NewGuid().ToString("N"), null)), CancellationToken.None),
-                    options.CheckNewTransfersCron);
-
             RecurringJob.AddOrUpdate<SheaftHangfireBridge>("28863f87b10d4c3fb79ed6bda3027949", mediatr =>
                 mediatr.Execute(nameof(CheckTransferRefundsCommand), new CheckTransferRefundsCommand(new RequestUser("28863f87b10d4c3fb79ed6bda3027949", Guid.NewGuid().ToString("N"), null)), CancellationToken.None),
                     options.CheckTransferRefundsCron);
-
-            RecurringJob.AddOrUpdate<SheaftHangfireBridge>("3c8ca8c9ace34845a8e5a98da0e7ba02", mediatr =>
-                mediatr.Execute(nameof(CheckNewTransferRefundsCommand), new CheckNewTransferRefundsCommand(new RequestUser("3c8ca8c9ace34845a8e5a98da0e7ba02", Guid.NewGuid().ToString("N"), null)), CancellationToken.None),
-                    options.CheckNewTransferRefundsCron);
 
             RecurringJob.AddOrUpdate<SheaftHangfireBridge>("0b74e15ec9de4332981a8f933377fc0a", mediatr =>
                 mediatr.Execute(nameof(UpdateZonesProgressCommand), new UpdateZonesProgressCommand(new RequestUser("0b74e15ec9de4332981a8f933377fc0a", Guid.NewGuid().ToString("N"), null)), CancellationToken.None),

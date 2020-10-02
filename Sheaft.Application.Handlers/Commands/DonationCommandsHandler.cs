@@ -18,7 +18,6 @@ using Sheaft.Application.Events;
 namespace Sheaft.Application.Handlers
 {
     public class DonationCommandsHandler : ResultsHandler,
-        IRequestHandler<CheckNewDonationsCommand, Result<bool>>,
         IRequestHandler<CreateDonationCommand, Result<Guid>>,
         IRequestHandler<CheckDonationsCommand, Result<bool>>,
         IRequestHandler<CheckDonationCommand, Result<bool>>,
@@ -41,32 +40,6 @@ namespace Sheaft.Application.Handlers
             _pspService = pspService;
             _routineOptions = routineOptions.Value;
             _pspOptions = pspOptions.Value;
-        }
-
-        public async Task<Result<bool>> Handle(CheckNewDonationsCommand request, CancellationToken token)
-        {
-            return await ExecuteAsync(async () =>
-            {
-                var skip = 0;
-                const int take = 100;
-
-                var orderIds = await GetNextOrderIdsAsync(skip, take, token);
-                while (orderIds.Any())
-                {
-                    foreach (var orderId in orderIds)
-                    {
-                        _mediatr.Post(new CreateDonationCommand(request.RequestUser)
-                        {
-                            OrderId = orderId
-                        });
-                    }
-
-                    skip += take;
-                    orderIds = await GetNextOrderIdsAsync(skip, take, token);
-                }
-
-                return Ok(true);
-            });
         }
 
         public async Task<Result<Guid>> Handle(CreateDonationCommand request, CancellationToken token)
@@ -133,20 +106,20 @@ namespace Sheaft.Application.Handlers
                 const int take = 100;
 
                 var expiredDate = DateTimeOffset.UtcNow.AddMinutes(-_routineOptions.CheckDonationsFromMinutes);
-                var transferIds = await GetNextDonationIdsAsync(expiredDate, skip, take, token);
+                var donationIds = await GetNextDonationIdsAsync(expiredDate, skip, take, token);
 
-                while (transferIds.Any())
+                while (donationIds.Any())
                 {
-                    foreach (var transferId in transferIds)
+                    foreach (var donationId in donationIds)
                     {
-                        _mediatr.Post(new CheckTransferCommand(request.RequestUser)
+                        _mediatr.Post(new CheckDonationCommand(request.RequestUser)
                         {
-                            TransferId = transferId
+                            DonationId = donationId
                         });
                     }
 
                     skip += take;
-                    transferIds = await GetNextDonationIdsAsync(expiredDate, skip, take, token);
+                    donationIds = await GetNextDonationIdsAsync(expiredDate, skip, take, token);
                 }
 
                 return Ok(true);
@@ -217,20 +190,6 @@ namespace Sheaft.Application.Handlers
 
                 return Ok(donation.Status);
             });
-        }
-
-        private async Task<IEnumerable<Guid>> GetNextOrderIdsAsync(int skip, int take, CancellationToken token)
-        {
-            return await _context.Orders
-                .Get(c => c.Donate > 0
-                            && c.Payin != null
-                            && c.Payin.Status == TransactionStatus.Succeeded
-                            && (c.Donation == null || c.Donation.Status == TransactionStatus.Expired), true)
-                .OrderBy(c => c.CreatedOn)
-                .Select(c => c.Id)
-                .Skip(skip)
-                .Take(take)
-                .ToListAsync(token);
         }
 
         private async Task<IEnumerable<Guid>> GetNextDonationIdsAsync(DateTimeOffset expiredDate, int skip, int take, CancellationToken token)

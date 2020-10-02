@@ -10,6 +10,7 @@ using Sheaft.Application.Interop;
 using Sheaft.Application.Events;
 using Microsoft.Extensions.Logging;
 using Microsoft.EntityFrameworkCore;
+using Sheaft.Domain.Enums;
 
 namespace Sheaft.Application.Handlers
 {
@@ -222,11 +223,12 @@ namespace Sheaft.Application.Handlers
             return await ExecuteAsync(async () =>
             {
                 var purchaseOrder = await _context.GetByIdAsync<PurchaseOrder>(request.Id, token);
-
                 purchaseOrder.Ship();
-                _context.Update(purchaseOrder);
 
-                return Ok(await _context.SaveChangesAsync(token) > 0);
+                _context.Update(purchaseOrder);
+                await _context.SaveChangesAsync(token);
+
+                return Ok(true);
             });
         }
 
@@ -235,11 +237,12 @@ namespace Sheaft.Application.Handlers
             return await ExecuteAsync(async () =>
             {
                 var purchaseOrder = await _context.GetByIdAsync<PurchaseOrder>(request.Id, token);
-
                 purchaseOrder.Deliver();
-                _context.Update(purchaseOrder);
 
-                return Ok(await _context.SaveChangesAsync(token) > 0);
+                _context.Update(purchaseOrder);
+                await _context.SaveChangesAsync(token);
+
+                return Ok(true);
             });
         }
 
@@ -248,16 +251,20 @@ namespace Sheaft.Application.Handlers
             return await ExecuteAsync(async () =>
             {
                 var purchaseOrder = await _context.GetByIdAsync<PurchaseOrder>(request.Id, token);
-
                 purchaseOrder.Cancel(request.Reason);
+
                 _context.Update(purchaseOrder);
+                await _context.SaveChangesAsync(token);
 
                 if (request.RequestUser.Id == purchaseOrder.Sender.Id)
                     _mediatr.Post(new PurchaseOrderCancelledBySenderEvent(request.RequestUser) { PurchaseOrderId = purchaseOrder.Id });
                 else
                     _mediatr.Post(new PurchaseOrderCancelledByVendorEvent(request.RequestUser) { PurchaseOrderId = purchaseOrder.Id });
 
-                return Ok(await _context.SaveChangesAsync(token) > 0);
+                if (purchaseOrder.Transfer != null && purchaseOrder.Transfer.Status == TransactionStatus.Succeeded)
+                    _mediatr.Post(new CreateTransferRefundCommand(request.RequestUser) { PurchaseOrderId = purchaseOrder.Id });
+
+                return Ok(true);
             });
         }
 
@@ -266,13 +273,17 @@ namespace Sheaft.Application.Handlers
             return await ExecuteAsync(async () =>
             {
                 var purchaseOrder = await _context.GetByIdAsync<PurchaseOrder>(request.Id, token);
-
                 purchaseOrder.Refuse(request.Reason);
+
                 _context.Update(purchaseOrder);
+                await _context.SaveChangesAsync(token);
 
                 _mediatr.Post(new PurchaseOrderRefusedEvent(request.RequestUser) { PurchaseOrderId = purchaseOrder.Id });
 
-                return Ok(await _context.SaveChangesAsync(token) > 0);
+                if(purchaseOrder.Transfer != null && purchaseOrder.Transfer.Status == TransactionStatus.Succeeded)
+                    _mediatr.Post(new CreateTransferRefundCommand(request.RequestUser) { PurchaseOrderId = purchaseOrder.Id });
+
+                return Ok(true);
             });
         }
 
@@ -281,13 +292,13 @@ namespace Sheaft.Application.Handlers
             return await ExecuteAsync(async () =>
             {
                 var purchaseOrder = await _context.GetByIdAsync<PurchaseOrder>(request.Id, token);
-
                 purchaseOrder.Process();
+
                 _context.Update(purchaseOrder);
+                await _context.SaveChangesAsync(token);
 
                 _mediatr.Post(new PurchaseOrderProcessingEvent(request.RequestUser) { PurchaseOrderId = purchaseOrder.Id });
-
-                return Ok(await _context.SaveChangesAsync(token) > 0);
+                return Ok(true);
             });
         }
 
@@ -296,13 +307,13 @@ namespace Sheaft.Application.Handlers
             return await ExecuteAsync(async () =>
             {
                 var purchaseOrder = await _context.GetByIdAsync<PurchaseOrder>(request.Id, token);
-
                 purchaseOrder.Complete();
+
                 _context.Update(purchaseOrder);
+                await _context.SaveChangesAsync(token);
 
                 _mediatr.Post(new PurchaseOrderCompletedEvent(request.RequestUser) { PurchaseOrderId = purchaseOrder.Id });
-
-                return Ok(await _context.SaveChangesAsync(token) > 0);
+                return Ok(true);
             });
         }
 
@@ -315,8 +326,10 @@ namespace Sheaft.Application.Handlers
                 purchaseOrder.Accept();
                 _context.Update(purchaseOrder);
 
-                _mediatr.Post(new PurchaseOrderAcceptedEvent(request.RequestUser) { PurchaseOrderId = purchaseOrder.Id });
                 await _context.SaveChangesAsync(token);
+                
+                _mediatr.Post(new PurchaseOrderAcceptedEvent(request.RequestUser) { PurchaseOrderId = purchaseOrder.Id });
+                _mediatr.Schedule(new CreateTransferCommand(request.RequestUser) { PurchaseOrderId = purchaseOrder.Id }, TimeSpan.FromMinutes(1440));
 
                 return Ok(true);
             });
@@ -327,9 +340,11 @@ namespace Sheaft.Application.Handlers
             return await ExecuteAsync(async () =>
             {
                 var entity = await _context.GetByIdAsync<PurchaseOrder>(request.Id, token);
-                _context.Remove(entity);
 
-                return Ok(await _context.SaveChangesAsync(token) > 0);
+                _context.Remove(entity);
+                await _context.SaveChangesAsync(token);
+
+                return Ok(true);
             });
         }
 
@@ -338,9 +353,11 @@ namespace Sheaft.Application.Handlers
             return await ExecuteAsync(async () =>
             {
                 var entity = await _context.PurchaseOrders.SingleOrDefaultAsync(a => a.Id == request.Id && a.RemovedOn.HasValue, token);
-                _context.Restore(entity);
 
-                return Ok(await _context.SaveChangesAsync(token) > 0);
+                _context.Restore(entity);
+                await _context.SaveChangesAsync(token);
+
+                return Ok(true);
             });
         }
     }

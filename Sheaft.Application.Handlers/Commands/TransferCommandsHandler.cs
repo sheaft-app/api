@@ -23,7 +23,6 @@ namespace Sheaft.Application.Handlers
         IRequestHandler<ExpireTransferCommand, Result<bool>>,
         IRequestHandler<UnblockTransferCommand, Result<bool>>,
         IRequestHandler<RefreshTransferStatusCommand, Result<TransactionStatus>>,
-        IRequestHandler<CheckNewTransfersCommand, Result<bool>>,
         IRequestHandler<CreateTransferCommand, Result<Guid>>
     {
         private readonly IPspService _pspService;
@@ -111,34 +110,6 @@ namespace Sheaft.Application.Handlers
 
                 _context.Update(transfer);
                 await _context.SaveChangesAsync(token);
-
-                return Ok(true);
-            });
-        }
-
-        public async Task<Result<bool>> Handle(CheckNewTransfersCommand request, CancellationToken token)
-        {
-            return await ExecuteAsync(async () =>
-            {
-                var skip = 0;
-                const int take = 100;
-
-                var expiredDate = DateTimeOffset.UtcNow.AddMinutes(-_routineOptions.CheckNewTransfersFromMinutes);
-                var purchaseOrderIds = await GetNextPurchaseOrderIdsAsync(expiredDate, skip, take, token);
-
-                while (purchaseOrderIds.Any())
-                {
-                    foreach (var purchaseOrderId in purchaseOrderIds)
-                    {
-                        _mediatr.Post(new CreateTransferCommand(request.RequestUser)
-                        {
-                            PurchaseOrderId = purchaseOrderId
-                        });
-                    }
-
-                    skip += take;
-                    purchaseOrderIds = await GetNextPurchaseOrderIdsAsync(expiredDate, skip, take, token);
-                }
 
                 return Ok(true);
             });
@@ -237,20 +208,6 @@ namespace Sheaft.Application.Handlers
                     return Ok(transfer.Id);
                 }
             });
-        }
-
-        private async Task<IEnumerable<Guid>> GetNextPurchaseOrderIdsAsync(DateTimeOffset expiredDate, int skip, int take, CancellationToken token)
-        {
-            return await _context.PurchaseOrders
-                .Get(c => !c.WithdrawnOn.HasValue 
-                            && !c.SkipBackgroundProcessing
-                            && c.AcceptedOn.HasValue && c.AcceptedOn.Value < expiredDate
-                            && (c.Transfer == null || c.Transfer.Status == TransactionStatus.Expired), true)
-                .OrderBy(c => c.CreatedOn)
-                .Select(c => c.Id)
-                .Skip(skip)
-                .Take(take)
-                .ToListAsync(token);
         }
 
         private async Task<IEnumerable<Guid>> GetNextTransferIdsAsync(DateTimeOffset expiredDate, int skip, int take, CancellationToken token)

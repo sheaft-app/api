@@ -22,7 +22,6 @@ namespace Sheaft.Application.Handlers
         IRequestHandler<CheckTransferRefundCommand, Result<bool>>,
         IRequestHandler<ExpireTransferRefundCommand, Result<bool>>,
         IRequestHandler<RefreshTransferRefundStatusCommand, Result<TransactionStatus>>,
-        IRequestHandler<CheckNewTransferRefundsCommand, Result<bool>>,
         IRequestHandler<CreateTransferRefundCommand, Result<Guid>>
     {
         private readonly IPspService _pspService;
@@ -38,34 +37,6 @@ namespace Sheaft.Application.Handlers
         {
             _pspService = pspService;
             _routineOptions = routineOptions.Value;
-        }
-
-        public async Task<Result<bool>> Handle(CheckNewTransferRefundsCommand request, CancellationToken token)
-        {
-            return await ExecuteAsync(async () =>
-            {
-                var skip = 0;
-                const int take = 100;
-
-                var expiredDate = DateTimeOffset.UtcNow.AddMinutes(-_routineOptions.CheckNewTransferRefundsFromMinutes);
-                var purchaseOrderIds = await GetNextPurchaseOrderIdsAsync(expiredDate, skip, take, token);
-
-                while (purchaseOrderIds.Any())
-                {
-                    foreach (var purchaseOrderId in purchaseOrderIds)
-                    {
-                        _mediatr.Post(new CreateTransferRefundCommand(request.RequestUser)
-                        {
-                            PurchaseOrderId = purchaseOrderId
-                        });
-                    }
-
-                    skip += take;
-                    purchaseOrderIds = await GetNextPurchaseOrderIdsAsync(expiredDate, skip, take, token);
-                }
-
-                return Ok(true);
-            });
         }
 
         public async Task<Result<Guid>> Handle(CreateTransferRefundCommand request, CancellationToken token)
@@ -217,22 +188,6 @@ namespace Sheaft.Application.Handlers
 
                 return Ok(transferRefund.Status);
             });
-        }
-
-        private async Task<IEnumerable<Guid>> GetNextPurchaseOrderIdsAsync(DateTimeOffset expiredDate, int skip, int take, CancellationToken token)
-        {
-            return await _context.PurchaseOrders
-                .Get(c => c.WithdrawnOn.HasValue 
-                        && c.Transfer != null 
-                        && c.Transfer.Status == TransactionStatus.Succeeded 
-                        && !c.Transfer.SkipBackgroundProcessing
-                        && c.WithdrawnOn.Value < expiredDate
-                        && (c.Transfer.Refund == null || c.Transfer.Refund.Status == TransactionStatus.Expired), true)
-                .OrderBy(c => c.CreatedOn)
-                .Select(c => c.Id)
-                .Skip(skip)
-                .Take(take)
-                .ToListAsync(token);
         }
 
         private async Task<IEnumerable<Guid>> GetNextTransferRefundIdsAsync(DateTimeOffset expiredDate, int skip, int take, CancellationToken token)

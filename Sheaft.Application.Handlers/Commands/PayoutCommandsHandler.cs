@@ -22,7 +22,6 @@ namespace Sheaft.Application.Handlers
         IRequestHandler<CheckPayoutCommand, Result<bool>>,
         IRequestHandler<ExpirePayoutCommand, Result<bool>>,
         IRequestHandler<RefreshPayoutStatusCommand, Result<TransactionStatus>>,
-        IRequestHandler<CheckNewPayoutsCommand, Result<bool>>,
         IRequestHandler<CreatePayoutCommand, Result<Guid>>
     {
         private readonly PspOptions _pspOptions;
@@ -134,34 +133,6 @@ namespace Sheaft.Application.Handlers
                 }
 
                 return Ok(payout.Status);
-            });
-        }
-
-        public async Task<Result<bool>> Handle(CheckNewPayoutsCommand request, CancellationToken token)
-        {
-            return await ExecuteAsync(async () =>
-            {
-                var expiredDate = DateTimeOffset.UtcNow.AddMinutes(-_routineOptions.CheckNewPayoutsFromMinutes);
-
-                var producersTransfers = await _context.Transfers
-                    .Get(t => t.Refund == null
-                            && t.Status == TransactionStatus.Succeeded
-                            && (t.Payout == null || t.Payout.Status == TransactionStatus.Expired)
-                            && t.PurchaseOrder.Status == PurchaseOrderStatus.Delivered
-                            && t.PurchaseOrder.DeliveredOn.HasValue && t.PurchaseOrder.DeliveredOn.Value < expiredDate)
-                    .Select(t => new { ProducerId = t.CreditedWallet.User.Id, TransferId = t.Id })
-                    .ToListAsync(token);
-
-                foreach (var producerTransfers in producersTransfers.GroupBy(t => t.ProducerId))
-                {
-                    _mediatr.Post(new CreatePayoutCommand(request.RequestUser)
-                    {
-                        ProducerId = producerTransfers.Key,
-                        TransferIds = producerTransfers.Select(pt => pt.TransferId)
-                    });
-                }
-
-                return Ok(true);
             });
         }
 

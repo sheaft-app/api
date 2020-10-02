@@ -271,6 +271,8 @@ namespace Sheaft.Application.Handlers
                         _mediatr.Post(new PurchaseOrderCreatedEvent(request.RequestUser) { PurchaseOrderId = orderId });
 
                     _mediatr.Post(new CreateUserPointsCommand(request.RequestUser) { CreatedOn = DateTimeOffset.UtcNow, Kind = PointKind.PurchaseOrder, UserId = request.RequestUser.Id });
+                    _mediatr.Schedule(new CreateDonationCommand(request.RequestUser) { OrderId = order.Id }, TimeSpan.FromMinutes(60));
+
                     return Ok(orderIds.AsEnumerable());
                 }
             });
