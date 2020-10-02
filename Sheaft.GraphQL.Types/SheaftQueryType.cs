@@ -161,7 +161,7 @@ namespace Sheaft.GraphQL.Types
                 .Name("order")
                 .Authorize(Policies.REGISTERED)
                 .Argument("input", c => c.Type<NonNullType<IdType>>())
-                .Type<NonNullType<OrderType>>()
+                .Type<OrderType>()
                 .UseSingleOrDefault()
                 .UseSelection();
 
