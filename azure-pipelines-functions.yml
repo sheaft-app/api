@@ -7,7 +7,7 @@ trigger:
   batch: true
   branches:  
     include:
-      - refs/tags/publish-functions
+      - refs/tags/publish-jobs
       - refs/tags/publish
 
 pool:
@@ -16,14 +16,14 @@ pool:
 steps:
   - script: |
       dotnet restore $(System.DefaultWorkingDirectory)/Sheaft.sln
-      dotnet publish $(System.DefaultWorkingDirectory)/Sheaft.Web.Functions/Sheaft.Web.Functions.csproj --configuration Release --output publish_output/Sheaft.Web.Functions/
+      dotnet publish $(System.DefaultWorkingDirectory)/Sheaft.Web.Jobs/Sheaft.Web.Jobs.csproj --configuration Release --output publish_output/Sheaft.Web.Jobs/
   - task: ArchiveFiles@2
     displayName: "Archive files"
     inputs:
-      rootFolderOrFile: "$(System.DefaultWorkingDirectory)/publish_output/Sheaft.Web.Functions"
+      rootFolderOrFile: "$(System.DefaultWorkingDirectory)/publish_output/Sheaft.Web.Jobs"
       includeRootFolder: false
-      archiveFile: "$(System.DefaultWorkingDirectory)/publish_output/Sheaft.Web.Functions/build$(Build.BuildId).zip"
+      archiveFile: "$(System.DefaultWorkingDirectory)/publish_output/Sheaft.Web.Jobs/build$(Build.BuildId).zip"
   - task: PublishBuildArtifacts@1
     inputs:
-      PathtoPublish: '$(System.DefaultWorkingDirectory)/publish_output/Sheaft.Web.Functions/build$(Build.BuildId).zip'
-      artifactName: 'sheaft-functions'
+      PathtoPublish: '$(System.DefaultWorkingDirectory)/publish_output/Sheaft.Web.Jobs/build$(Build.BuildId).zip'
+      artifactName: 'sheaft-jobs'
