@@ -216,6 +216,8 @@ namespace Sheaft.Web.Jobs
                 configuration.UseMediatR();
             });
 
+            services.AddApplicationInsightsTelemetry();
+
             services.AddHangfireServer();
             services.AddMvc();
         }
