@@ -1,11 +1,8 @@
-﻿using MediatR;
+﻿using Sheaft.Application.Interop;
 using Sheaft.Core;
 
 namespace Sheaft.Application.Commands
 {
-    public interface ICommand<T>: IRequest<Result<T>>, ITrackedUser
-    {
-    }
 
     public abstract class Command<T> : ICommand<T>
     {
