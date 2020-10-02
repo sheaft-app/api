@@ -12,6 +12,8 @@ namespace Sheaft.Application.Models
         public DateTimeOffset? RemovedOn { get; set; }
         public ProfileKind Kind { get; set; }
         public string Name { get; set; }
+        public string FirstName { get; set; }
+        public string LastName { get; set; }
         public string Email { get; set; }
         public string Phone { get; set; }
         public string Reason { get; set; }

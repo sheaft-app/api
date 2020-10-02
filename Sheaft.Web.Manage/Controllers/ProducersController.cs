@@ -111,6 +111,8 @@ namespace Sheaft.Manage.Controllers
                 Description = model.Description,
                 Email = model.Email,
                 Name = model.Name,
+                FirstName = model.FirstName,
+                LastName = model.LastName,
                 Kind = model.Kind,
                 Phone = model.Phone,
                 Tags = model.Tags,

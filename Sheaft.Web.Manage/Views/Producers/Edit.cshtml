@@ -24,6 +24,14 @@
                     @Html.TextBoxFor(c => c.Name, null, new { @class = "form-control" })
                 </div>
                 <div class="form-group">
+                    @Html.LabelFor(c => c.FirstName, new { @class = "form-label" })
+                    @Html.TextBoxFor(c => c.FirstName, null, new { @class = "form-control" })
+                </div>
+                <div class="form-group">
+                    @Html.LabelFor(c => c.LastName, new { @class = "form-label" })
+                    @Html.TextBoxFor(c => c.LastName, null, new { @class = "form-control" })
+                </div>
+                <div class="form-group">
                     @Html.LabelFor(m => m.CreatedOn)
                     @Html.TextBoxFor(m => m.CreatedOn, null, new { @class = "form-control", @disabled = "disabled" })
                 </div>
