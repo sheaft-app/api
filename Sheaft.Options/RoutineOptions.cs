@@ -35,7 +35,7 @@ namespace Sheaft.Options
         public string CheckNewTransfersCron { get; set; } = "*/10 * * * *";
         public string CheckTransferRefundsCron { get; set; } = "*/10 * * * *";
         public string CheckNewTransferRefundsCron { get; set; } = "*/10 * * * *";
-        public string CheckZonesProgressCron { get; set; } = "*/10 * * * *";
-        public string CheckZonesFileCron { get; set; } = "*/10 * * * *";
+        public string CheckZonesProgressCron { get; set; } = "0 1 * * *";
+        public string CheckZonesFileCron { get; set; } = "0 1 * * *";
     }
 }
