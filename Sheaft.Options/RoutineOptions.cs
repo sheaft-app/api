@@ -1,9 +1,5 @@
-﻿using Sheaft.Core.Extensions;
-using System;
-
-namespace Sheaft.Options
+﻿namespace Sheaft.Options
 {
-
     public class RoutineOptions
     {
         public const string SETTING = "Routines";

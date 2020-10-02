@@ -5,25 +5,27 @@ using Microsoft.Extensions.Configuration;
 using Sheaft.Application.Events;
 using Sheaft.Domain.Models;
 using Sheaft.Application.Interop;
+using Microsoft.Extensions.Options;
+using Sheaft.Options;
 
 namespace Sheaft.Application.Handlers
 {
-    public class PickingOrderEventsHandler :
+    public class PickingOrderEventsHandler : EventsHandler,
         INotificationHandler<PickingOrderExportSucceededEvent>,
         INotificationHandler<PickingOrderExportFailedEvent>,
         INotificationHandler<PickingOrderExportProcessingEvent>
     {
-        private readonly IAppDbContext _context;
-        private readonly IEmailService _emailService;
-        private readonly ISignalrService _signalrService;
         private readonly IConfiguration _configuration;
 
-        public PickingOrderEventsHandler(IConfiguration configuration, IAppDbContext context, IEmailService emailService, ISignalrService signalrService)
+        public PickingOrderEventsHandler(
+            IConfiguration configuration,
+            IAppDbContext context,
+            IEmailService emailService,
+            ISignalrService signalrService,
+            IOptionsSnapshot<EmailTemplateOptions> emailTemplateOptions)
+            : base(context, emailService, signalrService, emailTemplateOptions)
         {
-            _context = context;
             _configuration = configuration;
-            _emailService = emailService;
-            _signalrService = signalrService;
         }
 
         public async Task Handle(PickingOrderExportSucceededEvent pickingOrderEvent, CancellationToken token)
@@ -35,7 +37,7 @@ namespace Sheaft.Application.Handlers
             await _emailService.SendTemplatedEmailAsync(
                 job.User.Email,
                 job.User.Name,
-                PickingOrderExportSucceededEvent.MAILING_TEMPLATE_ID,
+                _emailTemplateOptions.PickingOrderExportSucceededEvent,
                 new { UserName = job.User.Name, Name = job.Name, job.CreatedOn, JobUrl = url, DownloadUrl = job.File },
                 token);            
         }
@@ -49,7 +51,7 @@ namespace Sheaft.Application.Handlers
             await _emailService.SendTemplatedEmailAsync(
                 job.User.Email,
                 job.User.Name,
-                PickingOrderExportFailedEvent.MAILING_TEMPLATE_ID,
+                _emailTemplateOptions.PickingOrderExportFailedEvent,
                 new { UserName = job.User.Name, Name = job.Name, job.CreatedOn, JobUrl = url },
                 token);            
         }

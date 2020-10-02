@@ -1,23 +1,25 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
+using Microsoft.Extensions.Options;
 using Sheaft.Application.Events;
 using Sheaft.Application.Interop;
+using Sheaft.Options;
 
 namespace Sheaft.Application.Handlers
 {
-    public class TransferRefundEventsHandler :
+    public class TransferRefundEventsHandler : EventsHandler,
         INotificationHandler<TransferRefundFailedEvent>,
         INotificationHandler<TransferRefundSucceededEvent>,
         INotificationHandler<CreateTransferRefundFailedEvent>
     {
-        private readonly IAppDbContext _context;
-        private readonly IEmailService _emailService;
-
-        public TransferRefundEventsHandler(IAppDbContext context, IEmailService emailService)
+        public TransferRefundEventsHandler(
+            IAppDbContext context,
+            IEmailService emailService,
+            ISignalrService signalrService,
+            IOptionsSnapshot<EmailTemplateOptions> emailTemplateOptions)
+            : base(context, emailService, signalrService, emailTemplateOptions)
         {
-            _context = context;
-            _emailService = emailService;
         }
 
         public Task Handle(TransferRefundFailedEvent notification, CancellationToken cancellationToken)

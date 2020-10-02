@@ -7,10 +7,12 @@ using Newtonsoft.Json;
 using Sheaft.Application.Events;
 using Sheaft.Domain.Models;
 using Sheaft.Application.Interop;
+using Sheaft.Options;
+using Microsoft.Extensions.Options;
 
 namespace Sheaft.Application.Handlers
 {
-    public class PurchaseOrderEventsHandler :
+    public class PurchaseOrderEventsHandler : EventsHandler,
         INotificationHandler<PurchaseOrderAcceptedEvent>,
         INotificationHandler<PurchaseOrderCancelledBySenderEvent>,
         INotificationHandler<PurchaseOrderCancelledByVendorEvent>,
@@ -20,17 +22,17 @@ namespace Sheaft.Application.Handlers
         INotificationHandler<PurchaseOrderRefusedEvent>,
         INotificationHandler<CreateTransferFailedEvent>
     {
-        private readonly IAppDbContext _context;
-        private readonly IEmailService _emailService;
-        private readonly ISignalrService _signalrService;
         private readonly IConfiguration _configuration;
 
-        public PurchaseOrderEventsHandler(IConfiguration configuration, IAppDbContext context, IEmailService emailService, ISignalrService signalrService)
+        public PurchaseOrderEventsHandler(
+            IConfiguration configuration,
+            IAppDbContext context,
+            IEmailService emailService,
+            ISignalrService signalrService,
+            IOptionsSnapshot<EmailTemplateOptions> emailTemplateOptions)
+            : base(context, emailService, signalrService, emailTemplateOptions)
         {
-            _context = context;
             _configuration = configuration;
-            _emailService = emailService;
-            _signalrService = signalrService;
         }
 
         public async Task Handle(PurchaseOrderAcceptedEvent orderEvent, CancellationToken token)
@@ -45,7 +47,7 @@ namespace Sheaft.Application.Handlers
             await _emailService.SendTemplatedEmailAsync(
                 email,
                 name,
-                PurchaseOrderAcceptedEvent.MAILING_TEMPLATE_ID,
+                _emailTemplateOptions.PurchaseOrderAcceptedEvent,
                 GetTemplateDatas(purchaseOrder, url),
                 token);
         }
@@ -59,7 +61,7 @@ namespace Sheaft.Application.Handlers
             await _emailService.SendTemplatedEmailAsync(
                 purchaseOrder.Vendor.Email,
                 purchaseOrder.Vendor.Name,
-                PurchaseOrderCancelledBySenderEvent.MAILING_TEMPLATE_ID,
+                _emailTemplateOptions.PurchaseOrderCancelledBySenderEvent,
                 GetTemplateDatas(purchaseOrder, url),
                 token);
         }
@@ -74,7 +76,7 @@ namespace Sheaft.Application.Handlers
             await _emailService.SendTemplatedEmailAsync(
                 purchaseOrder.Sender.Email,
                 purchaseOrder.Sender.Name,
-                PurchaseOrderCancelledByVendorEvent.MAILING_TEMPLATE_ID,
+                _emailTemplateOptions.PurchaseOrderCancelledByVendorEvent,
                 GetTemplateDatas(purchaseOrder, url),
                 token);
         }
@@ -91,7 +93,7 @@ namespace Sheaft.Application.Handlers
             await _emailService.SendTemplatedEmailAsync(
                 email,
                 name,
-                PurchaseOrderCompletedEvent.MAILING_TEMPLATE_ID,
+                _emailTemplateOptions.PurchaseOrderCompletedEvent,
                 GetTemplateDatas(purchaseOrder, url),
                 token);
         }
@@ -106,7 +108,7 @@ namespace Sheaft.Application.Handlers
             await _emailService.SendTemplatedEmailAsync(
                 purchaseOrder.Vendor.Email,
                 purchaseOrder.Vendor.Name,
-                PurchaseOrderCreatedEvent.MAILING_TEMPLATE_ID_VENDOR,
+                _emailTemplateOptions.PurchaseOrderCreatedForVendorEvent,
                 GetTemplateDatas(purchaseOrder, url),
                 token);
 
@@ -116,7 +118,7 @@ namespace Sheaft.Application.Handlers
             await _emailService.SendTemplatedEmailAsync(
                 senderMail,
                 senderName,
-                PurchaseOrderCreatedEvent.MAILING_TEMPLATE_ID_SENDER,
+                _emailTemplateOptions.PurchaseOrderCreatedForSenderEvent,
                 GetTemplateDatas(purchaseOrder, url),
                 token);
         }
@@ -133,7 +135,7 @@ namespace Sheaft.Application.Handlers
             await _emailService.SendTemplatedEmailAsync(
                 email,
                 name,
-                PurchaseOrderRefusedEvent.MAILING_TEMPLATE_ID,
+                _emailTemplateOptions.PurchaseOrderRefusedEvent,
                 GetTemplateDatas(purchaseOrder, url),
                 token);
         }
@@ -150,7 +152,7 @@ namespace Sheaft.Application.Handlers
             await _emailService.SendTemplatedEmailAsync(
                 "support@sheaft.com",
                 "Support",
-                CreateTransferFailedEvent.MAILING_TEMPLATE_ID,
+                _emailTemplateOptions.CreateTransferFailedEvent,
                 GetTemplateDatas(purchaseOrder, null),
                 token);
         }

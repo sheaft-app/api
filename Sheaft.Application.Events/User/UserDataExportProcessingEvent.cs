@@ -4,12 +4,10 @@ using Newtonsoft.Json;
 
 namespace Sheaft.Application.Events
 {
-    public class ExportUserDataProcessingEvent : Event
+    public class UserDataExportProcessingEvent : Event
     {
-        public const string MAILING_TEMPLATE_ID = "";
-
         [JsonConstructor]
-        public ExportUserDataProcessingEvent(RequestUser requestUser) : base(requestUser)
+        public UserDataExportProcessingEvent(RequestUser requestUser) : base(requestUser)
         {
         }
 

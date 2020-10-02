@@ -6,8 +6,6 @@ namespace Sheaft.Application.Events
 {
     public class DeclarationValidatedEvent : Event
     {
-        public const string MAILING_TEMPLATE_ID = "";
-
         [JsonConstructor]
         public DeclarationValidatedEvent(RequestUser requestUser) : base(requestUser)
         {

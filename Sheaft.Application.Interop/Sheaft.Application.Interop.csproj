@@ -12,6 +12,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Sheaft.Application.Models\Sheaft.Application.Models.csproj" />
+    <ProjectReference Include="..\Sheaft.Options\Sheaft.Options.csproj" />
   </ItemGroup>
 
 </Project>

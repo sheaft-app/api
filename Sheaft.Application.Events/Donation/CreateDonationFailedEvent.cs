@@ -6,8 +6,6 @@ namespace Sheaft.Application.Events
 {
     public class CreateDonationFailedEvent : Event
     {
-        public const string MAILING_TEMPLATE_ID = "";
-
         [JsonConstructor]
         public CreateDonationFailedEvent(RequestUser requestUser) : base(requestUser)
         {

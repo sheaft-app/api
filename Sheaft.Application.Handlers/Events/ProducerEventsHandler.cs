@@ -1,24 +1,26 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
+using Microsoft.Extensions.Options;
 using Sheaft.Application.Events;
 using Sheaft.Application.Interop;
+using Sheaft.Options;
 
 namespace Sheaft.Application.Handlers
 {
-    public class ProducerEventsHandler :
+    public class ProducerEventsHandler : EventsHandler,
         INotificationHandler<ProducerNotConfiguredEvent>,
         INotificationHandler<ProducerDocumentsNotCreatedEvent>,
         INotificationHandler<ProducerDocumentsNotReviewedEvent>,
         INotificationHandler<ProducerDocumentsNotValidatedEvent>
     {
-        private readonly IAppDbContext _context;
-        private readonly IEmailService _emailService;
-
-        public ProducerEventsHandler(IAppDbContext context, IEmailService emailService)
+        public ProducerEventsHandler(
+            IAppDbContext context,
+            IEmailService emailService,
+            ISignalrService signalrService,
+            IOptionsSnapshot<EmailTemplateOptions> emailTemplateOptions)
+            : base(context, emailService, signalrService, emailTemplateOptions)
         {
-            _context = context;
-            _emailService = emailService;
         }
 
         public Task Handle(ProducerNotConfiguredEvent notification, CancellationToken cancellationToken)

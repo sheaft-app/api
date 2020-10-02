@@ -5,25 +5,27 @@ using Microsoft.Extensions.Configuration;
 using Sheaft.Application.Events;
 using Sheaft.Domain.Models;
 using Sheaft.Application.Interop;
+using Microsoft.Extensions.Options;
+using Sheaft.Options;
 
 namespace Sheaft.Application.Handlers
 {
-    public class ProductEventsHandler :
+    public class ProductEventsHandler : EventsHandler,
         INotificationHandler<ProductImportSucceededEvent>,
         INotificationHandler<ProductImportFailedEvent>,
         INotificationHandler<ProductImportProcessingEvent>
     {
-        private readonly IAppDbContext _context;
-        private readonly IEmailService _emailService;
-        private readonly ISignalrService _signalrService;
         private readonly IConfiguration _configuration;
 
-        public ProductEventsHandler(IConfiguration configuration, IAppDbContext context, IEmailService emailService, ISignalrService signalrService)
+        public ProductEventsHandler(
+            IConfiguration configuration,
+            IAppDbContext context,
+            IEmailService emailService,
+            ISignalrService signalrService,
+            IOptionsSnapshot<EmailTemplateOptions> emailTemplateOptions)
+            : base(context, emailService, signalrService, emailTemplateOptions)
         {
-            _context = context;
             _configuration = configuration;
-            _emailService = emailService;
-            _signalrService = signalrService;
         }
 
         public async Task Handle(ProductImportSucceededEvent productEvent, CancellationToken token)
@@ -35,7 +37,7 @@ namespace Sheaft.Application.Handlers
             await _emailService.SendTemplatedEmailAsync(
                 job.User.Email,
                 job.User.Name,
-                ProductImportSucceededEvent.MAILING_TEMPLATE_ID,
+                _emailTemplateOptions.ProductImportSucceededEvent,
                 new { UserName = job.User.Name, Name = job.Name, job.CreatedOn, JobUrl = url, DownloadUrl = job.File },
                 token);
         }
@@ -49,7 +51,7 @@ namespace Sheaft.Application.Handlers
             await _emailService.SendTemplatedEmailAsync(
                 job.User.Email,
                 job.User.Name,
-                ProductImportFailedEvent.MAILING_TEMPLATE_ID,
+                _emailTemplateOptions.ProductImportFailedEvent,
                 new { UserName = job.User.Name, Name = job.Name, job.CreatedOn, JobUrl = url },
                 token);
         }

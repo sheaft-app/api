@@ -4,10 +4,10 @@ using Newtonsoft.Json;
 
 namespace Sheaft.Application.Events
 {
-    public class PickingOrderExportSucceededEvent : Event
+    public class UserDataExportSucceededEvent : Event
     {
         [JsonConstructor]
-        public PickingOrderExportSucceededEvent(RequestUser requestUser) : base(requestUser)
+        public UserDataExportSucceededEvent(RequestUser requestUser) : base(requestUser)
         {
         }
 

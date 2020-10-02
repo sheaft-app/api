@@ -6,8 +6,6 @@ namespace Sheaft.Application.Events
 {
     public class CreatePayinRefundFailedEvent : Event
     {
-        public const string MAILING_TEMPLATE_ID = "";
-
         [JsonConstructor]
         public CreatePayinRefundFailedEvent(RequestUser requestUser) : base(requestUser)
         {

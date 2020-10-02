@@ -6,8 +6,6 @@ namespace Sheaft.Application.Events
 {
     public class PayoutSucceededEvent : Event
     {
-        public const string MAILING_TEMPLATE_ID = "";
-
         [JsonConstructor]
         public PayoutSucceededEvent(RequestUser requestUser) : base(requestUser)
         {

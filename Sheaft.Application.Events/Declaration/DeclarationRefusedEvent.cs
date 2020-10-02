@@ -6,8 +6,6 @@ namespace Sheaft.Application.Events
 {
     public class DeclarationRefusedEvent : Event
     {
-        public const string MAILING_TEMPLATE_ID = "";
-
         [JsonConstructor]
         public DeclarationRefusedEvent(RequestUser requestUser) : base(requestUser)
         {

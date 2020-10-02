@@ -1,23 +1,25 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
+using Microsoft.Extensions.Options;
 using Sheaft.Application.Events;
 using Sheaft.Application.Interop;
+using Sheaft.Options;
 
 namespace Sheaft.Application.Handlers
 {
-    public class PayinRefundEventsHandler :
+    public class PayinRefundEventsHandler : EventsHandler,
         INotificationHandler<PayinRefundFailedEvent>,
         INotificationHandler<PayinRefundSucceededEvent>,
         INotificationHandler<CreatePayinRefundFailedEvent>
     {
-        private readonly IAppDbContext _context;
-        private readonly IEmailService _emailService;
-
-        public PayinRefundEventsHandler(IAppDbContext context, IEmailService emailService)
+        public PayinRefundEventsHandler(
+            IAppDbContext context,
+            IEmailService emailService,
+            ISignalrService signalrService,
+            IOptionsSnapshot<EmailTemplateOptions> emailTemplateOptions)
+            : base(context, emailService, signalrService, emailTemplateOptions)
         {
-            _context = context;
-            _emailService = emailService;
         }
 
         public Task Handle(PayinRefundFailedEvent notification, CancellationToken cancellationToken)

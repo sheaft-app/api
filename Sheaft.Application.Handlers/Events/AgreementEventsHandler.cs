@@ -8,26 +8,28 @@ using Newtonsoft.Json;
 using Sheaft.Application.Events;
 using Sheaft.Domain.Models;
 using Sheaft.Application.Interop;
+using Sheaft.Options;
+using Microsoft.Extensions.Options;
 
 namespace Sheaft.Application.Handlers
 {
-    public class AgreementEventsHandler :
+    public class AgreementEventsHandler : EventsHandler,
         INotificationHandler<AgreementCreatedEvent>,
         INotificationHandler<AgreementAcceptedEvent>,
         INotificationHandler<AgreementCancelledEvent>,
         INotificationHandler<AgreementRefusedEvent>
     {
-        private readonly IAppDbContext _context;
-        private readonly ISignalrService _signalrService;
-        private readonly IEmailService _emailService;
         private readonly IConfiguration _configuration;
 
-        public AgreementEventsHandler(IConfiguration configuration, IAppDbContext context, IEmailService emailService, ISignalrService signalrService)
+        public AgreementEventsHandler(
+            IConfiguration configuration,
+            IAppDbContext context,
+            IEmailService emailService,
+            ISignalrService signalrService,
+            IOptionsSnapshot<EmailTemplateOptions> emailTemplateOptions)
+            : base(context, emailService, signalrService, emailTemplateOptions)
         {
-            _context = context;
             _configuration = configuration;
-            _emailService = emailService;
-            _signalrService = signalrService;
         }
 
         public async Task Handle(AgreementCreatedEvent agreementEvent, CancellationToken token)
@@ -36,10 +38,10 @@ namespace Sheaft.Application.Handlers
             await _signalrService.SendNotificationToGroupAsync(agreement.Delivery.Producer.Id, nameof(AgreementCreatedEvent), GetNotificationContent(agreement));
 
             await _emailService.SendTemplatedEmailAsync(
-                agreement.Delivery.Producer.Email, 
-                agreement.Delivery.Producer.Name, 
-                AgreementCreatedEvent.MAILING_TEMPLATE_ID, 
-                GetNotificationDatas(agreement), 
+                agreement.Delivery.Producer.Email,
+                agreement.Delivery.Producer.Name,
+                _emailTemplateOptions.AgreementCreatedEvent,
+                GetNotificationDatas(agreement),
                 token);
         }
 
@@ -51,7 +53,7 @@ namespace Sheaft.Application.Handlers
             await _emailService.SendTemplatedEmailAsync(
                 agreement.Delivery.Producer.Email,
                 agreement.Delivery.Producer.Name,
-                AgreementAcceptedEvent.MAILING_TEMPLATE_ID,
+                _emailTemplateOptions.AgreementAcceptedEvent,
                 GetNotificationDatas(agreement),
                 token);
         }
@@ -64,7 +66,7 @@ namespace Sheaft.Application.Handlers
             await _emailService.SendTemplatedEmailAsync(
                 agreement.Delivery.Producer.Email,
                 agreement.Delivery.Producer.Name,
-                AgreementCancelledEvent.MAILING_TEMPLATE_ID,
+                _emailTemplateOptions.AgreementCancelledEvent,
                 GetNotificationDatas(agreement),
                 token);
         }
@@ -76,7 +78,7 @@ namespace Sheaft.Application.Handlers
             await _emailService.SendTemplatedEmailAsync(
                 agreement.Delivery.Producer.Email,
                 agreement.Delivery.Producer.Name,
-                AgreementRefusedEvent.MAILING_TEMPLATE_ID,
+                _emailTemplateOptions.AgreementRefusedEvent,
                 GetNotificationDatas(agreement),
                 token);
         }

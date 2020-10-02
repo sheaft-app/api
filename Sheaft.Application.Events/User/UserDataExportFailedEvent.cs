@@ -4,12 +4,10 @@ using Sheaft.Core;
 
 namespace Sheaft.Application.Events
 {
-    public class ExportUserDataFailedEvent : Event
+    public class UserDataExportFailedEvent : Event
     {
-        public const string MAILING_TEMPLATE_ID = "";
-
         [JsonConstructor]
-        public ExportUserDataFailedEvent(RequestUser requestUser) : base(requestUser)
+        public UserDataExportFailedEvent(RequestUser requestUser) : base(requestUser)
         {
         }
 

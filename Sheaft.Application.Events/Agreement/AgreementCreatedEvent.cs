@@ -6,8 +6,6 @@ namespace Sheaft.Application.Events
 {
     public class AgreementCreatedEvent : Event
     {
-        public const string MAILING_TEMPLATE_ID = "";
-
         [JsonConstructor]
         public AgreementCreatedEvent(RequestUser requestUser) : base(requestUser)
         {

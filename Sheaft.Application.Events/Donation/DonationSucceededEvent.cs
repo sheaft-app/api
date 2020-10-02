@@ -6,8 +6,6 @@ namespace Sheaft.Application.Events
 {
     public class DonationSucceededEvent : Event
     {
-        public const string MAILING_TEMPLATE_ID = "";
-
         [JsonConstructor]
         public DonationSucceededEvent(RequestUser requestUser) : base(requestUser)
         {
