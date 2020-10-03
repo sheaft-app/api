@@ -35,7 +35,7 @@ namespace Sheaft.Application.Queries
         {
             return _context.AnyAsync<Job>(r =>
                 !r.Archived &&
-                r.Kind == JobKind.CreatePickingFromOrders &&
+                r.Kind == JobKind.ExportPickingOrders &&
                 (r.Status == ProcessStatus.Paused || r.Status == ProcessStatus.Processing || r.Status == ProcessStatus.Waiting) &&
                 r.User.Id == producerId, token);
         }

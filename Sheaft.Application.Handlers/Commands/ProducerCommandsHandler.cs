@@ -13,6 +13,7 @@ using Microsoft.Extensions.Options;
 using Sheaft.Options;
 using Sheaft.Exceptions;
 using Microsoft.EntityFrameworkCore;
+using Sheaft.Domain.Enums;
 
 namespace Sheaft.Application.Handlers
 {
@@ -20,9 +21,7 @@ namespace Sheaft.Application.Handlers
         IRequestHandler<RegisterProducerCommand, Result<Guid>>,
         IRequestHandler<UpdateProducerCommand, Result<bool>>,
         IRequestHandler<CheckProducerConfigurationCommand, Result<bool>>,
-        IRequestHandler<CheckProducerDocumentsCreatedCommand, Result<bool>>,
-        IRequestHandler<CheckProducerDocumentsReviewedCommand, Result<bool>>,
-        IRequestHandler<CheckProducerDocumentsValidatedCommand, Result<bool>>
+        IRequestHandler<EnsureProducerDocumentsValidatedCommand, Result<bool>>
     {
         private readonly RoleOptions _roleOptions;
 
@@ -193,19 +192,16 @@ namespace Sheaft.Application.Handlers
             });
         }
 
-        public Task<Result<bool>> Handle(CheckProducerDocumentsCreatedCommand request, CancellationToken cancellationToken)
+        public async Task<Result<bool>> Handle(EnsureProducerDocumentsValidatedCommand request, CancellationToken token)
         {
-            throw new NotImplementedException();
-        }
+            return await ExecuteAsync(async () =>
+            {
+                var producerLegal = await _context.GetSingleAsync<BusinessLegal>(l => l.User.Id == request.ProducerId, token);
+                if (!producerLegal.Documents.Any() || producerLegal.Documents.Any(d => d.Status != DocumentStatus.Validated))
+                    return Failed<bool>(new InvalidOperationException());
 
-        public Task<Result<bool>> Handle(CheckProducerDocumentsReviewedCommand request, CancellationToken cancellationToken)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<Result<bool>> Handle(CheckProducerDocumentsValidatedCommand request, CancellationToken cancellationToken)
-        {
-            throw new NotImplementedException();
+                return Ok(true);
+            });
         }
     }
 }

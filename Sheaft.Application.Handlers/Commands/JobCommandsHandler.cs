@@ -8,6 +8,9 @@ using Sheaft.Core;
 using Sheaft.Domain.Models;
 using Sheaft.Application.Interop;
 using System;
+using Sheaft.Domain.Enums;
+using RestSharp.Serialization.Json;
+using Newtonsoft.Json;
 
 namespace Sheaft.Application.Handlers
 {
@@ -217,7 +220,16 @@ namespace Sheaft.Application.Handlers
 
         public async Task<Result<bool>> Handle(RetryJobCommand request, CancellationToken token)
         {
-            throw new NotImplementedException();
+            return await ExecuteAsync(async () =>
+            {
+                var entity = await _context.GetByIdAsync<Job>(request.Id, token);
+
+                entity.RetryJob();
+                await _context.SaveChangesAsync(token);
+
+                EnqueueJobCommand(entity, request.RequestUser);
+                return Ok(true);
+            });
         }
 
         public async Task<Result<bool>> Handle(PauseJobCommand request,
@@ -312,9 +324,15 @@ namespace Sheaft.Application.Handlers
             });
         }
 
-        public Task<Result<bool>> Handle(ResetJobCommand request, CancellationToken token)
+        public async Task<Result<bool>> Handle(ResetJobCommand request, CancellationToken token)
         {
-            throw new NotImplementedException();
+            var entity = await _context.GetByIdAsync<Job>(request.Id, token);
+
+            entity.ResetJob();
+            await _context.SaveChangesAsync(token);
+            
+            EnqueueJobCommand(entity, request.RequestUser);
+            return Ok(true);
         }
 
         public async Task<Result<bool>> Handle(DeleteJobCommand request, CancellationToken token)
@@ -351,6 +369,25 @@ namespace Sheaft.Application.Handlers
                 await _context.SaveChangesAsync(token);
                 return Ok(true);
             });
+        }
+
+        private void EnqueueJobCommand(Job entity, RequestUser requestUser)
+        {
+            switch (entity.Kind)
+            {
+                case JobKind.ExportPickingOrders:
+                    var exportPickingOrderCommand = JsonConvert.DeserializeObject<ExportPickingOrderCommand>(entity.Command);
+                    _mediatr.Post(new ExportPickingOrderCommand(requestUser) { JobId = exportPickingOrderCommand.JobId, PurchaseOrderIds = exportPickingOrderCommand.PurchaseOrderIds });
+                    break;
+                case JobKind.ExportUserData:
+                    var exportUserDataCommand = JsonConvert.DeserializeObject<ExportUserDataCommand>(entity.Command);
+                    _mediatr.Post(new ExportUserDataCommand(requestUser) { Id = exportUserDataCommand.Id });
+                    break;
+                case JobKind.ImportProducts:
+                    var importProductsCommand = JsonConvert.DeserializeObject<ImportProductsCommand>(entity.Command);
+                    _mediatr.Post(new ImportProductsCommand(requestUser) { Id = importProductsCommand.Id, Uri = importProductsCommand.Uri });
+                    break;
+            }
         }
     }
 }

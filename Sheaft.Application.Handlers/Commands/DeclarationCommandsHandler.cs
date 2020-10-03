@@ -9,7 +9,6 @@ using System.Threading;
 using Sheaft.Domain.Models;
 using Sheaft.Domain.Enums;
 using Sheaft.Application.Events;
-using Microsoft.EntityFrameworkCore;
 
 namespace Sheaft.Application.Handlers
 {
@@ -19,7 +18,7 @@ namespace Sheaft.Application.Handlers
            IRequestHandler<LockDeclarationCommand, Result<bool>>,
            IRequestHandler<UnLockDeclarationCommand, Result<bool>>,
            IRequestHandler<RefreshDeclarationStatusCommand, Result<DeclarationStatus>>,
-           IRequestHandler<CheckDeclarationConfigurationCommand, Result<bool>>
+           IRequestHandler<EnsureDeclarationIsValidatedCommand, Result<bool>>
     {
         private readonly IPspService _pspService;
 
@@ -135,7 +134,7 @@ namespace Sheaft.Application.Handlers
             });
         }
 
-        public async Task<Result<bool>> Handle(CheckDeclarationConfigurationCommand request, CancellationToken token)
+        public async Task<Result<bool>> Handle(EnsureDeclarationIsValidatedCommand request, CancellationToken token)
         {
             return await ExecuteAsync(async () =>
             {
@@ -162,6 +161,9 @@ namespace Sheaft.Application.Handlers
 
                     await _context.SaveChangesAsync(token);
                 }
+
+                if (legal.Declaration.Status != DeclarationStatus.Validated)
+                    return Failed<bool>(new InvalidOperationException());
 
                 return Ok(true);
             });

@@ -4,10 +4,10 @@ using Newtonsoft.Json;
 
 namespace Sheaft.Application.Commands
 {
-    public class CheckDeclarationConfigurationCommand : Command<bool>
+    public class EnsureDeclarationIsValidatedCommand : Command<bool>
     {
         [JsonConstructor]
-        public CheckDeclarationConfigurationCommand(RequestUser requestUser) : base(requestUser)
+        public EnsureDeclarationIsValidatedCommand(RequestUser requestUser) : base(requestUser)
         {
         }
 
