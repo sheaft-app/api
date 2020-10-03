@@ -4,6 +4,7 @@
     {
         Payments,
         Returnables,
-        Refunds
+        Refunds,
+        Donations
     }
 }

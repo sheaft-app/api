@@ -47,7 +47,7 @@ namespace Sheaft.Domain.Models
 
             FirstName = firstname;
 
-            if(Kind == ProfileKind.Consumer)
+            if (Kind == ProfileKind.Consumer)
                 SetUserName($"{FirstName} {LastName}");
         }
 
@@ -143,5 +143,24 @@ namespace Sheaft.Domain.Models
         {
             TotalPoints = points;
         }
+    }
+
+    public class Admin : User
+    {
+        protected Admin()
+        {
+        }
+
+        public Admin(Guid id, string name, string firstname, string lastname, string email)
+            : base(id, ProfileKind.Admin, name, firstname, lastname, email) { }
+    }
+
+    public class Support : User
+    {
+        protected Support()
+        {
+        }
+        public Support(Guid id, string name, string firstname, string lastname, string email)
+            : base(id, ProfileKind.Support, name, firstname, lastname, email) { }
     }
 }

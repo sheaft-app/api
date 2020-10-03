@@ -22,7 +22,9 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
             entity.HasDiscriminator(c => c.Kind)
                 .HasValue<Producer>(ProfileKind.Producer)
                 .HasValue<Store>(ProfileKind.Store)
-                .HasValue<Consumer>(ProfileKind.Consumer);
+                .HasValue<Consumer>(ProfileKind.Consumer)
+                .HasValue<Admin>(ProfileKind.Admin)
+                .HasValue<Support>(ProfileKind.Support);
 
             entity.OwnsOne(c => c.Address, cb =>
             {

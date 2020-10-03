@@ -31,6 +31,8 @@ using Sheaft.Application.Interop;
 using Sheaft.Application.Mappers;
 using Sheaft.Application.Queries;
 using Sheaft.Core.Security;
+using Sheaft.Domain.Enums;
+using Sheaft.Domain.Models;
 using Sheaft.GraphQL.Services;
 using Sheaft.GraphQL.Types;
 using Sheaft.Infrastructure;
@@ -321,7 +323,7 @@ namespace Sheaft.Web.Api
                 .SetCompatibilityVersion(CompatibilityVersion.Latest);
         }
 
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IConfiguration configuration)
         {
             if (env.IsDevelopment())
             {
@@ -333,6 +335,35 @@ namespace Sheaft.Web.Api
                     if (!context.AllMigrationsApplied())
                     {
                         context.Migrate();
+                    }
+
+                    var adminId = configuration.GetValue<Guid>("Users:admin:id");
+                    if (context.Users.FirstOrDefault(u=> u.Id == adminId) == null)
+                    {
+                        var firstname = configuration.GetValue<string>("Users:admin:firstname");
+                        var lastname = configuration.GetValue<string>("Users:admin:lastname");
+                        var email = configuration.GetValue<string>("Users:admin:email");
+
+                        var admin = new Admin(adminId, $"{firstname} {lastname}", firstname, lastname, email);
+                        admin.SetIdentifier(configuration.GetValue<string>("Psp:UserId"));
+                        context.Add(admin);
+
+                        var wallet = new Wallet(Guid.NewGuid(), "Donation", WalletKind.Donations, admin);
+                        wallet.SetIdentifier(configuration.GetValue<string>("Psp:WalletId"));
+                        context.Add(wallet);
+
+                        context.SaveChanges();
+                    }
+
+                    var supportId = configuration.GetValue<Guid>("Users:support:id");
+                    if (context.Users.FirstOrDefault(u => u.Id == supportId) == null)
+                    {
+                        var firstname = configuration.GetValue<string>("Users:support:firstname");
+                        var lastname = configuration.GetValue<string>("Users:support:lastname");
+                        var email = configuration.GetValue<string>("Users:support:email");
+
+                        context.Add(new Support(supportId, $"{firstname} {lastname}", firstname, lastname, email));
+                        context.SaveChanges();
                     }
                 }
             }
