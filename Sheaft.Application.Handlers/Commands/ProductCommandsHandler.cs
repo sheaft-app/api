@@ -118,7 +118,6 @@ namespace Sheaft.Application.Handlers
                 var tags = await _context.FindAsync<Tag>(t => request.Tags.Contains(t.Id), token);
                 entity.SetTags(tags);
 
-                _context.Update(entity);
                 await _context.SaveChangesAsync(token);
 
                 var imageResult = await _mediatr.Process(new UpdateProductPictureCommand(request.RequestUser) { ProductId = entity.Id, Picture = request.Picture }, token);
@@ -137,11 +136,9 @@ namespace Sheaft.Application.Handlers
                 var entity = await _context.GetByIdAsync<Product>(request.Id, token);
 
                 entity.AddRating(user, request.Value, request.Comment);
-                _context.Update(entity);
-
                 await _context.SaveChangesAsync(token);
-                _mediatr.Post(new CreateUserPointsCommand(request.RequestUser) { CreatedOn = DateTimeOffset.UtcNow, Kind = PointKind.RateProduct, UserId = request.RequestUser.Id });
 
+                _mediatr.Post(new CreateUserPointsCommand(request.RequestUser) { CreatedOn = DateTimeOffset.UtcNow, Kind = PointKind.RateProduct, UserId = request.RequestUser.Id });
                 return Ok(true);
             });
         }
@@ -172,9 +169,7 @@ namespace Sheaft.Application.Handlers
                 var entity = await _context.GetByIdAsync<Product>(request.Id, token);
                 entity.SetAvailable(request.Available);
 
-                _context.Update(entity);
                 await _context.SaveChangesAsync(token);
-
                 return Ok(true);
             });
         }

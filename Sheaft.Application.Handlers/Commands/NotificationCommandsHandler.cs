@@ -47,7 +47,6 @@ namespace Sheaft.Application.Handlers
                     return Ok(true);
 
                 notification.SetAsRead();
-                _context.Update(notification);
 
                 await _context.SaveChangesAsync(token);
                 return Ok(true);

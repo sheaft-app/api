@@ -29,13 +29,11 @@ namespace Sheaft.Application.Handlers
             return await ExecuteAsync(async () =>
             {
                 var entity = await _context.Regions.SingleOrDefaultAsync(c => c.Id == request.Id, token);
-
                 entity.SetName(request.Name);
                 entity.SetRequiredProducers(request.RequiredProducers);
 
-                _context.Update(entity);
-
-                return Ok(await _context.SaveChangesAsync(token) > 0);
+                await _context.SaveChangesAsync(token);
+                return Ok(true);
             });
         }
 
@@ -54,9 +52,7 @@ namespace Sheaft.Application.Handlers
                 region.SetProducersCount(request.Producers);
                 region.SetStoresCount(request.Stores);
 
-                _context.Update(region);
                 await _context.SaveChangesAsync(token);
-
                 return Ok(true);
             });
         }

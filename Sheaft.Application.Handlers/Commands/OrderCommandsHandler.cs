@@ -164,12 +164,12 @@ namespace Sheaft.Application.Handlers
                     var cartDelivery = request.ProducersExpectedDeliveries.FirstOrDefault(ped => ped.DeliveryModeId == delivery.Id);
                     cartDeliveries.Add(new Tuple<DeliveryMode, DateTimeOffset, string>(delivery, cartDelivery.ExpectedDeliveryDate, cartDelivery.Comment));
                 }
+
                 entity.SetDeliveries(cartDeliveries);
-
                 entity.SetDonation(request.Donation);
-                _context.Update(entity);
 
-                return Ok(await _context.SaveChangesAsync(token) > 0);
+                await _context.SaveChangesAsync(token);
+                return Ok(true);
             });
         }
 
@@ -188,8 +188,6 @@ namespace Sheaft.Application.Handlers
                         return Failed<Guid>(new ValidationException());
 
                     order.SetStatus(OrderStatus.Waiting);
-
-                    _context.Update(order);
                     await _context.SaveChangesAsync(token);
 
                     var result = await _mediatr.Process(new CreateWebPayinCommand(request.RequestUser) { OrderId = order.Id }, token);
@@ -220,8 +218,6 @@ namespace Sheaft.Application.Handlers
                 using (var transaction = await _context.Database.BeginTransactionAsync(token))
                 {
                     order.SetStatus(OrderStatus.Waiting);
-
-                    _context.Update(order);
                     await _context.SaveChangesAsync(token);
 
                     var result = await _mediatr.Process(new CreateWebPayinCommand(request.RequestUser) { OrderId = order.Id }, token);
@@ -285,9 +281,7 @@ namespace Sheaft.Application.Handlers
                 var order = await _context.GetByIdAsync<Order>(request.OrderId, token);
                 order.SetStatus(OrderStatus.Refused);
 
-                _context.Update(order);
                 await _context.SaveChangesAsync(token);
-
                 return Ok(true);
             });
         }
@@ -299,9 +293,7 @@ namespace Sheaft.Application.Handlers
                 var order = await _context.GetByIdAsync<Order>(request.OrderId, token);
                 order.SetStatus(OrderStatus.Expired);
 
-                _context.Update(order);
                 await _context.SaveChangesAsync(token);
-
                 return Ok(true);
             });
         }
@@ -313,9 +305,7 @@ namespace Sheaft.Application.Handlers
                 var order = await _context.GetByIdAsync<Order>(request.OrderId, token);
                 order.SetSkipBackgroundProcessing(false);
 
-                _context.Update(order);
                 await _context.SaveChangesAsync(token);
-
                 return Ok(true);
             });
         }

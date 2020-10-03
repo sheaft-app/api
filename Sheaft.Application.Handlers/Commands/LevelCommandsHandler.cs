@@ -43,12 +43,11 @@ namespace Sheaft.Application.Handlers
             return await ExecuteAsync(async () =>
             {
                 var entity = await _context.GetByIdAsync<Level>(request.Id, token);
-
                 entity.SetName(request.Name);
                 entity.SetRequiredPoints(request.RequiredPoints);
 
-                _context.Update(entity);
-                return Ok(await _context.SaveChangesAsync(token) > 0);
+                await _context.SaveChangesAsync(token);
+                return Ok(true);
             });
         }
 
@@ -59,7 +58,8 @@ namespace Sheaft.Application.Handlers
                 var entity = await _context.GetByIdAsync<Level>(request.Id, token);
                 _context.Remove(entity);
 
-                return Ok(await _context.SaveChangesAsync(token) > 0);
+                await _context.SaveChangesAsync(token);
+                return Ok(true);
             });
         }
 
@@ -70,7 +70,8 @@ namespace Sheaft.Application.Handlers
                 var entity = await _context.Levels.SingleOrDefaultAsync(r => r.Id == request.Id, token);
                 _context.Restore(entity);
 
-                return Ok(await _context.SaveChangesAsync(token) > 0);
+                await _context.SaveChangesAsync(token);
+                return Ok(true);
             });
         }
     }

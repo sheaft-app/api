@@ -54,8 +54,6 @@ namespace Sheaft.Application.Handlers
                     return Failed<Guid>(resultIdentifier.Exception);
 
                 var purchaseOrderId = order.AddPurchaseOrder(resultIdentifier.Data, producer);
-                _context.Update(order);
-
                 await _context.SaveChangesAsync(token);
 
                 if (!request.SkipSendEmail)
@@ -225,9 +223,7 @@ namespace Sheaft.Application.Handlers
                 var purchaseOrder = await _context.GetByIdAsync<PurchaseOrder>(request.Id, token);
                 purchaseOrder.Ship();
 
-                _context.Update(purchaseOrder);
                 await _context.SaveChangesAsync(token);
-
                 return Ok(true);
             });
         }
@@ -239,9 +235,7 @@ namespace Sheaft.Application.Handlers
                 var purchaseOrder = await _context.GetByIdAsync<PurchaseOrder>(request.Id, token);
                 purchaseOrder.Deliver();
 
-                _context.Update(purchaseOrder);
                 await _context.SaveChangesAsync(token);
-
                 return Ok(true);
             });
         }
@@ -253,7 +247,6 @@ namespace Sheaft.Application.Handlers
                 var purchaseOrder = await _context.GetByIdAsync<PurchaseOrder>(request.Id, token);
                 purchaseOrder.Cancel(request.Reason);
 
-                _context.Update(purchaseOrder);
                 await _context.SaveChangesAsync(token);
 
                 if (request.RequestUser.Id == purchaseOrder.Sender.Id)
@@ -275,7 +268,6 @@ namespace Sheaft.Application.Handlers
                 var purchaseOrder = await _context.GetByIdAsync<PurchaseOrder>(request.Id, token);
                 purchaseOrder.Refuse(request.Reason);
 
-                _context.Update(purchaseOrder);
                 await _context.SaveChangesAsync(token);
 
                 _mediatr.Post(new PurchaseOrderRefusedEvent(request.RequestUser) { PurchaseOrderId = purchaseOrder.Id });
@@ -294,7 +286,6 @@ namespace Sheaft.Application.Handlers
                 var purchaseOrder = await _context.GetByIdAsync<PurchaseOrder>(request.Id, token);
                 purchaseOrder.Process();
 
-                _context.Update(purchaseOrder);
                 await _context.SaveChangesAsync(token);
 
                 _mediatr.Post(new PurchaseOrderProcessingEvent(request.RequestUser) { PurchaseOrderId = purchaseOrder.Id });
@@ -309,7 +300,6 @@ namespace Sheaft.Application.Handlers
                 var purchaseOrder = await _context.GetByIdAsync<PurchaseOrder>(request.Id, token);
                 purchaseOrder.Complete();
 
-                _context.Update(purchaseOrder);
                 await _context.SaveChangesAsync(token);
 
                 _mediatr.Post(new PurchaseOrderCompletedEvent(request.RequestUser) { PurchaseOrderId = purchaseOrder.Id });
@@ -322,9 +312,7 @@ namespace Sheaft.Application.Handlers
             return await ExecuteAsync(async () =>
             {
                 var purchaseOrder = await _context.GetByIdAsync<PurchaseOrder>(request.Id, token);
-
                 purchaseOrder.Accept();
-                _context.Update(purchaseOrder);
 
                 await _context.SaveChangesAsync(token);
                 

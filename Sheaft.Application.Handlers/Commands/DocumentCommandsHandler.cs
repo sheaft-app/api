@@ -51,8 +51,6 @@ namespace Sheaft.Application.Handlers
                         throw new ValidationException();
 
                     var document = legal.AddDocument(request.Kind, request.Name);
-
-                    _context.Update(legal);
                     await _context.SaveChangesAsync(token);
 
                     var result = await _pspService.CreateDocumentAsync(document, legal.User.Identifier, token);
@@ -65,7 +63,6 @@ namespace Sheaft.Application.Handlers
                     document.SetIdentifier(result.Data.Identifier);
                     document.SetStatus(result.Data.Status);
 
-                    _context.Update(document);
                     await _context.SaveChangesAsync(token);
                     await transaction.CommitAsync(token);
 
@@ -96,9 +93,7 @@ namespace Sheaft.Application.Handlers
                     document.SetStatus(result.Data.Status);
                 }
 
-                _context.Update(document);
                 await _context.SaveChangesAsync(token);
-
                 return Ok(true);
             });
         }
@@ -134,8 +129,6 @@ namespace Sheaft.Application.Handlers
                     return Failed<bool>(new InvalidOperationException());
 
                 document.SetStatus(DocumentStatus.Locked);
-
-                _context.Update(document);
                 await _context.SaveChangesAsync(token);
 
                 return Ok(true);
@@ -150,9 +143,7 @@ namespace Sheaft.Application.Handlers
                 var document = legal.Documents.FirstOrDefault(c => c.Id == request.DocumentId);
                 document.SetStatus(DocumentStatus.UnLocked);
 
-                _context.Update(document);
                 await _context.SaveChangesAsync(token);
-
                 return Ok(true);
             });
         }
@@ -221,9 +212,7 @@ namespace Sheaft.Application.Handlers
                 var legal = await _context.GetSingleAsync<Legal>(r => r.Documents.Any(d => d.Id == request.Id), token);
                 legal.DeleteDocument(request.Id);
 
-                _context.Update(legal);
                 await _context.SaveChangesAsync(token);
-
                 return Ok(true);
             });
         }
@@ -243,7 +232,6 @@ namespace Sheaft.Application.Handlers
                 document.SetResult(pspResult.Data.ResultCode, pspResult.Data.ResultMessage);
                 document.SetProcessedOn(pspResult.Data.ProcessedOn);
 
-                _context.Update(document);
                 await _context.SaveChangesAsync(token);
 
                 switch (document.Status)

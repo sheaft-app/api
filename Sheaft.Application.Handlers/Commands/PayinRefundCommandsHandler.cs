@@ -93,9 +93,7 @@ namespace Sheaft.Application.Handlers
                 var payinRefund = await _context.GetByIdAsync<PayinRefund>(request.PayinRefundId, token);
                 payinRefund.SetStatus(TransactionStatus.Expired);
 
-                _context.Update(payinRefund);
                 await _context.SaveChangesAsync(token);
-
                 return Ok(true);
             });
         }
@@ -116,7 +114,6 @@ namespace Sheaft.Application.Handlers
                 payinRefund.SetResult(pspResult.Data.ResultCode, pspResult.Data.ResultMessage);
                 payinRefund.SetExecutedOn(pspResult.Data.ProcessedOn);
 
-                _context.Update(payinRefund);
                 await _context.SaveChangesAsync(token);
 
                 switch (payinRefund.Status)
@@ -150,7 +147,6 @@ namespace Sheaft.Application.Handlers
                 if (orderPayinRefunds.Count(c => c.Status == TransactionStatus.Expired) >= 3)
                 {
                     order.Payin.SetSkipBackgroundProcessing(true);
-                    _context.Update(order.Payin);
                     await _context.SaveChangesAsync(token);
 
                     _mediatr.Post(new CreatePayinRefundFailedEvent(request.RequestUser)
@@ -190,9 +186,6 @@ namespace Sheaft.Application.Handlers
                     payinRefund.SetResult(result.Data.ResultCode, result.Data.ResultMessage);
                     payinRefund.SetIdentifier(result.Data.Identifier);
                     payinRefund.SetStatus(result.Data.Status);
-
-                    _context.Update(payinRefund);
-                    _context.Update(order.Payin);
 
                     await _context.SaveChangesAsync(token);
                     await transaction.CommitAsync(token);

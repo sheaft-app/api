@@ -86,9 +86,7 @@ namespace Sheaft.Application.Handlers
                 if (!result.Success)
                     return result;
 
-                _context.Update(entity);
                 await _context.SaveChangesAsync(token);
-
                 return Ok(true);
             });
         }
@@ -107,7 +105,6 @@ namespace Sheaft.Application.Handlers
                     return Failed<string>(result.Exception);
 
                 entity.SetSponsoringCode(result.Data);
-                _context.Update(entity);
 
                 await _context.SaveChangesAsync(token);
                 return Created(entity.SponsorshipCode);
@@ -136,13 +133,11 @@ namespace Sheaft.Application.Handlers
                 var point = new Points(user, request.Kind, quantity, request.CreatedOn);
 
                 user.SetTotalPoints(user.TotalPoints + point.Quantity);
-                _context.Update(user);
 
                 await _context.AddAsync(point, token);
                 await _context.SaveChangesAsync(token);
 
                 _mediatr.Post(new UserPointsCreatedEvent(request.RequestUser) { UserId = user.Id, Kind = request.Kind, Points = quantity, CreatedOn = request.CreatedOn });
-
                 return Ok(true);
             });
         }
@@ -227,13 +222,11 @@ namespace Sheaft.Application.Handlers
                         return Failed<bool>(result.Exception);
 
                     entity.Close(request.Reason);
-                    _context.Update(entity);
 
                     await _context.SaveChangesAsync(token);
                     await transaction.CommitAsync(token);
 
                     _mediatr.Post(new RemoveUserDataCommand(request.RequestUser) { Id = request.Id, Email = entity.Email });
-
                     return Ok(true);
                 }
             });

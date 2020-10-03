@@ -94,9 +94,7 @@ namespace Sheaft.Application.Handlers
                 var transfer = await _context.GetByIdAsync<Transfer>(request.TransferId, token);
                 transfer.SetStatus(TransactionStatus.Expired);
 
-                _context.Update(transfer);
                 await _context.SaveChangesAsync(token);
-
                 return Ok(true);
             });
         }
@@ -108,9 +106,7 @@ namespace Sheaft.Application.Handlers
                 var transfer = await _context.GetByIdAsync<Transfer>(request.TransferId, token);
                 transfer.SetSkipBackgroundProcessing(false);
 
-                _context.Update(transfer);
                 await _context.SaveChangesAsync(token);
-
                 return Ok(true);
             });
         }
@@ -131,8 +127,7 @@ namespace Sheaft.Application.Handlers
                 transfer.SetResult(pspResult.Data.ResultCode, pspResult.Data.ResultMessage);
                 transfer.SetExecutedOn(pspResult.Data.ProcessedOn);
 
-                _context.Update(transfer);
-                var success = await _context.SaveChangesAsync(token) > 0;
+                await _context.SaveChangesAsync(token);
 
                 switch (transfer.Status)
                 {
@@ -169,7 +164,6 @@ namespace Sheaft.Application.Handlers
                 if (purchaseOrderTransfers.Count(c => c.Status == TransactionStatus.Expired) >= 3)
                 {
                     purchaseOrder.SetSkipBackgroundProcessing(true);
-                    _context.Update(purchaseOrder);
                     await _context.SaveChangesAsync(token);
 
                     _mediatr.Post(new CreateTransferFailedEvent(request.RequestUser)
@@ -198,9 +192,6 @@ namespace Sheaft.Application.Handlers
                     transfer.SetResult(result.Data.ResultCode, result.Data.ResultMessage);
                     transfer.SetIdentifier(result.Data.Identifier);
                     transfer.SetStatus(result.Data.Status);
-
-                    _context.Update(transfer);
-                    _context.Update(purchaseOrder);
 
                     await _context.SaveChangesAsync(token);
                     await transaction.CommitAsync(token);

@@ -59,7 +59,6 @@ namespace Sheaft.Application.Handlers
                 if (orderDonations.Count(c => c.Status == TransactionStatus.Expired) >= 3)
                 {
                     order.SetSkipBackgroundProcessing(true);
-                    _context.Update(order);
                     await _context.SaveChangesAsync(token);
 
                     _mediatr.Post(new CreateDonationFailedEvent(request.RequestUser)
@@ -86,9 +85,6 @@ namespace Sheaft.Application.Handlers
                     donation.SetResult(result.Data.ResultCode, result.Data.ResultMessage);
                     donation.SetIdentifier(result.Data.Identifier);
                     donation.SetStatus(result.Data.Status);
-
-                    _context.Update(donation);
-                    _context.Update(order);
 
                     await _context.SaveChangesAsync(token);
                     await transaction.CommitAsync(token);
@@ -152,9 +148,7 @@ namespace Sheaft.Application.Handlers
                 var donation = await _context.GetByIdAsync<Donation>(request.DonationId, token);
                 donation.SetStatus(TransactionStatus.Expired);
 
-                _context.Update(donation);
                 await _context.SaveChangesAsync(token);
-
                 return Ok(true);
             });
         }
@@ -175,8 +169,7 @@ namespace Sheaft.Application.Handlers
                 donation.SetResult(pspResult.Data.ResultCode, pspResult.Data.ResultMessage);
                 donation.SetExecutedOn(pspResult.Data.ProcessedOn);
 
-                _context.Update(donation);
-                var success = await _context.SaveChangesAsync(token) > 0;
+                await _context.SaveChangesAsync(token);
 
                 switch (donation.Status)
                 {

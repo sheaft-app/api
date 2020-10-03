@@ -55,13 +55,11 @@ namespace Sheaft.Application.Handlers
             return await ExecuteAsync(async () =>
             {
                 var entity = await _context.GetByIdAsync<QuickOrder>(request.Id, token);
-
                 entity.SetName(request.Name);
                 entity.SetDescription(request.Name);
 
-                _context.Update(entity);
-
-                return Ok(await _context.SaveChangesAsync(token) > 0);
+                await _context.SaveChangesAsync(token);
+                return Ok(true);
             });
         }
 
@@ -93,9 +91,8 @@ namespace Sheaft.Application.Handlers
                     }
                 }
 
-                _context.Update(entity);
-
-                return Ok(await _context.SaveChangesAsync(token) > 0);
+                await _context.SaveChangesAsync(token);
+                return Ok(true);
             });
         }
 

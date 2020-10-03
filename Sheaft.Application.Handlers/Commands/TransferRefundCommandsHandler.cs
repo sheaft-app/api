@@ -56,7 +56,6 @@ namespace Sheaft.Application.Handlers
                 if (purchaseOrderTransferRefunds.Count(c => c.Status == TransactionStatus.Expired) >= 3)
                 {
                     purchaseOrder.Transfer.SetSkipBackgroundProcessing(true);
-                    _context.Update(purchaseOrder.Transfer);
                     await _context.SaveChangesAsync(token);
 
                     _mediatr.Post(new CreateTransferRefundFailedEvent(request.RequestUser)
@@ -84,9 +83,6 @@ namespace Sheaft.Application.Handlers
                     transferRefund.SetResult(result.Data.ResultCode, result.Data.ResultMessage);
                     transferRefund.SetIdentifier(result.Data.Identifier);
                     transferRefund.SetStatus(result.Data.Status);
-
-                    _context.Update(transferRefund);
-                    _context.Update(purchaseOrder.Transfer);
 
                     await _context.SaveChangesAsync(token);
                     await transaction.CommitAsync(token);
@@ -150,9 +146,7 @@ namespace Sheaft.Application.Handlers
                 var transferRefund = await _context.GetByIdAsync<TransferRefund>(request.TransferRefundId, token);
                 transferRefund.SetStatus(TransactionStatus.Expired);
 
-                _context.Update(transferRefund);
                 await _context.SaveChangesAsync(token);
-
                 return Ok(true);
             });
         }
@@ -173,7 +167,6 @@ namespace Sheaft.Application.Handlers
                 transferRefund.SetResult(pspResult.Data.ResultCode, pspResult.Data.ResultMessage);
                 transferRefund.SetExecutedOn(pspResult.Data.ProcessedOn);
 
-                _context.Update(transferRefund);
                 await _context.SaveChangesAsync(token);
 
                 switch (transferRefund.Status)

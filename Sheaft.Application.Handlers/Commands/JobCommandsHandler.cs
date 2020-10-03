@@ -208,11 +208,10 @@ namespace Sheaft.Application.Handlers
             return await ExecuteAsync(async () =>
             {
                 var entity = await _context.GetByIdAsync<Job>(request.Id, token);
-
                 entity.CancelJob(request.Reason);
-                _context.Update(entity);
 
-                return Ok(await _context.SaveChangesAsync(token) > 0);
+                await _context.SaveChangesAsync(token);
+                return Ok(true);
             });
         }
 
@@ -227,11 +226,10 @@ namespace Sheaft.Application.Handlers
             return await ExecuteAsync(async () =>
             {
                 var entity = await _context.GetByIdAsync<Job>(request.Id, token);
-
                 entity.PauseJob();
-                _context.Update(entity);
 
-                return Ok(await _context.SaveChangesAsync(token) > 0);
+                await _context.SaveChangesAsync(token);
+                return Ok(true);
             });
         }
 
@@ -241,11 +239,10 @@ namespace Sheaft.Application.Handlers
             return await ExecuteAsync(async () =>
             {
                 var entity = await _context.GetByIdAsync<Job>(request.Id, token);
-
                 entity.ArchiveJob();
-                _context.Update(entity);
 
-                return Ok(await _context.SaveChangesAsync(token) > 0);
+                await _context.SaveChangesAsync(token);
+                return Ok(true);
             });
         }
 
@@ -255,11 +252,10 @@ namespace Sheaft.Application.Handlers
             return await ExecuteAsync(async () =>
             {
                 var entity = await _context.GetByIdAsync<Job>(request.Id, token);
-
                 entity.UnarchiveJob();
-                _context.Update(entity);
 
-                return Ok(await _context.SaveChangesAsync(token) > 0);
+                await _context.SaveChangesAsync(token);
+                return Ok(true);
             });
         }
 
@@ -269,11 +265,10 @@ namespace Sheaft.Application.Handlers
             return await ExecuteAsync(async () =>
             {
                 var entity = await _context.GetByIdAsync<Job>(request.Id, token);
-
                 entity.ResumeJob();
-                _context.Update(entity);
 
-                return Ok(await _context.SaveChangesAsync(token) > 0);
+                await _context.SaveChangesAsync(token);
+                return Ok(true);
             });
         }
 
@@ -283,11 +278,10 @@ namespace Sheaft.Application.Handlers
             return await ExecuteAsync(async () =>
             {
                 var entity = await _context.GetByIdAsync<Job>(request.Id, token);
-
                 entity.StartJob();
-                _context.Update(entity);
 
-                return Ok(await _context.SaveChangesAsync(token) > 0);
+                await _context.SaveChangesAsync(token);
+                return Ok(true);
             });
         }
 
@@ -297,13 +291,11 @@ namespace Sheaft.Application.Handlers
             return await ExecuteAsync(async () =>
             {
                 var entity = await _context.GetByIdAsync<Job>(request.Id, token);
-
                 entity.SetDownloadUrl(request.FileUrl);
                 entity.CompleteJob();
 
-                _context.Update(entity);
-
-                return Ok(await _context.SaveChangesAsync(token) > 0);
+                await _context.SaveChangesAsync(token);
+                return Ok(true);
             });
         }
 
@@ -313,11 +305,10 @@ namespace Sheaft.Application.Handlers
             return await ExecuteAsync(async () =>
             {
                 var entity = await _context.GetByIdAsync<Job>(request.Id, token);
-
                 entity.FailJob(request.Reason);
-                _context.Update(entity);
-                
-                return Ok(await _context.SaveChangesAsync(token) > 0);
+
+                await _context.SaveChangesAsync(token);
+                return Ok(true);
             });
         }
 
@@ -331,10 +322,10 @@ namespace Sheaft.Application.Handlers
             return await ExecuteAsync(async () =>
             {
                 var entity = await _context.GetByIdAsync<Job>(request.Id, token);
-
                 _context.Remove(entity);
 
-                return Ok(await _context.SaveChangesAsync(token) > 0);
+                await _context.SaveChangesAsync(token);
+                return Ok(true);
             });
         }
 
@@ -345,7 +336,8 @@ namespace Sheaft.Application.Handlers
                 var entity = await _context.Jobs.SingleOrDefaultAsync(a => a.Id == request.Id && a.RemovedOn.HasValue, token);
                 _context.Restore(entity);
 
-                return Ok(await _context.SaveChangesAsync(token) > 0);
+                await _context.SaveChangesAsync(token);
+                return Ok(true);
             });
         }
 
@@ -356,9 +348,8 @@ namespace Sheaft.Application.Handlers
                 var entity = await _context.GetByIdAsync<Job>(request.Id, token);
                 entity.SetName(request.Name);
 
-                _context.Update(entity);
-
-                return Ok(await _context.SaveChangesAsync(token) > 0);
+                await _context.SaveChangesAsync(token);
+                return Ok(true);
             });
         }
     }

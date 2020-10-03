@@ -68,8 +68,6 @@ namespace Sheaft.Application.Handlers
                 webPayin.SetStatus(result.Data.Status);
                 webPayin.SetCreditedAmount(result.Data.Credited);
 
-                _context.Update(webPayin);
-
                 await _context.SaveChangesAsync(token);
                 return Ok(webPayin.Id);
             });
@@ -129,9 +127,7 @@ namespace Sheaft.Application.Handlers
                 var payin = await _context.GetByIdAsync<Payin>(request.PayinId, token);
                 payin.SetStatus(TransactionStatus.Expired);
 
-                _context.Update(payin);
                 await _context.SaveChangesAsync(token);
-
                 return Ok(true);
             });
         }
@@ -152,7 +148,6 @@ namespace Sheaft.Application.Handlers
                 payin.SetResult(pspResult.Data.ResultCode, pspResult.Data.ResultMessage);
                 payin.SetExecutedOn(pspResult.Data.ProcessedOn);
 
-                _context.Update(payin);
                 await _context.SaveChangesAsync(token);
 
                 switch (payin.Status)

@@ -43,7 +43,6 @@ namespace Sheaft.Application.Handlers
 
                 legal.Declaration.AddUbo(ubo);
 
-                _context.Update(legal.Declaration);
                 await _context.SaveChangesAsync(token);
 
                 var result = await _pspService.CreateUboAsync(ubo, legal.Declaration, legal.User, token);
@@ -52,9 +51,7 @@ namespace Sheaft.Application.Handlers
 
                 ubo.SetIdentifier(result.Data);
 
-                _context.Update(ubo);
                 await _context.SaveChangesAsync(token);
-
                 return Ok(ubo.Id);
             });
         }
@@ -80,9 +77,7 @@ namespace Sheaft.Application.Handlers
                 if (!result.Success)
                     return Failed<bool>(result.Exception);
 
-                _context.Update(ubo);
                 await _context.SaveChangesAsync(token);
-
                 return Ok(true);
             });
         }
@@ -94,9 +89,7 @@ namespace Sheaft.Application.Handlers
                 var legal = await _context.GetSingleAsync<BusinessLegal>(c => c.Declaration.Ubos.Any(u => u.Id == request.Id), token);
                 legal.Declaration.RemoveUbo(request.Id);
 
-                _context.Update(legal.Declaration);
                 await _context.SaveChangesAsync(token);
-
                 return Ok(true);
             });
         }

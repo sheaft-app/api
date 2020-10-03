@@ -8,7 +8,6 @@ using System.Threading.Tasks;
 using System.Threading;
 using Sheaft.Domain.Models;
 using Sheaft.Domain.Enums;
-using Microsoft.EntityFrameworkCore;
 
 namespace Sheaft.Application.Handlers
 {
@@ -210,8 +209,6 @@ namespace Sheaft.Application.Handlers
                         return Failed<bool>(userResult.Exception);
 
                     legal.User.SetIdentifier(userResult.Data);
-                    _context.Update(legal.User);
-
                     await _context.SaveChangesAsync(token);
                 }
 
@@ -231,8 +228,6 @@ namespace Sheaft.Application.Handlers
                         return Failed<bool>(userResult.Exception);
 
                     legal.User.SetIdentifier(userResult.Data);
-                    _context.Update(legal.User);
-
                     await _context.SaveChangesAsync(token);
                 }
 

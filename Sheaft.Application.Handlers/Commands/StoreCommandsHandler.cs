@@ -178,7 +178,6 @@ namespace Sheaft.Application.Handlers
                     store.SetOpeningHours(openingHours);
                 }
 
-                _context.Update(store);
                 await _context.SaveChangesAsync(token);
 
                 var resultImage = await _mediatr.Process(new UpdateUserPictureCommand(request.RequestUser)

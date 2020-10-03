@@ -145,7 +145,6 @@ namespace Sheaft.Application.Handlers
                     producer.SetTags(tags);
                 }
 
-                _context.Update(producer);
                 await _context.SaveChangesAsync(token);
 
                 var resultImage = await _mediatr.Process(new UpdateUserPictureCommand(request.RequestUser)
@@ -189,10 +188,6 @@ namespace Sheaft.Application.Handlers
                 var wallet = await _mediatr.Process(new CheckWalletPaymentsConfigurationCommand(request.RequestUser) { UserId = request.ProducerId }, token);
                 if (!wallet.Success)
                     return Failed<bool>(wallet.Exception);
-
-                var declaration = await _mediatr.Process(new CheckDeclarationConfigurationCommand(request.RequestUser) { UserId = request.ProducerId }, token);
-                if (!declaration.Success)
-                    return Failed<bool>(declaration.Exception);
 
                 return Ok(true);
             });

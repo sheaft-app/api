@@ -40,8 +40,6 @@ namespace Sheaft.Application.Handlers
                 var legal = await _context.GetByIdAsync<BusinessLegal>(request.LegalId, token);
                 legal.SetDeclaration();
 
-                _context.Update(legal);
-
                 await _context.SaveChangesAsync(token);
 
                 var result = await _pspService.CreateUboDeclarationAsync(legal.Declaration, legal.User, token);
@@ -52,7 +50,6 @@ namespace Sheaft.Application.Handlers
                 legal.Declaration.SetStatus(result.Data.Status);
                 legal.Declaration.SetResult(result.Data.ResultCode, result.Data.ResultMessage);
 
-                _context.Update(legal.Declaration);
                 await _context.SaveChangesAsync(token);
 
                 return Ok(legal.Declaration.Id);
@@ -74,7 +71,6 @@ namespace Sheaft.Application.Handlers
                 legal.Declaration.SetStatus(result.Data.Status);
                 legal.Declaration.SetResult(result.Data.ResultCode, result.Data.ResultMessage);
 
-                _context.Update(legal.Declaration);
                 await _context.SaveChangesAsync(token);
 
                 return Ok(true);
@@ -88,7 +84,6 @@ namespace Sheaft.Application.Handlers
                 var legal = await _context.GetSingleAsync<BusinessLegal>(r => r.Declaration.Id == request.DeclarationId, token);
                 legal.Declaration.SetStatus(DeclarationStatus.Locked);
 
-                _context.Update(legal.Declaration);
                 await _context.SaveChangesAsync(token);
 
                 return Ok(true);
@@ -102,7 +97,6 @@ namespace Sheaft.Application.Handlers
                 var legal = await _context.GetSingleAsync<BusinessLegal>(r => r.Declaration.Id == request.DeclarationId, token);
                 legal.Declaration.SetStatus(DeclarationStatus.UnLocked);
 
-                _context.Update(legal.Declaration);
                 await _context.SaveChangesAsync(token);
 
                 return Ok(true);
@@ -122,7 +116,6 @@ namespace Sheaft.Application.Handlers
                 legal.Declaration.SetResult(pspResult.Data.ResultCode, pspResult.Data.ResultMessage);
                 legal.Declaration.SetProcessedOn(pspResult.Data.ProcessedOn);
 
-                _context.Update(legal.Declaration);
                 var success = await _context.SaveChangesAsync(token) > 0;
 
                 switch (legal.Declaration.Status)
@@ -167,7 +160,6 @@ namespace Sheaft.Application.Handlers
                     legal.Declaration.SetStatus(result.Data.Status);
                     legal.Declaration.SetResult(result.Data.ResultCode, result.Data.ResultMessage);
 
-                    _context.Update(legal.Declaration);
                     await _context.SaveChangesAsync(token);
                 }
 

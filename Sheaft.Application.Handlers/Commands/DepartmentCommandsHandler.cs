@@ -33,8 +33,9 @@ namespace Sheaft.Application.Handlers
                 entity.SetRequiredProducers(request.RequiredProducers);
 
                 _context.Update(entity);
+                await _context.SaveChangesAsync(token);
 
-                return Ok(await _context.SaveChangesAsync(token) > 0);
+                return Ok(true);
             });
         }
 
@@ -55,9 +56,7 @@ namespace Sheaft.Application.Handlers
                 department.SetProducersCount(request.Producers);
                 department.SetStoresCount(request.Stores);
 
-                _context.Update(department);
                 await _context.SaveChangesAsync(token);
-
                 return Ok(true);
             });
         }

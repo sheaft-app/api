@@ -41,7 +41,6 @@ namespace Sheaft.Application.Handlers
                 var document = legal.Documents.FirstOrDefault(d => d.Id == request.DocumentId);
                 document.AddPage(page);
 
-                _context.Update(document);
                 await _context.SaveChangesAsync(token);
 
                 var result = await _blobService.UploadDocumentPageAsync(document.Id, page.Id, request.Data, legal.User.Id, token);
@@ -70,7 +69,6 @@ namespace Sheaft.Application.Handlers
                     return result;
 
                 page.SetUploaded();
-                _context.Update(page);
 
                 await _context.SaveChangesAsync(token);
                 return result;
@@ -90,9 +88,7 @@ namespace Sheaft.Application.Handlers
 
                 document.DeletePage(request.PageId);
 
-                _context.Update(document);
                 await _context.SaveChangesAsync(token);
-
                 return Ok(true);
             });
         }

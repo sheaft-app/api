@@ -79,7 +79,6 @@ namespace Sheaft.Application.Handlers
                     entity.SetSelectedHours(selectedHours);
                 }
 
-                _context.Update(entity);
                 await _context.SaveChangesAsync(token);
 
                 _mediatr.Post(new AgreementAcceptedEvent(request.RequestUser) { AgreementId = entity.Id });
@@ -113,7 +112,6 @@ namespace Sheaft.Application.Handlers
                 var entity = await _context.GetByIdAsync<Agreement>(request.Id, token);
                 entity.CancelAgreement(request.Reason);
 
-                _context.Update(entity);
                 await _context.SaveChangesAsync(token);
 
                 _mediatr.Post(new AgreementCancelledEvent(request.RequestUser) { AgreementId = entity.Id });
@@ -147,7 +145,6 @@ namespace Sheaft.Application.Handlers
                 var entity = await _context.GetByIdAsync<Agreement>(request.Id, token);
                 entity.RefuseAgreement(request.Reason);
 
-                _context.Update(entity);
                 await _context.SaveChangesAsync(token);
 
                 _mediatr.Post(new AgreementRefusedEvent(request.RequestUser) { AgreementId = entity.Id });
@@ -175,7 +172,6 @@ namespace Sheaft.Application.Handlers
                 var entity = await _context.Agreements.SingleOrDefaultAsync(a => a.Id == request.Id && a.RemovedOn.HasValue, token);
                 entity.Reset();
 
-                _context.Update(entity);
                 await _context.SaveChangesAsync(token);
 
                 return Ok(true);

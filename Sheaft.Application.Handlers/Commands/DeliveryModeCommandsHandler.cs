@@ -71,10 +71,8 @@ namespace Sheaft.Application.Handlers
                 entity.SetKind(request.Kind);
 
                 if (request.Address != null)
-                {
                     entity.SetAddress(request.Address.Line1, request.Address.Line2, request.Address.Zipcode, request.Address.City, request.Address.Country, request.Address.Longitude, request.Address.Latitude);
-                }
-
+                
                 if (request.OpeningHours != null)
                 {
                     var openingHours = new List<TimeSlotHour>();
@@ -86,9 +84,8 @@ namespace Sheaft.Application.Handlers
                     entity.SetOpeningHours(openingHours);
                 }
 
-                _context.Update(entity);
-
-                return Ok(await _context.SaveChangesAsync(token) > 0);
+                await _context.SaveChangesAsync(token);
+                return Ok(true);
             });
         }
 
@@ -102,7 +99,9 @@ namespace Sheaft.Application.Handlers
                     return BadRequest<bool>(MessageKind.DeliveryMode_CannotRemove_With_Active_Agreements, entity.Name, activeAgreements);
 
                 _context.Remove(entity);
-                return Ok(await _context.SaveChangesAsync(token) > 0);
+                await _context.SaveChangesAsync(token);
+
+                return Ok(true);
             });
         }
 
@@ -112,8 +111,9 @@ namespace Sheaft.Application.Handlers
             {
                 var entity = await _context.DeliveryModes.SingleOrDefaultAsync(a => a.Id == request.Id && a.RemovedOn.HasValue, token);
                 _context.Restore(entity);
+                await _context.SaveChangesAsync(token);
 
-                return Ok(await _context.SaveChangesAsync(token) > 0);
+                return Ok(true);
             });
         }
     }

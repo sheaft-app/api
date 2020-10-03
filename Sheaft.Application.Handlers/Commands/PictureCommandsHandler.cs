@@ -36,8 +36,6 @@ namespace Sheaft.Application.Handlers
                     return Failed<string>(resultImage.Exception);
 
                 entity.SetPicture(resultImage.Data);
-
-                _context.Update(entity);
                 await _context.SaveChangesAsync(token);
 
                 if (request.SkipAuthUpdate)
@@ -67,8 +65,6 @@ namespace Sheaft.Application.Handlers
                     return Failed<string>(resultImage.Exception);
 
                 entity.SetPicture(resultImage.Data);
-
-                _context.Update(entity);
                 await _context.SaveChangesAsync(token);
 
                 return Ok(resultImage.Data);
@@ -86,8 +82,6 @@ namespace Sheaft.Application.Handlers
                     return Failed<string>(resultImage.Exception);
 
                 entity.SetPicture(resultImage.Data);
-
-                _context.Update(entity);
                 await _context.SaveChangesAsync(token);
 
                 return Ok(resultImage.Data);

@@ -45,15 +45,13 @@ namespace Sheaft.Application.Handlers
             return await ExecuteAsync(async () =>
             {
                 var entity = await _context.GetByIdAsync<Returnable>(request.Id, token);
-
                 entity.SetName(request.Name);
                 entity.SetDescription(request.Description);
                 entity.SetWholeSalePrice(request.WholeSalePrice);
                 entity.SetVat(request.Vat);
 
-                _context.Update(entity);
-
-                return Ok(await _context.SaveChangesAsync(token) > 0);
+                await _context.SaveChangesAsync(token);
+                return Ok(true);
             });
         }
 

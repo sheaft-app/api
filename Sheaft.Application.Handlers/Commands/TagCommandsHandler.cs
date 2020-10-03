@@ -48,7 +48,6 @@ namespace Sheaft.Application.Handlers
                 entity.SetDescription(request.Description);
                 entity.SetKind(request.Kind);
 
-                _context.Update(entity);
                 await _context.SaveChangesAsync(token);
 
                 var imageResult = await _mediatr.Process(new UpdateTagPictureCommand(request.RequestUser) { TagId = entity.Id, Picture = request.Picture }, token);

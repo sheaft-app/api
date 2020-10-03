@@ -92,7 +92,6 @@ namespace Sheaft.Application.Handlers
                 consumer.SetFirstname(request.FirstName);
                 consumer.SetLastname(request.LastName);
 
-                _context.Update(consumer);
                 await _context.SaveChangesAsync(token);
 
                 var resultImage = await _mediatr.Process(new UpdateUserPictureCommand(request.RequestUser)

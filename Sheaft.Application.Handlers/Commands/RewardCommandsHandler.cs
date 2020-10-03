@@ -79,9 +79,8 @@ namespace Sheaft.Application.Handlers
                     newLevel.AddReward(entity);
                 }
 
-                _context.Update(entity);
-
-                return Ok(await _context.SaveChangesAsync(token) > 0);
+                await _context.SaveChangesAsync(token);
+                return Ok(true);
             });
         }
 

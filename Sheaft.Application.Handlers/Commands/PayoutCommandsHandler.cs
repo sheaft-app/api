@@ -96,9 +96,7 @@ namespace Sheaft.Application.Handlers
                 var transaction = await _context.GetByIdAsync<Payout>(request.PayoutId, token);
                 transaction.SetStatus(TransactionStatus.Expired);
 
-                _context.Update(transaction);
                 await _context.SaveChangesAsync(token);
-
                 return Ok(true);
             });
         }
@@ -119,7 +117,6 @@ namespace Sheaft.Application.Handlers
                 payout.SetResult(pspResult.Data.ResultCode, pspResult.Data.ResultMessage);
                 payout.SetExecutedOn(pspResult.Data.ProcessedOn);
 
-                _context.Update(payout);
                 await _context.SaveChangesAsync(token);
 
                 switch (payout.Status)
@@ -178,7 +175,6 @@ namespace Sheaft.Application.Handlers
                     payout.SetResult(result.Data.ResultCode, result.Data.ResultMessage);
                     payout.SetExecutedOn(result.Data.ProcessedOn);
 
-                    _context.Update(payout);
                     await _context.SaveChangesAsync(token);
                     await transaction.CommitAsync(token);
 
