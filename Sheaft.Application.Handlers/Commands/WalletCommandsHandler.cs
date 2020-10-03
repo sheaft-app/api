@@ -79,7 +79,7 @@ namespace Sheaft.Application.Handlers
             {
                 var user = await _context.GetByIdAsync<User>(userId, token);
 
-                using (var transaction = await _context.Database.BeginTransactionAsync(token))
+                using (var transaction = await _context.BeginTransactionAsync(token))
                 {
                     var wallet = new Wallet(Guid.NewGuid(), name, kind, user);
                     await _context.AddAsync(wallet, token);

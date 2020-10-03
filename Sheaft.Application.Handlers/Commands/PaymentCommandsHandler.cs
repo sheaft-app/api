@@ -31,7 +31,7 @@ namespace Sheaft.Application.Handlers
             {
                 var user = await _context.GetByIdAsync<User>(request.UserId, token);
 
-                using (var transaction = await _context.Database.BeginTransactionAsync(token))
+                using (var transaction = await _context.BeginTransactionAsync(token))
                 {
                     var address = request.Address != null ?
                            new BankAddress(request.Address.Line1, request.Address.Line2, request.Address.Zipcode, request.Address.City,

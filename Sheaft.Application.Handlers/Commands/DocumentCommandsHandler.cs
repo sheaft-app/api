@@ -44,7 +44,7 @@ namespace Sheaft.Application.Handlers
         {
             return await ExecuteAsync(async () =>
             {
-                using (var transaction = await _context.Database.BeginTransactionAsync(token))
+                using (var transaction = await _context.BeginTransactionAsync(token))
                 {
                     var legal = await _context.GetSingleAsync<Legal>(r => r.Id == request.LegalId, token);
                     if (legal.Documents.Any(d => d.Kind == request.Kind))

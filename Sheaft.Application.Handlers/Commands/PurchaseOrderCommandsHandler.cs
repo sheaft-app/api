@@ -67,7 +67,7 @@ namespace Sheaft.Application.Handlers
         {
             return await ExecuteAsync(async () =>
             {
-                using (var transaction = await _context.Database.BeginTransactionAsync(token))
+                using (var transaction = await _context.BeginTransactionAsync(token))
                 {
                     foreach (var purchaseOrderId in request.Ids)
                     {
@@ -86,7 +86,7 @@ namespace Sheaft.Application.Handlers
         {
             return await ExecuteAsync(async () =>
             {
-                using (var transaction = await _context.Database.BeginTransactionAsync(token))
+                using (var transaction = await _context.BeginTransactionAsync(token))
                 {
                     foreach (var purchaseOrderId in request.Ids)
                     {
@@ -105,7 +105,7 @@ namespace Sheaft.Application.Handlers
         {
             return await ExecuteAsync(async () =>
             {
-                using (var transaction = await _context.Database.BeginTransactionAsync(token))
+                using (var transaction = await _context.BeginTransactionAsync(token))
                 {
                     foreach (var purchaseOrderId in request.Ids)
                     {
@@ -124,7 +124,7 @@ namespace Sheaft.Application.Handlers
         {
             return await ExecuteAsync(async () =>
             {
-                using (var transaction = await _context.Database.BeginTransactionAsync(token))
+                using (var transaction = await _context.BeginTransactionAsync(token))
                 {
                     var errors = new List<string>();
                     foreach (var purchaseOrderId in request.Ids)
@@ -144,7 +144,7 @@ namespace Sheaft.Application.Handlers
         {
             return await ExecuteAsync(async () =>
             {
-                using (var transaction = await _context.Database.BeginTransactionAsync(token))
+                using (var transaction = await _context.BeginTransactionAsync(token))
                 {
                     foreach (var purchaseOrderId in request.Ids)
                     {
@@ -163,7 +163,7 @@ namespace Sheaft.Application.Handlers
         {
             return await ExecuteAsync(async () =>
             {
-                using (var transaction = await _context.Database.BeginTransactionAsync(token))
+                using (var transaction = await _context.BeginTransactionAsync(token))
                 {
                     foreach (var purchaseOrderId in request.Ids)
                     {
@@ -182,7 +182,7 @@ namespace Sheaft.Application.Handlers
         {
             return await ExecuteAsync(async () =>
             {
-                using (var transaction = await _context.Database.BeginTransactionAsync(token))
+                using (var transaction = await _context.BeginTransactionAsync(token))
                 {
                     foreach (var purchaseOrderId in request.Ids)
                     {
@@ -201,7 +201,7 @@ namespace Sheaft.Application.Handlers
         {
             return await ExecuteAsync(async () =>
             {
-                using (var transaction = await _context.Database.BeginTransactionAsync(token))
+                using (var transaction = await _context.BeginTransactionAsync(token))
                 {
                     foreach (var purchaseOrderId in request.Ids)
                     {

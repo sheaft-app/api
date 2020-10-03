@@ -53,7 +53,7 @@ namespace Sheaft.Application.Handlers
         {
             return await ExecuteAsync(async () =>
             {
-                using (var transaction = await _context.Database.BeginTransactionAsync(token))
+                using (var transaction = await _context.BeginTransactionAsync(token))
                 {
                     var store = await _context.FindByIdAsync<Store>(request.RequestUser.Id, token);
                     if (store != null)

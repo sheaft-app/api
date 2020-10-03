@@ -83,7 +83,7 @@ namespace Sheaft.Application.Handlers
         {
             return await ExecuteAsync(async () =>
             {
-                using (var transaction = await _context.Database.BeginTransactionAsync(token))
+                using (var transaction = await _context.BeginTransactionAsync(token))
                 {
                     var productIds = request.Products.Select(p => p.Id);
                     var products = await _context.GetByIdsAsync<Product>(productIds, token);
@@ -181,7 +181,7 @@ namespace Sheaft.Application.Handlers
                 if (!checkResult.Success)
                     return Failed<Guid>(checkResult.Exception);
 
-                using (var transaction = await _context.Database.BeginTransactionAsync(token))
+                using (var transaction = await _context.BeginTransactionAsync(token))
                 {
                     var order = await _context.GetByIdAsync<Order>(request.OrderId, token);
                     if (!order.Deliveries.Any())
@@ -215,7 +215,7 @@ namespace Sheaft.Application.Handlers
                 if (!checkResult.Success)
                     return Failed<Guid>(checkResult.Exception);
 
-                using (var transaction = await _context.Database.BeginTransactionAsync(token))
+                using (var transaction = await _context.BeginTransactionAsync(token))
                 {
                     order.SetStatus(OrderStatus.Waiting);
                     await _context.SaveChangesAsync(token);
@@ -237,7 +237,7 @@ namespace Sheaft.Application.Handlers
         {
             return await ExecuteAsync(async () =>
             {
-                using (var transaction = await _context.Database.BeginTransactionAsync(token))
+                using (var transaction = await _context.BeginTransactionAsync(token))
                 {
                     var order = await _context.GetByIdAsync<Order>(request.OrderId, token);
                     var orderIds = new List<Guid>();

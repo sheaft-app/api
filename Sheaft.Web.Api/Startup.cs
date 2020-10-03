@@ -332,7 +332,7 @@ namespace Sheaft.Web.Api
                     var context = serviceScope.ServiceProvider.GetService<IAppDbContext>();
                     if (!context.AllMigrationsApplied())
                     {
-                        context.Database.Migrate();
+                        context.Migrate();
                     }
                 }
             }

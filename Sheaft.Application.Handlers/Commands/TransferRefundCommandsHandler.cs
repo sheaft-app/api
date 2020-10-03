@@ -66,7 +66,7 @@ namespace Sheaft.Application.Handlers
                     return TooManyRetries<Guid>();
                 }
 
-                using (var transaction = await _context.Database.BeginTransactionAsync(token))
+                using (var transaction = await _context.BeginTransactionAsync(token))
                 {
                     var transferRefund = new TransferRefund(Guid.NewGuid(), purchaseOrder.Transfer);
 

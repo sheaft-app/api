@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Internal;
+using Microsoft.EntityFrameworkCore.Storage;
 using Sheaft.Domain.Interop;
 using Sheaft.Domain.Models;
 using Sheaft.Domain.Views;
@@ -60,8 +61,9 @@ namespace Sheaft.Application.Interop
         Task<bool> AnyAsync<T>(Expression<Func<T, bool>> where, CancellationToken token, bool asNoTracking = false) where T : class, ITrackRemove;
         Task EnsureNotExists<T>(Guid id, CancellationToken token, bool asNoTracking = false) where T : class, IIdEntity, ITrackRemove;
         Task EnsureNotExists<T>(Expression<Func<T, bool>> where, CancellationToken token, bool asNoTracking = false) where T : class, IIdEntity, ITrackRemove;
-
-        DatabaseFacade Database { get; }
+        
+        void Migrate();
+        Task<IDbContextTransaction> BeginTransactionAsync(CancellationToken cancellationToken = default);
         ValueTask<EntityEntry<TEntity>> AddAsync<TEntity>([NotNullAttribute] TEntity entity, CancellationToken cancellationToken = default) where TEntity : class;
         Task AddRangeAsync([NotNullAttribute] IEnumerable<object> entities, CancellationToken cancellationToken = default);
         EntityEntry<TEntity> Remove<TEntity>([NotNullAttribute] TEntity entity) where TEntity : class;

@@ -147,7 +147,7 @@ namespace Sheaft.Application.Handlers
         {
             return await ExecuteAsync(async () =>
             {
-                using (var transaction = await _context.Database.BeginTransactionAsync(token))
+                using (var transaction = await _context.BeginTransactionAsync(token))
                 {
                     foreach (var id in request.Ids)
                     {
@@ -178,7 +178,7 @@ namespace Sheaft.Application.Handlers
         {
             return await ExecuteAsync(async () =>
             {
-                using (var transaction = await _context.Database.BeginTransactionAsync(token))
+                using (var transaction = await _context.BeginTransactionAsync(token))
                 {
                     foreach (var id in request.Ids)
                     {
@@ -254,7 +254,7 @@ namespace Sheaft.Application.Handlers
                             if (worksheet == null)
                                 throw new BadRequestException(MessageKind.ImportProduct_Missing_Tab);
 
-                            using (var transaction = await _context.Database.BeginTransactionAsync(token))
+                            using (var transaction = await _context.BeginTransactionAsync(token))
                             {
                                 for (var i = 2; i <= worksheet.Dimension.Rows; i++)
                                 {

@@ -13,6 +13,7 @@ using Sheaft.Localization;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Sheaft.Application.Interop;
 using Sheaft.Domain.Interop;
+using Microsoft.EntityFrameworkCore.Storage;
 
 namespace Sheaft.Infrastructure.Persistence
 {
@@ -251,6 +252,19 @@ namespace Sheaft.Infrastructure.Persistence
 
             entry.State = EntityState.Modified;
             return entry;
+        }
+
+        public async Task<IDbContextTransaction> BeginTransactionAsync(CancellationToken token = default)
+        {
+            if(Database.CurrentTransaction != null)
+                return new InnerTransaction(Database.CurrentTransaction.TransactionId);
+
+            return await Database.BeginTransactionAsync(token);
+        }
+
+        public void Migrate()
+        {
+            Database.Migrate();
         }
 
         private KeyValuePair<MessageKind, string> GetExceptionDefaultMessage<T>(MessageKind kind, Guid id) where T : class, IIdEntity, ITrackRemove

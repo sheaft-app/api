@@ -70,7 +70,7 @@ namespace Sheaft.Application.Handlers
                 }
 
                 var creditedWallet = await _context.GetSingleAsync<Wallet>(c => c.Identifier == _pspOptions.WalletId, token);
-                using (var transaction = await _context.Database.BeginTransactionAsync(token))
+                using (var transaction = await _context.BeginTransactionAsync(token))
                 {
                     var donation = new Donation(Guid.NewGuid(), order.Payin.CreditedWallet, creditedWallet, order);
                     await _context.AddAsync(donation, token);

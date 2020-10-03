@@ -160,7 +160,7 @@ namespace Sheaft.Application.Handlers
                 if (!checkDocumentsValidatedResult.Success)
                     return Failed<Guid>(checkDocumentsValidatedResult.Exception);
 
-                using (var transaction = await _context.Database.BeginTransactionAsync(token))
+                using (var transaction = await _context.BeginTransactionAsync(token))
                 {
                     var payout = new Payout(Guid.NewGuid(), amount, wallet, bankAccount, transfers, fees);
                     await _context.AddAsync(payout);

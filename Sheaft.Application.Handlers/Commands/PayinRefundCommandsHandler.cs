@@ -170,7 +170,7 @@ namespace Sheaft.Application.Handlers
                 if(availablePurchaseOrdersToRefund.Count() != purchaseOrdersToRefund.Count())
                     return Failed<Guid>(new InvalidOperationException());
 
-                using (var transaction = await _context.Database.BeginTransactionAsync(token))
+                using (var transaction = await _context.BeginTransactionAsync(token))
                 {
                     var payinRefund = new PayinRefund(Guid.NewGuid(), order.Payin, purchaseOrdersToRefund.Sum(po => po.TotalOnSalePrice));
 
