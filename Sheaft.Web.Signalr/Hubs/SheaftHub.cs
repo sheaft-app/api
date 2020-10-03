@@ -5,7 +5,7 @@ using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 
-namespace Sheaft.Signalr.Controllers
+namespace Sheaft.Web.Signalr.Controllers
 {
     [Authorize]
     public class SheaftHub : Hub

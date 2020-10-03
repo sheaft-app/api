@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
 using AutoMapper.QueryableExtensions;
-using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -10,7 +9,7 @@ using Sheaft.Application.Commands;
 using Sheaft.Core.Extensions;
 using Sheaft.Exceptions;
 using Sheaft.Application.Interop;
-using Sheaft.Manage.Models;
+using Sheaft.Web.Manage.Models;
 using Sheaft.Application.Models;
 using Sheaft.Options;
 using System;
@@ -19,7 +18,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Sheaft.Domain.Enums;
 
-namespace Sheaft.Manage.Controllers
+namespace Sheaft.Web.Manage.Controllers
 {
     public class PurchaseOrdersController : ManageController
     {

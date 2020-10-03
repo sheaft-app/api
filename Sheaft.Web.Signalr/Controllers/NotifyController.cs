@@ -12,7 +12,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Sheaft.Signalr.Controllers
+namespace Sheaft.Web.Signalr.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
@@ -21,11 +21,11 @@ namespace Sheaft.Signalr.Controllers
         private readonly IConfiguration _configuration;
         private readonly IHttpContextAccessor _accessor;
         private readonly IHubContext<SheaftHub> _context;
-        private readonly IQueueService _queuesService;
+        private readonly ISheaftMediatr _sheaftMediatr;
 
-        public NotifyController(IConfiguration configuration, IHubContext<SheaftHub> context, IHttpContextAccessor accessor, IQueueService queuesService)
+        public NotifyController(IConfiguration configuration, IHubContext<SheaftHub> context, IHttpContextAccessor accessor, ISheaftMediatr sheaftMediatr)
         {
-            _queuesService = queuesService;
+            _sheaftMediatr = sheaftMediatr;
             _context = context;
             _accessor = accessor;
             _configuration = configuration;
@@ -65,7 +65,7 @@ namespace Sheaft.Signalr.Controllers
                 await _context.Clients.User(userId).SendAsync("event", new { Method = method, UserId = userId, Content = body }, token);
 
                 if (Guid.TryParse(userId, out Guid id))
-                    await _queuesService.ProcessCommandAsync(new CreateUserNotificationCommand(new RequestUser("signalr-user", HttpContext.TraceIdentifier)) { Id = id, Method = method, Content = body }, token);
+                    _sheaftMediatr.Post(new CreateUserNotificationCommand(new RequestUser("signalr-user", HttpContext.TraceIdentifier)) { Id = id, Method = method, Content = body });
             }
 
             return Ok();
@@ -85,7 +85,7 @@ namespace Sheaft.Signalr.Controllers
                 await _context.Clients.Group(groupName).SendAsync("event", new { Method = method, GroupName = groupName, Content = body }, token);
 
                 if (Guid.TryParse(groupName, out Guid id))
-                    await _queuesService.ProcessCommandAsync(new CreateGroupNotificationCommand(new RequestUser("signalr-group", HttpContext.TraceIdentifier)) { Id = id, Method = method, Content = body }, token);
+                    _sheaftMediatr.Post(new CreateGroupNotificationCommand(new RequestUser("signalr-group", HttpContext.TraceIdentifier)) { Id = id, Method = method, Content = body });
             }
 
             return Ok();

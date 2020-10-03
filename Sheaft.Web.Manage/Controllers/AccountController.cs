@@ -15,7 +15,7 @@ using Sheaft.Domain.Models;
 using Sheaft.Application.Interop;
 using Sheaft.Application.Models;
 
-namespace Sheaft.Manage.Controllers
+namespace Sheaft.Web.Manage.Controllers
 {
     public class AccountController : Controller
     {

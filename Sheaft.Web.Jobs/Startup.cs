@@ -19,7 +19,9 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Newtonsoft.Json;
 using SendGrid;
 using Sheaft.Application.Commands;
 using Sheaft.Application.Events;
@@ -35,12 +37,14 @@ namespace Sheaft.Web.Jobs
 {
     public class Startup
     {
-        public Startup(IConfiguration configuration)
+        public Startup(IWebHostEnvironment environment, IConfiguration configuration)
         {
+            Env = environment;
             Configuration = configuration;
         }
 
         public IConfiguration Configuration { get; }
+        public IWebHostEnvironment Env { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
@@ -212,8 +216,25 @@ namespace Sheaft.Web.Jobs
                     UseRecommendedIsolationLevel = true,
                     DisableGlobalLocks = true
                 });
+                configuration.UseSerializerSettings(new JsonSerializerSettings
+                {
+                    TypeNameHandling = TypeNameHandling.All
+                });
+            });
 
-                configuration.UseMediatR();
+            services.AddLogging(config =>
+            {
+                config.ClearProviders();
+
+                config.AddConfiguration(Configuration.GetSection("Logging"));
+                config.AddEventSourceLogger();
+                config.AddApplicationInsights();
+
+                if (Env.IsDevelopment())
+                {
+                    config.AddDebug();
+                    config.AddConsole();
+                }
             });
 
             services.AddApplicationInsightsTelemetry();

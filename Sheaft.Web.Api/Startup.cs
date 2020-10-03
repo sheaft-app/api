@@ -22,6 +22,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using SendGrid;
 using Sheaft.Application.Commands;
 using Sheaft.Application.Events;
@@ -296,12 +297,12 @@ namespace Sheaft.Web.Api
                 config.ClearProviders();
 
                 config.AddConfiguration(Configuration.GetSection("Logging"));
-                config.AddDebug();
                 config.AddEventSourceLogger();
                 config.AddApplicationInsights();
 
                 if (Env.IsDevelopment())
                 {
+                    config.AddDebug();
                     config.AddConsole();
                 }
             });
@@ -310,7 +311,10 @@ namespace Sheaft.Web.Api
             services.AddHangfire(configuration =>
             {
                 configuration.UseSqlServerStorage(jobsDatabaseConfig.ConnectionString);
-                configuration.UseMediatR();
+                configuration.UseSerializerSettings(new JsonSerializerSettings
+                {
+                    TypeNameHandling = TypeNameHandling.All
+                });
             });
 
             services.AddMvc(option => option.EnableEndpointRouting = false)

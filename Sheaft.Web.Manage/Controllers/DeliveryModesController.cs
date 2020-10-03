@@ -9,7 +9,7 @@ using Newtonsoft.Json;
 using Sheaft.Application.Commands;
 using Sheaft.Exceptions;
 using Sheaft.Application.Interop;
-using Sheaft.Manage.Models;
+using Sheaft.Web.Manage.Models;
 using Sheaft.Application.Models;
 using Sheaft.Options;
 using System;
@@ -17,7 +17,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Sheaft.Manage.Controllers
+namespace Sheaft.Web.Manage.Controllers
 {
     public class DeliveryModesController : ManageController
     {

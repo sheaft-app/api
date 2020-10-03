@@ -16,7 +16,7 @@ using System.Threading.Tasks;
 using System.Collections.Generic;
 using Sheaft.Domain.Models;
 
-namespace Sheaft.Manage.Controllers
+namespace Sheaft.Web.Manage.Controllers
 {
     public class DeclarationsController : ManageController
     {

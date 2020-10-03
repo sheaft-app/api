@@ -7,7 +7,7 @@ using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Sheaft.Exceptions;
 using Sheaft.Application.Interop;
-using Sheaft.Manage.Models;
+using Sheaft.Web.Manage.Models;
 using Sheaft.Options;
 using System;
 using System.Linq;
@@ -17,7 +17,7 @@ using Sheaft.Application.Commands;
 using Sheaft.Application.Models;
 using Sheaft.Domain.Enums;
 
-namespace Sheaft.Manage.Controllers
+namespace Sheaft.Web.Manage.Controllers
 {
     public class OrdersController : ManageController
     {

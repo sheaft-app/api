@@ -1,6 +1,6 @@
 using System;
 
-namespace Sheaft.Manage.Models
+namespace Sheaft.Web.Manage.Models
 {
     [Serializable]
     public class ErrorViewModel

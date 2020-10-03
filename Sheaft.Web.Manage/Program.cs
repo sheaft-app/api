@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
 
-namespace Sheaft.Manage
+namespace Sheaft.Web.Manage
 {
     public class Program
     {

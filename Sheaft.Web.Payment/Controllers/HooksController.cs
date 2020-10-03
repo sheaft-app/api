@@ -7,7 +7,7 @@ using Sheaft.Application.Interop;
 using Sheaft.Core;
 using Sheaft.Domain.Enums;
 
-namespace Sheaft.Payment.Controllers
+namespace Sheaft.Web.Payment.Controllers
 {
     public class HooksController : Controller
     {

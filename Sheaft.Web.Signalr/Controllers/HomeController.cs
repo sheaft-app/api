@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 
-namespace Sheaft.Signalr.Controllers
+namespace Sheaft.Web.Signalr.Controllers
 {
     [ApiController]
     [Route("")]

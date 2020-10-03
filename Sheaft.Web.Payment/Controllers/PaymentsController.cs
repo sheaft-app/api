@@ -8,9 +8,9 @@ using Microsoft.Extensions.Options;
 using Sheaft.Application.Interop;
 using Sheaft.Domain.Enums;
 using Sheaft.Options;
-using Sheaft.Payment.Models;
+using Sheaft.Web.Payment.Models;
 
-namespace Sheaft.Payment.Controllers
+namespace Sheaft.Web.Payment.Controllers
 {
     public class PaymentsController : Controller
     {

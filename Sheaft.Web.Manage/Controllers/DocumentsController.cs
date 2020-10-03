@@ -17,7 +17,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Sheaft.Application.Queries;
 
-namespace Sheaft.Manage.Controllers
+namespace Sheaft.Web.Manage.Controllers
 {
     public class DocumentsController : ManageController
     {

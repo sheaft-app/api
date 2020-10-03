@@ -10,7 +10,7 @@ using Sheaft.Application.Commands;
 using Sheaft.Core.Extensions;
 using Sheaft.Exceptions;
 using Sheaft.Application.Interop;
-using Sheaft.Manage.Models;
+using Sheaft.Web.Manage.Models;
 using Sheaft.Application.Models;
 using Sheaft.Options;
 using System;
@@ -19,7 +19,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Sheaft.Domain.Enums;
 
-namespace Sheaft.Manage.Controllers
+namespace Sheaft.Web.Manage.Controllers
 {
     public class AgreementsController : ManageController
     {

@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
 using AutoMapper.QueryableExtensions;
-using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -8,12 +7,10 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Sheaft.Application.Commands;
-using Sheaft.Core;
 using Sheaft.Domain.Models;
 using Sheaft.Exceptions;
 using Sheaft.Application.Interop;
-using Sheaft.Domain.Enums;
-using Sheaft.Manage.Models;
+using Sheaft.Web.Manage.Models;
 using Sheaft.Application.Models;
 using Sheaft.Options;
 using System;
@@ -23,7 +20,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Sheaft.Manage.Controllers
+namespace Sheaft.Web.Manage.Controllers
 {
     public class StoresController : ManageController
     {

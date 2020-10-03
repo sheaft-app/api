@@ -1,6 +1,6 @@
 using System;
 
-namespace Sheaft.Payment.Models
+namespace Sheaft.Web.Payment.Models
 {
     public class ErrorViewModel
     {

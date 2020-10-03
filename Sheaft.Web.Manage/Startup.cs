@@ -29,9 +29,9 @@ using Sheaft.Infrastructure.Services;
 using Sheaft.Application.Queries;
 using Microsoft.Azure.Search;
 using Hangfire;
-using Sheaft.Web.Manage;
+using Newtonsoft.Json;
 
-namespace Sheaft.Manage
+namespace Sheaft.Web.Manage
 {
     public class Startup
     {
@@ -151,7 +151,10 @@ namespace Sheaft.Manage
             services.AddHangfire(configuration =>
             {
                 configuration.UseSqlServerStorage(jobsDatabaseConfig.ConnectionString);
-                configuration.UseMediatR();
+                configuration.UseSerializerSettings(new JsonSerializerSettings
+                {
+                    TypeNameHandling = TypeNameHandling.All
+                });
             });
 
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
@@ -206,7 +209,6 @@ namespace Sheaft.Manage
             services.AddScoped<ISearchServiceClient, SearchServiceClient>(_ => new SearchServiceClient(searchConfig.Name, new SearchCredentials(searchConfig.ApiKey)));
 
             services.AddOptions();
-
             services.AddControllersWithViews();
 
             services.AddLocalization(ops => ops.ResourcesPath = "Resources");
@@ -229,14 +231,17 @@ namespace Sheaft.Manage
                 config.ClearProviders();
 
                 config.AddConfiguration(Configuration.GetSection("Logging"));
-                config.AddDebug();
                 config.AddEventSourceLogger();
+                config.AddApplicationInsights();
 
                 if (Env.IsDevelopment())
                 {
+                    config.AddDebug();
                     config.AddConsole();
                 }
             });
+
+            services.AddApplicationInsightsTelemetry();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
