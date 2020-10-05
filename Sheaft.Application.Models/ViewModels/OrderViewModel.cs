@@ -12,6 +12,7 @@ namespace Sheaft.Application.Models
         public DateTimeOffset? RemovedOn { get; set; }
         public OrderStatus Status { get; set; }
         public DonationKind DonationKind { get; set; }
+        public string Reference { get; set; }
         public decimal TotalProductWholeSalePrice { get; set; }
         public decimal TotalProductVatPrice { get; set; }
         public decimal TotalProductOnSalePrice { get; set; }

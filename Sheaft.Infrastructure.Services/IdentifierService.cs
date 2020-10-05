@@ -29,7 +29,7 @@ namespace Sheaft.Infrastructure.Services
             _tableClient = cloudStorageAccount.CreateCloudTableClient();
         }
 
-        public async Task<Result<string>> GetNextOrderReferenceAsync(Guid serialNumber, CancellationToken token)
+        public async Task<Result<string>> GetNextPurchaseOrderReferenceAsync(Guid serialNumber, CancellationToken token)
         {
             return await ExecuteAsync(async () =>
             {
@@ -183,6 +183,19 @@ namespace Sheaft.Infrastructure.Services
                 } while (concurrentUpdateError);
 
                 return Ok(id);
+            });
+        }
+
+        public async Task<Result<string>> GetNextOrderReferenceAsync(CancellationToken token)
+        {
+            return await ExecuteAsync(async () =>
+            {
+                var uuid = await GetNextUuidAsync(_storageOptions.Tables.OrdersReferences, Guid.Empty, token);
+                if (!uuid.Success)
+                    return Failed<string>(uuid.Exception);
+
+                var identifier = GenerateEanIdentifier(uuid.Data, 13);
+                return Ok(identifier);
             });
         }
 

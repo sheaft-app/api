@@ -27,18 +27,26 @@ namespace Sheaft.Application.Handlers
 
         public async Task Handle(UserDataExportFailedEvent userEvent, CancellationToken token)
         {
+            var job = await _context.GetByIdAsync<Job>(userEvent.JobId, token);
+
             await _signalrService.SendNotificationToUserAsync(userEvent.RequestUser.Id, nameof(UserDataExportFailedEvent), new { JobId = userEvent.JobId, UserId = userEvent.RequestUser.Id });
+            await _emailService.SendTemplatedEmailAsync(
+                job.User.Email,
+                job.User.Name,
+                _emailTemplateOptions.ExportUserDataFailedEvent,
+                new { UserName = job.User.Name, job.CreatedOn, DownloadUrl = job.File },
+                token);
         }
 
         public async Task Handle(UserDataExportSucceededEvent userEvent, CancellationToken token)
         {
             var job = await _context.GetByIdAsync<Job>(userEvent.JobId, token);
-            await _signalrService.SendNotificationToUserAsync(userEvent.RequestUser.Id, nameof(UserDataExportSucceededEvent), new { JobId = userEvent.JobId, UserId = userEvent.RequestUser.Id, Url = job.File });
 
+            await _signalrService.SendNotificationToUserAsync(userEvent.RequestUser.Id, nameof(UserDataExportSucceededEvent), new { JobId = userEvent.JobId, UserId = userEvent.RequestUser.Id, Url = job.File });
             await _emailService.SendTemplatedEmailAsync(
                 job.User.Email,
                 job.User.Name,
-                _emailTemplateOptions.UserDataExportSucceededEvent,
+                _emailTemplateOptions.ExportUserDataSucceededEvent,
                 new { UserName = job.User.Name, job.CreatedOn, DownloadUrl = job.File },
                 token);            
         }

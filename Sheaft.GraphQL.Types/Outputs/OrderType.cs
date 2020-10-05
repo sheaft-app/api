@@ -11,6 +11,7 @@ namespace Sheaft.GraphQL.Types
             descriptor.Field(c => c.Status);
             descriptor.Field(c => c.DonationKind);
             descriptor.Field(c => c.CreatedOn);
+            descriptor.Field(c => c.Reference);
 
             descriptor.Field(c => c.TotalWholeSalePrice);
             descriptor.Field(c => c.TotalVatPrice);

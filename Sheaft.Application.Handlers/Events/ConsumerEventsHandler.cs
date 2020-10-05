@@ -8,8 +8,7 @@ using Sheaft.Options;
 
 namespace Sheaft.Application.Handlers
 {
-    public class ConsumerEventsHandler : EventsHandler,
-        INotificationHandler<ConsumerNotConfiguredEvent>
+    public class ConsumerEventsHandler : EventsHandler
     {
         public ConsumerEventsHandler(
             IAppDbContext context,
@@ -18,11 +17,6 @@ namespace Sheaft.Application.Handlers
             IOptionsSnapshot<EmailTemplateOptions> emailTemplateOptions)
             : base(context, emailService, signalrService, emailTemplateOptions)
         {
-        }
-
-        public Task Handle(ConsumerNotConfiguredEvent notification, CancellationToken cancellationToken)
-        {
-            throw new System.NotImplementedException();
         }
     }
 }

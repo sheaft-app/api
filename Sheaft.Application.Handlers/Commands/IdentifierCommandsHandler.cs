@@ -9,6 +9,7 @@ using Microsoft.Extensions.Logging;
 namespace Sheaft.Application.Handlers
 {
     public class IdentifierCommandsHandler : ResultsHandler,
+            IRequestHandler<CreateOrderIdentifierCommand, Result<string>>,
             IRequestHandler<CreatePurchaseOrderIdentifierCommand, Result<string>>,
             IRequestHandler<CreateProductIdentifierCommand, Result<string>>,
             IRequestHandler<CreateSponsoringCodeCommand, Result<string>>
@@ -25,9 +26,14 @@ namespace Sheaft.Application.Handlers
             _identifierService = identifierService;
         }
 
+        public async Task<Result<string>> Handle(CreateOrderIdentifierCommand request, CancellationToken token)
+        {
+            return await ExecuteAsync(() => _identifierService.GetNextOrderReferenceAsync(token));
+        }
+
         public async Task<Result<string>> Handle(CreatePurchaseOrderIdentifierCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(() => _identifierService.GetNextOrderReferenceAsync(request.ProducerId, token));
+            return await ExecuteAsync(() => _identifierService.GetNextPurchaseOrderReferenceAsync(request.ProducerId, token));
         }
 
         public async Task<Result<string>> Handle(CreateProductIdentifierCommand request, CancellationToken token)

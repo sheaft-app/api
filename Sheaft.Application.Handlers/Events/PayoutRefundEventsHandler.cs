@@ -9,8 +9,7 @@ using Sheaft.Options;
 namespace Sheaft.Application.Handlers
 {
     public class PayoutRefundEventsHandler : EventsHandler,
-        INotificationHandler<PayoutRefundFailedEvent>,
-        INotificationHandler<PayoutRefundSucceededEvent>
+        INotificationHandler<PayoutRefundFailedEvent>
     {
         public PayoutRefundEventsHandler(
             IAppDbContext context,
@@ -21,14 +20,15 @@ namespace Sheaft.Application.Handlers
         {
         }
 
-        public Task Handle(PayoutRefundFailedEvent notification, CancellationToken cancellationToken)
+        public async Task Handle(PayoutRefundFailedEvent notification, CancellationToken token)
         {
-            throw new System.NotImplementedException();
-        }
-
-        public Task Handle(PayoutRefundSucceededEvent notification, CancellationToken cancellationToken)
-        {
-            throw new System.NotImplementedException();
+            await _emailService.SendEmailAsync(
+               "support@sheaft.com",
+               "Support",
+               $"Le remboursement au producteur du virement {notification.RefundIdentifier}€ a échoué",
+               $"Le remboursement au producteur du virement {notification.RefundIdentifier}€ a échoué.",
+               false,
+               token);
         }
     }
 }

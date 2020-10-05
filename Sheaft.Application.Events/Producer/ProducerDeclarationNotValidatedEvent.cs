@@ -4,10 +4,10 @@ using Newtonsoft.Json;
 
 namespace Sheaft.Application.Events
 {
-    public class ProducerDocumentsNotCreatedEvent : Event
+    public class ProducerDeclarationNotValidatedEvent : Event
     {
         [JsonConstructor]
-        public ProducerDocumentsNotCreatedEvent(RequestUser requestUser) : base(requestUser)
+        public ProducerDeclarationNotValidatedEvent(RequestUser requestUser) : base(requestUser)
         {
         }
 

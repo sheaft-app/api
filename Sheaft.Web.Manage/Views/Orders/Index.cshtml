@@ -40,6 +40,7 @@
         <thead class="thead-dark">
             <tr>
                 <th scope="col">User</th>
+                <th scope="col">Reference</th>
                 <th scope="col">CreatedOn</th>
                 <th scope="col">Status</th>
                 <th scope="col">Lines</th>
@@ -56,6 +57,7 @@
             {
                 <tr>
                     <th scope="row">@entity.User.Name</th>
+                    <td>@entity.Reference</td>
                     <td>@entity.CreatedOn.ToString("dd/MM/yy hh:mm")</td>
                     <td>@entity.Status.ToString("G")</td>
                     <td>@entity.LinesCount</td>

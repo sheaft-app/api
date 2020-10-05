@@ -134,9 +134,6 @@ namespace Sheaft.Application.Handlers
                     case TransactionStatus.Failed:
                         _mediatr.Post(new TransferFailedEvent(request.RequestUser) { TransferId = transfer.Id });
                         break;
-                    case TransactionStatus.Succeeded:
-                        _mediatr.Post(new TransferSucceededEvent(request.RequestUser) { TransferId = transfer.Id });
-                        break;
                 }
 
                 return Ok(transfer.Status);

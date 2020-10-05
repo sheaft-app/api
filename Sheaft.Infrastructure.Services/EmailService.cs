@@ -18,8 +18,8 @@ namespace Sheaft.Infrastructure.Services
         private readonly ISendGridClient _sendgrid;
 
         public EmailService(
-            IOptionsSnapshot<SendgridOptions> sendgridOptions, 
-            ILogger<EmailService> logger, 
+            IOptionsSnapshot<SendgridOptions> sendgridOptions,
+            ILogger<EmailService> logger,
             ISendGridClient sendgrid) : base(logger)
         {
             _sendgridOptions = sendgridOptions.Value;
@@ -42,7 +42,35 @@ namespace Sheaft.Infrastructure.Services
                 msg.SetTemplateId(templateId);
                 msg.SetTemplateData(datas);
 
-                var response = await _sendgrid.SendEmailAsync(msg);
+                var response = await _sendgrid.SendEmailAsync(msg, token);
+                if ((int)response.StatusCode >= 400)
+                    return Ok(false, MessageKind.EmailProvider_SendEmail_Failure, await response.Body.ReadAsStringAsync());
+
+                return Ok(true);
+            });
+        }
+
+        public async Task<Result<bool>> SendEmailAsync(string toEmail, string toName, string subject, string content, bool isHtml, CancellationToken token)
+        {
+            return await ExecuteAsync(async () =>
+            {
+                var msg = new SendGridMessage();
+                msg.SetFrom(new EmailAddress(_sendgridOptions.Sender.Email, _sendgridOptions.Sender.Name));
+
+                var recipients = new List<EmailAddress>
+                {
+                    new EmailAddress(toEmail, toName)
+                };
+
+                msg.AddTos(recipients);
+                if (isHtml)
+                    msg.HtmlContent = content;
+                else
+                    msg.PlainTextContent = content;
+
+                msg.Subject = subject;
+
+                var response = await _sendgrid.SendEmailAsync(msg, token);
                 if ((int)response.StatusCode >= 400)
                     return Ok(false, MessageKind.EmailProvider_SendEmail_Failure, await response.Body.ReadAsStringAsync());
 

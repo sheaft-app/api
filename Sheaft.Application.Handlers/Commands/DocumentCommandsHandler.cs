@@ -242,9 +242,6 @@ namespace Sheaft.Application.Handlers
                     case DocumentStatus.OutOfDate:
                         _mediatr.Post(new DocumentOutdatedEvent(request.RequestUser) { DocumentId = document.Id });
                         break;
-                    case DocumentStatus.Validated:
-                        _mediatr.Post(new DocumentValidatedEvent(request.RequestUser) { DocumentId = document.Id });
-                        break;
                 }
 
                 return Ok(document.Status);

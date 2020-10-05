@@ -37,7 +37,7 @@ namespace Sheaft.Application.Handlers
             await _emailService.SendTemplatedEmailAsync(
                 job.User.Email,
                 job.User.Name,
-                _emailTemplateOptions.PickingOrderExportSucceededEvent,
+                _emailTemplateOptions.ExportPickingOrderSucceededEvent,
                 new { UserName = job.User.Name, Name = job.Name, job.CreatedOn, JobUrl = url, DownloadUrl = job.File },
                 token);            
         }
@@ -51,7 +51,7 @@ namespace Sheaft.Application.Handlers
             await _emailService.SendTemplatedEmailAsync(
                 job.User.Email,
                 job.User.Name,
-                _emailTemplateOptions.PickingOrderExportFailedEvent,
+                _emailTemplateOptions.ExportPickingOrderFailedEvent,
                 new { UserName = job.User.Name, Name = job.Name, job.CreatedOn, JobUrl = url },
                 token);            
         }

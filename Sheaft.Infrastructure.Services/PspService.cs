@@ -55,7 +55,8 @@ namespace Sheaft.Infrastructure.Services
                         consumerLegal.Owner.Nationality.GetCountry(),
                         consumerLegal.Owner.CountryOfResidence.GetCountry())
                     {
-                        Address = consumerLegal.Owner.Address.GetAddress()
+                        Address = consumerLegal.Owner.Address.GetAddress(),
+                        Tag = $"Id='{consumerLegal.Id}'"
                     });
 
                 return Ok(result.Id);
@@ -85,7 +86,8 @@ namespace Sheaft.Infrastructure.Services
                         CompanyNumber = businessLegal.Siret,
                         HeadquartersAddress = businessLegal.Address.GetAddress(),
                         LegalRepresentativeAddress = businessLegal.Owner.Address.GetAddress(),
-                        LegalRepresentativeEmail = businessLegal.Owner.Email
+                        LegalRepresentativeEmail = businessLegal.Owner.Email,
+                        Tag = $"Id='{businessLegal.Id}'"
                     });
 
                 return Ok(result.Id);
@@ -108,7 +110,10 @@ namespace Sheaft.Infrastructure.Services
                     wallet.Id.ToString("N"),
                     new WalletPostDTO(new List<string> { wallet.User.Identifier },
                     wallet.Name,
-                    CurrencyIso.EUR));
+                    CurrencyIso.EUR)
+                    {
+                        Tag = $"Id='{wallet.Id}'"
+                    });
 
                 return Ok(result.Id);
             });
@@ -141,7 +146,8 @@ namespace Sheaft.Infrastructure.Services
                     {
                         BIC = payment.BIC,
                         Type = BankAccountType.IBAN,
-                        UserId = payment.User.Identifier
+                        UserId = payment.User.Identifier,
+                        Tag = $"Id='{payment.Id}'"
                     });
 
                 return Ok(result.Id);
@@ -321,7 +327,10 @@ namespace Sheaft.Infrastructure.Services
                         ubo.Nationality.GetCountry(),
                         ubo.BirthDate.DateTime,
                         ubo.BirthPlace.GetBirthplace()
-                    ),
+                    )
+                    {
+                        Tag = $"Id='{ubo.Id}'"
+                    },
                     business.Identifier,
                     declaration.Identifier);
 
@@ -392,7 +401,8 @@ namespace Sheaft.Infrastructure.Services
                         TemplateURLOptionsCard = new TemplateURLOptionsCard
                         {
                             PAYLINEV2 = _pspOptions.PaymentUrl
-                        }
+                        },
+                        Tag = $"Id='{transaction.Id}'"
                     });
 
                 return Ok(new PspWebPaymentResultDto
@@ -445,7 +455,8 @@ namespace Sheaft.Infrastructure.Services
                             Address = owner.Address.GetAddress()
                         })
                     {
-                        SecureMode = SecureMode.DEFAULT
+                        SecureMode = SecureMode.DEFAULT,
+                        Tag = $"Id='{transaction.Id}'"
                     });
 
                 return Ok(new PspPaymentResultDto
@@ -513,7 +524,10 @@ namespace Sheaft.Infrastructure.Services
                             Currency = CurrencyIso.EUR
                         },
                         transaction.BankAccount.Identifier,
-                        transaction.Reference));
+                        transaction.Reference)
+                    {
+                        Tag = $"Id='{transaction.Id}''"
+                    });
 
                 return Ok(new PspPaymentResultDto
                 {
@@ -553,7 +567,10 @@ namespace Sheaft.Infrastructure.Services
                         {
                             Amount = transaction.Debited.GetAmount(),
                             Currency = CurrencyIso.EUR
-                        }));
+                        })
+                    {
+                        Tag = $"Id='{transaction.Id}'"
+                    });
 
                 return Ok(new PspPaymentResultDto
                 {
@@ -584,7 +601,10 @@ namespace Sheaft.Infrastructure.Services
                 var result = await _api.Transfers.CreateRefundAsync(
                     transaction.Id.ToString("N"),
                     transaction.Transfer.Identifier,
-                    new RefundTransferPostDTO(transaction.Author.Identifier));
+                    new RefundTransferPostDTO(transaction.Author.Identifier)
+                    {
+                        Tag = $"Id='{transaction.Id}'"
+                    });
 
                 return Ok(new PspPaymentResultDto
                 {
@@ -738,7 +758,10 @@ namespace Sheaft.Infrastructure.Services
                             Currency = CurrencyIso.EUR
                         },
                         debitedWalletIdentifier,
-                        creditedWalletIdentifier));
+                        creditedWalletIdentifier)
+                    {
+                        Tag = $"Id='{idempotencyKey}'"
+                    });
 
                 return Ok(new PspPaymentResultDto
                 {

@@ -4,13 +4,14 @@ using MediatR;
 using Microsoft.Extensions.Options;
 using Sheaft.Application.Events;
 using Sheaft.Application.Interop;
+using Sheaft.Domain.Enums;
+using Sheaft.Domain.Models;
 using Sheaft.Options;
 
 namespace Sheaft.Application.Handlers
 {
     public class TransferEventsHandler : EventsHandler,
-    INotificationHandler<TransferFailedEvent>,
-    INotificationHandler<TransferSucceededEvent>
+    INotificationHandler<TransferFailedEvent>
     {
         public TransferEventsHandler(
             IAppDbContext context,
@@ -21,14 +22,19 @@ namespace Sheaft.Application.Handlers
         {
         }
 
-        public Task Handle(TransferFailedEvent transferEvent, CancellationToken token)
+        public async Task Handle(TransferFailedEvent transferEvent, CancellationToken token)
         {
-            return Task.CompletedTask;
-        }
+            var transfer = await _context.GetByIdAsync<Transfer>(transferEvent.TransferId, token);
+            if (transfer.Status != TransactionStatus.Failed)
+                return;
 
-        public Task Handle(TransferSucceededEvent transferEvent, CancellationToken token)
-        {
-            return Task.CompletedTask;
+            await _emailService.SendEmailAsync(
+               "support@sheaft.com",
+               "Support",
+               $"Le paiement de {transfer.Debited}€ de la commande {transfer.PurchaseOrder.Reference} au producteur {transfer.Author.Name} a échoué",
+               $"Le paiement de {transfer.Debited}€ de la commande {transfer.PurchaseOrder.Reference} au producteur {transfer.Author.Name}({transfer.Author.Email}) a échoué. Raison: {transfer.ResultCode}-{transfer.ResultMessage}.",
+               false,
+               token);
         }
     }
 }

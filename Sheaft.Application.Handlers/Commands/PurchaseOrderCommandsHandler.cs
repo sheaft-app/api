@@ -57,7 +57,10 @@ namespace Sheaft.Application.Handlers
                 await _context.SaveChangesAsync(token);
 
                 if (!request.SkipSendEmail)
+                {
                     _mediatr.Post(new PurchaseOrderCreatedEvent(request.RequestUser) { PurchaseOrderId = purchaseOrderId });
+                    _mediatr.Post(new PurchaseOrderReceivedEvent(request.RequestUser) { PurchaseOrderId = purchaseOrderId });
+                }
 
                 return Ok(purchaseOrderId);
             });
@@ -250,9 +253,9 @@ namespace Sheaft.Application.Handlers
                 await _context.SaveChangesAsync(token);
 
                 if (request.RequestUser.Id == purchaseOrder.Sender.Id)
-                    _mediatr.Post(new PurchaseOrderCancelledBySenderEvent(request.RequestUser) { PurchaseOrderId = purchaseOrder.Id });
+                    _mediatr.Post(new PurchaseOrderWithdrawnEvent(request.RequestUser) { PurchaseOrderId = purchaseOrder.Id });
                 else
-                    _mediatr.Post(new PurchaseOrderCancelledByVendorEvent(request.RequestUser) { PurchaseOrderId = purchaseOrder.Id });
+                    _mediatr.Post(new PurchaseOrderCancelledEvent(request.RequestUser) { PurchaseOrderId = purchaseOrder.Id });
 
                 if (purchaseOrder.Transfer != null && purchaseOrder.Transfer.Status == TransactionStatus.Succeeded)
                     _mediatr.Post(new CreateTransferRefundCommand(request.RequestUser) { PurchaseOrderId = purchaseOrder.Id });

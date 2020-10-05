@@ -176,9 +176,6 @@ namespace Sheaft.Application.Handlers
                     case TransactionStatus.Failed:
                         _mediatr.Post(new DonationFailedEvent(request.RequestUser) { DonationId = donation.Id });
                         break;
-                    case TransactionStatus.Succeeded:
-                        _mediatr.Post(new DonationSucceededEvent(request.RequestUser) { DonationId = donation.Id });
-                        break;
                 }
 
                 return Ok(donation.Status);

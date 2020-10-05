@@ -13,4 +13,9 @@
     <ProjectReference Include="..\Sheaft.Domain\Sheaft.Domain.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Consumer\" />
+    <Folder Include="Store\" />
+  </ItemGroup>
+
 </Project>

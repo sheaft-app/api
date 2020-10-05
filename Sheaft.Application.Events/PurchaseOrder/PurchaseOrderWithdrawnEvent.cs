@@ -4,10 +4,10 @@ using Newtonsoft.Json;
 
 namespace Sheaft.Application.Events
 {
-    public class PurchaseOrderCancelledBySenderEvent : Event
+    public class PurchaseOrderWithdrawnEvent : Event
     {
         [JsonConstructor]
-        public PurchaseOrderCancelledBySenderEvent(RequestUser requestUser) : base(requestUser)
+        public PurchaseOrderWithdrawnEvent(RequestUser requestUser) : base(requestUser)
         {
         }
 

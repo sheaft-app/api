@@ -124,9 +124,6 @@ namespace Sheaft.Application.Handlers
                     case TransactionStatus.Failed:
                         _mediatr.Post(new PayoutFailedEvent(request.RequestUser) { PayoutId = payout.Id });
                         break;
-                    case TransactionStatus.Succeeded:
-                        _mediatr.Post(new PayoutSucceededEvent(request.RequestUser) { PayoutId = payout.Id });
-                        break;
                 }
 
                 return Ok(payout.Status);

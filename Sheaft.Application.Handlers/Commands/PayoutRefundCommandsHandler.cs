@@ -38,9 +38,6 @@ namespace Sheaft.Application.Handlers
                     case TransactionStatus.Failed:
                         _mediatr.Post(new PayoutRefundFailedEvent(request.RequestUser) { RefundIdentifier = request.Identifier });
                         break;
-                    case TransactionStatus.Succeeded:
-                        _mediatr.Post(new PayoutRefundSucceededEvent(request.RequestUser) { RefundIdentifier = request.Identifier });
-                        break;
                 }
 
                 return Ok(pspResult.Data.Status);

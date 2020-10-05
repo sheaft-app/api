@@ -174,9 +174,6 @@ namespace Sheaft.Application.Handlers
                     case TransactionStatus.Failed:
                         _mediatr.Post(new TransferRefundFailedEvent(request.RequestUser) { RefundId = transferRefund.Id });
                         break;
-                    case TransactionStatus.Succeeded:
-                        _mediatr.Post(new TransferRefundSucceededEvent(request.RequestUser) { RefundId = transferRefund.Id });
-                        break;
                 }
 
                 return Ok(transferRefund.Status);

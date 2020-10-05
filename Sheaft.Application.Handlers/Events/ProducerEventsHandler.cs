@@ -1,17 +1,18 @@
-﻿using System.Threading;
+﻿using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
 using Microsoft.Extensions.Options;
 using Sheaft.Application.Events;
 using Sheaft.Application.Interop;
+using Sheaft.Domain.Enums;
+using Sheaft.Domain.Models;
 using Sheaft.Options;
 
 namespace Sheaft.Application.Handlers
 {
     public class ProducerEventsHandler : EventsHandler,
-        INotificationHandler<ProducerNotConfiguredEvent>,
-        INotificationHandler<ProducerDocumentsNotCreatedEvent>,
-        INotificationHandler<ProducerDocumentsNotReviewedEvent>,
+        INotificationHandler<ProducerDeclarationNotValidatedEvent>,
         INotificationHandler<ProducerDocumentsNotValidatedEvent>
     {
         public ProducerEventsHandler(
@@ -23,24 +24,28 @@ namespace Sheaft.Application.Handlers
         {
         }
 
-        public Task Handle(ProducerNotConfiguredEvent notification, CancellationToken cancellationToken)
+        public async Task Handle(ProducerDeclarationNotValidatedEvent notification, CancellationToken token)
         {
-            throw new System.NotImplementedException();
+            var legal = await _context.GetSingleAsync<BusinessLegal>(c => c.User.Id == notification.ProducerId, token);
+            await _emailService.SendEmailAsync(
+               "support@sheaft.com",
+               "Support",
+               $"La validation de la configuration de la déclaration du producteur {legal.User.Name} a échouée",
+               $"La validation de la configuration de la déclaration du producteur {legal.User.Name} ({legal.User.Email}) a échouée. Veuillez vérifier la configuration de la déclaration depuis le site https://manage.sheaft.com.",
+               false,
+               token);
         }
 
-        public Task Handle(ProducerDocumentsNotCreatedEvent notification, CancellationToken cancellationToken)
+        public async Task Handle(ProducerDocumentsNotValidatedEvent notification, CancellationToken token)
         {
-            throw new System.NotImplementedException();
-        }
-
-        public Task Handle(ProducerDocumentsNotReviewedEvent notification, CancellationToken cancellationToken)
-        {
-            throw new System.NotImplementedException();
-        }
-
-        public Task Handle(ProducerDocumentsNotValidatedEvent notification, CancellationToken cancellationToken)
-        {
-            throw new System.NotImplementedException();
+            var legal = await _context.GetSingleAsync<BusinessLegal>(c => c.User.Id == notification.ProducerId, token);
+            await _emailService.SendEmailAsync(
+               "support@sheaft.com",
+               "Support",
+               $"La validation de la configuration des documents du producteur {legal.User.Name} a échouée",
+               $"La validation de la configuration des documents du producteur {legal.User.Name} ({legal.User.Email}) a échouée. Veuillez vérifier la configuration des documents depuis le site https://manage.sheaft.com.",
+               false,
+               token);
         }
     }
 }
