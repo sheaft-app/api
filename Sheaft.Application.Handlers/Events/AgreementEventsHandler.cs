@@ -38,6 +38,7 @@ namespace Sheaft.Application.Handlers
             var agreement = await _context.GetByIdAsync<Agreement>(agreementEvent.AgreementId, token);
             var email = string.Empty;
             var name = string.Empty;
+            var targetName = string.Empty;
             var id = Guid.Empty;
 
             var subEventName = "Event";
@@ -45,6 +46,7 @@ namespace Sheaft.Application.Handlers
             {
                 email = agreement.Delivery.Producer.Email;
                 name = agreement.Delivery.Producer.Name;
+                targetName = agreement.Store.Name;
                 id = agreement.Delivery.Producer.Id;
                 subEventName = "ByProducer" + subEventName;
             }
@@ -52,17 +54,18 @@ namespace Sheaft.Application.Handlers
             {
                 email = agreement.Store.Email;
                 name = agreement.Store.Name;
+                targetName = agreement.Delivery.Producer.Name;
                 id = agreement.Store.Id;
                 subEventName = "BySender" + subEventName;
             }
 
             var eventName = nameof(AgreementCreatedEvent).Replace("Event", subEventName);
-            await _signalrService.SendNotificationToGroupAsync(id, eventName, GetNotificationContent(agreement));
+            await _signalrService.SendNotificationToGroupAsync(id, eventName, GetNotificationContent(agreement, targetName));
             await _emailService.SendTemplatedEmailAsync(
                 email,
                 name,
                 _emailTemplateOptions.AgreementCreatedEvent,
-                GetNotificationDatas(agreement),
+                GetNotificationDatas(agreement, targetName),
                 token);
         }
 
@@ -72,6 +75,7 @@ namespace Sheaft.Application.Handlers
 
             var email = string.Empty;
             var name = string.Empty;
+            var targetName = string.Empty;
             var id = Guid.Empty;
 
             var subEventName = "Event";
@@ -79,6 +83,7 @@ namespace Sheaft.Application.Handlers
             {
                 email = agreement.Delivery.Producer.Email;
                 name = agreement.Delivery.Producer.Name;
+                targetName = agreement.Store.Name;
                 id = agreement.Delivery.Producer.Id;
                 subEventName = "ByProducer" + subEventName;
             }
@@ -86,17 +91,18 @@ namespace Sheaft.Application.Handlers
             {
                 email = agreement.Store.Email;
                 name = agreement.Store.Name;
+                targetName = agreement.Delivery.Producer.Name;
                 id = agreement.Store.Id;
                 subEventName = "BySender" + subEventName;
             }
 
             var eventName = nameof(AgreementAcceptedEvent).Replace("Event", subEventName);
-            await _signalrService.SendNotificationToGroupAsync(id, eventName, GetNotificationContent(agreement));
+            await _signalrService.SendNotificationToGroupAsync(id, eventName, GetNotificationContent(agreement, targetName));
             await _emailService.SendTemplatedEmailAsync(
                 email,
                 name,
                 _emailTemplateOptions.AgreementAcceptedEvent,
-                GetNotificationDatas(agreement),
+                GetNotificationDatas(agreement, targetName),
                 token);
         }
 
@@ -106,6 +112,7 @@ namespace Sheaft.Application.Handlers
 
             var email = string.Empty;
             var name = string.Empty;
+            var targetName = string.Empty;
             var id = Guid.Empty;
 
             var subEventName = "Event";
@@ -113,6 +120,7 @@ namespace Sheaft.Application.Handlers
             {
                 email = agreement.Delivery.Producer.Email;
                 name = agreement.Delivery.Producer.Name;
+                targetName = agreement.Store.Name;
                 id = agreement.Delivery.Producer.Id;
                 subEventName = "ByProducer" + subEventName;
             }
@@ -120,17 +128,18 @@ namespace Sheaft.Application.Handlers
             {
                 email = agreement.Store.Email;
                 name = agreement.Store.Name;
+                targetName = agreement.Delivery.Producer.Name;
                 id = agreement.Store.Id;
                 subEventName = "BySender" + subEventName;
             }
 
             var eventName = nameof(AgreementCancelledEvent).Replace("Event", subEventName);
-            await _signalrService.SendNotificationToGroupAsync(id, eventName, GetNotificationContent(agreement));
+            await _signalrService.SendNotificationToGroupAsync(id, eventName, GetNotificationContent(agreement, targetName));
             await _emailService.SendTemplatedEmailAsync(
                 email,
                 name,
                 _emailTemplateOptions.AgreementCancelledEvent,
-                GetNotificationDatas(agreement),
+                GetNotificationDatas(agreement, targetName),
                 token);
         }
 
@@ -140,6 +149,7 @@ namespace Sheaft.Application.Handlers
 
             var email = string.Empty;
             var name = string.Empty;
+            var targetName = string.Empty;
             var id = Guid.Empty;
 
             var subEventName = "Event";
@@ -147,6 +157,7 @@ namespace Sheaft.Application.Handlers
             {
                 email = agreement.Delivery.Producer.Email;
                 name = agreement.Delivery.Producer.Name;
+                targetName = agreement.Store.Name;
                 id = agreement.Delivery.Producer.Id;
                 subEventName = "ByProducer" + subEventName;
             }
@@ -154,30 +165,30 @@ namespace Sheaft.Application.Handlers
             {
                 email = agreement.Store.Email;
                 name = agreement.Store.Name;
+                targetName = agreement.Delivery.Producer.Name;
                 id = agreement.Store.Id;
                 subEventName = "BySender" + subEventName;
             }
 
             var eventName = nameof(AgreementRefusedEvent).Replace("Event", subEventName);
-            await _signalrService.SendNotificationToGroupAsync(id, eventName, GetNotificationContent(agreement));
+            await _signalrService.SendNotificationToGroupAsync(id, eventName, GetNotificationContent(agreement, targetName));
             await _emailService.SendTemplatedEmailAsync(
                 email,
                 name,
                 _emailTemplateOptions.AgreementRefusedEvent,
-                GetNotificationDatas(agreement),
+                GetNotificationDatas(agreement, targetName),
                 token);
         }
 
-        private StringContent GetNotificationContent(Domain.Models.Agreement agreement)
+        private StringContent GetNotificationContent(Domain.Models.Agreement agreement, string name)
         {
-            return new StringContent(JsonConvert.SerializeObject(GetNotificationDatas(agreement)), Encoding.UTF8, "application/json");
+            return new StringContent(JsonConvert.SerializeObject(GetNotificationDatas(agreement, name)), Encoding.UTF8, "application/json");
         }
 
-        private object GetNotificationDatas(Domain.Models.Agreement agreement)
+        private object GetNotificationDatas(Domain.Models.Agreement agreement, string name)
         {
             return new { 
-                StoreName = agreement.Store.Name, 
-                ProducerName = agreement.Delivery.Producer.Name, 
+                Name = name, 
                 AgreementId = agreement.Id, 
                 CreatedOn = agreement.CreatedOn, 
                 PortalUrl = $"{_configuration.GetValue<string>("Urls:Portal")}/#/agreements/{agreement.Id}" };
