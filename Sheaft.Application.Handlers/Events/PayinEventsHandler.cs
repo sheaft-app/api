@@ -36,7 +36,14 @@ namespace Sheaft.Application.Handlers
             if (payin.Status != TransactionStatus.Succeeded)
                 return;
 
-            await _emailService.SendTemplatedEmailAsync(payin.Order.User.Email, payin.Order.User.Name, _emailTemplateOptions.PayinSucceededEvent, new { payin.Order.User.FirstName, payin.Order.User.LastName, payin.Order.TotalPrice, payin.Order.CreatedOn, payin.Order.ProductsCount, payin.Order.Reference, MyOrdersUrl = $"{_configuration.GetValue<string>("Urls:Portal")}/#/my-orders" }, token);
+            var payinData = GetObject(payin);
+            await _signalrService.SendNotificationToUserAsync(payin.Author.Id, nameof(PayinSucceededEvent), payinData);
+            await _emailService.SendTemplatedEmailAsync(payin.Order.User.Email, payin.Order.User.Name, _emailTemplateOptions.PayinSucceededEvent, payinData, token);
+        }
+
+        private dynamic GetObject(Payin payin)
+        {
+            return new { payin.Order.User.FirstName, payin.Order.User.LastName, payin.Order.TotalPrice, payin.Order.CreatedOn, payin.Order.ProductsCount, payin.Order.Reference, OrderId = payin.Order.Id, MyOrdersUrl = $"{_configuration.GetValue<string>("Urls:Portal")}/#/my-orders" };
         }
     }
 }
