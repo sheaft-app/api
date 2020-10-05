@@ -59,15 +59,17 @@ namespace Sheaft.Web.Signalr.Controllers
             if (!IsAuthorized())
                 return Unauthorized();
 
+            if (!Guid.TryParse(userId, out Guid id))
+                return BadRequest("Invalid userId (Guid format expected)");
+
+            var body = string.Empty;
             using (var reader = new StreamReader(Request.Body))
             {
-                var body = await reader.ReadToEndAsync();
-                await _context.Clients.User(userId).SendAsync("event", new { Method = method, UserId = userId, Content = body }, token);
-
-                if (Guid.TryParse(userId, out Guid id))
-                    _sheaftMediatr.Post(new CreateUserNotificationCommand(new RequestUser("signalr-user", HttpContext.TraceIdentifier)) { Id = id, Method = method, Content = body });
+                body = await reader.ReadToEndAsync();
+                await _context.Clients.User(id.ToString("N")).SendAsync("event", new { Method = method, UserId = userId, Content = body }, token);
             }
 
+            _sheaftMediatr.Post(new CreateUserNotificationCommand(new RequestUser("signalr-user", HttpContext.TraceIdentifier)) { Id = id, Method = method, Content = body });
             return Ok();
         }
 
@@ -78,16 +80,17 @@ namespace Sheaft.Web.Signalr.Controllers
             if (!IsAuthorized())
                 return Unauthorized();
 
+            if (!Guid.TryParse(groupName, out Guid id))
+                return BadRequest("Invalid userId (Guid format expected)");
+
+            var body = string.Empty;
             using (var reader = new StreamReader(Request.Body))
             {
-                var body = await reader.ReadToEndAsync();
-
+                body = await reader.ReadToEndAsync();
                 await _context.Clients.Group(groupName).SendAsync("event", new { Method = method, GroupName = groupName, Content = body }, token);
-
-                if (Guid.TryParse(groupName, out Guid id))
-                    _sheaftMediatr.Post(new CreateGroupNotificationCommand(new RequestUser("signalr-group", HttpContext.TraceIdentifier)) { Id = id, Method = method, Content = body });
             }
 
+            _sheaftMediatr.Post(new CreateGroupNotificationCommand(new RequestUser("signalr-group", HttpContext.TraceIdentifier)) { Id = id, Method = method, Content = body });
             return Ok();
         }
     }
