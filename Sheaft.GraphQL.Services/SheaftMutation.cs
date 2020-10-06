@@ -317,7 +317,7 @@ namespace Sheaft.GraphQL.Services
         public async Task<IQueryable<UserProfileDto>> UpdateUserPictureAsync(UpdatePictureInput input, [Service] IUserQueries userQueries)
         {
             await ExecuteCommandAsync<UpdateUserPictureCommand, string>(_mapper.Map(input, new UpdateUserPictureCommand(CurrentUser)), Token);
-            return userQueries.GetUser(input.Id, CurrentUser);
+            return userQueries.GetUserProfile(input.Id, CurrentUser);
         }
 
         public async Task<bool> RemoveUserAsync(IdWithReasonInput input)
