@@ -122,7 +122,7 @@ namespace Sheaft.Web.Api
             services.AddType<UpdatePictureInputType>();
             services.AddType<UpdateProductInputType>();
             services.AddType<UpdateQuickOrderInputType>();
-            services.AddType<UpdateConsumerInput>();
+            services.AddType<UpdateConsumerInputType>();
             services.AddType<AddressInputType>();
             services.AddType<FullAddressInputType>();
             services.AddType<LocationAddressInputType>();
