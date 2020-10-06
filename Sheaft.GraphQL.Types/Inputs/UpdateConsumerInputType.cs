@@ -3,9 +3,9 @@ using Sheaft.Application.Models;
 
 namespace Sheaft.GraphQL.Types
 {
-    public class ConsumerInputType : SheaftInputType<ConsumerInput>
+    public class UpdateConsumerInputType : SheaftInputType<UpdateConsumerInput>
     {
-        protected override void Configure(IInputObjectTypeDescriptor<ConsumerInput> descriptor)
+        protected override void Configure(IInputObjectTypeDescriptor<UpdateConsumerInput> descriptor)
         {
             descriptor.Field(c => c.Phone);
             descriptor.Field(c => c.Picture);

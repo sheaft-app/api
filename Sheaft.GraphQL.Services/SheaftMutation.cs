@@ -296,7 +296,7 @@ namespace Sheaft.GraphQL.Services
             return consumerQueries.GetConsumer(result, CurrentUser);
         }
 
-        public async Task<IQueryable<ConsumerDto>> UpdateConsumerAsync(ConsumerInput input, [Service] IConsumerQueries consumerQueries)
+        public async Task<IQueryable<ConsumerDto>> UpdateConsumerAsync(UpdateConsumerInput input, [Service] IConsumerQueries consumerQueries)
         {
             await ExecuteCommandAsync<UpdateConsumerCommand, bool>(_mapper.Map(input, new UpdateConsumerCommand(CurrentUser)), Token);
             return consumerQueries.GetConsumer(input.Id, CurrentUser);

@@ -19,7 +19,7 @@ namespace Sheaft.Application.Mappers
                 .IncludeBase<Consumer, UserDto>();
 
             CreateMap<RegisterConsumerInput, RegisterConsumerCommand>();
-            CreateMap<ConsumerInput, UpdateConsumerCommand>();
+            CreateMap<UpdateConsumerInput, UpdateConsumerCommand>();
         }
     }
 }
