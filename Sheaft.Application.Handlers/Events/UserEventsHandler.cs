@@ -1,9 +1,11 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using Sheaft.Application.Events;
 using Sheaft.Application.Interop;
+using Sheaft.Application.Models.Mailer;
 using Sheaft.Domain.Models;
 using Sheaft.Options;
 
@@ -16,13 +18,16 @@ namespace Sheaft.Application.Handlers
         INotificationHandler<UserSponsoredEvent>,
         INotificationHandler<UserPointsCreatedEvent>
     {
+        private readonly IConfiguration _configuration;
+
         public UserEventsHandler(
+            IConfiguration configuration,
             IAppDbContext context,
             IEmailService emailService,
-            ISignalrService signalrService,
-            IOptionsSnapshot<EmailTemplateOptions> emailTemplateOptions)
-            : base(context, emailService, signalrService, emailTemplateOptions)
+            ISignalrService signalrService)
+            : base(context, emailService, signalrService)
         {
+            _configuration = configuration;
         }
 
         public async Task Handle(UserDataExportFailedEvent userEvent, CancellationToken token)
@@ -30,11 +35,15 @@ namespace Sheaft.Application.Handlers
             var job = await _context.GetByIdAsync<Job>(userEvent.JobId, token);
 
             await _signalrService.SendNotificationToUserAsync(userEvent.RequestUser.Id, nameof(UserDataExportFailedEvent), new { JobId = userEvent.JobId, UserId = userEvent.RequestUser.Id });
+
+            var url = $"{_configuration.GetValue<string>("Urls:Portal")}/#/account/profile";
             await _emailService.SendTemplatedEmailAsync(
                 job.User.Email,
                 job.User.Name,
-                _emailTemplateOptions.ExportUserDataFailedEvent,
-                new { UserName = job.User.Name, job.CreatedOn, DownloadUrl = job.File },
+                $"Votre export de données personnelles a échoué",
+                nameof(UserDataExportFailedEvent),
+                new RgpdExportMailerModel { UserName = job.User.Name, Name = job.Name, CreatedOn = job.CreatedOn, PortalUrl = url },
+                true,
                 token);
         }
 
@@ -46,8 +55,10 @@ namespace Sheaft.Application.Handlers
             await _emailService.SendTemplatedEmailAsync(
                 job.User.Email,
                 job.User.Name,
-                _emailTemplateOptions.ExportUserDataSucceededEvent,
-                new { UserName = job.User.Name, job.CreatedOn, DownloadUrl = job.File },
+                $"Votre export de données personnelles est prêt",
+                nameof(UserDataExportSucceededEvent),
+                new RgpdExportMailerModel { UserName = job.User.Name, Name = job.Name, CreatedOn = job.CreatedOn, DownloadUrl = job.File },
+                true,
                 token);            
         }
 

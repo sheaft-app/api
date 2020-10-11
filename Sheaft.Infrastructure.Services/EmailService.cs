@@ -1,7 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using SendGrid;
-using SendGrid.Helpers.Mail;
 using Sheaft.Core;
 using Sheaft.Exceptions;
 using Sheaft.Options;
@@ -9,42 +7,56 @@ using Sheaft.Application.Interop;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using Amazon.SimpleEmail;
+using Amazon.SimpleEmail.Model;
+using RazorLight;
 
 namespace Sheaft.Infrastructure.Services
 {
     public class EmailService : BaseService, IEmailService
     {
-        private readonly SendgridOptions _sendgridOptions;
-        private readonly ISendGridClient _sendgrid;
+        private readonly IRazorLightEngine _templateEngine;
+        private readonly IAmazonSimpleEmailService _mailer;
+        private readonly MailerOptions _mailerOptions;
 
         public EmailService(
-            IOptionsSnapshot<SendgridOptions> sendgridOptions,
+            IRazorLightEngine templateEngine,
+            IOptionsSnapshot<MailerOptions> mailerOptions,
             ILogger<EmailService> logger,
-            ISendGridClient sendgrid) : base(logger)
+            IAmazonSimpleEmailService mailer) 
+            : base(logger)
         {
-            _sendgridOptions = sendgridOptions.Value;
-            _sendgrid = sendgrid;
+            _templateEngine = templateEngine;
+            _mailerOptions = mailerOptions.Value;
+            _mailer = mailer;
         }
 
-        public async Task<Result<bool>> SendTemplatedEmailAsync<T>(string toEmail, string toName, string templateId, T datas, CancellationToken token)
+        public async Task<Result<bool>> SendTemplatedEmailAsync<T>(string toEmail, string toName, string subject, string templateId, T data, bool isHtml, CancellationToken token)
         {
             return await ExecuteAsync(async () =>
             {
-                var msg = new SendGridMessage();
-                msg.SetFrom(new EmailAddress(_sendgridOptions.Sender.Email, _sendgridOptions.Sender.Name));
-
-                var recipients = new List<EmailAddress>
+                var msg = new SendEmailRequest();
+                msg.Destination = new Destination
                 {
-                    new EmailAddress(toEmail, toName)
+                    ToAddresses = new List<string> { $"{toName}<{toEmail}>" }
                 };
 
-                msg.AddTos(recipients);
-                msg.SetTemplateId(templateId);
-                msg.SetTemplateData(datas);
+                msg.Source = $"{_mailerOptions.Sender.Name}<{_mailerOptions.Sender.Email}>";
+                msg.ReturnPath = _mailerOptions.Bounces;
+                msg.Message = new Message
+                {
+                    Subject = new Content(subject)
+                };
 
-                var response = await _sendgrid.SendEmailAsync(msg, token);
-                if ((int)response.StatusCode >= 400)
-                    return Ok(false, MessageKind.EmailProvider_SendEmail_Failure, await response.Body.ReadAsStringAsync());
+                var content = await _templateEngine.CompileRenderAsync($"{templateId}.cshtml", data);
+                if (isHtml)
+                    msg.Message.Body = new Body { Html = new Content(content) };
+                else
+                    msg.Message.Body = new Body { Text = new Content(content) };
+
+                var response = await _mailer.SendEmailAsync(msg, token);
+                if ((int)response.HttpStatusCode >= 400)
+                    return BadRequest<bool>(MessageKind.EmailProvider_SendEmail_Failure, string.Join(";", response.ResponseMetadata.Metadata));
 
                 return Ok(true);
             });
@@ -54,25 +66,27 @@ namespace Sheaft.Infrastructure.Services
         {
             return await ExecuteAsync(async () =>
             {
-                var msg = new SendGridMessage();
-                msg.SetFrom(new EmailAddress(_sendgridOptions.Sender.Email, _sendgridOptions.Sender.Name));
-
-                var recipients = new List<EmailAddress>
+                var msg = new SendEmailRequest();
+                msg.Destination = new Destination
                 {
-                    new EmailAddress(toEmail, toName)
+                    ToAddresses = new List<string> { $"{toName}<{toEmail}>" }
                 };
 
-                msg.AddTos(recipients);
+                msg.Source = $"{_mailerOptions.Sender.Name}<{_mailerOptions.Sender.Email}>";
+                msg.ReturnPath = _mailerOptions.Bounces;
+                msg.Message = new Message
+                {
+                    Subject = new Content(subject)
+                };
+
                 if (isHtml)
-                    msg.HtmlContent = content;
+                    msg.Message.Body = new Body { Html = new Content(content) };
                 else
-                    msg.PlainTextContent = content;
+                    msg.Message.Body = new Body { Text = new Content(content) };
 
-                msg.Subject = subject;
-
-                var response = await _sendgrid.SendEmailAsync(msg, token);
-                if ((int)response.StatusCode >= 400)
-                    return Ok(false, MessageKind.EmailProvider_SendEmail_Failure, await response.Body.ReadAsStringAsync());
+                var response = await _mailer.SendEmailAsync(msg, token);
+                if ((int)response.HttpStatusCode >= 400)
+                    return BadRequest<bool>(MessageKind.EmailProvider_SendEmail_Failure, string.Join(";", response.ResponseMetadata.Metadata));
 
                 return Ok(true);
             });

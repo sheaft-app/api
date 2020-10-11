@@ -17,7 +17,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using SendGrid;
 using Sheaft.Application.Commands;
 using Sheaft.Application.Events;
 using Sheaft.Application.Handlers;
@@ -30,6 +29,9 @@ using Sheaft.Application.Queries;
 using Microsoft.Azure.Search;
 using Hangfire;
 using Newtonsoft.Json;
+using Amazon.SimpleEmail;
+using RazorLight;
+using Amazon;
 
 namespace Sheaft.Web.Manage
 {
@@ -55,7 +57,7 @@ namespace Sheaft.Web.Manage
             var authSettings = Configuration.GetSection(AuthOptions.SETTING);
             var databaseSettings = Configuration.GetSection(AppDatabaseOptions.SETTING);
             var jobsDatabaseSettings = Configuration.GetSection(JobsDatabaseOptions.SETTING);
-            var sendgridSettings = Configuration.GetSection(SendgridOptions.SETTING);
+            var mailerSettings = Configuration.GetSection(MailerOptions.SETTING);
             var roleSettings = Configuration.GetSection(RoleOptions.SETTING);
             var pspSettings = Configuration.GetSection(PspOptions.SETTING);
             var searchSettings = Configuration.GetSection(SearchOptions.SETTING);
@@ -64,7 +66,7 @@ namespace Sheaft.Web.Manage
             services.Configure<AuthOptions>(authSettings);
             services.Configure<AppDatabaseOptions>(databaseSettings);
             services.Configure<JobsDatabaseOptions>(jobsDatabaseSettings);
-            services.Configure<SendgridOptions>(sendgridSettings);
+            services.Configure<MailerOptions>(mailerSettings);
             services.Configure<PspOptions>(pspSettings);
 
             services.Configure<StorageOptions>(Configuration.GetSection(StorageOptions.SETTING));
@@ -103,8 +105,15 @@ namespace Sheaft.Web.Manage
                 options.UseSqlServer(databaseConfig.ConnectionString, x => x.UseNetTopologySuite());//.EnableRetryOnFailure(5, TimeSpan.FromSeconds(5), null));
             }, ServiceLifetime.Scoped);
 
-            var sendgridConfig = sendgridSettings.Get<SendgridOptions>();
-            services.AddScoped<ISendGridClient, SendGridClient>(c => new SendGridClient(sendgridConfig.ApiKey));
+            var mailerConfig = mailerSettings.Get<MailerOptions>();
+
+            var rootDir = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().CodeBase);
+
+            services.AddScoped<IAmazonSimpleEmailService, AmazonSimpleEmailServiceClient>(_ => new AmazonSimpleEmailServiceClient(Configuration.GetValue<string>("Mailer:ApiId"), Configuration.GetValue<string>("Mailer:ApiKey"), RegionEndpoint.EUCentral1));
+            services.AddScoped<IRazorLightEngine>(_ => new RazorLightEngineBuilder()
+                                                .UseFileSystemProject($"{rootDir.Replace("file:\\", string.Empty)}\\Templates")
+                                                .UseMemoryCachingProvider()
+                                                .Build());
 
             var authConfig = authSettings.Get<AuthOptions>();
 

@@ -4,17 +4,16 @@ Ce projet permet de prendre en compte les requêtes de l'interface web de Sheaft
 
 ## Pré-requis
 
-- Entity Framework Core CLI: https://docs.microsoft.com/en-us/ef/core/miscellaneous/cli/dotnet 
-- Sql Cache CLI: dotnet tool install --global dotnet-sql-cache
-- Un container SQL docker avec l'image suivante: "docker run --name app -e 'ACCEPT_EULA=Y' -e 'SA_PASSWORD=##REPLACE##' -p 1434:1433 -d mcr.microsoft.com/mssql/server:2019-latest". Le port docker est redirigé sur 1434 pour ne pas interférer avec un serveur SQL déjà présent sur la machine.
-- SQLLocalDb/Express si vous possédez déjà une instance configurée et ne souhaitez pas utiliser docker (pensez à mettre à jour le port dans le fichier appsettings.json).
 - dotnet core 3.1 : https://dotnet.microsoft.com/download/dotnet-core/3.1
-- Un compte Sendgrid: https://sendgrid.com/pricing (il faudra créer des templates, et renseigner les ids dans les events correspondant dans la partie Sheaft.Application.Events).
+- Entity Framework Core CLI: https://docs.microsoft.com/en-us/ef/core/miscellaneous/cli/dotnet 
+- Un container SQL docker avec l'image suivante: "docker run --name app -e 'ACCEPT_EULA=Y' -e 'SA_PASSWORD=##REPLACE##' -p 1434:1433 -d mcr.microsoft.com/mssql/server:2019-latest". Le port docker est redirigé sur 1434 pour ne pas interférer avec un serveur SQL déjà présent sur la machine.
+- SQL Cache CLI: dotnet tool install --global dotnet-sql-cache
+- SQLLocalDb/Express si vous possédez déjà une instance configurée et ne souhaitez pas utiliser docker (pensez à mettre à jour le port dans le fichier appsettings.json).
+- Un compte Amazon SES: https://aws.amazon.com/fr/ses/
 - Un compte INSEE: https://api.insee.fr/ pour permettre d'effectuer les recherches de SIRET lors de l'enregistrement d'un compte producteur ou magasin.
 - Un serveur d'identité: le code source de celui de Sheaft est disponible dans le repository https://github.com/sheaft-app/identity, il démarre par défaut sur https://localhost:5001
 - Un compte de stockage Azure sur lequel sera chargé les images des produits, les exports/imports et autres données requises.
 - Un serveur Signalr pour envoyer les notifications de changement d'états à la partie Web, le code est disponible dans Sheaft.Signalr (il faut lui configurer une clé d'API pour pouvoir l'appeler, le setting est signalr:apikey).
-- Une plateforme Azure Functions pour executer les traitements asynchrones (export, notification, emailing etc), le code est disponible dans Sheaft.Functions
 
 Une fois que l'application a été lancée une fois, vous devez executer la commande suivante: dotnet sql-cache create "Data Source=##REPLACE##,1434;Initial Catalog=##REPLACE##;Integrated Security=True;User ID=##REPLACE##;Password=##REPLACE##;Trusted_Connection=False;" cache CachedItems
 

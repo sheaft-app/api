@@ -4,6 +4,8 @@ using System.Globalization;
 using System.IdentityModel.Tokens.Jwt;
 using System.Reflection;
 using System.Threading;
+using Amazon;
+using Amazon.SimpleEmail;
 using AutoMapper;
 using Hangfire;
 using Hangfire.SqlServer;
@@ -22,7 +24,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
-using SendGrid;
+using RazorLight;
 using Sheaft.Application.Commands;
 using Sheaft.Application.Events;
 using Sheaft.Application.Handlers;
@@ -49,8 +51,8 @@ namespace Sheaft.Web.Jobs
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            var sendgridSettings = Configuration.GetSection(SendgridOptions.SETTING);
-            services.Configure<SendgridOptions>(sendgridSettings);
+            var mailerSettings = Configuration.GetSection(MailerOptions.SETTING);
+            services.Configure<MailerOptions>(mailerSettings);
 
             var appDatabaseSettings = Configuration.GetSection(AppDatabaseOptions.SETTING);
             services.Configure<AppDatabaseOptions>(appDatabaseSettings);
@@ -82,7 +84,7 @@ namespace Sheaft.Web.Jobs
             services.Configure<PortalOptions>(Configuration.GetSection(PortalOptions.SETTING));
             services.Configure<ScoringOptions>(Configuration.GetSection(ScoringOptions.SETTING));
             services.Configure<SearchOptions>(Configuration.GetSection(SearchOptions.SETTING));
-            services.Configure<SendgridOptions>(Configuration.GetSection(SendgridOptions.SETTING));
+            services.Configure<MailerOptions>(Configuration.GetSection(MailerOptions.SETTING));
             services.Configure<SignalrOptions>(Configuration.GetSection(SignalrOptions.SETTING));
             services.Configure<SireneOptions>(Configuration.GetSection(SireneOptions.SETTING));
             services.Configure<SponsoringOptions>(Configuration.GetSection(SponsoringOptions.SETTING));
@@ -152,8 +154,15 @@ namespace Sheaft.Web.Jobs
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             services.AddHttpClient();
 
-            var sendgridConfig = sendgridSettings.Get<SendgridOptions>();
-            services.AddScoped<ISendGridClient, SendGridClient>(_ => new SendGridClient(sendgridConfig.ApiKey));
+            var mailerConfig = mailerSettings.Get<MailerOptions>();
+
+            var rootDir = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().CodeBase);
+
+            services.AddScoped<IAmazonSimpleEmailService, AmazonSimpleEmailServiceClient>(_ => new AmazonSimpleEmailServiceClient(Configuration.GetValue<string>("Mailer:ApiId"), Configuration.GetValue<string>("Mailer:ApiKey"), RegionEndpoint.EUCentral1));
+            services.AddScoped<IRazorLightEngine>(_ => new RazorLightEngineBuilder()
+                                                .UseFileSystemProject($"{rootDir.Replace("file:\\", string.Empty)}\\Templates")
+                                                .UseMemoryCachingProvider()
+                                                .Build());
 
             services.AddScoped<IIdentifierService, IdentifierService>();
             services.AddScoped<IQueueService, QueueService>();

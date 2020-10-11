@@ -14,9 +14,8 @@ namespace Sheaft.Application.Handlers
         public PayoutRefundEventsHandler(
             IAppDbContext context,
             IEmailService emailService,
-            ISignalrService signalrService,
-            IOptionsSnapshot<EmailTemplateOptions> emailTemplateOptions)
-            : base(context, emailService, signalrService, emailTemplateOptions)
+            ISignalrService signalrService)
+            : base(context, emailService, signalrService)
         {
         }
 

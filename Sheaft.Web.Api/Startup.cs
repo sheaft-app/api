@@ -1,4 +1,7 @@
-﻿using AspNetCoreRateLimit;
+﻿using Amazon;
+using Amazon.Runtime;
+using Amazon.SimpleEmail;
+using AspNetCoreRateLimit;
 using AutoMapper;
 using Hangfire;
 using HotChocolate;
@@ -23,7 +26,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using SendGrid;
+using RazorLight;
 using Sheaft.Application.Commands;
 using Sheaft.Application.Events;
 using Sheaft.Application.Handlers;
@@ -68,7 +71,7 @@ namespace Sheaft.Web.Api
 
             var authSettings = Configuration.GetSection(AuthOptions.SETTING);
             var corsSettings = Configuration.GetSection(CorsOptions.SETTING);
-            var sendgridSettings = Configuration.GetSection(SendgridOptions.SETTING);
+            var mailerSettings = Configuration.GetSection(MailerOptions.SETTING);
             var searchSettings = Configuration.GetSection(SearchOptions.SETTING);
             var appDatabaseSettings = Configuration.GetSection(AppDatabaseOptions.SETTING);
             var jobsDatabaseSettings = Configuration.GetSection(JobsDatabaseOptions.SETTING);
@@ -78,7 +81,7 @@ namespace Sheaft.Web.Api
 
             services.Configure<AuthOptions>(authSettings);
             services.Configure<CorsOptions>(corsSettings);
-            services.Configure<SendgridOptions>(sendgridSettings);
+            services.Configure<MailerOptions>(mailerSettings);
             services.Configure<SearchOptions>(searchSettings);
             services.Configure<AppDatabaseOptions>(appDatabaseSettings);
             services.Configure<JobsDatabaseOptions>(jobsDatabaseSettings);
@@ -240,8 +243,15 @@ namespace Sheaft.Web.Api
             var searchConfig = searchSettings.Get<SearchOptions>();
             services.AddScoped<ISearchServiceClient, SearchServiceClient>(_ => new SearchServiceClient(searchConfig.Name, new SearchCredentials(searchConfig.ApiKey)));
 
-            var sendgridConfig = sendgridSettings.Get<SendgridOptions>();
-            services.AddScoped<ISendGridClient, SendGridClient>(_ => new SendGridClient(sendgridConfig.ApiKey));
+            var mailerConfig = mailerSettings.Get<MailerOptions>();
+
+            var rootDir = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().CodeBase);
+
+            services.AddScoped<IAmazonSimpleEmailService, AmazonSimpleEmailServiceClient>(_ => new AmazonSimpleEmailServiceClient(Configuration.GetValue<string>("Mailer:ApiId"), Configuration.GetValue<string>("Mailer:ApiKey"), RegionEndpoint.EUCentral1));
+            services.AddScoped<IRazorLightEngine>(_ => new RazorLightEngineBuilder()
+                                                .UseFileSystemProject($"{rootDir.Replace("file:\\", string.Empty)}\\Templates")
+                                                .UseMemoryCachingProvider()
+                                                .Build());
 
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             services.AddScoped<IBackgroundJobClient, BackgroundJobClient>();

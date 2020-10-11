@@ -15,9 +15,8 @@ namespace Sheaft.Application.Handlers
         public OrderEventsHandler(
             IAppDbContext context,
             IEmailService emailService,
-            ISignalrService signalrService,
-            IOptionsSnapshot<EmailTemplateOptions> emailTemplateOptions)
-            : base(context, emailService, signalrService, emailTemplateOptions)
+            ISignalrService signalrService)
+            : base(context, emailService, signalrService)
         {
         }
 
@@ -28,7 +27,7 @@ namespace Sheaft.Application.Handlers
             await _emailService.SendEmailAsync(
                "support@sheaft.com",
                "Support",
-               $"La confirmation de l'order {order.Reference} a échoué",
+               $"La confirmation de l'order {order.Reference} a échouée",
                $"La confirmation de l'order {order.Reference} d'un montant de {order.TotalPrice}€ pour {order.User.Name} ({order.User.Email}) a échoué. Raison: {notification.Message}.",
                false,
                token);

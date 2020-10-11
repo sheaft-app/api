@@ -11,6 +11,7 @@ using Sheaft.Application.Interop;
 using Sheaft.Options;
 using Microsoft.Extensions.Options;
 using System;
+using Sheaft.Application.Models.Mailer;
 
 namespace Sheaft.Application.Handlers
 {
@@ -26,9 +27,8 @@ namespace Sheaft.Application.Handlers
             IConfiguration configuration,
             IAppDbContext context,
             IEmailService emailService,
-            ISignalrService signalrService,
-            IOptionsSnapshot<EmailTemplateOptions> emailTemplateOptions)
-            : base(context, emailService, signalrService, emailTemplateOptions)
+            ISignalrService signalrService)
+            : base(context, emailService, signalrService)
         {
             _configuration = configuration;
         }
@@ -64,8 +64,10 @@ namespace Sheaft.Application.Handlers
             await _emailService.SendTemplatedEmailAsync(
                 email,
                 name,
-                _emailTemplateOptions.AgreementCreatedEvent,
+                $"Nouvelle demande d'accord de {targetName} reçue",
+                nameof(AgreementCreatedEvent),
                 GetNotificationDatas(agreement, targetName),
+                true,
                 token);
         }
 
@@ -101,8 +103,10 @@ namespace Sheaft.Application.Handlers
             await _emailService.SendTemplatedEmailAsync(
                 email,
                 name,
-                _emailTemplateOptions.AgreementAcceptedEvent,
+                $"Votre demande d'accord avec {targetName} a été acceptée",
+                nameof(AgreementAcceptedEvent),
                 GetNotificationDatas(agreement, targetName),
+                true,
                 token);
         }
 
@@ -138,8 +142,10 @@ namespace Sheaft.Application.Handlers
             await _emailService.SendTemplatedEmailAsync(
                 email,
                 name,
-                _emailTemplateOptions.AgreementCancelledEvent,
+                $"L'accord commercial avec {targetName} a été annulé",
+                nameof(AgreementCancelledEvent),
                 GetNotificationDatas(agreement, targetName),
+                true,
                 token);
         }
 
@@ -175,8 +181,10 @@ namespace Sheaft.Application.Handlers
             await _emailService.SendTemplatedEmailAsync(
                 email,
                 name,
-                _emailTemplateOptions.AgreementRefusedEvent,
+                $"Votre demande d'accord avec {targetName} a été refusée",
+                nameof(AgreementRefusedEvent),
                 GetNotificationDatas(agreement, targetName),
+                true,
                 token);
         }
 
@@ -185,13 +193,15 @@ namespace Sheaft.Application.Handlers
             return new StringContent(JsonConvert.SerializeObject(GetNotificationDatas(agreement, name)), Encoding.UTF8, "application/json");
         }
 
-        private object GetNotificationDatas(Domain.Models.Agreement agreement, string name)
+        private AgreementMailerModel GetNotificationDatas(Domain.Models.Agreement agreement, string name)
         {
-            return new { 
+            return new AgreementMailerModel
+            { 
                 Name = name, 
                 AgreementId = agreement.Id, 
                 CreatedOn = agreement.CreatedOn, 
-                PortalUrl = $"{_configuration.GetValue<string>("Urls:Portal")}/#/agreements/{agreement.Id}" };
+                PortalUrl = $"{_configuration.GetValue<string>("Urls:Portal")}/#/agreements/{agreement.Id}" 
+            };
         }
     }
 }

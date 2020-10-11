@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
@@ -11,6 +11,85 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Remove="Templates\AgreementAcceptedEvent.cshtml" />
+    <None Remove="Templates\AgreementCancelledEvent.cshtml" />
+    <None Remove="Templates\AgreementCreatedEvent.cshtml" />
+    <None Remove="Templates\AgreementRefusedEvent.cshtml" />
+    <None Remove="Templates\PayinSucceededEvent.cshtml" />
+    <None Remove="Templates\PickingOrderExportFailedEvent.cshtml" />
+    <None Remove="Templates\PickingOrderExportSucceededEvent.cshtml" />
+    <None Remove="Templates\ProductImportFailedEvent.cshtml" />
+    <None Remove="Templates\ProductImportSucceededEvent.cshtml" />
+    <None Remove="Templates\PurchaseOrderAcceptedEvent.cshtml" />
+    <None Remove="Templates\PurchaseOrderCancelledEvent.cshtml" />
+    <None Remove="Templates\PurchaseOrderCompletedEvent.cshtml" />
+    <None Remove="Templates\PurchaseOrderCreatedEvent.cshtml" />
+    <None Remove="Templates\PurchaseOrderReceivedEvent.cshtml" />
+    <None Remove="Templates\PurchaseOrderRefusedEvent.cshtml" />
+    <None Remove="Templates\PurchaseOrderWithdrawnEvent.cshtml" />
+    <None Remove="Templates\UserDataExportFailedEvent.cshtml" />
+    <None Remove="Templates\UserDataExportSucceededEvent.cshtml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Templates\AgreementAcceptedEvent.cshtml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Templates\AgreementCancelledEvent.cshtml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Templates\AgreementCreatedEvent.cshtml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Templates\AgreementRefusedEvent.cshtml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Templates\PayinSucceededEvent.cshtml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Templates\PickingOrderExportFailedEvent.cshtml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Templates\PickingOrderExportSucceededEvent.cshtml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Templates\ProductImportFailedEvent.cshtml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Templates\ProductImportSucceededEvent.cshtml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Templates\PurchaseOrderAcceptedEvent.cshtml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Templates\PurchaseOrderCancelledEvent.cshtml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Templates\PurchaseOrderCompletedEvent.cshtml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Templates\PurchaseOrderCreatedEvent.cshtml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Templates\PurchaseOrderReceivedEvent.cshtml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Templates\PurchaseOrderRefusedEvent.cshtml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Templates\PurchaseOrderWithdrawnEvent.cshtml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Templates\UserDataExportFailedEvent.cshtml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Templates\UserDataExportSucceededEvent.cshtml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="AWSSDK.SimpleEmail" Version="3.5.0.26" />
     <PackageReference Include="Azure.Storage.Blobs" Version="12.6.0" />
     <PackageReference Include="Azure.Storage.Queues" Version="12.4.2" />
     <PackageReference Include="mangopay2-sdk" Version="2.1.6" />
@@ -20,7 +99,7 @@
     <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="3.1.8" />
     <PackageReference Include="Microsoft.Extensions.Http" Version="3.1.8" />
     <PackageReference Include="Powell.CouponCode" Version="1.0.3" />
-    <PackageReference Include="SendGrid" Version="9.21.0" />
+    <PackageReference Include="RazorLight.NetCore3" Version="3.0.2" />
     <PackageReference Include="SixLabors.ImageSharp" Version="1.0.1" />
   </ItemGroup>
 

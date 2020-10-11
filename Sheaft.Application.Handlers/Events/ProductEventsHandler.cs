@@ -7,6 +7,7 @@ using Sheaft.Domain.Models;
 using Sheaft.Application.Interop;
 using Microsoft.Extensions.Options;
 using Sheaft.Options;
+using Sheaft.Application.Models.Mailer;
 
 namespace Sheaft.Application.Handlers
 {
@@ -21,9 +22,8 @@ namespace Sheaft.Application.Handlers
             IConfiguration configuration,
             IAppDbContext context,
             IEmailService emailService,
-            ISignalrService signalrService,
-            IOptionsSnapshot<EmailTemplateOptions> emailTemplateOptions)
-            : base(context, emailService, signalrService, emailTemplateOptions)
+            ISignalrService signalrService)
+            : base(context, emailService, signalrService)
         {
             _configuration = configuration;
         }
@@ -33,12 +33,14 @@ namespace Sheaft.Application.Handlers
             var job = await _context.GetByIdAsync<Job>(productEvent.JobId, token);
             await _signalrService.SendNotificationToGroupAsync(job.User.Id, nameof(ProductImportSucceededEvent), new { JobId = job.Id, UserId = job.User.Id });
 
-            var url = $"{_configuration.GetValue<string>("Urls:Portal")}/#/jobs/{job.Id}";
+            var url = $"{_configuration.GetValue<string>("Urls:Portal")}/#/products";
             await _emailService.SendTemplatedEmailAsync(
                 job.User.Email,
                 job.User.Name,
-                _emailTemplateOptions.ImportProductsSucceededEvent,
-                new { UserName = job.User.Name, Name = job.Name, job.CreatedOn, JobUrl = url, DownloadUrl = job.File },
+                $"L'import de votre catalogue produit est terminé",
+                nameof(ProductImportSucceededEvent),
+                new ProductImportMailerModel { UserName = job.User.Name, Name = job.Name, CreatedOn = job.CreatedOn, PortalUrl = url },
+                true,
                 token);
         }
 
@@ -51,8 +53,10 @@ namespace Sheaft.Application.Handlers
             await _emailService.SendTemplatedEmailAsync(
                 job.User.Email,
                 job.User.Name,
-                _emailTemplateOptions.ImportProductsFailedEvent,
-                new { UserName = job.User.Name, Name = job.Name, job.CreatedOn, JobUrl = url },
+                $"L'import de votre catalogue produit a échoué",
+                nameof(ProductImportSucceededEvent),
+                new ProductImportMailerModel { UserName = job.User.Name, Name = job.Name, CreatedOn = job.CreatedOn, JobUrl = url },
+                true,
                 token);
         }
 

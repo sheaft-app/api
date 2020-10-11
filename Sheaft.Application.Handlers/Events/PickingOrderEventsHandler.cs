@@ -7,6 +7,7 @@ using Sheaft.Domain.Models;
 using Sheaft.Application.Interop;
 using Microsoft.Extensions.Options;
 using Sheaft.Options;
+using Sheaft.Application.Models.Mailer;
 
 namespace Sheaft.Application.Handlers
 {
@@ -21,9 +22,8 @@ namespace Sheaft.Application.Handlers
             IConfiguration configuration,
             IAppDbContext context,
             IEmailService emailService,
-            ISignalrService signalrService,
-            IOptionsSnapshot<EmailTemplateOptions> emailTemplateOptions)
-            : base(context, emailService, signalrService, emailTemplateOptions)
+            ISignalrService signalrService)
+            : base(context, emailService, signalrService)
         {
             _configuration = configuration;
         }
@@ -33,13 +33,14 @@ namespace Sheaft.Application.Handlers
             var job = await _context.GetByIdAsync<Job>(pickingOrderEvent.JobId, token);
             await _signalrService.SendNotificationToGroupAsync(job.User.Id, nameof(PickingOrderExportSucceededEvent), new { JobId = job.Id, Name = job.Name, UserId = job.User.Id, Url = job.File });
 
-            var url = $"{_configuration.GetValue<string>("Urls:Portal")}/#/jobs/{job.Id}";
             await _emailService.SendTemplatedEmailAsync(
                 job.User.Email,
                 job.User.Name,
-                _emailTemplateOptions.ExportPickingOrderSucceededEvent,
-                new { UserName = job.User.Name, Name = job.Name, job.CreatedOn, JobUrl = url, DownloadUrl = job.File },
-                token);            
+                $"Votre bon de préparation est prêt",
+                nameof(PickingOrderExportSucceededEvent),
+                new PickingOrderExportMailerModel { UserName = job.User.Name, Name = job.Name, CreatedOn = job.CreatedOn, DownloadUrl = job.File },
+                true,
+                token);
         }
 
         public async Task Handle(PickingOrderExportFailedEvent pickingOrderEvent, CancellationToken token)
@@ -47,13 +48,15 @@ namespace Sheaft.Application.Handlers
             var job = await _context.GetByIdAsync<Job>(pickingOrderEvent.JobId, token);
             await _signalrService.SendNotificationToGroupAsync(job.User.Id, nameof(PickingOrderExportFailedEvent), new { JobId = job.Id, Name = job.Name, UserId = job.User.Id });
 
-            var url = $"{_configuration.GetValue<string>("Urls:Portal")}/#/jobs/{job.Id}";
+            var url = $"{_configuration.GetValue<string>("Urls:Portal")}/#/purchase-orders";
             await _emailService.SendTemplatedEmailAsync(
                 job.User.Email,
                 job.User.Name,
-                _emailTemplateOptions.ExportPickingOrderFailedEvent,
-                new { UserName = job.User.Name, Name = job.Name, job.CreatedOn, JobUrl = url },
-                token);            
+                $"La génération de votre bon de préparation a échouée",
+                nameof(PickingOrderExportFailedEvent),
+                new PickingOrderExportMailerModel { UserName = job.User.Name, Name = job.Name, CreatedOn = job.CreatedOn, JobUrl = url },
+                true,
+                token);
         }
 
         public async Task Handle(PickingOrderExportProcessingEvent pickingOrderEvent, CancellationToken token)
