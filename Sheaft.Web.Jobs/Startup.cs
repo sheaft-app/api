@@ -160,7 +160,7 @@ namespace Sheaft.Web.Jobs
 
             services.AddScoped<IAmazonSimpleEmailService, AmazonSimpleEmailServiceClient>(_ => new AmazonSimpleEmailServiceClient(Configuration.GetValue<string>("Mailer:ApiId"), Configuration.GetValue<string>("Mailer:ApiKey"), RegionEndpoint.EUCentral1));
             services.AddScoped<IRazorLightEngine>(_ => new RazorLightEngineBuilder()
-                                                .UseFileSystemProject($"{rootDir.Replace("file:\\", string.Empty)}\\Templates")
+                                                .UseFileSystemProject($"{rootDir.Replace("file:\\", string.Empty)}/Templates")
                                                 .UseMemoryCachingProvider()
                                                 .Build());
 
