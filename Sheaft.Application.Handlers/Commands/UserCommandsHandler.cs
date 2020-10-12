@@ -130,11 +130,8 @@ namespace Sheaft.Application.Handlers
                     return BadRequest<bool>(MessageKind.UserPoints_Scoring_Matching_ActionPoints_NotFound);
 
                 var user = await _context.GetByIdAsync<User>(request.UserId, token);
-                var point = new Points(user, request.Kind, quantity, request.CreatedOn);
+                user.AddPoints(request.Kind, quantity, DateTimeOffset.UtcNow);
 
-                user.SetTotalPoints(user.TotalPoints + point.Quantity);
-
-                await _context.AddAsync(point, token);
                 await _context.SaveChangesAsync(token);
 
                 _mediatr.Post(new UserPointsCreatedEvent(request.RequestUser) { UserId = user.Id, Kind = request.Kind, Points = quantity, CreatedOn = request.CreatedOn });

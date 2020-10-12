@@ -3,11 +3,15 @@ using Sheaft.Exceptions;
 using Sheaft.Domain.Enums;
 using Sheaft.Domain.Interop;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Sheaft.Domain.Models
 {
     public abstract class User : IEntity
     {
+        private List<Points> _points;
+
         protected User()
         {
         }
@@ -22,6 +26,8 @@ namespace Sheaft.Domain.Models
             SetPhone(phone);
             SetFirstname(firstname);
             SetLastname(lastname);
+
+            RefreshPoints();
         }
 
         public Guid Id { get; private set; }
@@ -39,6 +45,7 @@ namespace Sheaft.Domain.Models
         public string SponsorshipCode { get; private set; }
         public int TotalPoints { get; private set; }
         public virtual UserAddress Address { get; private set; }
+        public virtual IReadOnlyCollection<Points> Points { get { return _points.AsReadOnly(); } }
 
         public void SetFirstname(string firstname)
         {
@@ -139,9 +146,21 @@ namespace Sheaft.Domain.Models
             SetAddress("", "", Address.Zipcode, "", Address.Country, Address.Department);
         }
 
-        public void SetTotalPoints(int points)
+        public Points AddPoints(PointKind kind, int quantity, DateTimeOffset? createdOn = null)
         {
-            TotalPoints = points;
+            if (Points == null)
+                _points = new List<Points>();
+
+            var points = new Points(Guid.NewGuid(), kind, quantity, createdOn ?? DateTimeOffset.UtcNow);
+            _points.Add(points);
+            RefreshPoints();
+
+            return points;
+        }
+
+        private void RefreshPoints()
+        {
+            TotalPoints = _points.Sum(c => c.Quantity);
         }
     }
 
