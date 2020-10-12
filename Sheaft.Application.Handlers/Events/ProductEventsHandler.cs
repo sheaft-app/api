@@ -5,8 +5,6 @@ using Microsoft.Extensions.Configuration;
 using Sheaft.Application.Events;
 using Sheaft.Domain.Models;
 using Sheaft.Application.Interop;
-using Microsoft.Extensions.Options;
-using Sheaft.Options;
 using Sheaft.Application.Models.Mailer;
 
 namespace Sheaft.Application.Handlers
@@ -33,7 +31,7 @@ namespace Sheaft.Application.Handlers
             var job = await _context.GetByIdAsync<Job>(productEvent.JobId, token);
             await _signalrService.SendNotificationToGroupAsync(job.User.Id, nameof(ProductImportSucceededEvent), new { JobId = job.Id, UserId = job.User.Id });
 
-            var url = $"{_configuration.GetValue<string>("Urls:Portal")}/#/products";
+            var url = $"{_configuration.GetValue<string>("Portal:url")}/#/products";
             await _emailService.SendTemplatedEmailAsync(
                 job.User.Email,
                 job.User.Name,
@@ -49,7 +47,7 @@ namespace Sheaft.Application.Handlers
             var job = await _context.GetByIdAsync<Job>(productEvent.JobId, token);
             await _signalrService.SendNotificationToGroupAsync(job.User.Id, nameof(ProductImportFailedEvent), new { JobId = job.Id, UserId = job.User.Id });
 
-            var url = $"{_configuration.GetValue<string>("Urls:Portal")}/#/jobs/{job.Id}";
+            var url = $"{_configuration.GetValue<string>("Portal:url")}/#/jobs/{job.Id}";
             await _emailService.SendTemplatedEmailAsync(
                 job.User.Email,
                 job.User.Name,

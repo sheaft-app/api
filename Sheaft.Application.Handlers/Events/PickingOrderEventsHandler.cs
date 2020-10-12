@@ -5,8 +5,6 @@ using Microsoft.Extensions.Configuration;
 using Sheaft.Application.Events;
 using Sheaft.Domain.Models;
 using Sheaft.Application.Interop;
-using Microsoft.Extensions.Options;
-using Sheaft.Options;
 using Sheaft.Application.Models.Mailer;
 
 namespace Sheaft.Application.Handlers
@@ -48,7 +46,7 @@ namespace Sheaft.Application.Handlers
             var job = await _context.GetByIdAsync<Job>(pickingOrderEvent.JobId, token);
             await _signalrService.SendNotificationToGroupAsync(job.User.Id, nameof(PickingOrderExportFailedEvent), new { JobId = job.Id, Name = job.Name, UserId = job.User.Id });
 
-            var url = $"{_configuration.GetValue<string>("Urls:Portal")}/#/purchase-orders";
+            var url = $"{_configuration.GetValue<string>("Portal:url")}/#/purchase-orders";
             await _emailService.SendTemplatedEmailAsync(
                 job.User.Email,
                 job.User.Name,

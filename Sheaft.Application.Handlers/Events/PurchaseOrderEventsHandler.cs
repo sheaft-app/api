@@ -7,8 +7,6 @@ using Newtonsoft.Json;
 using Sheaft.Application.Events;
 using Sheaft.Domain.Models;
 using Sheaft.Application.Interop;
-using Sheaft.Options;
-using Microsoft.Extensions.Options;
 using Sheaft.Application.Models.Mailer;
 
 namespace Sheaft.Application.Handlers
@@ -43,7 +41,7 @@ namespace Sheaft.Application.Handlers
 
             var email = purchaseOrder.Sender.Email;
             var name = purchaseOrder.Sender.Name;
-            var url = $"{_configuration.GetValue<string>("Urls:Portal")}/#/my-orders/{purchaseOrder.Id}";
+            var url = $"{_configuration.GetValue<string>("Portal:url")}/#/my-orders/{purchaseOrder.Id}";
 
             await _emailService.SendTemplatedEmailAsync(
                 email,
@@ -60,7 +58,7 @@ namespace Sheaft.Application.Handlers
             var purchaseOrder = await _context.GetByIdAsync<PurchaseOrder>(orderEvent.PurchaseOrderId, token);
             await _signalrService.SendNotificationToGroupAsync(purchaseOrder.Vendor.Id, nameof(PurchaseOrderWithdrawnEvent), GetPurchaseNotifModelAsString(purchaseOrder));
 
-            var url = $"{_configuration.GetValue<string>("Urls:Portal")}/#/orders/{purchaseOrder.Id}";
+            var url = $"{_configuration.GetValue<string>("Portal:url")}/#/orders/{purchaseOrder.Id}";
             await _emailService.SendTemplatedEmailAsync(
                 purchaseOrder.Vendor.Email,
                 purchaseOrder.Vendor.Name,
@@ -81,7 +79,7 @@ namespace Sheaft.Application.Handlers
                 purchaseOrder.Sender.Name,
                 $"Votre commande de {purchaseOrder.TotalOnSalePrice}€ pour le {purchaseOrder.ExpectedDelivery.ExpectedDeliveryDate:dd/MM/yyyy} a été annulée par {purchaseOrder.Vendor.Name}",
                 nameof(PurchaseOrderCancelledEvent),
-                GetTemplateDatas(purchaseOrder, $"{_configuration.GetValue<string>("Urls:Portal")}/#/my-orders/{purchaseOrder.Id}"),
+                GetTemplateDatas(purchaseOrder, $"{_configuration.GetValue<string>("Portal:url")}/#/my-orders/{purchaseOrder.Id}"),
                 true,
                 token);
         }
@@ -96,7 +94,7 @@ namespace Sheaft.Application.Handlers
                 purchaseOrder.Sender.Name,
                 $"Votre commande de {purchaseOrder.TotalOnSalePrice}€ auprès de {purchaseOrder.Vendor.Name} pour le {purchaseOrder.ExpectedDelivery.ExpectedDeliveryDate:dd/MM/yyyy} est prête",
                 nameof(PurchaseOrderCompletedEvent),
-                GetTemplateDatas(purchaseOrder, $"{_configuration.GetValue<string>("Urls:Portal")}/#/my-orders/{purchaseOrder.Id}"),
+                GetTemplateDatas(purchaseOrder, $"{_configuration.GetValue<string>("Portal:url")}/#/my-orders/{purchaseOrder.Id}"),
                 true,
                 token);
         }
@@ -111,7 +109,7 @@ namespace Sheaft.Application.Handlers
                 purchaseOrder.Sender.Name,
                 $"Votre commande de {purchaseOrder.TotalOnSalePrice}€ pour le {purchaseOrder.ExpectedDelivery.ExpectedDeliveryDate:dd/MM/yyyy} a bien été envoyée par {purchaseOrder.Vendor.Name}",
                 nameof(PurchaseOrderCreatedEvent),
-                GetTemplateDatas(purchaseOrder, $"{_configuration.GetValue<string>("Urls:Portal")}/#/my-orders/{purchaseOrder.Id}"),
+                GetTemplateDatas(purchaseOrder, $"{_configuration.GetValue<string>("Portal:url")}/#/my-orders/{purchaseOrder.Id}"),
                 true,
                 token);
         }
@@ -126,7 +124,7 @@ namespace Sheaft.Application.Handlers
                 purchaseOrder.Vendor.Name,
                 $"Une nouvelle commande de {purchaseOrder.TotalOnSalePrice}€ pour le {purchaseOrder.ExpectedDelivery.ExpectedDeliveryDate:dd/MM/yyyy} vient d'être créée par {purchaseOrder.Sender.Name}",
                 nameof(PurchaseOrderReceivedEvent),
-                GetTemplateDatas(purchaseOrder, $"{_configuration.GetValue<string>("Urls:Portal")}/#/orders/{purchaseOrder.Id}"),
+                GetTemplateDatas(purchaseOrder, $"{_configuration.GetValue<string>("Portal:url")}/#/orders/{purchaseOrder.Id}"),
                 true,
                 token);
         }
@@ -141,7 +139,7 @@ namespace Sheaft.Application.Handlers
                 purchaseOrder.Sender.Name,
                 $"Votre commande {purchaseOrder.Reference} de {purchaseOrder.TotalOnSalePrice}€ a été annulée par {purchaseOrder.Vendor.Name}",
                 nameof(PurchaseOrderRefusedEvent),
-                GetTemplateDatas(purchaseOrder, $"{_configuration.GetValue<string>("Urls:Portal")}/#/my-orders/{purchaseOrder.Id}"),
+                GetTemplateDatas(purchaseOrder, $"{_configuration.GetValue<string>("Portal:url")}/#/my-orders/{purchaseOrder.Id}"),
                 true,
                 token);
         }

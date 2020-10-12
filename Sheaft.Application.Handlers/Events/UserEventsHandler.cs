@@ -36,7 +36,7 @@ namespace Sheaft.Application.Handlers
 
             await _signalrService.SendNotificationToUserAsync(userEvent.RequestUser.Id, nameof(UserDataExportFailedEvent), new { JobId = userEvent.JobId, UserId = userEvent.RequestUser.Id });
 
-            var url = $"{_configuration.GetValue<string>("Urls:Portal")}/#/account/profile";
+            var url = $"{_configuration.GetValue<string>("Portal:url")}/#/account/profile";
             await _emailService.SendTemplatedEmailAsync(
                 job.User.Email,
                 job.User.Name,

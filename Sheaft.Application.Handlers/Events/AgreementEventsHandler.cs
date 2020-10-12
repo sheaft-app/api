@@ -8,8 +8,6 @@ using Newtonsoft.Json;
 using Sheaft.Application.Events;
 using Sheaft.Domain.Models;
 using Sheaft.Application.Interop;
-using Sheaft.Options;
-using Microsoft.Extensions.Options;
 using System;
 using Sheaft.Application.Models.Mailer;
 
@@ -200,7 +198,7 @@ namespace Sheaft.Application.Handlers
                 Name = name, 
                 AgreementId = agreement.Id, 
                 CreatedOn = agreement.CreatedOn, 
-                PortalUrl = $"{_configuration.GetValue<string>("Urls:Portal")}/#/agreements/{agreement.Id}" 
+                PortalUrl = $"{_configuration.GetValue<string>("Portal:url")}/#/agreements/{agreement.Id}" 
             };
         }
     }
