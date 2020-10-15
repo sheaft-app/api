@@ -124,7 +124,7 @@ namespace Sheaft.Application.Handlers
                 purchaseOrder.Vendor.Name,
                 $"Une nouvelle commande de {purchaseOrder.TotalOnSalePrice}€ pour le {purchaseOrder.ExpectedDelivery.ExpectedDeliveryDate:dd/MM/yyyy} vient d'être créée par {purchaseOrder.Sender.Name}",
                 nameof(PurchaseOrderReceivedEvent),
-                GetTemplateDatas(purchaseOrder, $"{_configuration.GetValue<string>("Portal:url")}/#/orders/{purchaseOrder.Id}"),
+                GetTemplateDatas(purchaseOrder, $"{_configuration.GetValue<string>("Portal:url")}/#/purchase-orders/{purchaseOrder.Id}"),
                 true,
                 token);
         }

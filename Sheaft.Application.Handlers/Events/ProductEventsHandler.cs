@@ -31,7 +31,7 @@ namespace Sheaft.Application.Handlers
             var job = await _context.GetByIdAsync<Job>(productEvent.JobId, token);
             await _signalrService.SendNotificationToGroupAsync(job.User.Id, nameof(ProductImportSucceededEvent), new { JobId = job.Id, UserId = job.User.Id });
 
-            var url = $"{_configuration.GetValue<string>("Portal:url")}/#/products";
+            var url = $"{_configuration.GetValue<string>("Portal:url")}/#/products/";
             await _emailService.SendTemplatedEmailAsync(
                 job.User.Email,
                 job.User.Name,
