@@ -46,8 +46,8 @@ namespace Sheaft.Domain.Models
 
         public void StartJob()
         {
-            if (StartedOn.HasValue || Status == ProcessStatus.Processing)
-                return;
+            if (StartedOn.HasValue || Status != ProcessStatus.Waiting)
+                throw new ValidationException();
 
             StartedOn = DateTimeOffset.UtcNow;
             Status = ProcessStatus.Processing;

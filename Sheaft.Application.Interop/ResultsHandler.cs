@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using Sheaft.Core;
 using Sheaft.Exceptions;
 
@@ -140,22 +141,21 @@ namespace Sheaft.Application.Interop
         {
             try
             {
-                _logger.LogTrace($"{nameof(ResultsHandler.ExecuteAsync)} - {method.Method.DeclaringType?.DeclaringType?.Name ?? method.Target.ToString().Split("+")[0]}");
                 return await method();
             }
             catch (SheaftException e)
             {
-                _logger.LogError($"SheaftException: {nameof(ResultsHandler.ExecuteAsync)} - {method.Method.DeclaringType?.DeclaringType?.Name ?? method.Target.ToString().Split("+")[0]}: exception: {{0}}", e);
+                LogError(method, e);
                 return Failed<T>(e.InnerException ?? e);
             }
             catch (DbUpdateConcurrencyException e)
             {
-                _logger.LogError($"DbUpdateConcurrencyException: {nameof(ResultsHandler.ExecuteAsync)} - {method.Method.DeclaringType?.DeclaringType?.Name ?? method.Target.ToString().Split("+")[0]}: exception: {{0}}, message: {{1}}", e, e.Message);
+                LogError(method, e);
                 return Conflict<T>(e.InnerException ?? e);
             }
             catch (DbUpdateException e)
             {
-                _logger.LogError($"DbUpdateException: {nameof(ResultsHandler.ExecuteAsync)} - {method.Method.DeclaringType?.DeclaringType?.Name ?? method.Target.ToString().Split("+")[0]}: exception: {{0}}, message: {{1}}", e, e.Message);
+                LogError(method, e);
 
                 if (e.InnerException != null && e.InnerException.Message.Contains("Cannot insert duplicate key row in object"))
                     return Failed<T>(new AlreadyExistsException(e.InnerException));
@@ -164,17 +164,17 @@ namespace Sheaft.Application.Interop
             }
             catch (NotSupportedException e)
             {
-                _logger.LogError($"NotSupportedException: {nameof(ResultsHandler.ExecuteAsync)} - {method.Method.DeclaringType?.DeclaringType?.Name ?? method.Target.ToString().Split("+")[0]}: exception: {{0}}, message: {{1}}", e, e.Message);
+                LogError(method, e);
                 return Failed<T>(e.InnerException ?? e);
             }
             catch (InvalidOperationException e)
             {
-                _logger.LogError($"InvalidOperationException: {nameof(ResultsHandler.ExecuteAsync)} - {method.Method.DeclaringType?.DeclaringType?.Name ?? method.Target.ToString().Split("+")[0]}: exception: {{0}}, message: {{1}}", e, e.Message);
+                LogError(method, e);
                 return Failed<T>(e.InnerException ?? e);
             }
             catch (Exception e)
             {
-                _logger.LogError($"Exception: {nameof(ResultsHandler.ExecuteAsync)} - {method.Method.DeclaringType?.DeclaringType?.Name ?? method.Target.ToString().Split("+")[0]}: exception: {{0}}, message: {{1}}", e, e.Message);
+                LogError(method, e);
                 return InternalError<T>(e.InnerException ?? e);
             }
         }
@@ -183,22 +183,21 @@ namespace Sheaft.Application.Interop
         {
             try
             {
-                _logger.LogTrace($"{nameof(ResultsHandler.ExecuteAsync)} - {method.Method.DeclaringType?.DeclaringType?.Name ?? method.Target.ToString().Split("+")[0]}");
                 return await method();
             }
             catch (SheaftException e)
             {
-                _logger.LogError($"SheaftException: {nameof(ResultsHandler.ExecuteAsync)} - {method.Method.DeclaringType?.DeclaringType?.Name ?? method.Target.ToString().Split("+")[0]}: exception: {{0}}", e);
+                LogError(method, e);
                 return Failed<IEnumerable<T>>(e.InnerException ?? e);
             }
             catch (DbUpdateConcurrencyException e)
             {
-                _logger.LogError($"DbUpdateConcurrencyException: {nameof(ResultsHandler.ExecuteAsync)} - {method.Method.DeclaringType?.DeclaringType?.Name ?? method.Target.ToString().Split("+")[0]}: exception: {{0}}, message: {{1}}", e, e.Message);
+                LogError(method, e);
                 return Conflict<IEnumerable<T>>(e.InnerException ?? e);
             }
             catch (DbUpdateException e)
             {
-                _logger.LogError($"DbUpdateException: {nameof(ResultsHandler.ExecuteAsync)} - {method.Method.DeclaringType?.DeclaringType?.Name ?? method.Target.ToString().Split("+")[0]}: exception: {{0}}, message: {{1}}", e, e.Message);
+                LogError(method, e);
 
                 if (e.InnerException != null && e.InnerException.Message.Contains("Cannot insert duplicate key row in object"))
                     return Failed<IEnumerable<T>>(new AlreadyExistsException(e.InnerException));
@@ -207,19 +206,29 @@ namespace Sheaft.Application.Interop
             }
             catch (NotSupportedException e)
             {
-                _logger.LogError($"NotSupportedException: {nameof(ResultsHandler.ExecuteAsync)} - {method.Method.DeclaringType?.DeclaringType?.Name ?? method.Target.ToString().Split("+")[0]}: exception: {{0}}, message: {{1}}", e, e.Message);
+                LogError(method, e);
                 return Failed<IEnumerable<T>>(e.InnerException ?? e);
             }
             catch (InvalidOperationException e)
             {
-                _logger.LogError($"InvalidOperationException: {nameof(ResultsHandler.ExecuteAsync)} - {method.Method.DeclaringType?.DeclaringType?.Name ?? method.Target.ToString().Split("+")[0]}: exception: {{0}}, message: {{1}}", e, e.Message);
+                LogError(method, e);
                 return Failed<IEnumerable<T>>(e.InnerException ?? e);
             }
             catch (Exception e)
             {
-                _logger.LogError($"Exception: {nameof(ResultsHandler.ExecuteAsync)} - {method.Method.DeclaringType?.DeclaringType?.Name ?? method.Target.ToString().Split("+")[0]}: exception: {{0}}, message: {{1}}", e, e.Message);
+                LogError(method, e);
                 return InternalError<IEnumerable<T>>(e.InnerException ?? e);
             }
+        }
+
+        private void LogError<T>(Func<Task<Result<T>>> method, Exception e)
+        {
+            _logger.LogError($"{method.Method.DeclaringType?.DeclaringType?.Name}.{method.Method.Name.Split('>')[0].Replace("<", "")} : exception: {{0}}, message: {{1}}", e, e.Message);
+        }
+
+        private void LogError<T>(Func<Task<Result<IEnumerable<T>>>> method, Exception e)
+        {
+            _logger.LogError($"{method.Method.DeclaringType?.DeclaringType?.Name}.{method.Method.Name.Split('>')[0].Replace("<", "")} : exception: {{0}}, message: {{1}}", e, e.Message);
         }
     }
 }

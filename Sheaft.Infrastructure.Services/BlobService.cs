@@ -11,6 +11,8 @@ using Microsoft.Extensions.Logging;
 using Sheaft.Core;
 using Azure.Storage.Blobs.Models;
 using Sheaft.Application.Interop;
+using Azure.Storage;
+using System.Web;
 
 namespace Sheaft.Infrastructure.Services
 {
@@ -32,6 +34,7 @@ namespace Sheaft.Infrastructure.Services
                 await containerClient.CreateIfNotExistsAsync(cancellationToken: token);
 
                 var blobClient = containerClient.GetBlobClient($"users/{userId}/profile/{Guid.NewGuid():N}.jpg");
+                await blobClient.DeleteIfExistsAsync(cancellationToken: token);
 
                 stream.Position = 0;
                 await blobClient.UploadAsync(stream, token);
@@ -48,6 +51,7 @@ namespace Sheaft.Infrastructure.Services
                 await containerClient.CreateIfNotExistsAsync(cancellationToken: token);
 
                 var blobClient = containerClient.GetBlobClient($"tags/{tagId:N}/{Guid.NewGuid():N}.jpg");
+                await blobClient.DeleteIfExistsAsync(cancellationToken: token);
 
                 stream.Position = 0;
                 await blobClient.UploadAsync(stream, token);
@@ -64,6 +68,7 @@ namespace Sheaft.Infrastructure.Services
                 await containerClient.CreateIfNotExistsAsync(cancellationToken: token);
 
                 var blobClient = containerClient.GetBlobClient(CoreProductExtensions.GetPictureUrl(userId, productId, filename, size));
+                await blobClient.DeleteIfExistsAsync(cancellationToken: token);
 
                 stream.Position = 0;
                 await blobClient.UploadAsync(stream, token);
@@ -128,6 +133,7 @@ namespace Sheaft.Infrastructure.Services
                 await containerClient.CreateIfNotExistsAsync(cancellationToken: token);
 
                 var blobClient = containerClient.GetBlobClient($"users/{userId:N}/products/{jobId:N}/{filename}");
+                await blobClient.DeleteIfExistsAsync(cancellationToken: token);
 
                 stream.Position = 0;
                 await blobClient.UploadAsync(stream, token);
@@ -143,7 +149,8 @@ namespace Sheaft.Infrastructure.Services
                 var containerClient = new BlobContainerClient(_storageOptions.ConnectionString, _storageOptions.Containers.Products);
                 await containerClient.CreateIfNotExistsAsync(cancellationToken: token);
 
-                var blobClient = containerClient.GetBlobClient(file);
+                var downloadUrl = HttpUtility.UrlDecode(file.Replace($"{containerClient.Uri}/", string.Empty));
+                var blobClient = containerClient.GetBlobClient(downloadUrl);
 
                 var stream = new MemoryStream();
                 await blobClient.DownloadToAsync(stream, token);
@@ -182,6 +189,7 @@ namespace Sheaft.Infrastructure.Services
                 await containerClient.CreateIfNotExistsAsync(cancellationToken: token);
 
                 var blobClient = containerClient.GetBlobClient($"users/{userId:N}/documents/{documentId:N}/{pageId:N}");
+                await blobClient.DeleteIfExistsAsync(cancellationToken: token);
 
                 using (var ms = new MemoryStream(data))
                     await blobClient.UploadAsync(ms, token);
@@ -214,10 +222,9 @@ namespace Sheaft.Infrastructure.Services
                 var blobClient = containerClient.GetBlobClient($"users/{userId:N}/{jobId:N}/{filename}");
 
                 stream.Position = 0;
-                await blobClient.UploadAsync(stream, token);
 
-                var blobServiceClient = new BlobServiceClient(_storageOptions.ConnectionString);
-                var key = await blobServiceClient.GetUserDelegationKeyAsync(DateTimeOffset.UtcNow, DateTimeOffset.UtcNow.AddDays(7));
+                await blobClient.DeleteIfExistsAsync(cancellationToken: token);
+                await blobClient.UploadAsync(stream, token);
 
                 var sasBuilder = new BlobSasBuilder()
                 {
@@ -230,7 +237,7 @@ namespace Sheaft.Infrastructure.Services
 
                 sasBuilder.SetPermissions(BlobSasPermissions.Read);
 
-                return Ok(GetBlobUri(blobClient, blobServiceClient, key, sasBuilder, _storageOptions.Containers.Rgpd));
+                return Ok(GetBlobUri(blobClient, sasBuilder, _storageOptions.Containers.Rgpd));
             });
         }
 
@@ -242,12 +249,10 @@ namespace Sheaft.Infrastructure.Services
                 await containerClient.CreateIfNotExistsAsync(cancellationToken: token);
 
                 var blobClient = containerClient.GetBlobClient($"users/{userId:N}/{jobId:N}/{filename}");
+                await blobClient.DeleteIfExistsAsync(cancellationToken: token);
 
                 stream.Position = 0;
                 await blobClient.UploadAsync(stream, token);
-
-                var blobServiceClient = new BlobServiceClient(_storageOptions.ConnectionString);
-                var key = await blobServiceClient.GetUserDelegationKeyAsync(DateTimeOffset.UtcNow, DateTimeOffset.UtcNow.AddDays(7));
 
                 var sasBuilder = new BlobSasBuilder
                 {
@@ -260,7 +265,7 @@ namespace Sheaft.Infrastructure.Services
 
                 sasBuilder.SetPermissions(BlobSasPermissions.Read);
 
-                return Ok(GetBlobUri(blobClient, blobServiceClient, key, sasBuilder, _storageOptions.Containers.PickingOrders));
+                return Ok(GetBlobUri(blobClient, sasBuilder, _storageOptions.Containers.PickingOrders));
             });
         }
 
@@ -272,7 +277,7 @@ namespace Sheaft.Infrastructure.Services
                 await containerClient.CreateIfNotExistsAsync(cancellationToken: token);
 
                 var blobClient = containerClient.GetBlobClient("departments.json");
-                await blobClient.DeleteIfExistsAsync(DeleteSnapshotsOption.IncludeSnapshots);
+                await blobClient.DeleteIfExistsAsync(cancellationToken: token);
 
                 stream.Position = 0;
                 await blobClient.UploadAsync(stream, new BlobUploadOptions(), token);
@@ -281,14 +286,14 @@ namespace Sheaft.Infrastructure.Services
             });
         }
 
-        private string GetBlobUri(BlobClient blobClient, BlobServiceClient blobServiceClient, Azure.Response<Azure.Storage.Blobs.Models.UserDelegationKey> key, BlobSasBuilder sasBuilder, string container)
+        private string GetBlobUri(BlobClient blobClient, BlobSasBuilder sasBuilder, string container)
         {
             return new UriBuilder
             {
                 Scheme = "https",
                 Host = string.Format("{0}.blob.{1}", _storageOptions.Account, _storageOptions.Suffix),
                 Path = string.Format("{0}/{1}", container, blobClient.Name),
-                Query = sasBuilder.ToSasQueryParameters(key, blobServiceClient.AccountName).ToString()
+                Query = sasBuilder.ToSasQueryParameters(new StorageSharedKeyCredential(_storageOptions.Account, _storageOptions.Key)).ToString()
             }.ToString();
         }
     }

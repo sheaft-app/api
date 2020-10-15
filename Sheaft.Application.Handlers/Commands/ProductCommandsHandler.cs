@@ -313,21 +313,25 @@ namespace Sheaft.Application.Handlers
             {
                 Reference = worksheet.Cells[i, 1].GetValue<string>(),
                 Name = nameStr,
-                Description = worksheet.Cells[i, 3].GetValue<string>()
+                Description = worksheet.Cells[i, 11].GetValue<string>()
             };
 
-            var wholeSalePriceStr = worksheet.Cells[i, 4].GetValue<string>()?.ToLowerInvariant().Replace(" ", "").Replace(",", ".").Replace("€", "");
-            var vatStr = worksheet.Cells[i, 5].GetValue<string>()?.ToLowerInvariant().Replace(" ", "").Replace(",", ".").Replace("%", "").Replace("en", "");
-            var weightStr = worksheet.Cells[i, 6].GetValue<string>()?.ToLowerInvariant().Replace(" ", "").Replace(",", ".").Replace("gr", "").Replace("grammes", "").Replace("gramme", "");
-            var availableValueStr = worksheet.Cells[i, 7].GetValue<string>()?.ToLowerInvariant().Replace(" ", "");
-            var tagsStr = worksheet.Cells[i, 8].GetValue<string>()?.ToLowerInvariant().Replace("\"", "").Replace("'", "").Replace(".", ",").Split(",").Select(t => t.Trim());
+            var wholeSalePriceStr = worksheet.Cells[i, 3].GetValue<string>()?.ToLowerInvariant().Replace(" ", "").Replace(",", ".").Replace("€", "");
+            var vatStr = worksheet.Cells[i, 4].GetValue<string>()?.ToLowerInvariant().Replace(" ", "").Replace(",", ".").Replace("%", "").Replace("en", "");
+            var conditioningStr = worksheet.Cells[i, 5].GetValue<string>()?.ToLowerInvariant().Replace("\"", "").Replace("'", "").Replace(".", ",").Split(",").Select(t => t.Trim()).FirstOrDefault();
+            var quantityPerUnitStr = worksheet.Cells[i, 6].GetValue<string>()?.ToLowerInvariant().Replace(" ", "").Replace(",", ".");
+            var unitKindStr = worksheet.Cells[i, 7].GetValue<string>()?.ToLowerInvariant().Replace(" ", "").Replace(",", ".").Split(",").Select(t => t.Trim()).FirstOrDefault();
+            var tagsStr = worksheet.Cells[i, 8].GetValue<string>()?.ToLowerInvariant().Replace("\"", "").Replace("'", "").Replace(".", ",").Split(",").Select(t => t.Trim()).FirstOrDefault();
+            var bioStr = worksheet.Cells[i, 9].GetValue<string>()?.ToLowerInvariant().Replace(" ", "");
+            var availableStr = worksheet.Cells[i, 10].GetValue<string>()?.ToLowerInvariant().Replace(" ", "");
+            var weightStr = worksheet.Cells[i, 12].GetValue<string>()?.ToLowerInvariant().Replace(" ", "").Replace(",", ".").Replace("gr", "").Replace("grammes", "").Replace("gramme", "");
 
             if (!decimal.TryParse(wholeSalePriceStr, NumberStyles.Any, new CultureInfo("en-US"), out decimal wholeSalePrice))
                 return Failed<CreateProductCommand>(new ValidationException(MessageKind.CreateProduct_WholeSalePrice_Invalid_Line, i));
             else
                 createProductCommand.WholeSalePricePerUnit = wholeSalePrice;
 
-            if (!decimal.TryParse(vatStr, NumberStyles.Any, new CultureInfo("en-US"), out decimal vat))
+            if (!decimal.TryParse(vatStr, NumberStyles.Any, new CultureInfo("en-US"), out decimal vat) || (vat != 5.5m && vat != 10m && vat != 20m))
                 return Failed<CreateProductCommand>(new ValidationException(MessageKind.CreateProduct_Vat_Invalid_Line, i));
             else
                 createProductCommand.Vat = vat;
@@ -335,7 +339,40 @@ namespace Sheaft.Application.Handlers
             if (!string.IsNullOrWhiteSpace(weightStr) && decimal.TryParse(weightStr, NumberStyles.Any, new CultureInfo("en-US"), out decimal weight))
                 createProductCommand.Weight = weight;
 
-            switch (availableValueStr)
+            if (!decimal.TryParse(quantityPerUnitStr, NumberStyles.Any, new CultureInfo("en-US"), out decimal qtyPerUnit))
+                return Failed<CreateProductCommand>(new ValidationException(MessageKind.CreateProduct_QtyPerUnit_Invalid_Line, i));
+            else
+                createProductCommand.QuantityPerUnit = qtyPerUnit;
+
+            var conditioningKind = ConditioningKind.Not_Specified;
+            switch (conditioningStr)
+            {
+                case "poids":
+                    conditioningKind = ConditioningKind.Bulk;
+                    break;
+                case "bouquet":
+                    conditioningKind = ConditioningKind.Bouquet;
+                    break;
+                case "boite":
+                    conditioningKind = ConditioningKind.Box;
+                    break;
+                case "botte":
+                    conditioningKind = ConditioningKind.Bunch;
+                    break;
+                case "piece":
+                    conditioningKind = ConditioningKind.Piece;
+                    break;
+            }
+
+            if (conditioningKind == ConditioningKind.Bulk)
+            {
+                if (!Enum.TryParse(unitKindStr, true, out UnitKind unitKind))
+                    return Failed<CreateProductCommand>(new ValidationException(MessageKind.CreateProduct_UnitKind_Invalid_Line, i));
+                else
+                    createProductCommand.Unit = unitKind;
+            }
+
+            switch (availableStr)
             {
                 case "non":
                 case "no":
@@ -348,7 +385,17 @@ namespace Sheaft.Application.Handlers
                     break;
             }
 
-            var tags = await _context.FindAsync<Tag>(t => tagsStr.Contains(t.Name), token);
+            switch (bioStr)
+            {
+                case "oui":
+                case "yes":
+                case "ok":
+                case "1":
+                    tagsStr += ";bio";
+                    break;
+            }
+
+            var tags = await _context.FindAsync<Tag>(t => tagsStr.Contains(t.Name.ToLower()), token);
             createProductCommand.Tags = tags.Select(t => t.Id);
 
             return Ok(createProductCommand);

@@ -66,7 +66,10 @@
         CreateProduct_Name_Required_Line = 0x005101,
         CreateProduct_WholeSalePrice_Invalid_Line = 0x005102,
         CreateProduct_Vat_Invalid_Line = 0x005103,
-        CreateProduct_Reference_AlreadyExists = 0x005104,
+        CreateProduct_QtyPerUnit_Invalid_Line = 0x005104,
+        CreateProduct_Conditioning_Invalid_Line = 0x005105,
+        CreateProduct_UnitKind_Invalid_Line = 0x005106,
+        CreateProduct_Reference_AlreadyExists = 0x005107,
         ImportProduct_Missing_Tab = 0x005201,
         ImportProduct_Reference_AlreadyExists = 0x005202,
 

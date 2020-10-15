@@ -1,18 +1,10 @@
-﻿using Azure.Storage.Blobs;
-using Azure.Storage.Sas;
-using Microsoft.Extensions.Options;
-using Sheaft.Options;
-using System;
-using System.IO;
-using System.Threading;
+﻿using System;
 using System.Threading.Tasks;
-using Sheaft.Core.Extensions;
 using Microsoft.Extensions.Logging;
 using Sheaft.Core;
-using Azure.Storage.Blobs.Models;
-using Sheaft.Application.Interop;
 using Sheaft.Exceptions;
 using System.Collections.Generic;
+using Newtonsoft.Json;
 
 namespace Sheaft.Infrastructure.Services
 {
@@ -130,27 +122,26 @@ namespace Sheaft.Infrastructure.Services
         {
             try
             {
-                _logger.LogTrace($"{nameof(BaseService.ExecuteAsync)} - {method.Method.DeclaringType?.DeclaringType?.Name ?? method.Target.ToString().Split("+")[0]}");
                 return await method();
             }
             catch (SheaftException e)
             {
-                _logger.LogError($"SheaftException: {nameof(BaseService.ExecuteAsync)} - {method.Method.DeclaringType?.DeclaringType?.Name ?? method.Target.ToString().Split("+")[0]}: exception: {{0}}", e);
+                LogError(method, e);
                 return Failed<T>(e);
             }
             catch (NotSupportedException e)
             {
-                _logger.LogError($"NotSupportedException: {nameof(BaseService.ExecuteAsync)} - {method.Method.DeclaringType?.DeclaringType?.Name ?? method.Target.ToString().Split("+")[0]}: exception: {{0}}, message: {{1}}", e, e.Message);
+                LogError(method, e);
                 return Failed<T>(e);
             }
             catch (InvalidOperationException e)
             {
-                _logger.LogError($"InvalidOperationException: {nameof(BaseService.ExecuteAsync)} - {method.Method.DeclaringType?.DeclaringType?.Name ?? method.Target.ToString().Split("+")[0]}: exception: {{0}}, message: {{1}}", e, e.Message);
+                LogError(method, e);
                 return Failed<T>(e);
             }
             catch (Exception e)
             {
-                _logger.LogError($"Exception: {nameof(BaseService.ExecuteAsync)} - {method.Method.DeclaringType?.DeclaringType?.Name ?? method.Target.ToString().Split("+")[0]}: exception: {{0}}, message: {{1}}", e, e.Message);
+                LogError(method, e);
                 return InternalError<T>();
             }
         }
@@ -159,29 +150,38 @@ namespace Sheaft.Infrastructure.Services
         {
             try
             {
-                _logger.LogTrace($"{nameof(BaseService.ExecuteAsync)} - {method.Method.DeclaringType?.DeclaringType?.Name ?? method.Target.ToString().Split("+")[0]}");
                 return await method();
             }
             catch (SheaftException e)
             {
-                _logger.LogError($"SheaftException: {nameof(BaseService.ExecuteAsync)} - {method.Method.DeclaringType?.DeclaringType?.Name ?? method.Target.ToString().Split("+")[0]}: exception: {{0}}", e);
+                LogError(method, e);
                 return Failed<IEnumerable<T>>(e);
             }
             catch (NotSupportedException e)
             {
-                _logger.LogError($"NotSupportedException: {nameof(BaseService.ExecuteAsync)} - {method.Method.DeclaringType?.DeclaringType?.Name ?? method.Target.ToString().Split("+")[0]}: exception: {{0}}, message: {{1}}", e, e.Message);
+                LogError(method, e);
                 return Failed<IEnumerable<T>>(e);
             }
             catch (InvalidOperationException e)
             {
-                _logger.LogError($"InvalidOperationException: {nameof(BaseService.ExecuteAsync)} - {method.Method.DeclaringType?.DeclaringType?.Name ?? method.Target.ToString().Split("+")[0]}: exception: {{0}}, message: {{1}}", e, e.Message);
+                LogError(method, e);
                 return Failed<IEnumerable<T>>(e);
             }
             catch (Exception e)
             {
-                _logger.LogError($"Exception: {nameof(BaseService.ExecuteAsync)} - {method.Method.DeclaringType?.DeclaringType?.Name ?? method.Target.ToString().Split("+")[0]}: exception: {{0}}, message: {{1}}", e, e.Message);
+                LogError(method, e);
                 return InternalError<IEnumerable<T>>();
             }
+        }
+
+        private void LogError<T>(Func<Task<Result<T>>> method, Exception e)
+        {
+            _logger.LogError($"{method.Method.DeclaringType?.DeclaringType?.Name}.{method.Method.Name.Split('>')[0].Replace("<", "")} : exception: {{0}}, message: {{1}}", e, e.Message);
+        }
+
+        private void LogError<T>(Func<Task<Result<IEnumerable<T>>>> method, Exception e)
+        {
+            _logger.LogError($"{method.Method.DeclaringType?.DeclaringType?.Name}.{method.Method.Name.Split('>')[0].Replace("<", "")} : exception: {{0}}, message: {{1}}", e, e.Message);
         }
     }
 }
