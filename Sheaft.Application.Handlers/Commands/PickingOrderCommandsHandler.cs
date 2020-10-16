@@ -109,6 +109,7 @@ namespace Sheaft.Application.Handlers
             public Guid SenderId { get; set; }
             public string Reference { get; set; }
             public string SenderName { get; set; }
+            public string ExpectedDeliveryDate { get; set; }
             public IEnumerable<LightProduct> Products { get; set; }
         }
 
@@ -141,6 +142,7 @@ namespace Sheaft.Application.Handlers
             var subsetOrders = purchaseOrders.Select(o => new LightOrder
             {
                 Reference = o.Reference,
+                ExpectedDeliveryDate = o.ExpectedDelivery.ExpectedDeliveryDate.ToString("dd/MM/yyyy"),
                 SenderId = o.Sender.Id,
                 SenderName = o.Sender.Name,
                 Products = o.Products.Select(GetLightProduct)
@@ -164,13 +166,14 @@ namespace Sheaft.Application.Handlers
                 {
                     var orderColumn = clientColumn + orderIndex - 1;
 
-                    WriteColumnOrderHeader(worksheet, orderColumn, order.Reference);
+                    WriteColumnOrderHeader(worksheet, orderColumn, $"{order.Reference} ({order.ExpectedDeliveryDate})");
                     WriteColumnProductsQuantity(worksheet, productsCount, orderColumn, order.Products);
                     WriteColumnTotalRow(worksheet, lastRow, orderColumn);
 
-                    if (clientOrdersCount > 1)
+                    if (clientOrdersCount < 2)
                         columnToHide.Add(orderColumn);
 
+                    worksheet.Column(orderColumn).Width = 15;
                     orderIndex++;
                 }
 
@@ -186,23 +189,23 @@ namespace Sheaft.Application.Handlers
             if (columnToHide.Any())
             {
                 worksheet.Row(PickingOrderFileSettings.ORDER_REFERENCE_ROW).Hidden = true;
-                worksheet.Cells.AutoFitColumns();
                 foreach (var col in columnToHide)
                 {
                     worksheet.Column(col).Hidden = true;
                 }
             }
-            else
-            {
-                worksheet.Cells.AutoFitColumns();
-            }
 
-            var range = worksheet.Cells[1, 1, clientColumn, lastRow];
+            var range = worksheet.Cells[1, 1, lastRow, clientColumn];
 
             range.Style.Border.Top.Style = ExcelBorderStyle.Thin;
             range.Style.Border.Left.Style = ExcelBorderStyle.Thin;
             range.Style.Border.Right.Style = ExcelBorderStyle.Thin;
             range.Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
+
+            worksheet.Row(1).Height = 30;
+            worksheet.Row(2).Height = 30;
+            worksheet.Row(3).Height = 30;
+            worksheet.Column(1).Width = 25;
 
             worksheet.Calculate();
             package.Save();
@@ -213,7 +216,6 @@ namespace Sheaft.Application.Handlers
             var range = worksheet.Cells[1, 1, 1, clientColumn];
             range.Merge = true;
             range.Value = title;
-            worksheet.Row(1).Height = 45;
             SetStyle(range, "#548235", "#ffffff", true, ExcelVerticalAlignment.Center, ExcelHorizontalAlignment.Center);
         }
 
@@ -305,7 +307,7 @@ namespace Sheaft.Application.Handlers
 
             var referenceRange = worksheet.Cells[PickingOrderFileSettings.ORDER_REFERENCE_ROW, PickingOrderFileSettings.PRODUCT_COLUMN];
             referenceRange.Value = "Commande(s)";
-            SetStyle(clientNameRange, "#C6E0B4", "#000000", false, ExcelVerticalAlignment.Center, ExcelHorizontalAlignment.Center);
+            SetStyle(referenceRange, "#C6E0B4", "#000000", false, ExcelVerticalAlignment.Center, ExcelHorizontalAlignment.Center);
 
             var productsName = products.Select(p => p.Name).Distinct().OrderBy(c => c).ToList();
 
@@ -338,7 +340,7 @@ namespace Sheaft.Application.Handlers
             clientHeaderRange.Merge = column > 1;
             clientHeaderRange.Value = label;
 
-            worksheet.Row(PickingOrderFileSettings.CLIENT_NAME_ROW).Height = 40;
+            worksheet.Row(PickingOrderFileSettings.CLIENT_NAME_ROW).Height = 30;
             SetStyle(clientHeaderRange, "#A9D08E", "#000000", true, ExcelVerticalAlignment.Center, ExcelHorizontalAlignment.Center);
         }
 

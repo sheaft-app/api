@@ -135,7 +135,7 @@ namespace Sheaft.Application.Handlers
                         _mediatr.Post(new PurchaseOrderReceivedEvent(request.RequestUser) { PurchaseOrderId = purchaseOrderId });
                     }
 
-                    _mediatr.Post(new CreateUserPointsCommand(request.RequestUser) { CreatedOn = DateTimeOffset.UtcNow, Kind = PointKind.PurchaseOrder, UserId = request.RequestUser.Id });
+                    _mediatr.Post(new CreateUserPointsCommand(request.RequestUser) { CreatedOn = DateTimeOffset.UtcNow, Kind = PointKind.PurchaseOrder, UserId = order.User.Id });
 
                     await transaction.CommitAsync(token);
                     return Ok(purchaseOrderIds.AsEnumerable());
@@ -281,7 +281,7 @@ namespace Sheaft.Application.Handlers
                             _mediatr.Post(new PurchaseOrderReceivedEvent(request.RequestUser) { PurchaseOrderId = purchaseOrderId });
                         }
 
-                        _mediatr.Post(new CreateUserPointsCommand(request.RequestUser) { CreatedOn = DateTimeOffset.UtcNow, Kind = PointKind.PurchaseOrder, UserId = request.RequestUser.Id });
+                        _mediatr.Post(new CreateUserPointsCommand(request.RequestUser) { CreatedOn = DateTimeOffset.UtcNow, Kind = PointKind.PurchaseOrder, UserId = order.User.Id });
                         _mediatr.Schedule(new CreateDonationCommand(request.RequestUser) { OrderId = order.Id }, TimeSpan.FromMinutes(60));
 
                         return Ok(purchaseOrderIds.AsEnumerable());

@@ -45,6 +45,9 @@ namespace Sheaft.Application.Handlers
             return await ExecuteAsync(async () =>
             {
                 var order = await _context.GetByIdAsync<Order>(request.OrderId, token);
+                if(order.Status == OrderStatus.Validated)
+                    return Failed<Guid>(new ValidationException());
+
                 var wallet = await _context.GetSingleAsync<Wallet>(c => c.User.Id == request.RequestUser.Id, token);
 
                 if (order.TotalOnSalePrice < 1)
@@ -80,9 +83,7 @@ namespace Sheaft.Application.Handlers
                 var skip = 0;
                 const int take = 100;
 
-                var expiredDate = DateTimeOffset.UtcNow.AddMinutes(-_routineOptions.CheckPayinsFromMinutes);
-                var payinIds = await GetNextPayinIdsAsync(expiredDate, skip, take, token);
-
+                var payinIds = await GetNextPayinIdsAsync(skip, take, token);
                 while (payinIds.Any())
                 {
                     foreach (var payinId in payinIds)
@@ -94,7 +95,7 @@ namespace Sheaft.Application.Handlers
                     }
 
                     skip += take;
-                    payinIds = await GetNextPayinIdsAsync(expiredDate, skip, take, token);
+                    payinIds = await GetNextPayinIdsAsync(skip, take, token);
                 }
 
                 return Ok(true);
@@ -165,11 +166,10 @@ namespace Sheaft.Application.Handlers
             });
         }
 
-        private async Task<IEnumerable<Guid>> GetNextPayinIdsAsync(DateTimeOffset expiredDate, int skip, int take, CancellationToken token)
+        private async Task<IEnumerable<Guid>> GetNextPayinIdsAsync(int skip, int take, CancellationToken token)
         {
             return await _context.Payins
-                .Get(c => c.CreatedOn < expiredDate 
-                      && (c.Status == TransactionStatus.Waiting || c.Status == TransactionStatus.Created), true)
+                .Get(c => c.Status == TransactionStatus.Waiting || c.Status == TransactionStatus.Created, true)
                 .OrderBy(c => c.CreatedOn)
                 .Select(c => c.Id)
                 .Skip(skip)
