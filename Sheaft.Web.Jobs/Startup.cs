@@ -51,6 +51,8 @@ namespace Sheaft.Web.Jobs
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            GlobalJobFilters.Filters.Add(new ProlongExpirationTimeAttribute());
+
             var mailerSettings = Configuration.GetSection(MailerOptions.SETTING);
             services.Configure<MailerOptions>(mailerSettings);
 

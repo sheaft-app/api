@@ -1,4 +1,8 @@
-﻿using Hangfire.Dashboard;
+﻿using Hangfire.Common;
+using Hangfire.Dashboard;
+using Hangfire.States;
+using Hangfire.Storage;
+using System;
 
 namespace Sheaft.Web.Jobs
 {
