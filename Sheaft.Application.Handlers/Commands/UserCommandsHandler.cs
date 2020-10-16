@@ -134,7 +134,7 @@ namespace Sheaft.Application.Handlers
 
                 await _context.SaveChangesAsync(token);
 
-                _mediatr.Post(new UserPointsCreatedEvent(request.RequestUser) { UserId = user.Id, Kind = request.Kind, Points = quantity, CreatedOn = request.CreatedOn });
+                //_mediatr.Post(new UserPointsCreatedEvent(request.RequestUser) { UserId = user.Id, Kind = request.Kind, Points = quantity, CreatedOn = request.CreatedOn });
                 return Ok(true);
             });
         }
