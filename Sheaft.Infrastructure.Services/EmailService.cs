@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using Amazon.SimpleEmail;
 using Amazon.SimpleEmail.Model;
 using RazorLight;
+using Sheaft.Core.Extensions;
 
 namespace Sheaft.Infrastructure.Services
 {
@@ -37,8 +38,8 @@ namespace Sheaft.Infrastructure.Services
             {
                 var msg = new SendEmailRequest();
                 msg.Destination = new Destination
-                {
-                    ToAddresses = new List<string> { $"{toName}<{toEmail}>" }
+                {                    
+                    ToAddresses = new List<string> { $"=?UTF-8?B?{toName.Base64Encode()}?= <{toEmail}>" }
                 };
 
                 msg.Source = $"{_mailerOptions.Sender.Name}<{_mailerOptions.Sender.Email}>";
@@ -69,7 +70,7 @@ namespace Sheaft.Infrastructure.Services
                 var msg = new SendEmailRequest();
                 msg.Destination = new Destination
                 {
-                    ToAddresses = new List<string> { $"{toName}<{toEmail}>" }
+                    ToAddresses = new List<string> { $"=?UTF-8?B?{toName.Base64Encode()}?= <{toEmail}>" }
                 };
 
                 msg.Source = $"{_mailerOptions.Sender.Name}<{_mailerOptions.Sender.Email}>";
