@@ -32,6 +32,9 @@ using Newtonsoft.Json;
 using Amazon.SimpleEmail;
 using RazorLight;
 using Amazon;
+using Serilog;
+using Serilog.Events;
+using NewRelic.LogEnrichers.Serilog;
 
 namespace Sheaft.Web.Manage
 {
@@ -41,6 +44,32 @@ namespace Sheaft.Web.Manage
         {
             Env = environment;
             Configuration = configuration;
+
+            var logger = new LoggerConfiguration()
+            .Enrich.WithNewRelicLogsInContext()
+            .WriteTo.Async(a => a.Console());
+
+            if (Env.IsProduction())
+            {
+                logger = logger
+                .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
+                .MinimumLevel.Information()
+                .WriteTo.Async(a => a.NewRelicLogs(
+                endpointUrl: Configuration.GetValue<string>("NEW_RELIC_LOG_API"),
+                applicationName: Configuration.GetValue<string>("NEW_RELIC_APP_NAME"),
+                licenseKey: Configuration.GetValue<string>("NEW_RELIC_LICENCE_KEY"),
+                insertKey: Configuration.GetValue<string>("NEW_RELIC_INSERT_KEY"),
+                restrictedToMinimumLevel: Configuration.GetValue<LogEventLevel>("NEW_RELIC_LOG_LEVEL"),
+                batchSizeLimit: Configuration.GetValue<int>("NEW_RELIC_BATCH_SIZE")));
+            }
+            else
+            {
+                logger = logger
+                .MinimumLevel.Override("Microsoft", LogEventLevel.Information)
+                .MinimumLevel.Verbose();
+            }
+
+            Log.Logger = logger.CreateLogger();
         }
 
         public IConfiguration Configuration { get; }
@@ -237,20 +266,9 @@ namespace Sheaft.Web.Manage
 
             services.AddLogging(config =>
             {
-                config.ClearProviders();
-
-                config.AddConfiguration(Configuration.GetSection("Logging"));
                 config.AddEventSourceLogger();
-                config.AddApplicationInsights();
-
-                if (Env.IsDevelopment())
-                {
-                    config.AddDebug();
-                    config.AddConsole();
-                }
+                config.AddSerilog(dispose: true);
             });
-
-            services.AddApplicationInsightsTelemetry();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

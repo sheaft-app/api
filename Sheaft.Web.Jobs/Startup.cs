@@ -23,8 +23,11 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using NewRelic.LogEnrichers.Serilog;
 using Newtonsoft.Json;
 using RazorLight;
+using Serilog;
+using Serilog.Events;
 using Sheaft.Application.Commands;
 using Sheaft.Application.Events;
 using Sheaft.Application.Handlers;
@@ -43,6 +46,32 @@ namespace Sheaft.Web.Jobs
         {
             Env = environment;
             Configuration = configuration;
+
+            var logger = new LoggerConfiguration()
+            .Enrich.WithNewRelicLogsInContext()
+            .WriteTo.Async(a => a.Console());
+
+            if (Env.IsProduction())
+            {
+                logger = logger
+                .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
+                .MinimumLevel.Information()
+                .WriteTo.Async(a => a.NewRelicLogs(
+                endpointUrl: Configuration.GetValue<string>("NEW_RELIC_LOG_API"),
+                applicationName: Configuration.GetValue<string>("NEW_RELIC_APP_NAME"),
+                licenseKey: Configuration.GetValue<string>("NEW_RELIC_LICENCE_KEY"),
+                insertKey: Configuration.GetValue<string>("NEW_RELIC_INSERT_KEY"),
+                restrictedToMinimumLevel: Configuration.GetValue<LogEventLevel>("NEW_RELIC_LOG_LEVEL"),
+                batchSizeLimit: Configuration.GetValue<int>("NEW_RELIC_BATCH_SIZE")));
+            }
+            else
+            {
+                logger = logger
+                .MinimumLevel.Override("Microsoft", LogEventLevel.Information)
+                .MinimumLevel.Verbose();
+            }
+
+            Log.Logger = logger.CreateLogger();
         }
 
         public IConfiguration Configuration { get; }
@@ -235,20 +264,9 @@ namespace Sheaft.Web.Jobs
 
             services.AddLogging(config =>
             {
-                config.ClearProviders();
-
-                config.AddConfiguration(Configuration.GetSection("Logging"));
                 config.AddEventSourceLogger();
-                config.AddApplicationInsights();
-
-                if (Env.IsDevelopment())
-                {
-                    config.AddDebug();
-                    config.AddConsole();
-                }
+                config.AddSerilog(dispose: true);
             });
-
-            services.AddApplicationInsightsTelemetry();
 
             services.AddHangfireServer();
             services.AddMvc();

@@ -25,8 +25,11 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using NewRelic.LogEnrichers.Serilog;
 using Newtonsoft.Json;
 using RazorLight;
+using Serilog;
+using Serilog.Events;
 using Sheaft.Application.Commands;
 using Sheaft.Application.Events;
 using Sheaft.Application.Handlers;
@@ -62,6 +65,32 @@ namespace Sheaft.Web.Api
         {
             Env = environment;
             Configuration = configuration;
+
+            var logger = new LoggerConfiguration()
+            .Enrich.WithNewRelicLogsInContext()
+            .WriteTo.Async(a => a.Console());
+
+            if (Env.IsProduction())
+            {
+                logger = logger
+                .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
+                .MinimumLevel.Information()
+                .WriteTo.Async(a => a.NewRelicLogs(
+                endpointUrl: Configuration.GetValue<string>("NEW_RELIC_LOG_API"),
+                applicationName: Configuration.GetValue<string>("NEW_RELIC_APP_NAME"),
+                licenseKey: Configuration.GetValue<string>("NEW_RELIC_LICENCE_KEY"),
+                insertKey: Configuration.GetValue<string>("NEW_RELIC_INSERT_KEY"),
+                restrictedToMinimumLevel: Configuration.GetValue<LogEventLevel>("NEW_RELIC_LOG_LEVEL"),
+                batchSizeLimit: Configuration.GetValue<int>("NEW_RELIC_BATCH_SIZE")));
+            }
+            else
+            {
+                logger = logger
+                .MinimumLevel.Override("Microsoft", LogEventLevel.Information)
+                .MinimumLevel.Verbose();
+            }
+
+            Log.Logger = logger.CreateLogger();
         }
 
         public void ConfigureServices(IServiceCollection services)
@@ -269,8 +298,6 @@ namespace Sheaft.Web.Api
 
             services.AddErrorFilter<SheaftErrorFilter>();
 
-            services.AddApplicationInsightsTelemetry();
-
             var cacheConfig = cacheSettings.Get<CacheOptions>();
             services.AddDistributedSqlServerCache(options =>
             {
@@ -306,17 +333,8 @@ namespace Sheaft.Web.Api
 
             services.AddLogging(config =>
             {
-                config.ClearProviders();
-
-                config.AddConfiguration(Configuration.GetSection("Logging"));
                 config.AddEventSourceLogger();
-                config.AddApplicationInsights();
-
-                if (Env.IsDevelopment())
-                {
-                    config.AddDebug();
-                    config.AddConsole();
-                }
+                config.AddSerilog(dispose: true);
             });
 
             var jobsDatabaseConfig = jobsDatabaseSettings.Get<JobsDatabaseOptions>();
@@ -348,7 +366,7 @@ namespace Sheaft.Web.Api
                     }
 
                     var adminId = configuration.GetValue<Guid>("Users:admin:id");
-                    if (context.Users.FirstOrDefault(u=> u.Id == adminId) == null)
+                    if (context.Users.FirstOrDefault(u => u.Id == adminId) == null)
                     {
                         var firstname = configuration.GetValue<string>("Users:admin:firstname");
                         var lastname = configuration.GetValue<string>("Users:admin:lastname");
@@ -385,12 +403,15 @@ namespace Sheaft.Web.Api
             app.UseHttpsRedirection();
             app.UseCors(MyAllowSpecificOrigins);
 
+            app.UseStaticFiles();
+
+            app.UseSerilogRequestLogging();
+
             app.UseAuthentication();
             app.UseAuthorization();
 
             app.UseIpRateLimiting();
 
-            app.UseStaticFiles();
             app.UseMvc();
 
             app.UseWebSockets();

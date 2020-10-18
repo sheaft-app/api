@@ -12,7 +12,10 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using NewRelic.LogEnrichers.Serilog;
 using Newtonsoft.Json;
+using Serilog;
+using Serilog.Events;
 using Sheaft.Application.Commands;
 using Sheaft.Application.Interop;
 using Sheaft.Options;
@@ -35,6 +38,32 @@ namespace Sheaft.Web.Signalr
         {
             Env = environment;
             Configuration = configuration;
+
+            var logger = new LoggerConfiguration()
+            .Enrich.WithNewRelicLogsInContext()
+            .WriteTo.Async(a => a.Console());
+
+            if (Env.IsProduction())
+            {
+                logger = logger
+                .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
+                .MinimumLevel.Information()
+                .WriteTo.Async(a => a.NewRelicLogs(
+                endpointUrl: Configuration.GetValue<string>("NEW_RELIC_LOG_API"),
+                applicationName: Configuration.GetValue<string>("NEW_RELIC_APP_NAME"),
+                licenseKey: Configuration.GetValue<string>("NEW_RELIC_LICENCE_KEY"),
+                insertKey: Configuration.GetValue<string>("NEW_RELIC_INSERT_KEY"),
+                restrictedToMinimumLevel: Configuration.GetValue<LogEventLevel>("NEW_RELIC_LOG_LEVEL"),
+                batchSizeLimit: Configuration.GetValue<int>("NEW_RELIC_BATCH_SIZE")));
+            }
+            else
+            {
+                logger = logger
+                .MinimumLevel.Override("Microsoft", LogEventLevel.Information)
+                .MinimumLevel.Verbose();
+            }
+
+            Log.Logger = logger.CreateLogger();
         }
 
         // This method gets called by the runtime. Use this method to add services to the container.
@@ -50,20 +79,9 @@ namespace Sheaft.Web.Signalr
 
             services.AddLogging(config =>
             {
-                config.ClearProviders();
-
-                config.AddConfiguration(Configuration.GetSection("Logging"));
                 config.AddEventSourceLogger();
-                config.AddApplicationInsights();
-
-                if (Env.IsDevelopment())
-                {
-                    config.AddDebug();
-                    config.AddConsole();
-                }
+                config.AddSerilog(dispose: true);
             });
-
-            services.AddApplicationInsightsTelemetry();
 
             var jobsDatabaseSettings = Configuration.GetSection(JobsDatabaseOptions.SETTING);
             services.Configure<JobsDatabaseOptions>(jobsDatabaseSettings);
