@@ -34,13 +34,13 @@ namespace Sheaft.Web.Payment.Controllers
             if (string.IsNullOrWhiteSpace(transactionId))
             {
                 _logger.LogError($"Missing transaction id at {DateTimeOffset.UtcNow:yyyyMMddHHmmss}");
-                throw new Exception("L'identifiant de transaction est requis");
+                return BadRequest("L'identifiant de transaction est requis");
             }
 
             if (string.IsNullOrWhiteSpace(token))
             {
                 _logger.LogError($"Missing token at {DateTimeOffset.UtcNow:yyyyMMddHHmmss}");
-                throw new Exception("Le token de transaction est requis");
+                return BadRequest("Le token de transaction est requis");
             }
 
             ViewBag.TransactionId = transactionId;

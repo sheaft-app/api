@@ -73,7 +73,7 @@ namespace Sheaft.Web.Payment.Controllers
                     _logger.LogInformation($"{EventType:G)} is not a supported Psp EventType for resource: {identifier} executed on: {GetExecutedOn(date)}.");
                     return BadRequest();
             }
-            
+
             return Ok();
         }
 

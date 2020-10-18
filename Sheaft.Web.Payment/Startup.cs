@@ -107,7 +107,7 @@ namespace Sheaft.Web.Payment
                 {
                     endpoints.MapRoute(
                         name: "default",
-                        template: "{controller=Payments}/{action=Index}/{id?}");
+                        template: "{controller=Home}/{action=Index}/{id?}");
                 });
         }
     }
