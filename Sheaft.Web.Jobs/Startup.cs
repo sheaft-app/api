@@ -48,8 +48,7 @@ namespace Sheaft.Web.Jobs
             Configuration = configuration;
 
             var logger = new LoggerConfiguration()
-            .Enrich.WithNewRelicLogsInContext()
-            .WriteTo.Async(a => a.Console());
+            .Enrich.WithNewRelicLogsInContext();
 
             if (Env.IsProduction())
             {
@@ -59,7 +58,7 @@ namespace Sheaft.Web.Jobs
                 .WriteTo.Async(a => a.NewRelicLogs(
                 endpointUrl: Configuration.GetValue<string>("NEW_RELIC_LOG_API"),
                 applicationName: Configuration.GetValue<string>("NEW_RELIC_APP_NAME"),
-                licenseKey: Configuration.GetValue<string>("NEW_RELIC_LICENCE_KEY"),
+                licenseKey: Configuration.GetValue<string>("NEW_RELIC_LICENSE_KEY"),
                 insertKey: Configuration.GetValue<string>("NEW_RELIC_INSERT_KEY"),
                 restrictedToMinimumLevel: Configuration.GetValue<LogEventLevel>("NEW_RELIC_LOG_LEVEL"),
                 batchSizeLimit: Configuration.GetValue<int>("NEW_RELIC_BATCH_SIZE")));
@@ -68,7 +67,8 @@ namespace Sheaft.Web.Jobs
             {
                 logger = logger
                 .MinimumLevel.Override("Microsoft", LogEventLevel.Information)
-                .MinimumLevel.Verbose();
+                .MinimumLevel.Verbose()
+                .WriteTo.Async(a => a.Console());
             }
 
             Log.Logger = logger.CreateLogger();
