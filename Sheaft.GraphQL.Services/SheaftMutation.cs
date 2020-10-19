@@ -255,7 +255,7 @@ namespace Sheaft.GraphQL.Services
             return businessQueries.GetStore(result, CurrentUser);
         }
 
-        public async Task<IQueryable<ProducerDto>> UpdateStoreAsync(UpdateStoreInput input, [Service] IBusinessQueries businessQueries)
+        public async Task<IQueryable<StoreDto>> UpdateStoreAsync(UpdateStoreInput input, [Service] IBusinessQueries businessQueries)
         {
             await ExecuteCommandAsync<UpdateStoreCommand, bool>(_mapper.Map(input, new UpdateStoreCommand(CurrentUser)), Token);
             return businessQueries.GetStore(input.Id, CurrentUser);
