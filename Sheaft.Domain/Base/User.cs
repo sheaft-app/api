@@ -27,6 +27,7 @@ namespace Sheaft.Domain.Models
             SetFirstname(firstname);
             SetLastname(lastname);
 
+            _points = new List<Points>();
             RefreshPoints();
         }
 
