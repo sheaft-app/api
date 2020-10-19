@@ -14,7 +14,7 @@ namespace Sheaft.Exceptions
         {
         }
 
-        public SheaftException(ExceptionKind kind, Exception exception, MessageKind? error = null, params object[] objs) : base(exception?.Message, exception)
+        public SheaftException(ExceptionKind kind, Exception exception, MessageKind? error = null, params object[] objs) : base(exception?.Message ?? $"{kind:G}{(error != null ? $":{error:G}":string.Empty)}", exception)
         {
             Kind = kind;
             Error = error;

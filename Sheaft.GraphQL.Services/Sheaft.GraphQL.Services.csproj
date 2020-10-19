@@ -8,6 +8,7 @@
     <PackageReference Include="MediatR" Version="8.1.0" />
     <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.2.0" />
     <PackageReference Include="Microsoft.Extensions.Localization.Abstractions" Version="3.1.8" />
+    <PackageReference Include="NewRelic.Agent.Api" Version="8.33.0" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Sheaft.Application.Commands\Sheaft.Application.Commands.csproj" />

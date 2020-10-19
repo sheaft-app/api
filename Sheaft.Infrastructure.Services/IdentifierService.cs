@@ -33,7 +33,7 @@ namespace Sheaft.Infrastructure.Services
         {
             return await ExecuteAsync(async () =>
             {
-                var uuid = await GetNextUuidAsync(_storageOptions.Tables.OrdersReferences, serialNumber, token);
+                var uuid = await GetNextUuidAsync(_storageOptions.Tables.PurchaseOrdersReferences, serialNumber, token);
                 if (!uuid.Success)
                     return Failed<string>(uuid.Exception);
 
