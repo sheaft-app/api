@@ -854,6 +854,9 @@ namespace Sheaft.Infrastructure.Services
         }
         public static MangoPay.SDK.Entities.Address GetAddress(this Domain.Models.Address address)
         {
+            if (address == null)
+                return null;
+
             return new MangoPay.SDK.Entities.Address
             {
                 AddressLine1 = address.Line1,
@@ -865,6 +868,9 @@ namespace Sheaft.Infrastructure.Services
         }
         public static Birthplace GetBirthplace(this BirthAddress address)
         {
+            if (address == null)
+                return null;
+
             return new Birthplace
             {
                 City = address.City,

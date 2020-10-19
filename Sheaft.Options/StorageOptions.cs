@@ -26,9 +26,10 @@
     }
     public class StorageTables
     {
-        public string OrdersReferences { get; set; }
-        public string ProductsReferences { get; set; }
-        public string SponsoringCodes { get; set; }
+        public string OrdersReferences { get; set; } = "orders";
+        public string PurchaseOrdersReferences { get; set; } = "purchaseorders";
+        public string ProductsReferences { get; set; } = "products";
+        public string SponsoringCodes { get; set; } = "sponsoring";
     }
 
     public class StorageQueues

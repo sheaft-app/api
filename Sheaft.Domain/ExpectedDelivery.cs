@@ -21,7 +21,7 @@ namespace Sheaft.Domain.Models
 
             Kind = mode.Kind;
             Name = mode.Name;
-            Address = new ExpectedAddress(mode.Address.Line1, mode.Address.Line2, mode.Address.Zipcode, mode.Address.City, mode.Address.Country, mode.Address.Longitude, mode.Address.Latitude);
+            Address = mode.Address != null ? new ExpectedAddress(mode.Address.Line1, mode.Address.Line2, mode.Address.Zipcode, mode.Address.City, mode.Address.Country, mode.Address.Longitude, mode.Address.Latitude) : null;
         }
 
         public DeliveryKind Kind { get; private set; }

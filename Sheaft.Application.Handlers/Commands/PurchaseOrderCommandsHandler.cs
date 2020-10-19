@@ -49,7 +49,7 @@ namespace Sheaft.Application.Handlers
                 var producer = await _context.GetByIdAsync<Producer>(request.ProducerId, token);
                 var order = await _context.GetByIdAsync<Order>(request.OrderId, token);
 
-                var resultIdentifier = await _mediatr.Process(new CreateProductIdentifierCommand(request.RequestUser) { ProducerId = request.ProducerId }, token);
+                var resultIdentifier = await _mediatr.Process(new CreatePurchaseOrderIdentifierCommand(request.RequestUser) { ProducerId = request.ProducerId }, token);
                 if (!resultIdentifier.Success)
                     return Failed<Guid>(resultIdentifier.Exception);
 

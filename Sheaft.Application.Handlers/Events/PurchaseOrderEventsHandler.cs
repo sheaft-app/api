@@ -186,7 +186,7 @@ namespace Sheaft.Application.Handlers
                 VatPrice = purchaseOrder.TotalVatPrice,
                 ExpectedFrom = purchaseOrder.ExpectedDelivery.From,
                 ExpectedTo = purchaseOrder.ExpectedDelivery.To,
-                Address = $"{address.Line1} {address.Line2} {address.Zipcode} {address.City}"
+                Address = address != null ? $"{address.Line1} {address.Line2} {address.Zipcode} {address.City}" : null
             };
         }
 

@@ -17,7 +17,7 @@ namespace Sheaft.GraphQL.Types
             descriptor.Field(c => c.Name);
 
             descriptor.Field(c => c.Address)
-                .Type<NonNullType<AddressType>>();
+                .Type<AddressType>();
         }
     }
 }

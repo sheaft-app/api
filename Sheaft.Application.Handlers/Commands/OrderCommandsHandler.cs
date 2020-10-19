@@ -104,7 +104,15 @@ namespace Sheaft.Application.Handlers
                         var cartDelivery = request.ProducersExpectedDeliveries.FirstOrDefault(ped => ped.DeliveryModeId == delivery.Id);
                         cartDeliveries.Add(new Tuple<DeliveryMode, DateTimeOffset, string>(delivery, cartDelivery.ExpectedDeliveryDate, cartDelivery.Comment));
                     }
+
                     order.SetDeliveries(cartDeliveries);
+                    order.SetStatus(OrderStatus.Validated);
+
+                    var referenceResult = await _mediatr.Process(new CreateOrderIdentifierCommand(request.RequestUser), token);
+                    if (!referenceResult.Success)
+                        return Failed<IEnumerable<Guid>>(referenceResult.Exception);
+
+                    order.SetReference(referenceResult.Data);
 
                     await _context.AddAsync(order, token);
                     await _context.SaveChangesAsync(token);
@@ -136,8 +144,6 @@ namespace Sheaft.Application.Handlers
                     }
 
                     _mediatr.Post(new CreateUserPointsCommand(request.RequestUser) { CreatedOn = DateTimeOffset.UtcNow, Kind = PointKind.PurchaseOrder, UserId = order.User.Id });
-
-                    await transaction.CommitAsync(token);
                     return Ok(purchaseOrderIds.AsEnumerable());
                 }
             });
