@@ -66,9 +66,29 @@ namespace Sheaft.Web.Api
             Env = environment;
             Configuration = configuration;
 
-            Log.Logger = new LoggerConfiguration()
+            var logger = new LoggerConfiguration()
                 .ReadFrom.Configuration(configuration)
-                .CreateLogger();
+                .Enrich.WithNewRelicLogsInContext();
+
+            if (Env.IsProduction())
+            {
+                logger = logger
+                    .WriteTo.Async(a => a.NewRelicLogs(
+                        endpointUrl: Configuration.GetValue<string>("NEW_RELIC_LOG_API"),
+                        applicationName: Configuration.GetValue<string>("NEW_RELIC_APP_NAME"),
+                        licenseKey: Configuration.GetValue<string>("NEW_RELIC_LICENSE_KEY"),
+                        insertKey: Configuration.GetValue<string>("NEW_RELIC_INSERT_KEY"),
+                        restrictedToMinimumLevel: Configuration.GetValue<LogEventLevel>("NEW_RELIC_LOG_LEVEL"),
+                        batchSizeLimit: Configuration.GetValue<int>("NEW_RELIC_BATCH_SIZE")
+                    ));
+            }
+            else
+            {
+                logger = logger
+                    .WriteTo.Async(a => a.Console());
+            }
+
+            Log.Logger = logger.CreateLogger();
         }
 
         public void ConfigureServices(IServiceCollection services)
