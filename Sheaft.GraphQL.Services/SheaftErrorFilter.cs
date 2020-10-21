@@ -42,6 +42,7 @@ namespace Sheaft.GraphQL.Services
             var kind = ExceptionKind.Unexpected;
             var exception = error.Exception;
 
+            var statusCode = 400;
             if (error.Exception != null && error.Exception is SheaftException exc)
             {
                 exception = exc;
@@ -54,20 +55,60 @@ namespace Sheaft.GraphQL.Services
 
                 error = error.AddExtension(exc.Kind.ToString("G"), message);
                 kind = exc.Kind;
+
+                switch (exc.Kind)
+                {
+                    case ExceptionKind.Conflict:
+                        statusCode = 409;
+                        break;
+                    case ExceptionKind.Forbidden:
+                        statusCode = 403;
+                        break;
+                    case ExceptionKind.Gone:
+                        statusCode = 410;
+                        break;
+                    case ExceptionKind.Locked:
+                        statusCode = 423;
+                        break;
+                    case ExceptionKind.NotFound:
+                        statusCode = 404;
+                        break;
+                    case ExceptionKind.Unauthorized:
+                        statusCode = 401;
+                        break;
+                    case ExceptionKind.Unexpected:
+                        statusCode = 500;
+                        break;
+                    case ExceptionKind.TooManyRetries:
+                    case ExceptionKind.BadRequest:
+                    case ExceptionKind.Validation:
+                    case ExceptionKind.AlreadyExists:
+                    default:
+                        statusCode = 400;
+                        break;
+                }
             }
             else
             {
+                statusCode = 400;
                 error = error.WithMessage(message);
             }
 
             if (error.Code == "AUTH_NOT_AUTHORIZED")
             {
+                statusCode = 401;
                 kind = ExceptionKind.Unauthorized;
                 error = error.WithCode(ExceptionKind.Unauthorized.ToString("G"));
                 error = error.WithMessage(_localizer[ExceptionKind.Unauthorized.ToString("G")]);
 
                 error = error.AddExtension(ExceptionKind.Unauthorized.ToString("G"), _localizer[ExceptionKind.Unauthorized.ToString("G")]);
             }
+
+            NewRelic.Api.Agent.NewRelic.SetTransactionName("StatusCode", statusCode.ToString());
+
+            var currentTransaction = NewRelic.Api.Agent.NewRelic.GetAgent().CurrentTransaction;
+            currentTransaction.AddCustomAttribute("ExceptionKind", kind);
+            currentTransaction.AddCustomAttribute("ExceptionMessage", message);
 
             var parameters = new Dictionary<string, object>
             {
@@ -76,15 +117,12 @@ namespace Sheaft.GraphQL.Services
                 { "IsAuthenticated", CurrentUser.IsAuthenticated },
                 { "Roles", string.Join(";", CurrentUser.Roles) },
                 { "Code", error.Code },
+                { "StatusCode", statusCode },
                 { "ExceptionKind", kind },
                 { "ExceptionMessage", message },
             };
+
             NewRelic.Api.Agent.NewRelic.NoticeError(exception, parameters);
-
-            var currentTransaction = NewRelic.Api.Agent.NewRelic.GetAgent().CurrentTransaction;
-            currentTransaction.AddCustomAttribute("ExceptionKind", kind);
-            currentTransaction.AddCustomAttribute("ExceptionMessage", message);
-
             return error;
         }
     }

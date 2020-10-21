@@ -41,7 +41,7 @@ namespace Sheaft.Application.Handlers
 
         public async Task<Result<Guid>> Handle(CreateTransferRefundCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
+            return await ExecuteAsync(request, async () =>
             {
                 var purchaseOrder = await _context.GetByIdAsync<PurchaseOrder>(request.PurchaseOrderId, token);
                 if (purchaseOrder.Transfer == null 
@@ -94,7 +94,7 @@ namespace Sheaft.Application.Handlers
 
         public async Task<Result<bool>> Handle(CheckTransferRefundsCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
+            return await ExecuteAsync(request, async () =>
             {
                 var skip = 0;
                 const int take = 100;
@@ -122,7 +122,7 @@ namespace Sheaft.Application.Handlers
 
         public async Task<Result<bool>> Handle(CheckTransferRefundCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
+            return await ExecuteAsync(request, async () =>
             {
                 var transferRefund = await _context.GetByIdAsync<TransferRefund>(request.TransferRefundId, token);
                 if (transferRefund.Status != TransactionStatus.Created && transferRefund.Status != TransactionStatus.Waiting)
@@ -141,7 +141,7 @@ namespace Sheaft.Application.Handlers
 
         public async Task<Result<bool>> Handle(ExpireTransferRefundCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
+            return await ExecuteAsync(request, async () =>
             {
                 var transferRefund = await _context.GetByIdAsync<TransferRefund>(request.TransferRefundId, token);
                 transferRefund.SetStatus(TransactionStatus.Expired);
@@ -153,7 +153,7 @@ namespace Sheaft.Application.Handlers
 
         public async Task<Result<TransactionStatus>> Handle(RefreshTransferRefundStatusCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
+            return await ExecuteAsync(request, async () =>
             {
                 var transferRefund = await _context.GetSingleAsync<TransferRefund>(c => c.Identifier == request.Identifier, token);
                 if (transferRefund.Status == TransactionStatus.Succeeded || transferRefund.Status == TransactionStatus.Failed)

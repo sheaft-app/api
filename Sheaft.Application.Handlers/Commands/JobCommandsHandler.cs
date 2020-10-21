@@ -48,7 +48,7 @@ namespace Sheaft.Application.Handlers
         public async Task<Result<bool>> Handle(CancelJobsCommand request,
             CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
+            return await ExecuteAsync(request, async () =>
            {
                using (var transaction = await _context.BeginTransactionAsync(token))
                {
@@ -68,7 +68,7 @@ namespace Sheaft.Application.Handlers
         public async Task<Result<bool>> Handle(RetryJobsCommand request,
             CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
+            return await ExecuteAsync(request, async () =>
            {
                using (var transaction = await _context.BeginTransactionAsync(token))
                {
@@ -88,7 +88,7 @@ namespace Sheaft.Application.Handlers
         public async Task<Result<bool>> Handle(PauseJobsCommand request,
             CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
+            return await ExecuteAsync(request, async () =>
            {
                using (var transaction = await _context.BeginTransactionAsync(token))
                {
@@ -108,7 +108,7 @@ namespace Sheaft.Application.Handlers
         public async Task<Result<bool>> Handle(ArchiveJobsCommand request,
             CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
+            return await ExecuteAsync(request, async () =>
            {
                using (var transaction = await _context.BeginTransactionAsync(token))
                {
@@ -128,7 +128,7 @@ namespace Sheaft.Application.Handlers
         public async Task<Result<bool>> Handle(ResumeJobsCommand request,
             CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
+            return await ExecuteAsync(request, async () =>
            {
                using (var transaction = await _context.BeginTransactionAsync(token))
                {
@@ -148,7 +148,7 @@ namespace Sheaft.Application.Handlers
         public async Task<Result<bool>> Handle(StartJobsCommand request,
             CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
+            return await ExecuteAsync(request, async () =>
             {
                 using (var transaction = await _context.BeginTransactionAsync(token))
                 {
@@ -168,7 +168,7 @@ namespace Sheaft.Application.Handlers
         public async Task<Result<bool>> Handle(CompleteJobsCommand request,
             CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
+            return await ExecuteAsync(request, async () =>
             {
                 using (var transaction = await _context.BeginTransactionAsync(token))
                 {
@@ -188,7 +188,7 @@ namespace Sheaft.Application.Handlers
         public async Task<Result<bool>> Handle(FailJobsCommand request,
             CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
+            return await ExecuteAsync(request, async () =>
             {
                 using (var transaction = await _context.BeginTransactionAsync(token))
                 {
@@ -208,7 +208,7 @@ namespace Sheaft.Application.Handlers
         public async Task<Result<bool>> Handle(CancelJobCommand request,
             CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
+            return await ExecuteAsync(request, async () =>
             {
                 var entity = await _context.GetByIdAsync<Job>(request.Id, token);
                 entity.CancelJob(request.Reason);
@@ -220,7 +220,7 @@ namespace Sheaft.Application.Handlers
 
         public async Task<Result<bool>> Handle(RetryJobCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
+            return await ExecuteAsync(request, async () =>
             {
                 var entity = await _context.GetByIdAsync<Job>(request.Id, token);
 
@@ -235,7 +235,7 @@ namespace Sheaft.Application.Handlers
         public async Task<Result<bool>> Handle(PauseJobCommand request,
             CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
+            return await ExecuteAsync(request, async () =>
             {
                 var entity = await _context.GetByIdAsync<Job>(request.Id, token);
                 entity.PauseJob();
@@ -248,7 +248,7 @@ namespace Sheaft.Application.Handlers
         public async Task<Result<bool>> Handle(ArchiveJobCommand request,
             CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
+            return await ExecuteAsync(request, async () =>
             {
                 var entity = await _context.GetByIdAsync<Job>(request.Id, token);
                 entity.ArchiveJob();
@@ -261,7 +261,7 @@ namespace Sheaft.Application.Handlers
         public async Task<Result<bool>> Handle(UnarchiveJobCommand request,
             CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
+            return await ExecuteAsync(request, async () =>
             {
                 var entity = await _context.GetByIdAsync<Job>(request.Id, token);
                 entity.UnarchiveJob();
@@ -274,7 +274,7 @@ namespace Sheaft.Application.Handlers
         public async Task<Result<bool>> Handle(ResumeJobCommand request,
             CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
+            return await ExecuteAsync(request, async () =>
             {
                 var entity = await _context.GetByIdAsync<Job>(request.Id, token);
                 entity.ResumeJob();
@@ -287,7 +287,7 @@ namespace Sheaft.Application.Handlers
         public async Task<Result<bool>> Handle(StartJobCommand request,
             CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
+            return await ExecuteAsync(request, async () =>
             {
                 var entity = await _context.GetByIdAsync<Job>(request.Id, token);
                 entity.StartJob();
@@ -300,7 +300,7 @@ namespace Sheaft.Application.Handlers
         public async Task<Result<bool>> Handle(CompleteJobCommand request,
             CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
+            return await ExecuteAsync(request, async () =>
             {
                 var entity = await _context.GetByIdAsync<Job>(request.Id, token);
                 entity.SetDownloadUrl(request.FileUrl);
@@ -314,7 +314,7 @@ namespace Sheaft.Application.Handlers
         public async Task<Result<bool>> Handle(FailJobCommand request,
             CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
+            return await ExecuteAsync(request, async () =>
             {
                 var entity = await _context.GetByIdAsync<Job>(request.Id, token);
                 entity.FailJob(request.Reason);
@@ -337,7 +337,7 @@ namespace Sheaft.Application.Handlers
 
         public async Task<Result<bool>> Handle(DeleteJobCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
+            return await ExecuteAsync(request, async () =>
             {
                 var entity = await _context.GetByIdAsync<Job>(request.Id, token);
                 _context.Remove(entity);
@@ -349,7 +349,7 @@ namespace Sheaft.Application.Handlers
 
         public async Task<Result<bool>> Handle(RestoreJobCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
+            return await ExecuteAsync(request, async () =>
             {
                 var entity = await _context.Jobs.SingleOrDefaultAsync(a => a.Id == request.Id && a.RemovedOn.HasValue, token);
                 _context.Restore(entity);
@@ -361,7 +361,7 @@ namespace Sheaft.Application.Handlers
 
         public async Task<Result<bool>> Handle(UpdateJobCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
+            return await ExecuteAsync(request, async () =>
             {
                 var entity = await _context.GetByIdAsync<Job>(request.Id, token);
                 entity.SetName(request.Name);

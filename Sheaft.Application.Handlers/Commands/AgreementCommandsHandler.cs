@@ -35,7 +35,7 @@ namespace Sheaft.Application.Handlers
 
         public async Task<Result<Guid>> Handle(CreateAgreementCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
+            return await ExecuteAsync(request, async() =>
             {
                 var user = await _context.GetByIdAsync<User>(request.RequestUser.Id, token);
                 var store = await _context.GetByIdAsync<Store>(request.StoreId, token);
@@ -63,7 +63,7 @@ namespace Sheaft.Application.Handlers
 
         public async Task<Result<bool>> Handle(AcceptAgreementCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
+            return await ExecuteAsync(request, async() =>
             {
                 var entity = await _context.GetByIdAsync<Agreement>(request.Id, token);
                 entity.AcceptAgreement();
@@ -88,7 +88,7 @@ namespace Sheaft.Application.Handlers
 
         public async Task<Result<bool>> Handle(CancelAgreementsCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
+            return await ExecuteAsync(request, async () =>
             {
                 using (var transaction = await _context.BeginTransactionAsync(token))
                 {
@@ -107,7 +107,7 @@ namespace Sheaft.Application.Handlers
 
         public async Task<Result<bool>> Handle(CancelAgreementCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
+            return await ExecuteAsync(request, async () =>
             {
                 var entity = await _context.GetByIdAsync<Agreement>(request.Id, token);
                 entity.CancelAgreement(request.Reason);
@@ -121,7 +121,7 @@ namespace Sheaft.Application.Handlers
 
         public async Task<Result<bool>> Handle(RefuseAgreementsCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
+            return await ExecuteAsync(request, async () =>
             {
                 using (var transaction = await _context.BeginTransactionAsync(token))
                 {
@@ -140,7 +140,7 @@ namespace Sheaft.Application.Handlers
 
         public async Task<Result<bool>> Handle(RefuseAgreementCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
+            return await ExecuteAsync(request, async () =>
             {
                 var entity = await _context.GetByIdAsync<Agreement>(request.Id, token);
                 entity.RefuseAgreement(request.Reason);
@@ -154,7 +154,7 @@ namespace Sheaft.Application.Handlers
 
         public async Task<Result<bool>> Handle(DeleteAgreementCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
+            return await ExecuteAsync(request, async () =>
             {
                 var entity = await _context.GetByIdAsync<Agreement>(request.Id, token);
 
@@ -167,7 +167,7 @@ namespace Sheaft.Application.Handlers
 
         public async Task<Result<bool>> Handle(ResetAgreementStatusToCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
+            return await ExecuteAsync(request, async () =>
             {
                 var entity = await _context.Agreements.SingleOrDefaultAsync(a => a.Id == request.Id && a.RemovedOn.HasValue, token);
                 entity.Reset();
@@ -180,7 +180,7 @@ namespace Sheaft.Application.Handlers
 
         public async Task<Result<bool>> Handle(RestoreAgreementCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
+            return await ExecuteAsync(request, async () =>
             {
                 var entity = await _context.Agreements.SingleOrDefaultAsync(a => a.Id == request.Id && a.RemovedOn.HasValue, token);
 

@@ -31,22 +31,22 @@ namespace Sheaft.Application.Handlers
 
         public async Task<Result<Guid>> Handle(CreateWalletPaymentsCommand request, CancellationToken token)
         {
-            return await CreateWalletAsync(request.UserId, "Paiements", WalletKind.Payments, token);
+            return await ExecuteAsync(request, async () => await CreateWalletAsync(request.UserId, "Paiements", WalletKind.Payments, token));
         }
 
         public async Task<Result<Guid>> Handle(CreateWalletRefundsCommand request, CancellationToken token)
         {
-            return await CreateWalletAsync(request.UserId, "Remboursements", WalletKind.Refunds, token);
+            return await ExecuteAsync(request, async () => await CreateWalletAsync(request.UserId, "Remboursements", WalletKind.Refunds, token));
         }
 
         public async Task<Result<Guid>> Handle(CreateWalletReturnablesCommand request, CancellationToken token)
         {
-            return await CreateWalletAsync(request.UserId, "Consignes", WalletKind.Returnables, token);
+            return await ExecuteAsync(request, async () => await CreateWalletAsync(request.UserId, "Consignes", WalletKind.Returnables, token));
         }
 
         public async Task<Result<bool>> Handle(CheckWalletPaymentsConfigurationCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
+            return await ExecuteAsync(request, async () =>
             {
                 var wallet = await _context.FindSingleAsync<Wallet>(c => c.User.Id == request.UserId && c.Kind == WalletKind.Payments, token);
                 if (wallet == null)
@@ -75,31 +75,28 @@ namespace Sheaft.Application.Handlers
 
         private async Task<Result<Guid>> CreateWalletAsync(Guid userId, string name, WalletKind kind, CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
+            var user = await _context.GetByIdAsync<User>(userId, token);
+
+            using (var transaction = await _context.BeginTransactionAsync(token))
             {
-                var user = await _context.GetByIdAsync<User>(userId, token);
+                var wallet = new Wallet(Guid.NewGuid(), name, kind, user);
+                await _context.AddAsync(wallet, token);
+                await _context.SaveChangesAsync(token);
 
-                using (var transaction = await _context.BeginTransactionAsync(token))
+                var result = await _pspService.CreateWalletAsync(wallet, token);
+                if (!result.Success)
                 {
-                    var wallet = new Wallet(Guid.NewGuid(), name, kind, user);
-                    await _context.AddAsync(wallet, token);
-                    await _context.SaveChangesAsync(token);
-
-                    var result = await _pspService.CreateWalletAsync(wallet, token);
-                    if (!result.Success)
-                    {
-                        await transaction.RollbackAsync(token);
-                        return Failed<Guid>(result.Exception);
-                    }
-
-                    wallet.SetIdentifier(result.Data);
-
-                    await _context.SaveChangesAsync(token);
-                    await transaction.CommitAsync(token);
-
-                    return Ok(wallet.Id);
+                    await transaction.RollbackAsync(token);
+                    return Failed<Guid>(result.Exception);
                 }
-            });
+
+                wallet.SetIdentifier(result.Data);
+
+                await _context.SaveChangesAsync(token);
+                await transaction.CommitAsync(token);
+
+                return Ok(wallet.Id);
+            }
         }
     }
 }

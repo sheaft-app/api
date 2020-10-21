@@ -26,7 +26,7 @@ namespace Sheaft.Application.Handlers
 
         public async Task<Result<bool>> Handle(UpdateRegionCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
+            return await ExecuteAsync(request, async () =>
             {
                 var entity = await _context.Regions.SingleOrDefaultAsync(c => c.Id == request.Id, token);
                 entity.SetName(request.Name);
@@ -39,7 +39,7 @@ namespace Sheaft.Application.Handlers
 
         public async Task<Result<bool>> Handle(UpdateRegionStatsCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
+            return await ExecuteAsync(request, async () =>
             {
                 var region = await _context.Regions.SingleOrDefaultAsync(c => c.Id == request.Id, token);
 

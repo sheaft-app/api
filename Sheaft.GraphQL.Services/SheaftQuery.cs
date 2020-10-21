@@ -377,6 +377,7 @@ namespace Sheaft.GraphQL.Services
             currentTransaction.AddCustomAttribute("UserIdentifier", CurrentUser.Id.ToString("N"));
             currentTransaction.AddCustomAttribute("IsAuthenticated", CurrentUser.IsAuthenticated);
             currentTransaction.AddCustomAttribute("Roles", string.Join(";", CurrentUser.Roles));
+            currentTransaction.AddCustomAttribute("GraphQL", name);
         }
     }
 }

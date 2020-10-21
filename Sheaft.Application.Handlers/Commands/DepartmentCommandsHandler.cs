@@ -25,7 +25,7 @@ namespace Sheaft.Application.Handlers
 
         public async Task<Result<bool>> Handle(UpdateDepartmentCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
+            return await ExecuteAsync(request, async () =>
             {
                 var entity = await _context.Departments.SingleOrDefaultAsync(c => c.Id == request.Id, token);
 
@@ -41,7 +41,7 @@ namespace Sheaft.Application.Handlers
 
         public async Task<Result<bool>> Handle(UpdateDepartmentStatsCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
+            return await ExecuteAsync(request, async () =>
             {
                 var department = await _context.Departments.SingleOrDefaultAsync(c => c.Id == request.Id, token);
                 var level = (await _context.GetAsync<Level>(c => c.RequiredPoints > request.Points, token)).OrderBy(c => c.RequiredPoints).FirstOrDefault();

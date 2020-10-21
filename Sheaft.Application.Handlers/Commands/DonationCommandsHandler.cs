@@ -44,7 +44,7 @@ namespace Sheaft.Application.Handlers
 
         public async Task<Result<Guid>> Handle(CreateDonationCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
+            return await ExecuteAsync(request, async () =>
             {
                 var order = await _context.GetByIdAsync<Order>(request.OrderId, token);
                 if (order.Payin == null 
@@ -96,7 +96,7 @@ namespace Sheaft.Application.Handlers
 
         public async Task<Result<bool>> Handle(CheckDonationsCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
+            return await ExecuteAsync(request, async () =>
             {
                 var skip = 0;
                 const int take = 100;
@@ -124,7 +124,7 @@ namespace Sheaft.Application.Handlers
 
         public async Task<Result<bool>> Handle(CheckDonationCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
+            return await ExecuteAsync(request, async () =>
             {
                 var donation = await _context.GetByIdAsync<Donation>(request.DonationId, token);
                 if (donation.Status != TransactionStatus.Created && donation.Status != TransactionStatus.Waiting)
@@ -143,7 +143,7 @@ namespace Sheaft.Application.Handlers
 
         public async Task<Result<bool>> Handle(ExpireDonationCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
+            return await ExecuteAsync(request, async () =>
             {
                 var donation = await _context.GetByIdAsync<Donation>(request.DonationId, token);
                 donation.SetStatus(TransactionStatus.Expired);
@@ -155,7 +155,7 @@ namespace Sheaft.Application.Handlers
 
         public async Task<Result<TransactionStatus>> Handle(RefreshDonationStatusCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
+            return await ExecuteAsync(request, async () =>
             {
                 var donation = await _context.GetSingleAsync<Donation>(c => c.Identifier == request.Identifier, token);
                 if (donation.Status == TransactionStatus.Succeeded || donation.Status == TransactionStatus.Failed)

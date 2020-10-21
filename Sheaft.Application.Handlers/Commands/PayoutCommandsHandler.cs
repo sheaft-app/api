@@ -44,7 +44,7 @@ namespace Sheaft.Application.Handlers
 
         public async Task<Result<bool>> Handle(CheckPayoutsCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
+            return await ExecuteAsync(request, async () =>
             {
                 var skip = 0;
                 const int take = 100;
@@ -72,7 +72,7 @@ namespace Sheaft.Application.Handlers
 
         public async Task<Result<bool>> Handle(CheckPayoutCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
+            return await ExecuteAsync(request, async () =>
             {
                 var payout = await _context.GetByIdAsync<Payout>(request.PayoutId, token);
                 if (payout.Status != TransactionStatus.Created && payout.Status != TransactionStatus.Waiting)
@@ -91,7 +91,7 @@ namespace Sheaft.Application.Handlers
 
         public async Task<Result<bool>> Handle(ExpirePayoutCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
+            return await ExecuteAsync(request, async () =>
             {
                 var transaction = await _context.GetByIdAsync<Payout>(request.PayoutId, token);
                 transaction.SetStatus(TransactionStatus.Expired);
@@ -103,7 +103,7 @@ namespace Sheaft.Application.Handlers
 
         public async Task<Result<TransactionStatus>> Handle(RefreshPayoutStatusCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
+            return await ExecuteAsync(request, async () =>
             {
                 var payout = await _context.GetSingleAsync<Payout>(c => c.Identifier == request.Identifier, token);
                 if (payout.Status == TransactionStatus.Succeeded || payout.Status == TransactionStatus.Failed)
@@ -132,7 +132,7 @@ namespace Sheaft.Application.Handlers
 
         public async Task<Result<Guid>> Handle(CreatePayoutCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
+            return await ExecuteAsync(request, async () =>
             {
                 var checkConfigurationResult = await _mediatr.Process(new CheckProducerConfigurationCommand(request.RequestUser) { ProducerId = request.ProducerId }, token);
                 if (!checkConfigurationResult.Success)

@@ -30,7 +30,7 @@ namespace Sheaft.Application.Handlers
 
         public async Task<Result<Guid>> Handle(CreateDeliveryModeCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
+            return await ExecuteAsync(request, async () =>
             {
                 var producer = await _context.GetByIdAsync<Producer>(request.RequestUser.Id, token);
 
@@ -60,7 +60,7 @@ namespace Sheaft.Application.Handlers
 
         public async Task<Result<bool>> Handle(UpdateDeliveryModeCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
+            return await ExecuteAsync(request, async () =>
             {
                 var producer = await _context.GetByIdAsync<Producer>(request.RequestUser.Id, token);
                 var entity = await _context.GetByIdAsync<DeliveryMode>(request.Id, token);
@@ -91,7 +91,7 @@ namespace Sheaft.Application.Handlers
 
         public async Task<Result<bool>> Handle(DeleteDeliveryModeCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
+            return await ExecuteAsync(request, async () =>
             {
                 var entity = await _context.GetByIdAsync<DeliveryMode>(request.Id, token);
                 var activeAgreements = await _context.Agreements.CountAsync(a => a.Delivery.Id == entity.Id && !a.RemovedOn.HasValue, token);
@@ -107,7 +107,7 @@ namespace Sheaft.Application.Handlers
 
         public async Task<Result<bool>> Handle(RestoreDeliveryModeCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
+            return await ExecuteAsync(request, async () =>
             {
                 var entity = await _context.DeliveryModes.SingleOrDefaultAsync(a => a.Id == request.Id && a.RemovedOn.HasValue, token);
                 _context.Restore(entity);

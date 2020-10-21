@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -117,109 +118,93 @@ namespace Sheaft.Application.Interop
             return new SuccessResult<IEnumerable<T>>(result, message, objs);
         }
 
-        protected async Task<Result<T>> ExecuteAsync<T>(Func<Task<Result<T>>> method)
+        protected Result<T> HandleException<T>(ICommand<T> request, Exception e)
+        {
+            var type = request.GetType().Name;
+
+            if (e is SheaftException sheaftException)
+            {
+                _logger.LogError(sheaftException, GetLogMessage(type, sheaftException.Message));
+                return Failed<T>(sheaftException.InnerException ?? sheaftException);
+            }
+
+            if (e is DbUpdateConcurrencyException dbUpdateConcurrency)
+            {
+                _logger.LogError(dbUpdateConcurrency, GetLogMessage(type, dbUpdateConcurrency.Message));
+                return Conflict<T>(dbUpdateConcurrency.InnerException ?? dbUpdateConcurrency);
+            }
+
+            if (e is DbUpdateException dbUpdate)
+            {
+                _logger.LogError(dbUpdate, GetLogMessage(type, dbUpdate.Message));
+
+                if (dbUpdate.InnerException != null && dbUpdate.InnerException.Message.Contains("Cannot insert duplicate key row in object"))
+                    return Failed<T>(new AlreadyExistsException(dbUpdate.InnerException));
+
+                return Failed<T>(dbUpdate.InnerException ?? dbUpdate);
+            }
+
+            if (e is NotSupportedException notSupported)
+            {
+                _logger.LogError(notSupported, GetLogMessage(type, notSupported.Message));
+                return Failed<T>(notSupported.InnerException ?? notSupported);
+            }
+
+            if (e is InvalidOperationException invalidOperation)
+            {
+                _logger.LogError(invalidOperation, GetLogMessage(type, invalidOperation.Message));
+                return Failed<T>(invalidOperation.InnerException ?? invalidOperation);
+            }
+            
+            _logger.LogError(e, GetLogMessage(type, e.Message));
+            return InternalError<T>(e.InnerException ?? e);
+        }
+
+        private static string GetLogMessage(string type, string message)
+        {
+            return $"Exception occured while executing {type} : {message}";
+        }
+
+        protected async Task<Result<T>> ExecuteAsync<T>(ICommand<T> request, Func<Task<Result<T>>> method)
         {
             try
             {
+                var type = request.GetType().Name;
+                _logger.LogInformation($"Executing {type}");
                 var result = await method();
-                LogInformation(result);
+
+                if(result.Success)
+                    _logger.LogInformation($"{type} succeeded.");
+                else
+                    _logger.LogInformation($"{type} failed.");
 
                 return result;
             }
-            catch (SheaftException e)
-            {
-                LogError(e);
-                return Failed<T>(e.InnerException ?? e);
-            }
-            catch (DbUpdateConcurrencyException e)
-            {
-                LogError(e);
-                return Conflict<T>(e.InnerException ?? e);
-            }
-            catch (DbUpdateException e)
-            {
-                LogError(e);
-
-                if (e.InnerException != null && e.InnerException.Message.Contains("Cannot insert duplicate key row in object"))
-                    return Failed<T>(new AlreadyExistsException(e.InnerException));
-
-                return Failed<T>(e.InnerException ?? e);
-            }
-            catch (NotSupportedException e)
-            {
-                LogError(e);
-                return Failed<T>(e.InnerException ?? e);
-            }
-            catch (InvalidOperationException e)
-            {
-                LogError(e);
-                return Failed<T>(e.InnerException ?? e);
-            }
             catch (Exception e)
             {
-                LogError(e);
-                return InternalError<T>(e.InnerException ?? e);
+                return HandleException(request, e);
             }
         }
 
-        protected async Task<Result<IEnumerable<T>>> ExecuteAsync<T>(Func<Task<Result<IEnumerable<T>>>> method)
+        protected async Task<Result<IEnumerable<T>>> ExecuteAsync<T>(ICommand<IEnumerable<T>> request, Func<Task<Result<IEnumerable<T>>>> method)
         {
             try
             {
+                var type = request.GetType().Name;
+                _logger.LogInformation($"Executing {type}");
                 var result = await method();
-                LogInformation(result);
+
+                if (result.Success)
+                    _logger.LogInformation($"{type} succeeded.");
+                else
+                    _logger.LogInformation($"{type} failed.");
 
                 return result;
             }
-            catch (SheaftException e)
-            {
-                LogError(e);
-                return Failed<IEnumerable<T>>(e.InnerException ?? e);
-            }
-            catch (DbUpdateConcurrencyException e)
-            {
-                LogError(e);
-                return Conflict<IEnumerable<T>>(e.InnerException ?? e);
-            }
-            catch (DbUpdateException e)
-            {
-                LogError(e);
-
-                if (e.InnerException != null && e.InnerException.Message.Contains("Cannot insert duplicate key row in object"))
-                    return Failed<IEnumerable<T>>(new AlreadyExistsException(e.InnerException));
-                                
-                return Failed<IEnumerable<T>>(e.InnerException ?? e);
-            }
-            catch (NotSupportedException e)
-            {
-                LogError(e);
-                return Failed<IEnumerable<T>>(e.InnerException ?? e);
-            }
-            catch (InvalidOperationException e)
-            {
-                LogError(e);
-                return Failed<IEnumerable<T>>(e.InnerException ?? e);
-            }
             catch (Exception e)
             {
-                LogError(e);
-                return InternalError<IEnumerable<T>>(e.InnerException ?? e);
+                return HandleException(request, e);
             }
-        }
-
-        private void LogError(Exception e)
-        {
-            _logger.LogError($"Exception: {{0}}, message: {{1}}", e, e.Message);
-        }
-
-        private void LogInformation<T>(Result<T> result)
-        {
-            _logger.LogTrace($"Succeeded: {result.Success}");
-        }
-
-        private void LogInformation<T>(Result<IEnumerable<T>> result)
-        {
-            _logger.LogTrace($"Succeeded: {result.Success}");
         }
     }
 }

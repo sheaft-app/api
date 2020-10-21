@@ -41,7 +41,7 @@ namespace Sheaft.Application.Handlers
 
         public async Task<Result<bool>> Handle(CheckPayinRefundsCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
+            return await ExecuteAsync(request, async () =>
             {
                 var skip = 0;
                 const int take = 100;
@@ -69,7 +69,7 @@ namespace Sheaft.Application.Handlers
 
         public async Task<Result<bool>> Handle(CheckPayinRefundCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
+            return await ExecuteAsync(request, async () =>
             {
                 var payinRefund = await _context.GetByIdAsync<PayinRefund>(request.PayinRefundId, token);
                 if (payinRefund.Status != TransactionStatus.Created && payinRefund.Status != TransactionStatus.Waiting)
@@ -88,7 +88,7 @@ namespace Sheaft.Application.Handlers
 
         public async Task<Result<bool>> Handle(ExpirePayinRefundCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
+            return await ExecuteAsync(request, async () =>
             {
                 var payinRefund = await _context.GetByIdAsync<PayinRefund>(request.PayinRefundId, token);
                 payinRefund.SetStatus(TransactionStatus.Expired);
@@ -100,7 +100,7 @@ namespace Sheaft.Application.Handlers
 
         public async Task<Result<TransactionStatus>> Handle(RefreshPayinRefundStatusCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
+            return await ExecuteAsync(request, async () =>
             {
                 var payinRefund = await _context.GetSingleAsync<PayinRefund>(c => c.Identifier == request.Identifier, token);
                 if (payinRefund.Status == TransactionStatus.Succeeded || payinRefund.Status == TransactionStatus.Failed)
@@ -129,7 +129,7 @@ namespace Sheaft.Application.Handlers
 
         public async Task<Result<Guid>> Handle(CreatePayinRefundCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
+            return await ExecuteAsync(request, async () =>
             {
                 var order = await _context.GetByIdAsync<Order>(request.OrderId, token);
                 if (order.Payin == null

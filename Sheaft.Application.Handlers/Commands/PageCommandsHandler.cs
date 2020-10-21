@@ -33,7 +33,7 @@ namespace Sheaft.Application.Handlers
 
         public async Task<Result<Guid>> Handle(UploadPageCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
+            return await ExecuteAsync(request, async () =>
             {
                 var page = new Page(Guid.NewGuid(), request.FileName, request.Extension, request.Size);
 
@@ -53,7 +53,7 @@ namespace Sheaft.Application.Handlers
 
         public async Task<Result<bool>> Handle(SendPageCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
+            return await ExecuteAsync(request, async () =>
             {
                 var legal = await _context.GetSingleAsync<Legal>(r => r.Documents.Any(d => d.Id == request.DocumentId), token);
                 var document = legal.Documents.FirstOrDefault(d => d.Id == request.DocumentId);
@@ -77,7 +77,7 @@ namespace Sheaft.Application.Handlers
 
         public async Task<Result<bool>> Handle(DeletePageCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
+            return await ExecuteAsync(request, async () =>
             {
                 var legal = await _context.GetSingleAsync<Legal>(r => r.Documents.Any(d => d.Id == request.DocumentId), token);
                 var document = legal.Documents.FirstOrDefault(d => d.Id == request.DocumentId);

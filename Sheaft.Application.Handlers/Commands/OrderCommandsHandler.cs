@@ -48,7 +48,7 @@ namespace Sheaft.Application.Handlers
 
         public async Task<Result<Guid>> Handle(CreateConsumerOrderCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
+            return await ExecuteAsync(request, async () =>
             {
                 var productIds = request.Products.Select(p => p.Id);
                 var products = await _context.GetByIdsAsync<Product>(productIds, token);
@@ -81,7 +81,7 @@ namespace Sheaft.Application.Handlers
 
         public async Task<Result<IEnumerable<Guid>>> Handle(CreateBusinessOrderCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
+            return await ExecuteAsync(request, async () =>
             {
                 using (var transaction = await _context.BeginTransactionAsync(token))
                 {
@@ -151,7 +151,7 @@ namespace Sheaft.Application.Handlers
 
         public async Task<Result<bool>> Handle(UpdateConsumerOrderCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
+            return await ExecuteAsync(request, async () =>
             {
                 var user = await _context.GetByIdAsync<User>(request.RequestUser.Id, token);
                 var entity = await _context.GetByIdAsync<Order>(request.Id, token);
@@ -184,7 +184,7 @@ namespace Sheaft.Application.Handlers
 
         public async Task<Result<Guid>> Handle(PayOrderCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
+            return await ExecuteAsync(request, async () =>
             {
                 var checkResult = await _mediatr.Process(new CheckConsumerConfigurationCommand(request.RequestUser) { Id = request.RequestUser.Id }, token);
                 if (!checkResult.Success)
@@ -221,7 +221,7 @@ namespace Sheaft.Application.Handlers
 
         public async Task<Result<Guid>> Handle(RetryOrderCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
+            return await ExecuteAsync(request, async () =>
             {
                 var order = await _context.GetByIdAsync<Order>(request.OrderId, token);
                 if (order.Status != OrderStatus.Refused)
@@ -251,7 +251,7 @@ namespace Sheaft.Application.Handlers
 
         public async Task<Result<IEnumerable<Guid>>> Handle(ConfirmOrderCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
+            return await ExecuteAsync(request, async () =>
             {
                 try
                 {
@@ -303,7 +303,7 @@ namespace Sheaft.Application.Handlers
 
         public async Task<Result<bool>> Handle(FailOrderCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
+            return await ExecuteAsync(request, async () =>
             {
                 var order = await _context.GetByIdAsync<Order>(request.OrderId, token);
                 order.SetStatus(OrderStatus.Refused);
@@ -315,7 +315,7 @@ namespace Sheaft.Application.Handlers
 
         public async Task<Result<bool>> Handle(ExpireOrderCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
+            return await ExecuteAsync(request, async () =>
             {
                 var order = await _context.GetByIdAsync<Order>(request.OrderId, token);
                 order.SetStatus(OrderStatus.Expired);
@@ -327,7 +327,7 @@ namespace Sheaft.Application.Handlers
 
         public async Task<Result<bool>> Handle(UnblockOrderCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
+            return await ExecuteAsync(request, async () =>
             {
                 var order = await _context.GetByIdAsync<Order>(request.OrderId, token);
                 order.SetSkipBackgroundProcessing(false);
@@ -339,7 +339,7 @@ namespace Sheaft.Application.Handlers
 
         public async Task<Result<bool>> Handle(CheckOrdersCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
+            return await ExecuteAsync(request, async () =>
             {
                 var skip = 0;
                 const int take = 100;
@@ -367,7 +367,7 @@ namespace Sheaft.Application.Handlers
 
         public async Task<Result<bool>> Handle(CheckOrderCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
+            return await ExecuteAsync(request, async () =>
             {
                 var payinRefund = await _context.GetByIdAsync<Order>(request.OrderId, token);
                 if (payinRefund.Status != OrderStatus.Created && payinRefund.Status != OrderStatus.Waiting)

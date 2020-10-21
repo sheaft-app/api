@@ -33,7 +33,7 @@ namespace Sheaft.Application.Handlers
 
         public async Task<Result<Guid>> Handle(CreateBusinessLegalCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
+            return await ExecuteAsync(request, async () =>
             {
                 var business = await _context.GetByIdAsync<Business>(request.UserId, token);
                 await _context.EnsureNotExists<BusinessLegal>(c => c.User.Id == business.Id, token);
@@ -79,7 +79,7 @@ namespace Sheaft.Application.Handlers
 
         public async Task<Result<Guid>> Handle(CreateConsumerLegalCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
+            return await ExecuteAsync(request, async () =>
             {
                 var consumer = await _context.GetByIdAsync<Consumer>(request.UserId, token);
                 await _context.EnsureNotExists<ConsumerLegal>(c => c.User.Id == consumer.Id, token);
@@ -119,7 +119,7 @@ namespace Sheaft.Application.Handlers
 
         public async Task<Result<bool>> Handle(UpdateBusinessLegalCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
+            return await ExecuteAsync(request, async () =>
             {
                 var legalAddress = new LegalAddress(request.Address.Line1,
                     request.Address.Line2,
@@ -165,7 +165,7 @@ namespace Sheaft.Application.Handlers
 
         public async Task<Result<bool>> Handle(UpdateConsumerLegalCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
+            return await ExecuteAsync(request, async () =>
             {
                 var legal = await _context.GetByIdAsync<ConsumerLegal>(request.Id, token);
 
@@ -199,7 +199,7 @@ namespace Sheaft.Application.Handlers
 
         public async Task<Result<bool>> Handle(CheckBusinessLegalConfigurationCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
+            return await ExecuteAsync(request, async () =>
             {
                 var legal = await _context.GetSingleAsync<BusinessLegal>(b => b.User.Id == request.UserId, token);
                 if (string.IsNullOrWhiteSpace(legal.User.Identifier))
@@ -218,7 +218,7 @@ namespace Sheaft.Application.Handlers
 
         public async Task<Result<bool>> Handle(CheckConsumerLegalConfigurationCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
+            return await ExecuteAsync(request, async () =>
             {
                 var legal = await _context.GetSingleAsync<ConsumerLegal>(b => b.User.Id == request.UserId, token);
                 if (string.IsNullOrWhiteSpace(legal.User.Identifier))

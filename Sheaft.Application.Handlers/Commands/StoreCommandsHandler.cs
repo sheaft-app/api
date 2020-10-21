@@ -35,7 +35,7 @@ namespace Sheaft.Application.Handlers
 
         public async Task<Result<bool>> Handle(CheckStoreConfigurationCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
+            return await ExecuteAsync(request, async () =>
             {
                 var business = await _mediatr.Process(new CheckBusinessLegalConfigurationCommand(request.RequestUser) { UserId = request.Id }, token);
                 if (!business.Success)
@@ -51,7 +51,7 @@ namespace Sheaft.Application.Handlers
 
         public async Task<Result<Guid>> Handle(RegisterStoreCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
+            return await ExecuteAsync(request, async () =>
             {
                 using (var transaction = await _context.BeginTransactionAsync(token))
                 {
@@ -142,7 +142,7 @@ namespace Sheaft.Application.Handlers
 
         public async Task<Result<bool>> Handle(UpdateStoreCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
+            return await ExecuteAsync(request, async () =>
             {
                 var store = await _context.GetByIdAsync<Store>(request.Id, token);
 

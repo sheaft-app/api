@@ -28,7 +28,7 @@ namespace Sheaft.Application.Handlers
 
         public async Task<Result<Guid>> Handle(CreateReturnableCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
+            return await ExecuteAsync(request, async () =>
             {
                 var producer = await _context.GetByIdAsync<Producer>(request.RequestUser.Id, token);
                 var returnable = new Returnable(Guid.NewGuid(), ReturnableKind.Container, producer, request.Name, request.WholeSalePrice, request.Vat, request.Description);
@@ -42,7 +42,7 @@ namespace Sheaft.Application.Handlers
 
         public async Task<Result<bool>> Handle(UpdateReturnableCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
+            return await ExecuteAsync(request, async () =>
             {
                 var entity = await _context.GetByIdAsync<Returnable>(request.Id, token);
                 entity.SetName(request.Name);
@@ -57,7 +57,7 @@ namespace Sheaft.Application.Handlers
 
         public async Task<Result<bool>> Handle(DeleteReturnableCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
+            return await ExecuteAsync(request, async () =>
             {
                 var entity = await _context.GetByIdAsync<Returnable>(request.Id, token);
                 _context.Remove(entity);
@@ -70,7 +70,7 @@ namespace Sheaft.Application.Handlers
 
         public async Task<Result<bool>> Handle(RestoreReturnableCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
+            return await ExecuteAsync(request, async () =>
             {
                 var entity = await _context.Returnables.SingleOrDefaultAsync(a => a.Id == request.Id && a.RemovedOn.HasValue, token);                
                 _context.Restore(entity);

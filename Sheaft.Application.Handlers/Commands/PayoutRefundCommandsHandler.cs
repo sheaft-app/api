@@ -27,7 +27,7 @@ namespace Sheaft.Application.Handlers
 
         public async Task<Result<TransactionStatus>> Handle(RefreshPayoutRefundStatusCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
+            return await ExecuteAsync(request, async () =>
             {
                 var pspResult = await _pspService.GetRefundAsync(request.Identifier, token);
                 if (!pspResult.Success)

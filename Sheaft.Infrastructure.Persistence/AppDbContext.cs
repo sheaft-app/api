@@ -200,7 +200,7 @@ namespace Sheaft.Infrastructure.Persistence
             if (result != null)
             {
                 var message = GetExceptionDefaultMessage<T>(MessageKind.AlreadyExists, id);
-                throw new SheaftException(ExceptionKind.NotFound, message.Key, message.Value);
+                throw new SheaftException(ExceptionKind.AlreadyExists, message.Key, message.Value);
             }
         }
 
@@ -214,7 +214,7 @@ namespace Sheaft.Infrastructure.Persistence
             if (result?.Any() == true)
             {
                 var message = GetExceptionDefaultMessage<T>(MessageKind.AlreadyExists);
-                throw new SheaftException(ExceptionKind.NotFound, message.Key, message.Value);
+                throw new SheaftException(ExceptionKind.AlreadyExists, message.Key, message.Value);
             }
         }
 

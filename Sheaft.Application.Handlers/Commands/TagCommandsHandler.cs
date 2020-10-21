@@ -27,7 +27,7 @@ namespace Sheaft.Application.Handlers
 
         public async Task<Result<Guid>> Handle(CreateTagCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
+            return await ExecuteAsync(request, async () =>
             {
                 var entity = new Tag(Guid.NewGuid(), request.Kind, request.Name, request.Description, request.Picture);
 
@@ -40,7 +40,7 @@ namespace Sheaft.Application.Handlers
 
         public async Task<Result<bool>> Handle(UpdateTagCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
+            return await ExecuteAsync(request, async () =>
             {
                 var entity = await _context.GetByIdAsync<Tag>(request.Id, token);
 
@@ -60,7 +60,7 @@ namespace Sheaft.Application.Handlers
 
         public async Task<Result<bool>> Handle(DeleteTagCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
+            return await ExecuteAsync(request, async () =>
             {
                 var entity = await _context.GetByIdAsync<Tag>(request.Id, token);
                 _context.Remove(entity);
@@ -72,7 +72,7 @@ namespace Sheaft.Application.Handlers
 
         public async Task<Result<bool>> Handle(RestoreTagCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
+            return await ExecuteAsync(request, async () =>
             {
                 var entity = await _context.Tags.SingleOrDefaultAsync(a => a.Id == request.Id && a.RemovedOn.HasValue, token);
                 _context.Restore(entity);

@@ -28,22 +28,22 @@ namespace Sheaft.Application.Handlers
 
         public async Task<Result<string>> Handle(CreateOrderIdentifierCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(() => _identifierService.GetNextOrderReferenceAsync(token));
+            return await ExecuteAsync(request, async () => await _identifierService.GetNextOrderReferenceAsync(token));
         }
 
         public async Task<Result<string>> Handle(CreatePurchaseOrderIdentifierCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(() => _identifierService.GetNextPurchaseOrderReferenceAsync(request.ProducerId, token));
+            return await ExecuteAsync(request, async () => await _identifierService.GetNextPurchaseOrderReferenceAsync(request.ProducerId, token));
         }
 
         public async Task<Result<string>> Handle(CreateProductIdentifierCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(() => _identifierService.GetNextProductReferenceAsync(request.ProducerId, token));
+            return await ExecuteAsync(request, async () => await _identifierService.GetNextProductReferenceAsync(request.ProducerId, token));
         }
 
         public async Task<Result<string>> Handle(CreateSponsoringCodeCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(() => _identifierService.GetNextSponsoringCode(token));
+            return await ExecuteAsync(request, async () => await _identifierService.GetNextSponsoringCode(token));
         }
     }
 }

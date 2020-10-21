@@ -32,7 +32,7 @@ namespace Sheaft.Application.Handlers
 
         public async Task<Result<bool>> Handle(UpdateZonesProgressCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
+            return await ExecuteAsync(request, async () =>
             {
                 //var pointsPerRegions = await _context.RegionPoints.ToListAsync(token);
                 //var pointsPerDepartments = await _context.DepartmentPoints.ToListAsync(token);
@@ -85,7 +85,7 @@ namespace Sheaft.Application.Handlers
 
         public async Task<Result<bool>> Handle(GenerateZonesFileCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
+            return await ExecuteAsync(request, async () =>
             {
                 var departments = await _context.Departments.ToListAsync(token);
                 var depts = departments.Select(d => new DepartmentProgress

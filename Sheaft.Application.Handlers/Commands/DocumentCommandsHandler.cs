@@ -42,7 +42,7 @@ namespace Sheaft.Application.Handlers
 
         public async Task<Result<Guid>> Handle(CreateDocumentCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
+            return await ExecuteAsync(request, async () =>
             {
                 using (var transaction = await _context.BeginTransactionAsync(token))
                 {
@@ -73,7 +73,7 @@ namespace Sheaft.Application.Handlers
 
         public async Task<Result<bool>> Handle(UpdateDocumentCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
+            return await ExecuteAsync(request, async () =>
             {
                 var legal = await _context.GetSingleAsync<Legal>(r => r.Documents.Any(d => d.Id == request.Id), token);
                 var document = legal.Documents.FirstOrDefault(c => c.Id == request.Id);
@@ -100,7 +100,7 @@ namespace Sheaft.Application.Handlers
 
         public async Task<Result<bool>> Handle(LockDocumentsCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
+            return await ExecuteAsync(request, async () =>
             {
                 var legal = await _context.GetSingleAsync<Legal>(r => r.Id == request.LegalId, token);
                 var success = true;
@@ -121,7 +121,7 @@ namespace Sheaft.Application.Handlers
 
         public async Task<Result<bool>> Handle(LockDocumentCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
+            return await ExecuteAsync(request, async () =>
             {
                 var legal = await _context.GetSingleAsync<Legal>(r => r.Documents.Any(d => d.Id == request.DocumentId), token);
                 var document = legal.Documents.FirstOrDefault(c => c.Id == request.DocumentId);
@@ -137,7 +137,7 @@ namespace Sheaft.Application.Handlers
 
         public async Task<Result<bool>> Handle(UnLockDocumentCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
+            return await ExecuteAsync(request, async () =>
             {
                 var legal = await _context.GetSingleAsync<Legal>(r => r.Documents.Any(d => d.Id == request.DocumentId), token);
                 var document = legal.Documents.FirstOrDefault(c => c.Id == request.DocumentId);
@@ -150,7 +150,7 @@ namespace Sheaft.Application.Handlers
 
         public async Task<Result<bool>> Handle(SubmitDocumentsCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
+            return await ExecuteAsync(request, async () =>
             {
                 var legal = await _context.GetSingleAsync<Legal>(r => r.Id == request.LegalId, token);
                 var success = true;
@@ -171,7 +171,7 @@ namespace Sheaft.Application.Handlers
 
         public async Task<Result<bool>> Handle(SubmitDocumentCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
+            return await ExecuteAsync(request, async () =>
             {
                 var legal = await _context.GetSingleAsync<Legal>(r => r.Documents.Any(d => d.Id == request.DocumentId), token);
                 var document = legal.Documents.FirstOrDefault(c => c.Id == request.DocumentId);
@@ -207,7 +207,7 @@ namespace Sheaft.Application.Handlers
 
         public async Task<Result<bool>> Handle(DeleteDocumentCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
+            return await ExecuteAsync(request, async () =>
             {
                 var legal = await _context.GetSingleAsync<Legal>(r => r.Documents.Any(d => d.Id == request.Id), token);
                 legal.DeleteDocument(request.Id);
@@ -219,7 +219,7 @@ namespace Sheaft.Application.Handlers
 
         public async Task<Result<DocumentStatus>> Handle(RefreshDocumentStatusCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
+            return await ExecuteAsync(request, async () =>
             {
                 var legal = await _context.GetSingleAsync<Legal>(r => r.Documents.Any(d => d.Identifier == request.Identifier), token);
                 var document = legal.Documents.FirstOrDefault(c => c.Identifier == request.Identifier);

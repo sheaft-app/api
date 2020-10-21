@@ -26,7 +26,7 @@ namespace Sheaft.Application.Handlers
 
         public async Task<Result<bool>> Handle(CreateSponsoringCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
+            return await ExecuteAsync(request, async () =>
             {
                 var user = await _context.GetByIdAsync<User>(request.UserId, token);
                 var sponsor = await _context.FindSingleAsync<User>(u => u.SponsorshipCode == request.Code, token);

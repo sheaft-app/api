@@ -33,7 +33,7 @@ namespace Sheaft.Application.Handlers
 
         public async Task<Result<Guid>> Handle(RegisterConsumerCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
+            return await ExecuteAsync(request, async () =>
             {
                 using (var transaction = await _context.BeginTransactionAsync(token))
                 {
@@ -83,7 +83,7 @@ namespace Sheaft.Application.Handlers
 
         public async Task<Result<bool>> Handle(UpdateConsumerCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
+            return await ExecuteAsync(request, async () =>
             {
                 var consumer = await _context.GetByIdAsync<Consumer>(request.Id, token);
 
@@ -125,7 +125,7 @@ namespace Sheaft.Application.Handlers
 
         public async Task<Result<bool>> Handle(CheckConsumerConfigurationCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
+            return await ExecuteAsync(request, async () =>
             {
                 var business = await _mediatr.Process(new CheckConsumerLegalConfigurationCommand(request.RequestUser) { UserId = request.Id }, token);
                 if (!business.Success)

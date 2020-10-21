@@ -30,7 +30,7 @@ namespace Sheaft.Application.Handlers
 
         public async Task<Result<Guid>> Handle(CreateUboCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
+            return await ExecuteAsync(request, async () =>
             {
                 var legal = await _context.GetSingleAsync<BusinessLegal>(c => c.Declaration.Id == request.DeclarationId, token);
                 var ubo = new Ubo(Guid.NewGuid(), 
@@ -58,7 +58,7 @@ namespace Sheaft.Application.Handlers
 
         public async Task<Result<bool>> Handle(UpdateUboCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
+            return await ExecuteAsync(request, async () =>
             {
                 var legal = await _context.GetSingleAsync<BusinessLegal>(c => c.Declaration.Ubos.Any(u => u.Id == request.Id), token);
                 var ubo = legal.Declaration.Ubos.FirstOrDefault(u => u.Id == request.Id);
@@ -84,7 +84,7 @@ namespace Sheaft.Application.Handlers
 
         public async Task<Result<bool>> Handle(DeleteUboCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
+            return await ExecuteAsync(request, async () =>
             {
                 var legal = await _context.GetSingleAsync<BusinessLegal>(c => c.Declaration.Ubos.Any(u => u.Id == request.Id), token);
                 legal.Declaration.RemoveUbo(request.Id);

@@ -34,7 +34,7 @@ namespace Sheaft.Application.Handlers
 
         public async Task<Result<Guid>> Handle(CreateDeclarationCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
+            return await ExecuteAsync(request, async () =>
             {
                 var legal = await _context.GetByIdAsync<BusinessLegal>(request.LegalId, token);
                 legal.SetDeclaration();
@@ -57,7 +57,7 @@ namespace Sheaft.Application.Handlers
 
         public async Task<Result<bool>> Handle(SubmitDeclarationCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
+            return await ExecuteAsync(request, async () =>
             {
                 var legal = await _context.GetSingleAsync<BusinessLegal>(r => r.Declaration.Id == request.DeclarationId, token);
                 if (legal.Declaration.Status != DeclarationStatus.Locked)
@@ -78,7 +78,7 @@ namespace Sheaft.Application.Handlers
 
         public async Task<Result<bool>> Handle(LockDeclarationCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
+            return await ExecuteAsync(request, async () =>
             {
                 var legal = await _context.GetSingleAsync<BusinessLegal>(r => r.Declaration.Id == request.DeclarationId, token);
                 legal.Declaration.SetStatus(DeclarationStatus.Locked);
@@ -91,7 +91,7 @@ namespace Sheaft.Application.Handlers
 
         public async Task<Result<bool>> Handle(UnLockDeclarationCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
+            return await ExecuteAsync(request, async () =>
             {
                 var legal = await _context.GetSingleAsync<BusinessLegal>(r => r.Declaration.Id == request.DeclarationId, token);
                 legal.Declaration.SetStatus(DeclarationStatus.UnLocked);
@@ -104,7 +104,7 @@ namespace Sheaft.Application.Handlers
 
         public async Task<Result<DeclarationStatus>> Handle(RefreshDeclarationStatusCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
+            return await ExecuteAsync(request, async () =>
             {
                 var legal = await _context.GetSingleAsync<BusinessLegal>(c => c.Declaration.Identifier == request.Identifier, token);
                 var pspResult = await _pspService.GetDeclarationAsync(legal.Declaration.Identifier, token);
@@ -136,7 +136,7 @@ namespace Sheaft.Application.Handlers
 
         public async Task<Result<bool>> Handle(EnsureDeclarationIsValidatedCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
+            return await ExecuteAsync(request, async () =>
             {
                 var legal = await _context.GetSingleAsync<BusinessLegal>(bl => bl.User.Id == request.UserId, token);
                 if (legal.Declaration == null)

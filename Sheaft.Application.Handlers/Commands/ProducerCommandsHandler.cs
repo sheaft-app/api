@@ -37,7 +37,7 @@ namespace Sheaft.Application.Handlers
 
         public async Task<Result<Guid>> Handle(RegisterProducerCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
+            return await ExecuteAsync(request, async () =>
             {
                 using (var transaction = await _context.BeginTransactionAsync(token))
                 {
@@ -119,7 +119,7 @@ namespace Sheaft.Application.Handlers
 
         public async Task<Result<bool>> Handle(UpdateProducerCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
+            return await ExecuteAsync(request, async () =>
             {
                 var producer = await _context.GetByIdAsync<Producer>(request.Id, token);
 
@@ -178,7 +178,7 @@ namespace Sheaft.Application.Handlers
 
         public async Task<Result<bool>> Handle(CheckProducerConfigurationCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
+            return await ExecuteAsync(request, async () =>
             {
                 var business = await _mediatr.Process(new CheckBusinessLegalConfigurationCommand(request.RequestUser) { UserId = request.ProducerId }, token);
                 if (!business.Success)
@@ -194,7 +194,7 @@ namespace Sheaft.Application.Handlers
 
         public async Task<Result<bool>> Handle(EnsureProducerDocumentsValidatedCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
+            return await ExecuteAsync(request, async () =>
             {
                 var producerLegal = await _context.GetSingleAsync<BusinessLegal>(l => l.User.Id == request.ProducerId, token);
                 if (!producerLegal.Documents.Any() || producerLegal.Documents.Any(d => d.Status != DocumentStatus.Validated))

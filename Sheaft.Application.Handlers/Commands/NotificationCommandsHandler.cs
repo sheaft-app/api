@@ -31,7 +31,7 @@ namespace Sheaft.Application.Handlers
 
         public async Task<Result<bool>> Handle(MarkUserNotificationsAsReadCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
+            return await ExecuteAsync(request, async () =>
             {
                 var result = await _dapperContext.SetNotificationAsReadAsync(request.RequestUser.Id, request.ReadBefore, token);
                 return Ok(result);
@@ -40,7 +40,7 @@ namespace Sheaft.Application.Handlers
 
         public async Task<Result<bool>> Handle(MarkUserNotificationAsReadCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
+            return await ExecuteAsync(request, async () =>
             {
                 var notification = await _context.GetByIdAsync<Notification>(request.Id, token);
                 if(!notification.Unread)
@@ -55,7 +55,7 @@ namespace Sheaft.Application.Handlers
 
         public async Task<Result<Guid>> Handle(CreateUserNotificationCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
+            return await ExecuteAsync(request, async () =>
             {
                 var user = await _context.GetByIdAsync<User>(request.Id, token);
                 var entity = new Notification(Guid.NewGuid(), NotificationKind.Business, request.Method, request.Content, user);
@@ -69,7 +69,7 @@ namespace Sheaft.Application.Handlers
 
         public async Task<Result<Guid>> Handle(CreateGroupNotificationCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
+            return await ExecuteAsync(request, async () =>
             {
                 var user = await _context.GetByIdAsync<User>(request.Id, token);
                 var entity = new Notification(Guid.NewGuid(), NotificationKind.Business, request.Method, request.Content, user);

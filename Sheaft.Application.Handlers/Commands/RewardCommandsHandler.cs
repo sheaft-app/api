@@ -27,7 +27,7 @@ namespace Sheaft.Application.Handlers
 
         public async Task<Result<Guid>> Handle(CreateRewardCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
+            return await ExecuteAsync(request, async () =>
             {
                 var department = await _context.Departments.SingleOrDefaultAsync(d => d.Id == request.DepartmentId, token);
                 var entity = new Reward(Guid.NewGuid(), request.Name, department);
@@ -52,7 +52,7 @@ namespace Sheaft.Application.Handlers
 
         public async Task<Result<bool>> Handle(UpdateRewardCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
+            return await ExecuteAsync(request, async () =>
             {
                 var entity = await _context.GetByIdAsync<Reward>(request.Id, token);
 
@@ -86,7 +86,7 @@ namespace Sheaft.Application.Handlers
 
         public async Task<Result<bool>> Handle(DeleteRewardCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
+            return await ExecuteAsync(request, async () =>
             {
                 var entity = await _context.GetByIdAsync<Reward>(request.Id, token);
                 _context.Remove(entity);
@@ -97,7 +97,7 @@ namespace Sheaft.Application.Handlers
 
         public async Task<Result<bool>> Handle(RestoreRewardCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
+            return await ExecuteAsync(request, async () =>
             {
                 var entity = await _context.Rewards.SingleOrDefaultAsync(r => r.Id == request.Id, token);
                 _context.Restore(entity);

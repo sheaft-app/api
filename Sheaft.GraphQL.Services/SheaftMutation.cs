@@ -448,8 +448,11 @@ namespace Sheaft.GraphQL.Services
 
         private async Task<T> ExecuteCommandAsync<U, T>(U input, CancellationToken token) where U : Command<T>
         {
+            var command = typeof(U).Name;
+
+            _logger.LogInformation($"Executing mutation {command}");
             var result = await _mediator.Process(input, token);
-            _logger.LogTrace($"Succeeded: {result.Success}");
+            _logger.LogTrace($"Mutation {command} result: {result.Success}");
 
             var currentTransaction = NewRelic.Api.Agent.NewRelic.GetAgent().CurrentTransaction;
             currentTransaction.AddCustomAttribute("CommandSucceeded", result.Success);
@@ -472,6 +475,7 @@ namespace Sheaft.GraphQL.Services
             currentTransaction.AddCustomAttribute("UserIdentifier", CurrentUser.Id.ToString("N"));
             currentTransaction.AddCustomAttribute("IsAuthenticated", CurrentUser.IsAuthenticated);
             currentTransaction.AddCustomAttribute("Roles", string.Join(";", CurrentUser.Roles));
+            currentTransaction.AddCustomAttribute("GraphQL", name);
         }
     }
 }

@@ -30,7 +30,7 @@ namespace Sheaft.Application.Handlers
 
         public async Task<Result<Guid>> Handle(CreateQuickOrderCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
+            return await ExecuteAsync(request, async () =>
             {
                 var user = await _context.GetByIdAsync<User>(request.RequestUser.Id, token);
 
@@ -52,7 +52,7 @@ namespace Sheaft.Application.Handlers
 
         public async Task<Result<bool>> Handle(UpdateQuickOrderCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
+            return await ExecuteAsync(request, async () =>
             {
                 var entity = await _context.GetByIdAsync<QuickOrder>(request.Id, token);
                 entity.SetName(request.Name);
@@ -65,7 +65,7 @@ namespace Sheaft.Application.Handlers
 
         public async Task<Result<bool>> Handle(UpdateQuickOrderProductsCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
+            return await ExecuteAsync(request, async () =>
             {
                 var entity = await _context.GetByIdAsync<QuickOrder>(request.Id, token);
                 if (request.Products != null && request.Products.Any())
@@ -98,7 +98,7 @@ namespace Sheaft.Application.Handlers
 
         public async Task<Result<bool>> Handle(SetDefaultQuickOrderCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
+            return await ExecuteAsync(request, async () =>
             {
                 var quickOrders = await _context.FindAsync<QuickOrder>(c => c.User.Id == request.RequestUser.Id, token);
                 foreach (var quickOrder in quickOrders)
@@ -117,7 +117,7 @@ namespace Sheaft.Application.Handlers
 
         public async Task<Result<bool>> Handle(DeleteQuickOrdersCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
+            return await ExecuteAsync(request, async () =>
             {
                 foreach (var id in request.Ids)
                 {
@@ -132,7 +132,7 @@ namespace Sheaft.Application.Handlers
 
         public async Task<Result<bool>> Handle(DeleteQuickOrderCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
+            return await ExecuteAsync(request, async () =>
             {
                 var entity = await _context.GetByIdAsync<QuickOrder>(request.Id, token);
                 _context.Remove(entity);

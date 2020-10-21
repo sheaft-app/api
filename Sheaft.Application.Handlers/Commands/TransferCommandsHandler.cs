@@ -42,7 +42,7 @@ namespace Sheaft.Application.Handlers
 
         public async Task<Result<bool>> Handle(CheckTransfersCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
+            return await ExecuteAsync(request, async () =>
             {
                 var skip = 0;
                 const int take = 100;
@@ -70,7 +70,7 @@ namespace Sheaft.Application.Handlers
 
         public async Task<Result<bool>> Handle(CheckTransferCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
+            return await ExecuteAsync(request, async () =>
             {
                 var transfer = await _context.GetByIdAsync<Transfer>(request.TransferId, token);
                 if (transfer.Status != TransactionStatus.Created && transfer.Status != TransactionStatus.Waiting)
@@ -89,7 +89,7 @@ namespace Sheaft.Application.Handlers
 
         public async Task<Result<bool>> Handle(ExpireTransferCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
+            return await ExecuteAsync(request, async () =>
             {
                 var transfer = await _context.GetByIdAsync<Transfer>(request.TransferId, token);
                 transfer.SetStatus(TransactionStatus.Expired);
@@ -101,7 +101,7 @@ namespace Sheaft.Application.Handlers
 
         public async Task<Result<bool>> Handle(UnblockTransferCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
+            return await ExecuteAsync(request, async () =>
             {
                 var transfer = await _context.GetByIdAsync<Transfer>(request.TransferId, token);
                 transfer.SetSkipBackgroundProcessing(false);
@@ -113,7 +113,7 @@ namespace Sheaft.Application.Handlers
 
         public async Task<Result<TransactionStatus>> Handle(RefreshTransferStatusCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
+            return await ExecuteAsync(request, async () =>
             {
                 var transfer = await _context.GetSingleAsync<Transfer>(c => c.Identifier == request.Identifier, token);
                 if (transfer.Status == TransactionStatus.Succeeded || transfer.Status == TransactionStatus.Failed)
@@ -142,7 +142,7 @@ namespace Sheaft.Application.Handlers
 
         public async Task<Result<Guid>> Handle(CreateTransferCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
+            return await ExecuteAsync(request, async () =>
             {
                 var purchaseOrder = await _context.GetByIdAsync<PurchaseOrder>(request.PurchaseOrderId, token);
                 if ((purchaseOrder.Transfer != null && purchaseOrder.Transfer.Status != TransactionStatus.Expired)

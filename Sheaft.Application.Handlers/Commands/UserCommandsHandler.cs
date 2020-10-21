@@ -48,7 +48,7 @@ namespace Sheaft.Application.Handlers
 
         public async Task<Result<bool>> Handle(ChangeUserRolesCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
+            return await ExecuteAsync(request, async () =>
             {
                 var entity = await _context.GetByIdAsync<User>(request.UserId, token);
 
@@ -93,7 +93,7 @@ namespace Sheaft.Application.Handlers
 
         public async Task<Result<string>> Handle(GenerateUserCodeCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
+            return await ExecuteAsync(request, async () =>
             {
                 var entity = await _context.GetByIdAsync<User>(request.Id, token);
 
@@ -113,7 +113,7 @@ namespace Sheaft.Application.Handlers
 
         public async Task<Result<string>> Handle(RemoveUserDataCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
+            return await ExecuteAsync(request, async () =>
             {
                 var entity = await _context.GetByIdAsync<User>(request.Id, token);
                 await _blobService.CleanUserStorageAsync(request.Id, token);
@@ -124,7 +124,7 @@ namespace Sheaft.Application.Handlers
 
         public async Task<Result<bool>> Handle(CreateUserPointsCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
+            return await ExecuteAsync(request, async () =>
             {
                 if (!_scoringOptions.Points.TryGetValue(request.Kind.ToString("G"), out int quantity))
                     return BadRequest<bool>(MessageKind.UserPoints_Scoring_Matching_ActionPoints_NotFound);
@@ -141,7 +141,7 @@ namespace Sheaft.Application.Handlers
 
         public async Task<Result<Guid>> Handle(QueueExportUserDataCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
+            return await ExecuteAsync(request, async () =>
             {
                 var sender = await _context.GetByIdAsync<User>(request.RequestUser.Id, token);
 
@@ -159,7 +159,7 @@ namespace Sheaft.Application.Handlers
 
         public async Task<Result<bool>> Handle(ExportUserDataCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
+            return await ExecuteAsync(request, async () =>
             {
                 var job = await _context.GetByIdAsync<Job>(request.Id, token);
                 var user = await _context.GetByIdAsync<User>(request.RequestUser.Id, token);
@@ -200,7 +200,7 @@ namespace Sheaft.Application.Handlers
 
         public async Task<Result<bool>> Handle(RemoveUserCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
+            return await ExecuteAsync(request, async () =>
             {
                 using (var transaction = await _context.BeginTransactionAsync(token))
                 {

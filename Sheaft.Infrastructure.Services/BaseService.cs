@@ -69,9 +69,9 @@ namespace Sheaft.Infrastructure.Services
             return new FailedResult<T>(new TooManyRetriesException(message, objs));
         }
 
-        protected Result<T> InternalError<T>(MessageKind? message = null, params object[] objs)
+        protected Result<T> InternalError<T>(Exception e, MessageKind? message = null, params object[] objs)
         {
-            return new FailedResult<T>(new UnexpectedException(message, objs));
+            return new FailedResult<T>(new UnexpectedException(e, message, objs));
         }
 
         protected Result<T> Failed<T>(Exception exception, MessageKind? message = null, params object[] objs)
@@ -101,81 +101,78 @@ namespace Sheaft.Infrastructure.Services
             return new SuccessResult<IEnumerable<T>>(result, message, objs);
         }
 
+
+        protected Result<T> HandleException<T>(string method, Exception e)
+        {
+            if (e is SheaftException sheaftException)
+            {
+                _logger.LogError(sheaftException, GetLogMessage(method, sheaftException.Message));
+                return Failed<T>(sheaftException.InnerException ?? sheaftException);
+            }
+
+            if (e is NotSupportedException notSupported)
+            {
+                _logger.LogError(notSupported, GetLogMessage(method, notSupported.Message));
+                return Failed<T>(notSupported.InnerException ?? notSupported);
+            }
+
+            if (e is InvalidOperationException invalidOperation)
+            {
+                _logger.LogError(invalidOperation, GetLogMessage(method, invalidOperation.Message));
+                return Failed<T>(invalidOperation.InnerException ?? invalidOperation);
+            }
+
+            _logger.LogError(e, GetLogMessage(method, e.Message));
+            return InternalError<T>(e.InnerException ?? e);
+        }
+
+        private static string GetLogMessage(string type, string message)
+        {
+            return $"Exception occured while executing {type} : {message}";
+        }
+
         protected async Task<Result<T>> ExecuteAsync<T>(Func<Task<Result<T>>> method)
         {
+            var type = method.Method.Name.Split('>')[0].Replace("<", string.Empty);
+
             try
             {
+                _logger.LogInformation($"Executing {type}");
                 var result = await method();
-                LogInformation(result);
+
+                if (result.Success)
+                    _logger.LogInformation($"{type} succeeded.");
+                else
+                    _logger.LogInformation($"{type} failed.");
 
                 return result;
             }
-            catch (SheaftException e)
-            {
-                LogError(e);
-                return Failed<T>(e);
-            }
-            catch (NotSupportedException e)
-            {
-                LogError(e);
-                return Failed<T>(e);
-            }
-            catch (InvalidOperationException e)
-            {
-                LogError(e);
-                return Failed<T>(e);
-            }
             catch (Exception e)
             {
-                LogError(e);
-                return InternalError<T>();
+                return HandleException<T>(type, e);
             }
         }
 
-        protected async Task<Result<IEnumerable<T>>> ExecuteAsync<T>(Func<Task<Result<IEnumerable<T>>>> method)
+        protected async Task<Result<IEnumerable<T>>> ExecuteAsync<T>(object request, Func<Task<Result<IEnumerable<T>>>> method)
         {
+            var type = method.Method.Name;
+
             try
             {
+                _logger.LogInformation($"Executing {type}");
                 var result = await method();
-                LogInformation(result);
+
+                if (result.Success)
+                    _logger.LogInformation($"{type} succeeded.");
+                else
+                    _logger.LogInformation($"{type} failed.");
 
                 return result;
             }
-            catch (SheaftException e)
-            {
-                LogError(e);
-                return Failed<IEnumerable<T>>(e);
-            }
-            catch (NotSupportedException e)
-            {
-                LogError(e);
-                return Failed<IEnumerable<T>>(e);
-            }
-            catch (InvalidOperationException e)
-            {
-                LogError(e);
-                return Failed<IEnumerable<T>>(e);
-            }
             catch (Exception e)
             {
-                LogError(e);
-                return InternalError<IEnumerable<T>>();
+                return HandleException<IEnumerable<T>>(type, e);
             }
-        }
-
-        private void LogError(Exception e)
-        {
-            _logger.LogError($"Exception: {{0}}, message: {{1}}", e, e.Message);
-        }
-
-        private void LogInformation<T>(Result<T> result)
-        {
-            _logger.LogTrace($"Succeeded: {result.Success}");
-        }
-
-        private void LogInformation<T>(Result<IEnumerable<T>> result)
-        {
-            _logger.LogTrace($"Succeeded: {result.Success}");
         }
     }
 }

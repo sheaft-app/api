@@ -27,7 +27,7 @@ namespace Sheaft.Application.Handlers
 
         public async Task<Result<string>> Handle(UpdateUserPictureCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
+            return await ExecuteAsync(request, async () =>
             {
                 var entity = await _context.GetByIdAsync<User>(request.UserId, token);
 
@@ -56,7 +56,7 @@ namespace Sheaft.Application.Handlers
 
         public async Task<Result<string>> Handle(UpdateProductPictureCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
+            return await ExecuteAsync(request, async () =>
             {
                 var entity = await _context.GetByIdAsync<Product>(request.ProductId, token);
 
@@ -73,7 +73,7 @@ namespace Sheaft.Application.Handlers
 
         public async Task<Result<string>> Handle(UpdateTagPictureCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
+            return await ExecuteAsync(request, async () =>
             {
                 var entity = await _context.GetByIdAsync<Tag>(request.TagId, token);
 

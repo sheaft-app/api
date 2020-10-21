@@ -36,7 +36,7 @@ namespace Sheaft.Application.Handlers
 
         public async Task<Result<Guid>> Handle(QueueExportPickingOrderCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
+            return await ExecuteAsync(request, async () =>
             {
                 var producer = await _context.GetByIdAsync<Producer>(request.RequestUser.Id, token);
                 var purchaseOrders = await _context.GetByIdsAsync<PurchaseOrder>(request.PurchaseOrderIds, token);
@@ -62,7 +62,7 @@ namespace Sheaft.Application.Handlers
 
         public async Task<Result<bool>> Handle(ExportPickingOrderCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
+            return await ExecuteAsync(request, async () =>
             {
                 var job = await _context.GetByIdAsync<Job>(request.JobId, token);
 

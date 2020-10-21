@@ -44,7 +44,7 @@ namespace Sheaft.Application.Handlers
 
         public async Task<Result<Guid>> Handle(CreatePurchaseOrderCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
+            return await ExecuteAsync(request, async () =>
             {
                 var producer = await _context.GetByIdAsync<Producer>(request.ProducerId, token);
                 var order = await _context.GetByIdAsync<Order>(request.OrderId, token);
@@ -68,7 +68,7 @@ namespace Sheaft.Application.Handlers
 
         public async Task<Result<bool>> Handle(ShipPurchaseOrdersCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
+            return await ExecuteAsync(request, async () =>
             {
                 using (var transaction = await _context.BeginTransactionAsync(token))
                 {
@@ -87,7 +87,7 @@ namespace Sheaft.Application.Handlers
 
         public async Task<Result<bool>> Handle(DeliverPurchaseOrdersCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
+            return await ExecuteAsync(request, async () =>
             {
                 using (var transaction = await _context.BeginTransactionAsync(token))
                 {
@@ -106,7 +106,7 @@ namespace Sheaft.Application.Handlers
 
         public async Task<Result<bool>> Handle(CancelPurchaseOrdersCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
+            return await ExecuteAsync(request, async () =>
             {
                 using (var transaction = await _context.BeginTransactionAsync(token))
                 {
@@ -125,7 +125,7 @@ namespace Sheaft.Application.Handlers
 
         public async Task<Result<bool>> Handle(RefusePurchaseOrdersCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
+            return await ExecuteAsync(request, async () =>
             {
                 using (var transaction = await _context.BeginTransactionAsync(token))
                 {
@@ -145,7 +145,7 @@ namespace Sheaft.Application.Handlers
 
         public async Task<Result<bool>> Handle(ProcessPurchaseOrdersCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
+            return await ExecuteAsync(request, async () =>
             {
                 using (var transaction = await _context.BeginTransactionAsync(token))
                 {
@@ -164,7 +164,7 @@ namespace Sheaft.Application.Handlers
 
         public async Task<Result<bool>> Handle(CompletePurchaseOrdersCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
+            return await ExecuteAsync(request, async () =>
             {
                 using (var transaction = await _context.BeginTransactionAsync(token))
                 {
@@ -183,7 +183,7 @@ namespace Sheaft.Application.Handlers
 
         public async Task<Result<bool>> Handle(AcceptPurchaseOrdersCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
+            return await ExecuteAsync(request, async () =>
             {
                 using (var transaction = await _context.BeginTransactionAsync(token))
                 {
@@ -202,7 +202,7 @@ namespace Sheaft.Application.Handlers
 
         public async Task<Result<bool>> Handle(DeletePurchaseOrdersCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
+            return await ExecuteAsync(request, async () =>
             {
                 using (var transaction = await _context.BeginTransactionAsync(token))
                 {
@@ -221,7 +221,7 @@ namespace Sheaft.Application.Handlers
 
         public async Task<Result<bool>> Handle(ShipPurchaseOrderCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
+            return await ExecuteAsync(request, async () =>
             {
                 var purchaseOrder = await _context.GetByIdAsync<PurchaseOrder>(request.Id, token);
                 purchaseOrder.Ship();
@@ -233,7 +233,7 @@ namespace Sheaft.Application.Handlers
 
         public async Task<Result<bool>> Handle(DeliverPurchaseOrderCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
+            return await ExecuteAsync(request, async () =>
             {
                 var purchaseOrder = await _context.GetByIdAsync<PurchaseOrder>(request.Id, token);
                 purchaseOrder.Deliver();
@@ -245,7 +245,7 @@ namespace Sheaft.Application.Handlers
 
         public async Task<Result<bool>> Handle(CancelPurchaseOrderCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
+            return await ExecuteAsync(request, async () =>
             {
                 var purchaseOrder = await _context.GetByIdAsync<PurchaseOrder>(request.Id, token);
                 purchaseOrder.Cancel(request.Reason);
@@ -266,7 +266,7 @@ namespace Sheaft.Application.Handlers
 
         public async Task<Result<bool>> Handle(RefusePurchaseOrderCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
+            return await ExecuteAsync(request, async () =>
             {
                 var purchaseOrder = await _context.GetByIdAsync<PurchaseOrder>(request.Id, token);
                 purchaseOrder.Refuse(request.Reason);
@@ -284,7 +284,7 @@ namespace Sheaft.Application.Handlers
 
         public async Task<Result<bool>> Handle(ProcessPurchaseOrderCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
+            return await ExecuteAsync(request, async () =>
             {
                 var purchaseOrder = await _context.GetByIdAsync<PurchaseOrder>(request.Id, token);
                 purchaseOrder.Process();
@@ -298,7 +298,7 @@ namespace Sheaft.Application.Handlers
 
         public async Task<Result<bool>> Handle(CompletePurchaseOrderCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
+            return await ExecuteAsync(request, async () =>
             {
                 var purchaseOrder = await _context.GetByIdAsync<PurchaseOrder>(request.Id, token);
                 purchaseOrder.Complete();
@@ -312,7 +312,7 @@ namespace Sheaft.Application.Handlers
 
         public async Task<Result<bool>> Handle(AcceptPurchaseOrderCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
+            return await ExecuteAsync(request, async () =>
             {
                 var purchaseOrder = await _context.GetByIdAsync<PurchaseOrder>(request.Id, token);
                 purchaseOrder.Accept();
@@ -328,7 +328,7 @@ namespace Sheaft.Application.Handlers
 
         public async Task<Result<bool>> Handle(DeletePurchaseOrderCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
+            return await ExecuteAsync(request, async () =>
             {
                 var entity = await _context.GetByIdAsync<PurchaseOrder>(request.Id, token);
 
@@ -341,7 +341,7 @@ namespace Sheaft.Application.Handlers
 
         public async Task<Result<bool>> Handle(RestorePurchaseOrderCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
+            return await ExecuteAsync(request, async () =>
             {
                 var entity = await _context.PurchaseOrders.SingleOrDefaultAsync(a => a.Id == request.Id && a.RemovedOn.HasValue, token);
 

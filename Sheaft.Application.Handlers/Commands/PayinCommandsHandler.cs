@@ -42,7 +42,7 @@ namespace Sheaft.Application.Handlers
 
         public async Task<Result<Guid>> Handle(CreateWebPayinCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
+            return await ExecuteAsync(request, async () =>
             {
                 var order = await _context.GetByIdAsync<Order>(request.OrderId, token);
                 if(order.Status == OrderStatus.Validated)
@@ -78,7 +78,7 @@ namespace Sheaft.Application.Handlers
 
         public async Task<Result<bool>> Handle(CheckPayinsCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
+            return await ExecuteAsync(request, async () =>
             {
                 var skip = 0;
                 const int take = 100;
@@ -104,7 +104,7 @@ namespace Sheaft.Application.Handlers
 
         public async Task<Result<bool>> Handle(CheckPayinCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
+            return await ExecuteAsync(request, async () =>
             {
                 var payin = await _context.GetByIdAsync<Payin>(request.PayinId, token);
                 if (payin.Status != TransactionStatus.Created && payin.Status != TransactionStatus.Waiting)
@@ -123,7 +123,7 @@ namespace Sheaft.Application.Handlers
 
         public async Task<Result<bool>> Handle(ExpirePayinCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
+            return await ExecuteAsync(request, async () =>
             {
                 var payin = await _context.GetByIdAsync<Payin>(request.PayinId, token);
                 payin.SetStatus(TransactionStatus.Expired);
@@ -135,7 +135,7 @@ namespace Sheaft.Application.Handlers
 
         public async Task<Result<TransactionStatus>> Handle(RefreshPayinStatusCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
+            return await ExecuteAsync(request, async () =>
             {
                 var payin = await _context.GetSingleAsync<Payin>(c => c.Identifier == request.Identifier, token);
                 if (payin.Status == TransactionStatus.Succeeded || payin.Status == TransactionStatus.Failed)

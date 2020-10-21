@@ -45,7 +45,7 @@ namespace Sheaft.Application.Handlers
 
         public async Task<Result<Guid>> Handle(CreateProductCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
+            return await ExecuteAsync(request, async () =>
             {
                 if (!string.IsNullOrWhiteSpace(request.Reference))
                 {
@@ -91,7 +91,7 @@ namespace Sheaft.Application.Handlers
 
         public async Task<Result<bool>> Handle(UpdateProductCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
+            return await ExecuteAsync(request, async () =>
             {
                 var entity = await _context.GetByIdAsync<Product>(request.Id, token);
 
@@ -130,7 +130,7 @@ namespace Sheaft.Application.Handlers
 
         public async Task<Result<bool>> Handle(RateProductCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
+            return await ExecuteAsync(request, async () =>
             {
                 var user = await _context.GetByIdAsync<User>(request.RequestUser.Id, token);
                 var entity = await _context.GetByIdAsync<Product>(request.Id, token);
@@ -145,7 +145,7 @@ namespace Sheaft.Application.Handlers
 
         public async Task<Result<bool>> Handle(SetProductsAvailabilityCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
+            return await ExecuteAsync(request, async () =>
             {
                 using (var transaction = await _context.BeginTransactionAsync(token))
                 {
@@ -164,7 +164,7 @@ namespace Sheaft.Application.Handlers
 
         public async Task<Result<bool>> Handle(SetProductAvailabilityCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
+            return await ExecuteAsync(request, async () =>
             {
                 var entity = await _context.GetByIdAsync<Product>(request.Id, token);
                 entity.SetAvailable(request.Available);
@@ -176,7 +176,7 @@ namespace Sheaft.Application.Handlers
 
         public async Task<Result<bool>> Handle(DeleteProductsCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
+            return await ExecuteAsync(request, async () =>
             {
                 using (var transaction = await _context.BeginTransactionAsync(token))
                 {
@@ -195,7 +195,7 @@ namespace Sheaft.Application.Handlers
 
         public async Task<Result<bool>> Handle(DeleteProductCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
+            return await ExecuteAsync(request, async () =>
             {
                 var entity = await _context.GetByIdAsync<Product>(request.Id, token);
                 _context.Remove(entity);
@@ -207,7 +207,7 @@ namespace Sheaft.Application.Handlers
 
         public async Task<Result<Guid>> Handle(QueueImportProductsCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
+            return await ExecuteAsync(request, async () =>
             {
                 var producer = await _context.GetByIdAsync<Producer>(request.RequestUser.Id, token);
                 var entity = new Job(Guid.NewGuid(), JobKind.ImportProducts, $"Import produits", producer);
@@ -226,7 +226,7 @@ namespace Sheaft.Application.Handlers
 
         public async Task<Result<bool>> Handle(ImportProductsCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
+            return await ExecuteAsync(request, async () =>
             {
                 var products = new List<Product>();
                 var job = await _context.GetByIdAsync<Job>(request.Id, token);
@@ -290,7 +290,7 @@ namespace Sheaft.Application.Handlers
 
         public async Task<Result<bool>> Handle(RestoreProductCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
+            return await ExecuteAsync(request, async () =>
             {
                 var entity = await _context.Products.SingleOrDefaultAsync(a => a.Id == request.Id && a.RemovedOn.HasValue, token);
                 _context.Restore(entity);
