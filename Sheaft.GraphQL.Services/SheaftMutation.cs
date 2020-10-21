@@ -413,7 +413,7 @@ namespace Sheaft.GraphQL.Services
             return deliveryQueries.GetDelivery(result, CurrentUser);
         }
 
-        public async Task<IQueryable<DeliveryModeDto>>UpdateDeliveryModeAsync(UpdateDeliveryModeInput input, [Service] IDeliveryQueries deliveryQueries)
+        public async Task<IQueryable<DeliveryModeDto>> UpdateDeliveryModeAsync(UpdateDeliveryModeInput input, [Service] IDeliveryQueries deliveryQueries)
         {
             SetLogTransaction("GraphQL", nameof(UpdateDeliveryModeAsync));
             await ExecuteCommandAsync<UpdateDeliveryModeCommand, bool>(_mapper.Map(input, new UpdateDeliveryModeCommand(CurrentUser)), Token);
@@ -446,24 +446,34 @@ namespace Sheaft.GraphQL.Services
             return await ExecuteCommandAsync<DeleteReturnableCommand, bool>(_mapper.Map(input, new DeleteReturnableCommand(CurrentUser)), Token);
         }
 
-        private async Task<T> ExecuteCommandAsync<U, T>(U input, CancellationToken token) where U : Command<T>
+        private async Task<T> ExecuteCommandAsync<U, T>(U input, CancellationToken token) where U : ICommand<T>
         {
             var command = typeof(U).Name;
 
-            _logger.LogInformation($"Executing mutation {command}");
-            var result = await _mediator.Process(input, token);
-            _logger.LogTrace($"Mutation {command} result: {result.Success}");
+            using (var scope = _logger.BeginScope(new Dictionary<string, object>
+            {
+                ["UserIdentifier"] = CurrentUser.Id.ToString("N"),
+                ["Roles"] = string.Join(';', CurrentUser.Roles),
+                ["IsAuthenticated"] = CurrentUser.IsAuthenticated,
+                ["GraphQL"] = command,
+            }))
+            {
+                _logger.LogInformation($"Executing mutation {command}");
+                var result = await _mediator.Process(input, token);
 
-            var currentTransaction = NewRelic.Api.Agent.NewRelic.GetAgent().CurrentTransaction;
-            currentTransaction.AddCustomAttribute("CommandSucceeded", result.Success);
+                var currentTransaction = NewRelic.Api.Agent.NewRelic.GetAgent().CurrentTransaction;
+                currentTransaction.AddCustomAttribute("CommandSucceeded", result.Success);
 
-            if (result.Success)
-                return result.Data;
+                if (result.Success)
+                {
+                    _logger.LogDebug($"Mutation {command} succeeded");
+                    return result.Data;
+                }
+                else
+                    _logger.LogDebug($"Mutation {command} failed");
 
-            if (result.Exception != null)
-                throw result.Exception;
-
-            throw new UnexpectedException(result.Message);
+                throw new UnexpectedException(result.Message);
+            }
         }
 
         private void SetLogTransaction(string category, string name)
@@ -471,7 +481,7 @@ namespace Sheaft.GraphQL.Services
             NewRelic.Api.Agent.NewRelic.SetTransactionName(category, name);
 
             var currentTransaction = NewRelic.Api.Agent.NewRelic.GetAgent().CurrentTransaction;
-            currentTransaction.AddCustomAttribute("RequestIdentifier", _httpContextAccessor.HttpContext.TraceIdentifier);
+            currentTransaction.AddCustomAttribute("RequestId", _httpContextAccessor.HttpContext.TraceIdentifier);
             currentTransaction.AddCustomAttribute("UserIdentifier", CurrentUser.Id.ToString("N"));
             currentTransaction.AddCustomAttribute("IsAuthenticated", CurrentUser.IsAuthenticated);
             currentTransaction.AddCustomAttribute("Roles", string.Join(";", CurrentUser.Roles));

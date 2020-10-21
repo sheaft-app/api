@@ -46,7 +46,7 @@ namespace Sheaft.GraphQL.Services
             if (error.Exception != null && error.Exception is SheaftException exc)
             {
                 exception = exc;
-                
+
                 if (exc.Error.HasValue)
                     message = _localizer[exc.Error.Value.ToString("G"), exc.Params ?? new object[] { }];
 
@@ -98,10 +98,11 @@ namespace Sheaft.GraphQL.Services
             {
                 statusCode = 401;
                 kind = ExceptionKind.Unauthorized;
+                message = _localizer[ExceptionKind.Unauthorized.ToString("G")];
                 error = error.WithCode(ExceptionKind.Unauthorized.ToString("G"));
-                error = error.WithMessage(_localizer[ExceptionKind.Unauthorized.ToString("G")]);
+                error = error.WithMessage(message);
 
-                error = error.AddExtension(ExceptionKind.Unauthorized.ToString("G"), _localizer[ExceptionKind.Unauthorized.ToString("G")]);
+                error = error.AddExtension(ExceptionKind.Unauthorized.ToString("G"), message);
             }
 
             NewRelic.Api.Agent.NewRelic.SetTransactionName("StatusCode", statusCode.ToString());
@@ -112,11 +113,10 @@ namespace Sheaft.GraphQL.Services
 
             var parameters = new Dictionary<string, object>
             {
-                { "RequestIdentifier", _httpContextAccessor.HttpContext.TraceIdentifier },
+                { "RequestId", _httpContextAccessor.HttpContext.TraceIdentifier },
                 { "UserIdentifier", CurrentUser.Id.ToString("N") },
                 { "IsAuthenticated", CurrentUser.IsAuthenticated },
                 { "Roles", string.Join(";", CurrentUser.Roles) },
-                { "Code", error.Code },
                 { "StatusCode", statusCode },
                 { "ExceptionKind", kind },
                 { "ExceptionMessage", message },

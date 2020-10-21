@@ -9,12 +9,15 @@ using Sheaft.Application.Models;
 using Sheaft.Core;
 using Sheaft.Core.Extensions;
 using HotChocolate;
+using Microsoft.Extensions.Logging;
 
 namespace Sheaft.GraphQL.Services
 {
     public class SheaftQuery
     {
         private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly ILogger<SheaftQuery> _logger;
+
         private CancellationToken Token => _httpContextAccessor.HttpContext.RequestAborted;
         private RequestUser CurrentUser
         {
@@ -27,9 +30,12 @@ namespace Sheaft.GraphQL.Services
             }
         }
 
-        public SheaftQuery(IHttpContextAccessor httpContextAccessor)
+        public SheaftQuery(
+            IHttpContextAccessor httpContextAccessor, 
+            ILogger<SheaftQuery> logger)
         {
             _httpContextAccessor = httpContextAccessor;
+            _logger = logger;
         }
 
         public async Task<string> GetFreshdeskTokenAsync([Service] IUserQueries userQueries)
@@ -378,6 +384,17 @@ namespace Sheaft.GraphQL.Services
             currentTransaction.AddCustomAttribute("IsAuthenticated", CurrentUser.IsAuthenticated);
             currentTransaction.AddCustomAttribute("Roles", string.Join(";", CurrentUser.Roles));
             currentTransaction.AddCustomAttribute("GraphQL", name);
+
+            using (var scope = _logger.BeginScope(new Dictionary<string, object>
+            {
+                ["UserIdentifier"] = CurrentUser.Id.ToString("N"),
+                ["Roles"] = string.Join(';', CurrentUser.Roles),
+                ["IsAuthenticated"] = CurrentUser.IsAuthenticated,
+                ["GraphQL"] = name,
+            }))
+            {
+                _logger.LogInformation($"Querying {name}");
+            }
         }
     }
 }

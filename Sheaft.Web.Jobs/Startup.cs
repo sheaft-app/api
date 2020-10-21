@@ -70,6 +70,8 @@ namespace Sheaft.Web.Jobs
             }
 
             Log.Logger = logger.CreateLogger();
+
+            GlobalConfiguration.Configuration.UseSerilogLogProvider();
         }
 
         public IConfiguration Configuration { get; }
@@ -79,6 +81,7 @@ namespace Sheaft.Web.Jobs
         public void ConfigureServices(IServiceCollection services)
         {
             GlobalJobFilters.Filters.Add(new ProlongExpirationTimeAttribute());
+            GlobalJobFilters.Filters.Add(new LogEverythingAttribute());
 
             var mailerSettings = Configuration.GetSection(MailerOptions.SETTING);
             services.Configure<MailerOptions>(mailerSettings);

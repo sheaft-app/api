@@ -3,6 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
 using Sheaft.Core;
+using Sheaft.Exceptions;
 
 namespace Sheaft.Application.Interop
 {
@@ -19,8 +20,10 @@ namespace Sheaft.Application.Interop
         public async Task<Result<T>> Execute<T>(string jobname, IRequest<Result<T>> data, CancellationToken token)
         {
             var result = await _mediatr.Send(data, token);
-            if (!result.Success)
+            if (!result.Success && result.Exception != null)
                 throw result.Exception;
+            else if (!result.Success)
+                throw new UnexpectedException(MessageKind.Unexpected);
 
             return result;
         }

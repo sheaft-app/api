@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq.Expressions;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -124,19 +123,19 @@ namespace Sheaft.Application.Interop
 
             if (e is SheaftException sheaftException)
             {
-                _logger.LogError(sheaftException, GetLogMessage(type, sheaftException.Message));
+                _logger.LogError(sheaftException, $"Error on executing {type} : {sheaftException.Message}");
                 return Failed<T>(sheaftException.InnerException ?? sheaftException);
             }
 
             if (e is DbUpdateConcurrencyException dbUpdateConcurrency)
             {
-                _logger.LogError(dbUpdateConcurrency, GetLogMessage(type, dbUpdateConcurrency.Message));
+                _logger.LogError(dbUpdateConcurrency, $"Error on executing {type} : {dbUpdateConcurrency.Message}");
                 return Conflict<T>(dbUpdateConcurrency.InnerException ?? dbUpdateConcurrency);
             }
 
             if (e is DbUpdateException dbUpdate)
             {
-                _logger.LogError(dbUpdate, GetLogMessage(type, dbUpdate.Message));
+                _logger.LogError(dbUpdate, $"Error on executing {type} : {dbUpdate.Message}");
 
                 if (dbUpdate.InnerException != null && dbUpdate.InnerException.Message.Contains("Cannot insert duplicate key row in object"))
                     return Failed<T>(new AlreadyExistsException(dbUpdate.InnerException));
@@ -146,64 +145,79 @@ namespace Sheaft.Application.Interop
 
             if (e is NotSupportedException notSupported)
             {
-                _logger.LogError(notSupported, GetLogMessage(type, notSupported.Message));
+                _logger.LogError(notSupported, $"Error on executing {type} : {notSupported.Message}");
                 return Failed<T>(notSupported.InnerException ?? notSupported);
             }
 
             if (e is InvalidOperationException invalidOperation)
             {
-                _logger.LogError(invalidOperation, GetLogMessage(type, invalidOperation.Message));
+                _logger.LogError(invalidOperation, $"Error on executing {type} : {invalidOperation.Message}");
                 return Failed<T>(invalidOperation.InnerException ?? invalidOperation);
             }
-            
-            _logger.LogError(e, GetLogMessage(type, e.Message));
-            return InternalError<T>(e.InnerException ?? e);
-        }
 
-        private static string GetLogMessage(string type, string message)
-        {
-            return $"Exception occured while executing {type} : {message}";
+            _logger.LogError(e, $"Error on executing {type} : {e.Message}");
+            return InternalError<T>(e.InnerException ?? e);
         }
 
         protected async Task<Result<T>> ExecuteAsync<T>(ICommand<T> request, Func<Task<Result<T>>> method)
         {
-            try
+            var type = request.GetType().Name;
+            using (var scope = _logger.BeginScope(new Dictionary<string, object>
             {
-                var type = request.GetType().Name;
-                _logger.LogInformation($"Executing {type}");
-                var result = await method();
-
-                if(result.Success)
-                    _logger.LogInformation($"{type} succeeded.");
-                else
-                    _logger.LogInformation($"{type} failed.");
-
-                return result;
-            }
-            catch (Exception e)
+                ["RequestId"] = request.RequestUser.RequestId,
+                ["UserIdentifier"] = request.RequestUser.Id.ToString("N"),
+                ["Roles"] = string.Join(';', request.RequestUser.Roles),
+                ["IsAuthenticated"] = request.RequestUser.IsAuthenticated,
+                ["Command"] = type,
+            }))
             {
-                return HandleException(request, e);
+                try
+                {
+                    _logger.LogInformation($"Executing {type}");
+                    var result = await method();
+
+                    if (result.Success)
+                        _logger.LogDebug($"{type} succeeded.");
+                    else
+                        _logger.LogDebug($"{type} failed.");
+
+                    return result;
+                }
+                catch (Exception e)
+                {
+                    return HandleException(request, e);
+                }
             }
         }
 
         protected async Task<Result<IEnumerable<T>>> ExecuteAsync<T>(ICommand<IEnumerable<T>> request, Func<Task<Result<IEnumerable<T>>>> method)
         {
-            try
+            var type = request.GetType().Name;
+            using (var scope = _logger.BeginScope(new Dictionary<string, object>
             {
-                var type = request.GetType().Name;
-                _logger.LogInformation($"Executing {type}");
-                var result = await method();
-
-                if (result.Success)
-                    _logger.LogInformation($"{type} succeeded.");
-                else
-                    _logger.LogInformation($"{type} failed.");
-
-                return result;
-            }
-            catch (Exception e)
+                ["RequestId"] = request.RequestUser.RequestId,
+                ["UserIdentifier"] = request.RequestUser.Id.ToString("N"),
+                ["Roles"] = string.Join(';', request.RequestUser.Roles),
+                ["IsAuthenticated"] = request.RequestUser.IsAuthenticated,
+                ["Command"] = type,
+            }))
             {
-                return HandleException(request, e);
+                try
+                {
+                    _logger.LogInformation($"Executing {type}");
+                    var result = await method();
+
+                    if (result.Success)
+                        _logger.LogDebug($"{type} succeeded.");
+                    else
+                        _logger.LogDebug($"{type} failed.");
+
+                    return result;
+                }
+                catch (Exception e)
+                {
+                    return HandleException(request, e);
+                }
             }
         }
     }

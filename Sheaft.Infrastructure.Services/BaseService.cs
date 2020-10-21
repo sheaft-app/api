@@ -4,7 +4,6 @@ using Microsoft.Extensions.Logging;
 using Sheaft.Core;
 using Sheaft.Exceptions;
 using System.Collections.Generic;
-using Newtonsoft.Json;
 
 namespace Sheaft.Infrastructure.Services
 {
@@ -106,34 +105,29 @@ namespace Sheaft.Infrastructure.Services
         {
             if (e is SheaftException sheaftException)
             {
-                _logger.LogError(sheaftException, GetLogMessage(method, sheaftException.Message));
+                _logger.LogError(sheaftException, $"Error on executing {method} : {sheaftException.Message}");
                 return Failed<T>(sheaftException.InnerException ?? sheaftException);
             }
 
             if (e is NotSupportedException notSupported)
             {
-                _logger.LogError(notSupported, GetLogMessage(method, notSupported.Message));
+                _logger.LogError(notSupported, $"Error on executing {method} : {notSupported.Message}");
                 return Failed<T>(notSupported.InnerException ?? notSupported);
             }
 
             if (e is InvalidOperationException invalidOperation)
             {
-                _logger.LogError(invalidOperation, GetLogMessage(method, invalidOperation.Message));
+                _logger.LogError(invalidOperation, $"Error on executing {method} : {invalidOperation.Message}");
                 return Failed<T>(invalidOperation.InnerException ?? invalidOperation);
             }
 
-            _logger.LogError(e, GetLogMessage(method, e.Message));
+            _logger.LogError(e, $"Error on executing {method} : {e.Message}");
             return InternalError<T>(e.InnerException ?? e);
-        }
-
-        private static string GetLogMessage(string type, string message)
-        {
-            return $"Exception occured while executing {type} : {message}";
         }
 
         protected async Task<Result<T>> ExecuteAsync<T>(Func<Task<Result<T>>> method)
         {
-            var type = method.Method.Name.Split('>')[0].Replace("<", string.Empty);
+            var type = method.Method.Name.Split('>')[0].Replace("<", string.Empty)+ "()";
 
             try
             {
@@ -141,9 +135,9 @@ namespace Sheaft.Infrastructure.Services
                 var result = await method();
 
                 if (result.Success)
-                    _logger.LogInformation($"{type} succeeded.");
+                    _logger.LogDebug($"{type} succeeded.");
                 else
-                    _logger.LogInformation($"{type} failed.");
+                    _logger.LogDebug($"{type} failed.");
 
                 return result;
             }
@@ -155,7 +149,7 @@ namespace Sheaft.Infrastructure.Services
 
         protected async Task<Result<IEnumerable<T>>> ExecuteAsync<T>(object request, Func<Task<Result<IEnumerable<T>>>> method)
         {
-            var type = method.Method.Name;
+            var type = method.Method.Name.Split('>')[0].Replace("<", string.Empty) + "()";
 
             try
             {
@@ -163,9 +157,9 @@ namespace Sheaft.Infrastructure.Services
                 var result = await method();
 
                 if (result.Success)
-                    _logger.LogInformation($"{type} succeeded.");
+                    _logger.LogDebug($"{type} succeeded.");
                 else
-                    _logger.LogInformation($"{type} failed.");
+                    _logger.LogDebug($"{type} failed.");
 
                 return result;
             }
