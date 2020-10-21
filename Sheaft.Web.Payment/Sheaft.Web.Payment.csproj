@@ -26,6 +26,7 @@
     <ProjectReference Include="..\Sheaft.Infrastructure.Persistence\Sheaft.Infrastructure.Persistence.csproj" />
     <ProjectReference Include="..\Sheaft.Application.Mappers\Sheaft.Application.Mappers.csproj" />
     <ProjectReference Include="..\Sheaft.Options\Sheaft.Options.csproj" />
+    <ProjectReference Include="..\Sheaft.Web.Common\Sheaft.Web.Common.csproj" />
   </ItemGroup>
 
   <ItemGroup>

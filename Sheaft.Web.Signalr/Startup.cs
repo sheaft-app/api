@@ -19,6 +19,7 @@ using Serilog.Events;
 using Sheaft.Application.Commands;
 using Sheaft.Application.Interop;
 using Sheaft.Options;
+using Sheaft.Web.Common;
 using Sheaft.Web.Signalr.Controllers;
 using System.Collections.Generic;
 using System.Linq;
@@ -182,6 +183,8 @@ namespace Sheaft.Web.Signalr
             {
                 app.UseDeveloperExceptionPage();
             }
+
+            app.UseRobotsTxt();
 
             app.UseRouting();
 

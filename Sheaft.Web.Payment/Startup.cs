@@ -17,6 +17,7 @@ using Sheaft.Application.Commands;
 using Sheaft.Application.Interop;
 using Sheaft.Infrastructure.Services;
 using Sheaft.Options;
+using Sheaft.Web.Common;
 using System.Collections.Generic;
 using System.Reflection;
 
@@ -115,6 +116,8 @@ namespace Sheaft.Web.Payment
             {
                 app.UseHsts();
             }
+
+            app.UseRobotsTxt();
 
             app.UseHttpsRedirection();
 

@@ -35,6 +35,7 @@ using Amazon;
 using Serilog;
 using Serilog.Events;
 using NewRelic.LogEnrichers.Serilog;
+using Sheaft.Web.Common;
 
 namespace Sheaft.Web.Manage
 {
@@ -279,6 +280,9 @@ namespace Sheaft.Web.Manage
                 app.UseExceptionHandler("/Error");
                 app.UseHsts();
             }
+
+            app.UseRobotsTxt();
+
             app.UseHttpsRedirection();
             app.UseStaticFiles();
 

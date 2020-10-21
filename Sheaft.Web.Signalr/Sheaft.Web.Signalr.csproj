@@ -27,6 +27,7 @@
     <ProjectReference Include="..\Sheaft.Application.Handlers\Sheaft.Application.Handlers.csproj" />
     <ProjectReference Include="..\Sheaft.Infrastructure.Persistence\Sheaft.Infrastructure.Persistence.csproj" />
     <ProjectReference Include="..\Sheaft.Infrastructure.Services\Sheaft.Infrastructure.Services.csproj" />
+    <ProjectReference Include="..\Sheaft.Web.Common\Sheaft.Web.Common.csproj" />
   </ItemGroup>
   <ItemGroup>
     <Content Update="appsettings.json">

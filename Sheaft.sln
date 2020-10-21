@@ -74,7 +74,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sheaft.Web.Payment", "Sheaf
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sheaft.Web.Signalr", "Sheaft.Web.Signalr\Sheaft.Web.Signalr.csproj", "{AA07C7A0-2FB8-4586-A800-62201938E607}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sheaft.Web.Jobs", "Sheaft.Web.Jobs\Sheaft.Web.Jobs.csproj", "{CE8B0658-EDB9-4DAD-AA63-08180512C740}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sheaft.Web.Jobs", "Sheaft.Web.Jobs\Sheaft.Web.Jobs.csproj", "{CE8B0658-EDB9-4DAD-AA63-08180512C740}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sheaft.Web.Common", "Sheaft.Web.Common\Sheaft.Web.Common.csproj", "{E2B3A05C-81FE-47D5-B0BB-8C1CA4ECBFA7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -186,6 +188,10 @@ Global
 		{CE8B0658-EDB9-4DAD-AA63-08180512C740}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CE8B0658-EDB9-4DAD-AA63-08180512C740}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CE8B0658-EDB9-4DAD-AA63-08180512C740}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E2B3A05C-81FE-47D5-B0BB-8C1CA4ECBFA7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E2B3A05C-81FE-47D5-B0BB-8C1CA4ECBFA7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E2B3A05C-81FE-47D5-B0BB-8C1CA4ECBFA7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E2B3A05C-81FE-47D5-B0BB-8C1CA4ECBFA7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -217,6 +223,7 @@ Global
 		{78C8879C-E418-41FA-A145-ABBC298811E1} = {E06A5FA4-720B-4357-BD73-4A06A34B67BE}
 		{AA07C7A0-2FB8-4586-A800-62201938E607} = {E06A5FA4-720B-4357-BD73-4A06A34B67BE}
 		{CE8B0658-EDB9-4DAD-AA63-08180512C740} = {E06A5FA4-720B-4357-BD73-4A06A34B67BE}
+		{E2B3A05C-81FE-47D5-B0BB-8C1CA4ECBFA7} = {E06A5FA4-720B-4357-BD73-4A06A34B67BE}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {CB01E52E-C0CE-48D8-B4A5-3646A7201224}

@@ -21,7 +21,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using NewRelic.LogEnrichers.Serilog;
 using Newtonsoft.Json;
@@ -37,6 +36,7 @@ using Sheaft.Core;
 using Sheaft.Infrastructure.Persistence;
 using Sheaft.Infrastructure.Services;
 using Sheaft.Options;
+using Sheaft.Web.Common;
 
 namespace Sheaft.Web.Jobs
 {
@@ -281,6 +281,8 @@ namespace Sheaft.Web.Jobs
                 app.UseExceptionHandler("/Error");
                 app.UseHsts();
             }
+
+            app.UseRobotsTxt();
 
             app.UseHttpsRedirection();
             app.UseStaticFiles();

@@ -46,6 +46,7 @@ using Sheaft.Infrastructure.Persistence;
 using Sheaft.Infrastructure.Services;
 using Sheaft.Options;
 using Sheaft.Web.Api.Authorize;
+using Sheaft.Web.Common;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -396,6 +397,8 @@ namespace Sheaft.Web.Api
             {
                 app.UseHsts();
             }
+
+            app.UseRobotsTxt();
 
             app.UseHttpsRedirection();
             app.UseCors(MyAllowSpecificOrigins);
