@@ -6,6 +6,7 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.2.0" />
+    <PackageReference Include="NewRelic.Agent.Api" Version="8.33.0" />
   </ItemGroup>
 
 </Project>
