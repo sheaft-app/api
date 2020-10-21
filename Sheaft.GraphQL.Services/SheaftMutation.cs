@@ -15,11 +15,14 @@ using Microsoft.Extensions.Logging;
 using Sheaft.Exceptions;
 using Sheaft.Core;
 using Sheaft.Application.Interop;
+using Newtonsoft.Json;
+using Microsoft.Extensions.Configuration;
 
 namespace Sheaft.GraphQL.Services
 {
     public class SheaftMutation
     {
+        private readonly IConfiguration _configuration;
         private readonly ISheaftMediatr _mediator;
         private readonly IMapper _mapper;
         private readonly IHttpContextAccessor _httpContextAccessor;
@@ -37,11 +40,13 @@ namespace Sheaft.GraphQL.Services
         }
 
         public SheaftMutation(
+            IConfiguration configuration,
             ISheaftMediatr mediator,
             IMapper mapper,
             IHttpContextAccessor httpContextAccessor,
             ILogger<SheaftMutation> logger)
         {
+            _configuration = configuration;
             _mediator = mediator;
             _mapper = mapper;
             _httpContextAccessor = httpContextAccessor;
@@ -456,6 +461,7 @@ namespace Sheaft.GraphQL.Services
                 ["Roles"] = string.Join(';', CurrentUser.Roles),
                 ["IsAuthenticated"] = CurrentUser.IsAuthenticated.ToString(),
                 ["GraphQL"] = command,
+                ["Datas"] = _configuration.GetValue<bool?>("NEW_RELIC_LOG_DATA_MUTATION") ?? true ? JsonConvert.SerializeObject(input) : null
             }))
             {
                 _logger.LogInformation($"Executing mutation {command}");

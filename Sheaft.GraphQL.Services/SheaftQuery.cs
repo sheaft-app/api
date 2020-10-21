@@ -10,11 +10,14 @@ using Sheaft.Core;
 using Sheaft.Core.Extensions;
 using HotChocolate;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
+using Microsoft.Extensions.Configuration;
 
 namespace Sheaft.GraphQL.Services
 {
     public class SheaftQuery
     {
+        private readonly IConfiguration _configuration;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly ILogger<SheaftQuery> _logger;
 
@@ -31,9 +34,11 @@ namespace Sheaft.GraphQL.Services
         }
 
         public SheaftQuery(
+            IConfiguration configuration,
             IHttpContextAccessor httpContextAccessor, 
             ILogger<SheaftQuery> logger)
         {
+            _configuration = configuration;
             _httpContextAccessor = httpContextAccessor;
             _logger = logger;
         }
@@ -82,37 +87,37 @@ namespace Sheaft.GraphQL.Services
 
         public async Task<IEnumerable<ProducerDeliveriesDto>> GetStoreDeliveriesForProducersAsync(SearchProducersDeliveriesInput input, [Service] IDeliveryQueries deliveryQueries)
         {
-            SetLogTransaction("GraphQL", nameof(GetStoreDeliveriesForProducersAsync));
+            SetLogTransaction("GraphQL", nameof(GetStoreDeliveriesForProducersAsync), input);
             return await deliveryQueries.GetStoreDeliveriesForProducersAsync(CurrentUser.Id, input.Ids, input.Kinds, DateTimeOffset.UtcNow, CurrentUser, Token);
         }
 
         public async Task<IEnumerable<ProducerDeliveriesDto>> GetProducersDeliveriesAsync(SearchProducersDeliveriesInput input, [Service] IDeliveryQueries deliveryQueries)
         {
-            SetLogTransaction("GraphQL", nameof(GetProducersDeliveriesAsync));
+            SetLogTransaction("GraphQL", nameof(GetProducersDeliveriesAsync), input);
             return await deliveryQueries.GetProducersDeliveriesAsync(input.Ids, input.Kinds, DateTimeOffset.UtcNow, CurrentUser, Token);
         }
 
         public async Task<SirenBusinessDto> SearchBusinessWithSiretAsync(string input, [Service] IBusinessQueries businessQueries)
         {
-            SetLogTransaction("GraphQL", nameof(SearchBusinessWithSiretAsync));
+            SetLogTransaction("GraphQL", nameof(SearchBusinessWithSiretAsync), input);
             return await businessQueries.RetrieveSiretInfosAsync(input, CurrentUser, Token);
         }
 
         public async Task<ProducersSearchDto> SearchProducersAsync(SearchTermsInput input, [Service] IBusinessQueries businessQueries)
         {
-            SetLogTransaction("GraphQL", nameof(SearchProducersAsync));
+            SetLogTransaction("GraphQL", nameof(SearchProducersAsync), input);
             return await businessQueries.SearchProducersAsync(CurrentUser.Id, input, CurrentUser, Token);
         }
 
         public async Task<StoresSearchDto> SearchStoresAsync(SearchTermsInput input, [Service] IBusinessQueries businessQueries)
         {
-            SetLogTransaction("GraphQL", nameof(SearchStoresAsync));
+            SetLogTransaction("GraphQL", nameof(SearchStoresAsync), input);
             return await businessQueries.SearchStoresAsync(CurrentUser.Id, input, CurrentUser, Token);
         }
 
         public async Task<ProductsSearchDto> SearchProductsAsync(SearchTermsInput input, [Service] IProductQueries productQueries)
         {
-            SetLogTransaction("GraphQL", nameof(SearchProductsAsync));
+            SetLogTransaction("GraphQL", nameof(SearchProductsAsync), input);
             return await productQueries.SearchAsync(input, CurrentUser, Token);
         }
 
@@ -130,19 +135,19 @@ namespace Sheaft.GraphQL.Services
 
         public IQueryable<ProducerDto> GetProducer(Guid input, [Service] IBusinessQueries businessQueries)
         {
-            SetLogTransaction("GraphQL", nameof(GetProducer));
+            SetLogTransaction("GraphQL", nameof(GetProducer), input);
             return businessQueries.GetProducer(input, CurrentUser);
         }
 
         public IQueryable<ConsumerDto> GetConsumer(Guid input, [Service] IConsumerQueries consumerQueries)
         {
-            SetLogTransaction("GraphQL", nameof(GetConsumer));
+            SetLogTransaction("GraphQL", nameof(GetConsumer), input);
             return consumerQueries.GetConsumer(input, CurrentUser);
         }
 
         public IQueryable<StoreDto> GetStore(Guid input, [Service] IBusinessQueries businessQueries)
         {
-            SetLogTransaction("GraphQL", nameof(GetStore));
+            SetLogTransaction("GraphQL", nameof(GetStore), input);
             return businessQueries.GetStore(input, CurrentUser);
         }
 
@@ -160,43 +165,43 @@ namespace Sheaft.GraphQL.Services
 
         public IQueryable<WebPayinDto> GetWebPayinTransaction(string input, [Service] ITransactionQueries transactionQueries)
         {
-            SetLogTransaction("GraphQL", nameof(GetWebPayinTransaction));
+            SetLogTransaction("GraphQL", nameof(GetWebPayinTransaction), input);
             return transactionQueries.GetWebPayinTransaction(input, CurrentUser);
         }
 
         public IQueryable<CountryPointsDto> GetCountryPoints(Guid? input, [Service] ILeaderboardQueries leaderboardQueries)
         {
-            SetLogTransaction("GraphQL", nameof(GetCountryPoints));
+            SetLogTransaction("GraphQL", nameof(GetCountryPoints), input);
             return leaderboardQueries.CountriesPoints(input, CurrentUser);
         }
 
         public IQueryable<RegionPointsDto> GetRegionsPoints(Guid? input, [Service] ILeaderboardQueries leaderboardQueries)
         {
-            SetLogTransaction("GraphQL", nameof(GetRegionsPoints));
+            SetLogTransaction("GraphQL", nameof(GetRegionsPoints), input);
             return leaderboardQueries.RegionsPoints(input, CurrentUser);
         }
 
         public IQueryable<DepartmentPointsDto> GetDepartmentsPoints(Guid? input, [Service] ILeaderboardQueries leaderboardQueries)
         {
-            SetLogTransaction("GraphQL", nameof(GetDepartmentsPoints));
+            SetLogTransaction("GraphQL", nameof(GetDepartmentsPoints), input);
             return leaderboardQueries.DepartmentsPoints(input, CurrentUser);
         }
 
         public IQueryable<CountryUserPointsDto> GetCountryUsersPoints(Guid? input, [Service] ILeaderboardQueries leaderboardQueries)
         {
-            SetLogTransaction("GraphQL", nameof(GetCountryUsersPoints));
+            SetLogTransaction("GraphQL", nameof(GetCountryUsersPoints), input);
             return leaderboardQueries.CountryUsersPoints(input, CurrentUser);
         }
 
         public IQueryable<RegionUserPointsDto> GetRegionUsersPoints(Guid? input, [Service] ILeaderboardQueries leaderboardQueries)
         {
-            SetLogTransaction("GraphQL", nameof(GetRegionUsersPoints));
+            SetLogTransaction("GraphQL", nameof(GetRegionUsersPoints), input);
             return leaderboardQueries.RegionUsersPoints(input, CurrentUser);
         }
 
         public IQueryable<DepartmentUserPointsDto> GetDepartmentUsersPoints(Guid? input, [Service] ILeaderboardQueries leaderboardQueries)
         {
-            SetLogTransaction("GraphQL", nameof(GetDepartmentUsersPoints));
+            SetLogTransaction("GraphQL", nameof(GetDepartmentUsersPoints), input);
             return leaderboardQueries.DepartmentUsersPoints(input, CurrentUser);
         }
 
@@ -208,7 +213,7 @@ namespace Sheaft.GraphQL.Services
 
         public IQueryable<QuickOrderDto> GetQuickOrder(Guid input, [Service] IQuickOrderQueries quickOrderQueries)
         {
-            SetLogTransaction("GraphQL", nameof(GetQuickOrder));
+            SetLogTransaction("GraphQL", nameof(GetQuickOrder), input);
             return quickOrderQueries.GetQuickOrder(input, CurrentUser);
         }
 
@@ -262,7 +267,7 @@ namespace Sheaft.GraphQL.Services
 
         public IQueryable<OrderDto> GetOrder(Guid input, [Service] IOrderQueries orderQueries)
         {
-            SetLogTransaction("GraphQL", nameof(GetOrder));
+            SetLogTransaction("GraphQL", nameof(GetOrder), input);
             return orderQueries.GetOrder(input, CurrentUser);
         }
 
@@ -274,7 +279,7 @@ namespace Sheaft.GraphQL.Services
 
         public IQueryable<AgreementDto> GetAgreement(Guid input, [Service] IAgreementQueries agreementQueries)
         {
-            SetLogTransaction("GraphQL", nameof(GetAgreement));
+            SetLogTransaction("GraphQL", nameof(GetAgreement), input);
             return agreementQueries.GetAgreement(input, CurrentUser);
         }
 
@@ -286,25 +291,25 @@ namespace Sheaft.GraphQL.Services
 
         public IQueryable<AgreementDto> GetStoreAgreements(Guid input, [Service] IAgreementQueries agreementQueries)
         {
-            SetLogTransaction("GraphQL", nameof(GetStoreAgreements));
+            SetLogTransaction("GraphQL", nameof(GetStoreAgreements), input);
             return agreementQueries.GetStoreAgreements(input, CurrentUser);
         }
 
         public IQueryable<AgreementDto> GetProducerAgreements(Guid input, [Service] IAgreementQueries agreementQueries)
         {
-            SetLogTransaction("GraphQL", nameof(GetProducerAgreements));
+            SetLogTransaction("GraphQL", nameof(GetProducerAgreements), input);
             return agreementQueries.GetProducerAgreements(input, CurrentUser);
         }
 
         public IQueryable<ProductDto> GetProduct(Guid input, [Service] IProductQueries productQueries)
         {
-            SetLogTransaction("GraphQL", nameof(GetProduct));
+            SetLogTransaction("GraphQL", nameof(GetProduct), input);
             return productQueries.GetProduct(input, CurrentUser);
         }
 
         public IQueryable<ProductDto> GetProducerProducts(Guid input, [Service] IProductQueries productQueries)
         {
-            SetLogTransaction("GraphQL", nameof(GetProducerProducts));
+            SetLogTransaction("GraphQL", nameof(GetProducerProducts), input);
             return productQueries.GetProducerProducts(input, CurrentUser);
         }
 
@@ -316,7 +321,7 @@ namespace Sheaft.GraphQL.Services
 
         public IQueryable<ReturnableDto> GetReturnable(Guid input, [Service] IReturnableQueries returnableQueries)
         {
-            SetLogTransaction("GraphQL", nameof(GetReturnable));
+            SetLogTransaction("GraphQL", nameof(GetReturnable), input);
             return returnableQueries.GetReturnable(input, CurrentUser);
         }
 
@@ -328,7 +333,7 @@ namespace Sheaft.GraphQL.Services
 
         public IQueryable<JobDto> GetJob(Guid input, [Service] IJobQueries jobQueries)
         {
-            SetLogTransaction("GraphQL", nameof(GetJob));
+            SetLogTransaction("GraphQL", nameof(GetJob), input);
             return jobQueries.GetJob(input, CurrentUser);
         }
 
@@ -340,7 +345,7 @@ namespace Sheaft.GraphQL.Services
 
         public IQueryable<DeliveryModeDto> GetDelivery(Guid input, [Service] IDeliveryQueries deliveryQueries)
         {
-            SetLogTransaction("GraphQL", nameof(GetDelivery));
+            SetLogTransaction("GraphQL", nameof(GetDelivery), input);
             return deliveryQueries.GetDelivery(input, CurrentUser);
         }
 
@@ -352,7 +357,7 @@ namespace Sheaft.GraphQL.Services
 
         public IQueryable<PurchaseOrderDto> GetPurchaseOrder(Guid input, [Service] IPurchaseOrderQueries purchaseOrderQueries)
         {
-            SetLogTransaction("GraphQL", nameof(GetPurchaseOrder));
+            SetLogTransaction("GraphQL", nameof(GetPurchaseOrder), input);
             return purchaseOrderQueries.GetPurchaseOrder(input, CurrentUser);
         }
 
@@ -374,7 +379,7 @@ namespace Sheaft.GraphQL.Services
             return businessQueries.GetMyProfile(CurrentUser);
         }
 
-        private void SetLogTransaction(string category, string name)
+        private void SetLogTransaction(string category, string name, object input = null)
         {
             NewRelic.Api.Agent.NewRelic.SetTransactionName(category, name);
 
@@ -391,6 +396,7 @@ namespace Sheaft.GraphQL.Services
                 ["Roles"] = string.Join(';', CurrentUser.Roles),
                 ["IsAuthenticated"] = CurrentUser.IsAuthenticated.ToString(),
                 ["GraphQL"] = name,
+                ["Datas"] = _configuration.GetValue<bool?>("NEW_RELIC_LOG_DATA_QUERY") ?? true ? JsonConvert.SerializeObject(input) : null
             }))
             {
                 _logger.LogInformation($"Querying {name}");
