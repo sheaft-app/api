@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Http;
 using System.Threading.Tasks;
 
 namespace Sheaft.Web.Common
@@ -18,6 +17,9 @@ namespace Sheaft.Web.Common
         {
             if (context.Request.Path.Value.StartsWith("/robots"))
             {
+                if(NewRelic.Api.Agent.NewRelic.GetAgent().CurrentTransaction != null)
+                    NewRelic.Api.Agent.NewRelic.SetTransactionName("SEO", "Robots");
+
                 context.Response.ContentType = "text/plain";
                 await context.Response.WriteAsync(Default);
             }

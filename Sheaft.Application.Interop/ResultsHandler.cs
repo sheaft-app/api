@@ -164,10 +164,9 @@ namespace Sheaft.Application.Interop
             var type = request.GetType().Name;
             using (var scope = _logger.BeginScope(new Dictionary<string, object>
             {
-                ["RequestId"] = request.RequestUser.RequestId,
                 ["UserIdentifier"] = request.RequestUser.Id.ToString("N"),
                 ["Roles"] = string.Join(';', request.RequestUser.Roles),
-                ["IsAuthenticated"] = request.RequestUser.IsAuthenticated,
+                ["IsAuthenticated"] = request.RequestUser.IsAuthenticated.ToString(),
                 ["Command"] = type,
             }))
             {

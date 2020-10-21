@@ -115,7 +115,7 @@ namespace Sheaft.GraphQL.Services
             {
                 { "RequestId", _httpContextAccessor.HttpContext.TraceIdentifier },
                 { "UserIdentifier", CurrentUser.Id.ToString("N") },
-                { "IsAuthenticated", CurrentUser.IsAuthenticated },
+                { "IsAuthenticated", CurrentUser.IsAuthenticated.ToString() },
                 { "Roles", string.Join(";", CurrentUser.Roles) },
                 { "StatusCode", statusCode },
                 { "ExceptionKind", kind },

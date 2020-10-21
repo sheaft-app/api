@@ -379,9 +379,9 @@ namespace Sheaft.GraphQL.Services
             NewRelic.Api.Agent.NewRelic.SetTransactionName(category, name);
 
             var currentTransaction = NewRelic.Api.Agent.NewRelic.GetAgent().CurrentTransaction;
-            currentTransaction.AddCustomAttribute("RequestIdentifier", _httpContextAccessor.HttpContext.TraceIdentifier);
+            currentTransaction.AddCustomAttribute("RequestId", _httpContextAccessor.HttpContext.TraceIdentifier);
             currentTransaction.AddCustomAttribute("UserIdentifier", CurrentUser.Id.ToString("N"));
-            currentTransaction.AddCustomAttribute("IsAuthenticated", CurrentUser.IsAuthenticated);
+            currentTransaction.AddCustomAttribute("IsAuthenticated", CurrentUser.IsAuthenticated.ToString());
             currentTransaction.AddCustomAttribute("Roles", string.Join(";", CurrentUser.Roles));
             currentTransaction.AddCustomAttribute("GraphQL", name);
 
@@ -389,7 +389,7 @@ namespace Sheaft.GraphQL.Services
             {
                 ["UserIdentifier"] = CurrentUser.Id.ToString("N"),
                 ["Roles"] = string.Join(';', CurrentUser.Roles),
-                ["IsAuthenticated"] = CurrentUser.IsAuthenticated,
+                ["IsAuthenticated"] = CurrentUser.IsAuthenticated.ToString(),
                 ["GraphQL"] = name,
             }))
             {
