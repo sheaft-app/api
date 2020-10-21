@@ -455,13 +455,17 @@ namespace Sheaft.GraphQL.Services
         {
             var command = typeof(U).Name;
 
+            var data = JsonConvert.SerializeObject(input);
+            var outData = JsonConvert.DeserializeObject<U>(data);
+            outData.RemoveUserInfos();
+
             using (var scope = _logger.BeginScope(new Dictionary<string, object>
             {
                 ["UserIdentifier"] = CurrentUser.Id.ToString("N"),
                 ["Roles"] = string.Join(';', CurrentUser.Roles),
                 ["IsAuthenticated"] = CurrentUser.IsAuthenticated.ToString(),
                 ["GraphQL"] = command,
-                ["Datas"] = _configuration.GetValue<bool?>("NEW_RELIC_LOG_DATA_MUTATION") ?? true ? JsonConvert.SerializeObject(input) : null
+                ["Datas"] = _configuration.GetValue<bool?>("NEW_RELIC_LOG_DATA_MUTATION") ?? true ? JsonConvert.SerializeObject(outData): null
             }))
             {
                 _logger.LogInformation($"Executing mutation {command}");

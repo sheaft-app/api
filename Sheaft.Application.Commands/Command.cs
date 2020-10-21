@@ -3,7 +3,6 @@ using Sheaft.Core;
 
 namespace Sheaft.Application.Commands
 {
-
     public abstract class Command<T> : ICommand<T>
     {
         protected Command(RequestUser requestUser)
@@ -12,5 +11,10 @@ namespace Sheaft.Application.Commands
         }
 
         public RequestUser RequestUser { get; protected set; }
+
+        public void RemoveUserInfos()
+        {
+            RequestUser = null;
+        }
     }
 }
