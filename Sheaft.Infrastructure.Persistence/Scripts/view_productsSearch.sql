@@ -1,3 +1,13 @@
+/****** Object:  View [dbo].[ProductsSearch]    Script Date: 10/22/2020 8:34:09 PM ******/
+DROP VIEW [dbo].[ProductsSearch]
+GO
+
+/****** Object:  View [dbo].[ProductsSearch]    Script Date: 10/22/2020 8:34:09 PM ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
 CREATE VIEW ProductsSearch
 as
     select
@@ -5,15 +15,15 @@ as
      , p.Name as product_name
      , p.Name as partialProductName
 	 , CAST(p.QuantityPerUnit as float) as product_quantityPerUnit	
-     , case when p.Unit = 0 then 'mL'
-			when p.Unit = 1 then 'L'
-			when p.Unit = 2 then 'g'
-			when p.Unit = 3 then 'kg' end as product_unit														
+     , case when p.Unit = 1 then 'mL'
+			when p.Unit = 2 then 'L'
+			when p.Unit = 3 then 'g'
+			when p.Unit = 4 then 'kg' end as product_unit														
      , CAST(p.OnSalePricePerUnit as float) as product_onSalePricePerUnit
      , CAST(p.OnSalePrice as float) as product_onSalePrice
      , CAST(p.Rating as float) as product_rating
      , p.RatingsCount as product_ratings_count
-     , case when pa.Uid is not null then cast(1 as bit) else cast(0 as bit) end as packaged
+     , case when pa.Uid is not null then cast(1 as bit) else cast(0 as bit) end as product_returnable
      , r.Id as producer_id
      , r.Name as producer_name
      , r.Email as producer_email
@@ -42,10 +52,10 @@ as
   group by
     p.Id,
     p.Name,
-   case when p.Unit = 0 then 'mL'
-			when p.Unit = 1 then 'L'
-			when p.Unit = 2 then 'g'
-			when p.Unit = 3 then 'kg' end,
+   case when p.Unit = 1 then 'mL'
+			when p.Unit = 2 then 'L'
+			when p.Unit = 3 then 'g'
+			when p.Unit = 4 then 'kg' end,
 	CAST(p.QuantityPerUnit as float),	
 	CAST(p.OnSalePricePerUnit as float),
     CAST(p.OnSalePrice as float),
