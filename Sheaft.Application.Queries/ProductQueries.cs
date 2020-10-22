@@ -97,8 +97,10 @@ namespace Sheaft.Application.Queries
                 {
                     Id = p.Product_id,
                     Name = p.Product_name,
-                    ImageMedium = p.Product_image,
-                    Picture = p.Product_image,
+                    ImageSmall = p.Product_image.EndsWith(".jpg") ? p.Product_image : p.Product_image + "_small.jpg",
+                    ImageMedium = p.Product_image.EndsWith(".jpg") ? p.Product_image : p.Product_image + "_medium.jpg",
+                    ImageLarge = p.Product_image.EndsWith(".jpg") ? p.Product_image : p.Product_image + "_large.jpg",
+                    Picture = p.Product_image.EndsWith(".jpg") ? p.Product_image : p.Product_image + "_medium.jpg",
                     OnSalePrice = p.Product_onSalePrice ?? 0,
                     OnSalePricePerUnit = p.Product_onSalePricePerUnit ?? 0,
                     QuantityPerUnit = p.Product_quantityPerUnit ?? 0,
