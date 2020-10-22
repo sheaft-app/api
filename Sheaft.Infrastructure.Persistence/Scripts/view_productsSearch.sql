@@ -20,7 +20,12 @@ as
      , r.Phone as producer_phone
      , ra.Zipcode as producer_zipcode
      , ra.City as producer_city
-	 , dbo.GetProductImage(p.Id, p.Picture, r.Id, STRING_AGG(LOWER(case when t.Kind = 0 then t.Name end), ',')) as product_image
+	 , p.Picture as product_image
+     , case when p.Conditioning = 1 then 'BOX'
+			when p.Conditioning = 2 then 'BULK'
+			when p.Conditioning = 3 then 'BOUQUET'
+			when p.Conditioning = 4 then 'BUNCH'
+			when p.Conditioning = 5 then 'PIECE' end as product_conditioning
      , dbo.InlineMax(dbo.InlineMax(dbo.InlineMax(p.UpdatedOn, r.UpdatedOn), t.UpdatedOn), p.CreatedOn) as last_update
      , case when (dbo.InlineMax(p.RemovedOn, r.RemovedOn)) is null and p.Available = 1 then 0 else 1 end as removed
      , '[' + STRING_AGG('\"' + LOWER(t.Name) + '\"', ',') + ']' as product_tags     
@@ -51,7 +56,12 @@ as
 	r.Id,
     r.Name,
     r.Email,
-	p.Picture,
+	p.Picture,    
+    case when p.Conditioning = 1 then 'BOX'
+			when p.Conditioning = 2 then 'BULK'
+			when p.Conditioning = 3 then 'BOUQUET'
+			when p.Conditioning = 4 then 'BUNCH'
+			when p.Conditioning = 5 then 'PIECE' end,
 	r.Id,
     r.Phone,
     ra.Zipcode,

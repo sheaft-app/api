@@ -85,6 +85,19 @@ POST https://sheaft.search.windows.net/indexes?api-version=2020-06-30
       "fields": []
     },
     {
+      "name": "product_conditioning",
+      "type": "Edm.String",
+      "facetable": false,
+      "filterable": true,
+      "retrievable": true,
+      "sortable": true,
+      "analyzer": null,
+      "indexAnalyzer": null,
+      "searchAnalyzer": null,
+      "synonymMaps": [],
+      "fields": []
+    },
+    {
       "name": "product_image",
       "type": "Edm.String",
       "facetable": false,
@@ -323,26 +336,11 @@ POST https://sheaft.search.windows.net/indexes?api-version=2020-06-30
       "fields": []
     },
     {
-      "name": "packaged",
+      "name": "product_returnable",
       "type": "Edm.Boolean",
       "facetable": false,
       "filterable": true,
       "retrievable": true,
-      "sortable": false,
-      "analyzer": null,
-      "indexAnalyzer": null,
-      "searchAnalyzer": null,
-      "synonymMaps": [],
-      "fields": []
-    },
-    {
-      "name": "product_conditioning",
-      "type": "Edm.String",
-      "facetable": false,
-      "filterable": false,
-      "key": false,
-      "retrievable": true,
-      "searchable": false,
       "sortable": false,
       "analyzer": null,
       "indexAnalyzer": null,
