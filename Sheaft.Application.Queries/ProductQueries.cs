@@ -103,11 +103,11 @@ namespace Sheaft.Application.Queries
                     OnSalePricePerUnit = p.Product_onSalePricePerUnit ?? 0,
                     QuantityPerUnit = p.Product_quantityPerUnit ?? 0,
                     Rating = p.Product_rating,
-                    IsReturnable = p.Product_Returnable ?? false,
+                    IsReturnable = p.Product_returnable ?? false,
                     RatingsCount = p.Product_ratings_count,
                     Tags = p.Product_tags?.Select(t => new TagDto { Name = t }) ?? new List<TagDto>(),
-                    Unit = !string.IsNullOrWhiteSpace(p.Product_unit) ? (UnitKind)Enum.Parse(typeof(UnitKind), p.Product_unit.ToLowerInvariant()) : UnitKind.NotSpecified,
-                    Conditioning = !string.IsNullOrWhiteSpace(p.Product_conditioning) ? (ConditioningKind)Enum.Parse(typeof(ConditioningKind), p.Product_conditioning.ToLowerInvariant()) : ConditioningKind.Not_Specified,
+                    Unit = !string.IsNullOrWhiteSpace(p.Product_unit) ? Enum.Parse<UnitKind>(p.Product_unit.ToLowerInvariant(), true) : UnitKind.NotSpecified,
+                    Conditioning = !string.IsNullOrWhiteSpace(p.Product_conditioning) ? Enum.Parse<ConditioningKind>(p.Product_conditioning, true) : ConditioningKind.Not_Specified,
                     Producer = new BusinessProfileDto
                     {
                         Id = p.Producer_id,
@@ -183,7 +183,7 @@ namespace Sheaft.Application.Queries
             public string Producer_phone { get; set; }
             public double Producer_longitude { get; set; }
             public double Producer_latitude { get; set; }
-            public bool? Product_Returnable { get; set; }
+            public bool? Product_returnable { get; set; }
             public string Product_conditioning { get; set; }
             public string Product_weight { get; set; }
         }
