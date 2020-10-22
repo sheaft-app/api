@@ -353,13 +353,13 @@ namespace Sheaft.Application.Handlers
                 case "bouquet":
                     conditioningKind = ConditioningKind.Bouquet;
                     break;
-                case "boite":
+                case "boîte":
                     conditioningKind = ConditioningKind.Box;
                     break;
                 case "botte":
                     conditioningKind = ConditioningKind.Bunch;
                     break;
-                case "piece":
+                case "pièce":
                     conditioningKind = ConditioningKind.Piece;
                     break;
             }
@@ -375,9 +375,6 @@ namespace Sheaft.Application.Handlers
             switch (availableStr)
             {
                 case "non":
-                case "no":
-                case "ko":
-                case "0":
                     createProductCommand.Available = false;
                     break;
                 default:
@@ -388,9 +385,6 @@ namespace Sheaft.Application.Handlers
             switch (bioStr)
             {
                 case "oui":
-                case "yes":
-                case "ok":
-                case "1":
                     tagsStr += ";bio";
                     break;
             }
