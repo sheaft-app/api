@@ -41,7 +41,7 @@ namespace Sheaft.Application.Queries
                 SearchFields = new List<string> { "partialProductName" },
                 Select = new List<string>()
                     {
-                        "product_id", "product_name", "product_onSalePricePerUnit", "product_onSalePrice", "product_rating", "product_ratings_count", "product_image", "product_tags", "producer_id", "producer_name", "producer_email", "producer_phone", "producer_zipcode", "producer_city", "producer_longitude", "producer_latitude", "packaged", "product_unit", "product_quantityPerUnit"
+                        "product_id", "product_name", "product_onSalePricePerUnit", "product_onSalePrice", "product_rating", "product_ratings_count", "product_image", "product_tags", "producer_id", "producer_name", "producer_email", "producer_phone", "producer_zipcode", "producer_city", "producer_longitude", "producer_latitude", "product_returnable", "product_unit", "product_quantityPerUnit", "product_conditioning"
                     },
                 IncludeTotalResultCount = true,
                 HighlightFields = new List<string>() { "product_name", "producer_name" },
