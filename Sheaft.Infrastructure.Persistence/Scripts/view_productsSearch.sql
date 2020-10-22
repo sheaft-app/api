@@ -28,7 +28,7 @@ as
 			when p.Conditioning = 5 then 'PIECE' end as product_conditioning
      , dbo.InlineMax(dbo.InlineMax(dbo.InlineMax(p.UpdatedOn, r.UpdatedOn), t.UpdatedOn), p.CreatedOn) as last_update
      , case when (dbo.InlineMax(p.RemovedOn, r.RemovedOn)) is null and p.Available = 1 then 0 else 1 end as removed
-     , '[' + STRING_AGG('\"' + LOWER(t.Name) + '\"', ',') + ']' as product_tags     
+     , '[' + STRING_AGG('"' + LOWER(t.Name) + '"', ',') + ']' as product_tags     
      , ra.Longitude as producer_longitude
      , ra.Latitude as producer_latitude
      , geography::STGeomFromText('POINT('+convert(varchar(20),ra.Longitude)+' '+convert(varchar(20),ra.Latitude)+')',4326) as producer_geolocation
