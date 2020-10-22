@@ -344,27 +344,29 @@ namespace Sheaft.Application.Handlers
             else
                 createProductCommand.QuantityPerUnit = qtyPerUnit;
 
-            var conditioningKind = ConditioningKind.Not_Specified;
             switch (conditioningStr)
             {
                 case "poids":
-                    conditioningKind = ConditioningKind.Bulk;
+                    createProductCommand.Conditioning = ConditioningKind.Bulk;
                     break;
                 case "bouquet":
-                    conditioningKind = ConditioningKind.Bouquet;
+                    createProductCommand.Conditioning = ConditioningKind.Bouquet;
                     break;
                 case "boîte":
-                    conditioningKind = ConditioningKind.Box;
+                    createProductCommand.Conditioning = ConditioningKind.Box;
                     break;
                 case "botte":
-                    conditioningKind = ConditioningKind.Bunch;
+                    createProductCommand.Conditioning = ConditioningKind.Bunch;
                     break;
                 case "pièce":
-                    conditioningKind = ConditioningKind.Piece;
+                    createProductCommand.Conditioning = ConditioningKind.Piece;
+                    break;
+                default:
+                    createProductCommand.Conditioning = ConditioningKind.Not_Specified;
                     break;
             }
 
-            if (conditioningKind == ConditioningKind.Bulk)
+            if (createProductCommand.Conditioning == ConditioningKind.Bulk)
             {
                 if (!Enum.TryParse(unitKindStr, true, out UnitKind unitKind))
                     return Failed<CreateProductCommand>(new ValidationException(MessageKind.CreateProduct_UnitKind_Invalid_Line, i));
@@ -382,6 +384,9 @@ namespace Sheaft.Application.Handlers
                     break;
             }
 
+            if (tagsStr.EndsWith('s'))
+                tagsStr = tagsStr.Substring(0, tagsStr.Length - 1);
+
             switch (bioStr)
             {
                 case "oui":
@@ -389,7 +394,9 @@ namespace Sheaft.Application.Handlers
                     break;
             }
 
-            var tags = await _context.FindAsync<Tag>(t => tagsStr.Contains(t.Name.ToLower()), token);
+            var tagsAsStr = tagsStr.Split(";");
+
+            var tags = await _context.FindAsync<Tag>(t => tagsAsStr.Any(c => c.Contains(t.Name.ToLower())), token);
             createProductCommand.Tags = tags.Select(t => t.Id);
 
             return Ok(createProductCommand);
