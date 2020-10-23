@@ -18,6 +18,8 @@ namespace Sheaft.GraphQL.Types
             descriptor.Field(c => c.Conditioning);
             descriptor.Field(c => c.Rating);
             descriptor.Field(c => c.ImageMedium);
+            descriptor.Field(c => c.ImageSmall);
+            descriptor.Field(c => c.ImageLarge);
             descriptor.Field(c => c.Picture);
             descriptor.Field(c => c.IsReturnable);
 
