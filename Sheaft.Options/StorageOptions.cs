@@ -12,6 +12,8 @@
         public StorageContainers Containers { get; set; }
         public StorageTables Tables { get; set; }
         public StorageQueues Queues { get; set; }
+        public string ContentHostname { get; set; } = "content.sheaft.com";
+        public string ContentScheme { get; set; } = "https";
     }
 
     public class StorageContainers

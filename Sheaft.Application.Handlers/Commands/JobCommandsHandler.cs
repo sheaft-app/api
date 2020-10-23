@@ -385,7 +385,7 @@ namespace Sheaft.Application.Handlers
                     break;
                 case JobKind.ImportProducts:
                     var importProductsCommand = JsonConvert.DeserializeObject<ImportProductsCommand>(entity.Command);
-                    _mediatr.Post(new ImportProductsCommand(requestUser) { Id = importProductsCommand.Id, Uri = importProductsCommand.Uri });
+                    _mediatr.Post(new ImportProductsCommand(requestUser) { Id = importProductsCommand.Id });
                     break;
             }
         }

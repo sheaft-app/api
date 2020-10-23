@@ -82,7 +82,7 @@ namespace Sheaft.Application.Handlers
                             CreateExcelPickingFile(package, job.Name, purchaseOrders);
                         }
 
-                        var response = await _blobsService.UploadPickingOrderFileAsync(request.RequestUser.Id, job.Id, $"Preparation_{job.CreatedOn:dd-MM-yyyy}.xlsx", stream, token);
+                        var response = await _blobsService.UploadPickingOrderFileAsync(request.RequestUser.Id, job.Id, $"Preparation_{job.CreatedOn:dd-MM-yyyy}.xlsx", stream.ToArray(), token);
                         if (!response.Success)
                             throw response.Exception;
 

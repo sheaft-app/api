@@ -212,14 +212,14 @@ namespace Sheaft.Application.Handlers
                 var producer = await _context.GetByIdAsync<Producer>(request.RequestUser.Id, token);
                 var entity = new Job(Guid.NewGuid(), JobKind.ImportProducts, $"Import produits", producer);
 
-                var response = await _blobService.UploadImportProductsFileAsync(producer.Id, entity.Id, request.FileName, request.FileStream, token);
+                var response = await _blobService.UploadImportProductsFileAsync(producer.Id, entity.Id, request.FileStream, token);
                 if (!response.Success)
                     return Failed<Guid>(response.Exception);
 
                 await _context.AddAsync(entity, token);
                 await _context.SaveChangesAsync(token);
 
-                _mediatr.Post(new ImportProductsCommand(request.RequestUser) { Id = entity.Id, Uri = response.Data });
+                _mediatr.Post(new ImportProductsCommand(request.RequestUser) { Id = entity.Id });
                 return Created(entity.Id);
             });
         }
@@ -239,15 +239,12 @@ namespace Sheaft.Application.Handlers
 
                     _mediatr.Post(new ProductImportProcessingEvent(request.RequestUser) { JobId = job.Id });
 
-                    using (var stream = new MemoryStream())
+                    var data = await _blobService.DownloadImportProductsFileAsync(job.User.Id, job.Id, token);
+                    if (!data.Success)
+                        throw data.Exception;
+
+                    using (var stream = new MemoryStream(data.Data))
                     {
-                        var data = await _blobService.DownloadImportProductsFileAsync(request.Uri, token);
-                        if (!data.Success)
-                            throw data.Exception;
-
-                        await data.Data.CopyToAsync(stream, token);
-                        stream.Position = 0;
-
                         using (var package = new ExcelPackage(stream))
                         {
                             var worksheet = package.Workbook.Worksheets.FirstOrDefault();

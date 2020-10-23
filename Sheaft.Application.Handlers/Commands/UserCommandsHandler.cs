@@ -179,7 +179,7 @@ namespace Sheaft.Application.Handlers
                             await CreateExcelUserDataFileAsync(package, user, token);
                         }
 
-                        var response = await _blobService.UploadRgpdFileAsync(request.RequestUser.Id, job.Id, $"RGPD_{job.CreatedOn:dd-MM-yyyy}.xlsx", stream, token);
+                        var response = await _blobService.UploadRgpdFileAsync(request.RequestUser.Id, job.Id, $"RGPD_{job.CreatedOn:dd-MM-yyyy}.xlsx", stream.ToArray(), token);
                         if (!response.Success)
                             throw response.Exception;
 

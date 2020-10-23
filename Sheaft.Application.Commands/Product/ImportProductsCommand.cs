@@ -12,6 +12,5 @@ namespace Sheaft.Application.Commands
         }
 
         public Guid Id { get; set; }
-        public string Uri { get; set; }
     }
 }

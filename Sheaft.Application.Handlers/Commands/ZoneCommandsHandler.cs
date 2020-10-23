@@ -100,11 +100,8 @@ namespace Sheaft.Application.Handlers
                     StoresCount = d.StoresCount
                 }).ToList();
 
-                using (var stream = new MemoryStream(Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(depts))))
-                {
-                    await _blobService.UploadDepartmentsProgressAsync(stream, token);
-                }
-
+                await _blobService.UploadDepartmentsProgressAsync(Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(depts)), token);
+                
                 return Ok(true);
             });
         }

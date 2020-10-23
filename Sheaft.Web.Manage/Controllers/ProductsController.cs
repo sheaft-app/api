@@ -226,8 +226,8 @@ namespace Sheaft.Web.Manage.Controllers
 
                 using (var stream = new MemoryStream())
                 {
-                    await formFile.CopyToAsync(stream);
-                    var result = await _mediatr.Process(new QueueImportProductsCommand(requestUser) { Id = requestUser.Id, FileName = formFile.FileName, FileStream = stream }, token);
+                    await formFile.CopyToAsync(stream, token);
+                    var result = await _mediatr.Process(new QueueImportProductsCommand(requestUser) { Id = requestUser.Id, FileName = formFile.FileName, FileStream = stream.ToArray() }, token);
                     if (!result.Success)
                         return BadRequest(result);
                 }

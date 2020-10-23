@@ -14,6 +14,6 @@ namespace Sheaft.Application.Commands
 
         public Guid Id { get; set; }
         public string FileName { get; set; }
-        public Stream FileStream { get; set; }
+        public byte[] FileStream { get; set; }
     }
 }
