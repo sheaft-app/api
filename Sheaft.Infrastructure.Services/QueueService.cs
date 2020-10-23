@@ -16,15 +16,12 @@ namespace Sheaft.Infrastructure.Services
 {
     public class QueueService : IQueueService
     {
-        private readonly ServiceBusOptions _serviceBusOptions;
         private readonly ILogger<QueueService> _logger;
 
         public QueueService(
-            IOptionsSnapshot<ServiceBusOptions> serviceBusOptions,
             ILogger<QueueService> logger)
         {
             _logger = logger;
-            _serviceBusOptions = serviceBusOptions.Value;
         }
 
         public async Task ProcessEventAsync<T>(T item, CancellationToken token) where T : INotification
@@ -46,12 +43,12 @@ namespace Sheaft.Infrastructure.Services
         {
             try
             {
-                var managementClient = new ManagementClient(_serviceBusOptions.ConnectionString);
-                if (!(await managementClient.QueueExistsAsync(queueName)))
-                    await managementClient.CreateQueueAsync(new QueueDescription(queueName), token);
+            //    var managementClient = new ManagementClient(_serviceBusOptions.ConnectionString);
+            //    if (!(await managementClient.QueueExistsAsync(queueName)))
+            //        await managementClient.CreateQueueAsync(new QueueDescription(queueName), token);
 
-                var queueClient = new QueueClient(_serviceBusOptions.ConnectionString, queueName);
-                await queueClient.SendAsync(new Message(Encoding.UTF8.GetBytes(item)));
+            //    var queueClient = new QueueClient(_serviceBusOptions.ConnectionString, queueName);
+            //    await queueClient.SendAsync(new Message(Encoding.UTF8.GetBytes(item)));
             }
             catch (Exception e)
             {

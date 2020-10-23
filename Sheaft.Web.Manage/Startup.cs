@@ -98,7 +98,6 @@ namespace Sheaft.Web.Manage
             services.Configure<PspOptions>(pspSettings);
 
             services.Configure<StorageOptions>(Configuration.GetSection(StorageOptions.SETTING));
-            services.Configure<ServiceBusOptions>(Configuration.GetSection(ServiceBusOptions.SETTING));
 
             var rolesOptions = roleSettings.Get<RoleOptions>();
             services.AddAuthorization(options =>

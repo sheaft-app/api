@@ -92,9 +92,6 @@ namespace Sheaft.Web.Jobs
             var storageSettings = Configuration.GetSection(StorageOptions.SETTING);
             services.Configure<StorageOptions>(storageSettings);
 
-            var serviceBusSettings = Configuration.GetSection(ServiceBusOptions.SETTING);
-            services.Configure<ServiceBusOptions>(serviceBusSettings);
-
             var pspSettings = Configuration.GetSection(PspOptions.SETTING);
             services.Configure<PspOptions>(pspSettings);
 
