@@ -129,7 +129,7 @@
                                                             <table class="module preheader preheader-hide" role="module" data-type="preheader" border="0" cellpadding="0" cellspacing="0" width="100%" style="display: none !important; mso-hide: all; visibility: hidden; opacity: 0; color: transparent; height: 0; width: 0;">
                                                                 <tr>
                                                                     <td role="module-content">
-                                                                        <p>Ca y est ! Votre commande @Model.Reference de @(Model.TotalOnSalePrice)€ pour @Model.VendorName est prête à être récupérée.</p>
+                                                                        <p>Ca y est ! Votre commande de @(Model.TotalOnSalePrice)€ passée à @Model.VendorName est prête à être récupérée.</p>
                                                                     </td>
                                                                 </tr>
                                                             </table><table class="wrapper" role="module" data-type="image" border="0" cellpadding="0" cellspacing="0" width="100%" style="table-layout: fixed;" data-muid="2bd7ba50-1bc4-49e2-a039-cfa223a2cb4e">
@@ -159,9 +159,9 @@
                                                                     <tr>
                                                                         <td style="padding:18px 0px 18px 0px; line-height:22px; text-align:inherit;" height="100%" valign="top" bgcolor="" role="module-content">
                                                                             <div>
-                                                                                <div style="font-family: inherit; text-align: center">Votre commande @Model.Reference de @(Model.TotalOnSalePrice)€ pour @Model.VendorName est prête !</div>
+                                                                                <div style="font-family: inherit; text-align: center">Votre commande de @(Model.TotalOnSalePrice)€ passée à @Model.VendorName est prête !</div>
                                                                                 <div style="font-family: inherit; text-align: center"><br /></div>
-                                                                                <div style="font-family: inherit; text-align: center">Vous pouvez désormais passer la récupérer le @Model.ExpectedDeliveryDate.ToString("dd/MM/yyyy") entre @(Model.ExpectedFrom.Hours)h@(Model.ExpectedFrom.Minutes) et @(Model.ExpectedTo.Hours)h@(Model.ExpectedTo.Minutes) au @Model.Address</div><div></div>
+                                                                                <div style="font-family: inherit; text-align: center">Vous pourrez passer la récupérer le @Model.ExpectedDeliveryDate.ToString("dd/MM/yyyy") entre @(Model.ExpectedFrom.Hours.ToString("hh"))h@(Model.ExpectedFrom.Minutes.ToString("mm")) et @(Model.ExpectedTo.Hours.ToString("hh"))h@(Model.ExpectedTo.Minutes.ToString("mm")) au @Model.Address</div><div></div>
                                                                             </div>
                                                                         </td>
                                                                     </tr>
