@@ -1,4 +1,4 @@
-POST https://sheaft.search.windows.net/indexes?api-version=2020-06-30
+POST https://sheaft-search.search.windows.net/indexes?api-version=2020-06-30
 {
   "name": "producers",
   "fields": [
@@ -286,7 +286,7 @@ POST https://sheaft.search.windows.net/indexes?api-version=2020-06-30
   "tokenizers": []
 }
 
-POST https://sheaft.search.windows.net/indexers?api-version=2020-06-30
+POST https://sheaft-search.search.windows.net/indexers?api-version=2020-06-30
 {
   "name": "producers-indexer",
   "description": "",
