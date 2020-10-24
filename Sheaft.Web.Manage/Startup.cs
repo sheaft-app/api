@@ -36,6 +36,7 @@ using Serilog;
 using Serilog.Events;
 using NewRelic.LogEnrichers.Serilog;
 using Sheaft.Web.Common;
+using Microsoft.IdentityModel.Logging;
 
 namespace Sheaft.Web.Manage
 {
@@ -76,6 +77,8 @@ namespace Sheaft.Web.Manage
 
         public void ConfigureServices(IServiceCollection services)
         {
+            IdentityModelEventSource.ShowPII = Configuration.GetValue<bool?>("ShowPII") ?? false;
+
             services.Configure<CookiePolicyOptions>(options =>
             {
                 options.CheckConsentNeeded = context => true;

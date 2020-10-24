@@ -22,6 +22,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Logging;
 using NewRelic.LogEnrichers.Serilog;
 using Newtonsoft.Json;
 using RazorLight;
@@ -80,6 +81,8 @@ namespace Sheaft.Web.Jobs
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            IdentityModelEventSource.ShowPII = Configuration.GetValue<bool?>("ShowPII") ?? false;
+
             GlobalJobFilters.Filters.Add(new ProlongExpirationTimeAttribute());
             GlobalJobFilters.Filters.Add(new LogEverythingAttribute());
 
