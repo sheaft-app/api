@@ -114,9 +114,9 @@ namespace Sheaft.Infrastructure.Services
                 var imageId = Guid.NewGuid().ToString("N");
                 using (Image image = Image.Load(bytes))
                 {
-                    await UploadPictureAsync(image, entity.Producer.Id, entity.Id, imageId, PictureSize.LARGE, 620, 256, token, ResizeMode.Crop, quality: 60);
-                    await UploadPictureAsync(image, entity.Producer.Id, entity.Id, imageId, PictureSize.MEDIUM, 310, 128, token, ResizeMode.Crop, quality: 80);
-                    await UploadPictureAsync(image, entity.Producer.Id, entity.Id, imageId, PictureSize.SMALL, 64, 64, token, ResizeMode.Crop, quality: 90);
+                    await UploadPictureAsync(image, entity.Producer.Id, entity.Id, imageId, PictureSize.LARGE, 620, 256, token, quality: 40);
+                    await UploadPictureAsync(image, entity.Producer.Id, entity.Id, imageId, PictureSize.MEDIUM, 310, 128, token, quality: 60);
+                    await UploadPictureAsync(image, entity.Producer.Id, entity.Id, imageId, PictureSize.SMALL, 64, 64, token, ResizeMode.Crop, quality: 80);
                     await UploadPictureAsync(image, entity.Producer.Id, entity.Id, imageId, PictureSize.ORIGINAL, token);
                 }
 
@@ -143,7 +143,7 @@ namespace Sheaft.Infrastructure.Services
                     Size = new Size(width, height),
                     Compand = true,
                     Sampler = KnownResamplers.Lanczos3
-                })).Save(blobStream, new JpegEncoder { Quality = quality });
+                })).Save(blobStream, new JpegEncoder { Quality = quality, Subsample = JpegSubsample.Ratio444 });
 
                 return await _blobService.UploadProductPictureAsync(userId, productId, filename, size, blobStream.ToArray(), token);
             }
@@ -153,7 +153,7 @@ namespace Sheaft.Infrastructure.Services
         {
             using (var blobStream = new MemoryStream())
             {
-                image.Save(blobStream, new JpegEncoder { Quality = 100 });
+                image.Save(blobStream, new JpegEncoder { Quality = 100, Subsample = JpegSubsample.Ratio444 });
                 return await _blobService.UploadProductPictureAsync(userId, productId, filename, size, blobStream.ToArray(), token);
             }
         }
