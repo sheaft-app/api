@@ -1,0 +1,75 @@
+# ASP.NET Core (.NET Framework)
+# Build and test ASP.NET Core projects targeting the full .NET Framework.
+# Add steps that publish symbols, save build artifacts, and more:
+# https://docs.microsoft.com/azure/devops/pipelines/languages/dotnet-core
+
+trigger:
+  batch: true
+
+pool:
+  vmImage: "ubuntu-latest"
+
+steps:
+  - script: |
+      dotnet restore $(System.DefaultWorkingDirectory)/Sheaft.sln
+      dotnet build $(System.DefaultWorkingDirectory)/Sheaft.sln -c Release
+      dotnet publish $(System.DefaultWorkingDirectory)/Sheaft.Web.Api/Sheaft.Web.Api.csproj -c Release --no-build --output publish_output/Sheaft.Web.Api/
+      dotnet publish $(System.DefaultWorkingDirectory)/Sheaft.Web.Jobs/Sheaft.Web.Jobs.csproj -c Release --no-build --output publish_output/Sheaft.Web.Jobs/
+      dotnet publish $(System.DefaultWorkingDirectory)/Sheaft.Web.Payment/Sheaft.Web.Payment.csproj -c Release --no-build --output publish_output/Sheaft.Web.Payment/
+      dotnet publish $(System.DefaultWorkingDirectory)/Sheaft.Web.Signalr/Sheaft.Web.Signalr.csproj -c Release --no-build --output publish_output/Sheaft.Web.Signalr/
+      dotnet publish $(System.DefaultWorkingDirectory)/Sheaft.Web.Manage/Sheaft.Web.Manage.csproj -c Release --no-build --output publish_output/Sheaft.Web.Manage/
+  - task: ArchiveFiles@2
+    displayName: "Archive API"
+    inputs:
+      rootFolderOrFile: "$(System.DefaultWorkingDirectory)/publish_output/Sheaft.Web.Api"
+      includeRootFolder: false
+      archiveFile: "$(System.DefaultWorkingDirectory)/publish_output/Sheaft.Web.Api/build$(Build.BuildId).zip"
+  - task: PublishBuildArtifacts@1
+    displayName: "Publish API"
+    inputs:
+      PathtoPublish: '$(System.DefaultWorkingDirectory)/publish_output/Sheaft.Web.Api/build$(Build.BuildId).zip'
+      artifactName: 'sheaft-api'
+  - task: ArchiveFiles@2
+    displayName: "Archive JOBS"
+    inputs:
+      rootFolderOrFile: "$(System.DefaultWorkingDirectory)/publish_output/Sheaft.Web.Jobs"
+      includeRootFolder: false
+      archiveFile: "$(System.DefaultWorkingDirectory)/publish_output/Sheaft.Web.Jobs/build$(Build.BuildId).zip"
+  - task: PublishBuildArtifacts@1
+    displayName: "Publish JOBS"
+    inputs:
+      PathtoPublish: '$(System.DefaultWorkingDirectory)/publish_output/Sheaft.Web.Jobs/build$(Build.BuildId).zip'
+      artifactName: 'sheaft-jobs'
+  - task: ArchiveFiles@2
+    displayName: "Archive PAYMENT"
+    inputs:
+      rootFolderOrFile: "$(System.DefaultWorkingDirectory)/publish_output/Sheaft.Web.Payment"
+      includeRootFolder: false
+      archiveFile: "$(System.DefaultWorkingDirectory)/publish_output/Sheaft.Web.Payment/build$(Build.BuildId).zip"
+  - task: PublishBuildArtifacts@1
+    displayName: "Publish PAYMENT"
+    inputs:
+      PathtoPublish: '$(System.DefaultWorkingDirectory)/publish_output/Sheaft.Web.Payment/build$(Build.BuildId).zip'
+      artifactName: 'sheaft-payment'
+  - task: ArchiveFiles@2
+    displayName: "Archive SIGNALR"
+    inputs:
+      rootFolderOrFile: "$(System.DefaultWorkingDirectory)/publish_output/Sheaft.Web.Signalr"
+      includeRootFolder: false
+      archiveFile: "$(System.DefaultWorkingDirectory)/publish_output/Sheaft.Web.Signalr/build$(Build.BuildId).zip"
+  - task: PublishBuildArtifacts@1
+    displayName: "Publish SIGNALR"
+    inputs:
+      PathtoPublish: '$(System.DefaultWorkingDirectory)/publish_output/Sheaft.Web.Signalr/build$(Build.BuildId).zip'
+      artifactName: 'sheaft-signalr'
+  - task: ArchiveFiles@2
+    displayName: "Archive MANAGE"
+    inputs:
+      rootFolderOrFile: "$(System.DefaultWorkingDirectory)/publish_output/Sheaft.Web.Manage"
+      includeRootFolder: false
+      archiveFile: "$(System.DefaultWorkingDirectory)/publish_output/Sheaft.Web.Manage/build$(Build.BuildId).zip"
+  - task: PublishBuildArtifacts@1
+    displayName: "Publish MANAGE"
+    inputs:
+      PathtoPublish: '$(System.DefaultWorkingDirectory)/publish_output/Sheaft.Web.Manage/build$(Build.BuildId).zip'
+      artifactName: 'sheaft-manage'
