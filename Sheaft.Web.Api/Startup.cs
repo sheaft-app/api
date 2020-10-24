@@ -94,7 +94,7 @@ namespace Sheaft.Web.Api
 
         public void ConfigureServices(IServiceCollection services)
         {
-            //IdentityModelEventSource.ShowPII = true;
+            IdentityModelEventSource.ShowPII = Configuration.GetValue<bool?>("ShowPII") ?? false;
             services.AddSingleton<IConfiguration>(Configuration);
 
             var authSettings = Configuration.GetSection(AuthOptions.SETTING);
