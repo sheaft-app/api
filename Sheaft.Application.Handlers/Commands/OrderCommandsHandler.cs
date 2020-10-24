@@ -306,9 +306,13 @@ namespace Sheaft.Application.Handlers
             return await ExecuteAsync(request, async () =>
             {
                 var order = await _context.GetByIdAsync<Order>(request.OrderId, token);
-                order.SetStatus(OrderStatus.Refused);
+                if (order.Payin.Id != request.PayinId)
+                    return Ok(true);
 
+                order.SetStatus(OrderStatus.Refused);
                 await _context.SaveChangesAsync(token);
+
+                _mediatr.Post(new PayinFailedEvent(request.RequestUser) { PayinId = request.PayinId });
                 return Ok(true);
             });
         }

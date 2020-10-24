@@ -154,7 +154,7 @@ namespace Sheaft.Application.Handlers
                 switch (payin.Status)
                 {
                     case TransactionStatus.Failed:
-                        _mediatr.Post(new FailOrderCommand(request.RequestUser) { OrderId = payin.Order.Id });
+                        _mediatr.Post(new FailOrderCommand(request.RequestUser) { OrderId = payin.Order.Id, PayinId = payin.Id });
                         break;
                     case TransactionStatus.Succeeded:
                         _mediatr.Post(new ConfirmOrderCommand(request.RequestUser) { OrderId = payin.Order.Id });
