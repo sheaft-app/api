@@ -28,7 +28,7 @@ steps:
     displayName: "Publish API"
     inputs:
       PathtoPublish: '$(System.DefaultWorkingDirectory)/publish_output/Sheaft.Web.Api/build$(Build.BuildId).zip'
-      artifactName: 'sheaft-api'
+      artifactName: 'sheaft-graphql'
   - task: ArchiveFiles@2
     displayName: "Archive JOBS"
     inputs:
