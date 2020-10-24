@@ -195,7 +195,8 @@ namespace Sheaft.Application.Handlers
         {
             return new AgreementMailerModel
             { 
-                Name = name, 
+                Name = name,
+                Reason = agreement.Reason,
                 AgreementId = agreement.Id, 
                 CreatedOn = agreement.CreatedOn, 
                 PortalUrl = $"{_configuration.GetValue<string>("Portal:url")}/#/agreements/{agreement.Id}" 

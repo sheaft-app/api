@@ -17,5 +17,6 @@ namespace Sheaft.Application.Models.Mailer
         public TimeSpan ExpectedFrom { get; set; }
         public TimeSpan ExpectedTo { get; set; }
         public string Address { get; set; }
+        public string Reason { get; set; }
     }
 }
