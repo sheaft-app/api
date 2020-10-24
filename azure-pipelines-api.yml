@@ -7,7 +7,7 @@ trigger:
   batch: true
   branches:  
     include:
-      - refs/tags/publish-api
+      - refs/tags/publish-graphql
       - refs/tags/publish
 
 pool:
@@ -26,4 +26,4 @@ steps:
   - task: PublishBuildArtifacts@1
     inputs:
       PathtoPublish: '$(System.DefaultWorkingDirectory)/publish_output/Sheaft.Web.Api/build$(Build.BuildId).zip'
-      artifactName: 'sheaft-api'
+      artifactName: 'sheaft-graphql'
