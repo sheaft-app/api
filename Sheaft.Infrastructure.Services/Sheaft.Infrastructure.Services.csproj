@@ -15,6 +15,7 @@
     <None Remove="Templates\AgreementCancelledEvent.cshtml" />
     <None Remove="Templates\AgreementCreatedEvent.cshtml" />
     <None Remove="Templates\AgreementRefusedEvent.cshtml" />
+    <None Remove="Templates\PayinFailedEvent.cshtml" />
     <None Remove="Templates\PayinSucceededEvent.cshtml" />
     <None Remove="Templates\PickingOrderExportFailedEvent.cshtml" />
     <None Remove="Templates\PickingOrderExportSucceededEvent.cshtml" />
@@ -42,6 +43,9 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="Templates\AgreementRefusedEvent.cshtml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Templates\PayinFailedEvent.cshtml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="Templates\PayinSucceededEvent.cshtml">

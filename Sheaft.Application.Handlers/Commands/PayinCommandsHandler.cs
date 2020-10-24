@@ -158,7 +158,7 @@ namespace Sheaft.Application.Handlers
                         break;
                     case TransactionStatus.Succeeded:
                         _mediatr.Post(new ConfirmOrderCommand(request.RequestUser) { OrderId = payin.Order.Id });
-                        _mediatr.Post(new PayinSucceededEvent(request.RequestUser) { PayinId = payin.Id });
+                        //_mediatr.Post(new PayinSucceededEvent(request.RequestUser) { PayinId = payin.Id });
                         break;
                 }
 
