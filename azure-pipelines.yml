@@ -19,13 +19,13 @@ steps:
       dotnet publish $(System.DefaultWorkingDirectory)/Sheaft.Web.Signalr/Sheaft.Web.Signalr.csproj -c Release --no-build --output publish_output/Sheaft.Web.Signalr/
       dotnet publish $(System.DefaultWorkingDirectory)/Sheaft.Web.Manage/Sheaft.Web.Manage.csproj -c Release --no-build --output publish_output/Sheaft.Web.Manage/
   - task: ArchiveFiles@2
-    displayName: "Archive API"
+    displayName: "Archive GRAPHQL"
     inputs:
       rootFolderOrFile: "$(System.DefaultWorkingDirectory)/publish_output/Sheaft.Web.Api"
       includeRootFolder: false
       archiveFile: "$(System.DefaultWorkingDirectory)/publish_output/Sheaft.Web.Api/build$(Build.BuildId).zip"
   - task: PublishBuildArtifacts@1
-    displayName: "Publish API"
+    displayName: "Publish GRAPHQL"
     inputs:
       PathtoPublish: '$(System.DefaultWorkingDirectory)/publish_output/Sheaft.Web.Api/build$(Build.BuildId).zip'
       artifactName: 'sheaft-graphql'
