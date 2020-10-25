@@ -35,7 +35,7 @@ namespace Sheaft.Application.Handlers
             await _emailService.SendTemplatedEmailAsync(
                 job.User.Email,
                 job.User.Name,
-                $"L'import de votre catalogue produit est terminé",
+                $"Votre catalogue produit a bien été importé",
                 nameof(ProductImportSucceededEvent),
                 new ProductImportMailerModel { UserName = job.User.Name, Name = job.Name, CreatedOn = job.CreatedOn, PortalUrl = url },
                 true,

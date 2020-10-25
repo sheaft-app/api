@@ -46,7 +46,7 @@ namespace Sheaft.Application.Handlers
             await _emailService.SendTemplatedEmailAsync(
                 email,
                 name,
-                $"Votre commande de {purchaseOrder.TotalOnSalePrice}€ pour le {purchaseOrder.ExpectedDelivery.ExpectedDeliveryDate:dd/MM/yyyy} a été acceptée par {purchaseOrder.Vendor.Name}",
+                $"{purchaseOrder.Vendor.Name} a accepté votre commande",
                 nameof(PurchaseOrderAcceptedEvent),
                 GetTemplateDatas(purchaseOrder, url),
                 true,
@@ -62,7 +62,7 @@ namespace Sheaft.Application.Handlers
             await _emailService.SendTemplatedEmailAsync(
                 purchaseOrder.Vendor.Email,
                 purchaseOrder.Vendor.Name,
-                $"La commande de {purchaseOrder.TotalOnSalePrice}€ pour le {purchaseOrder.ExpectedDelivery.ExpectedDeliveryDate:dd/MM/yyyy} a été annulée par {purchaseOrder.Sender.Name}",
+                $"{purchaseOrder.Sender.Name} a annulé sa commande pour le {purchaseOrder.ExpectedDelivery.ExpectedDeliveryDate:dd/MM/yyyy}",
                 nameof(PurchaseOrderWithdrawnEvent),
                 GetTemplateDatas(purchaseOrder, url),
                 true,
@@ -77,7 +77,7 @@ namespace Sheaft.Application.Handlers
             await _emailService.SendTemplatedEmailAsync(
                 purchaseOrder.Sender.Email,
                 purchaseOrder.Sender.Name,
-                $"Votre commande de {purchaseOrder.TotalOnSalePrice}€ pour le {purchaseOrder.ExpectedDelivery.ExpectedDeliveryDate:dd/MM/yyyy} a été annulée par {purchaseOrder.Vendor.Name}",
+                $"{purchaseOrder.Vendor.Name} a annulé votre commande",
                 nameof(PurchaseOrderCancelledEvent),
                 GetTemplateDatas(purchaseOrder, $"{_configuration.GetValue<string>("Portal:url")}/#/my-orders/{purchaseOrder.Id}"),
                 true,
@@ -92,7 +92,7 @@ namespace Sheaft.Application.Handlers
             await _emailService.SendTemplatedEmailAsync(
                 purchaseOrder.Sender.Email,
                 purchaseOrder.Sender.Name,
-                $"Votre commande de {purchaseOrder.TotalOnSalePrice}€ auprès de {purchaseOrder.Vendor.Name} pour le {purchaseOrder.ExpectedDelivery.ExpectedDeliveryDate:dd/MM/yyyy} est prête",
+                $"Votre commande est prête",
                 nameof(PurchaseOrderCompletedEvent),
                 GetTemplateDatas(purchaseOrder, $"{_configuration.GetValue<string>("Portal:url")}/#/my-orders/{purchaseOrder.Id}"),
                 true,
@@ -107,7 +107,7 @@ namespace Sheaft.Application.Handlers
             await _emailService.SendTemplatedEmailAsync(
                 purchaseOrder.Sender.Email,
                 purchaseOrder.Sender.Name,
-                $"Votre commande de {purchaseOrder.TotalOnSalePrice}€ pour le {purchaseOrder.ExpectedDelivery.ExpectedDeliveryDate:dd/MM/yyyy} a bien été envoyée par {purchaseOrder.Vendor.Name}",
+                $"Votre commande a été envoyée à {purchaseOrder.Vendor.Name}",
                 nameof(PurchaseOrderCreatedEvent),
                 GetTemplateDatas(purchaseOrder, $"{_configuration.GetValue<string>("Portal:url")}/#/my-orders/{purchaseOrder.Id}"),
                 true,
@@ -122,7 +122,7 @@ namespace Sheaft.Application.Handlers
             await _emailService.SendTemplatedEmailAsync(
                 purchaseOrder.Vendor.Email,
                 purchaseOrder.Vendor.Name,
-                $"Une nouvelle commande de {purchaseOrder.TotalOnSalePrice}€ pour le {purchaseOrder.ExpectedDelivery.ExpectedDeliveryDate:dd/MM/yyyy} vient d'être créée par {purchaseOrder.Sender.Name}",
+                $"{purchaseOrder.Sender.Name} a envoyé une nouvelle commande pour le {purchaseOrder.ExpectedDelivery.ExpectedDeliveryDate:dd/MM/yyyy}",
                 nameof(PurchaseOrderReceivedEvent),
                 GetTemplateDatas(purchaseOrder, $"{_configuration.GetValue<string>("Portal:url")}/#/purchase-orders/{purchaseOrder.Id}"),
                 true,
@@ -137,7 +137,7 @@ namespace Sheaft.Application.Handlers
             await _emailService.SendTemplatedEmailAsync(
                 purchaseOrder.Sender.Email,
                 purchaseOrder.Sender.Name,
-                $"Votre commande {purchaseOrder.Reference} de {purchaseOrder.TotalOnSalePrice}€ a été annulée par {purchaseOrder.Vendor.Name}",
+                $"Votre commande a été annulée par {purchaseOrder.Vendor.Name}",
                 nameof(PurchaseOrderRefusedEvent),
                 GetTemplateDatas(purchaseOrder, $"{_configuration.GetValue<string>("Portal:url")}/#/my-orders/{purchaseOrder.Id}"),
                 true,

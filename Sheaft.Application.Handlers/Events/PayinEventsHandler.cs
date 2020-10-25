@@ -78,7 +78,7 @@ namespace Sheaft.Application.Handlers
                 ProductsCount = payin.Order.ProductsCount, 
                 Reference = payin.Order.Reference, 
                 OrderId = payin.Order.Id, 
-                MyOrdersUrl = $"{_configuration.GetValue<string>("Portal:url")}/#/my-orders/"
+                MyOrdersUrl = $"{_configuration.GetValue<string>("Portal:url")}/#/my-orders/{payin.Order.Id:N}"
             };
         }
     }

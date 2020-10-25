@@ -50,7 +50,7 @@ namespace Sheaft.Application.Handlers
             await _emailService.SendTemplatedEmailAsync(
                 job.User.Email,
                 job.User.Name,
-                $"La génération de votre bon de préparation a échouée",
+                $"La création de votre bon de préparation a échouée",
                 nameof(PickingOrderExportFailedEvent),
                 new PickingOrderExportMailerModel { UserName = job.User.Name, Name = job.Name, CreatedOn = job.CreatedOn, JobUrl = url },
                 true,

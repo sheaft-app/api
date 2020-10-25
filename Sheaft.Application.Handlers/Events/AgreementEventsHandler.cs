@@ -62,7 +62,7 @@ namespace Sheaft.Application.Handlers
             await _emailService.SendTemplatedEmailAsync(
                 email,
                 name,
-                $"Nouvelle demande d'accord de {targetName} reçue",
+                $"{targetName} souhaiterait commercer avec vous",
                 nameof(AgreementCreatedEvent),
                 GetNotificationDatas(agreement, targetName),
                 true,
@@ -101,7 +101,7 @@ namespace Sheaft.Application.Handlers
             await _emailService.SendTemplatedEmailAsync(
                 email,
                 name,
-                $"Votre demande d'accord avec {targetName} a été acceptée",
+                $"{targetName} a accepté de commercer avec vous",
                 nameof(AgreementAcceptedEvent),
                 GetNotificationDatas(agreement, targetName),
                 true,
@@ -140,7 +140,7 @@ namespace Sheaft.Application.Handlers
             await _emailService.SendTemplatedEmailAsync(
                 email,
                 name,
-                $"L'accord commercial avec {targetName} a été annulé",
+                $"{targetName} a annulé votre accord commercial",
                 nameof(AgreementCancelledEvent),
                 GetNotificationDatas(agreement, targetName),
                 true,
@@ -179,7 +179,7 @@ namespace Sheaft.Application.Handlers
             await _emailService.SendTemplatedEmailAsync(
                 email,
                 name,
-                $"Votre demande d'accord avec {targetName} a été refusée",
+                $"{targetName} a refusé votre demande d'accord commercial",
                 nameof(AgreementRefusedEvent),
                 GetNotificationDatas(agreement, targetName),
                 true,

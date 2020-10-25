@@ -40,7 +40,7 @@ namespace Sheaft.Application.Handlers
             await _emailService.SendTemplatedEmailAsync(
                 job.User.Email,
                 job.User.Name,
-                $"Votre export de données personnelles a échoué",
+                $"Votre export de données a échoué",
                 nameof(UserDataExportFailedEvent),
                 new RgpdExportMailerModel { UserName = job.User.Name, Name = job.Name, CreatedOn = job.CreatedOn, PortalUrl = url },
                 true,
@@ -55,7 +55,7 @@ namespace Sheaft.Application.Handlers
             await _emailService.SendTemplatedEmailAsync(
                 job.User.Email,
                 job.User.Name,
-                $"Votre export de données personnelles est prêt",
+                $"Votre export de données est prêt",
                 nameof(UserDataExportSucceededEvent),
                 new RgpdExportMailerModel { UserName = job.User.Name, Name = job.Name, CreatedOn = job.CreatedOn, DownloadUrl = job.File },
                 true,
