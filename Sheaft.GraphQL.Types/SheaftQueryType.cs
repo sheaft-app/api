@@ -202,6 +202,11 @@ namespace Sheaft.GraphQL.Types
                 .UseSorting<NotificationSortType>()
                 .UseSelection();
 
+            descriptor.Field(c => c.GetUnreadNotificationsCount(default))
+                .Name("unreadNotificationsCount")
+                .Authorize(Policies.REGISTERED)
+                .Type<NonNullType<IntType>>();
+
             //RETURNABLE
             descriptor.Field(c => c.GetReturnable(default, default))
                 .Name("returnable")

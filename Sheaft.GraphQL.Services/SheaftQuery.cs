@@ -259,6 +259,12 @@ namespace Sheaft.GraphQL.Services
             return notificationQueries.GetNotifications(CurrentUser);
         }
 
+        public async Task<int> GetUnreadNotificationsCount([Service] INotificationQueries notificationQueries)
+        {
+            SetLogTransaction("GraphQL", nameof(GetUnreadNotificationsCount));
+            return await notificationQueries.GetUnreadNotificationsCount(CurrentUser, Token);
+        }
+
         public IQueryable<TagDto> GetTags([Service] ITagQueries tagQueries)
         {
             SetLogTransaction("GraphQL", nameof(GetTags));

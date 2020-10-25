@@ -4,6 +4,9 @@ using Sheaft.Application.Interop;
 using Sheaft.Application.Models;
 using Sheaft.Core;
 using AutoMapper.QueryableExtensions;
+using System.Threading;
+using Microsoft.EntityFrameworkCore;
+using System.Threading.Tasks;
 
 namespace Sheaft.Application.Queries
 {
@@ -23,6 +26,12 @@ namespace Sheaft.Application.Queries
             return _context.Notifications
                 .Get(c => c.Id == id && c.User.Id == currentUser.Id)
                 .ProjectTo<NotificationDto>(_configurationProvider);
+        }
+
+        public async Task<int> GetUnreadNotificationsCount(RequestUser currentUser, CancellationToken token)
+        {
+            return await _context.Notifications
+                .CountAsync(c => c.Unread && c.User.Id == currentUser.Id, token);
         }
 
         public IQueryable<NotificationDto> GetNotifications(RequestUser currentUser)

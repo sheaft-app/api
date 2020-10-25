@@ -370,7 +370,7 @@ namespace Sheaft.GraphQL.Types
 
             descriptor.Field(c => c.MarkNotificationAsReadAsync(default, default))
                 .Name("markUserNotificationAsRead")
-                .Authorize(Policies.PRODUCER)
+                .Authorize(Policies.REGISTERED)
                 .Type<NonNullType<NotificationType>>()
                 .UseSingleOrDefault()
                 .UseSelection();
