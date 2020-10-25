@@ -170,7 +170,7 @@ namespace Sheaft.Application.Handlers
                     WriteColumnProductsQuantity(worksheet, productsCount, orderColumn, order.Products);
                     WriteColumnTotalRow(worksheet, lastRow, orderColumn);
 
-                    if (clientOrdersCount < 2)
+                    if (clientOrdersCount > 1)
                         columnToHide.Add(orderColumn);
 
                     worksheet.Column(orderColumn).Width = 15;
@@ -188,7 +188,6 @@ namespace Sheaft.Application.Handlers
 
             if (columnToHide.Any())
             {
-                worksheet.Row(PickingOrderFileSettings.ORDER_REFERENCE_ROW).Hidden = true;
                 foreach (var col in columnToHide)
                 {
                     worksheet.Column(col).Hidden = true;
