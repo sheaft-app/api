@@ -12,6 +12,7 @@ namespace Sheaft.GraphQL.Types
             descriptor.Field(c => c.CreatedOn);
             descriptor.Field(c => c.UpdatedOn);
             descriptor.Field(c => c.Status);
+            descriptor.Field(c => c.Reason);
 
             descriptor.Field(c => c.Store)
                 .Type<NonNullType<BusinessProfileType>>();
