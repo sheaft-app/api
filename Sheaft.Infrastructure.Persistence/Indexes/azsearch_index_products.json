@@ -1,4 +1,4 @@
-POST https://sheaft-search.search.windows.net/indexes?api-version=2020-06-30
+POST https://sheaft-search.search.windows.net/indexes?api-version=2020-06-30&allowIndexDowntime=true
 {
   "name": "products",
   "fields": [
@@ -337,6 +337,32 @@ POST https://sheaft-search.search.windows.net/indexes?api-version=2020-06-30
     },
     {
       "name": "product_returnable",
+      "type": "Edm.Boolean",
+      "facetable": false,
+      "filterable": true,
+      "retrievable": true,
+      "sortable": false,
+      "analyzer": null,
+      "indexAnalyzer": null,
+      "searchAnalyzer": null,
+      "synonymMaps": [],
+      "fields": []
+    },
+    {
+      "name": "product_available",
+      "type": "Edm.Boolean",
+      "facetable": false,
+      "filterable": true,
+      "retrievable": true,
+      "sortable": false,
+      "analyzer": null,
+      "indexAnalyzer": null,
+      "searchAnalyzer": null,
+      "synonymMaps": [],
+      "fields": []
+    },
+    {
+      "name": "product_searchable",
       "type": "Edm.Boolean",
       "facetable": false,
       "filterable": true,

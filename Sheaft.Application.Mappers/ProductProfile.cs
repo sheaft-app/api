@@ -33,6 +33,7 @@ namespace Sheaft.Application.Mappers
             CreateMap<RateProductInput, RateProductCommand>();
             CreateMap<UpdatePictureInput, UpdateProductPictureCommand>();
             CreateMap<SetProductsAvailabilityInput, SetProductsAvailabilityCommand>();
+            CreateMap<SetProductsSearchabilityInput, SetProductsSearchabilityCommand>();
             CreateMap<IdsInput, DeleteProductsCommand>();
         }
     }

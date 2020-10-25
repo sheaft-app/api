@@ -1065,6 +1065,9 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                     b.Property<long?>("ReturnableUid")
                         .HasColumnType("bigint");
 
+                    b.Property<bool>("Searchable")
+                        .HasColumnType("bit");
+
                     b.Property<int>("Unit")
                         .HasColumnType("int");
 

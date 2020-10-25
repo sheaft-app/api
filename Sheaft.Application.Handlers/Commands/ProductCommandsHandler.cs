@@ -22,8 +22,10 @@ namespace Sheaft.Application.Handlers
     public class ProductCommandsHandler : ResultsHandler,
         IRequestHandler<CreateProductCommand, Result<Guid>>,
         IRequestHandler<UpdateProductCommand, Result<bool>>,
-        IRequestHandler<SetProductAvailabilityCommand, Result<bool>>,
         IRequestHandler<SetProductsAvailabilityCommand, Result<bool>>,
+        IRequestHandler<SetProductAvailabilityCommand, Result<bool>>,
+        IRequestHandler<SetProductsSearchabilityCommand, Result<bool>>,
+        IRequestHandler<SetProductSearchabilityCommand, Result<bool>>,
         IRequestHandler<RateProductCommand, Result<bool>>,
         IRequestHandler<DeleteProductsCommand, Result<bool>>,
         IRequestHandler<DeleteProductCommand, Result<bool>>,
@@ -66,7 +68,8 @@ namespace Sheaft.Application.Handlers
                 var entity = new Product(Guid.NewGuid(), request.Reference, request.Name, request.WholeSalePricePerUnit, request.Conditioning, request.Unit, request.QuantityPerUnit, request.Vat, producer);
 
                 entity.SetDescription(request.Description);
-                entity.SetAvailable(request.Available);
+                entity.SetAvailable(request.Available ?? false);
+                entity.SetSearchable(request.Searchable ?? false);
                 entity.SetWeight(request.Weight);
 
                 if (request.ReturnableId.HasValue)
@@ -102,6 +105,7 @@ namespace Sheaft.Application.Handlers
                 entity.SetReference(request.Reference);
                 entity.SetWeight(request.Weight);
                 entity.SetAvailable(request.Available);
+                entity.SetSearchable(request.Searchable);
                 entity.SetConditioning(request.Conditioning, request.QuantityPerUnit, request.Unit);
                 entity.SetWeight(request.Weight);
 
@@ -168,6 +172,37 @@ namespace Sheaft.Application.Handlers
             {
                 var entity = await _context.GetByIdAsync<Product>(request.Id, token);
                 entity.SetAvailable(request.Available);
+
+                await _context.SaveChangesAsync(token);
+                return Ok(true);
+            });
+        }
+
+        public async Task<Result<bool>> Handle(SetProductsSearchabilityCommand request, CancellationToken token)
+        {
+            return await ExecuteAsync(request, async () =>
+            {
+                using (var transaction = await _context.BeginTransactionAsync(token))
+                {
+                    foreach (var id in request.Ids)
+                    {
+                        var result = await _mediatr.Process(new SetProductSearchabilityCommand(request.RequestUser) { Id = id, Searchable = request.Searchable }, token);
+                        if (!result.Success)
+                            return Failed<bool>(result.Exception);
+                    }
+
+                    await transaction.CommitAsync(token);
+                    return Ok(true);
+                }
+            });
+        }
+
+        public async Task<Result<bool>> Handle(SetProductSearchabilityCommand request, CancellationToken token)
+        {
+            return await ExecuteAsync(request, async () =>
+            {
+                var entity = await _context.GetByIdAsync<Product>(request.Id, token);
+                entity.SetSearchable(request.Searchable);
 
                 await _context.SaveChangesAsync(token);
                 return Ok(true);
@@ -395,6 +430,9 @@ namespace Sheaft.Application.Handlers
 
             var tags = await _context.FindAsync<Tag>(t => tagsAsStr.Any(c => c.Contains(t.Name.ToLower())), token);
             createProductCommand.Tags = tags.Select(t => t.Id);
+
+            createProductCommand.Searchable = false;
+            createProductCommand.Available = false;
 
             return Ok(createProductCommand);
         }

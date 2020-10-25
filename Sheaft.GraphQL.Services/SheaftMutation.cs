@@ -282,6 +282,13 @@ namespace Sheaft.GraphQL.Services
             return productQueries.GetProducts(CurrentUser).Where(j => input.Ids.Contains(j.Id));
         }
 
+        public async Task<IQueryable<ProductDto>> SetProductsSearchabilityAsync(SetProductsSearchabilityInput input, [Service] IProductQueries productQueries)
+        {
+            SetLogTransaction("GraphQL", nameof(SetProductsSearchabilityAsync));
+            await ExecuteCommandAsync<SetProductsSearchabilityCommand, bool>(_mapper.Map(input, new SetProductsSearchabilityCommand(CurrentUser)), Token);
+            return productQueries.GetProducts(CurrentUser).Where(j => input.Ids.Contains(j.Id));
+        }
+
         public async Task<bool> DeleteProductsAsync(IdsInput input)
         {
             SetLogTransaction("GraphQL", nameof(DeleteProductsAsync));

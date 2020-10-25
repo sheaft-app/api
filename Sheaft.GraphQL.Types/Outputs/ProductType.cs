@@ -17,6 +17,7 @@ namespace Sheaft.GraphQL.Types
             descriptor.Field(c => c.WholeSalePrice);
             descriptor.Field(c => c.VatPrice);
             descriptor.Field(c => c.Available);
+            descriptor.Field(c => c.Searchable);
             descriptor.Field(c => c.RatingsCount);
             descriptor.Field(c => c.QuantityPerUnit);
             descriptor.Field(c => c.Unit);

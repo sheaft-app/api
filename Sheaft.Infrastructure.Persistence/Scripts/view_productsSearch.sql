@@ -31,13 +31,15 @@ as
      , ra.Zipcode as producer_zipcode
      , ra.City as producer_city
 	 , p.Picture as product_image
+     , p.Available as product_available
+     , p.Searchable as product_searchable
      , case when p.Conditioning = 1 then 'BOX'
 			when p.Conditioning = 2 then 'BULK'
 			when p.Conditioning = 3 then 'BOUQUET'
 			when p.Conditioning = 4 then 'BUNCH'
 			when p.Conditioning = 5 then 'PIECE' end as product_conditioning
      , dbo.InlineMax(dbo.InlineMax(dbo.InlineMax(p.UpdatedOn, r.UpdatedOn), t.UpdatedOn), p.CreatedOn) as last_update
-     , case when (dbo.InlineMax(p.RemovedOn, r.RemovedOn)) is null and p.Available = 1 then 0 else 1 end as removed
+     , case when (dbo.InlineMax(p.RemovedOn, r.RemovedOn)) is null then 0 else 1 end as removed
      , '[' + STRING_AGG('"' + LOWER(t.Name) + '"', ',') + ']' as product_tags     
      , ra.Longitude as producer_longitude
      , ra.Latitude as producer_latitude
@@ -74,9 +76,11 @@ as
 			when p.Conditioning = 5 then 'PIECE' end,
 	r.Id,
     r.Phone,
+    p.Available,
+    p.Searchable,
     ra.Zipcode,
     ra.City,
     dbo.InlineMax(dbo.InlineMax(dbo.InlineMax(p.UpdatedOn, r.UpdatedOn), t.UpdatedOn), p.CreatedOn),
-    case when (dbo.InlineMax(p.RemovedOn, r.RemovedOn)) is null and p.Available = 1 then 0 else 1 end,
+    case when (dbo.InlineMax(p.RemovedOn, r.RemovedOn)) is null then 0 else 1 end,
     ra.Longitude,
     ra.Latitude

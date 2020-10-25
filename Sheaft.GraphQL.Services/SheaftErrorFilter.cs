@@ -37,7 +37,7 @@ namespace Sheaft.GraphQL.Services
         public IError OnError(IError error)
         {
             error = error.AddExtension("RequestIdentifier", _httpContextAccessor.HttpContext.TraceIdentifier);
-            var message = "Une erreur inattendue est survenue, veuillez renouveler votre demande. Si l'erreur persiste, contactez notre support.";
+            var message = "Une erreur inattendue est survenue.";
 
             var kind = ExceptionKind.Unexpected;
             var exception = error.Exception;

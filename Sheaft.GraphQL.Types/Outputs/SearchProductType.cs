@@ -15,6 +15,7 @@ namespace Sheaft.GraphQL.Types
             descriptor.Field(c => c.RatingsCount);
             descriptor.Field(c => c.QuantityPerUnit);
             descriptor.Field(c => c.Unit);
+            descriptor.Field(c => c.Available);
             descriptor.Field(c => c.Conditioning);
             descriptor.Field(c => c.Rating);
             descriptor.Field(c => c.ImageMedium);

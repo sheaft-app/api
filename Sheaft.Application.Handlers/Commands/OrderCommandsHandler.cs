@@ -52,6 +52,9 @@ namespace Sheaft.Application.Handlers
             {
                 var productIds = request.Products.Select(p => p.Id);
                 var products = await _context.GetByIdsAsync<Product>(productIds, token);
+                if (products.Any(p => !p.Available))
+                    return Failed<Guid>(new ValidationException());
+
                 var cartProducts = new Dictionary<Product, int>();
                 foreach (var product in products)
                 {
@@ -87,6 +90,9 @@ namespace Sheaft.Application.Handlers
                 {
                     var productIds = request.Products.Select(p => p.Id);
                     var products = await _context.GetByIdsAsync<Product>(productIds, token);
+                    if(products.Any(p => !p.Available))
+                        return Failed<IEnumerable<Guid>>(new ValidationException());
+
                     var cartProducts = new Dictionary<Product, int>();
                     foreach (var product in products)
                     {
@@ -104,6 +110,9 @@ namespace Sheaft.Application.Handlers
                         var cartDelivery = request.ProducersExpectedDeliveries.FirstOrDefault(ped => ped.DeliveryModeId == delivery.Id);
                         cartDeliveries.Add(new Tuple<DeliveryMode, DateTimeOffset, string>(delivery, cartDelivery.ExpectedDeliveryDate, cartDelivery.Comment));
                     }
+
+                    if(!cartDeliveries.Any())
+                        return Failed<IEnumerable<Guid>>(new ValidationException());
 
                     order.SetDeliveries(cartDeliveries);
                     order.SetStatus(OrderStatus.Validated);
@@ -190,20 +199,25 @@ namespace Sheaft.Application.Handlers
                 if (!checkResult.Success)
                     return Failed<Guid>(checkResult.Exception);
 
+                var order = await _context.GetByIdAsync<Order>(request.OrderId, token);
+                if (!order.Deliveries.Any())
+                    return Failed<Guid>(new ValidationException());
+
+                var products = await _context.GetByIdsAsync<Product>(order.Products.Select(p => p.Id), token);
+                if (products.Any(p => !p.Available))
+                    return Failed<Guid>(new ValidationException());
+
+                if (products.Any(p => !p.Searchable))
+                    return Failed<Guid>(new ValidationException());
+
                 using (var transaction = await _context.BeginTransactionAsync(token))
                 {
-                    var order = await _context.GetByIdAsync<Order>(request.OrderId, token);
-                    if (!order.Deliveries.Any())
-                        return Failed<Guid>(new ValidationException());
-
-                    order.SetStatus(OrderStatus.Waiting);
-                    await _context.SaveChangesAsync(token);
-
                     var referenceResult = await _mediatr.Process(new CreateOrderIdentifierCommand(request.RequestUser), token);
                     if (!referenceResult.Success)
                         return Failed<Guid>(referenceResult.Exception);
 
                     order.SetReference(referenceResult.Data);
+                    order.SetStatus(OrderStatus.Waiting);
                     await _context.SaveChangesAsync(token);
 
                     var result = await _mediatr.Process(new CreateWebPayinCommand(request.RequestUser) { OrderId = order.Id }, token);

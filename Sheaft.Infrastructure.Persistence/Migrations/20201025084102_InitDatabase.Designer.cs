@@ -11,7 +11,7 @@ using Sheaft.Infrastructure.Persistence;
 namespace Sheaft.Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20200930203640_InitDatabase")]
+    [Migration("20201025084102_InitDatabase")]
     partial class InitDatabase
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -577,6 +577,9 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                     b.Property<int>("ProductsCount")
                         .HasColumnType("int");
 
+                    b.Property<string>("Reference")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<DateTimeOffset?>("RemovedOn")
                         .HasColumnType("datetimeoffset");
 
@@ -1063,6 +1066,9 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
 
                     b.Property<long?>("ReturnableUid")
                         .HasColumnType("bigint");
+
+                    b.Property<bool>("Searchable")
+                        .HasColumnType("bit");
 
                     b.Property<int>("Unit")
                         .HasColumnType("int");
@@ -2198,6 +2204,13 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                     b.HasDiscriminator().HasValue(301);
                 });
 
+            modelBuilder.Entity("Sheaft.Domain.Models.Admin", b =>
+                {
+                    b.HasBaseType("Sheaft.Domain.Models.User");
+
+                    b.HasDiscriminator().HasValue(4);
+                });
+
             modelBuilder.Entity("Sheaft.Domain.Models.Business", b =>
                 {
                     b.HasBaseType("Sheaft.Domain.Models.User");
@@ -2221,6 +2234,13 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                         .HasDefaultValue(false);
 
                     b.HasDiscriminator().HasValue(2);
+                });
+
+            modelBuilder.Entity("Sheaft.Domain.Models.Support", b =>
+                {
+                    b.HasBaseType("Sheaft.Domain.Models.User");
+
+                    b.HasDiscriminator().HasValue(3);
                 });
 
             modelBuilder.Entity("Sheaft.Domain.Models.Producer", b =>
@@ -2980,6 +3000,41 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
 
             modelBuilder.Entity("Sheaft.Domain.Models.User", b =>
                 {
+                    b.OwnsMany("Sheaft.Domain.Models.Points", "Points", b1 =>
+                        {
+                            b1.Property<long>("Uid")
+                                .ValueGeneratedOnAdd()
+                                .HasColumnType("bigint")
+                                .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                            b1.Property<DateTimeOffset>("CreatedOn")
+                                .HasColumnType("datetimeoffset");
+
+                            b1.Property<Guid>("Id")
+                                .HasColumnType("uniqueidentifier");
+
+                            b1.Property<int>("Kind")
+                                .HasColumnType("int");
+
+                            b1.Property<int>("Quantity")
+                                .HasColumnType("int");
+
+                            b1.Property<long>("UserUid")
+                                .HasColumnType("bigint");
+
+                            b1.HasKey("Uid");
+
+                            b1.HasIndex("Id")
+                                .IsUnique();
+
+                            b1.HasIndex("UserUid");
+
+                            b1.ToTable("UserPoints");
+
+                            b1.WithOwner()
+                                .HasForeignKey("UserUid");
+                        });
+
                     b.OwnsOne("Sheaft.Domain.Models.UserAddress", "Address", b1 =>
                         {
                             b1.Property<long>("UserUid")

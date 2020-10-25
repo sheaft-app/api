@@ -113,6 +113,7 @@ namespace Sheaft.Web.Api
             services.AddType<OwnerInputType>();
             services.AddType<SearchTermsInputType>();
             services.AddType<SetProductsAvailabilityInputType>();
+            services.AddType<SetProductsSearchabilityInputType>();
             services.AddType<TimeSlotGroupInputType>();
             services.AddType<UpdateStoreInputType>();
             services.AddType<UpdateProducerInputType>();

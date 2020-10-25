@@ -57,6 +57,7 @@ namespace Sheaft.Domain.Models
         public decimal VatPrice { get; set; }
         public decimal Vat { get; private set; }
         public bool Available { get; private set; }
+        public bool Searchable { get; private set; }
         public int RatingsCount { get; set; }
         public decimal? Rating { get; set; }
         public virtual Returnable Returnable { get; private set; }
@@ -83,6 +84,11 @@ namespace Sheaft.Domain.Models
         public void SetAvailable(bool? available)
         {
             Available = available ?? Available;
+        }
+
+        public void SetSearchable(bool? searchable)
+        {
+            Searchable = searchable ?? Searchable;
         }
 
         public void SetTags(IEnumerable<Tag> tags)

@@ -41,7 +41,7 @@ namespace Sheaft.Application.Queries
                 SearchFields = new List<string> { "partialProductName" },
                 Select = new List<string>()
                     {
-                        "product_id", "product_name", "product_onSalePricePerUnit", "product_onSalePrice", "product_rating", "product_ratings_count", "product_image", "product_tags", "producer_id", "producer_name", "producer_email", "producer_phone", "producer_zipcode", "producer_city", "producer_longitude", "producer_latitude", "product_returnable", "product_unit", "product_quantityPerUnit", "product_conditioning"
+                        "product_id", "product_name", "product_onSalePricePerUnit", "product_onSalePrice", "product_rating", "product_ratings_count", "product_image", "product_tags", "producer_id", "producer_name", "producer_email", "producer_phone", "producer_zipcode", "producer_city", "producer_longitude", "producer_latitude", "product_returnable", "product_unit", "product_quantityPerUnit", "product_conditioning", "product_available"
                     },
                 IncludeTotalResultCount = true,
                 HighlightFields = new List<string>() { "product_name", "producer_name" },
@@ -62,7 +62,7 @@ namespace Sheaft.Application.Queries
                 }
             }
 
-            var filter = "removed eq 0";
+            var filter = "removed eq 0 and product_searchable eq true";
             if (terms.Tags != null)
             {
                 foreach (var tag in terms.Tags)
@@ -107,6 +107,7 @@ namespace Sheaft.Application.Queries
                     Rating = p.Product_rating,
                     IsReturnable = p.Product_returnable ?? false,
                     RatingsCount = p.Product_ratings_count,
+                    Available = p.Product_available ?? true,
                     Tags = p.Product_tags?.Select(t => new TagDto { Name = t }) ?? new List<TagDto>(),
                     Unit = !string.IsNullOrWhiteSpace(p.Product_unit) ? Enum.Parse<UnitKind>(p.Product_unit.ToLowerInvariant(), true) : UnitKind.NotSpecified,
                     Conditioning = !string.IsNullOrWhiteSpace(p.Product_conditioning) ? Enum.Parse<ConditioningKind>(p.Product_conditioning, true) : ConditioningKind.Not_Specified,
@@ -186,6 +187,7 @@ namespace Sheaft.Application.Queries
             public double Producer_longitude { get; set; }
             public double Producer_latitude { get; set; }
             public bool? Product_returnable { get; set; }
+            public bool? Product_available { get; set; }
             public string Product_conditioning { get; set; }
             public string Product_weight { get; set; }
         }
