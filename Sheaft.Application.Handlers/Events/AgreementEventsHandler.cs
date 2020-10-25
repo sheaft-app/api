@@ -78,14 +78,14 @@ namespace Sheaft.Application.Handlers
             var targetName = string.Empty;
             var id = Guid.Empty;
 
-            var subEventName = "Event";
+            var subEventName = string.Empty;
             if (agreement.CreatedBy.Id == agreement.Delivery.Producer.Id)
             {
                 email = agreement.Delivery.Producer.Email;
                 name = agreement.Delivery.Producer.Name;
                 targetName = agreement.Store.Name;
                 id = agreement.Delivery.Producer.Id;
-                subEventName = "ByProducer" + subEventName;
+                subEventName = "ByStore";
             }
             else
             {
@@ -93,10 +93,10 @@ namespace Sheaft.Application.Handlers
                 name = agreement.Store.Name;
                 targetName = agreement.Delivery.Producer.Name;
                 id = agreement.Store.Id;
-                subEventName = "BySender" + subEventName;
+                subEventName = "ByProducer";
             }
 
-            var eventName = nameof(AgreementAcceptedEvent).Replace("Event", subEventName);
+            var eventName = nameof(AgreementAcceptedEvent).Replace("Event", $"{subEventName}Event");
             await _signalrService.SendNotificationToGroupAsync(id, eventName, GetNotificationContent(agreement, targetName));
             await _emailService.SendTemplatedEmailAsync(
                 email,
@@ -117,25 +117,25 @@ namespace Sheaft.Application.Handlers
             var targetName = string.Empty;
             var id = Guid.Empty;
 
-            var subEventName = "Event";
-            if (agreement.CreatedBy.Id == agreement.Delivery.Producer.Id)
-            {
-                email = agreement.Delivery.Producer.Email;
-                name = agreement.Delivery.Producer.Name;
-                targetName = agreement.Store.Name;
-                id = agreement.Delivery.Producer.Id;
-                subEventName = "ByProducer" + subEventName;
-            }
-            else
+            var subEventName = string.Empty;
+            if (agreementEvent.RequestUser.Id == agreement.Delivery.Producer.Id)
             {
                 email = agreement.Store.Email;
                 name = agreement.Store.Name;
                 targetName = agreement.Delivery.Producer.Name;
                 id = agreement.Store.Id;
-                subEventName = "BySender" + subEventName;
+                subEventName = "ByProducer";
+            }
+            else
+            {
+                email = agreement.Delivery.Producer.Email;
+                name = agreement.Delivery.Producer.Name;
+                targetName = agreement.Store.Name;
+                id = agreement.Delivery.Producer.Id;
+                subEventName = "ByStore";
             }
 
-            var eventName = nameof(AgreementCancelledEvent).Replace("Event", subEventName);
+            var eventName = nameof(AgreementCancelledEvent).Replace("Event", $"{subEventName}Event");
             await _signalrService.SendNotificationToGroupAsync(id, eventName, GetNotificationContent(agreement, targetName));
             await _emailService.SendTemplatedEmailAsync(
                 email,
@@ -156,14 +156,14 @@ namespace Sheaft.Application.Handlers
             var targetName = string.Empty;
             var id = Guid.Empty;
 
-            var subEventName = "Event";
+            var subEventName = string.Empty;
             if (agreement.CreatedBy.Id == agreement.Delivery.Producer.Id)
             {
                 email = agreement.Delivery.Producer.Email;
                 name = agreement.Delivery.Producer.Name;
                 targetName = agreement.Store.Name;
                 id = agreement.Delivery.Producer.Id;
-                subEventName = "ByProducer" + subEventName;
+                subEventName = "ByStore";
             }
             else
             {
@@ -171,10 +171,10 @@ namespace Sheaft.Application.Handlers
                 name = agreement.Store.Name;
                 targetName = agreement.Delivery.Producer.Name;
                 id = agreement.Store.Id;
-                subEventName = "BySender" + subEventName;
+                subEventName = "ByProducer";
             }
 
-            var eventName = nameof(AgreementRefusedEvent).Replace("Event", subEventName);
+            var eventName = nameof(AgreementRefusedEvent).Replace("Event", $"{subEventName}Event");
             await _signalrService.SendNotificationToGroupAsync(id, eventName, GetNotificationContent(agreement, targetName));
             await _emailService.SendTemplatedEmailAsync(
                 email,
