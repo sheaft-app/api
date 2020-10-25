@@ -37,6 +37,8 @@ namespace Sheaft.Application.Handlers
 
             var payinData = GetObject(payin);
             await _signalrService.SendNotificationToUserAsync(payin.Author.Id, nameof(PayinSucceededEvent), payinData);
+            return;
+
             await _emailService.SendTemplatedEmailAsync(
                 payin.Order.User.Email, 
                 payin.Order.User.Name, 
