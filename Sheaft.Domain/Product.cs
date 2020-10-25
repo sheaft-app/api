@@ -211,7 +211,13 @@ namespace Sheaft.Domain.Models
         }
 
         public void SetConditioning(ConditioningKind conditioning, decimal quantity, UnitKind unit = UnitKind.NotSpecified)
-        {
+        { 
+            if(conditioning != ConditioningKind.Bulk)
+                unit = UnitKind.NotSpecified;
+
+            if (conditioning == ConditioningKind.Bouquet || conditioning == ConditioningKind.Bunch)
+                QuantityPerUnit = 1;
+
             if (quantity <= 0)
                 throw new ValidationException(MessageKind.Product_QuantityPerUnit_CannotBe_LowerOrEqualThan, 0);
 
