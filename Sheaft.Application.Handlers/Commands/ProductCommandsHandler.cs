@@ -84,6 +84,9 @@ namespace Sheaft.Application.Handlers
                 await _context.AddAsync(entity, token);
                 await _context.SaveChangesAsync(token);
 
+                if (!request.SkipUpdateProducerTags)
+                    _mediatr.Post(new UpdateProducerTagsCommand(request.RequestUser) { ProducerId = request.RequestUser.Id });
+
                 var imageResult = await _mediatr.Process(new UpdateProductPictureCommand(request.RequestUser) { ProductId = entity.Id, Picture = request.Picture }, token);
                 if (!imageResult.Success)
                     return Failed<Guid>(imageResult.Exception);
@@ -123,6 +126,8 @@ namespace Sheaft.Application.Handlers
                 entity.SetTags(tags);
 
                 await _context.SaveChangesAsync(token);
+
+                _mediatr.Post(new UpdateProducerTagsCommand(request.RequestUser) { ProducerId = request.RequestUser.Id });
 
                 var imageResult = await _mediatr.Process(new UpdateProductPictureCommand(request.RequestUser) { ProductId = entity.Id, Picture = request.Picture }, token);
                 if (!imageResult.Success)
@@ -301,6 +306,8 @@ namespace Sheaft.Application.Handlers
 
                                 await _context.SaveChangesAsync(token);
                                 await transaction.CommitAsync(token);
+
+                                _mediatr.Post(new UpdateProducerTagsCommand(request.RequestUser) { ProducerId = request.RequestUser.Id });
                             }
                         }
                     }
@@ -433,6 +440,7 @@ namespace Sheaft.Application.Handlers
 
             createProductCommand.Searchable = false;
             createProductCommand.Available = false;
+            createProductCommand.SkipUpdateProducerTags = true;
 
             return Ok(createProductCommand);
         }

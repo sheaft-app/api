@@ -10,5 +10,7 @@ namespace Sheaft.Application.Commands
         public CreateProductCommand(RequestUser requestUser) : base(requestUser)
         {
         }
+
+        public bool SkipUpdateProducerTags { get; set; } = false;
     }
 }

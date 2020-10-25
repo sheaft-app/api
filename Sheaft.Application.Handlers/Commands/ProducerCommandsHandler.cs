@@ -21,7 +21,8 @@ namespace Sheaft.Application.Handlers
         IRequestHandler<RegisterProducerCommand, Result<Guid>>,
         IRequestHandler<UpdateProducerCommand, Result<bool>>,
         IRequestHandler<CheckProducerConfigurationCommand, Result<bool>>,
-        IRequestHandler<EnsureProducerDocumentsValidatedCommand, Result<bool>>
+        IRequestHandler<EnsureProducerDocumentsValidatedCommand, Result<bool>>,
+        IRequestHandler<UpdateProducerTagsCommand, Result<bool>>
     {
         private readonly RoleOptions _roleOptions;
 
@@ -200,6 +201,20 @@ namespace Sheaft.Application.Handlers
                 if (!producerLegal.Documents.Any() || producerLegal.Documents.Any(d => d.Status != DocumentStatus.Validated))
                     return Failed<bool>(new InvalidOperationException());
 
+                return Ok(true);
+            });
+        }
+
+        public async Task<Result<bool>> Handle(UpdateProducerTagsCommand request, CancellationToken token)
+        {
+            return await ExecuteAsync(request, async () =>
+            {
+                var producer = await _context.GetByIdAsync<Producer>(request.ProducerId, token);
+
+                var productTags = await _context.Products.Where(p => p.Producer.Id == producer.Id).SelectMany(p => p.Tags).Select(p => p.Tag).Distinct().ToListAsync(token);
+                producer.SetTags(productTags);
+
+                await _context.SaveChangesAsync(token);
                 return Ok(true);
             });
         }
