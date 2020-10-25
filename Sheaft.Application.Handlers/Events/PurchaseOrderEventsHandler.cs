@@ -58,7 +58,7 @@ namespace Sheaft.Application.Handlers
             var purchaseOrder = await _context.GetByIdAsync<PurchaseOrder>(orderEvent.PurchaseOrderId, token);
             await _signalrService.SendNotificationToGroupAsync(purchaseOrder.Vendor.Id, nameof(PurchaseOrderWithdrawnEvent), GetPurchaseNotifModelAsString(purchaseOrder));
 
-            var url = $"{_configuration.GetValue<string>("Portal:url")}/#/orders/{purchaseOrder.Id}";
+            var url = $"{_configuration.GetValue<string>("Portal:url")}/#/purchase-orders/{purchaseOrder.Id}";
             await _emailService.SendTemplatedEmailAsync(
                 purchaseOrder.Vendor.Email,
                 purchaseOrder.Vendor.Name,
