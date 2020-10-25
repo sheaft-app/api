@@ -39,25 +39,25 @@ namespace Sheaft.Application.Handlers
             var targetName = string.Empty;
             var id = Guid.Empty;
 
-            var subEventName = "Event";
+            var subEventName = string.Empty;
             if (agreement.CreatedBy.Id == agreement.Delivery.Producer.Id)
-            {
-                email = agreement.Delivery.Producer.Email;
-                name = agreement.Delivery.Producer.Name;
-                targetName = agreement.Store.Name;
-                id = agreement.Delivery.Producer.Id;
-                subEventName = "ByProducer" + subEventName;
-            }
-            else
             {
                 email = agreement.Store.Email;
                 name = agreement.Store.Name;
                 targetName = agreement.Delivery.Producer.Name;
                 id = agreement.Store.Id;
-                subEventName = "BySender" + subEventName;
+                subEventName = "ByProducer";
+            }
+            else
+            {
+                email = agreement.Delivery.Producer.Email;
+                name = agreement.Delivery.Producer.Name;
+                targetName = agreement.Store.Name;
+                id = agreement.Delivery.Producer.Id;
+                subEventName = "ByStore";
             }
 
-            var eventName = nameof(AgreementCreatedEvent).Replace("Event", subEventName);
+            var eventName = nameof(AgreementCreatedEvent).Replace("Event", $"{subEventName}Event");
             await _signalrService.SendNotificationToGroupAsync(id, eventName, GetNotificationContent(agreement, targetName));
             await _emailService.SendTemplatedEmailAsync(
                 email,
