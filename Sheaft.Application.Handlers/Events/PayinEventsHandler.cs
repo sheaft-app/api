@@ -64,7 +64,7 @@ namespace Sheaft.Application.Handlers
                 payin.Order.User.Email,
                 payin.Order.User.Name,
                 $"Votre paiement de {payin.Debited}€ a échoué",
-                nameof(PayinSucceededEvent),
+                nameof(PayinFailedEvent),
                 payinData,
                 true,
                 token);
