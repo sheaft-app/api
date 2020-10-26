@@ -264,26 +264,50 @@ POST https://sheaft-search.search.windows.net/indexes?api-version=2020-06-30
     {
       "@odata.type": "#Microsoft.Azure.Search.CustomAnalyzer",
       "name": "prefixCmAnalyzer",
-      "tokenizer": "standard_v2",
+      "tokenizer": "tokenizerLetterDigit",
       "tokenFilters": [
         "lowercase",
-        "asciifolding",
-        "edgeNGramCmTokenFilter"
+        "asciifolding"
       ],
-      "charFilters": []
+      "charFilters": [
+        "charFilterSpecial"
+      ]
     }
   ],
-  "charFilters": [],
-  "tokenFilters": [
+  "charFilters": [
     {
-      "@odata.type": "#Microsoft.Azure.Search.EdgeNGramTokenFilterV2",
-      "name": "edgeNGramCmTokenFilter",
-      "minGram": 2,
-      "maxGram": 20,
-      "side": "front"
+      "@odata.type": "#Microsoft.Azure.Search.MappingCharFilter",
+      "name": "charFilterSpecial",
+      "mappings": [
+        ",=>",
+        ";=>",
+        "!=>",
+        ".=>",
+        "|=>",
+        "==>",
+        "~=>",
+        "\"=>",
+        "(=>",
+        ")=>",
+        "[=>",
+        "]=>",
+        "#=>",
+        "&=>"
+      ]
     }
   ],
-  "tokenizers": []
+  "tokenizers": [
+    {
+      "@odata.type": "#Microsoft.Azure.Search.EdgeNGramTokenizer",
+      "name": "tokenizerLetterDigit",
+      "minGram": 3,
+      "maxGram": 7,
+      "tokenChars": [
+        "letter",
+        "digit"
+      ]
+    }
+  ]
 }
 
 POST https://sheaft-search.search.windows.net/indexers?api-version=2020-06-30
