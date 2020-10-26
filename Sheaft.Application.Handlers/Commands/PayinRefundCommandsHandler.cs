@@ -18,9 +18,9 @@ using Microsoft.Extensions.Options;
 namespace Sheaft.Application.Handlers
 {
     public class PayinRefundCommandsHandler : ResultsHandler,
+        IRequestHandler<CheckNewPayinRefundsCommand, Result<bool>>,
         IRequestHandler<CheckPayinRefundsCommand, Result<bool>>,
         IRequestHandler<CheckPayinRefundCommand, Result<bool>>,
-        IRequestHandler<ExpirePayinRefundCommand, Result<bool>>,
         IRequestHandler<RefreshPayinRefundStatusCommand, Result<TransactionStatus>>,
         IRequestHandler<CreatePayinRefundCommand, Result<Guid>>
     {
@@ -39,16 +39,15 @@ namespace Sheaft.Application.Handlers
             _routineOptions = routineOptions.Value;
         }
 
-        public async Task<Result<bool>> Handle(CheckPayinRefundsCommand request, CancellationToken token)
+        public async Task<Result<bool>> Handle(CheckNewPayinRefundsCommand request, CancellationToken token)
         {
             return await ExecuteAsync(request, async () =>
             {
                 var skip = 0;
                 const int take = 100;
 
-                var expiredDate = DateTimeOffset.UtcNow.AddMinutes(-_routineOptions.CheckPayinRefundsFromMinutes);
-                var payinRefundIds = await GetNextPayinRefundIdsAsync(expiredDate, skip, take, token);
-
+                var expiredDate = DateTimeOffset.UtcNow.AddMinutes(-_routineOptions.CheckNewPayinRefundsFromMinutes);
+                var payinRefundIds = await GetNextNewPayinRefundIdsAsync(expiredDate, skip, take, token);
                 while (payinRefundIds.Any())
                 {
                     foreach (var payinRefundId in payinRefundIds)
@@ -60,7 +59,33 @@ namespace Sheaft.Application.Handlers
                     }
 
                     skip += take;
-                    payinRefundIds = await GetNextPayinRefundIdsAsync(expiredDate, skip, take, token);
+                    payinRefundIds = await GetNextNewPayinRefundIdsAsync(expiredDate, skip, take, token);
+                }
+
+                return Ok(true);
+            });
+        }
+
+        public async Task<Result<bool>> Handle(CheckPayinRefundsCommand request, CancellationToken token)
+        {
+            return await ExecuteAsync(request, async () =>
+            {
+                var skip = 0;
+                const int take = 100;
+
+                var payinRefundIds = await GetNextPayinRefundIdsAsync(skip, take, token);
+                while (payinRefundIds.Any())
+                {
+                    foreach (var payinRefundId in payinRefundIds)
+                    {
+                        _mediatr.Post(new CheckPayinRefundCommand(request.RequestUser)
+                        {
+                            PayinRefundId = payinRefundId
+                        });
+                    }
+
+                    skip += take;
+                    payinRefundIds = await GetNextPayinRefundIdsAsync(skip, take, token);
                 }
 
                 return Ok(true);
@@ -75,25 +100,10 @@ namespace Sheaft.Application.Handlers
                 if (payinRefund.Status != TransactionStatus.Created && payinRefund.Status != TransactionStatus.Waiting)
                     return Ok(false);
 
-                if (payinRefund.CreatedOn.AddMinutes(_routineOptions.CheckPayinRefundExpiredFromMinutes) < DateTimeOffset.UtcNow && payinRefund.Status == TransactionStatus.Waiting)
-                    return await _mediatr.Process(new ExpirePayinRefundCommand(request.RequestUser) { PayinRefundId = request.PayinRefundId }, token);
-
                 var result = await _mediatr.Process(new RefreshPayinRefundStatusCommand(request.RequestUser, payinRefund.Identifier), token);
                 if (!result.Success)
                     return Failed<bool>(result.Exception);
 
-                return Ok(true);
-            });
-        }
-
-        public async Task<Result<bool>> Handle(ExpirePayinRefundCommand request, CancellationToken token)
-        {
-            return await ExecuteAsync(request, async () =>
-            {
-                var payinRefund = await _context.GetByIdAsync<PayinRefund>(request.PayinRefundId, token);
-                payinRefund.SetStatus(TransactionStatus.Expired);
-
-                await _context.SaveChangesAsync(token);
                 return Ok(true);
             });
         }
@@ -104,7 +114,7 @@ namespace Sheaft.Application.Handlers
             {
                 var payinRefund = await _context.GetSingleAsync<PayinRefund>(c => c.Identifier == request.Identifier, token);
                 if (payinRefund.Status == TransactionStatus.Succeeded || payinRefund.Status == TransactionStatus.Failed)
-                    return Failed<TransactionStatus>(new InvalidOperationException());
+                    return Ok(payinRefund.Status);
 
                 var pspResult = await _pspService.GetRefundAsync(payinRefund.Identifier, token);
                 if (!pspResult.Success)
@@ -134,39 +144,14 @@ namespace Sheaft.Application.Handlers
                 var order = await _context.GetByIdAsync<Order>(request.OrderId, token);
                 if (order.Payin == null
                     || order.Payin.Status != TransactionStatus.Succeeded
-                    || (order.Payin.Refund != null && order.Payin.Refund.Status != TransactionStatus.Expired))
+                    || (order.Payin.Refund != null && order.Payin.Refund.Status != TransactionStatus.Failed))
                     return Failed<Guid>(new InvalidOperationException());
 
                 var orderPayinRefunds = await _context.FindAsync<PayinRefund>(c => c.Payin.Id == order.Payin.Id, token);
-                if (orderPayinRefunds.Any(c => c.Status != TransactionStatus.Expired))
+                if (orderPayinRefunds.Any(c => c.Status != TransactionStatus.Failed))
                     return Failed<Guid>(new InvalidOperationException());
-
-                if (orderPayinRefunds.Count(c => c.Status == TransactionStatus.Expired) >= 3)
-                {
-                    order.Payin.SetSkipBackgroundProcessing(true);
-                    await _context.SaveChangesAsync(token);
-
-                    _mediatr.Post(new CreatePayinRefundFailedEvent(request.RequestUser)
-                    {
-                        OrderId = order.Id
-                    });
-
-                    return TooManyRetries<Guid>();
-                }
 
                 var purchaseOrdersToRefund = order.PurchaseOrders.Where(po => po.Status > PurchaseOrderStatus.Delivered);
-                var availablePurchaseOrdersToRefund = new List<PurchaseOrder>();
-                foreach(var purchaseOrderToRefund in purchaseOrdersToRefund)
-                {
-                    if (purchaseOrderToRefund.Transfer == null)
-                        availablePurchaseOrdersToRefund.Add(purchaseOrderToRefund);
-                    else if (purchaseOrderToRefund.Transfer.Refund != null && purchaseOrderToRefund.Transfer.Refund.Status == TransactionStatus.Succeeded)
-                        availablePurchaseOrdersToRefund.Add(purchaseOrderToRefund);
-                }
-
-                if(availablePurchaseOrdersToRefund.Count() != purchaseOrdersToRefund.Count())
-                    return Failed<Guid>(new InvalidOperationException());
-
                 using (var transaction = await _context.BeginTransactionAsync(token))
                 {
                     var payinRefund = new PayinRefund(Guid.NewGuid(), order.Payin, purchaseOrdersToRefund.Sum(po => po.TotalOnSalePrice));
@@ -192,12 +177,28 @@ namespace Sheaft.Application.Handlers
             });
         }
 
-        private async Task<IEnumerable<Guid>> GetNextPayinRefundIdsAsync(DateTimeOffset expiredDate, int skip, int take, CancellationToken token)
+        private async Task<IEnumerable<Guid>> GetNextPayinRefundIdsAsync(int skip, int take, CancellationToken token)
         {
             return await _context.Refunds
                 .OfType<PayinRefund>()
-                .Get(c => c.CreatedOn < expiredDate
-                      && (c.Status == TransactionStatus.Waiting || c.Status == TransactionStatus.Created), true)
+                .Get(c => c.Status == TransactionStatus.Waiting || c.Status == TransactionStatus.Created, true)
+                .OrderBy(c => c.CreatedOn)
+                .Select(c => c.Id)
+                .Skip(skip)
+                .Take(take)
+                .ToListAsync(token);
+        }
+
+        private async Task<IEnumerable<Guid>> GetNextNewPayinRefundIdsAsync(DateTimeOffset expiredDate, int skip, int take, CancellationToken token)
+        {
+            return await _context.Orders
+                .Get(c =>
+                        c.Payin != null
+                        && c.Payin.Status == TransactionStatus.Succeeded
+                        && (c.Payin.Refund == null || c.Payin.Status == TransactionStatus.Failed)
+                        && c.PurchaseOrders.All(po => po.Status >= PurchaseOrderStatus.Delivered)
+                        && c.PurchaseOrders.Any(po => po.WithdrawnOn.HasValue)
+                        && c.PurchaseOrders.Max(po => po.WithdrawnOn) < expiredDate, true)
                 .OrderBy(c => c.CreatedOn)
                 .Select(c => c.Id)
                 .Skip(skip)

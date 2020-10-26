@@ -20,7 +20,6 @@ namespace Sheaft.Domain.Models
             Reference = "SHEAFT";
         }
 
-        public bool SkipBackgroundProcessing { get; private set; }
         public virtual Wallet CreditedWallet { get; private set; }
         public virtual Order Order { get; private set; }
         public virtual PayinRefund Refund { get; private set; }
@@ -32,11 +31,6 @@ namespace Sheaft.Domain.Models
 
             Refund = null;
             Refund = refund;
-        }
-
-        public void SetSkipBackgroundProcessing(bool value)
-        {
-            SkipBackgroundProcessing = value;
         }
     }
 }

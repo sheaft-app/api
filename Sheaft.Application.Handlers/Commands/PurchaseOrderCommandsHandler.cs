@@ -239,6 +239,8 @@ namespace Sheaft.Application.Handlers
                 purchaseOrder.Deliver();
 
                 await _context.SaveChangesAsync(token);
+
+                _mediatr.Schedule(new CreateTransferCommand(request.RequestUser) { PurchaseOrderId = purchaseOrder.Id }, TimeSpan.FromDays(7));
                 return Ok(true);
             });
         }
@@ -257,9 +259,6 @@ namespace Sheaft.Application.Handlers
                 else
                     _mediatr.Post(new PurchaseOrderCancelledEvent(request.RequestUser) { PurchaseOrderId = purchaseOrder.Id });
 
-                if (purchaseOrder.Transfer != null && purchaseOrder.Transfer.Status == TransactionStatus.Succeeded)
-                    _mediatr.Post(new CreateTransferRefundCommand(request.RequestUser) { PurchaseOrderId = purchaseOrder.Id });
-
                 return Ok(true);
             });
         }
@@ -274,9 +273,6 @@ namespace Sheaft.Application.Handlers
                 await _context.SaveChangesAsync(token);
 
                 _mediatr.Post(new PurchaseOrderRefusedEvent(request.RequestUser) { PurchaseOrderId = purchaseOrder.Id });
-
-                if(purchaseOrder.Transfer != null && purchaseOrder.Transfer.Status == TransactionStatus.Succeeded)
-                    _mediatr.Post(new CreateTransferRefundCommand(request.RequestUser) { PurchaseOrderId = purchaseOrder.Id });
 
                 return Ok(true);
             });
@@ -320,8 +316,6 @@ namespace Sheaft.Application.Handlers
                 await _context.SaveChangesAsync(token);
                 
                 _mediatr.Post(new PurchaseOrderAcceptedEvent(request.RequestUser) { PurchaseOrderId = purchaseOrder.Id });
-                _mediatr.Schedule(new CreateTransferCommand(request.RequestUser) { PurchaseOrderId = purchaseOrder.Id }, TimeSpan.FromMinutes(1440));
-
                 return Ok(true);
             });
         }

@@ -27,7 +27,6 @@ namespace Sheaft.Application.Handlers
         IRequestHandler<ConfirmOrderCommand, Result<IEnumerable<Guid>>>,
         IRequestHandler<FailOrderCommand, Result<bool>>,
         IRequestHandler<ExpireOrderCommand, Result<bool>>,
-        IRequestHandler<UnblockOrderCommand, Result<bool>>,
         IRequestHandler<CheckOrdersCommand, Result<bool>>,
         IRequestHandler<CheckOrderCommand, Result<bool>>
     {
@@ -311,7 +310,8 @@ namespace Sheaft.Application.Handlers
                         }
 
                         _mediatr.Post(new CreateUserPointsCommand(request.RequestUser) { CreatedOn = DateTimeOffset.UtcNow, Kind = PointKind.PurchaseOrder, UserId = order.User.Id });
-                        _mediatr.Schedule(new CreateDonationCommand(request.RequestUser) { OrderId = order.Id }, TimeSpan.FromMinutes(60));
+                        if(order.Donate > 0)
+                            _mediatr.Post(new CreateDonationCommand(request.RequestUser) { OrderId = order.Id });
 
                         return Ok(purchaseOrderIds.AsEnumerable());
                     }
@@ -352,18 +352,6 @@ namespace Sheaft.Application.Handlers
             });
         }
 
-        public async Task<Result<bool>> Handle(UnblockOrderCommand request, CancellationToken token)
-        {
-            return await ExecuteAsync(request, async () =>
-            {
-                var order = await _context.GetByIdAsync<Order>(request.OrderId, token);
-                order.SetSkipBackgroundProcessing(false);
-
-                await _context.SaveChangesAsync(token);
-                return Ok(true);
-            });
-        }
-
         public async Task<Result<bool>> Handle(CheckOrdersCommand request, CancellationToken token)
         {
             return await ExecuteAsync(request, async () =>
@@ -371,8 +359,7 @@ namespace Sheaft.Application.Handlers
                 var skip = 0;
                 const int take = 100;
 
-                var expiredDate = DateTimeOffset.UtcNow.AddMinutes(-_routineOptions.CheckOrdersFromMinutes);
-                var orderIds = await GetNextOrderIdsAsync(expiredDate, skip, take, token);
+                var orderIds = await GetNextOrderIdsAsync(skip, take, token);
 
                 while (orderIds.Any())
                 {
@@ -385,7 +372,7 @@ namespace Sheaft.Application.Handlers
                     }
 
                     skip += take;
-                    orderIds = await GetNextOrderIdsAsync(expiredDate, skip, take, token);
+                    orderIds = await GetNextOrderIdsAsync(skip, take, token);
                 }
 
                 return Ok(true);
@@ -407,11 +394,10 @@ namespace Sheaft.Application.Handlers
             });
         }
 
-        private async Task<IEnumerable<Guid>> GetNextOrderIdsAsync(DateTimeOffset expiredDate, int skip, int take, CancellationToken token)
+        private async Task<IEnumerable<Guid>> GetNextOrderIdsAsync(int skip, int take, CancellationToken token)
         {
             return await _context.Orders
-                .Get(c => c.CreatedOn < expiredDate
-                        && (c.Payin == null || c.Payin.Status == TransactionStatus.Failed || c.Payin.Status == TransactionStatus.Expired)
+                .Get(c => (c.Payin == null || c.Payin.Status == TransactionStatus.Failed)
                         && (c.Status == OrderStatus.Waiting || c.Status == OrderStatus.Created), true)
                 .OrderBy(c => c.CreatedOn)
                 .Select(c => c.Id)

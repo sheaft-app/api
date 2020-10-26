@@ -22,8 +22,7 @@ namespace Sheaft.Application.Handlers
         IRequestHandler<CreateWebPayinCommand, Result<Guid>>,
         IRequestHandler<CheckPayinsCommand, Result<bool>>,
         IRequestHandler<CheckPayinCommand, Result<bool>>,
-        IRequestHandler<RefreshPayinStatusCommand, Result<TransactionStatus>>,
-        IRequestHandler<ExpirePayinCommand, Result<bool>>
+        IRequestHandler<RefreshPayinStatusCommand, Result<TransactionStatus>>
     {
         private readonly IPspService _pspService;
         private readonly RoutineOptions _routineOptions;
@@ -110,25 +109,10 @@ namespace Sheaft.Application.Handlers
                 if (payin.Status != TransactionStatus.Created && payin.Status != TransactionStatus.Waiting)
                     return Ok(false);
 
-                if (payin.CreatedOn.AddMinutes(_routineOptions.CheckPayinExpiredFromMinutes) < DateTimeOffset.UtcNow && payin.Status == TransactionStatus.Waiting)
-                    return await _mediatr.Process(new ExpirePayinCommand(request.RequestUser) { PayinId = request.PayinId }, token);
-
                 var result = await _mediatr.Process(new RefreshPayinStatusCommand(request.RequestUser, payin.Identifier), token);
                 if (!result.Success)
                     return Failed<bool>(result.Exception);
 
-                return Ok(true);
-            });
-        }
-
-        public async Task<Result<bool>> Handle(ExpirePayinCommand request, CancellationToken token)
-        {
-            return await ExecuteAsync(request, async () =>
-            {
-                var payin = await _context.GetByIdAsync<Payin>(request.PayinId, token);
-                payin.SetStatus(TransactionStatus.Expired);
-
-                await _context.SaveChangesAsync(token);
                 return Ok(true);
             });
         }
@@ -139,7 +123,7 @@ namespace Sheaft.Application.Handlers
             {
                 var payin = await _context.GetSingleAsync<Payin>(c => c.Identifier == request.Identifier, token);
                 if (payin.Status == TransactionStatus.Succeeded || payin.Status == TransactionStatus.Failed)
-                    return Failed<TransactionStatus>(new InvalidOperationException());
+                    return Ok(payin.Status);
 
                 var pspResult = await _pspService.GetPayinAsync(payin.Identifier, token);
                 if (!pspResult.Success)

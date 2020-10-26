@@ -85,13 +85,11 @@ namespace Sheaft.Web.Manage.Controllers
             if (take > 100)
                 take = 100;
 
-            var expiredDate = DateTimeOffset.UtcNow.AddMinutes(-_routineOptions.CheckNewPayoutsFromMinutes);
             var producersTransfers = await _context.Transfers
-                .Get(t => t.Refund == null
-                        && t.Status == TransactionStatus.Succeeded
-                        && (t.Payout == null || t.Payout.Status == TransactionStatus.Expired)
+                .Get(t => t.Status == TransactionStatus.Succeeded
+                        && (t.Payout == null || t.Payout.Status == TransactionStatus.Failed)
                         && t.PurchaseOrder.Status == PurchaseOrderStatus.Delivered
-                        && t.PurchaseOrder.DeliveredOn.HasValue && t.PurchaseOrder.DeliveredOn.Value < expiredDate)
+                        && t.PurchaseOrder.DeliveredOn.HasValue)
                 .Select(t => new ProducerPayoutViewModel { ProducerId = t.CreditedWallet.User.Id, Amount = t.Credited, TransferId = t.Id, Name = t.CreditedWallet.User.Name, Email = t.CreditedWallet.User.Email, Phone = t.CreditedWallet.User.Phone })
                 .OrderBy(c => c.ProducerId)
                 .Skip(page * take)
@@ -145,22 +143,6 @@ namespace Sheaft.Web.Manage.Controllers
                 throw new NotFoundException();
 
             return View(entity);
-        }
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Expire(PayoutViewModel model, CancellationToken token)
-        {
-            var requestUser = await GetRequestUser(token);
-            var result = await _mediatr.Process(new ExpirePayoutCommand(requestUser) { PayoutId = model.Id }, token);
-            if (!result.Success)
-            {
-                ModelState.AddModelError("", result.Exception.Message);
-                return View("Details", model);
-            }
-
-            TempData["Edited"] = JsonConvert.SerializeObject(new EntityViewModel { Id = model.Id, Name = model.Identifier });
-            return RedirectToAction("Index");
         }
     }
 }

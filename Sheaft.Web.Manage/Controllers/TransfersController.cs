@@ -87,37 +87,5 @@ namespace Sheaft.Web.Manage.Controllers
 
             return View(entity);
         }
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Expire(TransferViewModel model, CancellationToken token)
-        {
-            var requestUser = await GetRequestUser(token);
-            var result = await _mediatr.Process(new ExpireTransferCommand(requestUser) { TransferId = model.Id }, token);
-            if (!result.Success)
-            {
-                ModelState.AddModelError("", result.Exception.Message);
-                return View("Details", model);
-            }
-
-            TempData["Edited"] = JsonConvert.SerializeObject(new EntityViewModel { Id = model.Id, Name = model.Identifier });
-            return RedirectToAction("Index");
-        }
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Unblock(TransferViewModel model, CancellationToken token)
-        {
-            var requestUser = await GetRequestUser(token);
-            var result = await _mediatr.Process(new UnblockTransferCommand(requestUser) { TransferId = model.Id }, token);
-            if (!result.Success)
-            {
-                ModelState.AddModelError("", result.Exception.Message);
-                return View("Details", model);
-            }
-
-            TempData["Edited"] = JsonConvert.SerializeObject(new EntityViewModel { Id = model.Id, Name = model.Identifier });
-            return RedirectToAction("Index");
-        }
     }
 }

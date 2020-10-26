@@ -46,7 +46,7 @@ namespace Sheaft.Infrastructure.Services
 
                 await EnsureAccessTokenIsValidAsync(token);
 
-                var result = await _api.Users.CreateAsync(consumerLegal.Id.ToString("N"),
+                var result = await _api.Users.CreateAsync(GetIdempotencyKey(consumerLegal.Id),
                     new UserNaturalPostDTO(
                         consumerLegal.Owner.Email,
                         consumerLegal.Owner.FirstName,
@@ -72,7 +72,7 @@ namespace Sheaft.Infrastructure.Services
 
                 await EnsureAccessTokenIsValidAsync(token);
 
-                var result = await _api.Users.CreateAsync(businessLegal.Id.ToString("N"),
+                var result = await _api.Users.CreateAsync(GetIdempotencyKey(businessLegal.Id),
                     new UserLegalPostDTO(
                         businessLegal.Email,
                         businessLegal.User.Name,
@@ -107,7 +107,7 @@ namespace Sheaft.Infrastructure.Services
                 await EnsureAccessTokenIsValidAsync(token);
 
                 var result = await _api.Wallets.CreateAsync(
-                    wallet.Id.ToString("N"),
+                    GetIdempotencyKey(wallet.Id),
                     new WalletPostDTO(new List<string> { wallet.User.Identifier },
                     wallet.Name,
                     CurrencyIso.EUR)
@@ -131,7 +131,7 @@ namespace Sheaft.Infrastructure.Services
 
                 await EnsureAccessTokenIsValidAsync(token);
 
-                var result = await _api.Users.CreateBankAccountIbanAsync(payment.Id.ToString("N"),
+                var result = await _api.Users.CreateBankAccountIbanAsync(GetIdempotencyKey(payment.Id),
                     new BankAccountIbanPostDTO(
                         payment.Owner,
                         new MangoPay.SDK.Entities.Address
@@ -167,7 +167,7 @@ namespace Sheaft.Infrastructure.Services
                 await EnsureAccessTokenIsValidAsync(token);
 
                 var result = await _api.CardRegistrations.CreateAsync(
-                    payment.Id.ToString("N"),
+                    GetIdempotencyKey(payment.Id),
                     new CardRegistrationPostDTO(payment.User.Identifier, CurrencyIso.EUR, CardType.CB_VISA_MASTERCARD));
 
                 return Ok(new KeyValuePair<string, string>(result.Id, result.CardId));
@@ -200,7 +200,7 @@ namespace Sheaft.Infrastructure.Services
 
                 await EnsureAccessTokenIsValidAsync(token);
 
-                var result = await _api.Users.CreateKycDocumentAsync(document.Id.ToString("N"), userIdentifier, document.Kind.GetDocumentType());
+                var result = await _api.Users.CreateKycDocumentAsync(GetIdempotencyKey(document.Id), userIdentifier, document.Kind.GetDocumentType());
 
                 return Ok(new PspDocumentResultDto
                 {
@@ -222,7 +222,7 @@ namespace Sheaft.Infrastructure.Services
 
                 await EnsureAccessTokenIsValidAsync(token);
 
-                await _api.Users.CreateKycPageAsync(page.Id.ToString("N"), userIdentifier, document.Identifier, bytes);
+                await _api.Users.CreateKycPageAsync(GetIdempotencyKey(page.Id), userIdentifier, document.Identifier, bytes);
                 return Ok(true);
             });
         }
@@ -264,7 +264,7 @@ namespace Sheaft.Infrastructure.Services
 
                 await EnsureAccessTokenIsValidAsync(token);
 
-                var result = await _api.UboDeclarations.CreateUboDeclarationAsync(declaration.Id.ToString("N"), business.Identifier);
+                var result = await _api.UboDeclarations.CreateUboDeclarationAsync(GetIdempotencyKey(declaration.Id), business.Identifier);
                 return Ok(new PspDeclarationResultDto
                 {
                     Identifier = result.Id,
@@ -320,7 +320,7 @@ namespace Sheaft.Infrastructure.Services
 
                 await EnsureAccessTokenIsValidAsync(token);
 
-                var result = await _api.UboDeclarations.CreateUboAsync(ubo.Id.ToString("N"),
+                var result = await _api.UboDeclarations.CreateUboAsync(GetIdempotencyKey(ubo.Id),
                     new UboPostDTO(ubo.FirstName,
                         ubo.LastName,
                         ubo.Address.GetAddress(),
@@ -378,7 +378,7 @@ namespace Sheaft.Infrastructure.Services
 
                 await EnsureAccessTokenIsValidAsync(token);
 
-                var result = await _api.PayIns.CreateCardWebAsync(transaction.Id.ToString("N"),
+                var result = await _api.PayIns.CreateCardWebAsync(GetIdempotencyKey(transaction.Id),
                     new PayInCardWebPostDTO(
                         transaction.Author.Identifier,
                         new Money
@@ -432,7 +432,7 @@ namespace Sheaft.Infrastructure.Services
 
                 await EnsureAccessTokenIsValidAsync(token);
 
-                var result = await _api.PayIns.CreateCardDirectAsync(transaction.Id.ToString("N"),
+                var result = await _api.PayIns.CreateCardDirectAsync(GetIdempotencyKey(transaction.Id),
                     new PayInCardDirectPostDTO(
                         transaction.Author.Identifier,
                         transaction.CreditedWallet.User.Identifier,
@@ -509,7 +509,7 @@ namespace Sheaft.Infrastructure.Services
 
                 await EnsureAccessTokenIsValidAsync(token);
 
-                var result = await _api.PayOuts.CreateBankWireAsync(transaction.Id.ToString("N"),
+                var result = await _api.PayOuts.CreateBankWireAsync(GetIdempotencyKey(transaction.Id),
                     new PayOutBankWirePostDTO(
                         transaction.Author.Identifier,
                         transaction.DebitedWallet.Identifier,
@@ -555,7 +555,7 @@ namespace Sheaft.Infrastructure.Services
 
                 await EnsureAccessTokenIsValidAsync(token);
 
-                var result = await _api.PayIns.CreateRefundAsync(transaction.Id.ToString("N"), transaction.Payin.Identifier,
+                var result = await _api.PayIns.CreateRefundAsync(GetIdempotencyKey(transaction.Id), transaction.Payin.Identifier,
                     new RefundPayInPostDTO(
                         transaction.Author.Identifier,
                         new Money
@@ -568,40 +568,6 @@ namespace Sheaft.Infrastructure.Services
                             Amount = transaction.Debited.GetAmount(),
                             Currency = CurrencyIso.EUR
                         })
-                    {
-                        Tag = $"Id='{transaction.Id}'"
-                    });
-
-                return Ok(new PspPaymentResultDto
-                {
-                    Credited = result.CreditedFunds.Amount.GetAmount(),
-                    ProcessedOn = result.ExecutionDate,
-                    Identifier = result.Id,
-                    ResultCode = result.ResultCode,
-                    ResultMessage = MangoExtensions.GetOperationMessage(result.ResultCode, result.ResultMessage),
-                    Debited = result.DebitedFunds.Amount.GetAmount(),
-                    Fees = result.Fees.Amount.GetAmount(),
-                    Status = result.Status.GetTransactionStatus()
-                });
-            });
-        }
-
-        public async Task<Result<PspPaymentResultDto>> RefundTransferAsync(TransferRefund transaction, CancellationToken token)
-        {
-            return await ExecuteAsync(async () =>
-            {
-                if (string.IsNullOrWhiteSpace(transaction.Author.Identifier))
-                    return Failed<PspPaymentResultDto>(new SheaftException(ExceptionKind.BadRequest, MessageKind.PsP_CannotRefund_Transfer_Author_Not_Exists));
-
-                if (string.IsNullOrWhiteSpace(transaction.Transfer.Identifier))
-                    return Failed<PspPaymentResultDto>(new SheaftException(ExceptionKind.BadRequest, MessageKind.PsP_CannotRefund_Transfer_TransferIdentifier_Missing));
-
-                await EnsureAccessTokenIsValidAsync(token);
-
-                var result = await _api.Transfers.CreateRefundAsync(
-                    transaction.Id.ToString("N"),
-                    transaction.Transfer.Identifier,
-                    new RefundTransferPostDTO(transaction.Author.Identifier)
                     {
                         Tag = $"Id='{transaction.Id}'"
                     });
@@ -743,7 +709,7 @@ namespace Sheaft.Infrastructure.Services
 
                 await EnsureAccessTokenIsValidAsync(token);
 
-                var result = await _api.Transfers.CreateAsync(idempotencyKey.ToString("N"),
+                var result = await _api.Transfers.CreateAsync(GetIdempotencyKey(idempotencyKey),
                     new TransferPostDTO(
                         author,
                         creditedUserIdentifier,
@@ -789,6 +755,14 @@ namespace Sheaft.Infrastructure.Services
 
             oauthToken = await _api.AuthenticationManager.CreateTokenAsync();
             _api.OAuthTokenManager.StoreToken(oauthToken);
+        }
+
+        private string GetIdempotencyKey(Guid id)
+        {
+            if (_pspOptions.SkipIdempotencyKey)
+                return Guid.NewGuid().ToString("N");
+
+            return id.ToString("N");
         }
     }
 

@@ -92,7 +92,7 @@ namespace Sheaft.Application.Handlers
             await _emailService.SendTemplatedEmailAsync(
                 purchaseOrder.Sender.Email,
                 purchaseOrder.Sender.Name,
-                $"Votre commande est prête",
+                $"Votre commande pour {purchaseOrder.Vendor.Name} est prête !",
                 nameof(PurchaseOrderCompletedEvent),
                 GetTemplateDatas(purchaseOrder, $"{_configuration.GetValue<string>("Portal:url")}/#/my-orders/{purchaseOrder.Id}"),
                 true,

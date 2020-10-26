@@ -60,18 +60,12 @@ namespace Sheaft.Domain.Models
         public decimal Donate { get; private set; }
         public decimal FeesPrice { get; private set; }
         public decimal InternalFeesPrice { get; private set; }
-        public bool SkipBackgroundProcessing { get; private set; }
         public virtual User User { get; private set; }
         public virtual Payin Payin { get; private set; }
         public virtual Donation Donation { get; private set; }
         public virtual IReadOnlyCollection<OrderProduct> Products => _products?.AsReadOnly();
         public virtual IReadOnlyCollection<OrderDelivery> Deliveries => _deliveries?.AsReadOnly();
         public virtual IReadOnlyCollection<PurchaseOrder> PurchaseOrders => _purchaseOrders?.AsReadOnly();
-
-        public void SetSkipBackgroundProcessing(bool value)
-        {
-            SkipBackgroundProcessing = value;
-        }
 
         public Guid AddPurchaseOrder(string reference, Producer producer)
         {

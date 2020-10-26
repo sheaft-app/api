@@ -89,13 +89,12 @@ namespace Sheaft.Web.Manage.Controllers
             var ordersToRefund = await _context.Orders
                 .Get(c =>
                         c.Payin != null
-                        && !c.Payin.SkipBackgroundProcessing
                         && c.Payin.Status == TransactionStatus.Succeeded
-                        && (c.Payin.Refund == null || c.Payin.Status == TransactionStatus.Expired)
+                        && (c.Payin.Refund == null || c.Payin.Status == TransactionStatus.Failed)
                         && c.PurchaseOrders.All(po => po.Status >= PurchaseOrderStatus.Delivered)
                         && c.PurchaseOrders.Any(po => po.WithdrawnOn.HasValue
                                                     && (po.Transfer == null
-                                                    || (po.Transfer.Status == TransactionStatus.Succeeded && po.Transfer.Refund != null && po.Transfer.Refund.Status == TransactionStatus.Succeeded)))
+                                                    || (po.Transfer.Status == TransactionStatus.Succeeded)))
                         && c.PurchaseOrders.Max(po => po.WithdrawnOn) < expiredDate, true)
                 .OrderBy(c => c.CreatedOn)
                 .Skip(page * take)
@@ -136,22 +135,6 @@ namespace Sheaft.Web.Manage.Controllers
                 throw new NotFoundException();
 
             return View(entity);
-        }
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Expire(PayinViewModel model, CancellationToken token)
-        {
-            var requestUser = await GetRequestUser(token);
-            var result = await _mediatr.Process(new ExpirePayinCommand(requestUser) { PayinId = model.Id }, token);
-            if (!result.Success)
-            {
-                ModelState.AddModelError("", result.Exception.Message);
-                return View("Details", model);
-            }
-
-            TempData["Edited"] = JsonConvert.SerializeObject(new EntityViewModel { Id = model.Id, Name = model.Identifier });
-            return RedirectToAction("Index");
         }
     }
 }

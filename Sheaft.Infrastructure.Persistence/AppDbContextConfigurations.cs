@@ -72,7 +72,6 @@ namespace Sheaft.Infrastructure.Persistence
             modelBuilder.Entity<WebPayin>().HasBaseType<Payin>();
 
             modelBuilder.Entity<PayinRefund>().HasBaseType<Refund>();
-            modelBuilder.Entity<TransferRefund>().HasBaseType<Refund>();
 
             modelBuilder.Entity<BusinessLegal>().HasBaseType<Legal>();
             modelBuilder.Entity<ConsumerLegal>().HasBaseType<Legal>();
@@ -118,7 +117,6 @@ namespace Sheaft.Infrastructure.Persistence
             modelBuilder.ApplyConfiguration(new PayoutConfiguration());
             modelBuilder.ApplyConfiguration(new RefundConfiguration());
             modelBuilder.ApplyConfiguration(new PayinRefundConfiguration());
-            modelBuilder.ApplyConfiguration(new TransferRefundConfiguration());
             modelBuilder.ApplyConfiguration(new CountryConfiguration());
             modelBuilder.ApplyConfiguration(new NationalityConfiguration());
             modelBuilder.ApplyConfiguration(new LegalConfiguration());

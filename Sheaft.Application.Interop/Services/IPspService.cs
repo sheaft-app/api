@@ -23,7 +23,6 @@ namespace Sheaft.Application.Interop
         Task<Result<PspWebPaymentResultDto>> CreateWebPayinAsync(WebPayin transaction, Owner owner, CancellationToken token);
         Task<Result<PspPaymentResultDto>> CreateCardPayinAsync(CardPayin transaction, Owner owner, CancellationToken token);
         Task<Result<PspPaymentResultDto>> RefundPayinAsync(PayinRefund transaction, CancellationToken token);
-        Task<Result<PspPaymentResultDto>> RefundTransferAsync(TransferRefund transaction, CancellationToken token);
         Task<Result<PspDocumentResultDto>> SubmitDocumentAsync(Document document, string userIdentifier, CancellationToken token);
         Task<Result<string>> ValidateCardAsync(Card payment, string registrationId, string registrationData, CancellationToken token);
         Task<Result<PspDeclarationResultDto>> CreateUboDeclarationAsync(Declaration declaration, User business, CancellationToken token);

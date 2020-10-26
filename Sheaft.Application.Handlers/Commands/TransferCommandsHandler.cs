@@ -20,8 +20,6 @@ namespace Sheaft.Application.Handlers
     public class TransferCommandsHandler : ResultsHandler,
         IRequestHandler<CheckTransfersCommand, Result<bool>>,
         IRequestHandler<CheckTransferCommand, Result<bool>>,
-        IRequestHandler<ExpireTransferCommand, Result<bool>>,
-        IRequestHandler<UnblockTransferCommand, Result<bool>>,
         IRequestHandler<RefreshTransferStatusCommand, Result<TransactionStatus>>,
         IRequestHandler<CreateTransferCommand, Result<Guid>>
     {
@@ -47,9 +45,7 @@ namespace Sheaft.Application.Handlers
                 var skip = 0;
                 const int take = 100;
 
-                var expiredDate = DateTimeOffset.UtcNow.AddMinutes(-_routineOptions.CheckTransfersFromMinutes);
-                var transferIds = await GetNextTransferIdsAsync(expiredDate, skip, take, token);
-
+                var transferIds = await GetNextTransferIdsAsync(skip, take, token);
                 while (transferIds.Any())
                 {
                     foreach (var transferId in transferIds)
@@ -61,7 +57,7 @@ namespace Sheaft.Application.Handlers
                     }
 
                     skip += take;
-                    transferIds = await GetNextTransferIdsAsync(expiredDate, skip, take, token);
+                    transferIds = await GetNextTransferIdsAsync(skip, take, token);
                 }
 
                 return Ok(true);
@@ -76,37 +72,10 @@ namespace Sheaft.Application.Handlers
                 if (transfer.Status != TransactionStatus.Created && transfer.Status != TransactionStatus.Waiting)
                     return Ok(false);
 
-                if (transfer.CreatedOn.AddMinutes(_routineOptions.CheckTransferExpiredFromMinutes) < DateTimeOffset.UtcNow && transfer.Status == TransactionStatus.Waiting)
-                    return await _mediatr.Process(new ExpireTransferCommand(request.RequestUser) { TransferId = request.TransferId }, token);
-
                 var result = await _mediatr.Process(new RefreshTransferStatusCommand(request.RequestUser, transfer.Identifier), token);
                 if (!result.Success)
                     return Failed<bool>(result.Exception);
 
-                return Ok(true);
-            });
-        }
-
-        public async Task<Result<bool>> Handle(ExpireTransferCommand request, CancellationToken token)
-        {
-            return await ExecuteAsync(request, async () =>
-            {
-                var transfer = await _context.GetByIdAsync<Transfer>(request.TransferId, token);
-                transfer.SetStatus(TransactionStatus.Expired);
-
-                await _context.SaveChangesAsync(token);
-                return Ok(true);
-            });
-        }
-
-        public async Task<Result<bool>> Handle(UnblockTransferCommand request, CancellationToken token)
-        {
-            return await ExecuteAsync(request, async () =>
-            {
-                var transfer = await _context.GetByIdAsync<Transfer>(request.TransferId, token);
-                transfer.SetSkipBackgroundProcessing(false);
-
-                await _context.SaveChangesAsync(token);
                 return Ok(true);
             });
         }
@@ -117,7 +86,7 @@ namespace Sheaft.Application.Handlers
             {
                 var transfer = await _context.GetSingleAsync<Transfer>(c => c.Identifier == request.Identifier, token);
                 if (transfer.Status == TransactionStatus.Succeeded || transfer.Status == TransactionStatus.Failed)
-                    return Failed<TransactionStatus>(new InvalidOperationException());
+                    return Ok(transfer.Status);
 
                 var pspResult = await _pspService.GetTransferAsync(transfer.Identifier, token);
                 if (!pspResult.Success)
@@ -145,31 +114,17 @@ namespace Sheaft.Application.Handlers
             return await ExecuteAsync(request, async () =>
             {
                 var purchaseOrder = await _context.GetByIdAsync<PurchaseOrder>(request.PurchaseOrderId, token);
-                if ((purchaseOrder.Transfer != null && purchaseOrder.Transfer.Status != TransactionStatus.Expired)
-                    || !purchaseOrder.AcceptedOn.HasValue 
-                    || purchaseOrder.WithdrawnOn.HasValue)
+                if (purchaseOrder.Status != PurchaseOrderStatus.Delivered 
+                    || (purchaseOrder.Transfer != null && purchaseOrder.Transfer.Status != TransactionStatus.Failed))
                     return Failed<Guid>(new InvalidOperationException());
 
                 var purchaseOrderTransfers = await _context.FindAsync<Transfer>(c => c.PurchaseOrder.Id == purchaseOrder.Id, token);
-                if (purchaseOrderTransfers.Any(c => c.Status != TransactionStatus.Expired))
+                if (purchaseOrderTransfers.Any(c => c.Status != TransactionStatus.Failed))
                     return Failed<Guid>(new InvalidOperationException());
 
                 var checkResult = await _mediatr.Process(new CheckProducerConfigurationCommand(request.RequestUser) { ProducerId = purchaseOrder.Vendor.Id }, token);
                 if (!checkResult.Success)
                     return Failed<Guid>(checkResult.Exception);
-
-                if (purchaseOrderTransfers.Count(c => c.Status == TransactionStatus.Expired) >= 3)
-                {
-                    purchaseOrder.SetSkipBackgroundProcessing(true);
-                    await _context.SaveChangesAsync(token);
-
-                    _mediatr.Post(new CreateTransferFailedEvent(request.RequestUser)
-                    {
-                        PurchaseOrderId = purchaseOrder.Id
-                    });
-
-                    return TooManyRetries<Guid>();
-                }
 
                 var debitedWallet = await _context.GetSingleAsync<Wallet>(c => c.User.Id == purchaseOrder.Sender.Id, token);
                 var creditedWallet = await _context.GetSingleAsync<Wallet>(c => c.User.Id == purchaseOrder.Vendor.Id, token);
@@ -198,11 +153,10 @@ namespace Sheaft.Application.Handlers
             });
         }
 
-        private async Task<IEnumerable<Guid>> GetNextTransferIdsAsync(DateTimeOffset expiredDate, int skip, int take, CancellationToken token)
+        private async Task<IEnumerable<Guid>> GetNextTransferIdsAsync(int skip, int take, CancellationToken token)
         {
             return await _context.Transfers
-                .Get(c => c.CreatedOn < expiredDate
-                      && (c.Status == TransactionStatus.Waiting || c.Status == TransactionStatus.Created), true)
+                .Get(c => c.Status == TransactionStatus.Waiting || c.Status == TransactionStatus.Created, true)
                 .OrderBy(c => c.CreatedOn)
                 .Select(c => c.Id)
                 .Skip(skip)

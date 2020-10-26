@@ -151,21 +151,5 @@ namespace Sheaft.Web.Manage.Controllers
             TempData["Edited"] = JsonConvert.SerializeObject(new EntityViewModel { Id = model.Id, Name = model.Payin?.Identifier });
             return RedirectToAction("Index");
         }
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Unblock(OrderViewModel model, CancellationToken token)
-        {
-            var requestUser = await GetRequestUser(token);
-            var result = await _mediatr.Process(new UnblockOrderCommand(requestUser) { OrderId = model.Id }, token);
-            if (!result.Success)
-            {
-                ModelState.AddModelError("", result.Exception.Message);
-                return View("Details", model);
-            }
-
-            TempData["Edited"] = JsonConvert.SerializeObject(new EntityViewModel { Id = model.Id, Name = model.Payin?.Identifier });
-            return RedirectToAction("Index");
-        }
     }
 }

@@ -21,8 +21,7 @@ namespace Sheaft.Application.Handlers
         IRequestHandler<CreateDonationCommand, Result<Guid>>,
         IRequestHandler<CheckDonationsCommand, Result<bool>>,
         IRequestHandler<CheckDonationCommand, Result<bool>>,
-        IRequestHandler<RefreshDonationStatusCommand, Result<TransactionStatus>>,
-        IRequestHandler<ExpireDonationCommand, Result<bool>>
+        IRequestHandler<RefreshDonationStatusCommand, Result<TransactionStatus>>
     {
         private readonly IPspService _pspService;
         private readonly RoutineOptions _routineOptions;
@@ -49,25 +48,12 @@ namespace Sheaft.Application.Handlers
                 var order = await _context.GetByIdAsync<Order>(request.OrderId, token);
                 if (order.Payin == null 
                     || order.Payin.Status != TransactionStatus.Succeeded 
-                    || (order.Donation != null && order.Donation.Status != TransactionStatus.Expired))
+                    || (order.Donation != null && order.Donation.Status != TransactionStatus.Failed))
                     return Failed<Guid>(new InvalidOperationException());
 
                 var orderDonations = await _context.FindAsync<Donation>(c => c.Order.Id == order.Id, token);
-                if (orderDonations.Any(c => c.Status != TransactionStatus.Expired))
+                if (orderDonations.Any(c => c.Status != TransactionStatus.Failed))
                     return Failed<Guid>(new InvalidOperationException());
-
-                if (orderDonations.Count(c => c.Status == TransactionStatus.Expired) >= 3)
-                {
-                    order.SetSkipBackgroundProcessing(true);
-                    await _context.SaveChangesAsync(token);
-
-                    _mediatr.Post(new CreateDonationFailedEvent(request.RequestUser)
-                    {
-                        OrderId = order.Id
-                    });
-
-                    return TooManyRetries<Guid>();
-                }
 
                 var creditedWallet = await _context.GetSingleAsync<Wallet>(c => c.Identifier == _pspOptions.WalletId, token);
                 using (var transaction = await _context.BeginTransactionAsync(token))
@@ -101,9 +87,7 @@ namespace Sheaft.Application.Handlers
                 var skip = 0;
                 const int take = 100;
 
-                var expiredDate = DateTimeOffset.UtcNow.AddMinutes(-_routineOptions.CheckDonationsFromMinutes);
-                var donationIds = await GetNextDonationIdsAsync(expiredDate, skip, take, token);
-
+                var donationIds = await GetNextDonationIdsAsync(skip, take, token);
                 while (donationIds.Any())
                 {
                     foreach (var donationId in donationIds)
@@ -115,7 +99,7 @@ namespace Sheaft.Application.Handlers
                     }
 
                     skip += take;
-                    donationIds = await GetNextDonationIdsAsync(expiredDate, skip, take, token);
+                    donationIds = await GetNextDonationIdsAsync(skip, take, token);
                 }
 
                 return Ok(true);
@@ -130,25 +114,10 @@ namespace Sheaft.Application.Handlers
                 if (donation.Status != TransactionStatus.Created && donation.Status != TransactionStatus.Waiting)
                     return Ok(false);
 
-                if (donation.CreatedOn.AddMinutes(_routineOptions.CheckDonationExpiredFromMinutes) < DateTimeOffset.UtcNow && donation.Status == TransactionStatus.Waiting)
-                    return await _mediatr.Process(new ExpireDonationCommand(request.RequestUser) { DonationId = request.DonationId }, token);
-
                 var result = await _mediatr.Process(new RefreshDonationStatusCommand(request.RequestUser, donation.Identifier), token);
                 if (!result.Success)
                     return Failed<bool>(result.Exception);
 
-                return Ok(true);
-            });
-        }
-
-        public async Task<Result<bool>> Handle(ExpireDonationCommand request, CancellationToken token)
-        {
-            return await ExecuteAsync(request, async () =>
-            {
-                var donation = await _context.GetByIdAsync<Donation>(request.DonationId, token);
-                donation.SetStatus(TransactionStatus.Expired);
-
-                await _context.SaveChangesAsync(token);
                 return Ok(true);
             });
         }
@@ -159,7 +128,7 @@ namespace Sheaft.Application.Handlers
             {
                 var donation = await _context.GetSingleAsync<Donation>(c => c.Identifier == request.Identifier, token);
                 if (donation.Status == TransactionStatus.Succeeded || donation.Status == TransactionStatus.Failed)
-                    return Failed<TransactionStatus>(new InvalidOperationException());
+                    return Ok(donation.Status);
 
                 var pspResult = await _pspService.GetTransferAsync(donation.Identifier, token);
                 if (!pspResult.Success)
@@ -182,11 +151,10 @@ namespace Sheaft.Application.Handlers
             });
         }
 
-        private async Task<IEnumerable<Guid>> GetNextDonationIdsAsync(DateTimeOffset expiredDate, int skip, int take, CancellationToken token)
+        private async Task<IEnumerable<Guid>> GetNextDonationIdsAsync(int skip, int take, CancellationToken token)
         {
             return await _context.Donations
-                .Get(c => c.CreatedOn < expiredDate
-                      && (c.Status == TransactionStatus.Waiting || c.Status == TransactionStatus.Created), true)
+                .Get(c => c.Status == TransactionStatus.Waiting || c.Status == TransactionStatus.Created, true)
                 .OrderBy(c => c.CreatedOn)
                 .Select(c => c.Id)
                 .Skip(skip)

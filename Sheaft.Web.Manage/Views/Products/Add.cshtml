@@ -20,72 +20,76 @@
     returnables.Insert(0, new SelectListItem("None", null));
 }
 
-    <div class="container">
-        <h1 class="display-5">New Product</h1>
+<div class="container">
+    <h1 class="display-5">New Product</h1>
+    <br />
+
+    @using (Html.BeginForm("Add", "Products", FormMethod.Post, new { @class = "form", enctype = "multipart/form-data" }))
+    {
+        @Html.AntiForgeryToken()
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
         <br />
 
-        @using (Html.BeginForm("Add", "Products", FormMethod.Post, new { @class = "form", enctype = "multipart/form-data" }))
-        {
-            @Html.AntiForgeryToken()
-            @Html.ValidationSummary(true, "", new { @class = "text-danger" })
-            <br />
+        <div class="form-group">
+            @Html.LabelFor(c => c.Name, new { @class = "form-label" })
+            @Html.TextBoxFor(c => c.Name, null, new { @class = "form-control" })
+        </div>
+        <div class="form-group">
+            @Html.LabelFor(c => c.Reference, new { @class = "form-label" })
+            @Html.TextBoxFor(c => c.Reference, null, new { @class = "form-control" })
+        </div>
+        <div class="form-group">
+            @Html.LabelFor(c => c.WholeSalePricePerUnit, "WholeSalePricePerUnit", new { @class = "form-label" })
+            @Html.TextBoxFor(c => c.WholeSalePricePerUnit, null, new { @class = "form-control" })
+        </div>
+        <div class="form-group">
+            @Html.LabelFor(c => c.Vat, new { @class = "form-label" })
+            @Html.DropDownListFor(c => c.Vat, vats, new { @class = "form-control" })
+        </div>
+        <div class="form-group">
+            @Html.LabelFor(c => c.QuantityPerUnit, "QuantityPerUnit", new { @class = "form-label" })
+            @Html.TextBoxFor(c => c.QuantityPerUnit, null, new { @class = "form-control" })
+        </div>
+        <div class="form-group">
+            @Html.LabelFor(c => c.Unit, new { @class = "form-label" })
+            @Html.DropDownListFor(c => c.Unit, units, new { @class = "form-control" })
+        </div>
+        <div class="form-group">
+            @Html.LabelFor(c => c.Picture, new { @class = "form-label" })
+            @if (!string.IsNullOrWhiteSpace(Model.Picture))
+            {
+                <img src="@Model.Picture" height="100" />
+            }
+            @Html.TextBoxFor(c => c.Picture, new { @class = "form-control", @type = "file" })
+        </div>
+        <div class="form-group">
+            @Html.LabelFor(c => c.ReturnableId, "Returnable", new { @class = "form-label" })
+            @Html.DropDownListFor(c => c.ReturnableId, returnables, new { @class = "form-control" })
+        </div>
+        <div class="form-group">
+            @Html.LabelFor(c => c.Tags, new { @class = "form-label" })
+            @Html.ListBoxFor(c => c.Tags, tags, new { @class = "form-control", @style = "height:12rem;" })
+        </div>
+        <div class="form-group">
+            @Html.LabelFor(c => c.Description, new { @class = "form-label" })
+            @Html.TextAreaFor(c => c.Description, new { @class = "form-control" })
+        </div>
+        <div class="form-check">
+            @Html.CheckBoxFor(m => m.Available, new { @class = "form-check-input" })
+            @Html.LabelFor(m => m.Available, new { @class = "form-check-label" })
+        </div>
+        <div class="form-check">
+            @Html.CheckBoxFor(m => m.Searchable, new { @class = "form-check-input" })
+            @Html.LabelFor(m => m.Searchable, new { @class = "form-check-label" })
+        </div>
 
-            <div class="form-group">
-                @Html.LabelFor(c => c.Name, new { @class = "form-label" })
-                @Html.TextBoxFor(c => c.Name, null, new { @class = "form-control" })
-            </div>
-            <div class="form-group">
-                @Html.LabelFor(c => c.Reference, new { @class = "form-label" })
-                @Html.TextBoxFor(c => c.Reference, null, new { @class = "form-control" })
-            </div>
-            <div class="form-group">
-                @Html.LabelFor(c => c.WholeSalePricePerUnit, "WholeSalePricePerUnit", new { @class = "form-label" })
-                @Html.TextBoxFor(c => c.WholeSalePricePerUnit, null, new { @class = "form-control" })
-            </div>
-            <div class="form-group">
-                @Html.LabelFor(c => c.Vat, new { @class = "form-label" })
-                @Html.DropDownListFor(c => c.Vat, vats, new { @class = "form-control" })
-            </div>
-            <div class="form-group">
-                @Html.LabelFor(c => c.QuantityPerUnit, "QuantityPerUnit", new { @class = "form-label" })
-                @Html.TextBoxFor(c => c.QuantityPerUnit, null, new { @class = "form-control" })
-            </div>
-            <div class="form-group">
-                @Html.LabelFor(c => c.Unit, new { @class = "form-label" })
-                @Html.DropDownListFor(c => c.Unit, units, new { @class = "form-control" })
-            </div>
-            <div class="form-group">
-                @Html.LabelFor(c => c.Picture, new { @class = "form-label" })
-                @if (!string.IsNullOrWhiteSpace(Model.Picture))
-                {
-                    <img src="@Model.Picture" height="100" />
-                }
-                @Html.TextBoxFor(c => c.Picture, new { @class = "form-control", @type = "file" })
-            </div>
-            <div class="form-group">
-                @Html.LabelFor(c => c.ReturnableId, "Returnable", new { @class = "form-label" })
-                @Html.DropDownListFor(c => c.ReturnableId, returnables, new { @class = "form-control" })
-            </div>
-            <div class="form-group">
-                @Html.LabelFor(c => c.Tags, new { @class = "form-label" })
-                @Html.ListBoxFor(c => c.Tags, tags, new { @class = "form-control", @style = "height:12rem;" })
-            </div>
-            <div class="form-group">
-                @Html.LabelFor(c => c.Description, new { @class = "form-label" })
-                @Html.TextAreaFor(c => c.Description, new { @class = "form-control" })
-            </div>
-            <div class="form-check">
-                @Html.CheckBoxFor(m => m.Available, new { @class = "form-check-input" })
-                @Html.LabelFor(m => m.Available, new { @class = "form-check-label" })
-            </div>
+        <br />
+        <a asp-controller="Products" asp-action="Index" class="btn btn-light">
+            Cancel
+        </a>
+        <button type="submit" class="btn btn-success">
+            <i class="fa fa-plus">&nbsp;Create</i>
+        </button>
+    }
 
-            <br />
-            <a asp-controller="Products" asp-action="Index" class="btn btn-light">
-                Cancel
-            </a>
-            <button type="submit" class="btn btn-success">
-                <i class="fa fa-plus">&nbsp;Create</i>
-            </button>
-        }
-
-    </div>
+</div>

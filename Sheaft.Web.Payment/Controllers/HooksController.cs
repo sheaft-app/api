@@ -61,14 +61,6 @@ namespace Sheaft.Web.Payment.Controllers
                 case PspEventKind.PAYIN_REFUND_FAILED:
                     _sheaftMediatr.Post(new RefreshPayinRefundStatusCommand(requestUser, identifier));
                     break;
-                case PspEventKind.TRANSFER_REFUND_SUCCEEDED:
-                case PspEventKind.TRANSFER_REFUND_FAILED:
-                    _sheaftMediatr.Post(new RefreshTransferRefundStatusCommand(requestUser, identifier));
-                    break;
-                case PspEventKind.PAYOUT_REFUND_SUCCEEDED:
-                case PspEventKind.PAYOUT_REFUND_FAILED:
-                    _sheaftMediatr.Post(new RefreshPayoutRefundStatusCommand(requestUser, identifier));
-                    break;
                 default:
                     _logger.LogInformation($"{EventType:G)} is not a supported Psp EventType for resource: {identifier} executed on: {GetExecutedOn(date)}.");
                     return BadRequest();

@@ -161,7 +161,7 @@
                                                                             <div>
                                                                                 <div style="font-family: inherit; text-align: center">Votre commande de @(Model.TotalOnSalePrice)€ passée à @Model.VendorName est prête !</div>
                                                                                 <div style="font-family: inherit; text-align: center"><br /></div>
-                                                                                <div style="font-family: inherit; text-align: center">Vous pourrez passer la récupérer le @Model.ExpectedDeliveryDate.ToString("dd/MM/yyyy") entre @(Model.ExpectedFrom.Hours.ToString("hh"))h@(Model.ExpectedFrom.Minutes.ToString("mm")) et @(Model.ExpectedTo.Hours.ToString("hh"))h@(Model.ExpectedTo.Minutes.ToString("mm")) au @Model.Address</div><div></div>
+                                                                                <div style="font-family: inherit; text-align: center">Vous pourrez passer la récupérer le @Model.ExpectedDeliveryDate.ToString("dd/MM/yyyy") entre @(Model.ExpectedFrom.ToString(@"hh\hmm")) et @(Model.ExpectedTo.ToString(@"hh\hmm")) au @Model.Address</div><div></div>
                                                                             </div>
                                                                         </td>
                                                                     </tr>

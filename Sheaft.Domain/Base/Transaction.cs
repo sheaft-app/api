@@ -26,7 +26,6 @@ namespace Sheaft.Domain.Models
         public TransactionKind Kind { get; private set; }
         public TransactionStatus Status { get; private set; }
         public DateTimeOffset? ExecutedOn { get; private set; }
-        public DateTimeOffset? ExpiredOn { get; private set; }
         public string ResultCode { get; private set; }
         public string ResultMessage { get; private set; }
         public decimal Fees { get; protected set; }
@@ -53,16 +52,6 @@ namespace Sheaft.Domain.Models
 
         public virtual void SetStatus(TransactionStatus status)
         {
-            switch (status)
-            {
-                case TransactionStatus.Expired:
-                    ExpiredOn = DateTimeOffset.UtcNow;
-                    break;
-                default:
-                    ExpiredOn = null;
-                    break;
-            }
-
             Status = status;
         }
 

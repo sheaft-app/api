@@ -18,9 +18,9 @@ using Microsoft.Extensions.Options;
 namespace Sheaft.Application.Handlers
 {
     public class PayoutCommandsHandler : ResultsHandler,
+        IRequestHandler<CheckNewPayoutsCommand, Result<bool>>,
         IRequestHandler<CheckPayoutsCommand, Result<bool>>,
         IRequestHandler<CheckPayoutCommand, Result<bool>>,
-        IRequestHandler<ExpirePayoutCommand, Result<bool>>,
         IRequestHandler<RefreshPayoutStatusCommand, Result<TransactionStatus>>,
         IRequestHandler<CreatePayoutCommand, Result<Guid>>
     {
@@ -42,6 +42,33 @@ namespace Sheaft.Application.Handlers
             _routineOptions = routineOptions.Value;
         }
 
+        public async Task<Result<bool>> Handle(CheckNewPayoutsCommand request, CancellationToken token)
+        {
+            return await ExecuteAsync(request, async () =>
+            {
+                var skip = 0;
+                const int take = 100;
+
+                var payoutIds = await GetNextNewPayoutIdsAsync(skip, take, token);
+                while (payoutIds.Any())
+                {
+                    foreach (var payoutId in payoutIds)
+                    {
+                        _mediatr.Post(new CreatePayoutCommand(request.RequestUser)
+                        {
+                            ProducerId = payoutId.Key,
+                            TransferIds = payoutId.Value
+                        });
+                    }
+
+                    skip += take;
+                    payoutIds = await GetNextNewPayoutIdsAsync(skip, take, token);
+                }
+
+                return Ok(true);
+            });
+        }
+
         public async Task<Result<bool>> Handle(CheckPayoutsCommand request, CancellationToken token)
         {
             return await ExecuteAsync(request, async () =>
@@ -49,9 +76,7 @@ namespace Sheaft.Application.Handlers
                 var skip = 0;
                 const int take = 100;
 
-                var expiredDate = DateTimeOffset.UtcNow.AddMinutes(-_routineOptions.CheckPayoutsFromMinutes);
-                var payoutIds = await GetNextPayoutIdsAsync(expiredDate, skip, take, token);
-
+                var payoutIds = await GetNextPayoutIdsAsync(skip, take, token);
                 while (payoutIds.Any())
                 {
                     foreach (var payoutId in payoutIds)
@@ -63,7 +88,7 @@ namespace Sheaft.Application.Handlers
                     }
 
                     skip += take;
-                    payoutIds = await GetNextPayoutIdsAsync(expiredDate, skip, take, token);
+                    payoutIds = await GetNextPayoutIdsAsync(skip, take, token);
                 }
 
                 return Ok(true);
@@ -78,25 +103,10 @@ namespace Sheaft.Application.Handlers
                 if (payout.Status != TransactionStatus.Created && payout.Status != TransactionStatus.Waiting)
                     return Ok(false);
 
-                if (payout.CreatedOn.AddMinutes(_routineOptions.CheckPayoutExpiredFromMinutes) < DateTimeOffset.UtcNow && payout.Status == TransactionStatus.Waiting)
-                    return await _mediatr.Process(new ExpirePayoutCommand(request.RequestUser) { PayoutId = request.PayoutId }, token);
-
                 var result = await _mediatr.Process(new RefreshPayoutStatusCommand(request.RequestUser, payout.Identifier), token);
                 if (!result.Success)
                     return Failed<bool>(result.Exception);
 
-                return Ok(true);
-            });
-        }
-
-        public async Task<Result<bool>> Handle(ExpirePayoutCommand request, CancellationToken token)
-        {
-            return await ExecuteAsync(request, async () =>
-            {
-                var transaction = await _context.GetByIdAsync<Payout>(request.PayoutId, token);
-                transaction.SetStatus(TransactionStatus.Expired);
-
-                await _context.SaveChangesAsync(token);
                 return Ok(true);
             });
         }
@@ -107,7 +117,7 @@ namespace Sheaft.Application.Handlers
             {
                 var payout = await _context.GetSingleAsync<Payout>(c => c.Identifier == request.Identifier, token);
                 if (payout.Status == TransactionStatus.Succeeded || payout.Status == TransactionStatus.Failed)
-                    return Failed<TransactionStatus>(new InvalidOperationException());
+                    return Ok(payout.Status);
 
                 var pspResult = await _pspService.GetPayoutAsync(payout.Identifier, token);
                 if (!pspResult.Success)
@@ -149,12 +159,17 @@ namespace Sheaft.Application.Handlers
                 var wallet = await _context.GetSingleAsync<Wallet>(c => c.User.Id == request.ProducerId, token);
                 var bankAccount = await _context.GetSingleAsync<BankAccount>(c => c.User.Id == request.ProducerId && c.IsActive, token);
 
-                var transfers = await _context.GetAsync<Transfer>(t => request.TransferIds.Contains(t.Id)
-                                                            && t.PurchaseOrder.Status == PurchaseOrderStatus.Delivered
-                                                            && (t.Payout == null || t.Payout.Status == TransactionStatus.Expired), token);
+                var transfers = await _context.GetAsync<Transfer>(
+                    t => request.TransferIds.Contains(t.Id)
+                        && t.PurchaseOrder.Status == PurchaseOrderStatus.Delivered
+                        && (t.Payout == null || t.Payout.Status == TransactionStatus.Failed), 
+                    token);
 
-                var hasAlreadyPaidComission = await _context.AnyAsync<Payout>(p => p.Fees > 0 && p.DebitedWallet.User.Id == request.ProducerId
-                    && (p.Status == TransactionStatus.Waiting || p.Status == TransactionStatus.Created || p.Status == TransactionStatus.Succeeded), token);
+                var hasAlreadyPaidComission = await _context.AnyAsync<Payout>(
+                    p => p.Fees > 0 
+                        && p.DebitedWallet.User.Id == request.ProducerId
+                        && p.Status != TransactionStatus.Failed, 
+                    token);
 
                 var amount = transfers.Sum(t => t.Credited);
                 var fees = hasAlreadyPaidComission || amount < _pspOptions.ProducerFees ? 0m : _pspOptions.ProducerFees;
@@ -184,16 +199,31 @@ namespace Sheaft.Application.Handlers
             });
         }
 
-        private async Task<IEnumerable<Guid>> GetNextPayoutIdsAsync(DateTimeOffset expiredDate, int skip, int take, CancellationToken token)
+        private async Task<IEnumerable<Guid>> GetNextPayoutIdsAsync(int skip, int take, CancellationToken token)
         {
             return await _context.Payouts
-                .Get(c => c.CreatedOn < expiredDate
-                      && (c.Status == TransactionStatus.Waiting || c.Status == TransactionStatus.Created), true)
+                .Get(c => c.Status == TransactionStatus.Waiting || c.Status == TransactionStatus.Created, true)
                 .OrderBy(c => c.CreatedOn)
                 .Select(c => c.Id)
                 .Skip(skip)
                 .Take(take)
                 .ToListAsync(token);
+        }
+
+        private async Task<IEnumerable<KeyValuePair<Guid, IEnumerable<Guid>>>> GetNextNewPayoutIdsAsync(int skip, int take, CancellationToken token)
+        {
+            var producersTransfers = await _context.Transfers
+                .Get(t => t.Status == TransactionStatus.Succeeded
+                        && (t.Payout == null || t.Payout.Status == TransactionStatus.Failed)
+                        && t.PurchaseOrder.Status == PurchaseOrderStatus.Delivered)
+                .Select(t => new { ProducerId = t.CreditedWallet.User.Id, TransferId = t.Id })
+                .OrderBy(c => c.ProducerId)
+                .Skip(skip)
+                .Take(take)
+                .ToListAsync(token);
+
+            var groupedProducers = producersTransfers.GroupBy(t => t.ProducerId);
+            return groupedProducers.Select(c => new KeyValuePair<Guid, IEnumerable<Guid>>(c.Key, c.Select(t => t.TransferId)));
         }
     }
 }

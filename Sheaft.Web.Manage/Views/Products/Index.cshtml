@@ -72,6 +72,8 @@
                 <th scope="col">Name</th>
                 <th scope="col">WholeSalePrice</th>
                 <th scope="col">Vat</th>
+                <th scope="col">Available</th>
+                <th scope="col">Searchable</th>
                 @if (!imperonatingId.HasValue)
                 {
                     <th scope="col">Producer</th>
@@ -93,6 +95,8 @@
                     <td>@entity.Name</td>
                     <td>@entity.WholeSalePricePerUnit</td>
                     <td>@(entity.Vat)%</td>
+                    <td>@entity.Available</td>
+                    <td>@entity.Searchable</td>
                     @if (!imperonatingId.HasValue)
                     {
                         <td>

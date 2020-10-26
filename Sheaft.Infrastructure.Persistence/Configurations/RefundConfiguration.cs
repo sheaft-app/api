@@ -24,8 +24,7 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
             entity.HasOne(c => c.DebitedWallet).WithMany().HasForeignKey("DebitedWalletUid").OnDelete(DeleteBehavior.NoAction);
 
             entity.HasDiscriminator(c => c.Kind)
-                .HasValue<PayinRefund>(TransactionKind.RefundPayin)
-                .HasValue<TransferRefund>(TransactionKind.RefundTransfer);
+                .HasValue<PayinRefund>(TransactionKind.RefundPayin);
 
             entity.HasKey("Uid");
 

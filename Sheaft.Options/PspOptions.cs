@@ -19,6 +19,7 @@ namespace Sheaft.Options
         public decimal FixedAmount { get; set; } = 0.18m;
         public decimal Percent { get; set; } = 0.018m;
         public decimal ProducerFees { get; set; } = 2.5m;
+        public bool SkipIdempotencyKey { get; set; } = false;
         public string Token => $"{ClientId}:{ApiKey}".Base64Encode();
     }
 }
