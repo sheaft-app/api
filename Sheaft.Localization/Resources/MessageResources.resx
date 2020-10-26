@@ -475,7 +475,7 @@
     <value>{0} n'est plus accessible, elle a été supprimée</value>
   </data>
   <data name="Unexpected" xml:space="preserve">
-    <value>Une erreur innatendue est survenue, renouvellez votre demande. Si l'erreur persiste, contactez notre support.</value>
+    <value>Une erreur inattendue est survenue.</value>
   </data>
   <data name="Address" xml:space="preserve">
     <value>Adresse</value>

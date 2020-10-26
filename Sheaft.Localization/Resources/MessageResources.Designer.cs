@@ -1582,7 +1582,7 @@ namespace Sheaft.Localization.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Une erreur innatendue est survenue, renouvellez votre demande. Si l&apos;erreur persiste, contactez notre support..
+        ///   Looks up a localized string similar to Une erreur inattendue est survenue..
         /// </summary>
         internal static string Unexpected {
             get {
