@@ -90,7 +90,10 @@ namespace Sheaft.Application.Handlers
                 {
                     var productIds = request.Products.Select(p => p.Id);
                     var products = await _context.GetByIdsAsync<Product>(productIds, token);
-                    if(products.Any(p => !p.Available))
+                    if (products.Any(p => !p.Available))
+                        return Failed<IEnumerable<Guid>>(new ValidationException());
+
+                    if (products.Any(p => !p.Searchable))
                         return Failed<IEnumerable<Guid>>(new ValidationException());
 
                     var cartProducts = new Dictionary<Product, int>();
@@ -167,6 +170,12 @@ namespace Sheaft.Application.Handlers
 
                 var productIds = request.Products.Select(p => p.Id);
                 var products = await _context.GetByIdsAsync<Product>(productIds, token);
+                if (products.Any(p => !p.Available))
+                    return Failed<bool>(new ValidationException());
+
+                if (products.Any(p => !p.Searchable))
+                    return Failed<bool>(new ValidationException());
+
                 var cartProducts = new Dictionary<Product, int>();
                 foreach (var product in products)
                 {

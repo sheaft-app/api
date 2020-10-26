@@ -125,8 +125,8 @@ namespace Sheaft.Application.Queries
                             Zipcode = p.Producer_zipcode
                         }
                     }
-                })
-            } ?? new ProductsSearchDto();
+                }) ?? new List<ProductDto>()
+            };
         }
 
         public IQueryable<ProductDto> GetStoreProducts(Guid storeId, RequestUser currentUser)
@@ -136,7 +136,7 @@ namespace Sheaft.Application.Queries
                     .Select(a => a.Delivery.Producer.Id);
 
             return _context.Products
-                    .Get(p => producerIds.Contains(p.Producer.Id))
+                    .Get(p => producerIds.Contains(p.Producer.Id) && p.Searchable)
                     .ProjectTo<ProductDto>(_configurationProvider);
         }
 
