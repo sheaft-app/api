@@ -68,7 +68,7 @@ namespace Sheaft.Application.Handlers
                 var entity = new Product(Guid.NewGuid(), request.Reference, request.Name, request.WholeSalePricePerUnit, request.Conditioning, request.Unit, request.QuantityPerUnit, request.Vat, producer);
 
                 entity.SetDescription(request.Description);
-                entity.SetAvailable(request.Available ?? false);
+                entity.SetAvailable(request.Available ?? true);
                 entity.SetSearchable(request.Searchable ?? false);
                 entity.SetWeight(request.Weight);
 
@@ -363,7 +363,6 @@ namespace Sheaft.Application.Handlers
             var tagsStr = worksheet.Cells[i, 8].GetValue<string>()?.ToLowerInvariant().Replace("\"", "").Replace("'", "").Replace(".", ",").Split(",").Select(t => t.Trim()).FirstOrDefault();
             var bioStr = worksheet.Cells[i, 9].GetValue<string>()?.ToLowerInvariant().Replace(" ", "");
             var availableStr = worksheet.Cells[i, 10].GetValue<string>()?.ToLowerInvariant().Replace(" ", "");
-            var weightStr = worksheet.Cells[i, 12].GetValue<string>()?.ToLowerInvariant().Replace(" ", "").Replace(",", ".").Replace("gr", "").Replace("grammes", "").Replace("gramme", "");
 
             if (!decimal.TryParse(wholeSalePriceStr, NumberStyles.Any, new CultureInfo("en-US"), out decimal wholeSalePrice))
                 return Failed<CreateProductCommand>(new ValidationException(MessageKind.CreateProduct_WholeSalePrice_Invalid_Line, i));
@@ -374,9 +373,6 @@ namespace Sheaft.Application.Handlers
                 return Failed<CreateProductCommand>(new ValidationException(MessageKind.CreateProduct_Vat_Invalid_Line, i));
             else
                 createProductCommand.Vat = vat;
-
-            if (!string.IsNullOrWhiteSpace(weightStr) && decimal.TryParse(weightStr, NumberStyles.Any, new CultureInfo("en-US"), out decimal weight))
-                createProductCommand.Weight = weight;
 
             if (!decimal.TryParse(quantityPerUnitStr, NumberStyles.Any, new CultureInfo("en-US"), out decimal qtyPerUnit))
                 return Failed<CreateProductCommand>(new ValidationException(MessageKind.CreateProduct_QtyPerUnit_Invalid_Line, i));
@@ -439,7 +435,6 @@ namespace Sheaft.Application.Handlers
             createProductCommand.Tags = tags.Select(t => t.Id);
 
             createProductCommand.Searchable = false;
-            createProductCommand.Available = false;
             createProductCommand.SkipUpdateProducerTags = true;
 
             return Ok(createProductCommand);
