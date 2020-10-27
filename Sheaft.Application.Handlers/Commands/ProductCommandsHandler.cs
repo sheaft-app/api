@@ -69,7 +69,8 @@ namespace Sheaft.Application.Handlers
 
                 entity.SetDescription(request.Description);
                 entity.SetAvailable(request.Available ?? true);
-                entity.SetSearchable(request.Searchable ?? false);
+                entity.SetStoreVisibility(request.VisibleToStores ?? false);
+                entity.SetConsumerVisibility(request.VisibleToConsumers ?? false);
                 entity.SetWeight(request.Weight);
 
                 if (request.ReturnableId.HasValue)
@@ -108,7 +109,8 @@ namespace Sheaft.Application.Handlers
                 entity.SetReference(request.Reference);
                 entity.SetWeight(request.Weight);
                 entity.SetAvailable(request.Available);
-                entity.SetSearchable(request.Searchable);
+                entity.SetStoreVisibility(request.VisibleToStores);
+                entity.SetConsumerVisibility(request.VisibleToConsumers);
                 entity.SetConditioning(request.Conditioning, request.QuantityPerUnit, request.Unit);
                 entity.SetWeight(request.Weight);
 
@@ -191,7 +193,7 @@ namespace Sheaft.Application.Handlers
                 {
                     foreach (var id in request.Ids)
                     {
-                        var result = await _mediatr.Process(new SetProductSearchabilityCommand(request.RequestUser) { Id = id, Searchable = request.Searchable }, token);
+                        var result = await _mediatr.Process(new SetProductSearchabilityCommand(request.RequestUser) { Id = id, VisibleToStores = request.VisibleToStores, VisibleToConsumers = request.VisibleToConsumers }, token);
                         if (!result.Success)
                             return Failed<bool>(result.Exception);
                     }
@@ -207,7 +209,8 @@ namespace Sheaft.Application.Handlers
             return await ExecuteAsync(request, async () =>
             {
                 var entity = await _context.GetByIdAsync<Product>(request.Id, token);
-                entity.SetSearchable(request.Searchable);
+                entity.SetConsumerVisibility(request.VisibleToConsumers);
+                entity.SetStoreVisibility(request.VisibleToStores);
 
                 await _context.SaveChangesAsync(token);
                 return Ok(true);
@@ -434,7 +437,8 @@ namespace Sheaft.Application.Handlers
             var tags = await _context.FindAsync<Tag>(t => tagsAsStr.Any(c => c.Contains(t.Name.ToLower())), token);
             createProductCommand.Tags = tags.Select(t => t.Id);
 
-            createProductCommand.Searchable = false;
+            createProductCommand.VisibleToConsumers = false;
+            createProductCommand.VisibleToStores = false;
             createProductCommand.SkipUpdateProducerTags = true;
 
             return Ok(createProductCommand);

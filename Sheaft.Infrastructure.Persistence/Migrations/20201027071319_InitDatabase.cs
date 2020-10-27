@@ -802,7 +802,8 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                     VatPrice = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
                     Vat = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
                     Available = table.Column<bool>(nullable: false),
-                    Searchable = table.Column<bool>(nullable: false),
+                    VisibleToConsumers = table.Column<bool>(nullable: false),
+                    VisibleToStores = table.Column<bool>(nullable: false),
                     RatingsCount = table.Column<int>(nullable: false, defaultValue: 0),
                     Rating = table.Column<decimal>(type: "decimal(10,2)", nullable: true),
                     ReturnableUid = table.Column<long>(nullable: true),
@@ -838,7 +839,6 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                     Kind = table.Column<int>(nullable: false),
                     Status = table.Column<int>(nullable: false),
                     ExecutedOn = table.Column<DateTimeOffset>(nullable: true),
-                    ExpiredOn = table.Column<DateTimeOffset>(nullable: true),
                     ResultCode = table.Column<string>(nullable: true),
                     ResultMessage = table.Column<string>(nullable: true),
                     Fees = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
@@ -1080,7 +1080,6 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                     Donate = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
                     FeesPrice = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
                     InternalFeesPrice = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
-                    SkipBackgroundProcessing = table.Column<bool>(nullable: false),
                     UserUid = table.Column<long>(nullable: false),
                     PayinUid = table.Column<long>(nullable: true),
                     DonationUid = table.Column<long>(nullable: true)
@@ -1110,7 +1109,6 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                     Kind = table.Column<int>(nullable: false),
                     Status = table.Column<int>(nullable: false),
                     ExecutedOn = table.Column<DateTimeOffset>(nullable: true),
-                    ExpiredOn = table.Column<DateTimeOffset>(nullable: true),
                     ResultCode = table.Column<string>(nullable: true),
                     ResultMessage = table.Column<string>(nullable: true),
                     Fees = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
@@ -1209,7 +1207,6 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                     Kind = table.Column<int>(nullable: false),
                     Status = table.Column<int>(nullable: false),
                     ExecutedOn = table.Column<DateTimeOffset>(nullable: true),
-                    ExpiredOn = table.Column<DateTimeOffset>(nullable: true),
                     ResultCode = table.Column<string>(nullable: true),
                     ResultMessage = table.Column<string>(nullable: true),
                     Fees = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
@@ -1217,7 +1214,6 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                     Debited = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
                     Credited = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
                     AuthorUid = table.Column<long>(nullable: false),
-                    SkipBackgroundProcessing = table.Column<bool>(nullable: false),
                     CreditedWalletUid = table.Column<long>(nullable: false),
                     OrderUid = table.Column<long>(nullable: false),
                     RefundUid = table.Column<long>(nullable: true),
@@ -1246,6 +1242,50 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                         name: "FK_Payins_Orders_OrderUid",
                         column: x => x.OrderUid,
                         principalTable: "Orders",
+                        principalColumn: "Uid");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Refunds",
+                columns: table => new
+                {
+                    Uid = table.Column<long>(nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Id = table.Column<Guid>(nullable: false),
+                    CreatedOn = table.Column<DateTimeOffset>(nullable: false),
+                    UpdatedOn = table.Column<DateTimeOffset>(nullable: true),
+                    RemovedOn = table.Column<DateTimeOffset>(nullable: true),
+                    Identifier = table.Column<string>(nullable: true),
+                    Kind = table.Column<int>(nullable: false),
+                    Status = table.Column<int>(nullable: false),
+                    ExecutedOn = table.Column<DateTimeOffset>(nullable: true),
+                    ResultCode = table.Column<string>(nullable: true),
+                    ResultMessage = table.Column<string>(nullable: true),
+                    Fees = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
+                    Reference = table.Column<string>(nullable: true),
+                    Debited = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
+                    Credited = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
+                    AuthorUid = table.Column<long>(nullable: false),
+                    DebitedWalletUid = table.Column<long>(nullable: false),
+                    PayinUid = table.Column<long>(nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Refunds", x => x.Uid);
+                    table.ForeignKey(
+                        name: "FK_Refunds_Payins_PayinUid",
+                        column: x => x.PayinUid,
+                        principalTable: "Payins",
+                        principalColumn: "Uid");
+                    table.ForeignKey(
+                        name: "FK_Refunds_Users_AuthorUid",
+                        column: x => x.AuthorUid,
+                        principalTable: "Users",
+                        principalColumn: "Uid");
+                    table.ForeignKey(
+                        name: "FK_Refunds_Wallets_DebitedWalletUid",
+                        column: x => x.DebitedWalletUid,
+                        principalTable: "Wallets",
                         principalColumn: "Uid");
                 });
 
@@ -1382,58 +1422,6 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Refunds",
-                columns: table => new
-                {
-                    Uid = table.Column<long>(nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Id = table.Column<Guid>(nullable: false),
-                    CreatedOn = table.Column<DateTimeOffset>(nullable: false),
-                    UpdatedOn = table.Column<DateTimeOffset>(nullable: true),
-                    RemovedOn = table.Column<DateTimeOffset>(nullable: true),
-                    Identifier = table.Column<string>(nullable: true),
-                    Kind = table.Column<int>(nullable: false),
-                    Status = table.Column<int>(nullable: false),
-                    ExecutedOn = table.Column<DateTimeOffset>(nullable: true),
-                    ExpiredOn = table.Column<DateTimeOffset>(nullable: true),
-                    ResultCode = table.Column<string>(nullable: true),
-                    ResultMessage = table.Column<string>(nullable: true),
-                    Fees = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
-                    Reference = table.Column<string>(nullable: true),
-                    Debited = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
-                    Credited = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
-                    AuthorUid = table.Column<long>(nullable: false),
-                    DebitedWalletUid = table.Column<long>(nullable: false),
-                    PayinUid = table.Column<long>(nullable: true),
-                    CreditedWalletUid = table.Column<long>(nullable: true),
-                    TransferUid = table.Column<long>(nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Refunds", x => x.Uid);
-                    table.ForeignKey(
-                        name: "FK_Refunds_Payins_PayinUid",
-                        column: x => x.PayinUid,
-                        principalTable: "Payins",
-                        principalColumn: "Uid");
-                    table.ForeignKey(
-                        name: "FK_Refunds_Users_AuthorUid",
-                        column: x => x.AuthorUid,
-                        principalTable: "Users",
-                        principalColumn: "Uid");
-                    table.ForeignKey(
-                        name: "FK_Refunds_Wallets_DebitedWalletUid",
-                        column: x => x.DebitedWalletUid,
-                        principalTable: "Wallets",
-                        principalColumn: "Uid");
-                    table.ForeignKey(
-                        name: "FK_Refunds_Wallets_CreditedWalletUid",
-                        column: x => x.CreditedWalletUid,
-                        principalTable: "Wallets",
-                        principalColumn: "Uid");
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Transfers",
                 columns: table => new
                 {
@@ -1447,7 +1435,6 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                     Kind = table.Column<int>(nullable: false),
                     Status = table.Column<int>(nullable: false),
                     ExecutedOn = table.Column<DateTimeOffset>(nullable: true),
-                    ExpiredOn = table.Column<DateTimeOffset>(nullable: true),
                     ResultCode = table.Column<string>(nullable: true),
                     ResultMessage = table.Column<string>(nullable: true),
                     Fees = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
@@ -1455,11 +1442,9 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                     Debited = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
                     Credited = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
                     AuthorUid = table.Column<long>(nullable: false),
-                    SkipBackgroundProcessing = table.Column<bool>(nullable: false),
                     PurchaseOrderUid = table.Column<long>(nullable: false),
                     CreditedWalletUid = table.Column<long>(nullable: false),
                     DebitedWalletUid = table.Column<long>(nullable: false),
-                    RefundUid = table.Column<long>(nullable: true),
                     PayoutUid = table.Column<long>(nullable: true)
                 },
                 constraints: table =>
@@ -1489,11 +1474,6 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                         name: "FK_Transfers_PurchaseOrders_PurchaseOrderUid",
                         column: x => x.PurchaseOrderUid,
                         principalTable: "PurchaseOrders",
-                        principalColumn: "Uid");
-                    table.ForeignKey(
-                        name: "FK_Transfers_Refunds_RefundUid",
-                        column: x => x.RefundUid,
-                        principalTable: "Refunds",
                         principalColumn: "Uid");
                 });
 
@@ -2009,16 +1989,6 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                 columns: new[] { "Uid", "Id", "AuthorUid", "DebitedWalletUid", "RemovedOn" });
 
             migrationBuilder.CreateIndex(
-                name: "IX_Refunds_CreditedWalletUid",
-                table: "Refunds",
-                column: "CreditedWalletUid");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Refunds_TransferUid",
-                table: "Refunds",
-                column: "TransferUid");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_Regions_Code",
                 table: "Regions",
                 column: "Code",
@@ -2135,13 +2105,6 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                 column: "PurchaseOrderUid");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Transfers_RefundUid",
-                table: "Transfers",
-                column: "RefundUid",
-                unique: true,
-                filter: "[RefundUid] IS NOT NULL");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_Transfers_Uid_Id_AuthorUid_PurchaseOrderUid_CreditedWalletUid_DebitedWalletUid_RemovedOn",
                 table: "Transfers",
                 columns: new[] { "Uid", "Id", "AuthorUid", "PurchaseOrderUid", "CreditedWalletUid", "DebitedWalletUid", "RemovedOn" });
@@ -2237,13 +2200,6 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
             migrationBuilder.AddForeignKey(
                 name: "FK_PurchaseOrders_Transfers_TransferUid",
                 table: "PurchaseOrders",
-                column: "TransferUid",
-                principalTable: "Transfers",
-                principalColumn: "Uid");
-
-            migrationBuilder.AddForeignKey(
-                name: "FK_Refunds_Transfers_TransferUid",
-                table: "Refunds",
                 column: "TransferUid",
                 principalTable: "Transfers",
                 principalColumn: "Uid");
@@ -2851,7 +2807,7 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
             migrationBuilder.Sql("CREATE VIEW StoresPerDepartment AS select DepartmentId, DepartmentCode, DepartmentName, RegionId, RegionCode, RegionName, sum(Active) AS Active, sum(Created) as Created from ( select d.Id as DepartmentId, d.Code as DepartmentCode, d.Name as DepartmentName, r.Id as RegionId, r.Code as RegionCode, r.Name as RegionName, case when count(p.Uid) > 0 then 1 else 0 end as Active, count(distinct(c.Uid)) as Created from dbo.Departments d join dbo.Regions r on r.Uid = d.RegionUid left join dbo.UserAddresses ca on d.Uid = ca.DepartmentUid left join dbo.Users c on c.Uid = ca.UserUid and c.Kind = 1 left join dbo.Products p on c.Uid = p.ProducerUid group by c.Kind, d.Id, d.Code, d.Name, r.Id, r.Code, r.Name, c.RemovedOn ) cc group by DepartmentId, DepartmentCode, DepartmentName, RegionId, RegionCode, RegionName");
 
             migrationBuilder.Sql("CREATE VIEW ProducersSearch as 	select      r.Id as producer_id      , r.Name as producer_name         , r.Name as partialProducerName      , r.Email as producer_email      , r.Picture as producer_picture      , r.Phone as producer_phone      , ra.Line1 as producer_line1      , ra.Line2 as producer_line2      , ra.Zipcode as producer_zipcode      , ra.City as producer_city      , dbo.InlineMax(r.CreatedOn, dbo.InlineMax(r.UpdatedOn, t.UpdatedOn)) as last_update      , case when r.RemovedOn is null then 0 else 1 end as removed      , '[' + STRING_AGG('\"' + LOWER(t.Name) + '\"', ',') + ']' as producer_tags           , ra.Longitude as producer_longitude      , ra.Latitude as producer_latitude      , geography::STGeomFromText('POINT('+convert(varchar(20),ra.Longitude)+' '+convert(varchar(20),ra.Latitude)+')',4326) as producer_geolocation      , count(p.Id) as producer_products_count     from dbo.Users r      join dbo.UserAddresses ra on r.Uid = ra.UserUid     left join dbo.ProducerTags ct on r.Uid = ct.ProducerUid     left join dbo.Tags t on t.Uid = ct.TagUid     left join dbo.Products p on p.ProducerUid = r.Uid	 	where r.Kind = 0 and r.OpenForNewBusiness = 1   group by 	r.Id,     r.Name,     r.Email, 	r.Picture,     r.Phone,     ra.Line1,     ra.Line2,     ra.Zipcode,     ra.City,     dbo.InlineMax(r.CreatedOn, dbo.InlineMax(r.UpdatedOn, t.UpdatedOn)),     case when r.RemovedOn is null then 0 else 1 end,     ra.Longitude,     ra.Latitude");
-            migrationBuilder.Sql("CREATE VIEW ProductsSearch as     select     p.Id as product_id      , p.Name as product_name      , p.Name as partialProductName 	 , CAST(p.QuantityPerUnit as float) as product_quantityPerUnit	      , case when p.Unit = 1 then 'mL' 			when p.Unit = 2 then 'L' 			when p.Unit = 3 then 'g' 			when p.Unit = 4 then 'kg' end as product_unit														      , CAST(p.OnSalePricePerUnit as float) as product_onSalePricePerUnit      , CAST(p.OnSalePrice as float) as product_onSalePrice      , CAST(p.Rating as float) as product_rating      , p.RatingsCount as product_ratings_count      , case when pa.Uid is not null then cast(1 as bit) else cast(0 as bit) end as product_returnable      , r.Id as producer_id      , r.Name as producer_name      , r.Email as producer_email      , r.Phone as producer_phone      , ra.Zipcode as producer_zipcode      , ra.City as producer_city 	 , p.Picture as product_image      , p.Available as product_available      , p.Searchable as product_searchable      , case when p.Conditioning = 1 then 'BOX' 			when p.Conditioning = 2 then 'BULK' 			when p.Conditioning = 3 then 'BOUQUET' 			when p.Conditioning = 4 then 'BUNCH' 			when p.Conditioning = 5 then 'PIECE' end as product_conditioning      , dbo.InlineMax(dbo.InlineMax(dbo.InlineMax(p.UpdatedOn, r.UpdatedOn), t.UpdatedOn), p.CreatedOn) as last_update      , case when (dbo.InlineMax(p.RemovedOn, r.RemovedOn)) is null then 0 else 1 end as removed      , '[' + STRING_AGG('\"' + LOWER(t.Name) + '\"', ',') + ']' as product_tags           , ra.Longitude as producer_longitude      , ra.Latitude as producer_latitude      , geography::STGeomFromText('POINT('+convert(varchar(20),ra.Longitude)+' '+convert(varchar(20),ra.Latitude)+')',4326) as producer_geolocation   from dbo.Products p     join dbo.Users r on r.Uid = p.ProducerUid and r.Kind = 0     join dbo.UserAddresses ra on r.Uid = ra.UserUid 	join dbo.DeliveryModes dm on dm.ProducerUid = r.Uid and dm.Kind in (1, 2, 3, 4)      left join dbo.ProductTags pt on p.Uid = pt.ProductUid     left join dbo.Returnables pa on pa.Uid = p.ReturnableUid     left join dbo.Tags t on t.Uid = pt.TagUid   group by     p.Id,     p.Name,    case when p.Unit = 1 then 'mL' 			when p.Unit = 2 then 'L' 			when p.Unit = 3 then 'g' 			when p.Unit = 4 then 'kg' end, 	CAST(p.QuantityPerUnit as float),	 	CAST(p.OnSalePricePerUnit as float),     CAST(p.OnSalePrice as float),     CAST(p.WholeSalePrice as float),     CAST(p.Rating as float),     p.RatingsCount, 	case when pa.Uid is not null then cast(1 as bit) else cast(0 as bit) end, 	r.Id,     r.Name,     r.Email, 	p.Picture,         case when p.Conditioning = 1 then 'BOX' 			when p.Conditioning = 2 then 'BULK' 			when p.Conditioning = 3 then 'BOUQUET' 			when p.Conditioning = 4 then 'BUNCH' 			when p.Conditioning = 5 then 'PIECE' end, 	r.Id,     r.Phone,     p.Available,     p.Searchable,     ra.Zipcode,     ra.City,     dbo.InlineMax(dbo.InlineMax(dbo.InlineMax(p.UpdatedOn, r.UpdatedOn), t.UpdatedOn), p.CreatedOn),     case when (dbo.InlineMax(p.RemovedOn, r.RemovedOn)) is null then 0 else 1 end,     ra.Longitude,     ra.Latitude");
+            migrationBuilder.Sql("CREATE VIEW ProductsSearch as     select     p.Id as product_id      , p.Name as product_name      , p.Name as partialProductName 	 , CAST(p.QuantityPerUnit as float) as product_quantityPerUnit	      , case when p.Unit = 1 then 'mL' 			when p.Unit = 2 then 'L' 			when p.Unit = 3 then 'g' 			when p.Unit = 4 then 'kg' end as product_unit														      , CAST(p.OnSalePricePerUnit as float) as product_onSalePricePerUnit      , CAST(p.OnSalePrice as float) as product_onSalePrice      , CAST(p.Rating as float) as product_rating      , p.RatingsCount as product_ratings_count      , case when pa.Uid is not null then cast(1 as bit) else cast(0 as bit) end as product_returnable      , r.Id as producer_id      , r.Name as producer_name      , r.Email as producer_email      , r.Phone as producer_phone      , ra.Zipcode as producer_zipcode      , ra.City as producer_city 	 , p.Picture as product_image      , p.Available as product_available      , p.VisibleToConsumers as product_searchable      , case when p.Conditioning = 1 then 'BOX' 			when p.Conditioning = 2 then 'BULK' 			when p.Conditioning = 3 then 'BOUQUET' 			when p.Conditioning = 4 then 'BUNCH' 			when p.Conditioning = 5 then 'PIECE' end as product_conditioning      , dbo.InlineMax(dbo.InlineMax(dbo.InlineMax(p.UpdatedOn, r.UpdatedOn), t.UpdatedOn), p.CreatedOn) as last_update      , case when (dbo.InlineMax(p.RemovedOn, r.RemovedOn)) is null then 0 else 1 end as removed      , '[' + STRING_AGG('\"' + LOWER(t.Name) + '\"', ',') + ']' as product_tags           , ra.Longitude as producer_longitude      , ra.Latitude as producer_latitude      , geography::STGeomFromText('POINT('+convert(varchar(20),ra.Longitude)+' '+convert(varchar(20),ra.Latitude)+')',4326) as producer_geolocation   from dbo.Products p     join dbo.Users r on r.Uid = p.ProducerUid and r.Kind = 0     join dbo.UserAddresses ra on r.Uid = ra.UserUid 	join dbo.DeliveryModes dm on dm.ProducerUid = r.Uid and dm.Kind in (1, 2, 3, 4)      left join dbo.ProductTags pt on p.Uid = pt.ProductUid     left join dbo.Returnables pa on pa.Uid = p.ReturnableUid     left join dbo.Tags t on t.Uid = pt.TagUid   group by     p.Id,     p.Name,    case when p.Unit = 1 then 'mL' 			when p.Unit = 2 then 'L' 			when p.Unit = 3 then 'g' 			when p.Unit = 4 then 'kg' end, 	CAST(p.QuantityPerUnit as float),	 	CAST(p.OnSalePricePerUnit as float),     CAST(p.OnSalePrice as float),     CAST(p.WholeSalePrice as float),     CAST(p.Rating as float),     p.RatingsCount, 	case when pa.Uid is not null then cast(1 as bit) else cast(0 as bit) end, 	r.Id,     r.Name,     r.Email, 	p.Picture,         case when p.Conditioning = 1 then 'BOX' 			when p.Conditioning = 2 then 'BULK' 			when p.Conditioning = 3 then 'BOUQUET' 			when p.Conditioning = 4 then 'BUNCH' 			when p.Conditioning = 5 then 'PIECE' end, 	r.Id,     r.Phone,     p.Available,     p.VisibleToConsumers,     ra.Zipcode,     ra.City,     dbo.InlineMax(dbo.InlineMax(dbo.InlineMax(p.UpdatedOn, r.UpdatedOn), t.UpdatedOn), p.CreatedOn),     case when (dbo.InlineMax(p.RemovedOn, r.RemovedOn)) is null then 0 else 1 end,     ra.Longitude,     ra.Latitude");
             migrationBuilder.Sql("CREATE VIEW StoresSearch as     select      r.Id as store_id      , r.Name as store_name       , r.Name as partialStoreName      , r.Email as store_email      , r.Picture as store_picture      , r.Phone as store_phone      , ra.Line1 as store_line1      , ra.Line2 as store_line2      , ra.Zipcode as store_zipcode      , ra.City as store_city      , dbo.InlineMax(r.CreatedOn, dbo.InlineMax(r.UpdatedOn, t.UpdatedOn)) as last_update      , case when r.RemovedOn is null then 0 else 1 end as removed      , '[' + STRING_AGG('\"' + LOWER(t.Name) + '\"', ',') + ']' as store_tags           , ra.Longitude as store_longitude      , ra.Latitude as store_latitude      , geography::STGeomFromText('POINT('+convert(varchar(20),ra.Longitude)+' '+convert(varchar(20),ra.Latitude)+')',4326) as store_geolocation    from dbo.Users r      join dbo.UserAddresses ra on r.Uid = ra.UserUid     left join dbo.StoreTags ct on r.Uid = ct.StoreUid     left join dbo.Tags t on t.Uid = ct.TagUid	 	where r.Kind = 1 and r.OpenForNewBusiness = 1    group by 	r.Id,     r.Name,     r.Email, 	r.Picture,     r.Phone,     ra.Line1,     ra.Line2,     ra.Zipcode,     ra.City,     dbo.InlineMax(r.CreatedOn, dbo.InlineMax(r.UpdatedOn, t.UpdatedOn)),     case when r.RemovedOn is null then 0 else 1 end,     ra.Longitude,     ra.Latitude");
 
             migrationBuilder.Sql("CREATE SCHEMA [Cache]");
@@ -2894,25 +2850,25 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
             migrationBuilder.InsertData("AgreementSelectedHours", new List<string>() { "Id", "AgreementUid", "Day", "From", "To" }.ToArray(), new List<object>() { 2, 2, "4", TimeSpan.FromHours(12), TimeSpan.FromHours(18) }.ToArray(), "dbo");
             migrationBuilder.InsertData("AgreementSelectedHours", new List<string>() { "Id", "AgreementUid", "Day", "From", "To" }.ToArray(), new List<object>() { 3, 3, "2", TimeSpan.FromHours(8), TimeSpan.FromHours(18) }.ToArray(), "dbo");
 
-            migrationBuilder.InsertData("Products", new List<string>() { "Uid", "Id", "CreatedOn", "UpdatedOn", "Reference", "Conditioning", "Name", "Description", "WholeSalePrice", "Vat", "VatPrice", "OnSalePrice", "WholeSalePricePerUnit", "VatPricePerUnit", "OnSalePricePerUnit", "QuantityPerUnit", "Unit", "Picture", "Available", "Searchable", "ProducerUid", "Weight" }.ToArray(), new List<object>() { 1, "4FF642DE-40A6-427B-8101-08D7A1B89D07", "2018-11-12 21:01:53", "2020-04-03 23:00:47", "20011234", 2, "Miel d'acacia", "Pot de miel de fleurs d'acacia - 500g", "6.00", "1.30", "0.08", "6.08", "6.00", "1.30", "0.08", "1", "3", null, 1, 1, 1, "0" }.ToArray(), "dbo");
-            migrationBuilder.InsertData("Products", new List<string>() { "Uid", "Id", "CreatedOn", "UpdatedOn", "Reference", "Conditioning", "Name", "Description", "WholeSalePrice", "Vat", "VatPrice", "OnSalePrice", "WholeSalePricePerUnit", "VatPricePerUnit", "OnSalePricePerUnit", "QuantityPerUnit", "Unit", "Picture", "Available", "Searchable", "ProducerUid", "Weight" }.ToArray(), new List<object>() { 2, "10631DB6-91A1-4E37-8102-08D7A1B89D07", "2019-12-21 21:01:53", "2020-04-03 23:12:13", "19023491", 2, "Butternutt", "Butternut à la pièce", "2.00", "5.00", "0.10", "2.10", "6.00", "1.30", "0.08", "1", "3", null, 1, 1, 1, "0" }.ToArray(), "dbo");
-            migrationBuilder.InsertData("Products", new List<string>() { "Uid", "Id", "CreatedOn", "UpdatedOn", "Reference", "Conditioning", "Name", "Description", "WholeSalePrice", "Vat", "VatPrice", "OnSalePrice", "WholeSalePricePerUnit", "VatPricePerUnit", "OnSalePricePerUnit", "QuantityPerUnit", "Unit", "Picture", "Available", "Searchable", "ProducerUid", "Weight" }.ToArray(), new List<object>() { 3, "46D5F178-B68C-4082-8103-08D7A1B89D07", "2019-04-06 21:01:53", "2020-04-03 23:00:47", "20013469", 2, "Yaourt à la confiture d'abricot", "Yaourt à la confiture d'abricot, pot de 420g", "2.85", "0.10", "0.00", "2.85", "6.00", "1.30", "0.08", "1", "3", null, 1, 1, 1, "0" }.ToArray(), "dbo");
-            migrationBuilder.InsertData("Products", new List<string>() { "Uid", "Id", "CreatedOn", "UpdatedOn", "Reference", "Conditioning", "Name", "Description", "WholeSalePrice", "Vat", "VatPrice", "OnSalePrice", "WholeSalePricePerUnit", "VatPricePerUnit", "OnSalePricePerUnit", "QuantityPerUnit", "Unit", "Picture", "Available", "Searchable", "ProducerUid", "Weight" }.ToArray(), new List<object>() { 4, "7CCAEC7A-1262-4AE8-8104-08D7A1B89D07", "2018-09-10 21:01:53", "2020-04-03 23:00:47", "19016470", 2, "Courgettes jaunes", "1kg de courgettes jaunes", "3.20", "0.05", "0.00", "3.20", "6.00", "1.30", "0.08", "1", "3", null, 1, 1, 1, "0" }.ToArray(), "dbo");
-            migrationBuilder.InsertData("Products", new List<string>() { "Uid", "Id", "CreatedOn", "UpdatedOn", "Reference", "Conditioning", "Name", "Description", "WholeSalePrice", "Vat", "VatPrice", "OnSalePrice", "WholeSalePricePerUnit", "VatPricePerUnit", "OnSalePricePerUnit", "QuantityPerUnit", "Unit", "Picture", "Available", "Searchable", "ProducerUid", "Weight" }.ToArray(), new List<object>() { 5, "61427915-DCD7-4578-8105-08D7A1B89D07", "2017-10-16 21:01:53", "2020-04-03 23:00:47", "19051342", 2, "Tomates anciennes", "Tomates anciennes, 500g", "4.15", "0.05", "0.00", "4.15", "6.00", "1.30", "0.08", "1", "3", null, 1, 1, 1, "0" }.ToArray(), "dbo");
-            migrationBuilder.InsertData("Products", new List<string>() { "Uid", "Id", "CreatedOn", "UpdatedOn", "Reference", "Conditioning", "Name", "Description", "WholeSalePrice", "Vat", "VatPrice", "OnSalePrice", "WholeSalePricePerUnit", "VatPricePerUnit", "OnSalePricePerUnit", "QuantityPerUnit", "Unit", "Picture", "Available", "Searchable", "ProducerUid", "Weight" }.ToArray(), new List<object>() { 6, "6ADAB553-A678-4612-8106-08D7A1B89D07", "2017-12-16 21:01:53", "2020-04-03 23:00:47", "20478123", 2, "Oranges à jus", "1kg d'oranges à jus", "5.15", "0.05", "0.00", "5.15", "6.00", "1.30", "0.08", "1", "3", null, 1, 1, 1, "0" }.ToArray(), "dbo");
-            migrationBuilder.InsertData("Products", new List<string>() { "Uid", "Id", "CreatedOn", "UpdatedOn", "Reference", "Conditioning", "Name", "Description", "WholeSalePrice", "Vat", "VatPrice", "OnSalePrice", "WholeSalePricePerUnit", "VatPricePerUnit", "OnSalePricePerUnit", "QuantityPerUnit", "Unit", "Picture", "Available", "Searchable", "ProducerUid", "Weight" }.ToArray(), new List<object>() { 7, "1BD5BD83-4056-472C-8107-08D7A1B89D07", "2018-03-07 21:01:53", "2020-04-03 23:00:47", "19635248", 2, "Pâte à tartiner Crunchy", "Pâte à tartiner aux noisettes entières - 250g", "4.80", "0.10", "0.00", "4.80", "6.00", "1.30", "0.08", "1", "3", null, 1, 1, 1, "0" }.ToArray(), "dbo");
-            migrationBuilder.InsertData("Products", new List<string>() { "Uid", "Id", "CreatedOn", "UpdatedOn", "Reference", "Conditioning", "Name", "Description", "WholeSalePrice", "Vat", "VatPrice", "OnSalePrice", "WholeSalePricePerUnit", "VatPricePerUnit", "OnSalePricePerUnit", "QuantityPerUnit", "Unit", "Picture", "Available", "Searchable", "ProducerUid", "Weight" }.ToArray(), new List<object>() { 8, "8CEE4B98-EFF3-4FBA-8108-08D7A1B89D07", "2020-03-31 21:01:53", "2020-04-03 23:00:47", "19100235", 2, "Pain grillé au blé complet", "1 paquet de pain grillé au blé complet", "1.85", "0.10", "0.00", "1.85", "6.00", "1.30", "0.08", "1", "3", null, 1, 1, 1, "0" }.ToArray(), "dbo");
-            migrationBuilder.InsertData("Products", new List<string>() { "Uid", "Id", "CreatedOn", "UpdatedOn", "Reference", "Conditioning", "Name", "Description", "WholeSalePrice", "Vat", "VatPrice", "OnSalePrice", "WholeSalePricePerUnit", "VatPricePerUnit", "OnSalePricePerUnit", "QuantityPerUnit", "Unit", "Picture", "Available", "Searchable", "ProducerUid", "Weight" }.ToArray(), new List<object>() { 9, "2548FF9E-D160-4F1F-8109-08D7A1B89D07", "2018-11-25 21:01:53", "2020-04-03 23:00:47", "20369041", 2, "Soupe de potiron", "Une brique de soupe de potiron", "1.95", "0.10", "0.00", "1.95", "6.00", "1.30", "0.08", "1", "1", null, 1, 1, 1, "0" }.ToArray(), "dbo");
-            migrationBuilder.InsertData("Products", new List<string>() { "Uid", "Id", "CreatedOn", "UpdatedOn", "Reference", "Conditioning", "Name", "Description", "WholeSalePrice", "Vat", "VatPrice", "OnSalePrice", "WholeSalePricePerUnit", "VatPricePerUnit", "OnSalePricePerUnit", "QuantityPerUnit", "Unit", "Picture", "Available", "Searchable", "ProducerUid", "Weight" }.ToArray(), new List<object>() { 10, "8FD6F87C-0726-4B22-810A-08D7A1B89D07", "2019-09-29 21:01:53", "2020-04-03 23:10:30", "19447520", 2, "Carottes bio", "1kg de carottes - bio", "0.95", "0.05", "0.00", "0.95", "6.00", "1.30", "0.08", "1", "3", null, 1, 1, 1, "0" }.ToArray(), "dbo");
-            migrationBuilder.InsertData("Products", new List<string>() { "Uid", "Id", "CreatedOn", "UpdatedOn", "Reference", "Conditioning", "Name", "Description", "WholeSalePrice", "Vat", "VatPrice", "OnSalePrice", "WholeSalePricePerUnit", "VatPricePerUnit", "OnSalePricePerUnit", "QuantityPerUnit", "Unit", "Picture", "Available", "Searchable", "ProducerUid", "Weight" }.ToArray(), new List<object>() { 11, "1CD371A0-8C03-429A-810B-08D7A1B89D07", "2019-01-08 21:01:53", "2020-04-03 23:00:47", "20000142", 2, "Salade batavia", "Salade batavia à la pièce", "1.00", "0.05", "0.00", "1.00", "6.00", "1.30", "0.08", "1", "3", null, 1, 1, 1, "0" }.ToArray(), "dbo");
-            migrationBuilder.InsertData("Products", new List<string>() { "Uid", "Id", "CreatedOn", "UpdatedOn", "Reference", "Conditioning", "Name", "Description", "WholeSalePrice", "Vat", "VatPrice", "OnSalePrice", "WholeSalePricePerUnit", "VatPricePerUnit", "OnSalePricePerUnit", "QuantityPerUnit", "Unit", "Picture", "Available", "Searchable", "ProducerUid", "Weight" }.ToArray(), new List<object>() { 12, "55E66328-5DAA-4A61-810C-08D7A1B89D07", "2019-01-28 21:01:53", "2020-04-03 23:00:47", "19036658", 2, "Yaourts brassés à la vanille", "Un pack de 4 yaourts brassés à la vanille", "1.65", "0.10", "0.00", "1.65", "6.00", "1.30", "0.08", "1", "3", null, 1, 1, 1, "0" }.ToArray(), "dbo");
-            migrationBuilder.InsertData("Products", new List<string>() { "Uid", "Id", "CreatedOn", "UpdatedOn", "Reference", "Conditioning", "Name", "Description", "WholeSalePrice", "Vat", "VatPrice", "OnSalePrice", "WholeSalePricePerUnit", "VatPricePerUnit", "OnSalePricePerUnit", "QuantityPerUnit", "Unit", "Picture", "Available", "Searchable", "ProducerUid", "Weight" }.ToArray(), new List<object>() { 13, "6789434A-E8B6-444A-810D-08D7A1B89D07", "2018-09-22 21:01:53", "2020-04-03 23:00:47", "20111258", 2, "Jus de pomme", "Une bouteille de 75cl de jus de pomme", "1.30", "0.10", "0.00", "1.30", "6.00", "1.30", "0.08", "1", "1", null, 1, 1, 1, "0" }.ToArray(), "dbo");
-            migrationBuilder.InsertData("Products", new List<string>() { "Uid", "Id", "CreatedOn", "UpdatedOn", "Reference", "Conditioning", "Name", "Description", "WholeSalePrice", "Vat", "VatPrice", "OnSalePrice", "WholeSalePricePerUnit", "VatPricePerUnit", "OnSalePricePerUnit", "QuantityPerUnit", "Unit", "Picture", "Available", "Searchable", "ProducerUid", "Weight" }.ToArray(), new List<object>() { 14, "F851420E-BA14-486A-810E-08D7A1B89D07", "2019-02-22 21:01:53", "2020-04-03 23:00:47", "19887742", 2, "Compote de bananes", "Un bocal de 650g de compote de bananes", "4.20", "0.10", "0.00", "4.20", "6.00", "1.30", "0.08", "1", "3", null, 1, 1, 1, "0" }.ToArray(), "dbo");
-            migrationBuilder.InsertData("Products", new List<string>() { "Uid", "Id", "CreatedOn", "UpdatedOn", "Reference", "Conditioning", "Name", "Description", "WholeSalePrice", "Vat", "VatPrice", "OnSalePrice", "WholeSalePricePerUnit", "VatPricePerUnit", "OnSalePricePerUnit", "QuantityPerUnit", "Unit", "Picture", "Available", "Searchable", "ProducerUid", "Weight" }.ToArray(), new List<object>() { 15, "738727A2-ED2F-4FA6-810F-08D7A1B89D07", "2019-06-29 21:01:53", "2020-04-03 23:11:17", "20332501", 2, "Barres de céréales aux fruits secs", "Un paquet de 6 barres de céréales aux fruits secs", "2.50", "0.10", "0.00", "2.50", "6.00", "1.30", "0.08", "1", "3", null, 1, 1, 1, "0" }.ToArray(), "dbo");
-            migrationBuilder.InsertData("Products", new List<string>() { "Uid", "Id", "CreatedOn", "UpdatedOn", "Reference", "Conditioning", "Name", "Description", "WholeSalePrice", "Vat", "VatPrice", "OnSalePrice", "WholeSalePricePerUnit", "VatPricePerUnit", "OnSalePricePerUnit", "QuantityPerUnit", "Unit", "Picture", "Available", "Searchable", "ProducerUid", "Weight" }.ToArray(), new List<object>() { 16, "c8c32a96-dffe-431d-92cd-bbb5e37063c1", "2019-06-29 21:01:53", "2020-04-03 23:11:17", "45332501", 2, "Steack haché 150gr", "Un steack haché pur boeuf", "2.50", "0.10", "0.00", "2.50", "6.00", "1.30", "0.08", "1", "3", null, 1, 1, 4, "0" }.ToArray(), "dbo");
-            migrationBuilder.InsertData("Products", new List<string>() { "Uid", "Id", "CreatedOn", "UpdatedOn", "Reference", "Conditioning", "Name", "Description", "WholeSalePrice", "Vat", "VatPrice", "OnSalePrice", "WholeSalePricePerUnit", "VatPricePerUnit", "OnSalePricePerUnit", "QuantityPerUnit", "Unit", "Picture", "Available", "Searchable", "ProducerUid", "Weight" }.ToArray(), new List<object>() { 17, "a3970033-b5c7-4c01-8b43-e11ee1ebdc45", "2019-06-29 21:01:53", "2020-04-03 23:11:17", "24532501", 2, "Cuisse de poulet", "Une cuisse de poulet fermier", "3.40", "0.15", "0.00", "3.40", "6.00", "1.30", "0.08", "1", "3", null, 1, 1, 4, "0" }.ToArray(), "dbo");
-            migrationBuilder.InsertData("Products", new List<string>() { "Uid", "Id", "CreatedOn", "UpdatedOn", "Reference", "Conditioning", "Name", "Description", "WholeSalePrice", "Vat", "VatPrice", "OnSalePrice", "WholeSalePricePerUnit", "VatPricePerUnit", "OnSalePricePerUnit", "QuantityPerUnit", "Unit", "Picture", "Available", "Searchable", "ProducerUid", "Weight" }.ToArray(), new List<object>() { 18, "218cb379-fb0e-4755-84ef-e2b6414f1cc3", "2019-06-29 21:01:53", "2020-04-03 23:11:17", "66782501", 2, "Perche", "Une perche du nil", "2.50", "0.10", "0.00", "2.50", "6.00", "1.30", "0.08", "1", "3", null, 1, 1, 4, "0" }.ToArray(), "dbo");
-            migrationBuilder.InsertData("Products", new List<string>() { "Uid", "Id", "CreatedOn", "UpdatedOn", "Reference", "Conditioning", "Name", "Description", "WholeSalePrice", "Vat", "VatPrice", "OnSalePrice", "WholeSalePricePerUnit", "VatPricePerUnit", "OnSalePricePerUnit", "QuantityPerUnit", "Unit", "Picture", "Available", "Searchable", "ProducerUid", "Weight" }.ToArray(), new List<object>() { 19, "de7de3b5-5184-4150-9b10-a0ff11bcf5d7", "2019-06-29 21:01:53", "2020-04-03 23:11:17", "75412501", 2, "Pigeon bio", "Un super pigeon bio", "12.50", "2.10", "0.00", "12.50", "6.00", "1.30", "0.08", "1", "3", null, 1, 1, 4, "0" }.ToArray(), "dbo");
+            migrationBuilder.InsertData("Products", new List<string>() { "Uid", "Id", "CreatedOn", "UpdatedOn", "Reference", "Conditioning", "Name", "Description", "WholeSalePrice", "Vat", "VatPrice", "OnSalePrice", "WholeSalePricePerUnit", "VatPricePerUnit", "OnSalePricePerUnit", "QuantityPerUnit", "Unit", "Picture", "Available", "VisibleToStores", "VisibleToConsumers", "ProducerUid", "Weight" }.ToArray(), new List<object>() { 1, "4FF642DE-40A6-427B-8101-08D7A1B89D07", "2018-11-12 21:01:53", "2020-04-03 23:00:47", "20011234", 2, "Miel d'acacia", "Pot de miel de fleurs d'acacia - 500g", "6.00", "1.30", "0.08", "6.08", "6.00", "1.30", "0.08", "1", "3", null, 1, 1, 1, 1, "0" }.ToArray(), "dbo");
+            migrationBuilder.InsertData("Products", new List<string>() { "Uid", "Id", "CreatedOn", "UpdatedOn", "Reference", "Conditioning", "Name", "Description", "WholeSalePrice", "Vat", "VatPrice", "OnSalePrice", "WholeSalePricePerUnit", "VatPricePerUnit", "OnSalePricePerUnit", "QuantityPerUnit", "Unit", "Picture", "Available", "VisibleToStores", "VisibleToConsumers", "ProducerUid", "Weight" }.ToArray(), new List<object>() { 2, "10631DB6-91A1-4E37-8102-08D7A1B89D07", "2019-12-21 21:01:53", "2020-04-03 23:12:13", "19023491", 2, "Butternutt", "Butternut à la pièce", "2.00", "5.00", "0.10", "2.10", "6.00", "1.30", "0.08", "1", "3", null, 1, 1, 1, 1, "0" }.ToArray(), "dbo");
+            migrationBuilder.InsertData("Products", new List<string>() { "Uid", "Id", "CreatedOn", "UpdatedOn", "Reference", "Conditioning", "Name", "Description", "WholeSalePrice", "Vat", "VatPrice", "OnSalePrice", "WholeSalePricePerUnit", "VatPricePerUnit", "OnSalePricePerUnit", "QuantityPerUnit", "Unit", "Picture", "Available", "VisibleToStores", "VisibleToConsumers", "ProducerUid", "Weight" }.ToArray(), new List<object>() { 3, "46D5F178-B68C-4082-8103-08D7A1B89D07", "2019-04-06 21:01:53", "2020-04-03 23:00:47", "20013469", 2, "Yaourt à la confiture d'abricot", "Yaourt à la confiture d'abricot, pot de 420g", "2.85", "0.10", "0.00", "2.85", "6.00", "1.30", "0.08", "1", "3", null, 1, 1, 1, 1, "0" }.ToArray(), "dbo");
+            migrationBuilder.InsertData("Products", new List<string>() { "Uid", "Id", "CreatedOn", "UpdatedOn", "Reference", "Conditioning", "Name", "Description", "WholeSalePrice", "Vat", "VatPrice", "OnSalePrice", "WholeSalePricePerUnit", "VatPricePerUnit", "OnSalePricePerUnit", "QuantityPerUnit", "Unit", "Picture", "Available", "VisibleToStores", "VisibleToConsumers", "ProducerUid", "Weight" }.ToArray(), new List<object>() { 4, "7CCAEC7A-1262-4AE8-8104-08D7A1B89D07", "2018-09-10 21:01:53", "2020-04-03 23:00:47", "19016470", 2, "Courgettes jaunes", "1kg de courgettes jaunes", "3.20", "0.05", "0.00", "3.20", "6.00", "1.30", "0.08", "1", "3", null, 1, 1, 1, 1, "0" }.ToArray(), "dbo");
+            migrationBuilder.InsertData("Products", new List<string>() { "Uid", "Id", "CreatedOn", "UpdatedOn", "Reference", "Conditioning", "Name", "Description", "WholeSalePrice", "Vat", "VatPrice", "OnSalePrice", "WholeSalePricePerUnit", "VatPricePerUnit", "OnSalePricePerUnit", "QuantityPerUnit", "Unit", "Picture", "Available", "VisibleToStores", "VisibleToConsumers", "ProducerUid", "Weight" }.ToArray(), new List<object>() { 5, "61427915-DCD7-4578-8105-08D7A1B89D07", "2017-10-16 21:01:53", "2020-04-03 23:00:47", "19051342", 2, "Tomates anciennes", "Tomates anciennes, 500g", "4.15", "0.05", "0.00", "4.15", "6.00", "1.30", "0.08", "1", "3", null, 1, 1, 1, 1, "0" }.ToArray(), "dbo");
+            migrationBuilder.InsertData("Products", new List<string>() { "Uid", "Id", "CreatedOn", "UpdatedOn", "Reference", "Conditioning", "Name", "Description", "WholeSalePrice", "Vat", "VatPrice", "OnSalePrice", "WholeSalePricePerUnit", "VatPricePerUnit", "OnSalePricePerUnit", "QuantityPerUnit", "Unit", "Picture", "Available", "VisibleToStores", "VisibleToConsumers", "ProducerUid", "Weight" }.ToArray(), new List<object>() { 6, "6ADAB553-A678-4612-8106-08D7A1B89D07", "2017-12-16 21:01:53", "2020-04-03 23:00:47", "20478123", 2, "Oranges à jus", "1kg d'oranges à jus", "5.15", "0.05", "0.00", "5.15", "6.00", "1.30", "0.08", "1", "3", null, 1, 1, 1, 1, "0" }.ToArray(), "dbo");
+            migrationBuilder.InsertData("Products", new List<string>() { "Uid", "Id", "CreatedOn", "UpdatedOn", "Reference", "Conditioning", "Name", "Description", "WholeSalePrice", "Vat", "VatPrice", "OnSalePrice", "WholeSalePricePerUnit", "VatPricePerUnit", "OnSalePricePerUnit", "QuantityPerUnit", "Unit", "Picture", "Available", "VisibleToStores", "VisibleToConsumers", "ProducerUid", "Weight" }.ToArray(), new List<object>() { 7, "1BD5BD83-4056-472C-8107-08D7A1B89D07", "2018-03-07 21:01:53", "2020-04-03 23:00:47", "19635248", 2, "Pâte à tartiner Crunchy", "Pâte à tartiner aux noisettes entières - 250g", "4.80", "0.10", "0.00", "4.80", "6.00", "1.30", "0.08", "1", "3", null, 1, 1, 1, 1, "0" }.ToArray(), "dbo");
+            migrationBuilder.InsertData("Products", new List<string>() { "Uid", "Id", "CreatedOn", "UpdatedOn", "Reference", "Conditioning", "Name", "Description", "WholeSalePrice", "Vat", "VatPrice", "OnSalePrice", "WholeSalePricePerUnit", "VatPricePerUnit", "OnSalePricePerUnit", "QuantityPerUnit", "Unit", "Picture", "Available", "VisibleToStores", "VisibleToConsumers", "ProducerUid", "Weight" }.ToArray(), new List<object>() { 8, "8CEE4B98-EFF3-4FBA-8108-08D7A1B89D07", "2020-03-31 21:01:53", "2020-04-03 23:00:47", "19100235", 2, "Pain grillé au blé complet", "1 paquet de pain grillé au blé complet", "1.85", "0.10", "0.00", "1.85", "6.00", "1.30", "0.08", "1", "3", null, 1, 1, 1, 1, "0" }.ToArray(), "dbo");
+            migrationBuilder.InsertData("Products", new List<string>() { "Uid", "Id", "CreatedOn", "UpdatedOn", "Reference", "Conditioning", "Name", "Description", "WholeSalePrice", "Vat", "VatPrice", "OnSalePrice", "WholeSalePricePerUnit", "VatPricePerUnit", "OnSalePricePerUnit", "QuantityPerUnit", "Unit", "Picture", "Available", "VisibleToStores", "VisibleToConsumers", "ProducerUid", "Weight" }.ToArray(), new List<object>() { 9, "2548FF9E-D160-4F1F-8109-08D7A1B89D07", "2018-11-25 21:01:53", "2020-04-03 23:00:47", "20369041", 2, "Soupe de potiron", "Une brique de soupe de potiron", "1.95", "0.10", "0.00", "1.95", "6.00", "1.30", "0.08", "1", "1", null, 1, 1, 1, 1, "0" }.ToArray(), "dbo");
+            migrationBuilder.InsertData("Products", new List<string>() { "Uid", "Id", "CreatedOn", "UpdatedOn", "Reference", "Conditioning", "Name", "Description", "WholeSalePrice", "Vat", "VatPrice", "OnSalePrice", "WholeSalePricePerUnit", "VatPricePerUnit", "OnSalePricePerUnit", "QuantityPerUnit", "Unit", "Picture", "Available", "VisibleToStores", "VisibleToConsumers", "ProducerUid", "Weight" }.ToArray(), new List<object>() { 10, "8FD6F87C-0726-4B22-810A-08D7A1B89D07", "2019-09-29 21:01:53", "2020-04-03 23:10:30", "19447520", 2, "Carottes bio", "1kg de carottes - bio", "0.95", "0.05", "0.00", "0.95", "6.00", "1.30", "0.08", "1", "3", null, 1, 1, 1, 1, "0" }.ToArray(), "dbo");
+            migrationBuilder.InsertData("Products", new List<string>() { "Uid", "Id", "CreatedOn", "UpdatedOn", "Reference", "Conditioning", "Name", "Description", "WholeSalePrice", "Vat", "VatPrice", "OnSalePrice", "WholeSalePricePerUnit", "VatPricePerUnit", "OnSalePricePerUnit", "QuantityPerUnit", "Unit", "Picture", "Available", "VisibleToStores", "VisibleToConsumers", "ProducerUid", "Weight" }.ToArray(), new List<object>() { 11, "1CD371A0-8C03-429A-810B-08D7A1B89D07", "2019-01-08 21:01:53", "2020-04-03 23:00:47", "20000142", 2, "Salade batavia", "Salade batavia à la pièce", "1.00", "0.05", "0.00", "1.00", "6.00", "1.30", "0.08", "1", "3", null, 1, 1, 1, 1, "0" }.ToArray(), "dbo");
+            migrationBuilder.InsertData("Products", new List<string>() { "Uid", "Id", "CreatedOn", "UpdatedOn", "Reference", "Conditioning", "Name", "Description", "WholeSalePrice", "Vat", "VatPrice", "OnSalePrice", "WholeSalePricePerUnit", "VatPricePerUnit", "OnSalePricePerUnit", "QuantityPerUnit", "Unit", "Picture", "Available", "VisibleToStores", "VisibleToConsumers", "ProducerUid", "Weight" }.ToArray(), new List<object>() { 12, "55E66328-5DAA-4A61-810C-08D7A1B89D07", "2019-01-28 21:01:53", "2020-04-03 23:00:47", "19036658", 2, "Yaourts brassés à la vanille", "Un pack de 4 yaourts brassés à la vanille", "1.65", "0.10", "0.00", "1.65", "6.00", "1.30", "0.08", "1", "3", null, 1, 1, 1, 1, "0" }.ToArray(), "dbo");
+            migrationBuilder.InsertData("Products", new List<string>() { "Uid", "Id", "CreatedOn", "UpdatedOn", "Reference", "Conditioning", "Name", "Description", "WholeSalePrice", "Vat", "VatPrice", "OnSalePrice", "WholeSalePricePerUnit", "VatPricePerUnit", "OnSalePricePerUnit", "QuantityPerUnit", "Unit", "Picture", "Available", "VisibleToStores", "VisibleToConsumers", "ProducerUid", "Weight" }.ToArray(), new List<object>() { 13, "6789434A-E8B6-444A-810D-08D7A1B89D07", "2018-09-22 21:01:53", "2020-04-03 23:00:47", "20111258", 2, "Jus de pomme", "Une bouteille de 75cl de jus de pomme", "1.30", "0.10", "0.00", "1.30", "6.00", "1.30", "0.08", "1", "1", null, 1, 1, 1, 1, "0" }.ToArray(), "dbo");
+            migrationBuilder.InsertData("Products", new List<string>() { "Uid", "Id", "CreatedOn", "UpdatedOn", "Reference", "Conditioning", "Name", "Description", "WholeSalePrice", "Vat", "VatPrice", "OnSalePrice", "WholeSalePricePerUnit", "VatPricePerUnit", "OnSalePricePerUnit", "QuantityPerUnit", "Unit", "Picture", "Available", "VisibleToStores", "VisibleToConsumers", "ProducerUid", "Weight" }.ToArray(), new List<object>() { 14, "F851420E-BA14-486A-810E-08D7A1B89D07", "2019-02-22 21:01:53", "2020-04-03 23:00:47", "19887742", 2, "Compote de bananes", "Un bocal de 650g de compote de bananes", "4.20", "0.10", "0.00", "4.20", "6.00", "1.30", "0.08", "1", "3", null, 1, 1, 1, 1, "0" }.ToArray(), "dbo");
+            migrationBuilder.InsertData("Products", new List<string>() { "Uid", "Id", "CreatedOn", "UpdatedOn", "Reference", "Conditioning", "Name", "Description", "WholeSalePrice", "Vat", "VatPrice", "OnSalePrice", "WholeSalePricePerUnit", "VatPricePerUnit", "OnSalePricePerUnit", "QuantityPerUnit", "Unit", "Picture", "Available", "VisibleToStores", "VisibleToConsumers", "ProducerUid", "Weight" }.ToArray(), new List<object>() { 15, "738727A2-ED2F-4FA6-810F-08D7A1B89D07", "2019-06-29 21:01:53", "2020-04-03 23:11:17", "20332501", 2, "Barres de céréales aux fruits secs", "Un paquet de 6 barres de céréales aux fruits secs", "2.50", "0.10", "0.00", "2.50", "6.00", "1.30", "0.08", "1", "3", null, 1, 1, 1, 1, "0" }.ToArray(), "dbo");
+            migrationBuilder.InsertData("Products", new List<string>() { "Uid", "Id", "CreatedOn", "UpdatedOn", "Reference", "Conditioning", "Name", "Description", "WholeSalePrice", "Vat", "VatPrice", "OnSalePrice", "WholeSalePricePerUnit", "VatPricePerUnit", "OnSalePricePerUnit", "QuantityPerUnit", "Unit", "Picture", "Available", "VisibleToStores", "VisibleToConsumers", "ProducerUid", "Weight" }.ToArray(), new List<object>() { 16, "c8c32a96-dffe-431d-92cd-bbb5e37063c1", "2019-06-29 21:01:53", "2020-04-03 23:11:17", "45332501", 2, "Steack haché 150gr", "Un steack haché pur boeuf", "2.50", "0.10", "0.00", "2.50", "6.00", "1.30", "0.08", "1", "3", null, 1, 1, 1, 4, "0" }.ToArray(), "dbo");
+            migrationBuilder.InsertData("Products", new List<string>() { "Uid", "Id", "CreatedOn", "UpdatedOn", "Reference", "Conditioning", "Name", "Description", "WholeSalePrice", "Vat", "VatPrice", "OnSalePrice", "WholeSalePricePerUnit", "VatPricePerUnit", "OnSalePricePerUnit", "QuantityPerUnit", "Unit", "Picture", "Available", "VisibleToStores", "VisibleToConsumers", "ProducerUid", "Weight" }.ToArray(), new List<object>() { 17, "a3970033-b5c7-4c01-8b43-e11ee1ebdc45", "2019-06-29 21:01:53", "2020-04-03 23:11:17", "24532501", 2, "Cuisse de poulet", "Une cuisse de poulet fermier", "3.40", "0.15", "0.00", "3.40", "6.00", "1.30", "0.08", "1", "3", null, 1, 1, 1, 4, "0" }.ToArray(), "dbo");
+            migrationBuilder.InsertData("Products", new List<string>() { "Uid", "Id", "CreatedOn", "UpdatedOn", "Reference", "Conditioning", "Name", "Description", "WholeSalePrice", "Vat", "VatPrice", "OnSalePrice", "WholeSalePricePerUnit", "VatPricePerUnit", "OnSalePricePerUnit", "QuantityPerUnit", "Unit", "Picture", "Available", "VisibleToStores", "VisibleToConsumers", "ProducerUid", "Weight" }.ToArray(), new List<object>() { 18, "218cb379-fb0e-4755-84ef-e2b6414f1cc3", "2019-06-29 21:01:53", "2020-04-03 23:11:17", "66782501", 2, "Perche", "Une perche du nil", "2.50", "0.10", "0.00", "2.50", "6.00", "1.30", "0.08", "1", "3", null, 1, 1, 1, 4, "0" }.ToArray(), "dbo");
+            migrationBuilder.InsertData("Products", new List<string>() { "Uid", "Id", "CreatedOn", "UpdatedOn", "Reference", "Conditioning", "Name", "Description", "WholeSalePrice", "Vat", "VatPrice", "OnSalePrice", "WholeSalePricePerUnit", "VatPricePerUnit", "OnSalePricePerUnit", "QuantityPerUnit", "Unit", "Picture", "Available", "VisibleToStores", "VisibleToConsumers", "ProducerUid", "Weight" }.ToArray(), new List<object>() { 19, "de7de3b5-5184-4150-9b10-a0ff11bcf5d7", "2019-06-29 21:01:53", "2020-04-03 23:11:17", "75412501", 2, "Pigeon bio", "Un super pigeon bio", "12.50", "2.10", "0.00", "12.50", "6.00", "1.30", "0.08", "1", "3", null, 1, 1, 1, 4, "0" }.ToArray(), "dbo");
 
             migrationBuilder.InsertData("QuickOrders", new List<string>() { "Uid", "Id", "Name", "IsDefault", "CreatedOn", "UserUid" }.ToArray(), new List<object>() { 1, "151653C4-1311-4F08-9222-256F35CA2A16", "Commande rapide", "1", "2020-04-04", 3 }.ToArray(), "dbo");
 
@@ -3051,10 +3007,6 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                 table: "Refunds");
 
             migrationBuilder.DropForeignKey(
-                name: "FK_Refunds_Wallets_CreditedWalletUid",
-                table: "Refunds");
-
-            migrationBuilder.DropForeignKey(
                 name: "FK_Transfers_Wallets_CreditedWalletUid",
                 table: "Transfers");
 
@@ -3081,14 +3033,6 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
             migrationBuilder.DropForeignKey(
                 name: "FK_Refunds_Payins_PayinUid",
                 table: "Refunds");
-
-            migrationBuilder.DropForeignKey(
-                name: "FK_Payouts_PaymentMethods_BankAccountUid",
-                table: "Payouts");
-
-            migrationBuilder.DropForeignKey(
-                name: "FK_Transfers_Refunds_RefundUid",
-                table: "Transfers");
 
             migrationBuilder.DropTable(
                 name: "AgreementSelectedHours");
@@ -3217,6 +3161,12 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                 name: "PurchaseOrderVendors");
 
             migrationBuilder.DropTable(
+                name: "Transfers");
+
+            migrationBuilder.DropTable(
+                name: "Payouts");
+
+            migrationBuilder.DropTable(
                 name: "Payins");
 
             migrationBuilder.DropTable(
@@ -3224,12 +3174,6 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
 
             migrationBuilder.DropTable(
                 name: "Refunds");
-
-            migrationBuilder.DropTable(
-                name: "Transfers");
-
-            migrationBuilder.DropTable(
-                name: "Payouts");
         }
     }
 }

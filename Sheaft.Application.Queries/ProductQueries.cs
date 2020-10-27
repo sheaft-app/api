@@ -136,7 +136,7 @@ namespace Sheaft.Application.Queries
                     .Select(a => a.Delivery.Producer.Id);
 
             return _context.Products
-                    .Get(p => producerIds.Contains(p.Producer.Id) && p.Searchable)
+                    .Get(p => producerIds.Contains(p.Producer.Id) && p.VisibleToStores)
                     .ProjectTo<ProductDto>(_configurationProvider);
         }
 

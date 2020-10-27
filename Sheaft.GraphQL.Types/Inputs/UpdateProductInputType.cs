@@ -7,7 +7,8 @@ namespace Sheaft.GraphQL.Types
     {
         protected override void Configure(IInputObjectTypeDescriptor<UpdateProductInput> descriptor)
         {
-            descriptor.Field(c => c.Searchable);
+            descriptor.Field(c => c.VisibleToConsumers);
+            descriptor.Field(c => c.VisibleToStores);
             descriptor.Field(c => c.Available);
             descriptor.Field(c => c.Description);
             descriptor.Field(c => c.ReturnableId).Type<IdType>();

@@ -17,7 +17,8 @@ namespace Sheaft.Application.Models
         public decimal? Weight { get; set; }
         public string Description { get; set; }
         public bool? Available { get; set; }
-        public bool? Searchable { get; set; }
+        public bool? VisibleToStores { get; set; }
+        public bool? VisibleToConsumers { get; set; }
         public Guid? ReturnableId { get; set; }
         public IEnumerable<Guid> Tags { get; set; }
     }

@@ -92,7 +92,7 @@ namespace Sheaft.Application.Handlers
                     if (products.Any(p => !p.Available))
                         return Failed<IEnumerable<Guid>>(new ValidationException());
 
-                    if (products.Any(p => !p.Searchable))
+                    if (products.Any(p => !p.VisibleToStores))
                         return Failed<IEnumerable<Guid>>(new ValidationException());
 
                     var cartProducts = new Dictionary<Product, int>();
@@ -172,7 +172,7 @@ namespace Sheaft.Application.Handlers
                 if (products.Any(p => !p.Available))
                     return Failed<bool>(new ValidationException());
 
-                if (products.Any(p => !p.Searchable))
+                if (products.Any(p => !p.VisibleToConsumers))
                     return Failed<bool>(new ValidationException());
 
                 var cartProducts = new Dictionary<Product, int>();
@@ -215,7 +215,7 @@ namespace Sheaft.Application.Handlers
                 if (products.Any(p => !p.Available))
                     return Failed<Guid>(new ValidationException());
 
-                if (products.Any(p => !p.Searchable))
+                if (products.Any(p => !p.VisibleToConsumers))
                     return Failed<Guid>(new ValidationException());
 
                 using (var transaction = await _context.BeginTransactionAsync(token))

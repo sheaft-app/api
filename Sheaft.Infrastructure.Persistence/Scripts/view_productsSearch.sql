@@ -32,7 +32,7 @@ as
      , ra.City as producer_city
 	 , p.Picture as product_image
      , p.Available as product_available
-     , p.Searchable as product_searchable
+     , p.VisibleToConsumers as product_searchable
      , case when p.Conditioning = 1 then 'BOX'
 			when p.Conditioning = 2 then 'BULK'
 			when p.Conditioning = 3 then 'BOUQUET'
@@ -77,7 +77,7 @@ as
 	r.Id,
     r.Phone,
     p.Available,
-    p.Searchable,
+    p.VisibleToConsumers,
     ra.Zipcode,
     ra.City,
     dbo.InlineMax(dbo.InlineMax(dbo.InlineMax(p.UpdatedOn, r.UpdatedOn), t.UpdatedOn), p.CreatedOn),

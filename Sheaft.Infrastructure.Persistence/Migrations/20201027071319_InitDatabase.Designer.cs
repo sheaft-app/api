@@ -11,8 +11,8 @@ using Sheaft.Infrastructure.Persistence;
 namespace Sheaft.Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20201026190619_AddRemoveRefunds")]
-    partial class AddRemoveRefunds
+    [Migration("20201027071319_InitDatabase")]
+    partial class InitDatabase
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -1052,9 +1052,6 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                     b.Property<long?>("ReturnableUid")
                         .HasColumnType("bigint");
 
-                    b.Property<bool>("Searchable")
-                        .HasColumnType("bit");
-
                     b.Property<int>("Unit")
                         .HasColumnType("int");
 
@@ -1070,6 +1067,12 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
 
                     b.Property<decimal>("VatPricePerUnit")
                         .HasColumnType("decimal(10,2)");
+
+                    b.Property<bool>("VisibleToConsumers")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("VisibleToStores")
+                        .HasColumnType("bit");
 
                     b.Property<decimal?>("Weight")
                         .HasColumnType("decimal(10,2)");

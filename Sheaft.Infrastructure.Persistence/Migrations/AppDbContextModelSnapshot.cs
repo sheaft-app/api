@@ -1050,9 +1050,6 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                     b.Property<long?>("ReturnableUid")
                         .HasColumnType("bigint");
 
-                    b.Property<bool>("Searchable")
-                        .HasColumnType("bit");
-
                     b.Property<int>("Unit")
                         .HasColumnType("int");
 
@@ -1068,6 +1065,12 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
 
                     b.Property<decimal>("VatPricePerUnit")
                         .HasColumnType("decimal(10,2)");
+
+                    b.Property<bool>("VisibleToConsumers")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("VisibleToStores")
+                        .HasColumnType("bit");
 
                     b.Property<decimal?>("Weight")
                         .HasColumnType("decimal(10,2)");

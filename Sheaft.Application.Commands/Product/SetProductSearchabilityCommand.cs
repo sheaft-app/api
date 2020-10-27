@@ -12,6 +12,7 @@ namespace Sheaft.Application.Commands
         }
 
         public Guid Id { get; set; }
-        public bool Searchable { get; set; }
+        public bool VisibleToStores { get; set; }
+        public bool VisibleToConsumers { get; set; }
     }
 }
