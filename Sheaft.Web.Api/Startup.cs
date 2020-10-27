@@ -354,48 +354,48 @@ namespace Sheaft.Web.Api
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
-
-                using (var serviceScope = app.ApplicationServices.GetRequiredService<IServiceScopeFactory>().CreateScope())
-                {
-                    var context = serviceScope.ServiceProvider.GetService<IAppDbContext>();
-                    if (!context.AllMigrationsApplied())
-                    {
-                        context.Migrate();
-                    }
-
-                    var adminId = configuration.GetValue<Guid>("Users:admin:id");
-                    if (context.Users.FirstOrDefault(u => u.Id == adminId) == null)
-                    {
-                        var firstname = configuration.GetValue<string>("Users:admin:firstname");
-                        var lastname = configuration.GetValue<string>("Users:admin:lastname");
-                        var email = configuration.GetValue<string>("Users:admin:email");
-
-                        var admin = new Admin(adminId, $"{firstname} {lastname}", firstname, lastname, email);
-                        admin.SetIdentifier(configuration.GetValue<string>("Psp:UserId"));
-                        context.Add(admin);
-
-                        var wallet = new Wallet(Guid.NewGuid(), "Donation", WalletKind.Donations, admin);
-                        wallet.SetIdentifier(configuration.GetValue<string>("Psp:WalletId"));
-                        context.Add(wallet);
-
-                        context.SaveChanges();
-                    }
-
-                    var supportId = configuration.GetValue<Guid>("Users:support:id");
-                    if (context.Users.FirstOrDefault(u => u.Id == supportId) == null)
-                    {
-                        var firstname = configuration.GetValue<string>("Users:support:firstname");
-                        var lastname = configuration.GetValue<string>("Users:support:lastname");
-                        var email = configuration.GetValue<string>("Users:support:email");
-
-                        context.Add(new Support(supportId, $"{firstname} {lastname}", firstname, lastname, email));
-                        context.SaveChanges();
-                    }
-                }
             }
             else
             {
                 app.UseHsts();
+            }
+
+            using (var serviceScope = app.ApplicationServices.GetRequiredService<IServiceScopeFactory>().CreateScope())
+            {
+                var context = serviceScope.ServiceProvider.GetService<IAppDbContext>();
+                if (!context.AllMigrationsApplied())
+                {
+                    context.Migrate();
+                }
+
+                var adminId = configuration.GetValue<Guid>("Users:admin:id");
+                if (context.Users.FirstOrDefault(u => u.Id == adminId) == null)
+                {
+                    var firstname = configuration.GetValue<string>("Users:admin:firstname");
+                    var lastname = configuration.GetValue<string>("Users:admin:lastname");
+                    var email = configuration.GetValue<string>("Users:admin:email");
+
+                    var admin = new Admin(adminId, $"{firstname} {lastname}", firstname, lastname, email);
+                    admin.SetIdentifier(configuration.GetValue<string>("Psp:UserId"));
+                    context.Add(admin);
+
+                    var wallet = new Wallet(Guid.NewGuid(), "Donation", WalletKind.Donations, admin);
+                    wallet.SetIdentifier(configuration.GetValue<string>("Psp:WalletId"));
+                    context.Add(wallet);
+
+                    context.SaveChanges();
+                }
+
+                var supportId = configuration.GetValue<Guid>("Users:support:id");
+                if (context.Users.FirstOrDefault(u => u.Id == supportId) == null)
+                {
+                    var firstname = configuration.GetValue<string>("Users:support:firstname");
+                    var lastname = configuration.GetValue<string>("Users:support:lastname");
+                    var email = configuration.GetValue<string>("Users:support:email");
+
+                    context.Add(new Support(supportId, $"{firstname} {lastname}", firstname, lastname, email));
+                    context.SaveChanges();
+                }
             }
 
             app.UseRobotsTxt();
