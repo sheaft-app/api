@@ -6,7 +6,7 @@
         public int CheckOrderExpiredFromMinutes { get; set; } = 1440;
         public int CheckNewPayinRefundsFromMinutes { get; set; } = 10080;
 
-        public string CheckPayinsCron { get; set; } = "* */1 * * *";
+        public string CheckPayinsCron { get; set; } = "*/30 * * * *";
         public string CheckZonesProgressCron { get; set; } = "0 0 * * *";
         public string CheckZonesFileCron { get; set; } = "30 0 * * *";
         public string CheckOrdersCron { get; set; } = "0 1 * * *";
