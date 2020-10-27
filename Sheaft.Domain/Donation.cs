@@ -11,7 +11,7 @@ namespace Sheaft.Domain.Models
         }
 
         public Donation(Guid id, Wallet debitedWallet, Wallet creditedWallet, Order order)
-            : base(id, TransactionKind.Transfer, creditedWallet.User)
+            : base(id, TransactionKind.Transfer, debitedWallet.User)
         {
             Order = order;
             Fees = 0;

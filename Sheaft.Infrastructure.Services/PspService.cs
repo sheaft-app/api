@@ -491,7 +491,7 @@ namespace Sheaft.Infrastructure.Services
                 transaction.Debited, 
                 transaction.Fees, 
                 transaction.Author.Identifier, 
-                transaction.CreditedWallet.Identifier, 
+                transaction.CreditedWallet.Identifier,
                 transaction.CreditedWallet.User.Identifier, 
                 transaction.DebitedWallet.Identifier, 
                 token);

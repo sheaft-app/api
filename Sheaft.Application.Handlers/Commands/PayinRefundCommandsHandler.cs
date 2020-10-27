@@ -47,19 +47,19 @@ namespace Sheaft.Application.Handlers
                 const int take = 100;
 
                 var expiredDate = DateTimeOffset.UtcNow.AddMinutes(-_routineOptions.CheckNewPayinRefundsFromMinutes);
-                var payinRefundIds = await GetNextNewPayinRefundIdsAsync(expiredDate, skip, take, token);
-                while (payinRefundIds.Any())
+                var payinToRefundIds = await GetNextNewPayinRefundIdsAsync(expiredDate, skip, take, token);
+                while (payinToRefundIds.Any())
                 {
-                    foreach (var payinRefundId in payinRefundIds)
+                    foreach (var payinToRefundId in payinToRefundIds)
                     {
-                        _mediatr.Post(new CheckPayinRefundCommand(request.RequestUser)
+                        _mediatr.Post(new CreatePayinRefundCommand(request.RequestUser)
                         {
-                            PayinRefundId = payinRefundId
+                            PayinId = payinToRefundId
                         });
                     }
 
                     skip += take;
-                    payinRefundIds = await GetNextNewPayinRefundIdsAsync(expiredDate, skip, take, token);
+                    payinToRefundIds = await GetNextNewPayinRefundIdsAsync(expiredDate, skip, take, token);
                 }
 
                 return Ok(true);
@@ -141,25 +141,27 @@ namespace Sheaft.Application.Handlers
         {
             return await ExecuteAsync(request, async () =>
             {
-                var order = await _context.GetByIdAsync<Order>(request.OrderId, token);
-                if (order.Payin == null
-                    || order.Payin.Status != TransactionStatus.Succeeded
-                    || (order.Payin.Refund != null && order.Payin.Refund.Status != TransactionStatus.Failed))
+                var payin = await _context.GetByIdAsync<Payin>(request.PayinId, token);
+                if (payin.Id != payin.Order.Payin.Id)
                     return Failed<Guid>(new InvalidOperationException());
 
-                var orderPayinRefunds = await _context.FindAsync<PayinRefund>(c => c.Payin.Id == order.Payin.Id, token);
+                if (payin.Status != TransactionStatus.Succeeded
+                    || (payin.Refund != null && payin.Refund.Status != TransactionStatus.Failed))
+                    return Failed<Guid>(new InvalidOperationException());
+
+                var orderPayinRefunds = await _context.FindAsync<PayinRefund>(c => c.Payin.Id == payin.Id, token);
                 if (orderPayinRefunds.Any(c => c.Status != TransactionStatus.Failed))
                     return Failed<Guid>(new InvalidOperationException());
 
-                var purchaseOrdersToRefund = order.PurchaseOrders.Where(po => po.Status > PurchaseOrderStatus.Delivered);
+                var purchaseOrdersToRefund = payin.Order.PurchaseOrders.Where(po => po.Status > PurchaseOrderStatus.Delivered);
                 using (var transaction = await _context.BeginTransactionAsync(token))
                 {
-                    var payinRefund = new PayinRefund(Guid.NewGuid(), order.Payin, purchaseOrdersToRefund.Sum(po => po.TotalOnSalePrice));
+                    var payinRefund = new PayinRefund(Guid.NewGuid(), payin, purchaseOrdersToRefund.Sum(po => po.TotalOnSalePrice));
 
                     await _context.AddAsync(payinRefund, token);
                     await _context.SaveChangesAsync(token);
 
-                    order.Payin.SetRefund(payinRefund);
+                    payin.SetRefund(payinRefund);
 
                     var result = await _pspService.RefundPayinAsync(payinRefund, token);
                     if (!result.Success)
@@ -200,7 +202,7 @@ namespace Sheaft.Application.Handlers
                         && c.PurchaseOrders.Any(po => po.WithdrawnOn.HasValue)
                         && c.PurchaseOrders.Max(po => po.WithdrawnOn) < expiredDate, true)
                 .OrderBy(c => c.CreatedOn)
-                .Select(c => c.Id)
+                .Select(c => c.Payin.Id)
                 .Skip(skip)
                 .Take(take)
                 .ToListAsync(token);

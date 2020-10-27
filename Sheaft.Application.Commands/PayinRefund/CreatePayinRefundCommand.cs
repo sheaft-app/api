@@ -12,6 +12,6 @@ namespace Sheaft.Application.Commands
         {
         }
 
-        public Guid OrderId { get; set; }
+        public Guid PayinId { get; set; }
     }
 }
