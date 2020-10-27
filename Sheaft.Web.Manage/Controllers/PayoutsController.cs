@@ -121,7 +121,7 @@ namespace Sheaft.Web.Manage.Controllers
         public async Task<IActionResult> CreatePayout(ProducerPayoutsViewModel model, CancellationToken token)
         {
             if (!model.Transfers.Any())
-                throw new InvalidOperationException();
+                return BadRequest();
 
             var requestUser = await GetRequestUser(token);
             _mediatr.Post(new CreatePayoutCommand(requestUser) { ProducerId = model.Id, TransferIds = model.Transfers.Select(t => t.Id) });

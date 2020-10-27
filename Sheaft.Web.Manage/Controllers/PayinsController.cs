@@ -116,7 +116,7 @@ namespace Sheaft.Web.Manage.Controllers
         public async Task<IActionResult> CreatePayinRefund(Guid id, CancellationToken token)
         {
             var requestUser = await GetRequestUser(token);
-            _mediatr.Post(new CreatePayinRefundCommand(requestUser) { OrderId = id });
+            _mediatr.Post(new CreatePayinRefundCommand(requestUser) { PayinId = id });
 
             TempData["Submitted"] = JsonConvert.SerializeObject(new EntityViewModel { Id = id, Name = id.ToString("N") });
             return RedirectToAction("Todo");
