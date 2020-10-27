@@ -140,10 +140,10 @@ namespace Sheaft.Application.Queries
                     .ProjectTo<ProductDto>(_configurationProvider);
         }
 
-        public IQueryable<ProductDto> GetProducerProducts(Guid producerId, RequestUser currentUser)
+        public IQueryable<ProductDto> GetProducerProductsForStores(Guid producerId, RequestUser currentUser)
         {
             return _context.Products
-                    .Get(p => p.Producer.Id == producerId)
+                    .Get(p => p.Producer.Id == producerId && p.VisibleToStores)
                     .ProjectTo<ProductDto>(_configurationProvider);
         }
 

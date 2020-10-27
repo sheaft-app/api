@@ -316,7 +316,7 @@ namespace Sheaft.GraphQL.Services
         public IQueryable<ProductDto> GetProducerProducts(Guid input, [Service] IProductQueries productQueries)
         {
             SetLogTransaction("GraphQL", nameof(GetProducerProducts), input);
-            return productQueries.GetProducerProducts(input, CurrentUser);
+            return productQueries.GetProducerProductsForStores(input, CurrentUser);
         }
 
         public IQueryable<ProductDto> GetProducts([Service] IProductQueries productQueries)
