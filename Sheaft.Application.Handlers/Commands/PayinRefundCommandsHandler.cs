@@ -14,6 +14,7 @@ using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using Sheaft.Options;
 using Microsoft.Extensions.Options;
+using Sheaft.Exceptions;
 
 namespace Sheaft.Application.Handlers
 {
@@ -143,15 +144,13 @@ namespace Sheaft.Application.Handlers
             {
                 var payin = await _context.GetByIdAsync<Payin>(request.PayinId, token);
                 if (payin.Id != payin.Order.Payin.Id)
-                    return Failed<Guid>(new InvalidOperationException());
+                    return BadRequest<Guid>(MessageKind.PayinRefund_CannotCreate_Order_Payin_HasChanged);
 
-                if (payin.Status != TransactionStatus.Succeeded
-                    || (payin.Refund != null && payin.Refund.Status != TransactionStatus.Failed))
-                    return Failed<Guid>(new InvalidOperationException());
+                if (payin.Status != TransactionStatus.Succeeded)
+                    return BadRequest<Guid>(MessageKind.PayinRefund_CannotCreate_Payin_Invalid_Status);
 
-                var orderPayinRefunds = await _context.FindAsync<PayinRefund>(c => c.Payin.Id == payin.Id, token);
-                if (orderPayinRefunds.Any(c => c.Status != TransactionStatus.Failed))
-                    return Failed<Guid>(new InvalidOperationException());
+                if(payin.Refund != null && payin.Refund.Status != TransactionStatus.Failed)
+                    return BadRequest<Guid>(MessageKind.PayinRefund_CannotCreate_Pending_PayinRefund);
 
                 var purchaseOrdersToRefund = payin.Order.PurchaseOrders.Where(po => po.Status > PurchaseOrderStatus.Delivered);
                 using (var transaction = await _context.BeginTransactionAsync(token))

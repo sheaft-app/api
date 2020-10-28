@@ -46,11 +46,11 @@ namespace Sheaft.Domain.Models
         public void DeleteDocument(Guid id)
         {
             if (Documents == null)
-                throw new NotFoundException();
+                throw new NotFoundException(id);
 
             var document = _documents.FirstOrDefault(d => d.Id == id);
             if (document == null)
-                throw new NotFoundException();
+                throw new NotFoundException(id);
 
             _documents.Remove(document);
         }

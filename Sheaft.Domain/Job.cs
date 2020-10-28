@@ -46,8 +46,11 @@ namespace Sheaft.Domain.Models
 
         public void StartJob()
         {
-            if (StartedOn.HasValue || Status != ProcessStatus.Waiting)
-                throw new ValidationException();
+            if(StartedOn.HasValue)
+                throw new ValidationException(MessageKind.Job_CannotStart_Has_StartedOnDate);
+
+            if (Status != ProcessStatus.Waiting)
+                throw new ValidationException(MessageKind.Job_CannotStart_NotIn_WaitingStatus);
 
             StartedOn = DateTimeOffset.UtcNow;
             Status = ProcessStatus.Processing;

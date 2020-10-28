@@ -6,10 +6,10 @@ namespace Sheaft.Exceptions
     public class UnexpectedException : SheaftException
 #pragma warning restore RCS1194 // Implement exception constructors.
     {
-        public UnexpectedException(Exception exception, MessageKind? error = null, params object[] args) : base(ExceptionKind.Unexpected, exception, error, args)
+        public UnexpectedException(Exception exception, MessageKind? message = null, params object[] args) : base(ExceptionKind.Unexpected, exception, message, args)
         {
         }
-        public UnexpectedException(MessageKind? error = null, params object[] args) : this(null, error, args)
+        public UnexpectedException(MessageKind? message = null, params object[] args) : this(null, message, args)
         {
         }
     }

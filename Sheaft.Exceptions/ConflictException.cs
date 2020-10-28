@@ -6,10 +6,10 @@ namespace Sheaft.Exceptions
     public class ConflictException : SheaftException
 #pragma warning restore RCS1194 // Implement exception constructors.
     {
-        public ConflictException(Exception exception, MessageKind? error = null, params object[] args) : base(ExceptionKind.Conflict, exception, error, args)
+        public ConflictException(Exception exception, params object[] args) : base(ExceptionKind.Conflict, exception, null, args)
         {
         }
-        public ConflictException(MessageKind? error = null, params object[] args) : this(null, error, args)
+        public ConflictException(params object[] args) : this(null, args)
         {
         }
     }

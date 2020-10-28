@@ -2,7 +2,6 @@
 using Sheaft.Domains.Extensions;
 using Sheaft.Exceptions;
 using System;
-using System.Collections.Generic;
 
 namespace Sheaft.Domain.Models
 {
@@ -38,7 +37,7 @@ namespace Sheaft.Domain.Models
         public void SetSiret(string siret)
         {
             if (siret.IsNotNullAndIsEmptyOrWhiteSpace())
-                throw new ValidationException(MessageKind.Business_Siret_Required);
+                throw new ValidationException(MessageKind.Legal_Siret_Required);
 
             Siret = siret;
         }
@@ -46,7 +45,7 @@ namespace Sheaft.Domain.Models
         public void SetVatIdentifier(string vatNumber)
         {
             if (vatNumber.IsNotNullAndIsEmptyOrWhiteSpace())
-                throw new ValidationException(MessageKind.Business_Vat_Required);
+                throw new ValidationException(MessageKind.Legal_Vat_Required);
 
             VatIdentifier = vatNumber;
         }
@@ -54,7 +53,7 @@ namespace Sheaft.Domain.Models
         public void SetKind(LegalKind kind)
         {
             if (kind == LegalKind.Natural)
-                throw new ValidationException();
+                throw new ValidationException(MessageKind.Legal_Kind_Cannot_Be_Natural);
 
             Kind = kind;
         }
@@ -67,7 +66,7 @@ namespace Sheaft.Domain.Models
         public void SetEmail(string email)
         {
             if (string.IsNullOrWhiteSpace(email))
-                throw new ValidationException();
+                throw new ValidationException(MessageKind.Legal_Email_Required);
 
             Email = email;
         }

@@ -9,6 +9,7 @@ using System.Threading;
 using Sheaft.Domain.Models;
 using Sheaft.Domain.Enums;
 using Sheaft.Application.Events;
+using Sheaft.Exceptions;
 
 namespace Sheaft.Application.Handlers
 {
@@ -61,7 +62,7 @@ namespace Sheaft.Application.Handlers
             {
                 var legal = await _context.GetSingleAsync<BusinessLegal>(r => r.Declaration.Id == request.DeclarationId, token);
                 if (legal.Declaration.Status != DeclarationStatus.Locked)
-                    return Failed<bool>(new InvalidOperationException());
+                    return BadRequest<bool>(MessageKind.Declaration_CannotSubmit_NotLocked);
 
                 var result = await _pspService.SubmitUboDeclarationAsync(legal.Declaration, legal.User, token);
                 if (!result.Success)
@@ -71,7 +72,6 @@ namespace Sheaft.Application.Handlers
                 legal.Declaration.SetResult(result.Data.ResultCode, result.Data.ResultMessage);
 
                 await _context.SaveChangesAsync(token);
-
                 return Ok(true);
             });
         }
@@ -84,7 +84,6 @@ namespace Sheaft.Application.Handlers
                 legal.Declaration.SetStatus(DeclarationStatus.Locked);
 
                 await _context.SaveChangesAsync(token);
-
                 return Ok(true);
             });
         }
@@ -97,7 +96,6 @@ namespace Sheaft.Application.Handlers
                 legal.Declaration.SetStatus(DeclarationStatus.UnLocked);
 
                 await _context.SaveChangesAsync(token);
-
                 return Ok(true);
             });
         }
@@ -163,7 +161,7 @@ namespace Sheaft.Application.Handlers
                 }
 
                 if (legal.Declaration.Status != DeclarationStatus.Validated)
-                    return Failed<bool>(new InvalidOperationException());
+                    return BadRequest<bool>(MessageKind.Declaration_NotValidated);
 
                 return Ok(true);
             });

@@ -48,7 +48,7 @@ namespace Sheaft.Application.Handlers
                 {
                     var legal = await _context.GetSingleAsync<Legal>(r => r.Id == request.LegalId, token);
                     if (legal.Documents.Any(d => d.Kind == request.Kind))
-                        throw new ValidationException();
+                        return BadRequest<Guid>(MessageKind.Document_CannotCreate_Type_Already_Present);
 
                     var document = legal.AddDocument(request.Kind, request.Name);
                     await _context.SaveChangesAsync(token);
@@ -78,7 +78,7 @@ namespace Sheaft.Application.Handlers
                 var legal = await _context.GetSingleAsync<Legal>(r => r.Documents.Any(d => d.Id == request.Id), token);
                 var document = legal.Documents.FirstOrDefault(c => c.Id == request.Id);
                 if (document.Kind != request.Kind && legal.Documents.Any(d => d.Kind == request.Kind))
-                    throw new ValidationException();
+                    return BadRequest<bool>(MessageKind.Document_CannotUpdate_Another_Document_With_Type_Exists);
 
                 document.SetKind(request.Kind);
                 document.SetName(request.Name);
@@ -125,12 +125,9 @@ namespace Sheaft.Application.Handlers
             {
                 var legal = await _context.GetSingleAsync<Legal>(r => r.Documents.Any(d => d.Id == request.DocumentId), token);
                 var document = legal.Documents.FirstOrDefault(c => c.Id == request.DocumentId);
-                if (document.Status != DocumentStatus.Created && document.Status != DocumentStatus.UnLocked)
-                    return Failed<bool>(new InvalidOperationException());
-
                 document.SetStatus(DocumentStatus.Locked);
-                await _context.SaveChangesAsync(token);
 
+                await _context.SaveChangesAsync(token);
                 return Ok(true);
             });
         }
@@ -176,7 +173,7 @@ namespace Sheaft.Application.Handlers
                 var legal = await _context.GetSingleAsync<Legal>(r => r.Documents.Any(d => d.Id == request.DocumentId), token);
                 var document = legal.Documents.FirstOrDefault(c => c.Id == request.DocumentId);
                 if (document.Status != DocumentStatus.Locked)
-                    return Failed<bool>(new InvalidOperationException());
+                    return BadRequest<bool>(MessageKind.Document_CannotSubmit_NotLocked);
 
                 var results = new List<Result<bool>>();
                 foreach (var page in document.Pages.Where(p => !p.UploadedOn.HasValue))
@@ -189,7 +186,7 @@ namespace Sheaft.Application.Handlers
                 }
 
                 if (results.Any(r => !r.Success))
-                    return Failed<bool>(new InvalidOperationException());
+                    return BadRequest<bool>(MessageKind.Document_Errors_On_Submit);
 
                 var result = await _pspService.SubmitDocumentAsync(document, legal.User.Identifier, token);
                 if (!result.Success)

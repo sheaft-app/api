@@ -51,7 +51,7 @@ namespace Sheaft.Domain.Models
         public void SetFirstname(string firstname)
         {
             if (string.IsNullOrWhiteSpace(firstname))
-                throw new ValidationException(MessageKind.Consumer_Firstname_Required);
+                throw new ValidationException(MessageKind.User_Firstname_Required);
 
             FirstName = firstname;
 
@@ -62,7 +62,7 @@ namespace Sheaft.Domain.Models
         public void SetLastname(string lastname)
         {
             if (string.IsNullOrWhiteSpace(lastname))
-                throw new ValidationException(MessageKind.Consumer_Lastname_Required);
+                throw new ValidationException(MessageKind.User_Lastname_Required);
 
             LastName = lastname;
 
@@ -88,7 +88,7 @@ namespace Sheaft.Domain.Models
         protected void SetUserName(string name)
         {
             if (name.IsNotNullAndIsEmptyOrWhiteSpace())
-                throw new ValidationException(MessageKind.Business_Name_Required);
+                throw new ValidationException(MessageKind.User_Name_Required);
 
             Name = name;
         }
@@ -104,7 +104,7 @@ namespace Sheaft.Domain.Models
         public void SetEmail(string email)
         {
             if (email.IsNotNullAndIsEmptyOrWhiteSpace())
-                throw new ValidationException(MessageKind.Business_Email_Required);
+                throw new ValidationException(MessageKind.User_Email_Required);
 
             Email = email;
         }

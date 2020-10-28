@@ -14,6 +14,7 @@ using Sheaft.Domain.Models;
 using Microsoft.Extensions.Options;
 using Sheaft.Options;
 using Sheaft.Application.Events;
+using Sheaft.Exceptions;
 
 namespace Sheaft.Application.Handlers
 {
@@ -49,11 +50,11 @@ namespace Sheaft.Application.Handlers
                 if (order.Payin == null 
                     || order.Payin.Status != TransactionStatus.Succeeded 
                     || (order.Donation != null && order.Donation.Status != TransactionStatus.Failed))
-                    return Failed<Guid>(new InvalidOperationException());
+                    return BadRequest<Guid>(MessageKind.Donation_CannotCreate_AlreadySucceeded);
 
                 var orderDonations = await _context.FindAsync<Donation>(c => c.Order.Id == order.Id, token);
                 if (orderDonations.Any(c => c.Status != TransactionStatus.Failed))
-                    return Failed<Guid>(new InvalidOperationException());
+                    return BadRequest<Guid>(MessageKind.Donation_CannotCreate_PendingDonation);
 
                 var creditedWallet = await _context.GetSingleAsync<Wallet>(c => c.Identifier == _pspOptions.WalletId, token);
                 using (var transaction = await _context.BeginTransactionAsync(token))

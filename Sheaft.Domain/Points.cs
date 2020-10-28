@@ -13,7 +13,7 @@ namespace Sheaft.Domain.Models
         public Points(Guid id, PointKind kind, int quantity, DateTimeOffset createdOn)
         {
             if (quantity < 0)
-                throw new ValidationException(MessageKind.UserPoints_Quantity_CannotBe_LowerThan, 0);
+                throw new ValidationException(MessageKind.Points_Quantity_CannotBe_LowerThan, 0);
 
             Id = id;
             Kind = kind;

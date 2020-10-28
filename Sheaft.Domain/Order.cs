@@ -81,7 +81,7 @@ namespace Sheaft.Domain.Models
         public void SetPayin(Payin payin)
         {
             if(Payin != null && Payin.Status == TransactionStatus.Succeeded)
-                throw new ValidationException();
+                throw new ValidationException(MessageKind.Payin_CannotSet_Already_Succeeded);
 
             Payin = payin;
         }
@@ -89,7 +89,7 @@ namespace Sheaft.Domain.Models
         public void SetDonation(Donation donation)
         {
             if (Donation != null && Donation.Status == TransactionStatus.Succeeded)
-                throw new ValidationException();
+                throw new ValidationException(MessageKind.Donation_CannotSet_Already_Succeeded);
 
             Donation = donation;
         }

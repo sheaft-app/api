@@ -80,14 +80,14 @@ namespace Sheaft.Application.Interop
             return new FailedResult<T>(new TooManyRetriesException(message, objs));
         }
 
-        protected Result<T> InternalError<T>(MessageKind? message = null, params object[] objs)
+        protected Result<T> InternalError<T>()
         {
-            return new FailedResult<T>(new UnexpectedException(message, objs));
+            return new FailedResult<T>(new UnexpectedException());
         }
 
-        protected Result<T> InternalError<T>(Exception exception, MessageKind? message = null, params object[] objs)
+        protected Result<T> InternalError<T>(Exception exception)
         {
-            return new FailedResult<T>(new UnexpectedException(exception, message, objs));
+            return new FailedResult<T>(new UnexpectedException(exception));
         }
 
         protected Result<T> Failed<T>(Exception exception, MessageKind? message = null, params object[] objs)

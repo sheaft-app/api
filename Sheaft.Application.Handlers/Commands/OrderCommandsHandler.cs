@@ -52,7 +52,7 @@ namespace Sheaft.Application.Handlers
                 var productIds = request.Products.Select(p => p.Id);
                 var products = await _context.GetByIdsAsync<Product>(productIds, token);
                 if (products.Any(p => !p.Available))
-                    return Failed<Guid>(new ValidationException());
+                    return BadRequest<Guid>(MessageKind.Order_CannotCreate_Some_Products_NotAvailable);
 
                 var cartProducts = new Dictionary<Product, int>();
                 foreach (var product in products)
@@ -90,10 +90,10 @@ namespace Sheaft.Application.Handlers
                     var productIds = request.Products.Select(p => p.Id);
                     var products = await _context.GetByIdsAsync<Product>(productIds, token);
                     if (products.Any(p => !p.Available))
-                        return Failed<IEnumerable<Guid>>(new ValidationException());
+                        return BadRequest<IEnumerable<Guid>>(MessageKind.Order_CannotCreate_Some_Products_NotAvailable);
 
                     if (products.Any(p => !p.VisibleToStores))
-                        return Failed<IEnumerable<Guid>>(new ValidationException());
+                        return BadRequest<IEnumerable<Guid>>(MessageKind.Order_CannotCreate_Some_Products_NotVisible);
 
                     var cartProducts = new Dictionary<Product, int>();
                     foreach (var product in products)
@@ -114,7 +114,7 @@ namespace Sheaft.Application.Handlers
                     }
 
                     if(!cartDeliveries.Any())
-                        return Failed<IEnumerable<Guid>>(new ValidationException());
+                        return BadRequest<IEnumerable<Guid>>(MessageKind.Order_CannotCreate_Deliveries_Required);
 
                     order.SetDeliveries(cartDeliveries);
                     order.SetStatus(OrderStatus.Validated);
@@ -170,10 +170,10 @@ namespace Sheaft.Application.Handlers
                 var productIds = request.Products.Select(p => p.Id);
                 var products = await _context.GetByIdsAsync<Product>(productIds, token);
                 if (products.Any(p => !p.Available))
-                    return Failed<bool>(new ValidationException());
+                    return BadRequest<bool>(MessageKind.Order_CannotCreate_Some_Products_NotAvailable);
 
                 if (products.Any(p => !p.VisibleToConsumers))
-                    return Failed<bool>(new ValidationException());
+                    return BadRequest<bool>(MessageKind.Order_CannotCreate_Some_Products_NotVisible);
 
                 var cartProducts = new Dictionary<Product, int>();
                 foreach (var product in products)
@@ -209,14 +209,14 @@ namespace Sheaft.Application.Handlers
 
                 var order = await _context.GetByIdAsync<Order>(request.OrderId, token);
                 if (!order.Deliveries.Any())
-                    return Failed<Guid>(new ValidationException());
+                    return BadRequest<Guid>(MessageKind.Order_CannotPay_Deliveries_Required);
 
                 var products = await _context.GetByIdsAsync<Product>(order.Products.Select(p => p.Id), token);
                 if (products.Any(p => !p.Available))
-                    return Failed<Guid>(new ValidationException());
+                    return BadRequest<Guid>(MessageKind.Order_CannotPay_Some_Products_NotAvailable);
 
                 if (products.Any(p => !p.VisibleToConsumers))
-                    return Failed<Guid>(new ValidationException());
+                    return BadRequest<Guid>(MessageKind.Order_CannotPay_Some_Products_NotVisible);
 
                 using (var transaction = await _context.BeginTransactionAsync(token))
                 {
@@ -247,7 +247,7 @@ namespace Sheaft.Application.Handlers
             {
                 var order = await _context.GetByIdAsync<Order>(request.OrderId, token);
                 if (order.Status != OrderStatus.Refused)
-                    return Failed<Guid>(new InvalidOperationException());
+                    return BadRequest<Guid>(MessageKind.Order_CannotRetry_NotIn_Refused_Status);
 
                 var checkResult = await _mediatr.Process(new CheckConsumerConfigurationCommand(request.RequestUser) { Id = request.RequestUser.Id }, token);
                 if (!checkResult.Success)

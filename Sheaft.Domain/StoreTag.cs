@@ -12,7 +12,7 @@ namespace Sheaft.Domain.Models
         public StoreTag(Tag tag)
         {
             if (tag == null)
-                throw new ValidationException(MessageKind.Business_TagNotFound);
+                throw new ValidationException(MessageKind.User_TagNotFound);
 
             Tag = tag;
         }

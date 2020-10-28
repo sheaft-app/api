@@ -27,7 +27,7 @@ namespace Sheaft.Domain.Models
         public void SetRefund(PayinRefund refund)
         {
             if (Refund != null && Refund.Status == TransactionStatus.Succeeded)
-                throw new ValidationException();
+                throw new ValidationException(MessageKind.Payin_CannotSet_Refund_AlreadySucceeded);
 
             Refund = null;
             Refund = refund;

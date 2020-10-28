@@ -90,7 +90,7 @@ namespace Sheaft.Domain.Models
         public void SetTransfer(Transfer transfer)
         {
             if (Transfer != null && Transfer.Status == TransactionStatus.Succeeded)
-                throw new ValidationException();
+                throw new ValidationException(MessageKind.PurchaseOrder_CannotSet_Transfer_AlreadySucceeded);
 
             Transfer = transfer;
         }

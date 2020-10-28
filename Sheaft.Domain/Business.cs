@@ -15,7 +15,7 @@ namespace Sheaft.Domain.Models
             : base(id, kind, name, firstname, lastname, email, phone)
         {
             if (address == null)
-                throw new ValidationException(MessageKind.Business_Address_Required);
+                throw new ValidationException(MessageKind.User_Address_Required);
 
             SetOpenForNewBusiness(openForBusiness);
             SetDescription(description);

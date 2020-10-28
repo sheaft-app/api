@@ -45,12 +45,12 @@ namespace Sheaft.Application.Handlers
             {
                 var order = await _context.GetByIdAsync<Order>(request.OrderId, token);
                 if(order.Status == OrderStatus.Validated)
-                    return Failed<Guid>(new ValidationException());
+                    return BadRequest<Guid>(MessageKind.Payin_CannotCreate_Order_Already_Validated);
 
                 var wallet = await _context.GetSingleAsync<Wallet>(c => c.User.Id == request.RequestUser.Id, token);
 
                 if (order.TotalOnSalePrice < 1)
-                    return Failed<Guid>(new ValidationException(MessageKind.Order_Total_CannotBe_LowerThan, 1));
+                    return BadRequest<Guid>(MessageKind.Order_Total_CannotBe_LowerThan, 1);
 
                 var webPayin = new WebPayin(Guid.NewGuid(), wallet, order);
 

@@ -199,7 +199,7 @@ namespace Sheaft.Application.Handlers
             {
                 var producerLegal = await _context.GetSingleAsync<BusinessLegal>(l => l.User.Id == request.ProducerId, token);
                 if (!producerLegal.Documents.Any() || producerLegal.Documents.Any(d => d.Status != DocumentStatus.Validated))
-                    return Failed<bool>(new InvalidOperationException());
+                    return BadRequest<bool>(MessageKind.Producer_Documents_NotValidated);
 
                 return Ok(true);
             });

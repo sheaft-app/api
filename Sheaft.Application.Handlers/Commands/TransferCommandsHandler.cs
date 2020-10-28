@@ -14,6 +14,7 @@ using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using Sheaft.Options;
 using Microsoft.Extensions.Options;
+using Sheaft.Exceptions;
 
 namespace Sheaft.Application.Handlers
 {
@@ -114,13 +115,11 @@ namespace Sheaft.Application.Handlers
             return await ExecuteAsync(request, async () =>
             {
                 var purchaseOrder = await _context.GetByIdAsync<PurchaseOrder>(request.PurchaseOrderId, token);
-                if (purchaseOrder.Status != PurchaseOrderStatus.Delivered 
-                    || (purchaseOrder.Transfer != null && purchaseOrder.Transfer.Status != TransactionStatus.Failed))
-                    return Failed<Guid>(new InvalidOperationException());
+                if (purchaseOrder.Status != PurchaseOrderStatus.Delivered)
+                    return BadRequest<Guid>(MessageKind.Transfer_CannotCreate_PurchaseOrder_Invalid_Status);
 
-                var purchaseOrderTransfers = await _context.FindAsync<Transfer>(c => c.PurchaseOrder.Id == purchaseOrder.Id, token);
-                if (purchaseOrderTransfers.Any(c => c.Status != TransactionStatus.Failed))
-                    return Failed<Guid>(new InvalidOperationException());
+                if(purchaseOrder.Transfer != null && purchaseOrder.Transfer.Status != TransactionStatus.Failed)
+                    return BadRequest<Guid>(MessageKind.Transfer_CannotCreate_Pending_Transfer);
 
                 var checkResult = await _mediatr.Process(new CheckProducerConfigurationCommand(request.RequestUser) { ProducerId = purchaseOrder.Vendor.Id }, token);
                 if (!checkResult.Success)

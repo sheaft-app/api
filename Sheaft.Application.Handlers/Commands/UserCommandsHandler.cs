@@ -127,7 +127,7 @@ namespace Sheaft.Application.Handlers
             return await ExecuteAsync(request, async () =>
             {
                 if (!_scoringOptions.Points.TryGetValue(request.Kind.ToString("G"), out int quantity))
-                    return BadRequest<bool>(MessageKind.UserPoints_Scoring_Matching_ActionPoints_NotFound);
+                    return BadRequest<bool>(MessageKind.Points_Scoring_Matching_ActionPoints_NotFound);
 
                 var user = await _context.GetByIdAsync<User>(request.UserId, token);
                 user.AddPoints(request.Kind, quantity, DateTimeOffset.UtcNow);
