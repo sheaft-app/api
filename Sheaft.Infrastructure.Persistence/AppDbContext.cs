@@ -70,14 +70,14 @@ namespace Sheaft.Infrastructure.Persistence
             if (item == null)
             {
                 var message = GetExceptionDefaultMessage<T>(MessageKind.NotFound, id);
-                throw new SheaftException(ExceptionKind.NotFound, message.Key, message.Value);
+                throw new NotFoundException(message.Key, message.Value);
             }
 
             var itemAsRemoved = (ITrackRemove)item;
             if (itemAsRemoved.RemovedOn.HasValue)
             {
                 var message = GetExceptionDefaultMessage<T>(MessageKind.Gone, id);
-                throw new SheaftException(ExceptionKind.Gone, message.Key, message.Value);
+                throw new GoneException(message.Key, message.Value);
             }
 
             return item;
@@ -102,13 +102,13 @@ namespace Sheaft.Infrastructure.Persistence
             if (items?.Any() != true)
             {
                 var message = GetExceptionDefaultMessage<T>(MessageKind.NotFound, ids);
-                throw new SheaftException(ExceptionKind.NotFound, message.Key, message.Value);
+                throw new NotFoundException(message.Key, message.Value);
             }
 
             if (items.Count != ids.Count())
             {
                 var message = GetExceptionDefaultMessage<T>(MessageKind.NotFound, ids.Except(items.Select(i => i.Id)));
-                throw new SheaftException(ExceptionKind.NotFound, message.Key, message.Value);
+                throw new NotFoundException(message.Key, message.Value);
             }
 
             return items;
@@ -137,7 +137,7 @@ namespace Sheaft.Infrastructure.Persistence
             if (items?.Any() != true)
             {
                 var message = GetExceptionDefaultMessage<T>(MessageKind.NotFound);
-                throw new SheaftException(ExceptionKind.NotFound, message.Key, message.Value);
+                throw new NotFoundException(message.Key, message.Value);
             }
 
             return items;
@@ -166,7 +166,7 @@ namespace Sheaft.Infrastructure.Persistence
             if (item == null)
             {
                 var message = GetExceptionDefaultMessage<T>(MessageKind.NotFound);
-                throw new SheaftException(ExceptionKind.NotFound, message.Key, message.Value);
+                throw new NotFoundException(message.Key, message.Value);
             }
 
             return item;
@@ -200,7 +200,7 @@ namespace Sheaft.Infrastructure.Persistence
             if (result != null)
             {
                 var message = GetExceptionDefaultMessage<T>(MessageKind.AlreadyExists, id);
-                throw new SheaftException(ExceptionKind.AlreadyExists, message.Key, message.Value);
+                throw new AlreadyExistsException(message.Key, message.Value);
             }
         }
 
@@ -214,7 +214,7 @@ namespace Sheaft.Infrastructure.Persistence
             if (result?.Any() == true)
             {
                 var message = GetExceptionDefaultMessage<T>(MessageKind.AlreadyExists);
-                throw new SheaftException(ExceptionKind.AlreadyExists, message.Key, message.Value);
+                throw new AlreadyExistsException(message.Key, message.Value);
             }
         }
 

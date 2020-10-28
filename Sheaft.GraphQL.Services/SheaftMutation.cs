@@ -489,6 +489,9 @@ namespace Sheaft.GraphQL.Services
                 else
                     _logger.LogDebug($"Mutation {command} failed");
 
+                if (result.Exception != null)
+                    throw result.Exception;
+
                 throw new UnexpectedException(result.Message);
             }
         }

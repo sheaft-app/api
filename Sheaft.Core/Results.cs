@@ -21,7 +21,7 @@ namespace Sheaft.Core
 
         // exception result
 
-        protected Result(Exception exception, MessageKind? message = null, params object[] objs) : this(new SheaftException(ExceptionKind.Unexpected, exception), message, objs)
+        protected Result(Exception exception, MessageKind? message = null, params object[] objs) : this(new UnexpectedException(exception), message, objs)
         {
         }
         protected Result(SheaftException exception, MessageKind? message = null, params object[] objs) : this(message ?? MessageKind.Unexpected, objs)

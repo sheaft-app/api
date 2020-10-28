@@ -57,11 +57,7 @@ namespace Sheaft.Infrastructure.Services
                             Size = new Size(64, 64)
                         })).Save(blobStream, new JpegEncoder { Quality = 100 });
 
-                        var compImage = await _blobService.UploadUserPictureAsync(user.Id, blobStream.ToArray(), token);
-                        if (!compImage.Success)
-                            throw compImage.Exception ?? new BadRequestException();
-
-                        return compImage;
+                        return await _blobService.UploadUserPictureAsync(user.Id, blobStream.ToArray(), token);
                     }
                 }
             });
@@ -85,11 +81,7 @@ namespace Sheaft.Infrastructure.Services
                             Size = new Size(64, 64)
                         })).Save(blobStream, new JpegEncoder { Quality = 100 });
 
-                        var compImage = await _blobService.UploadTagPictureAsync(tag.Id, blobStream.ToArray(), token);
-                        if (!compImage.Success)
-                            throw compImage.Exception ?? new BadRequestException();
-
-                        return compImage;
+                        return await _blobService.UploadTagPictureAsync(tag.Id, blobStream.ToArray(), token);
                     }
                 }
             });

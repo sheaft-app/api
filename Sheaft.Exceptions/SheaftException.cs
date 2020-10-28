@@ -10,11 +10,11 @@ namespace Sheaft.Exceptions
         public MessageKind? Error { get; }
         public object[] Params { get; }
 
-        public SheaftException(ExceptionKind? kind = null, MessageKind? error = null, params object[] objs) : this(kind ?? ExceptionKind.Unexpected, null, error, objs)
+        protected SheaftException(ExceptionKind? kind = null, MessageKind? error = null, params object[] objs) : this(kind ?? ExceptionKind.Unexpected, null, error, objs)
         {
         }
 
-        public SheaftException(ExceptionKind kind, Exception exception, MessageKind? error = null, params object[] objs) : base(exception?.Message ?? $"{kind:G}{(error != null ? $":{error:G}":string.Empty)}", exception)
+        protected SheaftException(ExceptionKind kind, Exception exception, MessageKind? error = null, params object[] objs) : base(exception?.Message ?? $"{kind:G}{(error != null ? $":{error:G}":string.Empty)}", exception)
         {
             Kind = kind;
             Error = error;

@@ -42,7 +42,7 @@ namespace Sheaft.Infrastructure.Services
             return await ExecuteAsync(async () =>
             {
                 if (!string.IsNullOrWhiteSpace(consumerLegal.User.Identifier))
-                    return Failed<string>(new SheaftException(ExceptionKind.BadRequest, MessageKind.PsP_CannotCreate_User_User_Exists));
+                    return BadRequest<string>(MessageKind.PsP_CannotCreate_User_User_Exists);
 
                 await EnsureAccessTokenIsValidAsync(token);
 
@@ -68,7 +68,7 @@ namespace Sheaft.Infrastructure.Services
             return await ExecuteAsync(async () =>
             {
                 if (!string.IsNullOrWhiteSpace(businessLegal.User.Identifier))
-                    return Failed<string>(new SheaftException(ExceptionKind.BadRequest, MessageKind.PsP_CannotCreate_User_User_Exists));
+                    return BadRequest<string>(MessageKind.PsP_CannotCreate_User_User_Exists);
 
                 await EnsureAccessTokenIsValidAsync(token);
 
@@ -99,10 +99,10 @@ namespace Sheaft.Infrastructure.Services
             return await ExecuteAsync(async () =>
             {
                 if (string.IsNullOrWhiteSpace(wallet.User.Identifier))
-                    return Failed<string>(new SheaftException(ExceptionKind.BadRequest, MessageKind.PsP_CannotCreate_Wallet_User_Not_Exists));
+                    return BadRequest<string>(MessageKind.PsP_CannotCreate_Wallet_User_Not_Exists);
 
                 if (!string.IsNullOrWhiteSpace(wallet.Identifier))
-                    return Failed<string>(new SheaftException(ExceptionKind.BadRequest, MessageKind.PsP_CannotCreate_Wallet_Wallet_Exists));
+                    return BadRequest<string>(MessageKind.PsP_CannotCreate_Wallet_Wallet_Exists);
 
                 await EnsureAccessTokenIsValidAsync(token);
 
@@ -124,10 +124,10 @@ namespace Sheaft.Infrastructure.Services
             return await ExecuteAsync(async () =>
             {
                 if (string.IsNullOrWhiteSpace(payment.User.Identifier))
-                    return Failed<string>(new SheaftException(ExceptionKind.BadRequest, MessageKind.PsP_CannotCreate_Transfer_User_Not_Exists));
+                    return BadRequest<string>(MessageKind.PsP_CannotCreate_Transfer_User_Not_Exists);
 
                 if (!string.IsNullOrWhiteSpace(payment.Identifier))
-                    return Failed<string>(new SheaftException(ExceptionKind.BadRequest, MessageKind.PsP_CannotCreate_Transfer_BankIBAN_Exists));
+                    return BadRequest<string>(MessageKind.PsP_CannotCreate_Transfer_BankIBAN_Exists);
 
                 await EnsureAccessTokenIsValidAsync(token);
 
@@ -159,10 +159,10 @@ namespace Sheaft.Infrastructure.Services
             return await ExecuteAsync(async () =>
             {
                 if (string.IsNullOrWhiteSpace(payment.User.Identifier))
-                    return Failed<KeyValuePair<string, string>>(new SheaftException(ExceptionKind.BadRequest, MessageKind.PsP_CannotCreate_Card_User_Not_Exists));
+                    return BadRequest<KeyValuePair<string, string>>(MessageKind.PsP_CannotCreate_Card_User_Not_Exists);
 
                 if (!string.IsNullOrWhiteSpace(payment.Identifier))
-                    return Failed<KeyValuePair<string, string>>(new SheaftException(ExceptionKind.BadRequest, MessageKind.PsP_CannotCreate_Card_Card_Exists));
+                    return BadRequest<KeyValuePair<string, string>>(MessageKind.PsP_CannotCreate_Card_Card_Exists);
 
                 await EnsureAccessTokenIsValidAsync(token);
 
@@ -179,7 +179,7 @@ namespace Sheaft.Infrastructure.Services
             return await ExecuteAsync(async () =>
             {
                 if (string.IsNullOrWhiteSpace(payment.Identifier))
-                    return Failed<string>(new SheaftException(ExceptionKind.BadRequest, MessageKind.PsP_CannotValidate_Card_Card_Not_Exists));
+                    return BadRequest<string>(MessageKind.PsP_CannotValidate_Card_Card_Not_Exists);
 
                 await EnsureAccessTokenIsValidAsync(token);
 
@@ -193,10 +193,10 @@ namespace Sheaft.Infrastructure.Services
             return await ExecuteAsync(async () =>
             {
                 if (string.IsNullOrWhiteSpace(userIdentifier))
-                    return Failed<PspDocumentResultDto>(new SheaftException(ExceptionKind.BadRequest, MessageKind.PsP_CannotCreate_Document_User_Not_Exists));
+                    return BadRequest<PspDocumentResultDto>(MessageKind.PsP_CannotCreate_Document_User_Not_Exists);
 
                 if (!string.IsNullOrWhiteSpace(document.Identifier))
-                    return Failed<PspDocumentResultDto>(new SheaftException(ExceptionKind.BadRequest, MessageKind.PsP_CannotCreate_Document_Document_Exists));
+                    return BadRequest<PspDocumentResultDto>(MessageKind.PsP_CannotCreate_Document_Document_Exists);
 
                 await EnsureAccessTokenIsValidAsync(token);
 
@@ -218,7 +218,7 @@ namespace Sheaft.Infrastructure.Services
             return await ExecuteAsync(async () =>
             {
                 if (string.IsNullOrWhiteSpace(document.Identifier))
-                    return Failed<bool>(new SheaftException(ExceptionKind.BadRequest, MessageKind.PsP_CannotCreate_DocumentPage_Document_Not_Exists));
+                    return BadRequest<bool>(MessageKind.PsP_CannotCreate_DocumentPage_Document_Not_Exists);
 
                 await EnsureAccessTokenIsValidAsync(token);
 
@@ -232,10 +232,10 @@ namespace Sheaft.Infrastructure.Services
             return await ExecuteAsync(async () =>
             {
                 if (string.IsNullOrWhiteSpace(userIdentifier))
-                    return Failed<PspDocumentResultDto>(new SheaftException(ExceptionKind.BadRequest, MessageKind.PsP_CannotSubmit_Document_User_Not_Exists));
+                    return BadRequest<PspDocumentResultDto>(MessageKind.PsP_CannotSubmit_Document_User_Not_Exists);
 
                 if (string.IsNullOrWhiteSpace(document.Identifier))
-                    return Failed<PspDocumentResultDto>(new SheaftException(ExceptionKind.BadRequest, MessageKind.PsP_CannotSubmit_Document_Document_Not_Exists));
+                    return BadRequest<PspDocumentResultDto>(MessageKind.PsP_CannotSubmit_Document_Document_Not_Exists);
 
                 await EnsureAccessTokenIsValidAsync(token);
 
@@ -260,7 +260,7 @@ namespace Sheaft.Infrastructure.Services
             return await ExecuteAsync(async () =>
             {
                 if (string.IsNullOrWhiteSpace(business.Identifier))
-                    return Failed<PspDeclarationResultDto>(new SheaftException(ExceptionKind.BadRequest, MessageKind.PsP_CannotCreate_Declaration_User_Not_Exists));
+                    return BadRequest<PspDeclarationResultDto>(MessageKind.PsP_CannotCreate_Declaration_User_Not_Exists);
 
                 await EnsureAccessTokenIsValidAsync(token);
 
@@ -281,7 +281,7 @@ namespace Sheaft.Infrastructure.Services
             return await ExecuteAsync(async () =>
             {
                 if (string.IsNullOrWhiteSpace(declaration.Identifier))
-                    return Failed<PspDeclarationResultDto>(new SheaftException(ExceptionKind.BadRequest, MessageKind.PsP_CannotSubmit_Declaration_Not_Exists));
+                    return BadRequest<PspDeclarationResultDto>(MessageKind.PsP_CannotSubmit_Declaration_Not_Exists);
 
                 await EnsureAccessTokenIsValidAsync(token);
 
@@ -316,7 +316,7 @@ namespace Sheaft.Infrastructure.Services
             return await ExecuteAsync(async () =>
             {
                 if (string.IsNullOrWhiteSpace(declaration.Identifier))
-                    return Failed<string>(new SheaftException(ExceptionKind.BadRequest, MessageKind.PsP_CannotAddUbo_Declaration_Not_Exists));
+                    return BadRequest<string>(MessageKind.PsP_CannotAddUbo_Declaration_Not_Exists);
 
                 await EnsureAccessTokenIsValidAsync(token);
 
@@ -343,10 +343,10 @@ namespace Sheaft.Infrastructure.Services
             return await ExecuteAsync(async () =>
             {
                 if (string.IsNullOrWhiteSpace(declaration.Identifier))
-                    return Failed<bool>(new SheaftException(ExceptionKind.BadRequest, MessageKind.PsP_CannotUpdateUbo_Declaration_Not_Exists));
+                    return BadRequest<bool>(MessageKind.PsP_CannotUpdateUbo_Declaration_Not_Exists);
 
                 if (string.IsNullOrWhiteSpace(ubo.Identifier))
-                    return Failed<bool>(new SheaftException(ExceptionKind.BadRequest, MessageKind.PsP_CannotUpdateUbo_Ubo_Not_Exists));
+                    return BadRequest<bool>(MessageKind.PsP_CannotUpdateUbo_Ubo_Not_Exists);
 
                 await EnsureAccessTokenIsValidAsync(token);
 
@@ -371,10 +371,10 @@ namespace Sheaft.Infrastructure.Services
             return await ExecuteAsync(async () =>
             {
                 if (string.IsNullOrWhiteSpace(transaction.Author.Identifier))
-                    return Failed<PspWebPaymentResultDto>(new SheaftException(ExceptionKind.BadRequest, MessageKind.PsP_CannotCreate_WebPayin_Author_Not_Exists));
+                    return BadRequest<PspWebPaymentResultDto>(MessageKind.PsP_CannotCreate_WebPayin_Author_Not_Exists);
 
                 if (string.IsNullOrWhiteSpace(transaction.CreditedWallet.Identifier))
-                    return Failed<PspWebPaymentResultDto>(new SheaftException(ExceptionKind.BadRequest, MessageKind.PsP_CannotCreate_WebPayin_CreditedWallet_Not_Exists));
+                    return BadRequest<PspWebPaymentResultDto>(MessageKind.PsP_CannotCreate_WebPayin_CreditedWallet_Not_Exists);
 
                 await EnsureAccessTokenIsValidAsync(token);
 
@@ -425,10 +425,10 @@ namespace Sheaft.Infrastructure.Services
             return await ExecuteAsync(async () =>
             {
                 if (string.IsNullOrWhiteSpace(transaction.Author.Identifier))
-                    return Failed<PspPaymentResultDto>(new SheaftException(ExceptionKind.BadRequest, MessageKind.PsP_CannotCreate_WebPayin_Author_Not_Exists));
+                    return BadRequest<PspPaymentResultDto>(MessageKind.PsP_CannotCreate_WebPayin_Author_Not_Exists);
 
                 if (string.IsNullOrWhiteSpace(transaction.CreditedWallet.Identifier))
-                    return Failed<PspPaymentResultDto>(new SheaftException(ExceptionKind.BadRequest, MessageKind.PsP_CannotCreate_WebPayin_CreditedWallet_Not_Exists));
+                    return BadRequest<PspPaymentResultDto>(MessageKind.PsP_CannotCreate_WebPayin_CreditedWallet_Not_Exists);
 
                 await EnsureAccessTokenIsValidAsync(token);
 
@@ -502,10 +502,10 @@ namespace Sheaft.Infrastructure.Services
             return await ExecuteAsync(async () =>
             {
                 if (string.IsNullOrWhiteSpace(transaction.Author.Identifier))
-                    return Failed<PspPaymentResultDto>(new SheaftException(ExceptionKind.BadRequest, MessageKind.PsP_CannotCreate_Payout_Author_Not_Exists));
+                    return BadRequest<PspPaymentResultDto>(MessageKind.PsP_CannotCreate_Payout_Author_Not_Exists);
 
                 if (string.IsNullOrWhiteSpace(transaction.DebitedWallet.Identifier))
-                    return Failed<PspPaymentResultDto>(new SheaftException(ExceptionKind.BadRequest, MessageKind.PsP_CannotCreate_Payout_DebitedWallet_Not_Exists));
+                    return BadRequest<PspPaymentResultDto>(MessageKind.PsP_CannotCreate_Payout_DebitedWallet_Not_Exists);
 
                 await EnsureAccessTokenIsValidAsync(token);
 
@@ -548,10 +548,10 @@ namespace Sheaft.Infrastructure.Services
             return await ExecuteAsync(async () =>
             {
                 if (string.IsNullOrWhiteSpace(transaction.Author.Identifier))
-                    return Failed<PspPaymentResultDto>(new SheaftException(ExceptionKind.BadRequest, MessageKind.PsP_CannotRefund_Payin_Author_Not_Exists));
+                    return BadRequest<PspPaymentResultDto>(MessageKind.PsP_CannotRefund_Payin_Author_Not_Exists);
 
                 if (string.IsNullOrWhiteSpace(transaction.Payin.Identifier))
-                    return Failed<PspPaymentResultDto>(new SheaftException(ExceptionKind.BadRequest, MessageKind.PsP_CannotRefund_Payin_PayinIdentifier_Missing));
+                    return BadRequest<PspPaymentResultDto>(MessageKind.PsP_CannotRefund_Payin_PayinIdentifier_Missing);
 
                 await EnsureAccessTokenIsValidAsync(token);
 
@@ -699,13 +699,13 @@ namespace Sheaft.Infrastructure.Services
             return await ExecuteAsync(async () =>
             {
                 if (string.IsNullOrWhiteSpace(author))
-                    return Failed<PspPaymentResultDto>(new SheaftException(ExceptionKind.BadRequest, MessageKind.PsP_CannotCreate_Transfer_Author_Not_Exists));
+                    return BadRequest<PspPaymentResultDto>(MessageKind.PsP_CannotCreate_Transfer_Author_Not_Exists);
 
                 if (string.IsNullOrWhiteSpace(creditedWalletIdentifier))
-                    return Failed<PspPaymentResultDto>(new SheaftException(ExceptionKind.BadRequest, MessageKind.PsP_CannotCreate_Transfer_CreditedWallet_Not_Exists));
+                    return BadRequest<PspPaymentResultDto>(MessageKind.PsP_CannotCreate_Transfer_CreditedWallet_Not_Exists);
 
                 if (string.IsNullOrWhiteSpace(debitedWalletIdentifier))
-                    return Failed<PspPaymentResultDto>(new SheaftException(ExceptionKind.BadRequest, MessageKind.PsP_CannotCreate_Transfer_DebitedWallet_Not_Exists));
+                    return BadRequest<PspPaymentResultDto>(MessageKind.PsP_CannotCreate_Transfer_DebitedWallet_Not_Exists);
 
                 await EnsureAccessTokenIsValidAsync(token);
 
