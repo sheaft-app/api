@@ -90,7 +90,7 @@ namespace Sheaft.Web.Manage.Controllers
                 .Get(c =>
                         c.Payin != null
                         && c.Payin.Status == TransactionStatus.Succeeded
-                        && (c.Payin.Refund == null || c.Payin.Status == TransactionStatus.Failed)
+                        && c.Payin.Refunds.All(c => c.Status != TransactionStatus.Failed)
                         && c.PurchaseOrders.All(po => po.Status >= PurchaseOrderStatus.Delivered)
                         && c.PurchaseOrders.Any(po => po.WithdrawnOn.HasValue
                                                     && (po.Transfer == null
@@ -116,7 +116,7 @@ namespace Sheaft.Web.Manage.Controllers
         public async Task<IActionResult> CreatePayinRefund(Guid id, CancellationToken token)
         {
             var requestUser = await GetRequestUser(token);
-            _mediatr.Post(new CreatePayinRefundCommand(requestUser) { PayinId = id });
+            //_mediatr.Post(new CreatePayinRefundCommand(requestUser) { PayinId = id });
 
             TempData["Submitted"] = JsonConvert.SerializeObject(new EntityViewModel { Id = id, Name = id.ToString("N") });
             return RedirectToAction("Todo");

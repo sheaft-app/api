@@ -259,6 +259,7 @@ namespace Sheaft.Application.Handlers
                 else
                     _mediatr.Post(new PurchaseOrderCancelledEvent(request.RequestUser) { PurchaseOrderId = purchaseOrder.Id });
 
+                _mediatr.Schedule(new CreatePayinRefundCommand(request.RequestUser) { PurchaseOrderId = purchaseOrder.Id }, TimeSpan.FromDays(1));
                 return Ok(true);
             });
         }
@@ -273,7 +274,7 @@ namespace Sheaft.Application.Handlers
                 await _context.SaveChangesAsync(token);
 
                 _mediatr.Post(new PurchaseOrderRefusedEvent(request.RequestUser) { PurchaseOrderId = purchaseOrder.Id });
-
+                _mediatr.Schedule(new CreatePayinRefundCommand(request.RequestUser) { PurchaseOrderId = purchaseOrder.Id }, TimeSpan.FromDays(1));
                 return Ok(true);
             });
         }

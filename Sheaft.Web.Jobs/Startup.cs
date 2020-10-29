@@ -336,10 +336,6 @@ namespace Sheaft.Web.Jobs
                 mediatr.Execute(nameof(CheckTransfersCommand), new CheckTransfersCommand(new RequestUser("50a160aac50f480a872b04a509ef202c", Guid.NewGuid().ToString("N"), null)), CancellationToken.None),
                     options.CheckTransfersCron);
 
-            RecurringJob.AddOrUpdate<SheaftHangfireBridge>("2a612ac89bf1427692ebc2d8872ff7fd", mediatr =>
-                mediatr.Execute(nameof(CheckNewPayinRefundsCommand), new CheckNewPayinRefundsCommand(new RequestUser("2a612ac89bf1427692ebc2d8872ff7fd", Guid.NewGuid().ToString("N"), null)), CancellationToken.None),
-                    options.CheckNewPayinRefundsCron);
-
             RecurringJob.AddOrUpdate<SheaftHangfireBridge>("ae81c9c623f940b386ac9d3144147557", mediatr =>
                 mediatr.Execute(nameof(CheckNewPayoutsCommand), new CheckNewPayoutsCommand(new RequestUser("ae81c9c623f940b386ac9d3144147557", Guid.NewGuid().ToString("N"), null)), CancellationToken.None),
                     options.CheckNewPayoutsCron);

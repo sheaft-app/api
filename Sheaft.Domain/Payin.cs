@@ -1,11 +1,15 @@
 ﻿using Sheaft.Domain.Enums;
 using Sheaft.Exceptions;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Sheaft.Domain.Models
 {
     public abstract class Payin : Transaction
     {
+        private List<PayinRefund> _refunds;
+
         protected Payin()
         {
         }
@@ -22,15 +26,14 @@ namespace Sheaft.Domain.Models
 
         public virtual Wallet CreditedWallet { get; private set; }
         public virtual Order Order { get; private set; }
-        public virtual PayinRefund Refund { get; private set; }
+        public virtual IReadOnlyCollection<PayinRefund> Refunds => _refunds.AsReadOnly();
 
-        public void SetRefund(PayinRefund refund)
+        public void AddRefund(PayinRefund refund)
         {
-            if (Refund != null && Refund.Status == TransactionStatus.Succeeded)
-                throw new ValidationException(MessageKind.Payin_CannotSet_Refund_AlreadySucceeded);
+            if (Refunds != null && Refunds.Any(r => r.PurchaseOrder.Id == refund.PurchaseOrder.Id && r.Status == TransactionStatus.Succeeded))
+                throw new ValidationException(MessageKind.Payin_CannotAdd_Refund_PurchaseOrderRefund_AlreadySucceeded);
 
-            Refund = null;
-            Refund = refund;
+            _refunds.Add(refund);
         }
     }
 }

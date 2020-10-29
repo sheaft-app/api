@@ -1216,7 +1216,6 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                     AuthorUid = table.Column<long>(nullable: false),
                     CreditedWalletUid = table.Column<long>(nullable: false),
                     OrderUid = table.Column<long>(nullable: false),
-                    RefundUid = table.Column<long>(nullable: true),
                     CardUid = table.Column<long>(nullable: true),
                     RedirectUrl = table.Column<string>(nullable: true)
                 },
@@ -1242,50 +1241,6 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                         name: "FK_Payins_Orders_OrderUid",
                         column: x => x.OrderUid,
                         principalTable: "Orders",
-                        principalColumn: "Uid");
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Refunds",
-                columns: table => new
-                {
-                    Uid = table.Column<long>(nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Id = table.Column<Guid>(nullable: false),
-                    CreatedOn = table.Column<DateTimeOffset>(nullable: false),
-                    UpdatedOn = table.Column<DateTimeOffset>(nullable: true),
-                    RemovedOn = table.Column<DateTimeOffset>(nullable: true),
-                    Identifier = table.Column<string>(nullable: true),
-                    Kind = table.Column<int>(nullable: false),
-                    Status = table.Column<int>(nullable: false),
-                    ExecutedOn = table.Column<DateTimeOffset>(nullable: true),
-                    ResultCode = table.Column<string>(nullable: true),
-                    ResultMessage = table.Column<string>(nullable: true),
-                    Fees = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
-                    Reference = table.Column<string>(nullable: true),
-                    Debited = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
-                    Credited = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
-                    AuthorUid = table.Column<long>(nullable: false),
-                    DebitedWalletUid = table.Column<long>(nullable: false),
-                    PayinUid = table.Column<long>(nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Refunds", x => x.Uid);
-                    table.ForeignKey(
-                        name: "FK_Refunds_Payins_PayinUid",
-                        column: x => x.PayinUid,
-                        principalTable: "Payins",
-                        principalColumn: "Uid");
-                    table.ForeignKey(
-                        name: "FK_Refunds_Users_AuthorUid",
-                        column: x => x.AuthorUid,
-                        principalTable: "Users",
-                        principalColumn: "Uid");
-                    table.ForeignKey(
-                        name: "FK_Refunds_Wallets_DebitedWalletUid",
-                        column: x => x.DebitedWalletUid,
-                        principalTable: "Wallets",
                         principalColumn: "Uid");
                 });
 
@@ -1319,7 +1274,6 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                     TotalVatPrice = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
                     TotalOnSalePrice = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
                     TotalWeight = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
-                    SkipBackgroundProcessing = table.Column<bool>(nullable: false),
                     Status = table.Column<int>(nullable: false),
                     PurchaseOrderSenderUid = table.Column<long>(nullable: false),
                     PurchaseOrderVendorUid = table.Column<long>(nullable: false),
@@ -1419,6 +1373,57 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                         principalTable: "PurchaseOrders",
                         principalColumn: "Uid",
                         onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Refunds",
+                columns: table => new
+                {
+                    Uid = table.Column<long>(nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Id = table.Column<Guid>(nullable: false),
+                    CreatedOn = table.Column<DateTimeOffset>(nullable: false),
+                    UpdatedOn = table.Column<DateTimeOffset>(nullable: true),
+                    RemovedOn = table.Column<DateTimeOffset>(nullable: true),
+                    Identifier = table.Column<string>(nullable: true),
+                    Kind = table.Column<int>(nullable: false),
+                    Status = table.Column<int>(nullable: false),
+                    ExecutedOn = table.Column<DateTimeOffset>(nullable: true),
+                    ResultCode = table.Column<string>(nullable: true),
+                    ResultMessage = table.Column<string>(nullable: true),
+                    Fees = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
+                    Reference = table.Column<string>(nullable: true),
+                    Debited = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
+                    Credited = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
+                    AuthorUid = table.Column<long>(nullable: false),
+                    DebitedWalletUid = table.Column<long>(nullable: false),
+                    PayinUid = table.Column<long>(nullable: true),
+                    PurchaseOrderUid = table.Column<long>(nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Refunds", x => x.Uid);
+                    table.ForeignKey(
+                        name: "FK_Refunds_Payins_PayinUid",
+                        column: x => x.PayinUid,
+                        principalTable: "Payins",
+                        principalColumn: "Uid");
+                    table.ForeignKey(
+                        name: "FK_Refunds_PurchaseOrders_PurchaseOrderUid",
+                        column: x => x.PurchaseOrderUid,
+                        principalTable: "PurchaseOrders",
+                        principalColumn: "Uid",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Refunds_Users_AuthorUid",
+                        column: x => x.AuthorUid,
+                        principalTable: "Users",
+                        principalColumn: "Uid");
+                    table.ForeignKey(
+                        name: "FK_Refunds_Wallets_DebitedWalletUid",
+                        column: x => x.DebitedWalletUid,
+                        principalTable: "Wallets",
+                        principalColumn: "Uid");
                 });
 
             migrationBuilder.CreateTable(
@@ -1764,13 +1769,6 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                 column: "OrderUid");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Payins_RefundUid",
-                table: "Payins",
-                column: "RefundUid",
-                unique: true,
-                filter: "[RefundUid] IS NOT NULL");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_Payins_Uid_Id_AuthorUid_OrderUid_CreditedWalletUid_RemovedOn",
                 table: "Payins",
                 columns: new[] { "Uid", "Id", "AuthorUid", "OrderUid", "CreditedWalletUid", "RemovedOn" });
@@ -1961,6 +1959,11 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                 name: "IX_Refunds_PayinUid",
                 table: "Refunds",
                 column: "PayinUid");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Refunds_PurchaseOrderUid",
+                table: "Refunds",
+                column: "PurchaseOrderUid");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Refunds_AuthorUid",
@@ -2191,18 +2194,12 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                 principalColumn: "Uid");
 
             migrationBuilder.AddForeignKey(
-                name: "FK_Payins_Refunds_RefundUid",
-                table: "Payins",
-                column: "RefundUid",
-                principalTable: "Refunds",
-                principalColumn: "Uid");
-
-            migrationBuilder.AddForeignKey(
                 name: "FK_PurchaseOrders_Transfers_TransferUid",
                 table: "PurchaseOrders",
                 column: "TransferUid",
                 principalTable: "Transfers",
                 principalColumn: "Uid");
+
 
             migrationBuilder.InsertData("Levels", new List<string>() { "Uid", "Id", "CreatedOn", "RequiredPoints", "Name" }.ToArray(), new List<object>() { 1, "63b7d548-b8ae-43f6-bb9a-b47311ba57ed", "2020-05-01", "1000", "Niveau 1" }.ToArray(), "dbo");
             migrationBuilder.InsertData("Levels", new List<string>() { "Uid", "Id", "CreatedOn", "RequiredPoints", "Name" }.ToArray(), new List<object>() { 2, "a9193dc7-9508-4ab8-a1e3-0b72ee47589b", "2020-05-01", "2000", "Niveau 1" }.ToArray(), "dbo");
@@ -2975,10 +2972,6 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                 table: "Payouts");
 
             migrationBuilder.DropForeignKey(
-                name: "FK_Refunds_Users_AuthorUid",
-                table: "Refunds");
-
-            migrationBuilder.DropForeignKey(
                 name: "FK_Transfers_Users_AuthorUid",
                 table: "Transfers");
 
@@ -3003,10 +2996,6 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                 table: "Payouts");
 
             migrationBuilder.DropForeignKey(
-                name: "FK_Refunds_Wallets_DebitedWalletUid",
-                table: "Refunds");
-
-            migrationBuilder.DropForeignKey(
                 name: "FK_Transfers_Wallets_CreditedWalletUid",
                 table: "Transfers");
 
@@ -3029,10 +3018,6 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
             migrationBuilder.DropForeignKey(
                 name: "FK_Transfers_PurchaseOrders_PurchaseOrderUid",
                 table: "Transfers");
-
-            migrationBuilder.DropForeignKey(
-                name: "FK_Refunds_Payins_PayinUid",
-                table: "Refunds");
 
             migrationBuilder.DropTable(
                 name: "AgreementSelectedHours");
@@ -3084,6 +3069,9 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
 
             migrationBuilder.DropTable(
                 name: "Ratings");
+
+            migrationBuilder.DropTable(
+                name: "Refunds");
 
             migrationBuilder.DropTable(
                 name: "Rewards");
@@ -3152,6 +3140,9 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                 name: "Donations");
 
             migrationBuilder.DropTable(
+                name: "Payins");
+
+            migrationBuilder.DropTable(
                 name: "PurchaseOrders");
 
             migrationBuilder.DropTable(
@@ -3167,13 +3158,7 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                 name: "Payouts");
 
             migrationBuilder.DropTable(
-                name: "Payins");
-
-            migrationBuilder.DropTable(
                 name: "PaymentMethods");
-
-            migrationBuilder.DropTable(
-                name: "Refunds");
         }
     }
 }

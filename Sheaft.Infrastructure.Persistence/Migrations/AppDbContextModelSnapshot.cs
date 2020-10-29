@@ -804,9 +804,6 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                     b.Property<string>("Reference")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<long?>("RefundUid")
-                        .HasColumnType("bigint");
-
                     b.Property<DateTimeOffset?>("RemovedOn")
                         .HasColumnType("datetimeoffset");
 
@@ -835,10 +832,6 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                     b.HasIndex("Identifier");
 
                     b.HasIndex("OrderUid");
-
-                    b.HasIndex("RefundUid")
-                        .IsUnique()
-                        .HasFilter("[RefundUid] IS NOT NULL");
 
                     b.HasIndex("Uid", "Id", "AuthorUid", "OrderUid", "CreditedWalletUid", "RemovedOn");
 
@@ -1165,9 +1158,6 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
 
                     b.Property<int>("ReturnablesCount")
                         .HasColumnType("int");
-
-                    b.Property<bool>("SkipBackgroundProcessing")
-                        .HasColumnType("bit");
 
                     b.Property<int>("Status")
                         .HasColumnType("int");
@@ -2152,7 +2142,12 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                     b.Property<long>("PayinUid")
                         .HasColumnType("bigint");
 
+                    b.Property<long?>("PurchaseOrderUid")
+                        .HasColumnType("bigint");
+
                     b.HasIndex("PayinUid");
+
+                    b.HasIndex("PurchaseOrderUid");
 
                     b.HasDiscriminator().HasValue(300);
                 });
@@ -2618,11 +2613,6 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                         .HasForeignKey("OrderUid")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
-
-                    b.HasOne("Sheaft.Domain.Models.PayinRefund", "Refund")
-                        .WithOne()
-                        .HasForeignKey("Sheaft.Domain.Models.Payin", "RefundUid")
-                        .OnDelete(DeleteBehavior.NoAction);
                 });
 
             modelBuilder.Entity("Sheaft.Domain.Models.PaymentMethod", b =>
@@ -3214,10 +3204,14 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
             modelBuilder.Entity("Sheaft.Domain.Models.PayinRefund", b =>
                 {
                     b.HasOne("Sheaft.Domain.Models.Payin", "Payin")
-                        .WithMany()
+                        .WithMany("Refunds")
                         .HasForeignKey("PayinUid")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
+
+                    b.HasOne("Sheaft.Domain.Models.PurchaseOrder", "PurchaseOrder")
+                        .WithMany()
+                        .HasForeignKey("PurchaseOrderUid");
                 });
 
             modelBuilder.Entity("Sheaft.Domain.Models.Store", b =>

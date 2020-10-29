@@ -66,18 +66,12 @@ namespace Sheaft.Domain.Models
         public decimal TotalVatPrice { get; private set; }
         public decimal TotalOnSalePrice { get; private set; }
         public decimal TotalWeight { get; private set; }
-        public bool SkipBackgroundProcessing { get; private set; }
         public PurchaseOrderStatus Status { get; private set; }
         public virtual PurchaseOrderSender Sender { get; private set; }
         public virtual ExpectedDelivery ExpectedDelivery { get; private set; }
         public virtual PurchaseOrderVendor Vendor { get; private set; }
         public virtual Transfer Transfer { get; private set; }
         public virtual IReadOnlyCollection<PurchaseOrderProduct> Products => _products?.AsReadOnly();
-
-        public void SetSkipBackgroundProcessing(bool value)
-        {
-            SkipBackgroundProcessing = value;
-        }
 
         public void SetReference(string newReference)
         {

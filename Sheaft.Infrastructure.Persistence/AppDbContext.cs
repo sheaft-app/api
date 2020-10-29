@@ -271,14 +271,14 @@ namespace Sheaft.Infrastructure.Persistence
         {
             var type = typeof(T);
             var resource = $"{_localizer[type.Name, type.Name]} ({id})";
-            return GetFormattedDefaultMessage(kind, type, resource);
+            return new KeyValuePair<MessageKind, string>(kind, resource); ;
         }
 
         private KeyValuePair<MessageKind, string> GetExceptionDefaultMessage<T>(MessageKind kind) where T : class, ITrackRemove
         {
             var type = typeof(T);
             var resource = $"{_localizer[type.Name, type.Name]}";
-            return GetFormattedDefaultMessage(kind, type, resource);
+            return new KeyValuePair<MessageKind, string>(kind, resource); ;
         }
 
         private KeyValuePair<MessageKind, string> GetExceptionDefaultMessage<T>(MessageKind kind, IEnumerable<Guid> ids) where T : class, ITrackRemove
@@ -295,17 +295,7 @@ namespace Sheaft.Infrastructure.Persistence
             }
 
             var resource = $"{_localizer[type.Name, type.Name]} ({identifiers})";
-            return GetFormattedDefaultMessage(kind, type, resource);
-        }
-
-        private KeyValuePair<MessageKind, string> GetFormattedDefaultMessage(MessageKind kind, Type type, string resource)
-        {
-            var messageKind = kind;
-
-            if (Enum.TryParse(typeof(MessageKind), $"{type.Name}_{kind}", out object parsedKind))
-                messageKind = (MessageKind)parsedKind;
-
-            return new KeyValuePair<MessageKind, string>(messageKind, resource);
+            return new KeyValuePair<MessageKind, string>(kind, resource);
         }
 
         private void UpdateRelatedData()
