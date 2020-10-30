@@ -30,6 +30,9 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
                 .HasValue<WebPayin>(TransactionKind.PayinWeb)
                 .HasValue<CardPayin>(TransactionKind.PayinCard);
 
+            var refunds = entity.Metadata.FindNavigation(nameof(Payin.Refunds));
+            refunds.SetPropertyAccessMode(PropertyAccessMode.Field);
+
             entity.HasKey("Uid");
 
             entity.HasIndex(c => c.Id).IsUnique();

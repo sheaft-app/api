@@ -132,7 +132,11 @@ namespace Sheaft.Web.Manage
             services.AddDbContext<IAppDbContext, AppDbContext>(options =>
             {
                 options.UseLazyLoadingProxies();
-                options.UseSqlServer(databaseConfig.ConnectionString, x => x.UseNetTopologySuite());//.EnableRetryOnFailure(5, TimeSpan.FromSeconds(5), null));
+                options.UseSqlServer(databaseConfig.ConnectionString, x =>
+                {
+                    x.UseNetTopologySuite();
+                    x.MigrationsHistoryTable("AppMigrationTable", "ef");
+                });
             }, ServiceLifetime.Scoped);
 
             var mailerConfig = mailerSettings.Get<MailerOptions>();

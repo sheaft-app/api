@@ -4,7 +4,7 @@ CREATE PROCEDURE MarkUserNotificationsAsRead
 AS 
 BEGIN	
 	declare @Uid bigint
-	set @Uid = (select u.Uid from dbo.users u where u.Id = @UserUId)
+	set @Uid = (select u.Uid from app.users u where u.Id = @UserUId)
 
-    update dbo.Notifications set Unread = 0 where UserUid = @Uid and CreatedOn < @ReadBefore
+    update app.Notifications set Unread = 0 where UserUid = @Uid and CreatedOn < @ReadBefore
 END

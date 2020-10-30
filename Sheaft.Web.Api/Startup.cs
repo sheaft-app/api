@@ -229,7 +229,11 @@ namespace Sheaft.Web.Api
             services.AddDbContext<AppDbContext>(options =>
             {
                 options.UseLazyLoadingProxies();
-                options.UseSqlServer(databaseConfig.ConnectionString, x => x.UseNetTopologySuite());//.EnableRetryOnFailure(5, TimeSpan.FromSeconds(5), null));
+                options.UseSqlServer(databaseConfig.ConnectionString, x =>
+                {
+                    x.UseNetTopologySuite();
+                    x.MigrationsHistoryTable("AppMigrationTable", "ef");
+                });
             }, ServiceLifetime.Scoped);
 
             services.AddScoped<IIdentifierService, IdentifierService>();

@@ -9,6 +9,8 @@ namespace Sheaft.Infrastructure.Persistence
     {
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.HasDefaultSchema("app");
+
             base.OnModelCreating(modelBuilder);
 
             modelBuilder.Entity<DepartmentProducers>(eb =>

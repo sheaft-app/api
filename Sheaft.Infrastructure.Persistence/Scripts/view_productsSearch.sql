@@ -1,8 +1,8 @@
-/****** Object:  View [dbo].[ProductsSearch]    Script Date: 10/22/2020 8:34:09 PM ******/
-DROP VIEW [dbo].[ProductsSearch]
+/****** Object:  View [app].[ProductsSearch]    Script Date: 10/22/2020 8:34:09 PM ******/
+DROP VIEW [app].[ProductsSearch]
 GO
 
-/****** Object:  View [dbo].[ProductsSearch]    Script Date: 10/22/2020 8:34:09 PM ******/
+/****** Object:  View [app].[ProductsSearch]    Script Date: 10/22/2020 8:34:09 PM ******/
 SET ANSI_NULLS ON
 GO
 
@@ -38,19 +38,19 @@ as
 			when p.Conditioning = 3 then 'BOUQUET'
 			when p.Conditioning = 4 then 'BUNCH'
 			when p.Conditioning = 5 then 'PIECE' end as product_conditioning
-     , dbo.InlineMax(dbo.InlineMax(dbo.InlineMax(p.UpdatedOn, r.UpdatedOn), t.UpdatedOn), p.CreatedOn) as last_update
-     , case when (dbo.InlineMax(p.RemovedOn, r.RemovedOn)) is null then 0 else 1 end as removed
+     , app.InlineMax(app.InlineMax(app.InlineMax(p.UpdatedOn, r.UpdatedOn), t.UpdatedOn), p.CreatedOn) as last_update
+     , case when (app.InlineMax(p.RemovedOn, r.RemovedOn)) is null then 0 else 1 end as removed
      , '[' + STRING_AGG('"' + LOWER(t.Name) + '"', ',') + ']' as product_tags     
      , ra.Longitude as producer_longitude
      , ra.Latitude as producer_latitude
      , geography::STGeomFromText('POINT('+convert(varchar(20),ra.Longitude)+' '+convert(varchar(20),ra.Latitude)+')',4326) as producer_geolocation
-  from dbo.Products p
-    join dbo.Users r on r.Uid = p.ProducerUid and r.Kind = 0
-    join dbo.UserAddresses ra on r.Uid = ra.UserUid
-	join dbo.DeliveryModes dm on dm.ProducerUid = r.Uid and dm.Kind in (1, 2, 3, 4) 
-    left join dbo.ProductTags pt on p.Uid = pt.ProductUid
-    left join dbo.Returnables pa on pa.Uid = p.ReturnableUid
-    left join dbo.Tags t on t.Uid = pt.TagUid
+  from app.Products p
+    join app.Users r on r.Uid = p.ProducerUid and r.Kind = 0
+    join app.UserAddresses ra on r.Uid = ra.UserUid
+	join app.DeliveryModes dm on dm.ProducerUid = r.Uid and dm.Kind in (1, 2, 3, 4) 
+    left join app.ProductTags pt on p.Uid = pt.ProductUid
+    left join app.Returnables pa on pa.Uid = p.ReturnableUid
+    left join app.Tags t on t.Uid = pt.TagUid
   group by
     p.Id,
     p.Name,
@@ -80,7 +80,7 @@ as
     p.VisibleToConsumers,
     ra.Zipcode,
     ra.City,
-    dbo.InlineMax(dbo.InlineMax(dbo.InlineMax(p.UpdatedOn, r.UpdatedOn), t.UpdatedOn), p.CreatedOn),
-    case when (dbo.InlineMax(p.RemovedOn, r.RemovedOn)) is null then 0 else 1 end,
+    app.InlineMax(app.InlineMax(app.InlineMax(p.UpdatedOn, r.UpdatedOn), t.UpdatedOn), p.CreatedOn),
+    case when (app.InlineMax(p.RemovedOn, r.RemovedOn)) is null then 0 else 1 end,
     ra.Longitude,
     ra.Latitude

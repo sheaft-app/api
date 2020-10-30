@@ -11,13 +11,14 @@ using Sheaft.Infrastructure.Persistence;
 namespace Sheaft.Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20201029171031_InitDatabase")]
+    [Migration("20201030160301_InitDatabase")]
     partial class InitDatabase
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
+                .HasDefaultSchema("app")
                 .HasAnnotation("ProductVersion", "3.1.8")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
@@ -1807,6 +1808,9 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("Icon")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<Guid>("Id")
                         .HasColumnType("uniqueidentifier");
 
@@ -2144,7 +2148,7 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                     b.Property<long>("PayinUid")
                         .HasColumnType("bigint");
 
-                    b.Property<long?>("PurchaseOrderUid")
+                    b.Property<long>("PurchaseOrderUid")
                         .HasColumnType("bigint");
 
                     b.HasIndex("PayinUid");
@@ -3213,7 +3217,9 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
 
                     b.HasOne("Sheaft.Domain.Models.PurchaseOrder", "PurchaseOrder")
                         .WithMany()
-                        .HasForeignKey("PurchaseOrderUid");
+                        .HasForeignKey("PurchaseOrderUid")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Sheaft.Domain.Models.Store", b =>

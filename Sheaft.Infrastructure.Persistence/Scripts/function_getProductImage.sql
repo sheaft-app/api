@@ -1,4 +1,4 @@
-create function [dbo].[GetProductImage](@productId uniqueidentifier, @image nvarchar(max), @companyId uniqueidentifier, @tags nvarchar(max))
+create function [app].[GetProductImage](@productId uniqueidentifier, @image nvarchar(max), @companyId uniqueidentifier, @tags nvarchar(max))
 returns nvarchar(max)
 as
 begin

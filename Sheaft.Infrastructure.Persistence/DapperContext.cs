@@ -24,7 +24,7 @@ namespace Sheaft.Infrastructure.Persistence
         {
             using (var connection = new SqlConnection(_databaseOptions.ConnectionString))
             {
-                var result = await connection.QueryAsync<UserPosition>("exec [dbo].[UserPositionInDepartment] @DepartmentId, @UserId", new { UserId = userId, DepartmentId = departmentId });
+                var result = await connection.QueryAsync<UserPosition>("exec [app].[UserPositionInDepartment] @DepartmentId, @UserId", new { UserId = userId, DepartmentId = departmentId });
                 return result.SingleOrDefault();
             }
         }
@@ -33,7 +33,7 @@ namespace Sheaft.Infrastructure.Persistence
         {
             using (var connection = new SqlConnection(_databaseOptions.ConnectionString))
             {
-                var result = await connection.QueryAsync<UserPosition>("exec [dbo].[UserPositionInRegion] @RegionId, @UserId", new { UserId = userId, RegionId = regionId });
+                var result = await connection.QueryAsync<UserPosition>("exec [app].[UserPositionInRegion] @RegionId, @UserId", new { UserId = userId, RegionId = regionId });
                 return result.SingleOrDefault();
             }
         }
@@ -42,7 +42,7 @@ namespace Sheaft.Infrastructure.Persistence
         {
             using (var connection = new SqlConnection(_databaseOptions.ConnectionString))
             {
-                var result = await connection.QueryAsync<UserPosition>("exec [dbo].[UserPositionInCountry] @UserId", new { UserId = userId });
+                var result = await connection.QueryAsync<UserPosition>("exec [app].[UserPositionInCountry] @UserId", new { UserId = userId });
                 return result.SingleOrDefault();
             }
         }
@@ -51,7 +51,7 @@ namespace Sheaft.Infrastructure.Persistence
         {
             using (var connection = new SqlConnection(_databaseOptions.ConnectionString))
             {
-                var result = await connection.ExecuteAsync("exec [dbo].[MarkUserNotificationsAsRead] @UserUid, @ReadBefore", new { UserUid = userId, ReadBefore = readBefore });
+                var result = await connection.ExecuteAsync("exec [app].[MarkUserNotificationsAsRead] @UserUid, @ReadBefore", new { UserUid = userId, ReadBefore = readBefore });
                 return result > 0;
             }
         }

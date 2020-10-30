@@ -13,7 +13,12 @@
 
     public class AppDatabaseOptions : DatabaseOptions
     {
-        public const string SETTING = "Database";
+        public const string SETTING = "AppDatabase";
+    }
+
+    public class IdentityDatabaseOptions : DatabaseOptions
+    {
+        public const string SETTING = "IdentityDatabase";
     }
 
     public class JobsDatabaseOptions : DatabaseOptions

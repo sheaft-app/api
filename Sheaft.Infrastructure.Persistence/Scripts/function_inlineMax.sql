@@ -1,4 +1,4 @@
-create function [dbo].[InlineMax](@val1 datetime, @val2 datetime)
+create function [app].[InlineMax](@val1 datetime, @val2 datetime)
 returns datetime
 as
 begin

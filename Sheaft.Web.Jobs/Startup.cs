@@ -217,7 +217,11 @@ namespace Sheaft.Web.Jobs
             services.AddDbContext<IAppDbContext, AppDbContext>(options =>
             {
                 options.UseLazyLoadingProxies();
-                options.UseSqlServer(databaseConfig.ConnectionString, x => x.UseNetTopologySuite());
+                options.UseSqlServer(databaseConfig.ConnectionString, x =>
+                {
+                    x.UseNetTopologySuite();
+                    x.MigrationsHistoryTable("AppMigrationTable", "ef");
+                });
             }, ServiceLifetime.Scoped);
 
             var pspOptions = pspSettings.Get<PspOptions>();

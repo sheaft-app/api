@@ -29,6 +29,7 @@ namespace Sheaft.Domain.Models
         public string Name { get; private set; }
         public string Description { get; private set; }
         public string Picture { get; private set; }
+        public string Icon { get; private set; }
 
         public void SetName(string name)
         {
