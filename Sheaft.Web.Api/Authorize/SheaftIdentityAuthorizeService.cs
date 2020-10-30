@@ -117,24 +117,24 @@ namespace Sheaft.Web.Api.Authorize
                             }
 
                             if (!string.IsNullOrWhiteSpace(userInfo.email))
-                                uClaims.Add(new Claim(JwtClaimTypes.Email, userInfo.email, null, subClaim.Issuer, subClaim.OriginalIssuer, subClaim.Subject));
+                                uClaims.Add(new Claim(JwtClaimTypes.Email, userInfo.email, null, subClaim?.Issuer, subClaim?.OriginalIssuer, subClaim?.Subject));
 
                             if (!string.IsNullOrWhiteSpace(userInfo.family_name))
-                                uClaims.Add(new Claim(JwtClaimTypes.FamilyName, userInfo.family_name, null, subClaim.Issuer, subClaim.OriginalIssuer, subClaim.Subject));
+                                uClaims.Add(new Claim(JwtClaimTypes.FamilyName, userInfo.family_name, null, subClaim?.Issuer, subClaim?.OriginalIssuer, subClaim?.Subject));
 
                             if (!string.IsNullOrWhiteSpace(userInfo.given_name))
-                                uClaims.Add(new Claim(JwtClaimTypes.GivenName, userInfo.given_name, null, subClaim.Issuer, subClaim.OriginalIssuer, subClaim.Subject));
+                                uClaims.Add(new Claim(JwtClaimTypes.GivenName, userInfo.given_name, null, subClaim?.Issuer, subClaim?.OriginalIssuer, subClaim?.Subject));
 
                             if (!string.IsNullOrWhiteSpace(userInfo.name))
-                                uClaims.Add(new Claim(JwtClaimTypes.Name, userInfo.name, null, subClaim.Issuer, subClaim.OriginalIssuer, subClaim.Subject));
+                                uClaims.Add(new Claim(JwtClaimTypes.Name, userInfo.name, null, subClaim?.Issuer, subClaim?.OriginalIssuer, subClaim?.Subject));
 
                             if (!string.IsNullOrWhiteSpace(userInfo.picture))
-                                uClaims.Add(new Claim(JwtClaimTypes.Picture, userInfo.picture, null, subClaim.Issuer, subClaim.OriginalIssuer, subClaim.Subject));
+                                uClaims.Add(new Claim(JwtClaimTypes.Picture, userInfo.picture, null, subClaim?.Issuer, subClaim?.OriginalIssuer, subClaim?.Subject));
 
                             if (!string.IsNullOrWhiteSpace(userInfo.preferred_username))
-                                uClaims.Add(new Claim(JwtClaimTypes.PreferredUserName, userInfo.preferred_username, null, subClaim.Issuer, subClaim.OriginalIssuer, subClaim.Subject));
+                                uClaims.Add(new Claim(JwtClaimTypes.PreferredUserName, userInfo.preferred_username, null, subClaim?.Issuer, subClaim?.OriginalIssuer, subClaim?.Subject));
 
-                            uClaims.Add(new Claim(JwtClaimTypes.EmailVerified, userInfo.email_verified.ToString().ToLower(), null, subClaim.Issuer, subClaim.OriginalIssuer, subClaim.Subject));
+                            uClaims.Add(new Claim(JwtClaimTypes.EmailVerified, userInfo.email_verified.ToString().ToLower(), null, subClaim?.Issuer, subClaim?.OriginalIssuer, subClaim?.Subject));
 
                             byte[] buffer;
                             using (var ms = new MemoryStream())
@@ -153,7 +153,7 @@ namespace Sheaft.Web.Api.Authorize
 
                             claims.AddRange(uClaims);
 
-                            await _cache.SetAsync(user.Identity.Name, buffer, new DistributedCacheEntryOptions { AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(_cacheOptions.Value.CacheExpirationInMinutes ?? 5), SlidingExpiration = TimeSpan.FromMinutes(_cacheOptions.Value.CacheExpirationInMinutes ?? 5) });
+                            await _cache.SetAsync(userInfo.sub, buffer, new DistributedCacheEntryOptions { AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(_cacheOptions.Value.CacheExpirationInMinutes ?? 5), SlidingExpiration = TimeSpan.FromMinutes(_cacheOptions.Value.CacheExpirationInMinutes ?? 5) });
                             _accessor.HttpContext.User = new ClaimsPrincipal(new ClaimsIdentity(claims, user.Identity.AuthenticationType, JwtClaimTypes.Subject, JwtClaimTypes.Role));
                         }
                     }
