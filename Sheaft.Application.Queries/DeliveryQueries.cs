@@ -41,7 +41,17 @@ namespace Sheaft.Application.Queries
         public async Task<IEnumerable<ProducerDeliveriesDto>> GetProducersDeliveriesAsync(IEnumerable<Guid> producerIds, IEnumerable<DeliveryKind> kinds, DateTimeOffset currentDate, RequestUser currentUser, CancellationToken token)
         {
             var list = new List<ProducerDeliveriesDto>();
-            var deliveriesMode = await _context.GetAsync<DeliveryMode>(d => producerIds.Contains(d.Producer.Id) && kinds.Contains(d.Kind), token);
+            var deliveriesMode = await _context.FindAsync<DeliveryMode>(d => producerIds.Contains(d.Producer.Id) && kinds.Contains(d.Kind), token);
+
+            var deliveriesProducerIds = deliveriesMode.Select(c => c.Producer.Id).Distinct();
+            var producerDistinctIds = producerIds.Distinct();
+            if (deliveriesProducerIds.Count() != producerDistinctIds.Count())
+            {
+                var notFoundProducerIds = deliveriesProducerIds.Except(producerDistinctIds);
+                var producers = await _context.FindAsync<Producer>(c => notFoundProducerIds.Contains(c.Id), token);
+
+                list.AddRange(producers.Select(c => new ProducerDeliveriesDto { Id = c.Id, Name = c.Name, Deliveries = null }));
+            }
 
             foreach (var deliveriesGroup in deliveriesMode.GroupBy(c => c.Producer.Id))
             {
@@ -81,9 +91,19 @@ namespace Sheaft.Application.Queries
 
         public async Task<IEnumerable<ProducerDeliveriesDto>> GetStoreDeliveriesForProducersAsync(Guid storeId, IEnumerable<Guid> producerIds, IEnumerable<DeliveryKind> kinds, DateTimeOffset currentDate, RequestUser currentUser, CancellationToken token)
         {
-            var agreements = await _context.GetAsync<Agreement>(d => producerIds.Contains(d.Delivery.Producer.Id) && d.Store.Id == storeId && d.Status == AgreementStatus.Accepted && kinds.Contains(d.Delivery.Kind), token);
-
             var list = new List<ProducerDeliveriesDto>();
+            var agreements = await _context.FindAsync<Agreement>(d => producerIds.Contains(d.Delivery.Producer.Id) && d.Store.Id == storeId && d.Status == AgreementStatus.Accepted && kinds.Contains(d.Delivery.Kind), token);
+
+            var agreementProducerIds = agreements.Select(c => c.Delivery.Producer.Id).Distinct();
+            var producerDistinctIds = producerIds.Distinct();
+            if (agreementProducerIds.Count() != producerDistinctIds.Count())
+            {
+                var notFoundProducerIds = agreementProducerIds.Except(producerDistinctIds);
+                var producers = await _context.FindAsync<Producer>(c => notFoundProducerIds.Contains(c.Id), token);
+
+                list.AddRange(producers.Select(c => new ProducerDeliveriesDto { Id = c.Id, Name = c.Name, Deliveries = null }));
+            }
+
             kinds ??= new List<DeliveryKind> {
                     DeliveryKind.ProducerToStore,
                     DeliveryKind.ExternalToStore
