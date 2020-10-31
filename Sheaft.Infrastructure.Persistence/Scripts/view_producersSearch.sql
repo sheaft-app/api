@@ -1,4 +1,4 @@
-﻿CREATE VIEW ProducersSearch
+﻿CREATE VIEW  [app].ProducersSearch
 as
 	select
      r.Id as producer_id

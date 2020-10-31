@@ -1,4 +1,4 @@
-CREATE VIEW ProducersPerDepartment
+CREATE VIEW  [app].ProducersPerDepartment
 AS
 select DepartmentId, DepartmentCode, DepartmentName, RegionId, RegionCode, RegionName, sum(Active) AS Active, sum(Created) as Created from (
 select d.Id as DepartmentId, d.Code as DepartmentCode, d.Name as DepartmentName, r.Id as RegionId, r.Code as RegionCode, r.Name as RegionName, case when count(p.Uid) > 0 then 1 else 0 end as Active, count(distinct(c.Uid)) as Created
@@ -12,7 +12,7 @@ group by c.Kind, d.Id, d.Code, d.Name, r.Id, r.Code, r.Name, c.RemovedOn
 group by DepartmentId, DepartmentCode, DepartmentName, RegionId, RegionCode, RegionName
 GO
 
-CREATE VIEW StoresPerDepartment
+CREATE VIEW  [app].StoresPerDepartment
 AS
 select DepartmentId, DepartmentCode, DepartmentName, RegionId, RegionCode, RegionName, sum(Active) AS Active, sum(Created) as Created from (
 select d.Id as DepartmentId, d.Code as DepartmentCode, d.Name as DepartmentName, r.Id as RegionId, r.Code as RegionCode, r.Name as RegionName, case when count(p.Uid) > 0 then 1 else 0 end as Active, count(distinct(c.Uid)) as Created

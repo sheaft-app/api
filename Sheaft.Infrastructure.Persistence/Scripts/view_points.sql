@@ -1,6 +1,6 @@
-DROP VIEW UserPointsPerDepartment
+DROP VIEW  [app].UserPointsPerDepartment
 GO
-CREATE VIEW UserPointsPerDepartment
+CREATE VIEW  [app].UserPointsPerDepartment
    WITH SCHEMABINDING
    AS
 SELECT UserId, Kind, Name, Picture, RegionId, DepartmentId, Points, Position
@@ -17,9 +17,9 @@ where Position <= 10
 GO
 
 
-DROP VIEW UserPointsPerRegion
+DROP VIEW  [app].UserPointsPerRegion
 GO
-CREATE VIEW UserPointsPerRegion
+CREATE VIEW  [app].UserPointsPerRegion
    WITH SCHEMABINDING
    AS
 SELECT UserId, Kind, Name, Picture, RegionId, Points, Position
@@ -36,9 +36,9 @@ where Position <= 10
 GO
 
 
-DROP VIEW UserPointsPerCountry
+DROP VIEW  [app].UserPointsPerCountry
 GO
-CREATE VIEW UserPointsPerCountry
+CREATE VIEW  [app].UserPointsPerCountry
    WITH SCHEMABINDING
    AS
 SELECT UserId, Kind, Name, Picture, Points, Position
@@ -52,9 +52,9 @@ where Position <= 10
 GO
 
 
-DROP VIEW PointsPerDepartment
+DROP VIEW  [app].PointsPerDepartment
 GO
-CREATE VIEW PointsPerDepartment
+CREATE VIEW  [app].PointsPerDepartment
    WITH SCHEMABINDING
    AS
 SELECT RegionId, RegionName, Code, DepartmentId, DepartmentName, Points, Users, Position
@@ -71,9 +71,9 @@ where Position <= 10
 GO
 
 
-DROP VIEW PointsPerRegion
+DROP VIEW  [app].PointsPerRegion
 GO
-CREATE VIEW PointsPerRegion
+CREATE VIEW  [app].PointsPerRegion
    WITH SCHEMABINDING
    AS
 SELECT RegionId, RegionName, Points, Users, Position
@@ -90,18 +90,18 @@ where Position <= 10
 GO
 
 
-DROP VIEW PointsPerCountry
+DROP VIEW  [app].PointsPerCountry
 GO
-CREATE VIEW PointsPerCountry
+CREATE VIEW  [app].PointsPerCountry
    WITH SCHEMABINDING
    AS
 select sum(TotalPoints) as Points, count(distinct Uid) as Users from app.Users
 GO
 
 
-DROP PROCEDURE UserPositionInDepartement
+DROP PROCEDURE  [app].UserPositionInDepartement
 GO
-CREATE PROCEDURE UserPositionInDepartement
+CREATE PROCEDURE  [app].UserPositionInDepartement
 @DepartmentId uniqueidentifier,
 @UserId uniqueidentifier
 AS 
@@ -121,9 +121,9 @@ END
 GO
 
 
-DROP PROCEDURE UserPositionInRegion
+DROP PROCEDURE  [app].UserPositionInRegion
 GO
-CREATE PROCEDURE UserPositionInRegion
+CREATE PROCEDURE  [app].UserPositionInRegion
 @RegionId uniqueidentifier,
 @UserId uniqueidentifier
 AS 
@@ -144,9 +144,9 @@ END
 GO
 
 
-DROP PROCEDURE UserPositionInCountry
+DROP PROCEDURE  [app].UserPositionInCountry
 GO
-CREATE PROCEDURE UserPositionInCountry
+CREATE PROCEDURE  [app].UserPositionInCountry
 @UserId uniqueidentifier
 AS 
 BEGIN

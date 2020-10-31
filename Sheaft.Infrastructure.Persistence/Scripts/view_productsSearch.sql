@@ -8,7 +8,7 @@ GO
 
 SET QUOTED_IDENTIFIER ON
 GO
-CREATE VIEW ProductsSearch
+CREATE VIEW [app].ProductsSearch
 as
     select
     p.Id as product_id
@@ -45,7 +45,7 @@ as
      , ra.Latitude as producer_latitude
      , geography::STGeomFromText('POINT('+convert(varchar(20),ra.Longitude)+' '+convert(varchar(20),ra.Latitude)+')',4326) as producer_geolocation
   from app.Products p
-    join app.Users r on r.Uid = p.ProducerUid and r.Kind = 0
+    join app.Users r on r.Uid = p.ProducerUid and r.Kind = 0 and p.CanDirectSell = 1
     join app.UserAddresses ra on r.Uid = ra.UserUid
 	join app.DeliveryModes dm on dm.ProducerUid = r.Uid and dm.Kind in (1, 2, 3, 4) 
     left join app.ProductTags pt on p.Uid = pt.ProductUid

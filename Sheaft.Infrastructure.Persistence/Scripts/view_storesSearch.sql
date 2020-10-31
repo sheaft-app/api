@@ -1,4 +1,4 @@
-﻿CREATE VIEW StoresSearch
+﻿CREATE VIEW  [app].StoresSearch
 as
     select
      r.Id as store_id

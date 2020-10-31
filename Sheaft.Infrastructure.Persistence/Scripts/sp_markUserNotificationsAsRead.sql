@@ -1,4 +1,4 @@
-CREATE PROCEDURE MarkUserNotificationsAsRead
+CREATE PROCEDURE  [app].MarkUserNotificationsAsRead
 @UserUid uniqueidentifier,
 @ReadBefore datetimeoffset
 AS 

@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using Microsoft.Extensions.Logging;
 using Microsoft.EntityFrameworkCore;
 using Sheaft.Exceptions;
+using Sheaft.Domain.Enums;
 
 namespace Sheaft.Application.Handlers
 {
@@ -50,7 +51,10 @@ namespace Sheaft.Application.Handlers
                 }
 
                 var entity = new DeliveryMode(Guid.NewGuid(), request.Kind, producer, request.LockOrderHoursBeforeDelivery, deliveryModeAddress, openingHours, request.Name, request.Description);
-                
+
+                if (request.Kind == DeliveryKind.Collective || request.Kind == DeliveryKind.Farm || request.Kind == DeliveryKind.Market)
+                    producer.CanDirectSell = true;
+
                 await _context.AddAsync(entity, token);
                 await _context.SaveChangesAsync(token);
 
@@ -84,6 +88,13 @@ namespace Sheaft.Application.Handlers
                     entity.SetOpeningHours(openingHours);
                 }
 
+                if (request.Kind == DeliveryKind.Collective || request.Kind == DeliveryKind.Farm || request.Kind == DeliveryKind.Market)
+                    producer.CanDirectSell = true;
+                else
+                {
+                    producer.CanDirectSell = await _context.DeliveryModes.AnyAsync(c => c.Producer.Id == request.RequestUser.Id && (c.Kind == DeliveryKind.Collective || c.Kind == DeliveryKind.Farm || c.Kind == DeliveryKind.Market), token);
+                }
+
                 await _context.SaveChangesAsync(token);
                 return Ok(true);
             });
@@ -99,6 +110,8 @@ namespace Sheaft.Application.Handlers
                     return BadRequest<bool>(MessageKind.DeliveryMode_CannotRemove_With_Active_Agreements, entity.Name, activeAgreements);
 
                 _context.Remove(entity);
+                entity.Producer.CanDirectSell = await _context.DeliveryModes.AnyAsync(c => c.Producer.Id == request.RequestUser.Id && (c.Kind == DeliveryKind.Collective || c.Kind == DeliveryKind.Farm || c.Kind == DeliveryKind.Market), token);
+
                 await _context.SaveChangesAsync(token);
 
                 return Ok(true);
