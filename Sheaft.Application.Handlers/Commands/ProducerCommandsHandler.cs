@@ -93,32 +93,6 @@ namespace Sheaft.Application.Handlers
                     if (!authResult.Success)
                         return Failed<Guid>(authResult.Exception);
 
-                    var deliveryResult = await _mediatr.Process(new CreateDeliveryModeCommand(request.RequestUser)
-                    {
-                        Address = request.Address != null ?
-                        new LocationAddressInput
-                        {
-                            Line1 = request.Address.Line1,
-                            Line2 = request.Address.Line2,
-                            Zipcode = request.Address.Zipcode,
-                            City = request.Address.City,
-                            Country = request.Address.Country,
-                            Longitude = request.Address.Longitude,
-                            Latitude = request.Address.Latitude
-                        } : null,
-                        Kind = DeliveryKind.Farm,
-                        LockOrderHoursBeforeDelivery = 48,
-                        Name = "Vente à la ferme (à modifier)",
-                        OpeningHours = new List<TimeSlotGroupInput>
-                        {
-                            new TimeSlotGroupInput{ Days = new List<DayOfWeek>{ DayOfWeek.Monday, DayOfWeek.Tuesday, DayOfWeek.Wednesday, DayOfWeek.Thursday, DayOfWeek.Friday }, From = TimeSpan.FromHours(16), To = TimeSpan.FromHours(19) },
-                            new TimeSlotGroupInput{ Days = new List<DayOfWeek>{ DayOfWeek.Saturday }, From = TimeSpan.FromHours(9), To = TimeSpan.FromHours(12) },
-                        }
-                    }, token);
-
-                    if(!deliveryResult.Success)
-                        return Failed<Guid>(deliveryResult.Exception);
-
                     var result = await _mediatr.Process(new CreateBusinessLegalCommand(request.RequestUser)
                     {
                         Address = request.Legals.Address,
