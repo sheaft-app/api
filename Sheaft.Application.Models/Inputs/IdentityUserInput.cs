@@ -5,13 +5,14 @@ namespace Sheaft.Application.Models
 {
     public class IdentityUserInput
     {
-        public IdentityUserInput(Guid id, string email, string name, string firstname, string lastname, IEnumerable<Guid> roles = null)
+        public IdentityUserInput(Guid id, string email, string name, string firstname, string lastname, string picture = null, IEnumerable<Guid> roles = null)
         {
             Id = id.ToString("N");
             Email = email;
             Name = name;
             FirstName = firstname;
             LastName = lastname;
+            Picture = picture;
             Roles = roles ?? new List<Guid>();
         }
 

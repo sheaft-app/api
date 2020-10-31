@@ -33,7 +33,7 @@ namespace Sheaft.Application.Handlers
         {
             return await ExecuteAsync(request, async () =>
             {
-                var result = await _authService.UpdateUserAsync(new Models.IdentityUserInput(request.UserId, request.Email, request.Name, request.FirstName, request.LastName, request.Roles), token);
+                var result = await _authService.UpdateUserAsync(new Models.IdentityUserInput(request.UserId, request.Email, request.Name, request.FirstName, request.LastName, request.Picture, request.Roles), token);
                 if (!result.Success)
                     return result;
 
