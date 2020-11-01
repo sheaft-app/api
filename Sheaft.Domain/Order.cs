@@ -133,7 +133,7 @@ namespace Sheaft.Domain.Models
 
             foreach (var orderDelivery in orderDeliveries)
             {
-                _deliveries.Add(new OrderDelivery(orderDelivery.Item1, orderDelivery.Item2, orderDelivery.Item3));
+                _deliveries.Add(new OrderDelivery(orderDelivery.Item1, orderDelivery.Item2, orderDelivery.Item3));            
             }
         }
 
@@ -141,8 +141,7 @@ namespace Sheaft.Domain.Models
         {
             DonationKind = kind;
             RefreshFees();
-        }
-        
+        }        
 
         public void SetReference(string reference)
         {

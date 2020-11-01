@@ -9,6 +9,8 @@ namespace Sheaft.Domain.Models
         }
         public OrderDelivery(DeliveryMode delivery, DateTimeOffset expectedDeliveryDate, string comment = null)
         {
+            new ExpectedDelivery(delivery, expectedDeliveryDate);
+
             Id = delivery.Id;
             DeliveryMode = delivery;
             ExpectedDeliveryDate = expectedDeliveryDate;

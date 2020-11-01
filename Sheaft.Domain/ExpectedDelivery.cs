@@ -48,9 +48,15 @@ namespace Sheaft.Domain.Models
 
         private TimeSlotHour GetOpeningHour(DeliveryMode delivery, DateTimeOffset expectedDeliveryDate)
         {
+            if (delivery.RemovedOn.HasValue)
+                throw new ValidationException(MessageKind.ExpectedDelivery_ExpectedDate_DeliveryRemoved, delivery.Name, expectedDeliveryDate);
+
             var oh = delivery.OpeningHours.FirstOrDefault(o => o.Day == expectedDeliveryDate.DayOfWeek && o.From <= expectedDeliveryDate.TimeOfDay && o.To >= expectedDeliveryDate.TimeOfDay);
             if(oh == null)
-                throw new ValidationException(MessageKind.ExpectedDelivery_ExpectedDate_NotIn_DeliveryOpeningHours);
+                throw new ValidationException(MessageKind.ExpectedDelivery_ExpectedDate_NotIn_DeliveryOpeningHours, delivery.Name, expectedDeliveryDate);
+
+            if(delivery.LockOrderHoursBeforeDelivery > 0 && expectedDeliveryDate.AddHours(-delivery.LockOrderHoursBeforeDelivery) < DateTime.UtcNow)
+                throw new ValidationException(MessageKind.ExpectedDelivery_ExpectedDate_OrdersLocked, delivery.Name, expectedDeliveryDate);
 
             return oh;
         }

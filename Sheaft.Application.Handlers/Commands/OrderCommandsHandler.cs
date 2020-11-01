@@ -50,9 +50,12 @@ namespace Sheaft.Application.Handlers
             return await ExecuteAsync(request, async () =>
             {
                 var productIds = request.Products.Select(p => p.Id);
-                var products = await _context.GetByIdsAsync<Product>(productIds, token);
-                if (products.Any(p => !p.Available))
-                    return BadRequest<Guid>(MessageKind.Order_CannotCreate_Some_Products_NotAvailable);
+                var products = await _context.FindByIdsAsync<Product>(productIds, token);
+
+                var invalidProductIds = products.Where(p => p.RemovedOn.HasValue || !p.Available || !p.VisibleToConsumers || p.Producer.RemovedOn.HasValue || !p.Producer.CanDirectSell);
+
+                if (invalidProductIds.Any())
+                    return BadRequest<Guid>(MessageKind.Order_CannotCreate_Some_Products_Invalid, invalidProductIds.ToArray());
 
                 var cartProducts = new Dictionary<Product, int>();
                 foreach (var product in products)
@@ -88,12 +91,12 @@ namespace Sheaft.Application.Handlers
                 using (var transaction = await _context.BeginTransactionAsync(token))
                 {
                     var productIds = request.Products.Select(p => p.Id);
-                    var products = await _context.GetByIdsAsync<Product>(productIds, token);
-                    if (products.Any(p => !p.Available))
-                        return BadRequest<IEnumerable<Guid>>(MessageKind.Order_CannotCreate_Some_Products_NotAvailable);
+                    var products = await _context.FindByIdsAsync<Product>(productIds, token);
 
-                    if (products.Any(p => !p.VisibleToStores))
-                        return BadRequest<IEnumerable<Guid>>(MessageKind.Order_CannotCreate_Some_Products_NotVisible);
+                    var invalidProductIds = products.Where(p => p.RemovedOn.HasValue || !p.Available || !p.VisibleToStores || p.Producer.RemovedOn.HasValue || !p.Producer.CanDirectSell);
+
+                    if (invalidProductIds.Any())
+                        return BadRequest<IEnumerable<Guid>>(MessageKind.Order_CannotCreate_Some_Products_Invalid, invalidProductIds.ToArray());
 
                     var cartProducts = new Dictionary<Product, int>();
                     foreach (var product in products)
@@ -168,12 +171,11 @@ namespace Sheaft.Application.Handlers
                 var entity = await _context.GetByIdAsync<Order>(request.Id, token);
 
                 var productIds = request.Products.Select(p => p.Id);
-                var products = await _context.GetByIdsAsync<Product>(productIds, token);
-                if (products.Any(p => !p.Available))
-                    return BadRequest<bool>(MessageKind.Order_CannotCreate_Some_Products_NotAvailable);
+                var products = await _context.FindByIdsAsync<Product>(productIds, token);
+                var invalidProductIds = products.Where(p => p.RemovedOn.HasValue || !p.Available || !p.VisibleToConsumers || p.Producer.RemovedOn.HasValue || !p.Producer.CanDirectSell);
 
-                if (products.Any(p => !p.VisibleToConsumers))
-                    return BadRequest<bool>(MessageKind.Order_CannotCreate_Some_Products_NotVisible);
+                if (invalidProductIds.Any())
+                    return BadRequest<bool>(MessageKind.Order_CannotUpdate_Some_Products_Invalid, invalidProductIds.ToArray());
 
                 var cartProducts = new Dictionary<Product, int>();
                 foreach (var product in products)
@@ -212,11 +214,10 @@ namespace Sheaft.Application.Handlers
                     return BadRequest<Guid>(MessageKind.Order_CannotPay_Deliveries_Required);
 
                 var products = await _context.GetByIdsAsync<Product>(order.Products.Select(p => p.Id), token);
-                if (products.Any(p => !p.Available))
-                    return BadRequest<Guid>(MessageKind.Order_CannotPay_Some_Products_NotAvailable);
+                var invalidProductIds = products.Where(p => p.RemovedOn.HasValue || !p.Available || !p.VisibleToConsumers || p.Producer.RemovedOn.HasValue || !p.Producer.CanDirectSell);
 
-                if (products.Any(p => !p.VisibleToConsumers))
-                    return BadRequest<Guid>(MessageKind.Order_CannotPay_Some_Products_NotVisible);
+                if (invalidProductIds.Any())
+                    return BadRequest<Guid>(MessageKind.Order_CannotPay_Some_Products_Invalid, invalidProductIds.ToArray());
 
                 using (var transaction = await _context.BeginTransactionAsync(token))
                 {
