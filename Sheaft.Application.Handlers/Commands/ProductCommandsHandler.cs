@@ -355,7 +355,7 @@ namespace Sheaft.Application.Handlers
             {
                 Reference = worksheet.Cells[i, 1].GetValue<string>(),
                 Name = nameStr,
-                Description = worksheet.Cells[i, 11].GetValue<string>()
+                Description = worksheet.Cells[i, 10].GetValue<string>()
             };
 
             var wholeSalePriceStr = worksheet.Cells[i, 3].GetValue<string>()?.ToLowerInvariant().Replace(" ", "").Replace(",", ".").Replace("€", "");
@@ -365,7 +365,6 @@ namespace Sheaft.Application.Handlers
             var unitKindStr = worksheet.Cells[i, 7].GetValue<string>()?.ToLowerInvariant().Replace(" ", "").Replace(",", ".").Split(",").Select(t => t.Trim()).FirstOrDefault();
             var tagsStr = worksheet.Cells[i, 8].GetValue<string>()?.ToLowerInvariant().Replace("\"", "").Replace("'", "").Replace(".", ",").Split(",").Select(t => t.Trim()).FirstOrDefault();
             var bioStr = worksheet.Cells[i, 9].GetValue<string>()?.ToLowerInvariant().Replace(" ", "");
-            var availableStr = worksheet.Cells[i, 10].GetValue<string>()?.ToLowerInvariant().Replace(" ", "");
 
             if (!decimal.TryParse(wholeSalePriceStr, NumberStyles.Any, new CultureInfo("en-US"), out decimal wholeSalePrice))
                 return Failed<CreateProductCommand>(new ValidationException(MessageKind.CreateProduct_WholeSalePrice_Invalid_Line, i));
@@ -412,16 +411,6 @@ namespace Sheaft.Application.Handlers
                     createProductCommand.Unit = unitKind;
             }
 
-            switch (availableStr)
-            {
-                case "non":
-                    createProductCommand.Available = false;
-                    break;
-                default:
-                    createProductCommand.Available = true;
-                    break;
-            }
-
             if (tagsStr.EndsWith('s'))
                 tagsStr = tagsStr.Substring(0, tagsStr.Length - 1);
 
@@ -437,6 +426,7 @@ namespace Sheaft.Application.Handlers
             var tags = await _context.FindAsync<Tag>(t => tagsAsStr.Any(c => c.Contains(t.Name.ToLower())), token);
             createProductCommand.Tags = tags.Select(t => t.Id);
 
+            createProductCommand.Available = false;
             createProductCommand.VisibleToConsumers = false;
             createProductCommand.VisibleToStores = false;
             createProductCommand.SkipUpdateProducerTags = true;
