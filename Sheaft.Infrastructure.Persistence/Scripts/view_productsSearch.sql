@@ -39,13 +39,13 @@ as
 			when p.Conditioning = 4 then 'BUNCH'
 			when p.Conditioning = 5 then 'PIECE' end as product_conditioning
      , app.InlineMax(app.InlineMax(app.InlineMax(p.UpdatedOn, r.UpdatedOn), t.UpdatedOn), p.CreatedOn) as last_update
-     , case when (app.InlineMax(p.RemovedOn, r.RemovedOn)) is null then 0 else 1 end as removed
+     , case when (app.InlineMax(p.RemovedOn, r.RemovedOn)) is not null or r.CanDirectSell = 0 then 1 else 0 end as removed
      , '[' + STRING_AGG('"' + LOWER(t.Name) + '"', ',') + ']' as product_tags     
      , ra.Longitude as producer_longitude
      , ra.Latitude as producer_latitude
      , geography::STGeomFromText('POINT('+convert(varchar(20),ra.Longitude)+' '+convert(varchar(20),ra.Latitude)+')',4326) as producer_geolocation
   from app.Products p
-    join app.Users r on r.Uid = p.ProducerUid and r.Kind = 0 and p.CanDirectSell = 1
+    join app.Users r on r.Uid = p.ProducerUid and r.Kind = 0
     join app.UserAddresses ra on r.Uid = ra.UserUid
 	join app.DeliveryModes dm on dm.ProducerUid = r.Uid and dm.Kind in (1, 2, 3, 4) 
     left join app.ProductTags pt on p.Uid = pt.ProductUid
@@ -81,6 +81,6 @@ as
     ra.Zipcode,
     ra.City,
     app.InlineMax(app.InlineMax(app.InlineMax(p.UpdatedOn, r.UpdatedOn), t.UpdatedOn), p.CreatedOn),
-    case when (app.InlineMax(p.RemovedOn, r.RemovedOn)) is null then 0 else 1 end,
+    case when (app.InlineMax(p.RemovedOn, r.RemovedOn)) is not null or r.CanDirectSell = 0 then 1 else 0 end,
     ra.Longitude,
     ra.Latitude
