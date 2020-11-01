@@ -52,7 +52,7 @@ namespace Sheaft.Application.Handlers
                 job.User.Email,
                 job.User.Name,
                 $"L'import de votre catalogue produit a échoué",
-                nameof(ProductImportSucceededEvent),
+                nameof(ProductImportFailedEvent),
                 new ProductImportMailerModel { UserName = job.User.Name, Name = job.Name, CreatedOn = job.CreatedOn, JobUrl = url },
                 true,
                 token);
