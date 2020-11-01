@@ -79,11 +79,11 @@ namespace Sheaft.Localization.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to L&apos;adresse {0} n&apos;est plus disponible.
+        ///   Looks up a localized string similar to Le pays est requis.
         /// </summary>
-        internal static string Address_Gone {
+        internal static string Address_Country_Required {
             get {
-                return ResourceManager.GetString("Address_Gone", resourceCulture);
+                return ResourceManager.GetString("Address_Country_Required", resourceCulture);
             }
         }
         
@@ -97,15 +97,6 @@ namespace Sheaft.Localization.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to L&apos;adresse {0} est introuvable.
-        /// </summary>
-        internal static string Address_NotFound {
-            get {
-                return ResourceManager.GetString("Address_NotFound", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Le code postal est requis.
         /// </summary>
         internal static string Address_Zipcode_Required {
@@ -115,7 +106,7 @@ namespace Sheaft.Localization.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Accord.
+        ///   Looks up a localized string similar to Accord commercial.
         /// </summary>
         internal static string Agreement {
             get {
@@ -124,7 +115,7 @@ namespace Sheaft.Localization.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to L&apos;accord ne peut pas être accepté, il n&apos;est pas en attente d&apos;acceptation.
+        ///   Looks up a localized string similar to L&apos;accord commercial ne peut pas être accepté, il n&apos;est pas en attente.
         /// </summary>
         internal static string Agreement_CannotBeAccepted_NotInWaitingStatus {
             get {
@@ -133,7 +124,7 @@ namespace Sheaft.Localization.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to L&apos;accord ne peut pas être annulé, il a déjà été annulé.
+        ///   Looks up a localized string similar to L&apos;accord commercial ne peut pas être annulé, il l&apos;a déjà été.
         /// </summary>
         internal static string Agreement_CannotBeCancelled_AlreadyCancelled {
             get {
@@ -142,7 +133,7 @@ namespace Sheaft.Localization.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to L&apos;accord ne peut pas être annulé, il a déjà été refusé.
+        ///   Looks up a localized string similar to L&apos;accord commercial ne peut pas être refusé, il l&apos;a déjà été.
         /// </summary>
         internal static string Agreement_CannotBeCancelled_AlreadyRefused {
             get {
@@ -151,7 +142,7 @@ namespace Sheaft.Localization.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to L&apos;accord ne peut pas être refusé, il n&apos;est pas en attente d&apos;acceptation.
+        ///   Looks up a localized string similar to L&apos;accord commercial ne peut pas être refusé, il n&apos;est pas en attente.
         /// </summary>
         internal static string Agreement_CannotBeRefused_NotInWaitingStatus {
             get {
@@ -160,25 +151,7 @@ namespace Sheaft.Localization.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to L&apos;accord {0} n&apos;est plus disponible.
-        /// </summary>
-        internal static string Agreement_Gone {
-            get {
-                return ResourceManager.GetString("Agreement_Gone", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to L&apos;accord {0} est introuvable.
-        /// </summary>
-        internal static string Agreement_NotFound {
-            get {
-                return ResourceManager.GetString("Agreement_NotFound", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to L&apos;heure selectionnée pour l&apos;accord est introuvable dans les horaires disponibles.
+        ///   Looks up a localized string similar to L&apos;horaire sélectionné est introuvable dans la liste des horaires disponibles.
         /// </summary>
         internal static string Agreement_SelectedHour_NotFoundInDeliveryOpeningHours {
             get {
@@ -187,7 +160,16 @@ namespace Sheaft.Localization.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to La requête reçue est invalide, veuillez rafraichir la page et réessayer votre demande..
+        ///   Looks up a localized string similar to Une ressource {0} existe déjà.
+        /// </summary>
+        internal static string AlreadyExists {
+            get {
+                return ResourceManager.GetString("AlreadyExists", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Votre requête concernant la ressource {0} est invalide.
         /// </summary>
         internal static string BadRequest {
             get {
@@ -196,88 +178,16 @@ namespace Sheaft.Localization.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Société.
+        ///   Looks up a localized string similar to Compte en banque.
         /// </summary>
-        internal static string Company {
+        internal static string BankAccount {
             get {
-                return ResourceManager.GetString("Company", resourceCulture);
+                return ResourceManager.GetString("BankAccount", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to L&apos;adresse de la société est requise.
-        /// </summary>
-        internal static string Company_Address_Required {
-            get {
-                return ResourceManager.GetString("Company_Address_Required", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to L&apos;adresse email de contact est requis.
-        /// </summary>
-        internal static string Company_Email_Required {
-            get {
-                return ResourceManager.GetString("Company_Email_Required", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to La société {0} n&apos;est plus disponible.
-        /// </summary>
-        internal static string Company_Gone {
-            get {
-                return ResourceManager.GetString("Company_Gone", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Le nom de la société est requis.
-        /// </summary>
-        internal static string Company_Name_Required {
-            get {
-                return ResourceManager.GetString("Company_Name_Required", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to La société {0} est introuvable.
-        /// </summary>
-        internal static string Company_NotFound {
-            get {
-                return ResourceManager.GetString("Company_NotFound", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Le numéro de SIRET est requis.
-        /// </summary>
-        internal static string Company_Siret_Required {
-            get {
-                return ResourceManager.GetString("Company_Siret_Required", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Le tag spécifié pour la société est introuvable.
-        /// </summary>
-        internal static string Company_TagNotFound {
-            get {
-                return ResourceManager.GetString("Company_TagNotFound", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Le numéro de TVA est requis.
-        /// </summary>
-        internal static string Company_Vat_Required {
-            get {
-                return ResourceManager.GetString("Company_Vat_Required", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to {0} a été modifié(e) depuis votre dernière requête, veuillez rafraichir la page et réexecuter votre demande..
+        ///   Looks up a localized string similar to La ressource {0} a déjà été mise à jour en parallèle de votre demande, veuillez renouvelez votre demande..
         /// </summary>
         internal static string Conflict {
             get {
@@ -286,7 +196,97 @@ namespace Sheaft.Localization.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to La référence {0} existe déjà.
+        ///   Looks up a localized string similar to Consommateur.
+        /// </summary>
+        internal static string Consumer {
+            get {
+                return ResourceManager.GetString("Consumer", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Impossible de supprimer votre compte, vous avez des commandes en cours.
+        /// </summary>
+        internal static string Consumer_CannotBeDeleted_HasActiveOrders {
+            get {
+                return ResourceManager.GetString("Consumer_CannotBeDeleted_HasActiveOrders", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Votre email est requis.
+        /// </summary>
+        internal static string Consumer_Email_Required {
+            get {
+                return ResourceManager.GetString("Consumer_Email_Required", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Votre prénom est requis.
+        /// </summary>
+        internal static string Consumer_Firstname_Required {
+            get {
+                return ResourceManager.GetString("Consumer_Firstname_Required", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to L&apos;identifiant du consomateur est invalide.
+        /// </summary>
+        internal static string Consumer_Id_Invalid {
+            get {
+                return ResourceManager.GetString("Consumer_Id_Invalid", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Votre nom est requis.
+        /// </summary>
+        internal static string Consumer_Lastname_Required {
+            get {
+                return ResourceManager.GetString("Consumer_Lastname_Required", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Pays.
+        /// </summary>
+        internal static string Country {
+            get {
+                return ResourceManager.GetString("Country", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Le conditionnement du produit est invalide à la ligne {0}.
+        /// </summary>
+        internal static string CreateProduct_Conditioning_Invalid_Line {
+            get {
+                return ResourceManager.GetString("CreateProduct_Conditioning_Invalid_Line", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Le nom du produit est requis à la ligne {0}.
+        /// </summary>
+        internal static string CreateProduct_Name_Required_Line {
+            get {
+                return ResourceManager.GetString("CreateProduct_Name_Required_Line", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to La quantité de conditionnement est invalide à la ligne {0}.
+        /// </summary>
+        internal static string CreateProduct_QtyPerUnit_Invalid_Line {
+            get {
+                return ResourceManager.GetString("CreateProduct_QtyPerUnit_Invalid_Line", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to La référence du produit à la ligne {0} existe déjà dans votre catalogue.
         /// </summary>
         internal static string CreateProduct_Reference_AlreadyExists {
             get {
@@ -295,29 +295,56 @@ namespace Sheaft.Localization.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Suppression impossible, le compte possède des commandes actives.
+        ///   Looks up a localized string similar to L&apos;unité de conditionnement du produit est invalide à la ligne {0}.
         /// </summary>
-        internal static string DeleteUser_CannotBeDeleted_CompanyHasActiveOrders {
+        internal static string CreateProduct_UnitKind_Invalid_Line {
             get {
-                return ResourceManager.GetString("DeleteUser_CannotBeDeleted_CompanyHasActiveOrders", resourceCulture);
+                return ResourceManager.GetString("CreateProduct_UnitKind_Invalid_Line", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Suppression impossible, vous possédez des commandes actives.
+        ///   Looks up a localized string similar to La TVA du produit est invalide à la ligne {0}.
         /// </summary>
-        internal static string DeleteUser_CannotBeDeleted_HasActiveOrders {
+        internal static string CreateProduct_Vat_Invalid_Line {
             get {
-                return ResourceManager.GetString("DeleteUser_CannotBeDeleted_HasActiveOrders", resourceCulture);
+                return ResourceManager.GetString("CreateProduct_Vat_Invalid_Line", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Une erreur est survenue lors de la suppression de l&apos;identité unifiée du compte : {0}.
+        ///   Looks up a localized string similar to Le prix HT du produit est requis à la ligne {0}.
         /// </summary>
-        internal static string DeleteUser_Oidc_DeleteProfile_Error {
+        internal static string CreateProduct_WholeSalePrice_Invalid_Line {
             get {
-                return ResourceManager.GetString("DeleteUser_Oidc_DeleteProfile_Error", resourceCulture);
+                return ResourceManager.GetString("CreateProduct_WholeSalePrice_Invalid_Line", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Déclaration.
+        /// </summary>
+        internal static string Declaration {
+            get {
+                return ResourceManager.GetString("Declaration", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Impossible d&apos;envoyer la déclaration UBO, elle n&apos;a pas été validée par le support.
+        /// </summary>
+        internal static string Declaration_CannotSubmit_NotLocked {
+            get {
+                return ResourceManager.GetString("Declaration_CannotSubmit_NotLocked", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to La déclaration est invalide.
+        /// </summary>
+        internal static string Declaration_NotValidated {
+            get {
+                return ResourceManager.GetString("Declaration_NotValidated", resourceCulture);
             }
         }
         
@@ -331,7 +358,7 @@ namespace Sheaft.Localization.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Impossible de supprimer le mode de livraison {0}, {1} accords actif sont rattachés (annuler les accords avant de pouvoir supprimer ce mode de livraison, ou contactez notre support).
+        ///   Looks up a localized string similar to Impossible de supprimer ce mode de livraison, certains de vos accords commerciaux en dépende. Annuler d&apos;abord ces accords..
         /// </summary>
         internal static string DeliveryMode_CannotRemove_With_Active_Agreements {
             get {
@@ -340,29 +367,11 @@ namespace Sheaft.Localization.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Le mode de livraison {0} n&apos;est plus disponible.
-        /// </summary>
-        internal static string DeliveryMode_Gone {
-            get {
-                return ResourceManager.GetString("DeliveryMode_Gone", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to La durée en heures du vérouillage de prise de commande avant la livraison ne peut pas être inférieur ou égal à {0}.
+        ///   Looks up a localized string similar to Le vérouillage des commandes en heures avant la livraison ne peut pas être inférieur à {0}.
         /// </summary>
         internal static string DeliveryMode_LockOrderHoursBeforeDelivery_CannotBe_LowerThan {
             get {
                 return ResourceManager.GetString("DeliveryMode_LockOrderHoursBeforeDelivery_CannotBe_LowerThan", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Le mode de livraison {0} est introuvable.
-        /// </summary>
-        internal static string DeliveryMode_NotFound {
-            get {
-                return ResourceManager.GetString("DeliveryMode_NotFound", resourceCulture);
             }
         }
         
@@ -376,43 +385,88 @@ namespace Sheaft.Localization.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Le département {0} n&apos;est plus disponible.
+        ///   Looks up a localized string similar to Document.
         /// </summary>
-        internal static string Department_Gone {
+        internal static string Document {
             get {
-                return ResourceManager.GetString("Department_Gone", resourceCulture);
+                return ResourceManager.GetString("Document", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Le département {0} est introuvable.
+        ///   Looks up a localized string similar to Impossible de créer le document, un document de ce type existe déjà.
         /// </summary>
-        internal static string Department_NotFound {
+        internal static string Document_CannotCreate_Type_Already_Present {
             get {
-                return ResourceManager.GetString("Department_NotFound", resourceCulture);
+                return ResourceManager.GetString("Document_CannotCreate_Type_Already_Present", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to L&apos;adresse email pour l&apos;enregistrement à la newsletter est invalide.
+        ///   Looks up a localized string similar to Impossible d&apos;envoyer le document, il n&apos;a pas été validé par le support.
         /// </summary>
-        internal static string EmailProvider_Newsletter_Email_Invalid {
+        internal static string Document_CannotSubmit_NotLocked {
             get {
-                return ResourceManager.GetString("EmailProvider_Newsletter_Email_Invalid", resourceCulture);
+                return ResourceManager.GetString("Document_CannotSubmit_NotLocked", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to L&apos;enregistrement à la newsletter a échoué.
+        ///   Looks up a localized string similar to Impossible de modifier le type du document, un document de ce nouveau type existe déjà.
         /// </summary>
-        internal static string EmailProvider_Newsletter_RegisterFailure {
+        internal static string Document_CannotUpdate_Another_Document_With_Type_Exists {
             get {
-                return ResourceManager.GetString("EmailProvider_Newsletter_RegisterFailure", resourceCulture);
+                return ResourceManager.GetString("Document_CannotUpdate_Another_Document_With_Type_Exists", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to L&apos;envoi d&apos;email a échoué.
+        ///   Looks up a localized string similar to Une erreur s&apos;est produite lors de l&apos;envoi du document.
+        /// </summary>
+        internal static string Document_Errors_On_Submit {
+            get {
+                return ResourceManager.GetString("Document_Errors_On_Submit", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Don.
+        /// </summary>
+        internal static string Donation {
+            get {
+                return ResourceManager.GetString("Donation", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Impossible de créer un don pour le panier, il possède déjà un don validé.
+        /// </summary>
+        internal static string Donation_CannotCreate_AlreadySucceeded {
+            get {
+                return ResourceManager.GetString("Donation_CannotCreate_AlreadySucceeded", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Impossible de créer un don pour le panier, un don est déjà en cours.
+        /// </summary>
+        internal static string Donation_CannotCreate_PendingDonation {
+            get {
+                return ResourceManager.GetString("Donation_CannotCreate_PendingDonation", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Impossible d&apos;assigner le don au panier, il possède déjà un don validé.
+        /// </summary>
+        internal static string Donation_CannotSet_Already_Succeeded {
+            get {
+                return ResourceManager.GetString("Donation_CannotSet_Already_Succeeded", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Une erreur est survenue lors de l&apos;envoi de l&apos;email.
         /// </summary>
         internal static string EmailProvider_SendEmail_Failure {
             get {
@@ -421,7 +475,7 @@ namespace Sheaft.Localization.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Une erreur générique a été générée.
+        ///   Looks up a localized string similar to Erreur.
         /// </summary>
         internal static string Error {
             get {
@@ -430,7 +484,7 @@ namespace Sheaft.Localization.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Livraison attendue.
+        ///   Looks up a localized string similar to Date de livraison attendue.
         /// </summary>
         internal static string ExpectedDelivery {
             get {
@@ -439,7 +493,7 @@ namespace Sheaft.Localization.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to La date de livraison sélectionnée ne peut pas être antérieure à la date du jour.
+        ///   Looks up a localized string similar to La date de livraison {1} du point de vente {0} ne peut pas être avant aujourd&apos;hui.
         /// </summary>
         internal static string ExpectedDelivery_ExpectedDate_CannotBe_BeforeNow {
             get {
@@ -448,7 +502,16 @@ namespace Sheaft.Localization.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to La date de livraison sélectionnée n&apos;est pas située dans les horaires disponibles du producteur.
+        ///   Looks up a localized string similar to La date de livraison {1} ne peut pas être validée, le point de vente {0} n&apos;existe plus.
+        /// </summary>
+        internal static string ExpectedDelivery_ExpectedDate_DeliveryRemoved {
+            get {
+                return ResourceManager.GetString("ExpectedDelivery_ExpectedDate_DeliveryRemoved", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to La date de livraison {1} ne se trouve pas dans la liste des livraisons disponibles pour le point de vente {0}.
         /// </summary>
         internal static string ExpectedDelivery_ExpectedDate_NotIn_DeliveryOpeningHours {
             get {
@@ -457,25 +520,16 @@ namespace Sheaft.Localization.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to La livraison attendue {0} n&apos;est plus disponible.
+        ///   Looks up a localized string similar to La date de livraison {1} ne peut pas être validée pour le point de vente {0}, la date limite de commande est passée.
         /// </summary>
-        internal static string ExpectedDelivery_Gone {
+        internal static string ExpectedDelivery_ExpectedDate_OrdersLocked {
             get {
-                return ResourceManager.GetString("ExpectedDelivery_Gone", resourceCulture);
+                return ResourceManager.GetString("ExpectedDelivery_ExpectedDate_OrdersLocked", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to La livraison attendue {0} est introuvable.
-        /// </summary>
-        internal static string ExpectedDelivery_NotFound {
-            get {
-                return ResourceManager.GetString("ExpectedDelivery_NotFound", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Vous n&apos;êtes pas autorisé a accéder à cette ressource.
+        ///   Looks up a localized string similar to Vous n&apos;êtes pas autorisé à accéder à la ressource {0}.
         /// </summary>
         internal static string Forbidden {
             get {
@@ -484,7 +538,7 @@ namespace Sheaft.Localization.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to {0} n&apos;est plus accessible, elle a été supprimée.
+        ///   Looks up a localized string similar to La ressource {0} n&apos;est plus disponible.
         /// </summary>
         internal static string Gone {
             get {
@@ -493,7 +547,7 @@ namespace Sheaft.Localization.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to La génération du code de parainage a échouée.
+        ///   Looks up a localized string similar to Une erreur est survenue lors de la génération du code de parainage.
         /// </summary>
         internal static string Identifier_SponsorCode_Error {
             get {
@@ -502,7 +556,7 @@ namespace Sheaft.Localization.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to La génération de l&apos;identifiant unique a échouée.
+        ///   Looks up a localized string similar to Une erreur est survenue pendant la génération d&apos;un identifiant unique.
         /// </summary>
         internal static string Identifier_Uuid_Error {
             get {
@@ -511,7 +565,7 @@ namespace Sheaft.Localization.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Le fichier d&apos;import de catalogue est invalide, il manque l&apos;onglet principal des produits..
+        ///   Looks up a localized string similar to Le fichier d&apos;import est invalide, il manque un onglet .
         /// </summary>
         internal static string ImportProduct_Missing_Tab {
             get {
@@ -520,38 +574,11 @@ namespace Sheaft.Localization.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Le nom du produit est requis, ligne {0}.
-        /// </summary>
-        internal static string ImportProduct_Name_Required_Line {
-            get {
-                return ResourceManager.GetString("ImportProduct_Name_Required_Line", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to La référence du produit existe déjà, ligne {0}.
+        ///   Looks up a localized string similar to La référence du produit à la ligne {0} existe déjà dans votre catalogue.
         /// </summary>
         internal static string ImportProduct_Reference_AlreadyExists {
             get {
                 return ResourceManager.GetString("ImportProduct_Reference_AlreadyExists", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Le taux de TVA du produit est invalide, ligne {0}.
-        /// </summary>
-        internal static string ImportProduct_Vat_Invalid_Line {
-            get {
-                return ResourceManager.GetString("ImportProduct_Vat_Invalid_Line", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Le prix HT du produit est invalide, ligne {0}.
-        /// </summary>
-        internal static string ImportProduct_WholeSalePrice_Invalid_Line {
-            get {
-                return ResourceManager.GetString("ImportProduct_WholeSalePrice_Invalid_Line", resourceCulture);
             }
         }
         
@@ -565,7 +592,7 @@ namespace Sheaft.Localization.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Seule une tâche échouée, terminée ou annulée peut être archivée.
+        ///   Looks up a localized string similar to Impossible d&apos;archiver la tâche, elle n&apos;est pas dans un état terminée.
         /// </summary>
         internal static string Job_CannotArchive_NotIn_TerminatedStatus {
             get {
@@ -592,7 +619,7 @@ namespace Sheaft.Localization.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Impossible de terminer la tâche, elle n&apos;est pas en cours de traitement.
+        ///   Looks up a localized string similar to Impossible de compléter la tâche, elle n&apos;est pas en cours de traitement.
         /// </summary>
         internal static string Job_CannotComplete_NotIn_ProcessingStatus {
             get {
@@ -601,7 +628,7 @@ namespace Sheaft.Localization.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Impossible de passer la tâche en échouée, elle a déjà été annulée.
+        ///   Looks up a localized string similar to Impossible de déclarer la tâche en erreur, elle est déjà annulée.
         /// </summary>
         internal static string Job_CannotFail_AlreadyCancelled {
             get {
@@ -610,7 +637,7 @@ namespace Sheaft.Localization.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Impossible de passer la tâche en échouée, elle est déjà terminée.
+        ///   Looks up a localized string similar to Impossible de déclarer la tâche en erreur, elle est déjà terminée.
         /// </summary>
         internal static string Job_CannotFail_AlreadyDone {
             get {
@@ -628,7 +655,7 @@ namespace Sheaft.Localization.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Impossible de reprendre la tâche, elle n&apos;est pas en pause.
+        ///   Looks up a localized string similar to Impossible de reprendre l&apos;execution de la tâche, elle n&apos;est pas en pause.
         /// </summary>
         internal static string Job_CannotResume_NotIn_PausedStatus {
             get {
@@ -637,7 +664,7 @@ namespace Sheaft.Localization.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Impossible de ré-éxecuter la tâche, elle n&apos;est pas annulée ou échouée.
+        ///   Looks up a localized string similar to Impossible de reessayer d&apos;executer la tâche, elle n&apos;est pas dans un état annulée ou en erreur.
         /// </summary>
         internal static string Job_CannotRetry_NotIn_CanncelledOrFailedStatus {
             get {
@@ -646,20 +673,29 @@ namespace Sheaft.Localization.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to La commande pour la tâche est requise.
+        ///   Looks up a localized string similar to Impossible de lancer la tâche, une date de début d&apos;execution est déjà présente.
         /// </summary>
-        internal static string Job_Command_Required {
+        internal static string Job_CannotStart_Has_StartedOnDate {
             get {
-                return ResourceManager.GetString("Job_Command_Required", resourceCulture);
+                return ResourceManager.GetString("Job_CannotStart_Has_StartedOnDate", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to La tâche {0} n&apos;est plus disponible.
+        ///   Looks up a localized string similar to Impossible de lancer la tâche, elle n&apos;est pas en attente.
         /// </summary>
-        internal static string Job_Gone {
+        internal static string Job_CannotStart_NotIn_WaitingStatus {
             get {
-                return ResourceManager.GetString("Job_Gone", resourceCulture);
+                return ResourceManager.GetString("Job_CannotStart_NotIn_WaitingStatus", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to La commande de la tâche est requise.
+        /// </summary>
+        internal static string Job_Command_Required {
+            get {
+                return ResourceManager.GetString("Job_Command_Required", resourceCulture);
             }
         }
         
@@ -673,16 +709,7 @@ namespace Sheaft.Localization.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to La tâche {0} est introuvable.
-        /// </summary>
-        internal static string Job_NotFound {
-            get {
-                return ResourceManager.GetString("Job_NotFound", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to La nom de la file de traitement est requis.
+        ///   Looks up a localized string similar to La queue de traitement de la tâche est requise.
         /// </summary>
         internal static string Job_Queue_Required {
             get {
@@ -700,20 +727,56 @@ namespace Sheaft.Localization.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Information légales.
+        /// </summary>
+        internal static string Legal {
+            get {
+                return ResourceManager.GetString("Legal", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to L&apos;email de contact de votre entreprise est requis.
+        /// </summary>
+        internal static string Legal_Email_Required {
+            get {
+                return ResourceManager.GetString("Legal_Email_Required", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Le type d&apos;entité légale est requis.
+        /// </summary>
+        internal static string Legal_Kind_Cannot_Be_Natural {
+            get {
+                return ResourceManager.GetString("Legal_Kind_Cannot_Be_Natural", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Le SIRET est requis.
+        /// </summary>
+        internal static string Legal_Siret_Required {
+            get {
+                return ResourceManager.GetString("Legal_Siret_Required", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Le numéro de TVA est requis.
+        /// </summary>
+        internal static string Legal_Vat_Required {
+            get {
+                return ResourceManager.GetString("Legal_Vat_Required", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Niveau.
         /// </summary>
         internal static string Level {
             get {
                 return ResourceManager.GetString("Level", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Le niveau {0} n&apos;est plus disponible.
-        /// </summary>
-        internal static string Level_Gone {
-            get {
-                return ResourceManager.GetString("Level_Gone", resourceCulture);
             }
         }
         
@@ -727,16 +790,7 @@ namespace Sheaft.Localization.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Le niveau {0} est introuvable.
-        /// </summary>
-        internal static string Level_NotFound {
-            get {
-                return ResourceManager.GetString("Level_NotFound", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to {0} est actuellement vérouillé(e).
+        ///   Looks up a localized string similar to La ressource {0} est vérouillée.
         /// </summary>
         internal static string Locked {
             get {
@@ -745,7 +799,16 @@ namespace Sheaft.Localization.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to {0} est introuvable.
+        ///   Looks up a localized string similar to Nationalité.
+        /// </summary>
+        internal static string Nationality {
+            get {
+                return ResourceManager.GetString("Nationality", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to La ressource {0} est introuvable.
         /// </summary>
         internal static string NotFound {
             get {
@@ -763,24 +826,6 @@ namespace Sheaft.Localization.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to La notification {0} n&apos;est plus disponible.
-        /// </summary>
-        internal static string Notification_Gone {
-            get {
-                return ResourceManager.GetString("Notification_Gone", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to La notification {0} est introuvable.
-        /// </summary>
-        internal static string Notification_NotFound {
-            get {
-                return ResourceManager.GetString("Notification_NotFound", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Le contenu de la notification est requis.
         /// </summary>
         internal static string Notification_Require_Content {
@@ -790,65 +835,344 @@ namespace Sheaft.Localization.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Consigne.
+        ///   Looks up a localized string similar to La supression de votre compte sur notre fournisseur d&apos;identité à échouée.
         /// </summary>
-        internal static string Packaging {
+        internal static string Oidc_DeleteProfile_Error {
             get {
-                return ResourceManager.GetString("Packaging", resourceCulture);
+                return ResourceManager.GetString("Oidc_DeleteProfile_Error", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to La consigne {0} n&apos;est plus disponible.
+        ///   Looks up a localized string similar to L&apos;enregistrement de votre compte sur notre fournisseur d&apos;identité a échoué.
         /// </summary>
-        internal static string Packaging_Gone {
+        internal static string Oidc_Register_Error {
             get {
-                return ResourceManager.GetString("Packaging_Gone", resourceCulture);
+                return ResourceManager.GetString("Oidc_Register_Error", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Le nom de la consigne est requis.
+        ///   Looks up a localized string similar to La mise à jour de votre image sur notre fournisseur d&apos;identité à echouée.
         /// </summary>
-        internal static string Packaging_Name_Required {
+        internal static string Oidc_UpdatePicture_Error {
             get {
-                return ResourceManager.GetString("Packaging_Name_Required", resourceCulture);
+                return ResourceManager.GetString("Oidc_UpdatePicture_Error", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to La consigne {0} est introuvable.
+        ///   Looks up a localized string similar to La mise à jour de votre profile sur notre fournisseur d&apos;identité à échouée.
         /// </summary>
-        internal static string Packaging_NotFound {
+        internal static string Oidc_UpdateProfile_Error {
             get {
-                return ResourceManager.GetString("Packaging_NotFound", resourceCulture);
+                return ResourceManager.GetString("Oidc_UpdateProfile_Error", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to La TVA de la consigne ne peut pas être supérieur à {0}%.
+        ///   Looks up a localized string similar to Panier.
         /// </summary>
-        internal static string Packaging_Vat_CannotBe_GreaterThan {
+        internal static string Order {
             get {
-                return ResourceManager.GetString("Packaging_Vat_CannotBe_GreaterThan", resourceCulture);
+                return ResourceManager.GetString("Order", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to La TVA de la consigne ne peut pas être inférieur à {0}%.
+        ///   Looks up a localized string similar to Impossible de créer le panier, les dates de livraisons sont manquantes.
         /// </summary>
-        internal static string Packaging_Vat_CannotBe_LowerThan {
+        internal static string Order_CannotCreate_Deliveries_Required {
             get {
-                return ResourceManager.GetString("Packaging_Vat_CannotBe_LowerThan", resourceCulture);
+                return ResourceManager.GetString("Order_CannotCreate_Deliveries_Required", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Le prix HT de la consigne ne peut pas être inférieur ou égal à {0}%.
+        ///   Looks up a localized string similar to Impossible de créer le panier, certains produits sont invalides: {0}.
         /// </summary>
-        internal static string Packaging_WholeSalePrice_CannotBe_LowerThan {
+        internal static string Order_CannotCreate_Some_Products_Invalid {
             get {
-                return ResourceManager.GetString("Packaging_WholeSalePrice_CannotBe_LowerThan", resourceCulture);
+                return ResourceManager.GetString("Order_CannotCreate_Some_Products_Invalid", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Impossible de créer un ordre de paiement pour le panier, les dates de livraisons sont manquantes.
+        /// </summary>
+        internal static string Order_CannotPay_Deliveries_Required {
+            get {
+                return ResourceManager.GetString("Order_CannotPay_Deliveries_Required", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Impossible de créer un ordre de paiement pour le panier, certains produits sont invalides: {0}.
+        /// </summary>
+        internal static string Order_CannotPay_Some_Products_Invalid {
+            get {
+                return ResourceManager.GetString("Order_CannotPay_Some_Products_Invalid", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Impossible de relancer un ordre de paiement pour le panier, il n&apos;est pas dans un état de paiement refusé.
+        /// </summary>
+        internal static string Order_CannotRetry_NotIn_Refused_Status {
+            get {
+                return ResourceManager.GetString("Order_CannotRetry_NotIn_Refused_Status", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Impossible de mettre à jour le panier, certains produits sont invalides: {0}.
+        /// </summary>
+        internal static string Order_CannotUpdate_Some_Products_Invalid {
+            get {
+                return ResourceManager.GetString("Order_CannotUpdate_Some_Products_Invalid", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Le total du panier ne peut pas être inférieur à {0}€.
+        /// </summary>
+        internal static string Order_Total_CannotBe_LowerThan {
+            get {
+                return ResourceManager.GetString("Order_Total_CannotBe_LowerThan", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Représentant.
+        /// </summary>
+        internal static string Owner {
+            get {
+                return ResourceManager.GetString("Owner", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to L&apos;adresse est requise.
+        /// </summary>
+        internal static string Owner_Address_Required {
+            get {
+                return ResourceManager.GetString("Owner_Address_Required", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to La date de naissance est requise.
+        /// </summary>
+        internal static string Owner_Birthdate_Required {
+            get {
+                return ResourceManager.GetString("Owner_Birthdate_Required", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Le pays de résidence est requis.
+        /// </summary>
+        internal static string Owner_CountryOfResidence_Required {
+            get {
+                return ResourceManager.GetString("Owner_CountryOfResidence_Required", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to L&apos;email est requis.
+        /// </summary>
+        internal static string Owner_Email_Required {
+            get {
+                return ResourceManager.GetString("Owner_Email_Required", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Le prénom est requis.
+        /// </summary>
+        internal static string Owner_Firstname_Required {
+            get {
+                return ResourceManager.GetString("Owner_Firstname_Required", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Le nom est requis.
+        /// </summary>
+        internal static string Owner_Lastname_Required {
+            get {
+                return ResourceManager.GetString("Owner_Lastname_Required", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to La nationalité est requise.
+        /// </summary>
+        internal static string Owner_Nationality_Required {
+            get {
+                return ResourceManager.GetString("Owner_Nationality_Required", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Paiement.
+        /// </summary>
+        internal static string Payin {
+            get {
+                return ResourceManager.GetString("Payin", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Impossible de créer un remboursement pour le paiement, un remboursement a déjà été effectué.
+        /// </summary>
+        internal static string Payin_CannotAdd_Refund_PurchaseOrderRefund_AlreadySucceeded {
+            get {
+                return ResourceManager.GetString("Payin_CannotAdd_Refund_PurchaseOrderRefund_AlreadySucceeded", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Impossible de créer un paiement pour le panier, il est validé.
+        /// </summary>
+        internal static string Payin_CannotCreate_Order_Already_Validated {
+            get {
+                return ResourceManager.GetString("Payin_CannotCreate_Order_Already_Validated", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Impossible d&apos;assigner le paiement au panier, il possède déjà un paiement validé.
+        /// </summary>
+        internal static string Payin_CannotSet_Already_Succeeded {
+            get {
+                return ResourceManager.GetString("Payin_CannotSet_Already_Succeeded", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Remboursement.
+        /// </summary>
+        internal static string PayinRefund {
+            get {
+                return ResourceManager.GetString("PayinRefund", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Impossible de créer un remboursement pour le paiement, la commande relative est dans un état invalide.
+        /// </summary>
+        internal static string PayinRefund_CannotCreate_Payin_PurchaseOrder_Invalid_Status {
+            get {
+                return ResourceManager.GetString("PayinRefund_CannotCreate_Payin_PurchaseOrder_Invalid_Status", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Impossible de créer un remboursement pour la commande, le paiement est dans un état invalide.
+        /// </summary>
+        internal static string PayinRefund_CannotCreate_PurchaseOrderRefund_Payin_Invalid_Status {
+            get {
+                return ResourceManager.GetString("PayinRefund_CannotCreate_PurchaseOrderRefund_Payin_Invalid_Status", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Impossible de créer un remboursement pour la commande, un remboursement est déjà en cours.
+        /// </summary>
+        internal static string PayinRefund_CannotCreate_PurchaseOrderRefund_Pending_PayinRefund {
+            get {
+                return ResourceManager.GetString("PayinRefund_CannotCreate_PurchaseOrderRefund_Pending_PayinRefund", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Virement.
+        /// </summary>
+        internal static string Payout {
+            get {
+                return ResourceManager.GetString("Payout", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Points.
+        /// </summary>
+        internal static string Points {
+            get {
+                return ResourceManager.GetString("Points", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Le solde de point a affecter ne peut pas être inférieur à {0}.
+        /// </summary>
+        internal static string Points_Quantity_CannotBe_LowerThan {
+            get {
+                return ResourceManager.GetString("Points_Quantity_CannotBe_LowerThan", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Aucune correspondance de point n&apos;a été trouvée.
+        /// </summary>
+        internal static string Points_Scoring_Matching_ActionPoints_NotFound {
+            get {
+                return ResourceManager.GetString("Points_Scoring_Matching_ActionPoints_NotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to L&apos;utilisateur est requis.
+        /// </summary>
+        internal static string Points_User_Required {
+            get {
+                return ResourceManager.GetString("Points_User_Required", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Producteur.
+        /// </summary>
+        internal static string Producer {
+            get {
+                return ResourceManager.GetString("Producer", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Votre adresse est requise.
+        /// </summary>
+        internal static string Producer_Address_Required {
+            get {
+                return ResourceManager.GetString("Producer_Address_Required", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Vos documents bancaires doivent être validés.
+        /// </summary>
+        internal static string Producer_Documents_NotValidated {
+            get {
+                return ResourceManager.GetString("Producer_Documents_NotValidated", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Votre email de contact est requis.
+        /// </summary>
+        internal static string Producer_Email_Required {
+            get {
+                return ResourceManager.GetString("Producer_Email_Required", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Le nom de votre exploitation est requis.
+        /// </summary>
+        internal static string Producer_Name_Required {
+            get {
+                return ResourceManager.GetString("Producer_Name_Required", resourceCulture);
             }
         }
         
@@ -862,7 +1186,16 @@ namespace Sheaft.Localization.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Vous avez déjà noté ce produit.
+        ///   Looks up a localized string similar to Le conditionnement au poids nécessite de préciser l&apos;unité de mesure.
+        /// </summary>
+        internal static string Product_BulkConditioning_Requires_Unit_ToBe_Specified {
+            get {
+                return ResourceManager.GetString("Product_BulkConditioning_Requires_Unit_ToBe_Specified", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Impossible de noter ce produit, vous l&apos;avez déjà fait auparavant.
         /// </summary>
         internal static string Product_CannotRate_AlreadyRated {
             get {
@@ -871,7 +1204,7 @@ namespace Sheaft.Localization.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to La description du produit est trop longue, elle ne peut pas dépasser {0} caractères.
+        ///   Looks up a localized string similar to La description est trop longue.
         /// </summary>
         internal static string Product_Description_TooLong {
             get {
@@ -880,16 +1213,7 @@ namespace Sheaft.Localization.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Le produit {0} n&apos;est plus disponible.
-        /// </summary>
-        internal static string Product_Gone {
-            get {
-                return ResourceManager.GetString("Product_Gone", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Le nom du produit est requis.
+        ///   Looks up a localized string similar to Le nom est requis.
         /// </summary>
         internal static string Product_Name_Required {
             get {
@@ -898,16 +1222,7 @@ namespace Sheaft.Localization.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Le produit {0} est introuvable.
-        /// </summary>
-        internal static string Product_NotFound {
-            get {
-                return ResourceManager.GetString("Product_NotFound", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Le producteur est requis.
+        ///   Looks up a localized string similar to Le producteur est requis pour créer le produit.
         /// </summary>
         internal static string Product_Producer_Required {
             get {
@@ -916,7 +1231,7 @@ namespace Sheaft.Localization.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to La quantité par unité du produit ne peut pas être inférieur ou égale à {0}.
+        ///   Looks up a localized string similar to La quantité du conditionnement ne peut pas être inférieure ou égale à {0}.
         /// </summary>
         internal static string Product_QuantityPerUnit_CannotBe_LowerOrEqualThan {
             get {
@@ -925,7 +1240,7 @@ namespace Sheaft.Localization.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to La référence du produit est requise.
+        ///   Looks up a localized string similar to La référence est requise.
         /// </summary>
         internal static string Product_Reference_Required {
             get {
@@ -934,7 +1249,7 @@ namespace Sheaft.Localization.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Le tag spécifié pour le produit est introuvable.
+        ///   Looks up a localized string similar to Le tag du produit est introuvable.
         /// </summary>
         internal static string Product_TagNotFound {
             get {
@@ -943,7 +1258,7 @@ namespace Sheaft.Localization.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Le taux de TVA du produit ne peut pas être supérieur à {0}%.
+        ///   Looks up a localized string similar to La TVA ne peut pas être supérieur à {0}%.
         /// </summary>
         internal static string Product_Vat_CannotBe_GreaterThan {
             get {
@@ -952,7 +1267,7 @@ namespace Sheaft.Localization.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Le taux de TVA du produit ne peut pas être inférieur à {0}%.
+        ///   Looks up a localized string similar to La TVA ne peut pas être inférieure à {0}%.
         /// </summary>
         internal static string Product_Vat_CannotBe_LowerThan {
             get {
@@ -961,7 +1276,7 @@ namespace Sheaft.Localization.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Le poids du produit ne peut pas être inférieur ou égale à {0}kg.
+        ///   Looks up a localized string similar to Le poids ne peut pas être inférieur ou égal à {0}.
         /// </summary>
         internal static string Product_Weight_CannotBe_LowerOrEqualThan {
             get {
@@ -970,11 +1285,371 @@ namespace Sheaft.Localization.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Le prix HT du produit ne peut pas être inférieur ou égal à {0}€.
+        ///   Looks up a localized string similar to Le prix HT ne peut pas être inférieur ou égal à {0}€.
         /// </summary>
         internal static string Product_WholeSalePrice_CannotBe_LowerOrEqualThan {
             get {
                 return ResourceManager.GetString("Product_WholeSalePrice_CannotBe_LowerOrEqualThan", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        internal static string PsP_CannotAddUbo_Declaration_Not_Exists {
+            get {
+                return ResourceManager.GetString("PsP_CannotAddUbo_Declaration_Not_Exists", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        internal static string PsP_CannotCreate_Card_Card_Exists {
+            get {
+                return ResourceManager.GetString("PsP_CannotCreate_Card_Card_Exists", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        internal static string PsP_CannotCreate_Card_User_Not_Exists {
+            get {
+                return ResourceManager.GetString("PsP_CannotCreate_Card_User_Not_Exists", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        internal static string PsP_CannotCreate_Declaration_User_Not_Exists {
+            get {
+                return ResourceManager.GetString("PsP_CannotCreate_Declaration_User_Not_Exists", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        internal static string PsP_CannotCreate_Document_Document_Exists {
+            get {
+                return ResourceManager.GetString("PsP_CannotCreate_Document_Document_Exists", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        internal static string PsP_CannotCreate_Document_User_Not_Exists {
+            get {
+                return ResourceManager.GetString("PsP_CannotCreate_Document_User_Not_Exists", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        internal static string PsP_CannotCreate_DocumentPage_Document_Not_Exists {
+            get {
+                return ResourceManager.GetString("PsP_CannotCreate_DocumentPage_Document_Not_Exists", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        internal static string PsP_CannotCreate_Payout_Author_Not_Exists {
+            get {
+                return ResourceManager.GetString("PsP_CannotCreate_Payout_Author_Not_Exists", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        internal static string PsP_CannotCreate_Payout_DebitedWallet_Not_Exists {
+            get {
+                return ResourceManager.GetString("PsP_CannotCreate_Payout_DebitedWallet_Not_Exists", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        internal static string PsP_CannotCreate_Payout_TransactionKind_Mismatch {
+            get {
+                return ResourceManager.GetString("PsP_CannotCreate_Payout_TransactionKind_Mismatch", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        internal static string PsP_CannotCreate_Payout_TransactionNature_Mismatch {
+            get {
+                return ResourceManager.GetString("PsP_CannotCreate_Payout_TransactionNature_Mismatch", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        internal static string PsP_CannotCreate_Transfer_Author_Not_Exists {
+            get {
+                return ResourceManager.GetString("PsP_CannotCreate_Transfer_Author_Not_Exists", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        internal static string PsP_CannotCreate_Transfer_BankIBAN_Exists {
+            get {
+                return ResourceManager.GetString("PsP_CannotCreate_Transfer_BankIBAN_Exists", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        internal static string PsP_CannotCreate_Transfer_CreditedWallet_Not_Exists {
+            get {
+                return ResourceManager.GetString("PsP_CannotCreate_Transfer_CreditedWallet_Not_Exists", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        internal static string PsP_CannotCreate_Transfer_DebitedWallet_Not_Exists {
+            get {
+                return ResourceManager.GetString("PsP_CannotCreate_Transfer_DebitedWallet_Not_Exists", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        internal static string PsP_CannotCreate_Transfer_TransactionKind_Mismatch {
+            get {
+                return ResourceManager.GetString("PsP_CannotCreate_Transfer_TransactionKind_Mismatch", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        internal static string PsP_CannotCreate_Transfer_TransactionNature_Mismatch {
+            get {
+                return ResourceManager.GetString("PsP_CannotCreate_Transfer_TransactionNature_Mismatch", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        internal static string PsP_CannotCreate_Transfer_User_Not_Exists {
+            get {
+                return ResourceManager.GetString("PsP_CannotCreate_Transfer_User_Not_Exists", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        internal static string PsP_CannotCreate_User_User_Exists {
+            get {
+                return ResourceManager.GetString("PsP_CannotCreate_User_User_Exists", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        internal static string PsP_CannotCreate_Wallet_User_Not_Exists {
+            get {
+                return ResourceManager.GetString("PsP_CannotCreate_Wallet_User_Not_Exists", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        internal static string PsP_CannotCreate_Wallet_Wallet_Exists {
+            get {
+                return ResourceManager.GetString("PsP_CannotCreate_Wallet_Wallet_Exists", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        internal static string PsP_CannotCreate_WebPayin_Author_Not_Exists {
+            get {
+                return ResourceManager.GetString("PsP_CannotCreate_WebPayin_Author_Not_Exists", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        internal static string PsP_CannotCreate_WebPayin_CreditedWallet_Not_Exists {
+            get {
+                return ResourceManager.GetString("PsP_CannotCreate_WebPayin_CreditedWallet_Not_Exists", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        internal static string PsP_CannotCreate_WebPayin_TransactionKind_Mismatch {
+            get {
+                return ResourceManager.GetString("PsP_CannotCreate_WebPayin_TransactionKind_Mismatch", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        internal static string PsP_CannotCreate_WebPayin_TransactionNature_Mismatch {
+            get {
+                return ResourceManager.GetString("PsP_CannotCreate_WebPayin_TransactionNature_Mismatch", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        internal static string PsP_CannotRefund_Payin_Author_Not_Exists {
+            get {
+                return ResourceManager.GetString("PsP_CannotRefund_Payin_Author_Not_Exists", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        internal static string PsP_CannotRefund_Payin_PayinIdentifier_Missing {
+            get {
+                return ResourceManager.GetString("PsP_CannotRefund_Payin_PayinIdentifier_Missing", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        internal static string PsP_CannotRefund_Payin_TransactionKind_Mismatch {
+            get {
+                return ResourceManager.GetString("PsP_CannotRefund_Payin_TransactionKind_Mismatch", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        internal static string PsP_CannotRefund_Payin_TransactionNature_Mismatch {
+            get {
+                return ResourceManager.GetString("PsP_CannotRefund_Payin_TransactionNature_Mismatch", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        internal static string PsP_CannotRefund_Transfer_Author_Not_Exists {
+            get {
+                return ResourceManager.GetString("PsP_CannotRefund_Transfer_Author_Not_Exists", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        internal static string PsP_CannotRefund_Transfer_TransactionKind_Mismatch {
+            get {
+                return ResourceManager.GetString("PsP_CannotRefund_Transfer_TransactionKind_Mismatch", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        internal static string PsP_CannotRefund_Transfer_TransactionNature_Mismatch {
+            get {
+                return ResourceManager.GetString("PsP_CannotRefund_Transfer_TransactionNature_Mismatch", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        internal static string PsP_CannotRefund_Transfer_TransferIdentifier_Missing {
+            get {
+                return ResourceManager.GetString("PsP_CannotRefund_Transfer_TransferIdentifier_Missing", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        internal static string PsP_CannotSubmit_Declaration_Not_Exists {
+            get {
+                return ResourceManager.GetString("PsP_CannotSubmit_Declaration_Not_Exists", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        internal static string PsP_CannotSubmit_Document_Document_Not_Exists {
+            get {
+                return ResourceManager.GetString("PsP_CannotSubmit_Document_Document_Not_Exists", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        internal static string PsP_CannotSubmit_Document_User_Not_Exists {
+            get {
+                return ResourceManager.GetString("PsP_CannotSubmit_Document_User_Not_Exists", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        internal static string PsP_CannotUpdate_Declaration_Not_Exists {
+            get {
+                return ResourceManager.GetString("PsP_CannotUpdate_Declaration_Not_Exists", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        internal static string PsP_CannotUpdateUbo_Declaration_Not_Exists {
+            get {
+                return ResourceManager.GetString("PsP_CannotUpdateUbo_Declaration_Not_Exists", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        internal static string PsP_CannotUpdateUbo_Ubo_Not_Exists {
+            get {
+                return ResourceManager.GetString("PsP_CannotUpdateUbo_Ubo_Not_Exists", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        internal static string PsP_CannotValidate_Card_Card_Not_Exists {
+            get {
+                return ResourceManager.GetString("PsP_CannotValidate_Card_Card_Not_Exists", resourceCulture);
             }
         }
         
@@ -988,7 +1663,7 @@ namespace Sheaft.Localization.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Impossible d&apos;accepter la commande, elle n&apos;est pas en attente d&apos;acceptation.
+        ///   Looks up a localized string similar to Impossible d&apos;accepter la commande, elle n&apos;est pas en attente.
         /// </summary>
         internal static string PurchaseOrder_CannotAccept_NotIn_WaitingStatus {
             get {
@@ -997,7 +1672,7 @@ namespace Sheaft.Localization.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Impossible d&apos;ajouter le produit à la commande, elle est en cours de traitement.
+        ///   Looks up a localized string similar to Impossible d&apos;ajouter un produit, la commande est déjà validée.
         /// </summary>
         internal static string PurchaseOrder_CannotAddProduct_NotIn_WaitingStatus {
             get {
@@ -1006,7 +1681,7 @@ namespace Sheaft.Localization.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Impossible d&apos;ajouter le produit à la commande, il est introuvable.
+        ///   Looks up a localized string similar to Impossible d&apos;ajouter le produit, il est introuvable.
         /// </summary>
         internal static string PurchaseOrder_CannotAddProduct_Product_NotFound {
             get {
@@ -1015,7 +1690,16 @@ namespace Sheaft.Localization.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Impossible d&apos;annuler la commande, elle a déjà été livrée.
+        ///   Looks up a localized string similar to Impossible d&apos;annuler la commande, elle est déjà annulée.
+        /// </summary>
+        internal static string PurchaseOrder_CannotCancel_AlreadyIn_CancelledStatus {
+            get {
+                return ResourceManager.GetString("PurchaseOrder_CannotCancel_AlreadyIn_CancelledStatus", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Impossible d&apos;annuler la commande, elle est déjà receptionée.
         /// </summary>
         internal static string PurchaseOrder_CannotCancel_AlreadyIn_DeliveredStatus {
             get {
@@ -1024,7 +1708,7 @@ namespace Sheaft.Localization.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Impossible d&apos;annuler la commande, elle a déjà été refusée.
+        ///   Looks up a localized string similar to Impossible d&apos;annuler la commande, elle est refusée.
         /// </summary>
         internal static string PurchaseOrder_CannotCancel_AlreadyIn_RefusedStatus {
             get {
@@ -1033,7 +1717,7 @@ namespace Sheaft.Localization.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Impossible de modifier la quantité du produit de la commande, elle est en cours de traitement.
+        ///   Looks up a localized string similar to Impossible de modifier la quantité du produit, la commande est déjà validée.
         /// </summary>
         internal static string PurchaseOrder_CannotChangeProductQuantity_NotIn_WaitingStatus {
             get {
@@ -1042,7 +1726,7 @@ namespace Sheaft.Localization.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Impossible de modifier la quantité du produit de la commande, il est introuvable.
+        ///   Looks up a localized string similar to Impossible de modifier la quantité du produit, il est introuvable.
         /// </summary>
         internal static string PurchaseOrder_CannotChangeProductQuantity_Product_NotFound {
             get {
@@ -1051,7 +1735,7 @@ namespace Sheaft.Localization.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Impossible de compléter la commande, elle n&apos;est pas en cours de traitement.
+        ///   Looks up a localized string similar to Impossible de terminer la commande, elle n&apos;est pas en cours de préparation.
         /// </summary>
         internal static string PurchaseOrder_CannotComplete_NotIn_ProcessingStatus {
             get {
@@ -1060,7 +1744,7 @@ namespace Sheaft.Localization.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Impossible de délivrer la commande, elle n&apos;est pas prête ou pas encore en cours de livraison.
+        ///   Looks up a localized string similar to Impossible de marquer la commande comme receptionnée, elle n&apos;est ni terminée, ni en cours de livraison.
         /// </summary>
         internal static string PurchaseOrder_CannotDeliver_NotIn_CompletedOrShippingStatus {
             get {
@@ -1069,7 +1753,7 @@ namespace Sheaft.Localization.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Impossible de refuser la commande, elle a déjà été annulée.
+        ///   Looks up a localized string similar to Impossible de refuser la commande, elle est déjà annulée.
         /// </summary>
         internal static string PurchaseOrder_CannotRefuse_AlreadyIn_CancelledStatus {
             get {
@@ -1078,7 +1762,7 @@ namespace Sheaft.Localization.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Impossible de refuser la commande, elle a déjà été livrée.
+        ///   Looks up a localized string similar to Impossible de refuser la commande, elle est déjà receptionnée.
         /// </summary>
         internal static string PurchaseOrder_CannotRefuse_AlreadyIn_DeliveredStatus {
             get {
@@ -1087,7 +1771,7 @@ namespace Sheaft.Localization.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Impossible de refuser la commande, elle a déjà été refusée.
+        ///   Looks up a localized string similar to Impossible de refuser la commande, elle est déjà refusée.
         /// </summary>
         internal static string PurchaseOrder_CannotRefuse_AlreadyIn_RefusedStatus {
             get {
@@ -1096,7 +1780,7 @@ namespace Sheaft.Localization.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Impossible de supprimer le produit de la commande, elle est en cours de traitement.
+        ///   Looks up a localized string similar to Impossible de supprimer un produit, la commande est déjà validée.
         /// </summary>
         internal static string PurchaseOrder_CannotRemoveProduct_NotIn_WaitingStatus {
             get {
@@ -1105,7 +1789,7 @@ namespace Sheaft.Localization.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Impossible de supprimer le produit de la commande, il est introuvable.
+        ///   Looks up a localized string similar to Impossible de supprimer un produit, il est introuvable.
         /// </summary>
         internal static string PurchaseOrder_CannotRemoveProduct_Product_NotFound {
             get {
@@ -1114,7 +1798,16 @@ namespace Sheaft.Localization.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Impossible de débuter la livraison de la commande, elle n&apos;est pas prête.
+        ///   Looks up a localized string similar to Impossible de créer un virement pour cette commande, un virement a déjà été complété.
+        /// </summary>
+        internal static string PurchaseOrder_CannotSet_Transfer_AlreadySucceeded {
+            get {
+                return ResourceManager.GetString("PurchaseOrder_CannotSet_Transfer_AlreadySucceeded", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Impossible d&apos;expedier la commande, elle n&apos;est pas terminée.
         /// </summary>
         internal static string PurchaseOrder_CannotShip_NotIn_CompletedStatus {
             get {
@@ -1123,25 +1816,7 @@ namespace Sheaft.Localization.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to La commande {0} n&apos;est plus disponible.
-        /// </summary>
-        internal static string PurchaseOrder_Gone {
-            get {
-                return ResourceManager.GetString("PurchaseOrder_Gone", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to La commande {0} est introuvable.
-        /// </summary>
-        internal static string PurchaseOrder_NotFound {
-            get {
-                return ResourceManager.GetString("PurchaseOrder_NotFound", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Impossible de modifier la quantité du produit de la commande, la quantité ne peut pas être inférieur ou égale à {0}.
+        ///   Looks up a localized string similar to La quantité du produit ne peut pas être inférieur ou égale à {0}.
         /// </summary>
         internal static string PurchaseOrder_ProductQuantity_CannotBe_LowerOrEqualThan {
             get {
@@ -1150,7 +1825,7 @@ namespace Sheaft.Localization.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to La référence de commande est requise.
+        ///   Looks up a localized string similar to La référence est requise.
         /// </summary>
         internal static string PurchaseOrder_Reference_Required {
             get {
@@ -1159,7 +1834,7 @@ namespace Sheaft.Localization.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Le client de la commande est requis.
+        ///   Looks up a localized string similar to L&apos;acheteur est requis.
         /// </summary>
         internal static string PurchaseOrder_Sender_Required {
             get {
@@ -1168,7 +1843,7 @@ namespace Sheaft.Localization.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Le vendeur de la commande est requis.
+        ///   Looks up a localized string similar to Le vendeur est requis.
         /// </summary>
         internal static string PurchaseOrder_Vendor_Required {
             get {
@@ -1186,7 +1861,7 @@ namespace Sheaft.Localization.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Impossible d&apos;ajouter le produit à la commande rapide, il est déjà présent.
+        ///   Looks up a localized string similar to Impossible d&apos;ajouter le produit, il est déjà présent dans la liste.
         /// </summary>
         internal static string QuickOrder_CannotAddProduct_Product_AlreadyIn {
             get {
@@ -1195,20 +1870,11 @@ namespace Sheaft.Localization.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Impossible de supprimer le produit de la commande rapide, il est introuvable.
+        ///   Looks up a localized string similar to Impossible de supprimer le produit, il est introuvable dans la liste disponible.
         /// </summary>
         internal static string QuickOrder_CannotRemoveProduct_Product_NotFound {
             get {
                 return ResourceManager.GetString("QuickOrder_CannotRemoveProduct_Product_NotFound", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to La commande rapide {0} n&apos;est plus disponible.
-        /// </summary>
-        internal static string QuickOrder_Gone {
-            get {
-                return ResourceManager.GetString("QuickOrder_Gone", resourceCulture);
             }
         }
         
@@ -1222,16 +1888,7 @@ namespace Sheaft.Localization.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to La commande rapide {0} n&apos;est plus disponible.
-        /// </summary>
-        internal static string QuickOrder_NotFound {
-            get {
-                return ResourceManager.GetString("QuickOrder_NotFound", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Impossible de modifier la quantité du produit de la commande rapide, elle ne peut pas être inférieur ou égale à {0}.
+        ///   Looks up a localized string similar to La quantité du produit ne peut pas être inférieure ou égale à {0}.
         /// </summary>
         internal static string QuickOrder_ProductQuantity_CannotBe_LowerOrEqualThan {
             get {
@@ -1249,7 +1906,7 @@ namespace Sheaft.Localization.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Notation.
+        ///   Looks up a localized string similar to Avis.
         /// </summary>
         internal static string Rating {
             get {
@@ -1258,7 +1915,7 @@ namespace Sheaft.Localization.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to La note ne peut être supérieur à {0}.
+        ///   Looks up a localized string similar to La note ne peut pas être supérieure à {0}.
         /// </summary>
         internal static string Rating_CannotBe_GreatherThan {
             get {
@@ -1267,7 +1924,7 @@ namespace Sheaft.Localization.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to La note ne peut être inférieur ou égale à {0}.
+        ///   Looks up a localized string similar to La note ne peut pas être inférieure à {0}.
         /// </summary>
         internal static string Rating_CannotBe_LowerThan {
             get {
@@ -1276,25 +1933,7 @@ namespace Sheaft.Localization.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to La notation {0} n&apos;est plus disponible.
-        /// </summary>
-        internal static string Rating_Gone {
-            get {
-                return ResourceManager.GetString("Rating_Gone", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to La notation {0} est introuvable.
-        /// </summary>
-        internal static string Rating_NotFound {
-            get {
-                return ResourceManager.GetString("Rating_NotFound", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to L&apos;utilisateur de la note est requis.
+        ///   Looks up a localized string similar to L&apos;utilisateur de l&apos;avis est requis.
         /// </summary>
         internal static string Rating_User_Required {
             get {
@@ -1312,92 +1951,65 @@ namespace Sheaft.Localization.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to La région {0} n&apos;est plus disponible.
+        ///   Looks up a localized string similar to Un utilisateur existe déjà avec cet identifiant.
         /// </summary>
-        internal static string Region_Gone {
+        internal static string Register_User_AlreadyExists {
             get {
-                return ResourceManager.GetString("Region_Gone", resourceCulture);
+                return ResourceManager.GetString("Register_User_AlreadyExists", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to La région {0} est introuvable.
+        ///   Looks up a localized string similar to Le code du parain est introuvable.
         /// </summary>
-        internal static string Region_NotFound {
+        internal static string Register_User_SponsorCode_NotFound {
             get {
-                return ResourceManager.GetString("Region_NotFound", resourceCulture);
+                return ResourceManager.GetString("Register_User_SponsorCode_NotFound", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Un compte profesionnel ne peut pas être magasin et producteur en même temps.
+        ///   Looks up a localized string similar to Consigne.
         /// </summary>
-        internal static string RegisterCompany_CannotContains_ProducerAndStoreRoles {
+        internal static string Returnable {
             get {
-                return ResourceManager.GetString("RegisterCompany_CannotContains_ProducerAndStoreRoles", resourceCulture);
+                return ResourceManager.GetString("Returnable", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Une erreur est survenue lors de l&apos;association du compte à l&apos;identité unifiée : {0}.
+        ///   Looks up a localized string similar to Le nom de la consigne est requis.
         /// </summary>
-        internal static string RegisterConsumer_Oidc_Register_Error {
+        internal static string Returnable_Name_Required {
             get {
-                return ResourceManager.GetString("RegisterConsumer_Oidc_Register_Error", resourceCulture);
+                return ResourceManager.GetString("Returnable_Name_Required", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Un compte existe déjà avec l&apos;adresse email renseignée.
+        ///   Looks up a localized string similar to La TVA de la consigne ne peut pas être supérieure à {0}%.
         /// </summary>
-        internal static string RegisterConsumer_User_AlreadyExists {
+        internal static string Returnable_Vat_CannotBe_GreaterThan {
             get {
-                return ResourceManager.GetString("RegisterConsumer_User_AlreadyExists", resourceCulture);
+                return ResourceManager.GetString("Returnable_Vat_CannotBe_GreaterThan", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Le code parain spécifié pour la création du compte est introuvable.
+        ///   Looks up a localized string similar to La TVA de la consigne ne peut pas être inférieure à {0}%.
         /// </summary>
-        internal static string RegisterConsumer_UserWithSponsorCode_NotFound {
+        internal static string Returnable_Vat_CannotBe_LowerThan {
             get {
-                return ResourceManager.GetString("RegisterConsumer_UserWithSponsorCode_NotFound", resourceCulture);
+                return ResourceManager.GetString("Returnable_Vat_CannotBe_LowerThan", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Une erreur est survenue lors de l&apos;association du compte à l&apos;identité unifiée : {0}.
+        ///   Looks up a localized string similar to Le prix HT de la consigne ne peut pas être inférieur à {0}€.
         /// </summary>
-        internal static string RegisterOwner_Oidc_Register_Error {
+        internal static string Returnable_WholeSalePrice_CannotBe_LowerThan {
             get {
-                return ResourceManager.GetString("RegisterOwner_Oidc_Register_Error", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Un compte existe déjà avec l&apos;adresse email renseignée.
-        /// </summary>
-        internal static string RegisterOwner_User_AlreadyExists {
-            get {
-                return ResourceManager.GetString("RegisterOwner_User_AlreadyExists", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Le compte ne peut pas être un magasin et un producteur en même temps.
-        /// </summary>
-        internal static string RegisterOwner_User_CannotBe_ProducerAndStoreRoles {
-            get {
-                return ResourceManager.GetString("RegisterOwner_User_CannotBe_ProducerAndStoreRoles", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Le code parain spécifié pour la création du compte professionel est introuvable.
-        /// </summary>
-        internal static string RegisterOwner_UserWithSponsorCode_NotFound {
-            get {
-                return ResourceManager.GetString("RegisterOwner_UserWithSponsorCode_NotFound", resourceCulture);
+                return ResourceManager.GetString("Returnable_WholeSalePrice_CannotBe_LowerThan", resourceCulture);
             }
         }
         
@@ -1411,16 +2023,7 @@ namespace Sheaft.Localization.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to La récompense {0} n&apos;est plus disponible.
-        /// </summary>
-        internal static string Reward_Gone {
-            get {
-                return ResourceManager.GetString("Reward_Gone", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Le nom de la récompense est requis.
+        ///   Looks up a localized string similar to Le nom est requis.
         /// </summary>
         internal static string Reward_Name_Required {
             get {
@@ -1429,16 +2032,7 @@ namespace Sheaft.Localization.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to La récompense {0} est introuvable.
-        /// </summary>
-        internal static string Reward_NotFound {
-            get {
-                return ResourceManager.GetString("Reward_NotFound", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Parainage.
+        ///   Looks up a localized string similar to Partenariat.
         /// </summary>
         internal static string Sponsoring {
             get {
@@ -1447,25 +2041,7 @@ namespace Sheaft.Localization.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Le parainage {0} n&apos;est plus disponible.
-        /// </summary>
-        internal static string Sponsoring_Gone {
-            get {
-                return ResourceManager.GetString("Sponsoring_Gone", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Le parainage {0} est introuvable.
-        /// </summary>
-        internal static string Sponsoring_NotFound {
-            get {
-                return ResourceManager.GetString("Sponsoring_NotFound", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Le parrain est requis.
+        ///   Looks up a localized string similar to Le parain est requis.
         /// </summary>
         internal static string Sponsoring_Sponsor_Required {
             get {
@@ -1474,11 +2050,56 @@ namespace Sheaft.Localization.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Le parrainé est requis.
+        ///   Looks up a localized string similar to Le parainé est requis.
         /// </summary>
         internal static string Sponsoring_Sponsored_Required {
             get {
                 return ResourceManager.GetString("Sponsoring_Sponsored_Required", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Magasin.
+        /// </summary>
+        internal static string Store {
+            get {
+                return ResourceManager.GetString("Store", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to L&apos;adresse de votre magasin est requise.
+        /// </summary>
+        internal static string Store_Address_Required {
+            get {
+                return ResourceManager.GetString("Store_Address_Required", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to L&apos;email de contact de votre magasin est requis.
+        /// </summary>
+        internal static string Store_Email_Required {
+            get {
+                return ResourceManager.GetString("Store_Email_Required", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Le nom de votre magasin est requis.
+        /// </summary>
+        internal static string Store_Name_Required {
+            get {
+                return ResourceManager.GetString("Store_Name_Required", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Le tag spécifié pour votre magasin est introuvable.
+        /// </summary>
+        internal static string Store_TagNotFound {
+            get {
+                return ResourceManager.GetString("Store_TagNotFound", resourceCulture);
             }
         }
         
@@ -1492,29 +2113,11 @@ namespace Sheaft.Localization.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Le tag {0} n&apos;est plus disponible.
-        /// </summary>
-        internal static string Tag_Gone {
-            get {
-                return ResourceManager.GetString("Tag_Gone", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Le nom du tag est requis.
+        ///   Looks up a localized string similar to Le nom est requis.
         /// </summary>
         internal static string Tag_Name_Required {
             get {
                 return ResourceManager.GetString("Tag_Name_Required", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Le tag {0} est introuvable.
-        /// </summary>
-        internal static string Tag_NotFound {
-            get {
-                return ResourceManager.GetString("Tag_NotFound", resourceCulture);
             }
         }
         
@@ -1528,7 +2131,7 @@ namespace Sheaft.Localization.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to L&apos;heure de début ne peut pas être supérieur ou égale à {0} heures.
+        ///   Looks up a localized string similar to La plage horaire de début ne peut pas être supérieure ou égale à {0}.
         /// </summary>
         internal static string TimeSlot_From_CannotBe_GreaterOrEqualThan {
             get {
@@ -1537,7 +2140,7 @@ namespace Sheaft.Localization.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to L&apos;heure de début ne peut pas être supérieur ou égale à l&apos;heure de fin.
+        ///   Looks up a localized string similar to La plage horaire de début ne peut pas être supérieure à celle de fin.
         /// </summary>
         internal static string TimeSlot_From_CannotBe_GreaterOrEqualThan_To {
             get {
@@ -1546,25 +2149,7 @@ namespace Sheaft.Localization.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to La plage horaire {0} n&apos;est plus disponible.
-        /// </summary>
-        internal static string TimeSlot_Gone {
-            get {
-                return ResourceManager.GetString("TimeSlot_Gone", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to La plage horaire {0} est introuvable.
-        /// </summary>
-        internal static string TimeSlot_NotFound {
-            get {
-                return ResourceManager.GetString("TimeSlot_NotFound", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to L&apos;heure de fin ne peut pas être supérieur ou égale à {0} heures.
+        ///   Looks up a localized string similar to La plage horaire de fin ne peut pas être supérieure ou égale à {0}.
         /// </summary>
         internal static string TimeSlot_To_CannotBe_GreaterOrEqualThan {
             get {
@@ -1573,7 +2158,43 @@ namespace Sheaft.Localization.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to L&apos;accès n&apos;est pas autorisé, votre session a peut-être expirée, ou vos droits ne sont pas suffisants.
+        ///   Looks up a localized string similar to Transfert.
+        /// </summary>
+        internal static string Transfer {
+            get {
+                return ResourceManager.GetString("Transfer", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Impossible de créer un transfert pour la commande, un transfert est déjà en cours.
+        /// </summary>
+        internal static string Transfer_CannotCreate_Pending_Transfer {
+            get {
+                return ResourceManager.GetString("Transfer_CannotCreate_Pending_Transfer", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Impossible de créer un transfert, la commande est dans un état invalide.
+        /// </summary>
+        internal static string Transfer_CannotCreate_PurchaseOrder_Invalid_Status {
+            get {
+                return ResourceManager.GetString("Transfer_CannotCreate_PurchaseOrder_Invalid_Status", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Ubo.
+        /// </summary>
+        internal static string Ubo {
+            get {
+                return ResourceManager.GetString("Ubo", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Vous devez être connecté pour accéder à la ressource {0}.
         /// </summary>
         internal static string Unauthorized {
             get {
@@ -1582,7 +2203,7 @@ namespace Sheaft.Localization.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Une erreur inattendue est survenue..
+        ///   Looks up a localized string similar to Une erreur relative à la ressource {0} est survenue de manière inattendue.
         /// </summary>
         internal static string Unexpected {
             get {
@@ -1591,25 +2212,7 @@ namespace Sheaft.Localization.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Une erreur est survenue lors de la mise à jour de l&apos;image de l&apos;identité du compte : {0}.
-        /// </summary>
-        internal static string UpdateUser_Oidc_UpdatePicture_Error {
-            get {
-                return ResourceManager.GetString("UpdateUser_Oidc_UpdatePicture_Error", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Une erreur est survenue lors de la mise à jour des informations de l&apos;identité du compte : {0}.
-        /// </summary>
-        internal static string UpdateUser_Oidc_UpdateProfile_Error {
-            get {
-                return ResourceManager.GetString("UpdateUser_Oidc_UpdateProfile_Error", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to L&apos;utilisateur.
+        ///   Looks up a localized string similar to Utilisateur.
         /// </summary>
         internal static string User {
             get {
@@ -1618,7 +2221,16 @@ namespace Sheaft.Localization.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to L&apos;adresse email est requise.
+        ///   Looks up a localized string similar to L&apos;adresse est requise.
+        /// </summary>
+        internal static string User_Address_Required {
+            get {
+                return ResourceManager.GetString("User_Address_Required", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to L&apos;email est requis.
         /// </summary>
         internal static string User_Email_Required {
             get {
@@ -1636,25 +2248,7 @@ namespace Sheaft.Localization.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to L&apos;utilisateur {0} n&apos;est plus disponible.
-        /// </summary>
-        internal static string User_Gone {
-            get {
-                return ResourceManager.GetString("User_Gone", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to L&apos;identifiant de l&apos;utilisateur est invalide.
-        /// </summary>
-        internal static string User_Id_Invalid {
-            get {
-                return ResourceManager.GetString("User_Id_Invalid", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Le nom de famille est requis.
+        ///   Looks up a localized string similar to Le nom est requis.
         /// </summary>
         internal static string User_Lastname_Required {
             get {
@@ -1663,74 +2257,38 @@ namespace Sheaft.Localization.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to L&apos;utilisateur {0} est introuvable.
+        ///   Looks up a localized string similar to L&apos;enseigne est requise.
         /// </summary>
-        internal static string User_NotFound {
+        internal static string User_Name_Required {
             get {
-                return ResourceManager.GetString("User_NotFound", resourceCulture);
+                return ResourceManager.GetString("User_Name_Required", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Score utilisateur.
+        ///   Looks up a localized string similar to Le tag est introuvable.
         /// </summary>
-        internal static string UserPoints {
+        internal static string User_TagNotFound {
             get {
-                return ResourceManager.GetString("UserPoints", resourceCulture);
+                return ResourceManager.GetString("User_TagNotFound", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Le score utilisateur {0} n&apos;est plus disponible.
-        /// </summary>
-        internal static string UserPoints_Gone {
-            get {
-                return ResourceManager.GetString("UserPoints_Gone", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Le score utilisateur {0} est introuvable.
-        /// </summary>
-        internal static string UserPoints_NotFound {
-            get {
-                return ResourceManager.GetString("UserPoints_NotFound", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Le nombre de points pour l&apos;utilisateur ne peut être inférieur ou égale à {0}.
-        /// </summary>
-        internal static string UserPoints_Quantity_CannotBe_LowerThan {
-            get {
-                return ResourceManager.GetString("UserPoints_Quantity_CannotBe_LowerThan", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to La correspondance de niveau en fonction des points est introuvable.
-        /// </summary>
-        internal static string UserPoints_Scoring_Matching_ActionPoints_NotFound {
-            get {
-                return ResourceManager.GetString("UserPoints_Scoring_Matching_ActionPoints_NotFound", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to L&apos;utilisateur pour les points est requis.
-        /// </summary>
-        internal static string UserPoints_User_Required {
-            get {
-                return ResourceManager.GetString("UserPoints_User_Required", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Les données reçues sont invalides ou manquantes, veuillez vérifier les données saisies..
+        ///   Looks up a localized string similar to La validation de votre demande concernant la ressource {0} a échouée.
         /// </summary>
         internal static string Validation {
             get {
                 return ResourceManager.GetString("Validation", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Porte feuille digital.
+        /// </summary>
+        internal static string Wallet {
+            get {
+                return ResourceManager.GetString("Wallet", resourceCulture);
             }
         }
     }

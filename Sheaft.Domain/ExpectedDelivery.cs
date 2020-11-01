@@ -36,7 +36,7 @@ namespace Sheaft.Domain.Models
         public void SetExpectedDate(DateTimeOffset date)
         {
             if (date < DateTimeOffset.UtcNow)
-                throw new ValidationException(MessageKind.ExpectedDelivery_ExpectedDate_CannotBe_BeforeNow);
+                throw new ValidationException(MessageKind.ExpectedDelivery_ExpectedDate_CannotBe_BeforeNow, Name, date.ToString("dd/MM/yyyy"));
 
             ExpectedDeliveryDate = date;
         }
@@ -49,14 +49,14 @@ namespace Sheaft.Domain.Models
         private TimeSlotHour GetOpeningHour(DeliveryMode delivery, DateTimeOffset expectedDeliveryDate)
         {
             if (delivery.RemovedOn.HasValue)
-                throw new ValidationException(MessageKind.ExpectedDelivery_ExpectedDate_DeliveryRemoved, delivery.Name, expectedDeliveryDate);
+                throw new ValidationException(MessageKind.ExpectedDelivery_ExpectedDate_DeliveryRemoved, delivery.Name, expectedDeliveryDate.ToString("dd/MM/yyyy"));
 
             var oh = delivery.OpeningHours.FirstOrDefault(o => o.Day == expectedDeliveryDate.DayOfWeek && o.From <= expectedDeliveryDate.TimeOfDay && o.To >= expectedDeliveryDate.TimeOfDay);
             if(oh == null)
-                throw new ValidationException(MessageKind.ExpectedDelivery_ExpectedDate_NotIn_DeliveryOpeningHours, delivery.Name, expectedDeliveryDate);
+                throw new ValidationException(MessageKind.ExpectedDelivery_ExpectedDate_NotIn_DeliveryOpeningHours, delivery.Name, expectedDeliveryDate.ToString("dd/MM/yyyy"));
 
             if(delivery.LockOrderHoursBeforeDelivery > 0 && expectedDeliveryDate.AddHours(-delivery.LockOrderHoursBeforeDelivery) < DateTime.UtcNow)
-                throw new ValidationException(MessageKind.ExpectedDelivery_ExpectedDate_OrdersLocked, delivery.Name, expectedDeliveryDate);
+                throw new ValidationException(MessageKind.ExpectedDelivery_ExpectedDate_OrdersLocked, delivery.Name, expectedDeliveryDate.ToString("dd/MM/yyyy"));
 
             return oh;
         }

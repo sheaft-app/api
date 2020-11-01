@@ -52,10 +52,10 @@ namespace Sheaft.Application.Handlers
                 var productIds = request.Products.Select(p => p.Id);
                 var products = await _context.FindByIdsAsync<Product>(productIds, token);
 
-                var invalidProductIds = products.Where(p => p.RemovedOn.HasValue || !p.Available || !p.VisibleToConsumers || p.Producer.RemovedOn.HasValue || !p.Producer.CanDirectSell);
+                var invalidProductIds = products.Where(p => p.RemovedOn.HasValue || !p.Available || !p.VisibleToConsumers || p.Producer.RemovedOn.HasValue || !p.Producer.CanDirectSell).Select(p => p.Id);
 
                 if (invalidProductIds.Any())
-                    return BadRequest<Guid>(MessageKind.Order_CannotCreate_Some_Products_Invalid, invalidProductIds.ToArray());
+                    return BadRequest<Guid>(MessageKind.Order_CannotCreate_Some_Products_Invalid, string.Join(";", invalidProductIds));
 
                 var cartProducts = new Dictionary<Product, int>();
                 foreach (var product in products)
@@ -93,10 +93,10 @@ namespace Sheaft.Application.Handlers
                     var productIds = request.Products.Select(p => p.Id);
                     var products = await _context.FindByIdsAsync<Product>(productIds, token);
 
-                    var invalidProductIds = products.Where(p => p.RemovedOn.HasValue || !p.Available || !p.VisibleToStores || p.Producer.RemovedOn.HasValue || !p.Producer.CanDirectSell);
+                    var invalidProductIds = products.Where(p => p.RemovedOn.HasValue || !p.Available || !p.VisibleToStores || p.Producer.RemovedOn.HasValue || !p.Producer.CanDirectSell).Select(p => p.Id);
 
                     if (invalidProductIds.Any())
-                        return BadRequest<IEnumerable<Guid>>(MessageKind.Order_CannotCreate_Some_Products_Invalid, invalidProductIds.ToArray());
+                        return BadRequest<IEnumerable<Guid>>(MessageKind.Order_CannotCreate_Some_Products_Invalid, string.Join(";", invalidProductIds));
 
                     var cartProducts = new Dictionary<Product, int>();
                     foreach (var product in products)
@@ -172,10 +172,10 @@ namespace Sheaft.Application.Handlers
 
                 var productIds = request.Products.Select(p => p.Id);
                 var products = await _context.FindByIdsAsync<Product>(productIds, token);
-                var invalidProductIds = products.Where(p => p.RemovedOn.HasValue || !p.Available || !p.VisibleToConsumers || p.Producer.RemovedOn.HasValue || !p.Producer.CanDirectSell);
+                var invalidProductIds = products.Where(p => p.RemovedOn.HasValue || !p.Available || !p.VisibleToConsumers || p.Producer.RemovedOn.HasValue || !p.Producer.CanDirectSell).Select(p => p.Id);
 
                 if (invalidProductIds.Any())
-                    return BadRequest<bool>(MessageKind.Order_CannotUpdate_Some_Products_Invalid, invalidProductIds.ToArray());
+                    return BadRequest<bool>(MessageKind.Order_CannotUpdate_Some_Products_Invalid, string.Join(";", invalidProductIds));
 
                 var cartProducts = new Dictionary<Product, int>();
                 foreach (var product in products)
@@ -214,10 +214,10 @@ namespace Sheaft.Application.Handlers
                     return BadRequest<Guid>(MessageKind.Order_CannotPay_Deliveries_Required);
 
                 var products = await _context.GetByIdsAsync<Product>(order.Products.Select(p => p.Id), token);
-                var invalidProductIds = products.Where(p => p.RemovedOn.HasValue || !p.Available || !p.VisibleToConsumers || p.Producer.RemovedOn.HasValue || !p.Producer.CanDirectSell);
+                var invalidProductIds = products.Where(p => p.RemovedOn.HasValue || !p.Available || !p.VisibleToConsumers || p.Producer.RemovedOn.HasValue || !p.Producer.CanDirectSell).Select(p => p.Id);
 
                 if (invalidProductIds.Any())
-                    return BadRequest<Guid>(MessageKind.Order_CannotPay_Some_Products_Invalid, invalidProductIds.ToArray());
+                    return BadRequest<Guid>(MessageKind.Order_CannotPay_Some_Products_Invalid, string.Join(";", invalidProductIds));
 
                 using (var transaction = await _context.BeginTransactionAsync(token))
                 {
