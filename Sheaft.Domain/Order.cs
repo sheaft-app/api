@@ -115,7 +115,7 @@ namespace Sheaft.Domain.Models
 
         public void SetProducts(IDictionary<Product, int> orderProducts)
         {
-            if (Products != null)
+            if (Products == null || Products.Any())
                 _products = new List<OrderProduct>();
 
             foreach (var orderProduct in orderProducts)
