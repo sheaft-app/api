@@ -47,7 +47,6 @@ as
   from app.Products p
     join app.Users r on r.Uid = p.ProducerUid and r.Kind = 0
     join app.UserAddresses ra on r.Uid = ra.UserUid
-	join app.DeliveryModes dm on dm.ProducerUid = r.Uid and dm.Kind in (1, 2, 3, 4) 
     left join app.ProductTags pt on p.Uid = pt.ProductUid
     left join app.Returnables pa on pa.Uid = p.ReturnableUid
     left join app.Tags t on t.Uid = pt.TagUid
