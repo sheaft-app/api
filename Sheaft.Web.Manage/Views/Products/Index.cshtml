@@ -49,7 +49,7 @@
 
     @if (Context.Request.ImpersonificationId().HasValue)
     {
-        <a href="https://sheaftapp.blob.core.windows.net/resources/excel/sheaft_catalogue_produits.xlsx" target="_blank">Download sample products catalog</a>
+        <a href="https://content.sheaft.com/resources/excel/sheaft_catalogue_produits.xlsx" target="_blank">Download sample products catalog</a>
         <br />
         <br />
         @using (Html.BeginForm("Import", "Products", FormMethod.Post, new { @class = "form", enctype = "multipart/form-data" }))

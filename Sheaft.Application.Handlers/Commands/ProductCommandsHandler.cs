@@ -411,9 +411,6 @@ namespace Sheaft.Application.Handlers
                     createProductCommand.Unit = unitKind;
             }
 
-            if (tagsStr.EndsWith('s'))
-                tagsStr = tagsStr.Substring(0, tagsStr.Length - 1);
-
             switch (bioStr)
             {
                 case "oui":
@@ -421,9 +418,9 @@ namespace Sheaft.Application.Handlers
                     break;
             }
 
-            var tagsAsStr = tagsStr.Split(";");
+            var tagsAsStr = tagsStr.Split(";").ToList();
 
-            var tags = await _context.FindAsync<Tag>(t => tagsAsStr.Any(c => c.Contains(t.Name.ToLower())), token);
+            var tags = await _context.FindAsync<Tag>(t => tagsAsStr.Any(c => c == t.Name.ToLowerInvariant()), token);
             createProductCommand.Tags = tags.Select(t => t.Id);
 
             createProductCommand.Available = false;
