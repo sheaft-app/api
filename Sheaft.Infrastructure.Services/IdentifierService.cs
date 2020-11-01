@@ -156,8 +156,8 @@ namespace Sheaft.Infrastructure.Services
                         var results = (IdentifierTableEntity)tableResults.Result;
                         if (results != null)
                         {
-                            id = results.Id;
                             results.Id++;
+                            id = results.Id;
                             await table.ExecuteAsync(TableOperation.Replace(results), token);
                         }
                         else
