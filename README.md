@@ -13,11 +13,11 @@ Ce projet permet de prendre en compte les requêtes de l'interface web de Sheaft
 - Un compte INSEE: https://api.insee.fr/ pour permettre d'effectuer les recherches de SIRET lors de l'enregistrement d'un compte producteur ou magasin.
 - Un serveur d'identité: le code source de celui de Sheaft est disponible dans le repository https://github.com/sheaft-app/identity, il démarre par défaut sur https://localhost:5001
 - Un compte de stockage Azure sur lequel sera chargé les images des produits, les exports/imports et autres données requises.
-- Un serveur Signalr pour envoyer les notifications de changement d'états à la partie Web, le code est disponible dans Sheaft.Signalr (il faut lui configurer une clé d'API pour pouvoir l'appeler, le setting est signalr:apikey).
+- Un serveur Signalr pour envoyer les notifications de changement d'états à la partie Web, le code est disponible dans Sheaft.Web.Signalr (il faut lui configurer une clé d'API pour pouvoir l'appeler, le setting est signalr:apikey).
 
 Une fois que l'application a été lancée une fois, vous devez executer la commande suivante: dotnet sql-cache create "Data Source=##REPLACE##,1434;Initial Catalog=##REPLACE##;Integrated Security=True;User ID=##REPLACE##;Password=##REPLACE##;Trusted_Connection=False;" cache CachedItems
 
-## API (Sheaft.Api)
+## API (Sheaft.Web.Api)
 
 Le serveur d'api utilise AspNetCore 3.1 pour fournir le point d'entré applicatif.
 
@@ -49,7 +49,7 @@ La base de données est utilisée via l'ORM EntityFrameworkCore, cette couche ut
 ## Evolution du modèle de base de données
 
 Pour la mettre à jour le modèle de données, nous utilisons les migrations d'EF. 
-Il faut donc faire les modifications nécessaires sur AppDbContext puis se placer dans le répertoire Sheaft.Infrastructure et executer:  dotnet-ef migrations add ##REPLACE## -s ..\Sheaft.Api\Sheaft.Api.csproj -c AppDbContext 
+Il faut donc faire les modifications nécessaires sur AppDbContext puis se placer dans le répertoire Sheaft.Infrastructure et executer:  dotnet-ef migrations add ##REPLACE## -s ..\Sheaft.Web.Api\Sheaft.Web.Api.csproj -c AppDbContext 
 
 Vous pouvez ensuite appliquer la migration à l'aide de la commande suivante: dotnet-ef database update ##REPLACE###
 
