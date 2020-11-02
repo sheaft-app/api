@@ -29,7 +29,7 @@
             @Html.DropDownListFor(c => c.Kind, kinds, new { @class = "form-control" })
         </div>
         <div class="form-group">
-            @Html.LabelFor(c => c.Picture, new { @class = "form-label" })
+            @Html.LabelFor(c => c.Picture, new { @class = "form-label" })<span>(620*256)</span>
             @if (!string.IsNullOrWhiteSpace(Model.Picture))
             {
                 <img src="@Model.Picture" height="100" />
@@ -37,8 +37,20 @@
             @Html.TextBoxFor(c => c.Picture, new { @class = "form-control", @type = "file" })
         </div>
         <div class="form-group">
+            @Html.LabelFor(c => c.Icon, new { @class = "form-label" })
+            @if (!string.IsNullOrWhiteSpace(Model.Icon))
+            {
+                <img src="@Model.Icon" height="100" />
+            }
+            @Html.TextBoxFor(c => c.Icon, new { @class = "form-control", @type = "file" })
+        </div>
+        <div class="form-group">
             @Html.LabelFor(m => m.Description)
             @Html.TextAreaFor(m => m.Description, new { @class = "form-control" })
+        </div>
+        <div class="form-check">
+            @Html.CheckBoxFor(m => m.Available, new { @class = "form-check-input" })
+            @Html.LabelFor(m => m.Available, new { @class = "form-check-label" })
         </div>
 
         <br />

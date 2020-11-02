@@ -53,6 +53,7 @@
                     <th scope="col">Name</th>
                     <th scope="col">Kind</th>
                     <th scope="col">CreatedOn</th>
+                    <th scope="col">Available</th>
                     <th scope="col">Removed</th>
                     <th scope="col">
                         <a asp-controller="Tags" asp-action="Add" class="btn btn-success">
@@ -68,6 +69,7 @@
                     <th scope="row">@entity.Name</th>
                     <td>@entity.Kind</td>
                     <td>@entity.CreatedOn.ToString("dd/MM/yy hh:mm")</td>
+                    <td>@entity.Available</td>
                     <td>@entity.RemovedOn.HasValue</td>
                     <td>
                         <a asp-controller="Tags" asp-action="Edit" asp-route-id="@entity.Id" class="btn btn-info">

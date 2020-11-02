@@ -74,7 +74,7 @@ namespace Sheaft.Web.Manage.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Add(TagViewModel model, IFormFile picture, CancellationToken token)
+        public async Task<IActionResult> Add(TagViewModel model, IFormFile picture, IFormFile icon, CancellationToken token)
         {
             var requestUser = await GetRequestUser(token);
 
@@ -87,11 +87,22 @@ namespace Sheaft.Web.Manage.Controllers
                 }
             }
 
+            if (icon != null)
+            {
+                using (var ms = new MemoryStream())
+                {
+                    icon.CopyTo(ms);
+                    model.Icon = Convert.ToBase64String(ms.ToArray());
+                }
+            }
+
             var result = await _mediatr.Process(new CreateTagCommand(requestUser)
             {
                 Description = model.Description,
                 Name = model.Name,
                 Picture = model.Picture,
+                Icon = model.Icon,
+                Available = model.Available,
                 Kind = model.Kind
             }, token);
 
@@ -121,7 +132,7 @@ namespace Sheaft.Web.Manage.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(TagViewModel model, IFormFile picture, CancellationToken token)
+        public async Task<IActionResult> Edit(TagViewModel model, IFormFile picture, IFormFile icon, CancellationToken token)
         {
             var requestUser = await GetRequestUser(token);
 
@@ -134,12 +145,23 @@ namespace Sheaft.Web.Manage.Controllers
                 }
             }
 
+            if (icon != null)
+            {
+                using (var ms = new MemoryStream())
+                {
+                    icon.CopyTo(ms);
+                    model.Icon = Convert.ToBase64String(ms.ToArray());
+                }
+            }
+
             var result = await _mediatr.Process(new UpdateTagCommand(requestUser)
             {
                 Id = model.Id,
                 Description = model.Description,
                 Name = model.Name,
                 Picture = model.Picture,
+                Icon = model.Icon,
+                Available = model.Available,
                 Kind = model.Kind
             }, token);
 
