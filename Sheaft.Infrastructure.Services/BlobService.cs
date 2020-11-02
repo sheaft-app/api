@@ -41,14 +41,31 @@ namespace Sheaft.Infrastructure.Services
             });
         }
 
-        public async Task<Result<string>> UploadTagPictureAsync(Guid tagId, byte[] data, CancellationToken token)
+        public async Task<Result<string>> UploadTagPictureAsync(Guid tagId, string filename, string size, byte[] data, CancellationToken token)
         {
             return await ExecuteAsync(async () =>
             {
                 var containerClient = new BlobContainerClient(_storageOptions.ConnectionString, _storageOptions.Containers.Pictures);
                 await containerClient.CreateIfNotExistsAsync(cancellationToken: token);
 
-                var blobClient = containerClient.GetBlobClient($"tags/{tagId:N}/{Guid.NewGuid():N}.jpg");
+                var blobClient = containerClient.GetBlobClient($"tags/images/{tagId:N}/{filename}_{size}.jpg");
+                await blobClient.DeleteIfExistsAsync(cancellationToken: token);
+
+                using (var ms = new MemoryStream(data))
+                    await blobClient.UploadAsync(ms, token);
+
+                return Ok(GetBlobUri(blobClient, _storageOptions.Containers.Pictures));
+            });
+        }
+
+        public async Task<Result<string>> UploadTagIconAsync(Guid tagId, byte[] data, CancellationToken token)
+        {
+            return await ExecuteAsync(async () =>
+            {
+                var containerClient = new BlobContainerClient(_storageOptions.ConnectionString, _storageOptions.Containers.Pictures);
+                await containerClient.CreateIfNotExistsAsync(cancellationToken: token);
+
+                var blobClient = containerClient.GetBlobClient($"tags/icons/{tagId:N}/{Guid.NewGuid():N}.jpg");
                 await blobClient.DeleteIfExistsAsync(cancellationToken: token);
 
                 using (var ms = new MemoryStream(data))

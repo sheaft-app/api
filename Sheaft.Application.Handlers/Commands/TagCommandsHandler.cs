@@ -30,6 +30,7 @@ namespace Sheaft.Application.Handlers
             return await ExecuteAsync(request, async () =>
             {
                 var entity = new Tag(Guid.NewGuid(), request.Kind, request.Name, request.Description, request.Picture);
+                entity.SetAvailable(request.Available);
 
                 await _context.AddAsync(entity, token);
                 await _context.SaveChangesAsync(token);
@@ -47,12 +48,17 @@ namespace Sheaft.Application.Handlers
                 entity.SetName(request.Name);
                 entity.SetDescription(request.Description);
                 entity.SetKind(request.Kind);
+                entity.SetAvailable(request.Available);
 
                 await _context.SaveChangesAsync(token);
 
                 var imageResult = await _mediatr.Process(new UpdateTagPictureCommand(request.RequestUser) { TagId = entity.Id, Picture = request.Picture }, token);
                 if (!imageResult.Success)
                     return Failed<bool>(imageResult.Exception);
+
+                var iconResult = await _mediatr.Process(new UpdateTagIconCommand(request.RequestUser) { TagId = entity.Id, Icon = request.Icon }, token);
+                if (!iconResult.Success)
+                    return Failed<bool>(iconResult.Exception);
 
                 return Ok(true);
             });

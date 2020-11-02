@@ -13,6 +13,9 @@ namespace Sheaft.GraphQL.Types
             descriptor.Field(c => c.UpdatedOn);
             descriptor.Field(c => c.Kind).Type<NonNullType<TagKindEnumType>>();
             descriptor.Field(c => c.Description);
+            descriptor.Field(c => c.Available);
+            descriptor.Field(c => c.Picture);
+            descriptor.Field(c => c.Icon);
 
             descriptor.Field(c => c.Name)
                 .Type<NonNullType<StringType>>();

@@ -11,7 +11,9 @@ namespace Sheaft.Application.Handlers
 {
     public class PictureCommandsHandler : ResultsHandler,
         IRequestHandler<UpdateUserPictureCommand, Result<string>>,
-        IRequestHandler<UpdateProductPictureCommand, Result<string>>
+        IRequestHandler<UpdateProductPictureCommand, Result<string>>,
+        IRequestHandler<UpdateTagPictureCommand, Result<string>>,
+        IRequestHandler<UpdateTagIconCommand, Result<string>>
     {
         private readonly IPictureService _imageService;
 
@@ -82,6 +84,23 @@ namespace Sheaft.Application.Handlers
                     return Failed<string>(resultImage.Exception);
 
                 entity.SetPicture(resultImage.Data);
+                await _context.SaveChangesAsync(token);
+
+                return Ok(resultImage.Data);
+            });
+        }
+
+        public async Task<Result<string>> Handle(UpdateTagIconCommand request, CancellationToken token)
+        {
+            return await ExecuteAsync(request, async () =>
+            {
+                var entity = await _context.GetByIdAsync<Tag>(request.TagId, token);
+
+                var resultImage = await _imageService.HandleTagIconAsync(entity, request.Icon, token);
+                if (!resultImage.Success)
+                    return Failed<string>(resultImage.Exception);
+
+                entity.SetIcon(resultImage.Data);
                 await _context.SaveChangesAsync(token);
 
                 return Ok(resultImage.Data);

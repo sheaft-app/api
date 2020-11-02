@@ -71,6 +71,27 @@ namespace Sheaft.Infrastructure.Services
                 if (bytes == null)
                     return Ok(picture);
 
+                var filename = Guid.NewGuid().ToString("N");
+
+                using (var image = Image.Load(bytes))
+                {
+                    await UploadTagPictureAsync(image, tag.Id, filename, PictureSize.LARGE, 620, 256, token, quality: 40);
+                    await UploadTagPictureAsync(image, tag.Id, filename, PictureSize.MEDIUM, 310, 128, token, quality: 60);
+                    await UploadTagPictureAsync(image, tag.Id, filename, PictureSize.SMALL, 60, 60, token, quality: 80);
+                }
+
+                return Ok($"{_storageOptions.ContentScheme}://{_storageOptions.ContentHostname}/{_storageOptions.Containers.Pictures}/tags/pictures/{tag.Id:N}/{filename}");
+            });
+        }
+
+        public async Task<Result<string>> HandleTagIconAsync(Tag tag, string picture, CancellationToken token)
+        {
+            return await ExecuteAsync(async () =>
+            {
+                var bytes = await RetrievePictureBytesAsync(picture);
+                if (bytes == null)
+                    return Ok(picture);
+
                 using (var image = Image.Load(bytes))
                 {
                     using (var blobStream = new MemoryStream())
@@ -81,7 +102,7 @@ namespace Sheaft.Infrastructure.Services
                             Size = new Size(64, 64)
                         })).Save(blobStream, new JpegEncoder { Quality = 100 });
 
-                        return await _blobService.UploadTagPictureAsync(tag.Id, blobStream.ToArray(), token);
+                        return await _blobService.UploadTagIconAsync(tag.Id, blobStream.ToArray(), token);
                     }
                 }
             });
@@ -106,10 +127,10 @@ namespace Sheaft.Infrastructure.Services
                 var imageId = Guid.NewGuid().ToString("N");
                 using (Image image = Image.Load(bytes))
                 {
-                    await UploadPictureAsync(image, entity.Producer.Id, entity.Id, imageId, PictureSize.LARGE, 620, 256, token, quality: 50);
-                    await UploadPictureAsync(image, entity.Producer.Id, entity.Id, imageId, PictureSize.MEDIUM, 310, 128, token, quality: 70);
-                    await UploadPictureAsync(image, entity.Producer.Id, entity.Id, imageId, PictureSize.SMALL, 64, 64, token, ResizeMode.Crop, quality: 90);
-                    await UploadPictureAsync(image, entity.Producer.Id, entity.Id, imageId, PictureSize.ORIGINAL, token);
+                    await UploadProductPictureAsync(image, entity.Producer.Id, entity.Id, imageId, PictureSize.LARGE, 620, 256, token, quality: 50);
+                    await UploadProductPictureAsync(image, entity.Producer.Id, entity.Id, imageId, PictureSize.MEDIUM, 310, 128, token, quality: 70);
+                    await UploadProductPictureAsync(image, entity.Producer.Id, entity.Id, imageId, PictureSize.SMALL, 64, 64, token, ResizeMode.Crop, quality: 90);
+                    await UploadProductPictureAsync(image, entity.Producer.Id, entity.Id, imageId, PictureSize.ORIGINAL, token);
                 }
 
                 return Ok($"{_storageOptions.ContentScheme}://{_storageOptions.ContentHostname}/{_storageOptions.Containers.Pictures}/{CoreProductExtensions.GetPictureUrl(entity.Producer.Id, entity.Id, imageId)}");
@@ -119,13 +140,26 @@ namespace Sheaft.Infrastructure.Services
         private string GetDefaultProductPicture(IEnumerable<Tag> tags)
         {
             var category = tags.FirstOrDefault(t => t.Kind == TagKind.Category);
-            if (category != null)
-                return $"{_storageOptions.ContentScheme}://{_storageOptions.ContentHostname}/{_storageOptions.Containers.Pictures}/products/categories/{category.Id.ToString("D").ToUpperInvariant()}";
-
-            return $"{_storageOptions.ContentScheme}://{_storageOptions.ContentHostname}/{_storageOptions.Containers.Pictures}/products/categories/default";
+            return category?.Picture;
         }
 
-        private async Task<Result<string>> UploadPictureAsync(Image image, Guid userId, Guid productId, string filename, string size, int width, int height, CancellationToken token, ResizeMode mode = ResizeMode.Max, int quality = 100)
+        private async Task<Result<string>> UploadTagPictureAsync(Image image, Guid tagId, string filename, string size, int width, int height, CancellationToken token, ResizeMode mode = ResizeMode.Max, int quality = 100)
+        {
+            using (var blobStream = new MemoryStream())
+            {
+                image.Clone(context => context.Resize(new ResizeOptions
+                {
+                    Mode = mode,
+                    Size = new Size(width, height),
+                    Compand = true,
+                    Sampler = KnownResamplers.Lanczos3
+                })).Save(blobStream, new JpegEncoder { Quality = quality, Subsample = JpegSubsample.Ratio444 });
+
+                return await _blobService.UploadTagPictureAsync(tagId, filename, size, blobStream.ToArray(), token);
+            }
+        }
+
+        private async Task<Result<string>> UploadProductPictureAsync(Image image, Guid userId, Guid productId, string filename, string size, int width, int height, CancellationToken token, ResizeMode mode = ResizeMode.Max, int quality = 100)
         {
             using (var blobStream = new MemoryStream())
             {
@@ -141,7 +175,7 @@ namespace Sheaft.Infrastructure.Services
             }
         }
 
-        private async Task<Result<string>> UploadPictureAsync(Image image, Guid userId, Guid productId, string filename, string size, CancellationToken token)
+        private async Task<Result<string>> UploadProductPictureAsync(Image image, Guid userId, Guid productId, string filename, string size, CancellationToken token)
         {
             using (var blobStream = new MemoryStream())
             {

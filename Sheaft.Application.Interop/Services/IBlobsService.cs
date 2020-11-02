@@ -12,7 +12,8 @@ namespace Sheaft.Application.Interop
         Task<Result<bool>> UploadImportProductsFileAsync(Guid userId, Guid jobId, byte[] data, CancellationToken token);
         Task<Result<byte[]>> DownloadImportProductsFileAsync(Guid userId, Guid jobId, CancellationToken token);
         Task<Result<string>> UploadUserPictureAsync(Guid userId, byte[] data, CancellationToken token);
-        Task<Result<string>> UploadTagPictureAsync(Guid tagId, byte[] data, CancellationToken token);
+        Task<Result<string>> UploadTagIconAsync(Guid tagId, byte[] data, CancellationToken token);
+        Task<Result<string>> UploadTagPictureAsync(Guid tagId, string filename, string size, byte[] data, CancellationToken token);
         Task<Result<string>> UploadProductPictureAsync(Guid userId, Guid productId, string filename, string size, byte[] data, CancellationToken token);
         Task<Result<bool>> CleanContainerFolderStorageAsync(string container, string folder, CancellationToken token);
         Task<Result<bool>> CleanUserStorageAsync(Guid userId, CancellationToken token);
