@@ -228,7 +228,7 @@ namespace Sheaft.Domain.Models
                 unit = UnitKind.NotSpecified;
 
             if (conditioning == ConditioningKind.Bouquet || conditioning == ConditioningKind.Bunch)
-                QuantityPerUnit = 1;
+                quantity = 1;
 
             if (quantity <= 0)
                 throw new ValidationException(MessageKind.Product_QuantityPerUnit_CannotBe_LowerOrEqualThan, 0);

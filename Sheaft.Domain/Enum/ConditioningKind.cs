@@ -8,5 +8,6 @@
         Bouquet,
         Bunch,
         Piece,
+        Basket
     }
 }

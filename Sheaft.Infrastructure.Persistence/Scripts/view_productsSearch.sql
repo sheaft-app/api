@@ -37,7 +37,8 @@ as
 			when p.Conditioning = 2 then 'BULK'
 			when p.Conditioning = 3 then 'BOUQUET'
 			when p.Conditioning = 4 then 'BUNCH'
-			when p.Conditioning = 5 then 'PIECE' end as product_conditioning
+			when p.Conditioning = 5 then 'PIECE'
+			when p.Conditioning = 6 then 'BASKET' end as product_conditioning
      , app.InlineMax(app.InlineMax(app.InlineMax(p.UpdatedOn, r.UpdatedOn), t.UpdatedOn), p.CreatedOn) as last_update
      , case when (app.InlineMax(p.RemovedOn, r.RemovedOn)) is not null or r.CanDirectSell = 0 then 1 else 0 end as removed
      , '[' + STRING_AGG('"' + LOWER(t.Name) + '"', ',') + ']' as product_tags     
@@ -72,7 +73,8 @@ as
 			when p.Conditioning = 2 then 'BULK'
 			when p.Conditioning = 3 then 'BOUQUET'
 			when p.Conditioning = 4 then 'BUNCH'
-			when p.Conditioning = 5 then 'PIECE' end,
+			when p.Conditioning = 5 then 'PIECE'
+			when p.Conditioning = 6 then 'BASKET' end,
 	r.Id,
     r.Phone,
     p.Available,

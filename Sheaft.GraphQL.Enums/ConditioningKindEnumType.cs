@@ -12,6 +12,7 @@ namespace Sheaft.GraphQL.Enums
             descriptor.Value(ConditioningKind.Box).Name("BOX");
             descriptor.Value(ConditioningKind.Bunch).Name("BUNCH");
             descriptor.Value(ConditioningKind.Piece).Name("PIECE");
+            descriptor.Value(ConditioningKind.Basket).Name("BASKET");
             descriptor.Value(ConditioningKind.Not_Specified).Name("NOT_SPECIFIED");
         }
     }
