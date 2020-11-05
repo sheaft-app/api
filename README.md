@@ -1,4 +1,4 @@
-# Sheaft API (utilisée par https://app.sheaft.com)
+# Sheaft API
 
 Ce projet permet de prendre en compte les requêtes de l'interface web de Sheaft à l'aide de GraphQL et dotnetcore
 
