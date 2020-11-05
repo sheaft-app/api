@@ -381,6 +381,9 @@ namespace Sheaft.Application.Handlers
             else
                 createProductCommand.Vat = vat;
 
+            if (string.IsNullOrWhiteSpace(quantityPerUnitStr))
+                quantityPerUnitStr = "1";
+
             if (!decimal.TryParse(quantityPerUnitStr, NumberStyles.Any, new CultureInfo("en-US"), out decimal qtyPerUnit))
                 return Failed<CreateProductCommand>(new ValidationException(MessageKind.CreateProduct_QtyPerUnit_Invalid_Line, i));
             else
