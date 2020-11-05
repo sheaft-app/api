@@ -363,7 +363,7 @@ namespace Sheaft.Application.Handlers
             var conditioningStr = worksheet.Cells[i, 5].GetValue<string>()?.ToLowerInvariant().Replace("\"", "").Replace("'", "").Replace(".", ",").Split(",").Select(t => t.Trim()).FirstOrDefault();
             var quantityPerUnitStr = worksheet.Cells[i, 6].GetValue<string>()?.ToLowerInvariant().Replace(" ", "").Replace(",", ".");
             var unitKindStr = worksheet.Cells[i, 7].GetValue<string>()?.ToLowerInvariant().Replace(" ", "").Replace(",", ".").Split(",").Select(t => t.Trim()).FirstOrDefault();
-            var tagsStr = worksheet.Cells[i, 8].GetValue<string>()?.ToLowerInvariant().Replace("\"", "").Replace("'", "").Replace(".", ",").Split(",").Select(t => t.Trim()).FirstOrDefault();
+            var tagsStr = worksheet.Cells[i, 8].GetValue<string>()?.Replace("\"", "").Replace("'", "").Replace(".", ",").Split(",").Select(t => t.Trim()).FirstOrDefault();
             var bioStr = worksheet.Cells[i, 9].GetValue<string>()?.ToLowerInvariant().Replace(" ", "");
 
             if (!decimal.TryParse(wholeSalePriceStr, NumberStyles.Any, new CultureInfo("en-US"), out decimal wholeSalePrice))
@@ -420,7 +420,7 @@ namespace Sheaft.Application.Handlers
 
             var tagsAsStr = tagsStr.Split(";").ToList();
 
-            var tags = await _context.FindAsync<Tag>(t => tagsAsStr.Any(c => c == t.Name.ToLowerInvariant()), token);
+            var tags = await _context.FindAsync<Tag>(t => tagsAsStr.Contains(t.Name), token);
             createProductCommand.Tags = tags.Select(t => t.Id);
 
             createProductCommand.Available = false;
