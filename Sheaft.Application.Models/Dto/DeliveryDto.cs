@@ -9,6 +9,7 @@ namespace Sheaft.Application.Models
         public Guid Id { get; set; }
         public DeliveryKind Kind { get; set; }
         public string Name { get; set; }
+        public bool Available { get; set; }
         public AddressDto Address { get; set; }
         public IEnumerable<DeliveryHourDto> DeliveryHours { get; set; }
     }

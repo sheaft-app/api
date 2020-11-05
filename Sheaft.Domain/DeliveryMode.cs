@@ -37,6 +37,7 @@ namespace Sheaft.Domain.Models
         public int LockOrderHoursBeforeDelivery { get; private set; }
         public string Name { get; private set; }
         public string Description { get; private set; }
+        public bool Available { get; private set; }
         public virtual DeliveryAddress Address { get; private set; }
         public virtual Producer Producer { get; private set; }
         public virtual IReadOnlyCollection<TimeSlotHour> OpeningHours => _openingHours?.AsReadOnly(); 
@@ -64,6 +65,11 @@ namespace Sheaft.Domain.Models
             Description = description;
         }
 
+        public void SetAvailability(bool available)
+        {
+            Available = available;
+        }
+
         public void SetName(string name)
         {
             Name = name;
@@ -72,6 +78,11 @@ namespace Sheaft.Domain.Models
         public void SetKind(DeliveryKind kind)
         {
             Kind = kind;
+        }
+
+        public void SetAvailability(object available)
+        {
+            throw new NotImplementedException();
         }
     }
 }

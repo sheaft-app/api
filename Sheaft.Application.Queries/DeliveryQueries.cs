@@ -41,7 +41,7 @@ namespace Sheaft.Application.Queries
         public async Task<IEnumerable<ProducerDeliveriesDto>> GetProducersDeliveriesAsync(IEnumerable<Guid> producerIds, IEnumerable<DeliveryKind> kinds, DateTimeOffset currentDate, RequestUser currentUser, CancellationToken token)
         {
             var list = new List<ProducerDeliveriesDto>();
-            var deliveriesMode = await _context.FindAsync<DeliveryMode>(d => producerIds.Contains(d.Producer.Id) && kinds.Contains(d.Kind), token);
+            var deliveriesMode = await _context.FindAsync<DeliveryMode>(d => d.Available && producerIds.Contains(d.Producer.Id) && kinds.Contains(d.Kind), token);
 
             var deliveriesProducerIds = deliveriesMode.Select(c => c.Producer.Id).Distinct();
             var producerDistinctIds = producerIds.Distinct();
@@ -68,6 +68,7 @@ namespace Sheaft.Application.Queries
                     {
                         Id = deliveryMode.Id,
                         Kind = deliveryMode.Kind,
+                        Available = deliveryMode.Available,
                         Address = deliveryMode.Address != null ? new AddressDto
                         {
                             City = deliveryMode.Address.City,
@@ -92,7 +93,7 @@ namespace Sheaft.Application.Queries
         public async Task<IEnumerable<ProducerDeliveriesDto>> GetStoreDeliveriesForProducersAsync(Guid storeId, IEnumerable<Guid> producerIds, IEnumerable<DeliveryKind> kinds, DateTimeOffset currentDate, RequestUser currentUser, CancellationToken token)
         {
             var list = new List<ProducerDeliveriesDto>();
-            var agreements = await _context.FindAsync<Agreement>(d => producerIds.Contains(d.Delivery.Producer.Id) && d.Store.Id == storeId && d.Status == AgreementStatus.Accepted && kinds.Contains(d.Delivery.Kind), token);
+            var agreements = await _context.FindAsync<Agreement>(d => d.Delivery.Available && producerIds.Contains(d.Delivery.Producer.Id) && d.Store.Id == storeId && d.Status == AgreementStatus.Accepted && kinds.Contains(d.Delivery.Kind), token);
 
             var agreementProducerIds = agreements.Select(c => c.Delivery.Producer.Id).Distinct();
             var producerDistinctIds = producerIds.Distinct();
@@ -124,6 +125,7 @@ namespace Sheaft.Application.Queries
                     {
                         Id = agreement.Delivery.Id,
                         Kind = agreement.Delivery.Kind,
+                        Available = agreement.Delivery.Available,
                         Address = agreement.Delivery.Address != null ? new AddressDto
                         {
                             City = agreement.Delivery.Address.City,

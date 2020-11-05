@@ -20,5 +20,6 @@ namespace Sheaft.Application.Commands
         public int LockOrderHoursBeforeDelivery { get; set; }
         public LocationAddressInput Address { get; set; }
         public IEnumerable<TimeSlotGroupInput> OpeningHours { get; set; }
+        public bool Available { get; set; }
     }
 }

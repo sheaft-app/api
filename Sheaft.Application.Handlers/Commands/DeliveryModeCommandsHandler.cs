@@ -52,6 +52,8 @@ namespace Sheaft.Application.Handlers
 
                 var entity = new DeliveryMode(Guid.NewGuid(), request.Kind, producer, request.LockOrderHoursBeforeDelivery, deliveryModeAddress, openingHours, request.Name, request.Description);
 
+                entity.SetAvailability(request.Available);
+
                 if (request.Kind == DeliveryKind.Collective || request.Kind == DeliveryKind.Farm || request.Kind == DeliveryKind.Market)
                     producer.CanDirectSell = true;
 
@@ -70,6 +72,7 @@ namespace Sheaft.Application.Handlers
                 var entity = await _context.GetByIdAsync<DeliveryMode>(request.Id, token);
 
                 entity.SetName(request.Name);
+                entity.SetAvailability(request.Available);
                 entity.SetDescription(request.Description);
                 entity.SetLockOrderHoursBeforeDelivery(request.LockOrderHoursBeforeDelivery);
                 entity.SetKind(request.Kind);
