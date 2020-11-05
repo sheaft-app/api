@@ -262,7 +262,7 @@ namespace Sheaft.Application.Handlers
                 await _context.AddAsync(entity, token);
                 await _context.SaveChangesAsync(token);
 
-                _mediatr.Post(new ImportProductsCommand(request.RequestUser) { Id = entity.Id });
+                _mediatr.Post(new ImportProductsCommand(request.RequestUser) { Id = entity.Id, NotifyOnUpdates = request.NotifyOnUpdates });
                 return Created(entity.Id);
             });
         }
@@ -280,7 +280,8 @@ namespace Sheaft.Application.Handlers
                     if (!startResult.Success)
                         throw startResult.Exception;
 
-                    _mediatr.Post(new ProductImportProcessingEvent(request.RequestUser) { JobId = job.Id });
+                    if(request.NotifyOnUpdates)
+                        _mediatr.Post(new ProductImportProcessingEvent(request.RequestUser) { JobId = job.Id });
 
                     var data = await _blobService.DownloadImportProductsFileAsync(job.User.Id, job.Id, token);
                     if (!data.Success)
@@ -319,12 +320,16 @@ namespace Sheaft.Application.Handlers
                     if (!result.Success)
                         throw result.Exception;
 
-                    _mediatr.Post(new ProductImportSucceededEvent(request.RequestUser) { JobId = job.Id });
+                    if (request.NotifyOnUpdates)
+                        _mediatr.Post(new ProductImportSucceededEvent(request.RequestUser) { JobId = job.Id });
+
                     return result;
                 }
                 catch (Exception e)
                 {
-                    _mediatr.Post(new ProductImportFailedEvent(request.RequestUser) { JobId = job.Id });
+                    if (request.NotifyOnUpdates)
+                        _mediatr.Post(new ProductImportFailedEvent(request.RequestUser) { JobId = job.Id });
+
                     return await _mediatr.Process(new FailJobCommand(request.RequestUser) { Id = job.Id, Reason = e.Message }, token);
                 }
             });
