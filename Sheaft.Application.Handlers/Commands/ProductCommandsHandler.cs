@@ -422,6 +422,11 @@ namespace Sheaft.Application.Handlers
                     createProductCommand.Unit = unitKind;
             }
 
+            if(tagsStr == "Panier garni")
+            {
+                createProductCommand.Conditioning = ConditioningKind.Basket;
+            }
+
             switch (bioStr)
             {
                 case "oui":
