@@ -10,7 +10,6 @@ using Sheaft.Application.Interop;
 using Sheaft.Application.Events;
 using Microsoft.Extensions.Logging;
 using Microsoft.EntityFrameworkCore;
-using Sheaft.Domain.Enums;
 
 namespace Sheaft.Application.Handlers
 {
@@ -239,6 +238,10 @@ namespace Sheaft.Application.Handlers
                 purchaseOrder.Deliver();
 
                 await _context.SaveChangesAsync(token);
+
+                var producerLegals = await _context.GetSingleAsync<BusinessLegal>(c => c.User.Id == purchaseOrder.Vendor.Id, token);
+                if(!producerLegals.DeclarationRequired)
+                    _mediatr.Post(new CheckLegalsDeclarationRequiredCommand(request.RequestUser) { UserId = purchaseOrder.Vendor.Id });
 
                 _mediatr.Schedule(new CreateTransferCommand(request.RequestUser) { PurchaseOrderId = purchaseOrder.Id }, TimeSpan.FromDays(7));
                 return Ok(true);

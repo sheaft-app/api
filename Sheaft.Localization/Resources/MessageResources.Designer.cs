@@ -736,6 +736,15 @@ namespace Sheaft.Localization.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Il n&apos;est pas possible de basculer la déclaration en non requise.
+        /// </summary>
+        internal static string Legal_Cannot_Unrequire_Declaration {
+            get {
+                return ResourceManager.GetString("Legal_Cannot_Unrequire_Declaration", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to L&apos;email de contact de votre entreprise est requis.
         /// </summary>
         internal static string Legal_Email_Required {

@@ -151,6 +151,7 @@
         Legal_Vat_Required = 28101,
         Legal_Kind_Cannot_Be_Natural = 28102,
         Legal_Email_Required = 28103,
+        Legal_Cannot_Unrequire_Declaration = 28104,
         Payin = 29000,
         Payin_CannotSet_Already_Succeeded = 29101,
         Payin_CannotAdd_Refund_PurchaseOrderRefund_AlreadySucceeded = 29102,

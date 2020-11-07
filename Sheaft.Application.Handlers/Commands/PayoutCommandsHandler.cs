@@ -148,13 +148,17 @@ namespace Sheaft.Application.Handlers
                 if (!checkConfigurationResult.Success)
                     return Failed<Guid>(checkConfigurationResult.Exception);
 
-                var checkDocumentsResult = await _mediatr.Process(new EnsureProducerDocumentsValidatedCommand(request.RequestUser) { ProducerId = request.ProducerId }, token);
-                if (!checkDocumentsResult.Success)
-                    return Failed<Guid>(checkDocumentsResult.Exception);
+                var producerLegals = await _context.GetSingleAsync<BusinessLegal>(c => c.User.Id == request.ProducerId, token);
+                if (producerLegals.DeclarationRequired)
+                {
+                    var checkDocumentsResult = await _mediatr.Process(new EnsureProducerDocumentsValidatedCommand(request.RequestUser) { ProducerId = request.ProducerId }, token);
+                    if (!checkDocumentsResult.Success)
+                        return Failed<Guid>(checkDocumentsResult.Exception);
 
-                var checkDeclarationResult = await _mediatr.Process(new EnsureDeclarationIsValidatedCommand(request.RequestUser) { UserId = request.ProducerId }, token);
-                if (!checkDeclarationResult.Success)
-                    return Failed<Guid>(checkDeclarationResult.Exception);
+                    var checkDeclarationResult = await _mediatr.Process(new EnsureDeclarationIsValidatedCommand(request.RequestUser) { ProducerId = request.ProducerId }, token);
+                    if (!checkDeclarationResult.Success)
+                        return Failed<Guid>(checkDeclarationResult.Exception);
+                }
 
                 var wallet = await _context.GetSingleAsync<Wallet>(c => c.User.Id == request.ProducerId, token);
                 var bankAccount = await _context.GetSingleAsync<BankAccount>(c => c.User.Id == request.ProducerId && c.IsActive, token);

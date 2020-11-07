@@ -136,7 +136,7 @@ namespace Sheaft.Application.Handlers
         {
             return await ExecuteAsync(request, async () =>
             {
-                var legal = await _context.GetSingleAsync<BusinessLegal>(bl => bl.User.Id == request.UserId, token);
+                var legal = await _context.GetSingleAsync<BusinessLegal>(bl => bl.User.Id == request.ProducerId, token);
                 if (legal.Declaration == null)
                 {
                     var result = await _mediatr.Process(new CreateDeclarationCommand(request.RequestUser)

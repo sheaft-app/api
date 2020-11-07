@@ -742,123 +742,126 @@
     <value>La mise à jour de votre profile sur notre fournisseur d'identité à échouée</value>
   </data>
   <data name="PsP_CannotCreate_Wallet_User_Not_Exists" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="PsP_CannotCreate_Wallet_Wallet_Exists" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="PsP_CannotCreate_Transfer_User_Not_Exists" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="PsP_CannotCreate_Transfer_BankIBAN_Exists" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="PsP_CannotCreate_Card_User_Not_Exists" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="PsP_CannotCreate_Card_Card_Exists" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="PsP_CannotValidate_Card_Card_Not_Exists" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="PsP_CannotCreate_Document_User_Not_Exists" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="PsP_CannotCreate_Document_Document_Exists" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="PsP_CannotCreate_DocumentPage_Document_Not_Exists" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="PsP_CannotSubmit_Document_User_Not_Exists" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="PsP_CannotSubmit_Document_Document_Not_Exists" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="PsP_CannotCreate_WebPayin_TransactionKind_Mismatch" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="PsP_CannotCreate_WebPayin_TransactionNature_Mismatch" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="PsP_CannotCreate_WebPayin_Author_Not_Exists" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="PsP_CannotCreate_WebPayin_CreditedWallet_Not_Exists" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="PsP_CannotCreate_Transfer_TransactionKind_Mismatch" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="PsP_CannotCreate_Transfer_TransactionNature_Mismatch" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="PsP_CannotCreate_Transfer_Author_Not_Exists" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="PsP_CannotCreate_Transfer_CreditedWallet_Not_Exists" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="PsP_CannotCreate_Transfer_DebitedWallet_Not_Exists" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="PsP_CannotCreate_Payout_TransactionKind_Mismatch" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="PsP_CannotCreate_Payout_TransactionNature_Mismatch" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="PsP_CannotCreate_Payout_Author_Not_Exists" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="PsP_CannotCreate_Payout_DebitedWallet_Not_Exists" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="PsP_CannotRefund_Payin_TransactionKind_Mismatch" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="PsP_CannotRefund_Payin_TransactionNature_Mismatch" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="PsP_CannotRefund_Payin_Author_Not_Exists" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="PsP_CannotRefund_Payin_PayinIdentifier_Missing" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="PsP_CannotRefund_Transfer_TransactionKind_Mismatch" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="PsP_CannotRefund_Transfer_TransactionNature_Mismatch" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="PsP_CannotRefund_Transfer_Author_Not_Exists" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="PsP_CannotRefund_Transfer_TransferIdentifier_Missing" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="PsP_CannotCreate_Declaration_User_Not_Exists" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="PsP_CannotUpdate_Declaration_Not_Exists" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="PsP_CannotSubmit_Declaration_Not_Exists" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="PsP_CannotAddUbo_Declaration_Not_Exists" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="PsP_CannotUpdateUbo_Declaration_Not_Exists" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="PsP_CannotUpdateUbo_Ubo_Not_Exists" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="PsP_CannotCreate_User_User_Exists" xml:space="preserve">
-    <value></value>
+    <value />
+  </data>
+  <data name="Legal_Cannot_Unrequire_Declaration" xml:space="preserve">
+    <value>Il n'est pas possible de basculer la déclaration en non requise</value>
   </data>
 </root>
