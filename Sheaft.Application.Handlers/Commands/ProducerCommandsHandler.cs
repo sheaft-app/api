@@ -114,6 +114,8 @@ namespace Sheaft.Application.Handlers
                         _mediatr.Post(new CreateSponsoringCommand(request.RequestUser) { Code = request.SponsoringCode, UserId = producer.Id });
                     }
 
+                    _mediatr.Post(new ProducerRegisteredEvent(request.RequestUser) { ProducerId = producer.Id });
+
                     return Created(producer.Id);
                 }
             });
