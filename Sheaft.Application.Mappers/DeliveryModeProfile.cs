@@ -26,6 +26,7 @@ namespace Sheaft.Application.Mappers
             CreateMap<CreateDeliveryModeInput, CreateDeliveryModeCommand>();
             CreateMap<UpdateDeliveryModeInput, UpdateDeliveryModeCommand>();
             CreateMap<IdInput, DeleteDeliveryModeCommand>();
+            CreateMap<SetDeliveryModesAvailabilityInput, SetDeliveryModesAvailabilityCommand>();
         }
     }
 }

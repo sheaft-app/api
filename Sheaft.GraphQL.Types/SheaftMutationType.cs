@@ -236,6 +236,15 @@ namespace Sheaft.GraphQL.Types
                 .Authorize(Policies.PRODUCER)
                 .Type<NonNullType<BooleanType>>();
 
+            descriptor.Field(c => c.SetDeliveryModesAvailabilityAsync(default, default))
+                .Name("setDeliveryModesAvailability")
+                .Authorize(Policies.PRODUCER)
+                .Type<NonNullType<ListType<DeliveryModeType>>>()
+                .UsePaging<DeliveryModeType>()
+                .UseFiltering<DeliveryModeFilterType>()
+                .UseSorting<DeliveryModeSortType>()
+                .UseSelection();
+
             //RETURNABLE
             descriptor.Field(c => c.CreateReturnableAsync(default, default))
                 .Name("createReturnable")

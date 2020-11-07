@@ -418,6 +418,13 @@ namespace Sheaft.GraphQL.Services
             return await ExecuteCommandAsync<DeleteQuickOrdersCommand, bool>(_mapper.Map(input, new DeleteQuickOrdersCommand(CurrentUser)), Token);
         }
 
+        public async Task<IQueryable<DeliveryModeDto>> SetDeliveryModesAvailabilityAsync(SetDeliveryModesAvailabilityInput input, [Service] IDeliveryQueries deliveryModeQueries)
+        {
+            SetLogTransaction("GraphQL", nameof(SetProductsAvailabilityAsync));
+            await ExecuteCommandAsync<SetDeliveryModesAvailabilityCommand, bool>(_mapper.Map(input, new SetDeliveryModesAvailabilityCommand(CurrentUser)), Token);
+            return deliveryModeQueries.GetDeliveries(CurrentUser).Where(j => input.Ids.Contains(j.Id));
+        }
+
         public async Task<IQueryable<DeliveryModeDto>> CreateDeliveryModeAsync(CreateDeliveryModeInput input, [Service] IDeliveryQueries deliveryQueries)
         {
             SetLogTransaction("GraphQL", nameof(CreateDeliveryModeAsync));

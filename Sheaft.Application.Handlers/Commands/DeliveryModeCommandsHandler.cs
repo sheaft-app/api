@@ -19,7 +19,9 @@ namespace Sheaft.Application.Handlers
         IRequestHandler<CreateDeliveryModeCommand, Result<Guid>>,
         IRequestHandler<UpdateDeliveryModeCommand, Result<bool>>,
         IRequestHandler<DeleteDeliveryModeCommand, Result<bool>>,
-        IRequestHandler<RestoreDeliveryModeCommand, Result<bool>>
+        IRequestHandler<RestoreDeliveryModeCommand, Result<bool>>,
+        IRequestHandler<SetDeliveryModesAvailabilityCommand, Result<bool>>,
+        IRequestHandler<SetDeliveryModeAvailabilityCommand, Result<bool>>
     {
         public DeliveryModeCommandsHandler(
             ISheaftMediatr mediatr,
@@ -129,6 +131,37 @@ namespace Sheaft.Application.Handlers
                 _context.Restore(entity);
                 await _context.SaveChangesAsync(token);
 
+                return Ok(true);
+            });
+        }
+
+        public async Task<Result<bool>> Handle(SetDeliveryModesAvailabilityCommand request, CancellationToken token)
+        {
+            return await ExecuteAsync(request, async () =>
+            {
+                using (var transaction = await _context.BeginTransactionAsync(token))
+                {
+                    foreach (var id in request.Ids)
+                    {
+                        var result = await _mediatr.Process(new SetDeliveryModeAvailabilityCommand(request.RequestUser) { Id = id, Available = request.Available }, token);
+                        if (!result.Success)
+                            return Failed<bool>(result.Exception);
+                    }
+
+                    await transaction.CommitAsync(token);
+                    return Ok(true);
+                }
+            });
+        }
+
+        public async Task<Result<bool>> Handle(SetDeliveryModeAvailabilityCommand request, CancellationToken token)
+        {
+            return await ExecuteAsync(request, async () =>
+            {
+                var entity = await _context.GetByIdAsync<DeliveryMode>(request.Id, token);
+                entity.SetAvailability(request.Available);
+
+                await _context.SaveChangesAsync(token);
                 return Ok(true);
             });
         }
