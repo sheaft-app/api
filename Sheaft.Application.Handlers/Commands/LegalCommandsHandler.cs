@@ -10,6 +10,7 @@ using Sheaft.Domain.Models;
 using Sheaft.Domain.Enums;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
+using Sheaft.Application.Events;
 
 namespace Sheaft.Application.Handlers
 {
@@ -263,6 +264,7 @@ namespace Sheaft.Application.Handlers
                 {
                     legal.SetDeclarationRequired(true);
                     await _context.SaveChangesAsync(token);
+                    _mediatr.Post(new ProducerDeclarationRequiredEvent(request.RequestUser) { ProducerId = request.UserId });
                 }
 
                 return Ok(legal.DeclarationRequired);

@@ -14,7 +14,8 @@ namespace Sheaft.Application.Handlers
     public class ProducerEventsHandler : EventsHandler,
         INotificationHandler<ProducerDeclarationNotValidatedEvent>,
         INotificationHandler<ProducerDocumentsNotValidatedEvent>,
-        INotificationHandler<ProducerRegisteredEvent>
+        INotificationHandler<ProducerRegisteredEvent>,
+        INotificationHandler<ProducerDeclarationRequiredEvent>
     {
         public ProducerEventsHandler(
             IAppDbContext context,
@@ -56,6 +57,18 @@ namespace Sheaft.Application.Handlers
                "Support",
                $"Nouveau producteur sur la plateforme",
                $"Un nouveau producteur ({producer.Name}) ({producer.Address.Zipcode}) vient de s'enregistrer sur la plateforme, vous pouvez le contacter par email ({producer.Email}) ou par téléphone ({producer.Phone}).",
+               false,
+               token);
+        }
+
+        public async Task Handle(ProducerDeclarationRequiredEvent notification, CancellationToken token)
+        {
+            var producer = await _context.GetSingleAsync<Producer>(c => c.Id == notification.ProducerId, token);
+            await _emailService.SendEmailAsync(
+               "support@sheaft.com",
+               "Support",
+               $"Un producteur vient de dépasser les 150€/mois de commandes",
+               $"Un producteur ({producer.Name}) vient de franchir la limite des 150€/mois sur la plateforme, contactez le par email ({producer.Email}) ou par téléphone ({producer.Phone}) pour valider avec lui les documents banquaires.",
                false,
                token);
         }
