@@ -1087,6 +1087,15 @@ namespace Sheaft.Localization.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Impossible de créer un remboursement pour la commande, un remboursement est a déjà été effectué.
+        /// </summary>
+        internal static string PayinRefund_CannotCreate_PurchaseOrderRefund_PayinRefund_AlreadyProcessed {
+            get {
+                return ResourceManager.GetString("PayinRefund_CannotCreate_PurchaseOrderRefund_PayinRefund_AlreadyProcessed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Impossible de créer un remboursement pour la commande, un remboursement est déjà en cours.
         /// </summary>
         internal static string PayinRefund_CannotCreate_PurchaseOrderRefund_Pending_PayinRefund {
@@ -2172,6 +2181,15 @@ namespace Sheaft.Localization.Resources {
         internal static string Transfer {
             get {
                 return ResourceManager.GetString("Transfer", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Impossible de créer un transfert, un transfert a déjà été effectué.
+        /// </summary>
+        internal static string Transfer_CannotCreate_AlreadyProcessed {
+            get {
+                return ResourceManager.GetString("Transfer_CannotCreate_AlreadyProcessed", resourceCulture);
             }
         }
         

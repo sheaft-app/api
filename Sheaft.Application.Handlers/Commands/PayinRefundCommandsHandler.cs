@@ -122,7 +122,10 @@ namespace Sheaft.Application.Handlers
                 if (order.Payin.Status != TransactionStatus.Succeeded)
                     return BadRequest<Guid>(MessageKind.PayinRefund_CannotCreate_PurchaseOrderRefund_Payin_Invalid_Status);
 
-                if(order.Payin.Refunds.Any(c => c.PurchaseOrder.Id == purchaseOrder.Id && c.Status != TransactionStatus.Failed))
+                if (order.Payin.Refunds.Any(c => c.PurchaseOrder.Id == purchaseOrder.Id && c.Status == TransactionStatus.Succeeded))
+                    return BadRequest<Guid>(MessageKind.PayinRefund_CannotCreate_PurchaseOrderRefund_PayinRefund_AlreadyProcessed);
+
+                if (order.Payin.Refunds.Any(c => c.PurchaseOrder.Id == purchaseOrder.Id && c.Status != TransactionStatus.Failed))
                     return BadRequest<Guid>(MessageKind.PayinRefund_CannotCreate_PurchaseOrderRefund_Pending_PayinRefund);
 
                 using (var transaction = await _context.BeginTransactionAsync(token))

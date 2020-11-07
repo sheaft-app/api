@@ -118,7 +118,10 @@ namespace Sheaft.Application.Handlers
                 if (purchaseOrder.Status != PurchaseOrderStatus.Delivered)
                     return BadRequest<Guid>(MessageKind.Transfer_CannotCreate_PurchaseOrder_Invalid_Status);
 
-                if(purchaseOrder.Transfer != null && purchaseOrder.Transfer.Status != TransactionStatus.Failed)
+                if (purchaseOrder.Transfer != null && purchaseOrder.Transfer.Status == TransactionStatus.Succeeded)
+                    return BadRequest<Guid>(MessageKind.Transfer_CannotCreate_AlreadyProcessed);
+
+                if (purchaseOrder.Transfer != null && purchaseOrder.Transfer.Status != TransactionStatus.Failed)
                     return BadRequest<Guid>(MessageKind.Transfer_CannotCreate_Pending_Transfer);
 
                 var checkResult = await _mediatr.Process(new CheckProducerConfigurationCommand(request.RequestUser) { ProducerId = purchaseOrder.Vendor.Id }, token);

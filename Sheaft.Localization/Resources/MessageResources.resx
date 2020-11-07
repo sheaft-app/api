@@ -864,4 +864,10 @@
   <data name="Legal_Cannot_Unrequire_Declaration" xml:space="preserve">
     <value>Il n'est pas possible de basculer la déclaration en non requise</value>
   </data>
+  <data name="Transfer_CannotCreate_AlreadyProcessed" xml:space="preserve">
+    <value>Impossible de créer un transfert, un transfert a déjà été effectué</value>
+  </data>
+  <data name="PayinRefund_CannotCreate_PurchaseOrderRefund_PayinRefund_AlreadyProcessed" xml:space="preserve">
+    <value>Impossible de créer un remboursement pour la commande, un remboursement est a déjà été effectué</value>
+  </data>
 </root>
