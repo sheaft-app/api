@@ -406,6 +406,9 @@ namespace Sheaft.Application.Handlers
                 case "pièce":
                     createProductCommand.Conditioning = ConditioningKind.Piece;
                     break;
+                case "panier garni":
+                    createProductCommand.Conditioning = ConditioningKind.Basket;
+                    break;
                 default:
                     createProductCommand.Conditioning = ConditioningKind.Not_Specified;
                     break;
