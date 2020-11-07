@@ -430,7 +430,7 @@ namespace Sheaft.Application.Handlers
             switch (bioStr)
             {
                 case "oui":
-                    tagsStr += ";bio";
+                    tagsStr += ";Bio";
                     break;
             }
 
