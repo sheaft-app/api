@@ -15,6 +15,7 @@ using Sheaft.Exceptions;
 using Microsoft.EntityFrameworkCore;
 using Sheaft.Domain.Enums;
 using Sheaft.Application.Models;
+using Sheaft.Application.Events;
 
 namespace Sheaft.Application.Handlers
 {

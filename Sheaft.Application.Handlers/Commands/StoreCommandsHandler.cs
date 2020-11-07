@@ -13,6 +13,7 @@ using Microsoft.Extensions.Options;
 using Sheaft.Options;
 using Sheaft.Exceptions;
 using Microsoft.EntityFrameworkCore;
+using Sheaft.Application.Events;
 
 namespace Sheaft.Application.Handlers
 {
