@@ -135,6 +135,8 @@ namespace Sheaft.Application.Handlers
                         _mediatr.Post(new CreateSponsoringCommand(request.RequestUser) { Code = request.SponsoringCode, UserId = store.Id });
                     }
 
+                    _mediatr.Post(new StoreRegisteredEvent(request.RequestUser) { StoreId = store.Id });
+
                     return Created(store.Id);
                 }
             });
