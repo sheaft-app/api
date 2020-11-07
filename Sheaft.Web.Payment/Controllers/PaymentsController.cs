@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Web;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -84,14 +85,15 @@ namespace Sheaft.Web.Payment.Controllers
                 if (payin.Data.Status == TransactionStatus.Failed)
                 {
                     _logger.LogInformation($"Transaction {transactionId} failed, redirecting to failed page.");
-                    return RedirectPreserveMethod(_pspOptions.AppRedirectFailedUrl.Replace("{transactionId}", transactionId).Replace("{message}", payin.Data.ResultMessage));
+                    return RedirectPreserveMethod(_pspOptions.AppRedirectFailedUrl.Replace("{transactionId}", transactionId).Replace("{message}", HttpUtility.UrlEncode(payin.Data.ResultMessage)));
                 }
             }
             catch(Exception e)
             {
-                _logger.LogError(e, $"Unexpected error occured while processing transaction {transactionId} informations, redirecting to pending page."); 
+                _logger.LogError(e, $"Unexpected error occured while processing transaction {transactionId} informations.");
             }
 
+            _logger.LogInformation($"Transaction {transactionId} pending, redirecting to pending page.");
             return RedirectPreserveMethod(_pspOptions.AppRedirectPendingUrl.Replace("{transactionId}", transactionId));
         }
     }
