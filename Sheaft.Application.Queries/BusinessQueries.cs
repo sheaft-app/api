@@ -129,7 +129,7 @@ namespace Sheaft.Application.Queries
                     Name = p.Store_name,
                     Email = p.Store_email,
                     Phone = p.Store_phone,
-                    Picture = p.Store_picture,
+                    Picture = p.Store_picture != null ? p.Store_picture : string.Empty,
                     Tags = p.Store_tags?.Select(t => new TagDto { Name = t }) ?? new List<TagDto>(),
                     Address = new AddressDto
                     {
@@ -210,7 +210,7 @@ namespace Sheaft.Application.Queries
                     Name = p.Producer_name,
                     Email = p.Producer_email,
                     Phone = p.Producer_phone,
-                    Picture = p.Producer_picture,
+                    Picture = p.Producer_picture != null ? p.Producer_picture : string.Empty,
                     Tags = p.Producer_tags?.Select(t => new TagDto { Name = t }) ?? new List<TagDto>(),
                     Address = new AddressDto
                     {
