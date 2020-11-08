@@ -97,7 +97,8 @@ namespace Sheaft.Domain.Models
                     if (Status != PurchaseOrderStatus.Waiting)
                         throw new ValidationException(MessageKind.PurchaseOrder_CannotAccept_NotIn_WaitingStatus);
                         AcceptedOn = DateTimeOffset.UtcNow;
-                    break;
+                        Status = PurchaseOrderStatus.Processing;
+                    return;
                 case PurchaseOrderStatus.Completed:
                     if (Status != PurchaseOrderStatus.Processing)
                         throw new ValidationException(MessageKind.PurchaseOrder_CannotComplete_NotIn_ProcessingStatus);
