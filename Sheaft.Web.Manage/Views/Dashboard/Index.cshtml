@@ -30,40 +30,40 @@
             </div>
         </div>
         @*<div class="card w-25 d-inline-block">
-            <div class="card-body">
-                <h5 class="card-title">Tags</h5>
-                <h6 class="card-subtitle mb-2 text-muted">@ViewBag.Tags</h6>
-                <a asp-controller="Tags" asp-action="index" class="card-link">Show</a>
+                <div class="card-body">
+                    <h5 class="card-title">Tags</h5>
+                    <h6 class="card-subtitle mb-2 text-muted">@ViewBag.Tags</h6>
+                    <a asp-controller="Tags" asp-action="index" class="card-link">Show</a>
+                </div>
             </div>
-        </div>
-        <div class="card w-25 d-inline-block">
-            <div class="card-body">
-                <h5 class="card-title">Departments</h5>
-                <h6 class="card-subtitle mb-2 text-muted">@ViewBag.Departments</h6>
-                <a asp-controller="Departments" asp-action="index" class="card-link">Show</a>
+            <div class="card w-25 d-inline-block">
+                <div class="card-body">
+                    <h5 class="card-title">Departments</h5>
+                    <h6 class="card-subtitle mb-2 text-muted">@ViewBag.Departments</h6>
+                    <a asp-controller="Departments" asp-action="index" class="card-link">Show</a>
+                </div>
             </div>
-        </div>
-        <div class="card w-25 d-inline-block">
-            <div class="card-body">
-                <h5 class="card-title">Regions</h5>
-                <h6 class="card-subtitle mb-2 text-muted">@ViewBag.Regions</h6>
-                <a asp-controller="Regions" asp-action="index" class="card-link">Show</a>
+            <div class="card w-25 d-inline-block">
+                <div class="card-body">
+                    <h5 class="card-title">Regions</h5>
+                    <h6 class="card-subtitle mb-2 text-muted">@ViewBag.Regions</h6>
+                    <a asp-controller="Regions" asp-action="index" class="card-link">Show</a>
+                </div>
             </div>
-        </div>
-        <div class="card w-25 d-inline-block">
-            <div class="card-body">
-                <h5 class="card-title">Levels</h5>
-                <h6 class="card-subtitle mb-2 text-muted">@ViewBag.Levels</h6>
-                <a asp-controller="Levels" asp-action="index" class="card-link">Show</a>
+            <div class="card w-25 d-inline-block">
+                <div class="card-body">
+                    <h5 class="card-title">Levels</h5>
+                    <h6 class="card-subtitle mb-2 text-muted">@ViewBag.Levels</h6>
+                    <a asp-controller="Levels" asp-action="index" class="card-link">Show</a>
+                </div>
             </div>
-        </div>
-        <div class="card w-25 d-inline-block">
-            <div class="card-body">
-                <h5 class="card-title">Rewards</h5>
-                <h6 class="card-subtitle mb-2 text-muted">@ViewBag.Rewards</h6>
-                <a asp-controller="Rewards" asp-action="index" class="card-link">Show</a>
-            </div>
-        </div>*@
+            <div class="card w-25 d-inline-block">
+                <div class="card-body">
+                    <h5 class="card-title">Rewards</h5>
+                    <h6 class="card-subtitle mb-2 text-muted">@ViewBag.Rewards</h6>
+                    <a asp-controller="Rewards" asp-action="index" class="card-link">Show</a>
+                </div>
+            </div>*@
     }
     @if (!user.IsInRole("STORE") && !user.IsInRole("CONSUMER"))
     {
@@ -157,6 +157,13 @@
             <h5 class="card-title">Donations</h5>
             <h6 class="card-subtitle mb-2 text-muted">@ViewBag.Donations</h6>
             <a asp-controller="Donations" asp-action="index" class="card-link">Show</a>
+        </div>
+    </div>
+    <div class="card w-25 d-inline-block">
+        <div class="card-body">
+            <h5 class="card-title">Declarations</h5>
+            <h6 class="card-subtitle mb-2 text-muted"></h6>
+            <a asp-controller="Declarations" asp-action="index" class="card-link">Show</a>
         </div>
     </div>
 </div>

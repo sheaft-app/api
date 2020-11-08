@@ -15,6 +15,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using Sheaft.Domain.Models;
+using Sheaft.Domain.Enums;
 
 namespace Sheaft.Web.Manage.Controllers
 {
@@ -31,6 +32,50 @@ namespace Sheaft.Web.Manage.Controllers
             ILogger<DeclarationsController> logger) : base(context, mapper, roleOptions, mediatr, configurationProvider)
         {
             _logger = logger;
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Index(CancellationToken token, int page = 0, int take = 10)
+        {
+            if (page < 0)
+                page = 0;
+
+            if (take > 100)
+                take = 100;
+
+            var legalIds = await _context.Legals
+                .OfType<BusinessLegal>()
+                .Get(c => c.DeclarationRequired && c.Declaration != null && c.Declaration.Status == DeclarationStatus.Validated)
+                .Select(c => c.Id)
+                .ToListAsync(token);
+
+            var currentMonth = DateTimeOffset.UtcNow.Month;
+            var query = await _context.PurchaseOrders.Get(d =>
+                d.Status >= PurchaseOrderStatus.Accepted
+                && d.Status < PurchaseOrderStatus.Refused)
+                .Where(d => d.CreatedOn.Month == currentMonth && !legalIds.Contains(d.Vendor.Id))
+                .Select(d => new { d.Vendor, d.TotalOnSalePrice })
+                .ToListAsync(token);
+
+            var results = query.GroupBy(c => c.Vendor).Select(d => new ProducerRequiredDeclarationViewModel
+            {
+                Id = d.Key.Id,
+                Name = d.Key.Name,
+                Email = d.Key.Email,
+                Phone = d.Key.Phone,
+                Total = d.Sum(e => e.TotalOnSalePrice)
+            }).Where(d => d.Total > 100);
+
+            var entities = results
+                .OrderByDescending(c => c.Total)
+                .Skip(page * take)
+                .Take(take)
+                .ToList();
+
+            ViewBag.Page = page;
+            ViewBag.Take = take;
+
+            return View(entities);
         }
 
         [HttpGet]
