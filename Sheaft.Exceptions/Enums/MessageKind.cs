@@ -258,5 +258,6 @@
         PsP_CannotUpdateUbo_Declaration_Not_Exists = 105038,
         PsP_CannotUpdateUbo_Ubo_Not_Exists = 105039,
         PsP_CannotCreate_User_User_Exists = 105040,
+        PsP_CannotUpdate_User_User_Not_Exists = 105041,
     }
 }

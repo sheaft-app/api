@@ -55,10 +55,6 @@
                     @Html.TextBoxFor(c => c.Phone, null, new { @class = "form-control" })
                 </div>
                 <div class="form-group">
-                    @Html.LabelFor(c => c.Tags, new { @class = "form-label" })
-                    @Html.ListBoxFor(c => c.Tags, availableTags, new { @class = "form-control", @style = "height:12rem;" })
-                </div>
-                <div class="form-group">
                     @Html.LabelFor(c => c.Picture, new { @class = "form-label" })
                     @if (!string.IsNullOrWhiteSpace(Model.Picture))
                     {

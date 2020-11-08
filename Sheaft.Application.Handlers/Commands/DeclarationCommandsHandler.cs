@@ -40,8 +40,6 @@ namespace Sheaft.Application.Handlers
                 var legal = await _context.GetByIdAsync<BusinessLegal>(request.LegalId, token);
                 legal.SetDeclaration();
 
-                await _context.SaveChangesAsync(token);
-
                 var result = await _pspService.CreateUboDeclarationAsync(legal.Declaration, legal.User, token);
                 if (!result.Success)
                     return Failed<Guid>(result.Exception);
@@ -64,12 +62,19 @@ namespace Sheaft.Application.Handlers
                 if (legal.Declaration.Status != DeclarationStatus.Locked)
                     return BadRequest<bool>(MessageKind.Declaration_CannotSubmit_NotLocked);
 
-                var result = await _pspService.SubmitUboDeclarationAsync(legal.Declaration, legal.User, token);
-                if (!result.Success)
-                    return Failed<bool>(result.Exception);
+                if (string.IsNullOrWhiteSpace(legal.Declaration.Identifier))
+                {
+                    var createResult = await _mediatr.Process(new CreateDeclarationCommand(request.RequestUser) { LegalId = legal.Id }, token);
+                    if (!createResult.Success)
+                        return Failed<bool>(createResult.Exception);
+                }
 
-                legal.Declaration.SetStatus(result.Data.Status);
-                legal.Declaration.SetResult(result.Data.ResultCode, result.Data.ResultMessage);
+                var submitResult = await _pspService.SubmitUboDeclarationAsync(legal.Declaration, legal.User, token);
+                if (!submitResult.Success)
+                    return Failed<bool>(submitResult.Exception);
+
+                legal.Declaration.SetStatus(submitResult.Data.Status);
+                legal.Declaration.SetResult(submitResult.Data.ResultCode, submitResult.Data.ResultMessage);
 
                 await _context.SaveChangesAsync(token);
                 return Ok(true);

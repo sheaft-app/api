@@ -63,6 +63,32 @@ namespace Sheaft.Infrastructure.Services
             });
         }
 
+        public async Task<Result<string>> UpdateConsumerAsync(ConsumerLegal consumerLegal, CancellationToken token)
+        {
+            return await ExecuteAsync(async () =>
+            {
+                if (string.IsNullOrWhiteSpace(consumerLegal.User.Identifier))
+                    return BadRequest<string>(MessageKind.PsP_CannotUpdate_User_User_Not_Exists);
+
+                await EnsureAccessTokenIsValidAsync(token);
+
+                var result = await _api.Users.UpdateNaturalAsync(
+                    new UserNaturalPutDTO
+                    {
+                        Email = consumerLegal.Owner.Email,
+                        FirstName = consumerLegal.Owner.FirstName,
+                        LastName = consumerLegal.Owner.LastName,
+                        Birthday = consumerLegal.Owner.BirthDate.DateTime,
+                        Nationality = consumerLegal.Owner.Nationality.GetCountry(),
+                        CountryOfResidence = consumerLegal.Owner.CountryOfResidence.GetCountry(),
+                        Address = consumerLegal.Owner.Address.GetAddress(),
+                        Tag = $"Id='{consumerLegal.Id}'"
+                    }, consumerLegal.User.Identifier);
+
+                return Ok(result.Id);
+            });
+        }
+
         public async Task<Result<string>> CreateBusinessAsync(BusinessLegal businessLegal, CancellationToken token)
         {
             return await ExecuteAsync(async () =>
@@ -89,6 +115,37 @@ namespace Sheaft.Infrastructure.Services
                         LegalRepresentativeEmail = businessLegal.Owner.Email,
                         Tag = $"Id='{businessLegal.Id}'"
                     });
+
+                return Ok(result.Id);
+            });
+        }
+
+        public async Task<Result<string>> UpdateBusinessAsync(BusinessLegal businessLegal, CancellationToken token)
+        {
+            return await ExecuteAsync(async () =>
+            {
+                if (string.IsNullOrWhiteSpace(businessLegal.User.Identifier))
+                    return BadRequest<string>(MessageKind.PsP_CannotUpdate_User_User_Not_Exists);
+
+                await EnsureAccessTokenIsValidAsync(token);
+
+                var result = await _api.Users.UpdateLegalAsync(
+                    new UserLegalPutDTO
+                    {
+                        Email = businessLegal.Email,
+                        Name = businessLegal.User.Name,
+                        LegalPersonType = businessLegal.Kind.GetLegalPersonType(),
+                        LegalRepresentativeFirstName = businessLegal.Owner.FirstName,
+                        LegalRepresentativeLastName = businessLegal.Owner.LastName,
+                        LegalRepresentativeBirthday = businessLegal.Owner.BirthDate.DateTime,
+                        LegalRepresentativeNationality = businessLegal.Owner.Nationality.GetCountry(),
+                        LegalRepresentativeCountryOfResidence = businessLegal.Owner.CountryOfResidence.GetCountry(),
+                        CompanyNumber = businessLegal.Siret,
+                        HeadquartersAddress = businessLegal.Address.GetAddress(),
+                        LegalRepresentativeAddress = businessLegal.Owner.Address.GetAddress(),
+                        LegalRepresentativeEmail = businessLegal.Owner.Email,
+                        Tag = $"Id='{businessLegal.Id}'"
+                    }, businessLegal.User.Identifier);
 
                 return Ok(result.Id);
             });

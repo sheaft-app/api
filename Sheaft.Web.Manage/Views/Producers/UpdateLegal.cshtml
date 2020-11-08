@@ -11,7 +11,7 @@
         new SelectListItem("Organization", LegalKind.Organization.ToString("G"))
     };
 
-    var uboCount = Model.Declaration.Ubos?.Count() ?? 0;
+    var uboCount = Model.Declaration?.Ubos?.Count() ?? 0;
 }
 
 <div class="container">
@@ -199,35 +199,38 @@
             </tr>
         </thead>
         <tbody>
-            @foreach (var document in Model.Documents)
+            @if (Model.Documents != null)
             {
-                <tr>
-                    <td scope="row">@document.Name</td>
-                    <td>@document.Kind</td>
-                    <td>@document.Status</td>
-                    <td>
-                        <a asp-controller="Documents" asp-action="Edit" asp-route-id="@document.Id" class="btn btn-info">
-                            <i class="fa fa-pencil-alt"></i>
-                        </a>
+                @foreach (var document in Model.Documents)
+                {
+                    <tr>
+                        <td scope="row">@document.Name</td>
+                        <td>@document.Kind</td>
+                        <td>@document.Status</td>
+                        <td>
+                            <a asp-controller="Documents" asp-action="Edit" asp-route-id="@document.Id" class="btn btn-info">
+                                <i class="fa fa-pencil-alt"></i>
+                            </a>
 
-                        @using (Html.BeginForm("Download", "Documents", new { id = document.Id }, FormMethod.Post, true, new { @class = "form d-inline" }))
-                        {
-                            <button type="submit" class="btn btn-info">
-                                <i class="fa fa-download"></i>
-                            </button>
-                        }
-
-                        @if (document.Status != DocumentStatus.ValidationAsked && document.Status != DocumentStatus.Validated)
-                        {
-                            @using (Html.BeginForm("Delete", "Documents", new { id = document.Id }, FormMethod.Post, true, new { @class = "form d-inline" }))
+                            @using (Html.BeginForm("Download", "Documents", new { id = document.Id }, FormMethod.Post, true, new { @class = "form d-inline" }))
                             {
-                                <button type="submit" class="btn btn-danger">
-                                    <i class="fa fa-trash"></i>
+                                <button type="submit" class="btn btn-info">
+                                    <i class="fa fa-download"></i>
                                 </button>
                             }
-                        }
-                    </td>
-                </tr>
+
+                            @if (document.Status != DocumentStatus.ValidationAsked && document.Status != DocumentStatus.Validated)
+                            {
+                                @using (Html.BeginForm("Delete", "Documents", new { id = document.Id }, FormMethod.Post, true, new { @class = "form d-inline" }))
+                                {
+                                    <button type="submit" class="btn btn-danger">
+                                        <i class="fa fa-trash"></i>
+                                    </button>
+                                }
+                            }
+                        </td>
+                    </tr>
+                }
             }
         </tbody>
     </table>

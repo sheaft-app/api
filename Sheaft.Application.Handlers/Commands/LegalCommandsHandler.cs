@@ -69,12 +69,11 @@ namespace Sheaft.Application.Handlers
                     if (!userResult.Success)
                         return Failed<Guid>(userResult.Exception);
                 }
-
-                if (request.Kind == LegalKind.Business && business.Kind == ProfileKind.Producer)
+                else
                 {
-                    var result = await _mediatr.Process(new CreateDeclarationCommand(request.RequestUser) { LegalId = legal.Id }, token);
+                    var result = await _pspService.UpdateBusinessAsync(legal, token);
                     if (!result.Success)
-                        return result;
+                        return Failed<Guid>(result.Exception);
                 }
 
                 return Ok(legal.Id);
@@ -115,6 +114,12 @@ namespace Sheaft.Application.Handlers
                     var userResult = await _mediatr.Process(new CheckConsumerLegalConfigurationCommand(request.RequestUser) { UserId = legal.User.Id }, token);
                     if (!userResult.Success)
                         return Failed<Guid>(userResult.Exception);
+                }
+                else
+                {
+                    var result = await _pspService.UpdateConsumerAsync(legal, token);
+                    if (!result.Success)
+                        return Failed<Guid>(result.Exception);
                 }
 
                 return Ok(legal.Id);
@@ -162,6 +167,12 @@ namespace Sheaft.Application.Handlers
                     if (!userResult.Success)
                         return Failed<bool>(userResult.Exception);
                 }
+                else
+                {
+                    var result = await _pspService.UpdateBusinessAsync(legal, token);
+                    if (!result.Success)
+                        return Failed<bool>(result.Exception);
+                }
 
                 return Ok(true);
             });
@@ -195,6 +206,12 @@ namespace Sheaft.Application.Handlers
                     var userResult = await _mediatr.Process(new CheckConsumerLegalConfigurationCommand(request.RequestUser) { UserId = legal.User.Id }, token);
                     if (!userResult.Success)
                         return Failed<bool>(userResult.Exception);
+                }
+                else
+                {
+                    var result = await _pspService.UpdateConsumerAsync(legal, token);
+                    if (!result.Success)
+                        return Failed<bool>(result.Exception);
                 }
 
                 return Ok(true);
