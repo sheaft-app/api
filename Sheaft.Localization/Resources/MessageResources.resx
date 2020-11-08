@@ -870,4 +870,7 @@
   <data name="PayinRefund_CannotCreate_PurchaseOrderRefund_PayinRefund_AlreadyProcessed" xml:space="preserve">
     <value>Impossible de créer un remboursement pour la commande, un remboursement est a déjà été effectué</value>
   </data>
+  <data name="Product_Vat_Required" xml:space="preserve">
+    <value>La TVA du produit est requise</value>
+  </data>
 </root>

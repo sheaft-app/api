@@ -20,7 +20,7 @@ namespace Sheaft.Application.Commands
         public decimal QuantityPerUnit { get; set; }
         public UnitKind Unit { get; set; }
         public ConditioningKind Conditioning { get; set; }
-        public decimal Vat { get; set; }
+        public decimal? Vat { get; set; }
         public decimal? Weight { get; set; }
         public string Description { get; set; }
         public bool? Available { get; set; }

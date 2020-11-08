@@ -1294,6 +1294,15 @@ namespace Sheaft.Localization.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to La TVA du produit est requise.
+        /// </summary>
+        internal static string Product_Vat_Required {
+            get {
+                return ResourceManager.GetString("Product_Vat_Required", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Le poids ne peut pas être inférieur ou égal à {0}.
         /// </summary>
         internal static string Product_Weight_CannotBe_LowerOrEqualThan {

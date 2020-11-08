@@ -24,7 +24,8 @@ namespace Sheaft.Application.Handlers
         IRequestHandler<UpdateProducerCommand, Result<bool>>,
         IRequestHandler<CheckProducerConfigurationCommand, Result<bool>>,
         IRequestHandler<EnsureProducerDocumentsValidatedCommand, Result<bool>>,
-        IRequestHandler<UpdateProducerTagsCommand, Result<bool>>
+        IRequestHandler<UpdateProducerTagsCommand, Result<bool>>,
+        IRequestHandler<SetProducerProductsWithNoVatCommand, Result<bool>>
     {
         private readonly RoleOptions _roleOptions;
 
@@ -58,6 +59,7 @@ namespace Sheaft.Application.Handlers
 
                     producer = new Producer(request.RequestUser.Id, request.Name, request.FirstName, request.LastName, request.Email,
                         address, request.OpenForNewBusiness, request.Phone, request.Description);
+                    producer.SetNotSubjectToVat(request.NotSubjectToVat);
 
                     if (request.Tags != null && request.Tags.Any())
                     {
@@ -215,10 +217,29 @@ namespace Sheaft.Application.Handlers
             {
                 var producer = await _context.GetByIdAsync<Producer>(request.ProducerId, token);
 
-                var productTags = await _context.Products.Where(p => p.Producer.Id == producer.Id).SelectMany(p => p.Tags).Select(p => p.Tag).Distinct().ToListAsync(token);
+                var productTags = await _context.Products.Get(p => p.Producer.Id == producer.Id).SelectMany(p => p.Tags).Select(p => p.Tag).Distinct().ToListAsync(token);
                 producer.SetTags(productTags);
 
                 await _context.SaveChangesAsync(token);
+                return Ok(true);
+            });
+        }
+
+        public async Task<Result<bool>> Handle(SetProducerProductsWithNoVatCommand request, CancellationToken token)
+        {
+            return await ExecuteAsync(request, async () =>
+            {
+                var producer = await _context.GetByIdAsync<Producer>(request.ProducerId, token);
+                if (!producer.NotSubjectToVat)
+                    return Ok(false);
+
+                var products = await _context.FindAsync<Product>(p => p.Producer.Id == producer.Id, token);
+                foreach(var product in products)
+                {
+                    product.SetVat(0);
+                    await _context.SaveChangesAsync(token);
+                }
+
                 return Ok(true);
             });
         }

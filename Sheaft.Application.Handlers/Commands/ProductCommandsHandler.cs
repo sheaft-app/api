@@ -65,8 +65,9 @@ namespace Sheaft.Application.Handlers
                 }
 
                 var producer = await _context.GetByIdAsync<Producer>(request.RequestUser.Id, token);
-                var entity = new Product(Guid.NewGuid(), request.Reference, request.Name, request.WholeSalePricePerUnit, request.Conditioning, request.Unit, request.QuantityPerUnit, request.Vat, producer);
+                var entity = new Product(Guid.NewGuid(), request.Reference, request.Name, request.WholeSalePricePerUnit, request.Conditioning, request.Unit, request.QuantityPerUnit, producer);
 
+                entity.SetVat(request.Vat);
                 entity.SetDescription(request.Description);
                 entity.SetAvailable(request.Available ?? true);
                 entity.SetStoreVisibility(request.VisibleToStores ?? false);
@@ -102,6 +103,7 @@ namespace Sheaft.Application.Handlers
             {
                 var entity = await _context.GetByIdAsync<Product>(request.Id, token);
 
+                entity.SetVat(request.Vat);
                 entity.SetName(request.Name);
                 entity.SetDescription(request.Description);
                 entity.SetVat(request.Vat);

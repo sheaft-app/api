@@ -14,6 +14,7 @@ namespace Sheaft.Application.Models
         public string Picture { get; set; }
         public FullAddressInput Address { get; set; }
         public bool OpenForNewBusiness { get; set; }
+        public bool NotSubjectToVat { get; set; }
         public IEnumerable<Guid> Tags { get; set; }
     }
 }

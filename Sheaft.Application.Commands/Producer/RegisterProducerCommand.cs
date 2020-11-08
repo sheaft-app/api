@@ -24,6 +24,7 @@ namespace Sheaft.Application.Commands
         public BusinessLegalInput Legals { get; set; }
         public FullAddressInput Address { get; set; }
         public bool OpenForNewBusiness { get; set; }
+        public bool NotSubjectToVat { get; set; }
         public IEnumerable<Guid> Tags { get; set; }
     }
 }

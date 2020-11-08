@@ -14,6 +14,7 @@ namespace Sheaft.GraphQL.Types
             descriptor.Field(c => c.Description);
             descriptor.Field(c => c.VatIdentifier);
             descriptor.Field(c => c.OpenForNewBusiness);
+            descriptor.Field(c => c.NotSubjectToVat);
             descriptor.Field(c => c.FirstName);
             descriptor.Field(c => c.LastName);
             descriptor.Field(c => c.Email);

@@ -19,7 +19,7 @@ namespace Sheaft.Domain.Models
         {
         }
 
-        public Product(Guid id, string reference, string name, decimal price, ConditioningKind conditioning, UnitKind unit, decimal quantityPerUnit, decimal vat, Producer producer)
+        public Product(Guid id, string reference, string name, decimal price, ConditioningKind conditioning, UnitKind unit, decimal quantityPerUnit, Producer producer)
         {
             Id = id;
             Producer = producer ?? throw new ValidationException(MessageKind.Product_Producer_Required);
@@ -28,7 +28,6 @@ namespace Sheaft.Domain.Models
             SetReference(reference);
             SetConditioning(conditioning, quantityPerUnit, unit);
             SetWholeSalePricePerUnit(price);
-            SetVat(vat);
 
             _tags = new List<ProductTag>();
             _ratings = new List<Rating>();
@@ -136,15 +135,20 @@ namespace Sheaft.Domain.Models
             Weight = Math.Round(newWeight.Value, DIGITS_COUNT);
         }
 
-        public void SetVat(decimal newVat)
+        public void SetVat(decimal? newVat)
         {
+            if (Producer.NotSubjectToVat)
+                newVat = 0;
+            else if(!newVat.HasValue)
+                throw new ValidationException(MessageKind.Product_Vat_Required);
+
             if (newVat < 0)
                 throw new ValidationException(MessageKind.Product_Vat_CannotBe_LowerThan, 0);
 
             if (newVat > 100)
                 throw new ValidationException(MessageKind.Product_Vat_CannotBe_GreaterThan, 100);
 
-            Vat = newVat;
+            Vat = newVat.Value;
             RefreshPrices();
         }
 

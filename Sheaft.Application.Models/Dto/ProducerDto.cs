@@ -17,6 +17,7 @@ namespace Sheaft.Application.Models
         public string VatIdentifier { get; set; }
         public string Siret { get; set; }
         public bool OpenForNewBusiness { get; set; }
+        public bool NotSubjectToVat { get; set; }
         public AddressDto Address { get; set; }
         public IEnumerable<TagDto> Tags { get; set; }
     }

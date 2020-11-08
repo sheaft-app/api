@@ -21,6 +21,7 @@ namespace Sheaft.Domain.Models
         public virtual IReadOnlyCollection<ProducerTag> Tags => _tags?.AsReadOnly();
 
         public bool CanDirectSell { get; set; }
+        public bool NotSubjectToVat { get; set; }
 
         public void SetTags(IEnumerable<Tag> tags)
         {
@@ -31,6 +32,11 @@ namespace Sheaft.Domain.Models
                 _tags = new List<ProducerTag>();
 
             _tags = tags.Select(t => new ProducerTag(t)).ToList();
+        }
+
+        public void SetNotSubjectToVat(bool notSubjectToVat)
+        {
+            NotSubjectToVat = notSubjectToVat;
         }
     }
 }
