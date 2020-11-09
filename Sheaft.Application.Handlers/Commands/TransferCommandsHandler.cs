@@ -85,28 +85,15 @@ namespace Sheaft.Application.Handlers
         {
             return await ExecuteAsync(request, async () =>
             {
-                var transfer = await _context.GetSingleAsync<Transfer>(c => c.Identifier == request.Identifier, token);
-                if (transfer.Status == TransactionStatus.Succeeded || transfer.Status == TransactionStatus.Failed)
-                    return Ok(transfer.Status);
+                var transfer = await _context.FindSingleAsync<Transfer>(c => c.Identifier == request.Identifier, token);
+                if(transfer != null)
+                    return await HandleTransferStatusAsync(request, transfer, token);
 
-                var pspResult = await _pspService.GetTransferAsync(transfer.Identifier, token);
-                if (!pspResult.Success)
-                    return Failed<TransactionStatus>(pspResult.Exception);
+                var donation = await _context.FindSingleAsync<Donation>(c => c.Identifier == request.Identifier, token);
+                if(donation != null)
+                    return await HandleDonationStatusAsync(request, donation, token);
 
-                transfer.SetStatus(pspResult.Data.Status);
-                transfer.SetResult(pspResult.Data.ResultCode, pspResult.Data.ResultMessage);
-                transfer.SetExecutedOn(pspResult.Data.ProcessedOn);
-
-                await _context.SaveChangesAsync(token);
-
-                switch (transfer.Status)
-                {
-                    case TransactionStatus.Failed:
-                        _mediatr.Post(new TransferFailedEvent(request.RequestUser) { TransferId = transfer.Id });
-                        break;
-                }
-
-                return Ok(transfer.Status);
+                return NotFound<TransactionStatus>();
             });
         }
 
@@ -153,6 +140,56 @@ namespace Sheaft.Application.Handlers
                     return Ok(transfer.Id);
                 }
             });
+        }
+
+        private async Task<Result<TransactionStatus>> HandleTransferStatusAsync(RefreshTransferStatusCommand request, Transfer transfer, CancellationToken token)
+        {
+            if (transfer.Status == TransactionStatus.Succeeded || transfer.Status == TransactionStatus.Failed)
+                return Ok(transfer.Status);
+
+            var pspResult = await _pspService.GetTransferAsync(transfer.Identifier, token);
+            if (!pspResult.Success)
+                return Failed<TransactionStatus>(pspResult.Exception);
+
+            transfer.SetStatus(pspResult.Data.Status);
+            transfer.SetResult(pspResult.Data.ResultCode, pspResult.Data.ResultMessage);
+            transfer.SetExecutedOn(pspResult.Data.ProcessedOn);
+
+            await _context.SaveChangesAsync(token);
+
+            switch (transfer.Status)
+            {
+                case TransactionStatus.Failed:
+                    _mediatr.Post(new TransferFailedEvent(request.RequestUser) { TransferId = transfer.Id });
+                    break;
+            }
+
+            return Ok(transfer.Status);
+        }
+
+        private async Task<Result<TransactionStatus>> HandleDonationStatusAsync(RefreshTransferStatusCommand request, Donation donation, CancellationToken token)
+        {
+            if (donation.Status == TransactionStatus.Succeeded || donation.Status == TransactionStatus.Failed)
+                return Ok(donation.Status);
+
+            var pspResult = await _pspService.GetTransferAsync(donation.Identifier, token);
+            if (!pspResult.Success)
+                return Failed<TransactionStatus>(pspResult.Exception);
+
+            donation.SetStatus(pspResult.Data.Status);
+            donation.SetResult(pspResult.Data.ResultCode, pspResult.Data.ResultMessage);
+            donation.SetExecutedOn(pspResult.Data.ProcessedOn);
+
+            await _context.SaveChangesAsync(token);
+
+            switch (donation.Status)
+            {
+                case TransactionStatus.Failed:
+                    _mediatr.Post(new DonationFailedEvent(request.RequestUser) { DonationId = donation.Id });
+                    break;
+            }
+
+            return Ok(donation.Status);
         }
 
         private async Task<IEnumerable<Guid>> GetNextTransferIdsAsync(int skip, int take, CancellationToken token)
