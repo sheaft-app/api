@@ -28,6 +28,7 @@ namespace Sheaft.Infrastructure.Persistence
         }
 
         public DbSet<Agreement> Agreements { get; set; }
+        public DbSet<BankAccount> BankAccounts { get; set; }
         public DbSet<Country> Countries { get; set; }
         public DbSet<DeliveryMode> DeliveryModes { get; set; }
         public DbSet<Department> Departments { get; set; }

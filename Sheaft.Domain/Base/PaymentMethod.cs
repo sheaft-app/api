@@ -41,5 +41,13 @@ namespace Sheaft.Domain.Models
         {
             IsActive = isActive;
         }
+
+        public void SetName(string name)
+        {
+            if (name == null)
+                return;
+
+            Name = name;
+        }
     }
 }

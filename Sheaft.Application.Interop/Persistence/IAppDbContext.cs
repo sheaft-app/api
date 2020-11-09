@@ -18,6 +18,7 @@ namespace Sheaft.Application.Interop
     public interface IAppDbContext : IDisposable, IAsyncDisposable, IInfrastructure<IServiceProvider>, IDbContextDependencies, IDbSetCache, IDbContextPoolable, IResettableService
     {
         DbSet<Agreement> Agreements { get; set; }
+        DbSet<BankAccount> BankAccounts { get; set; }
         DbSet<Country> Countries { get; set; }
         DbSet<DeliveryMode> DeliveryModes { get; set; }
         DbSet<Department> Departments { get; set; }

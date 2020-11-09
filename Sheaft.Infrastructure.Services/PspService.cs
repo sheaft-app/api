@@ -188,7 +188,7 @@ namespace Sheaft.Infrastructure.Services
 
                 await EnsureAccessTokenIsValidAsync(token);
 
-                var result = await _api.Users.CreateBankAccountIbanAsync(GetIdempotencyKey(payment.Id),
+                var result = await _api.Users.CreateBankAccountIbanAsync(payment.User.Identifier,
                     new BankAccountIbanPostDTO(
                         payment.Owner,
                         new MangoPay.SDK.Entities.Address
@@ -203,11 +203,32 @@ namespace Sheaft.Infrastructure.Services
                     {
                         BIC = payment.BIC,
                         Type = BankAccountType.IBAN,
-                        UserId = payment.User.Identifier,
                         Tag = $"Id='{payment.Id}'"
                     });
 
                 return Ok(result.Id);
+            });
+        }
+
+        public async Task<Result<bool>> UpdateBankIbanAsync(BankAccount payment, bool isActive, CancellationToken token)
+        {
+            return await ExecuteAsync(async () =>
+            {
+                if (string.IsNullOrWhiteSpace(payment.User.Identifier))
+                    return BadRequest<bool>(MessageKind.PsP_CannotCreate_Transfer_User_Not_Exists);
+
+                if (!string.IsNullOrWhiteSpace(payment.Identifier))
+                    return BadRequest<bool>(MessageKind.PsP_CannotCreate_Transfer_BankIBAN_Exists);
+
+                await EnsureAccessTokenIsValidAsync(token);
+
+                var result = await _api.Users.UpdateBankAccountAsync(payment.User.Identifier,
+                new DisactivateBankAccountPutDTO
+                {
+                    Active = isActive
+                }, payment.Identifier);
+
+                return Ok(result.Active);
             });
         }
 

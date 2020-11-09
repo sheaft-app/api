@@ -83,6 +83,9 @@ namespace Sheaft.Web.Manage.Controllers
             if (entity == null)
                 throw new NotFoundException();
 
+            ViewBag.LegalsId = (await _context.FindSingleAsync<Legal>(c => c.User.Id == id, token))?.Id;
+            ViewBag.BankAccountId = (await _context.FindSingleAsync<BankAccount>(c => c.User.Id == id, token))?.Id;
+
             ViewBag.Tags = await GetTags(token);
             return View(entity);
         }
@@ -92,7 +95,6 @@ namespace Sheaft.Web.Manage.Controllers
         public async Task<IActionResult> Edit(ProducerViewModel model, IFormFile picture, CancellationToken token)
         {
             var requestUser = await GetRequestUser(token);
-
             if (picture != null)
             {
                 using (var ms = new MemoryStream())
@@ -122,6 +124,8 @@ namespace Sheaft.Web.Manage.Controllers
 
             if (!result.Success)
             {
+                ViewBag.LegalsId = (await _context.FindSingleAsync<Legal>(c => c.User.Id == model.Id, token))?.Id;
+                ViewBag.BankAccountId = (await _context.FindSingleAsync<BankAccount>(c => c.User.Id == model.Id, token))?.Id;
                 ViewBag.Tags = await GetTags(token);
 
                 ModelState.AddModelError("", result.Exception.Message);
@@ -185,15 +189,59 @@ namespace Sheaft.Web.Manage.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> UpdateLegal(Guid userId, CancellationToken token)
+        public async Task<IActionResult> CreateBankAccount(Guid userId, CancellationToken token)
         {
-            var entity = await _context.Legals.OfType<BusinessLegal>()
-                .Where(c => c.User.Id == userId)
-                .ProjectTo<BusinessLegalViewModel>(_configurationProvider)
+            var entity = await _context.Users.OfType<Business>()
+                .AsNoTracking()
+                .Where(c => c.Id == userId)
                 .SingleOrDefaultAsync(token);
 
             if (entity == null)
-                return RedirectToAction("CreateLegal", new { userId = userId });
+                throw new NotFoundException();
+
+            ViewBag.Countries = await GetCountries(token);
+            return View(new BankAccountViewModel
+            {
+                OwnerId = entity.Id,
+                IsActive = true
+            });
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> CreateBankAccount(BankAccountViewModel model, CancellationToken token)
+        {
+            var requestUser = await GetRequestUser(token);
+            var user = await _context.FindByIdAsync<Producer>(model.OwnerId, token);
+
+            var result = await _mediatr.Process(new CreateBankAccountCommand(requestUser)
+            {
+                UserId = user.Id,
+                Address = _mapper.Map<AddressInput>(model.Address),
+                BIC = model.BIC,
+                IBAN = model.IBAN,
+                Name = model.Name,
+                Owner = model.Owner
+            }, token);
+
+            if (!result.Success)
+            {
+                ViewBag.Countries = await GetCountries(token);
+                ModelState.AddModelError("", result.Exception.Message);
+                return View(model);
+            }
+
+            TempData["Created"] = JsonConvert.SerializeObject(new EntityViewModel { Id = model.OwnerId, Name = $"{model.Name}" });
+            return RedirectToAction("Edit", new { id = model.OwnerId });
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> UpdateLegal(Guid legalId, CancellationToken token)
+        {
+            var entity = await _context.Legals.OfType<BusinessLegal>()
+                .Where(c => c.Id == legalId)
+                .ProjectTo<BusinessLegalViewModel>(_configurationProvider)
+                .SingleOrDefaultAsync(token);
 
             ViewBag.Countries = await GetCountries(token);
             ViewBag.Nationalities = await GetNationalities(token);
@@ -227,6 +275,43 @@ namespace Sheaft.Web.Manage.Controllers
 
             TempData["Edited"] = JsonConvert.SerializeObject(new EntityViewModel { Id = model.Owner.Id, Name = $"{model.Email}" });
             return RedirectToAction("Edit", new { id = model.Owner.Id });
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> UpdateBankAccount(Guid bankAccountId, CancellationToken token)
+        {
+            var entity = await _context.BankAccounts.Get(c => c.Id == bankAccountId)
+                .ProjectTo<BankAccountViewModel>(_configurationProvider)
+                .SingleOrDefaultAsync(token);
+
+            ViewBag.Countries = await GetCountries(token);
+            return View(entity);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> UpdateBankAccount(BankAccountViewModel model, CancellationToken token)
+        {
+            var requestUser = await GetRequestUser(token);
+            var result = await _mediatr.Process(new UpdateBankAccountCommand(requestUser)
+            {
+                Id = model.Id,
+                Address = _mapper.Map<AddressInput>(model.Address),
+                BIC = model.BIC,
+                IBAN = model.IBAN,
+                Name = model.Name,
+                Owner = model.Owner
+            }, token);
+
+            if (!result.Success)
+            {
+                ViewBag.Countries = await GetCountries(token);
+                ModelState.AddModelError("", result.Exception.Message);
+                return View(model);
+            }
+
+            TempData["Edited"] = JsonConvert.SerializeObject(new EntityViewModel { Id = model.OwnerId, Name = $"{model.Name}" });
+            return RedirectToAction("Edit", new { id = model.OwnerId });
         }
 
         [HttpPost]

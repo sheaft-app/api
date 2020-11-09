@@ -12,6 +12,7 @@ namespace Sheaft.Application.Handlers
 {
     public class PaymentCommandsHandler : ResultsHandler,
            IRequestHandler<CreateBankAccountCommand, Result<Guid>>,
+           IRequestHandler<UpdateBankAccountCommand, Result<bool>>,
            IRequestHandler<EnsureBankAccountValidatedCommand, Result<bool>>
     {
         private readonly IPspService _pspService;
@@ -51,10 +52,50 @@ namespace Sheaft.Application.Handlers
                     }
 
                     bankAccount.SetIdentifier(result.Data);
+                    await _context.SaveChangesAsync(token);
 
                     await transaction.CommitAsync(token);
                     return Ok(bankAccount.Id);
                 }
+            });
+        }
+
+        public async Task<Result<bool>> Handle(UpdateBankAccountCommand request, CancellationToken token)
+        {
+            return await ExecuteAsync(request, async () =>
+            {
+                var bankAccount = await _context.GetByIdAsync<BankAccount>(request.Id, token);
+
+                var address = request.Address != null ?
+                       new BankAddress(request.Address.Line1, request.Address.Line2, request.Address.Zipcode, request.Address.City,
+                       request.Address.Country)
+                       : null;
+
+                bankAccount.SetAddress(address);
+                bankAccount.SetName(request.Name);
+                bankAccount.SetOwner(request.Owner);
+                bankAccount.SetIban(request.IBAN);
+                bankAccount.SetBic(request.BIC);
+
+                await _context.SaveChangesAsync(token);
+
+                if (!string.IsNullOrWhiteSpace(bankAccount.Identifier))
+                {
+                    var resetResult = await _pspService.UpdateBankIbanAsync(bankAccount, false, token);
+                    if (!resetResult.Success)
+                        return Failed<bool>(resetResult.Exception);
+
+                    bankAccount.SetIdentifier(string.Empty);
+                }
+
+                var result = await _pspService.CreateBankIbanAsync(bankAccount, token);
+                if (!result.Success)
+                    return Failed<bool>(result.Exception);
+
+                bankAccount.SetIdentifier(result.Data);
+                await _context.SaveChangesAsync(token);
+
+                return Ok(true);
             });
         }
 

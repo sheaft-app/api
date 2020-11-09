@@ -99,9 +99,33 @@
                 </div>
                 <br />
                 <h4>Legals</h4>
-                <a asp-controller="Producers" asp-action="UpdateLegal" asp-route-userId="@Model.Id" class="btn btn-info">
-                    Legals details
-                </a>
+                @if (ViewBag.LegalsId != null)
+                {
+                    <a asp-controller="Producers" asp-action="UpdateLegal" asp-route-legalId="@ViewBag.LegalsId" class="btn btn-info">
+                        Legals details
+                    </a>
+                }
+                else
+                {
+                    <a asp-controller="Producers" asp-action="CreateLegals" asp-route-userId="@Model.Id" class="btn btn-info">
+                        Create Legals
+                    </a>
+                }
+                <br />
+                <br />
+                <h4>BankAccount</h4>
+                @if (ViewBag.BankAccountId != null)
+                {
+                    <a asp-controller="Producers" asp-action="UpdateBankAccount" asp-route-bankAccountId="@ViewBag.BankAccountId" class="btn btn-info">
+                        Bank Account details
+                    </a>
+                }
+                else
+                {
+                    <a asp-controller="Producers" asp-action="CreateBankAccount" asp-route-userId="@Model.Id" class="btn btn-info">
+                        Create Bank Account
+                    </a>
+                }
             </div>
         </div>
         <br />

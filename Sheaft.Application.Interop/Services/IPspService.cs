@@ -12,6 +12,7 @@ namespace Sheaft.Application.Interop
     {
         Task<Result<bool>> AddPageToDocumentAsync(Page page, Document document, string userIdentifier, byte[] bytes, CancellationToken token);
         Task<Result<string>> CreateBankIbanAsync(BankAccount payment, CancellationToken token);
+        Task<Result<bool>> UpdateBankIbanAsync(BankAccount payment, bool isActive, CancellationToken token);
         Task<Result<KeyValuePair<string, string>>> CreateCardAsync(Card payment, CancellationToken token);
         Task<Result<PspDocumentResultDto>> CreateDocumentAsync(Document document, string userIdentifier, CancellationToken token);
         Task<Result<PspPaymentResultDto>> CreatePayoutAsync(Payout transaction, CancellationToken token);

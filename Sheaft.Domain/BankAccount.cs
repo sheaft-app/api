@@ -28,5 +28,41 @@ namespace Sheaft.Domain.Models
         public string Zipcode { get; private set; }
         public string City { get; private set; }
         public CountryIsoCode Country { get; private set; }
+
+        public void SetAddress(BankAddress address)
+        {
+            if (address == null)
+                return;
+
+            Line1 = address.Line1;
+            Line2 = address.Line2;
+            Zipcode = address.Zipcode;
+            City = address.City;
+            Country = address.Country;
+        }
+
+        public void SetOwner(string owner)
+        {
+            if (owner == null)
+                return;
+
+            Owner = owner;
+        }
+
+        public void SetIban(string iban)
+        {
+            if (iban == null)
+                return;
+
+            IBAN = iban;
+        }
+
+        public void SetBic(string bic)
+        {
+            if (bic == null)
+                return;
+
+            BIC = bic;
+        }
     }
 }
