@@ -139,7 +139,7 @@ namespace Sheaft.Domain.Models
         {
             if (Producer.NotSubjectToVat)
                 newVat = 0;
-            else if(!newVat.HasValue)
+            else if(!newVat.HasValue || newVat == 0)
                 throw new ValidationException(MessageKind.Product_Vat_Required);
 
             if (newVat < 0)

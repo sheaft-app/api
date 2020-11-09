@@ -106,7 +106,6 @@ namespace Sheaft.Application.Handlers
                 entity.SetVat(request.Vat);
                 entity.SetName(request.Name);
                 entity.SetDescription(request.Description);
-                entity.SetVat(request.Vat);
                 entity.SetWholeSalePricePerUnit(request.WholeSalePricePerUnit);
                 entity.SetReference(request.Reference);
                 entity.SetWeight(request.Weight);
