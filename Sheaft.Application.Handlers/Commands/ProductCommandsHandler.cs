@@ -103,6 +103,22 @@ namespace Sheaft.Application.Handlers
             {
                 var entity = await _context.GetByIdAsync<Product>(request.Id, token);
 
+                if (!string.IsNullOrWhiteSpace(request.Reference) && request.Reference != entity.Reference)
+                {
+                    var existingEntity = await _context.FindSingleAsync<Product>(p => p.Reference == request.Reference && p.Producer.Id == request.RequestUser.Id, token);
+                    if (existingEntity != null)
+                        return ValidationError<bool>(MessageKind.CreateProduct_Reference_AlreadyExists, request.Reference);
+                }
+
+                if(string.IsNullOrWhiteSpace(request.Reference))
+                {
+                    var resultIdentifier = await _mediatr.Process(new CreateProductIdentifierCommand(request.RequestUser) { ProducerId = request.RequestUser.Id }, token);
+                    if (!resultIdentifier.Success)
+                        return Failed<bool>(resultIdentifier.Exception);
+
+                    request.Reference = resultIdentifier.Data;
+                }
+
                 entity.SetVat(request.Vat);
                 entity.SetName(request.Name);
                 entity.SetDescription(request.Description);
