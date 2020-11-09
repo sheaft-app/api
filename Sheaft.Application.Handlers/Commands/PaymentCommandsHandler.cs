@@ -11,7 +11,8 @@ using Sheaft.Domain.Models;
 namespace Sheaft.Application.Handlers
 {
     public class PaymentCommandsHandler : ResultsHandler,
-           IRequestHandler<CreateBankAccountCommand, Result<Guid>>
+           IRequestHandler<CreateBankAccountCommand, Result<Guid>>,
+           IRequestHandler<EnsureBankAccountValidatedCommand, Result<bool>>
     {
         private readonly IPspService _pspService;
 
@@ -54,6 +55,23 @@ namespace Sheaft.Application.Handlers
                     await transaction.CommitAsync(token);
                     return Ok(bankAccount.Id);
                 }
+            });
+        }
+
+        public async Task<Result<bool>> Handle(EnsureBankAccountValidatedCommand request, CancellationToken token)
+        {
+            return await ExecuteAsync(request, async () =>
+            {
+                var user = await _context.GetByIdAsync<User>(request.ProducerId, token);
+                var bankAccount = await _context.GetSingleAsync<BankAccount>(c => c.User.Id == request.ProducerId && c.IsActive, token);
+                if (!string.IsNullOrWhiteSpace(bankAccount.Identifier))
+                    return Ok(true);
+
+                var result = await _pspService.CreateBankIbanAsync(bankAccount, token);
+                if (!result.Success)
+                    return Failed<bool>(result.Exception);
+
+                return Ok(true);
             });
         }
     }

@@ -26,5 +26,6 @@ namespace Sheaft.Application.Commands
         public bool OpenForNewBusiness { get; set; }
         public FullAddressInput Address { get; set; }
         public IEnumerable<Guid> Tags { get; set; }
+        public bool? NotSubjectToVat { get; set; }
     }
 }

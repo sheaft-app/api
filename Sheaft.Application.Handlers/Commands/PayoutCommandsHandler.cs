@@ -14,6 +14,7 @@ using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using Sheaft.Options;
 using Microsoft.Extensions.Options;
+using Sheaft.Exceptions;
 
 namespace Sheaft.Application.Handlers
 {
@@ -163,22 +164,30 @@ namespace Sheaft.Application.Handlers
                 var wallet = await _context.GetSingleAsync<Wallet>(c => c.User.Id == request.ProducerId, token);
                 var bankAccount = await _context.GetSingleAsync<BankAccount>(c => c.User.Id == request.ProducerId && c.IsActive, token);
 
+                var bankConfigurationResult = await _mediatr.Process(new EnsureBankAccountValidatedCommand(request.RequestUser) { ProducerId = request.ProducerId }, token);
+                if (!bankConfigurationResult.Success)
+                    return Failed<Guid>(bankConfigurationResult.Exception);
+
                 var transfers = await _context.GetAsync<Transfer>(
                     t => request.TransferIds.Contains(t.Id)
                         && t.PurchaseOrder.Status == PurchaseOrderStatus.Delivered
                         && (t.Payout == null || t.Payout.Status == TransactionStatus.Failed), 
                     token);
 
-                var hasAlreadyPaidComission = await _context.AnyAsync<Payout>(
-                    p => p.Fees > 0 
-                        && p.DebitedWallet.User.Id == request.ProducerId
-                        && p.Status != TransactionStatus.Failed, 
-                    token);
-
                 var amount = transfers.Sum(t => t.Credited);
-                var fees = hasAlreadyPaidComission || amount < _pspOptions.ProducerFees ? 0m : _pspOptions.ProducerFees;
-                if (!hasAlreadyPaidComission && fees == 0m)
-                    return Failed<Guid>(new InvalidCastException());
+                var fees = 0m;
+                if (producerLegals.DeclarationRequired)
+                {
+                    var hasAlreadyPaidComission = await _context.AnyAsync<Payout>(
+                        p => p.Fees > 0
+                            && p.DebitedWallet.User.Id == request.ProducerId
+                            && p.Status != TransactionStatus.Failed,
+                        token);
+                    
+                    fees = hasAlreadyPaidComission || amount < _pspOptions.ProducerFees ? 0m : _pspOptions.ProducerFees;
+                    if (!hasAlreadyPaidComission && fees == 0m)
+                        return Failed<Guid>(new Exception("Invalid fees for payout without paid commission."));
+                }
 
                 using (var transaction = await _context.BeginTransactionAsync(token))
                 {

@@ -116,7 +116,8 @@ namespace Sheaft.Web.Manage.Controllers
                 Kind = model.Kind,
                 Phone = model.Phone,
                 Tags = model.Tags,
-                Picture = model.Picture
+                Picture = model.Picture,
+                NotSubjectToVat = model.NotSubjectToVat
             }, token);
 
             if (!result.Success)
@@ -137,7 +138,6 @@ namespace Sheaft.Web.Manage.Controllers
             var entity = await _context.Users.OfType<Business>()
                 .AsNoTracking()
                 .Where(c => c.Id == userId)
-                .ProjectTo<ProducerViewModel>(_configurationProvider)
                 .SingleOrDefaultAsync(token);
 
             if (entity == null)
@@ -159,6 +159,8 @@ namespace Sheaft.Web.Manage.Controllers
         public async Task<IActionResult> CreateLegal(BusinessLegalViewModel model, CancellationToken token)
         {
             var requestUser = await GetRequestUser(token);
+            var user = await _context.FindByIdAsync<Producer>(model.Owner.Id, token);
+
             var result = await _mediatr.Process(new CreateBusinessLegalCommand(requestUser)
             {
                 UserId = model.Owner.Id,
@@ -167,7 +169,7 @@ namespace Sheaft.Web.Manage.Controllers
                 Kind = model.Kind,
                 Owner = _mapper.Map<OwnerInput>(model.Owner),
                 Siret = model.Siret,
-                VatIdentifier = model.VatIdentifier
+                VatIdentifier = user != null && user.NotSubjectToVat ? null : model.VatIdentifier
             }, token);
 
             if (!result.Success)
@@ -203,6 +205,7 @@ namespace Sheaft.Web.Manage.Controllers
         public async Task<IActionResult> UpdateLegal(BusinessLegalViewModel model, CancellationToken token)
         {
             var requestUser = await GetRequestUser(token);
+            var user = await _context.FindByIdAsync<Producer>(model.Owner.Id, token);
             var result = await _mediatr.Process(new UpdateBusinessLegalCommand(requestUser)
             {
                 Id = model.Id,
@@ -211,7 +214,7 @@ namespace Sheaft.Web.Manage.Controllers
                 Kind = model.Kind,
                 Owner = _mapper.Map<OwnerInput>(model.Owner),
                 Siret = model.Siret,
-                VatIdentifier = model.VatIdentifier
+                VatIdentifier = user != null && user.NotSubjectToVat ? null : model.VatIdentifier
             }, token);
 
             if (!result.Success)

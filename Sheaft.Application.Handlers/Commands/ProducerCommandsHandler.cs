@@ -102,7 +102,7 @@ namespace Sheaft.Application.Handlers
                         Email = request.Legals.Email,
                         Siret = request.Legals.Siret,
                         Kind = request.Legals.Kind,
-                        VatIdentifier = request.Legals.VatIdentifier,
+                        VatIdentifier = request.NotSubjectToVat ? null : request.Legals.VatIdentifier,
                         UserId = producer.Id,
                         Owner = request.Legals.Owner
                     }, token);
@@ -138,6 +138,11 @@ namespace Sheaft.Application.Handlers
                 producer.SetPhone(request.Phone);
                 producer.SetDescription(request.Description);
                 producer.SetOpenForNewBusiness(request.OpenForNewBusiness);
+
+                if (request.NotSubjectToVat.HasValue)
+                {
+                    producer.SetNotSubjectToVat(request.NotSubjectToVat.Value);
+                }
 
                 var departmentCode = UserAddress.GetDepartmentCode(request.Address.Zipcode);
                 var department = await _context.Departments.SingleOrDefaultAsync(d => d.Code == departmentCode, token);

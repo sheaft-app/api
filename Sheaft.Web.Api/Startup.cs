@@ -387,6 +387,17 @@ namespace Sheaft.Web.Api
                     wallet.SetIdentifier(configuration.GetValue<string>("Psp:WalletId"));
                     context.Add(wallet);
 
+                    var bankAccount = new BankAccount(Guid.NewGuid(), "Dons", "Sheaft", configuration.GetValue<string>("Psp:Bank:Iban"), configuration.GetValue<string>("Psp:Bank:Bic"), 
+                        new BankAddress(
+                            configuration.GetValue<string>("Psp:Bank:Address:Line1"),
+                            configuration.GetValue<string>("Psp:Bank:Address:Line2"),
+                            configuration.GetValue<string>("Psp:Bank:Address:Zipcode"),
+                            configuration.GetValue<string>("Psp:Bank:Address:City"),
+                            configuration.GetValue<CountryIsoCode>("Psp:Bank:Address:Country")), admin);
+
+                    bankAccount.SetIdentifier(configuration.GetValue<string>("Psp:Bank:Id"));
+                    context.Add(bankAccount);
+
                     context.SaveChanges();
                 }
 

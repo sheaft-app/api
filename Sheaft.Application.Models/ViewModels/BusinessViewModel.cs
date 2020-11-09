@@ -22,5 +22,6 @@ namespace Sheaft.Application.Models
         public bool OpenForNewBusiness { get; set; }
         public AddressViewModel Address { get; set; }
         public IEnumerable<Guid> Tags { get; set; }
+        public bool NotSubjectToVat { get; set; }
     }
 }
