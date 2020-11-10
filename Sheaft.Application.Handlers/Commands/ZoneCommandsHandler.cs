@@ -50,7 +50,7 @@ namespace Sheaft.Application.Handlers
                     foreach (var departmentId in region.DepartmentIds)
                     {
                         var producerPerDepartment = producersPerDepartments.First(p => p.DepartmentId == departmentId);
-                        producersCount += (producerPerDepartment.Created ?? 0);
+                        producersCount += (producerPerDepartment.Active ?? 0);
 
                         var storePerDepartment = storesPerDepartments.First(p => p.DepartmentId == departmentId);
                         storesCount += (storePerDepartment.Created ?? 0);
