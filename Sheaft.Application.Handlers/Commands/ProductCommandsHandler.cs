@@ -129,7 +129,6 @@ namespace Sheaft.Application.Handlers
                 entity.SetStoreVisibility(request.VisibleToStores);
                 entity.SetConsumerVisibility(request.VisibleToConsumers);
                 entity.SetConditioning(request.Conditioning, request.QuantityPerUnit, request.Unit);
-                entity.SetWeight(request.Weight);
 
                 if (request.ReturnableId.HasValue)
                 {

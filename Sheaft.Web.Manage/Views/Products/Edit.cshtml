@@ -13,7 +13,16 @@
         new SelectListItem("L", UnitKind.l.ToString("G")),
         new SelectListItem("gr", UnitKind.g.ToString("G")),
         new SelectListItem("kg", UnitKind.kg.ToString("G")),
-        new SelectListItem("NotSpecified", UnitKind.NotSpecified.ToString("G")),
+        new SelectListItem("Non spécifié", UnitKind.NotSpecified.ToString("G")),
+    };
+
+    var conditionings = new List<SelectListItem> {
+        new SelectListItem("Panier", ConditioningKind.Basket.ToString("G")),
+        new SelectListItem("Bouquet", ConditioningKind.Bouquet.ToString("G")),
+        new SelectListItem("Boite", ConditioningKind.Box.ToString("G")),
+        new SelectListItem("Poids", ConditioningKind.Bulk.ToString("G")),
+        new SelectListItem("Botte", ConditioningKind.Bunch.ToString("G")),
+        new SelectListItem("Inconnu", ConditioningKind.Not_Specified.ToString("G")),
     };
 
     var tags = ((List<TagViewModel>)ViewBag.Tags).Select(c => new SelectListItem(c.Name, c.Id.ToString("D"))).ToList();
@@ -50,7 +59,11 @@
             @Html.DropDownListFor(c => c.Vat, vats, new { @class = "form-control" })
         </div>
         <div class="form-group">
-            @Html.LabelFor(c => c.QuantityPerUnit, "QuantityPerUnit", new { @class = "form-label" })
+            @Html.LabelFor(c => c.Conditioning, new { @class = "form-label" })
+            @Html.DropDownListFor(c => c.Conditioning, conditionings, new { @class = "form-control" })
+        </div>
+        <div class="form-group">
+            @Html.LabelFor(c => c.QuantityPerUnit, new { @class = "form-label" })
             @Html.TextBoxFor(c => c.QuantityPerUnit, null, new { @class = "form-control" })
         </div>
         <div class="form-group">

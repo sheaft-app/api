@@ -51,6 +51,7 @@
         Product_CannotRate_AlreadyRated = 6111,
         Product_BulkConditioning_Requires_Unit_ToBe_Specified = 6112,
         Product_Vat_Required = 6113,
+        Product_Conditioning_Required = 6114,
         Consumer = 7000,
         Consumer_Id_Invalid = 7101,
         Consumer_Email_Required = 7102,

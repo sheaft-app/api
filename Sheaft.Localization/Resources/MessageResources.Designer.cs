@@ -1222,6 +1222,15 @@ namespace Sheaft.Localization.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Le type de conditionnement est requis.
+        /// </summary>
+        internal static string Product_Conditioning_Required {
+            get {
+                return ResourceManager.GetString("Product_Conditioning_Required", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to La description est trop longue.
         /// </summary>
         internal static string Product_Description_TooLong {

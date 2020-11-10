@@ -873,4 +873,7 @@
   <data name="Product_Vat_Required" xml:space="preserve">
     <value>La TVA du produit est requise</value>
   </data>
+  <data name="Product_Conditioning_Required" xml:space="preserve">
+    <value>Le type de conditionnement est requis</value>
+  </data>
 </root>

@@ -199,6 +199,7 @@ namespace Sheaft.Web.Manage.Controllers
                 QuantityPerUnit = model.QuantityPerUnit,
                 Reference = model.Reference,
                 Tags = model.Tags,
+                Conditioning = model.Conditioning,
                 Unit = model.Unit,
                 Vat = model.Vat,
                 Weight = model.Weight,

@@ -227,7 +227,10 @@ namespace Sheaft.Domain.Models
         }
 
         public void SetConditioning(ConditioningKind conditioning, decimal quantity, UnitKind unit = UnitKind.NotSpecified)
-        { 
+        {
+            if (conditioning == ConditioningKind.Not_Specified)
+                throw new ValidationException(MessageKind.Product_Conditioning_Required);
+
             if(conditioning != ConditioningKind.Bulk)
                 unit = UnitKind.NotSpecified;
 
