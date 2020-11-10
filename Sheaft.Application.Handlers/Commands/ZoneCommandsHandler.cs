@@ -62,7 +62,7 @@ namespace Sheaft.Application.Handlers
                                 Id = departmentId,
                                 Points = pointsPerDepartment?.Points ?? 0,
                                 Position = pointsPerDepartment != null ? (int)pointsPerDepartment.Position : 0,
-                                Producers = producerPerDepartment.Created ?? 0,
+                                Producers = producerPerDepartment.Active ?? 0,
                                 Stores = storePerDepartment.Created ?? 0
                         });
                     }
