@@ -38,7 +38,7 @@ namespace Sheaft.Application.Queries
                 SearchMode = SearchMode.Any,
                 Top = terms.Take,
                 Skip = (terms.Page - 1) * terms.Take,
-                SearchFields = new List<string> { "partialProductName" },
+                SearchFields = new List<string> { "partialProductName", "partialProducerName" },
                 Select = new List<string>()
                     {
                         "product_id", "product_name", "product_onSalePricePerUnit", "product_onSalePrice", "product_rating", "product_ratings_count", "product_image", "product_tags", "producer_id", "producer_name", "producer_email", "producer_phone", "producer_zipcode", "producer_city", "producer_longitude", "producer_latitude", "product_returnable", "product_unit", "product_quantityPerUnit", "product_conditioning", "product_available"

@@ -26,6 +26,7 @@ as
      , case when pa.Uid is not null then cast(1 as bit) else cast(0 as bit) end as product_returnable
      , r.Id as producer_id
      , r.Name as producer_name
+     , r.Name as partialProducerName
      , r.Email as producer_email
      , r.Phone as producer_phone
      , ra.Zipcode as producer_zipcode

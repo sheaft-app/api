@@ -295,6 +295,21 @@ POST https://sheaft-search.search.windows.net/indexes?api-version=2020-06-30&all
       "fields": []
     },
     {
+      "name": "partialProducerName",
+      "type": "Edm.String",
+      "facetable": false,
+      "filterable": false,
+      "key": false,
+      "retrievable": false,
+      "searchable": true,
+      "sortable": false,
+      "analyzer": null,
+      "indexAnalyzer": "prefixCmAnalyzer",
+      "searchAnalyzer": "standardCmAnalyzer",
+      "synonymMaps": [],
+      "fields": []
+    },
+    {
       "name": "packaging_name",
       "type": "Edm.String",
       "facetable": false,
