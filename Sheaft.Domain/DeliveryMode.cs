@@ -15,7 +15,7 @@ namespace Sheaft.Domain.Models
         {
         }
 
-        public DeliveryMode(Guid id, DeliveryKind kind, Producer producer, int lockOrderHoursBeforeDelivery, DeliveryAddress address, IEnumerable<TimeSlotHour> openingHours, string name, string description = null)
+        public DeliveryMode(Guid id, DeliveryKind kind, Producer producer, bool available, int lockOrderHoursBeforeDelivery, DeliveryAddress address, IEnumerable<TimeSlotHour> openingHours, string name, string description = null)
         {
             Id = id;
             Name = name;
@@ -27,6 +27,7 @@ namespace Sheaft.Domain.Models
             Producer = producer;
 
             SetOpeningHours(openingHours);
+            SetAvailability(available);
         }
 
         public Guid Id { get; private set; }

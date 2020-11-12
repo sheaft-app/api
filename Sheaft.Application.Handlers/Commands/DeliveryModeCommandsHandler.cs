@@ -52,9 +52,7 @@ namespace Sheaft.Application.Handlers
                     }
                 }
 
-                var entity = new DeliveryMode(Guid.NewGuid(), request.Kind, producer, request.LockOrderHoursBeforeDelivery, deliveryModeAddress, openingHours, request.Name, request.Description);
-
-                entity.SetAvailability(request.Available);
+                var entity = new DeliveryMode(Guid.NewGuid(), request.Kind, producer, request.Available, request.LockOrderHoursBeforeDelivery, deliveryModeAddress, openingHours, request.Name, request.Description);
 
                 if (request.Kind == DeliveryKind.Collective || request.Kind == DeliveryKind.Farm || request.Kind == DeliveryKind.Market)
                     producer.CanDirectSell = true;
