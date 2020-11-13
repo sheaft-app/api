@@ -12,12 +12,13 @@ pool:
 steps:
   - script: |
       dotnet restore $(System.DefaultWorkingDirectory)/Sheaft.sln
-      dotnet build $(System.DefaultWorkingDirectory)/Sheaft.sln -c Release
-      dotnet publish $(System.DefaultWorkingDirectory)/Sheaft.Web.Api/Sheaft.Web.Api.csproj -c Release --no-build --output publish_output/Sheaft.Web.Api/
-      dotnet publish $(System.DefaultWorkingDirectory)/Sheaft.Web.Jobs/Sheaft.Web.Jobs.csproj -c Release --no-build --output publish_output/Sheaft.Web.Jobs/
-      dotnet publish $(System.DefaultWorkingDirectory)/Sheaft.Web.Payment/Sheaft.Web.Payment.csproj -c Release --no-build --output publish_output/Sheaft.Web.Payment/
-      dotnet publish $(System.DefaultWorkingDirectory)/Sheaft.Web.Signalr/Sheaft.Web.Signalr.csproj -c Release --no-build --output publish_output/Sheaft.Web.Signalr/
-      dotnet publish $(System.DefaultWorkingDirectory)/Sheaft.Web.Manage/Sheaft.Web.Manage.csproj -c Release --no-build --output publish_output/Sheaft.Web.Manage/
+      dotnet build $(System.DefaultWorkingDirectory)/Sheaft.sln -c Release --no-restore
+      dotnet test $(System.DefaultWorkingDirectory)/Sheaft.sln -c Release --no-restore --no-build
+      dotnet publish $(System.DefaultWorkingDirectory)/Sheaft.Web.Api/Sheaft.Web.Api.csproj -c Release --no-restore --no-build --output publish_output/Sheaft.Web.Api/
+      dotnet publish $(System.DefaultWorkingDirectory)/Sheaft.Web.Jobs/Sheaft.Web.Jobs.csproj -c Release --no-restore --no-build --output publish_output/Sheaft.Web.Jobs/
+      dotnet publish $(System.DefaultWorkingDirectory)/Sheaft.Web.Payment/Sheaft.Web.Payment.csproj -c Release --no-restore --no-build --output publish_output/Sheaft.Web.Payment/
+      dotnet publish $(System.DefaultWorkingDirectory)/Sheaft.Web.Signalr/Sheaft.Web.Signalr.csproj -c Release --no-restore --no-build --output publish_output/Sheaft.Web.Signalr/
+      dotnet publish $(System.DefaultWorkingDirectory)/Sheaft.Web.Manage/Sheaft.Web.Manage.csproj -c Release --no-restore --no-build --output publish_output/Sheaft.Web.Manage/
   - task: ArchiveFiles@2
     displayName: "Archive GRAPHQL"
     inputs:
