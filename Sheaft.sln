@@ -76,9 +76,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sheaft.Web.Jobs", "Sheaft.W
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sheaft.Web.Common", "Sheaft.Web.Common\Sheaft.Web.Common.csproj", "{E2B3A05C-81FE-47D5-B0BB-8C1CA4ECBFA7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sheaft.Tests.Common", "Sheaft.Tests.Common\Sheaft.Tests.Common.csproj", "{21BAA1B4-B5E9-4CAC-B795-430425BA10C6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sheaft.Tests.Common", "Sheaft.Tests.Common\Sheaft.Tests.Common.csproj", "{21BAA1B4-B5E9-4CAC-B795-430425BA10C6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sheaft.Application.Queries.Tests", "Sheaft.Application.Queries.Tests\Sheaft.Application.Queries.Tests.csproj", "{B911920A-F71F-4A3E-B428-FE3B72D95613}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sheaft.Application.Queries.Tests", "Sheaft.Application.Queries.Tests\Sheaft.Application.Queries.Tests.csproj", "{B911920A-F71F-4A3E-B428-FE3B72D95613}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

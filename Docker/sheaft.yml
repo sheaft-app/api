@@ -1,0 +1,80 @@
+version: "3.8"
+services:
+  sql:
+    image: mcr.microsoft.com/mssql/server:2019-latest
+    env_file:
+      - ./docker.env
+    ports:
+      - "1434:1433"
+    environment:
+        ACCEPT_EULA: "Y"
+  identity:
+    image: sheaft/sheaft.identity:latest
+    env_file:
+      - ./docker.env
+    ports:
+      - "5001:443"
+    depends_on:
+      - sql
+    environment:
+        ASPNETCORE_NEW_RELIC_APP_NAME: "IDENTITY-DEV"
+  graphql:
+    image: sheaft/sheaft.graphql:latest
+    env_file:
+      - ./docker.env
+    ports:
+      - "5003:443"
+      - "5002:80"
+    depends_on:
+      - sql
+      - identity
+    environment:
+        ASPNETCORE_NEW_RELIC_APP_NAME: "GRAPHQL-DEV"
+  jobs:
+    image: sheaft/sheaft.jobs:latest
+    env_file:
+      - ./docker.env
+    ports:
+      - "5020:443"
+      - "5021:80"
+    depends_on:
+      - graphql
+      - identity
+    environment:
+        ASPNETCORE_NEW_RELIC_APP_NAME: "JOBS-DEV"
+  manage:
+    image: sheaft/sheaft.manage:latest
+    env_file:
+      - ./docker.env
+    ports:
+      - "5008:443"
+      - "5007:80"
+    depends_on:
+      - graphql
+      - identity
+    environment:
+        ASPNETCORE_NEW_RELIC_APP_NAME: "MANAGE-DEV"
+  signalr:
+    image: sheaft/sheaft.signalr:latest
+    env_file:
+      - ./docker.env
+    ports:
+      - "5010:443"
+      - "5009:80"
+    depends_on:
+      - graphql
+      - identity
+    environment:
+        ASPNETCORE_NEW_RELIC_APP_NAME: "SIGNALR-DEV"
+  payment:
+    image: sheaft/sheaft.payment:latest
+    env_file:
+      - ./docker.env
+    ports:
+      - "5015:443"
+      - "5014:80"
+    depends_on:
+      - graphql
+      - jobs
+    environment:
+        ASPNETCORE_NEW_RELIC_APP_NAME: "PAYMENT-DEV"
