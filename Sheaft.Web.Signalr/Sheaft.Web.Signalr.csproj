@@ -6,6 +6,9 @@
     <Content Remove="appsettings.Development.json" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\.dockerignore" Link=".dockerignore">
+      <DependentUpon>$(DockerDefaultDockerfile)</DependentUpon>
+    </None>
     <None Include="appsettings.Development.json" />
   </ItemGroup>
   <ItemGroup>
