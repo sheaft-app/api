@@ -74,9 +74,3 @@ steps:
     inputs:
       PathtoPublish: '$(System.DefaultWorkingDirectory)/publish_output/Sheaft.Web.Manage/build$(Build.BuildId).zip'
       artifactName: 'sheaft-manage'
-  - task: Docker@2
-    inputs:
-      containerRegistry: 'Docker Hub'
-      repository: 'sheaft.graphql'
-      command: 'buildAndPush'
-      Dockerfile: '**.Api/Dockerfile'
