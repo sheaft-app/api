@@ -80,6 +80,12 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sheaft.Tests.Common", "Shea
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sheaft.Application.Queries.Tests", "Sheaft.Application.Queries.Tests\Sheaft.Application.Queries.Tests.csproj", "{B911920A-F71F-4A3E-B428-FE3B72D95613}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Docker", "Docker", "{09B4FD56-BB50-4809-8174-47445A04B5DB}"
+	ProjectSection(SolutionItems) = preProject
+		Docker\docker.env = Docker\docker.env
+		Docker\sheaft.yml = Docker\sheaft.yml
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
