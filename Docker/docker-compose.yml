@@ -1,66 +1,105 @@
 version: "3.8"
 services:
   sql:
+    container_name: sql-db
     image: mcr.microsoft.com/mssql/server:2019-latest
     env_file:
       - ./docker.env
     ports:
       - "1434:1433"
+    networks:
+      sheaft_net:
+        aliases:
+          - db-svc
     environment:
-        ACCEPT_EULA: "Y"
+      ACCEPT_EULA: "Y"
   identity:
     image: sheaft/sheaft.identity:latest
+    container_name: identity
     env_file:
       - ./docker.env
     ports:
+      - "5000:80"
       - "5001:443"
+    networks:
+      sheaft_net:
+        aliases:
+          - identity-svc
     depends_on:
       - sql
+    links:
+      - "sql"
     environment:
         ASPNETCORE_NEW_RELIC_APP_NAME: "IDENTITY-DEV"
   graphql:
     image: sheaft/sheaft.graphql:latest
+    container_name: graphql
     env_file:
       - ./docker.env
     ports:
-      - "5003:443"
       - "5002:80"
+      - "5003:443"
+    networks:
+      sheaft_net:
+        aliases:
+          - graphql-svc
     depends_on:
       - sql
       - identity
+    links:
+      - "sql"
     environment:
         ASPNETCORE_NEW_RELIC_APP_NAME: "GRAPHQL-DEV"
   jobs:
     image: sheaft/sheaft.jobs:latest
+    container_name: jobs
     env_file:
       - ./docker.env
     ports:
-      - "5020:443"
       - "5021:80"
+      - "5020:443"
+    networks:
+      sheaft_net:
+        aliases:
+          - jobs-svc
     depends_on:
       - graphql
       - identity
+    links:
+      - "sql"
     environment:
         ASPNETCORE_NEW_RELIC_APP_NAME: "JOBS-DEV"
   manage:
     image: sheaft/sheaft.manage:latest
+    container_name: manage
     env_file:
       - ./docker.env
     ports:
-      - "5008:443"
       - "5007:80"
+      - "5008:443"
+    networks:
+      sheaft_net:
+        aliases:
+          - manage-svc
     depends_on:
       - graphql
       - identity
+    links:
+      - "sql"
     environment:
         ASPNETCORE_NEW_RELIC_APP_NAME: "MANAGE-DEV"
   signalr:
     image: sheaft/sheaft.signalr:latest
+    container_name: signalr
     env_file:
       - ./docker.env
     ports:
-      - "5010:443"
       - "5009:80"
+      - "5010:443"
+    networks:
+      sheaft_net:
+        aliases:
+          - signalr-svc
     depends_on:
       - graphql
       - identity
@@ -68,13 +107,22 @@ services:
         ASPNETCORE_NEW_RELIC_APP_NAME: "SIGNALR-DEV"
   payment:
     image: sheaft/sheaft.payment:latest
+    container_name: payment
     env_file:
       - ./docker.env
     ports:
-      - "5015:443"
       - "5014:80"
+      - "5015:443"
+    networks:
+      sheaft_net:
+        aliases:
+          - payment-svc
     depends_on:
       - graphql
       - jobs
     environment:
         ASPNETCORE_NEW_RELIC_APP_NAME: "PAYMENT-DEV"
+
+networks:
+  sheaft_net:
+    driver: bridge
