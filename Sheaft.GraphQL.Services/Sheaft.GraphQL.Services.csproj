@@ -7,8 +7,8 @@
     <PackageReference Include="HotChocolate.Abstractions" Version="10.5.3" />
     <PackageReference Include="MediatR" Version="9.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.2.0" />
-    <PackageReference Include="Microsoft.Extensions.Localization.Abstractions" Version="3.1.9" />
-    <PackageReference Include="NewRelic.Agent.Api" Version="8.34.0" />
+    <PackageReference Include="Microsoft.Extensions.Localization.Abstractions" Version="3.1.10" />
+    <PackageReference Include="NewRelic.Agent.Api" Version="8.35.0" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Sheaft.Application.Commands\Sheaft.Application.Commands.csproj" />
