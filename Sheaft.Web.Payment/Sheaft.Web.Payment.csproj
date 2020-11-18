@@ -3,6 +3,8 @@
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <CopyRefAssembliesToPublishDirectory>false</CopyRefAssembliesToPublishDirectory>
+    <UserSecretsId>78428eec-5bec-47f0-a78c-4341534ea7bc</UserSecretsId>
+    <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
   </PropertyGroup>
 
   <ItemGroup>
@@ -16,6 +18,7 @@
     <PackageReference Include="Hangfire.SqlServer" Version="1.7.17" />
     <PackageReference Include="mangopay2-sdk" Version="2.1.9" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="3.1.10" />
+    <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.10.9" />
     <PackageReference Include="NewRelic.Agent" Version="8.35.0" />
     <PackageReference Include="NewRelic.Agent.Api" Version="8.35.0" />
     <PackageReference Include="NewRelic.LogEnrichers.Serilog" Version="1.0.1" />
