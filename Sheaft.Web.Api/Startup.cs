@@ -185,14 +185,15 @@ namespace Sheaft.Web.Api
                 {
                     options.Authority = authConfig.Url;
                     options.Audience = authConfig.App.Audience;
-                    options.RequireHttpsMetadata = false;
+                    options.RequireHttpsMetadata = Env.IsProduction();
                     options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
                     {
                         RequireExpirationTime = true,
                         ValidateLifetime = true,
                         RoleClaimType = JwtClaimTypes.Role,
                         NameClaimType = JwtClaimTypes.Subject,
-                        AuthenticationType = JwtBearerDefaults.AuthenticationScheme
+                        AuthenticationType = JwtBearerDefaults.AuthenticationScheme,
+                        ValidateIssuer = authConfig.ValidateIssuer,
                     };
                 });
 

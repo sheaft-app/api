@@ -167,12 +167,15 @@ namespace Sheaft.Web.Jobs
                     options.Scope.Add("role");
                     options.Scope.Add("email");
 
+                    options.RequireHttpsMetadata = Env.IsProduction();
+
                     options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
                     {
                         RequireExpirationTime = true,
                         ValidateLifetime = true,
                         RoleClaimType = JwtClaimTypes.Role,
-                        NameClaimType = JwtClaimTypes.Subject
+                        NameClaimType = JwtClaimTypes.Subject,
+                        ValidateIssuer = authConfig.ValidateIssuer,
                     };
                 });
 

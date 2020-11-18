@@ -1,4 +1,6 @@
-﻿namespace Sheaft.Options
+﻿using System.Collections.Generic;
+
+namespace Sheaft.Options
 {
     public class AuthOptions
     {
@@ -12,6 +14,8 @@
         public AuthClient App { get; set; }
         public AuthClient Manage { get; set; }
         public AuthClient Jobs { get; set; }
+        public bool ValidateIssuer { get; set; } = true;
+
     }
 
     public class AuthClient
