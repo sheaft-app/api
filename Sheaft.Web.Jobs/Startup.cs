@@ -285,13 +285,13 @@ namespace Sheaft.Web.Jobs
             }
             else
             {
+                app.UseHttpsRedirection();
                 app.UseExceptionHandler("/Error");
                 app.UseHsts();
             }
 
             app.UseRobotsTxt();
 
-            app.UseHttpsRedirection();
             app.UseStaticFiles();
 
             app.UseRouting();

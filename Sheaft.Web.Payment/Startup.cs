@@ -114,12 +114,11 @@ namespace Sheaft.Web.Payment
             }
             else
             {
+                app.UseHttpsRedirection();
                 app.UseHsts();
             }
 
             app.UseRobotsTxt();
-
-            app.UseHttpsRedirection();
 
             app.UseStaticFiles();
             app.UseMvc(endpoints =>

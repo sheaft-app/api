@@ -361,6 +361,7 @@ namespace Sheaft.Web.Api
             }
             else
             {
+                app.UseHttpsRedirection();
                 app.UseHsts();
             }
 
@@ -415,7 +416,6 @@ namespace Sheaft.Web.Api
 
             app.UseRobotsTxt();
 
-            app.UseHttpsRedirection();
             app.UseCors(MyAllowSpecificOrigins);
 
             app.UseStaticFiles();

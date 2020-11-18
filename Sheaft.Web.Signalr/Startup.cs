@@ -186,12 +186,16 @@ namespace Sheaft.Web.Signalr
             {
                 app.UseDeveloperExceptionPage();
             }
+            else
+            {
+                app.UseHttpsRedirection();
+                app.UseHsts();
+            }
 
             app.UseRobotsTxt();
 
             app.UseRouting();
 
-            app.UseHttpsRedirection();
             app.UseCors(MyAllowSpecificOrigins);
 
             app.UseWebSockets();

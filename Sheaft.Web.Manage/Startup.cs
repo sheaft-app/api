@@ -283,13 +283,13 @@ namespace Sheaft.Web.Manage
             }
             else
             {
+                app.UseHttpsRedirection();
                 app.UseExceptionHandler("/Error");
                 app.UseHsts();
             }
 
             app.UseRobotsTxt();
 
-            app.UseHttpsRedirection();
             app.UseStaticFiles();
 
             app.UseRouting();
