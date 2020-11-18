@@ -1,16 +1,14 @@
 version: "3.8"
 services:
-  azurite:
+  storage:
     container_name: storage
     restart: unless-stopped
     image: mcr.microsoft.com/azure-storage/azurite:latest
-    env_file:
-      - ./docker.env
     ports:
       - "10000:10000"
       - "10001:10001"
     volumes:
-      - ${USERPROFILE}\azurite:/data
+      - ./storage:/data
   sql:
     container_name: sql-db
     restart: unless-stopped
@@ -21,6 +19,10 @@ services:
       - "1434:1433"
     environment:
       ACCEPT_EULA: "Y"
+    volumes:
+      - ./sql/data:/var/opt/mssql/data
+      - ./sql/log:/var/opt/mssql/log
+      - ./sql/secrets:/var/opt/mssql/secrets
   identity:
     build:
       context: ./../../identity/

@@ -12,3 +12,6 @@ Sheaft.Web.Manage/appsettings.Development.json
 Sheaft.Web.Payment/appsettings.Development.json
 Sheaft.Web.Jobs/appsettings.Development.json
 .history
+Docker/sql/data
+Docker/sql/log
+Docker/sql/secrets
