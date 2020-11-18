@@ -1,5 +1,16 @@
 version: "3.8"
 services:
+  azurite:
+    container_name: storage
+    restart: unless-stopped
+    image: mcr.microsoft.com/azure-storage/azurite:latest
+    env_file:
+      - ./docker.env
+    ports:
+      - "10000:10000"
+      - "10001:10001"
+    volumes:
+      - ${USERPROFILE}\azurite:/data
   sql:
     container_name: sql-db
     restart: unless-stopped
@@ -46,6 +57,7 @@ services:
     depends_on:
       - sql
       - identity
+      - storage
     environment:
         ASPNETCORE_NEW_RELIC_APP_NAME: "GRAPHQL-DEV"
         ASPNETCORE_URLS: "http://+:5002;https://+:5003"
