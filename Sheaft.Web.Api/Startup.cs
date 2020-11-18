@@ -280,10 +280,14 @@ namespace Sheaft.Web.Api
             var rootDir = System.IO.Path.GetDirectoryName(Assembly.GetExecutingAssembly().CodeBase);
 
             services.AddScoped<IAmazonSimpleEmailService, AmazonSimpleEmailServiceClient>(_ => new AmazonSimpleEmailServiceClient(Configuration.GetValue<string>("Mailer:ApiId"), Configuration.GetValue<string>("Mailer:ApiKey"), RegionEndpoint.EUCentral1));
-            services.AddScoped<IRazorLightEngine>(_ => new RazorLightEngineBuilder()
-                                                .UseFileSystemProject($"{(Env.IsDevelopment() ? rootDir.Replace("file:\\", string.Empty) : Env.ContentRootPath)}/Templates")
-                                                .UseMemoryCachingProvider()
-                                                .Build());
+
+            services.AddScoped<IRazorLightEngine>(_ => {
+                var rootDir = System.IO.Path.GetDirectoryName(Assembly.GetExecutingAssembly().CodeBase);
+                return new RazorLightEngineBuilder()
+                .UseFileSystemProject($"{rootDir.Replace("file:\\", string.Empty).Replace("file:", string.Empty)}/Templates")
+                .UseMemoryCachingProvider()
+                .Build();
+            });
 
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             services.AddScoped<IBackgroundJobClient, BackgroundJobClient>();
