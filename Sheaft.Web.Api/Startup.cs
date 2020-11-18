@@ -194,6 +194,7 @@ namespace Sheaft.Web.Api
                         NameClaimType = JwtClaimTypes.Subject,
                         AuthenticationType = JwtBearerDefaults.AuthenticationScheme,
                         ValidateIssuer = authConfig.ValidateIssuer,
+                        ValidIssuers = authConfig.ValidIssuers,
                     };
                 });
 

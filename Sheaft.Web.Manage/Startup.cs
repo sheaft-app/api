@@ -189,6 +189,7 @@ namespace Sheaft.Web.Manage
                         RoleClaimType = JwtClaimTypes.Role,
                         NameClaimType = JwtClaimTypes.Subject,
                         ValidateIssuer = authConfig.ValidateIssuer,
+                        ValidIssuers = authConfig.ValidIssuers,
                     };
                 });
 

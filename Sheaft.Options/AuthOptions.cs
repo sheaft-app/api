@@ -15,6 +15,7 @@ namespace Sheaft.Options
         public AuthClient Manage { get; set; }
         public AuthClient Jobs { get; set; }
         public bool ValidateIssuer { get; set; } = true;
+        public IEnumerable<string> ValidIssuers { get; set; };
 
     }
 
