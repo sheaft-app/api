@@ -2,7 +2,7 @@ version: "3.8"
 services:
   sql:
     container_name: sql-db
-    restart: always
+    restart: unless-stopped
     image: mcr.microsoft.com/mssql/server:2019-latest
     env_file:
       - ./docker.env
@@ -16,10 +16,9 @@ services:
       dockerfile: Sheaft.Identity/Dockerfile
     image: sheaft/sheaft.identity:latest
     container_name: identity
-    restart: always
+    restart: unless-stopped
     env_file:
       - ./../../identity/Sheaft.Identity/docker.env
-    network_mode: host
     ports:
       - "5000:5000"
       - "5001:5001"
@@ -38,10 +37,9 @@ services:
       dockerfile: Sheaft.Web.Api/Dockerfile
     image: sheaft/sheaft.graphql:latest
     container_name: graphql
-    restart: always
+    restart: unless-stopped
     env_file:
       - ./docker.env
-    network_mode: host
     ports:
       - "5002:5002"
       - "5003:5003"
@@ -61,10 +59,9 @@ services:
       dockerfile: Sheaft.Web.Jobs/Dockerfile
     image: sheaft/sheaft.jobs:latest
     container_name: jobs
-    restart: always
+    restart: unless-stopped
     env_file:
       - ./docker.env
-    network_mode: host
     ports:
       - "5019:5019"
       - "5020:5020"
@@ -84,10 +81,9 @@ services:
       dockerfile: Sheaft.Web.Manage/Dockerfile
     image: sheaft/sheaft.manage:latest
     container_name: manage
-    restart: always
+    restart: unless-stopped
     env_file:
       - ./docker.env
-    network_mode: host
     ports:
       - "5007:5007"
       - "5008:5008"
@@ -107,10 +103,9 @@ services:
       dockerfile: Sheaft.Web.Signalr/Dockerfile
     image: sheaft/sheaft.signalr:latest
     container_name: signalr
-    restart: always
+    restart: unless-stopped
     env_file:
       - ./docker.env
-    network_mode: host
     ports:
       - "5009:5009"
       - "5010:5010"
@@ -130,10 +125,9 @@ services:
       dockerfile: Sheaft.Web.Payment/Dockerfile
     image: sheaft/sheaft.payment:latest
     container_name: payment
-    restart: always
+    restart: unless-stopped
     env_file:
       - ./docker.env
-    network_mode: host
     ports:
       - "5014:5014"
       - "5015:5015"
