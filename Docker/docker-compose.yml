@@ -9,6 +9,7 @@ services:
       - "10001:10001"
       - "10002:10002"
     volumes:
+      - ./storage:/opt/azurite/folder
       - ./storage:/data
   sql:
     container_name: sql-db
