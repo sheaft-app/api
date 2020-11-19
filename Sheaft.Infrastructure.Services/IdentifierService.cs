@@ -158,6 +158,10 @@ namespace Sheaft.Infrastructure.Services
                         {
                             results.Id++;
                             id = results.Id;
+
+                            if (!_storageOptions.RequireEtag)
+                                results.ETag = "*";
+
                             await table.ExecuteAsync(TableOperation.Replace(results), token);
                         }
                         else

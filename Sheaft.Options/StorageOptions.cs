@@ -14,6 +14,7 @@
         public StorageQueues Queues { get; set; }
         public string ContentHostname { get; set; } = "content.sheaft.com";
         public string ContentScheme { get; set; } = "https";
+        public bool RequireEtag { get; set; } = true;
     }
 
     public class StorageContainers
