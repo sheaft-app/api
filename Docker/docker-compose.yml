@@ -3,10 +3,11 @@ services:
   storage:
     container_name: storage
     restart: unless-stopped
-    image: mcr.microsoft.com/azure-storage/azurite:latest
+    image: sheaft/sheaft.azurite:latest
     ports:
       - "10000:10000"
       - "10001:10001"
+      - "10002:10002"
     volumes:
       - ./storage:/data
   sql:
