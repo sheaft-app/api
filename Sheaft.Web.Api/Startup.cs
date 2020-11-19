@@ -175,56 +175,28 @@ namespace Sheaft.Web.Api
             services.Configure<KestrelServerOptions>(options => options.AllowSynchronousIO = true);
 
             var authConfig = authSettings.Get<AuthOptions>();
-            var authBuilder = services
+            services
                 .AddAuthentication(options =>
                 {
                     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
                     options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-                });
-
-            if (Env.IsDevelopment())
-            {
-                authBuilder.AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options =>
+                })
+                .AddJwtBearer(options =>
                 {
                     options.Authority = authConfig.Url;
                     options.Audience = authConfig.App.Audience;
-                    options.RequireHttpsMetadata = false;
+                    options.RequireHttpsMetadata = Env.IsProduction();
                     options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
                     {
-                        RequireExpirationTime = false,
-                        ValidateLifetime = false,
+                        RequireExpirationTime = true,
+                        ValidateLifetime = true,
                         RoleClaimType = JwtClaimTypes.Role,
                         NameClaimType = JwtClaimTypes.Subject,
                         AuthenticationType = JwtBearerDefaults.AuthenticationScheme,
-                        ValidateIssuer = false,
-                        ValidIssuers = new List<string>
-                        {
-                            authConfig.Url,
-                            "http://localhost:5000",
-                            "http://identity:5000",
-                            "http://127.0.0.1:5000"
-                        }
+                        ValidateIssuer = authConfig.ValidateIssuer,
+                        ValidIssuers = authConfig.ValidIssuers,
                     };
                 });
-            }
-            else
-            {
-                authBuilder.AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options =>
-                 {
-                     options.Authority = authConfig.Url;
-                     options.Audience = authConfig.App.Audience;
-                     options.RequireHttpsMetadata = true;
-                     options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
-                     {
-                         RequireExpirationTime = true,
-                         ValidateLifetime = true,
-                         RoleClaimType = JwtClaimTypes.Role,
-                         NameClaimType = JwtClaimTypes.Subject,
-                         AuthenticationType = JwtBearerDefaults.AuthenticationScheme,
-                         ValidateIssuer = true
-                     };
-                 });
-            }
 
             services.Configure<ApiBehaviorOptions>(options => options.SuppressModelStateInvalidFilter = true);
 
