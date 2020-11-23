@@ -70,6 +70,10 @@
                     @Html.CheckBoxFor(m => m.OpenForNewBusiness, new { @class = "form-check-input" })
                     @Html.LabelFor(m => m.OpenForNewBusiness, new { @class = "form-check-label" })
                 </div>
+                <div class="form-check">
+                    @Html.CheckBoxFor(m => m.NotSubjectToVat, new { @class = "form-check-input" })
+                    @Html.LabelFor(m => m.NotSubjectToVat, new { @class = "form-check-label" })
+                </div>
             </div>
             <div class="col-md-6">
                 <h4>Address</h4>
