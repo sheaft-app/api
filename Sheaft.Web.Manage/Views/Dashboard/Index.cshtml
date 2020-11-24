@@ -6,7 +6,7 @@
 <div class="text-center">
     <h1 class="display-5">Dashboard</h1>
     <br />
-    @if (user.IsInRole("ADMIN"))
+    @if (user.IsInRole("ADMIN") || user.IsInRole("SUPPORT"))
     {
         <div class="card w-25 d-inline-block">
             <div class="card-body">
