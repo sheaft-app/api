@@ -10,6 +10,9 @@ namespace Sheaft.GraphQL.Types
         {
             descriptor.Field(c => c.VatIdentifier);
 
+            descriptor.Field(c => c.Name)
+                .Type<NonNullType<StringType>>();
+
             descriptor.Field(c => c.Email)
                 .Type<NonNullType<StringType>>();
 

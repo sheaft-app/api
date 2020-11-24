@@ -4,6 +4,7 @@ namespace Sheaft.Application.Models
 {
     public class BusinessLegalInput
     {
+        public string Name { get; set; }
         public string Email { get; set; }
         public string VatIdentifier { get; set; }
         public string Siret { get; set; }

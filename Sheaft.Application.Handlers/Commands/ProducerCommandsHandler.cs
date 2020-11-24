@@ -99,6 +99,7 @@ namespace Sheaft.Application.Handlers
                     var result = await _mediatr.Process(new CreateBusinessLegalCommand(request.RequestUser)
                     {
                         Address = request.Legals.Address,
+                        Name = request.Legals.Name,
                         Email = request.Legals.Email,
                         Siret = request.Legals.Siret,
                         Kind = request.Legals.Kind,

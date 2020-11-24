@@ -101,7 +101,7 @@ namespace Sheaft.Infrastructure.Services
                 var result = await _api.Users.CreateAsync(GetIdempotencyKey(businessLegal.Id),
                     new UserLegalPostDTO(
                         businessLegal.Email,
-                        businessLegal.User.Name,
+                        businessLegal.Name,
                         businessLegal.Kind.GetLegalPersonType(),
                         businessLegal.Owner.FirstName,
                         businessLegal.Owner.LastName,
@@ -133,7 +133,7 @@ namespace Sheaft.Infrastructure.Services
                     new UserLegalPutDTO
                     {
                         Email = businessLegal.Email,
-                        Name = businessLegal.User.Name,
+                        Name = businessLegal.Name,
                         LegalPersonType = businessLegal.Kind.GetLegalPersonType(),
                         LegalRepresentativeFirstName = businessLegal.Owner.FirstName,
                         LegalRepresentativeLastName = businessLegal.Owner.LastName,

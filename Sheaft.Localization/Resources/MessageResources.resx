@@ -876,4 +876,7 @@
   <data name="Product_Conditioning_Required" xml:space="preserve">
     <value>Le type de conditionnement est requis</value>
   </data>
+  <data name="Legal_Name_Required" xml:space="preserve">
+    <value>Le nom de l'entité légale est requis</value>
+  </data>
 </root>

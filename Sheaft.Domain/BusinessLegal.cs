@@ -12,9 +12,10 @@ namespace Sheaft.Domain.Models
         {
         }
 
-        public BusinessLegal(Guid id, Business business, LegalKind kind, string email, string siret, string vatIdentifier, LegalAddress address, Owner owner)
+        public BusinessLegal(Guid id, Business business, LegalKind kind, string name, string email, string siret, string vatIdentifier, LegalAddress address, Owner owner)
             : base(id, kind, business, owner)
         {
+            SetName(name);
             SetEmail(email);
             SetAddress(address);
             SetSiret(siret);
@@ -22,6 +23,7 @@ namespace Sheaft.Domain.Models
             DeclarationRequired = false;
         }
 
+        public string Name { get; set; }
         public string Email { get; private set; }
         public string Siret { get; private set; }
         public string VatIdentifier { get; private set; }
@@ -82,6 +84,14 @@ namespace Sheaft.Domain.Models
                 throw new ValidationException(MessageKind.Legal_Email_Required);
 
             Email = email;
+        }
+
+        public void SetName(string name)
+        {
+            if (string.IsNullOrWhiteSpace(name))
+                throw new ValidationException(MessageKind.Legal_Name_Required);
+
+            Name = name;
         }
     }
 }

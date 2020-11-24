@@ -168,6 +168,7 @@ namespace Sheaft.Web.Manage.Controllers
             var result = await _mediatr.Process(new CreateBusinessLegalCommand(requestUser)
             {
                 UserId = model.Owner.Id,
+                Name = model.Name,
                 Email = model.Email,
                 Address = _mapper.Map<AddressInput>(model.Address),
                 Kind = model.Kind,
@@ -257,6 +258,7 @@ namespace Sheaft.Web.Manage.Controllers
             var result = await _mediatr.Process(new UpdateBusinessLegalCommand(requestUser)
             {
                 Id = model.Id,
+                Name = model.Name,
                 Email = model.Email,
                 Address = _mapper.Map<AddressInput>(model.Address),
                 Kind = model.Kind,

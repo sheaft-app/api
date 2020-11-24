@@ -763,6 +763,15 @@ namespace Sheaft.Localization.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Le nom de l&apos;entité légale est requis.
+        /// </summary>
+        internal static string Legal_Name_Required {
+            get {
+                return ResourceManager.GetString("Legal_Name_Required", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Le SIRET est requis.
         /// </summary>
         internal static string Legal_Siret_Required {

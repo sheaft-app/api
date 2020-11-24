@@ -46,6 +46,7 @@ namespace Sheaft.Application.Handlers
                     Guid.NewGuid(),
                     business,
                     request.Kind,
+                    request.Name,
                     request.Email,
                     request.Siret,
                     request.VatIdentifier,
@@ -146,6 +147,7 @@ namespace Sheaft.Application.Handlers
                 var legal = await _context.GetByIdAsync<BusinessLegal>(request.Id, token);
 
                 legal.SetKind(request.Kind);
+                legal.SetName(request.Name);
                 legal.SetEmail(request.Email);
                 legal.SetAddress(legalAddress);
                 legal.SetSiret(request.Siret);
