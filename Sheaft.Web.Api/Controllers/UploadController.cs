@@ -19,7 +19,7 @@ namespace Sheaft.Web.Api.Controllers
     [Authorize]
     [ApiController]
     [Route("upload")]
-    public class UploadController : ControllerBase
+    public class UploadController : Controller
     {
         private readonly ISheaftMediatr _mediatr;
         private readonly IHttpContextAccessor _httpContextAccessor;

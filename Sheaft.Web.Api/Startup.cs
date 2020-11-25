@@ -433,7 +433,12 @@ namespace Sheaft.Web.Api
 
             app.UseIpRateLimiting();
 
-            app.UseMvc();
+            app.UseMvc(endpoints =>
+            {
+                endpoints.MapRoute(
+                    name: "default",
+                    template: "{controller=Home}/{action=Index}/{id?}");
+            });
 
             app.UseWebSockets();
             app.UseGraphQL("/graphql");

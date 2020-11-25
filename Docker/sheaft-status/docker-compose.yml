@@ -1,0 +1,43 @@
+version: '3'
+services:
+  sql:
+    image: mysql:5.7
+    restart: always
+    environment:
+      - MYSQL_ROOT_PASSWORD=#########
+      - MYSQL_USER=user_sa
+      - MYSQL_PASSWORD=#########
+      - MYSQL_DATABASE=cachethq
+    volumes:
+      - sheaftstatus:/var/lib/mysql
+  cachet:
+    image: sheaft/sheaft.cachethq:latest
+    ports:
+      - 8000:8080
+    environment:
+      - DB_DRIVER=mysql
+      - DB_HOST=sql
+      - DB_DATABASE=cachethq
+      - DB_USERNAME=user_sa
+      - DB_PASSWORD==#########
+      - DB_PREFIX=chq_
+      - APP_KEY=base64:D9XPB/5oa1fi7RfcWdkZGtqx90JHdJXCfS/J7g0ZnZ4=
+      - APP_LOG=errorlog
+      - APP_ENV=production
+      - APP_DEBUG=true
+      - APP_URL=https://status.sheaft.com
+      - QUEUE_DRIVER=sync
+      - MAIL_DRIVER=SMTP
+      - MAIL_HOST==#########
+      - MAIL_PORT=25
+      - MAIL_USERNAME=#########
+      - MAIL_PASSWORD==#########
+      - MAIL_ADDRESS=status@sheaft.com
+      - MAIL_NAME="Monitoring Sheaft"
+      - MAIL_ENCRYPTION=tls
+    restart: always
+  monitoring:
+    image: sheaft/sheaft.cachetmonitor:latest
+    restart: always
+    volumes:
+      - ${WEBAPP_STORAGE_HOME}/site/wwwroot/config.yml:/etc/cachet-monitor.yaml

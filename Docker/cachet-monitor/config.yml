@@ -1,0 +1,91 @@
+api:
+  url: https://status.sheaft.com/api/v1
+  token: ######
+  insecure: false
+date_format: 02/01/2006 15:04:05 MST
+monitors:
+  - name: graphql
+    target: https://api.sheaft.com/health/livez
+    strict: true
+    method: GET    
+    component_id: 3
+    metric_id: 1
+    template:
+      investigating:
+        subject: "{{ .Monitor.Name }} - {{ .SystemName }}"
+        message: "{{ .Monitor.Name }} check **failed** (server time: {{ .now }})\n\n{{ .FailReason }}"
+      fixed:
+        subject: "GraphQL Fixed"    
+    interval: 60
+    timeout: 10
+    threshold: 80
+    expected_status_code: 200
+    expected_body: "OK"
+  - name: jobs
+    target: https://jobs.sheaft.com/health/livez
+    strict: true
+    method: GET    
+    component_id: 4
+    metric_id: 2
+    template:
+      investigating:
+        subject: "{{ .Monitor.Name }} - {{ .SystemName }}"
+        message: "{{ .Monitor.Name }} check **failed** (server time: {{ .now }})\n\n{{ .FailReason }}"
+      fixed:
+        subject: "Jobs Fixed"    
+    interval: 60
+    timeout: 10
+    threshold: 80
+    expected_status_code: 200
+    expected_body: "OK"
+  - name: payment
+    target: https://payment.sheaft.com/health/livez
+    strict: true
+    method: GET    
+    component_id: 5
+    metric_id: 3
+    template:
+      investigating:
+        subject: "{{ .Monitor.Name }} - {{ .SystemName }}"
+        message: "{{ .Monitor.Name }} check **failed** (server time: {{ .now }})\n\n{{ .FailReason }}"
+      fixed:
+        subject: "Payment Fixed"    
+    interval: 60
+    timeout: 10
+    threshold: 80
+    expected_status_code: 200
+    expected_body: "OK"
+  - name: signalr
+    target: https://signalr.sheaft.com/health/livez
+    strict: true
+    method: GET    
+    component_id: 6
+    metric_id: 4
+    template:
+      investigating:
+        subject: "{{ .Monitor.Name }} - {{ .SystemName }}"
+        message: "{{ .Monitor.Name }} check **failed** (server time: {{ .now }})\n\n{{ .FailReason }}"
+      fixed:
+        subject: "Signalr Fixed"    
+    interval: 60
+    timeout: 10
+    threshold: 80
+    expected_status_code: 200
+    expected_body: "OK"    
+  - name: identity
+    target: https://auth.sheaft.com/health/livez
+    strict: true
+    method: GET    
+    component_id: 13
+    metric_id: 5
+    template:
+      investigating:
+        subject: "{{ .Monitor.Name }} - {{ .SystemName }}"
+        message: "{{ .Monitor.Name }} check **failed** (server time: {{ .now }})\n\n{{ .FailReason }}"
+      fixed:
+        subject: "Identity Fixed"    
+    interval: 60
+    timeout: 10
+    threshold: 80
+    expected_status_code: 200
+    expected_body: "OK"
