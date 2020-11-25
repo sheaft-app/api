@@ -71,13 +71,6 @@ namespace Sheaft.Application.Handlers
                        request.Address.Country)
                        : null;
 
-                bankAccount.SetAddress(address);
-                bankAccount.SetName(request.Name);
-                bankAccount.SetOwner(request.Owner);
-                bankAccount.SetIban(request.IBAN);
-                bankAccount.SetBic(request.BIC);
-
-                await _context.SaveChangesAsync(token);
 
                 if (!string.IsNullOrWhiteSpace(bankAccount.Identifier))
                 {
@@ -87,6 +80,14 @@ namespace Sheaft.Application.Handlers
 
                     bankAccount.SetIdentifier(string.Empty);
                 }
+
+                bankAccount.SetAddress(address);
+                bankAccount.SetName(request.Name);
+                bankAccount.SetOwner(request.Owner);
+                bankAccount.SetIban(request.IBAN);
+                bankAccount.SetBic(request.BIC);
+
+                await _context.SaveChangesAsync(token);
 
                 var result = await _pspService.CreateBankIbanAsync(bankAccount, token);
                 if (!result.Success)

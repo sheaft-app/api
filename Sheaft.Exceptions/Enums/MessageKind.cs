@@ -223,8 +223,8 @@
         Oidc_UpdateProfile_Error = 104004,
         PsP_CannotCreate_Wallet_User_Not_Exists = 105001,
         PsP_CannotCreate_Wallet_Wallet_Exists = 105002,
-        PsP_CannotCreate_Transfer_User_Not_Exists = 105003,
-        PsP_CannotCreate_Transfer_BankIBAN_Exists = 105004,
+        PsP_CannotCreate_Bank_User_Not_Exists = 105003,
+        PsP_CannotCreate_Bank_Already_Exists = 105004,
         PsP_CannotCreate_Card_User_Not_Exists = 105005,
         PsP_CannotCreate_Card_Card_Exists = 105006,
         PsP_CannotValidate_Card_Card_Not_Exists = 105007,
@@ -262,5 +262,7 @@
         PsP_CannotUpdateUbo_Ubo_Not_Exists = 105039,
         PsP_CannotCreate_User_User_Exists = 105040,
         PsP_CannotUpdate_User_User_Not_Exists = 105041,
+        PsP_CannotUpdate_Bank_User_Not_Exists = 105042,
+        PsP_CannotUpdate_Bank_Not_Exists = 105043,
     }
 }

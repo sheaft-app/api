@@ -181,10 +181,10 @@ namespace Sheaft.Infrastructure.Services
             return await ExecuteAsync(async () =>
             {
                 if (string.IsNullOrWhiteSpace(payment.User.Identifier))
-                    return BadRequest<string>(MessageKind.PsP_CannotCreate_Transfer_User_Not_Exists);
+                    return BadRequest<string>(MessageKind.PsP_CannotCreate_Bank_User_Not_Exists);
 
-                if (!string.IsNullOrWhiteSpace(payment.Identifier))
-                    return BadRequest<string>(MessageKind.PsP_CannotCreate_Transfer_BankIBAN_Exists);
+                if (payment.Identifier.Length > 0)
+                    return BadRequest<string>(MessageKind.PsP_CannotCreate_Bank_Already_Exists);
 
                 await EnsureAccessTokenIsValidAsync(token);
 
@@ -215,10 +215,10 @@ namespace Sheaft.Infrastructure.Services
             return await ExecuteAsync(async () =>
             {
                 if (string.IsNullOrWhiteSpace(payment.User.Identifier))
-                    return BadRequest<bool>(MessageKind.PsP_CannotCreate_Transfer_User_Not_Exists);
+                    return BadRequest<bool>(MessageKind.PsP_CannotUpdate_Bank_User_Not_Exists);
 
-                if (!string.IsNullOrWhiteSpace(payment.Identifier))
-                    return BadRequest<bool>(MessageKind.PsP_CannotCreate_Transfer_BankIBAN_Exists);
+                if (string.IsNullOrWhiteSpace(payment.Identifier))
+                    return BadRequest<bool>(MessageKind.PsP_CannotUpdate_Bank_Not_Exists);
 
                 await EnsureAccessTokenIsValidAsync(token);
 
