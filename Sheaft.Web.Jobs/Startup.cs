@@ -308,12 +308,12 @@ namespace Sheaft.Web.Jobs
 
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapControllers();
                 endpoints.MapHangfireDashboard("", new DashboardOptions
                 {
                     AppPath = "https://app.sheaft.com",
                     Authorization = new[] { new MyAuthorizationFilter() }
                 });
+                endpoints.MapControllerRoute("default", "{controller=Home}/{action=Index}/{id?}");
             });
 
             RecuringJobs.Register(routineOptions.Value);
