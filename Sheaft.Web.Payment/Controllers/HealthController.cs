@@ -1,7 +1,9 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Sheaft.Web.Payment.Controllers
 {
+    [AllowAnonymous]
     public class HealthController : Controller
     {
         public IActionResult Livez()
