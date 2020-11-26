@@ -183,7 +183,7 @@ namespace Sheaft.Infrastructure.Services
                 if (string.IsNullOrWhiteSpace(payment.User.Identifier))
                     return BadRequest<string>(MessageKind.PsP_CannotCreate_Bank_User_Not_Exists);
 
-                if (payment.Identifier.Length > 0)
+                if (!string.IsNullOrWhiteSpace(payment.Identifier) && payment.Identifier.Length > 0)
                     return BadRequest<string>(MessageKind.PsP_CannotCreate_Bank_Already_Exists);
 
                 await EnsureAccessTokenIsValidAsync(token);

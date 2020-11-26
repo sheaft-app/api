@@ -79,6 +79,7 @@ namespace Sheaft.Application.Handlers
                         return Failed<bool>(resetResult.Exception);
 
                     bankAccount.SetIdentifier(string.Empty);
+                    await _context.SaveChangesAsync(token);
                 }
 
                 bankAccount.SetAddress(address);
@@ -86,8 +87,6 @@ namespace Sheaft.Application.Handlers
                 bankAccount.SetOwner(request.Owner);
                 bankAccount.SetIban(request.IBAN);
                 bankAccount.SetBic(request.BIC);
-
-                await _context.SaveChangesAsync(token);
 
                 var result = await _pspService.CreateBankIbanAsync(bankAccount, token);
                 if (!result.Success)
