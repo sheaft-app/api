@@ -310,8 +310,7 @@ namespace Sheaft.Web.Jobs
             {
                 endpoints.MapHangfireDashboard("", new DashboardOptions
                 {
-                    AppPath = "https://app.sheaft.com",
-                    Authorization = new[] { new MyAuthorizationFilter() }
+                    AppPath = Configuration.GetValue<string>("Portal:Url"),
                 });
                 endpoints.MapControllerRoute("default", "{controller=Home}/{action=Index}/{id?}");
             });
