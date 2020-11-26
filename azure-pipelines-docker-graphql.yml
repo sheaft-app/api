@@ -5,10 +5,7 @@ trigger:
  
 pool:
   vmImage: 'ubuntu-latest'
- 
-variables:
-  ImageName: 'sheaft/sheaft.graphql:$(Build.BuildId)'
- 
+  
 stages:
 - stage: Build
   displayName: Build image
