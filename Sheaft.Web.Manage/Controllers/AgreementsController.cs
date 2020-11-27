@@ -1,16 +1,13 @@
 ﻿using AutoMapper;
 using AutoMapper.QueryableExtensions;
-using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Newtonsoft.Json;
 using Sheaft.Application.Commands;
 using Sheaft.Core.Extensions;
 using Sheaft.Exceptions;
 using Sheaft.Application.Interop;
-using Sheaft.Web.Manage.Models;
 using Sheaft.Application.Models;
 using Sheaft.Options;
 using System;
@@ -66,17 +63,9 @@ namespace Sheaft.Web.Manage.Controllers
                 .ProjectTo<AgreementViewModel>(_configurationProvider)
                 .ToListAsync(token);
 
-            var edited = (string)TempData["Edited"];
-            ViewBag.Edited = !string.IsNullOrWhiteSpace(edited) ? JsonConvert.DeserializeObject(edited) : null;
-
-            var restored = (string)TempData["Restored"];
-            ViewBag.Restored = !string.IsNullOrWhiteSpace(restored) ? JsonConvert.DeserializeObject(restored) : null;
-
-            ViewBag.Removed = TempData["Removed"];
             ViewBag.Page = page;
             ViewBag.Take = take;
             ViewBag.Status = status;
-
             return View(entities);
         }
 
@@ -105,13 +94,9 @@ namespace Sheaft.Web.Manage.Controllers
             }, token);
 
             if (!result.Success)
-            {
-                ModelState.AddModelError("", result.Exception.Message);
-                return View(model);
-            }
+                throw result.Exception;
 
-            TempData["Edited"] = JsonConvert.SerializeObject(new EntityViewModel { Id = model.Id, Name = model.Id.ToString("N") });
-            return RedirectToAction("Index");
+            return RedirectToAction("Edit", new { model.Id });
         }
 
         [HttpPost]
@@ -124,12 +109,8 @@ namespace Sheaft.Web.Manage.Controllers
             }, token);
 
             if (!result.Success)
-            {
-                ModelState.AddModelError("", result.Exception.Message);
-                return RedirectToAction("Index");
-            }
+                throw result.Exception;
 
-            TempData["Removed"] = id.ToString("N");
             return RedirectToAction("Index");
         }
 
@@ -143,13 +124,9 @@ namespace Sheaft.Web.Manage.Controllers
             }, token);
 
             if (!result.Success)
-            {
-                ModelState.AddModelError("", result.Exception.Message);
-                return RedirectToAction("Index");
-            }
+                throw result.Exception;
 
-            TempData["Restored"] = JsonConvert.SerializeObject(new EntityViewModel { Id = id, Name = id.ToString("N") });
-            return RedirectToAction("Index");
+            return RedirectToAction("Edit", new { id });
         }
     }
 }

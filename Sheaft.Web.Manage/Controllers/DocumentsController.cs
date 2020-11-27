@@ -16,6 +16,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Sheaft.Application.Queries;
+using Sheaft.Domain.Enums;
 
 namespace Sheaft.Web.Manage.Controllers
 {
@@ -35,42 +36,6 @@ namespace Sheaft.Web.Manage.Controllers
         {
             _logger = logger;
             _documentQueries = documentQueries;
-        }
-
-        [HttpGet]
-        public async Task<IActionResult> Edit(Guid id, CancellationToken token)
-        {
-            var entity = await _context.Legals
-                .Where(c => c.Documents.Any(d => d.Id == id))
-                .ProjectTo<LegalViewModel>(_configurationProvider)
-                .SingleOrDefaultAsync(token);
-
-            if (entity == null)
-                throw new NotFoundException();
-
-            ViewBag.Kind = entity.Kind;
-            ViewBag.UserId = entity.Owner.Id;
-            ViewBag.LegalId = entity.Id;
-
-            var document = entity.Documents.FirstOrDefault(d => d.Id == id);
-            return View(document);
-        }
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(DocumentViewModel model, CancellationToken token)
-        {
-            var result = await _mediatr.Process(new UpdateDocumentCommand(await GetRequestUser(token))
-            {
-                Id = model.Id,
-                Name = model.Name,
-                Kind = model.Kind,
-            }, token);
-
-            if (!result.Success)
-                throw result.Exception;
-
-            return RedirectToAction("Edit", new { id = model.Id });
         }
 
         [HttpGet]
@@ -106,6 +71,42 @@ namespace Sheaft.Web.Manage.Controllers
                 throw result.Exception;
 
             return RedirectToAction("Edit", new { id = result.Data });
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Edit(Guid id, CancellationToken token)
+        {
+            var entity = await _context.Legals
+                .Where(c => c.Documents.Any(d => d.Id == id))
+                .ProjectTo<LegalViewModel>(_configurationProvider)
+                .SingleOrDefaultAsync(token);
+
+            if (entity == null)
+                throw new NotFoundException();
+
+            ViewBag.Kind = entity.Kind;
+            ViewBag.UserId = entity.Owner.Id;
+            ViewBag.LegalId = entity.Id;
+
+            var document = entity.Documents.FirstOrDefault(d => d.Id == id);
+            return View(document);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(DocumentViewModel model, CancellationToken token)
+        {
+            var result = await _mediatr.Process(new UpdateDocumentCommand(await GetRequestUser(token))
+            {
+                Id = model.Id,
+                Name = model.Name,
+                Kind = model.Kind,
+            }, token);
+
+            if (!result.Success)
+                throw result.Exception;
+
+            return RedirectToAction("Edit", new { model.Id });
         }
 
         [HttpGet]
@@ -154,7 +155,7 @@ namespace Sheaft.Web.Manage.Controllers
             if (!result.Success)
                 throw result.Exception;
 
-            return RedirectToAction("Edit", new { id = model.Id });
+            return RedirectToAction("Edit", new { model.Id });
         }
 
         [HttpPost]
@@ -169,7 +170,7 @@ namespace Sheaft.Web.Manage.Controllers
             if (!result.Success)
                 throw result.Exception;
 
-            return RedirectToAction("Edit", new { id = id });
+            return RedirectToAction("Edit", new { id });
         }
 
         [HttpPost]
@@ -184,7 +185,7 @@ namespace Sheaft.Web.Manage.Controllers
             if (!result.Success)
                 throw result.Exception;
 
-            return RedirectToAction("Edit", new { id = id });
+            return RedirectToAction("Edit", new { id });
         }
 
         [HttpPost]
@@ -199,7 +200,7 @@ namespace Sheaft.Web.Manage.Controllers
             if (!result.Success)
                 throw result.Exception;
 
-            return RedirectToAction("Edit", new { id = id });
+            return RedirectToAction("Edit", new { id });
         }
 
         [HttpPost]
@@ -256,11 +257,7 @@ namespace Sheaft.Web.Manage.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete(Guid id, CancellationToken token)
         {
-            var entity = await _context.Legals
-                .SingleOrDefaultAsync(c => c.Documents.Any(d => d.Id == id), token);
-
-            var requestUser = await GetRequestUser(token);
-            var result = await _mediatr.Process(new DeleteDocumentCommand(requestUser)
+            var result = await _mediatr.Process(new DeleteDocumentCommand(await GetRequestUser(token))
             {
                 Id = id
             }, token);
@@ -268,7 +265,13 @@ namespace Sheaft.Web.Manage.Controllers
             if (!result.Success)
                 throw result.Exception;
 
-            return RedirectToAction("Index", "Producers", new { userid = entity.User.Id });
+            var entity = await _context.Legals
+                .SingleOrDefaultAsync(c => c.Documents.Any(d => d.Id == id), token);
+
+            if (entity.Kind != LegalKind.Natural)
+                return RedirectToAction("EditLegalBusiness", "Legals", new { entity.Id });
+
+            return RedirectToAction("EditLegalConsumer", "Legals", new { entity.Id });
         }
     }
 }

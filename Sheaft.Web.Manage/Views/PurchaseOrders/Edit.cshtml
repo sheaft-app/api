@@ -123,7 +123,7 @@
                     @Html.TextAreaFor(c => c.Transfer.Status.ToString("G"), new { @class = "form-control", @disabled = "disabled" })
                 </div>
                 <br />
-                <a asp-controller="Transfers" asp-action="Details" asp-route-id="@Model.Transfer.Id" class="btn btn-info">
+                <a asp-controller="Transfers" asp-action="Edit" asp-route-id="@Model.Transfer.Id" class="btn btn-info">
                     User details
                 </a>
             }

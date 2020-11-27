@@ -4,12 +4,10 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Newtonsoft.Json;
 using Sheaft.Application.Commands;
 using Sheaft.Core.Extensions;
 using Sheaft.Exceptions;
 using Sheaft.Application.Interop;
-using Sheaft.Web.Manage.Models;
 using Sheaft.Application.Models;
 using Sheaft.Options;
 using System;
@@ -65,13 +63,6 @@ namespace Sheaft.Web.Manage.Controllers
                 .ProjectTo<PurchaseOrderViewModel>(_configurationProvider)
                 .ToListAsync(token);
 
-            var edited = (string)TempData["Edited"];
-            ViewBag.Edited = !string.IsNullOrWhiteSpace(edited) ? JsonConvert.DeserializeObject(edited) : null;
-
-            var restored = (string)TempData["Restored"];
-            ViewBag.Restored = !string.IsNullOrWhiteSpace(restored) ? JsonConvert.DeserializeObject(restored) : null;
-
-            ViewBag.Removed = TempData["Removed"];
             ViewBag.Page = page;
             ViewBag.Take = take;
             ViewBag.Status = status;
@@ -80,7 +71,7 @@ namespace Sheaft.Web.Manage.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Details(Guid id, CancellationToken token)
+        public async Task<IActionResult> Edit(Guid id, CancellationToken token)
         {
             var requestUser = await GetRequestUser(token);            
 
@@ -98,57 +89,31 @@ namespace Sheaft.Web.Manage.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Details(PurchaseOrderViewModel model, CancellationToken token)
+        public async Task<IActionResult> Restore(Guid id, CancellationToken token)
         {
-            var requestUser = await GetRequestUser(token);
+            var result = await _mediatr.Process(new RestorePurchaseOrderCommand(await GetRequestUser(token))
+            {
+                Id = id
+            }, token);
 
-            TempData["Edited"] = JsonConvert.SerializeObject(new EntityViewModel { Id = model.Id, Name = model.Reference });
-            return RedirectToAction("Index");
+            if (!result.Success)
+                throw result.Exception;
+
+            return RedirectToAction("Edit", new { id });
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete(Guid id, CancellationToken token)
         {
-            var entity = await _context.PurchaseOrders.SingleOrDefaultAsync(c => c.Id == id, token);
-            var reference = entity.Reference;
-
-            var requestUser = await GetRequestUser(token);
-            var result = await _mediatr.Process(new DeletePurchaseOrderCommand(requestUser)
+            var result = await _mediatr.Process(new DeletePurchaseOrderCommand(await GetRequestUser(token))
             {
                 Id = id
             }, token);
 
             if (!result.Success)
-            {
-                ModelState.AddModelError("", result.Exception.Message);
-                return RedirectToAction("Index");
-            }
+                throw result.Exception;
 
-            TempData["Removed"] = reference;
-            return RedirectToAction("Index");
-        }
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Restore(Guid id, CancellationToken token)
-        {
-            var entity = await _context.PurchaseOrders.SingleOrDefaultAsync(c => c.Id == id, token);
-            var name = entity.Reference;
-
-            var requestUser = await GetRequestUser(token);
-            var result = await _mediatr.Process(new RestorePurchaseOrderCommand(requestUser)
-            {
-                Id = id
-            }, token);
-
-            if (!result.Success)
-            {
-                ModelState.AddModelError("", result.Exception.Message);
-                return RedirectToAction("Index");
-            }
-
-            TempData["Restored"] = JsonConvert.SerializeObject(new EntityViewModel { Id = entity.Id, Name = name });
             return RedirectToAction("Index");
         }
     }

@@ -5,11 +5,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Newtonsoft.Json;
 using Sheaft.Application.Commands;
 using Sheaft.Exceptions;
 using Sheaft.Application.Interop;
-using Sheaft.Web.Manage.Models;
 using Sheaft.Application.Models;
 using Sheaft.Options;
 using System;
@@ -53,13 +51,6 @@ namespace Sheaft.Web.Manage.Controllers
                 .ProjectTo<TagViewModel>(_configurationProvider)
                 .ToListAsync(token);
 
-            var edited = (string)TempData["Edited"];
-            ViewBag.Edited = !string.IsNullOrWhiteSpace(edited) ? JsonConvert.DeserializeObject(edited) : null;
-
-            var restored = (string)TempData["Restored"];
-            ViewBag.Restored = !string.IsNullOrWhiteSpace(restored) ? JsonConvert.DeserializeObject(restored) : null;
-
-            ViewBag.Removed = TempData["Removed"];
             ViewBag.Page = page;
             ViewBag.Take = take;
 
@@ -76,8 +67,6 @@ namespace Sheaft.Web.Manage.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Add(TagViewModel model, IFormFile picture, IFormFile icon, CancellationToken token)
         {
-            var requestUser = await GetRequestUser(token);
-
             if (picture != null)
             {
                 using (var ms = new MemoryStream())
@@ -96,7 +85,7 @@ namespace Sheaft.Web.Manage.Controllers
                 }
             }
 
-            var result = await _mediatr.Process(new CreateTagCommand(requestUser)
+            var result = await _mediatr.Process(new CreateTagCommand(await GetRequestUser(token))
             {
                 Description = model.Description,
                 Name = model.Name,
@@ -134,8 +123,6 @@ namespace Sheaft.Web.Manage.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(TagViewModel model, IFormFile picture, IFormFile icon, CancellationToken token)
         {
-            var requestUser = await GetRequestUser(token);
-
             if (picture != null)
             {
                 using (var ms = new MemoryStream())
@@ -154,7 +141,7 @@ namespace Sheaft.Web.Manage.Controllers
                 }
             }
 
-            var result = await _mediatr.Process(new UpdateTagCommand(requestUser)
+            var result = await _mediatr.Process(new UpdateTagCommand(await GetRequestUser(token))
             {
                 Id = model.Id,
                 Description = model.Description,
@@ -171,53 +158,36 @@ namespace Sheaft.Web.Manage.Controllers
                 return View(model);
             }
 
-            TempData["Edited"] = JsonConvert.SerializeObject(new EntityViewModel { Id = model.Id, Name = model.Name });
-            return RedirectToAction("Index");
-        }
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Delete(Guid id, CancellationToken token)
-        {
-            var entity = await _context.Tags.SingleOrDefaultAsync(c => c.Id == id, token);
-            var name = entity.Name;
-
-            var requestUser = await GetRequestUser(token);
-            var result = await _mediatr.Process(new DeleteTagCommand(requestUser)
-            {
-                Id = id
-            }, token);
-
-            if (!result.Success)
-            {
-                ModelState.AddModelError("", result.Exception.Message);
-                return RedirectToAction("Index");
-            }
-
-            TempData["Removed"] = name;
-            return RedirectToAction("Index");
+            return RedirectToAction("Edit", new { model.Id });
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Restore(Guid id, CancellationToken token)
         {
-            var entity = await _context.Tags.SingleOrDefaultAsync(c => c.Id == id, token);
-            var name = entity.Name;
-
-            var requestUser = await GetRequestUser(token);
-            var result = await _mediatr.Process(new RestoreTagCommand(requestUser)
+            var result = await _mediatr.Process(new RestoreTagCommand(await GetRequestUser(token))
             {
                 Id = id
             }, token);
 
             if (!result.Success)
-            {
-                ModelState.AddModelError("", result.Exception.Message);
-                return RedirectToAction("Index");
-            }
+                throw result.Exception;
 
-            TempData["Restored"] = JsonConvert.SerializeObject(new EntityViewModel { Id = entity.Id, Name = name });
+            return RedirectToAction("Edit", new { id });
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Delete(Guid id, CancellationToken token)
+        {
+            var result = await _mediatr.Process(new DeleteTagCommand(await GetRequestUser(token))
+            {
+                Id = id
+            }, token);
+
+            if (!result.Success)
+                throw result.Exception;
+
             return RedirectToAction("Index");
         }
     }

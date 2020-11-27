@@ -4,17 +4,14 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Newtonsoft.Json;
 using Sheaft.Exceptions;
 using Sheaft.Application.Interop;
-using Sheaft.Web.Manage.Models;
 using Sheaft.Options;
 using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Sheaft.Domain.Enums;
-using Sheaft.Application.Commands;
 using Sheaft.Application.Models;
 
 namespace Sheaft.Web.Manage.Controllers
@@ -62,13 +59,6 @@ namespace Sheaft.Web.Manage.Controllers
                 .ProjectTo<PayinViewModel>(_configurationProvider)
                 .ToListAsync(token);
 
-            var edited = (string)TempData["Edited"];
-            ViewBag.Edited = !string.IsNullOrWhiteSpace(edited) ? JsonConvert.DeserializeObject(edited) : null;
-
-            var restored = (string)TempData["Restored"];
-            ViewBag.Restored = !string.IsNullOrWhiteSpace(restored) ? JsonConvert.DeserializeObject(restored) : null;
-
-            ViewBag.Removed = TempData["Removed"];
             ViewBag.Page = page;
             ViewBag.Take = take;
             ViewBag.Status = status;
@@ -77,53 +67,7 @@ namespace Sheaft.Web.Manage.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Todo(CancellationToken token, int page = 0, int take = 10)
-        {
-            if (page < 0)
-                page = 0;
-
-            if (take > 100)
-                take = 100;
-
-            var expiredDate = DateTimeOffset.UtcNow.AddMinutes(-_routineOptions.CheckNewPayinRefundsFromMinutes);
-            var ordersToRefund = await _context.Orders
-                .Get(c =>
-                        c.Payin != null
-                        && c.Payin.Status == TransactionStatus.Succeeded
-                        && c.Payin.Refunds.All(c => c.Status != TransactionStatus.Failed)
-                        && c.PurchaseOrders.All(po => po.Status >= PurchaseOrderStatus.Delivered)
-                        && c.PurchaseOrders.Any(po => po.WithdrawnOn.HasValue
-                                                    && (po.Transfer == null
-                                                    || (po.Transfer.Status == TransactionStatus.Succeeded)))
-                        && c.PurchaseOrders.Max(po => po.WithdrawnOn) < expiredDate, true)
-                .OrderBy(c => c.CreatedOn)
-                .Skip(page * take)
-                .Take(take)
-                .ProjectTo<OrderViewModel>(_configurationProvider)
-                .ToListAsync(token);
-
-            var submitted = (string)TempData["Submitted"];
-            ViewBag.Submitted = !string.IsNullOrWhiteSpace(submitted) ? JsonConvert.DeserializeObject(submitted) : null;
-
-            ViewBag.Page = page;
-            ViewBag.Take = take;
-
-            return View(ordersToRefund);
-        }
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> CreatePayinRefund(Guid id, CancellationToken token)
-        {
-            var requestUser = await GetRequestUser(token);
-            //_mediatr.Post(new CreatePayinRefundCommand(requestUser) { PayinId = id });
-
-            TempData["Submitted"] = JsonConvert.SerializeObject(new EntityViewModel { Id = id, Name = id.ToString("N") });
-            return RedirectToAction("Todo");
-        }
-
-        [HttpGet]
-        public async Task<IActionResult> Details(Guid id, CancellationToken token)
+        public async Task<IActionResult> Edit(Guid id, CancellationToken token)
         {
             var entity = await _context.Payins
                 .AsNoTracking()

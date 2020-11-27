@@ -5,16 +5,13 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Newtonsoft.Json;
 using Sheaft.Application.Commands;
 using Sheaft.Domain.Models;
 using Sheaft.Exceptions;
 using Sheaft.Application.Interop;
-using Sheaft.Web.Manage.Models;
 using Sheaft.Application.Models;
 using Sheaft.Options;
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading;
@@ -59,13 +56,6 @@ namespace Sheaft.Web.Manage.Controllers
                 .ProjectTo<ConsumerViewModel>(_configurationProvider)
                 .ToListAsync(token);
 
-            var edited = (string)TempData["Edited"];
-            ViewBag.Edited = !string.IsNullOrWhiteSpace(edited) ? JsonConvert.DeserializeObject(edited) : null;
-
-            var restored = (string)TempData["Restored"];
-            ViewBag.Restored = !string.IsNullOrWhiteSpace(restored) ? JsonConvert.DeserializeObject(restored) : null;
-
-            ViewBag.Removed = TempData["Removed"];
             ViewBag.Page = page;
             ViewBag.Take = take;
 
@@ -83,6 +73,7 @@ namespace Sheaft.Web.Manage.Controllers
             if (entity == null)
                 throw new NotFoundException();
 
+            ViewBag.LegalsId = (await _context.FindSingleAsync<Legal>(c => c.User.Id == id, token))?.Id;
             return View(entity);
         }
 
@@ -90,7 +81,6 @@ namespace Sheaft.Web.Manage.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(ConsumerViewModel model, IFormFile picture, CancellationToken token)
         {
-            var requestUser = await GetRequestUser(token);
             if (picture != null)
             {
                 using (var ms = new MemoryStream())
@@ -100,7 +90,7 @@ namespace Sheaft.Web.Manage.Controllers
                 }
             }
 
-            var result = await _mediatr.Process(new UpdateConsumerCommand(requestUser)
+            var result = await _mediatr.Process(new UpdateConsumerCommand(await GetRequestUser(token))
             {
                 Id = model.Id,
                 Email = model.Email,
@@ -116,103 +106,7 @@ namespace Sheaft.Web.Manage.Controllers
                 return View(model);
             }
 
-            TempData["Edited"] = JsonConvert.SerializeObject(new EntityViewModel { Id = model.Id, Name = $"{model.FirstName} {model.LastName}" });
-            return RedirectToAction("Index");
-        }
-
-        [HttpGet]
-        public async Task<IActionResult> CreateLegal(Guid userId, CancellationToken token)
-        {
-            var entity = await _context.Users.OfType<Consumer>()
-                .AsNoTracking()
-                .Where(c => c.Id == userId)
-                .ProjectTo<ConsumerViewModel>(_configurationProvider)
-                .SingleOrDefaultAsync(token);
-
-            if (entity == null)
-                throw new NotFoundException();
-
-            ViewBag.Countries = await GetCountries(token);
-            ViewBag.Nationalities = await GetNationalities(token);
-
-            return View(new ConsumerLegalViewModel
-            {
-                Owner = new OwnerViewModel { Id = userId }
-            });
-        }
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> CreateLegal(ConsumerLegalViewModel model, CancellationToken token)
-        {
-            var requestUser = await GetRequestUser(token);
-            var result = await _mediatr.Process(new CreateConsumerLegalCommand(requestUser)
-            {
-                UserId = model.Owner.Id,
-                Email = model.Owner.Email,
-                FirstName = model.Owner.FirstName,
-                LastName = model.Owner.LastName,
-                Address = _mapper.Map<AddressInput>(model.Owner.Address),
-                BirthDate = model.Owner.BirthDate,
-                CountryOfResidence = model.Owner.CountryOfResidence,
-                Nationality = model.Owner.Nationality
-            }, token);
-
-            if (!result.Success)
-            {
-                ViewBag.Countries = await GetCountries(token);
-                ViewBag.Nationalities = await GetNationalities(token);
-                ModelState.AddModelError("", result.Exception.Message);
-                return View(model);
-            }
-
-            TempData["Created"] = JsonConvert.SerializeObject(new EntityViewModel { Id = model.Owner.Id, Name = $"{model.Owner.FirstName} {model.Owner.LastName}" });
-            return RedirectToAction("Edit", new { id = model.Owner.Id });
-        }
-
-        [HttpGet]
-        public async Task<IActionResult> UpdateLegal(Guid userId, CancellationToken token)
-        {
-            var entity = await _context.Legals.OfType<ConsumerLegal>()
-                .Where(c => c.User.Id == userId)
-                .ProjectTo<ConsumerLegalViewModel>(_configurationProvider)
-                .SingleOrDefaultAsync(token);
-
-            if (entity == null)
-                return RedirectToAction("CreateLegal", new { userId = userId });
-
-            ViewBag.Countries = await GetCountries(token);
-            ViewBag.Nationalities = await GetNationalities(token);
-            return View(entity);
-        }
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> UpdateLegal(ConsumerLegalViewModel model, CancellationToken token)
-        {
-            var requestUser = await GetRequestUser(token);
-            var result = await _mediatr.Process(new UpdateConsumerLegalCommand(requestUser)
-            {
-                Id = model.Id,
-                Email = model.Owner.Email,
-                FirstName = model.Owner.FirstName,
-                LastName = model.Owner.LastName,
-                Address = _mapper.Map<AddressInput>(model.Owner.Address),
-                BirthDate = model.Owner.BirthDate,
-                CountryOfResidence = model.Owner.CountryOfResidence,
-                Nationality = model.Owner.Nationality
-            }, token);
-
-            if (!result.Success)
-            {
-                ViewBag.Countries = await GetCountries(token);
-                ViewBag.Nationalities = await GetNationalities(token);
-                ModelState.AddModelError("", result.Exception.Message);
-                return View(model);
-            }
-
-            TempData["Edited"] = JsonConvert.SerializeObject(new EntityViewModel { Id = model.Owner.Id, Name = $"{model.Owner.FirstName} {model.Owner.LastName}" });
-            return RedirectToAction("Edit", new { id = model.Owner.Id });
+            return RedirectToAction("Edit", new { model.Id });
         }
 
         [HttpPost]
@@ -222,30 +116,15 @@ namespace Sheaft.Web.Manage.Controllers
             var entity = await _context.Users.OfType<Consumer>().SingleOrDefaultAsync(c => c.Id == id, token);
             var name = entity.Name;
 
-            var requestUser = await GetRequestUser(token);
-            var result = await _mediatr.Process(new RemoveUserCommand(requestUser)
+            var result = await _mediatr.Process(new RemoveUserCommand(await GetRequestUser(token))
             {
                 Id = id
             }, token);
 
             if (!result.Success)
-            {
-                ModelState.AddModelError("", result.Exception.Message);
-                return RedirectToAction("Index");
-            }
+                throw result.Exception;
 
-            TempData["Restored"] = JsonConvert.SerializeObject(new EntityViewModel { Id = entity.Id, Name = name });
             return RedirectToAction("Index");
-        }
-
-        private async Task<IEnumerable<CountryViewModel>> GetCountries(CancellationToken token)
-        {
-            return await _context.Countries.AsNoTracking().ProjectTo<CountryViewModel>(_configurationProvider).ToListAsync(token);
-        }
-
-        private async Task<IEnumerable<NationalityViewModel>> GetNationalities(CancellationToken token)
-        {
-            return await _context.Nationalities.AsNoTracking().ProjectTo<NationalityViewModel>(_configurationProvider).ToListAsync(token);
         }
     }
 }

@@ -118,7 +118,7 @@ namespace Sheaft.Application.Handlers
                 legal.Declaration.SetResult(pspResult.Data.ResultCode, pspResult.Data.ResultMessage);
                 legal.Declaration.SetProcessedOn(pspResult.Data.ProcessedOn);
 
-                var success = await _context.SaveChangesAsync(token) > 0;
+                await _context.SaveChangesAsync(token);
 
                 switch (legal.Declaration.Status)
                 {

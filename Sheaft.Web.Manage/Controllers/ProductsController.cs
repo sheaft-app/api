@@ -61,13 +61,6 @@ namespace Sheaft.Web.Manage.Controllers
                 .ProjectTo<ProductViewModel>(_configurationProvider)
                 .ToListAsync(token);
 
-            var edited = (string)TempData["Edited"];
-            ViewBag.Edited = !string.IsNullOrWhiteSpace(edited) ? JsonConvert.DeserializeObject(edited) : null;
-
-            var restored = (string)TempData["Restored"];
-            ViewBag.Restored = !string.IsNullOrWhiteSpace(restored) ? JsonConvert.DeserializeObject(restored) : null;
-
-            ViewBag.Removed = TempData["Removed"];
             ViewBag.Page = page;
             ViewBag.Take = take;
 
@@ -215,8 +208,7 @@ namespace Sheaft.Web.Manage.Controllers
                 return View(model);
             }
 
-            TempData["Edited"] = JsonConvert.SerializeObject(new EntityViewModel { Id = model.Id, Name = model.Name });
-            return RedirectToAction("Index");
+            return RedirectToAction("Edit", new { model.Id });
         }
 
         [HttpPost]
@@ -243,47 +235,31 @@ namespace Sheaft.Web.Manage.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Delete(Guid id, CancellationToken token)
+        public async Task<IActionResult> Restore(Guid id, CancellationToken token)
         {
-            var entity = await _context.Products.SingleOrDefaultAsync(c => c.Id == id, token);
-            var name = entity.Name;
-
-            var requestUser = await GetRequestUser(token);
-            var result = await _mediatr.Process(new DeleteProductCommand(requestUser)
+            var result = await _mediatr.Process(new RestoreProductCommand(await GetRequestUser(token))
             {
                 Id = id
             }, token);
 
             if (!result.Success)
-            {
-                ModelState.AddModelError("", result.Exception.Message);
-                return RedirectToAction("Index");
-            }
+                throw result.Exception;
 
-            TempData["Removed"] = name;
-            return RedirectToAction("Index");
+            return RedirectToAction("Edit", new { id });
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Restore(Guid id, CancellationToken token)
+        public async Task<IActionResult> Delete(Guid id, CancellationToken token)
         {
-            var entity = await _context.Products.SingleOrDefaultAsync(c => c.Id == id, token);
-            var name = entity.Name;
-
-            var requestUser = await GetRequestUser(token);
-            var result = await _mediatr.Process(new RestoreProductCommand(requestUser)
+            var result = await _mediatr.Process(new DeleteProductCommand(await GetRequestUser(token))
             {
                 Id = id
             }, token);
 
             if (!result.Success)
-            {
-                ModelState.AddModelError("", result.Exception.Message);
-                return RedirectToAction("Index");
-            }
+                throw result.Exception;
 
-            TempData["Restored"] = JsonConvert.SerializeObject(new EntityViewModel { Id = entity.Id, Name = name });
             return RedirectToAction("Index");
         }
 

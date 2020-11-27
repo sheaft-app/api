@@ -79,11 +79,11 @@ namespace Sheaft.Web.Manage.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Details(Guid declarationId, CancellationToken token)
+        public async Task<IActionResult> Edit(Guid id, CancellationToken token)
         {
             var entity = await _context.Legals
                 .OfType<BusinessLegal>()
-                .Where(c => c.Declaration.Id == declarationId)
+                .Where(c => c.Declaration.Id == id)
                 .ProjectTo<BusinessLegalViewModel>(_configurationProvider)
                 .SingleOrDefaultAsync(token);
 
@@ -103,8 +103,8 @@ namespace Sheaft.Web.Manage.Controllers
                 .OfType<BusinessLegal>()
                 .SingleOrDefaultAsync(c => c.Id == legalId, token);
 
-            if (entity.Declaration != null)
-                return RedirectToAction("Details", new { declarationId = entity.Declaration.Id });
+            if (entity == null)
+                throw new NotFoundException();
 
             var result = await _mediatr.Process(new CreateDeclarationCommand(await GetRequestUser(token))
             {
@@ -114,7 +114,7 @@ namespace Sheaft.Web.Manage.Controllers
             if (!result.Success)
                 throw result.Exception;
 
-            return RedirectToAction("Details", new { declarationId = result.Data });
+            return RedirectToAction("Edit", new { id = result.Data });
         }
 
         [HttpGet]
@@ -152,7 +152,7 @@ namespace Sheaft.Web.Manage.Controllers
                 return View(model);
             }
 
-            return RedirectToAction("Details", new { declarationId = declarationId });
+            return RedirectToAction("Edit", new { id = declarationId });
         }
 
         [HttpGet]
@@ -199,7 +199,7 @@ namespace Sheaft.Web.Manage.Controllers
                 return View(model);
             }
 
-            return RedirectToAction("Details", new { declarationId = declarationId });
+            return RedirectToAction("Edit", new { id = declarationId });
         }
 
         [HttpPost]
@@ -214,7 +214,7 @@ namespace Sheaft.Web.Manage.Controllers
             if (!result.Success)
                 throw result.Exception;
 
-            return RedirectToAction("Details", new { declarationId = declarationId });
+            return RedirectToAction("Edit", new { id = declarationId });
         }
 
         [HttpPost]
@@ -229,7 +229,7 @@ namespace Sheaft.Web.Manage.Controllers
             if (!result.Success)
                 throw result.Exception;
 
-            return RedirectToAction("Details", new { declarationId = declarationId });
+            return RedirectToAction("Edit", new { id = declarationId });
         }
 
         [HttpPost]
@@ -244,7 +244,7 @@ namespace Sheaft.Web.Manage.Controllers
             if (!result.Success)
                 throw result.Exception;
 
-            return RedirectToAction("Details", new { declarationId = declarationId });
+            return RedirectToAction("Edit", new { id = declarationId });
         }
 
         [HttpPost]
@@ -259,23 +259,7 @@ namespace Sheaft.Web.Manage.Controllers
             if (!result.Success)
                 throw result.Exception;
 
-            return RedirectToAction("Details", new { declarationId = declarationId });
-        }
-
-        private async Task<IEnumerable<CountryViewModel>> GetCountries(CancellationToken token)
-        {
-            return await _context.Countries
-                .AsNoTracking()
-                .ProjectTo<CountryViewModel>(_configurationProvider)
-                .ToListAsync(token);
-        }
-
-        private async Task<IEnumerable<NationalityViewModel>> GetNationalities(CancellationToken token)
-        {
-            return await _context.Nationalities
-                .AsNoTracking()
-                .ProjectTo<NationalityViewModel>(_configurationProvider)
-                .ToListAsync(token);
+            return RedirectToAction("Edit", new { id = declarationId });
         }
     }
 }

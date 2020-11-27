@@ -71,7 +71,6 @@ namespace Sheaft.Application.Handlers
                        request.Address.Country)
                        : null;
 
-
                 if (!string.IsNullOrWhiteSpace(bankAccount.Identifier))
                 {
                     var resetResult = await _pspService.UpdateBankIbanAsync(bankAccount, false, token);

@@ -57,13 +57,6 @@ namespace Sheaft.Web.Manage.Controllers
                 .ProjectTo<ReturnableViewModel>(_configurationProvider)
                 .ToListAsync(token);
 
-            var edited = (string)TempData["Edited"];
-            ViewBag.Edited = !string.IsNullOrWhiteSpace(edited) ? JsonConvert.DeserializeObject(edited) : null;
-
-            var restored = (string)TempData["Restored"];
-            ViewBag.Restored = !string.IsNullOrWhiteSpace(restored) ? JsonConvert.DeserializeObject(restored) : null;
-
-            ViewBag.Removed = TempData["Removed"];
             ViewBag.Page = page;
             ViewBag.Take = take;
 
@@ -111,10 +104,6 @@ namespace Sheaft.Web.Manage.Controllers
         [HttpGet]
         public async Task<IActionResult> Edit(Guid id, CancellationToken token)
         {
-            var requestUser = await GetRequestUser(token);
-            if (!requestUser.IsImpersonating)
-                return RedirectToAction("Impersonate", "Account");
-
             var entity = await _context.Returnables
                 .AsNoTracking()
                 .Where(c => c.Id == id)
@@ -131,14 +120,7 @@ namespace Sheaft.Web.Manage.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(ReturnableViewModel model, CancellationToken token)
         {
-            var requestUser = await GetRequestUser(token);
-            if (!requestUser.IsImpersonating)
-            {
-                ModelState.AddModelError("", "You must impersonate returnable producer to edit it.");
-                return View(model);
-            }
-
-            var result = await _mediatr.Process(new UpdateReturnableCommand(requestUser)
+            var result = await _mediatr.Process(new UpdateReturnableCommand(await GetRequestUser(token))
             {
                 Id = model.Id,
                 Description = model.Description,
@@ -153,53 +135,36 @@ namespace Sheaft.Web.Manage.Controllers
                 return View(model);
             }
 
-            TempData["Edited"] = JsonConvert.SerializeObject(new EntityViewModel { Id = model.Id, Name = model.Name });
-            return RedirectToAction("Index");
-        }
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Delete(Guid id, CancellationToken token)
-        {
-            var entity = await _context.Returnables.SingleOrDefaultAsync(c => c.Id == id, token);
-            var name = entity.Name;
-
-            var requestUser = await GetRequestUser(token);
-            var result = await _mediatr.Process(new DeleteReturnableCommand(requestUser)
-            {
-                Id = id
-            }, token);
-
-            if (!result.Success)
-            {
-                ModelState.AddModelError("", result.Exception.Message);
-                return RedirectToAction("Index");
-            }
-
-            TempData["Removed"] = name;
-            return RedirectToAction("Index");
+            return RedirectToAction("Edit", new { model.Id });
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Restore(Guid id, CancellationToken token)
         {
-            var entity = await _context.Returnables.SingleOrDefaultAsync(c => c.Id == id, token);
-            var name = entity.Name;
-
-            var requestUser = await GetRequestUser(token);
-            var result = await _mediatr.Process(new RestoreReturnableCommand(requestUser)
+            var result = await _mediatr.Process(new RestoreReturnableCommand(await GetRequestUser(token))
             {
                 Id = id
             }, token);
 
             if (!result.Success)
-            {
-                ModelState.AddModelError("", result.Exception.Message);
-                return RedirectToAction("Index");
-            }
+                throw result.Exception;
 
-            TempData["Restored"] = JsonConvert.SerializeObject(new EntityViewModel { Id = entity.Id, Name = name });
+            return RedirectToAction("Edit", new { id });
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Delete(Guid id, CancellationToken token)
+        {
+            var result = await _mediatr.Process(new DeleteReturnableCommand(await GetRequestUser(token))
+            {
+                Id = id
+            }, token);
+
+            if (!result.Success)
+                throw result.Exception;
+
             return RedirectToAction("Index");
         }
     }

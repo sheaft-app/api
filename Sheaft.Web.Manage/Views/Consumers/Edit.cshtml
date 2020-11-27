@@ -12,6 +12,11 @@
         @Html.AntiForgeryToken()
         @Html.ValidationSummary(true, "", new { @class = "text-danger" })
         @Html.HiddenFor(model => model.Id)
+        @Html.HiddenFor(model => model.Name)
+        @Html.HiddenFor(model => model.CreatedOn)
+        @Html.HiddenFor(model => model.UpdatedOn)
+        @Html.HiddenFor(model => model.RemovedOn)
+
         <br />
 
         <div class="form-group">
@@ -57,11 +62,20 @@
             }
             @Html.TextBoxFor(c => c.Picture, new { @class = "form-control", @type = "file" })
         </div>
-
-        <h4>Billing</h4>
-        <a asp-controller="Consumers" asp-action="UpdateLegal" asp-route-userId="@Model.Id" class="btn btn-info">
-            Billing details
-        </a>
+        <br/>
+        <h4>Legals</h4>
+        @if (ViewBag.LegalsId != null)
+        {
+            <a asp-controller="Legals" asp-action="EditLegalConsumer" asp-route-id="@ViewBag.LegalsId" class="btn btn-info">
+                Legals details
+            </a>
+        }
+        else
+        {
+            <a asp-controller="Legals" asp-action="CreateLegalConsumer" asp-route-userId="@Model.Id" class="btn btn-info">
+                Create Legals
+            </a>
+        }
         <br />
         <br />
         <a asp-controller="Consumers" asp-action="Index" class="btn btn-light">

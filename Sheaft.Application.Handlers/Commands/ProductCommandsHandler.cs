@@ -49,51 +49,57 @@ namespace Sheaft.Application.Handlers
         {
             return await ExecuteAsync(request, async () =>
             {
-                if (!string.IsNullOrWhiteSpace(request.Reference))
+                using (var transaction = await _context.BeginTransactionAsync(token))
                 {
-                    var existingEntity = await _context.FindSingleAsync<Product>(p => p.Reference == request.Reference && p.Producer.Id == request.RequestUser.Id, token);
-                    if (existingEntity != null)
-                        return ValidationError<Guid>(MessageKind.CreateProduct_Reference_AlreadyExists, request.Reference);
+                    var reference = request.Reference;
+                    if (!string.IsNullOrWhiteSpace(reference))
+                    {
+                        var existingEntity = await _context.FindSingleAsync<Product>(p => p.Reference == reference && p.Producer.Id == request.RequestUser.Id, token);
+                        if (existingEntity != null)
+                            return ValidationError<Guid>(MessageKind.CreateProduct_Reference_AlreadyExists, reference);
+                    }
+                    else
+                    {
+                        var resultIdentifier = await _mediatr.Process(new CreateProductIdentifierCommand(request.RequestUser) { ProducerId = request.RequestUser.Id }, token);
+                        if (!resultIdentifier.Success)
+                            return Failed<Guid>(resultIdentifier.Exception);
+
+                        reference = resultIdentifier.Data;
+                    }
+
+                    var producer = await _context.GetByIdAsync<Producer>(request.RequestUser.Id, token);
+                    var entity = new Product(Guid.NewGuid(), reference, request.Name, request.WholeSalePricePerUnit, request.Conditioning, request.Unit, request.QuantityPerUnit, producer);
+
+                    entity.SetVat(request.Vat);
+                    entity.SetDescription(request.Description);
+                    entity.SetAvailable(request.Available ?? true);
+                    entity.SetStoreVisibility(request.VisibleToStores ?? false);
+                    entity.SetConsumerVisibility(request.VisibleToConsumers ?? false);
+                    entity.SetWeight(request.Weight);
+
+                    if (request.ReturnableId.HasValue)
+                    {
+                        var returnable = await _context.GetByIdAsync<Returnable>(request.ReturnableId.Value, token);
+                        entity.SetReturnable(returnable);
+                    }
+
+                    var tags = await _context.FindAsync<Tag>(t => request.Tags.Contains(t.Id), token);
+                    entity.SetTags(tags);
+
+                    await _context.AddAsync(entity, token);
+                    await _context.SaveChangesAsync(token);
+
+                    var imageResult = await _mediatr.Process(new UpdateProductPictureCommand(request.RequestUser) { ProductId = entity.Id, Picture = request.Picture }, token);
+                    if (!imageResult.Success)
+                        return Failed<Guid>(imageResult.Exception);
+
+                    await transaction.CommitAsync(token);
+
+                    if (!request.SkipUpdateProducerTags)
+                        _mediatr.Post(new UpdateProducerTagsCommand(request.RequestUser) { ProducerId = request.RequestUser.Id });
+
+                    return Created(entity.Id);
                 }
-                else
-                {
-                    var resultIdentifier = await _mediatr.Process(new CreateProductIdentifierCommand(request.RequestUser) { ProducerId = request.RequestUser.Id }, token);
-                    if (!resultIdentifier.Success)
-                        return Failed<Guid>(resultIdentifier.Exception);
-
-                    request.Reference = resultIdentifier.Data;
-                }
-
-                var producer = await _context.GetByIdAsync<Producer>(request.RequestUser.Id, token);
-                var entity = new Product(Guid.NewGuid(), request.Reference, request.Name, request.WholeSalePricePerUnit, request.Conditioning, request.Unit, request.QuantityPerUnit, producer);
-
-                entity.SetVat(request.Vat);
-                entity.SetDescription(request.Description);
-                entity.SetAvailable(request.Available ?? true);
-                entity.SetStoreVisibility(request.VisibleToStores ?? false);
-                entity.SetConsumerVisibility(request.VisibleToConsumers ?? false);
-                entity.SetWeight(request.Weight);
-
-                if (request.ReturnableId.HasValue)
-                {
-                    var returnable = await _context.GetByIdAsync<Returnable>(request.ReturnableId.Value, token);
-                    entity.SetReturnable(returnable);
-                }
-
-                var tags = await _context.FindAsync<Tag>(t => request.Tags.Contains(t.Id), token);
-                entity.SetTags(tags);
-
-                await _context.AddAsync(entity, token);
-                await _context.SaveChangesAsync(token);
-
-                if (!request.SkipUpdateProducerTags)
-                    _mediatr.Post(new UpdateProducerTagsCommand(request.RequestUser) { ProducerId = request.RequestUser.Id });
-
-                var imageResult = await _mediatr.Process(new UpdateProductPictureCommand(request.RequestUser) { ProductId = entity.Id, Picture = request.Picture }, token);
-                if (!imageResult.Success)
-                    return Failed<Guid>(imageResult.Exception);
-
-                return Created(entity.Id);
             });
         }
 
@@ -101,57 +107,62 @@ namespace Sheaft.Application.Handlers
         {
             return await ExecuteAsync(request, async () =>
             {
-                var entity = await _context.GetByIdAsync<Product>(request.Id, token);
-
-                if (!string.IsNullOrWhiteSpace(request.Reference) && request.Reference != entity.Reference)
+                using (var transaction = await _context.BeginTransactionAsync(token))
                 {
-                    var existingEntity = await _context.FindSingleAsync<Product>(p => p.Reference == request.Reference && p.Producer.Id == request.RequestUser.Id, token);
-                    if (existingEntity != null)
-                        return ValidationError<bool>(MessageKind.CreateProduct_Reference_AlreadyExists, request.Reference);
+                    var entity = await _context.GetByIdAsync<Product>(request.Id, token);
+
+                    var reference = request.Reference;
+                    if (!string.IsNullOrWhiteSpace(reference) && reference != entity.Reference)
+                    {
+                        var existingEntity = await _context.FindSingleAsync<Product>(p => p.Reference == reference && p.Producer.Id == request.RequestUser.Id, token);
+                        if (existingEntity != null)
+                            return ValidationError<bool>(MessageKind.CreateProduct_Reference_AlreadyExists, reference);
+                    }
+
+                    if (string.IsNullOrWhiteSpace(reference))
+                    {
+                        var resultIdentifier = await _mediatr.Process(new CreateProductIdentifierCommand(request.RequestUser) { ProducerId = request.RequestUser.Id }, token);
+                        if (!resultIdentifier.Success)
+                            return Failed<bool>(resultIdentifier.Exception);
+
+                        reference = resultIdentifier.Data;
+                    }
+
+                    entity.SetVat(request.Vat);
+                    entity.SetName(request.Name);
+                    entity.SetDescription(request.Description);
+                    entity.SetWholeSalePricePerUnit(request.WholeSalePricePerUnit);
+                    entity.SetReference(reference);
+                    entity.SetWeight(request.Weight);
+                    entity.SetAvailable(request.Available);
+                    entity.SetStoreVisibility(request.VisibleToStores);
+                    entity.SetConsumerVisibility(request.VisibleToConsumers);
+                    entity.SetConditioning(request.Conditioning, request.QuantityPerUnit, request.Unit);
+
+                    if (request.ReturnableId.HasValue)
+                    {
+                        var returnable = await _context.GetByIdAsync<Returnable>(request.ReturnableId.Value, token);
+                        entity.SetReturnable(returnable);
+                    }
+                    else
+                    {
+                        entity.SetReturnable(null);
+                    }
+
+                    var tags = await _context.FindAsync<Tag>(t => request.Tags.Contains(t.Id), token);
+                    entity.SetTags(tags);
+
+                    await _context.SaveChangesAsync(token);
+
+                    var imageResult = await _mediatr.Process(new UpdateProductPictureCommand(request.RequestUser) { ProductId = entity.Id, Picture = request.Picture }, token);
+                    if (!imageResult.Success)
+                        return Failed<bool>(imageResult.Exception);
+
+                    await transaction.CommitAsync(token);
+
+                    _mediatr.Post(new UpdateProducerTagsCommand(request.RequestUser) { ProducerId = request.RequestUser.Id });
+                    return Ok(true);
                 }
-
-                if(string.IsNullOrWhiteSpace(request.Reference))
-                {
-                    var resultIdentifier = await _mediatr.Process(new CreateProductIdentifierCommand(request.RequestUser) { ProducerId = request.RequestUser.Id }, token);
-                    if (!resultIdentifier.Success)
-                        return Failed<bool>(resultIdentifier.Exception);
-
-                    request.Reference = resultIdentifier.Data;
-                }
-
-                entity.SetVat(request.Vat);
-                entity.SetName(request.Name);
-                entity.SetDescription(request.Description);
-                entity.SetWholeSalePricePerUnit(request.WholeSalePricePerUnit);
-                entity.SetReference(request.Reference);
-                entity.SetWeight(request.Weight);
-                entity.SetAvailable(request.Available);
-                entity.SetStoreVisibility(request.VisibleToStores);
-                entity.SetConsumerVisibility(request.VisibleToConsumers);
-                entity.SetConditioning(request.Conditioning, request.QuantityPerUnit, request.Unit);
-
-                if (request.ReturnableId.HasValue)
-                {
-                    var returnable = await _context.GetByIdAsync<Returnable>(request.ReturnableId.Value, token);
-                    entity.SetReturnable(returnable);
-                }
-                else
-                {
-                    entity.SetReturnable(null);
-                }
-
-                var tags = await _context.FindAsync<Tag>(t => request.Tags.Contains(t.Id), token);
-                entity.SetTags(tags);
-
-                await _context.SaveChangesAsync(token);
-
-                _mediatr.Post(new UpdateProducerTagsCommand(request.RequestUser) { ProducerId = request.RequestUser.Id });
-
-                var imageResult = await _mediatr.Process(new UpdateProductPictureCommand(request.RequestUser) { ProductId = entity.Id, Picture = request.Picture }, token);
-                if (!imageResult.Success)
-                    return Failed<bool>(imageResult.Exception);
-
-                return Ok(true);
             });
         }
 

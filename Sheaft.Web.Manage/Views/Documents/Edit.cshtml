@@ -132,7 +132,7 @@
                     </div>
                 }
                 <br />
-                <a asp-controller="Producers" asp-action="UpdateLegal" asp-route-userid="@ViewBag.UserId" class="btn btn-light">
+                <a asp-controller="Legals" asp-action="EditUserLegals" asp-route-userid="@ViewBag.UserId" class="btn btn-light">
                     Go back
                 </a>
                 @if (Model.Status == DocumentStatus.Created || Model.Status == DocumentStatus.UnLocked)

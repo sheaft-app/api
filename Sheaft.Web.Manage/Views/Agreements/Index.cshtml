@@ -11,44 +11,6 @@
     <h2 class="display-5">Agreements</h2>
     <br />
 
-    @if (ViewBag.Removed != null)
-    {
-        <div class="alert alert-success alert-dismissible fade show" role="alert">
-            <span>Successfully removed agreement @ViewBag.Removed</span>
-
-            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-            </button>
-        </div>
-        <br />
-    }
-
-    @if (ViewBag.Restored != null)
-    {
-        <div class="alert alert-success alert-dismissible fade show" role="alert">
-            <span>Successfully restored agreement @ViewBag.Restored.Name</span>
-            <a asp-controller="Agreements" asp-action="Edit" asp-route-id="@ViewBag.Restored.Id">View details</a>
-
-            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-            </button>
-        </div>
-        <br />
-    }
-
-    @if (ViewBag.Edited != null)
-    {
-        <div class="alert alert-success alert-dismissible fade show" role="alert">
-            <span>Successfully updated agreement @ViewBag.Edited.Name</span>
-            <a asp-controller="Agreements" asp-action="Edit" asp-route-id="@ViewBag.Edited.Id">View details</a>
-
-            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-            </button>
-        </div>
-        <br />
-    }
-
     <div class="btn-group">
         <label class="btn btn-secondary @(status == null ? "active": "")">
             <a asp-controller="Agreements" asp-action="Index" asp-route-status="" asp-route-take="@take" asp-route-page="@currentPage" class="text-white">All</a>
@@ -69,7 +31,6 @@
                 <th scope="col">Store</th>
                 <th scope="col">Status</th>
                 <th scope="col">CreatedOn</th>
-                <th scope="col">Removed</th>
                 <th scope="col"></th>
             </tr>
         </thead>
@@ -106,7 +67,6 @@
 
                     <td>@entity.Status</td>
                     <td>@entity.CreatedOn.ToString("dd/MM/yy hh:mm")</td>
-                    <td>@entity.RemovedOn.HasValue</td>
                     <td>
                         <a asp-controller="Agreements" asp-action="Edit" asp-route-id="@entity.Id" class="btn btn-info">
                             <i class="fa fa-pen"></i>

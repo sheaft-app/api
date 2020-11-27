@@ -95,7 +95,7 @@ namespace Sheaft.Application.Handlers
                     producer.CanDirectSell = true;
                 else
                 {
-                    producer.CanDirectSell = await _context.DeliveryModes.AnyAsync(c => c.Producer.Id == request.RequestUser.Id && (c.Kind == DeliveryKind.Collective || c.Kind == DeliveryKind.Farm || c.Kind == DeliveryKind.Market), token);
+                    producer.CanDirectSell = await _context.DeliveryModes.AnyAsync(c => !c.RemovedOn.HasValue && c.Producer.Id == request.RequestUser.Id && (c.Kind == DeliveryKind.Collective || c.Kind == DeliveryKind.Farm || c.Kind == DeliveryKind.Market), token);
                 }
 
                 await _context.SaveChangesAsync(token);
@@ -113,10 +113,9 @@ namespace Sheaft.Application.Handlers
                     return BadRequest<bool>(MessageKind.DeliveryMode_CannotRemove_With_Active_Agreements, entity.Name, activeAgreements);
 
                 _context.Remove(entity);
-                entity.Producer.CanDirectSell = await _context.DeliveryModes.AnyAsync(c => c.Producer.Id == request.RequestUser.Id && (c.Kind == DeliveryKind.Collective || c.Kind == DeliveryKind.Farm || c.Kind == DeliveryKind.Market), token);
+                entity.Producer.CanDirectSell = await _context.DeliveryModes.AnyAsync(c => !c.RemovedOn.HasValue && c.Producer.Id == request.RequestUser.Id && (c.Kind == DeliveryKind.Collective || c.Kind == DeliveryKind.Farm || c.Kind == DeliveryKind.Market), token);
 
                 await _context.SaveChangesAsync(token);
-
                 return Ok(true);
             });
         }
@@ -126,9 +125,11 @@ namespace Sheaft.Application.Handlers
             return await ExecuteAsync(request, async () =>
             {
                 var entity = await _context.DeliveryModes.SingleOrDefaultAsync(a => a.Id == request.Id && a.RemovedOn.HasValue, token);
-                _context.Restore(entity);
-                await _context.SaveChangesAsync(token);
 
+                _context.Restore(entity);
+                entity.Producer.CanDirectSell = await _context.DeliveryModes.AnyAsync(c => !c.RemovedOn.HasValue && c.Producer.Id == request.RequestUser.Id && (c.Kind == DeliveryKind.Collective || c.Kind == DeliveryKind.Farm || c.Kind == DeliveryKind.Market), token);
+
+                await _context.SaveChangesAsync(token);
                 return Ok(true);
             });
         }

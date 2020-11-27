@@ -285,11 +285,9 @@ namespace Sheaft.Web.Manage
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            if (env.IsDevelopment())
-            {
-                app.UseDeveloperExceptionPage();
-            }
-            else
+            app.UseDeveloperExceptionPage();
+
+            if (!env.IsDevelopment())
             {
                 app.UseHttpsRedirection();
                 app.UseExceptionHandler("/Error");

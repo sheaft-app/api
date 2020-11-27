@@ -59,13 +59,6 @@ namespace Sheaft.Web.Manage.Controllers
                 .ProjectTo<TransferViewModel>(_configurationProvider)
                 .ToListAsync(token);
 
-            var edited = (string)TempData["Edited"];
-            ViewBag.Edited = !string.IsNullOrWhiteSpace(edited) ? JsonConvert.DeserializeObject(edited) : null;
-
-            var restored = (string)TempData["Restored"];
-            ViewBag.Restored = !string.IsNullOrWhiteSpace(restored) ? JsonConvert.DeserializeObject(restored) : null;
-
-            ViewBag.Removed = TempData["Removed"];
             ViewBag.Page = page;
             ViewBag.Take = take;
             ViewBag.Status = status;
@@ -74,7 +67,7 @@ namespace Sheaft.Web.Manage.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Details(Guid id, CancellationToken token)
+        public async Task<IActionResult> Edit(Guid id, CancellationToken token)
         {
             var entity = await _context.Transfers
                 .AsNoTracking()

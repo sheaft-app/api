@@ -29,13 +29,25 @@ namespace Sheaft.Application.Handlers
         {
             return await ExecuteAsync(request, async () =>
             {
-                var entity = new Tag(Guid.NewGuid(), request.Kind, request.Name, request.Description, request.Picture);
-                entity.SetAvailable(request.Available);
+                using (var transaction = await _context.BeginTransactionAsync(token))
+                {
+                    var entity = new Tag(Guid.NewGuid(), request.Kind, request.Name, request.Description, request.Picture);
+                    entity.SetAvailable(request.Available);
 
-                await _context.AddAsync(entity, token);
-                await _context.SaveChangesAsync(token);
+                    await _context.AddAsync(entity, token);
+                    await _context.SaveChangesAsync(token);
 
-                return Created(entity.Id);
+                    var imageResult = await _mediatr.Process(new UpdateTagPictureCommand(request.RequestUser) { TagId = entity.Id, Picture = request.Picture }, token);
+                    if (!imageResult.Success)
+                        return Failed<Guid>(imageResult.Exception);
+
+                    var iconResult = await _mediatr.Process(new UpdateTagIconCommand(request.RequestUser) { TagId = entity.Id, Icon = request.Icon }, token);
+                    if (!iconResult.Success)
+                        return Failed<Guid>(iconResult.Exception);
+
+                    await transaction.CommitAsync(token);
+                    return Created(entity.Id);
+                }
             });
         }
 
@@ -43,24 +55,28 @@ namespace Sheaft.Application.Handlers
         {
             return await ExecuteAsync(request, async () =>
             {
-                var entity = await _context.GetByIdAsync<Tag>(request.Id, token);
+                using (var transaction = await _context.BeginTransactionAsync(token))
+                {
+                    var entity = await _context.GetByIdAsync<Tag>(request.Id, token);
 
-                entity.SetName(request.Name);
-                entity.SetDescription(request.Description);
-                entity.SetKind(request.Kind);
-                entity.SetAvailable(request.Available);
+                    entity.SetName(request.Name);
+                    entity.SetDescription(request.Description);
+                    entity.SetKind(request.Kind);
+                    entity.SetAvailable(request.Available);
 
-                await _context.SaveChangesAsync(token);
+                    await _context.SaveChangesAsync(token);
 
-                var imageResult = await _mediatr.Process(new UpdateTagPictureCommand(request.RequestUser) { TagId = entity.Id, Picture = request.Picture }, token);
-                if (!imageResult.Success)
-                    return Failed<bool>(imageResult.Exception);
+                    var imageResult = await _mediatr.Process(new UpdateTagPictureCommand(request.RequestUser) { TagId = entity.Id, Picture = request.Picture }, token);
+                    if (!imageResult.Success)
+                        return Failed<bool>(imageResult.Exception);
 
-                var iconResult = await _mediatr.Process(new UpdateTagIconCommand(request.RequestUser) { TagId = entity.Id, Icon = request.Icon }, token);
-                if (!iconResult.Success)
-                    return Failed<bool>(iconResult.Exception);
+                    var iconResult = await _mediatr.Process(new UpdateTagIconCommand(request.RequestUser) { TagId = entity.Id, Icon = request.Icon }, token);
+                    if (!iconResult.Success)
+                        return Failed<bool>(iconResult.Exception);
 
-                return Ok(true);
+                    await transaction.CommitAsync(token);
+                    return Ok(true);
+                }
             });
         }
 

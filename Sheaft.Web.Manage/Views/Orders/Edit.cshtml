@@ -71,7 +71,7 @@
                 @Html.LabelFor(m => m.Donation.Status)
                 @Html.TextBoxFor(m => m.Donation.Status, null, new { @class = "form-control", @disabled = "disabled" })
             </div>
-            <a asp-controller="Donations" asp-action="Details" asp-route-id="@Model.Donation.Id" class="btn btn-info">
+            <a asp-controller="Donations" asp-action="Edit" asp-route-id="@Model.Donation.Id" class="btn btn-info">
                 Donation details
             </a>
             <br />
@@ -141,7 +141,7 @@
                         <td>@purchaseOrder.TotalOnSalePrice€</td>
                         <td>@purchaseOrder.Status</td>
                         <td>
-                            <a asp-controller="PurchaseOrders" asp-action="Details" asp-route-id="@purchaseOrder.Id" class="btn btn-info">
+                            <a asp-controller="PurchaseOrders" asp-action="Edit" asp-route-id="@purchaseOrder.Id" class="btn btn-info">
                                 <i class="fa fa-eye"></i>
                             </a>
                         </td>

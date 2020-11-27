@@ -1,15 +1,12 @@
 ﻿using AutoMapper;
 using AutoMapper.QueryableExtensions;
-using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Newtonsoft.Json;
 using Sheaft.Application.Commands;
 using Sheaft.Exceptions;
 using Sheaft.Application.Interop;
-using Sheaft.Web.Manage.Models;
 using Sheaft.Application.Models;
 using Sheaft.Options;
 using System;
@@ -58,13 +55,6 @@ namespace Sheaft.Web.Manage.Controllers
                 .ProjectTo<DeliveryModeViewModel>(_configurationProvider)
                 .ToListAsync(token);
 
-            var edited = (string)TempData["Edited"];
-            ViewBag.Edited = !string.IsNullOrWhiteSpace(edited) ? JsonConvert.DeserializeObject(edited) : null;
-
-            var restored = (string)TempData["Restored"];
-            ViewBag.Restored = !string.IsNullOrWhiteSpace(restored) ? JsonConvert.DeserializeObject(restored) : null;
-
-            ViewBag.Removed = TempData["Removed"];
             ViewBag.Page = page;
             ViewBag.Take = take;
 
@@ -72,53 +62,8 @@ namespace Sheaft.Web.Manage.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Add(CancellationToken token)
-        {
-            var requestUser = await GetRequestUser(token);
-            if (!requestUser.IsImpersonating)
-                return RedirectToAction("Impersonate", "Account");
-
-            return View(new DeliveryModeViewModel());
-        }
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Add(DeliveryModeViewModel model, CancellationToken token)
-        {
-            var requestUser = await GetRequestUser(token);
-            if (!requestUser.IsImpersonating)
-            {
-                ModelState.AddModelError("", "You must impersonate producer to create it.");
-                return View(model);
-            }
-
-            var entity = await _context.DeliveryModes.SingleOrDefaultAsync(t => t.Id == model.Id, token);
-            var result = await _mediatr.Process(new CreateDeliveryModeCommand(requestUser)
-            {
-                Description = model.Description,
-                Name = model.Name,
-                Address = _mapper.Map<LocationAddressInput>(model.Address),
-                Kind = model.Kind,
-                LockOrderHoursBeforeDelivery = model.LockOrderHoursBeforeDelivery,
-                OpeningHours = entity.OpeningHours?.GroupBy(oh => new { oh.From, oh.To }).Select(c => new TimeSlotGroupInput { From = c.Key.From, To = c.Key.To, Days = c.Select(o => o.Day) })
-            }, token);
-
-            if (!result.Success)
-            {
-                ModelState.AddModelError("", result.Exception.Message);
-                return View(model);
-            }
-
-            return RedirectToAction("Edit", new { id = result.Data });
-        }
-
-        [HttpGet]
         public async Task<IActionResult> Edit(Guid id, CancellationToken token)
         {
-            var requestUser = await GetRequestUser(token);
-            if (!requestUser.IsImpersonating)
-                return RedirectToAction("Impersonate", "Account");
-
             var entity = await _context.DeliveryModes
                 .AsNoTracking()
                 .Where(c => c.Id == id)
@@ -135,14 +80,7 @@ namespace Sheaft.Web.Manage.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(DeliveryModeViewModel model, CancellationToken token)
         {
-            var requestUser = await GetRequestUser(token);
-            if (!requestUser.IsImpersonating)
-            {
-                ModelState.AddModelError("", "You must impersonate delivery's producer to edit it.");
-                return View(model);
-            }
-
-            var result = await _mediatr.Process(new UpdateDeliveryModeCommand(requestUser)
+            var result = await _mediatr.Process(new UpdateDeliveryModeCommand(await GetRequestUser(token))
             {
                 Id = model.Id,
                 Description = model.Description,
@@ -158,30 +96,21 @@ namespace Sheaft.Web.Manage.Controllers
                 return View(model);
             }
 
-            TempData["Edited"] = JsonConvert.SerializeObject(new EntityViewModel { Id = model.Id, Name = model.Name });
-            return RedirectToAction("Index");
+            return RedirectToAction("Edit", new { model.Id });
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete(Guid id, CancellationToken token)
         {
-            var entity = await _context.DeliveryModes.SingleOrDefaultAsync(c => c.Id == id, token);
-            var name = entity.Name;
-
-            var requestUser = await GetRequestUser(token);
-            var result = await _mediatr.Process(new DeleteDeliveryModeCommand(requestUser)
+            var result = await _mediatr.Process(new DeleteDeliveryModeCommand(await GetRequestUser(token))
             {
                 Id = id
             }, token);
 
             if (!result.Success)
-            {
-                ModelState.AddModelError("", result.Exception.Message);
-                return RedirectToAction("Index");
-            }
+                throw result.Exception;
 
-            TempData["Removed"] = name;
             return RedirectToAction("Index");
         }
 
@@ -189,23 +118,15 @@ namespace Sheaft.Web.Manage.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Restore(Guid id, CancellationToken token)
         {
-            var entity = await _context.DeliveryModes.SingleOrDefaultAsync(c => c.Id == id, token);
-            var name = entity.Name;
-
-            var requestUser = await GetRequestUser(token);
-            var result = await _mediatr.Process(new RestoreDeliveryModeCommand(requestUser)
+            var result = await _mediatr.Process(new RestoreDeliveryModeCommand(await GetRequestUser(token))
             {
                 Id = id
             }, token);
 
             if (!result.Success)
-            {
-                ModelState.AddModelError("", result.Exception.Message);
-                return RedirectToAction("Index");
-            }
+                throw result.Exception;
 
-            TempData["Restored"] = JsonConvert.SerializeObject(new EntityViewModel { Id = entity.Id, Name = name });
-            return RedirectToAction("Index");
+            return RedirectToAction("Edit", new { id });
         }
     }
 }

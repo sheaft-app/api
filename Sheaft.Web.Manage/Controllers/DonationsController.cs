@@ -4,10 +4,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Newtonsoft.Json;
 using Sheaft.Exceptions;
 using Sheaft.Application.Interop;
-using Sheaft.Web.Manage.Models;
 using Sheaft.Options;
 using System;
 using System.Linq;
@@ -44,11 +42,6 @@ namespace Sheaft.Web.Manage.Controllers
                 take = 100;
 
             var query = _context.Donations.AsNoTracking();
-
-            var requestUser = await GetRequestUser(token);
-            if (requestUser.IsImpersonating)
-                query = query.Where(p => p.Author.Id == requestUser.Id);
-
             if (status != null)
                 query = query.Where(t => t.Status == status);
 
@@ -59,22 +52,14 @@ namespace Sheaft.Web.Manage.Controllers
                 .ProjectTo<DonationViewModel>(_configurationProvider)
                 .ToListAsync(token);
 
-            var edited = (string)TempData["Edited"];
-            ViewBag.Edited = !string.IsNullOrWhiteSpace(edited) ? JsonConvert.DeserializeObject(edited) : null;
-
-            var restored = (string)TempData["Restored"];
-            ViewBag.Restored = !string.IsNullOrWhiteSpace(restored) ? JsonConvert.DeserializeObject(restored) : null;
-
-            ViewBag.Removed = TempData["Removed"];
             ViewBag.Page = page;
             ViewBag.Take = take;
             ViewBag.Status = status;
-
             return View(entities);
         }
 
         [HttpGet]
-        public async Task<IActionResult> Details(Guid id, CancellationToken token)
+        public async Task<IActionResult> Edit(Guid id, CancellationToken token)
         {
             var entity = await _context.Donations
                 .AsNoTracking()
@@ -92,15 +77,14 @@ namespace Sheaft.Web.Manage.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Expire(DonationViewModel model, CancellationToken token)
         {
-            var requestUser = await GetRequestUser(token);
-            var result = await _mediatr.Process(new ExpireDonationCommand(requestUser) { DonationId = model.Id }, token);
-            if (!result.Success)
+            var result = await _mediatr.Process(new ExpireDonationCommand(await GetRequestUser(token))
             {
-                ModelState.AddModelError("", result.Exception.Message);
-                return View("Details", model);
-            }
+                DonationId = model.Id
+            }, token);
 
-            TempData["Edited"] = JsonConvert.SerializeObject(new EntityViewModel { Id = model.Id, Name = model.Identifier });
+            if (!result.Success)
+                throw result.Exception;
+
             return RedirectToAction("Index");
         }
     }

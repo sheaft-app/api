@@ -60,11 +60,11 @@ namespace Sheaft.Application.Handlers
             return await ExecuteAsync(request, async () =>
             {
                 var entity = await _context.GetByIdAsync<Returnable>(request.Id, token);
+
                 _context.Remove(entity);
+                await _context.SaveChangesAsync(token);
 
-                var results = await _context.SaveChangesAsync(token);
-
-                return Ok(results > 0);
+                return Ok(true);
             });
         }
 
@@ -72,10 +72,12 @@ namespace Sheaft.Application.Handlers
         {
             return await ExecuteAsync(request, async () =>
             {
-                var entity = await _context.Returnables.SingleOrDefaultAsync(a => a.Id == request.Id && a.RemovedOn.HasValue, token);                
+                var entity = await _context.Returnables.SingleOrDefaultAsync(a => a.Id == request.Id && a.RemovedOn.HasValue, token);     
+                
                 _context.Restore(entity);
+                await _context.SaveChangesAsync(token);
 
-                return Ok(await _context.SaveChangesAsync(token) > 0);
+                return Ok(true);
             });
         }
     }

@@ -32,9 +32,9 @@ namespace Sheaft.Web.Manage.Controllers
             var requestUser = await GetRequestUser(token);
 
             ViewBag.Consumers = await _context.Users.OfType<Consumer>().CountAsync(c => !c.RemovedOn.HasValue, token);
-            //ViewBag.Tags = await _context.Tags.CountAsync(c => !c.RemovedOn.HasValue, token);
-            //ViewBag.Departments = await _context.Departments.CountAsync(token);
-            //ViewBag.Regions = await _context.Regions.CountAsync(token);
+            ViewBag.Tags = await _context.Tags.CountAsync(c => !c.RemovedOn.HasValue, token);
+            ViewBag.Departments = await _context.Departments.CountAsync(token);
+            ViewBag.Regions = await _context.Regions.CountAsync(token);
             //ViewBag.Levels = await _context.Levels.CountAsync(c => !c.RemovedOn.HasValue, token);
             //ViewBag.Rewards = await _context.Rewards.CountAsync(c => !c.RemovedOn.HasValue, token);
 

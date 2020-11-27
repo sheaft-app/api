@@ -6,90 +6,77 @@
     string status = ((TransactionStatus?)ViewBag.Status)?.ToString("G");
 }
 
-    <div class="container">
-        <h2 class="display-5">Transfers</h2>
-        <br />
+<div class="container">
+    <h2 class="display-5">Transfers</h2>
+    <br />
 
-        @if (ViewBag.Edited != null)
+    <div class="btn-group">
+        <label class="btn btn-secondary @(status == null ? "active": "")">
+            <a asp-controller="Transfers" asp-action="Index" asp-route-status="" asp-route-take="@take" asp-route-page="@currentPage" class="text-white">All</a>
+        </label>
+        @foreach (var existingStatus in Enum.GetNames(typeof(TransactionStatus)))
         {
-            <div class="alert alert-success alert-dismissible fade show" role="alert">
-                <span>Successfully updated transfer @ViewBag.Edited.Name</span>
-                <a asp-controller="Transfers" asp-action="Details" asp-route-id="@ViewBag.Edited.Id">View details</a>
-
-                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <br />
-        }
-
-        <div class="btn-group">
-            <label class="btn btn-secondary @(status == null ? "active": "")">
-                <a asp-controller="Transfers" asp-action="Index" asp-route-status="" asp-route-take="@take" asp-route-page="@currentPage" class="text-white">All</a>
+            <label class="btn btn-secondary @(status == existingStatus ? "active": "")">
+                <a asp-controller="Transfers" asp-action="Index" asp-route-status="@existingStatus" asp-route-take="@take" asp-route-page="@currentPage" class="text-white">@existingStatus</a>
             </label>
-            @foreach (var existingStatus in Enum.GetNames(typeof(TransactionStatus)))
-            {
-                <label class="btn btn-secondary @(status == existingStatus ? "active": "")">
-                    <a asp-controller="Transfers" asp-action="Index" asp-route-status="@existingStatus" asp-route-take="@take" asp-route-page="@currentPage" class="text-white">@existingStatus</a>
-                </label>
-            }
-        </div>
-        <br />
+        }
+    </div>
+    <br />
 
-        <table class="table table-hover">
-            <thead class="thead-dark">
+    <table class="table table-hover">
+        <thead class="thead-dark">
+            <tr>
+                <th scope="col">Identifier</th>
+                <th scope="col">CreatedOn</th>
+                <th scope="col">Debited</th>
+                <th scope="col">From</th>
+                <th scope="col">Credited</th>
+                <th scope="col">To</th>
+                <th scope="col">Status</th>
+                <th scope="col">ExecutedOn</th>
+                <th scope="col">Code</th>
+                <th scope="col">
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var entity in Model)
+            {
                 <tr>
-                    <th scope="col">Identifier</th>
-                    <th scope="col">CreatedOn</th>
-                    <th scope="col">Debited</th>
-                    <th scope="col">From</th>
-                    <th scope="col">Credited</th>
-                    <th scope="col">To</th>
-                    <th scope="col">Status</th>
-                    <th scope="col">ExecutedOn</th>
-                    <th scope="col">Code</th>
-                    <th scope="col">
-                    </th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var entity in Model)
-                {
-                    <tr>
-                        <th scope="row">@entity.Identifier</th>
-                        <td>@entity.CreatedOn.ToString("dd/MM/yy hh:mm")</td>
-                        <td>@entity.Debited€</td>
-                        <td>@entity.DebitedUser.Name</td>
-                        <td>@entity.Credited€</td>
-                        <td>@entity.CreditedUser.Name</td>
-                        <td>@entity.Status.ToString("G")</td>
-                        <td>@entity.ExecutedOn?.ToString("dd/MM/yy hh:mm")</td>
-                        <td>@entity.ResultCode</td>
-                        <td>
-                            <a asp-controller="Transfers" asp-action="Details" asp-route-id="@entity.Id" class="btn btn-info">
-                                <i class="fa fa-eye"></i>
-                            </a>
-                        </td>
-                    </tr>
-                }
-            </tbody>
-            <tfoot>
-                <tr class="text-center">
-                    <td colspan="6">
-                        @if (currentPage >= 1)
-                        {
-                            <a asp-controller="Transfers" asp-action="Index" asp-route-take="@take" asp-route-page="@(currentPage-1)" class="btn btn-outline-secondary">
-                                <i class="fa fa-caret-left"></i>
-                            </a>
-                        }
-                        @if (take == Model.Count())
-                        {
-                            <a asp-controller="Transfers" asp-action="Index" asp-route-take="@take" asp-route-page="@(currentPage+1)" class="btn btn-outline-secondary">
-                                <i class="fa fa-caret-right"></i>
-                            </a>
-                        }
+                    <th scope="row">@entity.Identifier</th>
+                    <td>@entity.CreatedOn.ToString("dd/MM/yy hh:mm")</td>
+                    <td>@entity.Debited€</td>
+                    <td>@entity.DebitedUser.Name</td>
+                    <td>@entity.Credited€</td>
+                    <td>@entity.CreditedUser.Name</td>
+                    <td>@entity.Status.ToString("G")</td>
+                    <td>@entity.ExecutedOn?.ToString("dd/MM/yy hh:mm")</td>
+                    <td>@entity.ResultCode</td>
+                    <td>
+                        <a asp-controller="Transfers" asp-action="Edit" asp-route-id="@entity.Id" class="btn btn-info">
+                            <i class="fa fa-eye"></i>
+                        </a>
                     </td>
                 </tr>
-            </tfoot>
-        </table>
-    </div>
+            }
+        </tbody>
+        <tfoot>
+            <tr class="text-center">
+                <td colspan="6">
+                    @if (currentPage >= 1)
+                    {
+                        <a asp-controller="Transfers" asp-action="Index" asp-route-take="@take" asp-route-page="@(currentPage-1)" class="btn btn-outline-secondary">
+                            <i class="fa fa-caret-left"></i>
+                        </a>
+                    }
+                    @if (take == Model.Count())
+                    {
+                        <a asp-controller="Transfers" asp-action="Index" asp-route-take="@take" asp-route-page="@(currentPage+1)" class="btn btn-outline-secondary">
+                            <i class="fa fa-caret-right"></i>
+                        </a>
+                    }
+                </td>
+            </tr>
+        </tfoot>
+    </table>
+</div>

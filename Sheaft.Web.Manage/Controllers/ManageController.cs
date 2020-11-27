@@ -80,5 +80,15 @@ namespace Sheaft.Web.Manage.Controllers
             return requestUser;
         }
 
+        protected async Task<IEnumerable<CountryViewModel>> GetCountries(CancellationToken token)
+        {
+            return await _context.Countries.AsNoTracking().ProjectTo<CountryViewModel>(_configurationProvider).ToListAsync(token);
+        }
+
+        protected async Task<IEnumerable<NationalityViewModel>> GetNationalities(CancellationToken token)
+        {
+            return await _context.Nationalities.AsNoTracking().ProjectTo<NationalityViewModel>(_configurationProvider).ToListAsync(token);
+        }
+
     }
 }

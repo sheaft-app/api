@@ -143,8 +143,8 @@ namespace Sheaft.Application.Handlers
             return await ExecuteAsync(request, async () =>
             {
                 var entity = await _context.GetByIdAsync<Agreement>(request.Id, token);
-                entity.RefuseAgreement(request.Reason);
 
+                entity.RefuseAgreement(request.Reason);
                 await _context.SaveChangesAsync(token);
 
                 _mediatr.Post(new AgreementRefusedEvent(request.RequestUser) { AgreementId = entity.Id });
@@ -169,9 +169,9 @@ namespace Sheaft.Application.Handlers
         {
             return await ExecuteAsync(request, async () =>
             {
-                var entity = await _context.Agreements.SingleOrDefaultAsync(a => a.Id == request.Id && a.RemovedOn.HasValue, token);
-                entity.Reset();
+                var entity = await _context.Agreements.SingleOrDefaultAsync(a => a.Id == request.Id, token);
 
+                entity.Reset();
                 await _context.SaveChangesAsync(token);
 
                 return Ok(true);

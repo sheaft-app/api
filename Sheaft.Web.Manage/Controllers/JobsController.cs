@@ -4,11 +4,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Newtonsoft.Json;
 using Sheaft.Application.Commands;
 using Sheaft.Exceptions;
 using Sheaft.Application.Interop;
-using Sheaft.Web.Manage.Models;
 using Sheaft.Application.Models;
 using Sheaft.Options;
 using System;
@@ -59,13 +57,6 @@ namespace Sheaft.Web.Manage.Controllers
                 .ProjectTo<JobViewModel>(_configurationProvider)
                 .ToListAsync(token);
 
-            var edited = (string)TempData["Edited"];
-            ViewBag.Edited = !string.IsNullOrWhiteSpace(edited) ? JsonConvert.DeserializeObject(edited) : null;
-
-            var restored = (string)TempData["Restored"];
-            ViewBag.Restored = !string.IsNullOrWhiteSpace(restored) ? JsonConvert.DeserializeObject(restored) : null;
-
-            ViewBag.Removed = TempData["Removed"];
             ViewBag.Page = page;
             ViewBag.Take = take;
             ViewBag.Status = status;
@@ -92,8 +83,7 @@ namespace Sheaft.Web.Manage.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(JobViewModel model, CancellationToken token)
         {
-            var requestUser = await GetRequestUser(token);
-            var result = await _mediatr.Process(new UpdateJobCommand(requestUser)
+            var result = await _mediatr.Process(new UpdateJobCommand(await GetRequestUser(token))
             {
                 Id = model.Id,
                 Name = model.Name
@@ -105,27 +95,22 @@ namespace Sheaft.Web.Manage.Controllers
                 return View(model);
             }
 
-            TempData["Edited"] = JsonConvert.SerializeObject(new EntityViewModel { Id = model.Id, Name = model.Name });
-            return RedirectToAction("Index");
+            return RedirectToAction("Edit", new { model.Id });
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Archive(Guid id, CancellationToken token)
         {
-            var requestUser = await GetRequestUser(token);
-            var result = await _mediatr.Process(new ArchiveJobCommand(requestUser)
+            var result = await _mediatr.Process(new ArchiveJobCommand(await GetRequestUser(token))
             {
                 Id = id
             }, token);
 
             if (!result.Success)
-            {
-                ModelState.AddModelError("", result.Exception.Message);
-                return RedirectToAction("Edit", new { id = id });
-            }
+                throw result.Exception;
 
-            return RedirectToAction("Edit", new { id = id });
+            return RedirectToAction("Edit", new { id });
         }
 
         [HttpPost]
@@ -139,152 +124,113 @@ namespace Sheaft.Web.Manage.Controllers
             }, token);
 
             if (!result.Success)
-            {
-                ModelState.AddModelError("", result.Exception.Message);
-                return RedirectToAction("Edit", new { id = id });
-            }
+                throw result.Exception;
 
-            return RedirectToAction("Edit", new { id = id });
+            return RedirectToAction("Edit", new { id });
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Resume(Guid id, CancellationToken token)
         {
-            var requestUser = await GetRequestUser(token);
-            var result = await _mediatr.Process(new ResumeJobCommand(requestUser)
+            var result = await _mediatr.Process(new ResumeJobCommand(await GetRequestUser(token))
             {
                 Id = id
             }, token);
 
             if (!result.Success)
-            {
-                ModelState.AddModelError("", result.Exception.Message);
-                return RedirectToAction("Edit", new { id = id });
-            }
+                throw result.Exception;
 
-            return RedirectToAction("Edit", new { id = id });
+            return RedirectToAction("Edit", new { id });
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Cancel(Guid id, CancellationToken token)
         {
-            var requestUser = await GetRequestUser(token);
-            var result = await _mediatr.Process(new CancelJobCommand(requestUser)
+            var result = await _mediatr.Process(new CancelJobCommand(await GetRequestUser(token))
             {
                 Id = id
             }, token);
 
             if (!result.Success)
-            {
-                ModelState.AddModelError("", result.Exception.Message);
-                return RedirectToAction("Edit", new { id = id });
-            }
+                throw result.Exception;
 
-            return RedirectToAction("Edit", new { id = id });
+            return RedirectToAction("Edit", new { id });
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Retry(Guid id, CancellationToken token)
         {
-            var requestUser = await GetRequestUser(token);
-            var result = await _mediatr.Process(new RetryJobCommand(requestUser)
+            var result = await _mediatr.Process(new RetryJobCommand(await GetRequestUser(token))
             {
                 Id = id
             }, token);
 
             if (!result.Success)
-            {
-                ModelState.AddModelError("", result.Exception.Message);
-                return RedirectToAction("Edit", new { id = id });
-            }
+                throw result.Exception;
 
-            return RedirectToAction("Edit", new { id = id });
+            return RedirectToAction("Edit", new { id });
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Unarchive(Guid id, CancellationToken token)
         {
-            var requestUser = await GetRequestUser(token);
-            var result = await _mediatr.Process(new UnarchiveJobCommand(requestUser)
+            var result = await _mediatr.Process(new UnarchiveJobCommand(await GetRequestUser(token))
             {
                 Id = id
             }, token);
 
             if (!result.Success)
-            {
-                ModelState.AddModelError("", result.Exception.Message);
-                return RedirectToAction("Edit", new { id = id });
-            }
+                throw result.Exception;
 
-            return RedirectToAction("Edit", new { id = id });
+            return RedirectToAction("Edit", new { id });
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Reset(Guid id, CancellationToken token)
         {
-            var requestUser = await GetRequestUser(token);
-            var result = await _mediatr.Process(new ResetJobCommand(requestUser)
+            var result = await _mediatr.Process(new ResetJobCommand(await GetRequestUser(token))
             {
                 Id = id
             }, token);
 
             if (!result.Success)
-            {
-                ModelState.AddModelError("", result.Exception.Message);
-                return RedirectToAction("Edit", new { id = id });
-            }
+                throw result.Exception;
 
-            return RedirectToAction("Edit", new { id = id });
-        }
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Delete(Guid id, CancellationToken token)
-        {
-            var entity = await _context.Jobs.SingleOrDefaultAsync(c => c.Id == id, token);
-            var name = entity.Name;
-
-            var requestUser = await GetRequestUser(token);
-            var result = await _mediatr.Process(new DeleteJobCommand(requestUser)
-            {
-                Id = id
-            }, token);
-
-            if (!result.Success)
-            {
-                ModelState.AddModelError("", result.Exception.Message);
-                return RedirectToAction("Index");
-            }
-
-            TempData["Removed"] = name;
-            return RedirectToAction("Index");
+            return RedirectToAction("Edit", new { id });
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Restore(Guid id, CancellationToken token)
         {
-            var entity = await _context.Jobs.SingleOrDefaultAsync(c => c.Id == id, token);
-            var name = entity.Name;
-
-            var requestUser = await GetRequestUser(token);
-            var result = await _mediatr.Process(new RestoreJobCommand(requestUser)
+            var result = await _mediatr.Process(new RestoreJobCommand(await GetRequestUser(token))
             {
                 Id = id
             }, token);
 
             if (!result.Success)
-            {
-                ModelState.AddModelError("", result.Exception.Message);
-                return RedirectToAction("Index");
-            }
+                throw result.Exception;
 
-            TempData["Restored"] = JsonConvert.SerializeObject(new EntityViewModel { Id = entity.Id, Name = name });
+            return RedirectToAction("Edit", new { id });
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Delete(Guid id, CancellationToken token)
+        {
+            var result = await _mediatr.Process(new DeleteJobCommand(await GetRequestUser(token))
+            {
+                Id = id
+            }, token);
+
+            if (!result.Success)
+                throw result.Exception;
+
             return RedirectToAction("Index");
         }
     }

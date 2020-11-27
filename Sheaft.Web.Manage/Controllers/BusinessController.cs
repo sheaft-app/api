@@ -3,8 +3,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Sheaft.Domain.Models;
-using Sheaft.Exceptions;
 using Sheaft.Application.Interop;
 using Sheaft.Options;
 using System;
@@ -12,20 +10,21 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Sheaft.Domain.Enums;
+using Sheaft.Exceptions;
 
 namespace Sheaft.Web.Manage.Controllers
 {
-    public class UsersController : ManageController
+    public class BusinessController : ManageController
     {
-        private readonly ILogger<UsersController> _logger;
+        private readonly ILogger<BusinessController> _logger;
 
-        public UsersController(
+        public BusinessController(
             IAppDbContext context,
             IMapper mapper,
             ISheaftMediatr mediatr,
             IOptionsSnapshot<RoleOptions> roleOptions,
             IConfigurationProvider configurationProvider,
-            ILogger<UsersController> logger) : base(context, mapper, roleOptions, mediatr, configurationProvider)
+            ILogger<BusinessController> logger) : base(context, mapper, roleOptions, mediatr, configurationProvider)
         {
             _logger = logger;
         }
@@ -33,7 +32,7 @@ namespace Sheaft.Web.Manage.Controllers
         [HttpGet]
         public async Task<IActionResult> Edit(Guid id, CancellationToken token)
         {
-            var entity = await _context.Users.OfType<User>()
+            var entity = await _context.Users
                 .AsNoTracking()
                 .Where(c => c.Id == id)
                 .SingleOrDefaultAsync(token);
@@ -41,21 +40,16 @@ namespace Sheaft.Web.Manage.Controllers
             if (entity == null)
                 throw new NotFoundException();
 
-            var controller = string.Empty;
-            switch (entity.Kind)
-            {
-                case ProfileKind.Consumer:
-                    controller = "Consumers";
-                    break;
-                case ProfileKind.Producer:
-                    controller = "Producers";
-                    break;
-                case ProfileKind.Store:
-                    controller = "Stores";
-                    break;
-            }
+            if (entity.Kind == ProfileKind.Consumer)
+                return RedirectToAction("Edit", "Consumers", new { id });
 
-            return RedirectToAction("Edit", controller, new { id });
+            if (entity.Kind == ProfileKind.Producer)
+                return RedirectToAction("Edit", "Producers", new { id });
+
+            if (entity.Kind == ProfileKind.Store)
+                return RedirectToAction("Edit", "Stores", new { id });
+
+            return RedirectToAction("Index", "Dashboard");
         }
     }
 }

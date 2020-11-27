@@ -11,44 +11,6 @@
     <h2 class="display-5">Purchase Orders</h2>
     <br />
 
-    @if (ViewBag.Removed != null)
-    {
-        <div class="alert alert-success alert-dismissible fade show" role="alert">
-            <span>Successfully removed purchase order @ViewBag.Removed</span>
-
-            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-            </button>
-        </div>
-        <br />
-    }
-
-    @if (ViewBag.Restored != null)
-    {
-        <div class="alert alert-success alert-dismissible fade show" role="alert">
-            <span>Successfully restored purchase order @ViewBag.Restored.Name</span>
-            <a asp-controller="PurchaseOrders" asp-action="Details" asp-route-id="@ViewBag.Restored.Id">View details</a>
-
-            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-            </button>
-        </div>
-        <br />
-    }
-
-    @if (ViewBag.Edited != null)
-    {
-        <div class="alert alert-success alert-dismissible fade show" role="alert">
-            <span>Successfully updated purchase order @ViewBag.Edited.Name</span>
-            <a asp-controller="PurchaseOrders" asp-action="Details" asp-route-id="@ViewBag.Edited.Id">View details</a>
-
-            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-            </button>
-        </div>
-        <br />
-    }
-
     <div class="btn-group">
         <label class="btn btn-secondary @(status == null ? "active": "")">
             <a asp-controller="PurchaseOrders" asp-action="Index" asp-route-status="" asp-route-take="@take" asp-route-page="@currentPage" class="text-white">All</a>
@@ -111,7 +73,7 @@
                         }
                     </td>
                     <td>
-                        <a asp-controller="PurchaseOrders" asp-action="Details" asp-route-id="@entity.Id" class="btn btn-info">
+                        <a asp-controller="PurchaseOrders" asp-action="Edit" asp-route-id="@entity.Id" class="btn btn-info">
                             <i class="fa fa-pen"></i>
                         </a>
 

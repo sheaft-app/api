@@ -4,11 +4,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Newtonsoft.Json;
 using Sheaft.Application.Commands;
 using Sheaft.Exceptions;
 using Sheaft.Application.Interop;
-using Sheaft.Web.Manage.Models;
 using Sheaft.Application.Models;
 using Sheaft.Options;
 using System;
@@ -51,9 +49,6 @@ namespace Sheaft.Web.Manage.Controllers
                 .ProjectTo<RegionViewModel>(_configurationProvider)
                 .ToListAsync(token);
 
-            var edited = (string)TempData["Edited"];
-            ViewBag.Edited = !string.IsNullOrWhiteSpace(edited) ? JsonConvert.DeserializeObject(edited) : null;
-
             ViewBag.Page = page;
             ViewBag.Take = take;
 
@@ -80,8 +75,7 @@ namespace Sheaft.Web.Manage.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(RegionViewModel model, CancellationToken token)
         {
-            var requestUser = await GetRequestUser(token);
-            var result = await _mediatr.Process(new UpdateRegionCommand(requestUser)
+            var result = await _mediatr.Process(new UpdateRegionCommand(await GetRequestUser(token))
             {
                 Id = model.Id,
                 Name = model.Name,
@@ -94,7 +88,6 @@ namespace Sheaft.Web.Manage.Controllers
                 return View(model);
             }
 
-            TempData["Edited"] = JsonConvert.SerializeObject(new EntityViewModel { Id = model.Id, Name = model.Name });
             return RedirectToAction("Index");
         }
     }

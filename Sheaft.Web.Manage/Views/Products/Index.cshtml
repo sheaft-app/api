@@ -9,44 +9,6 @@
 <div class="container">
     <h2 class="display-5">Products</h2>
 
-    @if (ViewBag.Removed != null)
-    {
-        <div class="alert alert-success alert-dismissible fade show" role="alert">
-            <span>Successfully removed product @ViewBag.Removed</span>
-
-            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-            </button>
-        </div>
-        <br />
-    }
-
-    @if (ViewBag.Restored != null)
-    {
-        <div class="alert alert-success alert-dismissible fade show" role="alert">
-            <span>Successfully restored product @ViewBag.Restored.Name</span>
-            <a asp-controller="Products" asp-action="Edit" asp-route-id="@ViewBag.Restored.Id">View details</a>
-
-            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-            </button>
-        </div>
-        <br />
-    }
-
-    @if (ViewBag.Edited != null)
-    {
-        <div class="alert alert-success alert-dismissible fade show" role="alert">
-            <span>Successfully updated product @ViewBag.Edited.Name</span>
-            <a asp-controller="Products" asp-action="Edit" asp-route-id="@ViewBag.Edited.Id">View details</a>
-
-            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-            </button>
-        </div>
-        <br />
-    }
-
     @if (Context.Request.ImpersonificationId().HasValue)
     {
         <a href="https://content.sheaft.com/resources/excel/sheaft_catalogue_produits.xlsx" target="_blank">Download sample products catalog</a>

@@ -10,44 +10,6 @@
     <h2 class="display-5">DeliveryModes</h2>
     <br />
 
-    @if (ViewBag.Removed != null)
-    {
-        <div class="alert alert-success alert-dismissible fade show" role="alert">
-            <span>Successfully removed delivery mode @ViewBag.Removed</span>
-
-            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-            </button>
-        </div>
-        <br />
-    }
-
-    @if (ViewBag.Restored != null)
-    {
-        <div class="alert alert-success alert-dismissible fade show" role="alert">
-            <span>Successfully restored deliveryMode @ViewBag.Restored.Name</span>
-            <a asp-controller="DeliveryModes" asp-action="Edit" asp-route-id="@ViewBag.Restored.Id">View details</a>
-
-            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-            </button>
-        </div>
-        <br />
-    }
-
-    @if (ViewBag.Edited != null)
-    {
-        <div class="alert alert-success alert-dismissible fade show" role="alert">
-            <span>Successfully updated delivery mode @ViewBag.Edited.Name</span>
-            <a asp-controller="DeliveryModes" asp-action="Edit" asp-route-id="@ViewBag.Edited.Id">View details</a>
-
-            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-            </button>
-        </div>
-        <br />
-    }
-
     <table class="table table-hover">
         <thead class="thead-dark">
             <tr>

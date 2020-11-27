@@ -104,7 +104,21 @@
                 </div>
             </div>
         </div>
-
+        <br />
+        <h4>Legals</h4>
+        @if (ViewBag.LegalsId != null)
+        {
+            <a asp-controller="Legals" asp-action="EditLegalBusiness" asp-route-id="@ViewBag.LegalsId" class="btn btn-info">
+                Legals details
+            </a>
+        }
+        else
+        {
+            <a asp-controller="Legals" asp-action="CreateLegalBusiness" asp-route-userId="@Model.Id" class="btn btn-info">
+                Create Legals
+            </a>
+        }
+        <br />
         <br />
         <a asp-controller="Stores" asp-action="Index" class="btn btn-light">
             Cancel

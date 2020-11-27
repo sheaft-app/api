@@ -4,10 +4,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Newtonsoft.Json;
 using Sheaft.Exceptions;
 using Sheaft.Application.Interop;
-using Sheaft.Web.Manage.Models;
 using Sheaft.Options;
 using System;
 using System.Linq;
@@ -59,13 +57,6 @@ namespace Sheaft.Web.Manage.Controllers
                 .ProjectTo<OrderViewModel>(_configurationProvider)
                 .ToListAsync(token);
 
-            var edited = (string)TempData["Edited"];
-            ViewBag.Edited = !string.IsNullOrWhiteSpace(edited) ? JsonConvert.DeserializeObject(edited) : null;
-
-            var restored = (string)TempData["Restored"];
-            ViewBag.Restored = !string.IsNullOrWhiteSpace(restored) ? JsonConvert.DeserializeObject(restored) : null;
-
-            ViewBag.Removed = TempData["Removed"];
             ViewBag.Page = page;
             ViewBag.Take = take;
             ViewBag.Status = status;
@@ -74,7 +65,7 @@ namespace Sheaft.Web.Manage.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Details(Guid id, CancellationToken token)
+        public async Task<IActionResult> Edit(Guid id, CancellationToken token)
         {
             var entity = await _context.Orders
                 .AsNoTracking()
@@ -92,64 +83,60 @@ namespace Sheaft.Web.Manage.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Expire(OrderViewModel model, CancellationToken token)
         {
-            var requestUser = await GetRequestUser(token);
-            var result = await _mediatr.Process(new ExpireOrderCommand(requestUser) { OrderId = model.Id }, token);
-            if (!result.Success)
+            var result = await _mediatr.Process(new ExpireOrderCommand(await GetRequestUser(token))
             {
-                ModelState.AddModelError("", result.Exception.Message);
-                return View("Details", model);
-            }
+                OrderId = model.Id
+            }, token);
 
-            TempData["Edited"] = JsonConvert.SerializeObject(new EntityViewModel { Id = model.Id, Name = model.Payin?.Identifier });
-            return RedirectToAction("Index");
+            if (!result.Success)
+                throw result.Exception;
+
+            return RedirectToAction("Edit", new { model.Id });
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Confirm(OrderViewModel model, CancellationToken token)
         {
-            var requestUser = await GetRequestUser(token);
-            var result = await _mediatr.Process(new ConfirmOrderCommand(requestUser) { OrderId = model.Id }, token);
-            if (!result.Success)
+            var result = await _mediatr.Process(new ConfirmOrderCommand(await GetRequestUser(token))
             {
-                ModelState.AddModelError("", result.Exception.Message);
-                return View("Details", model);
-            }
+                OrderId = model.Id
+            }, token);
 
-            TempData["Edited"] = JsonConvert.SerializeObject(new EntityViewModel { Id = model.Id, Name = model.Payin?.Identifier });
-            return RedirectToAction("Index");
+            if (!result.Success)
+                throw result.Exception;
+
+            return RedirectToAction("Edit", new { model.Id });
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Fail(OrderViewModel model, CancellationToken token)
         {
-            var requestUser = await GetRequestUser(token);
-            var result = await _mediatr.Process(new FailOrderCommand(requestUser) { OrderId = model.Id }, token);
-            if (!result.Success)
+            var result = await _mediatr.Process(new FailOrderCommand(await GetRequestUser(token))
             {
-                ModelState.AddModelError("", result.Exception.Message);
-                return View("Details", model);
-            }
+                OrderId = model.Id
+            }, token);
 
-            TempData["Edited"] = JsonConvert.SerializeObject(new EntityViewModel { Id = model.Id, Name = model.Payin?.Identifier });
-            return RedirectToAction("Index");
+            if (!result.Success)
+                throw result.Exception;
+
+            return RedirectToAction("Edit", new { model.Id });
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Retry(OrderViewModel model, CancellationToken token)
         {
-            var requestUser = await GetRequestUser(token);
-            var result = await _mediatr.Process(new RetryOrderCommand(requestUser) { OrderId = model.Id }, token);
-            if (!result.Success)
+            var result = await _mediatr.Process(new RetryOrderCommand(await GetRequestUser(token))
             {
-                ModelState.AddModelError("", result.Exception.Message);
-                return View("Details", model);
-            }
+                OrderId = model.Id
+            }, token);
 
-            TempData["Edited"] = JsonConvert.SerializeObject(new EntityViewModel { Id = model.Id, Name = model.Payin?.Identifier });
-            return RedirectToAction("Index");
+            if (!result.Success)
+                throw result.Exception;
+
+            return RedirectToAction("Edit", new { model.Id });
         }
     }
 }
