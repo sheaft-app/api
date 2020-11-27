@@ -4,7 +4,7 @@ api:
   insecure: false
 date_format: 02/01/2006 15:04:05 MST
 monitors:
-  - name: graphql
+  - name: API GraphQL
     target: https://api.sheaft.com/health/livez
     strict: true
     method: GET    
@@ -12,16 +12,17 @@ monitors:
     metric_id: 1
     template:
       investigating:
-        subject: "{{ .Monitor.Name }} - {{ .SystemName }}"
-        message: "{{ .Monitor.Name }} check **failed** (server time: {{ .now }})\n\n{{ .FailReason }}"
+        subject: "Service {{ .Monitor.Name }} injoignable"
+        message: "La vérification de fonctionnement du service '{{ .Monitor.Name }}' a échouée à {{ .now }})\n\nRaison: {{ .FailReason }}"
       fixed:
-        subject: "GraphQL Fixed"    
-    interval: 60
+        subject: "Service {{ .Monitor.Name }} rétabli" 
+        message: "Le service '{{ .Monitor.Name }}' répond de nouveau aux solicitations à {{ .now }})"  
+    interval: 300
     timeout: 10
     threshold: 80
     expected_status_code: 200
     expected_body: "OK"
-  - name: jobs
+  - name: Tâches de fond
     target: https://jobs.sheaft.com/health/livez
     strict: true
     method: GET    
@@ -29,16 +30,17 @@ monitors:
     metric_id: 2
     template:
       investigating:
-        subject: "{{ .Monitor.Name }} - {{ .SystemName }}"
-        message: "{{ .Monitor.Name }} check **failed** (server time: {{ .now }})\n\n{{ .FailReason }}"
+        subject: "Service {{ .Monitor.Name }} injoignable"
+        message: "La vérification de fonctionnement du service '{{ .Monitor.Name }}' a échouée à {{ .now }})\n\nRaison: {{ .FailReason }}"
       fixed:
-        subject: "Jobs Fixed"    
-    interval: 60
+        subject: "Service {{ .Monitor.Name }} rétabli"   
+        message: "Le service '{{ .Monitor.Name }}' répond de nouveau aux solicitations à {{ .now }})" 
+    interval: 300
     timeout: 10
     threshold: 80
     expected_status_code: 200
     expected_body: "OK"
-  - name: payment
+  - name: Notifications de Paiement
     target: https://payment.sheaft.com/health/livez
     strict: true
     method: GET    
@@ -46,16 +48,17 @@ monitors:
     metric_id: 3
     template:
       investigating:
-        subject: "{{ .Monitor.Name }} - {{ .SystemName }}"
-        message: "{{ .Monitor.Name }} check **failed** (server time: {{ .now }})\n\n{{ .FailReason }}"
+        subject: "Service {{ .Monitor.Name }} injoignable"
+        message: "La vérification de fonctionnement du service '{{ .Monitor.Name }}' a échouée à {{ .now }})\n\nRaison: {{ .FailReason }}"
       fixed:
-        subject: "Payment Fixed"    
-    interval: 60
+        subject: "Service {{ .Monitor.Name }} rétabli" 
+        message: "Le service '{{ .Monitor.Name }}' répond de nouveau aux solicitations à {{ .now }})" 
+    interval: 300
     timeout: 10
     threshold: 80
     expected_status_code: 200
     expected_body: "OK"
-  - name: signalr
+  - name: Notifications Web
     target: https://signalr.sheaft.com/health/livez
     strict: true
     method: GET    
@@ -63,16 +66,17 @@ monitors:
     metric_id: 4
     template:
       investigating:
-        subject: "{{ .Monitor.Name }} - {{ .SystemName }}"
-        message: "{{ .Monitor.Name }} check **failed** (server time: {{ .now }})\n\n{{ .FailReason }}"
+        subject: "Service {{ .Monitor.Name }} injoignable"
+        message: "La vérification de fonctionnement du service '{{ .Monitor.Name }}' a échouée à {{ .now }})\n\nRaison: {{ .FailReason }}"
       fixed:
-        subject: "Signalr Fixed"    
-    interval: 60
+        subject: "Service {{ .Monitor.Name }} rétabli"  
+        message: "Le service '{{ .Monitor.Name }}' répond de nouveau aux solicitations à {{ .now }})" 
+    interval: 300
     timeout: 10
     threshold: 80
     expected_status_code: 200
     expected_body: "OK"    
-  - name: identity
+  - name: Authentification
     target: https://auth.sheaft.com/health/livez
     strict: true
     method: GET    
@@ -80,11 +84,12 @@ monitors:
     metric_id: 5
     template:
       investigating:
-        subject: "{{ .Monitor.Name }} - {{ .SystemName }}"
-        message: "{{ .Monitor.Name }} check **failed** (server time: {{ .now }})\n\n{{ .FailReason }}"
+        subject: "Service {{ .Monitor.Name }} injoignable"
+        message: "La vérification de fonctionnement du service '{{ .Monitor.Name }}' a échouée à {{ .now }})\n\nRaison: {{ .FailReason }}"
       fixed:
-        subject: "Identity Fixed"    
-    interval: 60
+        subject: "Service {{ .Monitor.Name }} rétabli" 
+        message: "Le service '{{ .Monitor.Name }}' répond de nouveau aux solicitations à {{ .now }})" 
+    interval: 300
     timeout: 10
     threshold: 80
     expected_status_code: 200
