@@ -7,10 +7,6 @@ using Microsoft.Extensions.Logging;
 using System.Threading.Tasks;
 using System.Threading;
 using Sheaft.Domain.Models;
-using Sheaft.Domain.Enums;
-using System.Linq;
-using Microsoft.EntityFrameworkCore;
-using Sheaft.Application.Events;
 
 namespace Sheaft.Application.Handlers
 {
@@ -20,8 +16,7 @@ namespace Sheaft.Application.Handlers
            IRequestHandler<UpdateBusinessLegalCommand, Result<bool>>,
            IRequestHandler<UpdateConsumerLegalCommand, Result<bool>>,
            IRequestHandler<CheckBusinessLegalConfigurationCommand, Result<bool>>,
-           IRequestHandler<CheckConsumerLegalConfigurationCommand, Result<bool>>,
-           IRequestHandler<CheckLegalsDeclarationRequiredCommand, Result<bool>>
+           IRequestHandler<CheckConsumerLegalConfigurationCommand, Result<bool>>
     {
         private readonly IPspService _pspService;
 
@@ -255,38 +250,6 @@ namespace Sheaft.Application.Handlers
                 }
 
                 return Ok(true);
-            });
-        }
-
-        public async Task<Result<bool>> Handle(CheckLegalsDeclarationRequiredCommand request, CancellationToken token)
-        {
-            return await ExecuteAsync(request, async () =>
-            {
-                var legal = await _context.GetSingleAsync<BusinessLegal>(b => b.User.Id == request.UserId, token);
-                if (legal.User.Kind != ProfileKind.Producer)
-                    return Ok(false);
-
-                if (legal.DeclarationRequired)
-                    return Ok(legal.DeclarationRequired);
-
-                var currentMonth = DateTimeOffset.UtcNow.Month;
-                var cumulatedMonthAmount = await _context.PurchaseOrders
-                    .Get(po =>
-                        po.Vendor.Id == request.UserId &&
-                        po.Sender.Kind == ProfileKind.Consumer &&
-                        po.Status == PurchaseOrderStatus.Delivered &&
-                        po.DeliveredOn.HasValue &&
-                        po.DeliveredOn.Value.Month == currentMonth)
-                    .SumAsync(po => po.TotalOnSalePrice, token);
-
-                if (cumulatedMonthAmount >= 150)
-                {
-                    legal.SetDeclarationRequired(true);
-                    await _context.SaveChangesAsync(token);
-                    _mediatr.Post(new ProducerDeclarationRequiredEvent(request.RequestUser) { ProducerId = request.UserId });
-                }
-
-                return Ok(legal.DeclarationRequired);
             });
         }
     }

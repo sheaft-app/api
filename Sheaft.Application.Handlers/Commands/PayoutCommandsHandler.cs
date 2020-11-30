@@ -149,13 +149,13 @@ namespace Sheaft.Application.Handlers
                 if (!checkConfigurationResult.Success)
                     return Failed<Guid>(checkConfigurationResult.Exception);
 
-                var producerLegals = await _context.GetSingleAsync<BusinessLegal>(c => c.User.Id == request.ProducerId, token);
-                if (producerLegals.DeclarationRequired)
-                {
-                    var checkDocumentsResult = await _mediatr.Process(new EnsureProducerDocumentsValidatedCommand(request.RequestUser) { ProducerId = request.ProducerId }, token);
-                    if (!checkDocumentsResult.Success)
-                        return Failed<Guid>(checkDocumentsResult.Exception);
+                var producerLegals = await _context.GetSingleAsync<BusinessLegal>(c => c.User.Id == request.ProducerId, token);               
+                var checkDocumentsResult = await _mediatr.Process(new EnsureProducerDocumentsValidatedCommand(request.RequestUser) { ProducerId = request.ProducerId }, token);
+                if (!checkDocumentsResult.Success)
+                    return Failed<Guid>(checkDocumentsResult.Exception);
 
+                if (producerLegals.Kind == LegalKind.Business)
+                {
                     var checkDeclarationResult = await _mediatr.Process(new EnsureDeclarationIsValidatedCommand(request.RequestUser) { ProducerId = request.ProducerId }, token);
                     if (!checkDeclarationResult.Success)
                         return Failed<Guid>(checkDeclarationResult.Exception);
@@ -175,19 +175,16 @@ namespace Sheaft.Application.Handlers
                     token);
 
                 var amount = transfers.Sum(t => t.Credited);
-                var fees = 0m;
-                if (producerLegals.DeclarationRequired)
-                {
-                    var hasAlreadyPaidComission = await _context.AnyAsync<Payout>(
-                        p => p.Fees > 0
-                            && p.DebitedWallet.User.Id == request.ProducerId
-                            && p.Status != TransactionStatus.Failed,
-                        token);
+                var fees = 0m;               
+                var hasAlreadyPaidComission = await _context.AnyAsync<Payout>(
+                    p => p.Fees > 0
+                        && p.DebitedWallet.User.Id == request.ProducerId
+                        && p.Status != TransactionStatus.Failed,
+                    token);
                     
-                    fees = hasAlreadyPaidComission || amount < _pspOptions.ProducerFees ? 0m : _pspOptions.ProducerFees;
-                    if (!hasAlreadyPaidComission && fees == 0m)
-                        return Failed<Guid>(new Exception("Invalid fees for payout without paid commission."));
-                }
+                fees = hasAlreadyPaidComission || amount < _pspOptions.ProducerFees ? 0m : _pspOptions.ProducerFees;
+                if (!hasAlreadyPaidComission && fees == 0m)
+                    return Failed<Guid>(new Exception("Invalid fees for payout without paid commission."));
 
                 using (var transaction = await _context.BeginTransactionAsync(token))
                 {

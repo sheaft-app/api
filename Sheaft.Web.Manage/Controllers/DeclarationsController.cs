@@ -43,34 +43,12 @@ namespace Sheaft.Web.Manage.Controllers
             if (take > 100)
                 take = 100;
 
-            var legalIds = await _context.Legals
+            var entities = await _context.Legals
                 .OfType<BusinessLegal>()
-                .Get(c => c.DeclarationRequired && c.Declaration != null && c.Declaration.Status == DeclarationStatus.Validated)
-                .Select(c => c.Id)
-                .ToListAsync(token);
-
-            var currentMonth = DateTimeOffset.UtcNow.Month;
-            var query = await _context.PurchaseOrders.Get(d =>
-                d.Status >= PurchaseOrderStatus.Accepted
-                && d.Status < PurchaseOrderStatus.Refused)
-                .Where(d => d.CreatedOn.Month == currentMonth && !legalIds.Contains(d.Vendor.Id))
-                .Select(d => new { d.Vendor, d.TotalOnSalePrice })
-                .ToListAsync(token);
-
-            var results = query.GroupBy(c => c.Vendor).Select(d => new ProducerRequiredDeclarationViewModel
-            {
-                Id = d.Key.Id,
-                Name = d.Key.Name,
-                Email = d.Key.Email,
-                Phone = d.Key.Phone,
-                Total = d.Sum(e => e.TotalOnSalePrice)
-            }).Where(d => d.Total > 100);
-
-            var entities = results
-                .OrderByDescending(c => c.Total)
+                .OrderByDescending(c => c.CreatedOn)
                 .Skip(page * take)
                 .Take(take)
-                .ToList();
+                .ToListAsync(token);
 
             ViewBag.Page = page;
             ViewBag.Take = take;

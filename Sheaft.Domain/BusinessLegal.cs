@@ -20,7 +20,6 @@ namespace Sheaft.Domain.Models
             SetAddress(address);
             SetSiret(siret);
             SetVatIdentifier(vatIdentifier);
-            DeclarationRequired = false;
         }
 
         public string Name { get; set; }
@@ -29,8 +28,6 @@ namespace Sheaft.Domain.Models
         public string VatIdentifier { get; private set; }
         public virtual LegalAddress Address { get; private set; }
         public virtual Declaration Declaration { get; private set; }
-        public bool DeclarationRequired { get; private set; }
-        public bool IsComplete => !DeclarationRequired || (DeclarationRequired && Declaration?.Status == DeclarationStatus.Validated && Documents.All(d => d.Status == DocumentStatus.Validated));
 
         public void SetDeclaration()
         {
@@ -38,15 +35,6 @@ namespace Sheaft.Domain.Models
                 Declaration = null;
 
             Declaration = new Declaration(Guid.NewGuid());
-        }
-
-
-        public void SetDeclarationRequired(bool validationRequired)
-        {
-            if (DeclarationRequired)
-                throw new ValidationException(MessageKind.Legal_Cannot_Unrequire_Declaration);
-
-            DeclarationRequired = validationRequired;
         }
 
         public void SetSiret(string siret)
