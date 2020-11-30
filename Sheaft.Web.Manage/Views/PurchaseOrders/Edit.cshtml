@@ -3,171 +3,207 @@
     ViewData["Title"] = "Purchase Order details";
 }
 
-    <div class="container">
-        <h2 class="display-5">Purchase Order details @(Model.RemovedOn.HasValue ? "(removed)":"")</h2>
-        <br />
+<div class="container">
+    <h2 class="display-5">Purchase Order details @(Model.RemovedOn.HasValue ? "(removed)":"")</h2>
+    <br />
 
-        @using (Html.BeginForm("Edit", "PurchaseOrders", FormMethod.Post, new { @class = "form" }))
+    @using (Html.BeginForm("Edit", "PurchaseOrders", FormMethod.Post, new { @class = "form" }))
+    {
+        @Html.AntiForgeryToken()
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+        @Html.HiddenFor(model => model.Id)
+
+        <div class="form-group">
+            @Html.LabelFor(c => c.Reference, new { @class = "form-label" })
+            @Html.TextBoxFor(c => c.Reference, null, new { @class = "form-control", @disabled = "disabled" })
+        </div>
+        <div class="form-group">
+            @Html.LabelFor(c => c.Status, new { @class = "form-label" })
+            @Html.TextBoxFor(c => c.Status, null, new { @class = "form-control", @disabled = "disabled" })
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(m => m.CreatedOn)
+            @Html.TextBoxFor(m => m.CreatedOn, null, new { @class = "form-control", @disabled = "disabled" })
+        </div>
+        <div class="form-group">
+            @Html.LabelFor(m => m.UpdatedOn)
+            @Html.TextBoxFor(m => m.UpdatedOn, null, new { @class = "form-control", @disabled = "disabled" })
+        </div>
+
+        @if (Model.AcceptedOn.HasValue)
         {
-            @Html.AntiForgeryToken()
-            @Html.ValidationSummary(true, "", new { @class = "text-danger" })
-            @Html.HiddenFor(model => model.Id)
+            <div class="form-group">
+                @Html.LabelFor(m => m.AcceptedOn)
+                @Html.TextBoxFor(m => m.AcceptedOn, null, new { @class = "form-control", @disabled = "disabled" })
+            </div>
+        }
+        @if (Model.CompletedOn.HasValue)
+        {
+            <div class="form-group">
+                @Html.LabelFor(m => m.CompletedOn)
+                @Html.TextBoxFor(m => m.CompletedOn, null, new { @class = "form-control", @disabled = "disabled" })
+            </div>
+        }
+        @if (Model.DeliveredOn.HasValue)
+        {
+            <div class="form-group">
+                @Html.LabelFor(m => m.DeliveredOn)
+                @Html.TextBoxFor(m => m.DeliveredOn, null, new { @class = "form-control", @disabled = "disabled" })
+            </div>
+        }
+        @if (Model.RemovedOn.HasValue)
+        {
+            <div class="form-group">
+                @Html.LabelFor(m => m.RemovedOn)
+                @Html.TextBoxFor(m => m.RemovedOn, null, new { @class = "form-control", @disabled = "disabled" })
+            </div>
+        }
+        <div class="form-group">
+            @Html.LabelFor(c => c.TotalWholeSalePrice, new { @class = "form-label" })
+            @Html.TextBoxFor(c => c.TotalWholeSalePrice, null, new { @class = "form-control", @disabled = "disabled" })
+        </div>
+        <div class="form-group">
+            @Html.LabelFor(c => c.TotalVatPrice, new { @class = "form-label" })
+            @Html.TextBoxFor(c => c.TotalVatPrice, null, new { @class = "form-control", @disabled = "disabled" })
+        </div>
+        <div class="form-group">
+            @Html.LabelFor(c => c.TotalOnSalePrice, new { @class = "form-label" })
+            @Html.TextBoxFor(c => c.TotalOnSalePrice, null, new { @class = "form-control", @disabled = "disabled" })
+        </div>
+        <h4>Delivery</h4>
+        <div class="form-group">
+            @Html.LabelFor(c => c.ExpectedDelivery.ExpectedDeliveryDate, new { @class = "form-label" })
+            @Html.TextBoxFor(c => c.ExpectedDelivery.ExpectedDeliveryDate, null, new { @class = "form-control", @disabled = "disabled" })
+        </div>
+        <div class="form-group">
+            @Html.LabelFor(c => c.ExpectedDelivery.Kind, new { @class = "form-label" })
+            @Html.TextBoxFor(c => c.ExpectedDelivery.Kind, null, new { @class = "form-control", @disabled = "disabled" })
+        </div>
+        <div class="form-group">
+            @Html.LabelFor(c => c.ExpectedDelivery.Name, new { @class = "form-label" })
+            @Html.TextBoxFor(c => c.ExpectedDelivery.Name, null, new { @class = "form-control", @disabled = "disabled" })
+        </div>
+        <div class="form-group">
+            @Html.LabelFor(c => c.ExpectedDelivery.Address.Line1, new { @class = "form-label" })
+            @Html.TextBoxFor(c => c.ExpectedDelivery.Address.Line1, null, new { @class = "form-control", @disabled = "disabled" })
+        </div>
+        <div class="form-group">
+            @Html.LabelFor(c => c.ExpectedDelivery.Address.Line2, new { @class = "form-label" })
+            @Html.TextBoxFor(c => c.ExpectedDelivery.Address.Line2, null, new { @class = "form-control", @disabled = "disabled" })
+        </div>
+        <div class="form-group">
+            @Html.LabelFor(c => c.ExpectedDelivery.Address.Zipcode, new { @class = "form-label" })
+            @Html.TextBoxFor(c => c.ExpectedDelivery.Address.Zipcode, null, new { @class = "form-control", @disabled = "disabled" })
+        </div>
+        <div class="form-group">
+            @Html.LabelFor(c => c.ExpectedDelivery.Address.City, new { @class = "form-label" })
+            @Html.TextBoxFor(c => c.ExpectedDelivery.Address.City, null, new { @class = "form-control", @disabled = "disabled" })
+        </div>
+        <h4>Sender</h4>
+        <div class="form-group">
+            @Html.LabelFor(c => c.Sender.Name, new { @class = "form-label" })
+            @Html.TextBoxFor(c => c.Sender.Name, null, new { @class = "form-control", @disabled = "disabled" })
+        </div>
+        <div class="form-group">
+            @Html.LabelFor(c => c.Sender.Kind, new { @class = "form-label" })
+            @Html.TextBoxFor(c => c.Sender.Kind, null, new { @class = "form-control", @disabled = "disabled" })
+        </div>
+        <div class="form-group">
+            @Html.LabelFor(c => c.Sender.Email, new { @class = "form-label" })
+            @Html.TextBoxFor(c => c.Sender.Email, null, new { @class = "form-control", @disabled = "disabled" })
+        </div>
+        <h4>Vendor</h4>
+        <div class="form-group">
+            @Html.LabelFor(c => c.Vendor.Name, new { @class = "form-label" })
+            @Html.TextBoxFor(c => c.Vendor.Name, null, new { @class = "form-control", @disabled = "disabled" })
+        </div>
+        <div class="form-group">
+            @Html.LabelFor(c => c.Vendor.Email, new { @class = "form-label" })
+            @Html.TextBoxFor(c => c.Vendor.Email, null, new { @class = "form-control", @disabled = "disabled" })
+        </div>
 
+        <h4>Info</h4>
+        @if (Model.WithdrawnOn.HasValue)
+        {
             <div class="form-group">
-                @Html.LabelFor(c => c.Reference, new { @class = "form-label" })
-                @Html.TextBoxFor(c => c.Reference, null, new { @class = "form-control", @disabled = "disabled" })
+                @Html.LabelFor(m => m.WithdrawnOn)
+                @Html.TextBoxFor(m => m.WithdrawnOn, null, new { @class = "form-control", @disabled = "disabled" })
             </div>
             <div class="form-group">
-                @Html.LabelFor(c => c.Status, new { @class = "form-label" })
-                @Html.TextBoxFor(c => c.Status, null, new { @class = "form-control", @disabled = "disabled" })
+                @Html.LabelFor(c => c.Reason, new { @class = "form-label" })
+                @Html.TextBoxFor(c => c.Reason, new { @class = "form-control", @disabled = "disabled" })
             </div>
-
-            <div class="form-group">
-                @Html.LabelFor(m => m.CreatedOn)
-                @Html.TextBoxFor(m => m.CreatedOn, null, new { @class = "form-control", @disabled = "disabled" })
-            </div>
-            <div class="form-group">
-                @Html.LabelFor(m => m.UpdatedOn)
-                @Html.TextBoxFor(m => m.UpdatedOn, null, new { @class = "form-control", @disabled = "disabled" })
-            </div>
-            @if (Model.RemovedOn.HasValue)
-            {
-                <div class="form-group">
-                    @Html.LabelFor(m => m.RemovedOn)
-                    @Html.TextBoxFor(m => m.RemovedOn, null, new { @class = "form-control", @disabled = "disabled" })
-                </div>
-            }
-            <div class="form-group">
-                @Html.LabelFor(c => c.TotalWholeSalePrice, new { @class = "form-label" })
-                @Html.TextBoxFor(c => c.TotalWholeSalePrice, null, new { @class = "form-control", @disabled = "disabled" })
-            </div>
-            <div class="form-group">
-                @Html.LabelFor(c => c.TotalVatPrice, new { @class = "form-label" })
-                @Html.TextBoxFor(c => c.TotalVatPrice, null, new { @class = "form-control", @disabled = "disabled" })
-            </div>
-            <div class="form-group">
-                @Html.LabelFor(c => c.TotalOnSalePrice, new { @class = "form-label" })
-                @Html.TextBoxFor(c => c.TotalOnSalePrice, null, new { @class = "form-control", @disabled = "disabled" })
-            </div>
-            <h4>Delivery</h4>
-            <div class="form-group">
-                @Html.LabelFor(c => c.ExpectedDelivery.ExpectedDeliveryDate, new { @class = "form-label" })
-                @Html.TextBoxFor(c => c.ExpectedDelivery.ExpectedDeliveryDate, null, new { @class = "form-control", @disabled = "disabled" })
-            </div>
-            <div class="form-group">
-                @Html.LabelFor(c => c.ExpectedDelivery.Kind, new { @class = "form-label" })
-                @Html.TextBoxFor(c => c.ExpectedDelivery.Kind, null, new { @class = "form-control", @disabled = "disabled" })
-            </div>
-            <div class="form-group">
-                @Html.LabelFor(c => c.ExpectedDelivery.Name, new { @class = "form-label" })
-                @Html.TextBoxFor(c => c.ExpectedDelivery.Name, null, new { @class = "form-control", @disabled = "disabled" })
-            </div>
-            <div class="form-group">
-                @Html.LabelFor(c => c.ExpectedDelivery.Address.Line1, new { @class = "form-label" })
-                @Html.TextBoxFor(c => c.ExpectedDelivery.Address.Line1, null, new { @class = "form-control", @disabled = "disabled" })
-            </div>
-            <div class="form-group">
-                @Html.LabelFor(c => c.ExpectedDelivery.Address.Line2, new { @class = "form-label" })
-                @Html.TextBoxFor(c => c.ExpectedDelivery.Address.Line2, null, new { @class = "form-control", @disabled = "disabled" })
-            </div>
-            <div class="form-group">
-                @Html.LabelFor(c => c.ExpectedDelivery.Address.Zipcode, new { @class = "form-label" })
-                @Html.TextBoxFor(c => c.ExpectedDelivery.Address.Zipcode, null, new { @class = "form-control", @disabled = "disabled" })
-            </div>
-            <div class="form-group">
-                @Html.LabelFor(c => c.ExpectedDelivery.Address.City, new { @class = "form-label" })
-                @Html.TextBoxFor(c => c.ExpectedDelivery.Address.City, null, new { @class = "form-control", @disabled = "disabled" })
-            </div>
-            <h4>Sender</h4>
-            <div class="form-group">
-                @Html.LabelFor(c => c.Sender.Name, new { @class = "form-label" })
-                @Html.TextBoxFor(c => c.Sender.Name, null, new { @class = "form-control", @disabled = "disabled" })
-            </div>
-            <div class="form-group">
-                @Html.LabelFor(c => c.Sender.Kind, new { @class = "form-label" })
-                @Html.TextBoxFor(c => c.Sender.Kind, null, new { @class = "form-control", @disabled = "disabled" })
-            </div>
-            <div class="form-group">
-                @Html.LabelFor(c => c.Sender.Email, new { @class = "form-label" })
-                @Html.TextBoxFor(c => c.Sender.Email, null, new { @class = "form-control", @disabled = "disabled" })
-            </div>
-            <h4>Vendor</h4>
-            <div class="form-group">
-                @Html.LabelFor(c => c.Vendor.Name, new { @class = "form-label" })
-                @Html.TextBoxFor(c => c.Vendor.Name, null, new { @class = "form-control", @disabled = "disabled" })
-            </div>
-            <div class="form-group">
-                @Html.LabelFor(c => c.Vendor.Email, new { @class = "form-label" })
-                @Html.TextBoxFor(c => c.Vendor.Email, null, new { @class = "form-control", @disabled = "disabled" })
-            </div>
-
-            <h4>Info</h4>
+        }
+        @if (!string.IsNullOrWhiteSpace(Model.Comment))
+        {
             <div class="form-group">
                 @Html.LabelFor(c => c.Comment, new { @class = "form-label" })
                 @Html.TextAreaFor(c => c.Comment, new { @class = "form-control", @disabled = "disabled" })
             </div>
-
-            @if (Model.Transfer != null)
-            {
-                <h4>Transfer</h4>
-                <div class="form-group">
-                    @Html.LabelFor(c => c.Transfer.Identifier, new { @class = "form-label" })
-                    @Html.TextAreaFor(c => c.Transfer.Identifier, new { @class = "form-control", @disabled = "disabled" })
-                </div>
-                <div class="form-group">
-                    @Html.LabelFor(c => c.Transfer.Credited, new { @class = "form-label" })
-                    @Html.TextAreaFor(c => c.Transfer.Credited, new { @class = "form-control", @disabled = "disabled" })
-                </div>
-                <div class="form-group">
-                    @Html.LabelFor(c => c.Transfer.Status, new { @class = "form-label" })
-                    @Html.TextAreaFor(c => c.Transfer.Status.ToString("G"), new { @class = "form-control", @disabled = "disabled" })
-                </div>
-                <br />
-                <a asp-controller="Transfers" asp-action="Edit" asp-route-id="@Model.Transfer.Id" class="btn btn-info">
-                    User details
-                </a>
-            }
-
-            <h4>Products</h4>
-
-            <table class="table table-hover">
-                <thead class="thead-dark">
-                    <tr>
-                        <th scope="col">Reference</th>
-                        <th scope="col">Name</th>
-                        <th scope="col">Quantity</th>
-                        <th scope="col">WholeSalePrice</th>
-                        <th scope="col">Vat</th>
-                        <th scope="col">OnSalePrice</th>
-                        <th scope="col">Returnable</th>
-                        <th scope="col">Total</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var product in Model.Products)
-                    {
-                        <tr>
-                            <th scope="row">@product.Reference</th>
-                            <td>@product.Name</td>
-                            <td>@product.Quantity</td>
-                            <td>@(product.UnitWholeSalePrice)€</td>
-                            <td>@(product.UnitVatPrice)€ (@(product.Vat)%)</td>
-                            <td>@(product.UnitOnSalePrice)€</td>
-                            <td>@(product.ReturnableOnSalePrice ?? 0)€</td>
-                            <td>@(product.TotalOnSalePrice)€</td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
-
-
-            <br />
-            <a asp-controller="PurchaseOrders" asp-action="Index" class="btn btn-light">
-                Cancel
-            </a>
-            <button type="submit" class="btn btn-success">
-                <i class="fa fa-check">&nbsp;Save</i>
-            </button>
         }
 
-    </div>
+        @if (Model.Transfer != null)
+        {
+            <h4>Transfer</h4>
+            <div class="form-group">
+                @Html.LabelFor(c => c.Transfer.Identifier, new { @class = "form-label" })
+                @Html.TextBoxFor(c => c.Transfer.Identifier, new { @class = "form-control", @disabled = "disabled" })
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(c => c.Transfer.Credited, new { @class = "form-label" })
+                @Html.TextBoxFor(c => c.Transfer.Credited, new { @class = "form-control", @disabled = "disabled" })
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(c => c.Transfer.Status, new { @class = "form-label" })
+                @Html.TextBoxFor(c => c.Transfer.Status, new { @class = "form-control", @disabled = "disabled" })
+            </div>
+            <br />
+            <a asp-controller="Transfers" asp-action="Edit" asp-route-id="@Model.Transfer.Id" class="btn btn-info">
+                User details
+            </a>
+        }
+
+        <h4>Products</h4>
+
+        <table class="table table-hover">
+            <thead class="thead-dark">
+                <tr>
+                    <th scope="col">Reference</th>
+                    <th scope="col">Name</th>
+                    <th scope="col">Quantity</th>
+                    <th scope="col">WholeSalePrice</th>
+                    <th scope="col">Vat</th>
+                    <th scope="col">OnSalePrice</th>
+                    <th scope="col">Returnable</th>
+                    <th scope="col">Total</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var product in Model.Products)
+                {
+                    <tr>
+                        <th scope="row">@product.Reference</th>
+                        <td>@product.Name</td>
+                        <td>@product.Quantity</td>
+                        <td>@(product.UnitWholeSalePrice)€</td>
+                        <td>@(product.UnitVatPrice)€ (@(product.Vat)%)</td>
+                        <td>@(product.UnitOnSalePrice)€</td>
+                        <td>@(product.ReturnableOnSalePrice ?? 0)€</td>
+                        <td>@(product.TotalOnSalePrice)€</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+
+        <br />
+        <a asp-controller="PurchaseOrders" asp-action="Index" class="btn btn-light">
+            Cancel
+        </a>
+        @*<button type="submit" class="btn btn-success">
+            <i class="fa fa-check">&nbsp;Save</i>
+        </button>*@
+    }
+
+</div>

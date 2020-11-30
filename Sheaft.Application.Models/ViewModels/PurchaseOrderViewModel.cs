@@ -9,6 +9,10 @@ namespace Sheaft.Application.Models
         public Guid Id { get; set; }
         public DateTimeOffset CreatedOn { get; set; }
         public DateTimeOffset? UpdatedOn { get; set; }
+        public DateTimeOffset? AcceptedOn { get; private set; }
+        public DateTimeOffset? CompletedOn { get; private set; }
+        public DateTimeOffset? DeliveredOn { get; private set; }
+        public DateTimeOffset? WithdrawnOn { get; private set; }
         public DateTimeOffset? RemovedOn { get; set; }
         public string Reference { get; set; }
         public string Reason { get; set; }
