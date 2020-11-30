@@ -45,6 +45,7 @@ namespace Sheaft.Web.Manage.Controllers
 
             var entities = await _context.Legals
                 .OfType<BusinessLegal>()
+                .ProjectTo<BusinessLegalViewModel>(_configurationProvider)
                 .OrderByDescending(c => c.CreatedOn)
                 .Skip(page * take)
                 .Take(take)

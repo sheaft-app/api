@@ -1,4 +1,4 @@
-﻿@model IEnumerable<ProducerRequiredDeclarationViewModel>
+﻿@model IEnumerable<BusinessLegalViewModel>
 @{
     ViewData["Title"] = "Declarations";
     int take = ViewBag.Take;
@@ -15,8 +15,7 @@
             <tr>
                 <th scope="col">Name</th>
                 <th scope="col">Email</th>
-                <th scope="col">Phone</th>
-                <th scope="col">Total</th>
+                <th scope="col">Declaration requise</th>
                 <th scope="col">
                 </th>
             </tr>
@@ -27,12 +26,20 @@
                 <tr>
                     <th scope="row">@entity.Name</th>
                     <td>@entity.Email</td>
-                    <td>@entity.Phone</td>
-                    <td>@(entity.Total)€</td>
+                    <td>@(entity.Kind == LegalKind.Business)</td>
                     <td>
-                        <a asp-controller="Producers" asp-action="Edit" asp-route-id="@entity.Id" class="btn btn-info">
-                            <i class="fa fa-pen"></i>
-                        </a>
+                        @if (entity.Kind == LegalKind.Business && entity.Declaration == null)
+                        {
+                            <a asp-controller="Declarations" asp-action="Create" asp-route-legalId="@entity.Id" class="btn btn-success">
+                                <i class="fa fa-plus"></i>
+                            </a>
+                        }
+                        @if (entity.Kind == LegalKind.Business && entity.Declaration != null)
+                        {
+                            <a asp-controller="Declarations" asp-action="Edit" asp-route-id="@entity.Declaration.Id" class="btn btn-info">
+                                <i class="fa fa-pen"></i>
+                            </a>
+                        }
                     </td>
                 </tr>
             }
@@ -42,13 +49,13 @@
                 <td colspan="6">
                     @if (currentPage >= 1)
                     {
-                        <a asp-controller="Producers" asp-action="Index" asp-route-take="@take" asp-route-page="@(currentPage-1)" class="btn btn-outline-secondary">
+                        <a asp-controller="Declarations" asp-action="Index" asp-route-take="@take" asp-route-page="@(currentPage-1)" class="btn btn-outline-secondary">
                             <i class="fa fa-caret-left"></i>
                         </a>
                     }
                     @if (take == Model.Count())
                     {
-                        <a asp-controller="Producers" asp-action="Index" asp-route-take="@take" asp-route-page="@(currentPage+1)" class="btn btn-outline-secondary">
+                        <a asp-controller="Declarations" asp-action="Index" asp-route-take="@take" asp-route-page="@(currentPage+1)" class="btn btn-outline-secondary">
                             <i class="fa fa-caret-right"></i>
                         </a>
                     }
