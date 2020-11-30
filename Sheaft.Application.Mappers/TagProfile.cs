@@ -1,7 +1,8 @@
 ﻿using AutoMapper;
 using Sheaft.Domain.Models;
 using Sheaft.Application.Models;
-using System;
+using Sheaft.Core.Extensions;
+using Sheaft.Core.Models;
 
 namespace Sheaft.Application.Mappers
 {
@@ -9,8 +10,10 @@ namespace Sheaft.Application.Mappers
     {
         public TagProfile()
         {
-            CreateMap<Tag, TagDto>();
-            CreateMap<Tag, TagViewModel>();
+            CreateMap<Tag, TagDto>()
+                .ForMember(d => d.Picture, opt => opt.MapFrom(r => CoreProductExtensions.GetPictureUrl(r.Picture, PictureSize.LARGE)));
+            CreateMap<Tag, TagViewModel>()
+                .ForMember(d => d.Picture, opt => opt.MapFrom(r => CoreProductExtensions.GetPictureUrl(r.Picture, PictureSize.LARGE)));
         }
     }
 }

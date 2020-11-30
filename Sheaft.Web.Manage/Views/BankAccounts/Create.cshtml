@@ -8,7 +8,7 @@
     <h2 class="display-4">New producer bank account</h2>
     <br />
 
-    @using (Html.BeginForm("CreateBankAccount", "Producers", FormMethod.Post))
+    @using (Html.BeginForm("Create", "BankAccounts", FormMethod.Post))
     {
         @Html.AntiForgeryToken()
         @Html.ValidationSummary(true, "", new { @class = "text-danger" })

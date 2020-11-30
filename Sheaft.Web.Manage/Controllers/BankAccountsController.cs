@@ -33,9 +33,8 @@ namespace Sheaft.Web.Manage.Controllers
             _logger = logger;
         }
 
-
         [HttpGet]
-        public async Task<IActionResult> CreateBankAccount(Guid userId, CancellationToken token)
+        public async Task<IActionResult> Create(Guid userId, CancellationToken token)
         {
             var entity = await _context.Users.OfType<Business>()
                 .AsNoTracking()
@@ -55,7 +54,7 @@ namespace Sheaft.Web.Manage.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> CreateBankAccount(BankAccountViewModel model, CancellationToken token)
+        public async Task<IActionResult> Create(BankAccountViewModel model, CancellationToken token)
         {
             var result = await _mediatr.Process(new CreateBankAccountCommand(await GetRequestUser(token))
             {
@@ -74,26 +73,44 @@ namespace Sheaft.Web.Manage.Controllers
                 return View(model);
             }
 
-            return RedirectToAction("Edit", new { id = model.OwnerId });
+            return RedirectToAction("Edit", new { id = result.Data });
         }
 
         [HttpGet]
-        public async Task<IActionResult> UpdateBankAccount(Guid bankAccountId, CancellationToken token)
+        public async Task<IActionResult> Edit(Guid id, CancellationToken token)
         {
-            var entity = await _context.BankAccounts.Get(c => c.Id == bankAccountId)
-                .ProjectTo<BankAccountViewModel>(_configurationProvider)
-                .SingleOrDefaultAsync(token);
+            var entity = await _context.BankAccounts
+                .SingleOrDefaultAsync(c => c.Id == id, token);
 
             if (entity == null)
                 throw new NotFoundException();
 
             ViewBag.Countries = await GetCountries(token);
-            return View(entity);
+
+            return View(new BankAccountViewModel
+            {
+                Id = entity.Id,
+                Identifier = entity.Identifier,
+                BIC = entity.BIC,
+                IBAN = entity.IBAN,
+                IsActive = entity.IsActive,
+                Name = entity.Name,
+                Owner = entity.Owner,
+                OwnerId = entity.User.Id,
+                Address = new AddressViewModel
+                {
+                    Line1 = entity.Line1,
+                    Line2 = entity.Line2,
+                    City = entity.City,
+                    Zipcode = entity.Zipcode,
+                    Country = entity.Country
+                }
+            });
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> UpdateBankAccount(BankAccountViewModel model, CancellationToken token)
+        public async Task<IActionResult> Edit(BankAccountViewModel model, CancellationToken token)
         {
             var result = await _mediatr.Process(new UpdateBankAccountCommand(await GetRequestUser(token))
             {
@@ -112,7 +129,7 @@ namespace Sheaft.Web.Manage.Controllers
                 return View(model);
             }
 
-            return RedirectToAction("Edit", new { id = model.OwnerId });
+            return RedirectToAction("Edit", new { id = model.Id });
         }
     }
 }

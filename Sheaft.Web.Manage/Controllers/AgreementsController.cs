@@ -34,7 +34,7 @@ namespace Sheaft.Web.Manage.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Index(CancellationToken token, AgreementStatus? status = null, int page = 0, int take = 10)
+        public async Task<IActionResult> Index(CancellationToken token, AgreementStatus? status = null, int page = 0, int take = 25)
         {
             if (page < 0)
                 page = 0;
