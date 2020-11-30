@@ -13,6 +13,6 @@ namespace Sheaft.Application.Commands
         }
 
         public Guid ProducerId { get; set; }
-        public IEnumerable<Guid> TransferIds { get; set; }
+        public List<Guid> TransferIds { get; set; }
     }
 }

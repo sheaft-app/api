@@ -223,7 +223,7 @@ namespace Sheaft.Application.Handlers
                 .ToListAsync(token);
         }
 
-        private async Task<IEnumerable<KeyValuePair<Guid, IEnumerable<Guid>>>> GetNextNewPayoutIdsAsync(int skip, int take, CancellationToken token)
+        private async Task<IEnumerable<KeyValuePair<Guid, List<Guid>>>> GetNextNewPayoutIdsAsync(int skip, int take, CancellationToken token)
         {
             var producersTransfers = await _context.Transfers
                 .Get(t => t.Status == TransactionStatus.Succeeded
@@ -236,7 +236,7 @@ namespace Sheaft.Application.Handlers
                 .ToListAsync(token);
 
             var groupedProducers = producersTransfers.GroupBy(t => t.ProducerId);
-            return groupedProducers.Select(c => new KeyValuePair<Guid, IEnumerable<Guid>>(c.Key, c.Select(t => t.TransferId)));
+            return groupedProducers.Select(c => new KeyValuePair<Guid, List<Guid>>(c.Key, c.Select(t => t.TransferId)?.ToList()));
         }
     }
 }
