@@ -43,7 +43,7 @@ namespace Sheaft.Web.Manage.Controllers
             if (take > 100)
                 take = 100;
 
-            var query = _context.Transfers.Where(t => t.Status != TransactionStatus.Succeeded).AsNoTracking();
+            var query = _context.Transfers.AsNoTracking();
 
             var requestUser = await GetRequestUser(token);
             if (requestUser.IsImpersonating)
