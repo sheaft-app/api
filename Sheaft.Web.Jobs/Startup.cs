@@ -8,6 +8,7 @@ using Amazon;
 using Amazon.SimpleEmail;
 using AutoMapper;
 using Hangfire;
+using Hangfire.Dashboard;
 using Hangfire.SqlServer;
 using IdentityModel;
 using MangoPay.SDK;
@@ -311,6 +312,7 @@ namespace Sheaft.Web.Jobs
                 endpoints.MapHangfireDashboard("", new DashboardOptions
                 {
                     AppPath = Configuration.GetValue<string>("Portal:Url"),
+                    Authorization = new List<IDashboardAuthorizationFilter> { new MyAuthorizationFilter() }
                 });
                 endpoints.MapControllerRoute("default", "{controller=Home}/{action=Index}/{id?}");
             });
