@@ -175,7 +175,7 @@
                 @Html.Label("ubos", "Ubos")
                 @Html.TextBox("ubos", uboCount, null, new { @class = "form-control", @disabled = "disabled" })
             </div>
-            <a asp-controller="Declarations" asp-action="Edit" asp-route-declarationid="@Model.Declaration.Id" class="btn btn-info">
+            <a asp-controller="Declarations" asp-action="Edit" asp-route-id="@Model.Declaration.Id" class="btn btn-info">
                 Edit declaration
             </a>
         }
