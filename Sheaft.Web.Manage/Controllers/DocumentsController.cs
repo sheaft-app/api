@@ -257,6 +257,9 @@ namespace Sheaft.Web.Manage.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete(Guid id, CancellationToken token)
         {
+            var entity = await _context.Legals
+                .SingleOrDefaultAsync(c => c.Documents.Any(d => d.Id == id), token);
+
             var result = await _mediatr.Process(new DeleteDocumentCommand(await GetRequestUser(token))
             {
                 Id = id
@@ -264,9 +267,6 @@ namespace Sheaft.Web.Manage.Controllers
 
             if (!result.Success)
                 throw result.Exception;
-
-            var entity = await _context.Legals
-                .SingleOrDefaultAsync(c => c.Documents.Any(d => d.Id == id), token);
 
             if (entity.Kind != LegalKind.Natural)
                 return RedirectToAction("EditLegalBusiness", "Legals", new { entity.Id });

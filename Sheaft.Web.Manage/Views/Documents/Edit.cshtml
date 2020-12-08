@@ -27,7 +27,7 @@
         }
     }
 
-    @if (Model.Status == DocumentStatus.Locked || Model.Status == DocumentStatus.Refused || Model.Status == DocumentStatus.OutOfDate)
+    @if (Model.Status == DocumentStatus.Locked)
     {
         @using (Html.BeginForm("Unlock", "Documents", new { id = Model.Id }, FormMethod.Post, true, new { @class = "form d-inline" }))
         {
@@ -149,7 +149,7 @@
                         <th scope="col">Size</th>
                         <th scope="col">UploadedOn</th>
                         <th scope="col">
-                            @if (Model.Status != DocumentStatus.Locked && Model.Status != DocumentStatus.Validated && Model.Status != DocumentStatus.ValidationAsked)
+                            @if (Model.Status == DocumentStatus.Created || Model.Status == DocumentStatus.UnLocked)
                             {
                                 <a asp-controller="Documents" asp-action="AddPage" asp-route-documentid="@Model.Id" class="btn btn-info">
                                     <i class="fa fa-plus"></i>
@@ -173,7 +173,7 @@
                                         <i class="fa fa-download"></i>
                                     </button>
                                 }
-                                @if (Model.Status != DocumentStatus.Locked && Model.Status != DocumentStatus.Validated && Model.Status != DocumentStatus.ValidationAsked)
+                                @if (Model.Status == DocumentStatus.Created || Model.Status == DocumentStatus.UnLocked)
                                 {
                                     @using (Html.BeginForm("DeletePage", "Documents", new { documentId = Model.Id, pageId = docPage.Id }, FormMethod.Post, true, new { @class = "form d-inline" }))
                                     {

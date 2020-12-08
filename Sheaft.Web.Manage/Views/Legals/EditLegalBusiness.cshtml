@@ -223,7 +223,7 @@
                                 </button>
                             }
 
-                            @if (document.Status != DocumentStatus.ValidationAsked && document.Status != DocumentStatus.Validated)
+                            @if (document.Status == DocumentStatus.Created || document.Status == DocumentStatus.Refused)
                             {
                                 @using (Html.BeginForm("Delete", "Documents", new { id = document.Id }, FormMethod.Post, true, new { @class = "form d-inline" }))
                                 {
