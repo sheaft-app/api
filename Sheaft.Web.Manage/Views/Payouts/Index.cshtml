@@ -32,6 +32,8 @@
                 <th scope="col">From</th>
                 <th scope="col">Credited</th>
                 <th scope="col">To</th>
+                <th scope="col">Status</th>
+                <th scope="col">Fees</th>
                 <th scope="col">ExecutedOn</th>
                 <th scope="col">Code</th>
                 <th scope="col">
@@ -49,6 +51,7 @@
                     <td>@entity.Credited€</td>
                     <td>@entity.BankAccount.Owner</td>
                     <td>@entity.Status.ToString("G")</td>
+                    <td>@entity.Fees€</td>
                     <td>@entity.ExecutedOn?.ToString("dd/MM/yy hh:mm")</td>
                     <td>@entity.ResultCode</td>
                     <td>

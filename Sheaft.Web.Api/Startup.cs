@@ -380,21 +380,40 @@ namespace Sheaft.Web.Api
                 }
 
                 var adminId = configuration.GetValue<Guid>("Users:admin:id");
-                if (context.Users.FirstOrDefault(u => u.Id == adminId) == null)
+                var admin = context.Users.FirstOrDefault(u => u.Id == adminId);
+                if (admin == null)
                 {
                     var firstname = configuration.GetValue<string>("Users:admin:firstname");
                     var lastname = configuration.GetValue<string>("Users:admin:lastname");
                     var email = configuration.GetValue<string>("Users:admin:email");
 
-                    var admin = new Admin(adminId, $"{firstname} {lastname}", firstname, lastname, email);
+                    admin = new Admin(adminId, $"{firstname} {lastname}", firstname, lastname, email);
                     admin.SetIdentifier(configuration.GetValue<string>("Psp:UserId"));
                     context.Add(admin);
+                    context.SaveChanges();
+                }
 
-                    var wallet = new Wallet(Guid.NewGuid(), "Donation", WalletKind.Donations, admin);
-                    wallet.SetIdentifier(configuration.GetValue<string>("Psp:WalletId"));
-                    context.Add(wallet);
+                var donationWalletId = configuration.GetValue<string>("Psp:WalletId");
+                if (context.Wallets.FirstOrDefault(u => u.Identifier == donationWalletId) == null)
+                {
+                    var donationWallet = new Wallet(Guid.NewGuid(), "Donation", WalletKind.Donations, admin);
+                    donationWallet.SetIdentifier(donationWalletId);
+                    context.Add(donationWallet);
+                    context.SaveChanges();
+                }
 
-                    var bankAccount = new BankAccount(Guid.NewGuid(), "Dons", "Sheaft", configuration.GetValue<string>("Psp:Bank:Iban"), configuration.GetValue<string>("Psp:Bank:Bic"), 
+                var documentWalletId = configuration.GetValue<string>("Psp:DocumentWalletId");
+                if (context.Wallets.FirstOrDefault(u => u.Identifier == donationWalletId) == null)
+                {
+                    var documentWallet = new Wallet(Guid.NewGuid(), "Document", WalletKind.Documents, admin);
+                    documentWallet.SetIdentifier(configuration.GetValue<string>("Psp:DocumentWalletId"));
+                    context.Add(documentWallet);
+                    context.SaveChanges();
+                }
+
+                if (context.BankAccounts.FirstOrDefault(c => c.User.Id == admin.Id) == null)
+                {
+                    var bankAccount = new BankAccount(Guid.NewGuid(), "Dons", "Sheaft", configuration.GetValue<string>("Psp:Bank:Iban"), configuration.GetValue<string>("Psp:Bank:Bic"),
                         new BankAddress(
                             configuration.GetValue<string>("Psp:Bank:Address:Line1"),
                             configuration.GetValue<string>("Psp:Bank:Address:Line2"),
@@ -404,7 +423,6 @@ namespace Sheaft.Web.Api
 
                     bankAccount.SetIdentifier(configuration.GetValue<string>("Psp:Bank:Id"));
                     context.Add(bankAccount);
-
                     context.SaveChanges();
                 }
 

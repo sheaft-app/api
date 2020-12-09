@@ -28,6 +28,7 @@ namespace Sheaft.Domain.Models
         public DateTimeOffset? UpdatedOn { get; private set; }
         public DateTimeOffset? RemovedOn { get; private set; }
         public LegalKind Kind { get; protected set; }
+        public LegalValidation Validation { get; protected set; }
         public virtual User User { get; private set; }
         public virtual Owner Owner { get; private set; }
         public virtual IReadOnlyCollection<Document> Documents => _documents?.AsReadOnly();
@@ -53,6 +54,16 @@ namespace Sheaft.Domain.Models
                 throw new NotFoundException(id);
 
             _documents.Remove(document);
+        }
+
+        public virtual void SetKind(LegalKind kind)
+        {
+            Kind = kind;
+        }
+
+        public void SetValidation(LegalValidation validation)
+        {
+            Validation = validation;
         }
     }
 }

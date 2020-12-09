@@ -41,6 +41,7 @@ namespace Sheaft.Application.Interop
         DbSet<Tag> Tags { get; set; }
         DbSet<Transfer> Transfers { get; set; }
         DbSet<User> Users { get; set; }
+        DbSet<Wallet> Wallets { get; set; }
 
         DbSet<CountryPoints> CountryPoints { get; set; }
         DbSet<CountryUserPoints> CountryUserPoints { get; set; }

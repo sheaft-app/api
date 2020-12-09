@@ -38,5 +38,7 @@ namespace Sheaft.Application.Interop
         Task<Result<PspTransactionResultDto>> GetTransferAsync(string identifier, CancellationToken token);
         Task<Result<PspTransactionResultDto>> GetPayoutAsync(string identifier, CancellationToken token);
         Task<Result<PspTransactionResultDto>> GetRefundAsync(string identifier, CancellationToken token);
+        Task<Result<PspUserLegalDto>> GetCompanyAsync(string identifier, CancellationToken token);
+        Task<Result<PspUserNormalDto>> GetConsumerAsync(string identifier, CancellationToken token);
     }
 }

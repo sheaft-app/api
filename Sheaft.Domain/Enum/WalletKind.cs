@@ -5,6 +5,7 @@
         Payments,
         Returnables,
         Refunds,
-        Donations
+        Donations,
+        Documents
     }
 }

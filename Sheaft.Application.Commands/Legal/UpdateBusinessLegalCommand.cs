@@ -3,7 +3,6 @@ using Sheaft.Domain.Enums;
 using Sheaft.Application.Models;
 using Sheaft.Core;
 using Newtonsoft.Json;
-using System.Collections.Generic;
 
 namespace Sheaft.Application.Commands
 {
@@ -22,5 +21,6 @@ namespace Sheaft.Application.Commands
         public string Siret { get; set; }
         public OwnerInput Owner { get; set; }
         public AddressInput Address { get; set; }
+        public LegalValidation Validation { get; set; }
     }
 }

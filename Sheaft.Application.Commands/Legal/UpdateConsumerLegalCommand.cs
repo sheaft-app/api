@@ -21,5 +21,6 @@ namespace Sheaft.Application.Commands
         public CountryIsoCode Nationality { get; set; }
         public CountryIsoCode CountryOfResidence { get; set; }
         public AddressInput Address { get; set; }
+        public LegalValidation Validation { get; set; }
     }
 }

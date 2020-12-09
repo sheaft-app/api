@@ -53,12 +53,12 @@ namespace Sheaft.Domain.Models
             VatIdentifier = vatNumber;
         }
 
-        public void SetKind(LegalKind kind)
+        public override void SetKind(LegalKind kind)
         {
             if (kind == LegalKind.Natural)
                 throw new ValidationException(MessageKind.Legal_Kind_Cannot_Be_Natural);
 
-            Kind = kind;
+            base.SetKind(kind);
         }
 
         public void SetAddress(LegalAddress legalAddress)

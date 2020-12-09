@@ -7,6 +7,7 @@ using Microsoft.Extensions.Logging;
 using System.Threading.Tasks;
 using System.Threading;
 using Sheaft.Domain.Models;
+using Sheaft.Domain.Enums;
 
 namespace Sheaft.Application.Handlers
 {
@@ -16,7 +17,8 @@ namespace Sheaft.Application.Handlers
            IRequestHandler<UpdateBusinessLegalCommand, Result<bool>>,
            IRequestHandler<UpdateConsumerLegalCommand, Result<bool>>,
            IRequestHandler<CheckBusinessLegalConfigurationCommand, Result<bool>>,
-           IRequestHandler<CheckConsumerLegalConfigurationCommand, Result<bool>>
+           IRequestHandler<CheckConsumerLegalConfigurationCommand, Result<bool>>,
+           IRequestHandler<RefreshLegalValidationCommand, Result<bool>>
     {
         private readonly IPspService _pspService;
 
@@ -142,6 +144,7 @@ namespace Sheaft.Application.Handlers
                 var legal = await _context.GetByIdAsync<BusinessLegal>(request.Id, token);
 
                 legal.SetKind(request.Kind);
+                legal.SetValidation(request.Validation);
                 legal.SetName(request.Name);
                 legal.SetEmail(request.Email);
                 legal.SetAddress(legalAddress);
@@ -188,6 +191,7 @@ namespace Sheaft.Application.Handlers
                     request.Address.Country
                 );
 
+                legal.SetValidation(request.Validation);
                 legal.Owner.SetFirstname(request.FirstName);
                 legal.Owner.SetLastname(request.LastName);
                 legal.Owner.SetEmail(request.Email);
@@ -248,6 +252,36 @@ namespace Sheaft.Application.Handlers
                     legal.User.SetIdentifier(userResult.Data);
                     await _context.SaveChangesAsync(token);
                 }
+
+                return Ok(true);
+            });
+        }
+
+        public async Task<Result<bool>> Handle(RefreshLegalValidationCommand request, CancellationToken token)
+        {
+            return await ExecuteAsync(request, async () =>
+            {
+                var legal = await _context.GetSingleAsync<Legal>(b => b.User.Identifier == request.Identifier, token);
+                var validation = LegalValidation.NotSpecified;
+                if (legal is BusinessLegal)
+                {
+                    var userResult = await _pspService.GetCompanyAsync(request.Identifier, token);
+                    if (!userResult.Success)
+                        return Failed<bool>(userResult.Exception);
+
+                    validation = userResult.Data.KYCLevel;
+                }
+                else
+                {
+                    var userResult = await _pspService.GetConsumerAsync(request.Identifier, token);
+                    if (!userResult.Success)
+                        return Failed<bool>(userResult.Exception);
+
+                    validation = userResult.Data.KYCLevel;
+                }
+
+                legal.SetValidation(validation);
+                await _context.SaveChangesAsync(token);
 
                 return Ok(true);
             });

@@ -229,6 +229,7 @@ namespace Sheaft.Web.Manage.Controllers
                 Email = model.Email,
                 Address = _mapper.Map<AddressInput>(model.Address),
                 Kind = model.Kind,
+                Validation = model.Validation,
                 Owner = _mapper.Map<OwnerInput>(model.Owner),
                 Siret = model.Siret,
                 VatIdentifier = model.VatIdentifier
@@ -274,6 +275,7 @@ namespace Sheaft.Web.Manage.Controllers
                 LastName = model.Owner.LastName,
                 Address = _mapper.Map<AddressInput>(model.Owner.Address),
                 BirthDate = model.Owner.BirthDate,
+                Validation = model.Validation,
                 CountryOfResidence = model.Owner.CountryOfResidence,
                 Nationality = model.Owner.Nationality
             }, token);

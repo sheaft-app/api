@@ -18,8 +18,7 @@ namespace Sheaft.Application.Handlers
            IRequestHandler<SubmitDeclarationCommand, Result<bool>>,
            IRequestHandler<LockDeclarationCommand, Result<bool>>,
            IRequestHandler<UnLockDeclarationCommand, Result<bool>>,
-           IRequestHandler<RefreshDeclarationStatusCommand, Result<DeclarationStatus>>,
-           IRequestHandler<EnsureDeclarationIsValidatedCommand, Result<bool>>
+           IRequestHandler<RefreshDeclarationStatusCommand, Result<DeclarationStatus>>
     {
         private readonly IPspService _pspService;
 
@@ -134,41 +133,6 @@ namespace Sheaft.Application.Handlers
                 }
 
                 return Ok(legal.Declaration.Status);
-            });
-        }
-
-        public async Task<Result<bool>> Handle(EnsureDeclarationIsValidatedCommand request, CancellationToken token)
-        {
-            return await ExecuteAsync(request, async () =>
-            {
-                var legal = await _context.GetSingleAsync<BusinessLegal>(bl => bl.User.Id == request.ProducerId, token);
-                if (legal.Declaration == null)
-                {
-                    var result = await _mediatr.Process(new CreateDeclarationCommand(request.RequestUser)
-                    {
-                        LegalId = legal.Id
-                    }, token);
-
-                    if (!result.Success)
-                        return Failed<bool>(result.Exception);
-                }
-                else if (string.IsNullOrWhiteSpace(legal.Declaration.Identifier))
-                {
-                    var result = await _pspService.CreateUboDeclarationAsync(legal.Declaration, legal.User, token);
-                    if (!result.Success)
-                        return Failed<bool>(result.Exception);
-
-                    legal.Declaration.SetIdentifier(result.Data.Identifier);
-                    legal.Declaration.SetStatus(result.Data.Status);
-                    legal.Declaration.SetResult(result.Data.ResultCode, result.Data.ResultMessage);
-
-                    await _context.SaveChangesAsync(token);
-                }
-
-                if (legal.Declaration.Status != DeclarationStatus.Validated)
-                    return BadRequest<bool>(MessageKind.Declaration_NotValidated);
-
-                return Ok(true);
             });
         }
     }

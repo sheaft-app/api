@@ -879,4 +879,13 @@
   <data name="Legal_Name_Required" xml:space="preserve">
     <value>Le nom de l'entité légale est requis</value>
   </data>
+  <data name="PsP_CannotCreate_Payout_BankAccount_Not_Exists" xml:space="preserve">
+    <value />
+  </data>
+  <data name="Payout_CannotCreate_User_NotValidated" xml:space="preserve">
+    <value />
+  </data>
+  <data name="Legal_Kind_Must_Be_Natural" xml:space="preserve">
+    <value>Le type de profile ne peut pas être différent de "Natural"</value>
+  </data>
 </root>

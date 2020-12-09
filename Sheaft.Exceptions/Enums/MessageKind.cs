@@ -155,6 +155,7 @@
         Legal_Email_Required = 28103,
         Legal_Cannot_Unrequire_Declaration = 28104,
         Legal_Name_Required = 28105,
+        Legal_Kind_Must_Be_Natural = 28106,
         Payin = 29000,
         Payin_CannotSet_Already_Succeeded = 29101,
         Payin_CannotAdd_Refund_PurchaseOrderRefund_AlreadySucceeded = 29102,
@@ -164,6 +165,7 @@
         Transfer_CannotCreate_Pending_Transfer = 30102,
         Transfer_CannotCreate_AlreadyProcessed = 30103,
         Payout = 31000,
+        Payout_CannotCreate_User_NotValidated = 31101,
         Ubo = 32000,
         Wallet = 33000,
         Donation = 34000,
@@ -264,5 +266,6 @@
         PsP_CannotUpdate_User_User_Not_Exists = 105041,
         PsP_CannotUpdate_Bank_User_Not_Exists = 105042,
         PsP_CannotUpdate_Bank_Not_Exists = 105043,
+        PsP_CannotCreate_Payout_BankAccount_Not_Exists = 105044,
     }
 }

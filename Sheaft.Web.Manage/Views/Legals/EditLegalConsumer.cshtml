@@ -3,6 +3,12 @@
     ViewData["Title"] = "Consumer Legals";
     var countries = ((List<CountryViewModel>)ViewBag.Countries).Select(c => new SelectListItem(c.Name, c.Alpha2)).ToList();
     var nationalities = ((List<NationalityViewModel>)ViewBag.Nationalities).Select(c => new SelectListItem(c.Name, c.Alpha2)).ToList();
+
+    var validations = new List<SelectListItem> {
+        new SelectListItem("NotSpecified", LegalValidation.NotSpecified.ToString("G")),
+        new SelectListItem("Light", LegalValidation.Light.ToString("G")),
+        new SelectListItem("Regular", LegalValidation.Regular.ToString("G"))
+    };
 }
 
 <div class="container">
@@ -68,6 +74,10 @@
                     @Html.DropDownListFor(m => m.Owner.Address.Country, countries, new { @class = "form-control" })
                 </div>
             </div>
+        </div>
+        <div class="form-group">
+            @Html.LabelFor(m => m.Validation)
+            @Html.DropDownListFor(m => m.Validation, validations, new { @class = "form-control" })
         </div>
         <div class="form-group">
             @Html.LabelFor(m => m.CreatedOn)

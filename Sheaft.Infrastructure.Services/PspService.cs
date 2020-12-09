@@ -16,7 +16,6 @@ using Sheaft.Options;
 using Sheaft.Application.Interop;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -35,6 +34,30 @@ namespace Sheaft.Infrastructure.Services
         {
             _api = mangoPayApi;
             _pspOptions = pspOptions.Value;
+        }
+
+        public async Task<Result<PspUserLegalDto>> GetCompanyAsync(string identifier, CancellationToken token)
+        {
+            return await ExecuteAsync(async () =>
+            {
+                await EnsureAccessTokenIsValidAsync(token);
+
+                var result = await _api.Users.GetLegalAsync(identifier);
+
+                return Ok(result.GetCompany());
+            });
+        }
+
+        public async Task<Result<PspUserNormalDto>> GetConsumerAsync(string identifier, CancellationToken token)
+        {
+            return await ExecuteAsync(async () =>
+            {
+                await EnsureAccessTokenIsValidAsync(token);
+
+                var result = await _api.Users.GetNaturalAsync(identifier);
+
+                return Ok(result.GetConsumer());
+            });
         }
 
         public async Task<Result<string>> CreateConsumerAsync(ConsumerLegal consumerLegal, CancellationToken token)
@@ -585,6 +608,9 @@ namespace Sheaft.Infrastructure.Services
                 if (string.IsNullOrWhiteSpace(transaction.DebitedWallet.Identifier))
                     return BadRequest<PspPaymentResultDto>(MessageKind.PsP_CannotCreate_Payout_DebitedWallet_Not_Exists);
 
+                if (string.IsNullOrWhiteSpace(transaction.BankAccount.Identifier))
+                    return BadRequest<PspPaymentResultDto>(MessageKind.PsP_CannotCreate_Payout_BankAccount_Not_Exists);
+
                 await EnsureAccessTokenIsValidAsync(token);
 
                 var result = await _api.PayOuts.CreateBankWireAsync(GetIdempotencyKey(transaction.Id),
@@ -846,6 +872,55 @@ namespace Sheaft.Infrastructure.Services
 
     internal static class MangoExtensions
     {
+        public static PspUserNormalDto GetConsumer(this UserNaturalDTO user)
+        {
+            if (user == null)
+                return null;
+
+            return new PspUserNormalDto
+            {
+                KYCLevel = user.KYCLevel.GetLevel(),
+                ProofOfAddress = user.ProofOfAddress,
+                Address = user.Address.GetAddress(),
+                AddressObsolete = user.AddressObsolete,
+                Birthday = user.Birthday,
+                Birthplace = user.Birthplace,
+                CountryOfResidence = user.CountryOfResidence.GetCountry(),
+                Email = user.Email,
+                FirstName = user.FirstName,
+                LastName = user.LastName,
+                Nationality = user.Nationality.GetCountry(),
+                ProofOfIdentity = user.ProofOfIdentity
+            };
+        }
+        public static PspUserLegalDto GetCompany(this UserLegalDTO user)
+        {
+            if (user == null)
+                return null;
+
+            return new PspUserLegalDto
+            {
+                Email = user.Email,
+                KYCLevel = user.KYCLevel.GetLevel(),
+                CompanyNumber = user.CompanyNumber,
+                HeadquartersAddress = user.HeadquartersAddress.GetAddress(),
+                HeadquartersAddressObsolete = user.HeadquartersAddressObsolete,
+                LegalPersonType = user.LegalPersonType.GetLegalKind(),
+                LegalRepresentativeAddress = user.LegalRepresentativeAddress.GetAddress(),
+                LegalRepresentativeAddressObsolete = user.LegalRepresentativeAddressObsolete,
+                LegalRepresentativeBirthday = user.LegalRepresentativeBirthday,
+                LegalRepresentativeCountryOfResidence = user.LegalRepresentativeCountryOfResidence.GetCountry(),
+                LegalRepresentativeEmail = user.LegalRepresentativeEmail,
+                LegalRepresentativeFirstName = user.LegalRepresentativeFirstName,
+                LegalRepresentativeLastName = user.LegalRepresentativeLastName,
+                LegalRepresentativeNationality = user.LegalRepresentativeNationality.GetCountry(),
+                LegalRepresentativeProofOfIdentity = user.LegalRepresentativeProofOfIdentity,
+                Name= user.Name,
+                ProofOfRegistration = user.ProofOfRegistration,
+                ShareholderDeclaration = user.ShareholderDeclaration,
+                Statute = user.Statute
+            };
+        }
         public static long GetAmount(this decimal amount)
         {
             return (long)(amount * 100);
@@ -854,6 +929,16 @@ namespace Sheaft.Infrastructure.Services
         public static decimal GetAmount(this long amount)
         {
             return (decimal)(amount / 100.00);
+        }
+
+        public static LegalValidation GetLevel(this KycLevel status)
+        {
+            return (LegalValidation)status;
+        }
+
+        public static CountryIsoCode GetCountry(this CountryIso code)
+        {
+            return (CountryIsoCode)code;
         }
 
         public static DocumentStatus GetValidationStatus(this KycStatus status)
@@ -869,6 +954,22 @@ namespace Sheaft.Infrastructure.Services
         public static Sheaft.Domain.Enums.TransactionStatus GetTransactionStatus(this MangoPay.SDK.Core.Enumerations.TransactionStatus status)
         {
             return (Sheaft.Domain.Enums.TransactionStatus)status;
+        }
+
+        public static LegalKind GetLegalKind(this LegalPersonType kind)
+        {
+            switch (kind)
+            {
+                case LegalPersonType.BUSINESS:
+                    return LegalKind.Business;
+                case LegalPersonType.SOLETRADER:
+                    return LegalKind.Individual;
+                case LegalPersonType.ORGANIZATION:
+                    return LegalKind.Organization;
+                case LegalPersonType.NotSpecified:
+                default:
+                    return LegalKind.Natural;
+            }
         }
 
         public static LegalPersonType GetLegalPersonType(this LegalKind kind)
@@ -918,6 +1019,20 @@ namespace Sheaft.Infrastructure.Services
                 PostalCode = address.Zipcode
             };
         }
+        public static AddressDto GetAddress(this MangoPay.SDK.Entities.Address address)
+        {
+            if (address == null)
+                return null;
+
+            return new AddressDto
+            {
+                Line1 = address.AddressLine1,
+                Line2 = address.AddressLine2,
+                City = address.City,
+                Country = address.Country.GetCountryCode(),
+                Zipcode = address.PostalCode
+            };
+        }
         public static Birthplace GetBirthplace(this BirthAddress address)
         {
             if (address == null)
@@ -928,6 +1043,10 @@ namespace Sheaft.Infrastructure.Services
                 City = address.City,
                 Country = address.Country.GetCountry()
             };
+        }
+        public static CountryIsoCode GetCountryCode(this CountryIso? countryCode)
+        {
+            return (CountryIsoCode)countryCode;
         }
         public static CountryIso GetCountry(this CountryIsoCode countryCode)
         {

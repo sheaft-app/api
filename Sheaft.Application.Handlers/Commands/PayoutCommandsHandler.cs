@@ -145,28 +145,12 @@ namespace Sheaft.Application.Handlers
         {
             return await ExecuteAsync(request, async () =>
             {
-                var checkConfigurationResult = await _mediatr.Process(new CheckProducerConfigurationCommand(request.RequestUser) { ProducerId = request.ProducerId }, token);
-                if (!checkConfigurationResult.Success)
-                    return Failed<Guid>(checkConfigurationResult.Exception);
-
-                var producerLegals = await _context.GetSingleAsync<BusinessLegal>(c => c.User.Id == request.ProducerId, token);               
-                var checkDocumentsResult = await _mediatr.Process(new EnsureProducerDocumentsValidatedCommand(request.RequestUser) { ProducerId = request.ProducerId }, token);
-                if (!checkDocumentsResult.Success)
-                    return Failed<Guid>(checkDocumentsResult.Exception);
-
-                if (producerLegals.Kind == LegalKind.Business)
-                {
-                    var checkDeclarationResult = await _mediatr.Process(new EnsureDeclarationIsValidatedCommand(request.RequestUser) { ProducerId = request.ProducerId }, token);
-                    if (!checkDeclarationResult.Success)
-                        return Failed<Guid>(checkDeclarationResult.Exception);
-                }
+                var producerLegals = await _context.GetSingleAsync<BusinessLegal>(c => c.User.Id == request.ProducerId, token);           
+                if (producerLegals.Validation != LegalValidation.Regular)
+                    return Failed<Guid>(new BadRequestException(MessageKind.Payout_CannotCreate_User_NotValidated));
 
                 var wallet = await _context.GetSingleAsync<Wallet>(c => c.User.Id == request.ProducerId, token);
                 var bankAccount = await _context.GetSingleAsync<BankAccount>(c => c.User.Id == request.ProducerId && c.IsActive, token);
-
-                var bankConfigurationResult = await _mediatr.Process(new EnsureBankAccountValidatedCommand(request.RequestUser) { ProducerId = request.ProducerId }, token);
-                if (!bankConfigurationResult.Success)
-                    return Failed<Guid>(bankConfigurationResult.Exception);
 
                 var transfers = await _context.GetAsync<Transfer>(
                     t => request.TransferIds.Contains(t.Id)

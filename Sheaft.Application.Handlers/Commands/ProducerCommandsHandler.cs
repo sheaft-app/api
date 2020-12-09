@@ -13,8 +13,6 @@ using Microsoft.Extensions.Options;
 using Sheaft.Options;
 using Sheaft.Exceptions;
 using Microsoft.EntityFrameworkCore;
-using Sheaft.Domain.Enums;
-using Sheaft.Application.Models;
 using Sheaft.Application.Events;
 
 namespace Sheaft.Application.Handlers
@@ -23,7 +21,6 @@ namespace Sheaft.Application.Handlers
         IRequestHandler<RegisterProducerCommand, Result<Guid>>,
         IRequestHandler<UpdateProducerCommand, Result<bool>>,
         IRequestHandler<CheckProducerConfigurationCommand, Result<bool>>,
-        IRequestHandler<EnsureProducerDocumentsValidatedCommand, Result<bool>>,
         IRequestHandler<UpdateProducerTagsCommand, Result<bool>>,
         IRequestHandler<SetProducerProductsWithNoVatCommand, Result<bool>>
     {
@@ -200,18 +197,6 @@ namespace Sheaft.Application.Handlers
                 var wallet = await _mediatr.Process(new CheckWalletPaymentsConfigurationCommand(request.RequestUser) { UserId = request.ProducerId }, token);
                 if (!wallet.Success)
                     return Failed<bool>(wallet.Exception);
-
-                return Ok(true);
-            });
-        }
-
-        public async Task<Result<bool>> Handle(EnsureProducerDocumentsValidatedCommand request, CancellationToken token)
-        {
-            return await ExecuteAsync(request, async () =>
-            {
-                var producerLegal = await _context.GetSingleAsync<BusinessLegal>(l => l.User.Id == request.ProducerId, token);
-                if (!producerLegal.Documents.Any() || producerLegal.Documents.Any(d => d.Status != DocumentStatus.Validated))
-                    return BadRequest<bool>(MessageKind.Producer_Documents_NotValidated);
 
                 return Ok(true);
             });

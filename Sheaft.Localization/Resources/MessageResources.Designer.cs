@@ -763,6 +763,15 @@ namespace Sheaft.Localization.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Le type de profile ne peut pas être différent de &quot;Natural&quot;.
+        /// </summary>
+        internal static string Legal_Kind_Must_Be_Natural {
+            get {
+                return ResourceManager.GetString("Legal_Kind_Must_Be_Natural", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Le nom de l&apos;entité légale est requis.
         /// </summary>
         internal static string Legal_Name_Required {
@@ -1123,6 +1132,15 @@ namespace Sheaft.Localization.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        internal static string Payout_CannotCreate_User_NotValidated {
+            get {
+                return ResourceManager.GetString("Payout_CannotCreate_User_NotValidated", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Points.
         /// </summary>
         internal static string Points {
@@ -1407,6 +1425,15 @@ namespace Sheaft.Localization.Resources {
         internal static string PsP_CannotCreate_Payout_Author_Not_Exists {
             get {
                 return ResourceManager.GetString("PsP_CannotCreate_Payout_Author_Not_Exists", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        internal static string PsP_CannotCreate_Payout_BankAccount_Not_Exists {
+            get {
+                return ResourceManager.GetString("PsP_CannotCreate_Payout_BankAccount_Not_Exists", resourceCulture);
             }
         }
         
