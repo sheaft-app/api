@@ -38,7 +38,7 @@ namespace Sheaft.Application.Handlers
             return await ExecuteAsync(request, async () =>
             {
                 var debitedWallet = await _context.GetSingleAsync<Wallet>(c => c.User.Id == request.UserId, token);
-                var creditedWallet = await _context.GetSingleAsync<Wallet>(c => c.Identifier == _pspOptions.WalletId, token);
+                var creditedWallet = await _context.GetSingleAsync<Wallet>(c => c.Identifier == _pspOptions.DocumentWalletId, token);
 
                 var withholding = new Withholding(Guid.NewGuid(), request.Amount, debitedWallet, creditedWallet);
                 await _context.AddAsync(withholding, token);
