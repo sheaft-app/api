@@ -93,6 +93,10 @@ namespace Sheaft.Application.Handlers
                 if(donation != null)
                     return await HandleDonationStatusAsync(request, donation, token);
 
+                var withholding = await _context.FindSingleAsync<Withholding>(c => c.Identifier == request.Identifier, token);
+                if (withholding != null)
+                    return await HandleWithholdingStatusAsync(request, donation, token);
+
                 return NotFound<TransactionStatus>();
             });
         }
@@ -191,6 +195,31 @@ namespace Sheaft.Application.Handlers
             }
 
             return Ok(donation.Status);
+        }
+
+        private async Task<Result<TransactionStatus>> HandleWithholdingStatusAsync(RefreshTransferStatusCommand request, Withholding withholding, CancellationToken token)
+        {
+            if (withholding.Status == TransactionStatus.Succeeded || withholding.Status == TransactionStatus.Failed)
+                return Ok(withholding.Status);
+
+            var pspResult = await _pspService.GetTransferAsync(withholding.Identifier, token);
+            if (!pspResult.Success)
+                return Failed<TransactionStatus>(pspResult.Exception);
+
+            withholding.SetStatus(pspResult.Data.Status);
+            withholding.SetResult(pspResult.Data.ResultCode, pspResult.Data.ResultMessage);
+            withholding.SetExecutedOn(pspResult.Data.ProcessedOn);
+
+            await _context.SaveChangesAsync(token);
+
+            switch (withholding.Status)
+            {
+                case TransactionStatus.Failed:
+                    _mediatr.Post(new WithHoldingFailedEvent(request.RequestUser) { WithholdingId = withholding.Id });
+                    break;
+            }
+
+            return Ok(withholding.Status);
         }
 
         private async Task<IEnumerable<Guid>> GetNextTransferIdsAsync(int skip, int take, CancellationToken token)
