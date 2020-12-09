@@ -80,7 +80,7 @@ namespace Sheaft.Application.Handlers
                 if (withholding.Status == TransactionStatus.Succeeded)
                     return Ok(withholding.Status);
 
-                if (withholding.Status != TransactionStatus.Failed)
+                if (withholding.Status != TransactionStatus.Failed && withholding.Status != TransactionStatus.Waiting)
                     return Failed<TransactionStatus>(new BadRequestException(MessageKind.Withholding_Cannot_Process_Pending));
 
                 using (var transaction = await _context.BeginTransactionAsync(token))
