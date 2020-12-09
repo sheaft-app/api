@@ -9,6 +9,7 @@ namespace Sheaft.Domain.Models
     {
         private List<Transfer> _transfers;
         private List<Withholding> _withholdings;
+
         protected Payout()
         {
         }
@@ -17,12 +18,12 @@ namespace Sheaft.Domain.Models
             : base(id, TransactionKind.Payout, debitedWallet.User)
         {
             BankAccount = bankAccount;
-            Debited = transfers.Sum(t => t.Credited) - withholdings.Sum(w => w.Debited);
+            Debited = transfers.Sum(t => t.Credited) - (withholdings?.Sum(w => w.Debited) ?? 0);
             Fees = 0;
             DebitedWallet = debitedWallet;
             Reference = "SHEAFT";
 
-            _withholdings = withholdings.ToList();
+            _withholdings = withholdings?.ToList();
             _transfers = transfers.ToList();
         }
 
