@@ -125,6 +125,7 @@ namespace Sheaft.Infrastructure.Persistence
             modelBuilder.ApplyConfiguration(new ConsumerLegalConfiguration());
             modelBuilder.ApplyConfiguration(new BusinessLegalConfiguration());
             modelBuilder.ApplyConfiguration(new DonationConfiguration());
+            modelBuilder.ApplyConfiguration(new WithholdingConfiguration());
         }
     }
 }

@@ -53,6 +53,7 @@ namespace Sheaft.Web.Manage.Controllers
                 ViewBag.Transfers = await _context.Transfers.CountAsync(c => !c.RemovedOn.HasValue && c.Author.Id == requestUser.Id, token);
                 ViewBag.Payouts = await _context.Payouts.CountAsync(c => !c.RemovedOn.HasValue && c.Author.Id == requestUser.Id, token);
                 ViewBag.Donations = await _context.Donations.CountAsync(c => !c.RemovedOn.HasValue && c.Author.Id == requestUser.Id, token);
+                ViewBag.Withholdings = await _context.Withholdings.CountAsync(c => !c.RemovedOn.HasValue && c.Author.Id == requestUser.Id, token);
             }
             else
             {
@@ -69,6 +70,7 @@ namespace Sheaft.Web.Manage.Controllers
                 ViewBag.Transfers = await _context.Transfers.CountAsync(c => !c.RemovedOn.HasValue, token);
                 ViewBag.Payouts = await _context.Payouts.CountAsync(c => !c.RemovedOn.HasValue, token);
                 ViewBag.Donations = await _context.Donations.CountAsync(c => !c.RemovedOn.HasValue, token);
+                ViewBag.Withholdings = await _context.Withholdings.CountAsync(c => !c.RemovedOn.HasValue, token);
             }
 
             ViewBag.RequestUser = requestUser;

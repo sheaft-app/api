@@ -1,10 +1,9 @@
 ﻿using Sheaft.Domain.Enums;
 using System;
-using System.Collections.Generic;
 
 namespace Sheaft.Application.Models
 {
-    public class PayoutViewModel
+    public class WithholdingViewModel
     {
         public Guid Id { get; set; }
         public string Identifier { get; set; }
@@ -21,8 +20,7 @@ namespace Sheaft.Application.Models
         public DateTimeOffset? ExecutedOn { get; set; }
         public UserProfileViewModel Author { get; set; }
         public UserProfileViewModel DebitedUser { get; set; }
-        public BankAccountShortViewModel BankAccount { get; set; }
-        public IEnumerable<TransferShortViewModel> Transfers { get; set; }
-        public IEnumerable<WithholdingShortViewModel> Withholdings { get; set; }
+        public UserProfileViewModel CreditedUser { get; set; }
+        public PayoutShortViewModel Payout { get; set; }
     }
 }

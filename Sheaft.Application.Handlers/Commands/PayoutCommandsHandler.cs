@@ -135,6 +135,10 @@ namespace Sheaft.Application.Handlers
                     case TransactionStatus.Failed:
                         _mediatr.Post(new PayoutFailedEvent(request.RequestUser) { PayoutId = payout.Id });
                         break;
+                    case TransactionStatus.Succeeded:
+                        if(payout.Withholdings.Any())
+                            _mediatr.Post(new ProcessWithholdingsCommand(request.RequestUser) { PayoutId = payout.Id });
+                        break;
                 }
 
                 return Ok(payout.Status);
@@ -158,21 +162,10 @@ namespace Sheaft.Application.Handlers
                         && (t.Payout == null || t.Payout.Status == TransactionStatus.Failed), 
                     token);
 
-                var amount = transfers.Sum(t => t.Credited);
-                var fees = 0m;               
-                var hasAlreadyPaidComission = await _context.AnyAsync<Payout>(
-                    p => p.Fees > 0
-                        && p.DebitedWallet.User.Id == request.ProducerId
-                        && p.Status != TransactionStatus.Failed,
-                    token);
-                    
-                fees = hasAlreadyPaidComission || amount < _pspOptions.ProducerFees ? 0m : _pspOptions.ProducerFees;
-                if (!hasAlreadyPaidComission && fees == 0m)
-                    return Failed<Guid>(new Exception("Invalid fees for payout without paid commission."));
-
+                var withholdings = await _context.GetAsync<Withholding>(c => c.DebitedWallet.User.Id == request.ProducerId && c.Status == TransactionStatus.Waiting && (c.Payout == null || c.Payout.Status == TransactionStatus.Failed), token);
                 using (var transaction = await _context.BeginTransactionAsync(token))
                 {
-                    var payout = new Payout(Guid.NewGuid(), amount, wallet, bankAccount, transfers, fees);
+                    var payout = new Payout(Guid.NewGuid(), wallet, bankAccount, transfers, withholdings);
                     await _context.AddAsync(payout);
                     await _context.SaveChangesAsync(token);
 

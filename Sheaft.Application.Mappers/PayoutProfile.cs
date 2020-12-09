@@ -15,11 +15,13 @@ namespace Sheaft.Application.Mappers
                 .IncludeBase<Payout, TransactionDto>()
                 .ForMember(m => m.DebitedUser, opt => opt.MapFrom(t => t.DebitedWallet.User));
 
+            CreateMap<Payout, PayoutShortViewModel>();
             CreateMap<Payout, PayoutViewModel>()
                 .ForMember(m => m.BankAccount, opt => opt.MapFrom(t => t.BankAccount))
                 .ForMember(m => m.Author, opt => opt.MapFrom(t => t.Author))
                 .ForMember(m => m.DebitedUser, opt => opt.MapFrom(t => t.DebitedWallet.User))
-                .ForMember(m => m.Transfers, opt => opt.MapFrom(t => t.Transfers));
+                .ForMember(m => m.Transfers, opt => opt.MapFrom(t => t.Transfers))
+                .ForMember(m => m.Withholdings, opt => opt.MapFrom(t => t.Withholdings));
         }
     }
 }

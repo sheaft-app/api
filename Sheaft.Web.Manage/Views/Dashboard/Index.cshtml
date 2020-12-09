@@ -38,20 +38,6 @@
         </div>
         <div class="card w-25 d-inline-block">
             <div class="card-body">
-                <h5 class="card-title">Departments</h5>
-                <h6 class="card-subtitle mb-2 text-muted">@ViewBag.Departments</h6>
-                <a asp-controller="Departments" asp-action="index" class="card-link">Show</a>
-            </div>
-        </div>
-        <div class="card w-25 d-inline-block">
-            <div class="card-body">
-                <h5 class="card-title">Regions</h5>
-                <h6 class="card-subtitle mb-2 text-muted">@ViewBag.Regions</h6>
-                <a asp-controller="Regions" asp-action="index" class="card-link">Show</a>
-            </div>
-        </div>
-        <div class="card w-25 d-inline-block">
-            <div class="card-body">
                 <h5 class="card-title">Declarations</h5>
                 <h6 class="card-subtitle mb-2 text-muted">N/A</h6>
                 <a asp-controller="Declarations" asp-action="index" class="card-link">Show</a>
@@ -142,6 +128,13 @@
         <div class="card-body">
             <h5 class="card-title">Payouts</h5>
             <h6 class="card-subtitle mb-2 text-muted">@ViewBag.Payouts</h6>
+            <a asp-controller="Payouts" asp-action="index" class="card-link">Show</a>
+        </div>
+    </div>
+    <div class="card w-25 d-inline-block">
+        <div class="card-body">
+            <h5 class="card-title">Withholdings</h5>
+            <h6 class="card-subtitle mb-2 text-muted">@ViewBag.Withholdings</h6>
             <a asp-controller="Payouts" asp-action="index" class="card-link">Show</a>
         </div>
     </div>

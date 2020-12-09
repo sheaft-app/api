@@ -888,4 +888,16 @@
   <data name="Legal_Kind_Must_Be_Natural" xml:space="preserve">
     <value>Le type de profile ne peut pas être différent de "Natural"</value>
   </data>
+  <data name="Withholding" xml:space="preserve">
+    <value>Retenue sur le virement</value>
+  </data>
+  <data name="Withholding_Cannot_Process_Already_Succeeded" xml:space="preserve">
+    <value>Impossible de traiter la retenue sur le virement, elle est déjà terminée</value>
+  </data>
+  <data name="Withholding_Cannot_Process_Payout_No_Withholdings" xml:space="preserve">
+    <value>Impossible de traiter la retenue sur le virement, aucune retenue rattachée au virement</value>
+  </data>
+  <data name="Withholding_Cannot_Process_Pending" xml:space="preserve">
+    <value>Impossible de traiter la retenue sur le virement, elle est actuellement en attente</value>
+  </data>
 </root>

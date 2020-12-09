@@ -267,5 +267,9 @@
         PsP_CannotUpdate_Bank_User_Not_Exists = 105042,
         PsP_CannotUpdate_Bank_Not_Exists = 105043,
         PsP_CannotCreate_Payout_BankAccount_Not_Exists = 105044,
+        Withholding = 106000,
+        Withholding_Cannot_Process_Pending = 106101,
+        Withholding_Cannot_Process_Already_Succeeded = 106102,
+        Withholding_Cannot_Process_Payout_No_Withholdings = 106103,
     }
 }

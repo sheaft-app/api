@@ -598,6 +598,18 @@ namespace Sheaft.Infrastructure.Services
                 token);
         }
 
+        public async Task<Result<PspPaymentResultDto>> CreateWithholdingAsync(Withholding transaction, CancellationToken token)
+        {
+            return await CreatePspTransferAsync(transaction.Id,
+                transaction.Debited,
+                transaction.Fees,
+                transaction.Author.Identifier,
+                transaction.CreditedWallet.Identifier,
+                transaction.CreditedWallet.User.Identifier,
+                transaction.DebitedWallet.Identifier,
+                token);
+        }
+
         public async Task<Result<PspPaymentResultDto>> CreatePayoutAsync(Payout transaction, CancellationToken token)
         {
             return await ExecuteAsync(async () =>

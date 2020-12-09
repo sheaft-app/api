@@ -69,6 +69,7 @@ namespace Sheaft.Application.Handlers
                 webPayin.SetRedirectUrl(result.Data.RedirectUrl);
                 webPayin.SetStatus(result.Data.Status);
                 webPayin.SetCreditedAmount(result.Data.Credited);
+                webPayin.SetExecutedOn(result.Data.ProcessedOn);
 
                 await _context.SaveChangesAsync(token);
                 return Ok(webPayin.Id);

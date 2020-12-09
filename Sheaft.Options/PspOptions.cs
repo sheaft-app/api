@@ -15,6 +15,7 @@ namespace Sheaft.Options
         public string ClientId { get; set; }
         public string UserId { get; set; }
         public string WalletId { get; set; }
+        public string DocumentWalletId { get; set; }
         public string ApiKey { get; set; }
         public decimal FixedAmount { get; set; } = 0.18m;
         public decimal Percent { get; set; } = 0.018m;

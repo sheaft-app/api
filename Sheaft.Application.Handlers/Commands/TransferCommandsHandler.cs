@@ -133,6 +133,7 @@ namespace Sheaft.Application.Handlers
                     transfer.SetResult(result.Data.ResultCode, result.Data.ResultMessage);
                     transfer.SetIdentifier(result.Data.Identifier);
                     transfer.SetStatus(result.Data.Status);
+                    transfer.SetExecutedOn(result.Data.ProcessedOn);
 
                     await _context.SaveChangesAsync(token);
                     await transaction.CommitAsync(token);

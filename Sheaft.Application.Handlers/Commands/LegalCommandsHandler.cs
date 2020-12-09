@@ -8,6 +8,8 @@ using System.Threading.Tasks;
 using System.Threading;
 using Sheaft.Domain.Models;
 using Sheaft.Domain.Enums;
+using Sheaft.Options;
+using Microsoft.Extensions.Options;
 
 namespace Sheaft.Application.Handlers
 {
@@ -20,15 +22,18 @@ namespace Sheaft.Application.Handlers
            IRequestHandler<CheckConsumerLegalConfigurationCommand, Result<bool>>,
            IRequestHandler<RefreshLegalValidationCommand, Result<bool>>
     {
+        private readonly PspOptions _pspOptions;
         private readonly IPspService _pspService;
 
         public LegalCommandsHandler(
             ISheaftMediatr mediatr,
             IAppDbContext context,
             IPspService pspService,
+            IOptionsSnapshot<PspOptions> pspOptions,
             ILogger<LegalCommandsHandler> logger)
             : base(mediatr, context, logger)
         {
+            _pspOptions = pspOptions.Value;
             _pspService = pspService;
         }
 
@@ -282,6 +287,13 @@ namespace Sheaft.Application.Handlers
 
                 legal.SetValidation(validation);
                 await _context.SaveChangesAsync(token);
+
+                if(validation == LegalValidation.Regular && legal.User.Kind == ProfileKind.Producer)
+                    _mediatr.Post(new CreateWithholdingCommand(request.RequestUser)
+                    {
+                        UserId = legal.User.Id,
+                        Amount = _pspOptions.ProducerFees
+                    });
 
                 return Ok(true);
             });

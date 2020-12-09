@@ -144,6 +144,7 @@ namespace Sheaft.Application.Handlers
                     payinRefund.SetResult(result.Data.ResultCode, result.Data.ResultMessage);
                     payinRefund.SetIdentifier(result.Data.Identifier);
                     payinRefund.SetStatus(result.Data.Status);
+                    payinRefund.SetExecutedOn(result.Data.ProcessedOn);
 
                     await _context.SaveChangesAsync(token);
                     await transaction.CommitAsync(token);

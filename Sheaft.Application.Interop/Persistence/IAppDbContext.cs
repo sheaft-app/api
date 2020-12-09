@@ -42,6 +42,7 @@ namespace Sheaft.Application.Interop
         DbSet<Transfer> Transfers { get; set; }
         DbSet<User> Users { get; set; }
         DbSet<Wallet> Wallets { get; set; }
+        DbSet<Withholding> Withholdings { get; set; }
 
         DbSet<CountryPoints> CountryPoints { get; set; }
         DbSet<CountryUserPoints> CountryUserPoints { get; set; }

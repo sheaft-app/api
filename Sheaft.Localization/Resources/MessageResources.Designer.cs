@@ -2372,5 +2372,41 @@ namespace Sheaft.Localization.Resources {
                 return ResourceManager.GetString("Wallet", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Retenue sur le virement.
+        /// </summary>
+        internal static string Withholding {
+            get {
+                return ResourceManager.GetString("Withholding", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Impossible de traiter la retenue sur le virement, elle est déjà terminée.
+        /// </summary>
+        internal static string Withholding_Cannot_Process_Already_Succeeded {
+            get {
+                return ResourceManager.GetString("Withholding_Cannot_Process_Already_Succeeded", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Impossible de traiter la retenue sur le virement, aucune retenue rattachée au virement.
+        /// </summary>
+        internal static string Withholding_Cannot_Process_Payout_No_Withholdings {
+            get {
+                return ResourceManager.GetString("Withholding_Cannot_Process_Payout_No_Withholdings", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Impossible de traiter la retenue sur le virement, elle est actuellement en attente.
+        /// </summary>
+        internal static string Withholding_Cannot_Process_Pending {
+            get {
+                return ResourceManager.GetString("Withholding_Cannot_Process_Pending", resourceCulture);
+            }
+        }
     }
 }

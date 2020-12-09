@@ -47,8 +47,8 @@ namespace Sheaft.Application.Handlers
             return await ExecuteAsync(request, async () =>
             {
                 var order = await _context.GetByIdAsync<Order>(request.OrderId, token);
-                if (order.Payin == null 
-                    || order.Payin.Status != TransactionStatus.Succeeded 
+                if (order.Payin == null
+                    || order.Payin.Status != TransactionStatus.Succeeded
                     || (order.Donation != null && order.Donation.Status != TransactionStatus.Failed))
                     return BadRequest<Guid>(MessageKind.Donation_CannotCreate_AlreadySucceeded);
 
@@ -72,6 +72,7 @@ namespace Sheaft.Application.Handlers
                     donation.SetResult(result.Data.ResultCode, result.Data.ResultMessage);
                     donation.SetIdentifier(result.Data.Identifier);
                     donation.SetStatus(result.Data.Status);
+                    donation.SetExecutedOn(result.Data.ProcessedOn);
 
                     await _context.SaveChangesAsync(token);
                     await transaction.CommitAsync(token);
