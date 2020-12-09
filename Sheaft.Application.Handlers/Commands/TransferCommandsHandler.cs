@@ -95,7 +95,7 @@ namespace Sheaft.Application.Handlers
 
                 var withholding = await _context.FindSingleAsync<Withholding>(c => c.Identifier == request.Identifier, token);
                 if (withholding != null)
-                    return await HandleWithholdingStatusAsync(request, donation, token);
+                    return await HandleWithholdingStatusAsync(request, withholding, token);
 
                 return NotFound<TransactionStatus>();
             });
@@ -215,7 +215,7 @@ namespace Sheaft.Application.Handlers
             switch (withholding.Status)
             {
                 case TransactionStatus.Failed:
-                    _mediatr.Post(new WithHoldingFailedEvent(request.RequestUser) { WithholdingId = withholding.Id });
+                    _mediatr.Post(new WithholdingFailedEvent(request.RequestUser) { WithholdingId = withholding.Id });
                     break;
             }
 
