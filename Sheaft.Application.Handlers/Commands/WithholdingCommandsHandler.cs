@@ -16,7 +16,9 @@ using System.Linq;
 namespace Sheaft.Application.Handlers
 {
     public class WithholdingCommandsHandler : ResultsHandler,
-        IRequestHandler<CreateWithholdingCommand, Result<Guid>>
+        IRequestHandler<CreateWithholdingCommand, Result<Guid>>,
+        IRequestHandler<ProcessWithholdingsCommand, Result<bool>>,
+        IRequestHandler<ProcessWithholdingCommand, Result<TransactionStatus>>
     {
         private readonly IPspService _pspService;
         private readonly PspOptions _pspOptions;
