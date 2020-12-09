@@ -403,10 +403,10 @@ namespace Sheaft.Web.Api
                 }
 
                 var documentWalletId = configuration.GetValue<string>("Psp:DocumentWalletId");
-                if (context.Wallets.FirstOrDefault(u => u.Identifier == donationWalletId) == null)
+                if (context.Wallets.FirstOrDefault(u => u.Identifier == documentWalletId) == null)
                 {
                     var documentWallet = new Wallet(Guid.NewGuid(), "Document", WalletKind.Documents, admin);
-                    documentWallet.SetIdentifier(configuration.GetValue<string>("Psp:DocumentWalletId"));
+                    documentWallet.SetIdentifier(documentWalletId);
                     context.Add(documentWallet);
                     context.SaveChanges();
                 }
