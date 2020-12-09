@@ -14,16 +14,16 @@ namespace Sheaft.Domain.Models
         {
         }
 
-        public Payout(Guid id, Wallet debitedWallet, BankAccount bankAccount, IEnumerable<Transfer> transfers, IEnumerable<Withholding> withholdings = null)
+        public Payout(Guid id, Wallet debitedWallet, BankAccount bankAccount, IEnumerable<Transfer> transfers, IEnumerable<Withholding> withholdings)
             : base(id, TransactionKind.Payout, debitedWallet.User)
         {
             BankAccount = bankAccount;
-            Debited = transfers.Sum(t => t.Credited) - (withholdings?.Sum(w => w.Debited) ?? 0);
+            Debited = transfers.Sum(t => t.Credited) - withholdings.Sum(w => w.Debited);
             Fees = 0;
             DebitedWallet = debitedWallet;
             Reference = "SHEAFT";
 
-            _withholdings = withholdings?.ToList();
+            _withholdings = withholdings.ToList();
             _transfers = transfers.ToList();
         }
 

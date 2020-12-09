@@ -162,7 +162,18 @@ namespace Sheaft.Application.Handlers
                         && (t.Payout == null || t.Payout.Status == TransactionStatus.Failed), 
                     token);
 
-                var withholdings = await _context.GetAsync<Withholding>(c => c.DebitedWallet.User.Id == request.ProducerId && c.Status == TransactionStatus.Waiting && (c.Payout == null || c.Payout.Status == TransactionStatus.Failed), token);
+                var pendingWithholdings = await _context.GetAsync<Withholding>(c => c.DebitedWallet.User.Id == request.ProducerId && c.Status == TransactionStatus.Waiting && (c.Payout == null || c.Payout.Status == TransactionStatus.Failed), token);
+                var withholdings = new List<Withholding>();
+                var amount = transfers.Sum(t => t.Credited);
+                var holdingAmount = 0m;
+                foreach(var withholding in pendingWithholdings.OrderBy(w => w.Debited))
+                {
+                    holdingAmount += withholding.Debited;
+                    if (holdingAmount < amount)
+                        withholdings.Add(withholding);
+                    else break;
+                }
+
                 using (var transaction = await _context.BeginTransactionAsync(token))
                 {
                     var payout = new Payout(Guid.NewGuid(), wallet, bankAccount, transfers, withholdings);
