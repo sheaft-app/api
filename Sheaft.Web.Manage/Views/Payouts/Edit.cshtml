@@ -37,14 +37,10 @@
             @Html.LabelFor(m => m.BankAccount.IBAN)
             @Html.TextBoxFor(m => m.BankAccount.IBAN, null, new { @class = "form-control", @disabled = "disabled" })
         </div>
-        <div class="form-group">
-            @Html.LabelFor(m => m.Credited)
-            @Html.TextBoxFor(m => m.Credited, null, new { @class = "form-control", @disabled = "disabled" })
-        </div>
         <h4>Operation</h4>
         <div class="form-group">
             @Html.LabelFor(m => m.Status)
-            @Html.TextBoxFor(m => m.Status.ToString("G"), null, new { @class = "form-control", @disabled = "disabled" })
+            @Html.TextBoxFor(m => m.Status, null, new { @class = "form-control", @disabled = "disabled" })
         </div>
         <div class="form-group">
             @Html.LabelFor(m => m.ExecutedOn)
@@ -82,7 +78,7 @@
                     <td>@transfer.PurchaseOrder.TotalOnSalePrice€</td>
                     <td>@transfer.PurchaseOrder.Status</td>
                     <td>
-                        <a asp-controller="Transfer" asp-action="Edit" asp-route-id="@transfer.Id" class="btn btn-info">
+                        <a asp-controller="Transfers" asp-action="Edit" asp-route-id="@transfer.Id" class="btn btn-info">
                             <i class="fa fa-eye"></i>
                         </a>
                         <a asp-controller="PurchaseOrders" asp-action="Edit" asp-route-id="@transfer.PurchaseOrder.Id" class="btn btn-info">

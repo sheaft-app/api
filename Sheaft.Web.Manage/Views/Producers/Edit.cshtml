@@ -5,7 +5,28 @@
 }
 
 <div class="container">
-    <h2 class="display-4">Producer details @(Model.RemovedOn.HasValue ? "(removed)":"")</h2>
+    <h2 class="display-4 d-inline">Producer details @(Model.RemovedOn.HasValue ? "(removed)":"")</h2>
+    <div class="d-inline">
+        @if (!Model.RemovedOn.HasValue)
+        {
+            @using (Html.BeginForm("Delete", "Producers", new { id = Model.Id }, FormMethod.Post, true, new { @class = "form d-inline" }))
+            {
+                <button type="submit" class="btn btn-danger">
+                    <i class="fa fa-trash"></i>
+                </button>
+            }
+        }
+        else
+        {
+            @using (Html.BeginForm("Restore", "Producers", new { id = Model.Id }, FormMethod.Post, true, new { @class = "form d-inline" }))
+            {
+                <button type="submit" class="btn btn-info">
+                    <i class="fa fa-trash-restore"></i>
+                </button>
+            }
+        }
+    </div>
+    <div class="clearfix"></div>
     <br />
 
     @using (Html.BeginForm("Edit", "Producers", FormMethod.Post, new { @class = "form", enctype = "multipart/form-data" }))

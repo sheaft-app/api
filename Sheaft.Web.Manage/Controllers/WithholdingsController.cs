@@ -61,7 +61,7 @@ namespace Sheaft.Web.Manage.Controllers
         [HttpGet]
         public async Task<IActionResult> Edit(Guid id, CancellationToken token)
         {
-            var entity = await _context.Donations
+            var entity = await _context.Withholdings
                 .AsNoTracking()
                 .Where(c => c.Id == id)
                 .ProjectTo<WithholdingViewModel>(_configurationProvider)

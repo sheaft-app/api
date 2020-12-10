@@ -29,15 +29,6 @@
                         <a asp-controller="Stores" asp-action="Edit" asp-route-id="@entity.Id" class="btn btn-info">
                             <i class="fa fa-pen"></i>
                         </a>
-                        @if (!entity.RemovedOn.HasValue)
-                        {
-                            @using (Html.BeginForm("Delete", "Stores", new { id = entity.Id }, FormMethod.Post, true, new { @class = "form d-inline" }))
-                            {
-                                <button type="submit" class="btn btn-danger">
-                                    <i class="fa fa-trash"></i>
-                                </button>
-                            }
-                        }
                     </td>
                 </tr>
             }

@@ -114,7 +114,7 @@
             @Html.LabelFor(m => m.Payin.Status)
             @Html.TextBoxFor(m => m.Payin.Status, null, new { @class = "form-control", @disabled = "disabled" })
         </div>
-        <a asp-controller="Payins" asp-action="Details" asp-route-id="@Model.Payin.Id" class="btn btn-info">
+        <a asp-controller="Payins" asp-action="Edit" asp-route-id="@Model.Payin.Id" class="btn btn-info">
             Payin details
         </a>
         <br />

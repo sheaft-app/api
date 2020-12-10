@@ -31,7 +31,7 @@
         <h4>Operation</h4>
         <div class="form-group">
             @Html.LabelFor(m => m.Status)
-            @Html.TextBoxFor(m => m.Status.ToString("G"), null, new { @class = "form-control", @disabled = "disabled" })
+            @Html.TextBoxFor(m => m.Status, null, new { @class = "form-control", @disabled = "disabled" })
         </div>
         <div class="form-group">
             @Html.LabelFor(m => m.ExecutedOn)
@@ -51,8 +51,8 @@
             @Html.TextBoxFor(m => m.Order.Identifier, null, new { @class = "form-control", @disabled = "disabled" })
         </div>
         <div class="form-group">
-            @Html.LabelFor(m => m.Order.Status.ToString("G"))
-            @Html.TextBoxFor(m => m.Order.Status.ToString("G"), null, new { @class = "form-control", @disabled = "disabled" })
+            @Html.LabelFor(m => m.Order.Status)
+            @Html.TextBoxFor(m => m.Order.Status, null, new { @class = "form-control", @disabled = "disabled" })
         </div>
         <div class="form-group">
             <a asp-controller="Orders" asp-action="Edit" asp-route-id="@Model.Order.Id" class="btn btn-info">

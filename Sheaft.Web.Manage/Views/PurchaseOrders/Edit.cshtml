@@ -4,7 +4,30 @@
 }
 
 <div class="container">
-    <h2 class="display-5">Purchase Order details @(Model.RemovedOn.HasValue ? "(removed)":"")</h2>
+    <div class="m-auto">
+        <h2 class="display-4 d-inline">Purchase Order details @(Model.RemovedOn.HasValue ? "(removed)":"")</h2>
+        <div class="d-inline text-right">
+            @if (!Model.RemovedOn.HasValue)
+            {
+                @using (Html.BeginForm("Delete", "PurchaseOrders", new { id = Model.Id }, FormMethod.Post, true, new { @class = "form d-inline" }))
+                {
+                    <button type="submit" class="btn btn-danger">
+                        <i class="fa fa-trash"></i>
+                    </button>
+                }
+            }
+            else
+            {
+                @using (Html.BeginForm("Restore", "PurchaseOrders", new { id = Model.Id }, FormMethod.Post, true, new { @class = "form d-inline" }))
+                {
+                    <button type="submit" class="btn btn-info">
+                        <i class="fa fa-trash-restore"></i>
+                    </button>
+                }
+            }
+        </div>
+    </div>
+    <div class="clearfix"></div>
     <br />
 
     @using (Html.BeginForm("Edit", "PurchaseOrders", FormMethod.Post, new { @class = "form" }))
@@ -123,7 +146,10 @@
             @Html.TextBoxFor(c => c.Vendor.Email, null, new { @class = "form-control", @disabled = "disabled" })
         </div>
 
-        <h4>Info</h4>
+        @if (Model.WithdrawnOn.HasValue || !string.IsNullOrWhiteSpace(Model.Comment))
+        {
+            <h4>Info</h4>
+        }
         @if (Model.WithdrawnOn.HasValue)
         {
             <div class="form-group">
@@ -158,12 +184,13 @@
                 @Html.LabelFor(c => c.Transfer.Status, new { @class = "form-label" })
                 @Html.TextBoxFor(c => c.Transfer.Status, new { @class = "form-control", @disabled = "disabled" })
             </div>
-            <br />
             <a asp-controller="Transfers" asp-action="Edit" asp-route-id="@Model.Transfer.Id" class="btn btn-info">
-                User details
+                Transfer details
             </a>
         }
 
+        <br/>
+        <br/>
         <h4>Products</h4>
 
         <table class="table table-hover">
@@ -202,8 +229,8 @@
             Cancel
         </a>
         @*<button type="submit" class="btn btn-success">
-            <i class="fa fa-check">&nbsp;Save</i>
-        </button>*@
+                <i class="fa fa-check">&nbsp;Save</i>
+            </button>*@
     }
 
 </div>

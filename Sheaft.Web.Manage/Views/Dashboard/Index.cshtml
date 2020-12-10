@@ -36,13 +36,6 @@
                 <a asp-controller="Tags" asp-action="index" class="card-link">Show</a>
             </div>
         </div>
-        <div class="card w-25 d-inline-block">
-            <div class="card-body">
-                <h5 class="card-title">Declarations</h5>
-                <h6 class="card-subtitle mb-2 text-muted">N/A</h6>
-                <a asp-controller="Declarations" asp-action="index" class="card-link">Show</a>
-            </div>
-        </div>
     }
     @if (!user.IsInRole("STORE") && !user.IsInRole("CONSUMER"))
     {
