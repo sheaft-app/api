@@ -37,7 +37,7 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
                 d.ToTable("Documents");
             });
 
-            entity.HasOne(c => c.User).WithOne().HasForeignKey<Legal>("UserUid").OnDelete(DeleteBehavior.Cascade);
+            entity.HasOne(c => c.User).WithOne(u => u.Legal).HasForeignKey<Legal>("UserUid").OnDelete(DeleteBehavior.Cascade);
 
             entity.HasDiscriminator<UserKind>("UserKind")
                 .HasValue<ConsumerLegal>(UserKind.Consumer)

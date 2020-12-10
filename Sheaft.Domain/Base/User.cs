@@ -46,6 +46,7 @@ namespace Sheaft.Domain.Models
         public string SponsorshipCode { get; private set; }
         public int TotalPoints { get; private set; }
         public virtual UserAddress Address { get; private set; }
+        public virtual Legal Legal { get; private set; }
         public virtual IReadOnlyCollection<Points> Points { get { return _points.AsReadOnly(); } }
 
         public void SetFirstname(string firstname)
