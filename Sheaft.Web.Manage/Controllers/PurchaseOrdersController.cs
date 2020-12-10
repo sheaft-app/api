@@ -47,7 +47,7 @@ namespace Sheaft.Web.Manage.Controllers
             var requestUser = await GetRequestUser(token);
             if (requestUser.IsImpersonating)
             {
-                if(requestUser.IsInRole(_roleOptions.Producer.Value))
+                if (requestUser.IsInRole(_roleOptions.Producer.Value))
                     query = query.Where(p => p.Vendor.Id == requestUser.Id);
                 else
                     query = query.Where(p => p.Sender.Id == requestUser.Id);
@@ -73,7 +73,9 @@ namespace Sheaft.Web.Manage.Controllers
         [HttpGet]
         public async Task<IActionResult> Edit(Guid id, CancellationToken token)
         {
-            var requestUser = await GetRequestUser(token);            
+            var requestUser = await GetRequestUser(token);
+            if (!requestUser.IsImpersonating)
+                return RedirectToAction("Impersonate", "Account");
 
             var entity = await _context.PurchaseOrders
                 .AsNoTracking()
@@ -85,6 +87,125 @@ namespace Sheaft.Web.Manage.Controllers
                 throw new NotFoundException();
 
             return View(entity);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Accept(Guid id, CancellationToken token)
+        {
+            var requestUser = await GetRequestUser(token);
+            if (!requestUser.IsImpersonating || !requestUser.IsInRole("PRODUCER"))
+                return RedirectToAction("Impersonate", "Account");
+
+            var result = await _mediatr.Process(new AcceptPurchaseOrderCommand(requestUser)
+            {
+                Id = id,
+                SkipNotification = true,
+            }, token);
+
+            if (!result.Success)
+                throw result.Exception;
+
+            return RedirectToAction("Edit", new { id });
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Refuse(Guid id, CancellationToken token)
+        {
+            var requestUser = await GetRequestUser(token);
+            if (!requestUser.IsImpersonating || !requestUser.IsInRole("PRODUCER"))
+                return RedirectToAction("Impersonate", "Account");
+
+            var result = await _mediatr.Process(new RefusePurchaseOrderCommand(requestUser)
+            {
+                Id = id,
+                SkipNotification = true,
+            }, token);
+
+            if (!result.Success)
+                throw result.Exception;
+
+            return RedirectToAction("Edit", new { id });
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Cancel(Guid id, CancellationToken token)
+        {
+            var requestUser = await GetRequestUser(token);
+            if (!requestUser.IsImpersonating || !requestUser.IsInRole("PRODUCER") || !requestUser.IsInRole("CONSUMER"))
+                return RedirectToAction("Impersonate", "Account");
+
+            var result = await _mediatr.Process(new CancelPurchaseOrderCommand(requestUser)
+            {
+                Id = id,
+                SkipNotification = true,
+            }, token);
+
+            if (!result.Success)
+                throw result.Exception;
+
+            return RedirectToAction("Edit", new { id });
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Process(Guid id, CancellationToken token)
+        {
+            var requestUser = await GetRequestUser(token);
+            if (!requestUser.IsImpersonating || !requestUser.IsInRole("PRODUCER"))
+                return RedirectToAction("Impersonate", "Account");
+
+            var result = await _mediatr.Process(new ProcessPurchaseOrderCommand(requestUser)
+            {
+                Id = id,
+                SkipNotification = true,
+            }, token);
+
+            if (!result.Success)
+                throw result.Exception;
+
+            return RedirectToAction("Edit", new { id });
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Complete(Guid id, CancellationToken token)
+        {
+            var requestUser = await GetRequestUser(token);
+            if (!requestUser.IsImpersonating || !requestUser.IsInRole("PRODUCER"))
+                return RedirectToAction("Impersonate", "Account");
+
+            var result = await _mediatr.Process(new CompletePurchaseOrderCommand(requestUser)
+            {
+                Id = id,
+                SkipNotification = true,
+            }, token);
+
+            if (!result.Success)
+                throw result.Exception;
+
+            return RedirectToAction("Edit", new { id });
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Deliver(Guid id, CancellationToken token)
+        {
+            var requestUser = await GetRequestUser(token);
+            if (!requestUser.IsImpersonating || !requestUser.IsInRole("PRODUCER"))
+                return RedirectToAction("Impersonate", "Account");
+
+            var result = await _mediatr.Process(new DeliverPurchaseOrderCommand(requestUser)
+            {
+                Id = id
+            }, token);
+
+            if (!result.Success)
+                throw result.Exception;
+
+            return RedirectToAction("Edit", new { id });
         }
 
         [HttpPost]

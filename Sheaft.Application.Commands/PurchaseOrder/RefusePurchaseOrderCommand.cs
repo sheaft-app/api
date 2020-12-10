@@ -13,5 +13,6 @@ namespace Sheaft.Application.Commands
 
         public Guid Id { get; set; }
         public string Reason { get; set; }
+        public bool SkipNotification { get; set; }
     }
 }

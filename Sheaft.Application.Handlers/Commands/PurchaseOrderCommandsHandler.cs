@@ -255,10 +255,13 @@ namespace Sheaft.Application.Handlers
 
                 await _context.SaveChangesAsync(token);
 
-                if (request.RequestUser.Id == purchaseOrder.Sender.Id)
-                    _mediatr.Post(new PurchaseOrderWithdrawnEvent(request.RequestUser) { PurchaseOrderId = purchaseOrder.Id });
-                else
-                    _mediatr.Post(new PurchaseOrderCancelledEvent(request.RequestUser) { PurchaseOrderId = purchaseOrder.Id });
+                if (!request.SkipNotification)
+                {
+                    if (request.RequestUser.Id == purchaseOrder.Sender.Id)
+                        _mediatr.Post(new PurchaseOrderWithdrawnEvent(request.RequestUser) { PurchaseOrderId = purchaseOrder.Id });
+                    else
+                        _mediatr.Post(new PurchaseOrderCancelledEvent(request.RequestUser) { PurchaseOrderId = purchaseOrder.Id });
+                }
 
                 _mediatr.Schedule(new CreatePayinRefundCommand(request.RequestUser) { PurchaseOrderId = purchaseOrder.Id }, TimeSpan.FromDays(1));
                 return Ok(true);
@@ -274,7 +277,9 @@ namespace Sheaft.Application.Handlers
 
                 await _context.SaveChangesAsync(token);
 
-                _mediatr.Post(new PurchaseOrderRefusedEvent(request.RequestUser) { PurchaseOrderId = purchaseOrder.Id });
+                if (!request.SkipNotification)
+                    _mediatr.Post(new PurchaseOrderRefusedEvent(request.RequestUser) { PurchaseOrderId = purchaseOrder.Id });
+
                 _mediatr.Schedule(new CreatePayinRefundCommand(request.RequestUser) { PurchaseOrderId = purchaseOrder.Id }, TimeSpan.FromDays(1));
                 return Ok(true);
             });
@@ -289,7 +294,9 @@ namespace Sheaft.Application.Handlers
 
                 await _context.SaveChangesAsync(token);
 
-                _mediatr.Post(new PurchaseOrderProcessingEvent(request.RequestUser) { PurchaseOrderId = purchaseOrder.Id });
+                if (!request.SkipNotification)
+                    _mediatr.Post(new PurchaseOrderProcessingEvent(request.RequestUser) { PurchaseOrderId = purchaseOrder.Id });
+
                 return Ok(true);
             });
         }
@@ -303,7 +310,9 @@ namespace Sheaft.Application.Handlers
 
                 await _context.SaveChangesAsync(token);
 
-                _mediatr.Post(new PurchaseOrderCompletedEvent(request.RequestUser) { PurchaseOrderId = purchaseOrder.Id });
+                if (!request.SkipNotification)
+                    _mediatr.Post(new PurchaseOrderCompletedEvent(request.RequestUser) { PurchaseOrderId = purchaseOrder.Id });
+
                 return Ok(true);
             });
         }
@@ -317,7 +326,9 @@ namespace Sheaft.Application.Handlers
 
                 await _context.SaveChangesAsync(token);
                 
-                _mediatr.Post(new PurchaseOrderAcceptedEvent(request.RequestUser) { PurchaseOrderId = purchaseOrder.Id });
+                if(!request.SkipNotification)
+                    _mediatr.Post(new PurchaseOrderAcceptedEvent(request.RequestUser) { PurchaseOrderId = purchaseOrder.Id });
+
                 return Ok(true);
             });
         }
