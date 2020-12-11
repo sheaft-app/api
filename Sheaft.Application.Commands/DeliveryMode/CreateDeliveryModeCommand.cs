@@ -21,5 +21,7 @@ namespace Sheaft.Application.Commands
         public LocationAddressInput Address { get; set; }
         public IEnumerable<TimeSlotGroupInput> OpeningHours { get; set; }
         public bool Available { get; set; }
+        public bool AutoAcceptRelatedPurchaseOrder { get; set; }
+        public bool AutoCompleteRelatedPurchaseOrder { get; set; }
     }
 }

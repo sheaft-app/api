@@ -139,7 +139,7 @@ namespace Sheaft.Application.Handlers
                         {
                             OrderId = order.Id,
                             ProducerId = producerId,
-                            SkipSendEmail = true
+                            SkipNotification = true
                         }, token);
 
                         if (!result.Success)
@@ -292,7 +292,7 @@ namespace Sheaft.Application.Handlers
                             {
                                 OrderId = order.Id,
                                 ProducerId = producerId,
-                                SkipSendEmail = true
+                                SkipNotification = true
                             }, token);
 
                             if (!result.Success)

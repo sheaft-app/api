@@ -10,6 +10,8 @@ namespace Sheaft.GraphQL.Types
             descriptor.Field(c => c.Description);
             descriptor.Field(c => c.Kind);
             descriptor.Field(c => c.Available);
+            descriptor.Field(c => c.AutoAcceptRelatedPurchaseOrder);
+            descriptor.Field(c => c.AutoCompleteRelatedPurchaseOrder);
             descriptor.Field(c => c.LockOrderHoursBeforeDelivery);
 
             descriptor.Field(c => c.Id)

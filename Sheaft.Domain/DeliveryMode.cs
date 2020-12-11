@@ -39,6 +39,8 @@ namespace Sheaft.Domain.Models
         public string Name { get; private set; }
         public string Description { get; private set; }
         public bool Available { get; private set; }
+        public bool AutoAcceptRelatedPurchaseOrder { get; private set; }
+        public bool AutoCompleteRelatedPurchaseOrder { get; private set; }
         public virtual DeliveryAddress Address { get; private set; }
         public virtual Producer Producer { get; private set; }
         public virtual IReadOnlyCollection<TimeSlotHour> OpeningHours => _openingHours?.AsReadOnly(); 
@@ -69,6 +71,16 @@ namespace Sheaft.Domain.Models
         public void SetAvailability(bool available)
         {
             Available = available;
+        }
+
+        public void SetAutoAcceptRelatedPurchaseOrders(bool autoAccept)
+        {
+            AutoAcceptRelatedPurchaseOrder = autoAccept;
+        }
+
+        public void SetAutoCompleteRelatedPurchaseOrders(bool autoComplete)
+        {
+            AutoCompleteRelatedPurchaseOrder = autoComplete;
         }
 
         public void SetName(string name)

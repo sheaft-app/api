@@ -10,6 +10,7 @@ using Sheaft.Application.Interop;
 using Sheaft.Application.Events;
 using Microsoft.Extensions.Logging;
 using Microsoft.EntityFrameworkCore;
+using System.Linq;
 
 namespace Sheaft.Application.Handlers
 {
@@ -55,11 +56,15 @@ namespace Sheaft.Application.Handlers
                 var purchaseOrderId = order.AddPurchaseOrder(resultIdentifier.Data, producer);
                 await _context.SaveChangesAsync(token);
 
-                if (!request.SkipSendEmail)
+                if (!request.SkipNotification)
                 {
                     _mediatr.Post(new PurchaseOrderCreatedEvent(request.RequestUser) { PurchaseOrderId = purchaseOrderId });
                     _mediatr.Post(new PurchaseOrderReceivedEvent(request.RequestUser) { PurchaseOrderId = purchaseOrderId });
                 }
+
+                var delivery = order.Deliveries.FirstOrDefault(d => d.DeliveryMode.Producer.Id == producer.Id);
+                if(delivery.DeliveryMode.AutoAcceptRelatedPurchaseOrder)
+                    _mediatr.Post(new AcceptPurchaseOrderCommand(request.RequestUser) { Id = purchaseOrderId, SkipNotification = request.SkipNotification });
 
                 return Ok(purchaseOrderId);
             });
@@ -328,6 +333,11 @@ namespace Sheaft.Application.Handlers
                 
                 if(!request.SkipNotification)
                     _mediatr.Post(new PurchaseOrderAcceptedEvent(request.RequestUser) { PurchaseOrderId = purchaseOrder.Id });
+
+                var order = await _context.GetSingleAsync<Order>(o => o.PurchaseOrders.Any(po => po.Id == purchaseOrder.Id), token);
+                var delivery = order.Deliveries.FirstOrDefault(d => d.DeliveryMode.Producer.Id == purchaseOrder.Vendor.Id);
+                if (delivery.DeliveryMode.AutoCompleteRelatedPurchaseOrder)
+                    _mediatr.Post(new CompletePurchaseOrderCommand(request.RequestUser) { Id = purchaseOrder.Id, SkipNotification = request.SkipNotification });
 
                 return Ok(true);
             });

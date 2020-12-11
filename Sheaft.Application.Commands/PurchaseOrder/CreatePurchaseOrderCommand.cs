@@ -13,6 +13,6 @@ namespace Sheaft.Application.Commands
 
         public Guid OrderId { get; set; }
         public Guid ProducerId { get; set; }
-        public bool SkipSendEmail { get; set; }
+        public bool SkipNotification { get; set; }
     }
 }

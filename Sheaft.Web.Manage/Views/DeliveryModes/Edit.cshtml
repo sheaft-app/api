@@ -53,6 +53,18 @@
             @Html.LabelFor(c => c.LockOrderHoursBeforeDelivery, new { @class = "form-label" })
             @Html.TextBoxFor(c => c.LockOrderHoursBeforeDelivery, null, new { @class = "form-control" })
         </div>
+        <div class="form-check">
+            @Html.CheckBoxFor(m => m.Available, new { @class = "form-check-input" })
+            @Html.LabelFor(m => m.Available, new { @class = "form-check-label" })
+        </div>
+        <div class="form-check">
+            @Html.CheckBoxFor(m => m.AutoAcceptRelatedPurchaseOrder, new { @class = "form-check-input" })
+            @Html.LabelFor(m => m.AutoAcceptRelatedPurchaseOrder, new { @class = "form-check-label" })
+        </div>
+        <div class="form-check">
+            @Html.CheckBoxFor(m => m.AutoCompleteRelatedPurchaseOrder, new { @class = "form-check-input" })
+            @Html.LabelFor(m => m.AutoCompleteRelatedPurchaseOrder, new { @class = "form-check-label" })
+        </div>
         <div class="form-group">
             @Html.LabelFor(c => c.Description, new { @class = "form-label" })
             @Html.TextAreaFor(c => c.Description, new { @class = "form-control" })

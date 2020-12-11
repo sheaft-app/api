@@ -14,6 +14,9 @@ namespace Sheaft.Application.Models
         public int LockOrderHoursBeforeDelivery { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
+        public bool Available { get; set; }
+        public bool AutoAcceptRelatedPurchaseOrder { get; set; }
+        public bool AutoCompleteRelatedPurchaseOrder { get; set; }
         public AddressViewModel Address { get; set; }
         public ProducerViewModel Producer { get; set; }
         public IEnumerable<TimeSlotViewModel> OpeningHours { get; set; }

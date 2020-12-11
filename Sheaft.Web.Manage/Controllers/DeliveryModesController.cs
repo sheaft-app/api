@@ -87,6 +87,9 @@ namespace Sheaft.Web.Manage.Controllers
                 Name = model.Name,
                 Address = _mapper.Map<LocationAddressInput>(model.Address),
                 Kind = model.Kind,
+                Available = model.Available,
+                AutoAcceptRelatedPurchaseOrder = model.AutoAcceptRelatedPurchaseOrder,
+                AutoCompleteRelatedPurchaseOrder = model.AutoCompleteRelatedPurchaseOrder,
                 LockOrderHoursBeforeDelivery = model.LockOrderHoursBeforeDelivery     
             }, token);
 
