@@ -432,7 +432,7 @@ namespace Sheaft.GraphQL.Types
 
             descriptor.Field(c => c.SearchProductsAsync(default, default))
                 .Name("searchProducts")
-                .Argument("input", c => c.Type<NonNullType<SearchTermsInputType>>())
+                .Argument("input", c => c.Type<NonNullType<SearchProductsInputType>>())
                 .Type<NonNullType<ProductsSearchType>>();
 
             descriptor.Field(c => c.SearchStoresAsync(default, default))

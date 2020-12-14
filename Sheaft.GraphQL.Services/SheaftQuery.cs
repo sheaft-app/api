@@ -115,7 +115,7 @@ namespace Sheaft.GraphQL.Services
             return await businessQueries.SearchStoresAsync(CurrentUser.Id, input, CurrentUser, Token);
         }
 
-        public async Task<ProductsSearchDto> SearchProductsAsync(SearchTermsInput input, [Service] IProductQueries productQueries)
+        public async Task<ProductsSearchDto> SearchProductsAsync(SearchProductsInput input, [Service] IProductQueries productQueries)
         {
             SetLogTransaction("GraphQL", nameof(SearchProductsAsync), input);
             return await productQueries.SearchAsync(input, CurrentUser, Token);

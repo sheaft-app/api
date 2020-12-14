@@ -113,6 +113,7 @@ namespace Sheaft.Web.Api
             services.AddType<RegisterNewsletterInputType>();
             services.AddType<OwnerInputType>();
             services.AddType<SearchTermsInputType>();
+            services.AddType<SearchProductsInputType>();
             services.AddType<SetProductsAvailabilityInputType>();
             services.AddType<SetProductsSearchabilityInputType>();
             services.AddType<SetDeliveryModesAvailabilityInputType>();

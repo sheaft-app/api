@@ -31,20 +31,20 @@ namespace Sheaft.Application.Queries
             _indexClient = searchServiceClient.Indexes.GetClient(searchOptions.Value.Indexes.Products);
         }
 
-        public async Task<ProductsSearchDto> SearchAsync(SearchTermsInput terms, RequestUser currentUser, CancellationToken token)
+        public async Task<ProductsSearchDto> SearchAsync(SearchProductsInput terms, RequestUser currentUser, CancellationToken token)
         {
             var sp = new SearchParameters()
             {
                 SearchMode = SearchMode.Any,
                 Top = terms.Take,
                 Skip = (terms.Page - 1) * terms.Take,
-                SearchFields = new List<string> { "partialProductName", "partialProducerName" },
+                SearchFields = new List<string> { "partialProductName"},
                 Select = new List<string>()
                     {
                         "product_id", "product_name", "product_onSalePricePerUnit", "product_onSalePrice", "product_rating", "product_ratings_count", "product_image", "product_tags", "producer_id", "producer_name", "producer_email", "producer_phone", "producer_zipcode", "producer_city", "producer_longitude", "producer_latitude", "product_returnable", "product_unit", "product_quantityPerUnit", "product_conditioning", "product_available"
                     },
                 IncludeTotalResultCount = true,
-                HighlightFields = new List<string>() { "product_name", "producer_name" },
+                HighlightFields = new List<string>() { "product_name" },
                 HighlightPreTag = "<b>",
                 HighlightPostTag = "</b>"
             };
@@ -53,8 +53,7 @@ namespace Sheaft.Application.Queries
             {
                 if (terms.Sort.Contains("producer_geolocation") && terms.Longitude.HasValue && terms.Latitude.HasValue)
                 {
-                    sp.OrderBy = new List<string>(){  "geo.distance(producer_geolocation, geography'POINT(" + terms.Longitude.Value.ToString(new CultureInfo("en-US")) + " " + terms.Latitude.Value.ToString(new CultureInfo("en-US")) +
-                              ")')" };
+                    sp.OrderBy = new List<string>(){  $"geo.distance(producer_geolocation, geography'POINT({terms.Longitude.Value.ToString(new CultureInfo("en-US"))} {terms.Latitude.Value.ToString(new CultureInfo("en-US"))})')" };
                 }
                 else if (!terms.Sort.Contains("producer_geolocation"))
                 {
@@ -63,20 +62,21 @@ namespace Sheaft.Application.Queries
             }
 
             var filter = "removed eq 0 and product_searchable eq true";
+            if (terms.ProducerId.HasValue)
+                filter += $" and producer_id eq '{terms.ProducerId.Value:N}'";
             if (terms.Tags != null)
             {
                 foreach (var tag in terms.Tags)
                 {
                     filter += " and ";
-                    filter += "product_tags/any(p: p eq '" + tag.ToLowerInvariant() + "')";
+                    filter += $"product_tags/any(p: p eq '{tag.ToLowerInvariant()}')";
                 }
             }
 
             if (terms.Longitude.HasValue && terms.Latitude.HasValue)
             {
                 filter += " and ";
-                filter += "geo.distance(producer_geolocation, geography'POINT(" + terms.Longitude.Value.ToString(new CultureInfo("en-US")) + " " + terms.Latitude.Value.ToString(new CultureInfo("en-US")) +
-                          ")') le " + (terms.MaxDistance ?? 200);
+                filter += $"geo.distance(producer_geolocation, geography'POINT({terms.Longitude.Value.ToString(new CultureInfo("en-US"))} {terms.Latitude.Value.ToString(new CultureInfo("en-US"))})') le {terms.MaxDistance ?? 200}";
             }
 
             sp.Filter = filter;
