@@ -85,7 +85,7 @@ namespace Sheaft.Application.Queries
             var searchResults = new List<SearchProduct>();
             foreach (var result in results.Results)
             {
-                var json = JsonConvert.SerializeObject(result.Document, Formatting.Indented);
+                var json = JsonConvert.SerializeObject(result.Document, Formatting.None);
                 var myobject = JsonConvert.DeserializeObject<SearchProduct>(json);
                 searchResults.Add(myobject);
             }

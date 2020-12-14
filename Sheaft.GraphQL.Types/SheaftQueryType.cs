@@ -424,6 +424,11 @@ namespace Sheaft.GraphQL.Types
                 .Argument("input", c => c.Type<NonNullType<StringType>>())
                 .Type<SirenBusinessType>();
 
+            descriptor.Field(c => c.SuggestProducersAsync(default, default))
+                .Name("suggestProducers")
+                .Argument("input", c => c.Type<NonNullType<SearchTermsInputType>>())
+                .Type<ListType<ProducerSuggestType>>();
+
             descriptor.Field(c => c.SearchProducersAsync(default, default))
                 .Name("searchProducers")
                 .Authorize(Policies.STORE)

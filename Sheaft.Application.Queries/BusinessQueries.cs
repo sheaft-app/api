@@ -63,6 +63,43 @@ namespace Sheaft.Application.Queries
             return contentObj.Etablissement;
         }
 
+        public async Task<IEnumerable<ProducerSuggestDto>> SuggestProducersAsync(SearchTermsInput terms, RequestUser currentUser, CancellationToken token)
+        {
+            var sp = new SuggestParameters
+            {
+                Top = terms.Take,
+                SearchFields = new List<string> { "partialProducerName" },
+                Select = new List<string>()
+                    {
+                        "producer_id", "producer_name", "producer_zipcode", "producer_city"
+                    },
+                HighlightPreTag = "<b>",
+                HighlightPostTag = "</b>",
+                UseFuzzyMatching = true,
+                OrderBy = new List<string> { "producer_name desc" },
+                Filter = "removed eq 0"
+            };
+
+            var results = await _producersIndex.Documents.SuggestAsync(terms.Text, _searchOptions.Suggesters.Producers, sp, cancellationToken: token); 
+            var searchResults = new List<SearchProducer>();
+            foreach (var result in results.Results)
+            {
+                var json = JsonConvert.SerializeObject(result.Document, Formatting.None);
+                searchResults.Add(JsonConvert.DeserializeObject<SearchProducer>(json));
+            }
+
+            return searchResults.Select(p => new ProducerSuggestDto
+            {
+                Id = p.Producer_id,
+                Name = p.Producer_name,
+                Address = new AddressSuggestDto
+                {
+                    City = p.Producer_city,
+                    Zipcode = p.Producer_zipcode
+                }
+            }) ?? new List<ProducerSuggestDto>();
+        }
+
         public async Task<StoresSearchDto> SearchStoresAsync(Guid producerId, SearchTermsInput terms, RequestUser currentUser, CancellationToken token)
         {
             var sp = new SearchParameters()
@@ -86,8 +123,7 @@ namespace Sheaft.Application.Queries
             {
                 if (terms.Sort.Contains("store_geolocation"))
                 {
-                    sp.OrderBy = new List<string>(){  "geo.distance(store_geolocation, geography'POINT(" + producer.Address.Longitude.Value.ToString(new CultureInfo("en-US")) + " " + producer.Address.Latitude.Value.ToString(new CultureInfo("en-US")) +
-                              ")')" };
+                    sp.OrderBy = new List<string>() { $"geo.distance(store_geolocation, geography'POINT({producer.Address.Longitude.Value.ToString(new CultureInfo("en-US"))} {producer.Address.Latitude.Value.ToString(new CultureInfo("en-US"))})')" };
                 }
                 else if (!terms.Sort.Contains("store_geolocation"))
                 {
@@ -101,13 +137,12 @@ namespace Sheaft.Application.Queries
                 foreach (var tag in terms.Tags)
                 {
                     filter += " and ";
-                    filter += "store_tags/any(p: p eq '" + tag.ToLowerInvariant() + "')";
+                    filter += $"store_tags/any(p: p eq '{tag.ToLowerInvariant()}')";
                 }
             }
 
             filter += " and ";
-            filter += "geo.distance(store_geolocation, geography'POINT(" + producer.Address.Longitude.Value.ToString(new CultureInfo("en-US")) + " " + producer.Address.Latitude.Value.ToString(new CultureInfo("en-US")) +
-                      ")') le " + (terms.MaxDistance ?? 200);
+            filter += $"geo.distance(store_geolocation, geography'POINT({producer.Address.Longitude.Value.ToString(new CultureInfo("en-US"))} {producer.Address.Latitude.Value.ToString(new CultureInfo("en-US"))})') le {terms.MaxDistance ?? 200}";
 
             sp.Filter = filter;
 
@@ -115,9 +150,8 @@ namespace Sheaft.Application.Queries
             var searchResults = new List<SearchStore>();
             foreach (var result in results.Results)
             {
-                var json = JsonConvert.SerializeObject(result.Document, Newtonsoft.Json.Formatting.Indented);
-                var myobject = JsonConvert.DeserializeObject<SearchStore>(json);
-                searchResults.Add(myobject);
+                var json = JsonConvert.SerializeObject(result.Document, Formatting.None);
+                searchResults.Add(JsonConvert.DeserializeObject<SearchStore>(json));
             }
 
             return new StoresSearchDto
@@ -167,8 +201,7 @@ namespace Sheaft.Application.Queries
             {
                 if (terms.Sort.Contains("producer_geolocation"))
                 {
-                    sp.OrderBy = new List<string>(){  "geo.distance(producer_geolocation, geography'POINT(" + store.Address.Longitude.Value.ToString(new CultureInfo("en-US")) + " " + store.Address.Latitude.Value.ToString(new CultureInfo("en-US")) +
-                              ")')" };
+                    sp.OrderBy = new List<string>() { $"geo.distance(producer_geolocation, geography'POINT({store.Address.Longitude.Value.ToString(new CultureInfo("en-US"))} {store.Address.Latitude.Value.ToString(new CultureInfo("en-US"))})')" };
                 }
                 else if (!terms.Sort.Contains("producer_geolocation"))
                 {
@@ -182,13 +215,12 @@ namespace Sheaft.Application.Queries
                 foreach (var tag in terms.Tags)
                 {
                     filter += " and ";
-                    filter += "producer_tags/any(p: p eq '" + tag.ToLowerInvariant() + "')";
+                    filter += $"producer_tags/any(p: p eq '{tag.ToLowerInvariant()}')";
                 }
             }
 
             filter += " and ";
-            filter += "geo.distance(producer_geolocation, geography'POINT(" + store.Address.Longitude.Value.ToString(new CultureInfo("en-US")) + " " + store.Address.Latitude.Value.ToString(new CultureInfo("en-US")) +
-                      ")') le " + (terms.MaxDistance ?? 200);
+            filter += $"geo.distance(producer_geolocation, geography'POINT({store.Address.Longitude.Value.ToString(new CultureInfo("en-US"))} {store.Address.Latitude.Value.ToString(new CultureInfo("en-US"))})') le {terms.MaxDistance ?? 200}";
 
             sp.Filter = filter;
 
@@ -196,9 +228,8 @@ namespace Sheaft.Application.Queries
             var searchResults = new List<SearchProducer>();
             foreach (var result in results.Results)
             {
-                var json = JsonConvert.SerializeObject(result.Document, Formatting.Indented);
-                var myobject = JsonConvert.DeserializeObject<SearchProducer>(json);
-                searchResults.Add(myobject);
+                var json = JsonConvert.SerializeObject(result.Document, Formatting.None);
+                searchResults.Add(JsonConvert.DeserializeObject<SearchProducer>(json));
             }
 
             return new ProducersSearchDto

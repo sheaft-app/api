@@ -121,6 +121,12 @@ namespace Sheaft.GraphQL.Services
             return await productQueries.SearchAsync(input, CurrentUser, Token);
         }
 
+        public async Task<IEnumerable<ProducerSuggestDto>> SuggestProducersAsync(SearchTermsInput input, [Service] IBusinessQueries businessQueries)
+        {
+            SetLogTransaction("GraphQL", nameof(SuggestProducersAsync), input);
+            return await businessQueries.SuggestProducersAsync(input, CurrentUser, Token);
+        }
+
         public IQueryable<UserProfileDto> GetMyUserProfile([Service] IUserQueries userQueries)
         {
             SetLogTransaction("GraphQL", nameof(GetMyUserProfile));

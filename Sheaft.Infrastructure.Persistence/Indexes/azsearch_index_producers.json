@@ -24,7 +24,7 @@ POST https://sheaft-search.search.windows.net/indexes?api-version=2020-06-30
       "filterable": false,
       "key": false,
       "retrievable": true,
-      "searchable": true,
+      "searchable": false,
       "sortable": true,
       "analyzer": "standard.lucene",
       "indexAnalyzer": null,
@@ -114,7 +114,7 @@ POST https://sheaft-search.search.windows.net/indexes?api-version=2020-06-30
       "filterable": true,
       "key": false,
       "retrievable": true,
-      "searchable": true,
+      "searchable": false,
       "sortable": true,
       "analyzer": "standard.lucene",
       "indexAnalyzer": null,
@@ -129,7 +129,7 @@ POST https://sheaft-search.search.windows.net/indexes?api-version=2020-06-30
       "filterable": true,
       "key": false,
       "retrievable": true,
-      "searchable": true,
+      "searchable": false,
       "sortable": true,
       "analyzer": "standard.lucene",
       "indexAnalyzer": null,
@@ -243,7 +243,15 @@ POST https://sheaft-search.search.windows.net/indexes?api-version=2020-06-30
       "fields": []
     }
   ],
-  "suggesters": [],
+  "suggesters": [
+    {
+      "name": "suggest-producers",
+      "searchMode": "analyzingInfixMatching",
+      "sourceFields": [
+        "partialProducerName"
+      ]
+    }
+  ],
   "similarity": {
     "@odata.type": "#Microsoft.Azure.Search.BM25Similarity"
   },

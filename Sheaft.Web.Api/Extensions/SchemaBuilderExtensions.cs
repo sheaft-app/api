@@ -47,6 +47,8 @@ namespace Sheaft.Web.Api
             services.AddType<DepartmentUserPointsType>();
             services.AddType<SearchStoreType>();
             services.AddType<SearchProducerType>();
+            services.AddType<AddressSuggestType>();
+            services.AddType<ProducerSuggestType>();
             services.AddType<ProductType>();
             services.AddType<OrderType>();
             services.AddType<TransactionType>();
