@@ -88,6 +88,7 @@ namespace Sheaft.Web.Manage.Controllers
                 Address = _mapper.Map<LocationAddressInput>(model.Address),
                 Kind = model.Kind,
                 Available = model.Available,
+                MaxPurchaseOrdersPerTimeSlot = model.MaxPurchaseOrdersPerTimeSlot,
                 AutoAcceptRelatedPurchaseOrder = model.AutoAcceptRelatedPurchaseOrder,
                 AutoCompleteRelatedPurchaseOrder = model.AutoCompleteRelatedPurchaseOrder,
                 LockOrderHoursBeforeDelivery = model.LockOrderHoursBeforeDelivery     

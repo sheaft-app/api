@@ -52,9 +52,11 @@ namespace Sheaft.Application.Handlers
                     }
                 }
 
-                var entity = new DeliveryMode(Guid.NewGuid(), request.Kind, producer, request.Available, request.LockOrderHoursBeforeDelivery, deliveryModeAddress, openingHours, request.Name, request.Description);
+                var entity = new DeliveryMode(Guid.NewGuid(), request.Kind, producer, request.Available, deliveryModeAddress, openingHours, request.Name, request.Description);
+                entity.SetLockOrderHoursBeforeDelivery(request.LockOrderHoursBeforeDelivery);
                 entity.SetAutoAcceptRelatedPurchaseOrders(request.AutoAcceptRelatedPurchaseOrder);
                 entity.SetAutoCompleteRelatedPurchaseOrders(request.AutoCompleteRelatedPurchaseOrder);
+                entity.SetMaxPurchaseOrdersPerTimeSlot(request.MaxPurchaseOrdersPerTimeSlot);
 
                 if (request.Kind == DeliveryKind.Collective || request.Kind == DeliveryKind.Farm || request.Kind == DeliveryKind.Market)
                     producer.CanDirectSell = true;
@@ -80,6 +82,7 @@ namespace Sheaft.Application.Handlers
                 entity.SetKind(request.Kind); 
                 entity.SetAutoAcceptRelatedPurchaseOrders(request.AutoAcceptRelatedPurchaseOrder);
                 entity.SetAutoCompleteRelatedPurchaseOrders(request.AutoCompleteRelatedPurchaseOrder);
+                entity.SetMaxPurchaseOrdersPerTimeSlot(request.MaxPurchaseOrdersPerTimeSlot);
 
                 if (request.Address != null)
                     entity.SetAddress(request.Address.Line1, request.Address.Line2, request.Address.Zipcode, request.Address.City, request.Address.Country, request.Address.Longitude, request.Address.Latitude);

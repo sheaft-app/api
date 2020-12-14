@@ -55,7 +55,7 @@ namespace Sheaft.Domain.Models
             if(oh == null)
                 throw new ValidationException(MessageKind.ExpectedDelivery_ExpectedDate_NotIn_DeliveryOpeningHours, delivery.Name, expectedDeliveryDate.ToString("dd/MM/yyyy"));
 
-            if(delivery.LockOrderHoursBeforeDelivery > 0 && expectedDeliveryDate.AddHours(-delivery.LockOrderHoursBeforeDelivery) < DateTime.UtcNow)
+            if(delivery.LockOrderHoursBeforeDelivery.HasValue && expectedDeliveryDate.AddHours(-delivery.LockOrderHoursBeforeDelivery.Value) < DateTime.UtcNow)
                 throw new ValidationException(MessageKind.ExpectedDelivery_ExpectedDate_OrdersLocked, delivery.Name, expectedDeliveryDate.ToString("dd/MM/yyyy"));
 
             return oh;

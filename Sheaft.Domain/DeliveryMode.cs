@@ -15,13 +15,12 @@ namespace Sheaft.Domain.Models
         {
         }
 
-        public DeliveryMode(Guid id, DeliveryKind kind, Producer producer, bool available, int lockOrderHoursBeforeDelivery, DeliveryAddress address, IEnumerable<TimeSlotHour> openingHours, string name, string description = null)
+        public DeliveryMode(Guid id, DeliveryKind kind, Producer producer, bool available, DeliveryAddress address, IEnumerable<TimeSlotHour> openingHours, string name, string description = null)
         {
             Id = id;
             Name = name;
             Kind = kind;
             Description = description;
-            LockOrderHoursBeforeDelivery = lockOrderHoursBeforeDelivery;
 
             Address = address;
             Producer = producer;
@@ -35,9 +34,10 @@ namespace Sheaft.Domain.Models
         public DateTimeOffset CreatedOn { get; private set; }
         public DateTimeOffset? UpdatedOn { get; private set; }
         public DateTimeOffset? RemovedOn { get; private set; }
-        public int LockOrderHoursBeforeDelivery { get; private set; }
+        public int? LockOrderHoursBeforeDelivery { get; private set; }
         public string Name { get; private set; }
         public string Description { get; private set; }
+        public int? MaxPurchaseOrdersPerTimeSlot { get; private set; }
         public bool Available { get; private set; }
         public bool AutoAcceptRelatedPurchaseOrder { get; private set; }
         public bool AutoCompleteRelatedPurchaseOrder { get; private set; }
@@ -50,11 +50,8 @@ namespace Sheaft.Domain.Models
             _openingHours = openingHours.ToList();
         }
 
-        public void SetLockOrderHoursBeforeDelivery(int lockOrderHoursBeforeDelivery)
+        public void SetLockOrderHoursBeforeDelivery(int? lockOrderHoursBeforeDelivery)
         {
-            if (lockOrderHoursBeforeDelivery < 0)
-                throw new ValidationException(MessageKind.DeliveryMode_LockOrderHoursBeforeDelivery_CannotBe_LowerThan, 0);
-
             LockOrderHoursBeforeDelivery = lockOrderHoursBeforeDelivery;
         }
 
@@ -93,9 +90,9 @@ namespace Sheaft.Domain.Models
             Kind = kind;
         }
 
-        public void SetAvailability(object available)
+        public void SetMaxPurchaseOrdersPerTimeSlot(int? maxPurchaseOrdersPerTimeSlot)
         {
-            throw new NotImplementedException();
+            MaxPurchaseOrdersPerTimeSlot = maxPurchaseOrdersPerTimeSlot;
         }
     }
 }

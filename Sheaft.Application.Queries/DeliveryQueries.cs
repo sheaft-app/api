@@ -79,7 +79,7 @@ namespace Sheaft.Application.Queries
                             Zipcode = deliveryMode.Address.Zipcode
                         } : null,
                         Name = deliveryMode.Name,
-                        DeliveryHours = GetAvailableDeliveryHours(deliveryMode.OpeningHours, deliveryMode.LockOrderHoursBeforeDelivery, currentDate),
+                        DeliveryHours = GetAvailableDeliveryHours(deliveryMode.OpeningHours, currentDate, deliveryMode.LockOrderHoursBeforeDelivery),
                     });
                 }
 
@@ -136,7 +136,7 @@ namespace Sheaft.Application.Queries
                             Zipcode = agreement.Delivery.Address.Zipcode
                         } : null,
                         Name = agreement.Delivery.Name,
-                        DeliveryHours = GetAvailableDeliveryHours(agreement.SelectedHours, agreement.Delivery.LockOrderHoursBeforeDelivery, currentDate),
+                        DeliveryHours = GetAvailableDeliveryHours(agreement.SelectedHours, currentDate, agreement.Delivery.LockOrderHoursBeforeDelivery),
                     });
                 }
 
@@ -147,7 +147,7 @@ namespace Sheaft.Application.Queries
             return list;
         }
 
-        private IEnumerable<DeliveryHourDto> GetAvailableDeliveryHours(IEnumerable<TimeSlotHour> openingHours, int lockOrderHoursBeforeDelivery, DateTimeOffset currentDate)
+        private IEnumerable<DeliveryHourDto> GetAvailableDeliveryHours(IEnumerable<TimeSlotHour> openingHours, DateTimeOffset currentDate, int? lockOrderHoursBeforeDelivery = 0)
         {
             var list = new List<DeliveryHourDto>();
             foreach (var openingHour in openingHours.OrderBy(oh => oh.Day))
@@ -171,10 +171,10 @@ namespace Sheaft.Application.Queries
             return list;
         }
 
-        private DeliveryHourDto GetDeliveryHourIfMatch(DateTimeOffset currentDate, TimeSlotHour openingHour, int diff, int lockOrderHoursBeforeDelivery)
+        private DeliveryHourDto GetDeliveryHourIfMatch(DateTimeOffset currentDate, TimeSlotHour openingHour, int diff, int? lockOrderHoursBeforeDelivery = 0)
         {
             var targetDate = new DateTime(currentDate.Year, currentDate.Month, currentDate.Day, openingHour.From.Hours, openingHour.From.Minutes, openingHour.From.Seconds).AddDays(diff);
-            if (currentDate.AddHours(lockOrderHoursBeforeDelivery) >= targetDate)
+            if (currentDate.AddHours(lockOrderHoursBeforeDelivery.Value) >= targetDate)
                 return null;
 
             return new DeliveryHourDto

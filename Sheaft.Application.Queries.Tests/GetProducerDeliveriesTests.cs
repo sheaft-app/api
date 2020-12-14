@@ -40,7 +40,6 @@ namespace Queries.Delivery.Tests
                 kind,
                 new Producer(Guid.Parse("3b5c008bb6a24f5c8cc8258b9e33105f"), "prod1", "fa", "la", "test@email.com", new UserAddress("x", null, "x", "x", CountryIsoCode.FR, null)),
                 available,
-                0,
                 new DeliveryAddress("x", null, "x", "x", CountryIsoCode.FR, null, null),
                 new List<TimeSlotHour>
                 {
@@ -73,15 +72,17 @@ namespace Queries.Delivery.Tests
             var currentDate = new DateTime(year, month, day, hour, minute, second);
             var producerId = Guid.NewGuid();
 
-            await _context.AddAsync(new DeliveryMode(
+            var delivery = new DeliveryMode(
                 Guid.NewGuid(),
                 DeliveryKind.Farm,
                 new Producer(producerId, "prod1", "fa", "la", "test@email.com", new UserAddress("x", null, "x", "x", CountryIsoCode.FR, null)),
                 true,
-                orderLockInHours,
                 new DeliveryAddress("x", null, "x", "x", CountryIsoCode.FR, null, null),
                 new List<TimeSlotHour> { new TimeSlotHour(DayOfWeek.Wednesday, TimeSpan.FromHours(8), TimeSpan.FromHours(12)) },
-                "delivery1"), token);
+                "delivery1");
+            delivery.SetLockOrderHoursBeforeDelivery(orderLockInHours);
+
+            await _context.AddAsync(delivery, token);
 
             await _context.SaveChangesAsync(token);
 
@@ -116,18 +117,19 @@ namespace Queries.Delivery.Tests
             var currentDate = new DateTime(year, month, day, hour, minute, second);
             var producerId = Guid.NewGuid();
 
-            await _context.AddAsync(new DeliveryMode(
-                Guid.NewGuid(),
-                DeliveryKind.Farm,
-                new Producer(producerId, "prod1", "fa", "la", "test@email.com", new UserAddress("x", null, "x", "x", CountryIsoCode.FR, null)),
-                true,
-                orderLockInHours,
-                new DeliveryAddress("x", null, "x", "x", CountryIsoCode.FR, null, null),
-                new List<TimeSlotHour> { 
-                    new TimeSlotHour(DayOfWeek.Wednesday, TimeSpan.FromHours(8), TimeSpan.FromHours(12)), 
-                    new TimeSlotHour(DayOfWeek.Saturday, TimeSpan.FromHours(10), TimeSpan.FromHours(16)) 
-                },
-                "delivery1"), token);
+            var entity = new DeliveryMode(
+                            Guid.NewGuid(),
+                            DeliveryKind.Farm,
+                            new Producer(producerId, "prod1", "fa", "la", "test@email.com", new UserAddress("x", null, "x", "x", CountryIsoCode.FR, null)),
+                            true,
+                            new DeliveryAddress("x", null, "x", "x", CountryIsoCode.FR, null, null),
+                            new List<TimeSlotHour> {
+                    new TimeSlotHour(DayOfWeek.Wednesday, TimeSpan.FromHours(8), TimeSpan.FromHours(12)),
+                    new TimeSlotHour(DayOfWeek.Saturday, TimeSpan.FromHours(10), TimeSpan.FromHours(16))
+                            },
+                            "delivery1");
+            entity.SetLockOrderHoursBeforeDelivery(orderLockInHours);
+            await _context.AddAsync(entity, token);
 
             await _context.SaveChangesAsync(token);
 
@@ -164,25 +166,27 @@ namespace Queries.Delivery.Tests
             var currentDate = new DateTime(year, month, day, hour, minute, second);
             var producerId = Guid.NewGuid();
 
-            await _context.AddAsync(new DeliveryMode(
+            var entity1 = new DeliveryMode(
                 Guid.NewGuid(),
                 DeliveryKind.Farm,
                 new Producer(producerId, "prod1", "fa", "la", "test@email.com", new UserAddress("x", null, "x", "x", CountryIsoCode.FR, null)),
                 true,
-                orderLockInHours,
                 new DeliveryAddress("x", null, "x", "x", CountryIsoCode.FR, null, null),
                 new List<TimeSlotHour> { new TimeSlotHour(DayOfWeek.Wednesday, TimeSpan.FromHours(8), TimeSpan.FromHours(12)) },
-                "delivery1"), token);
+                "delivery1");
+            entity1.SetLockOrderHoursBeforeDelivery(orderLockInHours);
+            await _context.AddAsync(entity1, token);
 
-            await _context.AddAsync(new DeliveryMode(
+            var entity2 = new DeliveryMode(
                 Guid.NewGuid(),
                 DeliveryKind.Market,
                 new Producer(producerId, "prod1", "fa", "la", "test@email.com", new UserAddress("x", null, "x", "x", CountryIsoCode.FR, null)),
                 true,
-                orderLockInHours,
                 new DeliveryAddress("x", null, "x", "x", CountryIsoCode.FR, null, null),
                 new List<TimeSlotHour> { new TimeSlotHour(DayOfWeek.Friday, TimeSpan.FromHours(16), TimeSpan.FromHours(18)) },
-                "delivery2"), token);
+                "delivery2");
+            entity2.SetLockOrderHoursBeforeDelivery(orderLockInHours);
+            await _context.AddAsync(entity2, token);
 
             await _context.SaveChangesAsync(token);
 
