@@ -68,7 +68,7 @@ namespace Sheaft.Application.Queries
             var sp = new SuggestParameters
             {
                 Top = terms.Take,
-                SearchFields = new List<string> { "partialProducerName" },
+                SearchFields = new List<string> { "producer_name" },
                 Select = new List<string>()
                     {
                         "producer_id", "producer_name", "producer_zipcode", "producer_city"

@@ -248,7 +248,7 @@ POST https://sheaft-search.search.windows.net/indexes?api-version=2020-06-30
       "name": "suggest-producers",
       "searchMode": "analyzingInfixMatching",
       "sourceFields": [
-        "partialProducerName"
+        "producer_name"
       ]
     }
   ],
