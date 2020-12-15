@@ -15,10 +15,10 @@ namespace Sheaft.Infrastructure.Services
     {
         private readonly CloudTableClient _tableClient;
         private readonly StorageOptions _storageOptions;
-        private readonly SponsoringOptions _sponsoringOptions;        
+        private readonly SponsoringOptions _sponsoringOptions;
 
         public IdentifierService(
-            IOptionsSnapshot<StorageOptions> storageOptions, 
+            IOptionsSnapshot<StorageOptions> storageOptions,
             IOptionsSnapshot<SponsoringOptions> sponsoringOptions,
             ILogger<IdentifierService> logger) : base(logger)
         {
@@ -68,6 +68,7 @@ namespace Sheaft.Infrastructure.Services
                 var code = "";
 
                 var concurrentUpdateError = false;
+                var retry = 0;
 
                 do
                 {
@@ -93,7 +94,8 @@ namespace Sheaft.Infrastructure.Services
                     }
                     catch (StorageException e)
                     {
-                        if (e.RequestInformation.HttpStatusCode == 412 || e.RequestInformation.HttpStatusCode == 409)
+                        retry++;
+                        if (retry <= 10 && (e.RequestInformation.HttpStatusCode == 412 || e.RequestInformation.HttpStatusCode == 409))
                             concurrentUpdateError = true;
                         else
                             throw;
@@ -147,6 +149,7 @@ namespace Sheaft.Infrastructure.Services
                 long id = 0;
 
                 var concurrentUpdateError = false;
+                var retry = 0;
 
                 do
                 {
@@ -179,7 +182,8 @@ namespace Sheaft.Infrastructure.Services
                     }
                     catch (StorageException e)
                     {
-                        if (e.RequestInformation.HttpStatusCode == 412 || e.RequestInformation.HttpStatusCode == 409)
+                        retry++;
+                        if (retry <= 10 && (e.RequestInformation.HttpStatusCode == 412 || e.RequestInformation.HttpStatusCode == 409))
                             concurrentUpdateError = true;
                         else
                             throw;

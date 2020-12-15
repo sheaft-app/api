@@ -1,8 +1,10 @@
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Moq;
 using Sheaft.Application.Interop;
 using Sheaft.Application.Models;
 using Sheaft.Application.Queries;
+using Sheaft.Core;
 using Sheaft.Domain.Enums;
 using Sheaft.Domain.Models;
 using Sheaft.Tests.Common;
@@ -19,12 +21,14 @@ namespace Queries.Delivery.Tests
     {
         private IAppDbContext _context;
         private IDeliveryQueries _queries;
+        private Mock<ICapingDeliveriesService> _capingMock;
 
         [TestInitialize]
         public void Initialize()
         {
+            _capingMock = new Mock<ICapingDeliveriesService>();
             _context = ContextHelper.GetInMemoryContext();
-            _queries = new DeliveryQueries(_context, null);
+            _queries = new DeliveryQueries(_context, _capingMock.Object, null);
         }
 
         [TestMethod]
@@ -213,6 +217,150 @@ namespace Queries.Delivery.Tests
             farmDelivery.DeliveryHours.Should().OnlyContain(c => c.Day == DayOfWeek.Wednesday);
             farmDelivery.DeliveryHours.ElementAt(0).ExpectedDeliveryDate.Day.Should().Be(expectedFarmDelivery_FirstDay);
             farmDelivery.DeliveryHours.ElementAt(1).ExpectedDeliveryDate.Day.Should().Be(expectedFarmDelivery_SecondDay);
+        }
+
+        [TestMethod]
+        [DataRow(1, 0, 2021, 1, 1, 8, 12)]
+        [DataRow(5, 3, 2021, 1, 1, 8, 12)]
+        public async Task Should_Return_Deliveries_With_Capings(int maxPurchaseOrders, int currentOrders, int year, int month, int day, int from, int to)
+        {
+            var deliveryId = Guid.NewGuid();
+            var producerId = Guid.NewGuid();
+            var expectedDeliveryDate = new DateTimeOffset(year, month, day, 0, 0, 0, TimeSpan.FromHours(0));
+            var expectedDeliveryDate2 = new DateTimeOffset(year, month, day, 0, 0, 0, TimeSpan.FromHours(0)).AddDays(7);
+            var result = new List<CapingDeliveryDto>
+            {
+                new CapingDeliveryDto
+                {
+                    Count = currentOrders,
+                    DeliveryId = deliveryId,
+                    ProducerId = producerId,
+                    From = TimeSpan.FromHours(from),
+                    To = TimeSpan.FromHours(to),
+                    PartitionKey = $"{producerId}-{deliveryId}-{expectedDeliveryDate.Year}{expectedDeliveryDate.Month}{expectedDeliveryDate.Day}",
+                    RowKey = $"{TimeSpan.FromHours(from).TotalSeconds}-{TimeSpan.FromHours(to).TotalSeconds}",
+                    ExpectedDate = expectedDeliveryDate
+                },
+                new CapingDeliveryDto
+                {
+                    Count = currentOrders,
+                    DeliveryId = deliveryId,
+                    ProducerId = producerId,
+                    From = TimeSpan.FromHours(from),
+                    To = TimeSpan.FromHours(to),
+                    PartitionKey = $"{producerId}-{deliveryId}-{expectedDeliveryDate2.Year}{expectedDeliveryDate2.Month}{expectedDeliveryDate2.Day}",
+                    RowKey = $"{TimeSpan.FromHours(from).TotalSeconds}-{TimeSpan.FromHours(to).TotalSeconds}",
+                    ExpectedDate = expectedDeliveryDate2
+                }
+            };
+
+            _capingMock.Setup(c => c.GetCapingDeliveriesAsync(It.IsAny<IEnumerable<Tuple<Guid, Guid, DeliveryHourDto>>>(), It.IsAny<CancellationToken>()))
+                .Returns(Task.FromResult((Result<IEnumerable<CapingDeliveryDto>>)new SuccessResult<IEnumerable<CapingDeliveryDto>>(result)));
+
+            var token = CancellationToken.None;
+
+            var delivery = new DeliveryMode(
+                deliveryId,
+                DeliveryKind.Farm,
+                new Producer(producerId, "prod1", "fa", "la", "test@email.com", new UserAddress("x", null, "x", "x", CountryIsoCode.FR, null)),
+                true,
+                new DeliveryAddress("x", null, "x", "x", CountryIsoCode.FR, null, null),
+                new List<TimeSlotHour>
+                {
+                    new TimeSlotHour(DayOfWeek.Friday, TimeSpan.FromHours(from), TimeSpan.FromHours(to))
+                },
+                "delivery1");
+
+            delivery.SetMaxPurchaseOrdersPerTimeSlot(maxPurchaseOrders);
+
+            await _context.AddAsync(delivery, token);
+            await _context.SaveChangesAsync(token);
+
+            //test
+            var results = await _queries.GetProducersDeliveriesAsync(
+                new List<Guid> { producerId },
+                new List<DeliveryKind> { DeliveryKind.Farm },
+                expectedDeliveryDate.AddDays(-1),
+                null,
+                token);
+
+            //assert
+            var deliveriesResults = results
+                .Should().NotBeNull().And.ContainSingle()
+                .And.Subject.First().Deliveries.Should().HaveCount(1);
+
+            deliveriesResults.And.Subject.First().DeliveryHours.Should().HaveCount(2);
+        }
+
+        [TestMethod]
+        [DataRow(1, 2, 2021, 1, 1, 8, 12)]
+        [DataRow(5, 5, 2021, 1, 1, 8, 12)]
+        public async Task Should_Return_No_Deliveries_With_Capings(int maxPurchaseOrders, int currentOrders, int year, int month, int day, int from, int to)
+        {
+            var deliveryId = Guid.NewGuid();
+            var producerId = Guid.NewGuid();
+            var expectedDeliveryDate = new DateTimeOffset(year, month, day, 0, 0, 0, TimeSpan.FromHours(0));
+            var expectedDeliveryDate2 = new DateTimeOffset(year, month, day, 0, 0, 0, TimeSpan.FromHours(0)).AddDays(7);
+            var result = new List<CapingDeliveryDto>
+            {
+                new CapingDeliveryDto
+                {
+                    Count = currentOrders,
+                    DeliveryId = deliveryId,
+                    ProducerId = producerId,
+                    From = TimeSpan.FromHours(from),
+                    To = TimeSpan.FromHours(to),
+                    PartitionKey = $"{producerId}-{deliveryId}-{expectedDeliveryDate.Year}{expectedDeliveryDate.Month}{expectedDeliveryDate.Day}",
+                    RowKey = $"{TimeSpan.FromHours(from).TotalSeconds}-{TimeSpan.FromHours(to).TotalSeconds}",
+                    ExpectedDate = expectedDeliveryDate
+                },
+                new CapingDeliveryDto
+                {
+                    Count = currentOrders,
+                    DeliveryId = deliveryId,
+                    ProducerId = producerId,
+                    From = TimeSpan.FromHours(from),
+                    To = TimeSpan.FromHours(to),
+                    PartitionKey = $"{producerId}-{deliveryId}-{expectedDeliveryDate2.Year}{expectedDeliveryDate2.Month}{expectedDeliveryDate2.Day}",
+                    RowKey = $"{TimeSpan.FromHours(from).TotalSeconds}-{TimeSpan.FromHours(to).TotalSeconds}",
+                    ExpectedDate = expectedDeliveryDate2
+                }
+            };
+
+            _capingMock.Setup(c => c.GetCapingDeliveriesAsync(It.IsAny<IEnumerable<Tuple<Guid, Guid, DeliveryHourDto>>>(), It.IsAny<CancellationToken>()))
+                .Returns(Task.FromResult((Result<IEnumerable<CapingDeliveryDto>>)new SuccessResult<IEnumerable<CapingDeliveryDto>>(result)));
+
+            var token = CancellationToken.None;
+
+            var delivery = new DeliveryMode(
+                deliveryId,
+                DeliveryKind.Farm,
+                new Producer(producerId, "prod1", "fa", "la", "test@email.com", new UserAddress("x", null, "x", "x", CountryIsoCode.FR, null)),
+                true,
+                new DeliveryAddress("x", null, "x", "x", CountryIsoCode.FR, null, null),
+                new List<TimeSlotHour>
+                {
+                    new TimeSlotHour(DayOfWeek.Friday, TimeSpan.FromHours(from), TimeSpan.FromHours(to))
+                },
+                "delivery1");
+
+            delivery.SetMaxPurchaseOrdersPerTimeSlot(maxPurchaseOrders);
+
+            await _context.AddAsync(delivery, token);
+            await _context.SaveChangesAsync(token);
+
+            //test
+            var results = await _queries.GetProducersDeliveriesAsync(
+                new List<Guid> { producerId },
+                new List<DeliveryKind> { DeliveryKind.Farm },
+                expectedDeliveryDate.AddDays(-1),
+                null,
+                token);
+
+            //assert
+            var deliveriesResults = results
+                .Should().NotBeNull().And.ContainSingle()
+                .And.Subject.First().Deliveries.Should().HaveCount(0);
         }
     }
 }

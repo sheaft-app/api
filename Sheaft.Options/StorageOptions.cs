@@ -33,6 +33,7 @@
         public string PurchaseOrdersReferences { get; set; } = "purchaseorders";
         public string ProductsReferences { get; set; } = "products";
         public string SponsoringCodes { get; set; } = "sponsoring";
+        public string CapingDeliveries { get; set; } = "capingdeliveries";
     }
 
     public class StorageQueues

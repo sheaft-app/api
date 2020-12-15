@@ -246,6 +246,7 @@ namespace Sheaft.Web.Api
             services.AddScoped<IPictureService, PictureService>();
             services.AddScoped<IPspService, PspService>();
             services.AddScoped<IFeesService, FeesService>();
+            services.AddScoped<ICapingDeliveriesService, CapingDeliveriesService>();
             services.AddScoped<ISheaftMediatr, SheaftMediatr>();
             services.AddScoped<IAuthService, AuthService>();
 

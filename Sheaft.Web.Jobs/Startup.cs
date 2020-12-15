@@ -213,6 +213,7 @@ namespace Sheaft.Web.Jobs
             services.AddScoped<IPictureService, PictureService>();
             services.AddScoped<IPspService, PspService>();
             services.AddScoped<IFeesService, FeesService>();
+            services.AddScoped<ICapingDeliveriesService, CapingDeliveriesService>();
             services.AddScoped<ISheaftMediatr, SheaftMediatr>();
             services.AddScoped<IAuthService, AuthService>();
             services.AddScoped<ISheaftHangfireBridge, SheaftHangfireBridge>();
