@@ -15,24 +15,23 @@ namespace Sheaft.Infrastructure.Services
 {
     public class CapingDeliveriesService : BaseService, ICapingDeliveriesService
     {
-        private readonly CloudTableClient _tableClient;
+        private readonly CloudStorageAccount _cloudStorageAccount;
         private readonly StorageOptions _storageOptions;
 
         public CapingDeliveriesService(
+            CloudStorageAccount cloudStorageAccount,
             IOptionsSnapshot<StorageOptions> storageOptions,
             ILogger<CapingDeliveriesService> logger) : base(logger)
         {
             _storageOptions = storageOptions.Value;
-
-            var cloudStorageAccount = CloudStorageAccount.Parse(_storageOptions.ConnectionString);
-            _tableClient = cloudStorageAccount.CreateCloudTableClient();
+            _cloudStorageAccount = cloudStorageAccount;
         }
 
         public async Task<Result<IEnumerable<CapingDeliveryDto>>> GetCapingDeliveriesAsync(IEnumerable<Tuple<Guid, Guid, DeliveryHourDto>> deliveries, CancellationToken token)
         {
             return await ExecuteAsync(async () =>
             {
-                var table = _tableClient.GetTableReference(_storageOptions.Tables.CapingDeliveries);
+                var table = _cloudStorageAccount.CreateCloudTableClient().GetTableReference(_storageOptions.Tables.CapingDeliveries);
                 await table.CreateIfNotExistsAsync(token);
 
                 var tasks = new List<Task<TableResult>>();
@@ -46,7 +45,7 @@ namespace Sheaft.Infrastructure.Services
                 var results = await Task.WhenAll(tasks);
                 foreach (var result in results)
                 {
-                    if (result == null || result.HttpStatusCode >= 400)
+                    if (result == null || result.HttpStatusCode != 404 && result.HttpStatusCode > 400)
                         continue;
 
                     if (result.Result is CapingDeliveryTableEntity capingDelivery && capingDelivery != null)
@@ -58,8 +57,8 @@ namespace Sheaft.Infrastructure.Services
                             DeliveryId = capingDelivery.DeliveryId,
                             ProducerId = capingDelivery.ProducerId,
                             ExpectedDate = capingDelivery.ExpectedDate,
-                            From = capingDelivery.From,
-                            To = capingDelivery.To
+                            From = TimeSpan.FromSeconds(capingDelivery.From),
+                            To = TimeSpan.FromSeconds(capingDelivery.To)
                         });
                 }
 
@@ -71,7 +70,7 @@ namespace Sheaft.Infrastructure.Services
         {
             return await ExecuteAsync(async () =>
             {
-                var table = _tableClient.GetTableReference(_storageOptions.Tables.CapingDeliveries);
+                var table = _cloudStorageAccount.CreateCloudTableClient().GetTableReference(_storageOptions.Tables.CapingDeliveries);
                 await table.CreateIfNotExistsAsync(token);
 
                 string partitionKey = GetPartitionKey(producerId, deliveryId, expectedDeliveryDate);
@@ -103,17 +102,27 @@ namespace Sheaft.Infrastructure.Services
                     DeliveryId = capingDelivery.DeliveryId,
                     ProducerId = capingDelivery.ProducerId,
                     ExpectedDate = capingDelivery.ExpectedDate,
-                    From = capingDelivery.From,
-                    To = capingDelivery.To
+                    From = TimeSpan.FromSeconds(capingDelivery.From),
+                    To = TimeSpan.FromSeconds(capingDelivery.To)
                 });
             });
         }
 
-        public async Task<Result<bool>> UpdateCapingDeliveryAsync(Guid producerId, Guid deliveryId, DateTimeOffset expectedDeliveryDate, TimeSpan from, TimeSpan to, int maxPurchaseOrders, CancellationToken token)
+        public async Task<Result<bool>> IncreaseProducerDeliveryCountAsync(Guid producerId, Guid deliveryId, DateTimeOffset expectedDeliveryDate, TimeSpan from, TimeSpan to, int maxPurchaseOrders, CancellationToken token)
+        {
+            return await UpdateProducerDeliveryCountAsync(producerId, deliveryId, expectedDeliveryDate, from, to, maxPurchaseOrders, +1, token);
+        }
+
+        public async Task<Result<bool>> DecreaseProducerDeliveryCountAsync(Guid producerId, Guid deliveryId, DateTimeOffset expectedDeliveryDate, TimeSpan from, TimeSpan to, int maxPurchaseOrders, CancellationToken token)
+        {
+            return await UpdateProducerDeliveryCountAsync(producerId, deliveryId, expectedDeliveryDate, from, to, maxPurchaseOrders, -1, token);
+        }
+
+        private async Task<Result<bool>> UpdateProducerDeliveryCountAsync(Guid producerId, Guid deliveryId, DateTimeOffset expectedDeliveryDate, TimeSpan from, TimeSpan to, int maxPurchaseOrders, int change, CancellationToken token)
         {
             return await ExecuteAsync(async () =>
             {
-                var table = _tableClient.GetTableReference(_storageOptions.Tables.CapingDeliveries);
+                var table = _cloudStorageAccount.CreateCloudTableClient().GetTableReference(_storageOptions.Tables.CapingDeliveries);
                 await table.CreateIfNotExistsAsync(token);
 
                 var concurrentUpdateError = false;
@@ -121,7 +130,6 @@ namespace Sheaft.Infrastructure.Services
                 string rowkey = GetRowKey(from, to);
 
                 var retry = 0;
-                var success = true;
 
                 do
                 {
@@ -131,14 +139,7 @@ namespace Sheaft.Infrastructure.Services
                         var results = (CapingDeliveryTableEntity)tableResults.Result;
                         if (results != null)
                         {
-                            if (results.Count >= maxPurchaseOrders)
-                            {
-                                concurrentUpdateError = false;
-                                success = false;
-                                break;
-                            }
-
-                            results.Count++;
+                            results.Count += change;
                             if (!_storageOptions.RequireEtag)
                                 results.ETag = "*";
 
@@ -150,12 +151,12 @@ namespace Sheaft.Infrastructure.Services
                             {
                                 PartitionKey = partitionKey,
                                 RowKey = rowkey,
-                                Count = 1,
+                                Count = change < 0 ? 0 : 1,
                                 ProducerId = producerId,
                                 DeliveryId = deliveryId,
                                 ExpectedDate = expectedDeliveryDate,
-                                From = from,
-                                To = to,
+                                From = from.TotalSeconds,
+                                To = to.TotalSeconds,
                             }), token);
                         }
 
@@ -171,7 +172,7 @@ namespace Sheaft.Infrastructure.Services
                     }
                 } while (concurrentUpdateError);
 
-                return Ok(success);
+                return Ok(true);
             });
         }
 
@@ -190,9 +191,9 @@ namespace Sheaft.Infrastructure.Services
             public int Count { get; set; }
             public Guid ProducerId { get; set; }
             public Guid DeliveryId { get; set; }
-            public DateTimeOffset ExpectedDate { get; internal set; }
-            public TimeSpan From { get; internal set; }
-            public TimeSpan To { get; internal set; }
+            public DateTimeOffset ExpectedDate { get; set; }
+            public double From { get; set; }
+            public double To { get; set; }
         }
     }
 }

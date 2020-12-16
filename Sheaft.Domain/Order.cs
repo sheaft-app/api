@@ -67,7 +67,7 @@ namespace Sheaft.Domain.Models
         public virtual IReadOnlyCollection<OrderDelivery> Deliveries => _deliveries?.AsReadOnly();
         public virtual IReadOnlyCollection<PurchaseOrder> PurchaseOrders => _purchaseOrders?.AsReadOnly();
 
-        public Guid AddPurchaseOrder(string reference, Producer producer)
+        public PurchaseOrder AddPurchaseOrder(string reference, Producer producer)
         {
             if (PurchaseOrders == null)
                 _purchaseOrders = new List<PurchaseOrder>();
@@ -75,7 +75,7 @@ namespace Sheaft.Domain.Models
             var purchaseOrder = new PurchaseOrder(Guid.NewGuid(), reference, PurchaseOrderStatus.Waiting, producer, this);
             _purchaseOrders.Add(purchaseOrder);
 
-            return purchaseOrder.Id;
+            return purchaseOrder;
         }
 
         public void SetPayin(Payin payin)

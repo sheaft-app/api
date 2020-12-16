@@ -34,12 +34,16 @@ namespace Sheaft.Application.Handlers
         IRequestHandler<DeletePurchaseOrderCommand, Result<bool>>,
         IRequestHandler<RestorePurchaseOrderCommand, Result<bool>>
     {
+        private readonly ICapingDeliveriesService _capingDeliveriesService;
+
         public PurchaseOrderCommandsHandler(
             IAppDbContext context,
             ISheaftMediatr mediatr,
+            ICapingDeliveriesService capingDeliveriesService,
             ILogger<PurchaseOrderCommandsHandler> logger)
             : base(mediatr, context, logger)
         {
+            _capingDeliveriesService = capingDeliveriesService;
         }
 
         public async Task<Result<Guid>> Handle(CreatePurchaseOrderCommand request, CancellationToken token)
@@ -48,25 +52,29 @@ namespace Sheaft.Application.Handlers
             {
                 var producer = await _context.GetByIdAsync<Producer>(request.ProducerId, token);
                 var order = await _context.GetByIdAsync<Order>(request.OrderId, token);
+                var delivery = order.Deliveries.FirstOrDefault(d => d.DeliveryMode.Producer.Id == producer.Id);
 
                 var resultIdentifier = await _mediatr.Process(new CreatePurchaseOrderIdentifierCommand(request.RequestUser) { ProducerId = request.ProducerId }, token);
                 if (!resultIdentifier.Success)
                     return Failed<Guid>(resultIdentifier.Exception);
 
-                var purchaseOrderId = order.AddPurchaseOrder(resultIdentifier.Data, producer);
+                var purchaseOrder = order.AddPurchaseOrder(resultIdentifier.Data, producer);
                 await _context.SaveChangesAsync(token);
+
+                if(delivery.DeliveryMode.MaxPurchaseOrdersPerTimeSlot.HasValue)
+                    await _capingDeliveriesService.IncreaseProducerDeliveryCountAsync(producer.Id, delivery.Id, purchaseOrder.ExpectedDelivery.ExpectedDeliveryDate, purchaseOrder.ExpectedDelivery.From, purchaseOrder.ExpectedDelivery.To, delivery.DeliveryMode.MaxPurchaseOrdersPerTimeSlot.Value, token);
 
                 if (!request.SkipNotification)
                 {
-                    _mediatr.Post(new PurchaseOrderCreatedEvent(request.RequestUser) { PurchaseOrderId = purchaseOrderId });
-                    _mediatr.Post(new PurchaseOrderReceivedEvent(request.RequestUser) { PurchaseOrderId = purchaseOrderId });
+                    _mediatr.Post(new PurchaseOrderCreatedEvent(request.RequestUser) { PurchaseOrderId = purchaseOrder.Id });
+                    _mediatr.Post(new PurchaseOrderReceivedEvent(request.RequestUser) { PurchaseOrderId = purchaseOrder.Id });
                 }
 
-                var delivery = order.Deliveries.FirstOrDefault(d => d.DeliveryMode.Producer.Id == producer.Id);
                 if(delivery.DeliveryMode.AutoAcceptRelatedPurchaseOrder)
-                    _mediatr.Post(new AcceptPurchaseOrderCommand(request.RequestUser) { Id = purchaseOrderId, SkipNotification = request.SkipNotification });
+                    _mediatr.Post(new AcceptPurchaseOrderCommand(request.RequestUser) { Id = purchaseOrder.Id, SkipNotification = request.SkipNotification });
 
-                return Ok(purchaseOrderId);
+
+                return Ok(purchaseOrder.Id);
             });
         }
 
@@ -260,6 +268,11 @@ namespace Sheaft.Application.Handlers
 
                 await _context.SaveChangesAsync(token);
 
+                var order = await _context.GetSingleAsync<Order>(o => o.PurchaseOrders.Any(po => po.Id == purchaseOrder.Id), token);
+                var delivery = order.Deliveries.FirstOrDefault(d => d.DeliveryMode.Producer.Id == purchaseOrder.Vendor.Id);
+                if (delivery.DeliveryMode.MaxPurchaseOrdersPerTimeSlot.HasValue)
+                    await _capingDeliveriesService.DecreaseProducerDeliveryCountAsync(delivery.DeliveryMode.Producer.Id, delivery.DeliveryMode.Id, purchaseOrder.ExpectedDelivery.ExpectedDeliveryDate, purchaseOrder.ExpectedDelivery.From, purchaseOrder.ExpectedDelivery.To, delivery.DeliveryMode.MaxPurchaseOrdersPerTimeSlot.Value, token);
+
                 if (!request.SkipNotification)
                 {
                     if (request.RequestUser.Id == purchaseOrder.Sender.Id)
@@ -281,6 +294,11 @@ namespace Sheaft.Application.Handlers
                 purchaseOrder.Refuse(request.Reason);
 
                 await _context.SaveChangesAsync(token);
+
+                var order = await _context.GetSingleAsync<Order>(o => o.PurchaseOrders.Any(po => po.Id == purchaseOrder.Id), token);
+                var delivery = order.Deliveries.FirstOrDefault(d => d.DeliveryMode.Producer.Id == purchaseOrder.Vendor.Id);
+                if (delivery.DeliveryMode.MaxPurchaseOrdersPerTimeSlot.HasValue)
+                    await _capingDeliveriesService.DecreaseProducerDeliveryCountAsync(delivery.DeliveryMode.Producer.Id, delivery.DeliveryMode.Id, purchaseOrder.ExpectedDelivery.ExpectedDeliveryDate, purchaseOrder.ExpectedDelivery.From, purchaseOrder.ExpectedDelivery.To, delivery.DeliveryMode.MaxPurchaseOrdersPerTimeSlot.Value, token);
 
                 if (!request.SkipNotification)
                     _mediatr.Post(new PurchaseOrderRefusedEvent(request.RequestUser) { PurchaseOrderId = purchaseOrder.Id });

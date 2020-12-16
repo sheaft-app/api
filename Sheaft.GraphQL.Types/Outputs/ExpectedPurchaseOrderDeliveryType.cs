@@ -3,9 +3,9 @@ using Sheaft.Application.Models;
 
 namespace Sheaft.GraphQL.Types
 {
-    public class ExpectedDeliveryType : ObjectType<ExpectedDeliveryDto>
+    public class ExpectedPurchaseOrderDeliveryType : ObjectType<ExpectedPurchaseOrderDeliveryDto>
     {
-        protected override void Configure(IObjectTypeDescriptor<ExpectedDeliveryDto> descriptor)
+        protected override void Configure(IObjectTypeDescriptor<ExpectedPurchaseOrderDeliveryDto> descriptor)
         {
             descriptor.Field(c => c.ExpectedDeliveryDate);
             descriptor.Field(c => c.DeliveryStartedOn);

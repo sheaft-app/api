@@ -349,7 +349,7 @@
     <value>Date de livraison attendue</value>
   </data>
   <data name="ExpectedDelivery_ExpectedDate_CannotBe_BeforeNow" xml:space="preserve">
-    <value>La date de livraison {1} du point de vente {0} ne peut pas être avant aujourd'hui</value>
+    <value>La date de livraison {1} ne peut pas être avant aujourd'hui</value>
   </data>
   <data name="ExpectedDelivery_ExpectedDate_NotIn_DeliveryOpeningHours" xml:space="preserve">
     <value>La date de livraison {1} ne se trouve pas dans la liste des livraisons disponibles pour le point de vente {0}</value>
@@ -899,5 +899,8 @@
   </data>
   <data name="Withholding_Cannot_Process_Pending" xml:space="preserve">
     <value>Impossible de traiter la retenue sur le virement, elle est actuellement en attente</value>
+  </data>
+  <data name="Order_CannotPay_Delivery_Max_PurchaseOrders_Reached" xml:space="preserve">
+    <value>La plage horaire de récupération ({1}) sélectionnée n'est plus disponible, le producteur {0} a atteint le maximum de commandes ({2}) configuré pour cette date. Veuillez revenir en arrière pour en sélectionner une nouvelle.</value>
   </data>
 </root>

@@ -493,7 +493,7 @@ namespace Sheaft.Localization.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to La date de livraison {1} du point de vente {0} ne peut pas être avant aujourd&apos;hui.
+        ///   Looks up a localized string similar to La date de livraison {1} ne peut pas être avant aujourd&apos;hui.
         /// </summary>
         internal static string ExpectedDelivery_ExpectedDate_CannotBe_BeforeNow {
             get {
@@ -930,6 +930,15 @@ namespace Sheaft.Localization.Resources {
         internal static string Order_CannotPay_Deliveries_Required {
             get {
                 return ResourceManager.GetString("Order_CannotPay_Deliveries_Required", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to La plage horaire de récupération ({1}) sélectionnée n&apos;est plus disponible, le producteur {0} a atteint le maximum de commandes ({2}) configuré pour cette date. Veuillez revenir en arrière pour en sélectionner une nouvelle..
+        /// </summary>
+        internal static string Order_CannotPay_Delivery_Max_PurchaseOrders_Reached {
+            get {
+                return ResourceManager.GetString("Order_CannotPay_Delivery_Max_PurchaseOrders_Reached", resourceCulture);
             }
         }
         

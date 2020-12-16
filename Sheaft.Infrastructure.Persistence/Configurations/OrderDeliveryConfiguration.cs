@@ -12,6 +12,9 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
 
             entity.HasKey("OrderUid", "Id");
 
+            entity.OwnsOne(c => c.ExpectedDelivery);
+            entity.HasOne(c => c.DeliveryMode).WithMany().HasForeignKey("DeliveryModeUid");
+
             entity.ToTable("OrderDeliveries");
         }
     }

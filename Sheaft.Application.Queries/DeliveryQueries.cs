@@ -58,7 +58,6 @@ namespace Sheaft.Application.Queries
                 producers.AddRange(notFoundProducers.Select(c => new ProducerDeliveriesDto { Id = c.Id, Name = c.Name, Deliveries = null }));
             }
 
-            var producerDeliveriesToCheck = new List<Tuple<Guid, Guid, DeliveryHourDto>>();
             foreach (var deliveriesGroup in deliveriesMode.GroupBy(c => c.Producer.Id))
             {
                 var deliveries = new List<DeliveryDto>();
@@ -69,58 +68,88 @@ namespace Sheaft.Application.Queries
                 };
 
                 foreach (var deliveryMode in deliveriesGroup)
-                {
-                    deliveries.Add(new DeliveryDto
-                    {
-                        Id = deliveryMode.Id,
-                        Kind = deliveryMode.Kind,
-                        Available = deliveryMode.Available,
-                        Address = deliveryMode.Address != null ? new AddressDto
-                        {
-                            City = deliveryMode.Address.City,
-                            Latitude = deliveryMode.Address.Latitude,
-                            Line1 = deliveryMode.Address.Line1,
-                            Line2 = deliveryMode.Address.Line2,
-                            Longitude = deliveryMode.Address.Longitude,
-                            Zipcode = deliveryMode.Address.Zipcode
-                        } : null,
-                        Name = deliveryMode.Name,
-                        DeliveryHours = GetAvailableDeliveryHours(deliveryMode.OpeningHours, currentDate, deliveryMode.LockOrderHoursBeforeDelivery),
-                    });
-                }
+                    deliveries.Add(GetDeliveriesForHours(currentDate, deliveryMode, deliveryMode.OpeningHours));
 
                 producer.Deliveries = deliveries;
-
-                var deliveryModesToCheckMaxOrders = deliveriesMode.Where(dm => deliveries.Any(d => dm.MaxPurchaseOrdersPerTimeSlot.HasValue && dm.Id == d.Id));
-                if (deliveryModesToCheckMaxOrders.Any())
-                {
-                    foreach (var deliveryMode in deliveryModesToCheckMaxOrders)
-                    {
-                        var delivery = deliveries.FirstOrDefault(d => d.Id == deliveryMode.Id);
-                        if (delivery == null)
-                            continue;
-
-                        producerDeliveriesToCheck.AddRange(delivery.DeliveryHours.Select(dh => new Tuple<Guid, Guid, DeliveryHourDto>(producer.Id, delivery.Id, dh)));
-                    }
-                }
-
                 producers.Add(producer);
             }
 
-            if (!producerDeliveriesToCheck.Any())
+            if (deliveriesMode.All(dm => !dm.MaxPurchaseOrdersPerTimeSlot.HasValue))
                 return producers;
 
-            return await GetNotCapedDeliveriesAsync(producers, deliveriesMode, producerDeliveriesToCheck, token);
+            return await GetNotCapedProducersDeliveriesAsync(producers, token);
         }
 
-        private async Task<IEnumerable<ProducerDeliveriesDto>> GetNotCapedDeliveriesAsync(IEnumerable<ProducerDeliveriesDto> producers, IEnumerable<DeliveryMode> deliveriesMode, IEnumerable<Tuple<Guid, Guid, DeliveryHourDto>> producerDeliveriesToCheck, CancellationToken token)
+        public async Task<IEnumerable<ProducerDeliveriesDto>> GetStoreDeliveriesForProducersAsync(Guid storeId, IEnumerable<Guid> producerIds, IEnumerable<DeliveryKind> kinds, DateTimeOffset currentDate, RequestUser currentUser, CancellationToken token)
         {
-            var results = await _capingDeliveriesService.GetCapingDeliveriesAsync(producerDeliveriesToCheck, token);
+            var producers = new List<ProducerDeliveriesDto>();
+            var agreements = await _context.FindAsync<Agreement>(d => d.Delivery.Available && producerIds.Contains(d.Delivery.Producer.Id) && d.Store.Id == storeId && d.Status == AgreementStatus.Accepted && kinds.Contains(d.Delivery.Kind), token);
+
+            var agreementProducerIds = agreements.Select(c => c.Delivery.Producer.Id).Distinct();
+            var producerDistinctIds = producerIds.Distinct();
+            if (agreementProducerIds.Count() != producerDistinctIds.Count())
+            {
+                var notFoundProducerIds = agreementProducerIds.Except(producerDistinctIds);
+                var notFoundProducers = await _context.FindAsync<Producer>(c => notFoundProducerIds.Contains(c.Id), token);
+
+                producers.AddRange(notFoundProducers.Select(c => new ProducerDeliveriesDto { Id = c.Id, Name = c.Name, Deliveries = null }));
+            }
+
+            kinds ??= new List<DeliveryKind> {
+                    DeliveryKind.ProducerToStore,
+                    DeliveryKind.ExternalToStore
+                };
+
+            foreach (var agreementGroups in agreements.GroupBy(c => c.Delivery.Producer.Id))
+            {
+                var deliveries = new List<DeliveryDto>();
+                var producer = new ProducerDeliveriesDto
+                {
+                    Id = agreementGroups.Key,
+                    Name = agreementGroups.First().Delivery.Producer.Name
+                };
+
+                foreach (var agreement in agreementGroups)
+                    deliveries.Add(GetDeliveriesForHours(currentDate, agreement.Delivery, agreement.SelectedHours));
+
+                producer.Deliveries = deliveries;
+                producers.Add(producer);
+            }
+
+            if (agreements.Select(a => a.Delivery).All(dm => !dm.MaxPurchaseOrdersPerTimeSlot.HasValue))
+                return producers;
+
+            return await GetNotCapedProducersDeliveriesAsync(producers, token);
+        }
+
+        public async Task<IEnumerable<ProducerDeliveriesDto>> GetNotCapedProducersDeliveriesAsync(IEnumerable<ProducerDeliveriesDto> producersDeliveries, CancellationToken token)
+        {
+            var producerIds = producersDeliveries.Select(c => c.Id);
+            var deliveryModeIds = producersDeliveries.SelectMany(c => c.Deliveries.Select(d => d.Id));
+
+            var producers = await _context.FindAsync<Producer>(p => producerIds.Contains(p.Id), token);
+            var deliveriesMode = await _context.FindAsync<DeliveryMode>(d => deliveryModeIds.Contains(d.Id), token);
+
+            var producerDeliveriesHoursToCheck = new List<Tuple<Guid, Guid, DeliveryHourDto>>();
+            foreach (var producer in producersDeliveries)
+            {
+                var deliveryModesToCheckMaxOrders = deliveriesMode.Where(dm => producer.Deliveries.Any(d => dm.MaxPurchaseOrdersPerTimeSlot.HasValue && dm.Id == d.Id));
+                foreach (var deliveryMode in deliveryModesToCheckMaxOrders)
+                {
+                    var delivery = producer.Deliveries.FirstOrDefault(d => d.Id == deliveryMode.Id);
+                    if (delivery == null)
+                        continue;
+
+                    producerDeliveriesHoursToCheck.AddRange(delivery.DeliveryHours.Select(dh => new Tuple<Guid, Guid, DeliveryHourDto>(producer.Id, delivery.Id, dh)));
+                }
+            }
+
+            var results = await _capingDeliveriesService.GetCapingDeliveriesAsync(producerDeliveriesHoursToCheck, token);
             if (!results.Success)
                 throw results.Exception;
 
-            var filteredProducers = producers.ToList();
-            foreach (var producer in filteredProducers)
+            var filteredProducers = new List<ProducerDeliveriesDto>();
+            foreach (var producer in producersDeliveries)
             {
                 var deliveries = new List<DeliveryDto>();
                 foreach (var delivery in producer.Deliveries)
@@ -156,66 +185,31 @@ namespace Sheaft.Application.Queries
                 }
 
                 producer.Deliveries = deliveries;
+                filteredProducers.Add(producer);
             }
 
             return filteredProducers;
         }
 
-        public async Task<IEnumerable<ProducerDeliveriesDto>> GetStoreDeliveriesForProducersAsync(Guid storeId, IEnumerable<Guid> producerIds, IEnumerable<DeliveryKind> kinds, DateTimeOffset currentDate, RequestUser currentUser, CancellationToken token)
+        private DeliveryDto GetDeliveriesForHours(DateTimeOffset currentDate, DeliveryMode deliveryMode, IReadOnlyCollection<TimeSlotHour> openingHours)
         {
-            var list = new List<ProducerDeliveriesDto>();
-            var agreements = await _context.FindAsync<Agreement>(d => d.Delivery.Available && producerIds.Contains(d.Delivery.Producer.Id) && d.Store.Id == storeId && d.Status == AgreementStatus.Accepted && kinds.Contains(d.Delivery.Kind), token);
-
-            var agreementProducerIds = agreements.Select(c => c.Delivery.Producer.Id).Distinct();
-            var producerDistinctIds = producerIds.Distinct();
-            if (agreementProducerIds.Count() != producerDistinctIds.Count())
+            return new DeliveryDto
             {
-                var notFoundProducerIds = agreementProducerIds.Except(producerDistinctIds);
-                var producers = await _context.FindAsync<Producer>(c => notFoundProducerIds.Contains(c.Id), token);
-
-                list.AddRange(producers.Select(c => new ProducerDeliveriesDto { Id = c.Id, Name = c.Name, Deliveries = null }));
-            }
-
-            kinds ??= new List<DeliveryKind> {
-                    DeliveryKind.ProducerToStore,
-                    DeliveryKind.ExternalToStore
-                };
-
-            foreach (var agreementGroups in agreements.GroupBy(c => c.Delivery.Producer.Id))
-            {
-                var deliveries = new List<DeliveryDto>();
-                var producer = new ProducerDeliveriesDto
+                Id = deliveryMode.Id,
+                Kind = deliveryMode.Kind,
+                Available = deliveryMode.Available,
+                Address = deliveryMode.Address != null ? new AddressDto
                 {
-                    Id = agreementGroups.Key,
-                    Name = agreementGroups.First().Delivery.Producer.Name
-                };
-
-                foreach (var agreement in agreementGroups)
-                {
-                    deliveries.Add(new DeliveryDto
-                    {
-                        Id = agreement.Delivery.Id,
-                        Kind = agreement.Delivery.Kind,
-                        Available = agreement.Delivery.Available,
-                        Address = agreement.Delivery.Address != null ? new AddressDto
-                        {
-                            City = agreement.Delivery.Address.City,
-                            Latitude = agreement.Delivery.Address.Latitude,
-                            Line1 = agreement.Delivery.Address.Line1,
-                            Line2 = agreement.Delivery.Address.Line2,
-                            Longitude = agreement.Delivery.Address.Longitude,
-                            Zipcode = agreement.Delivery.Address.Zipcode
-                        } : null,
-                        Name = agreement.Delivery.Name,
-                        DeliveryHours = GetAvailableDeliveryHours(agreement.SelectedHours, currentDate, agreement.Delivery.LockOrderHoursBeforeDelivery),
-                    });
-                }
-
-                producer.Deliveries = deliveries;
-                list.Add(producer);
-            }
-
-            return list;
+                    City = deliveryMode.Address.City,
+                    Latitude = deliveryMode.Address.Latitude,
+                    Line1 = deliveryMode.Address.Line1,
+                    Line2 = deliveryMode.Address.Line2,
+                    Longitude = deliveryMode.Address.Longitude,
+                    Zipcode = deliveryMode.Address.Zipcode
+                } : null,
+                Name = deliveryMode.Name,
+                DeliveryHours = GetAvailableDeliveryHours(openingHours, currentDate, deliveryMode.LockOrderHoursBeforeDelivery),
+            };
         }
 
         private IEnumerable<DeliveryHourDto> GetAvailableDeliveryHours(IEnumerable<TimeSlotHour> openingHours, DateTimeOffset currentDate, int? lockOrderHoursBeforeDelivery)

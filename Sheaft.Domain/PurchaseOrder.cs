@@ -29,7 +29,7 @@ namespace Sheaft.Domain.Models
             SetVendor(producer);
 
             var delivery = order.Deliveries.FirstOrDefault(d => d.DeliveryMode.Producer.Id == producer.Id);
-            SetExpectedDelivery(delivery.DeliveryMode, delivery.ExpectedDeliveryDate);
+            SetExpectedDelivery(delivery.DeliveryMode, delivery.ExpectedDelivery.ExpectedDeliveryDate);
             SetComment(delivery.Comment);
 
             SetReference(reference);
@@ -68,7 +68,7 @@ namespace Sheaft.Domain.Models
         public decimal TotalWeight { get; private set; }
         public PurchaseOrderStatus Status { get; private set; }
         public virtual PurchaseOrderSender Sender { get; private set; }
-        public virtual ExpectedDelivery ExpectedDelivery { get; private set; }
+        public virtual ExpectedPurchaseOrderDelivery ExpectedDelivery { get; private set; }
         public virtual PurchaseOrderVendor Vendor { get; private set; }
         public virtual Transfer Transfer { get; private set; }
         public virtual IReadOnlyCollection<PurchaseOrderProduct> Products => _products?.AsReadOnly();
@@ -191,7 +191,7 @@ namespace Sheaft.Domain.Models
 
         private void SetExpectedDelivery(DeliveryMode delivery, DateTimeOffset expectedDate)
         {
-            ExpectedDelivery = new ExpectedDelivery(delivery, expectedDate);
+            ExpectedDelivery = new ExpectedPurchaseOrderDelivery(delivery, expectedDate);
         }
 
         private void AddProduct(ProductRow product)

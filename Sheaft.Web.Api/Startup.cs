@@ -19,6 +19,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
+using Microsoft.Azure.Cosmos.Table;
 using Microsoft.Azure.Search;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -107,6 +108,7 @@ namespace Sheaft.Web.Api
             var roleSettings = Configuration.GetSection(RoleOptions.SETTING);
             var cacheSettings = Configuration.GetSection(CacheOptions.SETTING);
             var pspSettings = Configuration.GetSection(PspOptions.SETTING);
+            var storageSettings = Configuration.GetSection(StorageOptions.SETTING);
 
             services.Configure<AuthOptions>(authSettings);
             services.Configure<CorsOptions>(corsSettings);
@@ -117,6 +119,7 @@ namespace Sheaft.Web.Api
             services.Configure<RoleOptions>(roleSettings);
             services.Configure<CacheOptions>(cacheSettings);
             services.Configure<PspOptions>(pspSettings);
+            services.Configure<StorageOptions>(storageSettings);
 
             services.Configure<ApiOptions>(Configuration.GetSection(ApiOptions.SETTING));
             services.Configure<FreshdeskOptions>(Configuration.GetSection(FreshdeskOptions.SETTING));
@@ -126,7 +129,6 @@ namespace Sheaft.Web.Api
             services.Configure<SignalrOptions>(Configuration.GetSection(SignalrOptions.SETTING));
             services.Configure<SireneOptions>(Configuration.GetSection(SireneOptions.SETTING));
             services.Configure<SponsoringOptions>(Configuration.GetSection(SponsoringOptions.SETTING));
-            services.Configure<StorageOptions>(Configuration.GetSection(StorageOptions.SETTING));
             services.Configure<RoutineOptions>(Configuration.GetSection(RoutineOptions.SETTING));
 
             JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
@@ -272,6 +274,7 @@ namespace Sheaft.Web.Api
             services.AddScoped<IDocumentQueries, DocumentQueries>();
             services.AddScoped<ILegalQueries, LegalQueries>();
 
+
             services.AddScoped<IDapperContext, DapperContext>();
             services.AddScoped<IAppDbContext>(c => c.GetRequiredService<AppDbContext>());
 
@@ -291,6 +294,9 @@ namespace Sheaft.Web.Api
                 .UseMemoryCachingProvider()
                 .Build();
             });
+
+            var storageConfig = storageSettings.Get<StorageOptions>();
+            services.AddSingleton<CloudStorageAccount>(CloudStorageAccount.Parse(storageConfig.ConnectionString));
 
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             services.AddScoped<IBackgroundJobClient, BackgroundJobClient>();

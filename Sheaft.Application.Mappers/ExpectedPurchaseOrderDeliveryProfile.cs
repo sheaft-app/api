@@ -4,15 +4,15 @@ using Sheaft.Application.Models;
 
 namespace Sheaft.Application.Mappers
 {
-    public class ExpectedDeliveryProfile : Profile
+    public class ExpectedPurchaseOrderDeliveryProfile : Profile
     {
-        public ExpectedDeliveryProfile()
+        public ExpectedPurchaseOrderDeliveryProfile()
         {
-            CreateMap<ExpectedDelivery, ExpectedDeliveryDto>()
+            CreateMap<ExpectedPurchaseOrderDelivery, ExpectedPurchaseOrderDeliveryDto>()
                  .ForMember(d => d.Address, opt => opt.MapFrom(r => r.Address))
                  .ForMember(d => d.Day, opt => opt.MapFrom(r => r.ExpectedDeliveryDate.DayOfWeek));
 
-            CreateMap<ExpectedDelivery, ExpectedDeliveryViewModel>()
+            CreateMap<ExpectedPurchaseOrderDelivery, ExpectedPurchaseOrderDeliveryViewModel>()
                  .ForMember(d => d.Address, opt => opt.MapFrom(r => r.Address))
                  .ForMember(d => d.Day, opt => opt.MapFrom(r => r.ExpectedDeliveryDate.DayOfWeek));
         }

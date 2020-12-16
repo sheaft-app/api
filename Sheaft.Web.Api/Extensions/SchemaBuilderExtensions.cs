@@ -24,7 +24,8 @@ namespace Sheaft.Web.Api
             services.AddType<RewardType>();
             services.AddType<ConsumerType>();
             services.AddType<UserProfileType>();
-            services.AddType<ExpectedDeliveryType>();
+            services.AddType<ExpectedPurchaseOrderDeliveryType>();
+            services.AddType<ExpectedOrderDeliveryType>();
             services.AddType<RankInformationType>();
             services.AddType<SirenBusinessType>();
             services.AddType<SirenAddressType>();

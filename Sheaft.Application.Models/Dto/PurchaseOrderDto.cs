@@ -32,7 +32,7 @@ namespace Sheaft.Application.Models
         public decimal TotalWeight { get; set; }
         public PurchaseOrderStatus Status { get; set; }
         public UserProfileDto Sender { get; set; }
-        public ExpectedDeliveryDto ExpectedDelivery { get; set; }
+        public ExpectedPurchaseOrderDeliveryDto ExpectedDelivery { get; set; }
         public UserProfileDto Vendor { get; set; }
         public IEnumerable<PurchaseOrderProductQuantityDto> Products { get; set; }
     }

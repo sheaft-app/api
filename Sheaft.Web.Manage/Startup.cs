@@ -37,6 +37,7 @@ using Serilog.Events;
 using NewRelic.LogEnrichers.Serilog;
 using Sheaft.Web.Common;
 using Microsoft.IdentityModel.Logging;
+using Microsoft.Azure.Cosmos.Table;
 
 namespace Sheaft.Web.Manage
 {
@@ -92,6 +93,7 @@ namespace Sheaft.Web.Manage
             var roleSettings = Configuration.GetSection(RoleOptions.SETTING);
             var pspSettings = Configuration.GetSection(PspOptions.SETTING);
             var searchSettings = Configuration.GetSection(SearchOptions.SETTING);
+            var storageSettings = Configuration.GetSection(StorageOptions.SETTING);
 
             services.Configure<RoleOptions>(roleSettings);
             services.Configure<AuthOptions>(authSettings);
@@ -99,8 +101,7 @@ namespace Sheaft.Web.Manage
             services.Configure<JobsDatabaseOptions>(jobsDatabaseSettings);
             services.Configure<MailerOptions>(mailerSettings);
             services.Configure<PspOptions>(pspSettings);
-
-            services.Configure<StorageOptions>(Configuration.GetSection(StorageOptions.SETTING));
+            services.Configure<StorageOptions>(storageSettings);
 
             var rolesOptions = roleSettings.Get<RoleOptions>();
             services.AddAuthorization(options =>
@@ -255,6 +256,9 @@ namespace Sheaft.Web.Manage
             services.AddScoped<ITransactionQueries, TransactionQueries>();
             services.AddScoped<IDocumentQueries, DocumentQueries>();
             services.AddScoped<ILegalQueries, LegalQueries>();
+
+            var storageConfig = storageSettings.Get<StorageOptions>();
+            services.AddSingleton<CloudStorageAccount>(CloudStorageAccount.Parse(storageConfig.ConnectionString));
 
             var searchConfig = searchSettings.Get<SearchOptions>();
             services.AddScoped<ISearchServiceClient, SearchServiceClient>(_ => new SearchServiceClient(searchConfig.Name, new SearchCredentials(searchConfig.ApiKey)));

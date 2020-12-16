@@ -7,19 +7,18 @@ namespace Sheaft.Domain.Models
         protected OrderDelivery()
         {
         }
+
         public OrderDelivery(DeliveryMode delivery, DateTimeOffset expectedDeliveryDate, string comment = null)
         {
-            new ExpectedDelivery(delivery, expectedDeliveryDate);
-
             Id = delivery.Id;
             DeliveryMode = delivery;
-            ExpectedDeliveryDate = expectedDeliveryDate;
             Comment = comment;
+            ExpectedDelivery = new ExpectedOrderDelivery(delivery, expectedDeliveryDate);
         }
 
         public Guid Id { get; private set; }
-        public DateTimeOffset ExpectedDeliveryDate { get; private set; }
-        public virtual DeliveryMode DeliveryMode { get; private set; }
         public string Comment { get; private set; }
+        public virtual ExpectedOrderDelivery ExpectedDelivery { get; private set; }
+        public virtual DeliveryMode DeliveryMode { get; private set; }
     }
 }

@@ -13,20 +13,19 @@ namespace Sheaft.Infrastructure.Services
 {
     public class IdentifierService : BaseService, IIdentifierService
     {
-        private readonly CloudTableClient _tableClient;
+        private readonly CloudStorageAccount _cloudStorageAccount;
         private readonly StorageOptions _storageOptions;
         private readonly SponsoringOptions _sponsoringOptions;
 
         public IdentifierService(
+            CloudStorageAccount cloudStorageAccount,
             IOptionsSnapshot<StorageOptions> storageOptions,
             IOptionsSnapshot<SponsoringOptions> sponsoringOptions,
             ILogger<IdentifierService> logger) : base(logger)
         {
+            _cloudStorageAccount = cloudStorageAccount;
             _storageOptions = storageOptions.Value;
             _sponsoringOptions = sponsoringOptions.Value;
-
-            var cloudStorageAccount = CloudStorageAccount.Parse(_storageOptions.ConnectionString);
-            _tableClient = cloudStorageAccount.CreateCloudTableClient();
         }
 
         public async Task<Result<string>> GetNextPurchaseOrderReferenceAsync(Guid serialNumber, CancellationToken token)
@@ -59,7 +58,7 @@ namespace Sheaft.Infrastructure.Services
         {
             return await ExecuteAsync(async () =>
             {
-                var table = _tableClient.GetTableReference(_storageOptions.Tables.SponsoringCodes);
+                var table = _cloudStorageAccount.CreateCloudTableClient().GetTableReference(_storageOptions.Tables.SponsoringCodes);
                 await table.CreateIfNotExistsAsync(token);
 
                 var opts = new Powells.CouponCode.Options { PartLength = _sponsoringOptions.CodeLength, Parts = _sponsoringOptions.CodeParts };
@@ -105,6 +104,7 @@ namespace Sheaft.Infrastructure.Services
                 return Ok(code);
             });
         }
+
         private static string GenerateEanIdentifier(long value, int length)
         {
             if (value.ToString().Length > 12)
@@ -142,7 +142,7 @@ namespace Sheaft.Infrastructure.Services
         {
             return await ExecuteAsync(async () =>
             {
-                var table = _tableClient.GetTableReference(container);
+                var table = _cloudStorageAccount.CreateCloudTableClient().GetTableReference(container);
                 await table.CreateIfNotExistsAsync(token);
 
                 var key = "identifier";

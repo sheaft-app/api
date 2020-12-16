@@ -3,7 +3,7 @@ using System;
 
 namespace Sheaft.Application.Models
 {
-    public class ExpectedDeliveryViewModel
+    public class ExpectedPurchaseOrderDeliveryViewModel
     {
         public DateTimeOffset ExpectedDeliveryDate { get; set; }
         public DateTimeOffset? DeliveryStartedOn { get; set; }

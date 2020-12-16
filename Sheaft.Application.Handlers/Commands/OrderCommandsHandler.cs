@@ -30,17 +30,20 @@ namespace Sheaft.Application.Handlers
         IRequestHandler<CheckOrdersCommand, Result<bool>>,
         IRequestHandler<CheckOrderCommand, Result<bool>>
     {
+        private readonly ICapingDeliveriesService _capingDeliveriesService;
         private readonly PspOptions _pspOptions;
         private readonly RoutineOptions _routineOptions;
 
         public OrderCommandsHandler(
             IAppDbContext context,
             ISheaftMediatr mediatr,
+            ICapingDeliveriesService capingDeliveriesService,
             IOptionsSnapshot<PspOptions> pspOptions,
             IOptionsSnapshot<RoutineOptions> routineOptions,
             ILogger<OrderCommandsHandler> logger)
             : base(mediatr, context, logger)
         {
+            _capingDeliveriesService = capingDeliveriesService;
             _pspOptions = pspOptions.Value;
             _routineOptions = routineOptions.Value;
         }
@@ -53,7 +56,6 @@ namespace Sheaft.Application.Handlers
                 var products = await _context.FindByIdsAsync<Product>(productIds, token);
 
                 var invalidProductIds = products.Where(p => p.RemovedOn.HasValue || !p.Available || !p.VisibleToConsumers || p.Producer.RemovedOn.HasValue || !p.Producer.CanDirectSell).Select(p => p.Id.ToString("N"));
-
                 if (invalidProductIds.Any())
                     return BadRequest<Guid>(MessageKind.Order_CannotCreate_Some_Products_Invalid, string.Join(";", invalidProductIds));
 
@@ -94,7 +96,6 @@ namespace Sheaft.Application.Handlers
                     var products = await _context.FindByIdsAsync<Product>(productIds, token);
 
                     var invalidProductIds = products.Where(p => p.RemovedOn.HasValue || !p.Available || !p.VisibleToStores || p.Producer.RemovedOn.HasValue || !p.Producer.CanDirectSell).Select(p => p.Id.ToString("N"));
-
                     if (invalidProductIds.Any())
                         return BadRequest<IEnumerable<Guid>>(MessageKind.Order_CannotCreate_Some_Products_Invalid, string.Join(";", invalidProductIds));
 
@@ -116,11 +117,15 @@ namespace Sheaft.Application.Handlers
                         cartDeliveries.Add(new Tuple<DeliveryMode, DateTimeOffset, string>(delivery, cartDelivery.ExpectedDeliveryDate, cartDelivery.Comment));
                     }
 
-                    if(!cartDeliveries.Any())
+                    if (!cartDeliveries.Any())
                         return BadRequest<IEnumerable<Guid>>(MessageKind.Order_CannotCreate_Deliveries_Required);
 
                     order.SetDeliveries(cartDeliveries);
                     order.SetStatus(OrderStatus.Validated);
+
+                    var validatedDeliveries = await ValidateCapedDeliveriesAsync(order.Deliveries, token);
+                    if (!validatedDeliveries.Success)
+                        return Failed<IEnumerable<Guid>>(validatedDeliveries.Exception);
 
                     var referenceResult = await _mediatr.Process(new CreateOrderIdentifierCommand(request.RequestUser), token);
                     if (!referenceResult.Success)
@@ -172,8 +177,8 @@ namespace Sheaft.Application.Handlers
 
                 var productIds = request.Products.Select(p => p.Id);
                 var products = await _context.FindByIdsAsync<Product>(productIds, token);
-                var invalidProductIds = products.Where(p => p.RemovedOn.HasValue || !p.Available || !p.VisibleToConsumers || p.Producer.RemovedOn.HasValue || !p.Producer.CanDirectSell).Select(p => p.Id.ToString("N"));
 
+                var invalidProductIds = products.Where(p => p.RemovedOn.HasValue || !p.Available || !p.VisibleToConsumers || p.Producer.RemovedOn.HasValue || !p.Producer.CanDirectSell).Select(p => p.Id.ToString("N"));
                 if (invalidProductIds.Any())
                     return BadRequest<bool>(MessageKind.Order_CannotUpdate_Some_Products_Invalid, string.Join(";", invalidProductIds));
 
@@ -213,6 +218,10 @@ namespace Sheaft.Application.Handlers
                 if (!order.Deliveries.Any())
                     return BadRequest<Guid>(MessageKind.Order_CannotPay_Deliveries_Required);
 
+                var validatedDeliveries = await ValidateCapedDeliveriesAsync(order.Deliveries, token);
+                if (!validatedDeliveries.Success)
+                    return Failed<Guid>(validatedDeliveries.Exception);
+
                 var products = await _context.GetByIdsAsync<Product>(order.Products.Select(p => p.Id), token);
                 var invalidProductIds = products.Where(p => p.RemovedOn.HasValue || !p.Available || !p.VisibleToConsumers || p.Producer.RemovedOn.HasValue || !p.Producer.CanDirectSell).Select(p => p.Id.ToString("N"));
 
@@ -240,6 +249,47 @@ namespace Sheaft.Application.Handlers
                     return Ok(result.Data);
                 }
             });
+        }
+
+        private async Task<Result<bool>> ValidateCapedDeliveriesAsync(IReadOnlyCollection<OrderDelivery> orderDeliveries, CancellationToken token)
+        {
+            if (orderDeliveries.All(d => !d.DeliveryMode.MaxPurchaseOrdersPerTimeSlot.HasValue))
+                return Ok(true);
+
+            var results = await _capingDeliveriesService.GetCapingDeliveriesAsync(
+                orderDeliveries.Where(d => d.DeliveryMode.MaxPurchaseOrdersPerTimeSlot.HasValue).Select(d =>
+                    new Tuple<Guid, Guid, Models.DeliveryHourDto>(
+                        d.DeliveryMode.Producer.Id,
+                        d.DeliveryMode.Id,
+                        new Models.DeliveryHourDto
+                        {
+                            Day = d.ExpectedDelivery.ExpectedDeliveryDate.DayOfWeek,
+                            ExpectedDeliveryDate = d.ExpectedDelivery.ExpectedDeliveryDate,
+                            From = d.ExpectedDelivery.From,
+                            To = d.ExpectedDelivery.To,
+                        })
+                    ), token);
+
+            if (!results.Success)
+                return Failed<bool>(results.Exception);
+
+            foreach (var orderDelivery in orderDeliveries)
+            {
+                var delivery = results.Data.FirstOrDefault(d => d.DeliveryId == orderDelivery.Id 
+                    && d.ExpectedDate.Year == orderDelivery.ExpectedDelivery.ExpectedDeliveryDate.Year 
+                    && d.ExpectedDate.Month == orderDelivery.ExpectedDelivery.ExpectedDeliveryDate.Month 
+                    && d.ExpectedDate.Day == orderDelivery.ExpectedDelivery.ExpectedDeliveryDate.Day
+                    && d.From == orderDelivery.ExpectedDelivery.From
+                    && d.To == orderDelivery.ExpectedDelivery.To);
+
+                if (delivery == null)
+                    continue;
+
+                if (delivery.Count >= orderDelivery.DeliveryMode.MaxPurchaseOrdersPerTimeSlot)
+                    return Failed<bool>(new ValidationException(MessageKind.Order_CannotPay_Delivery_Max_PurchaseOrders_Reached, orderDelivery.DeliveryMode.Producer.Name, $"le {orderDelivery.ExpectedDelivery.ExpectedDeliveryDate:dd/MM/yyyy} entre {orderDelivery.ExpectedDelivery.From:hh\\hmm} et {orderDelivery.ExpectedDelivery.To:hh\\hmm}", orderDelivery.DeliveryMode.MaxPurchaseOrdersPerTimeSlot));
+            }
+
+            return Ok(true);
         }
 
         public async Task<Result<Guid>> Handle(RetryOrderCommand request, CancellationToken token)
@@ -311,7 +361,7 @@ namespace Sheaft.Application.Handlers
                         }
 
                         _mediatr.Post(new CreateUserPointsCommand(request.RequestUser) { CreatedOn = DateTimeOffset.UtcNow, Kind = PointKind.PurchaseOrder, UserId = order.User.Id });
-                        if(order.Donate > 0)
+                        if (order.Donate > 0)
                             _mediatr.Post(new CreateDonationCommand(request.RequestUser) { OrderId = order.Id });
 
                         return Ok(purchaseOrderIds.AsEnumerable());

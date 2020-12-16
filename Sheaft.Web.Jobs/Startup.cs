@@ -18,6 +18,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Localization;
+using Microsoft.Azure.Cosmos.Table;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -218,6 +219,9 @@ namespace Sheaft.Web.Jobs
             services.AddScoped<IAuthService, AuthService>();
             services.AddScoped<ISheaftHangfireBridge, SheaftHangfireBridge>();
             services.AddScoped<IBackgroundJobClient, BackgroundJobClient>();
+
+            var storageConfig = storageSettings.Get<StorageOptions>();
+            services.AddSingleton<CloudStorageAccount>(CloudStorageAccount.Parse(storageConfig.ConnectionString));
 
             services.AddScoped<IDapperContext, DapperContext>();
 

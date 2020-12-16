@@ -35,7 +35,7 @@ namespace Sheaft.GraphQL.Types
                 .Type<NonNullType<StringType>>();
 
             descriptor.Field(c => c.ExpectedDelivery)
-                .Type<NonNullType<ExpectedDeliveryType>>();
+                .Type<NonNullType<ExpectedPurchaseOrderDeliveryType>>();
 
             descriptor.Field(c => c.Sender)
                 .Type<NonNullType<UserProfileType>>();

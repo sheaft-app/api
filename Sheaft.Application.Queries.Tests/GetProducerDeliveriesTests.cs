@@ -84,10 +84,10 @@ namespace Queries.Delivery.Tests
                 new DeliveryAddress("x", null, "x", "x", CountryIsoCode.FR, null, null),
                 new List<TimeSlotHour> { new TimeSlotHour(DayOfWeek.Wednesday, TimeSpan.FromHours(8), TimeSpan.FromHours(12)) },
                 "delivery1");
+
             delivery.SetLockOrderHoursBeforeDelivery(orderLockInHours);
 
             await _context.AddAsync(delivery, token);
-
             await _context.SaveChangesAsync(token);
 
             //test
@@ -132,9 +132,9 @@ namespace Queries.Delivery.Tests
                     new TimeSlotHour(DayOfWeek.Saturday, TimeSpan.FromHours(10), TimeSpan.FromHours(16))
                             },
                             "delivery1");
+
             entity.SetLockOrderHoursBeforeDelivery(orderLockInHours);
             await _context.AddAsync(entity, token);
-
             await _context.SaveChangesAsync(token);
 
             //test
@@ -178,6 +178,7 @@ namespace Queries.Delivery.Tests
                 new DeliveryAddress("x", null, "x", "x", CountryIsoCode.FR, null, null),
                 new List<TimeSlotHour> { new TimeSlotHour(DayOfWeek.Wednesday, TimeSpan.FromHours(8), TimeSpan.FromHours(12)) },
                 "delivery1");
+
             entity1.SetLockOrderHoursBeforeDelivery(orderLockInHours);
             await _context.AddAsync(entity1, token);
 
@@ -189,6 +190,7 @@ namespace Queries.Delivery.Tests
                 new DeliveryAddress("x", null, "x", "x", CountryIsoCode.FR, null, null),
                 new List<TimeSlotHour> { new TimeSlotHour(DayOfWeek.Friday, TimeSpan.FromHours(16), TimeSpan.FromHours(18)) },
                 "delivery2");
+
             entity2.SetLockOrderHoursBeforeDelivery(orderLockInHours);
             await _context.AddAsync(entity2, token);
 
