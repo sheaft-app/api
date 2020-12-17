@@ -118,37 +118,37 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="Error" xml:space="preserve">
-    <value>Erreur</value>
+    <value>Une erreur est survenue</value>
   </data>
   <data name="Unauthorized" xml:space="preserve">
-    <value>Vous devez être connecté pour accéder à la ressource {0}</value>
+    <value>Vous devez être connecté pour accéder à la ressource</value>
   </data>
   <data name="Forbidden" xml:space="preserve">
-    <value>Vous n'êtes pas autorisé à accéder à la ressource {0}</value>
+    <value>Vous n'êtes pas autorisé à accéder à la ressource</value>
   </data>
   <data name="NotFound" xml:space="preserve">
-    <value>La ressource {0} est introuvable</value>
+    <value>La ressource est introuvable</value>
   </data>
   <data name="Gone" xml:space="preserve">
-    <value>La ressource {0} n'est plus disponible</value>
+    <value>La ressource n'est plus disponible</value>
   </data>
   <data name="Conflict" xml:space="preserve">
-    <value>La ressource {0} a déjà été mise à jour en parallèle de votre demande, veuillez renouvelez votre demande.</value>
+    <value>La ressource a été mise à jour entre l'affichage des informations et la sauvegarde des données que vous avez modifiées, veuillez renouvelez votre demande.</value>
   </data>
   <data name="Locked" xml:space="preserve">
-    <value>La ressource {0} est vérouillée</value>
+    <value>La ressource est inaccessible car vérouillée, veuillez renouveler votre demande</value>
   </data>
   <data name="BadRequest" xml:space="preserve">
-    <value>Votre requête concernant la ressource {0} est invalide</value>
+    <value>La requête envoyée est invalide</value>
   </data>
   <data name="Validation" xml:space="preserve">
-    <value>La validation de votre demande concernant la ressource {0} a échouée</value>
+    <value>Certaines données de votre requête sont invalides</value>
   </data>
   <data name="Unexpected" xml:space="preserve">
-    <value>Une erreur relative à la ressource {0} est survenue de manière inattendue</value>
+    <value>Une erreur inatendue est survenue</value>
   </data>
   <data name="AlreadyExists" xml:space="preserve">
-    <value>Une ressource {0} existe déjà</value>
+    <value>Une ressource existe déjà avec ces informations</value>
   </data>
   <data name="Address" xml:space="preserve">
     <value>Adresse</value>

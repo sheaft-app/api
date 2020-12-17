@@ -12,6 +12,7 @@ using HotChocolate;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Microsoft.Extensions.Configuration;
+using Sheaft.Exceptions;
 
 namespace Sheaft.GraphQL.Services
 {
@@ -117,6 +118,8 @@ namespace Sheaft.GraphQL.Services
 
         public async Task<ProductsSearchDto> SearchProductsAsync(SearchProductsInput input, [Service] IProductQueries productQueries)
         {
+            throw new ValidationException(null);
+            throw new BadRequestException(null);
             SetLogTransaction("GraphQL", nameof(SearchProductsAsync), input);
             return await productQueries.SearchAsync(input, CurrentUser, Token);
         }

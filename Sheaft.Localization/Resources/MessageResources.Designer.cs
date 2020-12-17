@@ -160,7 +160,7 @@ namespace Sheaft.Localization.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Une ressource {0} existe déjà.
+        ///   Looks up a localized string similar to Une ressource existe déjà avec ces informations.
         /// </summary>
         internal static string AlreadyExists {
             get {
@@ -169,7 +169,7 @@ namespace Sheaft.Localization.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Votre requête concernant la ressource {0} est invalide.
+        ///   Looks up a localized string similar to La requête envoyée est invalide.
         /// </summary>
         internal static string BadRequest {
             get {
@@ -187,7 +187,7 @@ namespace Sheaft.Localization.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to La ressource {0} a déjà été mise à jour en parallèle de votre demande, veuillez renouvelez votre demande..
+        ///   Looks up a localized string similar to La ressource a été mise à jour entre l&apos;affichage des informations et la sauvegarde des données que vous avez modifiées, veuillez renouvelez votre demande..
         /// </summary>
         internal static string Conflict {
             get {
@@ -475,7 +475,7 @@ namespace Sheaft.Localization.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Erreur.
+        ///   Looks up a localized string similar to Une erreur est survenue.
         /// </summary>
         internal static string Error {
             get {
@@ -529,7 +529,7 @@ namespace Sheaft.Localization.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Vous n&apos;êtes pas autorisé à accéder à la ressource {0}.
+        ///   Looks up a localized string similar to Vous n&apos;êtes pas autorisé à accéder à la ressource.
         /// </summary>
         internal static string Forbidden {
             get {
@@ -538,7 +538,7 @@ namespace Sheaft.Localization.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to La ressource {0} n&apos;est plus disponible.
+        ///   Looks up a localized string similar to La ressource n&apos;est plus disponible.
         /// </summary>
         internal static string Gone {
             get {
@@ -817,7 +817,7 @@ namespace Sheaft.Localization.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to La ressource {0} est vérouillée.
+        ///   Looks up a localized string similar to La ressource est inaccessible car vérouillée, veuillez renouveler votre demande.
         /// </summary>
         internal static string Locked {
             get {
@@ -835,7 +835,7 @@ namespace Sheaft.Localization.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to La ressource {0} est introuvable.
+        ///   Looks up a localized string similar to La ressource est introuvable.
         /// </summary>
         internal static string NotFound {
             get {
@@ -2284,7 +2284,7 @@ namespace Sheaft.Localization.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Vous devez être connecté pour accéder à la ressource {0}.
+        ///   Looks up a localized string similar to Vous devez être connecté pour accéder à la ressource.
         /// </summary>
         internal static string Unauthorized {
             get {
@@ -2293,7 +2293,7 @@ namespace Sheaft.Localization.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Une erreur relative à la ressource {0} est survenue de manière inattendue.
+        ///   Looks up a localized string similar to Une erreur inatendue est survenue.
         /// </summary>
         internal static string Unexpected {
             get {
@@ -2365,7 +2365,7 @@ namespace Sheaft.Localization.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to La validation de votre demande concernant la ressource {0} a échouée.
+        ///   Looks up a localized string similar to Certaines données de votre requête sont invalides.
         /// </summary>
         internal static string Validation {
             get {

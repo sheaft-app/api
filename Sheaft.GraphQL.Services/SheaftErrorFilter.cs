@@ -47,14 +47,16 @@ namespace Sheaft.GraphQL.Services
             {
                 exception = exc;
 
+                error = error.WithCode(exc.Kind.ToString("G"));
+
                 if (exc.Error.HasValue)
                     message = _localizer[exc.Error.Value.ToString("G"), exc.Params ?? new object[] { }];
 
-                error = error.WithCode(exc.Kind.ToString("G"));
-                error = error.WithMessage(message);
-
-                error = error.AddExtension(exc.Kind.ToString("G"), message);
                 kind = exc.Kind;
+
+                message = message != "Une erreur inattendue est survenue." ? message : _localizer[exc.Kind.ToString("G")];
+                error = error.AddExtension(exc.Kind.ToString("G"), message);
+                error = error.WithMessage(message);
 
                 switch (exc.Kind)
                 {
@@ -104,6 +106,8 @@ namespace Sheaft.GraphQL.Services
 
                 error = error.AddExtension(ExceptionKind.Unauthorized.ToString("G"), message);
             }
+
+            error = error.AddExtension("StatusCode", statusCode);
 
             NewRelic.Api.Agent.NewRelic.SetTransactionName("StatusCode", statusCode.ToString());
 
