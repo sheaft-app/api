@@ -24,14 +24,14 @@ namespace Sheaft.Infrastructure.Services
             _storageOptions = storageOptions.Value;
         }
 
-        public async Task<Result<string>> UploadUserPictureAsync(Guid userId, byte[] data, CancellationToken token)
+        public async Task<Result<string>> UploadUserPictureAsync(Guid userId, string filename, string size, byte[] data, CancellationToken token)
         {
             return await ExecuteAsync(async () =>
             {
                 var containerClient = new BlobContainerClient(_storageOptions.ConnectionString, _storageOptions.Containers.Pictures);
                 await containerClient.CreateIfNotExistsAsync(cancellationToken: token);
 
-                var blobClient = containerClient.GetBlobClient($"users/{userId}/profile/{Guid.NewGuid():N}.jpg");
+                var blobClient = containerClient.GetBlobClient($"users/{userId:N}/profile/{filename}_{size}.jpg");
                 await blobClient.DeleteIfExistsAsync(cancellationToken: token);
 
                 using (var ms = new MemoryStream(data))

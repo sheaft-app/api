@@ -7,6 +7,7 @@ namespace Sheaft.GraphQL.Types
     {
         protected override void Configure(IInputObjectTypeDescriptor<UpdatePictureInput> descriptor)
         {
+            descriptor.Field(c => c.OriginalPicture);
             descriptor.Field(c => c.Picture);
 
             descriptor.Field(c => c.Id)

@@ -123,6 +123,7 @@ namespace Sheaft.Web.Jobs
             services.Configure<SireneOptions>(Configuration.GetSection(SireneOptions.SETTING));
             services.Configure<SponsoringOptions>(Configuration.GetSection(SponsoringOptions.SETTING));
             services.Configure<RoutineOptions>(Configuration.GetSection(RoutineOptions.SETTING));
+            services.Configure<PictureOptions>(Configuration.GetSection(PictureOptions.SETTING));
 
             var rolesOptions = roleSettings.Get<RoleOptions>();
             services.AddAuthorization(options =>

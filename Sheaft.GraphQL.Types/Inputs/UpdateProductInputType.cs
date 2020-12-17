@@ -12,6 +12,7 @@ namespace Sheaft.GraphQL.Types
             descriptor.Field(c => c.Available);
             descriptor.Field(c => c.Description);
             descriptor.Field(c => c.ReturnableId).Type<IdType>();
+            descriptor.Field(c => c.OriginalPicture);
             descriptor.Field(c => c.Picture);
             descriptor.Field(c => c.QuantityPerUnit);
             descriptor.Field(c => c.Unit);

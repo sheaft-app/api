@@ -9,6 +9,7 @@ namespace Sheaft.Application.Models
         public string Reference { get; set; }
         public string Name { get; set; }
         public string Picture { get; set; }
+        public string OriginalPicture { get; set; }
         public decimal WholeSalePricePerUnit { get; set; }
         public decimal QuantityPerUnit { get; set; }
         public UnitKind Unit { get; set; }

@@ -89,7 +89,7 @@ namespace Sheaft.Application.Handlers
                     await _context.AddAsync(entity, token);
                     await _context.SaveChangesAsync(token);
 
-                    var imageResult = await _mediatr.Process(new UpdateProductPictureCommand(request.RequestUser) { ProductId = entity.Id, Picture = request.Picture }, token);
+                    var imageResult = await _mediatr.Process(new UpdateProductPictureCommand(request.RequestUser) { ProductId = entity.Id, Picture = request.Picture, OriginalPicture = request.OriginalPicture }, token);
                     if (!imageResult.Success)
                         return Failed<Guid>(imageResult.Exception);
 
@@ -154,7 +154,7 @@ namespace Sheaft.Application.Handlers
 
                     await _context.SaveChangesAsync(token);
 
-                    var imageResult = await _mediatr.Process(new UpdateProductPictureCommand(request.RequestUser) { ProductId = entity.Id, Picture = request.Picture }, token);
+                    var imageResult = await _mediatr.Process(new UpdateProductPictureCommand(request.RequestUser) { ProductId = entity.Id, Picture = request.Picture, OriginalPicture = request.OriginalPicture }, token);
                     if (!imageResult.Success)
                         return Failed<bool>(imageResult.Exception);
 

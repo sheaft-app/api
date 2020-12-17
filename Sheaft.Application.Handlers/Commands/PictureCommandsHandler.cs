@@ -33,7 +33,7 @@ namespace Sheaft.Application.Handlers
             {
                 var entity = await _context.GetByIdAsync<User>(request.UserId, token);
 
-                var resultImage = await _imageService.HandleUserPictureAsync(entity, request.Picture, token);
+                var resultImage = await _imageService.HandleUserPictureAsync(entity, request.Picture, request.OriginalPicture, token);
                 if (!resultImage.Success)
                     return Failed<string>(resultImage.Exception);
 
@@ -62,7 +62,7 @@ namespace Sheaft.Application.Handlers
             {
                 var entity = await _context.GetByIdAsync<Product>(request.ProductId, token);
 
-                var resultImage = await _imageService.HandleProductPictureAsync(entity, request.Picture, token);
+                var resultImage = await _imageService.HandleProductPictureAsync(entity, request.Picture, request.OriginalPicture, token);
                 if (!resultImage.Success)
                     return Failed<string>(resultImage.Exception);
 

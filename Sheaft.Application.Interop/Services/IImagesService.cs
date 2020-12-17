@@ -7,8 +7,8 @@ namespace Sheaft.Application.Interop
 {
     public interface IPictureService
     {
-        Task<Result<string>> HandleUserPictureAsync(User user, string picture, CancellationToken token);
-        Task<Result<string>> HandleProductPictureAsync(Product product, string picture, CancellationToken token);
+        Task<Result<string>> HandleUserPictureAsync(User user, string picture, string originalPicture, CancellationToken token);
+        Task<Result<string>> HandleProductPictureAsync(Product product, string picture, string originalPicture, CancellationToken token);
         Task<Result<string>> HandleTagPictureAsync(Tag tag, string picture, CancellationToken token);
         Task<Result<string>> HandleTagIconAsync(Tag tag, string icon, CancellationToken token);
     }

@@ -13,6 +13,7 @@ namespace Sheaft.Application.Commands
 
         public Guid UserId { get; set; }
         public string Picture { get; set; }
+        public string OriginalPicture { get; set; }
         public bool SkipAuthUpdate { get; set; }
     }
 }

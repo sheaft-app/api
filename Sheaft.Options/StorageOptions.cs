@@ -1,6 +1,6 @@
 ﻿namespace Sheaft.Options
 {
-    public class StorageOptions
+        public class StorageOptions
     {
         public const string SETTING = "Storage";
 

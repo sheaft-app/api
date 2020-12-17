@@ -13,5 +13,6 @@ namespace Sheaft.Application.Commands
 
         public Guid ProductId { get; set; }
         public string Picture { get; set; }
+        public string OriginalPicture { get; set; }
     }
 }
