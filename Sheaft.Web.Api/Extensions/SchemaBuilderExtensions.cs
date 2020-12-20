@@ -16,6 +16,7 @@ namespace Sheaft.Web.Api
             services.AddType<UserType>();
             services.AddType<StoreType>();
             services.AddType<ProducerType>();
+            services.AddType<ProducerSummaryType>();
             services.AddType<DepartmentType>();
             services.AddType<RegionType>();
             services.AddType<NationalityType>();

@@ -44,7 +44,7 @@ namespace Sheaft.Application.Queries
                         "product_id", "product_name", "product_onSalePricePerUnit", "product_onSalePrice", "product_rating", "product_ratings_count", "product_image", "product_tags", "producer_id", "producer_name", "producer_email", "producer_phone", "producer_zipcode", "producer_city", "producer_longitude", "producer_latitude", "product_returnable", "product_unit", "product_quantityPerUnit", "product_conditioning", "product_available"
                     },
                 IncludeTotalResultCount = true,
-                HighlightFields = new List<string>() { "product_name" },
+                HighlightFields = new List<string>(),
                 HighlightPreTag = "<b>",
                 HighlightPostTag = "</b>"
             };
@@ -63,7 +63,7 @@ namespace Sheaft.Application.Queries
 
             var filter = "removed eq 0 and product_searchable eq true";
             if (terms.ProducerId.HasValue)
-                filter += $" and producer_id eq '{terms.ProducerId.Value:N}'";
+                filter += $" and producer_id eq '{terms.ProducerId.Value.ToString("D").ToLowerInvariant()}'";
             if (terms.Tags != null)
             {
                 foreach (var tag in terms.Tags)

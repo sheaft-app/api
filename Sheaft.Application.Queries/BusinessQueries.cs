@@ -263,11 +263,11 @@ namespace Sheaft.Application.Queries
                     .ProjectTo<BusinessProfileDto>(_configurationProvider);
         }
 
-        public IQueryable<ProducerDto> GetProducer(Guid id, RequestUser currentUser)
+        public IQueryable<T> GetProducer<T>(Guid id, RequestUser currentUser)
         {
             return _context.Users.OfType<Producer>()
                     .Get(c => c.Id == id)
-                    .ProjectTo<ProducerDto>(_configurationProvider);
+                    .ProjectTo<T>(_configurationProvider);
         }
 
         public IQueryable<StoreDto> GetStore(Guid id, RequestUser currentUser)

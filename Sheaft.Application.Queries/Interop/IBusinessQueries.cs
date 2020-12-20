@@ -10,7 +10,7 @@ namespace Sheaft.Application.Queries
 {
     public interface IBusinessQueries
     {
-        IQueryable<ProducerDto> GetProducer(Guid id, RequestUser currentUser);
+        IQueryable<T> GetProducer<T>(Guid id, RequestUser currentUser);
         IQueryable<StoreDto> GetStore(Guid id, RequestUser currentUser);
         IQueryable<BusinessProfileDto> GetMyProfile(RequestUser currentUser);
         Task<SirenBusinessDto> RetrieveSiretInfosAsync(string siret, RequestUser currentUser, CancellationToken token);

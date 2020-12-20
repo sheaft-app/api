@@ -313,14 +313,14 @@ namespace Sheaft.GraphQL.Services
         {
             SetLogTransaction("GraphQL", nameof(RegisterProducerAsync));
             var result = await ExecuteCommandAsync<RegisterProducerCommand, Guid>(_mapper.Map(input, new RegisterProducerCommand(CurrentUser)), Token);
-            return businessQueries.GetProducer(result, CurrentUser);
+            return businessQueries.GetProducer<ProducerDto>(result, CurrentUser);
         }
 
         public async Task<IQueryable<ProducerDto>> UpdateProducerAsync(UpdateProducerInput input, [Service] IBusinessQueries businessQueries)
         {
             SetLogTransaction("GraphQL", nameof(UpdateProducerAsync));
             await ExecuteCommandAsync<UpdateProducerCommand, bool>(_mapper.Map(input, new UpdateProducerCommand(CurrentUser)), Token);
-            return businessQueries.GetProducer(input.Id, CurrentUser);
+            return businessQueries.GetProducer<ProducerDto>(input.Id, CurrentUser);
         }
 
         public async Task<IQueryable<BusinessLegalDto>> CreateBusinessLegalsAsync(CreateBusinessLegalInput input, [Service] ILegalQueries legalQueries)

@@ -1,5 +1,6 @@
 ﻿using HotChocolate.Types;
 using HotChocolate.Types.Relay;
+using Sheaft.Application.Models;
 using Sheaft.Core.Security;
 using Sheaft.GraphQL.Filters;
 using Sheaft.GraphQL.Services;
@@ -226,11 +227,18 @@ namespace Sheaft.GraphQL.Types
                 .UseSelection();
 
             //PRODUCER
-            descriptor.Field(c => c.GetProducer(default, default))
+            descriptor.Field(c => c.GetProducer<ProducerDto>(default, default))
                 .Name("producer")
                 .Authorize(Policies.OWNER)
                 .Argument("input", c => c.Type<NonNullType<IdType>>())
                 .Type<NonNullType<ProducerType>>()
+                .UseSingleOrDefault()
+                .UseSelection();
+
+            descriptor.Field(c => c.GetProducer<ProducerSummaryDto>(default, default))
+                .Name("producerSummary")
+                .Argument("input", c => c.Type<NonNullType<IdType>>())
+                .Type<NonNullType<ProducerSummaryType>>()
                 .UseSingleOrDefault()
                 .UseSelection();
 
