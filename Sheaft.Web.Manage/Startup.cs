@@ -234,6 +234,7 @@ namespace Sheaft.Web.Manage
             services.AddScoped<ISheaftMediatr, SheaftMediatr>();
             services.AddScoped<IAuthService, AuthService>();
             services.AddScoped<IFeesService, FeesService>();
+            services.AddScoped<ICapingDeliveriesService, CapingDeliveriesService>();
 
             services.AddScoped<IAgreementQueries, AgreementQueries>();
             services.AddScoped<IBusinessQueries, BusinessQueries>();

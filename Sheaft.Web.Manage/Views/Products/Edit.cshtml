@@ -118,6 +118,10 @@
             {
                 <img src="@Model.Picture" height="100" />
             }
+            @if (!string.IsNullOrWhiteSpace(Model.Picture))
+            {
+                <a href="@Model.Picture.Replace(Sheaft.Core.Models.PictureSize.SMALL, Sheaft.Core.Models.PictureSize.ORIGINAL).Replace(Sheaft.Core.Models.PictureSize.MEDIUM, Sheaft.Core.Models.PictureSize.ORIGINAL).Replace(Sheaft.Core.Models.PictureSize.LARGE, Sheaft.Core.Models.PictureSize.ORIGINAL)">Download original picture</a>
+            }
             @Html.TextBoxFor(c => c.Picture, new { @class = "form-control", @type = "file" })
         </div>
         <div class="form-group">
