@@ -139,11 +139,11 @@ namespace Sheaft.Application.Handlers
                     request.Address.City,
                     request.Address.Country);
 
-                var ownerAddress = new OwnerAddress(request.Address.Line1,
-                    request.Address.Line2,
-                    request.Address.Zipcode,
-                    request.Address.City,
-                    request.Address.Country
+                var ownerAddress = new OwnerAddress(request.Owner.Address.Line1,
+                    request.Owner.Address.Line2,
+                    request.Owner.Address.Zipcode,
+                    request.Owner.Address.City,
+                    request.Owner.Address.Country
                 );
 
                 var legal = await _context.GetByIdAsync<BusinessLegal>(request.Id, token);
