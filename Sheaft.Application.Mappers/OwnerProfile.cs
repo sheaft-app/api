@@ -11,7 +11,8 @@ namespace Sheaft.Application.Mappers
             CreateMap<Owner, OwnerDto>();
             CreateMap<Owner, OwnerViewModel>();
 
-            CreateMap<OwnerViewModel, OwnerInput>();
+            CreateMap<OwnerViewModel, OwnerInput>()
+                .ForMember(d => d.Address, opt => opt.MapFrom(r => r.Address));
         }
     }
 }

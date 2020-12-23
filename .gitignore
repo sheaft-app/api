@@ -15,3 +15,6 @@ Sheaft.Web.Jobs/appsettings.Development.json
 Docker/sql/data
 Docker/sql/log
 Docker/sql/secrets
+
+.idea/*
+*.sln.*.user
