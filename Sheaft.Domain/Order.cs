@@ -18,12 +18,13 @@ namespace Sheaft.Domain.Models
         {
         }
 
-        public Order(Guid id, DonationKind kind, User user, IDictionary<Product, int> orderProducts, decimal fixedAmount, decimal percent)
+        public Order(Guid id, DonationKind kind, User user, IDictionary<Product, int> orderProducts, decimal fixedAmount, decimal percent, decimal vatPercent)
         {
             Id = id;
             User = user;
             FeesFixedAmount = fixedAmount;
             FeesPercent = percent;
+            FeesVatPercent = FeesVatPercent;
             DonationKind = kind;
             Status = OrderStatus.Created;
 
@@ -53,6 +54,7 @@ namespace Sheaft.Domain.Models
         public decimal TotalPrice { get; private set; }
         public decimal TotalWeight { get; private set; }
         public decimal FeesFixedAmount { get; private set; }
+        public decimal FeesVatPercent { get; private set; }
         public decimal FeesPercent { get; private set; }
         public int ReturnablesCount { get; private set; }
         public int LinesCount { get; private set; }
@@ -231,7 +233,8 @@ namespace Sheaft.Domain.Models
 
         private decimal CalculateFees(decimal total)
         {
-            return (FeesPercent * total) + FeesFixedAmount;
+            var fees = (FeesPercent * total) + FeesFixedAmount;
+            return fees + fees * FeesVatPercent;
         }
     }
 }

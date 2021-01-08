@@ -66,7 +66,7 @@ namespace Sheaft.Application.Handlers
                 }
 
                 var user = await _context.GetByIdAsync<User>(request.RequestUser.Id, token);
-                var order = new Order(Guid.NewGuid(), request.Donation, user, cartProducts, _pspOptions.FixedAmount, _pspOptions.Percent);
+                var order = new Order(Guid.NewGuid(), request.Donation, user, cartProducts, _pspOptions.FixedAmount, _pspOptions.Percent, _pspOptions.VatPercent);
 
                 var deliveryIds = request.ProducersExpectedDeliveries?.Select(p => p.DeliveryModeId) ?? new List<Guid>();
                 var deliveries = deliveryIds.Any() ? await _context.GetByIdsAsync<DeliveryMode>(deliveryIds, token) : new List<DeliveryMode>();
@@ -106,7 +106,7 @@ namespace Sheaft.Application.Handlers
                     }
 
                     var user = await _context.GetByIdAsync<User>(request.RequestUser.Id, token);
-                    var order = new Order(Guid.NewGuid(), DonationKind.None, user, cartProducts, _pspOptions.FixedAmount, _pspOptions.Percent);
+                    var order = new Order(Guid.NewGuid(), DonationKind.None, user, cartProducts, _pspOptions.FixedAmount, _pspOptions.Percent, _pspOptions.VatPercent);
 
                     var deliveryIds = request.ProducersExpectedDeliveries?.Select(p => p.DeliveryModeId) ?? new List<Guid>();
                     var deliveries = deliveryIds.Any() ? await _context.GetByIdsAsync<DeliveryMode>(deliveryIds, token) : new List<DeliveryMode>();

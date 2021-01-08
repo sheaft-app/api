@@ -48,11 +48,11 @@ La base de données est utilisée via l'ORM EntityFrameworkCore, cette couche ut
 
 ## Evolution du modèle de base de données
 
-Pour la mettre à jour le modèle de données, nous utilisons les migrations d'EF. 
-Il faut donc faire les modifications nécessaires sur AppDbContext puis se placer dans le répertoire Sheaft.Infrastructure et executer:  dotnet-ef migrations add ##REPLACE## -s ..\Sheaft.Web.Api\Sheaft.Web.Api.csproj -c AppDbContext 
+Pour la mettre à jour le modèle de données, nous utilisons les migrations d'EF.
+Il faut donc faire les modifications nécessaires sur AppDbContext puis se placer dans le répertoire Sheaft.Infrastructure et executer:  dotnet-ef migrations add ##REPLACE## -s ..\Sheaft.Web.Api\Sheaft.Web.Api.csproj -c AppDbContext
 
 Vous pouvez ensuite appliquer la migration à l'aide de la commande suivante: dotnet-ef database update ##REPLACE###
 
-Vous pouvez annuler la dernière migration si celle-ci n'a pas été appliquée via:  dotnet-ef migrations remove -s ..\Sheaft.Api\Sheaft.Api.csproj -c AppDbContext 
+Vous pouvez annuler la dernière migration si celle-ci n'a pas été appliquée via:  dotnet-ef migrations remove -s ..\Sheaft.Api\Sheaft.Api.csproj -c AppDbContext
 
 L'utilisation du path vers le projet web est nécessaire pour executer la commande.
