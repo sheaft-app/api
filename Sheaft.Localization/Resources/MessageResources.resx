@@ -145,7 +145,7 @@
     <value>Certaines données de votre requête sont invalides</value>
   </data>
   <data name="Unexpected" xml:space="preserve">
-    <value>Une erreur inatendue est survenue</value>
+    <value>Une erreur inattendue est survenue</value>
   </data>
   <data name="AlreadyExists" xml:space="preserve">
     <value>Une ressource existe déjà avec ces informations</value>
