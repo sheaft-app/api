@@ -242,6 +242,14 @@ namespace Sheaft.GraphQL.Types
                 .UseSingleOrDefault()
                 .UseSelection();
 
+            descriptor.Field(c => c.GetProducers(default))
+                .Name("producers")
+                .Type<NonNullType<ListType<ProducerSummaryType>>>()
+                .UsePaging<ProducerSummaryType>()
+                .UseFiltering<ProducerSummaryFilterType>()
+                .UseSorting<ProducerSummarySortType>()
+                .UseSelection();
+
             descriptor.Field(c => c.GetProducerProducts(default, default))
                 .Name("producerProducts")
                 .Authorize(Policies.STORE)

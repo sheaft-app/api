@@ -270,6 +270,13 @@ namespace Sheaft.Application.Queries
                     .ProjectTo<T>(_configurationProvider);
         }
 
+        public IQueryable<ProducerSummaryDto> GetProducers(RequestUser currentUser)
+        {
+            return _context.Users.OfType<Producer>()
+                    .Get()
+                    .ProjectTo<ProducerSummaryDto>(_configurationProvider);
+        }
+
         public IQueryable<StoreDto> GetStore(Guid id, RequestUser currentUser)
         {
             return _context.Users.OfType<Store>()

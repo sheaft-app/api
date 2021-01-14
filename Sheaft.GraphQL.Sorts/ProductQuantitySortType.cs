@@ -10,5 +10,5 @@ namespace Sheaft.GraphQL.Sorts
             descriptor.BindFieldsExplicitly();
             descriptor.Sortable(c => c.Name);
         }
-    }
+    }    
 }

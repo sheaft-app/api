@@ -13,5 +13,5 @@ namespace Sheaft.GraphQL.Filters
             descriptor.Filter(c => c.Name).AllowContains();
             descriptor.Filter(c => c.Reference).AllowContains();
         }
-    }
+    }    
 }

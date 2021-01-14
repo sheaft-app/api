@@ -146,6 +146,13 @@ namespace Sheaft.GraphQL.Services
             return businessQueries.GetProducer<T>(input, CurrentUser);
         }
 
+        public IQueryable<ProducerSummaryDto> GetProducers([Service] IBusinessQueries businessQueries)
+        {
+            SetLogTransaction("GraphQL", nameof(GetProducers));
+            return businessQueries.GetProducers(CurrentUser);
+        }
+
+
         public IQueryable<ConsumerDto> GetConsumer(Guid input, [Service] IConsumerQueries consumerQueries)
         {
             SetLogTransaction("GraphQL", nameof(GetConsumer), input);
