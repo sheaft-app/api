@@ -465,18 +465,12 @@ namespace Sheaft.GraphQL.Types
                 .UseSingleOrDefault()
                 .UseSelection();
 
-            descriptor.Field(c => c.CreateCardRegistration(default, default))
+            descriptor.Field(c => c.CreateCardRegistration(default))
                 .Name("createCardRegistration")
                 .Authorize(Policies.CONSUMER)
                 .Type<NonNullType<CardRegistrationType>>()
                 .UseSingleOrDefault()
                 .UseSelection();
-
-            descriptor.Field(c => c.ValidateCardRegistration(default, default))
-                .Name("validateCardRegistration")
-                .Authorize(Policies.CONSUMER)
-                .Type<NonNullType<IdType>>()
-                .UseSingleOrDefault();
         }
     }
 }

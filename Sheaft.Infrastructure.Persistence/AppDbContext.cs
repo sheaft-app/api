@@ -30,7 +30,6 @@ namespace Sheaft.Infrastructure.Persistence
         public DbSet<Agreement> Agreements { get; set; }
         public DbSet<BankAccount> BankAccounts { get; set; }
         public DbSet<Card> Cards { get; set; }
-        public DbSet<CardRegistration> CardRegistrations { get; set; }
         public DbSet<Country> Countries { get; set; }
         public DbSet<DeliveryMode> DeliveryModes { get; set; }
         public DbSet<Department> Departments { get; set; }
@@ -56,7 +55,6 @@ namespace Sheaft.Infrastructure.Persistence
         public DbSet<User> Users { get; set; }
         public DbSet<Wallet> Wallets { get; set; }
         public DbSet<Withholding> Withholdings { get; set; }
-
         public DbSet<DepartmentProducers> DepartmentProducers { get; set; }
         public DbSet<DepartmentStores> DepartmentStores { get; set; }
         public DbSet<CountryPoints> CountryPoints { get; set; }

@@ -81,5 +81,13 @@ namespace Sheaft.Domain.Models
             ResultCode = resultCode;
             ResultMessage = resultMessage;
         }
+
+        public void SetSecureModeRedirectUrl(string secureModeRedirectUrl)
+        {
+            if(secureModeRedirectUrl == null)
+                return;
+
+            SecureModeRedirectUrl = secureModeRedirectUrl;
+        }
     }
 }

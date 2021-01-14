@@ -1,5 +1,3 @@
-using Sheaft.Domain.Enums;
-
 namespace Sheaft.Application.Models
 {
     public class PspCardRegistrationResultDto
@@ -9,8 +7,5 @@ namespace Sheaft.Application.Models
         public string PreregistrationData { get; set; }
         public string CardRegistrationURL { get; set; }
         public string CardId { get; set; }
-        public string RegistrationData { get; set; }
-        public string ResultCode { get; set; }
-        public CardStatus Status { get; set; }
     }
 }

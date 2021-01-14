@@ -128,7 +128,6 @@ namespace Sheaft.Infrastructure.Persistence
             modelBuilder.ApplyConfiguration(new WithholdingConfiguration());
             modelBuilder.ApplyConfiguration(new PreAuthorizationConfiguration());
             modelBuilder.ApplyConfiguration(new PreAuthorizedPayinConfiguration());
-            modelBuilder.ApplyConfiguration(new CardRegistrationConfiguration());
         }
     }
 }

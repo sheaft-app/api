@@ -399,12 +399,6 @@ namespace Sheaft.GraphQL.Services
             return preAuthorizationQueries.GetPreAuthorization(input, CurrentUser);
         }
 
-        public IQueryable<CardRegistrationDto> GetCardRegistration(Guid input, [Service] ICardRegistrationQueries cardRegistrationQueries)
-        {
-            SetLogTransaction("GraphQL", nameof(GetCardRegistration));
-            return cardRegistrationQueries.GetCardRegistration(input, CurrentUser);
-        }
-
         public IQueryable<BusinessProfileDto> GetMyBusiness([Service] IBusinessQueries businessQueries)
         {
             SetLogTransaction("GraphQL", nameof(GetMyBusiness));

@@ -255,21 +255,17 @@ namespace Sheaft.Infrastructure.Services
             });
         }
 
-        public async Task<Result<PspCardRegistrationResultDto>> CreateCardRegistrationAsync(CardRegistration payment, CancellationToken token)
+        public async Task<Result<PspCardRegistrationResultDto>> CreateCardRegistrationAsync(User user, CancellationToken token)
         {
             return await ExecuteAsync(async () =>
             {
-                if (string.IsNullOrWhiteSpace(payment.User.Identifier))
+                if (string.IsNullOrWhiteSpace(user.Identifier))
                     return BadRequest<PspCardRegistrationResultDto>(MessageKind.PsP_CannotCreate_Card_User_Not_Exists);
-
-                if (!string.IsNullOrWhiteSpace(payment.Identifier))
-                    return BadRequest<PspCardRegistrationResultDto>(MessageKind.PsP_CannotCreate_Card_Card_Exists);
 
                 await EnsureAccessTokenIsValidAsync(token);
 
                 var result = await _api.CardRegistrations.CreateAsync(
-                    GetIdempotencyKey(payment.Id),
-                    new CardRegistrationPostDTO(payment.User.Identifier, CurrencyIso.EUR, MangoPay.SDK.Core.Enumerations.CardType.CB_VISA_MASTERCARD));
+                    new CardRegistrationPostDTO(user.Identifier, CurrencyIso.EUR, MangoPay.SDK.Core.Enumerations.CardType.CB_VISA_MASTERCARD));
 
                 return Ok(new PspCardRegistrationResultDto
                 {
@@ -277,25 +273,8 @@ namespace Sheaft.Infrastructure.Services
                     CardId = result.CardId,
                     CardRegistrationURL = result.CardRegistrationURL,
                     PreregistrationData = result.PreregistrationData,
-                    RegistrationData = result.RegistrationData,
-                    ResultCode = result.ResultCode,
-                    Status = Enum.Parse<CardStatus>(result.Status),
                     UserId = result.UserId
                 });
-            });
-        }
-
-        public async Task<Result<string>> ValidateCardAsync(CardRegistration payment, string registrationData, CancellationToken token)
-        {
-            return await ExecuteAsync(async () =>
-            {
-                if (string.IsNullOrWhiteSpace(payment.Identifier))
-                    return BadRequest<string>(MessageKind.PsP_CannotValidate_Card_Card_Not_Exists);
-
-                await EnsureAccessTokenIsValidAsync(token);
-
-                var result = await _api.CardRegistrations.UpdateAsync(new CardRegistrationPutDTO() { RegistrationData = registrationData },  payment.Identifier);
-                return Ok(result.Id);
             });
         }
 
@@ -855,6 +834,7 @@ namespace Sheaft.Infrastructure.Services
                     ExpirationDate = result.ExpirationDate,
                     Debited = result.DebitedFunds.Amount,
                     Remaining = result.RemainingFunds.Amount,
+                    SecureModeRedirectUrl = result.SecureModeRedirectURL,
                 });
             });
         }

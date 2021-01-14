@@ -31,12 +31,5 @@ namespace Sheaft.Application.Queries
                     .Get(c => c.User.Id == currentUser.Id)
                     .ProjectTo<CardDto>(_configurationProvider);
         }
-
-        public IQueryable<CardDto> GetCardWithRegistrationId(Guid id, RequestUser currentUser)
-        {
-            return _context.Cards
-                    .Get(c => c.CardRegistration.Id == id && c.User.Id == currentUser.Id)
-                    .ProjectTo<CardDto>(_configurationProvider);
-        }
     }
 }

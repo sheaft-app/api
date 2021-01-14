@@ -40,13 +40,14 @@ namespace Sheaft.Application.Handlers
         {
             return await ExecuteAsync(request, async () =>
             {
-                var checkResult = await _mediatr.Process(new CheckConsumerConfigurationCommand(request.RequestUser) { Id = request.UserId }, token);
+                var order = await _context.GetByIdAsync<Order>(request.OrderId, token);
+
+                var checkResult = await _mediatr.Process(new CheckConsumerConfigurationCommand(request.RequestUser) { Id = order.User.Id }, token);
                 if (!checkResult.Success)
                     return Failed<Guid>(checkResult.Exception);
 
-                var order = await _context.GetByIdAsync<Order>(request.OrderId, token);
                 if (!order.Deliveries.Any())
-                    return BadRequest<Guid>(MessageKind.Order_CannotPay_Deliveries_Required);             
+                    return BadRequest<Guid>(MessageKind.Order_CannotPay_Deliveries_Required);
 
                 var validatedDeliveries = await _capingDeliveriesService.ValidateCapedDeliveriesAsync(order.Deliveries, token);
                 if (!validatedDeliveries.Success)
@@ -58,7 +59,14 @@ namespace Sheaft.Application.Handlers
                 if (invalidProductIds.Any())
                     return BadRequest<Guid>(MessageKind.Order_CannotPay_Some_Products_Invalid, string.Join(";", invalidProductIds));
 
-                var card = await _context.GetByIdAsync<Card>(request.CardId, token);
+                var card = await _context.GetSingleAsync<Card>(c => c.Identifier == request.CardIdentifier, token);
+                if(card == null)
+                {
+                    card = new Card(Guid.NewGuid(), request.CardIdentifier, $"Carte_{DateTime.UtcNow.ToString("YYYYMMDDTHHmmss")}", order.User);
+                    await _context.AddAsync(card, token);
+                    await _context.SaveChangesAsync(token);
+                }
+
                 using (var transaction = await _context.BeginTransactionAsync(token))
                 {
                     var preAuthorization = new PreAuthorization(Guid.NewGuid(), order, card);
@@ -84,12 +92,13 @@ namespace Sheaft.Application.Handlers
                     preAuthorization.SetRemaining(result.Data.Remaining);
                     preAuthorization.SetDebited(result.Data.Debited);
                     preAuthorization.SetResult(result.Data.ResultCode, result.Data.ResultMessage);
+                    preAuthorization.SetSecureModeRedirectUrl(result.Data.SecureModeRedirectUrl);
 
                     await _context.SaveChangesAsync(token);
-
                     await transaction.CommitAsync(token);
+
                     return Ok(preAuthorization.Id);
-                }
+                } 
             });
         }
     }

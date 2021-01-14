@@ -7,13 +7,10 @@ namespace Sheaft.GraphQL.Types
     {
         protected override void Configure(IInputObjectTypeDescriptor<CreatePreAuthorizationInput> descriptor)
         {
-            descriptor.Field(c => c.UserId)
-                .Type<NonNullType<IdType>>();
-
             descriptor.Field(c => c.OrderId)
                 .Type<NonNullType<IdType>>();
 
-            descriptor.Field(c => c.CardId)
+            descriptor.Field(c => c.CardIdentifier)
                 .Type<NonNullType<StringType>>();
         }
     }

@@ -10,9 +10,7 @@ namespace Sheaft.Application.Commands
         public CreatePreAuthorizationCommand(RequestUser requestUser) : base(requestUser)
         {
         }
-
-        public Guid UserId { get; set; }
         public Guid OrderId { get; set; }
-        public Guid CardId { get; set; }
+        public string CardIdentifier { get; set; }
     }
 }

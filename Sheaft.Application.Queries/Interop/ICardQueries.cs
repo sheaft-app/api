@@ -9,6 +9,5 @@ namespace Sheaft.Application.Queries
     {
         IQueryable<CardDto> GetCard(Guid id, RequestUser currentUser);
         IQueryable<CardDto> GetCards(RequestUser currentUser);
-        IQueryable<CardDto> GetCardWithRegistrationId(Guid id, RequestUser currentUser);
     }
 }

@@ -151,7 +151,6 @@ namespace Sheaft.Web.Api
             services.AddType<UpdateUboInputType>();
             services.AddType<CreatePreAuthorizationInputType>();
             services.AddType<CreateCardRegistrationInputType>();
-            services.AddType<ValidateCardRegistrationInputType>();
 
             return services;
         }
