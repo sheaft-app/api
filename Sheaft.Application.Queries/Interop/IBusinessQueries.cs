@@ -17,5 +17,6 @@ namespace Sheaft.Application.Queries
         Task<ProducersSearchDto> SearchProducersAsync(Guid storeId, SearchTermsInput terms, RequestUser currentUser, CancellationToken token);
         Task<StoresSearchDto> SearchStoresAsync(Guid producerId, SearchTermsInput terms, RequestUser currentUser, CancellationToken token);
         Task<IEnumerable<ProducerSuggestDto>> SuggestProducersAsync(SearchTermsInput terms, RequestUser currentUser, CancellationToken token);
+        IQueryable<ProducerSummaryDto> GetProducers(RequestUser currentUser);
     }
 }
