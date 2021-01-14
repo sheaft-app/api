@@ -1,5 +1,4 @@
-﻿using MediatR;
-using Sheaft.Application.Commands;
+﻿using Sheaft.Application.Commands;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -463,6 +462,27 @@ namespace Sheaft.GraphQL.Services
         {
             SetLogTransaction("GraphQL", nameof(DeleteReturnableAsync));
             return await ExecuteCommandAsync<DeleteReturnableCommand, bool>(_mapper.Map(input, new DeleteReturnableCommand(CurrentUser)), Token);
+        }
+
+        public async Task<IQueryable<CardRegistrationDto>> CreateCardRegistration(CreateCardRegistrationInput input, [Service] ICardRegistrationQueries cardRegistrationQueries)
+        {
+            SetLogTransaction("GraphQL", nameof(CreateCardRegistration));
+            var result =  await ExecuteCommandAsync<CreateCardRegistrationCommand, Guid>(_mapper.Map(input, new CreateCardRegistrationCommand(CurrentUser)), Token);
+            return cardRegistrationQueries.GetCardRegistration(result, CurrentUser);
+        }
+
+        public async Task<IQueryable<CardDto>> ValidateCardRegistration(ValidateCardRegistrationInput input, [Service] ICardQueries cardQueries)
+        {
+            SetLogTransaction("GraphQL", nameof(ValidateCardRegistration));
+            var result =  await ExecuteCommandAsync<ValidateCardRegistrationCommand, Guid>(_mapper.Map(input, new ValidateCardRegistrationCommand(CurrentUser)), Token);
+            return cardQueries.GetCardWithRegistrationId(result, CurrentUser);
+        }
+
+        public async Task<IQueryable<PreAuthorizationDto>> CreatePreAuthorization(CreatePreAuthorizationInput input, [Service] IPreAuthorizationQueries preAuthorizationQueries)
+        {
+            SetLogTransaction("GraphQL", nameof(CreatePreAuthorization));
+            var result = await ExecuteCommandAsync<CreatePreAuthorizationCommand, Guid>(_mapper.Map(input, new CreatePreAuthorizationCommand(CurrentUser)), Token);
+            return preAuthorizationQueries.GetPreAuthorization(result, CurrentUser);
         }
 
         private async Task<T> ExecuteCommandAsync<U, T>(U input, CancellationToken token) where U : ICommand<T>

@@ -4,6 +4,8 @@ using Microsoft.Extensions.Options;
 using Sheaft.Application.Interop;
 using Sheaft.Application.Models;
 using Sheaft.Core;
+using Sheaft.Domain.Models;
+using Sheaft.Exceptions;
 using Sheaft.Options;
 using System;
 using System.Collections.Generic;
@@ -25,6 +27,47 @@ namespace Sheaft.Infrastructure.Services
         {
             _storageOptions = storageOptions.Value;
             _cloudStorageAccount = cloudStorageAccount;
+        }        
+
+        public async Task<Result<bool>> ValidateCapedDeliveriesAsync(IReadOnlyCollection<OrderDelivery> orderDeliveries, CancellationToken token)
+        {
+            if (orderDeliveries.All(d => !d.DeliveryMode.MaxPurchaseOrdersPerTimeSlot.HasValue))
+                return Ok(true);
+
+            var results = await GetCapingDeliveriesAsync(
+                orderDeliveries.Where(d => d.DeliveryMode.MaxPurchaseOrdersPerTimeSlot.HasValue).Select(d =>
+                    new Tuple<Guid, Guid, DeliveryHourDto>(
+                        d.DeliveryMode.Producer.Id,
+                        d.DeliveryMode.Id,
+                        new DeliveryHourDto
+                        {
+                            Day = d.ExpectedDelivery.ExpectedDeliveryDate.DayOfWeek,
+                            ExpectedDeliveryDate = d.ExpectedDelivery.ExpectedDeliveryDate,
+                            From = d.ExpectedDelivery.From,
+                            To = d.ExpectedDelivery.To,
+                        })
+                    ), token);
+
+            if (!results.Success)
+                return Failed<bool>(results.Exception);
+
+            foreach (var orderDelivery in orderDeliveries)
+            {
+                var delivery = results.Data.FirstOrDefault(d => d.DeliveryId == orderDelivery.Id 
+                    && d.ExpectedDate.Year == orderDelivery.ExpectedDelivery.ExpectedDeliveryDate.Year 
+                    && d.ExpectedDate.Month == orderDelivery.ExpectedDelivery.ExpectedDeliveryDate.Month 
+                    && d.ExpectedDate.Day == orderDelivery.ExpectedDelivery.ExpectedDeliveryDate.Day
+                    && d.From == orderDelivery.ExpectedDelivery.From
+                    && d.To == orderDelivery.ExpectedDelivery.To);
+
+                if (delivery == null)
+                    continue;
+
+                if (delivery.Count >= orderDelivery.DeliveryMode.MaxPurchaseOrdersPerTimeSlot)
+                    return Failed<bool>(new ValidationException(MessageKind.Order_CannotPay_Delivery_Max_PurchaseOrders_Reached, orderDelivery.DeliveryMode.Producer.Name, $"le {orderDelivery.ExpectedDelivery.ExpectedDeliveryDate:dd/MM/yyyy} entre {orderDelivery.ExpectedDelivery.From:hh\\hmm} et {orderDelivery.ExpectedDelivery.To:hh\\hmm}", orderDelivery.DeliveryMode.MaxPurchaseOrdersPerTimeSlot));
+            }
+
+            return Ok(true);
         }
 
         public async Task<Result<IEnumerable<CapingDeliveryDto>>> GetCapingDeliveriesAsync(IEnumerable<Tuple<Guid, Guid, DeliveryHourDto>> deliveries, CancellationToken token)

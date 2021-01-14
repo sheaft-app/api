@@ -21,7 +21,7 @@ namespace Sheaft.Domain.Models
             Fees = order.FeesPrice;
             Debited = order.TotalPrice;
             CreditedWallet = creditedWallet;
-            Reference = "SHEAFT";
+            Reference = $"SHFT{DateTime.UtcNow.ToString("DDMMYY")}";
         }
 
         public virtual Wallet CreditedWallet { get; private set; }

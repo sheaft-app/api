@@ -29,6 +29,8 @@ namespace Sheaft.Infrastructure.Persistence
 
         public DbSet<Agreement> Agreements { get; set; }
         public DbSet<BankAccount> BankAccounts { get; set; }
+        public DbSet<Card> Cards { get; set; }
+        public DbSet<CardRegistration> CardRegistrations { get; set; }
         public DbSet<Country> Countries { get; set; }
         public DbSet<DeliveryMode> DeliveryModes { get; set; }
         public DbSet<Department> Departments { get; set; }
@@ -44,6 +46,7 @@ namespace Sheaft.Infrastructure.Persistence
         public DbSet<Payin> Payins { get; set; }
         public DbSet<Payout> Payouts { get; set; }
         public DbSet<Product> Products { get; set; }
+        public DbSet<PreAuthorization> PreAuthorizations { get; set; }
         public DbSet<QuickOrder> QuickOrders { get; set; }
         public DbSet<Refund> Refunds { get; set; }
         public DbSet<Region> Regions { get; set; }

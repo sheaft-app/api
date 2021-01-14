@@ -12,5 +12,5 @@ namespace Sheaft.GraphQL.Enums
             descriptor.Value(AddressKind.Legals).Name("LEGALS");
             descriptor.Value(AddressKind.Shipping).Name("SHIPPING");
         }
-    }
+    }    
 }

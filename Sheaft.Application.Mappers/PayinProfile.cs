@@ -22,6 +22,10 @@ namespace Sheaft.Application.Mappers
             CreateMap<WebPayin, WebPayinDto>()
                 .IncludeBase<Payin, TransactionDto>();
 
+            CreateMap<PreAuthorizedPayin, PreAuthorizedPayinDto>()
+                .IncludeBase<Payin, TransactionDto>()
+                .ForMember(m => m.PreAuthorization, opt => opt.MapFrom(t => t.PreAuthorization));
+
             CreateMap<Payin, PayinShortViewModel>();
 
             CreateMap<Payin, PayinViewModel>()

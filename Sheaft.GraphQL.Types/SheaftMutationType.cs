@@ -457,6 +457,26 @@ namespace Sheaft.GraphQL.Types
                 .Type<NonNullType<ConsumerLegalType>>()
                 .UseSingleOrDefault()
                 .UseSelection();
+
+            descriptor.Field(c => c.CreatePreAuthorization(default, default))
+                .Name("createPreAuthorization")
+                .Authorize(Policies.CONSUMER)
+                .Type<NonNullType<PreAuthorizationType>>()
+                .UseSingleOrDefault()
+                .UseSelection();
+
+            descriptor.Field(c => c.CreateCardRegistration(default, default))
+                .Name("createCardRegistration")
+                .Authorize(Policies.CONSUMER)
+                .Type<NonNullType<CardRegistrationType>>()
+                .UseSingleOrDefault()
+                .UseSelection();
+
+            descriptor.Field(c => c.ValidateCardRegistration(default, default))
+                .Name("validateCardRegistration")
+                .Authorize(Policies.CONSUMER)
+                .Type<NonNullType<IdType>>()
+                .UseSingleOrDefault();
         }
     }
 }

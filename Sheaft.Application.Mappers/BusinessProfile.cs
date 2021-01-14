@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using Sheaft.Application.Commands;
 using Sheaft.Domain.Models;
 using Sheaft.Application.Models;
 using System.Linq;
@@ -20,5 +19,5 @@ namespace Sheaft.Application.Mappers
             CreateMap<Business, BusinessProfileDto>()
                 .IncludeBase<Business, UserDto>();
         }
-    }
+    }    
 }

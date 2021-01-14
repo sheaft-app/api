@@ -64,6 +64,9 @@ namespace Sheaft.Web.Api
             services.AddType<ConsumerLegalType>();
             services.AddType<UboDeclarationType>();
             services.AddType<UboType>();
+            services.AddType<PreAuthorizationType>();
+            services.AddType<PreAuthorizedPayinType>();
+            services.AddType<CardRegistrationType>();
 
             services.AddType<AddressKindEnumType>();
             services.AddType<AgreementStatusEnumType>();
@@ -90,6 +93,11 @@ namespace Sheaft.Web.Api
             services.AddType<TransactionKindEnumType>();
             services.AddType<TransactionStatusEnumType>();
             services.AddType<LegalValidationEnumType>();
+            services.AddType<PaymentStatusEnumType>();
+            services.AddType<PreAuthorizationStatusEnumType>();
+            services.AddType<CardStatusEnumType>();
+            services.AddType<CardValidityEnumType>();
+            services.AddType<CardTypeEnumType>();
 
             services.AddType<CreateOrderInputType>();
             services.AddType<UpdateOrderInputType>();
@@ -141,6 +149,9 @@ namespace Sheaft.Web.Api
             services.AddType<UpdateConsumerLegalsInputType>();
             services.AddType<CreateUboInputType>();
             services.AddType<UpdateUboInputType>();
+            services.AddType<CreatePreAuthorizationInputType>();
+            services.AddType<CreateCardRegistrationInputType>();
+            services.AddType<ValidateCardRegistrationInputType>();
 
             return services;
         }

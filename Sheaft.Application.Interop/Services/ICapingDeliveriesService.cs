@@ -1,5 +1,6 @@
 ﻿using Sheaft.Application.Models;
 using Sheaft.Core;
+using Sheaft.Domain.Models;
 using System;
 using System.Collections.Generic;
 using System.Threading;
@@ -13,5 +14,6 @@ namespace Sheaft.Application.Interop
         Task<Result<CapingDeliveryDto>> GetCapingDeliveryAsync(Guid producerId, Guid deliveryId, DateTimeOffset expectedDeliveryDate, TimeSpan from, TimeSpan to, CancellationToken token);
         Task<Result<bool>> IncreaseProducerDeliveryCountAsync(Guid producerId, Guid deliveryId, DateTimeOffset expectedDeliveryDate, TimeSpan from, TimeSpan to, int maxPurchaseOrders, CancellationToken token);
         Task<Result<bool>> DecreaseProducerDeliveryCountAsync(Guid producerId, Guid deliveryId, DateTimeOffset expectedDeliveryDate, TimeSpan from, TimeSpan to, int maxPurchaseOrders, CancellationToken token);
+        Task<Result<bool>> ValidateCapedDeliveriesAsync(IReadOnlyCollection<OrderDelivery> orderDeliveries, CancellationToken token);
     }
 }

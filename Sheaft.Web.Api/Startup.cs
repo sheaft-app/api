@@ -274,7 +274,9 @@ namespace Sheaft.Web.Api
             services.AddScoped<ITransactionQueries, TransactionQueries>();
             services.AddScoped<IDocumentQueries, DocumentQueries>();
             services.AddScoped<ILegalQueries, LegalQueries>();
-
+            services.AddScoped<IPreAuthorizationQueries, PreAuthorizationQueries>();
+            services.AddScoped<ICardQueries, CardQueries>();
+            services.AddScoped<ICardRegistrationQueries, CardRegistrationQueries>();
 
             services.AddScoped<IDapperContext, DapperContext>();
             services.AddScoped<IAppDbContext>(c => c.GetRequiredService<AppDbContext>());

@@ -16,5 +16,5 @@ namespace Sheaft.Application.Commands
         public Guid StoreId { get; set; }
         public Guid DeliveryModeId { get; set; }
         public IEnumerable<TimeSlotGroupInput> SelectedHours { get; set; }
-    }
+    }    
 }

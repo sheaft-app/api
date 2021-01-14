@@ -15,6 +15,7 @@ namespace Sheaft.GraphQL.Types
             descriptor.Field(c => c.ResultCode);
             descriptor.Field(c => c.ResultMessage);
             descriptor.Field(c => c.RedirectUrl);
+            descriptor.Field(c => c.Credited);
 
             descriptor.Field(c => c.Kind)
                 .Type<NonNullType<TransactionKindEnumType>>();

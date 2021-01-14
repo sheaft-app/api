@@ -461,6 +461,22 @@ namespace Sheaft.GraphQL.Types
                 .Authorize(Policies.PRODUCER)
                 .Argument("input", c => c.Type<NonNullType<SearchTermsInputType>>())
                 .Type<NonNullType<StoresSearchType>>();
+                
+            descriptor.Field(c => c.GetPreAuthorization(default, default))
+                .Name("getPreAuthorization")
+                .Authorize(Policies.REGISTERED)
+                .Argument("input", c => c.Type<NonNullType<IdType>>())
+                .Type<NonNullType<PreAuthorizationType>>()
+                .UseSingleOrDefault()
+                .UseSelection();
+
+            descriptor.Field(c => c.GetCardRegistration(default, default))
+                .Name("getCardRegistration")
+                .Authorize(Policies.REGISTERED)
+                .Argument("input", c => c.Type<NonNullType<IdType>>())
+                .Type<NonNullType<CardRegistrationType>>()
+                .UseSingleOrDefault()
+                .UseSelection();
         }
     }
 }

@@ -19,6 +19,8 @@ namespace Sheaft.Application.Interop
     {
         DbSet<Agreement> Agreements { get; set; }
         DbSet<BankAccount> BankAccounts { get; set; }
+        DbSet<Card> Cards { get; set; }
+        DbSet<CardRegistration> CardRegistrations { get; set; }
         DbSet<Country> Countries { get; set; }
         DbSet<DeliveryMode> DeliveryModes { get; set; }
         DbSet<Department> Departments { get; set; }
@@ -33,6 +35,7 @@ namespace Sheaft.Application.Interop
         DbSet<Returnable> Returnables { get; set; }
         DbSet<Payin> Payins { get; set; }
         DbSet<Payout> Payouts { get; set; }
+        DbSet<PreAuthorization> PreAuthorizations { get; set; }
         DbSet<Product> Products { get; set; }
         DbSet<QuickOrder> QuickOrders { get; set; }
         DbSet<Refund> Refunds { get; set; }

@@ -255,27 +255,37 @@ namespace Sheaft.Infrastructure.Services
             });
         }
 
-        public async Task<Result<KeyValuePair<string, string>>> CreateCardAsync(Card payment, CancellationToken token)
+        public async Task<Result<PspCardRegistrationResultDto>> CreateCardRegistrationAsync(CardRegistration payment, CancellationToken token)
         {
             return await ExecuteAsync(async () =>
             {
                 if (string.IsNullOrWhiteSpace(payment.User.Identifier))
-                    return BadRequest<KeyValuePair<string, string>>(MessageKind.PsP_CannotCreate_Card_User_Not_Exists);
+                    return BadRequest<PspCardRegistrationResultDto>(MessageKind.PsP_CannotCreate_Card_User_Not_Exists);
 
                 if (!string.IsNullOrWhiteSpace(payment.Identifier))
-                    return BadRequest<KeyValuePair<string, string>>(MessageKind.PsP_CannotCreate_Card_Card_Exists);
+                    return BadRequest<PspCardRegistrationResultDto>(MessageKind.PsP_CannotCreate_Card_Card_Exists);
 
                 await EnsureAccessTokenIsValidAsync(token);
 
                 var result = await _api.CardRegistrations.CreateAsync(
                     GetIdempotencyKey(payment.Id),
-                    new CardRegistrationPostDTO(payment.User.Identifier, CurrencyIso.EUR, CardType.CB_VISA_MASTERCARD));
+                    new CardRegistrationPostDTO(payment.User.Identifier, CurrencyIso.EUR, MangoPay.SDK.Core.Enumerations.CardType.CB_VISA_MASTERCARD));
 
-                return Ok(new KeyValuePair<string, string>(result.Id, result.CardId));
+                return Ok(new PspCardRegistrationResultDto
+                {
+                    AccessKey = result.AccessKey,
+                    CardId = result.CardId,
+                    CardRegistrationURL = result.CardRegistrationURL,
+                    PreregistrationData = result.PreregistrationData,
+                    RegistrationData = result.RegistrationData,
+                    ResultCode = result.ResultCode,
+                    Status = Enum.Parse<CardStatus>(result.Status),
+                    UserId = result.UserId
+                });
             });
         }
 
-        public async Task<Result<string>> ValidateCardAsync(Card payment, string registrationId, string registrationData, CancellationToken token)
+        public async Task<Result<string>> ValidateCardAsync(CardRegistration payment, string registrationData, CancellationToken token)
         {
             return await ExecuteAsync(async () =>
             {
@@ -284,7 +294,7 @@ namespace Sheaft.Infrastructure.Services
 
                 await EnsureAccessTokenIsValidAsync(token);
 
-                var result = await _api.CardRegistrations.UpdateAsync(new CardRegistrationPutDTO() { RegistrationData = registrationData }, registrationId);
+                var result = await _api.CardRegistrations.UpdateAsync(new CardRegistrationPutDTO() { RegistrationData = registrationData },  payment.Identifier);
                 return Ok(result.Id);
             });
         }
@@ -308,7 +318,7 @@ namespace Sheaft.Infrastructure.Services
                     Identifier = result.Id,
                     ProcessedOn = result.ProcessedDate,
                     ResultCode = result.RefusedReasonType,
-                    ResultMessage = MangoExtensions.GetOperationMessage(result.RefusedReasonType, result.RefusedReasonMessage),
+                    ResultMessage = PspExtensions.GetOperationMessage(result.RefusedReasonType, result.RefusedReasonMessage),
                     Status = result.Status.GetValidationStatus()
                 });
             });
@@ -350,7 +360,7 @@ namespace Sheaft.Infrastructure.Services
                     Identifier = result.Id,
                     ProcessedOn = result.ProcessedDate,
                     ResultCode = result.RefusedReasonType,
-                    ResultMessage = MangoExtensions.GetOperationMessage(result.RefusedReasonType, result.RefusedReasonMessage),
+                    ResultMessage = PspExtensions.GetOperationMessage(result.RefusedReasonType, result.RefusedReasonMessage),
                     Status = result.Status.GetValidationStatus()
                 });
             });
@@ -370,7 +380,7 @@ namespace Sheaft.Infrastructure.Services
                 {
                     Identifier = result.Id,
                     Status = result.Status.GetDeclarationStatus(),
-                    ResultMessage = MangoExtensions.GetOperationMessage(result.Reason.ToString("G"), result.Message),
+                    ResultMessage = PspExtensions.GetOperationMessage(result.Reason.ToString("G"), result.Message),
                     ProcessedOn = result.ProcessedDate,
                     ResultCode = result.Reason.ToString("G")
                 });
@@ -405,7 +415,7 @@ namespace Sheaft.Infrastructure.Services
                 {
                     Identifier = result.Id,
                     Status = result.Status.GetDeclarationStatus(),
-                    ResultMessage = MangoExtensions.GetOperationMessage(result.Reason.ToString("G"), result.Message),
+                    ResultMessage = PspExtensions.GetOperationMessage(result.Reason.ToString("G"), result.Message),
                     ProcessedOn = result.ProcessedDate,
                     ResultCode = result.Reason.ToString("G")
                 });
@@ -495,7 +505,7 @@ namespace Sheaft.Infrastructure.Services
                         transaction.CreditedWallet.Identifier,
                         _pspOptions.ReturnUrl,
                         CultureCode.FR,
-                        CardType.CB_VISA_MASTERCARD,
+                        MangoPay.SDK.Core.Enumerations.CardType.CB_VISA_MASTERCARD,
                         transaction.Reference)
                     {
                         SecureMode = SecureMode.DEFAULT,
@@ -513,7 +523,7 @@ namespace Sheaft.Infrastructure.Services
                     Identifier = result.Id,
                     RedirectUrl = result.RedirectURL,
                     ResultCode = result.ResultCode,
-                    ResultMessage = MangoExtensions.GetOperationMessage(result.ResultCode, result.ResultMessage),
+                    ResultMessage = PspExtensions.GetOperationMessage(result.ResultCode, result.ResultMessage),
                     Debited = result.DebitedFunds.Amount.GetAmount(),
                     Fees = result.Fees.Amount.GetAmount(),
                     Status = result.Status.GetTransactionStatus()
@@ -566,7 +576,7 @@ namespace Sheaft.Infrastructure.Services
                     ProcessedOn = result.ExecutionDate,
                     Identifier = result.Id,
                     ResultCode = result.ResultCode,
-                    ResultMessage = MangoExtensions.GetOperationMessage(result.ResultCode, result.ResultMessage),
+                    ResultMessage = PspExtensions.GetOperationMessage(result.ResultCode, result.ResultMessage),
                     Debited = result.DebitedFunds.Amount.GetAmount(),
                     Fees = result.Fees.Amount.GetAmount(),
                     Status = result.Status.GetTransactionStatus()
@@ -588,13 +598,13 @@ namespace Sheaft.Infrastructure.Services
 
         public async Task<Result<PspPaymentResultDto>> CreateDonationAsync(Donation transaction, CancellationToken token)
         {
-            return await CreatePspTransferAsync(transaction.Id, 
-                transaction.Debited, 
-                transaction.Fees, 
-                transaction.Author.Identifier, 
+            return await CreatePspTransferAsync(transaction.Id,
+                transaction.Debited,
+                transaction.Fees,
+                transaction.Author.Identifier,
                 transaction.CreditedWallet.Identifier,
-                transaction.CreditedWallet.User.Identifier, 
-                transaction.DebitedWallet.Identifier, 
+                transaction.CreditedWallet.User.Identifier,
+                transaction.DebitedWallet.Identifier,
                 token);
         }
 
@@ -651,7 +661,7 @@ namespace Sheaft.Infrastructure.Services
                     ProcessedOn = result.ExecutionDate,
                     Identifier = result.Id,
                     ResultCode = result.ResultCode,
-                    ResultMessage = MangoExtensions.GetOperationMessage(result.ResultCode, result.ResultMessage),
+                    ResultMessage = PspExtensions.GetOperationMessage(result.ResultCode, result.ResultMessage),
                     Debited = result.DebitedFunds.Amount.GetAmount(),
                     Fees = result.Fees.Amount.GetAmount(),
                     Status = result.Status.GetTransactionStatus()
@@ -694,7 +704,7 @@ namespace Sheaft.Infrastructure.Services
                     ProcessedOn = result.ExecutionDate,
                     Identifier = result.Id,
                     ResultCode = result.ResultCode,
-                    ResultMessage = MangoExtensions.GetOperationMessage(result.ResultCode, result.ResultMessage),
+                    ResultMessage = PspExtensions.GetOperationMessage(result.ResultCode, result.ResultMessage),
                     Debited = result.DebitedFunds.Amount.GetAmount(),
                     Fees = result.Fees.Amount.GetAmount(),
                     Status = result.Status.GetTransactionStatus()
@@ -713,7 +723,7 @@ namespace Sheaft.Infrastructure.Services
                 {
                     Identifier = result.Id,
                     ResultCode = result.RefusedReasonType,
-                    ResultMessage = MangoExtensions.GetOperationMessage(result.RefusedReasonType, result.RefusedReasonMessage),
+                    ResultMessage = PspExtensions.GetOperationMessage(result.RefusedReasonType, result.RefusedReasonMessage),
                     Status = result.Status.GetValidationStatus(),
                     ProcessedOn = result.ProcessedDate
                 });
@@ -731,7 +741,7 @@ namespace Sheaft.Infrastructure.Services
                 {
                     Identifier = result.Id,
                     ResultCode = result.Reason.ToString("G"),
-                    ResultMessage = MangoExtensions.GetOperationMessage(result.Reason.ToString("G"), result.Message),
+                    ResultMessage = PspExtensions.GetOperationMessage(result.Reason.ToString("G"), result.Message),
                     Status = result.Status.GetDeclarationStatus(),
                     ProcessedOn = result.ProcessedDate
                 });
@@ -749,7 +759,7 @@ namespace Sheaft.Infrastructure.Services
                 {
                     Identifier = result.Id,
                     ResultCode = result.ResultCode,
-                    ResultMessage = MangoExtensions.GetOperationMessage(result.ResultCode, result.ResultMessage),
+                    ResultMessage = PspExtensions.GetOperationMessage(result.ResultCode, result.ResultMessage),
                     Status = result.Status.GetTransactionStatus(),
                     ProcessedOn = result.ExecutionDate
                 });
@@ -767,7 +777,7 @@ namespace Sheaft.Infrastructure.Services
                 {
                     Identifier = result.Id,
                     ResultCode = result.ResultCode,
-                    ResultMessage = MangoExtensions.GetOperationMessage(result.ResultCode, result.ResultMessage),
+                    ResultMessage = PspExtensions.GetOperationMessage(result.ResultCode, result.ResultMessage),
                     Status = result.Status.GetTransactionStatus(),
                     ProcessedOn = result.ExecutionDate
                 });
@@ -785,7 +795,7 @@ namespace Sheaft.Infrastructure.Services
                 {
                     Identifier = result.Id,
                     ResultCode = result.ResultCode,
-                    ResultMessage = MangoExtensions.GetOperationMessage(result.ResultCode, result.ResultMessage),
+                    ResultMessage = PspExtensions.GetOperationMessage(result.ResultCode, result.ResultMessage),
                     Status = result.Status.GetTransactionStatus(),
                     ProcessedOn = result.ExecutionDate
                 });
@@ -803,9 +813,48 @@ namespace Sheaft.Infrastructure.Services
                 {
                     Identifier = result.Id,
                     ResultCode = result.ResultCode,
-                    ResultMessage = MangoExtensions.GetOperationMessage(result.ResultCode, result.ResultMessage),
+                    ResultMessage = PspExtensions.GetOperationMessage(result.ResultCode, result.ResultMessage),
                     Status = result.Status.GetTransactionStatus(),
                     ProcessedOn = result.ExecutionDate
+                });
+            });
+        }
+
+        public async Task<Result<PspPreAuthorizationResultDto>> CreatePreAuthorizationAsync(PreAuthorization preAuthorization, CancellationToken token)
+        {
+            return await ExecuteAsync(async () =>
+            {
+                await EnsureAccessTokenIsValidAsync(token);
+                var result = await _api.CardPreAuthorizations.CreateAsync(
+                    GetIdempotencyKey(preAuthorization.Id),
+                    new CardPreAuthorizationPostDTO(
+                        preAuthorization.Card.User.Identifier,
+                        new Money
+                        {
+                            Amount = preAuthorization.Debited.GetAmount(),
+                            Currency = CurrencyIso.EUR
+                        },
+                        SecureMode.DEFAULT,
+                        preAuthorization.Card.Identifier,
+                        preAuthorization.SecureModeReturnURL,
+                        preAuthorization.Reference)
+                    {
+                        Billing = new Billing
+                        {
+                            Address = preAuthorization.Card.User.Address.GetAddress()
+                        }
+                    });
+
+                return Ok(new PspPreAuthorizationResultDto
+                {
+                    Identifier = result.Id,
+                    ResultCode = result.ResultCode,
+                    ResultMessage = PspExtensions.GetOperationMessage(result.ResultCode, result.ResultMessage),
+                    Status = result.Status.GetPreAuthorizationStatus(),
+                    PaymentStatus = result.PaymentStatus.GetPaymentStatus(),
+                    ExpirationDate = result.ExpirationDate,
+                    Debited = result.DebitedFunds.Amount,
+                    Remaining = result.RemainingFunds.Amount,
                 });
             });
         }
@@ -851,7 +900,7 @@ namespace Sheaft.Infrastructure.Services
                     ProcessedOn = result.ExecutionDate,
                     Identifier = result.Id,
                     ResultCode = result.ResultCode,
-                    ResultMessage = MangoExtensions.GetOperationMessage(result.ResultCode, result.ResultMessage),
+                    ResultMessage = PspExtensions.GetOperationMessage(result.ResultCode, result.ResultMessage),
                     Debited = result.DebitedFunds.Amount.GetAmount(),
                     Fees = result.Fees.Amount.GetAmount(),
                     Status = result.Status.GetTransactionStatus()
@@ -882,7 +931,7 @@ namespace Sheaft.Infrastructure.Services
         }
     }
 
-    internal static class MangoExtensions
+    internal static class PspExtensions
     {
         public static PspUserNormalDto GetConsumer(this UserNaturalDTO user)
         {
@@ -927,7 +976,7 @@ namespace Sheaft.Infrastructure.Services
                 LegalRepresentativeLastName = user.LegalRepresentativeLastName,
                 LegalRepresentativeNationality = user.LegalRepresentativeNationality.GetCountry(),
                 LegalRepresentativeProofOfIdentity = user.LegalRepresentativeProofOfIdentity,
-                Name= user.Name,
+                Name = user.Name,
                 ProofOfRegistration = user.ProofOfRegistration,
                 ShareholderDeclaration = user.ShareholderDeclaration,
                 Statute = user.Statute
@@ -966,6 +1015,16 @@ namespace Sheaft.Infrastructure.Services
         public static Sheaft.Domain.Enums.TransactionStatus GetTransactionStatus(this MangoPay.SDK.Core.Enumerations.TransactionStatus status)
         {
             return (Sheaft.Domain.Enums.TransactionStatus)status;
+        }
+
+        public static Sheaft.Domain.Enums.PaymentStatus GetPaymentStatus(this MangoPay.SDK.Core.Enumerations.PaymentStatus status)
+        {
+            return (Sheaft.Domain.Enums.PaymentStatus)status;
+        }
+
+        public static Sheaft.Domain.Enums.PreAuthorizationStatus GetPreAuthorizationStatus(this MangoPay.SDK.Core.Enumerations.PreAuthorizationStatus status)
+        {
+            return (Sheaft.Domain.Enums.PreAuthorizationStatus)status;
         }
 
         public static LegalKind GetLegalKind(this LegalPersonType kind)

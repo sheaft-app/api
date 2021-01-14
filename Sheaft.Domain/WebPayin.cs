@@ -10,7 +10,7 @@ namespace Sheaft.Domain.Models
         }
 
         public WebPayin(Guid id, Wallet creditedWallet, Order order)
-            : base(id, TransactionKind.PayinWeb, creditedWallet, order)
+            : base(id, TransactionKind.WebPayin, creditedWallet, order)
         {
         }
 

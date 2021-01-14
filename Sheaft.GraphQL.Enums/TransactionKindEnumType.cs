@@ -7,11 +7,9 @@ namespace Sheaft.GraphQL.Enums
     {
         protected override void Configure(IEnumTypeDescriptor<TransactionKind> descriptor)
         {
-            descriptor.Value(TransactionKind.PayinWeb).Name("PAYIN_WEB");
-            descriptor.Value(TransactionKind.PayinCard).Name("PAYIN_CARD");
-            descriptor.Value(TransactionKind.PayinCheck).Name("PAYIN_CHECK");
-            descriptor.Value(TransactionKind.PayinExternal).Name("PAYIN_EXTERNAL");
-            descriptor.Value(TransactionKind.PayinMoney).Name("PAYIN_MONEY");
+            descriptor.Value(TransactionKind.WebPayin).Name("WEB_PAYIN");
+            descriptor.Value(TransactionKind.CardPayin).Name("CARD");
+            descriptor.Value(TransactionKind.PreAuthorizedPayin).Name("PRE_AUTHORIZED_PAYIN");
             descriptor.Value(TransactionKind.Transfer).Name("TRANSFER");
             descriptor.Value(TransactionKind.Payout).Name("PAYOUT");
             descriptor.Value(TransactionKind.RefundPayin).Name("REFUND_PAYIN");

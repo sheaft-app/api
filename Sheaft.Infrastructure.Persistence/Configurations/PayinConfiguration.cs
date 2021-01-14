@@ -27,8 +27,9 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
             entity.HasMany(c => c.Refunds).WithOne(c => c.Payin).HasForeignKey("PayinUid").OnDelete(DeleteBehavior.NoAction);
 
             entity.HasDiscriminator(c => c.Kind)
-                .HasValue<WebPayin>(TransactionKind.PayinWeb)
-                .HasValue<CardPayin>(TransactionKind.PayinCard);
+                .HasValue<WebPayin>(TransactionKind.WebPayin)
+                .HasValue<CardPayin>(TransactionKind.CardPayin)
+                .HasValue<PreAuthorizedPayin>(TransactionKind.PreAuthorizedPayin);
 
             var refunds = entity.Metadata.FindNavigation(nameof(Payin.Refunds));
             refunds.SetPropertyAccessMode(PropertyAccessMode.Field);

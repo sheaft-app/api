@@ -123,7 +123,7 @@ namespace Sheaft.Application.Handlers
                     order.SetDeliveries(cartDeliveries);
                     order.SetStatus(OrderStatus.Validated);
 
-                    var validatedDeliveries = await ValidateCapedDeliveriesAsync(order.Deliveries, token);
+                    var validatedDeliveries = await _capingDeliveriesService.ValidateCapedDeliveriesAsync(order.Deliveries, token);
                     if (!validatedDeliveries.Success)
                         return Failed<IEnumerable<Guid>>(validatedDeliveries.Exception);
 
@@ -218,7 +218,7 @@ namespace Sheaft.Application.Handlers
                 if (!order.Deliveries.Any())
                     return BadRequest<Guid>(MessageKind.Order_CannotPay_Deliveries_Required);
 
-                var validatedDeliveries = await ValidateCapedDeliveriesAsync(order.Deliveries, token);
+                var validatedDeliveries = await _capingDeliveriesService.ValidateCapedDeliveriesAsync(order.Deliveries, token);
                 if (!validatedDeliveries.Success)
                     return Failed<Guid>(validatedDeliveries.Exception);
 
@@ -249,47 +249,6 @@ namespace Sheaft.Application.Handlers
                     return Ok(result.Data);
                 }
             });
-        }
-
-        private async Task<Result<bool>> ValidateCapedDeliveriesAsync(IReadOnlyCollection<OrderDelivery> orderDeliveries, CancellationToken token)
-        {
-            if (orderDeliveries.All(d => !d.DeliveryMode.MaxPurchaseOrdersPerTimeSlot.HasValue))
-                return Ok(true);
-
-            var results = await _capingDeliveriesService.GetCapingDeliveriesAsync(
-                orderDeliveries.Where(d => d.DeliveryMode.MaxPurchaseOrdersPerTimeSlot.HasValue).Select(d =>
-                    new Tuple<Guid, Guid, Models.DeliveryHourDto>(
-                        d.DeliveryMode.Producer.Id,
-                        d.DeliveryMode.Id,
-                        new Models.DeliveryHourDto
-                        {
-                            Day = d.ExpectedDelivery.ExpectedDeliveryDate.DayOfWeek,
-                            ExpectedDeliveryDate = d.ExpectedDelivery.ExpectedDeliveryDate,
-                            From = d.ExpectedDelivery.From,
-                            To = d.ExpectedDelivery.To,
-                        })
-                    ), token);
-
-            if (!results.Success)
-                return Failed<bool>(results.Exception);
-
-            foreach (var orderDelivery in orderDeliveries)
-            {
-                var delivery = results.Data.FirstOrDefault(d => d.DeliveryId == orderDelivery.Id 
-                    && d.ExpectedDate.Year == orderDelivery.ExpectedDelivery.ExpectedDeliveryDate.Year 
-                    && d.ExpectedDate.Month == orderDelivery.ExpectedDelivery.ExpectedDeliveryDate.Month 
-                    && d.ExpectedDate.Day == orderDelivery.ExpectedDelivery.ExpectedDeliveryDate.Day
-                    && d.From == orderDelivery.ExpectedDelivery.From
-                    && d.To == orderDelivery.ExpectedDelivery.To);
-
-                if (delivery == null)
-                    continue;
-
-                if (delivery.Count >= orderDelivery.DeliveryMode.MaxPurchaseOrdersPerTimeSlot)
-                    return Failed<bool>(new ValidationException(MessageKind.Order_CannotPay_Delivery_Max_PurchaseOrders_Reached, orderDelivery.DeliveryMode.Producer.Name, $"le {orderDelivery.ExpectedDelivery.ExpectedDeliveryDate:dd/MM/yyyy} entre {orderDelivery.ExpectedDelivery.From:hh\\hmm} et {orderDelivery.ExpectedDelivery.To:hh\\hmm}", orderDelivery.DeliveryMode.MaxPurchaseOrdersPerTimeSlot));
-            }
-
-            return Ok(true);
         }
 
         public async Task<Result<Guid>> Handle(RetryOrderCommand request, CancellationToken token)

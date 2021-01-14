@@ -7,9 +7,7 @@ using Sheaft.Application.Commands;
 using Sheaft.Core;
 using Sheaft.Domain.Models;
 using Sheaft.Application.Interop;
-using System;
 using Sheaft.Domain.Enums;
-using RestSharp.Serialization.Json;
 using Newtonsoft.Json;
 
 namespace Sheaft.Application.Handlers
