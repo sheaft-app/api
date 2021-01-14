@@ -468,9 +468,7 @@ namespace Sheaft.GraphQL.Types
             descriptor.Field(c => c.CreateCardRegistration(default))
                 .Name("createCardRegistration")
                 .Authorize(Policies.CONSUMER)
-                .Type<NonNullType<CardRegistrationType>>()
-                .UseSingleOrDefault()
-                .UseSelection();
+                .Type<NonNullType<CardRegistrationType>>();
         }
     }
 }

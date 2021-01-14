@@ -9,12 +9,13 @@ namespace Sheaft.Domain.Models
     {
         protected PreAuthorization() { }
         
-        public PreAuthorization(Guid id, Order order, Card card)
+        public PreAuthorization(Guid id, Order order, Card card, string secureModeReturnUrl)
         {
             Id= id;
             Order = order;
             Debited = order.TotalPrice;
             Card = card;
+            SecureModeReturnURL = secureModeReturnUrl;
             Reference = $"SHFT{DateTime.UtcNow.ToString("DDMMYY")}";
         }
 

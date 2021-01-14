@@ -7,5 +7,6 @@ namespace Sheaft.Application.Models
         public string PreregistrationData { get; set; }
         public string CardRegistrationURL { get; set; }
         public string CardId { get; set; }
+        public string Id { get; set; }
     }
 }

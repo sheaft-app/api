@@ -269,6 +269,7 @@ namespace Sheaft.Infrastructure.Services
 
                 return Ok(new PspCardRegistrationResultDto
                 {
+                    Id = result.Id,
                     AccessKey = result.AccessKey,
                     CardId = result.CardId,
                     CardRegistrationURL = result.CardRegistrationURL,

@@ -11,6 +11,7 @@ namespace Sheaft.Options
         public string AppRedirectFailedUrl { get; set; }
         public string ReturnUrl { get; set; }
         public string PaymentUrl { get; set; }
+        public string PreAuthorizeUrl { get; set; }
         public string PaylineUrl { get; set; }
         public string ClientId { get; set; }
         public string UserId { get; set; }

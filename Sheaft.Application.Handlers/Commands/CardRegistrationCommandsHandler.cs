@@ -45,7 +45,7 @@ namespace Sheaft.Application.Handlers
                     return Failed<CardRegistrationDto>(result.Exception);
 
                 return Ok(new CardRegistrationDto{
-                    Identifier = result.Data.CardId,
+                    Identifier = result.Data.Id,
                     AccessKey = result.Data.AccessKey,
                     PreRegistrationData = result.Data.PreregistrationData,
                     Url = result.Data.CardRegistrationURL

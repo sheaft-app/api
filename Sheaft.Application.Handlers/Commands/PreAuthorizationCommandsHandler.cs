@@ -69,7 +69,7 @@ namespace Sheaft.Application.Handlers
 
                 using (var transaction = await _context.BeginTransactionAsync(token))
                 {
-                    var preAuthorization = new PreAuthorization(Guid.NewGuid(), order, card);
+                    var preAuthorization = new PreAuthorization(Guid.NewGuid(), order, card, _pspOptions.PreAuthorizeUrl);
                     await _context.AddAsync(preAuthorization, token);
                     await _context.SaveChangesAsync(token);
 
