@@ -59,7 +59,7 @@ namespace Sheaft.Application.Handlers
                 if (invalidProductIds.Any())
                     return BadRequest<Guid>(MessageKind.Order_CannotPay_Some_Products_Invalid, string.Join(";", invalidProductIds));
 
-                var card = await _context.GetSingleAsync<Card>(c => c.Identifier == request.CardIdentifier, token);
+                var card = await _context.FindSingleAsync<Card>(c => c.Identifier == request.CardIdentifier, token);
                 if(card == null)
                 {
                     card = new Card(Guid.NewGuid(), request.CardIdentifier, $"Carte_{DateTime.UtcNow.ToString("YYYYMMDDTHHmmss")}", order.User);

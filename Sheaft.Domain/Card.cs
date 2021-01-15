@@ -10,6 +10,7 @@ namespace Sheaft.Domain.Models
         public Card(Guid id, string identifier, string name, User user)
             : base(id, name, PaymentKind.Card, user)
         {
+            SetIdentifier(identifier);
         }
     }
 }
