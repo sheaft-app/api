@@ -59,16 +59,16 @@ namespace Sheaft.Application.Handlers
                 if (invalidProductIds.Any())
                     return BadRequest<Guid>(MessageKind.Order_CannotPay_Some_Products_Invalid, string.Join(";", invalidProductIds));
 
-                var card = await _context.FindSingleAsync<Card>(c => c.Identifier == request.CardIdentifier, token);
-                if(card == null)
-                {
-                    card = new Card(Guid.NewGuid(), request.CardIdentifier, $"Carte_{DateTime.UtcNow.ToString("YYYYMMDDTHHmmss")}", order.User);
-                    await _context.AddAsync(card, token);
-                    await _context.SaveChangesAsync(token);
-                }
-
                 using (var transaction = await _context.BeginTransactionAsync(token))
                 {
+                    var card = await _context.FindSingleAsync<Card>(c => c.Identifier == request.CardIdentifier, token);
+                    if(card == null)
+                    {
+                        card = new Card(Guid.NewGuid(), request.CardIdentifier, $"Carte_{DateTime.UtcNow.ToString("YYYYMMDDTHHmmss")}", order.User);
+                        await _context.AddAsync(card, token);
+                        await _context.SaveChangesAsync(token);
+                    }
+                    
                     var preAuthorization = new PreAuthorization(Guid.NewGuid(), order, card, _pspOptions.PreAuthorizeUrl);
                     await _context.AddAsync(preAuthorization, token);
                     await _context.SaveChangesAsync(token);
@@ -97,6 +97,12 @@ namespace Sheaft.Application.Handlers
                     await _context.SaveChangesAsync(token);
                     await transaction.CommitAsync(token);
 
+                    if(preAuthorization.Status == PreAuthorizationStatus.Failed)
+                        _mediatr.Post(new PreAuthorizationFailedEvent()); 
+                        
+                    if(preAuthorization.Status == PreAuthorizationStatus.Succeeded)
+                        _mediatr.Post(new PreAuthorizationSucceededEvent());                         
+                    
                     return Ok(preAuthorization.Id);
                 } 
             });
