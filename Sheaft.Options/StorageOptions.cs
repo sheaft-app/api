@@ -25,6 +25,7 @@
         public string Rgpd { get; set; } = "rgpd";
         public string PickingOrders { get; set; } = "pickingorders";
         public string Progress { get; set; } = "progress";
+        public string Producers { get; set; } = "producers";
         public string Documents { get; set; } = "documents";
     }
     public class StorageTables

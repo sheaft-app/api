@@ -60,8 +60,11 @@ namespace Sheaft.Application.Interop
         Task<IEnumerable<T>> GetByIdsAsync<T>(IEnumerable<Guid> ids, CancellationToken token, bool asNoTracking = false) where T : class, IIdEntity, ITrackRemove;
         Task<IEnumerable<T>> FindByIdsAsync<T>(IEnumerable<Guid> ids, CancellationToken token, bool asNoTracking = false) where T : class, IIdEntity, ITrackRemove;
         Task<IEnumerable<T>> GetAsync<T>(Expression<Func<T, bool>> where, CancellationToken token, bool asNoTracking = false) where T : class, ITrackRemove;
+        Task<IEnumerable<T>> GetAsync<T>(CancellationToken token, bool asNoTracking = false) where T : class, ITrackRemove;
         Task<IEnumerable<T>> FindAsync<T>(Expression<Func<T, bool>> where, CancellationToken token, bool asNoTracking = false) where T : class, ITrackRemove;
+        Task<IEnumerable<T>> FindAsync<T>(CancellationToken token, bool asNoTracking = false) where T : class, ITrackRemove;
         Task<bool> AnyAsync<T>(Expression<Func<T, bool>> where, CancellationToken token, bool asNoTracking = false) where T : class, ITrackRemove;
+        Task<bool> AnyAsync<T>(CancellationToken token, bool asNoTracking = false) where T : class, ITrackRemove;
         Task EnsureNotExists<T>(Guid id, CancellationToken token, bool asNoTracking = false) where T : class, IIdEntity, ITrackRemove;
         Task EnsureNotExists<T>(Expression<Func<T, bool>> where, CancellationToken token, bool asNoTracking = false) where T : class, IIdEntity, ITrackRemove;
         

@@ -132,7 +132,10 @@ namespace Sheaft.Infrastructure.Persistence
 
         public async Task<IEnumerable<T>> GetAsync<T>(Expression<Func<T, bool>> where, CancellationToken token, bool asNoTracking = false) where T : class, ITrackRemove
         {
-            var query = Set<T>().Where(c => !c.RemovedOn.HasValue).Where(where);
+            var query = Set<T>().Where(c => !c.RemovedOn.HasValue);
+            if(where != null)
+                query = query.Where(where);
+
             if (asNoTracking)
                 query = query.AsNoTracking();
 
@@ -146,9 +149,17 @@ namespace Sheaft.Infrastructure.Persistence
             return items;
         }
 
+        public async Task<IEnumerable<T>> GetAsync<T>(CancellationToken token, bool asNoTracking = false) where T : class, ITrackRemove
+        {
+            return await GetAsync<T>(null, token, asNoTracking);
+        }
+
         public async Task<IEnumerable<T>> FindAsync<T>(Expression<Func<T, bool>> where, CancellationToken token, bool asNoTracking = false) where T : class, ITrackRemove
         {
-            var query = Set<T>().Where(c => !c.RemovedOn.HasValue).Where(where);
+            var query = Set<T>().Where(c => !c.RemovedOn.HasValue);
+            if(where != null)
+                query = query.Where(where);
+
             if (asNoTracking)
                 query = query.AsNoTracking();
 
@@ -159,9 +170,17 @@ namespace Sheaft.Infrastructure.Persistence
             return items;
         }
 
+        public async Task<IEnumerable<T>> FindAsync<T>(CancellationToken token, bool asNoTracking = false) where T : class, ITrackRemove
+        {
+            return await FindAsync<T>(null, token, asNoTracking);
+        }
+
         public async Task<T> GetSingleAsync<T>(Expression<Func<T, bool>> where, CancellationToken token, bool asNoTracking = false) where T : class, ITrackRemove
         {
-            var query = Set<T>().Where(c => !c.RemovedOn.HasValue).Where(where);
+            var query = Set<T>().Where(c => !c.RemovedOn.HasValue);
+            if(where != null)
+                query = query.Where(where);
+
             if (asNoTracking)
                 query = query.AsNoTracking();
 
@@ -177,7 +196,10 @@ namespace Sheaft.Infrastructure.Persistence
 
         public async Task<T> FindSingleAsync<T>(Expression<Func<T, bool>> where, CancellationToken token, bool asNoTracking = false) where T : class, ITrackRemove
         {
-            var query = Set<T>().Where(c => !c.RemovedOn.HasValue).Where(where);
+            var query = Set<T>().Where(c => !c.RemovedOn.HasValue);
+            if(where != null)
+                query = query.Where(where);
+
             if (asNoTracking)
                 query = query.AsNoTracking();
 
@@ -186,11 +208,19 @@ namespace Sheaft.Infrastructure.Persistence
 
         public async Task<bool> AnyAsync<T>(Expression<Func<T, bool>> where, CancellationToken token, bool asNoTracking = false) where T : class, ITrackRemove
         {
-            var query = Set<T>().Where(c => !c.RemovedOn.HasValue).Where(where);
+            var query = Set<T>().Where(c => !c.RemovedOn.HasValue);
+            if(where != null)
+                query = query.Where(where);
+
             if (asNoTracking)
                 query = query.AsNoTracking();
 
             return await query.AnyAsync(token);
+        }
+
+        public async Task<bool> AnyAsync<T>(CancellationToken token, bool asNoTracking = false) where T : class, ITrackRemove
+        {
+            return await AnyAsync<T>(null, token, asNoTracking);
         }
 
         public async Task EnsureNotExists<T>(Guid id, CancellationToken token, bool asNoTracking = false) where T : class, IIdEntity, ITrackRemove
@@ -209,7 +239,10 @@ namespace Sheaft.Infrastructure.Persistence
 
         public async Task EnsureNotExists<T>(Expression<Func<T, bool>> where, CancellationToken token, bool asNoTracking = false) where T : class, IIdEntity, ITrackRemove
         {
-            var query = Set<T>().Where(c => !c.RemovedOn.HasValue).Where(where);
+            var query = Set<T>().Where(c => !c.RemovedOn.HasValue);
+            if(where != null)
+                query = query.Where(where);
+
             if (asNoTracking)
                 query = query.AsNoTracking();
 

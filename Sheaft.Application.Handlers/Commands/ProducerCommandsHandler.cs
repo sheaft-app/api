@@ -14,10 +14,14 @@ using Sheaft.Options;
 using Sheaft.Exceptions;
 using Microsoft.EntityFrameworkCore;
 using Sheaft.Application.Events;
+using Newtonsoft.Json;
+using System.Text;
+using Newtonsoft.Json.Serialization;
 
 namespace Sheaft.Application.Handlers
 {
     public class ProducerCommandsHandler : ResultsHandler,
+        IRequestHandler<GenerateProducersFileCommand, Result<bool>>,
         IRequestHandler<RegisterProducerCommand, Result<Guid>>,
         IRequestHandler<UpdateProducerCommand, Result<bool>>,
         IRequestHandler<CheckProducerConfigurationCommand, Result<bool>>,
@@ -25,15 +29,36 @@ namespace Sheaft.Application.Handlers
         IRequestHandler<SetProducerProductsWithNoVatCommand, Result<bool>>
     {
         private readonly RoleOptions _roleOptions;
+        private readonly IBlobService _blobService;
 
         public ProducerCommandsHandler(
             IAppDbContext context,
             ISheaftMediatr mediatr,
+            IBlobService blobService,
             ILogger<ProducerCommandsHandler> logger,
             IOptionsSnapshot<RoleOptions> roleOptions)
             : base(mediatr, context, logger)
         {
             _roleOptions = roleOptions.Value;
+            _blobService = blobService;
+        }
+
+        public async Task<Result<bool>> Handle(GenerateProducersFileCommand request, CancellationToken token)
+        {
+            return await ExecuteAsync(request, async () =>
+            {
+                var producers = await _context.GetAsync<Producer>(token);
+                var prods = producers.Select(p => new ProducerListItem(p));
+
+                var result = await _blobService.UploadProducersListAsync(
+                    Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(prods, 
+                        new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore, ContractResolver = new DefaultContractResolver { NamingStrategy = new CamelCaseNamingStrategy() }})), token);
+                
+                if(!result.Success)
+                    return Failed<bool>(result.Exception);
+
+                return Ok(true);
+            });
         }
 
         public async Task<Result<Guid>> Handle(RegisterProducerCommand request, CancellationToken token)
@@ -233,6 +258,39 @@ namespace Sheaft.Application.Handlers
 
                 return Ok(true);
             });
+        }        
+
+        internal class ProducerListItem
+        {
+            internal ProducerListItem(User user)
+            {
+                Address = new AddressItem(user.Address);
+                Id = user.Id.ToString("N");
+                Name = user.Name;
+                Picture = user.Picture;
+            }
+            public string Id { get; set; }
+            public string Name { get; set; }
+            public string Picture { get; set; }
+            public AddressItem Address { get; set; }
+        }
+
+        internal class AddressItem {
+            internal AddressItem(UserAddress address)
+            {
+                Line1 = address.Line1;
+                Line2 = address.Line2;
+                Zipcode = address.Zipcode;
+                City = address.City;
+                Latitude = address.Latitude;
+                Longitude = address.Longitude;
+            }
+            public string Line1 { get; set; }
+            public string Line2 { get; set; }
+            public string Zipcode { get; set; }
+            public string City { get; set; }
+            public double? Latitude { get; set; }
+            public double? Longitude { get; set; }
         }
     }
 }

@@ -21,5 +21,6 @@ namespace Sheaft.Application.Interop
         Task<Result<byte[]>> DownloadDocumentPageAsync(Guid documentId, Guid pageId, Guid userId, CancellationToken token);
         Task<Result<bool>> UploadDocumentPageAsync(Guid documentId, Guid pageId, byte[] data, Guid userId, CancellationToken token);
         Task<Result<bool>> DeleteDocumentPageAsync(Guid documentId, Guid pageId, Guid userId, CancellationToken token);
+        Task<Result<string>> UploadProducersListAsync(byte[] data, CancellationToken token);
     }
 }

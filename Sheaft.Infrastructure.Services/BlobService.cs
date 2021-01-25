@@ -295,6 +295,23 @@ namespace Sheaft.Infrastructure.Services
             });
         }
 
+        public async Task<Result<string>> UploadProducersListAsync(byte[] data, CancellationToken token)
+        {
+            return await ExecuteAsync(async () =>
+            {
+                var containerClient = new BlobContainerClient(_storageOptions.ConnectionString, _storageOptions.Containers.Producers);
+                await containerClient.CreateIfNotExistsAsync(cancellationToken: token);
+
+                var blobClient = containerClient.GetBlobClient("producers.json");
+                await blobClient.DeleteIfExistsAsync(cancellationToken: token);
+
+                using (var ms = new MemoryStream(data))
+                    await blobClient.UploadAsync(ms, token);
+
+                return Ok(blobClient.Uri.ToString());
+            });
+        }
+
         private string GetBlobSasUri(BlobClient blobClient, BlobSasBuilder sasBuilder, string container)
         {
             return new UriBuilder
