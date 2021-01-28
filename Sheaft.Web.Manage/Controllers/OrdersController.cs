@@ -123,20 +123,5 @@ namespace Sheaft.Web.Manage.Controllers
 
             return RedirectToAction("Edit", new { model.Id });
         }
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Retry(OrderViewModel model, CancellationToken token)
-        {
-            var result = await _mediatr.Process(new RetryOrderCommand(await GetRequestUser(token))
-            {
-                OrderId = model.Id
-            }, token);
-
-            if (!result.Success)
-                throw result.Exception;
-
-            return RedirectToAction("Edit", new { model.Id });
-        }
     }
 }

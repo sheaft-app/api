@@ -12,11 +12,13 @@ using Sheaft.Domain.Enums;
 using Sheaft.Options;
 using Microsoft.Extensions.Options;
 using Sheaft.Exceptions;
+using Sheaft.Application.Events;
 
 namespace Sheaft.Application.Handlers
 {
     public class PreAuthorizationCommandsHandler : ResultsHandler,
-        IRequestHandler<CreatePreAuthorizationCommand, Result<Guid>>
+        IRequestHandler<CreatePreAuthorizationCommand, Result<Guid>>,
+        IRequestHandler<RefreshPreAuthorizationStatusCommand, Result<PreAuthorizationStatus>>
     {
         private readonly ICapingDeliveriesService _capingDeliveriesService;
         private readonly PspOptions _pspOptions;
@@ -98,13 +100,39 @@ namespace Sheaft.Application.Handlers
                     await transaction.CommitAsync(token);
 
                     if(preAuthorization.Status == PreAuthorizationStatus.Failed)
-                        _mediatr.Post(new PreAuthorizationFailedEvent()); 
-                        
-                    if(preAuthorization.Status == PreAuthorizationStatus.Succeeded)
-                        _mediatr.Post(new PreAuthorizationSucceededEvent());                         
+                        _mediatr.Post(new PreAuthorizationFailedEvent(request.RequestUser){PreAuthorizationId = preAuthorization.Id});                                           
                     
                     return Ok(preAuthorization.Id);
                 } 
+            });
+        }
+
+        public async Task<Result<PreAuthorizationStatus>> Handle(RefreshPreAuthorizationStatusCommand request, CancellationToken token)
+        {
+            return await ExecuteAsync(request, async () =>
+            {
+                var preAuthorization = await _context.GetSingleAsync<PreAuthorization>(c => c.Identifier == request.Identifier, token);
+                if (preAuthorization.Status == PreAuthorizationStatus.Succeeded || preAuthorization.Status == PreAuthorizationStatus.Failed)
+                    return Ok(preAuthorization.Status);
+
+                var pspResult = await _pspService.GetPreAuthorizationAsync(preAuthorization.Identifier, token);
+                if (!pspResult.Success)
+                    return Failed<PreAuthorizationStatus>(pspResult.Exception);
+
+                preAuthorization.SetStatus(pspResult.Data.Status);
+                preAuthorization.SetResult(pspResult.Data.ResultCode, pspResult.Data.ResultMessage);
+
+                await _context.SaveChangesAsync(token);
+
+                switch (preAuthorization.Status)
+                {
+                    case PreAuthorizationStatus.Succeeded:
+                        _mediatr.Post(new PreAuthorizationSucceededEvent(request.RequestUser) { PreAuthorizationId = preAuthorization.Id });
+                        _mediatr.Post(new ConfirmOrderCommand(request.RequestUser) { OrderId = preAuthorization.Order.Id });
+                        break;
+                }
+
+                return Ok(preAuthorization.Status);
             });
         }
     }

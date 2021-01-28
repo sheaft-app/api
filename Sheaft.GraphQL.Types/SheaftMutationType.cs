@@ -280,13 +280,6 @@ namespace Sheaft.GraphQL.Types
                 .UseSingleOrDefault()
                 .UseSelection();
 
-            descriptor.Field(c => c.PayOrderAsync(default, default))
-                .Name("payOrder")
-                .Authorize(Policies.CONSUMER)
-                .Type<NonNullType<WebPayinType>>()
-                .UseSingleOrDefault()
-                .UseSelection();
-
             descriptor.Field(c => c.CreateBusinessOrderAsync(default, default))
                 .Name("createPurchaseOrders")
                 .Authorize(Policies.STORE)

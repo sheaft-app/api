@@ -4,9 +4,9 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Sheaft.Infrastructure.Persistence.Configurations
 {
-    public class PayinRefundConfiguration : IEntityTypeConfiguration<PayinRefund>
+    public class PayinRefundConfiguration : IEntityTypeConfiguration<WebPayinRefund>
     {
-        public void Configure(EntityTypeBuilder<PayinRefund> entity)
+        public void Configure(EntityTypeBuilder<WebPayinRefund> entity)
         {
             entity.Property<long>("PayinUid");
             entity.Property<long>("PurchaseOrderUid");

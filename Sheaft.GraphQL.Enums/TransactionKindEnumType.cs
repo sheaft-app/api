@@ -9,7 +9,8 @@ namespace Sheaft.GraphQL.Enums
         {
             descriptor.Value(TransactionKind.WebPayin).Name("WEB_PAYIN");
             descriptor.Value(TransactionKind.CardPayin).Name("CARD");
-            descriptor.Value(TransactionKind.PreAuthorizedPayin).Name("PRE_AUTHORIZED_PAYIN");
+            descriptor.Value(TransactionKind.PreAuthorizedDonationPayin).Name("PRE_AUTHORIZED_DONATION_PAYIN");
+            descriptor.Value(TransactionKind.PreAuthorizedPurchaseOrderPayin).Name("PRE_AUTHORIZED_PURCHASE_ORDER_PAYIN");
             descriptor.Value(TransactionKind.Transfer).Name("TRANSFER");
             descriptor.Value(TransactionKind.Payout).Name("PAYOUT");
             descriptor.Value(TransactionKind.RefundPayin).Name("REFUND_PAYIN");

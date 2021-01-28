@@ -511,6 +511,16 @@ namespace Sheaft.Infrastructure.Services
             });
         }
 
+        public async Task<Result<PspPaymentResultDto>> CreatePreAuthorizedPayinAsync(PreAuthorizedPurchaseOrderPayin transaction, CancellationToken token)
+        {
+            return await CreatePreAuthorizedPayingAsync(transaction, transaction.PreAuthorization, token);
+        }
+
+        public async Task<Result<PspPaymentResultDto>> CreatePreAuthorizedPayinAsync(PreAuthorizedDonationPayin transaction, CancellationToken token)
+        {
+            return await CreatePreAuthorizedPayingAsync(transaction, transaction.PreAuthorization, token);
+        }
+
         public async Task<Result<PspPaymentResultDto>> CreateCardPayinAsync(CardPayin transaction, Owner owner, CancellationToken token)
         {
             return await ExecuteAsync(async () =>
@@ -649,7 +659,7 @@ namespace Sheaft.Infrastructure.Services
             });
         }
 
-        public async Task<Result<PspPaymentResultDto>> RefundPayinAsync(PayinRefund transaction, CancellationToken token)
+        public async Task<Result<PspPaymentResultDto>> RefundPayinAsync(WebPayinRefund transaction, CancellationToken token)
         {
             return await ExecuteAsync(async () =>
             {
@@ -836,6 +846,73 @@ namespace Sheaft.Infrastructure.Services
                     Debited = result.DebitedFunds.Amount,
                     Remaining = result.RemainingFunds.Amount,
                     SecureModeRedirectUrl = result.SecureModeRedirectURL,
+                });
+            });
+        }
+
+        public async Task<Result<PspPreAuthorizationResultDto>> GetPreAuthorizationAsync(string identifier, CancellationToken token)
+        {
+            return await ExecuteAsync(async () =>
+            {
+                await EnsureAccessTokenIsValidAsync(token);
+                var result = await _api.CardPreAuthorizations.GetAsync(identifier);
+
+                return Ok(new PspPreAuthorizationResultDto
+                {
+                    Identifier = result.Id,
+                    ResultCode = result.ResultCode,
+                    ResultMessage = PspExtensions.GetOperationMessage(result.ResultCode, result.ResultMessage),
+                    Status = result.Status.GetPreAuthorizationStatus(),
+                    ExpirationDate = result.ExpirationDate,
+                    PaymentStatus = result.PaymentStatus.GetPaymentStatus(),
+                    Debited = result.DebitedFunds.Amount,
+                    Remaining = result.RemainingFunds.Amount,
+                    SecureModeRedirectUrl = result.SecureModeRedirectURL
+                });
+            });
+        }
+
+        private async Task<Result<PspPaymentResultDto>> CreatePreAuthorizedPayingAsync(Payin transaction, PreAuthorization preAuthorization, CancellationToken token)
+        {
+            return await ExecuteAsync(async () =>
+            {
+                if (string.IsNullOrWhiteSpace(transaction.Author.Identifier))
+                    return BadRequest<PspPaymentResultDto>(MessageKind.PsP_CannotCreate_WebPayin_Author_Not_Exists);
+
+                if (string.IsNullOrWhiteSpace(transaction.CreditedWallet.Identifier))
+                    return BadRequest<PspPaymentResultDto>(MessageKind.PsP_CannotCreate_WebPayin_CreditedWallet_Not_Exists);
+
+                await EnsureAccessTokenIsValidAsync(token);
+
+                var result = await _api.PayIns.CreatePreauthorizedDirectAsync(GetIdempotencyKey(transaction.Id),
+                    new PayInPreauthorizedDirectPostDTO(
+                        transaction.Author.Identifier,
+                        new Money
+                        {
+                            Amount = transaction.Debited.GetAmount(),
+                            Currency = CurrencyIso.EUR
+                        },
+                        new Money
+                        {
+                            Amount = transaction.Fees.GetAmount(),
+                            Currency = CurrencyIso.EUR
+                        },
+                        transaction.CreditedWallet.Identifier,
+                        preAuthorization.Identifier)
+                    {
+                        Tag = $"Id='{transaction.Id}'"
+                    });
+
+                return Ok(new PspPaymentResultDto
+                {
+                    Credited = result.CreditedFunds.Amount.GetAmount(),
+                    ProcessedOn = result.ExecutionDate,
+                    Identifier = result.Id,
+                    ResultCode = result.ResultCode,
+                    ResultMessage = PspExtensions.GetOperationMessage(result.ResultCode, result.ResultMessage),
+                    Debited = result.DebitedFunds.Amount.GetAmount(),
+                    Fees = result.Fees.Amount.GetAmount(),
+                    Status = result.Status.GetTransactionStatus()
                 });
             });
         }

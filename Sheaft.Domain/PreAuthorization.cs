@@ -2,11 +2,13 @@ using Sheaft.Domain.Enums;
 using Sheaft.Domain.Interop;
 using Sheaft.Exceptions;
 using System;
+using System.Collections.Generic;
 
 namespace Sheaft.Domain.Models
 {
     public class PreAuthorization : IEntity
     {
+        private List<PreAuthorizedPurchaseOrderPayin> _purchaseOrdersPayins;
         protected PreAuthorization() { }
         
         public PreAuthorization(Guid id, Order order, Card card, string secureModeReturnUrl)
@@ -17,6 +19,8 @@ namespace Sheaft.Domain.Models
             Card = card;
             SecureModeReturnURL = secureModeReturnUrl;
             Reference = $"SHFT{DateTime.UtcNow.ToString("DDMMYY")}";
+
+            _purchaseOrdersPayins = new List<PreAuthorizedPurchaseOrderPayin>();
         }
 
         public Guid Id { get; private set;}
@@ -37,6 +41,8 @@ namespace Sheaft.Domain.Models
         public string SecureModeReturnURL { get; private set;}
         public virtual Order Order { get; private set;}
         public virtual Card Card { get; private set;}
+        public virtual PreAuthorizedDonationPayin DonationPayin  { get; private set;}
+        public virtual IReadOnlyCollection<PreAuthorizedPurchaseOrderPayin> PurchaseOrdersPayins => _purchaseOrdersPayins?.AsReadOnly();
 
         public void SetIdentifier(string identifier)
         {

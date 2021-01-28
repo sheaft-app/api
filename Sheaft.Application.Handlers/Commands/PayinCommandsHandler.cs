@@ -19,7 +19,7 @@ using Sheaft.Options;
 namespace Sheaft.Application.Handlers
 {
     public class PayinCommandsHandler : ResultsHandler,
-        IRequestHandler<CreateWebPayinCommand, Result<Guid>>,
+        IRequestHandler<CreatePreAuthorizedPayinCommand, Result<Guid>>,
         IRequestHandler<CheckPayinsCommand, Result<bool>>,
         IRequestHandler<CheckPayinCommand, Result<bool>>,
         IRequestHandler<RefreshPayinStatusCommand, Result<TransactionStatus>>
@@ -37,42 +37,39 @@ namespace Sheaft.Application.Handlers
         {
             _pspService = pspService;
             _routineOptions = routineOptions.Value;
-        }
+        }    
 
-        public async Task<Result<Guid>> Handle(CreateWebPayinCommand request, CancellationToken token)
+        public async Task<Result<Guid>> Handle(CreatePreAuthorizedPayinCommand request, CancellationToken token)
         {
             return await ExecuteAsync(request, async () =>
             {
-                var order = await _context.GetByIdAsync<Order>(request.OrderId, token);
-                if(order.Status == OrderStatus.Validated)
+                var preAuthorization = await _context.GetByIdAsync<PreAuthorization>(request.PreAuthorizationId, token);
+                if(preAuthorization.Order.Status == OrderStatus.Validated)
                     return BadRequest<Guid>(MessageKind.Payin_CannotCreate_Order_Already_Validated);
+                    
 
                 var wallet = await _context.GetSingleAsync<Wallet>(c => c.User.Id == request.RequestUser.Id, token);
 
-                if (order.TotalOnSalePrice < 1)
+                if (preAuthorization.Order.TotalOnSalePrice < 1)
                     return BadRequest<Guid>(MessageKind.Order_Total_CannotBe_LowerThan, 1);
 
-                var webPayin = new WebPayin(Guid.NewGuid(), wallet, order);
+                var preAuthorizedPayin = new PreAuthorizedPayin(Guid.NewGuid(), request.PurchaseOrderId, preAuthorization, wallet);
 
-                await _context.AddAsync(webPayin, token);
+                await _context.AddAsync(preAuthorizedPayin, token);
                 await _context.SaveChangesAsync(token);
 
-                order.SetPayin(webPayin);
-
-                var legal = await _context.GetSingleAsync<Legal>(c => c.Owner.Id == request.RequestUser.Id, token);
-                var result = await _pspService.CreateWebPayinAsync(webPayin, legal.Owner, token);
+                var result = await _pspService.CreatePreAuthorizedPayinAsync(preAuthorizedPayin, token);
                 if (!result.Success)
                     return Failed<Guid>(result.Exception);
 
-                webPayin.SetResult(result.Data.ResultCode, result.Data.ResultMessage);
-                webPayin.SetIdentifier(result.Data.Identifier);
-                webPayin.SetRedirectUrl(result.Data.RedirectUrl);
-                webPayin.SetStatus(result.Data.Status);
-                webPayin.SetCreditedAmount(result.Data.Credited);
-                webPayin.SetExecutedOn(result.Data.ProcessedOn);
+                preAuthorizedPayin.SetResult(result.Data.ResultCode, result.Data.ResultMessage);
+                preAuthorizedPayin.SetIdentifier(result.Data.Identifier);
+                preAuthorizedPayin.SetStatus(result.Data.Status);
+                preAuthorizedPayin.SetCreditedAmount(result.Data.Credited);
+                preAuthorizedPayin.SetExecutedOn(result.Data.ProcessedOn);
 
                 await _context.SaveChangesAsync(token);
-                return Ok(webPayin.Id);
+                return Ok(preAuthorizedPayin.Id);
             });
         }
 

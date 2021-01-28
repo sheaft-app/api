@@ -73,7 +73,7 @@ namespace Sheaft.Infrastructure.Persistence
             modelBuilder.Entity<CardPayin>().HasBaseType<Payin>();
             modelBuilder.Entity<WebPayin>().HasBaseType<Payin>();
 
-            modelBuilder.Entity<PayinRefund>().HasBaseType<Refund>();
+            modelBuilder.Entity<WebPayinRefund>().HasBaseType<Refund>();
 
             modelBuilder.Entity<BusinessLegal>().HasBaseType<Legal>();
             modelBuilder.Entity<ConsumerLegal>().HasBaseType<Legal>();

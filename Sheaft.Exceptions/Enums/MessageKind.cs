@@ -83,6 +83,8 @@
         PurchaseOrder_CannotRemoveProduct_Product_NotFound = 9119,
         PurchaseOrder_ProductQuantity_CannotBe_LowerOrEqualThan = 9120,
         PurchaseOrder_CannotSet_Transfer_AlreadySucceeded = 9121,
+        PurchaseOrder_CannotSet_Payin_AlreadySucceeded = 9122,
+        PurchaseOrder_CannotAccept_Expired = 9123,
         ExpectedDelivery = 10000,
         ExpectedDelivery_ExpectedDate_CannotBe_BeforeNow = 10101,
         ExpectedDelivery_ExpectedDate_NotIn_DeliveryOpeningHours = 10102,

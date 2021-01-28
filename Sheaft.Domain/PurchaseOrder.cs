@@ -36,7 +36,7 @@ namespace Sheaft.Domain.Models
             SetStatus(status);
 
             var orderProducts = order.Products.Where(p => p.Producer.Id == producer.Id);
-            foreach(var orderProduct in orderProducts)
+            foreach (var orderProduct in orderProducts)
             {
                 AddProduct(orderProduct);
             }
@@ -70,7 +70,6 @@ namespace Sheaft.Domain.Models
         public virtual PurchaseOrderSender Sender { get; private set; }
         public virtual ExpectedPurchaseOrderDelivery ExpectedDelivery { get; private set; }
         public virtual PurchaseOrderVendor Vendor { get; private set; }
-        public virtual Transfer Transfer { get; private set; }
         public virtual IReadOnlyCollection<PurchaseOrderProduct> Products => _products?.AsReadOnly();
 
         public void SetReference(string newReference)
@@ -81,14 +80,6 @@ namespace Sheaft.Domain.Models
             Reference = newReference;
         }
 
-        public void SetTransfer(Transfer transfer)
-        {
-            if (Transfer != null && Transfer.Status == TransactionStatus.Succeeded)
-                throw new ValidationException(MessageKind.PurchaseOrder_CannotSet_Transfer_AlreadySucceeded);
-
-            Transfer = transfer;
-        }
-
         private void SetStatus(PurchaseOrderStatus newStatus)
         {
             switch (newStatus)
@@ -96,8 +87,12 @@ namespace Sheaft.Domain.Models
                 case PurchaseOrderStatus.Accepted:
                     if (Status != PurchaseOrderStatus.Waiting)
                         throw new ValidationException(MessageKind.PurchaseOrder_CannotAccept_NotIn_WaitingStatus);
-                        AcceptedOn = DateTimeOffset.UtcNow;
-                        Status = PurchaseOrderStatus.Processing;
+
+                    if(CreatedOn.AddDays(7) <= DateTimeOffset.UtcNow)
+                        throw new ValidationException(MessageKind.PurchaseOrder_CannotAccept_Expired);
+
+                    AcceptedOn = DateTimeOffset.UtcNow;
+                    Status = PurchaseOrderStatus.Processing;
                     return;
                 case PurchaseOrderStatus.Completed:
                     if (Status != PurchaseOrderStatus.Processing)

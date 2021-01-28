@@ -4,7 +4,8 @@
     {
         WebPayin = 0,
         CardPayin,
-        PreAuthorizedPayin,
+        PreAuthorizedPurchaseOrderPayin,
+        PreAuthorizedDonationPayin,
         Transfer = 100,
         Payout = 200,
         RefundPayin = 300,

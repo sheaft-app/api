@@ -69,7 +69,7 @@ namespace Sheaft.Application.Handlers
         {
             return await ExecuteAsync(request, async () =>
             {
-                var payinRefund = await _context.GetByIdAsync<PayinRefund>(request.PayinRefundId, token);
+                var payinRefund = await _context.GetByIdAsync<WebPayinRefund>(request.PayinRefundId, token);
                 if (payinRefund.Status != TransactionStatus.Created && payinRefund.Status != TransactionStatus.Waiting)
                     return Ok(false);
 
@@ -85,7 +85,7 @@ namespace Sheaft.Application.Handlers
         {
             return await ExecuteAsync(request, async () =>
             {
-                var payinRefund = await _context.GetSingleAsync<PayinRefund>(c => c.Identifier == request.Identifier, token);
+                var payinRefund = await _context.GetSingleAsync<WebPayinRefund>(c => c.Identifier == request.Identifier, token);
                 if (payinRefund.Status == TransactionStatus.Succeeded || payinRefund.Status == TransactionStatus.Failed)
                     return Ok(payinRefund.Status);
 
@@ -118,24 +118,23 @@ namespace Sheaft.Application.Handlers
                 if(purchaseOrder.Status != PurchaseOrderStatus.Cancelled && purchaseOrder.Status != PurchaseOrderStatus.Refused)
                     return BadRequest<Guid>(MessageKind.PayinRefund_CannotCreate_Payin_PurchaseOrder_Invalid_Status);
 
-                var order = await _context.GetSingleAsync<Order>(c => c.PurchaseOrders.Any(c => c.Id == purchaseOrder.Id), token);
-                if (order.Payin.Status != TransactionStatus.Succeeded)
+                if (purchaseOrder.PreAuthorizedPayin.Status != TransactionStatus.Succeeded)
                     return BadRequest<Guid>(MessageKind.PayinRefund_CannotCreate_PurchaseOrderRefund_Payin_Invalid_Status);
 
-                if (order.Payin.Refunds.Any(c => c.PurchaseOrder.Id == purchaseOrder.Id && c.Status == TransactionStatus.Succeeded))
+                if (purchaseOrder.PreAuthorizedPayin.Refunds.Any(c => c.Status == TransactionStatus.Succeeded))
                     return BadRequest<Guid>(MessageKind.PayinRefund_CannotCreate_PurchaseOrderRefund_PayinRefund_AlreadyProcessed);
 
-                if (order.Payin.Refunds.Any(c => c.PurchaseOrder.Id == purchaseOrder.Id && c.Status != TransactionStatus.Failed))
+                if (purchaseOrder.PreAuthorizedPayin.Refunds.Any(c => c.Status != TransactionStatus.Failed))
                     return BadRequest<Guid>(MessageKind.PayinRefund_CannotCreate_PurchaseOrderRefund_Pending_PayinRefund);
 
                 using (var transaction = await _context.BeginTransactionAsync(token))
                 {
-                    var payinRefund = new PayinRefund(Guid.NewGuid(), order.Payin, purchaseOrder);
+                    var payinRefund = new PayinRefund(Guid.NewGuid(), purchaseOrder.PreAuthorizedPayin, purchaseOrder);
 
                     await _context.AddAsync(payinRefund, token);
                     await _context.SaveChangesAsync(token);
 
-                    order.Payin.AddRefund(payinRefund);
+                    purchaseOrder.PreAuthorizedPayin.AddRefund(payinRefund);
 
                     var result = await _pspService.RefundPayinAsync(payinRefund, token);
                     if (!result.Success)
@@ -157,7 +156,7 @@ namespace Sheaft.Application.Handlers
         private async Task<IEnumerable<Guid>> GetNextPayinRefundIdsAsync(int skip, int take, CancellationToken token)
         {
             return await _context.Refunds
-                .OfType<PayinRefund>()
+                .OfType<WebPayinRefund>()
                 .Get(c => c.Status == TransactionStatus.Waiting || c.Status == TransactionStatus.Created, true)
                 .OrderBy(c => c.CreatedOn)
                 .Select(c => c.Id)

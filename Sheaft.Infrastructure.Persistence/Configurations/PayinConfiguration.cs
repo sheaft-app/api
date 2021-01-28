@@ -29,7 +29,8 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
             entity.HasDiscriminator(c => c.Kind)
                 .HasValue<WebPayin>(TransactionKind.WebPayin)
                 .HasValue<CardPayin>(TransactionKind.CardPayin)
-                .HasValue<PreAuthorizedPayin>(TransactionKind.PreAuthorizedPayin);
+                .HasValue<PreAuthorizedDonationPayin>(TransactionKind.PreAuthorizedDonationPayin)
+                .HasValue<PreAuthorizedPurchaseOrderPayin>(TransactionKind.PreAuthorizedPurchaseOrderPayin);
 
             var refunds = entity.Metadata.FindNavigation(nameof(Payin.Refunds));
             refunds.SetPropertyAccessMode(PropertyAccessMode.Field);

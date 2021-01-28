@@ -23,7 +23,7 @@ namespace Sheaft.Application.Interop
         Task<Result<string>> CreateWalletAsync(Wallet wallet,  CancellationToken token);
         Task<Result<PspWebPaymentResultDto>> CreateWebPayinAsync(WebPayin transaction, Owner owner, CancellationToken token);
         Task<Result<PspPaymentResultDto>> CreateCardPayinAsync(CardPayin transaction, Owner owner, CancellationToken token);
-        Task<Result<PspPaymentResultDto>> RefundPayinAsync(PayinRefund transaction, CancellationToken token);
+        Task<Result<PspPaymentResultDto>> RefundPayinAsync(WebPayinRefund transaction, CancellationToken token);
         Task<Result<PspDocumentResultDto>> SubmitDocumentAsync(Document document, string userIdentifier, CancellationToken token);
         Task<Result<PspDeclarationResultDto>> CreateUboDeclarationAsync(Declaration declaration, User business, CancellationToken token);
         Task<Result<PspDeclarationResultDto>> SubmitUboDeclarationAsync(Declaration declaration, User business, CancellationToken token);
@@ -39,5 +39,8 @@ namespace Sheaft.Application.Interop
         Task<Result<PspUserNormalDto>> GetConsumerAsync(string identifier, CancellationToken token);
         Task<Result<PspPaymentResultDto>> CreateWithholdingAsync(Withholding transaction, CancellationToken token);
         Task<Result<PspPreAuthorizationResultDto>> CreatePreAuthorizationAsync(PreAuthorization preAuthorization, CancellationToken token);
+        Task<Result<PspPreAuthorizationResultDto>> GetPreAuthorizationAsync(string identifier, CancellationToken token);
+        Task<Result<PspPaymentResultDto>> CreatePreAuthorizedPayinAsync(PreAuthorizedPurchaseOrderPayin preAuthorizedPayin, CancellationToken token);
+        Task<Result<PspPaymentResultDto>> CreatePreAuthorizedPayinAsync(PreAuthorizedDonationPayin preAuthorizedPayin, CancellationToken token);
     }
 }

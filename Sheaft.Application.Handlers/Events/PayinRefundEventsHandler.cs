@@ -24,7 +24,7 @@ namespace Sheaft.Application.Handlers
 
         public async Task Handle(PayinRefundFailedEvent notification, CancellationToken token)
         {
-            var payinRefund = await _context.GetByIdAsync<PayinRefund>(notification.RefundId, token);
+            var payinRefund = await _context.GetByIdAsync<WebPayinRefund>(notification.RefundId, token);
             if (payinRefund.Status != TransactionStatus.Failed)
                 return;
 

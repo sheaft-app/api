@@ -61,7 +61,7 @@ namespace Sheaft.Application.Handlers
                 var purchaseOrder = order.AddPurchaseOrder(resultIdentifier.Data, producer);
                 await _context.SaveChangesAsync(token);
 
-                if(delivery.DeliveryMode.MaxPurchaseOrdersPerTimeSlot.HasValue)
+                if (delivery.DeliveryMode.MaxPurchaseOrdersPerTimeSlot.HasValue)
                     await _capingDeliveriesService.IncreaseProducerDeliveryCountAsync(producer.Id, delivery.Id, purchaseOrder.ExpectedDelivery.ExpectedDeliveryDate, purchaseOrder.ExpectedDelivery.From, purchaseOrder.ExpectedDelivery.To, delivery.DeliveryMode.MaxPurchaseOrdersPerTimeSlot.Value, token);
 
                 if (!request.SkipNotification)
@@ -70,7 +70,7 @@ namespace Sheaft.Application.Handlers
                     _mediatr.Post(new PurchaseOrderReceivedEvent(request.RequestUser) { PurchaseOrderId = purchaseOrder.Id });
                 }
 
-                if(delivery.DeliveryMode.AutoAcceptRelatedPurchaseOrder)
+                if (delivery.DeliveryMode.AutoAcceptRelatedPurchaseOrder)
                     _mediatr.Post(new AcceptPurchaseOrderCommand(request.RequestUser) { Id = purchaseOrder.Id, SkipNotification = request.SkipNotification });
 
 
@@ -348,12 +348,14 @@ namespace Sheaft.Application.Handlers
                 purchaseOrder.Accept();
 
                 await _context.SaveChangesAsync(token);
-                
-                if(!request.SkipNotification)
+
+                var preAuthorization = await _context.GetSingleAsync<PreAuthorization>(o => o.Order.PurchaseOrders.Any(po => po.Id == purchaseOrder.Id), token);
+                _mediatr.Post(new CreatePreAuthorizedPayinCommand(request.RequestUser) { PreAuthorizationId = preAuthorization.Id, PurchaseOrderId = purchaseOrder.Id });
+
+                if (!request.SkipNotification)
                     _mediatr.Post(new PurchaseOrderAcceptedEvent(request.RequestUser) { PurchaseOrderId = purchaseOrder.Id });
 
-                var order = await _context.GetSingleAsync<Order>(o => o.PurchaseOrders.Any(po => po.Id == purchaseOrder.Id), token);
-                var delivery = order.Deliveries.FirstOrDefault(d => d.DeliveryMode.Producer.Id == purchaseOrder.Vendor.Id);
+                var delivery = preAuthorization.Order.Deliveries.FirstOrDefault(d => d.DeliveryMode.Producer.Id == purchaseOrder.Vendor.Id);
                 if (delivery.DeliveryMode.AutoCompleteRelatedPurchaseOrder)
                     _mediatr.Post(new CompletePurchaseOrderCommand(request.RequestUser) { Id = purchaseOrder.Id, SkipNotification = request.SkipNotification });
 

@@ -46,24 +46,26 @@ namespace Sheaft.Application.Handlers
         {
             return await ExecuteAsync(request, async () =>
             {
-                var order = await _context.GetByIdAsync<Order>(request.OrderId, token);
-                if (order.Payin == null
-                    || order.Payin.Status != TransactionStatus.Succeeded
-                    || (order.Donation != null && order.Donation.Status != TransactionStatus.Failed))
+                var preAuthorization = await _context.GetSingleAsync<PreAuthorization>(c => c.Order.Id == request.OrderId && c.Status == PreAuthorizationStatus.Succeeded, token);
+                if (preAuthorization == null 
+                    || preAuthorization.PaymentStatus == PaymentStatus.Cancelled
+                    || preAuthorization.PaymentStatus == PaymentStatus.Expired
+                    || (preAuthorization.Order.Donation != null && preAuthorization.Order.Donation.Status != TransactionStatus.Failed))
                     return BadRequest<Guid>(MessageKind.Donation_CannotCreate_AlreadySucceeded);
 
-                var orderDonations = await _context.FindAsync<Donation>(c => c.Order.Id == order.Id, token);
+                var orderDonations = await _context.FindAsync<Donation>(c => c.Order.Id == request.OrderId, token);
                 if (orderDonations.Any(c => c.Status != TransactionStatus.Failed))
                     return BadRequest<Guid>(MessageKind.Donation_CannotCreate_PendingDonation);
 
+                var donationAuhtorization = new PreAuthorizedDonationPayin(Guid.NewGuid(), preAuthorization, )
                 var creditedWallet = await _context.GetSingleAsync<Wallet>(c => c.Identifier == _pspOptions.WalletId, token);
                 using (var transaction = await _context.BeginTransactionAsync(token))
                 {
-                    var donation = new Donation(Guid.NewGuid(), order.Payin.CreditedWallet, creditedWallet, order);
+                    var donation = new Donation(Guid.NewGuid(), preAuthorization, creditedWallet, preAuthorization.Order);
                     await _context.AddAsync(donation, token);
                     await _context.SaveChangesAsync(token);
 
-                    order.SetDonation(donation);
+                    preAuthorization.Order.SetDonation(donation);
 
                     var result = await _pspService.CreateDonationAsync(donation, token);
                     if (!result.Success)

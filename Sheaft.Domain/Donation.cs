@@ -1,5 +1,4 @@
 ﻿using Sheaft.Domain.Enums;
-using Sheaft.Exceptions;
 using System;
 
 namespace Sheaft.Domain.Models
@@ -10,12 +9,12 @@ namespace Sheaft.Domain.Models
         {
         }
 
-        public Donation(Guid id, Wallet debitedWallet, Wallet creditedWallet, Order order)
+        public Donation(Guid id, Wallet debitedWallet, Wallet creditedWallet, PreAuthorization preAuthorization)
             : base(id, TransactionKind.Transfer, debitedWallet.User)
         {
-            Order = order;
+            Order = preAuthorization.Order;
             Fees = 0;
-            Debited = Math.Round(order.Donate - order.InternalFeesPrice, 2);
+            Debited = preAuthorization.DonationPayin.Debited;
             CreditedWallet = creditedWallet;
             DebitedWallet = debitedWallet;
             Credited = Debited;

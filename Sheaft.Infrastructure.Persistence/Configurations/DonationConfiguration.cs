@@ -25,6 +25,7 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
             entity.HasOne(c => c.CreditedWallet).WithMany().HasForeignKey("CreditedWalletUid").OnDelete(DeleteBehavior.NoAction);
             entity.HasOne(c => c.DebitedWallet).WithMany().HasForeignKey("DebitedWalletUid").OnDelete(DeleteBehavior.NoAction);
             entity.HasOne(c => c.Order).WithMany().HasForeignKey("OrderUid").OnDelete(DeleteBehavior.NoAction);
+            entity.HasOne(c => c.PreAuthorizedPayin).WithOne().HasForeignKey<PreAuthorizedDonationPayin>("DonationUid").OnDelete(DeleteBehavior.NoAction);
 
             entity.HasKey("Uid");
 

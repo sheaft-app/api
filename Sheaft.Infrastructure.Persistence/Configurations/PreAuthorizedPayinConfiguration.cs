@@ -13,4 +13,18 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
             entity.HasIndex("PreAuthorizationUid");
         }
     }
+    public class PreAuthorizedPurchaseOrderPayinConfiguration : IEntityTypeConfiguration<PreAuthorizedPurchaseOrderPayin>
+    {
+        public void Configure(EntityTypeBuilder<PreAuthorizedPurchaseOrderPayin> entity)
+        {
+            entity.Property<long>("PurchaseOrderUid");
+        }
+    }
+    public class PreAuthorizedDonationPayinConfiguration : IEntityTypeConfiguration<PreAuthorizedDonationPayin>
+    {
+        public void Configure(EntityTypeBuilder<PreAuthorizedDonationPayin> entity)
+        {
+            entity.Property<long>("DonationUid");
+        }
+    }
 }
