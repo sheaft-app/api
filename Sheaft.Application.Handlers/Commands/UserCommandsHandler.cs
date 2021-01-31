@@ -16,6 +16,7 @@ using Sheaft.Exceptions;
 using Sheaft.Options;
 using Microsoft.Extensions.Options;
 using System.Collections.Generic;
+using Microsoft.EntityFrameworkCore;
 
 namespace Sheaft.Application.Handlers
 {
@@ -26,6 +27,7 @@ namespace Sheaft.Application.Handlers
         IRequestHandler<CreateUserPointsCommand, Result<bool>>,
         IRequestHandler<ChangeUserRolesCommand, Result<bool>>,
         IRequestHandler<RemoveUserCommand, Result<bool>>,
+        IRequestHandler<RestoreUserCommand, Result<bool>>,
         IRequestHandler<RemoveUserDataCommand, Result<string>>
     {
         private readonly IBlobService _blobService;
@@ -115,10 +117,27 @@ namespace Sheaft.Application.Handlers
         {
             return await ExecuteAsync(request, async () =>
             {
-                var entity = await _context.GetByIdAsync<User>(request.Id, token);
+                var entity = await _context.Users.FirstOrDefaultAsync(c => c.Id == request.Id, token);
+                if (entity == null)
+                    return NotFound<string>();
+
+                if (!entity.RemovedOn.HasValue)
+                    return Ok(request.Reason);
+
                 await _blobService.CleanUserStorageAsync(request.Id, token);
 
-                return Ok(request.Email);
+                var result = await _mediatr.Process(new RemoveAuthUserCommand(request.RequestUser)
+                {
+                    UserId = entity.Id
+                }, token);
+
+                if (!result.Success)
+                    return Failed<string>(result.Exception);
+
+                entity.Close();
+                await _context.SaveChangesAsync(token);
+
+                return Ok(request.Reason);
             });
         }
 
@@ -202,30 +221,35 @@ namespace Sheaft.Application.Handlers
         {
             return await ExecuteAsync(request, async () =>
             {
-                using (var transaction = await _context.BeginTransactionAsync(token))
-                {
-                    var entity = await _context.GetByIdAsync<User>(request.Id, token);
+                var entity = await _context.GetByIdAsync<User>(request.Id, token);
 
-                    var hasActiveOrders = await _context.AnyAsync<PurchaseOrder>(o => (o.Vendor.Id == entity.Id || o.Sender.Id == entity.Id) && (int)o.Status < 6, token);
-                    if (hasActiveOrders)
-                        return ValidationError<bool>(MessageKind.Consumer_CannotBeDeleted_HasActiveOrders);
+                var hasActiveOrders = await _context.AnyAsync<PurchaseOrder>(o => (o.Vendor.Id == entity.Id || o.Sender.Id == entity.Id) && (int)o.Status < 6, token);
+                if (hasActiveOrders)
+                    return ValidationError<bool>(MessageKind.Consumer_CannotBeDeleted_HasActiveOrders);
 
-                    var result = await _mediatr.Process(new RemoveAuthUserCommand(request.RequestUser)
-                    {
-                        UserId = entity.Id
-                    }, token);
+                _context.Remove(entity);
+                await _context.SaveChangesAsync(token);
 
-                    if (!result.Success)
-                        return Failed<bool>(result.Exception);
+                _mediatr.Schedule(new RemoveUserDataCommand(request.RequestUser) { Id = request.Id, Email = entity.Email, Reason = request.Reason }, TimeSpan.FromDays(14));
+                return Ok(true);
+            });
+        }
 
-                    entity.Close(request.Reason);
+        public async Task<Result<bool>> Handle(RestoreUserCommand request, CancellationToken token)
+        {
+            return await ExecuteAsync(request, async () =>
+            {
+                var entity = await _context.Users.FirstOrDefaultAsync(c => c.Id == request.Id, token);
+                if (entity == null)
+                    return NotFound<bool>();
+                    
+                if (!entity.RemovedOn.HasValue)
+                    return BadRequest<bool>();
 
-                    await _context.SaveChangesAsync(token);
-                    await transaction.CommitAsync(token);
+                entity.Restore();
+                await _context.SaveChangesAsync(token);
 
-                    _mediatr.Post(new RemoveUserDataCommand(request.RequestUser) { Id = request.Id, Email = entity.Email });
-                    return Ok(true);
-                }
+                return Ok(true);
             });
         }
 

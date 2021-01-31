@@ -138,14 +138,17 @@ namespace Sheaft.Domain.Models
             Identifier = identifier;
         }
 
-        public virtual void Close(string reason)
+        public virtual void Close()
         {
+            if(Kind != ProfileKind.Consumer)
+                return;
+
             FirstName = string.Empty;
             LastName = string.Empty;
-            Email = $"{Guid.NewGuid():N}@a.c";
+            Name = string.Empty;
+            Email = $"{Guid.NewGuid():N}@ano.nym";
             Phone = string.Empty;
-            RemovedOn = DateTime.UtcNow;
-            SetAddress("", "", Address.Zipcode, "", Address.Country, Address.Department);
+            SetAddress("Anonymous", null, Address.Zipcode, "Anonymous", Address.Country, Address.Department);
         }
 
         public Points AddPoints(PointKind kind, int quantity, DateTimeOffset? createdOn = null)
@@ -163,6 +166,11 @@ namespace Sheaft.Domain.Models
         private void RefreshPoints()
         {
             TotalPoints = _points.Sum(c => c.Quantity);
+        }
+
+        public void Restore()
+        {
+            RemovedOn = null;
         }
     }
 

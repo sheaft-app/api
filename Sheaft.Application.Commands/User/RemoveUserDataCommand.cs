@@ -13,5 +13,6 @@ namespace Sheaft.Application.Commands
 
         public Guid Id { get; set; }
         public string Email { get; set; }
+        public string Reason { get; set; }
     }
 }

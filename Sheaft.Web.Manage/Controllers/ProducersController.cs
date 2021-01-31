@@ -136,6 +136,21 @@ namespace Sheaft.Web.Manage.Controllers
                 throw result.Exception;
 
             return RedirectToAction("Index");
+        }        
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Restore(Guid id, CancellationToken token)
+        {
+            var result = await _mediatr.Process(new RestoreUserCommand(await GetRequestUser(token))
+            {
+                Id = id
+            }, token);
+
+            if (!result.Success)
+                throw result.Exception;
+
+            return RedirectToAction("Edit", new {id});
         }
     }
 }
