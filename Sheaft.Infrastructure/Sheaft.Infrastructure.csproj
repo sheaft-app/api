@@ -1,0 +1,57 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>netcoreapp3.1</TargetFramework>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <Content Include="Services\Templates\AgreementAcceptedEvent.cshtml" />
+      <Content Include="Services\Templates\AgreementCancelledEvent.cshtml" />
+      <Content Include="Services\Templates\AgreementCreatedEvent.cshtml" />
+      <Content Include="Services\Templates\AgreementRefusedEvent.cshtml" />
+      <Content Include="Services\Templates\PayinFailedEvent.cshtml" />
+      <Content Include="Services\Templates\PayinSucceededEvent.cshtml" />
+      <Content Include="Services\Templates\PickingOrderExportFailedEvent.cshtml" />
+      <Content Include="Services\Templates\PickingOrderExportSucceededEvent.cshtml" />
+      <Content Include="Services\Templates\ProductImportFailedEvent.cshtml" />
+      <Content Include="Services\Templates\ProductImportSucceededEvent.cshtml" />
+      <Content Include="Services\Templates\PurchaseOrderAcceptedEvent.cshtml" />
+      <Content Include="Services\Templates\PurchaseOrderCancelledEvent.cshtml" />
+      <Content Include="Services\Templates\PurchaseOrderCompletedEvent.cshtml" />
+      <Content Include="Services\Templates\PurchaseOrderCreatedEvent.cshtml" />
+      <Content Include="Services\Templates\PurchaseOrderReceivedEvent.cshtml" />
+      <Content Include="Services\Templates\PurchaseOrderRefusedEvent.cshtml" />
+      <Content Include="Services\Templates\PurchaseOrderWithdrawnEvent.cshtml" />
+      <Content Include="Services\Templates\UserDataExportFailedEvent.cshtml" />
+      <Content Include="Services\Templates\UserDataExportSucceededEvent.cshtml" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="AWSSDK.SimpleEmail" Version="3.5.0.52" />
+      <PackageReference Include="Azure.Storage.Blobs" Version="12.7.0" />
+      <PackageReference Include="Dapper" Version="2.0.78" />
+      <PackageReference Include="Hangfire.Core" Version="1.7.18" />
+      <PackageReference Include="IdentityModel" Version="4.5.0" />
+      <PackageReference Include="mangopay2-sdk" Version="2.1.11" />
+      <PackageReference Include="MediatR" Version="9.0.0" />
+      <PackageReference Include="Microsoft.Azure.Cosmos.Table" Version="1.0.8" />
+      <PackageReference Include="Microsoft.Data.SqlClient" Version="1.1.3" />
+      <PackageReference Include="Microsoft.EntityFrameworkCore" Version="3.1.10" />
+      <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="3.1.10" />
+      <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="3.1.10">
+        <PrivateAssets>all</PrivateAssets>
+        <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      </PackageReference>
+      <PackageReference Include="Microsoft.Extensions.Http" Version="3.1.10" />
+      <PackageReference Include="Microsoft.Extensions.Localization.Abstractions" Version="3.1.10" />
+      <PackageReference Include="Powell.CouponCode" Version="1.0.3" />
+      <PackageReference Include="RazorLight.NetCore3" Version="3.0.2" />
+      <PackageReference Include="SixLabors.ImageSharp" Version="1.0.2" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\Sheaft.Application\Sheaft.Application.csproj" />
+      <ProjectReference Include="..\Sheaft.Localization\Sheaft.Localization.csproj" />
+    </ItemGroup>
+
+</Project>

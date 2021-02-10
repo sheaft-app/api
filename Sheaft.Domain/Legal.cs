@@ -3,7 +3,7 @@ using Sheaft.Domain.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Sheaft.Exceptions;
+using Sheaft.Domains.Exceptions;
 
 namespace Sheaft.Domain.Models
 {
@@ -46,12 +46,9 @@ namespace Sheaft.Domain.Models
 
         public void DeleteDocument(Guid id)
         {
-            if (Documents == null)
-                throw new NotFoundException(id);
-
             var document = _documents.FirstOrDefault(d => d.Id == id);
             if (document == null)
-                throw new NotFoundException(id);
+                throw new ValidationException(MessageKind.Document_CannotDelete_NotFound);
 
             _documents.Remove(document);
         }

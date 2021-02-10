@@ -1,9 +1,9 @@
-﻿using Sheaft.Exceptions;
-using Sheaft.Domain.Interop;
+﻿using Sheaft.Domain.Interop;
 using Sheaft.Domain.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Sheaft.Domains.Exceptions;
 
 namespace Sheaft.Domain.Models
 {
@@ -38,19 +38,16 @@ namespace Sheaft.Domain.Models
 
             var existingUbo = _ubos.FirstOrDefault(u => u.Id == ubo.Id);
             if (existingUbo != null)
-                throw new ConflictException();
+                throw new ValidationException(MessageKind.Ubo_CannotAdd_AlreadyExists);
 
             _ubos.Add(ubo);
         }
 
         public void RemoveUbo(Guid id)
         {
-            if (Ubos == null)
-                throw new NotFoundException();
-
             var existingUbo = _ubos.FirstOrDefault(u => u.Id == id);
             if(existingUbo == null)
-                throw new NotFoundException();
+                throw new ValidationException(MessageKind.Ubo_CannotRemove_NotFound);
 
             _ubos.Remove(existingUbo);
         }

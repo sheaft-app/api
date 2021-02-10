@@ -1,13 +1,7 @@
-﻿using Hangfire.Client;
-using Hangfire.Common;
+﻿using Hangfire.Common;
 using Hangfire.Logging;
 using Hangfire.Server;
 using Hangfire.States;
-using Hangfire.Storage;
-using NewRelic.Api.Agent;
-using Sheaft.Application.Interop;
-using System;
-using System.Linq;
 
 namespace Sheaft.Web.Jobs
 {

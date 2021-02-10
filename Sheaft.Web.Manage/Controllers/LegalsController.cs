@@ -35,33 +35,6 @@ namespace Sheaft.Web.Manage.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Index(CancellationToken token, LegalKind? kind = null, int page = 0, int take = 50)
-        {
-            if (page < 0)
-                page = 0;
-
-            if (take > 100)
-                take = 100;
-
-            var query = _context.Legals.AsNoTracking();
-            if (kind != null)
-                query = query.Where(p => p.Kind == kind);
-
-            var entities = await query
-                .OrderByDescending(c => c.CreatedOn)
-                .Skip(page * take)
-                .Take(take)
-                .ProjectTo<LegalViewModel>(_configurationProvider)
-                .ToListAsync(token);
-
-            ViewBag.Page = page;
-            ViewBag.Take = take;
-            ViewBag.Kind = kind;
-
-            return View(entities);
-        }
-
-        [HttpGet]
         public async Task<IActionResult> EditUserLegals(Guid userId, CancellationToken token)
         {
             var entity = await _context.Legals

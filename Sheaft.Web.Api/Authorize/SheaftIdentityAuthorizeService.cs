@@ -20,7 +20,6 @@ using System.IO;
 
 namespace Sheaft.Web.Api.Authorize
 {
-
     public class SheaftIdentityAuthorizeService : IAuthorizationService
     {
         private readonly IAuthorizationPolicyProvider _policyProvider;

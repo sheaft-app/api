@@ -1,0 +1,98 @@
+﻿using System;
+using System.Threading;
+using System.Threading.Tasks;
+using MediatR;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using Sheaft.Domain.Enums;
+using Sheaft.Application.Models;
+using Sheaft.Core;
+using Newtonsoft.Json;
+using Sheaft.Application.Interop;
+using Sheaft.Domain.Models;
+using Sheaft.Options;
+
+namespace Sheaft.Application.Commands
+{
+    public class CreateBusinessLegalCommand : Command<Guid>
+    {
+        [JsonConstructor]
+        public CreateBusinessLegalCommand(RequestUser requestUser) : base(requestUser)
+        {
+        }
+
+        public Guid UserId { get; set; }
+        public LegalKind Kind { get; set; }
+        public string Name { get; set; }
+        public string Email { get; set; }
+        public string VatIdentifier { get; set; }
+        public string Siret { get; set; }
+        public OwnerInput Owner { get; set; }
+        public AddressInput Address { get; set; }
+    }
+    
+    public class CreateBusinessLegalCommandHandler : CommandsHandler,
+           IRequestHandler<CreateBusinessLegalCommand, Result<Guid>>
+    {
+        private readonly PspOptions _pspOptions;
+        private readonly IPspService _pspService;
+
+        public CreateBusinessLegalCommandHandler(
+            ISheaftMediatr mediatr,
+            IAppDbContext context,
+            IPspService pspService,
+            IOptionsSnapshot<PspOptions> pspOptions,
+            ILogger<CreateBusinessLegalCommandHandler> logger)
+            : base(mediatr, context, logger)
+        {
+            _pspOptions = pspOptions.Value;
+            _pspService = pspService;
+        }
+
+        public async Task<Result<Guid>> Handle(CreateBusinessLegalCommand request, CancellationToken token)
+        {
+            return await ExecuteAsync(request, async () =>
+            {
+                var business = await _context.GetByIdAsync<Business>(request.UserId, token);
+                await _context.EnsureNotExists<BusinessLegal>(c => c.User.Id == business.Id, token);
+
+                var legal = new BusinessLegal(
+                    Guid.NewGuid(),
+                    business,
+                    request.Kind,
+                    request.Name,
+                    request.Email,
+                    request.Siret,
+                    request.VatIdentifier,
+                    new LegalAddress(request.Address.Line1, request.Address.Line2, request.Address.Zipcode, request.Address.City, request.Address.Country),
+                    new Owner(business.Id,
+                        request.Owner.FirstName,
+                        request.Owner.LastName,
+                        request.Owner.Email,
+                        request.Owner.BirthDate,
+                        new OwnerAddress(request.Owner.Address.Line1, request.Owner.Address.Line2, request.Owner.Address.Zipcode, request.Owner.Address.City, request.Owner.Address.Country),
+                        request.Owner.Nationality,
+                        request.Owner.CountryOfResidence
+                    ));
+
+                await _context.AddAsync(legal, token);
+                await _context.SaveChangesAsync(token);
+
+                if (string.IsNullOrWhiteSpace(legal.User.Identifier))
+                {
+                    var userResult = await _mediatr.Process(new CheckBusinessLegalConfigurationCommand(request.RequestUser) { UserId = legal.User.Id }, token);
+                    if (!userResult.Success)
+                        return Failed<Guid>(userResult.Exception);
+                }
+                else
+                {
+                    var result = await _pspService.UpdateBusinessAsync(legal, token);
+                    if (!result.Success)
+                        return Failed<Guid>(result.Exception);
+                }
+
+                return Ok(legal.Id);
+            });
+        }
+    }
+}

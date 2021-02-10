@@ -1,6 +1,7 @@
-﻿using Sheaft.Exceptions;
-using System;
+﻿using System;
 using System.Linq;
+using Sheaft.Domain.Enums;
+using Sheaft.Domains.Exceptions;
 
 namespace Sheaft.Domain.Models
 {

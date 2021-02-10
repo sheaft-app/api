@@ -1,5 +1,4 @@
 ﻿using Sheaft.Domain.Enums;
-using Sheaft.Exceptions;
 using System;
 
 namespace Sheaft.Domain.Models

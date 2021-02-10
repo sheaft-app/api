@@ -3,7 +3,7 @@ using Sheaft.Domain.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Sheaft.Exceptions;
+using Sheaft.Domains.Exceptions;
 
 namespace Sheaft.Domain.Models
 {

@@ -1,8 +1,8 @@
 using System;
 using Newtonsoft.Json;
-using Sheaft.Exceptions;
 using Sheaft.Domain.Interop;
 using Sheaft.Domain.Enums;
+using Sheaft.Domains.Exceptions;
 
 namespace Sheaft.Domain.Models
 {
@@ -75,7 +75,7 @@ namespace Sheaft.Domain.Models
         public void RetryJob()
         {
             if (Status != ProcessStatus.Cancelled && Status != ProcessStatus.Failed)
-                throw new BadRequestException(MessageKind.Job_CannotRetry_NotIn_CanncelledOrFailedStatus);
+                throw new ValidationException(MessageKind.Job_CannotRetry_NotIn_CanncelledOrFailedStatus);
 
             StartedOn = null;
             Retried = Retried.HasValue ? Retried + 1 : 1;
@@ -85,7 +85,7 @@ namespace Sheaft.Domain.Models
         public void PauseJob()
         {
             if (!StartedOn.HasValue || Status != ProcessStatus.Processing)
-                throw new BadRequestException(MessageKind.Job_CannotPause_NotIn_ProcessingStatus);
+                throw new ValidationException(MessageKind.Job_CannotPause_NotIn_ProcessingStatus);
 
             Status = ProcessStatus.Paused;
         }
@@ -93,7 +93,7 @@ namespace Sheaft.Domain.Models
         public void ArchiveJob()
         {
             if (Status != ProcessStatus.Done && Status != ProcessStatus.Failed && Status != ProcessStatus.Cancelled)
-                throw new BadRequestException(MessageKind.Job_CannotArchive_NotIn_TerminatedStatus);
+                throw new ValidationException(MessageKind.Job_CannotArchive_NotIn_TerminatedStatus);
 
             Archived = true;
         }
@@ -106,7 +106,7 @@ namespace Sheaft.Domain.Models
         public void ResumeJob()
         {
             if (!StartedOn.HasValue || Status != ProcessStatus.Paused)
-                throw new BadRequestException(MessageKind.Job_CannotResume_NotIn_PausedStatus);
+                throw new ValidationException(MessageKind.Job_CannotResume_NotIn_PausedStatus);
 
             Status = ProcessStatus.Processing;
         }
@@ -114,7 +114,7 @@ namespace Sheaft.Domain.Models
         public void CompleteJob()
         {
             if (!StartedOn.HasValue || Status != ProcessStatus.Processing)
-                throw new BadRequestException(MessageKind.Job_CannotComplete_NotIn_ProcessingStatus);
+                throw new ValidationException(MessageKind.Job_CannotComplete_NotIn_ProcessingStatus);
 
             CompletedOn = DateTimeOffset.UtcNow;
             Status = ProcessStatus.Done;
@@ -123,10 +123,10 @@ namespace Sheaft.Domain.Models
         public void CancelJob(string message)
         {
             if (Status == ProcessStatus.Done)
-                throw new BadRequestException(MessageKind.Job_CannotCancel_AlreadyDone);
+                throw new ValidationException(MessageKind.Job_CannotCancel_AlreadyDone);
 
             if (Status == ProcessStatus.Cancelled)
-                throw new BadRequestException(MessageKind.Job_CannotCancel_AlreadyCancelled);
+                throw new ValidationException(MessageKind.Job_CannotCancel_AlreadyCancelled);
 
             Status = ProcessStatus.Cancelled;
             Message = message;
@@ -135,10 +135,10 @@ namespace Sheaft.Domain.Models
         public void FailJob(string message)
         {
             if (Status == ProcessStatus.Done)
-                throw new BadRequestException(MessageKind.Job_CannotFail_AlreadyDone);
+                throw new ValidationException(MessageKind.Job_CannotFail_AlreadyDone);
 
             if (Status == ProcessStatus.Cancelled)
-                throw new BadRequestException(MessageKind.Job_CannotFail_AlreadyCancelled);
+                throw new ValidationException(MessageKind.Job_CannotFail_AlreadyCancelled);
 
             Status = ProcessStatus.Failed;
             Message = message;

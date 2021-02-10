@@ -5,7 +5,6 @@ using System.Reflection;
 using AutoMapper;
 using IdentityModel;
 using MangoPay.SDK;
-using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -16,10 +15,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using Sheaft.Application.Commands;
 using Sheaft.Application.Events;
-using Sheaft.Application.Handlers;
 using Sheaft.Application.Interop;
 using Sheaft.Application.Mappers;
 using Sheaft.Options;
@@ -32,6 +29,7 @@ using Newtonsoft.Json;
 using Amazon.SimpleEmail;
 using RazorLight;
 using Amazon;
+using MediatR;
 using Serilog;
 using Serilog.Events;
 using NewRelic.LogEnrichers.Serilog;
@@ -194,7 +192,7 @@ namespace Sheaft.Web.Manage
                     };
                 });
 
-            services.AddMediatR(new List<Assembly>() { typeof(RegisterStoreCommand).Assembly, typeof(UserPointsCreatedEvent).Assembly, typeof(UserCommandsHandler).Assembly }.ToArray());
+            services.AddMediatR(new List<Assembly>() { typeof(RegisterStoreCommand).Assembly, typeof(UserPointsCreatedEvent).Assembly, typeof(RegisterProducerCommand).Assembly }.ToArray());
             
             services.AddScoped<IBackgroundJobClient, BackgroundJobClient>();
             services.AddScoped<ISheaftHangfireBridge, SheaftHangfireBridge>();
@@ -225,7 +223,6 @@ namespace Sheaft.Web.Manage
 
             services.AddScoped<IDapperContext, DapperContext>();
             services.AddScoped<IIdentifierService, IdentifierService>();
-            services.AddScoped<IQueueService, QueueService>();
             services.AddScoped<IBlobService, BlobService>();
             services.AddScoped<IEmailService, EmailService>();
             services.AddScoped<ISignalrService, SignalrService>();
@@ -237,7 +234,7 @@ namespace Sheaft.Web.Manage
             services.AddScoped<ICapingDeliveriesService, CapingDeliveriesService>();
 
             services.AddScoped<IAgreementQueries, AgreementQueries>();
-            services.AddScoped<IBusinessQueries, BusinessQueries>();
+            services.AddScoped<IProducerQueries, ProducerQueries>();
             services.AddScoped<IDeliveryQueries, DeliveryQueries>();
             services.AddScoped<IDepartmentQueries, DepartmentQueries>();
             services.AddScoped<IJobQueries, JobQueries>();
@@ -254,7 +251,7 @@ namespace Sheaft.Web.Manage
             services.AddScoped<INationalityQueries, NationalityQueries>();
             services.AddScoped<ICountryQueries, CountryQueries>();
             services.AddScoped<IOrderQueries, OrderQueries>();
-            services.AddScoped<ITransactionQueries, TransactionQueries>();
+            services.AddScoped<IPayinQueries, PayinQueries>();
             services.AddScoped<IDocumentQueries, DocumentQueries>();
             services.AddScoped<ILegalQueries, LegalQueries>();
 

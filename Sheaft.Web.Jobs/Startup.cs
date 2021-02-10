@@ -32,7 +32,6 @@ using Serilog;
 using Serilog.Events;
 using Sheaft.Application.Commands;
 using Sheaft.Application.Events;
-using Sheaft.Application.Handlers;
 using Sheaft.Application.Interop;
 using Sheaft.Application.Mappers;
 using Sheaft.Core;
@@ -184,7 +183,7 @@ namespace Sheaft.Web.Jobs
                 });
 
             services.AddAutoMapper(typeof(ProductProfile).Assembly);
-            services.AddMediatR(new List<Assembly>() { typeof(RegisterStoreCommand).Assembly, typeof(UserPointsCreatedEvent).Assembly, typeof(UserCommandsHandler).Assembly }.ToArray());
+            services.AddMediatR(new List<Assembly>() { typeof(RegisterStoreCommand).Assembly, typeof(UserPointsCreatedEvent).Assembly, typeof(RegisterProducerCommand).Assembly }.ToArray());
 
             services.AddMemoryCache();
             services.AddHttpClient();
@@ -208,7 +207,6 @@ namespace Sheaft.Web.Jobs
             });
 
             services.AddScoped<IIdentifierService, IdentifierService>();
-            services.AddScoped<IQueueService, QueueService>();
             services.AddScoped<IBlobService, BlobService>();
             services.AddScoped<IEmailService, EmailService>();
             services.AddScoped<ISignalrService, SignalrService>();

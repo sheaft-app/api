@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <RootNamespace>Sheaft.Tests.Common</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="3.1.10" />
+    <PackageReference Include="Moq" Version="4.15.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Sheaft.Application.Interop\Sheaft.Application.Interop.csproj" />
+    <ProjectReference Include="..\Sheaft.Application\Sheaft.Application.csproj" />
+    <ProjectReference Include="..\Sheaft.Infrastructure.Persistence\Sheaft.Infrastructure.Persistence.csproj" />
+    <ProjectReference Include="..\Sheaft.Infrastructure\Sheaft.Infrastructure.csproj" />
+  </ItemGroup>
+
+</Project>

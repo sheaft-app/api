@@ -72,20 +72,5 @@ namespace Sheaft.Web.Manage.Controllers
 
             return View(entity);
         }
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Expire(DonationViewModel model, CancellationToken token)
-        {
-            var result = await _mediatr.Process(new ExpireDonationCommand(await GetRequestUser(token))
-            {
-                DonationId = model.Id
-            }, token);
-
-            if (!result.Success)
-                throw result.Exception;
-
-            return RedirectToAction("Index");
-        }
     }
 }

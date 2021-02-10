@@ -2,7 +2,8 @@
 @{
     ViewData["Title"] = "Edit Document";
 
-    var kinds = new List<SelectListItem> {
+    var kinds = new List<SelectListItem>
+    {
         new SelectListItem("Association", DocumentKind.AssociationProof.ToString("G")),
         new SelectListItem("Identity", DocumentKind.IdentityProof.ToString("G")),
         new SelectListItem("Registration", DocumentKind.RegistrationProof.ToString("G")),
@@ -10,16 +11,18 @@
     };
 
     if (ViewBag.Kind != LegalKind.Business)
+    {
         kinds.Add(new SelectListItem("Address", DocumentKind.AddressProof.ToString("G")));
+    }
 }
 
 <div class="container">
     <h2 class="display-4">Edit Document</h2>
-    <br />
+    <br/>
 
     @if (Model.Status == DocumentStatus.Locked)
     {
-        @using (Html.BeginForm("Validate", "Documents", new { id = Model.Id }, FormMethod.Post, true, new { @class = "form d-inline" }))
+        @using (Html.BeginForm("Validate", "Documents", new {id = Model.Id}, FormMethod.Post, true, new {@class = "form d-inline"}))
         {
             <button type="submit" class="btn btn-success">
                 <i class="fa fa-check"></i> Send for Mango validation (2.5€)
@@ -29,7 +32,7 @@
 
     @if (Model.Status == DocumentStatus.Locked)
     {
-        @using (Html.BeginForm("Unlock", "Documents", new { id = Model.Id }, FormMethod.Post, true, new { @class = "form d-inline" }))
+        @using (Html.BeginForm("Unlock", "Documents", new {id = Model.Id}, FormMethod.Post, true, new {@class = "form d-inline"}))
         {
             <button type="submit" class="btn btn-outline-warning">
                 <i class="fa fa-unlock"></i> Unlock
@@ -39,7 +42,7 @@
 
     @if (Model.Pages.Any() && (Model.Status == DocumentStatus.UnLocked || Model.Status == DocumentStatus.Created || Model.Status == DocumentStatus.OutOfDate))
     {
-        @using (Html.BeginForm("Lock", "Documents", new { id = Model.Id }, FormMethod.Post, true, new { @class = "form d-inline" }))
+        @using (Html.BeginForm("Lock", "Documents", new {id = Model.Id}, FormMethod.Post, true, new {@class = "form d-inline"}))
         {
             <button type="submit" class="btn btn-outline-warning">
                 <i class="fa fa-lock"></i> Lock
@@ -49,7 +52,7 @@
 
     @if (Model.Status == DocumentStatus.Locked || Model.Status == DocumentStatus.UnLocked || Model.Status == DocumentStatus.Created)
     {
-        @using (Html.BeginForm("Delete", "Documents", new { id = Model.Id }, FormMethod.Post, true, new { @class = "form d-inline" }))
+        @using (Html.BeginForm("Delete", "Documents", new {id = Model.Id}, FormMethod.Post, true, new {@class = "form d-inline"}))
         {
             <button type="submit" class="btn btn-danger">
                 <i class="fa fa-trash"></i> Delete
@@ -58,7 +61,7 @@
     }
     @if (Model.Pages.Any())
     {
-        @using (Html.BeginForm("Download", "Documents", new { id = Model.Id }, FormMethod.Post, true, new { @class = "form d-inline" }))
+        @using (Html.BeginForm("Download", "Documents", new {id = Model.Id}, FormMethod.Post, true, new {@class = "form d-inline"}))
         {
             <button type="submit" class="btn btn-outline-info">
                 <i class="fa fa-download"></i>
@@ -68,66 +71,66 @@
 
     <div class="row">
         <div class="col-md-6">
-            @using (Html.BeginForm("Edit", "Documents", FormMethod.Post, new { @class = "form", enctype = "multipart/form-data" }))
+            @using (Html.BeginForm("Edit", "Documents", FormMethod.Post, new {@class = "form", enctype = "multipart/form-data"}))
             {
                 @Html.AntiForgeryToken()
-                @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                @Html.ValidationSummary(true, "", new {@class = "text-danger"})
                 @Html.HiddenFor(model => model.Id)
-                <br />
+                <br/>
                 @if (Model.Status == DocumentStatus.Created || Model.Status == DocumentStatus.UnLocked)
                 {
                     <div class="form-group">
-                        @Html.LabelFor(c => c.Name, new { @class = "form-label" })
-                        @Html.TextBoxFor(c => c.Name, null, new { @class = "form-control" })
+                        @Html.LabelFor(c => c.Name, new {@class = "form-label"})
+                        @Html.TextBoxFor(c => c.Name, null, new {@class = "form-control"})
                     </div>
                 }
                 else
                 {
                     <div class="form-group">
-                        @Html.LabelFor(c => c.Name, new { @class = "form-label" })
-                        @Html.TextBoxFor(c => c.Name, null, new { @class = "form-control", @disabled = "disabled" })
+                        @Html.LabelFor(c => c.Name, new {@class = "form-label"})
+                        @Html.TextBoxFor(c => c.Name, null, new {@class = "form-control", @disabled = "disabled"})
                     </div>
                 }
                 <div class="form-group">
-                    @Html.LabelFor(c => c.Kind, new { @class = "form-label" })
-                    @Html.DropDownListFor(c => c.Kind, kinds, new { @class = "form-control", @disabled = "disabled" })
+                    @Html.LabelFor(c => c.Kind, new {@class = "form-label"})
+                    @Html.DropDownListFor(c => c.Kind, kinds, new {@class = "form-control", @disabled = "disabled"})
                 </div>
                 <div class="form-group">
                     @Html.LabelFor(m => m.CreatedOn)
-                    @Html.TextBoxFor(m => m.CreatedOn, null, new { @class = "form-control", @disabled = "disabled" })
+                    @Html.TextBoxFor(m => m.CreatedOn, null, new {@class = "form-control", @disabled = "disabled"})
                 </div>
                 <div class="form-group">
                     @Html.LabelFor(m => m.UpdatedOn)
-                    @Html.TextBoxFor(m => m.UpdatedOn, null, new { @class = "form-control", @disabled = "disabled" })
+                    @Html.TextBoxFor(m => m.UpdatedOn, null, new {@class = "form-control", @disabled = "disabled"})
                 </div>
                 @if (Model.RemovedOn.HasValue)
                 {
                     <div class="form-group">
                         @Html.LabelFor(m => m.RemovedOn)
-                        @Html.TextBoxFor(m => m.RemovedOn, null, new { @class = "form-control", @disabled = "disabled" })
+                        @Html.TextBoxFor(m => m.RemovedOn, null, new {@class = "form-control", @disabled = "disabled"})
                     </div>
                 }
                 <h4>Operation</h4>
                 <div class="form-group">
                     @Html.LabelFor(m => m.Status)
-                    @Html.TextBoxFor(m => m.Status, null, new { @class = "form-control", @disabled = "disabled" })
+                    @Html.TextBoxFor(m => m.Status, null, new {@class = "form-control", @disabled = "disabled"})
                 </div>
                 @if (Model.ProcessedOn.HasValue)
                 {
                     <div class="form-group">
                         @Html.LabelFor(m => m.ProcessedOn)
-                        @Html.TextBoxFor(m => m.ProcessedOn, null, new { @class = "form-control", @disabled = "disabled" })
+                        @Html.TextBoxFor(m => m.ProcessedOn, null, new {@class = "form-control", @disabled = "disabled"})
                     </div>
                     <div class="form-group">
                         @Html.LabelFor(m => m.ReasonCode)
-                        @Html.TextBoxFor(m => m.ReasonCode, null, new { @class = "form-control", @disabled = "disabled" })
+                        @Html.TextBoxFor(m => m.ReasonCode, null, new {@class = "form-control", @disabled = "disabled"})
                     </div>
                     <div class="form-group">
                         @Html.LabelFor(m => m.ReasonMessage)
-                        @Html.TextAreaFor(m => m.ReasonMessage, new { @class = "form-control", @disabled = "disabled" })
+                        @Html.TextAreaFor(m => m.ReasonMessage, new {@class = "form-control", @disabled = "disabled"})
                     </div>
                 }
-                <br />
+                <br/>
                 <a asp-controller="Legals" asp-action="EditUserLegals" asp-route-userid="@ViewBag.UserId" class="btn btn-light">
                     Go back
                 </a>
@@ -143,48 +146,48 @@
             <h3>Pages</h3>
             <table class="table table-hover">
                 <thead class="thead-dark">
-                    <tr>
-                        <th scope="col">FileName</th>
-                        <th scope="col">Extension</th>
-                        <th scope="col">Size</th>
-                        <th scope="col">UploadedOn</th>
-                        <th scope="col">
-                            @if (Model.Status == DocumentStatus.Created || Model.Status == DocumentStatus.UnLocked)
-                            {
-                                <a asp-controller="Documents" asp-action="AddPage" asp-route-documentid="@Model.Id" class="btn btn-info">
-                                    <i class="fa fa-plus"></i>
-                                </a>
-                            }
-                        </th>
-                    </tr>
+                <tr>
+                    <th scope="col">FileName</th>
+                    <th scope="col">Extension</th>
+                    <th scope="col">Size</th>
+                    <th scope="col">UploadedOn</th>
+                    <th scope="col">
+                        @if (Model.Status == DocumentStatus.Created || Model.Status == DocumentStatus.UnLocked)
+                        {
+                            <a asp-controller="Documents" asp-action="AddPage" asp-route-documentid="@Model.Id" class="btn btn-info">
+                                <i class="fa fa-plus"></i>
+                            </a>
+                        }
+                    </th>
+                </tr>
                 </thead>
                 <tbody>
-                    @foreach (var docPage in Model.Pages)
-                    {
-                        <tr>
-                            <th scope="row">@docPage.FileName</th>
-                            <td>@docPage.Extension</td>
-                            <td>@(docPage.Size)kb</td>
-                            <td>@docPage.UploadedOn</td>
-                            <td>
-                                @using (Html.BeginForm("DownloadPage", "Documents", new { documentId = Model.Id, pageId = docPage.Id }, FormMethod.Post, true, new { @class = "form d-inline" }))
+                @foreach (var docPage in Model.Pages)
+                {
+                    <tr>
+                        <th scope="row">@docPage.FileName</th>
+                        <td>@docPage.Extension</td>
+                        <td>@(docPage.Size)kb</td>
+                        <td>@docPage.UploadedOn</td>
+                        <td>
+                            @using (Html.BeginForm("DownloadPage", "Documents", new {documentId = Model.Id, pageId = docPage.Id}, FormMethod.Post, true, new {@class = "form d-inline"}))
+                            {
+                                <button type="submit" class="btn btn-info">
+                                    <i class="fa fa-download"></i>
+                                </button>
+                            }
+                            @if (Model.Status == DocumentStatus.Created || Model.Status == DocumentStatus.UnLocked)
+                            {
+                                @using (Html.BeginForm("DeletePage", "Documents", new {documentId = Model.Id, pageId = docPage.Id}, FormMethod.Post, true, new {@class = "form d-inline"}))
                                 {
-                                    <button type="submit" class="btn btn-info">
-                                        <i class="fa fa-download"></i>
+                                    <button type="submit" class="btn btn-danger">
+                                        <i class="fa fa-trash"></i>
                                     </button>
                                 }
-                                @if (Model.Status == DocumentStatus.Created || Model.Status == DocumentStatus.UnLocked)
-                                {
-                                    @using (Html.BeginForm("DeletePage", "Documents", new { documentId = Model.Id, pageId = docPage.Id }, FormMethod.Post, true, new { @class = "form d-inline" }))
-                                    {
-                                        <button type="submit" class="btn btn-danger">
-                                            <i class="fa fa-trash"></i>
-                                        </button>
-                                    }
-                                }
-                            </td>
-                        </tr>
-                    }
+                            }
+                        </td>
+                    </tr>
+                }
                 </tbody>
             </table>
         </div>

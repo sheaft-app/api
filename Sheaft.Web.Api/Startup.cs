@@ -227,7 +227,7 @@ namespace Sheaft.Web.Api
             });
 
             services.AddAutoMapper(typeof(ProductProfile).Assembly);
-            services.AddMediatR(new List<Assembly>() { typeof(RegisterStoreCommand).Assembly, typeof(UserPointsCreatedEvent).Assembly, typeof(UserCommandsHandler).Assembly }.ToArray());
+            services.AddMediatR(new List<Assembly>() { typeof(RegisterStoreCommand).Assembly, typeof(UserPointsCreatedEvent).Assembly, typeof(RegisterProducerCommand).Assembly }.ToArray());
             services.AddHttpClient();
 
             var databaseConfig = appDatabaseSettings.Get<AppDatabaseOptions>();
@@ -242,7 +242,6 @@ namespace Sheaft.Web.Api
             }, ServiceLifetime.Scoped);
 
             services.AddScoped<IIdentifierService, IdentifierService>();
-            services.AddScoped<IQueueService, QueueService>();
             services.AddScoped<IBlobService, BlobService>();
             services.AddScoped<IEmailService, EmailService>();
             services.AddScoped<ISignalrService, SignalrService>();
@@ -254,7 +253,7 @@ namespace Sheaft.Web.Api
             services.AddScoped<IAuthService, AuthService>();
 
             services.AddScoped<IAgreementQueries, AgreementQueries>();
-            services.AddScoped<IBusinessQueries, BusinessQueries>();
+            services.AddScoped<IProducerQueries, ProducerQueries>();
             services.AddScoped<IDeliveryQueries, DeliveryQueries>();
             services.AddScoped<IDepartmentQueries, DepartmentQueries>();
             services.AddScoped<IJobQueries, JobQueries>();
@@ -271,7 +270,7 @@ namespace Sheaft.Web.Api
             services.AddScoped<INationalityQueries, NationalityQueries>();
             services.AddScoped<ICountryQueries, CountryQueries>();
             services.AddScoped<IOrderQueries, OrderQueries>();
-            services.AddScoped<ITransactionQueries, TransactionQueries>();
+            services.AddScoped<IPayinQueries, PayinQueries>();
             services.AddScoped<IDocumentQueries, DocumentQueries>();
             services.AddScoped<ILegalQueries, LegalQueries>();
 

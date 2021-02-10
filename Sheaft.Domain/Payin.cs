@@ -1,8 +1,8 @@
 ﻿using Sheaft.Domain.Enums;
-using Sheaft.Exceptions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Sheaft.Domains.Exceptions;
 
 namespace Sheaft.Domain.Models
 {
@@ -22,6 +22,8 @@ namespace Sheaft.Domain.Models
             Debited = order.TotalPrice;
             CreditedWallet = creditedWallet;
             Reference = "SHEAFT";
+
+            _refunds = new List<PayinRefund>();
         }
 
         public virtual Wallet CreditedWallet { get; private set; }
