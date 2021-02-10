@@ -66,7 +66,7 @@ namespace Sheaft.Application.Order.Commands
 
                 var invalidProductIds = products
                     .Where(p => p.RemovedOn.HasValue || !p.Available || !p.VisibleToStores ||
-                                p.Producer.RemovedOn.HasValue || !p.Producer.CanDirectSell)
+                                p.Producer.RemovedOn.HasValue)
                     .Select(p => p.Id.ToString("N"));
                 if (invalidProductIds.Any())
                     return Failure<IEnumerable<Guid>>(MessageKind.Order_CannotCreate_Some_Products_Invalid,

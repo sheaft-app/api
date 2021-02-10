@@ -13,6 +13,7 @@ using Sheaft.Application.Common.Interfaces;
 using Sheaft.Application.Common.Interfaces.Services;
 using Sheaft.Application.Common.Models;
 using Sheaft.Application.Common.Models.Inputs;
+using Sheaft.Application.Producer.Commands;
 using Sheaft.Domain;
 using Sheaft.Domain.Enum;
 
@@ -77,18 +78,9 @@ namespace Sheaft.Application.DeliveryMode.Commands
                 entity.SetOpeningHours(openingHours);
             }
 
-            if (request.Kind == DeliveryKind.Collective || request.Kind == DeliveryKind.Farm ||
-                request.Kind == DeliveryKind.Market)
-                entity.Producer.CanDirectSell = true;
-            else
-            {
-                entity.Producer.CanDirectSell = await _context.DeliveryModes.AnyAsync(
-                    c => !c.RemovedOn.HasValue && c.Producer.Id == entity.Producer.Id &&
-                         (c.Kind == DeliveryKind.Collective || c.Kind == DeliveryKind.Farm ||
-                          c.Kind == DeliveryKind.Market), token);
-            }
-
             await _context.SaveChangesAsync(token);
+            
+            _mediatr.Post(new UpdateProducerAvailabilityCommand(request.RequestUser) {ProducerId = entity.Producer.Id});
             return Success();
         }
     }

@@ -23,6 +23,7 @@ namespace Sheaft.Domain
 
         public virtual IReadOnlyCollection<ProducerTag> Tags => _tags?.AsReadOnly();
 
+        public bool HasProducts { get; set; }
         public bool CanDirectSell { get; set; }
         public bool NotSubjectToVat { get; private set; }
 

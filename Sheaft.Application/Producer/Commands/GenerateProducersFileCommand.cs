@@ -61,17 +61,19 @@ namespace Sheaft.Application.Producer.Commands
 
         internal class ProducerListItem
         {
-            internal ProducerListItem(Domain.User user)
+            internal ProducerListItem(Domain.Producer user)
             {
                 Address = new AddressItem(user.Address);
                 Id = user.Id.ToString("N");
                 Name = user.Name;
                 Picture = user.Picture;
+                HasProducts = user.HasProducts;
             }
 
             public string Id { get; set; }
             public string Name { get; set; }
             public string Picture { get; set; }
+            public bool HasProducts { get; set; }
             public AddressItem Address { get; set; }
         }
 

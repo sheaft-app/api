@@ -121,6 +121,9 @@ namespace Sheaft.Application.Product.Commands
                     _mediatr.Post(new UpdateProducerTagsCommand(request.RequestUser)
                         {ProducerId = request.ProducerId});
 
+                _mediatr.Post(new UpdateProducerProductsCommand(request.RequestUser)
+                    {ProducerId = request.ProducerId});
+
                 return Success(entity.Id);
             }
         }
