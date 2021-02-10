@@ -30,6 +30,7 @@ using Newtonsoft.Json;
 using RazorLight;
 using Serilog;
 using Serilog.Events;
+using Sheaft.Application.Common.Behaviours;
 using Sheaft.Application.Common.Interfaces;
 using Sheaft.Application.Common.Interfaces.Services;
 using Sheaft.Application.Common.Mappings;
@@ -109,10 +110,10 @@ namespace Sheaft.Web.Jobs
             services.Configure<PspOptions>(pspSettings);
 
             var authSettings = Configuration.GetSection(AuthOptions.SETTING);
-            services.Configure<AuthOptions>(pspSettings);
+            services.Configure<AuthOptions>(authSettings);
 
             var roleSettings = Configuration.GetSection(RoleOptions.SETTING);
-            services.Configure<RoleOptions>(pspSettings);
+            services.Configure<RoleOptions>(roleSettings);
 
             var jobsDatabaseSettings = Configuration.GetSection(JobsDatabaseOptions.SETTING);
             services.Configure<JobsDatabaseOptions>(jobsDatabaseSettings);
@@ -192,7 +193,7 @@ namespace Sheaft.Web.Jobs
                 });
 
             services.AddAutoMapper(typeof(ProductProfile).Assembly);
-            services.AddMediatR(new List<Assembly>() { typeof(RegisterStoreCommand).Assembly, typeof(UserPointsCreatedEvent).Assembly, typeof(RegisterProducerCommand).Assembly }.ToArray());
+            services.AddMediatR(new List<Assembly>() { typeof(RegisterStoreCommand).Assembly }.ToArray());
 
             services.AddMemoryCache();
             services.AddHttpClient();
@@ -225,9 +226,15 @@ namespace Sheaft.Web.Jobs
             services.AddScoped<ICapingDeliveriesService, CapingDeliveriesService>();
             services.AddScoped<ISheaftMediatr, SheaftMediatr>();
             services.AddScoped<IAuthService, AuthService>();
+            services.AddSingleton<ICurrentUserService, CurrentUserService>();
             services.AddScoped<ISheaftHangfireBridge, SheaftHangfireBridge>();
             services.AddScoped<IBackgroundJobClient, BackgroundJobClient>();
 
+            services.AddTransient(typeof(IPipelineBehavior<,>), typeof(UnhandledExceptionBehaviour<,>));
+            services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehaviour<,>));
+            services.AddTransient(typeof(IPipelineBehavior<,>), typeof(PerformanceBehaviour<,>));
+            services.AddTransient(typeof(IPipelineBehavior<,>), typeof(LoggingBehaviour<,>));
+            
             var storageConfig = storageSettings.Get<StorageOptions>();
             services.AddSingleton<CloudStorageAccount>(CloudStorageAccount.Parse(storageConfig.ConnectionString));
 

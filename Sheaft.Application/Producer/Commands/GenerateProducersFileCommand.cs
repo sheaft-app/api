@@ -79,6 +79,9 @@ namespace Sheaft.Application.Producer.Commands
         {
             internal AddressItem(UserAddress address)
             {
+                if (address == null)
+                    return;
+                
                 Line1 = address.Line1;
                 Line2 = address.Line2;
                 Zipcode = address.Zipcode;

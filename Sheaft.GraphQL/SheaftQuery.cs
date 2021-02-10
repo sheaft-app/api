@@ -18,19 +18,19 @@ namespace Sheaft.GraphQL
 {
     public class SheaftQuery
     {
-        private readonly IAuthService _authService;
+        private readonly ICurrentUserService _currentUserService;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly ILogger<SheaftQuery> _logger;
 
         private CancellationToken Token => _httpContextAccessor.HttpContext.RequestAborted;
-        private RequestUser CurrentUser => _authService.GetCurrentUserInfo().Data;
+        private RequestUser CurrentUser => _currentUserService.GetCurrentUserInfo().Data;
 
         public SheaftQuery(
-            IAuthService authService,
+            ICurrentUserService currentUserService,
             IHttpContextAccessor httpContextAccessor, 
             ILogger<SheaftQuery> logger)
         {
-            _authService = authService;
+            _currentUserService = currentUserService;
             _httpContextAccessor = httpContextAccessor;
             _logger = logger;
         }

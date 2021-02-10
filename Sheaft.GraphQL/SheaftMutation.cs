@@ -38,21 +38,21 @@ namespace Sheaft.GraphQL
     {
         private readonly ISheaftMediatr _mediator;
         private readonly IMapper _mapper;
-        private readonly IAuthService _authService;
+        private readonly ICurrentUserService _currentUserService;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private CancellationToken Token => _httpContextAccessor.HttpContext.RequestAborted;
 
-        private RequestUser CurrentUser => _authService.GetCurrentUserInfo().Data;
+        private RequestUser CurrentUser => _currentUserService.GetCurrentUserInfo().Data;
 
         public SheaftMutation(
             ISheaftMediatr mediator,
             IMapper mapper,
-            IAuthService authService,
+            ICurrentUserService currentUserService,
             IHttpContextAccessor httpContextAccessor)
         {
             _mediator = mediator;
             _mapper = mapper;
-            _authService = authService;
+            _currentUserService = currentUserService;
             _httpContextAccessor = httpContextAccessor;
         }
 

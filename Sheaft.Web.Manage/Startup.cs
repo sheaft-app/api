@@ -215,7 +215,7 @@ namespace Sheaft.Web.Manage
                     };
                 });
 
-            services.AddMediatR(new List<Assembly>() { typeof(RegisterStoreCommand).Assembly, typeof(UserPointsCreatedEvent).Assembly, typeof(RegisterProducerCommand).Assembly }.ToArray());
+            services.AddMediatR(new List<Assembly>() { typeof(RegisterStoreCommand).Assembly }.ToArray());
             
             services.AddScoped<IBackgroundJobClient, BackgroundJobClient>();
             services.AddScoped<ISheaftHangfireBridge, SheaftHangfireBridge>();
@@ -253,6 +253,7 @@ namespace Sheaft.Web.Manage
             services.AddScoped<IPspService, PspService>();
             services.AddScoped<ISheaftMediatr, SheaftMediatr>();
             services.AddScoped<IAuthService, AuthService>();
+            services.AddSingleton<ICurrentUserService, CurrentUserService>();
             services.AddScoped<IFeesService, FeesService>();
             services.AddScoped<ICapingDeliveriesService, CapingDeliveriesService>();
 

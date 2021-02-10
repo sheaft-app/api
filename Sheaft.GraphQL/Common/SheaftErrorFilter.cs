@@ -15,17 +15,17 @@ namespace Sheaft.GraphQL.Common
     public class SheaftErrorFilter : IErrorFilter
     {
         private readonly IStringLocalizer<MessageResources> _localizer;
-        private readonly IAuthService _authService;
+        private readonly ICurrentUserService _currentUserService;
         private readonly IHttpContextAccessor _httpContextAccessor;
 
-        private RequestUser CurrentUser => _authService.GetCurrentUserInfo().Data;
+        private RequestUser CurrentUser => _currentUserService.GetCurrentUserInfo().Data;
 
         public SheaftErrorFilter(
-            IAuthService authService,
+            ICurrentUserService currentUserService,
             IStringLocalizer<MessageResources> localizer,
             IHttpContextAccessor httpContextAccessor)
         {
-            _authService = authService;
+            _currentUserService = currentUserService;
             _httpContextAccessor = httpContextAccessor;
             _localizer = localizer;
         }

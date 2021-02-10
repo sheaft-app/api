@@ -21,18 +21,18 @@ namespace Sheaft.Web.Api.Controllers
     public class UploadController : Controller
     {
         private readonly ISheaftMediatr _mediatr;
-        private readonly IAuthService _authService;
+        private readonly ICurrentUserService _currentUserService;
         private readonly IHttpContextAccessor _httpContextAccessor;
 
-        private RequestUser CurrentUser => _authService.GetCurrentUserInfo().Data;
+        private RequestUser CurrentUser => _currentUserService.GetCurrentUserInfo().Data;
 
         public UploadController(
             ISheaftMediatr mediatr,
-            IAuthService authService,
+            ICurrentUserService currentUserService,
             IHttpContextAccessor httpContextAccessor)
         {
             _mediatr = mediatr;
-            _authService = authService;
+            _currentUserService = currentUserService;
             _httpContextAccessor = httpContextAccessor;
         }
 
