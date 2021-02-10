@@ -7,24 +7,29 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Sheaft.Core;
 using Newtonsoft.Json;
-using Sheaft.Application.Interop;
-using Sheaft.Domain.Enums;
-using Sheaft.Options;
+using Sheaft.Application.Common;
+using Sheaft.Application.Common.Extensions;
+using Sheaft.Application.Common.Handlers;
+using Sheaft.Application.Common.Interfaces;
+using Sheaft.Application.Common.Interfaces.Services;
+using Sheaft.Application.Common.Models;
+using Sheaft.Application.Common.Options;
+using Sheaft.Domain;
+using Sheaft.Domain.Enum;
 
-namespace Sheaft.Application.Commands
+namespace Sheaft.Application.Payin.Commands
 {
-    public class CheckPayinsCommand : Command<bool>
+    public class CheckPayinsCommand : Command
     {
         [JsonConstructor]
         public CheckPayinsCommand(RequestUser requestUser) : base(requestUser)
         {
         }
     }
-    
+
     public class CheckPayinsCommandHandler : CommandsHandler,
-        IRequestHandler<CheckPayinsCommand, Result<bool>>
+        IRequestHandler<CheckPayinsCommand, Result>
     {
         private readonly IPspService _pspService;
         private readonly RoutineOptions _routineOptions;
@@ -41,30 +46,27 @@ namespace Sheaft.Application.Commands
             _routineOptions = routineOptions.Value;
         }
 
-        public async Task<Result<bool>> Handle(CheckPayinsCommand request, CancellationToken token)
+        public async Task<Result> Handle(CheckPayinsCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(request, async () =>
+            var skip = 0;
+            const int take = 100;
+
+            var payinIds = await GetNextPayinIdsAsync(skip, take, token);
+            while (payinIds.Any())
             {
-                var skip = 0;
-                const int take = 100;
-
-                var payinIds = await GetNextPayinIdsAsync(skip, take, token);
-                while (payinIds.Any())
+                foreach (var payinId in payinIds)
                 {
-                    foreach (var payinId in payinIds)
+                    _mediatr.Post(new CheckPayinCommand(request.RequestUser)
                     {
-                        _mediatr.Post(new CheckPayinCommand(request.RequestUser)
-                        {
-                            PayinId = payinId
-                        });
-                    }
-
-                    skip += take;
-                    payinIds = await GetNextPayinIdsAsync(skip, take, token);
+                        PayinId = payinId
+                    });
                 }
 
-                return Ok(true);
-            });
+                skip += take;
+                payinIds = await GetNextPayinIdsAsync(skip, take, token);
+            }
+
+            return Success();
         }
 
         private async Task<IEnumerable<Guid>> GetNextPayinIdsAsync(int skip, int take, CancellationToken token)

@@ -1,9 +1,11 @@
 ﻿using AutoMapper;
-using Sheaft.Application.Commands;
-using Sheaft.Domain.Models;
-using Sheaft.Application.Models;
+using Sheaft.Application.Common.Models.Dto;
+using Sheaft.Application.Common.Models.Inputs;
+using Sheaft.Application.Common.Models.ViewModels;
+using Sheaft.Application.Legal.Commands;
+using Sheaft.Domain;
 
-namespace Sheaft.Application.Mappers
+namespace Sheaft.Application.Common.Mappings
 {
     public class ConsumerLegalProfile : Profile
     {
@@ -17,7 +19,7 @@ namespace Sheaft.Application.Mappers
                 .IncludeBase<ConsumerLegal, LegalViewModel>();
 
             CreateMap<ConsumerLegal, ConsumerLegalDto>()
-                .IncludeBase<Legal, BaseLegalDto>();
+                .IncludeBase<Domain.Legal, BaseLegalDto>();
 
             CreateMap<CreateConsumerLegalInput, CreateConsumerLegalCommand>();
             CreateMap<UpdateConsumerLegalInput, UpdateConsumerLegalCommand>();

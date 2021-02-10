@@ -1,8 +1,7 @@
 ﻿using HotChocolate.Types;
-using Sheaft.Application.Models;
-using Sheaft.GraphQL.Filters;
+using Sheaft.Application.Common.Models.Dto;
 
-namespace Sheaft.GraphQL.Types
+namespace Sheaft.GraphQL.Types.Outputs
 {
 
     public class ProducerSummaryType : SheaftOutputType<ProducerSummaryDto>

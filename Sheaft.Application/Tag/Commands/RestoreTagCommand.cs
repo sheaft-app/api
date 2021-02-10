@@ -1,16 +1,20 @@
-﻿using Newtonsoft.Json;
-using Sheaft.Core;
-using System;
+﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using Sheaft.Application.Interop;
+using Newtonsoft.Json;
+using Sheaft.Application.Common;
+using Sheaft.Application.Common.Handlers;
+using Sheaft.Application.Common.Interfaces;
+using Sheaft.Application.Common.Interfaces.Services;
+using Sheaft.Application.Common.Models;
+using Sheaft.Domain;
 
-namespace Sheaft.Application.Commands
+namespace Sheaft.Application.Tag.Commands
 {
-    public class RestoreTagCommand : Command<bool>
+    public class RestoreTagCommand : Command
     {
         [JsonConstructor]
         public RestoreTagCommand(RequestUser requestUser) : base(requestUser)
@@ -21,7 +25,7 @@ namespace Sheaft.Application.Commands
     }
     
     public class RestoreTagCommandHandler : CommandsHandler,
-        IRequestHandler<RestoreTagCommand, Result<bool>>
+        IRequestHandler<RestoreTagCommand, Result>
     {
         public RestoreTagCommandHandler(
             ISheaftMediatr mediatr,
@@ -31,16 +35,13 @@ namespace Sheaft.Application.Commands
         {
         }
 
-        public async Task<Result<bool>> Handle(RestoreTagCommand request, CancellationToken token)
+        public async Task<Result> Handle(RestoreTagCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(request, async () =>
-            {
                 var entity = await _context.Tags.SingleOrDefaultAsync(a => a.Id == request.Id && a.RemovedOn.HasValue, token);
                 _context.Restore(entity);
 
                 await _context.SaveChangesAsync(token);
-                return Ok(true);
-            });
+                return Success();
         }
     }
 }

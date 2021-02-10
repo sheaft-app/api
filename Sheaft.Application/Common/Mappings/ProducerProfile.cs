@@ -1,10 +1,12 @@
-﻿using AutoMapper;
-using Sheaft.Application.Commands;
-using Sheaft.Domain.Models;
-using Sheaft.Application.Models;
-using System.Linq;
+﻿using System.Linq;
+using AutoMapper;
+using Sheaft.Application.Common.Models.Dto;
+using Sheaft.Application.Common.Models.Inputs;
+using Sheaft.Application.Common.Models.ViewModels;
+using Sheaft.Application.Producer.Commands;
+using Sheaft.Domain;
 
-namespace Sheaft.Application.Mappers
+namespace Sheaft.Application.Common.Mappings
 {
     public class ProducerProfile : Profile
     {
@@ -13,20 +15,20 @@ namespace Sheaft.Application.Mappers
             CreateMap<Business, ProducerViewModel>()
                   .ForMember(d => d.Address, opt => opt.MapFrom(r => r.Address));
 
-            CreateMap<Producer, ProducerViewModel>()
+            CreateMap<Domain.Producer, ProducerViewModel>()
                 .IncludeBase<Business, ProducerViewModel>()
                   .ForMember(d => d.Tags, opt => opt.MapFrom(r => r.Tags.Select(t => t.Tag.Id)));
 
-            CreateMap<Producer, UserProfileDto>();
+            CreateMap<Domain.Producer, UserProfileDto>();
 
-            CreateMap<Producer, UserDto>()
+            CreateMap<Domain.Producer, UserDto>()
                 .ForMember(d => d.Address, opt => opt.MapFrom(r => r.Address));
 
-            CreateMap<Producer, ProducerDto>()
+            CreateMap<Domain.Producer, ProducerDto>()
                 .ForMember(d => d.Address, opt => opt.MapFrom(r => r.Address))
                 .ForMember(d => d.Tags, opt => opt.MapFrom(r => r.Tags.Select(t => t.Tag)));
 
-            CreateMap<Producer, ProducerSummaryDto>()
+            CreateMap<Domain.Producer, ProducerSummaryDto>()
                 .ForMember(d => d.Address, opt => opt.MapFrom(r => r.Address));
 
             CreateMap<RegisterProducerInput, RegisterProducerCommand>();

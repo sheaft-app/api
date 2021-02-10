@@ -1,12 +1,7 @@
 ﻿using HotChocolate.Types;
-using HotChocolate.Types.Relay;
-using Sheaft.Application.Models;
-using Sheaft.Application.Queries;
-using Sheaft.GraphQL.Enums;
-using Sheaft.GraphQL.Filters;
-using Sheaft.GraphQL.Sorts;
+using Sheaft.Application.Common.Models.Dto;
 
-namespace Sheaft.GraphQL.Types
+namespace Sheaft.GraphQL.Types.Outputs
 {
     public class UserPositionType : SheaftOutputType<UserPositionDto>
     {

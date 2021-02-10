@@ -1,5 +1,5 @@
-using Sheaft.Domain.Enums;
 using System;
+using Sheaft.Domain.Enum;
 
 namespace Sheaft.Domain.Views
 {

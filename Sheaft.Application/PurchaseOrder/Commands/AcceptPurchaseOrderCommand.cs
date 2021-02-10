@@ -5,14 +5,17 @@ using System.Threading.Tasks;
 using MediatR;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using Sheaft.Application.Events;
-using Sheaft.Application.Interop;
-using Sheaft.Core;
-using Sheaft.Domain.Models;
+using Sheaft.Application.Common;
+using Sheaft.Application.Common.Handlers;
+using Sheaft.Application.Common.Interfaces;
+using Sheaft.Application.Common.Interfaces.Services;
+using Sheaft.Application.Common.Models;
+using Sheaft.Domain;
+using Sheaft.Domain.Events.PurchaseOrder;
 
-namespace Sheaft.Application.Commands
+namespace Sheaft.Application.PurchaseOrder.Commands
 {
-    public class AcceptPurchaseOrderCommand : Command<bool>
+    public class AcceptPurchaseOrderCommand : Command
     {
         [JsonConstructor]
         public AcceptPurchaseOrderCommand(RequestUser requestUser) : base(requestUser)
@@ -22,9 +25,9 @@ namespace Sheaft.Application.Commands
         public Guid Id { get; set; }
         public bool SkipNotification { get; set; }
     }
-    
+
     public class AcceptPurchaseOrderCommandHandler : CommandsHandler,
-        IRequestHandler<AcceptPurchaseOrderCommand, Result<bool>>
+        IRequestHandler<AcceptPurchaseOrderCommand, Result>
     {
         private readonly ICapingDeliveriesService _capingDeliveriesService;
 
@@ -37,26 +40,22 @@ namespace Sheaft.Application.Commands
         {
             _capingDeliveriesService = capingDeliveriesService;
         }
-        
-        public async Task<Result<bool>> Handle(AcceptPurchaseOrderCommand request, CancellationToken token)
+
+        public async Task<Result> Handle(AcceptPurchaseOrderCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(request, async () =>
-            {
-                var purchaseOrder = await _context.GetByIdAsync<PurchaseOrder>(request.Id, token);
-                purchaseOrder.Accept();
+            var purchaseOrder = await _context.GetByIdAsync<Domain.PurchaseOrder>(request.Id, token);
+            purchaseOrder.Accept(request.SkipNotification);
 
-                await _context.SaveChangesAsync(token);
-                
-                if(!request.SkipNotification)
-                    _mediatr.Post(new PurchaseOrderAcceptedEvent(request.RequestUser) { PurchaseOrderId = purchaseOrder.Id });
+            await _context.SaveChangesAsync(token);
 
-                var order = await _context.GetSingleAsync<Order>(o => o.PurchaseOrders.Any(po => po.Id == purchaseOrder.Id), token);
-                var delivery = order.Deliveries.FirstOrDefault(d => d.DeliveryMode.Producer.Id == purchaseOrder.Vendor.Id);
-                if (delivery.DeliveryMode.AutoCompleteRelatedPurchaseOrder)
-                    _mediatr.Post(new CompletePurchaseOrderCommand(request.RequestUser) { Id = purchaseOrder.Id, SkipNotification = request.SkipNotification });
+            var order = await _context.GetSingleAsync<Domain.Order>(o => o.PurchaseOrders.Any(po => po.Id == purchaseOrder.Id),
+                token);
+            var delivery = order.Deliveries.FirstOrDefault(d => d.DeliveryMode.Producer.Id == purchaseOrder.Vendor.Id);
+            if (delivery.DeliveryMode.AutoCompleteRelatedPurchaseOrder)
+                _mediatr.Post(new CompletePurchaseOrderCommand(request.RequestUser)
+                    {Id = purchaseOrder.Id, SkipNotification = request.SkipNotification});
 
-                return Ok(true);
-            });
+            return Success();
         }
     }
 }

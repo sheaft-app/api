@@ -4,15 +4,17 @@ using System.Threading.Tasks;
 using MediatR;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Sheaft.Core;
 using Newtonsoft.Json;
-using Sheaft.Application.Interop;
-using Sheaft.Domain.Enums;
-using Sheaft.Domain.Models;
-using Sheaft.Exceptions;
-using Sheaft.Options;
+using Sheaft.Application.Common;
+using Sheaft.Application.Common.Handlers;
+using Sheaft.Application.Common.Interfaces;
+using Sheaft.Application.Common.Interfaces.Services;
+using Sheaft.Application.Common.Models;
+using Sheaft.Application.Common.Options;
+using Sheaft.Domain;
+using Sheaft.Domain.Enum;
 
-namespace Sheaft.Application.Commands
+namespace Sheaft.Application.Payin.Commands
 {
     public class CreateWebPayinCommand : Command<Guid>
     {
@@ -23,7 +25,7 @@ namespace Sheaft.Application.Commands
 
         public Guid OrderId { get; set; }
     }
-    
+
     public class CreateWebPayinCommandHandler : CommandsHandler,
         IRequestHandler<CreateWebPayinCommand, Result<Guid>>
     {
@@ -44,39 +46,36 @@ namespace Sheaft.Application.Commands
 
         public async Task<Result<Guid>> Handle(CreateWebPayinCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(request, async () =>
-            {
-                var order = await _context.GetByIdAsync<Order>(request.OrderId, token);
-                if(order.Status == OrderStatus.Validated)
-                    return BadRequest<Guid>(MessageKind.Payin_CannotCreate_Order_Already_Validated);
+            var order = await _context.GetByIdAsync<Domain.Order>(request.OrderId, token);
+            if (order.Status == OrderStatus.Validated)
+                return Failure<Guid>(MessageKind.Payin_CannotCreate_Order_Already_Validated);
 
-                var wallet = await _context.GetSingleAsync<Wallet>(c => c.User.Id == request.RequestUser.Id, token);
+            var wallet = await _context.GetSingleAsync<Domain.Wallet>(c => c.User.Id == request.RequestUser.Id, token);
 
-                if (order.TotalOnSalePrice < 1)
-                    return BadRequest<Guid>(MessageKind.Order_Total_CannotBe_LowerThan, 1);
+            if (order.TotalOnSalePrice < 1)
+                return Failure<Guid>(MessageKind.Order_Total_CannotBe_LowerThan, 1);
 
-                var webPayin = new WebPayin(Guid.NewGuid(), wallet, order);
+            var webPayin = new WebPayin(Guid.NewGuid(), wallet, order);
 
-                await _context.AddAsync(webPayin, token);
-                await _context.SaveChangesAsync(token);
+            await _context.AddAsync(webPayin, token);
+            await _context.SaveChangesAsync(token);
 
-                order.SetPayin(webPayin);
+            order.SetPayin(webPayin);
 
-                var legal = await _context.GetSingleAsync<Legal>(c => c.Owner.Id == request.RequestUser.Id, token);
-                var result = await _pspService.CreateWebPayinAsync(webPayin, legal.Owner, token);
-                if (!result.Success)
-                    return Failed<Guid>(result.Exception);
+            var legal = await _context.GetSingleAsync<Domain.Legal>(c => c.Owner.Id == request.RequestUser.Id, token);
+            var result = await _pspService.CreateWebPayinAsync(webPayin, legal.Owner, token);
+            if (!result.Succeeded)
+                return Failure<Guid>(result.Exception);
 
-                webPayin.SetResult(result.Data.ResultCode, result.Data.ResultMessage);
-                webPayin.SetIdentifier(result.Data.Identifier);
-                webPayin.SetRedirectUrl(result.Data.RedirectUrl);
-                webPayin.SetStatus(result.Data.Status);
-                webPayin.SetCreditedAmount(result.Data.Credited);
-                webPayin.SetExecutedOn(result.Data.ProcessedOn);
+            webPayin.SetResult(result.Data.ResultCode, result.Data.ResultMessage);
+            webPayin.SetIdentifier(result.Data.Identifier);
+            webPayin.SetRedirectUrl(result.Data.RedirectUrl);
+            webPayin.SetStatus(result.Data.Status);
+            webPayin.SetCreditedAmount(result.Data.Credited);
+            webPayin.SetExecutedOn(result.Data.ProcessedOn);
 
-                await _context.SaveChangesAsync(token);
-                return Ok(webPayin.Id);
-            });
+            await _context.SaveChangesAsync(token);
+            return Success(webPayin.Id);
         }
     }
 }

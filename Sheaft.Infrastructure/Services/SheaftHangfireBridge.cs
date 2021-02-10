@@ -1,13 +1,15 @@
-﻿using System.ComponentModel;
+﻿using System;
+using System.ComponentModel;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
-using Sheaft.Core;
-using Sheaft.Domain.Enums;
-using Sheaft.Domain.Models.Common;
-using Sheaft.Exceptions;
+using Sheaft.Application.Common.Interfaces.Services;
+using Sheaft.Application.Common.Models;
+using Sheaft.Domain.Common;
+using Sheaft.Domain.Enum;
+using Sheaft.Domain.Exceptions;
 
-namespace Sheaft.Application.Interop
+namespace Sheaft.Infrastructure.Services
 {
     public class SheaftHangfireBridge : ISheaftHangfireBridge
     {
@@ -22,18 +24,37 @@ namespace Sheaft.Application.Interop
         public async Task<Result<T>> Execute<T>(string jobname, IRequest<Result<T>> data, CancellationToken token)
         {
             var result = await _mediatr.Send(data, token);
-            if (!result.Success && result.Exception != null)
-                throw result.Exception;
-            else if (!result.Success)
-                throw new UnexpectedException(MessageKind.Unexpected);
+            if (result.Succeeded)
+                return result;
 
-            return result;
+            if (result.Exception != null)
+                throw result.Exception;
+
+            throw SheaftException.Unexpected(MessageKind.Unexpected);
+        }
+
+        public async Task<Result> Execute(string jobname, IRequest<Result> data, CancellationToken token)
+        {
+            var result = await _mediatr.Send(data, token);
+            if (result.Succeeded)
+                return result;
+
+            if (result.Exception != null)
+                throw result.Exception;
+
+            throw SheaftException.Unexpected(MessageKind.Unexpected);
         }
 
         [DisplayName("{0}")]
         public async Task Execute(string jobname, DomainEvent data, CancellationToken token)
         {
-            await _mediatr.Publish(data, token);
+            await _mediatr.Publish(GetNotificationCorrespondingToDomainEvent(data), token);
+        }
+
+        private INotification GetNotificationCorrespondingToDomainEvent(DomainEvent domainEvent)
+        {
+            return (INotification)Activator.CreateInstance(
+                typeof(DomainEventNotification<>).MakeGenericType(domainEvent.GetType()), domainEvent);
         }
     }
 }

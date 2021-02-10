@@ -1,6 +1,6 @@
-﻿using Sheaft.Domain.Enums;
+﻿using Sheaft.Domain.Enum;
 
-namespace Sheaft.Domains.Exceptions
+namespace Sheaft.Domain.Exceptions
 {
 #pragma warning disable RCS1194 // Implement exception constructors.
     public class ValidationException : SheaftException

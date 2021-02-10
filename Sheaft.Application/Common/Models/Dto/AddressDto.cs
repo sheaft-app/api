@@ -1,8 +1,6 @@
-﻿using CleanArchitecture.Application.Common.Mappings;
-using Sheaft.Domain.Enums;
-using Sheaft.Domain.Models;
+﻿using Sheaft.Domain.Enum;
 
-namespace Sheaft.Application.Models
+namespace Sheaft.Application.Common.Models.Dto
 {
     public class AddressDto
     {

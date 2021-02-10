@@ -1,15 +1,14 @@
 ﻿using AutoMapper;
-using Sheaft.Domain.Models;
-using Sheaft.Application.Models;
+using Sheaft.Application.Common.Models.ViewModels;
 
-namespace Sheaft.Application.Mappers
+namespace Sheaft.Application.Common.Mappings
 {
     public class DonationProfile : Profile
     {
         public DonationProfile()
         {
-            CreateMap<Donation, DonationShortViewModel>();
-            CreateMap<Donation, DonationViewModel>()
+            CreateMap<Domain.Donation, DonationShortViewModel>();
+            CreateMap<Domain.Donation, DonationViewModel>()
                 .ForMember(m => m.Author, opt => opt.MapFrom(t => t.Author))
                 .ForMember(m => m.CreditedUser, opt => opt.MapFrom(t => t.CreditedWallet.User))
                 .ForMember(m => m.DebitedUser, opt => opt.MapFrom(t => t.DebitedWallet.User))

@@ -1,6 +1,6 @@
-﻿using Sheaft.Domain.Models;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Sheaft.Domain;
 
 namespace Sheaft.Infrastructure.Persistence.Configurations
 {
@@ -19,6 +19,8 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
             {
                 cb.ToTable("AgreementSelectedHours");
             });
+
+            entity.Ignore(c => c.DomainEvents);
 
             entity.HasOne(c => c.Delivery).WithMany().HasForeignKey("DeliveryModeUid").OnDelete(DeleteBehavior.NoAction);
             entity.HasOne(c => c.Store).WithMany().HasForeignKey("StoreUid").OnDelete(DeleteBehavior.Cascade);

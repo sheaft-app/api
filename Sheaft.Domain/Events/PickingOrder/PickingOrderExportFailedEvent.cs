@@ -1,17 +1,17 @@
 ﻿using System;
 using Newtonsoft.Json;
-using Sheaft.Core;
-using Sheaft.Domain.Models.Common;
+using Sheaft.Domain.Common;
 
-namespace Sheaft.Application.Events
+namespace Sheaft.Domain.Events.PickingOrder
 {
     public class PickingOrderExportFailedEvent : DomainEvent
     {
         [JsonConstructor]
-        public PickingOrderExportFailedEvent(RequestUser requestUser) : base(requestUser)
+        public PickingOrderExportFailedEvent(Guid jobId)
         {
+            JobId = jobId;
         }
 
-        public Guid JobId { get; set; }
+        public Guid JobId { get; }
     }
 }

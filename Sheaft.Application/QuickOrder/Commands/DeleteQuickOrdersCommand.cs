@@ -5,12 +5,16 @@ using System.Threading.Tasks;
 using MediatR;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using Sheaft.Application.Interop;
-using Sheaft.Core;
+using Sheaft.Application.Common;
+using Sheaft.Application.Common.Handlers;
+using Sheaft.Application.Common.Interfaces;
+using Sheaft.Application.Common.Interfaces.Services;
+using Sheaft.Application.Common.Models;
+using Sheaft.Domain;
 
-namespace Sheaft.Application.Commands
+namespace Sheaft.Application.QuickOrder.Commands
 {
-    public class DeleteQuickOrdersCommand : Command<bool>
+    public class DeleteQuickOrdersCommand : Command
     {
         [JsonConstructor]
         public DeleteQuickOrdersCommand(RequestUser requestUser) : base(requestUser)
@@ -19,9 +23,9 @@ namespace Sheaft.Application.Commands
 
         public IEnumerable<Guid> Ids { get; set; }
     }
-    
+
     public class DeleteQuickOrdersCommandHandler : CommandsHandler,
-        IRequestHandler<DeleteQuickOrdersCommand, Result<bool>>
+        IRequestHandler<DeleteQuickOrdersCommand, Result>
     {
         public DeleteQuickOrdersCommandHandler(
             ISheaftMediatr mediatr,
@@ -31,19 +35,16 @@ namespace Sheaft.Application.Commands
         {
         }
 
-        public async Task<Result<bool>> Handle(DeleteQuickOrdersCommand request, CancellationToken token)
+        public async Task<Result> Handle(DeleteQuickOrdersCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(request, async () =>
+            foreach (var id in request.Ids)
             {
-                foreach (var id in request.Ids)
-                {
-                    var result = await _mediatr.Process(new DeleteQuickOrderCommand(request.RequestUser) { Id = id }, token);
-                    if (!result.Success)
-                        return Failed<bool>(result.Exception);
-                }
+                var result = await _mediatr.Process(new DeleteQuickOrderCommand(request.RequestUser) {Id = id}, token);
+                if (!result.Succeeded)
+                    return Failure(result.Exception);
+            }
 
-                return Ok(true);
-            });
+            return Success();
         }
     }
 }

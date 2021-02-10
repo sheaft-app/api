@@ -1,17 +1,14 @@
-﻿using System.Linq;
-using System.Threading;
+﻿using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
-using Microsoft.Extensions.Options;
-using Sheaft.Application.Commands.Handlers;
-using Sheaft.Application.Events;
-using Sheaft.Application.Interop;
-using Sheaft.Application.Models;
-using Sheaft.Domain.Enums;
-using Sheaft.Domain.Models;
-using Sheaft.Options;
+using Sheaft.Application.Common.Handlers;
+using Sheaft.Application.Common.Interfaces;
+using Sheaft.Application.Common.Interfaces.Services;
+using Sheaft.Application.Common.Models;
+using Sheaft.Domain;
+using Sheaft.Domain.Events.Producer;
 
-namespace Sheaft.Application.Handlers
+namespace Sheaft.Application.Producer.EventHandlers
 {
     public class ProducerDeclarationNotValidatedEventHandler : EventsHandler,
         INotificationHandler<DomainEventNotification<ProducerDeclarationNotValidatedEvent>>

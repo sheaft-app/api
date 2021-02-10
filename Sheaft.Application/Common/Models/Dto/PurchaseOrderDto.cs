@@ -1,8 +1,8 @@
-﻿using Sheaft.Domain.Enums;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using Sheaft.Domain.Enum;
 
-namespace Sheaft.Application.Models
+namespace Sheaft.Application.Common.Models.Dto
 {
     public class PurchaseOrderDto
     {

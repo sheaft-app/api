@@ -3,14 +3,15 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Sheaft.Application.Interop;
-using Sheaft.Options;
 using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Sheaft.Domain.Enums;
-using Sheaft.Exceptions;
+using Sheaft.Application.Common.Interfaces;
+using Sheaft.Application.Common.Interfaces.Services;
+using Sheaft.Application.Common.Options;
+using Sheaft.Domain.Enum;
+using Sheaft.Domain.Exceptions;
 
 namespace Sheaft.Web.Manage.Controllers
 {
@@ -38,7 +39,7 @@ namespace Sheaft.Web.Manage.Controllers
                 .SingleOrDefaultAsync(token);
 
             if (entity == null)
-                throw new NotFoundException();
+                throw SheaftException.NotFound();
 
             if (entity.Kind == ProfileKind.Consumer)
                 return RedirectToAction("Edit", "Consumers", new { id });

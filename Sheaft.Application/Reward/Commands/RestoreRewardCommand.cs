@@ -1,17 +1,20 @@
-﻿using Sheaft.Domain.Enums;
-using System;
+﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using Sheaft.Core;
 using Newtonsoft.Json;
-using Sheaft.Application.Interop;
+using Sheaft.Application.Common;
+using Sheaft.Application.Common.Handlers;
+using Sheaft.Application.Common.Interfaces;
+using Sheaft.Application.Common.Interfaces.Services;
+using Sheaft.Application.Common.Models;
+using Sheaft.Domain;
 
-namespace Sheaft.Application.Commands
+namespace Sheaft.Application.Reward.Commands
 {
-    public class RestoreRewardCommand : Command<bool>
+    public class RestoreRewardCommand : Command
     {
         [JsonConstructor]
         public RestoreRewardCommand(RequestUser requestUser) : base(requestUser)
@@ -20,9 +23,9 @@ namespace Sheaft.Application.Commands
 
         public Guid Id { get; set; }
     }
-    
+
     public class RestoreRewardCommandHandler : CommandsHandler,
-        IRequestHandler<RestoreRewardCommand, Result<bool>>
+        IRequestHandler<RestoreRewardCommand, Result>
     {
         public RestoreRewardCommandHandler(
             ISheaftMediatr mediatr,
@@ -32,17 +35,14 @@ namespace Sheaft.Application.Commands
         {
         }
 
-        public async Task<Result<bool>> Handle(RestoreRewardCommand request, CancellationToken token)
+        public async Task<Result> Handle(RestoreRewardCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(request, async () =>
-            {
-                var entity = await _context.Rewards.SingleOrDefaultAsync(r => r.Id == request.Id, token);
+            var entity = await _context.Rewards.SingleOrDefaultAsync(r => r.Id == request.Id, token);
 
-                _context.Restore(entity);
-                await _context.SaveChangesAsync(token);
+            _context.Restore(entity);
+            await _context.SaveChangesAsync(token);
 
-                return Ok(true);
-            });
+            return Success();
         }
     }
 }

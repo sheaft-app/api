@@ -1,6 +1,6 @@
-﻿using Sheaft.Core.Extensions;
+﻿using Sheaft.Application.Common.Extensions;
 
-namespace Sheaft.Options
+namespace Sheaft.Application.Common.Options
 {
     public class PspOptions
     {

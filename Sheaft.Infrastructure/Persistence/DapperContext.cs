@@ -2,12 +2,12 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Data.SqlClient;
-using Sheaft.Domain.StoreProcedures;
 using System.Threading;
 using Dapper;
-using Sheaft.Options;
 using Microsoft.Extensions.Options;
-using Sheaft.Application.Interop;
+using Sheaft.Application.Common.Interfaces;
+using Sheaft.Application.Common.Options;
+using Sheaft.Domain.Views;
 
 namespace Sheaft.Infrastructure.Persistence
 {

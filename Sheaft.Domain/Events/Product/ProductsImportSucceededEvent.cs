@@ -1,17 +1,17 @@
 ﻿using System;
 using Newtonsoft.Json;
-using Sheaft.Core;
-using Sheaft.Domain.Models.Common;
+using Sheaft.Domain.Common;
 
-namespace Sheaft.Application.Events
+namespace Sheaft.Domain.Events.Product
 {
     public class ProductImportSucceededEvent : DomainEvent
     {
         [JsonConstructor]
-        public ProductImportSucceededEvent(RequestUser requestUser) : base(requestUser)
+        public ProductImportSucceededEvent(Guid jobId)
         {
+            JobId = jobId;
         }
 
-        public Guid JobId { get; set; }
+        public Guid JobId { get; }
     }
 }

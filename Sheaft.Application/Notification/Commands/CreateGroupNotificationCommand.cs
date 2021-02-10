@@ -4,12 +4,15 @@ using System.Threading.Tasks;
 using MediatR;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using Sheaft.Application.Interop;
-using Sheaft.Core;
-using Sheaft.Domain.Enums;
-using Sheaft.Domain.Models;
+using Sheaft.Application.Common;
+using Sheaft.Application.Common.Handlers;
+using Sheaft.Application.Common.Interfaces;
+using Sheaft.Application.Common.Interfaces.Services;
+using Sheaft.Application.Common.Models;
+using Sheaft.Domain;
+using Sheaft.Domain.Enum;
 
-namespace Sheaft.Application.Commands
+namespace Sheaft.Application.Notification.Commands
 {
     public class CreateGroupNotificationCommand : Command<Guid>
     {
@@ -23,7 +26,7 @@ namespace Sheaft.Application.Commands
         public string Method { get; set; }
         public DateTimeOffset CreatedOn { get; set; }
     }
-    
+
     public class CreateGroupNotificationCommandHandler : CommandsHandler,
         IRequestHandler<CreateGroupNotificationCommand, Result<Guid>>
     {
@@ -41,16 +44,14 @@ namespace Sheaft.Application.Commands
 
         public async Task<Result<Guid>> Handle(CreateGroupNotificationCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(request, async () =>
-            {
-                var user = await _context.GetByIdAsync<User>(request.Id, token);
-                var entity = new Notification(Guid.NewGuid(), NotificationKind.Business, request.Method, request.Content, user);
+            var user = await _context.GetByIdAsync<Domain.User>(request.Id, token);
+            var entity = new Domain.Notification(Guid.NewGuid(), NotificationKind.Business, request.Method, request.Content,
+                user);
 
-                await _context.AddAsync(entity, token);
-                await _context.SaveChangesAsync(token);
+            await _context.AddAsync(entity, token);
+            await _context.SaveChangesAsync(token);
 
-                return Created(entity.Id);
-            });
+            return Success(entity.Id);
         }
     }
 }

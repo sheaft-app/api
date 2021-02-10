@@ -1,9 +1,11 @@
 ﻿using AutoMapper;
-using Sheaft.Application.Commands;
-using Sheaft.Domain.Models;
-using Sheaft.Application.Models;
+using Sheaft.Application.Common.Models.Dto;
+using Sheaft.Application.Common.Models.Inputs;
+using Sheaft.Application.Common.Models.ViewModels;
+using Sheaft.Application.Legal.Commands;
+using Sheaft.Domain;
 
-namespace Sheaft.Application.Mappers
+namespace Sheaft.Application.Common.Mappings
 {
     public class BusinessLegalProfile : Profile
     {
@@ -19,7 +21,7 @@ namespace Sheaft.Application.Mappers
                 .ForMember(c => c.Declaration, opt => opt.MapFrom(e => e.Declaration));
 
             CreateMap<BusinessLegal, BusinessLegalDto>()
-                .IncludeBase<Legal, BaseLegalDto>();
+                .IncludeBase<Domain.Legal, BaseLegalDto>();
 
             CreateMap<CreateBusinessLegalInput, CreateBusinessLegalCommand>();
             CreateMap<UpdateBusinessLegalInput, UpdateBusinessLegalCommand>();

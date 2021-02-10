@@ -4,13 +4,16 @@ using System.Threading.Tasks;
 using MediatR;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using Sheaft.Application.Interop;
-using Sheaft.Core;
-using Sheaft.Domain.Models;
+using Sheaft.Application.Common;
+using Sheaft.Application.Common.Handlers;
+using Sheaft.Application.Common.Interfaces;
+using Sheaft.Application.Common.Interfaces.Services;
+using Sheaft.Application.Common.Models;
+using Sheaft.Domain;
 
-namespace Sheaft.Application.Commands
+namespace Sheaft.Application.Product.Commands
 {
-    public class SetProductAvailabilityCommand : Command<bool>
+    public class SetProductAvailabilityCommand : Command
     {
         [JsonConstructor]
         public SetProductAvailabilityCommand(RequestUser requestUser) : base(requestUser)
@@ -20,9 +23,9 @@ namespace Sheaft.Application.Commands
         public Guid Id { get; set; }
         public bool Available { get; set; }
     }
-    
+
     public class SetProductAvailabilityCommandHandler : CommandsHandler,
-        IRequestHandler<SetProductAvailabilityCommand, Result<bool>>
+        IRequestHandler<SetProductAvailabilityCommand, Result>
     {
         private readonly IBlobService _blobService;
 
@@ -36,16 +39,13 @@ namespace Sheaft.Application.Commands
             _blobService = blobService;
         }
 
-        public async Task<Result<bool>> Handle(SetProductAvailabilityCommand request, CancellationToken token)
+        public async Task<Result> Handle(SetProductAvailabilityCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(request, async () =>
-            {
-                var entity = await _context.GetByIdAsync<Product>(request.Id, token);
-                entity.SetAvailable(request.Available);
+            var entity = await _context.GetByIdAsync<Domain.Product>(request.Id, token);
+            entity.SetAvailable(request.Available);
 
-                await _context.SaveChangesAsync(token);
-                return Ok(true);
-            });
+            await _context.SaveChangesAsync(token);
+            return Success();
         }
     }
 }

@@ -4,13 +4,16 @@ using System.Threading.Tasks;
 using MediatR;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using Sheaft.Application.Interop;
-using Sheaft.Core;
-using Sheaft.Domain.Models;
+using Sheaft.Application.Common;
+using Sheaft.Application.Common.Handlers;
+using Sheaft.Application.Common.Interfaces;
+using Sheaft.Application.Common.Interfaces.Services;
+using Sheaft.Application.Common.Models;
+using Sheaft.Domain;
 
-namespace Sheaft.Application.Commands
+namespace Sheaft.Application.Notification.Commands
 {
-    public class MarkUserNotificationAsReadCommand : Command<bool>
+    public class MarkUserNotificationAsReadCommand : Command
     {
         [JsonConstructor]
         public MarkUserNotificationAsReadCommand(RequestUser requestUser) : base(requestUser)
@@ -19,9 +22,9 @@ namespace Sheaft.Application.Commands
 
         public Guid Id { get; set; }
     }
-    
+
     public class MarkUserNotificationAsReadCommandHandler : CommandsHandler,
-        IRequestHandler<MarkUserNotificationAsReadCommand, Result<bool>>
+        IRequestHandler<MarkUserNotificationAsReadCommand, Result>
     {
         private readonly IDapperContext _dapperContext;
 
@@ -35,19 +38,16 @@ namespace Sheaft.Application.Commands
             _dapperContext = dapperContext;
         }
 
-        public async Task<Result<bool>> Handle(MarkUserNotificationAsReadCommand request, CancellationToken token)
+        public async Task<Result> Handle(MarkUserNotificationAsReadCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(request, async () =>
-            {
-                var notification = await _context.GetByIdAsync<Notification>(request.Id, token);
-                if(!notification.Unread)
-                    return Ok(true);
+            var notification = await _context.GetByIdAsync<Domain.Notification>(request.Id, token);
+            if (!notification.Unread)
+                return Success();
 
-                notification.SetAsRead();
+            notification.SetAsRead();
 
-                await _context.SaveChangesAsync(token);
-                return Ok(true);
-            });
+            await _context.SaveChangesAsync(token);
+            return Success();
         }
     }
 }

@@ -5,14 +5,18 @@ using System.Threading.Tasks;
 using MediatR;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using Sheaft.Application.Events;
-using Sheaft.Application.Interop;
-using Sheaft.Core;
-using Sheaft.Domain.Models;
+using Sheaft.Application.Common;
+using Sheaft.Application.Common.Handlers;
+using Sheaft.Application.Common.Interfaces;
+using Sheaft.Application.Common.Interfaces.Services;
+using Sheaft.Application.Common.Models;
+using Sheaft.Application.PayinRefund.Commands;
+using Sheaft.Domain;
+using Sheaft.Domain.Events.PurchaseOrder;
 
-namespace Sheaft.Application.Commands
+namespace Sheaft.Application.PurchaseOrder.Commands
 {
-    public class CancelPurchaseOrderCommand : Command<bool>
+    public class CancelPurchaseOrderCommand : Command
     {
         [JsonConstructor]
         public CancelPurchaseOrderCommand(RequestUser requestUser) : base(requestUser)
@@ -23,9 +27,9 @@ namespace Sheaft.Application.Commands
         public string Reason { get; set; }
         public bool SkipNotification { get; set; }
     }
-    
+
     public class CancelPurchaseOrderCommandHandler : CommandsHandler,
-        IRequestHandler<CancelPurchaseOrderCommand, Result<bool>>
+        IRequestHandler<CancelPurchaseOrderCommand, Result>
     {
         private readonly ICapingDeliveriesService _capingDeliveriesService;
 
@@ -39,31 +43,25 @@ namespace Sheaft.Application.Commands
             _capingDeliveriesService = capingDeliveriesService;
         }
 
-        public async Task<Result<bool>> Handle(CancelPurchaseOrderCommand request, CancellationToken token)
+        public async Task<Result> Handle(CancelPurchaseOrderCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(request, async () =>
-            {
-                var purchaseOrder = await _context.GetByIdAsync<PurchaseOrder>(request.Id, token);
-                purchaseOrder.Cancel(request.Reason);
+            var purchaseOrder = await _context.GetByIdAsync<Domain.PurchaseOrder>(request.Id, token);
+            purchaseOrder.Cancel(request.Reason, request.SkipNotification);
 
-                await _context.SaveChangesAsync(token);
+            await _context.SaveChangesAsync(token);
 
-                var order = await _context.GetSingleAsync<Order>(o => o.PurchaseOrders.Any(po => po.Id == purchaseOrder.Id), token);
-                var delivery = order.Deliveries.FirstOrDefault(d => d.DeliveryMode.Producer.Id == purchaseOrder.Vendor.Id);
-                if (delivery.DeliveryMode.MaxPurchaseOrdersPerTimeSlot.HasValue)
-                    await _capingDeliveriesService.DecreaseProducerDeliveryCountAsync(delivery.DeliveryMode.Producer.Id, delivery.DeliveryMode.Id, purchaseOrder.ExpectedDelivery.ExpectedDeliveryDate, purchaseOrder.ExpectedDelivery.From, purchaseOrder.ExpectedDelivery.To, delivery.DeliveryMode.MaxPurchaseOrdersPerTimeSlot.Value, token);
+            var order = await _context.GetSingleAsync<Domain.Order>(o => o.PurchaseOrders.Any(po => po.Id == purchaseOrder.Id),
+                token);
+            var delivery = order.Deliveries.FirstOrDefault(d => d.DeliveryMode.Producer.Id == purchaseOrder.Vendor.Id);
+            if (delivery.DeliveryMode.MaxPurchaseOrdersPerTimeSlot.HasValue)
+                await _capingDeliveriesService.DecreaseProducerDeliveryCountAsync(delivery.DeliveryMode.Producer.Id,
+                    delivery.DeliveryMode.Id, purchaseOrder.ExpectedDelivery.ExpectedDeliveryDate,
+                    purchaseOrder.ExpectedDelivery.From, purchaseOrder.ExpectedDelivery.To,
+                    delivery.DeliveryMode.MaxPurchaseOrdersPerTimeSlot.Value, token);
 
-                if (!request.SkipNotification)
-                {
-                    if (request.RequestUser.Id == purchaseOrder.Sender.Id)
-                        _mediatr.Post(new PurchaseOrderWithdrawnEvent(request.RequestUser) { PurchaseOrderId = purchaseOrder.Id });
-                    else
-                        _mediatr.Post(new PurchaseOrderCancelledEvent(request.RequestUser) { PurchaseOrderId = purchaseOrder.Id });
-                }
-
-                _mediatr.Schedule(new CreatePayinRefundCommand(request.RequestUser) { PurchaseOrderId = purchaseOrder.Id }, TimeSpan.FromDays(1));
-                return Ok(true);
-            });
+            _mediatr.Schedule(new CreatePayinRefundCommand(request.RequestUser) {PurchaseOrderId = purchaseOrder.Id},
+                TimeSpan.FromDays(1));
+            return Success();
         }
     }
 }

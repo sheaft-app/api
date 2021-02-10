@@ -4,13 +4,16 @@ using System.Threading.Tasks;
 using MediatR;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using Sheaft.Application.Interop;
-using Sheaft.Core;
-using Sheaft.Domain.Models;
+using Sheaft.Application.Common;
+using Sheaft.Application.Common.Handlers;
+using Sheaft.Application.Common.Interfaces;
+using Sheaft.Application.Common.Interfaces.Services;
+using Sheaft.Application.Common.Models;
+using Sheaft.Domain;
 
-namespace Sheaft.Application.Commands
+namespace Sheaft.Application.Job.Commands
 {
-    public class DeleteJobCommand : Command<bool>
+    public class DeleteJobCommand : Command
     {
         [JsonConstructor]
         public DeleteJobCommand(RequestUser requestUser) : base(requestUser)
@@ -19,27 +22,25 @@ namespace Sheaft.Application.Commands
 
         public Guid Id { get; set; }
     }
+
     public class DeleteJobCommandHandler : CommandsHandler,
-        IRequestHandler<DeleteJobCommand, Result<bool>>
+        IRequestHandler<DeleteJobCommand, Result>
     {
         public DeleteJobCommandHandler(
-            ISheaftMediatr mediatr, 
+            ISheaftMediatr mediatr,
             IAppDbContext context,
             ILogger<DeleteJobCommandHandler> logger)
             : base(mediatr, context, logger)
         {
         }
 
-        public async Task<Result<bool>> Handle(DeleteJobCommand request, CancellationToken token)
+        public async Task<Result> Handle(DeleteJobCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(request, async () =>
-            {
-                var entity = await _context.GetByIdAsync<Job>(request.Id, token);
-                _context.Remove(entity);
+            var entity = await _context.GetByIdAsync<Domain.Job>(request.Id, token);
+            _context.Remove(entity);
 
-                await _context.SaveChangesAsync(token);
-                return Ok(true);
-            });
+            await _context.SaveChangesAsync(token);
+            return Success();
         }
     }
 }

@@ -1,8 +1,8 @@
 using HotChocolate.Types;
+using Sheaft.Application.Common.Models.Inputs;
 using Sheaft.GraphQL.Enums;
-using Sheaft.Application.Models;
 
-namespace Sheaft.GraphQL.Types
+namespace Sheaft.GraphQL.Types.Inputs
 {
     public class AddressInputType : SheaftInputType<AddressInput>
     {

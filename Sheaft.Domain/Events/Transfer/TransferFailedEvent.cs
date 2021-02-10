@@ -1,17 +1,17 @@
 ﻿using System;
 using Newtonsoft.Json;
-using Sheaft.Core;
-using Sheaft.Domain.Models.Common;
+using Sheaft.Domain.Common;
 
-namespace Sheaft.Application.Events
+namespace Sheaft.Domain.Events.Transfer
 {
     public class TransferFailedEvent : DomainEvent
     {
         [JsonConstructor]
-        public TransferFailedEvent(RequestUser requestUser) : base(requestUser)
+        public TransferFailedEvent(Guid transferId)
         {
+            TransferId = transferId;
         }
 
-        public Guid TransferId { get; set; }
+        public Guid TransferId { get; }
     }
 }

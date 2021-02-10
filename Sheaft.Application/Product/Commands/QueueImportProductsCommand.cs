@@ -1,16 +1,18 @@
 using System;
-using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using Sheaft.Application.Interop;
-using Sheaft.Core;
-using Sheaft.Domain.Enums;
-using Sheaft.Domain.Models;
+using Sheaft.Application.Common;
+using Sheaft.Application.Common.Handlers;
+using Sheaft.Application.Common.Interfaces;
+using Sheaft.Application.Common.Interfaces.Services;
+using Sheaft.Application.Common.Models;
+using Sheaft.Domain;
+using Sheaft.Domain.Enum;
 
-namespace Sheaft.Application.Commands
+namespace Sheaft.Application.Product.Commands
 {
     public class QueueImportProductsCommand : Command<Guid>
     {
@@ -24,7 +26,7 @@ namespace Sheaft.Application.Commands
         public byte[] FileStream { get; set; }
         public bool NotifyOnUpdates { get; set; } = true;
     }
-    
+
     public class QueueImportProductsCommandHandler : CommandsHandler,
         IRequestHandler<QueueImportProductsCommand, Result<Guid>>
     {
@@ -39,23 +41,23 @@ namespace Sheaft.Application.Commands
         {
             _blobService = blobService;
         }
+
         public async Task<Result<Guid>> Handle(QueueImportProductsCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(request, async () =>
-            {
-                var producer = await _context.GetByIdAsync<Producer>(request.RequestUser.Id, token);
-                var entity = new Job(Guid.NewGuid(), JobKind.ImportProducts, $"Import produits", producer);
+            var producer = await _context.GetByIdAsync<Domain.Producer>(request.RequestUser.Id, token);
+            var entity = new Domain.Job(Guid.NewGuid(), JobKind.ImportProducts, $"Import produits", producer);
 
-                var response = await _blobService.UploadImportProductsFileAsync(producer.Id, entity.Id, request.FileStream, token);
-                if (!response.Success)
-                    return Failed<Guid>(response.Exception);
+            var response =
+                await _blobService.UploadImportProductsFileAsync(producer.Id, entity.Id, request.FileStream, token);
+            if (!response.Succeeded)
+                return Failure<Guid>(response.Exception);
 
-                await _context.AddAsync(entity, token);
-                await _context.SaveChangesAsync(token);
+            await _context.AddAsync(entity, token);
+            await _context.SaveChangesAsync(token);
 
-                _mediatr.Post(new ImportProductsCommand(request.RequestUser) { Id = entity.Id, NotifyOnUpdates = request.NotifyOnUpdates });
-                return Created(entity.Id);
-            });
+            _mediatr.Post(new ImportProductsCommand(request.RequestUser)
+                {Id = entity.Id, NotifyOnUpdates = request.NotifyOnUpdates});
+            return Success(entity.Id);
         }
     }
 }

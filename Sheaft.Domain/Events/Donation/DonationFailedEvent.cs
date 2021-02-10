@@ -1,17 +1,17 @@
 ﻿using System;
 using Newtonsoft.Json;
-using Sheaft.Core;
-using Sheaft.Domain.Models.Common;
+using Sheaft.Domain.Common;
 
-namespace Sheaft.Application.Events
+namespace Sheaft.Domain.Events.Donation
 {
     public class DonationFailedEvent : DomainEvent
-    {
+    {        
         [JsonConstructor]
-        public DonationFailedEvent(RequestUser requestUser) : base(requestUser)
+        public DonationFailedEvent(Guid donationId)
         {
+            DonationId = donationId;
         }
 
-        public Guid DonationId { get; set; }
+        public Guid DonationId { get; }
     }
 }

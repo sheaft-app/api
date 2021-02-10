@@ -4,13 +4,16 @@ using System.Threading.Tasks;
 using MediatR;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using Sheaft.Application.Interop;
-using Sheaft.Core;
-using Sheaft.Domain.Models;
+using Sheaft.Application.Common;
+using Sheaft.Application.Common.Handlers;
+using Sheaft.Application.Common.Interfaces;
+using Sheaft.Application.Common.Interfaces.Services;
+using Sheaft.Application.Common.Models;
+using Sheaft.Domain;
 
-namespace Sheaft.Application.Commands
+namespace Sheaft.Application.QuickOrder.Commands
 {
-    public class DeleteQuickOrderCommand : Command<bool>
+    public class DeleteQuickOrderCommand : Command
     {
         [JsonConstructor]
         public DeleteQuickOrderCommand(RequestUser requestUser) : base(requestUser)
@@ -19,9 +22,9 @@ namespace Sheaft.Application.Commands
 
         public Guid Id { get; set; }
     }
-    
+
     public class DeleteQuickOrderCommandHandler : CommandsHandler,
-        IRequestHandler<DeleteQuickOrderCommand, Result<bool>>
+        IRequestHandler<DeleteQuickOrderCommand, Result>
     {
         public DeleteQuickOrderCommandHandler(
             ISheaftMediatr mediatr,
@@ -31,17 +34,14 @@ namespace Sheaft.Application.Commands
         {
         }
 
-        public async Task<Result<bool>> Handle(DeleteQuickOrderCommand request, CancellationToken token)
+        public async Task<Result> Handle(DeleteQuickOrderCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(request, async () =>
-            {
-                var entity = await _context.GetByIdAsync<QuickOrder>(request.Id, token);
+            var entity = await _context.GetByIdAsync<Domain.QuickOrder>(request.Id, token);
 
-                _context.Remove(entity);
-                await _context.SaveChangesAsync(token);
+            _context.Remove(entity);
+            await _context.SaveChangesAsync(token);
 
-                return Ok(true);
-            });
+            return Success();
         }
     }
 }

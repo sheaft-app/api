@@ -1,21 +1,24 @@
 ﻿using System;
 using Newtonsoft.Json;
-using Sheaft.Core;
-using Sheaft.Domain.Enums;
-using Sheaft.Domain.Models.Common;
+using Sheaft.Domain.Common;
+using Sheaft.Domain.Enum;
 
-namespace Sheaft.Application.Events
+namespace Sheaft.Domain.Events.User
 {
     public class UserPointsCreatedEvent : DomainEvent
     {
         [JsonConstructor]
-        public UserPointsCreatedEvent(RequestUser requestUser) : base(requestUser)
+        public UserPointsCreatedEvent(Guid userId, PointKind kind, int points, DateTimeOffset createdOn)
         {
+            UserId = userId;
+            Kind = kind;
+            Points = points;
+            CreatedOn = createdOn;
         }
 
-        public Guid UserId { get; set; }
-        public PointKind Kind { get; set; }
-        public int Points { get; set; }
-        public DateTimeOffset CreatedOn { get; set; }
+        public Guid UserId { get; }
+        public PointKind Kind { get; }
+        public int Points { get; }
+        public DateTimeOffset CreatedOn { get; }
     }
 }

@@ -5,13 +5,17 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using Sheaft.Application.Interop;
-using Sheaft.Core;
-using Sheaft.Domain.Enums;
+using Sheaft.Application.Common;
+using Sheaft.Application.Common.Handlers;
+using Sheaft.Application.Common.Interfaces;
+using Sheaft.Application.Common.Interfaces.Services;
+using Sheaft.Application.Common.Models;
+using Sheaft.Domain;
+using Sheaft.Domain.Enum;
 
-namespace Sheaft.Application.Commands
+namespace Sheaft.Application.DeliveryMode.Commands
 {
-    public class RestoreDeliveryModeCommand : Command<bool>
+    public class RestoreDeliveryModeCommand : Command
     {
         [JsonConstructor]
         public RestoreDeliveryModeCommand(RequestUser requestUser) : base(requestUser)
@@ -20,8 +24,9 @@ namespace Sheaft.Application.Commands
 
         public Guid Id { get; set; }
     }
+
     public class RestoreDeliveryModeCommandHandler : CommandsHandler,
-        IRequestHandler<RestoreDeliveryModeCommand, Result<bool>>
+        IRequestHandler<RestoreDeliveryModeCommand, Result>
     {
         public RestoreDeliveryModeCommandHandler(
             ISheaftMediatr mediatr,
@@ -31,18 +36,20 @@ namespace Sheaft.Application.Commands
         {
         }
 
-        public async Task<Result<bool>> Handle(RestoreDeliveryModeCommand request, CancellationToken token)
+        public async Task<Result> Handle(RestoreDeliveryModeCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(request, async () =>
-            {
-                var entity = await _context.DeliveryModes.SingleOrDefaultAsync(a => a.Id == request.Id && a.RemovedOn.HasValue, token);
+            var entity =
+                await _context.DeliveryModes.SingleOrDefaultAsync(a => a.Id == request.Id && a.RemovedOn.HasValue,
+                    token);
 
-                _context.Restore(entity);
-                entity.Producer.CanDirectSell = await _context.DeliveryModes.AnyAsync(c => !c.RemovedOn.HasValue && c.Producer.Id == request.RequestUser.Id && (c.Kind == DeliveryKind.Collective || c.Kind == DeliveryKind.Farm || c.Kind == DeliveryKind.Market), token);
+            _context.Restore(entity);
+            entity.Producer.CanDirectSell = await _context.DeliveryModes.AnyAsync(
+                c => !c.RemovedOn.HasValue && c.Producer.Id == request.RequestUser.Id &&
+                     (c.Kind == DeliveryKind.Collective || c.Kind == DeliveryKind.Farm ||
+                      c.Kind == DeliveryKind.Market), token);
 
-                await _context.SaveChangesAsync(token);
-                return Ok(true);
-            });
+            await _context.SaveChangesAsync(token);
+            return Success();
         }
     }
 }

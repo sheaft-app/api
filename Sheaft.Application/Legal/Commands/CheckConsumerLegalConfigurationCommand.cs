@@ -4,17 +4,18 @@ using System.Threading.Tasks;
 using MediatR;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Sheaft.Domain.Enums;
-using Sheaft.Application.Models;
-using Sheaft.Core;
 using Newtonsoft.Json;
-using Sheaft.Application.Interop;
-using Sheaft.Domain.Models;
-using Sheaft.Options;
+using Sheaft.Application.Common;
+using Sheaft.Application.Common.Handlers;
+using Sheaft.Application.Common.Interfaces;
+using Sheaft.Application.Common.Interfaces.Services;
+using Sheaft.Application.Common.Models;
+using Sheaft.Application.Common.Options;
+using Sheaft.Domain;
 
-namespace Sheaft.Application.Commands
+namespace Sheaft.Application.Legal.Commands
 {
-    public class CheckConsumerLegalConfigurationCommand : Command<bool>
+    public class CheckConsumerLegalConfigurationCommand : Command
     {
         [JsonConstructor]
         public CheckConsumerLegalConfigurationCommand(RequestUser requestUser) : base(requestUser)
@@ -23,9 +24,9 @@ namespace Sheaft.Application.Commands
 
         public Guid UserId { get; set; }
     }
-    
+
     public class CheckConsumerLegalConfigurationCommandHandler : CommandsHandler,
-           IRequestHandler<CheckConsumerLegalConfigurationCommand, Result<bool>>
+        IRequestHandler<CheckConsumerLegalConfigurationCommand, Result>
     {
         private readonly PspOptions _pspOptions;
         private readonly IPspService _pspService;
@@ -41,23 +42,21 @@ namespace Sheaft.Application.Commands
             _pspOptions = pspOptions.Value;
             _pspService = pspService;
         }
-        public async Task<Result<bool>> Handle(CheckConsumerLegalConfigurationCommand request, CancellationToken token)
+
+        public async Task<Result> Handle(CheckConsumerLegalConfigurationCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(request, async () =>
+            var legal = await _context.GetSingleAsync<ConsumerLegal>(b => b.User.Id == request.UserId, token);
+            if (string.IsNullOrWhiteSpace(legal.User.Identifier))
             {
-                var legal = await _context.GetSingleAsync<ConsumerLegal>(b => b.User.Id == request.UserId, token);
-                if (string.IsNullOrWhiteSpace(legal.User.Identifier))
-                {
-                    var userResult = await _pspService.CreateConsumerAsync(legal, token);
-                    if (!userResult.Success)
-                        return Failed<bool>(userResult.Exception);
+                var userResult = await _pspService.CreateConsumerAsync(legal, token);
+                if (!userResult.Succeeded)
+                    return Failure(userResult.Exception);
 
-                    legal.User.SetIdentifier(userResult.Data);
-                    await _context.SaveChangesAsync(token);
-                }
+                legal.User.SetIdentifier(userResult.Data);
+                await _context.SaveChangesAsync(token);
+            }
 
-                return Ok(true);
-            });
+            return Success();
         }
     }
 }

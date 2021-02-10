@@ -3,14 +3,14 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Primitives;
-using Sheaft.Application.Commands;
-using Sheaft.Application.Interop;
-using Sheaft.Core;
 using System;
 using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Sheaft.Application.Common.Interfaces.Services;
+using Sheaft.Application.Notification.Commands;
+using Sheaft.Domain;
 
 namespace Sheaft.Web.Signalr.Controllers
 {

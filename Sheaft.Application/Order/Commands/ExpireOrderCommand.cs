@@ -1,20 +1,22 @@
 ﻿using System;
-using Sheaft.Core;
-using Newtonsoft.Json;
-using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Sheaft.Application.Interop;
-using Sheaft.Domain.Enums;
-using Sheaft.Domain.Models;
-using Sheaft.Options;
+using Newtonsoft.Json;
+using Sheaft.Application.Common;
+using Sheaft.Application.Common.Handlers;
+using Sheaft.Application.Common.Interfaces;
+using Sheaft.Application.Common.Interfaces.Services;
+using Sheaft.Application.Common.Models;
+using Sheaft.Application.Common.Options;
+using Sheaft.Domain;
+using Sheaft.Domain.Enum;
 
-namespace Sheaft.Application.Commands
+namespace Sheaft.Application.Order.Commands
 {
-    public class ExpireOrderCommand : Command<bool>
+    public class ExpireOrderCommand : Command
     {
         [JsonConstructor]
         public ExpireOrderCommand(RequestUser requestUser) : base(requestUser)
@@ -23,8 +25,9 @@ namespace Sheaft.Application.Commands
 
         public Guid OrderId { get; set; }
     }
+
     public class ExpireOrderCommandHandler : CommandsHandler,
-        IRequestHandler<ExpireOrderCommand, Result<bool>>
+        IRequestHandler<ExpireOrderCommand, Result>
     {
         private readonly ICapingDeliveriesService _capingDeliveriesService;
         private readonly PspOptions _pspOptions;
@@ -43,16 +46,14 @@ namespace Sheaft.Application.Commands
             _pspOptions = pspOptions.Value;
             _routineOptions = routineOptions.Value;
         }
-        public async Task<Result<bool>> Handle(ExpireOrderCommand request, CancellationToken token)
-        {
-            return await ExecuteAsync(request, async () =>
-            {
-                var order = await _context.GetByIdAsync<Order>(request.OrderId, token);
-                order.SetStatus(OrderStatus.Expired);
 
-                await _context.SaveChangesAsync(token);
-                return Ok(true);
-            });
+        public async Task<Result> Handle(ExpireOrderCommand request, CancellationToken token)
+        {
+            var order = await _context.GetByIdAsync<Domain.Order>(request.OrderId, token);
+            order.SetStatus(OrderStatus.Expired);
+
+            await _context.SaveChangesAsync(token);
+            return Success();
         }
     }
 }

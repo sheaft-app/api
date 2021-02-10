@@ -10,14 +10,19 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using OfficeOpenXml;
 using OfficeOpenXml.Style;
-using Sheaft.Application.Events;
-using Sheaft.Application.Interop;
-using Sheaft.Core;
-using Sheaft.Domain.Models;
+using Sheaft.Application.Common;
+using Sheaft.Application.Common.Handlers;
+using Sheaft.Application.Common.Interfaces;
+using Sheaft.Application.Common.Interfaces.Services;
+using Sheaft.Application.Common.Models;
+using Sheaft.Application.Job.Commands;
+using Sheaft.Application.PurchaseOrder.Commands;
+using Sheaft.Domain;
+using Sheaft.Domain.Events.PickingOrder;
 
-namespace Sheaft.Application.Commands
+namespace Sheaft.Application.PickingOrders.Commands
 {
-    public class ExportPickingOrderCommand : Command<bool>
+    public class ExportPickingOrderCommand : Command
     {
         [JsonConstructor]
         public ExportPickingOrderCommand(RequestUser requestUser) : base(requestUser)
@@ -27,15 +32,15 @@ namespace Sheaft.Application.Commands
         public Guid JobId { get; set; }
         public IEnumerable<Guid> PurchaseOrderIds { get; set; }
     }
-    
+
     public class ExportPickingOrderCommandHandler : CommandsHandler,
-        IRequestHandler<ExportPickingOrderCommand, Result<bool>>
+        IRequestHandler<ExportPickingOrderCommand, Result>
     {
         private readonly IBlobService _blobsService;
 
         public ExportPickingOrderCommandHandler(
-            ISheaftMediatr mediatr, 
-            IAppDbContext context, 
+            ISheaftMediatr mediatr,
+            IAppDbContext context,
             IBlobService blobsService,
             ILogger<ExportPickingOrderCommandHandler> logger)
             : base(mediatr, context, logger)
@@ -43,50 +48,51 @@ namespace Sheaft.Application.Commands
             _blobsService = blobsService;
         }
 
-        public async Task<Result<bool>> Handle(ExportPickingOrderCommand request, CancellationToken token)
+        public async Task<Result> Handle(ExportPickingOrderCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(request, async () =>
+            var job = await _context.GetByIdAsync<Domain.Job>(request.JobId, token);
+
+            try
             {
-                var job = await _context.GetByIdAsync<Job>(request.JobId, token);
+                var startResult = await _mediatr.Process(new StartJobCommand(request.RequestUser) {Id = job.Id}, token);
+                if (!startResult.Succeeded)
+                    throw startResult.Exception;
 
-                try
+                var purchaseOrders = await _context.GetByIdsAsync<Domain.PurchaseOrder>(request.PurchaseOrderIds, token);
+                _mediatr.Post(new PickingOrderExportProcessingEvent(job.Id));
+
+                using (var stream = new MemoryStream())
                 {
-                    var startResult = await _mediatr.Process(new StartJobCommand(request.RequestUser) { Id = job.Id }, token);
-                    if (!startResult.Success)
-                        throw startResult.Exception;
-
-                    var purchaseOrders = await _context.GetByIdsAsync<PurchaseOrder>(request.PurchaseOrderIds, token);
-                    _mediatr.Post(new PickingOrderExportProcessingEvent(request.RequestUser) { JobId = job.Id });
-
-                    using (var stream = new MemoryStream())
+                    using (var package = new ExcelPackage(stream))
                     {
-                        using (var package = new ExcelPackage(stream))
-                        {
-                            CreateExcelPickingFile(package, job.Name, purchaseOrders);
-                        }
-
-                        var response = await _blobsService.UploadPickingOrderFileAsync(request.RequestUser.Id, job.Id, $"Preparation_{job.CreatedOn:dd-MM-yyyy}.xlsx", stream.ToArray(), token);
-                        if (!response.Success)
-                            throw response.Exception;
-
-                        var result = await _mediatr.Process(new ProcessPurchaseOrdersCommand(request.RequestUser) { Ids = request.PurchaseOrderIds }, token);
-                        if (!result.Success)
-                            throw result.Exception;
-
-                        _mediatr.Post(new PickingOrderExportSucceededEvent(request.RequestUser) { JobId = job.Id });
-                        return await _mediatr.Process(new CompleteJobCommand(request.RequestUser) { Id = job.Id, FileUrl = response.Data }, token);
+                        CreateExcelPickingFile(package, job.Name, purchaseOrders);
                     }
+
+                    var response = await _blobsService.UploadPickingOrderFileAsync(request.RequestUser.Id, job.Id,
+                        $"Preparation_{job.CreatedOn:dd-MM-yyyy}.xlsx", stream.ToArray(), token);
+                    if (!response.Succeeded)
+                        throw response.Exception;
+
+                    var result = await _mediatr.Process(
+                        new ProcessPurchaseOrdersCommand(request.RequestUser) {Ids = request.PurchaseOrderIds}, token);
+                    if (!result.Succeeded)
+                        throw result.Exception;
+
+                    _mediatr.Post(new PickingOrderExportSucceededEvent(job.Id));
+                    return await _mediatr.Process(
+                        new CompleteJobCommand(request.RequestUser) {Id = job.Id, FileUrl = response.Data}, token);
                 }
-                catch (Exception e)
-                {
-                    _mediatr.Post(new PickingOrderExportFailedEvent(request.RequestUser) { JobId = job.Id });
-                    return await _mediatr.Process(new FailJobCommand(request.RequestUser) { Id = request.JobId, Reason = e.Message }, token);
-                }
-            });
+            }
+            catch (Exception e)
+            {
+                _mediatr.Post(new PickingOrderExportFailedEvent(job.Id));
+                return await _mediatr.Process(
+                    new FailJobCommand(request.RequestUser) {Id = request.JobId, Reason = e.Message}, token);
+            }
         }
 
         private void CreateExcelPickingFile(ExcelPackage package, string title,
-            IEnumerable<PurchaseOrder> purchaseOrders)
+            IEnumerable<Domain.PurchaseOrder> purchaseOrders)
         {
             var products = new List<LightProduct>();
             foreach (var purchaseOrder in purchaseOrders)
@@ -104,7 +110,7 @@ namespace Sheaft.Application.Commands
             });
 
             var groupedOrders = subsetOrders.OrderBy(c => c.SenderName)
-                .GroupBy(lc => new { Id = lc.SenderId, Name = lc.SenderName });
+                .GroupBy(lc => new {Id = lc.SenderId, Name = lc.SenderName});
 
             var worksheet = package.Workbook.Worksheets.Add("Préparation");
             var lastRow = WriteProductsColumn(worksheet, products);
@@ -173,7 +179,9 @@ namespace Sheaft.Application.Commands
             SetStyle(range, "#548235", "#ffffff", true, ExcelVerticalAlignment.Center, ExcelHorizontalAlignment.Center);
         }
 
-        private static void SetStyle(ExcelRange range, string backcolor = null, string fontcolor = null, bool? bold = null, ExcelVerticalAlignment? verticalAlignment = null, ExcelHorizontalAlignment? horizontalAlignment = null)
+        private static void SetStyle(ExcelRange range, string backcolor = null, string fontcolor = null,
+            bool? bold = null, ExcelVerticalAlignment? verticalAlignment = null,
+            ExcelHorizontalAlignment? horizontalAlignment = null)
         {
             range.Style.Fill.PatternType = ExcelFillStyle.Solid;
             range.Style.WrapText = true;
@@ -187,7 +195,8 @@ namespace Sheaft.Application.Commands
 
         private void WriteColumnTotal(ExcelWorksheet worksheet, int clientColumn, int productsCount)
         {
-            var range = worksheet.Cells[PickingOrderFileSettings.CLIENT_NAME_ROW, clientColumn, PickingOrderFileSettings.CLIENT_NAME_ROW + 1, clientColumn];
+            var range = worksheet.Cells[PickingOrderFileSettings.CLIENT_NAME_ROW, clientColumn,
+                PickingOrderFileSettings.CLIENT_NAME_ROW + 1, clientColumn];
             range.Merge = true;
             range.Value = "Total";
 
@@ -217,7 +226,8 @@ namespace Sheaft.Application.Commands
 
                 var rowValueRange = worksheet.Cells[currentProductRow, clientColumn];
                 rowValueRange.Formula = rowFormula;
-                SetStyle(rowValueRange, "#DDEBF7", "#000000", true, ExcelVerticalAlignment.Center, ExcelHorizontalAlignment.Right);
+                SetStyle(rowValueRange, "#DDEBF7", "#000000", true, ExcelVerticalAlignment.Center,
+                    ExcelHorizontalAlignment.Right);
             }
 
             var totalRows = PickingOrderFileSettings.PRODUCTS_START_ROW + productsCount;
@@ -250,28 +260,35 @@ namespace Sheaft.Application.Commands
             var range = worksheet.Cells[PickingOrderFileSettings.ORDER_REFERENCE_ROW, currentColumn];
             range.Value = label;
 
-            SetStyle(range, "#C6E0B4", "#000000", false, ExcelVerticalAlignment.Center, ExcelHorizontalAlignment.Center);
+            SetStyle(range, "#C6E0B4", "#000000", false, ExcelVerticalAlignment.Center,
+                ExcelHorizontalAlignment.Center);
         }
 
         private int WriteProductsColumn(ExcelWorksheet worksheet, IEnumerable<LightProduct> products)
         {
-            var clientNameRange = worksheet.Cells[PickingOrderFileSettings.CLIENT_NAME_ROW, PickingOrderFileSettings.PRODUCT_COLUMN];
+            var clientNameRange = worksheet.Cells[PickingOrderFileSettings.CLIENT_NAME_ROW,
+                PickingOrderFileSettings.PRODUCT_COLUMN];
             clientNameRange.Value = "Client";
-            SetStyle(clientNameRange, "#A9D08E", "#000000", true, ExcelVerticalAlignment.Center, ExcelHorizontalAlignment.Center);
+            SetStyle(clientNameRange, "#A9D08E", "#000000", true, ExcelVerticalAlignment.Center,
+                ExcelHorizontalAlignment.Center);
 
-            var referenceRange = worksheet.Cells[PickingOrderFileSettings.ORDER_REFERENCE_ROW, PickingOrderFileSettings.PRODUCT_COLUMN];
+            var referenceRange = worksheet.Cells[PickingOrderFileSettings.ORDER_REFERENCE_ROW,
+                PickingOrderFileSettings.PRODUCT_COLUMN];
             referenceRange.Value = "Commande(s)";
-            SetStyle(referenceRange, "#C6E0B4", "#000000", false, ExcelVerticalAlignment.Center, ExcelHorizontalAlignment.Center);
+            SetStyle(referenceRange, "#C6E0B4", "#000000", false, ExcelVerticalAlignment.Center,
+                ExcelHorizontalAlignment.Center);
 
             var productsName = products.Select(p => p.Name).Distinct().OrderBy(c => c).ToList();
 
             var row = 0;
             foreach (var productName in productsName)
             {
-                var productRange = worksheet.Cells[PickingOrderFileSettings.PRODUCTS_START_ROW + row, PickingOrderFileSettings.PRODUCT_COLUMN];
+                var productRange = worksheet.Cells[PickingOrderFileSettings.PRODUCTS_START_ROW + row,
+                    PickingOrderFileSettings.PRODUCT_COLUMN];
                 productRange.Value = productName;
 
-                SetStyle(productRange, "#E2EFDA", "#000000", false, ExcelVerticalAlignment.Center, ExcelHorizontalAlignment.Left);
+                SetStyle(productRange, "#E2EFDA", "#000000", false, ExcelVerticalAlignment.Center,
+                    ExcelHorizontalAlignment.Left);
                 row++;
             }
 
@@ -279,7 +296,8 @@ namespace Sheaft.Application.Commands
             var totalRange = worksheet.Cells[totalRow, PickingOrderFileSettings.PRODUCT_COLUMN];
             totalRange.Value = "Total";
 
-            SetStyle(totalRange, "#DDEBF7", "#000000", true, ExcelVerticalAlignment.Center, ExcelHorizontalAlignment.Right);
+            SetStyle(totalRange, "#DDEBF7", "#000000", true, ExcelVerticalAlignment.Center,
+                ExcelHorizontalAlignment.Right);
 
             return totalRow;
         }
@@ -295,7 +313,8 @@ namespace Sheaft.Application.Commands
             clientHeaderRange.Value = label;
 
             worksheet.Row(PickingOrderFileSettings.CLIENT_NAME_ROW).Height = 30;
-            SetStyle(clientHeaderRange, "#A9D08E", "#000000", true, ExcelVerticalAlignment.Center, ExcelHorizontalAlignment.Center);
+            SetStyle(clientHeaderRange, "#A9D08E", "#000000", true, ExcelVerticalAlignment.Center,
+                ExcelHorizontalAlignment.Center);
         }
 
         private int WriteColumnSubTotalRows(ExcelWorksheet worksheet, int startColumn, int ordersCount, int row)

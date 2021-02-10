@@ -1,15 +1,15 @@
 ﻿using AutoMapper;
-using Sheaft.Application.Commands;
-using Sheaft.Domain.Models;
-using Sheaft.Application.Models;
+using Sheaft.Application.Common.Models.Dto;
+using Sheaft.Application.Common.Models.Inputs;
+using Sheaft.Application.QuickOrder.Commands;
 
-namespace Sheaft.Application.Mappers
+namespace Sheaft.Application.Common.Mappings
 {
     public class QuickOrderProfile : Profile
     {
         public QuickOrderProfile()
         {
-            CreateMap<QuickOrder, QuickOrderDto>()
+            CreateMap<Domain.QuickOrder, QuickOrderDto>()
                 .ForMember(d => d.User, opt => opt.MapFrom(r => r.User))
                 .ForMember(d => d.Products, opt => opt.MapFrom(r => r.Products));
 

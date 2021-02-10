@@ -1,20 +1,22 @@
-﻿using Sheaft.Application.Models;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
 using Microsoft.Extensions.Logging;
-using Sheaft.Core;
 using Newtonsoft.Json;
-using Sheaft.Application.Events;
-using Sheaft.Application.Interop;
-using Sheaft.Domain.Models;
+using Sheaft.Application.Common;
+using Sheaft.Application.Common.Handlers;
+using Sheaft.Application.Common.Interfaces;
+using Sheaft.Application.Common.Interfaces.Services;
+using Sheaft.Application.Common.Models;
+using Sheaft.Application.Common.Models.Inputs;
+using Sheaft.Domain;
 
-namespace Sheaft.Application.Commands
+namespace Sheaft.Application.Agreement.Commands
 {
-    public class AcceptAgreementCommand : Command<bool>
+    public class AcceptAgreementCommand : Command
     {
         [JsonConstructor]
         public AcceptAgreementCommand(RequestUser requestUser) : base(requestUser)
@@ -24,9 +26,9 @@ namespace Sheaft.Application.Commands
         public Guid Id { get; set; }
         public IEnumerable<TimeSlotGroupInput> SelectedHours { get; set; }
     }
-    
+
     public class AcceptAgreementCommandsHandler : CommandsHandler,
-        IRequestHandler<AcceptAgreementCommand, Result<bool>>
+        IRequestHandler<AcceptAgreementCommand, Result>
     {
         public AcceptAgreementCommandsHandler(
             ISheaftMediatr mediatr,
@@ -36,29 +38,22 @@ namespace Sheaft.Application.Commands
         {
         }
 
-        public async Task<Result<bool>> Handle(AcceptAgreementCommand request, CancellationToken token)
+        public async Task<Result> Handle(AcceptAgreementCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(request, async() =>
+            var entity = await _context.GetByIdAsync<Domain.Agreement>(request.Id, token);
+            entity.AcceptAgreement();
+
+            var selectedHours = new List<TimeSlotHour>();
+            if (request.SelectedHours != null && request.SelectedHours.Any())
             {
-                var entity = await _context.GetByIdAsync<Agreement>(request.Id, token);
-                entity.AcceptAgreement();
+                foreach (var sh in request.SelectedHours)
+                    selectedHours.AddRange(sh.Days.Select(d => new TimeSlotHour(d, sh.From, sh.To)));
 
-                var selectedHours = new List<TimeSlotHour>();
-                if (request.SelectedHours != null && request.SelectedHours.Any())
-                {
-                    foreach (var sh in request.SelectedHours)
-                    {
-                        selectedHours.AddRange(sh.Days.Select(d => new TimeSlotHour(d, sh.From, sh.To)));
-                    }
+                entity.SetSelectedHours(selectedHours);
+            }
 
-                    entity.SetSelectedHours(selectedHours);
-                }
-
-                await _context.SaveChangesAsync(token);
-
-                _mediatr.Post(new AgreementAcceptedEvent(request.RequestUser) { AgreementId = entity.Id });
-                return Ok(true);
-            });
+            await _context.SaveChangesAsync(token);
+            return Success();
         }
     }
 }

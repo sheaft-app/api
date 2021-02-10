@@ -1,17 +1,15 @@
-﻿using HotChocolate;
+﻿using System.Collections.Generic;
+using HotChocolate;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
-using Sheaft.Core;
-using Sheaft.Core.Extensions;
-using Sheaft.Exceptions;
+using Sheaft.Application.Common.Extensions;
+using Sheaft.Domain;
+using Sheaft.Domain.Enum;
+using Sheaft.Domain.Exceptions;
 using Sheaft.Localization;
-using System;
-using System.Collections.Generic;
-using Sheaft.Domain.Enums;
-using Sheaft.Domains.Exceptions;
 
-namespace Sheaft.GraphQL.Services
+namespace Sheaft.GraphQL.Common
 {
     public class SheaftErrorFilter : IErrorFilter
     {

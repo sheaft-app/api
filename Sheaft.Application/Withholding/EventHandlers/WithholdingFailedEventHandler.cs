@@ -1,16 +1,14 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
-using Microsoft.Extensions.Options;
-using Sheaft.Application.Commands.Handlers;
-using Sheaft.Application.Events;
-using Sheaft.Application.Interop;
-using Sheaft.Application.Models;
-using Sheaft.Domain.Enums;
-using Sheaft.Domain.Models;
-using Sheaft.Options;
+using Sheaft.Application.Common.Handlers;
+using Sheaft.Application.Common.Interfaces;
+using Sheaft.Application.Common.Interfaces.Services;
+using Sheaft.Application.Common.Models;
+using Sheaft.Domain.Enum;
+using Sheaft.Domain.Events.Withholding;
 
-namespace Sheaft.Application.Handlers
+namespace Sheaft.Application.Withholding.EventHandlers
 {
     public class WithholdingFailedEventHandler : EventsHandler,
         INotificationHandler<DomainEventNotification<WithholdingFailedEvent>>
@@ -26,7 +24,7 @@ namespace Sheaft.Application.Handlers
         public async Task Handle(DomainEventNotification<WithholdingFailedEvent> notification, CancellationToken token)
         {
             var withholdingEvent = notification.DomainEvent;
-            var withholding = await _context.GetByIdAsync<Withholding>(withholdingEvent.WithholdingId, token);
+            var withholding = await _context.GetByIdAsync<Domain.Withholding>(withholdingEvent.WithholdingId, token);
             if (withholding.Status != TransactionStatus.Failed)
                 return;
 

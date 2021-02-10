@@ -4,13 +4,16 @@ using System.Threading.Tasks;
 using MediatR;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using Sheaft.Application.Interop;
-using Sheaft.Core;
-using Sheaft.Domain.Models;
+using Sheaft.Application.Common;
+using Sheaft.Application.Common.Handlers;
+using Sheaft.Application.Common.Interfaces;
+using Sheaft.Application.Common.Interfaces.Services;
+using Sheaft.Application.Common.Models;
+using Sheaft.Domain;
 
-namespace Sheaft.Application.Commands
+namespace Sheaft.Application.Job.Commands
 {
-    public class UpdateJobCommand : Command<bool>
+    public class UpdateJobCommand : Command
     {
         [JsonConstructor]
         public UpdateJobCommand(RequestUser requestUser) : base(requestUser)
@@ -20,26 +23,25 @@ namespace Sheaft.Application.Commands
         public Guid Id { get; set; }
         public string Name { get; set; }
     }
+
     public class UpdateJobCommandHandler : CommandsHandler,
-        IRequestHandler<UpdateJobCommand, Result<bool>>
+        IRequestHandler<UpdateJobCommand, Result>
     {
         public UpdateJobCommandHandler(
-            ISheaftMediatr mediatr, 
+            ISheaftMediatr mediatr,
             IAppDbContext context,
             ILogger<UpdateJobCommandHandler> logger)
             : base(mediatr, context, logger)
         {
         }
-        public async Task<Result<bool>> Handle(UpdateJobCommand request, CancellationToken token)
-        {
-            return await ExecuteAsync(request, async () =>
-            {
-                var entity = await _context.GetByIdAsync<Job>(request.Id, token);
-                entity.SetName(request.Name);
 
-                await _context.SaveChangesAsync(token);
-                return Ok(true);
-            });
+        public async Task<Result> Handle(UpdateJobCommand request, CancellationToken token)
+        {
+            var entity = await _context.GetByIdAsync<Domain.Job>(request.Id, token);
+            entity.SetName(request.Name);
+
+            await _context.SaveChangesAsync(token);
+            return Success();
         }
     }
 }

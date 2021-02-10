@@ -4,14 +4,17 @@ using System.Threading.Tasks;
 using MediatR;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using Sheaft.Application.Interop;
-using Sheaft.Core;
-using Sheaft.Domain.Enums;
-using Sheaft.Domain.Models;
+using Sheaft.Application.Common;
+using Sheaft.Application.Common.Extensions;
+using Sheaft.Application.Common.Handlers;
+using Sheaft.Application.Common.Interfaces;
+using Sheaft.Application.Common.Interfaces.Services;
+using Sheaft.Application.Common.Models;
+using Sheaft.Domain;
 
-namespace Sheaft.Application.Commands
+namespace Sheaft.Application.Job.Commands
 {
-    public class ResetJobCommand : Command<bool>
+    public class ResetJobCommand : Command
     {
         [JsonConstructor]
         public ResetJobCommand(RequestUser requestUser) : base(requestUser)
@@ -21,7 +24,7 @@ namespace Sheaft.Application.Commands
         public Guid Id { get; set; }
     }
     public class ResetJobCommandHandler : CommandsHandler,
-        IRequestHandler<ResetJobCommand, Result<bool>>
+        IRequestHandler<ResetJobCommand, Result>
     {
         public ResetJobCommandHandler(
             ISheaftMediatr mediatr, 
@@ -31,34 +34,15 @@ namespace Sheaft.Application.Commands
         {
         }
 
-        public async Task<Result<bool>> Handle(ResetJobCommand request, CancellationToken token)
+        public async Task<Result> Handle(ResetJobCommand request, CancellationToken token)
         {
-            var entity = await _context.GetByIdAsync<Job>(request.Id, token);
+            var entity = await _context.GetByIdAsync<Domain.Job>(request.Id, token);
 
             entity.ResetJob();
             await _context.SaveChangesAsync(token);
             
-            EnqueueJobCommand(entity, request.RequestUser);
-            return Ok(true);
-        }
-
-        private void EnqueueJobCommand(Job entity, RequestUser requestUser)
-        {
-            switch (entity.Kind)
-            {
-                case JobKind.ExportPickingOrders:
-                    var exportPickingOrderCommand = JsonConvert.DeserializeObject<ExportPickingOrderCommand>(entity.Command);
-                    _mediatr.Post(new ExportPickingOrderCommand(requestUser) { JobId = exportPickingOrderCommand.JobId, PurchaseOrderIds = exportPickingOrderCommand.PurchaseOrderIds });
-                    break;
-                case JobKind.ExportUserData:
-                    var exportUserDataCommand = JsonConvert.DeserializeObject<ExportUserDataCommand>(entity.Command);
-                    _mediatr.Post(new ExportUserDataCommand(requestUser) { Id = exportUserDataCommand.Id });
-                    break;
-                case JobKind.ImportProducts:
-                    var importProductsCommand = JsonConvert.DeserializeObject<ImportProductsCommand>(entity.Command);
-                    _mediatr.Post(new ImportProductsCommand(requestUser) { Id = importProductsCommand.Id });
-                    break;
-            }
+            entity.EnqueueJobCommand(_mediatr, request.RequestUser);
+            return Success();
         }
     }
 }

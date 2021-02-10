@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Sheaft.Application.Models.Mailer
+namespace Sheaft.Application.Common.Models.Mailer
 {
     public class PurchaseOrderMailerModel
     {

@@ -1,4 +1,4 @@
-﻿namespace Sheaft.Domain.StoreProcedures
+﻿namespace Sheaft.Domain.Views
 {
     public class UserPosition
     {

@@ -1,15 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Sheaft.Application.Models;
-using Sheaft.Core;
-using Sheaft.Core.Extensions;
 using AutoMapper.QueryableExtensions;
 using Microsoft.Extensions.Options;
-using Sheaft.Options;
-using Sheaft.Application.Interop;
+using Sheaft.Application.Common.Extensions;
+using Sheaft.Application.Common.Interfaces;
+using Sheaft.Application.Common.Interfaces.Queries;
+using Sheaft.Application.Common.Models.Dto;
+using Sheaft.Application.Common.Options;
+using Sheaft.Domain;
 
-namespace Sheaft.Application.Queries
+namespace Sheaft.Application.Agreement.Queries
 {
     public class AgreementQueries : IAgreementQueries
     {

@@ -1,7 +1,6 @@
-﻿using Sheaft.Domain.Interop;
-using System;
+﻿using System;
 
-namespace Sheaft.Domain.Models
+namespace Sheaft.Domain
 {
     public class Nationality
     {

@@ -1,17 +1,17 @@
 ﻿using System;
 using Newtonsoft.Json;
-using Sheaft.Core;
-using Sheaft.Domain.Models.Common;
+using Sheaft.Domain.Common;
 
-namespace Sheaft.Application.Events
+namespace Sheaft.Domain.Events.User
 {
     public class UserDataExportProcessingEvent : DomainEvent
     {
         [JsonConstructor]
-        public UserDataExportProcessingEvent(RequestUser requestUser) : base(requestUser)
+        public UserDataExportProcessingEvent(Guid jobId)
         {
+            JobId = jobId;
         }
 
-        public Guid JobId { get; set; }
+        public Guid JobId { get; }
     }
 }

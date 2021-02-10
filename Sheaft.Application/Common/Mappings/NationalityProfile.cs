@@ -1,16 +1,16 @@
 ﻿using AutoMapper;
-using Sheaft.Domain.Models;
-using Sheaft.Application.Models;
+using Sheaft.Application.Common.Models.Dto;
+using Sheaft.Application.Common.Models.ViewModels;
 
-namespace Sheaft.Application.Mappers
+namespace Sheaft.Application.Common.Mappings
 {
     public class NationalityProfile : Profile
     {
         public NationalityProfile()
         {
-            CreateMap<Nationality, NationalityViewModel>();
+            CreateMap<Domain.Nationality, NationalityViewModel>();
 
-            CreateMap<Nationality, NationalityDto>()
+            CreateMap<Domain.Nationality, NationalityDto>()
                 .ForMember(c => c.Code, opt => opt.MapFrom(t => t.Alpha2));
         }
     }

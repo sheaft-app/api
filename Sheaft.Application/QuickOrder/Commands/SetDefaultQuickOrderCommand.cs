@@ -4,13 +4,16 @@ using System.Threading.Tasks;
 using MediatR;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using Sheaft.Application.Interop;
-using Sheaft.Core;
-using Sheaft.Domain.Models;
+using Sheaft.Application.Common;
+using Sheaft.Application.Common.Handlers;
+using Sheaft.Application.Common.Interfaces;
+using Sheaft.Application.Common.Interfaces.Services;
+using Sheaft.Application.Common.Models;
+using Sheaft.Domain;
 
-namespace Sheaft.Application.Commands
+namespace Sheaft.Application.QuickOrder.Commands
 {
-    public class SetDefaultQuickOrderCommand : Command<bool>
+    public class SetDefaultQuickOrderCommand : Command
     {
         [JsonConstructor]
         public SetDefaultQuickOrderCommand(RequestUser requestUser) : base(requestUser)
@@ -19,9 +22,9 @@ namespace Sheaft.Application.Commands
 
         public Guid Id { get; set; }
     }
-    
+
     public class SetDefaultQuickOrderCommandHandler : CommandsHandler,
-        IRequestHandler<SetDefaultQuickOrderCommand, Result<bool>>
+        IRequestHandler<SetDefaultQuickOrderCommand, Result>
     {
         public SetDefaultQuickOrderCommandHandler(
             ISheaftMediatr mediatr,
@@ -30,24 +33,22 @@ namespace Sheaft.Application.Commands
             : base(mediatr, context, logger)
         {
         }
-        public async Task<Result<bool>> Handle(SetDefaultQuickOrderCommand request, CancellationToken token)
+
+        public async Task<Result> Handle(SetDefaultQuickOrderCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(request, async () =>
+            var quickOrders = await _context.FindAsync<Domain.QuickOrder>(c => c.User.Id == request.RequestUser.Id, token);
+            foreach (var quickOrder in quickOrders)
             {
-                var quickOrders = await _context.FindAsync<QuickOrder>(c => c.User.Id == request.RequestUser.Id, token);
-                foreach (var quickOrder in quickOrders)
-                {
-                    if (quickOrder.Id == request.Id)
-                        quickOrder.SetAsDefault();
-                    else
-                        quickOrder.UnsetAsDefault();
-                }
+                if (quickOrder.Id == request.Id)
+                    quickOrder.SetAsDefault();
+                else
+                    quickOrder.UnsetAsDefault();
+            }
 
-                _context.UpdateRange(quickOrders);
-                await _context.SaveChangesAsync(token); 
+            _context.UpdateRange(quickOrders);
+            await _context.SaveChangesAsync(token);
 
-                return Ok(true);
-            });
+            return Success();
         }
     }
 }

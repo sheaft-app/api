@@ -4,15 +4,16 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Sheaft.Application.Commands;
-using Sheaft.Exceptions;
-using Sheaft.Application.Interop;
-using Sheaft.Application.Models;
-using Sheaft.Options;
 using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Sheaft.Application.Common.Interfaces;
+using Sheaft.Application.Common.Interfaces.Services;
+using Sheaft.Application.Common.Models.ViewModels;
+using Sheaft.Application.Common.Options;
+using Sheaft.Application.Region.Commands;
+using Sheaft.Domain.Exceptions;
 
 namespace Sheaft.Web.Manage.Controllers
 {
@@ -66,7 +67,7 @@ namespace Sheaft.Web.Manage.Controllers
                 .SingleOrDefaultAsync(token);
 
             if (entity == null)
-                throw new NotFoundException();
+                throw SheaftException.NotFound();
 
             return View(entity);
         }
@@ -82,7 +83,7 @@ namespace Sheaft.Web.Manage.Controllers
                 RequiredProducers = model.RequiredProducers
             }, token);
 
-            if (!result.Success)
+            if (!result.Succeeded)
             {
                 ModelState.AddModelError("", result.Exception.Message);
                 return View(model);

@@ -4,13 +4,16 @@ using System.Threading.Tasks;
 using MediatR;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using Sheaft.Application.Interop;
-using Sheaft.Core;
-using Sheaft.Domain.Models;
+using Sheaft.Application.Common;
+using Sheaft.Application.Common.Handlers;
+using Sheaft.Application.Common.Interfaces;
+using Sheaft.Application.Common.Interfaces.Services;
+using Sheaft.Application.Common.Models;
+using Sheaft.Domain;
 
-namespace Sheaft.Application.Commands
+namespace Sheaft.Application.PurchaseOrder.Commands
 {
-    public class DeletePurchaseOrderCommand : Command<bool>
+    public class DeletePurchaseOrderCommand : Command
     {
         [JsonConstructor]
         public DeletePurchaseOrderCommand(RequestUser requestUser) : base(requestUser)
@@ -19,9 +22,9 @@ namespace Sheaft.Application.Commands
 
         public Guid Id { get; set; }
     }
-    
+
     public class DeletePurchaseOrderCommandHandler : CommandsHandler,
-        IRequestHandler<DeletePurchaseOrderCommand, Result<bool>>
+        IRequestHandler<DeletePurchaseOrderCommand, Result>
     {
         private readonly ICapingDeliveriesService _capingDeliveriesService;
 
@@ -34,17 +37,15 @@ namespace Sheaft.Application.Commands
         {
             _capingDeliveriesService = capingDeliveriesService;
         }
-        public async Task<Result<bool>> Handle(DeletePurchaseOrderCommand request, CancellationToken token)
+
+        public async Task<Result> Handle(DeletePurchaseOrderCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(request, async () =>
-            {
-                var entity = await _context.GetByIdAsync<PurchaseOrder>(request.Id, token);
+            var entity = await _context.GetByIdAsync<Domain.PurchaseOrder>(request.Id, token);
 
-                _context.Remove(entity);
-                await _context.SaveChangesAsync(token);
+            _context.Remove(entity);
+            await _context.SaveChangesAsync(token);
 
-                return Ok(true);
-            });
+            return Success();
         }
     }
 }

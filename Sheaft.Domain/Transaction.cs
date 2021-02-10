@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
+using Sheaft.Domain.Common;
+using Sheaft.Domain.Enum;
 using Sheaft.Domain.Interop;
-using Sheaft.Domain.Enums;
 
-namespace Sheaft.Domain.Models
+namespace Sheaft.Domain
 {
     public abstract class Transaction : IEntity
     {

@@ -3,27 +3,42 @@ using System.Threading;
 using System.Threading.Tasks;
 using Hangfire;
 using MediatR;
-using Sheaft.Core;
-using Sheaft.Domain.Models.Common;
+using Microsoft.Extensions.Logging;
+using Sheaft.Application.Common.Interfaces.Services;
+using Sheaft.Application.Common.Models;
+using Sheaft.Domain;
+using Sheaft.Domain.Common;
 
-namespace Sheaft.Application.Interop
+namespace Sheaft.Infrastructure.Services
 {
     public class SheaftMediatr : ISheaftMediatr
     {
         private readonly IMediator _mediatr;
         private readonly IBackgroundJobClient _backgroundJobClient;
+        private readonly ILogger<ISheaftMediatr> _logger;
 
         public SheaftMediatr(
             IMediator mediatr,
-            IBackgroundJobClient backgroundJobClient)
+            IBackgroundJobClient backgroundJobClient,
+            ILogger<ISheaftMediatr> logger)
         {
             _mediatr = mediatr;
             _backgroundJobClient = backgroundJobClient;
+            _logger = logger;
         }
 
         public void Post<T>(ICommand<T> command, string jobname = null)
         {
             var name = jobname ?? command.GetType().Name;
+            _logger.LogInformation("Offloading command {event}", name);
+            name += GetJobRequestUserName(command.RequestUser);
+            _backgroundJobClient.Enqueue<SheaftHangfireBridge>(bridge => bridge.Execute(name, command, CancellationToken.None));
+        }
+
+        public void Post(ICommand command, string jobname = null)
+        {
+            var name = jobname ?? command.GetType().Name;
+            _logger.LogInformation("Offloading command {event}", name);
             name += GetJobRequestUserName(command.RequestUser);
             _backgroundJobClient.Enqueue<SheaftHangfireBridge>(bridge => bridge.Execute(name, command, CancellationToken.None));
         }
@@ -31,13 +46,22 @@ namespace Sheaft.Application.Interop
         public void Post(DomainEvent notification, string jobname = null)
         {
             var name = jobname ?? notification.GetType().Name;
-            name += GetJobRequestUserName(notification.RequestUser);
+            _logger.LogInformation("Publishing event {event}", name);
             _backgroundJobClient.Enqueue<SheaftHangfireBridge>(bridge => bridge.Execute(name, notification, CancellationToken.None));
+        }
+
+        public void Schedule(ICommand command, TimeSpan delay, string jobname = null)
+        {
+            var name = jobname ?? command.GetType().Name;
+            _logger.LogInformation("Scheduling command {event}", name);
+            name += GetJobRequestUserName(command.RequestUser);
+            _backgroundJobClient.Schedule<SheaftHangfireBridge>(bridge => bridge.Execute(name, command, CancellationToken.None), delay);
         }
 
         public void Schedule<T>(ICommand<T> command, TimeSpan delay, string jobname = null)
         {
             var name = jobname ?? command.GetType().Name;
+            _logger.LogInformation("Scheduling command {event}", name);
             name += GetJobRequestUserName(command.RequestUser);
             _backgroundJobClient.Schedule<SheaftHangfireBridge>(bridge => bridge.Execute(name, command, CancellationToken.None), delay);
         }
@@ -45,18 +69,18 @@ namespace Sheaft.Application.Interop
         public void Schedule(DomainEvent notification, TimeSpan delay, string jobname = null)
         {
             var name = jobname ?? notification.GetType().Name;
-            name += GetJobRequestUserName(notification.RequestUser);
+            _logger.LogInformation("Scheduling event {event}", name);
             _backgroundJobClient.Schedule<SheaftHangfireBridge>(bridge => bridge.Execute(name, notification, CancellationToken.None), delay);
         }
 
-        public async Task<Result<T>> Process<T>(ICommand<T> data, CancellationToken token)
+        public async Task<Result> Process(ICommand command, CancellationToken token)
         {
-            return await _mediatr.Send(data, token);
+            return await _mediatr.Send(command, token);
         }
 
-        public async Task Process(DomainEvent data, CancellationToken token)
+        public async Task<Result<T>> Process<T>(ICommand<T> command, CancellationToken token)
         {
-            await _mediatr.Publish(data, token);
+            return await _mediatr.Send(command, token);
         }
 
         private static string GetJobRequestUserName(RequestUser user)

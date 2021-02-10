@@ -1,12 +1,14 @@
-﻿using Sheaft.Domain.Enums;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Sheaft.Domains.Exceptions;
+using Sheaft.Domain.Common;
+using Sheaft.Domain.Enum;
+using Sheaft.Domain.Events.Payin;
+using Sheaft.Domain.Exceptions;
 
-namespace Sheaft.Domain.Models
+namespace Sheaft.Domain
 {
-    public abstract class Payin : Transaction
+    public abstract class Payin : Transaction, IHasDomainEvent
     {
         private List<PayinRefund> _refunds;
 
@@ -23,6 +25,7 @@ namespace Sheaft.Domain.Models
             CreditedWallet = creditedWallet;
             Reference = "SHEAFT";
 
+            DomainEvents = new List<DomainEvent>();
             _refunds = new List<PayinRefund>();
         }
 
@@ -37,5 +40,22 @@ namespace Sheaft.Domain.Models
 
             _refunds.Add(refund);
         }
+
+        public override void SetStatus(TransactionStatus status)
+        {
+            base.SetStatus(status);
+            
+            switch (Status)
+            {
+                case TransactionStatus.Failed:
+                    DomainEvents.Add(new PayinFailedEvent(Id));
+                    break;
+                case TransactionStatus.Succeeded:
+                    DomainEvents.Add(new PayinSucceededEvent(Id));
+                    break;
+            }
+        }
+
+        public List<DomainEvent> DomainEvents { get; } = new List<DomainEvent>();
     }
 }

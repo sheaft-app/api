@@ -1,9 +1,9 @@
 using System;
+using Sheaft.Domain.Enum;
+using Sheaft.Domain.Exceptions;
 using Sheaft.Domain.Interop;
-using Sheaft.Domain.Enums;
-using Sheaft.Domains.Exceptions;
 
-namespace Sheaft.Domain.Models
+namespace Sheaft.Domain
 {
     public class Notification : IEntity
     {

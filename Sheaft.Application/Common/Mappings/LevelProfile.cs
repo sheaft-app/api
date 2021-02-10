@@ -1,17 +1,17 @@
 ﻿using AutoMapper;
-using Sheaft.Domain.Models;
-using Sheaft.Application.Models;
+using Sheaft.Application.Common.Models.Dto;
+using Sheaft.Application.Common.Models.ViewModels;
 
-namespace Sheaft.Application.Mappers
+namespace Sheaft.Application.Common.Mappings
 {
     public class LevelProfile : Profile
     {
         public LevelProfile()
         {
-            CreateMap<Level, LevelDto>()
+            CreateMap<Domain.Level, LevelDto>()
                 .ForMember(d => d.Rewards, opt => opt.MapFrom(r => r.Rewards));
 
-            CreateMap<Level, LevelViewModel>()
+            CreateMap<Domain.Level, LevelViewModel>()
                 .ForMember(d => d.Rewards, opt => opt.MapFrom(r => r.Rewards));
         }
     }

@@ -5,25 +5,63 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <Content Include="Services\Templates\AgreementAcceptedEvent.cshtml" />
-      <Content Include="Services\Templates\AgreementCancelledEvent.cshtml" />
-      <Content Include="Services\Templates\AgreementCreatedEvent.cshtml" />
-      <Content Include="Services\Templates\AgreementRefusedEvent.cshtml" />
-      <Content Include="Services\Templates\PayinFailedEvent.cshtml" />
-      <Content Include="Services\Templates\PayinSucceededEvent.cshtml" />
-      <Content Include="Services\Templates\PickingOrderExportFailedEvent.cshtml" />
-      <Content Include="Services\Templates\PickingOrderExportSucceededEvent.cshtml" />
-      <Content Include="Services\Templates\ProductImportFailedEvent.cshtml" />
-      <Content Include="Services\Templates\ProductImportSucceededEvent.cshtml" />
-      <Content Include="Services\Templates\PurchaseOrderAcceptedEvent.cshtml" />
-      <Content Include="Services\Templates\PurchaseOrderCancelledEvent.cshtml" />
-      <Content Include="Services\Templates\PurchaseOrderCompletedEvent.cshtml" />
-      <Content Include="Services\Templates\PurchaseOrderCreatedEvent.cshtml" />
-      <Content Include="Services\Templates\PurchaseOrderReceivedEvent.cshtml" />
-      <Content Include="Services\Templates\PurchaseOrderRefusedEvent.cshtml" />
-      <Content Include="Services\Templates\PurchaseOrderWithdrawnEvent.cshtml" />
-      <Content Include="Services\Templates\UserDataExportFailedEvent.cshtml" />
-      <Content Include="Services\Templates\UserDataExportSucceededEvent.cshtml" />
+      <Content Include="Services\Templates\AgreementAcceptedEvent.cshtml">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </Content>
+      <Content Include="Services\Templates\AgreementCancelledEvent.cshtml">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </Content>
+      <Content Include="Services\Templates\AgreementCreatedEvent.cshtml">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </Content>
+      <Content Include="Services\Templates\AgreementRefusedEvent.cshtml">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </Content>
+      <Content Include="Services\Templates\PayinFailedEvent.cshtml">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </Content>
+      <Content Include="Services\Templates\PayinSucceededEvent.cshtml">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </Content>
+      <Content Include="Services\Templates\PickingOrderExportFailedEvent.cshtml">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </Content>
+      <Content Include="Services\Templates\PickingOrderExportSucceededEvent.cshtml">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </Content>
+      <Content Include="Services\Templates\ProductImportFailedEvent.cshtml">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </Content>
+      <Content Include="Services\Templates\ProductImportSucceededEvent.cshtml">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </Content>
+      <Content Include="Services\Templates\PurchaseOrderAcceptedEvent.cshtml">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </Content>
+      <Content Include="Services\Templates\PurchaseOrderCancelledEvent.cshtml">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </Content>
+      <Content Include="Services\Templates\PurchaseOrderCompletedEvent.cshtml">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </Content>
+      <Content Include="Services\Templates\PurchaseOrderCreatedEvent.cshtml">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </Content>
+      <Content Include="Services\Templates\PurchaseOrderReceivedEvent.cshtml">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </Content>
+      <Content Include="Services\Templates\PurchaseOrderRefusedEvent.cshtml">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </Content>
+      <Content Include="Services\Templates\PurchaseOrderWithdrawnEvent.cshtml">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </Content>
+      <Content Include="Services\Templates\UserDataExportFailedEvent.cshtml">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </Content>
+      <Content Include="Services\Templates\UserDataExportSucceededEvent.cshtml">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </Content>
     </ItemGroup>
 
     <ItemGroup>

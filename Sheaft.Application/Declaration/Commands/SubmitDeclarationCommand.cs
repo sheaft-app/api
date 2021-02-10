@@ -3,26 +3,29 @@ using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
 using Microsoft.Extensions.Logging;
-using Sheaft.Core;
 using Newtonsoft.Json;
-using Sheaft.Application.Interop;
-using Sheaft.Domain.Enums;
-using Sheaft.Domain.Models;
-using Sheaft.Exceptions;
+using Sheaft.Application.Common;
+using Sheaft.Application.Common.Handlers;
+using Sheaft.Application.Common.Interfaces;
+using Sheaft.Application.Common.Interfaces.Services;
+using Sheaft.Application.Common.Models;
+using Sheaft.Domain;
+using Sheaft.Domain.Enum;
 
-namespace Sheaft.Application.Commands
+namespace Sheaft.Application.Declaration.Commands
 {
-    public class SubmitDeclarationCommand : Command<bool>
+    public class SubmitDeclarationCommand : Command
     {
         [JsonConstructor]
         public SubmitDeclarationCommand(RequestUser requestUser) : base(requestUser)
         {
         }
+
         public Guid DeclarationId { get; set; }
     }
-    
+
     public class SubmitDeclarationCommandHandler : CommandsHandler,
-           IRequestHandler<SubmitDeclarationCommand, Result<bool>>
+        IRequestHandler<SubmitDeclarationCommand, Result>
     {
         private readonly IPspService _pspService;
 
@@ -35,31 +38,32 @@ namespace Sheaft.Application.Commands
         {
             _pspService = pspService;
         }
-        public async Task<Result<bool>> Handle(SubmitDeclarationCommand request, CancellationToken token)
+
+        public async Task<Result> Handle(SubmitDeclarationCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(request, async () =>
+            var legal = await _context.GetSingleAsync<BusinessLegal>(r => r.Declaration.Id == request.DeclarationId,
+                token);
+            if (legal.Declaration.Status != DeclarationStatus.Locked)
+                return Failure(MessageKind.Declaration_CannotSubmit_NotLocked);
+
+            if (string.IsNullOrWhiteSpace(legal.Declaration.Identifier))
             {
-                var legal = await _context.GetSingleAsync<BusinessLegal>(r => r.Declaration.Id == request.DeclarationId, token);
-                if (legal.Declaration.Status != DeclarationStatus.Locked)
-                    return BadRequest<bool>(MessageKind.Declaration_CannotSubmit_NotLocked);
+                var createResult =
+                    await _mediatr.Process(new CreateDeclarationCommand(request.RequestUser) {LegalId = legal.Id},
+                        token);
+                if (!createResult.Succeeded)
+                    return Failure(createResult.Exception);
+            }
 
-                if (string.IsNullOrWhiteSpace(legal.Declaration.Identifier))
-                {
-                    var createResult = await _mediatr.Process(new CreateDeclarationCommand(request.RequestUser) { LegalId = legal.Id }, token);
-                    if (!createResult.Success)
-                        return Failed<bool>(createResult.Exception);
-                }
+            var submitResult = await _pspService.SubmitUboDeclarationAsync(legal.Declaration, legal.User, token);
+            if (!submitResult.Succeeded)
+                return Failure(submitResult.Exception);
 
-                var submitResult = await _pspService.SubmitUboDeclarationAsync(legal.Declaration, legal.User, token);
-                if (!submitResult.Success)
-                    return Failed<bool>(submitResult.Exception);
+            legal.Declaration.SetStatus(submitResult.Data.Status);
+            legal.Declaration.SetResult(submitResult.Data.ResultCode, submitResult.Data.ResultMessage);
 
-                legal.Declaration.SetStatus(submitResult.Data.Status);
-                legal.Declaration.SetResult(submitResult.Data.ResultCode, submitResult.Data.ResultMessage);
-
-                await _context.SaveChangesAsync(token);
-                return Ok(true);
-            });
+            await _context.SaveChangesAsync(token);
+            return Success();
         }
     }
 }

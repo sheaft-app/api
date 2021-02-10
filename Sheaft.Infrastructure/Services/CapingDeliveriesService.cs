@@ -1,15 +1,16 @@
 ﻿using Microsoft.Azure.Cosmos.Table;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Sheaft.Application.Interop;
-using Sheaft.Application.Models;
-using Sheaft.Core;
-using Sheaft.Options;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Sheaft.Application.Common;
+using Sheaft.Application.Common.Interfaces.Services;
+using Sheaft.Application.Common.Models;
+using Sheaft.Application.Common.Models.Dto;
+using Sheaft.Application.Common.Options;
 
 namespace Sheaft.Infrastructure.Services
 {
@@ -29,8 +30,6 @@ namespace Sheaft.Infrastructure.Services
 
         public async Task<Result<IEnumerable<CapingDeliveryDto>>> GetCapingDeliveriesAsync(IEnumerable<Tuple<Guid, Guid, DeliveryHourDto>> deliveries, CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
-            {
                 var table = _cloudStorageAccount.CreateCloudTableClient().GetTableReference(_storageOptions.Tables.CapingDeliveries);
                 await table.CreateIfNotExistsAsync(token);
 
@@ -62,14 +61,11 @@ namespace Sheaft.Infrastructure.Services
                         });
                 }
 
-                return Ok(capingDeliveries.AsEnumerable());
-            });
+                return Success(capingDeliveries.AsEnumerable());
         }
 
         public async Task<Result<CapingDeliveryDto>> GetCapingDeliveryAsync(Guid producerId, Guid deliveryId, DateTimeOffset expectedDeliveryDate, TimeSpan from, TimeSpan to, CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
-            {
                 var table = _cloudStorageAccount.CreateCloudTableClient().GetTableReference(_storageOptions.Tables.CapingDeliveries);
                 await table.CreateIfNotExistsAsync(token);
 
@@ -78,11 +74,11 @@ namespace Sheaft.Infrastructure.Services
 
                 var result = await table.ExecuteAsync(TableOperation.Retrieve<CapingDeliveryTableEntity>(partitionKey, rowkey), token);
                 if (result == null || result.HttpStatusCode >= 400)
-                    return Failed<CapingDeliveryDto>(new Exception($"{result.HttpStatusCode}-{result.SessionToken}"));
+                    return Failure<CapingDeliveryDto>(new Exception($"{result.HttpStatusCode}-{result.SessionToken}"));
 
                 var capingDelivery = result.Result as CapingDeliveryTableEntity;
                 if (capingDelivery == null)
-                    return Ok(new CapingDeliveryDto
+                    return Success(new CapingDeliveryDto
                     {
                         PartitionKey = partitionKey,
                         RowKey = rowkey,
@@ -94,7 +90,7 @@ namespace Sheaft.Infrastructure.Services
                         To = to
                     });
 
-                return Ok(new CapingDeliveryDto
+                return Success(new CapingDeliveryDto
                 {
                     PartitionKey = capingDelivery.PartitionKey,
                     RowKey = capingDelivery.RowKey,
@@ -105,23 +101,20 @@ namespace Sheaft.Infrastructure.Services
                     From = TimeSpan.FromSeconds(capingDelivery.From),
                     To = TimeSpan.FromSeconds(capingDelivery.To)
                 });
-            });
         }
 
-        public async Task<Result<bool>> IncreaseProducerDeliveryCountAsync(Guid producerId, Guid deliveryId, DateTimeOffset expectedDeliveryDate, TimeSpan from, TimeSpan to, int maxPurchaseOrders, CancellationToken token)
+        public async Task<Result> IncreaseProducerDeliveryCountAsync(Guid producerId, Guid deliveryId, DateTimeOffset expectedDeliveryDate, TimeSpan from, TimeSpan to, int maxPurchaseOrders, CancellationToken token)
         {
             return await UpdateProducerDeliveryCountAsync(producerId, deliveryId, expectedDeliveryDate, from, to, maxPurchaseOrders, +1, token);
         }
 
-        public async Task<Result<bool>> DecreaseProducerDeliveryCountAsync(Guid producerId, Guid deliveryId, DateTimeOffset expectedDeliveryDate, TimeSpan from, TimeSpan to, int maxPurchaseOrders, CancellationToken token)
+        public async Task<Result> DecreaseProducerDeliveryCountAsync(Guid producerId, Guid deliveryId, DateTimeOffset expectedDeliveryDate, TimeSpan from, TimeSpan to, int maxPurchaseOrders, CancellationToken token)
         {
             return await UpdateProducerDeliveryCountAsync(producerId, deliveryId, expectedDeliveryDate, from, to, maxPurchaseOrders, -1, token);
         }
 
-        private async Task<Result<bool>> UpdateProducerDeliveryCountAsync(Guid producerId, Guid deliveryId, DateTimeOffset expectedDeliveryDate, TimeSpan from, TimeSpan to, int maxPurchaseOrders, int change, CancellationToken token)
+        private async Task<Result> UpdateProducerDeliveryCountAsync(Guid producerId, Guid deliveryId, DateTimeOffset expectedDeliveryDate, TimeSpan from, TimeSpan to, int maxPurchaseOrders, int change, CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
-            {
                 var table = _cloudStorageAccount.CreateCloudTableClient().GetTableReference(_storageOptions.Tables.CapingDeliveries);
                 await table.CreateIfNotExistsAsync(token);
 
@@ -172,8 +165,7 @@ namespace Sheaft.Infrastructure.Services
                     }
                 } while (concurrentUpdateError);
 
-                return Ok(true);
-            });
+                return Success();
         }
 
         private static string GetRowKey(TimeSpan from, TimeSpan to)

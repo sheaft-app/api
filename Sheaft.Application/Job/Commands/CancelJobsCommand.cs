@@ -5,12 +5,16 @@ using System.Threading.Tasks;
 using MediatR;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using Sheaft.Application.Interop;
-using Sheaft.Core;
+using Sheaft.Application.Common;
+using Sheaft.Application.Common.Handlers;
+using Sheaft.Application.Common.Interfaces;
+using Sheaft.Application.Common.Interfaces.Services;
+using Sheaft.Application.Common.Models;
+using Sheaft.Domain;
 
-namespace Sheaft.Application.Commands
+namespace Sheaft.Application.Job.Commands
 {
-    public class CancelJobsCommand : Command<bool>
+    public class CancelJobsCommand : Command
     {
         [JsonConstructor]
         public CancelJobsCommand(RequestUser requestUser) : base(requestUser)
@@ -20,36 +24,34 @@ namespace Sheaft.Application.Commands
         public IEnumerable<Guid> Ids { get; set; }
         public string Reason { get; set; }
     }
-    
+
     public class CancelJobsCommandHandler : CommandsHandler,
-        IRequestHandler<CancelJobsCommand, Result<bool>>
+        IRequestHandler<CancelJobsCommand, Result>
     {
         public CancelJobsCommandHandler(
-            ISheaftMediatr mediatr, 
+            ISheaftMediatr mediatr,
             IAppDbContext context,
             ILogger<CancelJobsCommandHandler> logger)
             : base(mediatr, context, logger)
         {
         }
 
-        public async Task<Result<bool>> Handle(CancelJobsCommand request,
+        public async Task<Result> Handle(CancelJobsCommand request,
             CancellationToken token)
         {
-            return await ExecuteAsync(request, async () =>
-           {
-               using (var transaction = await _context.BeginTransactionAsync(token))
-               {
-                   foreach (var jobId in request.Ids)
-                   {
-                       var result = await _mediatr.Process(new CancelJobCommand(request.RequestUser) { Id = jobId, Reason = request.Reason }, token);
-                       if (!result.Success)
-                           return Failed<bool>(result.Exception);
-                   }
+            using (var transaction = await _context.BeginTransactionAsync(token))
+            {
+                foreach (var jobId in request.Ids)
+                {
+                    var result = await _mediatr.Process(
+                        new CancelJobCommand(request.RequestUser) {Id = jobId, Reason = request.Reason}, token);
+                    if (!result.Succeeded)
+                        return Failure(result.Exception);
+                }
 
-                   await transaction.CommitAsync(token);
-                   return Ok(true);
-               }
-           });
+                await transaction.CommitAsync(token);
+                return Success();
+            }
         }
     }
 }

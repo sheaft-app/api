@@ -4,16 +4,18 @@ using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
 using Microsoft.Extensions.Logging;
-using Sheaft.Core;
 using Newtonsoft.Json;
-using Sheaft.Application.Interop;
-using Sheaft.Domain.Enums;
-using Sheaft.Domain.Models;
-using Sheaft.Exceptions;
+using Sheaft.Application.Common;
+using Sheaft.Application.Common.Handlers;
+using Sheaft.Application.Common.Interfaces;
+using Sheaft.Application.Common.Interfaces.Services;
+using Sheaft.Application.Common.Models;
+using Sheaft.Domain;
+using Sheaft.Domain.Enum;
 
-namespace Sheaft.Application.Commands
+namespace Sheaft.Application.Document.Commands
 {
-    public class UpdateDocumentCommand : Command<bool>
+    public class UpdateDocumentCommand : Command
     {
         [JsonConstructor]
         public UpdateDocumentCommand(RequestUser requestUser) : base(requestUser)
@@ -24,8 +26,9 @@ namespace Sheaft.Application.Commands
         public string Name { get; set; }
         public DocumentKind Kind { get; set; }
     }
+
     public class UpdateDocumentCommandHandler : CommandsHandler,
-            IRequestHandler<UpdateDocumentCommand, Result<bool>>
+        IRequestHandler<UpdateDocumentCommand, Result>
     {
         private readonly IPspService _pspService;
 
@@ -39,31 +42,28 @@ namespace Sheaft.Application.Commands
             _pspService = pspService;
         }
 
-        public async Task<Result<bool>> Handle(UpdateDocumentCommand request, CancellationToken token)
+        public async Task<Result> Handle(UpdateDocumentCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(request, async () =>
+            var legal = await _context.GetSingleAsync<Domain.Legal>(r => r.Documents.Any(d => d.Id == request.Id), token);
+            var document = legal.Documents.FirstOrDefault(c => c.Id == request.Id);
+            if (document.Kind != request.Kind && legal.Documents.Any(d => d.Kind == request.Kind))
+                return Failure(MessageKind.Document_CannotUpdate_Another_Document_With_Type_Exists);
+
+            document.SetKind(request.Kind);
+            document.SetName(request.Name);
+
+            if (string.IsNullOrWhiteSpace(document.Identifier))
             {
-                var legal = await _context.GetSingleAsync<Legal>(r => r.Documents.Any(d => d.Id == request.Id), token);
-                var document = legal.Documents.FirstOrDefault(c => c.Id == request.Id);
-                if (document.Kind != request.Kind && legal.Documents.Any(d => d.Kind == request.Kind))
-                    return BadRequest<bool>(MessageKind.Document_CannotUpdate_Another_Document_With_Type_Exists);
+                var result = await _pspService.CreateDocumentAsync(document, legal.User.Identifier, token);
+                if (!result.Succeeded)
+                    return Failure(result.Exception);
 
-                document.SetKind(request.Kind);
-                document.SetName(request.Name);
+                document.SetIdentifier(result.Data.Identifier);
+                document.SetStatus(result.Data.Status);
+            }
 
-                if (string.IsNullOrWhiteSpace(document.Identifier))
-                {
-                    var result = await _pspService.CreateDocumentAsync(document, legal.User.Identifier, token);
-                    if (!result.Success)
-                        return Failed<bool>(result.Exception);
-
-                    document.SetIdentifier(result.Data.Identifier);
-                    document.SetStatus(result.Data.Status);
-                }
-
-                await _context.SaveChangesAsync(token);
-                return Ok(true);
-            });
+            await _context.SaveChangesAsync(token);
+            return Success();
         }
     }
 }

@@ -1,6 +1,6 @@
-﻿using Sheaft.Domain.Enums;
+﻿using Sheaft.Domain.Enum;
 
-namespace Sheaft.Application.Models
+namespace Sheaft.Application.Common.Models.Inputs
 {
     public class AddressInput
     {

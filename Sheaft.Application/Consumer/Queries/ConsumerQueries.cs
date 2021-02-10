@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Linq;
-using Sheaft.Core;
-using Sheaft.Domain.Models;
 using AutoMapper.QueryableExtensions;
-using Sheaft.Application.Models;
-using Sheaft.Application.Interop;
+using Sheaft.Application.Common.Extensions;
+using Sheaft.Application.Common.Interfaces;
+using Sheaft.Application.Common.Interfaces.Queries;
+using Sheaft.Application.Common.Models.Dto;
+using Sheaft.Domain;
 
-namespace Sheaft.Application.Queries
+namespace Sheaft.Application.Consumer.Queries
 {
     public class ConsumerQueries : IConsumerQueries
     {
@@ -21,7 +22,7 @@ namespace Sheaft.Application.Queries
 
         public IQueryable<ConsumerDto> GetConsumer(Guid id, RequestUser currentUser)
         {
-            return _context.Users.OfType<Consumer>()
+            return _context.Users.OfType<Domain.Consumer>()
                     .Get(c => c.Id == id)
                     .ProjectTo<ConsumerDto>(_configurationProvider);
         }

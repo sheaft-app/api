@@ -1,17 +1,20 @@
-﻿using Newtonsoft.Json;
-using Sheaft.Core;
-using System;
+﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Sheaft.Application.Interop;
-using Sheaft.Domain.Enums;
-using Sheaft.Domain.Models;
-using Sheaft.Options;
+using Newtonsoft.Json;
+using Sheaft.Application.Common;
+using Sheaft.Application.Common.Handlers;
+using Sheaft.Application.Common.Interfaces;
+using Sheaft.Application.Common.Interfaces.Services;
+using Sheaft.Application.Common.Models;
+using Sheaft.Application.Common.Options;
+using Sheaft.Domain;
+using Sheaft.Domain.Enum;
 
-namespace Sheaft.Application.Commands
+namespace Sheaft.Application.User.Commands
 {
     public class QueueExportUserDataCommand : Command<Guid>
     {
@@ -22,7 +25,7 @@ namespace Sheaft.Application.Commands
 
         public Guid Id { get; set; }
     }
-    
+
     public class QueueExportUserDataCommandHandler : CommandsHandler,
         IRequestHandler<QueueExportUserDataCommand, Result<Guid>>
     {
@@ -43,22 +46,21 @@ namespace Sheaft.Application.Commands
             _scoringOptions = scoringOptions.Value;
             _blobService = blobService;
         }
+
         public async Task<Result<Guid>> Handle(QueueExportUserDataCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(request, async () =>
-            {
-                var sender = await _context.GetByIdAsync<User>(request.RequestUser.Id, token);
+            var sender = await _context.GetByIdAsync<Domain.User>(request.RequestUser.Id, token);
 
-                var entity = new Job(Guid.NewGuid(), JobKind.ExportUserData, $"Export RGPD", sender);
+            var entity = new Domain.Job(Guid.NewGuid(), JobKind.ExportUserData, $"Export RGPD", sender);
 
-                await _context.AddAsync(entity, token);
-                await _context.SaveChangesAsync(token);
+            await _context.AddAsync(entity, token);
+            await _context.SaveChangesAsync(token);
 
-                _mediatr.Post(new ExportUserDataCommand(request.RequestUser) { Id = entity.Id }); ;
-                _logger.LogInformation($"User RGPD data export successfully initiated by {request.RequestUser.Id}");
+            _mediatr.Post(new ExportUserDataCommand(request.RequestUser) {Id = entity.Id});
+            ;
+            _logger.LogInformation($"User RGPD data export successfully initiated by {request.RequestUser.Id}");
 
-                return Ok(entity.Id);
-            });
+            return Success(entity.Id);
         }
     }
 }

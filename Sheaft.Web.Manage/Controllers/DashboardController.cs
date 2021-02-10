@@ -6,9 +6,10 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Sheaft.Domain.Models;
-using Sheaft.Application.Interop;
-using Sheaft.Options;
+using Sheaft.Application.Common.Interfaces;
+using Sheaft.Application.Common.Interfaces.Services;
+using Sheaft.Application.Common.Options;
+using Sheaft.Domain;
 
 namespace Sheaft.Web.Manage.Controllers
 {

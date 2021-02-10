@@ -1,8 +1,8 @@
-﻿using Sheaft.Domain.Enums;
+﻿using System;
+using Sheaft.Domain.Enum;
 using Sheaft.Domain.Interop;
-using System;
 
-namespace Sheaft.Domain.Models
+namespace Sheaft.Domain
 {
     public abstract class PaymentMethod : IEntity
     {

@@ -1,9 +1,12 @@
-﻿using Sheaft.Domain.Enums;
-using System;
+﻿using System;
+using System.Collections.Generic;
+using Sheaft.Domain.Common;
+using Sheaft.Domain.Enum;
+using Sheaft.Domain.Events.Withholding;
 
-namespace Sheaft.Domain.Models
+namespace Sheaft.Domain
 {
-    public class Withholding : Transaction
+    public class Withholding : Transaction, IHasDomainEvent
     {
         protected Withholding()
         {
@@ -18,10 +21,25 @@ namespace Sheaft.Domain.Models
             DebitedWallet = debitedWallet;
             Credited = Debited;
             Reference = "WITHHOLDING";
+            DomainEvents = new List<DomainEvent>();
         }
 
         public virtual Wallet CreditedWallet { get; private set; }
         public virtual Wallet DebitedWallet { get; private set; }
         public virtual Payout Payout { get; private set; }
+
+        public override void SetStatus(TransactionStatus status)
+        {
+            base.SetStatus(status);
+            
+            switch (Status)
+            {
+                case TransactionStatus.Failed:
+                    DomainEvents.Add(new WithholdingFailedEvent(Id));
+                    break;
+            }
+        }
+
+        public List<DomainEvent> DomainEvents { get; } = new List<DomainEvent>();
     }
 }

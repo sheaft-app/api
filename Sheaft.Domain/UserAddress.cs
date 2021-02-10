@@ -1,7 +1,7 @@
-﻿using Sheaft.Domain.Enums;
-using System.Text.RegularExpressions;
+﻿using System.Text.RegularExpressions;
+using Sheaft.Domain.Enum;
 
-namespace Sheaft.Domain.Models
+namespace Sheaft.Domain
 {
     public class UserAddress : Address
     {

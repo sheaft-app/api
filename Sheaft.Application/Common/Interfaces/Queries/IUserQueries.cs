@@ -1,11 +1,11 @@
-﻿using Sheaft.Core;
-using Sheaft.Application.Models;
+﻿using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using System;
+using Sheaft.Application.Common.Models.Dto;
+using Sheaft.Domain;
 
-namespace Sheaft.Application.Queries
+namespace Sheaft.Application.Common.Interfaces.Queries
 {
     public interface IUserQueries
     {

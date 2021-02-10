@@ -1,10 +1,10 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Sheaft.Domain.Interop;
-using System;
+﻿using System;
 using System.Linq;
 using System.Linq.Expressions;
+using Microsoft.EntityFrameworkCore;
+using Sheaft.Domain.Interop;
 
-namespace Sheaft.Application.Interop
+namespace Sheaft.Application.Common.Extensions
 {
     public static class ContextExtension
     {

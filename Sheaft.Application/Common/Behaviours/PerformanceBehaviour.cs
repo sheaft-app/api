@@ -1,11 +1,11 @@
-﻿using MediatR;
-using Microsoft.Extensions.Logging;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
-using Sheaft.Core;
+using MediatR;
+using Microsoft.Extensions.Logging;
+using Sheaft.Domain;
 
-namespace CleanArchitecture.Application.Common.Behaviours
+namespace Sheaft.Application.Common.Behaviours
 {
     public class PerformanceBehaviour<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
         where TRequest : ITrackedUser
@@ -29,13 +29,13 @@ namespace CleanArchitecture.Application.Common.Behaviours
 
             _timer.Stop();
 
-            if (_timer.ElapsedMilliseconds <= 500)
+            if (_timer.ElapsedMilliseconds <= 1000)
                 return response;
 
             var requestName = typeof(TRequest).Name;
             _logger.LogWarning(
-                "Long Running Request: {Name} ({ElapsedMilliseconds} milliseconds) {@UserId} {@Request}",
-                requestName, _timer.ElapsedMilliseconds, request.RequestUser.Name, request);
+                "Long Running Request: {Name} ({ElapsedMilliseconds} milliseconds) for {@UserId}",
+                requestName, _timer.ElapsedMilliseconds, request.RequestUser.Name);
 
             return response;
         }

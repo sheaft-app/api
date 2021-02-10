@@ -1,20 +1,22 @@
-﻿using Sheaft.Core;
-using Newtonsoft.Json;
-using Sheaft.Domain.Enums;
-using System;
-using System.Threading;
+﻿using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Sheaft.Application.Events;
-using Sheaft.Application.Interop;
-using Sheaft.Domain.Models;
-using Sheaft.Options;
+using Newtonsoft.Json;
+using Sheaft.Application.Common;
+using Sheaft.Application.Common.Handlers;
+using Sheaft.Application.Common.Interfaces;
+using Sheaft.Application.Common.Interfaces.Services;
+using Sheaft.Application.Common.Models;
+using Sheaft.Application.Common.Options;
+using Sheaft.Domain;
+using Sheaft.Domain.Enum;
+using Sheaft.Domain.Events.Donation;
 
-namespace Sheaft.Application.Commands
+namespace Sheaft.Application.Donation.Commands
 {
-    public class RefreshDonationStatusCommand : Command<TransactionStatus>
+    public class RefreshDonationStatusCommand : Command
     {
         [JsonConstructor]
         public RefreshDonationStatusCommand(RequestUser requestUser, string identifier)
@@ -27,7 +29,7 @@ namespace Sheaft.Application.Commands
     }
 
     public class RefreshDonationStatusCommandHandler : CommandsHandler,
-        IRequestHandler<RefreshDonationStatusCommand, Result<TransactionStatus>>
+        IRequestHandler<RefreshDonationStatusCommand, Result>
     {
         private readonly IPspService _pspService;
         private readonly RoutineOptions _routineOptions;
@@ -46,34 +48,24 @@ namespace Sheaft.Application.Commands
             _routineOptions = routineOptions.Value;
             _pspOptions = pspOptions.Value;
         }
-        public async Task<Result<TransactionStatus>> Handle(RefreshDonationStatusCommand request,
+
+        public async Task<Result> Handle(RefreshDonationStatusCommand request,
             CancellationToken token)
         {
-            return await ExecuteAsync(request, async () =>
-            {
-                var donation = await _context.GetSingleAsync<Donation>(c => c.Identifier == request.Identifier, token);
-                if (donation.Status == TransactionStatus.Succeeded || donation.Status == TransactionStatus.Failed)
-                    return Ok(donation.Status);
+            var donation = await _context.GetSingleAsync<Domain.Donation>(c => c.Identifier == request.Identifier, token);
+            if (donation.Status == TransactionStatus.Succeeded || donation.Status == TransactionStatus.Failed)
+                return Failure();
 
-                var pspResult = await _pspService.GetTransferAsync(donation.Identifier, token);
-                if (!pspResult.Success)
-                    return Failed<TransactionStatus>(pspResult.Exception);
+            var pspResult = await _pspService.GetTransferAsync(donation.Identifier, token);
+            if (!pspResult.Succeeded)
+                return Failure(pspResult.Exception);
 
-                donation.SetStatus(pspResult.Data.Status);
-                donation.SetResult(pspResult.Data.ResultCode, pspResult.Data.ResultMessage);
-                donation.SetExecutedOn(pspResult.Data.ProcessedOn);
+            donation.SetStatus(pspResult.Data.Status);
+            donation.SetResult(pspResult.Data.ResultCode, pspResult.Data.ResultMessage);
+            donation.SetExecutedOn(pspResult.Data.ProcessedOn);
 
-                await _context.SaveChangesAsync(token);
-
-                switch (donation.Status)
-                {
-                    case TransactionStatus.Failed:
-                        _mediatr.Post(new DonationFailedEvent(request.RequestUser) {DonationId = donation.Id});
-                        break;
-                }
-
-                return Ok(donation.Status);
-            });
+            await _context.SaveChangesAsync(token);
+            return Success();
         }
     }
 }

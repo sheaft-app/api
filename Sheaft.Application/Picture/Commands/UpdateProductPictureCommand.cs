@@ -4,11 +4,14 @@ using System.Threading.Tasks;
 using MediatR;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using Sheaft.Application.Interop;
-using Sheaft.Core;
-using Sheaft.Domain.Models;
+using Sheaft.Application.Common;
+using Sheaft.Application.Common.Handlers;
+using Sheaft.Application.Common.Interfaces;
+using Sheaft.Application.Common.Interfaces.Services;
+using Sheaft.Application.Common.Models;
+using Sheaft.Domain;
 
-namespace Sheaft.Application.Commands
+namespace Sheaft.Application.Picture.Commands
 {
     public class UpdateProductPictureCommand : Command<string>
     {
@@ -21,7 +24,7 @@ namespace Sheaft.Application.Commands
         public string Picture { get; set; }
         public string OriginalPicture { get; set; }
     }
-    
+
     public class UpdateProductPictureCommandHandler : CommandsHandler,
         IRequestHandler<UpdateProductPictureCommand, Result<string>>
     {
@@ -39,19 +42,17 @@ namespace Sheaft.Application.Commands
 
         public async Task<Result<string>> Handle(UpdateProductPictureCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(request, async () =>
-            {
-                var entity = await _context.GetByIdAsync<Product>(request.ProductId, token);
+            var entity = await _context.GetByIdAsync<Domain.Product>(request.ProductId, token);
 
-                var resultImage = await _imageService.HandleProductPictureAsync(entity, request.Picture, request.OriginalPicture, token);
-                if (!resultImage.Success)
-                    return Failed<string>(resultImage.Exception);
+            var resultImage =
+                await _imageService.HandleProductPictureAsync(entity, request.Picture, request.OriginalPicture, token);
+            if (!resultImage.Succeeded)
+                return Failure<string>(resultImage.Exception);
 
-                entity.SetPicture(resultImage.Data);
-                await _context.SaveChangesAsync(token);
+            entity.SetPicture(resultImage.Data);
+            await _context.SaveChangesAsync(token);
 
-                return Ok(resultImage.Data);
-            });
+            return Success(resultImage.Data);
         }
     }
 }

@@ -1,6 +1,6 @@
-﻿using Sheaft.Domain.Models;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Sheaft.Domain;
 
 namespace Sheaft.Infrastructure.Persistence.Configurations
 {
@@ -17,6 +17,7 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
 
             entity.OwnsOne(c => c.Declaration, d =>
             {
+                d.Ignore(c => c.DomainEvents);
                 d.OwnsMany(c => c.Ubos, e =>
                 {
                     e.OwnsOne(c => c.Address);

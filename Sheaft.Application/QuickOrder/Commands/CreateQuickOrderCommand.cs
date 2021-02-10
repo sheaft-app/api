@@ -5,14 +5,16 @@ using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
 using Microsoft.Extensions.Logging;
-using Sheaft.Application.Models;
-using Sheaft.Core;
 using Newtonsoft.Json;
-using Sheaft.Application.Interop;
-using Sheaft.Domain.Enums;
-using Sheaft.Domain.Models;
+using Sheaft.Application.Common;
+using Sheaft.Application.Common.Handlers;
+using Sheaft.Application.Common.Interfaces;
+using Sheaft.Application.Common.Interfaces.Services;
+using Sheaft.Application.Common.Models;
+using Sheaft.Application.Common.Models.Inputs;
+using Sheaft.Domain;
 
-namespace Sheaft.Application.Commands
+namespace Sheaft.Application.QuickOrder.Commands
 {
     public class CreateQuickOrderCommand : Command<Guid>
     {
@@ -25,7 +27,7 @@ namespace Sheaft.Application.Commands
         public string Description { get; set; }
         public IEnumerable<ProductQuantityInput> Products { get; set; }
     }
-    
+
     public class CreateQuickOrderCommandHandler : CommandsHandler,
         IRequestHandler<CreateQuickOrderCommand, Result<Guid>>
     {
@@ -39,24 +41,22 @@ namespace Sheaft.Application.Commands
 
         public async Task<Result<Guid>> Handle(CreateQuickOrderCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(request, async () =>
-            {
-                var user = await _context.GetByIdAsync<User>(request.RequestUser.Id, token);
+            var user = await _context.GetByIdAsync<Domain.User>(request.RequestUser.Id, token);
 
-                var productIds = request.Products.Select(p => p.Id);
-                var products = await _context.GetByIdsAsync<Product>(productIds, token);
+            var productIds = request.Products.Select(p => p.Id);
+            var products = await _context.GetByIdsAsync<Domain.Product>(productIds, token);
 
-                var cartProducts = products
-                                            .Select(c => new { Product = c, Quantity = request.Products.Where(p => p.Id == c.Id).Sum(c => c.Quantity) })
-                                            .ToDictionary(d => d.Product, d => d.Quantity);
+            var cartProducts = products
+                .Select(c => new
+                    {Product = c, Quantity = request.Products.Where(p => p.Id == c.Id).Sum(c => c.Quantity)})
+                .ToDictionary(d => d.Product, d => d.Quantity);
 
-                var quickOrder = new QuickOrder(Guid.NewGuid(), request.Name, cartProducts, user);
+            var quickOrder = new Domain.QuickOrder(Guid.NewGuid(), request.Name, cartProducts, user);
 
-                await _context.AddAsync(quickOrder, token);
-                await _context.SaveChangesAsync(token);
+            await _context.AddAsync(quickOrder, token);
+            await _context.SaveChangesAsync(token);
 
-                return Created(quickOrder.Id);
-            });
+            return Success(quickOrder.Id);
         }
     }
 }

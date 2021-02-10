@@ -1,8 +1,8 @@
 ﻿using AutoMapper;
+using Sheaft.Application.Common.Models.Dto;
 using Sheaft.Domain.Views;
-using Sheaft.Application.Models;
 
-namespace Sheaft.Application.Mappers
+namespace Sheaft.Application.Common.Mappings
 {
     public class DepartmentPointsProfile : Profile
     {

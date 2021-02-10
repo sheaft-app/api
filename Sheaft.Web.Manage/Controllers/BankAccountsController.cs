@@ -3,18 +3,18 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Sheaft.Application.Interop;
-using Sheaft.Options;
 using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Sheaft.Application.Models;
-using AutoMapper.QueryableExtensions;
-using Sheaft.Application.Commands;
-using Sheaft.Domain.Models;
-using System.Collections.Generic;
-using Sheaft.Exceptions;
+using Sheaft.Application.Bank.Commands;
+using Sheaft.Application.Common.Interfaces;
+using Sheaft.Application.Common.Interfaces.Services;
+using Sheaft.Application.Common.Models.Inputs;
+using Sheaft.Application.Common.Models.ViewModels;
+using Sheaft.Application.Common.Options;
+using Sheaft.Domain;
+using Sheaft.Domain.Exceptions;
 
 namespace Sheaft.Web.Manage.Controllers
 {
@@ -42,7 +42,7 @@ namespace Sheaft.Web.Manage.Controllers
                 .SingleOrDefaultAsync(token);
 
             if (entity == null)
-                throw new NotFoundException();
+                throw SheaftException.NotFound();
 
             ViewBag.Countries = await GetCountries(token);
             return View(new BankAccountViewModel
@@ -66,7 +66,7 @@ namespace Sheaft.Web.Manage.Controllers
                 Owner = model.Owner
             }, token);
 
-            if (!result.Success)
+            if (!result.Succeeded)
             {
                 ViewBag.Countries = await GetCountries(token);
                 ModelState.AddModelError("", result.Exception.Message);
@@ -83,7 +83,7 @@ namespace Sheaft.Web.Manage.Controllers
                 .SingleOrDefaultAsync(c => c.Id == id, token);
 
             if (entity == null)
-                throw new NotFoundException();
+                throw SheaftException.NotFound();
 
             ViewBag.Countries = await GetCountries(token);
 
@@ -122,7 +122,7 @@ namespace Sheaft.Web.Manage.Controllers
                 Owner = model.Owner
             }, token);
 
-            if (!result.Success)
+            if (!result.Succeeded)
             {
                 ViewBag.Countries = await GetCountries(token);
                 ModelState.AddModelError("", result.Exception.Message);

@@ -5,19 +5,21 @@ using System.Linq;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
+using AutoMapper.QueryableExtensions;
 using IdentityModel.Client;
 using Microsoft.Azure.Search;
 using Microsoft.Azure.Search.Models;
-using Newtonsoft.Json;
-using Sheaft.Core;
-using Sheaft.Application.Models;
-using Sheaft.Options;
 using Microsoft.Extensions.Options;
-using Sheaft.Domain.Models;
-using AutoMapper.QueryableExtensions;
-using Sheaft.Application.Interop;
+using Newtonsoft.Json;
+using Sheaft.Application.Common.Extensions;
+using Sheaft.Application.Common.Interfaces;
+using Sheaft.Application.Common.Interfaces.Queries;
+using Sheaft.Application.Common.Models.Dto;
+using Sheaft.Application.Common.Models.Inputs;
+using Sheaft.Application.Common.Options;
+using Sheaft.Domain;
 
-namespace Sheaft.Application.Queries
+namespace Sheaft.Application.Producer.Queries
 {
     public class ProducerQueries : IProducerQueries
     {
@@ -105,7 +107,7 @@ namespace Sheaft.Application.Queries
                 HighlightPostTag = "</b>"
             };
 
-            var store = await _context.GetByIdAsync<Store>(storeId, token);
+            var store = await _context.GetByIdAsync<Domain.Store>(storeId, token);
             if (!string.IsNullOrWhiteSpace(terms.Sort))
             {
                 if (terms.Sort.Contains("producer_geolocation"))
@@ -167,14 +169,14 @@ namespace Sheaft.Application.Queries
 
         public IQueryable<T> GetProducer<T>(Guid id, RequestUser currentUser)
         {
-            return _context.Users.OfType<Producer>()
+            return _context.Users.OfType<Domain.Producer>()
                     .Get(c => c.Id == id)
                     .ProjectTo<T>(_configurationProvider);
         }
 
         public IQueryable<ProducerSummaryDto> GetProducers(RequestUser currentUser)
         {
-            return _context.Users.OfType<Producer>()
+            return _context.Users.OfType<Domain.Producer>()
                     .Get()
                     .ProjectTo<ProducerSummaryDto>(_configurationProvider);
         }

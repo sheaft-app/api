@@ -1,7 +1,8 @@
 using System.Collections.Generic;
 using System.Linq;
+using Sheaft.Domain;
 
-namespace Sheaft.Core.Extensions
+namespace Sheaft.Application.Common.Extensions
 {
     public static class RequestUserExtensions
     {

@@ -4,12 +4,16 @@ using System.Threading.Tasks;
 using MediatR;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using Sheaft.Application.Interop;
-using Sheaft.Core;
+using Sheaft.Application.Common;
+using Sheaft.Application.Common.Handlers;
+using Sheaft.Application.Common.Interfaces;
+using Sheaft.Application.Common.Interfaces.Services;
+using Sheaft.Application.Common.Models;
+using Sheaft.Domain;
 
-namespace Sheaft.Application.Commands
+namespace Sheaft.Application.Notification.Commands
 {
-    public class MarkUserNotificationsAsReadCommand : Command<bool>
+    public class MarkUserNotificationsAsReadCommand : Command
     {
         [JsonConstructor]
         public MarkUserNotificationsAsReadCommand(RequestUser requestUser) : base(requestUser)
@@ -18,9 +22,9 @@ namespace Sheaft.Application.Commands
 
         public DateTimeOffset ReadBefore { get; set; }
     }
-    
+
     public class MarkUserNotificationsAsReadCommandHandler : CommandsHandler,
-        IRequestHandler<MarkUserNotificationsAsReadCommand, Result<bool>>
+        IRequestHandler<MarkUserNotificationsAsReadCommand, Result>
     {
         private readonly IDapperContext _dapperContext;
 
@@ -34,13 +38,10 @@ namespace Sheaft.Application.Commands
             _dapperContext = dapperContext;
         }
 
-        public async Task<Result<bool>> Handle(MarkUserNotificationsAsReadCommand request, CancellationToken token)
+        public async Task<Result> Handle(MarkUserNotificationsAsReadCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(request, async () =>
-            {
-                var result = await _dapperContext.SetNotificationAsReadAsync(request.RequestUser.Id, request.ReadBefore, token);
-                return Ok(result);
-            });
+            var result = await _dapperContext.SetNotificationAsReadAsync(request.RequestUser.Id, request.ReadBefore, token);
+            return result ? Success() : Failure();
         }
     }
 }

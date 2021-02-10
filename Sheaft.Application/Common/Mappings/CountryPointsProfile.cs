@@ -1,8 +1,8 @@
 ﻿using AutoMapper;
-using Sheaft.Application.Models;
+using Sheaft.Application.Common.Models.Dto;
 using Sheaft.Domain.Views;
 
-namespace Sheaft.Application.Mappers
+namespace Sheaft.Application.Common.Mappings
 {
     public class CountryPointsProfile : Profile
     {

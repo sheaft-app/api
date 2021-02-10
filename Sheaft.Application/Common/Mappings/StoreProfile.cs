@@ -1,10 +1,12 @@
-﻿using AutoMapper;
-using Sheaft.Application.Commands;
-using Sheaft.Domain.Models;
-using Sheaft.Application.Models;
-using System.Linq;
+﻿using System.Linq;
+using AutoMapper;
+using Sheaft.Application.Common.Models.Dto;
+using Sheaft.Application.Common.Models.Inputs;
+using Sheaft.Application.Common.Models.ViewModels;
+using Sheaft.Application.Store.Commands;
+using Sheaft.Domain;
 
-namespace Sheaft.Application.Mappers
+namespace Sheaft.Application.Common.Mappings
 {
     public class StoreProfile : Profile
     {
@@ -13,17 +15,17 @@ namespace Sheaft.Application.Mappers
             CreateMap<Business, StoreViewModel>()
                   .ForMember(d => d.Address, opt => opt.MapFrom(r => r.Address));
 
-            CreateMap<Store, StoreViewModel>()
+            CreateMap<Domain.Store, StoreViewModel>()
                 .IncludeBase<Business, StoreViewModel>()
                   .ForMember(d => d.OpeningHours, opt => opt.MapFrom(r => r.OpeningHours))
                   .ForMember(d => d.Tags, opt => opt.MapFrom(r => r.Tags.Select(t => t.Tag.Id)));
 
-            CreateMap<Store, UserProfileDto>();
+            CreateMap<Domain.Store, UserProfileDto>();
 
-            CreateMap<Store, UserDto>()
+            CreateMap<Domain.Store, UserDto>()
                 .ForMember(d => d.Address, opt => opt.MapFrom(r => r.Address));
 
-            CreateMap<Store, StoreDto>()
+            CreateMap<Domain.Store, StoreDto>()
                 .ForMember(d => d.Address, opt => opt.MapFrom(r => r.Address))
                 .ForMember(d => d.Tags, opt => opt.MapFrom(r => r.Tags.Select(t => t.Tag)))
                 .ForMember(d => d.OpeningHours, opt => opt.MapFrom(r => r.OpeningHours));

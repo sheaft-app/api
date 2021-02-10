@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Sheaft.Options
+namespace Sheaft.Application.Common.Options
 {
     public class RoleOptions
     {

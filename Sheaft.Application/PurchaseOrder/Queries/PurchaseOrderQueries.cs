@@ -1,14 +1,15 @@
 ﻿using System;
 using System.Linq;
 using AutoMapper.QueryableExtensions;
-using Sheaft.Application.Interop;
-using Sheaft.Application.Models;
-using Sheaft.Core;
-using Sheaft.Core.Extensions;
 using Microsoft.Extensions.Options;
-using Sheaft.Options;
+using Sheaft.Application.Common.Extensions;
+using Sheaft.Application.Common.Interfaces;
+using Sheaft.Application.Common.Interfaces.Queries;
+using Sheaft.Application.Common.Models.Dto;
+using Sheaft.Application.Common.Options;
+using Sheaft.Domain;
 
-namespace Sheaft.Application.Queries
+namespace Sheaft.Application.PurchaseOrder.Queries
 {
     public class PurchaseOrderQueries : IPurchaseOrderQueries
     {

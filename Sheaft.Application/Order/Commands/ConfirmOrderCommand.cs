@@ -1,6 +1,4 @@
 ﻿using System;
-using Sheaft.Core;
-using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -8,13 +6,22 @@ using System.Threading.Tasks;
 using MediatR;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Sheaft.Application.Events;
-using Sheaft.Application.Interop;
-using Sheaft.Domain.Enums;
-using Sheaft.Domain.Models;
-using Sheaft.Options;
+using Newtonsoft.Json;
+using Sheaft.Application.Common;
+using Sheaft.Application.Common.Handlers;
+using Sheaft.Application.Common.Interfaces;
+using Sheaft.Application.Common.Interfaces.Services;
+using Sheaft.Application.Common.Models;
+using Sheaft.Application.Common.Options;
+using Sheaft.Application.Donation.Commands;
+using Sheaft.Application.PurchaseOrder.Commands;
+using Sheaft.Application.User.Commands;
+using Sheaft.Domain;
+using Sheaft.Domain.Enum;
+using Sheaft.Domain.Events.Order;
+using Sheaft.Domain.Events.PurchaseOrder;
 
-namespace Sheaft.Application.Commands
+namespace Sheaft.Application.Order.Commands
 {
     public class ConfirmOrderCommand : Command<IEnumerable<Guid>>
     {
@@ -25,6 +32,7 @@ namespace Sheaft.Application.Commands
 
         public Guid OrderId { get; set; }
     }
+
     public class ConfirmOrderCommandHandler : CommandsHandler,
         IRequestHandler<ConfirmOrderCommand, Result<IEnumerable<Guid>>>
     {
@@ -48,55 +56,49 @@ namespace Sheaft.Application.Commands
 
         public async Task<Result<IEnumerable<Guid>>> Handle(ConfirmOrderCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(request, async () =>
+            var order = await _context.GetByIdAsync<Domain.Order>(request.OrderId, token);
+
+            using (var transaction = await _context.BeginTransactionAsync(token))
             {
-                try
+                var purchaseOrderIds = new List<Guid>();
+
+                order.SetStatus(OrderStatus.Validated);
+
+                var producerIds = order.Products.Select(p => p.Producer.Id).Distinct();
+                foreach (var producerId in producerIds)
                 {
-                    using (var transaction = await _context.BeginTransactionAsync(token))
+                    var result = await _mediatr.Process(new CreatePurchaseOrderCommand(request.RequestUser)
                     {
-                        var order = await _context.GetByIdAsync<Order>(request.OrderId, token);
-                        var purchaseOrderIds = new List<Guid>();
+                        OrderId = order.Id,
+                        ProducerId = producerId,
+                        SkipNotification = true
+                    }, token);
 
-                        order.SetStatus(OrderStatus.Validated);
+                    if (!result.Succeeded)
+                        return Failure<IEnumerable<Guid>>(result.Exception);
 
-                        var producerIds = order.Products.Select(p => p.Producer.Id).Distinct();
-                        foreach (var producerId in producerIds)
-                        {
-                            var result = await _mediatr.Process(new CreatePurchaseOrderCommand(request.RequestUser)
-                            {
-                                OrderId = order.Id,
-                                ProducerId = producerId,
-                                SkipNotification = true
-                            }, token);
-
-                            if (!result.Success)
-                                return Failed<IEnumerable<Guid>>(result.Exception);
-
-                            purchaseOrderIds.Add(result.Data);
-                        }
-
-                        await _context.SaveChangesAsync(token);
-                        await transaction.CommitAsync(token);
-
-                        foreach (var purchaseOrderId in purchaseOrderIds)
-                        {
-                            _mediatr.Post(new PurchaseOrderCreatedEvent(request.RequestUser) { PurchaseOrderId = purchaseOrderId });
-                            _mediatr.Post(new PurchaseOrderReceivedEvent(request.RequestUser) { PurchaseOrderId = purchaseOrderId });
-                        }
-
-                        _mediatr.Post(new CreateUserPointsCommand(request.RequestUser) { CreatedOn = DateTimeOffset.UtcNow, Kind = PointKind.PurchaseOrder, UserId = order.User.Id });
-                        if (order.Donate > 0)
-                            _mediatr.Post(new CreateDonationCommand(request.RequestUser) { OrderId = order.Id });
-
-                        return Ok(purchaseOrderIds.AsEnumerable());
-                    }
+                    purchaseOrderIds.Add(result.Data);
                 }
-                catch (Exception e)
+
+                if (order.Donate > 0)
                 {
-                    _mediatr.Post(new ConfirmOrderFailedEvent(request.RequestUser) { OrderId = request.OrderId, Message = e.Message });
-                    throw;
+                    var result = await _mediatr.Process(
+                        new CreateDonationCommand(request.RequestUser) {OrderId = order.Id},
+                        token);
+
+                    if (!result.Succeeded)
+                        return Failure<IEnumerable<Guid>>(result.Exception);
                 }
-            });
+
+                await transaction.CommitAsync(token);
+
+                _mediatr.Post(new CreateUserPointsCommand(request.RequestUser)
+                {
+                    CreatedOn = DateTimeOffset.UtcNow, Kind = PointKind.PurchaseOrder, UserId = order.User.Id
+                });
+
+                return Success(purchaseOrderIds.AsEnumerable());
+            }
         }
     }
 }

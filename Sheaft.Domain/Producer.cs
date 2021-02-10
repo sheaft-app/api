@@ -1,11 +1,13 @@
-﻿using Sheaft.Domain.Enums;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Sheaft.Domain.Common;
+using Sheaft.Domain.Enum;
+using Sheaft.Domain.Events.Producer;
 
-namespace Sheaft.Domain.Models
+namespace Sheaft.Domain
 {
-    public class Producer : Business
+    public class Producer : Business, IHasDomainEvent
     {
         private List<ProducerTag> _tags;
 
@@ -16,12 +18,13 @@ namespace Sheaft.Domain.Models
         public Producer(Guid id, string name, string firstname, string lastname, string email, UserAddress address, bool openForBusiness = true, string phone = null, string description = null)
            : base(id, ProfileKind.Producer, name, firstname, lastname, email, address, openForBusiness, phone, description)
         {
+            DomainEvents = new List<DomainEvent>{new ProducerRegisteredEvent(Id)};
         }
 
         public virtual IReadOnlyCollection<ProducerTag> Tags => _tags?.AsReadOnly();
 
         public bool CanDirectSell { get; set; }
-        public bool NotSubjectToVat { get; set; }
+        public bool NotSubjectToVat { get; private set; }
 
         public void SetTags(IEnumerable<Tag> tags)
         {
@@ -38,5 +41,7 @@ namespace Sheaft.Domain.Models
         {
             NotSubjectToVat = notSubjectToVat;
         }
+
+        public List<DomainEvent> DomainEvents { get; } = new List<DomainEvent>();
     }
 }

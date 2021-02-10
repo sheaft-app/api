@@ -4,16 +4,17 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Sheaft.Application.Commands;
-using Sheaft.Exceptions;
-using Sheaft.Application.Interop;
-using Sheaft.Application.Models;
-using Sheaft.Options;
 using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Sheaft.Domain.Enums;
+using Sheaft.Application.Common.Interfaces;
+using Sheaft.Application.Common.Interfaces.Services;
+using Sheaft.Application.Common.Models.ViewModels;
+using Sheaft.Application.Common.Options;
+using Sheaft.Application.Job.Commands;
+using Sheaft.Domain.Enum;
+using Sheaft.Domain.Exceptions;
 
 namespace Sheaft.Web.Manage.Controllers
 {
@@ -74,7 +75,7 @@ namespace Sheaft.Web.Manage.Controllers
                 .SingleOrDefaultAsync(token);
 
             if (entity == null)
-                throw new NotFoundException();
+                throw SheaftException.NotFound();
 
             return View(entity);
         }
@@ -89,7 +90,7 @@ namespace Sheaft.Web.Manage.Controllers
                 Name = model.Name
             }, token);
 
-            if (!result.Success)
+            if (!result.Succeeded)
             {
                 ModelState.AddModelError("", result.Exception.Message);
                 return View(model);
@@ -107,7 +108,7 @@ namespace Sheaft.Web.Manage.Controllers
                 Id = id
             }, token);
 
-            if (!result.Success)
+            if (!result.Succeeded)
                 throw result.Exception;
 
             return RedirectToAction("Edit", new { id });
@@ -123,7 +124,7 @@ namespace Sheaft.Web.Manage.Controllers
                 Id = id
             }, token);
 
-            if (!result.Success)
+            if (!result.Succeeded)
                 throw result.Exception;
 
             return RedirectToAction("Edit", new { id });
@@ -138,7 +139,7 @@ namespace Sheaft.Web.Manage.Controllers
                 Id = id
             }, token);
 
-            if (!result.Success)
+            if (!result.Succeeded)
                 throw result.Exception;
 
             return RedirectToAction("Edit", new { id });
@@ -153,7 +154,7 @@ namespace Sheaft.Web.Manage.Controllers
                 Id = id
             }, token);
 
-            if (!result.Success)
+            if (!result.Succeeded)
                 throw result.Exception;
 
             return RedirectToAction("Edit", new { id });
@@ -168,7 +169,7 @@ namespace Sheaft.Web.Manage.Controllers
                 Id = id
             }, token);
 
-            if (!result.Success)
+            if (!result.Succeeded)
                 throw result.Exception;
 
             return RedirectToAction("Edit", new { id });
@@ -183,7 +184,7 @@ namespace Sheaft.Web.Manage.Controllers
                 Id = id
             }, token);
 
-            if (!result.Success)
+            if (!result.Succeeded)
                 throw result.Exception;
 
             return RedirectToAction("Edit", new { id });
@@ -198,7 +199,7 @@ namespace Sheaft.Web.Manage.Controllers
                 Id = id
             }, token);
 
-            if (!result.Success)
+            if (!result.Succeeded)
                 throw result.Exception;
 
             return RedirectToAction("Edit", new { id });
@@ -213,7 +214,7 @@ namespace Sheaft.Web.Manage.Controllers
                 Id = id
             }, token);
 
-            if (!result.Success)
+            if (!result.Succeeded)
                 throw result.Exception;
 
             return RedirectToAction("Edit", new { id });
@@ -228,7 +229,7 @@ namespace Sheaft.Web.Manage.Controllers
                 Id = id
             }, token);
 
-            if (!result.Success)
+            if (!result.Succeeded)
                 throw result.Exception;
 
             return RedirectToAction("Index");

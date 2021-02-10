@@ -1,4 +1,4 @@
-﻿namespace Sheaft.Domain.Enums
+﻿namespace Sheaft.Domain.Enum
 {
     public enum ExceptionKind
     {

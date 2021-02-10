@@ -4,15 +4,18 @@ using System.Threading.Tasks;
 using MediatR;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Sheaft.Core;
 using Newtonsoft.Json;
-using Sheaft.Application.Interop;
-using Sheaft.Domain.Models;
-using Sheaft.Options;
+using Sheaft.Application.Common;
+using Sheaft.Application.Common.Handlers;
+using Sheaft.Application.Common.Interfaces;
+using Sheaft.Application.Common.Interfaces.Services;
+using Sheaft.Application.Common.Models;
+using Sheaft.Application.Common.Options;
+using Sheaft.Domain;
 
-namespace Sheaft.Application.Commands
+namespace Sheaft.Application.Producer.Commands
 {
-    public class SetProducerProductsWithNoVatCommand : Command<bool>
+    public class SetProducerProductsWithNoVatCommand : Command
     {
         [JsonConstructor]
         public SetProducerProductsWithNoVatCommand(RequestUser requestUser) : base(requestUser)
@@ -21,9 +24,9 @@ namespace Sheaft.Application.Commands
 
         public Guid ProducerId { get; set; }
     }
-    
+
     public class SetProducerProductsWithNoVatCommandHandler : CommandsHandler,
-        IRequestHandler<SetProducerProductsWithNoVatCommand, Result<bool>>
+        IRequestHandler<SetProducerProductsWithNoVatCommand, Result>
     {
         private readonly RoleOptions _roleOptions;
         private readonly IBlobService _blobService;
@@ -39,23 +42,21 @@ namespace Sheaft.Application.Commands
             _roleOptions = roleOptions.Value;
             _blobService = blobService;
         }
-        public async Task<Result<bool>> Handle(SetProducerProductsWithNoVatCommand request, CancellationToken token)
+
+        public async Task<Result> Handle(SetProducerProductsWithNoVatCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(request, async () =>
+            var producer = await _context.GetByIdAsync<Domain.Producer>(request.ProducerId, token);
+            if (!producer.NotSubjectToVat)
+                return Failure();
+
+            var products = await _context.FindAsync<Domain.Product>(p => p.Producer.Id == producer.Id, token);
+            foreach (var product in products)
             {
-                var producer = await _context.GetByIdAsync<Producer>(request.ProducerId, token);
-                if (!producer.NotSubjectToVat)
-                    return Ok(false);
+                product.SetVat(0);
+                await _context.SaveChangesAsync(token);
+            }
 
-                var products = await _context.FindAsync<Product>(p => p.Producer.Id == producer.Id, token);
-                foreach(var product in products)
-                {
-                    product.SetVat(0);
-                    await _context.SaveChangesAsync(token);
-                }
-
-                return Ok(true);
-            });
-        }        
+            return Success();
+        }
     }
 }

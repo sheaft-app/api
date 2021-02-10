@@ -4,11 +4,14 @@ using System.Threading.Tasks;
 using MediatR;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using Sheaft.Application.Interop;
-using Sheaft.Core;
-using Sheaft.Domain.Models;
+using Sheaft.Application.Common;
+using Sheaft.Application.Common.Handlers;
+using Sheaft.Application.Common.Interfaces;
+using Sheaft.Application.Common.Interfaces.Services;
+using Sheaft.Application.Common.Models;
+using Sheaft.Domain;
 
-namespace Sheaft.Application.Commands
+namespace Sheaft.Application.Picture.Commands
 {
     public class UpdateTagPictureCommand : Command<string>
     {
@@ -20,7 +23,7 @@ namespace Sheaft.Application.Commands
         public Guid TagId { get; set; }
         public string Picture { get; set; }
     }
-    
+
     public class UpdateTagPictureCommandHandler : CommandsHandler,
         IRequestHandler<UpdateTagPictureCommand, Result<string>>
     {
@@ -35,21 +38,19 @@ namespace Sheaft.Application.Commands
         {
             _imageService = imageService;
         }
+
         public async Task<Result<string>> Handle(UpdateTagPictureCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(request, async () =>
-            {
-                var entity = await _context.GetByIdAsync<Tag>(request.TagId, token);
+            var entity = await _context.GetByIdAsync<Domain.Tag>(request.TagId, token);
 
-                var resultImage = await _imageService.HandleTagPictureAsync(entity, request.Picture, token);
-                if (!resultImage.Success)
-                    return Failed<string>(resultImage.Exception);
+            var resultImage = await _imageService.HandleTagPictureAsync(entity, request.Picture, token);
+            if (!resultImage.Succeeded)
+                return Failure<string>(resultImage.Exception);
 
-                entity.SetPicture(resultImage.Data);
-                await _context.SaveChangesAsync(token);
+            entity.SetPicture(resultImage.Data);
+            await _context.SaveChangesAsync(token);
 
-                return Ok(resultImage.Data);
-            });
+            return Success(resultImage.Data);
         }
     }
 }

@@ -1,17 +1,19 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
 using Microsoft.Extensions.Logging;
-using Sheaft.Core;
 using Newtonsoft.Json;
-using Sheaft.Application.Interop;
-using Sheaft.Domain.Models;
+using Sheaft.Application.Common;
+using Sheaft.Application.Common.Handlers;
+using Sheaft.Application.Common.Interfaces;
+using Sheaft.Application.Common.Interfaces.Services;
+using Sheaft.Application.Common.Models;
+using Sheaft.Domain;
 
-namespace Sheaft.Application.Commands
+namespace Sheaft.Application.DeliveryMode.Commands
 {
-    public class SetDeliveryModeAvailabilityCommand : Command<bool>
+    public class SetDeliveryModeAvailabilityCommand : Command
     {
         [JsonConstructor]
         public SetDeliveryModeAvailabilityCommand(RequestUser requestUser) : base(requestUser)
@@ -21,9 +23,9 @@ namespace Sheaft.Application.Commands
         public Guid Id { get; set; }
         public bool Available { get; set; }
     }
-    
+
     public class SetDeliveryModeAvailabilityCommandHandler : CommandsHandler,
-        IRequestHandler<SetDeliveryModeAvailabilityCommand, Result<bool>>
+        IRequestHandler<SetDeliveryModeAvailabilityCommand, Result>
     {
         public SetDeliveryModeAvailabilityCommandHandler(
             ISheaftMediatr mediatr,
@@ -33,16 +35,13 @@ namespace Sheaft.Application.Commands
         {
         }
 
-        public async Task<Result<bool>> Handle(SetDeliveryModeAvailabilityCommand request, CancellationToken token)
+        public async Task<Result> Handle(SetDeliveryModeAvailabilityCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(request, async () =>
-            {
-                var entity = await _context.GetByIdAsync<DeliveryMode>(request.Id, token);
-                entity.SetAvailability(request.Available);
+            var entity = await _context.GetByIdAsync<Domain.DeliveryMode>(request.Id, token);
+            entity.SetAvailability(request.Available);
 
-                await _context.SaveChangesAsync(token);
-                return Ok(true);
-            });
+            await _context.SaveChangesAsync(token);
+            return Success();
         }
     }
 }

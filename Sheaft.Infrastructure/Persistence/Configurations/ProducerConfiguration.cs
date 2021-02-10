@@ -1,6 +1,6 @@
-﻿using Sheaft.Domain.Models;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Sheaft.Domain;
 
 namespace Sheaft.Infrastructure.Persistence.Configurations
 {
@@ -15,6 +15,8 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
 
             entity.HasMany<DeliveryMode>().WithOne(c => c.Producer).HasForeignKey("ProducerUid").OnDelete(DeleteBehavior.Cascade);
             entity.HasMany<Returnable>().WithOne(c => c.Producer).HasForeignKey("ProducerUid").OnDelete(DeleteBehavior.Cascade);
+            
+            entity.Ignore(c => c.DomainEvents);
         }
     }
 }

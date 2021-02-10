@@ -1,18 +1,18 @@
 ﻿using AutoMapper;
-using Sheaft.Domain.Models;
-using Sheaft.Application.Models;
-using Sheaft.Core.Extensions;
-using Sheaft.Core.Models;
+using Sheaft.Application.Common.Extensions;
+using Sheaft.Application.Common.Models;
+using Sheaft.Application.Common.Models.Dto;
+using Sheaft.Application.Common.Models.ViewModels;
 
-namespace Sheaft.Application.Mappers
+namespace Sheaft.Application.Common.Mappings
 {
     public class TagProfile : Profile
     {
         public TagProfile()
         {
-            CreateMap<Tag, TagDto>()
+            CreateMap<Domain.Tag, TagDto>()
                 .ForMember(d => d.Picture, opt => opt.MapFrom(r => ProductExtensions.GetPictureUrl(r.Picture, PictureSize.LARGE)));
-            CreateMap<Tag, TagViewModel>()
+            CreateMap<Domain.Tag, TagViewModel>()
                 .ForMember(d => d.Picture, opt => opt.MapFrom(r => ProductExtensions.GetPictureUrl(r.Picture, PictureSize.LARGE)));
         }
     }

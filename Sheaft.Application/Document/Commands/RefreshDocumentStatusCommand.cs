@@ -3,16 +3,19 @@ using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
 using Microsoft.Extensions.Logging;
-using Sheaft.Core;
 using Newtonsoft.Json;
-using Sheaft.Application.Events;
-using Sheaft.Application.Interop;
-using Sheaft.Domain.Enums;
-using Sheaft.Domain.Models;
+using Sheaft.Application.Common;
+using Sheaft.Application.Common.Handlers;
+using Sheaft.Application.Common.Interfaces;
+using Sheaft.Application.Common.Interfaces.Services;
+using Sheaft.Application.Common.Models;
+using Sheaft.Domain;
+using Sheaft.Domain.Enum;
+using Sheaft.Domain.Events.Document;
 
-namespace Sheaft.Application.Commands
+namespace Sheaft.Application.Document.Commands
 {
-    public class RefreshDocumentStatusCommand : Command<DocumentStatus>
+    public class RefreshDocumentStatusCommand : Command
     {
         [JsonConstructor]
         public RefreshDocumentStatusCommand(RequestUser requestUser, string identifier)
@@ -23,9 +26,9 @@ namespace Sheaft.Application.Commands
 
         public string Identifier { get; set; }
     }
-    
+
     public class RefreshDocumentStatusCommandHandler : CommandsHandler,
-            IRequestHandler<RefreshDocumentStatusCommand, Result<DocumentStatus>>
+        IRequestHandler<RefreshDocumentStatusCommand, Result>
     {
         private readonly IPspService _pspService;
 
@@ -39,35 +42,22 @@ namespace Sheaft.Application.Commands
             _pspService = pspService;
         }
 
-        public async Task<Result<DocumentStatus>> Handle(RefreshDocumentStatusCommand request, CancellationToken token)
+        public async Task<Result> Handle(RefreshDocumentStatusCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(request, async () =>
-            {
-                var legal = await _context.GetSingleAsync<Legal>(r => r.Documents.Any(d => d.Identifier == request.Identifier), token);
-                var document = legal.Documents.FirstOrDefault(c => c.Identifier == request.Identifier);
+            var legal = await _context.GetSingleAsync<Domain.Legal>(
+                r => r.Documents.Any(d => d.Identifier == request.Identifier), token);
+            var document = legal.Documents.FirstOrDefault(c => c.Identifier == request.Identifier);
 
-                var pspResult = await _pspService.GetDocumentAsync(document.Identifier, token);
-                if (!pspResult.Success)
-                    return Failed<DocumentStatus>(pspResult.Exception);
+            var pspResult = await _pspService.GetDocumentAsync(document.Identifier, token);
+            if (!pspResult.Succeeded)
+                return Failure(pspResult.Exception);
 
-                document.SetStatus(pspResult.Data.Status);
-                document.SetResult(pspResult.Data.ResultCode, pspResult.Data.ResultMessage);
-                document.SetProcessedOn(pspResult.Data.ProcessedOn);
+            document.SetStatus(pspResult.Data.Status);
+            document.SetResult(pspResult.Data.ResultCode, pspResult.Data.ResultMessage);
+            document.SetProcessedOn(pspResult.Data.ProcessedOn);
 
-                await _context.SaveChangesAsync(token);
-
-                switch (document.Status)
-                {
-                    case DocumentStatus.Refused:
-                        _mediatr.Post(new DocumentRefusedEvent(request.RequestUser) { DocumentId = document.Id });
-                        break;
-                    case DocumentStatus.OutOfDate:
-                        _mediatr.Post(new DocumentOutdatedEvent(request.RequestUser) { DocumentId = document.Id });
-                        break;
-                }
-
-                return Ok(document.Status);
-            });
+            await _context.SaveChangesAsync(token);
+            return Success();
         }
     }
 }

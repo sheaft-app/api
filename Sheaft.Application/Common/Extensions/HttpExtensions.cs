@@ -2,7 +2,7 @@
 using System.Linq;
 using Microsoft.AspNetCore.Http;
 
-namespace Sheaft.Core.Extensions
+namespace Sheaft.Application.Common.Extensions
 {
 
     public static class HttpExtensions

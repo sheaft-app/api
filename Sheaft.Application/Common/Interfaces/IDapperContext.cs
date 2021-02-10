@@ -1,9 +1,9 @@
-﻿using Sheaft.Domain.StoreProcedures;
-using System;
+﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Sheaft.Domain.Views;
 
-namespace Sheaft.Application.Interop
+namespace Sheaft.Application.Common.Interfaces
 {
     public interface IDapperContext
     {

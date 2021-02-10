@@ -1,7 +1,6 @@
-﻿using Sheaft.Domain.Models;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Sheaft.Domain.Enums;
+using Sheaft.Domain;
 
 namespace Sheaft.Infrastructure.Persistence.Configurations
 {
@@ -26,6 +25,8 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
             entity.HasOne(c => c.CreditedWallet).WithMany().HasForeignKey("CreditedWalletUid").OnDelete(DeleteBehavior.NoAction);
             entity.HasOne(c => c.DebitedWallet).WithMany().HasForeignKey("DebitedWalletUid").OnDelete(DeleteBehavior.NoAction);
 
+            entity.Ignore(c => c.DomainEvents);
+            
             entity.HasKey("Uid");
 
             entity.HasIndex(c => c.Id).IsUnique();

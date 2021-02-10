@@ -1,18 +1,21 @@
-﻿using Newtonsoft.Json;
-using Sheaft.Core;
-using System;
+﻿using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using Sheaft.Application.Interop;
-using Sheaft.Domain.Models;
+using Newtonsoft.Json;
+using Sheaft.Application.Common;
+using Sheaft.Application.Common.Handlers;
+using Sheaft.Application.Common.Interfaces;
+using Sheaft.Application.Common.Interfaces.Services;
+using Sheaft.Application.Common.Models;
+using Sheaft.Domain;
 
-namespace Sheaft.Application.Commands
+namespace Sheaft.Application.Department.Commands
 {
-    public class UpdateDepartmentStatsCommand : Command<bool>
+    public class UpdateDepartmentStatsCommand : Command
     {
         [JsonConstructor]
         public UpdateDepartmentStatsCommand(RequestUser requestUser) : base(requestUser)
@@ -25,9 +28,9 @@ namespace Sheaft.Application.Commands
         public int Producers { get; set; }
         public int Stores { get; set; }
     }
-    
+
     public class UpdateDepartmentStatsCommandHandler : CommandsHandler,
-        IRequestHandler<UpdateDepartmentStatsCommand, Result<bool>>
+        IRequestHandler<UpdateDepartmentStatsCommand, Result>
     {
         public UpdateDepartmentStatsCommandHandler(
             ISheaftMediatr mediatr,
@@ -37,26 +40,25 @@ namespace Sheaft.Application.Commands
         {
         }
 
-        public async Task<Result<bool>> Handle(UpdateDepartmentStatsCommand request, CancellationToken token)
+        public async Task<Result> Handle(UpdateDepartmentStatsCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(request, async () =>
-            {
-                var department = await _context.Departments.SingleOrDefaultAsync(c => c.Id == request.Id, token);
-                var level = (await _context.GetAsync<Level>(c => c.RequiredPoints > request.Points, token)).OrderBy(c => c.RequiredPoints).FirstOrDefault();
+            var department = await _context.Departments.SingleOrDefaultAsync(c => c.Id == request.Id, token);
+            var level = (await _context.GetAsync<Domain.Level>(c => c.RequiredPoints > request.Points, token))
+                .OrderBy(c => c.RequiredPoints).FirstOrDefault();
 
-                department.SetLevel(level);
-                department.SetPoints(request.Points);
-                department.SetPosition(request.Position);
-                var consumersCount = await _context.Users.OfType<Consumer>().CountAsync(u => !u.RemovedOn.HasValue && u.Address.Department.Id == request.Id, token);
+            department.SetLevel(level);
+            department.SetPoints(request.Points);
+            department.SetPosition(request.Position);
+            var consumersCount = await _context.Users.OfType<Domain.Consumer>()
+                .CountAsync(u => !u.RemovedOn.HasValue && u.Address.Department.Id == request.Id, token);
 
-                department.SetConsumersCount(consumersCount);
+            department.SetConsumersCount(consumersCount);
 
-                department.SetProducersCount(request.Producers);
-                department.SetStoresCount(request.Stores);
+            department.SetProducersCount(request.Producers);
+            department.SetStoresCount(request.Stores);
 
-                await _context.SaveChangesAsync(token);
-                return Ok(true);
-            });
+            await _context.SaveChangesAsync(token);
+            return Success();
         }
     }
 }

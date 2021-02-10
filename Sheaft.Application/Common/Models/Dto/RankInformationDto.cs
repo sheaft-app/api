@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 
-namespace Sheaft.Application.Models
+namespace Sheaft.Application.Common.Models.Dto
 {
     public class RankInformationDto
     {

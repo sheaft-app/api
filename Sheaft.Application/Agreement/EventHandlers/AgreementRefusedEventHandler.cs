@@ -1,20 +1,16 @@
-﻿using System.Net.Http;
-using System.Text;
+﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
 using Microsoft.Extensions.Configuration;
-using Newtonsoft.Json;
-using Sheaft.Application.Events;
-using Sheaft.Domain.Models;
-using Sheaft.Application.Interop;
-using System;
-using Sheaft.Application.Commands.Handlers;
 using Sheaft.Application.Common.Extensions;
-using Sheaft.Application.Models;
-using Sheaft.Application.Models.Mailer;
+using Sheaft.Application.Common.Handlers;
+using Sheaft.Application.Common.Interfaces;
+using Sheaft.Application.Common.Interfaces.Services;
+using Sheaft.Application.Common.Models;
+using Sheaft.Domain.Events.Agreement;
 
-namespace Sheaft.Application.Handlers
+namespace Sheaft.Application.Agreement.EventHandlers
 {
     public class AgreementRefuseEventHandler : EventsHandler,
         INotificationHandler<DomainEventNotification<AgreementRefusedEvent>>
@@ -34,7 +30,7 @@ namespace Sheaft.Application.Handlers
         public async Task Handle(DomainEventNotification<AgreementRefusedEvent> notification, CancellationToken token)
         {
             var agreementEvent = notification.DomainEvent;
-            var agreement = await _context.GetByIdAsync<Agreement>(agreementEvent.AgreementId, token);
+            var agreement = await _context.GetByIdAsync<Domain.Agreement>(agreementEvent.AgreementId, token);
 
             var email = string.Empty;
             var name = string.Empty;

@@ -1,16 +1,16 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
-using Sheaft.Application.Commands.Handlers;
-using Sheaft.Application.Events;
-using Sheaft.Application.Interop;
-using Sheaft.Application.Models;
-using Sheaft.Domain.Models;
+using Sheaft.Application.Common.Handlers;
+using Sheaft.Application.Common.Interfaces;
+using Sheaft.Application.Common.Interfaces.Services;
+using Sheaft.Application.Common.Models;
+using Sheaft.Domain.Events.Transfer;
 
-namespace Sheaft.Application.Handlers
+namespace Sheaft.Application.Transfer.EventHandlers
 {
     public class CreateTransferFailedEventHandler : EventsHandler,
-        INotificationHandler<DomainEventNotification<CreateTransferFailedEvent>>
+        INotificationHandler<DomainEventNotification<CreatePurchaseOrderTransferFailedEvent>>
     {
         public CreateTransferFailedEventHandler(
             IAppDbContext context,
@@ -20,10 +20,10 @@ namespace Sheaft.Application.Handlers
         {
         }
 
-        public async Task Handle(DomainEventNotification<CreateTransferFailedEvent> notification, CancellationToken token)
+        public async Task Handle(DomainEventNotification<CreatePurchaseOrderTransferFailedEvent> notification, CancellationToken token)
         {
             var orderEvent = notification.DomainEvent;
-            var purchaseOrder = await _context.GetByIdAsync<PurchaseOrder>(orderEvent.PurchaseOrderId, token);
+            var purchaseOrder = await _context.GetByIdAsync<Domain.PurchaseOrder>(orderEvent.PurchaseOrderId, token);
             await _emailService.SendEmailAsync(
                 "support@sheaft.com",
                 "Support",

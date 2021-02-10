@@ -1,17 +1,20 @@
-﻿using Sheaft.Domain.Enums;
-using System;
+﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using Sheaft.Core;
 using Newtonsoft.Json;
-using Sheaft.Application.Interop;
+using Sheaft.Application.Common;
+using Sheaft.Application.Common.Handlers;
+using Sheaft.Application.Common.Interfaces;
+using Sheaft.Application.Common.Interfaces.Services;
+using Sheaft.Application.Common.Models;
+using Sheaft.Domain;
 
-namespace Sheaft.Application.Commands
+namespace Sheaft.Application.Department.Commands
 {
-    public class UpdateDepartmentCommand : Command<bool>
+    public class UpdateDepartmentCommand : Command
     {
         [JsonConstructor]
         public UpdateDepartmentCommand(RequestUser requestUser) : base(requestUser)
@@ -22,9 +25,9 @@ namespace Sheaft.Application.Commands
         public string Name { get; set; }
         public int? RequiredProducers { get; set; }
     }
-    
+
     public class UpdateDepartmentCommandHandler : CommandsHandler,
-        IRequestHandler<UpdateDepartmentCommand, Result<bool>>
+        IRequestHandler<UpdateDepartmentCommand, Result>
     {
         public UpdateDepartmentCommandHandler(
             ISheaftMediatr mediatr,
@@ -34,20 +37,17 @@ namespace Sheaft.Application.Commands
         {
         }
 
-        public async Task<Result<bool>> Handle(UpdateDepartmentCommand request, CancellationToken token)
+        public async Task<Result> Handle(UpdateDepartmentCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(request, async () =>
-            {
-                var entity = await _context.Departments.SingleOrDefaultAsync(c => c.Id == request.Id, token);
+            var entity = await _context.Departments.SingleOrDefaultAsync(c => c.Id == request.Id, token);
 
-                entity.SetName(request.Name);
-                entity.SetRequiredProducers(request.RequiredProducers);
+            entity.SetName(request.Name);
+            entity.SetRequiredProducers(request.RequiredProducers);
 
-                _context.Update(entity);
-                await _context.SaveChangesAsync(token);
+            _context.Update(entity);
+            await _context.SaveChangesAsync(token);
 
-                return Ok(true);
-            });
+            return Success();
         }
     }
 }

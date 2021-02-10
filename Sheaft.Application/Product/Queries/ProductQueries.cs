@@ -4,19 +4,21 @@ using System.Globalization;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using AutoMapper.QueryableExtensions;
 using Microsoft.Azure.Search;
 using Microsoft.Azure.Search.Models;
-using Newtonsoft.Json;
-using Sheaft.Application.Interop;
-using Sheaft.Core;
-using Sheaft.Domain.Enums;
-using Sheaft.Application.Models;
-using Sheaft.Options;
 using Microsoft.Extensions.Options;
-using Sheaft.Domain.Models;
-using AutoMapper.QueryableExtensions;
+using Newtonsoft.Json;
+using Sheaft.Application.Common.Extensions;
+using Sheaft.Application.Common.Interfaces;
+using Sheaft.Application.Common.Interfaces.Queries;
+using Sheaft.Application.Common.Models.Dto;
+using Sheaft.Application.Common.Models.Inputs;
+using Sheaft.Application.Common.Options;
+using Sheaft.Domain;
+using Sheaft.Domain.Enum;
 
-namespace Sheaft.Application.Queries
+namespace Sheaft.Application.Product.Queries
 {
     public class ProductQueries : IProductQueries
     {
@@ -163,7 +165,7 @@ namespace Sheaft.Application.Queries
 
         public async Task<bool> ProductIsRatedByUserAsync(Guid id, Guid userId, RequestUser user, CancellationToken token)
         {
-            return await _context.AnyAsync<Product>(p => p.Id == id && p.Ratings.Any(r => r.User.Id == userId), token);
+            return await _context.AnyAsync<Domain.Product>(p => p.Id == id && p.Ratings.Any(r => r.User.Id == userId), token);
         }
 
         private class SearchProduct

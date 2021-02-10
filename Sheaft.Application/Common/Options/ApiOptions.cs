@@ -1,6 +1,4 @@
-﻿using Sheaft.Core.Extensions;
-
-namespace Sheaft.Options
+﻿namespace Sheaft.Application.Common.Options
 {
     public class ApiOptions
     {

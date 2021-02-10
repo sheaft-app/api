@@ -1,18 +1,19 @@
 ﻿using AutoMapper;
-using Sheaft.Application.Commands;
-using Sheaft.Domain.Models;
-using Sheaft.Application.Models;
+using Sheaft.Application.Common.Models.Dto;
+using Sheaft.Application.Common.Models.Inputs;
+using Sheaft.Application.Common.Models.ViewModels;
+using Sheaft.Application.Job.Commands;
 
-namespace Sheaft.Application.Mappers
+namespace Sheaft.Application.Common.Mappings
 {
     public class JobProfile : Profile
     {
         public JobProfile()
         {
-            CreateMap<Job, JobDto>()
+            CreateMap<Domain.Job, JobDto>()
                 .ForMember(d => d.User, opt => opt.MapFrom(r => r.User));
 
-            CreateMap<Job, JobViewModel>()
+            CreateMap<Domain.Job, JobViewModel>()
                 .ForMember(d => d.User, opt => opt.MapFrom(r => r.User));
 
             CreateMap<IdsInput, ResumeJobsCommand>();

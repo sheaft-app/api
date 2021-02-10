@@ -6,21 +6,25 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using Sheaft.Application.Interop;
-using Sheaft.Core;
+using Sheaft.Application.Common;
+using Sheaft.Application.Common.Handlers;
+using Sheaft.Application.Common.Interfaces;
+using Sheaft.Application.Common.Interfaces.Services;
+using Sheaft.Application.Common.Models;
+using Sheaft.Domain;
 
-namespace Sheaft.Application.Commands
+namespace Sheaft.Application.Zone.Commands
 {
-    public class GenerateZonesFileCommand : Command<bool>
+    public class GenerateZonesFileCommand : Command
     {
         [JsonConstructor]
         public GenerateZonesFileCommand(RequestUser requestUser) : base(requestUser)
         {
         }
     }
-    
+
     public class GenerateZonesFileCommandHandler : CommandsHandler,
-        IRequestHandler<GenerateZonesFileCommand, Result<bool>>
+        IRequestHandler<GenerateZonesFileCommand, Result>
     {
         private readonly IBlobService _blobService;
 
@@ -34,27 +38,25 @@ namespace Sheaft.Application.Commands
             _blobService = blobService;
         }
 
-        public async Task<Result<bool>> Handle(GenerateZonesFileCommand request, CancellationToken token)
+        public async Task<Result> Handle(GenerateZonesFileCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(request, async () =>
+            var departments = await _context.Departments.ToListAsync(token);
+            var depts = departments.Select(d => new DepartmentProgress
             {
-                var departments = await _context.Departments.ToListAsync(token);
-                var depts = departments.Select(d => new DepartmentProgress
-                {
-                    Code = d.Code,
-                    Name = d.Name,
-                    Points = d.Points,
-                    Position = d.Position,
-                    ProducersCount = d.ProducersCount,
-                    ProducersRequired = d.RequiredProducers,
-                    ConsumersCount = d.ConsumersCount,
-                    StoresCount = d.StoresCount
-                }).ToList();
+                Code = d.Code,
+                Name = d.Name,
+                Points = d.Points,
+                Position = d.Position,
+                ProducersCount = d.ProducersCount,
+                ProducersRequired = d.RequiredProducers,
+                ConsumersCount = d.ConsumersCount,
+                StoresCount = d.StoresCount
+            }).ToList();
 
-                await _blobService.UploadDepartmentsProgressAsync(Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(depts)), token);
-                
-                return Ok(true);
-            });
+            await _blobService.UploadDepartmentsProgressAsync(
+                Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(depts)), token);
+
+            return Success();
         }
 
         private class DepartmentProgress

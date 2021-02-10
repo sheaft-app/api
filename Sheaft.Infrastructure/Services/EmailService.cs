@@ -1,17 +1,17 @@
 ﻿using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Sheaft.Core;
-using Sheaft.Exceptions;
-using Sheaft.Options;
-using Sheaft.Application.Interop;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Amazon.SimpleEmail;
 using Amazon.SimpleEmail.Model;
 using RazorLight;
-using Sheaft.Core.Extensions;
-using Sheaft.Domain.Enums;
+using Sheaft.Application.Common;
+using Sheaft.Application.Common.Extensions;
+using Sheaft.Application.Common.Interfaces.Services;
+using Sheaft.Application.Common.Models;
+using Sheaft.Application.Common.Options;
+using Sheaft.Domain.Enum;
 
 namespace Sheaft.Infrastructure.Services
 {
@@ -25,7 +25,7 @@ namespace Sheaft.Infrastructure.Services
             IRazorLightEngine templateEngine,
             IOptionsSnapshot<MailerOptions> mailerOptions,
             ILogger<EmailService> logger,
-            IAmazonSimpleEmailService mailer) 
+            IAmazonSimpleEmailService mailer)
             : base(logger)
         {
             _templateEngine = templateEngine;
@@ -33,45 +33,43 @@ namespace Sheaft.Infrastructure.Services
             _mailer = mailer;
         }
 
-        public async Task<Result<bool>> SendTemplatedEmailAsync<T>(string toEmail, string toName, string subject, string templateId, T data, bool isHtml, CancellationToken token)
+        public async Task<Result> SendTemplatedEmailAsync<T>(string toEmail, string toName, string subject,
+            string templateId, T data, bool isHtml, CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
+            var msg = new SendEmailRequest();
+            msg.Destination = new Destination
             {
-                var msg = new SendEmailRequest();
-                msg.Destination = new Destination
-                {                    
-                    ToAddresses = new List<string> { $"=?UTF-8?B?{toName.Base64Encode()}?= <{toEmail}>" }
-                };
+                ToAddresses = new List<string> {$"=?UTF-8?B?{toName.Base64Encode()}?= <{toEmail}>"}
+            };
 
-                msg.Source = $"{_mailerOptions.Sender.Name}<{_mailerOptions.Sender.Email}>";
-                msg.ReturnPath = _mailerOptions.Bounces;
-                msg.Message = new Message
-                {
-                    Subject = new Content(subject)
-                };
+            msg.Source = $"{_mailerOptions.Sender.Name}<{_mailerOptions.Sender.Email}>";
+            msg.ReturnPath = _mailerOptions.Bounces;
+            msg.Message = new Message
+            {
+                Subject = new Content(subject)
+            };
 
-                var content = await _templateEngine.CompileRenderAsync($"{templateId}.cshtml", data);
-                if (isHtml)
-                    msg.Message.Body = new Body { Html = new Content(content) };
-                else
-                    msg.Message.Body = new Body { Text = new Content(content) };
+            var content = await _templateEngine.CompileRenderAsync($"{templateId}.cshtml", data);
+            if (isHtml)
+                msg.Message.Body = new Body {Html = new Content(content)};
+            else
+                msg.Message.Body = new Body {Text = new Content(content)};
 
-                var response = await _mailer.SendEmailAsync(msg, token);
-                if ((int)response.HttpStatusCode >= 400)
-                    return BadRequest<bool>(MessageKind.EmailProvider_SendEmail_Failure, string.Join(";", response.ResponseMetadata.Metadata));
+            var response = await _mailer.SendEmailAsync(msg, token);
+            if ((int) response.HttpStatusCode >= 400)
+                return Failure(MessageKind.EmailProvider_SendEmail_Failure,
+                    string.Join(";", response.ResponseMetadata.Metadata));
 
-                return Ok(true);
-            });
+            return Success();
         }
 
-        public async Task<Result<bool>> SendEmailAsync(string toEmail, string toName, string subject, string content, bool isHtml, CancellationToken token)
+        public async Task<Result> SendEmailAsync(string toEmail, string toName, string subject, string content,
+            bool isHtml, CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
-            {
                 var msg = new SendEmailRequest();
                 msg.Destination = new Destination
                 {
-                    ToAddresses = new List<string> { $"=?UTF-8?B?{toName.Base64Encode()}?= <{toEmail}>" }
+                    ToAddresses = new List<string> {$"=?UTF-8?B?{toName.Base64Encode()}?= <{toEmail}>"}
                 };
 
                 msg.Source = $"{_mailerOptions.Sender.Name}<{_mailerOptions.Sender.Email}>";
@@ -82,16 +80,16 @@ namespace Sheaft.Infrastructure.Services
                 };
 
                 if (isHtml)
-                    msg.Message.Body = new Body { Html = new Content(content) };
+                    msg.Message.Body = new Body {Html = new Content(content)};
                 else
-                    msg.Message.Body = new Body { Text = new Content(content) };
+                    msg.Message.Body = new Body {Text = new Content(content)};
 
                 var response = await _mailer.SendEmailAsync(msg, token);
-                if ((int)response.HttpStatusCode >= 400)
-                    return BadRequest<bool>(MessageKind.EmailProvider_SendEmail_Failure, string.Join(";", response.ResponseMetadata.Metadata));
+                if ((int) response.HttpStatusCode >= 400)
+                    return Failure(MessageKind.EmailProvider_SendEmail_Failure,
+                        string.Join(";", response.ResponseMetadata.Metadata));
 
-                return Ok(true);
-            });
+                return Success();
         }
     }
 }

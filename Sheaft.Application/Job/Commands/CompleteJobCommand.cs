@@ -4,13 +4,16 @@ using System.Threading.Tasks;
 using MediatR;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using Sheaft.Application.Interop;
-using Sheaft.Core;
-using Sheaft.Domain.Models;
+using Sheaft.Application.Common;
+using Sheaft.Application.Common.Handlers;
+using Sheaft.Application.Common.Interfaces;
+using Sheaft.Application.Common.Interfaces.Services;
+using Sheaft.Application.Common.Models;
+using Sheaft.Domain;
 
-namespace Sheaft.Application.Commands
+namespace Sheaft.Application.Job.Commands
 {
-    public class CompleteJobCommand : Command<bool>
+    public class CompleteJobCommand : Command
     {
         [JsonConstructor]
         public CompleteJobCommand(RequestUser requestUser) : base(requestUser)
@@ -20,30 +23,27 @@ namespace Sheaft.Application.Commands
         public Guid Id { get; set; }
         public string FileUrl { get; set; }
     }
-    
+
     public class CompleteJobCommandHandler : CommandsHandler,
-        IRequestHandler<CompleteJobCommand, Result<bool>>
+        IRequestHandler<CompleteJobCommand, Result>
     {
         public CompleteJobCommandHandler(
-            ISheaftMediatr mediatr, 
+            ISheaftMediatr mediatr,
             IAppDbContext context,
             ILogger<CompleteJobCommandHandler> logger)
             : base(mediatr, context, logger)
         {
         }
 
-        public async Task<Result<bool>> Handle(CompleteJobCommand request,
+        public async Task<Result> Handle(CompleteJobCommand request,
             CancellationToken token)
         {
-            return await ExecuteAsync(request, async () =>
-            {
-                var entity = await _context.GetByIdAsync<Job>(request.Id, token);
-                entity.SetDownloadUrl(request.FileUrl);
-                entity.CompleteJob();
+            var entity = await _context.GetByIdAsync<Domain.Job>(request.Id, token);
+            entity.SetDownloadUrl(request.FileUrl);
+            entity.CompleteJob();
 
-                await _context.SaveChangesAsync(token);
-                return Ok(true);
-            });
+            await _context.SaveChangesAsync(token);
+            return Success();
         }
     }
 }

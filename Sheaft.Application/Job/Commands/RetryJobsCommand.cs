@@ -5,12 +5,16 @@ using System.Threading.Tasks;
 using MediatR;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using Sheaft.Application.Interop;
-using Sheaft.Core;
+using Sheaft.Application.Common;
+using Sheaft.Application.Common.Handlers;
+using Sheaft.Application.Common.Interfaces;
+using Sheaft.Application.Common.Interfaces.Services;
+using Sheaft.Application.Common.Models;
+using Sheaft.Domain;
 
-namespace Sheaft.Application.Commands
+namespace Sheaft.Application.Job.Commands
 {
-    public class RetryJobsCommand : Command<bool>
+    public class RetryJobsCommand : Command
     {
         [JsonConstructor]
         public RetryJobsCommand(RequestUser requestUser) : base(requestUser)
@@ -19,35 +23,33 @@ namespace Sheaft.Application.Commands
 
         public IEnumerable<Guid> Ids { get; set; }
     }
-    
+
     public class RetryJobsCommandHandler : CommandsHandler,
-        IRequestHandler<RetryJobsCommand, Result<bool>>
+        IRequestHandler<RetryJobsCommand, Result>
     {
         public RetryJobsCommandHandler(
-            ISheaftMediatr mediatr, 
+            ISheaftMediatr mediatr,
             IAppDbContext context,
             ILogger<RetryJobsCommandHandler> logger)
             : base(mediatr, context, logger)
         {
         }
-        public async Task<Result<bool>> Handle(RetryJobsCommand request,
+
+        public async Task<Result> Handle(RetryJobsCommand request,
             CancellationToken token)
         {
-            return await ExecuteAsync(request, async () =>
-           {
-               using (var transaction = await _context.BeginTransactionAsync(token))
-               {
-                   foreach (var jobId in request.Ids)
-                   {
-                       var result = await _mediatr.Process(new RetryJobCommand(request.RequestUser) { Id = jobId }, token);
-                       if (!result.Success)
-                           return Failed<bool>(result.Exception);
-                   }
+            using (var transaction = await _context.BeginTransactionAsync(token))
+            {
+                foreach (var jobId in request.Ids)
+                {
+                    var result = await _mediatr.Process(new RetryJobCommand(request.RequestUser) {Id = jobId}, token);
+                    if (!result.Succeeded)
+                        return Failure(result.Exception);
+                }
 
-                   await transaction.CommitAsync(token);
-                   return Ok(true);
-               }
-           });
+                await transaction.CommitAsync(token);
+                return Success();
+            }
         }
     }
 }

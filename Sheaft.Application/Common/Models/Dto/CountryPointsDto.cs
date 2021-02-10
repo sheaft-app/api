@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Sheaft.Application.Models
+﻿namespace Sheaft.Application.Common.Models.Dto
 {
     public class CountryPointsDto
     {

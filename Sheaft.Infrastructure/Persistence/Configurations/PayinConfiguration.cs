@@ -1,7 +1,7 @@
-﻿using Sheaft.Domain.Models;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Sheaft.Domain.Enums;
+using Sheaft.Domain;
+using Sheaft.Domain.Enum;
 
 namespace Sheaft.Infrastructure.Persistence.Configurations
 {
@@ -25,6 +25,8 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
             entity.HasOne(c => c.CreditedWallet).WithMany().HasForeignKey("CreditedWalletUid").OnDelete(DeleteBehavior.NoAction);
             entity.HasOne(c => c.Order).WithMany().HasForeignKey("OrderUid").OnDelete(DeleteBehavior.NoAction);
             entity.HasMany(c => c.Refunds).WithOne(c => c.Payin).HasForeignKey("PayinUid").OnDelete(DeleteBehavior.NoAction);
+
+            entity.Ignore(c => c.DomainEvents);
 
             entity.HasDiscriminator(c => c.Kind)
                 .HasValue<WebPayin>(TransactionKind.PayinWeb)

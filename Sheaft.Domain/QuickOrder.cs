@@ -1,13 +1,14 @@
-﻿using Sheaft.Domain.Interop;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Sheaft.Domain.Enums;
-using Sheaft.Domains.Exceptions;
+using Sheaft.Domain.Common;
+using Sheaft.Domain.Enum;
+using Sheaft.Domain.Exceptions;
+using Sheaft.Domain.Interop;
 
-namespace Sheaft.Domain.Models
+namespace Sheaft.Domain
 {
-    public class QuickOrder : IEntity
+    public class QuickOrder : IEntity, IHasDomainEvent
     {
         private List<QuickOrderProduct> _products;
 
@@ -24,6 +25,7 @@ namespace Sheaft.Domain.Models
             SetAsDefault();
             User = user;
 
+            DomainEvents = new List<DomainEvent>();
             _products = new List<QuickOrderProduct>();
             AddProducts(products);
         }
@@ -93,5 +95,7 @@ namespace Sheaft.Domain.Models
 
             _products.Remove(productLine);
         }
+
+        public List<DomainEvent> DomainEvents { get; } = new List<DomainEvent>();
     }
 }

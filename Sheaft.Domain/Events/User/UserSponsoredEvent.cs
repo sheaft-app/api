@@ -1,18 +1,21 @@
 ﻿using System;
 using Newtonsoft.Json;
-using Sheaft.Core;
-using Sheaft.Domain.Models.Common;
+using Sheaft.Domain.Common;
 
-namespace Sheaft.Application.Events
+namespace Sheaft.Domain.Events.User
 {
     public class UserSponsoredEvent : DomainEvent
     {
         [JsonConstructor]
-        public UserSponsoredEvent(RequestUser requestUser) : base(requestUser)
+        public UserSponsoredEvent(Guid sponsorId, Guid sponsoredId)
         {
+            SponsorId = sponsorId;
+            SponsoredId = sponsoredId;
+            CreatedOn = DateTimeOffset.UtcNow;
         }
 
-        public Guid SponsorId { get; set; }
-        public Guid SponsoredId { get; set; }
+        public Guid SponsorId { get; }
+        public Guid SponsoredId { get; }
+        public DateTimeOffset CreatedOn { get; }
     }
 }

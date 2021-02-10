@@ -1,19 +1,21 @@
-﻿using Sheaft.Core;
-using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Sheaft.Application.Interop;
-using Sheaft.Domain.Enums;
-using Sheaft.Domain.Models;
-using Sheaft.Exceptions;
-using Sheaft.Options;
+using Newtonsoft.Json;
+using Sheaft.Application.Common;
+using Sheaft.Application.Common.Handlers;
+using Sheaft.Application.Common.Interfaces;
+using Sheaft.Application.Common.Interfaces.Services;
+using Sheaft.Application.Common.Models;
+using Sheaft.Application.Common.Options;
+using Sheaft.Domain;
+using Sheaft.Domain.Enum;
 
-namespace Sheaft.Application.Commands
+namespace Sheaft.Application.Donation.Commands
 {
     public class CreateDonationCommand : Command<Guid>
     {
@@ -49,43 +51,40 @@ namespace Sheaft.Application.Commands
 
         public async Task<Result<Guid>> Handle(CreateDonationCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(request, async () =>
+            var order = await _context.GetByIdAsync<Domain.Order>(request.OrderId, token);
+            if (order.Payin == null
+                || order.Payin.Status != TransactionStatus.Succeeded
+                || (order.Donation != null && order.Donation.Status != TransactionStatus.Failed))
+                return Failure<Guid>(MessageKind.Donation_CannotCreate_AlreadySucceeded);
+
+            var orderDonations = await _context.FindAsync<Domain.Donation>(c => c.Order.Id == order.Id, token);
+            if (orderDonations.Any(c => c.Status != TransactionStatus.Failed))
+                return Failure<Guid>(MessageKind.Donation_CannotCreate_PendingDonation);
+
+            var creditedWallet =
+                await _context.GetSingleAsync<Domain.Wallet>(c => c.Identifier == _pspOptions.WalletId, token);
+            using (var transaction = await _context.BeginTransactionAsync(token))
             {
-                var order = await _context.GetByIdAsync<Order>(request.OrderId, token);
-                if (order.Payin == null
-                    || order.Payin.Status != TransactionStatus.Succeeded
-                    || (order.Donation != null && order.Donation.Status != TransactionStatus.Failed))
-                    return BadRequest<Guid>(MessageKind.Donation_CannotCreate_AlreadySucceeded);
+                var donation = new Domain.Donation(Guid.NewGuid(), order.Payin.CreditedWallet, creditedWallet, order);
+                await _context.AddAsync(donation, token);
+                await _context.SaveChangesAsync(token);
 
-                var orderDonations = await _context.FindAsync<Donation>(c => c.Order.Id == order.Id, token);
-                if (orderDonations.Any(c => c.Status != TransactionStatus.Failed))
-                    return BadRequest<Guid>(MessageKind.Donation_CannotCreate_PendingDonation);
+                order.SetDonation(donation);
 
-                var creditedWallet =
-                    await _context.GetSingleAsync<Wallet>(c => c.Identifier == _pspOptions.WalletId, token);
-                using (var transaction = await _context.BeginTransactionAsync(token))
-                {
-                    var donation = new Donation(Guid.NewGuid(), order.Payin.CreditedWallet, creditedWallet, order);
-                    await _context.AddAsync(donation, token);
-                    await _context.SaveChangesAsync(token);
+                var result = await _pspService.CreateDonationAsync(donation, token);
+                if (!result.Succeeded)
+                    return Failure<Guid>(result.Exception);
 
-                    order.SetDonation(donation);
+                donation.SetResult(result.Data.ResultCode, result.Data.ResultMessage);
+                donation.SetIdentifier(result.Data.Identifier);
+                donation.SetStatus(result.Data.Status);
+                donation.SetExecutedOn(result.Data.ProcessedOn);
 
-                    var result = await _pspService.CreateDonationAsync(donation, token);
-                    if (!result.Success)
-                        return Failed<Guid>(result.Exception);
+                await _context.SaveChangesAsync(token);
+                await transaction.CommitAsync(token);
 
-                    donation.SetResult(result.Data.ResultCode, result.Data.ResultMessage);
-                    donation.SetIdentifier(result.Data.Identifier);
-                    donation.SetStatus(result.Data.Status);
-                    donation.SetExecutedOn(result.Data.ProcessedOn);
-
-                    await _context.SaveChangesAsync(token);
-                    await transaction.CommitAsync(token);
-
-                    return Ok(donation.Id);
-                }
-            });
+                return Success(donation.Id);
+            }
         }
     }
 }

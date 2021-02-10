@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Sheaft.Application.Models.Mailer
+namespace Sheaft.Application.Common.Models.Mailer
 {
     public class AgreementMailerModel
     {

@@ -1,9 +1,9 @@
-using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Newtonsoft.Json;
 
-namespace Sheaft.Core
+namespace Sheaft.Domain
 {
     public interface ITrackedUser
     {

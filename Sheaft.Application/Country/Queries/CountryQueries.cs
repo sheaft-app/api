@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Linq;
-using Sheaft.Application.Models;
-using Sheaft.Core;
 using AutoMapper.QueryableExtensions;
-using Sheaft.Application.Interop;
+using Sheaft.Application.Common.Interfaces;
+using Sheaft.Application.Common.Interfaces.Queries;
+using Sheaft.Application.Common.Models.Dto;
+using Sheaft.Domain;
 
-namespace Sheaft.Application.Queries
+namespace Sheaft.Application.Country.Queries
 {
     public class CountryQueries : ICountryQueries
     {

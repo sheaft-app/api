@@ -6,16 +6,19 @@ using System.Threading.Tasks;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using Sheaft.Application.Models;
-using Sheaft.Domain.Enums;
-using Sheaft.Core;
 using Newtonsoft.Json;
-using Sheaft.Application.Interop;
-using Sheaft.Domain.Models;
+using Sheaft.Application.Common;
+using Sheaft.Application.Common.Handlers;
+using Sheaft.Application.Common.Interfaces;
+using Sheaft.Application.Common.Interfaces.Services;
+using Sheaft.Application.Common.Models;
+using Sheaft.Application.Common.Models.Inputs;
+using Sheaft.Domain;
+using Sheaft.Domain.Enum;
 
-namespace Sheaft.Application.Commands
+namespace Sheaft.Application.DeliveryMode.Commands
 {
-    public class UpdateDeliveryModeCommand : Command<bool>
+    public class UpdateDeliveryModeCommand : Command
     {
         [JsonConstructor]
         public UpdateDeliveryModeCommand(RequestUser requestUser) : base(requestUser)
@@ -34,8 +37,9 @@ namespace Sheaft.Application.Commands
         public bool AutoAcceptRelatedPurchaseOrder { get; set; }
         public bool AutoCompleteRelatedPurchaseOrder { get; set; }
     }
+
     public class UpdateDeliveryModeCommandHandler : CommandsHandler,
-        IRequestHandler<UpdateDeliveryModeCommand, Result<bool>>
+        IRequestHandler<UpdateDeliveryModeCommand, Result>
     {
         public UpdateDeliveryModeCommandHandler(
             ISheaftMediatr mediatr,
@@ -45,46 +49,48 @@ namespace Sheaft.Application.Commands
         {
         }
 
-        public async Task<Result<bool>> Handle(UpdateDeliveryModeCommand request, CancellationToken token)
+        public async Task<Result> Handle(UpdateDeliveryModeCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(request, async () =>
+            var producer = await _context.GetByIdAsync<Domain.Producer>(request.RequestUser.Id, token);
+            var entity = await _context.GetByIdAsync<Domain.DeliveryMode>(request.Id, token);
+
+            entity.SetName(request.Name);
+            entity.SetAvailability(request.Available);
+            entity.SetDescription(request.Description);
+            entity.SetLockOrderHoursBeforeDelivery(request.LockOrderHoursBeforeDelivery);
+            entity.SetKind(request.Kind);
+            entity.SetAutoAcceptRelatedPurchaseOrders(request.AutoAcceptRelatedPurchaseOrder);
+            entity.SetAutoCompleteRelatedPurchaseOrders(request.AutoCompleteRelatedPurchaseOrder);
+            entity.SetMaxPurchaseOrdersPerTimeSlot(request.MaxPurchaseOrdersPerTimeSlot);
+
+            if (request.Address != null)
+                entity.SetAddress(request.Address.Line1, request.Address.Line2, request.Address.Zipcode,
+                    request.Address.City, request.Address.Country, request.Address.Longitude, request.Address.Latitude);
+
+            if (request.OpeningHours != null)
             {
-                var producer = await _context.GetByIdAsync<Producer>(request.RequestUser.Id, token);
-                var entity = await _context.GetByIdAsync<DeliveryMode>(request.Id, token);
-
-                entity.SetName(request.Name);
-                entity.SetAvailability(request.Available);
-                entity.SetDescription(request.Description);
-                entity.SetLockOrderHoursBeforeDelivery(request.LockOrderHoursBeforeDelivery);
-                entity.SetKind(request.Kind); 
-                entity.SetAutoAcceptRelatedPurchaseOrders(request.AutoAcceptRelatedPurchaseOrder);
-                entity.SetAutoCompleteRelatedPurchaseOrders(request.AutoCompleteRelatedPurchaseOrder);
-                entity.SetMaxPurchaseOrdersPerTimeSlot(request.MaxPurchaseOrdersPerTimeSlot);
-
-                if (request.Address != null)
-                    entity.SetAddress(request.Address.Line1, request.Address.Line2, request.Address.Zipcode, request.Address.City, request.Address.Country, request.Address.Longitude, request.Address.Latitude);
-                
-                if (request.OpeningHours != null)
+                var openingHours = new List<TimeSlotHour>();
+                foreach (var oh in request.OpeningHours)
                 {
-                    var openingHours = new List<TimeSlotHour>();
-                    foreach (var oh in request.OpeningHours)
-                    {
-                        openingHours.AddRange(oh.Days.Select(c => new TimeSlotHour(c, oh.From, oh.To)));
-                    }
-
-                    entity.SetOpeningHours(openingHours);
+                    openingHours.AddRange(oh.Days.Select(c => new TimeSlotHour(c, oh.From, oh.To)));
                 }
 
-                if (request.Kind == DeliveryKind.Collective || request.Kind == DeliveryKind.Farm || request.Kind == DeliveryKind.Market)
-                    producer.CanDirectSell = true;
-                else
-                {
-                    producer.CanDirectSell = await _context.DeliveryModes.AnyAsync(c => !c.RemovedOn.HasValue && c.Producer.Id == request.RequestUser.Id && (c.Kind == DeliveryKind.Collective || c.Kind == DeliveryKind.Farm || c.Kind == DeliveryKind.Market), token);
-                }
+                entity.SetOpeningHours(openingHours);
+            }
 
-                await _context.SaveChangesAsync(token);
-                return Ok(true);
-            });
+            if (request.Kind == DeliveryKind.Collective || request.Kind == DeliveryKind.Farm ||
+                request.Kind == DeliveryKind.Market)
+                producer.CanDirectSell = true;
+            else
+            {
+                producer.CanDirectSell = await _context.DeliveryModes.AnyAsync(
+                    c => !c.RemovedOn.HasValue && c.Producer.Id == request.RequestUser.Id &&
+                         (c.Kind == DeliveryKind.Collective || c.Kind == DeliveryKind.Farm ||
+                          c.Kind == DeliveryKind.Market), token);
+            }
+
+            await _context.SaveChangesAsync(token);
+            return Success();
         }
     }
 }

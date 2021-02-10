@@ -1,9 +1,9 @@
 ﻿using HotChocolate.Types;
 using HotChocolate.Types.Relay;
-using Sheaft.Core.Security;
+using Sheaft.Application.Common.Security;
 using Sheaft.GraphQL.Filters;
-using Sheaft.GraphQL.Services;
 using Sheaft.GraphQL.Sorts;
+using Sheaft.GraphQL.Types.Outputs;
 
 namespace Sheaft.GraphQL.Types
 {

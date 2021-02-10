@@ -4,13 +4,16 @@ using System.Threading.Tasks;
 using MediatR;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using Sheaft.Application.Interop;
-using Sheaft.Core;
-using Sheaft.Domain.Models;
+using Sheaft.Application.Common;
+using Sheaft.Application.Common.Handlers;
+using Sheaft.Application.Common.Interfaces;
+using Sheaft.Application.Common.Interfaces.Services;
+using Sheaft.Application.Common.Models;
+using Sheaft.Domain;
 
-namespace Sheaft.Application.Commands
+namespace Sheaft.Application.Returnable.Commands
 {
-    public class UpdateReturnableCommand : Command<bool>
+    public class UpdateReturnableCommand : Command
     {
         [JsonConstructor]
         public UpdateReturnableCommand(RequestUser requestUser) : base(requestUser)
@@ -23,9 +26,9 @@ namespace Sheaft.Application.Commands
         public decimal WholeSalePrice { get; set; }
         public decimal Vat { get; set; }
     }
-    
+
     public class UpdateReturnableCommandHandler : CommandsHandler,
-        IRequestHandler<UpdateReturnableCommand, Result<bool>>
+        IRequestHandler<UpdateReturnableCommand, Result>
     {
         public UpdateReturnableCommandHandler(
             ISheaftMediatr mediatr,
@@ -35,19 +38,16 @@ namespace Sheaft.Application.Commands
         {
         }
 
-        public async Task<Result<bool>> Handle(UpdateReturnableCommand request, CancellationToken token)
+        public async Task<Result> Handle(UpdateReturnableCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(request, async () =>
-            {
-                var entity = await _context.GetByIdAsync<Returnable>(request.Id, token);
-                entity.SetName(request.Name);
-                entity.SetDescription(request.Description);
-                entity.SetWholeSalePrice(request.WholeSalePrice);
-                entity.SetVat(request.Vat);
+            var entity = await _context.GetByIdAsync<Domain.Returnable>(request.Id, token);
+            entity.SetName(request.Name);
+            entity.SetDescription(request.Description);
+            entity.SetWholeSalePrice(request.WholeSalePrice);
+            entity.SetVat(request.Vat);
 
-                await _context.SaveChangesAsync(token);
-                return Ok(true);
-            });
+            await _context.SaveChangesAsync(token);
+            return Success();
         }
     }
 }

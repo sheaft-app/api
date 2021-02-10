@@ -1,17 +1,17 @@
 ﻿using System;
 using Newtonsoft.Json;
-using Sheaft.Core;
-using Sheaft.Domain.Models.Common;
+using Sheaft.Domain.Common;
 
-namespace Sheaft.Application.Events
+namespace Sheaft.Domain.Events.Store
 {
     public class StoreRegisteredEvent : DomainEvent
     {
         [JsonConstructor]
-        public StoreRegisteredEvent(RequestUser requestUser) : base(requestUser)
+        public StoreRegisteredEvent(Guid storeId)
         {
+            StoreId = storeId;
         }
 
-        public Guid StoreId { get; set; }
+        public Guid StoreId { get; }
     }
 }

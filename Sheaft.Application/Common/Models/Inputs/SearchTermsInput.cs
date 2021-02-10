@@ -1,7 +1,6 @@
-using System;
 using System.Collections.Generic;
 
-namespace Sheaft.Application.Models
+namespace Sheaft.Application.Common.Models.Inputs
 {
     public class SearchTermsInput
     {

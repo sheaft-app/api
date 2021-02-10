@@ -4,12 +4,15 @@ using System.Threading.Tasks;
 using MediatR;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using Sheaft.Application.Interop;
-using Sheaft.Core;
-using Sheaft.Application.Models;
-using Sheaft.Domain.Models;
+using Sheaft.Application.Common;
+using Sheaft.Application.Common.Handlers;
+using Sheaft.Application.Common.Interfaces;
+using Sheaft.Application.Common.Interfaces.Services;
+using Sheaft.Application.Common.Models;
+using Sheaft.Application.Common.Models.Inputs;
+using Sheaft.Domain;
 
-namespace Sheaft.Application.Commands
+namespace Sheaft.Application.Bank.Commands
 {
     public class CreateBankAccountCommand : Command<Guid>
     {
@@ -25,9 +28,9 @@ namespace Sheaft.Application.Commands
         public string IBAN { get; set; }
         public AddressInput Address { get; set; }
     }
-    
+
     public class CreateBankAccountCommandHandler : CommandsHandler,
-           IRequestHandler<CreateBankAccountCommand, Result<Guid>>
+        IRequestHandler<CreateBankAccountCommand, Result<Guid>>
     {
         private readonly IPspService _pspService;
 
@@ -43,35 +46,34 @@ namespace Sheaft.Application.Commands
 
         public async Task<Result<Guid>> Handle(CreateBankAccountCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(request, async () =>
+            var user = await _context.GetByIdAsync<Domain.User>(request.UserId, token);
+
+            using (var transaction = await _context.BeginTransactionAsync(token))
             {
-                var user = await _context.GetByIdAsync<User>(request.UserId, token);
+                var address = request.Address != null
+                    ? new BankAddress(request.Address.Line1, request.Address.Line2, request.Address.Zipcode,
+                        request.Address.City,
+                        request.Address.Country)
+                    : null;
 
-                using (var transaction = await _context.BeginTransactionAsync(token))
+                var bankAccount = new BankAccount(Guid.NewGuid(), request.Name, request.Owner, request.IBAN,
+                    request.BIC, address, user);
+                await _context.AddAsync(bankAccount, token);
+                await _context.SaveChangesAsync(token);
+
+                var result = await _pspService.CreateBankIbanAsync(bankAccount, token);
+                if (!result.Succeeded)
                 {
-                    var address = request.Address != null ?
-                           new BankAddress(request.Address.Line1, request.Address.Line2, request.Address.Zipcode, request.Address.City,
-                           request.Address.Country)
-                           : null;
-
-                    var bankAccount = new BankAccount(Guid.NewGuid(), request.Name, request.Owner, request.IBAN, request.BIC, address, user);
-                    await _context.AddAsync(bankAccount, token);
-                    await _context.SaveChangesAsync(token);
-
-                    var result = await _pspService.CreateBankIbanAsync(bankAccount, token);
-                    if (!result.Success)
-                    {
-                        await transaction.RollbackAsync(token);
-                        return Failed<Guid>(result.Exception);
-                    }
-
-                    bankAccount.SetIdentifier(result.Data);
-                    await _context.SaveChangesAsync(token);
-
-                    await transaction.CommitAsync(token);
-                    return Ok(bankAccount.Id);
+                    await transaction.RollbackAsync(token);
+                    return Failure<Guid>(result.Exception);
                 }
-            });
+
+                bankAccount.SetIdentifier(result.Data);
+                await _context.SaveChangesAsync(token);
+
+                await transaction.CommitAsync(token);
+                return Success(bankAccount.Id);
+            }
         }
     }
 }

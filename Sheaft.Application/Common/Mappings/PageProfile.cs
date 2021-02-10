@@ -1,15 +1,15 @@
 ﻿using AutoMapper;
-using Sheaft.Domain.Models;
-using Sheaft.Application.Models;
+using Sheaft.Application.Common.Models.Dto;
+using Sheaft.Application.Common.Models.ViewModels;
 
-namespace Sheaft.Application.Mappers
+namespace Sheaft.Application.Common.Mappings
 {
     public class PageProfile : Profile
     {
         public PageProfile()
         {
-            CreateMap<Page, PageDto>();
-            CreateMap<Page, PageViewModel>();
+            CreateMap<Domain.Page, PageDto>();
+            CreateMap<Domain.Page, PageViewModel>();
         }
     }
 }

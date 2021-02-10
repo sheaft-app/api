@@ -1,6 +1,6 @@
-﻿using Sheaft.Domain.Models;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Sheaft.Domain;
 
 namespace Sheaft.Infrastructure.Persistence.Configurations
 {
@@ -13,6 +13,8 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
 
             entity.HasOne(c => c.PurchaseOrder).WithMany().HasForeignKey("PurchaseOrderUid").OnDelete(DeleteBehavior.NoAction);
 
+            entity.Ignore(c => c.DomainEvents);
+            
             entity.HasIndex("PayinUid");
             entity.HasIndex("PurchaseOrderUid");
         }

@@ -1,7 +1,6 @@
-﻿using Sheaft.Domain.Enums;
-using System;
+﻿using Sheaft.Domain.Enum;
 
-namespace Sheaft.Application.Models
+namespace Sheaft.Application.Common.Models.Dto
 {
 
     public abstract class PspUserDto

@@ -4,13 +4,16 @@ using System.Threading.Tasks;
 using MediatR;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using Sheaft.Application.Interop;
-using Sheaft.Core;
-using Sheaft.Domain.Models;
+using Sheaft.Application.Common;
+using Sheaft.Application.Common.Handlers;
+using Sheaft.Application.Common.Interfaces;
+using Sheaft.Application.Common.Interfaces.Services;
+using Sheaft.Application.Common.Models;
+using Sheaft.Domain;
 
-namespace Sheaft.Application.Commands
+namespace Sheaft.Application.Product.Commands
 {
-    public class SetProductSearchabilityCommand : Command<bool>
+    public class SetProductSearchabilityCommand : Command
     {
         [JsonConstructor]
         public SetProductSearchabilityCommand(RequestUser requestUser) : base(requestUser)
@@ -21,9 +24,9 @@ namespace Sheaft.Application.Commands
         public bool VisibleToStores { get; set; }
         public bool VisibleToConsumers { get; set; }
     }
-    
+
     public class SetProductSearchabilityCommandHandler : CommandsHandler,
-        IRequestHandler<SetProductSearchabilityCommand, Result<bool>>
+        IRequestHandler<SetProductSearchabilityCommand, Result>
     {
         private readonly IBlobService _blobService;
 
@@ -36,17 +39,15 @@ namespace Sheaft.Application.Commands
         {
             _blobService = blobService;
         }
-        public async Task<Result<bool>> Handle(SetProductSearchabilityCommand request, CancellationToken token)
-        {
-            return await ExecuteAsync(request, async () =>
-            {
-                var entity = await _context.GetByIdAsync<Product>(request.Id, token);
-                entity.SetConsumerVisibility(request.VisibleToConsumers);
-                entity.SetStoreVisibility(request.VisibleToStores);
 
-                await _context.SaveChangesAsync(token);
-                return Ok(true);
-            });
+        public async Task<Result> Handle(SetProductSearchabilityCommand request, CancellationToken token)
+        {
+            var entity = await _context.GetByIdAsync<Domain.Product>(request.Id, token);
+            entity.SetConsumerVisibility(request.VisibleToConsumers);
+            entity.SetStoreVisibility(request.VisibleToStores);
+
+            await _context.SaveChangesAsync(token);
+            return Success();
         }
     }
 }

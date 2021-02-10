@@ -5,12 +5,16 @@ using System.Threading.Tasks;
 using MediatR;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using Sheaft.Application.Interop;
-using Sheaft.Core;
+using Sheaft.Application.Common;
+using Sheaft.Application.Common.Handlers;
+using Sheaft.Application.Common.Interfaces;
+using Sheaft.Application.Common.Interfaces.Services;
+using Sheaft.Application.Common.Models;
+using Sheaft.Domain;
 
-namespace Sheaft.Application.Commands
+namespace Sheaft.Application.Product.Commands
 {
-    public class SetProductsAvailabilityCommand : Command<bool>
+    public class SetProductsAvailabilityCommand : Command
     {
         [JsonConstructor]
         public SetProductsAvailabilityCommand(RequestUser requestUser) : base(requestUser)
@@ -20,9 +24,9 @@ namespace Sheaft.Application.Commands
         public IEnumerable<Guid> Ids { get; set; }
         public bool Available { get; set; }
     }
-    
+
     public class SetProductsAvailabilityCommandHandler : CommandsHandler,
-        IRequestHandler<SetProductsAvailabilityCommand, Result<bool>>
+        IRequestHandler<SetProductsAvailabilityCommand, Result>
     {
         private readonly IBlobService _blobService;
 
@@ -35,23 +39,23 @@ namespace Sheaft.Application.Commands
         {
             _blobService = blobService;
         }
-        public async Task<Result<bool>> Handle(SetProductsAvailabilityCommand request, CancellationToken token)
-        {
-            return await ExecuteAsync(request, async () =>
-            {
-                using (var transaction = await _context.BeginTransactionAsync(token))
-                {
-                    foreach (var id in request.Ids)
-                    {
-                        var result = await _mediatr.Process(new SetProductAvailabilityCommand(request.RequestUser) { Id = id, Available = request.Available }, token);
-                        if (!result.Success)
-                            return Failed<bool>(result.Exception);
-                    }
 
-                    await transaction.CommitAsync(token);
-                    return Ok(true);
+        public async Task<Result> Handle(SetProductsAvailabilityCommand request, CancellationToken token)
+        {
+            using (var transaction = await _context.BeginTransactionAsync(token))
+            {
+                foreach (var id in request.Ids)
+                {
+                    var result = await _mediatr.Process(
+                        new SetProductAvailabilityCommand(request.RequestUser) {Id = id, Available = request.Available},
+                        token);
+                    if (!result.Succeeded)
+                        return Failure(result.Exception);
                 }
-            });
+
+                await transaction.CommitAsync(token);
+                return Success();
+            }
         }
     }
 }

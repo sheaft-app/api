@@ -2,15 +2,15 @@
 using System.Threading.Tasks;
 using MediatR;
 using Microsoft.Extensions.Configuration;
-using Sheaft.Application.Commands.Handlers;
-using Sheaft.Application.Events;
-using Sheaft.Application.Interop;
-using Sheaft.Application.Models;
-using Sheaft.Application.Models.Mailer;
-using Sheaft.Domain.Enums;
-using Sheaft.Domain.Models;
+using Sheaft.Application.Common.Handlers;
+using Sheaft.Application.Common.Interfaces;
+using Sheaft.Application.Common.Interfaces.Services;
+using Sheaft.Application.Common.Models;
+using Sheaft.Application.Common.Models.Mailer;
+using Sheaft.Domain.Enum;
+using Sheaft.Domain.Events.Payin;
 
-namespace Sheaft.Application.Handlers
+namespace Sheaft.Application.Payin.EventHandlers
 {
     public class PayinEventSucceededHandler : EventsHandler,
         INotificationHandler<DomainEventNotification<PayinSucceededEvent>>
@@ -30,7 +30,7 @@ namespace Sheaft.Application.Handlers
         public async Task Handle(DomainEventNotification<PayinSucceededEvent> notification, CancellationToken token)
         {
             var payinEvent = notification.DomainEvent;
-            var payin = await _context.GetByIdAsync<Payin>(payinEvent.PayinId, token);
+            var payin = await _context.GetByIdAsync<Domain.Payin>(payinEvent.PayinId, token);
             if (payin.Order.Payin.Id != payin.Id)
                 return;
 
@@ -51,7 +51,7 @@ namespace Sheaft.Application.Handlers
                 token);
         }
         
-        private OrderMailerModel GetObject(Payin payin)
+        private OrderMailerModel GetObject(Domain.Payin payin)
         {
             return new OrderMailerModel { 
                 FirstName = payin.Order.User.FirstName, 

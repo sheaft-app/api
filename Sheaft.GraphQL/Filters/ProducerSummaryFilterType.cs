@@ -1,5 +1,5 @@
 using HotChocolate.Types.Filters;
-using Sheaft.Application.Models;
+using Sheaft.Application.Common.Models.Dto;
 
 namespace Sheaft.GraphQL.Filters
 {

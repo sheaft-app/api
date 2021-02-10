@@ -1,17 +1,17 @@
 ﻿using System;
 using Newtonsoft.Json;
-using Sheaft.Core;
-using Sheaft.Domain.Models.Common;
+using Sheaft.Domain.Common;
 
-namespace Sheaft.Application.Events
+namespace Sheaft.Domain.Events.Agreement
 {
     public class AgreementCreatedEvent : DomainEvent
     {
         [JsonConstructor]
-        public AgreementCreatedEvent(RequestUser requestUser) : base(requestUser)
+        public AgreementCreatedEvent(Guid agreementId)
         {
+            AgreementId = agreementId;
         }
 
-        public Guid AgreementId { get; set; }
+        public Guid AgreementId { get; }
     }
 }

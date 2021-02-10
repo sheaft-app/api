@@ -1,21 +1,23 @@
-﻿using Sheaft.Core;
-using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Sheaft.Application.Interop;
-using Sheaft.Domain.Enums;
-using Sheaft.Domain.Models;
-using Sheaft.Exceptions;
-using Sheaft.Options;
+using Newtonsoft.Json;
+using Sheaft.Application.Common;
+using Sheaft.Application.Common.Handlers;
+using Sheaft.Application.Common.Interfaces;
+using Sheaft.Application.Common.Interfaces.Services;
+using Sheaft.Application.Common.Models;
+using Sheaft.Application.Common.Options;
+using Sheaft.Domain;
+using Sheaft.Domain.Enum;
 
-namespace Sheaft.Application.Commands
+namespace Sheaft.Application.Withholding.Commands
 {
-    public class ProcessWithholdingsCommand : Command<bool>
+    public class ProcessWithholdingsCommand : Command
     {
         [JsonConstructor]
         public ProcessWithholdingsCommand(RequestUser requestUser)
@@ -25,9 +27,9 @@ namespace Sheaft.Application.Commands
 
         public Guid PayoutId { get; set; }
     }
-    
+
     public class ProcessWithholdingsCommandHandler : CommandsHandler,
-        IRequestHandler<ProcessWithholdingsCommand, Result<bool>>
+        IRequestHandler<ProcessWithholdingsCommand, Result>
     {
         private readonly IPspService _pspService;
         private readonly PspOptions _pspOptions;
@@ -44,26 +46,25 @@ namespace Sheaft.Application.Commands
             _pspOptions = pspOptions.Value;
         }
 
-        public async Task<Result<bool>> Handle(ProcessWithholdingsCommand request, CancellationToken token)
+        public async Task<Result> Handle(ProcessWithholdingsCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(request, async () =>
+            var payout = await _context.GetByIdAsync<Domain.Payout>(request.PayoutId, token);
+            if (payout.Status != TransactionStatus.Succeeded)
+                return Failure(MessageKind.Withholding_Cannot_Process_Already_Succeeded);
+
+            if (!payout.Withholdings.Any())
+                return Failure(MessageKind.Withholding_Cannot_Process_Payout_No_Withholdings);
+
+            foreach (var withholding in payout.Withholdings)
             {
-                var payout = await _context.GetByIdAsync<Payout>(request.PayoutId, token);
-                if (payout.Status != TransactionStatus.Succeeded)
-                    return Failed<bool>(new BadRequestException(MessageKind.Withholding_Cannot_Process_Already_Succeeded));
+                var result =
+                    await _mediatr.Process(
+                        new ProcessWithholdingCommand(request.RequestUser) {WithholdingId = withholding.Id}, token);
+                if (!result.Succeeded)
+                    throw result.Exception;
+            }
 
-                if(!payout.Withholdings.Any())
-                    return Failed<bool>(new BadRequestException(MessageKind.Withholding_Cannot_Process_Payout_No_Withholdings));
-
-                foreach (var withholding in payout.Withholdings)
-                {
-                    var result = await _mediatr.Process(new ProcessWithholdingCommand(request.RequestUser) { WithholdingId = withholding.Id }, token);
-                    if (!result.Success)
-                        throw result.Exception;
-                }
-
-                return Ok(true);
-            });
+            return Success();
         }
     }
 }

@@ -1,19 +1,22 @@
-﻿using Sheaft.Core;
-using Newtonsoft.Json;
-using Sheaft.Domain.Enums;
-using System;
+﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Sheaft.Application.Interop;
-using Sheaft.Domain.Models;
-using Sheaft.Options;
+using Newtonsoft.Json;
+using Sheaft.Application.Common;
+using Sheaft.Application.Common.Handlers;
+using Sheaft.Application.Common.Interfaces;
+using Sheaft.Application.Common.Interfaces.Services;
+using Sheaft.Application.Common.Models;
+using Sheaft.Application.Common.Options;
+using Sheaft.Domain;
+using Sheaft.Domain.Enum;
 
-namespace Sheaft.Application.Commands
+namespace Sheaft.Application.Donation.Commands
 {
-    public class CheckDonationCommand : Command<bool>
+    public class CheckDonationCommand : Command
     {
         [JsonConstructor]
         public CheckDonationCommand(RequestUser requestUser)
@@ -25,7 +28,7 @@ namespace Sheaft.Application.Commands
     }
 
     public class CheckDonationCommandHandler : CommandsHandler,
-        IRequestHandler<CheckDonationCommand, Result<bool>>
+        IRequestHandler<CheckDonationCommand, Result>
     {
         private readonly IPspService _pspService;
         private readonly RoutineOptions _routineOptions;
@@ -45,22 +48,19 @@ namespace Sheaft.Application.Commands
             _pspOptions = pspOptions.Value;
         }
 
-        public async Task<Result<bool>> Handle(CheckDonationCommand request, CancellationToken token)
+        public async Task<Result> Handle(CheckDonationCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(request, async () =>
-            {
-                var donation = await _context.GetByIdAsync<Donation>(request.DonationId, token);
-                if (donation.Status != TransactionStatus.Created && donation.Status != TransactionStatus.Waiting)
-                    return Ok(false);
+            var donation = await _context.GetByIdAsync<Domain.Donation>(request.DonationId, token);
+            if (donation.Status != TransactionStatus.Created && donation.Status != TransactionStatus.Waiting)
+                return Failure();
 
-                var result =
-                    await _mediatr.Process(new RefreshDonationStatusCommand(request.RequestUser, donation.Identifier),
-                        token);
-                if (!result.Success)
-                    return Failed<bool>(result.Exception);
+            var result =
+                await _mediatr.Process(new RefreshDonationStatusCommand(request.RequestUser, donation.Identifier),
+                    token);
+            if (!result.Succeeded)
+                return Failure(result.Exception);
 
-                return Ok(true);
-            });
+            return Success();
         }
     }
 }

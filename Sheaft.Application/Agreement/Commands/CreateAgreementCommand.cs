@@ -1,18 +1,21 @@
-﻿using Sheaft.Application.Models;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
 using Microsoft.Extensions.Logging;
-using Sheaft.Core;
 using Newtonsoft.Json;
-using Sheaft.Application.Events;
-using Sheaft.Application.Interop;
-using Sheaft.Domain.Models;
+using Sheaft.Application.Common;
+using Sheaft.Application.Common.Handlers;
+using Sheaft.Application.Common.Interfaces;
+using Sheaft.Application.Common.Interfaces.Services;
+using Sheaft.Application.Common.Models;
+using Sheaft.Application.Common.Models.Inputs;
+using Sheaft.Domain;
+using Sheaft.Domain.Events.Agreement;
 
-namespace Sheaft.Application.Commands
+namespace Sheaft.Application.Agreement.Commands
 {
     public class CreateAgreementCommand : Command<Guid>
     {
@@ -25,7 +28,7 @@ namespace Sheaft.Application.Commands
         public Guid DeliveryModeId { get; set; }
         public IEnumerable<TimeSlotGroupInput> SelectedHours { get; set; }
     }
-    
+
     public class CreateAgreementCommandsHandler : CommandsHandler,
         IRequestHandler<CreateAgreementCommand, Result<Guid>>
     {
@@ -39,30 +42,24 @@ namespace Sheaft.Application.Commands
 
         public async Task<Result<Guid>> Handle(CreateAgreementCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(request, async() =>
+            var user = await _context.GetByIdAsync<Domain.User>(request.RequestUser.Id, token);
+            var store = await _context.GetByIdAsync<Domain.Store>(request.StoreId, token);
+            var delivery = await _context.GetByIdAsync<Domain.DeliveryMode>(request.DeliveryModeId, token);
+
+            var selectedHours = new List<TimeSlotHour>();
+            if (request.SelectedHours != null && request.SelectedHours.Any())
             {
-                var user = await _context.GetByIdAsync<User>(request.RequestUser.Id, token);
-                var store = await _context.GetByIdAsync<Store>(request.StoreId, token);
-                var delivery = await _context.GetByIdAsync<DeliveryMode>(request.DeliveryModeId, token);
-
-                var selectedHours = new List<TimeSlotHour>();
-                if (request.SelectedHours != null && request.SelectedHours.Any())
+                foreach (var sh in request.SelectedHours)
                 {
-                    foreach (var sh in request.SelectedHours)
-                    {
-                        selectedHours.AddRange(sh.Days.Select(d => new TimeSlotHour(d, sh.From, sh.To)));
-                    }
+                    selectedHours.AddRange(sh.Days.Select(d => new TimeSlotHour(d, sh.From, sh.To)));
                 }
+            }
 
-                var entity = new Agreement(Guid.NewGuid(), store, delivery, user, selectedHours);
+            var entity = new Domain.Agreement(Guid.NewGuid(), store, delivery, user, selectedHours);
 
-                await _context.AddAsync(entity, token);
-                await _context.SaveChangesAsync(token);
-
-                _mediatr.Post(new AgreementCreatedEvent(request.RequestUser) { AgreementId = entity.Id });
-
-                return Ok(entity.Id);
-            });
+            await _context.AddAsync(entity, token);
+            await _context.SaveChangesAsync(token);
+            return Success(entity.Id);
         }
     }
 }

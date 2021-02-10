@@ -4,16 +4,19 @@ using System.Threading.Tasks;
 using MediatR;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Sheaft.Core;
 using Newtonsoft.Json;
-using Sheaft.Application.Interop;
-using Sheaft.Domain.Enums;
-using Sheaft.Domain.Models;
-using Sheaft.Options;
+using Sheaft.Application.Common;
+using Sheaft.Application.Common.Handlers;
+using Sheaft.Application.Common.Interfaces;
+using Sheaft.Application.Common.Interfaces.Services;
+using Sheaft.Application.Common.Models;
+using Sheaft.Application.Common.Options;
+using Sheaft.Domain;
+using Sheaft.Domain.Enum;
 
-namespace Sheaft.Application.Commands
+namespace Sheaft.Application.Transfer.Commands
 {
-    public class CheckTransferCommand : Command<bool>
+    public class CheckTransferCommand : Command
     {
         [JsonConstructor]
         public CheckTransferCommand(RequestUser requestUser) : base(requestUser)
@@ -22,9 +25,9 @@ namespace Sheaft.Application.Commands
 
         public Guid TransferId { get; set; }
     }
-    
+
     public class CheckTransferCommandHandler : CommandsHandler,
-        IRequestHandler<CheckTransferCommand, Result<bool>>
+        IRequestHandler<CheckTransferCommand, Result>
     {
         private readonly IPspService _pspService;
         private readonly RoutineOptions _routineOptions;
@@ -41,20 +44,19 @@ namespace Sheaft.Application.Commands
             _routineOptions = routineOptions.Value;
         }
 
-        public async Task<Result<bool>> Handle(CheckTransferCommand request, CancellationToken token)
+        public async Task<Result> Handle(CheckTransferCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(request, async () =>
-            {
-                var transfer = await _context.GetByIdAsync<Transfer>(request.TransferId, token);
-                if (transfer.Status != TransactionStatus.Created && transfer.Status != TransactionStatus.Waiting)
-                    return Ok(false);
+            var transfer = await _context.GetByIdAsync<Domain.Transfer>(request.TransferId, token);
+            if (transfer.Status != TransactionStatus.Created && transfer.Status != TransactionStatus.Waiting)
+                return Failure();
 
-                var result = await _mediatr.Process(new RefreshTransferStatusCommand(request.RequestUser, transfer.Identifier), token);
-                if (!result.Success)
-                    return Failed<bool>(result.Exception);
+            var result =
+                await _mediatr.Process(new RefreshTransferStatusCommand(request.RequestUser, transfer.Identifier),
+                    token);
+            if (!result.Succeeded)
+                return Failure(result.Exception);
 
-                return Ok(true);
-            });
+            return Success();
         }
     }
 }

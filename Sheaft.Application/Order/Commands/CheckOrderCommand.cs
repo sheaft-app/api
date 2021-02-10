@@ -1,29 +1,34 @@
-﻿using Sheaft.Core;
-using Newtonsoft.Json;
-using Sheaft.Domain.Enums;
-using System;
+﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Sheaft.Application.Interop;
-using Sheaft.Domain.Models;
-using Sheaft.Options;
+using Newtonsoft.Json;
+using Sheaft.Application.Common;
+using Sheaft.Application.Common.Handlers;
+using Sheaft.Application.Common.Interfaces;
+using Sheaft.Application.Common.Interfaces.Services;
+using Sheaft.Application.Common.Models;
+using Sheaft.Application.Common.Options;
+using Sheaft.Domain;
+using Sheaft.Domain.Enum;
 
-namespace Sheaft.Application.Commands
+namespace Sheaft.Application.Order.Commands
 {
-    public class CheckOrderCommand : Command<bool>
+    public class CheckOrderCommand : Command
     {
         [JsonConstructor]
         public CheckOrderCommand(RequestUser requestUser)
             : base(requestUser)
         {
         }
+
         public Guid OrderId { get; set; }
     }
+
     public class CheckOrderCommandHandler : CommandsHandler,
-        IRequestHandler<CheckOrderCommand, Result<bool>>
+        IRequestHandler<CheckOrderCommand, Result>
     {
         private readonly ICapingDeliveriesService _capingDeliveriesService;
         private readonly PspOptions _pspOptions;
@@ -43,19 +48,17 @@ namespace Sheaft.Application.Commands
             _routineOptions = routineOptions.Value;
         }
 
-        public async Task<Result<bool>> Handle(CheckOrderCommand request, CancellationToken token)
+        public async Task<Result> Handle(CheckOrderCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(request, async () =>
-            {
-                var payinRefund = await _context.GetByIdAsync<Order>(request.OrderId, token);
-                if (payinRefund.Status != OrderStatus.Created && payinRefund.Status != OrderStatus.Waiting)
-                    return Ok(false);
+            var payinRefund = await _context.GetByIdAsync<Domain.Order>(request.OrderId, token);
+            if (payinRefund.Status != OrderStatus.Created && payinRefund.Status != OrderStatus.Waiting)
+                return Success();
 
-                if (payinRefund.CreatedOn.AddMinutes(_routineOptions.CheckOrderExpiredFromMinutes) < DateTimeOffset.UtcNow)
-                    return await _mediatr.Process(new ExpireOrderCommand(request.RequestUser) { OrderId = request.OrderId }, token);
+            if (payinRefund.CreatedOn.AddMinutes(_routineOptions.CheckOrderExpiredFromMinutes) < DateTimeOffset.UtcNow)
+                return await _mediatr.Process(new ExpireOrderCommand(request.RequestUser) {OrderId = request.OrderId},
+                    token);
 
-                return Ok(true);
-            });
+            return Success();
         }
     }
 }

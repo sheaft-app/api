@@ -1,6 +1,6 @@
-using Sheaft.Domain.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Sheaft.Domain;
 
 namespace Sheaft.Infrastructure.Persistence.Configurations
 {
@@ -18,7 +18,7 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
             entity.Property(c => c.Value).IsRequired().HasColumnType("decimal(10,2)");
 
             entity.HasOne(c => c.User).WithMany().HasForeignKey("UserUid").OnDelete(DeleteBehavior.NoAction);
-
+            
             entity.HasKey("Uid");
 
             entity.HasIndex(c => c.Id).IsUnique();

@@ -1,12 +1,14 @@
-﻿using MediatR.Pipeline;
-using Microsoft.Extensions.Logging;
+﻿using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using Sheaft.Core;
+using MediatR;
+using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
+using Sheaft.Domain;
 
-namespace CleanArchitecture.Application.Common.Behaviours
+namespace Sheaft.Application.Common.Behaviours
 {
-    public class LoggingBehaviour<TRequest> : IRequestPreProcessor<TRequest>
+    public class LoggingBehaviour<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
         where TRequest : ITrackedUser
     {
         private readonly ILogger _logger;
@@ -16,14 +18,25 @@ namespace CleanArchitecture.Application.Common.Behaviours
             _logger = logger;
         }
 
-        public async Task Process(TRequest request, CancellationToken cancellationToken)
+        public async Task<TResponse> Handle(TRequest request, CancellationToken cancellationToken,
+            RequestHandlerDelegate<TResponse> next)
         {
             var requestName = typeof(TRequest).Name;
 
-            _logger.LogInformation("Processing request: {Name} for {@UserId} {@Request}",
-            requestName, request.RequestUser.Name, request);
-
-            await Task.CompletedTask;
+            _logger.LogInformation("Processing request: {Name} for {@UserId}", requestName, request.RequestUser.Name);
+            
+            using (var scope = _logger.BeginScope(new Dictionary<string, object>
+            {
+                ["RequestId"] = request.RequestUser.RequestId,
+                ["UserIdentifier"] = request.RequestUser.Id.ToString("N"),
+                ["Roles"] = string.Join(';', request.RequestUser.Roles),
+                ["IsAuthenticated"] = request.RequestUser.IsAuthenticated.ToString(),
+                ["Command"] = requestName,
+                ["Datas"] = JsonConvert.SerializeObject(request),
+            }))
+            {
+                return await next();
+            }
         }
     }
 }

@@ -3,16 +3,17 @@ using AutoMapper.QueryableExtensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
-using Sheaft.Core;
-using Sheaft.Core.Extensions;
-using Sheaft.Application.Interop;
-using Sheaft.Domain.Enums;
-using Sheaft.Application.Models;
-using Sheaft.Options;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Sheaft.Application.Common.Extensions;
+using Sheaft.Application.Common.Interfaces;
+using Sheaft.Application.Common.Interfaces.Services;
+using Sheaft.Application.Common.Models.ViewModels;
+using Sheaft.Application.Common.Options;
+using Sheaft.Domain;
+using Sheaft.Domain.Enum;
 
 namespace Sheaft.Web.Manage.Controllers
 {

@@ -1,6 +1,8 @@
 ﻿using HotChocolate;
 using Sheaft.GraphQL.Enums;
 using Sheaft.GraphQL.Types;
+using Sheaft.GraphQL.Types.Inputs;
+using Sheaft.GraphQL.Types.Outputs;
 
 namespace Sheaft.Web.Api
 {

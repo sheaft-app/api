@@ -2,12 +2,12 @@
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Powells.CouponCode;
-using Sheaft.Core;
-using Sheaft.Options;
-using Sheaft.Application.Interop;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Sheaft.Application.Common.Interfaces.Services;
+using Sheaft.Application.Common.Models;
+using Sheaft.Application.Common.Options;
 
 namespace Sheaft.Infrastructure.Services
 {
@@ -30,79 +30,84 @@ namespace Sheaft.Infrastructure.Services
 
         public async Task<Result<string>> GetNextPurchaseOrderReferenceAsync(Guid serialNumber, CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
-            {
-                var uuid = await GetNextUuidAsync(_storageOptions.Tables.PurchaseOrdersReferences, serialNumber, token);
-                if (!uuid.Success)
-                    return Failed<string>(uuid.Exception);
+            var uuid = await GetNextUuidAsync(_storageOptions.Tables.PurchaseOrdersReferences, serialNumber, token);
+            if (!uuid.Succeeded)
+                return Failure<string>(uuid.Exception);
 
-                var identifier = GenerateEanIdentifier(uuid.Data, 13);
-                return Ok(identifier);
-            });
+            var identifier = GenerateEanIdentifier(uuid.Data, 13);
+            return Success(identifier);
         }
 
         public async Task<Result<string>> GetNextProductReferenceAsync(Guid serialNumber, CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
-            {
-                var uuid = await GetNextUuidAsync(_storageOptions.Tables.ProductsReferences, serialNumber, token);
-                if (!uuid.Success)
-                    return Failed<string>(uuid.Exception);
+            var uuid = await GetNextUuidAsync(_storageOptions.Tables.ProductsReferences, serialNumber, token);
+            if (!uuid.Succeeded)
+                return Failure<string>(uuid.Exception);
 
-                var identifier = GenerateEanIdentifier(uuid.Data, 13);
-                return Ok(identifier);
-            });
+            var identifier = GenerateEanIdentifier(uuid.Data, 13);
+            return Success(identifier);
         }
 
         public async Task<Result<string>> GetNextSponsoringCode(CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
+            var table = _cloudStorageAccount.CreateCloudTableClient()
+                .GetTableReference(_storageOptions.Tables.SponsoringCodes);
+            await table.CreateIfNotExistsAsync(token);
+
+            var opts = new Powells.CouponCode.Options
+                {PartLength = _sponsoringOptions.CodeLength, Parts = _sponsoringOptions.CodeParts};
+            var ccb = new CouponCodeBuilder();
+            var badWords = ccb.BadWordsList;
+            var code = "";
+
+            var concurrentUpdateError = false;
+            var retry = 0;
+
+            do
             {
-                var table = _cloudStorageAccount.CreateCloudTableClient().GetTableReference(_storageOptions.Tables.SponsoringCodes);
-                await table.CreateIfNotExistsAsync(token);
-
-                var opts = new Powells.CouponCode.Options { PartLength = _sponsoringOptions.CodeLength, Parts = _sponsoringOptions.CodeParts };
-                var ccb = new CouponCodeBuilder();
-                var badWords = ccb.BadWordsList;
-                var code = "";
-
-                var concurrentUpdateError = false;
-                var retry = 0;
-
-                do
+                try
                 {
-                    try
+                    code = ccb.Generate(opts);
+
+                    var tableResults =
+                        await table.ExecuteAsync(TableOperation.Retrieve<SponsoringTableEntity>("code", code), token);
+                    if ((SponsoringTableEntity) tableResults?.Result != null)
                     {
-                        code = ccb.Generate(opts);
-
-                        var tableResults = await table.ExecuteAsync(TableOperation.Retrieve<SponsoringTableEntity>("code", code), token);
-                        if ((SponsoringTableEntity)tableResults?.Result != null)
-                        {
-                            concurrentUpdateError = true;
-                        }
-                        else
-                        {
-                            await table.ExecuteAsync(TableOperation.Insert(new SponsoringTableEntity
-                            {
-                                PartitionKey = "code",
-                                RowKey = code,
-                            }), token);
-                        }
-
-                        concurrentUpdateError = false;
+                        concurrentUpdateError = true;
                     }
-                    catch (StorageException e)
+                    else
                     {
-                        retry++;
-                        if (retry <= 10 && (e.RequestInformation.HttpStatusCode == 412 || e.RequestInformation.HttpStatusCode == 409))
-                            concurrentUpdateError = true;
-                        else
-                            throw;
+                        await table.ExecuteAsync(TableOperation.Insert(new SponsoringTableEntity
+                        {
+                            PartitionKey = "code",
+                            RowKey = code,
+                        }), token);
                     }
-                } while (concurrentUpdateError);
 
-                return Ok(code);
-            });
+                    concurrentUpdateError = false;
+                }
+                catch (StorageException e)
+                {
+                    retry++;
+                    if (retry <= 10 && (e.RequestInformation.HttpStatusCode == 412 ||
+                                        e.RequestInformation.HttpStatusCode == 409))
+                        concurrentUpdateError = true;
+                    else
+                        throw;
+                }
+            } while (concurrentUpdateError);
+
+            return Success(code);
+        }
+        
+        public async Task<Result<string>> GetNextOrderReferenceAsync(CancellationToken token)
+        {
+                var uuid = await GetNextUuidAsync(_storageOptions.Tables.OrdersReferences, Guid.Empty, token);
+                if (!uuid.Succeeded)
+                    return Failure<string>(uuid.Exception);
+
+                var identifier = GenerateEanIdentifier(uuid.Data, 13);
+                return Success(identifier);
         }
 
         private static string GenerateEanIdentifier(long value, int length)
@@ -124,7 +129,8 @@ namespace Sheaft.Infrastructure.Services
         private static int CalculateChecksum(string code)
         {
             if (code == null || code.Length != 12)
-                throw new ArgumentException("Code length should be 12, i.e. excluding the checksum digit", nameof(code));
+                throw new ArgumentException("Code length should be 12, i.e. excluding the checksum digit",
+                    nameof(code));
 
             int sum = 0;
             for (int i = 0; i < 12; i++)
@@ -134,14 +140,13 @@ namespace Sheaft.Infrastructure.Services
                     throw new ArgumentException("Invalid character encountered in specified code.", nameof(code));
                 sum += (i % 2 == 0 ? v : v * 3);
             }
+
             int check = 10 - (sum % 10);
             return check % 10;
         }
 
         private async Task<Result<long>> GetNextUuidAsync(string container, Guid identifier, CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
-            {
                 var table = _cloudStorageAccount.CreateCloudTableClient().GetTableReference(container);
                 await table.CreateIfNotExistsAsync(token);
 
@@ -155,8 +160,9 @@ namespace Sheaft.Infrastructure.Services
                 {
                     try
                     {
-                        var tableResults = await table.ExecuteAsync(TableOperation.Retrieve<IdentifierTableEntity>(identifier.ToString("N"), key), token);
-                        var results = (IdentifierTableEntity)tableResults.Result;
+                        var tableResults = await table.ExecuteAsync(
+                            TableOperation.Retrieve<IdentifierTableEntity>(identifier.ToString("N"), key), token);
+                        var results = (IdentifierTableEntity) tableResults.Result;
                         if (results != null)
                         {
                             results.Id++;
@@ -183,28 +189,15 @@ namespace Sheaft.Infrastructure.Services
                     catch (StorageException e)
                     {
                         retry++;
-                        if (retry <= 10 && (e.RequestInformation.HttpStatusCode == 412 || e.RequestInformation.HttpStatusCode == 409))
+                        if (retry <= 10 && (e.RequestInformation.HttpStatusCode == 412 ||
+                                            e.RequestInformation.HttpStatusCode == 409))
                             concurrentUpdateError = true;
                         else
                             throw;
                     }
                 } while (concurrentUpdateError);
 
-                return Ok(id);
-            });
-        }
-
-        public async Task<Result<string>> GetNextOrderReferenceAsync(CancellationToken token)
-        {
-            return await ExecuteAsync(async () =>
-            {
-                var uuid = await GetNextUuidAsync(_storageOptions.Tables.OrdersReferences, Guid.Empty, token);
-                if (!uuid.Success)
-                    return Failed<string>(uuid.Exception);
-
-                var identifier = GenerateEanIdentifier(uuid.Data, 13);
-                return Ok(identifier);
-            });
+                return Success(id);
         }
 
         private class IdentifierTableEntity : TableEntity

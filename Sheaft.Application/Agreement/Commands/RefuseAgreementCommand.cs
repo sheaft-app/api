@@ -4,14 +4,17 @@ using System.Threading.Tasks;
 using MediatR;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using Sheaft.Application.Events;
-using Sheaft.Application.Interop;
-using Sheaft.Core;
-using Sheaft.Domain.Models;
+using Sheaft.Application.Common;
+using Sheaft.Application.Common.Handlers;
+using Sheaft.Application.Common.Interfaces;
+using Sheaft.Application.Common.Interfaces.Services;
+using Sheaft.Application.Common.Models;
+using Sheaft.Domain;
+using Sheaft.Domain.Events.Agreement;
 
-namespace Sheaft.Application.Commands
+namespace Sheaft.Application.Agreement.Commands
 {
-    public class RefuseAgreementCommand : Command<bool>
+    public class RefuseAgreementCommand : Command
     {
         [JsonConstructor]
         public RefuseAgreementCommand(RequestUser requestUser) : base(requestUser)
@@ -21,9 +24,9 @@ namespace Sheaft.Application.Commands
         public Guid Id { get; set; }
         public string Reason { get; set; }
     }
-    
+
     public class RefuseAgreementCommandsHandler : CommandsHandler,
-        IRequestHandler<RefuseAgreementCommand, Result<bool>>
+        IRequestHandler<RefuseAgreementCommand, Result>
     {
         public RefuseAgreementCommandsHandler(
             ISheaftMediatr mediatr,
@@ -33,18 +36,13 @@ namespace Sheaft.Application.Commands
         {
         }
 
-        public async Task<Result<bool>> Handle(RefuseAgreementCommand request, CancellationToken token)
+        public async Task<Result> Handle(RefuseAgreementCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(request, async () =>
-            {
-                var entity = await _context.GetByIdAsync<Agreement>(request.Id, token);
-
-                entity.RefuseAgreement(request.Reason);
-                await _context.SaveChangesAsync(token);
-
-                _mediatr.Post(new AgreementRefusedEvent(request.RequestUser) { AgreementId = entity.Id });
-                return Ok(true);
-            });
+            var entity = await _context.GetByIdAsync<Domain.Agreement>(request.Id, token);
+            entity.RefuseAgreement(request.Reason);
+            
+            await _context.SaveChangesAsync(token);
+            return Success(true);
         }
     }
 }

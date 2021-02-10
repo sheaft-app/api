@@ -1,13 +1,15 @@
-﻿using Sheaft.Domain.Enums;
-using Sheaft.Domain.Interop;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Sheaft.Domains.Exceptions;
+using Sheaft.Domain.Common;
+using Sheaft.Domain.Enum;
+using Sheaft.Domain.Events.Agreement;
+using Sheaft.Domain.Exceptions;
+using Sheaft.Domain.Interop;
 
-namespace Sheaft.Domain.Models
+namespace Sheaft.Domain
 {
-    public class Agreement : IEntity
+    public class Agreement : IEntity, IHasDomainEvent
     {
         private List<TimeSlotHour> _selectedHours;
 
@@ -28,6 +30,7 @@ namespace Sheaft.Domain.Models
                 Status = AgreementStatus.WaitingForStoreApproval;
 
             SetSelectedHours(deliveryHours);
+            DomainEvents = new List<DomainEvent> {new AgreementCreatedEvent(Id)};
         }
 
         public Guid Id { get; private set; }
@@ -40,6 +43,7 @@ namespace Sheaft.Domain.Models
         public virtual Store Store { get; private set; }
         public virtual User CreatedBy { get; private set; }
         public virtual IReadOnlyCollection<TimeSlotHour> SelectedHours => _selectedHours?.AsReadOnly();
+        public List<DomainEvent> DomainEvents { get; } = new List<DomainEvent>();
 
         public void SetSelectedHours(IEnumerable<TimeSlotHour> selectedHours)
         {
@@ -60,6 +64,7 @@ namespace Sheaft.Domain.Models
                 throw new ValidationException(MessageKind.Agreement_CannotBeAccepted_NotInWaitingStatus);
 
             Status = AgreementStatus.Accepted;
+            DomainEvents.Add(new AgreementAcceptedEvent(Id));
         }
 
         public void CancelAgreement(string reason)
@@ -72,6 +77,7 @@ namespace Sheaft.Domain.Models
 
             Status = AgreementStatus.Cancelled;
             Reason = reason;
+            DomainEvents.Add(new AgreementCancelledEvent(Id));
         }
 
         public void RefuseAgreement(string reason)
@@ -81,6 +87,7 @@ namespace Sheaft.Domain.Models
 
             Status = AgreementStatus.Refused;
             Reason = reason;
+            DomainEvents.Add(new AgreementRefusedEvent(Id));
         }
 
         public void Reset()

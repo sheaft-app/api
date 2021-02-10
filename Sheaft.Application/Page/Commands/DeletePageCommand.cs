@@ -1,18 +1,20 @@
 ﻿using System;
-using Sheaft.Core;
-using Newtonsoft.Json;
-using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
 using Microsoft.Extensions.Logging;
-using Sheaft.Application.Interop;
-using Sheaft.Domain.Models;
+using Newtonsoft.Json;
+using Sheaft.Application.Common;
+using Sheaft.Application.Common.Handlers;
+using Sheaft.Application.Common.Interfaces;
+using Sheaft.Application.Common.Interfaces.Services;
+using Sheaft.Application.Common.Models;
+using Sheaft.Domain;
 
-namespace Sheaft.Application.Commands
+namespace Sheaft.Application.Page.Commands
 {
-    public class DeletePageCommand : Command<bool>
+    public class DeletePageCommand : Command
     {
         [JsonConstructor]
         public DeletePageCommand(RequestUser requestUser) : base(requestUser)
@@ -24,7 +26,7 @@ namespace Sheaft.Application.Commands
     }
 
     public class DeletePageCommandHandler : CommandsHandler,
-        IRequestHandler<DeletePageCommand, Result<bool>>
+        IRequestHandler<DeletePageCommand, Result>
     {
         private readonly IPspService _pspService;
         private readonly IBlobService _blobService;
@@ -40,25 +42,22 @@ namespace Sheaft.Application.Commands
             _pspService = pspService;
             _blobService = blobService;
         }
-        
-        public async Task<Result<bool>> Handle(DeletePageCommand request, CancellationToken token)
+
+        public async Task<Result> Handle(DeletePageCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(request, async () =>
-            {
-                var legal = await _context.GetSingleAsync<Legal>(r => r.Documents.Any(d => d.Id == request.DocumentId),
-                    token);
-                var document = legal.Documents.FirstOrDefault(d => d.Id == request.DocumentId);
+            var legal = await _context.GetSingleAsync<Domain.Legal>(r => r.Documents.Any(d => d.Id == request.DocumentId),
+                token);
+            var document = legal.Documents.FirstOrDefault(d => d.Id == request.DocumentId);
 
-                var deleteResult =
-                    await _blobService.DeleteDocumentPageAsync(document.Id, request.PageId, legal.User.Id, token);
-                if (!deleteResult.Success)
-                    return Failed<bool>(deleteResult.Exception);
+            var deleteResult =
+                await _blobService.DeleteDocumentPageAsync(document.Id, request.PageId, legal.User.Id, token);
+            if (!deleteResult.Succeeded)
+                return Failure(deleteResult.Exception);
 
-                document.DeletePage(request.PageId);
+            document.DeletePage(request.PageId);
 
-                await _context.SaveChangesAsync(token);
-                return Ok(true);
-            });
+            await _context.SaveChangesAsync(token);
+            return Success();
         }
     }
 }

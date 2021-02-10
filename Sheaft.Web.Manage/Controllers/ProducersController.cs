@@ -5,17 +5,20 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Sheaft.Application.Commands;
-using Sheaft.Domain.Models;
-using Sheaft.Exceptions;
-using Sheaft.Application.Interop;
-using Sheaft.Application.Models;
-using Sheaft.Options;
 using System;
 using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Sheaft.Application.Common.Interfaces;
+using Sheaft.Application.Common.Interfaces.Services;
+using Sheaft.Application.Common.Models.Inputs;
+using Sheaft.Application.Common.Models.ViewModels;
+using Sheaft.Application.Common.Options;
+using Sheaft.Application.Producer.Commands;
+using Sheaft.Application.User.Commands;
+using Sheaft.Domain;
+using Sheaft.Domain.Exceptions;
 
 namespace Sheaft.Web.Manage.Controllers
 {
@@ -70,7 +73,7 @@ namespace Sheaft.Web.Manage.Controllers
                 .SingleOrDefaultAsync(token);
 
             if (entity == null)
-                throw new NotFoundException();
+                throw SheaftException.NotFound();
 
             ViewBag.LegalsId = (await _context.FindSingleAsync<Legal>(c => c.User.Id == id, token))?.Id;
             ViewBag.BankAccountId = (await _context.FindSingleAsync<BankAccount>(c => c.User.Id == id, token))?.Id;
@@ -110,7 +113,7 @@ namespace Sheaft.Web.Manage.Controllers
                 NotSubjectToVat = model.NotSubjectToVat
             }, token);
 
-            if (!result.Success)
+            if (!result.Succeeded)
             {
                 ViewBag.LegalsId = (await _context.FindSingleAsync<Legal>(c => c.User.Id == model.Id, token))?.Id;
                 ViewBag.BankAccountId = (await _context.FindSingleAsync<BankAccount>(c => c.User.Id == model.Id, token))?.Id;
@@ -132,7 +135,7 @@ namespace Sheaft.Web.Manage.Controllers
                 Id = id
             }, token);
 
-            if (!result.Success)
+            if (!result.Succeeded)
                 throw result.Exception;
 
             return RedirectToAction("Index");
@@ -147,7 +150,7 @@ namespace Sheaft.Web.Manage.Controllers
                 Id = id
             }, token);
 
-            if (!result.Success)
+            if (!result.Succeeded)
                 throw result.Exception;
 
             return RedirectToAction("Edit", new {id});

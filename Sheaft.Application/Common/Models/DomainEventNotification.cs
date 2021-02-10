@@ -1,7 +1,7 @@
 ﻿using MediatR;
-using Sheaft.Domain.Models.Common;
+using Sheaft.Domain.Common;
 
-namespace Sheaft.Application.Models
+namespace Sheaft.Application.Common.Models
 {
     public class DomainEventNotification<TDomainEvent> : INotification where TDomainEvent : DomainEvent
     {

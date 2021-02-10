@@ -5,12 +5,16 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using Sheaft.Application.Interop;
-using Sheaft.Core;
+using Sheaft.Application.Common;
+using Sheaft.Application.Common.Handlers;
+using Sheaft.Application.Common.Interfaces;
+using Sheaft.Application.Common.Interfaces.Services;
+using Sheaft.Application.Common.Models;
+using Sheaft.Domain;
 
-namespace Sheaft.Application.Commands
+namespace Sheaft.Application.Returnable.Commands
 {
-    public class RestoreReturnableCommand : Command<bool>
+    public class RestoreReturnableCommand : Command
     {
         [JsonConstructor]
         public RestoreReturnableCommand(RequestUser requestUser) : base(requestUser)
@@ -19,9 +23,9 @@ namespace Sheaft.Application.Commands
 
         public Guid Id { get; set; }
     }
-    
+
     public class RestoreReturnableCommandHandler : CommandsHandler,
-        IRequestHandler<RestoreReturnableCommand, Result<bool>>
+        IRequestHandler<RestoreReturnableCommand, Result>
     {
         public RestoreReturnableCommandHandler(
             ISheaftMediatr mediatr,
@@ -31,17 +35,15 @@ namespace Sheaft.Application.Commands
         {
         }
 
-        public async Task<Result<bool>> Handle(RestoreReturnableCommand request, CancellationToken token)
+        public async Task<Result> Handle(RestoreReturnableCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(request, async () =>
-            {
-                var entity = await _context.Returnables.SingleOrDefaultAsync(a => a.Id == request.Id && a.RemovedOn.HasValue, token);     
-                
-                _context.Restore(entity);
-                await _context.SaveChangesAsync(token);
+            var entity =
+                await _context.Returnables.SingleOrDefaultAsync(a => a.Id == request.Id && a.RemovedOn.HasValue, token);
 
-                return Ok(true);
-            });
+            _context.Restore(entity);
+            await _context.SaveChangesAsync(token);
+
+            return Success();
         }
     }
 }

@@ -1,17 +1,22 @@
 ﻿using System;
-using Sheaft.Core;
-using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Logging;
-using Sheaft.Application.Interop;
+using Newtonsoft.Json;
+using Sheaft.Application.Common;
+using Sheaft.Application.Common.Handlers;
+using Sheaft.Application.Common.Interfaces;
+using Sheaft.Application.Common.Interfaces.Services;
+using Sheaft.Application.Common.Models;
+using Sheaft.Application.Common.Models.Inputs;
+using Sheaft.Domain;
 
-namespace Sheaft.Application.Commands
+namespace Sheaft.Application.Auth.Commands
 {
-    public class UpdateAuthUserCommand : Command<bool>
+    public class UpdateAuthUserCommand : Command
     {
         [JsonConstructor]
         public UpdateAuthUserCommand(RequestUser requestUser) : base(requestUser)
@@ -29,7 +34,7 @@ namespace Sheaft.Application.Commands
     }
 
     public class UpdateAuthUserCommandHandler : CommandsHandler,
-        IRequestHandler<UpdateAuthUserCommand, Result<bool>>
+        IRequestHandler<UpdateAuthUserCommand, Result>
     {
         private readonly IAuthService _authService;
         private readonly IDistributedCache _cache;
@@ -46,19 +51,16 @@ namespace Sheaft.Application.Commands
             _cache = cache;
         }
 
-        public async Task<Result<bool>> Handle(UpdateAuthUserCommand request, CancellationToken token)
+        public async Task<Result> Handle(UpdateAuthUserCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(request, async () =>
-            {
-                var result = await _authService.UpdateUserAsync(
-                    new Models.IdentityUserInput(request.UserId, request.Email, request.Name, request.FirstName,
-                        request.LastName, request.Picture, request.Roles), token);
-                if (!result.Success)
-                    return result;
-
-                await _cache.RemoveAsync(request.UserId.ToString("N"));
+            var result = await _authService.UpdateUserAsync(
+                new IdentityUserInput(request.UserId, request.Email, request.Name, request.FirstName,
+                    request.LastName, request.Picture, request.Roles), token);
+            if (!result.Succeeded)
                 return result;
-            });
+
+            await _cache.RemoveAsync(request.UserId.ToString("N"));
+            return result;
         }
     }
 }

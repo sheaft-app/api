@@ -1,12 +1,14 @@
 using System;
+using System.Collections.Generic;
 using Newtonsoft.Json;
+using Sheaft.Domain.Common;
+using Sheaft.Domain.Enum;
+using Sheaft.Domain.Exceptions;
 using Sheaft.Domain.Interop;
-using Sheaft.Domain.Enums;
-using Sheaft.Domains.Exceptions;
 
-namespace Sheaft.Domain.Models
+namespace Sheaft.Domain
 {
-    public class Job : IEntity
+    public class Job : IEntity, IHasDomainEvent
     {
         protected Job()
         {
@@ -25,6 +27,7 @@ namespace Sheaft.Domain.Models
             User = user;
             Status = ProcessStatus.Waiting;
             Kind = kind;
+            DomainEvents = new List<DomainEvent>();
         }
 
         public Guid Id { get; private set; }
@@ -168,5 +171,7 @@ namespace Sheaft.Domain.Models
             Retried = null;
             Message = null;
         }
+
+        public List<DomainEvent> DomainEvents { get; } = new List<DomainEvent>();
     }
 }

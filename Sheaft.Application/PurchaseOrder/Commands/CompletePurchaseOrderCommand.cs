@@ -4,14 +4,17 @@ using System.Threading.Tasks;
 using MediatR;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using Sheaft.Application.Events;
-using Sheaft.Application.Interop;
-using Sheaft.Core;
-using Sheaft.Domain.Models;
+using Sheaft.Application.Common;
+using Sheaft.Application.Common.Handlers;
+using Sheaft.Application.Common.Interfaces;
+using Sheaft.Application.Common.Interfaces.Services;
+using Sheaft.Application.Common.Models;
+using Sheaft.Domain;
+using Sheaft.Domain.Events.PurchaseOrder;
 
-namespace Sheaft.Application.Commands
+namespace Sheaft.Application.PurchaseOrder.Commands
 {
-    public class CompletePurchaseOrderCommand : Command<bool>
+    public class CompletePurchaseOrderCommand : Command
     {
         [JsonConstructor]
         public CompletePurchaseOrderCommand(RequestUser requestUser) : base(requestUser)
@@ -21,9 +24,9 @@ namespace Sheaft.Application.Commands
         public Guid Id { get; set; }
         public bool SkipNotification { get; set; }
     }
-    
+
     public class CompletePurchaseOrderCommandHandler : CommandsHandler,
-        IRequestHandler<CompletePurchaseOrderCommand, Result<bool>>
+        IRequestHandler<CompletePurchaseOrderCommand, Result>
     {
         private readonly ICapingDeliveriesService _capingDeliveriesService;
 
@@ -36,21 +39,14 @@ namespace Sheaft.Application.Commands
         {
             _capingDeliveriesService = capingDeliveriesService;
         }
-        
-        public async Task<Result<bool>> Handle(CompletePurchaseOrderCommand request, CancellationToken token)
+
+        public async Task<Result> Handle(CompletePurchaseOrderCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(request, async () =>
-            {
-                var purchaseOrder = await _context.GetByIdAsync<PurchaseOrder>(request.Id, token);
-                purchaseOrder.Complete();
+            var purchaseOrder = await _context.GetByIdAsync<Domain.PurchaseOrder>(request.Id, token);
+            purchaseOrder.Complete(request.SkipNotification);
 
-                await _context.SaveChangesAsync(token);
-
-                if (!request.SkipNotification)
-                    _mediatr.Post(new PurchaseOrderCompletedEvent(request.RequestUser) { PurchaseOrderId = purchaseOrder.Id });
-
-                return Ok(true);
-            });
+            await _context.SaveChangesAsync(token);
+            return Success();
         }
     }
 }

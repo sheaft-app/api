@@ -1,24 +1,30 @@
-﻿using Newtonsoft.Json;
-using Sheaft.Core;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Sheaft.Application.Interop;
-using Sheaft.Domain.Models;
-using Sheaft.Options;
+using Newtonsoft.Json;
+using Sheaft.Application.Auth.Commands;
+using Sheaft.Application.Common;
+using Sheaft.Application.Common.Handlers;
+using Sheaft.Application.Common.Interfaces;
+using Sheaft.Application.Common.Interfaces.Services;
+using Sheaft.Application.Common.Models;
+using Sheaft.Application.Common.Options;
+using Sheaft.Application.Picture.Commands;
+using Sheaft.Domain;
 
-namespace Sheaft.Application.Commands
+namespace Sheaft.Application.Consumer.Commands
 {
-    public class UpdateConsumerCommand : Command<bool>
+    public class UpdateConsumerCommand : Command
     {
         [JsonConstructor]
         public UpdateConsumerCommand(RequestUser requestUser) : base(requestUser)
         {
         }
+
         public Guid Id { get; set; }
         public string Email { get; set; }
         public string Phone { get; set; }
@@ -26,9 +32,9 @@ namespace Sheaft.Application.Commands
         public string LastName { get; set; }
         public string Picture { get; set; }
     }
-    
+
     public class UpdateConsumerCommandHandler : CommandsHandler,
-        IRequestHandler<UpdateConsumerCommand, Result<bool>>
+        IRequestHandler<UpdateConsumerCommand, Result>
     {
         private readonly RoleOptions _roleOptions;
 
@@ -42,46 +48,43 @@ namespace Sheaft.Application.Commands
             _roleOptions = roleOptions.Value;
         }
 
-        public async Task<Result<bool>> Handle(UpdateConsumerCommand request, CancellationToken token)
+        public async Task<Result> Handle(UpdateConsumerCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(request, async () =>
+            var consumer = await _context.GetByIdAsync<Domain.Consumer>(request.Id, token);
+
+            consumer.SetEmail(request.Email);
+            consumer.SetPhone(request.Phone);
+            consumer.SetFirstname(request.FirstName);
+            consumer.SetLastname(request.LastName);
+
+            await _context.SaveChangesAsync(token);
+
+            var resultImage = await _mediatr.Process(new UpdateUserPictureCommand(request.RequestUser)
             {
-                var consumer = await _context.GetByIdAsync<Consumer>(request.Id, token);
+                UserId = consumer.Id,
+                Picture = request.Picture,
+                SkipAuthUpdate = true
+            }, token);
 
-                consumer.SetEmail(request.Email);
-                consumer.SetPhone(request.Phone);
-                consumer.SetFirstname(request.FirstName);
-                consumer.SetLastname(request.LastName);
+            if (!resultImage.Succeeded)
+                return Failure(resultImage.Exception);
 
-                await _context.SaveChangesAsync(token);
+            var authResult = await _mediatr.Process(new UpdateAuthUserCommand(request.RequestUser)
+            {
+                Email = consumer.Email,
+                FirstName = consumer.FirstName,
+                LastName = consumer.LastName,
+                Name = consumer.Name,
+                Phone = consumer.Phone,
+                Picture = consumer.Picture,
+                Roles = new List<Guid> {_roleOptions.Consumer.Id},
+                UserId = consumer.Id
+            }, token);
 
-                var resultImage = await _mediatr.Process(new UpdateUserPictureCommand(request.RequestUser)
-                {
-                    UserId = consumer.Id,
-                    Picture = request.Picture,
-                    SkipAuthUpdate = true
-                }, token);
+            if (!authResult.Succeeded)
+                return authResult;
 
-                if (!resultImage.Success)
-                    return Failed<bool>(resultImage.Exception);
-
-                var authResult = await _mediatr.Process(new UpdateAuthUserCommand(request.RequestUser)
-                {
-                    Email = consumer.Email,
-                    FirstName = consumer.FirstName,
-                    LastName = consumer.LastName,
-                    Name = consumer.Name,
-                    Phone = consumer.Phone,
-                    Picture = consumer.Picture,
-                    Roles = new List<Guid> { _roleOptions.Consumer.Id },
-                    UserId = consumer.Id
-                }, token);
-
-                if (!authResult.Success)
-                    return authResult;
-
-                return Ok(true);
-            });
+            return Success();
         }
     }
 }

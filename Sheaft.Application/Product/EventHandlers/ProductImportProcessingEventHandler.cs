@@ -2,14 +2,13 @@
 using System.Threading.Tasks;
 using MediatR;
 using Microsoft.Extensions.Configuration;
-using Sheaft.Application.Commands.Handlers;
-using Sheaft.Application.Events;
-using Sheaft.Domain.Models;
-using Sheaft.Application.Interop;
-using Sheaft.Application.Models;
-using Sheaft.Application.Models.Mailer;
+using Sheaft.Application.Common.Handlers;
+using Sheaft.Application.Common.Interfaces;
+using Sheaft.Application.Common.Interfaces.Services;
+using Sheaft.Application.Common.Models;
+using Sheaft.Domain.Events.Product;
 
-namespace Sheaft.Application.Handlers
+namespace Sheaft.Application.Product.EventHandlers
 {
     public class ProductImportProcessingEventHandler : EventsHandler,
         INotificationHandler<DomainEventNotification<ProductImportProcessingEvent>>
@@ -29,7 +28,7 @@ namespace Sheaft.Application.Handlers
         public async Task Handle(DomainEventNotification<ProductImportProcessingEvent> notification, CancellationToken token)
         {
             var productEvent = notification.DomainEvent;
-            var job = await _context.GetByIdAsync<Job>(productEvent.JobId, token);
+            var job = await _context.GetByIdAsync<Domain.Job>(productEvent.JobId, token);
             await _signalrService.SendNotificationToGroupAsync(job.User.Id, nameof(ProductImportProcessingEvent), new { JobId = job.Id, UserId = job.User.Id });
         }
     }

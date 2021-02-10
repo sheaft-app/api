@@ -4,11 +4,15 @@ using System.Threading.Tasks;
 using MediatR;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using Sheaft.Application.Interop;
-using Sheaft.Core;
-using Sheaft.Domain.Models;
+using Sheaft.Application.Auth.Commands;
+using Sheaft.Application.Common;
+using Sheaft.Application.Common.Handlers;
+using Sheaft.Application.Common.Interfaces;
+using Sheaft.Application.Common.Interfaces.Services;
+using Sheaft.Application.Common.Models;
+using Sheaft.Domain;
 
-namespace Sheaft.Application.Commands
+namespace Sheaft.Application.Picture.Commands
 {
     public class UpdateUserPictureCommand : Command<string>
     {
@@ -22,7 +26,7 @@ namespace Sheaft.Application.Commands
         public string OriginalPicture { get; set; }
         public bool SkipAuthUpdate { get; set; }
     }
-    
+
     public class UpdateUserPictureCommandHandler : CommandsHandler,
         IRequestHandler<UpdateUserPictureCommand, Result<string>>
     {
@@ -40,31 +44,29 @@ namespace Sheaft.Application.Commands
 
         public async Task<Result<string>> Handle(UpdateUserPictureCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(request, async () =>
+            var entity = await _context.GetByIdAsync<Domain.User>(request.UserId, token);
+
+            var resultImage =
+                await _imageService.HandleUserPictureAsync(entity, request.Picture, request.OriginalPicture, token);
+            if (!resultImage.Succeeded)
+                return Failure<string>(resultImage.Exception);
+
+            entity.SetPicture(resultImage.Data);
+            await _context.SaveChangesAsync(token);
+
+            if (request.SkipAuthUpdate)
+                return Success(resultImage.Data);
+
+            var result = await _mediatr.Process(new UpdateAuthUserPictureCommand(request.RequestUser)
             {
-                var entity = await _context.GetByIdAsync<User>(request.UserId, token);
+                Picture = entity.Picture,
+                UserId = entity.Id
+            }, token);
 
-                var resultImage = await _imageService.HandleUserPictureAsync(entity, request.Picture, request.OriginalPicture, token);
-                if (!resultImage.Success)
-                    return Failed<string>(resultImage.Exception);
+            if (!result.Succeeded)
+                return Failure<string>(result.Exception);
 
-                entity.SetPicture(resultImage.Data);
-                await _context.SaveChangesAsync(token);
-
-                if (request.SkipAuthUpdate)
-                    return Ok(resultImage.Data);
-
-                var result = await _mediatr.Process(new UpdateAuthUserPictureCommand(request.RequestUser)
-                {
-                    Picture = entity.Picture,
-                    UserId = entity.Id
-                }, token);
-
-                if (!result.Success)
-                    return Failed<string>(result.Exception);
-
-                return Ok(resultImage.Data);
-            });
+            return Success(resultImage.Data);
         }
     }
 }

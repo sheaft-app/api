@@ -1,15 +1,15 @@
 ﻿using AutoMapper;
-using Sheaft.Domain.Models;
-using Sheaft.Application.Models;
+using Sheaft.Application.Common.Models.Dto;
+using Sheaft.Application.Common.Models.ViewModels;
 
-namespace Sheaft.Application.Mappers
+namespace Sheaft.Application.Common.Mappings
 {
     public class RegionProfile : Profile
     {
         public RegionProfile()
         {
-            CreateMap<Region, RegionDto>();
-            CreateMap<Region, RegionViewModel>();
+            CreateMap<Domain.Region, RegionDto>();
+            CreateMap<Domain.Region, RegionViewModel>();
         }
     }
 }

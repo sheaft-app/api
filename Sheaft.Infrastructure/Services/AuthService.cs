@@ -1,8 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Sheaft.Core;
-using Sheaft.Application.Models;
-using Sheaft.Options;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
@@ -10,8 +7,12 @@ using System.Net.Http;
 using IdentityModel.Client;
 using Newtonsoft.Json;
 using System.Text;
-using Sheaft.Application.Interop;
-using Sheaft.Domain.Enums;
+using Sheaft.Application.Common;
+using Sheaft.Application.Common.Interfaces.Services;
+using Sheaft.Application.Common.Models;
+using Sheaft.Application.Common.Models.Inputs;
+using Sheaft.Application.Common.Options;
+using Sheaft.Domain.Enum;
 
 namespace Sheaft.Infrastructure.Services
 {
@@ -32,44 +33,37 @@ namespace Sheaft.Infrastructure.Services
             _httpClient.SetToken(_authOptions.Scheme, _authOptions.ApiKey);
         }
 
-        public async Task<Result<bool>> UpdateUserAsync(IdentityUserInput user, CancellationToken token)
+        public async Task<Result> UpdateUserAsync(IdentityUserInput user, CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
-            {
-                var oidcResult = await _httpClient.PutAsync(_authOptions.Actions.Profile,
-                    new StringContent(JsonConvert.SerializeObject(user), Encoding.UTF8, "application/json"), token);
+            var oidcResult = await _httpClient.PutAsync(_authOptions.Actions.Profile,
+                new StringContent(JsonConvert.SerializeObject(user), Encoding.UTF8, "application/json"), token);
 
-                if (!oidcResult.IsSuccessStatusCode)
-                    return Failed<bool>(new Exception(await oidcResult.Content.ReadAsStringAsync().ConfigureAwait(false)));
+            if (!oidcResult.IsSuccessStatusCode)
+                return Failure(new Exception(await oidcResult.Content.ReadAsStringAsync().ConfigureAwait(false)));
 
-                return Ok(true);
-            });
+            return Success();
         }
 
-        public async Task<Result<bool>> UpdateUserPictureAsync(IdentityPictureInput user, CancellationToken token)
+        public async Task<Result> UpdateUserPictureAsync(IdentityPictureInput user, CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
-            {
-                var oidcResult = await _httpClient.PutAsync(_authOptions.Actions.Picture,
-                    new StringContent(JsonConvert.SerializeObject(user), Encoding.UTF8, "application/json"), token);
+            var oidcResult = await _httpClient.PutAsync(_authOptions.Actions.Picture,
+                new StringContent(JsonConvert.SerializeObject(user), Encoding.UTF8, "application/json"), token);
 
-                if (!oidcResult.IsSuccessStatusCode)
-                    return Failed<bool>(new Exception(await oidcResult.Content.ReadAsStringAsync().ConfigureAwait(false)));
+            if (!oidcResult.IsSuccessStatusCode)
+                return Failure(new Exception(await oidcResult.Content.ReadAsStringAsync().ConfigureAwait(false)));
 
-                return Ok(true);
-            });
+            return Success();
         }
 
-        public async Task<Result<bool>> RemoveUserAsync(Guid userId, CancellationToken token)
+        public async Task<Result> RemoveUserAsync(Guid userId, CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
-            {
-                var oidcResult = await _httpClient.DeleteAsync(string.Format(_authOptions.Actions.Delete, userId.ToString("N")), token);
-                if (!oidcResult.IsSuccessStatusCode)
-                    return BadRequest<bool>(MessageKind.Oidc_DeleteProfile_Error, await oidcResult.Content.ReadAsStringAsync().ConfigureAwait(false));
+            var oidcResult =
+                await _httpClient.DeleteAsync(string.Format(_authOptions.Actions.Delete, userId.ToString("N")), token);
+            if (!oidcResult.IsSuccessStatusCode)
+                return Failure(MessageKind.Oidc_DeleteProfile_Error,
+                    await oidcResult.Content.ReadAsStringAsync());
 
-                return Ok(true);
-            });
+            return Success();
         }
     }
 }

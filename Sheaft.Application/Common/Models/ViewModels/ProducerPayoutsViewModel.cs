@@ -1,9 +1,7 @@
-﻿using Sheaft.Domain.Enums;
-using System;
-using System.Collections;
+﻿using System;
 using System.Collections.Generic;
 
-namespace Sheaft.Application.Models
+namespace Sheaft.Application.Common.Models.ViewModels
 {
 
     public class ProducerPayoutsViewModel

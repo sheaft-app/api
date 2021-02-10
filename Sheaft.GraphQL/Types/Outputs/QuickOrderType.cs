@@ -1,8 +1,8 @@
 using HotChocolate.Types;
-using Sheaft.Application.Models;
+using Sheaft.Application.Common.Models.Dto;
 using Sheaft.GraphQL.Filters;
 
-namespace Sheaft.GraphQL.Types
+namespace Sheaft.GraphQL.Types.Outputs
 {
     public class QuickOrderType : SheaftOutputType<QuickOrderDto>
     {

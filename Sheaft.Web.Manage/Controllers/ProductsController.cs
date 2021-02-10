@@ -5,20 +5,19 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Newtonsoft.Json;
-using Sheaft.Application.Commands;
-using Sheaft.Exceptions;
-using Sheaft.Application.Interop;
-using Sheaft.Core;
-using Sheaft.Web.Manage.Models;
-using Sheaft.Application.Models;
-using Sheaft.Options;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Sheaft.Application.Common.Interfaces;
+using Sheaft.Application.Common.Interfaces.Services;
+using Sheaft.Application.Common.Models.ViewModels;
+using Sheaft.Application.Common.Options;
+using Sheaft.Application.Product.Commands;
+using Sheaft.Domain;
+using Sheaft.Domain.Exceptions;
 
 namespace Sheaft.Web.Manage.Controllers
 {
@@ -122,7 +121,7 @@ namespace Sheaft.Web.Manage.Controllers
                 WholeSalePricePerUnit = model.WholeSalePricePerUnit
             }, token);
 
-            if (!result.Success)
+            if (!result.Succeeded)
             {
                 ViewBag.Tags = await GetTags(token);
                 ViewBag.Returnables = await GetReturnables(requestUser, token);
@@ -148,7 +147,7 @@ namespace Sheaft.Web.Manage.Controllers
                 .SingleOrDefaultAsync(token);
 
             if (entity == null)
-                throw new NotFoundException();
+                throw SheaftException.NotFound();
 
             ViewBag.Tags = await GetTags(token);
             ViewBag.Returnables = await GetReturnables(requestUser, token);
@@ -199,7 +198,7 @@ namespace Sheaft.Web.Manage.Controllers
                 WholeSalePricePerUnit = model.WholeSalePricePerUnit
             }, token);
 
-            if (!result.Success)
+            if (!result.Succeeded)
             {
                 ViewBag.Tags = await GetTags(token);
                 ViewBag.Returnables = await GetReturnables(requestUser, token);
@@ -225,7 +224,7 @@ namespace Sheaft.Web.Manage.Controllers
                 {
                     await formFile.CopyToAsync(stream, token);
                     var result = await _mediatr.Process(new QueueImportProductsCommand(requestUser) { Id = requestUser.Id, NotifyOnUpdates = false, FileName = formFile.FileName, FileStream = stream.ToArray() }, token);
-                    if (!result.Success)
+                    if (!result.Succeeded)
                         return BadRequest(result);
                 }
             }
@@ -242,7 +241,7 @@ namespace Sheaft.Web.Manage.Controllers
                 Id = id
             }, token);
 
-            if (!result.Success)
+            if (!result.Succeeded)
                 throw result.Exception;
 
             return RedirectToAction("Edit", new { id });
@@ -257,7 +256,7 @@ namespace Sheaft.Web.Manage.Controllers
                 Id = id
             }, token);
 
-            if (!result.Success)
+            if (!result.Succeeded)
                 throw result.Exception;
 
             return RedirectToAction("Index");

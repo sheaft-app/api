@@ -1,4 +1,7 @@
-﻿@model ProductViewModel
+﻿@using Sheaft.Application.Common.Models
+@using Sheaft.Application.Common.Models.ViewModels
+@using Sheaft.Domain.Enum
+@model Sheaft.Application.Common.Models.ViewModels.ProductViewModel
 @{
     ViewData["Title"] = "Product details";
     var vats = new List<SelectListItem> {
@@ -120,7 +123,7 @@
             }
             @if (!string.IsNullOrWhiteSpace(Model.Picture))
             {
-                <a href="@Model.Picture.Replace(Sheaft.Core.Models.PictureSize.SMALL, Sheaft.Core.Models.PictureSize.ORIGINAL).Replace(Sheaft.Core.Models.PictureSize.MEDIUM, Sheaft.Core.Models.PictureSize.ORIGINAL).Replace(Sheaft.Core.Models.PictureSize.LARGE, Sheaft.Core.Models.PictureSize.ORIGINAL)">Download original picture</a>
+                <a href="@Model.Picture.Replace(PictureSize.SMALL, PictureSize.ORIGINAL).Replace(PictureSize.MEDIUM, PictureSize.ORIGINAL).Replace(PictureSize.LARGE, PictureSize.ORIGINAL)">Download original picture</a>
             }
             @Html.TextBoxFor(c => c.Picture, new { @class = "form-control", @type = "file" })
         </div>

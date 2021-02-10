@@ -1,8 +1,4 @@
-﻿using Sheaft.Domain.Enums;
-using System;
-using System.Collections.Generic;
-
-namespace Sheaft.Application.Models
+﻿namespace Sheaft.Application.Common.Models.Dto
 {
 
     public class ConsumerLegalDto : BaseLegalDto

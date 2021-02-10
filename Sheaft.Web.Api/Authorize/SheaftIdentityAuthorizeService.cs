@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http;
 using System.Collections.Generic;
-using Sheaft.Options;
 using System.Linq;
 using Microsoft.Extensions.Logging;
 using System;
@@ -17,6 +16,7 @@ using Newtonsoft.Json.Linq;
 using Microsoft.Extensions.Caching.Distributed;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.IO;
+using Sheaft.Application.Common.Options;
 
 namespace Sheaft.Web.Api.Authorize
 {

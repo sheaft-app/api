@@ -3,17 +3,21 @@ using System.Threading.Tasks;
 using MediatR;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Sheaft.Core;
 using Newtonsoft.Json;
-using Sheaft.Application.Events;
-using Sheaft.Application.Interop;
-using Sheaft.Domain.Enums;
-using Sheaft.Domain.Models;
-using Sheaft.Options;
+using Sheaft.Application.Common;
+using Sheaft.Application.Common.Handlers;
+using Sheaft.Application.Common.Interfaces;
+using Sheaft.Application.Common.Interfaces.Services;
+using Sheaft.Application.Common.Models;
+using Sheaft.Application.Common.Options;
+using Sheaft.Application.Order.Commands;
+using Sheaft.Domain;
+using Sheaft.Domain.Enum;
+using Sheaft.Domain.Events.Payin;
 
-namespace Sheaft.Application.Commands
+namespace Sheaft.Application.Payin.Commands
 {
-    public class RefreshPayinStatusCommand : Command<TransactionStatus>
+    public class RefreshPayinStatusCommand : Command
     {
         [JsonConstructor]
         public RefreshPayinStatusCommand(RequestUser requestUser, string identifier)
@@ -24,9 +28,9 @@ namespace Sheaft.Application.Commands
 
         public string Identifier { get; set; }
     }
-    
+
     public class RefreshPayinStatusCommandHandler : CommandsHandler,
-        IRequestHandler<RefreshPayinStatusCommand, Result<TransactionStatus>>
+        IRequestHandler<RefreshPayinStatusCommand, Result>
     {
         private readonly IPspService _pspService;
         private readonly RoutineOptions _routineOptions;
@@ -43,37 +47,33 @@ namespace Sheaft.Application.Commands
             _routineOptions = routineOptions.Value;
         }
 
-        public async Task<Result<TransactionStatus>> Handle(RefreshPayinStatusCommand request, CancellationToken token)
+        public async Task<Result> Handle(RefreshPayinStatusCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(request, async () =>
+            var payin = await _context.GetSingleAsync<Domain.Payin>(c => c.Identifier == request.Identifier, token);
+            if (payin.Status == TransactionStatus.Succeeded || payin.Status == TransactionStatus.Failed)
+                return Success();
+
+            var pspResult = await _pspService.GetPayinAsync(payin.Identifier, token);
+            if (!pspResult.Succeeded)
+                return Failure(pspResult.Exception);
+
+            payin.SetStatus(pspResult.Data.Status);
+            payin.SetResult(pspResult.Data.ResultCode, pspResult.Data.ResultMessage);
+            payin.SetExecutedOn(pspResult.Data.ProcessedOn);
+
+            await _context.SaveChangesAsync(token);
+
+            switch (payin.Status)
             {
-                var payin = await _context.GetSingleAsync<Payin>(c => c.Identifier == request.Identifier, token);
-                if (payin.Status == TransactionStatus.Succeeded || payin.Status == TransactionStatus.Failed)
-                    return Ok(payin.Status);
+                case TransactionStatus.Failed:
+                    _mediatr.Post(new FailOrderCommand(request.RequestUser) {OrderId = payin.Order.Id, PayinId = payin.Id});
+                    break;
+                case TransactionStatus.Succeeded:
+                    _mediatr.Post(new ConfirmOrderCommand(request.RequestUser) {OrderId = payin.Order.Id});
+                    break;
+            }
 
-                var pspResult = await _pspService.GetPayinAsync(payin.Identifier, token);
-                if (!pspResult.Success)
-                    return Failed<TransactionStatus>(pspResult.Exception);
-
-                payin.SetStatus(pspResult.Data.Status);
-                payin.SetResult(pspResult.Data.ResultCode, pspResult.Data.ResultMessage);
-                payin.SetExecutedOn(pspResult.Data.ProcessedOn);
-
-                await _context.SaveChangesAsync(token);
-
-                switch (payin.Status)
-                {
-                    case TransactionStatus.Failed:
-                        _mediatr.Post(new FailOrderCommand(request.RequestUser) { OrderId = payin.Order.Id, PayinId = payin.Id });
-                        break;
-                    case TransactionStatus.Succeeded:
-                        _mediatr.Post(new ConfirmOrderCommand(request.RequestUser) { OrderId = payin.Order.Id });
-                        _mediatr.Post(new PayinSucceededEvent(request.RequestUser) { PayinId = payin.Id });
-                        break;
-                }
-
-                return Ok(payin.Status);
-            });
+            return Success();
         }
     }
 }

@@ -1,17 +1,19 @@
-﻿using Sheaft.Domain.Enums;
-using System;
+﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
 using Microsoft.Extensions.Logging;
-using Sheaft.Core;
 using Newtonsoft.Json;
-using Sheaft.Application.Interop;
-using Sheaft.Domain.Models;
+using Sheaft.Application.Common;
+using Sheaft.Application.Common.Handlers;
+using Sheaft.Application.Common.Interfaces;
+using Sheaft.Application.Common.Interfaces.Services;
+using Sheaft.Application.Common.Models;
+using Sheaft.Domain;
 
-namespace Sheaft.Application.Commands
+namespace Sheaft.Application.Reward.Commands
 {
-    public class DeleteRewardCommand : Command<bool>
+    public class DeleteRewardCommand : Command
     {
         [JsonConstructor]
         public DeleteRewardCommand(RequestUser requestUser) : base(requestUser)
@@ -20,9 +22,9 @@ namespace Sheaft.Application.Commands
 
         public Guid Id { get; set; }
     }
-    
+
     public class DeleteRewardCommandHandler : CommandsHandler,
-        IRequestHandler<DeleteRewardCommand, Result<bool>>
+        IRequestHandler<DeleteRewardCommand, Result>
     {
         public DeleteRewardCommandHandler(
             ISheaftMediatr mediatr,
@@ -31,17 +33,15 @@ namespace Sheaft.Application.Commands
             : base(mediatr, context, logger)
         {
         }
-        public async Task<Result<bool>> Handle(DeleteRewardCommand request, CancellationToken token)
-        {
-            return await ExecuteAsync(request, async () =>
-            {
-                var entity = await _context.GetByIdAsync<Reward>(request.Id, token);
-                
-                _context.Remove(entity);
-                await _context.SaveChangesAsync(token);
 
-                return Ok(true);
-            });
+        public async Task<Result> Handle(DeleteRewardCommand request, CancellationToken token)
+        {
+            var entity = await _context.GetByIdAsync<Domain.Reward>(request.Id, token);
+
+            _context.Remove(entity);
+            await _context.SaveChangesAsync(token);
+
+            return Success();
         }
     }
 }

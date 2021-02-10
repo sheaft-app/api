@@ -1,18 +1,20 @@
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
-using Sheaft.Application.Interop;
-using Sheaft.Application.Models;
-using Sheaft.Application.Queries;
-using Sheaft.Core;
-using Sheaft.Domain.Enums;
-using Sheaft.Domain.Models;
 using Sheaft.Tests.Common;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Sheaft.Application.Common.Interfaces;
+using Sheaft.Application.Common.Interfaces.Queries;
+using Sheaft.Application.Common.Interfaces.Services;
+using Sheaft.Application.Common.Models;
+using Sheaft.Application.Common.Models.Dto;
+using Sheaft.Application.DeliveryMode.Queries;
+using Sheaft.Domain;
+using Sheaft.Domain.Enum;
 
 namespace Queries.Delivery.Tests
 {
@@ -257,7 +259,7 @@ namespace Queries.Delivery.Tests
             };
 
             _capingMock.Setup(c => c.GetCapingDeliveriesAsync(It.IsAny<IEnumerable<Tuple<Guid, Guid, DeliveryHourDto>>>(), It.IsAny<CancellationToken>()))
-                .Returns(Task.FromResult((Result<IEnumerable<CapingDeliveryDto>>)new SuccessResult<IEnumerable<CapingDeliveryDto>>(result)));
+                .Returns(Task.FromResult(Result<IEnumerable<CapingDeliveryDto>>.Success(result)));
 
             var token = CancellationToken.None;
 
@@ -330,7 +332,7 @@ namespace Queries.Delivery.Tests
             };
 
             _capingMock.Setup(c => c.GetCapingDeliveriesAsync(It.IsAny<IEnumerable<Tuple<Guid, Guid, DeliveryHourDto>>>(), It.IsAny<CancellationToken>()))
-                .Returns(Task.FromResult((Result<IEnumerable<CapingDeliveryDto>>)new SuccessResult<IEnumerable<CapingDeliveryDto>>(result)));
+                .Returns(Task.FromResult(Result<IEnumerable<CapingDeliveryDto>>.Success(result)));
 
             var token = CancellationToken.None;
 

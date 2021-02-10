@@ -1,20 +1,23 @@
-﻿using Sheaft.Domain.Enums;
-using System;
+﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Sheaft.Core;
 using Newtonsoft.Json;
-using Sheaft.Application.Interop;
-using Sheaft.Domain.Models;
-using Sheaft.Exceptions;
-using Sheaft.Options;
+using Sheaft.Application.Common;
+using Sheaft.Application.Common.Handlers;
+using Sheaft.Application.Common.Interfaces;
+using Sheaft.Application.Common.Interfaces.Services;
+using Sheaft.Application.Common.Models;
+using Sheaft.Application.Common.Options;
+using Sheaft.Domain;
+using Sheaft.Domain.Enum;
+using Sheaft.Domain.Events.User;
 
-namespace Sheaft.Application.Commands
+namespace Sheaft.Application.User.Commands
 {
-    public class CreateUserPointsCommand : Command<bool>
+    public class CreateUserPointsCommand : Command
     {
         [JsonConstructor]
         public CreateUserPointsCommand(RequestUser requestUser) : base(requestUser)
@@ -25,9 +28,9 @@ namespace Sheaft.Application.Commands
         public DateTimeOffset CreatedOn { get; set; }
         public Guid UserId { get; set; }
     }
-    
+
     public class CreateUserPointsCommandHandler : CommandsHandler,
-        IRequestHandler<CreateUserPointsCommand, Result<bool>>
+        IRequestHandler<CreateUserPointsCommand, Result>
     {
         private readonly IBlobService _blobService;
         private readonly ScoringOptions _scoringOptions;
@@ -47,21 +50,18 @@ namespace Sheaft.Application.Commands
             _blobService = blobService;
         }
 
-        public async Task<Result<bool>> Handle(CreateUserPointsCommand request, CancellationToken token)
+        public async Task<Result> Handle(CreateUserPointsCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(request, async () =>
-            {
-                if (!_scoringOptions.Points.TryGetValue(request.Kind.ToString("G"), out int quantity))
-                    return BadRequest<bool>(MessageKind.Points_Scoring_Matching_ActionPoints_NotFound);
+            if (!_scoringOptions.Points.TryGetValue(request.Kind.ToString("G"), out int quantity))
+                return Failure(MessageKind.Points_Scoring_Matching_ActionPoints_NotFound);
 
-                var user = await _context.GetByIdAsync<User>(request.UserId, token);
-                user.AddPoints(request.Kind, quantity, DateTimeOffset.UtcNow);
+            var user = await _context.GetByIdAsync<Domain.User>(request.UserId, token);
+            user.AddPoints(request.Kind, quantity, DateTimeOffset.UtcNow);
 
-                await _context.SaveChangesAsync(token);
+            await _context.SaveChangesAsync(token);
 
-                //_mediatr.Post(new UserPointsCreatedEvent(request.RequestUser) { UserId = user.Id, Kind = request.Kind, Points = quantity, CreatedOn = request.CreatedOn });
-                return Ok(true);
-            });
+            _mediatr.Post(new UserPointsCreatedEvent(user.Id, request.Kind, quantity, request.CreatedOn));
+            return Success();
         }
     }
 }

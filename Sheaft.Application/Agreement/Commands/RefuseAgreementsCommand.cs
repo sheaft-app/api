@@ -5,12 +5,16 @@ using System.Threading.Tasks;
 using MediatR;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using Sheaft.Application.Interop;
-using Sheaft.Core;
+using Sheaft.Application.Common;
+using Sheaft.Application.Common.Handlers;
+using Sheaft.Application.Common.Interfaces;
+using Sheaft.Application.Common.Interfaces.Services;
+using Sheaft.Application.Common.Models;
+using Sheaft.Domain;
 
-namespace Sheaft.Application.Commands
+namespace Sheaft.Application.Agreement.Commands
 {
-    public class RefuseAgreementsCommand : Command<bool>
+    public class RefuseAgreementsCommand : Command
     {
         [JsonConstructor]
         public RefuseAgreementsCommand(RequestUser requestUser) : base(requestUser)
@@ -20,9 +24,9 @@ namespace Sheaft.Application.Commands
         public IEnumerable<Guid> Ids { get; set; }
         public string Reason { get; set; }
     }
-    
+
     public class RefuseAgreementsCommandsHandler : CommandsHandler,
-        IRequestHandler<RefuseAgreementsCommand, Result<bool>>
+        IRequestHandler<RefuseAgreementsCommand, Result>
     {
         public RefuseAgreementsCommandsHandler(
             ISheaftMediatr mediatr,
@@ -31,23 +35,23 @@ namespace Sheaft.Application.Commands
             : base(mediatr, context, logger)
         {
         }
-        public async Task<Result<bool>> Handle(RefuseAgreementsCommand request, CancellationToken token)
-        {
-            return await ExecuteAsync(request, async () =>
-            {
-                using (var transaction = await _context.BeginTransactionAsync(token))
-                {
-                    foreach (var agreementId in request.Ids)
-                    {
-                        var result = await _mediatr.Process(new RefuseAgreementCommand(request.RequestUser) { Id = agreementId, Reason = request.Reason }, token);
-                        if (!result.Success)
-                            return Failed<bool>(result.Exception);
-                    }
 
-                    await transaction.CommitAsync(token);
-                    return Ok(true);
+        public async Task<Result> Handle(RefuseAgreementsCommand request, CancellationToken token)
+        {
+            using (var transaction = await _context.BeginTransactionAsync(token))
+            {
+                foreach (var agreementId in request.Ids)
+                {
+                    var result = await _mediatr.Process(
+                        new RefuseAgreementCommand(request.RequestUser) {Id = agreementId, Reason = request.Reason},
+                        token);
+                    if (!result.Succeeded)
+                        return Failure(result.Exception);
                 }
-            });
+
+                await transaction.CommitAsync(token);
+                return Success();
+            }
         }
     }
 }

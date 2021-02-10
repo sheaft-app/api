@@ -1,4 +1,4 @@
-﻿namespace Sheaft.Core.Models
+﻿namespace Sheaft.Application.Common.Models
 {
     public static class PictureSize
     {

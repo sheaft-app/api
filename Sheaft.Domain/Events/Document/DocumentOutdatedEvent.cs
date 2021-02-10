@@ -1,17 +1,17 @@
 ﻿using System;
 using Newtonsoft.Json;
-using Sheaft.Core;
-using Sheaft.Domain.Models.Common;
+using Sheaft.Domain.Common;
 
-namespace Sheaft.Application.Events
+namespace Sheaft.Domain.Events.Document
 {
     public class DocumentOutdatedEvent : DomainEvent
     {
         [JsonConstructor]
-        public DocumentOutdatedEvent(RequestUser requestUser) : base(requestUser)
+        public DocumentOutdatedEvent(Guid documentId)
         {
+            DocumentId = documentId;
         }
 
-        public Guid DocumentId { get; set; }
+        public Guid DocumentId { get; }
     }
 }

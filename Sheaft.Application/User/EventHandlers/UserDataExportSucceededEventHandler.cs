@@ -2,16 +2,14 @@
 using System.Threading.Tasks;
 using MediatR;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Options;
-using Sheaft.Application.Commands.Handlers;
-using Sheaft.Application.Events;
-using Sheaft.Application.Interop;
-using Sheaft.Application.Models;
-using Sheaft.Application.Models.Mailer;
-using Sheaft.Domain.Models;
-using Sheaft.Options;
+using Sheaft.Application.Common.Handlers;
+using Sheaft.Application.Common.Interfaces;
+using Sheaft.Application.Common.Interfaces.Services;
+using Sheaft.Application.Common.Models;
+using Sheaft.Application.Common.Models.Mailer;
+using Sheaft.Domain.Events.User;
 
-namespace Sheaft.Application.Handlers
+namespace Sheaft.Application.User.EventHandlers
 {
     public class UserDataExportSucceededEventHandler : EventsHandler,
         INotificationHandler<DomainEventNotification<UserDataExportSucceededEvent>>
@@ -31,9 +29,9 @@ namespace Sheaft.Application.Handlers
         public async Task Handle(DomainEventNotification<UserDataExportSucceededEvent> notification, CancellationToken token)
         {
             var userEvent = notification.DomainEvent;
-            var job = await _context.GetByIdAsync<Job>(userEvent.JobId, token);
+            var job = await _context.GetByIdAsync<Domain.Job>(userEvent.JobId, token);
 
-            await _signalrService.SendNotificationToUserAsync(userEvent.RequestUser.Id, nameof(UserDataExportSucceededEvent), new { JobId = userEvent.JobId, UserId = userEvent.RequestUser.Id, Url = job.File });
+            await _signalrService.SendNotificationToUserAsync(job.User.Id, nameof(UserDataExportSucceededEvent), new { JobId = userEvent.JobId, UserId = job.User.Id, Url = job.File });
             await _emailService.SendTemplatedEmailAsync(
                 job.User.Email,
                 job.User.Name,

@@ -4,13 +4,17 @@ using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
 using Microsoft.Extensions.Logging;
-using Sheaft.Core;
 using Newtonsoft.Json;
-using Sheaft.Application.Interop;
+using Sheaft.Application.Common;
+using Sheaft.Application.Common.Handlers;
+using Sheaft.Application.Common.Interfaces;
+using Sheaft.Application.Common.Interfaces.Services;
+using Sheaft.Application.Common.Models;
+using Sheaft.Domain;
 
-namespace Sheaft.Application.Commands
+namespace Sheaft.Application.DeliveryMode.Commands
 {
-    public class SetDeliveryModesAvailabilityCommand : Command<bool>
+    public class SetDeliveryModesAvailabilityCommand : Command
     {
         [JsonConstructor]
         public SetDeliveryModesAvailabilityCommand(RequestUser requestUser) : base(requestUser)
@@ -20,9 +24,9 @@ namespace Sheaft.Application.Commands
         public IEnumerable<Guid> Ids { get; set; }
         public bool Available { get; set; }
     }
-    
+
     public class SetDeliveryModesAvailabilityCommandHandler : CommandsHandler,
-        IRequestHandler<SetDeliveryModesAvailabilityCommand, Result<bool>>
+        IRequestHandler<SetDeliveryModesAvailabilityCommand, Result>
     {
         public SetDeliveryModesAvailabilityCommandHandler(
             ISheaftMediatr mediatr,
@@ -32,23 +36,22 @@ namespace Sheaft.Application.Commands
         {
         }
 
-        public async Task<Result<bool>> Handle(SetDeliveryModesAvailabilityCommand request, CancellationToken token)
+        public async Task<Result> Handle(SetDeliveryModesAvailabilityCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(request, async () =>
+            using (var transaction = await _context.BeginTransactionAsync(token))
             {
-                using (var transaction = await _context.BeginTransactionAsync(token))
+                foreach (var id in request.Ids)
                 {
-                    foreach (var id in request.Ids)
-                    {
-                        var result = await _mediatr.Process(new SetDeliveryModeAvailabilityCommand(request.RequestUser) { Id = id, Available = request.Available }, token);
-                        if (!result.Success)
-                            return Failed<bool>(result.Exception);
-                    }
-
-                    await transaction.CommitAsync(token);
-                    return Ok(true);
+                    var result = await _mediatr.Process(
+                        new SetDeliveryModeAvailabilityCommand(request.RequestUser)
+                            {Id = id, Available = request.Available}, token);
+                    if (!result.Succeeded)
+                        return Failure(result.Exception);
                 }
-            });
+
+                await transaction.CommitAsync(token);
+                return Success();
+            }
         }
     }
 }

@@ -1,6 +1,6 @@
-using Sheaft.Domain.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Sheaft.Domain;
 
 namespace Sheaft.Infrastructure.Persistence.Configurations
 {
@@ -45,6 +45,8 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
                 cb.ToTable("ExpectedDeliveries");
             });
 
+            entity.Ignore(c => c.DomainEvents);
+            
             var products = entity.Metadata.FindNavigation(nameof(PurchaseOrder.Products));
             products.SetPropertyAccessMode(PropertyAccessMode.Field);
 

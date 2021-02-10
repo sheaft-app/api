@@ -1,9 +1,6 @@
-﻿using Sheaft.Domain.Enums;
-using System;
-using System.Collections;
-using System.Collections.Generic;
+﻿using System;
 
-namespace Sheaft.Application.Models
+namespace Sheaft.Application.Common.Models.ViewModels
 {
     public class ProducerTransferViewModel
     {

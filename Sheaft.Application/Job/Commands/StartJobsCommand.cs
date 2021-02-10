@@ -5,12 +5,16 @@ using System.Threading.Tasks;
 using MediatR;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using Sheaft.Application.Interop;
-using Sheaft.Core;
+using Sheaft.Application.Common;
+using Sheaft.Application.Common.Handlers;
+using Sheaft.Application.Common.Interfaces;
+using Sheaft.Application.Common.Interfaces.Services;
+using Sheaft.Application.Common.Models;
+using Sheaft.Domain;
 
-namespace Sheaft.Application.Commands
+namespace Sheaft.Application.Job.Commands
 {
-    public class StartJobsCommand : Command<bool>
+    public class StartJobsCommand : Command
     {
         [JsonConstructor]
         public StartJobsCommand(RequestUser requestUser) : base(requestUser)
@@ -19,34 +23,33 @@ namespace Sheaft.Application.Commands
 
         public IEnumerable<Guid> Ids { get; set; }
     }
+
     public class StartJobsCommandHandler : CommandsHandler,
-        IRequestHandler<StartJobsCommand, Result<bool>>
+        IRequestHandler<StartJobsCommand, Result>
     {
         public StartJobsCommandHandler(
-            ISheaftMediatr mediatr, 
+            ISheaftMediatr mediatr,
             IAppDbContext context,
             ILogger<StartJobsCommandHandler> logger)
             : base(mediatr, context, logger)
         {
         }
-        public async Task<Result<bool>> Handle(StartJobsCommand request,
+
+        public async Task<Result> Handle(StartJobsCommand request,
             CancellationToken token)
         {
-            return await ExecuteAsync(request, async () =>
+            using (var transaction = await _context.BeginTransactionAsync(token))
             {
-                using (var transaction = await _context.BeginTransactionAsync(token))
+                foreach (var jobId in request.Ids)
                 {
-                    foreach (var jobId in request.Ids)
-                    {
-                        var result = await _mediatr.Process(new StartJobCommand(request.RequestUser) { Id = jobId }, token);
-                        if (!result.Success)
-                            return Failed<bool>(result.Exception);
-                    }
-
-                    await transaction.CommitAsync(token);
-                    return Ok(true);
+                    var result = await _mediatr.Process(new StartJobCommand(request.RequestUser) {Id = jobId}, token);
+                    if (!result.Succeeded)
+                        return Failure(result.Exception);
                 }
-            });
+
+                await transaction.CommitAsync(token);
+                return Success();
+            }
         }
     }
 }

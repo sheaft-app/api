@@ -6,13 +6,17 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
-using Sheaft.Application.Interop;
-using Sheaft.Core;
-using Sheaft.Options;
+using Sheaft.Application.Common;
+using Sheaft.Application.Common.Handlers;
+using Sheaft.Application.Common.Interfaces;
+using Sheaft.Application.Common.Interfaces.Services;
+using Sheaft.Application.Common.Models;
+using Sheaft.Application.Common.Options;
+using Sheaft.Domain;
 
-namespace Sheaft.Application.Commands
+namespace Sheaft.Application.User.Commands
 {
-    public class RestoreUserCommand : Command<bool>
+    public class RestoreUserCommand : Command
     {
         [JsonConstructor]
         public RestoreUserCommand(RequestUser requestUser) : base(requestUser)
@@ -21,9 +25,9 @@ namespace Sheaft.Application.Commands
 
         public Guid Id { get; set; }
     }
-    
+
     public class RestoreUserCommandHandler : CommandsHandler,
-        IRequestHandler<RestoreUserCommand, Result<bool>>
+        IRequestHandler<RestoreUserCommand, Result>
     {
         private readonly IBlobService _blobService;
         private readonly ScoringOptions _scoringOptions;
@@ -42,22 +46,17 @@ namespace Sheaft.Application.Commands
             _scoringOptions = scoringOptions.Value;
             _blobService = blobService;
         }
-        public async Task<Result<bool>> Handle(RestoreUserCommand request, CancellationToken token)
+
+        public async Task<Result> Handle(RestoreUserCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(request, async () =>
-            {
-                var entity = await _context.Users.FirstOrDefaultAsync(c => c.Id == request.Id, token);
-                if (entity == null)
-                    return NotFound<bool>();
-                    
-                if (!entity.RemovedOn.HasValue)
-                    return BadRequest<bool>();
+            var entity = await _context.Users.FirstOrDefaultAsync(c => c.Id == request.Id, token);
+            if (entity == null || !entity.RemovedOn.HasValue)
+                return Failure();
 
-                entity.Restore();
-                await _context.SaveChangesAsync(token);
+            entity.Restore();
+            await _context.SaveChangesAsync(token);
 
-                return Ok(true);
-            });
+            return Success();
         }
     }
 }

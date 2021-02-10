@@ -1,61 +1,29 @@
-﻿using Sheaft.Exceptions;
-using System;
-using Sheaft.Domain.Enums;
-using Sheaft.Domains.Exceptions;
+﻿using System;
+using Sheaft.Domain.Enum;
 
-namespace Sheaft.Core
+namespace Sheaft.Application.Common.Models
 {
-    public class Result<T>
+    public class Result<T> : Result
     {
-        public T Data { get; }
-        public bool Success { get; }
-        public SheaftException Exception { get; }
-        public MessageKind? Message { get; }
-        public object[] Params { get; }
+        public T Data { get; private set; }
 
-        // with result
-
-        protected Result(bool success, T data, MessageKind? message = null, params object[] objs) : this(message, objs)
-        {
-            Success = success;
-            Data = data;
-        }
-
-        // exception result
-
-        protected Result(Exception exception, MessageKind? message = null, params object[] objs) : this(new UnexpectedException(exception), message, objs)
+        internal Result(bool succeeded, MessageKind message, Exception exception = null, params object[] objs) : base(succeeded, message, exception, objs)
         {
         }
-        protected Result(SheaftException exception, MessageKind? message = null, params object[] objs) : this(message ?? MessageKind.Unexpected, objs)
+        
+        public static Result<T> Success(T data, MessageKind? message = null, params object[] objs)
         {
-            Success = false;
-            Exception = exception;
+            return new Result<T>(true, message ?? MessageKind.Success, null, objs) {Data = data};
         }
 
-        protected Result(MessageKind? message, params object[] objs)
+        public static Result<T> Failure(T data, MessageKind? error, params object[] objs)
         {
-            Message = message;
-            Params = objs;
+            return new Result<T>(false, error ?? MessageKind.Unexpected, null, objs);
         }
-    }
 
-    public class SuccessResult<T> : Result<T>
-    {
-        public SuccessResult(T data, MessageKind? message = null, params object[] objs)
-            :base(true, data, message, objs)
+        public static Result<T> Failure(T data, MessageKind? error, Exception exception, params object[] objs)
         {
-        }
-    }
-
-    public class FailedResult<T> : Result<T>
-    {
-        public FailedResult(Exception e, MessageKind? message = null, params object[] objs)
-            : base(e, message, objs)
-        {
-        }
-        public FailedResult(SheaftException e, MessageKind? message = null, params object[] objs)
-            : base(e, message, objs)
-        {
+            return new Result<T>(false, error ?? MessageKind.Unexpected, exception, objs);
         }
     }
 }

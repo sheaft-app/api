@@ -1,7 +1,7 @@
-﻿using Sheaft.Domain.Models;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Sheaft.Domain.Enums;
+using Sheaft.Domain;
+using Sheaft.Domain.Enum;
 
 namespace Sheaft.Infrastructure.Persistence.Configurations
 {
@@ -30,6 +30,8 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
 
                     cb.ToTable("DocumentPages");
                 });
+                
+                d.Ignore(c => c.DomainEvents);
 
                 d.HasIndex(c => c.Id).IsUnique();
                 d.HasIndex(c => c.Identifier);

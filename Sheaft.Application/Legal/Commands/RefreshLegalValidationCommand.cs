@@ -3,16 +3,20 @@ using System.Threading.Tasks;
 using MediatR;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Sheaft.Domain.Enums;
-using Sheaft.Core;
 using Newtonsoft.Json;
-using Sheaft.Application.Interop;
-using Sheaft.Domain.Models;
-using Sheaft.Options;
+using Sheaft.Application.Common;
+using Sheaft.Application.Common.Handlers;
+using Sheaft.Application.Common.Interfaces;
+using Sheaft.Application.Common.Interfaces.Services;
+using Sheaft.Application.Common.Models;
+using Sheaft.Application.Common.Options;
+using Sheaft.Application.Withholding.Commands;
+using Sheaft.Domain;
+using Sheaft.Domain.Enum;
 
-namespace Sheaft.Application.Commands
+namespace Sheaft.Application.Legal.Commands
 {
-    public class RefreshLegalValidationCommand : Command<bool>
+    public class RefreshLegalValidationCommand : Command
     {
         [JsonConstructor]
         public RefreshLegalValidationCommand(RequestUser requestUser, string identifier)
@@ -23,8 +27,9 @@ namespace Sheaft.Application.Commands
 
         public string Identifier { get; set; }
     }
+
     public class RefreshLegalValidationCommandHandler : CommandsHandler,
-           IRequestHandler<RefreshLegalValidationCommand, Result<bool>>
+        IRequestHandler<RefreshLegalValidationCommand, Result>
     {
         private readonly PspOptions _pspOptions;
         private readonly IPspService _pspService;
@@ -41,41 +46,38 @@ namespace Sheaft.Application.Commands
             _pspService = pspService;
         }
 
-        public async Task<Result<bool>> Handle(RefreshLegalValidationCommand request, CancellationToken token)
+        public async Task<Result> Handle(RefreshLegalValidationCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(request, async () =>
+            var legal = await _context.GetSingleAsync<Domain.Legal>(b => b.User.Identifier == request.Identifier, token);
+            var validation = LegalValidation.NotSpecified;
+            if (legal is BusinessLegal)
             {
-                var legal = await _context.GetSingleAsync<Legal>(b => b.User.Identifier == request.Identifier, token);
-                var validation = LegalValidation.NotSpecified;
-                if (legal is BusinessLegal)
+                var userResult = await _pspService.GetCompanyAsync(request.Identifier, token);
+                if (!userResult.Succeeded)
+                    return Failure(userResult.Exception);
+
+                validation = userResult.Data.KYCLevel;
+            }
+            else
+            {
+                var userResult = await _pspService.GetConsumerAsync(request.Identifier, token);
+                if (!userResult.Succeeded)
+                    return Failure(userResult.Exception);
+
+                validation = userResult.Data.KYCLevel;
+            }
+
+            legal.SetValidation(validation);
+            await _context.SaveChangesAsync(token);
+
+            if (validation == LegalValidation.Regular && legal.User.Kind == ProfileKind.Producer)
+                _mediatr.Post(new CreateWithholdingCommand(request.RequestUser)
                 {
-                    var userResult = await _pspService.GetCompanyAsync(request.Identifier, token);
-                    if (!userResult.Success)
-                        return Failed<bool>(userResult.Exception);
+                    UserId = legal.User.Id,
+                    Amount = _pspOptions.ProducerFees
+                });
 
-                    validation = userResult.Data.KYCLevel;
-                }
-                else
-                {
-                    var userResult = await _pspService.GetConsumerAsync(request.Identifier, token);
-                    if (!userResult.Success)
-                        return Failed<bool>(userResult.Exception);
-
-                    validation = userResult.Data.KYCLevel;
-                }
-
-                legal.SetValidation(validation);
-                await _context.SaveChangesAsync(token);
-
-                if(validation == LegalValidation.Regular && legal.User.Kind == ProfileKind.Producer)
-                    _mediatr.Post(new CreateWithholdingCommand(request.RequestUser)
-                    {
-                        UserId = legal.User.Id,
-                        Amount = _pspOptions.ProducerFees
-                    });
-
-                return Ok(true);
-            });
+            return Success();
         }
     }
 }

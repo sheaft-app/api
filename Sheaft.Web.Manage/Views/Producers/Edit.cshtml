@@ -1,4 +1,5 @@
-﻿@model ProducerViewModel
+﻿@using Sheaft.Application.Common.Models.ViewModels
+@model Sheaft.Application.Common.Models.ViewModels.ProducerViewModel
 @{
     ViewData["Title"] = "Producer details";
     var availableTags = ((List<TagViewModel>)ViewBag.Tags).Select(c => new SelectListItem(c.Name, c.Id.ToString("D"))).ToList();

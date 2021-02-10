@@ -7,23 +7,26 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
-using Sheaft.Application.Interop;
-using Sheaft.Core;
-using Sheaft.Domain.Models;
-using Sheaft.Options;
+using Sheaft.Application.Common;
+using Sheaft.Application.Common.Handlers;
+using Sheaft.Application.Common.Interfaces;
+using Sheaft.Application.Common.Interfaces.Services;
+using Sheaft.Application.Common.Models;
+using Sheaft.Application.Common.Options;
+using Sheaft.Domain;
 
-namespace Sheaft.Application.Commands
+namespace Sheaft.Application.Producer.Commands
 {
-    public class GenerateProducersFileCommand : Command<bool>
+    public class GenerateProducersFileCommand : Command
     {
         [JsonConstructor]
         public GenerateProducersFileCommand(RequestUser requestUser) : base(requestUser)
         {
         }
     }
-    
+
     public class GenerateProducersFileCommandHandler : CommandsHandler,
-        IRequestHandler<GenerateProducersFileCommand, Result<bool>>
+        IRequestHandler<GenerateProducersFileCommand, Result>
     {
         private readonly RoleOptions _roleOptions;
         private readonly IBlobService _blobService;
@@ -40,40 +43,43 @@ namespace Sheaft.Application.Commands
             _blobService = blobService;
         }
 
-        public async Task<Result<bool>> Handle(GenerateProducersFileCommand request, CancellationToken token)
+        public async Task<Result> Handle(GenerateProducersFileCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(request, async () =>
-            {
-                var producers = await _context.GetAsync<Producer>(p => p.CanDirectSell, token);
-                var prods = producers.Select(p => new ProducerListItem(p));
+            var producers = await _context.GetAsync<Domain.Producer>(p => p.CanDirectSell, token);
+            var prods = producers.Select(p => new ProducerListItem(p));
 
-                var result = await _blobService.UploadProducersListAsync(
-                    Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(prods, 
-                        new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore, ContractResolver = new DefaultContractResolver { NamingStrategy = new CamelCaseNamingStrategy() }})), token);
-                
-                if(!result.Success)
-                    return Failed<bool>(result.Exception);
+            var result = await _blobService.UploadProducersListAsync(
+                Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(prods,
+                    new JsonSerializerSettings
+                    {
+                        NullValueHandling = NullValueHandling.Ignore,
+                        ContractResolver = new DefaultContractResolver {NamingStrategy = new CamelCaseNamingStrategy()}
+                    })), token);
 
-                return Ok(true);
-            });
-        }    
+            if (!result.Succeeded)
+                return Failure(result.Exception);
+
+            return Success();
+        }
 
         internal class ProducerListItem
         {
-            internal ProducerListItem(User user)
+            internal ProducerListItem(Domain.User user)
             {
                 Address = new AddressItem(user.Address);
                 Id = user.Id.ToString("N");
                 Name = user.Name;
                 Picture = user.Picture;
             }
+
             public string Id { get; set; }
             public string Name { get; set; }
             public string Picture { get; set; }
             public AddressItem Address { get; set; }
         }
 
-        internal class AddressItem {
+        internal class AddressItem
+        {
             internal AddressItem(UserAddress address)
             {
                 Line1 = address.Line1;
@@ -83,6 +89,7 @@ namespace Sheaft.Application.Commands
                 Latitude = address.Latitude;
                 Longitude = address.Longitude;
             }
+
             public string Line1 { get; set; }
             public string Line2 { get; set; }
             public string Zipcode { get; set; }

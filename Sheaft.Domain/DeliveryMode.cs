@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Sheaft.Domain.Enums;
+using Sheaft.Domain.Common;
+using Sheaft.Domain.Enum;
 using Sheaft.Domain.Interop;
 
-namespace Sheaft.Domain.Models
+namespace Sheaft.Domain
 {
-    public class DeliveryMode : IEntity
+    public class DeliveryMode : IEntity, IHasDomainEvent
     {
         private List<TimeSlotHour> _openingHours;
 
@@ -26,6 +27,7 @@ namespace Sheaft.Domain.Models
 
             SetOpeningHours(openingHours);
             SetAvailability(available);
+            DomainEvents = new List<DomainEvent>();
         }
 
         public Guid Id { get; private set; }
@@ -93,5 +95,7 @@ namespace Sheaft.Domain.Models
         {
             MaxPurchaseOrdersPerTimeSlot = maxPurchaseOrdersPerTimeSlot;
         }
+
+        public List<DomainEvent> DomainEvents { get; } = new List<DomainEvent>();
     }
 }

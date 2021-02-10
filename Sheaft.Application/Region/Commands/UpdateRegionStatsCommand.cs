@@ -1,18 +1,21 @@
-﻿using Newtonsoft.Json;
-using Sheaft.Core;
-using System;
+﻿using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using Sheaft.Application.Interop;
-using Sheaft.Domain.Models;
+using Newtonsoft.Json;
+using Sheaft.Application.Common;
+using Sheaft.Application.Common.Handlers;
+using Sheaft.Application.Common.Interfaces;
+using Sheaft.Application.Common.Interfaces.Services;
+using Sheaft.Application.Common.Models;
+using Sheaft.Domain;
 
-namespace Sheaft.Application.Commands
+namespace Sheaft.Application.Region.Commands
 {
-    public class UpdateRegionStatsCommand : Command<bool>
+    public class UpdateRegionStatsCommand : Command
     {
         [JsonConstructor]
         public UpdateRegionStatsCommand(RequestUser requestUser) : base(requestUser)
@@ -25,9 +28,9 @@ namespace Sheaft.Application.Commands
         public int Producers { get; set; }
         public int Stores { get; set; }
     }
-    
+
     public class UpdateRegionStatsCommandHandler : CommandsHandler,
-        IRequestHandler<UpdateRegionStatsCommand, Result<bool>>
+        IRequestHandler<UpdateRegionStatsCommand, Result>
     {
         public UpdateRegionStatsCommandHandler(
             ISheaftMediatr mediatr,
@@ -37,24 +40,22 @@ namespace Sheaft.Application.Commands
         {
         }
 
-        public async Task<Result<bool>> Handle(UpdateRegionStatsCommand request, CancellationToken token)
+        public async Task<Result> Handle(UpdateRegionStatsCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(request, async () =>
-            {
-                var region = await _context.Regions.SingleOrDefaultAsync(c => c.Id == request.Id, token);
+            var region = await _context.Regions.SingleOrDefaultAsync(c => c.Id == request.Id, token);
 
-                region.SetPoints(request.Points);
-                region.SetPosition(request.Position);
-                var consumersCount = await _context.Users.OfType<Consumer>().CountAsync(u => !u.RemovedOn.HasValue && u.Address.Department.Region.Id == request.Id, token);
+            region.SetPoints(request.Points);
+            region.SetPosition(request.Position);
+            var consumersCount = await _context.Users.OfType<Domain.Consumer>()
+                .CountAsync(u => !u.RemovedOn.HasValue && u.Address.Department.Region.Id == request.Id, token);
 
-                region.SetConsumersCount(consumersCount);
+            region.SetConsumersCount(consumersCount);
 
-                region.SetProducersCount(request.Producers);
-                region.SetStoresCount(request.Stores);
+            region.SetProducersCount(request.Producers);
+            region.SetStoresCount(request.Stores);
 
-                await _context.SaveChangesAsync(token);
-                return Ok(true);
-            });
+            await _context.SaveChangesAsync(token);
+            return Success();
         }
     }
 }

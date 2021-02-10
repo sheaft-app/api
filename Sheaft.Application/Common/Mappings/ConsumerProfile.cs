@@ -1,22 +1,23 @@
 ﻿using AutoMapper;
-using Sheaft.Application.Commands;
-using Sheaft.Domain.Models;
-using Sheaft.Application.Models;
+using Sheaft.Application.Common.Models.Dto;
+using Sheaft.Application.Common.Models.Inputs;
+using Sheaft.Application.Common.Models.ViewModels;
+using Sheaft.Application.Consumer.Commands;
 
-namespace Sheaft.Application.Mappers
+namespace Sheaft.Application.Common.Mappings
 {
     public class ConsumerProfile : Profile
     {
         public ConsumerProfile()
         {
-            CreateMap<Consumer, UserViewModel>();
-            CreateMap<Consumer, ConsumerViewModel>();
+            CreateMap<Domain.Consumer, UserViewModel>();
+            CreateMap<Domain.Consumer, ConsumerViewModel>();
 
-            CreateMap<Consumer, UserDto>()
+            CreateMap<Domain.Consumer, UserDto>()
                 .ForMember(c => c.Address, opt => opt.MapFrom(d => d.Address));
 
-            CreateMap<Consumer, ConsumerDto>()
-                .IncludeBase<Consumer, UserDto>();
+            CreateMap<Domain.Consumer, ConsumerDto>()
+                .IncludeBase<Domain.Consumer, UserDto>();
 
             CreateMap<RegisterConsumerInput, RegisterConsumerCommand>();
             CreateMap<UpdateConsumerInput, UpdateConsumerCommand>();

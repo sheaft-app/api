@@ -7,24 +7,29 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Sheaft.Core;
 using Newtonsoft.Json;
-using Sheaft.Application.Interop;
-using Sheaft.Domain.Enums;
-using Sheaft.Options;
+using Sheaft.Application.Common;
+using Sheaft.Application.Common.Extensions;
+using Sheaft.Application.Common.Handlers;
+using Sheaft.Application.Common.Interfaces;
+using Sheaft.Application.Common.Interfaces.Services;
+using Sheaft.Application.Common.Models;
+using Sheaft.Application.Common.Options;
+using Sheaft.Domain;
+using Sheaft.Domain.Enum;
 
-namespace Sheaft.Application.Commands
+namespace Sheaft.Application.Transfer.Commands
 {
-    public class CheckTransfersCommand : Command<bool>
+    public class CheckTransfersCommand : Command
     {
         [JsonConstructor]
         public CheckTransfersCommand(RequestUser requestUser) : base(requestUser)
         {
         }
     }
-    
+
     public class CheckTransfersCommandHandler : CommandsHandler,
-        IRequestHandler<CheckTransfersCommand, Result<bool>>
+        IRequestHandler<CheckTransfersCommand, Result>
     {
         private readonly IPspService _pspService;
         private readonly RoutineOptions _routineOptions;
@@ -41,30 +46,27 @@ namespace Sheaft.Application.Commands
             _routineOptions = routineOptions.Value;
         }
 
-        public async Task<Result<bool>> Handle(CheckTransfersCommand request, CancellationToken token)
+        public async Task<Result> Handle(CheckTransfersCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(request, async () =>
+            var skip = 0;
+            const int take = 100;
+
+            var transferIds = await GetNextTransferIdsAsync(skip, take, token);
+            while (transferIds.Any())
             {
-                var skip = 0;
-                const int take = 100;
-
-                var transferIds = await GetNextTransferIdsAsync(skip, take, token);
-                while (transferIds.Any())
+                foreach (var transferId in transferIds)
                 {
-                    foreach (var transferId in transferIds)
+                    _mediatr.Post(new CheckTransferCommand(request.RequestUser)
                     {
-                        _mediatr.Post(new CheckTransferCommand(request.RequestUser)
-                        {
-                            TransferId = transferId
-                        });
-                    }
-
-                    skip += take;
-                    transferIds = await GetNextTransferIdsAsync(skip, take, token);
+                        TransferId = transferId
+                    });
                 }
 
-                return Ok(true);
-            });
+                skip += take;
+                transferIds = await GetNextTransferIdsAsync(skip, take, token);
+            }
+
+            return Success();
         }
 
         private async Task<IEnumerable<Guid>> GetNextTransferIdsAsync(int skip, int take, CancellationToken token)

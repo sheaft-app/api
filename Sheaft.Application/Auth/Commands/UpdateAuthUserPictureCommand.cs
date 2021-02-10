@@ -4,13 +4,18 @@ using System.Threading.Tasks;
 using MediatR;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Logging;
-using Sheaft.Core;
 using Newtonsoft.Json;
-using Sheaft.Application.Interop;
+using Sheaft.Application.Common;
+using Sheaft.Application.Common.Handlers;
+using Sheaft.Application.Common.Interfaces;
+using Sheaft.Application.Common.Interfaces.Services;
+using Sheaft.Application.Common.Models;
+using Sheaft.Application.Common.Models.Inputs;
+using Sheaft.Domain;
 
-namespace Sheaft.Application.Commands
+namespace Sheaft.Application.Auth.Commands
 {
-    public class UpdateAuthUserPictureCommand : Command<bool>
+    public class UpdateAuthUserPictureCommand : Command
     {
         [JsonConstructor]
         public UpdateAuthUserPictureCommand(RequestUser requestUser) : base(requestUser)
@@ -22,7 +27,7 @@ namespace Sheaft.Application.Commands
     }
 
     public class UpdateAuthUserPictureCommandHandler : CommandsHandler,
-        IRequestHandler<UpdateAuthUserPictureCommand, Result<bool>>
+        IRequestHandler<UpdateAuthUserPictureCommand, Result>
     {
         private readonly IAuthService _authService;
         private readonly IDistributedCache _cache;
@@ -39,19 +44,16 @@ namespace Sheaft.Application.Commands
             _cache = cache;
         }
 
-        public async Task<Result<bool>> Handle(UpdateAuthUserPictureCommand request, CancellationToken token)
+        public async Task<Result> Handle(UpdateAuthUserPictureCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(request, async () =>
-            {
-                var result =
-                    await _authService.UpdateUserPictureAsync(
-                        new Models.IdentityPictureInput(request.UserId, request.Picture), token);
-                if (!result.Success)
-                    return result;
-
-                await _cache.RemoveAsync(request.UserId.ToString("N"));
+            var result =
+                await _authService.UpdateUserPictureAsync(
+                    new IdentityPictureInput(request.UserId, request.Picture), token);
+            if (!result.Succeeded)
                 return result;
-            });
+
+            await _cache.RemoveAsync(request.UserId.ToString("N"));
+            return result;
         }
     }
 }

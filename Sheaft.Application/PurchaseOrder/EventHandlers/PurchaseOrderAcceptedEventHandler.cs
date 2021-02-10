@@ -1,18 +1,15 @@
-﻿using System.Linq;
-using System.Threading;
+﻿using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
 using Microsoft.Extensions.Configuration;
-using Newtonsoft.Json;
-using Sheaft.Application.Commands.Handlers;
 using Sheaft.Application.Common.Extensions;
-using Sheaft.Application.Events;
-using Sheaft.Domain.Models;
-using Sheaft.Application.Interop;
-using Sheaft.Application.Models;
-using Sheaft.Application.Models.Mailer;
+using Sheaft.Application.Common.Handlers;
+using Sheaft.Application.Common.Interfaces;
+using Sheaft.Application.Common.Interfaces.Services;
+using Sheaft.Application.Common.Models;
+using Sheaft.Domain.Events.PurchaseOrder;
 
-namespace Sheaft.Application.Handlers
+namespace Sheaft.Application.PurchaseOrder.EventHandlers
 {
     public class PurchaseOrderAcceptedEventHandler : EventsHandler,
         INotificationHandler<DomainEventNotification<PurchaseOrderAcceptedEvent>>
@@ -32,7 +29,7 @@ namespace Sheaft.Application.Handlers
         public async Task Handle(DomainEventNotification<PurchaseOrderAcceptedEvent> notification, CancellationToken token)
         {
             var orderEvent = notification.DomainEvent;
-            var purchaseOrder = await _context.GetByIdAsync<PurchaseOrder>(orderEvent.PurchaseOrderId, token);
+            var purchaseOrder = await _context.GetByIdAsync<Domain.PurchaseOrder>(orderEvent.PurchaseOrderId, token);
             await _signalrService.SendNotificationToUserAsync(purchaseOrder.Sender.Id, nameof(PurchaseOrderAcceptedEvent), purchaseOrder.GetPurchaseNotifModelAsString());
 
             var email = purchaseOrder.Sender.Email;

@@ -1,11 +1,14 @@
-using Sheaft.Domain.Interop;
 using System;
-using Sheaft.Domain.Enums;
-using Sheaft.Domains.Exceptions;
+using System.Collections.Generic;
+using Sheaft.Domain.Common;
+using Sheaft.Domain.Enum;
+using Sheaft.Domain.Events.User;
+using Sheaft.Domain.Exceptions;
+using Sheaft.Domain.Interop;
 
-namespace Sheaft.Domain.Models
+namespace Sheaft.Domain
 {
-    public class Sponsoring: ITrackCreation, ITrackRemove
+    public class Sponsoring: ITrackCreation, ITrackRemove, IHasDomainEvent
     {
         protected Sponsoring() { }
 
@@ -19,11 +22,13 @@ namespace Sheaft.Domain.Models
 
             Sponsor = sponsor;
             Sponsored = sponsored;
+            DomainEvents = new List<DomainEvent>{new UserSponsoredEvent(sponsor.Id, sponsored.Id)};
         }
 
         public DateTimeOffset CreatedOn { get; private set; }
         public DateTimeOffset? RemovedOn { get; private set; }
         public virtual User Sponsor { get; private set; }
         public virtual User Sponsored { get; private set; }
+        public List<DomainEvent> DomainEvents { get; } = new List<DomainEvent>();
     }
 }

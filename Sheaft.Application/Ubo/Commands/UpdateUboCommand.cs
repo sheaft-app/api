@@ -4,16 +4,19 @@ using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
 using Microsoft.Extensions.Logging;
-using Sheaft.Domain.Enums;
-using Sheaft.Application.Models;
-using Sheaft.Core;
 using Newtonsoft.Json;
-using Sheaft.Application.Interop;
-using Sheaft.Domain.Models;
+using Sheaft.Application.Common;
+using Sheaft.Application.Common.Handlers;
+using Sheaft.Application.Common.Interfaces;
+using Sheaft.Application.Common.Interfaces.Services;
+using Sheaft.Application.Common.Models;
+using Sheaft.Application.Common.Models.Inputs;
+using Sheaft.Domain;
+using Sheaft.Domain.Enum;
 
-namespace Sheaft.Application.Commands
+namespace Sheaft.Application.Ubo.Commands
 {
-    public class UpdateUboCommand : Command<bool>
+    public class UpdateUboCommand : Command
     {
         [JsonConstructor]
         public UpdateUboCommand(RequestUser requestUser) : base(requestUser)
@@ -31,7 +34,7 @@ namespace Sheaft.Application.Commands
     }
 
     public class UpdateUboCommandHandler : CommandsHandler,
-        IRequestHandler<UpdateUboCommand, Result<bool>>
+        IRequestHandler<UpdateUboCommand, Result>
     {
         private readonly IPspService _pspService;
 
@@ -45,32 +48,29 @@ namespace Sheaft.Application.Commands
             _pspService = pspService;
         }
 
-        public async Task<Result<bool>> Handle(UpdateUboCommand request, CancellationToken token)
+        public async Task<Result> Handle(UpdateUboCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(request, async () =>
-            {
-                var legal = await _context.GetSingleAsync<BusinessLegal>(
-                    c => c.Declaration.Ubos.Any(u => u.Id == request.Id), token);
-                var ubo = legal.Declaration.Ubos.FirstOrDefault(u => u.Id == request.Id);
+            var legal = await _context.GetSingleAsync<BusinessLegal>(
+                c => c.Declaration.Ubos.Any(u => u.Id == request.Id), token);
+            var ubo = legal.Declaration.Ubos.FirstOrDefault(u => u.Id == request.Id);
 
-                ubo.SetFirstName(request.FirstName);
-                ubo.SetLastName(request.LastName);
-                ubo.SetBirthDate(request.BirthDate);
+            ubo.SetFirstName(request.FirstName);
+            ubo.SetLastName(request.LastName);
+            ubo.SetBirthDate(request.BirthDate);
 
-                var address = new UboAddress(request.Address.Line1, request.Address.Line2, request.Address.Zipcode,
-                    request.Address.City, request.Address.Country);
-                ubo.SetAddress(address);
+            var address = new UboAddress(request.Address.Line1, request.Address.Line2, request.Address.Zipcode,
+                request.Address.City, request.Address.Country);
+            ubo.SetAddress(address);
 
-                var birthPlace = new BirthAddress(request.BirthPlace.City, request.BirthPlace.Country);
-                ubo.SetBirthPlace(birthPlace);
+            var birthPlace = new BirthAddress(request.BirthPlace.City, request.BirthPlace.Country);
+            ubo.SetBirthPlace(birthPlace);
 
-                var result = await _pspService.UpdateUboAsync(ubo, legal.Declaration, legal.User, token);
-                if (!result.Success)
-                    return Failed<bool>(result.Exception);
+            var result = await _pspService.UpdateUboAsync(ubo, legal.Declaration, legal.User, token);
+            if (!result.Succeeded)
+                return Failure(result.Exception);
 
-                await _context.SaveChangesAsync(token);
-                return Ok(true);
-            });
+            await _context.SaveChangesAsync(token);
+            return Success();
         }
     }
 }

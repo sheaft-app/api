@@ -4,24 +4,29 @@ using System.Threading.Tasks;
 using MediatR;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using Sheaft.Application.Interop;
-using Sheaft.Core;
-using Sheaft.Domain.Models;
+using Sheaft.Application.Common;
+using Sheaft.Application.Common.Handlers;
+using Sheaft.Application.Common.Interfaces;
+using Sheaft.Application.Common.Interfaces.Services;
+using Sheaft.Application.Common.Models;
+using Sheaft.Domain;
 
-namespace Sheaft.Application.Commands
+namespace Sheaft.Application.PurchaseOrder.Commands
 {
-    public class ShipPurchaseOrderCommand : Command<bool>
+    public class ShipPurchaseOrderCommand : Command
     {
         [JsonConstructor]
         public ShipPurchaseOrderCommand(RequestUser requestUser) : base(requestUser)
         {
+            SkipNotification = false;
         }
 
         public Guid Id { get; set; }
+        public bool SkipNotification { get; set; }
     }
-    
+
     public class ShipPurchaseOrderCommandHandler : CommandsHandler,
-        IRequestHandler<ShipPurchaseOrderCommand, Result<bool>>
+        IRequestHandler<ShipPurchaseOrderCommand, Result>
     {
         private readonly ICapingDeliveriesService _capingDeliveriesService;
 
@@ -34,17 +39,14 @@ namespace Sheaft.Application.Commands
         {
             _capingDeliveriesService = capingDeliveriesService;
         }
-        
-        public async Task<Result<bool>> Handle(ShipPurchaseOrderCommand request, CancellationToken token)
-        {
-            return await ExecuteAsync(request, async () =>
-            {
-                var purchaseOrder = await _context.GetByIdAsync<PurchaseOrder>(request.Id, token);
-                purchaseOrder.Ship();
 
-                await _context.SaveChangesAsync(token);
-                return Ok(true);
-            });
+        public async Task<Result> Handle(ShipPurchaseOrderCommand request, CancellationToken token)
+        {
+            var purchaseOrder = await _context.GetByIdAsync<Domain.PurchaseOrder>(request.Id, token);
+            purchaseOrder.Ship(request.SkipNotification);
+
+            await _context.SaveChangesAsync(token);
+            return Success();
         }
     }
 }

@@ -4,13 +4,16 @@ using System.Threading.Tasks;
 using MediatR;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using Sheaft.Application.Interop;
-using Sheaft.Core;
-using Sheaft.Domain.Models;
+using Sheaft.Application.Common;
+using Sheaft.Application.Common.Handlers;
+using Sheaft.Application.Common.Interfaces;
+using Sheaft.Application.Common.Interfaces.Services;
+using Sheaft.Application.Common.Models;
+using Sheaft.Domain;
 
-namespace Sheaft.Application.Commands
+namespace Sheaft.Application.QuickOrder.Commands
 {
-    public class UpdateQuickOrderCommand : Command<bool>
+    public class UpdateQuickOrderCommand : Command
     {
         [JsonConstructor]
         public UpdateQuickOrderCommand(RequestUser requestUser) : base(requestUser)
@@ -23,7 +26,7 @@ namespace Sheaft.Application.Commands
     }
 
     public class UpdateQuickOrderCommandHandler : CommandsHandler,
-        IRequestHandler<UpdateQuickOrderCommand, Result<bool>>
+        IRequestHandler<UpdateQuickOrderCommand, Result>
     {
         public UpdateQuickOrderCommandHandler(
             ISheaftMediatr mediatr,
@@ -33,17 +36,14 @@ namespace Sheaft.Application.Commands
         {
         }
 
-        public async Task<Result<bool>> Handle(UpdateQuickOrderCommand request, CancellationToken token)
+        public async Task<Result> Handle(UpdateQuickOrderCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(request, async () =>
-            {
-                var entity = await _context.GetByIdAsync<QuickOrder>(request.Id, token);
-                entity.SetName(request.Name);
-                entity.SetDescription(request.Name);
+            var entity = await _context.GetByIdAsync<Domain.QuickOrder>(request.Id, token);
+            entity.SetName(request.Name);
+            entity.SetDescription(request.Name);
 
-                await _context.SaveChangesAsync(token);
-                return Ok(true);
-            });
+            await _context.SaveChangesAsync(token);
+            return Success();
         }
     }
 }

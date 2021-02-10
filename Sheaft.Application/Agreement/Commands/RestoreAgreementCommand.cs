@@ -5,12 +5,16 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using Sheaft.Application.Interop;
-using Sheaft.Core;
+using Sheaft.Application.Common;
+using Sheaft.Application.Common.Handlers;
+using Sheaft.Application.Common.Interfaces;
+using Sheaft.Application.Common.Interfaces.Services;
+using Sheaft.Application.Common.Models;
+using Sheaft.Domain;
 
-namespace Sheaft.Application.Commands
+namespace Sheaft.Application.Agreement.Commands
 {
-    public class RestoreAgreementCommand : Command<bool>
+    public class RestoreAgreementCommand : Command
     {
         [JsonConstructor]
         public RestoreAgreementCommand(RequestUser requestUser) : base(requestUser)
@@ -19,9 +23,9 @@ namespace Sheaft.Application.Commands
 
         public Guid Id { get; set; }
     }
-    
+
     public class RestoreAgreementCommandsHandler : CommandsHandler,
-        IRequestHandler<RestoreAgreementCommand, Result<bool>>
+        IRequestHandler<RestoreAgreementCommand, Result>
     {
         public RestoreAgreementCommandsHandler(
             ISheaftMediatr mediatr,
@@ -31,17 +35,15 @@ namespace Sheaft.Application.Commands
         {
         }
 
-        public async Task<Result<bool>> Handle(RestoreAgreementCommand request, CancellationToken token)
+        public async Task<Result> Handle(RestoreAgreementCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(request, async () =>
-            {
-                var entity = await _context.Agreements.SingleOrDefaultAsync(a => a.Id == request.Id && a.RemovedOn.HasValue, token);
+            var entity =
+                await _context.Agreements.SingleOrDefaultAsync(a => a.Id == request.Id && a.RemovedOn.HasValue, token);
 
-                _context.Restore(entity);
-                await _context.SaveChangesAsync(token);
+            _context.Restore(entity);
+            await _context.SaveChangesAsync(token);
 
-                return Ok(true);
-            });
+            return Success();
         }
     }
 }

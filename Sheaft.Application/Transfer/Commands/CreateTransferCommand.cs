@@ -4,15 +4,18 @@ using System.Threading.Tasks;
 using MediatR;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Sheaft.Core;
 using Newtonsoft.Json;
-using Sheaft.Application.Interop;
-using Sheaft.Domain.Enums;
-using Sheaft.Domain.Models;
-using Sheaft.Exceptions;
-using Sheaft.Options;
+using Sheaft.Application.Common;
+using Sheaft.Application.Common.Handlers;
+using Sheaft.Application.Common.Interfaces;
+using Sheaft.Application.Common.Interfaces.Services;
+using Sheaft.Application.Common.Models;
+using Sheaft.Application.Common.Options;
+using Sheaft.Application.Producer.Commands;
+using Sheaft.Domain;
+using Sheaft.Domain.Enum;
 
-namespace Sheaft.Application.Commands
+namespace Sheaft.Application.Transfer.Commands
 {
     public class CreateTransferCommand : Command<Guid>
     {
@@ -23,7 +26,7 @@ namespace Sheaft.Application.Commands
 
         public Guid PurchaseOrderId { get; set; }
     }
-    
+
     public class CreateTransferCommandHandler : CommandsHandler,
         IRequestHandler<CreateTransferCommand, Result<Guid>>
     {
@@ -44,48 +47,49 @@ namespace Sheaft.Application.Commands
 
         public async Task<Result<Guid>> Handle(CreateTransferCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(request, async () =>
+            var purchaseOrder = await _context.GetByIdAsync<Domain.PurchaseOrder>(request.PurchaseOrderId, token);
+            if (purchaseOrder.Status != PurchaseOrderStatus.Delivered)
+                return Failure<Guid>(MessageKind.Transfer_CannotCreate_PurchaseOrder_Invalid_Status);
+
+            if (purchaseOrder.Transfer != null && purchaseOrder.Transfer.Status == TransactionStatus.Succeeded)
+                return Failure<Guid>(MessageKind.Transfer_CannotCreate_AlreadyProcessed);
+
+            if (purchaseOrder.Transfer != null && purchaseOrder.Transfer.Status != TransactionStatus.Failed)
+                return Failure<Guid>(MessageKind.Transfer_CannotCreate_Pending_Transfer);
+
+            var checkResult =
+                await _mediatr.Process(
+                    new CheckProducerConfigurationCommand(request.RequestUser) {ProducerId = purchaseOrder.Vendor.Id},
+                    token);
+            if (!checkResult.Succeeded)
+                return Failure<Guid>(checkResult.Exception);
+
+            var debitedWallet = await _context.GetSingleAsync<Domain.Wallet>(c => c.User.Id == purchaseOrder.Sender.Id, token);
+            var creditedWallet =
+                await _context.GetSingleAsync<Domain.Wallet>(c => c.User.Id == purchaseOrder.Vendor.Id, token);
+
+            using (var transaction = await _context.BeginTransactionAsync(token))
             {
-                var purchaseOrder = await _context.GetByIdAsync<PurchaseOrder>(request.PurchaseOrderId, token);
-                if (purchaseOrder.Status != PurchaseOrderStatus.Delivered)
-                    return BadRequest<Guid>(MessageKind.Transfer_CannotCreate_PurchaseOrder_Invalid_Status);
+                var transfer = new Domain.Transfer(Guid.NewGuid(), debitedWallet, creditedWallet, purchaseOrder);
+                await _context.AddAsync(transfer, token);
+                await _context.SaveChangesAsync(token);
 
-                if (purchaseOrder.Transfer != null && purchaseOrder.Transfer.Status == TransactionStatus.Succeeded)
-                    return BadRequest<Guid>(MessageKind.Transfer_CannotCreate_AlreadyProcessed);
+                purchaseOrder.SetTransfer(transfer);
 
-                if (purchaseOrder.Transfer != null && purchaseOrder.Transfer.Status != TransactionStatus.Failed)
-                    return BadRequest<Guid>(MessageKind.Transfer_CannotCreate_Pending_Transfer);
+                var result = await _pspService.CreateTransferAsync(transfer, token);
+                if (!result.Succeeded)
+                    return Failure<Guid>(result.Exception);
 
-                var checkResult = await _mediatr.Process(new CheckProducerConfigurationCommand(request.RequestUser) { ProducerId = purchaseOrder.Vendor.Id }, token);
-                if (!checkResult.Success)
-                    return Failed<Guid>(checkResult.Exception);
+                transfer.SetResult(result.Data.ResultCode, result.Data.ResultMessage);
+                transfer.SetIdentifier(result.Data.Identifier);
+                transfer.SetStatus(result.Data.Status);
+                transfer.SetExecutedOn(result.Data.ProcessedOn);
 
-                var debitedWallet = await _context.GetSingleAsync<Wallet>(c => c.User.Id == purchaseOrder.Sender.Id, token);
-                var creditedWallet = await _context.GetSingleAsync<Wallet>(c => c.User.Id == purchaseOrder.Vendor.Id, token);
+                await _context.SaveChangesAsync(token);
+                await transaction.CommitAsync(token);
 
-                using (var transaction = await _context.BeginTransactionAsync(token))
-                {
-                    var transfer = new Transfer(Guid.NewGuid(), debitedWallet, creditedWallet, purchaseOrder);
-                    await _context.AddAsync(transfer, token);
-                    await _context.SaveChangesAsync(token);
-
-                    purchaseOrder.SetTransfer(transfer);
-
-                    var result = await _pspService.CreateTransferAsync(transfer, token);
-                    if (!result.Success)
-                        return Failed<Guid>(result.Exception);
-
-                    transfer.SetResult(result.Data.ResultCode, result.Data.ResultMessage);
-                    transfer.SetIdentifier(result.Data.Identifier);
-                    transfer.SetStatus(result.Data.Status);
-                    transfer.SetExecutedOn(result.Data.ProcessedOn);
-
-                    await _context.SaveChangesAsync(token);
-                    await transaction.CommitAsync(token);
-
-                    return Ok(transfer.Id);
-                }
-            });
+                return Success(transfer.Id);
+            }
         }
     }
 }

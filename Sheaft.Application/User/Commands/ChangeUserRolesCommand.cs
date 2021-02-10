@@ -7,14 +7,18 @@ using MediatR;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
-using Sheaft.Application.Interop;
-using Sheaft.Core;
-using Sheaft.Domain.Models;
-using Sheaft.Options;
+using Sheaft.Application.Auth.Commands;
+using Sheaft.Application.Common;
+using Sheaft.Application.Common.Handlers;
+using Sheaft.Application.Common.Interfaces;
+using Sheaft.Application.Common.Interfaces.Services;
+using Sheaft.Application.Common.Models;
+using Sheaft.Application.Common.Options;
+using Sheaft.Domain;
 
-namespace Sheaft.Application.Commands
+namespace Sheaft.Application.User.Commands
 {
-    public class ChangeUserRolesCommand : Command<bool>
+    public class ChangeUserRolesCommand : Command
     {
         [JsonConstructor]
         public ChangeUserRolesCommand(RequestUser requestUser) : base(requestUser)
@@ -24,9 +28,9 @@ namespace Sheaft.Application.Commands
         public Guid UserId { get; set; }
         public IEnumerable<string> Roles { get; set; }
     }
-    
+
     public class ChangeUserRolesCommandHandler : CommandsHandler,
-        IRequestHandler<ChangeUserRolesCommand, Result<bool>>
+        IRequestHandler<ChangeUserRolesCommand, Result>
     {
         private readonly IBlobService _blobService;
         private readonly ScoringOptions _scoringOptions;
@@ -46,49 +50,44 @@ namespace Sheaft.Application.Commands
             _blobService = blobService;
         }
 
-        public async Task<Result<bool>> Handle(ChangeUserRolesCommand request, CancellationToken token)
+        public async Task<Result> Handle(ChangeUserRolesCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(request, async () =>
+            var entity = await _context.GetByIdAsync<Domain.User>(request.UserId, token);
+            var roles = new List<Guid>();
+            if (request.Roles.Contains(_roleOptions.Producer.Value))
             {
-                var entity = await _context.GetByIdAsync<User>(request.UserId, token);
+                roles.Add(_roleOptions.Producer.Id);
+            }
 
-                var roles = new List<Guid>();
+            if (request.Roles.Contains(_roleOptions.Store.Value))
+            {
+                roles.Add(_roleOptions.Owner.Id);
+                roles.Add(_roleOptions.Store.Id);
+            }
 
-                if (request.Roles.Contains(_roleOptions.Producer.Value))
-                {
-                    roles.Add(_roleOptions.Producer.Id);
-                }
+            if (request.Roles.Contains(_roleOptions.Consumer.Value))
+            {
+                roles.Add(_roleOptions.Owner.Id);
+                roles.Add(_roleOptions.Consumer.Id);
+            }
 
-                if (request.Roles.Contains(_roleOptions.Store.Value))
-                {
-                    roles.Add(_roleOptions.Owner.Id);
-                    roles.Add(_roleOptions.Store.Id);
-                }
+            var result = await _mediatr.Process(new UpdateAuthUserCommand(request.RequestUser)
+            {
+                Email = entity.Email,
+                FirstName = entity.FirstName,
+                LastName = entity.LastName,
+                Name = entity.Name,
+                Phone = entity.Phone,
+                Picture = entity.Picture,
+                Roles = roles,
+                UserId = entity.Id
+            }, token);
 
-                if (request.Roles.Contains(_roleOptions.Consumer.Value))
-                {
-                    roles.Add(_roleOptions.Owner.Id);
-                    roles.Add(_roleOptions.Consumer.Id);
-                }
+            if (!result.Succeeded)
+                return result;
 
-                var result = await _mediatr.Process(new UpdateAuthUserCommand(request.RequestUser)
-                {
-                    Email = entity.Email,
-                    FirstName = entity.FirstName,
-                    LastName = entity.LastName,
-                    Name = entity.Name,
-                    Phone = entity.Phone,
-                    Picture = entity.Picture,
-                    Roles = roles,
-                    UserId = entity.Id
-                }, token);
-
-                if (!result.Success)
-                    return result;
-
-                await _context.SaveChangesAsync(token);
-                return Ok(true);
-            });
+            await _context.SaveChangesAsync(token);
+            return Success();
         }
     }
 }

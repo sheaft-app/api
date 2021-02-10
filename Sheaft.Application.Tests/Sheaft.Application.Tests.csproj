@@ -20,10 +20,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Sheaft.Application.Interop\Sheaft.Application.Interop.csproj" />
-    <ProjectReference Include="..\Sheaft.Application.Queries\Sheaft.Application.Queries.csproj" />
     <ProjectReference Include="..\Sheaft.Application\Sheaft.Application.csproj" />
-    <ProjectReference Include="..\Sheaft.Infrastructure.Services\Sheaft.Infrastructure.Services.csproj" />
     <ProjectReference Include="..\Sheaft.Infrastructure.Tests\Sheaft.Infrastructure.Tests.csproj" />
   </ItemGroup>
 

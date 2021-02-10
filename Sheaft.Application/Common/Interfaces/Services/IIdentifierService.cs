@@ -1,9 +1,9 @@
-﻿using Sheaft.Core;
-using System;
+﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Sheaft.Application.Common.Models;
 
-namespace Sheaft.Application.Interop
+namespace Sheaft.Application.Common.Interfaces.Services
 {
     public interface IIdentifierService
     {

@@ -5,19 +5,21 @@ using System.Linq;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
-using IdentityModel.Client;
-using Newtonsoft.Json;
-using Sheaft.Core;
-using Sheaft.Application.Models;
-using Sheaft.Options;
-using Microsoft.Extensions.Options;
-using Sheaft.Domain.Models;
 using AutoMapper.QueryableExtensions;
+using IdentityModel.Client;
 using Microsoft.Azure.Search;
 using Microsoft.Azure.Search.Models;
-using Sheaft.Application.Interop;
+using Microsoft.Extensions.Options;
+using Newtonsoft.Json;
+using Sheaft.Application.Common.Extensions;
+using Sheaft.Application.Common.Interfaces;
+using Sheaft.Application.Common.Interfaces.Queries;
+using Sheaft.Application.Common.Models.Dto;
+using Sheaft.Application.Common.Models.Inputs;
+using Sheaft.Application.Common.Options;
+using Sheaft.Domain;
 
-namespace Sheaft.Application.Queries
+namespace Sheaft.Application.Store.Queries
 {
     public class StoreQueries : IStoreQueries
     {
@@ -68,7 +70,7 @@ namespace Sheaft.Application.Queries
                 HighlightPostTag = "</b>"
             };
 
-            var producer = await _context.GetByIdAsync<Producer>(producerId, token);
+            var producer = await _context.GetByIdAsync<Domain.Producer>(producerId, token);
             if (!string.IsNullOrWhiteSpace(terms.Sort))
             {
                 if (terms.Sort.Contains("store_geolocation"))
@@ -130,7 +132,7 @@ namespace Sheaft.Application.Queries
 
         public IQueryable<StoreDto> GetStore(Guid id, RequestUser currentUser)
         {
-            return _context.Users.OfType<Store>()
+            return _context.Users.OfType<Domain.Store>()
                     .Get(c => c.Id == id)
                     .ProjectTo<StoreDto>(_configurationProvider);
         }

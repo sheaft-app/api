@@ -4,16 +4,19 @@ using System.Threading.Tasks;
 using MediatR;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Sheaft.Core;
 using Newtonsoft.Json;
-using Sheaft.Application.Interop;
-using Sheaft.Domain.Enums;
-using Sheaft.Domain.Models;
-using Sheaft.Options;
+using Sheaft.Application.Common;
+using Sheaft.Application.Common.Handlers;
+using Sheaft.Application.Common.Interfaces;
+using Sheaft.Application.Common.Interfaces.Services;
+using Sheaft.Application.Common.Models;
+using Sheaft.Application.Common.Options;
+using Sheaft.Domain;
+using Sheaft.Domain.Enum;
 
-namespace Sheaft.Application.Commands
+namespace Sheaft.Application.Payin.Commands
 {
-    public class CheckPayinCommand : Command<bool>
+    public class CheckPayinCommand : Command
     {
         [JsonConstructor]
         public CheckPayinCommand(RequestUser requestUser) : base(requestUser)
@@ -22,9 +25,9 @@ namespace Sheaft.Application.Commands
 
         public Guid PayinId { get; set; }
     }
-    
+
     public class CheckPayinCommandHandler : CommandsHandler,
-        IRequestHandler<CheckPayinCommand, Result<bool>>
+        IRequestHandler<CheckPayinCommand, Result>
     {
         private readonly IPspService _pspService;
         private readonly RoutineOptions _routineOptions;
@@ -40,21 +43,19 @@ namespace Sheaft.Application.Commands
             _pspService = pspService;
             _routineOptions = routineOptions.Value;
         }
-        
-        public async Task<Result<bool>> Handle(CheckPayinCommand request, CancellationToken token)
+
+        public async Task<Result> Handle(CheckPayinCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(request, async () =>
-            {
-                var payin = await _context.GetByIdAsync<Payin>(request.PayinId, token);
-                if (payin.Status != TransactionStatus.Created && payin.Status != TransactionStatus.Waiting)
-                    return Ok(false);
+            var payin = await _context.GetByIdAsync<Domain.Payin>(request.PayinId, token);
+            if (payin.Status != TransactionStatus.Created && payin.Status != TransactionStatus.Waiting)
+                return Failure();
 
-                var result = await _mediatr.Process(new RefreshPayinStatusCommand(request.RequestUser, payin.Identifier), token);
-                if (!result.Success)
-                    return Failed<bool>(result.Exception);
+            var result = await _mediatr.Process(new RefreshPayinStatusCommand(request.RequestUser, payin.Identifier),
+                token);
+            if (!result.Succeeded)
+                return Failure(result.Exception);
 
-                return Ok(true);
-            });
+            return Success();
         }
     }
 }

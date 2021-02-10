@@ -5,12 +5,16 @@ using System.Threading.Tasks;
 using MediatR;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using Sheaft.Application.Interop;
-using Sheaft.Core;
+using Sheaft.Application.Common;
+using Sheaft.Application.Common.Handlers;
+using Sheaft.Application.Common.Interfaces;
+using Sheaft.Application.Common.Interfaces.Services;
+using Sheaft.Application.Common.Models;
+using Sheaft.Domain;
 
-namespace Sheaft.Application.Commands
+namespace Sheaft.Application.PurchaseOrder.Commands
 {
-    public class CompletePurchaseOrdersCommand : Command<bool>
+    public class CompletePurchaseOrdersCommand : Command
     {
         [JsonConstructor]
         public CompletePurchaseOrdersCommand(RequestUser requestUser) : base(requestUser)
@@ -19,9 +23,9 @@ namespace Sheaft.Application.Commands
 
         public IEnumerable<Guid> Ids { get; set; }
     }
-    
+
     public class CompletePurchaseOrdersCommandHandler : CommandsHandler,
-        IRequestHandler<CompletePurchaseOrdersCommand, Result<bool>>
+        IRequestHandler<CompletePurchaseOrdersCommand, Result>
     {
         private readonly ICapingDeliveriesService _capingDeliveriesService;
 
@@ -34,23 +38,23 @@ namespace Sheaft.Application.Commands
         {
             _capingDeliveriesService = capingDeliveriesService;
         }
-        public async Task<Result<bool>> Handle(CompletePurchaseOrdersCommand request, CancellationToken token)
-        {
-            return await ExecuteAsync(request, async () =>
-            {
-                using (var transaction = await _context.BeginTransactionAsync(token))
-                {
-                    foreach (var purchaseOrderId in request.Ids)
-                    {
-                        var result = await _mediatr.Process(new CompletePurchaseOrderCommand(request.RequestUser) { Id = purchaseOrderId }, token);
-                        if (!result.Success)
-                            return Failed<bool>(result.Exception);
-                    }
 
-                    await transaction.CommitAsync(token);
-                    return Ok(true);
+        public async Task<Result> Handle(CompletePurchaseOrdersCommand request, CancellationToken token)
+        {
+            using (var transaction = await _context.BeginTransactionAsync(token))
+            {
+                foreach (var purchaseOrderId in request.Ids)
+                {
+                    var result =
+                        await _mediatr.Process(
+                            new CompletePurchaseOrderCommand(request.RequestUser) {Id = purchaseOrderId}, token);
+                    if (!result.Succeeded)
+                        return Failure(result.Exception);
                 }
-            });
+
+                await transaction.CommitAsync(token);
+                return Success();
+            }
         }
     }
 }

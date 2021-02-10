@@ -4,16 +4,17 @@ using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
 using Microsoft.Extensions.Logging;
-using Sheaft.Domain.Enums;
-using Sheaft.Application.Models;
-using Sheaft.Core;
 using Newtonsoft.Json;
-using Sheaft.Application.Interop;
-using Sheaft.Domain.Models;
+using Sheaft.Application.Common;
+using Sheaft.Application.Common.Handlers;
+using Sheaft.Application.Common.Interfaces;
+using Sheaft.Application.Common.Interfaces.Services;
+using Sheaft.Application.Common.Models;
+using Sheaft.Domain;
 
-namespace Sheaft.Application.Commands
+namespace Sheaft.Application.Ubo.Commands
 {
-    public class DeleteUboCommand : Command<bool>
+    public class DeleteUboCommand : Command
     {
         [JsonConstructor]
         public DeleteUboCommand(RequestUser requestUser) : base(requestUser)
@@ -24,7 +25,7 @@ namespace Sheaft.Application.Commands
     }
 
     public class DeleteUboCommandHandler : CommandsHandler,
-        IRequestHandler<DeleteUboCommand, Result<bool>>
+        IRequestHandler<DeleteUboCommand, Result>
     {
         private readonly IPspService _pspService;
 
@@ -38,17 +39,14 @@ namespace Sheaft.Application.Commands
             _pspService = pspService;
         }
 
-        public async Task<Result<bool>> Handle(DeleteUboCommand request, CancellationToken token)
+        public async Task<Result> Handle(DeleteUboCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(request, async () =>
-            {
-                var legal = await _context.GetSingleAsync<BusinessLegal>(
-                    c => c.Declaration.Ubos.Any(u => u.Id == request.Id), token);
-                legal.Declaration.RemoveUbo(request.Id);
+            var legal = await _context.GetSingleAsync<BusinessLegal>(
+                c => c.Declaration.Ubos.Any(u => u.Id == request.Id), token);
+            legal.Declaration.RemoveUbo(request.Id);
 
-                await _context.SaveChangesAsync(token);
-                return Ok(true);
-            });
+            await _context.SaveChangesAsync(token);
+            return Success();
         }
     }
 }

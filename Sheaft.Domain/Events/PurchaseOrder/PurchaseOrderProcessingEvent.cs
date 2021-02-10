@@ -1,17 +1,17 @@
 ﻿using System;
 using Newtonsoft.Json;
-using Sheaft.Core;
-using Sheaft.Domain.Models.Common;
+using Sheaft.Domain.Common;
 
-namespace Sheaft.Application.Events
+namespace Sheaft.Domain.Events.PurchaseOrder
 {
     public class PurchaseOrderProcessingEvent : DomainEvent
     {
         [JsonConstructor]
-        public PurchaseOrderProcessingEvent(RequestUser requestUser) : base(requestUser)
+        public PurchaseOrderProcessingEvent(Guid purchaseOrderId)
         {
+            PurchaseOrderId = purchaseOrderId;
         }
 
-        public Guid PurchaseOrderId { get; set; }
+        public Guid PurchaseOrderId { get; }
     }
 }

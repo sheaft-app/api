@@ -1,7 +1,7 @@
 ﻿using HotChocolate.Types;
-using Sheaft.Application.Models;
+using Sheaft.Application.Common.Models.Inputs;
 
-namespace Sheaft.GraphQL.Types
+namespace Sheaft.GraphQL.Types.Inputs
 {
     public class UpdateConsumerLegalsInputType : SheaftInputType<UpdateConsumerLegalInput>
     {

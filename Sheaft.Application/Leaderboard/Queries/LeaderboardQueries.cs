@@ -2,17 +2,17 @@
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Sheaft.Application.Interop;
-using Sheaft.Application.Models;
-using Sheaft.Core;
-using Sheaft.Core.Extensions;
-using Sheaft.Options;
-using Microsoft.Extensions.Options;
 using AutoMapper.QueryableExtensions;
 using Microsoft.EntityFrameworkCore;
-using Sheaft.Domain.Models;
+using Microsoft.Extensions.Options;
+using Sheaft.Application.Common.Extensions;
+using Sheaft.Application.Common.Interfaces;
+using Sheaft.Application.Common.Interfaces.Queries;
+using Sheaft.Application.Common.Models.Dto;
+using Sheaft.Application.Common.Options;
+using Sheaft.Domain;
 
-namespace Sheaft.Application.Queries
+namespace Sheaft.Application.Leaderboard.Queries
 {
     public class LeaderboardQueries : ILeaderboardQueries
     {
@@ -44,7 +44,7 @@ namespace Sheaft.Application.Queries
             if (!currentUser.IsInRole(_roleOptions.Consumer.Value))
                 return null;
 
-            var user = await _context.FindByIdAsync<User>(id, token);
+            var user = await _context.FindByIdAsync<Domain.User>(id, token);
             if (user == null)
                 return null;
 
@@ -53,7 +53,7 @@ namespace Sheaft.Application.Queries
 
         public async Task<UserPositionDto> UserPositionInDepartmentAsync(Guid userId, RequestUser currentUser, CancellationToken token)
         {
-            var departement = await _context.Users.OfType<User>()
+            var departement = await _context.Users.OfType<Domain.User>()
                 .Get(u => u.Id == userId && !u.RemovedOn.HasValue)
                 .Select(u => u.Address.Department)
                 .SingleOrDefaultAsync(token);
@@ -66,7 +66,7 @@ namespace Sheaft.Application.Queries
 
         public async Task<UserPositionDto> UserPositionInRegionAsync(Guid userId, RequestUser currentUser, CancellationToken token)
         {
-            var departement = await _context.Users.OfType<User>()
+            var departement = await _context.Users.OfType<Domain.User>()
                 .Get(u => u.Id == userId && !u.RemovedOn.HasValue)
                 .Select(u => u.Address.Department)
                 .SingleOrDefaultAsync(token);

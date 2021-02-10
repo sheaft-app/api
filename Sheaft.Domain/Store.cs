@@ -1,11 +1,13 @@
-﻿using Sheaft.Domain.Enums;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Sheaft.Domain.Common;
+using Sheaft.Domain.Enum;
+using Sheaft.Domain.Events.Store;
 
-namespace Sheaft.Domain.Models
+namespace Sheaft.Domain
 {
-    public class Store : Business
+    public class Store : Business, IHasDomainEvent
     {
         private List<StoreTag> _tags;
         private List<TimeSlotHour> _openingHours;
@@ -18,6 +20,7 @@ namespace Sheaft.Domain.Models
             : base(id, ProfileKind.Store, name, firstname, lastname, email, address, openForBusiness, phone, description)
         {
             SetOpeningHours(openingHours);
+            DomainEvents = new List<DomainEvent>{new StoreRegisteredEvent(Id)};
         }
 
         public virtual IReadOnlyCollection<StoreTag> Tags => _tags?.AsReadOnly();
@@ -44,5 +47,7 @@ namespace Sheaft.Domain.Models
 
             _tags = tags.Select(t => new StoreTag(t)).ToList();
         }
+
+        public List<DomainEvent> DomainEvents { get; } = new List<DomainEvent>();
     }
 }

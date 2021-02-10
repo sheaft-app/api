@@ -1,20 +1,20 @@
 ﻿using AutoMapper;
-using Sheaft.Application.Commands;
-using Sheaft.Domain.Models;
-using Sheaft.Application.Models;
-using System.Linq;
+using Sheaft.Application.Common.Models.Dto;
+using Sheaft.Application.Common.Models.Inputs;
+using Sheaft.Application.Common.Models.ViewModels;
+using Sheaft.Application.Document.Commands;
 
-namespace Sheaft.Application.Mappers
+namespace Sheaft.Application.Common.Mappings
 {
     public class DocumentProfile : Profile
     {
         public DocumentProfile()
         {
-            CreateMap<Document, DocumentDto>()
+            CreateMap<Domain.Document, DocumentDto>()
                 .ForMember(m => m.Pages, opt => opt.MapFrom(e => e.Pages));
 
-            CreateMap<Document, DocumentShortViewModel>();
-            CreateMap<Document, DocumentViewModel>()
+            CreateMap<Domain.Document, DocumentShortViewModel>();
+            CreateMap<Domain.Document, DocumentViewModel>()
                 .ForMember(m => m.Pages, opt => opt.MapFrom(e => e.Pages));
 
             CreateMap<CreateDocumentInput, CreateDocumentCommand>();

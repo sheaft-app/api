@@ -1,7 +1,4 @@
-﻿using Sheaft.Core;
-using Newtonsoft.Json;
-using Sheaft.Domain.Enums;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -10,13 +7,20 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Sheaft.Application.Interop;
-using Sheaft.Domain.Models;
-using Sheaft.Options;
+using Newtonsoft.Json;
+using Sheaft.Application.Common;
+using Sheaft.Application.Common.Extensions;
+using Sheaft.Application.Common.Handlers;
+using Sheaft.Application.Common.Interfaces;
+using Sheaft.Application.Common.Interfaces.Services;
+using Sheaft.Application.Common.Models;
+using Sheaft.Application.Common.Options;
+using Sheaft.Domain;
+using Sheaft.Domain.Enum;
 
-namespace Sheaft.Application.Commands
+namespace Sheaft.Application.PayinRefund.Commands
 {
-    public class CheckPayinRefundsCommand : Command<bool>
+    public class CheckPayinRefundsCommand : Command
     {
         [JsonConstructor]
         public CheckPayinRefundsCommand(RequestUser requestUser)
@@ -26,7 +30,7 @@ namespace Sheaft.Application.Commands
     }
 
     public class CheckPayinRefundsCommandHandler : CommandsHandler,
-        IRequestHandler<CheckPayinRefundsCommand, Result<bool>>
+        IRequestHandler<CheckPayinRefundsCommand, Result>
     {
         private readonly IPspService _pspService;
         private readonly RoutineOptions _routineOptions;
@@ -43,36 +47,33 @@ namespace Sheaft.Application.Commands
             _routineOptions = routineOptions.Value;
         }
 
-        public async Task<Result<bool>> Handle(CheckPayinRefundsCommand request, CancellationToken token)
+        public async Task<Result> Handle(CheckPayinRefundsCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(request, async () =>
+            var skip = 0;
+            const int take = 100;
+
+            var payinRefundIds = await GetNextPayinRefundIdsAsync(skip, take, token);
+            while (payinRefundIds.Any())
             {
-                var skip = 0;
-                const int take = 100;
-
-                var payinRefundIds = await GetNextPayinRefundIdsAsync(skip, take, token);
-                while (payinRefundIds.Any())
+                foreach (var payinRefundId in payinRefundIds)
                 {
-                    foreach (var payinRefundId in payinRefundIds)
+                    _mediatr.Post(new CheckPayinRefundCommand(request.RequestUser)
                     {
-                        _mediatr.Post(new CheckPayinRefundCommand(request.RequestUser)
-                        {
-                            PayinRefundId = payinRefundId
-                        });
-                    }
-
-                    skip += take;
-                    payinRefundIds = await GetNextPayinRefundIdsAsync(skip, take, token);
+                        PayinRefundId = payinRefundId
+                    });
                 }
 
-                return Ok(true);
-            });
+                skip += take;
+                payinRefundIds = await GetNextPayinRefundIdsAsync(skip, take, token);
+            }
+
+            return Success();
         }
 
         private async Task<IEnumerable<Guid>> GetNextPayinRefundIdsAsync(int skip, int take, CancellationToken token)
         {
             return await _context.Refunds
-                .OfType<PayinRefund>()
+                .OfType<Domain.PayinRefund>()
                 .Get(c => c.Status == TransactionStatus.Waiting || c.Status == TransactionStatus.Created, true)
                 .OrderBy(c => c.CreatedOn)
                 .Select(c => c.Id)

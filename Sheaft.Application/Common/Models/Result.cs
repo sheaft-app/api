@@ -1,28 +1,36 @@
-﻿using System.Collections.Generic;
-using System.Linq;
+﻿using System;
+using Sheaft.Domain.Enum;
 
-namespace CleanArchitecture.Application.Common.Models
+namespace Sheaft.Application.Common.Models
 {
     public class Result
     {
-        internal Result(bool succeeded, IEnumerable<string> errors)
+        internal Result(bool succeeded, MessageKind message, Exception exception = null, params object[] objs)
         {
             Succeeded = succeeded;
-            Errors = errors.ToArray();
+            Message = message;
+            Exception = exception;
+            Params = objs;
         }
 
-        public bool Succeeded { get; set; }
+        public bool Succeeded { get; }
+        public MessageKind Message { get; }
+        public Exception Exception { get; }
+        public object[] Params { get; }
 
-        public string[] Errors { get; set; }
-
-        public static Result Success()
+        public static Result Success(MessageKind? message = null, params object[] objs)
         {
-            return new Result(true, new string[] { });
+            return new Result(true, message ?? MessageKind.Success, null, objs);
         }
 
-        public static Result Failure(IEnumerable<string> errors)
+        public static Result Failure(MessageKind? error, params object[] objs)
         {
-            return new Result(false, errors);
+            return new Result(false, error ?? MessageKind.Unexpected, null, objs);
+        }
+
+        public static Result Failure(MessageKind? error, Exception exception, params object[] objs)
+        {
+            return new Result(false, error ?? MessageKind.Unexpected, exception, objs);
         }
     }
 }

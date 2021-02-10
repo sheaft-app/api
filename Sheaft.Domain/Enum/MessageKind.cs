@@ -1,4 +1,4 @@
-﻿namespace Sheaft.Domain.Enums
+﻿namespace Sheaft.Domain.Enum
 {
     public enum MessageKind
     {
@@ -14,6 +14,7 @@
         Validation = 1009,
         Unexpected = 1010,
         AlreadyExists = 1011,
+        Success = 1012,
 
         //entities
         Address = 2000,

@@ -1,18 +1,20 @@
 ﻿using System;
-using Sheaft.Core;
-using Newtonsoft.Json;
-using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
 using Microsoft.Extensions.Logging;
-using Sheaft.Application.Interop;
-using Sheaft.Domain.Models;
+using Newtonsoft.Json;
+using Sheaft.Application.Common;
+using Sheaft.Application.Common.Handlers;
+using Sheaft.Application.Common.Interfaces;
+using Sheaft.Application.Common.Interfaces.Services;
+using Sheaft.Application.Common.Models;
+using Sheaft.Domain;
 
-namespace Sheaft.Application.Commands
+namespace Sheaft.Application.Page.Commands
 {
-    public class SendPageCommand : Command<bool>
+    public class SendPageCommand : Command
     {
         [JsonConstructor]
         public SendPageCommand(RequestUser requestUser) : base(requestUser)
@@ -24,7 +26,7 @@ namespace Sheaft.Application.Commands
     }
 
     public class SendPageCommandHandler : CommandsHandler,
-        IRequestHandler<SendPageCommand, Result<bool>>
+        IRequestHandler<SendPageCommand, Result>
     {
         private readonly IPspService _pspService;
         private readonly IBlobService _blobService;
@@ -40,32 +42,29 @@ namespace Sheaft.Application.Commands
             _pspService = pspService;
             _blobService = blobService;
         }
-        
-        public async Task<Result<bool>> Handle(SendPageCommand request, CancellationToken token)
+
+        public async Task<Result> Handle(SendPageCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(request, async () =>
-            {
-                var legal = await _context.GetSingleAsync<Legal>(r => r.Documents.Any(d => d.Id == request.DocumentId),
-                    token);
-                var document = legal.Documents.FirstOrDefault(d => d.Id == request.DocumentId);
+            var legal = await _context.GetSingleAsync<Domain.Legal>(r => r.Documents.Any(d => d.Id == request.DocumentId),
+                token);
+            var document = legal.Documents.FirstOrDefault(d => d.Id == request.DocumentId);
 
-                var page = document.Pages.SingleOrDefault(p => p.Id == request.PageId);
+            var page = document.Pages.SingleOrDefault(p => p.Id == request.PageId);
 
-                var downloadResult =
-                    await _blobService.DownloadDocumentPageAsync(document.Id, page.Id, legal.User.Id, token);
-                if (!downloadResult.Success)
-                    return Failed<bool>(downloadResult.Exception);
+            var downloadResult =
+                await _blobService.DownloadDocumentPageAsync(document.Id, page.Id, legal.User.Id, token);
+            if (!downloadResult.Succeeded)
+                return Failure(downloadResult.Exception);
 
-                var result = await _pspService.AddPageToDocumentAsync(page, document, legal.User.Identifier,
-                    downloadResult.Data, token);
-                if (!result.Success)
-                    return result;
-
-                page.SetUploaded();
-
-                await _context.SaveChangesAsync(token);
+            var result = await _pspService.AddPageToDocumentAsync(page, document, legal.User.Identifier,
+                downloadResult.Data, token);
+            if (!result.Succeeded)
                 return result;
-            });
+
+            page.SetUploaded();
+
+            await _context.SaveChangesAsync(token);
+            return result;
         }
     }
 }

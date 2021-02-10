@@ -4,11 +4,14 @@ using System.Threading.Tasks;
 using MediatR;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using Sheaft.Application.Interop;
-using Sheaft.Core;
-using Sheaft.Domain.Models;
+using Sheaft.Application.Common;
+using Sheaft.Application.Common.Handlers;
+using Sheaft.Application.Common.Interfaces;
+using Sheaft.Application.Common.Interfaces.Services;
+using Sheaft.Application.Common.Models;
+using Sheaft.Domain;
 
-namespace Sheaft.Application.Commands
+namespace Sheaft.Application.Picture.Commands
 {
     public class UpdateTagIconCommand : Command<string>
     {
@@ -20,7 +23,7 @@ namespace Sheaft.Application.Commands
         public Guid TagId { get; set; }
         public string Icon { get; set; }
     }
-    
+
     public class UpdateTagIconCommandHandler : CommandsHandler,
         IRequestHandler<UpdateTagIconCommand, Result<string>>
     {
@@ -38,19 +41,16 @@ namespace Sheaft.Application.Commands
 
         public async Task<Result<string>> Handle(UpdateTagIconCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(request, async () =>
-            {
-                var entity = await _context.GetByIdAsync<Tag>(request.TagId, token);
+            var entity = await _context.GetByIdAsync<Domain.Tag>(request.TagId, token);
 
-                var resultImage = await _imageService.HandleTagIconAsync(entity, request.Icon, token);
-                if (!resultImage.Success)
-                    return Failed<string>(resultImage.Exception);
+            var resultImage = await _imageService.HandleTagIconAsync(entity, request.Icon, token);
+            if (!resultImage.Succeeded)
+                return Failure<string>(resultImage.Exception);
 
-                entity.SetIcon(resultImage.Data);
-                await _context.SaveChangesAsync(token);
+            entity.SetIcon(resultImage.Data);
+            await _context.SaveChangesAsync(token);
 
-                return Ok(resultImage.Data);
-            });
+            return Success(resultImage.Data);
         }
     }
 }

@@ -3,9 +3,10 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using FluentValidation;
+using FluentValidation.Results;
 using MediatR;
 
-namespace CleanArchitecture.Application.Common.Behaviours
+namespace Sheaft.Application.Common.Behaviours
 {
     public class ValidationBehaviour<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
         where TRequest : IRequest<TResponse>
@@ -27,8 +28,7 @@ namespace CleanArchitecture.Application.Common.Behaviours
 
             var validationResults =
                 await Task.WhenAll(_validators.Select(v => v.ValidateAsync(context, cancellationToken)));
-            var failures = validationResults.SelectMany(r => r.Errors).Where(f => f != null).ToList();
-
+            var failures = validationResults?.SelectMany(r => r.Errors)?.Where(f => f != null)?.ToList();
             if (failures.Count != 0)
                 throw new ValidationException(failures);
 

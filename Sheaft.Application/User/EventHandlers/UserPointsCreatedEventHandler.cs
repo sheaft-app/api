@@ -2,16 +2,13 @@
 using System.Threading.Tasks;
 using MediatR;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Options;
-using Sheaft.Application.Commands.Handlers;
-using Sheaft.Application.Events;
-using Sheaft.Application.Interop;
-using Sheaft.Application.Models;
-using Sheaft.Application.Models.Mailer;
-using Sheaft.Domain.Models;
-using Sheaft.Options;
+using Sheaft.Application.Common.Handlers;
+using Sheaft.Application.Common.Interfaces;
+using Sheaft.Application.Common.Interfaces.Services;
+using Sheaft.Application.Common.Models;
+using Sheaft.Domain.Events.User;
 
-namespace Sheaft.Application.Handlers
+namespace Sheaft.Application.User.EventHandlers
 {
     public class UserPointsCreatedEventHandler : EventsHandler,
         INotificationHandler<DomainEventNotification<UserPointsCreatedEvent>>

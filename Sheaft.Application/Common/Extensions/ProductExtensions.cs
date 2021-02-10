@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Sheaft.Core.Extensions
+namespace Sheaft.Application.Common.Extensions
 {
     public static class ProductExtensions
     {

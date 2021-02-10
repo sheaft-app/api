@@ -1,28 +1,28 @@
 ﻿using AutoMapper;
-using Sheaft.Domain.Models;
-using Sheaft.Application.Models;
+using Sheaft.Application.Common.Models.Dto;
+using Sheaft.Application.Common.Models.ViewModels;
 
-namespace Sheaft.Application.Mappers
+namespace Sheaft.Application.Common.Mappings
 {
     public class TransferProfile : Profile
     {
         public TransferProfile()
         {
-            CreateMap<Transfer, TransactionDto>()
+            CreateMap<Domain.Transfer, TransactionDto>()
                 .ForMember(m => m.Author, opt => opt.MapFrom(t => t.Author));
 
-            CreateMap<Transfer, TransferDto>()
-                .IncludeBase<Transfer, TransactionDto>()
+            CreateMap<Domain.Transfer, TransferDto>()
+                .IncludeBase<Domain.Transfer, TransactionDto>()
                 .ForMember(m => m.CreditedUser, opt => opt.MapFrom(t => t.CreditedWallet.User))
                 .ForMember(m => m.DebitedUser, opt => opt.MapFrom(t => t.DebitedWallet.User))
                 .ForMember(m => m.PurchaseOrder, opt => opt.MapFrom(t => t.PurchaseOrder));
 
-            CreateMap<Transfer, TransferInfoViewModel>();
+            CreateMap<Domain.Transfer, TransferInfoViewModel>();
 
-            CreateMap<Transfer, TransferShortViewModel>()
+            CreateMap<Domain.Transfer, TransferShortViewModel>()
                 .ForMember(m => m.PurchaseOrder, opt => opt.MapFrom(t => t.PurchaseOrder));
 
-            CreateMap<Transfer, TransferViewModel>()
+            CreateMap<Domain.Transfer, TransferViewModel>()
                 .ForMember(m => m.Author, opt => opt.MapFrom(t => t.Author))
                 .ForMember(m => m.CreditedUser, opt => opt.MapFrom(t => t.CreditedWallet.User))
                 .ForMember(m => m.DebitedUser, opt => opt.MapFrom(t => t.DebitedWallet.User))

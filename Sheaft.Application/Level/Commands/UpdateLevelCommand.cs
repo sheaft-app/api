@@ -1,18 +1,19 @@
-﻿using Sheaft.Domain.Enums;
-using System;
-using Sheaft.Core;
-using Newtonsoft.Json;
-using System.Collections.Generic;
+﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
 using Microsoft.Extensions.Logging;
-using Sheaft.Application.Interop;
-using Sheaft.Domain.Models;
+using Newtonsoft.Json;
+using Sheaft.Application.Common;
+using Sheaft.Application.Common.Handlers;
+using Sheaft.Application.Common.Interfaces;
+using Sheaft.Application.Common.Interfaces.Services;
+using Sheaft.Application.Common.Models;
+using Sheaft.Domain;
 
-namespace Sheaft.Application.Commands
+namespace Sheaft.Application.Level.Commands
 {
-    public class UpdateLevelCommand : Command<bool>
+    public class UpdateLevelCommand : Command
     {
         [JsonConstructor]
         public UpdateLevelCommand(RequestUser requestUser) : base(requestUser)
@@ -25,7 +26,7 @@ namespace Sheaft.Application.Commands
     }
 
     public class UpdateLevelCommandHandler : CommandsHandler,
-        IRequestHandler<UpdateLevelCommand, Result<bool>>
+        IRequestHandler<UpdateLevelCommand, Result>
     {
         public UpdateLevelCommandHandler(
             ISheaftMediatr mediatr,
@@ -35,17 +36,14 @@ namespace Sheaft.Application.Commands
         {
         }
 
-        public async Task<Result<bool>> Handle(UpdateLevelCommand request, CancellationToken token)
+        public async Task<Result> Handle(UpdateLevelCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(request, async () =>
-            {
-                var entity = await _context.GetByIdAsync<Level>(request.Id, token);
-                entity.SetName(request.Name);
-                entity.SetRequiredPoints(request.RequiredPoints);
+            var entity = await _context.GetByIdAsync<Domain.Level>(request.Id, token);
+            entity.SetName(request.Name);
+            entity.SetRequiredPoints(request.RequiredPoints);
 
-                await _context.SaveChangesAsync(token);
-                return Ok(true);
-            });
+            await _context.SaveChangesAsync(token);
+            return Success();
         }
     }
 }

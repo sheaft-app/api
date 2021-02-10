@@ -1,23 +1,21 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Sheaft.Application.Commands;
-using Sheaft.Application.Interop;
-using Sheaft.Core;
-using Sheaft.Core.Extensions;
-using Sheaft.Core.Security;
-using Sheaft.Exceptions;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Sheaft.Domain.Enums;
+using Sheaft.Application.Common.Extensions;
+using Sheaft.Application.Common.Interfaces.Services;
+using Sheaft.Application.Common.Security;
+using Sheaft.Application.Product.Commands;
+using Sheaft.Domain;
+using Sheaft.Domain.Enum;
 
 namespace Sheaft.Web.Api.Controllers
 {
-    [Authorize]
+    [Microsoft.AspNetCore.Authorization.Authorize]
     [ApiController]
     [Route("upload")]
     public class UploadController : Controller
@@ -43,7 +41,7 @@ namespace Sheaft.Web.Api.Controllers
         }
 
         [HttpPost("products")]
-        [Authorize(Policy = Policies.PRODUCER)]
+        [Microsoft.AspNetCore.Authorization.Authorize(Policy = Policies.PRODUCER)]
         public async Task<IActionResult> UploadProductsCatalog(CancellationToken token)
         {
             NewRelic.Api.Agent.NewRelic.SetTransactionName("GraphQL", nameof(UploadProductsCatalog));
@@ -71,7 +69,7 @@ namespace Sheaft.Web.Api.Controllers
                     {
                         await formFile.CopyToAsync(stream, token);
                         var result = await _mediatr.Process(new QueueImportProductsCommand(CurrentUser) { Id = CurrentUser.Id, FileName = formFile.FileName, FileStream = stream.ToArray() }, token);
-                        if (!result.Success)
+                        if (!result.Succeeded)
                             return BadRequest(result);
 
                         ids.Add(result.Data);

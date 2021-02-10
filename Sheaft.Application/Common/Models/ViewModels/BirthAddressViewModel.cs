@@ -1,8 +1,6 @@
-﻿using Sheaft.Domain.Enums;
-using System;
-using System.Collections.Generic;
+﻿using Sheaft.Domain.Enum;
 
-namespace Sheaft.Application.Models
+namespace Sheaft.Application.Common.Models.ViewModels
 {
 
     public class BirthAddressViewModel

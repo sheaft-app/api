@@ -1,16 +1,17 @@
 ﻿using Azure.Storage.Blobs;
 using Azure.Storage.Sas;
 using Microsoft.Extensions.Options;
-using Sheaft.Options;
 using System;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
-using Sheaft.Core.Extensions;
 using Microsoft.Extensions.Logging;
-using Sheaft.Core;
-using Sheaft.Application.Interop;
 using Azure.Storage;
+using Sheaft.Application.Common;
+using Sheaft.Application.Common.Extensions;
+using Sheaft.Application.Common.Interfaces.Services;
+using Sheaft.Application.Common.Models;
+using Sheaft.Application.Common.Options;
 
 namespace Sheaft.Infrastructure.Services
 {
@@ -24,292 +25,294 @@ namespace Sheaft.Infrastructure.Services
             _storageOptions = storageOptions.Value;
         }
 
-        public async Task<Result<string>> UploadUserPictureAsync(Guid userId, string filename, string size, byte[] data, CancellationToken token)
+        public async Task<Result<string>> UploadUserPictureAsync(Guid userId, string filename, string size, byte[] data,
+            CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
-            {
-                var containerClient = new BlobContainerClient(_storageOptions.ConnectionString, _storageOptions.Containers.Pictures);
-                await containerClient.CreateIfNotExistsAsync(cancellationToken: token);
+            var containerClient =
+                new BlobContainerClient(_storageOptions.ConnectionString, _storageOptions.Containers.Pictures);
+            await containerClient.CreateIfNotExistsAsync(cancellationToken: token);
 
-                var blobClient = containerClient.GetBlobClient($"users/{userId:N}/profile/{filename}_{size}.jpg");
-                await blobClient.DeleteIfExistsAsync(cancellationToken: token);
+            var blobClient = containerClient.GetBlobClient($"users/{userId:N}/profile/{filename}_{size}.jpg");
+            await blobClient.DeleteIfExistsAsync(cancellationToken: token);
 
-                using (var ms = new MemoryStream(data))
-                    await blobClient.UploadAsync(ms, token);
+            using (var ms = new MemoryStream(data))
+                await blobClient.UploadAsync(ms, token);
 
-                return Ok(GetBlobUri(blobClient, _storageOptions.Containers.Pictures));
-            });
+            return Success(GetBlobUri(blobClient, _storageOptions.Containers.Pictures));
         }
 
-        public async Task<Result<string>> UploadTagPictureAsync(Guid tagId, string filename, string size, byte[] data, CancellationToken token)
+        public async Task<Result<string>> UploadTagPictureAsync(Guid tagId, string filename, string size, byte[] data,
+            CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
-            {
-                var containerClient = new BlobContainerClient(_storageOptions.ConnectionString, _storageOptions.Containers.Pictures);
-                await containerClient.CreateIfNotExistsAsync(cancellationToken: token);
+            var containerClient =
+                new BlobContainerClient(_storageOptions.ConnectionString, _storageOptions.Containers.Pictures);
+            await containerClient.CreateIfNotExistsAsync(cancellationToken: token);
 
-                var blobClient = containerClient.GetBlobClient($"tags/images/{tagId:N}/{filename}_{size}.jpg");
-                await blobClient.DeleteIfExistsAsync(cancellationToken: token);
+            var blobClient = containerClient.GetBlobClient($"tags/images/{tagId:N}/{filename}_{size}.jpg");
+            await blobClient.DeleteIfExistsAsync(cancellationToken: token);
 
-                using (var ms = new MemoryStream(data))
-                    await blobClient.UploadAsync(ms, token);
+            using (var ms = new MemoryStream(data))
+                await blobClient.UploadAsync(ms, token);
 
-                return Ok(GetBlobUri(blobClient, _storageOptions.Containers.Pictures));
-            });
+            return Success(GetBlobUri(blobClient, _storageOptions.Containers.Pictures));
         }
 
         public async Task<Result<string>> UploadTagIconAsync(Guid tagId, byte[] data, CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
-            {
-                var containerClient = new BlobContainerClient(_storageOptions.ConnectionString, _storageOptions.Containers.Pictures);
-                await containerClient.CreateIfNotExistsAsync(cancellationToken: token);
+            var containerClient =
+                new BlobContainerClient(_storageOptions.ConnectionString, _storageOptions.Containers.Pictures);
+            await containerClient.CreateIfNotExistsAsync(cancellationToken: token);
 
-                var blobClient = containerClient.GetBlobClient($"tags/icons/{tagId:N}/{Guid.NewGuid():N}.jpg");
-                await blobClient.DeleteIfExistsAsync(cancellationToken: token);
+            var blobClient = containerClient.GetBlobClient($"tags/icons/{tagId:N}/{Guid.NewGuid():N}.jpg");
+            await blobClient.DeleteIfExistsAsync(cancellationToken: token);
 
-                using (var ms = new MemoryStream(data))
-                    await blobClient.UploadAsync(ms, token);
+            using (var ms = new MemoryStream(data))
+                await blobClient.UploadAsync(ms, token);
 
-                return Ok(GetBlobUri(blobClient, _storageOptions.Containers.Pictures));
-            });
+            return Success(GetBlobUri(blobClient, _storageOptions.Containers.Pictures));
         }
 
-        public async Task<Result<string>> UploadProductPictureAsync(Guid userId, Guid productId, string filename, string size, byte[] data, CancellationToken token)
+        public async Task<Result<string>> UploadProductPictureAsync(Guid userId, Guid productId, string filename,
+            string size, byte[] data, CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
-            {
-                var containerClient = new BlobContainerClient(_storageOptions.ConnectionString, _storageOptions.Containers.Pictures);
-                await containerClient.CreateIfNotExistsAsync(cancellationToken: token);
+            var containerClient =
+                new BlobContainerClient(_storageOptions.ConnectionString, _storageOptions.Containers.Pictures);
+            await containerClient.CreateIfNotExistsAsync(cancellationToken: token);
 
-                var blobClient = containerClient.GetBlobClient(ProductExtensions.GetPictureUrl(userId, productId, filename, size));
-                await blobClient.DeleteIfExistsAsync(cancellationToken: token);
+            var blobClient =
+                containerClient.GetBlobClient(ProductExtensions.GetPictureUrl(userId, productId, filename, size));
+            await blobClient.DeleteIfExistsAsync(cancellationToken: token);
 
-                using (var ms = new MemoryStream(data))
-                    await blobClient.UploadAsync(ms, token);
+            using (var ms = new MemoryStream(data))
+                await blobClient.UploadAsync(ms, token);
 
-                return Ok(GetBlobUri(blobClient, _storageOptions.Containers.Pictures));
-            });
+            return Success(GetBlobUri(blobClient, _storageOptions.Containers.Pictures));
         }
 
-        public async Task<Result<bool>> CleanUserStorageAsync(Guid userId, CancellationToken token)
+        public async Task<Result> CleanUserStorageAsync(Guid userId, CancellationToken token)
         {
-            var response = await CleanContainerFolderStorageAsync(_storageOptions.Containers.Products, $"users/{userId:N}", token);
-            if (!response.Success)
+            var response =
+                await CleanContainerFolderStorageAsync(_storageOptions.Containers.Products, $"users/{userId:N}", token);
+            if (!response.Succeeded)
                 return response;
 
-            response = await CleanContainerFolderStorageAsync(_storageOptions.Containers.Pictures, $"users/{userId:N}", token);
-            if (!response.Success)
+            response = await CleanContainerFolderStorageAsync(_storageOptions.Containers.Pictures, $"users/{userId:N}",
+                token);
+            if (!response.Succeeded)
                 return response;
 
-            response = await CleanContainerFolderStorageAsync(_storageOptions.Containers.PickingOrders, $"users/{userId:N}", token);
-            if (!response.Success)
+            response = await CleanContainerFolderStorageAsync(_storageOptions.Containers.PickingOrders,
+                $"users/{userId:N}", token);
+            if (!response.Succeeded)
                 return response;
 
-            response = await CleanContainerFolderStorageAsync(_storageOptions.Containers.Jobs, $"users/{userId:N}", token);
-            if (!response.Success)
+            response = await CleanContainerFolderStorageAsync(_storageOptions.Containers.Jobs, $"users/{userId:N}",
+                token);
+            if (!response.Succeeded)
                 return response;
 
-            response = await CleanContainerFolderStorageAsync(_storageOptions.Containers.Rgpd, $"users/{userId:N}", token);
-            if (!response.Success)
+            response = await CleanContainerFolderStorageAsync(_storageOptions.Containers.Rgpd, $"users/{userId:N}",
+                token);
+            if (!response.Succeeded)
                 return response;
 
-            response = await CleanContainerFolderStorageAsync(_storageOptions.Containers.Documents, $"users/{userId:N}", token);
-            if (!response.Success)
+            response = await CleanContainerFolderStorageAsync(_storageOptions.Containers.Documents, $"users/{userId:N}",
+                token);
+            if (!response.Succeeded)
                 return response;
 
-            return Ok(true);
+            return Success();
         }
 
-        public async Task<Result<bool>> CleanContainerFolderStorageAsync(string container, string folder, CancellationToken token)
+        public async Task<Result> CleanContainerFolderStorageAsync(string container, string folder,
+            CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
+            var containerClient = new BlobContainerClient(_storageOptions.ConnectionString, container);
+
+            var blobClient = containerClient.GetBlobClient(folder);
+            if (!await blobClient.ExistsAsync(token))
+                return Success();
+
+            var success = true;
+            await foreach (var blob in containerClient.GetBlobsAsync(prefix: folder, cancellationToken: token))
             {
-                var containerClient = new BlobContainerClient(_storageOptions.ConnectionString, container);
+                var response = await containerClient.DeleteBlobAsync(blob.Name, cancellationToken: token);
+                if (response.Status >= 400)
+                    success = false;
+            }
 
-                var blobClient = containerClient.GetBlobClient(folder);
-                if (!await blobClient.ExistsAsync(token))
-                    return Ok(true);
-
-                await foreach (var blob in containerClient.GetBlobsAsync(prefix: folder, cancellationToken: token))
-                {
-                    await containerClient.DeleteBlobAsync(blob.Name, cancellationToken: token);
-                }
-
-                return Ok(true);
-            });
+            return success ? Success() : Failure();
         }
 
-        public async Task<Result<bool>> UploadImportProductsFileAsync(Guid userId, Guid jobId, byte[] data, CancellationToken token)
+        public async Task<Result> UploadImportProductsFileAsync(Guid userId, Guid jobId, byte[] data,
+            CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
+            var containerClient =
+                new BlobContainerClient(_storageOptions.ConnectionString, _storageOptions.Containers.Products);
+            await containerClient.CreateIfNotExistsAsync(cancellationToken: token);
+
+            var blobClient = containerClient.GetBlobClient($"users/{userId:N}/products/{jobId:N}");
+            await blobClient.DeleteIfExistsAsync(cancellationToken: token);
+
+            using (var ms = new MemoryStream(data))
             {
-                var containerClient = new BlobContainerClient(_storageOptions.ConnectionString, _storageOptions.Containers.Products);
-                await containerClient.CreateIfNotExistsAsync(cancellationToken: token);
+                var response = await blobClient.UploadAsync(ms, token);
+                if (response.GetRawResponse().Status >= 400)
+                    return Failure();
+            }
 
-                var blobClient = containerClient.GetBlobClient($"users/{userId:N}/products/{jobId:N}");
-                await blobClient.DeleteIfExistsAsync(cancellationToken: token);
-
-                using (var ms = new MemoryStream(data))
-                    await blobClient.UploadAsync(ms, token);
-
-                return Ok(true);
-            });
+            return Success();
         }
 
-        public async Task<Result<byte[]>> DownloadImportProductsFileAsync(Guid userId, Guid jobId, CancellationToken token)
+        public async Task<Result<byte[]>> DownloadImportProductsFileAsync(Guid userId, Guid jobId,
+            CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
-            {
-                var containerClient = new BlobContainerClient(_storageOptions.ConnectionString, _storageOptions.Containers.Products);
-                await containerClient.CreateIfNotExistsAsync(cancellationToken: token);
+            var containerClient =
+                new BlobContainerClient(_storageOptions.ConnectionString, _storageOptions.Containers.Products);
+            await containerClient.CreateIfNotExistsAsync(cancellationToken: token);
 
-                var blobClient = containerClient.GetBlobClient($"users/{userId:N}/products/{jobId:N}");
-                using (var stream = new MemoryStream())
-                {
-                    await blobClient.DownloadToAsync(stream, token);
-                    stream.Position = 0;
-                    return Ok(stream.ToArray());
-                }
-            });
+            var blobClient = containerClient.GetBlobClient($"users/{userId:N}/products/{jobId:N}");
+            using (var stream = new MemoryStream())
+            {
+                await blobClient.DownloadToAsync(stream, token);
+                stream.Position = 0;
+                return Success(stream.ToArray());
+            }
         }
 
-        public async Task<Result<byte[]>> DownloadDocumentPageAsync(Guid documentId, Guid pageId, Guid userId, CancellationToken token)
+        public async Task<Result<byte[]>> DownloadDocumentPageAsync(Guid documentId, Guid pageId, Guid userId,
+            CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
-            {
-                var containerClient = new BlobContainerClient(_storageOptions.ConnectionString, _storageOptions.Containers.Documents);
-                await containerClient.CreateIfNotExistsAsync(cancellationToken: token);
+            var containerClient =
+                new BlobContainerClient(_storageOptions.ConnectionString, _storageOptions.Containers.Documents);
+            await containerClient.CreateIfNotExistsAsync(cancellationToken: token);
 
-                var blobClient = containerClient.GetBlobClient($"users/{userId:N}/documents/{documentId:N}/{pageId:N}");
-                using (var stream = new MemoryStream())
-                {
-                    await blobClient.DownloadToAsync(stream, token);
-                    stream.Position = 0;
-                    return Ok(stream.ToArray());
-                }
-            });
+            var blobClient = containerClient.GetBlobClient($"users/{userId:N}/documents/{documentId:N}/{pageId:N}");
+            using (var stream = new MemoryStream())
+            {
+                await blobClient.DownloadToAsync(stream, token);
+                stream.Position = 0;
+                return Success(stream.ToArray());
+            }
         }
 
-        public async Task<Result<bool>> UploadDocumentPageAsync(Guid documentId, Guid pageId, byte[] data, Guid userId, CancellationToken token)
+        public async Task<Result> UploadDocumentPageAsync(Guid documentId, Guid pageId, byte[] data, Guid userId,
+            CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
+            var containerClient =
+                new BlobContainerClient(_storageOptions.ConnectionString, _storageOptions.Containers.Documents);
+            await containerClient.CreateIfNotExistsAsync(cancellationToken: token);
+
+            var blobClient = containerClient.GetBlobClient($"users/{userId:N}/documents/{documentId:N}/{pageId:N}");
+            await blobClient.DeleteIfExistsAsync(cancellationToken: token);
+
+            using (var ms = new MemoryStream(data))
             {
-                var containerClient = new BlobContainerClient(_storageOptions.ConnectionString, _storageOptions.Containers.Documents);
-                await containerClient.CreateIfNotExistsAsync(cancellationToken: token);
+                var response = await blobClient.UploadAsync(ms, token);
+                if (response.GetRawResponse().Status >= 400)
+                    return Failure();
+            }
 
-                var blobClient = containerClient.GetBlobClient($"users/{userId:N}/documents/{documentId:N}/{pageId:N}");
-                await blobClient.DeleteIfExistsAsync(cancellationToken: token);
-
-                using (var ms = new MemoryStream(data))
-                    await blobClient.UploadAsync(ms, token);
-
-                return Ok(true);
-            });
+            return Success();
         }
 
-        public async Task<Result<bool>> DeleteDocumentPageAsync(Guid documentId, Guid pageId, Guid userId, CancellationToken token)
+        public async Task<Result> DeleteDocumentPageAsync(Guid documentId, Guid pageId, Guid userId,
+            CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
-            {
-                var containerClient = new BlobContainerClient(_storageOptions.ConnectionString, _storageOptions.Containers.Documents);
-                await containerClient.CreateIfNotExistsAsync(cancellationToken: token);
+            var containerClient =
+                new BlobContainerClient(_storageOptions.ConnectionString, _storageOptions.Containers.Documents);
+            await containerClient.CreateIfNotExistsAsync(cancellationToken: token);
 
-                var blobClient = containerClient.GetBlobClient($"users/{userId:N}/documents/{documentId:N}/{pageId:N}");
-                await blobClient.DeleteIfExistsAsync(cancellationToken: token);
+            var blobClient = containerClient.GetBlobClient($"users/{userId:N}/documents/{documentId:N}/{pageId:N}");
+            var response = await blobClient.DeleteIfExistsAsync(cancellationToken: token);
+            if (!response.Value)
+                return Failure();
 
-                return Ok(true);
-            });
+            return Success();
         }
 
-        public async Task<Result<string>> UploadRgpdFileAsync(Guid userId, Guid jobId, string filename, byte[] data, CancellationToken token)
+        public async Task<Result<string>> UploadRgpdFileAsync(Guid userId, Guid jobId, string filename, byte[] data,
+            CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
+            var containerClient =
+                new BlobContainerClient(_storageOptions.ConnectionString, _storageOptions.Containers.Rgpd);
+            await containerClient.CreateIfNotExistsAsync(cancellationToken: token);
+
+            var blobClient = containerClient.GetBlobClient($"users/{userId:N}/{jobId:N}/{filename}");
+            await blobClient.DeleteIfExistsAsync(cancellationToken: token);
+
+            using (var ms = new MemoryStream(data))
+                await blobClient.UploadAsync(ms, token);
+
+            var sasBuilder = new BlobSasBuilder()
             {
-                var containerClient = new BlobContainerClient(_storageOptions.ConnectionString, _storageOptions.Containers.Rgpd);
-                await containerClient.CreateIfNotExistsAsync(cancellationToken: token);
+                BlobContainerName = _storageOptions.Containers.Rgpd,
+                BlobName = blobClient.Name,
+                Resource = "b",
+                StartsOn = DateTimeOffset.UtcNow.AddHours(-1),
+                ExpiresOn = DateTimeOffset.UtcNow.AddDays(30)
+            };
 
-                var blobClient = containerClient.GetBlobClient($"users/{userId:N}/{jobId:N}/{filename}");
-                await blobClient.DeleteIfExistsAsync(cancellationToken: token);
+            sasBuilder.SetPermissions(BlobSasPermissions.Read);
 
-                using (var ms = new MemoryStream(data))
-                    await blobClient.UploadAsync(ms, token);
-
-                var sasBuilder = new BlobSasBuilder()
-                {
-                    BlobContainerName = _storageOptions.Containers.Rgpd,
-                    BlobName = blobClient.Name,
-                    Resource = "b",
-                    StartsOn = DateTimeOffset.UtcNow.AddHours(-1),
-                    ExpiresOn = DateTimeOffset.UtcNow.AddDays(30)
-                };
-
-                sasBuilder.SetPermissions(BlobSasPermissions.Read);
-
-                return Ok(GetBlobSasUri(blobClient, sasBuilder, _storageOptions.Containers.Rgpd));
-            });
+            return Success(GetBlobSasUri(blobClient, sasBuilder, _storageOptions.Containers.Rgpd));
         }
 
-        public async Task<Result<string>> UploadPickingOrderFileAsync(Guid userId, Guid jobId, string filename, byte[] data, CancellationToken token)
+        public async Task<Result<string>> UploadPickingOrderFileAsync(Guid userId, Guid jobId, string filename,
+            byte[] data, CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
+            var containerClient = new BlobContainerClient(_storageOptions.ConnectionString,
+                _storageOptions.Containers.PickingOrders);
+            await containerClient.CreateIfNotExistsAsync(cancellationToken: token);
+
+            var blobClient = containerClient.GetBlobClient($"users/{userId:N}/{jobId:N}/{filename}");
+            await blobClient.DeleteIfExistsAsync(cancellationToken: token);
+
+            using (var ms = new MemoryStream(data))
+                await blobClient.UploadAsync(ms, token);
+
+            var sasBuilder = new BlobSasBuilder
             {
-                var containerClient = new BlobContainerClient(_storageOptions.ConnectionString, _storageOptions.Containers.PickingOrders);
-                await containerClient.CreateIfNotExistsAsync(cancellationToken: token);
+                BlobContainerName = _storageOptions.Containers.PickingOrders,
+                BlobName = blobClient.Name,
+                Resource = "b",
+                StartsOn = DateTimeOffset.UtcNow.AddHours(-1),
+                ExpiresOn = DateTimeOffset.UtcNow.AddDays(30)
+            };
 
-                var blobClient = containerClient.GetBlobClient($"users/{userId:N}/{jobId:N}/{filename}");
-                await blobClient.DeleteIfExistsAsync(cancellationToken: token);
+            sasBuilder.SetPermissions(BlobSasPermissions.Read);
 
-                using (var ms = new MemoryStream(data))
-                    await blobClient.UploadAsync(ms, token);
-
-                var sasBuilder = new BlobSasBuilder
-                {
-                    BlobContainerName = _storageOptions.Containers.PickingOrders,
-                    BlobName = blobClient.Name,
-                    Resource = "b",
-                    StartsOn = DateTimeOffset.UtcNow.AddHours(-1),
-                    ExpiresOn = DateTimeOffset.UtcNow.AddDays(30)
-                };
-
-                sasBuilder.SetPermissions(BlobSasPermissions.Read);
-
-                return Ok(GetBlobSasUri(blobClient, sasBuilder, _storageOptions.Containers.PickingOrders));
-            });
+            return Success(GetBlobSasUri(blobClient, sasBuilder, _storageOptions.Containers.PickingOrders));
         }
 
         public async Task<Result<string>> UploadDepartmentsProgressAsync(byte[] data, CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
-            {
-                var containerClient = new BlobContainerClient(_storageOptions.ConnectionString, _storageOptions.Containers.Progress);
-                await containerClient.CreateIfNotExistsAsync(cancellationToken: token);
+            var containerClient =
+                new BlobContainerClient(_storageOptions.ConnectionString, _storageOptions.Containers.Progress);
+            await containerClient.CreateIfNotExistsAsync(cancellationToken: token);
 
-                var blobClient = containerClient.GetBlobClient("departments.json");
-                await blobClient.DeleteIfExistsAsync(cancellationToken: token);
+            var blobClient = containerClient.GetBlobClient("departments.json");
+            await blobClient.DeleteIfExistsAsync(cancellationToken: token);
 
-                using (var ms = new MemoryStream(data))
-                    await blobClient.UploadAsync(ms, token);
+            using (var ms = new MemoryStream(data))
+                await blobClient.UploadAsync(ms, token);
 
-                return Ok(blobClient.Uri.ToString());
-            });
+            return Success(blobClient.Uri.ToString());
         }
 
         public async Task<Result<string>> UploadProducersListAsync(byte[] data, CancellationToken token)
         {
-            return await ExecuteAsync(async () =>
-            {
-                var containerClient = new BlobContainerClient(_storageOptions.ConnectionString, _storageOptions.Containers.Producers);
-                await containerClient.CreateIfNotExistsAsync(cancellationToken: token);
+            var containerClient =
+                new BlobContainerClient(_storageOptions.ConnectionString, _storageOptions.Containers.Producers);
+            await containerClient.CreateIfNotExistsAsync(cancellationToken: token);
 
-                var blobClient = containerClient.GetBlobClient("producers.json");
-                await blobClient.DeleteIfExistsAsync(cancellationToken: token);
+            var blobClient = containerClient.GetBlobClient("producers.json");
+            await blobClient.DeleteIfExistsAsync(cancellationToken: token);
 
-                using (var ms = new MemoryStream(data))
-                    await blobClient.UploadAsync(ms, token);
+            using (var ms = new MemoryStream(data))
+                await blobClient.UploadAsync(ms, token);
 
-                return Ok(blobClient.Uri.ToString());
-            });
+            return Success(blobClient.Uri.ToString());
         }
 
         private string GetBlobSasUri(BlobClient blobClient, BlobSasBuilder sasBuilder, string container)
@@ -319,7 +322,9 @@ namespace Sheaft.Infrastructure.Services
                 Scheme = _storageOptions.ContentScheme,
                 Host = _storageOptions.ContentHostname,
                 Path = string.Format("{0}/{1}", container, blobClient.Name),
-                Query = sasBuilder.ToSasQueryParameters(new StorageSharedKeyCredential(_storageOptions.Account, _storageOptions.Key)).ToString()
+                Query = sasBuilder
+                    .ToSasQueryParameters(new StorageSharedKeyCredential(_storageOptions.Account, _storageOptions.Key))
+                    .ToString()
             }.ToString();
         }
 

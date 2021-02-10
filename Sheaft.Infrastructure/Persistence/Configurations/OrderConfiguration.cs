@@ -1,6 +1,6 @@
-﻿using Sheaft.Domain.Models;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Sheaft.Domain;
 
 namespace Sheaft.Infrastructure.Persistence.Configurations
 {
@@ -43,6 +43,8 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
             entity.HasMany(c => c.PurchaseOrders).WithOne().HasForeignKey("OrderUid").OnDelete(DeleteBehavior.NoAction);
             entity.HasOne(c => c.Payin).WithOne().HasForeignKey<Order>("PayinUid").OnDelete(DeleteBehavior.NoAction);
             entity.HasOne(c => c.Donation).WithOne().HasForeignKey<Order>("DonationUid").OnDelete(DeleteBehavior.NoAction);
+
+            entity.Ignore(c => c.DomainEvents);
 
             var purchaseOrders = entity.Metadata.FindNavigation(nameof(Order.PurchaseOrders));
             purchaseOrders.SetPropertyAccessMode(PropertyAccessMode.Field);

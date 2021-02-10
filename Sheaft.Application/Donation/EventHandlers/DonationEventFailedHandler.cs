@@ -1,16 +1,14 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
-using Microsoft.Extensions.Options;
-using Sheaft.Application.Commands.Handlers;
-using Sheaft.Application.Events;
-using Sheaft.Application.Interop;
-using Sheaft.Application.Models;
-using Sheaft.Domain.Enums;
-using Sheaft.Domain.Models;
-using Sheaft.Options;
+using Sheaft.Application.Common.Handlers;
+using Sheaft.Application.Common.Interfaces;
+using Sheaft.Application.Common.Interfaces.Services;
+using Sheaft.Application.Common.Models;
+using Sheaft.Domain.Enum;
+using Sheaft.Domain.Events.Donation;
 
-namespace Sheaft.Application.Handlers
+namespace Sheaft.Application.Donation.EventHandlers
 {
     public class DonationFailedEventHandler : EventsHandler,
         INotificationHandler<DomainEventNotification<DonationFailedEvent>>
@@ -26,7 +24,7 @@ namespace Sheaft.Application.Handlers
         public async Task Handle(DomainEventNotification<DonationFailedEvent> notification, CancellationToken token)
         {
             var donationEvent = notification.DomainEvent;
-            var donation = await _context.GetByIdAsync<Donation>(donationEvent.DonationId, token);
+            var donation = await _context.GetByIdAsync<Domain.Donation>(donationEvent.DonationId, token);
             if (donation.Status != TransactionStatus.Failed)
                 return;
 

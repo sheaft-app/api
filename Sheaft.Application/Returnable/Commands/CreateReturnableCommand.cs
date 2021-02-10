@@ -4,12 +4,15 @@ using System.Threading.Tasks;
 using MediatR;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using Sheaft.Application.Interop;
-using Sheaft.Core;
-using Sheaft.Domain.Enums;
-using Sheaft.Domain.Models;
+using Sheaft.Application.Common;
+using Sheaft.Application.Common.Handlers;
+using Sheaft.Application.Common.Interfaces;
+using Sheaft.Application.Common.Interfaces.Services;
+using Sheaft.Application.Common.Models;
+using Sheaft.Domain;
+using Sheaft.Domain.Enum;
 
-namespace Sheaft.Application.Commands
+namespace Sheaft.Application.Returnable.Commands
 {
     public class CreateReturnableCommand : Command<Guid>
     {
@@ -23,7 +26,7 @@ namespace Sheaft.Application.Commands
         public decimal WholeSalePrice { get; set; }
         public decimal Vat { get; set; }
     }
-    
+
     public class CreateReturnableCommandHandler : CommandsHandler,
         IRequestHandler<CreateReturnableCommand, Result<Guid>>
     {
@@ -37,16 +40,14 @@ namespace Sheaft.Application.Commands
 
         public async Task<Result<Guid>> Handle(CreateReturnableCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(request, async () =>
-            {
-                var producer = await _context.GetByIdAsync<Producer>(request.RequestUser.Id, token);
-                var returnable = new Returnable(Guid.NewGuid(), ReturnableKind.Container, producer, request.Name, request.WholeSalePrice, request.Vat, request.Description);
+            var producer = await _context.GetByIdAsync<Domain.Producer>(request.RequestUser.Id, token);
+            var returnable = new Domain.Returnable(Guid.NewGuid(), ReturnableKind.Container, producer, request.Name,
+                request.WholeSalePrice, request.Vat, request.Description);
 
-                await _context.AddAsync(returnable, token);
-                await _context.SaveChangesAsync(token);
+            await _context.AddAsync(returnable, token);
+            await _context.SaveChangesAsync(token);
 
-                return Created(returnable.Id);
-            });
+            return Success(returnable.Id);
         }
     }
 }

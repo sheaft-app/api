@@ -5,15 +5,17 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using Sheaft.Application.Interop;
-using Sheaft.Core;
-using Sheaft.Domain.Enums;
-using Sheaft.Domain.Models;
-using Sheaft.Exceptions;
+using Sheaft.Application.Common;
+using Sheaft.Application.Common.Handlers;
+using Sheaft.Application.Common.Interfaces;
+using Sheaft.Application.Common.Interfaces.Services;
+using Sheaft.Application.Common.Models;
+using Sheaft.Domain;
+using Sheaft.Domain.Enum;
 
-namespace Sheaft.Application.Commands
+namespace Sheaft.Application.DeliveryMode.Commands
 {
-    public class DeleteDeliveryModeCommand : Command<bool>
+    public class DeleteDeliveryModeCommand : Command
     {
         [JsonConstructor]
         public DeleteDeliveryModeCommand(RequestUser requestUser) : base(requestUser)
@@ -22,9 +24,9 @@ namespace Sheaft.Application.Commands
 
         public Guid Id { get; set; }
     }
-    
+
     public class DeleteDeliveryModeCommandHandler : CommandsHandler,
-        IRequestHandler<DeleteDeliveryModeCommand, Result<bool>>
+        IRequestHandler<DeleteDeliveryModeCommand, Result>
     {
         public DeleteDeliveryModeCommandHandler(
             ISheaftMediatr mediatr,
@@ -34,21 +36,23 @@ namespace Sheaft.Application.Commands
         {
         }
 
-        public async Task<Result<bool>> Handle(DeleteDeliveryModeCommand request, CancellationToken token)
+        public async Task<Result> Handle(DeleteDeliveryModeCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(request, async () =>
-            {
-                var entity = await _context.GetByIdAsync<DeliveryMode>(request.Id, token);
-                var activeAgreements = await _context.Agreements.CountAsync(a => a.Delivery.Id == entity.Id && !a.RemovedOn.HasValue, token);
-                if (activeAgreements > 0)
-                    return BadRequest<bool>(MessageKind.DeliveryMode_CannotRemove_With_Active_Agreements, entity.Name, activeAgreements);
+            var entity = await _context.GetByIdAsync<Domain.DeliveryMode>(request.Id, token);
+            var activeAgreements =
+                await _context.Agreements.CountAsync(a => a.Delivery.Id == entity.Id && !a.RemovedOn.HasValue, token);
+            if (activeAgreements > 0)
+                return Failure(MessageKind.DeliveryMode_CannotRemove_With_Active_Agreements, entity.Name,
+                    activeAgreements);
 
-                _context.Remove(entity);
-                entity.Producer.CanDirectSell = await _context.DeliveryModes.AnyAsync(c => !c.RemovedOn.HasValue && c.Producer.Id == request.RequestUser.Id && (c.Kind == DeliveryKind.Collective || c.Kind == DeliveryKind.Farm || c.Kind == DeliveryKind.Market), token);
+            _context.Remove(entity);
+            entity.Producer.CanDirectSell = await _context.DeliveryModes.AnyAsync(
+                c => !c.RemovedOn.HasValue && c.Producer.Id == request.RequestUser.Id &&
+                     (c.Kind == DeliveryKind.Collective || c.Kind == DeliveryKind.Farm ||
+                      c.Kind == DeliveryKind.Market), token);
 
-                await _context.SaveChangesAsync(token);
-                return Ok(true);
-            });
+            await _context.SaveChangesAsync(token);
+            return Success();
         }
     }
 }

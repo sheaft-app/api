@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.Options;
-using Sheaft.Options;
-using Sheaft.Application.Interop;
+using Sheaft.Application.Common.Interfaces.Services;
+using Sheaft.Application.Common.Options;
 
 namespace Sheaft.Infrastructure.Services
 {

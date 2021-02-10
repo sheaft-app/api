@@ -5,12 +5,16 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using Sheaft.Application.Interop;
-using Sheaft.Core;
+using Sheaft.Application.Common;
+using Sheaft.Application.Common.Handlers;
+using Sheaft.Application.Common.Interfaces;
+using Sheaft.Application.Common.Interfaces.Services;
+using Sheaft.Application.Common.Models;
+using Sheaft.Domain;
 
-namespace Sheaft.Application.Commands
+namespace Sheaft.Application.Product.Commands
 {
-    public class RestoreProductCommand : Command<bool>
+    public class RestoreProductCommand : Command
     {
         [JsonConstructor]
         public RestoreProductCommand(RequestUser requestUser) : base(requestUser)
@@ -19,9 +23,9 @@ namespace Sheaft.Application.Commands
 
         public Guid Id { get; set; }
     }
-    
+
     public class RestoreProductCommandHandler : CommandsHandler,
-        IRequestHandler<RestoreProductCommand, Result<bool>>
+        IRequestHandler<RestoreProductCommand, Result>
     {
         private readonly IBlobService _blobService;
 
@@ -35,16 +39,14 @@ namespace Sheaft.Application.Commands
             _blobService = blobService;
         }
 
-        public async Task<Result<bool>> Handle(RestoreProductCommand request, CancellationToken token)
+        public async Task<Result> Handle(RestoreProductCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(request, async () =>
-            {
-                var entity = await _context.Products.SingleOrDefaultAsync(a => a.Id == request.Id && a.RemovedOn.HasValue, token);
-                _context.Restore(entity);
+            var entity =
+                await _context.Products.SingleOrDefaultAsync(a => a.Id == request.Id && a.RemovedOn.HasValue, token);
+            _context.Restore(entity);
 
-                await _context.SaveChangesAsync(token);
-                return Ok(true);
-            });
+            await _context.SaveChangesAsync(token);
+            return Success();
         }
     }
 }

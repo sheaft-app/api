@@ -1,15 +1,15 @@
 ﻿using AutoMapper;
-using Sheaft.Application.Commands;
-using Sheaft.Domain.Models;
-using Sheaft.Application.Models;
+using Sheaft.Application.Common.Models.Dto;
+using Sheaft.Application.Common.Models.Inputs;
+using Sheaft.Application.Notification.Commands;
 
-namespace Sheaft.Application.Mappers
+namespace Sheaft.Application.Common.Mappings
 {
     public class NotificationProfile : Profile
     {
         public NotificationProfile()
         {
-            CreateMap<Notification, NotificationDto>();
+            CreateMap<Domain.Notification, NotificationDto>();
 
             CreateMap<IdInput, MarkUserNotificationAsReadCommand>();
         }

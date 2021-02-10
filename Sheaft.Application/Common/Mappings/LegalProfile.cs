@@ -1,16 +1,15 @@
 ﻿using AutoMapper;
-using Sheaft.Application.Commands;
-using Sheaft.Domain.Models;
-using Sheaft.Application.Models;
+using Sheaft.Application.Common.Models.Dto;
+using Sheaft.Application.Common.Models.ViewModels;
 
-namespace Sheaft.Application.Mappers
+namespace Sheaft.Application.Common.Mappings
 {
     public class LegalProfile : Profile
     {
         public LegalProfile()
         {
-            CreateMap<Legal, BaseLegalDto>();
-            CreateMap<Legal, LegalViewModel>();
+            CreateMap<Domain.Legal, BaseLegalDto>();
+            CreateMap<Domain.Legal, LegalViewModel>();
         }
     }
 }

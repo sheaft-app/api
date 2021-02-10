@@ -1,13 +1,12 @@
 ﻿using System.Linq;
 using Newtonsoft.Json;
-using Sheaft.Application.Models.Mailer;
-using Sheaft.Domain.Models;
+using Sheaft.Application.Common.Models.Mailer;
 
 namespace Sheaft.Application.Common.Extensions
 {
     public static class PurchaseOrderExtensions
     {
-        public static PurchaseOrderMailerModel GetTemplateDatas(this PurchaseOrder purchaseOrder, string url)
+        public static PurchaseOrderMailerModel GetTemplateDatas(this Domain.PurchaseOrder purchaseOrder, string url)
         {
             var senderName = purchaseOrder.Sender.Name;
             var lines = purchaseOrder.Products.Select(o => new PurchaseOrderLineMailerModel 
@@ -36,12 +35,12 @@ namespace Sheaft.Application.Common.Extensions
             };
         }
 
-        public static string GetPurchaseNotifModelAsString(this PurchaseOrder purchaseOrder)
+        public static string GetPurchaseNotifModelAsString(this Domain.PurchaseOrder purchaseOrder)
         {
             return JsonConvert.SerializeObject(GetPurchaseNotifModel(purchaseOrder));
         }
 
-        public static object GetPurchaseNotifModel(this PurchaseOrder purchaseOrder)
+        public static object GetPurchaseNotifModel(this Domain.PurchaseOrder purchaseOrder)
         {
             return new
             {

@@ -1,6 +1,4 @@
-﻿using Newtonsoft.Json;
-using Sheaft.Core;
-using System;
+﻿using System;
 using System.IO;
 using System.Linq;
 using System.Threading;
@@ -8,15 +6,21 @@ using System.Threading.Tasks;
 using MediatR;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Newtonsoft.Json;
 using OfficeOpenXml;
-using Sheaft.Application.Events;
-using Sheaft.Application.Interop;
-using Sheaft.Domain.Models;
-using Sheaft.Options;
+using Sheaft.Application.Common;
+using Sheaft.Application.Common.Handlers;
+using Sheaft.Application.Common.Interfaces;
+using Sheaft.Application.Common.Interfaces.Services;
+using Sheaft.Application.Common.Models;
+using Sheaft.Application.Common.Options;
+using Sheaft.Application.Job.Commands;
+using Sheaft.Domain;
+using Sheaft.Domain.Events.User;
 
-namespace Sheaft.Application.Commands
+namespace Sheaft.Application.User.Commands
 {
-    public class ExportUserDataCommand : Command<bool>
+    public class ExportUserDataCommand : Command
     {
         [JsonConstructor]
         public ExportUserDataCommand(RequestUser requestUser) : base(requestUser)
@@ -25,9 +29,9 @@ namespace Sheaft.Application.Commands
 
         public Guid Id { get; set; }
     }
-    
+
     public class ExportUserDataCommandHandler : CommandsHandler,
-        IRequestHandler<ExportUserDataCommand, Result<bool>>
+        IRequestHandler<ExportUserDataCommand, Result>
     {
         private readonly IBlobService _blobService;
         private readonly ScoringOptions _scoringOptions;
@@ -47,48 +51,47 @@ namespace Sheaft.Application.Commands
             _blobService = blobService;
         }
 
-        public async Task<Result<bool>> Handle(ExportUserDataCommand request, CancellationToken token)
+        public async Task<Result> Handle(ExportUserDataCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(request, async () =>
+            var job = await _context.GetByIdAsync<Domain.Job>(request.Id, token);
+            var user = await _context.GetByIdAsync<Domain.User>(request.RequestUser.Id, token);
+
+            try
             {
-                var job = await _context.GetByIdAsync<Job>(request.Id, token);
-                var user = await _context.GetByIdAsync<User>(request.RequestUser.Id, token);
+                var startResult = await _mediatr.Process(new StartJobCommand(request.RequestUser) {Id = job.Id}, token);
+                if (!startResult.Succeeded)
+                    throw startResult.Exception;
 
-                try
+                _mediatr.Post(new UserDataExportProcessingEvent(job.Id));
+
+                using (var stream = new MemoryStream())
                 {
-                    var startResult = await _mediatr.Process(new StartJobCommand(request.RequestUser) { Id = job.Id }, token);
-                    if (!startResult.Success)
-                        throw startResult.Exception;
-
-                    _mediatr.Post(new UserDataExportProcessingEvent(request.RequestUser) { JobId = job.Id });
-
-                    using (var stream = new MemoryStream())
+                    using (var package = new ExcelPackage(stream))
                     {
-                        using (var package = new ExcelPackage(stream))
-                        {
-                            await CreateExcelUserDataFileAsync(package, user, token);
-                        }
-
-                        var response = await _blobService.UploadRgpdFileAsync(request.RequestUser.Id, job.Id, $"RGPD_{job.CreatedOn:dd-MM-yyyy}.xlsx", stream.ToArray(), token);
-                        if (!response.Success)
-                            throw response.Exception;
-
-                        _mediatr.Post(new UserDataExportSucceededEvent(request.RequestUser) { JobId = job.Id });
-
-                        _logger.LogInformation($"RGPD data for user {request.RequestUser.Id} successfully exported");
-                        return await _mediatr.Process(new CompleteJobCommand(request.RequestUser) { Id = job.Id, FileUrl = response.Data }, token);
+                        await CreateExcelUserDataFileAsync(package, user, token);
                     }
-                }
-                catch (Exception e)
-                {
-                    _mediatr.Post(new UserDataExportFailedEvent(request.RequestUser) { JobId = job.Id });
-                    return await _mediatr.Process(new FailJobCommand(request.RequestUser) { Id = job.Id, Reason = e.Message }, token);
-                }
 
-            });
+                    var response = await _blobService.UploadRgpdFileAsync(request.RequestUser.Id, job.Id,
+                        $"RGPD_{job.CreatedOn:dd-MM-yyyy}.xlsx", stream.ToArray(), token);
+                    if (!response.Succeeded)
+                        throw response.Exception;
+
+                    _mediatr.Post(new UserDataExportSucceededEvent(job.Id));
+
+                    _logger.LogInformation($"RGPD data for user {request.RequestUser.Id} successfully exported");
+                    return await _mediatr.Process(
+                        new CompleteJobCommand(request.RequestUser) {Id = job.Id, FileUrl = response.Data}, token);
+                }
+            }
+            catch (Exception e)
+            {
+                _mediatr.Post(new UserDataExportFailedEvent(job.Id));
+                return await _mediatr.Process(new FailJobCommand(request.RequestUser) {Id = job.Id, Reason = e.Message},
+                    token);
+            }
         }
 
-        private async Task CreateExcelUserDataFileAsync(ExcelPackage package, User user, CancellationToken token)
+        private async Task CreateExcelUserDataFileAsync(ExcelPackage package, Domain.User user, CancellationToken token)
         {
             package = ProcessUserProfileData(package, user);
             package = await ProcessUserOrdersDataAsync(package, user, token);
@@ -97,7 +100,7 @@ namespace Sheaft.Application.Commands
             package.Save();
         }
 
-        private ExcelPackage ProcessUserProfileData(ExcelPackage package, User user)
+        private ExcelPackage ProcessUserProfileData(ExcelPackage package, Domain.User user)
         {
             var profileWorksheet = package.Workbook.Worksheets.Add("Profil");
 
@@ -117,14 +120,16 @@ namespace Sheaft.Application.Commands
             profileWorksheet.Cells[7, 1].Value = "Date de création du compte";
             profileWorksheet.Cells[7, 2].Value = user.CreatedOn.ToString("dd/MM/yyyy HH:mm");
             profileWorksheet.Cells[8, 1].Value = "Date de dernière mise à jour";
-            profileWorksheet.Cells[8, 2].Value = (user.UpdatedOn.HasValue ? user.UpdatedOn.Value : user.CreatedOn).ToString("dd/MM/yyyy HH:mm");
+            profileWorksheet.Cells[8, 2].Value =
+                (user.UpdatedOn.HasValue ? user.UpdatedOn.Value : user.CreatedOn).ToString("dd/MM/yyyy HH:mm");
             profileWorksheet.Cells[9, 1].Value = "Points";
             profileWorksheet.Cells[9, 2].Value = user.TotalPoints;
 
             return package;
         }
 
-        private async Task<ExcelPackage> ProcessUserOrdersDataAsync(ExcelPackage package, User user, CancellationToken token)
+        private async Task<ExcelPackage> ProcessUserOrdersDataAsync(ExcelPackage package, Domain.User user,
+            CancellationToken token)
         {
             var ordersWorksheet = package.Workbook.Worksheets.Add("Commandes");
 
@@ -147,7 +152,7 @@ namespace Sheaft.Application.Commands
             ordersWorksheet.Cells[3, 8].Value = "Quantité";
             ordersWorksheet.Cells[3, 9].Value = "Prix TTC";
 
-            var orders = await _context.FindAsync<PurchaseOrder>(o => o.Sender.Id == user.Id, token);
+            var orders = await _context.FindAsync<Domain.PurchaseOrder>(o => o.Sender.Id == user.Id, token);
             var i = 4;
             foreach (var order in orders)
             {
@@ -157,7 +162,8 @@ namespace Sheaft.Application.Commands
                     ordersWorksheet.Cells[i, 2].Value = order.Vendor.Name;
                     ordersWorksheet.Cells[i, 3].Value = order.Status.ToString("G");
                     ordersWorksheet.Cells[i, 4].Value = order.CreatedOn.ToString("dd/MM/yyyy");
-                    ordersWorksheet.Cells[i, 5].Value = order.ExpectedDelivery.ExpectedDeliveryDate.ToString("dd/MM/yyyy");
+                    ordersWorksheet.Cells[i, 5].Value =
+                        order.ExpectedDelivery.ExpectedDeliveryDate.ToString("dd/MM/yyyy");
                     ordersWorksheet.Cells[i, 6].Value = order.TotalOnSalePrice;
 
                     ordersWorksheet.Cells[i, 7].Value = product.Name;
@@ -170,7 +176,8 @@ namespace Sheaft.Application.Commands
             return package;
         }
 
-        private async Task<ExcelPackage> ProcessUserRatingsDataAsync(ExcelPackage package, User user, CancellationToken token)
+        private async Task<ExcelPackage> ProcessUserRatingsDataAsync(ExcelPackage package, Domain.User user,
+            CancellationToken token)
         {
             var ratingsWorksheet = package.Workbook.Worksheets.Add("Avis");
 
@@ -183,7 +190,7 @@ namespace Sheaft.Application.Commands
             ratingsWorksheet.Cells[2, 4].Value = "Note";
             ratingsWorksheet.Cells[2, 5].Value = "Commentaire";
 
-            var productsRated = await _context.FindAsync<Product>(o => o.Ratings.Any(r => r.User.Id == user.Id), token);
+            var productsRated = await _context.FindAsync<Domain.Product>(o => o.Ratings.Any(r => r.User.Id == user.Id), token);
             var i = 3;
             foreach (var product in productsRated)
             {

@@ -1,19 +1,20 @@
 ﻿using AutoMapper;
-using Sheaft.Application.Commands;
-using Sheaft.Domain.Models;
-using Sheaft.Application.Models;
+using Sheaft.Application.Common.Models.Dto;
+using Sheaft.Application.Common.Models.Inputs;
+using Sheaft.Application.Common.Models.ViewModels;
+using Sheaft.Application.Ubo.Commands;
 
-namespace Sheaft.Application.Mappers
+namespace Sheaft.Application.Common.Mappings
 {
     public class UboProfile : Profile
     {
         public UboProfile()
         {
-            CreateMap<Ubo, UboDto>()
+            CreateMap<Domain.Ubo, UboDto>()
                 .ForMember(d => d.Address, opt => opt.MapFrom(r => r.Address))
                 .ForMember(d => d.BirthPlace, opt => opt.MapFrom(r => r.BirthPlace));
 
-            CreateMap<Ubo, UboViewModel>()
+            CreateMap<Domain.Ubo, UboViewModel>()
                 .ForMember(d => d.Address, opt => opt.MapFrom(r => r.Address))
                 .ForMember(d => d.BirthPlace, opt => opt.MapFrom(r => r.BirthPlace));
 

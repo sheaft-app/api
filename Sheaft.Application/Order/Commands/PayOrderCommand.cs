@@ -6,16 +6,21 @@ using System.Threading.Tasks;
 using MediatR;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Sheaft.Core;
 using Newtonsoft.Json;
-using Sheaft.Application.Interop;
-using Sheaft.Domain.Enums;
-using Sheaft.Domain.Models;
-using Sheaft.Domains.Exceptions;
-using Sheaft.Exceptions;
-using Sheaft.Options;
+using Sheaft.Application.Common;
+using Sheaft.Application.Common.Handlers;
+using Sheaft.Application.Common.Interfaces;
+using Sheaft.Application.Common.Interfaces.Services;
+using Sheaft.Application.Common.Models;
+using Sheaft.Application.Common.Models.Dto;
+using Sheaft.Application.Common.Options;
+using Sheaft.Application.Consumer.Commands;
+using Sheaft.Application.Payin.Commands;
+using Sheaft.Domain;
+using Sheaft.Domain.Enum;
+using Sheaft.Domain.Exceptions;
 
-namespace Sheaft.Application.Commands
+namespace Sheaft.Application.Order.Commands
 {
     public class PayOrderCommand : Command<Guid>
     {
@@ -26,6 +31,7 @@ namespace Sheaft.Application.Commands
 
         public Guid OrderId { get; set; }
     }
+
     public class PayOrderCommandHandler : CommandsHandler,
         IRequestHandler<PayOrderCommand, Result<Guid>>
     {
@@ -48,88 +54,100 @@ namespace Sheaft.Application.Commands
 
         public async Task<Result<Guid>> Handle(PayOrderCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(request, async () =>
+            var checkResult =
+                await _mediatr.Process(
+                    new CheckConsumerConfigurationCommand(request.RequestUser) {Id = request.RequestUser.Id}, token);
+            if (!checkResult.Succeeded)
+                return Failure<Guid>(checkResult.Exception);
+
+            var order = await _context.GetByIdAsync<Domain.Order>(request.OrderId, token);
+            if (!order.Deliveries.Any())
+                return Failure<Guid>(MessageKind.Order_CannotPay_Deliveries_Required);
+
+            var validatedDeliveries = await ValidateCapedDeliveriesAsync(order.Deliveries, token);
+            if (!validatedDeliveries.Succeeded)
+                return Failure<Guid>(validatedDeliveries.Exception);
+
+            var products = await _context.GetByIdsAsync<Domain.Product>(order.Products.Select(p => p.Id), token);
+            var invalidProductIds = products
+                .Where(p => p.RemovedOn.HasValue || !p.Available || !p.VisibleToConsumers ||
+                            p.Producer.RemovedOn.HasValue || !p.Producer.CanDirectSell).Select(p => p.Id.ToString("N"));
+
+            if (invalidProductIds.Any())
+                return Failure<Guid>(MessageKind.Order_CannotPay_Some_Products_Invalid,
+                    string.Join(";", invalidProductIds));
+
+            using (var transaction = await _context.BeginTransactionAsync(token))
             {
-                var checkResult = await _mediatr.Process(new CheckConsumerConfigurationCommand(request.RequestUser) { Id = request.RequestUser.Id }, token);
-                if (!checkResult.Success)
-                    return Failed<Guid>(checkResult.Exception);
+                var referenceResult = await _identifierService.GetNextOrderReferenceAsync(token);
+                if (!referenceResult.Succeeded)
+                    return Failure<Guid>(referenceResult.Exception);
 
-                var order = await _context.GetByIdAsync<Order>(request.OrderId, token);
-                if (!order.Deliveries.Any())
-                    return BadRequest<Guid>(MessageKind.Order_CannotPay_Deliveries_Required);
+                order.SetReference(referenceResult.Data);
+                order.SetStatus(OrderStatus.Waiting);
+                await _context.SaveChangesAsync(token);
 
-                var validatedDeliveries = await ValidateCapedDeliveriesAsync(order.Deliveries, token);
-                if (!validatedDeliveries.Success)
-                    return Failed<Guid>(validatedDeliveries.Exception);
-
-                var products = await _context.GetByIdsAsync<Product>(order.Products.Select(p => p.Id), token);
-                var invalidProductIds = products.Where(p => p.RemovedOn.HasValue || !p.Available || !p.VisibleToConsumers || p.Producer.RemovedOn.HasValue || !p.Producer.CanDirectSell).Select(p => p.Id.ToString("N"));
-
-                if (invalidProductIds.Any())
-                    return BadRequest<Guid>(MessageKind.Order_CannotPay_Some_Products_Invalid, string.Join(";", invalidProductIds));
-
-                using (var transaction = await _context.BeginTransactionAsync(token))
+                var result = await _mediatr.Process(new CreateWebPayinCommand(request.RequestUser) {OrderId = order.Id},
+                    token);
+                if (!result.Succeeded)
                 {
-                    var referenceResult = await _identifierService.GetNextOrderReferenceAsync(token);
-                    if (!referenceResult.Success)
-                        return Failed<Guid>(referenceResult.Exception);
-
-                    order.SetReference(referenceResult.Data);
-                    order.SetStatus(OrderStatus.Waiting);
-                    await _context.SaveChangesAsync(token);
-
-                    var result = await _mediatr.Process(new CreateWebPayinCommand(request.RequestUser) { OrderId = order.Id }, token);
-                    if (!result.Success)
-                    {
-                        await transaction.RollbackAsync(token);
-                        return Failed<Guid>(result.Exception);
-                    }
-
-                    await transaction.CommitAsync(token);
-                    return Ok(result.Data);
+                    await transaction.RollbackAsync(token);
+                    return Failure<Guid>(result.Exception);
                 }
-            });
+
+                await transaction.CommitAsync(token);
+                return Success(result.Data);
+            }
         }
 
-        private async Task<Result<bool>> ValidateCapedDeliveriesAsync(IReadOnlyCollection<OrderDelivery> orderDeliveries, CancellationToken token)
+        private async Task<Result<bool>> ValidateCapedDeliveriesAsync(
+            IReadOnlyCollection<OrderDelivery> orderDeliveries, CancellationToken token)
         {
             if (orderDeliveries.All(d => !d.DeliveryMode.MaxPurchaseOrdersPerTimeSlot.HasValue))
-                return Ok(true);
+                return Success(true);
 
             var results = await _capingDeliveriesService.GetCapingDeliveriesAsync(
                 orderDeliveries.Where(d => d.DeliveryMode.MaxPurchaseOrdersPerTimeSlot.HasValue).Select(d =>
-                    new Tuple<Guid, Guid, Models.DeliveryHourDto>(
+                    new Tuple<Guid, Guid, DeliveryHourDto>(
                         d.DeliveryMode.Producer.Id,
                         d.DeliveryMode.Id,
-                        new Models.DeliveryHourDto
+                        new DeliveryHourDto
                         {
                             Day = d.ExpectedDelivery.ExpectedDeliveryDate.DayOfWeek,
                             ExpectedDeliveryDate = d.ExpectedDelivery.ExpectedDeliveryDate,
                             From = d.ExpectedDelivery.From,
                             To = d.ExpectedDelivery.To,
                         })
-                    ), token);
+                ), token);
 
-            if (!results.Success)
-                return Failed<bool>(results.Exception);
+            if (!results.Succeeded)
+                return Failure<bool>(results.Exception);
 
             foreach (var orderDelivery in orderDeliveries)
             {
-                var delivery = results.Data.FirstOrDefault(d => d.DeliveryId == orderDelivery.Id 
-                    && d.ExpectedDate.Year == orderDelivery.ExpectedDelivery.ExpectedDeliveryDate.Year 
-                    && d.ExpectedDate.Month == orderDelivery.ExpectedDelivery.ExpectedDeliveryDate.Month 
-                    && d.ExpectedDate.Day == orderDelivery.ExpectedDelivery.ExpectedDeliveryDate.Day
-                    && d.From == orderDelivery.ExpectedDelivery.From
-                    && d.To == orderDelivery.ExpectedDelivery.To);
+                var delivery = results.Data.FirstOrDefault(d => d.DeliveryId == orderDelivery.Id
+                                                                && d.ExpectedDate.Year == orderDelivery.ExpectedDelivery
+                                                                    .ExpectedDeliveryDate.Year
+                                                                && d.ExpectedDate.Month ==
+                                                                orderDelivery.ExpectedDelivery.ExpectedDeliveryDate
+                                                                    .Month
+                                                                && d.ExpectedDate.Day == orderDelivery.ExpectedDelivery
+                                                                    .ExpectedDeliveryDate.Day
+                                                                && d.From == orderDelivery.ExpectedDelivery.From
+                                                                && d.To == orderDelivery.ExpectedDelivery.To);
 
                 if (delivery == null)
                     continue;
 
                 if (delivery.Count >= orderDelivery.DeliveryMode.MaxPurchaseOrdersPerTimeSlot)
-                    return Failed<bool>(new ValidationException(MessageKind.Order_CannotPay_Delivery_Max_PurchaseOrders_Reached, orderDelivery.DeliveryMode.Producer.Name, $"le {orderDelivery.ExpectedDelivery.ExpectedDeliveryDate:dd/MM/yyyy} entre {orderDelivery.ExpectedDelivery.From:hh\\hmm} et {orderDelivery.ExpectedDelivery.To:hh\\hmm}", orderDelivery.DeliveryMode.MaxPurchaseOrdersPerTimeSlot));
+                    return Failure<bool>(new ValidationException(
+                        MessageKind.Order_CannotPay_Delivery_Max_PurchaseOrders_Reached,
+                        orderDelivery.DeliveryMode.Producer.Name,
+                        $"le {orderDelivery.ExpectedDelivery.ExpectedDeliveryDate:dd/MM/yyyy} entre {orderDelivery.ExpectedDelivery.From:hh\\hmm} et {orderDelivery.ExpectedDelivery.To:hh\\hmm}",
+                        orderDelivery.DeliveryMode.MaxPurchaseOrdersPerTimeSlot));
             }
 
-            return Ok(true);
+            return Success(true);
         }
     }
 }

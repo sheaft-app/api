@@ -1,25 +1,26 @@
 ﻿using AutoMapper;
-using Sheaft.Application.Commands;
-using Sheaft.Domain.Models;
-using Sheaft.Application.Models;
+using Sheaft.Application.Common.Models.Dto;
+using Sheaft.Application.Common.Models.Inputs;
+using Sheaft.Application.Common.Models.ViewModels;
+using Sheaft.Application.DeliveryMode.Commands;
 
-namespace Sheaft.Application.Mappers
+namespace Sheaft.Application.Common.Mappings
 {
     public class DeliveryModeProfile : Profile
     {
         public DeliveryModeProfile()
         {
-            CreateMap<DeliveryMode, DeliveryModeDto>()
+            CreateMap<Domain.DeliveryMode, DeliveryModeDto>()
                 .ForMember(d => d.Address, opt => opt.MapFrom(r => r.Address))
                 .ForMember(d => d.Producer, opt => opt.MapFrom(r => r.Producer))
                 .ForMember(d => d.OpeningHours, opt => opt.MapFrom(r => r.OpeningHours));
 
-            CreateMap<DeliveryMode, DeliveryModeViewModel>()
+            CreateMap<Domain.DeliveryMode, DeliveryModeViewModel>()
                 .ForMember(d => d.Address, opt => opt.MapFrom(r => r.Address))
                 .ForMember(d => d.Producer, opt => opt.MapFrom(r => r.Producer))
                 .ForMember(d => d.OpeningHours, opt => opt.MapFrom(r => r.OpeningHours));
 
-            CreateMap<DeliveryMode, AgreementDeliveryModeDto>()
+            CreateMap<Domain.DeliveryMode, AgreementDeliveryModeDto>()
                 .ForMember(d => d.Address, opt => opt.MapFrom(r => r.Address))
                 .ForMember(d => d.Producer, opt => opt.MapFrom(r => r.Producer));
 

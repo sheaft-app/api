@@ -1,16 +1,14 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
-using Microsoft.Extensions.Options;
-using Sheaft.Application.Commands.Handlers;
-using Sheaft.Application.Events;
-using Sheaft.Application.Interop;
-using Sheaft.Application.Models;
-using Sheaft.Domain.Enums;
-using Sheaft.Domain.Models;
-using Sheaft.Options;
+using Sheaft.Application.Common.Handlers;
+using Sheaft.Application.Common.Interfaces;
+using Sheaft.Application.Common.Interfaces.Services;
+using Sheaft.Application.Common.Models;
+using Sheaft.Domain.Enum;
+using Sheaft.Domain.Events.Payout;
 
-namespace Sheaft.Application.Handlers
+namespace Sheaft.Application.Payout.EventHandlers
 {
     public class PayoutFailedEventHandler : EventsHandler,
         INotificationHandler<DomainEventNotification<PayoutFailedEvent>>
@@ -26,7 +24,7 @@ namespace Sheaft.Application.Handlers
         public async Task Handle(DomainEventNotification<PayoutFailedEvent> notification, CancellationToken token)
         {
             var payoutEvent = notification.DomainEvent;
-            var payout = await _context.GetByIdAsync<Payout>(payoutEvent.PayoutId, token);
+            var payout = await _context.GetByIdAsync<Domain.Payout>(payoutEvent.PayoutId, token);
             if (payout.Status != TransactionStatus.Failed)
                 return;
 

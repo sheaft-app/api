@@ -1,20 +1,22 @@
-﻿using Sheaft.Core;
-using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Sheaft.Application.Interop;
-using Sheaft.Domain.Enums;
-using Sheaft.Domain.Models;
-using Sheaft.Exceptions;
-using Sheaft.Options;
+using Newtonsoft.Json;
+using Sheaft.Application.Common;
+using Sheaft.Application.Common.Handlers;
+using Sheaft.Application.Common.Interfaces;
+using Sheaft.Application.Common.Interfaces.Services;
+using Sheaft.Application.Common.Models;
+using Sheaft.Application.Common.Options;
+using Sheaft.Domain;
+using Sheaft.Domain.Enum;
 
-namespace Sheaft.Application.Commands
+namespace Sheaft.Application.Withholding.Commands
 {
-    public class ProcessWithholdingCommand : Command<TransactionStatus>
+    public class ProcessWithholdingCommand : Command
     {
         [JsonConstructor]
         public ProcessWithholdingCommand(RequestUser requestUser)
@@ -24,9 +26,9 @@ namespace Sheaft.Application.Commands
 
         public Guid WithholdingId { get; set; }
     }
-    
+
     public class ProcessWithholdingCommandHandler : CommandsHandler,
-        IRequestHandler<ProcessWithholdingCommand, Result<TransactionStatus>>
+        IRequestHandler<ProcessWithholdingCommand, Result>
     {
         private readonly IPspService _pspService;
         private readonly PspOptions _pspOptions;
@@ -43,32 +45,29 @@ namespace Sheaft.Application.Commands
             _pspOptions = pspOptions.Value;
         }
 
-        public async Task<Result<TransactionStatus>> Handle(ProcessWithholdingCommand request, CancellationToken token)
+        public async Task<Result> Handle(ProcessWithholdingCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(request, async () =>
+            var withholding = await _context.GetByIdAsync<Domain.Withholding>(request.WithholdingId, token);
+            if (withholding.Status == TransactionStatus.Succeeded)
+                return Success();
+
+            if (withholding.Status != TransactionStatus.Failed && withholding.Status != TransactionStatus.Waiting)
+                return Failure(MessageKind.Withholding_Cannot_Process_Pending);
+
+            using (var transaction = await _context.BeginTransactionAsync(token))
             {
-                var withholding = await _context.GetByIdAsync<Withholding>(request.WithholdingId, token);
-                if (withholding.Status == TransactionStatus.Succeeded)
-                    return Ok(withholding.Status);
+                var result = await _pspService.CreateWithholdingAsync(withholding, token);
+                if (!result.Succeeded)
+                    return Failure(result.Exception);
 
-                if (withholding.Status != TransactionStatus.Failed && withholding.Status != TransactionStatus.Waiting)
-                    return Failed<TransactionStatus>(new BadRequestException(MessageKind.Withholding_Cannot_Process_Pending));
+                withholding.SetResult(result.Data.ResultCode, result.Data.ResultMessage);
+                withholding.SetIdentifier(result.Data.Identifier);
 
-                using (var transaction = await _context.BeginTransactionAsync(token))
-                {
-                    var result = await _pspService.CreateWithholdingAsync(withholding, token);
-                    if (!result.Success)
-                        return Failed<TransactionStatus>(result.Exception);
+                await _context.SaveChangesAsync(token);
+                await transaction.CommitAsync(token);
 
-                    withholding.SetResult(result.Data.ResultCode, result.Data.ResultMessage);
-                    withholding.SetIdentifier(result.Data.Identifier);
-
-                    await _context.SaveChangesAsync(token);
-                    await transaction.CommitAsync(token);
-
-                    return Ok(withholding.Status);
-                }
-            });
+                return Success();
+            }
         }
     }
 }

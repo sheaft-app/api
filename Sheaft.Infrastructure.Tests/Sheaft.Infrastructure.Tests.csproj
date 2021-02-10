@@ -11,9 +11,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Sheaft.Application.Interop\Sheaft.Application.Interop.csproj" />
     <ProjectReference Include="..\Sheaft.Application\Sheaft.Application.csproj" />
-    <ProjectReference Include="..\Sheaft.Infrastructure.Persistence\Sheaft.Infrastructure.Persistence.csproj" />
     <ProjectReference Include="..\Sheaft.Infrastructure\Sheaft.Infrastructure.csproj" />
   </ItemGroup>
 

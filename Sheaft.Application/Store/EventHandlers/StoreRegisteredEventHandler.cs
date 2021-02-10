@@ -1,13 +1,13 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
-using Sheaft.Application.Commands.Handlers;
-using Sheaft.Application.Events;
-using Sheaft.Application.Interop;
-using Sheaft.Application.Models;
-using Sheaft.Domain.Models;
+using Sheaft.Application.Common.Handlers;
+using Sheaft.Application.Common.Interfaces;
+using Sheaft.Application.Common.Interfaces.Services;
+using Sheaft.Application.Common.Models;
+using Sheaft.Domain.Events.Store;
 
-namespace Sheaft.Application.Handlers
+namespace Sheaft.Application.Store.EventHandlers
 {
     public class StoreRegisteredEventHandler : EventsHandler,
         INotificationHandler<DomainEventNotification<StoreRegisteredEvent>>
@@ -23,7 +23,7 @@ namespace Sheaft.Application.Handlers
         public async Task Handle(DomainEventNotification<StoreRegisteredEvent> notification, CancellationToken token)
         {
             var storeEvent = notification.DomainEvent;
-            var store = await _context.GetSingleAsync<Store>(c => c.Id == storeEvent.StoreId, token);
+            var store = await _context.GetSingleAsync<Domain.Store>(c => c.Id == storeEvent.StoreId, token);
             await _emailService.SendEmailAsync(
                "support@sheaft.com",
                "Support",

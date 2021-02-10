@@ -1,21 +1,22 @@
 ﻿using System;
 using System.Linq;
 using System.Net.Http;
-using Sheaft.Application.Interop;
-using Sheaft.Application.Models;
-using Sheaft.Core;
-using Sheaft.Domain.Models;
-using AutoMapper.QueryableExtensions;
-using Sheaft.Options;
-using Microsoft.Extensions.Options;
-using System.Threading.Tasks;
 using System.Threading;
+using System.Threading.Tasks;
+using AutoMapper.QueryableExtensions;
 using IdentityModel.Client;
 using JWT.Algorithms;
 using JWT.Builder;
+using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
+using Sheaft.Application.Common.Extensions;
+using Sheaft.Application.Common.Interfaces;
+using Sheaft.Application.Common.Interfaces.Queries;
+using Sheaft.Application.Common.Models.Dto;
+using Sheaft.Application.Common.Options;
+using Sheaft.Domain;
 
-namespace Sheaft.Application.Queries
+namespace Sheaft.Application.User.Queries
 {
     public class UserQueries : IUserQueries
     {
@@ -58,14 +59,14 @@ namespace Sheaft.Application.Queries
 
         public IQueryable<UserDto> GetUser(Guid id, RequestUser currentUser)
         {
-            return _context.Users.OfType<User>()
+            return _context.Users.OfType<Domain.User>()
                     .Get(c => c.Id == id)
                     .ProjectTo<UserDto>(_configurationProvider);
         }
 
         public IQueryable<UserProfileDto> GetUserProfile(Guid id, RequestUser currentUser)
         {
-            return _context.Users.OfType<User>()
+            return _context.Users.OfType<Domain.User>()
                     .Get(c => c.Id == id)
                     .ProjectTo<UserProfileDto>(_configurationProvider);
         }

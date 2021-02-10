@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Sheaft.Domain.Models;
+using Sheaft.Domain;
 using Sheaft.Domain.Views;
 using Sheaft.Infrastructure.Persistence.Configurations;
 

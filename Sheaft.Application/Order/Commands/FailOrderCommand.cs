@@ -1,21 +1,23 @@
 ﻿using System;
-using Sheaft.Core;
-using Newtonsoft.Json;
-using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Sheaft.Application.Events;
-using Sheaft.Application.Interop;
-using Sheaft.Domain.Enums;
-using Sheaft.Domain.Models;
-using Sheaft.Options;
+using Newtonsoft.Json;
+using Sheaft.Application.Common;
+using Sheaft.Application.Common.Handlers;
+using Sheaft.Application.Common.Interfaces;
+using Sheaft.Application.Common.Interfaces.Services;
+using Sheaft.Application.Common.Models;
+using Sheaft.Application.Common.Options;
+using Sheaft.Domain;
+using Sheaft.Domain.Enum;
+using Sheaft.Domain.Events.Payin;
 
-namespace Sheaft.Application.Commands
+namespace Sheaft.Application.Order.Commands
 {
-    public class FailOrderCommand : Command<bool>
+    public class FailOrderCommand : Command
     {
         [JsonConstructor]
         public FailOrderCommand(RequestUser requestUser) : base(requestUser)
@@ -25,8 +27,9 @@ namespace Sheaft.Application.Commands
         public Guid OrderId { get; set; }
         public Guid PayinId { get; set; }
     }
+
     public class FailOrderCommandHandler : CommandsHandler,
-        IRequestHandler<FailOrderCommand, Result<bool>>
+        IRequestHandler<FailOrderCommand, Result>
     {
         private readonly ICapingDeliveriesService _capingDeliveriesService;
         private readonly PspOptions _pspOptions;
@@ -46,20 +49,15 @@ namespace Sheaft.Application.Commands
             _routineOptions = routineOptions.Value;
         }
 
-        public async Task<Result<bool>> Handle(FailOrderCommand request, CancellationToken token)
+        public async Task<Result> Handle(FailOrderCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(request, async () =>
-            {
-                var order = await _context.GetByIdAsync<Order>(request.OrderId, token);
-                if (order.Payin.Id != request.PayinId)
-                    return Ok(true);
+            var order = await _context.GetByIdAsync<Domain.Order>(request.OrderId, token);
+            if (order.Payin.Id != request.PayinId)
+                return Failure();
 
-                order.SetStatus(OrderStatus.Refused);
-                await _context.SaveChangesAsync(token);
-
-                _mediatr.Post(new PayinFailedEvent(request.RequestUser) { PayinId = request.PayinId });
-                return Ok(true);
-            });
+            order.SetStatus(OrderStatus.Refused);
+            await _context.SaveChangesAsync(token);
+            return Success();
         }
     }
 }

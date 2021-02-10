@@ -3,17 +3,20 @@ using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
 using Microsoft.Extensions.Logging;
-using Sheaft.Core;
 using Newtonsoft.Json;
-using Sheaft.Application.Events;
-using Sheaft.Application.Interop;
-using Sheaft.Domain.Enums;
-using Sheaft.Domain.Models;
-using Sheaft.Exceptions;
+using Sheaft.Application.Common;
+using Sheaft.Application.Common.Handlers;
+using Sheaft.Application.Common.Interfaces;
+using Sheaft.Application.Common.Interfaces.Services;
+using Sheaft.Application.Common.Models;
+using Sheaft.Application.User.Commands;
+using Sheaft.Domain;
+using Sheaft.Domain.Enum;
+using Sheaft.Domain.Events.User;
 
-namespace Sheaft.Application.Commands
+namespace Sheaft.Application.Sponsor.Commands
 {
-    public class CreateSponsoringCommand : Command<bool>
+    public class CreateSponsoringCommand : Command
     {
         [JsonConstructor]
         public CreateSponsoringCommand(RequestUser requestUser) : base(requestUser)
@@ -23,9 +26,9 @@ namespace Sheaft.Application.Commands
         public Guid UserId { get; set; }
         public string Code { get; set; }
     }
-    
+
     public class CreateSponsoringCommandHandler : CommandsHandler,
-        IRequestHandler<CreateSponsoringCommand, Result<bool>>
+        IRequestHandler<CreateSponsoringCommand, Result>
     {
         public CreateSponsoringCommandHandler(
             ISheaftMediatr mediatr,
@@ -35,33 +38,17 @@ namespace Sheaft.Application.Commands
         {
         }
 
-        public async Task<Result<bool>> Handle(CreateSponsoringCommand request, CancellationToken token)
+        public async Task<Result> Handle(CreateSponsoringCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(request, async () =>
-            {
-                var user = await _context.GetByIdAsync<User>(request.UserId, token);
-                var sponsor = await _context.FindSingleAsync<User>(u => u.SponsorshipCode == request.Code, token);
-                if (sponsor == null)
-                    return NotFound<bool>(MessageKind.Register_User_SponsorCode_NotFound);
+            var user = await _context.GetByIdAsync<Domain.User>(request.UserId, token);
+            var sponsor = await _context.FindSingleAsync<Domain.User>(u => u.SponsorshipCode == request.Code, token);
+            if (sponsor == null)
+                return Failure(MessageKind.Register_User_SponsorCode_NotFound);
 
-                await _context.AddAsync(new Sponsoring(sponsor, user), token);
-                await _context.SaveChangesAsync(token);
+            await _context.AddAsync(new Sponsoring(sponsor, user), token);
+            await _context.SaveChangesAsync(token);
 
-                _mediatr.Post(new CreateUserPointsCommand(request.RequestUser)
-                {
-                    CreatedOn = DateTimeOffset.UtcNow,
-                    Kind = PointKind.Sponsoring,
-                    UserId = sponsor.Id
-                });
-
-                _mediatr.Post(new UserSponsoredEvent(request.RequestUser)
-                {
-                    SponsorId = sponsor.Id,
-                    SponsoredId = user.Id
-                });
-
-                return Ok(true);
-            });
+            return Success();
         }
     }
 }

@@ -5,18 +5,20 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Sheaft.Application.Commands;
-using Sheaft.Exceptions;
-using Sheaft.Application.Interop;
-using Sheaft.Application.Models;
-using Sheaft.Options;
 using System;
 using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Sheaft.Application.Queries;
-using Sheaft.Domain.Enums;
+using Sheaft.Application.Common.Interfaces;
+using Sheaft.Application.Common.Interfaces.Queries;
+using Sheaft.Application.Common.Interfaces.Services;
+using Sheaft.Application.Common.Models.ViewModels;
+using Sheaft.Application.Common.Options;
+using Sheaft.Application.Document.Commands;
+using Sheaft.Application.Page.Commands;
+using Sheaft.Domain.Enum;
+using Sheaft.Domain.Exceptions;
 
 namespace Sheaft.Web.Manage.Controllers
 {
@@ -47,7 +49,7 @@ namespace Sheaft.Web.Manage.Controllers
                 .SingleOrDefaultAsync(token);
 
             if (entity == null)
-                throw new NotFoundException();
+                throw SheaftException.NotFound();
 
             ViewBag.Kind = entity.Kind;
             ViewBag.UserId = entity.Owner.Id;
@@ -67,7 +69,7 @@ namespace Sheaft.Web.Manage.Controllers
                 LegalId = legalId
             }, token);
 
-            if (!result.Success)
+            if (!result.Succeeded)
                 throw result.Exception;
 
             return RedirectToAction("Edit", new { id = result.Data });
@@ -82,7 +84,7 @@ namespace Sheaft.Web.Manage.Controllers
                 .SingleOrDefaultAsync(token);
 
             if (entity == null)
-                throw new NotFoundException();
+                throw SheaftException.NotFound();
 
             ViewBag.Kind = entity.Kind;
             ViewBag.UserId = entity.Owner.Id;
@@ -103,7 +105,7 @@ namespace Sheaft.Web.Manage.Controllers
                 Kind = model.Kind,
             }, token);
 
-            if (!result.Success)
+            if (!result.Succeeded)
                 throw result.Exception;
 
             return RedirectToAction("Edit", new { model.Id });
@@ -118,7 +120,7 @@ namespace Sheaft.Web.Manage.Controllers
                 .SingleOrDefaultAsync(token);
 
             if (entity == null)
-                throw new NotFoundException();
+                throw SheaftException.NotFound();
 
             ViewBag.Kind = entity.Kind;
             ViewBag.UserId = entity.Owner.Id;
@@ -152,7 +154,7 @@ namespace Sheaft.Web.Manage.Controllers
                 Data = data
             }, token);
 
-            if (!result.Success)
+            if (!result.Succeeded)
                 throw result.Exception;
 
             return RedirectToAction("Edit", new { model.Id });
@@ -167,7 +169,7 @@ namespace Sheaft.Web.Manage.Controllers
                 DocumentId = id
             }, token);
 
-            if (!result.Success)
+            if (!result.Succeeded)
                 throw result.Exception;
 
             return RedirectToAction("Edit", new { id });
@@ -182,7 +184,7 @@ namespace Sheaft.Web.Manage.Controllers
                 DocumentId = id
             }, token);
 
-            if (!result.Success)
+            if (!result.Succeeded)
                 throw result.Exception;
 
             return RedirectToAction("Edit", new { id });
@@ -197,7 +199,7 @@ namespace Sheaft.Web.Manage.Controllers
                 DocumentId = id
             }, token);
 
-            if (!result.Success)
+            if (!result.Succeeded)
                 throw result.Exception;
 
             return RedirectToAction("Edit", new { id });
@@ -213,7 +215,7 @@ namespace Sheaft.Web.Manage.Controllers
                 .SingleOrDefaultAsync(c => c.Id == id, token);
 
             if (entity == null)
-                throw new NotFoundException();
+                throw SheaftException.NotFound();
 
             var data = await _documentQueries.DownloadDocumentAsync(id, await GetRequestUser(token), token);
             return File(data, "application/octet-stream", entity.Name + ".zip");
@@ -229,7 +231,7 @@ namespace Sheaft.Web.Manage.Controllers
                 .SingleOrDefaultAsync(c => c.Id == documentId && c.Pages.Any(p => p.Id == pageId), token);
 
             if (entity == null)
-                throw new NotFoundException();
+                throw SheaftException.NotFound();
 
             var page = entity.Pages.Single(p => p.Id == pageId);
             var data = await _documentQueries.DownloadDocumentPageAsync(documentId, pageId, await GetRequestUser(token), token);
@@ -247,7 +249,7 @@ namespace Sheaft.Web.Manage.Controllers
                 PageId = pageId
             }, token);
 
-            if (!result.Success)
+            if (!result.Succeeded)
                 throw result.Exception;
 
             return RedirectToAction("Edit", new { id = documentId });
@@ -265,7 +267,7 @@ namespace Sheaft.Web.Manage.Controllers
                 Id = id
             }, token);
 
-            if (!result.Success)
+            if (!result.Succeeded)
                 throw result.Exception;
 
             if (entity.Kind != LegalKind.Natural)

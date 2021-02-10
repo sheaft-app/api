@@ -5,16 +5,19 @@ using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
 using Microsoft.Extensions.Logging;
-using Sheaft.Core;
 using Newtonsoft.Json;
-using Sheaft.Application.Interop;
-using Sheaft.Domain.Enums;
-using Sheaft.Domain.Models;
-using Sheaft.Exceptions;
+using Sheaft.Application.Common;
+using Sheaft.Application.Common.Handlers;
+using Sheaft.Application.Common.Interfaces;
+using Sheaft.Application.Common.Interfaces.Services;
+using Sheaft.Application.Common.Models;
+using Sheaft.Application.Page.Commands;
+using Sheaft.Domain;
+using Sheaft.Domain.Enum;
 
-namespace Sheaft.Application.Commands
+namespace Sheaft.Application.Document.Commands
 {
-    public class SubmitDocumentCommand : Command<bool>
+    public class SubmitDocumentCommand : Command
     {
         [JsonConstructor]
         public SubmitDocumentCommand(RequestUser requestUser) : base(requestUser)
@@ -23,9 +26,9 @@ namespace Sheaft.Application.Commands
 
         public Guid DocumentId { get; set; }
     }
-    
+
     public class SubmitDocumentCommandHandler : CommandsHandler,
-            IRequestHandler<SubmitDocumentCommand, Result<bool>>
+        IRequestHandler<SubmitDocumentCommand, Result>
     {
         private readonly IPspService _pspService;
 
@@ -39,40 +42,38 @@ namespace Sheaft.Application.Commands
             _pspService = pspService;
         }
 
-        public async Task<Result<bool>> Handle(SubmitDocumentCommand request, CancellationToken token)
+        public async Task<Result> Handle(SubmitDocumentCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(request, async () =>
+            var legal = await _context.GetSingleAsync<Domain.Legal>(r => r.Documents.Any(d => d.Id == request.DocumentId),
+                token);
+            var document = legal.Documents.FirstOrDefault(c => c.Id == request.DocumentId);
+            if (document.Status != DocumentStatus.Locked)
+                return Failure(MessageKind.Document_CannotSubmit_NotLocked);
+
+            var results = new List<Result>();
+            foreach (var page in document.Pages.Where(p => !p.UploadedOn.HasValue))
             {
-                var legal = await _context.GetSingleAsync<Legal>(r => r.Documents.Any(d => d.Id == request.DocumentId), token);
-                var document = legal.Documents.FirstOrDefault(c => c.Id == request.DocumentId);
-                if (document.Status != DocumentStatus.Locked)
-                    return BadRequest<bool>(MessageKind.Document_CannotSubmit_NotLocked);
-
-                var results = new List<Result<bool>>();
-                foreach (var page in document.Pages.Where(p => !p.UploadedOn.HasValue))
+                results.Add(await _mediatr.Process(new SendPageCommand(request.RequestUser)
                 {
-                    results.Add(await _mediatr.Process(new SendPageCommand(request.RequestUser)
-                    {
-                        DocumentId = request.DocumentId,
-                        PageId = page.Id
-                    }, token));
-                }
+                    DocumentId = request.DocumentId,
+                    PageId = page.Id
+                }, token));
+            }
 
-                if (results.Any(r => !r.Success))
-                    return BadRequest<bool>(MessageKind.Document_Errors_On_Submit);
+            if (results.Any(r => !r.Succeeded))
+                return Failure(MessageKind.Document_Errors_On_Submit);
 
-                var result = await _pspService.SubmitDocumentAsync(document, legal.User.Identifier, token);
-                if (!result.Success)
-                    return Failed<bool>(result.Exception);
+            var result = await _pspService.SubmitDocumentAsync(document, legal.User.Identifier, token);
+            if (!result.Succeeded)
+                return Failure(result.Exception);
 
-                document.SetStatus(result.Data.Status);
-                document.SetResult(result.Data.ResultCode, result.Data.ResultMessage);
+            document.SetStatus(result.Data.Status);
+            document.SetResult(result.Data.ResultCode, result.Data.ResultMessage);
 
-                _context.Update(document);
-                await _context.SaveChangesAsync(token);
+            _context.Update(document);
+            await _context.SaveChangesAsync(token);
 
-                return Ok(true);
-            });
+            return Success();
         }
     }
 }

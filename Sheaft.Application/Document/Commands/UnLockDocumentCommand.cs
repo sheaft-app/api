@@ -1,19 +1,21 @@
 ﻿using System;
-using Sheaft.Core;
-using Newtonsoft.Json;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
 using Microsoft.Extensions.Logging;
-using Sheaft.Application.Interop;
-using Sheaft.Domain.Enums;
-using Sheaft.Domain.Models;
+using Newtonsoft.Json;
+using Sheaft.Application.Common;
+using Sheaft.Application.Common.Handlers;
+using Sheaft.Application.Common.Interfaces;
+using Sheaft.Application.Common.Interfaces.Services;
+using Sheaft.Application.Common.Models;
+using Sheaft.Domain;
+using Sheaft.Domain.Enum;
 
-namespace Sheaft.Application.Commands
+namespace Sheaft.Application.Document.Commands
 {
-    public class UnLockDocumentCommand : Command<bool>
+    public class UnLockDocumentCommand : Command
     {
         [JsonConstructor]
         public UnLockDocumentCommand(RequestUser requestUser) : base(requestUser)
@@ -22,8 +24,9 @@ namespace Sheaft.Application.Commands
 
         public Guid DocumentId { get; set; }
     }
+
     public class UnLockDocumentCommandHandler : CommandsHandler,
-            IRequestHandler<UnLockDocumentCommand, Result<bool>>
+        IRequestHandler<UnLockDocumentCommand, Result>
     {
         private readonly IPspService _pspService;
 
@@ -37,17 +40,15 @@ namespace Sheaft.Application.Commands
             _pspService = pspService;
         }
 
-        public async Task<Result<bool>> Handle(UnLockDocumentCommand request, CancellationToken token)
+        public async Task<Result> Handle(UnLockDocumentCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(request, async () =>
-            {
-                var legal = await _context.GetSingleAsync<Legal>(r => r.Documents.Any(d => d.Id == request.DocumentId), token);
-                var document = legal.Documents.FirstOrDefault(c => c.Id == request.DocumentId);
-                document.SetStatus(DocumentStatus.UnLocked);
+            var legal = await _context.GetSingleAsync<Domain.Legal>(r => r.Documents.Any(d => d.Id == request.DocumentId),
+                token);
+            var document = legal.Documents.FirstOrDefault(c => c.Id == request.DocumentId);
+            document.SetStatus(DocumentStatus.UnLocked);
 
-                await _context.SaveChangesAsync(token);
-                return Ok(true);
-            });
+            await _context.SaveChangesAsync(token);
+            return Success();
         }
     }
 }

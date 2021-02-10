@@ -2,18 +2,18 @@
 using System.Text;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
-using Sheaft.Application.Models.Mailer;
+using Sheaft.Application.Common.Models.Mailer;
 
 namespace Sheaft.Application.Common.Extensions
 {
     public static class AgreementExtensions
     {
-        public static StringContent GetNotificationContent(this Domain.Models.Agreement agreement, IConfiguration configuration, string name)
+        public static StringContent GetNotificationContent(this Domain.Agreement agreement, IConfiguration configuration, string name)
         {
             return new StringContent(JsonConvert.SerializeObject(agreement.GetNotificationDatas(configuration, name)), Encoding.UTF8, "application/json");
         }
 
-        public static AgreementMailerModel GetNotificationDatas(this Domain.Models.Agreement agreement, IConfiguration configuration,  string name)
+        public static AgreementMailerModel GetNotificationDatas(this Domain.Agreement agreement, IConfiguration configuration,  string name)
         {
             return new AgreementMailerModel
             { 

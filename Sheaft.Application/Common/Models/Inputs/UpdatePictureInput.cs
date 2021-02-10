@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Sheaft.Application.Models
+namespace Sheaft.Application.Common.Models.Inputs
 {
     public class UpdatePictureInput
     {

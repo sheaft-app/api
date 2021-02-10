@@ -1,18 +1,23 @@
-﻿using Sheaft.Core;
-using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Sheaft.Application.Interop;
-using Sheaft.Domain.Enums;
-using Sheaft.Options;
+using Newtonsoft.Json;
+using Sheaft.Application.Common;
+using Sheaft.Application.Common.Handlers;
+using Sheaft.Application.Common.Interfaces;
+using Sheaft.Application.Common.Interfaces.Services;
+using Sheaft.Application.Common.Models;
+using Sheaft.Application.Common.Options;
+using Sheaft.Application.Legal.Commands;
+using Sheaft.Application.Wallet.Commands;
+using Sheaft.Domain;
 
-namespace Sheaft.Application.Commands
+namespace Sheaft.Application.Producer.Commands
 {
-    public class CheckProducerConfigurationCommand : Command<bool>
+    public class CheckProducerConfigurationCommand : Command
     {
         [JsonConstructor]
         public CheckProducerConfigurationCommand(RequestUser requestUser) : base(requestUser)
@@ -21,9 +26,9 @@ namespace Sheaft.Application.Commands
 
         public Guid ProducerId { get; set; }
     }
-    
+
     public class CheckProducerConfigurationCommandHandler : CommandsHandler,
-        IRequestHandler<CheckProducerConfigurationCommand, Result<bool>>
+        IRequestHandler<CheckProducerConfigurationCommand, Result>
     {
         private readonly RoleOptions _roleOptions;
         private readonly IBlobService _blobService;
@@ -40,20 +45,23 @@ namespace Sheaft.Application.Commands
             _blobService = blobService;
         }
 
-        public async Task<Result<bool>> Handle(CheckProducerConfigurationCommand request, CancellationToken token)
+        public async Task<Result> Handle(CheckProducerConfigurationCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(request, async () =>
-            {
-                var business = await _mediatr.Process(new CheckBusinessLegalConfigurationCommand(request.RequestUser) { UserId = request.ProducerId }, token);
-                if (!business.Success)
-                    return Failed<bool>(business.Exception);
+            var business =
+                await _mediatr.Process(
+                    new CheckBusinessLegalConfigurationCommand(request.RequestUser) {UserId = request.ProducerId},
+                    token);
+            if (!business.Succeeded)
+                return Failure(business.Exception);
 
-                var wallet = await _mediatr.Process(new CheckWalletPaymentsConfigurationCommand(request.RequestUser) { UserId = request.ProducerId }, token);
-                if (!wallet.Success)
-                    return Failed<bool>(wallet.Exception);
+            var wallet =
+                await _mediatr.Process(
+                    new CheckWalletPaymentsConfigurationCommand(request.RequestUser) {UserId = request.ProducerId},
+                    token);
+            if (!wallet.Succeeded)
+                return Failure(wallet.Exception);
 
-                return Ok(true);
-            });
+            return Success();
         }
     }
 }

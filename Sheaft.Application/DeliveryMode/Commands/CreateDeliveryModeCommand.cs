@@ -5,14 +5,17 @@ using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
 using Microsoft.Extensions.Logging;
-using Sheaft.Application.Models;
-using Sheaft.Domain.Enums;
-using Sheaft.Core;
 using Newtonsoft.Json;
-using Sheaft.Application.Interop;
-using Sheaft.Domain.Models;
+using Sheaft.Application.Common;
+using Sheaft.Application.Common.Handlers;
+using Sheaft.Application.Common.Interfaces;
+using Sheaft.Application.Common.Interfaces.Services;
+using Sheaft.Application.Common.Models;
+using Sheaft.Application.Common.Models.Inputs;
+using Sheaft.Domain;
+using Sheaft.Domain.Enum;
 
-namespace Sheaft.Application.Commands
+namespace Sheaft.Application.DeliveryMode.Commands
 {
     public class CreateDeliveryModeCommand : Command<Guid>
     {
@@ -32,7 +35,7 @@ namespace Sheaft.Application.Commands
         public bool AutoAcceptRelatedPurchaseOrder { get; set; }
         public bool AutoCompleteRelatedPurchaseOrder { get; set; }
     }
-    
+
     public class CreateDeliveryModeCommandHandler : CommandsHandler,
         IRequestHandler<CreateDeliveryModeCommand, Result<Guid>>
     {
@@ -46,39 +49,40 @@ namespace Sheaft.Application.Commands
 
         public async Task<Result<Guid>> Handle(CreateDeliveryModeCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(request, async () =>
+            var producer = await _context.GetByIdAsync<Domain.Producer>(request.RequestUser.Id, token);
+
+            DeliveryAddress deliveryModeAddress = null;
+            if (request.Address != null)
             {
-                var producer = await _context.GetByIdAsync<Producer>(request.RequestUser.Id, token);
+                deliveryModeAddress = new DeliveryAddress(request.Address.Line1, request.Address.Line2,
+                    request.Address.Zipcode, request.Address.City, request.Address.Country, request.Address.Longitude,
+                    request.Address.Latitude);
+            }
 
-                DeliveryAddress deliveryModeAddress = null;
-                if (request.Address != null)
+            var openingHours = new List<TimeSlotHour>();
+            if (request.OpeningHours != null)
+            {
+                foreach (var oh in request.OpeningHours)
                 {
-                    deliveryModeAddress = new DeliveryAddress(request.Address.Line1, request.Address.Line2, request.Address.Zipcode, request.Address.City, request.Address.Country, request.Address.Longitude, request.Address.Latitude);
+                    openingHours.AddRange(oh.Days.Select(c => new TimeSlotHour(c, oh.From, oh.To)));
                 }
+            }
 
-                var openingHours = new List<TimeSlotHour>();
-                if (request.OpeningHours != null)
-                {
-                    foreach (var oh in request.OpeningHours)
-                    {
-                        openingHours.AddRange(oh.Days.Select(c => new TimeSlotHour(c, oh.From, oh.To)));
-                    }
-                }
+            var entity = new Domain.DeliveryMode(Guid.NewGuid(), request.Kind, producer, request.Available,
+                deliveryModeAddress, openingHours, request.Name, request.Description);
+            entity.SetLockOrderHoursBeforeDelivery(request.LockOrderHoursBeforeDelivery);
+            entity.SetAutoAcceptRelatedPurchaseOrders(request.AutoAcceptRelatedPurchaseOrder);
+            entity.SetAutoCompleteRelatedPurchaseOrders(request.AutoCompleteRelatedPurchaseOrder);
+            entity.SetMaxPurchaseOrdersPerTimeSlot(request.MaxPurchaseOrdersPerTimeSlot);
 
-                var entity = new DeliveryMode(Guid.NewGuid(), request.Kind, producer, request.Available, deliveryModeAddress, openingHours, request.Name, request.Description);
-                entity.SetLockOrderHoursBeforeDelivery(request.LockOrderHoursBeforeDelivery);
-                entity.SetAutoAcceptRelatedPurchaseOrders(request.AutoAcceptRelatedPurchaseOrder);
-                entity.SetAutoCompleteRelatedPurchaseOrders(request.AutoCompleteRelatedPurchaseOrder);
-                entity.SetMaxPurchaseOrdersPerTimeSlot(request.MaxPurchaseOrdersPerTimeSlot);
+            if (request.Kind == DeliveryKind.Collective || request.Kind == DeliveryKind.Farm ||
+                request.Kind == DeliveryKind.Market)
+                producer.CanDirectSell = true;
 
-                if (request.Kind == DeliveryKind.Collective || request.Kind == DeliveryKind.Farm || request.Kind == DeliveryKind.Market)
-                    producer.CanDirectSell = true;
+            await _context.AddAsync(entity, token);
+            await _context.SaveChangesAsync(token);
 
-                await _context.AddAsync(entity, token);
-                await _context.SaveChangesAsync(token);
-
-                return Ok(entity.Id);
-            });
+            return Success(entity.Id);
         }
     }
 }

@@ -1,6 +1,7 @@
-﻿using Sheaft.Application.Interop;
+﻿using Sheaft.Application.Common.Interfaces;
+using Sheaft.Application.Common.Interfaces.Services;
 
-namespace Sheaft.Application.Commands.Handlers
+namespace Sheaft.Application.Common.Handlers
 {
     public abstract class EventsHandler
     {

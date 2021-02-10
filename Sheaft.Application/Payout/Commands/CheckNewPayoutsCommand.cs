@@ -7,24 +7,29 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Sheaft.Core;
 using Newtonsoft.Json;
-using Sheaft.Application.Interop;
-using Sheaft.Domain.Enums;
-using Sheaft.Options;
+using Sheaft.Application.Common;
+using Sheaft.Application.Common.Extensions;
+using Sheaft.Application.Common.Handlers;
+using Sheaft.Application.Common.Interfaces;
+using Sheaft.Application.Common.Interfaces.Services;
+using Sheaft.Application.Common.Models;
+using Sheaft.Application.Common.Options;
+using Sheaft.Domain;
+using Sheaft.Domain.Enum;
 
-namespace Sheaft.Application.Commands
+namespace Sheaft.Application.Payout.Commands
 {
-    public class CheckNewPayoutsCommand : Command<bool>
+    public class CheckNewPayoutsCommand : Command
     {
         [JsonConstructor]
         public CheckNewPayoutsCommand(RequestUser requestUser) : base(requestUser)
         {
         }
     }
-    
+
     public class CheckNewPayoutsCommandHandler : CommandsHandler,
-        IRequestHandler<CheckNewPayoutsCommand, Result<bool>>
+        IRequestHandler<CheckNewPayoutsCommand, Result>
     {
         private readonly PspOptions _pspOptions;
         private readonly RoutineOptions _routineOptions;
@@ -44,48 +49,47 @@ namespace Sheaft.Application.Commands
             _routineOptions = routineOptions.Value;
         }
 
-        public async Task<Result<bool>> Handle(CheckNewPayoutsCommand request, CancellationToken token)
+        public async Task<Result> Handle(CheckNewPayoutsCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(request, async () =>
+            var skip = 0;
+            const int take = 100;
+
+            var payoutIds = await GetNextNewPayoutIdsAsync(skip, take, token);
+            while (payoutIds.Any())
             {
-                var skip = 0;
-                const int take = 100;
-
-                var payoutIds = await GetNextNewPayoutIdsAsync(skip, take, token);
-                while (payoutIds.Any())
+                foreach (var payoutId in payoutIds)
                 {
-                    foreach (var payoutId in payoutIds)
+                    _mediatr.Post(new CreatePayoutCommand(request.RequestUser)
                     {
-                        _mediatr.Post(new CreatePayoutCommand(request.RequestUser)
-                        {
-                            ProducerId = payoutId.Key,
-                            TransferIds = payoutId.Value
-                        });
-                    }
-
-                    skip += take;
-                    payoutIds = await GetNextNewPayoutIdsAsync(skip, take, token);
+                        ProducerId = payoutId.Key,
+                        TransferIds = payoutId.Value
+                    });
                 }
 
-                return Ok(true);
-            });
+                skip += take;
+                payoutIds = await GetNextNewPayoutIdsAsync(skip, take, token);
+            }
+
+            return Success();
         }
 
-        private async Task<IEnumerable<KeyValuePair<Guid, List<Guid>>>> GetNextNewPayoutIdsAsync(int skip, int take, CancellationToken token)
+        private async Task<IEnumerable<KeyValuePair<Guid, List<Guid>>>> GetNextNewPayoutIdsAsync(int skip, int take,
+            CancellationToken token)
         {
             var producersTransfers = await _context.Transfers
                 .Get(t => t.Status == TransactionStatus.Succeeded
-                        && t.CreditedWallet.User.Legal.Validation == LegalValidation.Regular
-                        && (t.Payout == null || t.Payout.Status == TransactionStatus.Failed)
-                        && t.PurchaseOrder.Status == PurchaseOrderStatus.Delivered)
-                .Select(t => new { ProducerId = t.CreditedWallet.User.Id, TransferId = t.Id })
+                          && t.CreditedWallet.User.Legal.Validation == LegalValidation.Regular
+                          && (t.Payout == null || t.Payout.Status == TransactionStatus.Failed)
+                          && t.PurchaseOrder.Status == PurchaseOrderStatus.Delivered)
+                .Select(t => new {ProducerId = t.CreditedWallet.User.Id, TransferId = t.Id})
                 .OrderBy(c => c.ProducerId)
                 .Skip(skip)
                 .Take(take)
                 .ToListAsync(token);
 
             var groupedProducers = producersTransfers.GroupBy(t => t.ProducerId);
-            return groupedProducers.Select(c => new KeyValuePair<Guid, List<Guid>>(c.Key, c.Select(t => t.TransferId)?.ToList()));
+            return groupedProducers.Select(c =>
+                new KeyValuePair<Guid, List<Guid>>(c.Key, c.Select(t => t.TransferId)?.ToList()));
         }
     }
 }

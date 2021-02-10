@@ -1,17 +1,17 @@
 ﻿using System;
 using Newtonsoft.Json;
-using Sheaft.Core;
-using Sheaft.Domain.Models.Common;
+using Sheaft.Domain.Common;
 
-namespace Sheaft.Application.Events
+namespace Sheaft.Domain.Events.Payout
 {
     public class PayoutFailedEvent : DomainEvent
     {
         [JsonConstructor]
-        public PayoutFailedEvent(RequestUser requestUser) : base(requestUser)
+        public PayoutFailedEvent(Guid payoutId)
         {
+            PayoutId = payoutId;
         }
 
-        public Guid PayoutId { get; set; }
+        public Guid PayoutId { get; }
     }
 }

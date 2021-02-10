@@ -1,6 +1,6 @@
-﻿using Sheaft.Domain.Models;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Sheaft.Domain;
 
 namespace Sheaft.Infrastructure.Persistence.Configurations
 {
@@ -25,6 +25,8 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
             entity.HasOne(c => c.BankAccount).WithMany().HasForeignKey("BankAccountUid").OnDelete(DeleteBehavior.NoAction);
             entity.HasMany(c => c.Transfers).WithOne(c => c.Payout).HasForeignKey("PayoutUid").OnDelete(DeleteBehavior.NoAction);
             entity.HasMany(c => c.Withholdings).WithOne(c => c.Payout).HasForeignKey("PayoutUid").OnDelete(DeleteBehavior.NoAction);
+
+            entity.Ignore(c => c.DomainEvents);
 
             var transfers = entity.Metadata.FindNavigation(nameof(Payout.Transfers));
             transfers.SetPropertyAccessMode(PropertyAccessMode.Field);

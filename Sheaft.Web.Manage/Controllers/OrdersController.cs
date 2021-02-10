@@ -4,16 +4,17 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Sheaft.Exceptions;
-using Sheaft.Application.Interop;
-using Sheaft.Options;
 using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Sheaft.Application.Commands;
-using Sheaft.Application.Models;
-using Sheaft.Domain.Enums;
+using Sheaft.Application.Common.Interfaces;
+using Sheaft.Application.Common.Interfaces.Services;
+using Sheaft.Application.Common.Models.ViewModels;
+using Sheaft.Application.Common.Options;
+using Sheaft.Application.Order.Commands;
+using Sheaft.Domain.Enum;
+using Sheaft.Domain.Exceptions;
 
 namespace Sheaft.Web.Manage.Controllers
 {
@@ -74,7 +75,7 @@ namespace Sheaft.Web.Manage.Controllers
                 .SingleOrDefaultAsync(token);
 
             if (entity == null)
-                throw new NotFoundException();
+                throw SheaftException.NotFound();
 
             return View(entity);
         }
@@ -88,7 +89,7 @@ namespace Sheaft.Web.Manage.Controllers
                 OrderId = model.Id
             }, token);
 
-            if (!result.Success)
+            if (!result.Succeeded)
                 throw result.Exception;
 
             return RedirectToAction("Edit", new { model.Id });
@@ -103,7 +104,7 @@ namespace Sheaft.Web.Manage.Controllers
                 OrderId = model.Id
             }, token);
 
-            if (!result.Success)
+            if (!result.Succeeded)
                 throw result.Exception;
 
             return RedirectToAction("Edit", new { model.Id });
@@ -118,7 +119,7 @@ namespace Sheaft.Web.Manage.Controllers
                 OrderId = model.Id
             }, token);
 
-            if (!result.Success)
+            if (!result.Succeeded)
                 throw result.Exception;
 
             return RedirectToAction("Edit", new { model.Id });
@@ -133,7 +134,7 @@ namespace Sheaft.Web.Manage.Controllers
                 OrderId = model.Id
             }, token);
 
-            if (!result.Success)
+            if (!result.Succeeded)
                 throw result.Exception;
 
             return RedirectToAction("Edit", new { model.Id });

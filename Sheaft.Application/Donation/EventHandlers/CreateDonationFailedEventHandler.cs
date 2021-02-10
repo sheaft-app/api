@@ -1,16 +1,13 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
-using Microsoft.Extensions.Options;
-using Sheaft.Application.Commands.Handlers;
-using Sheaft.Application.Events;
-using Sheaft.Application.Interop;
-using Sheaft.Application.Models;
-using Sheaft.Domain.Enums;
-using Sheaft.Domain.Models;
-using Sheaft.Options;
+using Sheaft.Application.Common.Handlers;
+using Sheaft.Application.Common.Interfaces;
+using Sheaft.Application.Common.Interfaces.Services;
+using Sheaft.Application.Common.Models;
+using Sheaft.Domain.Events.Donation;
 
-namespace Sheaft.Application.Handlers
+namespace Sheaft.Application.Donation.EventHandlers
 {
     public class CreateDonationFailedEventHandler : EventsHandler,
         INotificationHandler<DomainEventNotification<CreateDonationFailedEvent>>
@@ -26,7 +23,7 @@ namespace Sheaft.Application.Handlers
         public async Task Handle(DomainEventNotification<CreateDonationFailedEvent> notification, CancellationToken token)
         {
             var donationEvent = notification.DomainEvent;
-            var order = await _context.GetByIdAsync<Order>(donationEvent.OrderId, token);
+            var order = await _context.GetByIdAsync<Domain.Order>(donationEvent.OrderId, token);
 
             await _emailService.SendEmailAsync(
                "support@sheaft.com",

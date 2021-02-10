@@ -1,18 +1,6 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Sheaft.Domain.Models;
-using Sheaft.Domain.Views;
-using Microsoft.EntityFrameworkCore;
-using Sheaft.Exceptions;
-using System.Collections.Generic;
-using System.Linq;
-using System.Linq.Expressions;
-using Microsoft.Extensions.Localization;
-using Sheaft.Localization;
-using Microsoft.EntityFrameworkCore.ChangeTracking;
-using Sheaft.Application.Interop;
-using Sheaft.Domain.Interop;
 using Microsoft.EntityFrameworkCore.Storage;
 
 namespace Sheaft.Infrastructure.Persistence
@@ -20,38 +8,71 @@ namespace Sheaft.Infrastructure.Persistence
 
     public class InnerTransaction : IDbContextTransaction
     {
-        public InnerTransaction(Guid transactionId)
+        private readonly IDbContextTransaction _transaction;
+        private readonly Action _action;
+
+        public InnerTransaction()
         {
-            TransactionId = transactionId;
+            TransactionId = Guid.Empty;
+        }
+
+        public InnerTransaction(IDbContextTransaction transaction, Action action)
+        {
+            _transaction = transaction;
+            _action = action;
+            TransactionId = transaction.TransactionId;
         }
 
         public Guid TransactionId { get; }
 
         public void Commit()
         {
+            if(TransactionId == Guid.Empty)
+                return;
+            
+            _action();
+            _transaction.Commit();
         }
 
         public Task CommitAsync(CancellationToken token = default)
         {
-            return Task.CompletedTask;
+            if(TransactionId == Guid.Empty)
+                return Task.CompletedTask;
+                
+            _action();
+            return _transaction.CommitAsync(token);
         }
 
         public void Dispose()
         {
+            if(TransactionId == Guid.Empty)
+                return;
+            
+            _transaction.Dispose();
         }
 
         public ValueTask DisposeAsync()
         {
-            return new ValueTask(Task.CompletedTask);
+            if(TransactionId == Guid.Empty)
+                return new ValueTask(Task.CompletedTask);
+                
+            return _transaction.DisposeAsync();
         }
 
         public void Rollback()
         {
+            if(TransactionId == Guid.Empty)
+                return;
+
+            _transaction.Rollback();
         }
 
         public Task RollbackAsync(CancellationToken token = default)
         {
-            return Task.CompletedTask;
+            if(TransactionId == Guid.Empty)
+                return Task.CompletedTask;
+
+            return _transaction.RollbackAsync(token);
         }
     }
 }

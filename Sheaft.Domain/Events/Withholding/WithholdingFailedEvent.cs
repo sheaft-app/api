@@ -1,17 +1,17 @@
 ﻿using System;
 using Newtonsoft.Json;
-using Sheaft.Core;
-using Sheaft.Domain.Models.Common;
+using Sheaft.Domain.Common;
 
-namespace Sheaft.Application.Events
+namespace Sheaft.Domain.Events.Withholding
 {
     public class WithholdingFailedEvent : DomainEvent
     {
         [JsonConstructor]
-        public WithholdingFailedEvent(RequestUser requestUser) : base(requestUser)
+        public WithholdingFailedEvent(Guid withholdingId)
         {
+            WithholdingId = withholdingId;
         }
 
-        public Guid WithholdingId { get; set; }
+        public Guid WithholdingId { get; }
     }
 }

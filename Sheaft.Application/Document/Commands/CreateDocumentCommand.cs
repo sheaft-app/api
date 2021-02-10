@@ -4,14 +4,16 @@ using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
 using Microsoft.Extensions.Logging;
-using Sheaft.Core;
 using Newtonsoft.Json;
-using Sheaft.Application.Interop;
-using Sheaft.Domain.Enums;
-using Sheaft.Domain.Models;
-using Sheaft.Exceptions;
+using Sheaft.Application.Common;
+using Sheaft.Application.Common.Handlers;
+using Sheaft.Application.Common.Interfaces;
+using Sheaft.Application.Common.Interfaces.Services;
+using Sheaft.Application.Common.Models;
+using Sheaft.Domain;
+using Sheaft.Domain.Enum;
 
-namespace Sheaft.Application.Commands
+namespace Sheaft.Application.Document.Commands
 {
     public class CreateDocumentCommand : Command<Guid>
     {
@@ -24,9 +26,9 @@ namespace Sheaft.Application.Commands
         public string Name { get; set; }
         public DocumentKind Kind { get; set; }
     }
-    
+
     public class CreateDocumentCommandHandler : CommandsHandler,
-            IRequestHandler<CreateDocumentCommand, Result<Guid>>
+        IRequestHandler<CreateDocumentCommand, Result<Guid>>
     {
         private readonly IPspService _pspService;
 
@@ -42,33 +44,30 @@ namespace Sheaft.Application.Commands
 
         public async Task<Result<Guid>> Handle(CreateDocumentCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(request, async () =>
+            using (var transaction = await _context.BeginTransactionAsync(token))
             {
-                using (var transaction = await _context.BeginTransactionAsync(token))
+                var legal = await _context.GetSingleAsync<Domain.Legal>(r => r.Id == request.LegalId, token);
+                if (legal.Documents.Any(d => d.Kind == request.Kind))
+                    return Failure<Guid>(MessageKind.Document_CannotCreate_Type_Already_Present);
+
+                var document = legal.AddDocument(request.Kind, request.Name);
+                await _context.SaveChangesAsync(token);
+
+                var result = await _pspService.CreateDocumentAsync(document, legal.User.Identifier, token);
+                if (!result.Succeeded)
                 {
-                    var legal = await _context.GetSingleAsync<Legal>(r => r.Id == request.LegalId, token);
-                    if (legal.Documents.Any(d => d.Kind == request.Kind))
-                        return BadRequest<Guid>(MessageKind.Document_CannotCreate_Type_Already_Present);
-
-                    var document = legal.AddDocument(request.Kind, request.Name);
-                    await _context.SaveChangesAsync(token);
-
-                    var result = await _pspService.CreateDocumentAsync(document, legal.User.Identifier, token);
-                    if (!result.Success)
-                    {
-                        await transaction.RollbackAsync(token);
-                        return Failed<Guid>(result.Exception);
-                    }
-
-                    document.SetIdentifier(result.Data.Identifier);
-                    document.SetStatus(result.Data.Status);
-
-                    await _context.SaveChangesAsync(token);
-                    await transaction.CommitAsync(token);
-
-                    return Ok(document.Id);
+                    await transaction.RollbackAsync(token);
+                    return Failure<Guid>(result.Exception);
                 }
-            });
+
+                document.SetIdentifier(result.Data.Identifier);
+                document.SetStatus(result.Data.Status);
+
+                await _context.SaveChangesAsync(token);
+                await transaction.CommitAsync(token);
+
+                return Success(document.Id);
+            }
         }
     }
 }

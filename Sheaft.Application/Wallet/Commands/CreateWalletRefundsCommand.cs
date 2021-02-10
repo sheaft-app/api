@@ -4,12 +4,15 @@ using System.Threading.Tasks;
 using MediatR;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using Sheaft.Application.Interop;
-using Sheaft.Core;
-using Sheaft.Domain.Enums;
-using Sheaft.Domain.Models;
+using Sheaft.Application.Common;
+using Sheaft.Application.Common.Handlers;
+using Sheaft.Application.Common.Interfaces;
+using Sheaft.Application.Common.Interfaces.Services;
+using Sheaft.Application.Common.Models;
+using Sheaft.Domain;
+using Sheaft.Domain.Enum;
 
-namespace Sheaft.Application.Commands
+namespace Sheaft.Application.Wallet.Commands
 {
     public class CreateWalletRefundsCommand : Command<Guid>
     {
@@ -38,24 +41,24 @@ namespace Sheaft.Application.Commands
 
         public async Task<Result<Guid>> Handle(CreateWalletRefundsCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(request, async () => await CreateWalletAsync(request.UserId, "Remboursements", WalletKind.Refunds, token));
+            return await CreateWalletAsync(request.UserId, "Remboursements", WalletKind.Refunds, token);
         }
 
         private async Task<Result<Guid>> CreateWalletAsync(Guid userId, string name, WalletKind kind, CancellationToken token)
         {
-            var user = await _context.GetByIdAsync<User>(userId, token);
+            var user = await _context.GetByIdAsync<Domain.User>(userId, token);
 
             using (var transaction = await _context.BeginTransactionAsync(token))
             {
-                var wallet = new Wallet(Guid.NewGuid(), name, kind, user);
+                var wallet = new Domain.Wallet(Guid.NewGuid(), name, kind, user);
                 await _context.AddAsync(wallet, token);
                 await _context.SaveChangesAsync(token);
 
                 var result = await _pspService.CreateWalletAsync(wallet, token);
-                if (!result.Success)
+                if (!result.Succeeded)
                 {
                     await transaction.RollbackAsync(token);
-                    return Failed<Guid>(result.Exception);
+                    return Failure<Guid>(result.Exception);
                 }
 
                 wallet.SetIdentifier(result.Data);
@@ -63,7 +66,7 @@ namespace Sheaft.Application.Commands
                 await _context.SaveChangesAsync(token);
                 await transaction.CommitAsync(token);
 
-                return Ok(wallet.Id);
+                return Success(wallet.Id);
             }
         }
     }

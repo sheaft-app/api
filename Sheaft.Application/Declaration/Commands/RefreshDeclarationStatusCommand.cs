@@ -2,16 +2,19 @@
 using System.Threading.Tasks;
 using MediatR;
 using Microsoft.Extensions.Logging;
-using Sheaft.Core;
 using Newtonsoft.Json;
-using Sheaft.Application.Events;
-using Sheaft.Application.Interop;
-using Sheaft.Domain.Enums;
-using Sheaft.Domain.Models;
+using Sheaft.Application.Common;
+using Sheaft.Application.Common.Handlers;
+using Sheaft.Application.Common.Interfaces;
+using Sheaft.Application.Common.Interfaces.Services;
+using Sheaft.Application.Common.Models;
+using Sheaft.Domain;
+using Sheaft.Domain.Enum;
+using Sheaft.Domain.Events.Declaration;
 
-namespace Sheaft.Application.Commands
+namespace Sheaft.Application.Declaration.Commands
 {
-    public class RefreshDeclarationStatusCommand : Command<DeclarationStatus>
+    public class RefreshDeclarationStatusCommand : Command
     {
         [JsonConstructor]
         public RefreshDeclarationStatusCommand(RequestUser requestUser, string identifier)
@@ -22,9 +25,9 @@ namespace Sheaft.Application.Commands
 
         public string Identifier { get; set; }
     }
-    
+
     public class RefreshDeclarationStatusCommandHandler : CommandsHandler,
-           IRequestHandler<RefreshDeclarationStatusCommand, Result<DeclarationStatus>>
+        IRequestHandler<RefreshDeclarationStatusCommand, Result>
     {
         private readonly IPspService _pspService;
 
@@ -37,37 +40,22 @@ namespace Sheaft.Application.Commands
         {
             _pspService = pspService;
         }
-        
-        public async Task<Result<DeclarationStatus>> Handle(RefreshDeclarationStatusCommand request, CancellationToken token)
+
+        public async Task<Result> Handle(RefreshDeclarationStatusCommand request,
+            CancellationToken token)
         {
-            return await ExecuteAsync(request, async () =>
-            {
-                var legal = await _context.GetSingleAsync<BusinessLegal>(c => c.Declaration.Identifier == request.Identifier, token);
-                var pspResult = await _pspService.GetDeclarationAsync(legal.Declaration.Identifier, token);
-                if (!pspResult.Success)
-                    return Failed<DeclarationStatus>(pspResult.Exception);
+            var legal = await _context.GetSingleAsync<BusinessLegal>(
+                c => c.Declaration.Identifier == request.Identifier, token);
+            var pspResult = await _pspService.GetDeclarationAsync(legal.Declaration.Identifier, token);
+            if (!pspResult.Succeeded)
+                return Failure(pspResult.Exception);
 
-                legal.Declaration.SetStatus(pspResult.Data.Status);
-                legal.Declaration.SetResult(pspResult.Data.ResultCode, pspResult.Data.ResultMessage);
-                legal.Declaration.SetProcessedOn(pspResult.Data.ProcessedOn);
+            legal.Declaration.SetStatus(pspResult.Data.Status);
+            legal.Declaration.SetResult(pspResult.Data.ResultCode, pspResult.Data.ResultMessage);
+            legal.Declaration.SetProcessedOn(pspResult.Data.ProcessedOn);
 
-                await _context.SaveChangesAsync(token);
-
-                switch (legal.Declaration.Status)
-                {
-                    case DeclarationStatus.Incomplete:
-                        _mediatr.Post(new DeclarationIncompleteEvent(request.RequestUser) { DeclarationId = legal.Declaration.Id });
-                        break;
-                    case DeclarationStatus.Refused:
-                        _mediatr.Post(new DeclarationRefusedEvent(request.RequestUser) { DeclarationId = legal.Declaration.Id });
-                        break;
-                    case DeclarationStatus.Validated:
-                        _mediatr.Post(new DeclarationValidatedEvent(request.RequestUser) { DeclarationId = legal.Declaration.Id });
-                        break;
-                }
-
-                return Ok(legal.Declaration.Status);
-            });
+            await _context.SaveChangesAsync(token);
+            return Success();
         }
     }
 }

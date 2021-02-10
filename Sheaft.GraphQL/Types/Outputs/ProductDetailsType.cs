@@ -1,11 +1,11 @@
 ﻿using HotChocolate.Types;
 using HotChocolate.Types.Relay;
-using Sheaft.Application.Models;
-using Sheaft.Application.Queries;
+using Sheaft.Application.Common.Interfaces.Queries;
+using Sheaft.Application.Common.Models.Dto;
 using Sheaft.GraphQL.Filters;
 using Sheaft.GraphQL.Sorts;
 
-namespace Sheaft.GraphQL.Types
+namespace Sheaft.GraphQL.Types.Outputs
 {
     public class ProductDetailsType : SheaftOutputType<ProductDto>
     {

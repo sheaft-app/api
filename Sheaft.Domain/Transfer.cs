@@ -1,9 +1,12 @@
-﻿using Sheaft.Domain.Enums;
-using System;
+﻿using System;
+using System.Collections.Generic;
+using Sheaft.Domain.Common;
+using Sheaft.Domain.Enum;
+using Sheaft.Domain.Events.Transfer;
 
-namespace Sheaft.Domain.Models
+namespace Sheaft.Domain
 {
-    public class Transfer : Transaction
+    public class Transfer : Transaction, IHasDomainEvent
     {
         protected Transfer()
         {
@@ -18,11 +21,26 @@ namespace Sheaft.Domain.Models
             CreditedWallet = creditedWallet;
             DebitedWallet = debitedWallet;
             Reference = "SHEAFT";
+            DomainEvents = new List<DomainEvent>();
         }
 
         public virtual PurchaseOrder PurchaseOrder { get; private set; }
         public virtual Wallet CreditedWallet { get; private set; }
         public virtual Wallet DebitedWallet { get; private set; }
         public virtual Payout Payout { get; private set; }
+
+        public override void SetStatus(TransactionStatus status)
+        {
+            base.SetStatus(status);
+            
+            switch (Status)
+            {
+                case TransactionStatus.Failed:
+                    DomainEvents.Add(new TransferFailedEvent(Id));
+                    break;
+            }
+        }
+
+        public List<DomainEvent> DomainEvents { get; } = new List<DomainEvent>();
     }
 }

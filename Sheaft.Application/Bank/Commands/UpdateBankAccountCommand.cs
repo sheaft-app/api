@@ -4,14 +4,17 @@ using System.Threading.Tasks;
 using MediatR;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using Sheaft.Application.Interop;
-using Sheaft.Core;
-using Sheaft.Application.Models;
-using Sheaft.Domain.Models;
+using Sheaft.Application.Common;
+using Sheaft.Application.Common.Handlers;
+using Sheaft.Application.Common.Interfaces;
+using Sheaft.Application.Common.Interfaces.Services;
+using Sheaft.Application.Common.Models;
+using Sheaft.Application.Common.Models.Inputs;
+using Sheaft.Domain;
 
-namespace Sheaft.Application.Commands
+namespace Sheaft.Application.Bank.Commands
 {
-    public class UpdateBankAccountCommand : Command<bool>
+    public class UpdateBankAccountCommand : Command
     {
         [JsonConstructor]
         public UpdateBankAccountCommand(RequestUser requestUser) : base(requestUser)
@@ -25,9 +28,9 @@ namespace Sheaft.Application.Commands
         public string IBAN { get; set; }
         public AddressInput Address { get; set; }
     }
-    
+
     public class UpdateBankAccountCommandHandler : CommandsHandler,
-           IRequestHandler<UpdateBankAccountCommand, Result<bool>>
+        IRequestHandler<UpdateBankAccountCommand, Result>
     {
         private readonly IPspService _pspService;
 
@@ -41,42 +44,40 @@ namespace Sheaft.Application.Commands
             _pspService = pspService;
         }
 
-        public async Task<Result<bool>> Handle(UpdateBankAccountCommand request, CancellationToken token)
+        public async Task<Result> Handle(UpdateBankAccountCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(request, async () =>
+            var bankAccount = await _context.GetByIdAsync<BankAccount>(request.Id, token);
+
+            var address = request.Address != null
+                ? new BankAddress(request.Address.Line1, request.Address.Line2, request.Address.Zipcode,
+                    request.Address.City,
+                    request.Address.Country)
+                : null;
+
+            if (!string.IsNullOrWhiteSpace(bankAccount.Identifier))
             {
-                var bankAccount = await _context.GetByIdAsync<BankAccount>(request.Id, token);
+                var resetResult = await _pspService.UpdateBankIbanAsync(bankAccount, false, token);
+                if (!resetResult.Succeeded)
+                    return Failure(resetResult.Exception);
 
-                var address = request.Address != null ?
-                       new BankAddress(request.Address.Line1, request.Address.Line2, request.Address.Zipcode, request.Address.City,
-                       request.Address.Country)
-                       : null;
-
-                if (!string.IsNullOrWhiteSpace(bankAccount.Identifier))
-                {
-                    var resetResult = await _pspService.UpdateBankIbanAsync(bankAccount, false, token);
-                    if (!resetResult.Success)
-                        return Failed<bool>(resetResult.Exception);
-
-                    bankAccount.SetIdentifier(string.Empty);
-                    await _context.SaveChangesAsync(token);
-                }
-
-                bankAccount.SetAddress(address);
-                bankAccount.SetName(request.Name);
-                bankAccount.SetOwner(request.Owner);
-                bankAccount.SetIban(request.IBAN);
-                bankAccount.SetBic(request.BIC);
-
-                var result = await _pspService.CreateBankIbanAsync(bankAccount, token);
-                if (!result.Success)
-                    return Failed<bool>(result.Exception);
-
-                bankAccount.SetIdentifier(result.Data);
+                bankAccount.SetIdentifier(string.Empty);
                 await _context.SaveChangesAsync(token);
+            }
 
-                return Ok(true);
-            });
+            bankAccount.SetAddress(address);
+            bankAccount.SetName(request.Name);
+            bankAccount.SetOwner(request.Owner);
+            bankAccount.SetIban(request.IBAN);
+            bankAccount.SetBic(request.BIC);
+
+            var result = await _pspService.CreateBankIbanAsync(bankAccount, token);
+            if (!result.Succeeded)
+                return Failure(result.Exception);
+
+            bankAccount.SetIdentifier(result.Data);
+            await _context.SaveChangesAsync(token);
+
+            return Success();
         }
     }
 }

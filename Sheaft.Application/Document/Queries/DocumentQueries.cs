@@ -7,11 +7,13 @@ using System.Threading.Tasks;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using Microsoft.EntityFrameworkCore;
-using Sheaft.Application.Interop;
-using Sheaft.Application.Models;
-using Sheaft.Core;
+using Sheaft.Application.Common.Interfaces;
+using Sheaft.Application.Common.Interfaces.Queries;
+using Sheaft.Application.Common.Interfaces.Services;
+using Sheaft.Application.Common.Models.Dto;
+using Sheaft.Domain;
 
-namespace Sheaft.Application.Queries
+namespace Sheaft.Application.Document.Queries
 {
     public class DocumentQueries : IDocumentQueries
     {
@@ -61,7 +63,7 @@ namespace Sheaft.Application.Queries
                     foreach (var page in document.Pages)
                     {
                         var result = await _blobService.DownloadDocumentPageAsync(document.Id, page.Id, legal.User.Id, token);
-                        if (!result.Success)
+                        if (!result.Succeeded)
                             continue;
 
                         var zipArchiveEntry = archive.CreateEntry(page.Filename + page.Extension, CompressionLevel.Optimal);
@@ -86,7 +88,7 @@ namespace Sheaft.Application.Queries
                 return null;
 
             var result = await _blobService.DownloadDocumentPageAsync(document.Id, pageId, legal.User.Id, token);
-            if (!result.Success)
+            if (!result.Succeeded)
                 return null;
 
             return result.Data;

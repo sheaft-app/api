@@ -2,12 +2,12 @@
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
-using Sheaft.Options;
 using System;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
-using Sheaft.Application.Interop;
+using Sheaft.Application.Common.Interfaces.Services;
+using Sheaft.Application.Common.Options;
 
 namespace Sheaft.Infrastructure.Services
 {

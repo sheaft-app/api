@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Sheaft.Options
+namespace Sheaft.Application.Common.Options
 {
     public class CorsOptions
     {

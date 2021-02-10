@@ -1,9 +1,9 @@
-﻿using Microsoft.EntityFrameworkCore.Infrastructure;
+﻿using System.Linq;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
-using Sheaft.Application.Interop;
-using System.Linq;
+using Sheaft.Application.Common.Interfaces;
 
-namespace Sheaft.Infrastructure
+namespace Sheaft.Infrastructure.Persistence.Extensions
 {
     public static class DbContextExtension
     {

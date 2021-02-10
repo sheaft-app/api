@@ -1,15 +1,16 @@
 ﻿using System;
 using System.Linq;
-using Sheaft.Domain.Models;
-using Sheaft.Application.Interop;
-using Sheaft.Core;
-using Sheaft.Domain.Enums;
-using System.Threading.Tasks;
 using System.Threading;
-using Sheaft.Application.Models;
+using System.Threading.Tasks;
 using AutoMapper.QueryableExtensions;
+using Sheaft.Application.Common.Extensions;
+using Sheaft.Application.Common.Interfaces;
+using Sheaft.Application.Common.Interfaces.Queries;
+using Sheaft.Application.Common.Models.Dto;
+using Sheaft.Domain;
+using Sheaft.Domain.Enum;
 
-namespace Sheaft.Application.Queries
+namespace Sheaft.Application.Job.Queries
 {
     public class JobQueries : IJobQueries
     {
@@ -24,7 +25,7 @@ namespace Sheaft.Application.Queries
 
         public Task<bool> HasProductsImportsInProgressAsync(Guid producerId, RequestUser currentUser, CancellationToken token)
         {
-            return _context.AnyAsync<Job>(r =>
+            return _context.AnyAsync<Domain.Job>(r =>
                 !r.Archived &&
                 r.Kind == JobKind.ImportProducts &&
                 (r.Status == ProcessStatus.Paused || r.Status == ProcessStatus.Processing || r.Status == ProcessStatus.Waiting) &&
@@ -33,7 +34,7 @@ namespace Sheaft.Application.Queries
 
         public Task<bool> HasPickingOrdersExportsInProgressAsync(Guid producerId, RequestUser currentUser, CancellationToken token)
         {
-            return _context.AnyAsync<Job>(r =>
+            return _context.AnyAsync<Domain.Job>(r =>
                 !r.Archived &&
                 r.Kind == JobKind.ExportPickingOrders &&
                 (r.Status == ProcessStatus.Paused || r.Status == ProcessStatus.Processing || r.Status == ProcessStatus.Waiting) &&

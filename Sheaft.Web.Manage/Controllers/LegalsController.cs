@@ -4,18 +4,19 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Sheaft.Application.Commands;
-using Sheaft.Domain.Models;
-using Sheaft.Exceptions;
-using Sheaft.Application.Interop;
-using Sheaft.Application.Models;
-using Sheaft.Options;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Sheaft.Domain.Enums;
+using Sheaft.Application.Common.Interfaces;
+using Sheaft.Application.Common.Interfaces.Services;
+using Sheaft.Application.Common.Models.Inputs;
+using Sheaft.Application.Common.Models.ViewModels;
+using Sheaft.Application.Common.Options;
+using Sheaft.Application.Legal.Commands;
+using Sheaft.Domain;
+using Sheaft.Domain.Enum;
+using Sheaft.Domain.Exceptions;
 
 namespace Sheaft.Web.Manage.Controllers
 {
@@ -71,7 +72,7 @@ namespace Sheaft.Web.Manage.Controllers
                 .SingleOrDefaultAsync(token);
 
             if (entity == null)
-                throw new NotFoundException();
+                throw SheaftException.NotFound();
 
             if (entity.Kind != ProfileKind.Consumer)
                 return RedirectToAction("CreateLegalBusiness", new { userId });
@@ -88,7 +89,7 @@ namespace Sheaft.Web.Manage.Controllers
                 .SingleOrDefaultAsync(token);
 
             if (entity == null)
-                throw new NotFoundException();
+                throw SheaftException.NotFound();
 
             ViewBag.Countries = await GetCountries(token);
             ViewBag.Nationalities = await GetNationalities(token);
@@ -115,7 +116,7 @@ namespace Sheaft.Web.Manage.Controllers
                 VatIdentifier = model.VatIdentifier
             }, token);
 
-            if (!result.Success)
+            if (!result.Succeeded)
             {
                 ViewBag.Countries = await GetCountries(token);
                 ViewBag.Nationalities = await GetNationalities(token);
@@ -135,7 +136,7 @@ namespace Sheaft.Web.Manage.Controllers
                 .SingleOrDefaultAsync(token);
 
             if (entity == null)
-                throw new NotFoundException();
+                throw SheaftException.NotFound();
 
             ViewBag.Countries = await GetCountries(token);
             ViewBag.Nationalities = await GetNationalities(token);
@@ -163,7 +164,7 @@ namespace Sheaft.Web.Manage.Controllers
                 Nationality = model.Owner.Nationality
             }, token);
 
-            if (!result.Success)
+            if (!result.Succeeded)
             {
                 ViewBag.Countries = await GetCountries(token);
                 ViewBag.Nationalities = await GetNationalities(token);
@@ -184,7 +185,7 @@ namespace Sheaft.Web.Manage.Controllers
                 .SingleOrDefaultAsync(token);
 
             if (entity == null)
-                throw new NotFoundException();
+                throw SheaftException.NotFound();
 
             ViewBag.Countries = await GetCountries(token);
             ViewBag.Nationalities = await GetNationalities(token);
@@ -208,7 +209,7 @@ namespace Sheaft.Web.Manage.Controllers
                 VatIdentifier = model.VatIdentifier
             }, token);
 
-            if (!result.Success)
+            if (!result.Succeeded)
             {
                 ViewBag.Countries = await GetCountries(token);
                 ViewBag.Nationalities = await GetNationalities(token);
@@ -229,7 +230,7 @@ namespace Sheaft.Web.Manage.Controllers
                 .SingleOrDefaultAsync(token);
 
             if (entity == null)
-                throw new NotFoundException();
+                throw SheaftException.NotFound();
 
             ViewBag.Countries = await GetCountries(token);
             ViewBag.Nationalities = await GetNationalities(token);
@@ -253,7 +254,7 @@ namespace Sheaft.Web.Manage.Controllers
                 Nationality = model.Owner.Nationality
             }, token);
 
-            if (!result.Success)
+            if (!result.Succeeded)
             {
                 ViewBag.Countries = await GetCountries(token);
                 ViewBag.Nationalities = await GetNationalities(token);

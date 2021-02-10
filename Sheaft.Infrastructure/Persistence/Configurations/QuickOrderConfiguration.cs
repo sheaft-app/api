@@ -1,6 +1,6 @@
-using Sheaft.Domain.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Sheaft.Domain;
 
 namespace Sheaft.Infrastructure.Persistence.Configurations
 {
@@ -18,6 +18,8 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
 
             entity.HasMany(o => o.Products).WithOne().HasForeignKey("QuickOrderUid").OnDelete(DeleteBehavior.Cascade);
             entity.HasOne(c => c.User).WithMany().HasForeignKey("UserUid").OnDelete(DeleteBehavior.Cascade);
+
+            entity.Ignore(c => c.DomainEvents);
 
             var products = entity.Metadata.FindNavigation(nameof(QuickOrder.Products));
             products.SetPropertyAccessMode(PropertyAccessMode.Field);

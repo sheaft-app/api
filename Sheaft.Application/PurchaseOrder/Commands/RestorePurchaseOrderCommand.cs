@@ -5,12 +5,16 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using Sheaft.Application.Interop;
-using Sheaft.Core;
+using Sheaft.Application.Common;
+using Sheaft.Application.Common.Handlers;
+using Sheaft.Application.Common.Interfaces;
+using Sheaft.Application.Common.Interfaces.Services;
+using Sheaft.Application.Common.Models;
+using Sheaft.Domain;
 
-namespace Sheaft.Application.Commands
+namespace Sheaft.Application.PurchaseOrder.Commands
 {
-    public class RestorePurchaseOrderCommand : Command<bool>
+    public class RestorePurchaseOrderCommand : Command
     {
         [JsonConstructor]
         public RestorePurchaseOrderCommand(RequestUser requestUser) : base(requestUser)
@@ -19,9 +23,9 @@ namespace Sheaft.Application.Commands
 
         public Guid Id { get; set; }
     }
-    
+
     public class RestorePurchaseOrderCommandHandler : CommandsHandler,
-        IRequestHandler<RestorePurchaseOrderCommand, Result<bool>>
+        IRequestHandler<RestorePurchaseOrderCommand, Result>
     {
         private readonly ICapingDeliveriesService _capingDeliveriesService;
 
@@ -34,18 +38,17 @@ namespace Sheaft.Application.Commands
         {
             _capingDeliveriesService = capingDeliveriesService;
         }
-        
-        public async Task<Result<bool>> Handle(RestorePurchaseOrderCommand request, CancellationToken token)
+
+        public async Task<Result> Handle(RestorePurchaseOrderCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(request, async () =>
-            {
-                var entity = await _context.PurchaseOrders.SingleOrDefaultAsync(a => a.Id == request.Id && a.RemovedOn.HasValue, token);
+            var entity =
+                await _context.PurchaseOrders.SingleOrDefaultAsync(a => a.Id == request.Id && a.RemovedOn.HasValue,
+                    token);
 
-                _context.Restore(entity);
-                await _context.SaveChangesAsync(token);
+            _context.Restore(entity);
+            await _context.SaveChangesAsync(token);
 
-                return Ok(true);
-            });
+            return Success();
         }
     }
 }

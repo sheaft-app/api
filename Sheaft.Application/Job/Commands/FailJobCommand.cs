@@ -4,13 +4,16 @@ using System.Threading.Tasks;
 using MediatR;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using Sheaft.Application.Interop;
-using Sheaft.Core;
-using Sheaft.Domain.Models;
+using Sheaft.Application.Common;
+using Sheaft.Application.Common.Handlers;
+using Sheaft.Application.Common.Interfaces;
+using Sheaft.Application.Common.Interfaces.Services;
+using Sheaft.Application.Common.Models;
+using Sheaft.Domain;
 
-namespace Sheaft.Application.Commands
+namespace Sheaft.Application.Job.Commands
 {
-    public class FailJobCommand : Command<bool>
+    public class FailJobCommand : Command
     {
         [JsonConstructor]
         public FailJobCommand(RequestUser requestUser) : base(requestUser)
@@ -20,28 +23,26 @@ namespace Sheaft.Application.Commands
         public Guid Id { get; set; }
         public string Reason { get; set; }
     }
-    
+
     public class FailJobCommandHandler : CommandsHandler,
-        IRequestHandler<FailJobCommand, Result<bool>>
+        IRequestHandler<FailJobCommand, Result>
     {
         public FailJobCommandHandler(
-            ISheaftMediatr mediatr, 
+            ISheaftMediatr mediatr,
             IAppDbContext context,
             ILogger<FailJobCommandHandler> logger)
             : base(mediatr, context, logger)
         {
         }
-        public async Task<Result<bool>> Handle(FailJobCommand request,
+
+        public async Task<Result> Handle(FailJobCommand request,
             CancellationToken token)
         {
-            return await ExecuteAsync(request, async () =>
-            {
-                var entity = await _context.GetByIdAsync<Job>(request.Id, token);
-                entity.FailJob(request.Reason);
+            var entity = await _context.GetByIdAsync<Domain.Job>(request.Id, token);
+            entity.FailJob(request.Reason);
 
-                await _context.SaveChangesAsync(token);
-                return Ok(true);
-            });
+            await _context.SaveChangesAsync(token);
+            return Success();
         }
     }
 }

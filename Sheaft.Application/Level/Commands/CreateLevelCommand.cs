@@ -1,16 +1,17 @@
-﻿using Sheaft.Domain.Enums;
-using System;
-using Sheaft.Core;
-using Newtonsoft.Json;
-using System.Collections.Generic;
+﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
 using Microsoft.Extensions.Logging;
-using Sheaft.Application.Interop;
-using Sheaft.Domain.Models;
+using Newtonsoft.Json;
+using Sheaft.Application.Common;
+using Sheaft.Application.Common.Handlers;
+using Sheaft.Application.Common.Interfaces;
+using Sheaft.Application.Common.Interfaces.Services;
+using Sheaft.Application.Common.Models;
+using Sheaft.Domain;
 
-namespace Sheaft.Application.Commands
+namespace Sheaft.Application.Level.Commands
 {
     public class CreateLevelCommand : Command<Guid>
     {
@@ -36,15 +37,12 @@ namespace Sheaft.Application.Commands
 
         public async Task<Result<Guid>> Handle(CreateLevelCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(request, async () =>
-            {
-                var entity = new Level(Guid.NewGuid(), request.Name, request.RequiredPoints);
+            var entity = new Domain.Level(Guid.NewGuid(), request.Name, request.RequiredPoints);
 
-                await _context.AddAsync(entity, token);
-                await _context.SaveChangesAsync(token);
+            await _context.AddAsync(entity, token);
+            await _context.SaveChangesAsync(token);
 
-                return Created(entity.Id);
-            });
+            return Success(entity.Id);
         }
     }
 }

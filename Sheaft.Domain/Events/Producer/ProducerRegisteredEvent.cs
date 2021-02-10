@@ -1,17 +1,17 @@
 ﻿using System;
 using Newtonsoft.Json;
-using Sheaft.Core;
-using Sheaft.Domain.Models.Common;
+using Sheaft.Domain.Common;
 
-namespace Sheaft.Application.Events
+namespace Sheaft.Domain.Events.Producer
 {
     public class ProducerRegisteredEvent : DomainEvent
     {
         [JsonConstructor]
-        public ProducerRegisteredEvent(RequestUser requestUser) : base(requestUser)
+        public ProducerRegisteredEvent(Guid producerId)
         {
+            ProducerId = producerId;
         }
 
-        public Guid ProducerId { get; set; }
+        public Guid ProducerId { get; }
     }
 }

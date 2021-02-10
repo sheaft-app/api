@@ -1,17 +1,16 @@
-﻿using MediatR;
-using System;
-using System.Linq;
+﻿using System.Linq;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
+using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
-using Sheaft.Core;
-using Sheaft.Core.Extensions;
-using Sheaft.Exceptions;
-using AuthorizeAttribute = CleanArchitecture.Application.Common.Security.AuthorizeAttribute;
+using Sheaft.Application.Common.Extensions;
+using Sheaft.Domain;
+using Sheaft.Domain.Exceptions;
+using AuthorizeAttribute = Sheaft.Application.Common.Security.AuthorizeAttribute;
 
-namespace CleanArchitecture.Application.Common.Behaviours
+namespace Sheaft.Application.Common.Behaviours
 {
     public class AuthorizationBehaviour<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
         where TRequest : ITrackedUser
@@ -33,7 +32,7 @@ namespace CleanArchitecture.Application.Common.Behaviours
             if (authorizeAttributes.Any())
             {
                 if (!request.RequestUser.IsAuthenticated)
-                    throw new UnauthorizedAccessException();
+                    throw SheaftException.Unauthorized();
 
                 // Role-based authorization
                 var authorizeAttributesWithRoles = authorizeAttributes.Where(a => !string.IsNullOrWhiteSpace(a.Roles));
@@ -53,7 +52,7 @@ namespace CleanArchitecture.Application.Common.Behaviours
                         }
 
                         if (!authorized)
-                            throw new ForbiddenException();
+                            throw SheaftException.Forbidden();
                     }
                 }
 
@@ -65,7 +64,7 @@ namespace CleanArchitecture.Application.Common.Behaviours
                     {
                         var authorized = await _authorizationService.AuthorizeAsync(_httpContextAccessor.HttpContext?.User, policy);
                         if (!authorized.Succeeded)
-                            throw new ForbiddenException();
+                            throw SheaftException.Forbidden();
                     }
                 }
             }

@@ -1,7 +1,7 @@
-using Sheaft.Domain.Enums;
 using System;
+using Sheaft.Domain.Enum;
 
-namespace Sheaft.Domain.Models
+namespace Sheaft.Domain
 {
     public class Consumer : User
     {

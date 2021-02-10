@@ -1,19 +1,16 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
-using Microsoft.Extensions.Options;
-using Sheaft.Application.Commands.Handlers;
-using Sheaft.Application.Events;
-using Sheaft.Application.Interop;
-using Sheaft.Application.Models;
-using Sheaft.Domain.Enums;
-using Sheaft.Domain.Models;
-using Sheaft.Options;
+using Sheaft.Application.Common.Handlers;
+using Sheaft.Application.Common.Interfaces;
+using Sheaft.Application.Common.Interfaces.Services;
+using Sheaft.Application.Common.Models;
+using Sheaft.Domain.Events.PayinRefund;
 
-namespace Sheaft.Application.Handlers
+namespace Sheaft.Application.PayinRefund.EventHandlers
 {
     public class CreatePayinRefundFailedEventHandler : EventsHandler,
-        INotificationHandler<DomainEventNotification<CreatePayinRefundFailedEvent>>
+        INotificationHandler<DomainEventNotification<CreateOrderPayinRefundFailedEvent>>
     {
         public CreatePayinRefundFailedEventHandler(
             IAppDbContext context,
@@ -23,10 +20,10 @@ namespace Sheaft.Application.Handlers
         {
         }
 
-        public async Task Handle(DomainEventNotification<CreatePayinRefundFailedEvent> notification, CancellationToken token)
+        public async Task Handle(DomainEventNotification<CreateOrderPayinRefundFailedEvent> notification, CancellationToken token)
         {
             var orderEvent = notification.DomainEvent;
-            var order = await _context.GetByIdAsync<Order>(orderEvent.OrderId, token);
+            var order = await _context.GetByIdAsync<Domain.Order>(orderEvent.OrderId, token);
 
             await _emailService.SendEmailAsync(
                "support@sheaft.com",

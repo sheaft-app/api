@@ -1,6 +1,6 @@
-﻿using Sheaft.Domain.Models;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Sheaft.Domain;
 
 namespace Sheaft.Infrastructure.Persistence.Configurations
 {
@@ -12,6 +12,8 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
             entity.Property<long>("SponsorUid");
 
             entity.HasOne(c => c.Sponsored).WithMany().HasForeignKey("SponsoredUid").OnDelete(DeleteBehavior.NoAction);
+
+            entity.Ignore(c => c.DomainEvents);
 
             entity.HasKey("SponsorUid", "SponsoredUid");
 

@@ -1,4 +1,4 @@
-﻿namespace Sheaft.Core.Extensions
+﻿namespace Sheaft.Application.Common.Extensions
 {
     public static class Base64Extensions
     {

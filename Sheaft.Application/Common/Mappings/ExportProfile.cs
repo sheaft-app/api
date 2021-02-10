@@ -1,8 +1,9 @@
 ﻿using AutoMapper;
-using Sheaft.Application.Commands;
-using Sheaft.Application.Models;
+using Sheaft.Application.Common.Models.Inputs;
+using Sheaft.Application.PickingOrders.Commands;
+using Sheaft.Application.User.Commands;
 
-namespace Sheaft.Application.Mappers
+namespace Sheaft.Application.Common.Mappings
 {
     public class ExportProfile : Profile
     {

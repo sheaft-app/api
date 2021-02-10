@@ -1,18 +1,19 @@
 ﻿using System;
 using Newtonsoft.Json;
-using Sheaft.Core;
-using Sheaft.Domain.Models.Common;
+using Sheaft.Domain.Common;
 
-namespace Sheaft.Application.Events
+namespace Sheaft.Domain.Events.Order
 {
     public class ConfirmOrderFailedEvent : DomainEvent
     {
         [JsonConstructor]
-        public ConfirmOrderFailedEvent(RequestUser requestUser) : base(requestUser)
+        public ConfirmOrderFailedEvent(Guid orderId, string message)
         {
+            OrderId = orderId;
+            Message = message;
         }
 
-        public Guid OrderId { get; set; }
-        public string Message { get; set; }
+        public Guid OrderId { get; }
+        public string Message { get; }
     }
 }

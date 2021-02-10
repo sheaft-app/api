@@ -4,13 +4,16 @@ using System.Threading.Tasks;
 using MediatR;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using Sheaft.Application.Interop;
-using Sheaft.Core;
-using Sheaft.Domain.Models;
+using Sheaft.Application.Common;
+using Sheaft.Application.Common.Handlers;
+using Sheaft.Application.Common.Interfaces;
+using Sheaft.Application.Common.Interfaces.Services;
+using Sheaft.Application.Common.Models;
+using Sheaft.Domain;
 
-namespace Sheaft.Application.Commands
+namespace Sheaft.Application.Job.Commands
 {
-    public class UnarchiveJobCommand : Command<bool>
+    public class UnarchiveJobCommand : Command
     {
         [JsonConstructor]
         public UnarchiveJobCommand(RequestUser requestUser) : base(requestUser)
@@ -19,29 +22,26 @@ namespace Sheaft.Application.Commands
 
         public Guid Id { get; set; }
     }
-    
+
     public class UnarchiveJobCommandHandler : CommandsHandler,
-        IRequestHandler<UnarchiveJobCommand, Result<bool>>
+        IRequestHandler<UnarchiveJobCommand, Result>
     {
         public UnarchiveJobCommandHandler(
-            ISheaftMediatr mediatr, 
+            ISheaftMediatr mediatr,
             IAppDbContext context,
             ILogger<UnarchiveJobCommandHandler> logger)
             : base(mediatr, context, logger)
         {
         }
-        
-        public async Task<Result<bool>> Handle(UnarchiveJobCommand request,
+
+        public async Task<Result> Handle(UnarchiveJobCommand request,
             CancellationToken token)
         {
-            return await ExecuteAsync(request, async () =>
-            {
-                var entity = await _context.GetByIdAsync<Job>(request.Id, token);
-                entity.UnarchiveJob();
+            var entity = await _context.GetByIdAsync<Domain.Job>(request.Id, token);
+            entity.UnarchiveJob();
 
-                await _context.SaveChangesAsync(token);
-                return Ok(true);
-            });
+            await _context.SaveChangesAsync(token);
+            return Success();
         }
     }
 }

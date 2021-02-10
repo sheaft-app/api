@@ -1,17 +1,20 @@
-﻿using Sheaft.Domain.Enums;
-using System;
+﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using Sheaft.Core;
 using Newtonsoft.Json;
-using Sheaft.Application.Interop;
+using Sheaft.Application.Common;
+using Sheaft.Application.Common.Handlers;
+using Sheaft.Application.Common.Interfaces;
+using Sheaft.Application.Common.Interfaces.Services;
+using Sheaft.Application.Common.Models;
+using Sheaft.Domain;
 
-namespace Sheaft.Application.Commands
+namespace Sheaft.Application.Region.Commands
 {
-    public class UpdateRegionCommand : Command<bool>
+    public class UpdateRegionCommand : Command
     {
         [JsonConstructor]
         public UpdateRegionCommand(RequestUser requestUser) : base(requestUser)
@@ -22,9 +25,9 @@ namespace Sheaft.Application.Commands
         public string Name { get; set; }
         public int? RequiredProducers { get; set; }
     }
-    
+
     public class UpdateRegionCommandHandler : CommandsHandler,
-        IRequestHandler<UpdateRegionCommand, Result<bool>>
+        IRequestHandler<UpdateRegionCommand, Result>
     {
         public UpdateRegionCommandHandler(
             ISheaftMediatr mediatr,
@@ -34,17 +37,14 @@ namespace Sheaft.Application.Commands
         {
         }
 
-        public async Task<Result<bool>> Handle(UpdateRegionCommand request, CancellationToken token)
+        public async Task<Result> Handle(UpdateRegionCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(request, async () =>
-            {
-                var entity = await _context.Regions.SingleOrDefaultAsync(c => c.Id == request.Id, token);
-                entity.SetName(request.Name);
-                entity.SetRequiredProducers(request.RequiredProducers);
+            var entity = await _context.Regions.SingleOrDefaultAsync(c => c.Id == request.Id, token);
+            entity.SetName(request.Name);
+            entity.SetRequiredProducers(request.RequiredProducers);
 
-                await _context.SaveChangesAsync(token);
-                return Ok(true);
-            });
+            await _context.SaveChangesAsync(token);
+            return Success();
         }
     }
 }

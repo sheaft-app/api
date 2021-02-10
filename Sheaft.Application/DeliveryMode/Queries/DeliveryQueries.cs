@@ -3,15 +3,17 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Sheaft.Domain.Models;
-using Sheaft.Core;
-using Sheaft.Domain.Enums;
-using Sheaft.Application.Models;
-using AutoMapper.QueryableExtensions;
 using AutoMapper;
-using Sheaft.Application.Interop;
+using AutoMapper.QueryableExtensions;
+using Sheaft.Application.Common.Extensions;
+using Sheaft.Application.Common.Interfaces;
+using Sheaft.Application.Common.Interfaces.Queries;
+using Sheaft.Application.Common.Interfaces.Services;
+using Sheaft.Application.Common.Models.Dto;
+using Sheaft.Domain;
+using Sheaft.Domain.Enum;
 
-namespace Sheaft.Application.Queries
+namespace Sheaft.Application.DeliveryMode.Queries
 {
     public class DeliveryQueries : IDeliveryQueries
     {
@@ -46,14 +48,14 @@ namespace Sheaft.Application.Queries
         public async Task<IEnumerable<ProducerDeliveriesDto>> GetProducersDeliveriesAsync(IEnumerable<Guid> producerIds, IEnumerable<DeliveryKind> kinds, DateTimeOffset currentDate, RequestUser currentUser, CancellationToken token)
         {
             var producers = new List<ProducerDeliveriesDto>();
-            var deliveriesMode = await _context.FindAsync<DeliveryMode>(d => d.Available && producerIds.Contains(d.Producer.Id) && kinds.Contains(d.Kind), token);
+            var deliveriesMode = await _context.FindAsync<Domain.DeliveryMode>(d => d.Available && producerIds.Contains(d.Producer.Id) && kinds.Contains(d.Kind), token);
 
             var deliveriesProducerIds = deliveriesMode.Select(c => c.Producer.Id).Distinct();
             var producerDistinctIds = producerIds.Distinct();
             if (deliveriesProducerIds.Count() != producerDistinctIds.Count())
             {
                 var notFoundProducerIds = deliveriesProducerIds.Except(producerDistinctIds);
-                var notFoundProducers = await _context.FindAsync<Producer>(c => notFoundProducerIds.Contains(c.Id), token);
+                var notFoundProducers = await _context.FindAsync<Domain.Producer>(c => notFoundProducerIds.Contains(c.Id), token);
 
                 producers.AddRange(notFoundProducers.Select(c => new ProducerDeliveriesDto { Id = c.Id, Name = c.Name, Deliveries = null }));
             }
@@ -83,14 +85,14 @@ namespace Sheaft.Application.Queries
         public async Task<IEnumerable<ProducerDeliveriesDto>> GetStoreDeliveriesForProducersAsync(Guid storeId, IEnumerable<Guid> producerIds, IEnumerable<DeliveryKind> kinds, DateTimeOffset currentDate, RequestUser currentUser, CancellationToken token)
         {
             var producers = new List<ProducerDeliveriesDto>();
-            var agreements = await _context.FindAsync<Agreement>(d => d.Delivery.Available && producerIds.Contains(d.Delivery.Producer.Id) && d.Store.Id == storeId && d.Status == AgreementStatus.Accepted && kinds.Contains(d.Delivery.Kind), token);
+            var agreements = await _context.FindAsync<Domain.Agreement>(d => d.Delivery.Available && producerIds.Contains(d.Delivery.Producer.Id) && d.Store.Id == storeId && d.Status == AgreementStatus.Accepted && kinds.Contains(d.Delivery.Kind), token);
 
             var agreementProducerIds = agreements.Select(c => c.Delivery.Producer.Id).Distinct();
             var producerDistinctIds = producerIds.Distinct();
             if (agreementProducerIds.Count() != producerDistinctIds.Count())
             {
                 var notFoundProducerIds = agreementProducerIds.Except(producerDistinctIds);
-                var notFoundProducers = await _context.FindAsync<Producer>(c => notFoundProducerIds.Contains(c.Id), token);
+                var notFoundProducers = await _context.FindAsync<Domain.Producer>(c => notFoundProducerIds.Contains(c.Id), token);
 
                 producers.AddRange(notFoundProducers.Select(c => new ProducerDeliveriesDto { Id = c.Id, Name = c.Name, Deliveries = null }));
             }
@@ -127,8 +129,8 @@ namespace Sheaft.Application.Queries
             var producerIds = producersDeliveries.Select(c => c.Id);
             var deliveryModeIds = producersDeliveries.SelectMany(c => c.Deliveries.Select(d => d.Id));
 
-            var producers = await _context.FindAsync<Producer>(p => producerIds.Contains(p.Id), token);
-            var deliveriesMode = await _context.FindAsync<DeliveryMode>(d => deliveryModeIds.Contains(d.Id), token);
+            var producers = await _context.FindAsync<Domain.Producer>(p => producerIds.Contains(p.Id), token);
+            var deliveriesMode = await _context.FindAsync<Domain.DeliveryMode>(d => deliveryModeIds.Contains(d.Id), token);
 
             var producerDeliveriesHoursToCheck = new List<Tuple<Guid, Guid, DeliveryHourDto>>();
             foreach (var producer in producersDeliveries)
@@ -145,7 +147,7 @@ namespace Sheaft.Application.Queries
             }
 
             var results = await _capingDeliveriesService.GetCapingDeliveriesAsync(producerDeliveriesHoursToCheck, token);
-            if (!results.Success)
+            if (!results.Succeeded)
                 throw results.Exception;
 
             var filteredProducers = new List<ProducerDeliveriesDto>();
@@ -191,7 +193,7 @@ namespace Sheaft.Application.Queries
             return filteredProducers;
         }
 
-        private DeliveryDto GetDeliveriesForHours(DateTimeOffset currentDate, DeliveryMode deliveryMode, IReadOnlyCollection<TimeSlotHour> openingHours)
+        private DeliveryDto GetDeliveriesForHours(DateTimeOffset currentDate, Domain.DeliveryMode deliveryMode, IReadOnlyCollection<TimeSlotHour> openingHours)
         {
             return new DeliveryDto
             {

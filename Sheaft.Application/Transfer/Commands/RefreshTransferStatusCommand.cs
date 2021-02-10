@@ -1,23 +1,21 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
+﻿using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Sheaft.Core;
 using Newtonsoft.Json;
-using Sheaft.Application.Events;
-using Sheaft.Application.Interop;
-using Sheaft.Domain.Enums;
-using Sheaft.Domain.Models;
-using Sheaft.Options;
+using Sheaft.Application.Common;
+using Sheaft.Application.Common.Handlers;
+using Sheaft.Application.Common.Interfaces;
+using Sheaft.Application.Common.Interfaces.Services;
+using Sheaft.Application.Common.Models;
+using Sheaft.Application.Common.Options;
+using Sheaft.Domain;
+using Sheaft.Domain.Enum;
 
-namespace Sheaft.Application.Commands
+namespace Sheaft.Application.Transfer.Commands
 {
-    public class RefreshTransferStatusCommand : Command<TransactionStatus>
+    public class RefreshTransferStatusCommand : Command
     {
         [JsonConstructor]
         public RefreshTransferStatusCommand(RequestUser requestUser, string identifier) : base(requestUser)
@@ -27,9 +25,9 @@ namespace Sheaft.Application.Commands
 
         public string Identifier { get; set; }
     }
-    
+
     public class RefreshTransferStatusCommandHandler : CommandsHandler,
-        IRequestHandler<RefreshTransferStatusCommand, Result<TransactionStatus>>
+        IRequestHandler<RefreshTransferStatusCommand, Result>
     {
         private readonly IPspService _pspService;
         private readonly RoutineOptions _routineOptions;
@@ -46,110 +44,77 @@ namespace Sheaft.Application.Commands
             _routineOptions = routineOptions.Value;
         }
 
-        public async Task<Result<TransactionStatus>> Handle(RefreshTransferStatusCommand request, CancellationToken token)
+        public async Task<Result> Handle(RefreshTransferStatusCommand request,
+            CancellationToken token)
         {
-            return await ExecuteAsync(request, async () =>
-            {
-                var transfer = await _context.FindSingleAsync<Transfer>(c => c.Identifier == request.Identifier, token);
-                if(transfer != null)
-                    return await HandleTransferStatusAsync(request, transfer, token);
+            var transfer = await _context.FindSingleAsync<Domain.Transfer>(c => c.Identifier == request.Identifier, token);
+            if (transfer != null)
+                return await HandleTransferStatusAsync(request, transfer, token);
 
-                var donation = await _context.FindSingleAsync<Donation>(c => c.Identifier == request.Identifier, token);
-                if(donation != null)
-                    return await HandleDonationStatusAsync(request, donation, token);
+            var donation = await _context.FindSingleAsync<Domain.Donation>(c => c.Identifier == request.Identifier, token);
+            if (donation != null)
+                return await HandleDonationStatusAsync(request, donation, token);
 
-                var withholding = await _context.FindSingleAsync<Withholding>(c => c.Identifier == request.Identifier, token);
-                if (withholding != null)
-                    return await HandleWithholdingStatusAsync(request, withholding, token);
+            var withholding =
+                await _context.FindSingleAsync<Domain.Withholding>(c => c.Identifier == request.Identifier, token);
+            if (withholding != null)
+                return await HandleWithholdingStatusAsync(request, withholding, token);
 
-                return NotFound<TransactionStatus>();
-            });
+            return Failure();
         }
 
-        private async Task<Result<TransactionStatus>> HandleTransferStatusAsync(RefreshTransferStatusCommand request, Transfer transfer, CancellationToken token)
+        private async Task<Result> HandleTransferStatusAsync(RefreshTransferStatusCommand request,
+            Domain.Transfer transfer, CancellationToken token)
         {
             if (transfer.Status == TransactionStatus.Succeeded || transfer.Status == TransactionStatus.Failed)
-                return Ok(transfer.Status);
+                return Success();
 
             var pspResult = await _pspService.GetTransferAsync(transfer.Identifier, token);
-            if (!pspResult.Success)
-                return Failed<TransactionStatus>(pspResult.Exception);
+            if (!pspResult.Succeeded)
+                return Failure(pspResult.Exception);
 
             transfer.SetStatus(pspResult.Data.Status);
             transfer.SetResult(pspResult.Data.ResultCode, pspResult.Data.ResultMessage);
             transfer.SetExecutedOn(pspResult.Data.ProcessedOn);
 
             await _context.SaveChangesAsync(token);
-
-            switch (transfer.Status)
-            {
-                case TransactionStatus.Failed:
-                    _mediatr.Post(new TransferFailedEvent(request.RequestUser) { TransferId = transfer.Id });
-                    break;
-            }
-
-            return Ok(transfer.Status);
+            return Success();
         }
 
-        private async Task<Result<TransactionStatus>> HandleDonationStatusAsync(RefreshTransferStatusCommand request, Donation donation, CancellationToken token)
+        private async Task<Result> HandleDonationStatusAsync(RefreshTransferStatusCommand request,
+            Domain.Donation donation, CancellationToken token)
         {
             if (donation.Status == TransactionStatus.Succeeded || donation.Status == TransactionStatus.Failed)
-                return Ok(donation.Status);
+                return Success();
 
             var pspResult = await _pspService.GetTransferAsync(donation.Identifier, token);
-            if (!pspResult.Success)
-                return Failed<TransactionStatus>(pspResult.Exception);
+            if (!pspResult.Succeeded)
+                return Failure(pspResult.Exception);
 
             donation.SetStatus(pspResult.Data.Status);
             donation.SetResult(pspResult.Data.ResultCode, pspResult.Data.ResultMessage);
             donation.SetExecutedOn(pspResult.Data.ProcessedOn);
 
             await _context.SaveChangesAsync(token);
-
-            switch (donation.Status)
-            {
-                case TransactionStatus.Failed:
-                    _mediatr.Post(new DonationFailedEvent(request.RequestUser) { DonationId = donation.Id });
-                    break;
-            }
-
-            return Ok(donation.Status);
+            return Success();
         }
 
-        private async Task<Result<TransactionStatus>> HandleWithholdingStatusAsync(RefreshTransferStatusCommand request, Withholding withholding, CancellationToken token)
+        private async Task<Result> HandleWithholdingStatusAsync(RefreshTransferStatusCommand request,
+            Domain.Withholding withholding, CancellationToken token)
         {
             if (withholding.Status == TransactionStatus.Succeeded || withholding.Status == TransactionStatus.Failed)
-                return Ok(withholding.Status);
+                return Success();
 
             var pspResult = await _pspService.GetTransferAsync(withholding.Identifier, token);
-            if (!pspResult.Success)
-                return Failed<TransactionStatus>(pspResult.Exception);
+            if (!pspResult.Succeeded)
+                return Failure(pspResult.Exception);
 
             withholding.SetStatus(pspResult.Data.Status);
             withholding.SetResult(pspResult.Data.ResultCode, pspResult.Data.ResultMessage);
             withholding.SetExecutedOn(pspResult.Data.ProcessedOn);
 
             await _context.SaveChangesAsync(token);
-
-            switch (withholding.Status)
-            {
-                case TransactionStatus.Failed:
-                    _mediatr.Post(new WithholdingFailedEvent(request.RequestUser) { WithholdingId = withholding.Id });
-                    break;
-            }
-
-            return Ok(withholding.Status);
-        }
-
-        private async Task<IEnumerable<Guid>> GetNextTransferIdsAsync(int skip, int take, CancellationToken token)
-        {
-            return await _context.Transfers
-                .Get(c => c.Status == TransactionStatus.Waiting || c.Status == TransactionStatus.Created, true)
-                .OrderBy(c => c.CreatedOn)
-                .Select(c => c.Id)
-                .Skip(skip)
-                .Take(take)
-                .ToListAsync(token);
+            return Success();
         }
     }
 }

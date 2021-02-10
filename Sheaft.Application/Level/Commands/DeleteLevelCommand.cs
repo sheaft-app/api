@@ -1,17 +1,19 @@
-﻿using Sheaft.Domain.Enums;
-using System;
+﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
 using Microsoft.Extensions.Logging;
-using Sheaft.Core;
 using Newtonsoft.Json;
-using Sheaft.Application.Interop;
-using Sheaft.Domain.Models;
+using Sheaft.Application.Common;
+using Sheaft.Application.Common.Handlers;
+using Sheaft.Application.Common.Interfaces;
+using Sheaft.Application.Common.Interfaces.Services;
+using Sheaft.Application.Common.Models;
+using Sheaft.Domain;
 
-namespace Sheaft.Application.Commands
+namespace Sheaft.Application.Level.Commands
 {
-    public class DeleteLevelCommand : Command<bool>
+    public class DeleteLevelCommand : Command
     {
         [JsonConstructor]
         public DeleteLevelCommand(RequestUser requestUser) : base(requestUser)
@@ -22,7 +24,7 @@ namespace Sheaft.Application.Commands
     }
 
     public class DeleteLevelCommandHandler : CommandsHandler,
-        IRequestHandler<DeleteLevelCommand, Result<bool>>
+        IRequestHandler<DeleteLevelCommand, Result>
     {
         public DeleteLevelCommandHandler(
             ISheaftMediatr mediatr,
@@ -32,16 +34,13 @@ namespace Sheaft.Application.Commands
         {
         }
 
-        public async Task<Result<bool>> Handle(DeleteLevelCommand request, CancellationToken token)
+        public async Task<Result> Handle(DeleteLevelCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(request, async () =>
-            {
-                var entity = await _context.GetByIdAsync<Level>(request.Id, token);
-                _context.Remove(entity);
+            var entity = await _context.GetByIdAsync<Domain.Level>(request.Id, token);
+            _context.Remove(entity);
 
-                await _context.SaveChangesAsync(token);
-                return Ok(true);
-            });
+            await _context.SaveChangesAsync(token);
+            return Success();
         }
     }
 }

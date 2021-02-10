@@ -1,19 +1,22 @@
 ﻿using System;
-using Sheaft.Core;
-using Newtonsoft.Json;
-using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Sheaft.Application.Interop;
-using Sheaft.Domain.Enums;
-using Sheaft.Domain.Models;
-using Sheaft.Exceptions;
-using Sheaft.Options;
+using Newtonsoft.Json;
+using Sheaft.Application.Common;
+using Sheaft.Application.Common.Handlers;
+using Sheaft.Application.Common.Interfaces;
+using Sheaft.Application.Common.Interfaces.Services;
+using Sheaft.Application.Common.Models;
+using Sheaft.Application.Common.Options;
+using Sheaft.Application.Consumer.Commands;
+using Sheaft.Application.Payin.Commands;
+using Sheaft.Domain;
+using Sheaft.Domain.Enum;
 
-namespace Sheaft.Application.Commands
+namespace Sheaft.Application.Order.Commands
 {
     public class RetryOrderCommand : Command<Guid>
     {
@@ -24,6 +27,7 @@ namespace Sheaft.Application.Commands
 
         public Guid OrderId { get; set; }
     }
+
     public class RetryOrderCommandHandler : CommandsHandler,
         IRequestHandler<RetryOrderCommand, Result<Guid>>
     {
@@ -47,32 +51,32 @@ namespace Sheaft.Application.Commands
 
         public async Task<Result<Guid>> Handle(RetryOrderCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(request, async () =>
+            var order = await _context.GetByIdAsync<Domain.Order>(request.OrderId, token);
+            if (order.Status != OrderStatus.Refused)
+                return Failure<Guid>(MessageKind.Order_CannotRetry_NotIn_Refused_Status);
+
+            var checkResult =
+                await _mediatr.Process(
+                    new CheckConsumerConfigurationCommand(request.RequestUser) {Id = request.RequestUser.Id}, token);
+            if (!checkResult.Succeeded)
+                return Failure<Guid>(checkResult.Exception);
+
+            using (var transaction = await _context.BeginTransactionAsync(token))
             {
-                var order = await _context.GetByIdAsync<Order>(request.OrderId, token);
-                if (order.Status != OrderStatus.Refused)
-                    return BadRequest<Guid>(MessageKind.Order_CannotRetry_NotIn_Refused_Status);
+                order.SetStatus(OrderStatus.Waiting);
+                await _context.SaveChangesAsync(token);
 
-                var checkResult = await _mediatr.Process(new CheckConsumerConfigurationCommand(request.RequestUser) { Id = request.RequestUser.Id }, token);
-                if (!checkResult.Success)
-                    return Failed<Guid>(checkResult.Exception);
-
-                using (var transaction = await _context.BeginTransactionAsync(token))
+                var result = await _mediatr.Process(new CreateWebPayinCommand(request.RequestUser) {OrderId = order.Id},
+                    token);
+                if (!result.Succeeded)
                 {
-                    order.SetStatus(OrderStatus.Waiting);
-                    await _context.SaveChangesAsync(token);
-
-                    var result = await _mediatr.Process(new CreateWebPayinCommand(request.RequestUser) { OrderId = order.Id }, token);
-                    if (!result.Success)
-                    {
-                        await transaction.RollbackAsync(token);
-                        return Failed<Guid>(result.Exception);
-                    }
-
-                    await transaction.CommitAsync(token);
-                    return Ok(result.Data);
+                    await transaction.RollbackAsync(token);
+                    return Failure<Guid>(result.Exception);
                 }
-            });
+
+                await transaction.CommitAsync(token);
+                return Success(result.Data);
+            }
         }
     }
 }

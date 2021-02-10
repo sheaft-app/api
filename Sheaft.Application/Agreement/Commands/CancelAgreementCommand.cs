@@ -4,14 +4,17 @@ using System.Threading.Tasks;
 using MediatR;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using Sheaft.Application.Events;
-using Sheaft.Application.Interop;
-using Sheaft.Core;
-using Sheaft.Domain.Models;
+using Sheaft.Application.Common;
+using Sheaft.Application.Common.Handlers;
+using Sheaft.Application.Common.Interfaces;
+using Sheaft.Application.Common.Interfaces.Services;
+using Sheaft.Application.Common.Models;
+using Sheaft.Domain;
+using Sheaft.Domain.Events.Agreement;
 
-namespace Sheaft.Application.Commands
+namespace Sheaft.Application.Agreement.Commands
 {
-    public class CancelAgreementCommand : Command<bool>
+    public class CancelAgreementCommand : Command
     {
         [JsonConstructor]
         public CancelAgreementCommand(RequestUser requestUser) : base(requestUser)
@@ -21,9 +24,9 @@ namespace Sheaft.Application.Commands
         public Guid Id { get; set; }
         public string Reason { get; set; }
     }
-    
+
     public class CancelAgreementCommandsHandler : CommandsHandler,
-        IRequestHandler<CancelAgreementCommand, Result<bool>>
+        IRequestHandler<CancelAgreementCommand, Result>
     {
         public CancelAgreementCommandsHandler(
             ISheaftMediatr mediatr,
@@ -33,18 +36,13 @@ namespace Sheaft.Application.Commands
         {
         }
 
-        public async Task<Result<bool>> Handle(CancelAgreementCommand request, CancellationToken token)
+        public async Task<Result> Handle(CancelAgreementCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(request, async () =>
-            {
-                var entity = await _context.GetByIdAsync<Agreement>(request.Id, token);
-                entity.CancelAgreement(request.Reason);
+            var entity = await _context.GetByIdAsync<Domain.Agreement>(request.Id, token);
+            entity.CancelAgreement(request.Reason);
 
-                await _context.SaveChangesAsync(token);
-
-                _mediatr.Post(new AgreementCancelledEvent(request.RequestUser) { AgreementId = entity.Id });
-                return Ok(true);
-            });
+            await _context.SaveChangesAsync(token);
+            return Success();
         }
     }
 }

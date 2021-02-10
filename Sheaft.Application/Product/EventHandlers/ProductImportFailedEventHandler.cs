@@ -2,14 +2,14 @@
 using System.Threading.Tasks;
 using MediatR;
 using Microsoft.Extensions.Configuration;
-using Sheaft.Application.Commands.Handlers;
-using Sheaft.Application.Events;
-using Sheaft.Domain.Models;
-using Sheaft.Application.Interop;
-using Sheaft.Application.Models;
-using Sheaft.Application.Models.Mailer;
+using Sheaft.Application.Common.Handlers;
+using Sheaft.Application.Common.Interfaces;
+using Sheaft.Application.Common.Interfaces.Services;
+using Sheaft.Application.Common.Models;
+using Sheaft.Application.Common.Models.Mailer;
+using Sheaft.Domain.Events.Product;
 
-namespace Sheaft.Application.Handlers
+namespace Sheaft.Application.Product.EventHandlers
 {
     public class ProductImportFailedEventHandler : EventsHandler,
         INotificationHandler<DomainEventNotification<ProductImportFailedEvent>>
@@ -29,7 +29,7 @@ namespace Sheaft.Application.Handlers
         public async Task Handle(DomainEventNotification<ProductImportFailedEvent> notification, CancellationToken token)
         {
             var productEvent = notification.DomainEvent;
-            var job = await _context.GetByIdAsync<Job>(productEvent.JobId, token);
+            var job = await _context.GetByIdAsync<Domain.Job>(productEvent.JobId, token);
             await _signalrService.SendNotificationToGroupAsync(job.User.Id, nameof(ProductImportFailedEvent), new { JobId = job.Id, UserId = job.User.Id });
 
             var url = $"{_configuration.GetValue<string>("Portal:url")}/#/jobs/{job.Id}";

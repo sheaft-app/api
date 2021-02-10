@@ -4,13 +4,16 @@ using System.Threading.Tasks;
 using MediatR;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using Sheaft.Application.Interop;
-using Sheaft.Core;
-using Sheaft.Domain.Models;
+using Sheaft.Application.Common;
+using Sheaft.Application.Common.Handlers;
+using Sheaft.Application.Common.Interfaces;
+using Sheaft.Application.Common.Interfaces.Services;
+using Sheaft.Application.Common.Models;
+using Sheaft.Domain;
 
-namespace Sheaft.Application.Commands
+namespace Sheaft.Application.Product.Commands
 {
-    public class DeleteProductCommand : Command<bool>
+    public class DeleteProductCommand : Command
     {
         [JsonConstructor]
         public DeleteProductCommand(RequestUser requestUser) : base(requestUser)
@@ -19,9 +22,9 @@ namespace Sheaft.Application.Commands
 
         public Guid Id { get; set; }
     }
-    
+
     public class DeleteProductCommandHandler : CommandsHandler,
-        IRequestHandler<DeleteProductCommand, Result<bool>>
+        IRequestHandler<DeleteProductCommand, Result>
     {
         private readonly IBlobService _blobService;
 
@@ -35,16 +38,13 @@ namespace Sheaft.Application.Commands
             _blobService = blobService;
         }
 
-        public async Task<Result<bool>> Handle(DeleteProductCommand request, CancellationToken token)
+        public async Task<Result> Handle(DeleteProductCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(request, async () =>
-            {
-                var entity = await _context.GetByIdAsync<Product>(request.Id, token);
-                _context.Remove(entity);
+            var entity = await _context.GetByIdAsync<Domain.Product>(request.Id, token);
+            _context.Remove(entity);
 
-                await _context.SaveChangesAsync(token);
-                return Ok(true);
-            });
+            await _context.SaveChangesAsync(token);
+            return Success();
         }
     }
 }

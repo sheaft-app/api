@@ -5,12 +5,15 @@ using MediatR;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
-using Sheaft.Application.Interop;
-using Sheaft.Core;
-using Sheaft.Domain.Models;
-using Sheaft.Options;
+using Sheaft.Application.Common;
+using Sheaft.Application.Common.Handlers;
+using Sheaft.Application.Common.Interfaces;
+using Sheaft.Application.Common.Interfaces.Services;
+using Sheaft.Application.Common.Models;
+using Sheaft.Application.Common.Options;
+using Sheaft.Domain;
 
-namespace Sheaft.Application.Commands
+namespace Sheaft.Application.User.Commands
 {
     public class GenerateUserCodeCommand : Command<string>
     {
@@ -21,7 +24,7 @@ namespace Sheaft.Application.Commands
 
         public Guid Id { get; set; }
     }
-    
+
     public class GenerateUserCodeCommandHandler : CommandsHandler,
         IRequestHandler<GenerateUserCodeCommand, Result<string>>
     {
@@ -48,22 +51,19 @@ namespace Sheaft.Application.Commands
 
         public async Task<Result<string>> Handle(GenerateUserCodeCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(request, async () =>
-            {
-                var entity = await _context.GetByIdAsync<User>(request.Id, token);
+            var entity = await _context.GetByIdAsync<Domain.User>(request.Id, token);
 
-                if (!string.IsNullOrWhiteSpace(entity.SponsorshipCode))
-                    return Ok(entity.SponsorshipCode);
+            if (!string.IsNullOrWhiteSpace(entity.SponsorshipCode))
+                return Success(entity.SponsorshipCode);
 
-                var result = await _identifierService.GetNextSponsoringCode(token);
-                if (!result.Success)
-                    return Failed<string>(result.Exception);
+            var result = await _identifierService.GetNextSponsoringCode(token);
+            if (!result.Succeeded)
+                return Failure<string>(result.Exception);
 
-                entity.SetSponsoringCode(result.Data);
+            entity.SetSponsoringCode(result.Data);
 
-                await _context.SaveChangesAsync(token);
-                return Created(entity.SponsorshipCode);
-            });
+            await _context.SaveChangesAsync(token);
+            return Success(entity.SponsorshipCode);
         }
     }
 }

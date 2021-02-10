@@ -1,17 +1,17 @@
 ﻿using System;
 using Newtonsoft.Json;
-using Sheaft.Core;
-using Sheaft.Domain.Models.Common;
+using Sheaft.Domain.Common;
 
-namespace Sheaft.Application.Events
+namespace Sheaft.Domain.Events.Document
 {
     public class DocumentRefusedEvent : DomainEvent
     {
         [JsonConstructor]
-        public DocumentRefusedEvent(RequestUser requestUser) : base(requestUser)
+        public DocumentRefusedEvent(Guid documentId)
         {
+            DocumentId = documentId;
         }
 
-        public Guid DocumentId { get; set; }
+        public Guid DocumentId { get; }
     }
 }

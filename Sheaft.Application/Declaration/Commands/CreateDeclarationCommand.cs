@@ -3,15 +3,15 @@ using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
 using Microsoft.Extensions.Logging;
-using Sheaft.Core;
 using Newtonsoft.Json;
-using Sheaft.Application.Events;
-using Sheaft.Application.Interop;
-using Sheaft.Domain.Enums;
-using Sheaft.Domain.Models;
-using Sheaft.Exceptions;
+using Sheaft.Application.Common;
+using Sheaft.Application.Common.Handlers;
+using Sheaft.Application.Common.Interfaces;
+using Sheaft.Application.Common.Interfaces.Services;
+using Sheaft.Application.Common.Models;
+using Sheaft.Domain;
 
-namespace Sheaft.Application.Commands
+namespace Sheaft.Application.Declaration.Commands
 {
     public class CreateDeclarationCommand : Command<Guid>
     {
@@ -22,9 +22,9 @@ namespace Sheaft.Application.Commands
 
         public Guid LegalId { get; set; }
     }
-    
+
     public class CreateDeclarationCommandHandler : CommandsHandler,
-           IRequestHandler<CreateDeclarationCommand, Result<Guid>>
+        IRequestHandler<CreateDeclarationCommand, Result<Guid>>
     {
         private readonly IPspService _pspService;
 
@@ -40,23 +40,19 @@ namespace Sheaft.Application.Commands
 
         public async Task<Result<Guid>> Handle(CreateDeclarationCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(request, async () =>
-            {
-                var legal = await _context.GetByIdAsync<BusinessLegal>(request.LegalId, token);
-                legal.SetDeclaration();
+            var legal = await _context.GetByIdAsync<BusinessLegal>(request.LegalId, token);
+            legal.SetDeclaration();
 
-                var result = await _pspService.CreateUboDeclarationAsync(legal.Declaration, legal.User, token);
-                if (!result.Success)
-                    return Failed<Guid>(result.Exception);
+            var result = await _pspService.CreateUboDeclarationAsync(legal.Declaration, legal.User, token);
+            if (!result.Succeeded)
+                return Failure<Guid>(result.Exception);
 
-                legal.Declaration.SetIdentifier(result.Data.Identifier);
-                legal.Declaration.SetStatus(result.Data.Status);
-                legal.Declaration.SetResult(result.Data.ResultCode, result.Data.ResultMessage);
+            legal.Declaration.SetIdentifier(result.Data.Identifier);
+            legal.Declaration.SetStatus(result.Data.Status);
+            legal.Declaration.SetResult(result.Data.ResultCode, result.Data.ResultMessage);
 
-                await _context.SaveChangesAsync(token);
-
-                return Ok(legal.Declaration.Id);
-            });
+            await _context.SaveChangesAsync(token);
+            return Success(legal.Declaration.Id);
         }
     }
 }

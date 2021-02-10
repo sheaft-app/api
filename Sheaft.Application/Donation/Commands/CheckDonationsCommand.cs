@@ -1,7 +1,4 @@
-﻿using Sheaft.Core;
-using Newtonsoft.Json;
-using Sheaft.Domain.Enums;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -10,12 +7,20 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Sheaft.Application.Interop;
-using Sheaft.Options;
+using Newtonsoft.Json;
+using Sheaft.Application.Common;
+using Sheaft.Application.Common.Extensions;
+using Sheaft.Application.Common.Handlers;
+using Sheaft.Application.Common.Interfaces;
+using Sheaft.Application.Common.Interfaces.Services;
+using Sheaft.Application.Common.Models;
+using Sheaft.Application.Common.Options;
+using Sheaft.Domain;
+using Sheaft.Domain.Enum;
 
-namespace Sheaft.Application.Commands
+namespace Sheaft.Application.Donation.Commands
 {
-    public class CheckDonationsCommand : Command<bool>
+    public class CheckDonationsCommand : Command
     {
         [JsonConstructor]
         public CheckDonationsCommand(RequestUser requestUser)
@@ -25,7 +30,7 @@ namespace Sheaft.Application.Commands
     }
 
     public class CheckDonationsCommandHandler : CommandsHandler,
-        IRequestHandler<CheckDonationsCommand, Result<bool>>
+        IRequestHandler<CheckDonationsCommand, Result>
     {
         private readonly IPspService _pspService;
         private readonly RoutineOptions _routineOptions;
@@ -45,30 +50,27 @@ namespace Sheaft.Application.Commands
             _pspOptions = pspOptions.Value;
         }
 
-        public async Task<Result<bool>> Handle(CheckDonationsCommand request, CancellationToken token)
+        public async Task<Result> Handle(CheckDonationsCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(request, async () =>
+            var skip = 0;
+            const int take = 100;
+
+            var donationIds = await GetNextDonationIdsAsync(skip, take, token);
+            while (donationIds.Any())
             {
-                var skip = 0;
-                const int take = 100;
-
-                var donationIds = await GetNextDonationIdsAsync(skip, take, token);
-                while (donationIds.Any())
+                foreach (var donationId in donationIds)
                 {
-                    foreach (var donationId in donationIds)
+                    _mediatr.Post(new CheckDonationCommand(request.RequestUser)
                     {
-                        _mediatr.Post(new CheckDonationCommand(request.RequestUser)
-                        {
-                            DonationId = donationId
-                        });
-                    }
-
-                    skip += take;
-                    donationIds = await GetNextDonationIdsAsync(skip, take, token);
+                        DonationId = donationId
+                    });
                 }
 
-                return Ok(true);
-            });
+                skip += take;
+                donationIds = await GetNextDonationIdsAsync(skip, take, token);
+            }
+
+            return Success();
         }
 
         private async Task<IEnumerable<Guid>> GetNextDonationIdsAsync(int skip, int take, CancellationToken token)

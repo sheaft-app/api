@@ -4,17 +4,20 @@ using System.Threading.Tasks;
 using MediatR;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Sheaft.Application.Models;
-using Sheaft.Core;
 using Newtonsoft.Json;
-using Sheaft.Application.Interop;
-using Sheaft.Domain.Enums;
-using Sheaft.Domain.Models;
-using Sheaft.Options;
+using Sheaft.Application.Common;
+using Sheaft.Application.Common.Handlers;
+using Sheaft.Application.Common.Interfaces;
+using Sheaft.Application.Common.Interfaces.Services;
+using Sheaft.Application.Common.Models;
+using Sheaft.Application.Common.Models.Inputs;
+using Sheaft.Application.Common.Options;
+using Sheaft.Domain;
+using Sheaft.Domain.Enum;
 
-namespace Sheaft.Application.Commands
+namespace Sheaft.Application.Legal.Commands
 {
-    public class UpdateConsumerLegalCommand : Command<bool>
+    public class UpdateConsumerLegalCommand : Command
     {
         [JsonConstructor]
         public UpdateConsumerLegalCommand(RequestUser requestUser) : base(requestUser)
@@ -31,8 +34,9 @@ namespace Sheaft.Application.Commands
         public AddressInput Address { get; set; }
         public LegalValidation Validation { get; set; }
     }
+
     public class UpdateConsumerLegalCommandHandler : CommandsHandler,
-           IRequestHandler<UpdateConsumerLegalCommand, Result<bool>>
+        IRequestHandler<UpdateConsumerLegalCommand, Result>
     {
         private readonly PspOptions _pspOptions;
         private readonly IPspService _pspService;
@@ -49,45 +53,43 @@ namespace Sheaft.Application.Commands
             _pspService = pspService;
         }
 
-        public async Task<Result<bool>> Handle(UpdateConsumerLegalCommand request, CancellationToken token)
+        public async Task<Result> Handle(UpdateConsumerLegalCommand request, CancellationToken token)
         {
-            return await ExecuteAsync(request, async () =>
+            var legal = await _context.GetByIdAsync<ConsumerLegal>(request.Id, token);
+
+            var ownerAddress = new OwnerAddress(request.Address.Line1,
+                request.Address.Line2,
+                request.Address.Zipcode,
+                request.Address.City,
+                request.Address.Country
+            );
+
+            legal.SetValidation(request.Validation);
+            legal.Owner.SetFirstname(request.FirstName);
+            legal.Owner.SetLastname(request.LastName);
+            legal.Owner.SetEmail(request.Email);
+            legal.Owner.SetBirthDate(request.BirthDate);
+            legal.Owner.SetNationality(request.Nationality);
+            legal.Owner.SetCountryOfResidence(request.CountryOfResidence);
+            legal.Owner.SetAddress(ownerAddress);
+
+            await _context.SaveChangesAsync(token);
+
+            if (string.IsNullOrWhiteSpace(legal.User.Identifier))
             {
-                var legal = await _context.GetByIdAsync<ConsumerLegal>(request.Id, token);
+                var userResult = await _mediatr.Process(
+                    new CheckConsumerLegalConfigurationCommand(request.RequestUser) {UserId = legal.User.Id}, token);
+                if (!userResult.Succeeded)
+                    return Failure(userResult.Exception);
+            }
+            else
+            {
+                var result = await _pspService.UpdateConsumerAsync(legal, token);
+                if (!result.Succeeded)
+                    return Failure(result.Exception);
+            }
 
-                var ownerAddress = new OwnerAddress(request.Address.Line1,
-                    request.Address.Line2,
-                    request.Address.Zipcode,
-                    request.Address.City,
-                    request.Address.Country
-                );
-
-                legal.SetValidation(request.Validation);
-                legal.Owner.SetFirstname(request.FirstName);
-                legal.Owner.SetLastname(request.LastName);
-                legal.Owner.SetEmail(request.Email);
-                legal.Owner.SetBirthDate(request.BirthDate);
-                legal.Owner.SetNationality(request.Nationality);
-                legal.Owner.SetCountryOfResidence(request.CountryOfResidence);
-                legal.Owner.SetAddress(ownerAddress);
-
-                await _context.SaveChangesAsync(token);
-
-                if (string.IsNullOrWhiteSpace(legal.User.Identifier))
-                {
-                    var userResult = await _mediatr.Process(new CheckConsumerLegalConfigurationCommand(request.RequestUser) { UserId = legal.User.Id }, token);
-                    if (!userResult.Success)
-                        return Failed<bool>(userResult.Exception);
-                }
-                else
-                {
-                    var result = await _pspService.UpdateConsumerAsync(legal, token);
-                    if (!result.Success)
-                        return Failed<bool>(result.Exception);
-                }
-
-                return Ok(true);
-            });
+            return Success();
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿namespace Sheaft.Core.Security
+﻿namespace Sheaft.Application.Common.Security
 {
     public static class Policies
     {

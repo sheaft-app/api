@@ -1,18 +1,20 @@
-﻿using AutoMapper;
-using Sheaft.Application.Commands;
-using Sheaft.Core.Extensions;
-using Sheaft.Core.Models;
-using Sheaft.Domain.Models;
-using Sheaft.Application.Models;
-using System.Linq;
+﻿using System.Linq;
+using AutoMapper;
+using Sheaft.Application.Common.Extensions;
+using Sheaft.Application.Common.Models;
+using Sheaft.Application.Common.Models.Dto;
+using Sheaft.Application.Common.Models.Inputs;
+using Sheaft.Application.Common.Models.ViewModels;
+using Sheaft.Application.Picture.Commands;
+using Sheaft.Application.Product.Commands;
 
-namespace Sheaft.Application.Mappers
+namespace Sheaft.Application.Common.Mappings
 {
     public class ProductProfile : Profile
     {
         public ProductProfile()
         {
-            CreateMap<Product, ProductDto>()
+            CreateMap<Domain.Product, ProductDto>()
                 .ForMember(d => d.Producer, opt => opt.MapFrom(r => r.Producer))
                 .ForMember(d => d.Tags, opt => opt.MapFrom(r => r.Tags.Select(t => t.Tag)))
                 .ForMember(d => d.IsReturnable, opt => opt.MapFrom(r => r.Returnable != null))
@@ -22,7 +24,7 @@ namespace Sheaft.Application.Mappers
                 .ForMember(d => d.ImageMedium, opt => opt.MapFrom(r => ProductExtensions.GetPictureUrl(r.Picture, PictureSize.MEDIUM)))
                 .ForMember(d => d.ImageSmall, opt => opt.MapFrom(r => ProductExtensions.GetPictureUrl(r.Picture, PictureSize.SMALL)));
 
-            CreateMap<Product, ProductViewModel>()
+            CreateMap<Domain.Product, ProductViewModel>()
                 .ForMember(d => d.Producer, opt => opt.MapFrom(r => r.Producer))
                 .ForMember(d => d.Tags, opt => opt.MapFrom(r => r.Tags.Select(t => t.Tag.Id)))
                 .ForMember(d => d.ReturnableId, opt => opt.MapFrom(r => r.Returnable.Id))
