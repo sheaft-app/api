@@ -24,35 +24,31 @@ namespace Sheaft.Application.Consumer.Commands
         {
         }
 
-        public Guid Id { get; set; }
+        public Guid ConsumerId { get; set; }
     }
 
     public class CheckConsumerConfigurationCommandHandler : CommandsHandler,
         IRequestHandler<CheckConsumerConfigurationCommand, Result>
     {
-        private readonly RoleOptions _roleOptions;
-
         public CheckConsumerConfigurationCommandHandler(
             ISheaftMediatr mediatr,
             IAppDbContext context,
-            ILogger<CheckConsumerConfigurationCommandHandler> logger,
-            IOptionsSnapshot<RoleOptions> roleOptions)
+            ILogger<CheckConsumerConfigurationCommandHandler> logger)
             : base(mediatr, context, logger)
         {
-            _roleOptions = roleOptions.Value;
         }
 
         public async Task<Result> Handle(CheckConsumerConfigurationCommand request, CancellationToken token)
         {
             var business =
                 await _mediatr.Process(
-                    new CheckConsumerLegalConfigurationCommand(request.RequestUser) {UserId = request.Id}, token);
+                    new CheckConsumerLegalConfigurationCommand(request.RequestUser) {UserId = request.ConsumerId}, token);
             if (!business.Succeeded)
                 return Failure(business.Exception);
 
             var wallet =
                 await _mediatr.Process(
-                    new CheckWalletPaymentsConfigurationCommand(request.RequestUser) {UserId = request.Id}, token);
+                    new CheckWalletPaymentsConfigurationCommand(request.RequestUser) {UserId = request.ConsumerId}, token);
             if (!wallet.Succeeded)
                 return Failure(wallet.Exception);
 

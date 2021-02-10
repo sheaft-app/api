@@ -11,7 +11,8 @@ namespace Sheaft.Application.Common.Mappings
         {
             CreateMap<Domain.Notification, NotificationDto>();
 
-            CreateMap<IdInput, MarkUserNotificationAsReadCommand>();
+            CreateMap<IdInput, MarkUserNotificationAsReadCommand>()
+                    .ForMember(c => c.NotificationId, opt => opt.MapFrom(r => r.Id));
         }
     }
 }

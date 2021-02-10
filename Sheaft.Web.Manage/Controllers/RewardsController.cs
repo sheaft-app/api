@@ -20,17 +20,14 @@ namespace Sheaft.Web.Manage.Controllers
 {
     public class RewardsController : ManageController
     {
-        private readonly ILogger<RewardsController> _logger;
-
         public RewardsController(
             IAppDbContext context,
             IMapper mapper,
             ISheaftMediatr mediatr,
             IOptionsSnapshot<RoleOptions> roleOptions,
-            IConfigurationProvider configurationProvider,
-            ILogger<RewardsController> logger) : base(context, mapper, roleOptions, mediatr, configurationProvider)
+            IConfigurationProvider configurationProvider)
+            : base(context, mapper, roleOptions, mediatr, configurationProvider)
         {
-            _logger = logger;
         }
 
         [HttpGet]
@@ -91,7 +88,7 @@ namespace Sheaft.Web.Manage.Controllers
                 return View(model);
             }
 
-            return RedirectToAction("Edit", new { id = result.Data });
+            return RedirectToAction("Edit", new {id = result.Data});
         }
 
         [HttpGet]
@@ -117,7 +114,7 @@ namespace Sheaft.Web.Manage.Controllers
         {
             var result = await _mediatr.Process(new UpdateRewardCommand(await GetRequestUser(token))
             {
-                Id = model.Id,
+                RewardId = model.Id,
                 Name = model.Name,
                 Contact = model.Contact,
                 Description = model.Description,
@@ -137,7 +134,7 @@ namespace Sheaft.Web.Manage.Controllers
                 return View(model);
             }
 
-            return RedirectToAction("Edit", new { model.Id });
+            return RedirectToAction("Edit", new {model.Id});
         }
 
         [HttpPost]
@@ -146,13 +143,13 @@ namespace Sheaft.Web.Manage.Controllers
         {
             var result = await _mediatr.Process(new RestoreRewardCommand(await GetRequestUser(token))
             {
-                Id = id
+                RewardId = id
             }, token);
 
             if (!result.Succeeded)
                 throw result.Exception;
 
-            return RedirectToAction("Edit", new { id });
+            return RedirectToAction("Edit", new {id});
         }
 
         [HttpPost]
@@ -161,7 +158,7 @@ namespace Sheaft.Web.Manage.Controllers
         {
             var result = await _mediatr.Process(new DeleteRewardCommand(await GetRequestUser(token))
             {
-                Id = id
+                RewardId = id
             }, token);
 
             if (!result.Succeeded)

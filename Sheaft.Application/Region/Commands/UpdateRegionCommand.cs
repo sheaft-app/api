@@ -21,7 +21,7 @@ namespace Sheaft.Application.Region.Commands
         {
         }
 
-        public Guid Id { get; set; }
+        public Guid RegionId { get; set; }
         public string Name { get; set; }
         public int? RequiredProducers { get; set; }
     }
@@ -39,7 +39,7 @@ namespace Sheaft.Application.Region.Commands
 
         public async Task<Result> Handle(UpdateRegionCommand request, CancellationToken token)
         {
-            var entity = await _context.Regions.SingleOrDefaultAsync(c => c.Id == request.Id, token);
+            var entity = await _context.Regions.SingleOrDefaultAsync(c => c.Id == request.RegionId, token);
             entity.SetName(request.Name);
             entity.SetRequiredProducers(request.RequiredProducers);
 

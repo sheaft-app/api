@@ -19,24 +19,19 @@ namespace Sheaft.Web.Manage.Controllers
 {
     public class PayinsController : ManageController
     {
-        private readonly ILogger<PayinsController> _logger;
-        private RoutineOptions _routineOptions;
-
         public PayinsController(
             IAppDbContext context,
             IMapper mapper,
             ISheaftMediatr mediatr,
-            IOptionsSnapshot<RoutineOptions> routineOptions,
             IOptionsSnapshot<RoleOptions> roleOptions,
-            IConfigurationProvider configurationProvider,
-            ILogger<PayinsController> logger) : base(context, mapper, roleOptions, mediatr, configurationProvider)
+            IConfigurationProvider configurationProvider)
+            : base(context, mapper, roleOptions, mediatr, configurationProvider)
         {
-            _logger = logger;
-            _routineOptions = routineOptions.Value;
         }
 
         [HttpGet]
-        public async Task<IActionResult> Index(CancellationToken token, TransactionStatus? status = null, int page = 0, int take = 50)
+        public async Task<IActionResult> Index(CancellationToken token, TransactionStatus? status = null, int page = 0,
+            int take = 50)
         {
             if (page < 0)
                 page = 0;

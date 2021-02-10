@@ -33,18 +33,15 @@ namespace Sheaft.Application.Payin.Commands
         IRequestHandler<RefreshPayinStatusCommand, Result>
     {
         private readonly IPspService _pspService;
-        private readonly RoutineOptions _routineOptions;
 
         public RefreshPayinStatusCommandHandler(
             IAppDbContext context,
             IPspService pspService,
             ISheaftMediatr mediatr,
-            IOptionsSnapshot<RoutineOptions> routineOptions,
             ILogger<RefreshPayinStatusCommandHandler> logger)
             : base(mediatr, context, logger)
         {
             _pspService = pspService;
-            _routineOptions = routineOptions.Value;
         }
 
         public async Task<Result> Handle(RefreshPayinStatusCommand request, CancellationToken token)
@@ -66,7 +63,8 @@ namespace Sheaft.Application.Payin.Commands
             switch (payin.Status)
             {
                 case TransactionStatus.Failed:
-                    _mediatr.Post(new FailOrderCommand(request.RequestUser) {OrderId = payin.Order.Id, PayinId = payin.Id});
+                    _mediatr.Post(new FailOrderCommand(request.RequestUser)
+                        {OrderId = payin.Order.Id, PayinId = payin.Id});
                     break;
                 case TransactionStatus.Succeeded:
                     _mediatr.Post(new ConfirmOrderCommand(request.RequestUser) {OrderId = payin.Order.Id});

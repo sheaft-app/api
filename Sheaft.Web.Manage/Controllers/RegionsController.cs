@@ -19,17 +19,14 @@ namespace Sheaft.Web.Manage.Controllers
 {
     public class RegionsController : ManageController
     {
-        private readonly ILogger<RegionsController> _logger;
-
         public RegionsController(
             IAppDbContext context,
             IMapper mapper,
             ISheaftMediatr mediatr,
             IOptionsSnapshot<RoleOptions> roleOptions,
-            IConfigurationProvider configurationProvider,
-            ILogger<RegionsController> logger) : base(context, mapper, roleOptions, mediatr, configurationProvider)
+            IConfigurationProvider configurationProvider)
+            : base(context, mapper, roleOptions, mediatr, configurationProvider)
         {
-            _logger = logger;
         }
 
         [HttpGet]
@@ -78,7 +75,7 @@ namespace Sheaft.Web.Manage.Controllers
         {
             var result = await _mediatr.Process(new UpdateRegionCommand(await GetRequestUser(token))
             {
-                Id = model.Id,
+                RegionId = model.Id,
                 Name = model.Name,
                 RequiredProducers = model.RequiredProducers
             }, token);

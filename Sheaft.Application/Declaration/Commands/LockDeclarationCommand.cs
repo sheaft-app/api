@@ -27,16 +27,12 @@ namespace Sheaft.Application.Declaration.Commands
     public class LockDeclarationCommandHandler : CommandsHandler,
         IRequestHandler<LockDeclarationCommand, Result>
     {
-        private readonly IPspService _pspService;
-
         public LockDeclarationCommandHandler(
             ISheaftMediatr mediatr,
             IAppDbContext context,
-            IPspService pspService,
             ILogger<LockDeclarationCommandHandler> logger)
             : base(mediatr, context, logger)
         {
-            _pspService = pspService;
         }
 
         public async Task<Result> Handle(LockDeclarationCommand request, CancellationToken token)

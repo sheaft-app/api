@@ -22,17 +22,14 @@ namespace Sheaft.Web.Manage.Controllers
 {
     public class LegalsController : ManageController
     {
-        private readonly ILogger<LegalsController> _logger;
-
         public LegalsController(
             IAppDbContext context,
             IMapper mapper,
             ISheaftMediatr mediatr,
             IOptionsSnapshot<RoleOptions> roleOptions,
-            IConfigurationProvider configurationProvider,
-            ILogger<LegalsController> logger) : base(context, mapper, roleOptions, mediatr, configurationProvider)
+            IConfigurationProvider configurationProvider)
+            : base(context, mapper, roleOptions, mediatr, configurationProvider)
         {
-            _logger = logger;
         }
 
         [HttpGet]
@@ -44,9 +41,9 @@ namespace Sheaft.Web.Manage.Controllers
                 .SingleOrDefaultAsync(token);
 
             if (entity.Kind != LegalKind.Natural)
-                return RedirectToAction("EditLegalBusiness", new { entity.Id });
+                return RedirectToAction("EditLegalBusiness", new {entity.Id});
 
-            return RedirectToAction("EditLegalConsumer", new { entity.Id });
+            return RedirectToAction("EditLegalConsumer", new {entity.Id});
         }
 
         [HttpGet]
@@ -58,9 +55,9 @@ namespace Sheaft.Web.Manage.Controllers
                 .SingleOrDefaultAsync(token);
 
             if (entity.Kind != LegalKind.Natural)
-                return RedirectToAction("EditLegalBusiness", new { entity.Id });
+                return RedirectToAction("EditLegalBusiness", new {entity.Id});
 
-            return RedirectToAction("EditLegalConsumer", new { entity.Id });
+            return RedirectToAction("EditLegalConsumer", new {entity.Id});
         }
 
         [HttpGet]
@@ -75,9 +72,9 @@ namespace Sheaft.Web.Manage.Controllers
                 throw SheaftException.NotFound();
 
             if (entity.Kind != ProfileKind.Consumer)
-                return RedirectToAction("CreateLegalBusiness", new { userId });
+                return RedirectToAction("CreateLegalBusiness", new {userId});
 
-            return RedirectToAction("CreateLegalConsumer", new { userId });
+            return RedirectToAction("CreateLegalConsumer", new {userId});
         }
 
         [HttpGet]
@@ -96,7 +93,7 @@ namespace Sheaft.Web.Manage.Controllers
 
             return View(new BusinessLegalViewModel
             {
-                Owner = new OwnerViewModel { Id = userId }
+                Owner = new OwnerViewModel {Id = userId}
             });
         }
 
@@ -124,7 +121,7 @@ namespace Sheaft.Web.Manage.Controllers
                 return View(model);
             }
 
-            return RedirectToAction("EditLegalBusiness", new { id = result.Data });
+            return RedirectToAction("EditLegalBusiness", new {id = result.Data});
         }
 
         [HttpGet]
@@ -144,7 +141,7 @@ namespace Sheaft.Web.Manage.Controllers
             return View(new ConsumerLegalViewModel
             {
                 Kind = LegalKind.Natural,
-                Owner = new OwnerViewModel { Id = userId }
+                Owner = new OwnerViewModel {Id = userId}
             });
         }
 
@@ -172,7 +169,7 @@ namespace Sheaft.Web.Manage.Controllers
                 return View(model);
             }
 
-            return RedirectToAction("EditLegalConsumer", new { id = result.Data });
+            return RedirectToAction("EditLegalConsumer", new {id = result.Data});
         }
 
         [HttpGet]
@@ -198,7 +195,7 @@ namespace Sheaft.Web.Manage.Controllers
         {
             var result = await _mediatr.Process(new UpdateBusinessLegalCommand(await GetRequestUser(token))
             {
-                Id = model.Id,
+                LegalId = model.Id,
                 Name = model.Name,
                 Email = model.Email,
                 Address = _mapper.Map<AddressInput>(model.Address),
@@ -217,7 +214,7 @@ namespace Sheaft.Web.Manage.Controllers
                 return View(model);
             }
 
-            return RedirectToAction("EditLegalBusiness", new { model.Id });
+            return RedirectToAction("EditLegalBusiness", new {model.Id});
         }
 
         [HttpGet]
@@ -243,7 +240,7 @@ namespace Sheaft.Web.Manage.Controllers
         {
             var result = await _mediatr.Process(new UpdateConsumerLegalCommand(await GetRequestUser(token))
             {
-                Id = model.Id,
+                LegalId = model.Id,
                 Email = model.Owner.Email,
                 FirstName = model.Owner.FirstName,
                 LastName = model.Owner.LastName,
@@ -262,7 +259,7 @@ namespace Sheaft.Web.Manage.Controllers
                 return View(model);
             }
 
-            return RedirectToAction("EditLegalConsumer", new { model.Id });
+            return RedirectToAction("EditLegalConsumer", new {model.Id});
         }
     }
 }

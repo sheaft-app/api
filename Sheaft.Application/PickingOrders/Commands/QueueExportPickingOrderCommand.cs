@@ -26,26 +26,23 @@ namespace Sheaft.Application.PickingOrders.Commands
 
         public IEnumerable<Guid> PurchaseOrderIds { get; set; }
         public string Name { get; set; }
+        public Guid ProducerId { get; set; }
     }
 
     public class QueueExportPickingOrderCommandHandler : CommandsHandler,
         IRequestHandler<QueueExportPickingOrderCommand, Result<Guid>>
     {
-        private readonly IBlobService _blobsService;
-
         public QueueExportPickingOrderCommandHandler(
             ISheaftMediatr mediatr,
             IAppDbContext context,
-            IBlobService blobsService,
             ILogger<QueueExportPickingOrderCommandHandler> logger)
             : base(mediatr, context, logger)
         {
-            _blobsService = blobsService;
         }
 
         public async Task<Result<Guid>> Handle(QueueExportPickingOrderCommand request, CancellationToken token)
         {
-            var producer = await _context.GetByIdAsync<Domain.Producer>(request.RequestUser.Id, token);
+            var producer = await _context.GetByIdAsync<Domain.Producer>(request.ProducerId, token);
             var purchaseOrders = await _context.GetByIdsAsync<Domain.PurchaseOrder>(request.PurchaseOrderIds, token);
 
             var orderIdsToAccept = purchaseOrders.Where(c => c.Status == PurchaseOrderStatus.Waiting).Select(c => c.Id);
@@ -53,12 +50,13 @@ namespace Sheaft.Application.PickingOrders.Commands
             {
                 var result =
                     await _mediatr.Process(
-                        new AcceptPurchaseOrdersCommand(request.RequestUser) {Ids = orderIdsToAccept}, token);
+                        new AcceptPurchaseOrdersCommand(request.RequestUser) {PurchaseOrderIds = orderIdsToAccept}, token);
                 if (!result.Succeeded)
                     return Failure<Guid>(result.Exception);
             }
 
-            var entity = new Domain.Job(Guid.NewGuid(), JobKind.ExportPickingOrders, request.Name ?? $"Export bon préparation",
+            var entity = new Domain.Job(Guid.NewGuid(), JobKind.ExportPickingOrders,
+                request.Name ?? $"Export bon préparation",
                 producer);
 
             await _context.AddAsync(entity, token);

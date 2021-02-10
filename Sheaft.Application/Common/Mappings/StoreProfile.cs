@@ -31,7 +31,8 @@ namespace Sheaft.Application.Common.Mappings
                 .ForMember(d => d.OpeningHours, opt => opt.MapFrom(r => r.OpeningHours));
 
             CreateMap<RegisterStoreInput, RegisterStoreCommand>();
-            CreateMap<UpdateStoreInput, UpdateStoreCommand>();
+            CreateMap<UpdateStoreInput, UpdateStoreCommand>()
+                .ForMember(c => c.StoreId, opt => opt.MapFrom(r => r.Id));
         }
     }
 }

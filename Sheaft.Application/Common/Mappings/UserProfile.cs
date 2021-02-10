@@ -30,8 +30,10 @@ namespace Sheaft.Application.Common.Mappings
             CreateMap<UpdatePictureInput, UpdateUserPictureCommand>()
                 .ForMember(c => c.UserId, opt => opt.MapFrom(d => d.Id));
 
-            CreateMap<IdInput, GenerateUserCodeCommand>();
-            CreateMap<IdWithReasonInput, RemoveUserCommand>();
+            CreateMap<IdInput, GenerateUserCodeCommand>()
+                    .ForMember(c => c.UserId, opt => opt.MapFrom(r => r.Id));
+            CreateMap<IdWithReasonInput, RemoveUserCommand>()
+                .ForMember(c => c.UserId, opt => opt.MapFrom(r => r.Id));;
         }
     }
 }

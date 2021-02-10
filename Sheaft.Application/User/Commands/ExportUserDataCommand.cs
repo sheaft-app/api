@@ -27,38 +27,31 @@ namespace Sheaft.Application.User.Commands
         {
         }
 
-        public Guid Id { get; set; }
+        public Guid JobId { get; set; }
     }
 
     public class ExportUserDataCommandHandler : CommandsHandler,
         IRequestHandler<ExportUserDataCommand, Result>
     {
         private readonly IBlobService _blobService;
-        private readonly ScoringOptions _scoringOptions;
-        private readonly RoleOptions _roleOptions;
 
         public ExportUserDataCommandHandler(
-            IOptionsSnapshot<ScoringOptions> scoringOptions,
             ISheaftMediatr mediatr,
             IAppDbContext context,
             IBlobService blobService,
-            ILogger<ExportUserDataCommandHandler> logger,
-            IOptionsSnapshot<RoleOptions> roleOptions)
+            ILogger<ExportUserDataCommandHandler> logger)
             : base(mediatr, context, logger)
         {
-            _roleOptions = roleOptions.Value;
-            _scoringOptions = scoringOptions.Value;
             _blobService = blobService;
         }
 
         public async Task<Result> Handle(ExportUserDataCommand request, CancellationToken token)
         {
-            var job = await _context.GetByIdAsync<Domain.Job>(request.Id, token);
-            var user = await _context.GetByIdAsync<Domain.User>(request.RequestUser.Id, token);
+            var job = await _context.GetByIdAsync<Domain.Job>(request.JobId, token);
 
             try
             {
-                var startResult = await _mediatr.Process(new StartJobCommand(request.RequestUser) {Id = job.Id}, token);
+                var startResult = await _mediatr.Process(new StartJobCommand(request.RequestUser) {JobId = job.Id}, token);
                 if (!startResult.Succeeded)
                     throw startResult.Exception;
 
@@ -68,25 +61,25 @@ namespace Sheaft.Application.User.Commands
                 {
                     using (var package = new ExcelPackage(stream))
                     {
-                        await CreateExcelUserDataFileAsync(package, user, token);
+                        await CreateExcelUserDataFileAsync(package, job.User, token);
                     }
 
-                    var response = await _blobService.UploadRgpdFileAsync(request.RequestUser.Id, job.Id,
+                    var response = await _blobService.UploadRgpdFileAsync(job.User.Id, job.Id,
                         $"RGPD_{job.CreatedOn:dd-MM-yyyy}.xlsx", stream.ToArray(), token);
                     if (!response.Succeeded)
                         throw response.Exception;
 
                     _mediatr.Post(new UserDataExportSucceededEvent(job.Id));
 
-                    _logger.LogInformation($"RGPD data for user {request.RequestUser.Id} successfully exported");
+                    _logger.LogInformation($"RGPD data for user {job.User.Id} successfully exported");
                     return await _mediatr.Process(
-                        new CompleteJobCommand(request.RequestUser) {Id = job.Id, FileUrl = response.Data}, token);
+                        new CompleteJobCommand(request.RequestUser) {JobId = job.Id, FileUrl = response.Data}, token);
                 }
             }
             catch (Exception e)
             {
                 _mediatr.Post(new UserDataExportFailedEvent(job.Id));
-                return await _mediatr.Process(new FailJobCommand(request.RequestUser) {Id = job.Id, Reason = e.Message},
+                return await _mediatr.Process(new FailJobCommand(request.RequestUser) {JobId = job.Id, Reason = e.Message},
                     token);
             }
         }
@@ -190,7 +183,8 @@ namespace Sheaft.Application.User.Commands
             ratingsWorksheet.Cells[2, 4].Value = "Note";
             ratingsWorksheet.Cells[2, 5].Value = "Commentaire";
 
-            var productsRated = await _context.FindAsync<Domain.Product>(o => o.Ratings.Any(r => r.User.Id == user.Id), token);
+            var productsRated =
+                await _context.FindAsync<Domain.Product>(o => o.Ratings.Any(r => r.User.Id == user.Id), token);
             var i = 3;
             foreach (var product in productsRated)
             {

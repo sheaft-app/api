@@ -21,17 +21,14 @@ namespace Sheaft.Web.Manage.Controllers
 {
     public class TagsController : ManageController
     {
-        private readonly ILogger<TagsController> _logger;
-
         public TagsController(
             IAppDbContext context,
             IMapper mapper,
             ISheaftMediatr mediatr,
             IOptionsSnapshot<RoleOptions> roleOptions,
-            IConfigurationProvider configurationProvider,
-            ILogger<TagsController> logger) : base(context, mapper, roleOptions, mediatr, configurationProvider)
+            IConfigurationProvider configurationProvider)
+            : base(context, mapper, roleOptions, mediatr, configurationProvider)
         {
-            _logger = logger;
         }
 
         [HttpGet]
@@ -66,7 +63,8 @@ namespace Sheaft.Web.Manage.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Add(TagViewModel model, IFormFile picture, IFormFile icon, CancellationToken token)
+        public async Task<IActionResult> Add(TagViewModel model, IFormFile picture, IFormFile icon,
+            CancellationToken token)
         {
             if (picture != null)
             {
@@ -102,7 +100,7 @@ namespace Sheaft.Web.Manage.Controllers
                 return View(model);
             }
 
-            return RedirectToAction("Edit", new { id = result.Data });
+            return RedirectToAction("Edit", new {id = result.Data});
         }
 
         [HttpGet]
@@ -122,7 +120,8 @@ namespace Sheaft.Web.Manage.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(TagViewModel model, IFormFile picture, IFormFile icon, CancellationToken token)
+        public async Task<IActionResult> Edit(TagViewModel model, IFormFile picture, IFormFile icon,
+            CancellationToken token)
         {
             if (picture != null)
             {
@@ -144,7 +143,7 @@ namespace Sheaft.Web.Manage.Controllers
 
             var result = await _mediatr.Process(new UpdateTagCommand(await GetRequestUser(token))
             {
-                Id = model.Id,
+                TagId = model.Id,
                 Description = model.Description,
                 Name = model.Name,
                 Picture = model.Picture,
@@ -159,7 +158,7 @@ namespace Sheaft.Web.Manage.Controllers
                 return View(model);
             }
 
-            return RedirectToAction("Edit", new { model.Id });
+            return RedirectToAction("Edit", new {model.Id});
         }
 
         [HttpPost]
@@ -168,13 +167,13 @@ namespace Sheaft.Web.Manage.Controllers
         {
             var result = await _mediatr.Process(new RestoreTagCommand(await GetRequestUser(token))
             {
-                Id = id
+                TagId = id
             }, token);
 
             if (!result.Succeeded)
                 throw result.Exception;
 
-            return RedirectToAction("Edit", new { id });
+            return RedirectToAction("Edit", new {id});
         }
 
         [HttpPost]
@@ -183,7 +182,7 @@ namespace Sheaft.Web.Manage.Controllers
         {
             var result = await _mediatr.Process(new DeleteTagCommand(await GetRequestUser(token))
             {
-                Id = id
+                TagId = id
             }, token);
 
             if (!result.Succeeded)

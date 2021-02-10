@@ -28,24 +28,22 @@ namespace Sheaft.Application.Page.Commands
     public class DeletePageCommandHandler : CommandsHandler,
         IRequestHandler<DeletePageCommand, Result>
     {
-        private readonly IPspService _pspService;
         private readonly IBlobService _blobService;
 
         public DeletePageCommandHandler(
             IAppDbContext context,
-            IPspService pspService,
             IBlobService blobService,
             ISheaftMediatr mediatr,
             ILogger<DeletePageCommandHandler> logger)
             : base(mediatr, context, logger)
         {
-            _pspService = pspService;
             _blobService = blobService;
         }
 
         public async Task<Result> Handle(DeletePageCommand request, CancellationToken token)
         {
-            var legal = await _context.GetSingleAsync<Domain.Legal>(r => r.Documents.Any(d => d.Id == request.DocumentId),
+            var legal = await _context.GetSingleAsync<Domain.Legal>(
+                r => r.Documents.Any(d => d.Id == request.DocumentId),
                 token);
             var document = legal.Documents.FirstOrDefault(d => d.Id == request.DocumentId);
 

@@ -19,8 +19,10 @@ namespace Sheaft.Application.Common.Mappings
                 .ForMember(d => d.BirthPlace, opt => opt.MapFrom(r => r.BirthPlace));
 
             CreateMap<CreateUboInput, CreateUboCommand>();
-            CreateMap<UpdateUboInput, UpdateUboCommand>();
-            CreateMap<IdInput, DeleteUboCommand>();
+            CreateMap<UpdateUboInput, UpdateUboCommand>()
+                .ForMember(c => c.UboId, opt => opt.MapFrom(r => r.Id));;
+            CreateMap<IdInput, DeleteUboCommand>()
+                    .ForMember(c => c.UboId, opt => opt.MapFrom(r => r.Id));
         }
     }
 }

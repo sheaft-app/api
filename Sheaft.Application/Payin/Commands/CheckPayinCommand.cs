@@ -29,19 +29,12 @@ namespace Sheaft.Application.Payin.Commands
     public class CheckPayinCommandHandler : CommandsHandler,
         IRequestHandler<CheckPayinCommand, Result>
     {
-        private readonly IPspService _pspService;
-        private readonly RoutineOptions _routineOptions;
-
         public CheckPayinCommandHandler(
             IAppDbContext context,
-            IPspService pspService,
             ISheaftMediatr mediatr,
-            IOptionsSnapshot<RoutineOptions> routineOptions,
             ILogger<CheckPayinCommandHandler> logger)
             : base(mediatr, context, logger)
         {
-            _pspService = pspService;
-            _routineOptions = routineOptions.Value;
         }
 
         public async Task<Result> Handle(CheckPayinCommand request, CancellationToken token)

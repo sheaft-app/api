@@ -19,8 +19,10 @@ namespace Sheaft.Application.Common.Mappings
             CreateMap<Domain.Consumer, ConsumerDto>()
                 .IncludeBase<Domain.Consumer, UserDto>();
 
-            CreateMap<RegisterConsumerInput, RegisterConsumerCommand>();
-            CreateMap<UpdateConsumerInput, UpdateConsumerCommand>();
+            CreateMap<RegisterConsumerInput, RegisterConsumerCommand>()
+                .ForMember(c => c.ConsumerId, opt => opt.MapFrom(r => r.Id));;
+            CreateMap<UpdateConsumerInput, UpdateConsumerCommand>()
+                .ForMember(c => c.ConsumerId, opt => opt.MapFrom(r => r.Id));;
         }
     }
 }

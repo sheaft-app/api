@@ -21,7 +21,7 @@ namespace Sheaft.Application.Reward.Commands
         {
         }
 
-        public Guid Id { get; set; }
+        public Guid RewardId { get; set; }
     }
 
     public class RestoreRewardCommandHandler : CommandsHandler,
@@ -37,7 +37,7 @@ namespace Sheaft.Application.Reward.Commands
 
         public async Task<Result> Handle(RestoreRewardCommand request, CancellationToken token)
         {
-            var entity = await _context.Rewards.SingleOrDefaultAsync(r => r.Id == request.Id, token);
+            var entity = await _context.Rewards.SingleOrDefaultAsync(r => r.Id == request.RewardId, token);
 
             _context.Restore(entity);
             await _context.SaveChangesAsync(token);

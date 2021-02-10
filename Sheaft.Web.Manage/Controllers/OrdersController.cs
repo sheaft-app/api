@@ -20,21 +20,19 @@ namespace Sheaft.Web.Manage.Controllers
 {
     public class OrdersController : ManageController
     {
-        private readonly ILogger<OrdersController> _logger;
-
         public OrdersController(
             IAppDbContext context,
             IMapper mapper,
             ISheaftMediatr mediatr,
             IOptionsSnapshot<RoleOptions> roleOptions,
-            IConfigurationProvider configurationProvider,
-            ILogger<OrdersController> logger) : base(context, mapper, roleOptions, mediatr, configurationProvider)
+            IConfigurationProvider configurationProvider)
+            : base(context, mapper, roleOptions, mediatr, configurationProvider)
         {
-            _logger = logger;
         }
 
         [HttpGet]
-        public async Task<IActionResult> Index(CancellationToken token, OrderStatus? status = null, int page = 0, int take = 50)
+        public async Task<IActionResult> Index(CancellationToken token, OrderStatus? status = null, int page = 0,
+            int take = 50)
         {
             if (page < 0)
                 page = 0;
@@ -92,7 +90,7 @@ namespace Sheaft.Web.Manage.Controllers
             if (!result.Succeeded)
                 throw result.Exception;
 
-            return RedirectToAction("Edit", new { model.Id });
+            return RedirectToAction("Edit", new {model.Id});
         }
 
         [HttpPost]
@@ -107,7 +105,7 @@ namespace Sheaft.Web.Manage.Controllers
             if (!result.Succeeded)
                 throw result.Exception;
 
-            return RedirectToAction("Edit", new { model.Id });
+            return RedirectToAction("Edit", new {model.Id});
         }
 
         [HttpPost]
@@ -122,7 +120,7 @@ namespace Sheaft.Web.Manage.Controllers
             if (!result.Succeeded)
                 throw result.Exception;
 
-            return RedirectToAction("Edit", new { model.Id });
+            return RedirectToAction("Edit", new {model.Id});
         }
 
         [HttpPost]
@@ -137,7 +135,7 @@ namespace Sheaft.Web.Manage.Controllers
             if (!result.Succeeded)
                 throw result.Exception;
 
-            return RedirectToAction("Edit", new { model.Id });
+            return RedirectToAction("Edit", new {model.Id});
         }
     }
 }

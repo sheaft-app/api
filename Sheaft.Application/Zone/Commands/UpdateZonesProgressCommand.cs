@@ -28,16 +28,12 @@ namespace Sheaft.Application.Zone.Commands
     public class UpdateZonesProgressCommandHandler : CommandsHandler,
         IRequestHandler<UpdateZonesProgressCommand, Result>
     {
-        private readonly IBlobService _blobService;
-
         public UpdateZonesProgressCommandHandler(
             ISheaftMediatr mediatr,
             IAppDbContext context,
-            IBlobService blobService,
             ILogger<UpdateZonesProgressCommandHandler> logger)
             : base(mediatr, context, logger)
         {
-            _blobService = blobService;
         }
 
         public async Task<Result> Handle(UpdateZonesProgressCommand request, CancellationToken token)
@@ -70,7 +66,7 @@ namespace Sheaft.Application.Zone.Commands
 
                     _mediatr.Post(new UpdateDepartmentStatsCommand(request.RequestUser)
                     {
-                        Id = departmentId,
+                        DepartmentId = departmentId,
                         Points = pointsPerDepartment?.Points ?? 0,
                         Position = pointsPerDepartment != null ? (int) pointsPerDepartment.Position : 0,
                         Producers = producerPerDepartment.Active ?? 0,
@@ -82,7 +78,7 @@ namespace Sheaft.Application.Zone.Commands
 
                 _mediatr.Post(new UpdateRegionStatsCommand(request.RequestUser)
                 {
-                    Id = region.Id,
+                    RegionId = region.Id,
                     Points = pointsPerRegion?.Points ?? 0,
                     Position = pointsPerRegion != null ? (int) pointsPerRegion.Position : 0,
                     Producers = producersCount,

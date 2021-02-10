@@ -43,8 +43,6 @@ namespace Sheaft.Application.Order.Commands
             ISheaftMediatr mediatr,
             IIdentifierService identifierService,
             ICapingDeliveriesService capingDeliveriesService,
-            IOptionsSnapshot<PspOptions> pspOptions,
-            IOptionsSnapshot<RoutineOptions> routineOptions,
             ILogger<PayOrderCommandHandler> logger)
             : base(mediatr, context, logger)
         {
@@ -54,15 +52,15 @@ namespace Sheaft.Application.Order.Commands
 
         public async Task<Result<Guid>> Handle(PayOrderCommand request, CancellationToken token)
         {
-            var checkResult =
-                await _mediatr.Process(
-                    new CheckConsumerConfigurationCommand(request.RequestUser) {Id = request.RequestUser.Id}, token);
-            if (!checkResult.Succeeded)
-                return Failure<Guid>(checkResult.Exception);
-
             var order = await _context.GetByIdAsync<Domain.Order>(request.OrderId, token);
             if (!order.Deliveries.Any())
                 return Failure<Guid>(MessageKind.Order_CannotPay_Deliveries_Required);
+            
+            var checkResult =
+                await _mediatr.Process(
+                    new CheckConsumerConfigurationCommand(request.RequestUser) {ConsumerId = order.User.Id}, token);
+            if (!checkResult.Succeeded)
+                return Failure<Guid>(checkResult.Exception);
 
             var validatedDeliveries = await ValidateCapedDeliveriesAsync(order.Deliveries, token);
             if (!validatedDeliveries.Succeeded)

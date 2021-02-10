@@ -22,17 +22,18 @@ namespace Sheaft.Application.Common.Behaviours
             RequestHandlerDelegate<TResponse> next)
         {
             var requestName = typeof(TRequest).Name;
-
             _logger.LogInformation("Processing request: {Name} for {@UserId}", requestName, request.RequestUser.Name);
             
             using (var scope = _logger.BeginScope(new Dictionary<string, object>
             {
                 ["RequestId"] = request.RequestUser.RequestId,
                 ["UserIdentifier"] = request.RequestUser.Id.ToString("N"),
+                ["UserEmail"] = request.RequestUser.Email,
+                ["UserName"] = request.RequestUser.Name,
                 ["Roles"] = string.Join(';', request.RequestUser.Roles),
                 ["IsAuthenticated"] = request.RequestUser.IsAuthenticated.ToString(),
                 ["Command"] = requestName,
-                ["Datas"] = JsonConvert.SerializeObject(request),
+                ["Data"] = JsonConvert.SerializeObject(request),
             }))
             {
                 return await next();

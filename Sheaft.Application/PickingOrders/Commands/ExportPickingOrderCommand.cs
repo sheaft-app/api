@@ -54,7 +54,7 @@ namespace Sheaft.Application.PickingOrders.Commands
 
             try
             {
-                var startResult = await _mediatr.Process(new StartJobCommand(request.RequestUser) {Id = job.Id}, token);
+                var startResult = await _mediatr.Process(new StartJobCommand(request.RequestUser) {JobId = job.Id}, token);
                 if (!startResult.Succeeded)
                     throw startResult.Exception;
 
@@ -68,26 +68,26 @@ namespace Sheaft.Application.PickingOrders.Commands
                         CreateExcelPickingFile(package, job.Name, purchaseOrders);
                     }
 
-                    var response = await _blobsService.UploadPickingOrderFileAsync(request.RequestUser.Id, job.Id,
+                    var response = await _blobsService.UploadPickingOrderFileAsync(job.User.Id, job.Id,
                         $"Preparation_{job.CreatedOn:dd-MM-yyyy}.xlsx", stream.ToArray(), token);
                     if (!response.Succeeded)
                         throw response.Exception;
 
                     var result = await _mediatr.Process(
-                        new ProcessPurchaseOrdersCommand(request.RequestUser) {Ids = request.PurchaseOrderIds}, token);
+                        new ProcessPurchaseOrdersCommand(request.RequestUser) {PurchaseOrderIds = request.PurchaseOrderIds}, token);
                     if (!result.Succeeded)
                         throw result.Exception;
 
                     _mediatr.Post(new PickingOrderExportSucceededEvent(job.Id));
                     return await _mediatr.Process(
-                        new CompleteJobCommand(request.RequestUser) {Id = job.Id, FileUrl = response.Data}, token);
+                        new CompleteJobCommand(request.RequestUser) {JobId = job.Id, FileUrl = response.Data}, token);
                 }
             }
             catch (Exception e)
             {
                 _mediatr.Post(new PickingOrderExportFailedEvent(job.Id));
                 return await _mediatr.Process(
-                    new FailJobCommand(request.RequestUser) {Id = request.JobId, Reason = e.Message}, token);
+                    new FailJobCommand(request.RequestUser) {JobId = request.JobId, Reason = e.Message}, token);
             }
         }
 

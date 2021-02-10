@@ -21,7 +21,7 @@ namespace Sheaft.Application.Job.Commands
         {
         }
 
-        public Guid Id { get; set; }
+        public Guid JobId { get; set; }
     }
     public class ResetJobCommandHandler : CommandsHandler,
         IRequestHandler<ResetJobCommand, Result>
@@ -36,7 +36,7 @@ namespace Sheaft.Application.Job.Commands
 
         public async Task<Result> Handle(ResetJobCommand request, CancellationToken token)
         {
-            var entity = await _context.GetByIdAsync<Domain.Job>(request.Id, token);
+            var entity = await _context.GetByIdAsync<Domain.Job>(request.JobId, token);
 
             entity.ResetJob();
             await _context.SaveChangesAsync(token);

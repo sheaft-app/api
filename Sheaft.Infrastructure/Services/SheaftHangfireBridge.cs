@@ -33,6 +33,7 @@ namespace Sheaft.Infrastructure.Services
             throw SheaftException.Unexpected(MessageKind.Unexpected);
         }
 
+        [DisplayName("{0}")]
         public async Task<Result> Execute(string jobname, IRequest<Result> data, CancellationToken token)
         {
             var result = await _mediatr.Send(data, token);

@@ -32,18 +32,15 @@ namespace Sheaft.Application.PayinRefund.Commands
         IRequestHandler<RefreshPayinRefundStatusCommand, Result>
     {
         private readonly IPspService _pspService;
-        private readonly RoutineOptions _routineOptions;
 
         public RefreshPayinRefundStatusCommandHandler(
             IAppDbContext context,
             IPspService pspService,
             ISheaftMediatr mediatr,
-            IOptionsSnapshot<RoutineOptions> routineOptions,
             ILogger<RefreshPayinRefundStatusCommandHandler> logger)
             : base(mediatr, context, logger)
         {
             _pspService = pspService;
-            _routineOptions = routineOptions.Value;
         }
 
         public async Task<Result> Handle(RefreshPayinRefundStatusCommand request,

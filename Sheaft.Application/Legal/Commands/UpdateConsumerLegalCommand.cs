@@ -24,7 +24,7 @@ namespace Sheaft.Application.Legal.Commands
         {
         }
 
-        public Guid Id { get; set; }
+        public Guid LegalId { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public string Email { get; set; }
@@ -38,24 +38,21 @@ namespace Sheaft.Application.Legal.Commands
     public class UpdateConsumerLegalCommandHandler : CommandsHandler,
         IRequestHandler<UpdateConsumerLegalCommand, Result>
     {
-        private readonly PspOptions _pspOptions;
         private readonly IPspService _pspService;
 
         public UpdateConsumerLegalCommandHandler(
             ISheaftMediatr mediatr,
             IAppDbContext context,
             IPspService pspService,
-            IOptionsSnapshot<PspOptions> pspOptions,
             ILogger<UpdateConsumerLegalCommandHandler> logger)
             : base(mediatr, context, logger)
         {
-            _pspOptions = pspOptions.Value;
             _pspService = pspService;
         }
 
         public async Task<Result> Handle(UpdateConsumerLegalCommand request, CancellationToken token)
         {
-            var legal = await _context.GetByIdAsync<ConsumerLegal>(request.Id, token);
+            var legal = await _context.GetByIdAsync<ConsumerLegal>(request.LegalId, token);
 
             var ownerAddress = new OwnerAddress(request.Address.Line1,
                 request.Address.Line2,

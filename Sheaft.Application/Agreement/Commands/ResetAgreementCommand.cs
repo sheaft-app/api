@@ -21,7 +21,7 @@ namespace Sheaft.Application.Agreement.Commands
         {
         }
 
-        public Guid Id { get; set; }
+        public Guid AgreementId { get; set; }
     }
 
     public class ResetAgreementCommandsHandler : CommandsHandler,
@@ -37,7 +37,7 @@ namespace Sheaft.Application.Agreement.Commands
 
         public async Task<Result> Handle(ResetAgreementStatusToCommand request, CancellationToken token)
         {
-            var entity = await _context.Agreements.SingleOrDefaultAsync(a => a.Id == request.Id, token);
+            var entity = await _context.Agreements.SingleOrDefaultAsync(a => a.Id == request.AgreementId, token);
 
             entity.Reset();
             await _context.SaveChangesAsync(token);

@@ -32,7 +32,8 @@ namespace Sheaft.Application.Common.Mappings
                 .ForMember(d => d.Address, opt => opt.MapFrom(r => r.Address));
 
             CreateMap<RegisterProducerInput, RegisterProducerCommand>();
-            CreateMap<UpdateProducerInput, UpdateProducerCommand>();
+            CreateMap<UpdateProducerInput, UpdateProducerCommand>()
+                .ForMember(c => c.ProducerId, opt => opt.MapFrom(r => r.Id));
         }
     }
 }

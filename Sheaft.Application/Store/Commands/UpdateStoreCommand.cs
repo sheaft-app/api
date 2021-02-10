@@ -29,7 +29,7 @@ namespace Sheaft.Application.Store.Commands
         {
         }
 
-        public Guid Id { get; set; }
+        public Guid StoreId { get; set; }
         public ProfileKind? Kind { get; set; }
         public string Name { get; set; }
         public string FirstName { get; set; }
@@ -61,7 +61,7 @@ namespace Sheaft.Application.Store.Commands
 
         public async Task<Result> Handle(UpdateStoreCommand request, CancellationToken token)
         {
-            var store = await _context.GetByIdAsync<Domain.Store>(request.Id, token);
+            var store = await _context.GetByIdAsync<Domain.Store>(request.StoreId, token);
 
             store.SetName(request.Name);
             store.SetFirstname(request.FirstName);

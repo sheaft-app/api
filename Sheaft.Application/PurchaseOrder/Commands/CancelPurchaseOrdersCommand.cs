@@ -21,34 +21,30 @@ namespace Sheaft.Application.PurchaseOrder.Commands
         {
         }
 
-        public IEnumerable<Guid> Ids { get; set; }
+        public IEnumerable<Guid> PurchaseOrderIds { get; set; }
         public string Reason { get; set; }
     }
 
     public class CancelPurchaseOrdersCommandHandler : CommandsHandler,
         IRequestHandler<CancelPurchaseOrdersCommand, Result>
     {
-        private readonly ICapingDeliveriesService _capingDeliveriesService;
-
         public CancelPurchaseOrdersCommandHandler(
             IAppDbContext context,
             ISheaftMediatr mediatr,
-            ICapingDeliveriesService capingDeliveriesService,
             ILogger<CancelPurchaseOrdersCommandHandler> logger)
             : base(mediatr, context, logger)
         {
-            _capingDeliveriesService = capingDeliveriesService;
         }
 
         public async Task<Result> Handle(CancelPurchaseOrdersCommand request, CancellationToken token)
         {
             using (var transaction = await _context.BeginTransactionAsync(token))
             {
-                foreach (var purchaseOrderId in request.Ids)
+                foreach (var purchaseOrderId in request.PurchaseOrderIds)
                 {
                     var result = await _mediatr.Process(
                         new CancelPurchaseOrderCommand(request.RequestUser)
-                            {Id = purchaseOrderId, Reason = request.Reason}, token);
+                            {PurchaseOrderId = purchaseOrderId, Reason = request.Reason}, token);
                     if (!result.Succeeded)
                         return Failure(result.Exception);
                 }

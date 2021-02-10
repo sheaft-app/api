@@ -26,7 +26,7 @@ namespace Sheaft.Application.Order.Commands
         {
         }
 
-        public Guid Id { get; set; }
+        public Guid OrderId { get; set; }
         public DonationKind Donation { get; set; }
         public IEnumerable<ProductQuantityInput> Products { get; set; }
         public IEnumerable<ProducerExpectedDeliveryInput> ProducersExpectedDeliveries { get; set; }
@@ -35,28 +35,17 @@ namespace Sheaft.Application.Order.Commands
     public class UpdateConsumerOrderCommandHandler : CommandsHandler,
         IRequestHandler<UpdateConsumerOrderCommand, Result>
     {
-        private readonly ICapingDeliveriesService _capingDeliveriesService;
-        private readonly PspOptions _pspOptions;
-        private readonly RoutineOptions _routineOptions;
-
         public UpdateConsumerOrderCommandHandler(
             IAppDbContext context,
             ISheaftMediatr mediatr,
-            ICapingDeliveriesService capingDeliveriesService,
-            IOptionsSnapshot<PspOptions> pspOptions,
-            IOptionsSnapshot<RoutineOptions> routineOptions,
             ILogger<UpdateConsumerOrderCommandHandler> logger)
             : base(mediatr, context, logger)
         {
-            _capingDeliveriesService = capingDeliveriesService;
-            _pspOptions = pspOptions.Value;
-            _routineOptions = routineOptions.Value;
         }
 
         public async Task<Result> Handle(UpdateConsumerOrderCommand request, CancellationToken token)
         {
-            var user = await _context.GetByIdAsync<Domain.User>(request.RequestUser.Id, token);
-            var entity = await _context.GetByIdAsync<Domain.Order>(request.Id, token);
+            var entity = await _context.GetByIdAsync<Domain.Order>(request.OrderId, token);
 
             var productIds = request.Products.Select(p => p.Id);
             var products = await _context.FindByIdsAsync<Domain.Product>(productIds, token);

@@ -30,19 +30,12 @@ namespace Sheaft.Application.PayinRefund.Commands
     public class CheckPayinRefundCommandHandler : CommandsHandler,
         IRequestHandler<CheckPayinRefundCommand, Result>
     {
-        private readonly IPspService _pspService;
-        private readonly RoutineOptions _routineOptions;
-
         public CheckPayinRefundCommandHandler(
             IAppDbContext context,
-            IPspService pspService,
             ISheaftMediatr mediatr,
-            IOptionsSnapshot<RoutineOptions> routineOptions,
             ILogger<CheckPayinRefundCommandHandler> logger)
             : base(mediatr, context, logger)
         {
-            _pspService = pspService;
-            _routineOptions = routineOptions.Value;
         }
 
         public async Task<Result> Handle(CheckPayinRefundCommand request, CancellationToken token)

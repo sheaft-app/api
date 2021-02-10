@@ -69,7 +69,7 @@ namespace Sheaft.Web.Signalr.Controllers
                 await _context.Clients.User(id.ToString("N")).SendAsync("event", new { Method = method, UserId = userId, Content = body }, token);
             }
 
-            _sheaftMediatr.Post(new CreateUserNotificationCommand(new RequestUser("signalr-user", HttpContext.TraceIdentifier)) { Id = id, Method = method, Content = body });
+            _sheaftMediatr.Post(new CreateUserNotificationCommand(new RequestUser("signalr-user", HttpContext.TraceIdentifier)) { UserId = id, Method = method, Content = body });
             return Ok();
         }
 
@@ -90,7 +90,7 @@ namespace Sheaft.Web.Signalr.Controllers
                 await _context.Clients.Group(groupName).SendAsync("event", new { Method = method, GroupName = groupName, Content = body }, token);
             }
 
-            _sheaftMediatr.Post(new CreateGroupNotificationCommand(new RequestUser("signalr-group", HttpContext.TraceIdentifier)) { Id = id, Method = method, Content = body });
+            _sheaftMediatr.Post(new CreateGroupNotificationCommand(new RequestUser("signalr-group", HttpContext.TraceIdentifier)) { GroupId = id, Method = method, Content = body });
             return Ok();
         }
     }

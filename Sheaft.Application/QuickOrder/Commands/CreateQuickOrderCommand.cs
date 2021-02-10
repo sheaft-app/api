@@ -23,6 +23,7 @@ namespace Sheaft.Application.QuickOrder.Commands
         {
         }
 
+        public Guid UserId { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
         public IEnumerable<ProductQuantityInput> Products { get; set; }
@@ -41,7 +42,7 @@ namespace Sheaft.Application.QuickOrder.Commands
 
         public async Task<Result<Guid>> Handle(CreateQuickOrderCommand request, CancellationToken token)
         {
-            var user = await _context.GetByIdAsync<Domain.User>(request.RequestUser.Id, token);
+            var user = await _context.GetByIdAsync<Domain.User>(request.UserId, token);
 
             var productIds = request.Products.Select(p => p.Id);
             var products = await _context.GetByIdsAsync<Domain.Product>(productIds, token);

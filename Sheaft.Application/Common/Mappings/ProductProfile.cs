@@ -31,12 +31,18 @@ namespace Sheaft.Application.Common.Mappings
                 .ForMember(d => d.Picture, opt => opt.MapFrom(r => ProductExtensions.GetPictureUrl(r.Picture, PictureSize.LARGE)));
 
             CreateMap<CreateProductInput, CreateProductCommand>();
-            CreateMap<UpdateProductInput, UpdateProductCommand>();
-            CreateMap<RateProductInput, RateProductCommand>();
-            CreateMap<UpdatePictureInput, UpdateProductPictureCommand>();
-            CreateMap<SetProductsAvailabilityInput, SetProductsAvailabilityCommand>();
-            CreateMap<SetProductsSearchabilityInput, SetProductsSearchabilityCommand>();
-            CreateMap<IdsInput, DeleteProductsCommand>();
+            CreateMap<UpdateProductInput, UpdateProductCommand>()
+                .ForMember(c => c.ProductId, opt => opt.MapFrom(r => r.Id));
+            CreateMap<RateProductInput, RateProductCommand>()
+                .ForMember(c => c.ProductId, opt => opt.MapFrom(r => r.Id));
+            CreateMap<UpdatePictureInput, UpdateProductPictureCommand>()
+                .ForMember(c => c.ProductId, opt => opt.MapFrom(r => r.Id));
+            CreateMap<SetProductsAvailabilityInput, SetProductsAvailabilityCommand>()
+                .ForMember(c => c.ProductIds, opt => opt.MapFrom(r => r.Ids));
+            CreateMap<SetProductsSearchabilityInput, SetProductsSearchabilityCommand>()
+                .ForMember(c => c.ProductIds, opt => opt.MapFrom(r => r.Ids));
+            CreateMap<IdsInput, DeleteProductsCommand>()
+                .ForMember(c => c.ProductIds, opt => opt.MapFrom(r => r.Ids));;
         }
     }
 }

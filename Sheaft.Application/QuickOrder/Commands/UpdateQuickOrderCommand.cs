@@ -20,7 +20,7 @@ namespace Sheaft.Application.QuickOrder.Commands
         {
         }
 
-        public Guid Id { get; set; }
+        public Guid QuickOrderId { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
     }
@@ -38,7 +38,7 @@ namespace Sheaft.Application.QuickOrder.Commands
 
         public async Task<Result> Handle(UpdateQuickOrderCommand request, CancellationToken token)
         {
-            var entity = await _context.GetByIdAsync<Domain.QuickOrder>(request.Id, token);
+            var entity = await _context.GetByIdAsync<Domain.QuickOrder>(request.QuickOrderId, token);
             entity.SetName(request.Name);
             entity.SetDescription(request.Name);
 

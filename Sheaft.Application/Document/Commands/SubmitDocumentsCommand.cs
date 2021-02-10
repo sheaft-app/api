@@ -28,16 +28,12 @@ namespace Sheaft.Application.Document.Commands
     public class SubmitDocumentsCommandHandler : CommandsHandler,
         IRequestHandler<SubmitDocumentsCommand, Result>
     {
-        private readonly IPspService _pspService;
-
         public SubmitDocumentsCommandHandler(
             IAppDbContext context,
-            IPspService pspService,
             ISheaftMediatr mediatr,
             ILogger<SubmitDocumentsCommandHandler> logger)
             : base(mediatr, context, logger)
         {
-            _pspService = pspService;
         }
 
         public async Task<Result> Handle(SubmitDocumentsCommand request, CancellationToken token)

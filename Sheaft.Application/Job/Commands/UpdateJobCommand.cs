@@ -20,7 +20,7 @@ namespace Sheaft.Application.Job.Commands
         {
         }
 
-        public Guid Id { get; set; }
+        public Guid JobId { get; set; }
         public string Name { get; set; }
     }
 
@@ -37,7 +37,7 @@ namespace Sheaft.Application.Job.Commands
 
         public async Task<Result> Handle(UpdateJobCommand request, CancellationToken token)
         {
-            var entity = await _context.GetByIdAsync<Domain.Job>(request.Id, token);
+            var entity = await _context.GetByIdAsync<Domain.Job>(request.JobId, token);
             entity.SetName(request.Name);
 
             await _context.SaveChangesAsync(token);

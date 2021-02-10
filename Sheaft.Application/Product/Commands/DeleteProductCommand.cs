@@ -20,27 +20,23 @@ namespace Sheaft.Application.Product.Commands
         {
         }
 
-        public Guid Id { get; set; }
+        public Guid ProductId { get; set; }
     }
 
     public class DeleteProductCommandHandler : CommandsHandler,
         IRequestHandler<DeleteProductCommand, Result>
     {
-        private readonly IBlobService _blobService;
-
         public DeleteProductCommandHandler(
             ISheaftMediatr mediatr,
             IAppDbContext context,
-            IBlobService blobService,
             ILogger<DeleteProductCommandHandler> logger)
             : base(mediatr, context, logger)
         {
-            _blobService = blobService;
         }
 
         public async Task<Result> Handle(DeleteProductCommand request, CancellationToken token)
         {
-            var entity = await _context.GetByIdAsync<Domain.Product>(request.Id, token);
+            var entity = await _context.GetByIdAsync<Domain.Product>(request.ProductId, token);
             _context.Remove(entity);
 
             await _context.SaveChangesAsync(token);

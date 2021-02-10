@@ -29,22 +29,12 @@ namespace Sheaft.Application.Payout.Commands
     public class CheckPayoutCommandHandler : CommandsHandler,
         IRequestHandler<CheckPayoutCommand, Result>
     {
-        private readonly PspOptions _pspOptions;
-        private readonly RoutineOptions _routineOptions;
-        private readonly IPspService _pspService;
-
         public CheckPayoutCommandHandler(
             ISheaftMediatr mediatr,
             IAppDbContext context,
-            IPspService pspService,
-            IOptionsSnapshot<RoutineOptions> routineOptions,
-            IOptionsSnapshot<PspOptions> pspOptions,
             ILogger<CheckPayoutCommandHandler> logger)
             : base(mediatr, context, logger)
         {
-            _pspService = pspService;
-            _pspOptions = pspOptions.Value;
-            _routineOptions = routineOptions.Value;
         }
 
         public async Task<Result> Handle(CheckPayoutCommand request, CancellationToken token)

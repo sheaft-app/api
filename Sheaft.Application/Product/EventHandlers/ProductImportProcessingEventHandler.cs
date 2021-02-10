@@ -13,23 +13,21 @@ namespace Sheaft.Application.Product.EventHandlers
     public class ProductImportProcessingEventHandler : EventsHandler,
         INotificationHandler<DomainEventNotification<ProductImportProcessingEvent>>
     {
-        private readonly IConfiguration _configuration;
-
         public ProductImportProcessingEventHandler(
-            IConfiguration configuration,
             IAppDbContext context,
             IEmailService emailService,
             ISignalrService signalrService)
             : base(context, emailService, signalrService)
         {
-            _configuration = configuration;
         }
 
-        public async Task Handle(DomainEventNotification<ProductImportProcessingEvent> notification, CancellationToken token)
+        public async Task Handle(DomainEventNotification<ProductImportProcessingEvent> notification,
+            CancellationToken token)
         {
             var productEvent = notification.DomainEvent;
             var job = await _context.GetByIdAsync<Domain.Job>(productEvent.JobId, token);
-            await _signalrService.SendNotificationToGroupAsync(job.User.Id, nameof(ProductImportProcessingEvent), new { JobId = job.Id, UserId = job.User.Id });
+            await _signalrService.SendNotificationToGroupAsync(job.User.Id, nameof(ProductImportProcessingEvent),
+                new {JobId = job.Id, UserId = job.User.Id});
         }
     }
 }

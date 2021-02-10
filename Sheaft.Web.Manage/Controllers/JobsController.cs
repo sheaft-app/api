@@ -20,21 +20,19 @@ namespace Sheaft.Web.Manage.Controllers
 {
     public class JobsController : ManageController
     {
-        private readonly ILogger<JobsController> _logger;
-
         public JobsController(
             IAppDbContext context,
             IMapper mapper,
             ISheaftMediatr mediatr,
             IOptionsSnapshot<RoleOptions> roleOptions,
-            IConfigurationProvider configurationProvider,
-            ILogger<JobsController> logger) : base(context, mapper, roleOptions, mediatr, configurationProvider)
+            IConfigurationProvider configurationProvider)
+            : base(context, mapper, roleOptions, mediatr, configurationProvider)
         {
-            _logger = logger;
         }
 
         [HttpGet]
-        public async Task<IActionResult> Index(CancellationToken token, ProcessStatus? status = null, int page = 0, int take = 50)
+        public async Task<IActionResult> Index(CancellationToken token, ProcessStatus? status = null, int page = 0,
+            int take = 50)
         {
             if (page < 0)
                 page = 0;
@@ -86,7 +84,7 @@ namespace Sheaft.Web.Manage.Controllers
         {
             var result = await _mediatr.Process(new UpdateJobCommand(await GetRequestUser(token))
             {
-                Id = model.Id,
+                JobId = model.Id,
                 Name = model.Name
             }, token);
 
@@ -96,7 +94,7 @@ namespace Sheaft.Web.Manage.Controllers
                 return View(model);
             }
 
-            return RedirectToAction("Edit", new { model.Id });
+            return RedirectToAction("Edit", new {model.Id});
         }
 
         [HttpPost]
@@ -105,13 +103,13 @@ namespace Sheaft.Web.Manage.Controllers
         {
             var result = await _mediatr.Process(new ArchiveJobCommand(await GetRequestUser(token))
             {
-                Id = id
+                JobId = id
             }, token);
 
             if (!result.Succeeded)
                 throw result.Exception;
 
-            return RedirectToAction("Edit", new { id });
+            return RedirectToAction("Edit", new {id});
         }
 
         [HttpPost]
@@ -121,13 +119,13 @@ namespace Sheaft.Web.Manage.Controllers
             var requestUser = await GetRequestUser(token);
             var result = await _mediatr.Process(new PauseJobCommand(requestUser)
             {
-                Id = id
+                JobId = id
             }, token);
 
             if (!result.Succeeded)
                 throw result.Exception;
 
-            return RedirectToAction("Edit", new { id });
+            return RedirectToAction("Edit", new {id});
         }
 
         [HttpPost]
@@ -136,13 +134,13 @@ namespace Sheaft.Web.Manage.Controllers
         {
             var result = await _mediatr.Process(new ResumeJobCommand(await GetRequestUser(token))
             {
-                Id = id
+                JobId = id
             }, token);
 
             if (!result.Succeeded)
                 throw result.Exception;
 
-            return RedirectToAction("Edit", new { id });
+            return RedirectToAction("Edit", new {id});
         }
 
         [HttpPost]
@@ -151,13 +149,13 @@ namespace Sheaft.Web.Manage.Controllers
         {
             var result = await _mediatr.Process(new CancelJobCommand(await GetRequestUser(token))
             {
-                Id = id
+                JobId = id
             }, token);
 
             if (!result.Succeeded)
                 throw result.Exception;
 
-            return RedirectToAction("Edit", new { id });
+            return RedirectToAction("Edit", new {id});
         }
 
         [HttpPost]
@@ -166,13 +164,13 @@ namespace Sheaft.Web.Manage.Controllers
         {
             var result = await _mediatr.Process(new RetryJobCommand(await GetRequestUser(token))
             {
-                Id = id
+                JobId = id
             }, token);
 
             if (!result.Succeeded)
                 throw result.Exception;
 
-            return RedirectToAction("Edit", new { id });
+            return RedirectToAction("Edit", new {id});
         }
 
         [HttpPost]
@@ -181,13 +179,13 @@ namespace Sheaft.Web.Manage.Controllers
         {
             var result = await _mediatr.Process(new UnarchiveJobCommand(await GetRequestUser(token))
             {
-                Id = id
+                JobId = id
             }, token);
 
             if (!result.Succeeded)
                 throw result.Exception;
 
-            return RedirectToAction("Edit", new { id });
+            return RedirectToAction("Edit", new {id});
         }
 
         [HttpPost]
@@ -196,13 +194,13 @@ namespace Sheaft.Web.Manage.Controllers
         {
             var result = await _mediatr.Process(new ResetJobCommand(await GetRequestUser(token))
             {
-                Id = id
+                JobId = id
             }, token);
 
             if (!result.Succeeded)
                 throw result.Exception;
 
-            return RedirectToAction("Edit", new { id });
+            return RedirectToAction("Edit", new {id});
         }
 
         [HttpPost]
@@ -211,13 +209,13 @@ namespace Sheaft.Web.Manage.Controllers
         {
             var result = await _mediatr.Process(new RestoreJobCommand(await GetRequestUser(token))
             {
-                Id = id
+                JobId = id
             }, token);
 
             if (!result.Succeeded)
                 throw result.Exception;
 
-            return RedirectToAction("Edit", new { id });
+            return RedirectToAction("Edit", new {id});
         }
 
         [HttpPost]
@@ -226,7 +224,7 @@ namespace Sheaft.Web.Manage.Controllers
         {
             var result = await _mediatr.Process(new DeleteJobCommand(await GetRequestUser(token))
             {
-                Id = id
+                JobId = id
             }, token);
 
             if (!result.Succeeded)

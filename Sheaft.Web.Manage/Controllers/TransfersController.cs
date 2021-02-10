@@ -19,21 +19,19 @@ namespace Sheaft.Web.Manage.Controllers
 {
     public class TransfersController : ManageController
     {
-        private readonly ILogger<TransfersController> _logger;
-
         public TransfersController(
             IAppDbContext context,
             IMapper mapper,
             ISheaftMediatr mediatr,
             IOptionsSnapshot<RoleOptions> roleOptions,
-            IConfigurationProvider configurationProvider,
-            ILogger<TransfersController> logger) : base(context, mapper, roleOptions, mediatr, configurationProvider)
+            IConfigurationProvider configurationProvider)
+            : base(context, mapper, roleOptions, mediatr, configurationProvider)
         {
-            _logger = logger;
         }
 
         [HttpGet]
-        public async Task<IActionResult> Index(CancellationToken token, TransactionStatus? status = null, int page = 0, int take = 50)
+        public async Task<IActionResult> Index(CancellationToken token, TransactionStatus? status = null, int page = 0,
+            int take = 50)
         {
             if (page < 0)
                 page = 0;

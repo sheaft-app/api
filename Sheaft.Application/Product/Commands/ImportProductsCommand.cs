@@ -29,7 +29,7 @@ namespace Sheaft.Application.Product.Commands
         {
         }
 
-        public Guid Id { get; set; }
+        public Guid JobId { get; set; }
         public bool NotifyOnUpdates { get; set; } = true;
     }
 
@@ -50,11 +50,11 @@ namespace Sheaft.Application.Product.Commands
 
         public async Task<Result> Handle(ImportProductsCommand request, CancellationToken token)
         {
-            var job = await _context.GetByIdAsync<Domain.Job>(request.Id, token);
+            var job = await _context.GetByIdAsync<Domain.Job>(request.JobId, token);
 
             try
             {
-                var startResult = await _mediatr.Process(new StartJobCommand(request.RequestUser) {Id = job.Id}, token);
+                var startResult = await _mediatr.Process(new StartJobCommand(request.RequestUser) {JobId = job.Id}, token);
                 if (!startResult.Succeeded)
                     throw startResult.Exception;
 
@@ -77,7 +77,7 @@ namespace Sheaft.Application.Product.Commands
                         {
                             for (var i = 2; i <= worksheet.Dimension.Rows; i++)
                             {
-                                var command = await CreateProductCommandFromRowDatasAsync(worksheet, request, i, token);
+                                var command = await CreateProductCommandFromRowDatasAsync(worksheet, request, job.User.Id, i, token);
                                 if (!command.Succeeded)
                                     throw command.Exception;
 
@@ -90,12 +90,12 @@ namespace Sheaft.Application.Product.Commands
                             await transaction.CommitAsync(token);
 
                             _mediatr.Post(new UpdateProducerTagsCommand(request.RequestUser)
-                                {ProducerId = request.RequestUser.Id});
+                                {ProducerId = job.User.Id});
                         }
                     }
                 }
 
-                var result = await _mediatr.Process(new CompleteJobCommand(request.RequestUser) {Id = job.Id}, token);
+                var result = await _mediatr.Process(new CompleteJobCommand(request.RequestUser) {JobId = job.Id}, token);
                 if (!result.Succeeded)
                     throw result.Exception;
 
@@ -109,13 +109,13 @@ namespace Sheaft.Application.Product.Commands
                 if (request.NotifyOnUpdates)
                     _mediatr.Post(new ProductImportFailedEvent(job.Id));
 
-                return await _mediatr.Process(new FailJobCommand(request.RequestUser) {Id = job.Id, Reason = e.Message},
+                return await _mediatr.Process(new FailJobCommand(request.RequestUser) {JobId = job.Id, Reason = e.Message},
                     token);
             }
         }
 
         private async Task<Result<CreateProductCommand>> CreateProductCommandFromRowDatasAsync(ExcelWorksheet worksheet,
-            ImportProductsCommand request, int i, CancellationToken token)
+            ImportProductsCommand request, Guid producerId, int i, CancellationToken token)
         {
             var nameStr = worksheet.Cells[i, 2].GetValue<string>();
             if (string.IsNullOrWhiteSpace(nameStr))
@@ -124,6 +124,7 @@ namespace Sheaft.Application.Product.Commands
 
             var createProductCommand = new CreateProductCommand(request.RequestUser)
             {
+                ProducerId = producerId,
                 Reference = worksheet.Cells[i, 1].GetValue<string>(),
                 Name = nameStr,
                 Description = worksheet.Cells[i, 10].GetValue<string>()

@@ -42,7 +42,6 @@ namespace Sheaft.Application.Agreement.Commands
 
         public async Task<Result<Guid>> Handle(CreateAgreementCommand request, CancellationToken token)
         {
-            var user = await _context.GetByIdAsync<Domain.User>(request.RequestUser.Id, token);
             var store = await _context.GetByIdAsync<Domain.Store>(request.StoreId, token);
             var delivery = await _context.GetByIdAsync<Domain.DeliveryMode>(request.DeliveryModeId, token);
 
@@ -55,7 +54,7 @@ namespace Sheaft.Application.Agreement.Commands
                 }
             }
 
-            var entity = new Domain.Agreement(Guid.NewGuid(), store, delivery, user, selectedHours);
+            var entity = new Domain.Agreement(Guid.NewGuid(), store, delivery, store, selectedHours);
 
             await _context.AddAsync(entity, token);
             await _context.SaveChangesAsync(token);

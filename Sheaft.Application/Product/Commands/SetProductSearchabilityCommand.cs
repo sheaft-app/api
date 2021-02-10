@@ -20,7 +20,7 @@ namespace Sheaft.Application.Product.Commands
         {
         }
 
-        public Guid Id { get; set; }
+        public Guid ProductId { get; set; }
         public bool VisibleToStores { get; set; }
         public bool VisibleToConsumers { get; set; }
     }
@@ -28,21 +28,17 @@ namespace Sheaft.Application.Product.Commands
     public class SetProductSearchabilityCommandHandler : CommandsHandler,
         IRequestHandler<SetProductSearchabilityCommand, Result>
     {
-        private readonly IBlobService _blobService;
-
         public SetProductSearchabilityCommandHandler(
             ISheaftMediatr mediatr,
             IAppDbContext context,
-            IBlobService blobService,
             ILogger<SetProductSearchabilityCommandHandler> logger)
             : base(mediatr, context, logger)
         {
-            _blobService = blobService;
         }
 
         public async Task<Result> Handle(SetProductSearchabilityCommand request, CancellationToken token)
         {
-            var entity = await _context.GetByIdAsync<Domain.Product>(request.Id, token);
+            var entity = await _context.GetByIdAsync<Domain.Product>(request.ProductId, token);
             entity.SetConsumerVisibility(request.VisibleToConsumers);
             entity.SetStoreVisibility(request.VisibleToStores);
 

@@ -20,7 +20,8 @@ namespace Sheaft.Application.QuickOrder.Commands
         {
         }
 
-        public Guid Id { get; set; }
+        public Guid UserId { get; set; }
+        public Guid QuickOrderId { get; set; }
     }
 
     public class SetDefaultQuickOrderCommandHandler : CommandsHandler,
@@ -36,10 +37,10 @@ namespace Sheaft.Application.QuickOrder.Commands
 
         public async Task<Result> Handle(SetDefaultQuickOrderCommand request, CancellationToken token)
         {
-            var quickOrders = await _context.FindAsync<Domain.QuickOrder>(c => c.User.Id == request.RequestUser.Id, token);
+            var quickOrders = await _context.FindAsync<Domain.QuickOrder>(c => c.User.Id == request.UserId, token);
             foreach (var quickOrder in quickOrders)
             {
-                if (quickOrder.Id == request.Id)
+                if (quickOrder.Id == request.QuickOrderId)
                     quickOrder.SetAsDefault();
                 else
                     quickOrder.UnsetAsDefault();

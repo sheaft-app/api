@@ -14,10 +14,14 @@ namespace Sheaft.Application.Common.Mappings
                 .ForMember(d => d.Products, opt => opt.MapFrom(r => r.Products));
 
             CreateMap<CreateQuickOrderInput, CreateQuickOrderCommand>();
-            CreateMap<UpdateQuickOrderInput, UpdateQuickOrderCommand>();
-            CreateMap<UpdateIdProductsQuantitiesInput, UpdateQuickOrderProductsCommand>();
-            CreateMap<IdInput, SetDefaultQuickOrderCommand>();
-            CreateMap<IdsWithReasonInput, DeleteQuickOrdersCommand>();
+            CreateMap<UpdateQuickOrderInput, UpdateQuickOrderCommand>()
+                .ForMember(c => c.QuickOrderId, opt => opt.MapFrom(r => r.Id));;
+            CreateMap<UpdateIdProductsQuantitiesInput, UpdateQuickOrderProductsCommand>()
+                .ForMember(c => c.QuickOrderId, opt => opt.MapFrom(r => r.Id));
+            CreateMap<IdInput, SetDefaultQuickOrderCommand>()
+                    .ForMember(c => c.QuickOrderId, opt => opt.MapFrom(r => r.Id));
+            CreateMap<IdsWithReasonInput, DeleteQuickOrdersCommand>()
+                .ForMember(c => c.QuickOrderIds, opt => opt.MapFrom(r => r.Ids));
         }
     }
 }

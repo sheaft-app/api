@@ -21,7 +21,7 @@ namespace Sheaft.Application.Department.Commands
         {
         }
 
-        public Guid Id { get; set; }
+        public Guid DepartmentId { get; set; }
         public string Name { get; set; }
         public int? RequiredProducers { get; set; }
     }
@@ -39,7 +39,7 @@ namespace Sheaft.Application.Department.Commands
 
         public async Task<Result> Handle(UpdateDepartmentCommand request, CancellationToken token)
         {
-            var entity = await _context.Departments.SingleOrDefaultAsync(c => c.Id == request.Id, token);
+            var entity = await _context.Departments.SingleOrDefaultAsync(c => c.Id == request.DepartmentId, token);
 
             entity.SetName(request.Name);
             entity.SetRequiredProducers(request.RequiredProducers);

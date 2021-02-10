@@ -20,7 +20,7 @@ namespace Sheaft.Application.Returnable.Commands
         {
         }
 
-        public Guid Id { get; set; }
+        public Guid ReturnableId { get; set; }
     }
 
     public class DeleteReturnableCommandHandler : CommandsHandler,
@@ -36,7 +36,7 @@ namespace Sheaft.Application.Returnable.Commands
 
         public async Task<Result> Handle(DeleteReturnableCommand request, CancellationToken token)
         {
-            var entity = await _context.GetByIdAsync<Domain.Returnable>(request.Id, token);
+            var entity = await _context.GetByIdAsync<Domain.Returnable>(request.ReturnableId, token);
 
             _context.Remove(entity);
             await _context.SaveChangesAsync(token);

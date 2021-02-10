@@ -24,7 +24,6 @@ namespace Sheaft.Web.Manage.Controllers
 {
     public class DocumentsController : ManageController
     {
-        private readonly ILogger<DocumentsController> _logger;
         private readonly IDocumentQueries _documentQueries;
 
         public DocumentsController(
@@ -33,10 +32,9 @@ namespace Sheaft.Web.Manage.Controllers
             ISheaftMediatr mediatr,
             IDocumentQueries documentQueries,
             IOptionsSnapshot<RoleOptions> roleOptions,
-            IConfigurationProvider configurationProvider,
-            ILogger<DocumentsController> logger) : base(context, mapper, roleOptions, mediatr, configurationProvider)
+            IConfigurationProvider configurationProvider)
+            : base(context, mapper, roleOptions, mediatr, configurationProvider)
         {
-            _logger = logger;
             _documentQueries = documentQueries;
         }
 
@@ -72,7 +70,7 @@ namespace Sheaft.Web.Manage.Controllers
             if (!result.Succeeded)
                 throw result.Exception;
 
-            return RedirectToAction("Edit", new { id = result.Data });
+            return RedirectToAction("Edit", new {id = result.Data});
         }
 
         [HttpGet]
@@ -100,7 +98,7 @@ namespace Sheaft.Web.Manage.Controllers
         {
             var result = await _mediatr.Process(new UpdateDocumentCommand(await GetRequestUser(token))
             {
-                Id = model.Id,
+                DocumentId = model.Id,
                 Name = model.Name,
                 Kind = model.Kind,
             }, token);
@@ -108,7 +106,7 @@ namespace Sheaft.Web.Manage.Controllers
             if (!result.Succeeded)
                 throw result.Exception;
 
-            return RedirectToAction("Edit", new { model.Id });
+            return RedirectToAction("Edit", new {model.Id});
         }
 
         [HttpGet]
@@ -157,7 +155,7 @@ namespace Sheaft.Web.Manage.Controllers
             if (!result.Succeeded)
                 throw result.Exception;
 
-            return RedirectToAction("Edit", new { model.Id });
+            return RedirectToAction("Edit", new {model.Id});
         }
 
         [HttpPost]
@@ -172,7 +170,7 @@ namespace Sheaft.Web.Manage.Controllers
             if (!result.Succeeded)
                 throw result.Exception;
 
-            return RedirectToAction("Edit", new { id });
+            return RedirectToAction("Edit", new {id});
         }
 
         [HttpPost]
@@ -187,7 +185,7 @@ namespace Sheaft.Web.Manage.Controllers
             if (!result.Succeeded)
                 throw result.Exception;
 
-            return RedirectToAction("Edit", new { id });
+            return RedirectToAction("Edit", new {id});
         }
 
         [HttpPost]
@@ -202,7 +200,7 @@ namespace Sheaft.Web.Manage.Controllers
             if (!result.Succeeded)
                 throw result.Exception;
 
-            return RedirectToAction("Edit", new { id });
+            return RedirectToAction("Edit", new {id});
         }
 
         [HttpPost]
@@ -234,7 +232,8 @@ namespace Sheaft.Web.Manage.Controllers
                 throw SheaftException.NotFound();
 
             var page = entity.Pages.Single(p => p.Id == pageId);
-            var data = await _documentQueries.DownloadDocumentPageAsync(documentId, pageId, await GetRequestUser(token), token);
+            var data = await _documentQueries.DownloadDocumentPageAsync(documentId, pageId, await GetRequestUser(token),
+                token);
 
             return File(data, "application/octet-stream", page.FileName + page.Extension);
         }
@@ -252,7 +251,7 @@ namespace Sheaft.Web.Manage.Controllers
             if (!result.Succeeded)
                 throw result.Exception;
 
-            return RedirectToAction("Edit", new { id = documentId });
+            return RedirectToAction("Edit", new {id = documentId});
         }
 
         [HttpPost]
@@ -264,16 +263,16 @@ namespace Sheaft.Web.Manage.Controllers
 
             var result = await _mediatr.Process(new DeleteDocumentCommand(await GetRequestUser(token))
             {
-                Id = id
+                DocumentId = id
             }, token);
 
             if (!result.Succeeded)
                 throw result.Exception;
 
             if (entity.Kind != LegalKind.Natural)
-                return RedirectToAction("EditLegalBusiness", "Legals", new { entity.Id });
+                return RedirectToAction("EditLegalBusiness", "Legals", new {entity.Id});
 
-            return RedirectToAction("EditLegalConsumer", "Legals", new { entity.Id });
+            return RedirectToAction("EditLegalConsumer", "Legals", new {entity.Id});
         }
     }
 }

@@ -30,7 +30,8 @@ namespace Sheaft.Application.Store.Commands
         public RegisterStoreCommand(RequestUser requestUser) : base(requestUser)
         {
         }
-
+        
+        public Guid StoreId { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public string Name { get; set; }
@@ -63,7 +64,7 @@ namespace Sheaft.Application.Store.Commands
 
         public async Task<Result<Guid>> Handle(RegisterStoreCommand request, CancellationToken token)
         {
-            var store = await _context.FindByIdAsync<Domain.Store>(request.RequestUser.Id, token);
+            var store = await _context.FindByIdAsync<Domain.Store>(request.StoreId, token);
             if (store != null)
                 return Failure<Guid>(MessageKind.Register_User_AlreadyExists);
 
@@ -86,7 +87,7 @@ namespace Sheaft.Application.Store.Commands
                 }
             }
 
-            store = new Domain.Store(request.RequestUser.Id, request.Name, request.FirstName, request.LastName,
+            store = new Domain.Store(request.StoreId, request.Name, request.FirstName, request.LastName,
                 request.Email,
                 address, openingHours, request.OpenForNewBusiness, request.Phone, request.Description);
 

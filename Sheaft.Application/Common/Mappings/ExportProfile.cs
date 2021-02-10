@@ -10,7 +10,8 @@ namespace Sheaft.Application.Common.Mappings
         public ExportProfile()
         {
             CreateMap<ExportPickingOrdersInput, QueueExportPickingOrderCommand>();
-            CreateMap<IdInput, QueueExportUserDataCommand>();
+            CreateMap<IdInput, QueueExportUserDataCommand>()
+                    .ForMember(c => c.UserId, opt => opt.MapFrom(r => r.Id));
         } 
     }
 }

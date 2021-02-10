@@ -21,7 +21,7 @@ namespace Sheaft.Application.Tag.Commands
         {
         }
 
-        public Guid Id { get; set; }
+        public Guid TagId { get; set; }
     }
     
     public class RestoreTagCommandHandler : CommandsHandler,
@@ -37,7 +37,7 @@ namespace Sheaft.Application.Tag.Commands
 
         public async Task<Result> Handle(RestoreTagCommand request, CancellationToken token)
         {
-                var entity = await _context.Tags.SingleOrDefaultAsync(a => a.Id == request.Id && a.RemovedOn.HasValue, token);
+                var entity = await _context.Tags.SingleOrDefaultAsync(a => a.Id == request.TagId && a.RemovedOn.HasValue, token);
                 _context.Restore(entity);
 
                 await _context.SaveChangesAsync(token);

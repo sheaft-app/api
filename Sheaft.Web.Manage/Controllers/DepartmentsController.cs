@@ -19,17 +19,14 @@ namespace Sheaft.Web.Manage.Controllers
 {
     public class DepartmentsController : ManageController
     {
-        private readonly ILogger<DepartmentsController> _logger;
-
         public DepartmentsController(
             IAppDbContext context,
             IMapper mapper,
             ISheaftMediatr mediatr,
             IOptionsSnapshot<RoleOptions> roleOptions,
-            IConfigurationProvider configurationProvider,
-            ILogger<DepartmentsController> logger) : base(context, mapper, roleOptions, mediatr, configurationProvider)
+            IConfigurationProvider configurationProvider)
+            : base(context, mapper, roleOptions, mediatr, configurationProvider)
         {
-            _logger = logger;
         }
 
         [HttpGet]
@@ -77,7 +74,7 @@ namespace Sheaft.Web.Manage.Controllers
         {
             var result = await _mediatr.Process(new UpdateDepartmentCommand(await GetRequestUser(token))
             {
-                Id = model.Id,
+                DepartmentId = model.Id,
                 Name = model.Name,
                 RequiredProducers = model.RequiredProducers
             }, token);
@@ -88,7 +85,7 @@ namespace Sheaft.Web.Manage.Controllers
                 return View(model);
             }
 
-            return RedirectToAction("Edit", new { model.Id });
+            return RedirectToAction("Edit", new {model.Id});
         }
     }
 }

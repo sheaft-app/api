@@ -18,17 +18,14 @@ namespace Sheaft.Web.Manage.Controllers
 {
     public class UsersController : ManageController
     {
-        private readonly ILogger<UsersController> _logger;
-
         public UsersController(
             IAppDbContext context,
             IMapper mapper,
             ISheaftMediatr mediatr,
             IOptionsSnapshot<RoleOptions> roleOptions,
-            IConfigurationProvider configurationProvider,
-            ILogger<UsersController> logger) : base(context, mapper, roleOptions, mediatr, configurationProvider)
+            IConfigurationProvider configurationProvider)
+            : base(context, mapper, roleOptions, mediatr, configurationProvider)
         {
-            _logger = logger;
         }
 
         [HttpGet]
@@ -56,7 +53,7 @@ namespace Sheaft.Web.Manage.Controllers
                     break;
             }
 
-            return RedirectToAction("Edit", controller, new { id });
+            return RedirectToAction("Edit", controller, new {id});
         }
     }
 }

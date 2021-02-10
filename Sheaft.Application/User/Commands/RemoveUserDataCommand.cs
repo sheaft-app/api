@@ -24,7 +24,7 @@ namespace Sheaft.Application.User.Commands
         {
         }
 
-        public Guid Id { get; set; }
+        public Guid UserId { get; set; }
         public string Email { get; set; }
         public string Reason { get; set; }
     }
@@ -33,33 +33,27 @@ namespace Sheaft.Application.User.Commands
         IRequestHandler<RemoveUserDataCommand, Result<string>>
     {
         private readonly IBlobService _blobService;
-        private readonly ScoringOptions _scoringOptions;
-        private readonly RoleOptions _roleOptions;
 
         public RemoveUserDataCommandHandler(
-            IOptionsSnapshot<ScoringOptions> scoringOptions,
             ISheaftMediatr mediatr,
             IAppDbContext context,
             IBlobService blobService,
-            ILogger<RemoveUserDataCommandHandler> logger,
-            IOptionsSnapshot<RoleOptions> roleOptions)
+            ILogger<RemoveUserDataCommandHandler> logger)
             : base(mediatr, context, logger)
         {
-            _roleOptions = roleOptions.Value;
-            _scoringOptions = scoringOptions.Value;
             _blobService = blobService;
         }
 
         public async Task<Result<string>> Handle(RemoveUserDataCommand request, CancellationToken token)
         {
-            var entity = await _context.Users.FirstOrDefaultAsync(c => c.Id == request.Id, token);
+            var entity = await _context.Users.FirstOrDefaultAsync(c => c.Id == request.UserId, token);
             if (entity == null)
                 return Failure<string>();
 
             if (!entity.RemovedOn.HasValue)
                 return Success(request.Reason);
 
-            await _blobService.CleanUserStorageAsync(request.Id, token);
+            await _blobService.CleanUserStorageAsync(request.UserId, token);
 
             var result = await _mediatr.Process(new RemoveAuthUserCommand(request.RequestUser)
             {

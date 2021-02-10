@@ -26,14 +26,22 @@ namespace Sheaft.Application.Common.Mappings
                 .ForMember(d => d.Products, opt => opt.MapFrom(r => r.Products));
 
             CreateMap<CreatePurchaseOrderInput, CreatePurchaseOrderCommand>();
-            CreateMap<IdsInput, AcceptPurchaseOrdersCommand>();
-            CreateMap<IdsInput, ShipPurchaseOrdersCommand>();
-            CreateMap<IdsInput, DeliverPurchaseOrdersCommand>();
-            CreateMap<IdsInput, ProcessPurchaseOrdersCommand>();
-            CreateMap<IdsInput, CompletePurchaseOrdersCommand>();
-            CreateMap<IdsInput, DeletePurchaseOrdersCommand>();
-            CreateMap<IdsWithReasonInput, CancelPurchaseOrdersCommand>();
-            CreateMap<IdsWithReasonInput, RefusePurchaseOrdersCommand>();
+            CreateMap<IdsInput, AcceptPurchaseOrdersCommand>()
+                .ForMember(c => c.PurchaseOrderIds, opt => opt.MapFrom(r => r.Ids));
+            CreateMap<IdsInput, ShipPurchaseOrdersCommand>()
+                .ForMember(c => c.PurchaseOrderIds, opt => opt.MapFrom(r => r.Ids));
+            CreateMap<IdsInput, DeliverPurchaseOrdersCommand>()
+                .ForMember(c => c.PurchaseOrderIds, opt => opt.MapFrom(r => r.Ids));
+            CreateMap<IdsInput, ProcessPurchaseOrdersCommand>()
+                .ForMember(c => c.PurchaseOrderIds, opt => opt.MapFrom(r => r.Ids));
+            CreateMap<IdsInput, CompletePurchaseOrdersCommand>()
+                .ForMember(c => c.PurchaseOrderIds, opt => opt.MapFrom(r => r.Ids));
+            CreateMap<IdsInput, DeletePurchaseOrdersCommand>()
+                .ForMember(c => c.PurchaseOrderIds, opt => opt.MapFrom(r => r.Ids));
+            CreateMap<IdsWithReasonInput, CancelPurchaseOrdersCommand>()
+                .ForMember(c => c.PurchaseOrderIds, opt => opt.MapFrom(r => r.Ids));
+            CreateMap<IdsWithReasonInput, RefusePurchaseOrdersCommand>()
+                .ForMember(c => c.PurchaseOrderIds, opt => opt.MapFrom(r => r.Ids));
         }
     }
 }

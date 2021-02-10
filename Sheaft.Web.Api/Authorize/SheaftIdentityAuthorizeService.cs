@@ -24,10 +24,8 @@ namespace Sheaft.Web.Api.Authorize
     {
         private readonly IAuthorizationPolicyProvider _policyProvider;
         private readonly IAuthorizationHandlerProvider _handlers;
-        private readonly ILogger<DefaultAuthorizationService> _logger;
         private readonly IAuthorizationHandlerContextFactory _contextFactory;
         private readonly IAuthorizationEvaluator _evaluator;
-        private readonly IOptions<AuthorizationOptions> _options;
         private readonly IHttpClientFactory _httpClientFactory;
         private readonly IHttpContextAccessor _accessor;
         private readonly IOptions<AuthOptions> _authOptions;
@@ -39,10 +37,8 @@ namespace Sheaft.Web.Api.Authorize
             IHttpContextAccessor accessor,
             IAuthorizationPolicyProvider policyProvider,
             IAuthorizationHandlerProvider handlers,
-            ILogger<DefaultAuthorizationService> logger,
             IAuthorizationHandlerContextFactory contextFactory,
             IAuthorizationEvaluator evaluator,
-            IOptions<AuthorizationOptions> options,
             IOptions<AuthOptions> authOptions,
             IOptions<CacheOptions> cacheOptions,
             IDistributedCache cache)
@@ -51,10 +47,8 @@ namespace Sheaft.Web.Api.Authorize
             _accessor = accessor;
             _policyProvider = policyProvider;
             _handlers = handlers;
-            _logger = logger;
             _contextFactory = contextFactory;
             _evaluator = evaluator;
-            _options = options;
             _authOptions = authOptions;
             _httpClientFactory = httpClientFactory;
             _cacheOptions = cacheOptions;

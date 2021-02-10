@@ -20,7 +20,7 @@ namespace Sheaft.Application.Reward.Commands
         {
         }
 
-        public Guid Id { get; set; }
+        public Guid RewardId { get; set; }
     }
 
     public class DeleteRewardCommandHandler : CommandsHandler,
@@ -36,7 +36,7 @@ namespace Sheaft.Application.Reward.Commands
 
         public async Task<Result> Handle(DeleteRewardCommand request, CancellationToken token)
         {
-            var entity = await _context.GetByIdAsync<Domain.Reward>(request.Id, token);
+            var entity = await _context.GetByIdAsync<Domain.Reward>(request.RewardId, token);
 
             _context.Remove(entity);
             await _context.SaveChangesAsync(token);

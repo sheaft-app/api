@@ -21,31 +21,27 @@ namespace Sheaft.Application.Product.Commands
         {
         }
 
-        public IEnumerable<Guid> Ids { get; set; }
+        public IEnumerable<Guid> ProductIds { get; set; }
     }
 
     public class DeleteProductsCommandHandler : CommandsHandler,
         IRequestHandler<DeleteProductsCommand, Result>
     {
-        private readonly IBlobService _blobService;
-
         public DeleteProductsCommandHandler(
             ISheaftMediatr mediatr,
             IAppDbContext context,
-            IBlobService blobService,
             ILogger<DeleteProductsCommandHandler> logger)
             : base(mediatr, context, logger)
         {
-            _blobService = blobService;
         }
 
         public async Task<Result> Handle(DeleteProductsCommand request, CancellationToken token)
         {
             using (var transaction = await _context.BeginTransactionAsync(token))
             {
-                foreach (var id in request.Ids)
+                foreach (var id in request.ProductIds)
                 {
-                    var result = await _mediatr.Process(new DeleteProductCommand(request.RequestUser) {Id = id}, token);
+                    var result = await _mediatr.Process(new DeleteProductCommand(request.RequestUser) {ProductId = id}, token);
                     if (!result.Succeeded)
                         return Failure(result.Exception);
                 }

@@ -25,6 +25,7 @@ namespace Sheaft.Application.Product.Commands
         {
         }
 
+        public Guid ProducerId { get; set; }
         public string Reference { get; set; }
         public string Name { get; set; }
         public string Picture { get; set; }
@@ -47,18 +48,15 @@ namespace Sheaft.Application.Product.Commands
     public class CreateProductCommandHandler : CommandsHandler,
         IRequestHandler<CreateProductCommand, Result<Guid>>
     {
-        private readonly IBlobService _blobService;
         private readonly IIdentifierService _identifierService;
 
         public CreateProductCommandHandler(
             ISheaftMediatr mediatr,
             IAppDbContext context,
-            IBlobService blobService,
             IIdentifierService identifierService,
             ILogger<CreateProductCommandHandler> logger)
             : base(mediatr, context, logger)
         {
-            _blobService = blobService;
             _identifierService = identifierService;
         }
 
@@ -69,21 +67,21 @@ namespace Sheaft.Application.Product.Commands
             {
                 var existingEntity =
                     await _context.FindSingleAsync<Domain.Product>(
-                        p => p.Reference == reference && p.Producer.Id == request.RequestUser.Id, token);
+                        p => p.Reference == reference && p.Producer.Id == request.ProducerId, token);
                 if (existingEntity != null)
                     return Failure<Guid>(MessageKind.CreateProduct_Reference_AlreadyExists, reference);
             }
             else
             {
                 var resultIdentifier =
-                    await _identifierService.GetNextProductReferenceAsync(request.RequestUser.Id, token);
+                    await _identifierService.GetNextProductReferenceAsync(request.ProducerId, token);
                 if (!resultIdentifier.Succeeded)
                     return Failure<Guid>(resultIdentifier.Exception);
 
                 reference = resultIdentifier.Data;
             }
 
-            var producer = await _context.GetByIdAsync<Domain.Producer>(request.RequestUser.Id, token);
+            var producer = await _context.GetByIdAsync<Domain.Producer>(request.ProducerId, token);
 
             using (var transaction = await _context.BeginTransactionAsync(token))
             {
@@ -121,7 +119,7 @@ namespace Sheaft.Application.Product.Commands
 
                 if (!request.SkipUpdateProducerTags)
                     _mediatr.Post(new UpdateProducerTagsCommand(request.RequestUser)
-                        {ProducerId = request.RequestUser.Id});
+                        {ProducerId = request.ProducerId});
 
                 return Success(entity.Id);
             }

@@ -20,28 +20,24 @@ namespace Sheaft.Application.Product.Commands
         {
         }
 
-        public Guid Id { get; set; }
+        public Guid ProductId { get; set; }
         public bool Available { get; set; }
     }
 
     public class SetProductAvailabilityCommandHandler : CommandsHandler,
         IRequestHandler<SetProductAvailabilityCommand, Result>
     {
-        private readonly IBlobService _blobService;
-
         public SetProductAvailabilityCommandHandler(
             ISheaftMediatr mediatr,
             IAppDbContext context,
-            IBlobService blobService,
             ILogger<SetProductAvailabilityCommandHandler> logger)
             : base(mediatr, context, logger)
         {
-            _blobService = blobService;
         }
 
         public async Task<Result> Handle(SetProductAvailabilityCommand request, CancellationToken token)
         {
-            var entity = await _context.GetByIdAsync<Domain.Product>(request.Id, token);
+            var entity = await _context.GetByIdAsync<Domain.Product>(request.ProductId, token);
             entity.SetAvailable(request.Available);
 
             await _context.SaveChangesAsync(token);

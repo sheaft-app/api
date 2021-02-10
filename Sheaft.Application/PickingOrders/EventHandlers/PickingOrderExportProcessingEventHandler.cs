@@ -13,23 +13,21 @@ namespace Sheaft.Application.PickingOrders.EventHandlers
     public class PickingOrderExportProcessingEventHandler : EventsHandler,
         INotificationHandler<DomainEventNotification<PickingOrderExportProcessingEvent>>
     {
-        private readonly IConfiguration _configuration;
-
         public PickingOrderExportProcessingEventHandler(
-            IConfiguration configuration,
             IAppDbContext context,
             IEmailService emailService,
             ISignalrService signalrService)
             : base(context, emailService, signalrService)
         {
-            _configuration = configuration;
         }
 
-        public async Task Handle(DomainEventNotification<PickingOrderExportProcessingEvent> notification, CancellationToken token)
+        public async Task Handle(DomainEventNotification<PickingOrderExportProcessingEvent> notification,
+            CancellationToken token)
         {
             var pickingOrderEvent = notification.DomainEvent;
             var job = await _context.GetByIdAsync<Domain.Job>(pickingOrderEvent.JobId, token);
-            await _signalrService.SendNotificationToGroupAsync(job.User.Id, nameof(PickingOrderExportProcessingEvent), new { JobId = job.Id, Name = job.Name, UserId = job.User.Id });
+            await _signalrService.SendNotificationToGroupAsync(job.User.Id, nameof(PickingOrderExportProcessingEvent),
+                new {JobId = job.Id, Name = job.Name, UserId = job.User.Id});
         }
     }
 }

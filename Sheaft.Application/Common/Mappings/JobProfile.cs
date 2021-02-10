@@ -16,11 +16,16 @@ namespace Sheaft.Application.Common.Mappings
             CreateMap<Domain.Job, JobViewModel>()
                 .ForMember(d => d.User, opt => opt.MapFrom(r => r.User));
 
-            CreateMap<IdsInput, ResumeJobsCommand>();
-            CreateMap<IdsInput, PauseJobsCommand>();
-            CreateMap<IdsInput, RetryJobsCommand>();
-            CreateMap<IdsInput, ArchiveJobsCommand>();
-            CreateMap<IdsWithReasonInput, CancelJobsCommand>();
+            CreateMap<IdsInput, ResumeJobsCommand>()
+                .ForMember(c => c.JobIds, opt => opt.MapFrom(r => r.Ids));
+            CreateMap<IdsInput, PauseJobsCommand>()
+                .ForMember(c => c.JobIds, opt => opt.MapFrom(r => r.Ids));
+            CreateMap<IdsInput, RetryJobsCommand>()
+                .ForMember(c => c.JobIds, opt => opt.MapFrom(r => r.Ids));
+            CreateMap<IdsInput, ArchiveJobsCommand>()
+                .ForMember(c => c.JobIds, opt => opt.MapFrom(r => r.Ids));
+            CreateMap<IdsWithReasonInput, CancelJobsCommand>()
+                .ForMember(c => c.JobIds, opt => opt.MapFrom(r => r.Ids));
         }
     }
 }

@@ -32,7 +32,6 @@ namespace Sheaft.Application.Donation.Commands
         IRequestHandler<CreateDonationCommand, Result<Guid>>
     {
         private readonly IPspService _pspService;
-        private readonly RoutineOptions _routineOptions;
         private readonly PspOptions _pspOptions;
 
         public CreateDonationCommandHandler(
@@ -40,12 +39,10 @@ namespace Sheaft.Application.Donation.Commands
             IAppDbContext context,
             IPspService pspService,
             IOptionsSnapshot<PspOptions> pspOptions,
-            IOptionsSnapshot<RoutineOptions> routineOptions,
             ILogger<CreateDonationCommandHandler> logger)
             : base(mediatr, context, logger)
         {
             _pspService = pspService;
-            _routineOptions = routineOptions.Value;
             _pspOptions = pspOptions.Value;
         }
 

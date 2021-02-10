@@ -30,22 +30,12 @@ namespace Sheaft.Application.Donation.Commands
     public class CheckDonationCommandHandler : CommandsHandler,
         IRequestHandler<CheckDonationCommand, Result>
     {
-        private readonly IPspService _pspService;
-        private readonly RoutineOptions _routineOptions;
-        private readonly PspOptions _pspOptions;
-
         public CheckDonationCommandHandler(
             ISheaftMediatr mediatr,
             IAppDbContext context,
-            IPspService pspService,
-            IOptionsSnapshot<PspOptions> pspOptions,
-            IOptionsSnapshot<RoutineOptions> routineOptions,
             ILogger<CheckDonationCommandHandler> logger)
             : base(mediatr, context, logger)
         {
-            _pspService = pspService;
-            _routineOptions = routineOptions.Value;
-            _pspOptions = pspOptions.Value;
         }
 
         public async Task<Result> Handle(CheckDonationCommand request, CancellationToken token)

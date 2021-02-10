@@ -22,7 +22,7 @@ namespace Sheaft.Application.DeliveryMode.Commands
         {
         }
 
-        public Guid Id { get; set; }
+        public Guid DeliveryModeId { get; set; }
     }
 
     public class DeleteDeliveryModeCommandHandler : CommandsHandler,
@@ -38,7 +38,7 @@ namespace Sheaft.Application.DeliveryMode.Commands
 
         public async Task<Result> Handle(DeleteDeliveryModeCommand request, CancellationToken token)
         {
-            var entity = await _context.GetByIdAsync<Domain.DeliveryMode>(request.Id, token);
+            var entity = await _context.GetByIdAsync<Domain.DeliveryMode>(request.DeliveryModeId, token);
             var activeAgreements =
                 await _context.Agreements.CountAsync(a => a.Delivery.Id == entity.Id && !a.RemovedOn.HasValue, token);
             if (activeAgreements > 0)
@@ -47,7 +47,7 @@ namespace Sheaft.Application.DeliveryMode.Commands
 
             _context.Remove(entity);
             entity.Producer.CanDirectSell = await _context.DeliveryModes.AnyAsync(
-                c => !c.RemovedOn.HasValue && c.Producer.Id == request.RequestUser.Id &&
+                c => !c.RemovedOn.HasValue && c.Producer.Id == entity.Producer.Id &&
                      (c.Kind == DeliveryKind.Collective || c.Kind == DeliveryKind.Farm ||
                       c.Kind == DeliveryKind.Market), token);
 

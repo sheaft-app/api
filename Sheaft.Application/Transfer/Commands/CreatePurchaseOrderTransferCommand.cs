@@ -17,35 +17,32 @@ using Sheaft.Domain.Enum;
 
 namespace Sheaft.Application.Transfer.Commands
 {
-    public class CreateTransferCommand : Command<Guid>
+    public class CreatePurchaseOrderTransferCommand : Command<Guid>
     {
         [JsonConstructor]
-        public CreateTransferCommand(RequestUser requestUser) : base(requestUser)
+        public CreatePurchaseOrderTransferCommand(RequestUser requestUser) : base(requestUser)
         {
         }
 
         public Guid PurchaseOrderId { get; set; }
     }
 
-    public class CreateTransferCommandHandler : CommandsHandler,
-        IRequestHandler<CreateTransferCommand, Result<Guid>>
+    public class CreatePurchaseOrderTransferCommandHandler : CommandsHandler,
+        IRequestHandler<CreatePurchaseOrderTransferCommand, Result<Guid>>
     {
         private readonly IPspService _pspService;
-        private readonly RoutineOptions _routineOptions;
 
-        public CreateTransferCommandHandler(
+        public CreatePurchaseOrderTransferCommandHandler(
             IAppDbContext context,
             IPspService pspService,
             ISheaftMediatr mediatr,
-            IOptionsSnapshot<RoutineOptions> routineOptions,
-            ILogger<CreateTransferCommandHandler> logger)
+            ILogger<CreatePurchaseOrderTransferCommandHandler> logger)
             : base(mediatr, context, logger)
         {
             _pspService = pspService;
-            _routineOptions = routineOptions.Value;
         }
 
-        public async Task<Result<Guid>> Handle(CreateTransferCommand request, CancellationToken token)
+        public async Task<Result<Guid>> Handle(CreatePurchaseOrderTransferCommand request, CancellationToken token)
         {
             var purchaseOrder = await _context.GetByIdAsync<Domain.PurchaseOrder>(request.PurchaseOrderId, token);
             if (purchaseOrder.Status != PurchaseOrderStatus.Delivered)
@@ -64,7 +61,8 @@ namespace Sheaft.Application.Transfer.Commands
             if (!checkResult.Succeeded)
                 return Failure<Guid>(checkResult.Exception);
 
-            var debitedWallet = await _context.GetSingleAsync<Domain.Wallet>(c => c.User.Id == purchaseOrder.Sender.Id, token);
+            var debitedWallet =
+                await _context.GetSingleAsync<Domain.Wallet>(c => c.User.Id == purchaseOrder.Sender.Id, token);
             var creditedWallet =
                 await _context.GetSingleAsync<Domain.Wallet>(c => c.User.Id == purchaseOrder.Vendor.Id, token);
 

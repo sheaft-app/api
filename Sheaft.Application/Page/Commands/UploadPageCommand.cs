@@ -31,18 +31,15 @@ namespace Sheaft.Application.Page.Commands
     public class UploadPageCommandHandler : CommandsHandler,
         IRequestHandler<UploadPageCommand, Result<Guid>>
     {
-        private readonly IPspService _pspService;
         private readonly IBlobService _blobService;
 
         public UploadPageCommandHandler(
             IAppDbContext context,
-            IPspService pspService,
             IBlobService blobService,
             ISheaftMediatr mediatr,
             ILogger<UploadPageCommandHandler> logger)
             : base(mediatr, context, logger)
         {
-            _pspService = pspService;
             _blobService = blobService;
         }
 
@@ -50,7 +47,8 @@ namespace Sheaft.Application.Page.Commands
         {
             var page = new Domain.Page(Guid.NewGuid(), request.FileName, request.Extension, request.Size);
 
-            var legal = await _context.GetSingleAsync<Domain.Legal>(r => r.Documents.Any(d => d.Id == request.DocumentId),
+            var legal = await _context.GetSingleAsync<Domain.Legal>(
+                r => r.Documents.Any(d => d.Id == request.DocumentId),
                 token);
             var document = legal.Documents.FirstOrDefault(d => d.Id == request.DocumentId);
             document.AddPage(page);

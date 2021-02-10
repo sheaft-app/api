@@ -19,17 +19,14 @@ namespace Sheaft.Web.Manage.Controllers
 {
     public class LevelsController : ManageController
     {
-        private readonly ILogger<LevelsController> _logger;
-
         public LevelsController(
             IAppDbContext context,
             IMapper mapper,
             ISheaftMediatr mediatr,
             IOptionsSnapshot<RoleOptions> roleOptions,
-            IConfigurationProvider configurationProvider,
-            ILogger<LevelsController> logger) : base(context, mapper, roleOptions, mediatr, configurationProvider)
+            IConfigurationProvider configurationProvider)
+            : base(context, mapper, roleOptions, mediatr, configurationProvider)
         {
-            _logger = logger;
         }
 
         [HttpGet]
@@ -78,7 +75,7 @@ namespace Sheaft.Web.Manage.Controllers
                 return View(model);
             }
 
-            return RedirectToAction("Edit", new { id = result.Data });
+            return RedirectToAction("Edit", new {id = result.Data});
         }
 
         [HttpGet]
@@ -104,7 +101,7 @@ namespace Sheaft.Web.Manage.Controllers
         {
             var result = await _mediatr.Process(new UpdateLevelCommand(await GetRequestUser(token))
             {
-                Id = model.Id,
+                LevelId = model.Id,
                 Name = model.Name,
                 RequiredPoints = model.RequiredPoints
             }, token);
@@ -124,7 +121,7 @@ namespace Sheaft.Web.Manage.Controllers
         {
             var result = await _mediatr.Process(new DeleteLevelCommand(await GetRequestUser(token))
             {
-                Id = id
+                LevelId = id
             }, token);
 
             if (!result.Succeeded)
@@ -139,13 +136,13 @@ namespace Sheaft.Web.Manage.Controllers
         {
             var result = await _mediatr.Process(new RestoreLevelCommand(await GetRequestUser(token))
             {
-                Id = id
+                LevelId = id
             }, token);
 
             if (!result.Succeeded)
                 throw result.Exception;
 
-            return RedirectToAction("Edit", new { id });
+            return RedirectToAction("Edit", new {id});
         }
     }
 }

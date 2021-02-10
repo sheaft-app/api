@@ -21,22 +21,18 @@ namespace Sheaft.Web.Api.Controllers
     public class UploadController : Controller
     {
         private readonly ISheaftMediatr _mediatr;
+        private readonly IAuthService _authService;
         private readonly IHttpContextAccessor _httpContextAccessor;
-        private RequestUser CurrentUser
-        {
-            get
-            {
-                if (_httpContextAccessor.HttpContext.User.Identity.IsAuthenticated)
-                    return _httpContextAccessor.HttpContext.User.ToIdentityUser(_httpContextAccessor.HttpContext.TraceIdentifier);
-                else
-                    return new RequestUser(_httpContextAccessor.HttpContext.TraceIdentifier);
-            }
-        }
 
-        public UploadController(ISheaftMediatr mediatr,
+        private RequestUser CurrentUser => _authService.GetCurrentUserInfo().Data;
+
+        public UploadController(
+            ISheaftMediatr mediatr,
+            IAuthService authService,
             IHttpContextAccessor httpContextAccessor)
         {
             _mediatr = mediatr;
+            _authService = authService;
             _httpContextAccessor = httpContextAccessor;
         }
 
@@ -47,7 +43,8 @@ namespace Sheaft.Web.Api.Controllers
             NewRelic.Api.Agent.NewRelic.SetTransactionName("GraphQL", nameof(UploadProductsCatalog));
 
             var currentTransaction = NewRelic.Api.Agent.NewRelic.GetAgent().CurrentTransaction;
-            currentTransaction.AddCustomAttribute("RequestIdentifier", _httpContextAccessor.HttpContext.TraceIdentifier);
+            currentTransaction.AddCustomAttribute("RequestIdentifier",
+                _httpContextAccessor.HttpContext.TraceIdentifier);
             currentTransaction.AddCustomAttribute("UserIdentifier", CurrentUser.Id.ToString("N"));
             currentTransaction.AddCustomAttribute("IsAuthenticated", CurrentUser.IsAuthenticated);
             currentTransaction.AddCustomAttribute("Roles", string.Join(";", CurrentUser.Roles));
@@ -68,7 +65,11 @@ namespace Sheaft.Web.Api.Controllers
                     using (var stream = new MemoryStream())
                     {
                         await formFile.CopyToAsync(stream, token);
-                        var result = await _mediatr.Process(new QueueImportProductsCommand(CurrentUser) { Id = CurrentUser.Id, FileName = formFile.FileName, FileStream = stream.ToArray() }, token);
+                        var result = await _mediatr.Process(
+                            new QueueImportProductsCommand(CurrentUser)
+                            {
+                                ProducerId = CurrentUser.Id, FileName = formFile.FileName, FileStream = stream.ToArray()
+                            }, token);
                         if (!result.Succeeded)
                             return BadRequest(result);
 
@@ -78,7 +79,7 @@ namespace Sheaft.Web.Api.Controllers
 
                 return Ok(ids);
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 currentTransaction.AddCustomAttribute("ExceptionMessage", e.Message);
                 currentTransaction.AddCustomAttribute("ExceptionKind", ExceptionKind.Unexpected);

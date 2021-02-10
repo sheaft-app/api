@@ -31,19 +31,12 @@ namespace Sheaft.Application.Transfer.Commands
     public class CheckTransfersCommandHandler : CommandsHandler,
         IRequestHandler<CheckTransfersCommand, Result>
     {
-        private readonly IPspService _pspService;
-        private readonly RoutineOptions _routineOptions;
-
         public CheckTransfersCommandHandler(
             IAppDbContext context,
-            IPspService pspService,
             ISheaftMediatr mediatr,
-            IOptionsSnapshot<RoutineOptions> routineOptions,
             ILogger<CheckTransfersCommandHandler> logger)
             : base(mediatr, context, logger)
         {
-            _pspService = pspService;
-            _routineOptions = routineOptions.Value;
         }
 
         public async Task<Result> Handle(CheckTransfersCommand request, CancellationToken token)

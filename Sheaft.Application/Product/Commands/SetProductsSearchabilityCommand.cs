@@ -21,7 +21,7 @@ namespace Sheaft.Application.Product.Commands
         {
         }
 
-        public IEnumerable<Guid> Ids { get; set; }
+        public IEnumerable<Guid> ProductIds { get; set; }
         public bool VisibleToStores { get; set; }
         public bool VisibleToConsumers { get; set; }
     }
@@ -29,28 +29,24 @@ namespace Sheaft.Application.Product.Commands
     public class SetProductsSearchabilityCommandHandler : CommandsHandler,
         IRequestHandler<SetProductsSearchabilityCommand, Result>
     {
-        private readonly IBlobService _blobService;
-
         public SetProductsSearchabilityCommandHandler(
             ISheaftMediatr mediatr,
             IAppDbContext context,
-            IBlobService blobService,
             ILogger<SetProductsSearchabilityCommandHandler> logger)
             : base(mediatr, context, logger)
         {
-            _blobService = blobService;
         }
 
         public async Task<Result> Handle(SetProductsSearchabilityCommand request, CancellationToken token)
         {
             using (var transaction = await _context.BeginTransactionAsync(token))
             {
-                foreach (var id in request.Ids)
+                foreach (var id in request.ProductIds)
                 {
                     var result = await _mediatr.Process(
                         new SetProductSearchabilityCommand(request.RequestUser)
                         {
-                            Id = id, VisibleToStores = request.VisibleToStores,
+                            ProductId = id, VisibleToStores = request.VisibleToStores,
                             VisibleToConsumers = request.VisibleToConsumers
                         }, token);
                     if (!result.Succeeded)

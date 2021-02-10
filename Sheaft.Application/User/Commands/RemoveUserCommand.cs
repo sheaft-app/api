@@ -23,34 +23,24 @@ namespace Sheaft.Application.User.Commands
         {
         }
 
-        public Guid Id { get; set; }
+        public Guid UserId { get; set; }
         public string Reason { get; set; }
     }
 
     public class RemoveUserCommandHandler : CommandsHandler,
         IRequestHandler<RemoveUserCommand, Result>
     {
-        private readonly IBlobService _blobService;
-        private readonly ScoringOptions _scoringOptions;
-        private readonly RoleOptions _roleOptions;
-
         public RemoveUserCommandHandler(
-            IOptionsSnapshot<ScoringOptions> scoringOptions,
             ISheaftMediatr mediatr,
             IAppDbContext context,
-            IBlobService blobService,
-            ILogger<RemoveUserCommandHandler> logger,
-            IOptionsSnapshot<RoleOptions> roleOptions)
+            ILogger<RemoveUserCommandHandler> logger)
             : base(mediatr, context, logger)
         {
-            _roleOptions = roleOptions.Value;
-            _scoringOptions = scoringOptions.Value;
-            _blobService = blobService;
         }
 
         public async Task<Result> Handle(RemoveUserCommand request, CancellationToken token)
         {
-            var entity = await _context.GetByIdAsync<Domain.User>(request.Id, token);
+            var entity = await _context.GetByIdAsync<Domain.User>(request.UserId, token);
 
             var hasActiveOrders = await _context.AnyAsync<Domain.PurchaseOrder>(
                 o => (o.Vendor.Id == entity.Id || o.Sender.Id == entity.Id) && (int) o.Status < 6, token);
@@ -62,7 +52,7 @@ namespace Sheaft.Application.User.Commands
 
             _mediatr.Schedule(
                 new RemoveUserDataCommand(request.RequestUser)
-                    {Id = request.Id, Email = entity.Email, Reason = request.Reason}, TimeSpan.FromDays(14));
+                    {UserId = request.UserId, Email = entity.Email, Reason = request.Reason}, TimeSpan.FromDays(14));
             return Success();
         }
     }

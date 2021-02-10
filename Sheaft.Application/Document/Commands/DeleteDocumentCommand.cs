@@ -21,28 +21,25 @@ namespace Sheaft.Application.Document.Commands
         {
         }
 
-        public Guid Id { get; set; }
+        public Guid DocumentId { get; set; }
     }
 
     public class DeleteDocumentCommandHandler : CommandsHandler,
         IRequestHandler<DeleteDocumentCommand, Result>
     {
-        private readonly IPspService _pspService;
-
         public DeleteDocumentCommandHandler(
             IAppDbContext context,
-            IPspService pspService,
             ISheaftMediatr mediatr,
             ILogger<DeleteDocumentCommandHandler> logger)
             : base(mediatr, context, logger)
         {
-            _pspService = pspService;
         }
 
         public async Task<Result> Handle(DeleteDocumentCommand request, CancellationToken token)
         {
-            var legal = await _context.GetSingleAsync<Domain.Legal>(r => r.Documents.Any(d => d.Id == request.Id), token);
-            legal.DeleteDocument(request.Id);
+            var legal = await _context.GetSingleAsync<Domain.Legal>(r => r.Documents.Any(d => d.Id == request.DocumentId),
+                token);
+            legal.DeleteDocument(request.DocumentId);
 
             await _context.SaveChangesAsync(token);
             return Success();

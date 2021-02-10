@@ -25,9 +25,12 @@ namespace Sheaft.Application.Common.Mappings
                 .ForMember(d => d.Producer, opt => opt.MapFrom(r => r.Producer));
 
             CreateMap<CreateDeliveryModeInput, CreateDeliveryModeCommand>();
-            CreateMap<UpdateDeliveryModeInput, UpdateDeliveryModeCommand>();
-            CreateMap<IdInput, DeleteDeliveryModeCommand>();
-            CreateMap<SetDeliveryModesAvailabilityInput, SetDeliveryModesAvailabilityCommand>();
+            CreateMap<UpdateDeliveryModeInput, UpdateDeliveryModeCommand>()
+                .ForMember(c => c.DeliveryModeId, opt => opt.MapFrom(r => r.Id));;
+            CreateMap<IdInput, DeleteDeliveryModeCommand>()
+                    .ForMember(c => c.DeliveryModeId, opt => opt.MapFrom(r => r.Id));
+            CreateMap<SetDeliveryModesAvailabilityInput, SetDeliveryModesAvailabilityCommand>()
+                .ForMember(c => c.DeliveryModeIds, opt => opt.MapFrom(r => r.Ids));
         }
     }
 }

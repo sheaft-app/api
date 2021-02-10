@@ -21,7 +21,7 @@ namespace Sheaft.Application.Job.Commands
         {
         }
 
-        public IEnumerable<Guid> Ids { get; set; }
+        public IEnumerable<Guid> JobIds { get; set; }
         public string Reason { get; set; }
     }
 
@@ -41,10 +41,10 @@ namespace Sheaft.Application.Job.Commands
         {
             using (var transaction = await _context.BeginTransactionAsync(token))
             {
-                foreach (var jobId in request.Ids)
+                foreach (var jobId in request.JobIds)
                 {
                     var result = await _mediatr.Process(
-                        new CancelJobCommand(request.RequestUser) {Id = jobId, Reason = request.Reason}, token);
+                        new CancelJobCommand(request.RequestUser) {JobId = jobId, Reason = request.Reason}, token);
                     if (!result.Succeeded)
                         return Failure(result.Exception);
                 }

@@ -21,7 +21,7 @@ namespace Sheaft.Application.DeliveryMode.Commands
         {
         }
 
-        public IEnumerable<Guid> Ids { get; set; }
+        public IEnumerable<Guid> DeliveryModeIds { get; set; }
         public bool Available { get; set; }
     }
 
@@ -40,11 +40,11 @@ namespace Sheaft.Application.DeliveryMode.Commands
         {
             using (var transaction = await _context.BeginTransactionAsync(token))
             {
-                foreach (var id in request.Ids)
+                foreach (var id in request.DeliveryModeIds)
                 {
                     var result = await _mediatr.Process(
                         new SetDeliveryModeAvailabilityCommand(request.RequestUser)
-                            {Id = id, Available = request.Available}, token);
+                            {DeliveryModeId = id, Available = request.Available}, token);
                     if (!result.Succeeded)
                         return Failure(result.Exception);
                 }

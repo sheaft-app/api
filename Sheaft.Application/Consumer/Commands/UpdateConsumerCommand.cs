@@ -25,7 +25,7 @@ namespace Sheaft.Application.Consumer.Commands
         {
         }
 
-        public Guid Id { get; set; }
+        public Guid ConsumerId { get; set; }
         public string Email { get; set; }
         public string Phone { get; set; }
         public string FirstName { get; set; }
@@ -50,7 +50,7 @@ namespace Sheaft.Application.Consumer.Commands
 
         public async Task<Result> Handle(UpdateConsumerCommand request, CancellationToken token)
         {
-            var consumer = await _context.GetByIdAsync<Domain.Consumer>(request.Id, token);
+            var consumer = await _context.GetByIdAsync<Domain.Consumer>(request.ConsumerId, token);
 
             consumer.SetEmail(request.Email);
             consumer.SetPhone(request.Phone);

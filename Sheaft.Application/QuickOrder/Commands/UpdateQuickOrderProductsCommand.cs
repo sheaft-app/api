@@ -23,7 +23,7 @@ namespace Sheaft.Application.QuickOrder.Commands
         {
         }
 
-        public Guid Id { get; set; }
+        public Guid QuickOrderId { get; set; }
         public IEnumerable<ProductQuantityInput> Products { get; set; }
     }
 
@@ -40,7 +40,7 @@ namespace Sheaft.Application.QuickOrder.Commands
 
         public async Task<Result> Handle(UpdateQuickOrderProductsCommand request, CancellationToken token)
         {
-            var entity = await _context.GetByIdAsync<Domain.QuickOrder>(request.Id, token);
+            var entity = await _context.GetByIdAsync<Domain.QuickOrder>(request.QuickOrderId, token);
             if (request.Products != null && request.Products.Any())
             {
                 var products = request.Products.ToList();

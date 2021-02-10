@@ -21,7 +21,7 @@ namespace Sheaft.Application.Agreement.Commands
         {
         }
 
-        public Guid Id { get; set; }
+        public Guid AgreementId { get; set; }
         public string Reason { get; set; }
     }
 
@@ -38,7 +38,7 @@ namespace Sheaft.Application.Agreement.Commands
 
         public async Task<Result> Handle(RefuseAgreementCommand request, CancellationToken token)
         {
-            var entity = await _context.GetByIdAsync<Domain.Agreement>(request.Id, token);
+            var entity = await _context.GetByIdAsync<Domain.Agreement>(request.AgreementId, token);
             entity.RefuseAgreement(request.Reason);
             
             await _context.SaveChangesAsync(token);

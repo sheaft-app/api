@@ -24,7 +24,8 @@ namespace Sheaft.Application.Common.Mappings
                 .IncludeBase<Domain.Legal, BaseLegalDto>();
 
             CreateMap<CreateBusinessLegalInput, CreateBusinessLegalCommand>();
-            CreateMap<UpdateBusinessLegalInput, UpdateBusinessLegalCommand>();
+            CreateMap<UpdateBusinessLegalInput, UpdateBusinessLegalCommand>()
+                .ForMember(c => c.LegalId, opt => opt.MapFrom(r => r.Id));;
         }
     }
 }

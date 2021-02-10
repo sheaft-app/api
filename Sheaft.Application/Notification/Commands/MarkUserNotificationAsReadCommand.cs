@@ -20,27 +20,23 @@ namespace Sheaft.Application.Notification.Commands
         {
         }
 
-        public Guid Id { get; set; }
+        public Guid NotificationId { get; set; }
     }
 
     public class MarkUserNotificationAsReadCommandHandler : CommandsHandler,
         IRequestHandler<MarkUserNotificationAsReadCommand, Result>
     {
-        private readonly IDapperContext _dapperContext;
-
         public MarkUserNotificationAsReadCommandHandler(
-            IDapperContext dapperContext,
             ISheaftMediatr mediatr,
             IAppDbContext context,
             ILogger<MarkUserNotificationAsReadCommandHandler> logger)
             : base(mediatr, context, logger)
         {
-            _dapperContext = dapperContext;
         }
 
         public async Task<Result> Handle(MarkUserNotificationAsReadCommand request, CancellationToken token)
         {
-            var notification = await _context.GetByIdAsync<Domain.Notification>(request.Id, token);
+            var notification = await _context.GetByIdAsync<Domain.Notification>(request.NotificationId, token);
             if (!notification.Unread)
                 return Success();
 

@@ -23,42 +23,32 @@ namespace Sheaft.Application.User.Commands
         {
         }
 
-        public Guid Id { get; set; }
+        public Guid UserId { get; set; }
     }
 
     public class QueueExportUserDataCommandHandler : CommandsHandler,
         IRequestHandler<QueueExportUserDataCommand, Result<Guid>>
     {
-        private readonly IBlobService _blobService;
-        private readonly ScoringOptions _scoringOptions;
-        private readonly RoleOptions _roleOptions;
-
         public QueueExportUserDataCommandHandler(
-            IOptionsSnapshot<ScoringOptions> scoringOptions,
             ISheaftMediatr mediatr,
             IAppDbContext context,
-            IBlobService blobService,
-            ILogger<QueueExportUserDataCommandHandler> logger,
-            IOptionsSnapshot<RoleOptions> roleOptions)
+            ILogger<QueueExportUserDataCommandHandler> logger)
             : base(mediatr, context, logger)
         {
-            _roleOptions = roleOptions.Value;
-            _scoringOptions = scoringOptions.Value;
-            _blobService = blobService;
         }
 
         public async Task<Result<Guid>> Handle(QueueExportUserDataCommand request, CancellationToken token)
         {
-            var sender = await _context.GetByIdAsync<Domain.User>(request.RequestUser.Id, token);
+            var sender = await _context.GetByIdAsync<Domain.User>(request.UserId, token);
 
             var entity = new Domain.Job(Guid.NewGuid(), JobKind.ExportUserData, $"Export RGPD", sender);
 
             await _context.AddAsync(entity, token);
             await _context.SaveChangesAsync(token);
 
-            _mediatr.Post(new ExportUserDataCommand(request.RequestUser) {Id = entity.Id});
+            _mediatr.Post(new ExportUserDataCommand(request.RequestUser) {JobId = entity.Id});
             ;
-            _logger.LogInformation($"User RGPD data export successfully initiated by {request.RequestUser.Id}");
+            _logger.LogInformation($"User RGPD data export successfully initiated by {request.UserId}");
 
             return Success(entity.Id);
         }

@@ -32,27 +32,22 @@ namespace Sheaft.Application.Donation.Commands
         IRequestHandler<RefreshDonationStatusCommand, Result>
     {
         private readonly IPspService _pspService;
-        private readonly RoutineOptions _routineOptions;
-        private readonly PspOptions _pspOptions;
 
         public RefreshDonationStatusCommandHandler(
             ISheaftMediatr mediatr,
             IAppDbContext context,
             IPspService pspService,
-            IOptionsSnapshot<PspOptions> pspOptions,
-            IOptionsSnapshot<RoutineOptions> routineOptions,
             ILogger<RefreshDonationStatusCommandHandler> logger)
             : base(mediatr, context, logger)
         {
             _pspService = pspService;
-            _routineOptions = routineOptions.Value;
-            _pspOptions = pspOptions.Value;
         }
 
         public async Task<Result> Handle(RefreshDonationStatusCommand request,
             CancellationToken token)
         {
-            var donation = await _context.GetSingleAsync<Domain.Donation>(c => c.Identifier == request.Identifier, token);
+            var donation =
+                await _context.GetSingleAsync<Domain.Donation>(c => c.Identifier == request.Identifier, token);
             if (donation.Status == TransactionStatus.Succeeded || donation.Status == TransactionStatus.Failed)
                 return Failure();
 

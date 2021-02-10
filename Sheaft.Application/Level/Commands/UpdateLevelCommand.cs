@@ -20,7 +20,7 @@ namespace Sheaft.Application.Level.Commands
         {
         }
 
-        public Guid Id { get; set; }
+        public Guid LevelId { get; set; }
         public string Name { get; set; }
         public int RequiredPoints { get; set; }
     }
@@ -38,7 +38,7 @@ namespace Sheaft.Application.Level.Commands
 
         public async Task<Result> Handle(UpdateLevelCommand request, CancellationToken token)
         {
-            var entity = await _context.GetByIdAsync<Domain.Level>(request.Id, token);
+            var entity = await _context.GetByIdAsync<Domain.Level>(request.LevelId, token);
             entity.SetName(request.Name);
             entity.SetRequiredPoints(request.RequiredPoints);
 

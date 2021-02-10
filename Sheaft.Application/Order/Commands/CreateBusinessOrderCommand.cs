@@ -31,6 +31,7 @@ namespace Sheaft.Application.Order.Commands
         {
         }
 
+        public Guid UserId { get; set; }
         public IEnumerable<ProductQuantityInput> Products { get; set; }
         public IEnumerable<ProducerExpectedDeliveryInput> ProducersExpectedDeliveries { get; set; }
     }
@@ -41,7 +42,6 @@ namespace Sheaft.Application.Order.Commands
         private readonly ICapingDeliveriesService _capingDeliveriesService;
         private readonly IIdentifierService _identifierService;
         private readonly PspOptions _pspOptions;
-        private readonly RoutineOptions _routineOptions;
 
         public CreateBusinessOrderCommandHandler(
             IAppDbContext context,
@@ -49,14 +49,12 @@ namespace Sheaft.Application.Order.Commands
             ICapingDeliveriesService capingDeliveriesService,
             IIdentifierService identifierService,
             IOptionsSnapshot<PspOptions> pspOptions,
-            IOptionsSnapshot<RoutineOptions> routineOptions,
             ILogger<CreateBusinessOrderCommandHandler> logger)
             : base(mediatr, context, logger)
         {
             _capingDeliveriesService = capingDeliveriesService;
             _identifierService = identifierService;
             _pspOptions = pspOptions.Value;
-            _routineOptions = routineOptions.Value;
         }
 
         public async Task<Result<IEnumerable<Guid>>> Handle(CreateBusinessOrderCommand request, CancellationToken token)
@@ -80,8 +78,9 @@ namespace Sheaft.Application.Order.Commands
                     cartProducts.Add(product, request.Products.Where(p => p.Id == product.Id).Sum(c => c.Quantity));
                 }
 
-                var user = await _context.GetByIdAsync<Domain.User>(request.RequestUser.Id, token);
-                var order = new Domain.Order(Guid.NewGuid(), DonationKind.None, user, cartProducts, _pspOptions.FixedAmount,
+                var user = await _context.GetByIdAsync<Domain.User>(request.UserId, token);
+                var order = new Domain.Order(Guid.NewGuid(), DonationKind.None, user, cartProducts,
+                    _pspOptions.FixedAmount,
                     _pspOptions.Percent, _pspOptions.VatPercent);
 
                 var deliveryIds = request.ProducersExpectedDeliveries?.Select(p => p.DeliveryModeId) ??
@@ -141,7 +140,7 @@ namespace Sheaft.Application.Order.Commands
                 {
                     CreatedOn = DateTimeOffset.UtcNow, Kind = PointKind.PurchaseOrder, UserId = order.User.Id
                 });
-                
+
                 return Success(purchaseOrderIds.AsEnumerable());
             }
         }

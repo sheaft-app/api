@@ -24,6 +24,7 @@ namespace Sheaft.Application.DeliveryMode.Commands
         {
         }
 
+        public Guid ProducerId { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
         public DeliveryKind Kind { get; set; }
@@ -49,7 +50,7 @@ namespace Sheaft.Application.DeliveryMode.Commands
 
         public async Task<Result<Guid>> Handle(CreateDeliveryModeCommand request, CancellationToken token)
         {
-            var producer = await _context.GetByIdAsync<Domain.Producer>(request.RequestUser.Id, token);
+            var producer = await _context.GetByIdAsync<Domain.Producer>(request.ProducerId, token);
 
             DeliveryAddress deliveryModeAddress = null;
             if (request.Address != null)

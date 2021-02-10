@@ -20,7 +20,7 @@ namespace Sheaft.Application.Returnable.Commands
         {
         }
 
-        public Guid Id { get; set; }
+        public Guid ReturnableId { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
         public decimal WholeSalePrice { get; set; }
@@ -40,7 +40,7 @@ namespace Sheaft.Application.Returnable.Commands
 
         public async Task<Result> Handle(UpdateReturnableCommand request, CancellationToken token)
         {
-            var entity = await _context.GetByIdAsync<Domain.Returnable>(request.Id, token);
+            var entity = await _context.GetByIdAsync<Domain.Returnable>(request.ReturnableId, token);
             entity.SetName(request.Name);
             entity.SetDescription(request.Description);
             entity.SetWholeSalePrice(request.WholeSalePrice);

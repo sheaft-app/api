@@ -21,7 +21,7 @@ namespace Sheaft.Application.Job.Commands
         {
         }
 
-        public IEnumerable<Guid> Ids { get; set; }
+        public IEnumerable<Guid> JobIds { get; set; }
     }
 
     public class CompleteJobsCommandHandler : CommandsHandler,
@@ -40,10 +40,10 @@ namespace Sheaft.Application.Job.Commands
         {
             using (var transaction = await _context.BeginTransactionAsync(token))
             {
-                foreach (var jobId in request.Ids)
+                foreach (var jobId in request.JobIds)
                 {
                     var result =
-                        await _mediatr.Process(new CompleteJobCommand(request.RequestUser) {Id = jobId}, token);
+                        await _mediatr.Process(new CompleteJobCommand(request.RequestUser) {JobId = jobId}, token);
                     if (!result.Succeeded)
                         return Failure(result.Exception);
                 }

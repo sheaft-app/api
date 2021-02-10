@@ -21,7 +21,7 @@ namespace Sheaft.Application.Job.Commands
         {
         }
 
-        public Guid Id { get; set; }
+        public Guid JobId { get; set; }
     }
 
     public class RetryJobCommandHandler : CommandsHandler,
@@ -37,7 +37,7 @@ namespace Sheaft.Application.Job.Commands
 
         public async Task<Result> Handle(RetryJobCommand request, CancellationToken token)
         {
-            var entity = await _context.GetByIdAsync<Domain.Job>(request.Id, token);
+            var entity = await _context.GetByIdAsync<Domain.Job>(request.JobId, token);
 
             entity.RetryJob();
             await _context.SaveChangesAsync(token);

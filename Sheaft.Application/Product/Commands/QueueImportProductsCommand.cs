@@ -21,7 +21,7 @@ namespace Sheaft.Application.Product.Commands
         {
         }
 
-        public Guid Id { get; set; }
+        public Guid ProducerId { get; set; }
         public string FileName { get; set; }
         public byte[] FileStream { get; set; }
         public bool NotifyOnUpdates { get; set; } = true;
@@ -44,11 +44,11 @@ namespace Sheaft.Application.Product.Commands
 
         public async Task<Result<Guid>> Handle(QueueImportProductsCommand request, CancellationToken token)
         {
-            var producer = await _context.GetByIdAsync<Domain.Producer>(request.RequestUser.Id, token);
+            var producer = await _context.GetByIdAsync<Domain.Producer>(request.ProducerId, token);
             var entity = new Domain.Job(Guid.NewGuid(), JobKind.ImportProducts, $"Import produits", producer);
 
             var response =
-                await _blobService.UploadImportProductsFileAsync(producer.Id, entity.Id, request.FileStream, token);
+                await _blobService.UploadImportProductsFileAsync(request.ProducerId, entity.Id, request.FileStream, token);
             if (!response.Succeeded)
                 return Failure<Guid>(response.Exception);
 
@@ -56,7 +56,7 @@ namespace Sheaft.Application.Product.Commands
             await _context.SaveChangesAsync(token);
 
             _mediatr.Post(new ImportProductsCommand(request.RequestUser)
-                {Id = entity.Id, NotifyOnUpdates = request.NotifyOnUpdates});
+                {JobId = entity.Id, NotifyOnUpdates = request.NotifyOnUpdates});
             return Success(entity.Id);
         }
     }

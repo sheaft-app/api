@@ -32,22 +32,16 @@ namespace Sheaft.Application.User.Commands
     public class ChangeUserRolesCommandHandler : CommandsHandler,
         IRequestHandler<ChangeUserRolesCommand, Result>
     {
-        private readonly IBlobService _blobService;
-        private readonly ScoringOptions _scoringOptions;
         private readonly RoleOptions _roleOptions;
 
         public ChangeUserRolesCommandHandler(
-            IOptionsSnapshot<ScoringOptions> scoringOptions,
             ISheaftMediatr mediatr,
             IAppDbContext context,
-            IBlobService blobService,
             ILogger<ChangeUserRolesCommandHandler> logger,
             IOptionsSnapshot<RoleOptions> roleOptions)
             : base(mediatr, context, logger)
         {
             _roleOptions = roleOptions.Value;
-            _scoringOptions = scoringOptions.Value;
-            _blobService = blobService;
         }
 
         public async Task<Result> Handle(ChangeUserRolesCommand request, CancellationToken token)

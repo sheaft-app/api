@@ -14,8 +14,10 @@ namespace Sheaft.Application.Common.Mappings
             CreateMap<Domain.Returnable, ReturnableViewModel>();
 
             CreateMap<CreateReturnableInput, CreateReturnableCommand>();
-            CreateMap<UpdateReturnableInput, UpdateReturnableCommand>();
-            CreateMap<IdInput, DeleteReturnableCommand>();
+            CreateMap<UpdateReturnableInput, UpdateReturnableCommand>()
+                .ForMember(c => c.ReturnableId, opt => opt.MapFrom(r => r.Id));;
+            CreateMap<IdInput, DeleteReturnableCommand>()
+                .ForMember(c => c.ReturnableId, opt => opt.MapFrom(r => r.Id));
         }
     }
 }

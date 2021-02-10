@@ -28,6 +28,7 @@ namespace Sheaft.Application.Order.Commands
         {
         }
 
+        public Guid UserId { get; set; }
         public DonationKind Donation { get; set; }
         public IEnumerable<ProductQuantityInput> Products { get; set; }
         public IEnumerable<ProducerExpectedDeliveryInput> ProducersExpectedDeliveries { get; set; }
@@ -38,20 +39,17 @@ namespace Sheaft.Application.Order.Commands
     {
         private readonly ICapingDeliveriesService _capingDeliveriesService;
         private readonly PspOptions _pspOptions;
-        private readonly RoutineOptions _routineOptions;
 
         public CreateConsumerOrderCommandHandler(
             IAppDbContext context,
             ISheaftMediatr mediatr,
             ICapingDeliveriesService capingDeliveriesService,
             IOptionsSnapshot<PspOptions> pspOptions,
-            IOptionsSnapshot<RoutineOptions> routineOptions,
             ILogger<CreateConsumerOrderCommandHandler> logger)
             : base(mediatr, context, logger)
         {
             _capingDeliveriesService = capingDeliveriesService;
             _pspOptions = pspOptions.Value;
-            _routineOptions = routineOptions.Value;
         }
 
         public async Task<Result<Guid>> Handle(CreateConsumerOrderCommand request, CancellationToken token)
@@ -72,7 +70,7 @@ namespace Sheaft.Application.Order.Commands
                 cartProducts.Add(product, request.Products.Where(p => p.Id == product.Id).Sum(c => c.Quantity));
             }
 
-            var user = await _context.GetByIdAsync<Domain.User>(request.RequestUser.Id, token);
+            var user = await _context.GetByIdAsync<Domain.User>(request.UserId, token);
             var order = new Domain.Order(Guid.NewGuid(), request.Donation, user, cartProducts, _pspOptions.FixedAmount,
                 _pspOptions.Percent, _pspOptions.VatPercent);
 

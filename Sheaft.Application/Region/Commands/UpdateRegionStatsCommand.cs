@@ -22,7 +22,7 @@ namespace Sheaft.Application.Region.Commands
         {
         }
 
-        public Guid Id { get; set; }
+        public Guid RegionId { get; set; }
         public int Points { get; set; }
         public int Position { get; set; }
         public int Producers { get; set; }
@@ -42,12 +42,12 @@ namespace Sheaft.Application.Region.Commands
 
         public async Task<Result> Handle(UpdateRegionStatsCommand request, CancellationToken token)
         {
-            var region = await _context.Regions.SingleOrDefaultAsync(c => c.Id == request.Id, token);
+            var region = await _context.Regions.SingleOrDefaultAsync(c => c.Id == request.RegionId, token);
 
             region.SetPoints(request.Points);
             region.SetPosition(request.Position);
             var consumersCount = await _context.Users.OfType<Domain.Consumer>()
-                .CountAsync(u => !u.RemovedOn.HasValue && u.Address.Department.Region.Id == request.Id, token);
+                .CountAsync(u => !u.RemovedOn.HasValue && u.Address.Department.Region.Id == request.RegionId, token);
 
             region.SetConsumersCount(consumersCount);
 

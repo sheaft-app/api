@@ -22,36 +22,27 @@ namespace Sheaft.Application.User.Commands
         {
         }
 
-        public Guid Id { get; set; }
+        public Guid UserId { get; set; }
     }
 
     public class GenerateUserCodeCommandHandler : CommandsHandler,
         IRequestHandler<GenerateUserCodeCommand, Result<string>>
     {
-        private readonly IBlobService _blobService;
         private readonly IIdentifierService _identifierService;
-        private readonly ScoringOptions _scoringOptions;
-        private readonly RoleOptions _roleOptions;
 
         public GenerateUserCodeCommandHandler(
-            IOptionsSnapshot<ScoringOptions> scoringOptions,
             ISheaftMediatr mediatr,
             IAppDbContext context,
-            IBlobService blobService,
             IIdentifierService identifierService,
-            ILogger<GenerateUserCodeCommandHandler> logger,
-            IOptionsSnapshot<RoleOptions> roleOptions)
+            ILogger<GenerateUserCodeCommandHandler> logger)
             : base(mediatr, context, logger)
         {
-            _roleOptions = roleOptions.Value;
-            _scoringOptions = scoringOptions.Value;
-            _blobService = blobService;
             _identifierService = identifierService;
         }
 
         public async Task<Result<string>> Handle(GenerateUserCodeCommand request, CancellationToken token)
         {
-            var entity = await _context.GetByIdAsync<Domain.User>(request.Id, token);
+            var entity = await _context.GetByIdAsync<Domain.User>(request.UserId, token);
 
             if (!string.IsNullOrWhiteSpace(entity.SponsorshipCode))
                 return Success(entity.SponsorshipCode);

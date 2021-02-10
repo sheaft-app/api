@@ -25,7 +25,7 @@ namespace Sheaft.Application.Product.Commands
         {
         }
 
-        public Guid Id { get; set; }
+        public Guid ProductId { get; set; }
         public string Reference { get; set; }
         public string Name { get; set; }
         public string Picture { get; set; }
@@ -47,18 +47,15 @@ namespace Sheaft.Application.Product.Commands
     public class UpdateProductCommandHandler : CommandsHandler,
         IRequestHandler<UpdateProductCommand, Result>
     {
-        private readonly IBlobService _blobService;
         private readonly IIdentifierService _identifierService;
 
         public UpdateProductCommandHandler(
             ISheaftMediatr mediatr,
             IAppDbContext context,
-            IBlobService blobService,
             IIdentifierService identifierService,
             ILogger<UpdateProductCommandHandler> logger)
             : base(mediatr, context, logger)
         {
-            _blobService = blobService;
             _identifierService = identifierService;
         }
 
@@ -66,13 +63,13 @@ namespace Sheaft.Application.Product.Commands
         {
             using (var transaction = await _context.BeginTransactionAsync(token))
             {
-                var entity = await _context.GetByIdAsync<Domain.Product>(request.Id, token);
+                var entity = await _context.GetByIdAsync<Domain.Product>(request.ProductId, token);
 
                 var reference = request.Reference;
                 if (!string.IsNullOrWhiteSpace(reference) && reference != entity.Reference)
                 {
                     var existingEntity = await _context.FindSingleAsync<Domain.Product>(
-                        p => p.Reference == reference && p.Producer.Id == request.RequestUser.Id, token);
+                        p => p.Reference == reference && p.Producer.Id == entity.Producer.Id, token);
                     if (existingEntity != null)
                         return Failure(MessageKind.CreateProduct_Reference_AlreadyExists, reference);
                 }
@@ -80,7 +77,7 @@ namespace Sheaft.Application.Product.Commands
                 if (string.IsNullOrWhiteSpace(reference))
                 {
                     var resultIdentifier =
-                        await _identifierService.GetNextProductReferenceAsync(request.RequestUser.Id, token);
+                        await _identifierService.GetNextProductReferenceAsync(entity.Producer.Id, token);
                     if (!resultIdentifier.Succeeded)
                         return Failure(resultIdentifier.Exception);
 
@@ -123,7 +120,7 @@ namespace Sheaft.Application.Product.Commands
 
                 await transaction.CommitAsync(token);
 
-                _mediatr.Post(new UpdateProducerTagsCommand(request.RequestUser) {ProducerId = request.RequestUser.Id});
+                _mediatr.Post(new UpdateProducerTagsCommand(request.RequestUser) {ProducerId = entity.Producer.Id});
                 return Success();
             }
         }

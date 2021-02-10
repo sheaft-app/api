@@ -37,18 +37,15 @@ namespace Sheaft.Application.Legal.Commands
     public class CreateBusinessLegalCommandHandler : CommandsHandler,
         IRequestHandler<CreateBusinessLegalCommand, Result<Guid>>
     {
-        private readonly PspOptions _pspOptions;
         private readonly IPspService _pspService;
 
         public CreateBusinessLegalCommandHandler(
             ISheaftMediatr mediatr,
             IAppDbContext context,
             IPspService pspService,
-            IOptionsSnapshot<PspOptions> pspOptions,
             ILogger<CreateBusinessLegalCommandHandler> logger)
             : base(mediatr, context, logger)
         {
-            _pspOptions = pspOptions.Value;
             _pspService = pspService;
         }
 

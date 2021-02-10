@@ -21,28 +21,24 @@ namespace Sheaft.Application.PurchaseOrder.Commands
         {
         }
 
-        public Guid Id { get; set; }
+        public Guid PurchaseOrderId { get; set; }
         public bool SkipNotification { get; set; }
     }
 
     public class CompletePurchaseOrderCommandHandler : CommandsHandler,
         IRequestHandler<CompletePurchaseOrderCommand, Result>
     {
-        private readonly ICapingDeliveriesService _capingDeliveriesService;
-
         public CompletePurchaseOrderCommandHandler(
             IAppDbContext context,
             ISheaftMediatr mediatr,
-            ICapingDeliveriesService capingDeliveriesService,
             ILogger<CompletePurchaseOrderCommandHandler> logger)
             : base(mediatr, context, logger)
         {
-            _capingDeliveriesService = capingDeliveriesService;
         }
 
         public async Task<Result> Handle(CompletePurchaseOrderCommand request, CancellationToken token)
         {
-            var purchaseOrder = await _context.GetByIdAsync<Domain.PurchaseOrder>(request.Id, token);
+            var purchaseOrder = await _context.GetByIdAsync<Domain.PurchaseOrder>(request.PurchaseOrderId, token);
             purchaseOrder.Complete(request.SkipNotification);
 
             await _context.SaveChangesAsync(token);

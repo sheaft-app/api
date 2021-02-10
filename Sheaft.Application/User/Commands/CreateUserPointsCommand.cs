@@ -32,9 +32,7 @@ namespace Sheaft.Application.User.Commands
     public class CreateUserPointsCommandHandler : CommandsHandler,
         IRequestHandler<CreateUserPointsCommand, Result>
     {
-        private readonly IBlobService _blobService;
         private readonly ScoringOptions _scoringOptions;
-        private readonly RoleOptions _roleOptions;
 
         public CreateUserPointsCommandHandler(
             IOptionsSnapshot<ScoringOptions> scoringOptions,
@@ -45,9 +43,7 @@ namespace Sheaft.Application.User.Commands
             IOptionsSnapshot<RoleOptions> roleOptions)
             : base(mediatr, context, logger)
         {
-            _roleOptions = roleOptions.Value;
             _scoringOptions = scoringOptions.Value;
-            _blobService = blobService;
         }
 
         public async Task<Result> Handle(CreateUserPointsCommand request, CancellationToken token)

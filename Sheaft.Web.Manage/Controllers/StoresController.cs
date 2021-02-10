@@ -24,17 +24,14 @@ namespace Sheaft.Web.Manage.Controllers
 {
     public class StoresController : ManageController
     {
-        private readonly ILogger<StoresController> _logger;
-
         public StoresController(
             IAppDbContext context,
             IMapper mapper,
             ISheaftMediatr mediatr,
             IConfigurationProvider configurationProvider,
-            IOptionsSnapshot<RoleOptions> roleOptions,
-            ILogger<StoresController> logger) : base(context, mapper, roleOptions, mediatr, configurationProvider)
+            IOptionsSnapshot<RoleOptions> roleOptions)
+            : base(context, mapper, roleOptions, mediatr, configurationProvider)
         {
-            _logger = logger;
         }
 
         [HttpGet]
@@ -92,11 +89,11 @@ namespace Sheaft.Web.Manage.Controllers
                     model.Picture = Convert.ToBase64String(ms.ToArray());
                 }
             }
-                        
+
             var store = await _context.Users.OfType<Store>().SingleOrDefaultAsync(c => c.Id == model.Id, token);
             var result = await _mediatr.Process(new UpdateStoreCommand(await GetRequestUser(token))
             {
-                Id = model.Id,
+                StoreId = model.Id,
                 Address = _mapper.Map<FullAddressInput>(model.Address),
                 OpenForNewBusiness = model.OpenForNewBusiness,
                 Description = model.Description,
@@ -108,7 +105,8 @@ namespace Sheaft.Web.Manage.Controllers
                 Phone = model.Phone,
                 Tags = model.Tags,
                 Picture = model.Picture,
-                OpeningHours = store.OpeningHours?.GroupBy(oh => new { oh.From, oh.To }).Select(c => new TimeSlotGroupInput { From = c.Key.From, To = c.Key.To, Days = c.Select(o => o.Day) })
+                OpeningHours = store.OpeningHours?.GroupBy(oh => new {oh.From, oh.To}).Select(c =>
+                    new TimeSlotGroupInput {From = c.Key.From, To = c.Key.To, Days = c.Select(o => o.Day)})
             }, token);
 
             if (!result.Succeeded)
@@ -120,7 +118,7 @@ namespace Sheaft.Web.Manage.Controllers
                 return View(model);
             }
 
-            return RedirectToAction("Edit", new { model.Id });
+            return RedirectToAction("Edit", new {model.Id});
         }
 
         [HttpPost]
@@ -129,12 +127,12 @@ namespace Sheaft.Web.Manage.Controllers
         {
             var result = await _mediatr.Process(new RemoveUserCommand(await GetRequestUser(token))
             {
-                Id = id
+                UserId = id
             }, token);
 
             if (!result.Succeeded)
                 throw result.Exception;
-            
+
             return RedirectToAction("Index");
         }
 
@@ -144,7 +142,7 @@ namespace Sheaft.Web.Manage.Controllers
         {
             var result = await _mediatr.Process(new RestoreUserCommand(await GetRequestUser(token))
             {
-                Id = id
+                UserId = id
             }, token);
 
             if (!result.Succeeded)

@@ -15,17 +15,14 @@ namespace Sheaft.Web.Manage.Controllers
 {
     public class DashboardController : ManageController
     {
-        private readonly ILogger<DashboardController> _logger;
-
         public DashboardController(
             IAppDbContext context,
             IMapper mapper,
             ISheaftMediatr mediatr,
             IConfigurationProvider configurationProvider,
-            IOptionsSnapshot<RoleOptions> roleOptions,
-            ILogger<DashboardController> logger) : base(context, mapper, roleOptions, mediatr, configurationProvider)
+            IOptionsSnapshot<RoleOptions> roleOptions)
+            : base(context, mapper, roleOptions, mediatr, configurationProvider)
         {
-            _logger = logger;
         }
 
         public async Task<IActionResult> Index(CancellationToken token)
@@ -42,25 +39,48 @@ namespace Sheaft.Web.Manage.Controllers
             if (requestUser.IsImpersonating)
             {
                 ViewBag.Products = await _context.Products.CountAsync(c => c.Producer.Id == requestUser.Id, token);
-                ViewBag.Stores = await _context.Users.OfType<Store>().CountAsync(c => !c.RemovedOn.HasValue && c.Id == requestUser.Id, token);
-                ViewBag.Producers = await _context.Users.OfType<Producer>().CountAsync(c => !c.RemovedOn.HasValue && c.Id == requestUser.Id, token);
-                ViewBag.Agreements = await _context.Agreements.CountAsync(c => !c.RemovedOn.HasValue && (c.Delivery.Producer.Id == requestUser.Id || c.Store.Id == requestUser.Id), token);
-                ViewBag.DeliveryModes = await _context.DeliveryModes.CountAsync(c => !c.RemovedOn.HasValue && c.Producer.Id == requestUser.Id, token);
-                ViewBag.Jobs = await _context.Jobs.CountAsync(c => !c.RemovedOn.HasValue && c.User.Id == requestUser.Id, token);
-                ViewBag.Returnables = await _context.Returnables.CountAsync(c => !c.RemovedOn.HasValue && c.Producer.Id == requestUser.Id, token);
-                ViewBag.PurchaseOrders = await _context.PurchaseOrders.CountAsync(c => !c.RemovedOn.HasValue && (c.Vendor.Id == requestUser.Id || c.Sender.Id == requestUser.Id), token);
-                ViewBag.Orders = await _context.Orders.CountAsync(c => !c.RemovedOn.HasValue && c.User.Id == requestUser.Id, token);
-                ViewBag.Payins = await _context.Payins.CountAsync(c => !c.RemovedOn.HasValue && c.Author.Id == requestUser.Id, token);
-                ViewBag.Transfers = await _context.Transfers.CountAsync(c => !c.RemovedOn.HasValue && c.Author.Id == requestUser.Id, token);
-                ViewBag.Payouts = await _context.Payouts.CountAsync(c => !c.RemovedOn.HasValue && c.Author.Id == requestUser.Id, token);
-                ViewBag.Donations = await _context.Donations.CountAsync(c => !c.RemovedOn.HasValue && c.Author.Id == requestUser.Id, token);
-                ViewBag.Withholdings = await _context.Withholdings.CountAsync(c => !c.RemovedOn.HasValue && c.Author.Id == requestUser.Id, token);
+                ViewBag.Stores = await _context.Users.OfType<Store>()
+                    .CountAsync(c => !c.RemovedOn.HasValue && c.Id == requestUser.Id, token);
+                ViewBag.Producers = await _context.Users.OfType<Producer>()
+                    .CountAsync(c => !c.RemovedOn.HasValue && c.Id == requestUser.Id, token);
+                ViewBag.Agreements = await _context.Agreements.CountAsync(
+                    c => !c.RemovedOn.HasValue &&
+                         (c.Delivery.Producer.Id == requestUser.Id || c.Store.Id == requestUser.Id), token);
+                ViewBag.DeliveryModes =
+                    await _context.DeliveryModes.CountAsync(
+                        c => !c.RemovedOn.HasValue && c.Producer.Id == requestUser.Id, token);
+                ViewBag.Jobs =
+                    await _context.Jobs.CountAsync(c => !c.RemovedOn.HasValue && c.User.Id == requestUser.Id, token);
+                ViewBag.Returnables =
+                    await _context.Returnables.CountAsync(c => !c.RemovedOn.HasValue && c.Producer.Id == requestUser.Id,
+                        token);
+                ViewBag.PurchaseOrders = await _context.PurchaseOrders.CountAsync(
+                    c => !c.RemovedOn.HasValue && (c.Vendor.Id == requestUser.Id || c.Sender.Id == requestUser.Id),
+                    token);
+                ViewBag.Orders =
+                    await _context.Orders.CountAsync(c => !c.RemovedOn.HasValue && c.User.Id == requestUser.Id, token);
+                ViewBag.Payins =
+                    await _context.Payins.CountAsync(c => !c.RemovedOn.HasValue && c.Author.Id == requestUser.Id,
+                        token);
+                ViewBag.Transfers =
+                    await _context.Transfers.CountAsync(c => !c.RemovedOn.HasValue && c.Author.Id == requestUser.Id,
+                        token);
+                ViewBag.Payouts =
+                    await _context.Payouts.CountAsync(c => !c.RemovedOn.HasValue && c.Author.Id == requestUser.Id,
+                        token);
+                ViewBag.Donations =
+                    await _context.Donations.CountAsync(c => !c.RemovedOn.HasValue && c.Author.Id == requestUser.Id,
+                        token);
+                ViewBag.Withholdings =
+                    await _context.Withholdings.CountAsync(c => !c.RemovedOn.HasValue && c.Author.Id == requestUser.Id,
+                        token);
             }
             else
             {
                 ViewBag.Products = await _context.Products.CountAsync(token);
                 ViewBag.Stores = await _context.Users.OfType<Store>().CountAsync(c => !c.RemovedOn.HasValue, token);
-                ViewBag.Producers = await _context.Users.OfType<Producer>().CountAsync(c => !c.RemovedOn.HasValue, token);
+                ViewBag.Producers =
+                    await _context.Users.OfType<Producer>().CountAsync(c => !c.RemovedOn.HasValue, token);
                 ViewBag.Agreements = await _context.Agreements.CountAsync(c => !c.RemovedOn.HasValue, token);
                 ViewBag.DeliveryModes = await _context.DeliveryModes.CountAsync(c => !c.RemovedOn.HasValue, token);
                 ViewBag.Jobs = await _context.Jobs.CountAsync(c => !c.RemovedOn.HasValue, token);

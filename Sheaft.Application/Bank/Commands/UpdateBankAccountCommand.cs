@@ -21,7 +21,7 @@ namespace Sheaft.Application.Bank.Commands
         {
         }
 
-        public Guid Id { get; set; }
+        public Guid BankAccountId { get; set; }
         public string Name { get; set; }
         public string Owner { get; set; }
         public string BIC { get; set; }
@@ -46,7 +46,7 @@ namespace Sheaft.Application.Bank.Commands
 
         public async Task<Result> Handle(UpdateBankAccountCommand request, CancellationToken token)
         {
-            var bankAccount = await _context.GetByIdAsync<BankAccount>(request.Id, token);
+            var bankAccount = await _context.GetByIdAsync<BankAccount>(request.BankAccountId, token);
 
             var address = request.Address != null
                 ? new BankAddress(request.Address.Line1, request.Address.Line2, request.Address.Zipcode,

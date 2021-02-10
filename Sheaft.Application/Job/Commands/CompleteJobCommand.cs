@@ -20,7 +20,7 @@ namespace Sheaft.Application.Job.Commands
         {
         }
 
-        public Guid Id { get; set; }
+        public Guid JobId { get; set; }
         public string FileUrl { get; set; }
     }
 
@@ -38,7 +38,7 @@ namespace Sheaft.Application.Job.Commands
         public async Task<Result> Handle(CompleteJobCommand request,
             CancellationToken token)
         {
-            var entity = await _context.GetByIdAsync<Domain.Job>(request.Id, token);
+            var entity = await _context.GetByIdAsync<Domain.Job>(request.JobId, token);
             entity.SetDownloadUrl(request.FileUrl);
             entity.CompleteJob();
 

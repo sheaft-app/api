@@ -22,7 +22,7 @@ namespace Sheaft.Application.DeliveryMode.Commands
         {
         }
 
-        public Guid Id { get; set; }
+        public Guid DeliveryModeId { get; set; }
     }
 
     public class RestoreDeliveryModeCommandHandler : CommandsHandler,
@@ -39,12 +39,12 @@ namespace Sheaft.Application.DeliveryMode.Commands
         public async Task<Result> Handle(RestoreDeliveryModeCommand request, CancellationToken token)
         {
             var entity =
-                await _context.DeliveryModes.SingleOrDefaultAsync(a => a.Id == request.Id && a.RemovedOn.HasValue,
+                await _context.DeliveryModes.SingleOrDefaultAsync(a => a.Id == request.DeliveryModeId && a.RemovedOn.HasValue,
                     token);
 
             _context.Restore(entity);
             entity.Producer.CanDirectSell = await _context.DeliveryModes.AnyAsync(
-                c => !c.RemovedOn.HasValue && c.Producer.Id == request.RequestUser.Id &&
+                c => !c.RemovedOn.HasValue && c.Producer.Id == entity.Producer.Id &&
                      (c.Kind == DeliveryKind.Collective || c.Kind == DeliveryKind.Farm ||
                       c.Kind == DeliveryKind.Market), token);
 

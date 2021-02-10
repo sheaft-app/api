@@ -21,7 +21,7 @@ namespace Sheaft.Application.Level.Commands
         {
         }
 
-        public Guid Id { get; set; }
+        public Guid LevelId { get; set; }
     }
 
     public class RestoreLevelCommandHandler : CommandsHandler,
@@ -37,7 +37,7 @@ namespace Sheaft.Application.Level.Commands
 
         public async Task<Result> Handle(RestoreLevelCommand request, CancellationToken token)
         {
-            var entity = await _context.Levels.SingleOrDefaultAsync(r => r.Id == request.Id, token);
+            var entity = await _context.Levels.SingleOrDefaultAsync(r => r.Id == request.LevelId, token);
             _context.Restore(entity);
 
             await _context.SaveChangesAsync(token);

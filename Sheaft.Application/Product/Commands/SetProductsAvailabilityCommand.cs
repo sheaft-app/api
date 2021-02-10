@@ -21,33 +21,29 @@ namespace Sheaft.Application.Product.Commands
         {
         }
 
-        public IEnumerable<Guid> Ids { get; set; }
+        public IEnumerable<Guid> ProductIds { get; set; }
         public bool Available { get; set; }
     }
 
     public class SetProductsAvailabilityCommandHandler : CommandsHandler,
         IRequestHandler<SetProductsAvailabilityCommand, Result>
     {
-        private readonly IBlobService _blobService;
-
         public SetProductsAvailabilityCommandHandler(
             ISheaftMediatr mediatr,
             IAppDbContext context,
-            IBlobService blobService,
             ILogger<SetProductsAvailabilityCommandHandler> logger)
             : base(mediatr, context, logger)
         {
-            _blobService = blobService;
         }
 
         public async Task<Result> Handle(SetProductsAvailabilityCommand request, CancellationToken token)
         {
             using (var transaction = await _context.BeginTransactionAsync(token))
             {
-                foreach (var id in request.Ids)
+                foreach (var id in request.ProductIds)
                 {
                     var result = await _mediatr.Process(
-                        new SetProductAvailabilityCommand(request.RequestUser) {Id = id, Available = request.Available},
+                        new SetProductAvailabilityCommand(request.RequestUser) {ProductId = id, Available = request.Available},
                         token);
                     if (!result.Succeeded)
                         return Failure(result.Exception);

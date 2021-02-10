@@ -22,17 +22,14 @@ namespace Sheaft.Web.Manage.Controllers
 {
     public class DeclarationsController : ManageController
     {
-        private readonly ILogger<DeclarationsController> _logger;
-
         public DeclarationsController(
             IAppDbContext context,
             IMapper mapper,
             ISheaftMediatr mediatr,
             IOptionsSnapshot<RoleOptions> roleOptions,
-            IConfigurationProvider configurationProvider,
-            ILogger<DeclarationsController> logger) : base(context, mapper, roleOptions, mediatr, configurationProvider)
+            IConfigurationProvider configurationProvider)
+            : base(context, mapper, roleOptions, mediatr, configurationProvider)
         {
-            _logger = logger;
         }
 
         [HttpGet]
@@ -71,7 +68,7 @@ namespace Sheaft.Web.Manage.Controllers
             if (!result.Succeeded)
                 throw result.Exception;
 
-            return RedirectToAction("Edit", new { id = result.Data });
+            return RedirectToAction("Edit", new {id = result.Data});
         }
 
         [HttpGet]
@@ -97,7 +94,6 @@ namespace Sheaft.Web.Manage.Controllers
                 FirstName = model.FirstName,
                 LastName = model.LastName,
                 Nationality = model.Nationality
-
             }, token);
 
             if (!result.Succeeded)
@@ -109,7 +105,7 @@ namespace Sheaft.Web.Manage.Controllers
                 return View(model);
             }
 
-            return RedirectToAction("Edit", new { id = declarationId });
+            return RedirectToAction("Edit", new {id = declarationId});
         }
 
         [HttpGet]
@@ -138,7 +134,7 @@ namespace Sheaft.Web.Manage.Controllers
         {
             var result = await _mediatr.Process(new UpdateUboCommand(await GetRequestUser(token))
             {
-                Id = model.Id,
+                UboId = model.Id,
                 Address = _mapper.Map<AddressInput>(model.Address),
                 BirthDate = model.BirthDate,
                 BirthPlace = _mapper.Map<BirthAddressInput>(model.BirthPlace),
@@ -156,7 +152,7 @@ namespace Sheaft.Web.Manage.Controllers
                 return View(model);
             }
 
-            return RedirectToAction("Edit", new { id = declarationId });
+            return RedirectToAction("Edit", new {id = declarationId});
         }
 
         [HttpPost]
@@ -171,7 +167,7 @@ namespace Sheaft.Web.Manage.Controllers
             if (!result.Succeeded)
                 throw result.Exception;
 
-            return RedirectToAction("Edit", new { id = declarationId });
+            return RedirectToAction("Edit", new {id = declarationId});
         }
 
         [HttpPost]
@@ -186,7 +182,7 @@ namespace Sheaft.Web.Manage.Controllers
             if (!result.Succeeded)
                 throw result.Exception;
 
-            return RedirectToAction("Edit", new { id = declarationId });
+            return RedirectToAction("Edit", new {id = declarationId});
         }
 
         [HttpPost]
@@ -201,7 +197,7 @@ namespace Sheaft.Web.Manage.Controllers
             if (!result.Succeeded)
                 throw result.Exception;
 
-            return RedirectToAction("Edit", new { id = declarationId });
+            return RedirectToAction("Edit", new {id = declarationId});
         }
 
         [HttpPost]
@@ -210,13 +206,13 @@ namespace Sheaft.Web.Manage.Controllers
         {
             var result = await _mediatr.Process(new DeleteUboCommand(await GetRequestUser(token))
             {
-                Id = uboId
+                UboId = uboId
             }, token);
 
             if (!result.Succeeded)
                 throw result.Exception;
 
-            return RedirectToAction("Edit", new { id = declarationId });
+            return RedirectToAction("Edit", new {id = declarationId});
         }
     }
 }

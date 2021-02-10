@@ -28,16 +28,12 @@ namespace Sheaft.Application.Document.Commands
     public class LockDocumentsCommandHandler : CommandsHandler,
         IRequestHandler<LockDocumentsCommand, Result>
     {
-        private readonly IPspService _pspService;
-
         public LockDocumentsCommandHandler(
             IAppDbContext context,
-            IPspService pspService,
             ISheaftMediatr mediatr,
             ILogger<LockDocumentsCommandHandler> logger)
             : base(mediatr, context, logger)
         {
-            _pspService = pspService;
         }
 
         public async Task<Result> Handle(LockDocumentsCommand request, CancellationToken token)

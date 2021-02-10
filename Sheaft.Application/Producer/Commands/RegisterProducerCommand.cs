@@ -32,6 +32,7 @@ namespace Sheaft.Application.Producer.Commands
         {
         }
 
+        public Guid ProducerId { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public string Name { get; set; }
@@ -51,23 +52,20 @@ namespace Sheaft.Application.Producer.Commands
         IRequestHandler<RegisterProducerCommand, Result<Guid>>
     {
         private readonly RoleOptions _roleOptions;
-        private readonly IBlobService _blobService;
 
         public RegisterProducerCommandHandler(
             IAppDbContext context,
             ISheaftMediatr mediatr,
-            IBlobService blobService,
             ILogger<RegisterProducerCommandHandler> logger,
             IOptionsSnapshot<RoleOptions> roleOptions)
             : base(mediatr, context, logger)
         {
             _roleOptions = roleOptions.Value;
-            _blobService = blobService;
         }
 
         public async Task<Result<Guid>> Handle(RegisterProducerCommand request, CancellationToken token)
         {
-            var producer = await _context.FindByIdAsync<Domain.Producer>(request.RequestUser.Id, token);
+            var producer = await _context.FindByIdAsync<Domain.Producer>(request.ProducerId, token);
             if (producer != null)
                 return Failure<Guid>(MessageKind.Register_User_AlreadyExists);
 
@@ -80,7 +78,7 @@ namespace Sheaft.Application.Producer.Commands
                     request.Address.Country, department, request.Address.Longitude, request.Address.Latitude)
                 : null;
 
-            producer = new Domain.Producer(request.RequestUser.Id, request.Name, request.FirstName, request.LastName,
+            producer = new Domain.Producer(request.ProducerId, request.Name, request.FirstName, request.LastName,
                 request.Email,
                 address, request.OpenForNewBusiness, request.Phone, request.Description);
             producer.SetNotSubjectToVat(request.NotSubjectToVat);

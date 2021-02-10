@@ -18,7 +18,8 @@ namespace Sheaft.Application.Common.Mappings
                 .ForMember(m => m.Pages, opt => opt.MapFrom(e => e.Pages));
 
             CreateMap<CreateDocumentInput, CreateDocumentCommand>();
-            CreateMap<IdInput, DeleteDocumentCommand>();
+            CreateMap<IdInput, DeleteDocumentCommand>()
+                    .ForMember(c => c.DocumentId, opt => opt.MapFrom(r => r.Id));
         }
     }
 }

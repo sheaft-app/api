@@ -30,18 +30,15 @@ namespace Sheaft.Application.Payin.Commands
         IRequestHandler<CreateWebPayinCommand, Result<Guid>>
     {
         private readonly IPspService _pspService;
-        private readonly RoutineOptions _routineOptions;
 
         public CreateWebPayinCommandHandler(
             IAppDbContext context,
             IPspService pspService,
             ISheaftMediatr mediatr,
-            IOptionsSnapshot<RoutineOptions> routineOptions,
             ILogger<CreateWebPayinCommandHandler> logger)
             : base(mediatr, context, logger)
         {
             _pspService = pspService;
-            _routineOptions = routineOptions.Value;
         }
 
         public async Task<Result<Guid>> Handle(CreateWebPayinCommand request, CancellationToken token)
@@ -50,7 +47,7 @@ namespace Sheaft.Application.Payin.Commands
             if (order.Status == OrderStatus.Validated)
                 return Failure<Guid>(MessageKind.Payin_CannotCreate_Order_Already_Validated);
 
-            var wallet = await _context.GetSingleAsync<Domain.Wallet>(c => c.User.Id == request.RequestUser.Id, token);
+            var wallet = await _context.GetSingleAsync<Domain.Wallet>(c => c.User.Id == order.User.Id, token);
 
             if (order.TotalOnSalePrice < 1)
                 return Failure<Guid>(MessageKind.Order_Total_CannotBe_LowerThan, 1);
@@ -62,7 +59,7 @@ namespace Sheaft.Application.Payin.Commands
 
             order.SetPayin(webPayin);
 
-            var legal = await _context.GetSingleAsync<Domain.Legal>(c => c.Owner.Id == request.RequestUser.Id, token);
+            var legal = await _context.GetSingleAsync<Domain.Legal>(c => c.Owner.Id == order.User.Id, token);
             var result = await _pspService.CreateWebPayinAsync(webPayin, legal.Owner, token);
             if (!result.Succeeded)
                 return Failure<Guid>(result.Exception);

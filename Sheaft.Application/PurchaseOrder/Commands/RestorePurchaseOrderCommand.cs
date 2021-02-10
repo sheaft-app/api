@@ -21,28 +21,24 @@ namespace Sheaft.Application.PurchaseOrder.Commands
         {
         }
 
-        public Guid Id { get; set; }
+        public Guid PurchaseOrderId { get; set; }
     }
 
     public class RestorePurchaseOrderCommandHandler : CommandsHandler,
         IRequestHandler<RestorePurchaseOrderCommand, Result>
     {
-        private readonly ICapingDeliveriesService _capingDeliveriesService;
-
         public RestorePurchaseOrderCommandHandler(
             IAppDbContext context,
             ISheaftMediatr mediatr,
-            ICapingDeliveriesService capingDeliveriesService,
             ILogger<RestorePurchaseOrderCommandHandler> logger)
             : base(mediatr, context, logger)
         {
-            _capingDeliveriesService = capingDeliveriesService;
         }
 
         public async Task<Result> Handle(RestorePurchaseOrderCommand request, CancellationToken token)
         {
             var entity =
-                await _context.PurchaseOrders.SingleOrDefaultAsync(a => a.Id == request.Id && a.RemovedOn.HasValue,
+                await _context.PurchaseOrders.SingleOrDefaultAsync(a => a.Id == request.PurchaseOrderId && a.RemovedOn.HasValue,
                     token);
 
             _context.Restore(entity);

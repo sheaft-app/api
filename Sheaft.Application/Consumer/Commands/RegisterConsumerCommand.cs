@@ -27,6 +27,7 @@ namespace Sheaft.Application.Consumer.Commands
         {
         }
 
+        public Guid ConsumerId { get; set; }
         public string SponsoringCode { get; set; }
         public string Email { get; set; }
         public string Phone { get; set; }
@@ -56,11 +57,11 @@ namespace Sheaft.Application.Consumer.Commands
             {
                 var consumer =
                     await _context.FindSingleAsync<Domain.Consumer>(
-                        r => r.Id == request.RequestUser.Id || r.Email == request.Email, token);
+                        r => r.Id == request.ConsumerId || r.Email == request.Email, token);
                 if (consumer != null)
                     return Failure<Guid>(MessageKind.Register_User_AlreadyExists);
 
-                consumer = new Domain.Consumer(request.RequestUser.Id, request.Email, request.FirstName, request.LastName,
+                consumer = new Domain.Consumer(request.ConsumerId, request.Email, request.FirstName, request.LastName,
                     request.Phone);
                 await _context.AddAsync(consumer, token);
                 await _context.SaveChangesAsync(token);

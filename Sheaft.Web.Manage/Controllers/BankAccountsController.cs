@@ -20,17 +20,14 @@ namespace Sheaft.Web.Manage.Controllers
 {
     public class BankAccountsController : ManageController
     {
-        private readonly ILogger<BankAccountsController> _logger;
-
         public BankAccountsController(
             IAppDbContext context,
             IMapper mapper,
             ISheaftMediatr mediatr,
             IOptionsSnapshot<RoleOptions> roleOptions,
-            IConfigurationProvider configurationProvider,
-            ILogger<BankAccountsController> logger) : base(context, mapper, roleOptions, mediatr, configurationProvider)
+            IConfigurationProvider configurationProvider)
+            : base(context, mapper, roleOptions, mediatr, configurationProvider)
         {
-            _logger = logger;
         }
 
         [HttpGet]
@@ -73,7 +70,7 @@ namespace Sheaft.Web.Manage.Controllers
                 return View(model);
             }
 
-            return RedirectToAction("Edit", new { id = result.Data });
+            return RedirectToAction("Edit", new {id = result.Data});
         }
 
         [HttpGet]
@@ -114,7 +111,7 @@ namespace Sheaft.Web.Manage.Controllers
         {
             var result = await _mediatr.Process(new UpdateBankAccountCommand(await GetRequestUser(token))
             {
-                Id = model.Id,
+                BankAccountId = model.Id,
                 Address = _mapper.Map<AddressInput>(model.Address),
                 BIC = model.BIC,
                 IBAN = model.IBAN,
@@ -129,7 +126,7 @@ namespace Sheaft.Web.Manage.Controllers
                 return View(model);
             }
 
-            return RedirectToAction("Edit", new { id = model.Id });
+            return RedirectToAction("Edit", new {id = model.Id});
         }
     }
 }

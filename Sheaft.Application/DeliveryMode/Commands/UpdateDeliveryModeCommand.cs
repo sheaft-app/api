@@ -25,7 +25,7 @@ namespace Sheaft.Application.DeliveryMode.Commands
         {
         }
 
-        public Guid Id { get; set; }
+        public Guid DeliveryModeId { get; set; }
         public string Name { get; set; }
         public DeliveryKind Kind { get; set; }
         public string Description { get; set; }
@@ -51,8 +51,7 @@ namespace Sheaft.Application.DeliveryMode.Commands
 
         public async Task<Result> Handle(UpdateDeliveryModeCommand request, CancellationToken token)
         {
-            var producer = await _context.GetByIdAsync<Domain.Producer>(request.RequestUser.Id, token);
-            var entity = await _context.GetByIdAsync<Domain.DeliveryMode>(request.Id, token);
+            var entity = await _context.GetByIdAsync<Domain.DeliveryMode>(request.DeliveryModeId, token);
 
             entity.SetName(request.Name);
             entity.SetAvailability(request.Available);
@@ -80,11 +79,11 @@ namespace Sheaft.Application.DeliveryMode.Commands
 
             if (request.Kind == DeliveryKind.Collective || request.Kind == DeliveryKind.Farm ||
                 request.Kind == DeliveryKind.Market)
-                producer.CanDirectSell = true;
+                entity.Producer.CanDirectSell = true;
             else
             {
-                producer.CanDirectSell = await _context.DeliveryModes.AnyAsync(
-                    c => !c.RemovedOn.HasValue && c.Producer.Id == request.RequestUser.Id &&
+                entity.Producer.CanDirectSell = await _context.DeliveryModes.AnyAsync(
+                    c => !c.RemovedOn.HasValue && c.Producer.Id == entity.Producer.Id &&
                          (c.Kind == DeliveryKind.Collective || c.Kind == DeliveryKind.Farm ||
                           c.Kind == DeliveryKind.Market), token);
             }

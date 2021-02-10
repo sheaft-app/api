@@ -30,21 +30,15 @@ namespace Sheaft.Application.Order.Commands
     public class CheckOrderCommandHandler : CommandsHandler,
         IRequestHandler<CheckOrderCommand, Result>
     {
-        private readonly ICapingDeliveriesService _capingDeliveriesService;
-        private readonly PspOptions _pspOptions;
         private readonly RoutineOptions _routineOptions;
 
         public CheckOrderCommandHandler(
             IAppDbContext context,
             ISheaftMediatr mediatr,
-            ICapingDeliveriesService capingDeliveriesService,
-            IOptionsSnapshot<PspOptions> pspOptions,
             IOptionsSnapshot<RoutineOptions> routineOptions,
             ILogger<CheckOrderCommandHandler> logger)
             : base(mediatr, context, logger)
         {
-            _capingDeliveriesService = capingDeliveriesService;
-            _pspOptions = pspOptions.Value;
             _routineOptions = routineOptions.Value;
         }
 

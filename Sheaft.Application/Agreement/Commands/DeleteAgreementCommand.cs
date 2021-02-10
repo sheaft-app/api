@@ -20,7 +20,7 @@ namespace Sheaft.Application.Agreement.Commands
         {
         }
 
-        public Guid Id { get; set; }
+        public Guid AgreementId { get; set; }
     }
 
     public class DeleteAgreementCommandsHandler : CommandsHandler,
@@ -36,7 +36,7 @@ namespace Sheaft.Application.Agreement.Commands
 
         public async Task<Result> Handle(DeleteAgreementCommand request, CancellationToken token)
         {
-            var entity = await _context.GetByIdAsync<Domain.Agreement>(request.Id, token);
+            var entity = await _context.GetByIdAsync<Domain.Agreement>(request.AgreementId, token);
 
             _context.Remove(entity);
             await _context.SaveChangesAsync(token);

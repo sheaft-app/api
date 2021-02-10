@@ -29,22 +29,12 @@ namespace Sheaft.Application.Order.Commands
     public class ExpireOrderCommandHandler : CommandsHandler,
         IRequestHandler<ExpireOrderCommand, Result>
     {
-        private readonly ICapingDeliveriesService _capingDeliveriesService;
-        private readonly PspOptions _pspOptions;
-        private readonly RoutineOptions _routineOptions;
-
         public ExpireOrderCommandHandler(
             IAppDbContext context,
             ISheaftMediatr mediatr,
-            ICapingDeliveriesService capingDeliveriesService,
-            IOptionsSnapshot<PspOptions> pspOptions,
-            IOptionsSnapshot<RoutineOptions> routineOptions,
             ILogger<ExpireOrderCommandHandler> logger)
             : base(mediatr, context, logger)
         {
-            _capingDeliveriesService = capingDeliveriesService;
-            _pspOptions = pspOptions.Value;
-            _routineOptions = routineOptions.Value;
         }
 
         public async Task<Result> Handle(ExpireOrderCommand request, CancellationToken token)

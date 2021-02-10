@@ -23,17 +23,14 @@ namespace Sheaft.Web.Manage.Controllers
 {
     public class ConsumersController : ManageController
     {
-        private readonly ILogger<ConsumersController> _logger;
-
         public ConsumersController(
             IAppDbContext context,
             IMapper mapper,
             ISheaftMediatr mediatr,
             IOptionsSnapshot<RoleOptions> roleOptions,
-            IConfigurationProvider configurationProvider,
-            ILogger<ConsumersController> logger) : base(context, mapper, roleOptions, mediatr, configurationProvider)
+            IConfigurationProvider configurationProvider)
+            : base(context, mapper, roleOptions, mediatr, configurationProvider)
         {
-            _logger = logger;
         }
 
         [HttpGet]
@@ -94,7 +91,7 @@ namespace Sheaft.Web.Manage.Controllers
 
             var result = await _mediatr.Process(new UpdateConsumerCommand(await GetRequestUser(token))
             {
-                Id = model.Id,
+                ConsumerId = model.Id,
                 Email = model.Email,
                 FirstName = model.FirstName,
                 LastName = model.LastName,
@@ -108,7 +105,7 @@ namespace Sheaft.Web.Manage.Controllers
                 return View(model);
             }
 
-            return RedirectToAction("Edit", new { model.Id });
+            return RedirectToAction("Edit", new {model.Id});
         }
 
         [HttpPost]
@@ -120,7 +117,7 @@ namespace Sheaft.Web.Manage.Controllers
 
             var result = await _mediatr.Process(new RemoveUserCommand(await GetRequestUser(token))
             {
-                Id = id
+                UserId = id
             }, token);
 
             if (!result.Succeeded)
@@ -135,7 +132,7 @@ namespace Sheaft.Web.Manage.Controllers
         {
             var result = await _mediatr.Process(new RestoreUserCommand(await GetRequestUser(token))
             {
-                Id = id
+                UserId = id
             }, token);
 
             if (!result.Succeeded)

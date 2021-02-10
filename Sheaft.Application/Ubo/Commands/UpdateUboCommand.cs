@@ -23,7 +23,7 @@ namespace Sheaft.Application.Ubo.Commands
         {
         }
 
-        public Guid Id { get; set; }
+        public Guid UboId { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public string Email { get; set; }
@@ -51,8 +51,8 @@ namespace Sheaft.Application.Ubo.Commands
         public async Task<Result> Handle(UpdateUboCommand request, CancellationToken token)
         {
             var legal = await _context.GetSingleAsync<BusinessLegal>(
-                c => c.Declaration.Ubos.Any(u => u.Id == request.Id), token);
-            var ubo = legal.Declaration.Ubos.FirstOrDefault(u => u.Id == request.Id);
+                c => c.Declaration.Ubos.Any(u => u.Id == request.UboId), token);
+            var ubo = legal.Declaration.Ubos.FirstOrDefault(u => u.Id == request.UboId);
 
             ubo.SetFirstName(request.FirstName);
             ubo.SetLastName(request.LastName);

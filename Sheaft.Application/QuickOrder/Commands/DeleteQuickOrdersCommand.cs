@@ -21,7 +21,7 @@ namespace Sheaft.Application.QuickOrder.Commands
         {
         }
 
-        public IEnumerable<Guid> Ids { get; set; }
+        public IEnumerable<Guid> QuickOrderIds { get; set; }
     }
 
     public class DeleteQuickOrdersCommandHandler : CommandsHandler,
@@ -37,9 +37,9 @@ namespace Sheaft.Application.QuickOrder.Commands
 
         public async Task<Result> Handle(DeleteQuickOrdersCommand request, CancellationToken token)
         {
-            foreach (var id in request.Ids)
+            foreach (var id in request.QuickOrderIds)
             {
-                var result = await _mediatr.Process(new DeleteQuickOrderCommand(request.RequestUser) {Id = id}, token);
+                var result = await _mediatr.Process(new DeleteQuickOrderCommand(request.RequestUser) {QuickOrderId = id}, token);
                 if (!result.Succeeded)
                     return Failure(result.Exception);
             }

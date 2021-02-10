@@ -31,22 +31,12 @@ namespace Sheaft.Application.Order.Commands
     public class RetryOrderCommandHandler : CommandsHandler,
         IRequestHandler<RetryOrderCommand, Result<Guid>>
     {
-        private readonly ICapingDeliveriesService _capingDeliveriesService;
-        private readonly PspOptions _pspOptions;
-        private readonly RoutineOptions _routineOptions;
-
         public RetryOrderCommandHandler(
             IAppDbContext context,
             ISheaftMediatr mediatr,
-            ICapingDeliveriesService capingDeliveriesService,
-            IOptionsSnapshot<PspOptions> pspOptions,
-            IOptionsSnapshot<RoutineOptions> routineOptions,
             ILogger<RetryOrderCommandHandler> logger)
             : base(mediatr, context, logger)
         {
-            _capingDeliveriesService = capingDeliveriesService;
-            _pspOptions = pspOptions.Value;
-            _routineOptions = routineOptions.Value;
         }
 
         public async Task<Result<Guid>> Handle(RetryOrderCommand request, CancellationToken token)
@@ -57,7 +47,7 @@ namespace Sheaft.Application.Order.Commands
 
             var checkResult =
                 await _mediatr.Process(
-                    new CheckConsumerConfigurationCommand(request.RequestUser) {Id = request.RequestUser.Id}, token);
+                    new CheckConsumerConfigurationCommand(request.RequestUser) {ConsumerId = order.User.Id}, token);
             if (!checkResult.Succeeded)
                 return Failure<Guid>(checkResult.Exception);
 

@@ -28,21 +28,18 @@ namespace Sheaft.Application.Document.Commands
     public class LockDocumentCommandHandler : CommandsHandler,
         IRequestHandler<LockDocumentCommand, Result>
     {
-        private readonly IPspService _pspService;
-
         public LockDocumentCommandHandler(
             IAppDbContext context,
-            IPspService pspService,
             ISheaftMediatr mediatr,
             ILogger<LockDocumentCommandHandler> logger)
             : base(mediatr, context, logger)
         {
-            _pspService = pspService;
         }
 
         public async Task<Result> Handle(LockDocumentCommand request, CancellationToken token)
         {
-            var legal = await _context.GetSingleAsync<Domain.Legal>(r => r.Documents.Any(d => d.Id == request.DocumentId),
+            var legal = await _context.GetSingleAsync<Domain.Legal>(
+                r => r.Documents.Any(d => d.Id == request.DocumentId),
                 token);
             var document = legal.Documents.FirstOrDefault(c => c.Id == request.DocumentId);
             document.SetStatus(DocumentStatus.Locked);

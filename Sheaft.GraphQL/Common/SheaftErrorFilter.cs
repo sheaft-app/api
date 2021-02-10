@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
 using Sheaft.Application.Common.Extensions;
+using Sheaft.Application.Common.Interfaces.Services;
 using Sheaft.Domain;
 using Sheaft.Domain.Enum;
 using Sheaft.Domain.Exceptions;
@@ -14,23 +15,18 @@ namespace Sheaft.GraphQL.Common
     public class SheaftErrorFilter : IErrorFilter
     {
         private readonly IStringLocalizer<MessageResources> _localizer;
+        private readonly IAuthService _authService;
         private readonly IHttpContextAccessor _httpContextAccessor;
-        private readonly ILogger<SheaftErrorFilter> _logger;
-        private RequestUser CurrentUser
-        {
-            get
-            {
-                if (_httpContextAccessor.HttpContext.User.Identity.IsAuthenticated)
-                    return _httpContextAccessor.HttpContext.User.ToIdentityUser(_httpContextAccessor.HttpContext.TraceIdentifier);
-                else
-                    return new RequestUser(_httpContextAccessor.HttpContext.TraceIdentifier);
-            }
-        }
 
-        public SheaftErrorFilter(ILogger<SheaftErrorFilter> logger, IStringLocalizer<MessageResources> localizer, IHttpContextAccessor httpContextAccessor)
+        private RequestUser CurrentUser => _authService.GetCurrentUserInfo().Data;
+
+        public SheaftErrorFilter(
+            IAuthService authService,
+            IStringLocalizer<MessageResources> localizer,
+            IHttpContextAccessor httpContextAccessor)
         {
+            _authService = authService;
             _httpContextAccessor = httpContextAccessor;
-            _logger = logger;
             _localizer = localizer;
         }
 
@@ -54,7 +50,9 @@ namespace Sheaft.GraphQL.Common
 
                 kind = exc.Kind;
 
-                message = message != "Une erreur inattendue est survenue." ? message : _localizer[exc.Kind.ToString("G")];
+                message = message != "Une erreur inattendue est survenue."
+                    ? message
+                    : _localizer[exc.Kind.ToString("G")];
                 error = error.AddExtension(exc.Kind.ToString("G"), message);
                 error = error.WithMessage(message);
 
@@ -117,13 +115,13 @@ namespace Sheaft.GraphQL.Common
 
             var parameters = new Dictionary<string, object>
             {
-                { "RequestId", _httpContextAccessor.HttpContext.TraceIdentifier },
-                { "UserIdentifier", CurrentUser.Id.ToString("N") },
-                { "IsAuthenticated", CurrentUser.IsAuthenticated.ToString() },
-                { "Roles", string.Join(";", CurrentUser.Roles) },
-                { "StatusCode", statusCode },
-                { "ExceptionKind", kind },
-                { "ExceptionMessage", message },
+                {"RequestId", _httpContextAccessor.HttpContext.TraceIdentifier},
+                {"UserIdentifier", CurrentUser.Id.ToString("N")},
+                {"IsAuthenticated", CurrentUser.IsAuthenticated.ToString()},
+                {"Roles", string.Join(";", CurrentUser.Roles)},
+                {"StatusCode", statusCode},
+                {"ExceptionKind", kind},
+                {"ExceptionMessage", message},
             };
 
             NewRelic.Api.Agent.NewRelic.NoticeError(exception, parameters);

@@ -21,7 +21,7 @@ namespace Sheaft.Application.Returnable.Commands
         {
         }
 
-        public Guid Id { get; set; }
+        public Guid ReturnableId { get; set; }
     }
 
     public class RestoreReturnableCommandHandler : CommandsHandler,
@@ -38,7 +38,7 @@ namespace Sheaft.Application.Returnable.Commands
         public async Task<Result> Handle(RestoreReturnableCommand request, CancellationToken token)
         {
             var entity =
-                await _context.Returnables.SingleOrDefaultAsync(a => a.Id == request.Id && a.RemovedOn.HasValue, token);
+                await _context.Returnables.SingleOrDefaultAsync(a => a.Id == request.ReturnableId && a.RemovedOn.HasValue, token);
 
             _context.Restore(entity);
             await _context.SaveChangesAsync(token);

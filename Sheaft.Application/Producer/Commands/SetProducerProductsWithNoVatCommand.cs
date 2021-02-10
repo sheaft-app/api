@@ -28,19 +28,12 @@ namespace Sheaft.Application.Producer.Commands
     public class SetProducerProductsWithNoVatCommandHandler : CommandsHandler,
         IRequestHandler<SetProducerProductsWithNoVatCommand, Result>
     {
-        private readonly RoleOptions _roleOptions;
-        private readonly IBlobService _blobService;
-
         public SetProducerProductsWithNoVatCommandHandler(
             IAppDbContext context,
             ISheaftMediatr mediatr,
-            IBlobService blobService,
-            ILogger<SetProducerProductsWithNoVatCommandHandler> logger,
-            IOptionsSnapshot<RoleOptions> roleOptions)
+            ILogger<SetProducerProductsWithNoVatCommandHandler> logger)
             : base(mediatr, context, logger)
         {
-            _roleOptions = roleOptions.Value;
-            _blobService = blobService;
         }
 
         public async Task<Result> Handle(SetProducerProductsWithNoVatCommand request, CancellationToken token)

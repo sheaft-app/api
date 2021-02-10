@@ -20,7 +20,7 @@ namespace Sheaft.Application.Tag.Commands
         {
         }
 
-        public Guid Id { get; set; }
+        public Guid TagId { get; set; }
     }
     
     public class DeleteTagCommandHandler : CommandsHandler,
@@ -36,7 +36,7 @@ namespace Sheaft.Application.Tag.Commands
         
         public async Task<Result> Handle(DeleteTagCommand request, CancellationToken token)
         {
-                var entity = await _context.GetByIdAsync<Domain.Tag>(request.Id, token);
+                var entity = await _context.GetByIdAsync<Domain.Tag>(request.TagId, token);
                 _context.Remove(entity);
 
                 await _context.SaveChangesAsync(token);

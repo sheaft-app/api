@@ -31,19 +31,12 @@ namespace Sheaft.Application.Producer.Commands
     public class UpdateProducerTagsCommandHandler : CommandsHandler,
         IRequestHandler<UpdateProducerTagsCommand, Result>
     {
-        private readonly RoleOptions _roleOptions;
-        private readonly IBlobService _blobService;
-
         public UpdateProducerTagsCommandHandler(
             IAppDbContext context,
             ISheaftMediatr mediatr,
-            IBlobService blobService,
-            ILogger<UpdateProducerTagsCommandHandler> logger,
-            IOptionsSnapshot<RoleOptions> roleOptions)
+            ILogger<UpdateProducerTagsCommandHandler> logger)
             : base(mediatr, context, logger)
         {
-            _roleOptions = roleOptions.Value;
-            _blobService = blobService;
         }
 
         public async Task<Result> Handle(UpdateProducerTagsCommand request, CancellationToken token)

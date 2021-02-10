@@ -30,19 +30,12 @@ namespace Sheaft.Application.Producer.Commands
     public class CheckProducerConfigurationCommandHandler : CommandsHandler,
         IRequestHandler<CheckProducerConfigurationCommand, Result>
     {
-        private readonly RoleOptions _roleOptions;
-        private readonly IBlobService _blobService;
-
         public CheckProducerConfigurationCommandHandler(
             IAppDbContext context,
             ISheaftMediatr mediatr,
-            IBlobService blobService,
-            ILogger<CheckProducerConfigurationCommandHandler> logger,
-            IOptionsSnapshot<RoleOptions> roleOptions)
+            ILogger<CheckProducerConfigurationCommandHandler> logger)
             : base(mediatr, context, logger)
         {
-            _roleOptions = roleOptions.Value;
-            _blobService = blobService;
         }
 
         public async Task<Result> Handle(CheckProducerConfigurationCommand request, CancellationToken token)

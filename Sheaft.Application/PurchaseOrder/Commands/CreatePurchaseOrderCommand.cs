@@ -66,7 +66,7 @@ namespace Sheaft.Application.PurchaseOrder.Commands
 
             if (delivery.DeliveryMode.AutoAcceptRelatedPurchaseOrder)
                 _mediatr.Post(new AcceptPurchaseOrderCommand(request.RequestUser)
-                    {Id = purchaseOrder.Id, SkipNotification = request.SkipNotification});
+                    {PurchaseOrderId = purchaseOrder.Id, SkipNotification = request.SkipNotification});
 
             return Success(purchaseOrder.Id);
         }

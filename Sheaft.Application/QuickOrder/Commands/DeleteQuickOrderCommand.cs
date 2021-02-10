@@ -20,7 +20,7 @@ namespace Sheaft.Application.QuickOrder.Commands
         {
         }
 
-        public Guid Id { get; set; }
+        public Guid QuickOrderId { get; set; }
     }
 
     public class DeleteQuickOrderCommandHandler : CommandsHandler,
@@ -36,7 +36,7 @@ namespace Sheaft.Application.QuickOrder.Commands
 
         public async Task<Result> Handle(DeleteQuickOrderCommand request, CancellationToken token)
         {
-            var entity = await _context.GetByIdAsync<Domain.QuickOrder>(request.Id, token);
+            var entity = await _context.GetByIdAsync<Domain.QuickOrder>(request.QuickOrderId, token);
 
             _context.Remove(entity);
             await _context.SaveChangesAsync(token);

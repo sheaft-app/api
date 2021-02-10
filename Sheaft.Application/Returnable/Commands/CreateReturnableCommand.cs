@@ -25,6 +25,7 @@ namespace Sheaft.Application.Returnable.Commands
         public string Description { get; set; }
         public decimal WholeSalePrice { get; set; }
         public decimal Vat { get; set; }
+        public Guid UserId { get; set; }
     }
 
     public class CreateReturnableCommandHandler : CommandsHandler,
@@ -40,7 +41,7 @@ namespace Sheaft.Application.Returnable.Commands
 
         public async Task<Result<Guid>> Handle(CreateReturnableCommand request, CancellationToken token)
         {
-            var producer = await _context.GetByIdAsync<Domain.Producer>(request.RequestUser.Id, token);
+            var producer = await _context.GetByIdAsync<Domain.Producer>(request.UserId, token);
             var returnable = new Domain.Returnable(Guid.NewGuid(), ReturnableKind.Container, producer, request.Name,
                 request.WholeSalePrice, request.Vat, request.Description);
 

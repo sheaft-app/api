@@ -20,7 +20,7 @@ namespace Sheaft.Application.DeliveryMode.Commands
         {
         }
 
-        public Guid Id { get; set; }
+        public Guid DeliveryModeId { get; set; }
         public bool Available { get; set; }
     }
 
@@ -37,7 +37,7 @@ namespace Sheaft.Application.DeliveryMode.Commands
 
         public async Task<Result> Handle(SetDeliveryModeAvailabilityCommand request, CancellationToken token)
         {
-            var entity = await _context.GetByIdAsync<Domain.DeliveryMode>(request.Id, token);
+            var entity = await _context.GetByIdAsync<Domain.DeliveryMode>(request.DeliveryModeId, token);
             entity.SetAvailability(request.Available);
 
             await _context.SaveChangesAsync(token);

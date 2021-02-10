@@ -28,18 +28,15 @@ namespace Sheaft.Application.Legal.Commands
     public class CheckBusinessLegalConfigurationCommandHandler : CommandsHandler,
         IRequestHandler<CheckBusinessLegalConfigurationCommand, Result>
     {
-        private readonly PspOptions _pspOptions;
         private readonly IPspService _pspService;
 
         public CheckBusinessLegalConfigurationCommandHandler(
             ISheaftMediatr mediatr,
             IAppDbContext context,
             IPspService pspService,
-            IOptionsSnapshot<PspOptions> pspOptions,
             ILogger<CheckBusinessLegalConfigurationCommandHandler> logger)
             : base(mediatr, context, logger)
         {
-            _pspOptions = pspOptions.Value;
             _pspService = pspService;
         }
 

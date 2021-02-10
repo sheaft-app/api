@@ -13,22 +13,19 @@ namespace Sheaft.Application.User.EventHandlers
     public class UserPointsCreatedEventHandler : EventsHandler,
         INotificationHandler<DomainEventNotification<UserPointsCreatedEvent>>
     {
-        private readonly IConfiguration _configuration;
-
         public UserPointsCreatedEventHandler(
-            IConfiguration configuration,
             IAppDbContext context,
             IEmailService emailService,
             ISignalrService signalrService)
             : base(context, emailService, signalrService)
         {
-            _configuration = configuration;
         }
 
         public async Task Handle(DomainEventNotification<UserPointsCreatedEvent> notification, CancellationToken token)
         {
             var userEvent = notification.DomainEvent;
-            await _signalrService.SendNotificationToUserAsync(userEvent.UserId, nameof(UserPointsCreatedEvent), userEvent);
+            await _signalrService.SendNotificationToUserAsync(userEvent.UserId, nameof(UserPointsCreatedEvent),
+                userEvent);
         }
     }
 }

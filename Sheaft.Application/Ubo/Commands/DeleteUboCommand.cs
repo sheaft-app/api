@@ -21,29 +21,25 @@ namespace Sheaft.Application.Ubo.Commands
         {
         }
 
-        public Guid Id { get; set; }
+        public Guid UboId { get; set; }
     }
 
     public class DeleteUboCommandHandler : CommandsHandler,
         IRequestHandler<DeleteUboCommand, Result>
     {
-        private readonly IPspService _pspService;
-
         public DeleteUboCommandHandler(
             ISheaftMediatr mediatr,
             IAppDbContext context,
-            IPspService pspService,
             ILogger<DeleteUboCommandHandler> logger)
             : base(mediatr, context, logger)
         {
-            _pspService = pspService;
         }
 
         public async Task<Result> Handle(DeleteUboCommand request, CancellationToken token)
         {
             var legal = await _context.GetSingleAsync<BusinessLegal>(
-                c => c.Declaration.Ubos.Any(u => u.Id == request.Id), token);
-            legal.Declaration.RemoveUbo(request.Id);
+                c => c.Declaration.Ubos.Any(u => u.Id == request.UboId), token);
+            legal.Declaration.RemoveUbo(request.UboId);
 
             await _context.SaveChangesAsync(token);
             return Success();

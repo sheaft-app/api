@@ -20,11 +20,11 @@ namespace Sheaft.Application.Common.Extensions
                     break;
                 case JobKind.ExportUserData:
                     var exportUserDataCommand = JsonConvert.DeserializeObject<ExportUserDataCommand>(entity.Command);
-                    mediatr.Post(new ExportUserDataCommand(requestUser) { Id = exportUserDataCommand.Id });
+                    mediatr.Post(new ExportUserDataCommand(requestUser) { JobId = exportUserDataCommand.JobId });
                     break;
                 case JobKind.ImportProducts:
                     var importProductsCommand = JsonConvert.DeserializeObject<ImportProductsCommand>(entity.Command);
-                    mediatr.Post(new ImportProductsCommand(requestUser) { Id = importProductsCommand.Id });
+                    mediatr.Post(new ImportProductsCommand(requestUser) { JobId = importProductsCommand.JobId });
                     break;
             }
         }

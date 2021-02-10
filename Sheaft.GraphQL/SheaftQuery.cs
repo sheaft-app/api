@@ -9,6 +9,7 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Sheaft.Application.Common.Extensions;
 using Sheaft.Application.Common.Interfaces.Queries;
+using Sheaft.Application.Common.Interfaces.Services;
 using Sheaft.Application.Common.Models.Dto;
 using Sheaft.Application.Common.Models.Inputs;
 using Sheaft.Domain;
@@ -17,25 +18,19 @@ namespace Sheaft.GraphQL
 {
     public class SheaftQuery
     {
+        private readonly IAuthService _authService;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly ILogger<SheaftQuery> _logger;
 
         private CancellationToken Token => _httpContextAccessor.HttpContext.RequestAborted;
-        private RequestUser CurrentUser
-        {
-            get
-            {
-                if (_httpContextAccessor.HttpContext.User.Identity.IsAuthenticated)
-                    return _httpContextAccessor.HttpContext.User.ToIdentityUser(_httpContextAccessor.HttpContext.TraceIdentifier);
-                else
-                    return new RequestUser(_httpContextAccessor.HttpContext.TraceIdentifier);
-            }
-        }
+        private RequestUser CurrentUser => _authService.GetCurrentUserInfo().Data;
 
         public SheaftQuery(
+            IAuthService authService,
             IHttpContextAccessor httpContextAccessor, 
             ILogger<SheaftQuery> logger)
         {
+            _authService = authService;
             _httpContextAccessor = httpContextAccessor;
             _logger = logger;
         }

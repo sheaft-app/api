@@ -21,9 +21,12 @@ namespace Sheaft.Application.Common.Mappings
                    .ForMember(c => c.SelectedHours, opt => opt.MapFrom(o => o.SelectedHours));
 
             CreateMap<CreateAgreementInput, CreateAgreementCommand>();
-            CreateMap<IdTimeSlotGroupInput, AcceptAgreementCommand>();
-            CreateMap<IdsWithReasonInput, CancelAgreementsCommand>();
-            CreateMap<IdsWithReasonInput, RefuseAgreementsCommand>();
+            CreateMap<IdTimeSlotGroupInput, AcceptAgreementCommand>()
+                .ForMember(c => c.AgreementId, opt => opt.MapFrom(r => r.Id));
+            CreateMap<IdsWithReasonInput, CancelAgreementsCommand>()
+                .ForMember(c => c.AgreementIds, opt => opt.MapFrom(r => r.Ids));
+            CreateMap<IdsWithReasonInput, RefuseAgreementsCommand>()
+                .ForMember(c => c.AgreementIds, opt => opt.MapFrom(r => r.Ids));
         }
     }
 }

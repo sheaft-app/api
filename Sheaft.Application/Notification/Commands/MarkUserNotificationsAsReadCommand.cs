@@ -20,6 +20,7 @@ namespace Sheaft.Application.Notification.Commands
         {
         }
 
+        public Guid UserId { get; set; }
         public DateTimeOffset ReadBefore { get; set; }
     }
 
@@ -40,7 +41,7 @@ namespace Sheaft.Application.Notification.Commands
 
         public async Task<Result> Handle(MarkUserNotificationsAsReadCommand request, CancellationToken token)
         {
-            var result = await _dapperContext.SetNotificationAsReadAsync(request.RequestUser.Id, request.ReadBefore, token);
+            var result = await _dapperContext.SetNotificationAsReadAsync(request.UserId, request.ReadBefore, token);
             return result ? Success() : Failure();
         }
     }

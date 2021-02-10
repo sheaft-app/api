@@ -22,7 +22,7 @@ namespace Sheaft.Application.Department.Commands
         {
         }
 
-        public Guid Id { get; set; }
+        public Guid DepartmentId { get; set; }
         public int Points { get; set; }
         public int Position { get; set; }
         public int Producers { get; set; }
@@ -42,7 +42,7 @@ namespace Sheaft.Application.Department.Commands
 
         public async Task<Result> Handle(UpdateDepartmentStatsCommand request, CancellationToken token)
         {
-            var department = await _context.Departments.SingleOrDefaultAsync(c => c.Id == request.Id, token);
+            var department = await _context.Departments.SingleOrDefaultAsync(c => c.Id == request.DepartmentId, token);
             var level = (await _context.GetAsync<Domain.Level>(c => c.RequiredPoints > request.Points, token))
                 .OrderBy(c => c.RequiredPoints).FirstOrDefault();
 
@@ -50,7 +50,7 @@ namespace Sheaft.Application.Department.Commands
             department.SetPoints(request.Points);
             department.SetPosition(request.Position);
             var consumersCount = await _context.Users.OfType<Domain.Consumer>()
-                .CountAsync(u => !u.RemovedOn.HasValue && u.Address.Department.Id == request.Id, token);
+                .CountAsync(u => !u.RemovedOn.HasValue && u.Address.Department.Id == request.DepartmentId, token);
 
             department.SetConsumersCount(consumersCount);
 

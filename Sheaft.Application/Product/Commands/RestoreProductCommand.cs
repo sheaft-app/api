@@ -21,28 +21,24 @@ namespace Sheaft.Application.Product.Commands
         {
         }
 
-        public Guid Id { get; set; }
+        public Guid ProductId { get; set; }
     }
 
     public class RestoreProductCommandHandler : CommandsHandler,
         IRequestHandler<RestoreProductCommand, Result>
     {
-        private readonly IBlobService _blobService;
-
         public RestoreProductCommandHandler(
             ISheaftMediatr mediatr,
             IAppDbContext context,
-            IBlobService blobService,
             ILogger<RestoreProductCommandHandler> logger)
             : base(mediatr, context, logger)
         {
-            _blobService = blobService;
         }
 
         public async Task<Result> Handle(RestoreProductCommand request, CancellationToken token)
         {
             var entity =
-                await _context.Products.SingleOrDefaultAsync(a => a.Id == request.Id && a.RemovedOn.HasValue, token);
+                await _context.Products.SingleOrDefaultAsync(a => a.Id == request.ProductId && a.RemovedOn.HasValue, token);
             _context.Restore(entity);
 
             await _context.SaveChangesAsync(token);

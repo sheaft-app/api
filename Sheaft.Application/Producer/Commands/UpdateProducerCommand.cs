@@ -29,7 +29,7 @@ namespace Sheaft.Application.Producer.Commands
         {
         }
 
-        public Guid Id { get; set; }
+        public Guid ProducerId { get; set; }
         public ProfileKind? Kind { get; set; }
         public string Name { get; set; }
         public string FirstName { get; set; }
@@ -48,23 +48,20 @@ namespace Sheaft.Application.Producer.Commands
         IRequestHandler<UpdateProducerCommand, Result>
     {
         private readonly RoleOptions _roleOptions;
-        private readonly IBlobService _blobService;
 
         public UpdateProducerCommandHandler(
             IAppDbContext context,
             ISheaftMediatr mediatr,
-            IBlobService blobService,
             ILogger<UpdateProducerCommandHandler> logger,
             IOptionsSnapshot<RoleOptions> roleOptions)
             : base(mediatr, context, logger)
         {
             _roleOptions = roleOptions.Value;
-            _blobService = blobService;
         }
 
         public async Task<Result> Handle(UpdateProducerCommand request, CancellationToken token)
         {
-            var producer = await _context.GetByIdAsync<Domain.Producer>(request.Id, token);
+            var producer = await _context.GetByIdAsync<Domain.Producer>(request.ProducerId, token);
 
             producer.SetName(request.Name);
             producer.SetFirstname(request.FirstName);

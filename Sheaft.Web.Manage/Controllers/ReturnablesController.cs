@@ -19,17 +19,14 @@ namespace Sheaft.Web.Manage.Controllers
 {
     public class ReturnablesController : ManageController
     {
-        private readonly ILogger<ReturnablesController> _logger;
-
         public ReturnablesController(
             IAppDbContext context,
             IMapper mapper,
             ISheaftMediatr mediatr,
             IOptionsSnapshot<RoleOptions> roleOptions,
-            IConfigurationProvider configurationProvider,
-            ILogger<ReturnablesController> logger) : base(context, mapper, roleOptions, mediatr, configurationProvider)
+            IConfigurationProvider configurationProvider)
+            : base(context, mapper, roleOptions, mediatr, configurationProvider)
         {
-            _logger = logger;
         }
 
         [HttpGet]
@@ -97,7 +94,7 @@ namespace Sheaft.Web.Manage.Controllers
                 return View(model);
             }
 
-            return RedirectToAction("Edit", new { id = result.Data });
+            return RedirectToAction("Edit", new {id = result.Data});
         }
 
         [HttpGet]
@@ -121,7 +118,7 @@ namespace Sheaft.Web.Manage.Controllers
         {
             var result = await _mediatr.Process(new UpdateReturnableCommand(await GetRequestUser(token))
             {
-                Id = model.Id,
+                ReturnableId = model.Id,
                 Description = model.Description,
                 Name = model.Name,
                 Vat = model.Vat,
@@ -134,7 +131,7 @@ namespace Sheaft.Web.Manage.Controllers
                 return View(model);
             }
 
-            return RedirectToAction("Edit", new { model.Id });
+            return RedirectToAction("Edit", new {model.Id});
         }
 
         [HttpPost]
@@ -143,13 +140,13 @@ namespace Sheaft.Web.Manage.Controllers
         {
             var result = await _mediatr.Process(new RestoreReturnableCommand(await GetRequestUser(token))
             {
-                Id = id
+                ReturnableId = id
             }, token);
 
             if (!result.Succeeded)
                 throw result.Exception;
 
-            return RedirectToAction("Edit", new { id });
+            return RedirectToAction("Edit", new {id});
         }
 
         [HttpPost]
@@ -158,7 +155,7 @@ namespace Sheaft.Web.Manage.Controllers
         {
             var result = await _mediatr.Process(new DeleteReturnableCommand(await GetRequestUser(token))
             {
-                Id = id
+                ReturnableId = id
             }, token);
 
             if (!result.Succeeded)

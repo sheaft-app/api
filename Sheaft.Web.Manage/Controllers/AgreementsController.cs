@@ -21,21 +21,19 @@ namespace Sheaft.Web.Manage.Controllers
 {
     public class AgreementsController : ManageController
     {
-        private readonly ILogger<AgreementsController> _logger;
-
         public AgreementsController(
             IAppDbContext context,
             IMapper mapper,
             ISheaftMediatr mediatr,
             IOptionsSnapshot<RoleOptions> roleOptions,
-            IConfigurationProvider configurationProvider,
-            ILogger<AgreementsController> logger) : base(context, mapper, roleOptions, mediatr, configurationProvider)
+            IConfigurationProvider configurationProvider) 
+            : base(context, mapper, roleOptions, mediatr, configurationProvider)
         {
-            _logger = logger;
         }
 
         [HttpGet]
-        public async Task<IActionResult> Index(CancellationToken token, AgreementStatus? status = null, int page = 0, int take = 25)
+        public async Task<IActionResult> Index(CancellationToken token, AgreementStatus? status = null, int page = 0,
+            int take = 25)
         {
             if (page < 0)
                 page = 0;
@@ -48,7 +46,7 @@ namespace Sheaft.Web.Manage.Controllers
             var requestUser = await GetRequestUser(token);
             if (requestUser.IsImpersonating)
             {
-                if(requestUser.IsInRole(_roleOptions.Store.Value))
+                if (requestUser.IsInRole(_roleOptions.Store.Value))
                     query = query.Where(p => p.Store.Id == requestUser.Id);
                 else
                     query = query.Where(p => p.Delivery.Producer.Id == requestUser.Id);
@@ -91,13 +89,13 @@ namespace Sheaft.Web.Manage.Controllers
         {
             var result = await _mediatr.Process(new ResetAgreementStatusToCommand(await GetRequestUser(token))
             {
-                Id = model.Id
+                AgreementId = model.Id
             }, token);
 
             if (!result.Succeeded)
                 throw result.Exception;
 
-            return RedirectToAction("Edit", new { model.Id });
+            return RedirectToAction("Edit", new {model.Id});
         }
 
         [HttpPost]
@@ -106,7 +104,7 @@ namespace Sheaft.Web.Manage.Controllers
         {
             var result = await _mediatr.Process(new DeleteAgreementCommand(await GetRequestUser(token))
             {
-                Id = id
+                AgreementId = id
             }, token);
 
             if (!result.Succeeded)
@@ -121,13 +119,13 @@ namespace Sheaft.Web.Manage.Controllers
         {
             var result = await _mediatr.Process(new RestoreAgreementCommand(await GetRequestUser(token))
             {
-                Id = id
+                AgreementId = id
             }, token);
 
             if (!result.Succeeded)
                 throw result.Exception;
 
-            return RedirectToAction("Edit", new { id });
+            return RedirectToAction("Edit", new {id});
         }
     }
 }

@@ -21,7 +21,7 @@ namespace Sheaft.Application.Agreement.Commands
         {
         }
 
-        public IEnumerable<Guid> Ids { get; set; }
+        public IEnumerable<Guid> AgreementIds { get; set; }
         public string Reason { get; set; }
     }
 
@@ -40,10 +40,10 @@ namespace Sheaft.Application.Agreement.Commands
         {
             using (var transaction = await _context.BeginTransactionAsync(token))
             {
-                foreach (var agreementId in request.Ids)
+                foreach (var agreementId in request.AgreementIds)
                 {
                     var result = await _mediatr.Process(
-                        new CancelAgreementCommand(request.RequestUser) {Id = agreementId, Reason = request.Reason},
+                        new CancelAgreementCommand(request.RequestUser) {AgreementId = agreementId, Reason = request.Reason},
                         token);
                     if (!result.Succeeded)
                         return Failure(result.Exception);

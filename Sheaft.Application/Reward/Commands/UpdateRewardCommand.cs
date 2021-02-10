@@ -21,7 +21,7 @@ namespace Sheaft.Application.Reward.Commands
         {
         }
 
-        public Guid Id { get; set; }
+        public Guid RewardId { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
         public string Picture { get; set; }
@@ -46,7 +46,7 @@ namespace Sheaft.Application.Reward.Commands
 
         public async Task<Result> Handle(UpdateRewardCommand request, CancellationToken token)
         {
-            var entity = await _context.GetByIdAsync<Domain.Reward>(request.Id, token);
+            var entity = await _context.GetByIdAsync<Domain.Reward>(request.RewardId, token);
 
             entity.SetName(request.Name);
             entity.SetDescription(request.Description);

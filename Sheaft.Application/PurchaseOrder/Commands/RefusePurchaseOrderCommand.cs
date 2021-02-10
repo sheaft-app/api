@@ -23,7 +23,7 @@ namespace Sheaft.Application.PurchaseOrder.Commands
         {
         }
 
-        public Guid Id { get; set; }
+        public Guid PurchaseOrderId { get; set; }
         public string Reason { get; set; }
         public bool SkipNotification { get; set; }
     }
@@ -45,7 +45,7 @@ namespace Sheaft.Application.PurchaseOrder.Commands
 
         public async Task<Result> Handle(RefusePurchaseOrderCommand request, CancellationToken token)
         {
-            var purchaseOrder = await _context.GetByIdAsync<Domain.PurchaseOrder>(request.Id, token);
+            var purchaseOrder = await _context.GetByIdAsync<Domain.PurchaseOrder>(request.PurchaseOrderId, token);
             purchaseOrder.Refuse(request.Reason, request.SkipNotification);
 
             await _context.SaveChangesAsync(token);

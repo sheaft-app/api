@@ -20,7 +20,7 @@ namespace Sheaft.Application.Job.Commands
         {
         }
 
-        public Guid Id { get; set; }
+        public Guid JobId { get; set; }
     }
 
     public class DeleteJobCommandHandler : CommandsHandler,
@@ -36,7 +36,7 @@ namespace Sheaft.Application.Job.Commands
 
         public async Task<Result> Handle(DeleteJobCommand request, CancellationToken token)
         {
-            var entity = await _context.GetByIdAsync<Domain.Job>(request.Id, token);
+            var entity = await _context.GetByIdAsync<Domain.Job>(request.JobId, token);
             _context.Remove(entity);
 
             await _context.SaveChangesAsync(token);

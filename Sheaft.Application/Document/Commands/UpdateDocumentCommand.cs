@@ -22,7 +22,7 @@ namespace Sheaft.Application.Document.Commands
         {
         }
 
-        public Guid Id { get; set; }
+        public Guid DocumentId { get; set; }
         public string Name { get; set; }
         public DocumentKind Kind { get; set; }
     }
@@ -44,8 +44,8 @@ namespace Sheaft.Application.Document.Commands
 
         public async Task<Result> Handle(UpdateDocumentCommand request, CancellationToken token)
         {
-            var legal = await _context.GetSingleAsync<Domain.Legal>(r => r.Documents.Any(d => d.Id == request.Id), token);
-            var document = legal.Documents.FirstOrDefault(c => c.Id == request.Id);
+            var legal = await _context.GetSingleAsync<Domain.Legal>(r => r.Documents.Any(d => d.Id == request.DocumentId), token);
+            var document = legal.Documents.FirstOrDefault(c => c.Id == request.DocumentId);
             if (document.Kind != request.Kind && legal.Documents.Any(d => d.Kind == request.Kind))
                 return Failure(MessageKind.Document_CannotUpdate_Another_Document_With_Type_Exists);
 

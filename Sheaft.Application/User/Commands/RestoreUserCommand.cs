@@ -23,33 +23,23 @@ namespace Sheaft.Application.User.Commands
         {
         }
 
-        public Guid Id { get; set; }
+        public Guid UserId { get; set; }
     }
 
     public class RestoreUserCommandHandler : CommandsHandler,
         IRequestHandler<RestoreUserCommand, Result>
     {
-        private readonly IBlobService _blobService;
-        private readonly ScoringOptions _scoringOptions;
-        private readonly RoleOptions _roleOptions;
-
         public RestoreUserCommandHandler(
-            IOptionsSnapshot<ScoringOptions> scoringOptions,
             ISheaftMediatr mediatr,
             IAppDbContext context,
-            IBlobService blobService,
-            ILogger<RestoreUserCommandHandler> logger,
-            IOptionsSnapshot<RoleOptions> roleOptions)
+            ILogger<RestoreUserCommandHandler> logger)
             : base(mediatr, context, logger)
         {
-            _roleOptions = roleOptions.Value;
-            _scoringOptions = scoringOptions.Value;
-            _blobService = blobService;
         }
 
         public async Task<Result> Handle(RestoreUserCommand request, CancellationToken token)
         {
-            var entity = await _context.Users.FirstOrDefaultAsync(c => c.Id == request.Id, token);
+            var entity = await _context.Users.FirstOrDefaultAsync(c => c.Id == request.UserId, token);
             if (entity == null || !entity.RemovedOn.HasValue)
                 return Failure();
 

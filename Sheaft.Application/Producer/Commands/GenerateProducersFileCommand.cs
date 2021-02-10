@@ -28,18 +28,15 @@ namespace Sheaft.Application.Producer.Commands
     public class GenerateProducersFileCommandHandler : CommandsHandler,
         IRequestHandler<GenerateProducersFileCommand, Result>
     {
-        private readonly RoleOptions _roleOptions;
         private readonly IBlobService _blobService;
 
         public GenerateProducersFileCommandHandler(
             IAppDbContext context,
             ISheaftMediatr mediatr,
             IBlobService blobService,
-            ILogger<GenerateProducersFileCommandHandler> logger,
-            IOptionsSnapshot<RoleOptions> roleOptions)
+            ILogger<GenerateProducersFileCommandHandler> logger)
             : base(mediatr, context, logger)
         {
-            _roleOptions = roleOptions.Value;
             _blobService = blobService;
         }
 

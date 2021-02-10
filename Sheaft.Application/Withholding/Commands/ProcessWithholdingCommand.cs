@@ -31,18 +31,15 @@ namespace Sheaft.Application.Withholding.Commands
         IRequestHandler<ProcessWithholdingCommand, Result>
     {
         private readonly IPspService _pspService;
-        private readonly PspOptions _pspOptions;
 
         public ProcessWithholdingCommandHandler(
             ISheaftMediatr mediatr,
             IAppDbContext context,
             IPspService pspService,
-            IOptionsSnapshot<PspOptions> pspOptions,
             ILogger<ProcessWithholdingCommandHandler> logger)
             : base(mediatr, context, logger)
         {
             _pspService = pspService;
-            _pspOptions = pspOptions.Value;
         }
 
         public async Task<Result> Handle(ProcessWithholdingCommand request, CancellationToken token)

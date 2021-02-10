@@ -26,7 +26,8 @@ namespace Sheaft.Application.Common.Mappings
             CreateMap<CreateOrderInput, CreateConsumerOrderCommand>();
             CreateMap<CreateOrderInput, CreateBusinessOrderCommand>();
 
-            CreateMap<UpdateOrderInput, UpdateConsumerOrderCommand>();
+            CreateMap<UpdateOrderInput, UpdateConsumerOrderCommand>()
+                .ForMember(c => c.OrderId, opt => opt.MapFrom(r => r.Id));;
             CreateMap<IdInput, PayOrderCommand>()
                 .ForMember(c => c.OrderId, opt => opt.MapFrom(e => e.Id));
 

@@ -9,7 +9,6 @@ using Sheaft.Application.Common.Handlers;
 using Sheaft.Application.Common.Interfaces;
 using Sheaft.Application.Common.Interfaces.Services;
 using Sheaft.Application.Common.Models;
-using Sheaft.Application.Common.Options;
 using Sheaft.Domain;
 using Sheaft.Domain.Enum;
 
@@ -30,28 +29,27 @@ namespace Sheaft.Application.Transfer.Commands
         IRequestHandler<RefreshTransferStatusCommand, Result>
     {
         private readonly IPspService _pspService;
-        private readonly RoutineOptions _routineOptions;
 
         public RefreshTransferStatusCommandHandler(
             IAppDbContext context,
             IPspService pspService,
             ISheaftMediatr mediatr,
-            IOptionsSnapshot<RoutineOptions> routineOptions,
             ILogger<RefreshTransferStatusCommandHandler> logger)
             : base(mediatr, context, logger)
         {
             _pspService = pspService;
-            _routineOptions = routineOptions.Value;
         }
 
         public async Task<Result> Handle(RefreshTransferStatusCommand request,
             CancellationToken token)
         {
-            var transfer = await _context.FindSingleAsync<Domain.Transfer>(c => c.Identifier == request.Identifier, token);
+            var transfer =
+                await _context.FindSingleAsync<Domain.Transfer>(c => c.Identifier == request.Identifier, token);
             if (transfer != null)
                 return await HandleTransferStatusAsync(request, transfer, token);
 
-            var donation = await _context.FindSingleAsync<Domain.Donation>(c => c.Identifier == request.Identifier, token);
+            var donation =
+                await _context.FindSingleAsync<Domain.Donation>(c => c.Identifier == request.Identifier, token);
             if (donation != null)
                 return await HandleDonationStatusAsync(request, donation, token);
 

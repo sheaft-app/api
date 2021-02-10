@@ -30,18 +30,15 @@ namespace Sheaft.Application.Withholding.Commands
     public class CreateWithholdingCommandHandler : CommandsHandler,
         IRequestHandler<CreateWithholdingCommand, Result<Guid>>
     {
-        private readonly IPspService _pspService;
         private readonly PspOptions _pspOptions;
 
         public CreateWithholdingCommandHandler(
             ISheaftMediatr mediatr,
             IAppDbContext context,
-            IPspService pspService,
             IOptionsSnapshot<PspOptions> pspOptions,
             ILogger<CreateWithholdingCommandHandler> logger)
             : base(mediatr, context, logger)
         {
-            _pspService = pspService;
             _pspOptions = pspOptions.Value;
         }
 

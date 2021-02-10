@@ -24,35 +24,35 @@ namespace Sheaft.Application.Store.Commands
         {
         }
 
-        public Guid Id { get; set; }
+        public Guid StoreId { get; set; }
     }
-    
+
     public class CheckStoreConfigurationCommandHandler : CommandsHandler,
         IRequestHandler<CheckStoreConfigurationCommand, Result>
     {
-        private readonly RoleOptions _roleOptions;
-
         public CheckStoreConfigurationCommandHandler(
             IAppDbContext context,
             ISheaftMediatr mediatr,
-            ILogger<CheckStoreConfigurationCommandHandler> logger,
-            IOptionsSnapshot<RoleOptions> roleOptions)
+            ILogger<CheckStoreConfigurationCommandHandler> logger)
             : base(mediatr, context, logger)
         {
-            _roleOptions = roleOptions.Value;
         }
 
         public async Task<Result> Handle(CheckStoreConfigurationCommand request, CancellationToken token)
         {
-                var business = await _mediatr.Process(new CheckBusinessLegalConfigurationCommand(request.RequestUser) { UserId = request.Id }, token);
-                if (!business.Succeeded)
-                    return Failure(business.Exception);
+            var business =
+                await _mediatr.Process(
+                    new CheckBusinessLegalConfigurationCommand(request.RequestUser) {UserId = request.StoreId}, token);
+            if (!business.Succeeded)
+                return Failure(business.Exception);
 
-                var wallet = await _mediatr.Process(new CheckWalletPaymentsConfigurationCommand(request.RequestUser) { UserId = request.Id }, token);
-                if (!wallet.Succeeded)
-                    return Failure(wallet.Exception);
+            var wallet =
+                await _mediatr.Process(
+                    new CheckWalletPaymentsConfigurationCommand(request.RequestUser) {UserId = request.StoreId}, token);
+            if (!wallet.Succeeded)
+                return Failure(wallet.Exception);
 
-                return Success();
+            return Success();
         }
     }
 }

@@ -24,17 +24,14 @@ namespace Sheaft.Web.Manage.Controllers
 {
     public class ProducersController : ManageController
     {
-        private readonly ILogger<ProducersController> _logger;
-
         public ProducersController(
             IAppDbContext context,
             IMapper mapper,
             ISheaftMediatr mediatr,
             IConfigurationProvider configurationProvider,
-            IOptionsSnapshot<RoleOptions> roleOptions,
-            ILogger<ProducersController> logger) : base(context, mapper, roleOptions, mediatr, configurationProvider)
+            IOptionsSnapshot<RoleOptions> roleOptions)
+            : base(context, mapper, roleOptions, mediatr, configurationProvider)
         {
-            _logger = logger;
         }
 
         [HttpGet]
@@ -98,7 +95,7 @@ namespace Sheaft.Web.Manage.Controllers
             var producer = await _context.Users.OfType<Producer>().SingleOrDefaultAsync(c => c.Id == model.Id, token);
             var result = await _mediatr.Process(new UpdateProducerCommand(await GetRequestUser(token))
             {
-                Id = model.Id,
+                ProducerId = model.Id,
                 Address = _mapper.Map<FullAddressInput>(model.Address),
                 OpenForNewBusiness = model.OpenForNewBusiness,
                 Description = model.Description,
@@ -116,14 +113,15 @@ namespace Sheaft.Web.Manage.Controllers
             if (!result.Succeeded)
             {
                 ViewBag.LegalsId = (await _context.FindSingleAsync<Legal>(c => c.User.Id == model.Id, token))?.Id;
-                ViewBag.BankAccountId = (await _context.FindSingleAsync<BankAccount>(c => c.User.Id == model.Id, token))?.Id;
+                ViewBag.BankAccountId =
+                    (await _context.FindSingleAsync<BankAccount>(c => c.User.Id == model.Id, token))?.Id;
                 ViewBag.Tags = await GetTags(token);
 
                 ModelState.AddModelError("", result.Exception.Message);
                 return View(model);
             }
 
-            return RedirectToAction("Edit", new { model.Id });
+            return RedirectToAction("Edit", new {model.Id});
         }
 
         [HttpPost]
@@ -132,14 +130,14 @@ namespace Sheaft.Web.Manage.Controllers
         {
             var result = await _mediatr.Process(new RemoveUserCommand(await GetRequestUser(token))
             {
-                Id = id
+                UserId = id
             }, token);
 
             if (!result.Succeeded)
                 throw result.Exception;
 
             return RedirectToAction("Index");
-        }        
+        }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -147,7 +145,7 @@ namespace Sheaft.Web.Manage.Controllers
         {
             var result = await _mediatr.Process(new RestoreUserCommand(await GetRequestUser(token))
             {
-                Id = id
+                UserId = id
             }, token);
 
             if (!result.Succeeded)

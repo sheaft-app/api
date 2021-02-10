@@ -21,21 +21,19 @@ namespace Sheaft.Web.Manage.Controllers
 {
     public class PurchaseOrdersController : ManageController
     {
-        private readonly ILogger<PurchaseOrdersController> _logger;
-
         public PurchaseOrdersController(
             IAppDbContext context,
             IMapper mapper,
             ISheaftMediatr mediatr,
             IOptionsSnapshot<RoleOptions> roleOptions,
-            IConfigurationProvider configurationProvider,
-            ILogger<PurchaseOrdersController> logger) : base(context, mapper, roleOptions, mediatr, configurationProvider)
+            IConfigurationProvider configurationProvider)
+            : base(context, mapper, roleOptions, mediatr, configurationProvider)
         {
-            _logger = logger;
         }
 
         [HttpGet]
-        public async Task<IActionResult> Index(CancellationToken token, PurchaseOrderStatus? status = null, int page = 0, int take = 50)
+        public async Task<IActionResult> Index(CancellationToken token, PurchaseOrderStatus? status = null,
+            int page = 0, int take = 50)
         {
             if (page < 0)
                 page = 0;
@@ -100,14 +98,14 @@ namespace Sheaft.Web.Manage.Controllers
 
             var result = await _mediatr.Process(new AcceptPurchaseOrderCommand(requestUser)
             {
-                Id = id,
+                PurchaseOrderId = id,
                 SkipNotification = true,
             }, token);
 
             if (!result.Succeeded)
                 throw result.Exception;
 
-            return RedirectToAction("Edit", new { id });
+            return RedirectToAction("Edit", new {id});
         }
 
         [HttpPost]
@@ -120,14 +118,14 @@ namespace Sheaft.Web.Manage.Controllers
 
             var result = await _mediatr.Process(new RefusePurchaseOrderCommand(requestUser)
             {
-                Id = id,
+                PurchaseOrderId = id,
                 SkipNotification = true,
             }, token);
 
             if (!result.Succeeded)
                 throw result.Exception;
 
-            return RedirectToAction("Edit", new { id });
+            return RedirectToAction("Edit", new {id});
         }
 
         [HttpPost]
@@ -140,14 +138,14 @@ namespace Sheaft.Web.Manage.Controllers
 
             var result = await _mediatr.Process(new CancelPurchaseOrderCommand(requestUser)
             {
-                Id = id,
+                PurchaseOrderId = id,
                 SkipNotification = true,
             }, token);
 
             if (!result.Succeeded)
                 throw result.Exception;
 
-            return RedirectToAction("Edit", new { id });
+            return RedirectToAction("Edit", new {id});
         }
 
         [HttpPost]
@@ -160,14 +158,14 @@ namespace Sheaft.Web.Manage.Controllers
 
             var result = await _mediatr.Process(new ProcessPurchaseOrderCommand(requestUser)
             {
-                Id = id,
+                PurchaseOrderId = id,
                 SkipNotification = true,
             }, token);
 
             if (!result.Succeeded)
                 throw result.Exception;
 
-            return RedirectToAction("Edit", new { id });
+            return RedirectToAction("Edit", new {id});
         }
 
         [HttpPost]
@@ -180,14 +178,14 @@ namespace Sheaft.Web.Manage.Controllers
 
             var result = await _mediatr.Process(new CompletePurchaseOrderCommand(requestUser)
             {
-                Id = id,
+                PurchaseOrderId = id,
                 SkipNotification = true,
             }, token);
 
             if (!result.Succeeded)
                 throw result.Exception;
 
-            return RedirectToAction("Edit", new { id });
+            return RedirectToAction("Edit", new {id});
         }
 
         [HttpPost]
@@ -200,13 +198,13 @@ namespace Sheaft.Web.Manage.Controllers
 
             var result = await _mediatr.Process(new DeliverPurchaseOrderCommand(requestUser)
             {
-                Id = id
+                PurchaseOrderId = id
             }, token);
 
             if (!result.Succeeded)
                 throw result.Exception;
 
-            return RedirectToAction("Edit", new { id });
+            return RedirectToAction("Edit", new {id});
         }
 
         [HttpPost]
@@ -215,13 +213,13 @@ namespace Sheaft.Web.Manage.Controllers
         {
             var result = await _mediatr.Process(new RestorePurchaseOrderCommand(await GetRequestUser(token))
             {
-                Id = id
+                PurchaseOrderId = id
             }, token);
 
             if (!result.Succeeded)
                 throw result.Exception;
 
-            return RedirectToAction("Edit", new { id });
+            return RedirectToAction("Edit", new {id});
         }
 
         [HttpPost]
@@ -230,7 +228,7 @@ namespace Sheaft.Web.Manage.Controllers
         {
             var result = await _mediatr.Process(new DeletePurchaseOrderCommand(await GetRequestUser(token))
             {
-                Id = id
+                PurchaseOrderId = id
             }, token);
 
             if (!result.Succeeded)

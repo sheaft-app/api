@@ -23,17 +23,14 @@ namespace Sheaft.Web.Manage.Controllers
 {
     public class ProductsController : ManageController
     {
-        private readonly ILogger<ProductsController> _logger;
-
         public ProductsController(
             IAppDbContext context,
             IMapper mapper,
             ISheaftMediatr mediatr,
             IOptionsSnapshot<RoleOptions> roleOptions,
-            IConfigurationProvider configurationProvider,
-            ILogger<ProductsController> logger) : base(context, mapper, roleOptions, mediatr, configurationProvider)
+            IConfigurationProvider configurationProvider)
+            : base(context, mapper, roleOptions, mediatr, configurationProvider)
         {
-            _logger = logger;
         }
 
         [HttpGet]
@@ -104,6 +101,7 @@ namespace Sheaft.Web.Manage.Controllers
 
             var result = await _mediatr.Process(new CreateProductCommand(requestUser)
             {
+                ProducerId = requestUser.Id,
                 Description = model.Description,
                 Name = model.Name,
                 Available = model.Available,
@@ -130,7 +128,7 @@ namespace Sheaft.Web.Manage.Controllers
                 return View(model);
             }
 
-            return RedirectToAction("Edit", new { id = result.Data });
+            return RedirectToAction("Edit", new {id = result.Data});
         }
 
         [HttpGet]
@@ -160,7 +158,7 @@ namespace Sheaft.Web.Manage.Controllers
         public async Task<IActionResult> Edit(ProductViewModel model, IFormFile picture, CancellationToken token)
         {
             var requestUser = await GetRequestUser(token);
-            if(!requestUser.IsImpersonating)
+            if (!requestUser.IsImpersonating)
             {
                 ViewBag.Tags = await GetTags(token);
                 ViewBag.Returnables = await GetReturnables(requestUser, token);
@@ -180,7 +178,7 @@ namespace Sheaft.Web.Manage.Controllers
 
             var result = await _mediatr.Process(new UpdateProductCommand(requestUser)
             {
-                Id = model.Id,
+                ProductId = model.Id,
                 Description = model.Description,
                 Name = model.Name,
                 Available = model.Available,
@@ -207,7 +205,7 @@ namespace Sheaft.Web.Manage.Controllers
                 return View(model);
             }
 
-            return RedirectToAction("Edit", new { model.Id });
+            return RedirectToAction("Edit", new {model.Id});
         }
 
         [HttpPost]
@@ -223,7 +221,12 @@ namespace Sheaft.Web.Manage.Controllers
                 using (var stream = new MemoryStream())
                 {
                     await formFile.CopyToAsync(stream, token);
-                    var result = await _mediatr.Process(new QueueImportProductsCommand(requestUser) { Id = requestUser.Id, NotifyOnUpdates = false, FileName = formFile.FileName, FileStream = stream.ToArray() }, token);
+                    var result = await _mediatr.Process(
+                        new QueueImportProductsCommand(requestUser)
+                        {
+                            ProducerId = requestUser.Id, NotifyOnUpdates = false, FileName = formFile.FileName,
+                            FileStream = stream.ToArray()
+                        }, token);
                     if (!result.Succeeded)
                         return BadRequest(result);
                 }
@@ -238,13 +241,13 @@ namespace Sheaft.Web.Manage.Controllers
         {
             var result = await _mediatr.Process(new RestoreProductCommand(await GetRequestUser(token))
             {
-                Id = id
+                ProductId = id
             }, token);
 
             if (!result.Succeeded)
                 throw result.Exception;
 
-            return RedirectToAction("Edit", new { id });
+            return RedirectToAction("Edit", new {id});
         }
 
         [HttpPost]
@@ -253,7 +256,7 @@ namespace Sheaft.Web.Manage.Controllers
         {
             var result = await _mediatr.Process(new DeleteProductCommand(await GetRequestUser(token))
             {
-                Id = id
+                ProductId = id
             }, token);
 
             if (!result.Succeeded)
@@ -265,9 +268,9 @@ namespace Sheaft.Web.Manage.Controllers
         private async Task<List<ReturnableViewModel>> GetReturnables(RequestUser requestUser, CancellationToken token)
         {
             return await _context.Returnables
-                            .Where(c => c.Producer.Id == requestUser.Id && !c.RemovedOn.HasValue)
-                            .ProjectTo<ReturnableViewModel>(_configurationProvider)
-                            .ToListAsync(token);
+                .Where(c => c.Producer.Id == requestUser.Id && !c.RemovedOn.HasValue)
+                .ProjectTo<ReturnableViewModel>(_configurationProvider)
+                .ToListAsync(token);
         }
     }
 }

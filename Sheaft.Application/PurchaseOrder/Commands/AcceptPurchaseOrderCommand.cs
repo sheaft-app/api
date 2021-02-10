@@ -22,38 +22,35 @@ namespace Sheaft.Application.PurchaseOrder.Commands
         {
         }
 
-        public Guid Id { get; set; }
+        public Guid PurchaseOrderId { get; set; }
         public bool SkipNotification { get; set; }
     }
 
     public class AcceptPurchaseOrderCommandHandler : CommandsHandler,
         IRequestHandler<AcceptPurchaseOrderCommand, Result>
     {
-        private readonly ICapingDeliveriesService _capingDeliveriesService;
-
         public AcceptPurchaseOrderCommandHandler(
             IAppDbContext context,
             ISheaftMediatr mediatr,
-            ICapingDeliveriesService capingDeliveriesService,
             ILogger<AcceptPurchaseOrderCommandHandler> logger)
             : base(mediatr, context, logger)
         {
-            _capingDeliveriesService = capingDeliveriesService;
         }
 
         public async Task<Result> Handle(AcceptPurchaseOrderCommand request, CancellationToken token)
         {
-            var purchaseOrder = await _context.GetByIdAsync<Domain.PurchaseOrder>(request.Id, token);
+            var purchaseOrder = await _context.GetByIdAsync<Domain.PurchaseOrder>(request.PurchaseOrderId, token);
             purchaseOrder.Accept(request.SkipNotification);
 
             await _context.SaveChangesAsync(token);
 
-            var order = await _context.GetSingleAsync<Domain.Order>(o => o.PurchaseOrders.Any(po => po.Id == purchaseOrder.Id),
+            var order = await _context.GetSingleAsync<Domain.Order>(
+                o => o.PurchaseOrders.Any(po => po.Id == purchaseOrder.Id),
                 token);
             var delivery = order.Deliveries.FirstOrDefault(d => d.DeliveryMode.Producer.Id == purchaseOrder.Vendor.Id);
             if (delivery.DeliveryMode.AutoCompleteRelatedPurchaseOrder)
                 _mediatr.Post(new CompletePurchaseOrderCommand(request.RequestUser)
-                    {Id = purchaseOrder.Id, SkipNotification = request.SkipNotification});
+                    {PurchaseOrderId = purchaseOrder.Id, SkipNotification = request.SkipNotification});
 
             return Success();
         }

@@ -20,7 +20,7 @@ namespace Sheaft.Application.Level.Commands
         {
         }
 
-        public Guid Id { get; set; }
+        public Guid LevelId { get; set; }
     }
 
     public class DeleteLevelCommandHandler : CommandsHandler,
@@ -36,7 +36,7 @@ namespace Sheaft.Application.Level.Commands
 
         public async Task<Result> Handle(DeleteLevelCommand request, CancellationToken token)
         {
-            var entity = await _context.GetByIdAsync<Domain.Level>(request.Id, token);
+            var entity = await _context.GetByIdAsync<Domain.Level>(request.LevelId, token);
             _context.Remove(entity);
 
             await _context.SaveChangesAsync(token);

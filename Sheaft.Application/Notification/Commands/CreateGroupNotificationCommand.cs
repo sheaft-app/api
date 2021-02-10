@@ -21,7 +21,7 @@ namespace Sheaft.Application.Notification.Commands
         {
         }
 
-        public Guid Id { get; set; }
+        public Guid GroupId { get; set; }
         public string Content { get; set; }
         public string Method { get; set; }
         public DateTimeOffset CreatedOn { get; set; }
@@ -30,22 +30,19 @@ namespace Sheaft.Application.Notification.Commands
     public class CreateGroupNotificationCommandHandler : CommandsHandler,
         IRequestHandler<CreateGroupNotificationCommand, Result<Guid>>
     {
-        private readonly IDapperContext _dapperContext;
-
         public CreateGroupNotificationCommandHandler(
-            IDapperContext dapperContext,
             ISheaftMediatr mediatr,
             IAppDbContext context,
             ILogger<CreateGroupNotificationCommandHandler> logger)
             : base(mediatr, context, logger)
         {
-            _dapperContext = dapperContext;
         }
 
         public async Task<Result<Guid>> Handle(CreateGroupNotificationCommand request, CancellationToken token)
         {
-            var user = await _context.GetByIdAsync<Domain.User>(request.Id, token);
-            var entity = new Domain.Notification(Guid.NewGuid(), NotificationKind.Business, request.Method, request.Content,
+            var user = await _context.GetByIdAsync<Domain.User>(request.GroupId, token);
+            var entity = new Domain.Notification(Guid.NewGuid(), NotificationKind.Business, request.Method,
+                request.Content,
                 user);
 
             await _context.AddAsync(entity, token);

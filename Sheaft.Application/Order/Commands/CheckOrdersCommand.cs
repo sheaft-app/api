@@ -32,22 +32,12 @@ namespace Sheaft.Application.Order.Commands
     public class CheckOrdersCommandHandler : CommandsHandler,
         IRequestHandler<CheckOrdersCommand, Result>
     {
-        private readonly ICapingDeliveriesService _capingDeliveriesService;
-        private readonly PspOptions _pspOptions;
-        private readonly RoutineOptions _routineOptions;
-
         public CheckOrdersCommandHandler(
             IAppDbContext context,
             ISheaftMediatr mediatr,
-            ICapingDeliveriesService capingDeliveriesService,
-            IOptionsSnapshot<PspOptions> pspOptions,
-            IOptionsSnapshot<RoutineOptions> routineOptions,
             ILogger<CheckOrdersCommandHandler> logger)
             : base(mediatr, context, logger)
         {
-            _capingDeliveriesService = capingDeliveriesService;
-            _pspOptions = pspOptions.Value;
-            _routineOptions = routineOptions.Value;
         }
 
         public async Task<Result> Handle(CheckOrdersCommand request, CancellationToken token)

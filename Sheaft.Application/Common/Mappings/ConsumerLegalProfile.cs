@@ -22,7 +22,8 @@ namespace Sheaft.Application.Common.Mappings
                 .IncludeBase<Domain.Legal, BaseLegalDto>();
 
             CreateMap<CreateConsumerLegalInput, CreateConsumerLegalCommand>();
-            CreateMap<UpdateConsumerLegalInput, UpdateConsumerLegalCommand>();
+            CreateMap<UpdateConsumerLegalInput, UpdateConsumerLegalCommand>()
+                .ForMember(c => c.LegalId, opt => opt.MapFrom(r => r.Id));;
         }
     }
 }
