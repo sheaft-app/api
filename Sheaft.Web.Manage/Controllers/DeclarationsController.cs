@@ -4,57 +4,32 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Sheaft.Application.Commands;
-using Sheaft.Exceptions;
-using Sheaft.Application.Interop;
-using Sheaft.Application.Models;
-using Sheaft.Options;
 using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Collections.Generic;
-using Sheaft.Domain.Models;
-using Sheaft.Domain.Enums;
+using Sheaft.Application.Common.Interfaces;
+using Sheaft.Application.Common.Interfaces.Services;
+using Sheaft.Application.Common.Models.Inputs;
+using Sheaft.Application.Common.Models.ViewModels;
+using Sheaft.Application.Common.Options;
+using Sheaft.Application.Declaration.Commands;
+using Sheaft.Application.Ubo.Commands;
+using Sheaft.Domain;
+using Sheaft.Domain.Exceptions;
 
 namespace Sheaft.Web.Manage.Controllers
 {
     public class DeclarationsController : ManageController
     {
-        private readonly ILogger<DeclarationsController> _logger;
-
         public DeclarationsController(
             IAppDbContext context,
             IMapper mapper,
             ISheaftMediatr mediatr,
             IOptionsSnapshot<RoleOptions> roleOptions,
-            IConfigurationProvider configurationProvider,
-            ILogger<DeclarationsController> logger) : base(context, mapper, roleOptions, mediatr, configurationProvider)
+            IConfigurationProvider configurationProvider)
+            : base(context, mapper, roleOptions, mediatr, configurationProvider)
         {
-            _logger = logger;
-        }
-
-        [HttpGet]
-        public async Task<IActionResult> Index(CancellationToken token, int page = 0, int take = 25)
-        {
-            if (page < 0)
-                page = 0;
-
-            if (take > 100)
-                take = 100;
-
-            var entities = await _context.Legals
-                .OfType<BusinessLegal>()
-                .ProjectTo<BusinessLegalViewModel>(_configurationProvider)
-                .OrderByDescending(c => c.CreatedOn)
-                .Skip(page * take)
-                .Take(take)
-                .ToListAsync(token);
-
-            ViewBag.Page = page;
-            ViewBag.Take = take;
-
-            return View(entities);
         }
 
         [HttpGet]
@@ -67,7 +42,7 @@ namespace Sheaft.Web.Manage.Controllers
                 .SingleOrDefaultAsync(token);
 
             if (entity == null)
-                throw new NotFoundException();
+                throw SheaftException.NotFound();
 
             ViewBag.UserId = entity.Owner.Id;
             ViewBag.LegalId = entity.Id;
@@ -83,17 +58,17 @@ namespace Sheaft.Web.Manage.Controllers
                 .SingleOrDefaultAsync(c => c.Id == legalId, token);
 
             if (entity == null)
-                throw new NotFoundException();
+                throw SheaftException.NotFound();
 
             var result = await _mediatr.Process(new CreateDeclarationCommand(await GetRequestUser(token))
             {
                 LegalId = legalId
             }, token);
 
-            if (!result.Success)
+            if (!result.Succeeded)
                 throw result.Exception;
 
-            return RedirectToAction("Edit", new { id = result.Data });
+            return RedirectToAction("Edit", new {id = result.Data});
         }
 
         [HttpGet]
@@ -119,10 +94,9 @@ namespace Sheaft.Web.Manage.Controllers
                 FirstName = model.FirstName,
                 LastName = model.LastName,
                 Nationality = model.Nationality
-
             }, token);
 
-            if (!result.Success)
+            if (!result.Succeeded)
             {
                 ViewBag.Countries = await GetCountries(token);
                 ViewBag.Nationalities = await GetNationalities(token);
@@ -131,7 +105,7 @@ namespace Sheaft.Web.Manage.Controllers
                 return View(model);
             }
 
-            return RedirectToAction("Edit", new { id = declarationId });
+            return RedirectToAction("Edit", new {id = declarationId});
         }
 
         [HttpGet]
@@ -145,7 +119,7 @@ namespace Sheaft.Web.Manage.Controllers
                 .SingleOrDefaultAsync(token);
 
             if (ubo == null)
-                throw new NotFoundException();
+                throw SheaftException.NotFound();
 
             ViewBag.Countries = await GetCountries(token);
             ViewBag.Nationalities = await GetNationalities(token);
@@ -160,7 +134,7 @@ namespace Sheaft.Web.Manage.Controllers
         {
             var result = await _mediatr.Process(new UpdateUboCommand(await GetRequestUser(token))
             {
-                Id = model.Id,
+                UboId = model.Id,
                 Address = _mapper.Map<AddressInput>(model.Address),
                 BirthDate = model.BirthDate,
                 BirthPlace = _mapper.Map<BirthAddressInput>(model.BirthPlace),
@@ -169,7 +143,7 @@ namespace Sheaft.Web.Manage.Controllers
                 Nationality = model.Nationality
             }, token);
 
-            if (!result.Success)
+            if (!result.Succeeded)
             {
                 ViewBag.Countries = await GetCountries(token);
                 ViewBag.Nationalities = await GetNationalities(token);
@@ -178,7 +152,7 @@ namespace Sheaft.Web.Manage.Controllers
                 return View(model);
             }
 
-            return RedirectToAction("Edit", new { id = declarationId });
+            return RedirectToAction("Edit", new {id = declarationId});
         }
 
         [HttpPost]
@@ -190,10 +164,10 @@ namespace Sheaft.Web.Manage.Controllers
                 DeclarationId = declarationId
             }, token);
 
-            if (!result.Success)
+            if (!result.Succeeded)
                 throw result.Exception;
 
-            return RedirectToAction("Edit", new { id = declarationId });
+            return RedirectToAction("Edit", new {id = declarationId});
         }
 
         [HttpPost]
@@ -205,10 +179,10 @@ namespace Sheaft.Web.Manage.Controllers
                 DeclarationId = declarationId
             }, token);
 
-            if (!result.Success)
+            if (!result.Succeeded)
                 throw result.Exception;
 
-            return RedirectToAction("Edit", new { id = declarationId });
+            return RedirectToAction("Edit", new {id = declarationId});
         }
 
         [HttpPost]
@@ -220,10 +194,10 @@ namespace Sheaft.Web.Manage.Controllers
                 DeclarationId = declarationId
             }, token);
 
-            if (!result.Success)
+            if (!result.Succeeded)
                 throw result.Exception;
 
-            return RedirectToAction("Edit", new { id = declarationId });
+            return RedirectToAction("Edit", new {id = declarationId});
         }
 
         [HttpPost]
@@ -232,13 +206,13 @@ namespace Sheaft.Web.Manage.Controllers
         {
             var result = await _mediatr.Process(new DeleteUboCommand(await GetRequestUser(token))
             {
-                Id = uboId
+                UboId = uboId
             }, token);
 
-            if (!result.Success)
+            if (!result.Succeeded)
                 throw result.Exception;
 
-            return RedirectToAction("Edit", new { id = declarationId });
+            return RedirectToAction("Edit", new {id = declarationId});
         }
     }
 }

@@ -1,7 +1,6 @@
-﻿using Sheaft.Exceptions;
-using Sheaft.Domain.Enums;
+﻿using Sheaft.Domain.Enum;
 
-namespace Sheaft.Domain.Models
+namespace Sheaft.Domain
 {
     public class UboAddress : Address
     {

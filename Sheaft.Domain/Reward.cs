@@ -1,8 +1,9 @@
-﻿using Sheaft.Exceptions;
+﻿using System;
+using Sheaft.Domain.Enum;
+using Sheaft.Domain.Exceptions;
 using Sheaft.Domain.Interop;
-using System;
 
-namespace Sheaft.Domain.Models
+namespace Sheaft.Domain
 {
     public class Reward : IEntity
     {

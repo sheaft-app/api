@@ -5,24 +5,25 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Sheaft.Application.Commands;
-using Sheaft.Exceptions;
-using Sheaft.Application.Interop;
-using Sheaft.Application.Models;
-using Sheaft.Options;
 using System;
 using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Sheaft.Application.Queries;
-using Sheaft.Domain.Enums;
+using Sheaft.Application.Common.Interfaces;
+using Sheaft.Application.Common.Interfaces.Queries;
+using Sheaft.Application.Common.Interfaces.Services;
+using Sheaft.Application.Common.Models.ViewModels;
+using Sheaft.Application.Common.Options;
+using Sheaft.Application.Document.Commands;
+using Sheaft.Application.Page.Commands;
+using Sheaft.Domain.Enum;
+using Sheaft.Domain.Exceptions;
 
 namespace Sheaft.Web.Manage.Controllers
 {
     public class DocumentsController : ManageController
     {
-        private readonly ILogger<DocumentsController> _logger;
         private readonly IDocumentQueries _documentQueries;
 
         public DocumentsController(
@@ -31,10 +32,9 @@ namespace Sheaft.Web.Manage.Controllers
             ISheaftMediatr mediatr,
             IDocumentQueries documentQueries,
             IOptionsSnapshot<RoleOptions> roleOptions,
-            IConfigurationProvider configurationProvider,
-            ILogger<DocumentsController> logger) : base(context, mapper, roleOptions, mediatr, configurationProvider)
+            IConfigurationProvider configurationProvider)
+            : base(context, mapper, roleOptions, mediatr, configurationProvider)
         {
-            _logger = logger;
             _documentQueries = documentQueries;
         }
 
@@ -47,7 +47,7 @@ namespace Sheaft.Web.Manage.Controllers
                 .SingleOrDefaultAsync(token);
 
             if (entity == null)
-                throw new NotFoundException();
+                throw SheaftException.NotFound();
 
             ViewBag.Kind = entity.Kind;
             ViewBag.UserId = entity.Owner.Id;
@@ -67,10 +67,10 @@ namespace Sheaft.Web.Manage.Controllers
                 LegalId = legalId
             }, token);
 
-            if (!result.Success)
+            if (!result.Succeeded)
                 throw result.Exception;
 
-            return RedirectToAction("Edit", new { id = result.Data });
+            return RedirectToAction("Edit", new {id = result.Data});
         }
 
         [HttpGet]
@@ -82,7 +82,7 @@ namespace Sheaft.Web.Manage.Controllers
                 .SingleOrDefaultAsync(token);
 
             if (entity == null)
-                throw new NotFoundException();
+                throw SheaftException.NotFound();
 
             ViewBag.Kind = entity.Kind;
             ViewBag.UserId = entity.Owner.Id;
@@ -98,15 +98,15 @@ namespace Sheaft.Web.Manage.Controllers
         {
             var result = await _mediatr.Process(new UpdateDocumentCommand(await GetRequestUser(token))
             {
-                Id = model.Id,
+                DocumentId = model.Id,
                 Name = model.Name,
                 Kind = model.Kind,
             }, token);
 
-            if (!result.Success)
+            if (!result.Succeeded)
                 throw result.Exception;
 
-            return RedirectToAction("Edit", new { model.Id });
+            return RedirectToAction("Edit", new {model.Id});
         }
 
         [HttpGet]
@@ -118,7 +118,7 @@ namespace Sheaft.Web.Manage.Controllers
                 .SingleOrDefaultAsync(token);
 
             if (entity == null)
-                throw new NotFoundException();
+                throw SheaftException.NotFound();
 
             ViewBag.Kind = entity.Kind;
             ViewBag.UserId = entity.Owner.Id;
@@ -152,10 +152,10 @@ namespace Sheaft.Web.Manage.Controllers
                 Data = data
             }, token);
 
-            if (!result.Success)
+            if (!result.Succeeded)
                 throw result.Exception;
 
-            return RedirectToAction("Edit", new { model.Id });
+            return RedirectToAction("Edit", new {model.Id});
         }
 
         [HttpPost]
@@ -167,10 +167,10 @@ namespace Sheaft.Web.Manage.Controllers
                 DocumentId = id
             }, token);
 
-            if (!result.Success)
+            if (!result.Succeeded)
                 throw result.Exception;
 
-            return RedirectToAction("Edit", new { id });
+            return RedirectToAction("Edit", new {id});
         }
 
         [HttpPost]
@@ -182,10 +182,10 @@ namespace Sheaft.Web.Manage.Controllers
                 DocumentId = id
             }, token);
 
-            if (!result.Success)
+            if (!result.Succeeded)
                 throw result.Exception;
 
-            return RedirectToAction("Edit", new { id });
+            return RedirectToAction("Edit", new {id});
         }
 
         [HttpPost]
@@ -197,10 +197,10 @@ namespace Sheaft.Web.Manage.Controllers
                 DocumentId = id
             }, token);
 
-            if (!result.Success)
+            if (!result.Succeeded)
                 throw result.Exception;
 
-            return RedirectToAction("Edit", new { id });
+            return RedirectToAction("Edit", new {id});
         }
 
         [HttpPost]
@@ -213,7 +213,7 @@ namespace Sheaft.Web.Manage.Controllers
                 .SingleOrDefaultAsync(c => c.Id == id, token);
 
             if (entity == null)
-                throw new NotFoundException();
+                throw SheaftException.NotFound();
 
             var data = await _documentQueries.DownloadDocumentAsync(id, await GetRequestUser(token), token);
             return File(data, "application/octet-stream", entity.Name + ".zip");
@@ -229,10 +229,11 @@ namespace Sheaft.Web.Manage.Controllers
                 .SingleOrDefaultAsync(c => c.Id == documentId && c.Pages.Any(p => p.Id == pageId), token);
 
             if (entity == null)
-                throw new NotFoundException();
+                throw SheaftException.NotFound();
 
             var page = entity.Pages.Single(p => p.Id == pageId);
-            var data = await _documentQueries.DownloadDocumentPageAsync(documentId, pageId, await GetRequestUser(token), token);
+            var data = await _documentQueries.DownloadDocumentPageAsync(documentId, pageId, await GetRequestUser(token),
+                token);
 
             return File(data, "application/octet-stream", page.FileName + page.Extension);
         }
@@ -247,10 +248,10 @@ namespace Sheaft.Web.Manage.Controllers
                 PageId = pageId
             }, token);
 
-            if (!result.Success)
+            if (!result.Succeeded)
                 throw result.Exception;
 
-            return RedirectToAction("Edit", new { id = documentId });
+            return RedirectToAction("Edit", new {id = documentId});
         }
 
         [HttpPost]
@@ -262,16 +263,16 @@ namespace Sheaft.Web.Manage.Controllers
 
             var result = await _mediatr.Process(new DeleteDocumentCommand(await GetRequestUser(token))
             {
-                Id = id
+                DocumentId = id
             }, token);
 
-            if (!result.Success)
+            if (!result.Succeeded)
                 throw result.Exception;
 
             if (entity.Kind != LegalKind.Natural)
-                return RedirectToAction("EditLegalBusiness", "Legals", new { entity.Id });
+                return RedirectToAction("EditLegalBusiness", "Legals", new {entity.Id});
 
-            return RedirectToAction("EditLegalConsumer", "Legals", new { entity.Id });
+            return RedirectToAction("EditLegalConsumer", "Legals", new {entity.Id});
         }
     }
 }

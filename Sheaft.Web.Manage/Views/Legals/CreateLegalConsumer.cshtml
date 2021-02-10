@@ -1,4 +1,5 @@
-﻿@model ConsumerLegalViewModel
+﻿@using Sheaft.Application.Common.Models.ViewModels
+@model Sheaft.Application.Common.Models.ViewModels.ConsumerLegalViewModel
 @{
     ViewData["Title"] = "New Consumer Legals";
     var countries = ((List<CountryViewModel>)ViewBag.Countries).Select(c => new SelectListItem(c.Name, c.Alpha2)).ToList();

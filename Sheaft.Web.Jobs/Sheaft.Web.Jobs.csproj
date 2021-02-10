@@ -10,6 +10,7 @@
     <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="8.1.0" />
     <PackageReference Include="Hangfire.AspNetCore" Version="1.7.18" />
     <PackageReference Include="Hangfire.SqlServer" Version="1.7.18" />
+    <PackageReference Include="MediatR.Extensions.Microsoft.DependencyInjection" Version="9.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="3.1.10" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" Version="3.1.10" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="3.1.10" />
@@ -28,10 +29,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Sheaft.Application.Handlers\Sheaft.Application.Handlers.csproj" />
-    <ProjectReference Include="..\Sheaft.Application.Mappers\Sheaft.Application.Mappers.csproj" />
-    <ProjectReference Include="..\Sheaft.Infrastructure.Persistence\Sheaft.Infrastructure.Persistence.csproj" />
-    <ProjectReference Include="..\Sheaft.Options\Sheaft.Options.csproj" />
+    <ProjectReference Include="..\Sheaft.Application\Sheaft.Application.csproj" />
+    <ProjectReference Include="..\Sheaft.Infrastructure\Sheaft.Infrastructure.csproj" />
     <ProjectReference Include="..\Sheaft.Web.Common\Sheaft.Web.Common.csproj" />
   </ItemGroup>
 
@@ -46,6 +45,68 @@
       <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
     </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <_ContentIncludedByDefault Remove="Views\Dashboard\Index.cshtml" />
+    <_ContentIncludedByDefault Remove="Views\DeliveryModes\Edit.cshtml" />
+    <_ContentIncludedByDefault Remove="Views\DeliveryModes\Index.cshtml" />
+    <_ContentIncludedByDefault Remove="Views\Donations\Edit.cshtml" />
+    <_ContentIncludedByDefault Remove="Views\Donations\Index.cshtml" />
+    <_ContentIncludedByDefault Remove="Views\Withholdings\Edit.cshtml" />
+    <_ContentIncludedByDefault Remove="Views\Withholdings\Index.cshtml" />
+    <_ContentIncludedByDefault Remove="Views\Rewards\Add.cshtml" />
+    <_ContentIncludedByDefault Remove="Views\Rewards\Edit.cshtml" />
+    <_ContentIncludedByDefault Remove="Views\Rewards\Index.cshtml" />
+    <_ContentIncludedByDefault Remove="Views\Regions\Edit.cshtml" />
+    <_ContentIncludedByDefault Remove="Views\Regions\Index.cshtml" />
+    <_ContentIncludedByDefault Remove="Views\Products\Add.cshtml" />
+    <_ContentIncludedByDefault Remove="Views\Products\Edit.cshtml" />
+    <_ContentIncludedByDefault Remove="Views\Products\Index.cshtml" />
+    <_ContentIncludedByDefault Remove="Views\Tags\Add.cshtml" />
+    <_ContentIncludedByDefault Remove="Views\Tags\Edit.cshtml" />
+    <_ContentIncludedByDefault Remove="Views\Tags\Index.cshtml" />
+    <_ContentIncludedByDefault Remove="Views\Returnables\Add.cshtml" />
+    <_ContentIncludedByDefault Remove="Views\Returnables\Edit.cshtml" />
+    <_ContentIncludedByDefault Remove="Views\Returnables\Index.cshtml" />
+    <_ContentIncludedByDefault Remove="Views\Legals\CreateLegalBusiness.cshtml" />
+    <_ContentIncludedByDefault Remove="Views\Legals\CreateLegalConsumer.cshtml" />
+    <_ContentIncludedByDefault Remove="Views\Legals\EditLegalBusiness.cshtml" />
+    <_ContentIncludedByDefault Remove="Views\Legals\EditLegalConsumer.cshtml" />
+    <_ContentIncludedByDefault Remove="Views\Jobs\Edit.cshtml" />
+    <_ContentIncludedByDefault Remove="Views\Jobs\Index.cshtml" />
+    <_ContentIncludedByDefault Remove="Views\Transfers\Edit.cshtml" />
+    <_ContentIncludedByDefault Remove="Views\Transfers\Index.cshtml" />
+    <_ContentIncludedByDefault Remove="Views\Producers\Edit.cshtml" />
+    <_ContentIncludedByDefault Remove="Views\Producers\Index.cshtml" />
+    <_ContentIncludedByDefault Remove="Views\Declarations\AddUbo.cshtml" />
+    <_ContentIncludedByDefault Remove="Views\Declarations\Edit.cshtml" />
+    <_ContentIncludedByDefault Remove="Views\Declarations\EditUbo.cshtml" />
+    <_ContentIncludedByDefault Remove="Views\Stores\Edit.cshtml" />
+    <_ContentIncludedByDefault Remove="Views\Stores\Index.cshtml" />
+    <_ContentIncludedByDefault Remove="Views\Consumers\Edit.cshtml" />
+    <_ContentIncludedByDefault Remove="Views\Consumers\Index.cshtml" />
+    <_ContentIncludedByDefault Remove="Views\Payins\Edit.cshtml" />
+    <_ContentIncludedByDefault Remove="Views\Payins\Index.cshtml" />
+    <_ContentIncludedByDefault Remove="Views\Departments\Edit.cshtml" />
+    <_ContentIncludedByDefault Remove="Views\Departments\Index.cshtml" />
+    <_ContentIncludedByDefault Remove="Views\Orders\Edit.cshtml" />
+    <_ContentIncludedByDefault Remove="Views\Orders\Index.cshtml" />
+    <_ContentIncludedByDefault Remove="Views\PurchaseOrders\Edit.cshtml" />
+    <_ContentIncludedByDefault Remove="Views\PurchaseOrders\Index.cshtml" />
+    <_ContentIncludedByDefault Remove="Views\BankAccounts\Create.cshtml" />
+    <_ContentIncludedByDefault Remove="Views\BankAccounts\Edit.cshtml" />
+    <_ContentIncludedByDefault Remove="Views\Payouts\Edit.cshtml" />
+    <_ContentIncludedByDefault Remove="Views\Payouts\Index.cshtml" />
+    <_ContentIncludedByDefault Remove="Views\Documents\AddPage.cshtml" />
+    <_ContentIncludedByDefault Remove="Views\Documents\Create.cshtml" />
+    <_ContentIncludedByDefault Remove="Views\Documents\Edit.cshtml" />
+    <_ContentIncludedByDefault Remove="Views\Levels\Add.cshtml" />
+    <_ContentIncludedByDefault Remove="Views\Levels\Edit.cshtml" />
+    <_ContentIncludedByDefault Remove="Views\Levels\Index.cshtml" />
+    <_ContentIncludedByDefault Remove="Views\Agreements\Edit.cshtml" />
+    <_ContentIncludedByDefault Remove="Views\Agreements\Index.cshtml" />
+    <_ContentIncludedByDefault Remove="Views\Error\Index.cshtml" />
   </ItemGroup>
 
 

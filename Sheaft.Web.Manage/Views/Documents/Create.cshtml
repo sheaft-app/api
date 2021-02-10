@@ -1,8 +1,10 @@
-﻿@model DocumentViewModel
+﻿@using Sheaft.Domain.Enum
+@model Sheaft.Application.Common.Models.ViewModels.DocumentViewModel
 @{
     ViewData["Title"] = "Create Document";
 
-    var kinds = new List<SelectListItem> {
+    var kinds = new List<SelectListItem>
+    {
         new SelectListItem("Association", DocumentKind.AssociationProof.ToString("G")),
         new SelectListItem("Identity", DocumentKind.IdentityProof.ToString("G")),
         new SelectListItem("Registration", DocumentKind.RegistrationProof.ToString("G")),
@@ -10,35 +12,37 @@
     };
 
     if (ViewBag.Kind != LegalKind.Business)
+    {
         kinds.Add(new SelectListItem("Address", DocumentKind.AddressProof.ToString("G")));
+    }
 }
 
 <div class="container">
     <h2 class="display-4">Create Document</h2>
-    <br />
+    <br/>
 
     @using (Html.BeginForm("Create", "Documents", FormMethod.Post))
     {
         @Html.AntiForgeryToken()
-        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+        @Html.ValidationSummary(true, "", new {@class = "text-danger"})
         @Html.HiddenFor(model => model.Id)
-        @Html.Hidden("LegalId", (Guid)ViewBag.LegalId)
-        <br />
+        @Html.Hidden("LegalId", (Guid) ViewBag.LegalId)
+        <br/>
         <div class="form-group">
-            @Html.LabelFor(c => c.Name, new { @class = "form-label" })
-            @Html.TextBoxFor(c => c.Name, null, new { @class = "form-control" })
+            @Html.LabelFor(c => c.Name, new {@class = "form-label"})
+            @Html.TextBoxFor(c => c.Name, null, new {@class = "form-control"})
         </div>
         <div class="form-group">
-            @Html.LabelFor(c => c.Kind, new { @class = "form-label" })
-            @Html.DropDownListFor(c => c.Kind, kinds, new { @class = "form-control" })
+            @Html.LabelFor(c => c.Kind, new {@class = "form-label"})
+            @Html.DropDownListFor(c => c.Kind, kinds, new {@class = "form-control"})
         </div>
 
-        <br />
-            <a asp-controller="Legals" asp-action="Edit" asp-route-id="@ViewBag.LegalId" class="btn btn-light">
-                Go back
-            </a>
-            <button type="submit" class="btn btn-success">
-                <i class="fa fa-plus">&nbsp;Create</i>
-            </button>
-            }
-    </div>
+        <br/>
+        <a asp-controller="Legals" asp-action="Edit" asp-route-id="@ViewBag.LegalId" class="btn btn-light">
+            Go back
+        </a>
+        <button type="submit" class="btn btn-success">
+            <i class="fa fa-plus">&nbsp;Create</i>
+        </button>
+    }
+</div>

@@ -32,21 +32,10 @@ using Newtonsoft.Json;
 using RazorLight;
 using Serilog;
 using Serilog.Events;
-using Sheaft.Application.Commands;
-using Sheaft.Application.Events;
-using Sheaft.Application.Handlers;
-using Sheaft.Application.Interop;
-using Sheaft.Application.Mappers;
-using Sheaft.Application.Queries;
-using Sheaft.Core.Security;
-using Sheaft.Domain.Enums;
-using Sheaft.Domain.Models;
-using Sheaft.GraphQL.Services;
 using Sheaft.GraphQL.Types;
 using Sheaft.Infrastructure;
 using Sheaft.Infrastructure.Persistence;
 using Sheaft.Infrastructure.Services;
-using Sheaft.Options;
 using Sheaft.Web.Api.Authorize;
 using Sheaft.Web.Common;
 using System;
@@ -55,6 +44,42 @@ using System.Globalization;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Reflection;
+using Sheaft.Application.Agreement.Queries;
+using Sheaft.Application.Common.Behaviours;
+using Sheaft.Application.Common.Interfaces;
+using Sheaft.Application.Common.Interfaces.Queries;
+using Sheaft.Application.Common.Interfaces.Services;
+using Sheaft.Application.Common.Mappings;
+using Sheaft.Application.Common.Options;
+using Sheaft.Application.Common.Security;
+using Sheaft.Application.Consumer.Queries;
+using Sheaft.Application.Country.Queries;
+using Sheaft.Application.DeliveryMode.Queries;
+using Sheaft.Application.Department.Queries;
+using Sheaft.Application.Document.Queries;
+using Sheaft.Application.Job.Queries;
+using Sheaft.Application.Leaderboard.Queries;
+using Sheaft.Application.Legal.Queries;
+using Sheaft.Application.Nationality.Queries;
+using Sheaft.Application.Notification.Queries;
+using Sheaft.Application.Order.Queries;
+using Sheaft.Application.Payin.Queries;
+using Sheaft.Application.Producer.Commands;
+using Sheaft.Application.Producer.Queries;
+using Sheaft.Application.Product.Queries;
+using Sheaft.Application.PurchaseOrder.Queries;
+using Sheaft.Application.QuickOrder.Queries;
+using Sheaft.Application.Region.Queries;
+using Sheaft.Application.Returnable.Queries;
+using Sheaft.Application.Store.Commands;
+using Sheaft.Application.Tag.Queries;
+using Sheaft.Application.User.Queries;
+using Sheaft.Domain;
+using Sheaft.Domain.Enum;
+using Sheaft.Domain.Events.User;
+using Sheaft.GraphQL.Common;
+using Sheaft.GraphQL.Types.Outputs;
+using Sheaft.Infrastructure.Persistence.Extensions;
 
 namespace Sheaft.Web.Api
 {
@@ -227,7 +252,7 @@ namespace Sheaft.Web.Api
             });
 
             services.AddAutoMapper(typeof(ProductProfile).Assembly);
-            services.AddMediatR(new List<Assembly>() { typeof(RegisterStoreCommand).Assembly, typeof(UserPointsCreatedEvent).Assembly, typeof(UserCommandsHandler).Assembly }.ToArray());
+            services.AddMediatR(new List<Assembly>() { typeof(RegisterStoreCommand).Assembly }.ToArray());
             services.AddHttpClient();
 
             var databaseConfig = appDatabaseSettings.Get<AppDatabaseOptions>();
@@ -242,7 +267,6 @@ namespace Sheaft.Web.Api
             }, ServiceLifetime.Scoped);
 
             services.AddScoped<IIdentifierService, IdentifierService>();
-            services.AddScoped<IQueueService, QueueService>();
             services.AddScoped<IBlobService, BlobService>();
             services.AddScoped<IEmailService, EmailService>();
             services.AddScoped<ISignalrService, SignalrService>();
@@ -252,9 +276,10 @@ namespace Sheaft.Web.Api
             services.AddScoped<ICapingDeliveriesService, CapingDeliveriesService>();
             services.AddScoped<ISheaftMediatr, SheaftMediatr>();
             services.AddScoped<IAuthService, AuthService>();
+            services.AddSingleton<ICurrentUserService, CurrentUserService>();
 
             services.AddScoped<IAgreementQueries, AgreementQueries>();
-            services.AddScoped<IBusinessQueries, BusinessQueries>();
+            services.AddScoped<IProducerQueries, ProducerQueries>();
             services.AddScoped<IDeliveryQueries, DeliveryQueries>();
             services.AddScoped<IDepartmentQueries, DepartmentQueries>();
             services.AddScoped<IJobQueries, JobQueries>();
@@ -271,10 +296,9 @@ namespace Sheaft.Web.Api
             services.AddScoped<INationalityQueries, NationalityQueries>();
             services.AddScoped<ICountryQueries, CountryQueries>();
             services.AddScoped<IOrderQueries, OrderQueries>();
-            services.AddScoped<ITransactionQueries, TransactionQueries>();
+            services.AddScoped<IPayinQueries, PayinQueries>();
             services.AddScoped<IDocumentQueries, DocumentQueries>();
             services.AddScoped<ILegalQueries, LegalQueries>();
-
 
             services.AddScoped<IDapperContext, DapperContext>();
             services.AddScoped<IAppDbContext>(c => c.GetRequiredService<AppDbContext>());
@@ -302,6 +326,11 @@ namespace Sheaft.Web.Api
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             services.AddScoped<IBackgroundJobClient, BackgroundJobClient>();
             services.AddScoped<ISheaftHangfireBridge, SheaftHangfireBridge>();
+            
+            services.AddTransient(typeof(IPipelineBehavior<,>), typeof(UnhandledExceptionBehaviour<,>));
+            services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehaviour<,>));
+            services.AddTransient(typeof(IPipelineBehavior<,>), typeof(PerformanceBehaviour<,>));
+            services.AddTransient(typeof(IPipelineBehavior<,>), typeof(LoggingBehaviour<,>));
 
             services.AddGraphQL(sp => SchemaBuilder.New()
                 .AddServices(sp)

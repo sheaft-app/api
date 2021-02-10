@@ -1,9 +1,10 @@
-using Sheaft.Domains.Extensions;
-using Sheaft.Exceptions;
-using Sheaft.Domain.Enums;
 using System;
+using System.Collections.Generic;
+using Sheaft.Domain.Common;
+using Sheaft.Domain.Enum;
+using Sheaft.Domain.Exceptions;
 
-namespace Sheaft.Domain.Models
+namespace Sheaft.Domain
 {
     public abstract class Business : User
     {
@@ -16,7 +17,7 @@ namespace Sheaft.Domain.Models
         {
             if (address == null)
                 throw new ValidationException(MessageKind.User_Address_Required);
-
+            
             SetOpenForNewBusiness(openForBusiness);
             SetDescription(description);
 

@@ -1,0 +1,70 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>netcoreapp3.1</TargetFramework>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <Folder Include="Auth\EventHandlers" />
+      <Folder Include="Auth\Queries" />
+      <Folder Include="Bank\EventHandlers" />
+      <Folder Include="Bank\Queries" />
+      <Folder Include="Consumer\EventHandlers" />
+      <Folder Include="Country\Commands" />
+      <Folder Include="Country\EventHandlers" />
+      <Folder Include="Declaration\Queries" />
+      <Folder Include="DeliveryMode\EventHandlers" />
+      <Folder Include="Department\EventHandlers" />
+      <Folder Include="Donation\Queries" />
+      <Folder Include="Job\EventHandlers" />
+      <Folder Include="Leaderboard\Commands" />
+      <Folder Include="Leaderboard\EventHandlers" />
+      <Folder Include="Legal\EventHandlers" />
+      <Folder Include="Level\EventHandlers" />
+      <Folder Include="Level\Queries" />
+      <Folder Include="Notification\EventHandlers" />
+      <Folder Include="Page\EventHandlers" />
+      <Folder Include="Page\Queries" />
+      <Folder Include="PayinRefund\Queries" />
+      <Folder Include="Payout\Queries" />
+      <Folder Include="PickingOrders\Queries" />
+      <Folder Include="Picture\EventHandlers" />
+      <Folder Include="Picture\Queries" />
+      <Folder Include="QuickOrder\EventHandlers" />
+      <Folder Include="Region\EventHandlers" />
+      <Folder Include="Returnable\EventHandlers" />
+      <Folder Include="Reward\EventHandlers" />
+      <Folder Include="Reward\Queries" />
+      <Folder Include="Sponsor\EventHandlers" />
+      <Folder Include="Sponsor\Queries" />
+      <Folder Include="Tag\EventHandlers" />
+      <Folder Include="Transfer\Queries" />
+      <Folder Include="Ubo\EventHandlers" />
+      <Folder Include="Ubo\Queries" />
+      <Folder Include="Wallet\EventHandlers" />
+      <Folder Include="Wallet\Queries" />
+      <Folder Include="Withholding\Queries" />
+      <Folder Include="Zone\EventHandlers" />
+      <Folder Include="Zone\Queries" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\Sheaft.Domain\Sheaft.Domain.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="AutoMapper" Version="10.1.1" />
+      <PackageReference Include="EPPlus" Version="4.5.3.3" />
+      <PackageReference Include="FluentValidation" Version="9.5.0" />
+      <PackageReference Include="IdentityModel" Version="4.5.0" />
+      <PackageReference Include="JWT" Version="7.3.1" />
+      <PackageReference Include="MediatR" Version="9.0.0" />
+      <PackageReference Include="Microsoft.AspNetCore.Authorization" Version="2.1.1" />
+      <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.2.0" />
+      <PackageReference Include="Microsoft.Azure.Search" Version="10.1.0" />
+      <PackageReference Include="Microsoft.EntityFrameworkCore" Version="3.1.10" />
+      <PackageReference Include="Microsoft.Extensions.Http" Version="3.1.10" />
+      <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
+    </ItemGroup>
+
+</Project>

@@ -4,31 +4,29 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Sheaft.Application.Commands;
-using Sheaft.Exceptions;
-using Sheaft.Application.Interop;
-using Sheaft.Application.Models;
-using Sheaft.Options;
 using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Sheaft.Application.Common.Interfaces;
+using Sheaft.Application.Common.Interfaces.Services;
+using Sheaft.Application.Common.Models.ViewModels;
+using Sheaft.Application.Common.Options;
+using Sheaft.Application.Level.Commands;
+using Sheaft.Domain.Exceptions;
 
 namespace Sheaft.Web.Manage.Controllers
 {
     public class LevelsController : ManageController
     {
-        private readonly ILogger<LevelsController> _logger;
-
         public LevelsController(
             IAppDbContext context,
             IMapper mapper,
             ISheaftMediatr mediatr,
             IOptionsSnapshot<RoleOptions> roleOptions,
-            IConfigurationProvider configurationProvider,
-            ILogger<LevelsController> logger) : base(context, mapper, roleOptions, mediatr, configurationProvider)
+            IConfigurationProvider configurationProvider)
+            : base(context, mapper, roleOptions, mediatr, configurationProvider)
         {
-            _logger = logger;
         }
 
         [HttpGet]
@@ -71,13 +69,13 @@ namespace Sheaft.Web.Manage.Controllers
                 RequiredPoints = model.RequiredPoints,
             }, token);
 
-            if (!result.Success)
+            if (!result.Succeeded)
             {
                 ModelState.AddModelError("", result.Exception.Message);
                 return View(model);
             }
 
-            return RedirectToAction("Edit", new { id = result.Data });
+            return RedirectToAction("Edit", new {id = result.Data});
         }
 
         [HttpGet]
@@ -92,7 +90,7 @@ namespace Sheaft.Web.Manage.Controllers
                 .SingleOrDefaultAsync(token);
 
             if (entity == null)
-                throw new NotFoundException();
+                throw SheaftException.NotFound();
 
             return View(entity);
         }
@@ -103,12 +101,12 @@ namespace Sheaft.Web.Manage.Controllers
         {
             var result = await _mediatr.Process(new UpdateLevelCommand(await GetRequestUser(token))
             {
-                Id = model.Id,
+                LevelId = model.Id,
                 Name = model.Name,
                 RequiredPoints = model.RequiredPoints
             }, token);
 
-            if (!result.Success)
+            if (!result.Succeeded)
             {
                 ModelState.AddModelError("", result.Exception.Message);
                 return View(model);
@@ -123,10 +121,10 @@ namespace Sheaft.Web.Manage.Controllers
         {
             var result = await _mediatr.Process(new DeleteLevelCommand(await GetRequestUser(token))
             {
-                Id = id
+                LevelId = id
             }, token);
 
-            if (!result.Success)
+            if (!result.Succeeded)
                 throw result.Exception;
 
             return RedirectToAction("Index");
@@ -138,13 +136,13 @@ namespace Sheaft.Web.Manage.Controllers
         {
             var result = await _mediatr.Process(new RestoreLevelCommand(await GetRequestUser(token))
             {
-                Id = id
+                LevelId = id
             }, token);
 
-            if (!result.Success)
+            if (!result.Succeeded)
                 throw result.Exception;
 
-            return RedirectToAction("Edit", new { id });
+            return RedirectToAction("Edit", new {id});
         }
     }
 }

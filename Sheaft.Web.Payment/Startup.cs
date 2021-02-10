@@ -1,6 +1,5 @@
 using Hangfire;
 using MangoPay.SDK;
-using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -8,18 +7,18 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using NewRelic.LogEnrichers.Serilog;
 using Newtonsoft.Json;
 using Serilog;
 using Serilog.Events;
-using Sheaft.Application.Commands;
-using Sheaft.Application.Interop;
 using Sheaft.Infrastructure.Services;
-using Sheaft.Options;
 using Sheaft.Web.Common;
 using System.Collections.Generic;
 using System.Reflection;
+using MediatR;
+using Sheaft.Application.Common.Interfaces.Services;
+using Sheaft.Application.Common.Options;
+using Sheaft.Application.Store.Commands;
 
 namespace Sheaft.Web.Payment
 {

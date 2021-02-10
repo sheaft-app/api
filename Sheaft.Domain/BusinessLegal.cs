@@ -1,10 +1,9 @@
-﻿using Sheaft.Domain.Enums;
-using Sheaft.Domains.Extensions;
-using Sheaft.Exceptions;
-using System;
-using System.Linq;
+﻿using System;
+using Sheaft.Domain.Enum;
+using Sheaft.Domain.Exceptions;
+using Sheaft.Domain.Extensions;
 
-namespace Sheaft.Domain.Models
+namespace Sheaft.Domain
 {
     public class BusinessLegal : Legal
     {

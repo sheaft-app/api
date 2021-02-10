@@ -1,13 +1,15 @@
-using Sheaft.Exceptions;
-using Sheaft.Domain.Enums;
-using Sheaft.Domain.Interop;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Sheaft.Domain.Common;
+using Sheaft.Domain.Enum;
+using Sheaft.Domain.Events.PurchaseOrder;
+using Sheaft.Domain.Exceptions;
+using Sheaft.Domain.Interop;
 
-namespace Sheaft.Domain.Models
+namespace Sheaft.Domain
 {
-    public class PurchaseOrder : IEntity
+    public class PurchaseOrder : IEntity, IHasDomainEvent
     {
         private const int DIGITS_COUNT = 2;
         private List<PurchaseOrderProduct> _products;
@@ -24,6 +26,7 @@ namespace Sheaft.Domain.Models
             Id = id;
 
             _products = new List<PurchaseOrderProduct>();
+            DomainEvents = new List<DomainEvent> {new PurchaseOrderCreatedEvent(Id)};
 
             SetSender(order.User);
             SetVendor(producer);
@@ -33,10 +36,10 @@ namespace Sheaft.Domain.Models
             SetComment(delivery.Comment);
 
             SetReference(reference);
-            SetStatus(status);
+            SetStatus(status, false);
 
             var orderProducts = order.Products.Where(p => p.Producer.Id == producer.Id);
-            foreach(var orderProduct in orderProducts)
+            foreach (var orderProduct in orderProducts)
             {
                 AddProduct(orderProduct);
             }
@@ -89,28 +92,41 @@ namespace Sheaft.Domain.Models
             Transfer = transfer;
         }
 
-        private void SetStatus(PurchaseOrderStatus newStatus)
+        private void SetStatus(PurchaseOrderStatus newStatus, bool skipNotification)
         {
             switch (newStatus)
             {
                 case PurchaseOrderStatus.Accepted:
                     if (Status != PurchaseOrderStatus.Waiting)
                         throw new ValidationException(MessageKind.PurchaseOrder_CannotAccept_NotIn_WaitingStatus);
-                        AcceptedOn = DateTimeOffset.UtcNow;
-                        Status = PurchaseOrderStatus.Processing;
+
+                    AcceptedOn = DateTimeOffset.UtcNow;
+                    Status = PurchaseOrderStatus.Processing;
+
+                    if (!skipNotification)
+                        DomainEvents.Add(new PurchaseOrderAcceptedEvent(Id));
+
                     return;
                 case PurchaseOrderStatus.Completed:
                     if (Status != PurchaseOrderStatus.Processing)
                         throw new ValidationException(MessageKind.PurchaseOrder_CannotComplete_NotIn_ProcessingStatus);
+
                     CompletedOn = DateTimeOffset.UtcNow;
+
+                    if (!skipNotification)
+                        DomainEvents.Add(new PurchaseOrderCompletedEvent(Id));
+
                     break;
                 case PurchaseOrderStatus.Shipping:
                     if (Status != PurchaseOrderStatus.Completed)
                         throw new ValidationException(MessageKind.PurchaseOrder_CannotShip_NotIn_CompletedStatus);
+
                     break;
                 case PurchaseOrderStatus.Delivered:
                     if (Status != PurchaseOrderStatus.Completed && Status != PurchaseOrderStatus.Shipping)
-                        throw new ValidationException(MessageKind.PurchaseOrder_CannotDeliver_NotIn_CompletedOrShippingStatus);
+                        throw new ValidationException(MessageKind
+                            .PurchaseOrder_CannotDeliver_NotIn_CompletedOrShippingStatus);
+
                     DeliveredOn = DateTimeOffset.UtcNow;
                     break;
                 case PurchaseOrderStatus.Cancelled:
@@ -121,6 +137,10 @@ namespace Sheaft.Domain.Models
                     if (Status == PurchaseOrderStatus.Delivered)
                         throw new ValidationException(MessageKind.PurchaseOrder_CannotCancel_AlreadyIn_DeliveredStatus);
                     WithdrawnOn = DateTimeOffset.UtcNow;
+
+                    if (!skipNotification)
+                        DomainEvents.Add(new PurchaseOrderCancelledEvent(Id));
+
                     break;
                 case PurchaseOrderStatus.Refused:
                     if (Status == PurchaseOrderStatus.Cancelled)
@@ -130,6 +150,10 @@ namespace Sheaft.Domain.Models
                     if (Status == PurchaseOrderStatus.Delivered)
                         throw new ValidationException(MessageKind.PurchaseOrder_CannotRefuse_AlreadyIn_DeliveredStatus);
                     WithdrawnOn = DateTimeOffset.UtcNow;
+
+                    if (!skipNotification)
+                        DomainEvents.Add(new PurchaseOrderRefusedEvent(Id));
+
                     break;
             }
 
@@ -141,42 +165,42 @@ namespace Sheaft.Domain.Models
             Comment = comment;
         }
 
-        public void Ship()
+        public void Ship(bool skipNotification)
         {
-            SetStatus(PurchaseOrderStatus.Shipping);
+            SetStatus(PurchaseOrderStatus.Shipping, skipNotification);
         }
 
-        public void Deliver()
+        public void Deliver(bool skipNotification)
         {
-            SetStatus(PurchaseOrderStatus.Delivered);
+            SetStatus(PurchaseOrderStatus.Delivered, skipNotification);
             ExpectedDelivery.SetDeliveredDate(DateTimeOffset.UtcNow);
         }
 
-        public void Cancel(string reason)
+        public void Cancel(string reason, bool skipNotification)
         {
-            SetStatus(PurchaseOrderStatus.Cancelled);
+            SetStatus(PurchaseOrderStatus.Cancelled, skipNotification);
             Reason = reason;
         }
 
-        public void Refuse(string reason)
+        public void Refuse(string reason, bool skipNotification)
         {
-            SetStatus(PurchaseOrderStatus.Refused);
+            SetStatus(PurchaseOrderStatus.Refused, skipNotification);
             Reason = reason;
         }
 
-        public void Process()
+        public void Process(bool skipNotification)
         {
-            SetStatus(PurchaseOrderStatus.Processing);
+            SetStatus(PurchaseOrderStatus.Processing, skipNotification);
         }
 
-        public void Complete()
+        public void Complete(bool skipNotification)
         {
-            SetStatus(PurchaseOrderStatus.Completed);
+            SetStatus(PurchaseOrderStatus.Completed, skipNotification);
         }
 
-        public void Accept()
+        public void Accept(bool skipNotification)
         {
-            SetStatus(PurchaseOrderStatus.Accepted);
+            SetStatus(PurchaseOrderStatus.Accepted, skipNotification);
         }
 
         public void SetSender(User sender)
@@ -216,19 +240,27 @@ namespace Sheaft.Domain.Models
             TotalProductVatPrice = Math.Round(_products.Sum(p => p.TotalVatPrice), DIGITS_COUNT);
             TotalProductOnSalePrice = Math.Round(TotalProductWholeSalePrice + TotalProductVatPrice, DIGITS_COUNT);
 
-            TotalWeight = Math.Round(_products.Where(p => p.TotalWeight.HasValue).Sum(p => p.TotalWeight) ?? 0, DIGITS_COUNT);
+            TotalWeight = Math.Round(_products.Where(p => p.TotalWeight.HasValue).Sum(p => p.TotalWeight) ?? 0,
+                DIGITS_COUNT);
 
             LinesCount = _products.Count;
             ProductsCount = _products.Sum(p => p.Quantity);
             ReturnablesCount = _products.Sum(p => p.ReturnablesCount);
 
-            TotalReturnableWholeSalePrice = Math.Round(_products.Sum(p => p.ReturnablesCount > 0 ? p.TotalReturnableWholeSalePrice.Value : 0), DIGITS_COUNT);
-            TotalReturnableVatPrice = Math.Round(_products.Sum(p => p.ReturnablesCount > 0 ? p.TotalReturnableVatPrice.Value : 0), DIGITS_COUNT);
-            TotalReturnableOnSalePrice = Math.Round(TotalReturnableWholeSalePrice + TotalReturnableVatPrice, DIGITS_COUNT);
+            TotalReturnableWholeSalePrice =
+                Math.Round(_products.Sum(p => p.ReturnablesCount > 0 ? p.TotalReturnableWholeSalePrice.Value : 0),
+                    DIGITS_COUNT);
+            TotalReturnableVatPrice =
+                Math.Round(_products.Sum(p => p.ReturnablesCount > 0 ? p.TotalReturnableVatPrice.Value : 0),
+                    DIGITS_COUNT);
+            TotalReturnableOnSalePrice =
+                Math.Round(TotalReturnableWholeSalePrice + TotalReturnableVatPrice, DIGITS_COUNT);
 
             TotalWholeSalePrice = TotalProductWholeSalePrice + TotalReturnableWholeSalePrice;
             TotalVatPrice = TotalProductVatPrice + TotalReturnableVatPrice;
             TotalOnSalePrice = Math.Round(TotalWholeSalePrice + TotalVatPrice, DIGITS_COUNT);
         }
+
+        public List<DomainEvent> DomainEvents { get; } = new List<DomainEvent>();
     }
 }

@@ -1,9 +1,4 @@
-﻿using System;
-using System.Globalization;
-using System.Linq;
-using System.Text;
-
-namespace Sheaft.Domains.Extensions
+﻿namespace Sheaft.Domain.Extensions
 {
     internal static class StringExtensions
     {

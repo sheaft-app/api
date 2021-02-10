@@ -1,12 +1,14 @@
-﻿using Sheaft.Domain.Interop;
-using Sheaft.Domain.Enums;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Sheaft.Domain.Common;
+using Sheaft.Domain.Enum;
+using Sheaft.Domain.Events.Document;
+using Sheaft.Domain.Interop;
 
-namespace Sheaft.Domain.Models
+namespace Sheaft.Domain
 {
-    public class Document : IIdEntity, ITrackCreation, ITrackUpdate
+    public class Document : IIdEntity, ITrackCreation, ITrackUpdate, IHasDomainEvent
     {
         private List<Page> _pages;
 
@@ -22,6 +24,7 @@ namespace Sheaft.Domain.Models
             Status = DocumentStatus.UnLocked;
 
             _pages = new List<Page>();
+            DomainEvents = new List<DomainEvent>();
         }
 
         public Guid Id { get; private set; }
@@ -47,6 +50,16 @@ namespace Sheaft.Domain.Models
         public void SetStatus(DocumentStatus status)
         {
             Status = status;
+            
+            switch (Status)
+            {
+                case DocumentStatus.Refused:
+                    DomainEvents.Add(new DocumentRefusedEvent(Id));
+                    break;
+                case DocumentStatus.OutOfDate:
+                    DomainEvents.Add(new DocumentOutdatedEvent(Id));
+                    break;
+            }
         }
 
         public void SetResult(string code, string message)
@@ -92,5 +105,7 @@ namespace Sheaft.Domain.Models
             var page = Pages.FirstOrDefault(p => p.Id == pageId);
             _pages.Remove(page);
         }
+
+        public List<DomainEvent> DomainEvents { get; } = new List<DomainEvent>();
     }
 }

@@ -1,8 +1,8 @@
-﻿using Sheaft.Domain.Enums;
-using Sheaft.Exceptions;
-using System;
+﻿using System;
+using Sheaft.Domain.Enum;
+using Sheaft.Domain.Exceptions;
 
-namespace Sheaft.Domain.Models
+namespace Sheaft.Domain
 {
     public class ConsumerLegal : Legal
     {

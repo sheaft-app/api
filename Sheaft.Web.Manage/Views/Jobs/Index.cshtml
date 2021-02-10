@@ -1,4 +1,6 @@
-﻿@model IEnumerable<JobViewModel>
+﻿@using Sheaft.Domain.Enum
+@using Sheaft.Application.Common.Extensions
+@model IEnumerable<Sheaft.Application.Common.Models.ViewModels.JobViewModel>
 @{
     ViewData["Title"] = "Jobs";
     int take = ViewBag.Take;

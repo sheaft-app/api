@@ -6,9 +6,9 @@ using System.Web;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Sheaft.Application.Interop;
-using Sheaft.Domain.Enums;
-using Sheaft.Options;
+using Sheaft.Application.Common.Interfaces.Services;
+using Sheaft.Application.Common.Options;
+using Sheaft.Domain.Enum;
 using Sheaft.Web.Payment.Models;
 
 namespace Sheaft.Web.Payment.Controllers
@@ -64,7 +64,7 @@ namespace Sheaft.Web.Payment.Controllers
             try
             {
                 var payin = await _pspService.GetPayinAsync(transactionId, token);
-                if (!payin.Success)
+                if (!payin.Succeeded)
                 {
                     _logger.LogError(payin.Exception, $"Failed to retrieve transaction {transactionId} informations, redirecting to pending page.");
                     return RedirectPreserveMethod(_pspOptions.AppRedirectPendingUrl.Replace("{transactionId}", transactionId));

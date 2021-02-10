@@ -10,30 +10,24 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using Sheaft.Core.Extensions;
-using Sheaft.Domain.Models;
-using Sheaft.Application.Interop;
-using Sheaft.Application.Models;
+using Sheaft.Application.Common.Extensions;
+using Sheaft.Application.Common.Interfaces;
+using Sheaft.Application.Common.Models.ViewModels;
+using Sheaft.Domain;
 
 namespace Sheaft.Web.Manage.Controllers
 {
     public class AccountController : Controller
     {
-        private readonly ILogger<AccountController> _logger;
         private readonly IAppDbContext _context;
-        private readonly IMapper _mapper;
         private readonly IConfigurationProvider _configurationProvider;
 
         public AccountController(
             IAppDbContext context,
-            IMapper mapper,
-            IConfigurationProvider configurationProvider,
-            ILogger<AccountController> logger)
+            IConfigurationProvider configurationProvider)
         {
             _context = context;
-            _mapper = mapper;
             _configurationProvider = configurationProvider;
-            _logger = logger;
         }
 
         [AllowAnonymous]
@@ -109,8 +103,10 @@ namespace Sheaft.Web.Manage.Controllers
 
         private void AddImpersonate(Guid id, string name)
         {
-            HttpContext.Response.Cookies.Append("Sheaft.Impersonating.Id", id.ToString("N"), new CookieOptions { Secure = true, HttpOnly = true, SameSite = SameSiteMode.Strict });
-            HttpContext.Response.Cookies.Append("Sheaft.Impersonating.Name", name, new CookieOptions { Secure = true, HttpOnly = true, SameSite = SameSiteMode.Strict });
+            HttpContext.Response.Cookies.Append("Sheaft.Impersonating.Id", id.ToString("N"),
+                new CookieOptions {Secure = true, HttpOnly = true, SameSite = SameSiteMode.Strict});
+            HttpContext.Response.Cookies.Append("Sheaft.Impersonating.Name", name,
+                new CookieOptions {Secure = true, HttpOnly = true, SameSite = SameSiteMode.Strict});
         }
 
         private void RemoveImpersonate()

@@ -2,10 +2,16 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using Sheaft.Application.Commands;
-using Sheaft.Application.Interop;
-using Sheaft.Core;
-using Sheaft.Domain.Enums;
+using Sheaft.Application.Common.Interfaces.Services;
+using Sheaft.Application.Declaration.Commands;
+using Sheaft.Application.Document.Commands;
+using Sheaft.Application.Legal.Commands;
+using Sheaft.Application.Payin.Commands;
+using Sheaft.Application.PayinRefund.Commands;
+using Sheaft.Application.Payout.Commands;
+using Sheaft.Application.Transfer.Commands;
+using Sheaft.Domain;
+using Sheaft.Domain.Enum;
 
 namespace Sheaft.Web.Payment.Controllers
 {

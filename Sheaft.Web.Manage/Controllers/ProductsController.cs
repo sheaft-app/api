@@ -5,36 +5,32 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Newtonsoft.Json;
-using Sheaft.Application.Commands;
-using Sheaft.Exceptions;
-using Sheaft.Application.Interop;
-using Sheaft.Core;
-using Sheaft.Web.Manage.Models;
-using Sheaft.Application.Models;
-using Sheaft.Options;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Sheaft.Application.Common.Interfaces;
+using Sheaft.Application.Common.Interfaces.Services;
+using Sheaft.Application.Common.Models.ViewModels;
+using Sheaft.Application.Common.Options;
+using Sheaft.Application.Product.Commands;
+using Sheaft.Domain;
+using Sheaft.Domain.Exceptions;
 
 namespace Sheaft.Web.Manage.Controllers
 {
     public class ProductsController : ManageController
     {
-        private readonly ILogger<ProductsController> _logger;
-
         public ProductsController(
             IAppDbContext context,
             IMapper mapper,
             ISheaftMediatr mediatr,
             IOptionsSnapshot<RoleOptions> roleOptions,
-            IConfigurationProvider configurationProvider,
-            ILogger<ProductsController> logger) : base(context, mapper, roleOptions, mediatr, configurationProvider)
+            IConfigurationProvider configurationProvider)
+            : base(context, mapper, roleOptions, mediatr, configurationProvider)
         {
-            _logger = logger;
         }
 
         [HttpGet]
@@ -105,6 +101,7 @@ namespace Sheaft.Web.Manage.Controllers
 
             var result = await _mediatr.Process(new CreateProductCommand(requestUser)
             {
+                ProducerId = requestUser.Id,
                 Description = model.Description,
                 Name = model.Name,
                 Available = model.Available,
@@ -122,7 +119,7 @@ namespace Sheaft.Web.Manage.Controllers
                 WholeSalePricePerUnit = model.WholeSalePricePerUnit
             }, token);
 
-            if (!result.Success)
+            if (!result.Succeeded)
             {
                 ViewBag.Tags = await GetTags(token);
                 ViewBag.Returnables = await GetReturnables(requestUser, token);
@@ -131,7 +128,7 @@ namespace Sheaft.Web.Manage.Controllers
                 return View(model);
             }
 
-            return RedirectToAction("Edit", new { id = result.Data });
+            return RedirectToAction("Edit", new {id = result.Data});
         }
 
         [HttpGet]
@@ -148,7 +145,7 @@ namespace Sheaft.Web.Manage.Controllers
                 .SingleOrDefaultAsync(token);
 
             if (entity == null)
-                throw new NotFoundException();
+                throw SheaftException.NotFound();
 
             ViewBag.Tags = await GetTags(token);
             ViewBag.Returnables = await GetReturnables(requestUser, token);
@@ -161,7 +158,7 @@ namespace Sheaft.Web.Manage.Controllers
         public async Task<IActionResult> Edit(ProductViewModel model, IFormFile picture, CancellationToken token)
         {
             var requestUser = await GetRequestUser(token);
-            if(!requestUser.IsImpersonating)
+            if (!requestUser.IsImpersonating)
             {
                 ViewBag.Tags = await GetTags(token);
                 ViewBag.Returnables = await GetReturnables(requestUser, token);
@@ -181,7 +178,7 @@ namespace Sheaft.Web.Manage.Controllers
 
             var result = await _mediatr.Process(new UpdateProductCommand(requestUser)
             {
-                Id = model.Id,
+                ProductId = model.Id,
                 Description = model.Description,
                 Name = model.Name,
                 Available = model.Available,
@@ -199,7 +196,7 @@ namespace Sheaft.Web.Manage.Controllers
                 WholeSalePricePerUnit = model.WholeSalePricePerUnit
             }, token);
 
-            if (!result.Success)
+            if (!result.Succeeded)
             {
                 ViewBag.Tags = await GetTags(token);
                 ViewBag.Returnables = await GetReturnables(requestUser, token);
@@ -208,7 +205,7 @@ namespace Sheaft.Web.Manage.Controllers
                 return View(model);
             }
 
-            return RedirectToAction("Edit", new { model.Id });
+            return RedirectToAction("Edit", new {model.Id});
         }
 
         [HttpPost]
@@ -224,8 +221,13 @@ namespace Sheaft.Web.Manage.Controllers
                 using (var stream = new MemoryStream())
                 {
                     await formFile.CopyToAsync(stream, token);
-                    var result = await _mediatr.Process(new QueueImportProductsCommand(requestUser) { Id = requestUser.Id, NotifyOnUpdates = false, FileName = formFile.FileName, FileStream = stream.ToArray() }, token);
-                    if (!result.Success)
+                    var result = await _mediatr.Process(
+                        new QueueImportProductsCommand(requestUser)
+                        {
+                            ProducerId = requestUser.Id, NotifyOnUpdates = false, FileName = formFile.FileName,
+                            FileStream = stream.ToArray()
+                        }, token);
+                    if (!result.Succeeded)
                         return BadRequest(result);
                 }
             }
@@ -239,13 +241,13 @@ namespace Sheaft.Web.Manage.Controllers
         {
             var result = await _mediatr.Process(new RestoreProductCommand(await GetRequestUser(token))
             {
-                Id = id
+                ProductId = id
             }, token);
 
-            if (!result.Success)
+            if (!result.Succeeded)
                 throw result.Exception;
 
-            return RedirectToAction("Edit", new { id });
+            return RedirectToAction("Edit", new {id});
         }
 
         [HttpPost]
@@ -254,10 +256,10 @@ namespace Sheaft.Web.Manage.Controllers
         {
             var result = await _mediatr.Process(new DeleteProductCommand(await GetRequestUser(token))
             {
-                Id = id
+                ProductId = id
             }, token);
 
-            if (!result.Success)
+            if (!result.Succeeded)
                 throw result.Exception;
 
             return RedirectToAction("Index");
@@ -266,9 +268,9 @@ namespace Sheaft.Web.Manage.Controllers
         private async Task<List<ReturnableViewModel>> GetReturnables(RequestUser requestUser, CancellationToken token)
         {
             return await _context.Returnables
-                            .Where(c => c.Producer.Id == requestUser.Id && !c.RemovedOn.HasValue)
-                            .ProjectTo<ReturnableViewModel>(_configurationProvider)
-                            .ToListAsync(token);
+                .Where(c => c.Producer.Id == requestUser.Id && !c.RemovedOn.HasValue)
+                .ProjectTo<ReturnableViewModel>(_configurationProvider)
+                .ToListAsync(token);
         }
     }
 }

@@ -5,32 +5,30 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Sheaft.Application.Commands;
-using Sheaft.Exceptions;
-using Sheaft.Application.Interop;
-using Sheaft.Application.Models;
-using Sheaft.Options;
 using System;
 using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Sheaft.Application.Common.Interfaces;
+using Sheaft.Application.Common.Interfaces.Services;
+using Sheaft.Application.Common.Models.ViewModels;
+using Sheaft.Application.Common.Options;
+using Sheaft.Application.Tag.Commands;
+using Sheaft.Domain.Exceptions;
 
 namespace Sheaft.Web.Manage.Controllers
 {
     public class TagsController : ManageController
     {
-        private readonly ILogger<TagsController> _logger;
-
         public TagsController(
             IAppDbContext context,
             IMapper mapper,
             ISheaftMediatr mediatr,
             IOptionsSnapshot<RoleOptions> roleOptions,
-            IConfigurationProvider configurationProvider,
-            ILogger<TagsController> logger) : base(context, mapper, roleOptions, mediatr, configurationProvider)
+            IConfigurationProvider configurationProvider)
+            : base(context, mapper, roleOptions, mediatr, configurationProvider)
         {
-            _logger = logger;
         }
 
         [HttpGet]
@@ -65,7 +63,8 @@ namespace Sheaft.Web.Manage.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Add(TagViewModel model, IFormFile picture, IFormFile icon, CancellationToken token)
+        public async Task<IActionResult> Add(TagViewModel model, IFormFile picture, IFormFile icon,
+            CancellationToken token)
         {
             if (picture != null)
             {
@@ -95,13 +94,13 @@ namespace Sheaft.Web.Manage.Controllers
                 Kind = model.Kind
             }, token);
 
-            if (!result.Success)
+            if (!result.Succeeded)
             {
                 ModelState.AddModelError("", result.Exception.Message);
                 return View(model);
             }
 
-            return RedirectToAction("Edit", new { id = result.Data });
+            return RedirectToAction("Edit", new {id = result.Data});
         }
 
         [HttpGet]
@@ -114,14 +113,15 @@ namespace Sheaft.Web.Manage.Controllers
                 .SingleOrDefaultAsync(token);
 
             if (entity == null)
-                throw new NotFoundException();
+                throw SheaftException.NotFound();
 
             return View(entity);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(TagViewModel model, IFormFile picture, IFormFile icon, CancellationToken token)
+        public async Task<IActionResult> Edit(TagViewModel model, IFormFile picture, IFormFile icon,
+            CancellationToken token)
         {
             if (picture != null)
             {
@@ -143,7 +143,7 @@ namespace Sheaft.Web.Manage.Controllers
 
             var result = await _mediatr.Process(new UpdateTagCommand(await GetRequestUser(token))
             {
-                Id = model.Id,
+                TagId = model.Id,
                 Description = model.Description,
                 Name = model.Name,
                 Picture = model.Picture,
@@ -152,13 +152,13 @@ namespace Sheaft.Web.Manage.Controllers
                 Kind = model.Kind
             }, token);
 
-            if (!result.Success)
+            if (!result.Succeeded)
             {
                 ModelState.AddModelError("", result.Exception.Message);
                 return View(model);
             }
 
-            return RedirectToAction("Edit", new { model.Id });
+            return RedirectToAction("Edit", new {model.Id});
         }
 
         [HttpPost]
@@ -167,13 +167,13 @@ namespace Sheaft.Web.Manage.Controllers
         {
             var result = await _mediatr.Process(new RestoreTagCommand(await GetRequestUser(token))
             {
-                Id = id
+                TagId = id
             }, token);
 
-            if (!result.Success)
+            if (!result.Succeeded)
                 throw result.Exception;
 
-            return RedirectToAction("Edit", new { id });
+            return RedirectToAction("Edit", new {id});
         }
 
         [HttpPost]
@@ -182,10 +182,10 @@ namespace Sheaft.Web.Manage.Controllers
         {
             var result = await _mediatr.Process(new DeleteTagCommand(await GetRequestUser(token))
             {
-                Id = id
+                TagId = id
             }, token);
 
-            if (!result.Success)
+            if (!result.Succeeded)
                 throw result.Exception;
 
             return RedirectToAction("Index");

@@ -1,4 +1,6 @@
-﻿@model IEnumerable<AgreementViewModel>
+﻿@using Sheaft.Domain.Enum
+@using Sheaft.Application.Common.Extensions
+@model IEnumerable<Sheaft.Application.Common.Models.ViewModels.AgreementViewModel>
 @{
     ViewData["Title"] = "Agreements";
     int take = ViewBag.Take;

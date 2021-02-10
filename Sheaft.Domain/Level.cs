@@ -1,10 +1,11 @@
-﻿using Sheaft.Exceptions;
-using Sheaft.Domain.Interop;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Sheaft.Domain.Enum;
+using Sheaft.Domain.Exceptions;
+using Sheaft.Domain.Interop;
 
-namespace Sheaft.Domain.Models
+namespace Sheaft.Domain
 {
     public class Level : IEntity
     {

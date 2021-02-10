@@ -3,34 +3,31 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Sheaft.Application.Interop;
-using Sheaft.Options;
 using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Sheaft.Application.Models;
-using AutoMapper.QueryableExtensions;
-using Sheaft.Application.Commands;
-using Sheaft.Domain.Models;
-using System.Collections.Generic;
-using Sheaft.Exceptions;
+using Sheaft.Application.Bank.Commands;
+using Sheaft.Application.Common.Interfaces;
+using Sheaft.Application.Common.Interfaces.Services;
+using Sheaft.Application.Common.Models.Inputs;
+using Sheaft.Application.Common.Models.ViewModels;
+using Sheaft.Application.Common.Options;
+using Sheaft.Domain;
+using Sheaft.Domain.Exceptions;
 
 namespace Sheaft.Web.Manage.Controllers
 {
     public class BankAccountsController : ManageController
     {
-        private readonly ILogger<BankAccountsController> _logger;
-
         public BankAccountsController(
             IAppDbContext context,
             IMapper mapper,
             ISheaftMediatr mediatr,
             IOptionsSnapshot<RoleOptions> roleOptions,
-            IConfigurationProvider configurationProvider,
-            ILogger<BankAccountsController> logger) : base(context, mapper, roleOptions, mediatr, configurationProvider)
+            IConfigurationProvider configurationProvider)
+            : base(context, mapper, roleOptions, mediatr, configurationProvider)
         {
-            _logger = logger;
         }
 
         [HttpGet]
@@ -42,7 +39,7 @@ namespace Sheaft.Web.Manage.Controllers
                 .SingleOrDefaultAsync(token);
 
             if (entity == null)
-                throw new NotFoundException();
+                throw SheaftException.NotFound();
 
             ViewBag.Countries = await GetCountries(token);
             return View(new BankAccountViewModel
@@ -66,14 +63,14 @@ namespace Sheaft.Web.Manage.Controllers
                 Owner = model.Owner
             }, token);
 
-            if (!result.Success)
+            if (!result.Succeeded)
             {
                 ViewBag.Countries = await GetCountries(token);
                 ModelState.AddModelError("", result.Exception.Message);
                 return View(model);
             }
 
-            return RedirectToAction("Edit", new { id = result.Data });
+            return RedirectToAction("Edit", new {id = result.Data});
         }
 
         [HttpGet]
@@ -83,7 +80,7 @@ namespace Sheaft.Web.Manage.Controllers
                 .SingleOrDefaultAsync(c => c.Id == id, token);
 
             if (entity == null)
-                throw new NotFoundException();
+                throw SheaftException.NotFound();
 
             ViewBag.Countries = await GetCountries(token);
 
@@ -114,7 +111,7 @@ namespace Sheaft.Web.Manage.Controllers
         {
             var result = await _mediatr.Process(new UpdateBankAccountCommand(await GetRequestUser(token))
             {
-                Id = model.Id,
+                BankAccountId = model.Id,
                 Address = _mapper.Map<AddressInput>(model.Address),
                 BIC = model.BIC,
                 IBAN = model.IBAN,
@@ -122,14 +119,14 @@ namespace Sheaft.Web.Manage.Controllers
                 Owner = model.Owner
             }, token);
 
-            if (!result.Success)
+            if (!result.Succeeded)
             {
                 ViewBag.Countries = await GetCountries(token);
                 ModelState.AddModelError("", result.Exception.Message);
                 return View(model);
             }
 
-            return RedirectToAction("Edit", new { id = model.Id });
+            return RedirectToAction("Edit", new {id = model.Id});
         }
     }
 }

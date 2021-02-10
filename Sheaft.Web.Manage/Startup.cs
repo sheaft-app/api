@@ -5,7 +5,6 @@ using System.Reflection;
 using AutoMapper;
 using IdentityModel;
 using MangoPay.SDK;
-using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -16,28 +15,50 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
-using Sheaft.Application.Commands;
-using Sheaft.Application.Events;
-using Sheaft.Application.Handlers;
-using Sheaft.Application.Interop;
-using Sheaft.Application.Mappers;
-using Sheaft.Options;
 using Sheaft.Infrastructure.Persistence;
 using Sheaft.Infrastructure.Services;
-using Sheaft.Application.Queries;
 using Microsoft.Azure.Search;
 using Hangfire;
 using Newtonsoft.Json;
 using Amazon.SimpleEmail;
 using RazorLight;
 using Amazon;
+using MediatR;
 using Serilog;
 using Serilog.Events;
 using NewRelic.LogEnrichers.Serilog;
 using Sheaft.Web.Common;
 using Microsoft.IdentityModel.Logging;
 using Microsoft.Azure.Cosmos.Table;
+using Sheaft.Application.Agreement.Queries;
+using Sheaft.Application.Common.Interfaces;
+using Sheaft.Application.Common.Interfaces.Queries;
+using Sheaft.Application.Common.Interfaces.Services;
+using Sheaft.Application.Common.Mappings;
+using Sheaft.Application.Common.Options;
+using Sheaft.Application.Consumer.Queries;
+using Sheaft.Application.Country.Queries;
+using Sheaft.Application.DeliveryMode.Queries;
+using Sheaft.Application.Department.Queries;
+using Sheaft.Application.Document.Queries;
+using Sheaft.Application.Job.Queries;
+using Sheaft.Application.Leaderboard.Queries;
+using Sheaft.Application.Legal.Queries;
+using Sheaft.Application.Nationality.Queries;
+using Sheaft.Application.Notification.Queries;
+using Sheaft.Application.Order.Queries;
+using Sheaft.Application.Payin.Queries;
+using Sheaft.Application.Producer.Commands;
+using Sheaft.Application.Producer.Queries;
+using Sheaft.Application.Product.Queries;
+using Sheaft.Application.PurchaseOrder.Queries;
+using Sheaft.Application.QuickOrder.Queries;
+using Sheaft.Application.Region.Queries;
+using Sheaft.Application.Returnable.Queries;
+using Sheaft.Application.Store.Commands;
+using Sheaft.Application.Tag.Queries;
+using Sheaft.Application.User.Queries;
+using Sheaft.Domain.Events.User;
 
 namespace Sheaft.Web.Manage
 {
@@ -194,7 +215,7 @@ namespace Sheaft.Web.Manage
                     };
                 });
 
-            services.AddMediatR(new List<Assembly>() { typeof(RegisterStoreCommand).Assembly, typeof(UserPointsCreatedEvent).Assembly, typeof(UserCommandsHandler).Assembly }.ToArray());
+            services.AddMediatR(new List<Assembly>() { typeof(RegisterStoreCommand).Assembly }.ToArray());
             
             services.AddScoped<IBackgroundJobClient, BackgroundJobClient>();
             services.AddScoped<ISheaftHangfireBridge, SheaftHangfireBridge>();
@@ -225,7 +246,6 @@ namespace Sheaft.Web.Manage
 
             services.AddScoped<IDapperContext, DapperContext>();
             services.AddScoped<IIdentifierService, IdentifierService>();
-            services.AddScoped<IQueueService, QueueService>();
             services.AddScoped<IBlobService, BlobService>();
             services.AddScoped<IEmailService, EmailService>();
             services.AddScoped<ISignalrService, SignalrService>();
@@ -233,11 +253,12 @@ namespace Sheaft.Web.Manage
             services.AddScoped<IPspService, PspService>();
             services.AddScoped<ISheaftMediatr, SheaftMediatr>();
             services.AddScoped<IAuthService, AuthService>();
+            services.AddSingleton<ICurrentUserService, CurrentUserService>();
             services.AddScoped<IFeesService, FeesService>();
             services.AddScoped<ICapingDeliveriesService, CapingDeliveriesService>();
 
             services.AddScoped<IAgreementQueries, AgreementQueries>();
-            services.AddScoped<IBusinessQueries, BusinessQueries>();
+            services.AddScoped<IProducerQueries, ProducerQueries>();
             services.AddScoped<IDeliveryQueries, DeliveryQueries>();
             services.AddScoped<IDepartmentQueries, DepartmentQueries>();
             services.AddScoped<IJobQueries, JobQueries>();
@@ -254,7 +275,7 @@ namespace Sheaft.Web.Manage
             services.AddScoped<INationalityQueries, NationalityQueries>();
             services.AddScoped<ICountryQueries, CountryQueries>();
             services.AddScoped<IOrderQueries, OrderQueries>();
-            services.AddScoped<ITransactionQueries, TransactionQueries>();
+            services.AddScoped<IPayinQueries, PayinQueries>();
             services.AddScoped<IDocumentQueries, DocumentQueries>();
             services.AddScoped<ILegalQueries, LegalQueries>();
 

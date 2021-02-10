@@ -1,8 +1,9 @@
-﻿using Sheaft.Exceptions;
-using System;
+﻿using System;
 using System.Linq;
+using Sheaft.Domain.Enum;
+using Sheaft.Domain.Exceptions;
 
-namespace Sheaft.Domain.Models
+namespace Sheaft.Domain
 {
     public abstract class ExpectedDelivery
     {

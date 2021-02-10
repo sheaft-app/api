@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Sheaft.Domain.Models
+namespace Sheaft.Domain
 {
     public class Department
     {

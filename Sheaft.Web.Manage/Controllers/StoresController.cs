@@ -5,33 +5,33 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Sheaft.Application.Commands;
-using Sheaft.Domain.Models;
-using Sheaft.Exceptions;
-using Sheaft.Application.Interop;
-using Sheaft.Application.Models;
-using Sheaft.Options;
 using System;
 using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Sheaft.Application.Common.Interfaces;
+using Sheaft.Application.Common.Interfaces.Services;
+using Sheaft.Application.Common.Models.Inputs;
+using Sheaft.Application.Common.Models.ViewModels;
+using Sheaft.Application.Common.Options;
+using Sheaft.Application.Store.Commands;
+using Sheaft.Application.User.Commands;
+using Sheaft.Domain;
+using Sheaft.Domain.Exceptions;
 
 namespace Sheaft.Web.Manage.Controllers
 {
     public class StoresController : ManageController
     {
-        private readonly ILogger<StoresController> _logger;
-
         public StoresController(
             IAppDbContext context,
             IMapper mapper,
             ISheaftMediatr mediatr,
             IConfigurationProvider configurationProvider,
-            IOptionsSnapshot<RoleOptions> roleOptions,
-            ILogger<StoresController> logger) : base(context, mapper, roleOptions, mediatr, configurationProvider)
+            IOptionsSnapshot<RoleOptions> roleOptions)
+            : base(context, mapper, roleOptions, mediatr, configurationProvider)
         {
-            _logger = logger;
         }
 
         [HttpGet]
@@ -70,7 +70,7 @@ namespace Sheaft.Web.Manage.Controllers
                 .SingleOrDefaultAsync(token);
 
             if (entity == null)
-                throw new NotFoundException();
+                throw SheaftException.NotFound();
 
             ViewBag.LegalsId = (await _context.FindSingleAsync<Legal>(c => c.User.Id == id, token))?.Id;
             ViewBag.Tags = await GetTags(token);
@@ -89,11 +89,11 @@ namespace Sheaft.Web.Manage.Controllers
                     model.Picture = Convert.ToBase64String(ms.ToArray());
                 }
             }
-                        
+
             var store = await _context.Users.OfType<Store>().SingleOrDefaultAsync(c => c.Id == model.Id, token);
             var result = await _mediatr.Process(new UpdateStoreCommand(await GetRequestUser(token))
             {
-                Id = model.Id,
+                StoreId = model.Id,
                 Address = _mapper.Map<FullAddressInput>(model.Address),
                 OpenForNewBusiness = model.OpenForNewBusiness,
                 Description = model.Description,
@@ -105,10 +105,11 @@ namespace Sheaft.Web.Manage.Controllers
                 Phone = model.Phone,
                 Tags = model.Tags,
                 Picture = model.Picture,
-                OpeningHours = store.OpeningHours?.GroupBy(oh => new { oh.From, oh.To }).Select(c => new TimeSlotGroupInput { From = c.Key.From, To = c.Key.To, Days = c.Select(o => o.Day) })
+                OpeningHours = store.OpeningHours?.GroupBy(oh => new {oh.From, oh.To}).Select(c =>
+                    new TimeSlotGroupInput {From = c.Key.From, To = c.Key.To, Days = c.Select(o => o.Day)})
             }, token);
 
-            if (!result.Success)
+            if (!result.Succeeded)
             {
                 ViewBag.LegalsId = (await _context.FindSingleAsync<Legal>(c => c.User.Id == model.Id, token))?.Id;
                 ViewBag.Tags = await GetTags(token);
@@ -117,7 +118,7 @@ namespace Sheaft.Web.Manage.Controllers
                 return View(model);
             }
 
-            return RedirectToAction("Edit", new { model.Id });
+            return RedirectToAction("Edit", new {model.Id});
         }
 
         [HttpPost]
@@ -126,13 +127,28 @@ namespace Sheaft.Web.Manage.Controllers
         {
             var result = await _mediatr.Process(new RemoveUserCommand(await GetRequestUser(token))
             {
-                Id = id
+                UserId = id
             }, token);
 
-            if (!result.Success)
+            if (!result.Succeeded)
                 throw result.Exception;
-            
+
             return RedirectToAction("Index");
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Restore(Guid id, CancellationToken token)
+        {
+            var result = await _mediatr.Process(new RestoreUserCommand(await GetRequestUser(token))
+            {
+                UserId = id
+            }, token);
+
+            if (!result.Succeeded)
+                throw result.Exception;
+
+            return RedirectToAction("Edit", new {id});
         }
     }
 }

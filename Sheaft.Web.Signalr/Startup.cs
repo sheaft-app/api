@@ -1,6 +1,5 @@
 using Hangfire;
 using IdentityModel;
-using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -11,21 +10,22 @@ using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Logging;
 using NewRelic.LogEnrichers.Serilog;
 using Newtonsoft.Json;
 using Serilog;
 using Serilog.Events;
-using Sheaft.Application.Commands;
-using Sheaft.Application.Interop;
-using Sheaft.Options;
 using Sheaft.Web.Common;
 using Sheaft.Web.Signalr.Controllers;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
+using MediatR;
+using Sheaft.Application.Common.Interfaces.Services;
+using Sheaft.Application.Common.Options;
+using Sheaft.Application.Store.Commands;
+using Sheaft.Infrastructure.Services;
 
 namespace Sheaft.Web.Signalr
 {

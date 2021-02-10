@@ -1,13 +1,14 @@
-using Sheaft.Exceptions;
-using Sheaft.Domain.Interop;
-using Sheaft.Domain.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Sheaft.Domain.Common;
+using Sheaft.Domain.Enum;
+using Sheaft.Domain.Exceptions;
+using Sheaft.Domain.Interop;
 
-namespace Sheaft.Domain.Models
+namespace Sheaft.Domain
 {
-    public class Product : IEntity
+    public class Product : IEntity, IHasDomainEvent
     {
         private const int DESCRIPTION_MAXLENGTH = 500;
         private const int DIGITS_COUNT = 2;
@@ -31,6 +32,7 @@ namespace Sheaft.Domain.Models
 
             _tags = new List<ProductTag>();
             _ratings = new List<Rating>();
+            DomainEvents = new List<DomainEvent>();
 
             RefreshRatings();
             RefreshPrices();
@@ -284,5 +286,7 @@ namespace Sheaft.Domain.Models
             Rating = Ratings.Any() ? Ratings.Average(r => r.Value) : (decimal?)null;
             RatingsCount = Ratings.Count;
         }
+
+        public List<DomainEvent> DomainEvents { get; } = new List<DomainEvent>();
     }
 }

@@ -1,4 +1,5 @@
-﻿@model IEnumerable<DeliveryModeViewModel>
+﻿@using Sheaft.Application.Common.Extensions
+@model IEnumerable<Sheaft.Application.Common.Models.ViewModels.DeliveryModeViewModel>
 @{
     ViewData["Title"] = "DeliveryModes";
     int take = ViewBag.Take;
@@ -22,9 +23,6 @@
                 <th scope="col">Lock</th>
                 <th scope="col">CreatedOn</th>
                 <th scope="col">
-                    <a asp-controller="DeliveryModes" asp-action="Add" class="btn btn-success">
-                        <i class="fa fa-plus"></i>
-                    </a>
                 </th>
             </tr>
         </thead>

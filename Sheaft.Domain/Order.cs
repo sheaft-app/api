@@ -1,13 +1,14 @@
-﻿using Sheaft.Domain.Interop;
-using Sheaft.Domain.Enums;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Sheaft.Exceptions;
+using Sheaft.Domain.Common;
+using Sheaft.Domain.Enum;
+using Sheaft.Domain.Exceptions;
+using Sheaft.Domain.Interop;
 
-namespace Sheaft.Domain.Models
+namespace Sheaft.Domain
 {
-    public class Order : IEntity
+    public class Order : IEntity, IHasDomainEvent
     {
         private const int DIGITS_COUNT = 2;
         private List<OrderProduct> _products;
@@ -30,6 +31,7 @@ namespace Sheaft.Domain.Models
 
             _products = new List<OrderProduct>();
             _deliveries = new List<OrderDelivery>();
+            DomainEvents = new List<DomainEvent>();
 
             SetProducts(orderProducts);
         }
@@ -236,5 +238,7 @@ namespace Sheaft.Domain.Models
             var fees = (FeesPercent * total) + FeesFixedAmount;
             return fees + fees * FeesVatPercent;
         }
+
+        public List<DomainEvent> DomainEvents { get; } = new List<DomainEvent>();
     }
 }

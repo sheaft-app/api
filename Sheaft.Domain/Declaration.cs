@@ -1,13 +1,15 @@
-﻿using Sheaft.Exceptions;
-using Sheaft.Domain.Interop;
-using Sheaft.Domain.Enums;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Sheaft.Domain.Common;
+using Sheaft.Domain.Enum;
+using Sheaft.Domain.Events.Declaration;
+using Sheaft.Domain.Exceptions;
+using Sheaft.Domain.Interop;
 
-namespace Sheaft.Domain.Models
+namespace Sheaft.Domain
 {
-    public class Declaration : IIdEntity, ITrackCreation, ITrackUpdate
+    public class Declaration : IIdEntity, ITrackCreation, ITrackUpdate, IHasDomainEvent
     {
         private List<Ubo> _ubos;
 
@@ -19,6 +21,7 @@ namespace Sheaft.Domain.Models
         {
             Id = id;
             Status = DeclarationStatus.UnLocked;
+            DomainEvents = new List<DomainEvent>();
         }
 
         public Guid Id { get; private set; }
@@ -38,27 +41,36 @@ namespace Sheaft.Domain.Models
 
             var existingUbo = _ubos.FirstOrDefault(u => u.Id == ubo.Id);
             if (existingUbo != null)
-                throw new ConflictException();
+                throw new ValidationException(MessageKind.Ubo_CannotAdd_AlreadyExists);
 
             _ubos.Add(ubo);
         }
 
         public void RemoveUbo(Guid id)
         {
-            if (Ubos == null)
-                throw new NotFoundException();
-
             var existingUbo = _ubos.FirstOrDefault(u => u.Id == id);
             if(existingUbo == null)
-                throw new NotFoundException();
+                throw new ValidationException(MessageKind.Ubo_CannotRemove_NotFound);
 
             _ubos.Remove(existingUbo);
         }
 
-
         public void SetStatus(DeclarationStatus status)
         {
             Status = status;
+            
+            switch (Status)
+            {
+                case DeclarationStatus.Incomplete:
+                    DomainEvents.Add(new DeclarationIncompleteEvent(Id));
+                    break;
+                case DeclarationStatus.Refused:
+                    DomainEvents.Add(new DeclarationRefusedEvent(Id));
+                    break;
+                case DeclarationStatus.Validated:
+                    DomainEvents.Add(new DeclarationValidatedEvent(Id));
+                    break;
+            }
         }
 
         public void SetIdentifier(string identifier)
@@ -79,5 +91,7 @@ namespace Sheaft.Domain.Models
 
             ProcessedOn = processedOn;
         }
+
+        public List<DomainEvent> DomainEvents { get; } = new List<DomainEvent>();
     }
 }

@@ -1,8 +1,8 @@
-﻿using Sheaft.Domain.Interop;
-using Sheaft.Domain.Enums;
-using System;
+﻿using System;
+using Sheaft.Domain.Enum;
+using Sheaft.Domain.Interop;
 
-namespace Sheaft.Domain.Models
+namespace Sheaft.Domain
 {
     public class Wallet : IEntity
     {

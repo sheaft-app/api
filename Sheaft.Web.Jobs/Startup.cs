@@ -30,15 +30,24 @@ using Newtonsoft.Json;
 using RazorLight;
 using Serilog;
 using Serilog.Events;
-using Sheaft.Application.Commands;
-using Sheaft.Application.Events;
-using Sheaft.Application.Handlers;
-using Sheaft.Application.Interop;
-using Sheaft.Application.Mappers;
-using Sheaft.Core;
+using Sheaft.Application.Common.Behaviours;
+using Sheaft.Application.Common.Interfaces;
+using Sheaft.Application.Common.Interfaces.Services;
+using Sheaft.Application.Common.Mappings;
+using Sheaft.Application.Common.Options;
+using Sheaft.Application.Donation.Commands;
+using Sheaft.Application.Order.Commands;
+using Sheaft.Application.Payin.Commands;
+using Sheaft.Application.PayinRefund.Commands;
+using Sheaft.Application.Payout.Commands;
+using Sheaft.Application.Producer.Commands;
+using Sheaft.Application.Store.Commands;
+using Sheaft.Application.Transfer.Commands;
+using Sheaft.Application.Zone.Commands;
+using Sheaft.Domain;
+using Sheaft.Domain.Events.User;
 using Sheaft.Infrastructure.Persistence;
 using Sheaft.Infrastructure.Services;
-using Sheaft.Options;
 using Sheaft.Web.Common;
 
 namespace Sheaft.Web.Jobs
@@ -101,10 +110,10 @@ namespace Sheaft.Web.Jobs
             services.Configure<PspOptions>(pspSettings);
 
             var authSettings = Configuration.GetSection(AuthOptions.SETTING);
-            services.Configure<AuthOptions>(pspSettings);
+            services.Configure<AuthOptions>(authSettings);
 
             var roleSettings = Configuration.GetSection(RoleOptions.SETTING);
-            services.Configure<RoleOptions>(pspSettings);
+            services.Configure<RoleOptions>(roleSettings);
 
             var jobsDatabaseSettings = Configuration.GetSection(JobsDatabaseOptions.SETTING);
             services.Configure<JobsDatabaseOptions>(jobsDatabaseSettings);
@@ -184,7 +193,7 @@ namespace Sheaft.Web.Jobs
                 });
 
             services.AddAutoMapper(typeof(ProductProfile).Assembly);
-            services.AddMediatR(new List<Assembly>() { typeof(RegisterStoreCommand).Assembly, typeof(UserPointsCreatedEvent).Assembly, typeof(UserCommandsHandler).Assembly }.ToArray());
+            services.AddMediatR(new List<Assembly>() { typeof(RegisterStoreCommand).Assembly }.ToArray());
 
             services.AddMemoryCache();
             services.AddHttpClient();
@@ -208,7 +217,6 @@ namespace Sheaft.Web.Jobs
             });
 
             services.AddScoped<IIdentifierService, IdentifierService>();
-            services.AddScoped<IQueueService, QueueService>();
             services.AddScoped<IBlobService, BlobService>();
             services.AddScoped<IEmailService, EmailService>();
             services.AddScoped<ISignalrService, SignalrService>();
@@ -218,9 +226,15 @@ namespace Sheaft.Web.Jobs
             services.AddScoped<ICapingDeliveriesService, CapingDeliveriesService>();
             services.AddScoped<ISheaftMediatr, SheaftMediatr>();
             services.AddScoped<IAuthService, AuthService>();
+            services.AddSingleton<ICurrentUserService, CurrentUserService>();
             services.AddScoped<ISheaftHangfireBridge, SheaftHangfireBridge>();
             services.AddScoped<IBackgroundJobClient, BackgroundJobClient>();
 
+            services.AddTransient(typeof(IPipelineBehavior<,>), typeof(UnhandledExceptionBehaviour<,>));
+            services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehaviour<,>));
+            services.AddTransient(typeof(IPipelineBehavior<,>), typeof(PerformanceBehaviour<,>));
+            services.AddTransient(typeof(IPipelineBehavior<,>), typeof(LoggingBehaviour<,>));
+            
             var storageConfig = storageSettings.Get<StorageOptions>();
             services.AddSingleton<CloudStorageAccount>(CloudStorageAccount.Parse(storageConfig.ConnectionString));
 
