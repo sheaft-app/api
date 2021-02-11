@@ -10,6 +10,7 @@ using Sheaft.Application.Common.Handlers;
 using Sheaft.Application.Common.Interfaces;
 using Sheaft.Application.Common.Interfaces.Services;
 using Sheaft.Application.Common.Models;
+using Sheaft.Application.Producer.Commands;
 using Sheaft.Domain;
 using Sheaft.Domain.Enum;
 
@@ -42,13 +43,10 @@ namespace Sheaft.Application.DeliveryMode.Commands
                 await _context.DeliveryModes.SingleOrDefaultAsync(a => a.Id == request.DeliveryModeId && a.RemovedOn.HasValue,
                     token);
 
-            _context.Restore(entity);
-            entity.Producer.CanDirectSell = await _context.DeliveryModes.AnyAsync(
-                c => !c.RemovedOn.HasValue && c.Producer.Id == entity.Producer.Id &&
-                     (c.Kind == DeliveryKind.Collective || c.Kind == DeliveryKind.Farm ||
-                      c.Kind == DeliveryKind.Market), token);
-
+            _context.Restore(entity);            
             await _context.SaveChangesAsync(token);
+            
+            _mediatr.Post(new UpdateProducerAvailabilityCommand(request.RequestUser) {ProducerId = entity.Producer.Id});
             return Success();
         }
     }

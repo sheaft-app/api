@@ -9,6 +9,7 @@ using Sheaft.Application.Common.Handlers;
 using Sheaft.Application.Common.Interfaces;
 using Sheaft.Application.Common.Interfaces.Services;
 using Sheaft.Application.Common.Models;
+using Sheaft.Application.Producer.Commands;
 using Sheaft.Domain;
 
 namespace Sheaft.Application.Product.Commands
@@ -37,9 +38,11 @@ namespace Sheaft.Application.Product.Commands
         public async Task<Result> Handle(DeleteProductCommand request, CancellationToken token)
         {
             var entity = await _context.GetByIdAsync<Domain.Product>(request.ProductId, token);
+            
             _context.Remove(entity);
-
             await _context.SaveChangesAsync(token);
+            
+            _mediatr.Post(new UpdateProducerProductsCommand(request.RequestUser) {ProducerId = entity.Producer.Id});
             return Success();
         }
     }

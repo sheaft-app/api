@@ -12,6 +12,7 @@ using Sheaft.Application.Common.Interfaces;
 using Sheaft.Application.Common.Interfaces.Services;
 using Sheaft.Application.Common.Models;
 using Sheaft.Application.Common.Models.Inputs;
+using Sheaft.Application.Producer.Commands;
 using Sheaft.Domain;
 using Sheaft.Domain.Enum;
 
@@ -76,13 +77,10 @@ namespace Sheaft.Application.DeliveryMode.Commands
             entity.SetAutoCompleteRelatedPurchaseOrders(request.AutoCompleteRelatedPurchaseOrder);
             entity.SetMaxPurchaseOrdersPerTimeSlot(request.MaxPurchaseOrdersPerTimeSlot);
 
-            if (request.Kind == DeliveryKind.Collective || request.Kind == DeliveryKind.Farm ||
-                request.Kind == DeliveryKind.Market)
-                producer.CanDirectSell = true;
-
             await _context.AddAsync(entity, token);
             await _context.SaveChangesAsync(token);
-
+            
+            _mediatr.Post(new UpdateProducerAvailabilityCommand(request.RequestUser) {ProducerId = entity.Producer.Id});
             return Success(entity.Id);
         }
     }
