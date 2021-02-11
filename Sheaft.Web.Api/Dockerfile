@@ -12,7 +12,7 @@ WORKDIR /src
 COPY ["Sheaft.Web.Api/Sheaft.Web.Api.csproj", "Sheaft.Web.Api/"]
 COPY ["Sheaft.Web.Common/Sheaft.Web.Common.csproj", "Sheaft.Web.Common/"]
 COPY ["Sheaft.GraphQL/Sheaft.GraphQL.csproj", "Sheaft.GraphQL/"]
-COPY ["Sheaft.Application.Sheaft.Application.csproj", "Sheaft.Application/"]
+COPY ["Sheaft.Application/Sheaft.Application.csproj", "Sheaft.Application/"]
 COPY ["Sheaft.Domain/Sheaft.Domain.csproj", "Sheaft.Domain/"]
 COPY ["Sheaft.Infrastructure/Sheaft.Infrastructure.csproj", "Sheaft.Infrastructure/"]
 COPY ["Sheaft.Localization/Sheaft.Localization.csproj", "Sheaft.Localization/"]
