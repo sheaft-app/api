@@ -11,17 +11,9 @@ FROM mcr.microsoft.com/dotnet/core/sdk:3.1-buster AS build
 WORKDIR /src
 COPY ["Sheaft.Web.Signalr/Sheaft.Web.Signalr.csproj", "Sheaft.Web.Signalr/"]
 COPY ["Sheaft.Web.Common/Sheaft.Web.Common.csproj", "Sheaft.Web.Common/"]
-COPY ["Sheaft.Application.Commands/Sheaft.Application.Commands.csproj", "Sheaft.Application.Commands/"]
-COPY ["Sheaft.Application.Interop/Sheaft.Application.Interop.csproj", "Sheaft.Application.Interop/"]
-COPY ["Sheaft.Application.Models/Sheaft.Application.Models.csproj", "Sheaft.Application.Models/"]
+COPY ["Sheaft.Application.Sheaft.Application.csproj", "Sheaft.Application/"]
 COPY ["Sheaft.Domain/Sheaft.Domain.csproj", "Sheaft.Domain/"]
-COPY ["Sheaft.Core/Sheaft.Core.csproj", "Sheaft.Core/"]
-COPY ["Sheaft.Exceptions/Sheaft.Exceptions.csproj", "Sheaft.Exceptions/"]
-COPY ["Sheaft.Options/Sheaft.Options.csproj", "Sheaft.Options/"]
-COPY ["Sheaft.Application.Handlers/Sheaft.Application.Handlers.csproj", "Sheaft.Application.Handlers/"]
-COPY ["Sheaft.Infrastructure.Services/Sheaft.Infrastructure.Services.csproj", "Sheaft.Infrastructure.Services/"]
-COPY ["Sheaft.Application.Events/Sheaft.Application.Events.csproj", "Sheaft.Application.Events/"]
-COPY ["Sheaft.Infrastructure.Persistence/Sheaft.Infrastructure.Persistence.csproj", "Sheaft.Infrastructure.Persistence/"]
+COPY ["Sheaft.Infrastructure/Sheaft.Infrastructure.csproj", "Sheaft.Infrastructure/"]
 COPY ["Sheaft.Localization/Sheaft.Localization.csproj", "Sheaft.Localization/"]
 RUN dotnet restore "Sheaft.Web.Signalr/Sheaft.Web.Signalr.csproj"
 COPY . .
