@@ -11,7 +11,7 @@ FROM mcr.microsoft.com/dotnet/core/sdk:3.1-buster AS build
 WORKDIR /src
 COPY ["Sheaft.Web.Signalr/Sheaft.Web.Signalr.csproj", "Sheaft.Web.Signalr/"]
 COPY ["Sheaft.Web.Common/Sheaft.Web.Common.csproj", "Sheaft.Web.Common/"]
-COPY ["Sheaft.Application.Sheaft.Application.csproj", "Sheaft.Application/"]
+COPY ["Sheaft.Application/Sheaft.Application.csproj", "Sheaft.Application/"]
 COPY ["Sheaft.Domain/Sheaft.Domain.csproj", "Sheaft.Domain/"]
 COPY ["Sheaft.Infrastructure/Sheaft.Infrastructure.csproj", "Sheaft.Infrastructure/"]
 COPY ["Sheaft.Localization/Sheaft.Localization.csproj", "Sheaft.Localization/"]
