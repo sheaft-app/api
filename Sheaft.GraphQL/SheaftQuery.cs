@@ -128,7 +128,7 @@ namespace Sheaft.GraphQL
         public IQueryable<ProductDto> GetStoreProducts([Service] IProductQueries productQueries)
         {
             SetLogTransaction(nameof(GetStoreProducts));
-            return productQueries.GetStoreProducts(CurrentUser.Id, CurrentUser);
+            return productQueries.GetProducts(CurrentUser);
         }
 
         public IQueryable<T> GetProducer<T>(Guid input, [Service] IProducerQueries producerQueries)
@@ -321,7 +321,7 @@ namespace Sheaft.GraphQL
         public IQueryable<ProductDto> GetProducerProducts(Guid input, [Service] IProductQueries productQueries)
         {
             SetLogTransaction(nameof(GetProducerProducts), input);
-            return productQueries.GetProducerProductsForStores(input, CurrentUser);
+            return productQueries.GetProducerProducts(input, CurrentUser);
         }
 
         public IQueryable<ProductDto> GetProducts([Service] IProductQueries productQueries)

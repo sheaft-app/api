@@ -224,11 +224,11 @@ namespace Sheaft.Web.Jobs
             services.AddScoped<IPspService, PspService>();
             services.AddScoped<IFeesService, FeesService>();
             services.AddScoped<ICapingDeliveriesService, CapingDeliveriesService>();
-            services.AddScoped<ISheaftMediatr, SheaftMediatr>();
             services.AddScoped<IAuthService, AuthService>();
+            services.AddSingleton<IBackgroundJobClient, BackgroundJobClient>();
             services.AddSingleton<ICurrentUserService, CurrentUserService>();
-            services.AddScoped<ISheaftHangfireBridge, SheaftHangfireBridge>();
-            services.AddScoped<IBackgroundJobClient, BackgroundJobClient>();
+            services.AddSingleton<ISheaftMediatr, SheaftMediatr>();
+            services.AddSingleton<ISheaftHangfireBridge, SheaftHangfireBridge>();
 
             services.AddTransient(typeof(IPipelineBehavior<,>), typeof(UnhandledExceptionBehaviour<,>));
             services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehaviour<,>));

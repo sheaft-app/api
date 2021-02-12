@@ -217,9 +217,6 @@ namespace Sheaft.Web.Manage
 
             services.AddMediatR(new List<Assembly>() { typeof(RegisterStoreCommand).Assembly }.ToArray());
             
-            services.AddScoped<IBackgroundJobClient, BackgroundJobClient>();
-            services.AddScoped<ISheaftHangfireBridge, SheaftHangfireBridge>();
-
             var jobsDatabaseConfig = jobsDatabaseSettings.Get<JobsDatabaseOptions>();
             services.AddHangfire(configuration =>
             {
@@ -251,11 +248,12 @@ namespace Sheaft.Web.Manage
             services.AddScoped<ISignalrService, SignalrService>();
             services.AddScoped<IPictureService, PictureService>();
             services.AddScoped<IPspService, PspService>();
-            services.AddScoped<ISheaftMediatr, SheaftMediatr>();
             services.AddScoped<IAuthService, AuthService>();
-            services.AddSingleton<ICurrentUserService, CurrentUserService>();
             services.AddScoped<IFeesService, FeesService>();
             services.AddScoped<ICapingDeliveriesService, CapingDeliveriesService>();
+            services.AddSingleton<IBackgroundJobClient, BackgroundJobClient>();
+            services.AddSingleton<ICurrentUserService, CurrentUserService>();
+            services.AddSingleton<ISheaftMediatr, SheaftMediatr>();
 
             services.AddScoped<IAgreementQueries, AgreementQueries>();
             services.AddScoped<IProducerQueries, ProducerQueries>();

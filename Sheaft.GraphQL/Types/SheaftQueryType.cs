@@ -253,7 +253,6 @@ namespace Sheaft.GraphQL.Types
 
             descriptor.Field(c => c.GetProducerProducts(default, default))
                 .Name("producerProducts")
-                .Authorize(Policies.STORE)
                 .Argument("input", c => c.Type<NonNullType<IdType>>())
                 .Type<NonNullType<ListType<ProductType>>>()
                 .UsePaging<ProductType>()

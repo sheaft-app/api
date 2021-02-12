@@ -24,27 +24,39 @@ namespace Sheaft.Application.Product.Queries
     {
         private readonly ISearchIndexClient _indexClient;
         private readonly IAppDbContext _context;
+        private readonly RoleOptions _roleOptions;
         private readonly AutoMapper.IConfigurationProvider _configurationProvider;
 
-        public ProductQueries(IAppDbContext context, IOptionsSnapshot<SearchOptions> searchOptions, ISearchServiceClient searchServiceClient, AutoMapper.IConfigurationProvider configurationProvider)
+        public ProductQueries(
+            IAppDbContext context,
+            IOptionsSnapshot<SearchOptions> searchOptions,
+            IOptionsSnapshot<RoleOptions> roleOptions,
+            ISearchServiceClient searchServiceClient,
+            AutoMapper.IConfigurationProvider configurationProvider)
         {
             _context = context;
+            _roleOptions = roleOptions.Value;
             _configurationProvider = configurationProvider;
             _indexClient = searchServiceClient.Indexes.GetClient(searchOptions.Value.Indexes.Products);
         }
 
-        public async Task<ProductsSearchDto> SearchAsync(SearchProductsInput terms, RequestUser currentUser, CancellationToken token)
+        public async Task<ProductsSearchDto> SearchAsync(SearchProductsInput terms, RequestUser currentUser,
+            CancellationToken token)
         {
             var sp = new SearchParameters()
             {
                 SearchMode = SearchMode.Any,
                 Top = terms.Take,
                 Skip = (terms.Page - 1) * terms.Take,
-                SearchFields = new List<string> { "partialProductName"},
+                SearchFields = new List<string> {"partialProductName"},
                 Select = new List<string>()
-                    {
-                        "product_id", "product_name", "product_onSalePricePerUnit", "product_onSalePrice", "product_rating", "product_ratings_count", "product_image", "product_tags", "producer_id", "producer_name", "producer_email", "producer_phone", "producer_zipcode", "producer_city", "producer_longitude", "producer_latitude", "product_returnable", "product_unit", "product_quantityPerUnit", "product_conditioning", "product_available"
-                    },
+                {
+                    "product_id", "product_name", "product_onSalePricePerUnit", "product_onSalePrice", "product_rating",
+                    "product_ratings_count", "product_image", "product_tags", "producer_id", "producer_name",
+                    "producer_email", "producer_phone", "producer_zipcode", "producer_city", "producer_longitude",
+                    "producer_latitude", "product_returnable", "product_unit", "product_quantityPerUnit",
+                    "product_conditioning", "product_available"
+                },
                 IncludeTotalResultCount = true,
                 HighlightFields = new List<string>(),
                 HighlightPreTag = "<b>",
@@ -55,11 +67,14 @@ namespace Sheaft.Application.Product.Queries
             {
                 if (terms.Sort.Contains("producer_geolocation") && terms.Longitude.HasValue && terms.Latitude.HasValue)
                 {
-                    sp.OrderBy = new List<string>(){  $"geo.distance(producer_geolocation, geography'POINT({terms.Longitude.Value.ToString(new CultureInfo("en-US"))} {terms.Latitude.Value.ToString(new CultureInfo("en-US"))})')" };
+                    sp.OrderBy = new List<string>()
+                    {
+                        $"geo.distance(producer_geolocation, geography'POINT({terms.Longitude.Value.ToString(new CultureInfo("en-US"))} {terms.Latitude.Value.ToString(new CultureInfo("en-US"))})')"
+                    };
                 }
                 else if (!terms.Sort.Contains("producer_geolocation"))
                 {
-                    sp.OrderBy = new List<string>() { terms.Sort };
+                    sp.OrderBy = new List<string>() {terms.Sort};
                 }
             }
 
@@ -78,7 +93,8 @@ namespace Sheaft.Application.Product.Queries
             if (terms.Longitude.HasValue && terms.Latitude.HasValue)
             {
                 filter += " and ";
-                filter += $"geo.distance(producer_geolocation, geography'POINT({terms.Longitude.Value.ToString(new CultureInfo("en-US"))} {terms.Latitude.Value.ToString(new CultureInfo("en-US"))})') le {terms.MaxDistance ?? 200}";
+                filter +=
+                    $"geo.distance(producer_geolocation, geography'POINT({terms.Longitude.Value.ToString(new CultureInfo("en-US"))} {terms.Latitude.Value.ToString(new CultureInfo("en-US"))})') le {terms.MaxDistance ?? 200}";
             }
 
             sp.Filter = filter;
@@ -99,10 +115,18 @@ namespace Sheaft.Application.Product.Queries
                 {
                     Id = p.Product_id,
                     Name = p.Product_name,
-                    ImageSmall = p.Product_image != null ? p.Product_image.EndsWith(".jpg") ? p.Product_image : p.Product_image + "_small.jpg" : string.Empty,
-                    ImageMedium = p.Product_image != null ? p.Product_image.EndsWith(".jpg") ? p.Product_image : p.Product_image + "_medium.jpg" : string.Empty,
-                    ImageLarge = p.Product_image != null ? p.Product_image.EndsWith(".jpg") ? p.Product_image : p.Product_image + "_large.jpg" : string.Empty,
-                    Picture = p.Product_image != null ? p.Product_image.EndsWith(".jpg") ? p.Product_image : p.Product_image + "_medium.jpg" : string.Empty,
+                    ImageSmall = p.Product_image != null
+                        ? p.Product_image.EndsWith(".jpg") ? p.Product_image : p.Product_image + "_small.jpg"
+                        : string.Empty,
+                    ImageMedium = p.Product_image != null
+                        ? p.Product_image.EndsWith(".jpg") ? p.Product_image : p.Product_image + "_medium.jpg"
+                        : string.Empty,
+                    ImageLarge = p.Product_image != null
+                        ? p.Product_image.EndsWith(".jpg") ? p.Product_image : p.Product_image + "_large.jpg"
+                        : string.Empty,
+                    Picture = p.Product_image != null
+                        ? p.Product_image.EndsWith(".jpg") ? p.Product_image : p.Product_image + "_medium.jpg"
+                        : string.Empty,
                     OnSalePrice = p.Product_onSalePrice ?? 0,
                     OnSalePricePerUnit = p.Product_onSalePricePerUnit ?? 0,
                     QuantityPerUnit = p.Product_quantityPerUnit ?? 0,
@@ -110,9 +134,13 @@ namespace Sheaft.Application.Product.Queries
                     IsReturnable = p.Product_returnable ?? false,
                     RatingsCount = p.Product_ratings_count,
                     Available = p.Product_available ?? true,
-                    Tags = p.Product_tags?.Select(t => new TagDto { Name = t }) ?? new List<TagDto>(),
-                    Unit = !string.IsNullOrWhiteSpace(p.Product_unit) ? Enum.Parse<UnitKind>(p.Product_unit.ToLowerInvariant(), true) : UnitKind.NotSpecified,
-                    Conditioning = !string.IsNullOrWhiteSpace(p.Product_conditioning) ? Enum.Parse<ConditioningKind>(p.Product_conditioning, true) : ConditioningKind.Not_Specified,
+                    Tags = p.Product_tags?.Select(t => new TagDto {Name = t}) ?? new List<TagDto>(),
+                    Unit = !string.IsNullOrWhiteSpace(p.Product_unit)
+                        ? Enum.Parse<UnitKind>(p.Product_unit.ToLowerInvariant(), true)
+                        : UnitKind.NotSpecified,
+                    Conditioning = !string.IsNullOrWhiteSpace(p.Product_conditioning)
+                        ? Enum.Parse<ConditioningKind>(p.Product_conditioning, true)
+                        : ConditioningKind.Not_Specified,
                     Producer = new BusinessProfileDto
                     {
                         Id = p.Producer_id,
@@ -131,41 +159,73 @@ namespace Sheaft.Application.Product.Queries
             };
         }
 
-        public IQueryable<ProductDto> GetStoreProducts(Guid storeId, RequestUser currentUser)
-        {
-            var producerIds = _context.Agreements
-                    .Get(c => c.Store.Id == storeId && c.Status == AgreementStatus.Accepted)
-                    .Select(a => a.Delivery.Producer.Id);
-
-            return _context.Products
-                    .Get(p => producerIds.Contains(p.Producer.Id) && p.VisibleToStores)
-                    .ProjectTo<ProductDto>(_configurationProvider);
-        }
-
-        public IQueryable<ProductDto> GetProducerProductsForStores(Guid producerId, RequestUser currentUser)
-        {
-            return _context.Products
-                    .Get(p => p.Producer.Id == producerId && p.VisibleToStores)
-                    .ProjectTo<ProductDto>(_configurationProvider);
-        }
-
         public IQueryable<ProductDto> GetProduct(Guid id, RequestUser currentUser)
         {
-            return _context.Products
+            if (currentUser.IsInRole(_roleOptions.Admin.Value) || currentUser.IsInRole(_roleOptions.Support.Value))
+                return _context.Products
                     .Get(c => c.Id == id)
                     .ProjectTo<ProductDto>(_configurationProvider);
+
+            if (currentUser.IsInRole(_roleOptions.Store.Value))
+                return _context.Products
+                    .Get(c => c.Id == id && c.VisibleToStores)
+                    .ProjectTo<ProductDto>(_configurationProvider);
+
+            return _context.Products
+                .Get(c => c.Id == id && c.VisibleToConsumers)
+                .ProjectTo<ProductDto>(_configurationProvider);
         }
 
         public IQueryable<ProductDto> GetProducts(RequestUser currentUser)
         {
-            return _context.Products
+            if (currentUser.IsInRole(_roleOptions.Admin.Value) || currentUser.IsInRole(_roleOptions.Support.Value))
+                return _context.Products
+                    .Get()
+                    .ProjectTo<ProductDto>(_configurationProvider);
+
+            if (currentUser.IsInRole(_roleOptions.Producer.Value))
+                return _context.Products
                     .Get(c => c.Producer.Id == currentUser.Id)
                     .ProjectTo<ProductDto>(_configurationProvider);
+
+            if (currentUser.IsInRole(_roleOptions.Store.Value))
+            {
+                var producerIds = _context.Agreements
+                    .Get(c => c.Store.Id == currentUser.Id && c.Status == AgreementStatus.Accepted)
+                    .Select(a => a.Delivery.Producer.Id);
+
+                return _context.Products
+                    .Get(p => producerIds.Contains(p.Producer.Id) && p.VisibleToStores)
+                    .ProjectTo<ProductDto>(_configurationProvider);
+            }
+
+            return _context.Products
+                .Get(c => c.VisibleToConsumers)
+                .ProjectTo<ProductDto>(_configurationProvider);
         }
 
-        public async Task<bool> ProductIsRatedByUserAsync(Guid id, Guid userId, RequestUser user, CancellationToken token)
+        public IQueryable<ProductDto> GetProducerProducts(Guid producerId, RequestUser currentUser)
         {
-            return await _context.AnyAsync<Domain.Product>(p => p.Id == id && p.Ratings.Any(r => r.User.Id == userId), token);
+            if (currentUser.IsInRole(_roleOptions.Admin.Value) || currentUser.IsInRole(_roleOptions.Support.Value))
+                return _context.Products
+                    .Get(p => p.Producer.Id == producerId)
+                    .ProjectTo<ProductDto>(_configurationProvider);
+
+            if (currentUser.IsInRole(_roleOptions.Store.Value))
+                return _context.Products
+                    .Get(p => p.Producer.Id == producerId && p.VisibleToStores)
+                    .ProjectTo<ProductDto>(_configurationProvider);
+
+            return _context.Products
+                .Get(p => p.Producer.Id == producerId && p.VisibleToConsumers)
+                .ProjectTo<ProductDto>(_configurationProvider);
+        }
+
+        public async Task<bool> ProductIsRatedByUserAsync(Guid id, Guid userId, RequestUser user,
+            CancellationToken token)
+        {
+            return await _context.AnyAsync<Domain.Product>(p => p.Id == id && p.Ratings.Any(r => r.User.Id == userId),
+                token);
         }
 
         private class SearchProduct
