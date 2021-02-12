@@ -523,7 +523,7 @@ namespace Sheaft.GraphQL
             SetLogTransaction(nameof(CreateReturnableAsync));
             var result =
                 await ExecuteCommandAsync<CreateReturnableCommand, Guid>(
-                    _mapper.Map(input, new CreateReturnableCommand(CurrentUser)), Token);
+                    _mapper.Map(input, new CreateReturnableCommand(CurrentUser){UserId = CurrentUser.Id}), Token);
             return returnableQueries.GetReturnable(result, CurrentUser);
         }
 
