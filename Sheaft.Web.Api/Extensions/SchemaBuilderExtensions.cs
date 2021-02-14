@@ -1,4 +1,5 @@
 ﻿using HotChocolate;
+using Sheaft.Application.Common.Models.Inputs;
 using Sheaft.GraphQL.Enums;
 using Sheaft.GraphQL.Types;
 using Sheaft.GraphQL.Types.Inputs;
@@ -67,6 +68,8 @@ namespace Sheaft.Web.Api
             services.AddType<UboDeclarationType>();
             services.AddType<UboType>();
             services.AddType<ClosingType>();
+            services.AddType<PictureType>();
+            services.AddType<ProfileInformationType>();
 
             services.AddType<AddressKindEnumType>();
             services.AddType<AgreementStatusEnumType>();
@@ -148,6 +151,9 @@ namespace Sheaft.Web.Api
             services.AddType<CreateDeliveryClosingsInputType>();
             services.AddType<CreateProductClosingsInputType>();
             services.AddType<UpdateClosingInputType>();
+            services.AddType<PictureInputType>();
+            services.AddType<UpdateUserProfileInputType>();
+            services.AddType<AddPictureToUserProfileInput>();
 
             return services;
         }

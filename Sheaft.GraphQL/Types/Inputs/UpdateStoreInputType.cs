@@ -8,7 +8,6 @@ namespace Sheaft.GraphQL.Types.Inputs
         protected override void Configure(IInputObjectTypeDescriptor<UpdateStoreInput> descriptor)
         {
             descriptor.Field(c => c.OpenForNewBusiness);
-            descriptor.Field(c => c.Description);
             descriptor.Field(c => c.OpeningHours);
             descriptor.Field(c => c.Phone);
             descriptor.Field(c => c.Picture);

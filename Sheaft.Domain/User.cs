@@ -31,6 +31,14 @@ namespace Sheaft.Domain
             RefreshPoints();
         }
 
+        private void SetProfileInformation(ProfileInformation profileInformation)
+        {
+            if (profileInformation == null)
+                return;
+
+            ProfileInformation = profileInformation;
+        }
+
         public Guid Id { get; private set; }
         public DateTimeOffset CreatedOn { get; private set; }
         public DateTimeOffset? UpdatedOn { get; private set; }
@@ -47,6 +55,7 @@ namespace Sheaft.Domain
         public int TotalPoints { get; private set; }
         public virtual UserAddress Address { get; private set; }
         public virtual Legal Legal { get; private set; }
+        public virtual ProfileInformation ProfileInformation { get; private set; }
         public virtual IReadOnlyCollection<Points> Points { get { return _points.AsReadOnly(); } }
 
         public void SetFirstname(string firstname)

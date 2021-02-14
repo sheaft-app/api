@@ -28,6 +28,12 @@ namespace Sheaft.GraphQL.Types
                 .UseSingleOrDefault()
                 .UseSelection();
 
+            descriptor.Field(c => c.GetUserProfileInformation(default, default))
+                .Name("userProfile")
+                .Type<ProfileInformationType>()
+                .UseSingleOrDefault()
+                .UseSelection();
+
             descriptor.Field(c => c.GetFreshdeskTokenAsync(default))
                 .Name("generateFreshdeskToken")
                 .Authorize(Policies.AUTHENTICATED)

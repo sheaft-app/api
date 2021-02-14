@@ -443,6 +443,33 @@ namespace Sheaft.GraphQL
             return userQueries.GetUserProfile(input.Id, CurrentUser);
         }
 
+        public async Task<IQueryable<ProfileInformationDto>> UpdateUserProfileAsync(UpdateUserProfileInput input,
+            [Service] IUserQueries userQueries)
+        {
+            SetLogTransaction(nameof(UpdateUserProfileAsync));
+            await ExecuteCommandAsync(
+                _mapper.Map(input, new UpdateUserProfileCommand(CurrentUser)), Token);
+            return userQueries.GetUserProfileInformation(input.Id, CurrentUser);
+        }
+
+        public async Task<bool> AddPictureToUserProfileAsync(AddPictureToUserProfileInput input)
+        {
+            SetLogTransaction(nameof(AddPictureToUserProfileAsync));
+            return await ExecuteCommandAsync(_mapper.Map(input, new AddPictureToUserProfileCommand(CurrentUser)), Token);
+        }
+
+        public async Task<bool> RemoveUserProfilePictureAsync(IdInput input)
+        {
+            SetLogTransaction(nameof(RemoveUserProfilePictureAsync));
+            return await ExecuteCommandAsync(_mapper.Map(input, new RemoveUserProfilePictureCommand(CurrentUser){UserId = CurrentUser.Id}), Token);
+        }
+
+        public async Task<bool> RemoveUserProfilePicturesAsync(IdsInput input)
+        {
+            SetLogTransaction(nameof(RemoveUserProfilePicturesAsync));
+            return await ExecuteCommandAsync(_mapper.Map(input, new RemoveUserProfilePicturesCommand(CurrentUser){UserId = CurrentUser.Id}), Token);
+        }
+
         public async Task<bool> RemoveUserAsync(IdWithReasonInput input)
         {
             SetLogTransaction(nameof(RemoveUserAsync));

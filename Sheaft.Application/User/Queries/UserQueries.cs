@@ -71,6 +71,14 @@ namespace Sheaft.Application.User.Queries
                     .ProjectTo<UserProfileDto>(_configurationProvider);
         }
 
+        public IQueryable<ProfileInformationDto> GetUserProfileInformation(Guid id, RequestUser currentUser)
+        {
+            return _context.Users.OfType<Domain.User>()
+                .Get(c => c.Id == id)
+                .Select(c => c.ProfileInformation)
+                .ProjectTo<ProfileInformationDto>(_configurationProvider);
+        }
+
         public IQueryable<BusinessProfileDto> GetMyProfile(RequestUser currentUser)
         {
             return _context.Users.OfType<Business>()

@@ -125,6 +125,12 @@ namespace Sheaft.GraphQL
             return userQueries.GetUserProfile(CurrentUser.Id, CurrentUser);
         }
 
+        public IQueryable<ProfileInformationDto> GetUserProfileInformation(Guid input, [Service] IUserQueries userQueries)
+        {
+            SetLogTransaction(nameof(GetUserProfileInformation));
+            return userQueries.GetUserProfileInformation(input, CurrentUser);
+        }
+
         public IQueryable<ProductDto> GetStoreProducts([Service] IProductQueries productQueries)
         {
             SetLogTransaction(nameof(GetStoreProducts));

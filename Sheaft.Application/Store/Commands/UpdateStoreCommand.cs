@@ -36,7 +36,6 @@ namespace Sheaft.Application.Store.Commands
         public string LastName { get; set; }
         public string Email { get; set; }
         public string Phone { get; set; }
-        public string Description { get; set; }
         public string Picture { get; set; }
         public bool OpenForNewBusiness { get; set; }
         public FullAddressInput Address { get; set; }
@@ -69,7 +68,6 @@ namespace Sheaft.Application.Store.Commands
             store.SetEmail(request.Email);
             store.SetProfileKind(request.Kind);
             store.SetPhone(request.Phone);
-            store.SetDescription(request.Description);
             store.SetOpenForNewBusiness(request.OpenForNewBusiness);
 
             var departmentCode = UserAddress.GetDepartmentCode(request.Address.Zipcode);

@@ -36,7 +36,6 @@ namespace Sheaft.Application.Producer.Commands
         public string LastName { get; set; }
         public string Email { get; set; }
         public string Phone { get; set; }
-        public string Description { get; set; }
         public string Picture { get; set; }
         public bool OpenForNewBusiness { get; set; }
         public FullAddressInput Address { get; set; }
@@ -69,7 +68,6 @@ namespace Sheaft.Application.Producer.Commands
             producer.SetEmail(request.Email);
             producer.SetProfileKind(request.Kind);
             producer.SetPhone(request.Phone);
-            producer.SetDescription(request.Description);
             producer.SetOpenForNewBusiness(request.OpenForNewBusiness);
 
             if (request.NotSubjectToVat.HasValue)

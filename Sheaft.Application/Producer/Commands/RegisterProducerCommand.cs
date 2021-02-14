@@ -38,7 +38,6 @@ namespace Sheaft.Application.Producer.Commands
         public string Name { get; set; }
         public string Email { get; set; }
         public string Phone { get; set; }
-        public string Description { get; set; }
         public string Picture { get; set; }
         public string SponsoringCode { get; set; }
         public BusinessLegalInput Legals { get; set; }
@@ -77,10 +76,10 @@ namespace Sheaft.Application.Producer.Commands
                     request.Address.City,
                     request.Address.Country, department, request.Address.Longitude, request.Address.Latitude)
                 : null;
-
+            
             producer = new Domain.Producer(request.ProducerId, request.Name, request.FirstName, request.LastName,
                 request.Email,
-                address, request.OpenForNewBusiness, request.Phone, request.Description);
+                address, request.OpenForNewBusiness, request.Phone);
             producer.SetNotSubjectToVat(request.NotSubjectToVat);
 
             if (request.Tags != null && request.Tags.Any())

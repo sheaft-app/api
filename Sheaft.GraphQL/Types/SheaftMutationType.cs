@@ -1,6 +1,7 @@
 ﻿using HotChocolate.Types;
 using HotChocolate.Types.Relay;
 using Sheaft.Application.Common.Security;
+using Sheaft.Domain;
 using Sheaft.GraphQL.Filters;
 using Sheaft.GraphQL.Sorts;
 using Sheaft.GraphQL.Types.Outputs;
@@ -350,6 +351,23 @@ namespace Sheaft.GraphQL.Types
                 .Type<NonNullType<UserProfileType>>()
                 .UseSingleOrDefault()
                 .UseSelection();
+            
+            descriptor.Field(c => c.UpdateUserProfileAsync(default, default))
+                .Name("updateUserProfile")
+                .Authorize(Policies.REGISTERED)
+                .Type<NonNullType<ProfileInformationType>>()
+                .UseSingleOrDefault()
+                .UseSelection();
+            
+            descriptor.Field(c => c.AddPictureToUserProfileAsync(default))
+                .Name("addProfilePicture")
+                .Authorize(Policies.REGISTERED)
+                .Type<NonNullType<BooleanType>>();
+            
+            descriptor.Field(c => c.RemoveUserProfilePicturesAsync(default))
+                .Name("removeProfilePictures")
+                .Authorize(Policies.REGISTERED)
+                .Type<NonNullType<BooleanType>>();
 
             descriptor.Field(c => c.RemoveUserAsync(default))
                 .Name("removeUser")
