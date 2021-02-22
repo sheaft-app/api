@@ -83,6 +83,9 @@ namespace Sheaft.Application.Order.Commands
                 }
 
                 var user = await _context.GetByIdAsync<Domain.User>(request.UserId, token);
+                if(user.Id != request.RequestUser.Id)
+                    throw SheaftException.Forbidden();
+                
                 var order = new Domain.Order(Guid.NewGuid(), DonationKind.None, user, cartProducts,
                     _pspOptions.FixedAmount,
                     _pspOptions.Percent, _pspOptions.VatPercent);

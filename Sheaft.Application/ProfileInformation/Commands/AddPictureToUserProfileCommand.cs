@@ -10,6 +10,7 @@ using Sheaft.Application.Common.Interfaces;
 using Sheaft.Application.Common.Interfaces.Services;
 using Sheaft.Application.Common.Models;
 using Sheaft.Domain;
+using Sheaft.Domain.Exceptions;
 
 namespace Sheaft.Application.ProfileInformation.Commands
 {
@@ -42,6 +43,8 @@ namespace Sheaft.Application.ProfileInformation.Commands
         public async Task<Result> Handle(AddPictureToUserProfileCommand request, CancellationToken token)
         {
             var entity = await _context.FindByIdAsync<Domain.User>(request.UserId, token);
+            if(entity.Id != request.RequestUser.Id)
+                throw SheaftException.Forbidden();
             
             var id = Guid.NewGuid();
             var result = await _imageService.HandleProfilePictureAsync(entity, id, request.Picture, token);

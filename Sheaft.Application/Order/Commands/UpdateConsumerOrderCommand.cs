@@ -16,6 +16,7 @@ using Sheaft.Application.Common.Models.Inputs;
 using Sheaft.Application.Common.Options;
 using Sheaft.Domain;
 using Sheaft.Domain.Enum;
+using Sheaft.Domain.Exceptions;
 
 namespace Sheaft.Application.Order.Commands
 {
@@ -46,6 +47,8 @@ namespace Sheaft.Application.Order.Commands
         public async Task<Result> Handle(UpdateConsumerOrderCommand request, CancellationToken token)
         {
             var entity = await _context.GetByIdAsync<Domain.Order>(request.OrderId, token);
+            if(entity.User.Id != request.RequestUser.Id)
+                throw SheaftException.Forbidden();
 
             var productIds = request.Products.Select(p => p.Id);
             var products = await _context.FindByIdsAsync<Domain.Product>(productIds, token);

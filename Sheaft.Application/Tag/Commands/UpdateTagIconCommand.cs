@@ -11,7 +11,7 @@ using Sheaft.Application.Common.Interfaces.Services;
 using Sheaft.Application.Common.Models;
 using Sheaft.Domain;
 
-namespace Sheaft.Application.Picture.Commands
+namespace Sheaft.Application.Tag.Commands
 {
     public class UpdateTagIconCommand : Command<string>
     {

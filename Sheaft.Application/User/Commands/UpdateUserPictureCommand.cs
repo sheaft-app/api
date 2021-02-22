@@ -13,7 +13,7 @@ using Sheaft.Application.Common.Models;
 using Sheaft.Domain;
 using Sheaft.Domain.Exceptions;
 
-namespace Sheaft.Application.Picture.Commands
+namespace Sheaft.Application.User.Commands
 {
     public class UpdateUserPictureCommand : Command<string>
     {

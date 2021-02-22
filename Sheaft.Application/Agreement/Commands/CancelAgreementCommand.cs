@@ -11,6 +11,7 @@ using Sheaft.Application.Common.Interfaces.Services;
 using Sheaft.Application.Common.Models;
 using Sheaft.Domain;
 using Sheaft.Domain.Events.Agreement;
+using Sheaft.Domain.Exceptions;
 
 namespace Sheaft.Application.Agreement.Commands
 {
@@ -39,6 +40,9 @@ namespace Sheaft.Application.Agreement.Commands
         public async Task<Result> Handle(CancelAgreementCommand request, CancellationToken token)
         {
             var entity = await _context.GetByIdAsync<Domain.Agreement>(request.AgreementId, token);
+            if(entity.Delivery.Producer.Id != request.RequestUser.Id && entity.Store.Id != request.RequestUser.Id)
+                throw SheaftException.Forbidden();
+            
             entity.CancelAgreement(request.Reason);
 
             await _context.SaveChangesAsync(token);

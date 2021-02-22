@@ -17,6 +17,7 @@ using Sheaft.Application.Common.Options;
 using Sheaft.Application.Job.Commands;
 using Sheaft.Domain;
 using Sheaft.Domain.Events.User;
+using Sheaft.Domain.Exceptions;
 
 namespace Sheaft.Application.User.Commands
 {
@@ -48,6 +49,8 @@ namespace Sheaft.Application.User.Commands
         public async Task<Result> Handle(ExportUserDataCommand request, CancellationToken token)
         {
             var job = await _context.GetByIdAsync<Domain.Job>(request.JobId, token);
+            if(job.User.Id != request.RequestUser.Id)
+                throw SheaftException.Forbidden();
 
             try
             {

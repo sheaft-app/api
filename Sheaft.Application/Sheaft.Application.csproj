@@ -28,8 +28,6 @@
       <Folder Include="PayinRefund\Queries" />
       <Folder Include="Payout\Queries" />
       <Folder Include="PickingOrders\Queries" />
-      <Folder Include="Picture\EventHandlers" />
-      <Folder Include="Picture\Queries" />
       <Folder Include="ProfileInformation\EventHandlers" />
       <Folder Include="ProfileInformation\Queries" />
       <Folder Include="QuickOrder\EventHandlers" />

@@ -12,6 +12,7 @@ using Sheaft.Application.Common.Interfaces.Services;
 using Sheaft.Application.Common.Models;
 using Sheaft.Application.Common.Options;
 using Sheaft.Domain;
+using Sheaft.Domain.Exceptions;
 
 namespace Sheaft.Application.User.Commands
 {
@@ -43,6 +44,8 @@ namespace Sheaft.Application.User.Commands
         public async Task<Result<string>> Handle(GenerateUserCodeCommand request, CancellationToken token)
         {
             var entity = await _context.GetByIdAsync<Domain.User>(request.UserId, token);
+            if(entity.Id != request.RequestUser.Id)
+                throw SheaftException.Forbidden();
 
             if (!string.IsNullOrWhiteSpace(entity.SponsorshipCode))
                 return Success(entity.SponsorshipCode);

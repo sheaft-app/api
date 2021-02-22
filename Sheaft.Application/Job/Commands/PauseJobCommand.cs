@@ -10,6 +10,7 @@ using Sheaft.Application.Common.Interfaces;
 using Sheaft.Application.Common.Interfaces.Services;
 using Sheaft.Application.Common.Models;
 using Sheaft.Domain;
+using Sheaft.Domain.Exceptions;
 
 namespace Sheaft.Application.Job.Commands
 {
@@ -38,6 +39,9 @@ namespace Sheaft.Application.Job.Commands
             CancellationToken token)
         {
             var entity = await _context.GetByIdAsync<Domain.Job>(request.JobId, token);
+            if(entity.User.Id != request.RequestUser.Id)
+                throw SheaftException.Forbidden();
+
             entity.PauseJob();
 
             await _context.SaveChangesAsync(token);

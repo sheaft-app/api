@@ -13,6 +13,7 @@ using Sheaft.Application.Common.Models;
 using Sheaft.Application.Common.Options;
 using Sheaft.Domain;
 using Sheaft.Domain.Enum;
+using Sheaft.Domain.Exceptions;
 
 namespace Sheaft.Application.User.Commands
 {
@@ -40,6 +41,8 @@ namespace Sheaft.Application.User.Commands
         public async Task<Result<Guid>> Handle(QueueExportUserDataCommand request, CancellationToken token)
         {
             var sender = await _context.GetByIdAsync<Domain.User>(request.UserId, token);
+            if(sender.Id != request.RequestUser.Id)
+                throw SheaftException.Forbidden();
 
             var entity = new Domain.Job(Guid.NewGuid(), JobKind.ExportUserData, $"Export RGPD", sender);
 
