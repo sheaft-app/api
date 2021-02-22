@@ -287,7 +287,7 @@ namespace Sheaft.GraphQL.Types
             descriptor.Field(c => c.GetProduct(default, default))
                 .Name("product")
                 .Argument("input", c => c.Type<NonNullType<IdType>>())
-                .Type<NonNullType<ProductDetailsType>>()
+                .Type<NonNullType<ProductType>>()
                 .UseSingleOrDefault()
                 .UseSelection();
 
