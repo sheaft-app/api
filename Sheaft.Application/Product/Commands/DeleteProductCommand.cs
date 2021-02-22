@@ -11,6 +11,7 @@ using Sheaft.Application.Common.Interfaces.Services;
 using Sheaft.Application.Common.Models;
 using Sheaft.Application.Producer.Commands;
 using Sheaft.Domain;
+using Sheaft.Domain.Exceptions;
 
 namespace Sheaft.Application.Product.Commands
 {
@@ -38,6 +39,8 @@ namespace Sheaft.Application.Product.Commands
         public async Task<Result> Handle(DeleteProductCommand request, CancellationToken token)
         {
             var entity = await _context.GetByIdAsync<Domain.Product>(request.ProductId, token);
+            if(entity.Producer.Id != request.RequestUser.Id)
+                throw SheaftException.Forbidden();
             
             _context.Remove(entity);
             await _context.SaveChangesAsync(token);

@@ -19,6 +19,7 @@ using Sheaft.Application.Common.Options;
 using Sheaft.Application.Picture.Commands;
 using Sheaft.Domain;
 using Sheaft.Domain.Enum;
+using Sheaft.Domain.Exceptions;
 
 namespace Sheaft.Application.Producer.Commands
 {
@@ -61,6 +62,8 @@ namespace Sheaft.Application.Producer.Commands
         public async Task<Result> Handle(UpdateProducerCommand request, CancellationToken token)
         {
             var producer = await _context.GetByIdAsync<Domain.Producer>(request.ProducerId, token);
+            if(producer.Id != request.RequestUser.Id)
+                throw SheaftException.Forbidden();
 
             producer.SetName(request.Name);
             producer.SetFirstname(request.FirstName);

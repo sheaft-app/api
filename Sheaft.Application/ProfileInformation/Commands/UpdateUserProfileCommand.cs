@@ -10,8 +10,9 @@ using Sheaft.Application.Common.Interfaces;
 using Sheaft.Application.Common.Interfaces.Services;
 using Sheaft.Application.Common.Models;
 using Sheaft.Domain;
+using Sheaft.Domain.Exceptions;
 
-namespace Sheaft.Application.User.Commands
+namespace Sheaft.Application.ProfileInformation.Commands
 {
     public class UpdateUserProfileCommand : Command
     {
@@ -43,7 +44,9 @@ namespace Sheaft.Application.User.Commands
         public async Task<Result> Handle(UpdateUserProfileCommand request, CancellationToken token)
         {
             var entity = await _context.FindByIdAsync<Domain.User>(request.UserId, token);
-            
+            if(entity.Id != request.RequestUser.Id)
+                throw SheaftException.Forbidden();
+
             entity.ProfileInformation.SetSummary(request.Summary);
             entity.ProfileInformation.SetDescription(request.Description);
             entity.ProfileInformation.SetFacebook(request.Facebook);

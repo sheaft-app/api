@@ -15,6 +15,7 @@ using Sheaft.Application.Common.Models;
 using Sheaft.Application.Common.Options;
 using Sheaft.Application.Picture.Commands;
 using Sheaft.Domain;
+using Sheaft.Domain.Exceptions;
 
 namespace Sheaft.Application.Consumer.Commands
 {
@@ -51,6 +52,8 @@ namespace Sheaft.Application.Consumer.Commands
         public async Task<Result> Handle(UpdateConsumerCommand request, CancellationToken token)
         {
             var consumer = await _context.GetByIdAsync<Domain.Consumer>(request.ConsumerId, token);
+            if(consumer.Id != request.RequestUser.Id)
+                throw SheaftException.Forbidden();
 
             consumer.SetEmail(request.Email);
             consumer.SetPhone(request.Phone);

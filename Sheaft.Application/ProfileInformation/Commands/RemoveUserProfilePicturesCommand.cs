@@ -12,7 +12,7 @@ using Sheaft.Application.Common.Interfaces.Services;
 using Sheaft.Application.Common.Models;
 using Sheaft.Domain;
 
-namespace Sheaft.Application.User.Commands
+namespace Sheaft.Application.ProfileInformation.Commands
 {
     public class RemoveUserProfilePicturesCommand : Command
     {

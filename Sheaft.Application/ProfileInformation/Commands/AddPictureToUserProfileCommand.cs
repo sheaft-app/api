@@ -9,10 +9,9 @@ using Sheaft.Application.Common.Handlers;
 using Sheaft.Application.Common.Interfaces;
 using Sheaft.Application.Common.Interfaces.Services;
 using Sheaft.Application.Common.Models;
-using Sheaft.Application.Common.Models.Inputs;
 using Sheaft.Domain;
 
-namespace Sheaft.Application.User.Commands
+namespace Sheaft.Application.ProfileInformation.Commands
 {
     public class AddPictureToUserProfileCommand : Command
     {

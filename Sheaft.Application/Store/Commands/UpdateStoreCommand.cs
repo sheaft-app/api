@@ -19,6 +19,7 @@ using Sheaft.Application.Common.Options;
 using Sheaft.Application.Picture.Commands;
 using Sheaft.Domain;
 using Sheaft.Domain.Enum;
+using Sheaft.Domain.Exceptions;
 
 namespace Sheaft.Application.Store.Commands
 {
@@ -61,6 +62,8 @@ namespace Sheaft.Application.Store.Commands
         public async Task<Result> Handle(UpdateStoreCommand request, CancellationToken token)
         {
             var store = await _context.GetByIdAsync<Domain.Store>(request.StoreId, token);
+            if(store.Id != request.RequestUser.Id)
+                throw SheaftException.Forbidden();
 
             store.SetName(request.Name);
             store.SetFirstname(request.FirstName);

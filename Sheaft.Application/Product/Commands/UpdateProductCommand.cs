@@ -16,6 +16,7 @@ using Sheaft.Application.Picture.Commands;
 using Sheaft.Application.Producer.Commands;
 using Sheaft.Domain;
 using Sheaft.Domain.Enum;
+using Sheaft.Domain.Exceptions;
 
 namespace Sheaft.Application.Product.Commands
 {
@@ -65,6 +66,8 @@ namespace Sheaft.Application.Product.Commands
             using (var transaction = await _context.BeginTransactionAsync(token))
             {
                 var entity = await _context.GetByIdAsync<Domain.Product>(request.ProductId, token);
+                if(entity.Producer.Id != request.RequestUser.Id)
+                    throw SheaftException.Forbidden();
 
                 var reference = request.Reference;
                 if (!string.IsNullOrWhiteSpace(reference) && reference != entity.Reference)

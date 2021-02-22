@@ -7,6 +7,7 @@ using Sheaft.Application.Common.Models.Inputs;
 using Sheaft.Application.Common.Models.ViewModels;
 using Sheaft.Application.Picture.Commands;
 using Sheaft.Application.Product.Commands;
+using Sheaft.Application.User.Commands;
 
 namespace Sheaft.Application.Common.Mappings
 {
@@ -30,6 +31,12 @@ namespace Sheaft.Application.Common.Mappings
                 .ForMember(d => d.ReturnableId, opt => opt.MapFrom(r => r.Returnable.Id))
                 .ForMember(d => d.Picture, opt => opt.MapFrom(r => PictureExtensions.GetPictureUrl(r.Id, r.Picture, PictureSize.LARGE)));
 
+            CreateMap<AddPictureToInput, AddPictureToProductCommand>()
+                .ForMember(c => c.ProductId, opt => opt.MapFrom(r => r.Id));
+
+            CreateMap<IdInput, RemoveProductPictureCommand>();
+            CreateMap<IdsInput, RemoveProductPicturesCommand>();
+            
             CreateMap<CreateProductInput, CreateProductCommand>();
             CreateMap<UpdateProductInput, UpdateProductCommand>()
                 .ForMember(c => c.ProductId, opt => opt.MapFrom(r => r.Id));

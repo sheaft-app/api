@@ -14,39 +14,37 @@ using Sheaft.Domain.Exceptions;
 
 namespace Sheaft.Application.Product.Commands
 {
-    public class SetProductSearchabilityCommand : Command
+    public class RemoveProductPictureCommand : Command
     {
         [JsonConstructor]
-        public SetProductSearchabilityCommand(RequestUser requestUser) : base(requestUser)
+        public RemoveProductPictureCommand(RequestUser requestUser) : base(requestUser)
         {
         }
-
+        
         public Guid ProductId { get; set; }
-        public bool VisibleToStores { get; set; }
-        public bool VisibleToConsumers { get; set; }
+        public Guid PictureId { get; set; }
     }
 
-    public class SetProductSearchabilityCommandHandler : CommandsHandler,
-        IRequestHandler<SetProductSearchabilityCommand, Result>
+    public class RemoveProductPictureCommandHandler : CommandsHandler,
+        IRequestHandler<RemoveProductPictureCommand, Result>
     {
-        public SetProductSearchabilityCommandHandler(
+        public RemoveProductPictureCommandHandler(
             ISheaftMediatr mediatr,
             IAppDbContext context,
-            ILogger<SetProductSearchabilityCommandHandler> logger)
+            ILogger<RemoveProductPictureCommandHandler> logger)
             : base(mediatr, context, logger)
         {
         }
 
-        public async Task<Result> Handle(SetProductSearchabilityCommand request, CancellationToken token)
+        public async Task<Result> Handle(RemoveProductPictureCommand request, CancellationToken token)
         {
-            var entity = await _context.GetByIdAsync<Domain.Product>(request.ProductId, token);
+            var entity = await _context.FindByIdAsync<Domain.Product>(request.ProductId, token);
             if(entity.Producer.Id != request.RequestUser.Id)
                 throw SheaftException.Forbidden();
-
-            entity.SetConsumerVisibility(request.VisibleToConsumers);
-            entity.SetStoreVisibility(request.VisibleToStores);
-
+            
+            entity.RemovePicture(request.PictureId);
             await _context.SaveChangesAsync(token);
+
             return Success();
         }
     }

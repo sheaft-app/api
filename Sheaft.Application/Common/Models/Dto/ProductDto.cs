@@ -39,5 +39,6 @@ namespace Sheaft.Application.Common.Models.Dto
         public IEnumerable<TagDto> Tags { get; set; }
         public IEnumerable<RatingDto> Ratings { get; set; }
         public IEnumerable<ClosingDto> Closings { get; set; }
+        public IEnumerable<PictureDto> Pictures { get; set; }
     }
 }

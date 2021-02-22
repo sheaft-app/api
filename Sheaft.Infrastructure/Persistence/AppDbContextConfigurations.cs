@@ -131,7 +131,7 @@ namespace Sheaft.Infrastructure.Persistence
             modelBuilder.ApplyConfiguration(new BusinessClosingConfiguration());
             modelBuilder.ApplyConfiguration(new ProfileInformationConfiguration());
             modelBuilder.ApplyConfiguration(new ProfilePictureConfiguration());
-            // modelBuilder.ApplyConfiguration(new ProductPictureConfiguration());
+            modelBuilder.ApplyConfiguration(new ProductPictureConfiguration());
         }
     }
 }

@@ -71,6 +71,9 @@ namespace Sheaft.GraphQL.Types.Outputs
                 .UseSorting<RatingSortType>()
                 .UseFiltering<RatingFilterType>()
                 .UsePaging<RatingType>();
+
+            descriptor.Field(c => c.Pictures)
+                .Type<ListType<PictureType>>();
         }
     }
 }

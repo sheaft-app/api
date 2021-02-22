@@ -11,6 +11,7 @@ using Sheaft.Application.Common.Interfaces;
 using Sheaft.Application.Common.Interfaces.Services;
 using Sheaft.Application.Common.Models;
 using Sheaft.Domain;
+using Sheaft.Domain.Exceptions;
 
 namespace Sheaft.Application.Picture.Commands
 {
@@ -45,6 +46,8 @@ namespace Sheaft.Application.Picture.Commands
         public async Task<Result<string>> Handle(UpdateUserPictureCommand request, CancellationToken token)
         {
             var entity = await _context.GetByIdAsync<Domain.User>(request.UserId, token);
+            if(entity.Id != request.RequestUser.Id)
+                throw SheaftException.Forbidden();
 
             var resultImage =
                 await _imageService.HandleUserPictureAsync(entity, request.Picture, request.OriginalPicture, token);

@@ -217,6 +217,16 @@ namespace Sheaft.GraphQL.Types
                 .UseSingleOrDefault()
                 .UseSelection();
 
+            descriptor.Field(c => c.AddPictureToProductAsync(default))
+                .Name("addPictureToProduct")
+                .Authorize(Policies.PRODUCER)
+                .Type<NonNullType<BooleanType>>();
+            
+            descriptor.Field(c => c.RemoveProductPicturesAsync(default))
+                .Name("removeProductPictures")
+                .Authorize(Policies.PRODUCER)
+                .Type<NonNullType<BooleanType>>();
+
             //DELIVERY
             descriptor.Field(c => c.CreateDeliveryModeAsync(default, default))
                 .Name("createDeliveryMode")

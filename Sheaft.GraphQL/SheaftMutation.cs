@@ -28,6 +28,7 @@ using Sheaft.Application.Picture.Commands;
 using Sheaft.Application.Producer.Commands;
 using Sheaft.Application.Product.Commands;
 using Sheaft.Application.ProductClosing.Commands;
+using Sheaft.Application.ProfileInformation.Commands;
 using Sheaft.Application.PurchaseOrder.Commands;
 using Sheaft.Application.QuickOrder.Commands;
 using Sheaft.Application.Returnable.Commands;
@@ -452,7 +453,7 @@ namespace Sheaft.GraphQL
             return userQueries.GetUserProfileInformation(input.Id, CurrentUser);
         }
 
-        public async Task<bool> AddPictureToUserProfileAsync(AddPictureToUserProfileInput input)
+        public async Task<bool> AddPictureToUserProfileAsync(AddPictureToInput input)
         {
             SetLogTransaction(nameof(AddPictureToUserProfileAsync));
             return await ExecuteCommandAsync(_mapper.Map(input, new AddPictureToUserProfileCommand(CurrentUser)), Token);
@@ -462,6 +463,18 @@ namespace Sheaft.GraphQL
         {
             SetLogTransaction(nameof(RemoveUserProfilePicturesAsync));
             return await ExecuteCommandAsync(_mapper.Map(input, new RemoveUserProfilePicturesCommand(CurrentUser){UserId = CurrentUser.Id}), Token);
+        }
+
+        public async Task<bool> AddPictureToProductAsync(AddPictureToInput input)
+        {
+            SetLogTransaction(nameof(AddPictureToProductAsync));
+            return await ExecuteCommandAsync(_mapper.Map(input, new AddPictureToProductCommand(CurrentUser)), Token);
+        }
+
+        public async Task<bool> RemoveProductPicturesAsync(IdsInput input)
+        {
+            SetLogTransaction(nameof(RemoveProductPicturesAsync));
+            return await ExecuteCommandAsync(_mapper.Map(input, new RemoveProductPicturesCommand(CurrentUser)), Token);
         }
 
         public async Task<bool> RemoveUserAsync(IdWithReasonInput input)
