@@ -159,25 +159,6 @@ namespace Sheaft.Infrastructure.Services
             }
         }
 
-        public async Task<Result<string>> HandleProfileBannerAsync(User user, string pictureResized,
-            string pictureOriginal,
-            CancellationToken token)
-        {
-            var bytes = await RetrievePictureBytesAsync(pictureResized);
-            if (bytes == null)
-                return Success(pictureResized);
-
-            var originalBytes = await RetrievePictureBytesAsync(pictureOriginal);
-            if (originalBytes != null)
-                using (Image original = Image.Load(originalBytes))
-                    await UploadProfileOriginalBannerAsync(original, user.Id, token);
-
-            using (var image = Image.Load(bytes))
-                return await UploadProfileBannerAsync(image, user.Id, PictureSize.LARGE,
-                    _pictureOptions.Banner.Large.Width, _pictureOptions.Banner.Large.Height, token,
-                    quality: _pictureOptions.Banner.Large.Quality);
-        }
-
         public async Task<Result<string>> HandleProfilePictureAsync(User user, Guid pictureId, string picture,
             CancellationToken token)
         {
@@ -246,36 +227,6 @@ namespace Sheaft.Infrastructure.Services
                     token);
 
                 return await _blobService.UploadProductPreviewAsync(userId, productId, size, blobStream.ToArray(), token);
-            }
-        }
-
-        private async Task<Result<string>> UploadProfileBannerAsync(Image image, Guid userId, string size, int width,
-            int height, CancellationToken token, ResizeMode mode = ResizeMode.Max, int quality = 100)
-        {
-            using (var blobStream = new MemoryStream())
-            {
-                await image.Clone(context => context.Resize(new ResizeOptions
-                {
-                    Mode = mode,
-                    Size = new Size(width, height),
-                    Compand = true,
-                    Sampler = KnownResamplers.Lanczos3
-                })).SaveAsync(blobStream,
-                    new PngEncoder {CompressionLevel = PngCompressionLevel.BestCompression, IgnoreMetadata = true},
-                    token);
-
-                return await _blobService.UploadProfilePreviewAsync(userId, size, blobStream.ToArray(), token);
-            }
-        }
-
-        private async Task<Result<string>> UploadProfileOriginalBannerAsync(Image image, Guid userId, CancellationToken token)
-        {
-            using (var blobStream = new MemoryStream())
-            {
-                await image.SaveAsync(blobStream,
-                    new PngEncoder {CompressionLevel = PngCompressionLevel.BestCompression, IgnoreMetadata = true},
-                    token);
-                return await _blobService.UploadProfilePreviewAsync(userId, PictureSize.ORIGINAL, blobStream.ToArray(), token);
             }
         }
 

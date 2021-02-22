@@ -304,21 +304,6 @@ namespace Sheaft.Infrastructure.Services
             return Success(blobClient.Uri.ToString());
         }
 
-        public async Task<Result<string>> UploadProfilePreviewAsync(Guid userId, string size, byte[] data, CancellationToken token)
-        {
-            var containerClient =
-                new BlobContainerClient(_storageOptions.ConnectionString, _storageOptions.Containers.Pictures);
-            await containerClient.CreateIfNotExistsAsync(cancellationToken: token);
-
-            var blobClient = containerClient.GetBlobClient($"users/{userId:N}/profile/banner{(size == PictureSize.ORIGINAL ? $"_{PictureSize.ORIGINAL}" : string.Empty)}.png");
-            await blobClient.DeleteIfExistsAsync(cancellationToken: token);
-
-            using (var ms = new MemoryStream(data))
-                await blobClient.UploadAsync(ms, token);
-
-            return Success(GetBlobUri(blobClient, _storageOptions.Containers.Pictures).Split($"_{size}.png")[0]);
-        }
-
         public async Task<Result<string>> UploadProfilePictureAsync(Guid userId, Guid pictureId, byte[] data, CancellationToken token)
         {
             var containerClient =

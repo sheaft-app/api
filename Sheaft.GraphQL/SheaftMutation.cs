@@ -458,12 +458,6 @@ namespace Sheaft.GraphQL
             return await ExecuteCommandAsync(_mapper.Map(input, new AddPictureToUserProfileCommand(CurrentUser)), Token);
         }
 
-        public async Task<bool> RemoveUserProfilePictureAsync(IdInput input)
-        {
-            SetLogTransaction(nameof(RemoveUserProfilePictureAsync));
-            return await ExecuteCommandAsync(_mapper.Map(input, new RemoveUserProfilePictureCommand(CurrentUser){UserId = CurrentUser.Id}), Token);
-        }
-
         public async Task<bool> RemoveUserProfilePicturesAsync(IdsInput input)
         {
             SetLogTransaction(nameof(RemoveUserProfilePicturesAsync));
