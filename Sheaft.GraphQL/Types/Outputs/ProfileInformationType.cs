@@ -12,9 +12,7 @@ namespace Sheaft.GraphQL.Types.Outputs
             descriptor.Field(c => c.Facebook);
             descriptor.Field(c => c.Twitter);
             descriptor.Field(c => c.Instagram);
-
-            descriptor.Field(c => c.Banner)
-                .Type<PictureType>();
+            descriptor.Field(c => c.Banner);
 
             descriptor.Field(c => c.Pictures)
                 .Type<ListType<PictureType>>();

@@ -9,9 +9,8 @@ namespace Sheaft.GraphQL.Types.Inputs
         {
             descriptor.Field(c => c.Id)
                 .Type<NonNullType<IdType>>();
-            
-            descriptor.Field(c => c.Picture)
-                .Type<NonNullType<PictureInputType>>();
+
+            descriptor.Field(c => c.Picture);
         }
     }
 }

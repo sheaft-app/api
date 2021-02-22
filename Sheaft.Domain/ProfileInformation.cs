@@ -2,25 +2,32 @@
 using System.Collections.Generic;
 using System.Linq;
 using Sheaft.Domain.Exceptions;
+using Sheaft.Domain.Interop;
 
 namespace Sheaft.Domain
 {
-    public class ProfileInformation
+    public class ProfileInformation : IIdEntity
     {
         private List<ProfilePicture> _pictures;
 
-        public ProfileInformation()
+        protected ProfileInformation()
         {
+        }
+        
+        public ProfileInformation(User user)
+        {
+            Id = user.Id;
             _pictures = new List<ProfilePicture>();
         }
 
+        public Guid Id { get; private set; }
         public string Summary { get; private set; }
         public string Description { get; private set; }
         public string Website { get; private set; }
         public string Facebook { get; private set; }
         public string Twitter { get; private set; }
         public string Instagram { get; private set; }
-        public virtual ProfilePicture Banner { get; private set; }
+        public string Banner { get; private set; }
         public virtual IReadOnlyCollection<ProfilePicture> Pictures => _pictures.AsReadOnly();
 
         public void SetSummary(string summary)
@@ -71,18 +78,15 @@ namespace Sheaft.Domain
             Instagram = instagram;
         }
 
-        public void SetBanner(ProfilePicture picture)
+        public void SetBanner(string banner)
         {
-            Banner = picture;
+            Banner = banner;
         }
         
         public ProfilePicture AddPicture(ProfilePicture picture)
         {
             _pictures ??= new List<ProfilePicture>();
             _pictures.Add(picture);
-
-            if (_pictures.Count == 1)
-                picture.IsDefault = true;
 
             return picture;
         }
@@ -97,22 +101,6 @@ namespace Sheaft.Domain
                 throw SheaftException.NotFound();
             
             _pictures.Remove(existingPicture);
-
-            if (existingPicture.IsDefault && _pictures.Any())
-                _pictures.First().IsDefault = true;
-        }
-
-        public void SetDefaultPicture(Guid id)
-        {
-            var existingPicture = _pictures.FirstOrDefault(p => p.Id == id);
-            if (existingPicture == null)
-                throw SheaftException.NotFound();
-
-            existingPicture.IsDefault = true;
-            
-            var pictures = _pictures.Where(p => p.Id != id);
-            foreach (var picture in pictures)
-                picture.IsDefault = false;
         }
     }
 }

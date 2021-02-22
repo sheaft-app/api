@@ -11,7 +11,6 @@ namespace Sheaft.GraphQL.Types.Outputs
             descriptor.Field(c => c.Id).Type<NonNullType<IdType>>();
             descriptor.Field(c => c.Phone);
             descriptor.Field(c => c.Picture);
-            descriptor.Field(c => c.Description);
             descriptor.Field(c => c.VatIdentifier);
             descriptor.Field(c => c.OpenForNewBusiness);
             descriptor.Field(c => c.NotSubjectToVat);
@@ -30,6 +29,9 @@ namespace Sheaft.GraphQL.Types.Outputs
 
             descriptor.Field(c => c.Closings)
                 .Type<ListType<ClosingType>>();
+            
+            descriptor.Field(c => c.ProfileInformation)
+                .Type<ProfileInformationType>();
         }
     }
 }

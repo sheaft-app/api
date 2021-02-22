@@ -42,6 +42,17 @@ namespace Sheaft.Application.User.Commands
 
         public async Task<Result> Handle(UpdateUserProfileCommand request, CancellationToken token)
         {
+            var entity = await _context.FindByIdAsync<Domain.User>(request.UserId, token);
+            
+            entity.ProfileInformation.SetSummary(request.Summary);
+            entity.ProfileInformation.SetDescription(request.Description);
+            entity.ProfileInformation.SetFacebook(request.Facebook);
+            entity.ProfileInformation.SetTwitter(request.Facebook);
+            entity.ProfileInformation.SetWebsite(request.Facebook);
+            entity.ProfileInformation.SetInstagram(request.Facebook);
+            
+            await _context.SaveChangesAsync(token);
+            return Success();
         }
     }
 }

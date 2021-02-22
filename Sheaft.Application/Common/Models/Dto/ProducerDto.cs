@@ -12,12 +12,12 @@ namespace Sheaft.Application.Common.Models.Dto
         public string Email { get; set; }
         public string Phone { get; set; }
         public string Picture { get; set; }
-        public string Description { get; set; }
         public string VatIdentifier { get; set; }
         public string Siret { get; set; }
         public bool OpenForNewBusiness { get; set; }
         public bool NotSubjectToVat { get; set; }
         public AddressDto Address { get; set; }
+        public ProfileInformationDto ProfileInformation { get; set; }
         public IEnumerable<TagDto> Tags { get; set; }
         public IEnumerable<ClosingDto> Closings { get; set; }
     }

@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Sheaft.Domain.Enum;
 using Sheaft.Infrastructure.Persistence;
@@ -10,9 +11,10 @@ using Sheaft.Infrastructure.Persistence;
 namespace Sheaft.Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20210222155333_User_ProfileInformation")]
+    partial class User_ProfileInformation
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -72,50 +74,6 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                     b.ToTable("Agreements");
                 });
 
-            modelBuilder.Entity("Sheaft.Domain.BusinessClosing", b =>
-                {
-                    b.Property<long>("Uid")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<long>("BusinessUid")
-                        .HasColumnType("bigint");
-
-                    b.Property<DateTimeOffset>("ClosedFrom")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<DateTimeOffset>("ClosedTo")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<DateTimeOffset>("CreatedOn")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<Guid>("Id")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Reason")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTimeOffset?>("RemovedOn")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<DateTimeOffset?>("UpdatedOn")
-                        .IsConcurrencyToken()
-                        .HasColumnType("datetimeoffset");
-
-                    b.HasKey("Uid");
-
-                    b.HasIndex("BusinessUid");
-
-                    b.HasIndex("Id")
-                        .IsUnique();
-
-                    b.HasIndex("Uid", "Id", "BusinessUid", "RemovedOn");
-
-                    b.ToTable("BusinessClosings");
-                });
-
             modelBuilder.Entity("Sheaft.Domain.Country", b =>
                 {
                     b.Property<long>("Uid")
@@ -142,50 +100,6 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                     b.HasIndex("Uid", "Id", "Alpha2");
 
                     b.ToTable("Countries");
-                });
-
-            modelBuilder.Entity("Sheaft.Domain.DeliveryClosing", b =>
-                {
-                    b.Property<long>("Uid")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<DateTimeOffset>("ClosedFrom")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<DateTimeOffset>("ClosedTo")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<DateTimeOffset>("CreatedOn")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<long>("DeliveryModeUid")
-                        .HasColumnType("bigint");
-
-                    b.Property<Guid>("Id")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Reason")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTimeOffset?>("RemovedOn")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<DateTimeOffset?>("UpdatedOn")
-                        .IsConcurrencyToken()
-                        .HasColumnType("datetimeoffset");
-
-                    b.HasKey("Uid");
-
-                    b.HasIndex("DeliveryModeUid");
-
-                    b.HasIndex("Id")
-                        .IsUnique();
-
-                    b.HasIndex("Uid", "Id", "DeliveryModeUid", "RemovedOn");
-
-                    b.ToTable("DeliveryClosings");
                 });
 
             modelBuilder.Entity("Sheaft.Domain.DeliveryMode", b =>
@@ -1195,50 +1109,6 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                     b.HasIndex("Uid", "Id", "ProducerUid", "ReturnableUid", "RemovedOn");
 
                     b.ToTable("Products");
-                });
-
-            modelBuilder.Entity("Sheaft.Domain.ProductClosing", b =>
-                {
-                    b.Property<long>("Uid")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<DateTimeOffset>("ClosedFrom")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<DateTimeOffset>("ClosedTo")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<DateTimeOffset>("CreatedOn")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<Guid>("Id")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<long>("ProductUid")
-                        .HasColumnType("bigint");
-
-                    b.Property<string>("Reason")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTimeOffset?>("RemovedOn")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<DateTimeOffset?>("UpdatedOn")
-                        .IsConcurrencyToken()
-                        .HasColumnType("datetimeoffset");
-
-                    b.HasKey("Uid");
-
-                    b.HasIndex("Id")
-                        .IsUnique();
-
-                    b.HasIndex("ProductUid");
-
-                    b.HasIndex("Uid", "Id", "ProductUid", "RemovedOn");
-
-                    b.ToTable("ProductClosings");
                 });
 
             modelBuilder.Entity("Sheaft.Domain.ProductTag", b =>
@@ -2580,24 +2450,6 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                         });
                 });
 
-            modelBuilder.Entity("Sheaft.Domain.BusinessClosing", b =>
-                {
-                    b.HasOne("Sheaft.Domain.Business", null)
-                        .WithMany("Closings")
-                        .HasForeignKey("BusinessUid")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("Sheaft.Domain.DeliveryClosing", b =>
-                {
-                    b.HasOne("Sheaft.Domain.DeliveryMode", null)
-                        .WithMany("Closings")
-                        .HasForeignKey("DeliveryModeUid")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
             modelBuilder.Entity("Sheaft.Domain.DeliveryMode", b =>
                 {
                     b.HasOne("Sheaft.Domain.Producer", "Producer")
@@ -3044,15 +2896,6 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                         .WithMany()
                         .HasForeignKey("ReturnableUid")
                         .OnDelete(DeleteBehavior.NoAction);
-                });
-
-            modelBuilder.Entity("Sheaft.Domain.ProductClosing", b =>
-                {
-                    b.HasOne("Sheaft.Domain.Product", null)
-                        .WithMany("Closings")
-                        .HasForeignKey("ProductUid")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
                 });
 
             modelBuilder.Entity("Sheaft.Domain.ProductTag", b =>

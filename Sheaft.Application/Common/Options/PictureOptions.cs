@@ -24,6 +24,11 @@
             Medium = new SizeInfos { Height = 128, Width = 128, Quality = 80 },
             Large = new SizeInfos { Height = 256, Width = 256, Quality = 60 }
         };
+
+        public EntitySize Banner { get; set; } = new EntitySize
+        {
+            Large = new SizeInfos { Height = 256, Width = 720, Quality = 80 }
+        };
     }
 
     public class EntitySize

@@ -153,7 +153,7 @@ namespace Sheaft.Web.Api
             services.AddType<UpdateClosingInputType>();
             services.AddType<PictureInputType>();
             services.AddType<UpdateUserProfileInputType>();
-            services.AddType<AddPictureToUserProfileInput>();
+            services.AddType<AddPictureToUserProfileInputType>();
 
             return services;
         }

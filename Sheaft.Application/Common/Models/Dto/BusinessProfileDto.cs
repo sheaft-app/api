@@ -2,6 +2,5 @@
 {
     public class BusinessProfileDto : UserDto
     {
-        public string Description { get; set; }
     }
 }

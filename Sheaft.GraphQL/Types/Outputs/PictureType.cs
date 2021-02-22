@@ -10,7 +10,6 @@ namespace Sheaft.GraphQL.Types.Outputs
             descriptor.Field(c => c.Id).Type<NonNullType<IdType>>();
             
             descriptor.Field(c => c.Url);
-            descriptor.Field(c => c.IsDefault);
         }
     }
 }

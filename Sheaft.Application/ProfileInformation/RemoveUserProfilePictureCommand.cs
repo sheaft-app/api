@@ -37,6 +37,12 @@ namespace Sheaft.Application.User.Commands
 
         public async Task<Result> Handle(RemoveUserProfilePictureCommand request, CancellationToken token)
         {
+            var entity = await _context.FindByIdAsync<Domain.User>(request.UserId, token);
+            
+            entity.ProfileInformation.RemovePicture(request.PictureId);
+            await _context.SaveChangesAsync(token);
+
+            return Success();
         }
     }
 }

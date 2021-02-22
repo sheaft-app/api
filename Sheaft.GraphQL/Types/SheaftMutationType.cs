@@ -360,7 +360,7 @@ namespace Sheaft.GraphQL.Types
                 .UseSelection();
             
             descriptor.Field(c => c.AddPictureToUserProfileAsync(default))
-                .Name("addProfilePicture")
+                .Name("addPictureToProfile")
                 .Authorize(Policies.REGISTERED)
                 .Type<NonNullType<BooleanType>>();
             

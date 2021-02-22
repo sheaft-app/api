@@ -317,8 +317,8 @@ namespace Sheaft.GraphQL
             [Service] IProductQueries productQueries)
         {
             SetLogTransaction(nameof(UpdateProductPictureAsync));
-            await ExecuteCommandAsync<UpdateProductPictureCommand, string>(
-                _mapper.Map(input, new UpdateProductPictureCommand(CurrentUser)), Token);
+            await ExecuteCommandAsync<UpdateProductPreviewCommand, string>(
+                _mapper.Map(input, new UpdateProductPreviewCommand(CurrentUser)), Token);
             return productQueries.GetProduct(input.Id, CurrentUser);
         }
 

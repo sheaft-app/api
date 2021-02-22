@@ -34,6 +34,8 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
                 cb.ToTable("UserAddresses");
             });
 
+            entity.HasOne(c => c.ProfileInformation);
+
             entity.OwnsMany(c => c.Points, p =>
             {
                 p.Property<long>("Uid");

@@ -14,42 +14,43 @@ using Sheaft.Domain;
 
 namespace Sheaft.Application.User.Commands
 {
-    public class AddPictureToUserProfileCommand : Command
+    public class UpdateProfileBannerCommand : Command
     {
         [JsonConstructor]
-        public AddPictureToUserProfileCommand(RequestUser requestUser) : base(requestUser)
+        public UpdateProfileBannerCommand(RequestUser requestUser) : base(requestUser)
         {
         }
         
         public Guid UserId { get; set; }
-        public string Picture { get; set; }
+        public PictureInput Picture { get; set; }
     }
 
-    public class AddPictureToUserProfileCommandHandler : CommandsHandler,
-        IRequestHandler<AddPictureToUserProfileCommand, Result>
+    public class UpdateProfileBannerCommandHandler : CommandsHandler,
+        IRequestHandler<UpdateProfileBannerCommand, Result>
     {
         private readonly IPictureService _imageService;
 
-        public AddPictureToUserProfileCommandHandler(
+        public UpdateProfileBannerCommandHandler(
             ISheaftMediatr mediatr,
             IAppDbContext context,
             IPictureService imageService,
-            ILogger<AddPictureToUserProfileCommandHandler> logger)
+            ILogger<UpdateProfileBannerCommandHandler> logger)
             : base(mediatr, context, logger)
         {
             _imageService = imageService;
         }
 
-        public async Task<Result> Handle(AddPictureToUserProfileCommand request, CancellationToken token)
+        public async Task<Result> Handle(UpdateProfileBannerCommand request, CancellationToken token)
         {
             var entity = await _context.FindByIdAsync<Domain.User>(request.UserId, token);
+            if (entity.ProfileInformation == null)
+                throw new ArgumentException(nameof(entity.ProfileInformation));
             
-            var id = Guid.NewGuid();
-            var result = await _imageService.HandleProfilePictureAsync(entity, id, request.Picture, token);
+            var result = await _imageService.HandleProfileBannerAsync(entity, request.Picture.Resized, request.Picture.Original, token);
             if (!result.Succeeded)
                 return Failure(result.Exception);
             
-            entity.ProfileInformation.AddPicture(new ProfilePicture(id, result.Data));
+            entity.ProfileInformation.SetBanner(result.Data);
             await _context.SaveChangesAsync(token);
 
             return Success();

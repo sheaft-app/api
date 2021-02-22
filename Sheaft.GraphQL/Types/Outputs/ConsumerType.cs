@@ -29,6 +29,9 @@ namespace Sheaft.GraphQL.Types.Outputs
 
             descriptor.Field(c => c.Name)
                 .Type<NonNullType<StringType>>();
+            
+            descriptor.Field(c => c.ProfileInformation)
+                .Type<ProfileInformationType>();
         }
     }
 }

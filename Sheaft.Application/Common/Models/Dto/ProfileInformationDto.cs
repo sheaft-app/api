@@ -10,7 +10,7 @@ namespace Sheaft.Application.Common.Models.Dto
         public string Facebook { get; set; }
         public string Twitter { get; set; }
         public string Instagram { get; set; }
-        public PictureDto Banner { get; set; }
+        public string Banner { get; set; }
         public List<PictureDto> Pictures { get; set; }
     }
 }

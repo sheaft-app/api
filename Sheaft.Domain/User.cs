@@ -29,14 +29,7 @@ namespace Sheaft.Domain
 
             _points = new List<Points>();
             RefreshPoints();
-        }
-
-        private void SetProfileInformation(ProfileInformation profileInformation)
-        {
-            if (profileInformation == null)
-                return;
-
-            ProfileInformation = profileInformation;
+            SetProfileInformation(new ProfileInformation(this));
         }
 
         public Guid Id { get; private set; }
@@ -58,6 +51,14 @@ namespace Sheaft.Domain
         public virtual ProfileInformation ProfileInformation { get; private set; }
         public virtual IReadOnlyCollection<Points> Points { get { return _points.AsReadOnly(); } }
 
+        public void SetProfileInformation(ProfileInformation profileInformation)
+        {
+            if (profileInformation == null)
+                return;
+
+            ProfileInformation = profileInformation;
+        }
+        
         public void SetFirstname(string firstname)
         {
             if (string.IsNullOrWhiteSpace(firstname))

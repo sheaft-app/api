@@ -11,9 +11,9 @@ namespace Sheaft.Application.Common.Mappings
         public TagProfile()
         {
             CreateMap<Domain.Tag, TagDto>()
-                .ForMember(d => d.Picture, opt => opt.MapFrom(r => ProductExtensions.GetPictureUrl(r.Picture, PictureSize.LARGE)));
+                .ForMember(d => d.Picture, opt => opt.MapFrom(r => PictureExtensions.GetPictureUrl(r.Id, r.Picture, PictureSize.LARGE)));
             CreateMap<Domain.Tag, TagViewModel>()
-                .ForMember(d => d.Picture, opt => opt.MapFrom(r => ProductExtensions.GetPictureUrl(r.Picture, PictureSize.LARGE)));
+                .ForMember(d => d.Picture, opt => opt.MapFrom(r => PictureExtensions.GetPictureUrl(r.Id, r.Picture, PictureSize.LARGE)));
         }
     }
 }

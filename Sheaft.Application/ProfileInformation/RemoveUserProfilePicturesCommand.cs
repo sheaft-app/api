@@ -38,6 +38,23 @@ namespace Sheaft.Application.User.Commands
 
         public async Task<Result> Handle(RemoveUserProfilePicturesCommand request, CancellationToken token)
         {
+            using (var transaction = await _context.BeginTransactionAsync(token))
+            {
+                foreach (var pictureId in request.PictureIds)
+                {
+                    var result =
+                        await _mediatr.Process(
+                            new RemoveUserProfilePictureCommand(request.RequestUser)
+                                {PictureId = pictureId, UserId = request.UserId}, token);
+
+                    if (!result.Succeeded)
+                        return result;
+                }
+
+                await transaction.CommitAsync(token);
+            }
+
+            return Success();
         }
     }
 }

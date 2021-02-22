@@ -7,8 +7,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Azure.Storage;
-using Sheaft.Application.Common;
-using Sheaft.Application.Common.Extensions;
 using Sheaft.Application.Common.Interfaces.Services;
 using Sheaft.Application.Common.Models;
 using Sheaft.Application.Common.Options;
@@ -25,14 +23,14 @@ namespace Sheaft.Infrastructure.Services
             _storageOptions = storageOptions.Value;
         }
 
-        public async Task<Result<string>> UploadUserPictureAsync(Guid userId, string filename, string size, byte[] data,
+        public async Task<Result<string>> UploadUserPreviewAsync(Guid userId, string size, byte[] data,
             CancellationToken token)
         {
             var containerClient =
                 new BlobContainerClient(_storageOptions.ConnectionString, _storageOptions.Containers.Pictures);
             await containerClient.CreateIfNotExistsAsync(cancellationToken: token);
 
-            var blobClient = containerClient.GetBlobClient($"users/{userId:N}/profile/{filename}_{size}.jpg");
+            var blobClient = containerClient.GetBlobClient($"users/{userId:N}/profile/user{(size == PictureSize.ORIGINAL ? $"_{PictureSize.ORIGINAL}" : string.Empty)}.png");
             await blobClient.DeleteIfExistsAsync(cancellationToken: token);
 
             using (var ms = new MemoryStream(data))
@@ -41,14 +39,13 @@ namespace Sheaft.Infrastructure.Services
             return Success(GetBlobUri(blobClient, _storageOptions.Containers.Pictures));
         }
 
-        public async Task<Result<string>> UploadTagPictureAsync(Guid tagId, string filename, string size, byte[] data,
-            CancellationToken token)
+        public async Task<Result<string>> UploadTagPictureAsync(Guid tagId, byte[] data, CancellationToken token)
         {
             var containerClient =
                 new BlobContainerClient(_storageOptions.ConnectionString, _storageOptions.Containers.Pictures);
             await containerClient.CreateIfNotExistsAsync(cancellationToken: token);
 
-            var blobClient = containerClient.GetBlobClient($"tags/images/{tagId:N}/{filename}_{size}.jpg");
+            var blobClient = containerClient.GetBlobClient($"tags/images/{tagId:N}.png");
             await blobClient.DeleteIfExistsAsync(cancellationToken: token);
 
             using (var ms = new MemoryStream(data))
@@ -63,7 +60,7 @@ namespace Sheaft.Infrastructure.Services
                 new BlobContainerClient(_storageOptions.ConnectionString, _storageOptions.Containers.Pictures);
             await containerClient.CreateIfNotExistsAsync(cancellationToken: token);
 
-            var blobClient = containerClient.GetBlobClient($"tags/icons/{tagId:N}/{Guid.NewGuid():N}.jpg");
+            var blobClient = containerClient.GetBlobClient($"tags/icons/{tagId:N}.png");
             await blobClient.DeleteIfExistsAsync(cancellationToken: token);
 
             using (var ms = new MemoryStream(data))
@@ -72,21 +69,33 @@ namespace Sheaft.Infrastructure.Services
             return Success(GetBlobUri(blobClient, _storageOptions.Containers.Pictures));
         }
 
-        public async Task<Result<string>> UploadProductPictureAsync(Guid userId, Guid productId, string filename,
-            string size, byte[] data, CancellationToken token)
+        public async Task<Result<string>> UploadProductPictureAsync(Guid userId, Guid productId, Guid pictureId,
+            byte[] data, CancellationToken token)
         {
-            var containerClient =
-                new BlobContainerClient(_storageOptions.ConnectionString, _storageOptions.Containers.Pictures);
+            var containerClient = new BlobContainerClient(_storageOptions.ConnectionString, _storageOptions.Containers.Pictures);
             await containerClient.CreateIfNotExistsAsync(cancellationToken: token);
 
-            var blobClient =
-                containerClient.GetBlobClient(ProductExtensions.GetPictureUrl(userId, productId, filename, size));
+            var blobClient = containerClient.GetBlobClient(GetProductPictureUrl(userId, productId, pictureId));
             await blobClient.DeleteIfExistsAsync(cancellationToken: token);
 
             using (var ms = new MemoryStream(data))
                 await blobClient.UploadAsync(ms, token);
 
             return Success(GetBlobUri(blobClient, _storageOptions.Containers.Pictures));
+        }
+
+        public async Task<Result<string>> UploadProductPreviewAsync(Guid userId, Guid productId, string size, byte[] data, CancellationToken token)
+        {
+            var containerClient = new BlobContainerClient(_storageOptions.ConnectionString, _storageOptions.Containers.Pictures);
+            await containerClient.CreateIfNotExistsAsync(cancellationToken: token);
+
+            var blobClient = containerClient.GetBlobClient(GetProductPictureUrl(userId, productId, productId, size));
+            await blobClient.DeleteIfExistsAsync(cancellationToken: token);
+
+            using (var ms = new MemoryStream(data))
+                await blobClient.UploadAsync(ms, token);
+
+            return Success(GetBlobUri(blobClient, _storageOptions.Containers.Pictures).Split($"_{size}.png")[0]);
         }
 
         public async Task<Result> CleanUserStorageAsync(Guid userId, CancellationToken token)
@@ -122,26 +131,6 @@ namespace Sheaft.Infrastructure.Services
                 return response;
 
             return Success();
-        }
-
-        public async Task<Result> CleanContainerFolderStorageAsync(string container, string folder,
-            CancellationToken token)
-        {
-            var containerClient = new BlobContainerClient(_storageOptions.ConnectionString, container);
-
-            var blobClient = containerClient.GetBlobClient(folder);
-            if (!await blobClient.ExistsAsync(token))
-                return Success();
-
-            var success = true;
-            await foreach (var blob in containerClient.GetBlobsAsync(prefix: folder, cancellationToken: token))
-            {
-                var response = await containerClient.DeleteBlobAsync(blob.Name, cancellationToken: token);
-                if (response.Status >= 400)
-                    success = false;
-            }
-
-            return success ? Success() : Failure();
         }
 
         public async Task<Result> UploadImportProductsFileAsync(Guid userId, Guid jobId, byte[] data,
@@ -315,6 +304,56 @@ namespace Sheaft.Infrastructure.Services
             return Success(blobClient.Uri.ToString());
         }
 
+        public async Task<Result<string>> UploadProfilePreviewAsync(Guid userId, string size, byte[] data, CancellationToken token)
+        {
+            var containerClient =
+                new BlobContainerClient(_storageOptions.ConnectionString, _storageOptions.Containers.Pictures);
+            await containerClient.CreateIfNotExistsAsync(cancellationToken: token);
+
+            var blobClient = containerClient.GetBlobClient($"users/{userId:N}/profile/banner{(size == PictureSize.ORIGINAL ? $"_{PictureSize.ORIGINAL}" : string.Empty)}.png");
+            await blobClient.DeleteIfExistsAsync(cancellationToken: token);
+
+            using (var ms = new MemoryStream(data))
+                await blobClient.UploadAsync(ms, token);
+
+            return Success(GetBlobUri(blobClient, _storageOptions.Containers.Pictures).Split($"_{size}.png")[0]);
+        }
+
+        public async Task<Result<string>> UploadProfilePictureAsync(Guid userId, Guid pictureId, byte[] data, CancellationToken token)
+        {
+            var containerClient =
+                new BlobContainerClient(_storageOptions.ConnectionString, _storageOptions.Containers.Pictures);
+            await containerClient.CreateIfNotExistsAsync(cancellationToken: token);
+
+            var blobClient = containerClient.GetBlobClient($"users/{userId:N}/profile/pictures/{pictureId}.png");
+            await blobClient.DeleteIfExistsAsync(cancellationToken: token);
+
+            using (var ms = new MemoryStream(data))
+                await blobClient.UploadAsync(ms, token);
+
+            return Success(GetBlobUri(blobClient, _storageOptions.Containers.Pictures));
+        }
+
+        private async Task<Result> CleanContainerFolderStorageAsync(string container, string folder,
+            CancellationToken token)
+        {
+            var containerClient = new BlobContainerClient(_storageOptions.ConnectionString, container);
+
+            var blobClient = containerClient.GetBlobClient(folder);
+            if (!await blobClient.ExistsAsync(token))
+                return Success();
+
+            var success = true;
+            await foreach (var blob in containerClient.GetBlobsAsync(prefix: folder, cancellationToken: token))
+            {
+                var response = await containerClient.DeleteBlobAsync(blob.Name, cancellationToken: token);
+                if (response.Status >= 400)
+                    success = false;
+            }
+
+            return success ? Success() : Failure();
+        }
+
         private string GetBlobSasUri(BlobClient blobClient, BlobSasBuilder sasBuilder, string container)
         {
             return new UriBuilder
@@ -336,6 +375,11 @@ namespace Sheaft.Infrastructure.Services
                 Host = _storageOptions.ContentHostname,
                 Path = string.Format("{0}/{1}", container, blobClient.Name)
             }.ToString();
+        }
+
+        private string GetProductPictureUrl(Guid userId, Guid productId, Guid pictureId, string size = null)
+        {
+            return $"users/{userId:N}/products/{productId:N}/{pictureId:N}{(string.IsNullOrWhiteSpace(size) ? string.Empty : $"_{size}")}.png";
         }
     }
 }
