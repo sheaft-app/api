@@ -19,11 +19,16 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
             {
                 cb.ToTable("DeliveryModeOpeningHours");
             });
+            
+            entity.HasMany(c => c.Closings).WithOne().HasForeignKey("DeliveryModeUid").OnDelete(DeleteBehavior.Cascade);
 
             entity.Ignore(c => c.DomainEvents);
             
             var deliveryHours = entity.Metadata.FindNavigation(nameof(DeliveryMode.OpeningHours));
             deliveryHours.SetPropertyAccessMode(PropertyAccessMode.Field);
+
+            var closings = entity.Metadata.FindNavigation(nameof(DeliveryMode.Closings));
+            closings.SetPropertyAccessMode(PropertyAccessMode.Field);
 
             entity.HasKey("Uid");
 

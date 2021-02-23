@@ -42,7 +42,7 @@ namespace Sheaft.Application.Producer.Commands
 
         public async Task<Result> Handle(GenerateProducersFileCommand request, CancellationToken token)
         {
-            var producers = await _context.GetAsync<Domain.Producer>(p => p.CanDirectSell, token);
+            var producers = await _context.GetAsync<Domain.Producer>(token);
             var prods = producers.Select(p => new ProducerListItem(p));
 
             var result = await _blobService.UploadProducersListAsync(

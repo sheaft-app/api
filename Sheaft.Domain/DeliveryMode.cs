@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Sheaft.Domain.Common;
 using Sheaft.Domain.Enum;
+using Sheaft.Domain.Exceptions;
 using Sheaft.Domain.Interop;
 
 namespace Sheaft.Domain
@@ -10,6 +11,7 @@ namespace Sheaft.Domain
     public class DeliveryMode : IEntity, IHasDomainEvent
     {
         private List<TimeSlotHour> _openingHours;
+        private List<DeliveryClosing> _closings;
 
         protected DeliveryMode()
         {
@@ -45,6 +47,7 @@ namespace Sheaft.Domain
         public virtual DeliveryAddress Address { get; private set; }
         public virtual Producer Producer { get; private set; }
         public virtual IReadOnlyCollection<TimeSlotHour> OpeningHours => _openingHours?.AsReadOnly(); 
+        public virtual IReadOnlyCollection<DeliveryClosing> Closings => _closings?.AsReadOnly(); 
 
         public void SetOpeningHours(IEnumerable<TimeSlotHour> openingHours)
         {
@@ -94,6 +97,26 @@ namespace Sheaft.Domain
         public void SetMaxPurchaseOrdersPerTimeSlot(int? maxPurchaseOrdersPerTimeSlot)
         {
             MaxPurchaseOrdersPerTimeSlot = maxPurchaseOrdersPerTimeSlot;
+        }
+
+        public DeliveryClosing AddClosing(DateTimeOffset from, DateTimeOffset to, string reason = null)
+        {
+            if (Closings == null)
+                _closings = new List<DeliveryClosing>();
+
+            var closing = new DeliveryClosing(Guid.NewGuid(), from, to, reason);
+            _closings.Add(closing);
+
+            return closing;
+        }
+
+        public void RemoveClosing(Guid id)
+        {
+            var closing = _closings.SingleOrDefault(r => r.Id == id);
+            if(closing == null)
+                throw SheaftException.NotFound();
+            
+            _closings.Remove(closing);
         }
 
         public List<DomainEvent> DomainEvents { get; } = new List<DomainEvent>();

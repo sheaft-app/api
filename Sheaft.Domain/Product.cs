@@ -15,6 +15,7 @@ namespace Sheaft.Domain
 
         private List<ProductTag> _tags;
         private List<Rating> _ratings;
+        private List<ProductClosing> _closings;
 
         protected Product()
         {
@@ -66,6 +67,7 @@ namespace Sheaft.Domain
         public virtual Producer Producer { get; private set; }
         public virtual IReadOnlyCollection<ProductTag> Tags => _tags?.AsReadOnly();
         public virtual IReadOnlyCollection<Rating> Ratings => _ratings?.AsReadOnly();
+        public virtual IReadOnlyCollection<ProductClosing> Closings => _closings?.AsReadOnly(); 
 
         public void SetReference(string reference)
         {
@@ -178,47 +180,24 @@ namespace Sheaft.Domain
             RefreshRatings();
         }
 
-        public void RemoveRatings(IEnumerable<Guid> ids)
+        public ProductClosing AddClosing(DateTimeOffset from, DateTimeOffset to, string reason = null)
         {
-            foreach (var id in ids)
-            {
-                RemoveRating(id);
-            }
+            if (Closings == null)
+                _closings = new List<ProductClosing>();
+
+            var closing = new ProductClosing(Guid.NewGuid(), from, to, reason);
+            _closings.Add(closing);
+
+            return closing;
         }
 
-        public void RemoveRating(Guid id)
+        public void RemoveClosing(Guid id)
         {
-            var rating = _ratings.SingleOrDefault(r => r.Id == id);
-            _ratings.Remove(rating);
-
-            RefreshRatings();
-        }
-
-        public void AddTags(IEnumerable<Tag> tags)
-        {
-            foreach (var tag in tags)
-            {
-                AddTag(tag);
-            }
-        }
-
-        public void AddTag(Tag tag)
-        {
-            _tags.Add(new ProductTag(tag));
-        }
-
-        public void RemoveTags(IEnumerable<Guid> ids)
-        {
-            foreach (var id in ids)
-            {
-                RemoveTag(id);
-            }
-        }
-
-        public void RemoveTag(Guid id)
-        {
-            var tag = _tags.SingleOrDefault(r => r.Tag.Id == id);
-            _tags.Remove(tag);
+            var closing = _closings.SingleOrDefault(r => r.Id == id);
+            if(closing == null)
+                throw SheaftException.NotFound();
+            
+            _closings.Remove(closing);
         }
 
         public void SetReturnable(Returnable returnable)
@@ -253,7 +232,7 @@ namespace Sheaft.Domain
             RefreshPrices();
         }
 
-        protected void RefreshPrices()
+        private void RefreshPrices()
         {
             VatPricePerUnit = Math.Round(WholeSalePricePerUnit * Vat / 100, DIGITS_COUNT);
             OnSalePricePerUnit = Math.Round(WholeSalePricePerUnit + VatPricePerUnit, DIGITS_COUNT);
@@ -279,6 +258,12 @@ namespace Sheaft.Domain
 
             VatPrice = Math.Round(WholeSalePrice * Vat / 100, DIGITS_COUNT);
             OnSalePrice = Math.Round(WholeSalePrice + VatPrice, DIGITS_COUNT);
+        }
+        
+        private void AddTags(IEnumerable<Tag> tags)
+        {
+            foreach (var tag in tags)
+                _tags.Add(new ProductTag(tag));
         }
 
         private void RefreshRatings()
