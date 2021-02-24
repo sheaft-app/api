@@ -30,5 +30,13 @@ namespace Sheaft.Domain
             ClosedFrom = from;
             ClosedTo = to;
         }
+
+        public void SetReason(string reason)
+        {
+            if (reason == null)
+                return;
+
+            Reason = reason;
+        }
     }
 }
