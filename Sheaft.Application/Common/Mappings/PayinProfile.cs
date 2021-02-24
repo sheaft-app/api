@@ -14,8 +14,7 @@ namespace Sheaft.Application.Common.Mappings
 
             CreateMap<Domain.Payin, PayinDto>()
                 .IncludeBase<Domain.Payin, TransactionDto>()
-                .ForMember(m => m.CreditedUser, opt => opt.MapFrom(t => t.CreditedWallet.User))
-                .ForMember(m => m.Order, opt => opt.MapFrom(t => t.Order));
+                .ForMember(m => m.CreditedUser, opt => opt.MapFrom(t => t.CreditedWallet.User));
 
             CreateMap<CardPayin,TransactionDto>()
                 .IncludeBase<Domain.Payin, TransactionDto>();

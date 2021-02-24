@@ -70,6 +70,8 @@ namespace Sheaft.Web.Api
             services.AddType<ClosingType>();
             services.AddType<PictureType>();
             services.AddType<ProfileInformationType>();
+            services.AddType<OrderProductType>();
+            services.AddType<OrderDeliveryType>();
 
             services.AddType<AddressKindEnumType>();
             services.AddType<AgreementStatusEnumType>();

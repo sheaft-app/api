@@ -1,8 +1,9 @@
 ﻿using System;
+using Sheaft.Domain.Interop;
 
 namespace Sheaft.Domain
 {
-    public class OrderDelivery
+    public class OrderDelivery : IIdEntity
     {
         protected OrderDelivery()
         {

@@ -41,6 +41,15 @@ namespace Sheaft.GraphQL.Types.Outputs
 
             descriptor.Field(c => c.User)
                 .Type<NonNullType<UserProfileType>>();
+
+            descriptor.Field(c => c.Products)
+                .Type<ListType<OrderProductType>>();
+            
+            descriptor.Field(c => c.Deliveries)
+                .Type<ListType<OrderDeliveryType>>();
+            
+            descriptor.Field(c => c.Payin)
+                .Type<ListType<PayinType>>();
         }
     }
 }
