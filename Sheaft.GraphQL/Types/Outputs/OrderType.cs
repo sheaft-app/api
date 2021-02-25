@@ -40,7 +40,7 @@ namespace Sheaft.GraphQL.Types.Outputs
             descriptor.Field(c => c.TotalWeight);
 
             descriptor.Field(c => c.User)
-                .Type<NonNullType<UserProfileType>>();
+                .Type<UserProfileType>();
 
             descriptor.Field(c => c.Products)
                 .Type<ListType<OrderProductType>>();

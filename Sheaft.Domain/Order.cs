@@ -19,7 +19,7 @@ namespace Sheaft.Domain
         {
         }
 
-        public Order(Guid id, DonationKind kind, User user, IDictionary<Product, int> orderProducts, decimal fixedAmount, decimal percent, decimal vatPercent)
+        public Order(Guid id, DonationKind kind, IDictionary<Product, int> orderProducts, decimal fixedAmount, decimal percent, decimal vatPercent, User user = null)
         {
             Id = id;
             User = user;
@@ -70,6 +70,14 @@ namespace Sheaft.Domain
         public virtual IReadOnlyCollection<OrderProduct> Products => _products?.AsReadOnly();
         public virtual IReadOnlyCollection<OrderDelivery> Deliveries => _deliveries?.AsReadOnly();
         public virtual IReadOnlyCollection<PurchaseOrder> PurchaseOrders => _purchaseOrders?.AsReadOnly();
+
+        public void AssignToUser(User user)
+        {
+            if (User != null)
+                throw SheaftException.Conflict();
+            
+            User = user;
+        }
 
         public PurchaseOrder AddPurchaseOrder(string reference, Producer producer)
         {

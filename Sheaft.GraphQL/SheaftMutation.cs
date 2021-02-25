@@ -74,7 +74,8 @@ namespace Sheaft.GraphQL
             SetLogTransaction(nameof(ExportPickingOrdersAsync));
             var result =
                 await ExecuteCommandAsync<QueueExportPickingOrderCommand, Guid>(
-                    _mapper.Map(input, new QueueExportPickingOrderCommand(CurrentUser) {ProducerId = CurrentUser.Id}), Token);
+                    _mapper.Map(input, new QueueExportPickingOrderCommand(CurrentUser) {ProducerId = CurrentUser.Id}),
+                    Token);
             return jobQueries.GetJob(result, CurrentUser);
         }
 
@@ -97,14 +98,14 @@ namespace Sheaft.GraphQL
         public async Task<IQueryable<JobDto>> PauseJobsAsync(IdsInput input, [Service] IJobQueries jobQueries)
         {
             SetLogTransaction(nameof(PauseJobsAsync));
-            await ExecuteCommandAsync(_mapper.Map(input, new PauseJobsCommand(CurrentUser)),Token);
+            await ExecuteCommandAsync(_mapper.Map(input, new PauseJobsCommand(CurrentUser)), Token);
             return jobQueries.GetJobs(CurrentUser).Where(j => input.Ids.Contains(j.Id));
         }
 
         public async Task<IQueryable<JobDto>> RetryJobsAsync(IdsInput input, [Service] IJobQueries jobQueries)
         {
             SetLogTransaction(nameof(RetryJobsAsync));
-                await ExecuteCommandAsync(_mapper.Map(input, new RetryJobsCommand(CurrentUser)), Token);
+            await ExecuteCommandAsync(_mapper.Map(input, new RetryJobsCommand(CurrentUser)), Token);
             return jobQueries.GetJobs(CurrentUser).Where(j => input.Ids.Contains(j.Id));
         }
 
@@ -112,14 +113,14 @@ namespace Sheaft.GraphQL
             [Service] IJobQueries jobQueries)
         {
             SetLogTransaction(nameof(CancelJobsAsync));
-                await ExecuteCommandAsync(_mapper.Map(input, new CancelJobsCommand(CurrentUser)), Token);
+            await ExecuteCommandAsync(_mapper.Map(input, new CancelJobsCommand(CurrentUser)), Token);
             return jobQueries.GetJobs(CurrentUser).Where(j => input.Ids.Contains(j.Id));
         }
 
         public async Task<IQueryable<JobDto>> ArchiveJobsAsync(IdsInput input, [Service] IJobQueries jobQueries)
         {
             SetLogTransaction(nameof(ArchiveJobsAsync));
-                await ExecuteCommandAsync(_mapper.Map(input, new ArchiveJobsCommand(CurrentUser)), Token);
+            await ExecuteCommandAsync(_mapper.Map(input, new ArchiveJobsCommand(CurrentUser)), Token);
             return jobQueries.GetJobs(CurrentUser).Where(j => input.Ids.Contains(j.Id));
         }
 
@@ -160,7 +161,8 @@ namespace Sheaft.GraphQL
         public async Task<DateTimeOffset> MarkMyNotificationsAsReadAsync()
         {
             SetLogTransaction(nameof(MarkMyNotificationsAsReadAsync));
-            var input = new MarkUserNotificationsAsReadCommand(CurrentUser) {UserId = CurrentUser.Id, ReadBefore = DateTimeOffset.UtcNow};
+            var input = new MarkUserNotificationsAsReadCommand(CurrentUser)
+                {UserId = CurrentUser.Id, ReadBefore = DateTimeOffset.UtcNow};
             await ExecuteCommandAsync(input, Token);
             return input.ReadBefore;
         }
@@ -179,7 +181,9 @@ namespace Sheaft.GraphQL
             SetLogTransaction(nameof(CreateOrderAsync));
             var result =
                 await ExecuteCommandAsync<CreateConsumerOrderCommand, Guid>(
-                    _mapper.Map(input, new CreateConsumerOrderCommand(CurrentUser){UserId = CurrentUser.Id}), Token);
+                    _mapper.Map(input,
+                        new CreateConsumerOrderCommand(CurrentUser)
+                            {UserId = CurrentUser.Id}), Token);
             return orderQueries.GetOrder(result, CurrentUser);
         }
 
@@ -310,7 +314,8 @@ namespace Sheaft.GraphQL
             [Service] IProductQueries productQueries)
         {
             SetLogTransaction(nameof(RateProductAsync));
-            await ExecuteCommandAsync(_mapper.Map(input, new RateProductCommand(CurrentUser){UserId = CurrentUser.Id}), Token);
+            await ExecuteCommandAsync(_mapper.Map(input, new RateProductCommand(CurrentUser) {UserId = CurrentUser.Id}),
+                Token);
             return productQueries.GetProduct(input.Id, CurrentUser);
         }
 
@@ -351,7 +356,7 @@ namespace Sheaft.GraphQL
             SetLogTransaction(nameof(RegisterStoreAsync));
             var result =
                 await ExecuteCommandAsync<RegisterStoreCommand, Guid>(
-                    _mapper.Map(input, new RegisterStoreCommand(CurrentUser){StoreId = CurrentUser.Id}), Token);
+                    _mapper.Map(input, new RegisterStoreCommand(CurrentUser) {StoreId = CurrentUser.Id}), Token);
             return storeQueries.GetStore(result, CurrentUser);
         }
 
@@ -369,7 +374,7 @@ namespace Sheaft.GraphQL
             SetLogTransaction(nameof(RegisterProducerAsync));
             var result =
                 await ExecuteCommandAsync<RegisterProducerCommand, Guid>(
-                    _mapper.Map(input, new RegisterProducerCommand(CurrentUser){ProducerId =  CurrentUser.Id}), Token);
+                    _mapper.Map(input, new RegisterProducerCommand(CurrentUser) {ProducerId = CurrentUser.Id}), Token);
             return producerQueries.GetProducer<ProducerDto>(result, CurrentUser);
         }
 
@@ -405,7 +410,7 @@ namespace Sheaft.GraphQL
             SetLogTransaction(nameof(RegisterConsumerAsync));
             var result =
                 await ExecuteCommandAsync<RegisterConsumerCommand, Guid>(
-                    _mapper.Map(input, new RegisterConsumerCommand(CurrentUser) { ConsumerId = CurrentUser.Id}), Token);
+                    _mapper.Map(input, new RegisterConsumerCommand(CurrentUser) {ConsumerId = CurrentUser.Id}), Token);
             return consumerQueries.GetConsumer(result, CurrentUser);
         }
 
@@ -456,13 +461,15 @@ namespace Sheaft.GraphQL
         public async Task<bool> AddPictureToUserProfileAsync(AddPictureToInput input)
         {
             SetLogTransaction(nameof(AddPictureToUserProfileAsync));
-            return await ExecuteCommandAsync(_mapper.Map(input, new AddPictureToUserProfileCommand(CurrentUser)), Token);
+            return await ExecuteCommandAsync(_mapper.Map(input, new AddPictureToUserProfileCommand(CurrentUser)),
+                Token);
         }
 
         public async Task<bool> RemoveUserProfilePicturesAsync(IdsInput input)
         {
             SetLogTransaction(nameof(RemoveUserProfilePicturesAsync));
-            return await ExecuteCommandAsync(_mapper.Map(input, new RemoveUserProfilePicturesCommand(CurrentUser){UserId = CurrentUser.Id}), Token);
+            return await ExecuteCommandAsync(
+                _mapper.Map(input, new RemoveUserProfilePicturesCommand(CurrentUser) {UserId = CurrentUser.Id}), Token);
         }
 
         public async Task<bool> AddPictureToProductAsync(AddPictureToInput input)
@@ -489,7 +496,7 @@ namespace Sheaft.GraphQL
             SetLogTransaction(nameof(CreateQuickOrderAsync));
             var result =
                 await ExecuteCommandAsync<CreateQuickOrderCommand, Guid>(
-                    _mapper.Map(input, new CreateQuickOrderCommand(CurrentUser){UserId = CurrentUser.Id}), Token);
+                    _mapper.Map(input, new CreateQuickOrderCommand(CurrentUser) {UserId = CurrentUser.Id}), Token);
             return quickOrderQueries.GetQuickOrder(result, CurrentUser);
         }
 
@@ -497,7 +504,8 @@ namespace Sheaft.GraphQL
             [Service] IQuickOrderQueries quickOrderQueries)
         {
             SetLogTransaction(nameof(SetDefaultQuickOrderAsync));
-            await ExecuteCommandAsync(_mapper.Map(input, new SetDefaultQuickOrderCommand(CurrentUser){UserId = CurrentUser.Id}), Token);
+            await ExecuteCommandAsync(
+                _mapper.Map(input, new SetDefaultQuickOrderCommand(CurrentUser) {UserId = CurrentUser.Id}), Token);
             return quickOrderQueries.GetQuickOrder(input.Id, CurrentUser);
         }
 
@@ -537,7 +545,8 @@ namespace Sheaft.GraphQL
             SetLogTransaction(nameof(CreateDeliveryModeAsync));
             var result =
                 await ExecuteCommandAsync<CreateDeliveryModeCommand, Guid>(
-                    _mapper.Map(input, new CreateDeliveryModeCommand(CurrentUser) { ProducerId = CurrentUser.Id }), Token);
+                    _mapper.Map(input, new CreateDeliveryModeCommand(CurrentUser) {ProducerId = CurrentUser.Id}),
+                    Token);
             return deliveryQueries.GetDelivery(result, CurrentUser);
         }
 
@@ -561,7 +570,7 @@ namespace Sheaft.GraphQL
             SetLogTransaction(nameof(CreateReturnableAsync));
             var result =
                 await ExecuteCommandAsync<CreateReturnableCommand, Guid>(
-                    _mapper.Map(input, new CreateReturnableCommand(CurrentUser){UserId = CurrentUser.Id}), Token);
+                    _mapper.Map(input, new CreateReturnableCommand(CurrentUser) {UserId = CurrentUser.Id}), Token);
             return returnableQueries.GetReturnable(result, CurrentUser);
         }
 

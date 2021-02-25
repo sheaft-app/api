@@ -45,7 +45,6 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
             });
 
             entity.HasMany<Sponsoring>().WithOne(c => c.Sponsor).HasForeignKey("SponsorUid").OnDelete(DeleteBehavior.NoAction);
-            entity.HasMany<Order>().WithOne(c => c.User).HasForeignKey("UserUid").OnDelete(DeleteBehavior.Cascade);
 
             entity.HasKey("Uid");
 

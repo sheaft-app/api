@@ -165,9 +165,15 @@ namespace Sheaft.GraphQL.Types
                 .UseSelection();
 
             //ORDER
+            descriptor.Field(c => c.GetCurrentOrder(default))
+                .Name("currentOrder")
+                .Authorize(Policies.REGISTERED)
+                .Type<OrderType>()
+                .UseSingleOrDefault()
+                .UseSelection();
+            
             descriptor.Field(c => c.GetOrder(default, default))
                 .Name("order")
-                .Authorize(Policies.REGISTERED)
                 .Argument("input", c => c.Type<NonNullType<IdType>>())
                 .Type<OrderType>()
                 .UseSingleOrDefault()

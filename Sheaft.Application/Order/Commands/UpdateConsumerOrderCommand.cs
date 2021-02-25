@@ -27,6 +27,7 @@ namespace Sheaft.Application.Order.Commands
         {
         }
 
+        public Guid? UserId { get; set; }
         public Guid OrderId { get; set; }
         public DonationKind Donation { get; set; }
         public IEnumerable<ProductQuantityInput> Products { get; set; }
@@ -47,8 +48,17 @@ namespace Sheaft.Application.Order.Commands
         public async Task<Result> Handle(UpdateConsumerOrderCommand request, CancellationToken token)
         {
             var entity = await _context.GetByIdAsync<Domain.Order>(request.OrderId, token);
-            if(entity.User.Id != request.RequestUser.Id)
+            if(entity.User != null && entity.User.Id != request.RequestUser.Id)
                 throw SheaftException.Forbidden();
+            
+            if(entity.User != null && request.UserId.HasValue && request.UserId.Value != entity.User.Id)
+                throw SheaftException.Conflict();
+
+            if (entity.User == null && request.UserId.HasValue && request.UserId != Guid.Empty)
+            {
+                var user = await _context.GetByIdAsync<Domain.User>(request.UserId.Value, token);
+                entity.AssignToUser(user);
+            }
 
             var productIds = request.Products.Select(p => p.Id);
             var products = await _context.FindByIdsAsync<Domain.Product>(productIds, token);

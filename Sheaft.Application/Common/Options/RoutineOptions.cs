@@ -3,7 +3,7 @@
     public class RoutineOptions
     {
         public const string SETTING = "Routines";
-        public int CheckOrderExpiredFromMinutes { get; set; } = 1440;
+        public int CheckOrderExpiredFromMinutes { get; set; } = 10080;
         public int CheckNewPayinRefundsFromMinutes { get; set; } = 10080;
 
         public string CheckPayinsCron { get; set; } = "*/30 * * * *";

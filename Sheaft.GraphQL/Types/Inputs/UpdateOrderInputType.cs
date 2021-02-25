@@ -9,6 +9,9 @@ namespace Sheaft.GraphQL.Types.Inputs
         {
             descriptor.Field(c => c.Id)
                 .Type<NonNullType<IdType>>();
+            
+            descriptor.Field(c => c.UserId)
+                .Type<IdType>();
 
             descriptor.Field(c => c.Donation);
 

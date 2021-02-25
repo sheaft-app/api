@@ -279,7 +279,6 @@ namespace Sheaft.GraphQL.Types
             //ORDER
             descriptor.Field(c => c.CreateOrderAsync(default, default))
                 .Name("createOrder")
-                .Authorize(Policies.CONSUMER)
                 .Type<NonNullType<OrderType>>()
                 .UseSingleOrDefault()
                 .UseSelection();

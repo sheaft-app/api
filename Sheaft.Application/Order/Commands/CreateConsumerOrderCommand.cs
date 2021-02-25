@@ -77,12 +77,12 @@ namespace Sheaft.Application.Order.Commands
                 cartProducts.Add(product, request.Products.Where(p => p.Id == product.Id).Sum(c => c.Quantity));
             }
 
-            var user = await _context.GetByIdAsync<Domain.User>(request.UserId, token);
-            if(user.Id != request.RequestUser.Id)
+            Domain.User user = request.UserId != Guid.Empty ? await _context.GetByIdAsync<Domain.User>(request.UserId, token) : null;
+            if(user != null && user.Id != request.RequestUser.Id)
                 throw SheaftException.Forbidden();
             
-            var order = new Domain.Order(Guid.NewGuid(), request.Donation, user, cartProducts, _pspOptions.FixedAmount,
-                _pspOptions.Percent, _pspOptions.VatPercent);
+            var order = new Domain.Order(Guid.NewGuid(), request.Donation, cartProducts, _pspOptions.FixedAmount,
+                _pspOptions.Percent, _pspOptions.VatPercent, user);
 
             var deliveryIds = request.ProducersExpectedDeliveries?.Select(p => p.DeliveryModeId) ?? new List<Guid>();
             var deliveries = deliveryIds.Any()

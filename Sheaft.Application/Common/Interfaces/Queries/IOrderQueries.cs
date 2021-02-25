@@ -9,5 +9,6 @@ namespace Sheaft.Application.Common.Interfaces.Queries
     {
         IQueryable<OrderDto> GetOrder(Guid id, RequestUser currentUser);
         IQueryable<OrderDto> GetOrders(RequestUser currentUser);
+        IQueryable<OrderDto> GetCurrentOrder(RequestUser currentUser);
     }
 }

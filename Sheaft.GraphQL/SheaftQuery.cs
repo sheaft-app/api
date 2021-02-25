@@ -282,6 +282,12 @@ namespace Sheaft.GraphQL
             return tagQueries.GetTags(CurrentUser);
         }
 
+        public IQueryable<OrderDto> GetCurrentOrder([Service] IOrderQueries orderQueries)
+        {
+            SetLogTransaction(nameof(GetOrder));
+            return orderQueries.GetCurrentOrder(CurrentUser);
+        }
+
         public IQueryable<OrderDto> GetOrder(Guid input, [Service] IOrderQueries orderQueries)
         {
             SetLogTransaction(nameof(GetOrder), input);
