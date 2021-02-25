@@ -11,6 +11,7 @@ namespace Sheaft.GraphQL.Types.Outputs
             descriptor.Field(c => c.Status);
             descriptor.Field(c => c.DonationKind);
             descriptor.Field(c => c.CreatedOn);
+            descriptor.Field(c => c.UpdatedOn);
             descriptor.Field(c => c.Reference);
 
             descriptor.Field(c => c.TotalWholeSalePrice);
@@ -49,7 +50,7 @@ namespace Sheaft.GraphQL.Types.Outputs
                 .Type<ListType<OrderDeliveryType>>();
             
             descriptor.Field(c => c.Payin)
-                .Type<ListType<PayinType>>();
+                .Type<PayinType>();
         }
     }
 }

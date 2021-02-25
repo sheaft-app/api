@@ -9,7 +9,6 @@ namespace Sheaft.Application.Common.Models.Dto
         public Guid Id { get; set; }
         public DateTimeOffset CreatedOn { get; set; }
         public DateTimeOffset? UpdatedOn { get; set; }
-        public DateTimeOffset? RemovedOn { get; set; }
         public OrderStatus Status { get; set; }
         public DonationKind DonationKind { get; set; }
         public string Reference { get; set; }

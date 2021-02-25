@@ -49,6 +49,12 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
 
             var purchaseOrders = entity.Metadata.FindNavigation(nameof(Order.PurchaseOrders));
             purchaseOrders.SetPropertyAccessMode(PropertyAccessMode.Field);
+            
+            var products = entity.Metadata.FindNavigation(nameof(Order.Products));
+            products.SetPropertyAccessMode(PropertyAccessMode.Field);
+            
+            var deliveries = entity.Metadata.FindNavigation(nameof(Order.Deliveries));
+            deliveries.SetPropertyAccessMode(PropertyAccessMode.Field);
 
             entity.HasKey("Uid");
 

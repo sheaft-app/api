@@ -23,9 +23,14 @@ namespace Sheaft.Application.Order.Queries
 
         public IQueryable<OrderDto> GetOrder(Guid id, RequestUser currentUser)
         {
-            return _context.Orders
+            if (currentUser.IsAuthenticated)
+                return _context.Orders
                     .Get(c => c.Id == id && c.User.Id == currentUser.Id)
                     .ProjectTo<OrderDto>(_configurationProvider);
+            
+            return _context.Orders
+                .Get(c => c.Id == id && c.Status == OrderStatus.Created && c.User == null)
+                .ProjectTo<OrderDto>(_configurationProvider);
         }
 
         public IQueryable<OrderDto> GetOrders(RequestUser currentUser)
