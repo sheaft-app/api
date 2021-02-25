@@ -25,7 +25,7 @@ namespace Sheaft.Domain
             User = user;
             FeesFixedAmount = fixedAmount;
             FeesPercent = percent;
-            FeesVatPercent = FeesVatPercent;
+            FeesVatPercent = vatPercent;
             DonationKind = kind;
             Status = OrderStatus.Created;
 
