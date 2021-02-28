@@ -15,7 +15,7 @@ namespace Sheaft.GraphQL.Types.Outputs
             descriptor.Field(c => c.Reason);
 
             descriptor.Field(c => c.Store)
-                .Type<NonNullType<BusinessProfileType>>();
+                .Type<NonNullType<UserType>>();
 
             descriptor.Field(c => c.Delivery)
                 .Type<NonNullType<AgreementDeliveryModeType>>();

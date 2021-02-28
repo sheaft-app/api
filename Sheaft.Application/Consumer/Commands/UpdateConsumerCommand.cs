@@ -32,6 +32,12 @@ namespace Sheaft.Application.Consumer.Commands
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public string Picture { get; set; }
+        public string Summary { get; set; }
+        public string Description { get; set; }
+        public string Website { get; set; }
+        public string Facebook { get; set; }
+        public string Twitter { get; set; }
+        public string Instagram { get; set; }
     }
 
     public class UpdateConsumerCommandHandler : CommandsHandler,
@@ -59,6 +65,13 @@ namespace Sheaft.Application.Consumer.Commands
             consumer.SetPhone(request.Phone);
             consumer.SetFirstname(request.FirstName);
             consumer.SetLastname(request.LastName);
+            
+            consumer.ProfileInformation.SetSummary(request.Summary);
+            consumer.ProfileInformation.SetDescription(request.Description);
+            consumer.ProfileInformation.SetFacebook(request.Facebook);
+            consumer.ProfileInformation.SetTwitter(request.Twitter);
+            consumer.ProfileInformation.SetWebsite(request.Instagram);
+            consumer.ProfileInformation.SetInstagram(request.Website);
 
             await _context.SaveChangesAsync(token);
 

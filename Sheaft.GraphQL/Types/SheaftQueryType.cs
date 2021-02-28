@@ -14,23 +14,10 @@ namespace Sheaft.GraphQL.Types
         protected override void Configure(IObjectTypeDescriptor<SheaftQuery> descriptor)
         {
             //PROFILE
-            descriptor.Field(c => c.GetMyBusiness(default))
-                .Name("myBusiness")
-                .Authorize(Policies.OWNER)
-                .Type<NonNullType<BusinessProfileType>>()
-                .UseSingleOrDefault()
-                .UseSelection();
-
             descriptor.Field(c => c.GetMyUserProfile(default))
                 .Name("me")
                 .Authorize(Policies.AUTHENTICATED)
-                .Type<UserProfileType>()
-                .UseSingleOrDefault()
-                .UseSelection();
-
-            descriptor.Field(c => c.GetUserProfileInformation(default, default))
-                .Name("userProfile")
-                .Type<ProfileInformationType>()
+                .Type<UserType>()
                 .UseSingleOrDefault()
                 .UseSelection();
 
@@ -238,27 +225,17 @@ namespace Sheaft.GraphQL.Types
                 .UseSelection();
 
             //PRODUCER
-            descriptor.Field(c => c.GetProducer<ProducerDto>(default, default))
+            descriptor.Field(c => c.GetProducer(default, default))
                 .Name("producer")
-                .Authorize(Policies.OWNER)
                 .Argument("input", c => c.Type<NonNullType<IdType>>())
                 .Type<NonNullType<ProducerType>>()
                 .UseSingleOrDefault()
                 .UseSelection();
 
-            descriptor.Field(c => c.GetProducer<ProducerSummaryDto>(default, default))
-                .Name("producerSummary")
-                .Argument("input", c => c.Type<NonNullType<IdType>>())
-                .Type<NonNullType<ProducerSummaryType>>()
-                .UseSingleOrDefault()
-                .UseSelection();
-
             descriptor.Field(c => c.GetProducers(default))
                 .Name("producers")
-                .Type<NonNullType<ListType<ProducerSummaryType>>>()
-                .UsePaging<ProducerSummaryType>()
-                .UseFiltering<ProducerSummaryFilterType>()
-                .UseSorting<ProducerSummarySortType>()
+                .Type<NonNullType<ListType<ProducerType>>>()
+                .UsePaging<ProducerType>()
                 .UseSelection();
 
             descriptor.Field(c => c.GetProducerProducts(default, default))
@@ -453,7 +430,7 @@ namespace Sheaft.GraphQL.Types
             descriptor.Field(c => c.SuggestProducersAsync(default, default))
                 .Name("suggestProducers")
                 .Argument("input", c => c.Type<NonNullType<SearchTermsInputType>>())
-                .Type<ListType<ProducerSuggestType>>();
+                .Type<ListType<SuggestProducerType>>();
 
             descriptor.Field(c => c.SearchProducersAsync(default, default))
                 .Name("searchProducers")

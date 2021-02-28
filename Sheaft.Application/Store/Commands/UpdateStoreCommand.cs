@@ -38,6 +38,13 @@ namespace Sheaft.Application.Store.Commands
         public string Email { get; set; }
         public string Phone { get; set; }
         public string Picture { get; set; }
+        
+        public string Summary { get; set; }
+        public string Description { get; set; }
+        public string Website { get; set; }
+        public string Facebook { get; set; }
+        public string Twitter { get; set; }
+        public string Instagram { get; set; }
         public bool OpenForNewBusiness { get; set; }
         public FullAddressInput Address { get; set; }
         public IEnumerable<Guid> Tags { get; set; }
@@ -72,6 +79,13 @@ namespace Sheaft.Application.Store.Commands
             store.SetProfileKind(request.Kind);
             store.SetPhone(request.Phone);
             store.SetOpenForNewBusiness(request.OpenForNewBusiness);
+            
+            store.ProfileInformation.SetSummary(request.Summary);
+            store.ProfileInformation.SetDescription(request.Description);
+            store.ProfileInformation.SetFacebook(request.Facebook);
+            store.ProfileInformation.SetTwitter(request.Twitter);
+            store.ProfileInformation.SetWebsite(request.Instagram);
+            store.ProfileInformation.SetInstagram(request.Website);
 
             var departmentCode = UserAddress.GetDepartmentCode(request.Address.Zipcode);
             var department = await _context.Departments.SingleOrDefaultAsync(d => d.Code == departmentCode, token);

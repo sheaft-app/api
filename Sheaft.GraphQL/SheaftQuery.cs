@@ -5,9 +5,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using HotChocolate;
 using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
-using Sheaft.Application.Common.Extensions;
 using Sheaft.Application.Common.Interfaces.Queries;
 using Sheaft.Application.Common.Interfaces.Services;
 using Sheaft.Application.Common.Models.Dto;
@@ -20,19 +17,16 @@ namespace Sheaft.GraphQL
     {
         private readonly ICurrentUserService _currentUserService;
         private readonly IHttpContextAccessor _httpContextAccessor;
-        private readonly ILogger<SheaftQuery> _logger;
 
         private CancellationToken Token => _httpContextAccessor.HttpContext.RequestAborted;
         private RequestUser CurrentUser => _currentUserService.GetCurrentUserInfo().Data;
 
         public SheaftQuery(
             ICurrentUserService currentUserService,
-            IHttpContextAccessor httpContextAccessor, 
-            ILogger<SheaftQuery> logger)
+            IHttpContextAccessor httpContextAccessor)
         {
             _currentUserService = currentUserService;
             _httpContextAccessor = httpContextAccessor;
-            _logger = logger;
         }
 
         public async Task<string> GetFreshdeskTokenAsync([Service] IUserQueries userQueries)
@@ -113,22 +107,16 @@ namespace Sheaft.GraphQL
             return await productQueries.SearchAsync(input, CurrentUser, Token);
         }
 
-        public async Task<IEnumerable<ProducerSuggestDto>> SuggestProducersAsync(SearchTermsInput input, [Service] IProducerQueries producerQueries)
+        public async Task<IEnumerable<SuggestProducerDto>> SuggestProducersAsync(SearchTermsInput input, [Service] IProducerQueries producerQueries)
         {
             SetLogTransaction(nameof(SuggestProducersAsync), input);
             return await producerQueries.SuggestProducersAsync(input, CurrentUser, Token);
         }
 
-        public IQueryable<UserProfileDto> GetMyUserProfile([Service] IUserQueries userQueries)
+        public IQueryable<UserDto> GetMyUserProfile([Service] IUserQueries userQueries)
         {
             SetLogTransaction(nameof(GetMyUserProfile));
-            return userQueries.GetUserProfile(CurrentUser.Id, CurrentUser);
-        }
-
-        public IQueryable<ProfileInformationDto> GetUserProfileInformation(Guid input, [Service] IUserQueries userQueries)
-        {
-            SetLogTransaction(nameof(GetUserProfileInformation));
-            return userQueries.GetUserProfileInformation(input, CurrentUser);
+            return userQueries.GetUser(CurrentUser.Id, CurrentUser);
         }
 
         public IQueryable<ProductDto> GetStoreProducts([Service] IProductQueries productQueries)
@@ -137,13 +125,13 @@ namespace Sheaft.GraphQL
             return productQueries.GetProducts(CurrentUser);
         }
 
-        public IQueryable<T> GetProducer<T>(Guid input, [Service] IProducerQueries producerQueries)
+        public IQueryable<ProducerDto> GetProducer(Guid input, [Service] IProducerQueries producerQueries)
         {
             SetLogTransaction(nameof(GetProducer), input);
-            return producerQueries.GetProducer<T>(input, CurrentUser);
+            return producerQueries.GetProducer(input, CurrentUser);
         }
 
-        public IQueryable<ProducerSummaryDto> GetProducers([Service] IProducerQueries producerQueries)
+        public IQueryable<ProducerDto> GetProducers([Service] IProducerQueries producerQueries)
         {
             SetLogTransaction(nameof(GetProducers));
             return producerQueries.GetProducers(CurrentUser);
@@ -396,12 +384,6 @@ namespace Sheaft.GraphQL
             return purchaseOrderQueries.MyPurchaseOrders(CurrentUser);
         }
 
-        public IQueryable<BusinessProfileDto> GetMyBusiness([Service] IUserQueries userQueries)
-        {
-            SetLogTransaction(nameof(GetMyBusiness));
-            return userQueries.GetMyProfile(CurrentUser);
-        }
-
         private void SetLogTransaction(string name, object input = null)
         {
             NewRelic.Api.Agent.NewRelic.SetTransactionName("GraphQL", name);
@@ -412,19 +394,6 @@ namespace Sheaft.GraphQL
             currentTransaction.AddCustomAttribute("IsAuthenticated", CurrentUser.IsAuthenticated.ToString());
             currentTransaction.AddCustomAttribute("Roles", string.Join(";", CurrentUser.Roles));
             currentTransaction.AddCustomAttribute("GraphQL", name);
-
-            using (var scope = _logger.BeginScope(new Dictionary<string, object>
-            {
-                ["RequestId"] = CurrentUser.RequestId,
-                ["UserIdentifier"] = CurrentUser.Id.ToString("N"),
-                ["Roles"] = string.Join(';', CurrentUser.Roles),
-                ["IsAuthenticated"] = CurrentUser.IsAuthenticated.ToString(),
-                ["GraphQL"] = name,
-                ["Datas"] = input != null ? JsonConvert.SerializeObject(input) : null
-            }))
-            {
-                _logger.LogInformation($"Querying {name}");
-            }
         }
     }
 }

@@ -15,5 +15,11 @@ namespace Sheaft.Application.Common.Models.Inputs
         public bool OpenForNewBusiness { get; set; }
         public bool? NotSubjectToVat { get; set; }
         public IEnumerable<Guid> Tags { get; set; }
+        public string Summary { get; set; }
+        public string Description { get; set; }
+        public string Website { get; set; }
+        public string Facebook { get; set; }
+        public string Twitter { get; set; }
+        public string Instagram { get; set; }
     }
 }

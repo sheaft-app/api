@@ -375,7 +375,7 @@ namespace Sheaft.GraphQL
             var result =
                 await ExecuteCommandAsync<RegisterProducerCommand, Guid>(
                     _mapper.Map(input, new RegisterProducerCommand(CurrentUser) {ProducerId = CurrentUser.Id}), Token);
-            return producerQueries.GetProducer<ProducerDto>(result, CurrentUser);
+            return producerQueries.GetProducer(result, CurrentUser);
         }
 
         public async Task<IQueryable<ProducerDto>> UpdateProducerAsync(UpdateProducerInput input,
@@ -383,7 +383,7 @@ namespace Sheaft.GraphQL
         {
             SetLogTransaction(nameof(UpdateProducerAsync));
             await ExecuteCommandAsync(_mapper.Map(input, new UpdateProducerCommand(CurrentUser)), Token);
-            return producerQueries.GetProducer<ProducerDto>(input.Id, CurrentUser);
+            return producerQueries.GetProducer(input.Id, CurrentUser);
         }
 
         public async Task<IQueryable<BusinessLegalDto>> CreateBusinessLegalsAsync(CreateBusinessLegalInput input,
@@ -440,22 +440,13 @@ namespace Sheaft.GraphQL
             return legalQueries.GetConsumerLegals(input.Id, CurrentUser);
         }
 
-        public async Task<IQueryable<UserProfileDto>> UpdateUserPictureAsync(UpdatePictureInput input,
+        public async Task<IQueryable<UserDto>> UpdateUserPictureAsync(UpdatePictureInput input,
             [Service] IUserQueries userQueries)
         {
             SetLogTransaction(nameof(UpdateUserPictureAsync));
             await ExecuteCommandAsync<UpdateUserPictureCommand, string>(
                 _mapper.Map(input, new UpdateUserPictureCommand(CurrentUser)), Token);
-            return userQueries.GetUserProfile(input.Id, CurrentUser);
-        }
-
-        public async Task<IQueryable<ProfileInformationDto>> UpdateUserProfileAsync(UpdateUserProfileInput input,
-            [Service] IUserQueries userQueries)
-        {
-            SetLogTransaction(nameof(UpdateUserProfileAsync));
-            await ExecuteCommandAsync(
-                _mapper.Map(input, new UpdateUserProfileCommand(CurrentUser)), Token);
-            return userQueries.GetUserProfileInformation(input.Id, CurrentUser);
+            return userQueries.GetUser(input.Id, CurrentUser);
         }
 
         public async Task<bool> AddPictureToUserProfileAsync(AddPictureToInput input)

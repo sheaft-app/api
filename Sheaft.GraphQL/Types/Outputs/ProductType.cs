@@ -2,6 +2,7 @@
 using HotChocolate.Types.Relay;
 using Sheaft.Application.Common.Interfaces.Queries;
 using Sheaft.Application.Common.Models.Dto;
+using Sheaft.Application.Common.Security;
 using Sheaft.GraphQL.Filters;
 using Sheaft.GraphQL.Sorts;
 
@@ -21,8 +22,6 @@ namespace Sheaft.GraphQL.Types.Outputs
             descriptor.Field(c => c.WholeSalePrice);
             descriptor.Field(c => c.VatPrice);
             descriptor.Field(c => c.Available);
-            descriptor.Field(c => c.VisibleToStores);
-            descriptor.Field(c => c.VisibleToConsumers);
             descriptor.Field(c => c.RatingsCount);
             descriptor.Field(c => c.QuantityPerUnit);
             descriptor.Field(c => c.Unit);
@@ -36,6 +35,13 @@ namespace Sheaft.GraphQL.Types.Outputs
             descriptor.Field(c => c.ImageMedium);
             descriptor.Field(c => c.ImageSmall);
             descriptor.Field(c => c.IsReturnable);
+            
+            descriptor.Field(c => c.VisibleToStores)
+                .Authorize(Policies.OWNER);
+            
+            descriptor.Field(c => c.VisibleToConsumers)
+                .Authorize(Policies.OWNER);
+            
             descriptor.Field("currentUserHasRatedProduct")
                 .Type<NonNullType<BooleanType>>()
                 .Resolver(async c =>
@@ -57,7 +63,7 @@ namespace Sheaft.GraphQL.Types.Outputs
                 .Type<ReturnableType>();
 
             descriptor.Field(c => c.Producer)
-                .Type<NonNullType<BusinessProfileType>>();
+                .Type<NonNullType<UserType>>();
 
             descriptor.Field(c => c.Closings)
                 .Type<ListType<ClosingType>>();

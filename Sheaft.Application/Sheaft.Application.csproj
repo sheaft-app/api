@@ -9,7 +9,6 @@
       <Folder Include="Auth\Queries" />
       <Folder Include="Bank\EventHandlers" />
       <Folder Include="Bank\Queries" />
-      <Folder Include="Consumer\EventHandlers" />
       <Folder Include="Country\Commands" />
       <Folder Include="Country\EventHandlers" />
       <Folder Include="Declaration\Queries" />

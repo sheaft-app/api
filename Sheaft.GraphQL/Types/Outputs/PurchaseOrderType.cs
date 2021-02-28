@@ -38,10 +38,10 @@ namespace Sheaft.GraphQL.Types.Outputs
                 .Type<NonNullType<ExpectedPurchaseOrderDeliveryType>>();
 
             descriptor.Field(c => c.Sender)
-                .Type<NonNullType<UserProfileType>>();
+                .Type<NonNullType<UserType>>();
 
             descriptor.Field(c => c.Vendor)
-                .Type<NonNullType<UserProfileType>>();
+                .Type<NonNullType<UserType>>();
 
             descriptor.Field(c => c.Products)
                 .Type<NonNullType<ListType<PurchaseOrderProductQuantityType>>>()

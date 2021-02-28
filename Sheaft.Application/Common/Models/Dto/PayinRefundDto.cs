@@ -2,7 +2,7 @@
 {
     public class PayinRefundDto : TransactionDto
     {
-        public UserProfileDto DebitedUser { get; set; }
+        public UserDto DebitedUser { get; set; }
         public TransactionDto Payin { get; set; }
     }
 }

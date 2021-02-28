@@ -2,6 +2,6 @@
 {
     public class PayoutDto : TransactionDto
     {
-        public UserProfileDto DebitedUser { get; set; }
+        public UserDto DebitedUser { get; set; }
     }
 }

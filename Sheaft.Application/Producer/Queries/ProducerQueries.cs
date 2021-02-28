@@ -52,7 +52,7 @@ namespace Sheaft.Application.Producer.Queries
             _context = context;
         }
 
-        public async Task<IEnumerable<ProducerSuggestDto>> SuggestProducersAsync(SearchTermsInput terms, RequestUser currentUser, CancellationToken token)
+        public async Task<IEnumerable<SuggestProducerDto>> SuggestProducersAsync(SearchTermsInput terms, RequestUser currentUser, CancellationToken token)
         {
             var sp = new SuggestParameters
             {
@@ -77,16 +77,16 @@ namespace Sheaft.Application.Producer.Queries
                 searchResults.Add(JsonConvert.DeserializeObject<SearchProducer>(json));
             }
 
-            return searchResults.Select(p => new ProducerSuggestDto
+            return searchResults.Select(p => new SuggestProducerDto
             {
                 Id = p.Producer_id,
                 Name = p.Producer_name,
-                Address = new AddressSuggestDto
+                Address = new SuggestAddressDto
                 {
                     City = p.Producer_city,
                     Zipcode = p.Producer_zipcode
                 }
-            }) ?? new List<ProducerSuggestDto>();
+            }) ?? new List<SuggestProducerDto>();
         }
 
         public async Task<ProducersSearchDto> SearchProducersAsync(Guid storeId, SearchTermsInput terms, RequestUser currentUser, CancellationToken token)
@@ -167,18 +167,18 @@ namespace Sheaft.Application.Producer.Queries
             };
         }
 
-        public IQueryable<T> GetProducer<T>(Guid id, RequestUser currentUser)
+        public IQueryable<ProducerDto> GetProducer(Guid id, RequestUser currentUser)
         {
             return _context.Users.OfType<Domain.Producer>()
                     .Get(c => c.Id == id)
-                    .ProjectTo<T>(_configurationProvider);
+                    .ProjectTo<ProducerDto>(_configurationProvider);
         }
 
-        public IQueryable<ProducerSummaryDto> GetProducers(RequestUser currentUser)
+        public IQueryable<ProducerDto> GetProducers(RequestUser currentUser)
         {
             return _context.Users.OfType<Domain.Producer>()
                     .Get()
-                    .ProjectTo<ProducerSummaryDto>(_configurationProvider);
+                    .ProjectTo<ProducerDto>(_configurationProvider);
         }
 
         private class SearchProducer

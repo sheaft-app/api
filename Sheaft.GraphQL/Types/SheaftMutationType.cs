@@ -357,14 +357,7 @@ namespace Sheaft.GraphQL.Types
             descriptor.Field(c => c.UpdateUserPictureAsync(default, default))
                 .Name("updateUserPicture")
                 .Authorize(Policies.REGISTERED)
-                .Type<NonNullType<UserProfileType>>()
-                .UseSingleOrDefault()
-                .UseSelection();
-            
-            descriptor.Field(c => c.UpdateUserProfileAsync(default, default))
-                .Name("updateUserProfile")
-                .Authorize(Policies.REGISTERED)
-                .Type<NonNullType<ProfileInformationType>>()
+                .Type<NonNullType<UserType>>()
                 .UseSingleOrDefault()
                 .UseSelection();
             

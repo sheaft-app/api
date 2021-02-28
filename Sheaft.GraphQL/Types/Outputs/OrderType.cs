@@ -1,5 +1,6 @@
 ﻿using HotChocolate.Types;
 using Sheaft.Application.Common.Models.Dto;
+using Sheaft.Application.Common.Security;
 
 namespace Sheaft.GraphQL.Types.Outputs
 {
@@ -41,7 +42,7 @@ namespace Sheaft.GraphQL.Types.Outputs
             descriptor.Field(c => c.TotalWeight);
 
             descriptor.Field(c => c.User)
-                .Type<UserProfileType>();
+                .Type<UserType>();
 
             descriptor.Field(c => c.Products)
                 .Type<ListType<OrderProductType>>();

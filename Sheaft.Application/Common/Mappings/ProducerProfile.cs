@@ -19,18 +19,18 @@ namespace Sheaft.Application.Common.Mappings
                 .IncludeBase<Business, ProducerViewModel>()
                   .ForMember(d => d.Tags, opt => opt.MapFrom(r => r.Tags.Select(t => t.Tag.Id)));
 
-            CreateMap<Domain.Producer, UserProfileDto>();
-
             CreateMap<Domain.Producer, UserDto>()
-                .ForMember(d => d.Address, opt => opt.MapFrom(r => r.Address));
+                .ForMember(c => c.Summary, opt => opt.MapFrom(e => e.ProfileInformation.Summary))
+                .ForMember(c => c.Description, opt => opt.MapFrom(e => e.ProfileInformation.Description))
+                .ForMember(c => c.Facebook, opt => opt.MapFrom(e => e.ProfileInformation.Facebook))
+                .ForMember(c => c.Instagram, opt => opt.MapFrom(e => e.ProfileInformation.Instagram))
+                .ForMember(c => c.Twitter, opt => opt.MapFrom(e => e.ProfileInformation.Twitter))
+                .ForMember(c => c.Website, opt => opt.MapFrom(e => e.ProfileInformation.Website))
+                .ForMember(c => c.Pictures, opt => opt.MapFrom(e => e.ProfileInformation.Pictures));
 
             CreateMap<Domain.Producer, ProducerDto>()
-                .ForMember(d => d.Address, opt => opt.MapFrom(r => r.Address))
-                .ForMember(d => d.Tags, opt => opt.MapFrom(r => r.Tags.Select(t => t.Tag)));
-
-            CreateMap<Domain.Producer, ProducerSummaryDto>()
-                .ForMember(d => d.Address, opt => opt.MapFrom(r => r.Address));
-
+                .IncludeBase<Domain.Producer, UserDto>();
+            
             CreateMap<RegisterProducerInput, RegisterProducerCommand>();
             CreateMap<UpdateProducerInput, UpdateProducerCommand>()
                 .ForMember(c => c.ProducerId, opt => opt.MapFrom(r => r.Id));

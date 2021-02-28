@@ -26,7 +26,7 @@ namespace Sheaft.GraphQL.Types.Outputs
                 .Type<ReturnableType>();
 
             descriptor.Field(c => c.Producer)
-                .Type<NonNullType<BusinessProfileType>>();
+                .Type<NonNullType<UserType>>();
         }
     }
 }

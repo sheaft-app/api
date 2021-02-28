@@ -11,9 +11,9 @@ namespace Sheaft.Application.Common.Interfaces.Queries
 {
     public interface IProducerQueries
     {
-        IQueryable<T> GetProducer<T>(Guid id, RequestUser currentUser);
+        IQueryable<ProducerDto> GetProducer(Guid id, RequestUser currentUser);
+        IQueryable<ProducerDto> GetProducers(RequestUser currentUser);
         Task<ProducersSearchDto> SearchProducersAsync(Guid storeId, SearchTermsInput terms, RequestUser currentUser, CancellationToken token);
-        Task<IEnumerable<ProducerSuggestDto>> SuggestProducersAsync(SearchTermsInput terms, RequestUser currentUser, CancellationToken token);
-        IQueryable<ProducerSummaryDto> GetProducers(RequestUser currentUser);
+        Task<IEnumerable<SuggestProducerDto>> SuggestProducersAsync(SearchTermsInput terms, RequestUser currentUser, CancellationToken token);
     }
 }

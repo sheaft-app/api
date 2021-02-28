@@ -34,7 +34,7 @@ namespace Sheaft.GraphQL.Types.Outputs
                 .Type<NonNullType<StringType>>();
             
             descriptor.Field(c => c.Producer)
-                .Type<NonNullType<UserProfileType>>();
+                .Type<NonNullType<UserType>>();
         }
     }
 }

@@ -12,7 +12,7 @@ namespace Sheaft.Application.Common.Models.Dto
         public DateTimeOffset CreatedOn { get; set; }
         public DateTimeOffset? UpdatedOn { get; set; }
         public DateTimeOffset? RemovedOn { get; set; }
-        public UserProfileDto User { get; set; }
+        public UserDto User { get; set; }
         public IEnumerable<QuickOrderProductQuantityDto> Products { get; set; }
     }
 }

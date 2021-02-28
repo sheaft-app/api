@@ -2,6 +2,6 @@
 {
     public class PayinDto : TransactionDto
     {
-        public UserProfileDto CreditedUser { get; set; }
+        public UserDto CreditedUser { get; set; }
     }
 }

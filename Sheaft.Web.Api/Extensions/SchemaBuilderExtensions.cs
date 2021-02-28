@@ -19,7 +19,6 @@ namespace Sheaft.Web.Api
             services.AddType<UserType>();
             services.AddType<StoreType>();
             services.AddType<ProducerType>();
-            services.AddType<ProducerSummaryType>();
             services.AddType<DepartmentType>();
             services.AddType<RegionType>();
             services.AddType<NationalityType>();
@@ -27,7 +26,6 @@ namespace Sheaft.Web.Api
             services.AddType<LevelType>();
             services.AddType<RewardType>();
             services.AddType<ConsumerType>();
-            services.AddType<UserProfileType>();
             services.AddType<ExpectedPurchaseOrderDeliveryType>();
             services.AddType<ExpectedOrderDeliveryType>();
             services.AddType<RankInformationType>();
@@ -52,8 +50,8 @@ namespace Sheaft.Web.Api
             services.AddType<DepartmentUserPointsType>();
             services.AddType<SearchStoreType>();
             services.AddType<SearchProducerType>();
-            services.AddType<AddressSuggestType>();
-            services.AddType<ProducerSuggestType>();
+            services.AddType<SuggestAddressType>();
+            services.AddType<SuggestProducerType>();
             services.AddType<ProductType>();
             services.AddType<OrderType>();
             services.AddType<TransactionType>();
@@ -69,7 +67,6 @@ namespace Sheaft.Web.Api
             services.AddType<UboType>();
             services.AddType<ClosingType>();
             services.AddType<PictureType>();
-            services.AddType<ProfileInformationType>();
             services.AddType<OrderProductType>();
             services.AddType<OrderDeliveryType>();
 
@@ -154,7 +151,6 @@ namespace Sheaft.Web.Api
             services.AddType<CreateProductClosingsInputType>();
             services.AddType<UpdateClosingInputType>();
             services.AddType<PictureInputType>();
-            services.AddType<UpdateUserProfileInputType>();
             services.AddType<AddPictureToInputType>();
 
             return services;

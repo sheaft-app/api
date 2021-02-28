@@ -141,7 +141,7 @@ namespace Sheaft.Application.Product.Queries
                     Conditioning = !string.IsNullOrWhiteSpace(p.Product_conditioning)
                         ? Enum.Parse<ConditioningKind>(p.Product_conditioning, true)
                         : ConditioningKind.Not_Specified,
-                    Producer = new BusinessProfileDto
+                    Producer = new UserDto
                     {
                         Id = p.Producer_id,
                         Name = p.Producer_name,

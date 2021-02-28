@@ -29,6 +29,6 @@ namespace Sheaft.Application.Common.Models.Dto
         public decimal? TotalReturnableWholeSalePrice { get; set; }
         public decimal? TotalReturnableVatPrice { get; set; }
         public decimal? TotalReturnableOnSalePrice { get; set; }
-        public UserProfileDto Producer { get; set; }
+        public UserDto Producer { get; set; }
     }
 }
