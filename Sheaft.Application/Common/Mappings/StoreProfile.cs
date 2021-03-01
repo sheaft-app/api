@@ -30,7 +30,8 @@ namespace Sheaft.Application.Common.Mappings
                 .ForMember(c => c.Pictures, opt => opt.MapFrom(e => e.ProfileInformation.Pictures));
 
             CreateMap<Domain.Store, StoreDto>()
-                .IncludeBase<Domain.Store, UserDto>();
+                .IncludeBase<Domain.Store, UserDto>()
+                .ForMember(d => d.Tags, opt => opt.MapFrom(r => r.Tags.Select(t => t.Tag.Id)));;
             
             CreateMap<RegisterStoreInput, RegisterStoreCommand>();
             CreateMap<UpdateStoreInput, UpdateStoreCommand>()

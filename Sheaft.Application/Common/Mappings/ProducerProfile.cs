@@ -29,7 +29,8 @@ namespace Sheaft.Application.Common.Mappings
                 .ForMember(c => c.Pictures, opt => opt.MapFrom(e => e.ProfileInformation.Pictures));
 
             CreateMap<Domain.Producer, ProducerDto>()
-                .IncludeBase<Domain.Producer, UserDto>();
+                .IncludeBase<Domain.Producer, UserDto>()
+                  .ForMember(d => d.Tags, opt => opt.MapFrom(r => r.Tags.Select(t => t.Tag.Id)));
             
             CreateMap<RegisterProducerInput, RegisterProducerCommand>();
             CreateMap<UpdateProducerInput, UpdateProducerCommand>()
