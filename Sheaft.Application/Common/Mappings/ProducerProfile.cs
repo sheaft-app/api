@@ -30,7 +30,7 @@ namespace Sheaft.Application.Common.Mappings
 
             CreateMap<Domain.Producer, ProducerDto>()
                 .IncludeBase<Domain.Producer, UserDto>()
-                  .ForMember(d => d.Tags, opt => opt.MapFrom(r => r.Tags.Select(t => t.Tag.Id)));
+                  .ForMember(d => d.Tags, opt => opt.MapFrom(r => r.Tags.Select(t => t.Tag)));
             
             CreateMap<RegisterProducerInput, RegisterProducerCommand>();
             CreateMap<UpdateProducerInput, UpdateProducerCommand>()

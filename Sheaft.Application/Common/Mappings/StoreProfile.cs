@@ -31,7 +31,7 @@ namespace Sheaft.Application.Common.Mappings
 
             CreateMap<Domain.Store, StoreDto>()
                 .IncludeBase<Domain.Store, UserDto>()
-                .ForMember(d => d.Tags, opt => opt.MapFrom(r => r.Tags.Select(t => t.Tag.Id)));;
+                .ForMember(d => d.Tags, opt => opt.MapFrom(r => r.Tags.Select(t => t.Tag)));;
             
             CreateMap<RegisterStoreInput, RegisterStoreCommand>();
             CreateMap<UpdateStoreInput, UpdateStoreCommand>()
