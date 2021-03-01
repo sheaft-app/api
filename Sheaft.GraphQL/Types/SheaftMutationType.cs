@@ -280,14 +280,12 @@ namespace Sheaft.GraphQL.Types
             descriptor.Field(c => c.CreateOrderAsync(default, default))
                 .Name("createOrder")
                 .Type<NonNullType<OrderType>>()
-                .UseSingleOrDefault()
                 .UseSelection();
 
             descriptor.Field(c => c.UpdateOrderAsync(default, default))
                 .Name("updateOrder")
                 .Authorize(Policies.CONSUMER)
                 .Type<NonNullType<OrderType>>()
-                .UseSingleOrDefault()
                 .UseSelection();
 
             descriptor.Field(c => c.PayOrderAsync(default, default))
