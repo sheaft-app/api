@@ -457,6 +457,62 @@ namespace Sheaft.GraphQL.Types
                 .Type<NonNullType<ConsumerLegalType>>()
                 .UseSingleOrDefault()
                 .UseSelection();
+            
+            //CLOSINGS
+            
+            descriptor.Field(c => c.CreateBusinessClosingsAsync(default, default))
+                .Name("createBusinessClosings")
+                .Authorize(Policies.OWNER)
+                .Type<ListType<ClosingType>>()
+                .UseSelection();
+            
+            descriptor.Field(c => c.CreateDeliveryClosingsAsync(default, default))
+                .Name("createDeliveryClosings")
+                .Authorize(Policies.OWNER)
+                .Type<ListType<ClosingType>>()
+                .UseSelection();
+            
+            descriptor.Field(c => c.CreateProductClosingsAsync(default, default))
+                .Name("createProductClosings")
+                .Authorize(Policies.OWNER)
+                .Type<ListType<ClosingType>>()
+                .UseSelection();
+            
+            descriptor.Field(c => c.UpdateBusinessClosingAsync(default, default))
+                .Name("updateBusinessClosing")
+                .Authorize(Policies.OWNER)
+                .Type<NonNullType<ClosingType>>()
+                .UseSingleOrDefault()
+                .UseSelection();
+            
+            descriptor.Field(c => c.UpdateDeliveryClosingAsync(default, default))
+                .Name("updateDeliveryClosing")
+                .Authorize(Policies.OWNER)
+                .Type<NonNullType<ClosingType>>()
+                .UseSingleOrDefault()
+                .UseSelection();
+            
+            descriptor.Field(c => c.UpdateProductClosingAsync(default, default))
+                .Name("updateProductClosing")
+                .Authorize(Policies.OWNER)
+                .Type<NonNullType<ClosingType>>()
+                .UseSingleOrDefault()
+                .UseSelection();
+            
+            descriptor.Field(c => c.DeleteBusinessClosingsAsync(default))
+                .Name("deleteBusinessClosings")
+                .Authorize(Policies.OWNER)
+                .Type<BooleanType>();
+            
+            descriptor.Field(c => c.DeleteDeliveryClosingsAsync(default))
+                .Name("deleteDeliveryClosings")
+                .Authorize(Policies.OWNER)
+                .Type<BooleanType>();
+            
+            descriptor.Field(c => c.DeleteProductClosingsAsync(default))
+                .Name("deleteProductClosings")
+                .Authorize(Policies.OWNER)
+                .Type<BooleanType>();
         }
     }
 }

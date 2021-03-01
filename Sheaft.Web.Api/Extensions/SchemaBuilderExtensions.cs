@@ -66,6 +66,7 @@ namespace Sheaft.Web.Api
             services.AddType<ConsumerLegalType>();
             services.AddType<UboDeclarationType>();
             services.AddType<UboType>();
+            services.AddType<ClosingType>();
 
             services.AddType<AddressKindEnumType>();
             services.AddType<AgreementStatusEnumType>();
@@ -143,6 +144,10 @@ namespace Sheaft.Web.Api
             services.AddType<UpdateConsumerLegalsInputType>();
             services.AddType<CreateUboInputType>();
             services.AddType<UpdateUboInputType>();
+            services.AddType<CreateBusinessClosingsInputType>();
+            services.AddType<CreateDeliveryClosingsInputType>();
+            services.AddType<CreateProductClosingsInputType>();
+            services.AddType<UpdateClosingInputType>();
 
             return services;
         }

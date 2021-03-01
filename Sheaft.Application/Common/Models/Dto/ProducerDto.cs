@@ -19,5 +19,6 @@ namespace Sheaft.Application.Common.Models.Dto
         public bool NotSubjectToVat { get; set; }
         public AddressDto Address { get; set; }
         public IEnumerable<TagDto> Tags { get; set; }
+        public IEnumerable<ClosingDto> Closings { get; set; }
     }
 }

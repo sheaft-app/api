@@ -12,5 +12,6 @@ namespace Sheaft.Application.Common.Models.Dto
         public bool Available { get; set; }
         public AddressDto Address { get; set; }
         public IEnumerable<DeliveryHourDto> DeliveryHours { get; set; }
+        public IEnumerable<ClosingDto> Closings { get; set; }
     }
 }

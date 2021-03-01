@@ -70,6 +70,9 @@ namespace Sheaft.GraphQL.Types.Outputs
 
             descriptor.Field(c => c.Producer)
                 .Type<NonNullType<BusinessProfileType>>();
+
+            descriptor.Field(c => c.Closings)
+                .Type<ListType<ClosingType>>();
         }
     }
 }

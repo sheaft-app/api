@@ -19,6 +19,9 @@ namespace Sheaft.GraphQL.Types.Outputs
                 .Type<ListType<DeliveryHourType>>()
                 .UseSorting<DeliveryHourSortType>()
                 .UseFiltering<DeliveryHourFilterType>();
+
+            descriptor.Field(c => c.Closings)
+                .Type<ListType<ClosingType>>();
         }
     }
 }

@@ -11,6 +11,7 @@ using Sheaft.Application.Common.Handlers;
 using Sheaft.Application.Common.Interfaces;
 using Sheaft.Application.Common.Interfaces.Services;
 using Sheaft.Application.Common.Models;
+using Sheaft.Application.Common.Models.Inputs;
 using Sheaft.Domain;
 using Sheaft.Domain.Exceptions;
 
@@ -24,9 +25,7 @@ namespace Sheaft.Application.BusinessClosing.Commands
         }
 
         public Guid UserId { get; set; }
-        public DateTimeOffset From { get; set; }
-        public DateTimeOffset To { get; set; }
-        public string Reason { get; set; }
+        public ClosingInput Closing { get; set; }
     }
 
     public class CreateBusinessClosingCommandHandler : CommandsHandler,
@@ -46,7 +45,7 @@ namespace Sheaft.Application.BusinessClosing.Commands
             if(entity.Id != request.RequestUser.Id)
                 throw SheaftException.Forbidden();
             
-            entity.AddClosing(request.From, request.To, request.Reason);
+            entity.AddClosing(request.Closing.From, request.Closing.To, request.Closing.Reason);
             await _context.SaveChangesAsync(token);
             
             return Success(entity.Id);
