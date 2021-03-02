@@ -284,7 +284,6 @@ namespace Sheaft.GraphQL.Types
 
             descriptor.Field(c => c.UpdateOrderAsync(default, default))
                 .Name("updateOrder")
-                .Authorize(Policies.CONSUMER)
                 .Type<NonNullType<OrderType>>()
                 .UseSingleOrDefault();
 
