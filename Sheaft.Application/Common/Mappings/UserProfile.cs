@@ -2,7 +2,6 @@
 using Sheaft.Application.Common.Models.Dto;
 using Sheaft.Application.Common.Models.Inputs;
 using Sheaft.Application.Common.Models.ViewModels;
-using Sheaft.Application.Picture.Commands;
 using Sheaft.Application.User.Commands;
 using Sheaft.Domain;
 

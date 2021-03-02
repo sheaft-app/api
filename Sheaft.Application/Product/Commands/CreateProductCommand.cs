@@ -12,7 +12,6 @@ using Sheaft.Application.Common.Interfaces;
 using Sheaft.Application.Common.Interfaces.Services;
 using Sheaft.Application.Common.Models;
 using Sheaft.Application.Common.Models.Inputs;
-using Sheaft.Application.Picture.Commands;
 using Sheaft.Application.Producer.Commands;
 using Sheaft.Domain;
 using Sheaft.Domain.Enum;

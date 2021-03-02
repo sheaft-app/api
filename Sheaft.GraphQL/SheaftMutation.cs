@@ -24,7 +24,6 @@ using Sheaft.Application.Legal.Commands;
 using Sheaft.Application.Notification.Commands;
 using Sheaft.Application.Order.Commands;
 using Sheaft.Application.PickingOrders.Commands;
-using Sheaft.Application.Picture.Commands;
 using Sheaft.Application.Producer.Commands;
 using Sheaft.Application.Product.Commands;
 using Sheaft.Application.ProductClosing.Commands;

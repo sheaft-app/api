@@ -13,7 +13,7 @@ using Sheaft.Application.Common.Models.Inputs;
 using Sheaft.Domain;
 using Sheaft.Domain.Exceptions;
 
-namespace Sheaft.Application.Picture.Commands
+namespace Sheaft.Application.Product.Commands
 {
     public class UpdateProductPreviewCommand : Command<string>
     {
