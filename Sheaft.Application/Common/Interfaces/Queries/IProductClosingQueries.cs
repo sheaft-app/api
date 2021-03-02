@@ -5,7 +5,7 @@ using Sheaft.Domain;
 
 namespace Sheaft.Application.Common.Interfaces.Queries
 {
-    public interface IBusinessClosingQueries
+    public interface IProductClosingQueries
     {
         IQueryable<ClosingDto> GetClosing(Guid id, RequestUser currentUser);
         IQueryable<ClosingDto> GetClosings(RequestUser currentUser);

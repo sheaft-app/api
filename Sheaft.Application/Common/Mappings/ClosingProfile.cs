@@ -11,9 +11,15 @@ namespace Sheaft.Application.Common.Mappings
     {
         public ClosingProfile()
         {
-            CreateMap<Domain.BusinessClosing, ClosingDto>();
-            CreateMap<Domain.DeliveryClosing, ClosingDto>();
-            CreateMap<Domain.ProductClosing, ClosingDto>();
+            CreateMap<Domain.BusinessClosing, ClosingDto>()
+                .ForMember(c => c.From, opt => opt.MapFrom(e => e.ClosedFrom))
+                .ForMember(c => c.To, opt => opt.MapFrom(e => e.ClosedTo));
+            CreateMap<Domain.DeliveryClosing, ClosingDto>()
+                .ForMember(c => c.From, opt => opt.MapFrom(e => e.ClosedFrom))
+                .ForMember(c => c.To, opt => opt.MapFrom(e => e.ClosedTo));
+            CreateMap<Domain.ProductClosing, ClosingDto>()
+                .ForMember(c => c.From, opt => opt.MapFrom(e => e.ClosedFrom))
+                .ForMember(c => c.To, opt => opt.MapFrom(e => e.ClosedTo));
 
             CreateMap<CreateBusinessClosingsInput, CreateBusinessClosingsCommand>();
             CreateMap<CreateDeliveryClosingsInput, CreateDeliveryClosingsCommand>();

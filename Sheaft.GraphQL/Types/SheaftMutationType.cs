@@ -463,19 +463,22 @@ namespace Sheaft.GraphQL.Types
             descriptor.Field(c => c.CreateBusinessClosingsAsync(default, default))
                 .Name("createBusinessClosings")
                 .Authorize(Policies.OWNER)
-                .Type<ListType<ClosingType>>()
+                .Type<NonNullType<ListType<ClosingType>>>()
+                .UsePaging<ClosingType>()
                 .UseSelection();
             
             descriptor.Field(c => c.CreateDeliveryClosingsAsync(default, default))
                 .Name("createDeliveryClosings")
                 .Authorize(Policies.OWNER)
-                .Type<ListType<ClosingType>>()
+                .Type<NonNullType<ListType<ClosingType>>>()
+                .UsePaging<ClosingType>()
                 .UseSelection();
             
             descriptor.Field(c => c.CreateProductClosingsAsync(default, default))
                 .Name("createProductClosings")
                 .Authorize(Policies.OWNER)
-                .Type<ListType<ClosingType>>()
+                .Type<NonNullType<ListType<ClosingType>>>()
+                .UsePaging<ClosingType>()
                 .UseSelection();
             
             descriptor.Field(c => c.UpdateBusinessClosingAsync(default, default))

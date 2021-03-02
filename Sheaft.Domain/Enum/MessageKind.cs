@@ -150,6 +150,7 @@
         Order_CannotPay_Deliveries_Required = 27106,
         Order_CannotRetry_NotIn_Refused_Status = 27107,
         Order_CannotPay_Delivery_Max_PurchaseOrders_Reached = 27108,
+        Order_CannotCreate_Delivery_Closed = 27109,
         Legal = 28000,
         Legal_Siret_Required = 28100,
         Legal_Vat_Required = 28101,
