@@ -132,7 +132,9 @@ namespace Sheaft.Domain
 
             foreach (var orderProduct in orderProducts)
             {
-                _products.Add(new OrderProduct(orderProduct.Key, orderProduct.Value));
+                var product = new OrderProduct(orderProduct.Key, orderProduct.Value);
+                if(product.Quantity > 0)
+                    _products.Add(product);
             }
 
             RefreshOrder();
