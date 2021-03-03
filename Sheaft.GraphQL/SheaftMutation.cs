@@ -190,7 +190,7 @@ namespace Sheaft.GraphQL
             [Service] IOrderQueries orderQueries)
         {
             SetLogTransaction(nameof(UpdateOrderAsync));
-            await ExecuteCommandAsync(_mapper.Map(input, new UpdateConsumerOrderCommand(CurrentUser)), Token);
+            await ExecuteCommandAsync(_mapper.Map(input, new UpdateConsumerOrderCommand(CurrentUser){ UserId = CurrentUser.IsAuthenticated ? CurrentUser.Id : (Guid?)null }), Token);
             return orderQueries.GetOrder(input.Id, CurrentUser);
         }
 
