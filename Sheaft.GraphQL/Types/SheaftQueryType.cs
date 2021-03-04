@@ -156,7 +156,7 @@ namespace Sheaft.GraphQL.Types
                 .Name("currentOrder")
                 .Authorize(Policies.REGISTERED)
                 .Type<OrderType>()
-                .UseSingleOrDefault();
+                .UseFirstOrDefault();
             
             descriptor.Field(c => c.GetOrder(default, default))
                 .Name("order")
