@@ -9,5 +9,6 @@ namespace Sheaft.Application.Common.Models.Dto
         public bool OpenForNewBusiness { get; set; }
         public IEnumerable<TagDto> Tags { get; set; }
         public IEnumerable<TimeSlotDto> OpeningHours { get; set; }
+        public IEnumerable<ClosingDto> Closings { get; set; }
     }
 }
