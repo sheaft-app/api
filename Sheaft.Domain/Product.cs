@@ -16,6 +16,7 @@ namespace Sheaft.Domain
         private List<ProductTag> _tags;
         private List<Rating> _ratings;
         private List<ProductClosing> _closings;
+        private List<ProductPicture> _pictures;
 
         protected Product()
         {
@@ -68,6 +69,7 @@ namespace Sheaft.Domain
         public virtual IReadOnlyCollection<ProductTag> Tags => _tags?.AsReadOnly();
         public virtual IReadOnlyCollection<Rating> Ratings => _ratings?.AsReadOnly();
         public virtual IReadOnlyCollection<ProductClosing> Closings => _closings?.AsReadOnly(); 
+        public virtual IReadOnlyCollection<ProductPicture> Pictures => _pictures?.AsReadOnly();
 
         public void SetReference(string reference)
         {
@@ -230,6 +232,26 @@ namespace Sheaft.Domain
             Unit = unit;
 
             RefreshPrices();
+        }
+        
+        public ProductPicture AddPicture(ProductPicture picture)
+        {
+            _pictures ??= new List<ProductPicture>();
+            _pictures.Add(picture);
+
+            return picture;
+        }
+        
+        public void RemovePicture(Guid id)
+        {
+            if (_pictures == null || _pictures.Any())
+                throw SheaftException.NotFound();
+
+            var existingPicture = _pictures.FirstOrDefault(p => p.Id == id);
+            if (existingPicture == null)
+                throw SheaftException.NotFound();
+            
+            _pictures.Remove(existingPicture);
         }
 
         private void RefreshPrices()

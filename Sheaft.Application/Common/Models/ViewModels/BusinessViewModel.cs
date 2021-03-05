@@ -18,7 +18,6 @@ namespace Sheaft.Application.Common.Models.ViewModels
         public string Phone { get; set; }
         public string Reason { get; set; }
         public string Picture { get; set; }
-        public string Description { get; set; }
         public bool OpenForNewBusiness { get; set; }
         public AddressViewModel Address { get; set; }
         public IEnumerable<Guid> Tags { get; set; }

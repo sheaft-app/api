@@ -2,7 +2,6 @@
 using Sheaft.Application.Common.Models.Dto;
 using Sheaft.Application.Common.Models.Inputs;
 using Sheaft.Application.Common.Models.ViewModels;
-using Sheaft.Application.Picture.Commands;
 using Sheaft.Application.User.Commands;
 using Sheaft.Domain;
 
@@ -15,14 +14,17 @@ namespace Sheaft.Application.Common.Mappings
             CreateMap<Domain.User, UserViewModel>();
             CreateMap<Domain.User, UserProfileViewModel>();
 
-            CreateMap<Domain.User, UserProfileDto>();
-
             CreateMap<Domain.User, UserDto>()
-                .IncludeBase<Domain.User, UserProfileDto>()
-                .ForMember(c => c.Address, opt => opt.MapFrom(d => d.Address));
+                .ForMember(c => c.Summary, opt => opt.MapFrom(e => e.ProfileInformation.Summary))
+                .ForMember(c => c.Description, opt => opt.MapFrom(e => e.ProfileInformation.Description))
+                .ForMember(c => c.Facebook, opt => opt.MapFrom(e => e.ProfileInformation.Facebook))
+                .ForMember(c => c.Instagram, opt => opt.MapFrom(e => e.ProfileInformation.Instagram))
+                .ForMember(c => c.Twitter, opt => opt.MapFrom(e => e.ProfileInformation.Twitter))
+                .ForMember(c => c.Website, opt => opt.MapFrom(e => e.ProfileInformation.Website))
+                .ForMember(c => c.Pictures, opt => opt.MapFrom(e => e.ProfileInformation.Pictures));
 
-            CreateMap<PurchaseOrderSender, UserProfileDto>();
-            CreateMap<PurchaseOrderVendor, UserProfileDto>();
+            CreateMap<PurchaseOrderSender, UserDto>();
+            CreateMap<PurchaseOrderVendor, UserDto>();
 
             CreateMap<PurchaseOrderSender, UserProfileViewModel>();
             CreateMap<PurchaseOrderVendor, UserProfileViewModel>();

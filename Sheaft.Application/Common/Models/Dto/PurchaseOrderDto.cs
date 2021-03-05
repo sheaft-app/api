@@ -31,9 +31,9 @@ namespace Sheaft.Application.Common.Models.Dto
         public decimal TotalOnSalePrice { get; set; }
         public decimal TotalWeight { get; set; }
         public PurchaseOrderStatus Status { get; set; }
-        public UserProfileDto Sender { get; set; }
+        public UserDto Sender { get; set; }
         public ExpectedPurchaseOrderDeliveryDto ExpectedDelivery { get; set; }
-        public UserProfileDto Vendor { get; set; }
+        public UserDto Vendor { get; set; }
         public IEnumerable<PurchaseOrderProductQuantityDto> Products { get; set; }
     }
 }

@@ -35,9 +35,10 @@ namespace Sheaft.Application.Common.Models.Dto
         public decimal? Rating { get; set; }
         public bool IsReturnable { get; set; }
         public ReturnableDto Returnable { get; set; }
-        public BusinessProfileDto Producer { get; set; }
+        public UserDto Producer { get; set; }
         public IEnumerable<TagDto> Tags { get; set; }
         public IEnumerable<RatingDto> Ratings { get; set; }
         public IEnumerable<ClosingDto> Closings { get; set; }
+        public IEnumerable<PictureDto> Pictures { get; set; }
     }
 }

@@ -18,7 +18,7 @@ namespace Sheaft.GraphQL.Types.Outputs
                 .Type<NonNullType<StringType>>();
 
             descriptor.Field(c => c.User)
-                .Type<NonNullType<UserProfileType>>();
+                .Type<NonNullType<UserType>>();
 
             descriptor.Field(c => c.Products)
                 .Type<ListType<QuickOrderProductQuantityType>>()

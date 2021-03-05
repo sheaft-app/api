@@ -53,6 +53,12 @@ namespace Sheaft.Application.Order.Commands
         public async Task<Result<Guid>> Handle(PayOrderCommand request, CancellationToken token)
         {
             var order = await _context.GetByIdAsync<Domain.Order>(request.OrderId, token);
+            if(order.User == null)
+                throw SheaftException.BadRequest(MessageKind.Order_CannotPay_User_Required);
+            
+            if(order.User.Id != request.RequestUser.Id)
+                throw SheaftException.Forbidden();
+            
             if (!order.Deliveries.Any())
                 return Failure<Guid>(MessageKind.Order_CannotPay_Deliveries_Required);
 

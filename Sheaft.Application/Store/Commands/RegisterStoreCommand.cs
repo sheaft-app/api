@@ -17,8 +17,8 @@ using Sheaft.Application.Common.Models;
 using Sheaft.Application.Common.Models.Inputs;
 using Sheaft.Application.Common.Options;
 using Sheaft.Application.Legal.Commands;
-using Sheaft.Application.Picture.Commands;
 using Sheaft.Application.Sponsor.Commands;
+using Sheaft.Application.User.Commands;
 using Sheaft.Domain;
 using Sheaft.Domain.Enum;
 
@@ -37,7 +37,6 @@ namespace Sheaft.Application.Store.Commands
         public string Name { get; set; }
         public string Email { get; set; }
         public string Phone { get; set; }
-        public string Description { get; set; }
         public string Picture { get; set; }
         public string SponsoringCode { get; set; }
         public FullAddressInput Address { get; set; }
@@ -89,7 +88,7 @@ namespace Sheaft.Application.Store.Commands
 
             store = new Domain.Store(request.StoreId, request.Name, request.FirstName, request.LastName,
                 request.Email,
-                address, openingHours, request.OpenForNewBusiness, request.Phone, request.Description);
+                address, openingHours, request.OpenForNewBusiness, request.Phone);
 
             if (request.Tags != null && request.Tags.Any())
             {

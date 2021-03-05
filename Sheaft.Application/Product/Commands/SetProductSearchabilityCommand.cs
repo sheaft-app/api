@@ -10,6 +10,7 @@ using Sheaft.Application.Common.Interfaces;
 using Sheaft.Application.Common.Interfaces.Services;
 using Sheaft.Application.Common.Models;
 using Sheaft.Domain;
+using Sheaft.Domain.Exceptions;
 
 namespace Sheaft.Application.Product.Commands
 {
@@ -39,6 +40,9 @@ namespace Sheaft.Application.Product.Commands
         public async Task<Result> Handle(SetProductSearchabilityCommand request, CancellationToken token)
         {
             var entity = await _context.GetByIdAsync<Domain.Product>(request.ProductId, token);
+            if(entity.Producer.Id != request.RequestUser.Id)
+                throw SheaftException.Forbidden();
+
             entity.SetConsumerVisibility(request.VisibleToConsumers);
             entity.SetStoreVisibility(request.VisibleToStores);
 

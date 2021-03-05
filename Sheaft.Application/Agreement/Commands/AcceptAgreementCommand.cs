@@ -13,6 +13,8 @@ using Sheaft.Application.Common.Interfaces.Services;
 using Sheaft.Application.Common.Models;
 using Sheaft.Application.Common.Models.Inputs;
 using Sheaft.Domain;
+using Sheaft.Domain.Enum;
+using Sheaft.Domain.Exceptions;
 
 namespace Sheaft.Application.Agreement.Commands
 {
@@ -41,6 +43,12 @@ namespace Sheaft.Application.Agreement.Commands
         public async Task<Result> Handle(AcceptAgreementCommand request, CancellationToken token)
         {
             var entity = await _context.GetByIdAsync<Domain.Agreement>(request.AgreementId, token);
+            if(entity.CreatedBy.Kind == ProfileKind.Store && entity.Delivery.Producer.Id != request.RequestUser.Id)
+                throw SheaftException.Forbidden();
+            
+            if(entity.CreatedBy.Kind == ProfileKind.Producer && entity.Store.Id != request.RequestUser.Id)
+                throw SheaftException.Forbidden();
+
             entity.AcceptAgreement();
 
             var selectedHours = new List<TimeSlotHour>();

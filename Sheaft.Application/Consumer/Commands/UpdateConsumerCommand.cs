@@ -13,8 +13,9 @@ using Sheaft.Application.Common.Interfaces;
 using Sheaft.Application.Common.Interfaces.Services;
 using Sheaft.Application.Common.Models;
 using Sheaft.Application.Common.Options;
-using Sheaft.Application.Picture.Commands;
+using Sheaft.Application.User.Commands;
 using Sheaft.Domain;
+using Sheaft.Domain.Exceptions;
 
 namespace Sheaft.Application.Consumer.Commands
 {
@@ -31,6 +32,12 @@ namespace Sheaft.Application.Consumer.Commands
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public string Picture { get; set; }
+        public string Summary { get; set; }
+        public string Description { get; set; }
+        public string Website { get; set; }
+        public string Facebook { get; set; }
+        public string Twitter { get; set; }
+        public string Instagram { get; set; }
     }
 
     public class UpdateConsumerCommandHandler : CommandsHandler,
@@ -51,11 +58,20 @@ namespace Sheaft.Application.Consumer.Commands
         public async Task<Result> Handle(UpdateConsumerCommand request, CancellationToken token)
         {
             var consumer = await _context.GetByIdAsync<Domain.Consumer>(request.ConsumerId, token);
+            if(consumer.Id != request.RequestUser.Id)
+                throw SheaftException.Forbidden();
 
             consumer.SetEmail(request.Email);
             consumer.SetPhone(request.Phone);
             consumer.SetFirstname(request.FirstName);
             consumer.SetLastname(request.LastName);
+            
+            consumer.ProfileInformation.SetSummary(request.Summary);
+            consumer.ProfileInformation.SetDescription(request.Description);
+            consumer.ProfileInformation.SetFacebook(request.Facebook);
+            consumer.ProfileInformation.SetTwitter(request.Twitter);
+            consumer.ProfileInformation.SetWebsite(request.Instagram);
+            consumer.ProfileInformation.SetInstagram(request.Website);
 
             await _context.SaveChangesAsync(token);
 

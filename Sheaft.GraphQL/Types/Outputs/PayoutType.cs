@@ -24,7 +24,7 @@ namespace Sheaft.GraphQL.Types.Outputs
                 .Type<NonNullType<TransactionStatusEnumType>>();
 
             descriptor.Field(c => c.DebitedUser)
-                .Type<NonNullType<UserProfileType>>();
+                .Type<NonNullType<UserType>>();
         }
     }
 }

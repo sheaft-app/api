@@ -98,7 +98,6 @@ namespace Sheaft.Web.Manage.Controllers
                 ProducerId = model.Id,
                 Address = _mapper.Map<FullAddressInput>(model.Address),
                 OpenForNewBusiness = model.OpenForNewBusiness,
-                Description = model.Description,
                 Email = model.Email,
                 Name = model.Name,
                 FirstName = model.FirstName,

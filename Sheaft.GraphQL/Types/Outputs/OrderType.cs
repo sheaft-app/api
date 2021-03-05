@@ -1,5 +1,6 @@
 ﻿using HotChocolate.Types;
 using Sheaft.Application.Common.Models.Dto;
+using Sheaft.Application.Common.Security;
 
 namespace Sheaft.GraphQL.Types.Outputs
 {
@@ -11,6 +12,7 @@ namespace Sheaft.GraphQL.Types.Outputs
             descriptor.Field(c => c.Status);
             descriptor.Field(c => c.DonationKind);
             descriptor.Field(c => c.CreatedOn);
+            descriptor.Field(c => c.UpdatedOn);
             descriptor.Field(c => c.Reference);
 
             descriptor.Field(c => c.TotalWholeSalePrice);
@@ -40,7 +42,16 @@ namespace Sheaft.GraphQL.Types.Outputs
             descriptor.Field(c => c.TotalWeight);
 
             descriptor.Field(c => c.User)
-                .Type<NonNullType<UserProfileType>>();
+                .Type<UserType>();
+
+            descriptor.Field(c => c.Products)
+                .Type<ListType<OrderProductType>>();
+            
+            descriptor.Field(c => c.Deliveries)
+                .Type<ListType<OrderDeliveryType>>();
+            
+            descriptor.Field(c => c.Payin)
+                .Type<PayinType>();
         }
     }
 }

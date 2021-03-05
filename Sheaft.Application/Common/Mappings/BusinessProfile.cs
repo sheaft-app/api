@@ -10,14 +10,14 @@ namespace Sheaft.Application.Common.Mappings
         public BusinessProfile()
         {
             CreateMap<Business, UserViewModel>();
-
-            CreateMap<Business, UserProfileDto>();
-
             CreateMap<Business, UserDto>()
-                .ForMember(d => d.Address, opt => opt.MapFrom(r => r.Address));
-
-            CreateMap<Business, BusinessProfileDto>()
-                .IncludeBase<Business, UserDto>();
+                .ForMember(c => c.Summary, opt => opt.MapFrom(e => e.ProfileInformation.Summary))
+                .ForMember(c => c.Description, opt => opt.MapFrom(e => e.ProfileInformation.Description))
+                .ForMember(c => c.Facebook, opt => opt.MapFrom(e => e.ProfileInformation.Facebook))
+                .ForMember(c => c.Instagram, opt => opt.MapFrom(e => e.ProfileInformation.Instagram))
+                .ForMember(c => c.Twitter, opt => opt.MapFrom(e => e.ProfileInformation.Twitter))
+                .ForMember(c => c.Website, opt => opt.MapFrom(e => e.ProfileInformation.Website))
+                .ForMember(c => c.Pictures, opt => opt.MapFrom(e => e.ProfileInformation.Pictures));
         }
     }
 }

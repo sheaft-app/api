@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Sheaft.Application.Common.Models.Inputs;
 using Sheaft.Domain.Enum;
 
 namespace Sheaft.Application.Common.Models.ViewModels

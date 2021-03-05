@@ -10,6 +10,7 @@ using Sheaft.Application.Common.Interfaces;
 using Sheaft.Application.Common.Interfaces.Services;
 using Sheaft.Application.Common.Models;
 using Sheaft.Domain;
+using Sheaft.Domain.Exceptions;
 
 namespace Sheaft.Application.Notification.Commands
 {
@@ -39,6 +40,9 @@ namespace Sheaft.Application.Notification.Commands
             var notification = await _context.GetByIdAsync<Domain.Notification>(request.NotificationId, token);
             if (!notification.Unread)
                 return Success();
+            
+            if(notification.User.Id != request.RequestUser.Id)
+                throw SheaftException.Forbidden();
 
             notification.SetAsRead();
 

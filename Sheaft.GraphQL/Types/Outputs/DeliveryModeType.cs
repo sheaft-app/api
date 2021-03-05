@@ -24,7 +24,7 @@ namespace Sheaft.GraphQL.Types.Outputs
                 .Type<AddressType>();
 
             descriptor.Field(c => c.Producer)
-                .Type<NonNullType<BusinessProfileType>>();
+                .Type<NonNullType<UserType>>();
 
             descriptor.Field(c => c.OpeningHours)
                 .Type<ListType<TimeSlotType>>()

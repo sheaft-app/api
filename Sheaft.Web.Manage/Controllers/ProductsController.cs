@@ -13,6 +13,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Sheaft.Application.Common.Interfaces;
 using Sheaft.Application.Common.Interfaces.Services;
+using Sheaft.Application.Common.Models.Inputs;
 using Sheaft.Application.Common.Models.ViewModels;
 using Sheaft.Application.Common.Options;
 using Sheaft.Application.Product.Commands;
@@ -94,7 +95,7 @@ namespace Sheaft.Web.Manage.Controllers
             {
                 using (var ms = new MemoryStream())
                 {
-                    picture.CopyTo(ms);
+                    await picture.CopyToAsync(ms, token);
                     model.Picture = Convert.ToBase64String(ms.ToArray());
                 }
             }
@@ -108,7 +109,7 @@ namespace Sheaft.Web.Manage.Controllers
                 VisibleToStores = model.VisibleToStores,
                 VisibleToConsumers = model.VisibleToConsumers,
                 ReturnableId = model.ReturnableId,
-                Picture = model.Picture,
+                Picture = !string.IsNullOrWhiteSpace(model.Picture) ? new PictureInput(){Original = model.Picture} : null,
                 QuantityPerUnit = model.QuantityPerUnit,
                 Reference = model.Reference,
                 Tags = model.Tags,
@@ -171,7 +172,7 @@ namespace Sheaft.Web.Manage.Controllers
             {
                 using (var ms = new MemoryStream())
                 {
-                    picture.CopyTo(ms);
+                    await picture.CopyToAsync(ms, token);
                     model.Picture = Convert.ToBase64String(ms.ToArray());
                 }
             }
@@ -185,7 +186,7 @@ namespace Sheaft.Web.Manage.Controllers
                 VisibleToStores = model.VisibleToStores,
                 VisibleToConsumers = model.VisibleToConsumers,
                 ReturnableId = model.ReturnableId,
-                Picture = model.Picture,
+                Picture = !string.IsNullOrWhiteSpace(model.Picture) ? new PictureInput(){Original = model.Picture} : null,
                 QuantityPerUnit = model.QuantityPerUnit,
                 Reference = model.Reference,
                 Tags = model.Tags,

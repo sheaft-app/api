@@ -1,5 +1,6 @@
 ﻿using HotChocolate.Types;
 using Sheaft.Application.Common.Models.Dto;
+using Sheaft.Application.Common.Security;
 
 namespace Sheaft.GraphQL.Types.Outputs
 {
@@ -17,13 +18,14 @@ namespace Sheaft.GraphQL.Types.Outputs
             descriptor.Field(c => c.StartedOn);
             descriptor.Field(c => c.CompletedOn);
             descriptor.Field(c => c.Message);
-            descriptor.Field(c => c.File);
+            descriptor.Field(c => c.File)
+                .Authorize(Policies.REGISTERED);
 
             descriptor.Field(c => c.Name)
                 .Type<NonNullType<StringType>>();
 
             descriptor.Field(c => c.User)
-                .Type<NonNullType<UserProfileType>>();
+                .Type<NonNullType<UserType>>();
         }
     }
 }

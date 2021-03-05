@@ -18,6 +18,6 @@ namespace Sheaft.Application.Common.Models.Dto
         public DateTimeOffset? CompletedOn { get; set; }
         public bool Archived { get; set; }
         public int? Retried { get; set; }
-        public UserProfileDto User { get; set; }
+        public UserDto User { get; set; }
     }
 }

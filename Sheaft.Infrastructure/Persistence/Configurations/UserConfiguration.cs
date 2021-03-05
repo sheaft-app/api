@@ -34,6 +34,8 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
                 cb.ToTable("UserAddresses");
             });
 
+            entity.HasOne(c => c.ProfileInformation);
+
             entity.OwnsMany(c => c.Points, p =>
             {
                 p.Property<long>("Uid");
@@ -43,7 +45,6 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
             });
 
             entity.HasMany<Sponsoring>().WithOne(c => c.Sponsor).HasForeignKey("SponsorUid").OnDelete(DeleteBehavior.NoAction);
-            entity.HasMany<Order>().WithOne(c => c.User).HasForeignKey("UserUid").OnDelete(DeleteBehavior.Cascade);
 
             entity.HasKey("Uid");
 

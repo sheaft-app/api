@@ -20,16 +20,19 @@ namespace Sheaft.Application.Common.Mappings
                   .ForMember(d => d.OpeningHours, opt => opt.MapFrom(r => r.OpeningHours))
                   .ForMember(d => d.Tags, opt => opt.MapFrom(r => r.Tags.Select(t => t.Tag.Id)));
 
-            CreateMap<Domain.Store, UserProfileDto>();
-
             CreateMap<Domain.Store, UserDto>()
-                .ForMember(d => d.Address, opt => opt.MapFrom(r => r.Address));
+                .ForMember(c => c.Summary, opt => opt.MapFrom(e => e.ProfileInformation.Summary))
+                .ForMember(c => c.Description, opt => opt.MapFrom(e => e.ProfileInformation.Description))
+                .ForMember(c => c.Facebook, opt => opt.MapFrom(e => e.ProfileInformation.Facebook))
+                .ForMember(c => c.Instagram, opt => opt.MapFrom(e => e.ProfileInformation.Instagram))
+                .ForMember(c => c.Twitter, opt => opt.MapFrom(e => e.ProfileInformation.Twitter))
+                .ForMember(c => c.Website, opt => opt.MapFrom(e => e.ProfileInformation.Website))
+                .ForMember(c => c.Pictures, opt => opt.MapFrom(e => e.ProfileInformation.Pictures));
 
             CreateMap<Domain.Store, StoreDto>()
-                .ForMember(d => d.Address, opt => opt.MapFrom(r => r.Address))
-                .ForMember(d => d.Tags, opt => opt.MapFrom(r => r.Tags.Select(t => t.Tag)))
-                .ForMember(d => d.OpeningHours, opt => opt.MapFrom(r => r.OpeningHours));
-
+                .IncludeBase<Domain.Store, UserDto>()
+                .ForMember(d => d.Tags, opt => opt.MapFrom(r => r.Tags.Select(t => t.Tag)));;
+            
             CreateMap<RegisterStoreInput, RegisterStoreCommand>();
             CreateMap<UpdateStoreInput, UpdateStoreCommand>()
                 .ForMember(c => c.StoreId, opt => opt.MapFrom(r => r.Id));

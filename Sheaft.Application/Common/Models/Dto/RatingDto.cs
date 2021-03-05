@@ -9,6 +9,6 @@ namespace Sheaft.Application.Common.Models.Dto
         public DateTimeOffset? UpdatedOn { get; set; }
         public decimal Value { get; set; }
         public string Comment { get; set; }
-        public UserProfileDto User { get; set; }
+        public UserDto User { get; set; }
     }
 }

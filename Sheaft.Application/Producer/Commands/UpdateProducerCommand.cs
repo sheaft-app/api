@@ -16,9 +16,10 @@ using Sheaft.Application.Common.Interfaces.Services;
 using Sheaft.Application.Common.Models;
 using Sheaft.Application.Common.Models.Inputs;
 using Sheaft.Application.Common.Options;
-using Sheaft.Application.Picture.Commands;
+using Sheaft.Application.User.Commands;
 using Sheaft.Domain;
 using Sheaft.Domain.Enum;
+using Sheaft.Domain.Exceptions;
 
 namespace Sheaft.Application.Producer.Commands
 {
@@ -36,12 +37,17 @@ namespace Sheaft.Application.Producer.Commands
         public string LastName { get; set; }
         public string Email { get; set; }
         public string Phone { get; set; }
-        public string Description { get; set; }
         public string Picture { get; set; }
+        public string Summary { get; set; }
+        public string Description { get; set; }
+        public string Website { get; set; }
+        public string Facebook { get; set; }
+        public string Twitter { get; set; }
+        public string Instagram { get; set; }
+        public bool? NotSubjectToVat { get; set; }
         public bool OpenForNewBusiness { get; set; }
         public FullAddressInput Address { get; set; }
         public IEnumerable<Guid> Tags { get; set; }
-        public bool? NotSubjectToVat { get; set; }
     }
 
     public class UpdateProducerCommandHandler : CommandsHandler,
@@ -62,6 +68,8 @@ namespace Sheaft.Application.Producer.Commands
         public async Task<Result> Handle(UpdateProducerCommand request, CancellationToken token)
         {
             var producer = await _context.GetByIdAsync<Domain.Producer>(request.ProducerId, token);
+            if(producer.Id != request.RequestUser.Id)
+                throw SheaftException.Forbidden();
 
             producer.SetName(request.Name);
             producer.SetFirstname(request.FirstName);
@@ -69,8 +77,14 @@ namespace Sheaft.Application.Producer.Commands
             producer.SetEmail(request.Email);
             producer.SetProfileKind(request.Kind);
             producer.SetPhone(request.Phone);
-            producer.SetDescription(request.Description);
             producer.SetOpenForNewBusiness(request.OpenForNewBusiness);
+            
+            producer.ProfileInformation.SetSummary(request.Summary);
+            producer.ProfileInformation.SetDescription(request.Description);
+            producer.ProfileInformation.SetFacebook(request.Facebook);
+            producer.ProfileInformation.SetTwitter(request.Twitter);
+            producer.ProfileInformation.SetWebsite(request.Instagram);
+            producer.ProfileInformation.SetInstagram(request.Website);
 
             if (request.NotSubjectToVat.HasValue)
             {

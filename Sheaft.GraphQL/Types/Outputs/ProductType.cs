@@ -1,5 +1,10 @@
 ﻿using HotChocolate.Types;
+using HotChocolate.Types.Relay;
+using Sheaft.Application.Common.Interfaces.Queries;
 using Sheaft.Application.Common.Models.Dto;
+using Sheaft.Application.Common.Security;
+using Sheaft.GraphQL.Filters;
+using Sheaft.GraphQL.Sorts;
 
 namespace Sheaft.GraphQL.Types.Outputs
 {
@@ -17,8 +22,6 @@ namespace Sheaft.GraphQL.Types.Outputs
             descriptor.Field(c => c.WholeSalePrice);
             descriptor.Field(c => c.VatPrice);
             descriptor.Field(c => c.Available);
-            descriptor.Field(c => c.VisibleToConsumers);
-            descriptor.Field(c => c.VisibleToStores);
             descriptor.Field(c => c.RatingsCount);
             descriptor.Field(c => c.QuantityPerUnit);
             descriptor.Field(c => c.Unit);
@@ -32,6 +35,23 @@ namespace Sheaft.GraphQL.Types.Outputs
             descriptor.Field(c => c.ImageMedium);
             descriptor.Field(c => c.ImageSmall);
             descriptor.Field(c => c.IsReturnable);
+            
+            descriptor.Field(c => c.VisibleToStores)
+                .Authorize(Policies.OWNER);
+            
+            descriptor.Field(c => c.VisibleToConsumers)
+                .Authorize(Policies.OWNER);
+            
+            descriptor.Field("currentUserHasRatedProduct")
+                .Type<NonNullType<BooleanType>>()
+                .Resolver(async c =>
+                {
+                    var user = GetRequestUser(c.ContextData);
+                    if (!user.IsAuthenticated)
+                        return false;
+
+                    return await c.Service<IProductQueries>().ProductIsRatedByUserAsync(c.Parent<ProductDto>().Id, user.Id, user, c.RequestAborted);
+                });
 
             descriptor.Field(c => c.Name)
                 .Type<NonNullType<StringType>>();
@@ -43,10 +63,23 @@ namespace Sheaft.GraphQL.Types.Outputs
                 .Type<ReturnableType>();
 
             descriptor.Field(c => c.Producer)
-                .Type<NonNullType<BusinessProfileType>>();
+                .Type<NonNullType<UserType>>();
 
             descriptor.Field(c => c.Closings)
                 .Type<ListType<ClosingType>>();
+                
+            descriptor.Field(c => c.Tags)
+                .Type<ListType<TagType>>()
+                .UseFiltering<TagFilterType>();
+
+            descriptor.Field(c => c.Ratings)
+                .Type<ListType<RatingType>>()
+                .UseSorting<RatingSortType>()
+                .UseFiltering<RatingFilterType>()
+                .UsePaging<RatingType>();
+
+            descriptor.Field(c => c.Pictures)
+                .Type<ListType<PictureType>>();
         }
     }
 }

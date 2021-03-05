@@ -14,20 +14,17 @@ namespace Sheaft.Domain
         {
         }
 
-        protected Business(Guid id, ProfileKind kind, string name, string firstname, string lastname, string email, UserAddress address, bool openForBusiness = true, string phone = null, string description = null)
+        protected Business(Guid id, ProfileKind kind, string name, string firstname, string lastname, string email, UserAddress address, bool openForBusiness = true, string phone = null)
             : base(id, kind, name, firstname, lastname, email, phone)
         {
             if (address == null)
                 throw new ValidationException(MessageKind.User_Address_Required);
             
             SetOpenForNewBusiness(openForBusiness);
-            SetDescription(description);
-
             SetAddress(address);
         }
 
         public bool OpenForNewBusiness { get; private set; }
-        public string Description { get; private set; }
         public virtual IReadOnlyCollection<BusinessClosing> Closings => _closings?.AsReadOnly(); 
 
         public void SetName(string name)
@@ -38,14 +35,6 @@ namespace Sheaft.Domain
         public void SetOpenForNewBusiness(bool openForNewBusiness)
         {
             OpenForNewBusiness = openForNewBusiness;
-        }
-
-        public void SetDescription(string description)
-        {
-            if (description == null)
-                return;
-
-            Description = description;
         }
 
         public BusinessClosing AddClosing(DateTimeOffset from, DateTimeOffset to, string reason = null)

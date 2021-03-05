@@ -11,6 +11,7 @@ using Sheaft.Application.Common.Interfaces.Services;
 using Sheaft.Application.Common.Models;
 using Sheaft.Domain;
 using Sheaft.Domain.Events.PurchaseOrder;
+using Sheaft.Domain.Exceptions;
 
 namespace Sheaft.Application.PurchaseOrder.Commands
 {
@@ -39,6 +40,9 @@ namespace Sheaft.Application.PurchaseOrder.Commands
         public async Task<Result> Handle(CompletePurchaseOrderCommand request, CancellationToken token)
         {
             var purchaseOrder = await _context.GetByIdAsync<Domain.PurchaseOrder>(request.PurchaseOrderId, token);
+            if(purchaseOrder.Vendor.Id != request.RequestUser.Id)
+                throw SheaftException.Forbidden();
+            
             purchaseOrder.Complete(request.SkipNotification);
 
             await _context.SaveChangesAsync(token);

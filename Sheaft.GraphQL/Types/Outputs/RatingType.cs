@@ -14,7 +14,7 @@ namespace Sheaft.GraphQL.Types.Outputs
             descriptor.Field(c => c.Comment);
 
             descriptor.Field(c => c.User)
-                .Type<NonNullType<UserProfileType>>();
+                .Type<NonNullType<UserType>>();
         }
     }
 }

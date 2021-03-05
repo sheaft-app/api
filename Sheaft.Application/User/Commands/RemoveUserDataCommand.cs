@@ -14,6 +14,7 @@ using Sheaft.Application.Common.Interfaces.Services;
 using Sheaft.Application.Common.Models;
 using Sheaft.Application.Common.Options;
 using Sheaft.Domain;
+using Sheaft.Domain.Exceptions;
 
 namespace Sheaft.Application.User.Commands
 {
@@ -52,6 +53,9 @@ namespace Sheaft.Application.User.Commands
 
             if (!entity.RemovedOn.HasValue)
                 return Success(request.Reason);
+            
+            if(entity.Id != request.RequestUser.Id)
+                throw SheaftException.Forbidden();
 
             await _blobService.CleanUserStorageAsync(request.UserId, token);
 

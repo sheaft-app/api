@@ -15,6 +15,7 @@ using Sheaft.Application.Consumer.Commands;
 using Sheaft.Application.Payin.Commands;
 using Sheaft.Domain;
 using Sheaft.Domain.Enum;
+using Sheaft.Domain.Exceptions;
 
 namespace Sheaft.Application.Order.Commands
 {
@@ -42,6 +43,9 @@ namespace Sheaft.Application.Order.Commands
         public async Task<Result<Guid>> Handle(RetryOrderCommand request, CancellationToken token)
         {
             var order = await _context.GetByIdAsync<Domain.Order>(request.OrderId, token);
+            if(order.User.Id != request.RequestUser.Id)
+                throw SheaftException.Forbidden();
+            
             if (order.Status != OrderStatus.Refused)
                 return Failure<Guid>(MessageKind.Order_CannotRetry_NotIn_Refused_Status);
 

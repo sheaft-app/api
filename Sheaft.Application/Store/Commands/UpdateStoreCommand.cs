@@ -16,9 +16,10 @@ using Sheaft.Application.Common.Interfaces.Services;
 using Sheaft.Application.Common.Models;
 using Sheaft.Application.Common.Models.Inputs;
 using Sheaft.Application.Common.Options;
-using Sheaft.Application.Picture.Commands;
+using Sheaft.Application.User.Commands;
 using Sheaft.Domain;
 using Sheaft.Domain.Enum;
+using Sheaft.Domain.Exceptions;
 
 namespace Sheaft.Application.Store.Commands
 {
@@ -36,8 +37,14 @@ namespace Sheaft.Application.Store.Commands
         public string LastName { get; set; }
         public string Email { get; set; }
         public string Phone { get; set; }
-        public string Description { get; set; }
         public string Picture { get; set; }
+        
+        public string Summary { get; set; }
+        public string Description { get; set; }
+        public string Website { get; set; }
+        public string Facebook { get; set; }
+        public string Twitter { get; set; }
+        public string Instagram { get; set; }
         public bool OpenForNewBusiness { get; set; }
         public FullAddressInput Address { get; set; }
         public IEnumerable<Guid> Tags { get; set; }
@@ -62,6 +69,8 @@ namespace Sheaft.Application.Store.Commands
         public async Task<Result> Handle(UpdateStoreCommand request, CancellationToken token)
         {
             var store = await _context.GetByIdAsync<Domain.Store>(request.StoreId, token);
+            if(store.Id != request.RequestUser.Id)
+                throw SheaftException.Forbidden();
 
             store.SetName(request.Name);
             store.SetFirstname(request.FirstName);
@@ -69,8 +78,14 @@ namespace Sheaft.Application.Store.Commands
             store.SetEmail(request.Email);
             store.SetProfileKind(request.Kind);
             store.SetPhone(request.Phone);
-            store.SetDescription(request.Description);
             store.SetOpenForNewBusiness(request.OpenForNewBusiness);
+            
+            store.ProfileInformation.SetSummary(request.Summary);
+            store.ProfileInformation.SetDescription(request.Description);
+            store.ProfileInformation.SetFacebook(request.Facebook);
+            store.ProfileInformation.SetTwitter(request.Twitter);
+            store.ProfileInformation.SetWebsite(request.Instagram);
+            store.ProfileInformation.SetInstagram(request.Website);
 
             var departmentCode = UserAddress.GetDepartmentCode(request.Address.Zipcode);
             var department = await _context.Departments.SingleOrDefaultAsync(d => d.Code == departmentCode, token);

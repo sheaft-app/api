@@ -44,11 +44,11 @@ namespace Sheaft.Application.Order.Commands
 
         public async Task<Result> Handle(CheckOrderCommand request, CancellationToken token)
         {
-            var payinRefund = await _context.GetByIdAsync<Domain.Order>(request.OrderId, token);
-            if (payinRefund.Status != OrderStatus.Created && payinRefund.Status != OrderStatus.Waiting)
+            var order = await _context.GetByIdAsync<Domain.Order>(request.OrderId, token);
+            if (order.Status != OrderStatus.Created && order.Status != OrderStatus.Waiting)
                 return Success();
 
-            if (payinRefund.CreatedOn.AddMinutes(_routineOptions.CheckOrderExpiredFromMinutes) < DateTimeOffset.UtcNow)
+            if (order.CreatedOn.AddMinutes(_routineOptions.CheckOrderExpiredFromMinutes) < DateTimeOffset.UtcNow)
                 return await _mediatr.Process(new ExpireOrderCommand(request.RequestUser) {OrderId = request.OrderId},
                     token);
 

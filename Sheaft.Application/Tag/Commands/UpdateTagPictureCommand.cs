@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
@@ -11,41 +11,39 @@ using Sheaft.Application.Common.Interfaces.Services;
 using Sheaft.Application.Common.Models;
 using Sheaft.Domain;
 
-namespace Sheaft.Application.Picture.Commands
+namespace Sheaft.Application.Tag.Commands
 {
-    public class UpdateProductPictureCommand : Command<string>
+    public class UpdateTagPictureCommand : Command<string>
     {
         [JsonConstructor]
-        public UpdateProductPictureCommand(RequestUser requestUser) : base(requestUser)
+        public UpdateTagPictureCommand(RequestUser requestUser) : base(requestUser)
         {
         }
 
-        public Guid ProductId { get; set; }
+        public Guid TagId { get; set; }
         public string Picture { get; set; }
-        public string OriginalPicture { get; set; }
     }
 
-    public class UpdateProductPictureCommandHandler : CommandsHandler,
-        IRequestHandler<UpdateProductPictureCommand, Result<string>>
+    public class UpdateTagPictureCommandHandler : CommandsHandler,
+        IRequestHandler<UpdateTagPictureCommand, Result<string>>
     {
         private readonly IPictureService _imageService;
 
-        public UpdateProductPictureCommandHandler(
+        public UpdateTagPictureCommandHandler(
             ISheaftMediatr mediatr,
             IAppDbContext context,
             IPictureService imageService,
-            ILogger<UpdateProductPictureCommandHandler> logger)
+            ILogger<UpdateTagPictureCommandHandler> logger)
             : base(mediatr, context, logger)
         {
             _imageService = imageService;
         }
 
-        public async Task<Result<string>> Handle(UpdateProductPictureCommand request, CancellationToken token)
+        public async Task<Result<string>> Handle(UpdateTagPictureCommand request, CancellationToken token)
         {
-            var entity = await _context.GetByIdAsync<Domain.Product>(request.ProductId, token);
+            var entity = await _context.GetByIdAsync<Domain.Tag>(request.TagId, token);
 
-            var resultImage =
-                await _imageService.HandleProductPictureAsync(entity, request.Picture, request.OriginalPicture, token);
+            var resultImage = await _imageService.HandleTagPictureAsync(entity, request.Picture, token);
             if (!resultImage.Succeeded)
                 return Failure<string>(resultImage.Exception);
 

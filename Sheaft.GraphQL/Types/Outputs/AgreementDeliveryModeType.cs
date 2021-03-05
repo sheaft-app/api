@@ -19,7 +19,7 @@ namespace Sheaft.GraphQL.Types.Outputs
                 .Type<AddressType>();
 
             descriptor.Field(c => c.Producer)
-                .Type<NonNullType<BusinessProfileType>>();
+                .Type<NonNullType<UserType>>();
         }
     }
 }

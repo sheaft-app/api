@@ -13,6 +13,7 @@ using Sheaft.Application.Common.Models;
 using Sheaft.Application.Common.Options;
 using Sheaft.Domain;
 using Sheaft.Domain.Enum;
+using Sheaft.Domain.Exceptions;
 
 namespace Sheaft.Application.User.Commands
 {
@@ -41,6 +42,8 @@ namespace Sheaft.Application.User.Commands
         public async Task<Result> Handle(RemoveUserCommand request, CancellationToken token)
         {
             var entity = await _context.GetByIdAsync<Domain.User>(request.UserId, token);
+            if(entity.Id != request.RequestUser.Id)
+                throw SheaftException.Forbidden();
 
             var hasActiveOrders = await _context.AnyAsync<Domain.PurchaseOrder>(
                 o => (o.Vendor.Id == entity.Id || o.Sender.Id == entity.Id) && (int) o.Status < 6, token);

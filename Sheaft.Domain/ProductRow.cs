@@ -70,9 +70,6 @@ namespace Sheaft.Domain
 
         private void SetQuantity(int quantity)
         {
-            if (quantity <= 0)
-                throw new ValidationException(MessageKind.PurchaseOrder_ProductQuantity_CannotBe_LowerOrEqualThan, 0);
-
             Quantity = quantity;
             RefreshLine();
         }

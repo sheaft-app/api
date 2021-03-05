@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Sheaft.Domain.Enum;
 
 namespace Sheaft.Application.Common.Models.Dto
@@ -8,7 +9,6 @@ namespace Sheaft.Application.Common.Models.Dto
         public Guid Id { get; set; }
         public DateTimeOffset CreatedOn { get; set; }
         public DateTimeOffset? UpdatedOn { get; set; }
-        public DateTimeOffset? RemovedOn { get; set; }
         public OrderStatus Status { get; set; }
         public DonationKind DonationKind { get; set; }
         public string Reference { get; set; }
@@ -32,6 +32,9 @@ namespace Sheaft.Application.Common.Models.Dto
         public decimal InternalFeesPrice { get; set; }
         public decimal FeesFixedAmount { get; set; }
         public decimal FeesPercent { get; set; }
-        public virtual UserProfileDto User { get; set; }
+        public UserDto User { get; set; }
+        public PayinDto Payin { get; set; }
+        public List<OrderProductDto> Products { get; set; }
+        public List<OrderDeliveryDto> Deliveries { get; set; }
     }
 }

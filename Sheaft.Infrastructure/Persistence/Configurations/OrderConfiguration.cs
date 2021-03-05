@@ -9,7 +9,7 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
         public void Configure(EntityTypeBuilder<Order> entity)
         {
             entity.Property<long>("Uid");
-            entity.Property<long>("UserUid");
+            entity.Property<long?>("UserUid");
             entity.Property<long?>("PayinUid");
             entity.Property<long?>("DonationUid");
 
@@ -43,11 +43,18 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
             entity.HasMany(c => c.PurchaseOrders).WithOne().HasForeignKey("OrderUid").OnDelete(DeleteBehavior.NoAction);
             entity.HasOne(c => c.Payin).WithOne().HasForeignKey<Order>("PayinUid").OnDelete(DeleteBehavior.NoAction);
             entity.HasOne(c => c.Donation).WithOne().HasForeignKey<Order>("DonationUid").OnDelete(DeleteBehavior.NoAction);
+            entity.HasOne(c => c.User).WithMany().HasForeignKey("UserUid").OnDelete(DeleteBehavior.Cascade);
 
             entity.Ignore(c => c.DomainEvents);
 
             var purchaseOrders = entity.Metadata.FindNavigation(nameof(Order.PurchaseOrders));
             purchaseOrders.SetPropertyAccessMode(PropertyAccessMode.Field);
+            
+            var products = entity.Metadata.FindNavigation(nameof(Order.Products));
+            products.SetPropertyAccessMode(PropertyAccessMode.Field);
+            
+            var deliveries = entity.Metadata.FindNavigation(nameof(Order.Deliveries));
+            deliveries.SetPropertyAccessMode(PropertyAccessMode.Field);
 
             entity.HasKey("Uid");
 

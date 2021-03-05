@@ -11,6 +11,7 @@ using Sheaft.Application.Common.Interfaces;
 using Sheaft.Application.Common.Interfaces.Services;
 using Sheaft.Application.Common.Models;
 using Sheaft.Domain;
+using Sheaft.Domain.Exceptions;
 
 namespace Sheaft.Application.PurchaseOrder.Commands
 {
@@ -37,11 +38,13 @@ namespace Sheaft.Application.PurchaseOrder.Commands
 
         public async Task<Result> Handle(RestorePurchaseOrderCommand request, CancellationToken token)
         {
-            var entity =
+            var purchaseOrder =
                 await _context.PurchaseOrders.SingleOrDefaultAsync(a => a.Id == request.PurchaseOrderId && a.RemovedOn.HasValue,
                     token);
+            if(purchaseOrder.Vendor.Id != request.RequestUser.Id && purchaseOrder.Sender.Id != request.RequestUser.Id)
+                throw SheaftException.Forbidden();
 
-            _context.Restore(entity);
+            _context.Restore(purchaseOrder);
             await _context.SaveChangesAsync(token);
 
             return Success();

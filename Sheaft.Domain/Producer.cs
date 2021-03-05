@@ -15,8 +15,8 @@ namespace Sheaft.Domain
         {
         }
 
-        public Producer(Guid id, string name, string firstname, string lastname, string email, UserAddress address, bool openForBusiness = true, string phone = null, string description = null)
-           : base(id, ProfileKind.Producer, name, firstname, lastname, email, address, openForBusiness, phone, description)
+        public Producer(Guid id, string name, string firstname, string lastname, string email, UserAddress address, bool openForBusiness = true, string phone = null)
+           : base(id, ProfileKind.Producer, name, firstname, lastname, email, address, openForBusiness, phone)
         {
             DomainEvents = new List<DomainEvent>{new ProducerRegisteredEvent(Id)};
         }

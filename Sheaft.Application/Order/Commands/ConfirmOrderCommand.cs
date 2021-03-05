@@ -20,6 +20,7 @@ using Sheaft.Domain;
 using Sheaft.Domain.Enum;
 using Sheaft.Domain.Events.Order;
 using Sheaft.Domain.Events.PurchaseOrder;
+using Sheaft.Domain.Exceptions;
 
 namespace Sheaft.Application.Order.Commands
 {
@@ -47,6 +48,8 @@ namespace Sheaft.Application.Order.Commands
         public async Task<Result<IEnumerable<Guid>>> Handle(ConfirmOrderCommand request, CancellationToken token)
         {
             var order = await _context.GetByIdAsync<Domain.Order>(request.OrderId, token);
+            if(order.User == null)
+                throw SheaftException.BadRequest(MessageKind.Order_CannotCreate_User_Required);
 
             using (var transaction = await _context.BeginTransactionAsync(token))
             {

@@ -6,6 +6,7 @@ using Sheaft.Application.Common.Interfaces;
 using Sheaft.Application.Common.Interfaces.Queries;
 using Sheaft.Application.Common.Models.Dto;
 using Sheaft.Domain;
+using Sheaft.Domain.Enum;
 
 namespace Sheaft.Application.Order.Queries
 {
@@ -22,16 +23,29 @@ namespace Sheaft.Application.Order.Queries
 
         public IQueryable<OrderDto> GetOrder(Guid id, RequestUser currentUser)
         {
-            return _context.Orders
+            if (currentUser.IsAuthenticated)
+                return _context.Orders
                     .Get(c => c.Id == id && c.User.Id == currentUser.Id)
                     .ProjectTo<OrderDto>(_configurationProvider);
+            
+            return _context.Orders
+                .Get(c => c.Id == id && c.Status == OrderStatus.Created && c.User == null)
+                .ProjectTo<OrderDto>(_configurationProvider);
         }
 
         public IQueryable<OrderDto> GetOrders(RequestUser currentUser)
         {
             return _context.Orders
-                    .Get(c => c.User.Id == currentUser.Id)
+                    .Get(c => c.User.Id == currentUser.Id && c.Status != OrderStatus.Expired)
                     .ProjectTo<OrderDto>(_configurationProvider);
+        }
+
+        public IQueryable<OrderDto> GetCurrentOrder(RequestUser currentUser)
+        {
+            return _context.Orders
+                .Get(c => c.User.Id == currentUser.Id && c.Status == OrderStatus.Created)
+                .OrderByDescending(c => c.CreatedOn)
+                .ProjectTo<OrderDto>(_configurationProvider);
         }
     }
 }

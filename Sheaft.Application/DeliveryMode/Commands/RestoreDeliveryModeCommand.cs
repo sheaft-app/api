@@ -13,6 +13,7 @@ using Sheaft.Application.Common.Models;
 using Sheaft.Application.Producer.Commands;
 using Sheaft.Domain;
 using Sheaft.Domain.Enum;
+using Sheaft.Domain.Exceptions;
 
 namespace Sheaft.Application.DeliveryMode.Commands
 {
@@ -42,6 +43,8 @@ namespace Sheaft.Application.DeliveryMode.Commands
             var entity =
                 await _context.DeliveryModes.SingleOrDefaultAsync(a => a.Id == request.DeliveryModeId && a.RemovedOn.HasValue,
                     token);
+            if(entity.Producer.Id != request.RequestUser.Id)
+                throw SheaftException.Forbidden();
 
             _context.Restore(entity);            
             await _context.SaveChangesAsync(token);

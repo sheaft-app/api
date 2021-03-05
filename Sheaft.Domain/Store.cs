@@ -16,8 +16,8 @@ namespace Sheaft.Domain
         {
         }
 
-        public Store(Guid id, string name, string firstname, string lastname, string email, UserAddress address, IEnumerable<TimeSlotHour> openingHours = null, bool openForBusiness = true, string phone = null, string description = null)
-            : base(id, ProfileKind.Store, name, firstname, lastname, email, address, openForBusiness, phone, description)
+        public Store(Guid id, string name, string firstname, string lastname, string email, UserAddress address, IEnumerable<TimeSlotHour> openingHours = null, bool openForBusiness = true, string phone = null)
+            : base(id, ProfileKind.Store, name, firstname, lastname, email, address, openForBusiness, phone)
         {
             SetOpeningHours(openingHours);
             DomainEvents = new List<DomainEvent>{new StoreRegisteredEvent(Id)};

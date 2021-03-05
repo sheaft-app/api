@@ -64,20 +64,6 @@ namespace Sheaft.Application.User.Queries
                     .ProjectTo<UserDto>(_configurationProvider);
         }
 
-        public IQueryable<UserProfileDto> GetUserProfile(Guid id, RequestUser currentUser)
-        {
-            return _context.Users.OfType<Domain.User>()
-                    .Get(c => c.Id == id)
-                    .ProjectTo<UserProfileDto>(_configurationProvider);
-        }
-
-        public IQueryable<BusinessProfileDto> GetMyProfile(RequestUser currentUser)
-        {
-            return _context.Users.OfType<Business>()
-                .Get(c => c.Id == currentUser.Id)
-                .ProjectTo<BusinessProfileDto>(_configurationProvider);
-        }
-
         public async Task<SirenBusinessDto> RetrieveSiretInfosAsync(string siret, RequestUser currentUser, CancellationToken token)
         {
             var result = await _httpClient.GetAsync(string.Format(_sireneOptions.SearchSiretUrl, siret), token);

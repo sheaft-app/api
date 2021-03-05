@@ -730,7 +730,7 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                         .IsConcurrencyToken()
                         .HasColumnType("datetimeoffset");
 
-                    b.Property<long>("UserUid")
+                    b.Property<long?>("UserUid")
                         .HasColumnType("bigint");
 
                     b.HasKey("Uid");
@@ -1240,6 +1240,41 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
 
                     b.ToTable("ProductClosings");
                 });
+                
+                modelBuilder.Entity("Sheaft.Domain.ProductPicture", b =>
+                {
+                    b.Property<long>("Uid")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<DateTimeOffset>("CreatedOn")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<long>("ProductUid")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTimeOffset?>("UpdatedOn")
+                        .IsConcurrencyToken()
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("Url")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Uid");
+
+                    b.HasIndex("Id")
+                        .IsUnique();
+
+                    b.HasIndex("ProductUid");
+
+                    b.HasIndex("Uid", "Id", "ProductUid");
+
+                    b.ToTable("ProductPictures");
+                });
 
             modelBuilder.Entity("Sheaft.Domain.ProductTag", b =>
                 {
@@ -1254,6 +1289,85 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                     b.HasIndex("TagUid");
 
                     b.ToTable("ProductTags");
+                });
+
+            modelBuilder.Entity("Sheaft.Domain.ProfileInformation", b =>
+                {
+                    b.Property<long>("Uid")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Facebook")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Instagram")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Summary")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Twitter")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<long>("UserUid")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("Website")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Uid");
+
+                    b.HasIndex("Id")
+                        .IsUnique();
+
+                    b.HasIndex("UserUid")
+                        .IsUnique();
+
+                    b.HasIndex("Uid", "UserUid");
+
+                    b.ToTable("ProfileInformations");
+                });
+
+            modelBuilder.Entity("Sheaft.Domain.ProfilePicture", b =>
+                {
+                    b.Property<long>("Uid")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<DateTimeOffset>("CreatedOn")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<long>("ProfileInformationUid")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTimeOffset?>("UpdatedOn")
+                        .IsConcurrencyToken()
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("Url")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Uid");
+
+                    b.HasIndex("Id")
+                        .IsUnique();
+
+                    b.HasIndex("ProfileInformationUid");
+
+                    b.HasIndex("Uid", "Id", "ProfileInformationUid");
+
+                    b.ToTable("ProfilePictures");
                 });
 
             modelBuilder.Entity("Sheaft.Domain.PurchaseOrder", b =>
@@ -2404,9 +2518,6 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                 {
                     b.HasBaseType("Sheaft.Domain.User");
 
-                    b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<bool>("OpenForNewBusiness")
                         .HasColumnType("bit");
 
@@ -2830,8 +2941,7 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                     b.HasOne("Sheaft.Domain.User", "User")
                         .WithMany()
                         .HasForeignKey("UserUid")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Cascade);
                 });
 
             modelBuilder.Entity("Sheaft.Domain.OrderDelivery", b =>
@@ -2975,6 +3085,15 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
+                 
+            modelBuilder.Entity("Sheaft.Domain.ProductPicture", b =>
+                {
+                    b.HasOne("Sheaft.Domain.Product", null)
+                        .WithMany("Pictures")
+                        .HasForeignKey("ProductUid")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
 
             modelBuilder.Entity("Sheaft.Domain.ProductTag", b =>
                 {
@@ -2987,6 +3106,24 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                     b.HasOne("Sheaft.Domain.Tag", "Tag")
                         .WithMany()
                         .HasForeignKey("TagUid")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Sheaft.Domain.ProfileInformation", b =>
+                {
+                    b.HasOne("Sheaft.Domain.User", null)
+                        .WithOne("ProfileInformation")
+                        .HasForeignKey("Sheaft.Domain.ProfileInformation", "UserUid")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Sheaft.Domain.ProfilePicture", b =>
+                {
+                    b.HasOne("Sheaft.Domain.ProfileInformation", null)
+                        .WithMany("Pictures")
+                        .HasForeignKey("ProfileInformationUid")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });

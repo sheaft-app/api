@@ -3,9 +3,9 @@ using Sheaft.Application.Common.Models.Dto;
 
 namespace Sheaft.GraphQL.Types.Outputs
 {
-    public class AddressSuggestType : SheaftOutputType<AddressSuggestDto>
+    public class SuggestAddressType : SheaftOutputType<SuggestAddressDto>
     {
-        protected override void Configure(IObjectTypeDescriptor<AddressSuggestDto> descriptor)
+        protected override void Configure(IObjectTypeDescriptor<SuggestAddressDto> descriptor)
         {
             descriptor.Field(c => c.Zipcode);
             descriptor.Field(c => c.City);

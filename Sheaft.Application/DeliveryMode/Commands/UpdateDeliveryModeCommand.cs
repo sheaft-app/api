@@ -16,6 +16,7 @@ using Sheaft.Application.Common.Models.Inputs;
 using Sheaft.Application.Producer.Commands;
 using Sheaft.Domain;
 using Sheaft.Domain.Enum;
+using Sheaft.Domain.Exceptions;
 
 namespace Sheaft.Application.DeliveryMode.Commands
 {
@@ -53,6 +54,8 @@ namespace Sheaft.Application.DeliveryMode.Commands
         public async Task<Result> Handle(UpdateDeliveryModeCommand request, CancellationToken token)
         {
             var entity = await _context.GetByIdAsync<Domain.DeliveryMode>(request.DeliveryModeId, token);
+            if(entity.Producer.Id != request.RequestUser.Id)
+                throw SheaftException.Forbidden();
 
             entity.SetName(request.Name);
             entity.SetAvailability(request.Available);

@@ -1,6 +1,7 @@
 ﻿using HotChocolate.Types;
 using HotChocolate.Types.Relay;
 using Sheaft.Application.Common.Security;
+using Sheaft.Domain;
 using Sheaft.GraphQL.Filters;
 using Sheaft.GraphQL.Sorts;
 using Sheaft.GraphQL.Types.Outputs;
@@ -168,21 +169,21 @@ namespace Sheaft.GraphQL.Types
             descriptor.Field(c => c.CreateProductAsync(default, default))
                 .Name("createProduct")
                 .Authorize(Policies.PRODUCER)
-                .Type<NonNullType<ProductDetailsType>>()
+                .Type<NonNullType<ProductType>>()
                 .UseSingleOrDefault()
                 .UseSelection();
 
             descriptor.Field(c => c.UpdateProductAsync(default, default))
                 .Name("updateProduct")
                 .Authorize(Policies.PRODUCER)
-                .Type<NonNullType<ProductDetailsType>>()
+                .Type<NonNullType<ProductType>>()
                 .UseSingleOrDefault()
                 .UseSelection();
 
             descriptor.Field(c => c.UpdateProductPictureAsync(default, default))
                 .Name("updateProductPicture")
                 .Authorize(Policies.PRODUCER)
-                .Type<NonNullType<ProductDetailsType>>()
+                .Type<NonNullType<ProductType>>()
                 .UseSingleOrDefault()
                 .UseSelection();
 
@@ -212,9 +213,19 @@ namespace Sheaft.GraphQL.Types
             descriptor.Field(c => c.RateProductAsync(default, default))
                 .Name("rateProduct")
                 .Authorize(Policies.REGISTERED)
-                .Type<NonNullType<ProductDetailsType>>()
+                .Type<NonNullType<ProductType>>()
                 .UseSingleOrDefault()
                 .UseSelection();
+
+            descriptor.Field(c => c.AddPictureToProductAsync(default))
+                .Name("addPictureToProduct")
+                .Authorize(Policies.PRODUCER)
+                .Type<NonNullType<BooleanType>>();
+            
+            descriptor.Field(c => c.RemoveProductPicturesAsync(default))
+                .Name("removeProductPictures")
+                .Authorize(Policies.PRODUCER)
+                .Type<NonNullType<BooleanType>>();
 
             //DELIVERY
             descriptor.Field(c => c.CreateDeliveryModeAsync(default, default))
@@ -268,17 +279,13 @@ namespace Sheaft.GraphQL.Types
             //ORDER
             descriptor.Field(c => c.CreateOrderAsync(default, default))
                 .Name("createOrder")
-                .Authorize(Policies.CONSUMER)
                 .Type<NonNullType<OrderType>>()
-                .UseSingleOrDefault()
-                .UseSelection();
+                .UseSingleOrDefault();
 
             descriptor.Field(c => c.UpdateOrderAsync(default, default))
                 .Name("updateOrder")
-                .Authorize(Policies.CONSUMER)
                 .Type<NonNullType<OrderType>>()
-                .UseSingleOrDefault()
-                .UseSelection();
+                .UseSingleOrDefault();
 
             descriptor.Field(c => c.PayOrderAsync(default, default))
                 .Name("payOrder")
@@ -347,9 +354,19 @@ namespace Sheaft.GraphQL.Types
             descriptor.Field(c => c.UpdateUserPictureAsync(default, default))
                 .Name("updateUserPicture")
                 .Authorize(Policies.REGISTERED)
-                .Type<NonNullType<UserProfileType>>()
+                .Type<NonNullType<UserType>>()
                 .UseSingleOrDefault()
                 .UseSelection();
+            
+            descriptor.Field(c => c.AddPictureToUserProfileAsync(default))
+                .Name("addPictureToProfile")
+                .Authorize(Policies.REGISTERED)
+                .Type<NonNullType<BooleanType>>();
+            
+            descriptor.Field(c => c.RemoveUserProfilePicturesAsync(default))
+                .Name("removeProfilePictures")
+                .Authorize(Policies.REGISTERED)
+                .Type<NonNullType<BooleanType>>();
 
             descriptor.Field(c => c.RemoveUserAsync(default))
                 .Name("removeUser")

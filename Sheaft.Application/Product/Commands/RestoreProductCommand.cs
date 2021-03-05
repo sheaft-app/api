@@ -12,6 +12,7 @@ using Sheaft.Application.Common.Interfaces.Services;
 using Sheaft.Application.Common.Models;
 using Sheaft.Application.Producer.Commands;
 using Sheaft.Domain;
+using Sheaft.Domain.Exceptions;
 
 namespace Sheaft.Application.Product.Commands
 {
@@ -40,6 +41,9 @@ namespace Sheaft.Application.Product.Commands
         {
             var entity =
                 await _context.Products.SingleOrDefaultAsync(a => a.Id == request.ProductId && a.RemovedOn.HasValue, token);
+            
+            if(entity.Producer.Id != request.RequestUser.Id)
+                throw SheaftException.Forbidden();
                 
             _context.Restore(entity);
             await _context.SaveChangesAsync(token);

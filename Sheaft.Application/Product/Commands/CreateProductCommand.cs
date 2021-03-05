@@ -11,7 +11,7 @@ using Sheaft.Application.Common.Handlers;
 using Sheaft.Application.Common.Interfaces;
 using Sheaft.Application.Common.Interfaces.Services;
 using Sheaft.Application.Common.Models;
-using Sheaft.Application.Picture.Commands;
+using Sheaft.Application.Common.Models.Inputs;
 using Sheaft.Application.Producer.Commands;
 using Sheaft.Domain;
 using Sheaft.Domain.Enum;
@@ -28,7 +28,7 @@ namespace Sheaft.Application.Product.Commands
         public Guid ProducerId { get; set; }
         public string Reference { get; set; }
         public string Name { get; set; }
-        public string Picture { get; set; }
+        public PictureInput Picture { get; set; }
         public string OriginalPicture { get; set; }
         public decimal WholeSalePricePerUnit { get; set; }
         public decimal QuantityPerUnit { get; set; }
@@ -108,10 +108,12 @@ namespace Sheaft.Application.Product.Commands
                 await _context.SaveChangesAsync(token);
 
                 var imageResult = await _mediatr.Process(
-                    new UpdateProductPictureCommand(request.RequestUser)
+                    new UpdateProductPreviewCommand(request.RequestUser)
                     {
-                        ProductId = entity.Id, Picture = request.Picture, OriginalPicture = request.OriginalPicture
+                        ProductId = entity.Id, 
+                        Picture = request.Picture
                     }, token);
+                
                 if (!imageResult.Succeeded)
                     return Failure<Guid>(imageResult.Exception);
 

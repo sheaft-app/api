@@ -11,6 +11,7 @@ using Sheaft.Application.Common.Interfaces;
 using Sheaft.Application.Common.Interfaces.Services;
 using Sheaft.Application.Common.Models;
 using Sheaft.Domain;
+using Sheaft.Domain.Exceptions;
 
 namespace Sheaft.Application.Job.Commands
 {
@@ -39,6 +40,9 @@ namespace Sheaft.Application.Job.Commands
         {
             var entity =
                 await _context.Jobs.SingleOrDefaultAsync(a => a.Id == request.JobId && a.RemovedOn.HasValue, token);
+            if(entity.User.Id != request.RequestUser.Id)
+                throw SheaftException.Forbidden();
+
             _context.Restore(entity);
 
             await _context.SaveChangesAsync(token);

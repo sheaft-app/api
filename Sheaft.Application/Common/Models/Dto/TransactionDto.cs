@@ -18,6 +18,6 @@ namespace Sheaft.Application.Common.Models.Dto
         public string ResultCode { get; set; }
         public string ResultMessage { get; set; }
         public DateTimeOffset? ExecutedOn { get; set; }
-        public UserProfileDto Author { get; set; }
+        public UserDto Author { get; set; }
     }
 }
