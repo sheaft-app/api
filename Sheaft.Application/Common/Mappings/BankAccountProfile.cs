@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Sheaft.Application.Common.Models.Dto;
 using Sheaft.Application.Common.Models.ViewModels;
 using Sheaft.Domain;
 
@@ -8,6 +9,8 @@ namespace Sheaft.Application.Common.Mappings
     {
         public BankAccountProfile()
         {
+            CreateMap<BankAccount, BankAccountDto>();
+            
             CreateMap<BankAccount, BankAccountShortViewModel>();
             CreateMap<BankAccount, BankAccountViewModel>()
                 .ForMember(c => c.Address, opt => opt.MapFrom(r => new AddressViewModel {

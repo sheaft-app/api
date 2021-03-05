@@ -13,6 +13,9 @@
         RefundTransfer,
         RefundPayout,
         Repudiation = 400,
-        Settlement = 500
+        Settlement = 500,
+        Donation = 600,
+        Commission = 700,
+        Withholding = 800
     }
 }

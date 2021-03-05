@@ -276,16 +276,40 @@ namespace Sheaft.GraphQL
             return orderQueries.GetCurrentOrder(CurrentUser);
         }
         
-        public IQueryable<TransferDto> GetTransfer(Guid input, [Service] ITransferQueries transferQueries)
+        public IQueryable<PayoutDto> GetPayout(Guid input, [Service] IPayoutQueries payoutQueries)
         {
-            SetLogTransaction(nameof(GetTransfer));
-            return transferQueries.GetTransfer(input, CurrentUser);
+            SetLogTransaction(nameof(GetPayout));
+            return payoutQueries.GetPayout(input, CurrentUser);
         }
-
-        public IQueryable<TransferDto> GetTransfers([Service] ITransferQueries transferQueries)
+        
+        public IQueryable<PayoutDto> GetPayouts([Service] IPayoutQueries payoutQueries)
         {
-            SetLogTransaction(nameof(GetTransfers));
-            return transferQueries.GetTransfers(CurrentUser);
+            SetLogTransaction(nameof(GetPayouts));
+            return payoutQueries.GetPayouts(CurrentUser);
+        }
+        
+        public IQueryable<DonationDto> GetDonation(Guid input, [Service] IDonationQueries donationQueries)
+        {
+            SetLogTransaction(nameof(GetDonation));
+            return donationQueries.GetDonation(input, CurrentUser);
+        }
+        
+        public IQueryable<DonationDto> GetDonations([Service] IDonationQueries donationQueries)
+        {
+            SetLogTransaction(nameof(GetDonations));
+            return donationQueries.GetDonations(CurrentUser);
+        }
+        
+        public IQueryable<WithholdingDto> GetWithholding(Guid input, [Service] IWithholdingQueries withholdingQueries)
+        {
+            SetLogTransaction(nameof(GetWithholding));
+            return withholdingQueries.GetWithholding(input, CurrentUser);
+        }
+        
+        public IQueryable<WithholdingDto> GetWithholdings([Service] IWithholdingQueries withholdingQueries)
+        {
+            SetLogTransaction(nameof(GetWithholdings));
+            return withholdingQueries.GetWithholdings(CurrentUser);
         }
 
         public IQueryable<OrderDto> GetOrder(Guid input, [Service] IOrderQueries orderQueries)

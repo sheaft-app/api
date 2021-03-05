@@ -411,7 +411,7 @@ namespace Sheaft.GraphQL.Types
                 .UseSingleOrDefault()
                 .UseSelection();
 
-            //TRANSACTION
+            //WEBPAYIN
             descriptor.Field(c => c.GetWebPayinTransaction(default, default))
                 .Name("webPayinTransaction")
                 .Authorize(Policies.REGISTERED)
@@ -420,21 +420,55 @@ namespace Sheaft.GraphQL.Types
                 .UseSingleOrDefault()
                 .UseSelection();
             
-            //TRANSFERS
-            descriptor.Field(c => c.GetTransfer(default, default))
-                .Name("transfer")
-                .Authorize(Policies.REGISTERED)
-                .Type<NonNullType<TransferType>>()
+            //PAYOUTS
+            descriptor.Field(c => c.GetPayout(default, default))
+                .Name("payout")
+                .Authorize(Policies.PRODUCER)
+                .Type<NonNullType<PayoutType>>()
                 .UseSingleOrDefault()
                 .UseSelection();
             
-            descriptor.Field(c => c.GetTransfers(default))
-                .Name("transfers")
-                .Authorize(Policies.REGISTERED)
-                .Type<ListType<TransferType>>()
-                .UsePaging<AgreementType>()
-                .UseSorting<TransferSortType>()
-                .UseFiltering<TransferFilterType>()
+            descriptor.Field(c => c.GetPayouts(default))
+                .Name("payouts")
+                .Authorize(Policies.PRODUCER)
+                .Type<ListType<PayoutType>>()
+                .UsePaging<PayoutType>()
+                .UseSorting<PayoutSortType>()
+                .UseFiltering<PayoutFilterType>()
+                .UseSelection();
+            
+            //DONATIONS
+            descriptor.Field(c => c.GetDonation(default, default))
+                .Name("donation")
+                .Authorize(Policies.CONSUMER)
+                .Type<NonNullType<DonationType>>()
+                .UseSingleOrDefault()
+                .UseSelection();
+            
+            descriptor.Field(c => c.GetDonations(default))
+                .Name("donations")
+                .Authorize(Policies.CONSUMER)
+                .Type<ListType<DonationType>>()
+                .UsePaging<DonationType>()
+                .UseSorting<DonationSortType>()
+                .UseFiltering<DonationFilterType>()
+                .UseSelection();
+            
+            //WITHHOLDINGS
+            descriptor.Field(c => c.GetWithholding(default, default))
+                .Name("withholding")
+                .Authorize(Policies.PRODUCER)
+                .Type<NonNullType<WithholdingType>>()
+                .UseSingleOrDefault()
+                .UseSelection();
+            
+            descriptor.Field(c => c.GetWithholdings(default))
+                .Name("withholdings")
+                .Authorize(Policies.PRODUCER)
+                .Type<ListType<WithholdingType>>()
+                .UsePaging<WithholdingType>()
+                .UseSorting<WithholdingSortType>()
+                .UseFiltering<WithholdingFilterType>()
                 .UseSelection();
 
             //SEARCH

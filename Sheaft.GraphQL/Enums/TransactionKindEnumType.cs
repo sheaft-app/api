@@ -19,6 +19,9 @@ namespace Sheaft.GraphQL.Enums
             descriptor.Value(TransactionKind.RefundTransfer).Name("REFUND_TRANSFER");
             descriptor.Value(TransactionKind.Repudiation).Name("REPUDIATION");
             descriptor.Value(TransactionKind.Settlement).Name("SETTLEMENT");
+            descriptor.Value(TransactionKind.Donation).Name("DONATION");
+            descriptor.Value(TransactionKind.Commission).Name("COMMISSION");
+            descriptor.Value(TransactionKind.Withholding).Name("WITHHOLDING");
         }
     }
 }
