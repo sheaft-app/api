@@ -419,6 +419,23 @@ namespace Sheaft.GraphQL.Types
                 .Type<NonNullType<WebPayinType>>()
                 .UseSingleOrDefault()
                 .UseSelection();
+            
+            //TRANSFERS
+            descriptor.Field(c => c.GetTransfer(default, default))
+                .Name("transfer")
+                .Authorize(Policies.REGISTERED)
+                .Type<NonNullType<TransferType>>()
+                .UseSingleOrDefault()
+                .UseSelection();
+            
+            descriptor.Field(c => c.GetTransfers(default))
+                .Name("transfers")
+                .Authorize(Policies.REGISTERED)
+                .Type<ListType<TransferType>>()
+                .UsePaging<AgreementType>()
+                .UseSorting<TransferSortType>()
+                .UseFiltering<TransferFilterType>()
+                .UseSelection();
 
             //SEARCH
             descriptor.Field(c => c.SearchBusinessWithSiretAsync(default, default))

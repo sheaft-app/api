@@ -275,6 +275,18 @@ namespace Sheaft.GraphQL
             SetLogTransaction(nameof(GetOrder));
             return orderQueries.GetCurrentOrder(CurrentUser);
         }
+        
+        public IQueryable<TransferDto> GetTransfer(Guid input, [Service] ITransferQueries transferQueries)
+        {
+            SetLogTransaction(nameof(GetTransfer));
+            return transferQueries.GetTransfer(input, CurrentUser);
+        }
+
+        public IQueryable<TransferDto> GetTransfers([Service] ITransferQueries transferQueries)
+        {
+            SetLogTransaction(nameof(GetTransfers));
+            return transferQueries.GetTransfers(CurrentUser);
+        }
 
         public IQueryable<OrderDto> GetOrder(Guid input, [Service] IOrderQueries orderQueries)
         {
