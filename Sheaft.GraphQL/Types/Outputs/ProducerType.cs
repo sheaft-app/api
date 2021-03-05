@@ -27,6 +27,9 @@ namespace Sheaft.GraphQL.Types.Outputs
             descriptor.Field(c => c.Tags)
                 .Type<ListType<TagType>>()
                 .UseFiltering<TagFilterType>();
+
+            descriptor.Field(c => c.Closings)
+                .Type<ListType<ClosingType>>();
         }
     }
 }

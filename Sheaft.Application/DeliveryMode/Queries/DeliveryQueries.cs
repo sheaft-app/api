@@ -48,7 +48,11 @@ namespace Sheaft.Application.DeliveryMode.Queries
         public async Task<IEnumerable<ProducerDeliveriesDto>> GetProducersDeliveriesAsync(IEnumerable<Guid> producerIds, IEnumerable<DeliveryKind> kinds, DateTimeOffset currentDate, RequestUser currentUser, CancellationToken token)
         {
             var producers = new List<ProducerDeliveriesDto>();
-            var deliveriesMode = await _context.FindAsync<Domain.DeliveryMode>(d => d.Available && producerIds.Contains(d.Producer.Id) && kinds.Contains(d.Kind), token);
+            var deliveriesMode = await _context.FindAsync<Domain.DeliveryMode>(d => 
+                d.Available 
+                && producerIds.Contains(d.Producer.Id) 
+                && kinds.Contains(d.Kind)
+                && (!d.Closings.Any() || d.Closings.Any(c => DateTimeOffset.Now < c.ClosedFrom || DateTimeOffset.UtcNow > c.ClosedTo)), token);
 
             var deliveriesProducerIds = deliveriesMode.Select(c => c.Producer.Id).Distinct();
             var producerDistinctIds = producerIds.Distinct();
@@ -85,7 +89,13 @@ namespace Sheaft.Application.DeliveryMode.Queries
         public async Task<IEnumerable<ProducerDeliveriesDto>> GetStoreDeliveriesForProducersAsync(Guid storeId, IEnumerable<Guid> producerIds, IEnumerable<DeliveryKind> kinds, DateTimeOffset currentDate, RequestUser currentUser, CancellationToken token)
         {
             var producers = new List<ProducerDeliveriesDto>();
-            var agreements = await _context.FindAsync<Domain.Agreement>(d => d.Delivery.Available && producerIds.Contains(d.Delivery.Producer.Id) && d.Store.Id == storeId && d.Status == AgreementStatus.Accepted && kinds.Contains(d.Delivery.Kind), token);
+            var agreements = await _context.FindAsync<Domain.Agreement>(d => 
+                d.Delivery.Available 
+                && producerIds.Contains(d.Delivery.Producer.Id) 
+                && d.Store.Id == storeId 
+                && d.Status == AgreementStatus.Accepted 
+                && kinds.Contains(d.Delivery.Kind)
+                && (!d.Delivery.Closings.Any() || d.Delivery.Closings.Any(c => DateTimeOffset.Now < c.ClosedFrom || DateTimeOffset.UtcNow > c.ClosedTo)), token);
 
             var agreementProducerIds = agreements.Select(c => c.Delivery.Producer.Id).Distinct();
             var producerDistinctIds = producerIds.Distinct();
@@ -96,11 +106,6 @@ namespace Sheaft.Application.DeliveryMode.Queries
 
                 producers.AddRange(notFoundProducers.Select(c => new ProducerDeliveriesDto { Id = c.Id, Name = c.Name, Deliveries = null }));
             }
-
-            kinds ??= new List<DeliveryKind> {
-                    DeliveryKind.ProducerToStore,
-                    DeliveryKind.ExternalToStore
-                };
 
             foreach (var agreementGroups in agreements.GroupBy(c => c.Delivery.Producer.Id))
             {
@@ -126,10 +131,7 @@ namespace Sheaft.Application.DeliveryMode.Queries
 
         public async Task<IEnumerable<ProducerDeliveriesDto>> GetNotCapedProducersDeliveriesAsync(IEnumerable<ProducerDeliveriesDto> producersDeliveries, CancellationToken token)
         {
-            var producerIds = producersDeliveries.Select(c => c.Id);
             var deliveryModeIds = producersDeliveries.SelectMany(c => c.Deliveries.Select(d => d.Id));
-
-            var producers = await _context.FindAsync<Domain.Producer>(p => producerIds.Contains(p.Id), token);
             var deliveriesMode = await _context.FindAsync<Domain.DeliveryMode>(d => deliveryModeIds.Contains(d.Id), token);
 
             var producerDeliveriesHoursToCheck = new List<Tuple<Guid, Guid, DeliveryHourDto>>();

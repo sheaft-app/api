@@ -32,15 +32,19 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
             entity.HasOne(c => c.Producer).WithMany().HasForeignKey("ProducerUid").OnDelete(DeleteBehavior.Cascade);
             entity.HasMany(c => c.Ratings).WithOne().HasForeignKey("ProductUid").OnDelete(DeleteBehavior.Cascade);
             entity.HasMany(c => c.Tags).WithOne().HasForeignKey("ProductUid").OnDelete(DeleteBehavior.Cascade);
+            entity.HasMany(c => c.Closings).WithOne().HasForeignKey("ProductUid").OnDelete(DeleteBehavior.Cascade);
             entity.HasOne(c => c.Returnable).WithMany().HasForeignKey("ReturnableUid").OnDelete(DeleteBehavior.NoAction);
 
             entity.Ignore(c => c.DomainEvents);
             
-            var productTags = entity.Metadata.FindNavigation(nameof(Product.Tags));
-            productTags.SetPropertyAccessMode(PropertyAccessMode.Field);
+            var tags = entity.Metadata.FindNavigation(nameof(Product.Tags));
+            tags.SetPropertyAccessMode(PropertyAccessMode.Field);
 
-            var productRatings = entity.Metadata.FindNavigation(nameof(Product.Ratings));
-            productRatings.SetPropertyAccessMode(PropertyAccessMode.Field);
+            var ratings = entity.Metadata.FindNavigation(nameof(Product.Ratings));
+            ratings.SetPropertyAccessMode(PropertyAccessMode.Field);
+            
+            var closings = entity.Metadata.FindNavigation(nameof(Product.Closings));
+            closings.SetPropertyAccessMode(PropertyAccessMode.Field);
 
             entity.HasKey("Uid");
 

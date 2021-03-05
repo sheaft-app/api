@@ -17,6 +17,8 @@ namespace Sheaft.Application.Common.Interfaces
 {
     public interface IAppDbContext : IDisposable, IAsyncDisposable, IInfrastructure<IServiceProvider>, IDbContextDependencies, IDbSetCache, IDbContextPoolable, IResettableService
     {
+        public DbSet<TEntity> Set<TEntity>()
+            where TEntity : class;
         DbSet<Domain.Agreement> Agreements { get; set; }
         DbSet<BankAccount> BankAccounts { get; set; }
         DbSet<Domain.Country> Countries { get; set; }

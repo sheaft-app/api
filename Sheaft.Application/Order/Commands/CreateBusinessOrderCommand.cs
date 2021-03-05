@@ -65,8 +65,12 @@ namespace Sheaft.Application.Order.Commands
                 var products = await _context.FindByIdsAsync<Domain.Product>(productIds, token);
 
                 var invalidProductIds = products
-                    .Where(p => p.RemovedOn.HasValue || !p.Available || !p.VisibleToStores ||
-                                p.Producer.RemovedOn.HasValue)
+                    .Where(p => p.RemovedOn.HasValue 
+                                || !p.Available 
+                                || !p.VisibleToStores 
+                                || p.Producer.RemovedOn.HasValue 
+                                || p.Closings.Any(c => DateTimeOffset.Now >= c.ClosedFrom && DateTimeOffset.UtcNow <= c.ClosedTo)
+                                || p.Producer.Closings.Any(c => DateTimeOffset.Now >= c.ClosedFrom && DateTimeOffset.UtcNow <= c.ClosedTo))
                     .Select(p => p.Id.ToString("N"));
                 if (invalidProductIds.Any())
                     return Failure<IEnumerable<Guid>>(MessageKind.Order_CannotCreate_Some_Products_Invalid,
@@ -83,14 +87,16 @@ namespace Sheaft.Application.Order.Commands
                     _pspOptions.FixedAmount,
                     _pspOptions.Percent, _pspOptions.VatPercent);
 
-                var deliveryIds = request.ProducersExpectedDeliveries?.Select(p => p.DeliveryModeId) ??
-                                  new List<Guid>();
+                var deliveryIds = request.ProducersExpectedDeliveries.Select(p => p.DeliveryModeId);
                 var deliveries = deliveryIds.Any()
                     ? await _context.GetByIdsAsync<Domain.DeliveryMode>(deliveryIds, token)
                     : new List<Domain.DeliveryMode>();
                 var cartDeliveries = new List<Tuple<Domain.DeliveryMode, DateTimeOffset, string>>();
                 foreach (var delivery in deliveries)
                 {
+                    if(delivery.Closings.Any(c => DateTimeOffset.Now >= c.ClosedFrom && DateTimeOffset.UtcNow <= c.ClosedTo))
+                        return Failure<IEnumerable<Guid>>(MessageKind.Order_CannotCreate_Delivery_Closed, delivery.Name);
+                        
                     var cartDelivery =
                         request.ProducersExpectedDeliveries.FirstOrDefault(ped => ped.DeliveryModeId == delivery.Id);
                     cartDeliveries.Add(new Tuple<Domain.DeliveryMode, DateTimeOffset, string>(delivery,

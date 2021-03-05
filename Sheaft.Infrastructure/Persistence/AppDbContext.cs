@@ -34,7 +34,7 @@ namespace Sheaft.Infrastructure.Persistence
             _localizer = localizer;
             _mediatr = mediatr;
         }
-
+        
         public DbSet<Agreement> Agreements { get; set; }
         public DbSet<BankAccount> BankAccounts { get; set; }
         public DbSet<Country> Countries { get; set; }

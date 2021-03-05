@@ -55,6 +55,12 @@ namespace Sheaft.Application.Order.Commands
             var order = await _context.GetByIdAsync<Domain.Order>(request.OrderId, token);
             if (!order.Deliveries.Any())
                 return Failure<Guid>(MessageKind.Order_CannotPay_Deliveries_Required);
+
+            foreach (var delivery in order.Deliveries)
+            {
+                if(delivery.DeliveryMode.Closings.Any(c => DateTimeOffset.Now >= c.ClosedFrom && DateTimeOffset.UtcNow <= c.ClosedTo))
+                    return Failure<Guid>(MessageKind.Order_CannotCreate_Delivery_Closed, delivery.DeliveryMode.Name);
+            }
             
             var checkResult =
                 await _mediatr.Process(
@@ -68,8 +74,14 @@ namespace Sheaft.Application.Order.Commands
 
             var products = await _context.GetByIdsAsync<Domain.Product>(order.Products.Select(p => p.Id), token);
             var invalidProductIds = products
-                .Where(p => p.RemovedOn.HasValue || !p.Available || !p.VisibleToConsumers ||
-                            p.Producer.RemovedOn.HasValue || !p.Producer.CanDirectSell).Select(p => p.Id.ToString("N"));
+                .Where(p => p.RemovedOn.HasValue 
+                            || !p.Available 
+                            || !p.VisibleToConsumers 
+                            || p.Producer.RemovedOn.HasValue 
+                            || !p.Producer.CanDirectSell
+                            || p.Closings.Any(c => DateTimeOffset.Now >= c.ClosedFrom && DateTimeOffset.UtcNow <= c.ClosedTo)
+                            || p.Producer.Closings.Any(c => DateTimeOffset.Now >= c.ClosedFrom && DateTimeOffset.UtcNow <= c.ClosedTo))
+                .Select(p => p.Id.ToString("N"));
 
             if (invalidProductIds.Any())
                 return Failure<Guid>(MessageKind.Order_CannotPay_Some_Products_Invalid,

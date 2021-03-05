@@ -8,7 +8,8 @@ namespace Sheaft.Application.Common.Extensions
 {
     public static class ContextExtension
     {
-        public static IQueryable<T> Get<T>(this DbSet<T> dbset, Expression<Func<T, bool>> where = null, bool noTracking = false) where T:class, ITrackRemove
+        public static IQueryable<T> Get<T>(this DbSet<T> dbset, Expression<Func<T, bool>> where = null,
+            bool noTracking = false) where T : class, ITrackRemove
         {
             var query = dbset.Where(d => !d.RemovedOn.HasValue);
 
@@ -21,7 +22,8 @@ namespace Sheaft.Application.Common.Extensions
             return query.Where(where);
         }
 
-        public static IQueryable<T> Get<T>(this IQueryable<T> dbset, Expression<Func<T, bool>> where = null, bool noTracking = false) where T : class, ITrackRemove
+        public static IQueryable<T> Get<T>(this IQueryable<T> dbset, Expression<Func<T, bool>> where = null,
+            bool noTracking = false) where T : class, ITrackRemove
         {
             var query = dbset.Where(d => !d.RemovedOn.HasValue);
 
