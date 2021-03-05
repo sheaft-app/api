@@ -36,7 +36,7 @@ namespace Sheaft.Application.Order.Queries
         public IQueryable<OrderDto> GetOrders(RequestUser currentUser)
         {
             return _context.Orders
-                    .Get(c => c.User.Id == currentUser.Id && c.Status != OrderStatus.Expired)
+                    .Get(c => c.Status == OrderStatus.Validated)
                     .ProjectTo<OrderDto>(_configurationProvider);
         }
 

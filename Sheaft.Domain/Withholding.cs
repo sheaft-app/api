@@ -13,7 +13,7 @@ namespace Sheaft.Domain
         }
 
         public Withholding(Guid id, decimal amount, Wallet debitedWallet, Wallet creditedWallet)
-            : base(id, TransactionKind.Transfer, debitedWallet.User)
+            : base(id, TransactionKind.Withholding, debitedWallet.User)
         {
             Fees = 0;
             Debited = amount;

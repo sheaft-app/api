@@ -54,11 +54,12 @@ namespace Sheaft.Web.Api
             services.AddType<SuggestProducerType>();
             services.AddType<ProductType>();
             services.AddType<OrderType>();
-            services.AddType<TransactionType>();
+            services.AddType<DonationType>();
             services.AddType<WebPayinType>();
             services.AddType<PayinType>();
             services.AddType<TransferType>();
             services.AddType<PayoutType>();
+            services.AddType<WithholdingType>();
             services.AddType<DocumentType>();
             services.AddType<PageType>();
             services.AddType<BusinessLegalType>();
@@ -69,6 +70,7 @@ namespace Sheaft.Web.Api
             services.AddType<PictureType>();
             services.AddType<OrderProductType>();
             services.AddType<OrderDeliveryType>();
+            services.AddType<BankAccountType>();
 
             services.AddType<AddressKindEnumType>();
             services.AddType<AgreementStatusEnumType>();

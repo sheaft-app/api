@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Sheaft.Application.Common.Models.Dto;
 using Sheaft.Application.Common.Models.ViewModels;
 
 namespace Sheaft.Application.Common.Mappings
@@ -7,6 +8,12 @@ namespace Sheaft.Application.Common.Mappings
     {
         public WithholdingProfile()
         {
+            CreateMap<Domain.Withholding, TransactionDto>();
+
+            CreateMap<Domain.Withholding, WithholdingDto>()
+                .IncludeBase<Domain.Withholding, TransactionDto>()
+                .ForMember(m => m.CreditedUser, opt => opt.MapFrom(t => t.CreditedWallet.User));
+
             CreateMap<Domain.Withholding, WithholdingShortViewModel>();
             CreateMap<Domain.Withholding, WithholdingViewModel>()
                 .ForMember(m => m.Author, opt => opt.MapFrom(t => t.Author))

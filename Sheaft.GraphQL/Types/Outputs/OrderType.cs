@@ -49,9 +49,6 @@ namespace Sheaft.GraphQL.Types.Outputs
             
             descriptor.Field(c => c.Deliveries)
                 .Type<ListType<OrderDeliveryType>>();
-            
-            descriptor.Field(c => c.Payin)
-                .Type<PayinType>();
         }
     }
 }
