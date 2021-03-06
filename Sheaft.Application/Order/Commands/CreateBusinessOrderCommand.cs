@@ -111,7 +111,7 @@ namespace Sheaft.Application.Order.Commands
                 order.SetDeliveries(cartDeliveries);
                 order.SetStatus(OrderStatus.Validated);
 
-                var validatedDeliveries = await ValidateCapedDeliveriesAsync(order.Deliveries, token);
+                var validatedDeliveries = await _capingDeliveriesService.ValidateCapedDeliveriesAsync(order.Deliveries, token);
                 if (!validatedDeliveries.Succeeded)
                     return Failure<IEnumerable<Guid>>(validatedDeliveries.Exception);
 
@@ -151,56 +151,6 @@ namespace Sheaft.Application.Order.Commands
 
                 return Success(purchaseOrderIds.AsEnumerable());
             }
-        }
-
-        private async Task<Result<bool>> ValidateCapedDeliveriesAsync(
-            IReadOnlyCollection<OrderDelivery> orderDeliveries, CancellationToken token)
-        {
-            if (orderDeliveries.All(d => !d.DeliveryMode.MaxPurchaseOrdersPerTimeSlot.HasValue))
-                return Success(true);
-
-            var results = await _capingDeliveriesService.GetCapingDeliveriesAsync(
-                orderDeliveries.Where(d => d.DeliveryMode.MaxPurchaseOrdersPerTimeSlot.HasValue).Select(d =>
-                    new Tuple<Guid, Guid, DeliveryHourDto>(
-                        d.DeliveryMode.Producer.Id,
-                        d.DeliveryMode.Id,
-                        new DeliveryHourDto
-                        {
-                            Day = d.ExpectedDelivery.ExpectedDeliveryDate.DayOfWeek,
-                            ExpectedDeliveryDate = d.ExpectedDelivery.ExpectedDeliveryDate,
-                            From = d.ExpectedDelivery.From,
-                            To = d.ExpectedDelivery.To,
-                        })
-                ), token);
-
-            if (!results.Succeeded)
-                return Failure<bool>(results.Exception);
-
-            foreach (var orderDelivery in orderDeliveries)
-            {
-                var delivery = results.Data.FirstOrDefault(d => d.DeliveryId == orderDelivery.Id
-                                                                && d.ExpectedDate.Year == orderDelivery.ExpectedDelivery
-                                                                    .ExpectedDeliveryDate.Year
-                                                                && d.ExpectedDate.Month ==
-                                                                orderDelivery.ExpectedDelivery.ExpectedDeliveryDate
-                                                                    .Month
-                                                                && d.ExpectedDate.Day == orderDelivery.ExpectedDelivery
-                                                                    .ExpectedDeliveryDate.Day
-                                                                && d.From == orderDelivery.ExpectedDelivery.From
-                                                                && d.To == orderDelivery.ExpectedDelivery.To);
-
-                if (delivery == null)
-                    continue;
-
-                if (delivery.Count >= orderDelivery.DeliveryMode.MaxPurchaseOrdersPerTimeSlot)
-                    return Failure<bool>(new ValidationException(
-                        MessageKind.Order_CannotPay_Delivery_Max_PurchaseOrders_Reached,
-                        orderDelivery.DeliveryMode.Producer.Name,
-                        $"le {orderDelivery.ExpectedDelivery.ExpectedDeliveryDate:dd/MM/yyyy} entre {orderDelivery.ExpectedDelivery.From:hh\\hmm} et {orderDelivery.ExpectedDelivery.To:hh\\hmm}",
-                        orderDelivery.DeliveryMode.MaxPurchaseOrdersPerTimeSlot));
-            }
-
-            return Success(true);
         }
     }
 }
