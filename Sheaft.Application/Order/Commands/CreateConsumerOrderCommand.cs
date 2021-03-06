@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
@@ -52,20 +53,18 @@ namespace Sheaft.Application.Order.Commands
         public async Task<Result<Guid>> Handle(CreateConsumerOrderCommand request, CancellationToken token)
         {
             var productIds = request.Products.Select(p => p.Id);
-            var products = await _context.FindByIdsAsync<Domain.Product>(productIds, token);
-
+            var products = await _context.Products.Where(p => productIds.Contains(p.Id)).ToListAsync(token);
             var invalidProductIds = products
-                .Where(p => p.RemovedOn.HasValue 
-                            || !p.Available 
-                            || !p.VisibleToConsumers 
-                            || p.Producer.RemovedOn.HasValue 
-                            || !p.Producer.CanDirectSell
-                            || p.Closings.Any(c => DateTimeOffset.Now >= c.ClosedFrom && DateTimeOffset.UtcNow <= c.ClosedTo)
-                            || p.Producer.Closings.Any(c => DateTimeOffset.Now >= c.ClosedFrom && DateTimeOffset.UtcNow <= c.ClosedTo))
+                .Where(p => 
+                    p.RemovedOn.HasValue 
+                    || !p.Available 
+                    || !p.VisibleToConsumers 
+                    || p.Producer.RemovedOn.HasValue 
+                    || !p.Producer.CanDirectSell)
                 .Select(p => p.Id.ToString("N"));
             
             if (invalidProductIds.Any())
-                return Failure<Guid>(MessageKind.Order_CannotCreate_Some_Products_Invalid,
+                return Failure<Guid>(MessageKind.Order_CannotCreate_Some_Products_NotAvailable,
                     string.Join(";", invalidProductIds));
 
             var cartProducts = new Dictionary<Domain.Product, int>();
@@ -93,6 +92,23 @@ namespace Sheaft.Application.Order.Commands
                 
                 var cartDelivery =
                     request.ProducersExpectedDeliveries.FirstOrDefault(ped => ped.DeliveryModeId == delivery.Id);
+                
+                if(delivery.Closings.Any(c => cartDelivery.ExpectedDeliveryDate >= c.ClosedFrom && cartDelivery.ExpectedDeliveryDate <= c.ClosedTo))
+                    return Failure<Guid>(MessageKind.Order_CannotCreate_Delivery_Closed, delivery.Name, delivery.Producer.Name);
+                    
+                if(cartProducts.Any(p => p.Key.Producer.Id == delivery.Producer.Id && p.Key.Producer.Closings.Any(c => cartDelivery.ExpectedDeliveryDate >= c.ClosedFrom && cartDelivery.ExpectedDeliveryDate <= c.ClosedTo)))
+                    return Failure<Guid>(MessageKind.Order_CannotCreate_Producer_Closed, delivery.Producer.Name);
+
+                invalidProductIds = cartProducts.Where(p =>
+                        p.Key.Producer.Id == delivery.Producer.Id && p.Key.Closings.Any(c =>
+                            cartDelivery.ExpectedDeliveryDate >= c.ClosedFrom &&
+                            cartDelivery.ExpectedDeliveryDate <= c.ClosedTo))
+                    .Select(p => p.Key.Id.ToString("N"));
+                    
+                if(invalidProductIds.Any())
+                    return Failure<Guid>(MessageKind.Order_CannotCreate_Some_Products_Closed,
+                        string.Join(";", invalidProductIds));
+                
                 cartDeliveries.Add(new Tuple<Domain.DeliveryMode, DateTimeOffset, string>(delivery,
                     cartDelivery.ExpectedDeliveryDate, cartDelivery.Comment));
             }

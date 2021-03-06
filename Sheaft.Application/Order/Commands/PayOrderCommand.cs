@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
@@ -78,19 +79,18 @@ namespace Sheaft.Application.Order.Commands
             if (!validatedDeliveries.Succeeded)
                 return Failure<Guid>(validatedDeliveries.Exception);
 
-            var products = await _context.GetByIdsAsync<Domain.Product>(order.Products.Select(p => p.Id), token);
+            var products = await _context.Products.Where(p => order.Products.Select(p => p.Id).Contains(p.Id)).ToListAsync(token);
             var invalidProductIds = products
-                .Where(p => p.RemovedOn.HasValue 
-                            || !p.Available 
-                            || !p.VisibleToConsumers 
-                            || p.Producer.RemovedOn.HasValue 
-                            || !p.Producer.CanDirectSell
-                            || p.Closings.Any(c => DateTimeOffset.Now >= c.ClosedFrom && DateTimeOffset.UtcNow <= c.ClosedTo)
-                            || p.Producer.Closings.Any(c => DateTimeOffset.Now >= c.ClosedFrom && DateTimeOffset.UtcNow <= c.ClosedTo))
+                .Where(p => 
+                    p.RemovedOn.HasValue 
+                    || !p.Available 
+                    || !p.VisibleToConsumers 
+                    || p.Producer.RemovedOn.HasValue 
+                    || !p.Producer.CanDirectSell)
                 .Select(p => p.Id.ToString("N"));
 
             if (invalidProductIds.Any())
-                return Failure<Guid>(MessageKind.Order_CannotPay_Some_Products_Invalid,
+                return Failure<Guid>(MessageKind.Order_CannotPay_Some_Products_NotAvailable,
                     string.Join(";", invalidProductIds));
 
             using (var transaction = await _context.BeginTransactionAsync(token))

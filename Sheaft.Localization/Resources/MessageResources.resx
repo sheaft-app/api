@@ -522,20 +522,47 @@
   <data name="Order_Total_CannotBe_LowerThan" xml:space="preserve">
     <value>Le total du panier ne peut pas être inférieur à {0}€</value>
   </data>
-  <data name="Order_CannotCreate_Some_Products_Invalid" xml:space="preserve">
-    <value>Impossible de créer le panier, certains produits sont invalides: {0}</value>
+  <data name="Order_CannotCreate_Some_Products_NotAvailable" xml:space="preserve">
+    <value>Impossible de créer le panier, certains produits: {0}, sont actuellement indisponibles.</value>
   </data>
-  <data name="Order_CannotUpdate_Some_Products_Invalid" xml:space="preserve">
-    <value>Impossible de mettre à jour le panier, certains produits sont invalides: {0}</value>
+  <data name="Order_CannotUpdate_Some_Products_NotAvailable" xml:space="preserve">
+    <value>Impossible de mettre à jour le panier, certains produits: {0}, sont actuellement indisponibles.</value>
+  </data>
+  <data name="Order_CannotPay_Some_Products_NotAvailable" xml:space="preserve">
+    <value>Impossible de créer un ordre de paiement pour le panier, certains produits: {0}, sont actuellement indisponibles.</value>
+  </data>
+  <data name="Order_CannotCreate_Some_Products_Closed" xml:space="preserve">
+    <value>Impossible de créer le panier, certains produits: {0}, sont indisponibles à la date de livraison selectionnée: {0}</value>
+  </data>
+  <data name="Order_CannotUpdate_Some_Products_Closed" xml:space="preserve">
+    <value>Impossible de mettre à jour le panier, certains produits: {0}, sont indisponibles à la date de livraison selectionnée: {0}</value>
+  </data>
+  <data name="Order_CannotPay_Some_Products_Closed" xml:space="preserve">
+    <value>Impossible de créer un ordre de paiement pour le panier, certains produits: {0}, sont indisponibles à la date de livraison selectionnée.</value>
+  </data>
+  <data name="Order_CannotCreate_Some_Delivery_Closed" xml:space="preserve">
+    <value>Impossible de créer le panier, le point de livraison {0} du producteur {1} est indisponible à la date de livraison selectionnée.</value>
+  </data>
+  <data name="Order_CannotUpdate_Some_Delivery_Closed" xml:space="preserve">
+    <value>Impossible de mettre à jour le panier, le point de livraison {0} du producteur {1} est indisponible à la date de livraison selectionnée.</value>
+  </data>
+  <data name="Order_CannotPay_Some_Delivery_Closed" xml:space="preserve">
+    <value>Impossible de créer un ordre de paiement pour le panier, le point de livraison {0} du producteur {1} est indisponible à la date de livraison selectionnée.</value>
+  </data>
+  <data name="Order_CannotCreate_Some_Producer_Closed" xml:space="preserve">
+    <value>Impossible de créer le panier, le producteur {0} est indisponible à la date de livraison selectionnée.</value>
+  </data>
+  <data name="Order_CannotUpdate_Some_Producer_Closed" xml:space="preserve">
+    <value>Impossible de mettre à jour le panier, le producteur {0} est indisponible à la date de livraison selectionnée.</value>
+  </data>
+  <data name="Order_CannotPay_Some_Producer_Closed" xml:space="preserve">
+    <value>Impossible de créer un ordre de paiement pour le panier, le producteur {0} est indisponible à la date de livraison selectionnée.</value>
   </data>
   <data name="Order_CannotCreate_Deliveries_Required" xml:space="preserve">
     <value>Impossible de créer le panier, les dates de livraisons sont manquantes</value>
   </data>
   <data name="Order_CannotPay_Deliveries_Required" xml:space="preserve">
     <value>Impossible de créer un ordre de paiement pour le panier, les dates de livraisons sont manquantes</value>
-  </data>
-  <data name="Order_CannotPay_Some_Products_Invalid" xml:space="preserve">
-    <value>Impossible de créer un ordre de paiement pour le panier, certains produits sont invalides: {0}</value>
   </data>
   <data name="Order_CannotRetry_NotIn_Refused_Status" xml:space="preserve">
     <value>Impossible de relancer un ordre de paiement pour le panier, il n'est pas dans un état de paiement refusé</value>

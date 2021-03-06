@@ -19,7 +19,7 @@ namespace Sheaft.Localization.Resources {
     // class via a tool like ResGen or Visual Studio.
     // To add or remove a member, edit your .ResX file then rerun ResGen
     // with the /str option, or rebuild your VS project.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "16.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "4.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     internal class MessageResources {
@@ -916,11 +916,38 @@ namespace Sheaft.Localization.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Impossible de créer le panier, certains produits sont invalides: {0}.
+        ///   Looks up a localized string similar to Impossible de créer le panier, le point de livraison {0} du producteur {1} est indisponible à la date de livraison selectionnée..
         /// </summary>
-        internal static string Order_CannotCreate_Some_Products_Invalid {
+        internal static string Order_CannotCreate_Some_Delivery_Closed {
             get {
-                return ResourceManager.GetString("Order_CannotCreate_Some_Products_Invalid", resourceCulture);
+                return ResourceManager.GetString("Order_CannotCreate_Some_Delivery_Closed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Impossible de créer le panier, le producteur {0} est indisponible à la date de livraison selectionnée..
+        /// </summary>
+        internal static string Order_CannotCreate_Some_Producer_Closed {
+            get {
+                return ResourceManager.GetString("Order_CannotCreate_Some_Producer_Closed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Impossible de créer le panier, certains produits: {0}, sont indisponibles à la date de livraison selectionnée: {0}.
+        /// </summary>
+        internal static string Order_CannotCreate_Some_Products_Closed {
+            get {
+                return ResourceManager.GetString("Order_CannotCreate_Some_Products_Closed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Impossible de créer le panier, certains produits: {0}, sont actuellement indisponibles..
+        /// </summary>
+        internal static string Order_CannotCreate_Some_Products_NotAvailable {
+            get {
+                return ResourceManager.GetString("Order_CannotCreate_Some_Products_NotAvailable", resourceCulture);
             }
         }
         
@@ -943,11 +970,38 @@ namespace Sheaft.Localization.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Impossible de créer un ordre de paiement pour le panier, certains produits sont invalides: {0}.
+        ///   Looks up a localized string similar to Impossible de créer un ordre de paiement pour le panier, le point de livraison {0} du producteur {1} est indisponible à la date de livraison selectionnée..
         /// </summary>
-        internal static string Order_CannotPay_Some_Products_Invalid {
+        internal static string Order_CannotPay_Some_Delivery_Closed {
             get {
-                return ResourceManager.GetString("Order_CannotPay_Some_Products_Invalid", resourceCulture);
+                return ResourceManager.GetString("Order_CannotPay_Some_Delivery_Closed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Impossible de créer un ordre de paiement pour le panier, le producteur {0} est indisponible à la date de livraison selectionnée..
+        /// </summary>
+        internal static string Order_CannotPay_Some_Producer_Closed {
+            get {
+                return ResourceManager.GetString("Order_CannotPay_Some_Producer_Closed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Impossible de créer un ordre de paiement pour le panier, certains produits: {0}, sont indisponibles à la date de livraison selectionnée..
+        /// </summary>
+        internal static string Order_CannotPay_Some_Products_Closed {
+            get {
+                return ResourceManager.GetString("Order_CannotPay_Some_Products_Closed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Impossible de créer un ordre de paiement pour le panier, certains produits: {0}, sont actuellement indisponibles..
+        /// </summary>
+        internal static string Order_CannotPay_Some_Products_NotAvailable {
+            get {
+                return ResourceManager.GetString("Order_CannotPay_Some_Products_NotAvailable", resourceCulture);
             }
         }
         
@@ -961,11 +1015,38 @@ namespace Sheaft.Localization.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Impossible de mettre à jour le panier, certains produits sont invalides: {0}.
+        ///   Looks up a localized string similar to Impossible de mettre à jour le panier, le point de livraison {0} du producteur {1} est indisponible à la date de livraison selectionnée..
         /// </summary>
-        internal static string Order_CannotUpdate_Some_Products_Invalid {
+        internal static string Order_CannotUpdate_Some_Delivery_Closed {
             get {
-                return ResourceManager.GetString("Order_CannotUpdate_Some_Products_Invalid", resourceCulture);
+                return ResourceManager.GetString("Order_CannotUpdate_Some_Delivery_Closed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Impossible de mettre à jour le panier, le producteur {0} est indisponible à la date de livraison selectionnée..
+        /// </summary>
+        internal static string Order_CannotUpdate_Some_Producer_Closed {
+            get {
+                return ResourceManager.GetString("Order_CannotUpdate_Some_Producer_Closed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Impossible de mettre à jour le panier, certains produits: {0}, sont indisponibles à la date de livraison selectionnée: {0}.
+        /// </summary>
+        internal static string Order_CannotUpdate_Some_Products_Closed {
+            get {
+                return ResourceManager.GetString("Order_CannotUpdate_Some_Products_Closed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Impossible de mettre à jour le panier, certains produits: {0}, sont actuellement indisponibles..
+        /// </summary>
+        internal static string Order_CannotUpdate_Some_Products_NotAvailable {
+            get {
+                return ResourceManager.GetString("Order_CannotUpdate_Some_Products_NotAvailable", resourceCulture);
             }
         }
         
@@ -2293,7 +2374,7 @@ namespace Sheaft.Localization.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Une erreur inatendue est survenue.
+        ///   Looks up a localized string similar to Une erreur inattendue est survenue.
         /// </summary>
         internal static string Unexpected {
             get {

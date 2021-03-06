@@ -51,8 +51,7 @@ namespace Sheaft.Application.DeliveryMode.Queries
             var deliveriesMode = await _context.FindAsync<Domain.DeliveryMode>(d => 
                 d.Available 
                 && producerIds.Contains(d.Producer.Id) 
-                && kinds.Contains(d.Kind)
-                && (!d.Closings.Any() || d.Closings.Any(c => DateTimeOffset.Now < c.ClosedFrom || DateTimeOffset.UtcNow > c.ClosedTo)), token);
+                && kinds.Contains(d.Kind), token);
 
             var deliveriesProducerIds = deliveriesMode.Select(c => c.Producer.Id).Distinct();
             var producerDistinctIds = producerIds.Distinct();
@@ -94,8 +93,7 @@ namespace Sheaft.Application.DeliveryMode.Queries
                 && producerIds.Contains(d.Delivery.Producer.Id) 
                 && d.Store.Id == storeId 
                 && d.Status == AgreementStatus.Accepted 
-                && kinds.Contains(d.Delivery.Kind)
-                && (!d.Delivery.Closings.Any() || d.Delivery.Closings.Any(c => DateTimeOffset.Now < c.ClosedFrom || DateTimeOffset.UtcNow > c.ClosedTo)), token);
+                && kinds.Contains(d.Delivery.Kind), token);
 
             var agreementProducerIds = agreements.Select(c => c.Delivery.Producer.Id).Distinct();
             var producerDistinctIds = producerIds.Distinct();
@@ -212,11 +210,14 @@ namespace Sheaft.Application.DeliveryMode.Queries
                     Zipcode = deliveryMode.Address.Zipcode
                 } : null,
                 Name = deliveryMode.Name,
-                DeliveryHours = GetAvailableDeliveryHours(openingHours, currentDate, deliveryMode.LockOrderHoursBeforeDelivery),
+                DeliveryHours = GetAvailableDeliveryHours(openingHours, currentDate, deliveryMode.LockOrderHoursBeforeDelivery, deliveryMode.Producer.Closings, deliveryMode.Closings),
             };
         }
 
-        private IEnumerable<DeliveryHourDto> GetAvailableDeliveryHours(IEnumerable<TimeSlotHour> openingHours, DateTimeOffset currentDate, int? lockOrderHoursBeforeDelivery)
+        private IEnumerable<DeliveryHourDto> GetAvailableDeliveryHours(IEnumerable<TimeSlotHour> openingHours,
+            DateTimeOffset currentDate, int? lockOrderHoursBeforeDelivery,
+            IReadOnlyCollection<Domain.BusinessClosing> producerClosings,
+            IReadOnlyCollection<Domain.DeliveryClosing> deliveryClosings)
         {
             var list = new List<DeliveryHourDto>();
             foreach (var openingHour in openingHours.OrderBy(oh => oh.Day))
@@ -226,7 +227,7 @@ namespace Sheaft.Application.DeliveryMode.Queries
                 while (results.Count < 2 && increment < 31)
                 {
                     var diff = (int)openingHour.Day + increment - (int)currentDate.DayOfWeek;
-                    var result = GetDeliveryHourIfMatch(currentDate, openingHour, diff, lockOrderHoursBeforeDelivery);
+                    var result = GetDeliveryHourIfMatch(openingHour, currentDate, lockOrderHoursBeforeDelivery, diff, producerClosings, deliveryClosings);
                     if (result != null)
                         results.Add(result);
 
@@ -240,10 +241,19 @@ namespace Sheaft.Application.DeliveryMode.Queries
             return list;
         }
 
-        private DeliveryHourDto GetDeliveryHourIfMatch(DateTimeOffset currentDate, TimeSlotHour openingHour, int diff, int? lockOrderHoursBeforeDelivery)
+        private DeliveryHourDto GetDeliveryHourIfMatch(TimeSlotHour openingHour, 
+            DateTimeOffset currentDate, int? lockOrderHoursBeforeDelivery, int diff,
+            IReadOnlyCollection<Domain.BusinessClosing> producerClosings,
+            IReadOnlyCollection<Domain.DeliveryClosing> deliveryClosings)
         {
             var targetDate = new DateTime(currentDate.Year, currentDate.Month, currentDate.Day, openingHour.From.Hours, openingHour.From.Minutes, openingHour.From.Seconds).AddDays(diff);
             if (currentDate.AddHours(lockOrderHoursBeforeDelivery ?? 0) >= targetDate)
+                return null;
+            
+            if(deliveryClosings != null && deliveryClosings.Any(c => targetDate >= c.ClosedFrom && targetDate <= c.ClosedTo))
+                return null;
+            
+            if(producerClosings != null && producerClosings.Any(c => targetDate >= c.ClosedFrom && targetDate <= c.ClosedTo))
                 return null;
 
             return new DeliveryHourDto
