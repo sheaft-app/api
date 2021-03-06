@@ -224,7 +224,7 @@ namespace Sheaft.Application.DeliveryMode.Queries
             {
                 var results = new List<DeliveryHourDto>();
                 var increment = 0;
-                while (results.Count < 2 && increment < 31)
+                while (results.Count < 2 && increment < 365)
                 {
                     var diff = (int)openingHour.Day + increment - (int)currentDate.DayOfWeek;
                     var result = GetDeliveryHourIfMatch(openingHour, currentDate, lockOrderHoursBeforeDelivery, diff, producerClosings, deliveryClosings);
