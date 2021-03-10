@@ -1,0 +1,101 @@
+trigger:
+  batch: true
+stages:
+- stage: __default
+  jobs:
+  - job: Job
+    pool:
+      vmImage: "ubuntu-latest"
+    steps:
+    - task: CmdLine@2
+      inputs:
+        script: |
+          dotnet restore $(System.DefaultWorkingDirectory)/Sheaft.sln
+          dotnet build $(System.DefaultWorkingDirectory)/Sheaft.sln -c Release --no-restore
+          dotnet test $(System.DefaultWorkingDirectory)/Sheaft.sln -c Release --no-restore --no-build
+          dotnet publish $(System.DefaultWorkingDirectory)/Sheaft.Web.Api/Sheaft.Web.Api.csproj -c Release --no-restore --no-build --output publish_output/Sheaft.Web.Api/release/
+          dotnet publish $(System.DefaultWorkingDirectory)/Sheaft.Web.Jobs/Sheaft.Web.Jobs.csproj -c Release --no-restore --no-build --output publish_output/Sheaft.Web.Jobs/release/
+          dotnet publish $(System.DefaultWorkingDirectory)/Sheaft.Web.Payment/Sheaft.Web.Payment.csproj -c Release --no-restore --no-build --output publish_output/Sheaft.Web.Payment/release/
+          dotnet publish $(System.DefaultWorkingDirectory)/Sheaft.Web.Signalr/Sheaft.Web.Signalr.csproj -c Release --no-restore --no-build --output publish_output/Sheaft.Web.Signalr/release/
+          dotnet publish $(System.DefaultWorkingDirectory)/Sheaft.Web.Manage/Sheaft.Web.Manage.csproj -c Release --no-restore --no-build --output publish_output/Sheaft.Web.Manage/release/
+    - task: DeleteFiles@1
+      displayName: "Delete GRAPHQL NewRelic"
+      inputs:
+        SourceFolder: '$(System.DefaultWorkingDirectory)/publish_output/Sheaft.Web.Api/release/newrelic'
+        Contents: '*'
+    - task: ArchiveFiles@2
+      displayName: "Archive GRAPHQL"
+      inputs:
+        rootFolderOrFile: "$(System.DefaultWorkingDirectory)/publish_output/Sheaft.Web.Api/release"
+        includeRootFolder: false
+        archiveFile: "$(System.DefaultWorkingDirectory)/publish_output/Sheaft.Web.Api/build$(Build.BuildId).zip"
+    - task: PublishBuildArtifacts@1
+      displayName: "Publish GRAPHQL"
+      inputs:
+        PathtoPublish: '$(System.DefaultWorkingDirectory)/publish_output/Sheaft.Web.Api/build$(Build.BuildId).zip'
+        artifactName: 'sheaft-graphql-dev'
+    - task: DeleteFiles@1
+      displayName: "Delete JOBS NewRelic"
+      inputs:
+        SourceFolder: '$(System.DefaultWorkingDirectory)/publish_output/Sheaft.Web.Jobs/release/newrelic'
+        Contents: '*'
+    - task: ArchiveFiles@2
+      displayName: "Archive JOBS"
+      inputs:
+        rootFolderOrFile: "$(System.DefaultWorkingDirectory)/publish_output/Sheaft.Web.Jobs/release"
+        includeRootFolder: false
+        archiveFile: "$(System.DefaultWorkingDirectory)/publish_output/Sheaft.Web.Jobs/build$(Build.BuildId).zip"
+    - task: PublishBuildArtifacts@1
+      displayName: "Publish JOBS"
+      inputs:
+        PathtoPublish: '$(System.DefaultWorkingDirectory)/publish_output/Sheaft.Web.Jobs/build$(Build.BuildId).zip'
+        artifactName: 'sheaft-jobs-dev'
+    - task: DeleteFiles@1
+      displayName: "Delete PAYMENT NewRelic"
+      inputs:
+        SourceFolder: '$(System.DefaultWorkingDirectory)/publish_output/Sheaft.Web.Payment/release/newrelic'
+        Contents: '*'
+    - task: ArchiveFiles@2
+      displayName: "Archive PAYMENT"
+      inputs:
+        rootFolderOrFile: "$(System.DefaultWorkingDirectory)/publish_output/Sheaft.Web.Payment/release"
+        includeRootFolder: false
+        archiveFile: "$(System.DefaultWorkingDirectory)/publish_output/Sheaft.Web.Payment/build$(Build.BuildId).zip"
+    - task: PublishBuildArtifacts@1
+      displayName: "Publish PAYMENT"
+      inputs:
+        PathtoPublish: '$(System.DefaultWorkingDirectory)/publish_output/Sheaft.Web.Payment/build$(Build.BuildId).zip'
+        artifactName: 'sheaft-payment-dev'
+    - task: DeleteFiles@1
+      displayName: "Delete SIGNALR NewRelic"
+      inputs:
+        SourceFolder: '$(System.DefaultWorkingDirectory)/publish_output/Sheaft.Web.Signalr/release/newrelic'
+        Contents: '*'
+    - task: ArchiveFiles@2
+      displayName: "Archive SIGNALR"
+      inputs:
+        rootFolderOrFile: "$(System.DefaultWorkingDirectory)/publish_output/Sheaft.Web.Signalr/release"
+        includeRootFolder: false
+        archiveFile: "$(System.DefaultWorkingDirectory)/publish_output/Sheaft.Web.Signalr/build$(Build.BuildId).zip"
+    - task: PublishBuildArtifacts@1
+      displayName: "Publish SIGNALR"
+      inputs:
+        PathtoPublish: '$(System.DefaultWorkingDirectory)/publish_output/Sheaft.Web.Signalr/build$(Build.BuildId).zip'
+        artifactName: 'sheaft-signalr-dev'
+    - task: DeleteFiles@1
+      displayName: "Delete MANAGE NewRelic"
+      inputs:
+        SourceFolder: '$(System.DefaultWorkingDirectory)/publish_output/Sheaft.Web.Manage/release/newrelic'
+        Contents: '*'
+    - task: ArchiveFiles@2
+      displayName: "Archive MANAGE"
+      inputs:
+        rootFolderOrFile: "$(System.DefaultWorkingDirectory)/publish_output/Sheaft.Web.Manage/release"
+        includeRootFolder: false
+        archiveFile: "$(System.DefaultWorkingDirectory)/publish_output/Sheaft.Web.Manage/build$(Build.BuildId).zip"
+    - task: PublishBuildArtifacts@1
+      displayName: "Publish MANAGE"
+      inputs:
+        PathtoPublish: '$(System.DefaultWorkingDirectory)/publish_output/Sheaft.Web.Manage/build$(Build.BuildId).zip'
+        artifactName: 'sheaft-manage-dev'
+
