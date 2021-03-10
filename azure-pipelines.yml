@@ -14,26 +14,26 @@ steps:
       dotnet restore $(System.DefaultWorkingDirectory)/Sheaft.sln
       dotnet build $(System.DefaultWorkingDirectory)/Sheaft.sln -c Release --no-restore
       dotnet test $(System.DefaultWorkingDirectory)/Sheaft.sln -c Release --no-restore --no-build
-      dotnet publish $(System.DefaultWorkingDirectory)/Sheaft.Web.Api/Sheaft.Web.Api.csproj -c Release --no-restore --no-build --output publish_output/Sheaft.Web.Api/
-      dotnet publish $(System.DefaultWorkingDirectory)/Sheaft.Web.Jobs/Sheaft.Web.Jobs.csproj -c Release --no-restore --no-build --output publish_output/Sheaft.Web.Jobs/
-      dotnet publish $(System.DefaultWorkingDirectory)/Sheaft.Web.Payment/Sheaft.Web.Payment.csproj -c Release --no-restore --no-build --output publish_output/Sheaft.Web.Payment/
-      dotnet publish $(System.DefaultWorkingDirectory)/Sheaft.Web.Signalr/Sheaft.Web.Signalr.csproj -c Release --no-restore --no-build --output publish_output/Sheaft.Web.Signalr/
-      dotnet publish $(System.DefaultWorkingDirectory)/Sheaft.Web.Manage/Sheaft.Web.Manage.csproj -c Release --no-restore --no-build --output publish_output/Sheaft.Web.Manage/
+      dotnet publish $(System.DefaultWorkingDirectory)/Sheaft.Web.Api/Sheaft.Web.Api.csproj -c Release --no-restore --no-build --output publish_output/Sheaft.Web.Api/release/
+      dotnet publish $(System.DefaultWorkingDirectory)/Sheaft.Web.Jobs/Sheaft.Web.Jobs.csproj -c Release --no-restore --no-build --output publish_output/Sheaft.Web.Jobs/release/
+      dotnet publish $(System.DefaultWorkingDirectory)/Sheaft.Web.Payment/Sheaft.Web.Payment.csproj -c Release --no-restore --no-build --output publish_output/Sheaft.Web.Payment/release/
+      dotnet publish $(System.DefaultWorkingDirectory)/Sheaft.Web.Signalr/Sheaft.Web.Signalr.csproj -c Release --no-restore --no-build --output publish_output/Sheaft.Web.Signalr/release/
+      dotnet publish $(System.DefaultWorkingDirectory)/Sheaft.Web.Manage/Sheaft.Web.Manage.csproj -c Release --no-restore --no-build --output publish_output/Sheaft.Web.Manage/release/
   - task: ArchiveFiles@2
     displayName: "Archive GRAPHQL"
     inputs:
-      rootFolderOrFile: "$(System.DefaultWorkingDirectory)/publish_output/Sheaft.Web.Api"
+      rootFolderOrFile: "$(System.DefaultWorkingDirectory)/publish_output/Sheaft.Web.Api/release"
       includeRootFolder: false
       archiveFile: "$(System.DefaultWorkingDirectory)/publish_output/Sheaft.Web.Api/build$(Build.BuildId).zip"
   - task: DeleteFiles@1
     displayName: "Delete GRAPHQL NewRelic"
     inputs:
-      SourceFolder: '$(System.DefaultWorkingDirectory)/publish_output/Sheaft.Web.Api'
-      Contents: '**/newrelic/*'      
+      SourceFolder: '$(System.DefaultWorkingDirectory)/publish_output/Sheaft.Web.Api/release/newrelic'
+      Contents: '*'
   - task: ArchiveFiles@2
     displayName: "Archive GRAPHQL WithoutMonitoring"
     inputs:
-      rootFolderOrFile: "$(System.DefaultWorkingDirectory)/publish_output/Sheaft.Web.Api"
+      rootFolderOrFile: "$(System.DefaultWorkingDirectory)/publish_output/Sheaft.Web.Api/release"
       includeRootFolder: false
       archiveFile: "$(System.DefaultWorkingDirectory)/publish_output/Sheaft.Web.Api/build$(Build.BuildId)-nomonitoring.zip"
   - task: PublishBuildArtifacts@1
@@ -49,18 +49,18 @@ steps:
   - task: ArchiveFiles@2
     displayName: "Archive JOBS"
     inputs:
-      rootFolderOrFile: "$(System.DefaultWorkingDirectory)/publish_output/Sheaft.Web.Jobs"
+      rootFolderOrFile: "$(System.DefaultWorkingDirectory)/publish_output/Sheaft.Web.Jobs/release"
       includeRootFolder: false
       archiveFile: "$(System.DefaultWorkingDirectory)/publish_output/Sheaft.Web.Jobs/build$(Build.BuildId).zip"
   - task: DeleteFiles@1
     displayName: "Delete JOBS NewRelic"
     inputs:
-      SourceFolder: '$(System.DefaultWorkingDirectory)/publish_output/Sheaft.Web.Jobs'
-      Contents: '**/newrelic/*'   
+      SourceFolder: '$(System.DefaultWorkingDirectory)/publish_output/Sheaft.Web.Jobs/release/newrelic'
+      Contents: '*'
   - task: ArchiveFiles@2
     displayName: "Archive JOBS WithoutMonitoring"
     inputs:
-      rootFolderOrFile: "$(System.DefaultWorkingDirectory)/publish_output/Sheaft.Web.Jobs"
+      rootFolderOrFile: "$(System.DefaultWorkingDirectory)/publish_output/Sheaft.Web.Jobs/release"
       includeRootFolder: false
       archiveFile: "$(System.DefaultWorkingDirectory)/publish_output/Sheaft.Web.Jobs/build$(Build.BuildId)-nomonitoring.zip"
   - task: PublishBuildArtifacts@1
@@ -76,18 +76,18 @@ steps:
   - task: ArchiveFiles@2
     displayName: "Archive PAYMENT"
     inputs:
-      rootFolderOrFile: "$(System.DefaultWorkingDirectory)/publish_output/Sheaft.Web.Payment"
+      rootFolderOrFile: "$(System.DefaultWorkingDirectory)/publish_output/Sheaft.Web.Payment/release"
       includeRootFolder: false
       archiveFile: "$(System.DefaultWorkingDirectory)/publish_output/Sheaft.Web.Payment/build$(Build.BuildId).zip"
   - task: DeleteFiles@1
     displayName: "Delete PAYMENT NewRelic"
     inputs:
-      SourceFolder: '$(System.DefaultWorkingDirectory)/publish_output/Sheaft.Web.Payment'
-      Contents: '**/newrelic/*'     
+      SourceFolder: '$(System.DefaultWorkingDirectory)/publish_output/Sheaft.Web.Payment/release/newrelic'
+      Contents: '*'
   - task: ArchiveFiles@2
     displayName: "Archive PAYMENT WithoutMonitoring"
     inputs:
-      rootFolderOrFile: "$(System.DefaultWorkingDirectory)/publish_output/Sheaft.Web.Payment"
+      rootFolderOrFile: "$(System.DefaultWorkingDirectory)/publish_output/Sheaft.Web.Payment/release"
       includeRootFolder: false
       archiveFile: "$(System.DefaultWorkingDirectory)/publish_output/Sheaft.Web.Payment/build$(Build.BuildId)-nomonitoring.zip"
   - task: PublishBuildArtifacts@1
@@ -103,18 +103,18 @@ steps:
   - task: ArchiveFiles@2
     displayName: "Archive SIGNALR"
     inputs:
-      rootFolderOrFile: "$(System.DefaultWorkingDirectory)/publish_output/Sheaft.Web.Signalr"
+      rootFolderOrFile: "$(System.DefaultWorkingDirectory)/publish_output/Sheaft.Web.Signalr/release"
       includeRootFolder: false
       archiveFile: "$(System.DefaultWorkingDirectory)/publish_output/Sheaft.Web.Signalr/build$(Build.BuildId).zip"
   - task: DeleteFiles@1
     displayName: "Delete SIGNALR NewRelic"
     inputs:
-      SourceFolder: '$(System.DefaultWorkingDirectory)/publish_output/Sheaft.Web.Signalr'
-      Contents: '**/newrelic/*'     
+      SourceFolder: '$(System.DefaultWorkingDirectory)/publish_output/Sheaft.Web.Signalr/release/newrelic'
+      Contents: '*'
   - task: ArchiveFiles@2
     displayName: "Archive SIGNALR WithoutMonitoring"
     inputs:
-      rootFolderOrFile: "$(System.DefaultWorkingDirectory)/publish_output/Sheaft.Web.Signalr"
+      rootFolderOrFile: "$(System.DefaultWorkingDirectory)/publish_output/Sheaft.Web.Signalr/release"
       includeRootFolder: false
       archiveFile: "$(System.DefaultWorkingDirectory)/publish_output/Sheaft.Web.Signalr/build$(Build.BuildId)-nomonitoring.zip"
   - task: PublishBuildArtifacts@1
@@ -130,18 +130,18 @@ steps:
   - task: ArchiveFiles@2
     displayName: "Archive MANAGE"
     inputs:
-      rootFolderOrFile: "$(System.DefaultWorkingDirectory)/publish_output/Sheaft.Web.Manage"
+      rootFolderOrFile: "$(System.DefaultWorkingDirectory)/publish_output/Sheaft.Web.Manage/release"
       includeRootFolder: false
       archiveFile: "$(System.DefaultWorkingDirectory)/publish_output/Sheaft.Web.Manage/build$(Build.BuildId).zip"
   - task: DeleteFiles@1
     displayName: "Delete MANAGE NewRelic"
     inputs:
-      SourceFolder: '$(System.DefaultWorkingDirectory)/publish_output/Sheaft.Web.Manage'
-      Contents: '**/newrelic/*'     
+      SourceFolder: '$(System.DefaultWorkingDirectory)/publish_output/Sheaft.Web.Manage/release/newrelic'
+      Contents: '*'
   - task: ArchiveFiles@2
     displayName: "Archive MANAGE WithoutMonitoring"
     inputs:
-      rootFolderOrFile: "$(System.DefaultWorkingDirectory)/publish_output/Sheaft.Web.Manage"
+      rootFolderOrFile: "$(System.DefaultWorkingDirectory)/publish_output/Sheaft.Web.Manage/release"
       includeRootFolder: false
       archiveFile: "$(System.DefaultWorkingDirectory)/publish_output/Sheaft.Web.Manage/build$(Build.BuildId)-nomonitoring.zip"
   - task: PublishBuildArtifacts@1
