@@ -35,7 +35,7 @@ steps:
     inputs:
       rootFolderOrFile: "$(System.DefaultWorkingDirectory)/publish_output/Sheaft.Web.Api/release"
       includeRootFolder: false
-      archiveFile: "$(System.DefaultWorkingDirectory)/publish_output/Sheaft.Web.Api/build$(Build.BuildId)-nomonitoring.zip"
+      archiveFile: "$(System.DefaultWorkingDirectory)/publish_output/Sheaft.Web.Api/build$(Build.BuildId)-staging.zip"
   - task: PublishBuildArtifacts@1
     displayName: "Publish GRAPHQL"
     inputs:
@@ -44,8 +44,8 @@ steps:
   - task: PublishBuildArtifacts@1
     displayName: "Publish GRAPHQL WithoutMonitoring"
     inputs:
-      PathtoPublish: '$(System.DefaultWorkingDirectory)/publish_output/Sheaft.Web.Api/build$(Build.BuildId)-nomonitoring.zip'
-      artifactName: 'sheaft-graphql-nomonitoring'
+      PathtoPublish: '$(System.DefaultWorkingDirectory)/publish_output/Sheaft.Web.Api/build$(Build.BuildId)-staging.zip'
+      artifactName: 'sheaft-graphql-staging'
   - task: ArchiveFiles@2
     displayName: "Archive JOBS"
     inputs:
@@ -62,7 +62,7 @@ steps:
     inputs:
       rootFolderOrFile: "$(System.DefaultWorkingDirectory)/publish_output/Sheaft.Web.Jobs/release"
       includeRootFolder: false
-      archiveFile: "$(System.DefaultWorkingDirectory)/publish_output/Sheaft.Web.Jobs/build$(Build.BuildId)-nomonitoring.zip"
+      archiveFile: "$(System.DefaultWorkingDirectory)/publish_output/Sheaft.Web.Jobs/build$(Build.BuildId)-staging.zip"
   - task: PublishBuildArtifacts@1
     displayName: "Publish JOBS"
     inputs:
@@ -71,8 +71,8 @@ steps:
   - task: PublishBuildArtifacts@1
     displayName: "Publish JOBS WithoutMonitoring"
     inputs:
-      PathtoPublish: '$(System.DefaultWorkingDirectory)/publish_output/Sheaft.Web.Jobs/build$(Build.BuildId)-nomonitoring.zip'
-      artifactName: 'sheaft-jobs-nomonitoring'
+      PathtoPublish: '$(System.DefaultWorkingDirectory)/publish_output/Sheaft.Web.Jobs/build$(Build.BuildId)-staging.zip'
+      artifactName: 'sheaft-jobs-staging'
   - task: ArchiveFiles@2
     displayName: "Archive PAYMENT"
     inputs:
@@ -89,7 +89,7 @@ steps:
     inputs:
       rootFolderOrFile: "$(System.DefaultWorkingDirectory)/publish_output/Sheaft.Web.Payment/release"
       includeRootFolder: false
-      archiveFile: "$(System.DefaultWorkingDirectory)/publish_output/Sheaft.Web.Payment/build$(Build.BuildId)-nomonitoring.zip"
+      archiveFile: "$(System.DefaultWorkingDirectory)/publish_output/Sheaft.Web.Payment/build$(Build.BuildId)-staging.zip"
   - task: PublishBuildArtifacts@1
     displayName: "Publish PAYMENT"
     inputs:
@@ -98,8 +98,8 @@ steps:
   - task: PublishBuildArtifacts@1
     displayName: "Publish PAYMENT WithoutMonitoring"
     inputs:
-      PathtoPublish: '$(System.DefaultWorkingDirectory)/publish_output/Sheaft.Web.Payment/build$(Build.BuildId)-nomonitoring.zip'
-      artifactName: 'sheaft-payment-nomonitoring'
+      PathtoPublish: '$(System.DefaultWorkingDirectory)/publish_output/Sheaft.Web.Payment/build$(Build.BuildId)-staging.zip'
+      artifactName: 'sheaft-payment-staging'
   - task: ArchiveFiles@2
     displayName: "Archive SIGNALR"
     inputs:
@@ -116,7 +116,7 @@ steps:
     inputs:
       rootFolderOrFile: "$(System.DefaultWorkingDirectory)/publish_output/Sheaft.Web.Signalr/release"
       includeRootFolder: false
-      archiveFile: "$(System.DefaultWorkingDirectory)/publish_output/Sheaft.Web.Signalr/build$(Build.BuildId)-nomonitoring.zip"
+      archiveFile: "$(System.DefaultWorkingDirectory)/publish_output/Sheaft.Web.Signalr/build$(Build.BuildId)-staging.zip"
   - task: PublishBuildArtifacts@1
     displayName: "Publish SIGNALR"
     inputs:
@@ -125,8 +125,8 @@ steps:
   - task: PublishBuildArtifacts@1
     displayName: "Publish SIGNALR WithoutMonitoring"
     inputs:
-      PathtoPublish: '$(System.DefaultWorkingDirectory)/publish_output/Sheaft.Web.Signalr/build$(Build.BuildId)-nomonitoring.zip'
-      artifactName: 'sheaft-signalr-nomonitoring'
+      PathtoPublish: '$(System.DefaultWorkingDirectory)/publish_output/Sheaft.Web.Signalr/build$(Build.BuildId)-staging.zip'
+      artifactName: 'sheaft-signalr-staging'
   - task: ArchiveFiles@2
     displayName: "Archive MANAGE"
     inputs:
@@ -143,7 +143,7 @@ steps:
     inputs:
       rootFolderOrFile: "$(System.DefaultWorkingDirectory)/publish_output/Sheaft.Web.Manage/release"
       includeRootFolder: false
-      archiveFile: "$(System.DefaultWorkingDirectory)/publish_output/Sheaft.Web.Manage/build$(Build.BuildId)-nomonitoring.zip"
+      archiveFile: "$(System.DefaultWorkingDirectory)/publish_output/Sheaft.Web.Manage/build$(Build.BuildId)-staging.zip"
   - task: PublishBuildArtifacts@1
     displayName: "Publish MANAGE"
     inputs:
@@ -152,5 +152,5 @@ steps:
   - task: PublishBuildArtifacts@1
     displayName: "Publish MANAGE WithoutMonitoring"
     inputs:
-      PathtoPublish: '$(System.DefaultWorkingDirectory)/publish_output/Sheaft.Web.Manage/build$(Build.BuildId)-nomonitoring.zip'
-      artifactName: 'sheaft-manage-nomonitoring'
+      PathtoPublish: '$(System.DefaultWorkingDirectory)/publish_output/Sheaft.Web.Manage/build$(Build.BuildId)-staging.zip'
+      artifactName: 'sheaft-manage-staging'
