@@ -13,89 +13,89 @@ stages:
           dotnet restore $(System.DefaultWorkingDirectory)/Sheaft.sln
           dotnet build $(System.DefaultWorkingDirectory)/Sheaft.sln -c Release --no-restore
           dotnet test $(System.DefaultWorkingDirectory)/Sheaft.sln -c Release --no-restore --no-build
-          dotnet publish $(System.DefaultWorkingDirectory)/Sheaft.Web.Api/Sheaft.Web.Api.csproj -c Release --no-restore --no-build --output publish_output/Sheaft.Web.Api/release/
-          dotnet publish $(System.DefaultWorkingDirectory)/Sheaft.Web.Jobs/Sheaft.Web.Jobs.csproj -c Release --no-restore --no-build --output publish_output/Sheaft.Web.Jobs/release/
-          dotnet publish $(System.DefaultWorkingDirectory)/Sheaft.Web.Payment/Sheaft.Web.Payment.csproj -c Release --no-restore --no-build --output publish_output/Sheaft.Web.Payment/release/
-          dotnet publish $(System.DefaultWorkingDirectory)/Sheaft.Web.Signalr/Sheaft.Web.Signalr.csproj -c Release --no-restore --no-build --output publish_output/Sheaft.Web.Signalr/release/
-          dotnet publish $(System.DefaultWorkingDirectory)/Sheaft.Web.Manage/Sheaft.Web.Manage.csproj -c Release --no-restore --no-build --output publish_output/Sheaft.Web.Manage/release/
+          dotnet publish $(System.DefaultWorkingDirectory)/Sheaft.Web.Api/Sheaft.Web.Api.csproj -c Release --no-restore --no-build --output publish_output/Sheaft.Web.Api/sprint/
+          dotnet publish $(System.DefaultWorkingDirectory)/Sheaft.Web.Jobs/Sheaft.Web.Jobs.csproj -c Release --no-restore --no-build --output publish_output/Sheaft.Web.Jobs/sprint/
+          dotnet publish $(System.DefaultWorkingDirectory)/Sheaft.Web.Payment/Sheaft.Web.Payment.csproj -c Release --no-restore --no-build --output publish_output/Sheaft.Web.Payment/sprint/
+          dotnet publish $(System.DefaultWorkingDirectory)/Sheaft.Web.Signalr/Sheaft.Web.Signalr.csproj -c Release --no-restore --no-build --output publish_output/Sheaft.Web.Signalr/sprint/
+          dotnet publish $(System.DefaultWorkingDirectory)/Sheaft.Web.Manage/Sheaft.Web.Manage.csproj -c Release --no-restore --no-build --output publish_output/Sheaft.Web.Manage/sprint/
     - task: DeleteFiles@1
       displayName: "Delete GRAPHQL NewRelic"
       inputs:
-        SourceFolder: '$(System.DefaultWorkingDirectory)/publish_output/Sheaft.Web.Api/release/newrelic'
+        SourceFolder: '$(System.DefaultWorkingDirectory)/publish_output/Sheaft.Web.Api/sprint/newrelic'
         Contents: '*'
     - task: ArchiveFiles@2
       displayName: "Archive GRAPHQL"
       inputs:
-        rootFolderOrFile: "$(System.DefaultWorkingDirectory)/publish_output/Sheaft.Web.Api/release"
+        rootFolderOrFile: "$(System.DefaultWorkingDirectory)/publish_output/Sheaft.Web.Api/sprint"
         includeRootFolder: false
-        archiveFile: "$(System.DefaultWorkingDirectory)/publish_output/Sheaft.Web.Api/build$(Build.BuildId).zip"
+        archiveFile: "$(System.DefaultWorkingDirectory)/publish_output/Sheaft.Web.Api/build$(Build.BuildId)-sprint.zip"
     - task: PublishBuildArtifacts@1
       displayName: "Publish GRAPHQL"
       inputs:
-        PathtoPublish: '$(System.DefaultWorkingDirectory)/publish_output/Sheaft.Web.Api/build$(Build.BuildId).zip'
-        artifactName: 'sheaft-graphql-dev'
+        PathtoPublish: '$(System.DefaultWorkingDirectory)/publish_output/Sheaft.Web.Api/build$(Build.BuildId)-sprint.zip'
+        artifactName: 'sheaft-graphql-sprint'
     - task: DeleteFiles@1
       displayName: "Delete JOBS NewRelic"
       inputs:
-        SourceFolder: '$(System.DefaultWorkingDirectory)/publish_output/Sheaft.Web.Jobs/release/newrelic'
+        SourceFolder: '$(System.DefaultWorkingDirectory)/publish_output/Sheaft.Web.Jobs/sprint/newrelic'
         Contents: '*'
     - task: ArchiveFiles@2
       displayName: "Archive JOBS"
       inputs:
-        rootFolderOrFile: "$(System.DefaultWorkingDirectory)/publish_output/Sheaft.Web.Jobs/release"
+        rootFolderOrFile: "$(System.DefaultWorkingDirectory)/publish_output/Sheaft.Web.Jobs/sprint"
         includeRootFolder: false
-        archiveFile: "$(System.DefaultWorkingDirectory)/publish_output/Sheaft.Web.Jobs/build$(Build.BuildId).zip"
+        archiveFile: "$(System.DefaultWorkingDirectory)/publish_output/Sheaft.Web.Jobs/build$(Build.BuildId)-sprint.zip"
     - task: PublishBuildArtifacts@1
       displayName: "Publish JOBS"
       inputs:
-        PathtoPublish: '$(System.DefaultWorkingDirectory)/publish_output/Sheaft.Web.Jobs/build$(Build.BuildId).zip'
-        artifactName: 'sheaft-jobs-dev'
+        PathtoPublish: '$(System.DefaultWorkingDirectory)/publish_output/Sheaft.Web.Jobs/build$(Build.BuildId)-sprint.zip'
+        artifactName: 'sheaft-jobs-sprint'
     - task: DeleteFiles@1
       displayName: "Delete PAYMENT NewRelic"
       inputs:
-        SourceFolder: '$(System.DefaultWorkingDirectory)/publish_output/Sheaft.Web.Payment/release/newrelic'
+        SourceFolder: '$(System.DefaultWorkingDirectory)/publish_output/Sheaft.Web.Payment/sprint/newrelic'
         Contents: '*'
     - task: ArchiveFiles@2
       displayName: "Archive PAYMENT"
       inputs:
-        rootFolderOrFile: "$(System.DefaultWorkingDirectory)/publish_output/Sheaft.Web.Payment/release"
+        rootFolderOrFile: "$(System.DefaultWorkingDirectory)/publish_output/Sheaft.Web.Payment/sprint"
         includeRootFolder: false
-        archiveFile: "$(System.DefaultWorkingDirectory)/publish_output/Sheaft.Web.Payment/build$(Build.BuildId).zip"
+        archiveFile: "$(System.DefaultWorkingDirectory)/publish_output/Sheaft.Web.Payment/build$(Build.BuildId)-sprint.zip"
     - task: PublishBuildArtifacts@1
       displayName: "Publish PAYMENT"
       inputs:
-        PathtoPublish: '$(System.DefaultWorkingDirectory)/publish_output/Sheaft.Web.Payment/build$(Build.BuildId).zip'
-        artifactName: 'sheaft-payment-dev'
+        PathtoPublish: '$(System.DefaultWorkingDirectory)/publish_output/Sheaft.Web.Payment/build$(Build.BuildId)-sprint.zip'
+        artifactName: 'sheaft-payment-sprint'
     - task: DeleteFiles@1
       displayName: "Delete SIGNALR NewRelic"
       inputs:
-        SourceFolder: '$(System.DefaultWorkingDirectory)/publish_output/Sheaft.Web.Signalr/release/newrelic'
+        SourceFolder: '$(System.DefaultWorkingDirectory)/publish_output/Sheaft.Web.Signalr/sprint/newrelic'
         Contents: '*'
     - task: ArchiveFiles@2
       displayName: "Archive SIGNALR"
       inputs:
-        rootFolderOrFile: "$(System.DefaultWorkingDirectory)/publish_output/Sheaft.Web.Signalr/release"
+        rootFolderOrFile: "$(System.DefaultWorkingDirectory)/publish_output/Sheaft.Web.Signalr/sprint"
         includeRootFolder: false
-        archiveFile: "$(System.DefaultWorkingDirectory)/publish_output/Sheaft.Web.Signalr/build$(Build.BuildId).zip"
+        archiveFile: "$(System.DefaultWorkingDirectory)/publish_output/Sheaft.Web.Signalr/build$(Build.BuildId)-sprint.zip"
     - task: PublishBuildArtifacts@1
       displayName: "Publish SIGNALR"
       inputs:
-        PathtoPublish: '$(System.DefaultWorkingDirectory)/publish_output/Sheaft.Web.Signalr/build$(Build.BuildId).zip'
-        artifactName: 'sheaft-signalr-dev'
+        PathtoPublish: '$(System.DefaultWorkingDirectory)/publish_output/Sheaft.Web.Signalr/build$(Build.BuildId)-sprint.zip'
+        artifactName: 'sheaft-signalr-sprint'
     - task: DeleteFiles@1
       displayName: "Delete MANAGE NewRelic"
       inputs:
-        SourceFolder: '$(System.DefaultWorkingDirectory)/publish_output/Sheaft.Web.Manage/release/newrelic'
+        SourceFolder: '$(System.DefaultWorkingDirectory)/publish_output/Sheaft.Web.Manage/sprint/newrelic'
         Contents: '*'
     - task: ArchiveFiles@2
       displayName: "Archive MANAGE"
       inputs:
-        rootFolderOrFile: "$(System.DefaultWorkingDirectory)/publish_output/Sheaft.Web.Manage/release"
+        rootFolderOrFile: "$(System.DefaultWorkingDirectory)/publish_output/Sheaft.Web.Manage/sprint"
         includeRootFolder: false
-        archiveFile: "$(System.DefaultWorkingDirectory)/publish_output/Sheaft.Web.Manage/build$(Build.BuildId).zip"
+        archiveFile: "$(System.DefaultWorkingDirectory)/publish_output/Sheaft.Web.Manage/build$(Build.BuildId)-sprint.zip"
     - task: PublishBuildArtifacts@1
       displayName: "Publish MANAGE"
       inputs:
-        PathtoPublish: '$(System.DefaultWorkingDirectory)/publish_output/Sheaft.Web.Manage/build$(Build.BuildId).zip'
-        artifactName: 'sheaft-manage-dev'
+        PathtoPublish: '$(System.DefaultWorkingDirectory)/publish_output/Sheaft.Web.Manage/build$(Build.BuildId)-sprint.zip'
+        artifactName: 'sheaft-manage-sprint'
 
