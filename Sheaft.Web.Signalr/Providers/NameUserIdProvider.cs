@@ -1,8 +1,8 @@
-﻿using Microsoft.AspNetCore.SignalR;
-using System.Linq;
+﻿using System.Linq;
 using System.Security.Claims;
+using Microsoft.AspNetCore.SignalR;
 
-namespace Sheaft.Web.Signalr
+namespace Sheaft.Web.Signalr.Providers
 {
     public partial class Startup
     {

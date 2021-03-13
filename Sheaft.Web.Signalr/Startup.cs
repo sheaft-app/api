@@ -26,6 +26,7 @@ using Sheaft.Application.Common.Interfaces.Services;
 using Sheaft.Application.Common.Options;
 using Sheaft.Application.Store.Commands;
 using Sheaft.Infrastructure.Services;
+using Sheaft.Web.Signalr.Hubs;
 
 namespace Sheaft.Web.Signalr
 {
@@ -76,7 +77,7 @@ namespace Sheaft.Web.Signalr
             services.AddScoped<ISheaftHangfireBridge, SheaftHangfireBridge>();
             services.AddScoped<ISheaftMediatr, SheaftMediatr>();
 
-            services.AddSingleton<IUserIdProvider, NameUserIdProvider>();
+            services.AddSingleton<IUserIdProvider, Providers.Startup.NameUserIdProvider>();
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
             services.AddLogging(config =>

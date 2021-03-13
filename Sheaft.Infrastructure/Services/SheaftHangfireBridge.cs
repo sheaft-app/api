@@ -4,6 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
 using Sheaft.Application.Common.Interfaces.Services;
+using Sheaft.Application.Common.Mediatr;
 using Sheaft.Application.Common.Models;
 using Sheaft.Domain.Common;
 using Sheaft.Domain.Enum;
