@@ -3,7 +3,6 @@ using System.Collections.Generic;
 
 namespace Sheaft.Application.Common.Models.Inputs
 {
-
     public class ExportPickingOrdersInput
     {
         public IEnumerable<Guid> PurchaseOrderIds { get; set; }

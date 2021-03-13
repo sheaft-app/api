@@ -33,6 +33,7 @@ using Sheaft.Application.PurchaseOrder.Commands;
 using Sheaft.Application.QuickOrder.Commands;
 using Sheaft.Application.Returnable.Commands;
 using Sheaft.Application.Store.Commands;
+using Sheaft.Application.Transactions.Commands;
 using Sheaft.Application.User.Commands;
 using Sheaft.Domain;
 using Sheaft.Domain.Exceptions;
@@ -75,6 +76,28 @@ namespace Sheaft.GraphQL
             var result =
                 await ExecuteCommandAsync<QueueExportPickingOrderCommand, Guid>(
                     _mapper.Map(input, new QueueExportPickingOrderCommand(CurrentUser) {ProducerId = CurrentUser.Id}),
+                    Token);
+            return jobQueries.GetJob(result, CurrentUser);
+        }
+
+        public async Task<IQueryable<JobDto>> ExportPurchaseOrdersAsync(ExportPurchaseOrdersInput input,
+            [Service] IJobQueries jobQueries)
+        {
+            SetLogTransaction(nameof(ExportPurchaseOrdersAsync));
+            var result =
+                await ExecuteCommandAsync<QueueExportPurchaseOrdersCommand, Guid>(
+                    _mapper.Map(input, new QueueExportPurchaseOrdersCommand(CurrentUser) {UserId = CurrentUser.Id}),
+                    Token);
+            return jobQueries.GetJob(result, CurrentUser);
+        }
+
+        public async Task<IQueryable<JobDto>> ExportTransactionsAsync(ExportTransactionsInput input,
+            [Service] IJobQueries jobQueries)
+        {
+            SetLogTransaction(nameof(ExportTransactionsAsync));
+            var result =
+                await ExecuteCommandAsync<QueueExportTransactionsCommand, Guid>(
+                    _mapper.Map(input, new QueueExportTransactionsCommand(CurrentUser) {UserId = CurrentUser.Id}),
                     Token);
             return jobQueries.GetJob(result, CurrentUser);
         }

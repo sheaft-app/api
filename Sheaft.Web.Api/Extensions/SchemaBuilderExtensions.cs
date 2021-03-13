@@ -152,6 +152,8 @@ namespace Sheaft.Web.Api.Extensions
             services.AddType<UpdateClosingInputType>();
             services.AddType<PictureInputType>();
             services.AddType<AddPictureToInputType>();
+            services.AddType<ExportPurchaseOrdersInputType>();
+            services.AddType<ExportTransactionsInputType>();
 
             return services;
         }
