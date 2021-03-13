@@ -5,5 +5,6 @@ namespace Sheaft.Domain.Enum
         ExportPickingOrders,
         ImportProducts,
         ExportUserData,
+        ExportUserTransactions
     }
 }
