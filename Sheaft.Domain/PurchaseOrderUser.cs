@@ -17,6 +17,7 @@ namespace Sheaft.Domain
             Email = user.Email;
             Phone = user.Phone;
             Picture = user.Picture;
+            Address = user.Address?.ToString();
         }
 
         public Guid Id { get; private set; }
@@ -25,6 +26,7 @@ namespace Sheaft.Domain
         public string Email { get; private set; }
         public string Phone { get; private set; }
         public string Picture { get; private set; }
+        public string Address { get; private set; }
     }
 
     public class PurchaseOrderVendor : PurchaseOrderUser

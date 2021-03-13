@@ -48,5 +48,10 @@ namespace Sheaft.Domain
             
             return null;
         }
+
+        public override string ToString()
+        {
+            return $"{Line1}\n{Line2}\n{Zipcode},{City}";
+        }
     }
 }

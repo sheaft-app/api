@@ -65,8 +65,8 @@ namespace Sheaft.Application.Job.Commands
                     _mediatr.Post(new ImportProductsCommand(request.RequestUser) { JobId = importProductsCommand.JobId });
                     break;
                 case JobKind.ExportUserTransactions:
-                    var exportTransactionsCommand = JsonConvert.DeserializeObject<ExportUserTransactionsCommand>(entity.Command);
-                    _mediatr.Post(new ExportUserTransactionsCommand(request.RequestUser) { JobId = exportTransactionsCommand.JobId, From = exportTransactionsCommand.From, To = exportTransactionsCommand.To});
+                    var exportTransactionsCommand = JsonConvert.DeserializeObject<ExportTransactionsCommand>(entity.Command);
+                    _mediatr.Post(new ExportTransactionsCommand(request.RequestUser) { JobId = exportTransactionsCommand.JobId, From = exportTransactionsCommand.From, To = exportTransactionsCommand.To});
                     break;
             }
             

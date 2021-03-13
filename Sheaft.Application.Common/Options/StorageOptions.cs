@@ -27,7 +27,8 @@
         public string Progress { get; set; } = "progress";
         public string Producers { get; set; } = "producers";
         public string Documents { get; set; } = "documents";
-        public string Transactions { get; set; }= "transactions";
+        public string Transactions { get; set; } = "transactions";
+        public string PurchaseOrders { get; set; } = "purchaseorders";
     }
     public class StorageTables
     {

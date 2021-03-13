@@ -15,10 +15,10 @@ using Sheaft.Domain.Exceptions;
 
 namespace Sheaft.Application.Transactions.Commands
 {
-    public class QueueExportUserTransactionsCommand : Command<Guid>
+    public class QueueExportTransactionsCommand : Command<Guid>
     {
         [JsonConstructor]
-        public QueueExportUserTransactionsCommand(RequestUser requestUser) : base(requestUser)
+        public QueueExportTransactionsCommand(RequestUser requestUser) : base(requestUser)
         {
         }
 
@@ -27,29 +27,29 @@ namespace Sheaft.Application.Transactions.Commands
         public DateTimeOffset To { get; set; }
     }
 
-    public class QueueExportUserTransactionsCommandHandler : CommandsHandler,
-        IRequestHandler<QueueExportUserTransactionsCommand, Result<Guid>>
+    public class QueueExportTransactionsCommandHandler : CommandsHandler,
+        IRequestHandler<QueueExportTransactionsCommand, Result<Guid>>
     {
-        public QueueExportUserTransactionsCommandHandler(
+        public QueueExportTransactionsCommandHandler(
             ISheaftMediatr mediatr,
             IAppDbContext context,
-            ILogger<QueueExportUserTransactionsCommandHandler> logger)
+            ILogger<QueueExportTransactionsCommandHandler> logger)
             : base(mediatr, context, logger)
         {
         }
 
-        public async Task<Result<Guid>> Handle(QueueExportUserTransactionsCommand request, CancellationToken token)
+        public async Task<Result<Guid>> Handle(QueueExportTransactionsCommand request, CancellationToken token)
         {
             var sender = await _context.GetByIdAsync<Domain.User>(request.UserId, token);
             if(sender.Id != request.RequestUser.Id)
                 throw SheaftException.Forbidden();
 
-            var entity = new Domain.Job(Guid.NewGuid(), JobKind.ExportUserTransactions, $"Export Transactions", sender);
+            var entity = new Domain.Job(Guid.NewGuid(), JobKind.ExportUserTransactions, $"Export Virements", sender);
 
             await _context.AddAsync(entity, token);
             await _context.SaveChangesAsync(token);
 
-            _mediatr.Post(new ExportUserTransactionsCommand(request.RequestUser) {JobId = entity.Id, From = request.From, To = request.To});
+            _mediatr.Post(new ExportTransactionsCommand(request.RequestUser) {JobId = entity.Id, From = request.From, To = request.To});
             
             _logger.LogInformation($"User Transactions export successfully initiated by {request.UserId}");
 

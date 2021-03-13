@@ -24,5 +24,6 @@ namespace Sheaft.Application.Common.Interfaces.Services
         Task<Result> DeleteDocumentPageAsync(Guid documentId, Guid pageId, Guid userId, CancellationToken token);
         Task<Result<string>> UploadProducersListAsync(byte[] data, CancellationToken token);
         Task<Result<string>> UploadUserTransactionsFileAsync(Guid userId, Guid jobId, string filename, byte[] data, CancellationToken token);
+        Task<Result<string>> UploadUserPurchaseOrdersFileAsync(Guid userId, Guid jobId, string filename, byte[] data, CancellationToken token);
     }
 }

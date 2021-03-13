@@ -19,10 +19,10 @@ using Sheaft.Domain.Exceptions;
 
 namespace Sheaft.Application.Transactions.Commands
 {
-    public class ExportUserTransactionsCommand : Command
+    public class ExportTransactionsCommand : Command
     {
         [JsonConstructor]
-        public ExportUserTransactionsCommand(RequestUser requestUser) : base(requestUser)
+        public ExportTransactionsCommand(RequestUser requestUser) : base(requestUser)
         {
         }
 
@@ -31,22 +31,22 @@ namespace Sheaft.Application.Transactions.Commands
         public DateTimeOffset To { get; set; }
     }
 
-    public class ExportUserTransactionsCommandHandler : CommandsHandler,
-        IRequestHandler<ExportUserTransactionsCommand, Result>
+    public class ExportTransactionsCommandHandler : CommandsHandler,
+        IRequestHandler<ExportTransactionsCommand, Result>
     {
         private readonly IBlobService _blobService;
 
-        public ExportUserTransactionsCommandHandler(
+        public ExportTransactionsCommandHandler(
             ISheaftMediatr mediatr,
             IAppDbContext context,
             IBlobService blobService,
-            ILogger<ExportUserTransactionsCommandHandler> logger)
+            ILogger<ExportTransactionsCommandHandler> logger)
             : base(mediatr, context, logger)
         {
             _blobService = blobService;
         }
 
-        public async Task<Result> Handle(ExportUserTransactionsCommand request, CancellationToken token)
+        public async Task<Result> Handle(ExportTransactionsCommand request, CancellationToken token)
         {
             var job = await _context.GetByIdAsync<Domain.Job>(request.JobId, token);
             if(job.User.Id != request.RequestUser.Id)
@@ -58,7 +58,7 @@ namespace Sheaft.Application.Transactions.Commands
                 if (!startResult.Succeeded)
                     throw startResult.Exception;
 
-                _mediatr.Post(new UserTransactionsExportProcessingEvent(job.Id));
+                _mediatr.Post(new TransactionsExportProcessingEvent(job.Id));
 
                 using (var stream = new MemoryStream())
                 {
@@ -70,7 +70,7 @@ namespace Sheaft.Application.Transactions.Commands
                     if (!response.Succeeded)
                         throw response.Exception;
 
-                    _mediatr.Post(new UserTransactionsExportSucceededEvent(job.Id));
+                    _mediatr.Post(new TransactionsExportSucceededEvent(job.Id));
 
                     _logger.LogInformation($"Transactions for user {job.User.Id} successfully exported");
                     return await _mediatr.Process(
@@ -79,7 +79,7 @@ namespace Sheaft.Application.Transactions.Commands
             }
             catch (Exception e)
             {
-                _mediatr.Post(new UserTransactionsExportFailedEvent(job.Id));
+                _mediatr.Post(new TransactionsExportFailedEvent(job.Id));
                 return await _mediatr.Process(new FailJobCommand(request.RequestUser) {JobId = job.Id, Reason = e.Message},
                     token);
             }

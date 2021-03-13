@@ -274,6 +274,33 @@ namespace Sheaft.Infrastructure.Services
             return Success(GetBlobSasUri(blobClient, sasBuilder, _storageOptions.Containers.Transactions));
         }
 
+        public async Task<Result<string>> UploadUserPurchaseOrdersFileAsync(Guid userId, Guid jobId, string filename, byte[] data,
+            CancellationToken token)
+        {
+            var containerClient =
+                new BlobContainerClient(_storageOptions.ConnectionString, _storageOptions.Containers.PurchaseOrders);
+            await containerClient.CreateIfNotExistsAsync(cancellationToken: token);
+
+            var blobClient = containerClient.GetBlobClient($"users/{userId:N}/{jobId:N}/{filename}");
+            await blobClient.DeleteIfExistsAsync(cancellationToken: token);
+
+            using (var ms = new MemoryStream(data))
+                await blobClient.UploadAsync(ms, token);
+
+            var sasBuilder = new BlobSasBuilder()
+            {
+                BlobContainerName = _storageOptions.Containers.PurchaseOrders,
+                BlobName = blobClient.Name,
+                Resource = "b",
+                StartsOn = DateTimeOffset.UtcNow.AddHours(-1),
+                ExpiresOn = DateTimeOffset.UtcNow.AddDays(30)
+            };
+
+            sasBuilder.SetPermissions(BlobSasPermissions.Read);
+
+            return Success(GetBlobSasUri(blobClient, sasBuilder, _storageOptions.Containers.PurchaseOrders));
+        }
+
         public async Task<Result<string>> UploadPickingOrderFileAsync(Guid userId, Guid jobId, string filename,
             byte[] data, CancellationToken token)
         {
