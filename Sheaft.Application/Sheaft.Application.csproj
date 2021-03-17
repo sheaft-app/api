@@ -5,6 +5,7 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\Sheaft.Application.Common\Sheaft.Application.Common.csproj" />
       <ProjectReference Include="..\Sheaft.Domain\Sheaft.Domain.csproj" />
     </ItemGroup>
 

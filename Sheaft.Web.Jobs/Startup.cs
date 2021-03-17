@@ -33,7 +33,6 @@ using Serilog.Events;
 using Sheaft.Application.Common.Behaviours;
 using Sheaft.Application.Common.Interfaces;
 using Sheaft.Application.Common.Interfaces.Services;
-using Sheaft.Application.Common.Mappings;
 using Sheaft.Application.Common.Options;
 using Sheaft.Application.Donation.Commands;
 using Sheaft.Application.Order.Commands;
@@ -45,9 +44,9 @@ using Sheaft.Application.Store.Commands;
 using Sheaft.Application.Transfer.Commands;
 using Sheaft.Application.Zone.Commands;
 using Sheaft.Domain;
-using Sheaft.Domain.Events.User;
 using Sheaft.Infrastructure.Persistence;
 using Sheaft.Infrastructure.Services;
+using Sheaft.Mappings;
 using Sheaft.Web.Common;
 
 namespace Sheaft.Web.Jobs

@@ -34,7 +34,6 @@ using Sheaft.Application.Agreement.Queries;
 using Sheaft.Application.Common.Interfaces;
 using Sheaft.Application.Common.Interfaces.Queries;
 using Sheaft.Application.Common.Interfaces.Services;
-using Sheaft.Application.Common.Mappings;
 using Sheaft.Application.Common.Options;
 using Sheaft.Application.Consumer.Queries;
 using Sheaft.Application.Country.Queries;
@@ -48,7 +47,6 @@ using Sheaft.Application.Nationality.Queries;
 using Sheaft.Application.Notification.Queries;
 using Sheaft.Application.Order.Queries;
 using Sheaft.Application.Payin.Queries;
-using Sheaft.Application.Producer.Commands;
 using Sheaft.Application.Producer.Queries;
 using Sheaft.Application.Product.Queries;
 using Sheaft.Application.PurchaseOrder.Queries;
@@ -58,7 +56,7 @@ using Sheaft.Application.Returnable.Queries;
 using Sheaft.Application.Store.Commands;
 using Sheaft.Application.Tag.Queries;
 using Sheaft.Application.User.Queries;
-using Sheaft.Domain.Events.User;
+using Sheaft.Mappings;
 
 namespace Sheaft.Web.Manage
 {

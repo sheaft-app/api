@@ -6,11 +6,16 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Sheaft.Application.Common;
 using Sheaft.Application.Common.Extensions;
-using Sheaft.Application.Common.Handlers;
 using Sheaft.Application.Common.Interfaces;
 using Sheaft.Application.Common.Interfaces.Services;
+using Sheaft.Application.Common.Mediatr;
 using Sheaft.Application.Common.Models;
+using Sheaft.Application.PickingOrders.Commands;
+using Sheaft.Application.Product.Commands;
+using Sheaft.Application.Transactions.Commands;
+using Sheaft.Application.User.Commands;
 using Sheaft.Domain;
+using Sheaft.Domain.Enum;
 using Sheaft.Domain.Exceptions;
 
 namespace Sheaft.Application.Job.Commands
@@ -45,7 +50,26 @@ namespace Sheaft.Application.Job.Commands
             entity.RetryJob();
             await _context.SaveChangesAsync(token);
 
-            entity.EnqueueJobCommand(_mediatr, request.RequestUser);
+            switch (entity.Kind)
+            {
+                case JobKind.ExportPickingOrders:
+                    var exportPickingOrderCommand = JsonConvert.DeserializeObject<ExportPickingOrderCommand>(entity.Command);
+                    _mediatr.Post(new ExportPickingOrderCommand(request.RequestUser) { JobId = exportPickingOrderCommand.JobId, PurchaseOrderIds = exportPickingOrderCommand.PurchaseOrderIds });
+                    break;
+                case JobKind.ExportUserData:
+                    var exportUserDataCommand = JsonConvert.DeserializeObject<ExportUserDataCommand>(entity.Command);
+                    _mediatr.Post(new ExportUserDataCommand(request.RequestUser) { JobId = exportUserDataCommand.JobId });
+                    break;
+                case JobKind.ImportProducts:
+                    var importProductsCommand = JsonConvert.DeserializeObject<ImportProductsCommand>(entity.Command);
+                    _mediatr.Post(new ImportProductsCommand(request.RequestUser) { JobId = importProductsCommand.JobId });
+                    break;
+                case JobKind.ExportUserTransactions:
+                    var exportTransactionsCommand = JsonConvert.DeserializeObject<ExportTransactionsCommand>(entity.Command);
+                    _mediatr.Post(new ExportTransactionsCommand(request.RequestUser) { JobId = exportTransactionsCommand.JobId, From = exportTransactionsCommand.From, To = exportTransactionsCommand.To});
+                    break;
+            }
+            
             return Success();
         }
     }

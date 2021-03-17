@@ -6,9 +6,9 @@ using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Sheaft.Application.Common;
-using Sheaft.Application.Common.Handlers;
 using Sheaft.Application.Common.Interfaces;
 using Sheaft.Application.Common.Interfaces.Services;
+using Sheaft.Application.Common.Mediatr;
 using Sheaft.Application.Common.Models;
 using Sheaft.Domain;
 

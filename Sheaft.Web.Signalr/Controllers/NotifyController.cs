@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using Sheaft.Application.Common.Interfaces.Services;
 using Sheaft.Application.Notification.Commands;
 using Sheaft.Domain;
+using Sheaft.Web.Signalr.Hubs;
 
 namespace Sheaft.Web.Signalr.Controllers
 {

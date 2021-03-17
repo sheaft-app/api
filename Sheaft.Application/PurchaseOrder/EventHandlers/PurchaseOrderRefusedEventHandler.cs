@@ -3,9 +3,9 @@ using System.Threading.Tasks;
 using MediatR;
 using Microsoft.Extensions.Configuration;
 using Sheaft.Application.Common.Extensions;
-using Sheaft.Application.Common.Handlers;
 using Sheaft.Application.Common.Interfaces;
 using Sheaft.Application.Common.Interfaces.Services;
+using Sheaft.Application.Common.Mediatr;
 using Sheaft.Application.Common.Models;
 using Sheaft.Domain.Events.PurchaseOrder;
 

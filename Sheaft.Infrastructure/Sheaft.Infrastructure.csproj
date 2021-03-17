@@ -53,7 +53,19 @@
       <Content Include="Services\Templates\PurchaseOrderRefusedEvent.cshtml">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </Content>
+      <Content Include="Services\Templates\PurchaseOrdersExportFailedEvent.cshtml">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </Content>
+      <Content Include="Services\Templates\PurchaseOrdersExportSucceededEvent.cshtml">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </Content>
       <Content Include="Services\Templates\PurchaseOrderWithdrawnEvent.cshtml">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </Content>
+      <Content Include="Services\Templates\TransactionsExportFailedEvent.cshtml">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </Content>
+      <Content Include="Services\Templates\TransactionsExportSucceededEvent.cshtml">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </Content>
       <Content Include="Services\Templates\UserDataExportFailedEvent.cshtml">

@@ -388,6 +388,20 @@ namespace Sheaft.GraphQL.Types
                 .UseSingleOrDefault()
                 .UseSelection();
 
+            descriptor.Field(c => c.ExportPurchaseOrdersAsync(default, default))
+                .Name("exportPurchaseOrders")
+                .Authorize(Policies.PRODUCER)
+                .Type<NonNullType<JobType>>()
+                .UseSingleOrDefault()
+                .UseSelection();
+
+            descriptor.Field(c => c.ExportTransactionsAsync(default, default))
+                .Name("exportTransactions")
+                .Authorize(Policies.PRODUCER)
+                .Type<NonNullType<JobType>>()
+                .UseSingleOrDefault()
+                .UseSelection();
+
             //NOTIFICATIONS
             descriptor.Field(c => c.MarkMyNotificationsAsReadAsync())
                 .Name("markUserNotificationsAsRead")

@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Hangfire;
 using MediatR;
 using Microsoft.Extensions.Logging;
+using Sheaft.Application.Common.Interfaces;
 using Sheaft.Application.Common.Interfaces.Services;
 using Sheaft.Application.Common.Models;
 using Sheaft.Domain;

@@ -1,9 +1,9 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
-using Sheaft.Application.Common.Handlers;
 using Sheaft.Application.Common.Interfaces;
 using Sheaft.Application.Common.Interfaces.Services;
+using Sheaft.Application.Common.Mediatr;
 using Sheaft.Application.Common.Models;
 using Sheaft.Domain.Events.Donation;
 

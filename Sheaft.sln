@@ -46,6 +46,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sheaft.GraphQL", "Sheaft.Gr
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sheaft.Infrastructure", "Sheaft.Infrastructure\Sheaft.Infrastructure.csproj", "{09D7420E-FFCD-4A44-98CD-1E434271690B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sheaft.Application.Common", "Sheaft.Application.Common\Sheaft.Application.Common.csproj", "{63A9ECDC-6C27-4B1C-89BC-229F46AEECBF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sheaft.Mappings", "Sheaft.Mappings\Sheaft.Mappings.csproj", "{2AB1F4D3-FB97-40BF-B561-ACD410EF89C6}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -108,6 +112,14 @@ Global
 		{09D7420E-FFCD-4A44-98CD-1E434271690B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{09D7420E-FFCD-4A44-98CD-1E434271690B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{09D7420E-FFCD-4A44-98CD-1E434271690B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{63A9ECDC-6C27-4B1C-89BC-229F46AEECBF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{63A9ECDC-6C27-4B1C-89BC-229F46AEECBF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{63A9ECDC-6C27-4B1C-89BC-229F46AEECBF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{63A9ECDC-6C27-4B1C-89BC-229F46AEECBF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2AB1F4D3-FB97-40BF-B561-ACD410EF89C6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2AB1F4D3-FB97-40BF-B561-ACD410EF89C6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2AB1F4D3-FB97-40BF-B561-ACD410EF89C6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2AB1F4D3-FB97-40BF-B561-ACD410EF89C6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

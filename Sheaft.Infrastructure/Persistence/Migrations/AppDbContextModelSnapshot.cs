@@ -1240,8 +1240,8 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
 
                     b.ToTable("ProductClosings");
                 });
-                
-                modelBuilder.Entity("Sheaft.Domain.ProductPicture", b =>
+
+            modelBuilder.Entity("Sheaft.Domain.ProductPicture", b =>
                 {
                     b.Property<long>("Uid")
                         .ValueGeneratedOnAdd()
@@ -1586,6 +1586,9 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                         .HasColumnType("bigint")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
+                    b.Property<string>("Address")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Email")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -1619,6 +1622,9 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bigint")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("Address")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Email")
                         .IsRequired()
@@ -3085,7 +3091,7 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
-                 
+
             modelBuilder.Entity("Sheaft.Domain.ProductPicture", b =>
                 {
                     b.HasOne("Sheaft.Domain.Product", null)

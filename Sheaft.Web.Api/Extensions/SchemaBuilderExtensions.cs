@@ -1,11 +1,9 @@
 ﻿using HotChocolate;
-using Sheaft.Application.Common.Models.Inputs;
 using Sheaft.GraphQL.Enums;
-using Sheaft.GraphQL.Types;
 using Sheaft.GraphQL.Types.Inputs;
 using Sheaft.GraphQL.Types.Outputs;
 
-namespace Sheaft.Web.Api
+namespace Sheaft.Web.Api.Extensions
 {
     public static class SchemaBuilderExtensions
     {
@@ -154,6 +152,8 @@ namespace Sheaft.Web.Api
             services.AddType<UpdateClosingInputType>();
             services.AddType<PictureInputType>();
             services.AddType<AddPictureToInputType>();
+            services.AddType<ExportPurchaseOrdersInputType>();
+            services.AddType<ExportTransactionsInputType>();
 
             return services;
         }
