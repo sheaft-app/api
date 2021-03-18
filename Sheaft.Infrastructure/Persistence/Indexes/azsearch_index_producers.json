@@ -1,321 +1,321 @@
 POST https://sheaft-search.search.windows.net/indexes?api-version=2020-06-30
 {
-  "name": "producers",
-  "fields": [
-    {
-      "name": "producer_id",
-      "type": "Edm.String",
-      "facetable": false,
-      "filterable": false,
-      "key": true,
-      "retrievable": true,
-      "searchable": false,
-      "sortable": false,
-      "analyzer": null,
-      "indexAnalyzer": null,
-      "searchAnalyzer": null,
-      "synonymMaps": [],
-      "fields": []
-    },
-    {
-      "name": "producer_name",
-      "type": "Edm.String",
-      "facetable": false,
-      "filterable": false,
-      "key": false,
-      "retrievable": true,
-      "searchable": false,
-      "sortable": true,
-      "analyzer": "standard.lucene",
-      "indexAnalyzer": null,
-      "searchAnalyzer": null,
-      "synonymMaps": [],
-      "fields": []
-    },
-    {
-      "name": "producer_email",
-      "type": "Edm.String",
-      "facetable": false,
-      "filterable": false,
-      "key": false,
-      "retrievable": true,
-      "searchable": false,
-      "sortable": false,
-      "analyzer": null,
-      "indexAnalyzer": null,
-      "searchAnalyzer": null,
-      "synonymMaps": [],
-      "fields": []
-    },
-    {
-      "name": "producer_picture",
-      "type": "Edm.String",
-      "facetable": false,
-      "filterable": false,
-      "key": false,
-      "retrievable": true,
-      "searchable": false,
-      "sortable": false,
-      "analyzer": null,
-      "indexAnalyzer": null,
-      "searchAnalyzer": null,
-      "synonymMaps": [],
-      "fields": []
-    },
-    {
-      "name": "producer_phone",
-      "type": "Edm.String",
-      "facetable": false,
-      "filterable": false,
-      "key": false,
-      "retrievable": true,
-      "searchable": false,
-      "sortable": false,
-      "analyzer": null,
-      "indexAnalyzer": null,
-      "searchAnalyzer": null,
-      "synonymMaps": [],
-      "fields": []
-    },
-    {
-      "name": "producer_line1",
-      "type": "Edm.String",
-      "facetable": false,
-      "filterable": false,
-      "key": false,
-      "retrievable": true,
-      "searchable": false,
-      "sortable": false,
-      "analyzer": null,
-      "indexAnalyzer": null,
-      "searchAnalyzer": null,
-      "synonymMaps": [],
-      "fields": []
-    },
-    {
-      "name": "producer_line2",
-      "type": "Edm.String",
-      "facetable": false,
-      "filterable": false,
-      "key": false,
-      "retrievable": true,
-      "searchable": false,
-      "sortable": false,
-      "analyzer": null,
-      "indexAnalyzer": null,
-      "searchAnalyzer": null,
-      "synonymMaps": [],
-      "fields": []
-    },
-    {
-      "name": "producer_zipcode",
-      "type": "Edm.String",
-      "facetable": false,
-      "filterable": true,
-      "key": false,
-      "retrievable": true,
-      "searchable": false,
-      "sortable": true,
-      "analyzer": "standard.lucene",
-      "indexAnalyzer": null,
-      "searchAnalyzer": null,
-      "synonymMaps": [],
-      "fields": []
-    },
-    {
-      "name": "producer_city",
-      "type": "Edm.String",
-      "facetable": false,
-      "filterable": true,
-      "key": false,
-      "retrievable": true,
-      "searchable": false,
-      "sortable": true,
-      "analyzer": "standard.lucene",
-      "indexAnalyzer": null,
-      "searchAnalyzer": null,
-      "synonymMaps": [],
-      "fields": []
-    },
-    {
-      "name": "last_update",
-      "type": "Edm.DateTimeOffset",
-      "facetable": false,
-      "filterable": false,
-      "retrievable": false,
-      "sortable": false,
-      "analyzer": null,
-      "indexAnalyzer": null,
-      "searchAnalyzer": null,
-      "synonymMaps": [],
-      "fields": []
-    },
-    {
-      "name": "removed",
-      "type": "Edm.Int32",
-      "facetable": false,
-      "filterable": true,
-      "retrievable": false,
-      "sortable": false,
-      "analyzer": null,
-      "indexAnalyzer": null,
-      "searchAnalyzer": null,
-      "synonymMaps": [],
-      "fields": []
-    },
-    {
-      "name": "producer_tags",
-      "type": "Collection(Edm.String)",
-      "facetable": false,
-      "filterable": true,
-      "retrievable": true,
-      "searchable": false,
-      "analyzer": null,
-      "indexAnalyzer": null,
-      "searchAnalyzer": null,
-      "synonymMaps": [],
-      "fields": []
-    },
-    {
-      "name": "producer_longitude",
-      "type": "Edm.Double",
-      "facetable": false,
-      "filterable": false,
-      "retrievable": true,
-      "sortable": false,
-      "analyzer": null,
-      "indexAnalyzer": null,
-      "searchAnalyzer": null,
-      "synonymMaps": [],
-      "fields": []
-    },
-    {
-      "name": "producer_latitude",
-      "type": "Edm.Double",
-      "facetable": false,
-      "filterable": false,
-      "retrievable": true,
-      "sortable": false,
-      "analyzer": null,
-      "indexAnalyzer": null,
-      "searchAnalyzer": null,
-      "synonymMaps": [],
-      "fields": []
-    },
-    {
-      "name": "producer_geolocation",
-      "type": "Edm.GeographyPoint",
-      "filterable": true,
-      "retrievable": true,
-      "sortable": true,
-      "analyzer": null,
-      "indexAnalyzer": null,
-      "searchAnalyzer": null,
-      "synonymMaps": [],
-      "fields": []
-    },
-    {
-      "name": "producer_products_count",
-      "type": "Edm.Int32",
-      "facetable": false,
-      "filterable": true,
-      "retrievable": true,
-      "sortable": true,
-      "analyzer": null,
-      "indexAnalyzer": null,
-      "searchAnalyzer": null,
-      "synonymMaps": [],
-      "fields": []
-    },
-    {
-      "name": "partialProducerName",
-      "type": "Edm.String",
-      "facetable": false,
-      "filterable": false,
-      "key": false,
-      "retrievable": false,
-      "searchable": true,
-      "sortable": false,
-      "analyzer": null,
-      "indexAnalyzer": "prefixCmAnalyzer",
-      "searchAnalyzer": "standardCmAnalyzer",
-      "synonymMaps": [],
-      "fields": []
-    }
-  ],
-  "suggesters": [
-    {
-      "name": "suggest-producers",
-      "searchMode": "analyzingInfixMatching",
-      "sourceFields": [
-        "producer_name"
-      ]
-    }
-  ],
-  "similarity": {
-    "@odata.type": "#Microsoft.Azure.Search.BM25Similarity"
-  },
-  "scoringProfiles": [],
-  "defaultScoringProfile": "",
-  "corsOptions": null,
-  "analyzers": [
-    {
-      "@odata.type": "#Microsoft.Azure.Search.CustomAnalyzer",
-      "name": "standardCmAnalyzer",
-      "tokenizer": "standard_v2",
-      "tokenFilters": [
-        "lowercase",
-        "asciifolding"
-      ],
-      "charFilters": []
-    },
-    {
-      "@odata.type": "#Microsoft.Azure.Search.CustomAnalyzer",
-      "name": "prefixCmAnalyzer",
-      "tokenizer": "tokenizerLetterDigit",
-      "tokenFilters": [
-        "lowercase",
-        "asciifolding"
-      ],
-      "charFilters": [
-        "charFilterSpecial"
-      ]
-    }
-  ],
-  "charFilters": [
-    {
-      "@odata.type": "#Microsoft.Azure.Search.MappingCharFilter",
-      "name": "charFilterSpecial",
-      "mappings": [
-        ",=>",
-        ";=>",
-        "!=>",
-        ".=>",
-        "|=>",
-        "==>",
-        "~=>",
-        "\"=>",
-        "(=>",
-        ")=>",
-        "[=>",
-        "]=>",
-        "#=>",
-        "&=>"
-      ]
-    }
-  ],
-  "tokenizers": [
-    {
-      "@odata.type": "#Microsoft.Azure.Search.EdgeNGramTokenizer",
-      "name": "tokenizerLetterDigit",
-      "minGram": 3,
-      "maxGram": 7,
-      "tokenChars": [
-        "letter",
-        "digit"
-      ]
-    }
-  ]
+"name": "producers",
+"fields": [
+{
+"name": "producer_id",
+"type": "Edm.String",
+"facetable": false,
+"filterable": false,
+"key": true,
+"retrievable": true,
+"searchable": false,
+"sortable": false,
+"analyzer": null,
+"indexAnalyzer": null,
+"searchAnalyzer": null,
+"synonymMaps": [],
+"fields": []
+},
+{
+"name": "producer_name",
+"type": "Edm.String",
+"facetable": false,
+"filterable": false,
+"key": false,
+"retrievable": true,
+"searchable": true,
+"sortable": true,
+"analyzer": "standard.lucene",
+"indexAnalyzer": null,
+"searchAnalyzer": null,
+"synonymMaps": [],
+"fields": []
+},
+{
+"name": "producer_email",
+"type": "Edm.String",
+"facetable": false,
+"filterable": false,
+"key": false,
+"retrievable": true,
+"searchable": false,
+"sortable": false,
+"analyzer": null,
+"indexAnalyzer": null,
+"searchAnalyzer": null,
+"synonymMaps": [],
+"fields": []
+},
+{
+"name": "producer_picture",
+"type": "Edm.String",
+"facetable": false,
+"filterable": false,
+"key": false,
+"retrievable": true,
+"searchable": false,
+"sortable": false,
+"analyzer": null,
+"indexAnalyzer": null,
+"searchAnalyzer": null,
+"synonymMaps": [],
+"fields": []
+},
+{
+"name": "producer_phone",
+"type": "Edm.String",
+"facetable": false,
+"filterable": false,
+"key": false,
+"retrievable": true,
+"searchable": false,
+"sortable": false,
+"analyzer": null,
+"indexAnalyzer": null,
+"searchAnalyzer": null,
+"synonymMaps": [],
+"fields": []
+},
+{
+"name": "producer_line1",
+"type": "Edm.String",
+"facetable": false,
+"filterable": false,
+"key": false,
+"retrievable": true,
+"searchable": false,
+"sortable": false,
+"analyzer": null,
+"indexAnalyzer": null,
+"searchAnalyzer": null,
+"synonymMaps": [],
+"fields": []
+},
+{
+"name": "producer_line2",
+"type": "Edm.String",
+"facetable": false,
+"filterable": false,
+"key": false,
+"retrievable": true,
+"searchable": false,
+"sortable": false,
+"analyzer": null,
+"indexAnalyzer": null,
+"searchAnalyzer": null,
+"synonymMaps": [],
+"fields": []
+},
+{
+"name": "producer_zipcode",
+"type": "Edm.String",
+"facetable": false,
+"filterable": true,
+"key": false,
+"retrievable": true,
+"searchable": false,
+"sortable": true,
+"analyzer": null,
+"indexAnalyzer": null,
+"searchAnalyzer": null,
+"synonymMaps": [],
+"fields": []
+},
+{
+"name": "producer_city",
+"type": "Edm.String",
+"facetable": false,
+"filterable": true,
+"key": false,
+"retrievable": true,
+"searchable": null,
+"sortable": true,
+"analyzer": "standard.lucene",
+"indexAnalyzer": null,
+"searchAnalyzer": null,
+"synonymMaps": [],
+"fields": []
+},
+{
+"name": "last_update",
+"type": "Edm.DateTimeOffset",
+"facetable": false,
+"filterable": false,
+"retrievable": false,
+"sortable": false,
+"analyzer": null,
+"indexAnalyzer": null,
+"searchAnalyzer": null,
+"synonymMaps": [],
+"fields": []
+},
+{
+"name": "removed",
+"type": "Edm.Int32",
+"facetable": false,
+"filterable": true,
+"retrievable": false,
+"sortable": false,
+"analyzer": null,
+"indexAnalyzer": null,
+"searchAnalyzer": null,
+"synonymMaps": [],
+"fields": []
+},
+{
+"name": "producer_tags",
+"type": "Collection(Edm.String)",
+"facetable": false,
+"filterable": true,
+"retrievable": true,
+"searchable": false,
+"analyzer": null,
+"indexAnalyzer": null,
+"searchAnalyzer": null,
+"synonymMaps": [],
+"fields": []
+},
+{
+"name": "producer_longitude",
+"type": "Edm.Double",
+"facetable": false,
+"filterable": false,
+"retrievable": true,
+"sortable": false,
+"analyzer": null,
+"indexAnalyzer": null,
+"searchAnalyzer": null,
+"synonymMaps": [],
+"fields": []
+},
+{
+"name": "producer_latitude",
+"type": "Edm.Double",
+"facetable": false,
+"filterable": false,
+"retrievable": true,
+"sortable": false,
+"analyzer": null,
+"indexAnalyzer": null,
+"searchAnalyzer": null,
+"synonymMaps": [],
+"fields": []
+},
+{
+"name": "producer_geolocation",
+"type": "Edm.GeographyPoint",
+"filterable": true,
+"retrievable": true,
+"sortable": true,
+"analyzer": null,
+"indexAnalyzer": null,
+"searchAnalyzer": null,
+"synonymMaps": [],
+"fields": []
+},
+{
+"name": "producer_products_count",
+"type": "Edm.Int32",
+"facetable": false,
+"filterable": true,
+"retrievable": true,
+"sortable": true,
+"analyzer": null,
+"indexAnalyzer": null,
+"searchAnalyzer": null,
+"synonymMaps": [],
+"fields": []
+},
+{
+"name": "partialProducerName",
+"type": "Edm.String",
+"facetable": false,
+"filterable": false,
+"key": false,
+"retrievable": false,
+"searchable": true,
+"sortable": false,
+"analyzer": null,
+"indexAnalyzer": "prefixCmAnalyzer",
+"searchAnalyzer": "standardCmAnalyzer",
+"synonymMaps": [],
+"fields": []
+}
+],
+"suggesters": [
+{
+"name": "suggest-producers",
+"searchMode": "analyzingInfixMatching",
+"sourceFields": [
+"producer_name"
+]
+}
+],
+"similarity": {
+"@odata.type": "#Microsoft.Azure.Search.BM25Similarity"
+},
+"scoringProfiles": [],
+"defaultScoringProfile": "",
+"corsOptions": null,
+"analyzers": [
+{
+"@odata.type": "#Microsoft.Azure.Search.CustomAnalyzer",
+"name": "standardCmAnalyzer",
+"tokenizer": "standard_v2",
+"tokenFilters": [
+"lowercase",
+"asciifolding"
+],
+"charFilters": []
+},
+{
+"@odata.type": "#Microsoft.Azure.Search.CustomAnalyzer",
+"name": "prefixCmAnalyzer",
+"tokenizer": "tokenizerLetterDigit",
+"tokenFilters": [
+"lowercase",
+"asciifolding"
+],
+"charFilters": [
+"charFilterSpecial"
+]
+}
+],
+"charFilters": [
+{
+"@odata.type": "#Microsoft.Azure.Search.MappingCharFilter",
+"name": "charFilterSpecial",
+"mappings": [
+",=>",
+";=>",
+"!=>",
+".=>",
+"|=>",
+"==>",
+"~=>",
+"\"=>",
+"(=>",
+")=>",
+"[=>",
+"]=>",
+"#=>",
+"&=>"
+]
+}
+],
+"tokenizers": [
+{
+"@odata.type": "#Microsoft.Azure.Search.EdgeNGramTokenizer",
+"name": "tokenizerLetterDigit",
+"minGram": 3,
+"maxGram": 12,
+"tokenChars": [
+"letter",
+"digit"
+]
+}
+]
 }
 
 POST https://sheaft-search.search.windows.net/indexers?api-version=2020-06-30

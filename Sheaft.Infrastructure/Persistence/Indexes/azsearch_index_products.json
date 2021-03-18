@@ -474,7 +474,7 @@ POST https://sheaft-search.search.windows.net/indexes?api-version=2020-06-30&all
       "@odata.type": "#Microsoft.Azure.Search.EdgeNGramTokenizer",
       "name": "tokenizerLetterDigit",
       "minGram": 3,
-      "maxGram": 7,
+      "maxGram": 12,
       "tokenChars": [
         "letter",
         "digit"
