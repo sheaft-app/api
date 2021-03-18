@@ -1,12 +1,13 @@
 ﻿using HotChocolate.Types;
-using Sheaft.Application.Common.Models.Inputs;
+using Sheaft.Application.Models;
 
 namespace Sheaft.GraphQL.Types.Inputs
 {
-    public class CreateAgreementInputType : SheaftInputType<CreateAgreementInput>
+    public class CreateAgreementInputType : SheaftInputType<CreateAgreementDto>
     {
-        protected override void Configure(IInputObjectTypeDescriptor<CreateAgreementInput> descriptor)
+        protected override void Configure(IInputObjectTypeDescriptor<CreateAgreementDto> descriptor)
         {
+            descriptor.Name("CreateAgreementInput");
             descriptor.Field(c => c.DeliveryModeId)
                 .Type<NonNullType<IdType>>();
 

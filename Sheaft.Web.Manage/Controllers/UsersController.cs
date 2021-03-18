@@ -7,12 +7,12 @@ using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Sheaft.Application.Common.Interfaces;
-using Sheaft.Application.Common.Interfaces.Services;
-using Sheaft.Application.Common.Options;
+using Sheaft.Application.Interfaces;
+using Sheaft.Application.Interfaces.Infrastructure;
+using Sheaft.Core.Exceptions;
 using Sheaft.Domain;
 using Sheaft.Domain.Enum;
-using Sheaft.Domain.Exceptions;
+using Sheaft.Options;
 
 namespace Sheaft.Web.Manage.Controllers
 {

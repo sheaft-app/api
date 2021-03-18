@@ -8,15 +8,15 @@ using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Sheaft.Application.Common.Interfaces;
-using Sheaft.Application.Common.Interfaces.Services;
-using Sheaft.Application.Common.Models.Inputs;
-using Sheaft.Application.Common.Models.ViewModels;
-using Sheaft.Application.Common.Options;
-using Sheaft.Application.Declaration.Commands;
-using Sheaft.Application.Ubo.Commands;
+using Sheaft.Application.Interfaces;
+using Sheaft.Application.Interfaces.Infrastructure;
+using Sheaft.Application.Models;
+using Sheaft.Core.Exceptions;
 using Sheaft.Domain;
-using Sheaft.Domain.Exceptions;
+using Sheaft.Options;
+using Sheaft.Services.Declaration.Commands;
+using Sheaft.Services.Ubo.Commands;
+using Sheaft.Web.Manage.Models;
 
 namespace Sheaft.Web.Manage.Controllers
 {
@@ -88,9 +88,9 @@ namespace Sheaft.Web.Manage.Controllers
             var result = await _mediatr.Process(new CreateUboCommand(await GetRequestUser(token))
             {
                 DeclarationId = declarationId,
-                Address = _mapper.Map<AddressInput>(model.Address),
+                Address = _mapper.Map<AddressDto>(model.Address),
                 BirthDate = model.BirthDate,
-                BirthPlace = _mapper.Map<BirthAddressInput>(model.BirthPlace),
+                BirthPlace = _mapper.Map<BirthAddressDto>(model.BirthPlace),
                 FirstName = model.FirstName,
                 LastName = model.LastName,
                 Nationality = model.Nationality
@@ -135,9 +135,9 @@ namespace Sheaft.Web.Manage.Controllers
             var result = await _mediatr.Process(new UpdateUboCommand(await GetRequestUser(token))
             {
                 UboId = model.Id,
-                Address = _mapper.Map<AddressInput>(model.Address),
+                Address = _mapper.Map<AddressDto>(model.Address),
                 BirthDate = model.BirthDate,
-                BirthPlace = _mapper.Map<BirthAddressInput>(model.BirthPlace),
+                BirthPlace = _mapper.Map<BirthAddressDto>(model.BirthPlace),
                 FirstName = model.FirstName,
                 LastName = model.LastName,
                 Nationality = model.Nationality

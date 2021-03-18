@@ -7,13 +7,14 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Azure.Storage;
-using Sheaft.Application.Common.Interfaces.Services;
-using Sheaft.Application.Common.Models;
-using Sheaft.Application.Common.Options;
+using Sheaft.Application.Interfaces.Infrastructure;
+using Sheaft.Application.Services;
+using Sheaft.Core;
+using Sheaft.Options;
 
 namespace Sheaft.Infrastructure.Services
 {
-    public class BlobService : BaseService, IBlobService
+    public class BlobService : SheaftService, IBlobService
     {
         private readonly StorageOptions _storageOptions;
 

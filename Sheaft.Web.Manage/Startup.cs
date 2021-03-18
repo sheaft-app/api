@@ -30,33 +30,40 @@ using NewRelic.LogEnrichers.Serilog;
 using Sheaft.Web.Common;
 using Microsoft.IdentityModel.Logging;
 using Microsoft.Azure.Cosmos.Table;
-using Sheaft.Application.Agreement.Queries;
-using Sheaft.Application.Common.Interfaces;
-using Sheaft.Application.Common.Interfaces.Queries;
-using Sheaft.Application.Common.Interfaces.Services;
-using Sheaft.Application.Common.Options;
-using Sheaft.Application.Consumer.Queries;
-using Sheaft.Application.Country.Queries;
-using Sheaft.Application.DeliveryMode.Queries;
-using Sheaft.Application.Department.Queries;
-using Sheaft.Application.Document.Queries;
-using Sheaft.Application.Job.Queries;
-using Sheaft.Application.Leaderboard.Queries;
-using Sheaft.Application.Legal.Queries;
-using Sheaft.Application.Nationality.Queries;
-using Sheaft.Application.Notification.Queries;
-using Sheaft.Application.Order.Queries;
-using Sheaft.Application.Payin.Queries;
-using Sheaft.Application.Producer.Queries;
-using Sheaft.Application.Product.Queries;
-using Sheaft.Application.PurchaseOrder.Queries;
-using Sheaft.Application.QuickOrder.Queries;
-using Sheaft.Application.Region.Queries;
-using Sheaft.Application.Returnable.Queries;
-using Sheaft.Application.Store.Commands;
-using Sheaft.Application.Tag.Queries;
-using Sheaft.Application.User.Queries;
-using Sheaft.Mappings;
+using Sheaft.Application;
+using Sheaft.Application.Interfaces;
+using Sheaft.Application.Interfaces.Infrastructure;
+using Sheaft.Application.Interfaces.Queries;
+using Sheaft.Application.Interfaces.Services;
+using Sheaft.Application.Mappings;
+using Sheaft.Options;
+using Sheaft.Services;
+using Sheaft.Services.Agreement.Queries;
+using Sheaft.Services.Consumer.Queries;
+using Sheaft.Services.Country.Queries;
+using Sheaft.Services.DeliveryMode.Queries;
+using Sheaft.Services.DeliveryMode.Services;
+using Sheaft.Services.Department.Queries;
+using Sheaft.Services.Document.Queries;
+using Sheaft.Services.Fees.Services;
+using Sheaft.Services.Job.Queries;
+using Sheaft.Services.Leaderboard.Queries;
+using Sheaft.Services.Legal.Queries;
+using Sheaft.Services.Nationality.Queries;
+using Sheaft.Services.Notification.Queries;
+using Sheaft.Services.Order.Queries;
+using Sheaft.Services.Payin.Queries;
+using Sheaft.Services.Producer.Queries;
+using Sheaft.Services.Product.Queries;
+using Sheaft.Services.PurchaseOrder.Queries;
+using Sheaft.Services.QuickOrder.Queries;
+using Sheaft.Services.Region.Queries;
+using Sheaft.Services.Returnable.Queries;
+using Sheaft.Services.Store.Commands;
+using Sheaft.Services.Tag.Queries;
+using Sheaft.Services.User.Queries;
+using Sheaft.Services.User.Services;
+using Sheaft.Web.Manage.Mappings;
 
 namespace Sheaft.Web.Manage
 {
@@ -141,7 +148,7 @@ namespace Sheaft.Web.Manage
                     .Build();
             });
 
-            services.AddAutoMapper(typeof(ProductProfile).Assembly);
+            services.AddAutoMapper(new []{typeof(ProductProfile).Assembly, typeof(ProductViewProfile).Assembly});
 
             services.Configure<KestrelServerOptions>(options =>
             {
@@ -248,7 +255,8 @@ namespace Sheaft.Web.Manage
             services.AddScoped<IPspService, PspService>();
             services.AddScoped<IAuthService, AuthService>();
             services.AddScoped<IFeesService, FeesService>();
-            services.AddScoped<ICapingDeliveriesService, CapingDeliveriesService>();
+            services.AddScoped<IDeliveryService, DeliveryService>();
+            services.AddScoped<ITableService, TableService>();
             services.AddSingleton<IBackgroundJobClient, BackgroundJobClient>();
             services.AddSingleton<ICurrentUserService, CurrentUserService>();
             services.AddSingleton<ISheaftMediatr, SheaftMediatr>();

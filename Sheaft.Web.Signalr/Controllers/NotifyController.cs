@@ -8,9 +8,9 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Sheaft.Application.Common.Interfaces.Services;
-using Sheaft.Application.Notification.Commands;
+using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Domain;
+using Sheaft.Services.Notification.Commands;
 using Sheaft.Web.Signalr.Hubs;
 
 namespace Sheaft.Web.Signalr.Controllers

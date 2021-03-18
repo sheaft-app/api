@@ -1,10 +1,9 @@
-﻿@using Sheaft.Application.Common.Models.ViewModels
-@using Sheaft.Domain.Enum
-@model Sheaft.Application.Common.Models.ViewModels.BusinessLegalViewModel
+﻿@using Sheaft.Domain.Enum
+@model BusinessLegalViewModel
 @{
     ViewData["Title"] = "New Business Legals";
-    var countries = ((List<CountryViewModel>)ViewBag.Countries).Select(c => new SelectListItem(c.Name, c.Alpha2)).ToList();
-    var nationalities = ((List<NationalityViewModel>)ViewBag.Nationalities).Select(c => new SelectListItem(c.Name, c.Alpha2)).ToList();
+    var countries = ((List<CountryViewModel>)ViewBag.Countries).Select(c => new SelectListItem(c.Name, c.Code)).ToList();
+    var nationalities = ((List<NationalityViewModel>)ViewBag.Nationalities).Select(c => new SelectListItem(c.Name, c.Code)).ToList();
     var kinds = new List<SelectListItem> {
         new SelectListItem("Business", LegalKind.Business.ToString("G")),
         new SelectListItem("Individual", LegalKind.Individual.ToString("G")),

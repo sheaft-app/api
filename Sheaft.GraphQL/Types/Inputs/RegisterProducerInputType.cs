@@ -1,12 +1,13 @@
 ﻿using HotChocolate.Types;
-using Sheaft.Application.Common.Models.Inputs;
+using Sheaft.Application.Models;
 
 namespace Sheaft.GraphQL.Types.Inputs
 {
-    public class RegisterProducerInputType : SheaftInputType<RegisterProducerInput>
+    public class RegisterProducerInputType : SheaftInputType<RegisterProducerDto>
     {
-        protected override void Configure(IInputObjectTypeDescriptor<RegisterProducerInput> descriptor)
+        protected override void Configure(IInputObjectTypeDescriptor<RegisterProducerDto> descriptor)
         {
+            descriptor.Name("RegisterProducerInput");
             descriptor.Field(c => c.OpenForNewBusiness);
             descriptor.Field(c => c.Phone);
             descriptor.Field(c => c.Picture);
@@ -22,7 +23,7 @@ namespace Sheaft.GraphQL.Types.Inputs
                 .Type<NonNullType<BooleanType>>();
 
             descriptor.Field(c => c.Address)
-                .Type<NonNullType<FullAddressInputType>>();
+                .Type<NonNullType<AddressInputType>>();
 
             descriptor.Field(c => c.Email)
                 .Type<NonNullType<StringType>>();

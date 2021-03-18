@@ -5,78 +5,6 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <Content Include="Services\Templates\AgreementAcceptedEvent.cshtml">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </Content>
-      <Content Include="Services\Templates\AgreementCancelledEvent.cshtml">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </Content>
-      <Content Include="Services\Templates\AgreementCreatedEvent.cshtml">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </Content>
-      <Content Include="Services\Templates\AgreementRefusedEvent.cshtml">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </Content>
-      <Content Include="Services\Templates\PayinFailedEvent.cshtml">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </Content>
-      <Content Include="Services\Templates\PayinSucceededEvent.cshtml">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </Content>
-      <Content Include="Services\Templates\PickingOrderExportFailedEvent.cshtml">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </Content>
-      <Content Include="Services\Templates\PickingOrderExportSucceededEvent.cshtml">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </Content>
-      <Content Include="Services\Templates\ProductImportFailedEvent.cshtml">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </Content>
-      <Content Include="Services\Templates\ProductImportSucceededEvent.cshtml">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </Content>
-      <Content Include="Services\Templates\PurchaseOrderAcceptedEvent.cshtml">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </Content>
-      <Content Include="Services\Templates\PurchaseOrderCancelledEvent.cshtml">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </Content>
-      <Content Include="Services\Templates\PurchaseOrderCompletedEvent.cshtml">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </Content>
-      <Content Include="Services\Templates\PurchaseOrderCreatedEvent.cshtml">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </Content>
-      <Content Include="Services\Templates\PurchaseOrderReceivedEvent.cshtml">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </Content>
-      <Content Include="Services\Templates\PurchaseOrderRefusedEvent.cshtml">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </Content>
-      <Content Include="Services\Templates\PurchaseOrdersExportFailedEvent.cshtml">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </Content>
-      <Content Include="Services\Templates\PurchaseOrdersExportSucceededEvent.cshtml">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </Content>
-      <Content Include="Services\Templates\PurchaseOrderWithdrawnEvent.cshtml">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </Content>
-      <Content Include="Services\Templates\TransactionsExportFailedEvent.cshtml">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </Content>
-      <Content Include="Services\Templates\TransactionsExportSucceededEvent.cshtml">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </Content>
-      <Content Include="Services\Templates\UserDataExportFailedEvent.cshtml">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </Content>
-      <Content Include="Services\Templates\UserDataExportSucceededEvent.cshtml">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </Content>
-    </ItemGroup>
-
-    <ItemGroup>
       <PackageReference Include="AWSSDK.SimpleEmail" Version="3.5.0.52" />
       <PackageReference Include="Azure.Storage.Blobs" Version="12.7.0" />
       <PackageReference Include="Dapper" Version="2.0.78" />
@@ -101,7 +29,9 @@
 
     <ItemGroup>
       <ProjectReference Include="..\Sheaft.Application\Sheaft.Application.csproj" />
+      <ProjectReference Include="..\Sheaft.Core\Sheaft.Core.csproj" />
       <ProjectReference Include="..\Sheaft.Localization\Sheaft.Localization.csproj" />
+      <ProjectReference Include="..\Sheaft.Options\Sheaft.Options.csproj" />
     </ItemGroup>
 
 </Project>

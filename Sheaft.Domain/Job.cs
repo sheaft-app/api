@@ -1,9 +1,10 @@
 using System;
 using System.Collections.Generic;
 using Newtonsoft.Json;
+using Sheaft.Core.Enums;
+using Sheaft.Core.Exceptions;
 using Sheaft.Domain.Common;
 using Sheaft.Domain.Enum;
-using Sheaft.Domain.Exceptions;
 using Sheaft.Domain.Interop;
 
 namespace Sheaft.Domain

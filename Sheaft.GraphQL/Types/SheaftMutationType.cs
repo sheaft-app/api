@@ -1,6 +1,6 @@
 ﻿using HotChocolate.Types;
 using HotChocolate.Types.Relay;
-using Sheaft.Application.Common.Security;
+using Sheaft.Application.Security;
 using Sheaft.Domain;
 using Sheaft.GraphQL.Filters;
 using Sheaft.GraphQL.Sorts;

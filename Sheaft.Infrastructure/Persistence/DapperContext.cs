@@ -5,9 +5,9 @@ using Microsoft.Data.SqlClient;
 using System.Threading;
 using Dapper;
 using Microsoft.Extensions.Options;
-using Sheaft.Application.Common.Interfaces;
-using Sheaft.Application.Common.Options;
+using Sheaft.Application.Interfaces;
 using Sheaft.Domain.Views;
+using Sheaft.Options;
 
 namespace Sheaft.Infrastructure.Persistence
 {

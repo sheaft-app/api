@@ -10,16 +10,17 @@ using System.Net.Http;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
-using Sheaft.Application.Common.Interfaces.Services;
-using Sheaft.Application.Common.Models;
-using Sheaft.Application.Common.Options;
+using Sheaft.Application.Interfaces.Infrastructure;
+using Sheaft.Application.Services;
+using Sheaft.Core;
 using Sheaft.Domain;
 using Sheaft.Domain.Enum;
+using Sheaft.Options;
 using SixLabors.ImageSharp.Formats.Png;
 
 namespace Sheaft.Infrastructure.Services
 {
-    public class PictureService : BaseService, IPictureService
+    public class PictureService : SheaftService, IPictureService
     {
         private readonly HttpClient _httpClient;
         private readonly StorageOptions _storageOptions;

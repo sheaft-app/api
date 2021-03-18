@@ -2,7 +2,7 @@
 using Newtonsoft.Json;
 using Sheaft.Domain.Common;
 
-namespace Sheaft.Domain.Events.Transactions
+namespace Sheaft.Domain.Events.PurchaseOrder
 {
     public class PurchaseOrdersExportFailedEvent : DomainEvent
     {

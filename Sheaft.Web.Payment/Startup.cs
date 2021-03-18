@@ -16,9 +16,9 @@ using Sheaft.Web.Common;
 using System.Collections.Generic;
 using System.Reflection;
 using MediatR;
-using Sheaft.Application.Common.Interfaces.Services;
-using Sheaft.Application.Common.Options;
-using Sheaft.Application.Store.Commands;
+using Sheaft.Application.Interfaces.Infrastructure;
+using Sheaft.Options;
+using Sheaft.Services.Store.Commands;
 
 namespace Sheaft.Web.Payment
 {
@@ -81,7 +81,6 @@ namespace Sheaft.Web.Payment
 
             services.AddMediatR(new List<Assembly>() { typeof(RegisterStoreCommand).Assembly }.ToArray());
             services.AddScoped<IBackgroundJobClient, BackgroundJobClient>();
-            services.AddScoped<ISheaftHangfireBridge, SheaftHangfireBridge>();
 
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             services.AddOptions();

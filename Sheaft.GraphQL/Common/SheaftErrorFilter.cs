@@ -3,11 +3,11 @@ using HotChocolate;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
-using Sheaft.Application.Common.Extensions;
-using Sheaft.Application.Common.Interfaces.Services;
+using Sheaft.Application.Interfaces.Services;
+using Sheaft.Core.Enums;
+using Sheaft.Core.Exceptions;
 using Sheaft.Domain;
 using Sheaft.Domain.Enum;
-using Sheaft.Domain.Exceptions;
 using Sheaft.Localization;
 
 namespace Sheaft.GraphQL.Common

@@ -11,8 +11,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Sheaft.Application\Sheaft.Application.csproj" />
     <ProjectReference Include="..\Sheaft.Infrastructure\Sheaft.Infrastructure.csproj" />
+    <ProjectReference Include="..\Sheaft.Services\Sheaft.Services.csproj" />
   </ItemGroup>
 
 </Project>

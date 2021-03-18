@@ -8,15 +8,15 @@ using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Sheaft.Application.Common.Interfaces;
-using Sheaft.Application.Common.Interfaces.Services;
-using Sheaft.Application.Common.Models.Inputs;
-using Sheaft.Application.Common.Models.ViewModels;
-using Sheaft.Application.Common.Options;
-using Sheaft.Application.Legal.Commands;
+using Sheaft.Application.Interfaces;
+using Sheaft.Application.Interfaces.Infrastructure;
+using Sheaft.Application.Models;
+using Sheaft.Core.Exceptions;
 using Sheaft.Domain;
 using Sheaft.Domain.Enum;
-using Sheaft.Domain.Exceptions;
+using Sheaft.Options;
+using Sheaft.Services.Legal.Commands;
+using Sheaft.Web.Manage.Models;
 
 namespace Sheaft.Web.Manage.Controllers
 {
@@ -106,9 +106,9 @@ namespace Sheaft.Web.Manage.Controllers
                 UserId = model.Owner.Id,
                 Name = model.Name,
                 Email = model.Email,
-                Address = _mapper.Map<AddressInput>(model.Address),
+                Address = _mapper.Map<AddressDto>(model.Address),
                 Kind = model.Kind,
-                Owner = _mapper.Map<OwnerInput>(model.Owner),
+                Owner = _mapper.Map<CreateOwnerDto>(model.Owner),
                 Siret = model.Siret,
                 VatIdentifier = model.VatIdentifier
             }, token);
@@ -155,7 +155,7 @@ namespace Sheaft.Web.Manage.Controllers
                 Email = model.Owner.Email,
                 FirstName = model.Owner.FirstName,
                 LastName = model.Owner.LastName,
-                Address = _mapper.Map<AddressInput>(model.Owner.Address),
+                Address = _mapper.Map<AddressDto>(model.Owner.Address),
                 BirthDate = model.Owner.BirthDate,
                 CountryOfResidence = model.Owner.CountryOfResidence,
                 Nationality = model.Owner.Nationality
@@ -198,10 +198,10 @@ namespace Sheaft.Web.Manage.Controllers
                 LegalId = model.Id,
                 Name = model.Name,
                 Email = model.Email,
-                Address = _mapper.Map<AddressInput>(model.Address),
+                Address = _mapper.Map<AddressDto>(model.Address),
                 Kind = model.Kind,
                 Validation = model.Validation,
-                Owner = _mapper.Map<OwnerInput>(model.Owner),
+                Owner = _mapper.Map<OwnerDto>(model.Owner),
                 Siret = model.Siret,
                 VatIdentifier = model.VatIdentifier
             }, token);
@@ -244,7 +244,7 @@ namespace Sheaft.Web.Manage.Controllers
                 Email = model.Owner.Email,
                 FirstName = model.Owner.FirstName,
                 LastName = model.Owner.LastName,
-                Address = _mapper.Map<AddressInput>(model.Owner.Address),
+                Address = _mapper.Map<AddressDto>(model.Owner.Address),
                 BirthDate = model.Owner.BirthDate,
                 Validation = model.Validation,
                 CountryOfResidence = model.Owner.CountryOfResidence,

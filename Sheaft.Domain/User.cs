@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Sheaft.Core.Enums;
+using Sheaft.Core.Exceptions;
+using Sheaft.Core.Extensions;
 using Sheaft.Domain.Enum;
-using Sheaft.Domain.Exceptions;
-using Sheaft.Domain.Extensions;
 using Sheaft.Domain.Interop;
 
 namespace Sheaft.Domain

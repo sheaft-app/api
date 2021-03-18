@@ -1,12 +1,13 @@
 ﻿using HotChocolate.Types;
-using Sheaft.Application.Common.Models.Inputs;
+using Sheaft.Application.Models;
 
 namespace Sheaft.GraphQL.Types.Inputs
 {
-    public class UpdateConsumerLegalsInputType : SheaftInputType<UpdateConsumerLegalInput>
+    public class UpdateConsumerLegalsInputType : SheaftInputType<UpdateConsumerLegalDto>
     {
-        protected override void Configure(IInputObjectTypeDescriptor<UpdateConsumerLegalInput> descriptor)
+        protected override void Configure(IInputObjectTypeDescriptor<UpdateConsumerLegalDto> descriptor)
         {
+            descriptor.Name("UpdateConsumerLegalInput");
             descriptor.Field(c => c.Id)
                 .Type<NonNullType<IdType>>();
 

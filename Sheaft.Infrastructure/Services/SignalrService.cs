@@ -6,8 +6,8 @@ using System;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
-using Sheaft.Application.Common.Interfaces.Services;
-using Sheaft.Application.Common.Options;
+using Sheaft.Application.Interfaces.Infrastructure;
+using Sheaft.Options;
 
 namespace Sheaft.Infrastructure.Services
 {

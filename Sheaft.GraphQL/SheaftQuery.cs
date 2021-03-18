@@ -3,13 +3,18 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using AutoMapper;
 using HotChocolate;
 using Microsoft.AspNetCore.Http;
-using Sheaft.Application.Common.Interfaces.Queries;
-using Sheaft.Application.Common.Interfaces.Services;
-using Sheaft.Application.Common.Models.Dto;
-using Sheaft.Application.Common.Models.Inputs;
+using Sheaft.Application.Interfaces.Queries;
+using Sheaft.Application.Interfaces.Services;
+using Sheaft.Application.Models;
 using Sheaft.Domain;
+using BusinessLegalDto = Sheaft.Application.Models.BusinessLegalDto;
+using ConsumerDto = Sheaft.Application.Models.ConsumerDto;
+using ConsumerLegalDto = Sheaft.Application.Models.ConsumerLegalDto;
+using OrderDto = Sheaft.Application.Models.OrderDto;
+using QuickOrderDto = Sheaft.Application.Models.QuickOrderDto;
 
 namespace Sheaft.GraphQL
 {
@@ -71,13 +76,13 @@ namespace Sheaft.GraphQL
             return await jobQueries.HasPickingOrdersExportsInProgressAsync(CurrentUser.Id, CurrentUser, Token);
         }
 
-        public async Task<IEnumerable<ProducerDeliveriesDto>> GetStoreDeliveriesForProducersAsync(SearchProducersDeliveriesInput input, [Service] IDeliveryQueries deliveryQueries)
+        public async Task<IEnumerable<ProducerDeliveriesDto>> GetStoreDeliveriesForProducersAsync(SearchProducersDeliveriesDto input, [Service] IDeliveryQueries deliveryQueries)
         {
             SetLogTransaction(nameof(GetStoreDeliveriesForProducersAsync), input);
             return await deliveryQueries.GetStoreDeliveriesForProducersAsync(CurrentUser.Id, input.Ids, input.Kinds, DateTimeOffset.UtcNow, CurrentUser, Token);
         }
 
-        public async Task<IEnumerable<ProducerDeliveriesDto>> GetProducersDeliveriesAsync(SearchProducersDeliveriesInput input, [Service] IDeliveryQueries deliveryQueries)
+        public async Task<IEnumerable<ProducerDeliveriesDto>> GetProducersDeliveriesAsync(SearchProducersDeliveriesDto input, [Service] IDeliveryQueries deliveryQueries)
         {
             SetLogTransaction(nameof(GetProducersDeliveriesAsync), input);
             return await deliveryQueries.GetProducersDeliveriesAsync(input.Ids, input.Kinds, DateTimeOffset.UtcNow, CurrentUser, Token);
@@ -89,25 +94,25 @@ namespace Sheaft.GraphQL
             return await userQueries.RetrieveSiretInfosAsync(input, CurrentUser, Token);
         }
 
-        public async Task<ProducersSearchDto> SearchProducersAsync(SearchTermsInput input, [Service] IProducerQueries producerQueries)
+        public async Task<ProducersSearchDto> SearchProducersAsync(SearchTermsDto input, [Service] IProducerQueries producerQueries)
         {
             SetLogTransaction(nameof(SearchProducersAsync), input);
             return await producerQueries.SearchProducersAsync(CurrentUser.Id, input, CurrentUser, Token);
         }
 
-        public async Task<StoresSearchDto> SearchStoresAsync(SearchTermsInput input, [Service] IStoreQueries storeQueries)
+        public async Task<StoresSearchDto> SearchStoresAsync(SearchTermsDto input, [Service] IStoreQueries storeQueries)
         {
             SetLogTransaction(nameof(SearchStoresAsync), input);
             return await storeQueries.SearchStoresAsync(CurrentUser.Id, input, CurrentUser, Token);
         }
 
-        public async Task<ProductsSearchDto> SearchProductsAsync(SearchProductsInput input, [Service] IProductQueries productQueries)
+        public async Task<ProductsSearchDto> SearchProductsAsync(SearchProductsDto input, [Service] IProductQueries productQueries)
         {
             SetLogTransaction(nameof(SearchProductsAsync), input);
             return await productQueries.SearchAsync(input, CurrentUser, Token);
         }
 
-        public async Task<IEnumerable<SuggestProducerDto>> SuggestProducersAsync(SearchTermsInput input, [Service] IProducerQueries producerQueries)
+        public async Task<IEnumerable<SuggestProducerDto>> SuggestProducersAsync(SearchTermsDto input, [Service] IProducerQueries producerQueries)
         {
             SetLogTransaction(nameof(SuggestProducersAsync), input);
             return await producerQueries.SuggestProducersAsync(input, CurrentUser, Token);

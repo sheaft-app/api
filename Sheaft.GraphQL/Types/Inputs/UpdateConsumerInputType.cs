@@ -1,12 +1,13 @@
 ﻿using HotChocolate.Types;
-using Sheaft.Application.Common.Models.Inputs;
+using Sheaft.Application.Models;
 
 namespace Sheaft.GraphQL.Types.Inputs
 {
-    public class UpdateConsumerInputType : SheaftInputType<UpdateConsumerInput>
+    public class UpdateConsumerInputType : SheaftInputType<UpdateConsumerDto>
     {
-        protected override void Configure(IInputObjectTypeDescriptor<UpdateConsumerInput> descriptor)
+        protected override void Configure(IInputObjectTypeDescriptor<UpdateConsumerDto> descriptor)
         {
+            descriptor.Name("UpdateConsumerInput");
             descriptor.Field(c => c.Phone);
             descriptor.Field(c => c.Picture);
             descriptor.Field(c => c.Summary);

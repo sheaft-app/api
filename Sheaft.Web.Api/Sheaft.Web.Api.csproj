@@ -40,10 +40,9 @@
     <PackageReference Include="Serilog.Sinks.NewRelic.Logs" Version="1.0.1" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Sheaft.Application\Sheaft.Application.csproj" />
     <ProjectReference Include="..\Sheaft.GraphQL\Sheaft.GraphQL.csproj" />
     <ProjectReference Include="..\Sheaft.Infrastructure\Sheaft.Infrastructure.csproj" />
-    <ProjectReference Include="..\Sheaft.Mappings\Sheaft.Mappings.csproj" />
+    <ProjectReference Include="..\Sheaft.Services\Sheaft.Services.csproj" />
     <ProjectReference Include="..\Sheaft.Web.Common\Sheaft.Web.Common.csproj" />
   </ItemGroup>
   <ItemGroup>

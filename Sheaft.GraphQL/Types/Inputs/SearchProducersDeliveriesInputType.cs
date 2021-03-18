@@ -1,13 +1,14 @@
 ﻿using HotChocolate.Types;
-using Sheaft.Application.Common.Models.Inputs;
+using Sheaft.Application.Models;
 using Sheaft.GraphQL.Enums;
 
 namespace Sheaft.GraphQL.Types.Inputs
 {
-    public class SearchProducersDeliveriesInputType : SheaftInputType<SearchProducersDeliveriesInput>
+    public class SearchProducersDeliveriesInputType : SheaftInputType<SearchProducersDeliveriesDto>
     {
-        protected override void Configure(IInputObjectTypeDescriptor<SearchProducersDeliveriesInput> descriptor)
+        protected override void Configure(IInputObjectTypeDescriptor<SearchProducersDeliveriesDto> descriptor)
         {
+            descriptor.Name("SearchProducersDeliveriesInput");
             descriptor.Field(c => c.Kinds)
                 .Type<NonNullType<ListType<DeliveryKindEnumType>>>();
 

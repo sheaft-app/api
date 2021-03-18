@@ -1,12 +1,13 @@
 ﻿using HotChocolate.Types;
-using Sheaft.Application.Common.Models.Inputs;
+using Sheaft.Application.Models;
 
 namespace Sheaft.GraphQL.Types.Inputs
 {
-    public class SearchProductsInputType : SheaftInputType<SearchProductsInput>
+    public class SearchProductsInputType : SheaftInputType<SearchProductsDto>
     {
-        protected override void Configure(IInputObjectTypeDescriptor<SearchProductsInput> descriptor)
+        protected override void Configure(IInputObjectTypeDescriptor<SearchProductsDto> descriptor)
         {
+            descriptor.Name("SearchProductsInput");
             descriptor.Field(c => c.Latitude);
             descriptor.Field(c => c.Longitude);
             descriptor.Field(c => c.MaxDistance);

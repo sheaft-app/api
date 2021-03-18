@@ -6,16 +6,16 @@ using System.Threading.Tasks;
 using Amazon.SimpleEmail;
 using Amazon.SimpleEmail.Model;
 using RazorLight;
-using Sheaft.Application.Common;
-using Sheaft.Application.Common.Extensions;
-using Sheaft.Application.Common.Interfaces.Services;
-using Sheaft.Application.Common.Models;
-using Sheaft.Application.Common.Options;
-using Sheaft.Domain.Enum;
+using Sheaft.Application.Interfaces.Infrastructure;
+using Sheaft.Application.Services;
+using Sheaft.Core;
+using Sheaft.Core.Enums;
+using Sheaft.Core.Extensions;
+using Sheaft.Options;
 
 namespace Sheaft.Infrastructure.Services
 {
-    public class EmailService : BaseService, IEmailService
+    public class EmailService : SheaftService, IEmailService
     {
         private readonly IRazorLightEngine _templateEngine;
         private readonly IAmazonSimpleEmailService _mailer;

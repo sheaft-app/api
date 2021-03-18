@@ -1,14 +1,17 @@
 using HotChocolate.Types;
-using Sheaft.Application.Common.Models.Inputs;
+using Sheaft.Application.Models;
 using Sheaft.GraphQL.Enums;
 
 namespace Sheaft.GraphQL.Types.Inputs
 {
-    public class AddressInputType : SheaftInputType<AddressInput>
+    public class AddressInputType : SheaftInputType<AddressDto>
     {
-        protected override void Configure(IInputObjectTypeDescriptor<AddressInput> descriptor)
+        protected override void Configure(IInputObjectTypeDescriptor<AddressDto> descriptor)
         {
+            descriptor.Name("AddressInput");
             descriptor.Field(c => c.Line2);
+            descriptor.Field(c => c.Longitude);
+            descriptor.Field(c => c.Latitude);
 
             descriptor.Field(c => c.Line1)
                 .Type<NonNullType<StringType>>();

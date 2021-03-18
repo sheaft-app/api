@@ -6,12 +6,13 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Sheaft.Application.Common.Extensions;
-using Sheaft.Application.Common.Interfaces.Services;
-using Sheaft.Application.Common.Security;
-using Sheaft.Application.Product.Commands;
+using Sheaft.Application.Interfaces.Infrastructure;
+using Sheaft.Application.Interfaces.Services;
+using Sheaft.Application.Security;
+using Sheaft.Core.Enums;
 using Sheaft.Domain;
 using Sheaft.Domain.Enum;
+using Sheaft.Services.Product.Commands;
 
 namespace Sheaft.Web.Api.Controllers
 {

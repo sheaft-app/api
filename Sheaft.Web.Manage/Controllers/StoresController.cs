@@ -10,15 +10,15 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Sheaft.Application.Common.Interfaces;
-using Sheaft.Application.Common.Interfaces.Services;
-using Sheaft.Application.Common.Models.Inputs;
-using Sheaft.Application.Common.Models.ViewModels;
-using Sheaft.Application.Common.Options;
-using Sheaft.Application.Store.Commands;
-using Sheaft.Application.User.Commands;
+using Sheaft.Application.Interfaces;
+using Sheaft.Application.Interfaces.Infrastructure;
+using Sheaft.Application.Models;
+using Sheaft.Core.Exceptions;
 using Sheaft.Domain;
-using Sheaft.Domain.Exceptions;
+using Sheaft.Options;
+using Sheaft.Services.Store.Commands;
+using Sheaft.Services.User.Commands;
+using Sheaft.Web.Manage.Models;
 
 namespace Sheaft.Web.Manage.Controllers
 {
@@ -94,7 +94,7 @@ namespace Sheaft.Web.Manage.Controllers
             var result = await _mediatr.Process(new UpdateStoreCommand(await GetRequestUser(token))
             {
                 StoreId = model.Id,
-                Address = _mapper.Map<FullAddressInput>(model.Address),
+                Address = _mapper.Map<AddressDto>(model.Address),
                 OpenForNewBusiness = model.OpenForNewBusiness,
                 Email = model.Email,
                 Name = model.Name,
@@ -105,7 +105,7 @@ namespace Sheaft.Web.Manage.Controllers
                 Tags = model.Tags,
                 Picture = model.Picture,
                 OpeningHours = store.OpeningHours?.GroupBy(oh => new {oh.From, oh.To}).Select(c =>
-                    new TimeSlotGroupInput {From = c.Key.From, To = c.Key.To, Days = c.Select(o => o.Day)})
+                    new TimeSlotGroupDto {From = c.Key.From, To = c.Key.To, Days = c.Select(o => o.Day)})
             }, token);
 
             if (!result.Succeeded)

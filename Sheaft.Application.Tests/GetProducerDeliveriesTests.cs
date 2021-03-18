@@ -7,14 +7,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Sheaft.Application.Common.Interfaces;
-using Sheaft.Application.Common.Interfaces.Queries;
-using Sheaft.Application.Common.Interfaces.Services;
-using Sheaft.Application.Common.Models;
-using Sheaft.Application.Common.Models.Dto;
-using Sheaft.Application.DeliveryMode.Queries;
+using Sheaft.Application.Interfaces;
+using Sheaft.Application.Interfaces.Infrastructure;
+using Sheaft.Application.Interfaces.Queries;
+using Sheaft.Application.Models;
+using Sheaft.Core;
 using Sheaft.Domain;
 using Sheaft.Domain.Enum;
+using Sheaft.Infrastructure.Services;
+using Sheaft.Services.DeliveryMode.Queries;
 
 namespace Queries.Delivery.Tests
 {
@@ -23,12 +24,12 @@ namespace Queries.Delivery.Tests
     {
         private IAppDbContext _context;
         private IDeliveryQueries _queries;
-        private Mock<ICapingDeliveriesService> _capingMock;
+        private Mock<ITableService> _capingMock;
 
         [TestInitialize]
         public void Initialize()
         {
-            _capingMock = new Mock<ICapingDeliveriesService>();
+            _capingMock = new Mock<ITableService>();
             _context = ContextHelper.GetInMemoryContext();
             _queries = new DeliveryQueries(_context, _capingMock.Object, null);
         }
@@ -258,7 +259,7 @@ namespace Queries.Delivery.Tests
                 }
             };
 
-            _capingMock.Setup(c => c.GetCapingDeliveriesAsync(It.IsAny<IEnumerable<Tuple<Guid, Guid, DeliveryHourDto>>>(), It.IsAny<CancellationToken>()))
+            _capingMock.Setup(c => c.GetCapingDeliveriesInfosAsync(It.IsAny<IEnumerable<Tuple<Guid, Guid, DeliveryHourDto>>>(), It.IsAny<CancellationToken>()))
                 .Returns(Task.FromResult(Result<IEnumerable<CapingDeliveryDto>>.Success(result)));
 
             var token = CancellationToken.None;
@@ -331,7 +332,7 @@ namespace Queries.Delivery.Tests
                 }
             };
 
-            _capingMock.Setup(c => c.GetCapingDeliveriesAsync(It.IsAny<IEnumerable<Tuple<Guid, Guid, DeliveryHourDto>>>(), It.IsAny<CancellationToken>()))
+            _capingMock.Setup(c => c.GetCapingDeliveriesInfosAsync(It.IsAny<IEnumerable<Tuple<Guid, Guid, DeliveryHourDto>>>(), It.IsAny<CancellationToken>()))
                 .Returns(Task.FromResult(Result<IEnumerable<CapingDeliveryDto>>.Success(result)));
 
             var token = CancellationToken.None;

@@ -8,14 +8,14 @@ using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Sheaft.Application.Agreement.Commands;
-using Sheaft.Application.Common.Extensions;
-using Sheaft.Application.Common.Interfaces;
-using Sheaft.Application.Common.Interfaces.Services;
-using Sheaft.Application.Common.Models.ViewModels;
-using Sheaft.Application.Common.Options;
+using Sheaft.Application.Extensions;
+using Sheaft.Application.Interfaces;
+using Sheaft.Application.Interfaces.Infrastructure;
+using Sheaft.Core.Exceptions;
 using Sheaft.Domain.Enum;
-using Sheaft.Domain.Exceptions;
+using Sheaft.Options;
+using Sheaft.Services.Agreement.Commands;
+using Sheaft.Web.Manage.Models;
 
 namespace Sheaft.Web.Manage.Controllers
 {

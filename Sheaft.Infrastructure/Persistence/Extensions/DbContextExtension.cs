@@ -1,7 +1,7 @@
 ﻿using System.Linq;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
-using Sheaft.Application.Common.Interfaces;
+using Sheaft.Application.Interfaces;
 
 namespace Sheaft.Infrastructure.Persistence.Extensions
 {

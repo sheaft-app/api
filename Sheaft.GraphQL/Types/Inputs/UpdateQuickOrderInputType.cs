@@ -1,12 +1,13 @@
 ﻿using HotChocolate.Types;
-using Sheaft.Application.Common.Models.Inputs;
+using Sheaft.Application.Models;
 
 namespace Sheaft.GraphQL.Types.Inputs
 {
-    public class UpdateQuickOrderInputType : SheaftInputType<UpdateQuickOrderInput>
+    public class UpdateQuickOrderInputType : SheaftInputType<UpdateQuickOrderDto>
     {
-        protected override void Configure(IInputObjectTypeDescriptor<UpdateQuickOrderInput> descriptor)
+        protected override void Configure(IInputObjectTypeDescriptor<UpdateQuickOrderDto> descriptor)
         {
+            descriptor.Name("UpdateQuickOrderInput");
             descriptor.Field(c => c.Description);
 
             descriptor.Field(c => c.Id)

@@ -1,12 +1,13 @@
 ﻿using HotChocolate.Types;
-using Sheaft.Application.Common.Models.Inputs;
+using Sheaft.Application.Models;
 
 namespace Sheaft.GraphQL.Types.Inputs
 {
-    public class UpdateStoreInputType : SheaftInputType<UpdateStoreInput>
+    public class UpdateStoreInputType : SheaftInputType<UpdateStoreDto>
     {
-        protected override void Configure(IInputObjectTypeDescriptor<UpdateStoreInput> descriptor)
+        protected override void Configure(IInputObjectTypeDescriptor<UpdateStoreDto> descriptor)
         {
+            descriptor.Name("UpdateStoreInput");
             descriptor.Field(c => c.OpenForNewBusiness);
             descriptor.Field(c => c.OpeningHours);
             descriptor.Field(c => c.Phone);
@@ -22,7 +23,7 @@ namespace Sheaft.GraphQL.Types.Inputs
                 .Type<NonNullType<IdType>>();
 
             descriptor.Field(c => c.Address)
-                .Type<NonNullType<FullAddressInputType>>();
+                .Type<NonNullType<AddressInputType>>();
 
             descriptor.Field(c => c.Email)
                 .Type<NonNullType<StringType>>();

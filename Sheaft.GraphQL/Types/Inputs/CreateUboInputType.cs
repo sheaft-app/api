@@ -1,12 +1,13 @@
 ﻿using HotChocolate.Types;
-using Sheaft.Application.Common.Models.Inputs;
+using Sheaft.Application.Models;
 
 namespace Sheaft.GraphQL.Types.Inputs
 {
-    public class CreateUboInputType : SheaftInputType<CreateUboInput>
+    public class CreateUboInputType : SheaftInputType<CreateUboDto>
     {
-        protected override void Configure(IInputObjectTypeDescriptor<CreateUboInput> descriptor)
+        protected override void Configure(IInputObjectTypeDescriptor<CreateUboDto> descriptor)
         {
+            descriptor.Name("CreateUboInput");
             descriptor.Field(c => c.FirstName);
             descriptor.Field(c => c.LastName);
             descriptor.Field(c => c.BirthDate);

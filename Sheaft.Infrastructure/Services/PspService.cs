@@ -12,18 +12,20 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Sheaft.Application.Common.Interfaces.Services;
-using Sheaft.Application.Common.Models;
-using Sheaft.Application.Common.Models.Dto;
-using Sheaft.Application.Common.Options;
+using Sheaft.Application.Interfaces.Infrastructure;
+using Sheaft.Application.Models;
+using Sheaft.Application.Services;
+using Sheaft.Core;
+using Sheaft.Core.Enums;
 using Sheaft.Domain;
 using Sheaft.Domain.Enum;
+using Sheaft.Options;
 using Address = Sheaft.Domain.Address;
 using TransactionStatus = Sheaft.Domain.Enum.TransactionStatus;
 
 namespace Sheaft.Infrastructure.Services
 {
-    public class PspService : BaseService, IPspService
+    public class PspService : SheaftService, IPspService
     {
         private readonly MangoPayApi _api;
         private readonly PspOptions _pspOptions;
@@ -335,6 +337,7 @@ namespace Sheaft.Infrastructure.Services
             var result =
                 await _api.UboDeclarations.CreateUboDeclarationAsync(GetIdempotencyKey(declaration.Id),
                     business.Identifier);
+            
             return Success(new PspDeclarationResultDto
             {
                 Identifier = result.Id,

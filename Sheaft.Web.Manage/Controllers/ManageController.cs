@@ -7,13 +7,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Sheaft.Application.Common.Extensions;
-using Sheaft.Application.Common.Interfaces;
-using Sheaft.Application.Common.Interfaces.Services;
-using Sheaft.Application.Common.Models.ViewModels;
-using Sheaft.Application.Common.Options;
+using Sheaft.Application.Extensions;
+using Sheaft.Application.Interfaces;
+using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Domain;
 using Sheaft.Domain.Enum;
+using Sheaft.Options;
+using Sheaft.Web.Manage.Extensions;
+using Sheaft.Web.Manage.Models;
 
 namespace Sheaft.Web.Manage.Controllers
 {

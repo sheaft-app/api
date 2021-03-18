@@ -19,9 +19,9 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\Sheaft.Application\Sheaft.Application.csproj" />
       <ProjectReference Include="..\Sheaft.Domain\Sheaft.Domain.csproj" />
       <ProjectReference Include="..\Sheaft.Localization\Sheaft.Localization.csproj" />
+      <ProjectReference Include="..\Sheaft.Services\Sheaft.Services.csproj" />
     </ItemGroup>
 
 </Project>

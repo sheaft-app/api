@@ -5,23 +5,91 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\Sheaft.Application.Common\Sheaft.Application.Common.csproj" />
+      <ProjectReference Include="..\Sheaft.Core\Sheaft.Core.csproj" />
       <ProjectReference Include="..\Sheaft.Domain\Sheaft.Domain.csproj" />
     </ItemGroup>
 
     <ItemGroup>
       <PackageReference Include="AutoMapper" Version="10.1.1" />
-      <PackageReference Include="EPPlus" Version="4.5.3.3" />
       <PackageReference Include="FluentValidation" Version="9.5.0" />
       <PackageReference Include="IdentityModel" Version="4.5.0" />
-      <PackageReference Include="JWT" Version="7.3.1" />
       <PackageReference Include="MediatR" Version="9.0.0" />
-      <PackageReference Include="Microsoft.AspNetCore.Authorization" Version="2.1.1" />
       <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.2.0" />
-      <PackageReference Include="Microsoft.Azure.Search" Version="10.1.0" />
       <PackageReference Include="Microsoft.EntityFrameworkCore" Version="3.1.10" />
-      <PackageReference Include="Microsoft.Extensions.Http" Version="3.1.10" />
-      <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
+      <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="3.1.10" />
+      <PackageReference Include="RazorLight.NetCore3" Version="3.0.2" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Content Include="Mailings\Templates\AgreementAcceptedEvent.cshtml">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </Content>
+      <Content Include="Mailings\Templates\AgreementCancelledEvent.cshtml">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </Content>
+      <Content Include="Mailings\Templates\AgreementCreatedEvent.cshtml">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </Content>
+      <Content Include="Mailings\Templates\AgreementRefusedEvent.cshtml">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </Content>
+      <Content Include="Mailings\Templates\PayinFailedEvent.cshtml">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </Content>
+      <Content Include="Mailings\Templates\PayinSucceededEvent.cshtml">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </Content>
+      <Content Include="Mailings\Templates\PickingOrderExportFailedEvent.cshtml">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </Content>
+      <Content Include="Mailings\Templates\PickingOrderExportSucceededEvent.cshtml">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </Content>
+      <Content Include="Mailings\Templates\ProductImportFailedEvent.cshtml">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </Content>
+      <Content Include="Mailings\Templates\ProductImportSucceededEvent.cshtml">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </Content>
+      <Content Include="Mailings\Templates\PurchaseOrderAcceptedEvent.cshtml">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </Content>
+      <Content Include="Mailings\Templates\PurchaseOrderCancelledEvent.cshtml">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </Content>
+      <Content Include="Mailings\Templates\PurchaseOrderCompletedEvent.cshtml">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </Content>
+      <Content Include="Mailings\Templates\PurchaseOrderCreatedEvent.cshtml">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </Content>
+      <Content Include="Mailings\Templates\PurchaseOrderReceivedEvent.cshtml">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </Content>
+      <Content Include="Mailings\Templates\PurchaseOrderRefusedEvent.cshtml">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </Content>
+      <Content Include="Mailings\Templates\PurchaseOrdersExportFailedEvent.cshtml">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </Content>
+      <Content Include="Mailings\Templates\PurchaseOrdersExportSucceededEvent.cshtml">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </Content>
+      <Content Include="Mailings\Templates\PurchaseOrderWithdrawnEvent.cshtml">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </Content>
+      <Content Include="Mailings\Templates\TransactionsExportFailedEvent.cshtml">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </Content>
+      <Content Include="Mailings\Templates\TransactionsExportSucceededEvent.cshtml">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </Content>
+      <Content Include="Mailings\Templates\UserDataExportFailedEvent.cshtml">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </Content>
+      <Content Include="Mailings\Templates\UserDataExportSucceededEvent.cshtml">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </Content>
     </ItemGroup>
 
 </Project>

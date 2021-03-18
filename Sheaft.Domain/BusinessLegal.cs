@@ -1,7 +1,8 @@
 ﻿using System;
+using Sheaft.Core.Enums;
+using Sheaft.Core.Exceptions;
+using Sheaft.Core.Extensions;
 using Sheaft.Domain.Enum;
-using Sheaft.Domain.Exceptions;
-using Sheaft.Domain.Extensions;
 
 namespace Sheaft.Domain
 {

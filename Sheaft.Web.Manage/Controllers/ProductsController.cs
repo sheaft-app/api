@@ -11,14 +11,14 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Sheaft.Application.Common.Interfaces;
-using Sheaft.Application.Common.Interfaces.Services;
-using Sheaft.Application.Common.Models.Inputs;
-using Sheaft.Application.Common.Models.ViewModels;
-using Sheaft.Application.Common.Options;
-using Sheaft.Application.Product.Commands;
+using Sheaft.Application.Interfaces;
+using Sheaft.Application.Interfaces.Infrastructure;
+using Sheaft.Application.Models;
+using Sheaft.Core.Exceptions;
 using Sheaft.Domain;
-using Sheaft.Domain.Exceptions;
+using Sheaft.Options;
+using Sheaft.Services.Product.Commands;
+using Sheaft.Web.Manage.Models;
 
 namespace Sheaft.Web.Manage.Controllers
 {
@@ -109,7 +109,7 @@ namespace Sheaft.Web.Manage.Controllers
                 VisibleToStores = model.VisibleToStores,
                 VisibleToConsumers = model.VisibleToConsumers,
                 ReturnableId = model.ReturnableId,
-                Picture = !string.IsNullOrWhiteSpace(model.Picture) ? new PictureInput(){Original = model.Picture} : null,
+                Picture = !string.IsNullOrWhiteSpace(model.Picture) ? new PictureSourceDto{Original = model.Picture} : null,
                 QuantityPerUnit = model.QuantityPerUnit,
                 Reference = model.Reference,
                 Tags = model.Tags,
@@ -186,7 +186,7 @@ namespace Sheaft.Web.Manage.Controllers
                 VisibleToStores = model.VisibleToStores,
                 VisibleToConsumers = model.VisibleToConsumers,
                 ReturnableId = model.ReturnableId,
-                Picture = !string.IsNullOrWhiteSpace(model.Picture) ? new PictureInput(){Original = model.Picture} : null,
+                Picture = !string.IsNullOrWhiteSpace(model.Picture) ? new PictureSourceDto{Original = model.Picture} : null,
                 QuantityPerUnit = model.QuantityPerUnit,
                 Reference = model.Reference,
                 Tags = model.Tags,

@@ -1,12 +1,13 @@
 ﻿using HotChocolate.Types;
-using Sheaft.Application.Common.Models.Inputs;
+using Sheaft.Application.Models;
 
 namespace Sheaft.GraphQL.Types.Inputs
 {
-    public class UpdateDeliveryModeInputType : SheaftInputType<UpdateDeliveryModeInput>
+    public class UpdateDeliveryModeInputType : SheaftInputType<UpdateDeliveryModeDto>
     {
-        protected override void Configure(IInputObjectTypeDescriptor<UpdateDeliveryModeInput> descriptor)
+        protected override void Configure(IInputObjectTypeDescriptor<UpdateDeliveryModeDto> descriptor)
         {
+            descriptor.Name("UpdateDeliveryModeInput");
             descriptor.Field(c => c.Description);
             descriptor.Field(c => c.Kind);
             descriptor.Field(c => c.Available);
@@ -19,7 +20,7 @@ namespace Sheaft.GraphQL.Types.Inputs
                 .Type<NonNullType<IdType>>();
 
             descriptor.Field(c => c.Address)
-                .Type<LocationAddressInputType>();
+                .Type<AddressInputType>();
 
             descriptor.Field(c => c.Name)
                 .Type<NonNullType<StringType>>();

@@ -1,4 +1,4 @@
-﻿@model IEnumerable<Sheaft.Application.Common.Models.ViewModels.DepartmentViewModel>
+﻿@model IEnumerable<DepartmentViewModel>
 @{
     ViewData["Title"] = "Departments";
     int take = ViewBag.Take;
@@ -30,7 +30,7 @@
                     <th scope="row">@entity.Name</th>
                     <td>@entity.Position</td>
                     <td>@entity.Points</td>
-                    <td>@entity.Level</td>
+                    <td>@entity.LevelName</td>
                     <td>@entity.RequiredProducers</td>
                     <td>@entity.ProducersCount</td>
                     <td>@entity.StoresCount</td>

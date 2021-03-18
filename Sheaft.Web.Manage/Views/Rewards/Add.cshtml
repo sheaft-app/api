@@ -1,5 +1,4 @@
-﻿@using Sheaft.Application.Common.Models.ViewModels
-@model Sheaft.Application.Common.Models.ViewModels.RewardViewModel
+﻿@model RewardViewModel
 @{
     ViewData["Title"] = "New Reward";
     var departments = ((List<DepartmentViewModel>)ViewBag.Departments).Select(c => new SelectListItem($"{c.Code} - {c.Name}", c.Id.ToString("D"))).ToList();

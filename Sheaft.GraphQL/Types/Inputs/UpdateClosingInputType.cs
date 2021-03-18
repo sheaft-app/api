@@ -1,12 +1,13 @@
 ﻿using HotChocolate.Types;
-using Sheaft.Application.Common.Models.Inputs;
+using Sheaft.Application.Models;
 
 namespace Sheaft.GraphQL.Types.Inputs
 {
-    public class UpdateClosingInputType : SheaftInputType<UpdateClosingInput>
+    public class UpdateClosingInputType : SheaftInputType<UpdateClosingDto>
     {
-        protected override void Configure(IInputObjectTypeDescriptor<UpdateClosingInput> descriptor)
+        protected override void Configure(IInputObjectTypeDescriptor<UpdateClosingDto> descriptor)
         {
+            descriptor.Name("UpdateClosingInput");
             descriptor.Field(c => c.Id)
                 .Type<NonNullType<IdType>>();
             descriptor.Field(c => c.From);

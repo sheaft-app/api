@@ -16,7 +16,7 @@ using Newtonsoft.Json.Linq;
 using Microsoft.Extensions.Caching.Distributed;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.IO;
-using Sheaft.Application.Common.Options;
+using Sheaft.Options;
 
 namespace Sheaft.Web.Api.Authorize
 {

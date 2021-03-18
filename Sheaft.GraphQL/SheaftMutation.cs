@@ -7,36 +7,40 @@ using AutoMapper;
 using HotChocolate;
 using HotChocolate.Execution;
 using Microsoft.AspNetCore.Http;
-using Sheaft.Application.Agreement.Commands;
-using Sheaft.Application.BusinessClosing.Commands;
-using Sheaft.Application.Common.Extensions;
-using Sheaft.Application.Common.Interfaces;
-using Sheaft.Application.Common.Interfaces.Queries;
-using Sheaft.Application.Common.Interfaces.Services;
-using Sheaft.Application.Common.Models;
-using Sheaft.Application.Common.Models.Dto;
-using Sheaft.Application.Common.Models.Inputs;
-using Sheaft.Application.Consumer.Commands;
-using Sheaft.Application.DeliveryClosing.Commands;
-using Sheaft.Application.DeliveryMode.Commands;
-using Sheaft.Application.Document.Commands;
-using Sheaft.Application.Job.Commands;
-using Sheaft.Application.Legal.Commands;
-using Sheaft.Application.Notification.Commands;
-using Sheaft.Application.Order.Commands;
-using Sheaft.Application.PickingOrders.Commands;
-using Sheaft.Application.Producer.Commands;
-using Sheaft.Application.Product.Commands;
-using Sheaft.Application.ProductClosing.Commands;
-using Sheaft.Application.ProfileInformation.Commands;
-using Sheaft.Application.PurchaseOrder.Commands;
-using Sheaft.Application.QuickOrder.Commands;
-using Sheaft.Application.Returnable.Commands;
-using Sheaft.Application.Store.Commands;
-using Sheaft.Application.Transactions.Commands;
-using Sheaft.Application.User.Commands;
+using Sheaft.Application.Interfaces;
+using Sheaft.Application.Interfaces.Infrastructure;
+using Sheaft.Application.Interfaces.Queries;
+using Sheaft.Application.Interfaces.Services;
+using Sheaft.Application.Models;
+using Sheaft.Core.Exceptions;
 using Sheaft.Domain;
-using Sheaft.Domain.Exceptions;
+using Sheaft.Services.Agreement.Commands;
+using Sheaft.Services.BusinessClosing.Commands;
+using Sheaft.Services.Consumer.Commands;
+using Sheaft.Services.DeliveryClosing.Commands;
+using Sheaft.Services.DeliveryMode.Commands;
+using Sheaft.Services.Document.Commands;
+using Sheaft.Services.Job.Commands;
+using Sheaft.Services.Legal.Commands;
+using Sheaft.Services.Notification.Commands;
+using Sheaft.Services.Order.Commands;
+using Sheaft.Services.PickingOrders.Commands;
+using Sheaft.Services.Producer.Commands;
+using Sheaft.Services.Product.Commands;
+using Sheaft.Services.ProductClosing.Commands;
+using Sheaft.Services.ProfileInformation.Commands;
+using Sheaft.Services.PurchaseOrder.Commands;
+using Sheaft.Services.QuickOrder.Commands;
+using Sheaft.Services.Returnable.Commands;
+using Sheaft.Services.Store.Commands;
+using Sheaft.Services.Transactions.Commands;
+using Sheaft.Services.User.Commands;
+using BusinessLegalDto = Sheaft.Application.Models.BusinessLegalDto;
+using ConsumerDto = Sheaft.Application.Models.ConsumerDto;
+using ConsumerLegalDto = Sheaft.Application.Models.ConsumerLegalDto;
+using CreateBusinessLegalDto = Sheaft.Application.Models.CreateBusinessLegalDto;
+using OrderDto = Sheaft.Application.Models.OrderDto;
+using QuickOrderDto = Sheaft.Application.Models.QuickOrderDto;
 
 namespace Sheaft.GraphQL
 {
@@ -62,14 +66,14 @@ namespace Sheaft.GraphQL
             _httpContextAccessor = httpContextAccessor;
         }
 
-        public async Task<string> GenerateUserSponsoringCodeAsync(IdInput input)
+        public async Task<string> GenerateUserSponsoringCodeAsync(ResourceIdDto input)
         {
             SetLogTransaction(nameof(GenerateUserSponsoringCodeAsync));
             return await ExecuteCommandAsync<GenerateUserCodeCommand, string>(
                 _mapper.Map(input, new GenerateUserCodeCommand(CurrentUser)), Token);
         }
 
-        public async Task<IQueryable<JobDto>> ExportPickingOrdersAsync(ExportPickingOrdersInput input,
+        public async Task<IQueryable<JobDto>> ExportPickingOrdersAsync(ExportPickingOrdersDto input,
             [Service] IJobQueries jobQueries)
         {
             SetLogTransaction(nameof(ExportPickingOrdersAsync));
@@ -80,7 +84,7 @@ namespace Sheaft.GraphQL
             return jobQueries.GetJob(result, CurrentUser);
         }
 
-        public async Task<IQueryable<JobDto>> ExportPurchaseOrdersAsync(ExportPurchaseOrdersInput input,
+        public async Task<IQueryable<JobDto>> ExportPurchaseOrdersAsync(ExportPurchaseOrdersDto input,
             [Service] IJobQueries jobQueries)
         {
             SetLogTransaction(nameof(ExportPurchaseOrdersAsync));
@@ -91,7 +95,7 @@ namespace Sheaft.GraphQL
             return jobQueries.GetJob(result, CurrentUser);
         }
 
-        public async Task<IQueryable<JobDto>> ExportTransactionsAsync(ExportTransactionsInput input,
+        public async Task<IQueryable<JobDto>> ExportTransactionsAsync(ExportTransactionsDto input,
             [Service] IJobQueries jobQueries)
         {
             SetLogTransaction(nameof(ExportTransactionsAsync));
@@ -102,7 +106,7 @@ namespace Sheaft.GraphQL
             return jobQueries.GetJob(result, CurrentUser);
         }
 
-        public async Task<IQueryable<JobDto>> ExportUserDataAsync(IdInput input, [Service] IJobQueries jobQueries)
+        public async Task<IQueryable<JobDto>> ExportUserDataAsync(ResourceIdDto input, [Service] IJobQueries jobQueries)
         {
             SetLogTransaction(nameof(ExportUserDataAsync));
             var result =
@@ -111,28 +115,28 @@ namespace Sheaft.GraphQL
             return jobQueries.GetJob(result, CurrentUser);
         }
 
-        public async Task<IQueryable<JobDto>> ResumeJobsAsync(IdsInput input, [Service] IJobQueries jobQueries)
+        public async Task<IQueryable<JobDto>> ResumeJobsAsync(ResourceIdsDto input, [Service] IJobQueries jobQueries)
         {
             SetLogTransaction(nameof(ResumeJobsAsync));
             await ExecuteCommandAsync(_mapper.Map(input, new ResumeJobsCommand(CurrentUser)), Token);
             return jobQueries.GetJobs(CurrentUser).Where(j => input.Ids.Contains(j.Id));
         }
 
-        public async Task<IQueryable<JobDto>> PauseJobsAsync(IdsInput input, [Service] IJobQueries jobQueries)
+        public async Task<IQueryable<JobDto>> PauseJobsAsync(ResourceIdsDto input, [Service] IJobQueries jobQueries)
         {
             SetLogTransaction(nameof(PauseJobsAsync));
             await ExecuteCommandAsync(_mapper.Map(input, new PauseJobsCommand(CurrentUser)), Token);
             return jobQueries.GetJobs(CurrentUser).Where(j => input.Ids.Contains(j.Id));
         }
 
-        public async Task<IQueryable<JobDto>> RetryJobsAsync(IdsInput input, [Service] IJobQueries jobQueries)
+        public async Task<IQueryable<JobDto>> RetryJobsAsync(ResourceIdsDto input, [Service] IJobQueries jobQueries)
         {
             SetLogTransaction(nameof(RetryJobsAsync));
             await ExecuteCommandAsync(_mapper.Map(input, new RetryJobsCommand(CurrentUser)), Token);
             return jobQueries.GetJobs(CurrentUser).Where(j => input.Ids.Contains(j.Id));
         }
 
-        public async Task<IQueryable<JobDto>> CancelJobsAsync(IdsWithReasonInput input,
+        public async Task<IQueryable<JobDto>> CancelJobsAsync(ResourceIdsWithReasonDto input,
             [Service] IJobQueries jobQueries)
         {
             SetLogTransaction(nameof(CancelJobsAsync));
@@ -140,14 +144,14 @@ namespace Sheaft.GraphQL
             return jobQueries.GetJobs(CurrentUser).Where(j => input.Ids.Contains(j.Id));
         }
 
-        public async Task<IQueryable<JobDto>> ArchiveJobsAsync(IdsInput input, [Service] IJobQueries jobQueries)
+        public async Task<IQueryable<JobDto>> ArchiveJobsAsync(ResourceIdsDto input, [Service] IJobQueries jobQueries)
         {
             SetLogTransaction(nameof(ArchiveJobsAsync));
             await ExecuteCommandAsync(_mapper.Map(input, new ArchiveJobsCommand(CurrentUser)), Token);
             return jobQueries.GetJobs(CurrentUser).Where(j => input.Ids.Contains(j.Id));
         }
 
-        public async Task<IQueryable<AgreementDto>> CreateAgreementAsync(CreateAgreementInput input,
+        public async Task<IQueryable<AgreementDto>> CreateAgreementAsync(CreateAgreementDto input,
             [Service] IAgreementQueries agreementQueries)
         {
             SetLogTransaction(nameof(CreateAgreementAsync));
@@ -157,7 +161,7 @@ namespace Sheaft.GraphQL
             return agreementQueries.GetAgreement(result, CurrentUser);
         }
 
-        public async Task<IQueryable<AgreementDto>> AcceptAgreementAsync(IdTimeSlotGroupInput input,
+        public async Task<IQueryable<AgreementDto>> AcceptAgreementAsync(ResourceIdTimeSlotsDto input,
             [Service] IAgreementQueries agreementQueries)
         {
             SetLogTransaction(nameof(AcceptAgreementAsync));
@@ -165,7 +169,7 @@ namespace Sheaft.GraphQL
             return agreementQueries.GetAgreement(input.Id, CurrentUser);
         }
 
-        public async Task<IQueryable<AgreementDto>> CancelAgreementsAsync(IdsWithReasonInput input,
+        public async Task<IQueryable<AgreementDto>> CancelAgreementsAsync(ResourceIdsWithReasonDto input,
             [Service] IAgreementQueries agreementQueries)
         {
             SetLogTransaction(nameof(CancelAgreementsAsync));
@@ -173,7 +177,7 @@ namespace Sheaft.GraphQL
             return agreementQueries.GetAgreements(CurrentUser).Where(j => input.Ids.Contains(j.Id));
         }
 
-        public async Task<IQueryable<AgreementDto>> RefuseAgreementsAsync(IdsWithReasonInput input,
+        public async Task<IQueryable<AgreementDto>> RefuseAgreementsAsync(ResourceIdsWithReasonDto input,
             [Service] IAgreementQueries agreementQueries)
         {
             SetLogTransaction(nameof(RefuseAgreementsAsync));
@@ -190,7 +194,7 @@ namespace Sheaft.GraphQL
             return input.ReadBefore;
         }
 
-        public async Task<IQueryable<NotificationDto>> MarkNotificationAsReadAsync(IdInput input,
+        public async Task<IQueryable<NotificationDto>> MarkNotificationAsReadAsync(ResourceIdDto input,
             [Service] INotificationQueries notificationQueries)
         {
             SetLogTransaction(nameof(MarkNotificationAsReadAsync));
@@ -198,7 +202,7 @@ namespace Sheaft.GraphQL
             return notificationQueries.GetNotification(input.Id, CurrentUser);
         }
 
-        public async Task<IQueryable<OrderDto>> CreateOrderAsync(CreateOrderInput input,
+        public async Task<IQueryable<OrderDto>> CreateOrderAsync(CreateOrderDto input,
             [Service] IOrderQueries orderQueries)
         {
             SetLogTransaction(nameof(CreateOrderAsync));
@@ -210,7 +214,7 @@ namespace Sheaft.GraphQL
             return orderQueries.GetOrder(result, CurrentUser);
         }
 
-        public async Task<IQueryable<OrderDto>> UpdateOrderAsync(UpdateOrderInput input,
+        public async Task<IQueryable<OrderDto>> UpdateOrderAsync(UpdateOrderDto input,
             [Service] IOrderQueries orderQueries)
         {
             SetLogTransaction(nameof(UpdateOrderAsync));
@@ -218,7 +222,7 @@ namespace Sheaft.GraphQL
             return orderQueries.GetOrder(input.Id, CurrentUser);
         }
 
-        public async Task<IQueryable<WebPayinDto>> PayOrderAsync(IdInput input, [Service] IPayinQueries payinQueries)
+        public async Task<IQueryable<WebPayinDto>> PayOrderAsync(ResourceIdDto input, [Service] IPayinQueries payinQueries)
         {
             SetLogTransaction(nameof(PayOrderAsync));
             var result =
@@ -227,7 +231,7 @@ namespace Sheaft.GraphQL
             return payinQueries.GetWebPayinTransaction(result, CurrentUser);
         }
 
-        public async Task<IQueryable<PurchaseOrderDto>> CreateBusinessOrderAsync(CreateOrderInput input,
+        public async Task<IQueryable<PurchaseOrderDto>> CreateBusinessOrderAsync(CreateOrderDto input,
             [Service] IPurchaseOrderQueries purchaseOrderQueries)
         {
             SetLogTransaction(nameof(CreateBusinessOrderAsync));
@@ -237,7 +241,7 @@ namespace Sheaft.GraphQL
             return purchaseOrderQueries.GetPurchaseOrders(CurrentUser).Where(j => result.Contains(j.Id));
         }
 
-        public async Task<IQueryable<DocumentDto>> CreateDocumentAsync(CreateDocumentInput input,
+        public async Task<IQueryable<DocumentDto>> CreateDocumentAsync(CreateDocumentDto input,
             [Service] IDocumentQueries documentQueries)
         {
             SetLogTransaction(nameof(CreateDocumentAsync));
@@ -247,13 +251,13 @@ namespace Sheaft.GraphQL
             return documentQueries.GetDocument(result, CurrentUser);
         }
 
-        public async Task<bool> RemoveDocumentAsync(IdInput input)
+        public async Task<bool> RemoveDocumentAsync(ResourceIdDto input)
         {
             SetLogTransaction(nameof(RemoveDocumentAsync));
             return await ExecuteCommandAsync(_mapper.Map(input, new DeleteDocumentCommand(CurrentUser)), Token);
         }
 
-        public async Task<IQueryable<PurchaseOrderDto>> AcceptPurchaseOrdersAsync(IdsInput input,
+        public async Task<IQueryable<PurchaseOrderDto>> AcceptPurchaseOrdersAsync(ResourceIdsDto input,
             [Service] IPurchaseOrderQueries purchaseOrderQueries)
         {
             SetLogTransaction(nameof(AcceptPurchaseOrdersAsync));
@@ -261,7 +265,7 @@ namespace Sheaft.GraphQL
             return purchaseOrderQueries.GetPurchaseOrders(CurrentUser).Where(j => input.Ids.Contains(j.Id));
         }
 
-        public async Task<IQueryable<PurchaseOrderDto>> ShipPurchaseOrdersAsync(IdsInput input,
+        public async Task<IQueryable<PurchaseOrderDto>> ShipPurchaseOrdersAsync(ResourceIdsDto input,
             [Service] IPurchaseOrderQueries purchaseOrderQueries)
         {
             SetLogTransaction(nameof(ShipPurchaseOrdersAsync));
@@ -269,7 +273,7 @@ namespace Sheaft.GraphQL
             return purchaseOrderQueries.GetPurchaseOrders(CurrentUser).Where(j => input.Ids.Contains(j.Id));
         }
 
-        public async Task<IQueryable<PurchaseOrderDto>> DeliverPurchaseOrdersAsync(IdsInput input,
+        public async Task<IQueryable<PurchaseOrderDto>> DeliverPurchaseOrdersAsync(ResourceIdsDto input,
             [Service] IPurchaseOrderQueries purchaseOrderQueries)
         {
             SetLogTransaction(nameof(DeliverPurchaseOrdersAsync));
@@ -277,7 +281,7 @@ namespace Sheaft.GraphQL
             return purchaseOrderQueries.GetPurchaseOrders(CurrentUser).Where(j => input.Ids.Contains(j.Id));
         }
 
-        public async Task<IQueryable<PurchaseOrderDto>> ProcessPurchaseOrdersAsync(IdsInput input,
+        public async Task<IQueryable<PurchaseOrderDto>> ProcessPurchaseOrdersAsync(ResourceIdsDto input,
             [Service] IPurchaseOrderQueries purchaseOrderQueries)
         {
             SetLogTransaction(nameof(ProcessPurchaseOrdersAsync));
@@ -285,7 +289,7 @@ namespace Sheaft.GraphQL
             return purchaseOrderQueries.GetPurchaseOrders(CurrentUser).Where(j => input.Ids.Contains(j.Id));
         }
 
-        public async Task<IQueryable<PurchaseOrderDto>> CompletePurchaseOrdersAsync(IdsInput input,
+        public async Task<IQueryable<PurchaseOrderDto>> CompletePurchaseOrdersAsync(ResourceIdsDto input,
             [Service] IPurchaseOrderQueries purchaseOrderQueries)
         {
             SetLogTransaction(nameof(CompletePurchaseOrdersAsync));
@@ -293,7 +297,7 @@ namespace Sheaft.GraphQL
             return purchaseOrderQueries.GetPurchaseOrders(CurrentUser).Where(j => input.Ids.Contains(j.Id));
         }
 
-        public async Task<IQueryable<PurchaseOrderDto>> CancelPurchaseOrdersAsync(IdsWithReasonInput input,
+        public async Task<IQueryable<PurchaseOrderDto>> CancelPurchaseOrdersAsync(ResourceIdsWithReasonDto input,
             [Service] IPurchaseOrderQueries purchaseOrderQueries)
         {
             SetLogTransaction(nameof(CancelPurchaseOrdersAsync));
@@ -301,7 +305,7 @@ namespace Sheaft.GraphQL
             return purchaseOrderQueries.GetPurchaseOrders(CurrentUser).Where(j => input.Ids.Contains(j.Id));
         }
 
-        public async Task<IQueryable<PurchaseOrderDto>> RefusePurchaseOrdersAsync(IdsWithReasonInput input,
+        public async Task<IQueryable<PurchaseOrderDto>> RefusePurchaseOrdersAsync(ResourceIdsWithReasonDto input,
             [Service] IPurchaseOrderQueries purchaseOrderQueries)
         {
             SetLogTransaction(nameof(RefusePurchaseOrdersAsync));
@@ -309,13 +313,13 @@ namespace Sheaft.GraphQL
             return purchaseOrderQueries.GetPurchaseOrders(CurrentUser).Where(j => input.Ids.Contains(j.Id));
         }
 
-        public async Task<bool> DeletePurchaseOrdersAsync(IdsInput input)
+        public async Task<bool> DeletePurchaseOrdersAsync(ResourceIdsDto input)
         {
             SetLogTransaction(nameof(DeletePurchaseOrdersAsync));
             return await ExecuteCommandAsync(_mapper.Map(input, new DeletePurchaseOrdersCommand(CurrentUser)), Token);
         }
 
-        public async Task<IQueryable<ProductDto>> CreateProductAsync(CreateProductInput input,
+        public async Task<IQueryable<ProductDto>> CreateProductAsync(CreateProductDto input,
             [Service] IProductQueries productQueries)
         {
             SetLogTransaction(nameof(CreateProductAsync));
@@ -325,7 +329,7 @@ namespace Sheaft.GraphQL
             return productQueries.GetProduct(result, CurrentUser);
         }
 
-        public async Task<IQueryable<ProductDto>> UpdateProductAsync(UpdateProductInput input,
+        public async Task<IQueryable<ProductDto>> UpdateProductAsync(UpdateProductDto input,
             [Service] IProductQueries productQueries)
         {
             SetLogTransaction(nameof(UpdateProductAsync));
@@ -333,7 +337,7 @@ namespace Sheaft.GraphQL
             return productQueries.GetProduct(input.Id, CurrentUser);
         }
 
-        public async Task<IQueryable<ProductDto>> RateProductAsync(RateProductInput input,
+        public async Task<IQueryable<ProductDto>> RateProductAsync(RateProductDto input,
             [Service] IProductQueries productQueries)
         {
             SetLogTransaction(nameof(RateProductAsync));
@@ -342,7 +346,7 @@ namespace Sheaft.GraphQL
             return productQueries.GetProduct(input.Id, CurrentUser);
         }
 
-        public async Task<IQueryable<ProductDto>> UpdateProductPictureAsync(UpdatePictureInput input,
+        public async Task<IQueryable<ProductDto>> UpdateProductPictureAsync(UpdateResourceIdPictureDto input,
             [Service] IProductQueries productQueries)
         {
             SetLogTransaction(nameof(UpdateProductPictureAsync));
@@ -351,7 +355,7 @@ namespace Sheaft.GraphQL
             return productQueries.GetProduct(input.Id, CurrentUser);
         }
 
-        public async Task<IQueryable<ProductDto>> SetProductsAvailabilityAsync(SetProductsAvailabilityInput input,
+        public async Task<IQueryable<ProductDto>> SetProductsAvailabilityAsync(SetResourceIdsAvailabilityDto input,
             [Service] IProductQueries productQueries)
         {
             SetLogTransaction(nameof(SetProductsAvailabilityAsync));
@@ -359,7 +363,7 @@ namespace Sheaft.GraphQL
             return productQueries.GetProducts(CurrentUser).Where(j => input.Ids.Contains(j.Id));
         }
 
-        public async Task<IQueryable<ProductDto>> SetProductsSearchabilityAsync(SetProductsSearchabilityInput input,
+        public async Task<IQueryable<ProductDto>> SetProductsSearchabilityAsync(SetResourceIdsVisibilityDto input,
             [Service] IProductQueries productQueries)
         {
             SetLogTransaction(nameof(SetProductsSearchabilityAsync));
@@ -367,13 +371,13 @@ namespace Sheaft.GraphQL
             return productQueries.GetProducts(CurrentUser).Where(j => input.Ids.Contains(j.Id));
         }
 
-        public async Task<bool> DeleteProductsAsync(IdsInput input)
+        public async Task<bool> DeleteProductsAsync(ResourceIdsDto input)
         {
             SetLogTransaction(nameof(DeleteProductsAsync));
             return await ExecuteCommandAsync(_mapper.Map(input, new DeleteProductsCommand(CurrentUser)), Token);
         }
 
-        public async Task<IQueryable<StoreDto>> RegisterStoreAsync(RegisterStoreInput input,
+        public async Task<IQueryable<StoreDto>> RegisterStoreAsync(RegisterStoreDto input,
             [Service] IStoreQueries storeQueries)
         {
             SetLogTransaction(nameof(RegisterStoreAsync));
@@ -383,7 +387,7 @@ namespace Sheaft.GraphQL
             return storeQueries.GetStore(result, CurrentUser);
         }
 
-        public async Task<IQueryable<StoreDto>> UpdateStoreAsync(UpdateStoreInput input,
+        public async Task<IQueryable<StoreDto>> UpdateStoreAsync(UpdateStoreDto input,
             [Service] IStoreQueries storeQueries)
         {
             SetLogTransaction(nameof(UpdateStoreAsync));
@@ -391,7 +395,7 @@ namespace Sheaft.GraphQL
             return storeQueries.GetStore(input.Id, CurrentUser);
         }
 
-        public async Task<IQueryable<ProducerDto>> RegisterProducerAsync(RegisterProducerInput input,
+        public async Task<IQueryable<ProducerDto>> RegisterProducerAsync(RegisterProducerDto input,
             [Service] IProducerQueries producerQueries)
         {
             SetLogTransaction(nameof(RegisterProducerAsync));
@@ -401,7 +405,7 @@ namespace Sheaft.GraphQL
             return producerQueries.GetProducer(result, CurrentUser);
         }
 
-        public async Task<IQueryable<ProducerDto>> UpdateProducerAsync(UpdateProducerInput input,
+        public async Task<IQueryable<ProducerDto>> UpdateProducerAsync(UpdateProducerDto input,
             [Service] IProducerQueries producerQueries)
         {
             SetLogTransaction(nameof(UpdateProducerAsync));
@@ -409,7 +413,7 @@ namespace Sheaft.GraphQL
             return producerQueries.GetProducer(input.Id, CurrentUser);
         }
 
-        public async Task<IQueryable<BusinessLegalDto>> CreateBusinessLegalsAsync(CreateBusinessLegalInput input,
+        public async Task<IQueryable<BusinessLegalDto>> CreateBusinessLegalsAsync(CreateBusinessLegalDto input,
             [Service] ILegalQueries legalQueries)
         {
             SetLogTransaction(nameof(CreateBusinessLegalsAsync));
@@ -419,7 +423,7 @@ namespace Sheaft.GraphQL
             return legalQueries.GetBusinessLegals(result, CurrentUser);
         }
 
-        public async Task<IQueryable<BusinessLegalDto>> UpdateBusinessLegalsAsync(UpdateBusinessLegalInput input,
+        public async Task<IQueryable<BusinessLegalDto>> UpdateBusinessLegalsAsync(UpdateBusinessLegalDto input,
             [Service] ILegalQueries legalQueries)
         {
             SetLogTransaction(nameof(UpdateBusinessLegalsAsync));
@@ -427,7 +431,7 @@ namespace Sheaft.GraphQL
             return legalQueries.GetBusinessLegals(input.Id, CurrentUser);
         }
 
-        public async Task<IQueryable<ConsumerDto>> RegisterConsumerAsync(RegisterConsumerInput input,
+        public async Task<IQueryable<ConsumerDto>> RegisterConsumerAsync(RegisterConsumerDto input,
             [Service] IConsumerQueries consumerQueries)
         {
             SetLogTransaction(nameof(RegisterConsumerAsync));
@@ -437,7 +441,7 @@ namespace Sheaft.GraphQL
             return consumerQueries.GetConsumer(result, CurrentUser);
         }
 
-        public async Task<IQueryable<ConsumerDto>> UpdateConsumerAsync(UpdateConsumerInput input,
+        public async Task<IQueryable<ConsumerDto>> UpdateConsumerAsync(UpdateConsumerDto input,
             [Service] IConsumerQueries consumerQueries)
         {
             SetLogTransaction(nameof(UpdateConsumerAsync));
@@ -445,7 +449,7 @@ namespace Sheaft.GraphQL
             return consumerQueries.GetConsumer(input.Id, CurrentUser);
         }
 
-        public async Task<IQueryable<ConsumerLegalDto>> CreateConsumerLegalsAsync(CreateConsumerLegalInput input,
+        public async Task<IQueryable<ConsumerLegalDto>> CreateConsumerLegalsAsync(CreateConsumerLegalDto input,
             [Service] ILegalQueries legalQueries)
         {
             SetLogTransaction(nameof(CreateConsumerLegalsAsync));
@@ -455,7 +459,7 @@ namespace Sheaft.GraphQL
             return legalQueries.GetConsumerLegals(result, CurrentUser);
         }
 
-        public async Task<IQueryable<ConsumerLegalDto>> UpdateConsumerLegalsAsync(UpdateConsumerLegalInput input,
+        public async Task<IQueryable<ConsumerLegalDto>> UpdateConsumerLegalsAsync(UpdateConsumerLegalDto input,
             [Service] ILegalQueries legalQueries)
         {
             SetLogTransaction(nameof(UpdateConsumerLegalsAsync));
@@ -463,7 +467,7 @@ namespace Sheaft.GraphQL
             return legalQueries.GetConsumerLegals(input.Id, CurrentUser);
         }
 
-        public async Task<IQueryable<UserDto>> UpdateUserPictureAsync(UpdatePictureInput input,
+        public async Task<IQueryable<UserDto>> UpdateUserPictureAsync(UpdateResourceIdPictureDto input,
             [Service] IUserQueries userQueries)
         {
             SetLogTransaction(nameof(UpdateUserPictureAsync));
@@ -472,39 +476,39 @@ namespace Sheaft.GraphQL
             return userQueries.GetUser(input.Id, CurrentUser);
         }
 
-        public async Task<bool> AddPictureToUserProfileAsync(AddPictureToInput input)
+        public async Task<bool> AddPictureToUserProfileAsync(AddPictureToResourceIdDto input)
         {
             SetLogTransaction(nameof(AddPictureToUserProfileAsync));
             return await ExecuteCommandAsync(_mapper.Map(input, new AddPictureToUserProfileCommand(CurrentUser)),
                 Token);
         }
 
-        public async Task<bool> RemoveUserProfilePicturesAsync(IdsInput input)
+        public async Task<bool> RemoveUserProfilePicturesAsync(ResourceIdsDto input)
         {
             SetLogTransaction(nameof(RemoveUserProfilePicturesAsync));
             return await ExecuteCommandAsync(
                 _mapper.Map(input, new RemoveUserProfilePicturesCommand(CurrentUser) {UserId = CurrentUser.Id}), Token);
         }
 
-        public async Task<bool> AddPictureToProductAsync(AddPictureToInput input)
+        public async Task<bool> AddPictureToProductAsync(AddPictureToResourceIdDto input)
         {
             SetLogTransaction(nameof(AddPictureToProductAsync));
             return await ExecuteCommandAsync(_mapper.Map(input, new AddPictureToProductCommand(CurrentUser)), Token);
         }
 
-        public async Task<bool> RemoveProductPicturesAsync(IdsInput input)
+        public async Task<bool> RemoveProductPicturesAsync(ResourceIdsDto input)
         {
             SetLogTransaction(nameof(RemoveProductPicturesAsync));
             return await ExecuteCommandAsync(_mapper.Map(input, new RemoveProductPicturesCommand(CurrentUser)), Token);
         }
 
-        public async Task<bool> RemoveUserAsync(IdWithReasonInput input)
+        public async Task<bool> RemoveUserAsync(ResourceIdWithReasonDto input)
         {
             SetLogTransaction(nameof(RemoveUserAsync));
             return await ExecuteCommandAsync(_mapper.Map(input, new RemoveUserCommand(CurrentUser)), Token);
         }
 
-        public async Task<IQueryable<QuickOrderDto>> CreateQuickOrderAsync(CreateQuickOrderInput input,
+        public async Task<IQueryable<QuickOrderDto>> CreateQuickOrderAsync(CreateQuickOrderDto input,
             [Service] IQuickOrderQueries quickOrderQueries)
         {
             SetLogTransaction(nameof(CreateQuickOrderAsync));
@@ -514,7 +518,7 @@ namespace Sheaft.GraphQL
             return quickOrderQueries.GetQuickOrder(result, CurrentUser);
         }
 
-        public async Task<IQueryable<QuickOrderDto>> SetDefaultQuickOrderAsync(IdInput input,
+        public async Task<IQueryable<QuickOrderDto>> SetDefaultQuickOrderAsync(ResourceIdDto input,
             [Service] IQuickOrderQueries quickOrderQueries)
         {
             SetLogTransaction(nameof(SetDefaultQuickOrderAsync));
@@ -523,7 +527,7 @@ namespace Sheaft.GraphQL
             return quickOrderQueries.GetQuickOrder(input.Id, CurrentUser);
         }
 
-        public async Task<IQueryable<QuickOrderDto>> UpdateQuickOrderAsync(UpdateQuickOrderInput input,
+        public async Task<IQueryable<QuickOrderDto>> UpdateQuickOrderAsync(UpdateQuickOrderDto input,
             [Service] IQuickOrderQueries quickOrderQueries)
         {
             SetLogTransaction(nameof(UpdateQuickOrderAsync));
@@ -532,28 +536,28 @@ namespace Sheaft.GraphQL
         }
 
         public async Task<IQueryable<QuickOrderDto>> UpdateQuickOrderProductsAsync(
-            UpdateIdProductsQuantitiesInput input, [Service] IQuickOrderQueries quickOrderQueries)
+            UpdateResourceIdProductsQuantitiesDto input, [Service] IQuickOrderQueries quickOrderQueries)
         {
             SetLogTransaction(nameof(UpdateQuickOrderProductsAsync));
             await ExecuteCommandAsync(_mapper.Map(input, new UpdateQuickOrderProductsCommand(CurrentUser)), Token);
             return quickOrderQueries.GetQuickOrder(input.Id, CurrentUser);
         }
 
-        public async Task<bool> DeleteQuickOrdersAsync(IdsWithReasonInput input)
+        public async Task<bool> DeleteQuickOrdersAsync(ResourceIdsWithReasonDto input)
         {
             SetLogTransaction(nameof(DeleteQuickOrdersAsync));
             return await ExecuteCommandAsync(_mapper.Map(input, new DeleteQuickOrdersCommand(CurrentUser)), Token);
         }
 
         public async Task<IQueryable<DeliveryModeDto>> SetDeliveryModesAvailabilityAsync(
-            SetDeliveryModesAvailabilityInput input, [Service] IDeliveryQueries deliveryModeQueries)
+            SetResourceIdsAvailabilityDto input, [Service] IDeliveryQueries deliveryModeQueries)
         {
             SetLogTransaction(nameof(SetProductsAvailabilityAsync));
             await ExecuteCommandAsync(_mapper.Map(input, new SetDeliveryModesAvailabilityCommand(CurrentUser)), Token);
             return deliveryModeQueries.GetDeliveries(CurrentUser).Where(j => input.Ids.Contains(j.Id));
         }
 
-        public async Task<IQueryable<DeliveryModeDto>> CreateDeliveryModeAsync(CreateDeliveryModeInput input,
+        public async Task<IQueryable<DeliveryModeDto>> CreateDeliveryModeAsync(CreateDeliveryModeDto input,
             [Service] IDeliveryQueries deliveryQueries)
         {
             SetLogTransaction(nameof(CreateDeliveryModeAsync));
@@ -564,7 +568,7 @@ namespace Sheaft.GraphQL
             return deliveryQueries.GetDelivery(result, CurrentUser);
         }
 
-        public async Task<IQueryable<DeliveryModeDto>> UpdateDeliveryModeAsync(UpdateDeliveryModeInput input,
+        public async Task<IQueryable<DeliveryModeDto>> UpdateDeliveryModeAsync(UpdateDeliveryModeDto input,
             [Service] IDeliveryQueries deliveryQueries)
         {
             SetLogTransaction(nameof(UpdateDeliveryModeAsync));
@@ -572,13 +576,13 @@ namespace Sheaft.GraphQL
             return deliveryQueries.GetDelivery(input.Id, CurrentUser);
         }
 
-        public async Task<bool> DeleteDeliveryModeAsync(IdInput input)
+        public async Task<bool> DeleteDeliveryModeAsync(ResourceIdDto input)
         {
             SetLogTransaction(nameof(DeleteDeliveryModeAsync));
             return await ExecuteCommandAsync(_mapper.Map(input, new DeleteDeliveryModeCommand(CurrentUser)), Token);
         }
 
-        public async Task<IQueryable<ReturnableDto>> CreateReturnableAsync(CreateReturnableInput input,
+        public async Task<IQueryable<ReturnableDto>> CreateReturnableAsync(CreateReturnableDto input,
             [Service] IReturnableQueries returnableQueries)
         {
             SetLogTransaction(nameof(CreateReturnableAsync));
@@ -588,7 +592,7 @@ namespace Sheaft.GraphQL
             return returnableQueries.GetReturnable(result, CurrentUser);
         }
 
-        public async Task<IQueryable<ReturnableDto>> UpdateReturnableAsync(UpdateReturnableInput input,
+        public async Task<IQueryable<ReturnableDto>> UpdateReturnableAsync(UpdateReturnableDto input,
             [Service] IReturnableQueries returnableQueries)
         {
             SetLogTransaction(nameof(UpdateReturnableAsync));
@@ -596,60 +600,60 @@ namespace Sheaft.GraphQL
             return returnableQueries.GetReturnable(input.Id, CurrentUser);
         }
 
-        public async Task<bool> DeleteReturnableAsync(IdInput input)
+        public async Task<bool> DeleteReturnableAsync(ResourceIdDto input)
         {
             SetLogTransaction(nameof(DeleteReturnableAsync));
             return await ExecuteCommandAsync(_mapper.Map(input, new DeleteReturnableCommand(CurrentUser)), Token);
         }
         
         //Closings
-        public async Task<IQueryable<ClosingDto>> CreateBusinessClosingsAsync(CreateBusinessClosingsInput input, [Service] IBusinessClosingQueries closingQueries)
+        public async Task<IQueryable<ClosingDto>> CreateBusinessClosingsAsync(CreateResourceIdClosingsDto input, [Service] IBusinessClosingQueries closingQueries)
         {
             SetLogTransaction(nameof(CreateBusinessClosingsAsync));
             var result = await ExecuteCommandAsync<CreateBusinessClosingsCommand, List<Guid>>(_mapper.Map(input, new CreateBusinessClosingsCommand(CurrentUser)), Token);
             return closingQueries.GetClosings(CurrentUser).Where(j => result.Contains(j.Id));
         }
-        public async Task<IQueryable<ClosingDto>> CreateDeliveryClosingsAsync(CreateDeliveryClosingsInput input, [Service] IDeliveryClosingQueries closingQueries)
+        public async Task<IQueryable<ClosingDto>> CreateDeliveryClosingsAsync(CreateResourceIdClosingsDto input, [Service] IDeliveryClosingQueries closingQueries)
         {
             SetLogTransaction(nameof(CreateDeliveryClosingsAsync));
             var result = await ExecuteCommandAsync<CreateDeliveryClosingsCommand, List<Guid>>(_mapper.Map(input, new CreateDeliveryClosingsCommand(CurrentUser)), Token);
             return closingQueries.GetClosings(CurrentUser).Where(j => result.Contains(j.Id));
         }
-        public async Task<IQueryable<ClosingDto>> CreateProductClosingsAsync(CreateProductClosingsInput input, [Service] IProductClosingQueries closingQueries)
+        public async Task<IQueryable<ClosingDto>> CreateProductClosingsAsync(CreateResourceIdClosingsDto input, [Service] IProductClosingQueries closingQueries)
         {
             SetLogTransaction(nameof(CreateProductClosingsAsync));
             var result = await ExecuteCommandAsync<CreateProductClosingsCommand, List<Guid>>(_mapper.Map(input, new CreateProductClosingsCommand(CurrentUser)), Token);
             return closingQueries.GetClosings(CurrentUser).Where(j => result.Contains(j.Id));
         }
-        public async Task<IQueryable<ClosingDto>> UpdateBusinessClosingAsync(UpdateClosingInput input, [Service] IBusinessClosingQueries closingQueries)
+        public async Task<IQueryable<ClosingDto>> UpdateBusinessClosingAsync(UpdateClosingDto input, [Service] IBusinessClosingQueries closingQueries)
         {
             SetLogTransaction(nameof(UpdateBusinessClosingAsync));
             await ExecuteCommandAsync(_mapper.Map(input, new UpdateBusinessClosingCommand(CurrentUser)), Token);
             return closingQueries.GetClosing(input.Id, CurrentUser);
         }
-        public async Task<IQueryable<ClosingDto>> UpdateDeliveryClosingAsync(UpdateClosingInput input, [Service] IDeliveryClosingQueries closingQueries)
+        public async Task<IQueryable<ClosingDto>> UpdateDeliveryClosingAsync(UpdateClosingDto input, [Service] IDeliveryClosingQueries closingQueries)
         {
             SetLogTransaction(nameof(UpdateDeliveryClosingAsync));
             await ExecuteCommandAsync(_mapper.Map(input, new UpdateDeliveryClosingCommand(CurrentUser)), Token);
             return closingQueries.GetClosing(input.Id, CurrentUser);
         }
-        public async Task<IQueryable<ClosingDto>> UpdateProductClosingAsync(UpdateClosingInput input, [Service] IProductClosingQueries closingQueries)
+        public async Task<IQueryable<ClosingDto>> UpdateProductClosingAsync(UpdateClosingDto input, [Service] IProductClosingQueries closingQueries)
         {
             SetLogTransaction(nameof(UpdateProductClosingAsync));
             await ExecuteCommandAsync(_mapper.Map(input, new UpdateProductClosingCommand(CurrentUser)), Token);
             return closingQueries.GetClosing(input.Id, CurrentUser);
         }
-        public async Task<bool> DeleteBusinessClosingsAsync(IdsInput input)
+        public async Task<bool> DeleteBusinessClosingsAsync(ResourceIdsDto input)
         {
             SetLogTransaction(nameof(DeleteBusinessClosingsAsync));
             return await ExecuteCommandAsync(_mapper.Map(input, new DeleteBusinessClosingsCommand(CurrentUser)), Token);
         }
-        public async Task<bool> DeleteDeliveryClosingsAsync(IdsInput input)
+        public async Task<bool> DeleteDeliveryClosingsAsync(ResourceIdsDto input)
         {
             SetLogTransaction(nameof(DeleteDeliveryClosingsAsync));
             return await ExecuteCommandAsync(_mapper.Map(input, new DeleteDeliveryClosingsCommand(CurrentUser)), Token);
         }
-        public async Task<bool> DeleteProductClosingsAsync(IdsInput input)
+        public async Task<bool> DeleteProductClosingsAsync(ResourceIdsDto input)
         {
             SetLogTransaction(nameof(UpdateProductClosingAsync));
             return await ExecuteCommandAsync(_mapper.Map(input, new DeleteProductClosingsCommand(CurrentUser)), Token);

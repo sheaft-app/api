@@ -8,18 +8,18 @@ using IdentityModel.Client;
 using Newtonsoft.Json;
 using System.Text;
 using Microsoft.AspNetCore.Http;
-using Sheaft.Application.Common;
-using Sheaft.Application.Common.Extensions;
-using Sheaft.Application.Common.Interfaces.Services;
-using Sheaft.Application.Common.Models;
-using Sheaft.Application.Common.Models.Inputs;
-using Sheaft.Application.Common.Options;
+using Sheaft.Application.Extensions;
+using Sheaft.Application.Interfaces.Infrastructure;
+using Sheaft.Application.Models;
+using Sheaft.Application.Services;
+using Sheaft.Core;
+using Sheaft.Core.Enums;
 using Sheaft.Domain;
-using Sheaft.Domain.Enum;
+using Sheaft.Options;
 
 namespace Sheaft.Infrastructure.Services
 {
-    public class AuthService : BaseService, IAuthService
+    public class AuthService : SheaftService, IAuthService
     {
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly AuthOptions _authOptions;
@@ -52,7 +52,7 @@ namespace Sheaft.Infrastructure.Services
             return Result<RequestUser>.Success(new RequestUser(_httpContextAccessor.HttpContext.TraceIdentifier));
         }
 
-        public async Task<Result> UpdateUserAsync(IdentityUserInput user, CancellationToken token)
+        public async Task<Result> UpdateUserAsync(IdentityUserDto user, CancellationToken token)
         {
             var oidcResult = await _httpClient.PutAsync(_authOptions.Actions.Profile,
                 new StringContent(JsonConvert.SerializeObject(user), Encoding.UTF8, "application/json"), token);
@@ -63,7 +63,7 @@ namespace Sheaft.Infrastructure.Services
             return Success();
         }
 
-        public async Task<Result> UpdateUserPictureAsync(IdentityPictureInput user, CancellationToken token)
+        public async Task<Result> UpdateUserPictureAsync(IdentityPictureDto user, CancellationToken token)
         {
             var oidcResult = await _httpClient.PutAsync(_authOptions.Actions.Picture,
                 new StringContent(JsonConvert.SerializeObject(user), Encoding.UTF8, "application/json"), token);

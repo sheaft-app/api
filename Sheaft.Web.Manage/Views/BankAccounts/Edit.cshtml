@@ -1,8 +1,7 @@
-﻿@using Sheaft.Application.Common.Models.ViewModels
-@model Sheaft.Application.Common.Models.ViewModels.BankAccountViewModel
+﻿@model BankAccountViewModel
 @{
     ViewData["Title"] = "Update producer bank account";
-    var countries = ((List<CountryViewModel>)ViewBag.Countries).Select(c => new SelectListItem(c.Name, c.Alpha2)).ToList();
+    var countries = ((List<CountryViewModel>)ViewBag.Countries).Select(c => new SelectListItem(c.Name, c.Code)).ToList();
 }
 
 <div class="container">

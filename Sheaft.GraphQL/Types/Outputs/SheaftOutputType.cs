@@ -4,7 +4,7 @@ using System.Security.Claims;
 using HotChocolate.Resolvers;
 using HotChocolate.Types;
 using Microsoft.AspNetCore.Http;
-using Sheaft.Application.Common.Extensions;
+using Sheaft.Application.Extensions;
 using Sheaft.Domain;
 
 namespace Sheaft.GraphQL.Types.Outputs

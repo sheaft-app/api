@@ -1,8 +1,8 @@
 ﻿using HotChocolate.Types;
 using HotChocolate.Types.Relay;
-using Sheaft.Application.Common.Interfaces.Queries;
-using Sheaft.Application.Common.Models.Dto;
-using Sheaft.Application.Common.Security;
+using Sheaft.Application.Interfaces.Queries;
+using Sheaft.Application.Models;
+using Sheaft.Application.Security;
 using Sheaft.GraphQL.Filters;
 using Sheaft.GraphQL.Sorts;
 

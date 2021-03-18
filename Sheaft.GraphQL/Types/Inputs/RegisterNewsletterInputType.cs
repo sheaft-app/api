@@ -1,12 +1,13 @@
 ﻿using HotChocolate.Types;
-using Sheaft.Application.Common.Models.Inputs;
+using Sheaft.Application.Models;
 
 namespace Sheaft.GraphQL.Types.Inputs
 {
-    public class RegisterNewsletterInputType : SheaftInputType<RegisterNewsletterInput>
+    public class RegisterNewsletterInputType : SheaftInputType<RegisterNewsletterDto>
     {
-        protected override void Configure(IInputObjectTypeDescriptor<RegisterNewsletterInput> descriptor)
+        protected override void Configure(IInputObjectTypeDescriptor<RegisterNewsletterDto> descriptor)
         {
+            descriptor.Name("RegisterNewsletterInput");
             descriptor.Field(c => c.Email)
                 .Type<NonNullType<StringType>>();
 

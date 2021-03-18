@@ -1,12 +1,13 @@
 ﻿using HotChocolate.Types;
-using Sheaft.Application.Common.Models.Inputs;
+using Sheaft.Application.Models;
 
 namespace Sheaft.GraphQL.Types.Inputs
 {
-    public class CreateDeliveryModeInputType : SheaftInputType<CreateDeliveryModeInput>
+    public class CreateDeliveryModeInputType : SheaftInputType<CreateDeliveryModeDto>
     {
-        protected override void Configure(IInputObjectTypeDescriptor<CreateDeliveryModeInput> descriptor)
+        protected override void Configure(IInputObjectTypeDescriptor<CreateDeliveryModeDto> descriptor)
         {
+            descriptor.Name("CreateDeliveryModeInput");
             descriptor.Field(c => c.Description);
             descriptor.Field(c => c.Kind);
             descriptor.Field(c => c.Name);
@@ -17,7 +18,7 @@ namespace Sheaft.GraphQL.Types.Inputs
             descriptor.Field(c => c.LockOrderHoursBeforeDelivery);
 
             descriptor.Field(c => c.Address)
-                .Type<LocationAddressInputType>();
+                .Type<AddressInputType>();
 
             descriptor.Field(c => c.OpeningHours)
                 .Type<NonNullType<ListType<TimeSlotGroupInputType>>>();

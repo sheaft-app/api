@@ -1,6 +1,6 @@
 ﻿using HotChocolate.Types;
-using Sheaft.Application.Common.Models.Dto;
-using Sheaft.Application.Common.Security;
+using Sheaft.Application.Models;
+using Sheaft.Application.Security;
 using Sheaft.GraphQL.Filters;
 
 namespace Sheaft.GraphQL.Types.Outputs

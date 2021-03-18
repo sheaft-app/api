@@ -5,13 +5,14 @@ using Powells.CouponCode;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Sheaft.Application.Common.Interfaces.Services;
-using Sheaft.Application.Common.Models;
-using Sheaft.Application.Common.Options;
+using Sheaft.Application.Interfaces.Infrastructure;
+using Sheaft.Application.Services;
+using Sheaft.Core;
+using Sheaft.Options;
 
 namespace Sheaft.Infrastructure.Services
 {
-    public class IdentifierService : BaseService, IIdentifierService
+    public class IdentifierService : SheaftService, IIdentifierService
     {
         private readonly CloudStorageAccount _cloudStorageAccount;
         private readonly StorageOptions _storageOptions;

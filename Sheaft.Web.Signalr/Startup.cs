@@ -22,10 +22,10 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using MediatR;
-using Sheaft.Application.Common.Interfaces.Services;
-using Sheaft.Application.Common.Options;
-using Sheaft.Application.Store.Commands;
+using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Infrastructure.Services;
+using Sheaft.Options;
+using Sheaft.Services.Store.Commands;
 using Sheaft.Web.Signalr.Hubs;
 
 namespace Sheaft.Web.Signalr
@@ -74,7 +74,6 @@ namespace Sheaft.Web.Signalr
 
             services.AddMediatR(new List<Assembly>() { typeof(RegisterStoreCommand).Assembly }.ToArray());
             services.AddScoped<IBackgroundJobClient, BackgroundJobClient>();
-            services.AddScoped<ISheaftHangfireBridge, SheaftHangfireBridge>();
             services.AddScoped<ISheaftMediatr, SheaftMediatr>();
 
             services.AddSingleton<IUserIdProvider, Providers.Startup.NameUserIdProvider>();

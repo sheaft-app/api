@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Sheaft.Domain.Exceptions;
+using Sheaft.Core.Exceptions;
 using Sheaft.Domain.Interop;
 
 namespace Sheaft.Domain

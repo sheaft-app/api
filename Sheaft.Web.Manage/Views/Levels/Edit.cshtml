@@ -1,4 +1,4 @@
-﻿@model Sheaft.Application.Common.Models.ViewModels.LevelViewModel
+﻿@model LevelViewModel
 @{
     ViewData["Title"] = "Level details";
 }
@@ -79,7 +79,7 @@
                         <th scope="row">@reward.Name</th>
                         <td>@reward.Contact</td>
                         <td>@reward.Email</td>
-                        <td>@reward.Department</td>
+                        <td>@reward.DepartmentName</td>
                         <td>@reward.Url</td>
                         <td>
                             <a asp-controller="Rewards" asp-action="Edit" asp-route-id="@reward.Id" class="btn btn-info">
