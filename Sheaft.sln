@@ -40,7 +40,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Docker", "Docker", "{09B4FD
 		Docker\sheaft.yml = Docker\sheaft.yml
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sheaft.Services", "Sheaft.Services\Sheaft.Services.csproj", "{5F66FC4D-40C9-497C-AD22-9C8AC2244222}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sheaft.Mediatr", "Sheaft.Mediatr\Sheaft.Mediatr.csproj", "{5F66FC4D-40C9-497C-AD22-9C8AC2244222}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sheaft.GraphQL", "Sheaft.GraphQL\Sheaft.GraphQL.csproj", "{1D41AE06-8EED-49C8-B0FE-5EFCCF85A96C}"
 EndProject
@@ -51,6 +51,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sheaft.Options", "Sheaft.Options\Sheaft.Options.csproj", "{D0AE7255-C27E-4959-AB84-C3AB86EC18B2}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sheaft.Core", "Sheaft.Core\Sheaft.Core.csproj", "{15EFA5C1-835E-414F-BC68-1D2CECE81547}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sheaft.Business", "Sheaft.Business\Sheaft.Business.csproj", "{F06B3458-4413-480D-9EFF-194815E0DFAB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -126,6 +128,10 @@ Global
 		{15EFA5C1-835E-414F-BC68-1D2CECE81547}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{15EFA5C1-835E-414F-BC68-1D2CECE81547}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{15EFA5C1-835E-414F-BC68-1D2CECE81547}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F06B3458-4413-480D-9EFF-194815E0DFAB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F06B3458-4413-480D-9EFF-194815E0DFAB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F06B3458-4413-480D-9EFF-194815E0DFAB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F06B3458-4413-480D-9EFF-194815E0DFAB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

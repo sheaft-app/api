@@ -14,8 +14,8 @@ using Sheaft.Application.Models;
 using Sheaft.Core.Exceptions;
 using Sheaft.Domain;
 using Sheaft.Domain.Enum;
+using Sheaft.Mediatr.Legal.Commands;
 using Sheaft.Options;
-using Sheaft.Services.Legal.Commands;
 using Sheaft.Web.Manage.Models;
 
 namespace Sheaft.Web.Manage.Controllers

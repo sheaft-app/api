@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>netcoreapp3.1</TargetFramework>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\Sheaft.Application\Sheaft.Application.csproj" />
+      <ProjectReference Include="..\Sheaft.Options\Sheaft.Options.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="EPPlus" Version="4.5.3.3" />
+    </ItemGroup>
+
+</Project>

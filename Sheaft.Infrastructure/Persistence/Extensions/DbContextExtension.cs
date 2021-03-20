@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Sheaft.Application.Interfaces;
+using Sheaft.Application.Interfaces.Infrastructure;
 
 namespace Sheaft.Infrastructure.Persistence.Extensions
 {

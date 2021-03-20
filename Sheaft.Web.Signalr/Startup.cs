@@ -24,8 +24,8 @@ using System.Threading.Tasks;
 using MediatR;
 using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Infrastructure.Services;
+using Sheaft.Mediatr.Store.Commands;
 using Sheaft.Options;
-using Sheaft.Services.Store.Commands;
 using Sheaft.Web.Signalr.Hubs;
 
 namespace Sheaft.Web.Signalr

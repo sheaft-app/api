@@ -15,7 +15,7 @@ using Sheaft.Core;
 using Sheaft.Domain;
 using Sheaft.Domain.Enum;
 using Sheaft.Infrastructure.Services;
-using Sheaft.Services.DeliveryMode.Queries;
+using Sheaft.Mediatr.DeliveryMode.Queries;
 
 namespace Queries.Delivery.Tests
 {

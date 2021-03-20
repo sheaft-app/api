@@ -13,9 +13,9 @@ using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Application.Models;
 using Sheaft.Core.Exceptions;
 using Sheaft.Domain;
+using Sheaft.Mediatr.Declaration.Commands;
+using Sheaft.Mediatr.Ubo.Commands;
 using Sheaft.Options;
-using Sheaft.Services.Declaration.Commands;
-using Sheaft.Services.Ubo.Commands;
 using Sheaft.Web.Manage.Models;
 
 namespace Sheaft.Web.Manage.Controllers

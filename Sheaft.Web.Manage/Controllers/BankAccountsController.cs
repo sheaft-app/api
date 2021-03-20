@@ -12,8 +12,8 @@ using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Application.Models;
 using Sheaft.Core.Exceptions;
 using Sheaft.Domain;
+using Sheaft.Mediatr.Bank.Commands;
 using Sheaft.Options;
-using Sheaft.Services.Bank.Commands;
 using Sheaft.Web.Manage.Models;
 
 namespace Sheaft.Web.Manage.Controllers
@@ -33,7 +33,7 @@ namespace Sheaft.Web.Manage.Controllers
         [HttpGet]
         public async Task<IActionResult> Create(Guid userId, CancellationToken token)
         {
-            var entity = await _context.Users.OfType<Business>()
+            var entity = await _context.Users.OfType<Domain.Business>()
                 .AsNoTracking()
                 .Where(c => c.Id == userId)
                 .SingleOrDefaultAsync(token);

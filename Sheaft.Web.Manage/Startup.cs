@@ -32,37 +32,35 @@ using Microsoft.IdentityModel.Logging;
 using Microsoft.Azure.Cosmos.Table;
 using Sheaft.Application;
 using Sheaft.Application.Interfaces;
+using Sheaft.Application.Interfaces.Business;
+using Sheaft.Application.Interfaces.Factories;
 using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Application.Interfaces.Queries;
-using Sheaft.Application.Interfaces.Services;
 using Sheaft.Application.Mappings;
+using Sheaft.Business;
+using Sheaft.Mediatr.Agreement.Queries;
+using Sheaft.Mediatr.Consumer.Queries;
+using Sheaft.Mediatr.Country.Queries;
+using Sheaft.Mediatr.DeliveryMode.Queries;
+using Sheaft.Mediatr.Department.Queries;
+using Sheaft.Mediatr.Document.Queries;
+using Sheaft.Mediatr.Job.Queries;
+using Sheaft.Mediatr.Leaderboard.Queries;
+using Sheaft.Mediatr.Legal.Queries;
+using Sheaft.Mediatr.Nationality.Queries;
+using Sheaft.Mediatr.Notification.Queries;
+using Sheaft.Mediatr.Order.Queries;
+using Sheaft.Mediatr.Payin.Queries;
+using Sheaft.Mediatr.Producer.Queries;
+using Sheaft.Mediatr.Product.Queries;
+using Sheaft.Mediatr.PurchaseOrder.Queries;
+using Sheaft.Mediatr.QuickOrder.Queries;
+using Sheaft.Mediatr.Region.Queries;
+using Sheaft.Mediatr.Returnable.Queries;
+using Sheaft.Mediatr.Store.Commands;
+using Sheaft.Mediatr.Tag.Queries;
+using Sheaft.Mediatr.User.Queries;
 using Sheaft.Options;
-using Sheaft.Services;
-using Sheaft.Services.Agreement.Queries;
-using Sheaft.Services.Consumer.Queries;
-using Sheaft.Services.Country.Queries;
-using Sheaft.Services.DeliveryMode.Queries;
-using Sheaft.Services.DeliveryMode.Services;
-using Sheaft.Services.Department.Queries;
-using Sheaft.Services.Document.Queries;
-using Sheaft.Services.Fees.Services;
-using Sheaft.Services.Job.Queries;
-using Sheaft.Services.Leaderboard.Queries;
-using Sheaft.Services.Legal.Queries;
-using Sheaft.Services.Nationality.Queries;
-using Sheaft.Services.Notification.Queries;
-using Sheaft.Services.Order.Queries;
-using Sheaft.Services.Payin.Queries;
-using Sheaft.Services.Producer.Queries;
-using Sheaft.Services.Product.Queries;
-using Sheaft.Services.PurchaseOrder.Queries;
-using Sheaft.Services.QuickOrder.Queries;
-using Sheaft.Services.Region.Queries;
-using Sheaft.Services.Returnable.Queries;
-using Sheaft.Services.Store.Commands;
-using Sheaft.Services.Tag.Queries;
-using Sheaft.Services.User.Queries;
-using Sheaft.Services.User.Services;
 using Sheaft.Web.Manage.Mappings;
 
 namespace Sheaft.Web.Manage
@@ -128,6 +126,8 @@ namespace Sheaft.Web.Manage
             services.Configure<MailerOptions>(mailerSettings);
             services.Configure<PspOptions>(pspSettings);
             services.Configure<StorageOptions>(storageSettings);
+            services.Configure<ImportersOptions>(Configuration.GetSection(ImportersOptions.SETTING));
+            services.Configure<ExportersOptions>(Configuration.GetSection(ExportersOptions.SETTING));
 
             var rolesOptions = roleSettings.Get<RoleOptions>();
             services.AddAuthorization(options =>
@@ -175,7 +175,7 @@ namespace Sheaft.Web.Manage
             services.AddScoped<IRazorLightEngine>(_ => {
                 var rootDir = System.IO.Path.GetDirectoryName(Assembly.GetExecutingAssembly().CodeBase);
                 return new RazorLightEngineBuilder()
-                .UseFileSystemProject($"{rootDir.Replace("file:\\", string.Empty).Replace("file:", string.Empty)}/Templates")
+                .UseFileSystemProject($"{rootDir.Replace("file:\\", string.Empty).Replace("file:", string.Empty)}/Mailings/Templates")
                 .UseMemoryCachingProvider()
                 .Build();
             });
@@ -254,12 +254,22 @@ namespace Sheaft.Web.Manage
             services.AddScoped<IPictureService, PictureService>();
             services.AddScoped<IPspService, PspService>();
             services.AddScoped<IAuthService, AuthService>();
-            services.AddScoped<IFeesService, FeesService>();
-            services.AddScoped<IDeliveryService, DeliveryService>();
             services.AddScoped<ITableService, TableService>();
             services.AddSingleton<IBackgroundJobClient, BackgroundJobClient>();
             services.AddSingleton<ICurrentUserService, CurrentUserService>();
             services.AddSingleton<ISheaftMediatr, SheaftMediatr>();
+            
+            services.AddScoped<IFeesCalculator, FeesCalculator>();
+            services.AddScoped<IDeliveryService, DeliveryService>();
+            services.AddScoped<IProductsFileImporter, ExcelProductsImporter>();
+            services.AddScoped<IPurchaseOrdersFileExporter, ExcelPurchaseOrdersExporter>();
+            services.AddScoped<IPickingOrdersFileExporter, ExcelPickingOrdersExporter>();
+            services.AddScoped<ITransactionsFileExporter, ExcelTransactionsExporter>();
+            
+            services.AddScoped<IProductsImporterFactory, ProductsImporterFactory>();
+            services.AddScoped<IPickingOrdersExportersFactory, PickingOrdersExportersFactory>();
+            services.AddScoped<IPurchaseOrdersExportersFactory, PurchaseOrdersExportersFactory>();
+            services.AddScoped<ITransactionsExportersFactory, TransactionsExportersFactory>();
 
             services.AddScoped<IAgreementQueries, AgreementQueries>();
             services.AddScoped<IProducerQueries, ProducerQueries>();

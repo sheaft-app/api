@@ -6,6 +6,7 @@ using System.Threading;
 using Dapper;
 using Microsoft.Extensions.Options;
 using Sheaft.Application.Interfaces;
+using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Domain.Views;
 using Sheaft.Options;
 

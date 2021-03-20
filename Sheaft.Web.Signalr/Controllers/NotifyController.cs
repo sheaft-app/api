@@ -10,7 +10,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Domain;
-using Sheaft.Services.Notification.Commands;
+using Sheaft.Mediatr.Notification.Commands;
 using Sheaft.Web.Signalr.Hubs;
 
 namespace Sheaft.Web.Signalr.Controllers

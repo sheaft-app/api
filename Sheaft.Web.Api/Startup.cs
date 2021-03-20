@@ -43,51 +43,51 @@ using System.Linq;
 using System.Reflection;
 using Sheaft.Application.Behaviours;
 using Sheaft.Application.Interfaces;
+using Sheaft.Application.Interfaces.Business;
+using Sheaft.Application.Interfaces.Factories;
 using Sheaft.Application.Interfaces.Infrastructure;
+using Sheaft.Application.Interfaces.Mediatr;
 using Sheaft.Application.Interfaces.Queries;
-using Sheaft.Application.Interfaces.Services;
 using Sheaft.Application.Mappings;
 using Sheaft.Application.Security;
+using Sheaft.Business;
 using Sheaft.Domain;
 using Sheaft.Domain.Enum;
 using Sheaft.GraphQL.Common;
 using Sheaft.GraphQL.Types.Outputs;
 using Sheaft.Infrastructure.Persistence.Extensions;
+using Sheaft.Mediatr;
+using Sheaft.Mediatr.Agreement.Queries;
+using Sheaft.Mediatr.BusinessClosing.Queries;
+using Sheaft.Mediatr.Consumer.Queries;
+using Sheaft.Mediatr.Country.Queries;
+using Sheaft.Mediatr.DeliveryClosing.Queries;
+using Sheaft.Mediatr.DeliveryMode.Queries;
+using Sheaft.Mediatr.Department.Queries;
+using Sheaft.Mediatr.Document.Queries;
+using Sheaft.Mediatr.Donation.Queries;
+using Sheaft.Mediatr.Job.Queries;
+using Sheaft.Mediatr.Leaderboard.Queries;
+using Sheaft.Mediatr.Legal.Queries;
+using Sheaft.Mediatr.Mappings;
+using Sheaft.Mediatr.Nationality.Queries;
+using Sheaft.Mediatr.Notification.Queries;
+using Sheaft.Mediatr.Order.Queries;
+using Sheaft.Mediatr.Payin.Queries;
+using Sheaft.Mediatr.Payout.Queries;
+using Sheaft.Mediatr.Producer.Queries;
+using Sheaft.Mediatr.Product.Queries;
+using Sheaft.Mediatr.ProductClosing.Queries;
+using Sheaft.Mediatr.PurchaseOrder.Queries;
+using Sheaft.Mediatr.QuickOrder.Queries;
+using Sheaft.Mediatr.Region.Queries;
+using Sheaft.Mediatr.Returnable.Queries;
+using Sheaft.Mediatr.Store.Commands;
+using Sheaft.Mediatr.Tag.Queries;
+using Sheaft.Mediatr.Transfer.Queries;
+using Sheaft.Mediatr.User.Queries;
+using Sheaft.Mediatr.Withholding.Queries;
 using Sheaft.Options;
-using Sheaft.Services;
-using Sheaft.Services.Agreement.Queries;
-using Sheaft.Services.BusinessClosing.Queries;
-using Sheaft.Services.Consumer.Queries;
-using Sheaft.Services.Country.Queries;
-using Sheaft.Services.DeliveryClosing.Queries;
-using Sheaft.Services.DeliveryMode.Queries;
-using Sheaft.Services.DeliveryMode.Services;
-using Sheaft.Services.Department.Queries;
-using Sheaft.Services.Document.Queries;
-using Sheaft.Services.Donation.Queries;
-using Sheaft.Services.Fees.Services;
-using Sheaft.Services.Job.Queries;
-using Sheaft.Services.Leaderboard.Queries;
-using Sheaft.Services.Legal.Queries;
-using Sheaft.Services.Mappings;
-using Sheaft.Services.Nationality.Queries;
-using Sheaft.Services.Notification.Queries;
-using Sheaft.Services.Order.Queries;
-using Sheaft.Services.Payin.Queries;
-using Sheaft.Services.Payout.Queries;
-using Sheaft.Services.Producer.Queries;
-using Sheaft.Services.Product.Queries;
-using Sheaft.Services.ProductClosing.Queries;
-using Sheaft.Services.PurchaseOrder.Queries;
-using Sheaft.Services.QuickOrder.Queries;
-using Sheaft.Services.Region.Queries;
-using Sheaft.Services.Returnable.Queries;
-using Sheaft.Services.Store.Commands;
-using Sheaft.Services.Tag.Queries;
-using Sheaft.Services.Transfer.Queries;
-using Sheaft.Services.User.Queries;
-using Sheaft.Services.User.Services;
-using Sheaft.Services.Withholding.Queries;
 using Sheaft.Web.Api.Extensions;
 
 namespace Sheaft.Web.Api
@@ -165,6 +165,8 @@ namespace Sheaft.Web.Api
             services.Configure<SponsoringOptions>(Configuration.GetSection(SponsoringOptions.SETTING));
             services.Configure<RoutineOptions>(Configuration.GetSection(RoutineOptions.SETTING));
             services.Configure<PictureOptions>(Configuration.GetSection(PictureOptions.SETTING));
+            services.Configure<ImportersOptions>(Configuration.GetSection(ImportersOptions.SETTING));
+            services.Configure<ExportersOptions>(Configuration.GetSection(ExportersOptions.SETTING));
 
             JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
 
@@ -281,12 +283,22 @@ namespace Sheaft.Web.Api
             services.AddScoped<ISignalrService, SignalrService>();
             services.AddScoped<IPictureService, PictureService>();
             services.AddScoped<IPspService, PspService>();
-            services.AddScoped<IFeesService, FeesService>();
-            services.AddScoped<IDeliveryService, DeliveryService>();
             services.AddScoped<ITableService, TableService>();
             services.AddScoped<ISheaftMediatr, SheaftMediatr>();
             services.AddScoped<IAuthService, AuthService>();
             services.AddSingleton<ICurrentUserService, CurrentUserService>();
+            
+            services.AddScoped<IFeesCalculator, FeesCalculator>();
+            services.AddScoped<IDeliveryService, DeliveryService>();
+            services.AddScoped<IProductsFileImporter, ExcelProductsImporter>();
+            services.AddScoped<IPurchaseOrdersFileExporter, ExcelPurchaseOrdersExporter>();
+            services.AddScoped<IPickingOrdersFileExporter, ExcelPickingOrdersExporter>();
+            services.AddScoped<ITransactionsFileExporter, ExcelTransactionsExporter>();
+            
+            services.AddScoped<IProductsImporterFactory, ProductsImporterFactory>();
+            services.AddScoped<IPickingOrdersExportersFactory, PickingOrdersExportersFactory>();
+            services.AddScoped<IPurchaseOrdersExportersFactory, PurchaseOrdersExportersFactory>();
+            services.AddScoped<ITransactionsExportersFactory, TransactionsExportersFactory>();
 
             services.AddScoped<IAgreementQueries, AgreementQueries>();
             services.AddScoped<IProducerQueries, ProducerQueries>();
@@ -332,7 +344,7 @@ namespace Sheaft.Web.Api
             services.AddScoped<IRazorLightEngine>(_ => {
                 var rootDir = System.IO.Path.GetDirectoryName(Assembly.GetExecutingAssembly().CodeBase);
                 return new RazorLightEngineBuilder()
-                .UseFileSystemProject($"{rootDir.Replace("file:\\", string.Empty).Replace("file:", string.Empty)}/Templates")
+                .UseFileSystemProject($"{rootDir.Replace("file:\\", string.Empty).Replace("file:", string.Empty)}/Mailings/Templates")
                 .UseMemoryCachingProvider()
                 .Build();
             });

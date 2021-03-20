@@ -12,6 +12,7 @@ namespace Sheaft.Domain
     public abstract class User : IEntity
     {
         private List<Points> _points;
+        private List<UserSetting> _settings;
 
         protected User()
         {
@@ -51,6 +52,7 @@ namespace Sheaft.Domain
         public virtual Legal Legal { get; private set; }
         public virtual ProfileInformation ProfileInformation { get; private set; }
         public virtual IReadOnlyCollection<Points> Points { get { return _points.AsReadOnly(); } }
+        public virtual IReadOnlyCollection<UserSetting> Settings { get { return _settings.AsReadOnly(); } }
 
         public void SetProfileInformation(ProfileInformation profileInformation)
         {
@@ -182,6 +184,11 @@ namespace Sheaft.Domain
         public void Restore()
         {
             RemovedOn = null;
+        }
+
+        public UserSetting GetSetting(SettingKind kind)
+        {
+            return _settings?.SingleOrDefault(s => s.Setting.Kind == kind);
         }
     }
 

@@ -32,26 +32,26 @@ using Serilog;
 using Serilog.Events;
 using Sheaft.Application.Behaviours;
 using Sheaft.Application.Interfaces;
+using Sheaft.Application.Interfaces.Business;
+using Sheaft.Application.Interfaces.Factories;
 using Sheaft.Application.Interfaces.Infrastructure;
-using Sheaft.Application.Interfaces.Services;
+using Sheaft.Application.Interfaces.Mediatr;
 using Sheaft.Application.Mappings;
+using Sheaft.Business;
 using Sheaft.Domain;
 using Sheaft.Infrastructure.Persistence;
 using Sheaft.Infrastructure.Services;
+using Sheaft.Mediatr;
+using Sheaft.Mediatr.Donation.Commands;
+using Sheaft.Mediatr.Order.Commands;
+using Sheaft.Mediatr.Payin.Commands;
+using Sheaft.Mediatr.PayinRefund.Commands;
+using Sheaft.Mediatr.Payout.Commands;
+using Sheaft.Mediatr.Producer.Commands;
+using Sheaft.Mediatr.Store.Commands;
+using Sheaft.Mediatr.Transfer.Commands;
+using Sheaft.Mediatr.Zone.Commands;
 using Sheaft.Options;
-using Sheaft.Services;
-using Sheaft.Services.DeliveryMode.Services;
-using Sheaft.Services.Donation.Commands;
-using Sheaft.Services.Fees.Services;
-using Sheaft.Services.Order.Commands;
-using Sheaft.Services.Payin.Commands;
-using Sheaft.Services.PayinRefund.Commands;
-using Sheaft.Services.Payout.Commands;
-using Sheaft.Services.Producer.Commands;
-using Sheaft.Services.Store.Commands;
-using Sheaft.Services.Transfer.Commands;
-using Sheaft.Services.User.Services;
-using Sheaft.Services.Zone.Commands;
 using Sheaft.Web.Common;
 
 namespace Sheaft.Web.Jobs
@@ -137,6 +137,8 @@ namespace Sheaft.Web.Jobs
             services.Configure<SponsoringOptions>(Configuration.GetSection(SponsoringOptions.SETTING));
             services.Configure<RoutineOptions>(Configuration.GetSection(RoutineOptions.SETTING));
             services.Configure<PictureOptions>(Configuration.GetSection(PictureOptions.SETTING));
+            services.Configure<ImportersOptions>(Configuration.GetSection(ImportersOptions.SETTING));
+            services.Configure<ExportersOptions>(Configuration.GetSection(ExportersOptions.SETTING));
 
             var rolesOptions = roleSettings.Get<RoleOptions>();
             services.AddAuthorization(options =>
@@ -215,7 +217,7 @@ namespace Sheaft.Web.Jobs
             services.AddScoped<IRazorLightEngine>(_ => {
                 var rootDir = System.IO.Path.GetDirectoryName(Assembly.GetExecutingAssembly().CodeBase);
                 return new RazorLightEngineBuilder()
-                .UseFileSystemProject($"{rootDir.Replace("file:\\", string.Empty).Replace("file:", string.Empty)}/Templates")
+                .UseFileSystemProject($"{rootDir.Replace("file:\\", string.Empty).Replace("file:", string.Empty)}/Mailings/Templates")
                 .UseMemoryCachingProvider()
                 .Build();
             });
@@ -226,14 +228,24 @@ namespace Sheaft.Web.Jobs
             services.AddScoped<ISignalrService, SignalrService>();
             services.AddScoped<IPictureService, PictureService>();
             services.AddScoped<IPspService, PspService>();
-            services.AddScoped<IFeesService, FeesService>();
-            services.AddScoped<IDeliveryService, DeliveryService>();
             services.AddScoped<ITableService, TableService>();
             services.AddScoped<IAuthService, AuthService>();
             services.AddSingleton<IBackgroundJobClient, BackgroundJobClient>();
             services.AddSingleton<ICurrentUserService, CurrentUserService>();
             services.AddSingleton<ISheaftMediatr, SheaftMediatr>();
             services.AddSingleton<ISheaftDispatcher, SheaftDispatcher>();
+            
+            services.AddScoped<IFeesCalculator, FeesCalculator>();
+            services.AddScoped<IDeliveryService, DeliveryService>();
+            services.AddScoped<IProductsFileImporter, ExcelProductsImporter>();
+            services.AddScoped<IPurchaseOrdersFileExporter, ExcelPurchaseOrdersExporter>();
+            services.AddScoped<IPickingOrdersFileExporter, ExcelPickingOrdersExporter>();
+            services.AddScoped<ITransactionsFileExporter, ExcelTransactionsExporter>();
+            
+            services.AddScoped<IProductsImporterFactory, ProductsImporterFactory>();
+            services.AddScoped<IPickingOrdersExportersFactory, PickingOrdersExportersFactory>();
+            services.AddScoped<IPurchaseOrdersExportersFactory, PurchaseOrdersExportersFactory>();
+            services.AddScoped<ITransactionsExportersFactory, TransactionsExportersFactory>();
 
             services.AddTransient(typeof(IPipelineBehavior<,>), typeof(UnhandledExceptionBehaviour<,>));
             services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehaviour<,>));

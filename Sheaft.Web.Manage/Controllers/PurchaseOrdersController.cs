@@ -13,8 +13,8 @@ using Sheaft.Application.Interfaces;
 using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Core.Exceptions;
 using Sheaft.Domain.Enum;
+using Sheaft.Mediatr.PurchaseOrder.Commands;
 using Sheaft.Options;
-using Sheaft.Services.PurchaseOrder.Commands;
 using Sheaft.Web.Manage.Models;
 
 namespace Sheaft.Web.Manage.Controllers

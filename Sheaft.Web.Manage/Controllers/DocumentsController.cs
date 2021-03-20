@@ -15,9 +15,9 @@ using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Application.Interfaces.Queries;
 using Sheaft.Core.Exceptions;
 using Sheaft.Domain.Enum;
+using Sheaft.Mediatr.Document.Commands;
+using Sheaft.Mediatr.Page.Commands;
 using Sheaft.Options;
-using Sheaft.Services.Document.Commands;
-using Sheaft.Services.Page.Commands;
 using Sheaft.Web.Manage.Models;
 
 namespace Sheaft.Web.Manage.Controllers

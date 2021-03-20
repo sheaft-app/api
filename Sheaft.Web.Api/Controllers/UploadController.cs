@@ -7,12 +7,11 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Sheaft.Application.Interfaces.Infrastructure;
-using Sheaft.Application.Interfaces.Services;
 using Sheaft.Application.Security;
 using Sheaft.Core.Enums;
 using Sheaft.Domain;
 using Sheaft.Domain.Enum;
-using Sheaft.Services.Product.Commands;
+using Sheaft.Mediatr.Product.Commands;
 
 namespace Sheaft.Web.Api.Controllers
 {
