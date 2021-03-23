@@ -30,6 +30,8 @@ namespace Sheaft.Domain
             SetLastname(lastname);
 
             _points = new List<Points>();
+            _settings = new List<UserSetting>();
+            
             RefreshPoints();
             SetProfileInformation(new ProfileInformation(this));
         }
@@ -82,11 +84,6 @@ namespace Sheaft.Domain
 
             if (Kind == ProfileKind.Consumer)
                 SetUserName($"{FirstName} {LastName}");
-        }
-
-        public void SetAddress(Department department)
-        {
-            Address = new UserAddress(department);
         }
 
         public void SetAddress(UserAddress address)

@@ -4,7 +4,7 @@ using Sheaft.Domain.Interop;
 
 namespace Sheaft.Domain
 {
-    public class Setting : IIdEntity
+    public class Setting : IIdEntity, ITrackRemove
     {
         protected Setting(){}
 
@@ -19,5 +19,25 @@ namespace Sheaft.Domain
         public SettingKind Kind { get; private set; }
         public string Name { get; private set; }
         public string Description { get; private set; }
+
+        public void SetName(string name)
+        {
+            if (string.IsNullOrWhiteSpace(name))
+                return;
+
+            Name = name;
+        }
+
+        public void SetKind(SettingKind kind)
+        {
+            Kind = kind;
+        }
+        
+        public void SetDescription(string description)
+        {
+            Description = description;
+        }
+
+        public DateTimeOffset? RemovedOn { get; }
     }
 }

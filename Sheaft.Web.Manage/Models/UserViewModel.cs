@@ -25,5 +25,6 @@ namespace Sheaft.Web.Manage.Models
         public string Instagram { get; set; }
         public AddressViewModel Address { get; set; }
         public List<PictureViewModel> Pictures { get; set; }
+        public List<UserSettingViewModel> Settings { get; set; }
     }
 }

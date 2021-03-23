@@ -498,6 +498,26 @@ namespace Sheaft.Web.Api
                     context.Add(new Support(supportId, $"{firstname} {lastname}", firstname, lastname, email));
                     context.SaveChanges();
                 }
+
+                var settingsEnum = Enum.GetValues(typeof(SettingKind)).Cast<SettingKind>().ToList();
+                var settings = context.Settings.ToList();
+                var missingSettings = settingsEnum.Except(settings.Select(s => s.Kind));
+                foreach (var missingSetting in missingSettings)
+                {
+                    context.Add(new Setting(Guid.NewGuid(), missingSetting.ToString("G"), missingSetting));
+                    context.SaveChanges();
+                }
+                
+                var removedSettings = settings.Select(s => s.Kind).Except(settingsEnum);
+                foreach (var removedSetting in removedSettings)
+                {
+                    var setting = settings.FirstOrDefault(s => s.Kind == removedSetting);
+                    if (setting == null)
+                        continue;
+                    
+                    context.Remove(setting);
+                    context.SaveChanges();
+                }
             }
 
             app.UseRobotsTxt();

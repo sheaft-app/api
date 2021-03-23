@@ -1,0 +1,59 @@
+﻿@model IEnumerable<SettingViewModel>
+@{
+    ViewData["Title"] = "Settings";
+    int take = ViewBag.Take;
+    int currentPage = ViewBag.Page;
+}
+
+<div class="container">
+    <h2 class="display-5">Settings</h2>
+    <br />
+
+    <table class="table table-hover">
+        <thead class="thead-dark">
+            <tr>
+                <th scope="col">Id</th>
+                <th scope="col">Name</th>
+                <th scope="col">Kind</th>
+                <th scope="col">
+                    <a asp-controller="Settings" asp-action="Add" class="btn btn-success">
+                        <i class="fa fa-plus"></i>
+                    </a>
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var entity in Model)
+            {
+                <tr>
+                    <th scope="row">@entity.Id</th>
+                    <td>@entity.Name</td>
+                    <td>@entity.Kind</td>
+                    <td>
+                        <a asp-controller="Settings" asp-action="Edit" asp-route-id="@entity.Id" class="btn btn-info">
+                            <i class="fa fa-pen"></i>
+                        </a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+        <tfoot>
+            <tr class="text-center">
+                <td colspan="6">
+                    @if (currentPage >= 1)
+                    {
+                        <a asp-controller="Settings" asp-action="Index" asp-route-take="@take" asp-route-page="@(currentPage-1)" class="btn btn-outline-secondary">
+                            <i class="fa fa-caret-left"></i>
+                        </a>
+                    }
+                    @if (take == Model.Count())
+                    {
+                        <a asp-controller="Settings" asp-action="Index" asp-route-take="@take" asp-route-page="@(currentPage+1)" class="btn btn-outline-secondary">
+                            <i class="fa fa-caret-right"></i>
+                        </a>
+                    }
+                </td>
+            </tr>
+        </tfoot>
+    </table>
+</div>

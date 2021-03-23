@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Sheaft.Application.Interfaces.Mediatr;
 using Sheaft.Core;
 using Sheaft.Domain.Common;
 
-namespace Sheaft.Application.Interfaces.Infrastructure
+namespace Sheaft.Application.Interfaces.Mediatr
 {
     public interface ISheaftMediatr
     {

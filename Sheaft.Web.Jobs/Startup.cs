@@ -358,43 +358,43 @@ namespace Sheaft.Web.Jobs
     {
         public static void Register(RoutineOptions options)
         {
-            RecurringJob.AddOrUpdate<ISheaftDispatcher>("79d5e199b5ef41268fade4da1fa3f83b", mediatr =>
+            RecurringJob.AddOrUpdate<SheaftDispatcher>("79d5e199b5ef41268fade4da1fa3f83b", mediatr =>
                 mediatr.Execute(nameof(CheckOrdersCommand), new CheckOrdersCommand(new RequestUser("037e7e93c73f4406a4e31994d8686b7c", Guid.NewGuid().ToString("N"), null)), CancellationToken.None),
                     options.CheckOrdersCron);
 
-            RecurringJob.AddOrUpdate<ISheaftDispatcher>("44d0d009c3d24cb6b05f113e49b60d35", mediatr =>
+            RecurringJob.AddOrUpdate<SheaftDispatcher>("44d0d009c3d24cb6b05f113e49b60d35", mediatr =>
                 mediatr.Execute(nameof(CheckDonationsCommand), new CheckDonationsCommand(new RequestUser("037e7e93c73f4406a4e31994d8686b7c", Guid.NewGuid().ToString("N"), null)), CancellationToken.None),
                     options.CheckDonationsCron);
 
-            RecurringJob.AddOrUpdate<ISheaftDispatcher>("cd2bc132393f4a379f7ac44d56f84d9e", mediatr =>
+            RecurringJob.AddOrUpdate<SheaftDispatcher>("cd2bc132393f4a379f7ac44d56f84d9e", mediatr =>
                 mediatr.Execute(nameof(CheckPayinsCommand), new CheckPayinsCommand(new RequestUser("037e7e93c73f4406a4e31994d8686b7c", Guid.NewGuid().ToString("N"), null)), CancellationToken.None),
                     options.CheckPayinsCron);
 
-            RecurringJob.AddOrUpdate<ISheaftDispatcher>("eaf648de5fe54fc1980c093fd78bb2f7", mediatr =>
+            RecurringJob.AddOrUpdate<SheaftDispatcher>("eaf648de5fe54fc1980c093fd78bb2f7", mediatr =>
                 mediatr.Execute(nameof(CheckPayinRefundsCommand), new CheckPayinRefundsCommand(new RequestUser("037e7e93c73f4406a4e31994d8686b7c", Guid.NewGuid().ToString("N"), null)), CancellationToken.None),
                     options.CheckPayinRefundsCron);
 
-            RecurringJob.AddOrUpdate<ISheaftDispatcher>("dddd91a8fa494da3af1477d1b537fd95", mediatr =>
+            RecurringJob.AddOrUpdate<SheaftDispatcher>("dddd91a8fa494da3af1477d1b537fd95", mediatr =>
                 mediatr.Execute(nameof(CheckPayoutsCommand), new CheckPayoutsCommand(new RequestUser("037e7e93c73f4406a4e31994d8686b7c", Guid.NewGuid().ToString("N"), null)), CancellationToken.None),
                     options.CheckPayoutsCron);
 
-            RecurringJob.AddOrUpdate<ISheaftDispatcher>("50a160aac50f480a872b04a509ef202c", mediatr =>
+            RecurringJob.AddOrUpdate<SheaftDispatcher>("50a160aac50f480a872b04a509ef202c", mediatr =>
                 mediatr.Execute(nameof(CheckTransfersCommand), new CheckTransfersCommand(new RequestUser("037e7e93c73f4406a4e31994d8686b7c", Guid.NewGuid().ToString("N"), null)), CancellationToken.None),
                     options.CheckTransfersCron);
 
-            RecurringJob.AddOrUpdate<ISheaftDispatcher>("ae81c9c623f940b386ac9d3144147557", mediatr =>
+            RecurringJob.AddOrUpdate<SheaftDispatcher>("ae81c9c623f940b386ac9d3144147557", mediatr =>
                 mediatr.Execute(nameof(CheckNewPayoutsCommand), new CheckNewPayoutsCommand(new RequestUser("037e7e93c73f4406a4e31994d8686b7c", Guid.NewGuid().ToString("N"), null)), CancellationToken.None),
                     options.CheckNewPayoutsCron);
 
-            RecurringJob.AddOrUpdate<ISheaftDispatcher>("0b74e15ec9de4332981a8f933377fc0a", mediatr =>
+            RecurringJob.AddOrUpdate<SheaftDispatcher>("0b74e15ec9de4332981a8f933377fc0a", mediatr =>
                 mediatr.Execute(nameof(UpdateZonesProgressCommand), new UpdateZonesProgressCommand(new RequestUser("037e7e93c73f4406a4e31994d8686b7c", Guid.NewGuid().ToString("N"), null)), CancellationToken.None),
                     options.CheckZonesProgressCron);
 
-            RecurringJob.AddOrUpdate<ISheaftDispatcher>("7236b37addc04f62ac2afef157903132", mediatr =>
+            RecurringJob.AddOrUpdate<SheaftDispatcher>("7236b37addc04f62ac2afef157903132", mediatr =>
                 mediatr.Execute(nameof(GenerateZonesFileCommand), new GenerateZonesFileCommand(new RequestUser("037e7e93c73f4406a4e31994d8686b7c", Guid.NewGuid().ToString("N"), null)), CancellationToken.None),
                     options.CheckZonesFileCron);
 
-            RecurringJob.AddOrUpdate<ISheaftDispatcher>("4787cf27f6bd491292014902a84a11ae", mediatr =>
+            RecurringJob.AddOrUpdate<SheaftDispatcher>("4787cf27f6bd491292014902a84a11ae", mediatr =>
                 mediatr.Execute(nameof(GenerateProducersFileCommand), new GenerateProducersFileCommand(new RequestUser("037e7e93c73f4406a4e31994d8686b7c", Guid.NewGuid().ToString("N"), null)), CancellationToken.None),
                     options.CheckProducersFileCron);
         }

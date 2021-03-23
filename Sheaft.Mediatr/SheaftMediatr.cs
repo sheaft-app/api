@@ -4,14 +4,13 @@ using System.Threading.Tasks;
 using Hangfire;
 using MediatR;
 using Microsoft.Extensions.Logging;
-using Sheaft.Application.Interfaces;
 using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Application.Interfaces.Mediatr;
 using Sheaft.Core;
 using Sheaft.Domain;
 using Sheaft.Domain.Common;
 
-namespace Sheaft.Infrastructure.Services
+namespace Sheaft.Mediatr
 {
     public class SheaftMediatr : ISheaftMediatr
     {
@@ -34,7 +33,7 @@ namespace Sheaft.Infrastructure.Services
             var name = jobname ?? command.GetType().Name;
             _logger.LogInformation("Offloading command {event}", name);
             name += GetJobRequestUserName(command.RequestUser);
-            _backgroundJobClient.Enqueue<ISheaftDispatcher>(bridge => bridge.Execute(name, command, CancellationToken.None));
+            _backgroundJobClient.Enqueue<SheaftDispatcher>(bridge => bridge.Execute(name, command, CancellationToken.None));
         }
 
         public void Post(ICommand command, string jobname = null)
@@ -42,14 +41,14 @@ namespace Sheaft.Infrastructure.Services
             var name = jobname ?? command.GetType().Name;
             _logger.LogInformation("Offloading command {event}", name);
             name += GetJobRequestUserName(command.RequestUser);
-            _backgroundJobClient.Enqueue<ISheaftDispatcher>(bridge => bridge.Execute(name, command, CancellationToken.None));
+            _backgroundJobClient.Enqueue<SheaftDispatcher>(bridge => bridge.Execute(name, command, CancellationToken.None));
         }
 
         public void Post(DomainEvent notification, string jobname = null)
         {
             var name = jobname ?? notification.GetType().Name;
             _logger.LogInformation("Publishing event {event}", name);
-            _backgroundJobClient.Enqueue<ISheaftDispatcher>(bridge => bridge.Execute(name, notification, CancellationToken.None));
+            _backgroundJobClient.Enqueue<SheaftDispatcher>(bridge => bridge.Execute(name, notification, CancellationToken.None));
         }
 
         public void Schedule(ICommand command, TimeSpan delay, string jobname = null)
@@ -57,7 +56,7 @@ namespace Sheaft.Infrastructure.Services
             var name = jobname ?? command.GetType().Name;
             _logger.LogInformation("Scheduling command {event}", name);
             name += GetJobRequestUserName(command.RequestUser);
-            _backgroundJobClient.Schedule<ISheaftDispatcher>(bridge => bridge.Execute(name, command, CancellationToken.None), delay);
+            _backgroundJobClient.Schedule<SheaftDispatcher>(bridge => bridge.Execute(name, command, CancellationToken.None), delay);
         }
 
         public void Schedule<T>(ICommand<T> command, TimeSpan delay, string jobname = null)
@@ -65,14 +64,14 @@ namespace Sheaft.Infrastructure.Services
             var name = jobname ?? command.GetType().Name;
             _logger.LogInformation("Scheduling command {event}", name);
             name += GetJobRequestUserName(command.RequestUser);
-            _backgroundJobClient.Schedule<ISheaftDispatcher>(bridge => bridge.Execute(name, command, CancellationToken.None), delay);
+            _backgroundJobClient.Schedule<SheaftDispatcher>(bridge => bridge.Execute(name, command, CancellationToken.None), delay);
         }
 
         public void Schedule(DomainEvent notification, TimeSpan delay, string jobname = null)
         {
             var name = jobname ?? notification.GetType().Name;
             _logger.LogInformation("Scheduling event {event}", name);
-            _backgroundJobClient.Schedule<ISheaftDispatcher>(bridge => bridge.Execute(name, notification, CancellationToken.None), delay);
+            _backgroundJobClient.Schedule<SheaftDispatcher>(bridge => bridge.Execute(name, notification, CancellationToken.None), delay);
         }
 
         public async Task<Result> Process(ICommand command, CancellationToken token)

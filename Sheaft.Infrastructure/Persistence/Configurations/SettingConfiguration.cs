@@ -14,6 +14,7 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
 
             entity.HasKey("Uid");
             entity.HasIndex(c => c.Id).IsUnique();
+            entity.HasIndex(c => c.Kind).IsUnique();
             entity.HasIndex("Uid", "Id");
             entity.ToTable("Settings");
         }
