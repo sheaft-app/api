@@ -237,10 +237,6 @@ namespace Sheaft.Web.Jobs
             
             services.AddScoped<IFeesCalculator, FeesCalculator>();
             services.AddScoped<IDeliveryService, DeliveryService>();
-            services.AddScoped<IProductsFileImporter, ExcelProductsImporter>();
-            services.AddScoped<IPurchaseOrdersFileExporter, ExcelPurchaseOrdersExporter>();
-            services.AddScoped<IPickingOrdersFileExporter, ExcelPickingOrdersExporter>();
-            services.AddScoped<ITransactionsFileExporter, ExcelTransactionsExporter>();
             
             services.AddScoped<IProductsImporterFactory, ProductsImporterFactory>();
             services.AddScoped<IPickingOrdersExportersFactory, PickingOrdersExportersFactory>();
