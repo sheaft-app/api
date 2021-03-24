@@ -101,7 +101,7 @@ namespace Sheaft.Web.Manage.Controllers
                 return View(model);
             }
 
-            return RedirectToAction("Edit", new {id = result.Data});
+            return RedirectToAction("Index");
         }
 
         [HttpGet]
@@ -159,7 +159,7 @@ namespace Sheaft.Web.Manage.Controllers
                 return View(model);
             }
 
-            return RedirectToAction("Edit", new {model.Id});
+            return RedirectToAction("Index");
         }
 
         [HttpPost]
@@ -174,7 +174,7 @@ namespace Sheaft.Web.Manage.Controllers
             if (!result.Succeeded)
                 throw result.Exception;
 
-            return RedirectToAction("Edit", new {id});
+            return RedirectToAction("Index");
         }
 
         [HttpPost]

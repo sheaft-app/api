@@ -41,11 +41,14 @@ using Sheaft.Application.Mappings;
 using Sheaft.Business;
 using Sheaft.Mediatr;
 using Sheaft.Mediatr.Agreement.Queries;
+using Sheaft.Mediatr.BusinessClosing.Queries;
 using Sheaft.Mediatr.Consumer.Queries;
 using Sheaft.Mediatr.Country.Queries;
+using Sheaft.Mediatr.DeliveryClosing.Queries;
 using Sheaft.Mediatr.DeliveryMode.Queries;
 using Sheaft.Mediatr.Department.Queries;
 using Sheaft.Mediatr.Document.Queries;
+using Sheaft.Mediatr.Donation.Queries;
 using Sheaft.Mediatr.Job.Queries;
 using Sheaft.Mediatr.Leaderboard.Queries;
 using Sheaft.Mediatr.Legal.Queries;
@@ -53,15 +56,19 @@ using Sheaft.Mediatr.Nationality.Queries;
 using Sheaft.Mediatr.Notification.Queries;
 using Sheaft.Mediatr.Order.Queries;
 using Sheaft.Mediatr.Payin.Queries;
+using Sheaft.Mediatr.Payout.Queries;
 using Sheaft.Mediatr.Producer.Queries;
 using Sheaft.Mediatr.Product.Queries;
+using Sheaft.Mediatr.ProductClosing.Queries;
 using Sheaft.Mediatr.PurchaseOrder.Queries;
 using Sheaft.Mediatr.QuickOrder.Queries;
 using Sheaft.Mediatr.Region.Queries;
 using Sheaft.Mediatr.Returnable.Queries;
 using Sheaft.Mediatr.Store.Commands;
 using Sheaft.Mediatr.Tag.Queries;
+using Sheaft.Mediatr.Transfer.Queries;
 using Sheaft.Mediatr.User.Queries;
+using Sheaft.Mediatr.Withholding.Queries;
 using Sheaft.Options;
 using Sheaft.Web.Manage.Mappings;
 
@@ -169,10 +176,7 @@ namespace Sheaft.Web.Manage
             }, ServiceLifetime.Scoped);
 
             var mailerConfig = mailerSettings.Get<MailerOptions>();
-
-            var rootDir = System.IO.Path.GetDirectoryName(Assembly.GetExecutingAssembly().CodeBase);
-
-            services.AddScoped<IAmazonSimpleEmailService, AmazonSimpleEmailServiceClient>(_ => new AmazonSimpleEmailServiceClient(Configuration.GetValue<string>("Mailer:ApiId"), Configuration.GetValue<string>("Mailer:ApiKey"), RegionEndpoint.EUCentral1));
+            services.AddScoped<IAmazonSimpleEmailService, AmazonSimpleEmailServiceClient>(_ => new AmazonSimpleEmailServiceClient(mailerConfig.ApiId, mailerConfig.ApiKey, RegionEndpoint.EUCentral1));
 
             services.AddScoped<IRazorLightEngine>(_ => {
                 var rootDir = System.IO.Path.GetDirectoryName(Assembly.GetExecutingAssembly().CodeBase);
@@ -255,11 +259,10 @@ namespace Sheaft.Web.Manage
             services.AddScoped<ISignalrService, SignalrService>();
             services.AddScoped<IPictureService, PictureService>();
             services.AddScoped<IPspService, PspService>();
-            services.AddScoped<IAuthService, AuthService>();
             services.AddScoped<ITableService, TableService>();
-            services.AddSingleton<IBackgroundJobClient, BackgroundJobClient>();
+            services.AddScoped<ISheaftMediatr, SheaftMediatr>();
+            services.AddScoped<IAuthService, AuthService>();
             services.AddSingleton<ICurrentUserService, CurrentUserService>();
-            services.AddSingleton<ISheaftMediatr, SheaftMediatr>();
             
             services.AddScoped<IFeesCalculator, FeesCalculator>();
             services.AddScoped<IDeliveryService, DeliveryService>();
@@ -290,6 +293,13 @@ namespace Sheaft.Web.Manage
             services.AddScoped<IPayinQueries, PayinQueries>();
             services.AddScoped<IDocumentQueries, DocumentQueries>();
             services.AddScoped<ILegalQueries, LegalQueries>();
+            services.AddScoped<IBusinessClosingQueries, BusinessClosingQueries>();
+            services.AddScoped<IDeliveryClosingQueries, DeliveryClosingQueries>();
+            services.AddScoped<IProductClosingQueries, ProductClosingQueries>();
+            services.AddScoped<ITransferQueries, TransferQueries>();
+            services.AddScoped<IPayoutQueries, PayoutQueries>();
+            services.AddScoped<IDonationQueries, DonationQueries>();
+            services.AddScoped<IWithholdingQueries, WithholdingQueries>();
 
             var storageConfig = storageSettings.Get<StorageOptions>();
             services.AddSingleton<CloudStorageAccount>(CloudStorageAccount.Parse(storageConfig.ConnectionString));

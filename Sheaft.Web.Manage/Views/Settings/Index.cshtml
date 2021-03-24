@@ -12,7 +12,6 @@
     <table class="table table-hover">
         <thead class="thead-dark">
             <tr>
-                <th scope="col">Id</th>
                 <th scope="col">Name</th>
                 <th scope="col">Kind</th>
                 <th scope="col">
@@ -26,8 +25,7 @@
             @foreach (var entity in Model)
             {
                 <tr>
-                    <th scope="row">@entity.Id</th>
-                    <td>@entity.Name</td>
+                    <th scope="row">@entity.Name</th>
                     <td>@entity.Kind</td>
                     <td>
                         <a asp-controller="Settings" asp-action="Edit" asp-route-id="@entity.Id" class="btn btn-info">
