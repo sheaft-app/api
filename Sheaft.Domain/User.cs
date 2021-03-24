@@ -185,7 +185,47 @@ namespace Sheaft.Domain
 
         public UserSetting GetSetting(SettingKind kind)
         {
-            return _settings?.SingleOrDefault(s => s.Setting.Kind == kind);
+            return Settings?.SingleOrDefault(s => s.Setting.Kind == kind);
+        }
+
+        public UserSetting GetSetting(Guid id)
+        {
+            return Settings?.SingleOrDefault(s => s.Setting.Id == id);
+        }
+
+        public void AddSetting(Setting setting, string value)
+        {
+            if (Settings == null)
+                _settings = new List<UserSetting>();
+
+            if (_settings.Any(s => s.Setting.Kind == setting.Kind))
+                throw SheaftException.AlreadyExists();
+            
+            _settings.Add(new UserSetting(setting, value));
+        }
+
+        public void EditSetting(Guid settingId, string value)
+        {
+            if (Settings == null)
+                throw SheaftException.NotFound();
+
+            var setting = _settings.SingleOrDefault(s => s.Setting.Id == settingId);
+            if(setting == null)
+                throw SheaftException.NotFound();
+
+            setting.SetValue(value);
+        }
+
+        public void RemoveSetting(Guid settingId)
+        {
+            if (Settings == null)
+                throw SheaftException.NotFound();
+
+            var setting = _settings.SingleOrDefault(s => s.Setting.Id == settingId);
+            if(setting == null)
+                throw SheaftException.NotFound();
+
+            _settings.Remove(setting);
         }
     }
 

@@ -46,7 +46,7 @@ namespace Sheaft.Web.Manage.Controllers
 
             var query = _context.Users.OfType<Producer>().AsNoTracking();
 
-            var requestUser = await GetRequestUser(token);
+            var requestUser = await GetRequestUserAsync(token);
             if (requestUser.IsImpersonating)
                 query = query.Where(p => p.Id == requestUser.Id);
 
@@ -94,7 +94,7 @@ namespace Sheaft.Web.Manage.Controllers
             }
 
             var producer = await _context.Users.OfType<Producer>().SingleOrDefaultAsync(c => c.Id == model.Id, token);
-            var result = await _mediatr.Process(new UpdateProducerCommand(await GetRequestUser(token))
+            var result = await _mediatr.Process(new UpdateProducerCommand(await GetRequestUserAsync(token))
             {
                 ProducerId = model.Id,
                 Address = _mapper.Map<AddressDto>(model.Address),
@@ -128,7 +128,7 @@ namespace Sheaft.Web.Manage.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete(Guid id, CancellationToken token)
         {
-            var result = await _mediatr.Process(new RemoveUserCommand(await GetRequestUser(token))
+            var result = await _mediatr.Process(new RemoveUserCommand(await GetRequestUserAsync(token))
             {
                 UserId = id
             }, token);
@@ -143,7 +143,7 @@ namespace Sheaft.Web.Manage.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Restore(Guid id, CancellationToken token)
         {
-            var result = await _mediatr.Process(new RestoreUserCommand(await GetRequestUser(token))
+            var result = await _mediatr.Process(new RestoreUserCommand(await GetRequestUserAsync(token))
             {
                 UserId = id
             }, token);

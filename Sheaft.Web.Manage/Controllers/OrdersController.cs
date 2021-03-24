@@ -43,7 +43,7 @@ namespace Sheaft.Web.Manage.Controllers
 
             var query = _context.Orders.AsNoTracking();
 
-            var requestUser = await GetRequestUser(token);
+            var requestUser = await GetRequestUserAsync(token);
             if (requestUser.IsImpersonating)
                 query = query.Where(p => p.User.Id == requestUser.Id);
 
@@ -83,7 +83,7 @@ namespace Sheaft.Web.Manage.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Expire(OrderViewModel model, CancellationToken token)
         {
-            var result = await _mediatr.Process(new ExpireOrderCommand(await GetRequestUser(token))
+            var result = await _mediatr.Process(new ExpireOrderCommand(await GetRequestUserAsync(token))
             {
                 OrderId = model.Id
             }, token);
@@ -98,7 +98,7 @@ namespace Sheaft.Web.Manage.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Confirm(OrderViewModel model, CancellationToken token)
         {
-            var result = await _mediatr.Process(new ConfirmOrderCommand(await GetRequestUser(token))
+            var result = await _mediatr.Process(new ConfirmOrderCommand(await GetRequestUserAsync(token))
             {
                 OrderId = model.Id
             }, token);
@@ -113,7 +113,7 @@ namespace Sheaft.Web.Manage.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Fail(OrderViewModel model, CancellationToken token)
         {
-            var result = await _mediatr.Process(new FailOrderCommand(await GetRequestUser(token))
+            var result = await _mediatr.Process(new FailOrderCommand(await GetRequestUserAsync(token))
             {
                 OrderId = model.Id
             }, token);
@@ -128,7 +128,7 @@ namespace Sheaft.Web.Manage.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Retry(OrderViewModel model, CancellationToken token)
         {
-            var result = await _mediatr.Process(new RetryOrderCommand(await GetRequestUser(token))
+            var result = await _mediatr.Process(new RetryOrderCommand(await GetRequestUserAsync(token))
             {
                 OrderId = model.Id
             }, token);

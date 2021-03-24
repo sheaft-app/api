@@ -62,7 +62,7 @@ namespace Sheaft.Web.Manage.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Add(SettingViewModel model, CancellationToken token)
         {
-            var result = await _mediatr.Process(_mapper.Map(model, new CreateSettingCommand(await GetRequestUser(token))), token);
+            var result = await _mediatr.Process(_mapper.Map(model, new CreateSettingCommand(await GetRequestUserAsync(token))), token);
             if (!result.Succeeded)
             {
                 ModelState.AddModelError("", result.Exception.Message);
@@ -91,7 +91,7 @@ namespace Sheaft.Web.Manage.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(SettingViewModel model, CancellationToken token)
         {
-            var result = await _mediatr.Process(_mapper.Map(model, new UpdateSettingCommand(await GetRequestUser(token))), token);
+            var result = await _mediatr.Process(_mapper.Map(model, new UpdateSettingCommand(await GetRequestUserAsync(token))), token);
             if (!result.Succeeded)
             {
                 ModelState.AddModelError("", result.Exception.Message);
@@ -105,7 +105,7 @@ namespace Sheaft.Web.Manage.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete(Guid id, CancellationToken token)
         {
-            var result = await _mediatr.Process(new DeleteSettingCommand(await GetRequestUser(token)){SettingId = id}, token);
+            var result = await _mediatr.Process(new DeleteSettingCommand(await GetRequestUserAsync(token)){SettingId = id}, token);
             if (!result.Succeeded)
                 throw result.Exception;
 

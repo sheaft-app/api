@@ -44,7 +44,7 @@ namespace Sheaft.Web.Manage.Controllers
 
             var query = _context.Agreements.AsNoTracking();
 
-            var requestUser = await GetRequestUser(token);
+            var requestUser = await GetRequestUserAsync(token);
             if (requestUser.IsImpersonating)
             {
                 if (requestUser.IsInRole(_roleOptions.Store.Value))
@@ -88,7 +88,7 @@ namespace Sheaft.Web.Manage.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Reset(AgreementViewModel model, CancellationToken token)
         {
-            var result = await _mediatr.Process(new ResetAgreementStatusToCommand(await GetRequestUser(token))
+            var result = await _mediatr.Process(new ResetAgreementStatusToCommand(await GetRequestUserAsync(token))
             {
                 AgreementId = model.Id
             }, token);
@@ -103,7 +103,7 @@ namespace Sheaft.Web.Manage.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete(Guid id, CancellationToken token)
         {
-            var result = await _mediatr.Process(new DeleteAgreementCommand(await GetRequestUser(token))
+            var result = await _mediatr.Process(new DeleteAgreementCommand(await GetRequestUserAsync(token))
             {
                 AgreementId = id
             }, token);
@@ -118,7 +118,7 @@ namespace Sheaft.Web.Manage.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Restore(Guid id, CancellationToken token)
         {
-            var result = await _mediatr.Process(new RestoreAgreementCommand(await GetRequestUser(token))
+            var result = await _mediatr.Process(new RestoreAgreementCommand(await GetRequestUserAsync(token))
             {
                 AgreementId = id
             }, token);

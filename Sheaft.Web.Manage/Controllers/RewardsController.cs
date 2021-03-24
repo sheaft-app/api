@@ -68,7 +68,7 @@ namespace Sheaft.Web.Manage.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Add(RewardViewModel model, CancellationToken token)
         {
-            var result = await _mediatr.Process(new CreateRewardCommand(await GetRequestUser(token))
+            var result = await _mediatr.Process(new CreateRewardCommand(await GetRequestUserAsync(token))
             {
                 Name = model.Name,
                 Contact = model.Contact,
@@ -113,7 +113,7 @@ namespace Sheaft.Web.Manage.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(RewardViewModel model, CancellationToken token)
         {
-            var result = await _mediatr.Process(new UpdateRewardCommand(await GetRequestUser(token))
+            var result = await _mediatr.Process(new UpdateRewardCommand(await GetRequestUserAsync(token))
             {
                 RewardId = model.Id,
                 Name = model.Name,
@@ -142,7 +142,7 @@ namespace Sheaft.Web.Manage.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Restore(Guid id, CancellationToken token)
         {
-            var result = await _mediatr.Process(new RestoreRewardCommand(await GetRequestUser(token))
+            var result = await _mediatr.Process(new RestoreRewardCommand(await GetRequestUserAsync(token))
             {
                 RewardId = id
             }, token);
@@ -157,7 +157,7 @@ namespace Sheaft.Web.Manage.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete(Guid id, CancellationToken token)
         {
-            var result = await _mediatr.Process(new DeleteRewardCommand(await GetRequestUser(token))
+            var result = await _mediatr.Process(new DeleteRewardCommand(await GetRequestUserAsync(token))
             {
                 RewardId = id
             }, token);

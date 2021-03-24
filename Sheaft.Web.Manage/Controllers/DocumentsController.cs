@@ -61,7 +61,7 @@ namespace Sheaft.Web.Manage.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(Guid legalId, DocumentViewModel model, CancellationToken token)
         {
-            var result = await _mediatr.Process(new CreateDocumentCommand(await GetRequestUser(token))
+            var result = await _mediatr.Process(new CreateDocumentCommand(await GetRequestUserAsync(token))
             {
                 Name = model.Name,
                 Kind = model.Kind,
@@ -97,7 +97,7 @@ namespace Sheaft.Web.Manage.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(DocumentViewModel model, CancellationToken token)
         {
-            var result = await _mediatr.Process(new UpdateDocumentCommand(await GetRequestUser(token))
+            var result = await _mediatr.Process(new UpdateDocumentCommand(await GetRequestUserAsync(token))
             {
                 DocumentId = model.Id,
                 Name = model.Name,
@@ -144,7 +144,7 @@ namespace Sheaft.Web.Manage.Controllers
                 data = ms.ToArray();
             }
 
-            var result = await _mediatr.Process(new UploadPageCommand(await GetRequestUser(token))
+            var result = await _mediatr.Process(new UploadPageCommand(await GetRequestUserAsync(token))
             {
                 DocumentId = model.Id,
                 Extension = Path.GetExtension(page.FileName),
@@ -163,7 +163,7 @@ namespace Sheaft.Web.Manage.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Lock(Guid id, CancellationToken token)
         {
-            var result = await _mediatr.Process(new LockDocumentCommand(await GetRequestUser(token))
+            var result = await _mediatr.Process(new LockDocumentCommand(await GetRequestUserAsync(token))
             {
                 DocumentId = id
             }, token);
@@ -178,7 +178,7 @@ namespace Sheaft.Web.Manage.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Unlock(Guid id, CancellationToken token)
         {
-            var result = await _mediatr.Process(new UnLockDocumentCommand(await GetRequestUser(token))
+            var result = await _mediatr.Process(new UnLockDocumentCommand(await GetRequestUserAsync(token))
             {
                 DocumentId = id
             }, token);
@@ -193,7 +193,7 @@ namespace Sheaft.Web.Manage.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Validate(Guid id, CancellationToken token)
         {
-            var result = await _mediatr.Process(new SubmitDocumentCommand(await GetRequestUser(token))
+            var result = await _mediatr.Process(new SubmitDocumentCommand(await GetRequestUserAsync(token))
             {
                 DocumentId = id
             }, token);
@@ -216,7 +216,7 @@ namespace Sheaft.Web.Manage.Controllers
             if (entity == null)
                 throw SheaftException.NotFound();
 
-            var data = await _documentQueries.DownloadDocumentAsync(id, await GetRequestUser(token), token);
+            var data = await _documentQueries.DownloadDocumentAsync(id, await GetRequestUserAsync(token), token);
             return File(data, "application/octet-stream", entity.Name + ".zip");
         }
 
@@ -233,7 +233,7 @@ namespace Sheaft.Web.Manage.Controllers
                 throw SheaftException.NotFound();
 
             var page = entity.Pages.Single(p => p.Id == pageId);
-            var data = await _documentQueries.DownloadDocumentPageAsync(documentId, pageId, await GetRequestUser(token),
+            var data = await _documentQueries.DownloadDocumentPageAsync(documentId, pageId, await GetRequestUserAsync(token),
                 token);
 
             return File(data, "application/octet-stream", page.FileName + page.Extension);
@@ -243,7 +243,7 @@ namespace Sheaft.Web.Manage.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeletePage(Guid documentId, Guid pageId, CancellationToken token)
         {
-            var result = await _mediatr.Process(new DeletePageCommand(await GetRequestUser(token))
+            var result = await _mediatr.Process(new DeletePageCommand(await GetRequestUserAsync(token))
             {
                 DocumentId = documentId,
                 PageId = pageId
@@ -262,7 +262,7 @@ namespace Sheaft.Web.Manage.Controllers
             var entity = await _context.Legals
                 .SingleOrDefaultAsync(c => c.Documents.Any(d => d.Id == id), token);
 
-            var result = await _mediatr.Process(new DeleteDocumentCommand(await GetRequestUser(token))
+            var result = await _mediatr.Process(new DeleteDocumentCommand(await GetRequestUserAsync(token))
             {
                 DocumentId = id
             }, token);

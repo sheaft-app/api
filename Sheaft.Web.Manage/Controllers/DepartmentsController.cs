@@ -73,7 +73,7 @@ namespace Sheaft.Web.Manage.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(DepartmentViewModel model, CancellationToken token)
         {
-            var result = await _mediatr.Process(new UpdateDepartmentCommand(await GetRequestUser(token))
+            var result = await _mediatr.Process(new UpdateDepartmentCommand(await GetRequestUserAsync(token))
             {
                 DepartmentId = model.Id,
                 Name = model.Name,

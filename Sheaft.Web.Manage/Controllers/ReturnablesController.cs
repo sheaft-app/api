@@ -41,7 +41,7 @@ namespace Sheaft.Web.Manage.Controllers
 
             var query = _context.Returnables.AsNoTracking();
 
-            var requestUser = await GetRequestUser(token);
+            var requestUser = await GetRequestUserAsync(token);
             if (requestUser.IsImpersonating)
             {
                 query = query.Where(p => p.Producer.Id == requestUser.Id);
@@ -63,7 +63,7 @@ namespace Sheaft.Web.Manage.Controllers
         [HttpGet]
         public async Task<IActionResult> Add(CancellationToken token)
         {
-            var requestUser = await GetRequestUser(token);
+            var requestUser = await GetRequestUserAsync(token);
             if (!requestUser.IsImpersonating)
                 return RedirectToAction("Impersonate", "Account");
 
@@ -74,7 +74,7 @@ namespace Sheaft.Web.Manage.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Add(ReturnableViewModel model, CancellationToken token)
         {
-            var requestUser = await GetRequestUser(token);
+            var requestUser = await GetRequestUserAsync(token);
             if (!requestUser.IsImpersonating)
             {
                 ModelState.AddModelError("", "You must impersonate producer to create it.");
@@ -117,7 +117,7 @@ namespace Sheaft.Web.Manage.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(ReturnableViewModel model, CancellationToken token)
         {
-            var result = await _mediatr.Process(new UpdateReturnableCommand(await GetRequestUser(token))
+            var result = await _mediatr.Process(new UpdateReturnableCommand(await GetRequestUserAsync(token))
             {
                 ReturnableId = model.Id,
                 Description = model.Description,
@@ -139,7 +139,7 @@ namespace Sheaft.Web.Manage.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Restore(Guid id, CancellationToken token)
         {
-            var result = await _mediatr.Process(new RestoreReturnableCommand(await GetRequestUser(token))
+            var result = await _mediatr.Process(new RestoreReturnableCommand(await GetRequestUserAsync(token))
             {
                 ReturnableId = id
             }, token);
@@ -154,7 +154,7 @@ namespace Sheaft.Web.Manage.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete(Guid id, CancellationToken token)
         {
-            var result = await _mediatr.Process(new DeleteReturnableCommand(await GetRequestUser(token))
+            var result = await _mediatr.Process(new DeleteReturnableCommand(await GetRequestUserAsync(token))
             {
                 ReturnableId = id
             }, token);

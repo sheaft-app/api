@@ -46,7 +46,7 @@ namespace Sheaft.Web.Manage.Controllers
 
             var query = _context.Products.AsNoTracking();
 
-            var requestUser = await GetRequestUser(token);
+            var requestUser = await GetRequestUserAsync(token);
             if (requestUser.IsImpersonating)
             {
                 query = query.Where(p => p.Producer.Id == requestUser.Id);
@@ -68,7 +68,7 @@ namespace Sheaft.Web.Manage.Controllers
         [HttpGet]
         public async Task<IActionResult> Add(CancellationToken token)
         {
-            var requestUser = await GetRequestUser(token);
+            var requestUser = await GetRequestUserAsync(token);
             if (!requestUser.IsImpersonating)
                 return RedirectToAction("Impersonate", "Account");
 
@@ -82,7 +82,7 @@ namespace Sheaft.Web.Manage.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Add(ProductViewModel model, IFormFile picture, CancellationToken token)
         {
-            var requestUser = await GetRequestUser(token);
+            var requestUser = await GetRequestUserAsync(token);
             if (!requestUser.IsImpersonating)
             {
                 ViewBag.Tags = await GetTags(token);
@@ -136,7 +136,7 @@ namespace Sheaft.Web.Manage.Controllers
         [HttpGet]
         public async Task<IActionResult> Edit(Guid id, CancellationToken token)
         {
-            var requestUser = await GetRequestUser(token);
+            var requestUser = await GetRequestUserAsync(token);
             if (!requestUser.IsImpersonating)
                 return RedirectToAction("Impersonate", "Account");
 
@@ -159,7 +159,7 @@ namespace Sheaft.Web.Manage.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(ProductViewModel model, IFormFile picture, CancellationToken token)
         {
-            var requestUser = await GetRequestUser(token);
+            var requestUser = await GetRequestUserAsync(token);
             if (!requestUser.IsImpersonating)
             {
                 ViewBag.Tags = await GetTags(token);
@@ -214,7 +214,7 @@ namespace Sheaft.Web.Manage.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Import(IEnumerable<IFormFile> products, CancellationToken token)
         {
-            var requestUser = await GetRequestUser(token);
+            var requestUser = await GetRequestUserAsync(token);
             foreach (var formFile in products)
             {
                 if (formFile.Length == 0)
@@ -241,7 +241,7 @@ namespace Sheaft.Web.Manage.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Restore(Guid id, CancellationToken token)
         {
-            var result = await _mediatr.Process(new RestoreProductCommand(await GetRequestUser(token))
+            var result = await _mediatr.Process(new RestoreProductCommand(await GetRequestUserAsync(token))
             {
                 ProductId = id
             }, token);
@@ -256,7 +256,7 @@ namespace Sheaft.Web.Manage.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete(Guid id, CancellationToken token)
         {
-            var result = await _mediatr.Process(new DeleteProductCommand(await GetRequestUser(token))
+            var result = await _mediatr.Process(new DeleteProductCommand(await GetRequestUserAsync(token))
             {
                 ProductId = id
             }, token);

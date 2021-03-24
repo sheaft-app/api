@@ -42,7 +42,7 @@ namespace Sheaft.Web.Manage.Controllers
 
             var query = _context.Payouts.AsNoTracking();
 
-            var requestUser = await GetRequestUser(token);
+            var requestUser = await GetRequestUserAsync(token);
             if (requestUser.IsImpersonating)
                 query = query.Where(p => p.Author.Id == requestUser.Id);
 

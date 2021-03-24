@@ -61,7 +61,7 @@ namespace Sheaft.Web.Manage.Controllers
             if (entity == null)
                 throw SheaftException.NotFound();
 
-            var result = await _mediatr.Process(new CreateDeclarationCommand(await GetRequestUser(token))
+            var result = await _mediatr.Process(new CreateDeclarationCommand(await GetRequestUserAsync(token))
             {
                 LegalId = legalId
             }, token);
@@ -86,7 +86,7 @@ namespace Sheaft.Web.Manage.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> AddUbo(Guid declarationId, UboViewModel model, CancellationToken token)
         {
-            var result = await _mediatr.Process(new CreateUboCommand(await GetRequestUser(token))
+            var result = await _mediatr.Process(new CreateUboCommand(await GetRequestUserAsync(token))
             {
                 DeclarationId = declarationId,
                 Address = _mapper.Map<AddressDto>(model.Address),
@@ -133,7 +133,7 @@ namespace Sheaft.Web.Manage.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> EditUbo(Guid declarationId, UboViewModel model, CancellationToken token)
         {
-            var result = await _mediatr.Process(new UpdateUboCommand(await GetRequestUser(token))
+            var result = await _mediatr.Process(new UpdateUboCommand(await GetRequestUserAsync(token))
             {
                 UboId = model.Id,
                 Address = _mapper.Map<AddressDto>(model.Address),
@@ -160,7 +160,7 @@ namespace Sheaft.Web.Manage.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Lock(Guid declarationId, CancellationToken token)
         {
-            var result = await _mediatr.Process(new LockDeclarationCommand(await GetRequestUser(token))
+            var result = await _mediatr.Process(new LockDeclarationCommand(await GetRequestUserAsync(token))
             {
                 DeclarationId = declarationId
             }, token);
@@ -175,7 +175,7 @@ namespace Sheaft.Web.Manage.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Unlock(Guid declarationId, CancellationToken token)
         {
-            var result = await _mediatr.Process(new UnLockDeclarationCommand(await GetRequestUser(token))
+            var result = await _mediatr.Process(new UnLockDeclarationCommand(await GetRequestUserAsync(token))
             {
                 DeclarationId = declarationId
             }, token);
@@ -190,7 +190,7 @@ namespace Sheaft.Web.Manage.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Validate(Guid declarationId, CancellationToken token)
         {
-            var result = await _mediatr.Process(new SubmitDeclarationCommand(await GetRequestUser(token))
+            var result = await _mediatr.Process(new SubmitDeclarationCommand(await GetRequestUserAsync(token))
             {
                 DeclarationId = declarationId
             }, token);
@@ -205,7 +205,7 @@ namespace Sheaft.Web.Manage.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteUbo(Guid declarationId, Guid uboId, CancellationToken token)
         {
-            var result = await _mediatr.Process(new DeleteUboCommand(await GetRequestUser(token))
+            var result = await _mediatr.Process(new DeleteUboCommand(await GetRequestUserAsync(token))
             {
                 UboId = uboId
             }, token);

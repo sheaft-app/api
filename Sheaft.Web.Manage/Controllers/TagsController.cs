@@ -85,7 +85,7 @@ namespace Sheaft.Web.Manage.Controllers
                 }
             }
 
-            var result = await _mediatr.Process(new CreateTagCommand(await GetRequestUser(token))
+            var result = await _mediatr.Process(new CreateTagCommand(await GetRequestUserAsync(token))
             {
                 Description = model.Description,
                 Name = model.Name,
@@ -142,7 +142,7 @@ namespace Sheaft.Web.Manage.Controllers
                 }
             }
 
-            var result = await _mediatr.Process(new UpdateTagCommand(await GetRequestUser(token))
+            var result = await _mediatr.Process(new UpdateTagCommand(await GetRequestUserAsync(token))
             {
                 TagId = model.Id,
                 Description = model.Description,
@@ -166,7 +166,7 @@ namespace Sheaft.Web.Manage.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Restore(Guid id, CancellationToken token)
         {
-            var result = await _mediatr.Process(new RestoreTagCommand(await GetRequestUser(token))
+            var result = await _mediatr.Process(new RestoreTagCommand(await GetRequestUserAsync(token))
             {
                 TagId = id
             }, token);
@@ -181,7 +181,7 @@ namespace Sheaft.Web.Manage.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete(Guid id, CancellationToken token)
         {
-            var result = await _mediatr.Process(new DeleteTagCommand(await GetRequestUser(token))
+            var result = await _mediatr.Process(new DeleteTagCommand(await GetRequestUserAsync(token))
             {
                 TagId = id
             }, token);

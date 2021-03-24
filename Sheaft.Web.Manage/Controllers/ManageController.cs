@@ -50,7 +50,7 @@ namespace Sheaft.Web.Manage.Controllers
                 .ToListAsync(token);
         }
 
-        protected async Task<RequestUser> GetRequestUser(CancellationToken token)
+        protected async Task<RequestUser> GetRequestUserAsync(CancellationToken token)
         {
             var requestUser = User.ToIdentityUser(HttpContext.TraceIdentifier);
 

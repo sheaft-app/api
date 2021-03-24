@@ -42,7 +42,7 @@ namespace Sheaft.Web.Manage.Controllers
 
             var query = _context.DeliveryModes.AsNoTracking();
 
-            var requestUser = await GetRequestUser(token);
+            var requestUser = await GetRequestUserAsync(token);
             if (requestUser.IsImpersonating)
             {
                 query = query.Where(p => p.Producer.Id == requestUser.Id);
@@ -80,7 +80,7 @@ namespace Sheaft.Web.Manage.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(DeliveryModeViewModel model, CancellationToken token)
         {
-            var result = await _mediatr.Process(new UpdateDeliveryModeCommand(await GetRequestUser(token))
+            var result = await _mediatr.Process(new UpdateDeliveryModeCommand(await GetRequestUserAsync(token))
             {
                 DeliveryModeId = model.Id,
                 Description = model.Description,
@@ -107,7 +107,7 @@ namespace Sheaft.Web.Manage.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete(Guid id, CancellationToken token)
         {
-            var result = await _mediatr.Process(new DeleteDeliveryModeCommand(await GetRequestUser(token))
+            var result = await _mediatr.Process(new DeleteDeliveryModeCommand(await GetRequestUserAsync(token))
             {
                 DeliveryModeId = id
             }, token);
@@ -122,7 +122,7 @@ namespace Sheaft.Web.Manage.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Restore(Guid id, CancellationToken token)
         {
-            var result = await _mediatr.Process(new RestoreDeliveryModeCommand(await GetRequestUser(token))
+            var result = await _mediatr.Process(new RestoreDeliveryModeCommand(await GetRequestUserAsync(token))
             {
                 DeliveryModeId = id
             }, token);

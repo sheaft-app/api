@@ -64,7 +64,7 @@ namespace Sheaft.Web.Manage.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Add(LevelViewModel model, CancellationToken token)
         {
-            var result = await _mediatr.Process(new CreateLevelCommand(await GetRequestUser(token))
+            var result = await _mediatr.Process(new CreateLevelCommand(await GetRequestUserAsync(token))
             {
                 Name = model.Name,
                 RequiredPoints = model.RequiredPoints,
@@ -82,7 +82,7 @@ namespace Sheaft.Web.Manage.Controllers
         [HttpGet]
         public async Task<IActionResult> Edit(Guid id, CancellationToken token)
         {
-            var requestUser = await GetRequestUser(token);
+            var requestUser = await GetRequestUserAsync(token);
 
             var entity = await _context.Levels
                 .AsNoTracking()
@@ -100,7 +100,7 @@ namespace Sheaft.Web.Manage.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(LevelViewModel model, CancellationToken token)
         {
-            var result = await _mediatr.Process(new UpdateLevelCommand(await GetRequestUser(token))
+            var result = await _mediatr.Process(new UpdateLevelCommand(await GetRequestUserAsync(token))
             {
                 LevelId = model.Id,
                 Name = model.Name,
@@ -120,7 +120,7 @@ namespace Sheaft.Web.Manage.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete(Guid id, CancellationToken token)
         {
-            var result = await _mediatr.Process(new DeleteLevelCommand(await GetRequestUser(token))
+            var result = await _mediatr.Process(new DeleteLevelCommand(await GetRequestUserAsync(token))
             {
                 LevelId = id
             }, token);
@@ -135,7 +135,7 @@ namespace Sheaft.Web.Manage.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Restore(Guid id, CancellationToken token)
         {
-            var result = await _mediatr.Process(new RestoreLevelCommand(await GetRequestUser(token))
+            var result = await _mediatr.Process(new RestoreLevelCommand(await GetRequestUserAsync(token))
             {
                 LevelId = id
             }, token);

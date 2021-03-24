@@ -54,7 +54,7 @@ namespace Sheaft.Web.Manage.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(BankAccountViewModel model, CancellationToken token)
         {
-            var result = await _mediatr.Process(new CreateBankAccountCommand(await GetRequestUser(token))
+            var result = await _mediatr.Process(new CreateBankAccountCommand(await GetRequestUserAsync(token))
             {
                 UserId = model.OwnerId,
                 Address = _mapper.Map<AddressDto>(model.Address),
@@ -110,7 +110,7 @@ namespace Sheaft.Web.Manage.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(BankAccountViewModel model, CancellationToken token)
         {
-            var result = await _mediatr.Process(new UpdateBankAccountCommand(await GetRequestUser(token))
+            var result = await _mediatr.Process(new UpdateBankAccountCommand(await GetRequestUserAsync(token))
             {
                 BankAccountId = model.Id,
                 Address = _mapper.Map<AddressDto>(model.Address),
