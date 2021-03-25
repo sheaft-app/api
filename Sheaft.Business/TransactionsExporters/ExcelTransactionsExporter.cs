@@ -17,7 +17,7 @@ namespace Sheaft.Business
 {
     public class ExcelTransactionsExporter : SheaftService, ITransactionsFileExporter
     {
-        public ExcelTransactionsExporter(ILogger logger) : base(logger)
+        public ExcelTransactionsExporter(ILogger<ExcelTransactionsExporter> logger) : base(logger)
         {
         }
 

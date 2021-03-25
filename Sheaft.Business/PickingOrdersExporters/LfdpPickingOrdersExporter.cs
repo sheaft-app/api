@@ -32,74 +32,74 @@ namespace Sheaft.Business
         public async Task<Result<ResourceExportDto>> ExportAsync(RequestUser user,
             IQueryable<PurchaseOrder> purchaseOrdersQuery, CancellationToken token)
         {
-            using (var stream = new MemoryStream())
+            using (var excelPkg = new ExcelPackage())
             {
-                using (var excelPkg = new ExcelPackage())
-                {
-                    var purchaseOrders = await purchaseOrdersQuery.ToListAsync(token);
-                    var storeDeliveryDays = purchaseOrders
-                        .Where(po => po.Sender.Kind == ProfileKind.Store)
-                        .GroupBy(po => po.ExpectedDelivery.ExpectedDeliveryDate.DayOfWeek);
+                var purchaseOrders = await purchaseOrdersQuery.ToListAsync(token);
+                var storeDeliveryDays = purchaseOrders
+                    .Where(po => po.Sender.Kind == ProfileKind.Store)
+                    .GroupBy(po => po.ExpectedDelivery.ExpectedDeliveryDate.DayOfWeek);
 
-                    var products = await _context.Products
-                        .Where(p =>
-                            !p.RemovedOn.HasValue
-                            && p.Producer.Id == user.Id)
+                var products = await _context.Products
+                    .Where(p =>
+                        !p.RemovedOn.HasValue
+                        && p.Producer.Id == user.Id)
+                    .OrderBy(p => p.Name)
+                    .ToListAsync(token);
+
+                foreach (var storeDeliveryDay in storeDeliveryDays)
+                {
+                    var worksheet =
+                        excelPkg.Workbook.Worksheets.Add($"Commandes du {DayHelper.GetDayFromEnum(storeDeliveryDay.Key)}");
+                    var clients = await _context.Agreements
+                        .Where(u =>
+                            !u.RemovedOn.HasValue
+                            && u.Delivery.Producer.Id == user.Id
+                            && u.Delivery.Kind == DeliveryKind.ProducerToStore
+                            && u.Delivery.OpeningHours.Any(oh => oh.Day == storeDeliveryDay.Key))
+                        .Select(c => new KeyValuePair<Guid,string>(c.Store.Id, c.Store.Name))
+                        .OrderBy(c => c.Value)
                         .ToListAsync(token);
 
-                    foreach (var storeDeliveryDay in storeDeliveryDays)
-                    {
-                        var worksheet =
-                            excelPkg.Workbook.Worksheets.Add("Commandes du " +
-                                                             DayHelper.GetDayFromEnum(storeDeliveryDay.Key));
-                        var clients = await _context.Agreements
-                            .Where(u =>
-                                !u.RemovedOn.HasValue
-                                && u.Delivery.Producer.Id == user.Id
-                                && u.Delivery.Kind == DeliveryKind.ProducerToStore
-                                && u.Delivery.OpeningHours.Any(oh => oh.Day == storeDeliveryDay.Key))
-                            .Select(c => c.Store.Name)
-                            .ToListAsync(token);
-
-                        var storesPurchaseOrders = storeDeliveryDay.Select(d => d).ToList();
-                        PopulateWorksheetWithPurchaseOrders(worksheet, storeDeliveryDay.Key, clients, products,
-                            storesPurchaseOrders);
-                    }
-
-                    var consumerDeliveryDays = purchaseOrders
-                        .Where(po => po.Sender.Kind == ProfileKind.Consumer)
-                        .GroupBy(po => po.ExpectedDelivery.ExpectedDeliveryDate.DayOfWeek)
-                        .ToList();
-
-                    if (consumerDeliveryDays.Any())
-                    {
-                        var clients = consumerDeliveryDays.SelectMany(cpo => cpo.Select(c => c.Sender.Name)).ToList();
-                        foreach (var consumerDeliveryDay in consumerDeliveryDays)
-                        {
-                            var worksheet = excelPkg.Workbook.Worksheets.Add("Commandes consommateurs du " +
-                                                                             DayHelper.GetDayFromEnum(
-                                                                                 consumerDeliveryDay.Key));
-                            var consumersPurchaseOrders = consumerDeliveryDay.Select(d => d).ToList();
-                            PopulateWorksheetWithPurchaseOrders(worksheet, consumerDeliveryDay.Key, clients, products,
-                                consumersPurchaseOrders);
-                        }
-                    }
-
-                    return Success(new ResourceExportDto
-                        {Data = excelPkg.GetAsByteArray(), Extension = "xlsx", MimeType = "application/ms-excel"});
+                    var storesPurchaseOrders = storeDeliveryDay.Select(d => d).ToList();
+                    PopulateWorksheetWithPurchaseOrders(worksheet, storeDeliveryDay.Key, clients, products,
+                        storesPurchaseOrders);
                 }
+
+                var consumerDeliveryDays = purchaseOrders
+                    .Where(po => po.Sender.Kind == ProfileKind.Consumer)
+                    .GroupBy(po => po.ExpectedDelivery.ExpectedDeliveryDate.DayOfWeek)
+                    .ToList();
+
+                if (consumerDeliveryDays.Any())
+                {
+                    var clients = consumerDeliveryDays
+                        .SelectMany(cpo => cpo.Select(c => new KeyValuePair<Guid, string>(c.Sender.Id, $"{c.Sender.Name} ({c.Reference})")))
+                        .OrderBy(c => c.Value)
+                        .ToList();
+                    
+                    foreach (var consumerDeliveryDay in consumerDeliveryDays)
+                    {
+                        var worksheet = excelPkg.Workbook.Worksheets.Add($"Commandes conso du {DayHelper.GetDayFromEnum(consumerDeliveryDay.Key)}");
+                        var consumersPurchaseOrders = consumerDeliveryDay.Select(d => d).ToList();
+                        PopulateWorksheetWithPurchaseOrders(worksheet, consumerDeliveryDay.Key, clients, products,
+                            consumersPurchaseOrders);
+                    }
+                }
+
+                return Success(new ResourceExportDto
+                    {Data = excelPkg.GetAsByteArray(), Extension = "xlsx", MimeType = "application/ms-excel"});
             }
         }
 
         private void PopulateWorksheetWithPurchaseOrders(ExcelWorksheet worksheet, DayOfWeek day,
-            IEnumerable<string> clients,
+            IEnumerable<KeyValuePair<Guid, string>> clients,
             IEnumerable<Product> existingProducts, IEnumerable<PurchaseOrder> purchaseOrders)
         {
             AddHeadersRow(worksheet, DayHelper.GetDayFromEnum(day), clients);
             AddProductsRows(worksheet, clients, existingProducts, purchaseOrders);
         }
 
-        private void AddHeadersRow(ExcelWorksheet worksheet, string day, IEnumerable<string> clients)
+        private void AddHeadersRow(ExcelWorksheet worksheet, string day, IEnumerable<KeyValuePair<Guid, string>> clients)
         {
             using (var rng = worksheet.Cells[1, 1])
             {
@@ -113,7 +113,7 @@ namespace Sheaft.Business
             {
                 using (var rng = worksheet.Cells[1, pClient * 2, 1, pClient * 2 + 1])
                 {
-                    rng.Value = client;
+                    rng.Value = client.Value;
                     rng.Merge = true;
                     rng.AutoFitColumns(15);
                     UpdateRngHeader(rng);
@@ -129,7 +129,6 @@ namespace Sheaft.Business
                 UpdateRngHeader(rng);
             }
 
-
             using (var rng = worksheet.Cells[1, clients.Count() * 2 + 3])
             {
                 rng.AutoFitColumns(25);
@@ -137,7 +136,7 @@ namespace Sheaft.Business
             }
         }
 
-        private int AddProductsRows(ExcelWorksheet worksheet, IEnumerable<string> clients,
+        private int AddProductsRows(ExcelWorksheet worksheet, IEnumerable<KeyValuePair<Guid, string>> clients,
             IEnumerable<Product> existingProducts, IEnumerable<PurchaseOrder> purchaseOrders)
         {
             var grandTotal = 0;
@@ -158,7 +157,7 @@ namespace Sheaft.Business
                 foreach (var client in clients)
                 {
                     var current = 0;
-                    var order = purchaseOrders.FirstOrDefault(o => o.Sender.Name == client);
+                    var order = purchaseOrders.FirstOrDefault(o => o.Sender.Id == client.Key);
                     var productOrder = order?.Products.FirstOrDefault(op => op.Id == product.Id);
 
                     current += productOrder?.Quantity ?? 0;

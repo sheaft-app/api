@@ -17,7 +17,6 @@ namespace Sheaft.GraphQL.Types.Inputs
             descriptor.Field(c => c.Twitter);
             descriptor.Field(c => c.Instagram);
             descriptor.Field(c => c.Website);
-            descriptor.Field(c => c.Anonymous);
 
             descriptor.Field(c => c.Email)
                 .Type<NonNullType<StringType>>();

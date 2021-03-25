@@ -45,7 +45,7 @@ namespace Sheaft.Mediatr.Order.Queries
         {
             return _context.Orders
                 .Get(c => c.User.Id == currentUser.Id && c.Status == OrderStatus.Created)
-                .OrderByDescending(c => c.CreatedOn)
+                .OrderBy(c => c.CreatedOn)
                 .ProjectTo<OrderDto>(_configurationProvider);
         }
     }

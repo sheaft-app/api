@@ -16,12 +16,12 @@ namespace Sheaft.Mediatr
     {
         private readonly IMediator _mediatr;
         private readonly IBackgroundJobClient _backgroundJobClient;
-        private readonly ILogger<ISheaftMediatr> _logger;
+        private readonly ILogger<SheaftMediatr> _logger;
 
         public SheaftMediatr(
             IMediator mediatr,
             IBackgroundJobClient backgroundJobClient,
-            ILogger<ISheaftMediatr> logger)
+            ILogger<SheaftMediatr> logger)
         {
             _mediatr = mediatr;
             _backgroundJobClient = backgroundJobClient;

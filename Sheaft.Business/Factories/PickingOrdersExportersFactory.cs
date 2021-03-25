@@ -14,17 +14,19 @@ namespace Sheaft.Business
     public class PickingOrdersExportersFactory : IPickingOrdersExportersFactory
     {
         private readonly IAppDbContext _context;
+        private readonly Func<string, IPickingOrdersFileExporter> _resolver;
         private readonly ExportersOptions _options;
 
-        public PickingOrdersExportersFactory(IAppDbContext context, IOptions<ExportersOptions> options)
+        public PickingOrdersExportersFactory(IAppDbContext context, IOptions<ExportersOptions> options, Func<string, IPickingOrdersFileExporter> resolver)
         {
             _context = context;
+            _resolver = resolver;
             _options = options.Value;
         }
 
         public IPickingOrdersFileExporter GetExporter(RequestUser requestUser, string typename)
         {
-            return InstanciateExporter(requestUser, typename);
+            return InstanciateExporter(typename);
         }
         
         public async Task<IPickingOrdersFileExporter> GetExporterAsync(RequestUser requestUser, CancellationToken token)
@@ -32,19 +34,12 @@ namespace Sheaft.Business
             var user = await _context.GetByIdAsync<User>(requestUser.Id, token);
             var setting = user.GetSetting(SettingKind.PickingOrdersExporter);
             
-            return InstanciateExporter(requestUser, setting?.Value ?? _options.PickingOrdersExporter);
+            return InstanciateExporter(setting?.Value ?? _options.PickingOrdersExporter);
         }
 
-        private static IPickingOrdersFileExporter InstanciateExporter(RequestUser requestUser, string typename)
+        private IPickingOrdersFileExporter InstanciateExporter(string typename)
         {
-            var type = Type.GetType(typename);
-            if (type == null)
-                throw new ArgumentException($"Invalid typename configured for user: {requestUser.Id} picking orders exporter.");
-
-            if (!(Activator.CreateInstance(type) is IPickingOrdersFileExporter importer))
-                throw new ArgumentException($"Invalid type used {type.FullName} for picking orders exporter.");
-
-            return importer;
+            return _resolver.Invoke(typename);
         }
     }
 }

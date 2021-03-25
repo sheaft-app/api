@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.IdentityModel.Tokens.Jwt;
+using System.Linq;
 using System.Reflection;
 using AutoMapper;
 using IdentityModel;
@@ -253,6 +254,9 @@ namespace Sheaft.Web.Manage
             });
 
             services.AddScoped<IDapperContext, DapperContext>();
+            services.AddScoped<ISheaftMediatr, SheaftMediatr>();
+            services.AddScoped<ISheaftDispatcher, SheaftDispatcher>();
+            
             services.AddScoped<IIdentifierService, IdentifierService>();
             services.AddScoped<IBlobService, BlobService>();
             services.AddScoped<IEmailService, EmailService>();
@@ -260,18 +264,22 @@ namespace Sheaft.Web.Manage
             services.AddScoped<IPictureService, PictureService>();
             services.AddScoped<IPspService, PspService>();
             services.AddScoped<ITableService, TableService>();
-            services.AddScoped<ISheaftMediatr, SheaftMediatr>();
             services.AddScoped<IAuthService, AuthService>();
-            services.AddSingleton<ICurrentUserService, CurrentUserService>();
+            services.AddScoped<ICurrentUserService, CurrentUserService>();
             
             services.AddScoped<IFeesCalculator, FeesCalculator>();
             services.AddScoped<IDeliveryService, DeliveryService>();
             
+            services.AddScopedDynamic<IProductsFileImporter>(typeof(ExcelProductsImporter).Assembly.GetTypes().Where(t => t.GetInterfaces().Contains(typeof(IProductsFileImporter))));
+            services.AddScopedDynamic<IPickingOrdersFileExporter>(typeof(ExcelPickingOrdersExporter).Assembly.GetTypes().Where(t => t.GetInterfaces().Contains(typeof(IPickingOrdersFileExporter))));
+            services.AddScopedDynamic<IPurchaseOrdersFileExporter>(typeof(ExcelPurchaseOrdersExporter).Assembly.GetTypes().Where(t => t.GetInterfaces().Contains(typeof(IPurchaseOrdersFileExporter))));
+            services.AddScopedDynamic<ITransactionsFileExporter>(typeof(ExcelTransactionsExporter).Assembly.GetTypes().Where(t => t.GetInterfaces().Contains(typeof(ITransactionsFileExporter))));
+
             services.AddScoped<IProductsImporterFactory, ProductsImporterFactory>();
             services.AddScoped<IPickingOrdersExportersFactory, PickingOrdersExportersFactory>();
             services.AddScoped<IPurchaseOrdersExportersFactory, PurchaseOrdersExportersFactory>();
             services.AddScoped<ITransactionsExportersFactory, TransactionsExportersFactory>();
-
+            
             services.AddScoped<IAgreementQueries, AgreementQueries>();
             services.AddScoped<IProducerQueries, ProducerQueries>();
             services.AddScoped<IDeliveryQueries, DeliveryQueries>();

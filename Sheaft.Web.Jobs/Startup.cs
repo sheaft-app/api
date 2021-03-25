@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IdentityModel.Tokens.Jwt;
+using System.Linq;
 using System.Reflection;
 using System.Threading;
 using Amazon;
@@ -198,8 +199,8 @@ namespace Sheaft.Web.Jobs
                     };
                 });
 
-            services.AddAutoMapper(new []{typeof(ProductProfile).Assembly});
-            services.AddMediatR(new List<Assembly>() { typeof(RegisterStoreCommand).Assembly }.ToArray());
+            services.AddAutoMapper(typeof(ProductProfile).Assembly);
+            services.AddMediatR(typeof(RefreshPayinStatusCommand).Assembly);
 
             services.AddMemoryCache();
             services.AddHttpClient();
@@ -209,10 +210,7 @@ namespace Sheaft.Web.Jobs
             services.AddHttpClient();
 
             var mailerConfig = mailerSettings.Get<MailerOptions>();
-
-            var rootDir = System.IO.Path.GetDirectoryName(Assembly.GetExecutingAssembly().CodeBase);
-
-            services.AddScoped<IAmazonSimpleEmailService, AmazonSimpleEmailServiceClient>(_ => new AmazonSimpleEmailServiceClient(Configuration.GetValue<string>("Mailer:ApiId"), Configuration.GetValue<string>("Mailer:ApiKey"), RegionEndpoint.EUCentral1));
+            services.AddScoped<IAmazonSimpleEmailService, AmazonSimpleEmailServiceClient>(_ => new AmazonSimpleEmailServiceClient(mailerConfig.ApiId, mailerConfig.ApiKey, RegionEndpoint.EUCentral1));
 
             services.AddScoped<IRazorLightEngine>(_ => {
                 var rootDir = System.IO.Path.GetDirectoryName(Assembly.GetExecutingAssembly().CodeBase);
@@ -230,14 +228,16 @@ namespace Sheaft.Web.Jobs
             services.AddScoped<IPspService, PspService>();
             services.AddScoped<ITableService, TableService>();
             services.AddScoped<IAuthService, AuthService>();
-            services.AddSingleton<IBackgroundJobClient, BackgroundJobClient>();
-            services.AddSingleton<ICurrentUserService, CurrentUserService>();
-            services.AddSingleton<ISheaftMediatr, SheaftMediatr>();
-            services.AddSingleton<ISheaftDispatcher, SheaftDispatcher>();
+            services.AddScoped<ICurrentUserService, CurrentUserService>();
             
             services.AddScoped<IFeesCalculator, FeesCalculator>();
             services.AddScoped<IDeliveryService, DeliveryService>();
             
+            services.AddScopedDynamic<IProductsFileImporter>(typeof(ExcelProductsImporter).Assembly.GetTypes().Where(t => t.GetInterfaces().Contains(typeof(IProductsFileImporter))));
+            services.AddScopedDynamic<IPickingOrdersFileExporter>(typeof(ExcelPickingOrdersExporter).Assembly.GetTypes().Where(t => t.GetInterfaces().Contains(typeof(IPickingOrdersFileExporter))));
+            services.AddScopedDynamic<IPurchaseOrdersFileExporter>(typeof(ExcelPurchaseOrdersExporter).Assembly.GetTypes().Where(t => t.GetInterfaces().Contains(typeof(IPurchaseOrdersFileExporter))));
+            services.AddScopedDynamic<ITransactionsFileExporter>(typeof(ExcelTransactionsExporter).Assembly.GetTypes().Where(t => t.GetInterfaces().Contains(typeof(ITransactionsFileExporter))));
+
             services.AddScoped<IProductsImporterFactory, ProductsImporterFactory>();
             services.AddScoped<IPickingOrdersExportersFactory, PickingOrdersExportersFactory>();
             services.AddScoped<IPurchaseOrdersExportersFactory, PurchaseOrdersExportersFactory>();
@@ -252,6 +252,8 @@ namespace Sheaft.Web.Jobs
             services.AddSingleton<CloudStorageAccount>(CloudStorageAccount.Parse(storageConfig.ConnectionString));
 
             services.AddScoped<IDapperContext, DapperContext>();
+            services.AddScoped<ISheaftMediatr, SheaftMediatr>();
+            services.AddScoped<ISheaftDispatcher, SheaftDispatcher>();
 
             services.AddOptions();
 
