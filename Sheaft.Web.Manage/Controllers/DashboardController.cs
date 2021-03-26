@@ -8,6 +8,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Sheaft.Application.Interfaces;
 using Sheaft.Application.Interfaces.Infrastructure;
+using Sheaft.Application.Interfaces.Mediatr;
 using Sheaft.Domain;
 using Sheaft.Options;
 
@@ -27,7 +28,7 @@ namespace Sheaft.Web.Manage.Controllers
 
         public async Task<IActionResult> Index(CancellationToken token)
         {
-            var requestUser = await GetRequestUser(token);
+            var requestUser = await GetRequestUserAsync(token);
 
             ViewBag.Consumers = await _context.Users.OfType<Consumer>().CountAsync(c => !c.RemovedOn.HasValue, token);
             ViewBag.Tags = await _context.Tags.CountAsync(c => !c.RemovedOn.HasValue, token);

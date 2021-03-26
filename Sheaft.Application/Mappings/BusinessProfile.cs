@@ -8,7 +8,7 @@ namespace Sheaft.Application.Mappings
     {
         public BusinessProfile()
         {
-            CreateMap<Business, UserDto>()
+            CreateMap<Domain.Business, UserDto>()
                 .ForMember(c => c.Summary, opt => opt.MapFrom(e => e.ProfileInformation.Summary))
                 .ForMember(c => c.Description, opt => opt.MapFrom(e => e.ProfileInformation.Description))
                 .ForMember(c => c.Facebook, opt => opt.MapFrom(e => e.ProfileInformation.Facebook))
@@ -17,11 +17,11 @@ namespace Sheaft.Application.Mappings
                 .ForMember(c => c.Website, opt => opt.MapFrom(e => e.ProfileInformation.Website))
                 .ForMember(c => c.Pictures, opt => opt.MapFrom(e => e.ProfileInformation.Pictures));
             
-            CreateMap<Business, ProducerDto>()
-                .IncludeBase<Business, UserDto>();
+            CreateMap<Domain.Business, ProducerDto>()
+                .IncludeBase<Domain.Business, UserDto>();
             
-            CreateMap<Business, StoreDto>()
-                .IncludeBase<Business, UserDto>();
+            CreateMap<Domain.Business, StoreDto>()
+                .IncludeBase<Domain.Business, UserDto>();
         }
     }
 }

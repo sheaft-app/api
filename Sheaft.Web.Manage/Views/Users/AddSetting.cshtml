@@ -1,0 +1,44 @@
+﻿@using Sheaft.Domain.Enum
+@model UserSettingViewModel
+@{
+    ViewData["Title"] = "Setting details";
+    var kinds = new List<SelectListItem> {
+        new SelectListItem("Products Importer", ((int)SettingKind.ProductsImporter).ToString()),
+        new SelectListItem("Transactions Exporter", ((int)SettingKind.TransactionsExporter).ToString()),
+        new SelectListItem("PickingOrders Exporter", ((int)SettingKind.PickingOrdersExporter).ToString()),
+        new SelectListItem("PurchaseOrders Exporter", ((int)SettingKind.PuchaseOrdersExporter).ToString()),
+    };
+
+}
+
+<div class="container">
+    <h2 class="display-4">Setting details</h2>
+    <br />
+
+    @using (Html.BeginForm("AddSetting", "Users", FormMethod.Post, new { @class = "form", enctype = "multipart/form-data" }))
+    {
+        @Html.AntiForgeryToken()
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+        @Html.Hidden("userId", (Guid)ViewBag.UserId)
+        
+        <br />
+
+        <div class="form-group">
+            @Html.Label("settingKind")
+            @Html.DropDownList("settingKind", kinds, new { @class = "form-control" })
+        </div>
+        <div class="form-group">
+            @Html.Label("value")
+            @Html.TextBox("value", null, new { @class = "form-control" })
+        </div>
+
+        <br />
+        <a asp-controller="Tags" asp-action="Index" class="btn btn-light">
+            Cancel
+        </a>
+        <button type="submit" class="btn btn-success">
+            <i class="fa fa-check">&nbsp;Add</i>
+        </button>
+    }
+
+</div>

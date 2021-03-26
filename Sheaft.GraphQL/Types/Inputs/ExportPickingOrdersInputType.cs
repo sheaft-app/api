@@ -7,7 +7,7 @@ namespace Sheaft.GraphQL.Types.Inputs
     {
         protected override void Configure(IInputObjectTypeDescriptor<ExportPickingOrdersDto> descriptor)
         {
-            descriptor.Name("ExportPickiginOrdersInput");
+            descriptor.Name("ExportPickingOrdersInput");
             descriptor.Field(c => c.Name);
             descriptor.Field(c => c.ExpectedDeliveryDate);
 

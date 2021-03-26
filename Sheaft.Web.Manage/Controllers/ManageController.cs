@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using Sheaft.Application.Extensions;
 using Sheaft.Application.Interfaces;
 using Sheaft.Application.Interfaces.Infrastructure;
+using Sheaft.Application.Interfaces.Mediatr;
 using Sheaft.Domain;
 using Sheaft.Domain.Enum;
 using Sheaft.Options;
@@ -49,7 +50,7 @@ namespace Sheaft.Web.Manage.Controllers
                 .ToListAsync(token);
         }
 
-        protected async Task<RequestUser> GetRequestUser(CancellationToken token)
+        protected async Task<RequestUser> GetRequestUserAsync(CancellationToken token)
         {
             var requestUser = User.ToIdentityUser(HttpContext.TraceIdentifier);
 

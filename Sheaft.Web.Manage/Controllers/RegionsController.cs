@@ -10,9 +10,10 @@ using System.Threading;
 using System.Threading.Tasks;
 using Sheaft.Application.Interfaces;
 using Sheaft.Application.Interfaces.Infrastructure;
+using Sheaft.Application.Interfaces.Mediatr;
 using Sheaft.Core.Exceptions;
+using Sheaft.Mediatr.Region.Commands;
 using Sheaft.Options;
-using Sheaft.Services.Region.Commands;
 using Sheaft.Web.Manage.Models;
 
 namespace Sheaft.Web.Manage.Controllers
@@ -56,7 +57,7 @@ namespace Sheaft.Web.Manage.Controllers
         [HttpGet]
         public async Task<IActionResult> Edit(Guid id, CancellationToken token)
         {
-            var requestUser = await GetRequestUser(token);
+            var requestUser = await GetRequestUserAsync(token);
             var entity = await _context.Regions
                 .AsNoTracking()
                 .Where(c => c.Id == id)
@@ -73,7 +74,7 @@ namespace Sheaft.Web.Manage.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(RegionViewModel model, CancellationToken token)
         {
-            var result = await _mediatr.Process(new UpdateRegionCommand(await GetRequestUser(token))
+            var result = await _mediatr.Process(new UpdateRegionCommand(await GetRequestUserAsync(token))
             {
                 RegionId = model.Id,
                 Name = model.Name,

@@ -10,12 +10,13 @@ using System.Threading;
 using System.Threading.Tasks;
 using Sheaft.Application.Interfaces;
 using Sheaft.Application.Interfaces.Infrastructure;
+using Sheaft.Application.Interfaces.Mediatr;
 using Sheaft.Application.Models;
 using Sheaft.Core.Exceptions;
 using Sheaft.Domain;
 using Sheaft.Domain.Enum;
+using Sheaft.Mediatr.Legal.Commands;
 using Sheaft.Options;
-using Sheaft.Services.Legal.Commands;
 using Sheaft.Web.Manage.Models;
 
 namespace Sheaft.Web.Manage.Controllers
@@ -101,7 +102,7 @@ namespace Sheaft.Web.Manage.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> CreateLegalBusiness(BusinessLegalViewModel model, CancellationToken token)
         {
-            var result = await _mediatr.Process(new CreateBusinessLegalCommand(await GetRequestUser(token))
+            var result = await _mediatr.Process(new CreateBusinessLegalCommand(await GetRequestUserAsync(token))
             {
                 UserId = model.Owner.Id,
                 Name = model.Name,
@@ -149,7 +150,7 @@ namespace Sheaft.Web.Manage.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> CreateLegalConsumer(ConsumerLegalViewModel model, CancellationToken token)
         {
-            var result = await _mediatr.Process(new CreateConsumerLegalCommand(await GetRequestUser(token))
+            var result = await _mediatr.Process(new CreateConsumerLegalCommand(await GetRequestUserAsync(token))
             {
                 UserId = model.Owner.Id,
                 Email = model.Owner.Email,
@@ -193,7 +194,7 @@ namespace Sheaft.Web.Manage.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> EditLegalBusiness(BusinessLegalViewModel model, CancellationToken token)
         {
-            var result = await _mediatr.Process(new UpdateBusinessLegalCommand(await GetRequestUser(token))
+            var result = await _mediatr.Process(new UpdateBusinessLegalCommand(await GetRequestUserAsync(token))
             {
                 LegalId = model.Id,
                 Name = model.Name,
@@ -238,7 +239,7 @@ namespace Sheaft.Web.Manage.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> EditLegalConsumer(ConsumerLegalViewModel model, CancellationToken token)
         {
-            var result = await _mediatr.Process(new UpdateConsumerLegalCommand(await GetRequestUser(token))
+            var result = await _mediatr.Process(new UpdateConsumerLegalCommand(await GetRequestUserAsync(token))
             {
                 LegalId = model.Id,
                 Email = model.Owner.Email,

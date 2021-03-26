@@ -10,6 +10,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Sheaft.Application.Interfaces;
 using Sheaft.Application.Interfaces.Infrastructure;
+using Sheaft.Application.Interfaces.Mediatr;
 using Sheaft.Core.Exceptions;
 using Sheaft.Domain.Enum;
 using Sheaft.Options;
@@ -41,7 +42,7 @@ namespace Sheaft.Web.Manage.Controllers
 
             var query = _context.Payins.AsNoTracking();
 
-            var requestUser = await GetRequestUser(token);
+            var requestUser = await GetRequestUserAsync(token);
             if (requestUser.IsImpersonating)
                 query = query.Where(p => p.Author.Id == requestUser.Id);
 

@@ -10,9 +10,10 @@ using System.Threading;
 using System.Threading.Tasks;
 using Sheaft.Application.Interfaces;
 using Sheaft.Application.Interfaces.Infrastructure;
+using Sheaft.Application.Interfaces.Mediatr;
 using Sheaft.Core.Exceptions;
+using Sheaft.Mediatr.Department.Commands;
 using Sheaft.Options;
-using Sheaft.Services.Department.Commands;
 using Sheaft.Web.Manage.Models;
 
 namespace Sheaft.Web.Manage.Controllers
@@ -72,7 +73,7 @@ namespace Sheaft.Web.Manage.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(DepartmentViewModel model, CancellationToken token)
         {
-            var result = await _mediatr.Process(new UpdateDepartmentCommand(await GetRequestUser(token))
+            var result = await _mediatr.Process(new UpdateDepartmentCommand(await GetRequestUserAsync(token))
             {
                 DepartmentId = model.Id,
                 Name = model.Name,

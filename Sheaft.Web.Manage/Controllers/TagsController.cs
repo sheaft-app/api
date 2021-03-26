@@ -12,9 +12,10 @@ using System.Threading;
 using System.Threading.Tasks;
 using Sheaft.Application.Interfaces;
 using Sheaft.Application.Interfaces.Infrastructure;
+using Sheaft.Application.Interfaces.Mediatr;
 using Sheaft.Core.Exceptions;
+using Sheaft.Mediatr.Tag.Commands;
 using Sheaft.Options;
-using Sheaft.Services.Tag.Commands;
 using Sheaft.Web.Manage.Models;
 
 namespace Sheaft.Web.Manage.Controllers
@@ -84,7 +85,7 @@ namespace Sheaft.Web.Manage.Controllers
                 }
             }
 
-            var result = await _mediatr.Process(new CreateTagCommand(await GetRequestUser(token))
+            var result = await _mediatr.Process(new CreateTagCommand(await GetRequestUserAsync(token))
             {
                 Description = model.Description,
                 Name = model.Name,
@@ -100,7 +101,7 @@ namespace Sheaft.Web.Manage.Controllers
                 return View(model);
             }
 
-            return RedirectToAction("Edit", new {id = result.Data});
+            return RedirectToAction("Index");
         }
 
         [HttpGet]
@@ -141,7 +142,7 @@ namespace Sheaft.Web.Manage.Controllers
                 }
             }
 
-            var result = await _mediatr.Process(new UpdateTagCommand(await GetRequestUser(token))
+            var result = await _mediatr.Process(new UpdateTagCommand(await GetRequestUserAsync(token))
             {
                 TagId = model.Id,
                 Description = model.Description,
@@ -158,14 +159,14 @@ namespace Sheaft.Web.Manage.Controllers
                 return View(model);
             }
 
-            return RedirectToAction("Edit", new {model.Id});
+            return RedirectToAction("Index");
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Restore(Guid id, CancellationToken token)
         {
-            var result = await _mediatr.Process(new RestoreTagCommand(await GetRequestUser(token))
+            var result = await _mediatr.Process(new RestoreTagCommand(await GetRequestUserAsync(token))
             {
                 TagId = id
             }, token);
@@ -173,14 +174,14 @@ namespace Sheaft.Web.Manage.Controllers
             if (!result.Succeeded)
                 throw result.Exception;
 
-            return RedirectToAction("Edit", new {id});
+            return RedirectToAction("Index");
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete(Guid id, CancellationToken token)
         {
-            var result = await _mediatr.Process(new DeleteTagCommand(await GetRequestUser(token))
+            var result = await _mediatr.Process(new DeleteTagCommand(await GetRequestUserAsync(token))
             {
                 TagId = id
             }, token);

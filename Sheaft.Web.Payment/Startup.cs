@@ -17,8 +17,10 @@ using System.Collections.Generic;
 using System.Reflection;
 using MediatR;
 using Sheaft.Application.Interfaces.Infrastructure;
+using Sheaft.Application.Interfaces.Mediatr;
+using Sheaft.Mediatr;
+using Sheaft.Mediatr.Store.Commands;
 using Sheaft.Options;
-using Sheaft.Services.Store.Commands;
 
 namespace Sheaft.Web.Payment
 {

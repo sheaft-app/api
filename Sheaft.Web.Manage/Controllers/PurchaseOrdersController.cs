@@ -11,10 +11,11 @@ using System.Threading.Tasks;
 using Sheaft.Application.Extensions;
 using Sheaft.Application.Interfaces;
 using Sheaft.Application.Interfaces.Infrastructure;
+using Sheaft.Application.Interfaces.Mediatr;
 using Sheaft.Core.Exceptions;
 using Sheaft.Domain.Enum;
+using Sheaft.Mediatr.PurchaseOrder.Commands;
 using Sheaft.Options;
-using Sheaft.Services.PurchaseOrder.Commands;
 using Sheaft.Web.Manage.Models;
 
 namespace Sheaft.Web.Manage.Controllers
@@ -43,7 +44,7 @@ namespace Sheaft.Web.Manage.Controllers
 
             var query = _context.PurchaseOrders.AsNoTracking();
 
-            var requestUser = await GetRequestUser(token);
+            var requestUser = await GetRequestUserAsync(token);
             if (requestUser.IsImpersonating)
             {
                 if (requestUser.IsInRole(_roleOptions.Producer.Value))
@@ -72,7 +73,7 @@ namespace Sheaft.Web.Manage.Controllers
         [HttpGet]
         public async Task<IActionResult> Edit(Guid id, CancellationToken token)
         {
-            var requestUser = await GetRequestUser(token);
+            var requestUser = await GetRequestUserAsync(token);
             if (!requestUser.IsImpersonating)
                 return RedirectToAction("Impersonate", "Account");
 
@@ -92,7 +93,7 @@ namespace Sheaft.Web.Manage.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Accept(Guid id, CancellationToken token)
         {
-            var requestUser = await GetRequestUser(token);
+            var requestUser = await GetRequestUserAsync(token);
             if (!requestUser.IsImpersonating || !requestUser.IsInRole("PRODUCER"))
                 return RedirectToAction("Impersonate", "Account");
 
@@ -112,7 +113,7 @@ namespace Sheaft.Web.Manage.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Refuse(Guid id, CancellationToken token)
         {
-            var requestUser = await GetRequestUser(token);
+            var requestUser = await GetRequestUserAsync(token);
             if (!requestUser.IsImpersonating || !requestUser.IsInRole("PRODUCER"))
                 return RedirectToAction("Impersonate", "Account");
 
@@ -132,7 +133,7 @@ namespace Sheaft.Web.Manage.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Cancel(Guid id, CancellationToken token)
         {
-            var requestUser = await GetRequestUser(token);
+            var requestUser = await GetRequestUserAsync(token);
             if (!requestUser.IsImpersonating || !requestUser.IsInRole("PRODUCER") || !requestUser.IsInRole("CONSUMER"))
                 return RedirectToAction("Impersonate", "Account");
 
@@ -152,7 +153,7 @@ namespace Sheaft.Web.Manage.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Process(Guid id, CancellationToken token)
         {
-            var requestUser = await GetRequestUser(token);
+            var requestUser = await GetRequestUserAsync(token);
             if (!requestUser.IsImpersonating || !requestUser.IsInRole("PRODUCER"))
                 return RedirectToAction("Impersonate", "Account");
 
@@ -172,7 +173,7 @@ namespace Sheaft.Web.Manage.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Complete(Guid id, CancellationToken token)
         {
-            var requestUser = await GetRequestUser(token);
+            var requestUser = await GetRequestUserAsync(token);
             if (!requestUser.IsImpersonating || !requestUser.IsInRole("PRODUCER"))
                 return RedirectToAction("Impersonate", "Account");
 
@@ -192,7 +193,7 @@ namespace Sheaft.Web.Manage.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Deliver(Guid id, CancellationToken token)
         {
-            var requestUser = await GetRequestUser(token);
+            var requestUser = await GetRequestUserAsync(token);
             if (!requestUser.IsImpersonating || !requestUser.IsInRole("PRODUCER"))
                 return RedirectToAction("Impersonate", "Account");
 
@@ -211,7 +212,7 @@ namespace Sheaft.Web.Manage.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Restore(Guid id, CancellationToken token)
         {
-            var result = await _mediatr.Process(new RestorePurchaseOrderCommand(await GetRequestUser(token))
+            var result = await _mediatr.Process(new RestorePurchaseOrderCommand(await GetRequestUserAsync(token))
             {
                 PurchaseOrderId = id
             }, token);
@@ -226,7 +227,7 @@ namespace Sheaft.Web.Manage.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete(Guid id, CancellationToken token)
         {
-            var result = await _mediatr.Process(new DeletePurchaseOrderCommand(await GetRequestUser(token))
+            var result = await _mediatr.Process(new DeletePurchaseOrderCommand(await GetRequestUserAsync(token))
             {
                 PurchaseOrderId = id
             }, token);

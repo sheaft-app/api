@@ -2026,6 +2026,39 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                     b.ToTable("Rewards");
                 });
 
+            modelBuilder.Entity("Sheaft.Domain.Setting", b =>
+                {
+                    b.Property<long>("Uid")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("Kind")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Uid");
+
+                    b.HasIndex("Id")
+                        .IsUnique();
+
+                    b.HasIndex("Kind")
+                        .IsUnique();
+
+                    b.HasIndex("Uid", "Id");
+
+                    b.ToTable("Settings");
+                });
+
             modelBuilder.Entity("Sheaft.Domain.Sponsoring", b =>
                 {
                     b.Property<long>("SponsorUid")
@@ -2269,6 +2302,25 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                     b.ToTable("Users");
 
                     b.HasDiscriminator<int>("Kind");
+                });
+
+            modelBuilder.Entity("Sheaft.Domain.UserSetting", b =>
+                {
+                    b.Property<long>("UserUid")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("SettingUid")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("Value")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("UserUid", "SettingUid");
+
+                    b.HasIndex("SettingUid");
+
+                    b.ToTable("UserSettings");
                 });
 
             modelBuilder.Entity("Sheaft.Domain.Wallet", b =>
@@ -3462,6 +3514,21 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                             b1.WithOwner()
                                 .HasForeignKey("UserUid");
                         });
+                });
+
+            modelBuilder.Entity("Sheaft.Domain.UserSetting", b =>
+                {
+                    b.HasOne("Sheaft.Domain.Setting", "Setting")
+                        .WithMany()
+                        .HasForeignKey("SettingUid")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Sheaft.Domain.User", null)
+                        .WithMany("Settings")
+                        .HasForeignKey("UserUid")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Sheaft.Domain.Wallet", b =>

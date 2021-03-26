@@ -12,6 +12,7 @@ namespace Sheaft.Domain
     public abstract class User : IEntity
     {
         private List<Points> _points;
+        private List<UserSetting> _settings;
 
         protected User()
         {
@@ -29,6 +30,8 @@ namespace Sheaft.Domain
             SetLastname(lastname);
 
             _points = new List<Points>();
+            _settings = new List<UserSetting>();
+            
             RefreshPoints();
             SetProfileInformation(new ProfileInformation(this));
         }
@@ -51,6 +54,7 @@ namespace Sheaft.Domain
         public virtual Legal Legal { get; private set; }
         public virtual ProfileInformation ProfileInformation { get; private set; }
         public virtual IReadOnlyCollection<Points> Points { get { return _points.AsReadOnly(); } }
+        public virtual IReadOnlyCollection<UserSetting> Settings { get { return _settings.AsReadOnly(); } }
 
         public void SetProfileInformation(ProfileInformation profileInformation)
         {
@@ -80,11 +84,6 @@ namespace Sheaft.Domain
 
             if (Kind == ProfileKind.Consumer)
                 SetUserName($"{FirstName} {LastName}");
-        }
-
-        public void SetAddress(Department department)
-        {
-            Address = new UserAddress(department);
         }
 
         public void SetAddress(UserAddress address)
@@ -182,6 +181,51 @@ namespace Sheaft.Domain
         public void Restore()
         {
             RemovedOn = null;
+        }
+
+        public UserSetting GetSetting(SettingKind kind)
+        {
+            return Settings?.SingleOrDefault(s => s.Setting.Kind == kind);
+        }
+
+        public UserSetting GetSetting(Guid id)
+        {
+            return Settings?.SingleOrDefault(s => s.Setting.Id == id);
+        }
+
+        public void AddSetting(Setting setting, string value)
+        {
+            if (Settings == null)
+                _settings = new List<UserSetting>();
+
+            if (_settings.Any(s => s.Setting.Kind == setting.Kind))
+                throw SheaftException.AlreadyExists();
+            
+            _settings.Add(new UserSetting(setting, value));
+        }
+
+        public void EditSetting(Guid settingId, string value)
+        {
+            if (Settings == null)
+                throw SheaftException.NotFound();
+
+            var setting = _settings.SingleOrDefault(s => s.Setting.Id == settingId);
+            if(setting == null)
+                throw SheaftException.NotFound();
+
+            setting.SetValue(value);
+        }
+
+        public void RemoveSetting(Guid settingId)
+        {
+            if (Settings == null)
+                throw SheaftException.NotFound();
+
+            var setting = _settings.SingleOrDefault(s => s.Setting.Id == settingId);
+            if(setting == null)
+                throw SheaftException.NotFound();
+
+            _settings.Remove(setting);
         }
     }
 

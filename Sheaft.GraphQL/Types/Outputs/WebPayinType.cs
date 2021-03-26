@@ -15,6 +15,7 @@ namespace Sheaft.GraphQL.Types.Outputs
             descriptor.Field(c => c.CreatedOn);
             descriptor.Field(c => c.UpdatedOn);
             descriptor.Field(c => c.ExecutedOn);
+            descriptor.Field(c => c.Identifier);
 
             descriptor.Field(c => c.Kind)
                 .Type<NonNullType<TransactionKindEnumType>>();

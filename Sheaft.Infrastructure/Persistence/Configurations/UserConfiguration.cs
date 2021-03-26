@@ -35,6 +35,7 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
             });
 
             entity.HasOne(c => c.ProfileInformation);
+            entity.HasMany(c => c.Settings).WithOne().HasForeignKey("UserUid").OnDelete(DeleteBehavior.Cascade);
 
             entity.OwnsMany(c => c.Points, p =>
             {
@@ -46,6 +47,12 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
 
             entity.HasMany<Sponsoring>().WithOne(c => c.Sponsor).HasForeignKey("SponsorUid").OnDelete(DeleteBehavior.NoAction);
 
+            var settings = entity.Metadata.FindNavigation(nameof(User.Settings));
+            settings.SetPropertyAccessMode(PropertyAccessMode.Field);
+            
+            var points = entity.Metadata.FindNavigation(nameof(User.Points));
+            points.SetPropertyAccessMode(PropertyAccessMode.Field);
+            
             entity.HasKey("Uid");
 
             entity.HasIndex(c => c.Id).IsUnique();

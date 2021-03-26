@@ -10,6 +10,7 @@ using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.Localization;
 using Sheaft.Application.Interfaces;
 using Sheaft.Application.Interfaces.Infrastructure;
+using Sheaft.Application.Interfaces.Mediatr;
 using Sheaft.Core.Enums;
 using Sheaft.Core.Exceptions;
 using Sheaft.Domain;
@@ -57,6 +58,7 @@ namespace Sheaft.Infrastructure.Persistence
         public DbSet<Refund> Refunds { get; set; }
         public DbSet<Region> Regions { get; set; }
         public DbSet<Reward> Rewards { get; set; }
+        public DbSet<Setting> Settings { get; set; }
         public DbSet<Tag> Tags { get; set; }
         public DbSet<Transfer> Transfers { get; set; }
         public DbSet<User> Users { get; set; }

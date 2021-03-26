@@ -32,7 +32,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Sheaft.Infrastructure\Sheaft.Infrastructure.csproj" />
-    <ProjectReference Include="..\Sheaft.Services\Sheaft.Services.csproj" />
+    <ProjectReference Include="..\Sheaft.Mediatr\Sheaft.Mediatr.csproj" />
     <ProjectReference Include="..\Sheaft.Web.Common\Sheaft.Web.Common.csproj" />
   </ItemGroup>
 

@@ -4,11 +4,11 @@ using Sheaft.Domain;
 
 namespace Sheaft.Infrastructure.Persistence.Configurations
 {
-    public class BusinessConfiguration : IEntityTypeConfiguration<Business>
+    public class BusinessConfiguration : IEntityTypeConfiguration<Domain.Business>
     {
-        public void Configure(EntityTypeBuilder<Business> entity)
+        public void Configure(EntityTypeBuilder<Domain.Business> entity)
         {
-            var closings = entity.Metadata.FindNavigation(nameof(Business.Closings));
+            var closings = entity.Metadata.FindNavigation(nameof(Domain.Business.Closings));
             closings.SetPropertyAccessMode(PropertyAccessMode.Field);
             
             entity.HasMany(c => c.Closings).WithOne().HasForeignKey("BusinessUid").OnDelete(DeleteBehavior.Cascade);

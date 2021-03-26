@@ -9,11 +9,12 @@ using System.Threading;
 using System.Threading.Tasks;
 using Sheaft.Application.Interfaces;
 using Sheaft.Application.Interfaces.Infrastructure;
+using Sheaft.Application.Interfaces.Mediatr;
 using Sheaft.Application.Models;
 using Sheaft.Core.Exceptions;
 using Sheaft.Domain;
+using Sheaft.Mediatr.Bank.Commands;
 using Sheaft.Options;
-using Sheaft.Services.Bank.Commands;
 using Sheaft.Web.Manage.Models;
 
 namespace Sheaft.Web.Manage.Controllers
@@ -33,7 +34,7 @@ namespace Sheaft.Web.Manage.Controllers
         [HttpGet]
         public async Task<IActionResult> Create(Guid userId, CancellationToken token)
         {
-            var entity = await _context.Users.OfType<Business>()
+            var entity = await _context.Users.OfType<Domain.Business>()
                 .AsNoTracking()
                 .Where(c => c.Id == userId)
                 .SingleOrDefaultAsync(token);
@@ -53,7 +54,7 @@ namespace Sheaft.Web.Manage.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(BankAccountViewModel model, CancellationToken token)
         {
-            var result = await _mediatr.Process(new CreateBankAccountCommand(await GetRequestUser(token))
+            var result = await _mediatr.Process(new CreateBankAccountCommand(await GetRequestUserAsync(token))
             {
                 UserId = model.OwnerId,
                 Address = _mapper.Map<AddressDto>(model.Address),
@@ -109,7 +110,7 @@ namespace Sheaft.Web.Manage.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(BankAccountViewModel model, CancellationToken token)
         {
-            var result = await _mediatr.Process(new UpdateBankAccountCommand(await GetRequestUser(token))
+            var result = await _mediatr.Process(new UpdateBankAccountCommand(await GetRequestUserAsync(token))
             {
                 BankAccountId = model.Id,
                 Address = _mapper.Map<AddressDto>(model.Address),

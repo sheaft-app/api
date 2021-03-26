@@ -1,4 +1,6 @@
-﻿namespace Sheaft.Options
+﻿using System.Collections.Generic;
+
+namespace Sheaft.Options
 {
     public class ApiOptions
     {

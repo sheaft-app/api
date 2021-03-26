@@ -62,10 +62,10 @@ namespace Sheaft.Infrastructure.Persistence
             });
 
             modelBuilder.Entity<Consumer>().HasBaseType<User>();
-            modelBuilder.Entity<Business>().HasBaseType<User>();
+            modelBuilder.Entity<Domain.Business>().HasBaseType<User>();
 
-            modelBuilder.Entity<Producer>().HasBaseType<Business>();
-            modelBuilder.Entity<Store>().HasBaseType<Business>();
+            modelBuilder.Entity<Producer>().HasBaseType<Domain.Business>();
+            modelBuilder.Entity<Store>().HasBaseType<Domain.Business>();
 
             modelBuilder.Entity<Card>().HasBaseType<PaymentMethod>();
             modelBuilder.Entity<BankAccount>().HasBaseType<PaymentMethod>();
@@ -132,6 +132,8 @@ namespace Sheaft.Infrastructure.Persistence
             modelBuilder.ApplyConfiguration(new ProfileInformationConfiguration());
             modelBuilder.ApplyConfiguration(new ProfilePictureConfiguration());
             modelBuilder.ApplyConfiguration(new ProductPictureConfiguration());
+            modelBuilder.ApplyConfiguration(new UserSettingConfiguration());
+            modelBuilder.ApplyConfiguration(new SettingConfiguration());
         }
     }
 }

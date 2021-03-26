@@ -10,10 +10,11 @@ using System.Threading;
 using System.Threading.Tasks;
 using Sheaft.Application.Interfaces;
 using Sheaft.Application.Interfaces.Infrastructure;
+using Sheaft.Application.Interfaces.Mediatr;
 using Sheaft.Core.Exceptions;
 using Sheaft.Domain.Enum;
+using Sheaft.Mediatr.Job.Commands;
 using Sheaft.Options;
-using Sheaft.Services.Job.Commands;
 using Sheaft.Web.Manage.Models;
 
 namespace Sheaft.Web.Manage.Controllers
@@ -42,7 +43,7 @@ namespace Sheaft.Web.Manage.Controllers
 
             var query = _context.Jobs.AsNoTracking();
 
-            var requestUser = await GetRequestUser(token);
+            var requestUser = await GetRequestUserAsync(token);
             if (requestUser.IsImpersonating)
                 query = query.Where(p => p.User.Id == requestUser.Id);
 
@@ -82,7 +83,7 @@ namespace Sheaft.Web.Manage.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(JobViewModel model, CancellationToken token)
         {
-            var result = await _mediatr.Process(new UpdateJobCommand(await GetRequestUser(token))
+            var result = await _mediatr.Process(new UpdateJobCommand(await GetRequestUserAsync(token))
             {
                 JobId = model.Id,
                 Name = model.Name
@@ -101,7 +102,7 @@ namespace Sheaft.Web.Manage.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Archive(Guid id, CancellationToken token)
         {
-            var result = await _mediatr.Process(new ArchiveJobCommand(await GetRequestUser(token))
+            var result = await _mediatr.Process(new ArchiveJobCommand(await GetRequestUserAsync(token))
             {
                 JobId = id
             }, token);
@@ -116,7 +117,7 @@ namespace Sheaft.Web.Manage.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Pause(Guid id, CancellationToken token)
         {
-            var requestUser = await GetRequestUser(token);
+            var requestUser = await GetRequestUserAsync(token);
             var result = await _mediatr.Process(new PauseJobCommand(requestUser)
             {
                 JobId = id
@@ -132,7 +133,7 @@ namespace Sheaft.Web.Manage.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Resume(Guid id, CancellationToken token)
         {
-            var result = await _mediatr.Process(new ResumeJobCommand(await GetRequestUser(token))
+            var result = await _mediatr.Process(new ResumeJobCommand(await GetRequestUserAsync(token))
             {
                 JobId = id
             }, token);
@@ -147,7 +148,7 @@ namespace Sheaft.Web.Manage.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Cancel(Guid id, CancellationToken token)
         {
-            var result = await _mediatr.Process(new CancelJobCommand(await GetRequestUser(token))
+            var result = await _mediatr.Process(new CancelJobCommand(await GetRequestUserAsync(token))
             {
                 JobId = id
             }, token);
@@ -162,7 +163,7 @@ namespace Sheaft.Web.Manage.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Retry(Guid id, CancellationToken token)
         {
-            var result = await _mediatr.Process(new RetryJobCommand(await GetRequestUser(token))
+            var result = await _mediatr.Process(new RetryJobCommand(await GetRequestUserAsync(token))
             {
                 JobId = id
             }, token);
@@ -177,7 +178,7 @@ namespace Sheaft.Web.Manage.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Unarchive(Guid id, CancellationToken token)
         {
-            var result = await _mediatr.Process(new UnarchiveJobCommand(await GetRequestUser(token))
+            var result = await _mediatr.Process(new UnarchiveJobCommand(await GetRequestUserAsync(token))
             {
                 JobId = id
             }, token);
@@ -192,7 +193,7 @@ namespace Sheaft.Web.Manage.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Reset(Guid id, CancellationToken token)
         {
-            var result = await _mediatr.Process(new ResetJobCommand(await GetRequestUser(token))
+            var result = await _mediatr.Process(new ResetJobCommand(await GetRequestUserAsync(token))
             {
                 JobId = id
             }, token);
@@ -207,7 +208,7 @@ namespace Sheaft.Web.Manage.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Restore(Guid id, CancellationToken token)
         {
-            var result = await _mediatr.Process(new RestoreJobCommand(await GetRequestUser(token))
+            var result = await _mediatr.Process(new RestoreJobCommand(await GetRequestUserAsync(token))
             {
                 JobId = id
             }, token);
@@ -222,7 +223,7 @@ namespace Sheaft.Web.Manage.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete(Guid id, CancellationToken token)
         {
-            var result = await _mediatr.Process(new DeleteJobCommand(await GetRequestUser(token))
+            var result = await _mediatr.Process(new DeleteJobCommand(await GetRequestUserAsync(token))
             {
                 JobId = id
             }, token);
