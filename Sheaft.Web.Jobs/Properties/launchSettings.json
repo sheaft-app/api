@@ -18,6 +18,17 @@
       },
       "applicationUrl": "https://localhost:5020;http://localhost:5021"
     },
+    "jobs-linux": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "launchUrl": "",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "ASPNETCORE_Kestrel__Certificates__Default__Password": "password",
+        "ASPNETCORE_Kestrel__Certificates__Default__Path": "/home/nono/.aspnet/https/localhost.pfx"
+      },
+      "applicationUrl": "https://localhost:5020;http://localhost:5021"
+    },
     "Docker": {
       "commandName": "Docker",
       "launchBrowser": true,

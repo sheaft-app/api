@@ -16,6 +16,16 @@
         "ASPNETCORE_HOSTINGSTARTUPASSEMBLIES": "Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation"
       }
     },
+    "payment-linux": {
+      "commandName": "Project",
+      "applicationUrl": "https://localhost:5015;http://localhost:5014",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "ASPNETCORE_HOSTINGSTARTUPASSEMBLIES": "Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation",
+        "ASPNETCORE_Kestrel__Certificates__Default__Password": "password",
+        "ASPNETCORE_Kestrel__Certificates__Default__Path": "/home/nono/.aspnet/https/localhost.pfx"
+      }
+    },
     "Docker": {
       "commandName": "Docker",
       "launchUrl": "{Scheme}://{ServiceHost}:{ServicePort}",
