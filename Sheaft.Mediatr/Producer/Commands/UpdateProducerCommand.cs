@@ -82,8 +82,8 @@ namespace Sheaft.Mediatr.Producer.Commands
             producer.ProfileInformation.SetDescription(request.Description);
             producer.ProfileInformation.SetFacebook(request.Facebook);
             producer.ProfileInformation.SetTwitter(request.Twitter);
-            producer.ProfileInformation.SetWebsite(request.Instagram);
-            producer.ProfileInformation.SetInstagram(request.Website);
+            producer.ProfileInformation.SetWebsite(request.Website);
+            producer.ProfileInformation.SetInstagram(request.Instagram);
 
             if (request.NotSubjectToVat.HasValue)
             {

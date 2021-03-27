@@ -69,8 +69,8 @@ namespace Sheaft.Mediatr.Consumer.Commands
             consumer.ProfileInformation.SetDescription(request.Description);
             consumer.ProfileInformation.SetFacebook(request.Facebook);
             consumer.ProfileInformation.SetTwitter(request.Twitter);
-            consumer.ProfileInformation.SetWebsite(request.Instagram);
-            consumer.ProfileInformation.SetInstagram(request.Website);
+            consumer.ProfileInformation.SetWebsite(request.Website);
+            consumer.ProfileInformation.SetInstagram(request.Instagram);
 
             await _context.SaveChangesAsync(token);
 

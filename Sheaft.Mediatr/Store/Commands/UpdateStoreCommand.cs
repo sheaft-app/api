@@ -83,8 +83,8 @@ namespace Sheaft.Mediatr.Store.Commands
             store.ProfileInformation.SetDescription(request.Description);
             store.ProfileInformation.SetFacebook(request.Facebook);
             store.ProfileInformation.SetTwitter(request.Twitter);
-            store.ProfileInformation.SetWebsite(request.Instagram);
-            store.ProfileInformation.SetInstagram(request.Website);
+            store.ProfileInformation.SetWebsite(request.Website);
+            store.ProfileInformation.SetInstagram(request.Instagram);
 
             var departmentCode = UserAddress.GetDepartmentCode(request.Address.Zipcode);
             var department = await _context.Departments.SingleOrDefaultAsync(d => d.Code == departmentCode, token);
