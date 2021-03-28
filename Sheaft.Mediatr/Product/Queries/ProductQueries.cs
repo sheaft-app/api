@@ -111,7 +111,7 @@ namespace Sheaft.Mediatr.Product.Queries
             return new ProductsSearchDto
             {
                 Count = results.Count ?? 0,
-                Products = searchResults?.Select(p => new ProductDto
+                Products = searchResults?.Select(p => new SearchProductDto
                 {
                     Id = p.Product_id,
                     Name = p.Product_name,
@@ -155,7 +155,7 @@ namespace Sheaft.Mediatr.Product.Queries
                             Zipcode = p.Producer_zipcode
                         }
                     }
-                }) ?? new List<ProductDto>()
+                }) ?? new List<SearchProductDto>()
             };
         }
 

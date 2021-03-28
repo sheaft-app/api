@@ -118,7 +118,7 @@ namespace Sheaft.Web.Manage.Controllers
                 Conditioning = model.Conditioning,
                 Vat = model.Vat,
                 Weight = model.Weight,
-                WholeSalePricePerUnit = model.WholeSalePricePerUnit
+                //TODO Catalog prices WholeSalePricePerUnit = model.WholeSalePricePerUnit
             }, token);
 
             if (!result.Succeeded)

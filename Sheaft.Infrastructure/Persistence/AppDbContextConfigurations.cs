@@ -134,6 +134,8 @@ namespace Sheaft.Infrastructure.Persistence
             modelBuilder.ApplyConfiguration(new ProductPictureConfiguration());
             modelBuilder.ApplyConfiguration(new UserSettingConfiguration());
             modelBuilder.ApplyConfiguration(new SettingConfiguration());
+            modelBuilder.ApplyConfiguration(new CatalogConfiguration());
+            modelBuilder.ApplyConfiguration(new CatalogProductConfiguration());
         }
     }
 }

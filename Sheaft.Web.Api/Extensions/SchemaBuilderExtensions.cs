@@ -69,6 +69,7 @@ namespace Sheaft.Web.Api.Extensions
             services.AddType<OrderProductType>();
             services.AddType<OrderDeliveryType>();
             services.AddType<BankAccountType>();
+            services.AddType<CatalogPriceType>();
 
             services.AddType<AddressKindEnumType>();
             services.AddType<AgreementStatusEnumType>();
@@ -149,6 +150,7 @@ namespace Sheaft.Web.Api.Extensions
             services.AddType<AddPictureToInputType>();
             services.AddType<ExportPurchaseOrdersInputType>();
             services.AddType<ExportTransactionsInputType>();
+            services.AddType<CatalogPriceInputType>();
 
             return services;
         }

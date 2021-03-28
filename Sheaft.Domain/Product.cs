@@ -18,12 +18,13 @@ namespace Sheaft.Domain
         private List<Rating> _ratings;
         private List<ProductClosing> _closings;
         private List<ProductPicture> _pictures;
+        private List<CatalogProduct> _prices;
 
         protected Product()
         {
         }
 
-        public Product(Guid id, string reference, string name, decimal price, ConditioningKind conditioning, UnitKind unit, decimal quantityPerUnit, Producer producer)
+        public Product(Guid id, string reference, string name, ConditioningKind conditioning, UnitKind unit, decimal quantityPerUnit, Producer producer)
         {
             Id = id;
             Producer = producer ?? throw new ValidationException(MessageKind.Product_Producer_Required);
@@ -31,7 +32,6 @@ namespace Sheaft.Domain
             SetName(name);
             SetReference(reference);
             SetConditioning(conditioning, quantityPerUnit, unit);
-            SetWholeSalePricePerUnit(price);
 
             _tags = new List<ProductTag>();
             _ratings = new List<Rating>();
@@ -48,17 +48,11 @@ namespace Sheaft.Domain
         public string Reference { get; private set; }
         public string Name { get; private set; }
         public decimal? Weight { get; private set; }
-        public decimal WholeSalePricePerUnit { get; private set; }
-        public decimal VatPricePerUnit { get; private set; }
-        public decimal OnSalePricePerUnit { get; private set; }
         public string Description { get; private set; }
         public string Picture { get; private set; }
         public UnitKind Unit { get; private set; }
         public decimal QuantityPerUnit { get; private set; }
         public ConditioningKind Conditioning { get; private set; }
-        public decimal OnSalePrice { get; set; }
-        public decimal WholeSalePrice { get; set; }
-        public decimal VatPrice { get; set; }
         public decimal Vat { get; private set; }
         public bool Available { get; private set; }
         public bool VisibleToConsumers { get; private set; }
@@ -71,6 +65,7 @@ namespace Sheaft.Domain
         public virtual IReadOnlyCollection<Rating> Ratings => _ratings?.AsReadOnly();
         public virtual IReadOnlyCollection<ProductClosing> Closings => _closings?.AsReadOnly(); 
         public virtual IReadOnlyCollection<ProductPicture> Pictures => _pictures?.AsReadOnly();
+        public virtual IReadOnlyCollection<CatalogProduct> Prices => _prices?.AsReadOnly();
 
         public void SetReference(string reference)
         {
@@ -120,15 +115,6 @@ namespace Sheaft.Domain
                 return;
 
             Picture = picture;
-        }
-
-        public void SetWholeSalePricePerUnit(decimal newPrice)
-        {
-            if (newPrice <= 0)
-                throw new ValidationException(MessageKind.Product_WholeSalePrice_CannotBe_LowerOrEqualThan, 0);
-
-            WholeSalePricePerUnit = Math.Round(newPrice, DIGITS_COUNT);
-            RefreshPrices();
         }
 
         public void SetWeight(decimal? newWeight)
@@ -265,30 +251,8 @@ namespace Sheaft.Domain
 
         private void RefreshPrices()
         {
-            VatPricePerUnit = Math.Round(WholeSalePricePerUnit * Vat / 100, DIGITS_COUNT);
-            OnSalePricePerUnit = Math.Round(WholeSalePricePerUnit + VatPricePerUnit, DIGITS_COUNT);
-
-            switch (Unit)
-            {
-                case UnitKind.ml:
-                    WholeSalePrice = Math.Round((WholeSalePricePerUnit / QuantityPerUnit) * 1000, DIGITS_COUNT);
-                    break;
-                case UnitKind.l:
-                    WholeSalePrice = Math.Round(WholeSalePricePerUnit / QuantityPerUnit, DIGITS_COUNT);
-                    break;
-                case UnitKind.g:
-                    WholeSalePrice = Math.Round((WholeSalePricePerUnit / QuantityPerUnit) * 1000, DIGITS_COUNT);
-                    break;
-                case UnitKind.kg:
-                    WholeSalePrice = Math.Round(WholeSalePricePerUnit / QuantityPerUnit, DIGITS_COUNT);
-                    break;
-                default:
-                    WholeSalePrice = WholeSalePricePerUnit;
-                    break;
-            }
-
-            VatPrice = Math.Round(WholeSalePrice * Vat / 100, DIGITS_COUNT);
-            OnSalePrice = Math.Round(WholeSalePrice + VatPrice, DIGITS_COUNT);
+            foreach (var price in _prices)
+                price.RefreshPrice(Vat, Unit, QuantityPerUnit);
         }
         
         private void AddTags(IEnumerable<Tag> tags)

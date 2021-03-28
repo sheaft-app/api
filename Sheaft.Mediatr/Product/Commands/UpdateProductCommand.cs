@@ -45,6 +45,7 @@ namespace Sheaft.Mediatr.Product.Commands
         public Guid? ReturnableId { get; set; }
         public IEnumerable<Guid> Tags { get; set; }
         public IEnumerable<UpdateOrCreateClosingDto> Closings { get; set; }
+        public IEnumerable<CatalogPriceDto> Prices { get; set; }
     }
 
     public class UpdateProductCommandHandler : CommandsHandler,
@@ -92,7 +93,6 @@ namespace Sheaft.Mediatr.Product.Commands
                 entity.SetVat(request.Vat);
                 entity.SetName(request.Name);
                 entity.SetDescription(request.Description);
-                entity.SetWholeSalePricePerUnit(request.WholeSalePricePerUnit);
                 entity.SetReference(reference);
                 entity.SetWeight(request.Weight);
                 entity.SetAvailable(request.Available);
@@ -113,7 +113,21 @@ namespace Sheaft.Mediatr.Product.Commands
                 var tags = await _context.FindAsync<Domain.Tag>(t => request.Tags.Contains(t.Id), token);
                 entity.SetTags(tags);
 
-                await _context.SaveChangesAsync(token);
+                var productCatalogs = entity.Prices.Select(p => p.Catalog);
+                foreach (var catalog in productCatalogs)
+                {
+                    if(!request.Prices.Any(p => p.Id == catalog.Id))
+                        catalog.RemoveProduct(entity.Id);
+                }
+                
+                foreach (var price in request.Prices)
+                {
+                    var catalog = await _context.GetByIdAsync<Catalog>(price.Id, token);
+                    if(!catalog.Products.Any(p => p.Product.Id == entity.Id))
+                        catalog.AddProduct(entity, price.WholeSalePricePerUnit);
+                    else
+                        catalog.SetProductWholeSalePricePerUnit(entity.Id, price.WholeSalePricePerUnit);
+                }
 
                 var result =
                     await _mediatr.Process(
@@ -121,6 +135,8 @@ namespace Sheaft.Mediatr.Product.Commands
                             {ProductId = entity.Id, Closings = request.Closings}, token);
                 if (!result.Succeeded)
                     return Failure(result.Exception);
+
+                await _context.SaveChangesAsync(token);                
 
                 var imageResult = await _mediatr.Process(
                     new UpdateProductPreviewCommand(request.RequestUser)

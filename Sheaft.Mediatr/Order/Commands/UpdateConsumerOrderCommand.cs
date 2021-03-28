@@ -74,10 +74,11 @@ namespace Sheaft.Mediatr.Order.Commands
                 return Failure(MessageKind.Order_CannotUpdate_Some_Products_NotAvailable,
                     string.Join(";", invalidProductIds));
 
-            var cartProducts = new Dictionary<Domain.Product, int>();
+            var cartProducts = new List<Tuple<Domain.Product, Guid, int>>();
             foreach (var product in products)
             {
-                cartProducts.Add(product, request.Products.Where(p => p.Id == product.Id).Sum(c => c.Quantity));
+                var catalog = product.Prices.Select(p => p.Catalog).SingleOrDefault(p => !p.RemovedOn.HasValue && p.VisibleToConsumers);
+                cartProducts.Add(new Tuple<Domain.Product, Guid, int>(product, catalog.Id, request.Products.Where(p => p.Id == product.Id).Sum(c => c.Quantity)));
             }
 
             entity.SetProducts(cartProducts);
@@ -98,14 +99,14 @@ namespace Sheaft.Mediatr.Order.Commands
                 if(delivery.Closings.Any(c => cartDelivery.ExpectedDeliveryDate >= c.ClosedFrom && cartDelivery.ExpectedDeliveryDate <= c.ClosedTo))
                     return Failure(MessageKind.Order_CannotUpdate_Delivery_Closed, delivery.Name, delivery.Producer.Name);
                     
-                if(cartProducts.Any(p => p.Key.Producer.Id == delivery.Producer.Id && p.Key.Producer.Closings.Any(c => cartDelivery.ExpectedDeliveryDate >= c.ClosedFrom && cartDelivery.ExpectedDeliveryDate <= c.ClosedTo)))
+                if(cartProducts.Any(p => p.Item1.Producer.Id == delivery.Producer.Id && p.Item1.Producer.Closings.Any(c => cartDelivery.ExpectedDeliveryDate >= c.ClosedFrom && cartDelivery.ExpectedDeliveryDate <= c.ClosedTo)))
                     return Failure(MessageKind.Order_CannotUpdate_Producer_Closed, delivery.Producer.Name);
 
                 invalidProductIds = cartProducts.Where(p =>
-                        p.Key.Producer.Id == delivery.Producer.Id && p.Key.Closings.Any(c =>
+                        p.Item1.Producer.Id == delivery.Producer.Id && p.Item1.Closings.Any(c =>
                             cartDelivery.ExpectedDeliveryDate >= c.ClosedFrom &&
                             cartDelivery.ExpectedDeliveryDate <= c.ClosedTo))
-                    .Select(p => p.Key.Id.ToString("N"));
+                    .Select(p => p.Item1.Id.ToString("N"));
                     
                 if(invalidProductIds.Any())
                     return Failure(MessageKind.Order_CannotUpdate_Some_Products_Closed,

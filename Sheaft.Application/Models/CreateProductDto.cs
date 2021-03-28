@@ -10,7 +10,6 @@ namespace Sheaft.Application.Models
         public string Name { get; set; }
         public string Picture { get; set; }
         public string OriginalPicture { get; set; }
-        public decimal WholeSalePricePerUnit { get; set; }
         public decimal QuantityPerUnit { get; set; }
         public UnitKind Unit { get; set; }
         public ConditioningKind Conditioning { get; set; }
@@ -23,5 +22,6 @@ namespace Sheaft.Application.Models
         public Guid? ReturnableId { get; set; }
         public IEnumerable<Guid> Tags { get; set; }
         public IEnumerable<UpdateOrCreateClosingDto> Closings { get; set; }
+        public IEnumerable<CatalogPriceDto> Prices { get; set; }
     }
 }

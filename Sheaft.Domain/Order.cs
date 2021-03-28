@@ -20,7 +20,7 @@ namespace Sheaft.Domain
         {
         }
 
-        public Order(Guid id, DonationKind kind, IDictionary<Product, int> orderProducts, decimal fixedAmount, decimal percent, decimal vatPercent, User user = null)
+        public Order(Guid id, DonationKind kind, IEnumerable<Tuple<Product, Guid, int>> orderProducts, decimal fixedAmount, decimal percent, decimal vatPercent, User user = null)
         {
             Id = id;
             User = user;
@@ -126,14 +126,14 @@ namespace Sheaft.Domain
             Status = status;
         }
 
-        public void SetProducts(IDictionary<Product, int> orderProducts)
+        public void SetProducts(IEnumerable<Tuple<Product, Guid, int>> orderProducts)
         {
             if (Products == null || Products.Any())
                 _products = new List<OrderProduct>();
 
             foreach (var orderProduct in orderProducts)
             {
-                var product = new OrderProduct(orderProduct.Key, orderProduct.Value);
+                var product = new OrderProduct(orderProduct.Item1, orderProduct.Item2, orderProduct.Item3);
                 if(product.Quantity > 0)
                     _products.Add(product);
             }

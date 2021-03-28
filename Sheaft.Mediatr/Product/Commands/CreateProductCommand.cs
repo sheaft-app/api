@@ -32,7 +32,6 @@ namespace Sheaft.Mediatr.Product.Commands
         public string Name { get; set; }
         public string Picture { get; set; }
         public string OriginalPicture { get; set; }
-        public decimal WholeSalePricePerUnit { get; set; }
         public decimal QuantityPerUnit { get; set; }
         public UnitKind Unit { get; set; }
         public ConditioningKind Conditioning { get; set; }
@@ -46,6 +45,7 @@ namespace Sheaft.Mediatr.Product.Commands
         public IEnumerable<Guid> Tags { get; set; }
         public IEnumerable<UpdateOrCreateClosingDto> Closings { get; set; }
         public bool SkipUpdateProducerTags { get; set; } = false;
+        public IEnumerable<CatalogPriceDto> Prices { get; set; }
     }
 
     public class CreateProductCommandHandler : CommandsHandler,
@@ -88,8 +88,7 @@ namespace Sheaft.Mediatr.Product.Commands
 
             using (var transaction = await _context.BeginTransactionAsync(token))
             {
-                var entity = new Domain.Product(Guid.NewGuid(), reference, request.Name, request.WholeSalePricePerUnit,
-                    request.Conditioning, request.Unit, request.QuantityPerUnit, producer);
+                var entity = new Domain.Product(Guid.NewGuid(), reference, request.Name, request.Conditioning, request.Unit, request.QuantityPerUnit, producer);
 
                 entity.SetVat(request.Vat);
                 entity.SetDescription(request.Description);
@@ -106,6 +105,12 @@ namespace Sheaft.Mediatr.Product.Commands
 
                 var tags = await _context.FindAsync<Domain.Tag>(t => request.Tags.Contains(t.Id), token);
                 entity.SetTags(tags);
+
+                foreach (var price in request.Prices)
+                {
+                    var catalog = await _context.GetByIdAsync<Catalog>(price.Id, token);
+                    catalog.AddProduct(entity, price.WholeSalePricePerUnit);
+                }
 
                 await _context.AddAsync(entity, token);
                 await _context.SaveChangesAsync(token);

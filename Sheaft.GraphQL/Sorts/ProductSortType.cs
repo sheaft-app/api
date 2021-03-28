@@ -3,14 +3,12 @@ using Sheaft.Application.Models;
 
 namespace Sheaft.GraphQL.Sorts
 {
-    public class ProductSortType : SortInputType<ProductDto>
+    public class ProductSortType : SortInputType<SearchProductDto>
     {
-        protected override void Configure(ISortInputTypeDescriptor<ProductDto> descriptor)
+        protected override void Configure(ISortInputTypeDescriptor<SearchProductDto> descriptor)
         {
             descriptor.BindFieldsExplicitly();
             descriptor.Sortable(c => c.Name);
-            descriptor.Sortable(c => c.CreatedOn);
-            descriptor.Sortable(c => c.WholeSalePrice);
             descriptor.Sortable(c => c.OnSalePrice);
         }
     }

@@ -1,4 +1,6 @@
-﻿namespace Sheaft.Domain
+﻿using System;
+
+namespace Sheaft.Domain
 {
     public class OrderProduct : ProductRow
     {
@@ -6,8 +8,8 @@
         {
         }
 
-        public OrderProduct(Product product, int quantity)
-            : base(product, quantity)
+        public OrderProduct(Product product, Guid catalogId, int quantity)
+            : base(product, catalogId, quantity)
         {
             Producer = product.Producer;
         }

@@ -3,9 +3,9 @@ using Sheaft.Application.Models;
 
 namespace Sheaft.GraphQL.Types.Outputs
 {
-    public class SearchProductType : SheaftOutputType<ProductDto>
+    public class SearchProductType : SheaftOutputType<SearchProductDto>
     {
-        protected override void Configure(IObjectTypeDescriptor<ProductDto> descriptor)
+        protected override void Configure(IObjectTypeDescriptor<SearchProductDto> descriptor)
         {
             descriptor.Name("SearchProductDto");
 

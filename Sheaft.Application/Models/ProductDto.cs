@@ -13,9 +13,6 @@ namespace Sheaft.Application.Models
         public string Reference { get; set; }
         public string Name { get; set; }
         public decimal? Weight { get; set; }
-        public decimal WholeSalePricePerUnit { get; set; }
-        public decimal VatPricePerUnit { get; set; }
-        public decimal OnSalePricePerUnit { get; set; }
         public string Description { get; set; }
         public string Picture { get; set; }
         public string ImageLarge { get; set; }
@@ -24,9 +21,6 @@ namespace Sheaft.Application.Models
         public decimal QuantityPerUnit { get; set; }
         public UnitKind Unit { get; set; }
         public ConditioningKind Conditioning { get; set; }
-        public decimal OnSalePrice { get; set; }
-        public decimal WholeSalePrice { get; set; }
-        public decimal VatPrice { get; set; }
         public decimal Vat { get; set; }
         public bool Available { get; set; }
         public bool VisibleToStores { get; set; }
@@ -40,5 +34,6 @@ namespace Sheaft.Application.Models
         public IEnumerable<RatingDto> Ratings { get; set; }
         public IEnumerable<ClosingDto> Closings { get; set; }
         public IEnumerable<PictureDto> Pictures { get; set; }
+        public IEnumerable<CatalogPriceDto> Prices { get; set; }
     }
 }

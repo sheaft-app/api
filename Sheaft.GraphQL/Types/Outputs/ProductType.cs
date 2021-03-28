@@ -15,12 +15,6 @@ namespace Sheaft.GraphQL.Types.Outputs
             descriptor.Field(c => c.Id).Type<NonNullType<IdType>>();
             descriptor.Field(c => c.CreatedOn);
             descriptor.Field(c => c.Vat);
-            descriptor.Field(c => c.VatPricePerUnit);
-            descriptor.Field(c => c.OnSalePricePerUnit);
-            descriptor.Field(c => c.WholeSalePricePerUnit);
-            descriptor.Field(c => c.OnSalePrice);
-            descriptor.Field(c => c.WholeSalePrice);
-            descriptor.Field(c => c.VatPrice);
             descriptor.Field(c => c.Available);
             descriptor.Field(c => c.RatingsCount);
             descriptor.Field(c => c.QuantityPerUnit);
@@ -80,6 +74,9 @@ namespace Sheaft.GraphQL.Types.Outputs
 
             descriptor.Field(c => c.Pictures)
                 .Type<ListType<PictureType>>();
+
+            descriptor.Field(c => c.Prices)
+                .Type<ListType<CatalogPriceType>>();
         }
     }
 }

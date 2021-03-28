@@ -20,7 +20,6 @@ namespace Sheaft.GraphQL.Types.Inputs
             descriptor.Field(c => c.Conditioning);
             descriptor.Field(c => c.Vat);
             descriptor.Field(c => c.Weight);
-            descriptor.Field(c => c.WholeSalePricePerUnit);
 
             descriptor.Field(c => c.Id)
                 .Type<NonNullType<IdType>>();
@@ -36,6 +35,9 @@ namespace Sheaft.GraphQL.Types.Inputs
 
             descriptor.Field(c => c.Closings)
                 .Type<ListType<UpdateClosingInputType>>();
+            
+            descriptor.Field(c => c.Prices)
+                .Type<NonNullType<ListType<CatalogPriceInputType>>>();
         }
     }
 }
