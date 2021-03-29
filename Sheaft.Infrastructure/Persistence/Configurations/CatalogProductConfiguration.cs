@@ -8,7 +8,8 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
     {
         public void Configure(EntityTypeBuilder<CatalogProduct> entity)
         {
-            entity.Property<long>("Uid");
+            entity.Property<long>("CatalogUid");
+            entity.Property<long>("ProductUid");
 
             entity.Property(c => c.CreatedOn);
             entity.Property(c => c.UpdatedOn).IsConcurrencyToken();

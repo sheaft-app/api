@@ -169,7 +169,7 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                     b.Property<long>("CatalogUid")
                         .HasColumnType("bigint");
 
-                    b.Property<long?>("ProductUid")
+                    b.Property<long>("ProductUid")
                         .HasColumnType("bigint");
 
                     b.Property<DateTimeOffset>("CreatedOn")
@@ -180,9 +180,6 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
 
                     b.Property<decimal>("OnSalePricePerUnit")
                         .HasColumnType("decimal(10,2)");
-
-                    b.Property<long>("Uid")
-                        .HasColumnType("bigint");
 
                     b.Property<DateTimeOffset?>("UpdatedOn")
                         .IsConcurrencyToken()

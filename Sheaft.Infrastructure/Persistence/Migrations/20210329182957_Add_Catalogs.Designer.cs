@@ -11,7 +11,7 @@ using Sheaft.Infrastructure.Persistence;
 namespace Sheaft.Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20210328191117_Add_Catalogs")]
+    [Migration("20210329182957_Add_Catalogs")]
     partial class Add_Catalogs
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -171,7 +171,7 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                     b.Property<long>("CatalogUid")
                         .HasColumnType("bigint");
 
-                    b.Property<long?>("ProductUid")
+                    b.Property<long>("ProductUid")
                         .HasColumnType("bigint");
 
                     b.Property<DateTimeOffset>("CreatedOn")
@@ -182,9 +182,6 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
 
                     b.Property<decimal>("OnSalePricePerUnit")
                         .HasColumnType("decimal(10,2)");
-
-                    b.Property<long>("Uid")
-                        .HasColumnType("bigint");
 
                     b.Property<DateTimeOffset?>("UpdatedOn")
                         .IsConcurrencyToken()

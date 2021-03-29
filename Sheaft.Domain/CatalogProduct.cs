@@ -6,7 +6,7 @@ using Sheaft.Domain.Interop;
 
 namespace Sheaft.Domain
 {
-    public class CatalogProduct : ITrackCreation, ITrackUpdate, ITrackRemove
+    public class CatalogProduct : ITrackCreation, ITrackUpdate
     {
         private const int DIGITS_COUNT = 2;
 
@@ -23,7 +23,6 @@ namespace Sheaft.Domain
 
         public DateTimeOffset CreatedOn { get; }
         public DateTimeOffset? UpdatedOn { get; }
-        public DateTimeOffset? RemovedOn { get; }
         public decimal OnSalePrice { get; private set; }
         public decimal WholeSalePrice { get; private set; }
         public decimal VatPrice { get; private set; }

@@ -7,36 +7,6 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropColumn(
-                name: "OnSalePrice",
-                schema: "app",
-                table: "Products");
-
-            migrationBuilder.DropColumn(
-                name: "OnSalePricePerUnit",
-                schema: "app",
-                table: "Products");
-
-            migrationBuilder.DropColumn(
-                name: "VatPrice",
-                schema: "app",
-                table: "Products");
-
-            migrationBuilder.DropColumn(
-                name: "VatPricePerUnit",
-                schema: "app",
-                table: "Products");
-
-            migrationBuilder.DropColumn(
-                name: "WholeSalePrice",
-                schema: "app",
-                table: "Products");
-
-            migrationBuilder.DropColumn(
-                name: "WholeSalePricePerUnit",
-                schema: "app",
-                table: "Products");
-
             migrationBuilder.CreateTable(
                 name: "Catalogs",
                 schema: "app",
@@ -80,8 +50,7 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                     VatPrice = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
                     WholeSalePricePerUnit = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
                     VatPricePerUnit = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
-                    OnSalePricePerUnit = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
-                    Uid = table.Column<long>(nullable: false)
+                    OnSalePricePerUnit = table.Column<decimal>(type: "decimal(10,2)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -125,6 +94,45 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                 schema: "app",
                 table: "Catalogs",
                 columns: new[] { "Uid", "Id", "ProducerUid", "RemovedOn" });
+            
+            migrationBuilder.Sql(
+                "insert into app.Catalogs (Id, Name, CreatedOn, IsDefaultForStores, VisibleToConsumers, VisibleToStores, ProducerUid) select newid(), 'Catalogue par défaut', getutcdate(), 1, 1, 1, Uid from app.Users u where u.Kind = 0");
+
+            migrationBuilder.Sql(
+                "insert into app.CatalogProducts (CatalogUid, ProductUid, CreatedOn, WholeSalePricePerUnit, WholeSalePrice, OnSalePricePerUnit, OnSalePrice, VatPricePerUnit, VatPrice) select c.Uid, p.Uid, getutcdate(), p.WholeSalePricePerUnit, p.WholeSalePrice, p.OnSalePricePerUnit, p.OnSalePrice, p.VatPricePerUnit, p.VatPrice from app.catalogs c join app.users u on u.Uid = c.ProducerUid join app.Products p on p.ProducerUid = u.Uid");
+
+            migrationBuilder.DropColumn(
+                name: "OnSalePrice",
+                schema: "app",
+                table: "Products");
+
+            migrationBuilder.DropColumn(
+                name: "OnSalePricePerUnit",
+                schema: "app",
+                table: "Products");
+
+            migrationBuilder.DropColumn(
+                name: "VatPrice",
+                schema: "app",
+                table: "Products");
+
+            migrationBuilder.DropColumn(
+                name: "VatPricePerUnit",
+                schema: "app",
+                table: "Products");
+
+            migrationBuilder.DropColumn(
+                name: "WholeSalePrice",
+                schema: "app",
+                table: "Products");
+
+            migrationBuilder.DropColumn(
+                name: "WholeSalePricePerUnit",
+                schema: "app",
+                table: "Products");
+
+            migrationBuilder.Sql(
+                "DROP VIEW [app].[ProductsSearch] GO SET ANSI_NULLS ON GO SET QUOTED_IDENTIFIER ON GO CREATE VIEW [app].ProductsSearch as select     p.Id as product_id      , p.Name as product_name      , p.Name as partialProductName      , CAST(p.QuantityPerUnit as float) as product_quantityPerUnit      , case when p.Unit = 1 then 'mL'             when p.Unit = 2 then 'L'             when p.Unit = 3 then 'g'             when p.Unit = 4 then 'kg' end as product_unit      , case when c.VisibleToConsumers = 1 then CAST(cp.OnSalePricePerUnit as float) else 0 end as product_onSalePricePerUnit      , case when c.VisibleToConsumers = 1 then CAST(cp.OnSalePrice as float) else 0 end as product_onSalePrice      , CAST(p.Rating as float) as product_rating      , p.RatingsCount as product_ratings_count      , case when pa.Uid is not null then cast(1 as bit) else cast(0 as bit) end as product_returnable      , r.Id as producer_id      , r.Name as producer_name      , r.Name as partialProducerName      , r.Email as producer_email      , r.Phone as producer_phone      , ra.Zipcode as producer_zipcode      , ra.City as producer_city      , p.Picture as product_image      , p.Available as product_available      , c.VisibleToConsumers as product_searchable      , case when p.Conditioning = 1 then 'BOX'             when p.Conditioning = 2 then 'BULK'             when p.Conditioning = 3 then 'BOUQUET'             when p.Conditioning = 4 then 'BUNCH'             when p.Conditioning = 5 then 'PIECE'             when p.Conditioning = 6 then 'BASKET' end as product_conditioning      , app.InlineMax(app.InlineMax(app.InlineMax(p.UpdatedOn, r.UpdatedOn), t.UpdatedOn), p.CreatedOn) as last_update      , case when (app.InlineMax(p.RemovedOn, r.RemovedOn)) is not null or r.CanDirectSell = 0 then 1 else 0 end as removed      , '[' + STRING_AGG('\"' + LOWER(t.Name) + '\"', ',') + ']' as product_tags      , ra.Longitude as producer_longitude      , ra.Latitude as producer_latitude      , geography::STGeomFromText('POINT('+convert(varchar(20),ra.Longitude)+' '+convert(varchar(20),ra.Latitude)+')',4326) as producer_geolocation from app.Catalogs c          join app.CatalogProducts cp on cp.CatalogUid = c.Uid          join app.Products p on p.Uid = cp.ProductUid          join app.Users r on r.Uid = p.ProducerUid and r.Kind = 0          join app.UserAddresses ra on r.Uid = ra.UserUid          left join app.ProductTags pt on p.Uid = pt.ProductUid          left join app.Returnables pa on pa.Uid = p.ReturnableUid          left join app.Tags t on t.Uid = pt.TagUid group by     p.Id,     p.Name,     case when p.Unit = 1 then 'mL'          when p.Unit = 2 then 'L'          when p.Unit = 3 then 'g'          when p.Unit = 4 then 'kg' end,     CAST(p.QuantityPerUnit as float),     c.VisibleToConsumers,     case when c.VisibleToConsumers = 1 then CAST(cp.OnSalePricePerUnit as float) else 0 end,     case when c.VisibleToConsumers = 1 then CAST(cp.OnSalePrice as float) else 0 end,     CAST(p.Rating as float),     p.RatingsCount,     case when pa.Uid is not null then cast(1 as bit) else cast(0 as bit) end,     r.Id,     r.Name,     r.Email,     p.Picture,     case when p.Conditioning = 1 then 'BOX'          when p.Conditioning = 2 then 'BULK'          when p.Conditioning = 3 then 'BOUQUET'          when p.Conditioning = 4 then 'BUNCH'          when p.Conditioning = 5 then 'PIECE'          when p.Conditioning = 6 then 'BASKET' end,     r.Id,     r.Phone,     p.Available,     p.VisibleToConsumers,     ra.Zipcode,     ra.City,     app.InlineMax(app.InlineMax(app.InlineMax(p.UpdatedOn, r.UpdatedOn), t.UpdatedOn), p.CreatedOn),     case when (app.InlineMax(p.RemovedOn, r.RemovedOn)) is not null or r.CanDirectSell = 0 then 1 else 0 end,     ra.Longitude,     ra.Latitude");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
