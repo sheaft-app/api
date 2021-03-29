@@ -491,43 +491,22 @@ namespace Sheaft.GraphQL.Types
             
             //CLOSINGS
             
-            descriptor.Field(c => c.CreateBusinessClosingsAsync(default, default))
-                .Name("createBusinessClosings")
-                .Authorize(Policies.OWNER)
-                .Type<NonNullType<ListType<ClosingType>>>()
-                .UsePaging<ClosingType>()
-                .UseSelection();
-            
-            descriptor.Field(c => c.CreateDeliveryClosingsAsync(default, default))
-                .Name("createDeliveryClosings")
-                .Authorize(Policies.OWNER)
-                .Type<NonNullType<ListType<ClosingType>>>()
-                .UsePaging<ClosingType>()
-                .UseSelection();
-            
-            descriptor.Field(c => c.CreateProductClosingsAsync(default, default))
-                .Name("createProductClosings")
-                .Authorize(Policies.OWNER)
-                .Type<NonNullType<ListType<ClosingType>>>()
-                .UsePaging<ClosingType>()
-                .UseSelection();
-            
-            descriptor.Field(c => c.UpdateBusinessClosingAsync(default, default))
-                .Name("updateBusinessClosing")
+            descriptor.Field(c => c.UpdateOrCreateBusinessClosingAsync(default, default))
+                .Name("updateOrCreateBusinessClosing")
                 .Authorize(Policies.OWNER)
                 .Type<NonNullType<ClosingType>>()
                 .UseSingleOrDefault()
                 .UseSelection();
             
-            descriptor.Field(c => c.UpdateDeliveryClosingAsync(default, default))
-                .Name("updateDeliveryClosing")
+            descriptor.Field(c => c.UpdateOrCreateDeliveryClosingAsync(default, default))
+                .Name("updateOrCreateDeliveryClosing")
                 .Authorize(Policies.OWNER)
                 .Type<NonNullType<ClosingType>>()
                 .UseSingleOrDefault()
                 .UseSelection();
             
-            descriptor.Field(c => c.UpdateProductClosingAsync(default, default))
-                .Name("updateProductClosing")
+            descriptor.Field(c => c.UpdateOrCreateProductClosingAsync(default, default))
+                .Name("updateOrCreateProductClosing")
                 .Authorize(Policies.OWNER)
                 .Type<NonNullType<ClosingType>>()
                 .UseSingleOrDefault()

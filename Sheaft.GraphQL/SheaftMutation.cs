@@ -607,41 +607,23 @@ namespace Sheaft.GraphQL
         }
         
         //Closings
-        public async Task<IQueryable<ClosingDto>> CreateBusinessClosingsAsync(CreateResourceIdClosingsDto input, [Service] IBusinessClosingQueries closingQueries)
+        public async Task<IQueryable<ClosingDto>> UpdateOrCreateBusinessClosingAsync(UpdateOrCreateClosingDto input, [Service] IBusinessClosingQueries closingQueries)
         {
-            SetLogTransaction(nameof(CreateBusinessClosingsAsync));
-            var result = await ExecuteCommandAsync<CreateBusinessClosingsCommand, List<Guid>>(_mapper.Map(input, new CreateBusinessClosingsCommand(CurrentUser)), Token);
-            return closingQueries.GetClosings(CurrentUser).Where(j => result.Contains(j.Id));
+            SetLogTransaction(nameof(UpdateOrCreateBusinessClosingAsync));
+            var result = await ExecuteCommandAsync<UpdateOrCreateBusinessClosingCommand, Guid>(_mapper.Map(input, new UpdateOrCreateBusinessClosingCommand(CurrentUser)), Token);
+            return closingQueries.GetClosing(result, CurrentUser);
         }
-        public async Task<IQueryable<ClosingDto>> CreateDeliveryClosingsAsync(CreateResourceIdClosingsDto input, [Service] IDeliveryClosingQueries closingQueries)
+        public async Task<IQueryable<ClosingDto>> UpdateOrCreateDeliveryClosingAsync(UpdateOrCreateClosingDto input, [Service] IDeliveryClosingQueries closingQueries)
         {
-            SetLogTransaction(nameof(CreateDeliveryClosingsAsync));
-            var result = await ExecuteCommandAsync<CreateDeliveryClosingsCommand, List<Guid>>(_mapper.Map(input, new CreateDeliveryClosingsCommand(CurrentUser)), Token);
-            return closingQueries.GetClosings(CurrentUser).Where(j => result.Contains(j.Id));
+            SetLogTransaction(nameof(UpdateOrCreateDeliveryClosingAsync));
+            var result = await ExecuteCommandAsync<UpdateOrCreateDeliveryClosingCommand, Guid>(_mapper.Map(input, new UpdateOrCreateDeliveryClosingCommand(CurrentUser)), Token);
+            return closingQueries.GetClosing(result, CurrentUser);
         }
-        public async Task<IQueryable<ClosingDto>> CreateProductClosingsAsync(CreateResourceIdClosingsDto input, [Service] IProductClosingQueries closingQueries)
+        public async Task<IQueryable<ClosingDto>> UpdateOrCreateProductClosingAsync(UpdateOrCreateClosingDto input, [Service] IProductClosingQueries closingQueries)
         {
-            SetLogTransaction(nameof(CreateProductClosingsAsync));
-            var result = await ExecuteCommandAsync<CreateProductClosingsCommand, List<Guid>>(_mapper.Map(input, new CreateProductClosingsCommand(CurrentUser)), Token);
-            return closingQueries.GetClosings(CurrentUser).Where(j => result.Contains(j.Id));
-        }
-        public async Task<IQueryable<ClosingDto>> UpdateBusinessClosingAsync(UpdateClosingDto input, [Service] IBusinessClosingQueries closingQueries)
-        {
-            SetLogTransaction(nameof(UpdateBusinessClosingAsync));
-            await ExecuteCommandAsync(_mapper.Map(input, new UpdateBusinessClosingCommand(CurrentUser)), Token);
-            return closingQueries.GetClosing(input.Id, CurrentUser);
-        }
-        public async Task<IQueryable<ClosingDto>> UpdateDeliveryClosingAsync(UpdateClosingDto input, [Service] IDeliveryClosingQueries closingQueries)
-        {
-            SetLogTransaction(nameof(UpdateDeliveryClosingAsync));
-            await ExecuteCommandAsync(_mapper.Map(input, new UpdateDeliveryClosingCommand(CurrentUser)), Token);
-            return closingQueries.GetClosing(input.Id, CurrentUser);
-        }
-        public async Task<IQueryable<ClosingDto>> UpdateProductClosingAsync(UpdateClosingDto input, [Service] IProductClosingQueries closingQueries)
-        {
-            SetLogTransaction(nameof(UpdateProductClosingAsync));
-            await ExecuteCommandAsync(_mapper.Map(input, new UpdateProductClosingCommand(CurrentUser)), Token);
-            return closingQueries.GetClosing(input.Id, CurrentUser);
+            SetLogTransaction(nameof(UpdateOrCreateProductClosingAsync));
+            var result = await ExecuteCommandAsync<UpdateOrCreateProductClosingCommand, Guid>(_mapper.Map(input, new UpdateOrCreateProductClosingCommand(CurrentUser)), Token);
+            return closingQueries.GetClosing(result, CurrentUser);
         }
         public async Task<bool> DeleteBusinessClosingsAsync(ResourceIdsDto input)
         {
@@ -655,7 +637,7 @@ namespace Sheaft.GraphQL
         }
         public async Task<bool> DeleteProductClosingsAsync(ResourceIdsDto input)
         {
-            SetLogTransaction(nameof(UpdateProductClosingAsync));
+            SetLogTransaction(nameof(DeleteProductClosingsAsync));
             return await ExecuteCommandAsync(_mapper.Map(input, new DeleteProductClosingsCommand(CurrentUser)), Token);
         }
 

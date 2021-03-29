@@ -17,6 +17,7 @@ using Sheaft.Core.Exceptions;
 using Sheaft.Domain;
 using Sheaft.Domain.Enum;
 using Sheaft.Mediatr.Auth.Commands;
+using Sheaft.Mediatr.BusinessClosing.Commands;
 using Sheaft.Mediatr.User.Commands;
 using Sheaft.Options;
 
@@ -48,6 +49,7 @@ namespace Sheaft.Mediatr.Store.Commands
         public AddressDto Address { get; set; }
         public IEnumerable<Guid> Tags { get; set; }
         public IEnumerable<TimeSlotGroupDto> OpeningHours { get; set; }
+        public IEnumerable<UpdateOrCreateClosingDto> Closings { get; set; }
     }
 
     public class UpdateStoreCommandHandler : CommandsHandler,
@@ -111,6 +113,13 @@ namespace Sheaft.Mediatr.Store.Commands
             }
 
             await _context.SaveChangesAsync(token);
+            
+            var result =
+                await _mediatr.Process(
+                    new UpdateOrCreateBusinessClosingsCommand(request.RequestUser)
+                        {UserId = store.Id, Closings = request.Closings}, token);
+            if (!result.Succeeded)
+                return Failure(result.Exception);
 
             var resultImage = await _mediatr.Process(new UpdateUserPictureCommand(request.RequestUser)
             {

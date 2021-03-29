@@ -14,7 +14,9 @@ using Sheaft.Core;
 using Sheaft.Core.Enums;
 using Sheaft.Domain;
 using Sheaft.Domain.Enum;
+using Sheaft.Mediatr.DeliveryClosing.Commands;
 using Sheaft.Mediatr.Producer.Commands;
+using Sheaft.Mediatr.ProductClosing.Commands;
 
 namespace Sheaft.Mediatr.Product.Commands
 {
@@ -28,7 +30,7 @@ namespace Sheaft.Mediatr.Product.Commands
         public Guid ProducerId { get; set; }
         public string Reference { get; set; }
         public string Name { get; set; }
-        public PictureSourceDto Picture { get; set; }
+        public string Picture { get; set; }
         public string OriginalPicture { get; set; }
         public decimal WholeSalePricePerUnit { get; set; }
         public decimal QuantityPerUnit { get; set; }
@@ -42,6 +44,7 @@ namespace Sheaft.Mediatr.Product.Commands
         public bool? VisibleToStores { get; set; }
         public Guid? ReturnableId { get; set; }
         public IEnumerable<Guid> Tags { get; set; }
+        public IEnumerable<UpdateOrCreateClosingDto> Closings { get; set; }
         public bool SkipUpdateProducerTags { get; set; } = false;
     }
 
@@ -106,12 +109,19 @@ namespace Sheaft.Mediatr.Product.Commands
 
                 await _context.AddAsync(entity, token);
                 await _context.SaveChangesAsync(token);
-
+                
+                var result =
+                    await _mediatr.Process(
+                        new UpdateOrCreateProductClosingsCommand(request.RequestUser)
+                            {ProductId = entity.Id, Closings = request.Closings}, token);
+                if (!result.Succeeded)
+                    return Failure<Guid>(result.Exception);
+                
                 var imageResult = await _mediatr.Process(
                     new UpdateProductPreviewCommand(request.RequestUser)
                     {
                         ProductId = entity.Id, 
-                        Picture = request.Picture
+                        Picture = new PictureSourceDto {Resized = request.Picture, Original = request.OriginalPicture}
                     }, token);
                 
                 if (!imageResult.Succeeded)

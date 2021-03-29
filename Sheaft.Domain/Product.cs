@@ -193,6 +193,14 @@ namespace Sheaft.Domain
 
             return closing;
         }
+        
+        public void RemoveClosings(IEnumerable<Guid> ids)
+        {
+            foreach (var id in ids)
+            {
+                RemoveClosing(id);
+            }
+        }
 
         public void RemoveClosing(Guid id)
         {
@@ -296,5 +304,6 @@ namespace Sheaft.Domain
         }
 
         public List<DomainEvent> DomainEvents { get; } = new List<DomainEvent>();
+
     }
 }

@@ -48,6 +48,14 @@ namespace Sheaft.Domain
 
             return closing;
         }
+        
+        public void RemoveClosings(List<Guid> ids)
+        {
+            foreach (var id in ids)
+            {
+                RemoveClosing(id);
+            }
+        }
 
         public void RemoveClosing(Guid id)
         {

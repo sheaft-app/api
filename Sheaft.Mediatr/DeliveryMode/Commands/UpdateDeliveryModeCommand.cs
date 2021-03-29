@@ -14,6 +14,7 @@ using Sheaft.Core;
 using Sheaft.Core.Exceptions;
 using Sheaft.Domain;
 using Sheaft.Domain.Enum;
+using Sheaft.Mediatr.DeliveryClosing.Commands;
 using Sheaft.Mediatr.Producer.Commands;
 
 namespace Sheaft.Mediatr.DeliveryMode.Commands
@@ -36,6 +37,7 @@ namespace Sheaft.Mediatr.DeliveryMode.Commands
         public bool Available { get; set; }
         public bool AutoAcceptRelatedPurchaseOrder { get; set; }
         public bool AutoCompleteRelatedPurchaseOrder { get; set; }
+        public IEnumerable<UpdateOrCreateClosingDto> Closings { get; set; }
     }
 
     public class UpdateDeliveryModeCommandHandler : CommandsHandler,
@@ -80,6 +82,13 @@ namespace Sheaft.Mediatr.DeliveryMode.Commands
             }
 
             await _context.SaveChangesAsync(token);
+            
+            var result =
+                await _mediatr.Process(
+                    new UpdateOrCreateDeliveryClosingsCommand(request.RequestUser)
+                        {DeliveryId = entity.Id, Closings = request.Closings}, token);
+            if (!result.Succeeded)
+                return Failure(result.Exception);
             
             _mediatr.Post(new UpdateProducerAvailabilityCommand(request.RequestUser) {ProducerId = entity.Producer.Id});
             return Success();

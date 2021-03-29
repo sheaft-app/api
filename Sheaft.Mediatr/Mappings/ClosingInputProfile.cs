@@ -10,19 +10,19 @@ namespace Sheaft.Mediatr.Mappings
     {
         public ClosingInputProfile()
         {
-            CreateMap<CreateResourceIdClosingsDto, CreateBusinessClosingsCommand>()
+            CreateMap<UpdateOrCreateResourceIdClosingDto, UpdateOrCreateBusinessClosingCommand>()
                 .ForMember(c => c.UserId, opt => opt.MapFrom(d => d.Id));
-            CreateMap<CreateResourceIdClosingsDto, CreateDeliveryClosingsCommand>()
+            CreateMap<UpdateOrCreateResourceIdClosingDto, UpdateOrCreateDeliveryClosingCommand>()
                 .ForMember(c => c.DeliveryId, opt => opt.MapFrom(d => d.Id));
-            CreateMap<CreateResourceIdClosingsDto, CreateProductClosingsCommand>()
+            CreateMap<UpdateOrCreateResourceIdClosingDto, UpdateOrCreateProductClosingCommand>()
                 .ForMember(c => c.ProductId, opt => opt.MapFrom(d => d.Id));
 
-            CreateMap<UpdateClosingDto, UpdateBusinessClosingCommand>()
-                .ForMember(c => c.ClosingId, opt => opt.MapFrom(e => e.Id));
-            CreateMap<UpdateClosingDto, UpdateDeliveryClosingCommand>()
-                .ForMember(c => c.ClosingId, opt => opt.MapFrom(e => e.Id));
-            CreateMap<UpdateClosingDto, UpdateProductClosingCommand>()
-                .ForMember(c => c.ClosingId, opt => opt.MapFrom(e => e.Id));
+            CreateMap<UpdateOrCreateResourceIdClosingsDto, UpdateOrCreateBusinessClosingsCommand>()
+                .ForMember(c => c.UserId, opt => opt.MapFrom(d => d.Id));
+            CreateMap<UpdateOrCreateResourceIdClosingsDto, UpdateOrCreateDeliveryClosingsCommand>()
+                .ForMember(c => c.DeliveryId, opt => opt.MapFrom(d => d.Id));
+            CreateMap<UpdateOrCreateResourceIdClosingsDto, UpdateOrCreateProductClosingsCommand>()
+                .ForMember(c => c.ProductId, opt => opt.MapFrom(d => d.Id));
             
             CreateMap<ResourceIdsDto, DeleteBusinessClosingsCommand>()
                 .ForMember(e => e.ClosingIds, opt => opt.MapFrom(a => a.Ids));

@@ -42,6 +42,9 @@ namespace Sheaft.GraphQL.Types.Inputs
 
             descriptor.Field(c => c.OpeningHours)
                 .Type<ListType<TimeSlotGroupInputType>>();
+
+            descriptor.Field(c => c.Closings)
+                .Type<ListType<UpdateClosingInputType>>();
         }
     }
 }
