@@ -45,7 +45,7 @@ namespace Sheaft.Mediatr.ProductClosing.Commands
                 throw SheaftException.Forbidden();
 
             Guid closingId;
-            if (!request.Closing.Id.HasValue)
+            if (request.Closing.Id.HasValue)
             {
                 var closing = entity.Closings.SingleOrDefault(c => c.Id == request.Closing.Id);
                 if (closing == null)
