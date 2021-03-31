@@ -22,6 +22,6 @@ namespace Sheaft.Application.Models
         public Guid? ReturnableId { get; set; }
         public IEnumerable<Guid> Tags { get; set; }
         public IEnumerable<UpdateOrCreateClosingDto> Closings { get; set; }
-        public IEnumerable<CatalogPriceDto> Prices { get; set; }
+        public IEnumerable<UpdateOrCreateCatalogPriceDto> Catalogs { get; set; }
     }
 }

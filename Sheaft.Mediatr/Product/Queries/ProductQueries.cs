@@ -168,11 +168,11 @@ namespace Sheaft.Mediatr.Product.Queries
 
             if (currentUser.IsInRole(_roleOptions.Store.Value))
                 return _context.Products
-                    .Get(c => c.Id == id && c.VisibleToStores)
+                    .Get(c => c.Id == id && c.CatalogsPrices.Any(cp => cp.Catalog.Kind == CatalogKind.Stores))
                     .ProjectTo<ProductDto>(_configurationProvider);
 
             return _context.Products
-                .Get(c => c.Id == id && c.VisibleToConsumers)
+                .Get(c => c.Id == id  && c.CatalogsPrices.Any(cp => cp.Catalog.Kind == CatalogKind.Consumers))
                 .ProjectTo<ProductDto>(_configurationProvider);
         }
 
@@ -195,12 +195,12 @@ namespace Sheaft.Mediatr.Product.Queries
                     .Select(a => a.Delivery.Producer.Id);
 
                 return _context.Products
-                    .Get(p => producerIds.Contains(p.Producer.Id) && p.VisibleToStores)
+                    .Get(p => producerIds.Contains(p.Producer.Id) && p.CatalogsPrices.Any(cp => cp.Catalog.Kind == CatalogKind.Stores))
                     .ProjectTo<ProductDto>(_configurationProvider);
             }
 
             return _context.Products
-                .Get(c => c.VisibleToConsumers)
+                .Get(c => c.CatalogsPrices.Any(cp => cp.Catalog.Kind == CatalogKind.Consumers))
                 .ProjectTo<ProductDto>(_configurationProvider);
         }
 
@@ -213,11 +213,11 @@ namespace Sheaft.Mediatr.Product.Queries
 
             if (currentUser.IsInRole(_roleOptions.Store.Value))
                 return _context.Products
-                    .Get(p => p.Producer.Id == producerId && p.VisibleToStores)
+                    .Get(p => p.Producer.Id == producerId && p.CatalogsPrices.Any(cp => cp.Catalog.Kind == CatalogKind.Stores))
                     .ProjectTo<ProductDto>(_configurationProvider);
 
             return _context.Products
-                .Get(p => p.Producer.Id == producerId && p.VisibleToConsumers)
+                .Get(p => p.Producer.Id == producerId && p.CatalogsPrices.Any(cp => cp.Catalog.Kind == CatalogKind.Consumers))
                 .ProjectTo<ProductDto>(_configurationProvider);
         }
 

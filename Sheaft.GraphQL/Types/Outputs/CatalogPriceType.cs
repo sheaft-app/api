@@ -3,9 +3,9 @@ using Sheaft.Application.Models;
 
 namespace Sheaft.GraphQL.Types.Outputs
 {
-    public class CatalogPriceType : SheaftOutputType<CatalogPriceDto>
+    public class CatalogPriceType : SheaftOutputType<CatalogProductDto>
     {
-        protected override void Configure(IObjectTypeDescriptor<CatalogPriceDto> descriptor)
+        protected override void Configure(IObjectTypeDescriptor<CatalogProductDto> descriptor)
         {
             descriptor.Field(c => c.Id).Type<NonNullType<IdType>>();
             descriptor.Field(c => c.Name);

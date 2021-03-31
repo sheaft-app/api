@@ -18,7 +18,7 @@ namespace Sheaft.Domain
         private List<Rating> _ratings;
         private List<ProductClosing> _closings;
         private List<ProductPicture> _pictures;
-        private List<CatalogProduct> _prices;
+        private List<CatalogProduct> _catalogsPrices;
 
         protected Product()
         {
@@ -35,6 +35,9 @@ namespace Sheaft.Domain
 
             _tags = new List<ProductTag>();
             _ratings = new List<Rating>();
+            _closings = new List<ProductClosing>();
+            _catalogsPrices = new List<CatalogProduct>();
+            
             DomainEvents = new List<DomainEvent>();
 
             RefreshRatings();
@@ -55,8 +58,6 @@ namespace Sheaft.Domain
         public ConditioningKind Conditioning { get; private set; }
         public decimal Vat { get; private set; }
         public bool Available { get; private set; }
-        public bool VisibleToConsumers { get; private set; }
-        public bool VisibleToStores { get; private set; }
         public int RatingsCount { get; set; }
         public decimal? Rating { get; set; }
         public virtual Returnable Returnable { get; private set; }
@@ -65,7 +66,7 @@ namespace Sheaft.Domain
         public virtual IReadOnlyCollection<Rating> Ratings => _ratings?.AsReadOnly();
         public virtual IReadOnlyCollection<ProductClosing> Closings => _closings?.AsReadOnly(); 
         public virtual IReadOnlyCollection<ProductPicture> Pictures => _pictures?.AsReadOnly();
-        public virtual IReadOnlyCollection<CatalogProduct> Prices => _prices?.AsReadOnly();
+        public virtual IReadOnlyCollection<CatalogProduct> CatalogsPrices => _catalogsPrices?.AsReadOnly();
 
         public void SetReference(string reference)
         {
@@ -86,16 +87,6 @@ namespace Sheaft.Domain
         public void SetAvailable(bool? available)
         {
             Available = available ?? Available;
-        }
-
-        public void SetStoreVisibility(bool? visible)
-        {
-            VisibleToStores = visible ?? VisibleToStores;
-        }
-
-        public void SetConsumerVisibility(bool? visible)
-        {
-            VisibleToConsumers = visible ?? VisibleToConsumers;
         }
 
         public void SetTags(IEnumerable<Tag> tags)
@@ -251,7 +242,7 @@ namespace Sheaft.Domain
 
         private void RefreshPrices()
         {
-            foreach (var price in _prices)
+            foreach (var price in _catalogsPrices)
                 price.RefreshPrice(Vat, Unit, QuantityPerUnit);
         }
         

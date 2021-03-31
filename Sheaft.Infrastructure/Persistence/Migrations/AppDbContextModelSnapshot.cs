@@ -123,14 +123,20 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                         .HasColumnType("bigint")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
+                    b.Property<bool>("Available")
+                        .HasColumnType("bit");
+
                     b.Property<DateTimeOffset>("CreatedOn")
                         .HasColumnType("datetimeoffset");
 
                     b.Property<Guid>("Id")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<bool>("IsDefaultForStores")
+                    b.Property<bool>("IsDefault")
                         .HasColumnType("bit");
+
+                    b.Property<int>("Kind")
+                        .HasColumnType("int");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -145,12 +151,6 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                     b.Property<DateTimeOffset?>("UpdatedOn")
                         .IsConcurrencyToken()
                         .HasColumnType("datetimeoffset");
-
-                    b.Property<bool>("VisibleToConsumers")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("VisibleToStores")
-                        .HasColumnType("bit");
 
                     b.HasKey("Uid");
 
@@ -1240,12 +1240,6 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
 
                     b.Property<decimal>("Vat")
                         .HasColumnType("decimal(10,2)");
-
-                    b.Property<bool>("VisibleToConsumers")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("VisibleToStores")
-                        .HasColumnType("bit");
 
                     b.Property<decimal?>("Weight")
                         .HasColumnType("decimal(10,2)");
@@ -2767,7 +2761,7 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                         .IsRequired();
 
                     b.HasOne("Sheaft.Domain.Product", null)
-                        .WithMany("Prices")
+                        .WithMany("CatalogsPrices")
                         .HasForeignKey("ProductUid")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();

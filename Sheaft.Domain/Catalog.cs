@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Sheaft.Core.Exceptions;
+using Sheaft.Domain.Enum;
 using Sheaft.Domain.Interop;
 
 namespace Sheaft.Domain
@@ -14,10 +15,11 @@ namespace Sheaft.Domain
         {
         }
 
-        public Catalog(Producer producer, Guid id, string name)
+        public Catalog(Producer producer, CatalogKind kind, Guid id, string name)
         {
             Id = id;
             Name = name;
+            Kind = kind;
             Producer = producer;
         }
 
@@ -26,31 +28,20 @@ namespace Sheaft.Domain
         public DateTimeOffset? UpdatedOn { get; }
         public DateTimeOffset? RemovedOn { get; }
         public string Name { get; private set;}
-        public bool IsDefaultForStores { get; private set; }
-        public bool VisibleToStores { get; private set;}
-        public bool VisibleToConsumers { get; private set;}
+        public CatalogKind Kind { get; private set; }
+        public bool Available { get; private set; }
+        public bool IsDefault { get; private set; }
         public virtual Producer Producer { get; private set;}
         public virtual IReadOnlyCollection<CatalogProduct> Products => _products?.AsReadOnly();
 
-        public void SetAsDefaultCatalogForStore()
+        public void SetIsAvailable(bool isAvailable)
         {
-            if (!VisibleToStores)
-                throw SheaftException.Validation();
-            
-            IsDefaultForStores = true;
+            Available = isAvailable;
         }
-
-        public void SetVisibleToConsumers(bool visibileToConsumers)
+        
+        public void SetIsDefault(bool isDefault)
         {
-            VisibleToConsumers = visibileToConsumers;
-        }
-
-        public void SetVisibleToStores(bool visibileToStores)
-        {
-            if (IsDefaultForStores)
-                throw SheaftException.Validation();
-            
-            VisibleToStores = visibileToStores;
+            IsDefault = isDefault;
         }
         
         public void AddProduct(Product product, decimal wholeSalePrice)

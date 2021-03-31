@@ -23,8 +23,6 @@ namespace Sheaft.Application.Models
         public ConditioningKind Conditioning { get; set; }
         public decimal Vat { get; set; }
         public bool Available { get; set; }
-        public bool VisibleToStores { get; set; }
-        public bool VisibleToConsumers { get; set; }
         public int RatingsCount { get; set; }
         public decimal? Rating { get; set; }
         public bool IsReturnable { get; set; }
@@ -34,6 +32,6 @@ namespace Sheaft.Application.Models
         public IEnumerable<RatingDto> Ratings { get; set; }
         public IEnumerable<ClosingDto> Closings { get; set; }
         public IEnumerable<PictureDto> Pictures { get; set; }
-        public IEnumerable<CatalogPriceDto> Prices { get; set; }
+        public IEnumerable<CatalogPriceDto> Catalogs { get; set; }
     }
 }

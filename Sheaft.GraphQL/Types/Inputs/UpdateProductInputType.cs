@@ -36,7 +36,7 @@ namespace Sheaft.GraphQL.Types.Inputs
             descriptor.Field(c => c.Closings)
                 .Type<ListType<UpdateClosingInputType>>();
             
-            descriptor.Field(c => c.Prices)
+            descriptor.Field(c => c.Catalogs)
                 .Type<NonNullType<ListType<CatalogPriceInputType>>>();
         }
     }

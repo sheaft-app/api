@@ -196,15 +196,6 @@ namespace Sheaft.GraphQL.Types
                 .UseSorting<ProductSortType>()
                 .UseSelection();
 
-            descriptor.Field(c => c.SetProductsSearchabilityAsync(default, default))
-                .Name("setProductsSearchability")
-                .Authorize(Policies.PRODUCER)
-                .Type<NonNullType<ListType<ProductType>>>()
-                .UsePaging<ProductType>()
-                .UseFiltering<ProductFilterType>()
-                .UseSorting<ProductSortType>()
-                .UseSelection();
-
             descriptor.Field(c => c.DeleteProductsAsync(default))
                 .Name("deleteProducts")
                 .Authorize(Policies.PRODUCER)

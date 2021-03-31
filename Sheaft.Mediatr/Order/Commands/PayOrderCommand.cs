@@ -81,7 +81,7 @@ namespace Sheaft.Mediatr.Order.Commands
                 .Where(p => 
                     p.RemovedOn.HasValue 
                     || !p.Available 
-                    || !p.VisibleToConsumers 
+                    || p.CatalogsPrices.Any(cp => cp.Catalog.Kind == CatalogKind.Consumers && cp.Catalog.IsDefault && !cp.Catalog.Available)
                     || p.Producer.RemovedOn.HasValue 
                     || !p.Producer.CanDirectSell)
                 .Select(p => p.Id.ToString("N"));

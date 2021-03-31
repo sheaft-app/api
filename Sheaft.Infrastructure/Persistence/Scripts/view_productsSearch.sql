@@ -1,13 +1,12 @@
-/****** Object:  View [app].[ProductsSearch]    Script Date: 10/22/2020 8:34:09 PM ******/
 DROP VIEW [app].[ProductsSearch]
 GO
 
-/****** Object:  View [app].[ProductsSearch]    Script Date: 10/22/2020 8:34:09 PM ******/
 SET ANSI_NULLS ON
 GO
 
 SET QUOTED_IDENTIFIER ON
 GO
+
 CREATE VIEW [app].ProductsSearch
 as
 select
@@ -19,8 +18,8 @@ select
             when p.Unit = 2 then 'L'
             when p.Unit = 3 then 'g'
             when p.Unit = 4 then 'kg' end as product_unit
-     , case when c.VisibleToConsumers = 1 then CAST(cp.OnSalePricePerUnit as float) else 0 end as product_onSalePricePerUnit
-     , case when c.VisibleToConsumers = 1 then CAST(cp.OnSalePrice as float) else 0 end as product_onSalePrice
+     , CAST(cp.OnSalePricePerUnit as float) as product_onSalePricePerUnit
+     , CAST(cp.OnSalePrice as float) as product_onSalePrice
      , CAST(p.Rating as float) as product_rating
      , p.RatingsCount as product_ratings_count
      , case when pa.Uid is not null then cast(1 as bit) else cast(0 as bit) end as product_returnable
@@ -33,7 +32,7 @@ select
      , ra.City as producer_city
      , p.Picture as product_image
      , p.Available as product_available
-     , c.VisibleToConsumers as product_searchable
+     , c.Available as product_searchable
      , case when p.Conditioning = 1 then 'BOX'
             when p.Conditioning = 2 then 'BULK'
             when p.Conditioning = 3 then 'BOUQUET'
@@ -47,7 +46,7 @@ select
      , ra.Latitude as producer_latitude
      , geography::STGeomFromText('POINT('+convert(varchar(20),ra.Longitude)+' '+convert(varchar(20),ra.Latitude)+')',4326) as producer_geolocation
 from app.Catalogs c
-         join app.CatalogProducts cp on cp.CatalogUid = c.Uid
+         join app.CatalogProducts cp on cp.CatalogUid = c.Uid and c.Kind = 1 and c.IsDefault = 1 and c.Available = 1
          join app.Products p on p.Uid = cp.ProductUid
          join app.Users r on r.Uid = p.ProducerUid and r.Kind = 0
          join app.UserAddresses ra on r.Uid = ra.UserUid
@@ -62,9 +61,8 @@ group by
          when p.Unit = 3 then 'g'
          when p.Unit = 4 then 'kg' end,
     CAST(p.QuantityPerUnit as float),
-    c.VisibleToConsumers,
-    case when c.VisibleToConsumers = 1 then CAST(cp.OnSalePricePerUnit as float) else 0 end,
-    case when c.VisibleToConsumers = 1 then CAST(cp.OnSalePrice as float) else 0 end,
+    CAST(cp.OnSalePricePerUnit as float),
+    CAST(cp.OnSalePrice as float),
     CAST(p.Rating as float),
     p.RatingsCount,
     case when pa.Uid is not null then cast(1 as bit) else cast(0 as bit) end,
@@ -81,7 +79,7 @@ group by
     r.Id,
     r.Phone,
     p.Available,
-    p.VisibleToConsumers,
+    c.Available,
     ra.Zipcode,
     ra.City,
     app.InlineMax(app.InlineMax(app.InlineMax(p.UpdatedOn, r.UpdatedOn), t.UpdatedOn), p.CreatedOn),

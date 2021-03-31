@@ -27,8 +27,6 @@ namespace Sheaft.Web.Manage.Models
         public decimal VatPrice { get; set; }
         public decimal Vat { get; set; }
         public bool Available { get; set; } = true;
-        public bool VisibleToStores { get; set; } = false;
-        public bool VisibleToConsumers { get; set; } = false;
         public decimal? Rating { get; set; }
         public Guid? ReturnableId { get; set; }
         public ProducerViewModel Producer { get; set; }

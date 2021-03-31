@@ -44,7 +44,7 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
             var closings = entity.Metadata.FindNavigation(nameof(Product.Closings));
             closings.SetPropertyAccessMode(PropertyAccessMode.Field);
             
-            var prices = entity.Metadata.FindNavigation(nameof(Product.Prices));
+            var prices = entity.Metadata.FindNavigation(nameof(Product.CatalogsPrices));
             prices.SetPropertyAccessMode(PropertyAccessMode.Field);
 
             entity.HasKey("Uid");

@@ -39,13 +39,11 @@ namespace Sheaft.Mediatr.Product.Commands
         public decimal? Weight { get; set; }
         public string Description { get; set; }
         public bool? Available { get; set; }
-        public bool? VisibleToConsumers { get; set; }
-        public bool? VisibleToStores { get; set; }
         public Guid? ReturnableId { get; set; }
         public IEnumerable<Guid> Tags { get; set; }
         public IEnumerable<UpdateOrCreateClosingDto> Closings { get; set; }
         public bool SkipUpdateProducerTags { get; set; } = false;
-        public IEnumerable<CatalogPriceDto> Prices { get; set; }
+        public IEnumerable<UpdateOrCreateCatalogPriceDto> Catalogs { get; set; }
     }
 
     public class CreateProductCommandHandler : CommandsHandler,
@@ -93,8 +91,6 @@ namespace Sheaft.Mediatr.Product.Commands
                 entity.SetVat(request.Vat);
                 entity.SetDescription(request.Description);
                 entity.SetAvailable(request.Available ?? true);
-                entity.SetStoreVisibility(request.VisibleToStores ?? false);
-                entity.SetConsumerVisibility(request.VisibleToConsumers ?? false);
                 entity.SetWeight(request.Weight);
 
                 if (request.ReturnableId.HasValue)
@@ -106,10 +102,10 @@ namespace Sheaft.Mediatr.Product.Commands
                 var tags = await _context.FindAsync<Domain.Tag>(t => request.Tags.Contains(t.Id), token);
                 entity.SetTags(tags);
 
-                foreach (var price in request.Prices)
+                foreach (var catalogPrice in request.Catalogs)
                 {
-                    var catalog = await _context.GetByIdAsync<Catalog>(price.Id, token);
-                    catalog.AddProduct(entity, price.WholeSalePricePerUnit);
+                    var catalog = await _context.GetByIdAsync<Domain.Catalog>(catalogPrice.Id, token);
+                    catalog.AddProduct(entity, catalogPrice.WholeSalePricePerUnit);
                 }
 
                 await _context.AddAsync(entity, token);

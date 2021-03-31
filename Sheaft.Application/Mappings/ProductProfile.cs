@@ -12,6 +12,7 @@ namespace Sheaft.Application.Mappings
         {
             CreateMap<Domain.Product, ProductDto>()
                 .ForMember(d => d.Tags, opt => opt.MapFrom(r => r.Tags.Select(t => t.Tag)))
+                .ForMember(d => d.Catalogs, opt => opt.MapFrom(r => r.CatalogsPrices))
                 .ForMember(d => d.IsReturnable, opt => opt.MapFrom(r => r.Returnable != null))
                 .ForMember(d => d.Picture, opt => opt.MapFrom(r => PictureExtensions.GetPictureUrl(r.Id, r.Picture, PictureSize.LARGE)))
                 .ForMember(d => d.ImageLarge, opt => opt.MapFrom(r => PictureExtensions.GetPictureUrl(r.Id, r.Picture, PictureSize.LARGE)))

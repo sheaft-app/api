@@ -62,12 +62,16 @@ namespace Sheaft.Mediatr.Order.Commands
             using (var transaction = await _context.BeginTransactionAsync(token))
             {
                 var productIds = request.Products.Select(p => p.Id);
-                var products = await _context.Products.Where(p => productIds.Contains(p.Id)).ToListAsync(token);
+                var products = await _context.Products
+                    .Where(p => productIds.Contains(p.Id))
+                    .Include(c => c.CatalogsPrices)
+                        .ThenInclude(c => c.Catalog)
+                    .ToListAsync(token);
+                
                 var invalidProductIds = products
                     .Where(p => 
                         p.RemovedOn.HasValue 
                         || !p.Available 
-                        || !p.VisibleToStores 
                         || p.Producer.RemovedOn.HasValue)
                     .Select(p => p.Id.ToString("N"));
 
@@ -83,7 +87,10 @@ namespace Sheaft.Mediatr.Order.Commands
                     //TODO get catalog from Agreement
                     // var agreement = agreements.SingleOrDefault(a => a.Delivery.Producer.Id == product.Producer.Id);
                     // var catalog = agreement.Catalog;
-                    var catalog = product.Prices.Select(p => p.Catalog).SingleOrDefault(p => !p.RemovedOn.HasValue && p.VisibleToStores && p.Producer.Id == product.Producer.Id);
+                    var catalog = product.CatalogsPrices.Select(p => p.Catalog).SingleOrDefault(p => !p.RemovedOn.HasValue && p.Available && p.Kind == CatalogKind.Stores && p.Producer.Id == product.Producer.Id);
+                    if (catalog == null)
+                        throw SheaftException.Validation();
+                    
                     cartProducts.Add(new Tuple<Domain.Product, Guid, int>(product, catalog.Id, request.Products.Where(p => p.Id == product.Id).Sum(c => c.Quantity)));
                 }
                 
@@ -104,16 +111,6 @@ namespace Sheaft.Mediatr.Order.Commands
                     
                     cartDeliveries.Add(new Tuple<Domain.DeliveryMode, DateTimeOffset, string>(delivery,
                         cartDelivery.ExpectedDeliveryDate, cartDelivery.Comment));
-                    
-                    invalidProductIds = cartProducts.Where(p =>
-                            p.Item1.Producer.Id == delivery.Producer.Id && p.Item1.Closings.Any(c =>
-                                cartDelivery.ExpectedDeliveryDate >= c.ClosedFrom &&
-                                cartDelivery.ExpectedDeliveryDate <= c.ClosedTo))
-                        .Select(p => p.Item1.Id.ToString("N"));
-                    
-                    if(invalidProductIds.Any())
-                        return Failure<IEnumerable<Guid>>(MessageKind.Order_CannotCreate_Some_Products_Closed,
-                            string.Join(";", invalidProductIds));
                 }
 
                 if (!cartDeliveries.Any())

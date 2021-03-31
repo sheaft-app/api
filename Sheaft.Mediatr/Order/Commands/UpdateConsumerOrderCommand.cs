@@ -65,7 +65,7 @@ namespace Sheaft.Mediatr.Order.Commands
                 .Where(p => 
                     p.RemovedOn.HasValue 
                     || !p.Available 
-                    || !p.VisibleToConsumers 
+                    || p.CatalogsPrices.Any(cp => cp.Catalog.Kind == CatalogKind.Consumers && cp.Catalog.IsDefault && !cp.Catalog.Available)
                     || p.Producer.RemovedOn.HasValue 
                     || !p.Producer.CanDirectSell)
                 .Select(p => p.Id.ToString("N"));
@@ -77,7 +77,10 @@ namespace Sheaft.Mediatr.Order.Commands
             var cartProducts = new List<Tuple<Domain.Product, Guid, int>>();
             foreach (var product in products)
             {
-                var catalog = product.Prices.Select(p => p.Catalog).SingleOrDefault(p => !p.RemovedOn.HasValue && p.VisibleToConsumers);
+                var catalog = product.CatalogsPrices.Select(p => p.Catalog).SingleOrDefault(p => !p.RemovedOn.HasValue && p.Kind == CatalogKind.Consumers && p.IsDefault && p.Available);
+                if(catalog == null)
+                    throw SheaftException.Validation();
+
                 cartProducts.Add(new Tuple<Domain.Product, Guid, int>(product, catalog.Id, request.Products.Where(p => p.Id == product.Id).Sum(c => c.Quantity)));
             }
 
@@ -101,16 +104,6 @@ namespace Sheaft.Mediatr.Order.Commands
                     
                 if(cartProducts.Any(p => p.Item1.Producer.Id == delivery.Producer.Id && p.Item1.Producer.Closings.Any(c => cartDelivery.ExpectedDeliveryDate >= c.ClosedFrom && cartDelivery.ExpectedDeliveryDate <= c.ClosedTo)))
                     return Failure(MessageKind.Order_CannotUpdate_Producer_Closed, delivery.Producer.Name);
-
-                invalidProductIds = cartProducts.Where(p =>
-                        p.Item1.Producer.Id == delivery.Producer.Id && p.Item1.Closings.Any(c =>
-                            cartDelivery.ExpectedDeliveryDate >= c.ClosedFrom &&
-                            cartDelivery.ExpectedDeliveryDate <= c.ClosedTo))
-                    .Select(p => p.Item1.Id.ToString("N"));
-                    
-                if(invalidProductIds.Any())
-                    return Failure(MessageKind.Order_CannotUpdate_Some_Products_Closed,
-                        string.Join(";", invalidProductIds));
                 
                 cartDeliveries.Add(new Tuple<Domain.DeliveryMode, DateTimeOffset, string>(delivery,
                     cartDelivery.ExpectedDeliveryDate, cartDelivery.Comment));

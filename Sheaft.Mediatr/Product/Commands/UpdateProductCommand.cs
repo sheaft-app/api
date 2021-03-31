@@ -40,12 +40,10 @@ namespace Sheaft.Mediatr.Product.Commands
         public decimal? Weight { get; set; }
         public string Description { get; set; }
         public bool? Available { get; set; }
-        public bool? VisibleToConsumers { get; set; }
-        public bool? VisibleToStores { get; set; }
         public Guid? ReturnableId { get; set; }
         public IEnumerable<Guid> Tags { get; set; }
         public IEnumerable<UpdateOrCreateClosingDto> Closings { get; set; }
-        public IEnumerable<CatalogPriceDto> Prices { get; set; }
+        public IEnumerable<UpdateOrCreateCatalogPriceDto> Catalogs { get; set; }
     }
 
     public class UpdateProductCommandHandler : CommandsHandler,
@@ -96,8 +94,6 @@ namespace Sheaft.Mediatr.Product.Commands
                 entity.SetReference(reference);
                 entity.SetWeight(request.Weight);
                 entity.SetAvailable(request.Available);
-                entity.SetStoreVisibility(request.VisibleToStores);
-                entity.SetConsumerVisibility(request.VisibleToConsumers);
                 entity.SetConditioning(request.Conditioning, request.QuantityPerUnit, request.Unit);
 
                 if (request.ReturnableId.HasValue)
@@ -113,20 +109,20 @@ namespace Sheaft.Mediatr.Product.Commands
                 var tags = await _context.FindAsync<Domain.Tag>(t => request.Tags.Contains(t.Id), token);
                 entity.SetTags(tags);
 
-                var productCatalogs = entity.Prices.Select(p => p.Catalog);
+                var productCatalogs = entity.CatalogsPrices.Select(p => p.Catalog);
                 foreach (var catalog in productCatalogs)
                 {
-                    if(!request.Prices.Any(p => p.Id == catalog.Id))
+                    if(!request.Catalogs.Any(p => p.Id == catalog.Id))
                         catalog.RemoveProduct(entity.Id);
                 }
                 
-                foreach (var price in request.Prices)
+                foreach (var catalogPrice in request.Catalogs)
                 {
-                    var catalog = await _context.GetByIdAsync<Catalog>(price.Id, token);
+                    var catalog = await _context.GetByIdAsync<Domain.Catalog>(catalogPrice.Id, token);
                     if(!catalog.Products.Any(p => p.Product.Id == entity.Id))
-                        catalog.AddProduct(entity, price.WholeSalePricePerUnit);
+                        catalog.AddProduct(entity, catalogPrice.WholeSalePricePerUnit);
                     else
-                        catalog.SetProductWholeSalePricePerUnit(entity.Id, price.WholeSalePricePerUnit);
+                        catalog.SetProductWholeSalePricePerUnit(entity.Id, catalogPrice.WholeSalePricePerUnit);
                 }
 
                 var result =

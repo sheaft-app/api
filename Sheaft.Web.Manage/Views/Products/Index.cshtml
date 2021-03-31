@@ -36,8 +36,6 @@
                 <th scope="col">WholeSalePrice</th>
                 <th scope="col">Vat</th>
                 <th scope="col">Available</th>
-                <th scope="col">Visible consumers</th>
-                <th scope="col">Visible stores</th>
                 @if (!imperonatingId.HasValue)
                 {
                     <th scope="col">Producer</th>
@@ -60,8 +58,6 @@
                     <td>@entity.WholeSalePricePerUnit</td>
                     <td>@(entity.Vat)%</td>
                     <td>@entity.Available</td>
-                    <td>@entity.VisibleToConsumers</td>
-                    <td>@entity.VisibleToStores</td>
                     @if (!imperonatingId.HasValue)
                     {
                         <td>

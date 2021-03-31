@@ -94,14 +94,6 @@
             @Html.CheckBoxFor(m => m.Available, new { @class = "form-check-input" })
             @Html.LabelFor(m => m.Available, new { @class = "form-check-label" })
         </div>
-        <div class="form-check">
-            @Html.CheckBoxFor(m => m.VisibleToStores, new { @class = "form-check-input" })
-            @Html.LabelFor(m => m.VisibleToStores, new { @class = "form-check-label" })
-        </div>
-        <div class="form-check">
-            @Html.CheckBoxFor(m => m.VisibleToConsumers, new { @class = "form-check-input" })
-            @Html.LabelFor(m => m.VisibleToConsumers, new { @class = "form-check-label" })
-        </div>
 
         <br />
         <a asp-controller="Products" asp-action="Index" class="btn btn-light">

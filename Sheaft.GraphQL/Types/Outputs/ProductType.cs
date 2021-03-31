@@ -30,12 +30,6 @@ namespace Sheaft.GraphQL.Types.Outputs
             descriptor.Field(c => c.ImageSmall);
             descriptor.Field(c => c.IsReturnable);
             
-            descriptor.Field(c => c.VisibleToStores)
-                .Authorize(Policies.OWNER);
-            
-            descriptor.Field(c => c.VisibleToConsumers)
-                .Authorize(Policies.OWNER);
-            
             descriptor.Field("currentUserHasRatedProduct")
                 .Type<NonNullType<BooleanType>>()
                 .Resolver(async c =>
@@ -75,7 +69,7 @@ namespace Sheaft.GraphQL.Types.Outputs
             descriptor.Field(c => c.Pictures)
                 .Type<ListType<PictureType>>();
 
-            descriptor.Field(c => c.Prices)
+            descriptor.Field(c => c.Catalogs)
                 .Type<ListType<CatalogPriceType>>();
         }
     }
