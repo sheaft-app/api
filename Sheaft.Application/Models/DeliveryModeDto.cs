@@ -21,5 +21,6 @@ namespace Sheaft.Application.Models
         public AddressDto Address { get; set; }
         public UserDto Producer { get; set; }
         public IEnumerable<TimeSlotDto> OpeningHours { get; set; }
+        public IEnumerable<ClosingDto> Closings { get; set; }
     }
 }

@@ -35,7 +35,7 @@ namespace Sheaft.GraphQL.Types.Inputs
                 .Type<NonNullType<ListType<IdType>>>();
 
             descriptor.Field(c => c.Closings)
-                .Type<ListType<UpdateClosingInputType>>();
+                .Type<ListType<UpdateOrCreateClosingInputType>>();
         }
     }
 }
