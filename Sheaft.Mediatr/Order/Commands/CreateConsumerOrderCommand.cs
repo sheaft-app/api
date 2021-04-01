@@ -97,15 +97,6 @@ namespace Sheaft.Mediatr.Order.Commands
                     
                 if(cartProducts.Any(p => p.Key.Producer.Id == delivery.Producer.Id && p.Key.Producer.Closings.Any(c => cartDelivery.ExpectedDeliveryDate >= c.ClosedFrom && cartDelivery.ExpectedDeliveryDate <= c.ClosedTo)))
                     return Failure<Guid>(MessageKind.Order_CannotCreate_Producer_Closed, delivery.Producer.Name);
-
-                var year = DateTime.UtcNow.Year;
-                invalidProductIds = cartProducts.Where(p =>
-                        p.Key.Producer.Id == delivery.Producer.Id)
-                    .Select(p => p.Key.Id.ToString("N"));
-                    
-                if(invalidProductIds.Any())
-                    return Failure<Guid>(MessageKind.Order_CannotCreate_Some_Products_Closed,
-                        string.Join(";", invalidProductIds));
                 
                 cartDeliveries.Add(new Tuple<Domain.DeliveryMode, DateTimeOffset, string>(delivery,
                     cartDelivery.ExpectedDeliveryDate, cartDelivery.Comment));
