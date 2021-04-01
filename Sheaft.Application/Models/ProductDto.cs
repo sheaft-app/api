@@ -30,7 +30,6 @@ namespace Sheaft.Application.Models
         public UserDto Producer { get; set; }
         public IEnumerable<TagDto> Tags { get; set; }
         public IEnumerable<RatingDto> Ratings { get; set; }
-        public IEnumerable<ClosingDto> Closings { get; set; }
         public IEnumerable<PictureDto> Pictures { get; set; }
         public IEnumerable<CatalogPriceDto> Catalogs { get; set; }
     }

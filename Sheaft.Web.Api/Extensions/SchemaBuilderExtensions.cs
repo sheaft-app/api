@@ -144,7 +144,7 @@ namespace Sheaft.Web.Api.Extensions
             services.AddType<UpdateConsumerLegalsInputType>();
             services.AddType<CreateUboInputType>();
             services.AddType<UpdateUboInputType>();
-            services.AddType<UpdateClosingInputType>();
+            services.AddType<UpdateOrCreateClosingInputType>();
             services.AddType<UpdateOrCreateResourceIdClosingsInputType>();
             services.AddType<PictureSourceInputType>();
             services.AddType<AddPictureToInputType>();

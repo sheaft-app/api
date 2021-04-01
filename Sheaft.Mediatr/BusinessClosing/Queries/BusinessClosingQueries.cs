@@ -39,7 +39,7 @@ namespace Sheaft.Mediatr.BusinessClosing.Queries
             }
             
             return _context.Set<Domain.BusinessClosing>()
-                .Get(c => c.Id == id)
+                .Where(c => c.Id == id)
                 .ProjectTo<ClosingDto>(_configurationProvider);
         }
 
@@ -54,7 +54,6 @@ namespace Sheaft.Mediatr.BusinessClosing.Queries
             }
             
             return _context.Set<Domain.BusinessClosing>()
-                .Get()
                 .ProjectTo<ClosingDto>(_configurationProvider);
         }
     }

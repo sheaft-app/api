@@ -29,7 +29,7 @@ namespace Sheaft.GraphQL.Types.Inputs
                 .Type<NonNullType<ListType<TimeSlotGroupInputType>>>();
 
             descriptor.Field(c => c.Closings)
-                .Type<ListType<UpdateClosingInputType>>();
+                .Type<ListType<UpdateOrCreateClosingInputType>>();
         }
     }
 }

@@ -18,7 +18,7 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
 
             entity.HasIndex(c => c.Id).IsUnique();
             entity.HasIndex("BusinessUid");
-            entity.HasIndex("Uid", "Id", "BusinessUid", "RemovedOn");
+            entity.HasIndex("Uid", "Id", "BusinessUid");
 
             entity.ToTable("BusinessClosings");
         }

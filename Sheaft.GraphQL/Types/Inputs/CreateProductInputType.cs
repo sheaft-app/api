@@ -31,9 +31,6 @@ namespace Sheaft.GraphQL.Types.Inputs
 
             descriptor.Field(c => c.Tags)
                 .Type<NonNullType<ListType<IdType>>>();
-
-            descriptor.Field(c => c.Closings)
-                .Type<ListType<UpdateOrCreateClosingInputType>>();
             
             descriptor.Field(c => c.Catalogs)
                 .Type<NonNullType<ListType<CatalogPriceInputType>>>();

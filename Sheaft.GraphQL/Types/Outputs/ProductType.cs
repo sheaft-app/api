@@ -52,9 +52,6 @@ namespace Sheaft.GraphQL.Types.Outputs
 
             descriptor.Field(c => c.Producer)
                 .Type<NonNullType<UserType>>();
-
-            descriptor.Field(c => c.Closings)
-                .Type<ListType<ClosingType>>();
                 
             descriptor.Field(c => c.Tags)
                 .Type<ListType<TagType>>()

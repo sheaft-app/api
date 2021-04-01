@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using MediatR;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using Sheaft.Application.Interfaces;
 using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Application.Interfaces.Mediatr;
 using Sheaft.Application.Models;
@@ -14,9 +13,7 @@ using Sheaft.Core;
 using Sheaft.Core.Enums;
 using Sheaft.Domain;
 using Sheaft.Domain.Enum;
-using Sheaft.Mediatr.DeliveryClosing.Commands;
 using Sheaft.Mediatr.Producer.Commands;
-using Sheaft.Mediatr.ProductClosing.Commands;
 
 namespace Sheaft.Mediatr.Product.Commands
 {
@@ -41,7 +38,6 @@ namespace Sheaft.Mediatr.Product.Commands
         public bool? Available { get; set; }
         public Guid? ReturnableId { get; set; }
         public IEnumerable<Guid> Tags { get; set; }
-        public IEnumerable<UpdateOrCreateClosingDto> Closings { get; set; }
         public bool SkipUpdateProducerTags { get; set; } = false;
         public IEnumerable<UpdateOrCreateCatalogPriceDto> Catalogs { get; set; }
     }
@@ -110,13 +106,6 @@ namespace Sheaft.Mediatr.Product.Commands
 
                 await _context.AddAsync(entity, token);
                 await _context.SaveChangesAsync(token);
-                
-                var result =
-                    await _mediatr.Process(
-                        new UpdateOrCreateProductClosingsCommand(request.RequestUser)
-                            {ProductId = entity.Id, Closings = request.Closings}, token);
-                if (!result.Succeeded)
-                    return Failure<Guid>(result.Exception);
                 
                 var imageResult = await _mediatr.Process(
                     new UpdateProductPreviewCommand(request.RequestUser)

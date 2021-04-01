@@ -18,7 +18,7 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
 
             entity.HasIndex(c => c.Id).IsUnique();
             entity.HasIndex("DeliveryModeUid");
-            entity.HasIndex("Uid", "Id", "DeliveryModeUid", "RemovedOn");
+            entity.HasIndex("Uid", "Id", "DeliveryModeUid");
 
             entity.ToTable("DeliveryClosings");
         }

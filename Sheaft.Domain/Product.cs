@@ -16,7 +16,6 @@ namespace Sheaft.Domain
 
         private List<ProductTag> _tags;
         private List<Rating> _ratings;
-        private List<ProductClosing> _closings;
         private List<ProductPicture> _pictures;
         private List<CatalogProduct> _catalogsPrices;
 
@@ -35,7 +34,6 @@ namespace Sheaft.Domain
 
             _tags = new List<ProductTag>();
             _ratings = new List<Rating>();
-            _closings = new List<ProductClosing>();
             _catalogsPrices = new List<CatalogProduct>();
             
             DomainEvents = new List<DomainEvent>();
@@ -64,7 +62,6 @@ namespace Sheaft.Domain
         public virtual Producer Producer { get; private set; }
         public virtual IReadOnlyCollection<ProductTag> Tags => _tags?.AsReadOnly();
         public virtual IReadOnlyCollection<Rating> Ratings => _ratings?.AsReadOnly();
-        public virtual IReadOnlyCollection<ProductClosing> Closings => _closings?.AsReadOnly(); 
         public virtual IReadOnlyCollection<ProductPicture> Pictures => _pictures?.AsReadOnly();
         public virtual IReadOnlyCollection<CatalogProduct> CatalogsPrices => _catalogsPrices?.AsReadOnly();
 
@@ -158,34 +155,6 @@ namespace Sheaft.Domain
 
             _ratings.Add(new Rating(Guid.NewGuid(), value, user, comment));
             RefreshRatings();
-        }
-
-        public ProductClosing AddClosing(DateTimeOffset from, DateTimeOffset to, string reason = null)
-        {
-            if (Closings == null)
-                _closings = new List<ProductClosing>();
-
-            var closing = new ProductClosing(Guid.NewGuid(), from, to, reason);
-            _closings.Add(closing);
-
-            return closing;
-        }
-        
-        public void RemoveClosings(IEnumerable<Guid> ids)
-        {
-            foreach (var id in ids)
-            {
-                RemoveClosing(id);
-            }
-        }
-
-        public void RemoveClosing(Guid id)
-        {
-            var closing = _closings.SingleOrDefault(r => r.Id == id);
-            if(closing == null)
-                throw SheaftException.NotFound();
-            
-            _closings.Remove(closing);
         }
 
         public void SetReturnable(Returnable returnable)

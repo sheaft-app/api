@@ -8,9 +8,4 @@ namespace Sheaft.Application.Models
         public Guid Id { get; set; }
         public List<UpdateOrCreateClosingDto> Closings { get; set; }
     }
-    public class UpdateOrCreateResourceIdClosingDto
-    {
-        public Guid Id { get; set; }
-        public UpdateOrCreateClosingDto Closing { get; set; }
-    }
 }

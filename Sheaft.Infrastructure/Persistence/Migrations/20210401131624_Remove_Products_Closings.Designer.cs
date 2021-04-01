@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Sheaft.Domain.Enum;
 using Sheaft.Infrastructure.Persistence;
@@ -10,9 +11,10 @@ using Sheaft.Infrastructure.Persistence;
 namespace Sheaft.Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20210401131624_Remove_Products_Closings")]
+    partial class Remove_Products_Closings
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -111,94 +113,6 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                     b.HasIndex("Uid", "Id", "BusinessUid");
 
                     b.ToTable("BusinessClosings");
-                });
-
-            modelBuilder.Entity("Sheaft.Domain.Catalog", b =>
-                {
-                    b.Property<long>("Uid")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<bool>("Available")
-                        .HasColumnType("bit");
-
-                    b.Property<DateTimeOffset>("CreatedOn")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<Guid>("Id")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<bool>("IsDefault")
-                        .HasColumnType("bit");
-
-                    b.Property<int>("Kind")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<long>("ProducerUid")
-                        .HasColumnType("bigint");
-
-                    b.Property<DateTimeOffset?>("RemovedOn")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<DateTimeOffset?>("UpdatedOn")
-                        .IsConcurrencyToken()
-                        .HasColumnType("datetimeoffset");
-
-                    b.HasKey("Uid");
-
-                    b.HasIndex("Id")
-                        .IsUnique();
-
-                    b.HasIndex("ProducerUid");
-
-                    b.HasIndex("Uid", "Id", "ProducerUid", "RemovedOn");
-
-                    b.ToTable("Catalogs");
-                });
-
-            modelBuilder.Entity("Sheaft.Domain.CatalogProduct", b =>
-                {
-                    b.Property<long>("CatalogUid")
-                        .HasColumnType("bigint");
-
-                    b.Property<long>("ProductUid")
-                        .HasColumnType("bigint");
-
-                    b.Property<DateTimeOffset>("CreatedOn")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<decimal>("OnSalePrice")
-                        .HasColumnType("decimal(10,2)");
-
-                    b.Property<decimal>("OnSalePricePerUnit")
-                        .HasColumnType("decimal(10,2)");
-
-                    b.Property<DateTimeOffset?>("UpdatedOn")
-                        .IsConcurrencyToken()
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<decimal>("VatPrice")
-                        .HasColumnType("decimal(10,2)");
-
-                    b.Property<decimal>("VatPricePerUnit")
-                        .HasColumnType("decimal(10,2)");
-
-                    b.Property<decimal>("WholeSalePrice")
-                        .HasColumnType("decimal(10,2)");
-
-                    b.Property<decimal>("WholeSalePricePerUnit")
-                        .HasColumnType("decimal(10,2)");
-
-                    b.HasKey("CatalogUid", "ProductUid");
-
-                    b.HasIndex("ProductUid");
-
-                    b.ToTable("CatalogProducts");
                 });
 
             modelBuilder.Entity("Sheaft.Domain.Country", b =>
@@ -1198,6 +1112,12 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<decimal>("OnSalePrice")
+                        .HasColumnType("decimal(10,2)");
+
+                    b.Property<decimal>("OnSalePricePerUnit")
+                        .HasColumnType("decimal(10,2)");
+
                     b.Property<string>("Picture")
                         .HasColumnType("nvarchar(max)");
 
@@ -1235,7 +1155,25 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                     b.Property<decimal>("Vat")
                         .HasColumnType("decimal(10,2)");
 
+                    b.Property<decimal>("VatPrice")
+                        .HasColumnType("decimal(10,2)");
+
+                    b.Property<decimal>("VatPricePerUnit")
+                        .HasColumnType("decimal(10,2)");
+
+                    b.Property<bool>("VisibleToConsumers")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("VisibleToStores")
+                        .HasColumnType("bit");
+
                     b.Property<decimal?>("Weight")
+                        .HasColumnType("decimal(10,2)");
+
+                    b.Property<decimal>("WholeSalePrice")
+                        .HasColumnType("decimal(10,2)");
+
+                    b.Property<decimal>("WholeSalePricePerUnit")
                         .HasColumnType("decimal(10,2)");
 
                     b.HasKey("Uid");
@@ -2689,30 +2627,6 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                     b.HasOne("Sheaft.Domain.Business", null)
                         .WithMany("Closings")
                         .HasForeignKey("BusinessUid")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("Sheaft.Domain.Catalog", b =>
-                {
-                    b.HasOne("Sheaft.Domain.Producer", "Producer")
-                        .WithMany()
-                        .HasForeignKey("ProducerUid")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("Sheaft.Domain.CatalogProduct", b =>
-                {
-                    b.HasOne("Sheaft.Domain.Catalog", "Catalog")
-                        .WithMany("Products")
-                        .HasForeignKey("CatalogUid")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
-                    b.HasOne("Sheaft.Domain.Product", null)
-                        .WithMany("CatalogsPrices")
-                        .HasForeignKey("ProductUid")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
