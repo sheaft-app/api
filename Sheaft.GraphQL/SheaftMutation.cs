@@ -5,9 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using AutoMapper;
 using HotChocolate;
-using HotChocolate.Execution;
 using Microsoft.AspNetCore.Http;
-using Sheaft.Application.Interfaces;
 using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Application.Interfaces.Mediatr;
 using Sheaft.Application.Interfaces.Queries;
@@ -27,7 +25,6 @@ using Sheaft.Mediatr.Order.Commands;
 using Sheaft.Mediatr.PickingOrders.Commands;
 using Sheaft.Mediatr.Producer.Commands;
 using Sheaft.Mediatr.Product.Commands;
-using Sheaft.Mediatr.ProductClosing.Commands;
 using Sheaft.Mediatr.ProfileInformation.Commands;
 using Sheaft.Mediatr.PurchaseOrder.Commands;
 using Sheaft.Mediatr.QuickOrder.Commands;
@@ -35,12 +32,6 @@ using Sheaft.Mediatr.Returnable.Commands;
 using Sheaft.Mediatr.Store.Commands;
 using Sheaft.Mediatr.Transactions.Commands;
 using Sheaft.Mediatr.User.Commands;
-using BusinessLegalDto = Sheaft.Application.Models.BusinessLegalDto;
-using ConsumerDto = Sheaft.Application.Models.ConsumerDto;
-using ConsumerLegalDto = Sheaft.Application.Models.ConsumerLegalDto;
-using CreateBusinessLegalDto = Sheaft.Application.Models.CreateBusinessLegalDto;
-using OrderDto = Sheaft.Application.Models.OrderDto;
-using QuickOrderDto = Sheaft.Application.Models.QuickOrderDto;
 
 namespace Sheaft.GraphQL
 {
@@ -552,7 +543,7 @@ namespace Sheaft.GraphQL
         public async Task<IQueryable<DeliveryModeDto>> SetDeliveryModesAvailabilityAsync(
             SetResourceIdsAvailabilityDto input, [Service] IDeliveryQueries deliveryModeQueries)
         {
-            SetLogTransaction(nameof(SetProductsAvailabilityAsync));
+            SetLogTransaction(nameof(SetDeliveryModesAvailabilityAsync));
             await ExecuteCommandAsync(_mapper.Map(input, new SetDeliveryModesAvailabilityCommand(CurrentUser)), Token);
             return deliveryModeQueries.GetDeliveries(CurrentUser).Where(j => input.Ids.Contains(j.Id));
         }
@@ -619,12 +610,6 @@ namespace Sheaft.GraphQL
             var result = await ExecuteCommandAsync<UpdateOrCreateDeliveryClosingCommand, Guid>(_mapper.Map(input, new UpdateOrCreateDeliveryClosingCommand(CurrentUser)), Token);
             return closingQueries.GetClosing(result, CurrentUser);
         }
-        public async Task<IQueryable<ClosingDto>> UpdateOrCreateProductClosingAsync(UpdateOrCreateClosingDto input, [Service] IProductClosingQueries closingQueries)
-        {
-            SetLogTransaction(nameof(UpdateOrCreateProductClosingAsync));
-            var result = await ExecuteCommandAsync<UpdateOrCreateProductClosingCommand, Guid>(_mapper.Map(input, new UpdateOrCreateProductClosingCommand(CurrentUser)), Token);
-            return closingQueries.GetClosing(result, CurrentUser);
-        }
         public async Task<bool> DeleteBusinessClosingsAsync(ResourceIdsDto input)
         {
             SetLogTransaction(nameof(DeleteBusinessClosingsAsync));
@@ -634,11 +619,6 @@ namespace Sheaft.GraphQL
         {
             SetLogTransaction(nameof(DeleteDeliveryClosingsAsync));
             return await ExecuteCommandAsync(_mapper.Map(input, new DeleteDeliveryClosingsCommand(CurrentUser)), Token);
-        }
-        public async Task<bool> DeleteProductClosingsAsync(ResourceIdsDto input)
-        {
-            SetLogTransaction(nameof(DeleteProductClosingsAsync));
-            return await ExecuteCommandAsync(_mapper.Map(input, new DeleteProductClosingsCommand(CurrentUser)), Token);
         }
 
         private async Task<T> ExecuteCommandAsync<TU, T>(TU input, CancellationToken token) where TU : ICommand<T>

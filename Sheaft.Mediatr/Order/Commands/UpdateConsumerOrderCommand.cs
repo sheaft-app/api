@@ -102,9 +102,7 @@ namespace Sheaft.Mediatr.Order.Commands
                     return Failure(MessageKind.Order_CannotUpdate_Producer_Closed, delivery.Producer.Name);
 
                 invalidProductIds = cartProducts.Where(p =>
-                        p.Key.Producer.Id == delivery.Producer.Id && p.Key.Closings.Any(c =>
-                            cartDelivery.ExpectedDeliveryDate >= c.ClosedFrom &&
-                            cartDelivery.ExpectedDeliveryDate <= c.ClosedTo))
+                        p.Key.Producer.Id == delivery.Producer.Id)
                     .Select(p => p.Key.Id.ToString("N"));
                     
                 if(invalidProductIds.Any())

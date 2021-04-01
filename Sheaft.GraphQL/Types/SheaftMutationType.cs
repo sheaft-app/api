@@ -1,7 +1,6 @@
 ﻿using HotChocolate.Types;
 using HotChocolate.Types.Relay;
 using Sheaft.Application.Security;
-using Sheaft.Domain;
 using Sheaft.GraphQL.Filters;
 using Sheaft.GraphQL.Sorts;
 using Sheaft.GraphQL.Types.Outputs;
@@ -505,13 +504,6 @@ namespace Sheaft.GraphQL.Types
                 .UseSingleOrDefault()
                 .UseSelection();
             
-            descriptor.Field(c => c.UpdateOrCreateProductClosingAsync(default, default))
-                .Name("updateOrCreateProductClosing")
-                .Authorize(Policies.OWNER)
-                .Type<NonNullType<ClosingType>>()
-                .UseSingleOrDefault()
-                .UseSelection();
-            
             descriptor.Field(c => c.DeleteBusinessClosingsAsync(default))
                 .Name("deleteBusinessClosings")
                 .Authorize(Policies.OWNER)
@@ -519,11 +511,6 @@ namespace Sheaft.GraphQL.Types
             
             descriptor.Field(c => c.DeleteDeliveryClosingsAsync(default))
                 .Name("deleteDeliveryClosings")
-                .Authorize(Policies.OWNER)
-                .Type<BooleanType>();
-            
-            descriptor.Field(c => c.DeleteProductClosingsAsync(default))
-                .Name("deleteProductClosings")
                 .Authorize(Policies.OWNER)
                 .Type<BooleanType>();
         }

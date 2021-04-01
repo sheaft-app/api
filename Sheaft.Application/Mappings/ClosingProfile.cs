@@ -14,9 +14,6 @@ namespace Sheaft.Application.Mappings
             CreateMap<DeliveryClosing, ClosingDto>()
                 .ForMember(c => c.From, opt => opt.MapFrom(e => e.ClosedFrom))
                 .ForMember(c => c.To, opt => opt.MapFrom(e => e.ClosedTo));
-            CreateMap<ProductClosing, ClosingDto>()
-                .ForMember(c => c.From, opt => opt.MapFrom(e => e.ClosedFrom))
-                .ForMember(c => c.To, opt => opt.MapFrom(e => e.ClosedTo));
         }
     }
 }

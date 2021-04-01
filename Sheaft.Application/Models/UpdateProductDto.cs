@@ -23,6 +23,5 @@ namespace Sheaft.Application.Models
         public bool? VisibleToConsumers { get; set; }
         public Guid? ReturnableId { get; set; }
         public IEnumerable<Guid> Tags { get; set; }
-        public IEnumerable<UpdateOrCreateClosingDto> Closings { get; set; }
     }
 }

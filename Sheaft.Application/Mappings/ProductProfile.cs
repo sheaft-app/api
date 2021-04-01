@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using AutoMapper;
 using Sheaft.Application.Extensions;
 using Sheaft.Application.Models;
@@ -13,10 +14,14 @@ namespace Sheaft.Application.Mappings
             CreateMap<Domain.Product, ProductDto>()
                 .ForMember(d => d.Tags, opt => opt.MapFrom(r => r.Tags.Select(t => t.Tag)))
                 .ForMember(d => d.IsReturnable, opt => opt.MapFrom(r => r.Returnable != null))
-                .ForMember(d => d.Picture, opt => opt.MapFrom(r => PictureExtensions.GetPictureUrl(r.Id, r.Picture, PictureSize.LARGE)))
-                .ForMember(d => d.ImageLarge, opt => opt.MapFrom(r => PictureExtensions.GetPictureUrl(r.Id, r.Picture, PictureSize.LARGE)))
-                .ForMember(d => d.ImageMedium, opt => opt.MapFrom(r => PictureExtensions.GetPictureUrl(r.Id, r.Picture, PictureSize.MEDIUM)))
-                .ForMember(d => d.ImageSmall, opt => opt.MapFrom(r => PictureExtensions.GetPictureUrl(r.Id, r.Picture, PictureSize.SMALL)));
+                .ForMember(d => d.Picture,
+                    opt => opt.MapFrom(r => PictureExtensions.GetPictureUrl(r.Id, r.Picture, PictureSize.LARGE)))
+                .ForMember(d => d.ImageLarge,
+                    opt => opt.MapFrom(r => PictureExtensions.GetPictureUrl(r.Id, r.Picture, PictureSize.LARGE)))
+                .ForMember(d => d.ImageMedium,
+                    opt => opt.MapFrom(r => PictureExtensions.GetPictureUrl(r.Id, r.Picture, PictureSize.MEDIUM)))
+                .ForMember(d => d.ImageSmall,
+                    opt => opt.MapFrom(r => PictureExtensions.GetPictureUrl(r.Id, r.Picture, PictureSize.SMALL)));
         }
     }
 }

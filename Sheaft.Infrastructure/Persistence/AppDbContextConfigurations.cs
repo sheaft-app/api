@@ -127,7 +127,6 @@ namespace Sheaft.Infrastructure.Persistence
             modelBuilder.ApplyConfiguration(new DonationConfiguration());
             modelBuilder.ApplyConfiguration(new WithholdingConfiguration());
             modelBuilder.ApplyConfiguration(new DeliveryClosingConfiguration());
-            modelBuilder.ApplyConfiguration(new ProductClosingConfiguration());
             modelBuilder.ApplyConfiguration(new BusinessClosingConfiguration());
             modelBuilder.ApplyConfiguration(new ProfileInformationConfiguration());
             modelBuilder.ApplyConfiguration(new ProfilePictureConfiguration());
