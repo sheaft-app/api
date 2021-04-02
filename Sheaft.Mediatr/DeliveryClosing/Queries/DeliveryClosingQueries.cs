@@ -43,17 +43,19 @@ namespace Sheaft.Mediatr.DeliveryClosing.Queries
                 .ProjectTo<ClosingDto>(_configurationProvider);
         }
 
-        public IQueryable<ClosingDto> GetClosings(RequestUser currentUser)
+        public IQueryable<ClosingDto> GetClosings(Guid? deliveryId, RequestUser currentUser)
         {
             if (currentUser.IsInRole(_roleOptions.Owner.Value))
             {
                 return _context.Set<Domain.DeliveryMode>()
-                    .Get(b => b.Producer.Id == currentUser.Id)
+                    .Get(b => b.Producer.Id != currentUser.Id || !deliveryId.HasValue || b.Id == deliveryId.Value)
                     .SelectMany(b => b.Closings)
                     .ProjectTo<ClosingDto>(_configurationProvider);
             }
             
-            return _context.Set<Domain.DeliveryClosing>()
+            return _context.Set<Domain.DeliveryMode>()
+                .Get(b => !deliveryId.HasValue || b.Id == deliveryId.Value)
+                .SelectMany(b => b.Closings)
                 .ProjectTo<ClosingDto>(_configurationProvider);
         }
     }

@@ -8,6 +8,6 @@ namespace Sheaft.Application.Interfaces.Queries
     public interface IDeliveryClosingQueries
     {
         IQueryable<ClosingDto> GetClosing(Guid id, RequestUser currentUser);
-        IQueryable<ClosingDto> GetClosings(RequestUser currentUser);
+        IQueryable<ClosingDto> GetClosings(Guid? deliveryId, RequestUser currentUser);
     }
 }

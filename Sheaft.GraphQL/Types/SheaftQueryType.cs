@@ -498,6 +498,22 @@ namespace Sheaft.GraphQL.Types
                 .Authorize(Policies.PRODUCER)
                 .Argument("input", c => c.Type<NonNullType<SearchTermsInputType>>())
                 .Type<NonNullType<StoresSearchType>>();
+            
+            //CLOSINGS
+            descriptor.Field(c => c.GetBusinessClosings(default))
+                .Name("businessClosings")
+                .Authorize(Policies.OWNER)
+                .Type<ListType<ClosingType>>()
+                .UsePaging<ClosingType>()
+                .UseSelection();
+            
+            descriptor.Field(c => c.GetDeliveryClosings(default, default))
+                .Name("deliveryClosings")
+                .Authorize(Policies.OWNER)
+                .Argument("input", c => c.Type<IdType>())
+                .Type<ListType<ClosingType>>()
+                .UsePaging<ClosingType>()
+                .UseSelection();
         }
     }
 }
