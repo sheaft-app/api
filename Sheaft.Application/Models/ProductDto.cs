@@ -31,6 +31,6 @@ namespace Sheaft.Application.Models
         public IEnumerable<TagDto> Tags { get; set; }
         public IEnumerable<RatingDto> Ratings { get; set; }
         public IEnumerable<PictureDto> Pictures { get; set; }
-        public IEnumerable<CatalogPriceDto> Catalogs { get; set; }
+        public IEnumerable<CatalogPriceDto> CatalogsPrices { get; set; }
     }
 }

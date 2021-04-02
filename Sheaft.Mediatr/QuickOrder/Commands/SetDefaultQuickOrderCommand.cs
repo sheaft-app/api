@@ -17,6 +17,7 @@ namespace Sheaft.Mediatr.QuickOrder.Commands
         [JsonConstructor]
         public SetDefaultQuickOrderCommand(RequestUser requestUser) : base(requestUser)
         {
+            UserId = requestUser.Id;
         }
 
         public Guid UserId { get; set; }

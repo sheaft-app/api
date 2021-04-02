@@ -24,6 +24,7 @@ namespace Sheaft.Mediatr.Order.Commands
         [JsonConstructor]
         public UpdateConsumerOrderCommand(RequestUser requestUser) : base(requestUser)
         {
+            UserId = requestUser.IsAuthenticated ? requestUser.Id : (Guid?) null;
         }
 
         public Guid? UserId { get; set; }

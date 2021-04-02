@@ -22,6 +22,7 @@ namespace Sheaft.Mediatr.Product.Commands
         [JsonConstructor]
         public CreateProductCommand(RequestUser requestUser) : base(requestUser)
         {
+            ProducerId = requestUser.Id;
         }
 
         public Guid ProducerId { get; set; }

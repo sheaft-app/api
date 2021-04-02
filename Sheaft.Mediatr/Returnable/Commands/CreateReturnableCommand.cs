@@ -18,6 +18,7 @@ namespace Sheaft.Mediatr.Returnable.Commands
         [JsonConstructor]
         public CreateReturnableCommand(RequestUser requestUser) : base(requestUser)
         {
+            UserId = requestUser.Id;
         }
 
         public string Name { get; set; }

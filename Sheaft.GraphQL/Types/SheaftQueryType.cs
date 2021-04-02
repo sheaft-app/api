@@ -422,6 +422,7 @@ namespace Sheaft.GraphQL.Types
             //PAYOUTS
             descriptor.Field(c => c.GetPayout(default, default))
                 .Name("payout")
+                .Argument("input", c => c.Type<NonNullType<IdType>>())
                 .Authorize(Policies.PRODUCER)
                 .Type<NonNullType<PayoutType>>()
                 .UseSingleOrDefault()
@@ -440,6 +441,7 @@ namespace Sheaft.GraphQL.Types
             descriptor.Field(c => c.GetDonation(default, default))
                 .Name("donation")
                 .Authorize(Policies.CONSUMER)
+                .Argument("input", c => c.Type<NonNullType<IdType>>())
                 .Type<NonNullType<DonationType>>()
                 .UseSingleOrDefault()
                 .UseSelection();
@@ -457,6 +459,7 @@ namespace Sheaft.GraphQL.Types
             descriptor.Field(c => c.GetWithholding(default, default))
                 .Name("withholding")
                 .Authorize(Policies.PRODUCER)
+                .Argument("input", c => c.Type<NonNullType<IdType>>())
                 .Type<NonNullType<WithholdingType>>()
                 .UseSingleOrDefault()
                 .UseSelection();
@@ -513,6 +516,30 @@ namespace Sheaft.GraphQL.Types
                 .Argument("input", c => c.Type<IdType>())
                 .Type<ListType<ClosingType>>()
                 .UsePaging<ClosingType>()
+                .UseSelection();
+            
+            //CATALOGS
+            descriptor.Field(c => c.GetCatalog(default, default))
+                .Name("catalog")
+                .Authorize(Policies.PRODUCER)
+                .Argument("input", c => c.Type<NonNullType<IdType>>())
+                .Type<NonNullType<CatalogType>>()
+                .UseSingleOrDefault()
+                .UseSelection();
+            
+            descriptor.Field(c => c.GetCatalogProducts(default, default))
+                .Name("catalogProducts")
+                .Authorize(Policies.PRODUCER)
+                .Argument("input", c => c.Type<NonNullType<IdType>>())
+                .Type<ListType<CatalogProductType>>()
+                .UsePaging<CatalogProductType>()
+                .UseSelection();
+            
+            descriptor.Field(c => c.GetCatalogs(default))
+                .Name("catalogs")
+                .Authorize(Policies.PRODUCER)
+                .Type<ListType<CatalogType>>()
+                .UsePaging<CatalogType>()
                 .UseSelection();
         }
     }

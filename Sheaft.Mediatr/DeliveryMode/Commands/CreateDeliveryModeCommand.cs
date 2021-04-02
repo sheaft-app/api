@@ -23,6 +23,7 @@ namespace Sheaft.Mediatr.DeliveryMode.Commands
         [JsonConstructor]
         public CreateDeliveryModeCommand(RequestUser requestUser) : base(requestUser)
         {
+            ProducerId = requestUser.Id;
         }
 
         public Guid ProducerId { get; set; }

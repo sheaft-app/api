@@ -12,6 +12,9 @@ namespace Sheaft.Application.Mappings
                 .ForMember(c => c.ProductsCount, opt => opt.MapFrom(e => e.Products.Count));
 
             CreateMap<CatalogProduct, CatalogProductDto>()
+                .ForMember(c => c.Id, opt => opt.MapFrom(e => e.Product.Id))
+                .ForMember(c => c.Name, opt => opt.MapFrom(e => e.Product.Name))
+                .ForMember(c => c.Reference, opt => opt.MapFrom(e => e.Product.Reference))
                 .ForMember(c => c.AddedTo, opt => opt.MapFrom(e => e.CreatedOn));
 
             CreateMap<CatalogProduct, CatalogPriceDto>()

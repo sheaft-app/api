@@ -1,5 +1,6 @@
 ﻿using HotChocolate.Types;
 using Sheaft.Application.Models;
+using Sheaft.GraphQL.Types.Outputs;
 
 namespace Sheaft.GraphQL.Types.Inputs
 {
@@ -33,7 +34,7 @@ namespace Sheaft.GraphQL.Types.Inputs
                 .Type<NonNullType<ListType<IdType>>>();
             
             descriptor.Field(c => c.Catalogs)
-                .Type<NonNullType<ListType<CatalogPriceInputType>>>();
+                .Type<NonNullType<ListType<UpdateOrCreateCatalogPriceInputType>>>();
         }
     }
 }

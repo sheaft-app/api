@@ -69,6 +69,8 @@ namespace Sheaft.Web.Api.Extensions
             services.AddType<OrderProductType>();
             services.AddType<OrderDeliveryType>();
             services.AddType<BankAccountType>();
+            services.AddType<CatalogType>();
+            services.AddType<CatalogProductType>();
             services.AddType<CatalogPriceType>();
 
             services.AddType<AddressKindEnumType>();
@@ -96,6 +98,7 @@ namespace Sheaft.Web.Api.Extensions
             services.AddType<TransactionKindEnumType>();
             services.AddType<TransactionStatusEnumType>();
             services.AddType<LegalValidationEnumType>();
+            services.AddType<CatalogKindEnumType>();
 
             services.AddType<CreateOrderInputType>();
             services.AddType<UpdateOrderInputType>();
@@ -151,7 +154,14 @@ namespace Sheaft.Web.Api.Extensions
             services.AddType<AddPictureToInputType>();
             services.AddType<ExportPurchaseOrdersInputType>();
             services.AddType<ExportTransactionsInputType>();
-            services.AddType<CatalogPriceInputType>();
+            services.AddType<CreateCatalogInputType>();
+            services.AddType<UpdateCatalogInputType>();
+            services.AddType<CloneCatalogInputType>();
+            services.AddType<AddProductsToCatalogInputType>();
+            services.AddType<RemoveProductsFromCatalogInputType>();
+            services.AddType<UpdateAllCatalogPricesInputType>();
+            services.AddType<UpdateCatalogPricesInputType>();
+            services.AddType<UpdateOrCreateCatalogPriceInputType>();
 
             return services;
         }

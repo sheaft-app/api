@@ -20,6 +20,7 @@ namespace Sheaft.Mediatr.PurchaseOrder.Commands
         [JsonConstructor]
         public QueueExportPurchaseOrdersCommand(RequestUser requestUser) : base(requestUser)
         {
+            UserId = requestUser.Id;
         }
 
         public Guid UserId { get; set; }

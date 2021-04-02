@@ -28,6 +28,7 @@ namespace Sheaft.Mediatr.Store.Commands
         [JsonConstructor]
         public RegisterStoreCommand(RequestUser requestUser) : base(requestUser)
         {
+            StoreId = requestUser.Id;
         }
         
         public Guid StoreId { get; set; }

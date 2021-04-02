@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 using AutoMapper;
 using HotChocolate;
 using Microsoft.AspNetCore.Http;
+using Newtonsoft.Json;
 using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Application.Interfaces.Queries;
 using Sheaft.Application.Models;
@@ -36,408 +38,426 @@ namespace Sheaft.GraphQL
 
         public async Task<string> GetFreshdeskTokenAsync([Service] IUserQueries userQueries)
         {
-            SetLogTransaction(nameof(GetFreshdeskTokenAsync));
+            SetLogTransaction();
             return await userQueries.GetFreshdeskTokenAsync(CurrentUser, Token);
         }
 
         public async Task<RankInformationDto> GetMyRankInformationAsync([Service] ILeaderboardQueries leaderboardQueries)
         {
-            SetLogTransaction(nameof(GetMyRankInformationAsync));
+            SetLogTransaction();
             return await leaderboardQueries.UserRankInformationAsync(CurrentUser.Id, CurrentUser, Token);
         }
 
         public async Task<UserPositionDto> GetMyPositionInDepartment([Service] ILeaderboardQueries leaderboardQueries)
         {
-            SetLogTransaction(nameof(GetMyPositionInDepartment));
+            SetLogTransaction();
             return await leaderboardQueries.UserPositionInDepartmentAsync(CurrentUser.Id, CurrentUser, Token);
         }
 
         public async Task<UserPositionDto> GetMyPositionInRegion([Service] ILeaderboardQueries leaderboardQueries)
         {
-            SetLogTransaction(nameof(GetMyPositionInRegion));
+            SetLogTransaction();
             return await leaderboardQueries.UserPositionInRegionAsync(CurrentUser.Id, CurrentUser, Token);
         }
 
         public async Task<UserPositionDto> GetMyPositionAsync([Service] ILeaderboardQueries leaderboardQueries)
         {
-            SetLogTransaction(nameof(GetMyPositionAsync));
+            SetLogTransaction();
             return await leaderboardQueries.UserPositionInCountryAsync(CurrentUser.Id, CurrentUser, Token);
         }
 
         public async Task<bool> HasProductsImportsInProgressAsync([Service] IJobQueries jobQueries)
         {
-            SetLogTransaction(nameof(HasProductsImportsInProgressAsync));
+            SetLogTransaction();
             return await jobQueries.HasProductsImportsInProgressAsync(CurrentUser.Id, CurrentUser, Token);
         }
 
         public async Task<bool> HasPickingOrdersExportsInProgressAsync([Service] IJobQueries jobQueries)
         {
-            SetLogTransaction(nameof(HasPickingOrdersExportsInProgressAsync));
+            SetLogTransaction();
             return await jobQueries.HasPickingOrdersExportsInProgressAsync(CurrentUser.Id, CurrentUser, Token);
         }
 
         public async Task<IEnumerable<ProducerDeliveriesDto>> GetStoreDeliveriesForProducersAsync(SearchProducersDeliveriesDto input, [Service] IDeliveryQueries deliveryQueries)
         {
-            SetLogTransaction(nameof(GetStoreDeliveriesForProducersAsync), input);
+            SetLogTransaction(input);
             return await deliveryQueries.GetStoreDeliveriesForProducersAsync(CurrentUser.Id, input.Ids, input.Kinds, DateTimeOffset.UtcNow, CurrentUser, Token);
         }
 
         public async Task<IEnumerable<ProducerDeliveriesDto>> GetProducersDeliveriesAsync(SearchProducersDeliveriesDto input, [Service] IDeliveryQueries deliveryQueries)
         {
-            SetLogTransaction(nameof(GetProducersDeliveriesAsync), input);
+            SetLogTransaction(input);
             return await deliveryQueries.GetProducersDeliveriesAsync(input.Ids, input.Kinds, DateTimeOffset.UtcNow, CurrentUser, Token);
         }
 
         public async Task<SirenBusinessDto> SearchBusinessWithSiretAsync(string input, [Service] IUserQueries userQueries)
         {
-            SetLogTransaction(nameof(SearchBusinessWithSiretAsync), input);
+            SetLogTransaction(input);
             return await userQueries.RetrieveSiretInfosAsync(input, CurrentUser, Token);
         }
 
         public async Task<ProducersSearchDto> SearchProducersAsync(SearchTermsDto input, [Service] IProducerQueries producerQueries)
         {
-            SetLogTransaction(nameof(SearchProducersAsync), input);
+            SetLogTransaction(input);
             return await producerQueries.SearchProducersAsync(CurrentUser.Id, input, CurrentUser, Token);
         }
 
         public async Task<StoresSearchDto> SearchStoresAsync(SearchTermsDto input, [Service] IStoreQueries storeQueries)
         {
-            SetLogTransaction(nameof(SearchStoresAsync), input);
+            SetLogTransaction(input);
             return await storeQueries.SearchStoresAsync(CurrentUser.Id, input, CurrentUser, Token);
         }
 
         public async Task<ProductsSearchDto> SearchProductsAsync(SearchProductsDto input, [Service] IProductQueries productQueries)
         {
-            SetLogTransaction(nameof(SearchProductsAsync), input);
+            SetLogTransaction(input);
             return await productQueries.SearchAsync(input, CurrentUser, Token);
         }
 
         public async Task<IEnumerable<SuggestProducerDto>> SuggestProducersAsync(SearchTermsDto input, [Service] IProducerQueries producerQueries)
         {
-            SetLogTransaction(nameof(SuggestProducersAsync), input);
+            SetLogTransaction(input);
             return await producerQueries.SuggestProducersAsync(input, CurrentUser, Token);
         }
 
         public IQueryable<UserDto> GetMyUserProfile([Service] IUserQueries userQueries)
         {
-            SetLogTransaction(nameof(GetMyUserProfile));
+            SetLogTransaction();
             return userQueries.GetUser(CurrentUser.Id, CurrentUser);
         }
 
         public IQueryable<ProductDto> GetStoreProducts([Service] IProductQueries productQueries)
         {
-            SetLogTransaction(nameof(GetStoreProducts));
+            SetLogTransaction();
             return productQueries.GetProducts(CurrentUser);
         }
 
         public IQueryable<ProducerDto> GetProducer(Guid input, [Service] IProducerQueries producerQueries)
         {
-            SetLogTransaction(nameof(GetProducer), input);
+            SetLogTransaction(input);
             return producerQueries.GetProducer(input, CurrentUser);
         }
 
         public IQueryable<ProducerDto> GetProducers([Service] IProducerQueries producerQueries)
         {
-            SetLogTransaction(nameof(GetProducers));
+            SetLogTransaction();
             return producerQueries.GetProducers(CurrentUser);
         }
 
 
         public IQueryable<ConsumerDto> GetConsumer(Guid input, [Service] IConsumerQueries consumerQueries)
         {
-            SetLogTransaction(nameof(GetConsumer), input);
+            SetLogTransaction(input);
             return consumerQueries.GetConsumer(input, CurrentUser);
         }
 
         public IQueryable<StoreDto> GetStore(Guid input, [Service] IStoreQueries storeQueries)
         {
-            SetLogTransaction(nameof(GetStore), input);
+            SetLogTransaction(input);
             return storeQueries.GetStore(input, CurrentUser);
         }
 
         public IQueryable<ConsumerLegalDto> GetConsumerLegals([Service] ILegalQueries legalQueries)
         {
-            SetLogTransaction(nameof(GetConsumerLegals));
+            SetLogTransaction();
             return legalQueries.GetMyConsumerLegals(CurrentUser);
         }
 
         public IQueryable<BusinessLegalDto> GetBusinessLegals([Service] ILegalQueries legalQueries)
         {
-            SetLogTransaction(nameof(GetBusinessLegals));
+            SetLogTransaction();
             return legalQueries.GetMyBusinessLegals(CurrentUser);
         }
 
         public IQueryable<WebPayinDto> GetWebPayinTransaction(string input, [Service] IPayinQueries payinQueries)
         {
-            SetLogTransaction(nameof(GetWebPayinTransaction), input);
+            SetLogTransaction(input);
             return payinQueries.GetWebPayinTransaction(input, CurrentUser);
         }
 
         public IQueryable<CountryPointsDto> GetCountryPoints(Guid? input, [Service] ILeaderboardQueries leaderboardQueries)
         {
-            SetLogTransaction(nameof(GetCountryPoints), input);
+            SetLogTransaction(input);
             return leaderboardQueries.CountriesPoints(input, CurrentUser);
         }
 
         public IQueryable<RegionPointsDto> GetRegionsPoints(Guid? input, [Service] ILeaderboardQueries leaderboardQueries)
         {
-            SetLogTransaction(nameof(GetRegionsPoints), input);
+            SetLogTransaction(input);
             return leaderboardQueries.RegionsPoints(input, CurrentUser);
         }
 
         public IQueryable<DepartmentPointsDto> GetDepartmentsPoints(Guid? input, [Service] ILeaderboardQueries leaderboardQueries)
         {
-            SetLogTransaction(nameof(GetDepartmentsPoints), input);
+            SetLogTransaction(input);
             return leaderboardQueries.DepartmentsPoints(input, CurrentUser);
         }
 
         public IQueryable<CountryUserPointsDto> GetCountryUsersPoints(Guid? input, [Service] ILeaderboardQueries leaderboardQueries)
         {
-            SetLogTransaction(nameof(GetCountryUsersPoints), input);
+            SetLogTransaction(input);
             return leaderboardQueries.CountryUsersPoints(input, CurrentUser);
         }
 
         public IQueryable<RegionUserPointsDto> GetRegionUsersPoints(Guid? input, [Service] ILeaderboardQueries leaderboardQueries)
         {
-            SetLogTransaction(nameof(GetRegionUsersPoints), input);
+            SetLogTransaction(input);
             return leaderboardQueries.RegionUsersPoints(input, CurrentUser);
         }
 
         public IQueryable<DepartmentUserPointsDto> GetDepartmentUsersPoints(Guid? input, [Service] ILeaderboardQueries leaderboardQueries)
         {
-            SetLogTransaction(nameof(GetDepartmentUsersPoints), input);
+            SetLogTransaction(input);
             return leaderboardQueries.DepartmentUsersPoints(input, CurrentUser);
         }
 
         public IQueryable<QuickOrderDto> GetMyDefaultQuickOrder([Service] IQuickOrderQueries quickOrderQueries)
         {
-            SetLogTransaction(nameof(GetMyDefaultQuickOrder));
+            SetLogTransaction();
             return quickOrderQueries.GetUserDefaultQuickOrder(CurrentUser.Id, CurrentUser);
         }
 
         public IQueryable<QuickOrderDto> GetQuickOrder(Guid input, [Service] IQuickOrderQueries quickOrderQueries)
         {
-            SetLogTransaction(nameof(GetQuickOrder), input);
+            SetLogTransaction(input);
             return quickOrderQueries.GetQuickOrder(input, CurrentUser);
         }
 
         public IQueryable<QuickOrderDto> GetQuickOrders([Service] IQuickOrderQueries quickOrderQueries)
         {
-            SetLogTransaction(nameof(GetQuickOrders));
+            SetLogTransaction();
             return quickOrderQueries.GetQuickOrders(CurrentUser);
         }
 
         public IQueryable<DocumentDto> GetDocuments([Service] IDocumentQueries documentQueries)
         {
-            SetLogTransaction(nameof(GetDocuments));
+            SetLogTransaction();
             return documentQueries.GetDocuments(CurrentUser);
         }
 
         public IQueryable<DepartmentDto> GetDepartments([Service] IDepartmentQueries departmentQueries)
         {
-            SetLogTransaction(nameof(GetDepartments));
+            SetLogTransaction();
             return departmentQueries.GetDepartments(CurrentUser);
         }
 
         public IQueryable<RegionDto> GetRegions([Service] IRegionQueries regionQueries)
         {
-            SetLogTransaction(nameof(GetRegions));
+            SetLogTransaction();
             return regionQueries.GetRegions(CurrentUser);
         }
 
         public IQueryable<NationalityDto> GetNationalities([Service] INationalityQueries nationalityQueries)
         {
-            SetLogTransaction(nameof(GetNationalities));
+            SetLogTransaction();
             return nationalityQueries.GetNationalities(CurrentUser);
         }
 
         public IQueryable<CountryDto> GetCountries([Service] ICountryQueries countryQueries)
         {
-            SetLogTransaction(nameof(GetCountries));
+            SetLogTransaction();
             return countryQueries.GetCountries(CurrentUser);
         }
 
         public IQueryable<NotificationDto> GetNotifications([Service] INotificationQueries notificationQueries)
         {
-            SetLogTransaction(nameof(GetNotifications));
+            SetLogTransaction();
             return notificationQueries.GetNotifications(CurrentUser);
         }
 
         public async Task<int> GetUnreadNotificationsCount([Service] INotificationQueries notificationQueries)
         {
-            SetLogTransaction(nameof(GetUnreadNotificationsCount));
+            SetLogTransaction();
             return await notificationQueries.GetUnreadNotificationsCount(CurrentUser, Token);
         }
 
         public IQueryable<TagDto> GetTags([Service] ITagQueries tagQueries)
         {
-            SetLogTransaction(nameof(GetTags));
+            SetLogTransaction();
             return tagQueries.GetTags(CurrentUser);
         }
 
         public IQueryable<OrderDto> GetCurrentOrder([Service] IOrderQueries orderQueries)
         {
-            SetLogTransaction(nameof(GetOrder));
+            SetLogTransaction();
             return orderQueries.GetCurrentOrder(CurrentUser);
         }
         
         public IQueryable<PayoutDto> GetPayout(Guid input, [Service] IPayoutQueries payoutQueries)
         {
-            SetLogTransaction(nameof(GetPayout));
+            SetLogTransaction();
             return payoutQueries.GetPayout(input, CurrentUser);
         }
         
         public IQueryable<PayoutDto> GetPayouts([Service] IPayoutQueries payoutQueries)
         {
-            SetLogTransaction(nameof(GetPayouts));
+            SetLogTransaction();
             return payoutQueries.GetPayouts(CurrentUser);
         }
         
         public IQueryable<DonationDto> GetDonation(Guid input, [Service] IDonationQueries donationQueries)
         {
-            SetLogTransaction(nameof(GetDonation));
+            SetLogTransaction();
             return donationQueries.GetDonation(input, CurrentUser);
         }
         
         public IQueryable<DonationDto> GetDonations([Service] IDonationQueries donationQueries)
         {
-            SetLogTransaction(nameof(GetDonations));
+            SetLogTransaction();
             return donationQueries.GetDonations(CurrentUser);
         }
         
         public IQueryable<WithholdingDto> GetWithholding(Guid input, [Service] IWithholdingQueries withholdingQueries)
         {
-            SetLogTransaction(nameof(GetWithholding));
+            SetLogTransaction();
             return withholdingQueries.GetWithholding(input, CurrentUser);
         }
         
         public IQueryable<WithholdingDto> GetWithholdings([Service] IWithholdingQueries withholdingQueries)
         {
-            SetLogTransaction(nameof(GetWithholdings));
+            SetLogTransaction();
             return withholdingQueries.GetWithholdings(CurrentUser);
         }
 
         public IQueryable<OrderDto> GetOrder(Guid input, [Service] IOrderQueries orderQueries)
         {
-            SetLogTransaction(nameof(GetOrder), input);
+            SetLogTransaction(input);
             return orderQueries.GetOrder(input, CurrentUser);
         }
 
         public IQueryable<OrderDto> GetOrders([Service] IOrderQueries orderQueries)
         {
-            SetLogTransaction(nameof(GetOrders));
+            SetLogTransaction();
             return orderQueries.GetOrders(CurrentUser);
         }
 
         public IQueryable<AgreementDto> GetAgreement(Guid input, [Service] IAgreementQueries agreementQueries)
         {
-            SetLogTransaction(nameof(GetAgreement), input);
+            SetLogTransaction(input);
             return agreementQueries.GetAgreement(input, CurrentUser);
         }
 
         public IQueryable<AgreementDto> GetAgreements([Service] IAgreementQueries agreementQueries)
         {
-            SetLogTransaction(nameof(GetAgreements));
+            SetLogTransaction();
             return agreementQueries.GetAgreements(CurrentUser);
         }
 
         public IQueryable<AgreementDto> GetStoreAgreements(Guid input, [Service] IAgreementQueries agreementQueries)
         {
-            SetLogTransaction(nameof(GetStoreAgreements), input);
+            SetLogTransaction(input);
             return agreementQueries.GetStoreAgreements(input, CurrentUser);
         }
 
         public IQueryable<AgreementDto> GetProducerAgreements(Guid input, [Service] IAgreementQueries agreementQueries)
         {
-            SetLogTransaction(nameof(GetProducerAgreements), input);
+            SetLogTransaction(input);
             return agreementQueries.GetProducerAgreements(input, CurrentUser);
         }
 
         public IQueryable<ProductDto> GetProduct(Guid input, [Service] IProductQueries productQueries)
         {
-            SetLogTransaction(nameof(GetProduct), input);
+            SetLogTransaction(input);
             return productQueries.GetProduct(input, CurrentUser);
         }
 
         public IQueryable<ProductDto> GetProducerProducts(Guid input, [Service] IProductQueries productQueries)
         {
-            SetLogTransaction(nameof(GetProducerProducts), input);
+            SetLogTransaction(input);
             return productQueries.GetProducerProducts(input, CurrentUser);
         }
 
         public IQueryable<ProductDto> GetProducts([Service] IProductQueries productQueries)
         {
-            SetLogTransaction(nameof(GetProducts));
+            SetLogTransaction();
             return productQueries.GetProducts(CurrentUser);
         }
 
         public IQueryable<ReturnableDto> GetReturnable(Guid input, [Service] IReturnableQueries returnableQueries)
         {
-            SetLogTransaction(nameof(GetReturnable), input);
+            SetLogTransaction(input);
             return returnableQueries.GetReturnable(input, CurrentUser);
         }
 
         public IQueryable<ReturnableDto> GetReturnables([Service] IReturnableQueries returnableQueries)
         {
-            SetLogTransaction(nameof(GetReturnables));
+            SetLogTransaction();
             return returnableQueries.GetReturnables(CurrentUser);
         }
 
         public IQueryable<JobDto> GetJob(Guid input, [Service] IJobQueries jobQueries)
         {
-            SetLogTransaction(nameof(GetJob), input);
+            SetLogTransaction(input);
             return jobQueries.GetJob(input, CurrentUser);
         }
 
         public IQueryable<JobDto> GetJobs([Service] IJobQueries jobQueries)
         {
-            SetLogTransaction(nameof(GetJobs));
+            SetLogTransaction();
             return jobQueries.GetJobs(CurrentUser);
         }
 
         public IQueryable<DeliveryModeDto> GetDelivery(Guid input, [Service] IDeliveryQueries deliveryQueries)
         {
-            SetLogTransaction(nameof(GetDelivery), input);
+            SetLogTransaction(input);
             return deliveryQueries.GetDelivery(input, CurrentUser);
         }
 
         public IQueryable<DeliveryModeDto> GetDeliveries([Service] IDeliveryQueries deliveryQueries)
         {
-            SetLogTransaction(nameof(GetDeliveries));
+            SetLogTransaction();
             return deliveryQueries.GetDeliveries(CurrentUser);
         }
 
         public IQueryable<PurchaseOrderDto> GetPurchaseOrder(Guid input, [Service] IPurchaseOrderQueries purchaseOrderQueries)
         {
-            SetLogTransaction(nameof(GetPurchaseOrder), input);
+            SetLogTransaction(input);
             return purchaseOrderQueries.GetPurchaseOrder(input, CurrentUser);
         }
 
         public IQueryable<PurchaseOrderDto> GetPurchaseOrders([Service] IPurchaseOrderQueries purchaseOrderQueries)
         {
-            SetLogTransaction(nameof(GetPurchaseOrders));
+            SetLogTransaction();
             return purchaseOrderQueries.GetPurchaseOrders(CurrentUser);
         }
 
         public IQueryable<PurchaseOrderDto> GetMyPurchaseOrders([Service] IPurchaseOrderQueries purchaseOrderQueries)
         {
-            SetLogTransaction(nameof(GetMyPurchaseOrders));
+            SetLogTransaction();
             return purchaseOrderQueries.MyPurchaseOrders(CurrentUser);
         }
 
         public IQueryable<ClosingDto> GetBusinessClosings([Service] IBusinessClosingQueries closingQueries)
         {
-            SetLogTransaction(nameof(GetBusinessClosings));
+            SetLogTransaction();
             return closingQueries.GetClosings(CurrentUser);
         }
 
         public IQueryable<ClosingDto> GetDeliveryClosings(Guid? input, [Service] IDeliveryClosingQueries closingQueries)
         {
-            SetLogTransaction(nameof(GetDeliveryClosings));
+            SetLogTransaction();
             return closingQueries.GetClosings(input, CurrentUser);
         }
 
-        private void SetLogTransaction(string name, object input = null)
+        public IQueryable<CatalogDto> GetCatalog(Guid input, [Service] ICatalogQueries catalogQueries)
+        {
+            SetLogTransaction();
+            return catalogQueries.GetCatalog(input, CurrentUser);
+        }
+
+        public IQueryable<CatalogDto> GetCatalogs([Service] ICatalogQueries catalogQueries)
+        {
+            SetLogTransaction();
+            return catalogQueries.GetCatalogs(CurrentUser);
+        }
+
+        public IQueryable<CatalogProductDto> GetCatalogProducts(Guid input, [Service] ICatalogQueries catalogQueries)
+        {
+            SetLogTransaction();
+            return catalogQueries.GetCatalogProducts(input, CurrentUser);
+        }
+
+        private void SetLogTransaction(object input = null, [CallerMemberName] string name = "")
         {
             NewRelic.Api.Agent.NewRelic.SetTransactionName("GraphQL", name);
 
@@ -447,6 +467,9 @@ namespace Sheaft.GraphQL
             currentTransaction.AddCustomAttribute("IsAuthenticated", CurrentUser.IsAuthenticated.ToString());
             currentTransaction.AddCustomAttribute("Roles", string.Join(";", CurrentUser.Roles));
             currentTransaction.AddCustomAttribute("GraphQL", name);
+            
+            if(input != null)
+                currentTransaction.AddCustomAttribute("Input", JsonConvert.SerializeObject(input));
         }
     }
 }

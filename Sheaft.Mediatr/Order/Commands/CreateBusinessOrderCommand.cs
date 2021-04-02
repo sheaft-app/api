@@ -29,6 +29,7 @@ namespace Sheaft.Mediatr.Order.Commands
         [JsonConstructor]
         public CreateBusinessOrderCommand(RequestUser requestUser) : base(requestUser)
         {
+            UserId = requestUser.Id;
         }
 
         public Guid UserId { get; set; }

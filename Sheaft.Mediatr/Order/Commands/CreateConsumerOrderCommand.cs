@@ -26,9 +26,10 @@ namespace Sheaft.Mediatr.Order.Commands
         [JsonConstructor]
         public CreateConsumerOrderCommand(RequestUser requestUser) : base(requestUser)
         {
+            UserId = requestUser.IsAuthenticated ? requestUser.Id : (Guid?) null;
         }
 
-        public Guid UserId { get; set; }
+        public Guid? UserId { get; set; }
         public DonationKind Donation { get; set; }
         public IEnumerable<ResourceIdQuantityDto> Products { get; set; }
         public IEnumerable<ProducerExpectedDeliveryDto> ProducersExpectedDeliveries { get; set; }
@@ -99,7 +100,7 @@ namespace Sheaft.Mediatr.Order.Commands
                     cartDelivery.ExpectedDeliveryDate, cartDelivery.Comment));
             }
 
-            Domain.User user = request.UserId != Guid.Empty ? await _context.GetByIdAsync<Domain.User>(request.UserId, token) : null;
+            Domain.User user = request.UserId.HasValue && request.UserId != Guid.Empty ? await _context.GetByIdAsync<Domain.User>(request.UserId.Value, token) : null;
             if(user != null && user.Id != request.RequestUser.Id)
                 throw SheaftException.Forbidden();
             
