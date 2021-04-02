@@ -7,6 +7,5 @@ namespace Sheaft.Application.Models
     {
         public Guid Id { get; set; }
         public IEnumerable<TimeSlotGroupDto> OpeningHours { get; set; }
-        public IEnumerable<UpdateOrCreateClosingDto> Closings { get; set; }
     }
 }

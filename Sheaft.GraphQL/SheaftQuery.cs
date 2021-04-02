@@ -425,6 +425,18 @@ namespace Sheaft.GraphQL
             return purchaseOrderQueries.MyPurchaseOrders(CurrentUser);
         }
 
+        public IQueryable<ClosingDto> GetBusinessClosings([Service] IBusinessClosingQueries closingQueries)
+        {
+            SetLogTransaction(nameof(GetBusinessClosings));
+            return closingQueries.GetClosings(CurrentUser);
+        }
+
+        public IQueryable<ClosingDto> GetDeliveryClosings(Guid? input, [Service] IDeliveryClosingQueries closingQueries)
+        {
+            SetLogTransaction(nameof(GetDeliveryClosings));
+            return closingQueries.GetClosings(input, CurrentUser);
+        }
+
         private void SetLogTransaction(string name, object input = null)
         {
             NewRelic.Api.Agent.NewRelic.SetTransactionName("GraphQL", name);
