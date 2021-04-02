@@ -12,6 +12,7 @@ using Sheaft.Application.Interfaces.Mediatr;
 using Sheaft.Application.Models;
 using Sheaft.Core;
 using Sheaft.Domain;
+using Sheaft.Domain.Enum;
 
 namespace Sheaft.Mediatr.QuickOrder.Commands
 {
@@ -56,9 +57,14 @@ namespace Sheaft.Mediatr.QuickOrder.Commands
                     products.Remove(productToUpdate);
                 }
 
+                var productIds = products.Select(p => p.Id).ToList();
+                var existingProducts = await _context.GetAsync<Domain.Product>(
+                    p => productIds.Contains(p.Id) && p.CatalogsPrices.Any(cp => cp.Catalog.Kind == CatalogKind.Stores),
+                    token);
+                
                 foreach (var newProduct in products)
                 {
-                    var product = await _context.FindByIdAsync<Domain.Product>(newProduct.Id, token);
+                    var product = existingProducts.Single(ep => ep.Id == newProduct.Id);
                     entity.AddProduct(new KeyValuePair<Domain.Product, int>(product, newProduct.Quantity));
                 }
             }

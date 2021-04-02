@@ -12,6 +12,7 @@ using Sheaft.Application.Interfaces.Mediatr;
 using Sheaft.Application.Models;
 using Sheaft.Core;
 using Sheaft.Domain;
+using Sheaft.Domain.Enum;
 
 namespace Sheaft.Mediatr.QuickOrder.Commands
 {
@@ -44,12 +45,14 @@ namespace Sheaft.Mediatr.QuickOrder.Commands
         {
             var user = await _context.GetByIdAsync<Domain.User>(request.UserId, token);
 
-            var productIds = request.Products.Select(p => p.Id);
-            var products = await _context.GetByIdsAsync<Domain.Product>(productIds, token);
-
-            var cartProducts = products
+            var productIds = request.Products.Select(p => p.Id).ToList();
+            var existingProducts = await _context.GetAsync<Domain.Product>(
+                p => productIds.Contains(p.Id) && p.CatalogsPrices.Any(cp => cp.Catalog.Kind == CatalogKind.Stores),
+                token);
+                
+            var cartProducts = existingProducts
                 .Select(c => new
-                    {Product = c, Quantity = request.Products.Where(p => p.Id == c.Id).Sum(c => c.Quantity)})
+                    {Product = c, Quantity = request.Products.Where(p => p.Id == c.Id).Sum(p => p.Quantity)})
                 .ToDictionary(d => d.Product, d => d.Quantity);
 
             var quickOrder = new Domain.QuickOrder(Guid.NewGuid(), request.Name, cartProducts, user);

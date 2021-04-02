@@ -39,7 +39,7 @@ namespace Sheaft.Mediatr.QuickOrder.Commands
         {
             var entity = await _context.GetByIdAsync<Domain.QuickOrder>(request.QuickOrderId, token);
             entity.SetName(request.Name);
-            entity.SetDescription(request.Name);
+            entity.SetDescription(request.Description);
 
             await _context.SaveChangesAsync(token);
             return Success();
