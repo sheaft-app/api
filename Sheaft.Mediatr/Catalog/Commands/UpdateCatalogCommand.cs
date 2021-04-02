@@ -47,9 +47,11 @@ namespace Sheaft.Mediatr.Catalog
                 throw SheaftException.Validation();
                 
             entity.SetIsAvailable(request.IsAvailable);
-            entity.SetIsDefault(request.IsDefault);
+            
+            if(entity.Kind != CatalogKind.Consumers)
+                entity.SetIsDefault(request.IsDefault);
 
-            if (request.IsDefault && catalogs.Any(c => c.Id != entity.Id && c.IsDefault && c.Kind == CatalogKind.Stores))
+            if (entity.IsDefault && catalogs.Any(c => c.Id != entity.Id && c.IsDefault && c.Kind == CatalogKind.Stores))
             {
                 var actualDefaultCatalog = catalogs.Single(c => c.Id != entity.Id && c.IsDefault && c.Kind == CatalogKind.Stores);
                 actualDefaultCatalog.SetIsDefault(false);

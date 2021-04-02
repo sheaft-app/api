@@ -68,5 +68,10 @@ namespace Sheaft.Domain
             VatPrice = Math.Round(WholeSalePrice * vat / 100, DIGITS_COUNT);
             OnSalePrice = Math.Round(WholeSalePrice + VatPrice, DIGITS_COUNT);
         }
+
+        public void UpdatePrice(decimal percent)
+        {
+            SetWholeSalePricePerUnit(WholeSalePricePerUnit * 1 + percent);
+        }
     }
 }

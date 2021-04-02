@@ -1,7 +1,9 @@
 using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Application.Interfaces.Mediatr;
@@ -31,9 +33,20 @@ namespace Sheaft.Mediatr.Catalog
         {
         }
 
-        public Task<Result> Handle(UpdateAllCatalogPricesCommand request, CancellationToken cancellationToken)
+        public async Task<Result> Handle(UpdateAllCatalogPricesCommand request, CancellationToken token)
         {
-            throw new NotImplementedException();
+            var catalogProductsPrice = await _context.Set<CatalogProduct>()
+                .Where(c => c.Catalog.Id == request.CatalogId && !c.Catalog.RemovedOn.HasValue)
+                .Include(c => c.Product)
+                .ToListAsync(token);
+
+            foreach (var catalogProductPrice in catalogProductsPrice)
+            {
+                catalogProductPrice.UpdatePrice(request.Percent);
+            }
+
+            await _context.SaveChangesAsync(token);
+            return Success();
         }
     }
 }

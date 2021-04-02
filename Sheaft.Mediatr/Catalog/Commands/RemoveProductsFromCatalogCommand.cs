@@ -32,9 +32,13 @@ namespace Sheaft.Mediatr.Catalog
         {
         }
 
-        public Task<Result> Handle(RemoveProductsFromCatalogCommand request, CancellationToken cancellationToken)
+        public async Task<Result> Handle(RemoveProductsFromCatalogCommand request, CancellationToken token)
         {
-            throw new NotImplementedException();
+            var catalog = await _context.GetByIdAsync<Domain.Catalog>(request.CatalogId, token);
+            catalog.RemoveProducts(request.ProductIds);
+            
+            await _context.SaveChangesAsync(token);
+            return Success();
         }
     }
 }

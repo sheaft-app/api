@@ -55,6 +55,14 @@ namespace Sheaft.Domain
             _products.Add(new CatalogProduct(product, this, wholeSalePrice));
         }
         
+        public void RemoveProducts(IEnumerable<Guid> productIds)
+        {
+            foreach (var productId in productIds)
+            {
+                RemoveProduct(productId);
+            }
+        }
+        
         public void RemoveProduct(Guid productId)
         {
             if (_products == null)
