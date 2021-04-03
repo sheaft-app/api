@@ -7,6 +7,7 @@ namespace Sheaft.GraphQL.Sorts
     {
         protected override void Configure(ISortInputTypeDescriptor<PayoutDto> descriptor)
         {
+            descriptor.Name("PayoutSort");
             descriptor.BindFieldsExplicitly();
             descriptor.Sortable(c => c.Status);
             descriptor.Sortable(c => c.CreatedOn);

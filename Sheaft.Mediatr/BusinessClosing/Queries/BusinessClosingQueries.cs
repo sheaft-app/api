@@ -49,7 +49,7 @@ namespace Sheaft.Mediatr.BusinessClosing.Queries
             {
                 return _context.Set<Domain.Business>()
                     .Get(b => b.Id == currentUser.Id)
-                    .Select(b => b.Closings)
+                    .SelectMany(b => b.Closings)
                     .ProjectTo<ClosingDto>(_configurationProvider);
             }
             

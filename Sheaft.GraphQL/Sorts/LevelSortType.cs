@@ -7,6 +7,7 @@ namespace Sheaft.GraphQL.Sorts
     {
         protected override void Configure(ISortInputTypeDescriptor<LevelDto> descriptor)
         {
+            descriptor.Name("LevelSort");
             descriptor.BindFieldsExplicitly();
             descriptor.Sortable(c => c.Number);
         }

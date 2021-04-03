@@ -7,6 +7,7 @@ namespace Sheaft.GraphQL.Sorts
     {
         protected override void Configure(ISortInputTypeDescriptor<DepartmentDto> descriptor)
         {
+            descriptor.Name("DepartmentSort");
             descriptor.BindFieldsExplicitly();
             descriptor.Sortable(c => c.Code);
         }

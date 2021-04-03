@@ -7,6 +7,7 @@ namespace Sheaft.GraphQL.Sorts
     {
         protected override void Configure(ISortInputTypeDescriptor<TagDto> descriptor)
         {
+            descriptor.Name("TagSort");
             descriptor.BindFieldsExplicitly();
             descriptor.Sortable(c => c.Name);
         }
