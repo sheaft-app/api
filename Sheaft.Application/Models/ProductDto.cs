@@ -23,6 +23,14 @@ namespace Sheaft.Application.Models
         public ConditioningKind Conditioning { get; set; }
         public decimal Vat { get; set; }
         public bool Available { get; set; }
+        public bool? VisibleToStores { get; set; }
+        public bool? VisibleToConsumers { get; set; }
+        public decimal? WholeSalePricePerUnit { get; set; }
+        public decimal? OnSalePricePerUnit { get; set; }
+        public decimal? VatPricePerUnit { get; set; }
+        public decimal? WholeSalePrice { get; set; }
+        public decimal? OnSalePrice { get; set; }
+        public decimal? VatPrice { get; set; }
         public int RatingsCount { get; set; }
         public decimal? Rating { get; set; }
         public bool IsReturnable { get; set; }

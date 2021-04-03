@@ -37,6 +37,9 @@ namespace Sheaft.Mediatr.Product.Commands
         public decimal? Weight { get; set; }
         public string Description { get; set; }
         public bool? Available { get; set; }
+        public bool? VisibleToStores { get; set; }
+        public bool? VisibleToConsumers { get; set; }
+        public decimal? WholeSalePricePerUnit { get; set; }
         public Guid? ReturnableId { get; set; }
         public IEnumerable<Guid> Tags { get; set; }
         public bool SkipUpdateProducerTags { get; set; } = false;
@@ -83,7 +86,8 @@ namespace Sheaft.Mediatr.Product.Commands
 
             using (var transaction = await _context.BeginTransactionAsync(token))
             {
-                var entity = new Domain.Product(Guid.NewGuid(), reference, request.Name, request.Conditioning, request.Unit, request.QuantityPerUnit, producer);
+                var entity = new Domain.Product(Guid.NewGuid(), reference, request.Name, request.Conditioning,
+                    request.Unit, request.QuantityPerUnit, producer);
 
                 entity.SetVat(request.Vat);
                 entity.SetDescription(request.Description);
@@ -99,22 +103,43 @@ namespace Sheaft.Mediatr.Product.Commands
                 var tags = await _context.FindAsync<Domain.Tag>(t => request.Tags.Contains(t.Id), token);
                 entity.SetTags(tags);
 
-                foreach (var catalogPrice in request.Catalogs)
-                {
-                    var catalog = await _context.GetByIdAsync<Domain.Catalog>(catalogPrice.Id, token);
-                    catalog.AddProduct(entity, catalogPrice.WholeSalePricePerUnit);
-                }
-
                 await _context.AddAsync(entity, token);
                 await _context.SaveChangesAsync(token);
                 
+                if (request.VisibleToConsumers.HasValue && request.VisibleToConsumers.Value)
+                {
+                    var consumerCatalog = await _context.GetSingleAsync<Domain.Catalog>(
+                        c => c.Producer.Id == request.ProducerId && c.Kind == CatalogKind.Consumers, token);
+                    
+                    consumerCatalog.AddProduct(entity, request.WholeSalePricePerUnit.Value);
+                    await _context.SaveChangesAsync(token);
+                }
+                
+                if (request.VisibleToStores.HasValue && request.VisibleToStores.Value)
+                {
+                    var storeCatalog = await _context.GetSingleAsync<Domain.Catalog>(
+                        c => c.Producer.Id == request.ProducerId && c.Kind == CatalogKind.Stores, token);
+                    
+                    storeCatalog.AddProduct(entity, request.WholeSalePricePerUnit.Value);
+                    await _context.SaveChangesAsync(token);
+                }
+
+                if (request.Catalogs != null && request.Catalogs.Any())
+                {
+                    foreach (var catalogPrice in request.Catalogs)
+                    {
+                        var catalog = await _context.GetByIdAsync<Domain.Catalog>(catalogPrice.Id, token);
+                        catalog.AddProduct(entity, catalogPrice.WholeSalePricePerUnit);
+                    }
+                }
+
                 var imageResult = await _mediatr.Process(
                     new UpdateProductPreviewCommand(request.RequestUser)
                     {
-                        ProductId = entity.Id, 
+                        ProductId = entity.Id,
                         Picture = new PictureSourceDto {Resized = request.Picture, Original = request.OriginalPicture}
                     }, token);
-                
+
                 if (!imageResult.Succeeded)
                     return Failure<Guid>(imageResult.Exception);
 
