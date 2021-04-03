@@ -7,6 +7,7 @@ namespace Sheaft.GraphQL.Filters
     {
         protected override void Configure(IFilterInputTypeDescriptor<QuickOrderDto> descriptor)
         {
+            descriptor.Name("QuickOrderFilter");
             descriptor.BindFieldsExplicitly();
             descriptor.Filter(c => c.Id).AllowEquals();
             descriptor.Filter(c => c.IsDefault).AllowEquals();

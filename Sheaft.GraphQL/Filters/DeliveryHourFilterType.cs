@@ -7,6 +7,7 @@ namespace Sheaft.GraphQL.Filters
     {
         protected override void Configure(IFilterInputTypeDescriptor<DeliveryHourDto> descriptor)
         {
+            descriptor.Name("DeliveryHourFilter");
             descriptor.BindFieldsExplicitly();
             descriptor.Filter(c => c.Day).AllowIn();
 

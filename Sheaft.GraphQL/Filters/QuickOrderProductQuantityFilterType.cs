@@ -7,6 +7,7 @@ namespace Sheaft.GraphQL.Filters
     {
         protected override void Configure(IFilterInputTypeDescriptor<QuickOrderProductQuantityDto> descriptor)
         {
+            descriptor.Name("QuickOrderProductQuantityFilter");
             descriptor.BindFieldsExplicitly();
         }
     }

@@ -7,6 +7,7 @@ namespace Sheaft.GraphQL.Filters
     {
         protected override void Configure(IFilterInputTypeDescriptor<JobDto> descriptor)
         {
+            descriptor.Name("JobFilter");
             descriptor.BindFieldsExplicitly();
             descriptor.Filter(c => c.Id).AllowEquals();
             descriptor.Filter(c => c.Status).AllowIn();

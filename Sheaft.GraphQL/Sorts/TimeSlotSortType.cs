@@ -7,6 +7,7 @@ namespace Sheaft.GraphQL.Sorts
     {
         protected override void Configure(ISortInputTypeDescriptor<TimeSlotDto> descriptor)
         {
+            descriptor.Name("TimeSlotSort");
             descriptor.BindFieldsExplicitly();
             descriptor.Sortable(c => c.Day);
         }

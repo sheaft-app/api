@@ -7,6 +7,7 @@ namespace Sheaft.GraphQL.Filters
     {
         protected override void Configure(IFilterInputTypeDescriptor<ReturnableDto> descriptor)
         {
+            descriptor.Name("ReturnableFilter");
             descriptor.BindFieldsExplicitly();
             descriptor.Filter(c => c.Id).AllowEquals();
             descriptor.Filter(c => c.Name).AllowContains();

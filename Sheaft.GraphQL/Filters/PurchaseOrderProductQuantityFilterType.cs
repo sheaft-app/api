@@ -7,6 +7,7 @@ namespace Sheaft.GraphQL.Filters
     {
         protected override void Configure(IFilterInputTypeDescriptor<PurchaseOrderProductQuantityDto> descriptor)
         {
+            descriptor.Name("PurchaseOrderProductQuantityFilter");
             descriptor.BindFieldsExplicitly();
         }
     }

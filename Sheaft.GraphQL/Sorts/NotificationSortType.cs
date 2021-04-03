@@ -7,6 +7,7 @@ namespace Sheaft.GraphQL.Sorts
     {
         protected override void Configure(ISortInputTypeDescriptor<NotificationDto> descriptor)
         {
+            descriptor.Name("NotificationSort");
             descriptor.BindFieldsExplicitly();
             descriptor.Sortable(c => c.CreatedOn);
         }

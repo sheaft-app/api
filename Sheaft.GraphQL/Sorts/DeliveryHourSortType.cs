@@ -7,6 +7,7 @@ namespace Sheaft.GraphQL.Sorts
     {
         protected override void Configure(ISortInputTypeDescriptor<DeliveryHourDto> descriptor)
         {
+            descriptor.Name("DeliveryHourSort");
             descriptor.BindFieldsExplicitly();
             descriptor.Sortable(c => c.Day);
             descriptor.Sortable(c => c.ExpectedDeliveryDate);

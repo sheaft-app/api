@@ -7,6 +7,7 @@ namespace Sheaft.GraphQL.Sorts
     {
         protected override void Configure(ISortInputTypeDescriptor<QuickOrderDto> descriptor)
         {
+            descriptor.Name("QuickOrderSort");
             descriptor.BindFieldsExplicitly();
             descriptor.Sortable(c => c.Name);
         }

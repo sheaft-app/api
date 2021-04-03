@@ -7,6 +7,7 @@ namespace Sheaft.GraphQL.Filters
     {
         protected override void Configure(IFilterInputTypeDescriptor<TimeSlotDto> descriptor)
         {
+            descriptor.Name("TimeSlotFilter");
             descriptor.BindFieldsExplicitly();
             descriptor.Filter(c => c.Day).AllowIn();
 

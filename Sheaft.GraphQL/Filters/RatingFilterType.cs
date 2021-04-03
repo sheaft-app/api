@@ -7,6 +7,7 @@ namespace Sheaft.GraphQL.Filters
     {
         protected override void Configure(IFilterInputTypeDescriptor<RatingDto> descriptor)
         {
+            descriptor.Name("RatingFilter");
             descriptor.BindFieldsExplicitly();
             descriptor.Filter(c => c.Value).AllowGreaterThan();
             descriptor.Filter(c => c.Value).AllowNotGreaterThanOrEquals();

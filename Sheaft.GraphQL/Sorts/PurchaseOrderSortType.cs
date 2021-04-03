@@ -7,6 +7,7 @@ namespace Sheaft.GraphQL.Sorts
     {
         protected override void Configure(ISortInputTypeDescriptor<PurchaseOrderDto> descriptor)
         {
+            descriptor.Name("PurchaseOrderSort");
             descriptor.BindFieldsExplicitly();
             descriptor.Sortable(c => c.Reference);
             descriptor.Sortable(c => c.Status);
