@@ -1,4 +1,4 @@
-using HotChocolate.Types.Sorting;
+﻿using HotChocolate.Types.Sorting;
 using Sheaft.Application.Models;
 
 namespace Sheaft.GraphQL.Sorts
@@ -11,6 +11,9 @@ namespace Sheaft.GraphQL.Sorts
             descriptor.BindFieldsExplicitly();
             descriptor.Sortable(c => c.Name);
             descriptor.Sortable(c => c.OnSalePrice);
+            descriptor.Sortable(c => c.CreatedOn);
+            descriptor.Sortable(c => c.WholeSalePrice);
+
         }
     }
 }
