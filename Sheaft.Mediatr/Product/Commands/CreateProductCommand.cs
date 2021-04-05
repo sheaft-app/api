@@ -105,33 +105,36 @@ namespace Sheaft.Mediatr.Product.Commands
 
                 await _context.AddAsync(entity, token);
                 await _context.SaveChangesAsync(token);
-                
-                if (request.VisibleToConsumers.HasValue && request.VisibleToConsumers.Value)
+
+                if (request.VisibleToConsumers.HasValue && request.VisibleToStores.HasValue)
                 {
-                    var consumerCatalog = await _context.GetSingleAsync<Domain.Catalog>(
-                        c => c.Producer.Id == request.ProducerId && c.Kind == CatalogKind.Consumers, token);
-                    
-                    consumerCatalog.AddProduct(entity, request.WholeSalePricePerUnit.Value);
-                    await _context.SaveChangesAsync(token);
-                }
-                
-                if (request.VisibleToStores.HasValue && request.VisibleToStores.Value)
-                {
-                    var storeCatalog = await _context.GetSingleAsync<Domain.Catalog>(
-                        c => c.Producer.Id == request.ProducerId && c.Kind == CatalogKind.Stores, token);
-                    
-                    storeCatalog.AddProduct(entity, request.WholeSalePricePerUnit.Value);
-                    await _context.SaveChangesAsync(token);
+                    if (request.VisibleToConsumers.Value)
+                    {
+                        var consumerCatalog = await _context.GetSingleAsync<Domain.Catalog>(
+                            c => c.Producer.Id == entity.Producer.Id && c.Kind == CatalogKind.Consumers, token);
+
+                        consumerCatalog.AddOrUpdateProduct(entity, request.WholeSalePricePerUnit.Value);
+                    }
+
+                    if (request.VisibleToStores.Value)
+                    {
+                        var storeCatalog = await _context.GetSingleAsync<Domain.Catalog>(
+                            c => c.Producer.Id == entity.Producer.Id && c.Kind == CatalogKind.Stores, token);
+
+                        storeCatalog.AddOrUpdateProduct(entity, request.WholeSalePricePerUnit.Value);
+                    }
                 }
 
-                if (request.Catalogs != null && request.Catalogs.Any())
+                if (!request.VisibleToConsumers.HasValue || !request.VisibleToStores.HasValue)
                 {
                     foreach (var catalogPrice in request.Catalogs)
                     {
                         var catalog = await _context.GetByIdAsync<Domain.Catalog>(catalogPrice.Id, token);
-                        catalog.AddProduct(entity, catalogPrice.WholeSalePricePerUnit);
+                        catalog.AddOrUpdateProduct(entity, catalogPrice.WholeSalePricePerUnit);
                     }
                 }
+
+                await _context.SaveChangesAsync(token);
 
                 var imageResult = await _mediatr.Process(
                     new UpdateProductPreviewCommand(request.RequestUser)

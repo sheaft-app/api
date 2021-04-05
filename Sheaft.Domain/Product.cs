@@ -88,7 +88,7 @@ namespace Sheaft.Domain
 
         public void SetTags(IEnumerable<Tag> tags)
         {
-            if(!Tags.Any())
+            if(Tags == null)
                 _tags = new List<ProductTag>();
 
             _tags.Clear();
@@ -189,20 +189,20 @@ namespace Sheaft.Domain
             RefreshPrices();
         }
         
-        public ProductPicture AddPicture(ProductPicture picture)
+        public void AddPicture(ProductPicture picture)
         {
-            _pictures ??= new List<ProductPicture>();
+            if (Pictures == null)
+                _pictures = new List<ProductPicture>();
+            
             _pictures.Add(picture);
-
-            return picture;
         }
         
         public void RemovePicture(Guid id)
         {
-            if (_pictures == null || _pictures.Any())
+            if (Pictures == null || !Pictures.Any())
                 throw SheaftException.NotFound();
 
-            var existingPicture = _pictures.FirstOrDefault(p => p.Id == id);
+            var existingPicture = Pictures.FirstOrDefault(p => p.Id == id);
             if (existingPicture == null)
                 throw SheaftException.NotFound();
             
@@ -211,12 +211,18 @@ namespace Sheaft.Domain
 
         private void RefreshPrices()
         {
-            foreach (var price in _catalogsPrices)
+            if (CatalogsPrices == null)
+                return;
+            
+            foreach (var price in CatalogsPrices)
                 price.RefreshPrice(Vat, Unit, QuantityPerUnit);
         }
         
         private void AddTags(IEnumerable<Tag> tags)
         {
+            if (Tags == null)
+                _tags = new List<ProductTag>();
+            
             foreach (var tag in tags)
                 _tags.Add(new ProductTag(tag));
         }
@@ -227,7 +233,34 @@ namespace Sheaft.Domain
             RatingsCount = Ratings.Count;
         }
 
-        public List<DomainEvent> DomainEvents { get; } = new List<DomainEvent>();
+        public void AddOrUpdateCatalogPrice(Catalog catalog, decimal wholeSalePricePerUnit)
+        {
+            if (CatalogsPrices == null)
+                _catalogsPrices = new List<CatalogProduct>();
 
+            try
+            {
+                var existingCatalogPrice = _catalogsPrices.SingleOrDefault(c => c.Catalog.Id == catalog.Id);
+                if (existingCatalogPrice == null)
+                    _catalogsPrices.Add(new CatalogProduct(this, catalog, wholeSalePricePerUnit));
+                else
+                    existingCatalogPrice.SetWholeSalePricePerUnit(wholeSalePricePerUnit);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+            }
+        }
+
+        public void RemoveFromCatalog(Guid catalogId)
+        {
+            if (CatalogsPrices == null || !CatalogsPrices.Any())
+                throw SheaftException.NotFound();
+            
+            var existingCatalogPrice = _catalogsPrices.SingleOrDefault(c => c.Catalog.Id == catalogId);
+            _catalogsPrices.Remove(existingCatalogPrice);
+        }
+
+        public List<DomainEvent> DomainEvents { get; } = new List<DomainEvent>();
     }
 }

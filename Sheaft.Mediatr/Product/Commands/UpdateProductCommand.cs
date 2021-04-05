@@ -65,7 +65,7 @@ namespace Sheaft.Mediatr.Product.Commands
             using (var transaction = await _context.BeginTransactionAsync(token))
             {
                 var entity = await _context.GetByIdAsync<Domain.Product>(request.ProductId, token);
-                if(entity.Producer.Id != request.RequestUser.Id)
+                if (entity.Producer.Id != request.RequestUser.Id)
                     throw SheaftException.Forbidden();
 
                 var reference = request.Reference;
@@ -107,41 +107,38 @@ namespace Sheaft.Mediatr.Product.Commands
 
                 var tags = await _context.FindAsync<Domain.Tag>(t => request.Tags.Contains(t.Id), token);
                 entity.SetTags(tags);
-                
-                if (request.VisibleToConsumers.HasValue)
+
+                if (request.VisibleToConsumers.HasValue && request.VisibleToStores.HasValue)
                 {
-                    var consumerCatalog =
-                        entity.CatalogsPrices.FirstOrDefault(cp => cp.Catalog.Kind == CatalogKind.Consumers)?.Catalog;
-                    
-                    consumerCatalog ??= await _context.GetSingleAsync<Domain.Catalog>(
+                    var consumerCatalog = await _context.GetSingleAsync<Domain.Catalog>(
                         c => c.Producer.Id == entity.Producer.Id && c.Kind == CatalogKind.Consumers, token);
-                    
-                    consumerCatalog.AddOrUpdateProduct(entity, request.WholeSalePricePerUnit.Value);
-                    await _context.SaveChangesAsync(token);
-                }
-                
-                if (request.VisibleToStores.HasValue && request.VisibleToStores.Value)
-                {
+
+                    if (request.VisibleToConsumers.Value)
+                        consumerCatalog.AddOrUpdateProduct(entity, request.WholeSalePricePerUnit.Value);
+                    else if(consumerCatalog.Products.Any(pc => pc.Product.Id == entity.Id))
+                        consumerCatalog.RemoveProduct(entity.Id); 
+
                     var storeCatalog = await _context.GetSingleAsync<Domain.Catalog>(
                         c => c.Producer.Id == entity.Producer.Id && c.Kind == CatalogKind.Stores, token);
                     
-                    storeCatalog.AddOrUpdateProduct(entity, request.WholeSalePricePerUnit.Value);
-                    await _context.SaveChangesAsync(token);
+                    if (request.VisibleToStores.Value)
+                        storeCatalog.AddOrUpdateProduct(entity, request.WholeSalePricePerUnit.Value);
+                    else if(storeCatalog.Products.Any(pc => pc.Product.Id == entity.Id))
+                        storeCatalog.RemoveProduct(entity.Id);
                 }
-                
-                if (request.Catalogs != null)
+
+                if (!request.VisibleToConsumers.HasValue || !request.VisibleToStores.HasValue)
                 {
                     var productCatalogs = entity.CatalogsPrices.Select(p => p.Catalog);
-                    foreach (var catalog in productCatalogs)
-                    {
-                        if (request.Catalogs.All(p => p.Id != catalog.Id))
-                            catalog.RemoveProduct(entity.Id);
-                    }
+                    var catalogIds = productCatalogs.Select(pc => pc.Id);
+                    var catalogToRemoveIds = catalogIds.Except(request.Catalogs.Select(c => c.Id));
+                    foreach (var catalog in productCatalogs.Where(pc => catalogToRemoveIds.Contains(pc.Id)))
+                        catalog.RemoveProduct(entity.Id);
 
                     foreach (var catalogPrice in request.Catalogs)
                     {
-                        var catalog = await _context.GetByIdAsync<Domain.Catalog>(catalogPrice.Id, token);
-                        catalog.AddOrUpdateProduct(entity, catalogPrice.WholeSalePricePerUnit);
+                        var catalog = entity.CatalogsPrices.FirstOrDefault(c => c.Catalog.Id == catalogPrice.Id)?.Catalog ?? await _context.GetByIdAsync<Domain.Catalog>(catalogPrice.Id, token);
+                        catalog.AddOrUpdateProduct(entity, request.WholeSalePricePerUnit.Value);
                     }
                 }
 
@@ -150,10 +147,10 @@ namespace Sheaft.Mediatr.Product.Commands
                 var imageResult = await _mediatr.Process(
                     new UpdateProductPreviewCommand(request.RequestUser)
                     {
-                        ProductId = entity.Id, 
+                        ProductId = entity.Id,
                         Picture = new PictureSourceDto {Resized = request.Picture, Original = request.OriginalPicture}
                     }, token);
-                
+
                 if (!imageResult.Succeeded)
                     return Failure(imageResult.Exception);
 

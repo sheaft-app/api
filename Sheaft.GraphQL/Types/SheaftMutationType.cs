@@ -269,11 +269,13 @@ namespace Sheaft.GraphQL.Types
             //ORDER
             descriptor.Field(c => c.CreateOrderAsync(default, default))
                 .Name("createOrder")
+                .Authorize(Policies.ANONYMOUS_OR_CONNECTED)
                 .Type<NonNullType<OrderType>>()
                 .UseSingleOrDefault();
 
             descriptor.Field(c => c.UpdateOrderAsync(default, default))
                 .Name("updateOrder")
+                .Authorize(Policies.ANONYMOUS_OR_CONNECTED)
                 .Type<NonNullType<OrderType>>()
                 .UseSingleOrDefault();
 

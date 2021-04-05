@@ -207,6 +207,10 @@ namespace Sheaft.Web.Api
                     builder.RequireAuthenticatedUser();
                     builder.RequireRole(rolesOptions.Consumer.Value);
                 });
+                options.AddPolicy(Policies.ANONYMOUS_OR_CONNECTED, builder =>
+                {
+                    builder.RequireAssertion(c => !c.User.Identity.IsAuthenticated || c.User.Identity.IsAuthenticated);
+                });
             });
 
             services.Configure<KestrelServerOptions>(options => options.AllowSynchronousIO = true);

@@ -43,10 +43,14 @@ namespace Sheaft.Mediatr.Catalog
                 var entity = new Domain.Catalog(catalog.Producer, catalog.Kind, Guid.NewGuid(), request.Name);
                 await _context.AddAsync(entity, token);
 
-                var products = catalog.Products.Select(p =>
+                var catalogProducts =
+                    await _context.GetAsync<Domain.Product>(
+                        p => p.CatalogsPrices.Any(cp => cp.Catalog.Id == request.CatalogId), token);
+                
+                var products = catalogProducts.Select(p =>
                     new UpdateOrCreateCatalogPriceDto
                     {
-                        Id = p.Product.Id, WholeSalePricePerUnit = p.WholeSalePricePerUnit * (1 + request.Percent ?? 0)
+                        Id = p.Id, WholeSalePricePerUnit = p.CatalogsPrices.Single(c => c.Catalog.Id == request.CatalogId).WholeSalePricePerUnit * (1 + request.Percent ?? 0)
                     });
 
                 var result =

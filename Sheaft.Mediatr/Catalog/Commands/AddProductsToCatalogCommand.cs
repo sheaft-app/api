@@ -44,7 +44,7 @@ namespace Sheaft.Mediatr.Catalog
             foreach (var product in products)
             {
                 var catalogProductPrice = request.Products.Single(p => p.Id == product.Id);
-                catalog.AddProduct(product, catalogProductPrice.WholeSalePricePerUnit);
+                product.AddOrUpdateCatalogPrice(catalog, catalogProductPrice.WholeSalePricePerUnit);
             }
             
             await _context.SaveChangesAsync(token);

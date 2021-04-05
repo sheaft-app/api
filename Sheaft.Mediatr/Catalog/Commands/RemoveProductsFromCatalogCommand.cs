@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
@@ -34,8 +35,9 @@ namespace Sheaft.Mediatr.Catalog
 
         public async Task<Result> Handle(RemoveProductsFromCatalogCommand request, CancellationToken token)
         {
-            var catalog = await _context.GetByIdAsync<Domain.Catalog>(request.CatalogId, token);
-            catalog.RemoveProducts(request.ProductIds);
+            var products = await _context.GetAsync<Domain.Product>(p => p.CatalogsPrices.Any(cp => cp.Catalog.Id == request.CatalogId), token);
+            foreach (var product in products)
+                product.RemoveFromCatalog(request.CatalogId);
             
             await _context.SaveChangesAsync(token);
             return Success();

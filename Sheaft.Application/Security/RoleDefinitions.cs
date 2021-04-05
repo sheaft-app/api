@@ -2,6 +2,7 @@
 {
     public static class Policies
     {
+        public const string ANONYMOUS_OR_CONNECTED = "Anything";
         public const string AUTHENTICATED = "Authenticated";
         public const string REGISTERED = "Registered";
         public const string UNREGISTERED = "Unregistered";

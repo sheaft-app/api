@@ -28,6 +28,7 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
             entity.HasMany(c => c.Tags).WithOne().HasForeignKey("ProductUid").OnDelete(DeleteBehavior.Cascade);
             entity.HasOne(c => c.Returnable).WithMany().HasForeignKey("ReturnableUid").OnDelete(DeleteBehavior.NoAction);
             entity.HasMany(c => c.Pictures).WithOne().HasForeignKey("ProductUid").OnDelete(DeleteBehavior.Cascade);
+            entity.HasMany(c => c.CatalogsPrices).WithOne(c => c.Product).HasForeignKey("ProductUid").OnDelete(DeleteBehavior.Cascade);
 
             entity.Ignore(c => c.DomainEvents);
             
