@@ -99,6 +99,13 @@ namespace Sheaft.GraphQL.Types
                 .Type<NonNullType<AgreementType>>()
                 .UseSingleOrDefault()
                 .UseSelection();
+            
+            descriptor.Field(c => c.AssignCatalogToAgreementAsync(default, default))
+                .Name("assignCatalogToAgreement")
+                .Authorize(Policies.PRODUCER)
+                .Type<NonNullType<AgreementType>>()
+                .UseSingleOrDefault()
+                .UseSelection();
 
             descriptor.Field(c => c.RefuseAgreementsAsync(default, default))
                 .Name("refuseAgreements")

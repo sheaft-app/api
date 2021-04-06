@@ -24,7 +24,7 @@ POST https://sheaft-search.search.windows.net/indexes?api-version=2020-06-30
 "filterable": false,
 "key": false,
 "retrievable": true,
-"searchable": false,
+"searchable": true,
 "sortable": true,
 "analyzer": null,
 "indexAnalyzer": null,

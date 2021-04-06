@@ -25,6 +25,7 @@ namespace Sheaft.Mediatr.Agreement.Commands
         }
 
         public Guid AgreementId { get; set; }
+        public Guid? CatalogId { get; set; }
         public IEnumerable<TimeSlotGroupDto> SelectedHours { get; set; }
     }
 
@@ -57,6 +58,17 @@ namespace Sheaft.Mediatr.Agreement.Commands
                     selectedHours.AddRange(sh.Days.Select(d => new TimeSlotHour(d, sh.From, sh.To)));
 
                 entity.SetSelectedHours(selectedHours);
+            }
+            
+            if (request.CatalogId.HasValue && entity.Catalog?.Id != request.CatalogId.Value)
+            {
+                var catalog = await _context.GetByIdAsync<Domain.Catalog>(request.CatalogId.Value, token);
+                entity.AssignCatalog(catalog);
+            }
+            else if (!request.CatalogId.HasValue && entity.Catalog?.Id == null)
+            {
+                var catalog = await _context.GetSingleAsync<Domain.Catalog>(c => c.IsDefault && c.Kind == CatalogKind.Stores && c.Producer.Id == entity.Delivery.Producer.Id, token);
+                entity.AssignCatalog(catalog);
             }
 
             await _context.SaveChangesAsync(token);

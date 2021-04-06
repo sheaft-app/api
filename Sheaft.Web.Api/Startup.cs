@@ -81,6 +81,7 @@ using Sheaft.Mediatr.QuickOrder.Queries;
 using Sheaft.Mediatr.Region.Queries;
 using Sheaft.Mediatr.Returnable.Queries;
 using Sheaft.Mediatr.Store.Commands;
+using Sheaft.Mediatr.Store.Queries;
 using Sheaft.Mediatr.Tag.Queries;
 using Sheaft.Mediatr.Transfer.Queries;
 using Sheaft.Mediatr.User.Queries;
@@ -304,6 +305,7 @@ namespace Sheaft.Web.Api
             
             services.AddScoped<IAgreementQueries, AgreementQueries>();
             services.AddScoped<IProducerQueries, ProducerQueries>();
+            services.AddScoped<IStoreQueries, StoreQueries>();
             services.AddScoped<IDeliveryQueries, DeliveryQueries>();
             services.AddScoped<IDepartmentQueries, DepartmentQueries>();
             services.AddScoped<IJobQueries, JobQueries>();

@@ -130,11 +130,18 @@ namespace Sheaft.GraphQL
             return agreementQueries.GetAgreement(result, CurrentUser);
         }
 
-        public async Task<IQueryable<AgreementDto>> AcceptAgreementAsync(ResourceIdTimeSlotsDto input,
+        public async Task<IQueryable<AgreementDto>> AcceptAgreementAsync(AcceptAgreementDto input,
             [Service] IAgreementQueries agreementQueries)
         {
-            await ExecuteAsync<ResourceIdTimeSlotsDto, AcceptAgreementCommand>(input, Token);
+            await ExecuteAsync<AcceptAgreementDto, AcceptAgreementCommand>(input, Token);
             return agreementQueries.GetAgreement(input.Id, CurrentUser);
+        }
+
+        public async Task<IQueryable<AgreementDto>> AssignCatalogToAgreementAsync(AssignCatalogToAgreementDto input,
+            [Service] IAgreementQueries agreementQueries)
+        {
+            await ExecuteAsync<AssignCatalogToAgreementDto, AssignCatalogToAgreementCommand>(input, Token);
+            return agreementQueries.GetAgreement(input.AgreementId, CurrentUser);
         }
 
         public async Task<IQueryable<AgreementDto>> CancelAgreementsAsync(ResourceIdsWithReasonDto input,

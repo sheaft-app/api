@@ -16,6 +16,9 @@ namespace Sheaft.GraphQL.Types.Inputs
 
             descriptor.Field(c => c.StoreId)
                 .Type<NonNullType<IdType>>();
+
+            descriptor.Field(c => c.CatalogId)
+                .Type<IdType>();
         }
     }
 }

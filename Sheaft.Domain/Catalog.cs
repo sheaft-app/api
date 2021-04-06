@@ -14,7 +14,7 @@ namespace Sheaft.Domain
         protected Catalog()
         {
         }
-
+        
         public Catalog(Producer producer, CatalogKind kind, Guid id, string name)
         {
             Id = id;
@@ -44,25 +44,6 @@ namespace Sheaft.Domain
             IsDefault = isDefault;
         }
 
-        public void AddProduct(Product product, decimal wholeSalePrice)
-        {
-            if (_products == null)
-                _products = new List<CatalogProduct>();
-
-            if (_products != null && _products.Any(p => p.Product.Id == product.Id))
-                throw SheaftException.AlreadyExists();
-
-            _products.Add(new CatalogProduct(product, this, wholeSalePrice));
-        }
-
-        public void RemoveProducts(IEnumerable<Guid> productIds)
-        {
-            foreach (var productId in productIds)
-            {
-                RemoveProduct(productId);
-            }
-        }
-
         public void RemoveProduct(Guid productId)
         {
             if (_products == null)
@@ -73,15 +54,6 @@ namespace Sheaft.Domain
                 throw SheaftException.NotFound();
 
             _products.Remove(product);
-        }
-
-        public void SetProductWholeSalePricePerUnit(Guid productId, decimal newPrice)
-        {
-            var productPrice = _products?.SingleOrDefault(cp => cp.Product.Id == productId);
-            if (productPrice == null)
-                throw SheaftException.NotFound();
-
-            productPrice.SetWholeSalePricePerUnit(newPrice);
         }
 
         public void AddOrUpdateProduct(Product product, decimal wholeSalePrice)

@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using AutoMapper.QueryableExtensions;
 using Microsoft.Azure.Search;
 using Microsoft.Azure.Search.Models;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Sheaft.Application.Extensions;
@@ -168,9 +169,23 @@ namespace Sheaft.Mediatr.Product.Queries
                     .ProjectTo<ProductDto>(_configurationProvider);
 
             if (currentUser.IsInRole(_roleOptions.Store.Value))
+            {
+                var catalogId = _context.Agreements
+                    .Get(c => c.Store.Id == currentUser.Id && c.Catalog.Products.Any(p => p.Product.Id == id))
+                    .Select(a => a.Catalog.Id);
+
+                if (catalogId.Any())
+                    return _context.Agreements
+                        .Get(c => c.Store.Id == currentUser.Id && c.Catalog.Products.Any(p => p.Product.Id == id))
+                        .SelectMany(a => a.Catalog.Products)
+                        .Select(c => c.Product)
+                        .Where(c => c.Id == id)
+                        .ProjectTo<ProductDto>(_configurationProvider);
+
                 return _context.Products
-                    .Get(c => c.Id == id && c.CatalogsPrices.Any(cp => cp.Catalog.Kind == CatalogKind.Stores))
+                    .Get(c => c.Id == id && c.CatalogsPrices.Any(cp => cp.Catalog.Kind == CatalogKind.Stores && cp.Catalog.IsDefault))
                     .ProjectTo<ProductDto>(_configurationProvider);
+            }
 
             return _context.Products
                 .Get(c => c.Id == id && c.CatalogsPrices.Any(cp => cp.Catalog.Kind == CatalogKind.Consumers))
@@ -190,16 +205,11 @@ namespace Sheaft.Mediatr.Product.Queries
                     .ProjectTo<ProductDto>(_configurationProvider);
 
             if (currentUser.IsInRole(_roleOptions.Store.Value))
-            {
-                var producerIds = _context.Agreements
-                    .Get(c => c.Store.Id == currentUser.Id && c.Status == AgreementStatus.Accepted)
-                    .Select(a => a.Delivery.Producer.Id);
-
-                return _context.Products
-                    .Get(p => producerIds.Contains(p.Producer.Id) &&
-                              p.CatalogsPrices.Any(cp => cp.Catalog.Kind == CatalogKind.Stores))
-                    .ProjectTo<ProductDto>(_configurationProvider);
-            }
+                    return _context.Agreements
+                        .Get(c => c.Store.Id == currentUser.Id)
+                        .SelectMany(a => a.Catalog.Products)
+                        .Select(c => c.Product)
+                        .ProjectTo<ProductDto>(_configurationProvider);
 
             return _context.Products
                 .Get(c => c.CatalogsPrices.Any(cp => cp.Catalog.Kind == CatalogKind.Consumers))
@@ -214,10 +224,23 @@ namespace Sheaft.Mediatr.Product.Queries
                     .ProjectTo<ProductDto>(_configurationProvider);
 
             if (currentUser.IsInRole(_roleOptions.Store.Value))
+            {
+                var catalogId = _context.Agreements
+                    .Get(c => c.Store.Id == currentUser.Id && c.Delivery.Producer.Id == producerId)
+                    .Select(a => a.Catalog.Id);
+
+                if (catalogId.Any())
+                    return _context.Agreements
+                        .Get(c => c.Store.Id == currentUser.Id && c.Delivery.Producer.Id == producerId)
+                        .SelectMany(a => a.Catalog.Products)
+                        .Select(c => c.Product)
+                        .ProjectTo<ProductDto>(_configurationProvider);
+
                 return _context.Products
                     .Get(p => p.Producer.Id == producerId &&
-                              p.CatalogsPrices.Any(cp => cp.Catalog.Kind == CatalogKind.Stores))
+                              p.CatalogsPrices.Any(cp => cp.Catalog.Kind == CatalogKind.Stores && cp.Catalog.IsDefault))
                     .ProjectTo<ProductDto>(_configurationProvider);
+            }
 
             return _context.Products
                 .Get(p => p.Producer.Id == producerId &&

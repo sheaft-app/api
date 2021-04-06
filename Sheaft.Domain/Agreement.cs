@@ -24,7 +24,7 @@ namespace Sheaft.Domain
             Delivery = delivery;
             Store = store;
             CreatedBy = createdBy;
-
+            
             if(CreatedBy.Id == store.Id)
                 Status = AgreementStatus.WaitingForProducerApproval;
             else
@@ -43,6 +43,7 @@ namespace Sheaft.Domain
         public virtual DeliveryMode Delivery { get; private set; }
         public virtual Store Store { get; private set; }
         public virtual User CreatedBy { get; private set; }
+        public virtual Catalog Catalog { get; private set; }
         public virtual IReadOnlyCollection<TimeSlotHour> SelectedHours => _selectedHours?.AsReadOnly();
         public List<DomainEvent> DomainEvents { get; } = new List<DomainEvent>();
 
@@ -99,6 +100,14 @@ namespace Sheaft.Domain
                 Status = AgreementStatus.WaitingForProducerApproval;
 
             Reason = null;
+        }
+
+        public void AssignCatalog(Catalog catalog)
+        {
+            if (catalog.Kind == CatalogKind.Consumers)
+                throw SheaftException.Validation();
+            
+            Catalog = catalog;
         }
     }
 }

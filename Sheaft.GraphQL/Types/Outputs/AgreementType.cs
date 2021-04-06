@@ -23,6 +23,9 @@ namespace Sheaft.GraphQL.Types.Outputs
             descriptor.Field(c => c.SelectedHours)
                 .Type<ListType<TimeSlotType>>()
                 .UseFiltering<TimeSlotFilterType>();
+            
+            descriptor.Field(c => c.Catalog)
+                .Type<CatalogType>();
         }
     }
 }

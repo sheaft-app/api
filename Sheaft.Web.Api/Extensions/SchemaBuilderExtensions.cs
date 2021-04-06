@@ -104,6 +104,8 @@ namespace Sheaft.Web.Api.Extensions
             services.AddType<UpdateOrderInputType>();
             services.AddType<CreateDocumentType>();
             services.AddType<CreateAgreementInputType>();
+            services.AddType<AcceptAgreementInputType>();
+            services.AddType<AssignCatalogToAgreementInputType>();
             services.AddType<CreatePurchaseOrderInputType>();
             services.AddType<CreateQuickOrderInputType>();
             services.AddType<CreateDeliveryModeInputType>();
