@@ -65,6 +65,7 @@ namespace Sheaft.Mediatr.Order.Commands
                 var productIds = request.Products.Select(p => p.Id);
                 var products = await _context.Products
                     .Where(p => productIds.Contains(p.Id))
+                    .Include(p => p.Producer)
                     .Include(c => c.CatalogsPrices)
                         .ThenInclude(c => c.Catalog)
                     .ToListAsync(token);
@@ -74,7 +75,8 @@ namespace Sheaft.Mediatr.Order.Commands
                         p.RemovedOn.HasValue 
                         || !p.Available 
                         || p.Producer.RemovedOn.HasValue)
-                    .Select(p => p.Id.ToString("N"));
+                    .Select(p => p.Id.ToString("N"))
+                    .ToList();
 
                 if (invalidProductIds.Any())
                     return Failure<IEnumerable<Guid>>(MessageKind.Order_CannotCreate_Some_Products_NotAvailable,
@@ -82,18 +84,22 @@ namespace Sheaft.Mediatr.Order.Commands
                 
                 var cartProducts = new List<Tuple<Domain.Product, Guid, int>>();
                 var deliveryIds = request.ProducersExpectedDeliveries.Select(p => p.DeliveryModeId);
-                // var agreements = await _context.GetAsync<Domain.Agreement>(a => deliveryIds.Contains(a.Delivery.Id), token);
+                var agreements = await _context.GetAsync<Domain.Agreement>(a => deliveryIds.Contains(a.Delivery.Id), token);
                 foreach (var product in products)
                 {
-                    //TODO get catalog from Agreement
-                    // var agreement = agreements.SingleOrDefault(a => a.Delivery.Producer.Id == product.Producer.Id);
-                    // var catalog = agreement.Catalog;
-                    var catalog = product.CatalogsPrices.Select(p => p.Catalog).SingleOrDefault(p => !p.RemovedOn.HasValue && p.Available && p.Kind == CatalogKind.Stores && p.Producer.Id == product.Producer.Id);
-                    if (catalog == null)
+                    var agreement = agreements.SingleOrDefault(a => a.Delivery.Producer.Id == product.Producer.Id);
+                    if (agreement?.Catalog == null)
                         throw SheaftException.Validation();
                     
-                    cartProducts.Add(new Tuple<Domain.Product, Guid, int>(product, catalog.Id, request.Products.Where(p => p.Id == product.Id).Sum(c => c.Quantity)));
+                    if(!agreement.Catalog.Products.Any(p => p.Product.Id == product.Id))
+                        invalidProductIds.Add(product.Id.ToString("N"));
+
+                    cartProducts.Add(new Tuple<Domain.Product, Guid, int>(product, agreement.Catalog.Id, request.Products.Where(p => p.Id == product.Id).Sum(c => c.Quantity)));
                 }
+                
+                if (invalidProductIds.Any())
+                    return Failure<IEnumerable<Guid>>(MessageKind.Order_CannotCreate_Some_Products_NotAvailable,
+                        string.Join(";", invalidProductIds));
                 
                 var deliveries = deliveryIds.Any()
                     ? await _context.GetByIdsAsync<Domain.DeliveryMode>(deliveryIds, token)
