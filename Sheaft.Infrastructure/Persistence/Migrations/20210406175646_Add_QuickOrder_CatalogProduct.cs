@@ -6,6 +6,7 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            
             migrationBuilder.DropForeignKey(
                 name: "FK_QuickOrderProducts_Products_ProductUid",
                 schema: "app",
@@ -41,6 +42,14 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                     defaultValue: 0L)
                 .Annotation("SqlServer:Identity", "1, 1");
 
+            migrationBuilder.Sql(
+                "update app.QuickOrderProducts set CatalogProductUid = res.Uid from (select cp.Uid, qop.QuickOrderUid as qoUid, qop.ProductUid as poUid from app.QuickOrders qo      join app.QuickOrderProducts qop on qop.QuickOrderUid = qo.Uid     join app.Products p on p.Uid = qop.ProductUid     join app.CatalogProducts cp on cp.ProductUid = p.Uid     join app.Catalogs c on c.Uid = cp.CatalogUid     where c.Kind = 0) res where QuickOrderUid = res.qoUid and ProductUid = res.poUid");
+            
+            migrationBuilder.DropColumn(
+                name: "ProductUid",
+                schema: "app",
+                table: "QuickOrderProducts");
+            
             migrationBuilder.AddPrimaryKey(
                 name: "PK_QuickOrderProducts",
                 schema: "app",
@@ -66,13 +75,6 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                 columns: new[] { "CatalogUid", "ProductUid" },
                 unique: true);
             
-            //TODO update quickorder links
-            
-            migrationBuilder.DropColumn(
-                name: "ProductUid",
-                schema: "app",
-                table: "QuickOrderProducts");
-            
             migrationBuilder.AddForeignKey(
                 name: "FK_QuickOrderProducts_CatalogProducts_CatalogProductUid",
                 schema: "app",
@@ -80,8 +82,7 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                 column: "CatalogProductUid",
                 principalSchema: "app",
                 principalTable: "CatalogProducts",
-                principalColumn: "Uid",
-                onDelete: ReferentialAction.Cascade);
+                principalColumn: "Uid");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)

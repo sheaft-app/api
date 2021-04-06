@@ -11,7 +11,7 @@ using Sheaft.Infrastructure.Persistence;
 namespace Sheaft.Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20210406171600_Add_QuickOrder_CatalogProduct")]
+    [Migration("20210406175646_Add_QuickOrder_CatalogProduct")]
     partial class Add_QuickOrder_CatalogProduct
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -3352,7 +3352,7 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                     b.HasOne("Sheaft.Domain.CatalogProduct", "CatalogProduct")
                         .WithMany()
                         .HasForeignKey("CatalogProductUid")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.HasOne("Sheaft.Domain.QuickOrder", null)

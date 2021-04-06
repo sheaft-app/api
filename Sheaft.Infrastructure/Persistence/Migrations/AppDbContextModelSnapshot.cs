@@ -3350,7 +3350,7 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                     b.HasOne("Sheaft.Domain.CatalogProduct", "CatalogProduct")
                         .WithMany()
                         .HasForeignKey("CatalogProductUid")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.HasOne("Sheaft.Domain.QuickOrder", null)

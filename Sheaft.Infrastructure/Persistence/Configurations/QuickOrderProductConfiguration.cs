@@ -12,7 +12,7 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
             entity.Property<long>("CatalogProductUid");
             entity.Property(c => c.Quantity).IsConcurrencyToken();
 
-            entity.HasOne(c => c.CatalogProduct).WithMany().HasForeignKey("CatalogProductUid").OnDelete(DeleteBehavior.Cascade);
+            entity.HasOne(c => c.CatalogProduct).WithMany().HasForeignKey("CatalogProductUid").OnDelete(DeleteBehavior.NoAction);
 
             entity.HasKey("QuickOrderUid", "CatalogProductUid");
             entity.ToTable("QuickOrderProducts");
