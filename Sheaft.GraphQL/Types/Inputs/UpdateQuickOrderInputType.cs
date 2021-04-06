@@ -15,6 +15,9 @@ namespace Sheaft.GraphQL.Types.Inputs
 
             descriptor.Field(c => c.Name)
                 .Type<NonNullType<StringType>>();
+            
+            descriptor.Field(c => c.Products)
+                .Type<ListType<ResourceIdQuantityInputType>>();
         }
     }
 }

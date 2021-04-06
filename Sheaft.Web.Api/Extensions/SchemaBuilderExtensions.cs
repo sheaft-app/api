@@ -135,7 +135,6 @@ namespace Sheaft.Web.Api.Extensions
             services.AddType<UpdateStoreInputType>();
             services.AddType<UpdateProducerInputType>();
             services.AddType<UpdateDeliveryModeInputType>();
-            services.AddType<UpdateResourceIdProductsQuantitiesInputType>();
             services.AddType<UpdateReturnableInputType>();
             services.AddType<UpdateResourceIdPictureInputType>();
             services.AddType<UpdateProductInputType>();

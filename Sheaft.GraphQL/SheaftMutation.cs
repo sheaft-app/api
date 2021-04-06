@@ -419,13 +419,6 @@ namespace Sheaft.GraphQL
             return quickOrderQueries.GetQuickOrder(input.Id, CurrentUser);
         }
 
-        public async Task<IQueryable<QuickOrderDto>> UpdateQuickOrderProductsAsync(
-            UpdateResourceIdProductsQuantitiesDto input, [Service] IQuickOrderQueries quickOrderQueries)
-        {
-            await ExecuteAsync<UpdateResourceIdProductsQuantitiesDto, UpdateQuickOrderProductsCommand>(input, Token);
-            return quickOrderQueries.GetQuickOrder(input.Id, CurrentUser);
-        }
-
         public async Task<bool> DeleteQuickOrdersAsync(ResourceIdsWithReasonDto input)
         {
             return await ExecuteAsync<ResourceIdsWithReasonDto, DeleteQuickOrdersCommand>(input, Token);

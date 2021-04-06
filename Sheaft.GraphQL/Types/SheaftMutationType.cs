@@ -324,13 +324,6 @@ namespace Sheaft.GraphQL.Types
                 .UseSingleOrDefault()
                 .UseSelection();
 
-            descriptor.Field(c => c.UpdateQuickOrderProductsAsync(default, default))
-                .Name("updateQuickOrderProducts")
-                .Authorize(Policies.STORE)
-                .Type<NonNullType<QuickOrderType>>()
-                .UseSingleOrDefault()
-                .UseSelection();
-
             descriptor.Field(c => c.DeleteQuickOrdersAsync(default))
                 .Name("deleteQuickOrders")
                 .Authorize(Policies.STORE)
