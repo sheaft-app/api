@@ -43,6 +43,7 @@ namespace Sheaft.Mediatr.Agreement.Commands
         public async Task<Result<Guid>> Handle(CreateAgreementCommand request, CancellationToken token)
         {
             var store = await _context.GetByIdAsync<Domain.Store>(request.StoreId, token);
+            var currentUser = await _context.GetByIdAsync<Domain.User>(request.RequestUser.Id, token);
             var delivery = await _context.GetByIdAsync<Domain.DeliveryMode>(request.DeliveryModeId, token);
 
             var selectedHours = new List<TimeSlotHour>();
@@ -54,7 +55,7 @@ namespace Sheaft.Mediatr.Agreement.Commands
                 }
             }
 
-            var entity = new Domain.Agreement(Guid.NewGuid(), store, delivery, store, selectedHours);
+            var entity = new Domain.Agreement(Guid.NewGuid(), store, delivery, currentUser, selectedHours);
             if (request.CatalogId.HasValue)
             {
                 var catalog = await _context.GetByIdAsync<Domain.Catalog>(request.CatalogId.Value, token);
