@@ -11,6 +11,7 @@ namespace Sheaft.GraphQL.Filters
             descriptor.BindFieldsExplicitly();
             descriptor.Filter(c => c.Id).AllowEquals();
             descriptor.Filter(c => c.Status).AllowIn();
+            descriptor.Filter(c => c.PurchaseOrdersCount).AllowEquals();
         }
     }
 }
