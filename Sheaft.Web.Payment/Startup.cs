@@ -1,5 +1,6 @@
 using Hangfire;
 using MangoPay.SDK;
+using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -13,13 +14,9 @@ using Serilog;
 using Serilog.Events;
 using Sheaft.Infrastructure.Services;
 using Sheaft.Web.Common;
-using System.Collections.Generic;
-using System.Reflection;
-using MediatR;
 using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Application.Interfaces.Mediatr;
 using Sheaft.Mediatr;
-using Sheaft.Mediatr.Store.Commands;
 using Sheaft.Options;
 
 namespace Sheaft.Web.Payment
@@ -81,7 +78,7 @@ namespace Sheaft.Web.Payment
             services.AddScoped<IPspService, PspService>();
             services.AddScoped<ISheaftMediatr, SheaftMediatr>();
 
-            services.AddMediatR(new List<Assembly>() { typeof(RegisterStoreCommand).Assembly }.ToArray());
+            services.AddMediatR(typeof(Startup).Assembly);
             services.AddScoped<IBackgroundJobClient, BackgroundJobClient>();
 
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
@@ -91,7 +88,7 @@ namespace Sheaft.Web.Payment
             {
                 config.AddSerilog(dispose: true);
             });
-
+            
             var jobsDatabaseConfig = jobsDatabaseSettings.Get<JobsDatabaseOptions>();
             services.AddHangfire(configuration =>
             {
