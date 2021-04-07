@@ -33,6 +33,7 @@ namespace Sheaft.GraphQL.Types.Outputs
 
             descriptor.Field(c => c.FeesFixedAmount);
             descriptor.Field(c => c.FeesPercent);
+            descriptor.Field(c => c.PurchaseOrdersCount);
 
             descriptor.Field(c => c.ReturnablesCount);
             descriptor.Field(c => c.LinesCount);

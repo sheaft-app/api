@@ -9,7 +9,8 @@ namespace Sheaft.Application.Mappings
         {
             CreateMap<Domain.Order, OrderDto>()
                 .ForMember(d => d.Donation, opt => opt.MapFrom(r => r.Donate))
-                .ForMember(d => d.TotalFees, opt => opt.MapFrom(r => r.FeesPrice - r.InternalFeesPrice));
+                .ForMember(d => d.TotalFees, opt => opt.MapFrom(r => r.FeesPrice - r.InternalFeesPrice))
+                .ForMember(d => d.PurchaseOrdersCount, opt => opt.MapFrom(r => r.PurchaseOrders.Count));
         }
     }
 }
