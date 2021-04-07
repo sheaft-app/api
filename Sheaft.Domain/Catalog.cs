@@ -44,7 +44,7 @@ namespace Sheaft.Domain
             IsDefault = isDefault;
         }
 
-        public void RemoveProduct(Guid productId)
+        public CatalogProduct RemoveProduct(Guid productId)
         {
             if (_products == null)
                 throw SheaftException.NotFound();
@@ -54,6 +54,7 @@ namespace Sheaft.Domain
                 throw SheaftException.NotFound();
 
             _products.Remove(product);
+            return product;
         }
 
         public void AddOrUpdateProduct(Product product, decimal wholeSalePrice)

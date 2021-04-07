@@ -116,7 +116,7 @@ namespace Sheaft.Mediatr.Product.Commands
                     if (request.VisibleToConsumers.Value)
                         consumerCatalog.AddOrUpdateProduct(entity, request.WholeSalePricePerUnit.Value);
                     else if(consumerCatalog.Products.Any(pc => pc.Product.Id == entity.Id))
-                        consumerCatalog.RemoveProduct(entity.Id); 
+                        _context.Remove(consumerCatalog.RemoveProduct(entity.Id)); 
 
                     var storeCatalog = await _context.GetSingleAsync<Domain.Catalog>(
                         c => c.Producer.Id == entity.Producer.Id && c.Kind == CatalogKind.Stores, token);
@@ -124,7 +124,7 @@ namespace Sheaft.Mediatr.Product.Commands
                     if (request.VisibleToStores.Value)
                         storeCatalog.AddOrUpdateProduct(entity, request.WholeSalePricePerUnit.Value);
                     else if(storeCatalog.Products.Any(pc => pc.Product.Id == entity.Id))
-                        storeCatalog.RemoveProduct(entity.Id);
+                        _context.Remove(storeCatalog.RemoveProduct(entity.Id));
                 }
 
                 if (!request.VisibleToConsumers.HasValue || !request.VisibleToStores.HasValue)
@@ -133,7 +133,7 @@ namespace Sheaft.Mediatr.Product.Commands
                     var catalogIds = productCatalogs.Select(pc => pc.Id);
                     var catalogToRemoveIds = catalogIds.Except(request.Catalogs.Select(c => c.Id));
                     foreach (var catalog in productCatalogs.Where(pc => catalogToRemoveIds.Contains(pc.Id)))
-                        catalog.RemoveProduct(entity.Id);
+                        _context.Remove(catalog.RemoveProduct(entity.Id));
 
                     foreach (var catalogPrice in request.Catalogs)
                     {
