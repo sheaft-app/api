@@ -17,7 +17,7 @@ namespace Sheaft.Web.Signalr
                 .UseSerilog()
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
-                    webBuilder.UseStartup<Providers.Startup>();
+                    webBuilder.UseStartup<Startup>();
                 });
     }
 }

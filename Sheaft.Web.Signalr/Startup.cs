@@ -74,7 +74,7 @@ namespace Sheaft.Web.Signalr
         {
             IdentityModelEventSource.ShowPII = Configuration.GetValue<bool?>("ShowPII") ?? false;
 
-            services.AddMediatR(new List<Assembly>() { typeof(RegisterStoreCommand).Assembly }.ToArray());
+            services.AddMediatR(typeof(Startup).Assembly);
             services.AddScoped<IBackgroundJobClient, BackgroundJobClient>();
             services.AddScoped<ISheaftMediatr, SheaftMediatr>();
 
