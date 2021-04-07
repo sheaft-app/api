@@ -41,7 +41,7 @@ namespace Sheaft.Mediatr.DeliveryClosing.Commands
             using (var transaction = await _context.BeginTransactionAsync(token))
             {
                 var entity = await _context.GetByIdAsync<Domain.DeliveryMode>(request.DeliveryId, token);
-                var existingClosingIds = entity.Closings.Select(c => c.Id).ToList();
+                var existingClosingIds = entity.Closings?.Select(c => c.Id)?.ToList() ?? new List<Guid>();
                 
                 var closingIdsToRemove = existingClosingIds.Except(request.Closings?.Where(c => c.Id.HasValue)?.Select(c => c.Id.Value) ?? new List<Guid>()).ToList();
                 if (closingIdsToRemove.Any())
@@ -51,20 +51,17 @@ namespace Sheaft.Mediatr.DeliveryClosing.Commands
                 }
 
                 var ids = new List<Guid>();
-                if (request.Closings != null)
+                foreach (var closing in request.Closings)
                 {
-                    foreach (var closing in request.Closings)
-                    {
-                        var result =
-                            await _mediatr.Process(
-                                new UpdateOrCreateDeliveryClosingCommand(request.RequestUser)
-                                    {DeliveryId = request.DeliveryId, Closing = closing}, token);
+                    var result =
+                        await _mediatr.Process(
+                            new UpdateOrCreateDeliveryClosingCommand(request.RequestUser)
+                                {DeliveryId = request.DeliveryId, Closing = closing}, token);
 
-                        if (!result.Succeeded)
-                            throw result.Exception;
+                    if (!result.Succeeded)
+                        throw result.Exception;
 
-                        ids.Add(result.Data);
-                    }
+                    ids.Add(result.Data);
                 }
 
                 await transaction.CommitAsync(token);

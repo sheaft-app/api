@@ -473,8 +473,8 @@ namespace Sheaft.GraphQL.Types
             descriptor.Field(c => c.UpdateOrCreateBusinessClosingsAsync(default, default))
                 .Name("updateOrCreateBusinessClosings")
                 .Authorize(Policies.OWNER)
-                .Type<NonNullType<ClosingType>>()
-                .UseSingleOrDefault()
+                .Type<NonNullType<ListType<ClosingType>>>()
+                .UsePaging<ClosingType>()
                 .UseSelection();
             
             descriptor.Field(c => c.UpdateOrCreateBusinessClosingAsync(default, default))

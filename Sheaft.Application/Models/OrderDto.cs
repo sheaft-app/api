@@ -32,6 +32,7 @@ namespace Sheaft.Application.Models
         public decimal InternalFeesPrice { get; set; }
         public decimal FeesFixedAmount { get; set; }
         public decimal FeesPercent { get; set; }
+        public int PurchaseOrdersCount { get; set; }
         public UserDto User { get; set; }
         public List<OrderProductDto> Products { get; set; }
         public List<OrderDeliveryDto> Deliveries { get; set; }
