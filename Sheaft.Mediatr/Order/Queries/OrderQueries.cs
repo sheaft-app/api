@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using AutoMapper.QueryableExtensions;
 using Sheaft.Application.Extensions;
@@ -36,17 +37,23 @@ namespace Sheaft.Mediatr.Order.Queries
 
         public IQueryable<OrderDto> GetOrders(RequestUser currentUser)
         {
-            return _context.Orders
-                    .Get(c => c.Status == OrderStatus.Validated)
+            if (currentUser.IsAuthenticated)
+                return _context.Orders
+                    .Get(o => o.User.Id == currentUser.Id)
                     .ProjectTo<OrderDto>(_configurationProvider);
+
+            return new List<OrderDto>().AsQueryable();
         }
 
         public IQueryable<OrderDto> GetCurrentOrder(RequestUser currentUser)
         {
-            return _context.Orders
-                .Get(c => c.User.Id == currentUser.Id && c.Status == OrderStatus.Created)
-                .OrderBy(c => c.CreatedOn)
-                .ProjectTo<OrderDto>(_configurationProvider);
+            if (currentUser.IsAuthenticated)
+                return _context.Orders
+                    .Get(c => c.User.Id == currentUser.Id && c.Status == OrderStatus.Created)
+                    .OrderBy(c => c.CreatedOn)
+                    .ProjectTo<OrderDto>(_configurationProvider);
+            
+            return new List<OrderDto>().AsQueryable();
         }
     }
 }
