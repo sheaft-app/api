@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
@@ -42,6 +43,17 @@ namespace Sheaft.Mediatr.Agreement.Commands
                 throw SheaftException.Forbidden();
             
             entity.CancelAgreement(request.Reason);
+
+            var quickOrders = await _context.GetAsync<Domain.QuickOrder>(
+                qo => qo.Products.Any(qop => qop.CatalogProduct.Catalog.Id == entity.Catalog.Id) &&
+                      qo.User.Id == entity.Store.Id, token);
+
+            foreach (var quickOrder in quickOrders)
+            {
+                var products = quickOrder.Products.Where(p => p.CatalogProduct.Catalog.Id == entity.Catalog.Id);
+                foreach (var product in products)
+                    quickOrder.RemoveProduct(product.CatalogProduct.Product.Id);
+            }
 
             await _context.SaveChangesAsync(token);
             return Success();
