@@ -35,7 +35,7 @@ namespace Sheaft.Mediatr.Catalog
 
         public async Task<Result> Handle(RemoveProductsFromCatalogCommand request, CancellationToken token)
         {
-            var products = await _context.GetAsync<Domain.Product>(p => p.CatalogsPrices.Any(cp => cp.Catalog.Id == request.CatalogId), token);
+            var products = await _context.GetAsync<Domain.Product>(p => request.ProductIds.Contains(p.Id), token);
             foreach (var product in products)
                 product.RemoveFromCatalog(request.CatalogId);
             

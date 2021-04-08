@@ -258,6 +258,9 @@ namespace Sheaft.Domain
                 throw SheaftException.NotFound();
             
             var existingCatalogPrice = _catalogsPrices.SingleOrDefault(c => c.Catalog.Id == catalogId);
+            if (existingCatalogPrice == null)
+                throw SheaftException.NotFound();
+            
             _catalogsPrices.Remove(existingCatalogPrice);
         }
 

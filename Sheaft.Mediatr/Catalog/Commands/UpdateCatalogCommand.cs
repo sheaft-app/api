@@ -57,6 +57,9 @@ namespace Sheaft.Mediatr.Catalog
                 actualDefaultCatalog.SetIsDefault(false);
             }
 
+            if (catalogs.Where(c => c.Kind == CatalogKind.Stores).All(c => !c.IsDefault))
+                throw SheaftException.Validation();
+
             await _context.SaveChangesAsync(token);
             return Success();
         }

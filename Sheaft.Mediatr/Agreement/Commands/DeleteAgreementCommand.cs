@@ -4,13 +4,16 @@ using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
+using Sheaft.Application.Extensions;
 using Sheaft.Application.Interfaces;
 using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Application.Interfaces.Mediatr;
 using Sheaft.Core;
 using Sheaft.Core.Exceptions;
 using Sheaft.Domain;
+using Sheaft.Options;
 
 namespace Sheaft.Mediatr.Agreement.Commands
 {
@@ -27,18 +30,25 @@ namespace Sheaft.Mediatr.Agreement.Commands
     public class DeleteAgreementCommandsHandler : CommandsHandler,
         IRequestHandler<DeleteAgreementCommand, Result>
     {
+        private readonly RoleOptions _roleOptions;
+
         public DeleteAgreementCommandsHandler(
             ISheaftMediatr mediatr,
             IAppDbContext context,
+            IOptionsSnapshot<RoleOptions> roleOptions,
             ILogger<DeleteAgreementCommandsHandler> logger)
             : base(mediatr, context, logger)
         {
+            _roleOptions = roleOptions.Value;
         }
 
         public async Task<Result> Handle(DeleteAgreementCommand request, CancellationToken token)
         {
             var entity = await _context.GetByIdAsync<Domain.Agreement>(request.AgreementId, token);
-            if(entity.Delivery.Producer.Id != request.RequestUser.Id && entity.Store.Id != request.RequestUser.Id)
+            if(request.RequestUser.IsInRole(_roleOptions.Producer.Value) && entity.Delivery.Producer.Id != request.RequestUser.Id)
+                throw SheaftException.Forbidden();
+            
+            if(request.RequestUser.IsInRole(_roleOptions.Store.Value) && entity.Store.Id != request.RequestUser.Id)
                 throw SheaftException.Forbidden();
             
             _context.Remove(entity);

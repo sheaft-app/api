@@ -13,9 +13,9 @@ using Sheaft.Domain;
 
 namespace Sheaft.Mediatr.Catalog
 {
-    public class AddProductsToCatalogCommand: Command
+    public class AddOrUpdateProductsToCatalogCommand: Command
     {
-        public AddProductsToCatalogCommand(RequestUser requestUser) : base(requestUser)
+        public AddOrUpdateProductsToCatalogCommand(RequestUser requestUser) : base(requestUser)
         {
         }
         
@@ -23,18 +23,18 @@ namespace Sheaft.Mediatr.Catalog
         public IEnumerable<UpdateOrCreateCatalogPriceDto> Products { get; set; }
     }
 
-    public class AddProductsToCatalogCommandHandler : CommandsHandler,
-        IRequestHandler<AddProductsToCatalogCommand, Result>
+    public class AddOrUpdateProductsToCatalogCommandHandler : CommandsHandler,
+        IRequestHandler<AddOrUpdateProductsToCatalogCommand, Result>
     {
-        public AddProductsToCatalogCommandHandler(
+        public AddOrUpdateProductsToCatalogCommandHandler(
             ISheaftMediatr mediatr,
             IAppDbContext context,
-            ILogger<AddProductsToCatalogCommandHandler> logger)
+            ILogger<AddOrUpdateProductsToCatalogCommandHandler> logger)
             : base(mediatr, context, logger)
         {
         }
 
-        public async Task<Result> Handle(AddProductsToCatalogCommand request, CancellationToken token)
+        public async Task<Result> Handle(AddOrUpdateProductsToCatalogCommand request, CancellationToken token)
         {
             var catalog = await _context.GetByIdAsync<Domain.Catalog>(request.CatalogId, token);
 

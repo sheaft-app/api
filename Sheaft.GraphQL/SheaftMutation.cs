@@ -525,10 +525,10 @@ namespace Sheaft.GraphQL
             return await ExecuteAsync<ResourceIdsDto, DeleteCatalogsCommand>(input, Token);
         }
 
-        public async Task<IQueryable<CatalogDto>> AddProductsToCatalogAsync(AddProductsToCatalogDto input,
+        public async Task<IQueryable<CatalogDto>> AddOrUpdateProductsToCatalogAsync(AddOrUpdateProductsToCatalogDto input,
             [Service] ICatalogQueries catalogQueries)
         {
-            await ExecuteAsync<AddProductsToCatalogDto, AddProductsToCatalogCommand>(input, Token);
+            await ExecuteAsync<AddOrUpdateProductsToCatalogDto, AddOrUpdateProductsToCatalogCommand>(input, Token);
             return catalogQueries.GetCatalog(input.Id, CurrentUser);
         }
 

@@ -522,8 +522,8 @@ namespace Sheaft.GraphQL.Types
                 .Authorize(Policies.OWNER)
                 .Type<BooleanType>();
             
-            descriptor.Field(c => c.AddProductsToCatalogAsync(default, default))
-                .Name("addProductsToCatalog")
+            descriptor.Field(c => c.AddOrUpdateProductsToCatalogAsync(default, default))
+                .Name("addOrUpdateProductsToCatalog")
                 .Authorize(Policies.OWNER)
                 .Type<NonNullType<CatalogType>>()
                 .UseSingleOrDefault()

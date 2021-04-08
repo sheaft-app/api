@@ -158,7 +158,7 @@ namespace Sheaft.Web.Api.Extensions
             services.AddType<CreateCatalogInputType>();
             services.AddType<UpdateCatalogInputType>();
             services.AddType<CloneCatalogInputType>();
-            services.AddType<AddProductsToCatalogInputType>();
+            services.AddType<AddOrUpdateProductsToCatalogInputType>();
             services.AddType<RemoveProductsFromCatalogInputType>();
             services.AddType<UpdateAllCatalogPricesInputType>();
             services.AddType<UpdateCatalogPricesInputType>();

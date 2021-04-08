@@ -107,6 +107,9 @@ namespace Sheaft.Domain
             if (catalog.Kind == CatalogKind.Consumers)
                 throw SheaftException.Validation();
             
+            if(!catalog.Available)
+                throw SheaftException.Validation();
+
             Catalog = catalog;
         }
     }

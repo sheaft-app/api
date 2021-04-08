@@ -58,6 +58,7 @@ using Sheaft.Infrastructure.Persistence.Extensions;
 using Sheaft.Mediatr;
 using Sheaft.Mediatr.Agreement.Queries;
 using Sheaft.Mediatr.BusinessClosing.Queries;
+using Sheaft.Mediatr.Catalog.Queries;
 using Sheaft.Mediatr.Consumer.Queries;
 using Sheaft.Mediatr.Country.Queries;
 using Sheaft.Mediatr.DeliveryClosing.Queries;
@@ -331,6 +332,7 @@ namespace Sheaft.Web.Api
             services.AddScoped<IPayoutQueries, PayoutQueries>();
             services.AddScoped<IDonationQueries, DonationQueries>();
             services.AddScoped<IWithholdingQueries, WithholdingQueries>();
+            services.AddScoped<ICatalogQueries, CatalogQueries>();
             
             services.AddScoped<ISheaftMediatr, SheaftMediatr>();
             services.AddScoped<ISheaftDispatcher, SheaftDispatcher>();

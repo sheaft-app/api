@@ -55,7 +55,7 @@ namespace Sheaft.Mediatr.Catalog
 
                 var result =
                     await _mediatr.Process(
-                        new AddProductsToCatalogCommand(request.RequestUser)
+                        new AddOrUpdateProductsToCatalogCommand(request.RequestUser)
                             {CatalogId = entity.Id, Products = products}, token);
 
                 if (!result.Succeeded)

@@ -17,12 +17,15 @@ namespace Sheaft.Mediatr.Catalog
     {
         public CreateCatalogCommand(RequestUser requestUser) : base(requestUser)
         {
+            Kind = CatalogKind.Stores;
+            ProducerId = requestUser.Id;
         }
 
         public string Name { get; set; }
         public CatalogKind Kind { get; set; }
         public bool IsDefault { get; set; }
         public bool IsAvailable { get; set; }
+        public Guid ProducerId { get; set; }
     }
 
     public class CreateCatalogCommandHandler : CommandsHandler,
@@ -38,7 +41,7 @@ namespace Sheaft.Mediatr.Catalog
 
         public async Task<Result<Guid>> Handle(CreateCatalogCommand request, CancellationToken token)
         {
-            var producer = await _context.GetByIdAsync<Domain.Producer>(request.RequestUser.Id, token);
+            var producer = await _context.GetByIdAsync<Domain.Producer>(request.ProducerId, token);
             var catalogs =
                 await _context.GetAsync<Domain.Catalog>(
                     c => c.Producer.Id == request.RequestUser.Id, token);

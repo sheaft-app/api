@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Sheaft.Domain.Enum;
 
 namespace Sheaft.Application.Models
 {
@@ -7,6 +8,7 @@ namespace Sheaft.Application.Models
     {
         public Guid Id { get; set; }
         public string Name { get; set; }
+        public CatalogKind Kind { get; set; }
         public DateTimeOffset CreatedOn { get; set; }
         public DateTimeOffset? UpdatedOn { get; set; }
         public bool IsAvailable { get; set; }

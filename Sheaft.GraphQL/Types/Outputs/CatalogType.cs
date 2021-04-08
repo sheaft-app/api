@@ -7,8 +7,9 @@ namespace Sheaft.GraphQL.Types.Outputs
     {
         protected override void Configure(IObjectTypeDescriptor<CatalogDto> descriptor)
         {
-            descriptor.Field(c => c.Id);
+            descriptor.Field(c => c.Id).Type<NonNullType<IdType>>();
             descriptor.Field(c => c.Name);
+            descriptor.Field(c => c.Kind);
             descriptor.Field(c => c.CreatedOn);
             descriptor.Field(c => c.UpdatedOn);
             descriptor.Field(c => c.ProductsCount);

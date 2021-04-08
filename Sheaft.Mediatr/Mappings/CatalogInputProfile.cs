@@ -18,7 +18,7 @@ namespace Sheaft.Mediatr.Mappings
             CreateMap<SetResourceIdsAvailabilityDto, SetCatalogsAvailabilityCommand>()
                 .ForMember(c => c.CatalogIds, opt =>opt.MapFrom(e => e.Ids));
             
-            CreateMap<AddProductsToCatalogDto, AddProductsToCatalogCommand>()
+            CreateMap<AddOrUpdateProductsToCatalogDto, AddOrUpdateProductsToCatalogCommand>()
                 .ForMember(c => c.CatalogId, opt =>opt.MapFrom(e => e.Id));
             CreateMap<RemoveProductsFromCatalogDto, RemoveProductsFromCatalogCommand>()
                 .ForMember(c => c.CatalogId, opt =>opt.MapFrom(e => e.Id));
