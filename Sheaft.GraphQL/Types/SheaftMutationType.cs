@@ -99,6 +99,13 @@ namespace Sheaft.GraphQL.Types
                 .Type<NonNullType<AgreementType>>()
                 .UseSingleOrDefault()
                 .UseSelection();
+            
+            descriptor.Field(c => c.AssignCatalogToAgreementAsync(default, default))
+                .Name("assignCatalogToAgreement")
+                .Authorize(Policies.PRODUCER)
+                .Type<NonNullType<AgreementType>>()
+                .UseSingleOrDefault()
+                .UseSelection();
 
             descriptor.Field(c => c.RefuseAgreementsAsync(default, default))
                 .Name("refuseAgreements")
@@ -192,16 +199,7 @@ namespace Sheaft.GraphQL.Types
                 .Type<NonNullType<ListType<ProductType>>>()
                 .UsePaging<ProductType>()
                 .UseFiltering<ProductFilterType>()
-                .UseSorting<ProductSortType>()
-                .UseSelection();
-
-            descriptor.Field(c => c.SetProductsSearchabilityAsync(default, default))
-                .Name("setProductsSearchability")
-                .Authorize(Policies.PRODUCER)
-                .Type<NonNullType<ListType<ProductType>>>()
-                .UsePaging<ProductType>()
-                .UseFiltering<ProductFilterType>()
-                .UseSorting<ProductSortType>()
+                .UseSorting<SearchProductSortType>()
                 .UseSelection();
 
             descriptor.Field(c => c.DeleteProductsAsync(default))
@@ -278,11 +276,13 @@ namespace Sheaft.GraphQL.Types
             //ORDER
             descriptor.Field(c => c.CreateOrderAsync(default, default))
                 .Name("createOrder")
+                .Authorize(Policies.ANONYMOUS_OR_CONNECTED)
                 .Type<NonNullType<OrderType>>()
                 .UseSingleOrDefault();
 
             descriptor.Field(c => c.UpdateOrderAsync(default, default))
                 .Name("updateOrder")
+                .Authorize(Policies.ANONYMOUS_OR_CONNECTED)
                 .Type<NonNullType<OrderType>>()
                 .UseSingleOrDefault();
 
@@ -324,29 +324,9 @@ namespace Sheaft.GraphQL.Types
                 .UseSingleOrDefault()
                 .UseSelection();
 
-            descriptor.Field(c => c.UpdateQuickOrderProductsAsync(default, default))
-                .Name("updateQuickOrderProducts")
-                .Authorize(Policies.STORE)
-                .Type<NonNullType<QuickOrderType>>()
-                .UseSingleOrDefault()
-                .UseSelection();
-
             descriptor.Field(c => c.DeleteQuickOrdersAsync(default))
                 .Name("deleteQuickOrders")
                 .Authorize(Policies.STORE)
-                .Type<NonNullType<BooleanType>>();
-
-            //DOCUMENTS
-            descriptor.Field(c => c.CreateDocumentAsync(default, default))
-                .Name("createDocument")
-                .Authorize(Policies.PRODUCER)
-                .Type<NonNullType<DocumentType>>()
-                .UseSingleOrDefault()
-                .UseSelection();
-
-            descriptor.Field(c => c.RemoveDocumentAsync(default))
-                .Name("removeDocument")
-                .Authorize(Policies.PRODUCER)
                 .Type<NonNullType<BooleanType>>();
 
             //USER
@@ -520,6 +500,76 @@ namespace Sheaft.GraphQL.Types
                 .Name("deleteDeliveryClosings")
                 .Authorize(Policies.OWNER)
                 .Type<BooleanType>();
+            
+            //CATALOGS
+            
+            descriptor.Field(c => c.CreateCatalogAsync(default, default))
+                .Name("createCatalog")
+                .Authorize(Policies.OWNER)
+                .Type<NonNullType<CatalogType>>()
+                .UseSingleOrDefault()
+                .UseSelection();
+            
+            descriptor.Field(c => c.UpdateCatalogAsync(default, default))
+                .Name("updateCatalog")
+                .Authorize(Policies.OWNER)
+                .Type<NonNullType<CatalogType>>()
+                .UseSingleOrDefault()
+                .UseSelection();
+            
+            descriptor.Field(c => c.DeleteCatalogsAsync(default))
+                .Name("deleteCatalogs")
+                .Authorize(Policies.OWNER)
+                .Type<BooleanType>();
+            
+            descriptor.Field(c => c.AddOrUpdateProductsToCatalogAsync(default, default))
+                .Name("addOrUpdateProductsToCatalog")
+                .Authorize(Policies.OWNER)
+                .Type<NonNullType<CatalogType>>()
+                .UseSingleOrDefault()
+                .UseSelection();
+            
+            descriptor.Field(c => c.RemoveProductsFromCatalogAsync(default, default))
+                .Name("removeProductsFromCatalog")
+                .Authorize(Policies.OWNER)
+                .Type<NonNullType<CatalogType>>()
+                .UseSingleOrDefault()
+                .UseSelection();
+            
+            descriptor.Field(c => c.CloneCatalogAsync(default, default))
+                .Name("cloneCatalog")
+                .Authorize(Policies.OWNER)
+                .Type<NonNullType<CatalogType>>()
+                .UseSingleOrDefault()
+                .UseSelection();
+            
+            descriptor.Field(c => c.UpdateAllCatalogPricesAsync(default, default))
+                .Name("updateAllCatalogPrices")
+                .Authorize(Policies.OWNER)
+                .Type<NonNullType<CatalogType>>()
+                .UseSingleOrDefault()
+                .UseSelection();
+            
+            descriptor.Field(c => c.UpdateCatalogPricesAsync(default, default))
+                .Name("updateCatalogPrices")
+                .Authorize(Policies.OWNER)
+                .Type<NonNullType<CatalogType>>()
+                .UseSingleOrDefault()
+                .UseSelection();
+            
+            descriptor.Field(c => c.SetCatalogAsDefaultAsync(default, default))
+                .Name("setCatalogAsDefault")
+                .Authorize(Policies.OWNER)
+                .Type<NonNullType<CatalogType>>()
+                .UseSingleOrDefault()
+                .UseSelection();
+            
+            descriptor.Field(c => c.SetCatalogsAvailabilityAsync(default, default))
+                .Name("setCatalogsAvailability")
+                .Authorize(Policies.OWNER)
+                .Type<NonNullType<ListType<CatalogType>>>()
+                .UseSingleOrDefault()
+                .UseSelection();
         }
     }
 }

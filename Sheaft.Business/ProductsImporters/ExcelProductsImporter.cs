@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
@@ -151,8 +150,8 @@ namespace Sheaft.Business
                 .ToList();
             
             createProductCommand.Available = false;
-            createProductCommand.VisibleToConsumers = false;
-            createProductCommand.VisibleToStores = false;
+            createProductCommand.VisibleToConsumers = true;
+            createProductCommand.VisibleToStores = true;
 
             return Success(createProductCommand);
         }

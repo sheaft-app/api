@@ -22,6 +22,7 @@ namespace Sheaft.Mediatr.Product.Commands
         [JsonConstructor]
         public CreateProductCommand(RequestUser requestUser) : base(requestUser)
         {
+            ProducerId = requestUser.Id;
         }
 
         public Guid ProducerId { get; set; }
@@ -29,7 +30,6 @@ namespace Sheaft.Mediatr.Product.Commands
         public string Name { get; set; }
         public string Picture { get; set; }
         public string OriginalPicture { get; set; }
-        public decimal WholeSalePricePerUnit { get; set; }
         public decimal QuantityPerUnit { get; set; }
         public UnitKind Unit { get; set; }
         public ConditioningKind Conditioning { get; set; }
@@ -37,11 +37,13 @@ namespace Sheaft.Mediatr.Product.Commands
         public decimal? Weight { get; set; }
         public string Description { get; set; }
         public bool? Available { get; set; }
-        public bool? VisibleToConsumers { get; set; }
         public bool? VisibleToStores { get; set; }
+        public bool? VisibleToConsumers { get; set; }
+        public decimal? WholeSalePricePerUnit { get; set; }
         public Guid? ReturnableId { get; set; }
         public IEnumerable<Guid> Tags { get; set; }
         public bool SkipUpdateProducerTags { get; set; } = false;
+        public IEnumerable<UpdateOrCreateCatalogPriceDto> Catalogs { get; set; }
     }
 
     public class CreateProductCommandHandler : CommandsHandler,
@@ -84,14 +86,12 @@ namespace Sheaft.Mediatr.Product.Commands
 
             using (var transaction = await _context.BeginTransactionAsync(token))
             {
-                var entity = new Domain.Product(Guid.NewGuid(), reference, request.Name, request.WholeSalePricePerUnit,
-                    request.Conditioning, request.Unit, request.QuantityPerUnit, producer);
+                var entity = new Domain.Product(Guid.NewGuid(), reference, request.Name, request.Conditioning,
+                    request.Unit, request.QuantityPerUnit, producer);
 
                 entity.SetVat(request.Vat);
                 entity.SetDescription(request.Description);
                 entity.SetAvailable(request.Available ?? true);
-                entity.SetStoreVisibility(request.VisibleToStores ?? false);
-                entity.SetConsumerVisibility(request.VisibleToConsumers ?? false);
                 entity.SetWeight(request.Weight);
 
                 if (request.ReturnableId.HasValue)
@@ -105,14 +105,44 @@ namespace Sheaft.Mediatr.Product.Commands
 
                 await _context.AddAsync(entity, token);
                 await _context.SaveChangesAsync(token);
-                
+
+                if (request.VisibleToConsumers.HasValue && request.VisibleToStores.HasValue)
+                {
+                    if (request.VisibleToConsumers.Value)
+                    {
+                        var consumerCatalog = await _context.GetSingleAsync<Domain.Catalog>(
+                            c => c.Producer.Id == entity.Producer.Id && c.Kind == CatalogKind.Consumers, token);
+
+                        consumerCatalog.AddOrUpdateProduct(entity, request.WholeSalePricePerUnit.Value);
+                    }
+
+                    if (request.VisibleToStores.Value)
+                    {
+                        var storeCatalog = await _context.GetSingleAsync<Domain.Catalog>(
+                            c => c.Producer.Id == entity.Producer.Id && c.Kind == CatalogKind.Stores, token);
+
+                        storeCatalog.AddOrUpdateProduct(entity, request.WholeSalePricePerUnit.Value);
+                    }
+                }
+
+                if (!request.VisibleToConsumers.HasValue || !request.VisibleToStores.HasValue)
+                {
+                    foreach (var catalogPrice in request.Catalogs)
+                    {
+                        var catalog = await _context.GetByIdAsync<Domain.Catalog>(catalogPrice.Id, token);
+                        catalog.AddOrUpdateProduct(entity, catalogPrice.WholeSalePricePerUnit);
+                    }
+                }
+
+                await _context.SaveChangesAsync(token);
+
                 var imageResult = await _mediatr.Process(
                     new UpdateProductPreviewCommand(request.RequestUser)
                     {
-                        ProductId = entity.Id, 
+                        ProductId = entity.Id,
                         Picture = new PictureSourceDto {Resized = request.Picture, Original = request.OriginalPicture}
                     }, token);
-                
+
                 if (!imageResult.Succeeded)
                     return Failure<Guid>(imageResult.Exception);
 

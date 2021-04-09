@@ -69,6 +69,9 @@ namespace Sheaft.Web.Api.Extensions
             services.AddType<OrderProductType>();
             services.AddType<OrderDeliveryType>();
             services.AddType<BankAccountType>();
+            services.AddType<CatalogType>();
+            services.AddType<CatalogProductType>();
+            services.AddType<CatalogPriceType>();
 
             services.AddType<AddressKindEnumType>();
             services.AddType<AgreementStatusEnumType>();
@@ -95,11 +98,14 @@ namespace Sheaft.Web.Api.Extensions
             services.AddType<TransactionKindEnumType>();
             services.AddType<TransactionStatusEnumType>();
             services.AddType<LegalValidationEnumType>();
+            services.AddType<CatalogKindEnumType>();
 
             services.AddType<CreateOrderInputType>();
             services.AddType<UpdateOrderInputType>();
             services.AddType<CreateDocumentType>();
             services.AddType<CreateAgreementInputType>();
+            services.AddType<AcceptAgreementInputType>();
+            services.AddType<AssignCatalogToAgreementInputType>();
             services.AddType<CreatePurchaseOrderInputType>();
             services.AddType<CreateQuickOrderInputType>();
             services.AddType<CreateDeliveryModeInputType>();
@@ -129,7 +135,6 @@ namespace Sheaft.Web.Api.Extensions
             services.AddType<UpdateStoreInputType>();
             services.AddType<UpdateProducerInputType>();
             services.AddType<UpdateDeliveryModeInputType>();
-            services.AddType<UpdateResourceIdProductsQuantitiesInputType>();
             services.AddType<UpdateReturnableInputType>();
             services.AddType<UpdateResourceIdPictureInputType>();
             services.AddType<UpdateProductInputType>();
@@ -150,6 +155,14 @@ namespace Sheaft.Web.Api.Extensions
             services.AddType<AddPictureToInputType>();
             services.AddType<ExportPurchaseOrdersInputType>();
             services.AddType<ExportTransactionsInputType>();
+            services.AddType<CreateCatalogInputType>();
+            services.AddType<UpdateCatalogInputType>();
+            services.AddType<CloneCatalogInputType>();
+            services.AddType<AddOrUpdateProductsToCatalogInputType>();
+            services.AddType<RemoveProductsFromCatalogInputType>();
+            services.AddType<UpdateAllCatalogPricesInputType>();
+            services.AddType<UpdateCatalogPricesInputType>();
+            services.AddType<UpdateOrCreateCatalogPriceInputType>();
 
             return services;
         }

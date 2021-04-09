@@ -17,6 +17,7 @@ namespace Sheaft.Mediatr.Notification.Commands
         [JsonConstructor]
         public MarkUserNotificationsAsReadCommand(RequestUser requestUser) : base(requestUser)
         {
+            UserId = requestUser.Id;
         }
 
         public Guid UserId { get; set; }

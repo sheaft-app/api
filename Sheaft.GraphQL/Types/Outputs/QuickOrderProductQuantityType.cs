@@ -11,7 +11,6 @@ namespace Sheaft.GraphQL.Types.Outputs
             descriptor.Field(c => c.Quantity);
             descriptor.Field(c => c.Vat);
             descriptor.Field(c => c.UnitOnSalePrice);
-            descriptor.Field(c => c.UnitVatPrice);
             descriptor.Field(c => c.UnitWholeSalePrice);
             descriptor.Field(c => c.UnitVatPrice);
             descriptor.Field(c => c.UnitWeight);

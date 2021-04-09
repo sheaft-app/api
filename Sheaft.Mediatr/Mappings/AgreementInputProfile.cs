@@ -8,8 +8,9 @@ namespace Sheaft.Mediatr.Mappings
     {
         public AgreementInputProfile()
         {
+            CreateMap<AssignCatalogToAgreementDto, AssignCatalogToAgreementCommand>();
             CreateMap<CreateAgreementDto, CreateAgreementCommand>();
-            CreateMap<ResourceIdTimeSlotsDto, AcceptAgreementCommand>()
+            CreateMap<AcceptAgreementDto, AcceptAgreementCommand>()
                 .ForMember(c => c.AgreementId, opt => opt.MapFrom(r => r.Id));
             CreateMap<ResourceIdsWithReasonDto, CancelAgreementsCommand>()
                 .ForMember(c => c.AgreementIds, opt => opt.MapFrom(r => r.Ids));

@@ -24,6 +24,7 @@ namespace Sheaft.Mediatr.Order.Commands
         [JsonConstructor]
         public UpdateConsumerOrderCommand(RequestUser requestUser) : base(requestUser)
         {
+            UserId = requestUser.IsAuthenticated ? requestUser.Id : (Guid?) null;
         }
 
         public Guid? UserId { get; set; }
@@ -65,7 +66,7 @@ namespace Sheaft.Mediatr.Order.Commands
                 .Where(p => 
                     p.RemovedOn.HasValue 
                     || !p.Available 
-                    || !p.VisibleToConsumers 
+                    || p.CatalogsPrices.Any(cp => cp.Catalog.Kind == CatalogKind.Consumers && cp.Catalog.IsDefault && !cp.Catalog.Available)
                     || p.Producer.RemovedOn.HasValue 
                     || !p.Producer.CanDirectSell)
                 .Select(p => p.Id.ToString("N"));
@@ -74,10 +75,14 @@ namespace Sheaft.Mediatr.Order.Commands
                 return Failure(MessageKind.Order_CannotUpdate_Some_Products_NotAvailable,
                     string.Join(";", invalidProductIds));
 
-            var cartProducts = new Dictionary<Domain.Product, int>();
+            var cartProducts = new List<Tuple<Domain.Product, Guid, int>>();
             foreach (var product in products)
             {
-                cartProducts.Add(product, request.Products.Where(p => p.Id == product.Id).Sum(c => c.Quantity));
+                var catalog = product.CatalogsPrices.Select(p => p.Catalog).SingleOrDefault(p => !p.RemovedOn.HasValue && p.Kind == CatalogKind.Consumers && p.IsDefault && p.Available);
+                if(catalog == null)
+                    throw SheaftException.Validation();
+
+                cartProducts.Add(new Tuple<Domain.Product, Guid, int>(product, catalog.Id, request.Products.Where(p => p.Id == product.Id).Sum(c => c.Quantity)));
             }
 
             entity.SetProducts(cartProducts);
@@ -98,7 +103,7 @@ namespace Sheaft.Mediatr.Order.Commands
                 if(delivery.Closings.Any(c => cartDelivery.ExpectedDeliveryDate >= c.ClosedFrom && cartDelivery.ExpectedDeliveryDate <= c.ClosedTo))
                     return Failure(MessageKind.Order_CannotUpdate_Delivery_Closed, delivery.Name, delivery.Producer.Name);
                     
-                if(cartProducts.Any(p => p.Key.Producer.Id == delivery.Producer.Id && p.Key.Producer.Closings.Any(c => cartDelivery.ExpectedDeliveryDate >= c.ClosedFrom && cartDelivery.ExpectedDeliveryDate <= c.ClosedTo)))
+                if(cartProducts.Any(p => p.Item1.Producer.Id == delivery.Producer.Id && p.Item1.Producer.Closings.Any(c => cartDelivery.ExpectedDeliveryDate >= c.ClosedFrom && cartDelivery.ExpectedDeliveryDate <= c.ClosedTo)))
                     return Failure(MessageKind.Order_CannotUpdate_Producer_Closed, delivery.Producer.Name);
                 
                 cartDeliveries.Add(new Tuple<Domain.DeliveryMode, DateTimeOffset, string>(delivery,

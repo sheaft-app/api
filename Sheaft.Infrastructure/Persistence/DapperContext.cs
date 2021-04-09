@@ -25,7 +25,9 @@ namespace Sheaft.Infrastructure.Persistence
         {
             using (var connection = new SqlConnection(_databaseOptions.ConnectionString))
             {
-                var result = await connection.QueryAsync<UserPosition>("exec [app].[UserPositionInDepartment] @DepartmentId, @UserId", new { UserId = userId, DepartmentId = departmentId });
+                var result = await connection.QueryAsync<UserPosition>(
+                    "exec [app].[UserPositionInDepartment] @DepartmentId, @UserId",
+                    new {UserId = userId, DepartmentId = departmentId});
                 return result.SingleOrDefault();
             }
         }
@@ -34,7 +36,8 @@ namespace Sheaft.Infrastructure.Persistence
         {
             using (var connection = new SqlConnection(_databaseOptions.ConnectionString))
             {
-                var result = await connection.QueryAsync<UserPosition>("exec [app].[UserPositionInRegion] @RegionId, @UserId", new { UserId = userId, RegionId = regionId });
+                var result = await connection.QueryAsync<UserPosition>(
+                    "exec [app].[UserPositionInRegion] @RegionId, @UserId", new {UserId = userId, RegionId = regionId});
                 return result.SingleOrDefault();
             }
         }
@@ -43,17 +46,22 @@ namespace Sheaft.Infrastructure.Persistence
         {
             using (var connection = new SqlConnection(_databaseOptions.ConnectionString))
             {
-                var result = await connection.QueryAsync<UserPosition>("exec [app].[UserPositionInCountry] @UserId", new { UserId = userId });
+                var result = await connection.QueryAsync<UserPosition>("exec [app].[UserPositionInCountry] @UserId",
+                    new {UserId = userId});
                 return result.SingleOrDefault();
             }
         }
 
-        public async Task<bool> SetNotificationAsReadAsync(Guid userId, DateTimeOffset readBefore, CancellationToken token)
+        public async Task<bool> SetNotificationAsReadAsync(Guid userId, DateTimeOffset readBefore,
+            CancellationToken token)
         {
             using (var connection = new SqlConnection(_databaseOptions.ConnectionString))
             {
-                var result = await connection.ExecuteAsync("exec [app].[MarkUserNotificationsAsRead] @UserUid, @ReadBefore", new { UserUid = userId, ReadBefore = readBefore });
-                return result > 0;
+                await connection.ExecuteAsync(
+                    "exec [app].[MarkUserNotificationsAsRead] @UserUid, @ReadBefore",
+                    new {UserUid = userId, ReadBefore = readBefore});
+
+                return true;
             }
         }
     }

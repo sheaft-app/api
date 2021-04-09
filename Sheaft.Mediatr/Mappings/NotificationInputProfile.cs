@@ -10,6 +10,7 @@ namespace Sheaft.Mediatr.Mappings
         {
             CreateMap<ResourceIdDto, MarkUserNotificationAsReadCommand>()
                     .ForMember(c => c.NotificationId, opt => opt.MapFrom(r => r.Id));
+            CreateMap<MarkMyNotificationAsReadDto, MarkUserNotificationsAsReadCommand>();
         }
     }
 }

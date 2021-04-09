@@ -12,6 +12,7 @@ using Sheaft.Application.Interfaces.Mediatr;
 using Sheaft.Application.Models;
 using Sheaft.Core;
 using Sheaft.Domain;
+using Sheaft.Domain.Enum;
 
 namespace Sheaft.Mediatr.Agreement.Commands
 {
@@ -25,6 +26,7 @@ namespace Sheaft.Mediatr.Agreement.Commands
         public Guid StoreId { get; set; }
         public Guid DeliveryModeId { get; set; }
         public IEnumerable<TimeSlotGroupDto> SelectedHours { get; set; }
+        public Guid? CatalogId { get; set; }
     }
 
     public class CreateAgreementCommandsHandler : CommandsHandler,
@@ -41,6 +43,7 @@ namespace Sheaft.Mediatr.Agreement.Commands
         public async Task<Result<Guid>> Handle(CreateAgreementCommand request, CancellationToken token)
         {
             var store = await _context.GetByIdAsync<Domain.Store>(request.StoreId, token);
+            var currentUser = await _context.GetByIdAsync<Domain.User>(request.RequestUser.Id, token);
             var delivery = await _context.GetByIdAsync<Domain.DeliveryMode>(request.DeliveryModeId, token);
 
             var selectedHours = new List<TimeSlotHour>();
@@ -52,7 +55,17 @@ namespace Sheaft.Mediatr.Agreement.Commands
                 }
             }
 
-            var entity = new Domain.Agreement(Guid.NewGuid(), store, delivery, store, selectedHours);
+            var entity = new Domain.Agreement(Guid.NewGuid(), store, delivery, currentUser, selectedHours);
+            if (request.CatalogId.HasValue)
+            {
+                var catalog = await _context.GetByIdAsync<Domain.Catalog>(request.CatalogId.Value, token);
+                entity.AssignCatalog(catalog);
+            }
+            else
+            {
+                var catalog = await _context.GetSingleAsync<Domain.Catalog>(c => c.IsDefault && c.Kind == CatalogKind.Stores && c.Producer.Id == delivery.Producer.Id, token);
+                entity.AssignCatalog(catalog);
+            }
 
             await _context.AddAsync(entity, token);
             await _context.SaveChangesAsync(token);

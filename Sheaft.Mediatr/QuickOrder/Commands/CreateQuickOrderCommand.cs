@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Sheaft.Application.Interfaces;
@@ -11,7 +12,9 @@ using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Application.Interfaces.Mediatr;
 using Sheaft.Application.Models;
 using Sheaft.Core;
+using Sheaft.Core.Exceptions;
 using Sheaft.Domain;
+using Sheaft.Domain.Enum;
 
 namespace Sheaft.Mediatr.QuickOrder.Commands
 {
@@ -20,6 +23,7 @@ namespace Sheaft.Mediatr.QuickOrder.Commands
         [JsonConstructor]
         public CreateQuickOrderCommand(RequestUser requestUser) : base(requestUser)
         {
+            UserId = requestUser.Id;
         }
 
         public Guid UserId { get; set; }
@@ -41,17 +45,33 @@ namespace Sheaft.Mediatr.QuickOrder.Commands
 
         public async Task<Result<Guid>> Handle(CreateQuickOrderCommand request, CancellationToken token)
         {
-            var user = await _context.GetByIdAsync<Domain.User>(request.UserId, token);
+            var store = await _context.GetByIdAsync<Domain.User>(request.UserId, token);
 
-            var productIds = request.Products.Select(p => p.Id);
-            var products = await _context.GetByIdsAsync<Domain.Product>(productIds, token);
+            var productIds = request.Products.Select(p => p.Id).ToList();
+            var agreements = await _context.Set<Domain.Agreement>()
+                .Where(a => a.Store.Id == store.Id && a.Catalog.Products.Any(p => productIds.Contains(p.Product.Id)))
+                .Include(a => a.Catalog)
+                    .ThenInclude(c => c.Products)
+                        .ThenInclude(c => c.Product)
+                .ToListAsync(token);
 
-            var cartProducts = products
-                .Select(c => new
-                    {Product = c, Quantity = request.Products.Where(p => p.Id == c.Id).Sum(c => c.Quantity)})
-                .ToDictionary(d => d.Product, d => d.Quantity);
+            var catalogProducts = new Dictionary<CatalogProduct, int>();
+            foreach (var productId in productIds)
+            {
+                var quantity = request.Products.Where(p => p.Id == productId).Sum(p => p.Quantity);
+                var catalogProduct =
+                    agreements.Where(a => a.Catalog.Products.Any(p => p.Product.Id == productId))
+                        .Select(a => a.Catalog)
+                        .SelectMany(c => c.Products)
+                        .FirstOrDefault(cp => cp.Product.Id == productId);
 
-            var quickOrder = new Domain.QuickOrder(Guid.NewGuid(), request.Name, cartProducts, user);
+                if (catalogProduct == null)
+                    throw SheaftException.NotFound();
+
+                catalogProducts.Add(catalogProduct, quantity);
+            }
+
+            var quickOrder = new Domain.QuickOrder(Guid.NewGuid(), request.Name, catalogProducts, store);
 
             await _context.AddAsync(quickOrder, token);
             await _context.SaveChangesAsync(token);

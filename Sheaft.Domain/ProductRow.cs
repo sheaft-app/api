@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using Sheaft.Domain.Enum;
 
 namespace Sheaft.Domain
@@ -46,11 +47,13 @@ namespace Sheaft.Domain
             TotalOnSalePrice = product.TotalOnSalePrice;
         }
 
-        protected ProductRow(Product product, int quantity)
+        protected ProductRow(Product product, Guid catalogId, int quantity)
         {
-            UnitWholeSalePrice = product.WholeSalePricePerUnit;
-            UnitOnSalePrice = product.OnSalePricePerUnit;
-            UnitVatPrice = product.VatPricePerUnit;
+            var productPrice = product.CatalogsPrices.Single(p => p.Catalog.Id == catalogId);
+            
+            UnitWholeSalePrice = productPrice.WholeSalePricePerUnit;
+            UnitOnSalePrice = productPrice.OnSalePricePerUnit;
+            UnitVatPrice = productPrice.VatPricePerUnit;
             UnitWeight = product.Weight;
             Vat = product.Vat;
 

@@ -8,7 +8,6 @@ namespace Sheaft.GraphQL.Types.Outputs
         protected override void Configure(IObjectTypeDescriptor<PictureDto> descriptor)
         {
             descriptor.Field(c => c.Id).Type<NonNullType<IdType>>();
-            
             descriptor.Field(c => c.Url);
         }
     }

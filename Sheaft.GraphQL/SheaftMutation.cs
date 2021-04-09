@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 using AutoMapper;
 using HotChocolate;
 using Microsoft.AspNetCore.Http;
+using Newtonsoft.Json;
 using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Application.Interfaces.Mediatr;
 using Sheaft.Application.Interfaces.Queries;
@@ -14,10 +16,10 @@ using Sheaft.Core.Exceptions;
 using Sheaft.Domain;
 using Sheaft.Mediatr.Agreement.Commands;
 using Sheaft.Mediatr.BusinessClosing.Commands;
+using Sheaft.Mediatr.Catalog;
 using Sheaft.Mediatr.Consumer.Commands;
 using Sheaft.Mediatr.DeliveryClosing.Commands;
 using Sheaft.Mediatr.DeliveryMode.Commands;
-using Sheaft.Mediatr.Document.Commands;
 using Sheaft.Mediatr.Job.Commands;
 using Sheaft.Mediatr.Legal.Commands;
 using Sheaft.Mediatr.Notification.Commands;
@@ -59,589 +61,526 @@ namespace Sheaft.GraphQL
 
         public async Task<string> GenerateUserSponsoringCodeAsync(ResourceIdDto input)
         {
-            SetLogTransaction(nameof(GenerateUserSponsoringCodeAsync));
-            return await ExecuteCommandAsync<GenerateUserCodeCommand, string>(
-                _mapper.Map(input, new GenerateUserCodeCommand(CurrentUser)), Token);
+            return await ExecuteAsync<ResourceIdDto, GenerateUserCodeCommand, string>(input, Token);
         }
 
         public async Task<IQueryable<JobDto>> ExportPickingOrdersAsync(ExportPickingOrdersDto input,
             [Service] IJobQueries jobQueries)
         {
-            SetLogTransaction(nameof(ExportPickingOrdersAsync));
-            var result =
-                await ExecuteCommandAsync<QueueExportPickingOrderCommand, Guid>(
-                    _mapper.Map(input, new QueueExportPickingOrderCommand(CurrentUser) {ProducerId = CurrentUser.Id}),
-                    Token);
+            var result = await ExecuteAsync<ExportPickingOrdersDto, QueueExportPickingOrderCommand, Guid>(input, Token);
             return jobQueries.GetJob(result, CurrentUser);
         }
 
         public async Task<IQueryable<JobDto>> ExportPurchaseOrdersAsync(ExportPurchaseOrdersDto input,
             [Service] IJobQueries jobQueries)
         {
-            SetLogTransaction(nameof(ExportPurchaseOrdersAsync));
             var result =
-                await ExecuteCommandAsync<QueueExportPurchaseOrdersCommand, Guid>(
-                    _mapper.Map(input, new QueueExportPurchaseOrdersCommand(CurrentUser) {UserId = CurrentUser.Id}),
-                    Token);
+                await ExecuteAsync<ExportPurchaseOrdersDto, QueueExportPurchaseOrdersCommand, Guid>(input, Token);
             return jobQueries.GetJob(result, CurrentUser);
         }
 
         public async Task<IQueryable<JobDto>> ExportTransactionsAsync(ExportTransactionsDto input,
             [Service] IJobQueries jobQueries)
         {
-            SetLogTransaction(nameof(ExportTransactionsAsync));
-            var result =
-                await ExecuteCommandAsync<QueueExportTransactionsCommand, Guid>(
-                    _mapper.Map(input, new QueueExportTransactionsCommand(CurrentUser) {UserId = CurrentUser.Id}),
-                    Token);
+            var result = await ExecuteAsync<ExportTransactionsDto, QueueExportTransactionsCommand, Guid>(input, Token);
             return jobQueries.GetJob(result, CurrentUser);
         }
 
         public async Task<IQueryable<JobDto>> ExportUserDataAsync(ResourceIdDto input, [Service] IJobQueries jobQueries)
         {
-            SetLogTransaction(nameof(ExportUserDataAsync));
-            var result =
-                await ExecuteCommandAsync<QueueExportUserDataCommand, Guid>(
-                    _mapper.Map(input, new QueueExportUserDataCommand(CurrentUser)), Token);
+            var result = await ExecuteAsync<ResourceIdDto, QueueExportUserDataCommand, Guid>(input, Token);
             return jobQueries.GetJob(result, CurrentUser);
         }
 
         public async Task<IQueryable<JobDto>> ResumeJobsAsync(ResourceIdsDto input, [Service] IJobQueries jobQueries)
         {
-            SetLogTransaction(nameof(ResumeJobsAsync));
-            await ExecuteCommandAsync(_mapper.Map(input, new ResumeJobsCommand(CurrentUser)), Token);
+            await ExecuteAsync<ResourceIdsDto, ResumeJobsCommand>(input, Token);
             return jobQueries.GetJobs(CurrentUser).Where(j => input.Ids.Contains(j.Id));
         }
 
         public async Task<IQueryable<JobDto>> PauseJobsAsync(ResourceIdsDto input, [Service] IJobQueries jobQueries)
         {
-            SetLogTransaction(nameof(PauseJobsAsync));
-            await ExecuteCommandAsync(_mapper.Map(input, new PauseJobsCommand(CurrentUser)), Token);
+            await ExecuteAsync<ResourceIdsDto, PauseJobsCommand>(input, Token);
             return jobQueries.GetJobs(CurrentUser).Where(j => input.Ids.Contains(j.Id));
         }
 
         public async Task<IQueryable<JobDto>> RetryJobsAsync(ResourceIdsDto input, [Service] IJobQueries jobQueries)
         {
-            SetLogTransaction(nameof(RetryJobsAsync));
-            await ExecuteCommandAsync(_mapper.Map(input, new RetryJobsCommand(CurrentUser)), Token);
+            await ExecuteAsync<ResourceIdsDto, RetryJobsCommand>(input, Token);
             return jobQueries.GetJobs(CurrentUser).Where(j => input.Ids.Contains(j.Id));
         }
 
         public async Task<IQueryable<JobDto>> CancelJobsAsync(ResourceIdsWithReasonDto input,
             [Service] IJobQueries jobQueries)
         {
-            SetLogTransaction(nameof(CancelJobsAsync));
-            await ExecuteCommandAsync(_mapper.Map(input, new CancelJobsCommand(CurrentUser)), Token);
+            await ExecuteAsync<ResourceIdsWithReasonDto, CancelJobsCommand>(input, Token);
             return jobQueries.GetJobs(CurrentUser).Where(j => input.Ids.Contains(j.Id));
         }
 
         public async Task<IQueryable<JobDto>> ArchiveJobsAsync(ResourceIdsDto input, [Service] IJobQueries jobQueries)
         {
-            SetLogTransaction(nameof(ArchiveJobsAsync));
-            await ExecuteCommandAsync(_mapper.Map(input, new ArchiveJobsCommand(CurrentUser)), Token);
+            await ExecuteAsync<ResourceIdsDto, ArchiveJobsCommand>(input, Token);
             return jobQueries.GetJobs(CurrentUser).Where(j => input.Ids.Contains(j.Id));
         }
 
         public async Task<IQueryable<AgreementDto>> CreateAgreementAsync(CreateAgreementDto input,
             [Service] IAgreementQueries agreementQueries)
         {
-            SetLogTransaction(nameof(CreateAgreementAsync));
-            var result =
-                await ExecuteCommandAsync<CreateAgreementCommand, Guid>(
-                    _mapper.Map(input, new CreateAgreementCommand(CurrentUser)), Token);
+            var result = await ExecuteAsync<CreateAgreementDto, CreateAgreementCommand, Guid>(input, Token);
             return agreementQueries.GetAgreement(result, CurrentUser);
         }
 
-        public async Task<IQueryable<AgreementDto>> AcceptAgreementAsync(ResourceIdTimeSlotsDto input,
+        public async Task<IQueryable<AgreementDto>> AcceptAgreementAsync(AcceptAgreementDto input,
             [Service] IAgreementQueries agreementQueries)
         {
-            SetLogTransaction(nameof(AcceptAgreementAsync));
-            await ExecuteCommandAsync(_mapper.Map(input, new AcceptAgreementCommand(CurrentUser)), Token);
+            await ExecuteAsync<AcceptAgreementDto, AcceptAgreementCommand>(input, Token);
             return agreementQueries.GetAgreement(input.Id, CurrentUser);
+        }
+
+        public async Task<IQueryable<AgreementDto>> AssignCatalogToAgreementAsync(AssignCatalogToAgreementDto input,
+            [Service] IAgreementQueries agreementQueries)
+        {
+            await ExecuteAsync<AssignCatalogToAgreementDto, AssignCatalogToAgreementCommand>(input, Token);
+            return agreementQueries.GetAgreement(input.AgreementId, CurrentUser);
         }
 
         public async Task<IQueryable<AgreementDto>> CancelAgreementsAsync(ResourceIdsWithReasonDto input,
             [Service] IAgreementQueries agreementQueries)
         {
-            SetLogTransaction(nameof(CancelAgreementsAsync));
-            await ExecuteCommandAsync(_mapper.Map(input, new CancelAgreementsCommand(CurrentUser)), Token);
+            await ExecuteAsync<ResourceIdsWithReasonDto, CancelAgreementsCommand>(input, Token);
             return agreementQueries.GetAgreements(CurrentUser).Where(j => input.Ids.Contains(j.Id));
         }
 
         public async Task<IQueryable<AgreementDto>> RefuseAgreementsAsync(ResourceIdsWithReasonDto input,
             [Service] IAgreementQueries agreementQueries)
         {
-            SetLogTransaction(nameof(RefuseAgreementsAsync));
-            await ExecuteCommandAsync(_mapper.Map(input, new RefuseAgreementsCommand(CurrentUser)), Token);
+            await ExecuteAsync<ResourceIdsWithReasonDto, RefuseAgreementsCommand>(input, Token);
             return agreementQueries.GetAgreements(CurrentUser).Where(j => input.Ids.Contains(j.Id));
         }
 
         public async Task<DateTimeOffset> MarkMyNotificationsAsReadAsync()
         {
-            SetLogTransaction(nameof(MarkMyNotificationsAsReadAsync));
-            var input = new MarkUserNotificationsAsReadCommand(CurrentUser)
-                {UserId = CurrentUser.Id, ReadBefore = DateTimeOffset.UtcNow};
-            await ExecuteCommandAsync(input, Token);
+            var input = new MarkMyNotificationAsReadDto(DateTimeOffset.UtcNow);
+            await ExecuteAsync<MarkMyNotificationAsReadDto, MarkUserNotificationsAsReadCommand>(input, Token);
             return input.ReadBefore;
         }
 
         public async Task<IQueryable<NotificationDto>> MarkNotificationAsReadAsync(ResourceIdDto input,
             [Service] INotificationQueries notificationQueries)
         {
-            SetLogTransaction(nameof(MarkNotificationAsReadAsync));
-            await ExecuteCommandAsync(_mapper.Map(input, new MarkUserNotificationAsReadCommand(CurrentUser)), Token);
+            await ExecuteAsync<ResourceIdDto, MarkUserNotificationAsReadCommand>(input, Token);
             return notificationQueries.GetNotification(input.Id, CurrentUser);
         }
 
         public async Task<IQueryable<OrderDto>> CreateOrderAsync(CreateOrderDto input,
             [Service] IOrderQueries orderQueries)
         {
-            SetLogTransaction(nameof(CreateOrderAsync));
-            var result =
-                await ExecuteCommandAsync<CreateConsumerOrderCommand, Guid>(
-                    _mapper.Map(input,
-                        new CreateConsumerOrderCommand(CurrentUser)
-                            {UserId = CurrentUser.Id}), Token);
+            var result = await ExecuteAsync<CreateOrderDto, CreateConsumerOrderCommand, Guid>(input, Token);
             return orderQueries.GetOrder(result, CurrentUser);
         }
 
         public async Task<IQueryable<OrderDto>> UpdateOrderAsync(UpdateOrderDto input,
             [Service] IOrderQueries orderQueries)
         {
-            SetLogTransaction(nameof(UpdateOrderAsync));
-            await ExecuteCommandAsync(_mapper.Map(input, new UpdateConsumerOrderCommand(CurrentUser){ UserId = CurrentUser.IsAuthenticated ? CurrentUser.Id : (Guid?)null }), Token);
+            await ExecuteAsync<UpdateOrderDto, UpdateConsumerOrderCommand>(input, Token);
             return orderQueries.GetOrder(input.Id, CurrentUser);
         }
 
-        public async Task<IQueryable<WebPayinDto>> PayOrderAsync(ResourceIdDto input, [Service] IPayinQueries payinQueries)
+        public async Task<IQueryable<WebPayinDto>> PayOrderAsync(ResourceIdDto input,
+            [Service] IPayinQueries payinQueries)
         {
-            SetLogTransaction(nameof(PayOrderAsync));
             var result =
-                await ExecuteCommandAsync<PayOrderCommand, Guid>(_mapper.Map(input, new PayOrderCommand(CurrentUser)),
-                    Token);
+                await ExecuteAsync<ResourceIdDto, PayOrderCommand, Guid>(input, Token);
             return payinQueries.GetWebPayinTransaction(result, CurrentUser);
         }
 
         public async Task<IQueryable<PurchaseOrderDto>> CreateBusinessOrderAsync(CreateOrderDto input,
             [Service] IPurchaseOrderQueries purchaseOrderQueries)
         {
-            SetLogTransaction(nameof(CreateBusinessOrderAsync));
             var result =
-                await ExecuteCommandAsync<CreateBusinessOrderCommand, IEnumerable<Guid>>(
-                    _mapper.Map(input, new CreateBusinessOrderCommand(CurrentUser) {UserId = CurrentUser.Id}), Token);
+                await ExecuteAsync<CreateOrderDto, CreateBusinessOrderCommand, IEnumerable<Guid>>(input, Token);
             return purchaseOrderQueries.GetPurchaseOrders(CurrentUser).Where(j => result.Contains(j.Id));
-        }
-
-        public async Task<IQueryable<DocumentDto>> CreateDocumentAsync(CreateDocumentDto input,
-            [Service] IDocumentQueries documentQueries)
-        {
-            SetLogTransaction(nameof(CreateDocumentAsync));
-            var result =
-                await ExecuteCommandAsync<CreateDocumentCommand, Guid>(
-                    _mapper.Map(input, new CreateDocumentCommand(CurrentUser)), Token);
-            return documentQueries.GetDocument(result, CurrentUser);
-        }
-
-        public async Task<bool> RemoveDocumentAsync(ResourceIdDto input)
-        {
-            SetLogTransaction(nameof(RemoveDocumentAsync));
-            return await ExecuteCommandAsync(_mapper.Map(input, new DeleteDocumentCommand(CurrentUser)), Token);
         }
 
         public async Task<IQueryable<PurchaseOrderDto>> AcceptPurchaseOrdersAsync(ResourceIdsDto input,
             [Service] IPurchaseOrderQueries purchaseOrderQueries)
         {
-            SetLogTransaction(nameof(AcceptPurchaseOrdersAsync));
-            await ExecuteCommandAsync(_mapper.Map(input, new AcceptPurchaseOrdersCommand(CurrentUser)), Token);
+            await ExecuteAsync<ResourceIdsDto, AcceptPurchaseOrdersCommand>(input, Token);
             return purchaseOrderQueries.GetPurchaseOrders(CurrentUser).Where(j => input.Ids.Contains(j.Id));
         }
 
         public async Task<IQueryable<PurchaseOrderDto>> ShipPurchaseOrdersAsync(ResourceIdsDto input,
             [Service] IPurchaseOrderQueries purchaseOrderQueries)
         {
-            SetLogTransaction(nameof(ShipPurchaseOrdersAsync));
-            await ExecuteCommandAsync(_mapper.Map(input, new ShipPurchaseOrdersCommand(CurrentUser)), Token);
+            await ExecuteAsync<ResourceIdsDto, ShipPurchaseOrdersCommand>(input, Token);
             return purchaseOrderQueries.GetPurchaseOrders(CurrentUser).Where(j => input.Ids.Contains(j.Id));
         }
 
         public async Task<IQueryable<PurchaseOrderDto>> DeliverPurchaseOrdersAsync(ResourceIdsDto input,
             [Service] IPurchaseOrderQueries purchaseOrderQueries)
         {
-            SetLogTransaction(nameof(DeliverPurchaseOrdersAsync));
-            await ExecuteCommandAsync(_mapper.Map(input, new DeliverPurchaseOrdersCommand(CurrentUser)), Token);
+            await ExecuteAsync<ResourceIdsDto, DeliverPurchaseOrdersCommand>(input, Token);
             return purchaseOrderQueries.GetPurchaseOrders(CurrentUser).Where(j => input.Ids.Contains(j.Id));
         }
 
         public async Task<IQueryable<PurchaseOrderDto>> ProcessPurchaseOrdersAsync(ResourceIdsDto input,
             [Service] IPurchaseOrderQueries purchaseOrderQueries)
         {
-            SetLogTransaction(nameof(ProcessPurchaseOrdersAsync));
-            await ExecuteCommandAsync(_mapper.Map(input, new ProcessPurchaseOrdersCommand(CurrentUser)), Token);
+            await ExecuteAsync<ResourceIdsDto, ProcessPurchaseOrdersCommand>(input, Token);
             return purchaseOrderQueries.GetPurchaseOrders(CurrentUser).Where(j => input.Ids.Contains(j.Id));
         }
 
         public async Task<IQueryable<PurchaseOrderDto>> CompletePurchaseOrdersAsync(ResourceIdsDto input,
             [Service] IPurchaseOrderQueries purchaseOrderQueries)
         {
-            SetLogTransaction(nameof(CompletePurchaseOrdersAsync));
-            await ExecuteCommandAsync(_mapper.Map(input, new CompletePurchaseOrdersCommand(CurrentUser)), Token);
+            await ExecuteAsync<ResourceIdsDto, CompletePurchaseOrdersCommand>(input, Token);
             return purchaseOrderQueries.GetPurchaseOrders(CurrentUser).Where(j => input.Ids.Contains(j.Id));
         }
 
         public async Task<IQueryable<PurchaseOrderDto>> CancelPurchaseOrdersAsync(ResourceIdsWithReasonDto input,
             [Service] IPurchaseOrderQueries purchaseOrderQueries)
         {
-            SetLogTransaction(nameof(CancelPurchaseOrdersAsync));
-            await ExecuteCommandAsync(_mapper.Map(input, new CancelPurchaseOrdersCommand(CurrentUser)), Token);
+            await ExecuteAsync<ResourceIdsWithReasonDto, CancelPurchaseOrdersCommand>(input, Token);
             return purchaseOrderQueries.GetPurchaseOrders(CurrentUser).Where(j => input.Ids.Contains(j.Id));
         }
 
         public async Task<IQueryable<PurchaseOrderDto>> RefusePurchaseOrdersAsync(ResourceIdsWithReasonDto input,
             [Service] IPurchaseOrderQueries purchaseOrderQueries)
         {
-            SetLogTransaction(nameof(RefusePurchaseOrdersAsync));
-            await ExecuteCommandAsync(_mapper.Map(input, new RefusePurchaseOrdersCommand(CurrentUser)), Token);
+            await ExecuteAsync<ResourceIdsWithReasonDto, RefusePurchaseOrdersCommand>(input, Token);
             return purchaseOrderQueries.GetPurchaseOrders(CurrentUser).Where(j => input.Ids.Contains(j.Id));
         }
 
         public async Task<bool> DeletePurchaseOrdersAsync(ResourceIdsDto input)
         {
-            SetLogTransaction(nameof(DeletePurchaseOrdersAsync));
-            return await ExecuteCommandAsync(_mapper.Map(input, new DeletePurchaseOrdersCommand(CurrentUser)), Token);
+            return await ExecuteAsync<ResourceIdsDto, DeletePurchaseOrdersCommand>(input, Token);
         }
 
         public async Task<IQueryable<ProductDto>> CreateProductAsync(CreateProductDto input,
             [Service] IProductQueries productQueries)
         {
-            SetLogTransaction(nameof(CreateProductAsync));
-            var result =
-                await ExecuteCommandAsync<CreateProductCommand, Guid>(
-                    _mapper.Map(input, new CreateProductCommand(CurrentUser) {ProducerId = CurrentUser.Id}), Token);
+            var result = await ExecuteAsync<CreateProductDto, CreateProductCommand, Guid>(input, Token);
             return productQueries.GetProduct(result, CurrentUser);
         }
 
         public async Task<IQueryable<ProductDto>> UpdateProductAsync(UpdateProductDto input,
             [Service] IProductQueries productQueries)
         {
-            SetLogTransaction(nameof(UpdateProductAsync));
-            await ExecuteCommandAsync(_mapper.Map(input, new UpdateProductCommand(CurrentUser)), Token);
+            await ExecuteAsync<UpdateProductDto, UpdateProductCommand>(input, Token);
             return productQueries.GetProduct(input.Id, CurrentUser);
         }
 
         public async Task<IQueryable<ProductDto>> RateProductAsync(RateProductDto input,
             [Service] IProductQueries productQueries)
         {
-            SetLogTransaction(nameof(RateProductAsync));
-            await ExecuteCommandAsync(_mapper.Map(input, new RateProductCommand(CurrentUser) {UserId = CurrentUser.Id}),
-                Token);
+            await ExecuteAsync<RateProductDto, RateProductCommand>(input, Token);
             return productQueries.GetProduct(input.Id, CurrentUser);
         }
 
         public async Task<IQueryable<ProductDto>> UpdateProductPictureAsync(UpdateResourceIdPictureDto input,
             [Service] IProductQueries productQueries)
         {
-            SetLogTransaction(nameof(UpdateProductPictureAsync));
-            await ExecuteCommandAsync<UpdateProductPreviewCommand, string>(
-                _mapper.Map(input, new UpdateProductPreviewCommand(CurrentUser)), Token);
+            await ExecuteAsync<UpdateResourceIdPictureDto, UpdateProductPreviewCommand, string>(input, Token);
             return productQueries.GetProduct(input.Id, CurrentUser);
         }
 
         public async Task<IQueryable<ProductDto>> SetProductsAvailabilityAsync(SetResourceIdsAvailabilityDto input,
             [Service] IProductQueries productQueries)
         {
-            SetLogTransaction(nameof(SetProductsAvailabilityAsync));
-            await ExecuteCommandAsync(_mapper.Map(input, new SetProductsAvailabilityCommand(CurrentUser)), Token);
-            return productQueries.GetProducts(CurrentUser).Where(j => input.Ids.Contains(j.Id));
-        }
-
-        public async Task<IQueryable<ProductDto>> SetProductsSearchabilityAsync(SetResourceIdsVisibilityDto input,
-            [Service] IProductQueries productQueries)
-        {
-            SetLogTransaction(nameof(SetProductsSearchabilityAsync));
-            await ExecuteCommandAsync(_mapper.Map(input, new SetProductsSearchabilityCommand(CurrentUser)), Token);
+            await ExecuteAsync<SetResourceIdsAvailabilityDto, SetProductsAvailabilityCommand>(input, Token);
             return productQueries.GetProducts(CurrentUser).Where(j => input.Ids.Contains(j.Id));
         }
 
         public async Task<bool> DeleteProductsAsync(ResourceIdsDto input)
         {
-            SetLogTransaction(nameof(DeleteProductsAsync));
-            return await ExecuteCommandAsync(_mapper.Map(input, new DeleteProductsCommand(CurrentUser)), Token);
+            return await ExecuteAsync<ResourceIdsDto, DeleteProductsCommand>(input, Token);
         }
 
         public async Task<IQueryable<StoreDto>> RegisterStoreAsync(RegisterStoreDto input,
             [Service] IStoreQueries storeQueries)
         {
-            SetLogTransaction(nameof(RegisterStoreAsync));
-            var result =
-                await ExecuteCommandAsync<RegisterStoreCommand, Guid>(
-                    _mapper.Map(input, new RegisterStoreCommand(CurrentUser) {StoreId = CurrentUser.Id}), Token);
+            var result = await ExecuteAsync<RegisterStoreDto, RegisterStoreCommand, Guid>(input, Token);
             return storeQueries.GetStore(result, CurrentUser);
         }
 
         public async Task<IQueryable<StoreDto>> UpdateStoreAsync(UpdateStoreDto input,
             [Service] IStoreQueries storeQueries)
         {
-            SetLogTransaction(nameof(UpdateStoreAsync));
-            await ExecuteCommandAsync(_mapper.Map(input, new UpdateStoreCommand(CurrentUser)), Token);
+            await ExecuteAsync<UpdateStoreDto, UpdateStoreCommand>(input, Token);
             return storeQueries.GetStore(input.Id, CurrentUser);
         }
 
         public async Task<IQueryable<ProducerDto>> RegisterProducerAsync(RegisterProducerDto input,
             [Service] IProducerQueries producerQueries)
         {
-            SetLogTransaction(nameof(RegisterProducerAsync));
-            var result =
-                await ExecuteCommandAsync<RegisterProducerCommand, Guid>(
-                    _mapper.Map(input, new RegisterProducerCommand(CurrentUser) {ProducerId = CurrentUser.Id}), Token);
+            var result = await ExecuteAsync<RegisterProducerDto, RegisterProducerCommand, Guid>(input, Token);
             return producerQueries.GetProducer(result, CurrentUser);
         }
 
         public async Task<IQueryable<ProducerDto>> UpdateProducerAsync(UpdateProducerDto input,
             [Service] IProducerQueries producerQueries)
         {
-            SetLogTransaction(nameof(UpdateProducerAsync));
-            await ExecuteCommandAsync(_mapper.Map(input, new UpdateProducerCommand(CurrentUser)), Token);
+            await ExecuteAsync<UpdateProducerDto, UpdateProducerCommand>(input, Token);
             return producerQueries.GetProducer(input.Id, CurrentUser);
         }
 
         public async Task<IQueryable<BusinessLegalDto>> CreateBusinessLegalsAsync(CreateBusinessLegalDto input,
             [Service] ILegalQueries legalQueries)
         {
-            SetLogTransaction(nameof(CreateBusinessLegalsAsync));
-            var result =
-                await ExecuteCommandAsync<CreateBusinessLegalCommand, Guid>(
-                    _mapper.Map(input, new CreateBusinessLegalCommand(CurrentUser)), Token);
+            var result = await ExecuteAsync<CreateBusinessLegalDto, CreateBusinessLegalCommand, Guid>(input, Token);
             return legalQueries.GetBusinessLegals(result, CurrentUser);
         }
 
         public async Task<IQueryable<BusinessLegalDto>> UpdateBusinessLegalsAsync(UpdateBusinessLegalDto input,
             [Service] ILegalQueries legalQueries)
         {
-            SetLogTransaction(nameof(UpdateBusinessLegalsAsync));
-            await ExecuteCommandAsync(_mapper.Map(input, new UpdateBusinessLegalCommand(CurrentUser)), Token);
+            await ExecuteAsync<UpdateBusinessLegalDto, UpdateBusinessLegalCommand>(input, Token);
             return legalQueries.GetBusinessLegals(input.Id, CurrentUser);
         }
 
         public async Task<IQueryable<ConsumerDto>> RegisterConsumerAsync(RegisterConsumerDto input,
             [Service] IConsumerQueries consumerQueries)
         {
-            SetLogTransaction(nameof(RegisterConsumerAsync));
-            var result =
-                await ExecuteCommandAsync<RegisterConsumerCommand, Guid>(
-                    _mapper.Map(input, new RegisterConsumerCommand(CurrentUser) {ConsumerId = CurrentUser.Id}), Token);
+            var result = await ExecuteAsync<RegisterConsumerDto, RegisterConsumerCommand, Guid>(input, Token);
             return consumerQueries.GetConsumer(result, CurrentUser);
         }
 
         public async Task<IQueryable<ConsumerDto>> UpdateConsumerAsync(UpdateConsumerDto input,
             [Service] IConsumerQueries consumerQueries)
         {
-            SetLogTransaction(nameof(UpdateConsumerAsync));
-            await ExecuteCommandAsync(_mapper.Map(input, new UpdateConsumerCommand(CurrentUser)), Token);
+            await ExecuteAsync<UpdateConsumerDto, UpdateConsumerCommand>(input, Token);
             return consumerQueries.GetConsumer(input.Id, CurrentUser);
         }
 
         public async Task<IQueryable<ConsumerLegalDto>> CreateConsumerLegalsAsync(CreateConsumerLegalDto input,
             [Service] ILegalQueries legalQueries)
         {
-            SetLogTransaction(nameof(CreateConsumerLegalsAsync));
-            var result =
-                await ExecuteCommandAsync<CreateConsumerLegalCommand, Guid>(
-                    _mapper.Map(input, new CreateConsumerLegalCommand(CurrentUser)), Token);
+            var result = await ExecuteAsync<CreateConsumerLegalDto, CreateConsumerLegalCommand, Guid>(input, Token);
             return legalQueries.GetConsumerLegals(result, CurrentUser);
         }
 
         public async Task<IQueryable<ConsumerLegalDto>> UpdateConsumerLegalsAsync(UpdateConsumerLegalDto input,
             [Service] ILegalQueries legalQueries)
         {
-            SetLogTransaction(nameof(UpdateConsumerLegalsAsync));
-            await ExecuteCommandAsync(_mapper.Map(input, new UpdateConsumerLegalCommand(CurrentUser)), Token);
+            await ExecuteAsync<UpdateConsumerLegalDto, UpdateConsumerLegalCommand>(input, Token);
             return legalQueries.GetConsumerLegals(input.Id, CurrentUser);
         }
 
         public async Task<IQueryable<UserDto>> UpdateUserPictureAsync(UpdateResourceIdPictureDto input,
             [Service] IUserQueries userQueries)
         {
-            SetLogTransaction(nameof(UpdateUserPictureAsync));
-            await ExecuteCommandAsync<UpdateUserPictureCommand, string>(
-                _mapper.Map(input, new UpdateUserPictureCommand(CurrentUser)), Token);
+            await ExecuteAsync<UpdateResourceIdPictureDto, UpdateUserPictureCommand, string>(input, Token);
             return userQueries.GetUser(input.Id, CurrentUser);
         }
 
         public async Task<bool> AddPictureToUserProfileAsync(AddPictureToResourceIdDto input)
         {
-            SetLogTransaction(nameof(AddPictureToUserProfileAsync));
-            return await ExecuteCommandAsync(_mapper.Map(input, new AddPictureToUserProfileCommand(CurrentUser)),
-                Token);
+            return await ExecuteAsync<AddPictureToResourceIdDto, AddPictureToUserProfileCommand>(input, Token);
         }
 
         public async Task<bool> RemoveUserProfilePicturesAsync(ResourceIdsDto input)
         {
-            SetLogTransaction(nameof(RemoveUserProfilePicturesAsync));
-            return await ExecuteCommandAsync(
-                _mapper.Map(input, new RemoveUserProfilePicturesCommand(CurrentUser) {UserId = CurrentUser.Id}), Token);
+            return await ExecuteAsync<ResourceIdsDto, RemoveUserProfilePicturesCommand>(input, Token);
         }
 
         public async Task<bool> AddPictureToProductAsync(AddPictureToResourceIdDto input)
         {
-            SetLogTransaction(nameof(AddPictureToProductAsync));
-            return await ExecuteCommandAsync(_mapper.Map(input, new AddPictureToProductCommand(CurrentUser)), Token);
+            return await ExecuteAsync<AddPictureToResourceIdDto, AddPictureToProductCommand>(input, Token);
         }
 
         public async Task<bool> RemoveProductPicturesAsync(ResourceIdsDto input)
         {
-            SetLogTransaction(nameof(RemoveProductPicturesAsync));
-            return await ExecuteCommandAsync(_mapper.Map(input, new RemoveProductPicturesCommand(CurrentUser)), Token);
+            return await ExecuteAsync<ResourceIdsDto, RemoveProductPicturesCommand>(input, Token);
         }
 
         public async Task<bool> RemoveUserAsync(ResourceIdWithReasonDto input)
         {
-            SetLogTransaction(nameof(RemoveUserAsync));
-            return await ExecuteCommandAsync(_mapper.Map(input, new RemoveUserCommand(CurrentUser)), Token);
+            return await ExecuteAsync<ResourceIdWithReasonDto, RemoveUserCommand>(input, Token);
         }
 
         public async Task<IQueryable<QuickOrderDto>> CreateQuickOrderAsync(CreateQuickOrderDto input,
             [Service] IQuickOrderQueries quickOrderQueries)
         {
-            SetLogTransaction(nameof(CreateQuickOrderAsync));
-            var result =
-                await ExecuteCommandAsync<CreateQuickOrderCommand, Guid>(
-                    _mapper.Map(input, new CreateQuickOrderCommand(CurrentUser) {UserId = CurrentUser.Id}), Token);
+            var result = await ExecuteAsync<CreateQuickOrderDto, CreateQuickOrderCommand, Guid>(input, Token);
             return quickOrderQueries.GetQuickOrder(result, CurrentUser);
         }
 
         public async Task<IQueryable<QuickOrderDto>> SetDefaultQuickOrderAsync(ResourceIdDto input,
             [Service] IQuickOrderQueries quickOrderQueries)
         {
-            SetLogTransaction(nameof(SetDefaultQuickOrderAsync));
-            await ExecuteCommandAsync(
-                _mapper.Map(input, new SetDefaultQuickOrderCommand(CurrentUser) {UserId = CurrentUser.Id}), Token);
+            await ExecuteAsync<ResourceIdDto, SetDefaultQuickOrderCommand>(input, Token);
             return quickOrderQueries.GetQuickOrder(input.Id, CurrentUser);
         }
 
         public async Task<IQueryable<QuickOrderDto>> UpdateQuickOrderAsync(UpdateQuickOrderDto input,
             [Service] IQuickOrderQueries quickOrderQueries)
         {
-            SetLogTransaction(nameof(UpdateQuickOrderAsync));
-            await ExecuteCommandAsync(_mapper.Map(input, new UpdateQuickOrderCommand(CurrentUser)), Token);
-            return quickOrderQueries.GetQuickOrder(input.Id, CurrentUser);
-        }
-
-        public async Task<IQueryable<QuickOrderDto>> UpdateQuickOrderProductsAsync(
-            UpdateResourceIdProductsQuantitiesDto input, [Service] IQuickOrderQueries quickOrderQueries)
-        {
-            SetLogTransaction(nameof(UpdateQuickOrderProductsAsync));
-            await ExecuteCommandAsync(_mapper.Map(input, new UpdateQuickOrderProductsCommand(CurrentUser)), Token);
+            await ExecuteAsync<UpdateQuickOrderDto, UpdateQuickOrderCommand>(input, Token);
             return quickOrderQueries.GetQuickOrder(input.Id, CurrentUser);
         }
 
         public async Task<bool> DeleteQuickOrdersAsync(ResourceIdsWithReasonDto input)
         {
-            SetLogTransaction(nameof(DeleteQuickOrdersAsync));
-            return await ExecuteCommandAsync(_mapper.Map(input, new DeleteQuickOrdersCommand(CurrentUser)), Token);
+            return await ExecuteAsync<ResourceIdsWithReasonDto, DeleteQuickOrdersCommand>(input, Token);
         }
 
         public async Task<IQueryable<DeliveryModeDto>> SetDeliveryModesAvailabilityAsync(
             SetResourceIdsAvailabilityDto input, [Service] IDeliveryQueries deliveryModeQueries)
         {
-            SetLogTransaction(nameof(SetDeliveryModesAvailabilityAsync));
-            await ExecuteCommandAsync(_mapper.Map(input, new SetDeliveryModesAvailabilityCommand(CurrentUser)), Token);
+            await ExecuteAsync<SetResourceIdsAvailabilityDto, SetDeliveryModesAvailabilityCommand>(input, Token);
             return deliveryModeQueries.GetDeliveries(CurrentUser).Where(j => input.Ids.Contains(j.Id));
         }
 
         public async Task<IQueryable<DeliveryModeDto>> CreateDeliveryModeAsync(CreateDeliveryModeDto input,
             [Service] IDeliveryQueries deliveryQueries)
         {
-            SetLogTransaction(nameof(CreateDeliveryModeAsync));
-            var result =
-                await ExecuteCommandAsync<CreateDeliveryModeCommand, Guid>(
-                    _mapper.Map(input, new CreateDeliveryModeCommand(CurrentUser) {ProducerId = CurrentUser.Id}),
-                    Token);
+            var result = await ExecuteAsync<CreateDeliveryModeDto, CreateDeliveryModeCommand, Guid>(input, Token);
             return deliveryQueries.GetDelivery(result, CurrentUser);
         }
 
         public async Task<IQueryable<DeliveryModeDto>> UpdateDeliveryModeAsync(UpdateDeliveryModeDto input,
             [Service] IDeliveryQueries deliveryQueries)
         {
-            SetLogTransaction(nameof(UpdateDeliveryModeAsync));
-            await ExecuteCommandAsync(_mapper.Map(input, new UpdateDeliveryModeCommand(CurrentUser)), Token);
+            await ExecuteAsync<UpdateDeliveryModeDto, UpdateDeliveryModeCommand>(input, Token);
             return deliveryQueries.GetDelivery(input.Id, CurrentUser);
         }
 
         public async Task<bool> DeleteDeliveryModeAsync(ResourceIdDto input)
         {
-            SetLogTransaction(nameof(DeleteDeliveryModeAsync));
-            return await ExecuteCommandAsync(_mapper.Map(input, new DeleteDeliveryModeCommand(CurrentUser)), Token);
+            return await ExecuteAsync<ResourceIdDto, DeleteDeliveryModeCommand>(input, Token);
         }
 
         public async Task<IQueryable<ReturnableDto>> CreateReturnableAsync(CreateReturnableDto input,
             [Service] IReturnableQueries returnableQueries)
         {
-            SetLogTransaction(nameof(CreateReturnableAsync));
-            var result =
-                await ExecuteCommandAsync<CreateReturnableCommand, Guid>(
-                    _mapper.Map(input, new CreateReturnableCommand(CurrentUser) {UserId = CurrentUser.Id}), Token);
+            var result = await ExecuteAsync<CreateReturnableDto, CreateReturnableCommand, Guid>(input, Token);
             return returnableQueries.GetReturnable(result, CurrentUser);
         }
 
         public async Task<IQueryable<ReturnableDto>> UpdateReturnableAsync(UpdateReturnableDto input,
             [Service] IReturnableQueries returnableQueries)
         {
-            SetLogTransaction(nameof(UpdateReturnableAsync));
-            await ExecuteCommandAsync(_mapper.Map(input, new UpdateReturnableCommand(CurrentUser)), Token);
+            await ExecuteAsync<UpdateReturnableDto, UpdateReturnableCommand>(input, Token);
             return returnableQueries.GetReturnable(input.Id, CurrentUser);
         }
 
         public async Task<bool> DeleteReturnableAsync(ResourceIdDto input)
         {
-            SetLogTransaction(nameof(DeleteReturnableAsync));
-            return await ExecuteCommandAsync(_mapper.Map(input, new DeleteReturnableCommand(CurrentUser)), Token);
+            return await ExecuteAsync<ResourceIdDto, DeleteReturnableCommand>(input, Token);
         }
-        
-        //Closings
-        public async Task<IQueryable<ClosingDto>> UpdateOrCreateBusinessClosingsAsync(UpdateOrCreateResourceIdClosingsDto input, [Service] IBusinessClosingQueries closingQueries)
+
+        public async Task<IQueryable<ClosingDto>> UpdateOrCreateBusinessClosingsAsync(
+            UpdateOrCreateResourceIdClosingsDto input, [Service] IBusinessClosingQueries closingQueries)
         {
-            SetLogTransaction(nameof(UpdateOrCreateBusinessClosingsAsync));
-            var result = await ExecuteCommandAsync<UpdateOrCreateBusinessClosingsCommand, IEnumerable<Guid>>(_mapper.Map(input, new UpdateOrCreateBusinessClosingsCommand(CurrentUser)), Token);
+            var result =
+                await ExecuteAsync<UpdateOrCreateResourceIdClosingsDto, UpdateOrCreateBusinessClosingsCommand,
+                    IEnumerable<Guid>>(input, Token);
             return closingQueries.GetClosings(CurrentUser).Where(c => result.Contains(c.Id));
         }
-        public async Task<IQueryable<ClosingDto>> UpdateOrCreateBusinessClosingAsync(UpdateOrCreateResourceIdClosingDto input, [Service] IBusinessClosingQueries closingQueries)
+
+        public async Task<IQueryable<ClosingDto>> UpdateOrCreateBusinessClosingAsync(
+            UpdateOrCreateResourceIdClosingDto input, [Service] IBusinessClosingQueries closingQueries)
         {
-            SetLogTransaction(nameof(UpdateOrCreateBusinessClosingAsync));
-            var result = await ExecuteCommandAsync<UpdateOrCreateBusinessClosingCommand, Guid>(_mapper.Map(input, new UpdateOrCreateBusinessClosingCommand(CurrentUser)), Token);
+            var result =
+                await ExecuteAsync<UpdateOrCreateResourceIdClosingDto, UpdateOrCreateBusinessClosingCommand, Guid>(
+                    input, Token);
             return closingQueries.GetClosing(result, CurrentUser);
         }
-        public async Task<IQueryable<ClosingDto>> UpdateOrCreateDeliveryClosingAsync(UpdateOrCreateResourceIdClosingDto input, [Service] IDeliveryClosingQueries closingQueries)
+
+        public async Task<IQueryable<ClosingDto>> UpdateOrCreateDeliveryClosingAsync(
+            UpdateOrCreateResourceIdClosingDto input, [Service] IDeliveryClosingQueries closingQueries)
         {
-            SetLogTransaction(nameof(UpdateOrCreateDeliveryClosingAsync));
-            var result = await ExecuteCommandAsync<UpdateOrCreateDeliveryClosingCommand, Guid>(_mapper.Map(input, new UpdateOrCreateDeliveryClosingCommand(CurrentUser)), Token);
+            var result =
+                await ExecuteAsync<UpdateOrCreateResourceIdClosingDto, UpdateOrCreateDeliveryClosingCommand, Guid>(
+                    input, Token);
             return closingQueries.GetClosing(result, CurrentUser);
         }
+
         public async Task<bool> DeleteBusinessClosingsAsync(ResourceIdsDto input)
         {
-            SetLogTransaction(nameof(DeleteBusinessClosingsAsync));
-            return await ExecuteCommandAsync(_mapper.Map(input, new DeleteBusinessClosingsCommand(CurrentUser)), Token);
+            return await ExecuteAsync<ResourceIdsDto, DeleteBusinessClosingsCommand>(input, Token);
         }
+
         public async Task<bool> DeleteDeliveryClosingsAsync(ResourceIdsDto input)
         {
-            SetLogTransaction(nameof(DeleteDeliveryClosingsAsync));
-            return await ExecuteCommandAsync(_mapper.Map(input, new DeleteDeliveryClosingsCommand(CurrentUser)), Token);
+            return await ExecuteAsync<ResourceIdsDto, DeleteDeliveryClosingsCommand>(input, Token);
         }
 
-        private async Task<T> ExecuteCommandAsync<TU, T>(TU input, CancellationToken token) where TU : ICommand<T>
+        public async Task<IQueryable<CatalogDto>> CreateCatalogAsync(CreateCatalogDto input,
+            [Service] ICatalogQueries catalogQueries)
         {
-            var result = await _mediator.Process(input, token);
-            if (result.Succeeded)
-                return result.Data;
-
-            if (result.Exception != null)
-                throw result.Exception;
-
-            throw SheaftException.Unexpected(result.Message);
+            var result = await ExecuteAsync<CreateCatalogDto, CreateCatalogCommand, Guid>(input, Token);
+            return catalogQueries.GetCatalog(result, CurrentUser);
         }
 
-        private async Task<bool> ExecuteCommandAsync<TU>(TU input, CancellationToken token) where TU : ICommand
+        public async Task<IQueryable<CatalogDto>> UpdateCatalogAsync(UpdateCatalogDto input,
+            [Service] ICatalogQueries catalogQueries)
         {
-            var result = await _mediator.Process(input, token);
+            await ExecuteAsync<UpdateCatalogDto, UpdateCatalogCommand>(input, Token);
+            return catalogQueries.GetCatalog(input.Id, CurrentUser);
+        }
+
+        public async Task<bool> DeleteCatalogsAsync(ResourceIdsDto input)
+        {
+            return await ExecuteAsync<ResourceIdsDto, DeleteCatalogsCommand>(input, Token);
+        }
+
+        public async Task<IQueryable<CatalogDto>> AddOrUpdateProductsToCatalogAsync(AddOrUpdateProductsToCatalogDto input,
+            [Service] ICatalogQueries catalogQueries)
+        {
+            await ExecuteAsync<AddOrUpdateProductsToCatalogDto, AddOrUpdateProductsToCatalogCommand>(input, Token);
+            return catalogQueries.GetCatalog(input.Id, CurrentUser);
+        }
+
+        public async Task<IQueryable<CatalogDto>> RemoveProductsFromCatalogAsync(RemoveProductsFromCatalogDto input,
+            [Service] ICatalogQueries catalogQueries)
+        {
+            await ExecuteAsync<RemoveProductsFromCatalogDto, RemoveProductsFromCatalogCommand>(input, Token);
+            return catalogQueries.GetCatalog(input.Id, CurrentUser);
+        }
+
+        public async Task<IQueryable<CatalogDto>> CloneCatalogAsync(CloneCatalogDto input,
+            [Service] ICatalogQueries catalogQueries)
+        {
+            var result = await ExecuteAsync<CloneCatalogDto, CloneCatalogCommand, Guid>(input, Token);
+            return catalogQueries.GetCatalog(result, CurrentUser);
+        }
+
+        public async Task<IQueryable<CatalogDto>> UpdateAllCatalogPricesAsync(UpdateAllCatalogPricesDto input,
+            [Service] ICatalogQueries catalogQueries)
+        {
+            await ExecuteAsync<UpdateAllCatalogPricesDto, UpdateAllCatalogPricesCommand>(input, Token);
+            return catalogQueries.GetCatalog(input.Id, CurrentUser);
+        }
+
+        public async Task<IQueryable<CatalogDto>> UpdateCatalogPricesAsync(UpdateCatalogPricesDto input,
+            [Service] ICatalogQueries catalogQueries)
+        {
+            await ExecuteAsync<UpdateCatalogPricesDto, UpdateCatalogPricesCommand>(input, Token);
+            return catalogQueries.GetCatalog(input.Id, CurrentUser);
+        }
+
+        public async Task<IQueryable<CatalogDto>> SetCatalogAsDefaultAsync(ResourceIdDto input,
+            [Service] ICatalogQueries catalogQueries)
+        {
+            await ExecuteAsync<ResourceIdDto, SetCatalogAsDefaultCommand>(input, Token);
+            return catalogQueries.GetCatalog(input.Id, CurrentUser);
+        }
+
+        public async Task<IQueryable<CatalogDto>> SetCatalogsAvailabilityAsync(SetResourceIdsAvailabilityDto input,
+            [Service] ICatalogQueries catalogQueries)
+        {
+            await ExecuteAsync<SetResourceIdsAvailabilityDto, SetCatalogsAvailabilityCommand>(input, Token);
+            return catalogQueries.GetCatalogs(CurrentUser).Where(c => input.Ids.Contains(c.Id));
+        }
+
+        private async Task<bool> ExecuteAsync<T, TU>(T input, CancellationToken token,
+            [CallerMemberName] string memberName = null) where TU : ICommand
+        {
+            SetLogTransaction(input, memberName);
+
+            var command = _mapper.Map(input, (TU) Activator.CreateInstance(typeof(TU), CurrentUser));
+            var result = await _mediator.Process(command, token);
             if (result.Succeeded)
                 return true;
 
@@ -651,7 +590,23 @@ namespace Sheaft.GraphQL
             throw SheaftException.Unexpected(result.Message);
         }
 
-        private void SetLogTransaction(string name)
+        private async Task<TX> ExecuteAsync<T, TU, TX>(T input, CancellationToken token,
+            [CallerMemberName] string memberName = null) where TU : ICommand<TX>
+        {
+            SetLogTransaction(input, memberName);
+
+            var command = _mapper.Map(input, (TU) Activator.CreateInstance(typeof(TU), CurrentUser));
+            var result = await _mediator.Process(command, token);
+            if (result.Succeeded)
+                return result.Data;
+
+            if (result.Exception != null)
+                throw result.Exception;
+
+            throw SheaftException.Unexpected(result.Message);
+        }
+
+        private void SetLogTransaction(object input, string name)
         {
             NewRelic.Api.Agent.NewRelic.SetTransactionName("GraphQL", name);
 
@@ -661,6 +616,9 @@ namespace Sheaft.GraphQL
             currentTransaction.AddCustomAttribute("IsAuthenticated", CurrentUser.IsAuthenticated.ToString());
             currentTransaction.AddCustomAttribute("Roles", string.Join(";", CurrentUser.Roles));
             currentTransaction.AddCustomAttribute("GraphQL", name);
+
+            if (input != null)
+                currentTransaction.AddCustomAttribute("Input", JsonConvert.SerializeObject(input));
         }
     }
 }

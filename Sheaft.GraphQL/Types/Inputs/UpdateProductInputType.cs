@@ -10,6 +10,7 @@ namespace Sheaft.GraphQL.Types.Inputs
             descriptor.Name("UpdateProductInput");
             descriptor.Field(c => c.VisibleToConsumers);
             descriptor.Field(c => c.VisibleToStores);
+            descriptor.Field(c => c.WholeSalePricePerUnit);
             descriptor.Field(c => c.Available);
             descriptor.Field(c => c.Description);
             descriptor.Field(c => c.ReturnableId).Type<IdType>();
@@ -20,7 +21,6 @@ namespace Sheaft.GraphQL.Types.Inputs
             descriptor.Field(c => c.Conditioning);
             descriptor.Field(c => c.Vat);
             descriptor.Field(c => c.Weight);
-            descriptor.Field(c => c.WholeSalePricePerUnit);
 
             descriptor.Field(c => c.Id)
                 .Type<NonNullType<IdType>>();
@@ -33,6 +33,9 @@ namespace Sheaft.GraphQL.Types.Inputs
 
             descriptor.Field(c => c.Tags)
                 .Type<NonNullType<ListType<IdType>>>();
+            
+            descriptor.Field(c => c.Catalogs)
+                .Type<ListType<UpdateOrCreateCatalogPriceInputType>>();
         }
     }
 }

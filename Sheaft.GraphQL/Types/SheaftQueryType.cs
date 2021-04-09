@@ -46,36 +46,42 @@ namespace Sheaft.GraphQL.Types
             //LEADERBOARD
             descriptor.Field(c => c.GetCountryPoints(default, default))
                 .Name("pointsPerCountry")
+                .Authorize(Policies.ANONYMOUS_OR_CONNECTED)
                 .Argument("input", c => c.Type<IdType>())
                 .Type<ListType<CountryPointsType>>()
                 .UseSelection();
 
             descriptor.Field(c => c.GetCountryUsersPoints(default, default))
                 .Name("userPointsPerCountry")
+                .Authorize(Policies.ANONYMOUS_OR_CONNECTED)
                 .Argument("input", c => c.Type<IdType>())
                 .Type<ListType<CountryUserPointsType>>()
                 .UseSelection();
 
             descriptor.Field(c => c.GetDepartmentsPoints(default, default))
                 .Name("pointsPerDepartment")
+                .Authorize(Policies.ANONYMOUS_OR_CONNECTED)
                 .Argument("input", c => c.Type<IdType>())
                 .Type<ListType<DepartmentPointsType>>()
                 .UseSelection();
 
             descriptor.Field(c => c.GetDepartmentUsersPoints(default, default))
                 .Name("userPointsPerDepartment")
+                .Authorize(Policies.ANONYMOUS_OR_CONNECTED)
                 .Argument("input", c => c.Type<IdType>())
                 .Type<ListType<DepartmentUserPointsType>>()
                 .UseSelection();
 
             descriptor.Field(c => c.GetRegionsPoints(default, default))
                 .Name("pointsPerRegion")
+                .Authorize(Policies.ANONYMOUS_OR_CONNECTED)
                 .Argument("input", c => c.Type<IdType>())
                 .Type<ListType<RegionPointsType>>()
                 .UseSelection();
 
             descriptor.Field(c => c.GetRegionUsersPoints(default, default))
                 .Name("userPointsPerRegion")
+                .Authorize(Policies.ANONYMOUS_OR_CONNECTED)
                 .Argument("input", c => c.Type<IdType>())
                 .Type<ListType<RegionUserPointsType>>()
                 .UseSelection();
@@ -125,26 +131,31 @@ namespace Sheaft.GraphQL.Types
             //LISTS
             descriptor.Field(c => c.GetDepartments(default))
                 .Name("departments")
+                .Authorize(Policies.ANONYMOUS_OR_CONNECTED)
                 .Type<NonNullType<ListType<DepartmentType>>>()
                 .UseSelection();
 
             descriptor.Field(c => c.GetNationalities(default))
                 .Name("nationalities")
+                .Authorize(Policies.ANONYMOUS_OR_CONNECTED)
                 .Type<NonNullType<ListType<NationalityType>>>()
                 .UseSelection();
 
             descriptor.Field(c => c.GetCountries(default))
                 .Name("countries")
+                .Authorize(Policies.ANONYMOUS_OR_CONNECTED)
                 .Type<NonNullType<ListType<CountryType>>>()
                 .UseSelection();
 
             descriptor.Field(c => c.GetRegions(default))
                 .Name("regions")
+                .Authorize(Policies.ANONYMOUS_OR_CONNECTED)
                 .Type<NonNullType<ListType<RegionType>>>()
                 .UseSelection();
 
             descriptor.Field(c => c.GetTags(default))
                 .Name("tags")
+                .Authorize(Policies.ANONYMOUS_OR_CONNECTED)
                 .Type<NonNullType<ListType<TagType>>>()
                 .UseSorting<TagSortType>()
                 .UseFiltering<TagFilterType>()
@@ -159,6 +170,7 @@ namespace Sheaft.GraphQL.Types
             
             descriptor.Field(c => c.GetOrder(default, default))
                 .Name("order")
+                .Authorize(Policies.ANONYMOUS_OR_CONNECTED)
                 .Argument("input", c => c.Type<NonNullType<IdType>>())
                 .Type<OrderType>()
                 .UseSingleOrDefault();
@@ -226,6 +238,7 @@ namespace Sheaft.GraphQL.Types
             //PRODUCER
             descriptor.Field(c => c.GetProducer(default, default))
                 .Name("producer")
+                .Authorize(Policies.ANONYMOUS_OR_CONNECTED)
                 .Argument("input", c => c.Type<NonNullType<IdType>>())
                 .Type<NonNullType<ProducerType>>()
                 .UseSingleOrDefault()
@@ -233,12 +246,14 @@ namespace Sheaft.GraphQL.Types
 
             descriptor.Field(c => c.GetProducers(default))
                 .Name("producers")
+                .Authorize(Policies.ANONYMOUS_OR_CONNECTED)
                 .Type<NonNullType<ListType<ProducerType>>>()
                 .UsePaging<ProducerType>()
                 .UseSelection();
 
             descriptor.Field(c => c.GetProducerProducts(default, default))
                 .Name("producerProducts")
+                .Authorize(Policies.ANONYMOUS_OR_CONNECTED)
                 .Argument("input", c => c.Type<NonNullType<IdType>>())
                 .Type<NonNullType<ListType<ProductType>>>()
                 .UsePaging<ProductType>()
@@ -258,6 +273,7 @@ namespace Sheaft.GraphQL.Types
 
             descriptor.Field(c => c.GetProducersDeliveriesAsync(default, default))
                 .Name("getDeliveriesForProducers")
+                .Authorize(Policies.ANONYMOUS_OR_CONNECTED)
                 .Argument("input", c => c.Type<SearchProducersDeliveriesInputType>())
                 .Type<NonNullType<ListType<ProducerDeliveriesType>>>()
                 .UseSorting<ProducerDeliveriesSortType>()
@@ -266,6 +282,7 @@ namespace Sheaft.GraphQL.Types
             //PRODUCT
             descriptor.Field(c => c.GetProduct(default, default))
                 .Name("product")
+                .Authorize(Policies.ANONYMOUS_OR_CONNECTED)
                 .Argument("input", c => c.Type<NonNullType<IdType>>())
                 .Type<NonNullType<ProductType>>()
                 .UseSingleOrDefault()
@@ -422,6 +439,7 @@ namespace Sheaft.GraphQL.Types
             //PAYOUTS
             descriptor.Field(c => c.GetPayout(default, default))
                 .Name("payout")
+                .Argument("input", c => c.Type<NonNullType<IdType>>())
                 .Authorize(Policies.PRODUCER)
                 .Type<NonNullType<PayoutType>>()
                 .UseSingleOrDefault()
@@ -440,6 +458,7 @@ namespace Sheaft.GraphQL.Types
             descriptor.Field(c => c.GetDonation(default, default))
                 .Name("donation")
                 .Authorize(Policies.CONSUMER)
+                .Argument("input", c => c.Type<NonNullType<IdType>>())
                 .Type<NonNullType<DonationType>>()
                 .UseSingleOrDefault()
                 .UseSelection();
@@ -457,6 +476,7 @@ namespace Sheaft.GraphQL.Types
             descriptor.Field(c => c.GetWithholding(default, default))
                 .Name("withholding")
                 .Authorize(Policies.PRODUCER)
+                .Argument("input", c => c.Type<NonNullType<IdType>>())
                 .Type<NonNullType<WithholdingType>>()
                 .UseSingleOrDefault()
                 .UseSelection();
@@ -479,6 +499,7 @@ namespace Sheaft.GraphQL.Types
 
             descriptor.Field(c => c.SuggestProducersAsync(default, default))
                 .Name("suggestProducers")
+                .Authorize(Policies.ANONYMOUS_OR_CONNECTED)
                 .Argument("input", c => c.Type<NonNullType<SearchTermsInputType>>())
                 .Type<ListType<SuggestProducerType>>();
 
@@ -490,6 +511,7 @@ namespace Sheaft.GraphQL.Types
 
             descriptor.Field(c => c.SearchProductsAsync(default, default))
                 .Name("searchProducts")
+                .Authorize(Policies.ANONYMOUS_OR_CONNECTED)
                 .Argument("input", c => c.Type<NonNullType<SearchProductsInputType>>())
                 .Type<NonNullType<ProductsSearchType>>();
 
@@ -513,6 +535,30 @@ namespace Sheaft.GraphQL.Types
                 .Argument("input", c => c.Type<IdType>())
                 .Type<ListType<ClosingType>>()
                 .UsePaging<ClosingType>()
+                .UseSelection();
+            
+            //CATALOGS
+            descriptor.Field(c => c.GetCatalog(default, default))
+                .Name("catalog")
+                .Authorize(Policies.PRODUCER)
+                .Argument("input", c => c.Type<NonNullType<IdType>>())
+                .Type<NonNullType<CatalogType>>()
+                .UseSingleOrDefault()
+                .UseSelection();
+            
+            descriptor.Field(c => c.GetCatalogProducts(default, default))
+                .Name("catalogProducts")
+                .Authorize(Policies.PRODUCER)
+                .Argument("input", c => c.Type<NonNullType<IdType>>())
+                .Type<ListType<CatalogProductType>>()
+                .UsePaging<CatalogProductType>()
+                .UseSelection();
+            
+            descriptor.Field(c => c.GetCatalogs(default))
+                .Name("catalogs")
+                .Authorize(Policies.PRODUCER)
+                .Type<ListType<CatalogType>>()
+                .UsePaging<CatalogType>()
                 .UseSelection();
         }
     }

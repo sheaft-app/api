@@ -17,12 +17,13 @@ namespace Sheaft.Domain
         private List<ProductTag> _tags;
         private List<Rating> _ratings;
         private List<ProductPicture> _pictures;
+        private List<CatalogProduct> _catalogsPrices;
 
         protected Product()
         {
         }
 
-        public Product(Guid id, string reference, string name, decimal price, ConditioningKind conditioning, UnitKind unit, decimal quantityPerUnit, Producer producer)
+        public Product(Guid id, string reference, string name, ConditioningKind conditioning, UnitKind unit, decimal quantityPerUnit, Producer producer)
         {
             Id = id;
             Producer = producer ?? throw new ValidationException(MessageKind.Product_Producer_Required);
@@ -30,10 +31,11 @@ namespace Sheaft.Domain
             SetName(name);
             SetReference(reference);
             SetConditioning(conditioning, quantityPerUnit, unit);
-            SetWholeSalePricePerUnit(price);
 
             _tags = new List<ProductTag>();
             _ratings = new List<Rating>();
+            _catalogsPrices = new List<CatalogProduct>();
+            
             DomainEvents = new List<DomainEvent>();
 
             RefreshRatings();
@@ -47,21 +49,13 @@ namespace Sheaft.Domain
         public string Reference { get; private set; }
         public string Name { get; private set; }
         public decimal? Weight { get; private set; }
-        public decimal WholeSalePricePerUnit { get; private set; }
-        public decimal VatPricePerUnit { get; private set; }
-        public decimal OnSalePricePerUnit { get; private set; }
         public string Description { get; private set; }
         public string Picture { get; private set; }
         public UnitKind Unit { get; private set; }
         public decimal QuantityPerUnit { get; private set; }
         public ConditioningKind Conditioning { get; private set; }
-        public decimal OnSalePrice { get; set; }
-        public decimal WholeSalePrice { get; set; }
-        public decimal VatPrice { get; set; }
         public decimal Vat { get; private set; }
         public bool Available { get; private set; }
-        public bool VisibleToConsumers { get; private set; }
-        public bool VisibleToStores { get; private set; }
         public int RatingsCount { get; set; }
         public decimal? Rating { get; set; }
         public virtual Returnable Returnable { get; private set; }
@@ -69,6 +63,7 @@ namespace Sheaft.Domain
         public virtual IReadOnlyCollection<ProductTag> Tags => _tags?.AsReadOnly();
         public virtual IReadOnlyCollection<Rating> Ratings => _ratings?.AsReadOnly();
         public virtual IReadOnlyCollection<ProductPicture> Pictures => _pictures?.AsReadOnly();
+        public virtual IReadOnlyCollection<CatalogProduct> CatalogsPrices => _catalogsPrices?.AsReadOnly();
 
         public void SetReference(string reference)
         {
@@ -91,19 +86,9 @@ namespace Sheaft.Domain
             Available = available ?? Available;
         }
 
-        public void SetStoreVisibility(bool? visible)
-        {
-            VisibleToStores = visible ?? VisibleToStores;
-        }
-
-        public void SetConsumerVisibility(bool? visible)
-        {
-            VisibleToConsumers = visible ?? VisibleToConsumers;
-        }
-
         public void SetTags(IEnumerable<Tag> tags)
         {
-            if(!Tags.Any())
+            if(Tags == null)
                 _tags = new List<ProductTag>();
 
             _tags.Clear();
@@ -118,15 +103,6 @@ namespace Sheaft.Domain
                 return;
 
             Picture = picture;
-        }
-
-        public void SetWholeSalePricePerUnit(decimal newPrice)
-        {
-            if (newPrice <= 0)
-                throw new ValidationException(MessageKind.Product_WholeSalePrice_CannotBe_LowerOrEqualThan, 0);
-
-            WholeSalePricePerUnit = Math.Round(newPrice, DIGITS_COUNT);
-            RefreshPrices();
         }
 
         public void SetWeight(decimal? newWeight)
@@ -213,20 +189,20 @@ namespace Sheaft.Domain
             RefreshPrices();
         }
         
-        public ProductPicture AddPicture(ProductPicture picture)
+        public void AddPicture(ProductPicture picture)
         {
-            _pictures ??= new List<ProductPicture>();
+            if (Pictures == null)
+                _pictures = new List<ProductPicture>();
+            
             _pictures.Add(picture);
-
-            return picture;
         }
         
         public void RemovePicture(Guid id)
         {
-            if (_pictures == null || _pictures.Any())
+            if (Pictures == null || !Pictures.Any())
                 throw SheaftException.NotFound();
 
-            var existingPicture = _pictures.FirstOrDefault(p => p.Id == id);
+            var existingPicture = Pictures.FirstOrDefault(p => p.Id == id);
             if (existingPicture == null)
                 throw SheaftException.NotFound();
             
@@ -235,34 +211,18 @@ namespace Sheaft.Domain
 
         private void RefreshPrices()
         {
-            VatPricePerUnit = Math.Round(WholeSalePricePerUnit * Vat / 100, DIGITS_COUNT);
-            OnSalePricePerUnit = Math.Round(WholeSalePricePerUnit + VatPricePerUnit, DIGITS_COUNT);
-
-            switch (Unit)
-            {
-                case UnitKind.ml:
-                    WholeSalePrice = Math.Round((WholeSalePricePerUnit / QuantityPerUnit) * 1000, DIGITS_COUNT);
-                    break;
-                case UnitKind.l:
-                    WholeSalePrice = Math.Round(WholeSalePricePerUnit / QuantityPerUnit, DIGITS_COUNT);
-                    break;
-                case UnitKind.g:
-                    WholeSalePrice = Math.Round((WholeSalePricePerUnit / QuantityPerUnit) * 1000, DIGITS_COUNT);
-                    break;
-                case UnitKind.kg:
-                    WholeSalePrice = Math.Round(WholeSalePricePerUnit / QuantityPerUnit, DIGITS_COUNT);
-                    break;
-                default:
-                    WholeSalePrice = WholeSalePricePerUnit;
-                    break;
-            }
-
-            VatPrice = Math.Round(WholeSalePrice * Vat / 100, DIGITS_COUNT);
-            OnSalePrice = Math.Round(WholeSalePrice + VatPrice, DIGITS_COUNT);
+            if (CatalogsPrices == null)
+                return;
+            
+            foreach (var price in CatalogsPrices)
+                price.RefreshPrice(Vat, Unit, QuantityPerUnit);
         }
         
         private void AddTags(IEnumerable<Tag> tags)
         {
+            if (Tags == null)
+                _tags = new List<ProductTag>();
+            
             foreach (var tag in tags)
                 _tags.Add(new ProductTag(tag));
         }
@@ -273,7 +233,37 @@ namespace Sheaft.Domain
             RatingsCount = Ratings.Count;
         }
 
-        public List<DomainEvent> DomainEvents { get; } = new List<DomainEvent>();
+        public void AddOrUpdateCatalogPrice(Catalog catalog, decimal wholeSalePricePerUnit)
+        {
+            if (CatalogsPrices == null)
+                _catalogsPrices = new List<CatalogProduct>();
 
+            try
+            {
+                var existingCatalogPrice = _catalogsPrices.SingleOrDefault(c => c.Catalog.Id == catalog.Id);
+                if (existingCatalogPrice == null)
+                    _catalogsPrices.Add(new CatalogProduct(this, catalog, wholeSalePricePerUnit));
+                else
+                    existingCatalogPrice.SetWholeSalePricePerUnit(wholeSalePricePerUnit);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+            }
+        }
+
+        public void RemoveFromCatalog(Guid catalogId)
+        {
+            if (CatalogsPrices == null || !CatalogsPrices.Any())
+                throw SheaftException.NotFound();
+            
+            var existingCatalogPrice = _catalogsPrices.SingleOrDefault(c => c.Catalog.Id == catalogId);
+            if (existingCatalogPrice == null)
+                throw SheaftException.NotFound();
+            
+            _catalogsPrices.Remove(existingCatalogPrice);
+        }
+
+        public List<DomainEvent> DomainEvents { get; } = new List<DomainEvent>();
     }
 }

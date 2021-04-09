@@ -21,6 +21,7 @@ namespace Sheaft.Mediatr.PickingOrders.Commands
         [JsonConstructor]
         public QueueExportPickingOrderCommand(RequestUser requestUser) : base(requestUser)
         {
+            ProducerId = requestUser.Id;
         }
 
         public IEnumerable<Guid> PurchaseOrderIds { get; set; }

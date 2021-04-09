@@ -26,9 +26,10 @@ namespace Sheaft.Mediatr.Order.Commands
         [JsonConstructor]
         public CreateConsumerOrderCommand(RequestUser requestUser) : base(requestUser)
         {
+            UserId = requestUser.IsAuthenticated ? requestUser.Id : (Guid?) null;
         }
 
-        public Guid UserId { get; set; }
+        public Guid? UserId { get; set; }
         public DonationKind Donation { get; set; }
         public IEnumerable<ResourceIdQuantityDto> Products { get; set; }
         public IEnumerable<ProducerExpectedDeliveryDto> ProducersExpectedDeliveries { get; set; }
@@ -57,7 +58,7 @@ namespace Sheaft.Mediatr.Order.Commands
                 .Where(p => 
                     p.RemovedOn.HasValue 
                     || !p.Available 
-                    || !p.VisibleToConsumers 
+                    || p.CatalogsPrices.Any(cp => cp.Catalog.Kind == CatalogKind.Consumers && cp.Catalog.IsDefault && !cp.Catalog.Available)
                     || p.Producer.RemovedOn.HasValue 
                     || !p.Producer.CanDirectSell)
                 .Select(p => p.Id.ToString("N"));
@@ -66,18 +67,15 @@ namespace Sheaft.Mediatr.Order.Commands
                 return Failure<Guid>(MessageKind.Order_CannotCreate_Some_Products_NotAvailable,
                     string.Join(";", invalidProductIds));
 
-            var cartProducts = new Dictionary<Domain.Product, int>();
+            var cartProducts = new List<Tuple<Domain.Product, Guid, int>>();
             foreach (var product in products)
             {
-                cartProducts.Add(product, request.Products.Where(p => p.Id == product.Id).Sum(c => c.Quantity));
+                var catalog = product.CatalogsPrices.Select(p => p.Catalog).SingleOrDefault(p => !p.RemovedOn.HasValue && p.Kind == CatalogKind.Consumers && p.IsDefault && p.Available);
+                if(catalog == null)
+                    throw SheaftException.Validation();
+                
+                cartProducts.Add(new Tuple<Domain.Product, Guid, int>(product, catalog.Id, request.Products.Where(p => p.Id == product.Id).Sum(c => c.Quantity)));
             }
-
-            Domain.User user = request.UserId != Guid.Empty ? await _context.GetByIdAsync<Domain.User>(request.UserId, token) : null;
-            if(user != null && user.Id != request.RequestUser.Id)
-                throw SheaftException.Forbidden();
-            
-            var order = new Domain.Order(Guid.NewGuid(), request.Donation, cartProducts, _pspOptions.FixedAmount,
-                _pspOptions.Percent, _pspOptions.VatPercent, user);
 
             var deliveryIds = request.ProducersExpectedDeliveries?.Select(p => p.DeliveryModeId) ?? new List<Guid>();
             var deliveries = deliveryIds.Any()
@@ -95,13 +93,20 @@ namespace Sheaft.Mediatr.Order.Commands
                 if(delivery.Closings.Any(c => cartDelivery.ExpectedDeliveryDate >= c.ClosedFrom && cartDelivery.ExpectedDeliveryDate <= c.ClosedTo))
                     return Failure<Guid>(MessageKind.Order_CannotCreate_Delivery_Closed, delivery.Name, delivery.Producer.Name);
                     
-                if(cartProducts.Any(p => p.Key.Producer.Id == delivery.Producer.Id && p.Key.Producer.Closings.Any(c => cartDelivery.ExpectedDeliveryDate >= c.ClosedFrom && cartDelivery.ExpectedDeliveryDate <= c.ClosedTo)))
+                if(cartProducts.Any(p => p.Item1.Producer.Id == delivery.Producer.Id && p.Item1.Producer.Closings.Any(c => cartDelivery.ExpectedDeliveryDate >= c.ClosedFrom && cartDelivery.ExpectedDeliveryDate <= c.ClosedTo)))
                     return Failure<Guid>(MessageKind.Order_CannotCreate_Producer_Closed, delivery.Producer.Name);
                 
                 cartDeliveries.Add(new Tuple<Domain.DeliveryMode, DateTimeOffset, string>(delivery,
                     cartDelivery.ExpectedDeliveryDate, cartDelivery.Comment));
             }
 
+            Domain.User user = request.UserId.HasValue && request.UserId != Guid.Empty ? await _context.GetByIdAsync<Domain.User>(request.UserId.Value, token) : null;
+            if(user != null && user.Id != request.RequestUser.Id)
+                throw SheaftException.Forbidden();
+            
+            var order = new Domain.Order(Guid.NewGuid(), request.Donation, cartProducts, _pspOptions.FixedAmount,
+                _pspOptions.Percent, _pspOptions.VatPercent, user);
+            
             order.SetDeliveries(cartDeliveries);
 
             await _context.AddAsync(order, token);

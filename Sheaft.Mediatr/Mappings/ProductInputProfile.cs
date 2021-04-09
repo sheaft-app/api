@@ -25,8 +25,7 @@ namespace Sheaft.Mediatr.Mappings
                 .ForMember(c => c.ProductId, opt => opt.MapFrom(r => r.Id));
             CreateMap<SetResourceIdsAvailabilityDto, SetProductsAvailabilityCommand>()
                 .ForMember(c => c.ProductIds, opt => opt.MapFrom(r => r.Ids));
-            CreateMap<SetResourceIdsVisibilityDto, SetProductsSearchabilityCommand>()
-                .ForMember(c => c.ProductIds, opt => opt.MapFrom(r => r.Ids));
+            
             CreateMap<ResourceIdsDto, DeleteProductsCommand>()
                 .ForMember(c => c.ProductIds, opt => opt.MapFrom(r => r.Ids));
             ;

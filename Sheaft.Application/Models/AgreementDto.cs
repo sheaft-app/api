@@ -14,6 +14,7 @@ namespace Sheaft.Application.Models
         public string Reason { get; set; }
         public AgreementDeliveryModeDto Delivery { get; set; }
         public UserDto Store { get; set; }
+        public CatalogDto Catalog { get; set; }
         public IEnumerable<TimeSlotDto> SelectedHours { get; set; }
     }
 }

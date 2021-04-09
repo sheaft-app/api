@@ -11,6 +11,7 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
             entity.Property<long>("Uid");
             entity.Property<long>("DeliveryModeUid");
             entity.Property<long>("StoreUid");
+            entity.Property<long?>("CatalogUid");
 
             entity.Property(c => c.CreatedOn);
             entity.Property(c => c.UpdatedOn).IsConcurrencyToken();
@@ -24,6 +25,7 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
 
             entity.HasOne(c => c.Delivery).WithMany().HasForeignKey("DeliveryModeUid").OnDelete(DeleteBehavior.NoAction);
             entity.HasOne(c => c.Store).WithMany().HasForeignKey("StoreUid").OnDelete(DeleteBehavior.Cascade);
+            entity.HasOne(c => c.Catalog).WithMany().HasForeignKey("CatalogUid").OnDelete(DeleteBehavior.NoAction);
 
             var hours = entity.Metadata.FindNavigation(nameof(Agreement.SelectedHours));
             hours.SetPropertyAccessMode(PropertyAccessMode.Field);
@@ -33,7 +35,8 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
             entity.HasIndex(c => c.Id).IsUnique();
             entity.HasIndex("StoreUid");
             entity.HasIndex("DeliveryModeUid");
-            entity.HasIndex("Uid", "Id", "StoreUid", "DeliveryModeUid", "RemovedOn");
+            entity.HasIndex("CatalogUid");
+            entity.HasIndex("Uid", "Id", "StoreUid", "DeliveryModeUid", "CatalogUid", "RemovedOn");
 
             entity.ToTable("Agreements");
         }

@@ -9,14 +9,12 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
         public void Configure(EntityTypeBuilder<QuickOrderProduct> entity)
         {
             entity.Property<long>("QuickOrderUid");
-            entity.Property<long>("ProductUid");
-
+            entity.Property<long>("CatalogProductUid");
             entity.Property(c => c.Quantity).IsConcurrencyToken();
 
-            entity.HasOne(c => c.Product).WithMany().HasForeignKey("ProductUid").OnDelete(DeleteBehavior.NoAction);
+            entity.HasOne(c => c.CatalogProduct).WithMany().HasForeignKey("CatalogProductUid").OnDelete(DeleteBehavior.NoAction);
 
-            entity.HasKey("QuickOrderUid", "ProductUid");
-
+            entity.HasKey("QuickOrderUid", "CatalogProductUid");
             entity.ToTable("QuickOrderProducts");
         }
     }

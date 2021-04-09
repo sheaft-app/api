@@ -21,6 +21,7 @@ namespace Sheaft.Application.Interfaces.Infrastructure
             where TEntity : class;
         DbSet<Domain.Agreement> Agreements { get; set; }
         DbSet<BankAccount> BankAccounts { get; set; }
+        DbSet<Domain.Catalog> Catalogs { get; set; }
         DbSet<Domain.Country> Countries { get; set; }
         DbSet<Domain.DeliveryMode> DeliveryModes { get; set; }
         DbSet<Domain.Department> Departments { get; set; }

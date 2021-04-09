@@ -58,6 +58,7 @@ using Sheaft.Infrastructure.Persistence.Extensions;
 using Sheaft.Mediatr;
 using Sheaft.Mediatr.Agreement.Queries;
 using Sheaft.Mediatr.BusinessClosing.Queries;
+using Sheaft.Mediatr.Catalog.Queries;
 using Sheaft.Mediatr.Consumer.Queries;
 using Sheaft.Mediatr.Country.Queries;
 using Sheaft.Mediatr.DeliveryClosing.Queries;
@@ -81,6 +82,7 @@ using Sheaft.Mediatr.QuickOrder.Queries;
 using Sheaft.Mediatr.Region.Queries;
 using Sheaft.Mediatr.Returnable.Queries;
 using Sheaft.Mediatr.Store.Commands;
+using Sheaft.Mediatr.Store.Queries;
 using Sheaft.Mediatr.Tag.Queries;
 using Sheaft.Mediatr.Transfer.Queries;
 using Sheaft.Mediatr.User.Queries;
@@ -207,6 +209,10 @@ namespace Sheaft.Web.Api
                     builder.RequireAuthenticatedUser();
                     builder.RequireRole(rolesOptions.Consumer.Value);
                 });
+                options.AddPolicy(Policies.ANONYMOUS_OR_CONNECTED, builder =>
+                {
+                    builder.RequireAssertion(c => !c.User.Identity.IsAuthenticated || c.User.Identity.IsAuthenticated);
+                });
             });
 
             services.Configure<KestrelServerOptions>(options => options.AllowSynchronousIO = true);
@@ -300,6 +306,7 @@ namespace Sheaft.Web.Api
             
             services.AddScoped<IAgreementQueries, AgreementQueries>();
             services.AddScoped<IProducerQueries, ProducerQueries>();
+            services.AddScoped<IStoreQueries, StoreQueries>();
             services.AddScoped<IDeliveryQueries, DeliveryQueries>();
             services.AddScoped<IDepartmentQueries, DepartmentQueries>();
             services.AddScoped<IJobQueries, JobQueries>();
@@ -325,6 +332,7 @@ namespace Sheaft.Web.Api
             services.AddScoped<IPayoutQueries, PayoutQueries>();
             services.AddScoped<IDonationQueries, DonationQueries>();
             services.AddScoped<IWithholdingQueries, WithholdingQueries>();
+            services.AddScoped<ICatalogQueries, CatalogQueries>();
             
             services.AddScoped<ISheaftMediatr, SheaftMediatr>();
             services.AddScoped<ISheaftDispatcher, SheaftDispatcher>();

@@ -4,7 +4,6 @@ using System.Linq;
 using Sheaft.Core.Enums;
 using Sheaft.Core.Exceptions;
 using Sheaft.Domain.Common;
-using Sheaft.Domain.Enum;
 using Sheaft.Domain.Interop;
 
 namespace Sheaft.Domain
@@ -15,7 +14,7 @@ namespace Sheaft.Domain
 
         protected QuickOrder() { }
 
-        public QuickOrder(Guid id, string name, IDictionary<Product, int> products, User user)
+        public QuickOrder(Guid id, string name, IDictionary<CatalogProduct, int> products, User user)
         {
             if (user == null)
                 throw new ValidationException(MessageKind.QuickOrder_User_Required);
@@ -39,7 +38,7 @@ namespace Sheaft.Domain
         public DateTimeOffset? UpdatedOn { get; private set; }
         public DateTimeOffset? RemovedOn { get; private set; }
         public virtual User User { get; private set; }
-        public virtual IEnumerable<QuickOrderProduct> Products { get { return _products?.AsReadOnly(); } private set { } }
+        public virtual IEnumerable<QuickOrderProduct> Products => _products?.AsReadOnly();
 
         public void SetName(string name)
         {
@@ -67,30 +66,30 @@ namespace Sheaft.Domain
             IsDefault = false;
         }
 
-        public void AddProducts(IDictionary<Product, int> products)
+        public void AddProducts(IDictionary<CatalogProduct, int> products)
         {
-            foreach (var product in products)
-                AddProduct(product);
-        }
-
-        public void AddProduct(KeyValuePair<Product, int> product)
-        {
-            var productLine = _products.SingleOrDefault(p => p.Product.Id == product.Key.Id);
-            if (productLine != null)
-                throw new ValidationException(MessageKind.QuickOrder_CannotAddProduct_Product_AlreadyIn);
+            if (products == null)
+                return;
             
-            _products.Add(new QuickOrderProduct(product.Key, product.Value));            
-        }
-
-        public void RemoveProducts(IEnumerable<Product> products)
-        {
             foreach (var product in products)
-                RemoveProduct(product);
+                AddOrUpdateProduct(product.Key, product.Value);
         }
 
-        public void RemoveProduct(Product product)
+        public void AddOrUpdateProduct(CatalogProduct catalogProduct, int quantity)
         {
-            var productLine = _products.SingleOrDefault(p => p.Product.Id == product.Id);
+            var productLine = _products.SingleOrDefault(p => p.CatalogProduct.Product.Id == catalogProduct.Product.Id);
+            if (productLine != null)
+            {
+                productLine.SetQuantity(quantity);
+                return;
+            }
+
+            _products.Add(new QuickOrderProduct(catalogProduct, quantity)); 
+        }
+
+        public void RemoveProduct(Guid productId)
+        {
+            var productLine = _products.SingleOrDefault(p => p.CatalogProduct.Product.Id == productId);
             if (productLine == null)
                 throw new ValidationException(MessageKind.QuickOrder_CannotRemoveProduct_Product_NotFound);
 

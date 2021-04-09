@@ -107,8 +107,6 @@ namespace Sheaft.Web.Manage.Controllers
                 Description = model.Description,
                 Name = model.Name,
                 Available = model.Available,
-                VisibleToStores = model.VisibleToStores,
-                VisibleToConsumers = model.VisibleToConsumers,
                 ReturnableId = model.ReturnableId,
                 Picture = model.Picture,
                 QuantityPerUnit = model.QuantityPerUnit,
@@ -118,7 +116,8 @@ namespace Sheaft.Web.Manage.Controllers
                 Conditioning = model.Conditioning,
                 Vat = model.Vat,
                 Weight = model.Weight,
-                WholeSalePricePerUnit = model.WholeSalePricePerUnit
+                VisibleToStores = model.VisibleToStores,
+                VisibleToConsumers = model.VisibleToConsumers,
             }, token);
 
             if (!result.Succeeded)
@@ -184,8 +183,6 @@ namespace Sheaft.Web.Manage.Controllers
                 Description = model.Description,
                 Name = model.Name,
                 Available = model.Available,
-                VisibleToStores = model.VisibleToStores,
-                VisibleToConsumers = model.VisibleToConsumers,
                 ReturnableId = model.ReturnableId,
                 Picture = model.Picture,
                 QuantityPerUnit = model.QuantityPerUnit,
@@ -195,7 +192,9 @@ namespace Sheaft.Web.Manage.Controllers
                 Unit = model.Unit,
                 Vat = model.Vat,
                 Weight = model.Weight,
-                WholeSalePricePerUnit = model.WholeSalePricePerUnit
+                WholeSalePricePerUnit = model.WholeSalePricePerUnit,
+                VisibleToStores = model.VisibleToStores,
+                VisibleToConsumers = model.VisibleToConsumers,
             }, token);
 
             if (!result.Succeeded)

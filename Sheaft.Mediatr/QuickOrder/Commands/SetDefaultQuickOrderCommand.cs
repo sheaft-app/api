@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
@@ -8,6 +9,7 @@ using Sheaft.Application.Interfaces;
 using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Application.Interfaces.Mediatr;
 using Sheaft.Core;
+using Sheaft.Core.Exceptions;
 using Sheaft.Domain;
 
 namespace Sheaft.Mediatr.QuickOrder.Commands
@@ -17,6 +19,7 @@ namespace Sheaft.Mediatr.QuickOrder.Commands
         [JsonConstructor]
         public SetDefaultQuickOrderCommand(RequestUser requestUser) : base(requestUser)
         {
+            UserId = requestUser.Id;
         }
 
         public Guid UserId { get; set; }
@@ -37,17 +40,17 @@ namespace Sheaft.Mediatr.QuickOrder.Commands
         public async Task<Result> Handle(SetDefaultQuickOrderCommand request, CancellationToken token)
         {
             var quickOrders = await _context.FindAsync<Domain.QuickOrder>(c => c.User.Id == request.UserId, token);
-            foreach (var quickOrder in quickOrders)
-            {
-                if (quickOrder.Id == request.QuickOrderId)
-                    quickOrder.SetAsDefault();
-                else
-                    quickOrder.UnsetAsDefault();
-            }
+            var entity = quickOrders.FirstOrDefault(qo => qo.Id == request.QuickOrderId);
+            if (entity == null)
+                return Failure(SheaftException.NotFound());
+            
+            entity.SetAsDefault();
 
-            _context.UpdateRange(quickOrders);
+            var oldDefaultQuickOrder = quickOrders.SingleOrDefault(qo => qo.Id != request.QuickOrderId && qo.IsDefault);
+            if (oldDefaultQuickOrder != null)
+                oldDefaultQuickOrder.UnsetAsDefault();
+            
             await _context.SaveChangesAsync(token);
-
             return Success();
         }
     }

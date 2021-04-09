@@ -1,6 +1,6 @@
-﻿using Sheaft.Core.Enums;
+﻿using System;
+using Sheaft.Core.Enums;
 using Sheaft.Core.Exceptions;
-using Sheaft.Domain.Enum;
 
 namespace Sheaft.Domain
 {
@@ -8,19 +8,14 @@ namespace Sheaft.Domain
     {
         protected QuickOrderProduct() { }
 
-        public QuickOrderProduct(Product product) : this(product, 0)
+        public QuickOrderProduct(CatalogProduct product, int quantity = 0)
         {
-
-        }
-
-        public QuickOrderProduct(Product product, int quantity)
-        {
-            Product = product;
+            CatalogProduct = product;
             Quantity = quantity;
         }
 
-        public virtual Product Product { get; private set; }
         public int? Quantity { get; private set; }
+        public virtual CatalogProduct CatalogProduct { get; private set; }
 
         public void SetQuantity(int? quantity)
         {

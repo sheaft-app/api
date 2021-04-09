@@ -19,6 +19,7 @@ namespace Sheaft.Mediatr.Product.Commands
         [JsonConstructor]
         public RateProductCommand(RequestUser requestUser) : base(requestUser)
         {
+            UserId = requestUser.Id;
         }
 
         public Guid UserId { get; set; }
