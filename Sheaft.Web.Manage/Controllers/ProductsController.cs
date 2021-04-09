@@ -116,7 +116,8 @@ namespace Sheaft.Web.Manage.Controllers
                 Conditioning = model.Conditioning,
                 Vat = model.Vat,
                 Weight = model.Weight,
-                //TODO Catalog prices WholeSalePricePerUnit = model.WholeSalePricePerUnit
+                VisibleToStores = model.VisibleToStores,
+                VisibleToConsumers = model.VisibleToConsumers,
             }, token);
 
             if (!result.Succeeded)
@@ -191,7 +192,9 @@ namespace Sheaft.Web.Manage.Controllers
                 Unit = model.Unit,
                 Vat = model.Vat,
                 Weight = model.Weight,
-                WholeSalePricePerUnit = model.WholeSalePricePerUnit
+                WholeSalePricePerUnit = model.WholeSalePricePerUnit,
+                VisibleToStores = model.VisibleToStores,
+                VisibleToConsumers = model.VisibleToConsumers,
             }, token);
 
             if (!result.Succeeded)
