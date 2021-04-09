@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Sheaft.Application.Interfaces;
@@ -46,10 +48,14 @@ namespace Sheaft.Mediatr.Transfer.Commands
             if (purchaseOrder.Status != PurchaseOrderStatus.Delivered)
                 return Failure<Guid>(MessageKind.Transfer_CannotCreate_PurchaseOrder_Invalid_Status);
 
-            if (purchaseOrder.Transfer != null && purchaseOrder.Transfer.Status == TransactionStatus.Succeeded)
+            var pendingTransfers = await _context.Transfers
+                .Where(t => t.PurchaseOrder.Id == request.PurchaseOrderId)
+                .ToListAsync(token);
+            
+            if (pendingTransfers.Any(pt => pt.Status == TransactionStatus.Succeeded))
                 return Failure<Guid>(MessageKind.Transfer_CannotCreate_AlreadyProcessed);
 
-            if (purchaseOrder.Transfer != null && purchaseOrder.Transfer.Status != TransactionStatus.Failed)
+            if (pendingTransfers.Any(pt => pt.Status == TransactionStatus.Created || pt.Status == TransactionStatus.Waiting))
                 return Failure<Guid>(MessageKind.Transfer_CannotCreate_Pending_Transfer);
 
             var checkResult =
@@ -69,8 +75,6 @@ namespace Sheaft.Mediatr.Transfer.Commands
                 var transfer = new Domain.Transfer(Guid.NewGuid(), debitedWallet, creditedWallet, purchaseOrder);
                 await _context.AddAsync(transfer, token);
                 await _context.SaveChangesAsync(token);
-
-                purchaseOrder.SetTransfer(transfer);
 
                 var result = await _pspService.CreateTransferAsync(transfer, token);
                 if (!result.Succeeded)

@@ -74,7 +74,6 @@ namespace Sheaft.Domain
         public virtual PurchaseOrderSender Sender { get; private set; }
         public virtual ExpectedPurchaseOrderDelivery ExpectedDelivery { get; private set; }
         public virtual PurchaseOrderVendor Vendor { get; private set; }
-        public virtual Transfer Transfer { get; private set; }
         public virtual IReadOnlyCollection<PurchaseOrderProduct> Products => _products?.AsReadOnly();
 
         public void SetReference(string newReference)
@@ -83,14 +82,6 @@ namespace Sheaft.Domain
                 throw new ValidationException(MessageKind.PurchaseOrder_Reference_Required);
 
             Reference = newReference;
-        }
-
-        public void SetTransfer(Transfer transfer)
-        {
-            if (Transfer != null && Transfer.Status == TransactionStatus.Succeeded)
-                throw new ValidationException(MessageKind.PurchaseOrder_CannotSet_Transfer_AlreadySucceeded);
-
-            Transfer = transfer;
         }
 
         private void SetStatus(PurchaseOrderStatus newStatus, bool skipNotification)

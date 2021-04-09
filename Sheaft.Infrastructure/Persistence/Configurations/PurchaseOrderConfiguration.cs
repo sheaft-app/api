@@ -37,7 +37,6 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
 
             entity.HasOne(c => c.Vendor).WithOne().HasForeignKey<PurchaseOrder>("PurchaseOrderVendorUid").OnDelete(DeleteBehavior.Cascade);
             entity.HasOne(c => c.Sender).WithOne().HasForeignKey<PurchaseOrder>("PurchaseOrderSenderUid").OnDelete(DeleteBehavior.Cascade);
-            entity.HasOne(c => c.Transfer).WithOne().HasForeignKey<PurchaseOrder>("TransferUid").OnDelete(DeleteBehavior.NoAction);
             entity.OwnsOne(c => c.ExpectedDelivery, cb =>
             {
                 cb.OwnsOne(ca => ca.Address);

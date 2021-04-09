@@ -113,7 +113,7 @@ namespace Sheaft.Mediatr.Order.Commands
                 else
                 {
                     result = await _mediatr.Process(
-                        new CreatePayinCommand(request.RequestUser) {OrderId = order.Id},
+                        new CreateWebPayinCommand(request.RequestUser) {OrderId = order.Id},
                         token);
                 }
                 

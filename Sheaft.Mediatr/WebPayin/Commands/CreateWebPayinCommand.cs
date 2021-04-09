@@ -14,10 +14,10 @@ using Sheaft.Domain.Enum;
 
 namespace Sheaft.Mediatr.Payin.Commands
 {
-    public class CreatePayinCommand : Command<Guid>
+    public class CreateWebPayinCommand : Command<Guid>
     {
         [JsonConstructor]
-        public CreatePayinCommand(RequestUser requestUser) : base(requestUser)
+        public CreateWebPayinCommand(RequestUser requestUser) : base(requestUser)
         {
         }
 
@@ -25,7 +25,7 @@ namespace Sheaft.Mediatr.Payin.Commands
     }
 
     public class CreatePayinCommandHandler : CommandsHandler,
-        IRequestHandler<CreatePayinCommand, Result<Guid>>
+        IRequestHandler<CreateWebPayinCommand, Result<Guid>>
     {
         private readonly IPspService _pspService;
 
@@ -39,7 +39,7 @@ namespace Sheaft.Mediatr.Payin.Commands
             _pspService = pspService;
         }
 
-        public async Task<Result<Guid>> Handle(CreatePayinCommand request, CancellationToken token)
+        public async Task<Result<Guid>> Handle(CreateWebPayinCommand request, CancellationToken token)
         {
             var order = await _context.GetByIdAsync<Domain.Order>(request.OrderId, token);
             if (order.Status == OrderStatus.Validated)
@@ -54,8 +54,6 @@ namespace Sheaft.Mediatr.Payin.Commands
 
             await _context.AddAsync(webPayin, token);
             await _context.SaveChangesAsync(token);
-
-            order.SetPayin(webPayin);
 
             var legal = await _context.GetSingleAsync<Domain.Legal>(c => c.Owner.Id == order.User.Id, token);
             var result = await _pspService.CreateWebPayinAsync(webPayin, legal.Owner, token);

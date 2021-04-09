@@ -29,9 +29,6 @@ namespace Sheaft.Mediatr.Payin.EventHandlers
         {
             var payinEvent = notification.DomainEvent;
             var payin = await _context.GetByIdAsync<Domain.Payin>(payinEvent.PayinId, token);
-            if (payin.Order.Payin.Id != payin.Id)
-                return;
-
             if (payin.Status != TransactionStatus.Failed)
                 return;
 

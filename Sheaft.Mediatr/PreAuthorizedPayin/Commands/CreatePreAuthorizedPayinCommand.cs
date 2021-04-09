@@ -1,5 +1,4 @@
 using System;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
@@ -24,25 +23,21 @@ namespace Sheaft.Mediatr.PreAuthorizedPayin
         }
         
         public Guid PreAuthorizationId { get; set; }
-        public Guid PurchaseOrderId { get; set; }
     }
     
     public class CreatePreAuthorizedPayinCommandHandler : CommandsHandler,
         IRequestHandler<CreatePreAuthorizedPayinCommand, Result<Guid>>
     {
-        private readonly PspOptions _pspOptions;
         private readonly IPspService _pspService;
 
         public CreatePreAuthorizedPayinCommandHandler(
             IAppDbContext context,
             ISheaftMediatr mediatr,
             IPspService pspService,
-            IOptionsSnapshot<PspOptions> pspOptions,
             ILogger<CreatePreAuthorizedPayinCommandHandler> logger)
             : base(mediatr, context, logger)
         {
             _pspService = pspService;
-            _pspOptions = pspOptions.Value;
         }
 
         public async Task<Result<Guid>> Handle(CreatePreAuthorizedPayinCommand request, CancellationToken token)

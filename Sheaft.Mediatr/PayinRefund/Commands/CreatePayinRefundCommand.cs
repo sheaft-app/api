@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Sheaft.Application.Interfaces;
@@ -48,30 +49,33 @@ namespace Sheaft.Mediatr.PayinRefund.Commands
                 purchaseOrder.Status != PurchaseOrderStatus.Refused)
                 return Failure<Guid>(MessageKind.PayinRefund_CannotCreate_Payin_PurchaseOrder_Invalid_Status);
 
-            var order = await _context.GetSingleAsync<Domain.Order>(
-                c => c.PurchaseOrders.Any(c => c.Id == purchaseOrder.Id), token);
-            if (order.Payin.Status != TransactionStatus.Succeeded)
+            var orderPayins = await _context.Payins
+                .Where(p => p.Order.PurchaseOrders.Any(po => po.Id == purchaseOrder.Id))
+                .ToListAsync(token);
+
+            var payin = orderPayins.FirstOrDefault(p => p.Status == TransactionStatus.Succeeded);
+            if(payin == null)
                 return Failure<Guid>(MessageKind
                     .PayinRefund_CannotCreate_PurchaseOrderRefund_Payin_Invalid_Status);
 
-            if (order.Payin.Refunds.Any(c =>
+            if (payin.Refunds.Any(c =>
                 c.PurchaseOrder.Id == purchaseOrder.Id && c.Status == TransactionStatus.Succeeded))
                 return Failure<Guid>(MessageKind
                     .PayinRefund_CannotCreate_PurchaseOrderRefund_PayinRefund_AlreadyProcessed);
 
-            if (order.Payin.Refunds.Any(c =>
+            if (payin.Refunds.Any(c =>
                 c.PurchaseOrder.Id == purchaseOrder.Id && c.Status != TransactionStatus.Failed))
                 return Failure<Guid>(
                     MessageKind.PayinRefund_CannotCreate_PurchaseOrderRefund_Pending_PayinRefund);
 
             using (var transaction = await _context.BeginTransactionAsync(token))
             {
-                var payinRefund = new Domain.PayinRefund(Guid.NewGuid(), order.Payin, purchaseOrder);
+                var payinRefund = new Domain.PayinRefund(Guid.NewGuid(), payin, purchaseOrder);
 
                 await _context.AddAsync(payinRefund, token);
                 await _context.SaveChangesAsync(token);
 
-                order.Payin.AddRefund(payinRefund);
+                payin.AddRefund(payinRefund);
 
                 var result = await _pspService.RefundPayinAsync(payinRefund, token);
                 if (!result.Succeeded)

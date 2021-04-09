@@ -66,8 +66,6 @@ namespace Sheaft.Domain
         public decimal FeesPrice { get; private set; }
         public decimal InternalFeesPrice { get; private set; }
         public virtual User User { get; private set; }
-        public virtual Payin Payin { get; private set; }
-        public virtual Donation Donation { get; private set; }
         public virtual IReadOnlyCollection<OrderProduct> Products => _products?.AsReadOnly();
         public virtual IReadOnlyCollection<OrderDelivery> Deliveries => _deliveries?.AsReadOnly();
         public virtual IReadOnlyCollection<PurchaseOrder> PurchaseOrders => _purchaseOrders?.AsReadOnly();
@@ -91,24 +89,11 @@ namespace Sheaft.Domain
             return purchaseOrder;
         }
 
-        public void SetPayin(WebPayin payin)
-        {
-            if(Payin != null && Payin.Status == TransactionStatus.Succeeded)
-                throw new ValidationException(MessageKind.Payin_CannotSet_Already_Succeeded);
-
-            Payin = payin;
-        }
-
-        public void SetDonation(Donation donation)
-        {
-            if (Donation != null && Donation.Status == TransactionStatus.Succeeded)
-                throw new ValidationException(MessageKind.Donation_CannotSet_Already_Succeeded);
-
-            Donation = donation;
-        }
-
         public void SetStatus(OrderStatus status)
         {
+            if (Status == OrderStatus.Refused || Status == OrderStatus.Validated)
+                return;
+            
             switch (status)
             {
                 case OrderStatus.Waiting:
