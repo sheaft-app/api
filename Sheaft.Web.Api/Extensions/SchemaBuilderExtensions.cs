@@ -172,6 +172,8 @@ namespace Sheaft.Web.Api.Extensions
             services.AddType<UpdateCatalogPricesInputType>();
             services.AddType<UpdateOrCreateCatalogPriceInputType>();
             services.AddType<PayOrderInputType>();
+            services.AddType<CreatePreAuthorizationInputType>();
+            services.AddType<CreateCardRegistrationInputType>();
 
             return services;
         }
