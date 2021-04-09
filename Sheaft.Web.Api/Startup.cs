@@ -374,7 +374,7 @@ namespace Sheaft.Web.Api
                 .AddMutationType<SheaftMutationType>()
                 .AddQueryType<SheaftQueryType>()
                 .BindClrType<TimeSpan, SheaftTimeSpanType>()
-                .RegisterTypes()
+                .RegisterGraphQlTypes()
                 .Create(), new QueryExecutionOptions { IncludeExceptionDetails = true });
 
             services.AddErrorFilter<SheaftErrorFilter>();
