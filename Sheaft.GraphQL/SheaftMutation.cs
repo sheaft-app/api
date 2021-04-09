@@ -16,6 +16,7 @@ using Sheaft.Core.Exceptions;
 using Sheaft.Domain;
 using Sheaft.Mediatr.Agreement.Commands;
 using Sheaft.Mediatr.BusinessClosing.Commands;
+using Sheaft.Mediatr.Cards.Commands;
 using Sheaft.Mediatr.Catalog;
 using Sheaft.Mediatr.Consumer.Commands;
 using Sheaft.Mediatr.DeliveryClosing.Commands;
@@ -25,6 +26,7 @@ using Sheaft.Mediatr.Legal.Commands;
 using Sheaft.Mediatr.Notification.Commands;
 using Sheaft.Mediatr.Order.Commands;
 using Sheaft.Mediatr.PickingOrders.Commands;
+using Sheaft.Mediatr.PreAuthorization;
 using Sheaft.Mediatr.Producer.Commands;
 using Sheaft.Mediatr.Product.Commands;
 using Sheaft.Mediatr.ProfileInformation.Commands;
@@ -186,12 +188,12 @@ namespace Sheaft.GraphQL
             return orderQueries.GetOrder(input.Id, CurrentUser);
         }
 
-        public async Task<IQueryable<WebPayinDto>> PayOrderAsync(ResourceIdDto input,
+        public async Task<IQueryable<PayinDto>> PayOrderAsync(PayOrderDto input,
             [Service] IPayinQueries payinQueries)
         {
             var result =
-                await ExecuteAsync<ResourceIdDto, PayOrderCommand, Guid>(input, Token);
-            return payinQueries.GetWebPayinTransaction(result, CurrentUser);
+                await ExecuteAsync<PayOrderDto, PayOrderCommand, Guid>(input, Token);
+            return payinQueries.GetPayin(result, CurrentUser);
         }
 
         public async Task<IQueryable<PurchaseOrderDto>> CreateBusinessOrderAsync(CreateOrderDto input,
@@ -572,6 +574,17 @@ namespace Sheaft.GraphQL
         {
             await ExecuteAsync<SetResourceIdsAvailabilityDto, SetCatalogsAvailabilityCommand>(input, Token);
             return catalogQueries.GetCatalogs(CurrentUser).Where(c => input.Ids.Contains(c.Id));
+        }
+
+        public async Task<CardRegistrationDto> CreateCardRegistration(CreateCardRegistrationDto input)
+        {
+            return await ExecuteAsync<CreateCardRegistrationDto, CreateCardRegistrationCommand, CardRegistrationDto>(input, Token);
+        }
+
+        public async Task<IQueryable<PreAuthorizationDto>> CreatePreAuthorization(CreatePreAuthorizationDto input, [Service] IPreAuthorizationQueries preAuthorizationQueries)
+        {
+            var result = await ExecuteAsync<CreatePreAuthorizationDto, CreatePreAuthorizationCommand, Guid>(input, Token);
+            return preAuthorizationQueries.GetPreAuthorization(result, CurrentUser);
         }
 
         private async Task<bool> ExecuteAsync<T, TU>(T input, CancellationToken token,

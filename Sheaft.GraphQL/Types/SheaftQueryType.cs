@@ -428,11 +428,11 @@ namespace Sheaft.GraphQL.Types
                 .UseSelection();
 
             //WEBPAYIN
-            descriptor.Field(c => c.GetWebPayinTransaction(default, default))
-                .Name("webPayinTransaction")
+            descriptor.Field(c => c.GetPayinTransaction(default, default))
+                .Name("payin")
                 .Authorize(Policies.REGISTERED)
                 .Argument("input", c => c.Type<NonNullType<StringType>>())
-                .Type<NonNullType<WebPayinType>>()
+                .Type<NonNullType<PayinType>>()
                 .UseSingleOrDefault()
                 .UseSelection();
             
@@ -559,6 +559,15 @@ namespace Sheaft.GraphQL.Types
                 .Authorize(Policies.PRODUCER)
                 .Type<ListType<CatalogType>>()
                 .UsePaging<CatalogType>()
+                .UseSelection();
+            
+            //PreAuthorize
+            descriptor.Field(c => c.GetPreAuthorization(default, default))
+                .Name("getPreAuthorization")
+                .Authorize(Policies.REGISTERED)
+                .Argument("input", c => c.Type<NonNullType<IdType>>())
+                .Type<NonNullType<PreAuthorizationType>>()
+                .UseSingleOrDefault()
                 .UseSelection();
         }
     }

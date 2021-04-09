@@ -6,6 +6,7 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using OfficeOpenXml.FormulaParsing.Excel.Functions.Information;
 using Sheaft.Application.Interfaces;
 using Sheaft.Application.Interfaces.Business;
 using Sheaft.Application.Interfaces.Infrastructure;
@@ -17,6 +18,7 @@ using Sheaft.Domain;
 using Sheaft.Domain.Enum;
 using Sheaft.Mediatr.Consumer.Commands;
 using Sheaft.Mediatr.Payin.Commands;
+using Sheaft.Mediatr.PreAuthorization;
 
 namespace Sheaft.Mediatr.Order.Commands
 {
@@ -28,6 +30,7 @@ namespace Sheaft.Mediatr.Order.Commands
         }
 
         public Guid OrderId { get; set; }
+        public string CardIdentifier { get; set; }
     }
 
     public class PayOrderCommandHandler : CommandsHandler,
@@ -100,8 +103,20 @@ namespace Sheaft.Mediatr.Order.Commands
                 order.SetStatus(OrderStatus.Waiting);
                 await _context.SaveChangesAsync(token);
 
-                var result = await _mediatr.Process(new CreateWebPayinCommand(request.RequestUser) {OrderId = order.Id},
-                    token);
+                Result<Guid> result = null;
+                if (!string.IsNullOrWhiteSpace(request.CardIdentifier))
+                {
+                    result = await _mediatr.Process(
+                        new CreatePreAuthorizationCommand(request.RequestUser) {OrderId = order.Id, CardIdentifier = request.CardIdentifier},
+                        token);
+                }
+                else
+                {
+                    result = await _mediatr.Process(
+                        new CreatePayinCommand(request.RequestUser) {OrderId = order.Id},
+                        token);
+                }
+                
                 if (!result.Succeeded)
                 {
                     await transaction.RollbackAsync(token);

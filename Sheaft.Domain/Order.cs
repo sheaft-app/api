@@ -91,7 +91,7 @@ namespace Sheaft.Domain
             return purchaseOrder;
         }
 
-        public void SetPayin(Payin payin)
+        public void SetPayin(WebPayin payin)
         {
             if(Payin != null && Payin.Status == TransactionStatus.Succeeded)
                 throw new ValidationException(MessageKind.Payin_CannotSet_Already_Succeeded);

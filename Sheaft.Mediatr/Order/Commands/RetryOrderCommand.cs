@@ -58,7 +58,7 @@ namespace Sheaft.Mediatr.Order.Commands
                 order.SetStatus(OrderStatus.Waiting);
                 await _context.SaveChangesAsync(token);
 
-                var result = await _mediatr.Process(new CreateWebPayinCommand(request.RequestUser) {OrderId = order.Id},
+                var result = await _mediatr.Process(new CreatePayinCommand(request.RequestUser) {OrderId = order.Id},
                     token);
                 if (!result.Succeeded)
                 {

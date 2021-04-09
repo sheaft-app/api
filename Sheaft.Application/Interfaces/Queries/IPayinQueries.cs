@@ -7,7 +7,7 @@ namespace Sheaft.Application.Interfaces.Queries
 {
     public interface IPayinQueries
     {
-        IQueryable<WebPayinDto> GetWebPayinTransaction(Guid id, RequestUser currentUser);
-        IQueryable<WebPayinDto> GetWebPayinTransaction(string identifier, RequestUser currentUser);
+        IQueryable<PayinDto> GetPayin(Guid id, RequestUser currentUser);
+        IQueryable<PayinDto> GetPayin(string identifier, RequestUser currentUser);
     }
 }

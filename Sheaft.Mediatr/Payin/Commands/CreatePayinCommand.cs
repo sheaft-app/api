@@ -14,32 +14,32 @@ using Sheaft.Domain.Enum;
 
 namespace Sheaft.Mediatr.Payin.Commands
 {
-    public class CreateWebPayinCommand : Command<Guid>
+    public class CreatePayinCommand : Command<Guid>
     {
         [JsonConstructor]
-        public CreateWebPayinCommand(RequestUser requestUser) : base(requestUser)
+        public CreatePayinCommand(RequestUser requestUser) : base(requestUser)
         {
         }
 
         public Guid OrderId { get; set; }
     }
 
-    public class CreateWebPayinCommandHandler : CommandsHandler,
-        IRequestHandler<CreateWebPayinCommand, Result<Guid>>
+    public class CreatePayinCommandHandler : CommandsHandler,
+        IRequestHandler<CreatePayinCommand, Result<Guid>>
     {
         private readonly IPspService _pspService;
 
-        public CreateWebPayinCommandHandler(
+        public CreatePayinCommandHandler(
             IAppDbContext context,
             IPspService pspService,
             ISheaftMediatr mediatr,
-            ILogger<CreateWebPayinCommandHandler> logger)
+            ILogger<CreatePayinCommandHandler> logger)
             : base(mediatr, context, logger)
         {
             _pspService = pspService;
         }
 
-        public async Task<Result<Guid>> Handle(CreateWebPayinCommand request, CancellationToken token)
+        public async Task<Result<Guid>> Handle(CreatePayinCommand request, CancellationToken token)
         {
             var order = await _context.GetByIdAsync<Domain.Order>(request.OrderId, token);
             if (order.Status == OrderStatus.Validated)
