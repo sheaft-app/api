@@ -19,6 +19,7 @@ namespace Sheaft.Mediatr.Consumer.Commands
         [JsonConstructor]
         public CheckConsumerConfigurationCommand(RequestUser requestUser) : base(requestUser)
         {
+            ConsumerId = requestUser.Id;
         }
 
         public Guid ConsumerId { get; set; }

@@ -9,5 +9,7 @@ namespace Sheaft.Application.Interfaces.Queries
     {
         IQueryable<PayinDto> GetPayin(Guid id, RequestUser currentUser);
         IQueryable<PayinDto> GetPayin(string identifier, RequestUser currentUser);
+        IQueryable<WebPayinDto> GetWebPayin(Guid id, RequestUser currentUser);
+        IQueryable<PayinDto> GetPreAuthorizedPayin(Guid id, RequestUser currentUser);
     }
 }

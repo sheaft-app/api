@@ -33,7 +33,7 @@ namespace Sheaft.Domain
         public virtual Wallet CreditedWallet { get; private set; }
         public virtual Order Order { get; private set; }
         public virtual IReadOnlyCollection<PayinRefund> Refunds => _refunds.AsReadOnly();
-
+        
         public void AddRefund(PayinRefund refund)
         {
             if (Refunds != null && Refunds.Any(r => r.PurchaseOrder.Id == refund.PurchaseOrder.Id && r.Status == TransactionStatus.Succeeded))

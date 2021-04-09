@@ -22,7 +22,6 @@ namespace Sheaft.Mediatr.Order.Commands
         }
 
         public Guid OrderId { get; set; }
-        public Guid PayinId { get; set; }
     }
 
     public class FailOrderCommandHandler : CommandsHandler,

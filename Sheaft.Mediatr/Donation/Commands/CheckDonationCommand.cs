@@ -8,6 +8,7 @@ using Sheaft.Application.Interfaces;
 using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Application.Interfaces.Mediatr;
 using Sheaft.Core;
+using Sheaft.Core.Enums;
 using Sheaft.Domain;
 using Sheaft.Domain.Enum;
 
@@ -39,7 +40,7 @@ namespace Sheaft.Mediatr.Donation.Commands
         {
             var donation = await _context.GetByIdAsync<Domain.Donation>(request.DonationId, token);
             if (donation.Status != TransactionStatus.Created && donation.Status != TransactionStatus.Waiting)
-                return Failure();
+                return Failure(MessageKind.BadRequest);
 
             var result =
                 await _mediatr.Process(new RefreshDonationStatusCommand(request.RequestUser, donation.Identifier),

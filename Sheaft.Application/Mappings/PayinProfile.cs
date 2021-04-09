@@ -19,7 +19,8 @@ namespace Sheaft.Application.Mappings
                 .ForMember(m => m.CreditedUser, opt => opt.MapFrom(t => t.CreditedWallet.User));
             CreateMap<PreAuthorizedPayin, PayinDto>()
                 .ForMember(m => m.CreditedUser, opt => opt.MapFrom(t => t.CreditedWallet.User));
-            
+            CreateMap<WebPayin, WebPayinDto>()
+                .ForMember(m => m.CreditedUser, opt => opt.MapFrom(t => t.CreditedWallet.User));
         }
     }
 }

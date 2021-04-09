@@ -8,7 +8,7 @@ namespace Sheaft.Mediatr.Mappings
     {
         public PreAuthorizationInputProfile()
         {
-            CreateMap<CreatePreAuthorizationDto, CreatePreAuthorizationCommand>();
+            CreateMap<CreatePreAuthorizationDto, CreatePreAuthorizationForOrderCommand>();
         }
     }
 }

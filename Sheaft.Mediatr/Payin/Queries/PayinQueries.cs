@@ -35,5 +35,21 @@ namespace Sheaft.Mediatr.Payin.Queries
                     .Get(c => c.Id == id && c.Author.Id == currentUser.Id)
                     .ProjectTo<PayinDto>(_configurationProvider);
         }
+        
+        public IQueryable<WebPayinDto> GetWebPayin(Guid id, RequestUser currentUser)
+        {
+            return _context.Payins
+                .OfType<Domain.WebPayin>()
+                .Get(c => c.Id == id && c.Author.Id == currentUser.Id)
+                .ProjectTo<WebPayinDto>(_configurationProvider);
+        }
+        
+        public IQueryable<PayinDto> GetPreAuthorizedPayin(Guid id, RequestUser currentUser)
+        {
+            return _context.Payins
+                .OfType<Domain.PreAuthorizedPayin>()
+                .Get(c => c.Id == id && c.Author.Id == currentUser.Id)
+                .ProjectTo<PayinDto>(_configurationProvider);
+        }
     }
 }

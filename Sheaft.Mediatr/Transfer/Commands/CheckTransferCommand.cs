@@ -8,6 +8,7 @@ using Sheaft.Application.Interfaces;
 using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Application.Interfaces.Mediatr;
 using Sheaft.Core;
+using Sheaft.Core.Enums;
 using Sheaft.Domain;
 using Sheaft.Domain.Enum;
 
@@ -37,14 +38,14 @@ namespace Sheaft.Mediatr.Transfer.Commands
         public async Task<Result> Handle(CheckTransferCommand request, CancellationToken token)
         {
             var transfer = await _context.GetByIdAsync<Domain.Transfer>(request.TransferId, token);
-            if (transfer.Status != TransactionStatus.Created && transfer.Status != TransactionStatus.Waiting)
-                return Failure();
-
-            var result =
-                await _mediatr.Process(new RefreshTransferStatusCommand(request.RequestUser, transfer.Identifier),
-                    token);
-            if (!result.Succeeded)
-                return Failure(result.Exception);
+            if (transfer.Status == TransactionStatus.Created || transfer.Status == TransactionStatus.Waiting)
+            {
+                var result =
+                    await _mediatr.Process(new RefreshTransferStatusCommand(request.RequestUser, transfer.Identifier),
+                        token);
+                if (!result.Succeeded)
+                    return Failure(result.Exception, result.Message);
+            }
 
             return Success();
         }

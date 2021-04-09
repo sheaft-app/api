@@ -17,6 +17,7 @@ namespace Sheaft.Mediatr.Cards.Commands
         [JsonConstructor]
         public CreateCardRegistrationCommand(RequestUser requestUser) : base(requestUser)
         {
+            UserId = requestUser.Id;
         }
 
         public Guid UserId { get; set; }

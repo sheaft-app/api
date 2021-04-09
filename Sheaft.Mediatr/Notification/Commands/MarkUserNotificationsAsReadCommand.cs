@@ -8,6 +8,7 @@ using Sheaft.Application.Interfaces;
 using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Application.Interfaces.Mediatr;
 using Sheaft.Core;
+using Sheaft.Core.Enums;
 using Sheaft.Domain;
 
 namespace Sheaft.Mediatr.Notification.Commands
@@ -42,7 +43,7 @@ namespace Sheaft.Mediatr.Notification.Commands
         public async Task<Result> Handle(MarkUserNotificationsAsReadCommand request, CancellationToken token)
         {
             var result = await _dapperContext.SetNotificationAsReadAsync(request.UserId, request.ReadBefore, token);
-            return result ? Success() : Failure();
+            return result ? Success() : Failure(MessageKind.BadRequest);
         }
     }
 }

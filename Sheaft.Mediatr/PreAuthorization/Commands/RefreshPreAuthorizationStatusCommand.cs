@@ -49,7 +49,8 @@ namespace Sheaft.Mediatr.PreAuthorization
             var preAuthorization =
                 await _context.GetSingleAsync<Domain.PreAuthorization>(c => c.Identifier == request.Identifier, token);
             if (preAuthorization.Status == PreAuthorizationStatus.Succeeded ||
-                preAuthorization.Status == PreAuthorizationStatus.Failed)
+                preAuthorization.Status == PreAuthorizationStatus.Failed || 
+                preAuthorization.Status == PreAuthorizationStatus.Cancelled)
                 return Success(preAuthorization.Status);
 
             var pspResult = await _pspService.GetPreAuthorizationAsync(preAuthorization.Identifier, token);
@@ -63,6 +64,10 @@ namespace Sheaft.Mediatr.PreAuthorization
 
             switch (preAuthorization.Status)
             {
+                case PreAuthorizationStatus.Failed:
+                    _mediatr.Post(new FailOrderCommand(request.RequestUser)
+                        {OrderId = preAuthorization.Order.Id});
+                    break;
                 case PreAuthorizationStatus.Succeeded:
                     _mediatr.Post(new PreAuthorizationSucceededEvent(preAuthorization.Id));
                     _mediatr.Post(new ConfirmOrderCommand(request.RequestUser) {OrderId = preAuthorization.Order.Id});

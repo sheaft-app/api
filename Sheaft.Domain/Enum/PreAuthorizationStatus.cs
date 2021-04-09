@@ -5,6 +5,7 @@ namespace Sheaft.Domain.Enum
         NotSpecified = 0,
         Created = 1,
         Succeeded = 2,
-        Failed = 3
+        Failed = 3,
+        Cancelled = 100
     }
 }

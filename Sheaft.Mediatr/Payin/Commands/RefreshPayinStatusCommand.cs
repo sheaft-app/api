@@ -43,7 +43,7 @@ namespace Sheaft.Mediatr.Payin.Commands
         public async Task<Result> Handle(RefreshPayinStatusCommand request, CancellationToken token)
         {
             var payin = await _context.GetSingleAsync<Domain.Payin>(c => c.Identifier == request.Identifier, token);
-            if (payin.Status == TransactionStatus.Succeeded || payin.Status == TransactionStatus.Failed)
+            if (payin.Status == TransactionStatus.Succeeded || payin.Status == TransactionStatus.Failed || payin.Status == TransactionStatus.Cancelled)
                 return Success();
 
             var pspResult = await _pspService.GetPayinAsync(payin.Identifier, token);
@@ -60,7 +60,7 @@ namespace Sheaft.Mediatr.Payin.Commands
             {
                 case TransactionStatus.Failed:
                     _mediatr.Post(new FailOrderCommand(request.RequestUser)
-                        {OrderId = payin.Order.Id, PayinId = payin.Id});
+                        {OrderId = payin.Order.Id});
                     break;
                 case TransactionStatus.Succeeded:
                     _mediatr.Post(new ConfirmOrderCommand(request.RequestUser) {OrderId = payin.Order.Id});

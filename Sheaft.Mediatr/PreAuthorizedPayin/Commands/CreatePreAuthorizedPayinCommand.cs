@@ -11,7 +11,6 @@ using Sheaft.Core;
 using Sheaft.Core.Enums;
 using Sheaft.Domain;
 using Sheaft.Domain.Enum;
-using Sheaft.Options;
 
 namespace Sheaft.Mediatr.PreAuthorizedPayin
 {

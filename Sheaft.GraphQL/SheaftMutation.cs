@@ -188,12 +188,19 @@ namespace Sheaft.GraphQL
             return orderQueries.GetOrder(input.Id, CurrentUser);
         }
 
-        public async Task<IQueryable<PayinDto>> PayOrderAsync(PayOrderDto input,
+        public async Task<IQueryable<WebPayinDto>> CreateWebPayinForOrderAsync(CreateWebPayinDto input,
             [Service] IPayinQueries payinQueries)
         {
             var result =
-                await ExecuteAsync<PayOrderDto, PayOrderCommand, Guid>(input, Token);
-            return payinQueries.GetPayin(result, CurrentUser);
+                await ExecuteAsync<CreateWebPayinDto, CreateWebPayinForOrderCommand, Guid>(input, Token);
+            return payinQueries.GetWebPayin(result, CurrentUser);
+        }
+
+        public async Task<IQueryable<OrderDto>> ResetOrderAsync(ResourceIdDto input,
+            [Service] IOrderQueries orderQueries)
+        {
+            await ExecuteAsync<ResourceIdDto, ResetOrderCommand>(input, Token);
+            return orderQueries.GetOrder(input.Id, CurrentUser);
         }
 
         public async Task<IQueryable<PurchaseOrderDto>> CreateBusinessOrderAsync(CreateOrderDto input,
@@ -576,14 +583,14 @@ namespace Sheaft.GraphQL
             return catalogQueries.GetCatalogs(CurrentUser).Where(c => input.Ids.Contains(c.Id));
         }
 
-        public async Task<CardRegistrationDto> CreateCardRegistration(CreateCardRegistrationDto input)
+        public async Task<CardRegistrationDto> CreateCardRegistration()
         {
-            return await ExecuteAsync<CreateCardRegistrationDto, CreateCardRegistrationCommand, CardRegistrationDto>(input, Token);
+            return await ExecuteAsync<CreateCardRegistrationDto, CreateCardRegistrationCommand, CardRegistrationDto>(new CreateCardRegistrationDto(), Token);
         }
 
         public async Task<IQueryable<PreAuthorizationDto>> CreatePreAuthorization(CreatePreAuthorizationDto input, [Service] IPreAuthorizationQueries preAuthorizationQueries)
         {
-            var result = await ExecuteAsync<CreatePreAuthorizationDto, CreatePreAuthorizationCommand, Guid>(input, Token);
+            var result = await ExecuteAsync<CreatePreAuthorizationDto, CreatePreAuthorizationForOrderCommand, Guid>(input, Token);
             return preAuthorizationQueries.GetPreAuthorization(result, CurrentUser);
         }
 

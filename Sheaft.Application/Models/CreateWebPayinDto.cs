@@ -2,9 +2,8 @@ using System;
 
 namespace Sheaft.Application.Models
 {
-    public class PayOrderDto
+    public class CreateWebPayinDto
     {
         public Guid Id { get; set; }
-        public string CardIdentifier { get; set; }
     }
 }
