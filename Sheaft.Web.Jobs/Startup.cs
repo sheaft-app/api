@@ -230,7 +230,6 @@ namespace Sheaft.Web.Jobs
             services.AddScoped<IAuthService, AuthService>();
             services.AddScoped<ICurrentUserService, CurrentUserService>();
             
-            services.AddScoped<IFeesCalculator, FeesCalculator>();
             services.AddScoped<IDeliveryService, DeliveryService>();
             services.AddScoped<IOrderService, OrderService>();
             
@@ -408,6 +407,10 @@ namespace Sheaft.Web.Jobs
             RecurringJob.AddOrUpdate<SheaftDispatcher>("707f7ee279c14f24ad7d5f31e22f4d3c", mediatr =>
                     mediatr.Execute(nameof(CheckPreAuthorizationsCommand), new CheckPreAuthorizationsCommand(new RequestUser("037e7e93c73f4406a4e31994d8686b7c", Guid.NewGuid().ToString("N"), null)), CancellationToken.None),
                 options.CheckPreAuthorizationsCron);
+
+            RecurringJob.AddOrUpdate<SheaftDispatcher>("5300415aae7e419299aff57b61c95a3e", mediatr =>
+                    mediatr.Execute(nameof(CheckNewPreAuthorizedPayinCommand), new CheckNewPreAuthorizedPayinCommand(new RequestUser("037e7e93c73f4406a4e31994d8686b7c", Guid.NewGuid().ToString("N"), null)), CancellationToken.None),
+                options.CheckNewPreAuthorizedPayinCron);
         }
     }
 }

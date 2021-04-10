@@ -8,9 +8,6 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
     {
         public void Configure(EntityTypeBuilder<PreAuthorizedPayin> entity)
         {
-            entity.Property<long>("PreAuthorizationUid");
-            entity.HasOne(c => c.PreAuthorization).WithMany().HasForeignKey("PreAuthorizationUid").OnDelete(DeleteBehavior.NoAction);
-            entity.HasIndex("PreAuthorizationUid");
         }
     }
 }

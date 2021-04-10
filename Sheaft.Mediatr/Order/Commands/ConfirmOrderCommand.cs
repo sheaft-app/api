@@ -69,7 +69,7 @@ namespace Sheaft.Mediatr.Order.Commands
                     purchaseOrderIds.Add(result.Data);
                 }
 
-                if (order.Donate > 0)
+                if (order.Donation > 0)
                 {
                     var result = await _mediatr.Process(
                         new CreateDonationCommand(request.RequestUser) {OrderId = order.Id},

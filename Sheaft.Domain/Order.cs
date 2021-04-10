@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Sheaft.Core.Enums;
+using Sheaft.Application.Models;
 using Sheaft.Core.Exceptions;
 using Sheaft.Domain.Common;
 using Sheaft.Domain.Enum;
@@ -62,9 +62,9 @@ namespace Sheaft.Domain
         public int ReturnablesCount { get; private set; }
         public int LinesCount { get; private set; }
         public int ProductsCount { get; private set; }
-        public decimal Donate { get; private set; }
+        public decimal Donation { get; private set; }
         public decimal FeesPrice { get; private set; }
-        public decimal InternalFeesPrice { get; private set; }
+        public decimal DonationFeesPrice { get; private set; }
         public virtual User User { get; private set; }
         public virtual IReadOnlyCollection<OrderProduct> Products => _products?.AsReadOnly();
         public virtual IReadOnlyCollection<OrderDelivery> Deliveries => _deliveries?.AsReadOnly();
@@ -141,7 +141,7 @@ namespace Sheaft.Domain
         {
             DonationKind = kind;
             RefreshFees();
-        }        
+        }
 
         public void SetReference(string reference)
         {
@@ -176,65 +176,89 @@ namespace Sheaft.Domain
 
         private void RefreshFees()
         {
-            Donate = 0;
-            FeesPrice = GetFees(TotalOnSalePrice);
+            var prices = GetOrderFees(this, TotalOnSalePrice);
+            
+            FeesPrice = prices.FeesPrice;
+            TotalPrice = prices.TotalPrice;
+            DonationFeesPrice = prices.DonationFees;
+            Donation = prices.Donation;
+        }
 
-            switch (DonationKind)
+        public List<DomainEvent> DomainEvents { get; } = new List<DomainEvent>();
+        
+        private class FeesDto
+        {
+            public decimal FeesPrice { get; set; }
+            public decimal DonationFees { get; set; }
+        }
+        
+        public static OrderPrices GetOrderFees(Order order, decimal totalOnSalePrice)
+        {
+            var donate = 0M;
+            var feesPrice = GetFees(totalOnSalePrice, order.FeesPercent, order.FeesFixedAmount, order.FeesVatPercent);
+
+            switch (order.DonationKind)
             {
                 case DonationKind.Rounded:
-                    Donate = GetRoundedDonation();
+                    donate = GetRoundedDonation(totalOnSalePrice, feesPrice);
                     break;
                 case DonationKind.Euro:
-                    Donate = 1;
+                    donate = 1;
                     break;
-                case DonationKind.None:
-                case DonationKind.Free:
                 default:
-                    Donate = 0;
+                    donate = 0;
                     break;
             }
 
-            UpdateFees();
-            TotalPrice = Math.Round(TotalOnSalePrice + Donate + FeesPrice - InternalFeesPrice, DIGITS_COUNT);
+            var results = UpdateFees(totalOnSalePrice, feesPrice, donate, order.FeesPercent, order.FeesFixedAmount, order.FeesVatPercent);
+            var totalPrice = Math.Round(totalOnSalePrice + donate + results.FeesPrice - results.DonationFees, DIGITS_COUNT);
+
+            return new OrderPrices
+            {
+                Donation = donate,
+                DonationFees = results.DonationFees,
+                FeesPrice = results.FeesPrice,
+                TotalPrice = totalPrice
+            };
         }
 
-        private decimal GetRoundedDonation()
+        private static decimal GetRoundedDonation(decimal totalOnSalePrice, decimal feesPrice)
         {
-            var value = TotalOnSalePrice + FeesPrice;
+            var value = totalOnSalePrice + feesPrice;
             return Math.Ceiling(value) - value;
         }
 
-        private void UpdateFees()
+        private static FeesDto UpdateFees(decimal totalOnSalePrice, decimal feesPrice, decimal donate, decimal feesPercent, decimal feesFixedAmount, decimal feesVatPercent)
         {
-            var total = TotalOnSalePrice + FeesPrice + Donate;
-            var newFees = CalculateFees(total);
+            var total = totalOnSalePrice + feesPrice + donate;
+            var newFees = CalculateFees(total, feesPercent, feesFixedAmount, feesVatPercent);
 
-            InternalFeesPrice = Math.Round(newFees - FeesPrice, DIGITS_COUNT);
-            FeesPrice = Math.Round(newFees, DIGITS_COUNT);
+            var donationFees = Math.Round(newFees - feesPrice, DIGITS_COUNT);
+            var newFeesPrice = Math.Round(newFees, DIGITS_COUNT);
+
+            return new FeesDto{ FeesPrice = newFeesPrice, DonationFees = donationFees};
         }
 
-        public decimal GetFees(decimal total)
+        private static decimal GetFees(decimal total, decimal feesPercent, decimal feesFixedAmount, decimal feesVatPercent)
         {
-            var fees = CalculateFees(total);
-            var mangofees = CalculateFees(total + fees);
+            var fees = CalculateFees(total, feesPercent, feesFixedAmount, feesVatPercent);
+            var pspFees = CalculateFees(total + fees, feesPercent, feesFixedAmount, feesVatPercent);
             var increment = fees;
 
-            while (total + mangofees > total + fees)
+            while (total + pspFees > total + fees)
             {
                 increment += 0.01m;
-                fees = CalculateFees(total + increment);
-                mangofees = CalculateFees(total + fees);
+                fees = CalculateFees(total + increment, feesPercent, feesFixedAmount, feesVatPercent);
+                pspFees = CalculateFees(total + fees, feesPercent, feesFixedAmount, feesVatPercent);
             }
 
             return Math.Round(fees, 2);
         }
 
-        private decimal CalculateFees(decimal total)
+        private static decimal CalculateFees(decimal total, decimal feesPercent, decimal feesFixedAmount, decimal feesVatPercent)
         {
-            var fees = (FeesPercent * total) + FeesFixedAmount;
-            return fees + fees * FeesVatPercent;
+            var fees = (feesPercent * total) + feesFixedAmount;
+            return fees + fees * feesVatPercent;
         }
-
-        public List<DomainEvent> DomainEvents { get; } = new List<DomainEvent>();
     }
 }

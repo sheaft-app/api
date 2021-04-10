@@ -253,20 +253,6 @@ namespace Sheaft.Infrastructure.Services
             });
         }
 
-        public async Task<Result<string>> ValidateCardAsync(Card payment, string registrationId,
-            string registrationData, CancellationToken token)
-        {
-            if (string.IsNullOrWhiteSpace(payment.Identifier))
-                return Failure<string>(MessageKind.PsP_CannotValidate_Card_Card_Not_Exists);
-
-            await EnsureAccessTokenIsValidAsync(token);
-
-            var result =
-                await _api.CardRegistrations.UpdateAsync(
-                    new CardRegistrationPutDTO() {RegistrationData = registrationData}, registrationId);
-            return Success(result.Id);
-        }
-
         public async Task<Result<PspDocumentResultDto>> CreateDocumentAsync(Document document, string userIdentifier,
             CancellationToken token)
         {
@@ -766,34 +752,34 @@ namespace Sheaft.Infrastructure.Services
             });
         }
 
-        public async Task<Result<PspPaymentResultDto>> CreatePreAuthorizedPayinAsync(PreAuthorizedPayin preAuthorizedPayin, CancellationToken token)
+        public async Task<Result<PspPaymentResultDto>> CreatePreAuthorizedPayinAsync(PreAuthorization preAuthorization, CancellationToken token)
         {
-            if (string.IsNullOrWhiteSpace(preAuthorizedPayin.Author.Identifier))
+            if (string.IsNullOrWhiteSpace(preAuthorization.PreAuthorizedPayin.Author.Identifier))
                 return Failure<PspPaymentResultDto>(MessageKind.PsP_CannotCreate_WebPayin_Author_Not_Exists);
 
-            if (string.IsNullOrWhiteSpace(preAuthorizedPayin.CreditedWallet.Identifier))
+            if (string.IsNullOrWhiteSpace(preAuthorization.PreAuthorizedPayin.CreditedWallet.Identifier))
                 return Failure<PspPaymentResultDto>(MessageKind
                     .PsP_CannotCreate_WebPayin_CreditedWallet_Not_Exists);
 
             await EnsureAccessTokenIsValidAsync(token);
 
-            var result = await _api.PayIns.CreatePreauthorizedDirectAsync(GetIdempotencyKey(preAuthorizedPayin.Id),
+            var result = await _api.PayIns.CreatePreauthorizedDirectAsync(GetIdempotencyKey(preAuthorization.Id),
                 new PayInPreauthorizedDirectPostDTO(
-                    preAuthorizedPayin.Author.Identifier,
+                    preAuthorization.PreAuthorizedPayin.Author.Identifier,
                     new Money
                     {
-                        Amount = preAuthorizedPayin.Debited.GetAmount(),
+                        Amount = preAuthorization.Debited.GetAmount(),
                         Currency = CurrencyIso.EUR
                     },
                     new Money
                     {
-                        Amount = preAuthorizedPayin.Fees.GetAmount(),
+                        Amount = preAuthorization.PreAuthorizedPayin.Fees.GetAmount(),
                         Currency = CurrencyIso.EUR
                     },
-                    preAuthorizedPayin.CreditedWallet.Identifier,
-                    preAuthorizedPayin.PreAuthorization.Identifier)
+                    preAuthorization.PreAuthorizedPayin.CreditedWallet.Identifier,
+                    preAuthorization.Identifier)
                 {
-                    Tag = $"Id='{preAuthorizedPayin.Id}'"
+                    Tag = $"Id='{preAuthorization.Id}'"
                 });
 
             return Success(new PspPaymentResultDto

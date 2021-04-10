@@ -9,6 +9,7 @@ using Sheaft.Application.Interfaces.Mediatr;
 using Sheaft.Core;
 using Sheaft.Domain;
 using Sheaft.Domain.Enum;
+using Sheaft.Mediatr.PurchaseOrder.Commands;
 
 namespace Sheaft.Mediatr.Payin.Commands
 {
@@ -38,17 +39,20 @@ namespace Sheaft.Mediatr.Payin.Commands
             var purchaseOrder = await _context.GetByIdAsync<Domain.PurchaseOrder>(request.PurchaseOrderId, token);
             if (purchaseOrder.Status == PurchaseOrderStatus.Waiting 
                 && purchaseOrder.Sender.Kind == ProfileKind.Consumer 
-                && purchaseOrder.CreatedOn.AddDays(5) < DateTimeOffset.UtcNow)
+                && purchaseOrder.CreatedOn.AddDays(3) < DateTimeOffset.UtcNow)
             {
-                purchaseOrder.Cancel("La commande n'a pas été acceptée dans le délai de 5 jours prévu par nos conditions d'utilisations.", false);
-                await _context.SaveChangesAsync(token);
+                return await _mediatr.Process(
+                    new CancelPurchaseOrderCommand(request.RequestUser)
+                        {PurchaseOrderId = purchaseOrder.Id, Reason = "La commande n'a pas été acceptée dans le délai de 72 heures prévu par nos conditions d'utilisations.", SkipNotification = false}, token);
             }
-            else if (purchaseOrder.Status == PurchaseOrderStatus.Waiting 
+            
+            if (purchaseOrder.Status == PurchaseOrderStatus.Waiting 
                 && purchaseOrder.Sender.Kind == ProfileKind.Consumer 
                 && purchaseOrder.ExpectedDelivery.ExpectedDeliveryDate < DateTimeOffset.UtcNow)
             {
-                purchaseOrder.Cancel("La commande n'a pas été acceptée avant la date de livraison choisie.", false);
-                await _context.SaveChangesAsync(token);
+                return await _mediatr.Process(
+                        new CancelPurchaseOrderCommand(request.RequestUser)
+                            {PurchaseOrderId = purchaseOrder.Id, Reason = "La commande n'a pas été acceptée avant la date de réception choisie.", SkipNotification = false}, token);
             }
             
             return Success();

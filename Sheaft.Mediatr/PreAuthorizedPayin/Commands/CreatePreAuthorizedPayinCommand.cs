@@ -1,9 +1,9 @@
 using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Application.Interfaces.Mediatr;
@@ -41,10 +41,17 @@ namespace Sheaft.Mediatr.PreAuthorizedPayin
 
         public async Task<Result<Guid>> Handle(CreatePreAuthorizedPayinCommand request, CancellationToken token)
         {
-            var preAuthorization =
-                await _context.GetByIdAsync<Domain.PreAuthorization>(request.PreAuthorizationId, token);
-            if (preAuthorization.Order.Status == OrderStatus.Validated)
-                return Failure<Guid>(MessageKind.Payin_CannotCreate_Order_Already_Validated);
+            var preAuthorization = await _context.GetByIdAsync<Domain.PreAuthorization>(request.PreAuthorizationId, token);
+            if (preAuthorization.Status != PreAuthorizationStatus.Succeeded 
+                && preAuthorization.PaymentStatus != PaymentStatus.Validated 
+                && preAuthorization.Order.Status != OrderStatus.Validated 
+                && !preAuthorization.Order.PurchaseOrders.Any(po =>
+                    po.AcceptedOn.HasValue 
+                    && !po.WithdrawnOn.HasValue 
+                    && po.CreatedOn.AddDays(5) < DateTimeOffset.UtcNow 
+                    && po.CreatedOn.AddDays(7) > DateTimeOffset.UtcNow)
+                && preAuthorization.PreAuthorizedPayin != null)
+                return Failure<Guid>(MessageKind.Validation);
 
             var wallet = await _context.GetSingleAsync<Domain.Wallet>(c => c.User.Id == request.RequestUser.Id, token);
             if (preAuthorization.Order.TotalOnSalePrice < 1)
@@ -53,10 +60,12 @@ namespace Sheaft.Mediatr.PreAuthorizedPayin
             var preAuthorizedPayin =
                 new Domain.PreAuthorizedPayin(Guid.NewGuid(), preAuthorization, wallet);
 
+            preAuthorization.SetPreAuthorizedPayin(preAuthorizedPayin);
+            
             await _context.AddAsync(preAuthorizedPayin, token);
             await _context.SaveChangesAsync(token);
 
-            var result = await _pspService.CreatePreAuthorizedPayinAsync(preAuthorizedPayin, token);
+            var result = await _pspService.CreatePreAuthorizedPayinAsync(preAuthorization, token);
             if (!result.Succeeded)
                 return Failure<Guid>(result.Exception);
 

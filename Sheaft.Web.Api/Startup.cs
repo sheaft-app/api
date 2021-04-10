@@ -293,7 +293,6 @@ namespace Sheaft.Web.Api
             services.AddScoped<IAuthService, AuthService>();
             services.AddSingleton<ICurrentUserService, CurrentUserService>();
             
-            services.AddScoped<IFeesCalculator, FeesCalculator>();
             services.AddScoped<IDeliveryService, DeliveryService>();
             services.AddScoped<IOrderService, OrderService>();
             

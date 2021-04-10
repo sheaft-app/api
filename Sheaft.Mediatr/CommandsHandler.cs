@@ -50,6 +50,11 @@ namespace Sheaft.Mediatr
             return Result.Failure(message, exception, objs);
         }
 
+        protected Result<T> Success<T>()
+        {
+            return Result<T>.Success(default(T));
+        }
+
         protected Result<T> Success<T>(T result)
         {
             return Result<T>.Success(result);
