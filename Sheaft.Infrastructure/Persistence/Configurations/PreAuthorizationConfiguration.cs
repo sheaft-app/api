@@ -22,6 +22,8 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
 
             entity.HasKey("Uid");
 
+            entity.Ignore(c => c.DomainEvents);
+            
             entity.HasIndex(c => c.Id).IsUnique();
             entity.HasIndex(c => c.Identifier);
             entity.HasIndex("OrderUid");
