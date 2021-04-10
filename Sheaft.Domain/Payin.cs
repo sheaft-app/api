@@ -42,18 +42,22 @@ namespace Sheaft.Domain
             _refunds.Add(refund);
         }
 
+        //TO REMOVE 1 MONTH AFTER RELEASE
         public override void SetStatus(TransactionStatus status)
         {
             base.SetStatus(status);
-            
-            switch (Status)
+
+            if (Kind == TransactionKind.WebPayin)
             {
-                case TransactionStatus.Failed:
-                    DomainEvents.Add(new PayinFailedEvent(Id));
-                    break;
-                case TransactionStatus.Succeeded:
-                    DomainEvents.Add(new PayinSucceededEvent(Id));
-                    break;
+                switch (Status)
+                {
+                    case TransactionStatus.Failed:
+                        DomainEvents.Add(new PayinFailedEvent(Id));
+                        break;
+                    case TransactionStatus.Succeeded:
+                        DomainEvents.Add(new PayinSucceededEvent(Id));
+                        break;
+                }
             }
         }
 

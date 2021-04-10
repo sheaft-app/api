@@ -69,7 +69,6 @@ namespace Sheaft.Mediatr.PreAuthorization
                         {OrderId = preAuthorization.Order.Id});
                     break;
                 case PreAuthorizationStatus.Succeeded:
-                    _mediatr.Post(new PreAuthorizationSucceededEvent(preAuthorization.Id));
                     _mediatr.Post(new ConfirmOrderCommand(request.RequestUser) {OrderId = preAuthorization.Order.Id});
                     break;
             }

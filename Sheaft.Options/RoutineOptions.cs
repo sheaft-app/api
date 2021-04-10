@@ -19,6 +19,5 @@ namespace Sheaft.Options
         public string CheckNewPayoutsCron { get; set; } = "30 5 * * MON";
         public string CheckExpiredPurchaseOrdersCron { get; set; } = "30 1 * * *";
         public string CheckPreAuthorizationsCron { get; set; } = "*/15 * * * *";
-        public string CheckNewPreAuthorizedPayinCron { get; set; } = "0 6 * * *";
     }
 }

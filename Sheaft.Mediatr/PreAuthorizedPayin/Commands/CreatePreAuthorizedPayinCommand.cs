@@ -11,6 +11,7 @@ using Sheaft.Core;
 using Sheaft.Core.Enums;
 using Sheaft.Domain;
 using Sheaft.Domain.Enum;
+using Sheaft.Mediatr.Donation.Commands;
 
 namespace Sheaft.Mediatr.PreAuthorizedPayin
 {
@@ -47,11 +48,12 @@ namespace Sheaft.Mediatr.PreAuthorizedPayin
                 && preAuthorization.Order.Status != OrderStatus.Validated 
                 && !preAuthorization.Order.PurchaseOrders.Any(po =>
                     po.AcceptedOn.HasValue 
-                    && !po.WithdrawnOn.HasValue 
-                    && po.CreatedOn.AddDays(5) < DateTimeOffset.UtcNow 
-                    && po.CreatedOn.AddDays(7) > DateTimeOffset.UtcNow)
-                && preAuthorization.PreAuthorizedPayin != null)
-                return Failure<Guid>(MessageKind.Validation);
+                    && !po.WithdrawnOn.HasValue))
+                return Success<Guid>();
+            
+            if(preAuthorization.PreAuthorizedPayin != null
+                || preAuthorization.ExpirationDate < DateTimeOffset.UtcNow)
+                return Failure<Guid>(MessageKind.Unexpected);
 
             var wallet = await _context.GetSingleAsync<Domain.Wallet>(c => c.User.Id == request.RequestUser.Id, token);
             if (preAuthorization.Order.TotalOnSalePrice < 1)
@@ -74,7 +76,10 @@ namespace Sheaft.Mediatr.PreAuthorizedPayin
             preAuthorizedPayin.SetStatus(result.Data.Status);
             preAuthorizedPayin.SetCreditedAmount(result.Data.Credited);
             preAuthorizedPayin.SetExecutedOn(result.Data.ProcessedOn);
-
+            
+            if(preAuthorizedPayin.Status == TransactionStatus.Succeeded && preAuthorization.Order.Donation > 0)
+                _mediatr.Schedule(new CreateDonationCommand(request.RequestUser){OrderId = preAuthorization.Order.Id}, TimeSpan.FromDays(1));
+            
             await _context.SaveChangesAsync(token);
             return Success(preAuthorizedPayin.Id);
         }

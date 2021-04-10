@@ -15,6 +15,7 @@ using Sheaft.Core.Exceptions;
 using Sheaft.Domain;
 using Sheaft.Domain.Enum;
 using Sheaft.Mediatr.Donation.Commands;
+using Sheaft.Mediatr.PreAuthorizedPayin;
 using Sheaft.Mediatr.PurchaseOrder.Commands;
 using Sheaft.Mediatr.User.Commands;
 
@@ -50,7 +51,6 @@ namespace Sheaft.Mediatr.Order.Commands
             using (var transaction = await _context.BeginTransactionAsync(token))
             {
                 var purchaseOrderIds = new List<Guid>();
-
                 order.SetStatus(OrderStatus.Validated);
 
                 var producerIds = order.Products.Select(p => p.Producer.Id).Distinct();
@@ -69,17 +69,20 @@ namespace Sheaft.Mediatr.Order.Commands
                     purchaseOrderIds.Add(result.Data);
                 }
 
-                if (order.Donation > 0)
-                {
-                    var result = await _mediatr.Process(
-                        new CreateDonationCommand(request.RequestUser) {OrderId = order.Id},
-                        token);
-
-                    if (!result.Succeeded)
-                        return Failure<IEnumerable<Guid>>(result.Exception);
-                }
-
                 await transaction.CommitAsync(token);
+
+                var preAuthorization = await _context.FindSingleAsync<Domain.PreAuthorization>(p =>
+                    p.Order.Id == order.Id && p.Status == PreAuthorizationStatus.Succeeded &&
+                    p.PaymentStatus == PaymentStatus.Validated, token);
+
+                if (preAuthorization != null)
+                {
+                    TimeSpan diff = preAuthorization.ExpirationDate.Value.AddDays(-2) - DateTimeOffset.Now;
+                    _mediatr.Schedule(new CreatePreAuthorizedPayinCommand(request.RequestUser)
+                    {
+                        PreAuthorizationId = preAuthorization.Id
+                    }, TimeSpan.FromHours(diff.TotalHours));
+                }
 
                 _mediatr.Post(new CreateUserPointsCommand(request.RequestUser)
                 {

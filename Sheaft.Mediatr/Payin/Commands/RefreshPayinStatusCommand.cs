@@ -1,4 +1,5 @@
-﻿using System.Threading;
+﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
 using Microsoft.Extensions.Logging;
@@ -9,6 +10,8 @@ using Sheaft.Application.Interfaces.Mediatr;
 using Sheaft.Core;
 using Sheaft.Domain;
 using Sheaft.Domain.Enum;
+using Sheaft.Domain.Events.Payin;
+using Sheaft.Mediatr.Donation.Commands;
 using Sheaft.Mediatr.Order.Commands;
 
 namespace Sheaft.Mediatr.Payin.Commands
@@ -43,7 +46,9 @@ namespace Sheaft.Mediatr.Payin.Commands
         public async Task<Result> Handle(RefreshPayinStatusCommand request, CancellationToken token)
         {
             var payin = await _context.GetSingleAsync<Domain.Payin>(c => c.Identifier == request.Identifier, token);
-            if (payin.Status == TransactionStatus.Succeeded || payin.Status == TransactionStatus.Failed || payin.Status == TransactionStatus.Cancelled)
+            if (payin.Status == TransactionStatus.Succeeded 
+                || payin.Status == TransactionStatus.Failed 
+                || payin.Status == TransactionStatus.Cancelled)
                 return Success();
 
             var pspResult = await _pspService.GetPayinAsync(payin.Identifier, token);
@@ -56,15 +61,22 @@ namespace Sheaft.Mediatr.Payin.Commands
 
             await _context.SaveChangesAsync(token);
 
-            switch (payin.Status)
+            //TO REMOVE 1 MONTH AFTER RELEASE
+            if (payin.Kind == TransactionKind.WebPayin)
             {
-                case TransactionStatus.Failed:
-                    _mediatr.Post(new FailOrderCommand(request.RequestUser)
-                        {OrderId = payin.Order.Id});
-                    break;
-                case TransactionStatus.Succeeded:
-                    _mediatr.Post(new ConfirmOrderCommand(request.RequestUser) {OrderId = payin.Order.Id});
-                    break;
+                switch (payin.Status)
+                {
+                    case TransactionStatus.Failed:
+                        _mediatr.Post(new FailOrderCommand(request.RequestUser)
+                            {OrderId = payin.Order.Id});
+                        break;
+                    case TransactionStatus.Succeeded:
+                        _mediatr.Post(new ConfirmOrderCommand(request.RequestUser) {OrderId = payin.Order.Id});
+                        break;
+                }
+                
+                if(payin.Order.Donation > 0)
+                    _mediatr.Schedule(new CreateDonationCommand(request.RequestUser){OrderId = payin.Order.Id}, TimeSpan.FromDays(1));
             }
 
             return Success();

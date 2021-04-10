@@ -1,12 +1,14 @@
 using System;
 using System.Collections.Generic;
 using Sheaft.Core.Exceptions;
+using Sheaft.Domain.Common;
 using Sheaft.Domain.Enum;
+using Sheaft.Domain.Events.Agreement;
 using Sheaft.Domain.Interop;
 
 namespace Sheaft.Domain
 {
-    public class PreAuthorization : IEntity
+    public class PreAuthorization : IEntity, IHasDomainEvent
     {
         protected PreAuthorization()
         {
@@ -20,6 +22,8 @@ namespace Sheaft.Domain
             Card = card;
             SecureModeReturnURL = secureModeReturnUrl;
             Reference = $"SHFT{DateTime.UtcNow.ToString("DDMMYY")}";
+            
+            DomainEvents = new List<DomainEvent>();
         }
 
         public Guid Id { get; private set; }
@@ -60,6 +64,16 @@ namespace Sheaft.Domain
 
         public void SetStatus(PreAuthorizationStatus status)
         {
+            switch (status)
+            {
+                case PreAuthorizationStatus.Failed:
+                    DomainEvents.Add(new PreAuthorizationFailedEvent(Id));
+                    break;
+                case PreAuthorizationStatus.Succeeded:
+                    DomainEvents.Add(new PreAuthorizationSucceededEvent(Id));
+                    break;
+            }
+            
             Status = status;
         }
 
@@ -102,5 +116,7 @@ namespace Sheaft.Domain
 
             SecureModeRedirectUrl = secureModeRedirectUrl;
         }
+
+        public List<DomainEvent> DomainEvents { get; }
     }
 }

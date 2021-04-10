@@ -93,9 +93,6 @@ namespace Sheaft.Mediatr.PreAuthorization
                 await _context.SaveChangesAsync(token);
                 await transaction.CommitAsync(token);
 
-                if (preAuthorization.Status == PreAuthorizationStatus.Failed)
-                    _mediatr.Post(new PreAuthorizationFailedEvent(preAuthorization.Id));
-
                 return Success(preAuthorization.Id);
             }
         }
