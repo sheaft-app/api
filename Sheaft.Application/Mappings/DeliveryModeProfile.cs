@@ -1,4 +1,6 @@
-﻿using AutoMapper;
+﻿using System;
+using System.Linq;
+using AutoMapper;
 using Sheaft.Application.Models;
 
 namespace Sheaft.Application.Mappings
@@ -7,7 +9,9 @@ namespace Sheaft.Application.Mappings
     {
         public DeliveryModeProfile()
         {
-            CreateMap<Domain.DeliveryMode, DeliveryModeDto>();
+            CreateMap<Domain.DeliveryMode, DeliveryModeDto>()
+                .ForMember(c => c.Closings,
+                    opt => opt.MapFrom(e => e.Closings.Where(c => c.ClosedTo > DateTimeOffset.UtcNow)));
             CreateMap<Domain.DeliveryMode, AgreementDeliveryModeDto>();
         }
     }

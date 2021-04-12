@@ -211,6 +211,13 @@ namespace Sheaft.Mediatr.DeliveryMode.Queries
                 } : null,
                 Name = deliveryMode.Name,
                 DeliveryHours = GetAvailableDeliveryHours(openingHours, currentDate, deliveryMode.LockOrderHoursBeforeDelivery, deliveryMode.Producer.Closings, deliveryMode.Closings),
+                Closings = deliveryMode.Closings?.Select(c => new ClosingDto
+                {
+                    Id = c.Id,
+                    From = new DateTimeOffset(new DateTime(c.ClosedFrom.Year, c.ClosedFrom.Month, c.ClosedFrom.Day, 0, 0, 0, DateTimeKind.Utc)),
+                    Reason = c.Reason,
+                    To = new DateTimeOffset(new DateTime(c.ClosedTo.Year, c.ClosedTo.Month, c.ClosedTo.Day, 0, 0, 0, DateTimeKind.Utc))
+                }) ?? new List<ClosingDto>()
             };
         }
 

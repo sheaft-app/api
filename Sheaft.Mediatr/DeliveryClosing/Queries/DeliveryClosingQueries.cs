@@ -49,7 +49,7 @@ namespace Sheaft.Mediatr.DeliveryClosing.Queries
             {
                 return _context.Set<Domain.DeliveryMode>()
                     .Get(b => b.Producer.Id != currentUser.Id || !deliveryId.HasValue || b.Id == deliveryId.Value)
-                    .SelectMany(b => b.Closings)
+                    .SelectMany(b => b.Closings.Where(c => c.ClosedTo > DateTimeOffset.UtcNow))
                     .ProjectTo<ClosingDto>(_configurationProvider);
             }
             
