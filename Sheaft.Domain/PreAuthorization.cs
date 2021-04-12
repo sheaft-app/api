@@ -22,8 +22,6 @@ namespace Sheaft.Domain
             Card = card;
             SecureModeReturnURL = secureModeReturnUrl;
             Reference = $"SHFT{DateTime.UtcNow.ToString("DDMMYY")}";
-            
-            DomainEvents = new List<DomainEvent>();
         }
 
         public Guid Id { get; private set; }
@@ -117,6 +115,6 @@ namespace Sheaft.Domain
             SecureModeRedirectUrl = secureModeRedirectUrl;
         }
 
-        public List<DomainEvent> DomainEvents { get; }
+        public List<DomainEvent> DomainEvents { get; } = new List<DomainEvent>();
     }
 }

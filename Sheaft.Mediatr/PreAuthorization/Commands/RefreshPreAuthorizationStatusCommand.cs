@@ -48,7 +48,7 @@ namespace Sheaft.Mediatr.PreAuthorization
         {
             var preAuthorization =
                 await _context.GetSingleAsync<Domain.PreAuthorization>(c => c.Identifier == request.Identifier, token);
-            if (preAuthorization.Status == PreAuthorizationStatus.Succeeded ||
+            if ((preAuthorization.Status == PreAuthorizationStatus.Succeeded && preAuthorization.PaymentStatus == PaymentStatus.Validated) ||
                 preAuthorization.Status == PreAuthorizationStatus.Failed || 
                 preAuthorization.Status == PreAuthorizationStatus.Cancelled)
                 return Success(preAuthorization.Status);

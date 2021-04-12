@@ -507,8 +507,8 @@ namespace Sheaft.Infrastructure.Services
                 Status = result.Status.GetPreAuthorizationStatus(),
                 PaymentStatus = result.PaymentStatus.GetPaymentStatus(),
                 ExpirationDate = result.ExpirationDate,
-                Debited = result.DebitedFunds.Amount,
-                Remaining = result.RemainingFunds.Amount,
+                Debited = result.DebitedFunds.Amount.GetAmount(),
+                Remaining = result.RemainingFunds.Amount.GetAmount(),
                 SecureModeRedirectUrl = result.SecureModeRedirectURL,
             });
         }
@@ -527,8 +527,8 @@ namespace Sheaft.Infrastructure.Services
                 Status = result.Status.GetPreAuthorizationStatus(),
                 ExpirationDate = result.ExpirationDate,
                 PaymentStatus = result.PaymentStatus.GetPaymentStatus(),
-                Debited = result.DebitedFunds.Amount,
-                Remaining = result.RemainingFunds.Amount,
+                Debited = result.DebitedFunds.Amount.GetAmount(),
+                Remaining = result.RemainingFunds.Amount.GetAmount(),
                 SecureModeRedirectUrl = result.SecureModeRedirectURL
             });
         }

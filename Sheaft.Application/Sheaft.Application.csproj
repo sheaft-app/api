@@ -39,6 +39,12 @@
       <Content Include="Mailings\Templates\PayinSucceededEvent.cshtml">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </Content>
+      <Content Include="Mailings\Templates\PreAuthorizationFailedEvent.cshtml">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </Content>
+      <Content Include="Mailings\Templates\PreAuthorizationSucceededEvent.cshtml">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </Content>
       <Content Include="Mailings\Templates\PickingOrderExportFailedEvent.cshtml">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </Content>
