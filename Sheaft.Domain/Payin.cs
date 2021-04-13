@@ -33,7 +33,7 @@ namespace Sheaft.Domain
         public virtual Wallet CreditedWallet { get; private set; }
         public virtual Order Order { get; private set; }
         public virtual IReadOnlyCollection<PayinRefund> Refunds => _refunds.AsReadOnly();
-
+        
         public void AddRefund(PayinRefund refund)
         {
             if (Refunds != null && Refunds.Any(r => r.PurchaseOrder.Id == refund.PurchaseOrder.Id && r.Status == TransactionStatus.Succeeded))
@@ -42,18 +42,22 @@ namespace Sheaft.Domain
             _refunds.Add(refund);
         }
 
+        //TO REMOVE 1 MONTH AFTER RELEASE
         public override void SetStatus(TransactionStatus status)
         {
             base.SetStatus(status);
-            
-            switch (Status)
+
+            if (Kind == TransactionKind.WebPayin)
             {
-                case TransactionStatus.Failed:
-                    DomainEvents.Add(new PayinFailedEvent(Id));
-                    break;
-                case TransactionStatus.Succeeded:
-                    DomainEvents.Add(new PayinSucceededEvent(Id));
-                    break;
+                switch (Status)
+                {
+                    case TransactionStatus.Failed:
+                        DomainEvents.Add(new PayinFailedEvent(Id));
+                        break;
+                    case TransactionStatus.Succeeded:
+                        DomainEvents.Add(new PayinSucceededEvent(Id));
+                        break;
+                }
             }
         }
 

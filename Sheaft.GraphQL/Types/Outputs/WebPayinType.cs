@@ -1,4 +1,4 @@
-﻿using HotChocolate.Types;
+using HotChocolate.Types;
 using Sheaft.Application.Models;
 using Sheaft.GraphQL.Enums;
 
@@ -9,14 +9,15 @@ namespace Sheaft.GraphQL.Types.Outputs
         protected override void Configure(IObjectTypeDescriptor<WebPayinDto> descriptor)
         {
             descriptor.Field(c => c.Id).Type<NonNullType<IdType>>();
-            descriptor.Field(c => c.Status);
-            descriptor.Field(c => c.Reference);
+            descriptor.Field(c => c.ResultCode);
+            descriptor.Field(c => c.ResultMessage);
             descriptor.Field(c => c.RedirectUrl);
-            descriptor.Field(c => c.CreatedOn);
-            descriptor.Field(c => c.UpdatedOn);
             descriptor.Field(c => c.ExecutedOn);
-            descriptor.Field(c => c.Identifier);
-
+            descriptor.Field(c => c.Reference);
+            
+            descriptor.Field(c => c.Author)
+                .Type<NonNullType<UserType>>();
+            
             descriptor.Field(c => c.Kind)
                 .Type<NonNullType<TransactionKindEnumType>>();
 

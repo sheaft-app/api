@@ -2,11 +2,8 @@
 {
     public enum TransactionKind
     {
-        PayinWeb = 0,
-        PayinCard,
-        PayinMoney,
-        PayinCheck,
-        PayinExternal,
+        WebPayin = 0,
+        PreAuthorizedPayin,
         Transfer = 100,
         Payout = 200,
         RefundPayin = 300,

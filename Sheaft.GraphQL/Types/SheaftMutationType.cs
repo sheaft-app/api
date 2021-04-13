@@ -286,10 +286,17 @@ namespace Sheaft.GraphQL.Types
                 .Type<NonNullType<OrderType>>()
                 .UseSingleOrDefault();
 
-            descriptor.Field(c => c.PayOrderAsync(default, default))
+            descriptor.Field(c => c.CreateWebPayinForOrderAsync(default, default))
                 .Name("payOrder")
                 .Authorize(Policies.CONSUMER)
                 .Type<NonNullType<WebPayinType>>()
+                .UseSingleOrDefault()
+                .UseSelection();
+            
+            descriptor.Field(c => c.ResetOrderAsync(default, default))
+                .Name("resetOrder")
+                .Authorize(Policies.CONSUMER)
+                .Type<NonNullType<OrderType>>()
                 .UseSingleOrDefault()
                 .UseSelection();
 
@@ -570,6 +577,20 @@ namespace Sheaft.GraphQL.Types
                 .Type<NonNullType<ListType<CatalogType>>>()
                 .UseSingleOrDefault()
                 .UseSelection();
+            
+            //PreAuhtorization
+            
+            descriptor.Field(c => c.CreatePreAuthorization(default, default))
+                .Name("prepayOrder")
+                .Authorize(Policies.CONSUMER)
+                .Type<NonNullType<PreAuthorizationType>>()
+                .UseSingleOrDefault()
+                .UseSelection();
+
+            descriptor.Field(c => c.CreateCardRegistration())
+                .Name("createCardRegistration")
+                .Authorize(Policies.CONSUMER)
+                .Type<NonNullType<CardRegistrationType>>();
         }
     }
 }

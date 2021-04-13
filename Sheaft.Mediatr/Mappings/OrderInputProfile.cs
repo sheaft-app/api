@@ -13,10 +13,13 @@ namespace Sheaft.Mediatr.Mappings
 
             CreateMap<UpdateOrderDto, UpdateConsumerOrderCommand>()
                 .ForMember(c => c.OrderId, opt => opt.MapFrom(r => r.Id));;
-            CreateMap<ResourceIdDto, PayOrderCommand>()
+            CreateMap<CreateWebPayinDto, CreateWebPayinForOrderCommand>()
                 .ForMember(c => c.OrderId, opt => opt.MapFrom(e => e.Id));
 
             CreateMap<ResourceIdDto, ConfirmOrderCommand>()
+                .ForMember(c => c.OrderId, opt => opt.MapFrom(e => e.Id));
+            
+            CreateMap<ResourceIdDto, ResetOrderCommand>()
                 .ForMember(c => c.OrderId, opt => opt.MapFrom(e => e.Id));
         }
     }

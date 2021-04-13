@@ -26,8 +26,8 @@ namespace Sheaft.Mediatr.Donation.EventHandlers
             await _emailService.SendEmailAsync(
                "support@sheaft.com",
                "Support",
-               $"La création du transfert pour la donation de {order.Donate - order.InternalFeesPrice}€ de {order.User.Name} a échouée",
-               $"La création du transfert pour la donation de {order.Donate - order.InternalFeesPrice}€ de {order.User.Name} a échouée à plus de 3 reprises, la donation est mise en supsend, veuillez traiter manuellement la demande.",
+               $"La création du transfert pour la donation de {order.Donation - order.DonationFeesPrice}€ de {order.User.Name} a échouée",
+               $"La création du transfert pour la donation de {order.Donation - order.DonationFeesPrice}€ de {order.User.Name} a échouée à plus de 3 reprises, la donation est mise en supsend, veuillez traiter manuellement la demande.",
                false,
                token);
         }

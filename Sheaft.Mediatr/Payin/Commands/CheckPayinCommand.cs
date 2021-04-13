@@ -8,6 +8,7 @@ using Sheaft.Application.Interfaces;
 using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Application.Interfaces.Mediatr;
 using Sheaft.Core;
+using Sheaft.Core.Enums;
 using Sheaft.Domain;
 using Sheaft.Domain.Enum;
 
@@ -37,14 +38,15 @@ namespace Sheaft.Mediatr.Payin.Commands
         public async Task<Result> Handle(CheckPayinCommand request, CancellationToken token)
         {
             var payin = await _context.GetByIdAsync<Domain.Payin>(request.PayinId, token);
-            if (payin.Status != TransactionStatus.Created && payin.Status != TransactionStatus.Waiting)
-                return Failure();
-
-            var result = await _mediatr.Process(new RefreshPayinStatusCommand(request.RequestUser, payin.Identifier),
-                token);
-            if (!result.Succeeded)
-                return Failure(result.Exception);
-
+            if (payin.Status == TransactionStatus.Created || payin.Status == TransactionStatus.Waiting)
+            {
+                var result = await _mediatr.Process(
+                    new RefreshPayinStatusCommand(request.RequestUser, payin.Identifier),
+                    token);
+                if (!result.Succeeded)
+                    return Failure(result.Exception);
+            }
+            
             return Success();
         }
     }

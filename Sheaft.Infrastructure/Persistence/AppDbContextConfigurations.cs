@@ -70,8 +70,8 @@ namespace Sheaft.Infrastructure.Persistence
             modelBuilder.Entity<Card>().HasBaseType<PaymentMethod>();
             modelBuilder.Entity<BankAccount>().HasBaseType<PaymentMethod>();
 
-            modelBuilder.Entity<CardPayin>().HasBaseType<Payin>();
             modelBuilder.Entity<WebPayin>().HasBaseType<Payin>();
+            modelBuilder.Entity<PreAuthorizedPayin>().HasBaseType<Payin>();
 
             modelBuilder.Entity<PayinRefund>().HasBaseType<Refund>();
 
@@ -114,7 +114,6 @@ namespace Sheaft.Infrastructure.Persistence
             modelBuilder.ApplyConfiguration(new WalletConfiguration());
             modelBuilder.ApplyConfiguration(new PayinConfiguration());
             modelBuilder.ApplyConfiguration(new WebPayinConfiguration());
-            modelBuilder.ApplyConfiguration(new CardPayinConfiguration());
             modelBuilder.ApplyConfiguration(new TransferConfiguration());
             modelBuilder.ApplyConfiguration(new PayoutConfiguration());
             modelBuilder.ApplyConfiguration(new RefundConfiguration());
@@ -135,6 +134,8 @@ namespace Sheaft.Infrastructure.Persistence
             modelBuilder.ApplyConfiguration(new SettingConfiguration());
             modelBuilder.ApplyConfiguration(new CatalogConfiguration());
             modelBuilder.ApplyConfiguration(new CatalogProductConfiguration());
+            modelBuilder.ApplyConfiguration(new PreAuthorizationConfiguration());
+            modelBuilder.ApplyConfiguration(new PreAuthorizedPayinConfiguration());
         }
     }
 }

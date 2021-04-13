@@ -8,6 +8,7 @@ using Sheaft.Application.Interfaces;
 using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Application.Interfaces.Mediatr;
 using Sheaft.Core;
+using Sheaft.Core.Enums;
 using Sheaft.Domain;
 using Sheaft.Domain.Enum;
 
@@ -37,13 +38,14 @@ namespace Sheaft.Mediatr.Payout.Commands
         public async Task<Result> Handle(CheckPayoutCommand request, CancellationToken token)
         {
             var payout = await _context.GetByIdAsync<Domain.Payout>(request.PayoutId, token);
-            if (payout.Status != TransactionStatus.Created && payout.Status != TransactionStatus.Waiting)
-                return Failure();
-
-            var result = await _mediatr.Process(new RefreshPayoutStatusCommand(request.RequestUser, payout.Identifier),
-                token);
-            if (!result.Succeeded)
-                return Failure(result.Exception);
+            if (payout.Status == TransactionStatus.Created || payout.Status == TransactionStatus.Waiting)
+            {
+                var result = await _mediatr.Process(
+                    new RefreshPayoutStatusCommand(request.RequestUser, payout.Identifier),
+                    token);
+                if (!result.Succeeded)
+                    return Failure(result.Exception);
+            }
 
             return Success();
         }

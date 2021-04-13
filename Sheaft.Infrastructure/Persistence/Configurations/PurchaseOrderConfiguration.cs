@@ -12,7 +12,6 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
             entity.Property<long>("OrderUid");
             entity.Property<long>("PurchaseOrderVendorUid");
             entity.Property<long>("PurchaseOrderSenderUid");
-            entity.Property<long?>("TransferUid");
 
             entity.Property(c => c.CreatedOn);
             entity.Property(c => c.UpdatedOn).IsConcurrencyToken();
@@ -37,8 +36,6 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
 
             entity.HasOne(c => c.Vendor).WithOne().HasForeignKey<PurchaseOrder>("PurchaseOrderVendorUid").OnDelete(DeleteBehavior.Cascade);
             entity.HasOne(c => c.Sender).WithOne().HasForeignKey<PurchaseOrder>("PurchaseOrderSenderUid").OnDelete(DeleteBehavior.Cascade);
-            entity.HasOne(c => c.Transfer).WithOne().HasForeignKey<PurchaseOrder>("TransferUid").OnDelete(DeleteBehavior.NoAction);
-
             entity.OwnsOne(c => c.ExpectedDelivery, cb =>
             {
                 cb.OwnsOne(ca => ca.Address);
@@ -57,7 +54,6 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
             entity.HasIndex("OrderUid");
             entity.HasIndex("PurchaseOrderVendorUid");
             entity.HasIndex("PurchaseOrderSenderUid");
-            entity.HasIndex("TransferUid");
             entity.HasIndex("OrderUid", "Uid", "Id", "PurchaseOrderVendorUid", "PurchaseOrderSenderUid", "RemovedOn");
             entity.ToTable("PurchaseOrders");
         }

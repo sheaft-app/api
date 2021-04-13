@@ -2,7 +2,6 @@
 using System.Linq;
 using AutoMapper.QueryableExtensions;
 using Sheaft.Application.Extensions;
-using Sheaft.Application.Interfaces;
 using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Application.Interfaces.Queries;
 using Sheaft.Application.Models;
@@ -21,20 +20,36 @@ namespace Sheaft.Mediatr.Payin.Queries
             _configurationProvider = configurationProvider;
         }
 
-        public IQueryable<WebPayinDto> GetWebPayinTransaction(string identifier, RequestUser currentUser)
+        public IQueryable<PayinDto> GetPayin(string identifier, RequestUser currentUser)
         {
             return _context.Payins
-                    .OfType<WebPayin>()
+                    .OfType<Domain.Payin>()
                     .Get(c => c.Identifier == identifier && c.Author.Id == currentUser.Id)
-                    .ProjectTo<WebPayinDto>(_configurationProvider);
+                    .ProjectTo<PayinDto>(_configurationProvider);
         }
 
-        public IQueryable<WebPayinDto> GetWebPayinTransaction(Guid id, RequestUser currentUser)
+        public IQueryable<PayinDto> GetPayin(Guid id, RequestUser currentUser)
         {
             return _context.Payins
-                    .OfType<WebPayin>()
+                    .OfType<Domain.Payin>()
                     .Get(c => c.Id == id && c.Author.Id == currentUser.Id)
-                    .ProjectTo<WebPayinDto>(_configurationProvider);
+                    .ProjectTo<PayinDto>(_configurationProvider);
+        }
+        
+        public IQueryable<WebPayinDto> GetWebPayin(Guid id, RequestUser currentUser)
+        {
+            return _context.Payins
+                .OfType<Domain.WebPayin>()
+                .Get(c => c.Id == id && c.Author.Id == currentUser.Id)
+                .ProjectTo<WebPayinDto>(_configurationProvider);
+        }
+        
+        public IQueryable<PayinDto> GetPreAuthorizedPayin(Guid id, RequestUser currentUser)
+        {
+            return _context.Payins
+                .OfType<Domain.PreAuthorizedPayin>()
+                .Get(c => c.Id == id && c.Author.Id == currentUser.Id)
+                .ProjectTo<PayinDto>(_configurationProvider);
         }
     }
 }

@@ -25,32 +25,57 @@ namespace Sheaft.Mediatr
             _logger = logger;
         }
 
-        protected Result Success(MessageKind? message = null, params object[] objs)
+        protected Result Success()
+        {
+            return Result.Success();
+        }
+
+        protected Result Success(MessageKind message, params object[] objs)
         {
             return Result.Success(message, objs);
         }
 
-        protected Result Failure(MessageKind? message = null, params object[] objs)
+        protected Result Failure(MessageKind message, params object[] objs)
         {
             return Failure(null, message, objs);
         }
 
-        protected Result Failure(Exception exception, MessageKind? message = null, params object[] objs)
+        protected Result Failure(Exception exception, params object[] objs)
+        {
+            return Failure(exception, null, objs);
+        }
+
+        protected Result Failure(Exception exception, MessageKind message, params object[] objs)
         {
             return Result.Failure(message, exception, objs);
         }
 
-        protected Result<T> Success<T>(T result, MessageKind? message = null, params object[] objs)
+        protected Result<T> Success<T>()
+        {
+            return Result<T>.Success(default(T));
+        }
+
+        protected Result<T> Success<T>(T result)
+        {
+            return Result<T>.Success(result);
+        }
+
+        protected Result<T> Success<T>(T result, MessageKind message, params object[] objs)
         {
             return Result<T>.Success(result, message, objs);
         }
 
-        protected Result<T> Failure<T>(MessageKind? message = null, params object[] objs)
+        protected Result<T> Failure<T>(Exception exception, params object[] objs)
+        {
+            return Failure<T>(exception, null, objs);
+        }
+
+        protected Result<T> Failure<T>(MessageKind message, params object[] objs)
         {
             return Failure<T>(null, message, objs);
         }
 
-        protected Result<T> Failure<T>(Exception exception, MessageKind? message = null, params object[] objs)
+        protected Result<T> Failure<T>(Exception exception, MessageKind message, params object[] objs)
         {
             return Result<T>.Failure(default(T), message, exception, objs);
         }

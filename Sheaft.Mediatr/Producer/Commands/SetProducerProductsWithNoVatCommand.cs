@@ -8,6 +8,7 @@ using Sheaft.Application.Interfaces;
 using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Application.Interfaces.Mediatr;
 using Sheaft.Core;
+using Sheaft.Core.Enums;
 using Sheaft.Domain;
 
 namespace Sheaft.Mediatr.Producer.Commands
@@ -37,7 +38,7 @@ namespace Sheaft.Mediatr.Producer.Commands
         {
             var producer = await _context.GetByIdAsync<Domain.Producer>(request.ProducerId, token);
             if (!producer.NotSubjectToVat)
-                return Failure();
+                return Failure(MessageKind.BadRequest);
 
             var products = await _context.FindAsync<Domain.Product>(p => p.Producer.Id == producer.Id, token);
             foreach (var product in products)

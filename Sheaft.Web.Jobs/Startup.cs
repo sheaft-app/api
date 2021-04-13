@@ -230,8 +230,8 @@ namespace Sheaft.Web.Jobs
             services.AddScoped<IAuthService, AuthService>();
             services.AddScoped<ICurrentUserService, CurrentUserService>();
             
-            services.AddScoped<IFeesCalculator, FeesCalculator>();
             services.AddScoped<IDeliveryService, DeliveryService>();
+            services.AddScoped<IOrderService, OrderService>();
             
             services.AddScopedDynamic<IProductsFileImporter>(typeof(ExcelProductsImporter).Assembly.GetTypes().Where(t => t.GetInterfaces().Contains(typeof(IProductsFileImporter))));
             services.AddScopedDynamic<IPickingOrdersFileExporter>(typeof(ExcelPickingOrdersExporter).Assembly.GetTypes().Where(t => t.GetInterfaces().Contains(typeof(IPickingOrdersFileExporter))));
@@ -399,6 +399,14 @@ namespace Sheaft.Web.Jobs
             RecurringJob.AddOrUpdate<SheaftDispatcher>("4787cf27f6bd491292014902a84a11ae", mediatr =>
                 mediatr.Execute(nameof(GenerateProducersFileCommand), new GenerateProducersFileCommand(new RequestUser("037e7e93c73f4406a4e31994d8686b7c", Guid.NewGuid().ToString("N"), null)), CancellationToken.None),
                     options.CheckProducersFileCron);
+
+            RecurringJob.AddOrUpdate<SheaftDispatcher>("41739516c21a48dc907b429a96cd0edd", mediatr =>
+                    mediatr.Execute(nameof(CheckExpiredPurchaseOrdersCommand), new CheckExpiredPurchaseOrdersCommand(new RequestUser("037e7e93c73f4406a4e31994d8686b7c", Guid.NewGuid().ToString("N"), null)), CancellationToken.None),
+                options.CheckExpiredPurchaseOrdersCron);
+
+            RecurringJob.AddOrUpdate<SheaftDispatcher>("707f7ee279c14f24ad7d5f31e22f4d3c", mediatr =>
+                    mediatr.Execute(nameof(CheckPreAuthorizationsCommand), new CheckPreAuthorizationsCommand(new RequestUser("037e7e93c73f4406a4e31994d8686b7c", Guid.NewGuid().ToString("N"), null)), CancellationToken.None),
+                options.CheckPreAuthorizationsCron);
         }
     }
 }

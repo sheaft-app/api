@@ -8,6 +8,7 @@ using Sheaft.Application.Interfaces;
 using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Application.Interfaces.Mediatr;
 using Sheaft.Core;
+using Sheaft.Core.Enums;
 using Sheaft.Domain;
 using Sheaft.Domain.Enum;
 
@@ -38,14 +39,14 @@ namespace Sheaft.Mediatr.PayinRefund.Commands
         public async Task<Result> Handle(CheckPayinRefundCommand request, CancellationToken token)
         {
             var payinRefund = await _context.GetByIdAsync<Domain.PayinRefund>(request.PayinRefundId, token);
-            if (payinRefund.Status != TransactionStatus.Created && payinRefund.Status != TransactionStatus.Waiting)
-                return Failure();
-
-            var result =
-                await _mediatr.Process(
-                    new RefreshPayinRefundStatusCommand(request.RequestUser, payinRefund.Identifier), token);
-            if (!result.Succeeded)
-                return Failure(result.Exception);
+            if (payinRefund.Status == TransactionStatus.Created || payinRefund.Status == TransactionStatus.Waiting)
+            {
+                var result =
+                    await _mediatr.Process(
+                        new RefreshPayinRefundStatusCommand(request.RequestUser, payinRefund.Identifier), token);
+                if (!result.Succeeded)
+                    return Failure(result.Exception);
+            }
 
             return Success();
         }

@@ -264,8 +264,8 @@ namespace Sheaft.Web.Manage
             services.AddScoped<IAuthService, AuthService>();
             services.AddScoped<ICurrentUserService, CurrentUserService>();
             
-            services.AddScoped<IFeesCalculator, FeesCalculator>();
             services.AddScoped<IDeliveryService, DeliveryService>();
+            services.AddScoped<IOrderService, OrderService>();
             
             services.AddScopedDynamic<IProductsFileImporter>(typeof(ExcelProductsImporter).Assembly.GetTypes().Where(t => t.GetInterfaces().Contains(typeof(IProductsFileImporter))));
             services.AddScopedDynamic<IPickingOrdersFileExporter>(typeof(ExcelPickingOrdersExporter).Assembly.GetTypes().Where(t => t.GetInterfaces().Contains(typeof(IPickingOrdersFileExporter))));
@@ -277,34 +277,6 @@ namespace Sheaft.Web.Manage
             services.AddScoped<IPurchaseOrdersExportersFactory, PurchaseOrdersExportersFactory>();
             services.AddScoped<ITransactionsExportersFactory, TransactionsExportersFactory>();
             
-            services.AddScoped<IAgreementQueries, AgreementQueries>();
-            services.AddScoped<IProducerQueries, ProducerQueries>();
-            services.AddScoped<IDeliveryQueries, DeliveryQueries>();
-            services.AddScoped<IDepartmentQueries, DepartmentQueries>();
-            services.AddScoped<IJobQueries, JobQueries>();
-            services.AddScoped<ILeaderboardQueries, LeaderboardQueries>();
-            services.AddScoped<INotificationQueries, NotificationQueries>();
-            services.AddScoped<IReturnableQueries, ReturnableQueries>();
-            services.AddScoped<IProductQueries, ProductQueries>();
-            services.AddScoped<IPurchaseOrderQueries, PurchaseOrderQueries>();
-            services.AddScoped<IQuickOrderQueries, QuickOrderQueries>();
-            services.AddScoped<IRegionQueries, RegionQueries>();
-            services.AddScoped<ITagQueries, TagQueries>();
-            services.AddScoped<IConsumerQueries, ConsumerQueries>();
-            services.AddScoped<IUserQueries, UserQueries>();
-            services.AddScoped<INationalityQueries, NationalityQueries>();
-            services.AddScoped<ICountryQueries, CountryQueries>();
-            services.AddScoped<IOrderQueries, OrderQueries>();
-            services.AddScoped<IPayinQueries, PayinQueries>();
-            services.AddScoped<IDocumentQueries, DocumentQueries>();
-            services.AddScoped<ILegalQueries, LegalQueries>();
-            services.AddScoped<IBusinessClosingQueries, BusinessClosingQueries>();
-            services.AddScoped<IDeliveryClosingQueries, DeliveryClosingQueries>();
-            services.AddScoped<ITransferQueries, TransferQueries>();
-            services.AddScoped<IPayoutQueries, PayoutQueries>();
-            services.AddScoped<IDonationQueries, DonationQueries>();
-            services.AddScoped<IWithholdingQueries, WithholdingQueries>();
-
             var storageConfig = storageSettings.Get<StorageOptions>();
             services.AddSingleton<CloudStorageAccount>(CloudStorageAccount.Parse(storageConfig.ConnectionString));
 

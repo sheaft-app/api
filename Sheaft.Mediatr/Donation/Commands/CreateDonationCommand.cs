@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
@@ -49,24 +50,27 @@ namespace Sheaft.Mediatr.Donation.Commands
         public async Task<Result<Guid>> Handle(CreateDonationCommand request, CancellationToken token)
         {
             var order = await _context.GetByIdAsync<Domain.Order>(request.OrderId, token);
-            if (order.Payin == null
-                || order.Payin.Status != TransactionStatus.Succeeded
-                || (order.Donation != null && order.Donation.Status != TransactionStatus.Failed))
+            var orderPayin =
+                await _context.GetSingleAsync<Domain.Payin>(
+                    c => c.Order.Id == order.Id && c.Status == TransactionStatus.Succeeded, token);
+            
+            var pendingDonations = await _context.Donations
+                .Where(t => t.Order.Id == request.OrderId)
+                .ToListAsync(token);
+
+            if (pendingDonations.Any(pt => pt.Status == TransactionStatus.Succeeded))
                 return Failure<Guid>(MessageKind.Donation_CannotCreate_AlreadySucceeded);
-
-            var orderDonations = await _context.FindAsync<Domain.Donation>(c => c.Order.Id == order.Id, token);
-            if (orderDonations.Any(c => c.Status != TransactionStatus.Failed))
+            
+            if (pendingDonations.Any(pt => pt.Status == TransactionStatus.Created || pt.Status == TransactionStatus.Waiting))
                 return Failure<Guid>(MessageKind.Donation_CannotCreate_PendingDonation);
-
-            var creditedWallet =
+            
+            var sheaftWallet =
                 await _context.GetSingleAsync<Domain.Wallet>(c => c.Identifier == _pspOptions.WalletId, token);
             using (var transaction = await _context.BeginTransactionAsync(token))
             {
-                var donation = new Domain.Donation(Guid.NewGuid(), order.Payin.CreditedWallet, creditedWallet, order);
+                var donation = new Domain.Donation(Guid.NewGuid(), orderPayin.CreditedWallet, sheaftWallet, order);
                 await _context.AddAsync(donation, token);
                 await _context.SaveChangesAsync(token);
-
-                order.SetDonation(donation);
 
                 var result = await _pspService.CreateDonationAsync(donation, token);
                 if (!result.Succeeded)

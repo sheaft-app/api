@@ -7,6 +7,7 @@ using Sheaft.Application.Interfaces;
 using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Application.Interfaces.Mediatr;
 using Sheaft.Core;
+using Sheaft.Core.Enums;
 using Sheaft.Domain;
 using Sheaft.Domain.Enum;
 
@@ -56,13 +57,13 @@ namespace Sheaft.Mediatr.Transfer.Commands
             if (withholding != null)
                 return await HandleWithholdingStatusAsync(request, withholding, token);
 
-            return Failure();
+            return Failure(MessageKind.Unexpected);
         }
 
         private async Task<Result> HandleTransferStatusAsync(RefreshTransferStatusCommand request,
             Domain.Transfer transfer, CancellationToken token)
         {
-            if (transfer.Status == TransactionStatus.Succeeded || transfer.Status == TransactionStatus.Failed)
+            if (transfer.Status == TransactionStatus.Succeeded || transfer.Status == TransactionStatus.Failed || transfer.Status == TransactionStatus.Cancelled)
                 return Success();
 
             var pspResult = await _pspService.GetTransferAsync(transfer.Identifier, token);

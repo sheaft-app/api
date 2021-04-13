@@ -8,8 +8,8 @@ namespace Sheaft.Application.Mappings
         public OrderProfile()
         {
             CreateMap<Domain.Order, OrderDto>()
-                .ForMember(d => d.Donation, opt => opt.MapFrom(r => r.Donate))
-                .ForMember(d => d.TotalFees, opt => opt.MapFrom(r => r.FeesPrice - r.InternalFeesPrice))
+                .ForMember(d => d.Donation, opt => opt.MapFrom(r => r.Donation))
+                .ForMember(d => d.TotalFees, opt => opt.MapFrom(r => r.FeesPrice - r.DonationFeesPrice))
                 .ForMember(d => d.PurchaseOrdersCount, opt => opt.MapFrom(r => r.PurchaseOrders.Count));
         }
     }

@@ -21,6 +21,7 @@ namespace Sheaft.Application.Interfaces.Infrastructure
             where TEntity : class;
         DbSet<Domain.Agreement> Agreements { get; set; }
         DbSet<BankAccount> BankAccounts { get; set; }
+        DbSet<Domain.Card> Cards { get; set; }
         DbSet<Domain.Catalog> Catalogs { get; set; }
         DbSet<Domain.Country> Countries { get; set; }
         DbSet<Domain.DeliveryMode> DeliveryModes { get; set; }
@@ -36,6 +37,7 @@ namespace Sheaft.Application.Interfaces.Infrastructure
         DbSet<Domain.Returnable> Returnables { get; set; }
         DbSet<Domain.Payin> Payins { get; set; }
         DbSet<Domain.Payout> Payouts { get; set; }
+        public DbSet<PreAuthorization> PreAuthorizations { get; set; }
         DbSet<Domain.Product> Products { get; set; }
         DbSet<Domain.QuickOrder> QuickOrders { get; set; }
         DbSet<Refund> Refunds { get; set; }

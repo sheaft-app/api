@@ -1,4 +1,4 @@
-﻿namespace Sheaft.Application.Models
+namespace Sheaft.Application.Models
 {
     public class WebPayinDto : PayinDto
     {

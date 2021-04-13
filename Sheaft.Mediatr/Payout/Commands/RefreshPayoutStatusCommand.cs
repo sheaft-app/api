@@ -44,12 +44,12 @@ namespace Sheaft.Mediatr.Payout.Commands
         public async Task<Result> Handle(RefreshPayoutStatusCommand request, CancellationToken token)
         {
             var payout = await _context.GetSingleAsync<Domain.Payout>(c => c.Identifier == request.Identifier, token);
-            if (payout.Status == TransactionStatus.Succeeded || payout.Status == TransactionStatus.Failed)
-                return Success();
-
             var pspResult = await _pspService.GetPayoutAsync(payout.Identifier, token);
             if (!pspResult.Succeeded)
                 return Failure(pspResult.Exception);
+            
+            if (payout.Status == TransactionStatus.Succeeded && pspResult.Data.Status == TransactionStatus.Succeeded || payout.Status == TransactionStatus.Failed || payout.Status == TransactionStatus.Cancelled)
+                return Success();
 
             payout.SetStatus(pspResult.Data.Status);
             payout.SetResult(pspResult.Data.ResultCode, pspResult.Data.ResultMessage);

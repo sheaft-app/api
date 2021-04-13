@@ -12,6 +12,7 @@ using Sheaft.Mediatr.Legal.Commands;
 using Sheaft.Mediatr.Payin.Commands;
 using Sheaft.Mediatr.PayinRefund.Commands;
 using Sheaft.Mediatr.Payout.Commands;
+using Sheaft.Mediatr.PreAuthorization;
 using Sheaft.Mediatr.Transfer.Commands;
 
 namespace Sheaft.Web.Payment.Controllers
@@ -71,6 +72,12 @@ namespace Sheaft.Web.Payment.Controllers
                 case PspEventKind.USER_KYC_LIGHT:
                 case PspEventKind.USER_KYC_REGULAR:
                     _sheaftMediatr.Post(new RefreshLegalValidationCommand(requestUser, identifier));
+                    break;                    
+                case PspEventKind.PREAUTHORIZATION_PAYMENT_CANCELED:
+                case PspEventKind.PREAUTHORIZATION_PAYMENT_EXPIRED:
+                case PspEventKind.PREAUTHORIZATION_PAYMENT_VALIDATED:
+                case PspEventKind.PREAUTHORIZATION_PAYMENT_WAITING:
+                    _sheaftMediatr.Post(new RefreshPreAuthorizationStatusCommand(requestUser, identifier));
                     break;
                 default:
                     _logger.LogInformation($"{EventType:G)} is not a supported Psp EventType for resource: {identifier} executed on: {GetExecutedOn(date)}.");

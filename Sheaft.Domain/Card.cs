@@ -7,9 +7,11 @@ namespace Sheaft.Domain
     {
         protected Card() { }
 
-        public Card(Guid id, string name, User user)
+        public Card(Guid id, string identifier, string name, User user)
             : base(id, name, PaymentKind.Card, user)
         {
+            SetIdentifier(identifier);
         }
     }
+    
 }

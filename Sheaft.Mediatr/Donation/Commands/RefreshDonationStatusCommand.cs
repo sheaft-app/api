@@ -7,6 +7,7 @@ using Sheaft.Application.Interfaces;
 using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Application.Interfaces.Mediatr;
 using Sheaft.Core;
+using Sheaft.Core.Enums;
 using Sheaft.Domain;
 using Sheaft.Domain.Enum;
 
@@ -45,7 +46,7 @@ namespace Sheaft.Mediatr.Donation.Commands
             var donation =
                 await _context.GetSingleAsync<Domain.Donation>(c => c.Identifier == request.Identifier, token);
             if (donation.Status == TransactionStatus.Succeeded || donation.Status == TransactionStatus.Failed)
-                return Failure();
+                return Failure(MessageKind.BadRequest);
 
             var pspResult = await _pspService.GetTransferAsync(donation.Identifier, token);
             if (!pspResult.Succeeded)

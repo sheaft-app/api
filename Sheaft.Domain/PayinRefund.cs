@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using Sheaft.Domain.Common;
 using Sheaft.Domain.Enum;
@@ -17,7 +17,6 @@ namespace Sheaft.Domain
         {
             Credited = transaction.Debited;
             Payin = transaction;
-            PurchaseOrder = purchaseOrder;
             DomainEvents = new List<DomainEvent>();
         }
 

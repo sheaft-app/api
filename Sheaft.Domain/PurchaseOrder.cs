@@ -22,7 +22,7 @@ namespace Sheaft.Domain
         public PurchaseOrder(Guid id, string reference, PurchaseOrderStatus status, Producer producer, Order order)
         {
             if (producer == null)
-                throw new ValidationException(MessageKind.PurchaseOrder_Vendor_Required);
+                throw SheaftException.Validation(MessageKind.PurchaseOrder_Vendor_Required);
 
             Id = id;
 
@@ -74,23 +74,14 @@ namespace Sheaft.Domain
         public virtual PurchaseOrderSender Sender { get; private set; }
         public virtual ExpectedPurchaseOrderDelivery ExpectedDelivery { get; private set; }
         public virtual PurchaseOrderVendor Vendor { get; private set; }
-        public virtual Transfer Transfer { get; private set; }
         public virtual IReadOnlyCollection<PurchaseOrderProduct> Products => _products?.AsReadOnly();
 
         public void SetReference(string newReference)
         {
             if (string.IsNullOrWhiteSpace(newReference))
-                throw new ValidationException(MessageKind.PurchaseOrder_Reference_Required);
+                throw SheaftException.Validation(MessageKind.PurchaseOrder_Reference_Required);
 
             Reference = newReference;
-        }
-
-        public void SetTransfer(Transfer transfer)
-        {
-            if (Transfer != null && Transfer.Status == TransactionStatus.Succeeded)
-                throw new ValidationException(MessageKind.PurchaseOrder_CannotSet_Transfer_AlreadySucceeded);
-
-            Transfer = transfer;
         }
 
         private void SetStatus(PurchaseOrderStatus newStatus, bool skipNotification)
@@ -99,8 +90,11 @@ namespace Sheaft.Domain
             {
                 case PurchaseOrderStatus.Accepted:
                     if (Status != PurchaseOrderStatus.Waiting)
-                        throw new ValidationException(MessageKind.PurchaseOrder_CannotAccept_NotIn_WaitingStatus);
+                        throw SheaftException.Validation(MessageKind.PurchaseOrder_CannotAccept_NotIn_WaitingStatus);
 
+                    if (Sender.Kind == ProfileKind.Consumer && CreatedOn.AddDays(5) < DateTimeOffset.UtcNow)
+                        throw SheaftException.Validation();
+                    
                     AcceptedOn = DateTimeOffset.UtcNow;
                     Status = PurchaseOrderStatus.Processing;
 
@@ -110,7 +104,7 @@ namespace Sheaft.Domain
                     return;
                 case PurchaseOrderStatus.Completed:
                     if (Status != PurchaseOrderStatus.Processing)
-                        throw new ValidationException(MessageKind.PurchaseOrder_CannotComplete_NotIn_ProcessingStatus);
+                        throw SheaftException.Validation(MessageKind.PurchaseOrder_CannotComplete_NotIn_ProcessingStatus);
 
                     CompletedOn = DateTimeOffset.UtcNow;
 
@@ -120,23 +114,23 @@ namespace Sheaft.Domain
                     break;
                 case PurchaseOrderStatus.Shipping:
                     if (Status != PurchaseOrderStatus.Completed)
-                        throw new ValidationException(MessageKind.PurchaseOrder_CannotShip_NotIn_CompletedStatus);
+                        throw SheaftException.Validation(MessageKind.PurchaseOrder_CannotShip_NotIn_CompletedStatus);
 
                     break;
                 case PurchaseOrderStatus.Delivered:
                     if (Status != PurchaseOrderStatus.Completed && Status != PurchaseOrderStatus.Shipping)
-                        throw new ValidationException(MessageKind
+                        throw SheaftException.Validation(MessageKind
                             .PurchaseOrder_CannotDeliver_NotIn_CompletedOrShippingStatus);
 
                     DeliveredOn = DateTimeOffset.UtcNow;
                     break;
                 case PurchaseOrderStatus.Cancelled:
                     if (Status == PurchaseOrderStatus.Cancelled)
-                        throw new ValidationException(MessageKind.PurchaseOrder_CannotCancel_AlreadyIn_CancelledStatus);
+                        throw SheaftException.Validation(MessageKind.PurchaseOrder_CannotCancel_AlreadyIn_CancelledStatus);
                     if (Status == PurchaseOrderStatus.Refused)
-                        throw new ValidationException(MessageKind.PurchaseOrder_CannotCancel_AlreadyIn_RefusedStatus);
+                        throw SheaftException.Validation(MessageKind.PurchaseOrder_CannotCancel_AlreadyIn_RefusedStatus);
                     if (Status == PurchaseOrderStatus.Delivered)
-                        throw new ValidationException(MessageKind.PurchaseOrder_CannotCancel_AlreadyIn_DeliveredStatus);
+                        throw SheaftException.Validation(MessageKind.PurchaseOrder_CannotCancel_AlreadyIn_DeliveredStatus);
                     WithdrawnOn = DateTimeOffset.UtcNow;
 
                     if (!skipNotification)
@@ -145,11 +139,11 @@ namespace Sheaft.Domain
                     break;
                 case PurchaseOrderStatus.Refused:
                     if (Status == PurchaseOrderStatus.Cancelled)
-                        throw new ValidationException(MessageKind.PurchaseOrder_CannotRefuse_AlreadyIn_CancelledStatus);
+                        throw SheaftException.Validation(MessageKind.PurchaseOrder_CannotRefuse_AlreadyIn_CancelledStatus);
                     if (Status == PurchaseOrderStatus.Refused)
-                        throw new ValidationException(MessageKind.PurchaseOrder_CannotRefuse_AlreadyIn_RefusedStatus);
+                        throw SheaftException.Validation(MessageKind.PurchaseOrder_CannotRefuse_AlreadyIn_RefusedStatus);
                     if (Status == PurchaseOrderStatus.Delivered)
-                        throw new ValidationException(MessageKind.PurchaseOrder_CannotRefuse_AlreadyIn_DeliveredStatus);
+                        throw SheaftException.Validation(MessageKind.PurchaseOrder_CannotRefuse_AlreadyIn_DeliveredStatus);
                     WithdrawnOn = DateTimeOffset.UtcNow;
 
                     if (!skipNotification)
@@ -222,10 +216,10 @@ namespace Sheaft.Domain
         private void AddProduct(ProductRow product)
         {
             if (Status != PurchaseOrderStatus.Waiting)
-                throw new ValidationException(MessageKind.PurchaseOrder_CannotAddProduct_NotIn_WaitingStatus);
+                throw SheaftException.Validation(MessageKind.PurchaseOrder_CannotAddProduct_NotIn_WaitingStatus);
 
             if (product == null)
-                throw new ValidationException(MessageKind.PurchaseOrder_CannotAddProduct_Product_NotFound);
+                throw SheaftException.Validation(MessageKind.PurchaseOrder_CannotAddProduct_Product_NotFound);
 
             var productLine = _products.SingleOrDefault(p => p.Id == product.Id);
             if (productLine != null)

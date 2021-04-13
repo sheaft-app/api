@@ -1,168 +1,23 @@
-﻿using HotChocolate;
-using Sheaft.GraphQL.Enums;
-using Sheaft.GraphQL.Types.Inputs;
+﻿using System.Linq;
+using System.Reflection;
+using HotChocolate;
 using Sheaft.GraphQL.Types.Outputs;
 
 namespace Sheaft.Web.Api.Extensions
 {
     public static class SchemaBuilderExtensions
     {
-        public static ISchemaBuilder RegisterTypes(this ISchemaBuilder services)
+        public static ISchemaBuilder RegisterGraphQlTypes(this ISchemaBuilder services)
         {
-            services.AddType<AddressType>();
-            services.AddType<BirthAddressType>();
-            services.AddType<AgreementType>();
-            services.AddType<DeliveryModeType>();
-            services.AddType<TimeSlotType>();
-            services.AddType<UserType>();
-            services.AddType<StoreType>();
-            services.AddType<ProducerType>();
-            services.AddType<DepartmentType>();
-            services.AddType<RegionType>();
-            services.AddType<NationalityType>();
-            services.AddType<CountryType>();
-            services.AddType<LevelType>();
-            services.AddType<RewardType>();
-            services.AddType<ConsumerType>();
-            services.AddType<ExpectedPurchaseOrderDeliveryType>();
-            services.AddType<ExpectedOrderDeliveryType>();
-            services.AddType<RankInformationType>();
-            services.AddType<SirenBusinessType>();
-            services.AddType<SirenAddressType>();
-            services.AddType<SirenLegalsType>();
-            services.AddType<JobType>();
-            services.AddType<NotificationType>();
-            services.AddType<ReturnableType>();
-            services.AddType<PurchaseOrderType>();
-            services.AddType<RatingType>();
-            services.AddType<PurchaseOrderProductQuantityType>();
-            services.AddType<QuickOrderType>();
-            services.AddType<TagType>();
-            services.AddType<UserPositionType>();
-            services.AddType<ProducerDeliveriesType>();
-            services.AddType<CountryPointsType>();
-            services.AddType<RegionPointsType>();
-            services.AddType<DepartmentPointsType>();
-            services.AddType<CountryUserPointsType>();
-            services.AddType<RegionUserPointsType>();
-            services.AddType<DepartmentUserPointsType>();
-            services.AddType<SearchStoreType>();
-            services.AddType<SearchProducerType>();
-            services.AddType<SuggestAddressType>();
-            services.AddType<SuggestProducerType>();
-            services.AddType<ProductType>();
-            services.AddType<OrderType>();
-            services.AddType<DonationType>();
-            services.AddType<WebPayinType>();
-            services.AddType<PayinType>();
-            services.AddType<TransferType>();
-            services.AddType<PayoutType>();
-            services.AddType<WithholdingType>();
-            services.AddType<DocumentType>();
-            services.AddType<PageType>();
-            services.AddType<BusinessLegalType>();
-            services.AddType<ConsumerLegalType>();
-            services.AddType<UboDeclarationType>();
-            services.AddType<UboType>();
-            services.AddType<ClosingType>();
-            services.AddType<PictureType>();
-            services.AddType<OrderProductType>();
-            services.AddType<OrderDeliveryType>();
-            services.AddType<BankAccountType>();
-            services.AddType<CatalogType>();
-            services.AddType<CatalogProductType>();
-            services.AddType<CatalogPriceType>();
-
-            services.AddType<AddressKindEnumType>();
-            services.AddType<AgreementStatusEnumType>();
-            services.AddType<PurchaseOrderStatusEnumType>();
-            services.AddType<OrderStatusEnumType>();
-            services.AddType<DonationKindEnumType>();
-            services.AddType<JobKindEnumType>();
-            services.AddType<LegalKindEnumType>();
-            services.AddType<TagKindEnumType>();
-            services.AddType<ProcessStatusEnumType>();
-            services.AddType<NotificationKindEnumType>();
-            services.AddType<PointKindEnumType>();
-            services.AddType<DeliveryKindEnumType>();
-            services.AddType<DayOfWeekEnumType>();
-            services.AddType<ProfileKindEnumType>();
-            services.AddType<UnitKindEnumType>();
-            services.AddType<ConditioningKindEnumType>();
-            services.AddType<ProfileKindEnumType>();
-            services.AddType<PaymentKindEnumType>();
-            services.AddType<WalletKindEnumType>();
-            services.AddType<DocumentStatusEnumType>();
-            services.AddType<DeclarationStatusEnumType>();
-            services.AddType<DocumentKindEnumType>();
-            services.AddType<TransactionKindEnumType>();
-            services.AddType<TransactionStatusEnumType>();
-            services.AddType<LegalValidationEnumType>();
-            services.AddType<CatalogKindEnumType>();
-
-            services.AddType<CreateOrderInputType>();
-            services.AddType<UpdateOrderInputType>();
-            services.AddType<CreateDocumentType>();
-            services.AddType<CreateAgreementInputType>();
-            services.AddType<AcceptAgreementInputType>();
-            services.AddType<AssignCatalogToAgreementInputType>();
-            services.AddType<CreatePurchaseOrderInputType>();
-            services.AddType<CreateQuickOrderInputType>();
-            services.AddType<CreateDeliveryModeInputType>();
-            services.AddType<ExportPickingOrdersInputType>();
-            services.AddType<GenerateUserSponsoringCodeInputType>();
-            services.AddType<ResourceIdInputType>();
-            services.AddType<ResourceIdsInputType>();
-            services.AddType<ResourceIdsWithReasonInputType>();
-            services.AddType<ResourceIdTimeSlotsInputType>();
-            services.AddType<ResourceIdWithReasonInputType>();
-            services.AddType<CreateReturnableInputType>();
-            services.AddType<ProducerExpectedDeliveryInputType>();
-            services.AddType<SearchProducersDeliveriesInputType>();
-            services.AddType<CreateProductInputType>();
-            services.AddType<ResourceIdQuantityInputType>();
-            services.AddType<RateProductInputType>();
-            services.AddType<RegisterProducerInputType>();
-            services.AddType<RegisterStoreInputType>();
-            services.AddType<RegisterConsumerInputType>();
-            services.AddType<RegisterNewsletterInputType>();
-            services.AddType<CreateOwnerInputType>();
-            services.AddType<SearchTermsInputType>();
-            services.AddType<SearchProductsInputType>();
-            services.AddType<SetResourceIdsAvailabilityInputType>();
-            services.AddType<SetResourceIdsVisibilityInputType>();
-            services.AddType<TimeSlotGroupInputType>();
-            services.AddType<UpdateStoreInputType>();
-            services.AddType<UpdateProducerInputType>();
-            services.AddType<UpdateDeliveryModeInputType>();
-            services.AddType<UpdateReturnableInputType>();
-            services.AddType<UpdateResourceIdPictureInputType>();
-            services.AddType<UpdateProductInputType>();
-            services.AddType<UpdateQuickOrderInputType>();
-            services.AddType<UpdateConsumerInputType>();
-            services.AddType<AddressInputType>();
-            services.AddType<BirthAddressInputType>();
-            services.AddType<CreateBusinessLegalsInputType>();
-            services.AddType<UpdateBusinessLegalsInputType>();
-            services.AddType<CreateConsumerLegalsInputType>();
-            services.AddType<UpdateConsumerLegalsInputType>();
-            services.AddType<CreateUboInputType>();
-            services.AddType<UpdateUboInputType>();
-            services.AddType<UpdateOrCreateClosingInputType>();
-            services.AddType<UpdateOrCreateResourceIdClosingsInputType>();
-            services.AddType<UpdateOrCreateResourceIdClosingInputType>();
-            services.AddType<PictureSourceInputType>();
-            services.AddType<AddPictureToInputType>();
-            services.AddType<ExportPurchaseOrdersInputType>();
-            services.AddType<ExportTransactionsInputType>();
-            services.AddType<CreateCatalogInputType>();
-            services.AddType<UpdateCatalogInputType>();
-            services.AddType<CloneCatalogInputType>();
-            services.AddType<AddOrUpdateProductsToCatalogInputType>();
-            services.AddType<RemoveProductsFromCatalogInputType>();
-            services.AddType<UpdateAllCatalogPricesInputType>();
-            services.AddType<UpdateCatalogPricesInputType>();
-            services.AddType<UpdateOrCreateCatalogPriceInputType>();
+            var types = typeof(AddressType).Assembly.GetExportedTypes()
+                .Where(t => 
+                    !t.IsGenericType &&
+                    (t.Namespace.Contains(nameof(GraphQL.Enums))
+                    || t.Namespace.Contains(nameof(GraphQL.Types.Outputs))
+                    || t.Namespace.Contains(nameof(GraphQL.Types.Inputs))))
+                .ToArray();
+            
+                services.AddTypes(types);
 
             return services;
         }

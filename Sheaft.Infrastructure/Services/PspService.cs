@@ -21,6 +21,7 @@ using Sheaft.Domain;
 using Sheaft.Domain.Enum;
 using Sheaft.Options;
 using Address = Sheaft.Domain.Address;
+using CardType = MangoPay.SDK.Core.Enumerations.CardType;
 using TransactionStatus = Sheaft.Domain.Enum.TransactionStatus;
 
 namespace Sheaft.Infrastructure.Services
@@ -231,35 +232,25 @@ namespace Sheaft.Infrastructure.Services
             return Success(result.Active);
         }
 
-        public async Task<Result<KeyValuePair<string, string>>> CreateCardAsync(Card payment, CancellationToken token)
+        public async Task<Result<PspCardRegistrationResultDto>> CreateCardRegistrationAsync(User user,
+            CancellationToken token)
         {
-            if (string.IsNullOrWhiteSpace(payment.User.Identifier))
-                return Failure<KeyValuePair<string, string>>(MessageKind.PsP_CannotCreate_Card_User_Not_Exists);
-
-            if (!string.IsNullOrWhiteSpace(payment.Identifier))
-                return Failure<KeyValuePair<string, string>>(MessageKind.PsP_CannotCreate_Card_Card_Exists);
+            if (string.IsNullOrWhiteSpace(user.Identifier))
+                return Failure<PspCardRegistrationResultDto>(MessageKind.PsP_CannotCreate_Card_User_Not_Exists);
 
             await EnsureAccessTokenIsValidAsync(token);
-
-            var result = await _api.CardRegistrations.CreateAsync(
-                GetIdempotencyKey(payment.Id),
-                new CardRegistrationPostDTO(payment.User.Identifier, CurrencyIso.EUR, CardType.CB_VISA_MASTERCARD));
-
-            return Success(new KeyValuePair<string, string>(result.Id, result.CardId));
-        }
-
-        public async Task<Result<string>> ValidateCardAsync(Card payment, string registrationId,
-            string registrationData, CancellationToken token)
-        {
-            if (string.IsNullOrWhiteSpace(payment.Identifier))
-                return Failure<string>(MessageKind.PsP_CannotValidate_Card_Card_Not_Exists);
-
-            await EnsureAccessTokenIsValidAsync(token);
-
             var result =
-                await _api.CardRegistrations.UpdateAsync(
-                    new CardRegistrationPutDTO() {RegistrationData = registrationData}, registrationId);
-            return Success(result.Id);
+                await _api.CardRegistrations.CreateAsync(new CardRegistrationPostDTO(user.Identifier, CurrencyIso.EUR));
+
+            return Success(new PspCardRegistrationResultDto
+            {
+                Id = result.Id,
+                AccessKey = result.AccessKey,
+                CardId = result.CardId,
+                CardRegistrationURL = result.CardRegistrationURL,
+                PreregistrationData = result.PreregistrationData,
+                UserId = result.UserId
+            });
         }
 
         public async Task<Result<PspDocumentResultDto>> CreateDocumentAsync(Document document, string userIdentifier,
@@ -282,7 +273,7 @@ namespace Sheaft.Infrastructure.Services
                 ProcessedOn = result.ProcessedDate,
                 ResultCode = result.RefusedReasonType,
                 ResultMessage =
-                    MangoExtensions.GetOperationMessage(result.RefusedReasonType, result.RefusedReasonMessage),
+                    PspExtensions.GetOperationMessage(result.RefusedReasonType, result.RefusedReasonMessage),
                 Status = result.Status.GetValidationStatus()
             });
         }
@@ -321,7 +312,7 @@ namespace Sheaft.Infrastructure.Services
                 ProcessedOn = result.ProcessedDate,
                 ResultCode = result.RefusedReasonType,
                 ResultMessage =
-                    MangoExtensions.GetOperationMessage(result.RefusedReasonType, result.RefusedReasonMessage),
+                    PspExtensions.GetOperationMessage(result.RefusedReasonType, result.RefusedReasonMessage),
                 Status = result.Status.GetValidationStatus()
             });
         }
@@ -337,14 +328,14 @@ namespace Sheaft.Infrastructure.Services
             var result =
                 await _api.UboDeclarations.CreateUboDeclarationAsync(GetIdempotencyKey(declaration.Id),
                     business.Identifier);
-            
+
             return Success(new PspDeclarationResultDto
             {
                 Identifier = result.Id,
                 Status = result.Status.GetDeclarationStatus(),
-                ResultMessage = MangoExtensions.GetOperationMessage(result.Reason.ToString("G"), result.Message),
+                ResultMessage = PspExtensions.GetOperationMessage(result.Reason?.ToString("G"), result.Message),
                 ProcessedOn = result.ProcessedDate,
-                ResultCode = result.Reason.ToString("G")
+                ResultCode = result.Reason?.ToString("G")
             });
         }
 
@@ -375,9 +366,9 @@ namespace Sheaft.Infrastructure.Services
             {
                 Identifier = result.Id,
                 Status = result.Status.GetDeclarationStatus(),
-                ResultMessage = MangoExtensions.GetOperationMessage(result.Reason.ToString("G"), result.Message),
+                ResultMessage = PspExtensions.GetOperationMessage(result.Reason?.ToString("G"), result.Message),
                 ProcessedOn = result.ProcessedDate,
-                ResultCode = result.Reason.ToString("G")
+                ResultCode = result.Reason?.ToString("G")
             });
         }
 
@@ -477,61 +468,81 @@ namespace Sheaft.Infrastructure.Services
                 Identifier = result.Id,
                 RedirectUrl = result.RedirectURL,
                 ResultCode = result.ResultCode,
-                ResultMessage = MangoExtensions.GetOperationMessage(result.ResultCode, result.ResultMessage),
+                ResultMessage = PspExtensions.GetOperationMessage(result.ResultCode, result.ResultMessage),
                 Debited = result.DebitedFunds.Amount.GetAmount(),
                 Fees = result.Fees.Amount.GetAmount(),
                 Status = result.Status.GetTransactionStatus()
             });
         }
 
-        public async Task<Result<PspPaymentResultDto>> CreateCardPayinAsync(CardPayin transaction, Owner owner,
-            CancellationToken token)
+        public async Task<Result<PspPreAuthorizationResultDto>> CreatePreAuthorizationAsync(
+            PreAuthorization preAuthorization, string ipAddress, BrowserInfoDto browserInfo, CancellationToken token)
         {
-            if (string.IsNullOrWhiteSpace(transaction.Author.Identifier))
-                return Failure<PspPaymentResultDto>(MessageKind.PsP_CannotCreate_WebPayin_Author_Not_Exists);
-
-            if (string.IsNullOrWhiteSpace(transaction.CreditedWallet.Identifier))
-                return Failure<PspPaymentResultDto>(MessageKind.PsP_CannotCreate_WebPayin_CreditedWallet_Not_Exists);
-
             await EnsureAccessTokenIsValidAsync(token);
-
-            var result = await _api.PayIns.CreateCardDirectAsync(GetIdempotencyKey(transaction.Id),
-                new PayInCardDirectPostDTO(
-                    transaction.Author.Identifier,
-                    transaction.CreditedWallet.User.Identifier,
+            var result = await _api.CardPreAuthorizations.CreateAsync(
+                GetIdempotencyKey(preAuthorization.Id),
+                new CardPreAuthorizationPostDTO(
+                    preAuthorization.Card.User.Identifier,
                     new Money
                     {
-                        Amount = transaction.Debited.GetAmount(),
+                        Amount = preAuthorization.Debited.GetAmount(),
                         Currency = CurrencyIso.EUR
                     },
-                    new Money
-                    {
-                        Amount = transaction.Fees.GetAmount(),
-                        Currency = CurrencyIso.EUR
-                    },
-                    transaction.CreditedWallet.Identifier,
-                    _pspOptions.ReturnUrl,
-                    transaction.Card.Identifier,
-                    transaction.Reference,
-                    new Billing
-                    {
-                        Address = owner.Address.GetAddress()
-                    })
+                    SecureMode.DEFAULT,
+                    preAuthorization.Card.Identifier,
+                    preAuthorization.SecureModeReturnURL,
+                    preAuthorization.Reference)
                 {
-                    SecureMode = SecureMode.DEFAULT,
-                    Tag = $"Id='{transaction.Id}'"
+                    Billing = new Billing
+                    {
+                        Address = preAuthorization.Card.User.Address.GetAddress()
+                    },
+                    IpAddress = ipAddress,
+                    BrowserInfo = new BrowserInfo
+                    {
+                        AcceptHeader = browserInfo.AcceptHeader,
+                        Language = browserInfo.Language,
+                        ColorDepth = browserInfo.ColorDepth.ToString(),
+                        JavaEnabled = browserInfo.JavaEnabled,
+                        JavascriptEnabled = browserInfo.JavascriptEnabled,
+                        ScreenHeight = browserInfo.ScreenHeight.ToString(),
+                        ScreenWidth = browserInfo.ScreenWidth.ToString(),
+                        UserAgent = browserInfo.UserAgent,
+                        TimeZoneOffset = browserInfo.TimeZoneOffset,
+                    }
                 });
 
-            return Success(new PspPaymentResultDto
+            return Success(new PspPreAuthorizationResultDto
             {
-                Credited = result.CreditedFunds.Amount.GetAmount(),
-                ProcessedOn = result.ExecutionDate,
                 Identifier = result.Id,
                 ResultCode = result.ResultCode,
-                ResultMessage = MangoExtensions.GetOperationMessage(result.ResultCode, result.ResultMessage),
+                ResultMessage = PspExtensions.GetOperationMessage(result.ResultCode, result.ResultMessage),
+                Status = result.Status.GetPreAuthorizationStatus(),
+                PaymentStatus = result.PaymentStatus.GetPaymentStatus(),
+                ExpirationDate = result.ExpirationDate,
                 Debited = result.DebitedFunds.Amount.GetAmount(),
-                Fees = result.Fees.Amount.GetAmount(),
-                Status = result.Status.GetTransactionStatus()
+                Remaining = result.RemainingFunds.Amount.GetAmount(),
+                SecureModeRedirectUrl = result.SecureModeRedirectURL,
+            });
+        }
+
+        public async Task<Result<PspPreAuthorizationResultDto>> GetPreAuthorizationAsync(string identifier,
+            CancellationToken token)
+        {
+            await EnsureAccessTokenIsValidAsync(token);
+            var result = await _api.CardPreAuthorizations.GetAsync(identifier);
+
+            return Success(new PspPreAuthorizationResultDto
+            {
+                Identifier = result.Id,
+                ResultCode = result.ResultCode,
+                ResultMessage = PspExtensions.GetOperationMessage(result.ResultCode, result.ResultMessage),
+                Status = result.Status.GetPreAuthorizationStatus(),
+                ExpirationDate = result.ExpirationDate,
+                PaymentStatus = result.PaymentStatus.GetPaymentStatus(),
+                Debited = result.DebitedFunds.Amount.GetAmount(),
+                Remaining = result.RemainingFunds.Amount.GetAmount(),
+                SecureModeRedirectUrl = result.SecureModeRedirectURL
             });
         }
 
@@ -602,9 +613,10 @@ namespace Sheaft.Infrastructure.Services
                         Currency = CurrencyIso.EUR
                     },
                     transaction.BankAccount.Identifier,
-                    transaction.Reference)
+                    transaction.Reference,
+                    PayOutPaymentType.BANK_WIRE.ToString("G"))
                 {
-                    Tag = $"Id='{transaction.Id}''"
+                    Tag = $"Id='{transaction.Id}'"
                 });
 
             return Success(new PspPaymentResultDto
@@ -613,7 +625,7 @@ namespace Sheaft.Infrastructure.Services
                 ProcessedOn = result.ExecutionDate,
                 Identifier = result.Id,
                 ResultCode = result.ResultCode,
-                ResultMessage = MangoExtensions.GetOperationMessage(result.ResultCode, result.ResultMessage),
+                ResultMessage = PspExtensions.GetOperationMessage(result.ResultCode, result.ResultMessage),
                 Debited = result.DebitedFunds.Amount.GetAmount(),
                 Fees = result.Fees.Amount.GetAmount(),
                 Status = result.Status.GetTransactionStatus()
@@ -655,7 +667,7 @@ namespace Sheaft.Infrastructure.Services
                 ProcessedOn = result.ExecutionDate,
                 Identifier = result.Id,
                 ResultCode = result.ResultCode,
-                ResultMessage = MangoExtensions.GetOperationMessage(result.ResultCode, result.ResultMessage),
+                ResultMessage = PspExtensions.GetOperationMessage(result.ResultCode, result.ResultMessage),
                 Debited = result.DebitedFunds.Amount.GetAmount(),
                 Fees = result.Fees.Amount.GetAmount(),
                 Status = result.Status.GetTransactionStatus()
@@ -672,7 +684,7 @@ namespace Sheaft.Infrastructure.Services
                 Identifier = result.Id,
                 ResultCode = result.RefusedReasonType,
                 ResultMessage =
-                    MangoExtensions.GetOperationMessage(result.RefusedReasonType, result.RefusedReasonMessage),
+                    PspExtensions.GetOperationMessage(result.RefusedReasonType, result.RefusedReasonMessage),
                 Status = result.Status.GetValidationStatus(),
                 ProcessedOn = result.ProcessedDate
             });
@@ -687,8 +699,8 @@ namespace Sheaft.Infrastructure.Services
             return Success(new PspDeclarationResultDto
             {
                 Identifier = result.Id,
-                ResultCode = result.Reason.ToString("G"),
-                ResultMessage = MangoExtensions.GetOperationMessage(result.Reason.ToString("G"), result.Message),
+                ResultCode = result.Reason?.ToString("G"),
+                ResultMessage = PspExtensions.GetOperationMessage(result.Reason?.ToString("G"), result.Message),
                 Status = result.Status.GetDeclarationStatus(),
                 ProcessedOn = result.ProcessedDate
             });
@@ -703,7 +715,7 @@ namespace Sheaft.Infrastructure.Services
             {
                 Identifier = result.Id,
                 ResultCode = result.ResultCode,
-                ResultMessage = MangoExtensions.GetOperationMessage(result.ResultCode, result.ResultMessage),
+                ResultMessage = PspExtensions.GetOperationMessage(result.ResultCode, result.ResultMessage),
                 Status = result.Status.GetTransactionStatus(),
                 ProcessedOn = result.ExecutionDate
             });
@@ -718,7 +730,7 @@ namespace Sheaft.Infrastructure.Services
             {
                 Identifier = result.Id,
                 ResultCode = result.ResultCode,
-                ResultMessage = MangoExtensions.GetOperationMessage(result.ResultCode, result.ResultMessage),
+                ResultMessage = PspExtensions.GetOperationMessage(result.ResultCode, result.ResultMessage),
                 Status = result.Status.GetTransactionStatus(),
                 ProcessedOn = result.ExecutionDate
             });
@@ -733,7 +745,7 @@ namespace Sheaft.Infrastructure.Services
             {
                 Identifier = result.Id,
                 ResultCode = result.ResultCode,
-                ResultMessage = MangoExtensions.GetOperationMessage(result.ResultCode, result.ResultMessage),
+                ResultMessage = PspExtensions.GetOperationMessage(result.ResultCode, result.ResultMessage),
                 Status = result.Status.GetTransactionStatus(),
                 ProcessedOn = result.ExecutionDate
             });
@@ -748,9 +760,52 @@ namespace Sheaft.Infrastructure.Services
             {
                 Identifier = result.Id,
                 ResultCode = result.ResultCode,
-                ResultMessage = MangoExtensions.GetOperationMessage(result.ResultCode, result.ResultMessage),
+                ResultMessage = PspExtensions.GetOperationMessage(result.ResultCode, result.ResultMessage),
                 Status = result.Status.GetTransactionStatus(),
                 ProcessedOn = result.ExecutionDate
+            });
+        }
+
+        public async Task<Result<PspPaymentResultDto>> CreatePreAuthorizedPayinAsync(PreAuthorization preAuthorization, CancellationToken token)
+        {
+            if (string.IsNullOrWhiteSpace(preAuthorization.PreAuthorizedPayin.Author.Identifier))
+                return Failure<PspPaymentResultDto>(MessageKind.PsP_CannotCreate_WebPayin_Author_Not_Exists);
+
+            if (string.IsNullOrWhiteSpace(preAuthorization.PreAuthorizedPayin.CreditedWallet.Identifier))
+                return Failure<PspPaymentResultDto>(MessageKind
+                    .PsP_CannotCreate_WebPayin_CreditedWallet_Not_Exists);
+
+            await EnsureAccessTokenIsValidAsync(token);
+
+            var result = await _api.PayIns.CreatePreauthorizedDirectAsync(GetIdempotencyKey(preAuthorization.Id),
+                new PayInPreauthorizedDirectPostDTO(
+                    preAuthorization.PreAuthorizedPayin.Author.Identifier,
+                    new Money
+                    {
+                        Amount = preAuthorization.Debited.GetAmount(),
+                        Currency = CurrencyIso.EUR
+                    },
+                    new Money
+                    {
+                        Amount = preAuthorization.PreAuthorizedPayin.Fees.GetAmount(),
+                        Currency = CurrencyIso.EUR
+                    },
+                    preAuthorization.PreAuthorizedPayin.CreditedWallet.Identifier,
+                    preAuthorization.Identifier)
+                {
+                    Tag = $"Id='{preAuthorization.Id}'"
+                });
+
+            return Success(new PspPaymentResultDto
+            {
+                Credited = result.CreditedFunds.Amount.GetAmount(),
+                ProcessedOn = result.ExecutionDate,
+                Identifier = result.Id,
+                ResultCode = result.ResultCode,
+                ResultMessage = PspExtensions.GetOperationMessage(result.ResultCode, result.ResultMessage),
+                Debited = result.DebitedFunds.Amount.GetAmount(),
+                Fees = result.Fees.Amount.GetAmount(),
+                Status = result.Status.GetTransactionStatus()
             });
         }
 
@@ -795,7 +850,7 @@ namespace Sheaft.Infrastructure.Services
                 ProcessedOn = result.ExecutionDate,
                 Identifier = result.Id,
                 ResultCode = result.ResultCode,
-                ResultMessage = MangoExtensions.GetOperationMessage(result.ResultCode, result.ResultMessage),
+                ResultMessage = PspExtensions.GetOperationMessage(result.ResultCode, result.ResultMessage),
                 Debited = result.DebitedFunds.Amount.GetAmount(),
                 Fees = result.Fees.Amount.GetAmount(),
                 Status = result.Status.GetTransactionStatus()
@@ -825,7 +880,7 @@ namespace Sheaft.Infrastructure.Services
         }
     }
 
-    internal static class MangoExtensions
+    internal static class PspExtensions
     {
         public static PspUserNormalDto GetConsumer(this UserNaturalDTO user)
         {
@@ -1017,6 +1072,18 @@ namespace Sheaft.Infrastructure.Services
             return (CountryIso) countryCode;
         }
 
+        public static Sheaft.Domain.Enum.PaymentStatus GetPaymentStatus(
+            this MangoPay.SDK.Core.Enumerations.PaymentStatus status)
+        {
+            return (Sheaft.Domain.Enum.PaymentStatus) status;
+        }
+
+        public static Sheaft.Domain.Enum.PreAuthorizationStatus GetPreAuthorizationStatus(
+            this MangoPay.SDK.Core.Enumerations.PreAuthorizationStatus status)
+        {
+            return (Sheaft.Domain.Enum.PreAuthorizationStatus) status;
+        }
+
         public static string GetOperationMessage(string code, string message)
         {
             switch (code)
@@ -1028,10 +1095,10 @@ namespace Sheaft.Infrastructure.Services
                 case "001031":
                 case "101002":
                     return
-                        "Le processus de paiement a été annulé à votre initiative, vous pouvez renouveler votre demande.";
+                        "Le processus de paiement a été annulé à votre initiative.";
                 case "001034":
                 case "101001":
-                    return "La page de paiement a expirée, veuillez renouveler votre demande.";
+                    return "La page de paiement a expirée.";
                 case "101399":
                     return "Le mode 3DSecure n'est pas disponible, veuillez contacter notre support.";
                 case "101304":
@@ -1055,7 +1122,7 @@ namespace Sheaft.Infrastructure.Services
                 case "001013":
                     return "Le montant de la transaction est invalide.";
                 case "001014":
-                    return "Le montant crédité doit être supérieur à 0.";
+                    return "Le montant doit être supérieur à 0€.";
                 default:
                     return message;
             }

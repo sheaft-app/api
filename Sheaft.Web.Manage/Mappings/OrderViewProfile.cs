@@ -9,10 +9,10 @@ namespace Sheaft.Web.Manage.Mappings
         public OrderViewProfile()
         {
             CreateMap<Domain.Order, OrderViewModel>()
-                .ForMember(d => d.TotalFees, opt => opt.MapFrom(r => r.FeesPrice - r.InternalFeesPrice));
+                .ForMember(d => d.TotalFees, opt => opt.MapFrom(r => r.FeesPrice - r.DonationFeesPrice));
 
             CreateMap<Domain.Order, OrderShortViewModel>()
-                .ForMember(d => d.TotalFees, opt => opt.MapFrom(r => r.FeesPrice - r.InternalFeesPrice));
+                .ForMember(d => d.TotalFees, opt => opt.MapFrom(r => r.FeesPrice - r.DonationFeesPrice));
 
             CreateMap<OrderDto, OrderViewModel>()
                 .ForMember(d => d.Donate, opt => opt.MapFrom(r => r.Donation));

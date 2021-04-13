@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
@@ -21,7 +22,6 @@ namespace Sheaft.Mediatr.Order.Commands
         }
 
         public Guid OrderId { get; set; }
-        public Guid PayinId { get; set; }
     }
 
     public class FailOrderCommandHandler : CommandsHandler,
@@ -38,10 +38,8 @@ namespace Sheaft.Mediatr.Order.Commands
         public async Task<Result> Handle(FailOrderCommand request, CancellationToken token)
         {
             var order = await _context.GetByIdAsync<Domain.Order>(request.OrderId, token);
-            if (order.Payin.Id != request.PayinId)
-                return Failure();
-
             order.SetStatus(OrderStatus.Refused);
+            
             await _context.SaveChangesAsync(token);
             return Success();
         }

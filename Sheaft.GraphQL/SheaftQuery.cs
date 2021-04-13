@@ -169,10 +169,10 @@ namespace Sheaft.GraphQL
             return legalQueries.GetMyBusinessLegals(CurrentUser);
         }
 
-        public IQueryable<WebPayinDto> GetWebPayinTransaction(string input, [Service] IPayinQueries payinQueries)
+        public IQueryable<PayinDto> GetPayinTransaction(string input, [Service] IPayinQueries payinQueries)
         {
             SetLogTransaction(input);
-            return payinQueries.GetWebPayinTransaction(input, CurrentUser);
+            return payinQueries.GetPayin(input, CurrentUser);
         }
 
         public IQueryable<CountryPointsDto> GetCountryPoints(Guid? input, [Service] ILeaderboardQueries leaderboardQueries)
@@ -455,6 +455,12 @@ namespace Sheaft.GraphQL
         {
             SetLogTransaction();
             return catalogQueries.GetCatalogProducts(input, CurrentUser);
+        }
+
+        public IQueryable<PreAuthorizationDto> GetPreAuthorization(Guid input, [Service] IPreAuthorizationQueries preAuthorizationQueries)
+        {
+            SetLogTransaction();
+            return preAuthorizationQueries.GetPreAuthorization(input, CurrentUser);
         }
 
         private void SetLogTransaction(object input = null, [CallerMemberName] string name = "")

@@ -58,6 +58,7 @@ using Sheaft.Infrastructure.Persistence.Extensions;
 using Sheaft.Mediatr;
 using Sheaft.Mediatr.Agreement.Queries;
 using Sheaft.Mediatr.BusinessClosing.Queries;
+using Sheaft.Mediatr.Cards.Queries;
 using Sheaft.Mediatr.Catalog.Queries;
 using Sheaft.Mediatr.Consumer.Queries;
 using Sheaft.Mediatr.Country.Queries;
@@ -75,6 +76,7 @@ using Sheaft.Mediatr.Notification.Queries;
 using Sheaft.Mediatr.Order.Queries;
 using Sheaft.Mediatr.Payin.Queries;
 using Sheaft.Mediatr.Payout.Queries;
+using Sheaft.Mediatr.PreAuthorization.Queries;
 using Sheaft.Mediatr.Producer.Queries;
 using Sheaft.Mediatr.Product.Queries;
 using Sheaft.Mediatr.PurchaseOrder.Queries;
@@ -291,8 +293,8 @@ namespace Sheaft.Web.Api
             services.AddScoped<IAuthService, AuthService>();
             services.AddSingleton<ICurrentUserService, CurrentUserService>();
             
-            services.AddScoped<IFeesCalculator, FeesCalculator>();
             services.AddScoped<IDeliveryService, DeliveryService>();
+            services.AddScoped<IOrderService, OrderService>();
             
             services.AddScopedDynamic<IProductsFileImporter>(typeof(ExcelProductsImporter).Assembly.GetTypes().Where(t => t.GetInterfaces().Contains(typeof(IProductsFileImporter))));
             services.AddScopedDynamic<IPickingOrdersFileExporter>(typeof(ExcelPickingOrdersExporter).Assembly.GetTypes().Where(t => t.GetInterfaces().Contains(typeof(IPickingOrdersFileExporter))));
@@ -333,6 +335,8 @@ namespace Sheaft.Web.Api
             services.AddScoped<IDonationQueries, DonationQueries>();
             services.AddScoped<IWithholdingQueries, WithholdingQueries>();
             services.AddScoped<ICatalogQueries, CatalogQueries>();
+            services.AddScoped<IPreAuthorizationQueries, PreAuthorizationQueries>();
+            services.AddScoped<ICardQueries, CardQueries>();
             
             services.AddScoped<ISheaftMediatr, SheaftMediatr>();
             services.AddScoped<ISheaftDispatcher, SheaftDispatcher>();
@@ -370,7 +374,7 @@ namespace Sheaft.Web.Api
                 .AddMutationType<SheaftMutationType>()
                 .AddQueryType<SheaftQueryType>()
                 .BindClrType<TimeSpan, SheaftTimeSpanType>()
-                .RegisterTypes()
+                .RegisterGraphQlTypes()
                 .Create(), new QueryExecutionOptions { IncludeExceptionDetails = true });
 
             services.AddErrorFilter<SheaftErrorFilter>();

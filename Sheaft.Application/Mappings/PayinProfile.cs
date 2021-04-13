@@ -9,11 +9,17 @@ namespace Sheaft.Application.Mappings
         public PayinProfile()
         {
             CreateMap<Payin, TransactionDto>();
-            CreateMap<CardPayin, TransactionDto>();
             CreateMap<WebPayin, TransactionDto>();
-            CreateMap<WebPayin, WebPayinDto>();
-
+            CreateMap<PreAuthorizedPayin, TransactionDto>();
+            CreateMap<PreAuthorizedPayin, PreAuthorizedPayinDto>();
+            
             CreateMap<Payin, PayinDto>()
+                .ForMember(m => m.CreditedUser, opt => opt.MapFrom(t => t.CreditedWallet.User));
+            CreateMap<WebPayin, PayinDto>()
+                .ForMember(m => m.CreditedUser, opt => opt.MapFrom(t => t.CreditedWallet.User));
+            CreateMap<PreAuthorizedPayin, PayinDto>()
+                .ForMember(m => m.CreditedUser, opt => opt.MapFrom(t => t.CreditedWallet.User));
+            CreateMap<WebPayin, WebPayinDto>()
                 .ForMember(m => m.CreditedUser, opt => opt.MapFrom(t => t.CreditedWallet.User));
         }
     }
