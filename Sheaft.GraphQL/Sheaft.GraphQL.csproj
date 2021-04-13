@@ -6,16 +6,16 @@
 
     <ItemGroup>
       <PackageReference Include="AutoMapper" Version="10.1.1" />
-      <PackageReference Include="HotChocolate.Abstractions" Version="10.5.3" />
-      <PackageReference Include="HotChocolate.AspNetCore.Authorization" Version="10.5.3" />
-      <PackageReference Include="HotChocolate.Types" Version="10.5.3" />
-      <PackageReference Include="HotChocolate.Types.Filters" Version="10.5.3" />
-      <PackageReference Include="HotChocolate.Types.Selections" Version="10.5.3" />
-      <PackageReference Include="HotChocolate.Types.Sorting" Version="10.5.3" />
+      <PackageReference Include="HotChocolate.Abstractions" Version="10.5.5" />
+      <PackageReference Include="HotChocolate.AspNetCore.Authorization" Version="10.5.5" />
+      <PackageReference Include="HotChocolate.Types" Version="10.5.5" />
+      <PackageReference Include="HotChocolate.Types.Filters" Version="10.5.5" />
+      <PackageReference Include="HotChocolate.Types.Selections" Version="10.5.5" />
+      <PackageReference Include="HotChocolate.Types.Sorting" Version="10.5.5" />
       <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.2.0" />
       <PackageReference Include="Microsoft.Extensions.Localization.Abstractions" Version="3.1.10" />
       <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="3.1.10" />
-      <PackageReference Include="NewRelic.Agent.Api" Version="8.36.0" />
+      <PackageReference Include="NewRelic.Agent.Api" Version="8.39.1" />
     </ItemGroup>
 
     <ItemGroup>

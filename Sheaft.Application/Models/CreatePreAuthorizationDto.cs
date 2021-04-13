@@ -6,5 +6,7 @@ namespace Sheaft.Application.Models
     {
         public Guid OrderId { get; set; }
         public string CardIdentifier { get; set; }
+        public string IpAddress { get; set; }
+        public BrowserInfoDto BrowserInfo { get; set; }
     }
 }

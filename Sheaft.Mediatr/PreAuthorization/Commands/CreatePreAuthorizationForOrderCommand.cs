@@ -9,6 +9,7 @@ using Newtonsoft.Json;
 using Sheaft.Application.Interfaces.Business;
 using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Application.Interfaces.Mediatr;
+using Sheaft.Application.Models;
 using Sheaft.Core;
 using Sheaft.Core.Enums;
 using Sheaft.Domain;
@@ -28,6 +29,8 @@ namespace Sheaft.Mediatr.PreAuthorization
         }
         public Guid OrderId { get; set; }
         public string CardIdentifier { get; set; }
+        public string IpAddress { get; set; }
+        public BrowserInfoDto BrowserInfo { get; set; }
     }
     
     public class CreatePreAuthorizationCommandHandler : CommandsHandler,
@@ -78,7 +81,7 @@ namespace Sheaft.Mediatr.PreAuthorization
                 await _context.AddAsync(preAuthorization, token);
                 await _context.SaveChangesAsync(token);
 
-                var result = await _pspService.CreatePreAuthorizationAsync(preAuthorization, token);
+                var result = await _pspService.CreatePreAuthorizationAsync(preAuthorization, request.IpAddress, request.BrowserInfo, token);
                 if (!result.Succeeded)
                     return Failure<Guid>(result.Exception);
 

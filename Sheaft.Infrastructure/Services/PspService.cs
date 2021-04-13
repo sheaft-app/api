@@ -333,9 +333,9 @@ namespace Sheaft.Infrastructure.Services
             {
                 Identifier = result.Id,
                 Status = result.Status.GetDeclarationStatus(),
-                ResultMessage = PspExtensions.GetOperationMessage(result.Reason.ToString("G"), result.Message),
+                ResultMessage = PspExtensions.GetOperationMessage(result.Reason?.ToString("G"), result.Message),
                 ProcessedOn = result.ProcessedDate,
-                ResultCode = result.Reason.ToString("G")
+                ResultCode = result.Reason?.ToString("G")
             });
         }
 
@@ -366,9 +366,9 @@ namespace Sheaft.Infrastructure.Services
             {
                 Identifier = result.Id,
                 Status = result.Status.GetDeclarationStatus(),
-                ResultMessage = PspExtensions.GetOperationMessage(result.Reason.ToString("G"), result.Message),
+                ResultMessage = PspExtensions.GetOperationMessage(result.Reason?.ToString("G"), result.Message),
                 ProcessedOn = result.ProcessedDate,
-                ResultCode = result.Reason.ToString("G")
+                ResultCode = result.Reason?.ToString("G")
             });
         }
 
@@ -476,7 +476,7 @@ namespace Sheaft.Infrastructure.Services
         }
 
         public async Task<Result<PspPreAuthorizationResultDto>> CreatePreAuthorizationAsync(
-            PreAuthorization preAuthorization, CancellationToken token)
+            PreAuthorization preAuthorization, string ipAddress, BrowserInfoDto browserInfo, CancellationToken token)
         {
             await EnsureAccessTokenIsValidAsync(token);
             var result = await _api.CardPreAuthorizations.CreateAsync(
@@ -496,6 +496,19 @@ namespace Sheaft.Infrastructure.Services
                     Billing = new Billing
                     {
                         Address = preAuthorization.Card.User.Address.GetAddress()
+                    },
+                    IpAddress = ipAddress,
+                    BrowserInfo = new BrowserInfo
+                    {
+                        AcceptHeader = browserInfo.AcceptHeader,
+                        Language = browserInfo.Language,
+                        ColorDepth = browserInfo.ColorDepth.ToString(),
+                        JavaEnabled = browserInfo.JavaEnabled,
+                        JavascriptEnabled = browserInfo.JavascriptEnabled,
+                        ScreenHeight = browserInfo.ScreenHeight.ToString(),
+                        ScreenWidth = browserInfo.ScreenWidth.ToString(),
+                        UserAgent = browserInfo.UserAgent,
+                        TimeZoneOffset = browserInfo.TimeZoneOffset,
                     }
                 });
 
@@ -600,9 +613,10 @@ namespace Sheaft.Infrastructure.Services
                         Currency = CurrencyIso.EUR
                     },
                     transaction.BankAccount.Identifier,
-                    transaction.Reference)
+                    transaction.Reference,
+                    PayOutPaymentType.BANK_WIRE.ToString("G"))
                 {
-                    Tag = $"Id='{transaction.Id}''"
+                    Tag = $"Id='{transaction.Id}'"
                 });
 
             return Success(new PspPaymentResultDto
@@ -685,8 +699,8 @@ namespace Sheaft.Infrastructure.Services
             return Success(new PspDeclarationResultDto
             {
                 Identifier = result.Id,
-                ResultCode = result.Reason.ToString("G"),
-                ResultMessage = PspExtensions.GetOperationMessage(result.Reason.ToString("G"), result.Message),
+                ResultCode = result.Reason?.ToString("G"),
+                ResultMessage = PspExtensions.GetOperationMessage(result.Reason?.ToString("G"), result.Message),
                 Status = result.Status.GetDeclarationStatus(),
                 ProcessedOn = result.ProcessedDate
             });
@@ -1081,10 +1095,10 @@ namespace Sheaft.Infrastructure.Services
                 case "001031":
                 case "101002":
                     return
-                        "Le processus de paiement a été annulé à votre initiative, vous pouvez renouveler votre demande.";
+                        "Le processus de paiement a été annulé à votre initiative.";
                 case "001034":
                 case "101001":
-                    return "La page de paiement a expirée, veuillez renouveler votre demande.";
+                    return "La page de paiement a expirée.";
                 case "101399":
                     return "Le mode 3DSecure n'est pas disponible, veuillez contacter notre support.";
                 case "101304":
@@ -1108,7 +1122,7 @@ namespace Sheaft.Infrastructure.Services
                 case "001013":
                     return "Le montant de la transaction est invalide.";
                 case "001014":
-                    return "Le montant crédité doit être supérieur à 0.";
+                    return "Le montant doit être supérieur à 0€.";
                 default:
                     return message;
             }

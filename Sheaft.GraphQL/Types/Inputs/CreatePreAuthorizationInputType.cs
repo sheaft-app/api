@@ -13,6 +13,12 @@ namespace Sheaft.GraphQL.Types.Inputs
 
             descriptor.Field(c => c.CardIdentifier)
                 .Type<NonNullType<StringType>>();
+            
+            descriptor.Field(c => c.IpAddress)
+                .Type<NonNullType<StringType>>();
+            
+            descriptor.Field(c => c.BrowserInfo)
+                .Type<NonNullType<BrowserInfoInputType>>();
         }
     }
 }

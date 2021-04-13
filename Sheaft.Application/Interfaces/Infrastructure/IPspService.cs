@@ -38,7 +38,7 @@ namespace Sheaft.Application.Interfaces.Infrastructure
         Task<Result<PspUserLegalDto>> GetCompanyAsync(string identifier, CancellationToken token);
         Task<Result<PspUserNormalDto>> GetConsumerAsync(string identifier, CancellationToken token);
         Task<Result<PspPaymentResultDto>> CreateWithholdingAsync(Domain.Withholding transaction, CancellationToken token);
-        Task<Result<PspPreAuthorizationResultDto>> CreatePreAuthorizationAsync(PreAuthorization preAuthorization, CancellationToken token);
+        Task<Result<PspPreAuthorizationResultDto>> CreatePreAuthorizationAsync(PreAuthorization preAuthorization, string ipAddress, BrowserInfoDto browserInfo, CancellationToken token);
         Task<Result<PspPreAuthorizationResultDto>> GetPreAuthorizationAsync(string identifier, CancellationToken token);
         Task<Result<PspPaymentResultDto>> CreatePreAuthorizedPayinAsync(PreAuthorization preAuthorization, CancellationToken token);
     }
