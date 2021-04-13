@@ -14,6 +14,7 @@ namespace Sheaft.GraphQL.Types.Outputs
             descriptor.Field(c => c.RedirectUrl);
             descriptor.Field(c => c.ExecutedOn);
             descriptor.Field(c => c.Reference);
+            descriptor.Field(c => c.Identifier);
             
             descriptor.Field(c => c.Author)
                 .Type<NonNullType<UserType>>();
