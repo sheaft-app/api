@@ -46,7 +46,7 @@ namespace Sheaft.Mediatr.Payin.Commands
             {
                 foreach (var purchaseOrderId in purchaseOrderIds)
                 {
-                    _mediatr.Post(new CheckPurchaseOrderExpirationCommand(request.RequestUser)
+                    _mediatr.Post(new ExpirePurchaseOrderCommand(request.RequestUser)
                     {
                         PurchaseOrderId = purchaseOrderId
                     });
@@ -62,7 +62,7 @@ namespace Sheaft.Mediatr.Payin.Commands
         private async Task<IEnumerable<Guid>> GetNextPurchaseOrderIdsAsync(int skip, int take, CancellationToken token)
         {
             return await _context.PurchaseOrders
-                .Get(c => c.Status == PurchaseOrderStatus.Waiting && c.Sender.Kind == ProfileKind.Consumer && (c.CreatedOn.AddDays(3) < DateTimeOffset.UtcNow || c.ExpectedDelivery.ExpectedDeliveryDate < DateTimeOffset.UtcNow), true)
+                .Get(c => c.Status == PurchaseOrderStatus.Waiting && (c.CreatedOn.AddDays(3) < DateTimeOffset.UtcNow || c.ExpectedDelivery.ExpectedDeliveryDate < DateTimeOffset.UtcNow), true)
                 .OrderBy(c => c.CreatedOn)
                 .Select(c => c.Id)
                 .Skip(skip)

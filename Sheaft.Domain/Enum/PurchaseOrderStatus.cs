@@ -9,6 +9,8 @@ namespace Sheaft.Domain.Enum
         Shipping,
         Delivered,
         Refused,
-        Cancelled
+        Cancelled,
+        Withdrawned,
+        Expired
     }
 }

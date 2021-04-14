@@ -20,7 +20,7 @@ namespace Sheaft.Domain
         private static OrderPrices GetPurchaseOrdersPrices(Order order)
         {
             var totalPrice = order.PurchaseOrders
-                .Where(po => po.AcceptedOn.HasValue && !po.WithdrawnOn.HasValue)
+                .Where(po => po.AcceptedOn.HasValue && !po.DroppedOn.HasValue)
                 .Sum(po => po.TotalOnSalePrice);
 
             return Domain.Order.GetOrderFees(order, totalPrice);

@@ -253,6 +253,13 @@ namespace Sheaft.GraphQL
             return purchaseOrderQueries.GetPurchaseOrders(CurrentUser).Where(j => input.Ids.Contains(j.Id));
         }
 
+        public async Task<IQueryable<PurchaseOrderDto>> WithdrawnPurchaseOrdersAsync(ResourceIdsWithReasonDto input,
+            [Service] IPurchaseOrderQueries purchaseOrderQueries)
+        {
+            await ExecuteAsync<ResourceIdsWithReasonDto, WithdrawnPurchaseOrdersCommand>(input, Token);
+            return purchaseOrderQueries.GetPurchaseOrders(CurrentUser).Where(j => input.Ids.Contains(j.Id));
+        }
+        
         public async Task<IQueryable<PurchaseOrderDto>> RefusePurchaseOrdersAsync(ResourceIdsWithReasonDto input,
             [Service] IPurchaseOrderQueries purchaseOrderQueries)
         {

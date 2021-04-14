@@ -17,10 +17,10 @@ using Sheaft.Mediatr.PayinRefund.Commands;
 
 namespace Sheaft.Mediatr.PurchaseOrder.Commands
 {
-    public class RefusePurchaseOrderCommand : Command
+    public class WithdrawnPurchaseOrderCommand : Command
     {
         [JsonConstructor]
-        public RefusePurchaseOrderCommand(RequestUser requestUser) : base(requestUser)
+        public WithdrawnPurchaseOrderCommand(RequestUser requestUser) : base(requestUser)
         {
         }
 
@@ -29,32 +29,33 @@ namespace Sheaft.Mediatr.PurchaseOrder.Commands
         public bool SkipNotification { get; set; }
     }
 
-    public class RefusePurchaseOrderCommandHandler : CommandsHandler,
-        IRequestHandler<RefusePurchaseOrderCommand, Result>
+    public class WithdrawnPurchaseOrderCommandHandler : CommandsHandler,
+        IRequestHandler<WithdrawnPurchaseOrderCommand, Result>
     {
         private readonly ITableService _tableService;
 
-        public RefusePurchaseOrderCommandHandler(
+        public WithdrawnPurchaseOrderCommandHandler(
             IAppDbContext context,
             ISheaftMediatr mediatr,
             ITableService tableService,
-            ILogger<RefusePurchaseOrderCommandHandler> logger)
+            ILogger<WithdrawnPurchaseOrderCommandHandler> logger)
             : base(mediatr, context, logger)
         {
             _tableService = tableService;
         }
 
-        public async Task<Result> Handle(RefusePurchaseOrderCommand request, CancellationToken token)
+        public async Task<Result> Handle(WithdrawnPurchaseOrderCommand request, CancellationToken token)
         {
             var purchaseOrder = await _context.GetByIdAsync<Domain.PurchaseOrder>(request.PurchaseOrderId, token);
-            if(purchaseOrder.Vendor.Id != request.RequestUser.Id)
+            if (purchaseOrder.Vendor.Id != request.RequestUser.Id && purchaseOrder.Sender.Id != request.RequestUser.Id)
                 throw SheaftException.Forbidden();
-            
-            purchaseOrder.Refuse(request.Reason, request.SkipNotification);
+
+            purchaseOrder.Withdrawn(request.Reason, request.SkipNotification);
 
             await _context.SaveChangesAsync(token);
 
-            var order = await _context.GetSingleAsync<Domain.Order>(o => o.PurchaseOrders.Any(po => po.Id == purchaseOrder.Id),
+            var order = await _context.GetSingleAsync<Domain.Order>(
+                o => o.PurchaseOrders.Any(po => po.Id == purchaseOrder.Id),
                 token);
             var delivery = order.Deliveries.FirstOrDefault(d => d.DeliveryMode.Producer.Id == purchaseOrder.Vendor.Id);
             if (delivery.DeliveryMode.MaxPurchaseOrdersPerTimeSlot.HasValue)
@@ -62,14 +63,16 @@ namespace Sheaft.Mediatr.PurchaseOrder.Commands
                     delivery.DeliveryMode.Id, purchaseOrder.ExpectedDelivery.ExpectedDeliveryDate,
                     purchaseOrder.ExpectedDelivery.From, purchaseOrder.ExpectedDelivery.To,
                     delivery.DeliveryMode.MaxPurchaseOrdersPerTimeSlot.Value, token);
-            
+
             var hasPayins = await _context.Payins.AnyAsync(p =>
                 (p.Status == TransactionStatus.Succeeded || p.Status == TransactionStatus.Waiting)
                 & p.Order.Id == order.Id, token);
 
-            if(hasPayins)
-                _mediatr.Schedule(new CreatePayinRefundCommand(request.RequestUser) {PurchaseOrderId = purchaseOrder.Id}, TimeSpan.FromDays(1));
-            
+            if (hasPayins)
+                _mediatr.Schedule(
+                    new CreatePayinRefundCommand(request.RequestUser) {PurchaseOrderId = purchaseOrder.Id},
+                    TimeSpan.FromDays(1));
+
             return Success();
         }
     }

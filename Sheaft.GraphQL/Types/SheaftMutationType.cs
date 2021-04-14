@@ -73,11 +73,18 @@ namespace Sheaft.GraphQL.Types
 
             descriptor.Field(c => c.CancelPurchaseOrdersAsync(default, default))
                 .Name("cancelPurchaseOrders")
-                .Authorize(Policies.REGISTERED)
+                .Authorize(Policies.PRODUCER)
                 .Type<NonNullType<ListType<PurchaseOrderType>>>()
                 .UsePaging<PurchaseOrderType>()
                 .UseFiltering<PurchaseOrderFilterType>()
                 .UseSorting<PurchaseOrderSortType>()
+                .UseSelection();
+            
+            descriptor.Field(c => c.WithdrawnPurchaseOrdersAsync(default, default))
+                .Name("withdrawnPurchaseOrders")
+                .Authorize(Policies.STORE_OR_CONSUMER)
+                .Type<NonNullType<ListType<PurchaseOrderType>>>()
+                .UseSingleOrDefault()
                 .UseSelection();
 
             descriptor.Field(c => c.DeletePurchaseOrdersAsync(default))

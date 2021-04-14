@@ -7,6 +7,7 @@
         public const string REGISTERED = "Registered";
         public const string UNREGISTERED = "Unregistered";
         public const string STORE_OR_PRODUCER = "StoreOrProducer";
+        public const string STORE_OR_CONSUMER = "StoreOrConsumer";
         public const string OWNER = "Owner";
         public const string PRODUCER = "Producer";
         public const string STORE = "Store";

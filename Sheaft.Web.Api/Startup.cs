@@ -186,6 +186,11 @@ namespace Sheaft.Web.Api
                     builder.RequireAuthenticatedUser();
                     builder.RequireRole(rolesOptions.Producer.Value, rolesOptions.Store.Value);
                 });
+                options.AddPolicy(Policies.STORE_OR_CONSUMER, builder =>
+                {
+                    builder.RequireAuthenticatedUser();
+                    builder.RequireRole(rolesOptions.Consumer.Value, rolesOptions.Store.Value);
+                });
                 options.AddPolicy(Policies.UNREGISTERED, builder =>
                 {
                     builder.RequireAuthenticatedUser();

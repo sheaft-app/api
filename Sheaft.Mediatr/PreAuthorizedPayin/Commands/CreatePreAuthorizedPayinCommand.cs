@@ -48,7 +48,7 @@ namespace Sheaft.Mediatr.PreAuthorizedPayin
                 && preAuthorization.Order.Status != OrderStatus.Validated 
                 && !preAuthorization.Order.PurchaseOrders.Any(po =>
                     po.AcceptedOn.HasValue 
-                    && !po.WithdrawnOn.HasValue))
+                    && !po.DroppedOn.HasValue))
                 return Success<Guid>();
             
             if(preAuthorization.PreAuthorizedPayin != null

@@ -15,6 +15,8 @@ namespace Sheaft.GraphQL.Enums
             descriptor.Value(PurchaseOrderStatus.Refused).Name("REFUSED");
             descriptor.Value(PurchaseOrderStatus.Shipping).Name("SHIPPING");
             descriptor.Value(PurchaseOrderStatus.Waiting).Name("WAITING");
+            descriptor.Value(PurchaseOrderStatus.Withdrawned).Name("WITHDRAWNED");
+            descriptor.Value(PurchaseOrderStatus.Expired).Name("EXPIRED");
         }
     }
 }

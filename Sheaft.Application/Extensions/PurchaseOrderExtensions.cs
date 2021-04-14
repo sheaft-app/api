@@ -26,6 +26,7 @@ namespace Sheaft.Application.Extensions
                 CreatedOn = purchaseOrder.CreatedOn,
                 ExpectedDeliveryDate = purchaseOrder.ExpectedDelivery.ExpectedDeliveryDate,
                 TotalOnSalePrice = purchaseOrder.TotalOnSalePrice, 
+                TotalWholeSalePrice = purchaseOrder.TotalWholeSalePrice, 
                 PurchaseOrderUrl = url,
                 VatPrice = purchaseOrder.TotalVatPrice,
                 ExpectedFrom = purchaseOrder.ExpectedDelivery.From,
@@ -50,6 +51,8 @@ namespace Sheaft.Application.Extensions
                 VendorName = purchaseOrder.Vendor.Name,
                 SenderName = purchaseOrder.Sender.Name,
                 CreatedOn = purchaseOrder.CreatedOn,
+                TotalOnSalePrice = purchaseOrder.TotalOnSalePrice,
+                TotalWholeSalePrice = purchaseOrder.TotalWholeSalePrice,
                 ExpectedDeliveryDate = purchaseOrder.ExpectedDelivery.ExpectedDeliveryDate
             };
         }

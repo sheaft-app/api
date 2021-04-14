@@ -53,7 +53,7 @@ namespace Sheaft.Domain
         public DateTimeOffset? AcceptedOn { get; private set; }
         public DateTimeOffset? CompletedOn { get; private set; }
         public DateTimeOffset? DeliveredOn { get; private set; }
-        public DateTimeOffset? WithdrawnOn { get; private set; }
+        public DateTimeOffset? DroppedOn { get; private set; }
         public string Reference { get; private set; }
         public string Reason { get; private set; }
         public string Comment { get; private set; }
@@ -131,10 +131,27 @@ namespace Sheaft.Domain
                         throw SheaftException.Validation(MessageKind.PurchaseOrder_CannotCancel_AlreadyIn_RefusedStatus);
                     if (Status == PurchaseOrderStatus.Delivered)
                         throw SheaftException.Validation(MessageKind.PurchaseOrder_CannotCancel_AlreadyIn_DeliveredStatus);
-                    WithdrawnOn = DateTimeOffset.UtcNow;
+                    if (Status == PurchaseOrderStatus.Expired)
+                        throw SheaftException.Validation();
+                    DroppedOn = DateTimeOffset.UtcNow;
 
                     if (!skipNotification)
                         DomainEvents.Add(new PurchaseOrderCancelledEvent(Id));
+
+                    break;
+                case PurchaseOrderStatus.Withdrawned:
+                    if (Status == PurchaseOrderStatus.Withdrawned)
+                        throw SheaftException.Validation();
+                    if (Status == PurchaseOrderStatus.Refused)
+                        throw SheaftException.Validation(MessageKind.PurchaseOrder_CannotCancel_AlreadyIn_RefusedStatus);
+                    if (Status == PurchaseOrderStatus.Delivered)
+                        throw SheaftException.Validation(MessageKind.PurchaseOrder_CannotCancel_AlreadyIn_DeliveredStatus);
+                    if (Status == PurchaseOrderStatus.Expired)
+                        throw SheaftException.Validation();
+                    DroppedOn = DateTimeOffset.UtcNow;
+
+                    if (!skipNotification)
+                        DomainEvents.Add(new PurchaseOrderWithdrawnedEvent(Id));
 
                     break;
                 case PurchaseOrderStatus.Refused:
@@ -144,11 +161,18 @@ namespace Sheaft.Domain
                         throw SheaftException.Validation(MessageKind.PurchaseOrder_CannotRefuse_AlreadyIn_RefusedStatus);
                     if (Status == PurchaseOrderStatus.Delivered)
                         throw SheaftException.Validation(MessageKind.PurchaseOrder_CannotRefuse_AlreadyIn_DeliveredStatus);
-                    WithdrawnOn = DateTimeOffset.UtcNow;
+                    DroppedOn = DateTimeOffset.UtcNow;
 
                     if (!skipNotification)
                         DomainEvents.Add(new PurchaseOrderRefusedEvent(Id));
-
+                    break;
+                
+                case PurchaseOrderStatus.Expired:
+                    if(Status != PurchaseOrderStatus.Waiting)
+                        throw SheaftException.Validation();
+                    
+                    if (!skipNotification)
+                        DomainEvents.Add(new PurchaseOrderExpiredEvent(Id));
                     break;
             }
 
@@ -174,6 +198,18 @@ namespace Sheaft.Domain
         public void Cancel(string reason, bool skipNotification)
         {
             SetStatus(PurchaseOrderStatus.Cancelled, skipNotification);
+            Reason = reason;
+        }
+        
+        public void Withdrawn(string reason, bool skipNotification)
+        {
+            SetStatus(PurchaseOrderStatus.Withdrawned, skipNotification);
+            Reason = reason;
+        }
+
+        public void Expire(string reason, bool skipNotification)
+        {
+            SetStatus(PurchaseOrderStatus.Expired, skipNotification);
             Reason = reason;
         }
 
@@ -257,5 +293,6 @@ namespace Sheaft.Domain
         }
 
         public List<DomainEvent> DomainEvents { get; } = new List<DomainEvent>();
+
     }
 }
