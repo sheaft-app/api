@@ -23,7 +23,8 @@ namespace Sheaft.Domain
         {
         }
 
-        public Product(Guid id, string reference, string name, ConditioningKind conditioning, UnitKind unit, decimal quantityPerUnit, Producer producer)
+        public Product(Guid id, string reference, string name, ConditioningKind conditioning, UnitKind unit,
+            decimal quantityPerUnit, Producer producer)
         {
             Id = id;
             Producer = producer ?? throw new ValidationException(MessageKind.Product_Producer_Required);
@@ -35,7 +36,7 @@ namespace Sheaft.Domain
             _tags = new List<ProductTag>();
             _ratings = new List<Rating>();
             _catalogsPrices = new List<CatalogProduct>();
-            
+
             DomainEvents = new List<DomainEvent>();
 
             RefreshRatings();
@@ -88,7 +89,7 @@ namespace Sheaft.Domain
 
         public void SetTags(IEnumerable<Tag> tags)
         {
-            if(Tags == null)
+            if (Tags == null)
                 _tags = new List<ProductTag>();
 
             _tags.Clear();
@@ -120,8 +121,8 @@ namespace Sheaft.Domain
         {
             if (Producer.NotSubjectToVat)
                 newVat = 0;
-            
-            if(!newVat.HasValue)
+
+            if (!newVat.HasValue)
                 throw new ValidationException(MessageKind.Product_Vat_Required);
 
             if (newVat < 0)
@@ -165,12 +166,13 @@ namespace Sheaft.Domain
             Returnable = returnable;
         }
 
-        public void SetConditioning(ConditioningKind conditioning, decimal quantity, UnitKind unit = UnitKind.NotSpecified)
+        public void SetConditioning(ConditioningKind conditioning, decimal quantity,
+            UnitKind unit = UnitKind.NotSpecified)
         {
             if (conditioning == ConditioningKind.Not_Specified)
                 throw new ValidationException(MessageKind.Product_Conditioning_Required);
 
-            if(conditioning != ConditioningKind.Bulk)
+            if (conditioning != ConditioningKind.Bulk)
                 unit = UnitKind.NotSpecified;
 
             if (conditioning == ConditioningKind.Bouquet || conditioning == ConditioningKind.Bunch)
@@ -188,15 +190,15 @@ namespace Sheaft.Domain
 
             RefreshPrices();
         }
-        
+
         public void AddPicture(ProductPicture picture)
         {
             if (Pictures == null)
                 _pictures = new List<ProductPicture>();
-            
+
             _pictures.Add(picture);
         }
-        
+
         public void RemovePicture(Guid id)
         {
             if (Pictures == null || !Pictures.Any())
@@ -205,7 +207,7 @@ namespace Sheaft.Domain
             var existingPicture = Pictures.FirstOrDefault(p => p.Id == id);
             if (existingPicture == null)
                 throw SheaftException.NotFound();
-            
+
             _pictures.Remove(existingPicture);
         }
 
@@ -213,23 +215,23 @@ namespace Sheaft.Domain
         {
             if (CatalogsPrices == null)
                 return;
-            
+
             foreach (var price in CatalogsPrices)
                 price.RefreshPrice(Vat, Unit, QuantityPerUnit);
         }
-        
+
         private void AddTags(IEnumerable<Tag> tags)
         {
             if (Tags == null)
                 _tags = new List<ProductTag>();
-            
+
             foreach (var tag in tags)
                 _tags.Add(new ProductTag(tag));
         }
 
         private void RefreshRatings()
         {
-            Rating = Ratings.Any() ? Ratings.Average(r => r.Value) : (decimal?)null;
+            Rating = Ratings.Any() ? Ratings.Average(r => r.Value) : (decimal?) null;
             RatingsCount = Ratings.Count;
         }
 
@@ -238,32 +240,34 @@ namespace Sheaft.Domain
             if (CatalogsPrices == null)
                 _catalogsPrices = new List<CatalogProduct>();
 
-            try
-            {
-                var existingCatalogPrice = _catalogsPrices.SingleOrDefault(c => c.Catalog.Id == catalog.Id);
-                if (existingCatalogPrice == null)
-                    _catalogsPrices.Add(new CatalogProduct(this, catalog, wholeSalePricePerUnit));
-                else
-                    existingCatalogPrice.SetWholeSalePricePerUnit(wholeSalePricePerUnit);
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-            }
+            var existingCatalogPrice = _catalogsPrices.SingleOrDefault(c => c.Catalog.Id == catalog.Id);
+            if (existingCatalogPrice == null)
+                _catalogsPrices.Add(new CatalogProduct(this, catalog, wholeSalePricePerUnit));
+            else
+                existingCatalogPrice.SetWholeSalePricePerUnit(wholeSalePricePerUnit);
+            
+            RefreshCatalogs();
         }
 
         public void RemoveFromCatalog(Guid catalogId)
         {
             if (CatalogsPrices == null || !CatalogsPrices.Any())
                 throw SheaftException.NotFound();
-            
+
             var existingCatalogPrice = _catalogsPrices.SingleOrDefault(c => c.Catalog.Id == catalogId);
             if (existingCatalogPrice == null)
                 throw SheaftException.NotFound();
-            
+
             _catalogsPrices.Remove(existingCatalogPrice);
+            RefreshCatalogs();
         }
 
         public List<DomainEvent> DomainEvents { get; } = new List<DomainEvent>();
+
+        //Needed to update the UpdateOn column in SQL to be processed by azure search indexer
+        public void RefreshCatalogs()
+        {
+            UpdatedOn = DateTimeOffset.Now;
+        }
     }
 }

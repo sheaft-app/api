@@ -32,7 +32,7 @@ select
      , ra.City as producer_city
      , p.Picture as product_image
      , p.Available as product_available
-     , c.Available as product_searchable
+     , case when sum(case when c.Kind = 1 and c.Available = 1 then 1 end) > 0 then cast(1 as bit) else cast(0 as bit) end as product_searchable
      , case when p.Conditioning = 1 then 'BOX'
             when p.Conditioning = 2 then 'BULK'
             when p.Conditioning = 3 then 'BOUQUET'
@@ -40,16 +40,16 @@ select
             when p.Conditioning = 5 then 'PIECE'
             when p.Conditioning = 6 then 'BASKET' end as product_conditioning
      , app.InlineMax(app.InlineMax(app.InlineMax(p.UpdatedOn, r.UpdatedOn), t.UpdatedOn), p.CreatedOn) as last_update
-     , case when (app.InlineMax(p.RemovedOn, r.RemovedOn)) is not null or r.CanDirectSell = 0 then 1 else 0 end as removed
+     , case when (app.InlineMax(p.RemovedOn, r.RemovedOn)) is not null then 1 else 0 end as removed
      , '[' + STRING_AGG('"' + LOWER(t.Name) + '"', ',') + ']' as product_tags
      , ra.Longitude as producer_longitude
      , ra.Latitude as producer_latitude
      , geography::STGeomFromText('POINT('+convert(varchar(20),ra.Longitude)+' '+convert(varchar(20),ra.Latitude)+')',4326) as producer_geolocation
-from app.Catalogs c
-         join app.CatalogProducts cp on cp.CatalogUid = c.Uid and c.Kind = 1 and c.IsDefault = 1 and c.Available = 1
-         join app.Products p on p.Uid = cp.ProductUid
+from app.Products p
          join app.Users r on r.Uid = p.ProducerUid and r.Kind = 0
          join app.UserAddresses ra on r.Uid = ra.UserUid
+         left join app.CatalogProducts cp on cp.ProductUid = p.Uid
+         left join app.Catalogs c on c.Uid = cp.CatalogUid
          left join app.ProductTags pt on p.Uid = pt.ProductUid
          left join app.Returnables pa on pa.Uid = p.ReturnableUid
          left join app.Tags t on t.Uid = pt.TagUid
@@ -79,10 +79,14 @@ group by
     r.Id,
     r.Phone,
     p.Available,
-    c.Available,
     ra.Zipcode,
     ra.City,
-    app.InlineMax(app.InlineMax(app.InlineMax(p.UpdatedOn, r.UpdatedOn), t.UpdatedOn), p.CreatedOn),
-    case when (app.InlineMax(p.RemovedOn, r.RemovedOn)) is not null or r.CanDirectSell = 0 then 1 else 0 end,
     ra.Longitude,
-    ra.Latitude
+    ra.Latitude,
+    p.CreatedOn,
+    p.UpdatedOn,
+    p.RemovedOn,
+    r.UpdatedOn,
+    r.RemovedOn,
+    r.CanDirectSell,
+    t.UpdatedOn
