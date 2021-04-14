@@ -17,7 +17,7 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
             entity.Property(c => c.UpdatedOn).IsConcurrencyToken();
 
             entity.Property(o => o.Reference).IsRequired();
-            entity.Property(o => o.DroppedOn).HasColumnName("WithrawnOn");
+            entity.Property(o => o.DroppedOn).HasColumnName("WithdrawnOn");
 
             entity.Property(o => o.TotalWeight).HasColumnType("decimal(10,2)");
 
