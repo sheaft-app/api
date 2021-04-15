@@ -84,7 +84,9 @@ namespace Sheaft.GraphQL.Types
                 .Name("withdrawnPurchaseOrders")
                 .Authorize(Policies.STORE_OR_CONSUMER)
                 .Type<NonNullType<ListType<PurchaseOrderType>>>()
-                .UseSingleOrDefault()
+                .UsePaging<PurchaseOrderType>()
+                .UseFiltering<PurchaseOrderFilterType>()
+                .UseSorting<PurchaseOrderSortType>()
                 .UseSelection();
 
             descriptor.Field(c => c.DeletePurchaseOrdersAsync(default))
