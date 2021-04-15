@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Sheaft.Application.Interfaces;
@@ -38,6 +40,14 @@ namespace Sheaft.Mediatr.Returnable.Commands
             var entity = await _context.GetByIdAsync<Domain.Returnable>(request.ReturnableId, token);
 
             _context.Remove(entity);
+
+            var products = await _context.Products
+                .Where(p => p.Returnable != null && p.Returnable.Id == entity.Id)
+                .ToListAsync(token);
+
+            foreach (var product in products)
+                product.SetReturnable(null);
+            
             await _context.SaveChangesAsync(token);
 
             return Success();

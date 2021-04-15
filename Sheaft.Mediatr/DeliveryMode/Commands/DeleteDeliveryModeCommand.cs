@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
@@ -12,6 +13,8 @@ using Sheaft.Core;
 using Sheaft.Core.Enums;
 using Sheaft.Core.Exceptions;
 using Sheaft.Domain;
+using Sheaft.Domain.Enum;
+using Sheaft.Mediatr.Agreement.Commands;
 using Sheaft.Mediatr.Producer.Commands;
 
 namespace Sheaft.Mediatr.DeliveryMode.Commands
@@ -43,14 +46,34 @@ namespace Sheaft.Mediatr.DeliveryMode.Commands
             if(entity.Producer.Id != request.RequestUser.Id)
                 throw SheaftException.Forbidden();
 
-            var activeAgreements =
-                await _context.Agreements.CountAsync(a => a.Delivery.Id == entity.Id && !a.RemovedOn.HasValue, token);
-            if (activeAgreements > 0)
+            var agreements =
+                await _context.Agreements.Where(a => a.Delivery.Id == entity.Id).ToListAsync(token);
+            if (agreements.Any(a => a.Status == AgreementStatus.Accepted))
                 return Failure(MessageKind.DeliveryMode_CannotRemove_With_Active_Agreements, entity.Name,
-                    activeAgreements);
+                    agreements.Count(a => a.Status == AgreementStatus.Accepted));
 
-            _context.Remove(entity);            
-            await _context.SaveChangesAsync(token);
+            var orderDeliveries = await _context.Set<OrderDelivery>()
+                .Where(o => o.DeliveryMode.Id == entity.Id)
+                .ToListAsync(token);
+
+            using (var transaction = await _context.BeginTransactionAsync(token))
+            {
+                foreach (var agreement in agreements)
+                {
+                    var result =
+                        await _mediatr.Process(
+                            new DeleteAgreementCommand(request.RequestUser) {AgreementId = agreement.Id}, token);
+                    if (!result.Succeeded)
+                        return Failure(result.Exception, result.Message);
+                }
+                
+                foreach (var orderDelivery in orderDeliveries.ToList())
+                    _context.Remove(orderDelivery);
+
+                _context.Remove(entity);
+                await _context.SaveChangesAsync(token);
+                await transaction.CommitAsync(token);
+            }
 
             _mediatr.Post(new UpdateProducerAvailabilityCommand(request.RequestUser) {ProducerId = entity.Producer.Id});
             return Success();

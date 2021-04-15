@@ -23,12 +23,12 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
             entity.Property(o => o.Rating).HasColumnType("decimal(10,2)");
             entity.Property(o => o.RatingsCount).HasDefaultValue(0);
 
+            entity.HasOne(c => c.Returnable).WithMany().HasForeignKey("ReturnableUid").OnDelete(DeleteBehavior.NoAction);
             entity.HasOne(c => c.Producer).WithMany().HasForeignKey("ProducerUid").OnDelete(DeleteBehavior.Cascade);
             entity.HasMany(c => c.Ratings).WithOne().HasForeignKey("ProductUid").OnDelete(DeleteBehavior.Cascade);
             entity.HasMany(c => c.Tags).WithOne().HasForeignKey("ProductUid").OnDelete(DeleteBehavior.Cascade);
-            entity.HasOne(c => c.Returnable).WithMany().HasForeignKey("ReturnableUid").OnDelete(DeleteBehavior.NoAction);
             entity.HasMany(c => c.Pictures).WithOne().HasForeignKey("ProductUid").OnDelete(DeleteBehavior.Cascade);
-            entity.HasMany(c => c.CatalogsPrices).WithOne(c => c.Product).HasForeignKey("ProductUid").OnDelete(DeleteBehavior.Cascade);
+            entity.HasMany(c => c.CatalogsPrices).WithOne(c => c.Product).HasForeignKey("ProductUid").OnDelete(DeleteBehavior.NoAction);
 
             entity.Ignore(c => c.DomainEvents);
             

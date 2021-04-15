@@ -59,7 +59,7 @@ namespace Sheaft.Mediatr.Agreement.Commands
 
             foreach (var quickOrder in quickOrders)
             {
-                var products = quickOrder.Products.Where(p => p.CatalogProduct.Catalog.Id == entity.Catalog.Id);
+                var products = quickOrder.Products.Where(p => p.CatalogProduct.Catalog.Id == entity.Catalog.Id).ToList();
                 foreach (var product in products)
                     quickOrder.RemoveProduct(product.CatalogProduct.Product.Id);
             }

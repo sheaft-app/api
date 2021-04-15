@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
@@ -40,6 +41,10 @@ namespace Sheaft.Mediatr.Product.Commands
             var entity = await _context.GetByIdAsync<Domain.Product>(request.ProductId, token);
             if(entity.Producer.Id != request.RequestUser.Id)
                 throw SheaftException.Forbidden();
+
+            if (entity.CatalogsPrices != null && entity.CatalogsPrices.Any())
+                foreach (var catalogProduct in entity.CatalogsPrices.ToList())
+                    entity.RemoveFromCatalog(catalogProduct.Catalog.Id);
             
             _context.Remove(entity);
             await _context.SaveChangesAsync(token);
