@@ -41,7 +41,7 @@ namespace Sheaft.Mediatr.ProfileInformation.Commands
             if(entity.Id != request.RequestUser.Id)
                 throw SheaftException.Forbidden();
             
-            entity.ProfileInformation.RemovePicture(request.PictureId);
+            entity.RemovePicture(request.PictureId);
             await _context.SaveChangesAsync(token);
 
             return Success();

@@ -80,12 +80,12 @@ namespace Sheaft.Mediatr.Producer.Commands
             producer.SetPhone(request.Phone);
             producer.SetOpenForNewBusiness(request.OpenForNewBusiness);
             
-            producer.ProfileInformation.SetSummary(request.Summary);
-            producer.ProfileInformation.SetDescription(request.Description);
-            producer.ProfileInformation.SetFacebook(request.Facebook);
-            producer.ProfileInformation.SetTwitter(request.Twitter);
-            producer.ProfileInformation.SetWebsite(request.Website);
-            producer.ProfileInformation.SetInstagram(request.Instagram);
+            producer.SetSummary(request.Summary);
+            producer.SetDescription(request.Description);
+            producer.SetFacebook(request.Facebook);
+            producer.SetTwitter(request.Twitter);
+            producer.SetWebsite(request.Website);
+            producer.SetInstagram(request.Instagram);
 
             if (request.NotSubjectToVat.HasValue)
             {

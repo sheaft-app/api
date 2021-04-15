@@ -65,12 +65,12 @@ namespace Sheaft.Mediatr.Consumer.Commands
             consumer.SetFirstname(request.FirstName);
             consumer.SetLastname(request.LastName);
             
-            consumer.ProfileInformation.SetSummary(request.Summary);
-            consumer.ProfileInformation.SetDescription(request.Description);
-            consumer.ProfileInformation.SetFacebook(request.Facebook);
-            consumer.ProfileInformation.SetTwitter(request.Twitter);
-            consumer.ProfileInformation.SetWebsite(request.Website);
-            consumer.ProfileInformation.SetInstagram(request.Instagram);
+            consumer.SetSummary(request.Summary);
+            consumer.SetDescription(request.Description);
+            consumer.SetFacebook(request.Facebook);
+            consumer.SetTwitter(request.Twitter);
+            consumer.SetWebsite(request.Website);
+            consumer.SetInstagram(request.Instagram);
 
             await _context.SaveChangesAsync(token);
 

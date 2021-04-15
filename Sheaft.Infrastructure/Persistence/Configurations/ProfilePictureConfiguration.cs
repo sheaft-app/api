@@ -9,7 +9,7 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
         public void Configure(EntityTypeBuilder<ProfilePicture> entity)
         {
             entity.Property<long>("Uid");
-            entity.Property<long>("ProfileInformationUid");
+            entity.Property<long>("UserUid");
 
             entity.Property(c => c.CreatedOn);
             entity.Property(c => c.UpdatedOn).IsConcurrencyToken();
@@ -17,8 +17,8 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
             entity.HasKey("Uid");
 
             entity.HasIndex(c => c.Id).IsUnique();
-            entity.HasIndex("ProfileInformationUid");
-            entity.HasIndex("Uid", "Id", "ProfileInformationUid");
+            entity.HasIndex("UserUid");
+            entity.HasIndex("Uid", "Id", "UserUid");
 
             entity.ToTable("ProfilePictures");
         }

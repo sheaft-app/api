@@ -50,7 +50,7 @@ namespace Sheaft.Mediatr.ProfileInformation.Commands
             if (!result.Succeeded)
                 return Failure(result.Exception);
             
-            entity.ProfileInformation.AddPicture(new ProfilePicture(id, result.Data));
+            entity.AddPicture(new ProfilePicture(id, result.Data));
             await _context.SaveChangesAsync(token);
 
             return Success();

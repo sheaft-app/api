@@ -34,9 +34,6 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
                 cb.ToTable("UserAddresses");
             });
 
-            entity.HasOne(c => c.ProfileInformation);
-            entity.HasMany(c => c.Settings).WithOne().HasForeignKey("UserUid").OnDelete(DeleteBehavior.Cascade);
-
             entity.OwnsMany(c => c.Points, p =>
             {
                 p.Property<long>("Uid");
@@ -45,6 +42,8 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
                 p.ToTable("UserPoints");
             });
 
+            entity.HasMany(c => c.Settings).WithOne().HasForeignKey("UserUid").OnDelete(DeleteBehavior.Cascade);
+            entity.HasMany(c => c.Pictures).WithOne().HasForeignKey("UserUid").OnDelete(DeleteBehavior.Cascade);
             entity.HasMany<Sponsoring>().WithOne(c => c.Sponsor).HasForeignKey("SponsorUid").OnDelete(DeleteBehavior.NoAction);
 
             var settings = entity.Metadata.FindNavigation(nameof(User.Settings));
@@ -52,6 +51,9 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
             
             var points = entity.Metadata.FindNavigation(nameof(User.Points));
             points.SetPropertyAccessMode(PropertyAccessMode.Field);
+            
+            var pictures = entity.Metadata.FindNavigation(nameof(User.Pictures));
+            pictures.SetPropertyAccessMode(PropertyAccessMode.Field);
             
             entity.HasKey("Uid");
 

@@ -13,6 +13,7 @@ namespace Sheaft.Domain
     {
         private List<Points> _points;
         private List<UserSetting> _settings;
+        private List<ProfilePicture> _pictures;
 
         protected User()
         {
@@ -33,7 +34,6 @@ namespace Sheaft.Domain
             _settings = new List<UserSetting>();
             
             RefreshPoints();
-            SetProfileInformation(new ProfileInformation(this));
         }
 
         public Guid Id { get; private set; }
@@ -50,18 +50,84 @@ namespace Sheaft.Domain
         public string LastName { get; private set; }
         public string SponsorshipCode { get; private set; }
         public int TotalPoints { get; private set; }
+        public string Summary { get; private set; }
+        public string Description { get; private set; }
+        public string Website { get; private set; }
+        public string Facebook { get; private set; }
+        public string Twitter { get; private set; }
+        public string Instagram { get; private set; }
         public virtual UserAddress Address { get; private set; }
         public virtual Legal Legal { get; private set; }
-        public virtual ProfileInformation ProfileInformation { get; private set; }
-        public virtual IReadOnlyCollection<Points> Points { get { return _points.AsReadOnly(); } }
-        public virtual IReadOnlyCollection<UserSetting> Settings { get { return _settings.AsReadOnly(); } }
+        public virtual IReadOnlyCollection<Points> Points => _points.AsReadOnly();
+        public virtual IReadOnlyCollection<UserSetting> Settings => _settings.AsReadOnly();
+        public virtual IReadOnlyCollection<ProfilePicture> Pictures => _pictures?.AsReadOnly();
 
-        public void SetProfileInformation(ProfileInformation profileInformation)
+        public void SetSummary(string summary)
         {
-            if (profileInformation == null)
+            if (summary == null)
                 return;
 
-            ProfileInformation = profileInformation;
+            Summary = summary;
+        }
+
+        public void SetDescription(string description)
+        {
+            if (description == null)
+                return;
+
+            Description = description;
+        }
+
+        public void SetWebsite(string website)
+        {
+            if (website == null)
+                return;
+
+            Website = website;
+        }
+
+        public void SetFacebook(string facebook)
+        {
+            if (facebook == null)
+                return;
+
+            Facebook = facebook;
+        }
+
+        public void SetTwitter(string twitter)
+        {
+            if (twitter == null)
+                return;
+
+            Twitter = twitter;
+        }
+
+        public void SetInstagram(string instagram)
+        {
+            if (instagram == null)
+                return;
+
+            Instagram = instagram;
+        }
+        
+        public ProfilePicture AddPicture(ProfilePicture picture)
+        {
+            _pictures ??= new List<ProfilePicture>();
+            _pictures.Add(picture);
+
+            return picture;
+        }
+        
+        public void RemovePicture(Guid id)
+        {
+            if (_pictures == null || _pictures.Any())
+                throw SheaftException.NotFound();
+
+            var existingPicture = _pictures.FirstOrDefault(p => p.Id == id);
+            if (existingPicture == null)
+                throw SheaftException.NotFound();
+            
+            _pictures.Remove(existingPicture);
         }
         
         public void SetFirstname(string firstname)

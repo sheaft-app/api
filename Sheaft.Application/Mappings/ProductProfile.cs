@@ -28,17 +28,17 @@ namespace Sheaft.Application.Mappings
                 .ForMember(d => d.VisibleToStores,
                     opt => opt.MapFrom(p => p.CatalogsPrices.Any(cp => cp.Catalog.Kind == CatalogKind.Stores)))
                 .ForMember(d => d.WholeSalePricePerUnit,
-                    opt => opt.MapFrom(p => p.CatalogsPrices.FirstOrDefault().WholeSalePricePerUnit))
+                    opt => opt.MapFrom(p => p.CatalogsPrices.OrderByDescending(cp => cp.Catalog.Kind).FirstOrDefault().WholeSalePricePerUnit))
                 .ForMember(d => d.VatPricePerUnit,
-                    opt => opt.MapFrom(p => p.CatalogsPrices.FirstOrDefault().VatPricePerUnit))
+                    opt => opt.MapFrom(p => p.CatalogsPrices.OrderByDescending(cp => cp.Catalog.Kind).FirstOrDefault().VatPricePerUnit))
                 .ForMember(d => d.OnSalePricePerUnit,
-                    opt => opt.MapFrom(p => p.CatalogsPrices.FirstOrDefault().OnSalePricePerUnit))
+                    opt => opt.MapFrom(p => p.CatalogsPrices.OrderByDescending(cp => cp.Catalog.Kind).FirstOrDefault().OnSalePricePerUnit))
                 .ForMember(d => d.WholeSalePrice,
-                    opt => opt.MapFrom(p => p.CatalogsPrices.FirstOrDefault().WholeSalePrice))
+                    opt => opt.MapFrom(p => p.CatalogsPrices.OrderByDescending(cp => cp.Catalog.Kind).FirstOrDefault().WholeSalePrice))
                 .ForMember(d => d.VatPrice,
-                    opt => opt.MapFrom(p => p.CatalogsPrices.FirstOrDefault().VatPrice))
+                    opt => opt.MapFrom(p => p.CatalogsPrices.OrderByDescending(cp => cp.Catalog.Kind).FirstOrDefault().VatPrice))
                 .ForMember(d => d.OnSalePrice,
-                    opt => opt.MapFrom(p => p.CatalogsPrices.FirstOrDefault().OnSalePrice));
+                    opt => opt.MapFrom(p => p.CatalogsPrices.OrderByDescending(cp => cp.Catalog.Kind).FirstOrDefault().OnSalePrice));
         }
     }
 }

@@ -80,12 +80,12 @@ namespace Sheaft.Mediatr.Store.Commands
             store.SetPhone(request.Phone);
             store.SetOpenForNewBusiness(request.OpenForNewBusiness);
             
-            store.ProfileInformation.SetSummary(request.Summary);
-            store.ProfileInformation.SetDescription(request.Description);
-            store.ProfileInformation.SetFacebook(request.Facebook);
-            store.ProfileInformation.SetTwitter(request.Twitter);
-            store.ProfileInformation.SetWebsite(request.Website);
-            store.ProfileInformation.SetInstagram(request.Instagram);
+            store.SetSummary(request.Summary);
+            store.SetDescription(request.Description);
+            store.SetFacebook(request.Facebook);
+            store.SetTwitter(request.Twitter);
+            store.SetWebsite(request.Website);
+            store.SetInstagram(request.Instagram);
 
             var departmentCode = UserAddress.GetDepartmentCode(request.Address.Zipcode);
             var department = await _context.Departments.SingleOrDefaultAsync(d => d.Code == departmentCode, token);
