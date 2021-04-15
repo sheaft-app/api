@@ -30,15 +30,23 @@ namespace Sheaft.Mediatr.PurchaseOrder.EventHandlers
             var orderEvent = notification.DomainEvent;
             var purchaseOrder = await _context.GetByIdAsync<Domain.PurchaseOrder>(orderEvent.PurchaseOrderId, token);
             
-            await _signalrService.SendNotificationToGroupAsync(purchaseOrder.Vendor.Id, "PurchaseOrderWithdrawnEvent", purchaseOrder.GetPurchaseNotifModelAsString());
+            await _signalrService.SendNotificationToGroupAsync(purchaseOrder.Vendor.Id, nameof(PurchaseOrderWithdrawnedEvent), purchaseOrder.GetPurchaseNotifModelAsString());
 
-            var url = $"{_configuration.GetValue<string>("Portal:url")}/#/purchase-orders/{purchaseOrder.Id}";
+            await _emailService.SendTemplatedEmailAsync(
+                purchaseOrder.Sender.Email,
+                purchaseOrder.Sender.Name,
+                $"Votre commande pour {purchaseOrder.Vendor.Name} prévue pour le {purchaseOrder.ExpectedDelivery.ExpectedDeliveryDate:dd/MM/yyyy} a bien été annulée",
+                nameof(PurchaseOrderWithdrawnedEvent),
+                purchaseOrder.GetTemplateData($"{_configuration.GetValue<string>("Portal:url")}/#/my-orders/{purchaseOrder.Id}"),
+                true,
+                token);
+            
             await _emailService.SendTemplatedEmailAsync(
                 purchaseOrder.Vendor.Email,
                 purchaseOrder.Vendor.Name,
                 $"{purchaseOrder.Sender.Name} a annulé sa commande pour le {purchaseOrder.ExpectedDelivery.ExpectedDeliveryDate:dd/MM/yyyy}",
                 nameof(PurchaseOrderWithdrawnedEvent),
-                purchaseOrder.GetTemplateData(url),
+                purchaseOrder.GetTemplateData($"{_configuration.GetValue<string>("Portal:url")}/#/purchase-orders/{purchaseOrder.Id}"),
                 true,
                 token);
         }

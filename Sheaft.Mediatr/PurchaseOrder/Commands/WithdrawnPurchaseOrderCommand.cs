@@ -57,6 +57,7 @@ namespace Sheaft.Mediatr.PurchaseOrder.Commands
             var order = await _context.GetSingleAsync<Domain.Order>(
                 o => o.PurchaseOrders.Any(po => po.Id == purchaseOrder.Id),
                 token);
+            
             var delivery = order.Deliveries.FirstOrDefault(d => d.DeliveryMode.Producer.Id == purchaseOrder.Vendor.Id);
             if (delivery.DeliveryMode.MaxPurchaseOrdersPerTimeSlot.HasValue)
                 await _tableService.DecreaseProducerDeliveryCountAsync(delivery.DeliveryMode.Producer.Id,

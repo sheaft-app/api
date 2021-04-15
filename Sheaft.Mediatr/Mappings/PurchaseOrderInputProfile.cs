@@ -25,8 +25,8 @@ namespace Sheaft.Mediatr.Mappings
                 .ForMember(c => c.PurchaseOrderIds, opt => opt.MapFrom(r => r.Ids));
             CreateMap<ResourceIdsWithReasonDto, RefusePurchaseOrdersCommand>()
                 .ForMember(c => c.PurchaseOrderIds, opt => opt.MapFrom(r => r.Ids));
-            CreateMap<ResourceIdWithReasonDto, WithdrawnPurchaseOrderCommand>()
-                .ForMember(c => c.PurchaseOrderId, opt => opt.MapFrom(r => r.Id));
+            CreateMap<ResourceIdsWithReasonDto, WithdrawnPurchaseOrdersCommand>()
+                .ForMember(c => c.PurchaseOrderIds, opt => opt.MapFrom(r => r.Ids));
         }
     }
 }
