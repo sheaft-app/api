@@ -183,12 +183,12 @@ namespace Sheaft.Mediatr.Product.Queries
                         .ProjectTo<ProductDto>(_configurationProvider);
 
                 return _context.Products
-                    .Get(c => c.Id == id && c.CatalogsPrices.Any(cp => cp.Catalog.Kind == CatalogKind.Stores && cp.Catalog.IsDefault))
+                    .Get(c => c.Id == id)
                     .ProjectTo<ProductDto>(_configurationProvider);
             }
 
             return _context.Products
-                .Get(c => c.Id == id && c.CatalogsPrices.Any(cp => cp.Catalog.Kind == CatalogKind.Consumers))
+                .Get(c => c.Id == id)
                 .ProjectTo<ProductDto>(_configurationProvider);
         }
 
@@ -212,7 +212,7 @@ namespace Sheaft.Mediatr.Product.Queries
                         .ProjectTo<ProductDto>(_configurationProvider);
 
             return _context.Products
-                .Get(c => c.CatalogsPrices.Any(cp => cp.Catalog.Kind == CatalogKind.Consumers))
+                .Get()
                 .ProjectTo<ProductDto>(_configurationProvider);
         }
 
@@ -237,14 +237,12 @@ namespace Sheaft.Mediatr.Product.Queries
                         .ProjectTo<ProductDto>(_configurationProvider);
 
                 return _context.Products
-                    .Get(p => p.Producer.Id == producerId &&
-                              p.CatalogsPrices.Any(cp => cp.Catalog.Kind == CatalogKind.Stores && cp.Catalog.IsDefault))
+                    .Get(p => p.Producer.Id == producerId)
                     .ProjectTo<ProductDto>(_configurationProvider);
             }
 
             return _context.Products
-                .Get(p => p.Producer.Id == producerId &&
-                          p.CatalogsPrices.Any(cp => cp.Catalog.Kind == CatalogKind.Consumers))
+                .Get(p => p.Producer.Id == producerId)
                 .ProjectTo<ProductDto>(_configurationProvider);
         }
 

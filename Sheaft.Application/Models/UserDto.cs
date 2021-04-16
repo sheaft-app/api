@@ -23,6 +23,6 @@ namespace Sheaft.Application.Models
         public string Twitter { get; set; }
         public string Instagram { get; set; }
         public AddressDto Address { get; set; }
-        public List<PictureDto> Pictures { get; set; }
+        public IEnumerable<PictureDto> Pictures { get; set; }
     }
 }

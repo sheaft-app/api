@@ -39,9 +39,6 @@ namespace Sheaft.GraphQL.Types.Outputs
             descriptor.Field(c => c.Twitter);
             descriptor.Field(c => c.Instagram);
             descriptor.Field(c => c.Website);
-
-            descriptor.Field(c => c.Pictures)
-                .Type<ListType<PictureType>>();
         }
     }
 }

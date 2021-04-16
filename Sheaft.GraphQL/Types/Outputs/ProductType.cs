@@ -71,9 +71,6 @@ namespace Sheaft.GraphQL.Types.Outputs
                 .UseFiltering<RatingFilterType>()
                 .UsePaging<RatingType>();
 
-            descriptor.Field(c => c.Pictures)
-                .Type<ListType<PictureType>>();
-
             descriptor.Field(c => c.CatalogsPrices)
                 .Type<ListType<CatalogPriceType>>();
         }
