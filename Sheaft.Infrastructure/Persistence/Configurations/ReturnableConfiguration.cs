@@ -7,6 +7,13 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
 {
     public class ReturnableConfiguration : IEntityTypeConfiguration<Returnable>
     {
+        private readonly bool _isAdmin;
+
+        public ReturnableConfiguration(bool isAdmin)
+        {
+            _isAdmin = isAdmin;
+        }
+
         public void Configure(EntityTypeBuilder<Returnable> entity)
         {
             entity.Property<long>("Uid");
@@ -14,6 +21,9 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
 
             entity.Property(c => c.CreatedOn);
             entity.Property(c => c.UpdatedOn).IsConcurrencyToken();
+            
+            if(!_isAdmin)
+                entity.HasQueryFilter(p => !p.RemovedOn.HasValue);
 
             entity.Property(c => c.Kind).HasDefaultValue(ReturnableKind.Container);
 

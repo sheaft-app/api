@@ -64,10 +64,10 @@ namespace Sheaft.Mediatr.Payout.Commands
             CancellationToken token)
         {
             var producersTransfers = await _context.Transfers
-                .Get(t => t.Status == TransactionStatus.Succeeded
-                          && t.CreditedWallet.User.Legal.Validation == LegalValidation.Regular
-                          && (t.Payout == null || t.Payout.Status == TransactionStatus.Failed)
-                          && t.PurchaseOrder.Status == PurchaseOrderStatus.Delivered)
+                .Where(t => t.Status == TransactionStatus.Succeeded
+                            && t.CreditedWallet.User.Legal.Validation == LegalValidation.Regular
+                            && (t.Payout == null || t.Payout.Status == TransactionStatus.Failed)
+                            && t.PurchaseOrder.Status == PurchaseOrderStatus.Delivered)
                 .Select(t => new {ProducerId = t.CreditedWallet.User.Id, TransferId = t.Id})
                 .OrderBy(c => c.ProducerId)
                 .Skip(skip)

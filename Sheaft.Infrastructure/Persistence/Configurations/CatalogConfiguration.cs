@@ -6,6 +6,13 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
 {
     public class CatalogConfiguration : IEntityTypeConfiguration<Catalog>
     {
+        private readonly bool _isAdmin;
+
+        public CatalogConfiguration(bool isAdmin)
+        {
+            _isAdmin = isAdmin;
+        }
+        
         public void Configure(EntityTypeBuilder<Catalog> entity)
         {
             entity.Property<long>("Uid");
@@ -13,11 +20,14 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
 
             entity.Property(c => c.CreatedOn);
             entity.Property(c => c.UpdatedOn).IsConcurrencyToken();
+            
+            if(!_isAdmin)
+                entity.HasQueryFilter(p => !p.RemovedOn.HasValue);
 
             entity.Property(o => o.Name).IsRequired();
             
-            entity.HasOne(c => c.Producer).WithMany().HasForeignKey("ProducerUid").OnDelete(DeleteBehavior.Cascade);
-            entity.HasMany(c => c.Products).WithOne(c => c.Catalog).HasForeignKey("CatalogUid").OnDelete(DeleteBehavior.Cascade);
+            entity.HasOne(c => c.Producer).WithMany().HasForeignKey("ProducerUid").OnDelete(DeleteBehavior.Cascade).IsRequired();
+            entity.HasMany(c => c.Products).WithOne(c => c.Catalog).HasForeignKey("CatalogUid").OnDelete(DeleteBehavior.Cascade).IsRequired();
             
             var products = entity.Metadata.FindNavigation(nameof(Catalog.Products));
             products.SetPropertyAccessMode(PropertyAccessMode.Field);

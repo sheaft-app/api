@@ -6,6 +6,13 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
 {
     public class TransferConfiguration : IEntityTypeConfiguration<Transfer>
     {
+        private readonly bool _isAdmin;
+
+        public TransferConfiguration(bool isAdmin)
+        {
+            _isAdmin = isAdmin;
+        }
+
         public void Configure(EntityTypeBuilder<Transfer> entity)
         {
             entity.Property<long>("Uid");
@@ -21,11 +28,14 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
 
             entity.Property(c => c.CreatedOn);
             entity.Property(c => c.UpdatedOn).IsConcurrencyToken();
+            
+            if(!_isAdmin)
+                entity.HasQueryFilter(p => !p.RemovedOn.HasValue);
 
-            entity.HasOne(c => c.Author).WithMany().HasForeignKey("AuthorUid").OnDelete(DeleteBehavior.NoAction);
-            entity.HasOne(c => c.CreditedWallet).WithMany().HasForeignKey("CreditedWalletUid").OnDelete(DeleteBehavior.NoAction);
-            entity.HasOne(c => c.DebitedWallet).WithMany().HasForeignKey("DebitedWalletUid").OnDelete(DeleteBehavior.NoAction);
-            entity.HasOne(c => c.PurchaseOrder).WithMany().HasForeignKey("PurchaseOrderUid").OnDelete(DeleteBehavior.NoAction);
+            entity.HasOne(c => c.Author).WithMany().HasForeignKey("AuthorUid").OnDelete(DeleteBehavior.NoAction).IsRequired();
+            entity.HasOne(c => c.CreditedWallet).WithMany().HasForeignKey("CreditedWalletUid").OnDelete(DeleteBehavior.NoAction).IsRequired();
+            entity.HasOne(c => c.DebitedWallet).WithMany().HasForeignKey("DebitedWalletUid").OnDelete(DeleteBehavior.NoAction).IsRequired();
+            entity.HasOne(c => c.PurchaseOrder).WithMany().HasForeignKey("PurchaseOrderUid").OnDelete(DeleteBehavior.NoAction).IsRequired();
 
             entity.Ignore(c => c.DomainEvents);
             

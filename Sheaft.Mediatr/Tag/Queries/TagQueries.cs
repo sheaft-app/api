@@ -25,14 +25,13 @@ namespace Sheaft.Mediatr.Tag.Queries
         public IQueryable<TagDto> GetTag(Guid id, RequestUser currentUser)
         {
             return _context.Tags
-                    .Get(d => d.Id == id, true)
+                    .Where(d => d.Id == id)
                     .ProjectTo<TagDto>(_configurationProvider);
         }
 
         public IQueryable<TagDto> GetTags(RequestUser currentUser)
         {
             return _context.Tags
-                    .Get(null, true)
                     .ProjectTo<TagDto>(_configurationProvider);
         }
     }

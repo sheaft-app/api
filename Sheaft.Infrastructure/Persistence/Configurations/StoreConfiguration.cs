@@ -13,7 +13,7 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
                 cb.ToTable("StoreOpeningHours");
             });
 
-            entity.HasMany(c => c.Tags).WithOne().HasForeignKey("StoreUid").OnDelete(DeleteBehavior.Cascade);
+            entity.HasMany(c => c.Tags).WithOne().HasForeignKey("StoreUid").OnDelete(DeleteBehavior.Cascade).IsRequired();
 
             entity.Ignore(c => c.DomainEvents);
             

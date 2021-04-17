@@ -62,7 +62,7 @@ namespace Sheaft.Mediatr.Payout.Commands
         private async Task<IEnumerable<Guid>> GetNextPayoutIdsAsync(int skip, int take, CancellationToken token)
         {
             return await _context.Payouts
-                .Get(c => c.Status == TransactionStatus.Waiting || c.Status == TransactionStatus.Created, true)
+                .Where(c => c.Status == TransactionStatus.Waiting || c.Status == TransactionStatus.Created)
                 .OrderBy(c => c.CreatedOn)
                 .Select(c => c.Id)
                 .Skip(skip)

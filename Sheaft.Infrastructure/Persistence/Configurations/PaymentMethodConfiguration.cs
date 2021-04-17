@@ -7,6 +7,13 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
 {
     public class PaymentMethodConfiguration : IEntityTypeConfiguration<PaymentMethod>
     {
+        private readonly bool _isAdmin;
+
+        public PaymentMethodConfiguration(bool isAdmin)
+        {
+            _isAdmin = isAdmin;
+        }
+
         public void Configure(EntityTypeBuilder<PaymentMethod> entity)
         {
             entity.Property<long>("Uid");
@@ -14,6 +21,9 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
 
             entity.Property(c => c.CreatedOn);
             entity.Property(c => c.UpdatedOn).IsConcurrencyToken();
+            
+            if(!_isAdmin)
+                entity.HasQueryFilter(p => !p.RemovedOn.HasValue);
 
             entity.Property(c => c.Name).IsRequired();
 
@@ -21,7 +31,7 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
                 .HasValue<BankAccount>(PaymentKind.BankAccount)
                 .HasValue<Card>(PaymentKind.Card);
 
-            entity.HasOne(c => c.User).WithMany().HasForeignKey("UserUid").OnDelete(DeleteBehavior.Cascade);
+            entity.HasOne(c => c.User).WithMany().HasForeignKey("UserUid").OnDelete(DeleteBehavior.Cascade).IsRequired();
 
             entity.HasKey("Uid");
 

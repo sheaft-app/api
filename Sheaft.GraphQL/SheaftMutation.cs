@@ -279,28 +279,28 @@ namespace Sheaft.GraphQL
             [Service] IProductQueries productQueries)
         {
             var result = await ExecuteAsync<CreateProductDto, CreateProductCommand, Guid>(input, Token);
-            return productQueries.GetProduct(result, CurrentUser);
+            return await productQueries.GetProduct(result, CurrentUser, Token);
         }
 
         public async Task<IQueryable<ProductDto>> UpdateProductAsync(UpdateProductDto input,
             [Service] IProductQueries productQueries)
         {
             await ExecuteAsync<UpdateProductDto, UpdateProductCommand>(input, Token);
-            return productQueries.GetProduct(input.Id, CurrentUser);
+            return await productQueries.GetProduct(input.Id, CurrentUser, Token);
         }
 
         public async Task<IQueryable<ProductDto>> RateProductAsync(RateProductDto input,
             [Service] IProductQueries productQueries)
         {
             await ExecuteAsync<RateProductDto, RateProductCommand>(input, Token);
-            return productQueries.GetProduct(input.Id, CurrentUser);
+            return await productQueries.GetProduct(input.Id, CurrentUser, Token);
         }
 
         public async Task<IQueryable<ProductDto>> UpdateProductPictureAsync(UpdateResourceIdPictureDto input,
             [Service] IProductQueries productQueries)
         {
             await ExecuteAsync<UpdateResourceIdPictureDto, UpdateProductPreviewCommand, string>(input, Token);
-            return productQueries.GetProduct(input.Id, CurrentUser);
+            return await productQueries.GetProduct(input.Id, CurrentUser, Token);
         }
 
         public async Task<IQueryable<ProductDto>> SetProductsAvailabilityAsync(SetResourceIdsAvailabilityDto input,

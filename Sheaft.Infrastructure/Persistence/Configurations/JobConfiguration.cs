@@ -6,6 +6,13 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
 {
     public class JobConfiguration : IEntityTypeConfiguration<Job>
     {
+        private readonly bool _isAdmin;
+
+        public JobConfiguration(bool isAdmin)
+        {
+            _isAdmin = isAdmin;
+        }
+
         public void Configure(EntityTypeBuilder<Job> entity)
         {
             entity.Property<long>("Uid");
@@ -13,12 +20,15 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
 
             entity.Property(c => c.CreatedOn);
             entity.Property(c => c.UpdatedOn).IsConcurrencyToken();
+            
+            if(!_isAdmin)
+                entity.HasQueryFilter(p => !p.RemovedOn.HasValue);
 
             entity.Property(c => c.Name).IsRequired();
             entity.Property(c => c.Status).IsRequired();
             entity.Property(c => c.Kind).IsRequired();
 
-            entity.HasOne(o => o.User).WithMany().HasForeignKey("UserUid").OnDelete(DeleteBehavior.Cascade);
+            entity.HasOne(o => o.User).WithMany().HasForeignKey("UserUid").OnDelete(DeleteBehavior.Cascade).IsRequired();
 
             entity.Ignore(c => c.DomainEvents);
             

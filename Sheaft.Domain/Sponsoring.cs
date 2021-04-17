@@ -9,7 +9,7 @@ using Sheaft.Domain.Interop;
 
 namespace Sheaft.Domain
 {
-    public class Sponsoring: ITrackCreation, ITrackRemove, IHasDomainEvent
+    public class Sponsoring: ITrackCreation, IHasDomainEvent
     {
         protected Sponsoring() { }
 
@@ -27,7 +27,6 @@ namespace Sheaft.Domain
         }
 
         public DateTimeOffset CreatedOn { get; private set; }
-        public DateTimeOffset? RemovedOn { get; private set; }
         public virtual User Sponsor { get; private set; }
         public virtual User Sponsored { get; private set; }
         public List<DomainEvent> DomainEvents { get; } = new List<DomainEvent>();

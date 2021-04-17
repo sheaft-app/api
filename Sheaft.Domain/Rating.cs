@@ -6,7 +6,7 @@ using Sheaft.Domain.Interop;
 
 namespace Sheaft.Domain
 {
-    public class Rating : IEntity
+    public class Rating : IIdEntity, ITrackCreation, ITrackUpdate
     {
         protected Rating()
         {
@@ -32,7 +32,6 @@ namespace Sheaft.Domain
         public Guid Id { get; private set; }
         public DateTimeOffset CreatedOn { get; private set; }
         public DateTimeOffset? UpdatedOn { get; private set; }
-        public DateTimeOffset? RemovedOn { get; private set; }
         public decimal Value { get; private set; }
         public string Comment { get; private set; }
         public virtual User User { get; private set; }

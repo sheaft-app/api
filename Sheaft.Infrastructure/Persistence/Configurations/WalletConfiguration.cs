@@ -6,6 +6,13 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
 {
     public class WalletConfiguration : IEntityTypeConfiguration<Wallet>
     {
+        private readonly bool _isAdmin;
+
+        public WalletConfiguration(bool isAdmin)
+        {
+            _isAdmin = isAdmin;
+        }
+
         public void Configure(EntityTypeBuilder<Wallet> entity)
         {
             entity.Property<long>("Uid");
@@ -13,10 +20,14 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
 
             entity.Property(c => c.CreatedOn);
             entity.Property(c => c.UpdatedOn).IsConcurrencyToken();
+            
+            if(!_isAdmin)
+                entity.HasQueryFilter(p => !p.RemovedOn.HasValue);
+            
             entity.Property(c => c.Name).IsRequired();
             entity.Property(o => o.Balance).HasColumnType("decimal(10,2)");
 
-            entity.HasOne(c => c.User).WithMany().HasForeignKey("UserUid").OnDelete(DeleteBehavior.Cascade);
+            entity.HasOne(c => c.User).WithMany().HasForeignKey("UserUid").OnDelete(DeleteBehavior.Cascade).IsRequired();
 
             entity.HasKey("Uid");
 

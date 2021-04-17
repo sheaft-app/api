@@ -3,6 +3,7 @@ using Microsoft.Extensions.Localization;
 using Moq;
 using Sheaft.Localization;
 using System;
+using Microsoft.Extensions.Configuration;
 using Sheaft.Application.Interfaces;
 using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Application.Interfaces.Mediatr;
@@ -18,7 +19,7 @@ namespace Sheaft.Tests.Common
                 .UseInMemoryDatabase(Guid.NewGuid().ToString("N"))
                 .Options;
 
-            return new AppDbContext(options, Mock.Of<IStringLocalizer<MessageResources>>(), Mock.Of<ISheaftMediatr>());
+            return new AppDbContext(options, Mock.Of<IStringLocalizer<MessageResources>>(), Mock.Of<ISheaftMediatr>(), Mock.Of<IConfiguration>());
         }
     }
 }

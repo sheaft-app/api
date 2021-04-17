@@ -33,7 +33,7 @@ namespace Sheaft.Mediatr.BusinessClosing.Queries
             if (currentUser.IsInRole(_roleOptions.Owner.Value))
             {
                 return _context.Set<Domain.Business>()
-                    .Get(b => b.Id == currentUser.Id)
+                    .Where(b => b.Id == currentUser.Id)
                     .Select(b => b.Closings.SingleOrDefault(c => c.Id == id))
                     .ProjectTo<ClosingDto>(_configurationProvider);
             }
@@ -48,7 +48,7 @@ namespace Sheaft.Mediatr.BusinessClosing.Queries
             if (currentUser.IsInRole(_roleOptions.Owner.Value))
             {
                 return _context.Set<Domain.Business>()
-                    .Get(b => b.Id == currentUser.Id)
+                    .Where(b => b.Id == currentUser.Id)
                     .SelectMany(b => b.Closings.Where(c => c.ClosedTo > DateTimeOffset.UtcNow))
                     .ProjectTo<ClosingDto>(_configurationProvider);
             }

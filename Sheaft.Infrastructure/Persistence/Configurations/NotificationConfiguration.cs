@@ -13,14 +13,14 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
 
             entity.Property(c => c.CreatedOn);
             entity.Property(c => c.UpdatedOn).IsConcurrencyToken();
-
-            entity.HasOne(c => c.User).WithMany().HasForeignKey("UserUid").OnDelete(DeleteBehavior.NoAction);
+            
+            entity.HasOne(c => c.User).WithMany().HasForeignKey("UserUid").OnDelete(DeleteBehavior.NoAction).IsRequired();
 
             entity.HasKey("Uid");
 
             entity.HasIndex(c => c.Id).IsUnique();
             entity.HasIndex("UserUid");
-            entity.HasIndex("Uid", "Id", "UserUid", "RemovedOn");
+            entity.HasIndex("Uid", "Id", "UserUid");
 
             entity.ToTable("Notifications");
         }

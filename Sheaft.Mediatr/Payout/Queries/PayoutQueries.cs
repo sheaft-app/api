@@ -25,14 +25,14 @@ namespace Sheaft.Mediatr.Payout.Queries
         public IQueryable<PayoutDto> GetPayout(Guid id, RequestUser currentUser)
         {
             return _context.Payouts
-                .Get(d => d.Id == id && d.Author.Id == currentUser.Id)
+                .Where(d => d.Id == id && d.Author.Id == currentUser.Id)
                 .ProjectTo<PayoutDto>(_configurationProvider);
         }
 
         public IQueryable<PayoutDto> GetPayouts(RequestUser currentUser)
         {
             return _context.Payouts
-                .Get(d => d.Author.Id == currentUser.Id)
+                .Where(d => d.Author.Id == currentUser.Id)
                 .ProjectTo<PayoutDto>(_configurationProvider);
         }
     }

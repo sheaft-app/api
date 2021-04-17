@@ -14,7 +14,7 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
 
             entity.Property(c => c.CreatedOn);
             entity.Property(c => c.UpdatedOn).IsConcurrencyToken();
-
+            
             entity.OwnsOne(c => c.Owner, e => {
                 e.OwnsOne(a => a.Address);
             });
@@ -39,7 +39,7 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
                 d.ToTable("Documents");
             });
 
-            entity.HasOne(c => c.User).WithOne(u => u.Legal).HasForeignKey<Legal>("UserUid").OnDelete(DeleteBehavior.Cascade);
+            entity.HasOne(c => c.User).WithOne(u => u.Legal).HasForeignKey<Legal>("UserUid").OnDelete(DeleteBehavior.Cascade).IsRequired();
 
             entity.HasDiscriminator<UserKind>("UserKind")
                 .HasValue<ConsumerLegal>(UserKind.Consumer)

@@ -18,7 +18,8 @@ namespace Sheaft.Mediatr.PurchaseOrder.Queries
         private readonly AutoMapper.IConfigurationProvider _configurationProvider;
         private readonly RoleOptions _roleOptions;
 
-        public PurchaseOrderQueries(IAppDbContext context, AutoMapper.IConfigurationProvider configurationProvider, IOptionsSnapshot<RoleOptions> roleOptions)
+        public PurchaseOrderQueries(IAppDbContext context, AutoMapper.IConfigurationProvider configurationProvider,
+            IOptionsSnapshot<RoleOptions> roleOptions)
         {
             _roleOptions = roleOptions.Value;
             _context = context;
@@ -28,8 +29,8 @@ namespace Sheaft.Mediatr.PurchaseOrder.Queries
         public IQueryable<PurchaseOrderDto> MyPurchaseOrders(RequestUser currentUser)
         {
             return _context.PurchaseOrders
-                    .Get(c => c.Sender.Id == currentUser.Id)
-                    .ProjectTo<PurchaseOrderDto>(_configurationProvider);
+                .Where(c => c.Sender.Id == currentUser.Id)
+                .ProjectTo<PurchaseOrderDto>(_configurationProvider);
         }
 
         public IQueryable<PurchaseOrderDto> GetPurchaseOrder(Guid id, RequestUser currentUser)
@@ -37,13 +38,13 @@ namespace Sheaft.Mediatr.PurchaseOrder.Queries
             if (currentUser.IsInRole(_roleOptions.Producer.Value))
             {
                 return _context.PurchaseOrders
-                            .Get(c => c.Id == id && c.Vendor.Id == currentUser.Id)
-                            .ProjectTo<PurchaseOrderDto>(_configurationProvider);
+                    .Where(c => c.Id == id && c.Vendor.Id == currentUser.Id)
+                    .ProjectTo<PurchaseOrderDto>(_configurationProvider);
             }
 
             return _context.PurchaseOrders
-                        .Get(c => c.Id == id && c.Sender.Id == currentUser.Id)
-                        .ProjectTo<PurchaseOrderDto>(_configurationProvider);
+                .Where(c => c.Id == id && c.Sender.Id == currentUser.Id)
+                .ProjectTo<PurchaseOrderDto>(_configurationProvider);
         }
 
         public IQueryable<PurchaseOrderDto> GetPurchaseOrders(RequestUser currentUser)
@@ -51,13 +52,13 @@ namespace Sheaft.Mediatr.PurchaseOrder.Queries
             if (currentUser.IsInRole(_roleOptions.Producer.Value))
             {
                 return _context.PurchaseOrders
-                            .Get(c => c.Vendor.Id == currentUser.Id)
-                            .ProjectTo<PurchaseOrderDto>(_configurationProvider);
+                    .Where(c => c.Vendor.Id == currentUser.Id)
+                    .ProjectTo<PurchaseOrderDto>(_configurationProvider);
             }
 
             return _context.PurchaseOrders
-                        .Get(c => c.Sender.Id == currentUser.Id)
-                        .ProjectTo<PurchaseOrderDto>(_configurationProvider);
+                .Where(c => c.Sender.Id == currentUser.Id)
+                .ProjectTo<PurchaseOrderDto>(_configurationProvider);
         }
     }
 }

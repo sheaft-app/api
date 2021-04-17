@@ -582,9 +582,6 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                     b.Property<int>("Kind")
                         .HasColumnType("int");
 
-                    b.Property<DateTimeOffset?>("RemovedOn")
-                        .HasColumnType("datetimeoffset");
-
                     b.Property<DateTimeOffset?>("UpdatedOn")
                         .IsConcurrencyToken()
                         .HasColumnType("datetimeoffset");
@@ -700,9 +697,6 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                     b.Property<string>("Method")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTimeOffset?>("RemovedOn")
-                        .HasColumnType("datetimeoffset");
-
                     b.Property<bool>("Unread")
                         .HasColumnType("bit");
 
@@ -720,7 +714,7 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
 
                     b.HasIndex("UserUid");
 
-                    b.HasIndex("Uid", "Id", "UserUid", "RemovedOn");
+                    b.HasIndex("Uid", "Id", "UserUid");
 
                     b.ToTable("Notifications");
                 });
@@ -1220,6 +1214,7 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                         .HasColumnType("int");
 
                     b.Property<DateTimeOffset?>("UpdatedOn")
+                        .IsConcurrencyToken()
                         .HasColumnType("datetimeoffset");
 
                     b.HasKey("Uid");
@@ -1447,6 +1442,10 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                     b.Property<DateTimeOffset?>("DeliveredOn")
                         .HasColumnType("datetimeoffset");
 
+                    b.Property<DateTimeOffset?>("DroppedOn")
+                        .HasColumnName("WithdrawnOn")
+                        .HasColumnType("datetimeoffset");
+
                     b.Property<Guid>("Id")
                         .HasColumnType("uniqueidentifier");
 
@@ -1513,9 +1512,6 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
 
                     b.Property<DateTimeOffset?>("UpdatedOn")
                         .IsConcurrencyToken()
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<DateTimeOffset?>("WithdrawnOn")
                         .HasColumnType("datetimeoffset");
 
                     b.HasKey("Uid");
@@ -1784,9 +1780,6 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                     b.Property<long>("ProductUid")
                         .HasColumnType("bigint");
 
-                    b.Property<DateTimeOffset?>("RemovedOn")
-                        .HasColumnType("datetimeoffset");
-
                     b.Property<DateTimeOffset?>("UpdatedOn")
                         .IsConcurrencyToken()
                         .HasColumnType("datetimeoffset");
@@ -1806,7 +1799,7 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
 
                     b.HasIndex("UserUid");
 
-                    b.HasIndex("Uid", "Id", "ProductUid", "UserUid", "RemovedOn");
+                    b.HasIndex("Uid", "Id", "ProductUid", "UserUid");
 
                     b.ToTable("Ratings");
                 });
@@ -2069,7 +2062,7 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
 
                     b.HasIndex("WinnerUid");
 
-                    b.HasIndex("Uid", "Id", "DepartmentUid", "LevelUid", "RemovedOn");
+                    b.HasIndex("Uid", "Id", "DepartmentUid", "LevelUid");
 
                     b.ToTable("Rewards");
                 });
@@ -2116,9 +2109,6 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                         .HasColumnType("bigint");
 
                     b.Property<DateTimeOffset>("CreatedOn")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<DateTimeOffset?>("RemovedOn")
                         .HasColumnType("datetimeoffset");
 
                     b.HasKey("SponsorUid", "SponsoredUid");
@@ -3446,7 +3436,8 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
 
                     b.HasOne("Sheaft.Domain.Consumer", "Winner")
                         .WithMany()
-                        .HasForeignKey("WinnerUid");
+                        .HasForeignKey("WinnerUid")
+                        .OnDelete(DeleteBehavior.NoAction);
                 });
 
             modelBuilder.Entity("Sheaft.Domain.Sponsoring", b =>

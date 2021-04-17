@@ -6,6 +6,13 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
 {
     public class AgreementConfiguration : IEntityTypeConfiguration<Agreement>
     {
+        private readonly bool _isAdmin;
+
+        public AgreementConfiguration(bool isAdmin)
+        {
+            _isAdmin = isAdmin;
+        }
+        
         public void Configure(EntityTypeBuilder<Agreement> entity)
         {
             entity.Property<long>("Uid");
@@ -15,6 +22,9 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
 
             entity.Property(c => c.CreatedOn);
             entity.Property(c => c.UpdatedOn).IsConcurrencyToken();
+            
+            if(!_isAdmin)
+                entity.HasQueryFilter(p => !p.RemovedOn.HasValue);
 
             entity.OwnsMany(c => c.SelectedHours, cb =>
             {
@@ -23,8 +33,8 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
 
             entity.Ignore(c => c.DomainEvents);
 
-            entity.HasOne(c => c.Delivery).WithMany().HasForeignKey("DeliveryModeUid").OnDelete(DeleteBehavior.NoAction);
-            entity.HasOne(c => c.Store).WithMany().HasForeignKey("StoreUid").OnDelete(DeleteBehavior.Cascade);
+            entity.HasOne(c => c.Delivery).WithMany().HasForeignKey("DeliveryModeUid").OnDelete(DeleteBehavior.NoAction).IsRequired();
+            entity.HasOne(c => c.Store).WithMany().HasForeignKey("StoreUid").OnDelete(DeleteBehavior.Cascade).IsRequired();
             entity.HasOne(c => c.Catalog).WithMany().HasForeignKey("CatalogUid").OnDelete(DeleteBehavior.NoAction);
 
             var hours = entity.Metadata.FindNavigation(nameof(Agreement.SelectedHours));

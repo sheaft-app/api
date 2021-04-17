@@ -55,7 +55,7 @@ namespace Sheaft.Mediatr.Leaderboard.Queries
         public async Task<UserPositionDto> UserPositionInDepartmentAsync(Guid userId, RequestUser currentUser, CancellationToken token)
         {
             var departement = await _context.Users.OfType<Domain.User>()
-                .Get(u => u.Id == userId && !u.RemovedOn.HasValue)
+                .Where(u => u.Id == userId && !u.RemovedOn.HasValue)
                 .Select(u => u.Address.Department)
                 .SingleOrDefaultAsync(token);
 
@@ -68,7 +68,7 @@ namespace Sheaft.Mediatr.Leaderboard.Queries
         public async Task<UserPositionDto> UserPositionInRegionAsync(Guid userId, RequestUser currentUser, CancellationToken token)
         {
             var departement = await _context.Users.OfType<Domain.User>()
-                .Get(u => u.Id == userId && !u.RemovedOn.HasValue)
+                .Where(u => u.Id == userId && !u.RemovedOn.HasValue)
                 .Select(u => u.Address.Department)
                 .SingleOrDefaultAsync(token);
 

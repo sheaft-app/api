@@ -11,8 +11,8 @@ using Sheaft.Infrastructure.Persistence;
 namespace Sheaft.Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20210415174813_Merge_ProfileInformation")]
-    partial class Merge_ProfileInformation
+    [Migration("20210417205522_Remove_ProfileInformation_RemovedOn")]
+    partial class Remove_ProfileInformation_RemovedOn
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -48,6 +48,9 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                     b.Property<string>("Reason")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<DateTimeOffset?>("RemovedOn")
+                        .HasColumnType("datetimeoffset");
+
                     b.Property<int>("Status")
                         .HasColumnType("int");
 
@@ -71,7 +74,7 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
 
                     b.HasIndex("StoreUid");
 
-                    b.HasIndex("Uid", "Id", "StoreUid", "DeliveryModeUid", "CatalogUid");
+                    b.HasIndex("Uid", "Id", "StoreUid", "DeliveryModeUid", "CatalogUid", "RemovedOn");
 
                     b.ToTable("Agreements");
                 });
@@ -146,6 +149,9 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                     b.Property<long>("ProducerUid")
                         .HasColumnType("bigint");
 
+                    b.Property<DateTimeOffset?>("RemovedOn")
+                        .HasColumnType("datetimeoffset");
+
                     b.Property<DateTimeOffset?>("UpdatedOn")
                         .IsConcurrencyToken()
                         .HasColumnType("datetimeoffset");
@@ -157,7 +163,7 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
 
                     b.HasIndex("ProducerUid");
 
-                    b.HasIndex("Uid", "Id", "ProducerUid");
+                    b.HasIndex("Uid", "Id", "ProducerUid", "RemovedOn");
 
                     b.ToTable("Catalogs");
                 });
@@ -319,6 +325,9 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                     b.Property<long>("ProducerUid")
                         .HasColumnType("bigint");
 
+                    b.Property<DateTimeOffset?>("RemovedOn")
+                        .HasColumnType("datetimeoffset");
+
                     b.Property<DateTimeOffset?>("UpdatedOn")
                         .IsConcurrencyToken()
                         .HasColumnType("datetimeoffset");
@@ -330,7 +339,7 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
 
                     b.HasIndex("ProducerUid");
 
-                    b.HasIndex("Uid", "Id", "ProducerUid");
+                    b.HasIndex("Uid", "Id", "ProducerUid", "RemovedOn");
 
                     b.ToTable("DeliveryModes");
                 });
@@ -454,6 +463,9 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                     b.Property<string>("Reference")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<DateTimeOffset?>("RemovedOn")
+                        .HasColumnType("datetimeoffset");
+
                     b.Property<string>("ResultCode")
                         .HasColumnType("nvarchar(max)");
 
@@ -482,7 +494,7 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
 
                     b.HasIndex("OrderUid");
 
-                    b.HasIndex("Uid", "Id", "AuthorUid", "OrderUid", "CreditedWalletUid", "DebitedWalletUid");
+                    b.HasIndex("Uid", "Id", "AuthorUid", "OrderUid", "CreditedWalletUid", "DebitedWalletUid", "RemovedOn");
 
                     b.ToTable("Donations");
                 });
@@ -525,6 +537,9 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                     b.Property<string>("Queue")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<DateTimeOffset?>("RemovedOn")
+                        .HasColumnType("datetimeoffset");
+
                     b.Property<int?>("Retried")
                         .HasColumnType("int");
 
@@ -548,7 +563,7 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
 
                     b.HasIndex("UserUid");
 
-                    b.HasIndex("Uid", "Id", "UserUid");
+                    b.HasIndex("Uid", "Id", "UserUid", "RemovedOn");
 
                     b.ToTable("Jobs");
                 });
@@ -614,6 +629,9 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<DateTimeOffset?>("RemovedOn")
+                        .HasColumnType("datetimeoffset");
+
                     b.Property<int>("RequiredPoints")
                         .HasColumnType("int");
 
@@ -626,7 +644,7 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                     b.HasIndex("Id")
                         .IsUnique();
 
-                    b.HasIndex("Uid", "Id");
+                    b.HasIndex("Uid", "Id", "RemovedOn");
 
                     b.ToTable("Levels");
                 });
@@ -753,6 +771,9 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                     b.Property<string>("Reference")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<DateTimeOffset?>("RemovedOn")
+                        .HasColumnType("datetimeoffset");
+
                     b.Property<int>("ReturnablesCount")
                         .HasColumnType("int");
 
@@ -806,7 +827,7 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
 
                     b.HasIndex("UserUid");
 
-                    b.HasIndex("Uid", "Id", "UserUid");
+                    b.HasIndex("Uid", "Id", "UserUid", "RemovedOn");
 
                     b.ToTable("Orders");
                 });
@@ -968,6 +989,9 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                     b.Property<string>("Reference")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<DateTimeOffset?>("RemovedOn")
+                        .HasColumnType("datetimeoffset");
+
                     b.Property<string>("ResultCode")
                         .HasColumnType("nvarchar(max)");
 
@@ -994,7 +1018,7 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
 
                     b.HasIndex("OrderUid");
 
-                    b.HasIndex("Uid", "Id", "AuthorUid", "OrderUid", "CreditedWalletUid");
+                    b.HasIndex("Uid", "Id", "AuthorUid", "OrderUid", "CreditedWalletUid", "RemovedOn");
 
                     b.ToTable("Payins");
 
@@ -1027,6 +1051,9 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<DateTimeOffset?>("RemovedOn")
+                        .HasColumnType("datetimeoffset");
+
                     b.Property<DateTimeOffset?>("UpdatedOn")
                         .IsConcurrencyToken()
                         .HasColumnType("datetimeoffset");
@@ -1043,7 +1070,7 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
 
                     b.HasIndex("UserUid");
 
-                    b.HasIndex("Uid", "Id", "Identifier", "UserUid");
+                    b.HasIndex("Uid", "Id", "Identifier", "UserUid", "RemovedOn");
 
                     b.ToTable("PaymentMethods");
 
@@ -1093,6 +1120,9 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                     b.Property<string>("Reference")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<DateTimeOffset?>("RemovedOn")
+                        .HasColumnType("datetimeoffset");
+
                     b.Property<string>("ResultCode")
                         .HasColumnType("nvarchar(max)");
 
@@ -1119,7 +1149,7 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
 
                     b.HasIndex("Identifier");
 
-                    b.HasIndex("Uid", "Id", "AuthorUid", "BankAccountUid", "DebitedWalletUid");
+                    b.HasIndex("Uid", "Id", "AuthorUid", "BankAccountUid", "DebitedWalletUid", "RemovedOn");
 
                     b.ToTable("Payouts");
                 });
@@ -1164,6 +1194,9 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                     b.Property<decimal>("Remaining")
                         .HasColumnType("decimal(10,2)");
 
+                    b.Property<DateTimeOffset?>("RemovedOn")
+                        .HasColumnType("datetimeoffset");
+
                     b.Property<string>("ResultCode")
                         .HasColumnType("nvarchar(max)");
 
@@ -1183,6 +1216,7 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                         .HasColumnType("int");
 
                     b.Property<DateTimeOffset?>("UpdatedOn")
+                        .IsConcurrencyToken()
                         .HasColumnType("datetimeoffset");
 
                     b.HasKey("Uid");
@@ -1200,7 +1234,7 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                         .IsUnique()
                         .HasFilter("[PreAuthorizedPayinUid] IS NOT NULL");
 
-                    b.HasIndex("Uid", "Id", "OrderUid", "CardUid");
+                    b.HasIndex("Uid", "Id", "OrderUid", "CardUid", "RemovedOn");
 
                     b.ToTable("PreAuthorizations");
                 });
@@ -1267,6 +1301,9 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
+                    b.Property<DateTimeOffset?>("RemovedOn")
+                        .HasColumnType("datetimeoffset");
+
                     b.Property<long?>("ReturnableUid")
                         .HasColumnType("bigint");
 
@@ -1295,7 +1332,7 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                     b.HasIndex("ProducerUid", "Reference")
                         .IsUnique();
 
-                    b.HasIndex("Uid", "Id", "ProducerUid", "ReturnableUid");
+                    b.HasIndex("Uid", "Id", "ProducerUid", "ReturnableUid", "RemovedOn");
 
                     b.ToTable("Products");
                 });
@@ -1436,6 +1473,9 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
+                    b.Property<DateTimeOffset?>("RemovedOn")
+                        .HasColumnType("datetimeoffset");
+
                     b.Property<int>("ReturnablesCount")
                         .HasColumnType("int");
 
@@ -1492,7 +1532,7 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                     b.HasIndex("PurchaseOrderVendorUid", "Reference")
                         .IsUnique();
 
-                    b.HasIndex("OrderUid", "Uid", "Id", "PurchaseOrderVendorUid", "PurchaseOrderSenderUid");
+                    b.HasIndex("OrderUid", "Uid", "Id", "PurchaseOrderVendorUid", "PurchaseOrderSenderUid", "RemovedOn");
 
                     b.ToTable("PurchaseOrders");
                 });
@@ -1682,6 +1722,9 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<DateTimeOffset?>("RemovedOn")
+                        .HasColumnType("datetimeoffset");
+
                     b.Property<DateTimeOffset?>("UpdatedOn")
                         .IsConcurrencyToken()
                         .HasColumnType("datetimeoffset");
@@ -1696,7 +1739,7 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
 
                     b.HasIndex("UserUid");
 
-                    b.HasIndex("Uid", "Id", "UserUid");
+                    b.HasIndex("Uid", "Id", "UserUid", "RemovedOn");
 
                     b.ToTable("QuickOrders");
                 });
@@ -1803,6 +1846,9 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                     b.Property<string>("Reference")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<DateTimeOffset?>("RemovedOn")
+                        .HasColumnType("datetimeoffset");
+
                     b.Property<string>("ResultCode")
                         .HasColumnType("nvarchar(max)");
 
@@ -1827,7 +1873,7 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
 
                     b.HasIndex("Identifier");
 
-                    b.HasIndex("Uid", "Id", "AuthorUid", "DebitedWalletUid");
+                    b.HasIndex("Uid", "Id", "AuthorUid", "DebitedWalletUid", "RemovedOn");
 
                     b.ToTable("Refunds");
 
@@ -1928,6 +1974,9 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                     b.Property<long>("ProducerUid")
                         .HasColumnType("bigint");
 
+                    b.Property<DateTimeOffset?>("RemovedOn")
+                        .HasColumnType("datetimeoffset");
+
                     b.Property<DateTimeOffset?>("UpdatedOn")
                         .IsConcurrencyToken()
                         .HasColumnType("datetimeoffset");
@@ -1948,7 +1997,7 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
 
                     b.HasIndex("ProducerUid");
 
-                    b.HasIndex("Uid", "Id");
+                    b.HasIndex("Uid", "Id", "RemovedOn");
 
                     b.ToTable("Returnables");
                 });
@@ -1990,6 +2039,9 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
 
                     b.Property<string>("Picture")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTimeOffset?>("RemovedOn")
+                        .HasColumnType("datetimeoffset");
 
                     b.Property<DateTimeOffset?>("UpdatedOn")
                         .IsConcurrencyToken()
@@ -2115,6 +2167,9 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                     b.Property<string>("Picture")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<DateTimeOffset?>("RemovedOn")
+                        .HasColumnType("datetimeoffset");
+
                     b.Property<DateTimeOffset?>("UpdatedOn")
                         .IsConcurrencyToken()
                         .HasColumnType("datetimeoffset");
@@ -2124,7 +2179,7 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                     b.HasIndex("Id")
                         .IsUnique();
 
-                    b.HasIndex("Uid", "Id");
+                    b.HasIndex("Uid", "Id", "RemovedOn");
 
                     b.ToTable("Tags");
                 });
@@ -2178,6 +2233,9 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                     b.Property<string>("Reference")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<DateTimeOffset?>("RemovedOn")
+                        .HasColumnType("datetimeoffset");
+
                     b.Property<string>("ResultCode")
                         .HasColumnType("nvarchar(max)");
 
@@ -2208,7 +2266,7 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
 
                     b.HasIndex("PurchaseOrderUid");
 
-                    b.HasIndex("Uid", "Id", "AuthorUid", "PurchaseOrderUid", "CreditedWalletUid", "DebitedWalletUid");
+                    b.HasIndex("Uid", "Id", "AuthorUid", "PurchaseOrderUid", "CreditedWalletUid", "DebitedWalletUid", "RemovedOn");
 
                     b.ToTable("Transfers");
                 });
@@ -2336,6 +2394,9 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                     b.Property<DateTimeOffset>("CreatedOn")
                         .HasColumnType("datetimeoffset");
 
+                    b.Property<DateTimeOffset?>("ExternalUpdatedOn")
+                        .HasColumnType("datetimeoffset");
+
                     b.Property<Guid>("Id")
                         .HasColumnType("uniqueidentifier");
 
@@ -2348,6 +2409,9 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTimeOffset?>("RemovedOn")
+                        .HasColumnType("datetimeoffset");
 
                     b.Property<DateTimeOffset?>("UpdatedOn")
                         .IsConcurrencyToken()
@@ -2365,7 +2429,7 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
 
                     b.HasIndex("UserUid");
 
-                    b.HasIndex("Uid", "Id", "UserUid");
+                    b.HasIndex("Uid", "Id", "UserUid", "RemovedOn");
 
                     b.ToTable("Wallets");
                 });
@@ -2416,6 +2480,9 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                     b.Property<string>("Reference")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<DateTimeOffset?>("RemovedOn")
+                        .HasColumnType("datetimeoffset");
+
                     b.Property<string>("ResultCode")
                         .HasColumnType("nvarchar(max)");
 
@@ -2444,7 +2511,7 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
 
                     b.HasIndex("PayoutUid");
 
-                    b.HasIndex("Uid", "Id", "AuthorUid", "CreditedWalletUid", "DebitedWalletUid");
+                    b.HasIndex("Uid", "Id", "AuthorUid", "CreditedWalletUid", "DebitedWalletUid", "RemovedOn");
 
                     b.ToTable("Withholdings");
                 });
@@ -2684,13 +2751,13 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                     b.HasOne("Sheaft.Domain.Catalog", "Catalog")
                         .WithMany("Products")
                         .HasForeignKey("CatalogUid")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("Sheaft.Domain.Product", "Product")
                         .WithMany("CatalogsPrices")
                         .HasForeignKey("ProductUid")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
                 });
 
@@ -3011,7 +3078,8 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                 {
                     b.HasOne("Sheaft.Domain.DeliveryMode", "DeliveryMode")
                         .WithMany()
-                        .HasForeignKey("DeliveryModeUid");
+                        .HasForeignKey("DeliveryModeUid")
+                        .OnDelete(DeleteBehavior.NoAction);
 
                     b.HasOne("Sheaft.Domain.Order", null)
                         .WithMany("Deliveries")
@@ -3370,7 +3438,8 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
 
                     b.HasOne("Sheaft.Domain.Consumer", "Winner")
                         .WithMany()
-                        .HasForeignKey("WinnerUid");
+                        .HasForeignKey("WinnerUid")
+                        .OnDelete(DeleteBehavior.NoAction);
                 });
 
             modelBuilder.Entity("Sheaft.Domain.Sponsoring", b =>

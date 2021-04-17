@@ -25,14 +25,14 @@ namespace Sheaft.Mediatr.Donation.Queries
         public IQueryable<DonationDto> GetDonation(Guid id, RequestUser currentUser)
         {
             return _context.Donations
-                .Get(d => d.Id == id && d.Author.Id == currentUser.Id)
+                .Where(d => d.Id == id && d.Author.Id == currentUser.Id)
                 .ProjectTo<DonationDto>(_configurationProvider);
         }
 
         public IQueryable<DonationDto> GetDonations(RequestUser currentUser)
         {
             return _context.Donations
-                .Get(d => d.Author.Id == currentUser.Id)
+                .Where(d => d.Author.Id == currentUser.Id)
                 .ProjectTo<DonationDto>(_configurationProvider);
         }
     }

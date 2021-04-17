@@ -11,7 +11,7 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
             entity.Property<long>("Uid");
 
             entity.Property(c => c.Name).IsRequired();
-
+            
             entity.HasKey("Uid");
             entity.HasIndex(c => c.Id).IsUnique();
             entity.HasIndex(c => c.Kind).IsUnique();

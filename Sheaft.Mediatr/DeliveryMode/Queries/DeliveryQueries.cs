@@ -34,14 +34,14 @@ namespace Sheaft.Mediatr.DeliveryMode.Queries
         public IQueryable<DeliveryModeDto> GetDelivery(Guid id, RequestUser currentUser)
         {
             return _context.DeliveryModes
-                    .Get(c => c.Id == id && c.Producer.Id == currentUser.Id)
+                    .Where(c => c.Id == id && c.Producer.Id == currentUser.Id)
                     .ProjectTo<DeliveryModeDto>(_configurationProvider);
         }
 
         public IQueryable<DeliveryModeDto> GetDeliveries(RequestUser currentUser)
         {
             return _context.DeliveryModes
-                    .Get(c => c.Producer.Id == currentUser.Id)
+                    .Where(c => c.Producer.Id == currentUser.Id)
                     .ProjectTo<DeliveryModeDto>(_configurationProvider);
         }
 

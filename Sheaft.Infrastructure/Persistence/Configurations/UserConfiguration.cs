@@ -7,11 +7,21 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
 {
     public class UserConfiguration : IEntityTypeConfiguration<User>
     {
+        private readonly bool _isAdmin;
+
+        public UserConfiguration(bool isAdmin)
+        {
+            _isAdmin = isAdmin;
+        }
+
         public void Configure(EntityTypeBuilder<User> entity)
         {
             entity.Property<long>("Uid");
 
             entity.Property(c => c.UpdatedOn).IsConcurrencyToken();
+            
+            if(!_isAdmin)
+                entity.HasQueryFilter(p => !p.RemovedOn.HasValue);
 
             entity.Property(c => c.Name).IsRequired();
             entity.Property(c => c.Email).IsRequired();
@@ -42,9 +52,9 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
                 p.ToTable("UserPoints");
             });
 
-            entity.HasMany(c => c.Settings).WithOne().HasForeignKey("UserUid").OnDelete(DeleteBehavior.Cascade);
-            entity.HasMany(c => c.Pictures).WithOne().HasForeignKey("UserUid").OnDelete(DeleteBehavior.Cascade);
-            entity.HasMany<Sponsoring>().WithOne(c => c.Sponsor).HasForeignKey("SponsorUid").OnDelete(DeleteBehavior.NoAction);
+            entity.HasMany(c => c.Settings).WithOne().HasForeignKey("UserUid").OnDelete(DeleteBehavior.Cascade).IsRequired();
+            entity.HasMany(c => c.Pictures).WithOne().HasForeignKey("UserUid").OnDelete(DeleteBehavior.Cascade).IsRequired();
+            entity.HasMany<Sponsoring>().WithOne(c => c.Sponsor).HasForeignKey("SponsorUid").OnDelete(DeleteBehavior.NoAction).IsRequired();
 
             var settings = entity.Metadata.FindNavigation(nameof(User.Settings));
             settings.SetPropertyAccessMode(PropertyAccessMode.Field);

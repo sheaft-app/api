@@ -64,7 +64,7 @@ namespace Sheaft.Mediatr.PayinRefund.Commands
         {
             return await _context.Refunds
                 .OfType<Domain.PayinRefund>()
-                .Get(c => c.Status == TransactionStatus.Waiting || c.Status == TransactionStatus.Created, true)
+                .Where(c => c.Status == TransactionStatus.Waiting || c.Status == TransactionStatus.Created)
                 .OrderBy(c => c.CreatedOn)
                 .Select(c => c.Id)
                 .Skip(skip)

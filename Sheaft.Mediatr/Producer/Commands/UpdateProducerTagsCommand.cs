@@ -40,7 +40,7 @@ namespace Sheaft.Mediatr.Producer.Commands
         {
             var producer = await _context.GetByIdAsync<Domain.Producer>(request.ProducerId, token);
 
-            var productTags = await _context.Products.Get(p => p.Producer.Id == producer.Id).SelectMany(p => p.Tags)
+            var productTags = await _context.Products.Where(p => p.Producer.Id == producer.Id).SelectMany(p => p.Tags)
                 .Select(p => p.Tag).Distinct().ToListAsync(token);
             producer.SetTags(productTags);
 

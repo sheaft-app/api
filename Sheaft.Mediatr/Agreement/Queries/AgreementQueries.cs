@@ -31,14 +31,14 @@ namespace Sheaft.Mediatr.Agreement.Queries
             if (currentUser.IsInRole(_roleOptions.Store.Value))
             {
                 return _context.Agreements
-                        .Get(c => c.Id == id && c.Store.Id == currentUser.Id && !c.Delivery.RemovedOn.HasValue)
+                        .Where(c => c.Id == id && c.Store.Id == currentUser.Id && !c.Delivery.RemovedOn.HasValue)
                         .ProjectTo<AgreementDto>(_configurationProvider);
             }
 
             if (currentUser.IsInRole(_roleOptions.Producer.Value))
             {
                 return _context.Agreements
-                        .Get(c => c.Id == id && c.Delivery.Producer.Id == currentUser.Id && !c.Delivery.RemovedOn.HasValue)
+                        .Where(c => c.Id == id && c.Delivery.Producer.Id == currentUser.Id && !c.Delivery.RemovedOn.HasValue)
                         .ProjectTo<AgreementDto>(_configurationProvider);
             }
 
@@ -50,14 +50,14 @@ namespace Sheaft.Mediatr.Agreement.Queries
             if (currentUser.IsInRole(_roleOptions.Store.Value))
             {
                 return _context.Agreements
-                        .Get(c => c.Store.Id == currentUser.Id && !c.Delivery.RemovedOn.HasValue)
+                        .Where(c => c.Store.Id == currentUser.Id && !c.Delivery.RemovedOn.HasValue)
                         .ProjectTo<AgreementDto>(_configurationProvider);
             }
 
             if (currentUser.IsInRole(_roleOptions.Producer.Value))
             {
                 return _context.Agreements
-                        .Get(c => c.Delivery.Producer.Id == currentUser.Id && !c.Delivery.RemovedOn.HasValue)
+                        .Where(c => c.Delivery.Producer.Id == currentUser.Id && !c.Delivery.RemovedOn.HasValue)
                         .ProjectTo<AgreementDto>(_configurationProvider);
             }
 
@@ -69,7 +69,7 @@ namespace Sheaft.Mediatr.Agreement.Queries
             if (currentUser.IsInRole(_roleOptions.Producer.Value))
             {
                 return _context.Agreements
-                        .Get(c => c.Store.Id == storeId && c.Delivery.Producer.Id == currentUser.Id && !c.Delivery.RemovedOn.HasValue)
+                        .Where(c => c.Store.Id == storeId && c.Delivery.Producer.Id == currentUser.Id && !c.Delivery.RemovedOn.HasValue)
                         .ProjectTo<AgreementDto>(_configurationProvider);
             }
 
@@ -81,7 +81,7 @@ namespace Sheaft.Mediatr.Agreement.Queries
             if (currentUser.IsInRole(_roleOptions.Store.Value))
             {
                 return _context.Agreements
-                        .Get(c => c.Store.Id == currentUser.Id && c.Delivery.Producer.Id == producerId && !c.Delivery.RemovedOn.HasValue)
+                        .Where(c => c.Store.Id == currentUser.Id && c.Delivery.Producer.Id == producerId && !c.Delivery.RemovedOn.HasValue)
                         .ProjectTo<AgreementDto>(_configurationProvider);
             }
 

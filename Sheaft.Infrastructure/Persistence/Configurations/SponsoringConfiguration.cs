@@ -10,8 +10,8 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
         {
             entity.Property<long>("SponsoredUid");
             entity.Property<long>("SponsorUid");
-
-            entity.HasOne(c => c.Sponsored).WithMany().HasForeignKey("SponsoredUid").OnDelete(DeleteBehavior.NoAction);
+            
+            entity.HasOne(c => c.Sponsored).WithMany().HasForeignKey("SponsoredUid").OnDelete(DeleteBehavior.NoAction).IsRequired();
 
             entity.Ignore(c => c.DomainEvents);
 

@@ -61,7 +61,7 @@ namespace Sheaft.Mediatr.User.Queries
         public IQueryable<UserDto> GetUser(Guid id, RequestUser currentUser)
         {
             return _context.Users.OfType<Domain.User>()
-                    .Get(c => c.Id == id)
+                    .Where(c => c.Id == id)
                     .ProjectTo<UserDto>(_configurationProvider);
         }
 

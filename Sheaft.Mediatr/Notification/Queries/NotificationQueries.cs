@@ -27,7 +27,7 @@ namespace Sheaft.Mediatr.Notification.Queries
         public IQueryable<NotificationDto> GetNotification(Guid id, RequestUser currentUser)
         {
             return _context.Notifications
-                .Get(c => c.Id == id && c.User.Id == currentUser.Id)
+                .Where(c => c.Id == id && c.User.Id == currentUser.Id)
                 .ProjectTo<NotificationDto>(_configurationProvider);
         }
 
@@ -40,7 +40,7 @@ namespace Sheaft.Mediatr.Notification.Queries
         public IQueryable<NotificationDto> GetNotifications(RequestUser currentUser)
         {
             return _context.Notifications
-                .Get(c => c.User.Id == currentUser.Id)
+                .Where(c => c.User.Id == currentUser.Id)
                 .ProjectTo<NotificationDto>(_configurationProvider);
         }
     }

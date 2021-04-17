@@ -6,6 +6,13 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
 {
     public class ProductConfiguration : IEntityTypeConfiguration<Product>
     {
+        private readonly bool _isAdmin;
+
+        public ProductConfiguration(bool isAdmin)
+        {
+            _isAdmin = isAdmin;
+        }
+
         public void Configure(EntityTypeBuilder<Product> entity)
         {
             entity.Property<long>("Uid");
@@ -14,6 +21,9 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
 
             entity.Property(c => c.CreatedOn);
             entity.Property(c => c.UpdatedOn).IsConcurrencyToken();
+            
+            if(!_isAdmin)
+                entity.HasQueryFilter(p => !p.RemovedOn.HasValue);
 
             entity.Property(o => o.Name).IsRequired();
             entity.Property(o => o.Reference).IsRequired();
@@ -24,11 +34,11 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
             entity.Property(o => o.RatingsCount).HasDefaultValue(0);
 
             entity.HasOne(c => c.Returnable).WithMany().HasForeignKey("ReturnableUid").OnDelete(DeleteBehavior.NoAction);
-            entity.HasOne(c => c.Producer).WithMany().HasForeignKey("ProducerUid").OnDelete(DeleteBehavior.Cascade);
-            entity.HasMany(c => c.Ratings).WithOne().HasForeignKey("ProductUid").OnDelete(DeleteBehavior.Cascade);
-            entity.HasMany(c => c.Tags).WithOne().HasForeignKey("ProductUid").OnDelete(DeleteBehavior.Cascade);
-            entity.HasMany(c => c.Pictures).WithOne().HasForeignKey("ProductUid").OnDelete(DeleteBehavior.Cascade);
-            entity.HasMany(c => c.CatalogsPrices).WithOne(c => c.Product).HasForeignKey("ProductUid").OnDelete(DeleteBehavior.NoAction);
+            entity.HasOne(c => c.Producer).WithMany().HasForeignKey("ProducerUid").OnDelete(DeleteBehavior.Cascade).IsRequired();
+            entity.HasMany(c => c.Ratings).WithOne().HasForeignKey("ProductUid").OnDelete(DeleteBehavior.Cascade).IsRequired();
+            entity.HasMany(c => c.Tags).WithOne().HasForeignKey("ProductUid").OnDelete(DeleteBehavior.Cascade).IsRequired();
+            entity.HasMany(c => c.Pictures).WithOne().HasForeignKey("ProductUid").OnDelete(DeleteBehavior.Cascade).IsRequired();
+            entity.HasMany(c => c.CatalogsPrices).WithOne(c => c.Product).HasForeignKey("ProductUid").OnDelete(DeleteBehavior.NoAction).IsRequired();
 
             entity.Ignore(c => c.DomainEvents);
             

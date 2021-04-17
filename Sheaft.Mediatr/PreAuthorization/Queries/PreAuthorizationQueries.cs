@@ -23,14 +23,14 @@ namespace Sheaft.Mediatr.PreAuthorization.Queries
         public IQueryable<PreAuthorizationDto> GetPreAuthorization(Guid id, RequestUser currentUser)
         {
             return _context.PreAuthorizations
-                .Get(c => c.Id == id && c.Order.User.Id == currentUser.Id)
+                .Where(c => c.Id == id && c.Order.User.Id == currentUser.Id)
                 .ProjectTo<PreAuthorizationDto>(_configurationProvider);
         }
 
         public IQueryable<PreAuthorizationDto> GetPreAuthorizations(RequestUser currentUser)
         {
             return _context.PreAuthorizations
-                .Get(c => c.Order.User.Id == currentUser.Id)
+                .Where(c => c.Order.User.Id == currentUser.Id)
                 .ProjectTo<PreAuthorizationDto>(_configurationProvider);
         }
     }

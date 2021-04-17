@@ -355,16 +355,16 @@ namespace Sheaft.GraphQL
             return agreementQueries.GetProducerAgreements(input, CurrentUser);
         }
 
-        public IQueryable<ProductDto> GetProduct(Guid input, [Service] IProductQueries productQueries)
+        public async Task<IQueryable<ProductDto>> GetProduct(Guid input, [Service] IProductQueries productQueries)
         {
             SetLogTransaction(input);
-            return productQueries.GetProduct(input, CurrentUser);
+            return await productQueries.GetProduct(input, CurrentUser, Token);
         }
 
-        public IQueryable<ProductDto> GetProducerProducts(Guid input, [Service] IProductQueries productQueries)
+        public async Task<IQueryable<ProductDto>> GetProducerProducts(Guid input, [Service] IProductQueries productQueries)
         {
             SetLogTransaction(input);
-            return productQueries.GetProducerProducts(input, CurrentUser);
+            return await productQueries.GetProducerProducts(input, CurrentUser, Token);
         }
 
         public IQueryable<ProductDto> GetProducts([Service] IProductQueries productQueries)

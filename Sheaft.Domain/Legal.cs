@@ -8,7 +8,7 @@ using Sheaft.Domain.Interop;
 
 namespace Sheaft.Domain
 {
-    public abstract class Legal : IEntity
+    public abstract class Legal : IIdEntity, ITrackCreation, ITrackUpdate
     {
         private List<Document> _documents;
 
@@ -27,7 +27,6 @@ namespace Sheaft.Domain
         public Guid Id { get; private set; }
         public DateTimeOffset CreatedOn { get; private set; }
         public DateTimeOffset? UpdatedOn { get; private set; }
-        public DateTimeOffset? RemovedOn { get; private set; }
         public LegalKind Kind { get; protected set; }
         public LegalValidation Validation { get; protected set; }
         public virtual User User { get; private set; }

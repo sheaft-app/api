@@ -24,22 +24,22 @@ namespace Sheaft.Mediatr.QuickOrder.Queries
         public IQueryable<QuickOrderDto> GetUserDefaultQuickOrder(Guid userId, RequestUser currentUser)
         {
             return _context.QuickOrders
-                    .Get(c => c.User.Id == userId && c.IsDefault)
-                    .ProjectTo<QuickOrderDto>(_configurationProvider);
+                .Where(c => c.User.Id == userId && c.IsDefault)
+                .ProjectTo<QuickOrderDto>(_configurationProvider);
         }
 
         public IQueryable<QuickOrderDto> GetQuickOrder(Guid quickOrderId, RequestUser currentUser)
         {
             return _context.QuickOrders
-                    .Get(c => c.Id == quickOrderId && c.User.Id == currentUser.Id)
-                    .ProjectTo<QuickOrderDto>(_configurationProvider);
+                .Where(c => c.Id == quickOrderId && c.User.Id == currentUser.Id)
+                .ProjectTo<QuickOrderDto>(_configurationProvider);
         }
 
         public IQueryable<QuickOrderDto> GetQuickOrders(RequestUser currentUser)
         {
             return _context.QuickOrders
-                    .Get(c => c.User.Id == currentUser.Id)
-                    .ProjectTo<QuickOrderDto>(_configurationProvider);
+                .Where(c => c.User.Id == currentUser.Id)
+                .ProjectTo<QuickOrderDto>(_configurationProvider);
         }
     }
 }

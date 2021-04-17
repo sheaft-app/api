@@ -133,7 +133,7 @@ namespace Sheaft.Mediatr.Store.Queries
         public IQueryable<StoreDto> GetStore(Guid id, RequestUser currentUser)
         {
             return _context.Users.OfType<Domain.Store>()
-                    .Get(c => c.Id == id)
+                    .Where(c => c.Id == id)
                     .ProjectTo<StoreDto>(_configurationProvider);
         }
 

@@ -32,12 +32,12 @@ namespace Sheaft.Mediatr.Catalog.Queries
             if (currentUser.IsInRole(_roleOptions.Owner.Value))
             {
                 return _context.Set<Domain.Catalog>()
-                    .Get(b => b.Producer.Id == currentUser.Id && b.Id == id)
+                    .Where(b => b.Producer.Id == currentUser.Id && b.Id == id)
                     .ProjectTo<CatalogDto>(_configurationProvider);
             }
             
             return _context.Set<Domain.Catalog>()
-                .Get(c => c.Id == id)
+                .Where(c => c.Id == id)
                 .ProjectTo<CatalogDto>(_configurationProvider);
         }
 
@@ -60,12 +60,11 @@ namespace Sheaft.Mediatr.Catalog.Queries
             if (currentUser.IsInRole(_roleOptions.Owner.Value))
             {
                 return _context.Set<Domain.Catalog>()
-                    .Get(b => b.Producer.Id == currentUser.Id)
+                    .Where(b => b.Producer.Id == currentUser.Id)
                     .ProjectTo<CatalogDto>(_configurationProvider);
             }
             
             return _context.Set<Domain.Catalog>()
-                .Get()
                 .ProjectTo<CatalogDto>(_configurationProvider);
         }
     }

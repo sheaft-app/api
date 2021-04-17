@@ -25,7 +25,7 @@ namespace Sheaft.Mediatr.Legal.Queries
         {
             return _context.Legals
                     .OfType<ConsumerLegal>()
-                    .Get(c => c.User.Id == currentUser.Id)
+                    .Where(c => c.User.Id == currentUser.Id)
                     .ProjectTo<ConsumerLegalDto>(_configurationProvider);
         }
 
@@ -33,7 +33,7 @@ namespace Sheaft.Mediatr.Legal.Queries
         {
             return _context.Legals
                     .OfType<BusinessLegal>()
-                    .Get(c => c.User.Id == currentUser.Id)
+                    .Where(c => c.User.Id == currentUser.Id)
                     .ProjectTo<BusinessLegalDto>(_configurationProvider);
         }
 
@@ -41,7 +41,7 @@ namespace Sheaft.Mediatr.Legal.Queries
         {
             return _context.Legals
                     .OfType<ConsumerLegal>()
-                    .Get(c => c.Id == id && c.User.Id == currentUser.Id)
+                    .Where(c => c.Id == id && c.User.Id == currentUser.Id)
                     .ProjectTo<ConsumerLegalDto>(_configurationProvider);
         }
 
@@ -49,7 +49,7 @@ namespace Sheaft.Mediatr.Legal.Queries
         {
             return _context.Legals
                     .OfType<BusinessLegal>()
-                    .Get(c => c.Id == id && c.User.Id == currentUser.Id)
+                    .Where(c => c.Id == id && c.User.Id == currentUser.Id)
                     .ProjectTo<BusinessLegalDto>(_configurationProvider);
         }
     }

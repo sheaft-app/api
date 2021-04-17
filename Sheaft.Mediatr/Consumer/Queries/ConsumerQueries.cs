@@ -24,7 +24,7 @@ namespace Sheaft.Mediatr.Consumer.Queries
         public IQueryable<ConsumerDto> GetConsumer(Guid id, RequestUser currentUser)
         {
             return _context.Users.OfType<Domain.Consumer>()
-                    .Get(c => c.Id == id)
+                    .Where(c => c.Id == id)
                     .ProjectTo<ConsumerDto>(_configurationProvider);
         }
     }

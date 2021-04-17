@@ -63,7 +63,7 @@ namespace Sheaft.Mediatr.Donation.Commands
         private async Task<IEnumerable<Guid>> GetNextDonationIdsAsync(int skip, int take, CancellationToken token)
         {
             return await _context.Donations
-                .Get(c => c.Status == TransactionStatus.Waiting || c.Status == TransactionStatus.Created, true)
+                .Where(c => c.Status == TransactionStatus.Waiting || c.Status == TransactionStatus.Created)
                 .OrderBy(c => c.CreatedOn)
                 .Select(c => c.Id)
                 .Skip(skip)

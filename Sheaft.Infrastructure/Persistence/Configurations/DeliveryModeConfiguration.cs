@@ -6,6 +6,13 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
 {
     public class DeliveryModeConfiguration : IEntityTypeConfiguration<DeliveryMode>
     {
+        private readonly bool _isAdmin;
+
+        public DeliveryModeConfiguration(bool isAdmin)
+        {
+            _isAdmin = isAdmin;
+        }
+        
         public void Configure(EntityTypeBuilder<DeliveryMode> entity)
         {
             entity.Property<long>("Uid");
@@ -13,6 +20,9 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
 
             entity.Property(c => c.CreatedOn);
             entity.Property(c => c.UpdatedOn).IsConcurrencyToken();
+            
+            if(!_isAdmin)
+                entity.HasQueryFilter(p => !p.RemovedOn.HasValue);
 
             entity.OwnsOne(c => c.Address);
             entity.OwnsMany(c => c.OpeningHours, cb =>
@@ -20,7 +30,7 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
                 cb.ToTable("DeliveryModeOpeningHours");
             });
             
-            entity.HasMany(c => c.Closings).WithOne().HasForeignKey("DeliveryModeUid").OnDelete(DeleteBehavior.Cascade);
+            entity.HasMany(c => c.Closings).WithOne().HasForeignKey("DeliveryModeUid").OnDelete(DeleteBehavior.Cascade).IsRequired();
 
             entity.Ignore(c => c.DomainEvents);
             

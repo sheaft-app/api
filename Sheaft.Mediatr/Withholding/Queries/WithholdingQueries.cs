@@ -25,15 +25,15 @@ namespace Sheaft.Mediatr.Withholding.Queries
         public IQueryable<WithholdingDto> GetWithholding(Guid id, RequestUser currentUser)
         {
             return _context.Withholdings
-                .Get(d => d.Id == id && d.Author.Id == currentUser.Id)
-                    .ProjectTo<WithholdingDto>(_configurationProvider);
+                .Where(d => d.Id == id && d.Author.Id == currentUser.Id)
+                .ProjectTo<WithholdingDto>(_configurationProvider);
         }
 
         public IQueryable<WithholdingDto> GetWithholdings(RequestUser currentUser)
         {
             return _context.Withholdings
-                    .Get(d => d.Author.Id == currentUser.Id)
-                    .ProjectTo<WithholdingDto>(_configurationProvider);
+                .Where(d => d.Author.Id == currentUser.Id)
+                .ProjectTo<WithholdingDto>(_configurationProvider);
         }
     }
 }

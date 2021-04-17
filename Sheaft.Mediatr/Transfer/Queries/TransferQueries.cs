@@ -25,14 +25,13 @@ namespace Sheaft.Mediatr.Transfer.Queries
         public IQueryable<TransferDto> GetTransfer(Guid id, RequestUser currentUser)
         {
             return _context.Transfers
-                    .Get(d => d.Id == id, true)
+                    .Where(d => d.Id == id)
                     .ProjectTo<TransferDto>(_configurationProvider);
         }
 
         public IQueryable<TransferDto> GetTransfers(RequestUser currentUser)
         {
             return _context.Transfers
-                    .Get(null, true)
                     .ProjectTo<TransferDto>(_configurationProvider);
         }
     }

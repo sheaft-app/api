@@ -13,8 +13,8 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
             var businessTags = entity.Metadata.FindNavigation(nameof(Producer.Tags));
             businessTags.SetPropertyAccessMode(PropertyAccessMode.Field);
 
-            entity.HasMany<DeliveryMode>().WithOne(c => c.Producer).HasForeignKey("ProducerUid").OnDelete(DeleteBehavior.Cascade);
-            entity.HasMany<Returnable>().WithOne(c => c.Producer).HasForeignKey("ProducerUid").OnDelete(DeleteBehavior.Cascade);
+            entity.HasMany<DeliveryMode>().WithOne(c => c.Producer).HasForeignKey("ProducerUid").OnDelete(DeleteBehavior.Cascade).IsRequired();
+            entity.HasMany<Returnable>().WithOne(c => c.Producer).HasForeignKey("ProducerUid").OnDelete(DeleteBehavior.Cascade).IsRequired();
             
             entity.Ignore(c => c.DomainEvents);
         }

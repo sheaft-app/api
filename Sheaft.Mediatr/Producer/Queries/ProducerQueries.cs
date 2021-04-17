@@ -170,14 +170,13 @@ namespace Sheaft.Mediatr.Producer.Queries
         public IQueryable<ProducerDto> GetProducer(Guid id, RequestUser currentUser)
         {
             return _context.Users.OfType<Domain.Producer>()
-                    .Get(c => c.Id == id)
+                    .Where(c => c.Id == id)
                     .ProjectTo<ProducerDto>(_configurationProvider);
         }
 
         public IQueryable<ProducerDto> GetProducers(RequestUser currentUser)
         {
             return _context.Users.OfType<Domain.Producer>()
-                    .Get()
                     .ProjectTo<ProducerDto>(_configurationProvider);
         }
 

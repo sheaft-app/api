@@ -14,7 +14,7 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
             
             entity.HasKey("UserUid", "SettingUid");
 
-            entity.HasOne(c => c.Setting).WithMany().HasForeignKey("SettingUid").OnDelete(DeleteBehavior.Cascade);
+            entity.HasOne(c => c.Setting).WithMany().HasForeignKey("SettingUid").OnDelete(DeleteBehavior.Cascade).IsRequired();
             
             entity.ToTable("UserSettings");
         }
