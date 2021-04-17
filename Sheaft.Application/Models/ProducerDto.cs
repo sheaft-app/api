@@ -10,5 +10,6 @@ namespace Sheaft.Application.Models
         public bool NotSubjectToVat { get; set; }
         public IEnumerable<TagDto> Tags { get; set; }
         public IEnumerable<ClosingDto> Closings { get; set; }
+        public IEnumerable<PictureDto> Pictures { get; set; }
     }
 }
