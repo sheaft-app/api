@@ -1,5 +1,4 @@
 using System;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
@@ -11,15 +10,11 @@ using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Application.Interfaces.Mediatr;
 using Sheaft.Application.Models;
 using Sheaft.Core;
-using Sheaft.Core.Enums;
 using Sheaft.Domain;
-using Sheaft.Domain.Enum;
-using Sheaft.Domain.Events.Agreement;
 using Sheaft.Mediatr.Consumer.Commands;
-using Sheaft.Mediatr.Order.Commands;
 using Sheaft.Options;
 
-namespace Sheaft.Mediatr.PreAuthorization
+namespace Sheaft.Mediatr.PreAuthorization.Commands
 {
     public class CreatePreAuthorizationForOrderCommand : Command<Guid>
     {
@@ -67,10 +62,10 @@ namespace Sheaft.Mediatr.PreAuthorization
             var order = await _context.GetByIdAsync<Domain.Order>(request.OrderId, token);
             using (var transaction = await _context.BeginTransactionAsync(token))
             {
-                var card = await _context.FindSingleAsync<Card>(c => c.Identifier == request.CardIdentifier, token);
+                var card = await _context.FindSingleAsync<Domain.Card>(c => c.Identifier == request.CardIdentifier, token);
                 if (card == null)
                 {
-                    card = new Card(Guid.NewGuid(), request.CardIdentifier,
+                    card = new Domain.Card(Guid.NewGuid(), request.CardIdentifier,
                         $"Carte_{DateTime.UtcNow.ToString("YYYYMMDDTHHmmss")}", order.User);
                     await _context.AddAsync(card, token);
                     await _context.SaveChangesAsync(token);

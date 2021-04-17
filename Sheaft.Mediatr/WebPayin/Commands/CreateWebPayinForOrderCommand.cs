@@ -1,9 +1,7 @@
 ﻿using System;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Sheaft.Application.Interfaces.Business;
@@ -11,12 +9,11 @@ using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Application.Interfaces.Mediatr;
 using Sheaft.Core;
 using Sheaft.Core.Enums;
-using Sheaft.Core.Exceptions;
 using Sheaft.Domain;
 using Sheaft.Domain.Enum;
 using Sheaft.Mediatr.Consumer.Commands;
 
-namespace Sheaft.Mediatr.Order.Commands
+namespace Sheaft.Mediatr.WebPayin.Commands
 {
     public class CreateWebPayinForOrderCommand : Command<Guid>
     {
@@ -80,7 +77,7 @@ namespace Sheaft.Mediatr.Order.Commands
                 if (order.TotalOnSalePrice < 1)
                     return Failure<Guid>(MessageKind.Order_Total_CannotBe_LowerThan, 1);
 
-                var webPayin = new WebPayin(Guid.NewGuid(), wallet, order);
+                var webPayin = new Domain.WebPayin(Guid.NewGuid(), wallet, order);
 
                 await _context.AddAsync(webPayin, token);
                 await _context.SaveChangesAsync(token);

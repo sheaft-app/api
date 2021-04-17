@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using Sheaft.Application.Interfaces.Business;
 using Sheaft.Domain;
 
-namespace Sheaft.Business
+namespace Sheaft.Application.Interfaces.Factories
 {
     public interface ITransactionsExportersFactory
     {

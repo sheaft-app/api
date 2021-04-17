@@ -2,19 +2,15 @@ using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
-using Sheaft.Application.Interfaces.Business;
 using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Application.Interfaces.Mediatr;
 using Sheaft.Core;
 using Sheaft.Domain;
 using Sheaft.Domain.Enum;
-using Sheaft.Domain.Events.Agreement;
 using Sheaft.Mediatr.Order.Commands;
-using Sheaft.Options;
 
-namespace Sheaft.Mediatr.PreAuthorization
+namespace Sheaft.Mediatr.PreAuthorization.Commands
 {
     public class RefreshPreAuthorizationStatusCommand : Command<PreAuthorizationStatus>
     {

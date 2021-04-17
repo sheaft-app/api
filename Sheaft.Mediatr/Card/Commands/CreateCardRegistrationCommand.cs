@@ -10,7 +10,7 @@ using Sheaft.Application.Models;
 using Sheaft.Core;
 using Sheaft.Domain;
 
-namespace Sheaft.Mediatr.Cards.Commands
+namespace Sheaft.Mediatr.Card.Commands
 {
     public class CreateCardRegistrationCommand : Command<CardRegistrationDto>
     {

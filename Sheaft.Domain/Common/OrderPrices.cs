@@ -1,4 +1,4 @@
-namespace Sheaft.Application.Models
+namespace Sheaft.Domain.Common
 {
     public class OrderPrices
     {

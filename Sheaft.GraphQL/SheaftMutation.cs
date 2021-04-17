@@ -16,8 +16,9 @@ using Sheaft.Core.Exceptions;
 using Sheaft.Domain;
 using Sheaft.Mediatr.Agreement.Commands;
 using Sheaft.Mediatr.BusinessClosing.Commands;
-using Sheaft.Mediatr.Cards.Commands;
+using Sheaft.Mediatr.Card.Commands;
 using Sheaft.Mediatr.Catalog;
+using Sheaft.Mediatr.Catalog.Commands;
 using Sheaft.Mediatr.Consumer.Commands;
 using Sheaft.Mediatr.DeliveryClosing.Commands;
 using Sheaft.Mediatr.DeliveryMode.Commands;
@@ -27,6 +28,7 @@ using Sheaft.Mediatr.Notification.Commands;
 using Sheaft.Mediatr.Order.Commands;
 using Sheaft.Mediatr.PickingOrders.Commands;
 using Sheaft.Mediatr.PreAuthorization;
+using Sheaft.Mediatr.PreAuthorization.Commands;
 using Sheaft.Mediatr.Producer.Commands;
 using Sheaft.Mediatr.Product.Commands;
 using Sheaft.Mediatr.ProfileInformation.Commands;
@@ -36,6 +38,7 @@ using Sheaft.Mediatr.Returnable.Commands;
 using Sheaft.Mediatr.Store.Commands;
 using Sheaft.Mediatr.Transactions.Commands;
 using Sheaft.Mediatr.User.Commands;
+using Sheaft.Mediatr.WebPayin.Commands;
 
 namespace Sheaft.GraphQL
 {

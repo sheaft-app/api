@@ -3,13 +3,12 @@ using Sheaft.Application.Models;
 
 namespace Sheaft.GraphQL.Types.Outputs
 {
-    public class CatalogProductType : SheaftOutputType<CatalogProductDto>
+    public class CatalogPriceType : SheaftOutputType<CatalogPriceDto>
     {
-        protected override void Configure(IObjectTypeDescriptor<CatalogProductDto> descriptor)
+        protected override void Configure(IObjectTypeDescriptor<CatalogPriceDto> descriptor)
         {
             descriptor.Field(c => c.Id).Type<NonNullType<IdType>>();
             descriptor.Field(c => c.Name);
-            descriptor.Field(c => c.Reference);
             descriptor.Field(c => c.VatPricePerUnit);
             descriptor.Field(c => c.OnSalePricePerUnit);
             descriptor.Field(c => c.WholeSalePricePerUnit);

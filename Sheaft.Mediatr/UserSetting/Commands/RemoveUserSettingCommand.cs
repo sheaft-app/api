@@ -9,7 +9,7 @@ using Sheaft.Application.Interfaces.Mediatr;
 using Sheaft.Core;
 using Sheaft.Domain;
 
-namespace Sheaft.Mediatr.Setting.Commands
+namespace Sheaft.Mediatr.UserSetting.Commands
 {
     public class RemoveUserSettingCommand : Command
     {

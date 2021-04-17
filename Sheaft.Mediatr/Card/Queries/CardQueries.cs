@@ -7,7 +7,7 @@ using Sheaft.Application.Interfaces.Queries;
 using Sheaft.Application.Models;
 using Sheaft.Domain;
 
-namespace Sheaft.Mediatr.Cards.Queries
+namespace Sheaft.Mediatr.Card.Queries
 {
     public class CardQueries : ICardQueries
     {

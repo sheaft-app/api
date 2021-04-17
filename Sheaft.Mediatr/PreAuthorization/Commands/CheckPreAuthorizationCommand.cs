@@ -4,16 +4,13 @@ using System.Threading.Tasks;
 using MediatR;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using Sheaft.Application.Interfaces;
 using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Application.Interfaces.Mediatr;
 using Sheaft.Core;
-using Sheaft.Core.Enums;
 using Sheaft.Domain;
 using Sheaft.Domain.Enum;
-using Sheaft.Mediatr.PreAuthorization;
 
-namespace Sheaft.Mediatr.Payin.Commands
+namespace Sheaft.Mediatr.PreAuthorization.Commands
 {
     public class CheckPreAuthorizationCommand : Command
     {

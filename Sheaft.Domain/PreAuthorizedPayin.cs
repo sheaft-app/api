@@ -1,6 +1,6 @@
 using System;
 using System.Linq;
-using Sheaft.Application.Models;
+using Sheaft.Domain.Common;
 using Sheaft.Domain.Enum;
 
 namespace Sheaft.Domain

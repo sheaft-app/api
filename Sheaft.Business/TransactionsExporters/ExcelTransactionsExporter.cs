@@ -13,7 +13,7 @@ using Sheaft.Application.Services;
 using Sheaft.Core;
 using Sheaft.Domain;
 
-namespace Sheaft.Business
+namespace Sheaft.Business.TransactionsExporters
 {
     public class ExcelTransactionsExporter : SheaftService, ITransactionsFileExporter
     {

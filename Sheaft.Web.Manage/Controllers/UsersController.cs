@@ -15,6 +15,7 @@ using Sheaft.Core.Exceptions;
 using Sheaft.Domain;
 using Sheaft.Domain.Enum;
 using Sheaft.Mediatr.Setting.Commands;
+using Sheaft.Mediatr.UserSetting.Commands;
 using Sheaft.Options;
 using Sheaft.Web.Manage.Models;
 

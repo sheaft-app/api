@@ -13,6 +13,7 @@ using Sheaft.Mediatr.Payin.Commands;
 using Sheaft.Mediatr.PayinRefund.Commands;
 using Sheaft.Mediatr.Payout.Commands;
 using Sheaft.Mediatr.PreAuthorization;
+using Sheaft.Mediatr.PreAuthorization.Commands;
 using Sheaft.Mediatr.Transfer.Commands;
 
 namespace Sheaft.Web.Payment.Controllers

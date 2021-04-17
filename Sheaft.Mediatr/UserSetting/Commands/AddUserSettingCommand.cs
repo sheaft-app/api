@@ -8,9 +8,8 @@ using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Application.Interfaces.Mediatr;
 using Sheaft.Core;
 using Sheaft.Domain;
-using Sheaft.Domain.Enum;
 
-namespace Sheaft.Mediatr.Setting.Commands
+namespace Sheaft.Mediatr.UserSetting.Commands
 {
     public class AddUserSettingCommand : Command
     {

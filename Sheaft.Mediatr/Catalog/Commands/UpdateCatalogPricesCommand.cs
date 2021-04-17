@@ -12,7 +12,7 @@ using Sheaft.Application.Models;
 using Sheaft.Core;
 using Sheaft.Domain;
 
-namespace Sheaft.Mediatr.Catalog
+namespace Sheaft.Mediatr.Catalog.Commands
 {
     public class UpdateCatalogPricesCommand: Command
     {

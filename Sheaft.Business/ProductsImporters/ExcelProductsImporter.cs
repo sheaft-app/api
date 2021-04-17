@@ -15,7 +15,7 @@ using Sheaft.Core.Enums;
 using Sheaft.Core.Exceptions;
 using Sheaft.Domain.Enum;
 
-namespace Sheaft.Business
+namespace Sheaft.Business.ProductsImporters
 {
     public class ExcelProductsImporter : SheaftService, IProductsFileImporter
     {

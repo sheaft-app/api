@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Sheaft.Application.Models;
 using Sheaft.Mediatr.Order.Commands;
+using Sheaft.Mediatr.WebPayin.Commands;
 
 namespace Sheaft.Mediatr.Mappings
 {

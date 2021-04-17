@@ -16,6 +16,7 @@ using Sheaft.Domain;
 using Sheaft.Domain.Enum;
 using Sheaft.Mediatr.Donation.Commands;
 using Sheaft.Mediatr.PreAuthorizedPayin;
+using Sheaft.Mediatr.PreAuthorizedPayin.Commands;
 using Sheaft.Mediatr.PurchaseOrder.Commands;
 using Sheaft.Mediatr.User.Commands;
 

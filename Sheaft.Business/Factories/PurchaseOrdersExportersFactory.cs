@@ -9,7 +9,7 @@ using Sheaft.Domain;
 using Sheaft.Domain.Enum;
 using Sheaft.Options;
 
-namespace Sheaft.Business
+namespace Sheaft.Business.Factories
 {
     public class PurchaseOrdersExportersFactory : IPurchaseOrdersExportersFactory
     {

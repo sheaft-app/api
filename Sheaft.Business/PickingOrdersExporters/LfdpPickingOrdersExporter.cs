@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -16,7 +15,7 @@ using Sheaft.Core;
 using Sheaft.Domain;
 using Sheaft.Domain.Enum;
 
-namespace Sheaft.Business
+namespace Sheaft.Business.PickingOrdersExporters
 {
     public class LfdpPickingOrdersExporter : SheaftService, IPickingOrdersFileExporter
     {

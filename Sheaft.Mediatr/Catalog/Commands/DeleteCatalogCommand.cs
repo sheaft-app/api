@@ -12,7 +12,7 @@ using Sheaft.Core.Exceptions;
 using Sheaft.Domain;
 using Sheaft.Domain.Enum;
 
-namespace Sheaft.Mediatr.Catalog
+namespace Sheaft.Mediatr.Catalog.Commands
 {
     public class DeleteCatalogCommand: Command
     {

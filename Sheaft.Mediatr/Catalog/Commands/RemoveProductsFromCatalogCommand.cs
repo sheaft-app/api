@@ -10,7 +10,7 @@ using Sheaft.Application.Interfaces.Mediatr;
 using Sheaft.Core;
 using Sheaft.Domain;
 
-namespace Sheaft.Mediatr.Catalog
+namespace Sheaft.Mediatr.Catalog.Commands
 {
     public class RemoveProductsFromCatalogCommand: Command
     {

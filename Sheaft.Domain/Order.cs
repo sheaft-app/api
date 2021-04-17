@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Sheaft.Application.Models;
 using Sheaft.Core.Exceptions;
 using Sheaft.Domain.Common;
 using Sheaft.Domain.Enum;

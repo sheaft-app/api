@@ -15,7 +15,7 @@ using Sheaft.Application.Services;
 using Sheaft.Core;
 using Sheaft.Domain;
 
-namespace Sheaft.Business
+namespace Sheaft.Business.PickingOrdersExporters
 {
     public class ExcelPickingOrdersExporter : SheaftService, IPickingOrdersFileExporter
     {

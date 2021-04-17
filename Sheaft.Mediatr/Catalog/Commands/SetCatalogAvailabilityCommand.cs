@@ -1,5 +1,4 @@
 using System;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
@@ -7,10 +6,9 @@ using Microsoft.Extensions.Logging;
 using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Application.Interfaces.Mediatr;
 using Sheaft.Core;
-using Sheaft.Core.Exceptions;
 using Sheaft.Domain;
 
-namespace Sheaft.Mediatr.Catalog
+namespace Sheaft.Mediatr.Catalog.Commands
 {
     public class SetCatalogAvailabilityCommand: Command
     {

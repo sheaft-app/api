@@ -13,7 +13,7 @@ using Sheaft.Domain;
 using Sheaft.Domain.Enum;
 using Sheaft.Mediatr.Donation.Commands;
 
-namespace Sheaft.Mediatr.PreAuthorizedPayin
+namespace Sheaft.Mediatr.PreAuthorizedPayin.Commands
 {
     public class CreatePreAuthorizedPayinCommand : Command<Guid>
     {

@@ -1,6 +1,7 @@
 using AutoMapper;
 using Sheaft.Application.Models;
 using Sheaft.Mediatr.Catalog;
+using Sheaft.Mediatr.Catalog.Commands;
 
 namespace Sheaft.Mediatr.Mappings
 {

@@ -9,9 +9,8 @@ using Sheaft.Application.Interfaces.Mediatr;
 using Sheaft.Core;
 using Sheaft.Domain;
 using Sheaft.Domain.Enum;
-using Sheaft.Mediatr.PurchaseOrder.Commands;
 
-namespace Sheaft.Mediatr.Payin.Commands
+namespace Sheaft.Mediatr.PurchaseOrder.Commands
 {
     public class ExpirePurchaseOrderCommand : Command
     {
