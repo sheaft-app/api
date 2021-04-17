@@ -64,7 +64,7 @@ namespace Sheaft.Mediatr.Ubo.Commands
 
             var result = await _pspService.CreateUboAsync(ubo, legal.Declaration, legal.User, token);
             if (!result.Succeeded)
-                return Failure<Guid>(result.Exception);
+                return Failure<Guid>(result);
 
             ubo.SetIdentifier(result.Data);
 

@@ -8,6 +8,7 @@ using Sheaft.Application.Interfaces;
 using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Application.Interfaces.Mediatr;
 using Sheaft.Core;
+using Sheaft.Core.Enums;
 using Sheaft.Core.Exceptions;
 using Sheaft.Domain;
 using Sheaft.Mediatr.Auth.Commands;
@@ -46,12 +47,12 @@ namespace Sheaft.Mediatr.User.Commands
         {
             var entity = await _context.GetByIdAsync<Domain.User>(request.UserId, token);
             if(entity.Id != request.RequestUser.Id)
-                throw SheaftException.Forbidden();
+                return Failure<string>(MessageKind.Forbidden);
 
             var resultImage =
                 await _imageService.HandleUserPictureAsync(entity, request.Picture, request.OriginalPicture, token);
             if (!resultImage.Succeeded)
-                return Failure<string>(resultImage.Exception);
+                return Failure<string>(resultImage);
 
             entity.SetPicture(resultImage.Data);
             await _context.SaveChangesAsync(token);
@@ -66,7 +67,7 @@ namespace Sheaft.Mediatr.User.Commands
             }, token);
 
             if (!result.Succeeded)
-                return Failure<string>(result.Exception);
+                return Failure<string>(result);
 
             return Success(resultImage.Data);
         }

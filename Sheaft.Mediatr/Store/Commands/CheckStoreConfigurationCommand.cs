@@ -41,13 +41,13 @@ namespace Sheaft.Mediatr.Store.Commands
                 await _mediatr.Process(
                     new CheckBusinessLegalConfigurationCommand(request.RequestUser) {UserId = request.StoreId}, token);
             if (!business.Succeeded)
-                return Failure(business.Exception);
+                return Failure(business);
 
             var wallet =
                 await _mediatr.Process(
                     new CheckWalletPaymentsConfigurationCommand(request.RequestUser) {UserId = request.StoreId}, token);
             if (!wallet.Succeeded)
-                return Failure(wallet.Exception);
+                return Failure(wallet);
 
             return Success();
         }

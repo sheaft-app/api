@@ -10,6 +10,7 @@ using Sheaft.Application.Interfaces;
 using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Application.Interfaces.Mediatr;
 using Sheaft.Core;
+using Sheaft.Core.Enums;
 using Sheaft.Core.Exceptions;
 using Sheaft.Domain;
 using Sheaft.Mediatr.Auth.Commands;
@@ -58,7 +59,7 @@ namespace Sheaft.Mediatr.Consumer.Commands
         {
             var consumer = await _context.GetByIdAsync<Domain.Consumer>(request.ConsumerId, token);
             if(consumer.Id != request.RequestUser.Id)
-                throw SheaftException.Forbidden();
+                return Failure(MessageKind.Forbidden);
 
             consumer.SetEmail(request.Email);
             consumer.SetPhone(request.Phone);
@@ -82,7 +83,7 @@ namespace Sheaft.Mediatr.Consumer.Commands
             }, token);
 
             if (!resultImage.Succeeded)
-                return Failure(resultImage.Exception);
+                return Failure(resultImage);
 
             var authResult = await _mediatr.Process(new UpdateAuthUserCommand(request.RequestUser)
             {

@@ -55,13 +55,13 @@ namespace Sheaft.Mediatr.Order.Commands
             var productIds = request.Products.Select(p => p.Id);
             var cartProductsResult = await _orderService.GetCartProductsAsync(productIds, request.Products, token);
             if (!cartProductsResult.Succeeded)
-                return Failure<Guid>(cartProductsResult.Message);
+                return Failure<Guid>(cartProductsResult);
 
             var deliveryIds = request.ProducersExpectedDeliveries?.Select(p => p.DeliveryModeId) ?? new List<Guid>();
             var cartDeliveriesResult = await _orderService.GetCartDeliveriesAsync(request.ProducersExpectedDeliveries, deliveryIds,
                 cartProductsResult.Data, token);
             if (!cartDeliveriesResult.Succeeded)
-                return Failure<Guid>(cartDeliveriesResult.Message);
+                return Failure<Guid>(cartDeliveriesResult);
             
             Domain.User user = request.UserId.HasValue && request.UserId != Guid.Empty ? await _context.GetByIdAsync<Domain.User>(request.UserId.Value, token) : null;
             var order = new Domain.Order(Guid.NewGuid(), request.Donation, cartProductsResult.Data, _pspOptions.FixedAmount,

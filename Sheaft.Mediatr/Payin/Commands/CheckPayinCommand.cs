@@ -44,7 +44,7 @@ namespace Sheaft.Mediatr.Payin.Commands
                     new RefreshPayinStatusCommand(request.RequestUser, payin.Identifier),
                     token);
                 if (!result.Succeeded)
-                    return Failure(result.Exception);
+                    return Failure(result);
             }
             
             return Success();

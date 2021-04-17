@@ -57,7 +57,7 @@ namespace Sheaft.Mediatr.Wallet.Commands
                 if (!result.Succeeded)
                 {
                     await transaction.RollbackAsync(token);
-                    return Failure<Guid>(result.Exception);
+                    return Failure<Guid>(result);
                 }
 
                 wallet.SetIdentifier(result.Data);

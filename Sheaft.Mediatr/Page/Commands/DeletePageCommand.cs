@@ -49,7 +49,7 @@ namespace Sheaft.Mediatr.Page.Commands
             var deleteResult =
                 await _blobService.DeleteDocumentPageAsync(document.Id, request.PageId, legal.User.Id, token);
             if (!deleteResult.Succeeded)
-                return Failure(deleteResult.Exception);
+                return Failure(deleteResult);
 
             document.DeletePage(request.PageId);
 

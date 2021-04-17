@@ -613,11 +613,8 @@ namespace Sheaft.GraphQL
             var result = await _mediator.Process(command, token);
             if (result.Succeeded)
                 return true;
-
-            if (result.Exception != null)
-                throw result.Exception;
-
-            throw SheaftException.Unexpected(result.Message);
+            
+            throw new SheaftException(result);
         }
 
         private async Task<TX> ExecuteAsync<T, TU, TX>(T input, CancellationToken token,
@@ -630,10 +627,7 @@ namespace Sheaft.GraphQL
             if (result.Succeeded)
                 return result.Data;
 
-            if (result.Exception != null)
-                throw result.Exception;
-
-            throw SheaftException.Unexpected(result.Message);
+            throw new SheaftException(result);
         }
 
         private void SetLogTransaction(object input, string name)

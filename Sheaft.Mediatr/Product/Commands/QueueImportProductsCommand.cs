@@ -49,7 +49,7 @@ namespace Sheaft.Mediatr.Product.Commands
             var response =
                 await _blobService.UploadImportProductsFileAsync(request.ProducerId, entity.Id, request.FileStream, token);
             if (!response.Succeeded)
-                return Failure<Guid>(response.Exception);
+                return Failure<Guid>(response);
 
             await _context.AddAsync(entity, token);
             await _context.SaveChangesAsync(token);

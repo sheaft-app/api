@@ -49,7 +49,7 @@ namespace Sheaft.Mediatr.PayinRefund.Commands
 
             var pspResult = await _pspService.GetRefundAsync(payinRefund.Identifier, token);
             if (!pspResult.Succeeded)
-                return Failure(pspResult.Exception);
+                return Failure(pspResult);
 
             payinRefund.SetStatus(pspResult.Data.Status);
             payinRefund.SetResult(pspResult.Data.ResultCode, pspResult.Data.ResultMessage);

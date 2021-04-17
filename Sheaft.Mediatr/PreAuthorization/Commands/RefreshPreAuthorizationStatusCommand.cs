@@ -51,7 +51,7 @@ namespace Sheaft.Mediatr.PreAuthorization.Commands
 
             var pspResult = await _pspService.GetPreAuthorizationAsync(preAuthorization.Identifier, token);
             if (!pspResult.Succeeded)
-                return Failure<PreAuthorizationStatus>(pspResult.Exception);
+                return Failure<PreAuthorizationStatus>(pspResult);
 
             preAuthorization.SetStatus(pspResult.Data.Status);
             preAuthorization.SetResult(pspResult.Data.ResultCode, pspResult.Data.ResultMessage);

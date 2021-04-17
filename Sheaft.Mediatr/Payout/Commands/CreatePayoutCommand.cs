@@ -82,7 +82,7 @@ namespace Sheaft.Mediatr.Payout.Commands
 
                 var result = await _pspService.CreatePayoutAsync(payout, token);
                 if (!result.Succeeded)
-                    return Failure<Guid>(result.Exception);
+                    return Failure<Guid>(result);
 
                 payout.SetIdentifier(result.Data.Identifier);
                 payout.SetStatus(result.Data.Status);

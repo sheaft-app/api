@@ -11,6 +11,7 @@ using Sheaft.Application.Interfaces;
 using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Application.Interfaces.Mediatr;
 using Sheaft.Core;
+using Sheaft.Core.Enums;
 using Sheaft.Core.Exceptions;
 using Sheaft.Domain;
 using Sheaft.Mediatr.Auth.Commands;
@@ -48,7 +49,7 @@ namespace Sheaft.Mediatr.User.Commands
         {
             var entity = await _context.GetByIdAsync<Domain.User>(request.UserId, token);
             if(entity.Id != request.RequestUser.Id)
-                throw SheaftException.Forbidden();
+                return Failure(MessageKind.Forbidden);
             
             var roles = new List<Guid>();
             if (request.Roles.Contains(_roleOptions.Producer.Value))

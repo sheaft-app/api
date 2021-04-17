@@ -44,7 +44,7 @@ namespace Sheaft.Mediatr.DeliveryMode.Commands
         {
             var entity = await _context.GetByIdAsync<Domain.DeliveryMode>(request.DeliveryModeId, token);
             if(entity.Producer.Id != request.RequestUser.Id)
-                throw SheaftException.Forbidden();
+                return Failure(MessageKind.Forbidden);
 
             var agreements =
                 await _context.Agreements.Where(a => a.Delivery.Id == entity.Id).ToListAsync(token);
@@ -64,7 +64,7 @@ namespace Sheaft.Mediatr.DeliveryMode.Commands
                         await _mediatr.Process(
                             new DeleteAgreementCommand(request.RequestUser) {AgreementId = agreement.Id}, token);
                     if (!result.Succeeded)
-                        return Failure(result.Exception, result.Message);
+                        return Failure(result);
                 }
                 
                 foreach (var orderDelivery in orderDeliveries.ToList())

@@ -66,7 +66,7 @@ namespace Sheaft.Mediatr.Ubo.Commands
 
             var result = await _pspService.UpdateUboAsync(ubo, legal.Declaration, legal.User, token);
             if (!result.Succeeded)
-                return Failure(result.Exception);
+                return Failure(result);
 
             await _context.SaveChangesAsync(token);
             return Success();

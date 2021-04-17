@@ -44,7 +44,7 @@ namespace Sheaft.Mediatr.Transfer.Commands
                     await _mediatr.Process(new RefreshTransferStatusCommand(request.RequestUser, transfer.Identifier),
                         token);
                 if (!result.Succeeded)
-                    return Failure(result.Exception, result.Message);
+                    return Failure(result);
             }
 
             return Success();

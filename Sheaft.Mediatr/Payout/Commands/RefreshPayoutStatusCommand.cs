@@ -46,7 +46,7 @@ namespace Sheaft.Mediatr.Payout.Commands
             var payout = await _context.GetSingleAsync<Domain.Payout>(c => c.Identifier == request.Identifier, token);
             var pspResult = await _pspService.GetPayoutAsync(payout.Identifier, token);
             if (!pspResult.Succeeded)
-                return Failure(pspResult.Exception);
+                return Failure(pspResult);
             
             if (payout.Status == TransactionStatus.Succeeded && pspResult.Data.Status == TransactionStatus.Succeeded || payout.Status == TransactionStatus.Failed || payout.Status == TransactionStatus.Cancelled)
                 return Success();

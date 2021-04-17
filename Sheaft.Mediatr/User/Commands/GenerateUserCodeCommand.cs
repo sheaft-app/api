@@ -8,6 +8,7 @@ using Sheaft.Application.Interfaces;
 using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Application.Interfaces.Mediatr;
 using Sheaft.Core;
+using Sheaft.Core.Enums;
 using Sheaft.Core.Exceptions;
 using Sheaft.Domain;
 
@@ -42,14 +43,14 @@ namespace Sheaft.Mediatr.User.Commands
         {
             var entity = await _context.GetByIdAsync<Domain.User>(request.UserId, token);
             if(entity.Id != request.RequestUser.Id)
-                throw SheaftException.Forbidden();
+                return Failure<string>(MessageKind.Forbidden);
 
             if (!string.IsNullOrWhiteSpace(entity.SponsorshipCode))
                 return Success(entity.SponsorshipCode);
 
             var result = await _identifierService.GetNextSponsoringCode(token);
             if (!result.Succeeded)
-                return Failure<string>(result.Exception);
+                return Failure<string>(result);
 
             entity.SetSponsoringCode(result.Data);
 

@@ -40,7 +40,7 @@ namespace Sheaft.Mediatr.User.Commands
         {
             var entity = await _context.GetByIdAsync<Domain.User>(request.UserId, token);
             if(entity.Id != request.RequestUser.Id)
-                throw SheaftException.Forbidden();
+                return Failure(MessageKind.Forbidden);
 
             var hasActiveOrders = await _context.AnyAsync<Domain.PurchaseOrder>(
                 o => (o.Vendor.Id == entity.Id || o.Sender.Id == entity.Id) && (int) o.Status < 6, token);

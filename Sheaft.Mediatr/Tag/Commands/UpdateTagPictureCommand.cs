@@ -44,7 +44,7 @@ namespace Sheaft.Mediatr.Tag.Commands
 
             var resultImage = await _imageService.HandleTagPictureAsync(entity, request.Picture, token);
             if (!resultImage.Succeeded)
-                return Failure<string>(resultImage.Exception);
+                return Failure<string>(resultImage);
 
             entity.SetPicture(resultImage.Data);
             await _context.SaveChangesAsync(token);

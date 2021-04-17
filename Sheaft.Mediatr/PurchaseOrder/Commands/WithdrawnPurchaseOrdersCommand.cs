@@ -45,7 +45,7 @@ namespace Sheaft.Mediatr.PurchaseOrder.Commands
                         new WithdrawnPurchaseOrderCommand(request.RequestUser)
                             {PurchaseOrderId = purchaseOrderId, Reason = request.Reason}, token);
                     if (!result.Succeeded)
-                        return Failure(result.Exception);
+                        return Failure(result);
                 }
 
                 await transaction.CommitAsync(token);

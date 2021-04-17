@@ -65,7 +65,7 @@ namespace Sheaft.Mediatr.Document.Commands
 
             var result = await _pspService.SubmitDocumentAsync(document, legal.User.Identifier, token);
             if (!result.Succeeded)
-                return Failure(result.Exception);
+                return Failure(result);
 
             document.SetStatus(result.Data.Status);
             document.SetResult(result.Data.ResultCode, result.Data.ResultMessage);

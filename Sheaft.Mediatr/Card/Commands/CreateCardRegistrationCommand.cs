@@ -45,7 +45,7 @@ namespace Sheaft.Mediatr.Card.Commands
 
             var result = await _pspService.CreateCardRegistrationAsync(user, token);
             if (!result.Succeeded)
-                return Failure<CardRegistrationDto>(result.Exception);
+                return Failure<CardRegistrationDto>(result);
 
             return Success(new CardRegistrationDto
             {

@@ -8,6 +8,7 @@ using Sheaft.Application.Interfaces;
 using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Application.Interfaces.Mediatr;
 using Sheaft.Core;
+using Sheaft.Core.Enums;
 using Sheaft.Core.Exceptions;
 using Sheaft.Domain;
 
@@ -43,12 +44,12 @@ namespace Sheaft.Mediatr.Product.Commands
         {
             var entity = await _context.FindByIdAsync<Domain.Product>(request.ProductId, token);
             if(entity.Producer.Id != request.RequestUser.Id)
-                throw SheaftException.Forbidden();
+                return Failure(MessageKind.Forbidden);
             
             var id = Guid.NewGuid();
             var result = await _imageService.HandleProductPictureAsync(entity, id, request.Picture, token);
             if (!result.Succeeded)
-                return Failure(result.Exception);
+                return Failure(result);
             
             entity.AddPicture(new ProductPicture(id, result.Data));
             await _context.SaveChangesAsync(token);

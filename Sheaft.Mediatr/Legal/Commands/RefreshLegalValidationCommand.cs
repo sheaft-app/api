@@ -53,7 +53,7 @@ namespace Sheaft.Mediatr.Legal.Commands
             {
                 var userResult = await _pspService.GetCompanyAsync(request.Identifier, token);
                 if (!userResult.Succeeded)
-                    return Failure(userResult.Exception);
+                    return Failure(userResult);
 
                 validation = userResult.Data.KYCLevel;
             }
@@ -61,7 +61,7 @@ namespace Sheaft.Mediatr.Legal.Commands
             {
                 var userResult = await _pspService.GetConsumerAsync(request.Identifier, token);
                 if (!userResult.Succeeded)
-                    return Failure(userResult.Exception);
+                    return Failure(userResult);
 
                 validation = userResult.Data.KYCLevel;
             }

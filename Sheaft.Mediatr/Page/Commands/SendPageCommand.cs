@@ -53,7 +53,7 @@ namespace Sheaft.Mediatr.Page.Commands
             var downloadResult =
                 await _blobService.DownloadDocumentPageAsync(document.Id, page.Id, legal.User.Id, token);
             if (!downloadResult.Succeeded)
-                return Failure(downloadResult.Exception);
+                return Failure(downloadResult);
 
             var result = await _pspService.AddPageToDocumentAsync(page, document, legal.User.Identifier,
                 downloadResult.Data, token);

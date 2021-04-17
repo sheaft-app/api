@@ -40,7 +40,7 @@ namespace Sheaft.Mediatr.QuickOrder.Commands
             {
                 var result = await _mediatr.Process(new DeleteQuickOrderCommand(request.RequestUser) {QuickOrderId = id}, token);
                 if (!result.Succeeded)
-                    return Failure(result.Exception);
+                    return Failure(result);
             }
 
             return Success();

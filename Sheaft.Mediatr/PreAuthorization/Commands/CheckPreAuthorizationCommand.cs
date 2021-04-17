@@ -42,7 +42,7 @@ namespace Sheaft.Mediatr.PreAuthorization.Commands
                     new RefreshPreAuthorizationStatusCommand(request.RequestUser, preAuthorization.Identifier),
                     token);
                 if (!result.Succeeded)
-                    return Failure(result.Exception);
+                    return Failure(result);
             }
             
             return Success();

@@ -7,6 +7,7 @@ using Microsoft.Extensions.Logging;
 using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Application.Interfaces.Mediatr;
 using Sheaft.Core;
+using Sheaft.Core.Enums;
 using Sheaft.Core.Exceptions;
 using Sheaft.Domain;
 using Sheaft.Domain.Enum;
@@ -47,7 +48,7 @@ namespace Sheaft.Mediatr.Catalog.Commands
                     c => c.Producer.Id == request.RequestUser.Id, token);
             
             if(request.Kind == CatalogKind.Consumers && catalogs.Any(c => c.Kind == CatalogKind.Consumers))
-                throw SheaftException.AlreadyExists();
+                return Failure<Guid>(MessageKind.AlreadyExists);
             
             var entity = new Domain.Catalog(producer, request.Kind, Guid.NewGuid(), request.Name);
             entity.SetIsAvailable(request.IsAvailable);

@@ -53,7 +53,7 @@ namespace Sheaft.Mediatr.Withholding.Commands
             {
                 var result = await _pspService.CreateWithholdingAsync(withholding, token);
                 if (!result.Succeeded)
-                    return Failure(result.Exception);
+                    return Failure(result);
 
                 withholding.SetResult(result.Data.ResultCode, result.Data.ResultMessage);
                 withholding.SetIdentifier(result.Data.Identifier);

@@ -69,7 +69,7 @@ namespace Sheaft.Mediatr.PreAuthorizedPayin.Commands
 
             var result = await _pspService.CreatePreAuthorizedPayinAsync(preAuthorization, token);
             if (!result.Succeeded)
-                return Failure<Guid>(result.Exception);
+                return Failure<Guid>(result);
 
             preAuthorizedPayin.SetResult(result.Data.ResultCode, result.Data.ResultMessage);
             preAuthorizedPayin.SetIdentifier(result.Data.Identifier);

@@ -45,7 +45,7 @@ namespace Sheaft.Mediatr.Agreement.Commands
                         new CancelAgreementCommand(request.RequestUser) {AgreementId = agreementId, Reason = request.Reason},
                         token);
                     if (!result.Succeeded)
-                        return Failure(result.Exception);
+                        return Failure(result);
                 }
 
                 await transaction.CommitAsync(token);

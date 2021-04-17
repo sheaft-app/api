@@ -7,6 +7,7 @@ using Microsoft.Extensions.Logging;
 using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Application.Interfaces.Mediatr;
 using Sheaft.Core;
+using Sheaft.Core.Enums;
 using Sheaft.Core.Exceptions;
 using Sheaft.Domain;
 using Sheaft.Domain.Enum;
@@ -44,7 +45,7 @@ namespace Sheaft.Mediatr.Catalog.Commands
             
             var entity = catalogs.Single(c => c.Id == request.CatalogId);
             if(!request.IsDefault && entity.Kind == CatalogKind.Consumers)
-                throw SheaftException.Validation();
+                return Failure(MessageKind.Validation);
                 
             entity.SetIsAvailable(request.IsAvailable);
             
@@ -58,7 +59,7 @@ namespace Sheaft.Mediatr.Catalog.Commands
             }
 
             if (catalogs.Where(c => c.Kind == CatalogKind.Stores).All(c => !c.IsDefault))
-                throw SheaftException.Validation();
+                return Failure(MessageKind.Validation);
 
             await _context.SaveChangesAsync(token);
             return Success();

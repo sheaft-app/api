@@ -74,7 +74,7 @@ namespace Sheaft.Mediatr.Donation.Commands
 
                 var result = await _pspService.CreateDonationAsync(donation, token);
                 if (!result.Succeeded)
-                    return Failure<Guid>(result.Exception);
+                    return Failure<Guid>(result);
 
                 donation.SetResult(result.Data.ResultCode, result.Data.ResultMessage);
                 donation.SetIdentifier(result.Data.Identifier);

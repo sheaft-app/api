@@ -45,7 +45,7 @@ namespace Sheaft.Mediatr.Declaration.Commands
                 c => c.Declaration.Identifier == request.Identifier, token);
             var pspResult = await _pspService.GetDeclarationAsync(legal.Declaration.Identifier, token);
             if (!pspResult.Succeeded)
-                return Failure(pspResult.Exception);
+                return Failure(pspResult);
 
             legal.Declaration.SetStatus(pspResult.Data.Status);
             legal.Declaration.SetResult(pspResult.Data.ResultCode, pspResult.Data.ResultMessage);

@@ -46,7 +46,7 @@ namespace Sheaft.Mediatr.Donation.Commands
                 await _mediatr.Process(new RefreshDonationStatusCommand(request.RequestUser, donation.Identifier),
                     token);
             if (!result.Succeeded)
-                return Failure(result.Exception);
+                return Failure(result);
 
             return Success();
         }

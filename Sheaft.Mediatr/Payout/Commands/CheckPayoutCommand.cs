@@ -44,7 +44,7 @@ namespace Sheaft.Mediatr.Payout.Commands
                     new RefreshPayoutStatusCommand(request.RequestUser, payout.Identifier),
                     token);
                 if (!result.Succeeded)
-                    return Failure(result.Exception);
+                    return Failure(result);
             }
 
             return Success();

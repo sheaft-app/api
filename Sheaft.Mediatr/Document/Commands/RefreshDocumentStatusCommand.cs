@@ -47,7 +47,7 @@ namespace Sheaft.Mediatr.Document.Commands
 
             var pspResult = await _pspService.GetDocumentAsync(document.Identifier, token);
             if (!pspResult.Succeeded)
-                return Failure(pspResult.Exception);
+                return Failure(pspResult);
 
             document.SetStatus(pspResult.Data.Status);
             document.SetResult(pspResult.Data.ResultCode, pspResult.Data.ResultMessage);

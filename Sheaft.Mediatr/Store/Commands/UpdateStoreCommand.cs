@@ -13,6 +13,7 @@ using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Application.Interfaces.Mediatr;
 using Sheaft.Application.Models;
 using Sheaft.Core;
+using Sheaft.Core.Enums;
 using Sheaft.Core.Exceptions;
 using Sheaft.Domain;
 using Sheaft.Domain.Enum;
@@ -70,7 +71,7 @@ namespace Sheaft.Mediatr.Store.Commands
         {
             var store = await _context.GetByIdAsync<Domain.Store>(request.StoreId, token);
             if(store.Id != request.RequestUser.Id)
-                throw SheaftException.Forbidden();
+                return Failure(MessageKind.Forbidden);
 
             store.SetName(request.Name);
             store.SetFirstname(request.FirstName);
@@ -121,7 +122,7 @@ namespace Sheaft.Mediatr.Store.Commands
             }, token);
 
             if (!resultImage.Succeeded)
-                return Failure(resultImage.Exception);
+                return Failure(resultImage);
 
             var roles = new List<Guid> {_roleOptions.Owner.Id, _roleOptions.Store.Id};
             var authResult = await _mediatr.Process(new UpdateAuthUserCommand(request.RequestUser)

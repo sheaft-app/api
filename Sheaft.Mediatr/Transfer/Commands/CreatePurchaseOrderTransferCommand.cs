@@ -63,7 +63,7 @@ namespace Sheaft.Mediatr.Transfer.Commands
                     new CheckProducerConfigurationCommand(request.RequestUser) {ProducerId = purchaseOrder.Vendor.Id},
                     token);
             if (!checkResult.Succeeded)
-                return Failure<Guid>(checkResult.Exception);
+                return Failure<Guid>(checkResult);
 
             var debitedWallet =
                 await _context.GetSingleAsync<Domain.Wallet>(c => c.User.Id == purchaseOrder.Sender.Id, token);
@@ -78,7 +78,7 @@ namespace Sheaft.Mediatr.Transfer.Commands
 
                 var result = await _pspService.CreateTransferAsync(transfer, token);
                 if (!result.Succeeded)
-                    return Failure<Guid>(result.Exception);
+                    return Failure<Guid>(result);
 
                 transfer.SetResult(result.Data.ResultCode, result.Data.ResultMessage);
                 transfer.SetIdentifier(result.Data.Identifier);

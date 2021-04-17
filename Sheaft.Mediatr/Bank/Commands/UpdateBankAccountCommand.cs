@@ -57,7 +57,7 @@ namespace Sheaft.Mediatr.Bank.Commands
             {
                 var resetResult = await _pspService.UpdateBankIbanAsync(bankAccount, false, token);
                 if (!resetResult.Succeeded)
-                    return Failure(resetResult.Exception);
+                    return Failure(resetResult);
 
                 bankAccount.SetIdentifier(string.Empty);
                 await _context.SaveChangesAsync(token);
@@ -71,7 +71,7 @@ namespace Sheaft.Mediatr.Bank.Commands
 
             var result = await _pspService.CreateBankIbanAsync(bankAccount, token);
             if (!result.Succeeded)
-                return Failure(result.Exception);
+                return Failure(result);
 
             bankAccount.SetIdentifier(result.Data);
             await _context.SaveChangesAsync(token);

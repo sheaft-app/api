@@ -53,11 +53,11 @@ namespace Sheaft.Mediatr.WebPayin.Commands
         {
             var validationResult = await _orderService.ValidateConsumerOrderAsync(request.OrderId, request.RequestUser, token);
             if (!validationResult.Succeeded)
-                return Failure<Guid>(validationResult.Message);
+                return Failure<Guid>(validationResult);
 
             var checkResult = await _mediatr.Process(new CheckConsumerConfigurationCommand(request.RequestUser), token);
             if (!checkResult.Succeeded)
-                return Failure<Guid>(checkResult.Exception);
+                return Failure<Guid>(checkResult);
             
             var order = await _context.GetByIdAsync<Domain.Order>(request.OrderId, token);
             using (var transaction = await _context.BeginTransactionAsync(token))

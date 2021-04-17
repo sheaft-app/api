@@ -35,6 +35,11 @@ namespace Sheaft.Mediatr
             return Result.Success(message, objs);
         }
 
+        protected Result Failure(Result result)
+        {
+            return Failure(result.Exception, result.Message, result.Params);
+        }
+
         protected Result Failure(MessageKind message, params object[] objs)
         {
             return Failure(null, message, objs);
@@ -63,6 +68,11 @@ namespace Sheaft.Mediatr
         protected Result<T> Success<T>(T result, MessageKind message, params object[] objs)
         {
             return Result<T>.Success(result, message, objs);
+        }
+
+        protected Result<T> Failure<T>(Result result)
+        {
+            return Failure<T>(result.Exception, result.Message, result.Params);
         }
 
         protected Result<T> Failure<T>(Exception exception, params object[] objs)

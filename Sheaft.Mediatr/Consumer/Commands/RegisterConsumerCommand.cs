@@ -74,7 +74,7 @@ namespace Sheaft.Mediatr.Consumer.Commands
                 }, token);
 
                 if (!resultImage.Succeeded)
-                    return Failure<Guid>(resultImage.Exception);
+                    return Failure<Guid>(resultImage);
 
                 var authResult = await _mediatr.Process(new UpdateAuthUserCommand(request.RequestUser)
                 {
@@ -89,7 +89,7 @@ namespace Sheaft.Mediatr.Consumer.Commands
                 }, token);
 
                 if (!authResult.Succeeded)
-                    return Failure<Guid>(authResult.Exception);
+                    return Failure<Guid>(authResult);
 
                 await transaction.CommitAsync(token);
 

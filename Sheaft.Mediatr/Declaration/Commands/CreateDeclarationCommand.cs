@@ -44,7 +44,7 @@ namespace Sheaft.Mediatr.Declaration.Commands
 
             var result = await _pspService.CreateUboDeclarationAsync(legal.Declaration, legal.User, token);
             if (!result.Succeeded)
-                return Failure<Guid>(result.Exception);
+                return Failure<Guid>(result);
 
             legal.Declaration.SetIdentifier(result.Data.Identifier);
             legal.Declaration.SetStatus(result.Data.Status);

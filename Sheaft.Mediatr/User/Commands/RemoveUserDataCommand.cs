@@ -53,7 +53,7 @@ namespace Sheaft.Mediatr.User.Commands
                 return Success(request.Reason);
             
             if(entity.Id != request.RequestUser.Id)
-                throw SheaftException.Forbidden();
+                return Failure<string>(MessageKind.Forbidden);
 
             await _blobService.CleanUserStorageAsync(request.UserId, token);
 
@@ -63,7 +63,7 @@ namespace Sheaft.Mediatr.User.Commands
             }, token);
 
             if (!result.Succeeded)
-                return Failure<string>(result.Exception);
+                return Failure<string>(result);
 
             entity.Close();
             await _context.SaveChangesAsync(token);

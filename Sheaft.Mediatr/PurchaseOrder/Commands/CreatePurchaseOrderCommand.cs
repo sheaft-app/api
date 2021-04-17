@@ -52,7 +52,7 @@ namespace Sheaft.Mediatr.PurchaseOrder.Commands
             var resultIdentifier =
                 await _identifierService.GetNextPurchaseOrderReferenceAsync(request.ProducerId, token);
             if (!resultIdentifier.Succeeded)
-                return Failure<Guid>(resultIdentifier.Exception);
+                return Failure<Guid>(resultIdentifier);
 
             var purchaseOrder = order.AddPurchaseOrder(resultIdentifier.Data, producer);
             await _context.SaveChangesAsync(token);

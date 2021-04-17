@@ -8,6 +8,7 @@ using Microsoft.Extensions.Logging;
 using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Application.Interfaces.Mediatr;
 using Sheaft.Core;
+using Sheaft.Core.Enums;
 using Sheaft.Core.Exceptions;
 using Sheaft.Domain;
 using Sheaft.Domain.Enum;
@@ -42,14 +43,14 @@ namespace Sheaft.Mediatr.Catalog.Commands
             
             var entity = catalogs.Single(c => c.Id == request.CatalogId);
             if(entity.IsDefault)
-                throw SheaftException.Validation();
+                return Failure(MessageKind.Validation);
 
             var agreements = await _context.Agreements
                 .Where(a => a.Catalog != null && a.Catalog.Id == entity.Id)
                 .ToListAsync(token);
             
             if(agreements.Any(a => a.Status == AgreementStatus.Accepted))
-                throw SheaftException.Validation();
+                return Failure(MessageKind.Validation);
 
             _context.Remove(entity);
             await _context.SaveChangesAsync(token);

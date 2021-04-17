@@ -10,7 +10,11 @@ namespace Sheaft.Core.Exceptions
         public ExceptionKind Kind { get; }
         public MessageKind? Error { get; }
         public object[] Params { get; }
-
+        
+        public SheaftException(Result result) : this(ExceptionKind.Unexpected, result.Exception, result.Message, result.Params)
+        {
+        }
+        
         protected SheaftException(ExceptionKind? kind = null, MessageKind? error = null, params object[] objs) : this(kind ?? ExceptionKind.Unexpected, null, error, objs)
         {
         }

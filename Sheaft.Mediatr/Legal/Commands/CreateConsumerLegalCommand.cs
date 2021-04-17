@@ -78,13 +78,13 @@ namespace Sheaft.Mediatr.Legal.Commands
                 var userResult = await _mediatr.Process(
                     new CheckConsumerLegalConfigurationCommand(request.RequestUser) {UserId = legal.User.Id}, token);
                 if (!userResult.Succeeded)
-                    return Failure<Guid>(userResult.Exception);
+                    return Failure<Guid>(userResult);
             }
             else
             {
                 var result = await _pspService.UpdateConsumerAsync(legal, token);
                 if (!result.Succeeded)
-                    return Failure<Guid>(result.Exception);
+                    return Failure<Guid>(result);
             }
 
             return Success(legal.Id);

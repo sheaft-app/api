@@ -45,7 +45,7 @@ namespace Sheaft.Mediatr.DeliveryMode.Commands
                         new SetDeliveryModeAvailabilityCommand(request.RequestUser)
                             {DeliveryModeId = id, Available = request.Available}, token);
                     if (!result.Succeeded)
-                        return Failure(result.Exception);
+                        return Failure(result);
                 }
 
                 await transaction.CommitAsync(token);

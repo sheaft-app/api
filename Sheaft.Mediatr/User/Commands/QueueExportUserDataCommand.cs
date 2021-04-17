@@ -8,6 +8,7 @@ using Sheaft.Application.Interfaces;
 using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Application.Interfaces.Mediatr;
 using Sheaft.Core;
+using Sheaft.Core.Enums;
 using Sheaft.Core.Exceptions;
 using Sheaft.Domain;
 using Sheaft.Domain.Enum;
@@ -39,7 +40,7 @@ namespace Sheaft.Mediatr.User.Commands
         {
             var sender = await _context.GetByIdAsync<Domain.User>(request.UserId, token);
             if(sender.Id != request.RequestUser.Id)
-                throw SheaftException.Forbidden();
+                return Failure<Guid>(MessageKind.Forbidden);
 
             var entity = new Domain.Job(Guid.NewGuid(), JobKind.ExportUserData, $"Export RGPD", sender);
 

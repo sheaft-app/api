@@ -51,13 +51,13 @@ namespace Sheaft.Mediatr.Wallet.Commands
                 }, token);
 
                 if (!walletResult.Succeeded)
-                    return Failure(walletResult.Exception);
+                    return Failure(walletResult);
             }
             else if (string.IsNullOrWhiteSpace(wallet.Identifier))
             {
                 var result = await _pspService.CreateWalletAsync(wallet, token);
                 if (!result.Succeeded)
-                    return Failure(result.Exception);
+                    return Failure(result);
 
                 wallet.SetIdentifier(result.Data);
                 await _context.SaveChangesAsync(token);

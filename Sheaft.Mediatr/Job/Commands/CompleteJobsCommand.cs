@@ -44,7 +44,7 @@ namespace Sheaft.Mediatr.Job.Commands
                     var result =
                         await _mediatr.Process(new CompleteJobCommand(request.RequestUser) {JobId = jobId}, token);
                     if (!result.Succeeded)
-                        return Failure(result.Exception);
+                        return Failure(result);
                 }
 
                 await transaction.CommitAsync(token);

@@ -78,7 +78,7 @@ namespace Sheaft.Mediatr.PayinRefund.Commands
 
                 var result = await _pspService.RefundPayinAsync(payinRefund, token);
                 if (!result.Succeeded)
-                    return Failure<Guid>(result.Exception);
+                    return Failure<Guid>(result);
 
                 payinRefund.SetResult(result.Data.ResultCode, result.Data.ResultMessage);
                 payinRefund.SetIdentifier(result.Data.Identifier);

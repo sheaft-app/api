@@ -9,6 +9,7 @@ using Sheaft.Application.Interfaces;
 using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Application.Interfaces.Mediatr;
 using Sheaft.Core;
+using Sheaft.Core.Enums;
 using Sheaft.Core.Exceptions;
 using Sheaft.Domain;
 using Sheaft.Mediatr.Producer.Commands;
@@ -40,7 +41,7 @@ namespace Sheaft.Mediatr.Product.Commands
         {
             var entity = await _context.GetByIdAsync<Domain.Product>(request.ProductId, token);
             if(entity.Producer.Id != request.RequestUser.Id)
-                throw SheaftException.Forbidden();
+                return Failure(MessageKind.Forbidden);
 
             if (entity.CatalogsPrices != null && entity.CatalogsPrices.Any())
                 foreach (var catalogProduct in entity.CatalogsPrices.ToList())

@@ -14,6 +14,7 @@ using Sheaft.Application.Interfaces.Factories;
 using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Application.Interfaces.Mediatr;
 using Sheaft.Core;
+using Sheaft.Core.Enums;
 using Sheaft.Core.Exceptions;
 using Sheaft.Domain;
 using Sheaft.Domain.Enum;
@@ -56,7 +57,7 @@ namespace Sheaft.Mediatr.Transactions.Commands
         {
             var job = await _context.GetByIdAsync<Domain.Job>(request.JobId, token);
             if (job.User.Id != request.RequestUser.Id)
-                throw SheaftException.Forbidden();
+                return Failure(MessageKind.Forbidden);
 
             try
             {

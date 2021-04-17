@@ -87,7 +87,7 @@ namespace Sheaft.Mediatr.DeliveryMode.Commands
                     new UpdateOrCreateDeliveryClosingsCommand(request.RequestUser)
                         {DeliveryId = entity.Id, Closings = request.Closings}, token);
             if (!result.Succeeded)
-                return Failure<Guid>(result.Exception);
+                return Failure<Guid>(result);
             
             _mediatr.Post(new UpdateProducerAvailabilityCommand(request.RequestUser) {ProducerId = entity.Producer.Id});
             return Success(entity.Id);

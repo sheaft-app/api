@@ -66,7 +66,7 @@ namespace Sheaft.Mediatr.Product.Commands
             {
                 var entity = await _context.GetByIdAsync<Domain.Product>(request.ProductId, token);
                 if (entity.Producer.Id != request.RequestUser.Id)
-                    throw SheaftException.Forbidden();
+                    return Failure(MessageKind.Forbidden);
 
                 var reference = request.Reference;
                 if (!string.IsNullOrWhiteSpace(reference) && reference != entity.Reference)
@@ -82,7 +82,7 @@ namespace Sheaft.Mediatr.Product.Commands
                     var resultIdentifier =
                         await _identifierService.GetNextProductReferenceAsync(entity.Producer.Id, token);
                     if (!resultIdentifier.Succeeded)
-                        return Failure(resultIdentifier.Exception);
+                        return Failure(resultIdentifier);
 
                     reference = resultIdentifier.Data;
                 }
@@ -152,7 +152,7 @@ namespace Sheaft.Mediatr.Product.Commands
                     }, token);
 
                 if (!imageResult.Succeeded)
-                    return Failure(imageResult.Exception);
+                    return Failure(imageResult);
 
                 await transaction.CommitAsync(token);
 

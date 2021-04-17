@@ -57,12 +57,12 @@ namespace Sheaft.Mediatr.Tag.Commands
                     new UpdateTagPictureCommand(request.RequestUser) {TagId = entity.Id, Picture = request.Picture},
                     token);
                 if (!imageResult.Succeeded)
-                    return Failure(imageResult.Exception);
+                    return Failure(imageResult);
 
                 var iconResult = await _mediatr.Process(
                     new UpdateTagIconCommand(request.RequestUser) {TagId = entity.Id, Icon = request.Icon}, token);
                 if (!iconResult.Succeeded)
-                    return Failure(iconResult.Exception);
+                    return Failure(iconResult);
 
                 await transaction.CommitAsync(token);
                 return Success();

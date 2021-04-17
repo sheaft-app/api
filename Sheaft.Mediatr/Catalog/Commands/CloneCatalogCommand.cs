@@ -59,7 +59,7 @@ namespace Sheaft.Mediatr.Catalog.Commands
                             {CatalogId = entity.Id, Products = products}, token);
 
                 if (!result.Succeeded)
-                    return Failure<Guid>(result.Exception);
+                    return Failure<Guid>(result);
 
                 await transaction.CommitAsync(token);
                 return Success(entity.Id);

@@ -124,7 +124,7 @@ namespace Sheaft.Mediatr.Order.Commands
                 
                 var user = await _context.GetByIdAsync<Domain.User>(request.UserId, token);
                 if (user.Id != request.RequestUser.Id)
-                    throw SheaftException.Forbidden();
+                    return Failure<IEnumerable<Guid>>(MessageKind.Forbidden);
 
                 var order = new Domain.Order(Guid.NewGuid(), DonationKind.None, cartProducts,
                     _pspOptions.FixedAmount, _pspOptions.Percent, _pspOptions.VatPercent, user);
@@ -134,11 +134,11 @@ namespace Sheaft.Mediatr.Order.Commands
 
                 var validatedDeliveries = await _deliveryService.ValidateCapedDeliveriesAsync(order.Deliveries, token);
                 if (!validatedDeliveries.Succeeded)
-                    return Failure<IEnumerable<Guid>>(validatedDeliveries.Exception);
+                    return Failure<IEnumerable<Guid>>(validatedDeliveries);
 
                 var referenceResult = await _identifierService.GetNextOrderReferenceAsync(token);
                 if (!referenceResult.Succeeded)
-                    return Failure<IEnumerable<Guid>>(referenceResult.Exception);
+                    return Failure<IEnumerable<Guid>>(referenceResult);
 
                 order.SetReference(referenceResult.Data);
 
@@ -157,7 +157,7 @@ namespace Sheaft.Mediatr.Order.Commands
                     }, token);
 
                     if (!result.Succeeded)
-                        return Failure<IEnumerable<Guid>>(result.Exception);
+                        return Failure<IEnumerable<Guid>>(result);
 
                     purchaseOrderIds.Add(result.Data);
                 }

@@ -58,7 +58,7 @@ namespace Sheaft.Mediatr.Page.Commands
                 await _blobService.UploadDocumentPageAsync(document.Id, page.Id, request.Data, legal.User.Id,
                     token);
             if (!result.Succeeded)
-                return Failure<Guid>(result.Exception);
+                return Failure<Guid>(result);
 
             return Success(page.Id);
         }

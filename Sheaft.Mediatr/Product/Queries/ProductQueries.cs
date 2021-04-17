@@ -237,12 +237,12 @@ namespace Sheaft.Mediatr.Product.Queries
                         .ProjectTo<ProductDto>(_configurationProvider);
 
                 return _context.Products
-                    .Get(p => p.Producer.Id == producerId)
+                    .Get(p => p.Producer.Id == producerId && p.CatalogsPrices.Any(cp => cp.Catalog.Kind == CatalogKind.Stores && cp.Catalog.Available && cp.Catalog.IsDefault))
                     .ProjectTo<ProductDto>(_configurationProvider);
             }
 
             return _context.Products
-                .Get(p => p.Producer.Id == producerId)
+                .Get(p => p.Producer.Id == producerId && p.CatalogsPrices.Any(cp => cp.Catalog.Kind == CatalogKind.Consumers))
                 .ProjectTo<ProductDto>(_configurationProvider);
         }
 

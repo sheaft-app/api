@@ -11,6 +11,7 @@ using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Application.Interfaces.Mediatr;
 using Sheaft.Application.Models;
 using Sheaft.Core;
+using Sheaft.Core.Enums;
 using Sheaft.Core.Exceptions;
 using Sheaft.Domain;
 using Sheaft.Domain.Enum;
@@ -55,7 +56,7 @@ namespace Sheaft.Mediatr.DeliveryMode.Commands
         {
             var entity = await _context.GetByIdAsync<Domain.DeliveryMode>(request.DeliveryModeId, token);
             if(entity.Producer.Id != request.RequestUser.Id)
-                throw SheaftException.Forbidden();
+                return Failure(MessageKind.Forbidden);
 
             entity.SetName(request.Name);
             entity.SetAvailability(request.Available);
@@ -88,7 +89,7 @@ namespace Sheaft.Mediatr.DeliveryMode.Commands
                     new UpdateOrCreateDeliveryClosingsCommand(request.RequestUser)
                         {DeliveryId = entity.Id, Closings = request.Closings}, token);
             if (!result.Succeeded)
-                return Failure(result.Exception);
+                return Failure(result);
             
             _mediatr.Post(new UpdateProducerAvailabilityCommand(request.RequestUser) {ProducerId = entity.Producer.Id});
             return Success();

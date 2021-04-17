@@ -3,10 +3,8 @@ using System.ComponentModel;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
-using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Application.Interfaces.Mediatr;
 using Sheaft.Core;
-using Sheaft.Core.Enums;
 using Sheaft.Core.Exceptions;
 using Sheaft.Domain.Common;
 
@@ -28,10 +26,7 @@ namespace Sheaft.Mediatr
             if (result.Succeeded)
                 return result;
 
-            if (result.Exception != null)
-                throw result.Exception;
-
-            throw SheaftException.Unexpected(MessageKind.Unexpected);
+            throw new SheaftException(result);
         }
 
         [DisplayName("{0}")]
@@ -40,11 +35,8 @@ namespace Sheaft.Mediatr
             var result = await _mediatr.Send(data, token);
             if (result.Succeeded)
                 return result;
-
-            if (result.Exception != null)
-                throw result.Exception;
-
-            throw SheaftException.Unexpected(MessageKind.Unexpected);
+                
+            throw new SheaftException(result);
         }
 
         [DisplayName("{0}")]

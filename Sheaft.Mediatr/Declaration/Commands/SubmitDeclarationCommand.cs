@@ -52,12 +52,12 @@ namespace Sheaft.Mediatr.Declaration.Commands
                     await _mediatr.Process(new CreateDeclarationCommand(request.RequestUser) {LegalId = legal.Id},
                         token);
                 if (!createResult.Succeeded)
-                    return Failure(createResult.Exception);
+                    return Failure(createResult);
             }
 
             var submitResult = await _pspService.SubmitUboDeclarationAsync(legal.Declaration, legal.User, token);
             if (!submitResult.Succeeded)
-                return Failure(submitResult.Exception);
+                return Failure(submitResult);
 
             legal.Declaration.SetStatus(submitResult.Data.Status);
             legal.Declaration.SetResult(submitResult.Data.ResultCode, submitResult.Data.ResultMessage);

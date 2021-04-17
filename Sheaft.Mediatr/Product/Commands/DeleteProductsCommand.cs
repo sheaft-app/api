@@ -42,7 +42,7 @@ namespace Sheaft.Mediatr.Product.Commands
                 {
                     var result = await _mediatr.Process(new DeleteProductCommand(request.RequestUser) {ProductId = id}, token);
                     if (!result.Succeeded)
-                        return Failure(result.Exception);
+                        return Failure(result);
                 }
 
                 await transaction.CommitAsync(token);

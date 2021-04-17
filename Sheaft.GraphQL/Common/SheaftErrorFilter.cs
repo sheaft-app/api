@@ -42,7 +42,6 @@ namespace Sheaft.GraphQL.Common
             if (error.Exception != null && error.Exception is SheaftException exc)
             {
                 exception = exc;
-
                 error = error.WithCode(exc.Kind.ToString("G"));
 
                 if (exc.Error.HasValue)

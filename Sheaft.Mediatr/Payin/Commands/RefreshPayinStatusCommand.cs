@@ -53,7 +53,7 @@ namespace Sheaft.Mediatr.Payin.Commands
 
             var pspResult = await _pspService.GetPayinAsync(payin.Identifier, token);
             if (!pspResult.Succeeded)
-                return Failure(pspResult.Exception);
+                return Failure(pspResult);
 
             payin.SetStatus(pspResult.Data.Status);
             payin.SetResult(pspResult.Data.ResultCode, pspResult.Data.ResultMessage);

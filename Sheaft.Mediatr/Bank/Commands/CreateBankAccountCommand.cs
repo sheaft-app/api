@@ -64,7 +64,7 @@ namespace Sheaft.Mediatr.Bank.Commands
                 if (!result.Succeeded)
                 {
                     await transaction.RollbackAsync(token);
-                    return Failure<Guid>(result.Exception);
+                    return Failure<Guid>(result);
                 }
 
                 bankAccount.SetIdentifier(result.Data);

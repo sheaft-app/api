@@ -45,7 +45,7 @@ namespace Sheaft.Mediatr.DeliveryClosing.Commands
                             {ClosingId = closingId}, token);
                     
                     if (!result.Succeeded)
-                        return Failure(result.Exception);
+                        return Failure(result);
                 }
 
                 await transaction.CommitAsync(token);

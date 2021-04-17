@@ -42,14 +42,14 @@ namespace Sheaft.Mediatr.Producer.Commands
                     new CheckBusinessLegalConfigurationCommand(request.RequestUser) {UserId = request.ProducerId},
                     token);
             if (!business.Succeeded)
-                return Failure(business.Exception);
+                return Failure(business);
 
             var wallet =
                 await _mediatr.Process(
                     new CheckWalletPaymentsConfigurationCommand(request.RequestUser) {UserId = request.ProducerId},
                     token);
             if (!wallet.Succeeded)
-                return Failure(wallet.Exception);
+                return Failure(wallet);
 
             return Success();
         }

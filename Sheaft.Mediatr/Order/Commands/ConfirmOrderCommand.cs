@@ -65,7 +65,7 @@ namespace Sheaft.Mediatr.Order.Commands
                     }, token);
 
                     if (!result.Succeeded)
-                        return Failure<IEnumerable<Guid>>(result.Exception);
+                        return Failure<IEnumerable<Guid>>(result);
 
                     purchaseOrderIds.Add(result.Data);
                 }

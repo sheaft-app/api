@@ -51,7 +51,7 @@ namespace Sheaft.Mediatr.Producer.Commands
                     })), token);
 
             if (!result.Succeeded)
-                return Failure(result.Exception);
+                return Failure(result);
 
             return Success();
         }

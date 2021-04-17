@@ -102,7 +102,6 @@ namespace Sheaft.Business
         public async Task<Result<List<Tuple<Domain.Product, Guid, int>>>> GetCartProductsAsync(IEnumerable<Guid> productIds, IEnumerable<ResourceIdQuantityDto> productsQuantities, CancellationToken token)
         {
             var invalidProductIds = await GetConsumerInvalidProductIds(productIds, token);
-
             if (invalidProductIds.Any())
                 return Failure<List<Tuple<Domain.Product, Guid, int>>>(MessageKind.Order_CannotCreate_Some_Products_NotAvailable,
                     string.Join(";", invalidProductIds));

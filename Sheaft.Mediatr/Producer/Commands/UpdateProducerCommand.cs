@@ -13,6 +13,7 @@ using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Application.Interfaces.Mediatr;
 using Sheaft.Application.Models;
 using Sheaft.Core;
+using Sheaft.Core.Enums;
 using Sheaft.Core.Exceptions;
 using Sheaft.Domain;
 using Sheaft.Domain.Enum;
@@ -70,7 +71,7 @@ namespace Sheaft.Mediatr.Producer.Commands
         {
             var producer = await _context.GetByIdAsync<Domain.Producer>(request.ProducerId, token);
             if(producer.Id != request.RequestUser.Id)
-                throw SheaftException.Forbidden();
+                return Failure(MessageKind.Forbidden);
 
             producer.SetName(request.Name);
             producer.SetFirstname(request.FirstName);
@@ -115,7 +116,7 @@ namespace Sheaft.Mediatr.Producer.Commands
             }, token);
 
             if (!resultImage.Succeeded)
-                return Failure(resultImage.Exception);
+                return Failure(resultImage);
 
             var roles = new List<Guid> {_roleOptions.Owner.Id, _roleOptions.Producer.Id};
             var authResult = await _mediatr.Process(new UpdateAuthUserCommand(request.RequestUser)

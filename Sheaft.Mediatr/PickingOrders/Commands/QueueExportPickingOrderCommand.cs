@@ -52,7 +52,7 @@ namespace Sheaft.Mediatr.PickingOrders.Commands
                     await _mediatr.Process(
                         new AcceptPurchaseOrdersCommand(request.RequestUser) {PurchaseOrderIds = orderIdsToAccept}, token);
                 if (!result.Succeeded)
-                    return Failure<Guid>(result.Exception);
+                    return Failure<Guid>(result);
             }
 
             var entity = new Domain.Job(Guid.NewGuid(), JobKind.ExportPickingOrders,

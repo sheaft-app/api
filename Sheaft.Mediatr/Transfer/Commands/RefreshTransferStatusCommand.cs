@@ -68,7 +68,7 @@ namespace Sheaft.Mediatr.Transfer.Commands
 
             var pspResult = await _pspService.GetTransferAsync(transfer.Identifier, token);
             if (!pspResult.Succeeded)
-                return Failure(pspResult.Exception);
+                return Failure(pspResult);
 
             transfer.SetStatus(pspResult.Data.Status);
             transfer.SetResult(pspResult.Data.ResultCode, pspResult.Data.ResultMessage);
@@ -86,7 +86,7 @@ namespace Sheaft.Mediatr.Transfer.Commands
 
             var pspResult = await _pspService.GetTransferAsync(donation.Identifier, token);
             if (!pspResult.Succeeded)
-                return Failure(pspResult.Exception);
+                return Failure(pspResult);
 
             donation.SetStatus(pspResult.Data.Status);
             donation.SetResult(pspResult.Data.ResultCode, pspResult.Data.ResultMessage);
@@ -104,7 +104,7 @@ namespace Sheaft.Mediatr.Transfer.Commands
 
             var pspResult = await _pspService.GetTransferAsync(withholding.Identifier, token);
             if (!pspResult.Succeeded)
-                return Failure(pspResult.Exception);
+                return Failure(pspResult);
 
             withholding.SetStatus(pspResult.Data.Status);
             withholding.SetResult(pspResult.Data.ResultCode, pspResult.Data.ResultMessage);

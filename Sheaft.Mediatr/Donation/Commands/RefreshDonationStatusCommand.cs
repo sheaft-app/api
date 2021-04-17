@@ -50,7 +50,7 @@ namespace Sheaft.Mediatr.Donation.Commands
 
             var pspResult = await _pspService.GetTransferAsync(donation.Identifier, token);
             if (!pspResult.Succeeded)
-                return Failure(pspResult.Exception);
+                return Failure(pspResult);
 
             donation.SetStatus(pspResult.Data.Status);
             donation.SetResult(pspResult.Data.ResultCode, pspResult.Data.ResultMessage);

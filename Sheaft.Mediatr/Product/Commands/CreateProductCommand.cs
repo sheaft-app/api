@@ -77,7 +77,7 @@ namespace Sheaft.Mediatr.Product.Commands
                 var resultIdentifier =
                     await _identifierService.GetNextProductReferenceAsync(request.ProducerId, token);
                 if (!resultIdentifier.Succeeded)
-                    return Failure<Guid>(resultIdentifier.Exception);
+                    return Failure<Guid>(resultIdentifier);
 
                 reference = resultIdentifier.Data;
             }
@@ -144,7 +144,7 @@ namespace Sheaft.Mediatr.Product.Commands
                     }, token);
 
                 if (!imageResult.Succeeded)
-                    return Failure<Guid>(imageResult.Exception);
+                    return Failure<Guid>(imageResult);
 
                 await transaction.CommitAsync(token);
 

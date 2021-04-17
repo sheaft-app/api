@@ -44,7 +44,7 @@ namespace Sheaft.Mediatr.Legal.Commands
             {
                 var userResult = await _pspService.CreateBusinessAsync(legal, token);
                 if (!userResult.Succeeded)
-                    return Failure(userResult.Exception);
+                    return Failure(userResult);
 
                 legal.User.SetIdentifier(userResult.Data);
                 await _context.SaveChangesAsync(token);

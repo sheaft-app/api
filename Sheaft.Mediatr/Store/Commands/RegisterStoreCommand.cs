@@ -109,7 +109,7 @@ namespace Sheaft.Mediatr.Store.Commands
                 }, token);
 
                 if (!resultImage.Succeeded)
-                    return Failure<Guid>(resultImage.Exception);
+                    return Failure<Guid>(resultImage);
 
                 var roles = new List<Guid> {_roleOptions.Owner.Id, _roleOptions.Store.Id};
                 var authResult = await _mediatr.Process(new UpdateAuthUserCommand(request.RequestUser)
@@ -125,7 +125,7 @@ namespace Sheaft.Mediatr.Store.Commands
                 }, token);
 
                 if (!authResult.Succeeded)
-                    return Failure<Guid>(authResult.Exception);
+                    return Failure<Guid>(authResult);
 
                 var result = await _mediatr.Process(new CreateBusinessLegalCommand(request.RequestUser)
                 {

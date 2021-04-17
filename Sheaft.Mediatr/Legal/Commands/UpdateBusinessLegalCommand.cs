@@ -87,13 +87,13 @@ namespace Sheaft.Mediatr.Legal.Commands
                 var userResult = await _mediatr.Process(
                     new CheckBusinessLegalConfigurationCommand(request.RequestUser) {UserId = legal.User.Id}, token);
                 if (!userResult.Succeeded)
-                    return Failure(userResult.Exception);
+                    return Failure(userResult);
             }
             else
             {
                 var result = await _pspService.UpdateBusinessAsync(legal, token);
                 if (!result.Succeeded)
-                    return Failure(result.Exception);
+                    return Failure(result);
             }
 
             return Success();
