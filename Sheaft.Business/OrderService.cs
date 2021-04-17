@@ -30,12 +30,13 @@ namespace Sheaft.Business
             _deliveryService = deliveryService;
         }
 
-        public async Task<Result> ValidateConsumerOrderAsync(Guid orderId, RequestUser requestUser, CancellationToken token)
+        public async Task<Result> ValidateConsumerOrderAsync(Guid orderId, RequestUser requestUser,
+            CancellationToken token)
         {
             var order = await _context.GetByIdAsync<Domain.Order>(orderId, token);
             if (order.Status != OrderStatus.Created)
                 return Failure(MessageKind.AlreadyExists);
-            
+
             if (order.User == null)
                 return Failure(MessageKind.Order_CannotPay_User_Required);
 
@@ -66,7 +67,9 @@ namespace Sheaft.Business
             return Success();
         }
 
-        public async Task<Result<List<Tuple<Domain.DeliveryMode, DateTimeOffset, string>>>> GetCartDeliveriesAsync(IEnumerable<ProducerExpectedDeliveryDto> producersExpectedDeliveries, IEnumerable<Guid> deliveryIds, IEnumerable<Tuple<Domain.Product, Guid, int>> cartProducts, CancellationToken token)
+        public async Task<Result<List<Tuple<Domain.DeliveryMode, DateTimeOffset, string>>>> GetCartDeliveriesAsync(
+            IEnumerable<ProducerExpectedDeliveryDto> producersExpectedDeliveries, IEnumerable<Guid> deliveryIds,
+            IEnumerable<Tuple<Domain.Product, Guid, int>> cartProducts, CancellationToken token)
         {
             var deliveries = deliveryIds.Any()
                 ? await _context.GetByIdsAsync<Domain.DeliveryMode>(deliveryIds, token)
@@ -75,21 +78,28 @@ namespace Sheaft.Business
             var cartDeliveries = new List<Tuple<Domain.DeliveryMode, DateTimeOffset, string>>();
             foreach (var delivery in deliveries)
             {
-                if (delivery.Closings.Any(c => DateTimeOffset.Now >= c.ClosedFrom && DateTimeOffset.UtcNow <= c.ClosedTo))
-                    return Failure<List<Tuple<Domain.DeliveryMode, DateTimeOffset, string>>>(MessageKind.Order_CannotCreate_Delivery_Closed, delivery.Name);
+                if (delivery.Closings.Any(
+                    c => DateTimeOffset.Now >= c.ClosedFrom && DateTimeOffset.UtcNow <= c.ClosedTo))
+                    return Failure<List<Tuple<Domain.DeliveryMode, DateTimeOffset, string>>>(
+                        MessageKind.Order_CannotCreate_Delivery_Closed, delivery.Name);
 
                 var cartDelivery = producersExpectedDeliveries.FirstOrDefault(ped => ped.DeliveryModeId == delivery.Id);
                 if (delivery.Closings.Any(c =>
-                    cartDelivery.ExpectedDeliveryDate >= c.ClosedFrom && cartDelivery.ExpectedDeliveryDate <= c.ClosedTo))
+                    cartDelivery.ExpectedDeliveryDate >= c.ClosedFrom &&
+                    cartDelivery.ExpectedDeliveryDate <= c.ClosedTo))
                 {
-                    return Failure<List<Tuple<Domain.DeliveryMode, DateTimeOffset, string>>>(MessageKind.Order_CannotCreate_Delivery_Closed, delivery.Name,
+                    return Failure<List<Tuple<Domain.DeliveryMode, DateTimeOffset, string>>>(
+                        MessageKind.Order_CannotCreate_Delivery_Closed, delivery.Name,
                         delivery.Producer.Name);
                 }
 
-                if (cartProducts.Any(p => p.Item1.Producer.Id == delivery.Producer.Id && p.Item1.Producer.Closings.Any(c =>
-                    cartDelivery.ExpectedDeliveryDate >= c.ClosedFrom && cartDelivery.ExpectedDeliveryDate <= c.ClosedTo)))
+                if (cartProducts.Any(p => p.Item1.Producer.Id == delivery.Producer.Id && p.Item1.Producer.Closings.Any(
+                    c =>
+                        cartDelivery.ExpectedDeliveryDate >= c.ClosedFrom &&
+                        cartDelivery.ExpectedDeliveryDate <= c.ClosedTo)))
                 {
-                    return Failure<List<Tuple<Domain.DeliveryMode, DateTimeOffset, string>>>(MessageKind.Order_CannotCreate_Producer_Closed, delivery.Producer.Name);
+                    return Failure<List<Tuple<Domain.DeliveryMode, DateTimeOffset, string>>>(
+                        MessageKind.Order_CannotCreate_Producer_Closed, delivery.Producer.Name);
                 }
 
                 cartDeliveries.Add(new Tuple<Domain.DeliveryMode, DateTimeOffset, string>(delivery,
@@ -99,11 +109,14 @@ namespace Sheaft.Business
             return Success(cartDeliveries);
         }
 
-        public async Task<Result<List<Tuple<Domain.Product, Guid, int>>>> GetCartProductsAsync(IEnumerable<Guid> productIds, IEnumerable<ResourceIdQuantityDto> productsQuantities, CancellationToken token)
+        public async Task<Result<List<Tuple<Domain.Product, Guid, int>>>> GetCartProductsAsync(
+            IEnumerable<Guid> productIds, IEnumerable<ResourceIdQuantityDto> productsQuantities,
+            CancellationToken token)
         {
             var invalidProductIds = await GetConsumerInvalidProductIds(productIds, token);
             if (invalidProductIds.Any())
-                return Failure<List<Tuple<Domain.Product, Guid, int>>>(MessageKind.Order_CannotCreate_Some_Products_NotAvailable,
+                return Failure<List<Tuple<Domain.Product, Guid, int>>>(
+                    MessageKind.Order_CannotCreate_Some_Products_NotAvailable,
                     string.Join(";", invalidProductIds));
 
             var cartProducts = new List<Tuple<Domain.Product, Guid, int>>();
@@ -122,20 +135,20 @@ namespace Sheaft.Business
             return Success(cartProducts);
         }
 
-        private async Task<IEnumerable<string>> GetConsumerInvalidProductIds(IEnumerable<Guid> productIds, CancellationToken token)
+        private async Task<IEnumerable<string>> GetConsumerInvalidProductIds(IEnumerable<Guid> productIds,
+            CancellationToken token)
         {
             var products = await _context.Products.Where(p => productIds.Contains(p.Id))
                 .ToListAsync(token);
 
             var invalidProductIds = products
-                .Where(p =>
-                    p.RemovedOn.HasValue
-                    || !p.Available
-                    || p.CatalogsPrices.Any(cp =>
-                        cp.Catalog.Kind == CatalogKind.Consumers && cp.Catalog.IsDefault && !cp.Catalog.Available)
-                    || p.Producer.RemovedOn.HasValue
-                    || !p.Producer.CanDirectSell)
-                .Select(p => p.Id.ToString("N"));
+                .Where(p => !p.Available
+                            || !p.CatalogsPrices.Any(cp => cp.Catalog.Kind == CatalogKind.Consumers)
+                            || p.Producer.RemovedOn.HasValue
+                            || !p.Producer.CanDirectSell)
+                .Select(p => p.Id.ToString("N"))
+                .ToList();
+            
             return invalidProductIds;
         }
     }
