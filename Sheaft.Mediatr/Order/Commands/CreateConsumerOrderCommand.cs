@@ -22,6 +22,10 @@ namespace Sheaft.Mediatr.Order.Commands
 {
     public class CreateConsumerOrderCommand : Command<Guid>
     {
+        protected CreateConsumerOrderCommand()
+        {
+            
+        }
         [JsonConstructor]
         public CreateConsumerOrderCommand(RequestUser requestUser) : base(requestUser)
         {
@@ -30,8 +34,8 @@ namespace Sheaft.Mediatr.Order.Commands
 
         public Guid? UserId { get; set; }
         public DonationKind Donation { get; set; }
-        public IEnumerable<ResourceIdQuantityDto> Products { get; set; }
-        public IEnumerable<ProducerExpectedDeliveryDto> ProducersExpectedDeliveries { get; set; }
+        public IEnumerable<ResourceIdQuantityInputDto> Products { get; set; }
+        public IEnumerable<ProducerExpectedDeliveryInputDto> ProducersExpectedDeliveries { get; set; }
     }
 
     public class CreateConsumerOrderCommandHandler : CommandsHandler,

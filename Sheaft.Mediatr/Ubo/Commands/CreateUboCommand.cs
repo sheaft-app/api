@@ -17,6 +17,10 @@ namespace Sheaft.Mediatr.Ubo.Commands
 {
     public class CreateUboCommand : Command<Guid>
     {
+        protected CreateUboCommand()
+        {
+            
+        }
         [JsonConstructor]
         public CreateUboCommand(RequestUser requestUser) : base(requestUser)
         {

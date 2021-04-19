@@ -19,6 +19,10 @@ namespace Sheaft.Mediatr.Transfer.Commands
 {
     public class CheckTransfersCommand : Command
     {
+        protected CheckTransfersCommand()
+        {
+            
+        }
         [JsonConstructor]
         public CheckTransfersCommand(RequestUser requestUser) : base(requestUser)
         {

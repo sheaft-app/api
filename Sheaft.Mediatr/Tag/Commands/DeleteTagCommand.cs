@@ -16,6 +16,10 @@ namespace Sheaft.Mediatr.Tag.Commands
 {
     public class DeleteTagCommand : Command
     {
+        protected DeleteTagCommand()
+        {
+            
+        }
         [JsonConstructor]
         public DeleteTagCommand(RequestUser requestUser) : base(requestUser)
         {

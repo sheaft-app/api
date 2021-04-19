@@ -18,6 +18,10 @@ namespace Sheaft.Mediatr.Payin.Commands
 {
     public class CheckPayinCommand : Command
     {
+        protected CheckPayinCommand()
+        {
+            
+        }
         [JsonConstructor]
         public CheckPayinCommand(RequestUser requestUser) : base(requestUser)
         {

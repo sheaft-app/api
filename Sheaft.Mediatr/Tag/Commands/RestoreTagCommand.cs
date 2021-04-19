@@ -15,6 +15,10 @@ namespace Sheaft.Mediatr.Tag.Commands
 {
     public class RestoreTagCommand : Command
     {
+        protected RestoreTagCommand()
+        {
+            
+        }
         [JsonConstructor]
         public RestoreTagCommand(RequestUser requestUser) : base(requestUser)
         {

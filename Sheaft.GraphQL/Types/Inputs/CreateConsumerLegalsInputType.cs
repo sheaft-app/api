@@ -1,11 +1,12 @@
 ﻿using HotChocolate.Types;
 using Sheaft.Application.Models;
+using Sheaft.Mediatr.Legal.Commands;
 
 namespace Sheaft.GraphQL.Types.Inputs
 {
-    public class CreateConsumerLegalsInputType : SheaftInputType<CreateConsumerLegalDto>
+    public class CreateConsumerLegalsInputType : SheaftInputType<CreateConsumerLegalCommand>
     {
-        protected override void Configure(IInputObjectTypeDescriptor<CreateConsumerLegalDto> descriptor)
+        protected override void Configure(IInputObjectTypeDescriptor<CreateConsumerLegalCommand> descriptor)
         {
             descriptor.Name("CreateConsumerLegalInput");
             descriptor.Field(c => c.FirstName);

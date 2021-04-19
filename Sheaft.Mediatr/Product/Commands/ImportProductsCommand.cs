@@ -22,6 +22,10 @@ namespace Sheaft.Mediatr.Product.Commands
 {
     public class ImportProductsCommand : Command
     {
+        protected ImportProductsCommand()
+        {
+            
+        }
         [JsonConstructor]
         public ImportProductsCommand(RequestUser requestUser) : base(requestUser)
         {

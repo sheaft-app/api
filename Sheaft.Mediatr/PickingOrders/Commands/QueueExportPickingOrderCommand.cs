@@ -20,15 +20,25 @@ namespace Sheaft.Mediatr.PickingOrders.Commands
 {
     public class QueueExportPickingOrderCommand : Command<Guid>
     {
+        protected QueueExportPickingOrderCommand()
+        {
+            
+        }
         [JsonConstructor]
         public QueueExportPickingOrderCommand(RequestUser requestUser) : base(requestUser)
         {
-            ProducerId = requestUser.Id;
+            ProducerId = RequestUser.Id;
         }
 
         public IEnumerable<Guid> PurchaseOrderIds { get; set; }
         public string Name { get; set; }
         public Guid ProducerId { get; set; }
+
+        public override void SetRequestUser(RequestUser user)
+        {
+            base.SetRequestUser(user);
+            ProducerId = RequestUser.Id;
+        }
     }
 
     public class QueueExportPickingOrderCommandHandler : CommandsHandler,

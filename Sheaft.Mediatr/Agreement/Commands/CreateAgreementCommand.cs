@@ -19,6 +19,10 @@ namespace Sheaft.Mediatr.Agreement.Commands
 {
     public class CreateAgreementCommand : Command<Guid>
     {
+        protected CreateAgreementCommand()
+        {
+        }
+        
         [JsonConstructor]
         public CreateAgreementCommand(RequestUser requestUser) : base(requestUser)
         {

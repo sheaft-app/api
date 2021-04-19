@@ -14,6 +14,10 @@ namespace Sheaft.Mediatr.Declaration.Commands
 {
     public class RefreshDeclarationStatusCommand : Command
     {
+        protected RefreshDeclarationStatusCommand()
+        {
+            
+        }
         [JsonConstructor]
         public RefreshDeclarationStatusCommand(RequestUser requestUser, string identifier)
             : base(requestUser)

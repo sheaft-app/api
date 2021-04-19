@@ -20,15 +20,25 @@ namespace Sheaft.Mediatr.PurchaseOrder.Commands
 {
     public class QueueExportPurchaseOrdersCommand : Command<Guid>
     {
+        protected QueueExportPurchaseOrdersCommand()
+        {
+            
+        }
         [JsonConstructor]
         public QueueExportPurchaseOrdersCommand(RequestUser requestUser) : base(requestUser)
         {
-            UserId = requestUser.Id;
+            UserId = RequestUser.Id;
         }
 
         public Guid UserId { get; set; }
         public DateTimeOffset From { get; set; }
         public DateTimeOffset To { get; set; }
+
+        public override void SetRequestUser(RequestUser user)
+        {
+            base.SetRequestUser(user);
+            UserId = RequestUser.Id;
+        }
     }
 
     public class QueueExportPurchaseOrdersCommandHandler : CommandsHandler,

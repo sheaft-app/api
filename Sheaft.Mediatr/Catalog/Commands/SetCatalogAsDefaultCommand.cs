@@ -17,6 +17,10 @@ namespace Sheaft.Mediatr.Catalog.Commands
 {
     public class SetCatalogAsDefaultCommand: Command
     {
+        protected SetCatalogAsDefaultCommand()
+        {
+            
+        }
         public SetCatalogAsDefaultCommand(RequestUser requestUser) : base(requestUser)
         {
         }

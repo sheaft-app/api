@@ -22,6 +22,10 @@ namespace Sheaft.Mediatr.Product.Commands
 {
     public class UpdateProductCommand : Command
     {
+        protected UpdateProductCommand()
+        {
+            
+        }
         [JsonConstructor]
         public UpdateProductCommand(RequestUser requestUser) : base(requestUser)
         {
@@ -44,7 +48,7 @@ namespace Sheaft.Mediatr.Product.Commands
         public bool? VisibleToConsumers { get; set; }
         public decimal? WholeSalePricePerUnit { get; set; }
         public IEnumerable<Guid> Tags { get; set; }
-        public IEnumerable<UpdateOrCreateCatalogPriceDto> Catalogs { get; set; }
+        public IEnumerable<CatalogPriceInputDto> Catalogs { get; set; }
     }
 
     public class UpdateProductCommandHandler : CommandsHandler,
@@ -133,15 +137,15 @@ namespace Sheaft.Mediatr.Product.Commands
                 {
                     var productCatalogs = entity.CatalogsPrices.Select(p => p.Catalog);
                     var catalogIds = productCatalogs.Select(pc => pc.Id);
-                    var catalogToRemoveIds = catalogIds.Except(request.Catalogs.Select(c => c.Id));
+                    var catalogToRemoveIds = catalogIds.Except(request.Catalogs.Select(c => c.CatalogId));
                     foreach (var catalog in productCatalogs.Where(pc => catalogToRemoveIds.Contains(pc.Id)))
                         _context.Remove(catalog.RemoveProduct(entity.Id));
 
                     foreach (var catalogPrice in request.Catalogs)
                     {
                         var catalog =
-                            entity.CatalogsPrices.FirstOrDefault(c => c.Catalog.Id == catalogPrice.Id)?.Catalog ??
-                            await _context.Catalogs.SingleAsync(e => e.Id == catalogPrice.Id, token);
+                            entity.CatalogsPrices.FirstOrDefault(c => c.Catalog.Id == catalogPrice.CatalogId)?.Catalog ??
+                            await _context.Catalogs.SingleAsync(e => e.Id == catalogPrice.CatalogId, token);
                         catalog.AddOrUpdateProduct(entity, request.WholeSalePricePerUnit.Value);
                     }
                 }

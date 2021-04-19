@@ -1,7 +1,6 @@
 ﻿using Amazon;
 using Amazon.SimpleEmail;
 using AspNetCoreRateLimit;
-using AutoMapper;
 using Hangfire;
 using HotChocolate;
 using HotChocolate.AspNetCore;
@@ -75,7 +74,6 @@ using Sheaft.Mediatr.Donation.Queries;
 using Sheaft.Mediatr.Job.Queries;
 using Sheaft.Mediatr.Leaderboard.Queries;
 using Sheaft.Mediatr.Legal.Queries;
-using Sheaft.Mediatr.Mappings;
 using Sheaft.Mediatr.Nationality.Queries;
 using Sheaft.Mediatr.Notification.Queries;
 using Sheaft.Mediatr.Order.Queries;
@@ -278,7 +276,7 @@ namespace Sheaft.Web.Api
                 }
             });
 
-            services.AddAutoMapper(new []{typeof(ProductProfile).Assembly, typeof(ProductInputProfile).Assembly});
+            services.AddAutoMapper(typeof(ProductProfile).Assembly);
             services.AddMediatR(new List<Assembly>() { typeof(RegisterStoreCommand).Assembly }.ToArray());
             services.AddHttpClient();
 

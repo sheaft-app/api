@@ -21,6 +21,10 @@ namespace Sheaft.Mediatr.User.Commands
 {
     public class CreateUserPointsCommand : Command
     {
+        protected CreateUserPointsCommand()
+        {
+            
+        }
         [JsonConstructor]
         public CreateUserPointsCommand(RequestUser requestUser) : base(requestUser)
         {

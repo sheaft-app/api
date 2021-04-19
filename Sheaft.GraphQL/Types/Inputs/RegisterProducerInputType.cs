@@ -1,23 +1,18 @@
 ﻿using HotChocolate.Types;
 using Sheaft.Application.Models;
+using Sheaft.Mediatr.Producer.Commands;
 
 namespace Sheaft.GraphQL.Types.Inputs
 {
-    public class RegisterProducerInputType : SheaftInputType<RegisterProducerDto>
+    public class RegisterProducerInputType : SheaftInputType<RegisterProducerCommand>
     {
-        protected override void Configure(IInputObjectTypeDescriptor<RegisterProducerDto> descriptor)
+        protected override void Configure(IInputObjectTypeDescriptor<RegisterProducerCommand> descriptor)
         {
             descriptor.Name("RegisterProducerInput");
             descriptor.Field(c => c.OpenForNewBusiness);
             descriptor.Field(c => c.Phone);
             descriptor.Field(c => c.Picture);
             descriptor.Field(c => c.SponsoringCode);
-            descriptor.Field(c => c.Summary);
-            descriptor.Field(c => c.Description);
-            descriptor.Field(c => c.Facebook);
-            descriptor.Field(c => c.Twitter);
-            descriptor.Field(c => c.Instagram);
-            descriptor.Field(c => c.Website);
 
             descriptor.Field(c => c.NotSubjectToVat)
                 .Type<NonNullType<BooleanType>>();
@@ -41,7 +36,7 @@ namespace Sheaft.GraphQL.Types.Inputs
                 .Type<ListType<IdType>>();
 
             descriptor.Field(c => c.Legals)
-                .Type<NonNullType<CreateBusinessLegalsInputType>>();
+                .Type<NonNullType<BusinessLegalInputType>>();
         }
     }
 }

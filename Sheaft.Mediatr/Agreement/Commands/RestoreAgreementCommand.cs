@@ -16,6 +16,10 @@ namespace Sheaft.Mediatr.Agreement.Commands
 {
     public class RestoreAgreementCommand : Command
     {
+        protected RestoreAgreementCommand()
+        {
+            
+        }
         [JsonConstructor]
         public RestoreAgreementCommand(RequestUser requestUser) : base(requestUser)
         {

@@ -14,6 +14,10 @@ namespace Sheaft.Mediatr.Catalog.Commands
 {
     public class SetCatalogAvailabilityCommand: Command
     {
+        protected SetCatalogAvailabilityCommand()
+        {
+            
+        }
         public SetCatalogAvailabilityCommand(RequestUser requestUser) : base(requestUser)
         {
         }

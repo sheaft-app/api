@@ -13,11 +13,15 @@ namespace Sheaft.Mediatr.Catalog.Commands
 {
     public class SetCatalogsAvailabilityCommand: Command
     {
+        protected SetCatalogsAvailabilityCommand()
+        {
+            
+        }
         public SetCatalogsAvailabilityCommand(RequestUser requestUser) : base(requestUser)
         {
         }
         
-        public bool IsAvailable { get; set; }
+        public bool Available { get; set; }
         public IEnumerable<Guid> CatalogIds { get; set; }
     }
 
@@ -40,7 +44,7 @@ namespace Sheaft.Mediatr.Catalog.Commands
                 {
                     var result = await _mediatr.Process(
                         new SetCatalogAvailabilityCommand(request.RequestUser)
-                            {CatalogId = id, IsAvailable = request.IsAvailable}, token);
+                            {CatalogId = id, IsAvailable = request.Available}, token);
 
                     if (!result.Succeeded)
                         throw result.Exception;

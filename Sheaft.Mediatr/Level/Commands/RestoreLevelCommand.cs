@@ -15,6 +15,10 @@ namespace Sheaft.Mediatr.Level.Commands
 {
     public class RestoreLevelCommand : Command
     {
+        protected RestoreLevelCommand()
+        {
+            
+        }
         [JsonConstructor]
         public RestoreLevelCommand(RequestUser requestUser) : base(requestUser)
         {

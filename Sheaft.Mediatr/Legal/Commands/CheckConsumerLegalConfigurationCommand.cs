@@ -15,6 +15,10 @@ namespace Sheaft.Mediatr.Legal.Commands
 {
     public class CheckConsumerLegalConfigurationCommand : Command
     {
+        protected CheckConsumerLegalConfigurationCommand()
+        {
+            
+        }
         [JsonConstructor]
         public CheckConsumerLegalConfigurationCommand(RequestUser requestUser) : base(requestUser)
         {

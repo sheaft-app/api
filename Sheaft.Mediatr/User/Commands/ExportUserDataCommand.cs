@@ -23,6 +23,10 @@ namespace Sheaft.Mediatr.User.Commands
 {
     public class ExportUserDataCommand : Command
     {
+        protected ExportUserDataCommand()
+        {
+            
+        }
         [JsonConstructor]
         public ExportUserDataCommand(RequestUser requestUser) : base(requestUser)
         {

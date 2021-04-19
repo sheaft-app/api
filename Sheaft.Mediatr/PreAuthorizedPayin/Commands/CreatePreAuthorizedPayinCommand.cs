@@ -19,6 +19,10 @@ namespace Sheaft.Mediatr.PreAuthorizedPayin.Commands
 {
     public class CreatePreAuthorizedPayinCommand : Command<Guid>
     {
+        protected CreatePreAuthorizedPayinCommand()
+        {
+            
+        }
         [JsonConstructor]
         public CreatePreAuthorizedPayinCommand(RequestUser requestUser) : base(requestUser)
         {

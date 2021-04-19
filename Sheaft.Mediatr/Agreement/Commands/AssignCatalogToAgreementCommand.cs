@@ -20,6 +20,10 @@ namespace Sheaft.Mediatr.Agreement.Commands
 {
     public class AssignCatalogToAgreementCommand : Command
     {
+        protected AssignCatalogToAgreementCommand()
+        {
+        }
+
         [JsonConstructor]
         public AssignCatalogToAgreementCommand(RequestUser requestUser) : base(requestUser)
         {

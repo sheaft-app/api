@@ -21,6 +21,10 @@ namespace Sheaft.Mediatr.Donation.Commands
 {
     public class CreateDonationCommand : Command<Guid>
     {
+        protected CreateDonationCommand()
+        {
+            
+        }
         [JsonConstructor]
         public CreateDonationCommand(RequestUser requestUser)
             : base(requestUser)

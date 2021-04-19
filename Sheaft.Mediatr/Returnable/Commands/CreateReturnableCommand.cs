@@ -17,10 +17,14 @@ namespace Sheaft.Mediatr.Returnable.Commands
 {
     public class CreateReturnableCommand : Command<Guid>
     {
+        protected CreateReturnableCommand()
+        {
+            
+        }
         [JsonConstructor]
         public CreateReturnableCommand(RequestUser requestUser) : base(requestUser)
         {
-            UserId = requestUser.Id;
+            UserId = RequestUser.Id;
         }
 
         public string Name { get; set; }
@@ -28,6 +32,12 @@ namespace Sheaft.Mediatr.Returnable.Commands
         public decimal WholeSalePrice { get; set; }
         public decimal Vat { get; set; }
         public Guid UserId { get; set; }
+
+        public override void SetRequestUser(RequestUser user)
+        {
+            base.SetRequestUser(user);
+            UserId = RequestUser.Id;
+        }
     }
 
     public class CreateReturnableCommandHandler : CommandsHandler,

@@ -17,6 +17,10 @@ namespace Sheaft.Mediatr.Job.Commands
 {
     public class FailJobCommand : Command
     {
+        protected FailJobCommand()
+        {
+            
+        }
         [JsonConstructor]
         public FailJobCommand(RequestUser requestUser) : base(requestUser)
         {

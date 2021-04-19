@@ -15,6 +15,10 @@ namespace Sheaft.Mediatr.DeliveryClosing.Commands
 {
     public class DeleteDeliveryClosingsCommand : Command
     {
+        protected DeleteDeliveryClosingsCommand()
+        {
+            
+        }
         [JsonConstructor]
         public DeleteDeliveryClosingsCommand(RequestUser requestUser) : base(requestUser)
         {

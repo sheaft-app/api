@@ -19,6 +19,10 @@ namespace Sheaft.Mediatr.Withholding.Commands
 {
     public class ProcessWithholdingsCommand : Command
     {
+        protected ProcessWithholdingsCommand()
+        {
+            
+        }
         [JsonConstructor]
         public ProcessWithholdingsCommand(RequestUser requestUser)
             : base(requestUser)

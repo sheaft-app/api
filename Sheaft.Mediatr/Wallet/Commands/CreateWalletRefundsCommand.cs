@@ -17,6 +17,10 @@ namespace Sheaft.Mediatr.Wallet.Commands
 {
     public class CreateWalletRefundsCommand : Command<Guid>
     {
+        protected CreateWalletRefundsCommand()
+        {
+            
+        }
         [JsonConstructor]
         public CreateWalletRefundsCommand(RequestUser requestUser) : base(requestUser)
         {

@@ -16,6 +16,10 @@ namespace Sheaft.Mediatr.PurchaseOrder.Commands
 {
     public class ExpirePurchaseOrderCommand : Command
     {
+        protected ExpirePurchaseOrderCommand()
+        {
+            
+        }
         [JsonConstructor]
         public ExpirePurchaseOrderCommand(RequestUser requestUser) : base(requestUser)
         {

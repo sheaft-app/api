@@ -27,6 +27,10 @@ namespace Sheaft.Mediatr.Producer.Commands
 {
     public class UpdateProducerCommand : Command
     {
+        protected UpdateProducerCommand()
+        {
+            
+        }
         [JsonConstructor]
         public UpdateProducerCommand(RequestUser requestUser) : base(requestUser)
         {
@@ -109,7 +113,7 @@ namespace Sheaft.Mediatr.Producer.Commands
 
             await _context.SaveChangesAsync(token);
             
-            var resultImage = await _mediatr.Process(new UpdateUserPictureCommand(request.RequestUser)
+            var resultImage = await _mediatr.Process(new UpdateUserPreviewCommand(request.RequestUser)
             {
                 UserId = producer.Id,
                 Picture = request.Picture,

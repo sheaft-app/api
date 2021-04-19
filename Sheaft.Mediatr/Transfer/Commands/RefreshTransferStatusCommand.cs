@@ -16,6 +16,10 @@ namespace Sheaft.Mediatr.Transfer.Commands
 {
     public class RefreshTransferStatusCommand : Command
     {
+        protected RefreshTransferStatusCommand()
+        {
+            
+        }
         [JsonConstructor]
         public RefreshTransferStatusCommand(RequestUser requestUser, string identifier) : base(requestUser)
         {

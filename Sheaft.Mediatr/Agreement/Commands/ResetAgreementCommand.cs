@@ -20,6 +20,10 @@ namespace Sheaft.Mediatr.Agreement.Commands
 {
     public class ResetAgreementStatusToCommand : Command
     {
+        protected ResetAgreementStatusToCommand()
+        {
+            
+        }
         [JsonConstructor]
         public ResetAgreementStatusToCommand(RequestUser requestUser) : base(requestUser)
         {

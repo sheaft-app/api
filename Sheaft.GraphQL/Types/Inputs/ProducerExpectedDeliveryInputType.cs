@@ -3,9 +3,9 @@ using Sheaft.Application.Models;
 
 namespace Sheaft.GraphQL.Types.Inputs
 {
-    public class ProducerExpectedDeliveryInputType : SheaftInputType<ProducerExpectedDeliveryDto>
+    public class ProducerExpectedDeliveryInputType : SheaftInputType<ProducerExpectedDeliveryInputDto>
     {
-        protected override void Configure(IInputObjectTypeDescriptor<ProducerExpectedDeliveryDto> descriptor)
+        protected override void Configure(IInputObjectTypeDescriptor<ProducerExpectedDeliveryInputDto> descriptor)
         {
             descriptor.Name("ProducerExpectedDeliveryInput");
             descriptor.Field(c => c.ProducerId).Type<NonNullType<IdType>>();

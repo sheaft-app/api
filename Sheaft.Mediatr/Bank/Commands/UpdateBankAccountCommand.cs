@@ -17,6 +17,10 @@ namespace Sheaft.Mediatr.Bank.Commands
 {
     public class UpdateBankAccountCommand : Command
     {
+        protected UpdateBankAccountCommand()
+        {
+            
+        }
         [JsonConstructor]
         public UpdateBankAccountCommand(RequestUser requestUser) : base(requestUser)
         {

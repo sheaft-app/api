@@ -21,16 +21,26 @@ namespace Sheaft.Mediatr.QuickOrder.Commands
 {
     public class CreateQuickOrderCommand : Command<Guid>
     {
+        protected CreateQuickOrderCommand()
+        {
+            
+        }
         [JsonConstructor]
         public CreateQuickOrderCommand(RequestUser requestUser) : base(requestUser)
         {
-            UserId = requestUser.Id;
+            UserId = RequestUser.Id;
         }
 
         public Guid UserId { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
-        public IEnumerable<ResourceIdQuantityDto> Products { get; set; }
+        public IEnumerable<ResourceIdQuantityInputDto> Products { get; set; }
+
+        public override void SetRequestUser(RequestUser user)
+        {
+            base.SetRequestUser(user);
+            UserId = RequestUser.Id;
+        }
     }
 
     public class CreateQuickOrderCommandHandler : CommandsHandler,

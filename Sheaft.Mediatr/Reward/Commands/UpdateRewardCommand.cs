@@ -16,6 +16,10 @@ namespace Sheaft.Mediatr.Reward.Commands
 {
     public class UpdateRewardCommand : Command
     {
+        protected UpdateRewardCommand()
+        {
+            
+        }
         [JsonConstructor]
         public UpdateRewardCommand(RequestUser requestUser) : base(requestUser)
         {

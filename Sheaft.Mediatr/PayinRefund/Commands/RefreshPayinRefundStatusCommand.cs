@@ -15,6 +15,10 @@ namespace Sheaft.Mediatr.PayinRefund.Commands
 {
     public class RefreshPayinRefundStatusCommand : Command
     {
+        protected RefreshPayinRefundStatusCommand()
+        {
+            
+        }
         [JsonConstructor]
         public RefreshPayinRefundStatusCommand(RequestUser requestUser, string identifier)
             : base(requestUser)

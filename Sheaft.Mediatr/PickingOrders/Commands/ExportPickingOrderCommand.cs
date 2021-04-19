@@ -26,6 +26,10 @@ namespace Sheaft.Mediatr.PickingOrders.Commands
 {
     public class ExportPickingOrderCommand : Command
     {
+        protected ExportPickingOrderCommand()
+        {
+            
+        }
         [JsonConstructor]
         public ExportPickingOrderCommand(RequestUser requestUser) : base(requestUser)
         {

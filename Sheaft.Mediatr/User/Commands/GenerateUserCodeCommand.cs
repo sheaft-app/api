@@ -18,6 +18,10 @@ namespace Sheaft.Mediatr.User.Commands
 {
     public class GenerateUserCodeCommand : Command<string>
     {
+        protected GenerateUserCodeCommand()
+        {
+            
+        }
         [JsonConstructor]
         public GenerateUserCodeCommand(RequestUser requestUser) : base(requestUser)
         {

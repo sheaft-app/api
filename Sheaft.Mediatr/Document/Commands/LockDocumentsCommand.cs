@@ -19,6 +19,10 @@ namespace Sheaft.Mediatr.Document.Commands
 {
     public class LockDocumentsCommand : Command
     {
+        protected LockDocumentsCommand()
+        {
+            
+        }
         [JsonConstructor]
         public LockDocumentsCommand(RequestUser requestUser) : base(requestUser)
         {

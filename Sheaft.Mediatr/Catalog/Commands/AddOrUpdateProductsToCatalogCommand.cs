@@ -17,12 +17,16 @@ namespace Sheaft.Mediatr.Catalog.Commands
 {
     public class AddOrUpdateProductsToCatalogCommand: Command
     {
+        protected AddOrUpdateProductsToCatalogCommand()
+        {
+            
+        }
         public AddOrUpdateProductsToCatalogCommand(RequestUser requestUser) : base(requestUser)
         {
         }
         
         public Guid CatalogId { get; set; }
-        public IEnumerable<UpdateOrCreateCatalogPriceDto> Products { get; set; }
+        public IEnumerable<ProductPriceInputDto> Products { get; set; }
     }
 
     public class AddOrUpdateProductsToCatalogCommandHandler : CommandsHandler,
@@ -40,14 +44,14 @@ namespace Sheaft.Mediatr.Catalog.Commands
         {
             var catalog = await _context.Catalogs.SingleAsync(e => e.Id == request.CatalogId, token);
 
-            var productIds = request.Products.Select(p => p.Id);
+            var productIds = request.Products.Select(p => p.ProductId);
             var products = await _context.Products
                 .Where(p => productIds.Contains(p.Id))
                 .ToListAsync(token);
 
             foreach (var product in products)
             {
-                var catalogProductPrice = request.Products.Single(p => p.Id == product.Id);
+                var catalogProductPrice = request.Products.Single(p => p.ProductId == product.Id);
                 product.AddOrUpdateCatalogPrice(catalog, catalogProductPrice.WholeSalePricePerUnit);
             }
             

@@ -17,6 +17,10 @@ namespace Sheaft.Mediatr.Withholding.Commands
 {
     public class CreateWithholdingCommand : Command<Guid>
     {
+        protected CreateWithholdingCommand()
+        {
+            
+        }
         [JsonConstructor]
         public CreateWithholdingCommand(RequestUser requestUser)
             : base(requestUser)

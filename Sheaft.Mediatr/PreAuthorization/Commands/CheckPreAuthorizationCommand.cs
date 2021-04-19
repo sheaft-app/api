@@ -16,6 +16,10 @@ namespace Sheaft.Mediatr.PreAuthorization.Commands
 {
     public class CheckPreAuthorizationCommand : Command
     {
+        protected CheckPreAuthorizationCommand()
+        {
+            
+        }
         [JsonConstructor]
         public CheckPreAuthorizationCommand(RequestUser requestUser) : base(requestUser)
         {

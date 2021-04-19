@@ -17,6 +17,10 @@ namespace Sheaft.Mediatr.Producer.Commands
 {
     public class UpdateProducerTagsCommand : Command
     {
+        protected UpdateProducerTagsCommand()
+        {
+            
+        }
         [JsonConstructor]
         public UpdateProducerTagsCommand(RequestUser requestUser) : base(requestUser)
         {

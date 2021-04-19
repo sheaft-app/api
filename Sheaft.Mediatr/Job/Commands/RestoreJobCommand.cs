@@ -16,6 +16,10 @@ namespace Sheaft.Mediatr.Job.Commands
 {
     public class RestoreJobCommand : Command
     {
+        protected RestoreJobCommand()
+        {
+            
+        }
         [JsonConstructor]
         public RestoreJobCommand(RequestUser requestUser) : base(requestUser)
         {

@@ -3,9 +3,9 @@ using Sheaft.Application.Models;
 
 namespace Sheaft.GraphQL.Types.Inputs
 {
-    public class UpdateOrCreateClosingInputType : SheaftInputType<UpdateOrCreateClosingDto>
+    public class UpdateOrCreateClosingInputType : SheaftInputType<ClosingInputDto>
     {
-        protected override void Configure(IInputObjectTypeDescriptor<UpdateOrCreateClosingDto> descriptor)
+        protected override void Configure(IInputObjectTypeDescriptor<ClosingInputDto> descriptor)
         {
             descriptor.Name("UpdateOrCreateClosingInput");
             descriptor.Field(c => c.Id).Type<IdType>();

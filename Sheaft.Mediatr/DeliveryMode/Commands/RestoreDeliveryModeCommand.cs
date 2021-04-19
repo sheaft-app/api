@@ -17,6 +17,10 @@ namespace Sheaft.Mediatr.DeliveryMode.Commands
 {
     public class RestoreDeliveryModeCommand : Command
     {
+        protected RestoreDeliveryModeCommand()
+        {
+            
+        }
         [JsonConstructor]
         public RestoreDeliveryModeCommand(RequestUser requestUser) : base(requestUser)
         {

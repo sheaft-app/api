@@ -19,15 +19,25 @@ namespace Sheaft.Mediatr.Transactions.Commands
 {
     public class QueueExportTransactionsCommand : Command<Guid>
     {
+        protected QueueExportTransactionsCommand()
+        {
+            
+        }
         [JsonConstructor]
         public QueueExportTransactionsCommand(RequestUser requestUser) : base(requestUser)
         {
-            UserId = requestUser.Id;
+            UserId = RequestUser.Id;
         }
 
         public Guid UserId { get; set; }
         public DateTimeOffset From { get; set; }
         public DateTimeOffset To { get; set; }
+
+        public override void SetRequestUser(RequestUser user)
+        {
+            base.SetRequestUser(user);
+            UserId = RequestUser.Id;
+        }
     }
 
     public class QueueExportTransactionsCommandHandler : CommandsHandler,

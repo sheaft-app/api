@@ -1,11 +1,12 @@
 ﻿using HotChocolate.Types;
 using Sheaft.Application.Models;
+using Sheaft.Mediatr.Returnable.Commands;
 
 namespace Sheaft.GraphQL.Types.Inputs
 {
-    public class CreateReturnableInputType : SheaftInputType<CreateReturnableDto>
+    public class CreateReturnableInputType : SheaftInputType<CreateReturnableCommand>
     {
-        protected override void Configure(IInputObjectTypeDescriptor<CreateReturnableDto> descriptor)
+        protected override void Configure(IInputObjectTypeDescriptor<CreateReturnableCommand> descriptor)
         {
             descriptor.Name("CreateReturnableInput");
             descriptor.Field(c => c.Vat);

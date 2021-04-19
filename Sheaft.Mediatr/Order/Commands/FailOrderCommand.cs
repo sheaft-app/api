@@ -18,6 +18,10 @@ namespace Sheaft.Mediatr.Order.Commands
 {
     public class FailOrderCommand : Command
     {
+        protected FailOrderCommand()
+        {
+            
+        }
         [JsonConstructor]
         public FailOrderCommand(RequestUser requestUser) : base(requestUser)
         {

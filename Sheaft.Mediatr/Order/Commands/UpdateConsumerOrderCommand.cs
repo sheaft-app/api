@@ -21,6 +21,10 @@ namespace Sheaft.Mediatr.Order.Commands
 {
     public class UpdateConsumerOrderCommand : Command
     {
+        protected UpdateConsumerOrderCommand()
+        {
+            
+        }
         [JsonConstructor]
         public UpdateConsumerOrderCommand(RequestUser requestUser) : base(requestUser)
         {
@@ -30,8 +34,8 @@ namespace Sheaft.Mediatr.Order.Commands
         public Guid? UserId { get; set; }
         public Guid OrderId { get; set; }
         public DonationKind Donation { get; set; }
-        public IEnumerable<ResourceIdQuantityDto> Products { get; set; }
-        public IEnumerable<ProducerExpectedDeliveryDto> ProducersExpectedDeliveries { get; set; }
+        public IEnumerable<ResourceIdQuantityInputDto> Products { get; set; }
+        public IEnumerable<ProducerExpectedDeliveryInputDto> ProducersExpectedDeliveries { get; set; }
     }
 
     public class UpdateConsumerOrderCommandHandler : CommandsHandler,

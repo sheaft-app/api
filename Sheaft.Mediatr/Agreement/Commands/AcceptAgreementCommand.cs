@@ -22,6 +22,10 @@ namespace Sheaft.Mediatr.Agreement.Commands
 {
     public class AcceptAgreementCommand : Command
     {
+        protected AcceptAgreementCommand()
+        {
+        }
+
         [JsonConstructor]
         public AcceptAgreementCommand(RequestUser requestUser) : base(requestUser)
         {

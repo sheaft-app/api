@@ -15,6 +15,10 @@ namespace Sheaft.Mediatr.BusinessClosing.Commands
 {
     public class DeleteBusinessClosingsCommand : Command
     {
+        protected DeleteBusinessClosingsCommand()
+        {
+            
+        }
         [JsonConstructor]
         public DeleteBusinessClosingsCommand(RequestUser requestUser) : base(requestUser)
         {

@@ -15,6 +15,10 @@ namespace Sheaft.Mediatr.Product.Commands
 {
     public class DeleteProductsCommand : Command
     {
+        protected DeleteProductsCommand()
+        {
+            
+        }
         [JsonConstructor]
         public DeleteProductsCommand(RequestUser requestUser) : base(requestUser)
         {

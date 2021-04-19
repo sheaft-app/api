@@ -15,6 +15,10 @@ namespace Sheaft.Mediatr.Job.Commands
 {
     public class CancelJobsCommand : Command
     {
+        protected CancelJobsCommand()
+        {
+            
+        }
         [JsonConstructor]
         public CancelJobsCommand(RequestUser requestUser) : base(requestUser)
         {

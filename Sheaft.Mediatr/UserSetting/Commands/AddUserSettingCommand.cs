@@ -15,6 +15,10 @@ namespace Sheaft.Mediatr.UserSetting.Commands
 {
     public class AddUserSettingCommand : Command
     {
+        protected AddUserSettingCommand()
+        {
+            
+        }
         [JsonConstructor]
         public AddUserSettingCommand(RequestUser requestUser) : base(requestUser)
         {

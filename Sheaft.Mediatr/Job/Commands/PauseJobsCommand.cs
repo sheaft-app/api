@@ -15,6 +15,10 @@ namespace Sheaft.Mediatr.Job.Commands
 {
     public class PauseJobsCommand : Command
     {
+        protected PauseJobsCommand()
+        {
+            
+        }
         [JsonConstructor]
         public PauseJobsCommand(RequestUser requestUser) : base(requestUser)
         {

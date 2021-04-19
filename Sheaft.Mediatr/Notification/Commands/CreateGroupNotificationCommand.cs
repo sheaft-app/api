@@ -17,6 +17,10 @@ namespace Sheaft.Mediatr.Notification.Commands
 {
     public class CreateGroupNotificationCommand : Command<Guid>
     {
+        protected CreateGroupNotificationCommand()
+        {
+            
+        }
         [JsonConstructor]
         public CreateGroupNotificationCommand(RequestUser requestUser) : base(requestUser)
         {

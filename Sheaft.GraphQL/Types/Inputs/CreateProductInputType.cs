@@ -1,12 +1,13 @@
 ﻿using HotChocolate.Types;
 using Sheaft.Application.Models;
 using Sheaft.GraphQL.Types.Outputs;
+using Sheaft.Mediatr.Product.Commands;
 
 namespace Sheaft.GraphQL.Types.Inputs
 {
-    public class CreateProductInputType : SheaftInputType<CreateProductDto>
+    public class CreateProductInputType : SheaftInputType<CreateProductCommand>
     {
-        protected override void Configure(IInputObjectTypeDescriptor<CreateProductDto> descriptor)
+        protected override void Configure(IInputObjectTypeDescriptor<CreateProductCommand> descriptor)
         {
             descriptor.Name("CreateProductInput");
             descriptor.Field(c => c.Reference);
@@ -35,7 +36,7 @@ namespace Sheaft.GraphQL.Types.Inputs
                 .Type<NonNullType<ListType<IdType>>>();
             
             descriptor.Field(c => c.Catalogs)
-                .Type<ListType<UpdateOrCreateCatalogPriceInputType>>();
+                .Type<ListType<CatalogPriceInputType>>();
         }
     }
 }

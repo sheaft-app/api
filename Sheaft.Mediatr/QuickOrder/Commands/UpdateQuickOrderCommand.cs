@@ -20,6 +20,10 @@ namespace Sheaft.Mediatr.QuickOrder.Commands
 {
     public class UpdateQuickOrderCommand : Command
     {
+        protected UpdateQuickOrderCommand()
+        {
+            
+        }
         [JsonConstructor]
         public UpdateQuickOrderCommand(RequestUser requestUser) : base(requestUser)
         {
@@ -28,7 +32,7 @@ namespace Sheaft.Mediatr.QuickOrder.Commands
         public Guid QuickOrderId { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
-        public IEnumerable<ResourceIdQuantityDto> Products { get; set; }
+        public IEnumerable<ResourceIdQuantityInputDto> Products { get; set; }
     }
 
     public class UpdateQuickOrderCommandHandler : CommandsHandler,

@@ -16,6 +16,10 @@ namespace Sheaft.Mediatr.Level.Commands
 {
     public class DeleteLevelCommand : Command
     {
+        protected DeleteLevelCommand()
+        {
+            
+        }
         [JsonConstructor]
         public DeleteLevelCommand(RequestUser requestUser) : base(requestUser)
         {

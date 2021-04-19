@@ -16,6 +16,10 @@ namespace Sheaft.Mediatr.Page.Commands
 {
     public class DeletePageCommand : Command
     {
+        protected DeletePageCommand()
+        {
+            
+        }
         [JsonConstructor]
         public DeletePageCommand(RequestUser requestUser) : base(requestUser)
         {

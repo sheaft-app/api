@@ -17,6 +17,10 @@ namespace Sheaft.Mediatr.Declaration.Commands
 {
     public class SubmitDeclarationCommand : Command
     {
+        protected SubmitDeclarationCommand()
+        {
+            
+        }
         [JsonConstructor]
         public SubmitDeclarationCommand(RequestUser requestUser) : base(requestUser)
         {

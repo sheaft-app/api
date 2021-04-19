@@ -18,6 +18,10 @@ namespace Sheaft.Mediatr.Legal.Commands
 {
     public class CreateConsumerLegalCommand : Command<Guid>
     {
+        protected CreateConsumerLegalCommand()
+        {
+            
+        }
         [JsonConstructor]
         public CreateConsumerLegalCommand(RequestUser requestUser) : base(requestUser)
         {

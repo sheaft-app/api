@@ -19,6 +19,10 @@ namespace Sheaft.Mediatr.Product.Commands
 {
     public class UpdateProductPreviewCommand : Command<string>
     {
+        protected UpdateProductPreviewCommand()
+        {
+            
+        }
         [JsonConstructor]
         public UpdateProductPreviewCommand(RequestUser requestUser) : base(requestUser)
         {

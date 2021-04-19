@@ -1,14 +1,16 @@
 using HotChocolate.Types;
 using Sheaft.Application.Models;
+using Sheaft.Mediatr.Agreement.Commands;
 
 namespace Sheaft.GraphQL.Types.Inputs
 {
-    public class AcceptAgreementInputType : SheaftInputType<AcceptAgreementDto>
+    public class AcceptAgreementInputType : SheaftInputType<AcceptAgreementCommand>
     {
-        protected override void Configure(IInputObjectTypeDescriptor<AcceptAgreementDto> descriptor)
+        protected override void Configure(IInputObjectTypeDescriptor<AcceptAgreementCommand> descriptor)
         {
             descriptor.Name("AcceptAgreementInput");
-            descriptor.Field(c => c.Id)
+            descriptor.Field(c => c.AgreementId)
+                .Name("Id")
                 .Type<NonNullType<IdType>>();
 
             descriptor.Field(c => c.SelectedHours)

@@ -19,6 +19,10 @@ namespace Sheaft.Mediatr.User.Commands
 {
     public class QueueExportUserDataCommand : Command<Guid>
     {
+        protected QueueExportUserDataCommand()
+        {
+            
+        }
         [JsonConstructor]
         public QueueExportUserDataCommand(RequestUser requestUser) : base(requestUser)
         {

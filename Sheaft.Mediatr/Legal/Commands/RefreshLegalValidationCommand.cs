@@ -18,6 +18,10 @@ namespace Sheaft.Mediatr.Legal.Commands
 {
     public class RefreshLegalValidationCommand : Command
     {
+        protected RefreshLegalValidationCommand()
+        {
+            
+        }
         [JsonConstructor]
         public RefreshLegalValidationCommand(RequestUser requestUser, string identifier)
             : base(requestUser)

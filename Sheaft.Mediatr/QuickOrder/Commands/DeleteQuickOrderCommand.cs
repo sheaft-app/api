@@ -16,6 +16,10 @@ namespace Sheaft.Mediatr.QuickOrder.Commands
 {
     public class DeleteQuickOrderCommand : Command
     {
+        protected DeleteQuickOrderCommand()
+        {
+            
+        }
         [JsonConstructor]
         public DeleteQuickOrderCommand(RequestUser requestUser) : base(requestUser)
         {

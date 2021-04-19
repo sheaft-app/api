@@ -21,10 +21,14 @@ namespace Sheaft.Mediatr.Product.Commands
 {
     public class CreateProductCommand : Command<Guid>
     {
+        protected CreateProductCommand()
+        {
+            
+        }
         [JsonConstructor]
         public CreateProductCommand(RequestUser requestUser) : base(requestUser)
         {
-            ProducerId = requestUser.Id;
+            ProducerId = RequestUser.Id;
         }
 
         public Guid ProducerId { get; set; }
@@ -45,7 +49,13 @@ namespace Sheaft.Mediatr.Product.Commands
         public Guid? ReturnableId { get; set; }
         public IEnumerable<Guid> Tags { get; set; }
         public bool SkipUpdateProducerTags { get; set; } = false;
-        public IEnumerable<UpdateOrCreateCatalogPriceDto> Catalogs { get; set; }
+        public IEnumerable<CatalogPriceInputDto> Catalogs { get; set; }
+
+        public override void SetRequestUser(RequestUser user)
+        {
+            base.SetRequestUser(user);
+            ProducerId = RequestUser.Id;
+        }
     }
 
     public class CreateProductCommandHandler : CommandsHandler,
@@ -131,7 +141,7 @@ namespace Sheaft.Mediatr.Product.Commands
                 {
                     foreach (var catalogPrice in request.Catalogs)
                     {
-                        var catalog = await _context.Catalogs.SingleAsync(e => e.Id == catalogPrice.Id, token);
+                        var catalog = await _context.Catalogs.SingleAsync(e => e.Id == catalogPrice.CatalogId, token);
                         catalog.AddOrUpdateProduct(entity, catalogPrice.WholeSalePricePerUnit);
                     }
                 }

@@ -15,6 +15,10 @@ namespace Sheaft.Mediatr.Product.Commands
 {
     public class SetProductsAvailabilityCommand : Command
     {
+        protected SetProductsAvailabilityCommand()
+        {
+            
+        }
         [JsonConstructor]
         public SetProductsAvailabilityCommand(RequestUser requestUser) : base(requestUser)
         {

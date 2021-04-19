@@ -16,13 +16,23 @@ namespace Sheaft.Mediatr.Consumer.Commands
 {
     public class CheckConsumerConfigurationCommand : Command
     {
+        protected CheckConsumerConfigurationCommand()
+        {
+            
+        }
         [JsonConstructor]
         public CheckConsumerConfigurationCommand(RequestUser requestUser) : base(requestUser)
         {
-            ConsumerId = requestUser.Id;
+            ConsumerId = RequestUser.Id;
         }
 
         public Guid ConsumerId { get; set; }
+
+        public override void SetRequestUser(RequestUser user)
+        {
+            base.SetRequestUser(user);
+            ConsumerId = RequestUser.Id;
+        }
     }
 
     public class CheckConsumerConfigurationCommandHandler : CommandsHandler,

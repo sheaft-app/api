@@ -17,6 +17,10 @@ namespace Sheaft.Mediatr.Product.Commands
 {
     public class QueueImportProductsCommand : Command<Guid>
     {
+        protected QueueImportProductsCommand()
+        {
+            
+        }
         [JsonConstructor]
         public QueueImportProductsCommand(RequestUser requestUser) : base(requestUser)
         {

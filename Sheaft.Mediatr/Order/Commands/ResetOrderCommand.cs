@@ -18,6 +18,10 @@ namespace Sheaft.Mediatr.Order.Commands
 {
     public class ResetOrderCommand : Command
     {
+        protected ResetOrderCommand()
+        {
+            
+        }
         [JsonConstructor]
         public ResetOrderCommand(RequestUser requestUser) : base(requestUser)
         {

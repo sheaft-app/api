@@ -18,6 +18,10 @@ namespace Sheaft.Mediatr.Job.Commands
 {
     public class UpdateJobCommand : Command
     {
+        protected UpdateJobCommand()
+        {
+            
+        }
         [JsonConstructor]
         public UpdateJobCommand(RequestUser requestUser) : base(requestUser)
         {

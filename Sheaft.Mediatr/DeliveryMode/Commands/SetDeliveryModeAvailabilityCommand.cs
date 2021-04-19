@@ -18,6 +18,10 @@ namespace Sheaft.Mediatr.DeliveryMode.Commands
 {
     public class SetDeliveryModeAvailabilityCommand : Command
     {
+        protected SetDeliveryModeAvailabilityCommand()
+        {
+            
+        }
         [JsonConstructor]
         public SetDeliveryModeAvailabilityCommand(RequestUser requestUser) : base(requestUser)
         {

@@ -22,6 +22,10 @@ namespace Sheaft.Mediatr.DeliveryMode.Commands
 {
     public class DeleteDeliveryModeCommand : Command
     {
+        protected DeleteDeliveryModeCommand()
+        {
+            
+        }
         [JsonConstructor]
         public DeleteDeliveryModeCommand(RequestUser requestUser) : base(requestUser)
         {

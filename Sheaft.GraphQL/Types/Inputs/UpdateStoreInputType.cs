@@ -1,11 +1,12 @@
 ﻿using HotChocolate.Types;
 using Sheaft.Application.Models;
+using Sheaft.Mediatr.Store.Commands;
 
 namespace Sheaft.GraphQL.Types.Inputs
 {
-    public class UpdateStoreInputType : SheaftInputType<UpdateStoreDto>
+    public class UpdateStoreInputType : SheaftInputType<UpdateStoreCommand>
     {
-        protected override void Configure(IInputObjectTypeDescriptor<UpdateStoreDto> descriptor)
+        protected override void Configure(IInputObjectTypeDescriptor<UpdateStoreCommand> descriptor)
         {
             descriptor.Name("UpdateStoreInput");
             descriptor.Field(c => c.OpenForNewBusiness);
@@ -19,7 +20,8 @@ namespace Sheaft.GraphQL.Types.Inputs
             descriptor.Field(c => c.Instagram);
             descriptor.Field(c => c.Website);
 
-            descriptor.Field(c => c.Id)
+            descriptor.Field(c => c.StoreId)
+                .Name("Id")
                 .Type<NonNullType<IdType>>();
 
             descriptor.Field(c => c.Address)

@@ -19,6 +19,10 @@ namespace Sheaft.Mediatr.Document.Commands
 {
     public class SubmitDocumentsCommand : Command
     {
+        protected SubmitDocumentsCommand()
+        {
+            
+        }
         [JsonConstructor]
         public SubmitDocumentsCommand(RequestUser requestUser) : base(requestUser)
         {

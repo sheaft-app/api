@@ -20,13 +20,17 @@ namespace Sheaft.Mediatr.DeliveryClosing.Commands
 {
     public class UpdateOrCreateDeliveryClosingCommand : Command<Guid>
     {
+        protected UpdateOrCreateDeliveryClosingCommand()
+        {
+            
+        }
         [JsonConstructor]
         public UpdateOrCreateDeliveryClosingCommand(RequestUser requestUser) : base(requestUser)
         {
         }
 
         public Guid DeliveryId { get; set; }
-        public UpdateOrCreateClosingDto Closing { get; set; }
+        public ClosingInputDto Closing { get; set; }
     }
 
     public class UpdateOrCreateDeliveryClosingCommandHandler : CommandsHandler,

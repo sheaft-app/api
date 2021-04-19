@@ -15,6 +15,10 @@ namespace Sheaft.Mediatr.PreAuthorization.Commands
 {
     public class RefreshPreAuthorizationStatusCommand : Command<PreAuthorizationStatus>
     {
+        protected RefreshPreAuthorizationStatusCommand()
+        {
+            
+        }
         [JsonConstructor]
         public RefreshPreAuthorizationStatusCommand(RequestUser requestUser, string identifier)
             : base(requestUser)

@@ -19,6 +19,10 @@ namespace Sheaft.Mediatr.Sponsor.Commands
 {
     public class CreateSponsoringCommand : Command
     {
+        protected CreateSponsoringCommand()
+        {
+            
+        }
         [JsonConstructor]
         public CreateSponsoringCommand(RequestUser requestUser) : base(requestUser)
         {

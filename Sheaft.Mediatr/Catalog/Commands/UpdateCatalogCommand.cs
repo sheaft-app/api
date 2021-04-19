@@ -17,6 +17,10 @@ namespace Sheaft.Mediatr.Catalog.Commands
 {
     public class UpdateCatalogCommand: Command
     {
+        protected UpdateCatalogCommand()
+        {
+            
+        }
         public UpdateCatalogCommand(RequestUser requestUser) : base(requestUser)
         {
         }

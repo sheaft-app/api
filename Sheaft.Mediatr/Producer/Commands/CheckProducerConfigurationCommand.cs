@@ -16,6 +16,10 @@ namespace Sheaft.Mediatr.Producer.Commands
 {
     public class CheckProducerConfigurationCommand : Command
     {
+        protected CheckProducerConfigurationCommand()
+        {
+            
+        }
         [JsonConstructor]
         public CheckProducerConfigurationCommand(RequestUser requestUser) : base(requestUser)
         {

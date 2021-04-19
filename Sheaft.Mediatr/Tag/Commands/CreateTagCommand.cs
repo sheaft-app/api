@@ -15,6 +15,10 @@ namespace Sheaft.Mediatr.Tag.Commands
 {
     public class CreateTagCommand : Command<Guid>
     {
+        protected CreateTagCommand()
+        {
+            
+        }
         [JsonConstructor]
         public CreateTagCommand(RequestUser requestUser) : base(requestUser)
         {

@@ -18,6 +18,10 @@ namespace Sheaft.Mediatr.Zone.Commands
 {
     public class UpdateZonesProgressCommand : Command
     {
+        protected UpdateZonesProgressCommand()
+        {
+            
+        }
         [JsonConstructor]
         public UpdateZonesProgressCommand(RequestUser requestUser) : base(requestUser)
         {

@@ -16,6 +16,10 @@ namespace Sheaft.Mediatr.Zone.Commands
 {
     public class GenerateZonesFileCommand : Command
     {
+        protected GenerateZonesFileCommand()
+        {
+            
+        }
         [JsonConstructor]
         public GenerateZonesFileCommand(RequestUser requestUser) : base(requestUser)
         {

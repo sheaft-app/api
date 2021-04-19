@@ -1,23 +1,18 @@
 ﻿using HotChocolate.Types;
 using Sheaft.Application.Models;
+using Sheaft.Mediatr.Store.Commands;
 
 namespace Sheaft.GraphQL.Types.Inputs
 {
-    public class RegisterStoreInputType : SheaftInputType<RegisterStoreDto>
+    public class RegisterStoreInputType : SheaftInputType<RegisterStoreCommand>
     {
-        protected override void Configure(IInputObjectTypeDescriptor<RegisterStoreDto> descriptor)
+        protected override void Configure(IInputObjectTypeDescriptor<RegisterStoreCommand> descriptor)
         {
             descriptor.Name("RegisterStoreInput");
             descriptor.Field(c => c.OpenForNewBusiness);
             descriptor.Field(c => c.Phone);
             descriptor.Field(c => c.Picture);
             descriptor.Field(c => c.SponsoringCode);
-            descriptor.Field(c => c.Summary);
-            descriptor.Field(c => c.Description);
-            descriptor.Field(c => c.Facebook);
-            descriptor.Field(c => c.Twitter);
-            descriptor.Field(c => c.Instagram);
-            descriptor.Field(c => c.Website);
 
             descriptor.Field(c => c.Address)
                 .Type<NonNullType<AddressInputType>>();
@@ -41,7 +36,7 @@ namespace Sheaft.GraphQL.Types.Inputs
                 .Type<ListType<TimeSlotGroupInputType>>();
 
             descriptor.Field(c => c.Legals)
-                .Type<NonNullType<CreateBusinessLegalsInputType>>();
+                .Type<NonNullType<BusinessLegalInputType>>();
         }
     }
 }

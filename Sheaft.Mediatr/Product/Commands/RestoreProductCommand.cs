@@ -17,6 +17,10 @@ namespace Sheaft.Mediatr.Product.Commands
 {
     public class RestoreProductCommand : Command
     {
+        protected RestoreProductCommand()
+        {
+            
+        }
         [JsonConstructor]
         public RestoreProductCommand(RequestUser requestUser) : base(requestUser)
         {

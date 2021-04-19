@@ -15,6 +15,10 @@ namespace Sheaft.Mediatr.PurchaseOrder.Commands
 {
     public class AcceptPurchaseOrdersCommand : Command
     {
+        protected AcceptPurchaseOrdersCommand()
+        {
+        }
+
         [JsonConstructor]
         public AcceptPurchaseOrdersCommand(RequestUser requestUser) : base(requestUser)
         {
@@ -42,7 +46,8 @@ namespace Sheaft.Mediatr.PurchaseOrder.Commands
                 {
                     var result =
                         await _mediatr.Process(
-                            new AcceptPurchaseOrderCommand(request.RequestUser) {PurchaseOrderId = purchaseOrderId}, token);
+                            new AcceptPurchaseOrderCommand(request.RequestUser) {PurchaseOrderId = purchaseOrderId},
+                            token);
                     if (!result.Succeeded)
                         return Failure(result);
                 }

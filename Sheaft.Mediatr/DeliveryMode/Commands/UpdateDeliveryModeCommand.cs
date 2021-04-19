@@ -24,6 +24,10 @@ namespace Sheaft.Mediatr.DeliveryMode.Commands
 {
     public class UpdateDeliveryModeCommand : Command
     {
+        protected UpdateDeliveryModeCommand()
+        {
+            
+        }
         [JsonConstructor]
         public UpdateDeliveryModeCommand(RequestUser requestUser) : base(requestUser)
         {
@@ -40,7 +44,7 @@ namespace Sheaft.Mediatr.DeliveryMode.Commands
         public bool Available { get; set; }
         public bool AutoAcceptRelatedPurchaseOrder { get; set; }
         public bool AutoCompleteRelatedPurchaseOrder { get; set; }
-        public IEnumerable<UpdateOrCreateClosingDto> Closings { get; set; }
+        public IEnumerable<ClosingInputDto> Closings { get; set; }
     }
 
     public class UpdateDeliveryModeCommandHandler : CommandsHandler,

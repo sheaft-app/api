@@ -16,6 +16,10 @@ namespace Sheaft.Mediatr.Wallet.Commands
 {
     public class CheckWalletPaymentsConfigurationCommand : Command
     {
+        protected CheckWalletPaymentsConfigurationCommand()
+        {
+            
+        }
         [JsonConstructor]
         public CheckWalletPaymentsConfigurationCommand(RequestUser requestUser) : base(requestUser)
         {

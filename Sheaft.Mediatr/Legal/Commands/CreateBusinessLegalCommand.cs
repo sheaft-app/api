@@ -18,6 +18,10 @@ namespace Sheaft.Mediatr.Legal.Commands
 {
     public class CreateBusinessLegalCommand : Command<Guid>
     {
+        protected CreateBusinessLegalCommand()
+        {
+            
+        }
         [JsonConstructor]
         public CreateBusinessLegalCommand(RequestUser requestUser) : base(requestUser)
         {
@@ -29,7 +33,7 @@ namespace Sheaft.Mediatr.Legal.Commands
         public string Email { get; set; }
         public string VatIdentifier { get; set; }
         public string Siret { get; set; }
-        public CreateOwnerDto Owner { get; set; }
+        public OwnerInputDto Owner { get; set; }
         public AddressDto Address { get; set; }
     }
 

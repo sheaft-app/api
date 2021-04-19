@@ -17,6 +17,10 @@ namespace Sheaft.Mediatr.Producer.Commands
 {
     public class GenerateProducersFileCommand : Command
     {
+        protected GenerateProducersFileCommand()
+        {
+            
+        }
         [JsonConstructor]
         public GenerateProducersFileCommand(RequestUser requestUser) : base(requestUser)
         {

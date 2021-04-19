@@ -8,7 +8,6 @@ namespace Sheaft.GraphQL.Types.Inputs
         protected override void Configure(IInputObjectTypeDescriptor<BrowserInfoDto> descriptor)
         {
             descriptor.Name("BrowserInfoInput");
-            descriptor.Field(c => c.AcceptHeader).Type<NonNullType<StringType>>();
             descriptor.Field(c => c.JavaEnabled).Type<NonNullType<BooleanType>>();
             descriptor.Field(c => c.Language).Type<NonNullType<StringType>>();
             descriptor.Field(c => c.ColorDepth).Type<NonNullType<IntType>>();

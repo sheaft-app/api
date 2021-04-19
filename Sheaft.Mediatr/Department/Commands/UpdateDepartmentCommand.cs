@@ -15,6 +15,10 @@ namespace Sheaft.Mediatr.Department.Commands
 {
     public class UpdateDepartmentCommand : Command
     {
+        protected UpdateDepartmentCommand()
+        {
+            
+        }
         [JsonConstructor]
         public UpdateDepartmentCommand(RequestUser requestUser) : base(requestUser)
         {

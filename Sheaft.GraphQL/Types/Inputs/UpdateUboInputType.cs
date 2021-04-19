@@ -1,14 +1,16 @@
 ﻿using HotChocolate.Types;
 using Sheaft.Application.Models;
+using Sheaft.Mediatr.Ubo.Commands;
 
 namespace Sheaft.GraphQL.Types.Inputs
 {
-    public class UpdateUboInputType : SheaftInputType<UpdateUboDto>
+    public class UpdateUboInputType : SheaftInputType<UpdateUboCommand>
     {
-        protected override void Configure(IInputObjectTypeDescriptor<UpdateUboDto> descriptor)
+        protected override void Configure(IInputObjectTypeDescriptor<UpdateUboCommand> descriptor)
         {
             descriptor.Name("UpdateUboInput");
-            descriptor.Field(c => c.Id)
+            descriptor.Field(c => c.UboId)
+                .Name("Id")
                 .Type<NonNullType<IdType>>();
 
             descriptor.Field(c => c.FirstName);

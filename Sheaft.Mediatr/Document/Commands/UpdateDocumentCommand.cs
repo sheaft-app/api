@@ -18,6 +18,10 @@ namespace Sheaft.Mediatr.Document.Commands
 {
     public class UpdateDocumentCommand : Command
     {
+        protected UpdateDocumentCommand()
+        {
+            
+        }
         [JsonConstructor]
         public UpdateDocumentCommand(RequestUser requestUser) : base(requestUser)
         {

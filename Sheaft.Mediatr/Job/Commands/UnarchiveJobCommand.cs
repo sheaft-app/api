@@ -18,6 +18,10 @@ namespace Sheaft.Mediatr.Job.Commands
 {
     public class UnarchiveJobCommand : Command
     {
+        protected UnarchiveJobCommand()
+        {
+            
+        }
         [JsonConstructor]
         public UnarchiveJobCommand(RequestUser requestUser) : base(requestUser)
         {

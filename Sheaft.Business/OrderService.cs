@@ -69,7 +69,7 @@ namespace Sheaft.Business
         }
 
         public async Task<Result<List<Tuple<Domain.DeliveryMode, DateTimeOffset, string>>>> GetCartDeliveriesAsync(
-            IEnumerable<ProducerExpectedDeliveryDto> producersExpectedDeliveries, IEnumerable<Guid> deliveryIds,
+            IEnumerable<ProducerExpectedDeliveryInputDto> producersExpectedDeliveries, IEnumerable<Guid> deliveryIds,
             IEnumerable<Tuple<Domain.Product, Guid, int>> cartProducts, CancellationToken token)
         {
             var deliveries = deliveryIds.Any()
@@ -111,7 +111,7 @@ namespace Sheaft.Business
         }
 
         public async Task<Result<List<Tuple<Domain.Product, Guid, int>>>> GetCartProductsAsync(
-            IEnumerable<Guid> productIds, IEnumerable<ResourceIdQuantityDto> productsQuantities,
+            IEnumerable<Guid> productIds, IEnumerable<ResourceIdQuantityInputDto> productsQuantities,
             CancellationToken token)
         {
             var invalidProductIds = await GetConsumerInvalidProductIds(productIds, token);

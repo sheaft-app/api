@@ -23,6 +23,10 @@ namespace Sheaft.Mediatr.User.Commands
 {
     public class ChangeUserRolesCommand : Command
     {
+        protected ChangeUserRolesCommand()
+        {
+            
+        }
         [JsonConstructor]
         public ChangeUserRolesCommand(RequestUser requestUser) : base(requestUser)
         {

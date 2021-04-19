@@ -19,6 +19,10 @@ namespace Sheaft.Mediatr.Document.Commands
 {
     public class CreateDocumentCommand : Command<Guid>
     {
+        protected CreateDocumentCommand()
+        {
+            
+        }
         [JsonConstructor]
         public CreateDocumentCommand(RequestUser requestUser) : base(requestUser)
         {

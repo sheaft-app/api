@@ -15,14 +15,24 @@ namespace Sheaft.Mediatr.Notification.Commands
 {
     public class MarkUserNotificationsAsReadCommand : Command
     {
+        protected MarkUserNotificationsAsReadCommand()
+        {
+            
+        }
         [JsonConstructor]
         public MarkUserNotificationsAsReadCommand(RequestUser requestUser) : base(requestUser)
         {
-            UserId = requestUser.Id;
+            UserId = RequestUser.Id;
         }
 
         public Guid UserId { get; set; }
         public DateTimeOffset ReadBefore { get; set; }
+
+        public override void SetRequestUser(RequestUser user)
+        {
+            base.SetRequestUser(user);
+            UserId = RequestUser.Id;
+        }
     }
 
     public class MarkUserNotificationsAsReadCommandHandler : CommandsHandler,

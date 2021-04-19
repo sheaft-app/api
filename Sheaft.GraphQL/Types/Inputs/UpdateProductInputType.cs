@@ -1,11 +1,12 @@
 ﻿using HotChocolate.Types;
 using Sheaft.Application.Models;
+using Sheaft.Mediatr.Product.Commands;
 
 namespace Sheaft.GraphQL.Types.Inputs
 {
-    public class UpdateProductInputType : SheaftInputType<UpdateProductDto>
+    public class UpdateProductInputType : SheaftInputType<UpdateProductCommand>
     {
-        protected override void Configure(IInputObjectTypeDescriptor<UpdateProductDto> descriptor)
+        protected override void Configure(IInputObjectTypeDescriptor<UpdateProductCommand> descriptor)
         {
             descriptor.Name("UpdateProductInput");
             descriptor.Field(c => c.VisibleToConsumers);
@@ -22,7 +23,8 @@ namespace Sheaft.GraphQL.Types.Inputs
             descriptor.Field(c => c.Vat);
             descriptor.Field(c => c.Weight);
 
-            descriptor.Field(c => c.Id)
+            descriptor.Field(c => c.ProductId)
+                .Name("Id")
                 .Type<NonNullType<IdType>>();
 
             descriptor.Field(c => c.Name)
@@ -35,7 +37,7 @@ namespace Sheaft.GraphQL.Types.Inputs
                 .Type<NonNullType<ListType<IdType>>>();
             
             descriptor.Field(c => c.Catalogs)
-                .Type<ListType<UpdateOrCreateCatalogPriceInputType>>();
+                .Type<ListType<CatalogPriceInputType>>();
         }
     }
 }

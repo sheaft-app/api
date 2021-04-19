@@ -16,6 +16,10 @@ namespace Sheaft.Mediatr.Donation.Commands
 {
     public class RefreshDonationStatusCommand : Command
     {
+        protected RefreshDonationStatusCommand()
+        {
+            
+        }
         [JsonConstructor]
         public RefreshDonationStatusCommand(RequestUser requestUser, string identifier)
             : base(requestUser)

@@ -15,6 +15,10 @@ namespace Sheaft.Mediatr.Document.Commands
 {
     public class RefreshDocumentStatusCommand : Command
     {
+        protected RefreshDocumentStatusCommand()
+        {
+            
+        }
         [JsonConstructor]
         public RefreshDocumentStatusCommand(RequestUser requestUser, string identifier)
             : base(requestUser)

@@ -3,9 +3,9 @@ using Sheaft.Application.Models;
 
 namespace Sheaft.GraphQL.Types.Inputs
 {
-    public class ResourceIdQuantityInputType : SheaftInputType<ResourceIdQuantityDto>
+    public class ResourceIdQuantityInputType : SheaftInputType<ResourceIdQuantityInputDto>
     {
-        protected override void Configure(IInputObjectTypeDescriptor<ResourceIdQuantityDto> descriptor)
+        protected override void Configure(IInputObjectTypeDescriptor<ResourceIdQuantityInputDto> descriptor)
         {
             descriptor.Name("ResourceIdQuantityInput");
             descriptor.Field(c => c.Quantity);

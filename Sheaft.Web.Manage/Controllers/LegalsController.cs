@@ -109,7 +109,7 @@ namespace Sheaft.Web.Manage.Controllers
                 Email = model.Email,
                 Address = _mapper.Map<AddressDto>(model.Address),
                 Kind = model.Kind,
-                Owner = _mapper.Map<CreateOwnerDto>(model.Owner),
+                Owner = _mapper.Map<OwnerInputDto>(model.Owner),
                 Siret = model.Siret,
                 VatIdentifier = model.VatIdentifier
             }, token);

@@ -1,16 +1,18 @@
 using HotChocolate.Types;
 using Sheaft.Application.Models;
+using Sheaft.Mediatr.Catalog.Commands;
 
 namespace Sheaft.GraphQL.Types.Inputs
 {
-    public class UpdateCatalogInputType : SheaftInputType<UpdateCatalogDto>
+    public class UpdateCatalogInputType : SheaftInputType<UpdateCatalogCommand>
     {
-        protected override void Configure(IInputObjectTypeDescriptor<UpdateCatalogDto> descriptor)
+        protected override void Configure(IInputObjectTypeDescriptor<UpdateCatalogCommand> descriptor)
         {
             descriptor.Name("UpdateCatalogInput");
             descriptor.Field(c => c.Name);
 
-            descriptor.Field(c => c.Id)
+            descriptor.Field(c => c.CatalogId)
+                .Name("Id")
                 .Type<NonNullType<IdType>>();
 
             descriptor.Field(c => c.IsAvailable);

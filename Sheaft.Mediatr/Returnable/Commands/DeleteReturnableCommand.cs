@@ -17,6 +17,10 @@ namespace Sheaft.Mediatr.Returnable.Commands
 {
     public class DeleteReturnableCommand : Command
     {
+        protected DeleteReturnableCommand()
+        {
+            
+        }
         [JsonConstructor]
         public DeleteReturnableCommand(RequestUser requestUser) : base(requestUser)
         {

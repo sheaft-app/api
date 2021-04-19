@@ -16,6 +16,10 @@ namespace Sheaft.Mediatr.Region.Commands
 {
     public class UpdateRegionStatsCommand : Command
     {
+        protected UpdateRegionStatsCommand()
+        {
+            
+        }
         [JsonConstructor]
         public UpdateRegionStatsCommand(RequestUser requestUser) : base(requestUser)
         {

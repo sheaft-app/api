@@ -18,6 +18,10 @@ namespace Sheaft.Mediatr.Legal.Commands
 {
     public class UpdateBusinessLegalCommand : Command
     {
+        protected UpdateBusinessLegalCommand()
+        {
+            
+        }
         [JsonConstructor]
         public UpdateBusinessLegalCommand(RequestUser requestUser) : base(requestUser)
         {

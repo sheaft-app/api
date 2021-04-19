@@ -25,10 +25,14 @@ namespace Sheaft.Mediatr.Producer.Commands
 {
     public class RegisterProducerCommand : Command<Guid>
     {
+        protected RegisterProducerCommand()
+        {
+            
+        }
         [JsonConstructor]
         public RegisterProducerCommand(RequestUser requestUser) : base(requestUser)
         {
-            ProducerId = requestUser.Id;
+            ProducerId = RequestUser.Id;
         }
 
         public Guid ProducerId { get; set; }
@@ -39,11 +43,17 @@ namespace Sheaft.Mediatr.Producer.Commands
         public string Phone { get; set; }
         public string Picture { get; set; }
         public string SponsoringCode { get; set; }
-        public CreateBusinessLegalDto Legals { get; set; }
+        public BusinessLegalInputDto Legals { get; set; }
         public AddressDto Address { get; set; }
         public bool OpenForNewBusiness { get; set; }
         public bool NotSubjectToVat { get; set; }
         public IEnumerable<Guid> Tags { get; set; }
+
+        public override void SetRequestUser(RequestUser user)
+        {
+            base.SetRequestUser(user);
+            ProducerId = RequestUser.Id;
+        }
     }
 
     public class RegisterProducerCommandHandler : CommandsHandler,
@@ -92,7 +102,7 @@ namespace Sheaft.Mediatr.Producer.Commands
                 await _context.AddAsync(producer, token);
                 await _context.SaveChangesAsync(token);
 
-                var resultImage = await _mediatr.Process(new UpdateUserPictureCommand(request.RequestUser)
+                var resultImage = await _mediatr.Process(new UpdateUserPreviewCommand(request.RequestUser)
                 {
                     UserId = producer.Id,
                     Picture = request.Picture,

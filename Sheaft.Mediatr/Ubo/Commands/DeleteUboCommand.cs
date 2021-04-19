@@ -16,6 +16,10 @@ namespace Sheaft.Mediatr.Ubo.Commands
 {
     public class DeleteUboCommand : Command
     {
+        protected DeleteUboCommand()
+        {
+            
+        }
         [JsonConstructor]
         public DeleteUboCommand(RequestUser requestUser) : base(requestUser)
         {

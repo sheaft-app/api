@@ -18,10 +18,13 @@ namespace Sheaft.Mediatr.Catalog.Commands
 {
     public class CreateCatalogCommand : Command<Guid>
     {
+        protected CreateCatalogCommand()
+        {
+            
+        }
         public CreateCatalogCommand(RequestUser requestUser) : base(requestUser)
         {
-            Kind = CatalogKind.Stores;
-            ProducerId = requestUser.Id;
+            ProducerId = RequestUser.Id;
         }
 
         public string Name { get; set; }
@@ -29,6 +32,12 @@ namespace Sheaft.Mediatr.Catalog.Commands
         public bool IsDefault { get; set; }
         public bool IsAvailable { get; set; }
         public Guid ProducerId { get; set; }
+
+        public override void SetRequestUser(RequestUser user)
+        {
+            base.SetRequestUser(user);
+            ProducerId = RequestUser.Id;
+        }
     }
 
     public class CreateCatalogCommandHandler : CommandsHandler,

@@ -18,6 +18,10 @@ namespace Sheaft.Mediatr.Notification.Commands
 {
     public class MarkUserNotificationAsReadCommand : Command
     {
+        protected MarkUserNotificationAsReadCommand()
+        {
+        }
+        
         [JsonConstructor]
         public MarkUserNotificationAsReadCommand(RequestUser requestUser) : base(requestUser)
         {

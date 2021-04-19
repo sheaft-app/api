@@ -16,6 +16,10 @@ namespace Sheaft.Mediatr.Document.Commands
 {
     public class DeleteDocumentCommand : Command
     {
+        protected DeleteDocumentCommand()
+        {
+            
+        }
         [JsonConstructor]
         public DeleteDocumentCommand(RequestUser requestUser) : base(requestUser)
         {

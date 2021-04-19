@@ -25,10 +25,14 @@ namespace Sheaft.Mediatr.Store.Commands
 {
     public class RegisterStoreCommand : Command<Guid>
     {
+        protected RegisterStoreCommand()
+        {
+            
+        }
         [JsonConstructor]
         public RegisterStoreCommand(RequestUser requestUser) : base(requestUser)
         {
-            StoreId = requestUser.Id;
+            StoreId = RequestUser.Id;
         }
         
         public Guid StoreId { get; set; }
@@ -41,9 +45,15 @@ namespace Sheaft.Mediatr.Store.Commands
         public string SponsoringCode { get; set; }
         public AddressDto Address { get; set; }
         public bool OpenForNewBusiness { get; set; }
-        public CreateBusinessLegalDto Legals { get; set; }
+        public BusinessLegalInputDto Legals { get; set; }
         public IEnumerable<Guid> Tags { get; set; }
         public IEnumerable<TimeSlotGroupDto> OpeningHours { get; set; }
+
+        public override void SetRequestUser(RequestUser user)
+        {
+            base.SetRequestUser(user);
+            StoreId = RequestUser.Id;
+        }
     }
 
     public class RegisterStoreCommandHandler : CommandsHandler,
@@ -101,7 +111,7 @@ namespace Sheaft.Mediatr.Store.Commands
                 await _context.AddAsync(store, token);
                 await _context.SaveChangesAsync(token);
 
-                var resultImage = await _mediatr.Process(new UpdateUserPictureCommand(request.RequestUser)
+                var resultImage = await _mediatr.Process(new UpdateUserPreviewCommand(request.RequestUser)
                 {
                     UserId = store.Id,
                     Picture = request.Picture,

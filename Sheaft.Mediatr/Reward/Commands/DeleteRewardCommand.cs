@@ -16,6 +16,10 @@ namespace Sheaft.Mediatr.Reward.Commands
 {
     public class DeleteRewardCommand : Command
     {
+        protected DeleteRewardCommand()
+        {
+            
+        }
         [JsonConstructor]
         public DeleteRewardCommand(RequestUser requestUser) : base(requestUser)
         {

@@ -20,6 +20,10 @@ namespace Sheaft.Mediatr.Transfer.Commands
 {
     public class CreatePurchaseOrderTransferCommand : Command<Guid>
     {
+        protected CreatePurchaseOrderTransferCommand()
+        {
+            
+        }
         [JsonConstructor]
         public CreatePurchaseOrderTransferCommand(RequestUser requestUser) : base(requestUser)
         {

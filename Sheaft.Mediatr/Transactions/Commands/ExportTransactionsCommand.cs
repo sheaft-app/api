@@ -27,6 +27,10 @@ namespace Sheaft.Mediatr.Transactions.Commands
 {
     public class ExportTransactionsCommand : Command
     {
+        protected ExportTransactionsCommand()
+        {
+            
+        }
         [JsonConstructor]
         public ExportTransactionsCommand(RequestUser requestUser) : base(requestUser)
         {

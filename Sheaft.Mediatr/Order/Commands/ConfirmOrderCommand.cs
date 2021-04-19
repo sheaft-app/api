@@ -26,6 +26,10 @@ namespace Sheaft.Mediatr.Order.Commands
 {
     public class ConfirmOrderCommand : Command<IEnumerable<Guid>>
     {
+        protected ConfirmOrderCommand()
+        {
+            
+        }
         [JsonConstructor]
         public ConfirmOrderCommand(RequestUser requestUser) : base(requestUser)
         {

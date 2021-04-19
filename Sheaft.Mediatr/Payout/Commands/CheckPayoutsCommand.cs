@@ -19,6 +19,10 @@ namespace Sheaft.Mediatr.Payout.Commands
 {
     public class CheckPayoutsCommand : Command
     {
+        protected CheckPayoutsCommand()
+        {
+            
+        }
         [JsonConstructor]
         public CheckPayoutsCommand(RequestUser requestUser) : base(requestUser)
         {

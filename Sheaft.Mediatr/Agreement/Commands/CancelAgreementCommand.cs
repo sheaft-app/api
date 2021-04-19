@@ -21,6 +21,10 @@ namespace Sheaft.Mediatr.Agreement.Commands
 {
     public class CancelAgreementCommand : Command
     {
+        protected CancelAgreementCommand()
+        {
+        }
+
         [JsonConstructor]
         public CancelAgreementCommand(RequestUser requestUser) : base(requestUser)
         {

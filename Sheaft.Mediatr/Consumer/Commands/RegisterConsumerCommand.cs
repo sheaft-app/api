@@ -22,10 +22,14 @@ namespace Sheaft.Mediatr.Consumer.Commands
 {
     public class RegisterConsumerCommand : Command<Guid>
     {
+        protected RegisterConsumerCommand()
+        {
+            
+        }
         [JsonConstructor]
         public RegisterConsumerCommand(RequestUser requestUser) : base(requestUser)
         {
-            ConsumerId = requestUser.Id;
+            ConsumerId = RequestUser.Id;
         }
 
         public Guid ConsumerId { get; set; }
@@ -35,6 +39,12 @@ namespace Sheaft.Mediatr.Consumer.Commands
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public string Picture { get; set; }
+
+        public override void SetRequestUser(RequestUser user)
+        {
+            base.SetRequestUser(user);
+            ConsumerId = RequestUser.Id;
+        }
     }
 
     public class RegisterConsumerCommandHandler : CommandsHandler,
@@ -66,7 +76,7 @@ namespace Sheaft.Mediatr.Consumer.Commands
                 await _context.AddAsync(consumer, token);
                 await _context.SaveChangesAsync(token);
 
-                var resultImage = await _mediatr.Process(new UpdateUserPictureCommand(request.RequestUser)
+                var resultImage = await _mediatr.Process(new UpdateUserPreviewCommand(request.RequestUser)
                 {
                     UserId = consumer.Id,
                     Picture = request.Picture,

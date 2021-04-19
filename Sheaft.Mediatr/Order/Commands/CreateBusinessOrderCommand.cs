@@ -26,15 +26,25 @@ namespace Sheaft.Mediatr.Order.Commands
 {
     public class CreateBusinessOrderCommand : Command<IEnumerable<Guid>>
     {
+        protected CreateBusinessOrderCommand()
+        {
+            
+        }
         [JsonConstructor]
         public CreateBusinessOrderCommand(RequestUser requestUser) : base(requestUser)
         {
-            UserId = requestUser.Id;
+            UserId = RequestUser.Id;
         }
 
         public Guid UserId { get; set; }
-        public IEnumerable<ResourceIdQuantityDto> Products { get; set; }
-        public IEnumerable<ProducerExpectedDeliveryDto> ProducersExpectedDeliveries { get; set; }
+        public IEnumerable<ResourceIdQuantityInputDto> Products { get; set; }
+        public IEnumerable<ProducerExpectedDeliveryInputDto> ProducersExpectedDeliveries { get; set; }
+
+        public override void SetRequestUser(RequestUser user)
+        {
+            base.SetRequestUser(user);
+            UserId = RequestUser.Id;
+        }
     }
 
     public class CreateBusinessOrderCommandHandler : CommandsHandler,

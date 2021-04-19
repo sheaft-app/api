@@ -18,16 +18,26 @@ namespace Sheaft.Mediatr.Product.Commands
 {
     public class RateProductCommand : Command
     {
+        protected RateProductCommand()
+        {
+            
+        }
         [JsonConstructor]
         public RateProductCommand(RequestUser requestUser) : base(requestUser)
         {
-            UserId = requestUser.Id;
+            UserId = RequestUser.Id;
         }
 
         public Guid UserId { get; set; }
         public Guid ProductId { get; set; }
         public decimal Value { get; set; }
         public string Comment { get; set; }
+
+        public override void SetRequestUser(RequestUser user)
+        {
+            base.SetRequestUser(user);
+            UserId = RequestUser.Id;
+        }
     }
 
     public class RateProductCommandHandler : CommandsHandler,

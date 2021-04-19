@@ -18,6 +18,10 @@ namespace Sheaft.Mediatr.Ubo.Commands
 {
     public class UpdateUboCommand : Command
     {
+        protected UpdateUboCommand()
+        {
+            
+        }
         [JsonConstructor]
         public UpdateUboCommand(RequestUser requestUser) : base(requestUser)
         {

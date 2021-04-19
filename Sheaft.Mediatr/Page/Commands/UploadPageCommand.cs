@@ -16,6 +16,10 @@ namespace Sheaft.Mediatr.Page.Commands
 {
     public class UploadPageCommand : Command<Guid>
     {
+        protected UploadPageCommand()
+        {
+            
+        }
         [JsonConstructor]
         public UploadPageCommand(RequestUser requestUser) : base(requestUser)
         {

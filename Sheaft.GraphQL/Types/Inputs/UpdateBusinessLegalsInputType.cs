@@ -1,12 +1,13 @@
 ﻿using HotChocolate.Types;
 using Sheaft.Application.Models;
 using Sheaft.GraphQL.Enums;
+using Sheaft.Mediatr.Legal.Commands;
 
 namespace Sheaft.GraphQL.Types.Inputs
 {
-    public class UpdateBusinessLegalsInputType : SheaftInputType<UpdateBusinessLegalDto>
+    public class UpdateBusinessLegalsInputType : SheaftInputType<UpdateBusinessLegalCommand>
     {
-        protected override void Configure(IInputObjectTypeDescriptor<UpdateBusinessLegalDto> descriptor)
+        protected override void Configure(IInputObjectTypeDescriptor<UpdateBusinessLegalCommand> descriptor)
         {
             descriptor.Name("UpdateBusinessLegalInput");
             descriptor.Field(c => c.VatIdentifier);
@@ -17,7 +18,8 @@ namespace Sheaft.GraphQL.Types.Inputs
             descriptor.Field(c => c.Email)
                 .Type<NonNullType<StringType>>();
 
-            descriptor.Field(c => c.Id)
+            descriptor.Field(c => c.LegalId)
+                .Name("Id")
                 .Type<NonNullType<IdType>>();
 
             descriptor.Field(c => c.Kind)

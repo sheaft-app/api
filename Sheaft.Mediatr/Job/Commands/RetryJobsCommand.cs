@@ -15,6 +15,10 @@ namespace Sheaft.Mediatr.Job.Commands
 {
     public class RetryJobsCommand : Command
     {
+        protected RetryJobsCommand()
+        {
+            
+        }
         [JsonConstructor]
         public RetryJobsCommand(RequestUser requestUser) : base(requestUser)
         {

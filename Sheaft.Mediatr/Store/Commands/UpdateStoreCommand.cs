@@ -27,6 +27,10 @@ namespace Sheaft.Mediatr.Store.Commands
 {
     public class UpdateStoreCommand : Command
     {
+        protected UpdateStoreCommand()
+        {
+            
+        }
         [JsonConstructor]
         public UpdateStoreCommand(RequestUser requestUser) : base(requestUser)
         {
@@ -115,7 +119,7 @@ namespace Sheaft.Mediatr.Store.Commands
 
             await _context.SaveChangesAsync(token);
             
-            var resultImage = await _mediatr.Process(new UpdateUserPictureCommand(request.RequestUser)
+            var resultImage = await _mediatr.Process(new UpdateUserPreviewCommand(request.RequestUser)
             {
                 UserId = store.Id,
                 Picture = request.Picture,

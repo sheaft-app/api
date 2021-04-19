@@ -18,6 +18,10 @@ namespace Sheaft.Mediatr.PurchaseOrder.Commands
 {
     public class CheckExpiredPurchaseOrdersCommand : Command
     {
+        protected CheckExpiredPurchaseOrdersCommand()
+        {
+            
+        }
         [JsonConstructor]
         public CheckExpiredPurchaseOrdersCommand(RequestUser requestUser) : base(requestUser)
         {

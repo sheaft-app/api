@@ -16,6 +16,10 @@ namespace Sheaft.Mediatr.Level.Commands
 {
     public class UpdateLevelCommand : Command
     {
+        protected UpdateLevelCommand()
+        {
+            
+        }
         [JsonConstructor]
         public UpdateLevelCommand(RequestUser requestUser) : base(requestUser)
         {

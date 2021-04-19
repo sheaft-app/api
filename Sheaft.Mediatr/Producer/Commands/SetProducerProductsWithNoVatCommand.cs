@@ -18,6 +18,10 @@ namespace Sheaft.Mediatr.Producer.Commands
 {
     public class SetProducerProductsWithNoVatCommand : Command
     {
+        protected SetProducerProductsWithNoVatCommand()
+        {
+            
+        }
         [JsonConstructor]
         public SetProducerProductsWithNoVatCommand(RequestUser requestUser) : base(requestUser)
         {

@@ -19,6 +19,10 @@ namespace Sheaft.Mediatr.WebPayin.Commands
 {
     public class CreateWebPayinForOrderCommand : Command<Guid>
     {
+        protected CreateWebPayinForOrderCommand()
+        {
+            
+        }
         [JsonConstructor]
         public CreateWebPayinForOrderCommand(RequestUser requestUser) : base(requestUser)
         {

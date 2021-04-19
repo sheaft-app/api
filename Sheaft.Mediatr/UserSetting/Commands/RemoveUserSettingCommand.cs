@@ -15,6 +15,10 @@ namespace Sheaft.Mediatr.UserSetting.Commands
 {
     public class RemoveUserSettingCommand : Command
     {
+        protected RemoveUserSettingCommand()
+        {
+            
+        }
         [JsonConstructor]
         public RemoveUserSettingCommand(RequestUser requestUser) : base(requestUser)
         {

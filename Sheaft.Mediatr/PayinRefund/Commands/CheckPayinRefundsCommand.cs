@@ -19,6 +19,10 @@ namespace Sheaft.Mediatr.PayinRefund.Commands
 {
     public class CheckPayinRefundsCommand : Command
     {
+        protected CheckPayinRefundsCommand()
+        {
+            
+        }
         [JsonConstructor]
         public CheckPayinRefundsCommand(RequestUser requestUser)
             : base(requestUser)

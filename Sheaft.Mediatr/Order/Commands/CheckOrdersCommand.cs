@@ -19,6 +19,10 @@ namespace Sheaft.Mediatr.Order.Commands
 {
     public class CheckOrdersCommand : Command
     {
+        protected CheckOrdersCommand()
+        {
+            
+        }
         [JsonConstructor]
         public CheckOrdersCommand(RequestUser requestUser)
             : base(requestUser)

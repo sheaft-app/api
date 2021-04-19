@@ -16,6 +16,10 @@ namespace Sheaft.Mediatr.Auth.Commands
 {
     public class UpdateAuthUserPictureCommand : Command
     {
+        protected UpdateAuthUserPictureCommand()
+        {
+            
+        }
         [JsonConstructor]
         public UpdateAuthUserPictureCommand(RequestUser requestUser) : base(requestUser)
         {

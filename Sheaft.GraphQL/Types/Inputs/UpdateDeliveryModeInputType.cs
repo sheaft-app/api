@@ -1,11 +1,12 @@
 ﻿using HotChocolate.Types;
 using Sheaft.Application.Models;
+using Sheaft.Mediatr.DeliveryMode.Commands;
 
 namespace Sheaft.GraphQL.Types.Inputs
 {
-    public class UpdateDeliveryModeInputType : SheaftInputType<UpdateDeliveryModeDto>
+    public class UpdateDeliveryModeInputType : SheaftInputType<UpdateDeliveryModeCommand>
     {
-        protected override void Configure(IInputObjectTypeDescriptor<UpdateDeliveryModeDto> descriptor)
+        protected override void Configure(IInputObjectTypeDescriptor<UpdateDeliveryModeCommand> descriptor)
         {
             descriptor.Name("UpdateDeliveryModeInput");
             descriptor.Field(c => c.Description);
@@ -16,7 +17,8 @@ namespace Sheaft.GraphQL.Types.Inputs
             descriptor.Field(c => c.AutoCompleteRelatedPurchaseOrder);
             descriptor.Field(c => c.LockOrderHoursBeforeDelivery);
 
-            descriptor.Field(c => c.Id)
+            descriptor.Field(c => c.DeliveryModeId)
+                .Name("Id")
                 .Type<NonNullType<IdType>>();
 
             descriptor.Field(c => c.Address)

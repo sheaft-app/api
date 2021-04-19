@@ -15,6 +15,10 @@ namespace Sheaft.Mediatr.PurchaseOrder.Commands
 {
     public class ShipPurchaseOrdersCommand : Command
     {
+        protected ShipPurchaseOrdersCommand()
+        {
+            
+        }
         [JsonConstructor]
         public ShipPurchaseOrdersCommand(RequestUser requestUser) : base(requestUser)
         {

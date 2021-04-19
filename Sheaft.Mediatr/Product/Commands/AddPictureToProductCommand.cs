@@ -18,6 +18,10 @@ namespace Sheaft.Mediatr.Product.Commands
 {
     public class AddPictureToProductCommand : Command
     {
+        protected AddPictureToProductCommand()
+        {
+            
+        }
         [JsonConstructor]
         public AddPictureToProductCommand(RequestUser requestUser) : base(requestUser)
         {

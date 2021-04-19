@@ -16,12 +16,16 @@ namespace Sheaft.Mediatr.Catalog.Commands
 {
     public class UpdateCatalogPricesCommand: Command
     {
+        protected UpdateCatalogPricesCommand()
+        {
+            
+        }
         public UpdateCatalogPricesCommand(RequestUser requestUser) : base(requestUser)
         {
         }
         
         public Guid CatalogId { get; set; }
-        public IEnumerable<UpdateOrCreateCatalogPriceDto> Prices { get; set; }
+        public IEnumerable<ProductPriceInputDto> Prices { get; set; }
     }
 
     public class UpdateCatalogPricesCommandHandler : CommandsHandler,
@@ -37,7 +41,7 @@ namespace Sheaft.Mediatr.Catalog.Commands
 
         public async Task<Result> Handle(UpdateCatalogPricesCommand request, CancellationToken token)
         {
-            var productIds = request.Prices.Select(p => p.Id);
+            var productIds = request.Prices.Select(p => p.ProductId);
             var catalogProductsPrice = await _context.Set<CatalogProduct>()
                 .Where(c => c.Catalog.Id == request.CatalogId && !c.Catalog.RemovedOn.HasValue && productIds.Contains(c.Product.Id))
                 .Include(c => c.Product)
@@ -45,7 +49,7 @@ namespace Sheaft.Mediatr.Catalog.Commands
 
             foreach (var catalogProductPrice in catalogProductsPrice)
             {
-                var newProductPrice = request.Prices.Single(p => p.Id == catalogProductPrice.Product.Id);
+                var newProductPrice = request.Prices.Single(p => p.ProductId == catalogProductPrice.Product.Id);
                 catalogProductPrice.SetWholeSalePricePerUnit(newProductPrice.WholeSalePricePerUnit);
             }
 

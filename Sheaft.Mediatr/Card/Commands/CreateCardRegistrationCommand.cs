@@ -16,13 +16,23 @@ namespace Sheaft.Mediatr.Card.Commands
 {
     public class CreateCardRegistrationCommand : Command<CardRegistrationDto>
     {
+        protected CreateCardRegistrationCommand()
+        {
+            
+        }
         [JsonConstructor]
         public CreateCardRegistrationCommand(RequestUser requestUser) : base(requestUser)
         {
-            UserId = requestUser.Id;
+            UserId = RequestUser.Id;
         }
 
         public Guid UserId { get; set; }
+
+        public override void SetRequestUser(RequestUser user)
+        {
+            base.SetRequestUser(user);
+            UserId = RequestUser.Id;
+        }
     }
     
     public class CreateCardRegistrationCommandHandler : CommandsHandler,

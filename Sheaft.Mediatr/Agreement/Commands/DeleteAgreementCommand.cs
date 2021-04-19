@@ -21,6 +21,10 @@ namespace Sheaft.Mediatr.Agreement.Commands
 {
     public class DeleteAgreementCommand : Command
     {
+        protected DeleteAgreementCommand()
+        {
+        }
+
         [JsonConstructor]
         public DeleteAgreementCommand(RequestUser requestUser) : base(requestUser)
         {
@@ -47,12 +51,13 @@ namespace Sheaft.Mediatr.Agreement.Commands
         public async Task<Result> Handle(DeleteAgreementCommand request, CancellationToken token)
         {
             var entity = await _context.Agreements.SingleAsync(e => e.Id == request.AgreementId, token);
-            if(request.RequestUser.IsInRole(_roleOptions.Producer.Value) && entity.Delivery.Producer.Id != request.RequestUser.Id)
+            if (request.RequestUser.IsInRole(_roleOptions.Producer.Value) &&
+                entity.Delivery.Producer.Id != request.RequestUser.Id)
                 return Failure(MessageKind.Forbidden);
-            
-            if(request.RequestUser.IsInRole(_roleOptions.Store.Value) && entity.Store.Id != request.RequestUser.Id)
+
+            if (request.RequestUser.IsInRole(_roleOptions.Store.Value) && entity.Store.Id != request.RequestUser.Id)
                 return Failure(MessageKind.Forbidden);
-            
+
             _context.Remove(entity);
 
             var quickOrders = await _context.QuickOrders
@@ -62,11 +67,12 @@ namespace Sheaft.Mediatr.Agreement.Commands
 
             foreach (var quickOrder in quickOrders)
             {
-                var products = quickOrder.Products.Where(p => p.CatalogProduct.Catalog.Id == entity.Catalog.Id).ToList();
+                var products = quickOrder.Products.Where(p => p.CatalogProduct.Catalog.Id == entity.Catalog.Id)
+                    .ToList();
                 foreach (var product in products)
                     quickOrder.RemoveProduct(product.CatalogProduct.Product.Id);
             }
-            
+
             await _context.SaveChangesAsync(token);
 
             return Success();

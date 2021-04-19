@@ -16,6 +16,10 @@ namespace Sheaft.Mediatr.Store.Commands
 {
     public class CheckStoreConfigurationCommand : Command
     {
+        protected CheckStoreConfigurationCommand()
+        {
+            
+        }
         [JsonConstructor]
         public CheckStoreConfigurationCommand(RequestUser requestUser) : base(requestUser)
         {

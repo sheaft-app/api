@@ -26,6 +26,10 @@ namespace Sheaft.Mediatr.PurchaseOrder.Commands
 {
     public class ExportPurchaseOrdersCommand : Command
     {
+        protected ExportPurchaseOrdersCommand()
+        {
+            
+        }
         [JsonConstructor]
         public ExportPurchaseOrdersCommand(RequestUser requestUser) : base(requestUser)
         {

@@ -16,6 +16,10 @@ namespace Sheaft.Mediatr.Returnable.Commands
 {
     public class UpdateReturnableCommand : Command
     {
+        protected UpdateReturnableCommand()
+        {
+            
+        }
         [JsonConstructor]
         public UpdateReturnableCommand(RequestUser requestUser) : base(requestUser)
         {

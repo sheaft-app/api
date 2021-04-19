@@ -21,30 +21,35 @@ namespace Sheaft.Mediatr.PreAuthorization.Commands
 {
     public class CreatePreAuthorizationForOrderCommand : Command<Guid>
     {
+        protected CreatePreAuthorizationForOrderCommand()
+        {
+            
+        }
         [JsonConstructor]
         public CreatePreAuthorizationForOrderCommand(RequestUser requestUser) : base(requestUser)
         {
         }
+        
         public Guid OrderId { get; set; }
         public string CardIdentifier { get; set; }
         public string IpAddress { get; set; }
         public BrowserInfoDto BrowserInfo { get; set; }
     }
     
-    public class CreatePreAuthorizationCommandHandler : CommandsHandler,
+    public class CreatePreAuthorizationForOrderCommandHandler : CommandsHandler,
         IRequestHandler<CreatePreAuthorizationForOrderCommand, Result<Guid>>
     {
         private readonly PspOptions _pspOptions;
         private readonly IPspService _pspService;
         private readonly IOrderService _orderService;
 
-        public CreatePreAuthorizationCommandHandler(
+        public CreatePreAuthorizationForOrderCommandHandler(
             IAppDbContext context,
             ISheaftMediatr mediatr,
             IPspService pspService,
             IOrderService orderService,
             IOptionsSnapshot<PspOptions> pspOptions,
-            ILogger<CreatePreAuthorizationCommandHandler> logger)
+            ILogger<CreatePreAuthorizationForOrderCommandHandler> logger)
             : base(mediatr, context, logger)
         {
             _pspService = pspService;

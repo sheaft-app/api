@@ -15,6 +15,10 @@ namespace Sheaft.Mediatr.Catalog.Commands
 {
     public class RemoveProductsFromCatalogCommand : Command
     {
+        protected RemoveProductsFromCatalogCommand()
+        {
+            
+        }
         public RemoveProductsFromCatalogCommand(RequestUser requestUser) : base(requestUser)
         {
         }

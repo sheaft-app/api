@@ -17,6 +17,10 @@ namespace Sheaft.Mediatr.Producer.Commands
 {
     public class UpdateProducerAvailabilityCommand : Command
     {
+        protected UpdateProducerAvailabilityCommand()
+        {
+            
+        }
         [JsonConstructor]
         public UpdateProducerAvailabilityCommand(RequestUser requestUser) : base(requestUser)
         {

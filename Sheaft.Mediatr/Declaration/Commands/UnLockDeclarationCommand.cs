@@ -16,6 +16,10 @@ namespace Sheaft.Mediatr.Declaration.Commands
 {
     public class UnLockDeclarationCommand : Command
     {
+        protected UnLockDeclarationCommand()
+        {
+            
+        }
         [JsonConstructor]
         public UnLockDeclarationCommand(RequestUser requestUser) : base(requestUser)
         {

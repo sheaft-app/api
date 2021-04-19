@@ -16,6 +16,10 @@ namespace Sheaft.Mediatr.Catalog.Commands
 {
     public class CloneCatalogCommand : Command<Guid>
     {
+        protected CloneCatalogCommand()
+        {
+            
+        }
         public CloneCatalogCommand(RequestUser requestUser) : base(requestUser)
         {
         }
@@ -51,9 +55,9 @@ namespace Sheaft.Mediatr.Catalog.Commands
                         .ToListAsync(token);
 
                 var products = catalogProducts.Select(p =>
-                    new UpdateOrCreateCatalogPriceDto
+                    new ProductPriceInputDto
                     {
-                        Id = p.Id,
+                        ProductId = p.Id,
                         WholeSalePricePerUnit =
                             p.CatalogsPrices.Single(c => c.Catalog.Id == request.CatalogId).WholeSalePricePerUnit *
                             (1 + request.Percent ?? 0)

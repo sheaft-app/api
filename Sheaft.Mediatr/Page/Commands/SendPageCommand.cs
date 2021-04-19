@@ -16,6 +16,10 @@ namespace Sheaft.Mediatr.Page.Commands
 {
     public class SendPageCommand : Command
     {
+        protected SendPageCommand()
+        {
+            
+        }
         [JsonConstructor]
         public SendPageCommand(RequestUser requestUser) : base(requestUser)
         {

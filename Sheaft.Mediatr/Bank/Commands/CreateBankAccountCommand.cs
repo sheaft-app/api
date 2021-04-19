@@ -15,6 +15,10 @@ namespace Sheaft.Mediatr.Bank.Commands
 {
     public class CreateBankAccountCommand : Command<Guid>
     {
+        protected CreateBankAccountCommand()
+        {
+            
+        }
         [JsonConstructor]
         public CreateBankAccountCommand(RequestUser requestUser) : base(requestUser)
         {

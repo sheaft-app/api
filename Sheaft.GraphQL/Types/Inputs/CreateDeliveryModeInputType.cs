@@ -1,11 +1,12 @@
 ﻿using HotChocolate.Types;
 using Sheaft.Application.Models;
+using Sheaft.Mediatr.DeliveryMode.Commands;
 
 namespace Sheaft.GraphQL.Types.Inputs
 {
-    public class CreateDeliveryModeInputType : SheaftInputType<CreateDeliveryModeDto>
+    public class CreateDeliveryModeInputType : SheaftInputType<CreateDeliveryModeCommand>
     {
-        protected override void Configure(IInputObjectTypeDescriptor<CreateDeliveryModeDto> descriptor)
+        protected override void Configure(IInputObjectTypeDescriptor<CreateDeliveryModeCommand> descriptor)
         {
             descriptor.Name("CreateDeliveryModeInput");
             descriptor.Field(c => c.Description);

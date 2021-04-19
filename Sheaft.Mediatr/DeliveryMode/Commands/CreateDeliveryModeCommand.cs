@@ -22,10 +22,14 @@ namespace Sheaft.Mediatr.DeliveryMode.Commands
 {
     public class CreateDeliveryModeCommand : Command<Guid>
     {
+        protected CreateDeliveryModeCommand()
+        {
+            
+        }
         [JsonConstructor]
         public CreateDeliveryModeCommand(RequestUser requestUser) : base(requestUser)
         {
-            ProducerId = requestUser.Id;
+            ProducerId = RequestUser.Id;
         }
 
         public Guid ProducerId { get; set; }
@@ -39,7 +43,13 @@ namespace Sheaft.Mediatr.DeliveryMode.Commands
         public bool Available { get; set; }
         public bool AutoAcceptRelatedPurchaseOrder { get; set; }
         public bool AutoCompleteRelatedPurchaseOrder { get; set; }
-        public IEnumerable<UpdateOrCreateClosingDto> Closings { get; set; }
+        public IEnumerable<ClosingInputDto> Closings { get; set; }
+
+        public override void SetRequestUser(RequestUser user)
+        {
+            base.SetRequestUser(user);
+            ProducerId = RequestUser.Id;
+        }
     }
 
     public class CreateDeliveryModeCommandHandler : CommandsHandler,
