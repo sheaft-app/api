@@ -1,6 +1,8 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
+using Sheaft.Application.Extensions;
 using Sheaft.Application.Interfaces;
 using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Domain.Enum;
@@ -22,7 +24,7 @@ namespace Sheaft.Mediatr.Transfer.EventHandlers
         public async Task Handle(DomainEventNotification<TransferFailedEvent> notification, CancellationToken token)
         {
             var transferEvent = notification.DomainEvent;
-            var transfer = await _context.GetByIdAsync<Domain.Transfer>(transferEvent.TransferId, token);
+            var transfer = await _context.Transfers.SingleAsync(e => e.Id == transferEvent.TransferId, token);
             if (transfer.Status != TransactionStatus.Failed)
                 return;
 

@@ -6,6 +6,7 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using Sheaft.Application.Extensions;
 using Sheaft.Application.Interfaces;
 using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Application.Interfaces.Mediatr;
@@ -47,7 +48,7 @@ namespace Sheaft.Mediatr.PurchaseOrder.Commands
 
         public async Task<Result> Handle(CancelPurchaseOrderCommand request, CancellationToken token)
         {
-            var purchaseOrder = await _context.GetByIdAsync<Domain.PurchaseOrder>(request.PurchaseOrderId, token);
+            var purchaseOrder = await _context.PurchaseOrders.SingleAsync(e => e.Id == request.PurchaseOrderId, token);
             if (purchaseOrder.Vendor.Id != request.RequestUser.Id && purchaseOrder.Sender.Id != request.RequestUser.Id)
                 return Failure(MessageKind.Forbidden);
 
@@ -55,9 +56,9 @@ namespace Sheaft.Mediatr.PurchaseOrder.Commands
 
             await _context.SaveChangesAsync(token);
 
-            var order = await _context.GetSingleAsync<Domain.Order>(
-                o => o.PurchaseOrders.Any(po => po.Id == purchaseOrder.Id),
-                token);
+            var order = await _context.Orders
+                .SingleOrDefaultAsync(o => o.PurchaseOrders.Any(po => po.Id == purchaseOrder.Id), token);
+            
             var delivery = order.Deliveries.FirstOrDefault(d => d.DeliveryMode.Producer.Id == purchaseOrder.Vendor.Id);
             if (delivery.DeliveryMode.MaxPurchaseOrdersPerTimeSlot.HasValue)
                 await _tableService.DecreaseProducerDeliveryCountAsync(delivery.DeliveryMode.Producer.Id,

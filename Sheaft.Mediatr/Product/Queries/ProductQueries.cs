@@ -236,7 +236,7 @@ namespace Sheaft.Mediatr.Product.Queries
         public async Task<bool> ProductIsRatedByUserAsync(Guid id, Guid userId, RequestUser user,
             CancellationToken token)
         {
-            return await _context.AnyAsync<Domain.Product>(p => p.Id == id && p.Ratings.Any(r => r.User.Id == userId),
+            return await _context.Products.AnyAsync(p => p.Id == id && p.Ratings.Any(r => r.User.Id == userId),
                 token);
         }
 

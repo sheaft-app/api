@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Sheaft.Application.Interfaces;
@@ -36,8 +37,8 @@ namespace Sheaft.Mediatr.Ubo.Commands
 
         public async Task<Result> Handle(DeleteUboCommand request, CancellationToken token)
         {
-            var legal = await _context.GetSingleAsync<BusinessLegal>(
-                c => c.Declaration.Ubos.Any(u => u.Id == request.UboId), token);
+            var legal = await _context.Set<BusinessLegal>()
+                .SingleOrDefaultAsync(c => c.Declaration.Ubos.Any(u => u.Id == request.UboId), token);
             legal.Declaration.RemoveUbo(request.UboId);
 
             await _context.SaveChangesAsync(token);

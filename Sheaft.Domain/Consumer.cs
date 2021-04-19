@@ -1,4 +1,5 @@
 using System;
+using Sheaft.Core.Exceptions;
 using Sheaft.Domain.Enum;
 
 namespace Sheaft.Domain
@@ -20,6 +21,17 @@ namespace Sheaft.Domain
         public void SetAnonymous(bool anonymous)
         {
             Anonymous = anonymous;
+        }
+
+        public ConsumerLegal SetLegals(Owner owner)
+        {
+            if (Legal != null)
+                throw SheaftException.AlreadyExists();
+
+            var legals = new ConsumerLegal(Guid.NewGuid(),this, owner);
+            Legal = legals;
+
+            return legals;
         }
     }
 }

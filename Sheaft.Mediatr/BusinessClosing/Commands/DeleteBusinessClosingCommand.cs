@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Sheaft.Application.Interfaces;
@@ -38,7 +39,7 @@ namespace Sheaft.Mediatr.BusinessClosing.Commands
 
         public async Task<Result> Handle(DeleteBusinessClosingCommand request, CancellationToken token)
         {
-            var entity = await _context.GetSingleAsync<Domain.Business>(c => c.Closings.Any(cc => cc.Id == request.ClosingId), token);
+            var entity = await _context.Businesses.SingleAsync(c => c.Closings.Any(cc => cc.Id == request.ClosingId), token);
             if(entity.Id != request.RequestUser.Id)
                 return Failure(MessageKind.Forbidden);
 

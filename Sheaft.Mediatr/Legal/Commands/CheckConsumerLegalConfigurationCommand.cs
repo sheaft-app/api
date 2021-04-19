@@ -2,6 +2,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Sheaft.Application.Interfaces;
@@ -39,7 +40,7 @@ namespace Sheaft.Mediatr.Legal.Commands
 
         public async Task<Result> Handle(CheckConsumerLegalConfigurationCommand request, CancellationToken token)
         {
-            var legal = await _context.GetSingleAsync<ConsumerLegal>(b => b.User.Id == request.UserId, token);
+            var legal = await _context.Set<ConsumerLegal>().SingleOrDefaultAsync(b => b.User.Id == request.UserId, token);
             if (string.IsNullOrWhiteSpace(legal.User.Identifier))
             {
                 var userResult = await _pspService.CreateConsumerAsync(legal, token);

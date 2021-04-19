@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Sheaft.Application.Interfaces;
@@ -39,7 +40,7 @@ namespace Sheaft.Mediatr.QuickOrder.Commands
 
         public async Task<Result> Handle(SetDefaultQuickOrderCommand request, CancellationToken token)
         {
-            var quickOrders = await _context.FindAsync<Domain.QuickOrder>(c => c.User.Id == request.UserId, token);
+            var quickOrders = await _context.QuickOrders.Where(c => c.User.Id == request.UserId).ToListAsync(token);
             var entity = quickOrders.FirstOrDefault(qo => qo.Id == request.QuickOrderId);
             if (entity == null)
                 return Failure(SheaftException.NotFound());

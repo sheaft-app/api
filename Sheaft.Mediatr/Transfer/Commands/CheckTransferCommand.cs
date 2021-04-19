@@ -2,8 +2,10 @@
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using Sheaft.Application.Extensions;
 using Sheaft.Application.Interfaces;
 using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Application.Interfaces.Mediatr;
@@ -37,7 +39,7 @@ namespace Sheaft.Mediatr.Transfer.Commands
 
         public async Task<Result> Handle(CheckTransferCommand request, CancellationToken token)
         {
-            var transfer = await _context.GetByIdAsync<Domain.Transfer>(request.TransferId, token);
+            var transfer = await _context.Transfers.SingleAsync(e => e.Id == request.TransferId, token);
             if (transfer.Status == TransactionStatus.Created || transfer.Status == TransactionStatus.Waiting)
             {
                 var result =

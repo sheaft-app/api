@@ -5,6 +5,7 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using Sheaft.Application.Extensions;
 using Sheaft.Application.Interfaces;
 using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Application.Interfaces.Mediatr;
@@ -55,7 +56,7 @@ namespace Sheaft.Mediatr.Reward.Commands
             entity.SetContact(request.Contact);
             entity.SetUrl(request.Url);
 
-            var level = await _context.GetByIdAsync<Domain.Level>(request.LevelId, token);
+            var level = await _context.Levels.SingleAsync(e => e.Id == request.LevelId, token);
             level.AddReward(entity);
 
             await _context.AddAsync(entity, token);

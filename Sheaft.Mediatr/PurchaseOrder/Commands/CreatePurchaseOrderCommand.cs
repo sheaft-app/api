@@ -3,8 +3,10 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using Sheaft.Application.Extensions;
 using Sheaft.Application.Interfaces;
 using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Application.Interfaces.Mediatr;
@@ -45,8 +47,8 @@ namespace Sheaft.Mediatr.PurchaseOrder.Commands
 
         public async Task<Result<Guid>> Handle(CreatePurchaseOrderCommand request, CancellationToken token)
         {
-            var producer = await _context.GetByIdAsync<Domain.Producer>(request.ProducerId, token);
-            var order = await _context.GetByIdAsync<Domain.Order>(request.OrderId, token);
+            var producer = await _context.Producers.SingleAsync(e => e.Id == request.ProducerId, token);
+            var order = await _context.Orders.SingleAsync(e => e.Id == request.OrderId, token);
             var delivery = order.Deliveries.FirstOrDefault(d => d.DeliveryMode.Producer.Id == producer.Id);
 
             var resultIdentifier =

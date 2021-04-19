@@ -1,7 +1,9 @@
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Sheaft.Application.Extensions;
 using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Application.Mailings;
 using Sheaft.Domain.Enum;
@@ -27,7 +29,7 @@ namespace Sheaft.Mediatr.PreAuthorization.EventHandlers
         public async Task Handle(DomainEventNotification<PreAuthorizationSucceededEvent> customEvent, CancellationToken token)
         {
             var preAuthorizationEvent = customEvent.DomainEvent;
-            var preAuthorization = await _context.GetByIdAsync<Domain.PreAuthorization>(preAuthorizationEvent.PreAuthorizationId, token);
+            var preAuthorization = await _context.PreAuthorizations.SingleAsync(e => e.Id == preAuthorizationEvent.PreAuthorizationId, token);
             if (preAuthorization.Status != PreAuthorizationStatus.Succeeded)
                 return;
 

@@ -4,7 +4,9 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Sheaft.Application.Extensions;
 using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Application.Interfaces.Mediatr;
 using Sheaft.Application.Models;
@@ -36,10 +38,12 @@ namespace Sheaft.Mediatr.Catalog.Commands
 
         public async Task<Result> Handle(AddOrUpdateProductsToCatalogCommand request, CancellationToken token)
         {
-            var catalog = await _context.GetByIdAsync<Domain.Catalog>(request.CatalogId, token);
+            var catalog = await _context.Catalogs.SingleAsync(e => e.Id == request.CatalogId, token);
 
             var productIds = request.Products.Select(p => p.Id);
-            var products = await _context.GetAsync<Domain.Product>(p => productIds.Contains(p.Id), token);
+            var products = await _context.Products
+                .Where(p => productIds.Contains(p.Id))
+                .ToListAsync(token);
 
             foreach (var product in products)
             {

@@ -73,7 +73,7 @@ namespace Sheaft.Web.Manage.Controllers
             if (entity == null)
                 throw SheaftException.NotFound();
 
-            ViewBag.LegalsId = (await _context.FindSingleAsync<Legal>(c => c.User.Id == id, token))?.Id;
+            ViewBag.LegalsId = (await _context.Legals.FirstOrDefaultAsync(c => c.User.Id == id, token))?.Id;
             return View(entity);
         }
 

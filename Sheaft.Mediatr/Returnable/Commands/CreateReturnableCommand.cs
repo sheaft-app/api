@@ -2,8 +2,10 @@
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using Sheaft.Application.Extensions;
 using Sheaft.Application.Interfaces;
 using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Application.Interfaces.Mediatr;
@@ -41,7 +43,7 @@ namespace Sheaft.Mediatr.Returnable.Commands
 
         public async Task<Result<Guid>> Handle(CreateReturnableCommand request, CancellationToken token)
         {
-            var producer = await _context.GetByIdAsync<Domain.Producer>(request.UserId, token);
+            var producer = await _context.Producers.SingleAsync(e => e.Id == request.UserId, token);
             var returnable = new Domain.Returnable(Guid.NewGuid(), ReturnableKind.Container, producer, request.Name,
                 request.WholeSalePrice, request.Vat, request.Description);
 

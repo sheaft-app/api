@@ -2,6 +2,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
@@ -43,9 +44,10 @@ namespace Sheaft.Mediatr.Withholding.Commands
 
         public async Task<Result<Guid>> Handle(CreateWithholdingCommand request, CancellationToken token)
         {
-            var debitedWallet = await _context.GetSingleAsync<Domain.Wallet>(c => c.User.Id == request.UserId, token);
-            var creditedWallet =
-                await _context.GetSingleAsync<Domain.Wallet>(c => c.Identifier == _pspOptions.DocumentWalletId, token);
+            var debitedWallet = await _context.Wallets
+                .SingleOrDefaultAsync(c => c.User.Id == request.UserId, token);
+            var creditedWallet = await _context.Wallets
+                .SingleOrDefaultAsync(c => c.Identifier == _pspOptions.DocumentWalletId, token);
 
             var withholding = new Domain.Withholding(Guid.NewGuid(), request.Amount, debitedWallet, creditedWallet);
             await _context.AddAsync(withholding, token);

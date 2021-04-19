@@ -63,7 +63,7 @@ namespace Sheaft.Mediatr.Producer.Commands
 
         public async Task<Result<Guid>> Handle(RegisterProducerCommand request, CancellationToken token)
         {
-            var producer = await _context.FindByIdAsync<Domain.Producer>(request.ProducerId, token);
+            var producer = await _context.Producers.SingleOrDefaultAsync(r => r.Id == request.ProducerId || r.Email == request.Email, token);
             if (producer != null)
                 return Failure<Guid>(MessageKind.Register_User_AlreadyExists);
 
@@ -83,7 +83,7 @@ namespace Sheaft.Mediatr.Producer.Commands
 
             if (request.Tags != null && request.Tags.Any())
             {
-                var tags = await _context.FindAsync<Domain.Tag>(t => request.Tags.Contains(t.Id), token);
+                var tags = await _context.Tags.Where(t => request.Tags.Contains(t.Id)).ToListAsync(token);
                 producer.SetTags(tags);
             }
 

@@ -4,8 +4,10 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using Sheaft.Application.Extensions;
 using Sheaft.Application.Interfaces;
 using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Application.Interfaces.Mediatr;
@@ -45,7 +47,7 @@ namespace Sheaft.Mediatr.Order.Commands
 
         public async Task<Result<IEnumerable<Guid>>> Handle(ConfirmOrderCommand request, CancellationToken token)
         {
-            var order = await _context.GetByIdAsync<Domain.Order>(request.OrderId, token);
+            var order = await _context.Orders.SingleAsync(e => e.Id == request.OrderId, token);
             if(order.User == null)
                 throw SheaftException.BadRequest(MessageKind.Order_CannotCreate_User_Required);
 
@@ -72,7 +74,7 @@ namespace Sheaft.Mediatr.Order.Commands
 
                 await transaction.CommitAsync(token);
 
-                var preAuthorization = await _context.FindSingleAsync<Domain.PreAuthorization>(p =>
+                var preAuthorization = await _context.PreAuthorizations.SingleOrDefaultAsync(p =>
                     p.Order.Id == order.Id && p.Status == PreAuthorizationStatus.Succeeded &&
                     p.PaymentStatus == PaymentStatus.Validated, token);
 

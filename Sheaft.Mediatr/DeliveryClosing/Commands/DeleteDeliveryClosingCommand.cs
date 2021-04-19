@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Sheaft.Application.Interfaces;
@@ -38,13 +39,14 @@ namespace Sheaft.Mediatr.DeliveryClosing.Commands
 
         public async Task<Result> Handle(DeleteDeliveryClosingCommand request, CancellationToken token)
         {
-            var entity = await _context.GetSingleAsync<Domain.DeliveryMode>(c => c.Closings.Any(cc => cc.Id == request.ClosingId), token);
-            if(entity.Producer.Id != request.RequestUser.Id)
+            var entity = await _context.DeliveryModes
+                .SingleOrDefaultAsync(c => c.Closings.Any(cc => cc.Id == request.ClosingId), token);
+            if (entity.Producer.Id != request.RequestUser.Id)
                 return Failure(MessageKind.Forbidden);
 
             entity.RemoveClosing(request.ClosingId);
             await _context.SaveChangesAsync(token);
-            
+
             return Success();
         }
     }

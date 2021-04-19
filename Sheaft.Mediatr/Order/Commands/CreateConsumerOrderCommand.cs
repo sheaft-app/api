@@ -4,9 +4,11 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
+using Sheaft.Application.Extensions;
 using Sheaft.Application.Interfaces.Business;
 using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Application.Interfaces.Mediatr;
@@ -58,15 +60,19 @@ namespace Sheaft.Mediatr.Order.Commands
                 return Failure<Guid>(cartProductsResult);
 
             var deliveryIds = request.ProducersExpectedDeliveries?.Select(p => p.DeliveryModeId) ?? new List<Guid>();
-            var cartDeliveriesResult = await _orderService.GetCartDeliveriesAsync(request.ProducersExpectedDeliveries, deliveryIds,
+            var cartDeliveriesResult = await _orderService.GetCartDeliveriesAsync(request.ProducersExpectedDeliveries,
+                deliveryIds,
                 cartProductsResult.Data, token);
             if (!cartDeliveriesResult.Succeeded)
                 return Failure<Guid>(cartDeliveriesResult);
-            
-            Domain.User user = request.UserId.HasValue && request.UserId != Guid.Empty ? await _context.GetByIdAsync<Domain.User>(request.UserId.Value, token) : null;
-            var order = new Domain.Order(Guid.NewGuid(), request.Donation, cartProductsResult.Data, _pspOptions.FixedAmount,
+
+            Domain.User user = request.UserId.HasValue && request.UserId != Guid.Empty
+                ? await _context.Users.SingleAsync(e => e.Id == request.UserId.Value, token)
+                : null;
+            var order = new Domain.Order(Guid.NewGuid(), request.Donation, cartProductsResult.Data,
+                _pspOptions.FixedAmount,
                 _pspOptions.Percent, _pspOptions.VatPercent, user);
-            
+
             order.SetProducts(cartProductsResult.Data);
             order.SetDeliveries(cartDeliveriesResult.Data);
 

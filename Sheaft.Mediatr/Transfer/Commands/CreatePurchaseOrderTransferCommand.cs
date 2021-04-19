@@ -6,6 +6,7 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using Sheaft.Application.Extensions;
 using Sheaft.Application.Interfaces;
 using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Application.Interfaces.Mediatr;
@@ -44,7 +45,7 @@ namespace Sheaft.Mediatr.Transfer.Commands
 
         public async Task<Result<Guid>> Handle(CreatePurchaseOrderTransferCommand request, CancellationToken token)
         {
-            var purchaseOrder = await _context.GetByIdAsync<Domain.PurchaseOrder>(request.PurchaseOrderId, token);
+            var purchaseOrder = await _context.PurchaseOrders.SingleAsync(e => e.Id == request.PurchaseOrderId, token);
             if (purchaseOrder.Status != PurchaseOrderStatus.Delivered)
                 return Failure<Guid>(MessageKind.Transfer_CannotCreate_PurchaseOrder_Invalid_Status);
 
@@ -66,9 +67,9 @@ namespace Sheaft.Mediatr.Transfer.Commands
                 return Failure<Guid>(checkResult);
 
             var debitedWallet =
-                await _context.GetSingleAsync<Domain.Wallet>(c => c.User.Id == purchaseOrder.Sender.Id, token);
+                await _context.Wallets.SingleOrDefaultAsync(c => c.User.Id == purchaseOrder.Sender.Id, token);
             var creditedWallet =
-                await _context.GetSingleAsync<Domain.Wallet>(c => c.User.Id == purchaseOrder.Vendor.Id, token);
+                await _context.Wallets.SingleOrDefaultAsync(c => c.User.Id == purchaseOrder.Vendor.Id, token);
 
             using (var transaction = await _context.BeginTransactionAsync(token))
             {

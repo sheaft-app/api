@@ -1,6 +1,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Sheaft.Application.Interfaces.Infrastructure;
@@ -42,8 +43,8 @@ namespace Sheaft.Mediatr.PreAuthorization.Commands
         public async Task<Result<PreAuthorizationStatus>> Handle(RefreshPreAuthorizationStatusCommand request,
             CancellationToken token)
         {
-            var preAuthorization =
-                await _context.GetSingleAsync<Domain.PreAuthorization>(c => c.Identifier == request.Identifier, token);
+            var preAuthorization = await _context.PreAuthorizations.
+                SingleOrDefaultAsync(c => c.Identifier == request.Identifier, token);
             if ((preAuthorization.Status == PreAuthorizationStatus.Succeeded && preAuthorization.PaymentStatus == PaymentStatus.Validated) ||
                 preAuthorization.Status == PreAuthorizationStatus.Failed || 
                 preAuthorization.Status == PreAuthorizationStatus.Cancelled)

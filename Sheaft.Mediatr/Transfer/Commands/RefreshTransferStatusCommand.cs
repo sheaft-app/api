@@ -1,6 +1,7 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Sheaft.Application.Interfaces;
@@ -43,17 +44,17 @@ namespace Sheaft.Mediatr.Transfer.Commands
             CancellationToken token)
         {
             var transfer =
-                await _context.FindSingleAsync<Domain.Transfer>(c => c.Identifier == request.Identifier, token);
+                await _context.Transfers.SingleOrDefaultAsync(c => c.Identifier == request.Identifier, token);
             if (transfer != null)
                 return await HandleTransferStatusAsync(request, transfer, token);
 
             var donation =
-                await _context.FindSingleAsync<Domain.Donation>(c => c.Identifier == request.Identifier, token);
+                await _context.Donations.SingleOrDefaultAsync(c => c.Identifier == request.Identifier, token);
             if (donation != null)
                 return await HandleDonationStatusAsync(request, donation, token);
 
             var withholding =
-                await _context.FindSingleAsync<Domain.Withholding>(c => c.Identifier == request.Identifier, token);
+                await _context.Withholdings.SingleOrDefaultAsync(c => c.Identifier == request.Identifier, token);
             if (withholding != null)
                 return await HandleWithholdingStatusAsync(request, withholding, token);
 

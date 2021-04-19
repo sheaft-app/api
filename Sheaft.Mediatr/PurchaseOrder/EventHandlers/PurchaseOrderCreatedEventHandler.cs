@@ -1,6 +1,7 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Sheaft.Application.Extensions;
 using Sheaft.Application.Interfaces;
@@ -33,7 +34,7 @@ namespace Sheaft.Mediatr.PurchaseOrder.EventHandlers
         private async Task NotifyConsumerAsync(DomainEventNotification<PurchaseOrderCreatedEvent> notification, CancellationToken token)
         {
             var orderEvent = notification.DomainEvent;
-            var purchaseOrder = await _context.GetByIdAsync<Domain.PurchaseOrder>(orderEvent.PurchaseOrderId, token);
+            var purchaseOrder = await _context.PurchaseOrders.SingleAsync(e => e.Id == orderEvent.PurchaseOrderId, token);
             await _signalrService.SendNotificationToUserAsync(purchaseOrder.Sender.Id, nameof(PurchaseOrderCreatedEvent),
                 purchaseOrder.GetPurchaseNotifModelAsString());
 
@@ -51,7 +52,7 @@ namespace Sheaft.Mediatr.PurchaseOrder.EventHandlers
         private async Task NotifyProducerAsync(DomainEventNotification<PurchaseOrderCreatedEvent> notification, CancellationToken token)
         {
             var orderEvent = notification.DomainEvent;
-            var purchaseOrder = await _context.GetByIdAsync<Domain.PurchaseOrder>(orderEvent.PurchaseOrderId, token);
+            var purchaseOrder = await _context.PurchaseOrders.SingleAsync(e => e.Id == orderEvent.PurchaseOrderId, token);
             await _signalrService.SendNotificationToUserAsync(purchaseOrder.Vendor.Id, "PurchaseOrderReceivedEvent", purchaseOrder.GetPurchaseNotifModelAsString());
 
             await _emailService.SendTemplatedEmailAsync(

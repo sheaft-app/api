@@ -63,7 +63,7 @@ namespace Sheaft.Mediatr.Store.Commands
 
         public async Task<Result<Guid>> Handle(RegisterStoreCommand request, CancellationToken token)
         {
-            var store = await _context.FindByIdAsync<Domain.Store>(request.StoreId, token);
+            var store = await _context.Stores.SingleOrDefaultAsync(r => r.Id == request.StoreId || r.Email == request.Email, token);
             if (store != null)
                 return Failure<Guid>(MessageKind.Register_User_AlreadyExists);
 
@@ -92,7 +92,7 @@ namespace Sheaft.Mediatr.Store.Commands
 
             if (request.Tags != null && request.Tags.Any())
             {
-                var tags = await _context.FindAsync<Domain.Tag>(t => request.Tags.Contains(t.Id), token);
+                var tags = await _context.Tags.Where(t => request.Tags.Contains(t.Id)).ToListAsync(token);
                 store.SetTags(tags);
             }
 

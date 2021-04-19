@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
@@ -47,6 +46,10 @@ namespace Sheaft.Application.Interfaces.Infrastructure
         DbSet<Domain.Tag> Tags { get; set; }
         DbSet<Domain.Transfer> Transfers { get; set; }
         DbSet<Domain.User> Users { get; set; }
+        DbSet<Domain.Store> Stores { get; set; }
+        DbSet<Domain.Producer> Producers { get; set; }
+        DbSet<Domain.Consumer> Consumers { get; set; }
+        DbSet<Domain.Business> Businesses { get; set; }
         DbSet<Domain.Wallet> Wallets { get; set; }
         DbSet<Domain.Withholding> Withholdings { get; set; }
 
@@ -59,21 +62,6 @@ namespace Sheaft.Application.Interfaces.Infrastructure
         DbSet<DepartmentProducers> DepartmentProducers { get; set; }
         DbSet<DepartmentStores> DepartmentStores { get; set; }
 
-        Task<T> GetByIdAsync<T>(Guid id, CancellationToken token, bool asNoTracking = false) where T : class, IIdEntity;
-        Task<T> FindByIdAsync<T>(Guid id, CancellationToken token, bool asNoTracking = false) where T : class, IIdEntity;
-        Task<T> GetSingleAsync<T>(Expression<Func<T, bool>> where, CancellationToken token, bool asNoTracking = false) where T : class;
-        Task<T> FindSingleAsync<T>(Expression<Func<T, bool>> where, CancellationToken token, bool asNoTracking = false) where T : class;
-        Task<IEnumerable<T>> GetByIdsAsync<T>(IEnumerable<Guid> ids, CancellationToken token, bool asNoTracking = false) where T : class, IIdEntity;
-        Task<IEnumerable<T>> FindByIdsAsync<T>(IEnumerable<Guid> ids, CancellationToken token, bool asNoTracking = false) where T : class, IIdEntity;
-        Task<IEnumerable<T>> GetAsync<T>(Expression<Func<T, bool>> where, CancellationToken token, bool asNoTracking = false) where T : class;
-        Task<IEnumerable<T>> GetAsync<T>(CancellationToken token, bool asNoTracking = false) where T : class;
-        Task<IEnumerable<T>> FindAsync<T>(Expression<Func<T, bool>> where, CancellationToken token, bool asNoTracking = false) where T : class;
-        Task<IEnumerable<T>> FindAsync<T>(CancellationToken token, bool asNoTracking = false) where T : class;
-        Task<bool> AnyAsync<T>(Expression<Func<T, bool>> where, CancellationToken token, bool asNoTracking = false) where T : class;
-        Task<bool> AnyAsync<T>(CancellationToken token, bool asNoTracking = false) where T : class;
-        Task EnsureNotExists<T>(Guid id, CancellationToken token, bool asNoTracking = false) where T : class, IIdEntity;
-        Task EnsureNotExists<T>(Expression<Func<T, bool>> where, CancellationToken token, bool asNoTracking = false) where T : class, IIdEntity;
-        
         void Migrate();
         Task<IDbContextTransaction> BeginTransactionAsync(CancellationToken cancellationToken = default);
         EntityEntry<TEntity> Add<TEntity>([NotNull] TEntity entity) where TEntity : class;

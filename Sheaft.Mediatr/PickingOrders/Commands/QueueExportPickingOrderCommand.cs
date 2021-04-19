@@ -4,8 +4,10 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using Sheaft.Application.Extensions;
 using Sheaft.Application.Interfaces;
 using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Application.Interfaces.Mediatr;
@@ -42,15 +44,20 @@ namespace Sheaft.Mediatr.PickingOrders.Commands
 
         public async Task<Result<Guid>> Handle(QueueExportPickingOrderCommand request, CancellationToken token)
         {
-            var producer = await _context.GetByIdAsync<Domain.Producer>(request.ProducerId, token);
-            var purchaseOrders = await _context.GetByIdsAsync<Domain.PurchaseOrder>(request.PurchaseOrderIds, token);
+            var producer = await _context.Producers.SingleAsync(e => e.Id == request.ProducerId, token);
+            var purchaseOrders = await _context.PurchaseOrders.Where(d => request.PurchaseOrderIds.Contains(d.Id))
+                .ToListAsync(token);
 
-            var orderIdsToAccept = purchaseOrders.Where(c => c.Status == PurchaseOrderStatus.Waiting).Select(c => c.Id);
+            var orderIdsToAccept = purchaseOrders
+                .Where(c => c.Status == PurchaseOrderStatus.Waiting)
+                .Select(c => c.Id);
+            
             if (orderIdsToAccept.Any())
             {
                 var result =
                     await _mediatr.Process(
-                        new AcceptPurchaseOrdersCommand(request.RequestUser) {PurchaseOrderIds = orderIdsToAccept}, token);
+                        new AcceptPurchaseOrdersCommand(request.RequestUser) {PurchaseOrderIds = orderIdsToAccept},
+                        token);
                 if (!result.Succeeded)
                     return Failure<Guid>(result);
             }

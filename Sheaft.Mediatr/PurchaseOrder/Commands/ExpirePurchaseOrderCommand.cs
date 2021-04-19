@@ -2,8 +2,10 @@
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using Sheaft.Application.Extensions;
 using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Application.Interfaces.Mediatr;
 using Sheaft.Core;
@@ -35,7 +37,7 @@ namespace Sheaft.Mediatr.PurchaseOrder.Commands
 
         public async Task<Result> Handle(ExpirePurchaseOrderCommand request, CancellationToken token)
         {
-            var purchaseOrder = await _context.GetByIdAsync<Domain.PurchaseOrder>(request.PurchaseOrderId, token);
+            var purchaseOrder = await _context.PurchaseOrders.SingleAsync(e => e.Id == request.PurchaseOrderId, token);
             if (purchaseOrder.Status == PurchaseOrderStatus.Waiting 
                 && purchaseOrder.CreatedOn.AddDays(3) < DateTimeOffset.UtcNow)
             {

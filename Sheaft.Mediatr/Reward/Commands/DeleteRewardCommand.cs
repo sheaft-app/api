@@ -2,8 +2,10 @@
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using Sheaft.Application.Extensions;
 using Sheaft.Application.Interfaces;
 using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Application.Interfaces.Mediatr;
@@ -35,7 +37,7 @@ namespace Sheaft.Mediatr.Reward.Commands
 
         public async Task<Result> Handle(DeleteRewardCommand request, CancellationToken token)
         {
-            var entity = await _context.GetByIdAsync<Domain.Reward>(request.RewardId, token);
+            var entity = await _context.Rewards.SingleAsync(e => e.Id == request.RewardId, token);
 
             _context.Remove(entity);
             await _context.SaveChangesAsync(token);

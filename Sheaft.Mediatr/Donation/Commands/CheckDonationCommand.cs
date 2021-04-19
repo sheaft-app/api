@@ -2,8 +2,10 @@
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using Sheaft.Application.Extensions;
 using Sheaft.Application.Interfaces;
 using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Application.Interfaces.Mediatr;
@@ -38,7 +40,7 @@ namespace Sheaft.Mediatr.Donation.Commands
 
         public async Task<Result> Handle(CheckDonationCommand request, CancellationToken token)
         {
-            var donation = await _context.GetByIdAsync<Domain.Donation>(request.DonationId, token);
+            var donation = await _context.Donations.SingleAsync(e => e.Id == request.DonationId, token);
             if (donation.Status != TransactionStatus.Created && donation.Status != TransactionStatus.Waiting)
                 return Failure(MessageKind.BadRequest);
 

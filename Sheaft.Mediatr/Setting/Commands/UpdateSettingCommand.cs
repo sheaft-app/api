@@ -2,8 +2,10 @@
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using Sheaft.Application.Extensions;
 using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Application.Interfaces.Mediatr;
 using Sheaft.Core;
@@ -38,7 +40,7 @@ namespace Sheaft.Mediatr.Setting.Commands
 
         public async Task<Result> Handle(UpdateSettingCommand request, CancellationToken token)
         {
-            var entity = await _context.GetByIdAsync<Domain.Setting>(request.SettingId, token);
+            var entity = await _context.Settings.SingleAsync(e => e.Id == request.SettingId, token);
 
             entity.SetName(request.Name);
             entity.SetDescription(request.Description);

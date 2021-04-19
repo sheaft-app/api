@@ -2,6 +2,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Sheaft.Application.Extensions;
 using Sheaft.Application.Interfaces;
@@ -28,7 +29,7 @@ namespace Sheaft.Mediatr.Agreement.EventHandlers
         public async Task Handle(DomainEventNotification<AgreementAcceptedEvent> notification, CancellationToken token)
         {
             var agreementEvent = notification.DomainEvent;
-            var agreement = await _context.GetByIdAsync<Domain.Agreement>(agreementEvent.AgreementId, token);
+            var agreement = await _context.Agreements.SingleAsync(e => e.Id == agreementEvent.AgreementId, token);
 
             var email = string.Empty;
             var name = string.Empty;

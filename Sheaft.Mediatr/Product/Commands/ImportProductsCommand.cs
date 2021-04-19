@@ -5,8 +5,10 @@ using System.Threading;
 using System.Threading.Tasks;
 using AutoMapper;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using Sheaft.Application.Extensions;
 using Sheaft.Application.Interfaces.Factories;
 using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Application.Interfaces.Mediatr;
@@ -52,7 +54,7 @@ namespace Sheaft.Mediatr.Product.Commands
 
         public async Task<Result> Handle(ImportProductsCommand request, CancellationToken token)
         {
-            var job = await _context.GetByIdAsync<Domain.Job>(request.JobId, token);
+            var job = await _context.Jobs.SingleAsync(e => e.Id == request.JobId, token);
 
             try
             {
@@ -70,7 +72,7 @@ namespace Sheaft.Mediatr.Product.Commands
 
                 var productsImporter = await _productsImporterFactory.GetImporterAsync(request.RequestUser, token);
                 
-                var tags = await _context.GetAsync<Domain.Tag>(token);
+                var tags = await _context.Tags.ToListAsync(token);
                 var productsResult = await productsImporter.ImportAsync(fileDataResult.Data, tags.Select(t => new KeyValuePair<Guid, string>(t.Id, t.Name)), token);
                 if(!productsResult.Succeeded)
                     throw productsResult.Exception;

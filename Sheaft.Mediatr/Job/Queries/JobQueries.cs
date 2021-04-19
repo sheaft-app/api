@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using AutoMapper.QueryableExtensions;
+using Microsoft.EntityFrameworkCore;
 using Sheaft.Application.Extensions;
 using Sheaft.Application.Interfaces;
 using Sheaft.Application.Interfaces.Infrastructure;
@@ -26,7 +27,7 @@ namespace Sheaft.Mediatr.Job.Queries
 
         public Task<bool> HasProductsImportsInProgressAsync(Guid producerId, RequestUser currentUser, CancellationToken token)
         {
-            return _context.AnyAsync<Domain.Job>(r =>
+            return _context.Jobs.AnyAsync(r =>
                 !r.Archived &&
                 r.Kind == JobKind.ImportProducts &&
                 (r.Status == ProcessStatus.Paused || r.Status == ProcessStatus.Processing || r.Status == ProcessStatus.Waiting) &&
@@ -35,7 +36,7 @@ namespace Sheaft.Mediatr.Job.Queries
 
         public Task<bool> HasPickingOrdersExportsInProgressAsync(Guid producerId, RequestUser currentUser, CancellationToken token)
         {
-            return _context.AnyAsync<Domain.Job>(r =>
+            return _context.Jobs.AnyAsync(r =>
                 !r.Archived &&
                 r.Kind == JobKind.ExportPickingOrders &&
                 (r.Status == ProcessStatus.Paused || r.Status == ProcessStatus.Processing || r.Status == ProcessStatus.Waiting) &&

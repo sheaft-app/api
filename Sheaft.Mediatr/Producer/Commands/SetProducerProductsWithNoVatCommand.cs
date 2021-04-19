@@ -1,9 +1,12 @@
 ﻿using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using Sheaft.Application.Extensions;
 using Sheaft.Application.Interfaces;
 using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Application.Interfaces.Mediatr;
@@ -36,11 +39,14 @@ namespace Sheaft.Mediatr.Producer.Commands
 
         public async Task<Result> Handle(SetProducerProductsWithNoVatCommand request, CancellationToken token)
         {
-            var producer = await _context.GetByIdAsync<Domain.Producer>(request.ProducerId, token);
+            var producer = await _context.Producers.SingleAsync(e => e.Id == request.ProducerId, token);
             if (!producer.NotSubjectToVat)
                 return Failure(MessageKind.BadRequest);
 
-            var products = await _context.FindAsync<Domain.Product>(p => p.Producer.Id == producer.Id, token);
+            var products = await _context.Products
+                .Where(p => p.Producer.Id == producer.Id)
+                .ToListAsync(token);
+            
             foreach (var product in products)
             {
                 product.SetVat(0);

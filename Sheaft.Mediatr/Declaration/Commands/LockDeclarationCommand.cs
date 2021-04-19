@@ -2,6 +2,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Sheaft.Application.Interfaces;
@@ -36,8 +37,8 @@ namespace Sheaft.Mediatr.Declaration.Commands
 
         public async Task<Result> Handle(LockDeclarationCommand request, CancellationToken token)
         {
-            var legal = await _context.GetSingleAsync<BusinessLegal>(r => r.Declaration.Id == request.DeclarationId,
-                token);
+            var legal = await _context.Set<BusinessLegal>()
+                .SingleOrDefaultAsync(r => r.Declaration.Id == request.DeclarationId, token);
             legal.Declaration.SetStatus(DeclarationStatus.Locked);
 
             await _context.SaveChangesAsync(token);

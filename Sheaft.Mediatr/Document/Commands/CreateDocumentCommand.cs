@@ -3,8 +3,10 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using Sheaft.Application.Extensions;
 using Sheaft.Application.Interfaces;
 using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Application.Interfaces.Mediatr;
@@ -46,7 +48,7 @@ namespace Sheaft.Mediatr.Document.Commands
         {
             using (var transaction = await _context.BeginTransactionAsync(token))
             {
-                var legal = await _context.GetSingleAsync<Domain.Legal>(r => r.Id == request.LegalId, token);
+                var legal = await _context.Legals.SingleAsync(e => e.Id == request.LegalId, token);
                 if (legal.Documents.Any(d => d.Kind == request.Kind))
                     return Failure<Guid>(MessageKind.Document_CannotCreate_Type_Already_Present);
 

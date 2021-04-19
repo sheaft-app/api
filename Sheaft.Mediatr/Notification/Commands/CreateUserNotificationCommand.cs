@@ -2,8 +2,10 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using Sheaft.Application.Extensions;
 using Sheaft.Application.Interfaces;
 using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Application.Interfaces.Mediatr;
@@ -39,7 +41,7 @@ namespace Sheaft.Mediatr.Notification.Commands
 
         public async Task<Result<Guid>> Handle(CreateUserNotificationCommand request, CancellationToken token)
         {
-            var user = await _context.GetByIdAsync<Domain.User>(request.UserId, token);
+            var user = await _context.Users.SingleAsync(e => e.Id == request.UserId, token);
             var entity = new Domain.Notification(Guid.NewGuid(), NotificationKind.Business, request.Method,
                 request.Content,
                 user);

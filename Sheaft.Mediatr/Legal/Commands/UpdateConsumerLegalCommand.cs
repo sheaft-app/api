@@ -2,8 +2,10 @@
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using Sheaft.Application.Extensions;
 using Sheaft.Application.Interfaces;
 using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Application.Interfaces.Mediatr;
@@ -49,7 +51,7 @@ namespace Sheaft.Mediatr.Legal.Commands
 
         public async Task<Result> Handle(UpdateConsumerLegalCommand request, CancellationToken token)
         {
-            var legal = await _context.GetByIdAsync<ConsumerLegal>(request.LegalId, token);
+            var legal = await _context.Set<ConsumerLegal>().SingleAsync(e => e.Id == request.LegalId, token);
 
             var ownerAddress = new OwnerAddress(request.Address.Line1,
                 request.Address.Line2,

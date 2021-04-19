@@ -4,9 +4,10 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using Sheaft.Application.Interfaces;
+using Sheaft.Application.Extensions;
 using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Application.Interfaces.Mediatr;
 using Sheaft.Application.Models;
@@ -42,9 +43,9 @@ namespace Sheaft.Mediatr.Agreement.Commands
 
         public async Task<Result<Guid>> Handle(CreateAgreementCommand request, CancellationToken token)
         {
-            var store = await _context.GetByIdAsync<Domain.Store>(request.StoreId, token);
-            var currentUser = await _context.GetByIdAsync<Domain.User>(request.RequestUser.Id, token);
-            var delivery = await _context.GetByIdAsync<Domain.DeliveryMode>(request.DeliveryModeId, token);
+            var store = await _context.Stores.SingleAsync(e => e.Id == request.StoreId, token);
+            var currentUser = await _context.Users.SingleAsync(e => e.Id == request.RequestUser.Id, token);
+            var delivery = await _context.DeliveryModes.SingleAsync(e => e.Id == request.DeliveryModeId, token);
 
             var selectedHours = new List<TimeSlotHour>();
             if (request.SelectedHours != null && request.SelectedHours.Any())
@@ -58,12 +59,12 @@ namespace Sheaft.Mediatr.Agreement.Commands
             var entity = new Domain.Agreement(Guid.NewGuid(), store, delivery, currentUser, selectedHours);
             if (request.CatalogId.HasValue)
             {
-                var catalog = await _context.GetByIdAsync<Domain.Catalog>(request.CatalogId.Value, token);
+                var catalog = await _context.Catalogs.SingleAsync(e => e.Id == request.CatalogId.Value, token);
                 entity.AssignCatalog(catalog);
             }
             else
             {
-                var catalog = await _context.GetSingleAsync<Domain.Catalog>(c => c.IsDefault && c.Kind == CatalogKind.Stores && c.Producer.Id == delivery.Producer.Id, token);
+                var catalog = await _context.Catalogs.SingleAsync(c => c.IsDefault && c.Kind == CatalogKind.Stores && c.Producer.Id == delivery.Producer.Id, token);
                 entity.AssignCatalog(catalog);
             }
 

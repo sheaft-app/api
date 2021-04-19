@@ -2,8 +2,10 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using Sheaft.Application.Extensions;
 using Sheaft.Application.Interfaces;
 using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Application.Interfaces.Mediatr;
@@ -41,8 +43,8 @@ namespace Sheaft.Mediatr.Product.Commands
 
         public async Task<Result> Handle(RateProductCommand request, CancellationToken token)
         {
-            var user = await _context.GetByIdAsync<Domain.User>(request.UserId, token);
-            var entity = await _context.GetByIdAsync<Domain.Product>(request.ProductId, token);
+            var user = await _context.Users.SingleAsync(e => e.Id == request.UserId, token);
+            var entity = await _context.Products.SingleAsync(e => e.Id == request.ProductId, token);
 
             entity.AddRating(user, request.Value, request.Comment);
             await _context.SaveChangesAsync(token);

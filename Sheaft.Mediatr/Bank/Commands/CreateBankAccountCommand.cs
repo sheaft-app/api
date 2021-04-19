@@ -2,9 +2,9 @@
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using Sheaft.Application.Interfaces;
 using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Application.Interfaces.Mediatr;
 using Sheaft.Application.Models;
@@ -45,7 +45,7 @@ namespace Sheaft.Mediatr.Bank.Commands
 
         public async Task<Result<Guid>> Handle(CreateBankAccountCommand request, CancellationToken token)
         {
-            var user = await _context.GetByIdAsync<Domain.User>(request.UserId, token);
+            var user = await _context.Users.SingleAsync(e => e.Id == request.UserId, token);
 
             using (var transaction = await _context.BeginTransactionAsync(token))
             {

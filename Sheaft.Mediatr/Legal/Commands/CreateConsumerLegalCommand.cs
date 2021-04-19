@@ -2,8 +2,10 @@
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using Sheaft.Application.Extensions;
 using Sheaft.Application.Interfaces;
 using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Application.Interfaces.Mediatr;
@@ -48,46 +50,39 @@ namespace Sheaft.Mediatr.Legal.Commands
 
         public async Task<Result<Guid>> Handle(CreateConsumerLegalCommand request, CancellationToken token)
         {
-            var consumer = await _context.GetByIdAsync<Domain.Consumer>(request.UserId, token);
-            await _context.EnsureNotExists<ConsumerLegal>(c => c.User.Id == consumer.Id, token);
-
-            var ownerAddress = new OwnerAddress(request.Address.Line1,
-                request.Address.Line2,
-                request.Address.Zipcode,
-                request.Address.City,
-                request.Address.Country
-            );
-
-            var legal = new ConsumerLegal(Guid.NewGuid(),
-                consumer,
-                new Owner(consumer.Id,
-                    request.FirstName,
-                    request.LastName,
-                    request.Email,
-                    request.BirthDate,
-                    ownerAddress,
-                    request.Nationality,
-                    request.CountryOfResidence
-                ));
-
-            await _context.AddAsync(legal, token);
+            var consumer = await _context.Consumers.SingleAsync(e => e.Id == request.UserId, token);
+            var legals = consumer.SetLegals(new Owner(consumer.Id,
+                request.FirstName,
+                request.LastName,
+                request.Email,
+                request.BirthDate,
+                new OwnerAddress(request.Address.Line1,
+                    request.Address.Line2,
+                    request.Address.Zipcode,
+                    request.Address.City,
+                    request.Address.Country
+                ),
+                request.Nationality,
+                request.CountryOfResidence
+            ));
+               
             await _context.SaveChangesAsync(token);
 
-            if (string.IsNullOrWhiteSpace(legal.User.Identifier))
+            if (string.IsNullOrWhiteSpace(consumer.Identifier))
             {
                 var userResult = await _mediatr.Process(
-                    new CheckConsumerLegalConfigurationCommand(request.RequestUser) {UserId = legal.User.Id}, token);
+                    new CheckConsumerLegalConfigurationCommand(request.RequestUser) {UserId = consumer.Id}, token);
                 if (!userResult.Succeeded)
                     return Failure<Guid>(userResult);
             }
             else
             {
-                var result = await _pspService.UpdateConsumerAsync(legal, token);
+                var result = await _pspService.UpdateConsumerAsync(legals, token);
                 if (!result.Succeeded)
                     return Failure<Guid>(result);
             }
 
-            return Success(legal.Id);
+            return Success(legals.Id);
         }
     }
 }

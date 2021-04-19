@@ -2,8 +2,10 @@
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using Sheaft.Application.Extensions;
 using Sheaft.Application.Interfaces.Business;
 using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Application.Interfaces.Mediatr;
@@ -59,7 +61,7 @@ namespace Sheaft.Mediatr.WebPayin.Commands
             if (!checkResult.Succeeded)
                 return Failure<Guid>(checkResult);
             
-            var order = await _context.GetByIdAsync<Domain.Order>(request.OrderId, token);
+            var order = await _context.Orders.SingleAsync(e => e.Id == request.OrderId, token);
             using (var transaction = await _context.BeginTransactionAsync(token))
             {
                 if (!string.IsNullOrWhiteSpace(order.Reference))
@@ -73,7 +75,7 @@ namespace Sheaft.Mediatr.WebPayin.Commands
 
                 order.SetStatus(OrderStatus.Waiting);
 
-                var wallet = await _context.GetSingleAsync<Domain.Wallet>(c => c.User.Id == order.User.Id, token);
+                var wallet = await _context.Wallets.SingleOrDefaultAsync(c => c.User.Id == order.User.Id, token);
                 if (order.TotalOnSalePrice < 1)
                     return Failure<Guid>(MessageKind.Order_Total_CannotBe_LowerThan, 1);
 
@@ -82,7 +84,7 @@ namespace Sheaft.Mediatr.WebPayin.Commands
                 await _context.AddAsync(webPayin, token);
                 await _context.SaveChangesAsync(token);
 
-                var legal = await _context.GetSingleAsync<Domain.Legal>(c => c.Owner.Id == order.User.Id, token);
+                var legal = await _context.Legals.SingleOrDefaultAsync(c => c.Owner.Id == order.User.Id, token);
                 var result = await _pspService.CreateWebPayinAsync(webPayin, legal.Owner, token);
                 if (!result.Succeeded)
                     return Failure<Guid>(result.Exception);

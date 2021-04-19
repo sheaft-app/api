@@ -3,6 +3,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
@@ -39,7 +40,7 @@ namespace Sheaft.Mediatr.Producer.Commands
 
         public async Task<Result> Handle(GenerateProducersFileCommand request, CancellationToken token)
         {
-            var producers = await _context.GetAsync<Domain.Producer>(token);
+            var producers = await _context.Producers.ToListAsync(token);
             var prods = producers.Select(p => new ProducerListItem(p));
 
             var result = await _blobService.UploadProducersListAsync(

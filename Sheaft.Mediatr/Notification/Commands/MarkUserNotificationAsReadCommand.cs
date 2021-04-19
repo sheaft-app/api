@@ -2,8 +2,10 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using Sheaft.Application.Extensions;
 using Sheaft.Application.Interfaces;
 using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Application.Interfaces.Mediatr;
@@ -37,7 +39,7 @@ namespace Sheaft.Mediatr.Notification.Commands
 
         public async Task<Result> Handle(MarkUserNotificationAsReadCommand request, CancellationToken token)
         {
-            var notification = await _context.GetByIdAsync<Domain.Notification>(request.NotificationId, token);
+            var notification = await _context.Notifications.SingleAsync(e => e.Id == request.NotificationId, token);
             if (!notification.Unread)
                 return Success();
             

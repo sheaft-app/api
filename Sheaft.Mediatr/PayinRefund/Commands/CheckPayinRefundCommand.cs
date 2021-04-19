@@ -2,8 +2,10 @@
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using Sheaft.Application.Extensions;
 using Sheaft.Application.Interfaces;
 using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Application.Interfaces.Mediatr;
@@ -38,7 +40,7 @@ namespace Sheaft.Mediatr.PayinRefund.Commands
 
         public async Task<Result> Handle(CheckPayinRefundCommand request, CancellationToken token)
         {
-            var payinRefund = await _context.GetByIdAsync<Domain.PayinRefund>(request.PayinRefundId, token);
+            var payinRefund = await _context.Set<Domain.PayinRefund>().SingleAsync(e => e.Id == request.PayinRefundId, token);
             if (payinRefund.Status == TransactionStatus.Created || payinRefund.Status == TransactionStatus.Waiting)
             {
                 var result =

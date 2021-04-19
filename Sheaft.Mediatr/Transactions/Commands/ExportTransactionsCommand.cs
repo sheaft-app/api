@@ -6,9 +6,11 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using OfficeOpenXml;
+using Sheaft.Application.Extensions;
 using Sheaft.Application.Interfaces;
 using Sheaft.Application.Interfaces.Factories;
 using Sheaft.Application.Interfaces.Infrastructure;
@@ -55,7 +57,7 @@ namespace Sheaft.Mediatr.Transactions.Commands
 
         public async Task<Result> Handle(ExportTransactionsCommand request, CancellationToken token)
         {
-            var job = await _context.GetByIdAsync<Domain.Job>(request.JobId, token);
+            var job = await _context.Jobs.SingleAsync(e => e.Id == request.JobId, token);
             if (job.User.Id != request.RequestUser.Id)
                 return Failure(MessageKind.Forbidden);
 

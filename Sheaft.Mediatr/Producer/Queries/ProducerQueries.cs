@@ -9,6 +9,7 @@ using AutoMapper.QueryableExtensions;
 using IdentityModel.Client;
 using Microsoft.Azure.Search;
 using Microsoft.Azure.Search.Models;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Sheaft.Application.Extensions;
@@ -107,7 +108,7 @@ namespace Sheaft.Mediatr.Producer.Queries
                 HighlightPostTag = "</b>"
             };
 
-            var store = await _context.GetByIdAsync<Domain.Store>(storeId, token);
+            var store = await _context.Stores.SingleAsync(e => e.Id == storeId, token);
             if (!string.IsNullOrWhiteSpace(terms.Sort))
             {
                 if (terms.Sort.Contains("producer_geolocation"))

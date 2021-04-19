@@ -38,7 +38,7 @@ namespace Sheaft.Mediatr.Producer.Commands
 
         public async Task<Result> Handle(UpdateProducerTagsCommand request, CancellationToken token)
         {
-            var producer = await _context.GetByIdAsync<Domain.Producer>(request.ProducerId, token);
+            var producer = await _context.Producers.SingleAsync(e => e.Id == request.ProducerId, token);
 
             var productTags = await _context.Products.Where(p => p.Producer.Id == producer.Id).SelectMany(p => p.Tags)
                 .Select(p => p.Tag).Distinct().ToListAsync(token);

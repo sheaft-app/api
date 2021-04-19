@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
+using Microsoft.EntityFrameworkCore;
 using Sheaft.Application.Extensions;
 using Sheaft.Application.Interfaces;
 using Sheaft.Application.Interfaces.Infrastructure;
@@ -34,33 +35,40 @@ namespace Sheaft.Mediatr.DeliveryMode.Queries
         public IQueryable<DeliveryModeDto> GetDelivery(Guid id, RequestUser currentUser)
         {
             return _context.DeliveryModes
-                    .Where(c => c.Id == id && c.Producer.Id == currentUser.Id)
-                    .ProjectTo<DeliveryModeDto>(_configurationProvider);
+                .Where(c => c.Id == id && c.Producer.Id == currentUser.Id)
+                .ProjectTo<DeliveryModeDto>(_configurationProvider);
         }
 
         public IQueryable<DeliveryModeDto> GetDeliveries(RequestUser currentUser)
         {
             return _context.DeliveryModes
-                    .Where(c => c.Producer.Id == currentUser.Id)
-                    .ProjectTo<DeliveryModeDto>(_configurationProvider);
+                .Where(c => c.Producer.Id == currentUser.Id)
+                .ProjectTo<DeliveryModeDto>(_configurationProvider);
         }
 
-        public async Task<IEnumerable<ProducerDeliveriesDto>> GetProducersDeliveriesAsync(IEnumerable<Guid> producerIds, IEnumerable<DeliveryKind> kinds, DateTimeOffset currentDate, RequestUser currentUser, CancellationToken token)
+        public async Task<IEnumerable<ProducerDeliveriesDto>> GetProducersDeliveriesAsync(IEnumerable<Guid> producerIds,
+            IEnumerable<DeliveryKind> kinds, DateTimeOffset currentDate, RequestUser currentUser,
+            CancellationToken token)
         {
             var producers = new List<ProducerDeliveriesDto>();
-            var deliveriesMode = await _context.FindAsync<Domain.DeliveryMode>(d => 
-                d.Available 
-                && producerIds.Contains(d.Producer.Id) 
-                && kinds.Contains(d.Kind), token);
+            var deliveriesMode = await _context.DeliveryModes
+                .Where(d =>
+                    d.Available
+                    && producerIds.Contains(d.Producer.Id)
+                    && kinds.Contains(d.Kind))
+                .ToListAsync(token);
 
             var deliveriesProducerIds = deliveriesMode.Select(c => c.Producer.Id).Distinct();
             var producerDistinctIds = producerIds.Distinct();
             if (deliveriesProducerIds.Count() != producerDistinctIds.Count())
             {
                 var notFoundProducerIds = deliveriesProducerIds.Except(producerDistinctIds);
-                var notFoundProducers = await _context.FindAsync<Domain.Producer>(c => notFoundProducerIds.Contains(c.Id), token);
+                var notFoundProducers = await _context.Producers
+                    .Where(c => notFoundProducerIds.Contains(c.Id))
+                    .ToListAsync(token);
 
-                producers.AddRange(notFoundProducers.Select(c => new ProducerDeliveriesDto { Id = c.Id, Name = c.Name, Deliveries = null }));
+                producers.AddRange(notFoundProducers.Select(c => new ProducerDeliveriesDto
+                    {Id = c.Id, Name = c.Name, Deliveries = null}));
             }
 
             foreach (var deliveriesGroup in deliveriesMode.GroupBy(c => c.Producer.Id))
@@ -85,24 +93,31 @@ namespace Sheaft.Mediatr.DeliveryMode.Queries
             return await GetNotCapedProducersDeliveriesAsync(producers, token);
         }
 
-        public async Task<IEnumerable<ProducerDeliveriesDto>> GetStoreDeliveriesForProducersAsync(Guid storeId, IEnumerable<Guid> producerIds, IEnumerable<DeliveryKind> kinds, DateTimeOffset currentDate, RequestUser currentUser, CancellationToken token)
+        public async Task<IEnumerable<ProducerDeliveriesDto>> GetStoreDeliveriesForProducersAsync(Guid storeId,
+            IEnumerable<Guid> producerIds, IEnumerable<DeliveryKind> kinds, DateTimeOffset currentDate,
+            RequestUser currentUser, CancellationToken token)
         {
             var producers = new List<ProducerDeliveriesDto>();
-            var agreements = await _context.FindAsync<Domain.Agreement>(d => 
-                d.Delivery.Available 
-                && producerIds.Contains(d.Delivery.Producer.Id) 
-                && d.Store.Id == storeId 
-                && d.Status == AgreementStatus.Accepted 
-                && kinds.Contains(d.Delivery.Kind), token);
+            var agreements = await _context.Agreements
+                .Where(d =>
+                    d.Delivery.Available
+                    && producerIds.Contains(d.Delivery.Producer.Id)
+                    && d.Store.Id == storeId
+                    && d.Status == AgreementStatus.Accepted
+                    && kinds.Contains(d.Delivery.Kind))
+                .ToListAsync(token);
 
             var agreementProducerIds = agreements.Select(c => c.Delivery.Producer.Id).Distinct();
             var producerDistinctIds = producerIds.Distinct();
             if (agreementProducerIds.Count() != producerDistinctIds.Count())
             {
                 var notFoundProducerIds = agreementProducerIds.Except(producerDistinctIds);
-                var notFoundProducers = await _context.FindAsync<Domain.Producer>(c => notFoundProducerIds.Contains(c.Id), token);
+                var notFoundProducers = await _context.Producers
+                        .Where(c => notFoundProducerIds.Contains(c.Id))
+                        .ToListAsync(token);
 
-                producers.AddRange(notFoundProducers.Select(c => new ProducerDeliveriesDto { Id = c.Id, Name = c.Name, Deliveries = null }));
+                producers.AddRange(notFoundProducers.Select(c => new ProducerDeliveriesDto
+                    {Id = c.Id, Name = c.Name, Deliveries = null}));
             }
 
             foreach (var agreementGroups in agreements.GroupBy(c => c.Delivery.Producer.Id))
@@ -127,22 +142,27 @@ namespace Sheaft.Mediatr.DeliveryMode.Queries
             return await GetNotCapedProducersDeliveriesAsync(producers, token);
         }
 
-        public async Task<IEnumerable<ProducerDeliveriesDto>> GetNotCapedProducersDeliveriesAsync(IEnumerable<ProducerDeliveriesDto> producersDeliveries, CancellationToken token)
+        public async Task<IEnumerable<ProducerDeliveriesDto>> GetNotCapedProducersDeliveriesAsync(
+            IEnumerable<ProducerDeliveriesDto> producersDeliveries, CancellationToken token)
         {
             var deliveryModeIds = producersDeliveries.SelectMany(c => c.Deliveries.Select(d => d.Id));
-            var deliveriesMode = await _context.FindAsync<Domain.DeliveryMode>(d => deliveryModeIds.Contains(d.Id), token);
+            var deliveriesMode = await _context.DeliveryModes
+                    .Where(d => deliveryModeIds.Contains(d.Id))
+                    .ToListAsync(token);
 
             var producerDeliveriesHoursToCheck = new List<Tuple<Guid, Guid, DeliveryHourDto>>();
             foreach (var producer in producersDeliveries)
             {
-                var deliveryModesToCheckMaxOrders = deliveriesMode.Where(dm => producer.Deliveries.Any(d => dm.MaxPurchaseOrdersPerTimeSlot.HasValue && dm.Id == d.Id));
+                var deliveryModesToCheckMaxOrders = deliveriesMode.Where(dm =>
+                    producer.Deliveries.Any(d => dm.MaxPurchaseOrdersPerTimeSlot.HasValue && dm.Id == d.Id));
                 foreach (var deliveryMode in deliveryModesToCheckMaxOrders)
                 {
                     var delivery = producer.Deliveries.FirstOrDefault(d => d.Id == deliveryMode.Id);
                     if (delivery == null)
                         continue;
 
-                    producerDeliveriesHoursToCheck.AddRange(delivery.DeliveryHours.Select(dh => new Tuple<Guid, Guid, DeliveryHourDto>(producer.Id, delivery.Id, dh)));
+                    producerDeliveriesHoursToCheck.AddRange(delivery.DeliveryHours.Select(dh =>
+                        new Tuple<Guid, Guid, DeliveryHourDto>(producer.Id, delivery.Id, dh)));
                 }
             }
 
@@ -168,12 +188,12 @@ namespace Sheaft.Mediatr.DeliveryMode.Queries
                     {
                         var capingDelivery = results.Data
                             .FirstOrDefault(cr => cr.ProducerId == producer.Id
-                                && cr.DeliveryId == delivery.Id
-                                && cr.ExpectedDate.Year == deliveryHour.ExpectedDeliveryDate.Year
-                                && cr.ExpectedDate.Month == deliveryHour.ExpectedDeliveryDate.Month
-                                && cr.ExpectedDate.Day == deliveryHour.ExpectedDeliveryDate.Day
-                                && cr.From == deliveryHour.From
-                                && cr.To == deliveryHour.To);
+                                                  && cr.DeliveryId == delivery.Id
+                                                  && cr.ExpectedDate.Year == deliveryHour.ExpectedDeliveryDate.Year
+                                                  && cr.ExpectedDate.Month == deliveryHour.ExpectedDeliveryDate.Month
+                                                  && cr.ExpectedDate.Day == deliveryHour.ExpectedDeliveryDate.Day
+                                                  && cr.From == deliveryHour.From
+                                                  && cr.To == deliveryHour.To);
 
                         if (capingDelivery == null || capingDelivery.Count < deliveryMode.MaxPurchaseOrdersPerTimeSlot)
                             deliveryHours.Add(deliveryHour);
@@ -193,30 +213,36 @@ namespace Sheaft.Mediatr.DeliveryMode.Queries
             return filteredProducers;
         }
 
-        private DeliveryDto GetDeliveriesForHours(DateTimeOffset currentDate, Domain.DeliveryMode deliveryMode, IReadOnlyCollection<TimeSlotHour> openingHours)
+        private DeliveryDto GetDeliveriesForHours(DateTimeOffset currentDate, Domain.DeliveryMode deliveryMode,
+            IReadOnlyCollection<TimeSlotHour> openingHours)
         {
             return new DeliveryDto
             {
                 Id = deliveryMode.Id,
                 Kind = deliveryMode.Kind,
                 Available = deliveryMode.Available,
-                Address = deliveryMode.Address != null ? new AddressDto
-                {
-                    City = deliveryMode.Address.City,
-                    Latitude = deliveryMode.Address.Latitude,
-                    Line1 = deliveryMode.Address.Line1,
-                    Line2 = deliveryMode.Address.Line2,
-                    Longitude = deliveryMode.Address.Longitude,
-                    Zipcode = deliveryMode.Address.Zipcode
-                } : null,
+                Address = deliveryMode.Address != null
+                    ? new AddressDto
+                    {
+                        City = deliveryMode.Address.City,
+                        Latitude = deliveryMode.Address.Latitude,
+                        Line1 = deliveryMode.Address.Line1,
+                        Line2 = deliveryMode.Address.Line2,
+                        Longitude = deliveryMode.Address.Longitude,
+                        Zipcode = deliveryMode.Address.Zipcode
+                    }
+                    : null,
                 Name = deliveryMode.Name,
-                DeliveryHours = GetAvailableDeliveryHours(openingHours, currentDate, deliveryMode.LockOrderHoursBeforeDelivery, deliveryMode.Producer.Closings, deliveryMode.Closings),
+                DeliveryHours = GetAvailableDeliveryHours(openingHours, currentDate,
+                    deliveryMode.LockOrderHoursBeforeDelivery, deliveryMode.Producer.Closings, deliveryMode.Closings),
                 Closings = deliveryMode.Closings?.Select(c => new ClosingDto
                 {
                     Id = c.Id,
-                    From = new DateTimeOffset(new DateTime(c.ClosedFrom.Year, c.ClosedFrom.Month, c.ClosedFrom.Day, 0, 0, 0, DateTimeKind.Utc)),
+                    From = new DateTimeOffset(new DateTime(c.ClosedFrom.Year, c.ClosedFrom.Month, c.ClosedFrom.Day, 0,
+                        0, 0, DateTimeKind.Utc)),
                     Reason = c.Reason,
-                    To = new DateTimeOffset(new DateTime(c.ClosedTo.Year, c.ClosedTo.Month, c.ClosedTo.Day, 0, 0, 0, DateTimeKind.Utc))
+                    To = new DateTimeOffset(new DateTime(c.ClosedTo.Year, c.ClosedTo.Month, c.ClosedTo.Day, 0, 0, 0,
+                        DateTimeKind.Utc))
                 }) ?? new List<ClosingDto>()
             };
         }
@@ -233,8 +259,9 @@ namespace Sheaft.Mediatr.DeliveryMode.Queries
                 var increment = 0;
                 while (results.Count < 2 && increment < 365)
                 {
-                    var diff = (int)openingHour.Day + increment - (int)currentDate.DayOfWeek;
-                    var result = GetDeliveryHourIfMatch(openingHour, currentDate, lockOrderHoursBeforeDelivery, diff, producerClosings, deliveryClosings);
+                    var diff = (int) openingHour.Day + increment - (int) currentDate.DayOfWeek;
+                    var result = GetDeliveryHourIfMatch(openingHour, currentDate, lockOrderHoursBeforeDelivery, diff,
+                        producerClosings, deliveryClosings);
                     if (result != null)
                         results.Add(result);
 
@@ -248,19 +275,22 @@ namespace Sheaft.Mediatr.DeliveryMode.Queries
             return list;
         }
 
-        private DeliveryHourDto GetDeliveryHourIfMatch(TimeSlotHour openingHour, 
+        private DeliveryHourDto GetDeliveryHourIfMatch(TimeSlotHour openingHour,
             DateTimeOffset currentDate, int? lockOrderHoursBeforeDelivery, int diff,
             IReadOnlyCollection<Domain.BusinessClosing> producerClosings,
             IReadOnlyCollection<Domain.DeliveryClosing> deliveryClosings)
         {
-            var targetDate = new DateTime(currentDate.Year, currentDate.Month, currentDate.Day, openingHour.From.Hours, openingHour.From.Minutes, openingHour.From.Seconds).AddDays(diff);
+            var targetDate = new DateTime(currentDate.Year, currentDate.Month, currentDate.Day, openingHour.From.Hours,
+                openingHour.From.Minutes, openingHour.From.Seconds).AddDays(diff);
             if (currentDate.AddHours(lockOrderHoursBeforeDelivery ?? 0) >= targetDate)
                 return null;
-            
-            if(deliveryClosings != null && deliveryClosings.Any(c => targetDate >= c.ClosedFrom && targetDate <= c.ClosedTo))
+
+            if (deliveryClosings != null &&
+                deliveryClosings.Any(c => targetDate >= c.ClosedFrom && targetDate <= c.ClosedTo))
                 return null;
-            
-            if(producerClosings != null && producerClosings.Any(c => targetDate >= c.ClosedFrom && targetDate <= c.ClosedTo))
+
+            if (producerClosings != null &&
+                producerClosings.Any(c => targetDate >= c.ClosedFrom && targetDate <= c.ClosedTo))
                 return null;
 
             return new DeliveryHourDto

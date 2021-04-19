@@ -42,8 +42,10 @@ namespace Sheaft.Mediatr.Department.Commands
         public async Task<Result> Handle(UpdateDepartmentStatsCommand request, CancellationToken token)
         {
             var department = await _context.Departments.SingleOrDefaultAsync(c => c.Id == request.DepartmentId, token);
-            var level = (await _context.GetAsync<Domain.Level>(c => c.RequiredPoints > request.Points, token))
-                .OrderBy(c => c.RequiredPoints).FirstOrDefault();
+            var level = await _context.Levels
+                .Where(c => c.RequiredPoints > request.Points)
+                .OrderBy(c => c.RequiredPoints)
+                .FirstOrDefaultAsync(token);
 
             department.SetLevel(level);
             department.SetPoints(request.Points);

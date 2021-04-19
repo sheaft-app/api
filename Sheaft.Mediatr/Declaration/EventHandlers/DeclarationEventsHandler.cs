@@ -1,6 +1,7 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Sheaft.Application.Interfaces;
 using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Domain;
@@ -25,7 +26,7 @@ namespace Sheaft.Mediatr.Declaration.EventHandlers
         public async Task Handle(DomainEventNotification<DeclarationIncompleteEvent> notification, CancellationToken token)
         {
             var declarationEvent = notification.DomainEvent;
-            var legal = await _context.GetSingleAsync<BusinessLegal>(l => l.Declaration.Id == declarationEvent.DeclarationId, token);
+            var legal = await _context.Set<BusinessLegal>().SingleOrDefaultAsync(l => l.Declaration.Id == declarationEvent.DeclarationId, token);
             if (legal.Declaration.Status != DeclarationStatus.Incomplete)
                 return;
 
@@ -41,7 +42,7 @@ namespace Sheaft.Mediatr.Declaration.EventHandlers
         public async Task Handle(DomainEventNotification<DeclarationRefusedEvent> notification, CancellationToken token)
         {
             var declarationEvent = notification.DomainEvent;
-            var legal = await _context.GetSingleAsync<BusinessLegal>(l => l.Declaration.Id == declarationEvent.DeclarationId, token);
+            var legal = await _context.Set<BusinessLegal>().SingleOrDefaultAsync(l => l.Declaration.Id == declarationEvent.DeclarationId, token);
             if (legal.Declaration.Status != DeclarationStatus.Refused)
                 return;
 

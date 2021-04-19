@@ -3,8 +3,10 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using Sheaft.Application.Extensions;
 using Sheaft.Application.Interfaces;
 using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Application.Interfaces.Mediatr;
@@ -39,7 +41,7 @@ namespace Sheaft.Mediatr.Withholding.Commands
 
         public async Task<Result> Handle(ProcessWithholdingsCommand request, CancellationToken token)
         {
-            var payout = await _context.GetByIdAsync<Domain.Payout>(request.PayoutId, token);
+            var payout = await _context.Payouts.SingleAsync(e => e.Id == request.PayoutId, token);
             if (payout.Status != TransactionStatus.Succeeded)
                 return Failure(MessageKind.Withholding_Cannot_Process_Already_Succeeded);
 

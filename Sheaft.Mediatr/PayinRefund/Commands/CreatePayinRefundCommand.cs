@@ -6,6 +6,7 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using Sheaft.Application.Extensions;
 using Sheaft.Application.Interfaces;
 using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Application.Interfaces.Mediatr;
@@ -44,8 +45,9 @@ namespace Sheaft.Mediatr.PayinRefund.Commands
 
         public async Task<Result<Guid>> Handle(CreatePayinRefundCommand request, CancellationToken token)
         {
-            var purchaseOrder = await _context.GetByIdAsync<Domain.PurchaseOrder>(request.PurchaseOrderId, token);
+            var purchaseOrder = await _context.PurchaseOrders.SingleAsync(e => e.Id == request.PurchaseOrderId, token);
             if (purchaseOrder.Status != PurchaseOrderStatus.Cancelled &&
+                purchaseOrder.Status != PurchaseOrderStatus.Withdrawned &&
                 purchaseOrder.Status != PurchaseOrderStatus.Refused)
                 return Failure<Guid>(MessageKind.PayinRefund_CannotCreate_Payin_PurchaseOrder_Invalid_Status);
 

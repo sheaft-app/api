@@ -2,6 +2,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Sheaft.Application.Interfaces;
@@ -41,8 +42,8 @@ namespace Sheaft.Mediatr.Document.Commands
 
         public async Task<Result> Handle(RefreshDocumentStatusCommand request, CancellationToken token)
         {
-            var legal = await _context.GetSingleAsync<Domain.Legal>(
-                r => r.Documents.Any(d => d.Identifier == request.Identifier), token);
+            var legal = await _context.Legals
+                .SingleOrDefaultAsync(r => r.Documents.Any(d => d.Identifier == request.Identifier), token);
             var document = legal.Documents.FirstOrDefault(c => c.Identifier == request.Identifier);
 
             var pspResult = await _pspService.GetDocumentAsync(document.Identifier, token);

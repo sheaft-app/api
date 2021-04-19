@@ -1,6 +1,8 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
+using Sheaft.Application.Extensions;
 using Sheaft.Application.Interfaces;
 using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Domain.Events.Store;
@@ -21,7 +23,7 @@ namespace Sheaft.Mediatr.Store.EventHandlers
         public async Task Handle(DomainEventNotification<StoreRegisteredEvent> notification, CancellationToken token)
         {
             var storeEvent = notification.DomainEvent;
-            var store = await _context.GetSingleAsync<Domain.Store>(c => c.Id == storeEvent.StoreId, token);
+            var store = await _context.Stores.SingleAsync(e => e.Id == storeEvent.StoreId, token);
             await _emailService.SendEmailAsync(
                "support@sheaft.com",
                "Support",

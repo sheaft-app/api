@@ -2,8 +2,10 @@
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using Sheaft.Application.Extensions;
 using Sheaft.Application.Interfaces;
 using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Application.Interfaces.Mediatr;
@@ -40,7 +42,7 @@ namespace Sheaft.Mediatr.Tag.Commands
 
         public async Task<Result<string>> Handle(UpdateTagPictureCommand request, CancellationToken token)
         {
-            var entity = await _context.GetByIdAsync<Domain.Tag>(request.TagId, token);
+            var entity = await _context.Tags.SingleAsync(e => e.Id == request.TagId, token);
 
             var resultImage = await _imageService.HandleTagPictureAsync(entity, request.Picture, token);
             if (!resultImage.Succeeded)

@@ -2,6 +2,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Sheaft.Application.Interfaces;
@@ -43,7 +44,7 @@ namespace Sheaft.Mediatr.Payout.Commands
 
         public async Task<Result> Handle(RefreshPayoutStatusCommand request, CancellationToken token)
         {
-            var payout = await _context.GetSingleAsync<Domain.Payout>(c => c.Identifier == request.Identifier, token);
+            var payout = await _context.Payouts.SingleOrDefaultAsync(c => c.Identifier == request.Identifier, token);
             var pspResult = await _pspService.GetPayoutAsync(payout.Identifier, token);
             if (!pspResult.Succeeded)
                 return Failure(pspResult);

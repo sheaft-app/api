@@ -1,7 +1,9 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Sheaft.Application.Extensions;
 using Sheaft.Application.Interfaces;
 using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Application.Mailings;
@@ -29,7 +31,7 @@ namespace Sheaft.Mediatr.Payin.EventHandlers
         {
             var payinEvent = notification.DomainEvent;
             
-            var payin = await _context.GetByIdAsync<Domain.Payin>(payinEvent.PayinId, token);
+            var payin = await _context.Payins.SingleAsync(e => e.Id == payinEvent.PayinId, token);
             if (payin.Status != TransactionStatus.Succeeded)
                 return;
 

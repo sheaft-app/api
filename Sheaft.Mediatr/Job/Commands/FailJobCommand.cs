@@ -2,8 +2,10 @@
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using Sheaft.Application.Extensions;
 using Sheaft.Application.Interfaces;
 using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Application.Interfaces.Mediatr;
@@ -38,7 +40,7 @@ namespace Sheaft.Mediatr.Job.Commands
         public async Task<Result> Handle(FailJobCommand request,
             CancellationToken token)
         {
-            var entity = await _context.GetByIdAsync<Domain.Job>(request.JobId, token);
+            var entity = await _context.Jobs.SingleAsync(e => e.Id == request.JobId, token);
             if(entity.User.Id != request.RequestUser.Id)
                 throw SheaftException.Forbidden();
 

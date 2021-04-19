@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
@@ -45,7 +46,7 @@ namespace Sheaft.Mediatr.Agreement.Commands
 
         public async Task<Result> Handle(DeleteAgreementCommand request, CancellationToken token)
         {
-            var entity = await _context.GetByIdAsync<Domain.Agreement>(request.AgreementId, token);
+            var entity = await _context.Agreements.SingleAsync(e => e.Id == request.AgreementId, token);
             if(request.RequestUser.IsInRole(_roleOptions.Producer.Value) && entity.Delivery.Producer.Id != request.RequestUser.Id)
                 return Failure(MessageKind.Forbidden);
             
@@ -53,10 +54,11 @@ namespace Sheaft.Mediatr.Agreement.Commands
                 return Failure(MessageKind.Forbidden);
             
             _context.Remove(entity);
-            
-            var quickOrders = await _context.GetAsync<Domain.QuickOrder>(
-                qo => qo.Products.Any(qop => qop.CatalogProduct.Catalog.Id == entity.Catalog.Id) &&
-                      qo.User.Id == entity.Store.Id, token);
+
+            var quickOrders = await _context.QuickOrders
+                .Where(qo => qo.Products.Any(qop => qop.CatalogProduct.Catalog.Id == entity.Catalog.Id) &&
+                             qo.User.Id == entity.Store.Id)
+                .ToListAsync(token);
 
             foreach (var quickOrder in quickOrders)
             {

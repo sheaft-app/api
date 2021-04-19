@@ -2,8 +2,10 @@
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using Sheaft.Application.Extensions;
 using Sheaft.Application.Interfaces;
 using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Application.Interfaces.Mediatr;
@@ -39,8 +41,8 @@ namespace Sheaft.Mediatr.Sponsor.Commands
 
         public async Task<Result> Handle(CreateSponsoringCommand request, CancellationToken token)
         {
-            var user = await _context.GetByIdAsync<Domain.User>(request.UserId, token);
-            var sponsor = await _context.FindSingleAsync<Domain.User>(u => u.SponsorshipCode == request.Code, token);
+            var user = await _context.Users.SingleAsync(e => e.Id == request.UserId, token);
+            var sponsor = await _context.Users.SingleOrDefaultAsync(u => u.SponsorshipCode == request.Code, token);
             if (sponsor == null)
                 return Failure(MessageKind.Register_User_SponsorCode_NotFound);
 

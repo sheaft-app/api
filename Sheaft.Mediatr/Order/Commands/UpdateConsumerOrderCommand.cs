@@ -4,8 +4,10 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using Sheaft.Application.Extensions;
 using Sheaft.Application.Interfaces.Business;
 using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Application.Interfaces.Mediatr;
@@ -49,7 +51,7 @@ namespace Sheaft.Mediatr.Order.Commands
 
         public async Task<Result> Handle(UpdateConsumerOrderCommand request, CancellationToken token)
         {
-            var entity = await _context.GetByIdAsync<Domain.Order>(request.OrderId, token);
+            var entity = await _context.Orders.SingleAsync(e => e.Id == request.OrderId, token);
             if (entity.User != null && entity.User.Id != request.RequestUser.Id)
                 return Failure(MessageKind.Forbidden);
             
@@ -58,7 +60,7 @@ namespace Sheaft.Mediatr.Order.Commands
 
             if (entity.User == null && request.UserId.HasValue && request.UserId != Guid.Empty)
             {
-                var user = await _context.GetByIdAsync<Domain.User>(request.UserId.Value, token);
+                var user = await _context.Users.SingleAsync(e => e.Id == request.UserId.Value, token);
                 entity.AssignToUser(user);
             }
 

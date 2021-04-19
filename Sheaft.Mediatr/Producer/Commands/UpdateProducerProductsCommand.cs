@@ -5,6 +5,7 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using Sheaft.Application.Extensions;
 using Sheaft.Application.Interfaces;
 using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Application.Interfaces.Mediatr;
@@ -36,7 +37,7 @@ namespace Sheaft.Mediatr.Producer.Commands
 
         public async Task<Result> Handle(UpdateProducerProductsCommand request, CancellationToken token)
         {
-            var producer = await _context.FindByIdAsync<Domain.Producer>(request.ProducerId, token);
+            var producer = await _context.Producers.SingleAsync(e => e.Id == request.ProducerId, token);
             producer.HasProducts = await _context.Products.AnyAsync(p => p.Producer.Id == producer.Id, token);
             
             await _context.SaveChangesAsync(token);

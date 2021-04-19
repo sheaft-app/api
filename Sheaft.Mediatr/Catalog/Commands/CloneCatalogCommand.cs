@@ -3,7 +3,9 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Sheaft.Application.Extensions;
 using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Application.Interfaces.Mediatr;
 using Sheaft.Application.Models;
@@ -38,19 +40,23 @@ namespace Sheaft.Mediatr.Catalog.Commands
         {
             using (var transaction = await _context.BeginTransactionAsync(token))
             {
-                var catalog = await _context.GetByIdAsync<Domain.Catalog>(request.CatalogId, token);
+                var catalog = await _context.Catalogs.SingleAsync(e => e.Id == request.CatalogId, token);
 
                 var entity = new Domain.Catalog(catalog.Producer, catalog.Kind, Guid.NewGuid(), request.Name);
                 await _context.AddAsync(entity, token);
 
                 var catalogProducts =
-                    await _context.GetAsync<Domain.Product>(
-                        p => p.CatalogsPrices.Any(cp => cp.Catalog.Id == request.CatalogId), token);
-                
+                    await _context.Products
+                        .Where(p => p.CatalogsPrices.Any(cp => cp.Catalog.Id == request.CatalogId))
+                        .ToListAsync(token);
+
                 var products = catalogProducts.Select(p =>
                     new UpdateOrCreateCatalogPriceDto
                     {
-                        Id = p.Id, WholeSalePricePerUnit = p.CatalogsPrices.Single(c => c.Catalog.Id == request.CatalogId).WholeSalePricePerUnit * (1 + request.Percent ?? 0)
+                        Id = p.Id,
+                        WholeSalePricePerUnit =
+                            p.CatalogsPrices.Single(c => c.Catalog.Id == request.CatalogId).WholeSalePricePerUnit *
+                            (1 + request.Percent ?? 0)
                     });
 
                 var result =

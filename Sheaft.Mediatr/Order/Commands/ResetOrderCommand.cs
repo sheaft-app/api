@@ -6,6 +6,7 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using Sheaft.Application.Extensions;
 using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Application.Interfaces.Mediatr;
 using Sheaft.Core;
@@ -38,7 +39,7 @@ namespace Sheaft.Mediatr.Order.Commands
 
         public async Task<Result> Handle(ResetOrderCommand request, CancellationToken token)
         {
-            var order = await _context.GetByIdAsync<Domain.Order>(request.OrderId, token);
+            var order = await _context.Orders.SingleAsync(e => e.Id == request.OrderId, token);
             if (order.User.Id != request.RequestUser.Id)
                 return Failure(MessageKind.Forbidden);
             

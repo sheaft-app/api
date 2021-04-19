@@ -3,7 +3,9 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Sheaft.Application.Extensions;
 using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Application.Interfaces.Mediatr;
 using Sheaft.Core;
@@ -42,14 +44,15 @@ namespace Sheaft.Mediatr.Catalog.Commands
 
         public async Task<Result<Guid>> Handle(CreateCatalogCommand request, CancellationToken token)
         {
-            var producer = await _context.GetByIdAsync<Domain.Producer>(request.ProducerId, token);
             var catalogs =
-                await _context.GetAsync<Domain.Catalog>(
-                    c => c.Producer.Id == request.RequestUser.Id, token);
-            
-            if(request.Kind == CatalogKind.Consumers && catalogs.Any(c => c.Kind == CatalogKind.Consumers))
+                await _context.Catalogs
+                    .Where(c => c.Producer.Id == request.RequestUser.Id)
+                    .ToListAsync(token);
+
+            if (request.Kind == CatalogKind.Consumers && catalogs.Any(c => c.Kind == CatalogKind.Consumers))
                 return Failure<Guid>(MessageKind.AlreadyExists);
-            
+
+            var producer = await _context.Producers.SingleAsync(e => e.Id == request.ProducerId, token);
             var entity = new Domain.Catalog(producer, request.Kind, Guid.NewGuid(), request.Name);
             entity.SetIsAvailable(request.IsAvailable);
             entity.SetIsDefault(request.IsDefault);

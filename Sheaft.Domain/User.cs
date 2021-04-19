@@ -57,7 +57,7 @@ namespace Sheaft.Domain
         public string Twitter { get; private set; }
         public string Instagram { get; private set; }
         public virtual UserAddress Address { get; private set; }
-        public virtual Legal Legal { get; private set; }
+        public virtual Legal Legal { get; protected set; }
         public virtual IReadOnlyCollection<Points> Points => _points.AsReadOnly();
         public virtual IReadOnlyCollection<UserSetting> Settings => _settings.AsReadOnly();
         public virtual IReadOnlyCollection<ProfilePicture> Pictures => _pictures?.AsReadOnly();

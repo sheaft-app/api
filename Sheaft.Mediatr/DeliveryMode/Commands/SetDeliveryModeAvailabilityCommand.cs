@@ -2,8 +2,10 @@
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using Sheaft.Application.Extensions;
 using Sheaft.Application.Interfaces;
 using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Application.Interfaces.Mediatr;
@@ -38,7 +40,7 @@ namespace Sheaft.Mediatr.DeliveryMode.Commands
 
         public async Task<Result> Handle(SetDeliveryModeAvailabilityCommand request, CancellationToken token)
         {
-            var entity = await _context.GetByIdAsync<Domain.DeliveryMode>(request.DeliveryModeId, token);
+            var entity = await _context.DeliveryModes.SingleAsync(e => e.Id == request.DeliveryModeId, token);
             if(entity.Producer.Id != request.RequestUser.Id)
                 return Failure(MessageKind.Forbidden);
 

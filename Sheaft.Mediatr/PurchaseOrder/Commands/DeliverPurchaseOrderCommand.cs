@@ -2,8 +2,10 @@
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using Sheaft.Application.Extensions;
 using Sheaft.Application.Interfaces;
 using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Application.Interfaces.Mediatr;
@@ -40,7 +42,7 @@ namespace Sheaft.Mediatr.PurchaseOrder.Commands
 
         public async Task<Result> Handle(DeliverPurchaseOrderCommand request, CancellationToken token)
         {
-            var purchaseOrder = await _context.GetByIdAsync<Domain.PurchaseOrder>(request.PurchaseOrderId, token);
+            var purchaseOrder = await _context.PurchaseOrders.SingleAsync(e => e.Id == request.PurchaseOrderId, token);
             if(purchaseOrder.Vendor.Id != request.RequestUser.Id)
                 return Failure(MessageKind.Forbidden);
             
@@ -48,10 +50,9 @@ namespace Sheaft.Mediatr.PurchaseOrder.Commands
 
             await _context.SaveChangesAsync(token);
 
-            var producerLegals =
-                await _context.GetSingleAsync<BusinessLegal>(c => c.User.Id == purchaseOrder.Vendor.Id, token);
+            var dateDiff = purchaseOrder.ExpectedDelivery.ExpectedDeliveryDate.AddDays(7) - DateTime.UtcNow;
             _mediatr.Schedule(new CreatePurchaseOrderTransferCommand(request.RequestUser) {PurchaseOrderId = purchaseOrder.Id},
-                TimeSpan.FromDays(7));
+                TimeSpan.FromDays(dateDiff.TotalDays));
 
             return Success();
         }

@@ -1,6 +1,8 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
+using Sheaft.Application.Extensions;
 using Sheaft.Application.Interfaces;
 using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Domain.Enum;
@@ -22,7 +24,7 @@ namespace Sheaft.Mediatr.PayinRefund.EventHandlers
         public async Task Handle(DomainEventNotification<PayinRefundFailedEvent> notification, CancellationToken token)
         {
             var orderEvent = notification.DomainEvent;
-            var payinRefund = await _context.GetByIdAsync<Domain.PayinRefund>(orderEvent.RefundId, token);
+            var payinRefund = await _context.Set<Domain.PayinRefund>().SingleAsync(e => e.Id == orderEvent.RefundId, token);
             if (payinRefund.Status != TransactionStatus.Failed)
                 return;
 

@@ -45,7 +45,7 @@ namespace Sheaft.Mediatr.Leaderboard.Queries
             if (!currentUser.IsInRole(_roleOptions.Consumer.Value))
                 return null;
 
-            var user = await _context.FindByIdAsync<Domain.User>(id, token);
+            var user = await _context.Users.SingleOrDefaultAsync(u => u.Id == id, token);
             if (user == null)
                 return null;
 

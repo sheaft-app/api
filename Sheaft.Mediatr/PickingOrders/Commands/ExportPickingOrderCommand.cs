@@ -6,10 +6,12 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using OfficeOpenXml;
 using OfficeOpenXml.Style;
+using Sheaft.Application.Extensions;
 using Sheaft.Application.Interfaces;
 using Sheaft.Application.Interfaces.Factories;
 using Sheaft.Application.Interfaces.Infrastructure;
@@ -53,7 +55,7 @@ namespace Sheaft.Mediatr.PickingOrders.Commands
 
         public async Task<Result> Handle(ExportPickingOrderCommand request, CancellationToken token)
         {
-            var job = await _context.GetByIdAsync<Domain.Job>(request.JobId, token);
+            var job = await _context.Jobs.SingleAsync(e => e.Id == request.JobId, token);
 
             try
             {
@@ -62,12 +64,11 @@ namespace Sheaft.Mediatr.PickingOrders.Commands
                 if (!startResult.Succeeded)
                     throw startResult.Exception;
 
-                var purchaseOrdersQuery = _context.Set<Domain.PurchaseOrder>()
-                    .Where(po => request.PurchaseOrderIds.Contains(po.Id));
-
                 _mediatr.Post(new PickingOrderExportProcessingEvent(job.Id));
-
                 var exporter = await _pickingOrdersExportersFactory.GetExporterAsync(request.RequestUser, token);
+                
+                var purchaseOrdersQuery = _context.PurchaseOrders
+                    .Where(po => request.PurchaseOrderIds.Contains(po.Id));
                 var pickingOrdersExportResult = await exporter.ExportAsync(request.RequestUser, purchaseOrdersQuery, token);
                 if (!pickingOrdersExportResult.Succeeded)
                     throw pickingOrdersExportResult.Exception;

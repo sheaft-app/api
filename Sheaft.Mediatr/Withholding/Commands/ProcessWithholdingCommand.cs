@@ -2,8 +2,10 @@
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using Sheaft.Application.Extensions;
 using Sheaft.Application.Interfaces;
 using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Application.Interfaces.Mediatr;
@@ -42,7 +44,7 @@ namespace Sheaft.Mediatr.Withholding.Commands
 
         public async Task<Result> Handle(ProcessWithholdingCommand request, CancellationToken token)
         {
-            var withholding = await _context.GetByIdAsync<Domain.Withholding>(request.WithholdingId, token);
+            var withholding = await _context.Withholdings.SingleAsync(e => e.Id == request.WithholdingId, token);
             if (withholding.Status == TransactionStatus.Succeeded)
                 return Success();
 

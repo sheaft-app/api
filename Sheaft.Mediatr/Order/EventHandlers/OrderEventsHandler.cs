@@ -1,6 +1,8 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
+using Sheaft.Application.Extensions;
 using Sheaft.Application.Interfaces;
 using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Domain.Events.Order;
@@ -21,7 +23,7 @@ namespace Sheaft.Mediatr.Order.EventHandlers
         public async Task Handle(DomainEventNotification<ConfirmOrderFailedEvent> notification, CancellationToken token)
         {
             var orderEvent = notification.DomainEvent;
-            var order = await _context.GetByIdAsync<Domain.Order>(orderEvent.OrderId, token);
+            var order = await _context.Orders.SingleAsync(e => e.Id == orderEvent.OrderId, token);
 
             await _emailService.SendEmailAsync(
                "support@sheaft.com",

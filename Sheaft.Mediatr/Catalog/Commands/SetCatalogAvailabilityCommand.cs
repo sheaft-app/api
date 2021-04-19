@@ -2,7 +2,9 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Sheaft.Application.Extensions;
 using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Application.Interfaces.Mediatr;
 using Sheaft.Core;
@@ -33,7 +35,7 @@ namespace Sheaft.Mediatr.Catalog.Commands
 
         public async Task<Result> Handle(SetCatalogAvailabilityCommand request, CancellationToken token)
         {
-            var entity = await _context.GetByIdAsync<Domain.Catalog>(request.CatalogId, token);
+            var entity = await _context.Catalogs.SingleAsync(e => e.Id == request.CatalogId, token);
             entity.SetIsAvailable(request.IsAvailable);
 
             await _context.SaveChangesAsync(token);

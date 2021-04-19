@@ -4,8 +4,10 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using Sheaft.Application.Extensions;
 using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Application.Interfaces.Mediatr;
 using Sheaft.Application.Models;
@@ -67,9 +69,9 @@ namespace Sheaft.Mediatr.Product.Commands
             if (!string.IsNullOrWhiteSpace(reference))
             {
                 var existingEntity =
-                    await _context.FindSingleAsync<Domain.Product>(
+                    await _context.Products.AnyAsync(
                         p => p.Reference == reference && p.Producer.Id == request.ProducerId, token);
-                if (existingEntity != null)
+                if (existingEntity)
                     return Failure<Guid>(MessageKind.CreateProduct_Reference_AlreadyExists, reference);
             }
             else
@@ -82,7 +84,7 @@ namespace Sheaft.Mediatr.Product.Commands
                 reference = resultIdentifier.Data;
             }
 
-            var producer = await _context.GetByIdAsync<Domain.Producer>(request.ProducerId, token);
+            var producer = await _context.Producers.SingleAsync(e => e.Id == request.ProducerId, token);
 
             using (var transaction = await _context.BeginTransactionAsync(token))
             {
@@ -96,11 +98,11 @@ namespace Sheaft.Mediatr.Product.Commands
 
                 if (request.ReturnableId.HasValue)
                 {
-                    var returnable = await _context.GetByIdAsync<Domain.Returnable>(request.ReturnableId.Value, token);
+                    var returnable = await _context.Returnables.SingleAsync(e => e.Id == request.ReturnableId.Value, token);
                     entity.SetReturnable(returnable);
                 }
 
-                var tags = await _context.FindAsync<Domain.Tag>(t => request.Tags.Contains(t.Id), token);
+                var tags = await _context.Tags.Where(t => request.Tags.Contains(t.Id)).ToListAsync(token);
                 entity.SetTags(tags);
 
                 await _context.AddAsync(entity, token);
@@ -110,7 +112,7 @@ namespace Sheaft.Mediatr.Product.Commands
                 {
                     if (request.VisibleToConsumers.Value)
                     {
-                        var consumerCatalog = await _context.GetSingleAsync<Domain.Catalog>(
+                        var consumerCatalog = await _context.Catalogs.SingleOrDefaultAsync(
                             c => c.Producer.Id == entity.Producer.Id && c.Kind == CatalogKind.Consumers, token);
 
                         consumerCatalog.AddOrUpdateProduct(entity, request.WholeSalePricePerUnit.Value);
@@ -118,7 +120,7 @@ namespace Sheaft.Mediatr.Product.Commands
 
                     if (request.VisibleToStores.Value)
                     {
-                        var storeCatalog = await _context.GetSingleAsync<Domain.Catalog>(
+                        var storeCatalog = await _context.Catalogs.SingleOrDefaultAsync(
                             c => c.Producer.Id == entity.Producer.Id && c.Kind == CatalogKind.Stores, token);
 
                         storeCatalog.AddOrUpdateProduct(entity, request.WholeSalePricePerUnit.Value);
@@ -129,7 +131,7 @@ namespace Sheaft.Mediatr.Product.Commands
                 {
                     foreach (var catalogPrice in request.Catalogs)
                     {
-                        var catalog = await _context.GetByIdAsync<Domain.Catalog>(catalogPrice.Id, token);
+                        var catalog = await _context.Catalogs.SingleAsync(e => e.Id == catalogPrice.Id, token);
                         catalog.AddOrUpdateProduct(entity, catalogPrice.WholeSalePricePerUnit);
                     }
                 }

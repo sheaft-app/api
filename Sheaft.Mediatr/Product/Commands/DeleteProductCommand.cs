@@ -3,8 +3,10 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using Sheaft.Application.Extensions;
 using Sheaft.Application.Interfaces;
 using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Application.Interfaces.Mediatr;
@@ -39,7 +41,7 @@ namespace Sheaft.Mediatr.Product.Commands
 
         public async Task<Result> Handle(DeleteProductCommand request, CancellationToken token)
         {
-            var entity = await _context.GetByIdAsync<Domain.Product>(request.ProductId, token);
+            var entity = await _context.Products.SingleAsync(e => e.Id == request.ProductId, token);
             if(entity.Producer.Id != request.RequestUser.Id)
                 return Failure(MessageKind.Forbidden);
 

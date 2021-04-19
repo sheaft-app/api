@@ -8,6 +8,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using AutoMapper.QueryableExtensions;
+using Sheaft.Application.Extensions;
 using Sheaft.Application.Interfaces;
 using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Application.Interfaces.Mediatr;
@@ -86,7 +87,7 @@ namespace Sheaft.Web.Manage.Controllers
         public async Task<IActionResult> EditSetting(Guid userId, Guid settingId, CancellationToken token)
         {
             ViewBag.UserId = userId;
-            var entity = await _context.FindByIdAsync<User>(userId, token);
+            var entity = await _context.Users.SingleAsync(e => e.Id == userId, token);
             var userSetting = entity.GetSetting(settingId);
 
             return View(_mapper.Map<UserSettingViewModel>(userSetting));

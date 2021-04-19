@@ -4,17 +4,16 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Sheaft.Application.Extensions;
-using Sheaft.Application.Interfaces;
 using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Application.Interfaces.Mediatr;
 using Sheaft.Application.Models;
 using Sheaft.Core;
 using Sheaft.Core.Enums;
-using Sheaft.Core.Exceptions;
 using Sheaft.Domain;
 using Sheaft.Domain.Enum;
 using Sheaft.Options;
@@ -50,7 +49,7 @@ namespace Sheaft.Mediatr.Agreement.Commands
 
         public async Task<Result> Handle(AcceptAgreementCommand request, CancellationToken token)
         {
-            var entity = await _context.GetByIdAsync<Domain.Agreement>(request.AgreementId, token);
+            var entity = await _context.Agreements.SingleAsync(e => e.Id == request.AgreementId, token);
             if(request.RequestUser.IsInRole(_roleOptions.Producer.Value) && entity.Delivery.Producer.Id != request.RequestUser.Id)
                 return Failure(MessageKind.Forbidden);
             
@@ -70,12 +69,12 @@ namespace Sheaft.Mediatr.Agreement.Commands
             
             if (request.CatalogId.HasValue && entity.Catalog?.Id != request.CatalogId.Value)
             {
-                var catalog = await _context.GetByIdAsync<Domain.Catalog>(request.CatalogId.Value, token);
+                var catalog = await _context.Catalogs.SingleAsync(e => e.Id == request.CatalogId.Value, token);
                 entity.AssignCatalog(catalog);
             }
             else if (!request.CatalogId.HasValue && entity.Catalog?.Id == null)
             {
-                var catalog = await _context.GetSingleAsync<Domain.Catalog>(c => c.IsDefault && c.Kind == CatalogKind.Stores && c.Producer.Id == entity.Delivery.Producer.Id, token);
+                var catalog = await _context.Catalogs.SingleOrDefaultAsync(c => c.IsDefault && c.Kind == CatalogKind.Stores && c.Producer.Id == entity.Delivery.Producer.Id, token);
                 entity.AssignCatalog(catalog);
             }
 

@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using Sheaft.Application.Extensions;
 using Sheaft.Application.Interfaces.Business;
 using Sheaft.Application.Interfaces.Factories;
 using Sheaft.Application.Interfaces.Infrastructure;
@@ -29,7 +31,7 @@ namespace Sheaft.Business.Factories
         
         public async Task<IProductsFileImporter> GetImporterAsync(RequestUser requestUser, CancellationToken token)
         {
-            var user = await _context.GetByIdAsync<User>(requestUser.Id, token);
+            var user = await _context.Users.SingleAsync(e => e.Id == requestUser.Id, token);
             var setting = user.GetSetting(SettingKind.ProductsImporter);
             
             return InstanciateImporter(requestUser, setting?.Value ?? _options.ProductsImporter);

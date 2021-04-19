@@ -1,6 +1,8 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
+using Sheaft.Application.Extensions;
 using Sheaft.Application.Interfaces;
 using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Domain;
@@ -22,9 +24,9 @@ namespace Sheaft.Mediatr.User.EventHandlers
         public async Task Handle(DomainEventNotification<UserSponsoredEvent> notification, CancellationToken token)
         {
             var userEvent = notification.DomainEvent;
-            var user = await _context.GetByIdAsync<Domain.User>(userEvent.SponsorId, token);
-            var sponsoring = await _context.GetSingleAsync<Sponsoring>(
-                c => c.Sponsor.Id == userEvent.SponsorId && c.Sponsored.Id == userEvent.SponsoredId, token);
+            var user = await _context.Users.SingleAsync(e => e.Id == userEvent.SponsorId, token);
+            var sponsoring = await _context.Set<Sponsoring>()
+                .SingleOrDefaultAsync(c => c.Sponsor.Id == userEvent.SponsorId && c.Sponsored.Id == userEvent.SponsoredId, token);
 
             await _signalrService.SendNotificationToUserAsync(userEvent.SponsorId, "SponsoringUsedEvent",
                 new {SponsoredName = sponsoring.Sponsored.Name});

@@ -4,9 +4,11 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using OfficeOpenXml;
+using Sheaft.Application.Extensions;
 using Sheaft.Application.Interfaces;
 using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Application.Interfaces.Mediatr;
@@ -46,7 +48,7 @@ namespace Sheaft.Mediatr.User.Commands
 
         public async Task<Result> Handle(ExportUserDataCommand request, CancellationToken token)
         {
-            var job = await _context.GetByIdAsync<Domain.Job>(request.JobId, token);
+            var job = await _context.Jobs.SingleAsync(e => e.Id == request.JobId, token);
             if(job.User.Id != request.RequestUser.Id)
                 return Failure(MessageKind.Forbidden);
 
@@ -146,7 +148,7 @@ namespace Sheaft.Mediatr.User.Commands
             ordersWorksheet.Cells[3, 8].Value = "Quantité";
             ordersWorksheet.Cells[3, 9].Value = "Prix TTC";
 
-            var orders = await _context.FindAsync<Domain.PurchaseOrder>(o => o.Sender.Id == user.Id, token);
+            var orders = await _context.PurchaseOrders.Where(o => o.Sender.Id == user.Id).ToListAsync(token);
             var i = 4;
             foreach (var order in orders)
             {
@@ -185,7 +187,7 @@ namespace Sheaft.Mediatr.User.Commands
             ratingsWorksheet.Cells[2, 5].Value = "Commentaire";
 
             var productsRated =
-                await _context.FindAsync<Domain.Product>(o => o.Ratings.Any(r => r.User.Id == user.Id), token);
+                await _context.Products.Where(o => o.Ratings.Any(r => r.User.Id == user.Id)).ToListAsync(token);
             var i = 3;
             foreach (var product in productsRated)
             {

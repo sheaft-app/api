@@ -2,8 +2,10 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using Sheaft.Application.Extensions;
 using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Application.Interfaces.Mediatr;
 using Sheaft.Application.Models;
@@ -41,7 +43,7 @@ namespace Sheaft.Mediatr.Card.Commands
         public async Task<Result<CardRegistrationDto>> Handle(CreateCardRegistrationCommand request,
             CancellationToken token)
         {
-            var user = await _context.GetByIdAsync<Domain.User>(request.UserId, token);
+            var user = await _context.Users.SingleAsync(e => e.Id == request.UserId, token);
 
             var result = await _pspService.CreateCardRegistrationAsync(user, token);
             if (!result.Succeeded)

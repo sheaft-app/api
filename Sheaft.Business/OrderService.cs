@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Sheaft.Application.Extensions;
 using Sheaft.Application.Interfaces.Business;
 using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Application.Models;
@@ -33,7 +34,7 @@ namespace Sheaft.Business
         public async Task<Result> ValidateConsumerOrderAsync(Guid orderId, RequestUser requestUser,
             CancellationToken token)
         {
-            var order = await _context.GetByIdAsync<Domain.Order>(orderId, token);
+            var order = await _context.Orders.SingleAsync(e => e.Id == orderId, token);
             if (order.Status != OrderStatus.Created)
                 return Failure(MessageKind.AlreadyExists);
 
@@ -72,7 +73,7 @@ namespace Sheaft.Business
             IEnumerable<Tuple<Domain.Product, Guid, int>> cartProducts, CancellationToken token)
         {
             var deliveries = deliveryIds.Any()
-                ? await _context.GetByIdsAsync<Domain.DeliveryMode>(deliveryIds, token)
+                ? await _context.DeliveryModes.Where(d => deliveryIds.Contains(d.Id)).ToListAsync(token)
                 : new List<Domain.DeliveryMode>();
 
             var cartDeliveries = new List<Tuple<Domain.DeliveryMode, DateTimeOffset, string>>();

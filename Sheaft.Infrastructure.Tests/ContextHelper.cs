@@ -19,7 +19,7 @@ namespace Sheaft.Tests.Common
                 .UseInMemoryDatabase(Guid.NewGuid().ToString("N"))
                 .Options;
 
-            return new AppDbContext(options, Mock.Of<IStringLocalizer<MessageResources>>(), Mock.Of<ISheaftMediatr>(), Mock.Of<IConfiguration>());
+            return new AppDbContext(options, Mock.Of<ISheaftMediatr>(), Mock.Of<IConfiguration>());
         }
     }
 }

@@ -2,8 +2,10 @@
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using Sheaft.Application.Extensions;
 using Sheaft.Application.Interfaces;
 using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Application.Interfaces.Mediatr;
@@ -48,12 +50,8 @@ namespace Sheaft.Mediatr.Legal.Commands
 
         public async Task<Result<Guid>> Handle(CreateBusinessLegalCommand request, CancellationToken token)
         {
-            var business = await _context.GetByIdAsync<Domain.Business>(request.UserId, token);
-            await _context.EnsureNotExists<BusinessLegal>(c => c.User.Id == business.Id, token);
-
-            var legal = new BusinessLegal(
-                Guid.NewGuid(),
-                business,
+            var business = await _context.Businesses.SingleAsync(e => e.Id == request.UserId, token);
+            var legals = business.SetLegals(
                 request.Kind,
                 request.Name,
                 request.Email,
@@ -71,25 +69,24 @@ namespace Sheaft.Mediatr.Legal.Commands
                     request.Owner.Nationality,
                     request.Owner.CountryOfResidence
                 ));
-
-            await _context.AddAsync(legal, token);
+            
             await _context.SaveChangesAsync(token);
 
-            if (string.IsNullOrWhiteSpace(legal.User.Identifier))
+            if (string.IsNullOrWhiteSpace(business.Identifier))
             {
                 var userResult = await _mediatr.Process(
-                    new CheckBusinessLegalConfigurationCommand(request.RequestUser) {UserId = legal.User.Id}, token);
+                    new CheckBusinessLegalConfigurationCommand(request.RequestUser) {UserId = business.Id}, token);
                 if (!userResult.Succeeded)
                     return Failure<Guid>(userResult);
             }
             else
             {
-                var result = await _pspService.UpdateBusinessAsync(legal, token);
+                var result = await _pspService.UpdateBusinessAsync(legals, token);
                 if (!result.Succeeded)
                     return Failure<Guid>(result);
             }
 
-            return Success(legal.Id);
+            return Success(legals.Id);
         }
     }
 }

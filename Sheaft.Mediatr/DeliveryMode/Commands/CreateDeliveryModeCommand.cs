@@ -4,8 +4,10 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using Sheaft.Application.Extensions;
 using Sheaft.Application.Interfaces;
 using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Application.Interfaces.Mediatr;
@@ -53,8 +55,6 @@ namespace Sheaft.Mediatr.DeliveryMode.Commands
 
         public async Task<Result<Guid>> Handle(CreateDeliveryModeCommand request, CancellationToken token)
         {
-            var producer = await _context.GetByIdAsync<Domain.Producer>(request.ProducerId, token);
-
             DeliveryAddress deliveryModeAddress = null;
             if (request.Address != null)
             {
@@ -72,6 +72,7 @@ namespace Sheaft.Mediatr.DeliveryMode.Commands
                 }
             }
 
+            var producer = await _context.Producers.SingleAsync(e => e.Id == request.ProducerId, token);
             var entity = new Domain.DeliveryMode(Guid.NewGuid(), request.Kind, producer, request.Available,
                 deliveryModeAddress, openingHours, request.Name, request.Description);
             entity.SetLockOrderHoursBeforeDelivery(request.LockOrderHoursBeforeDelivery);

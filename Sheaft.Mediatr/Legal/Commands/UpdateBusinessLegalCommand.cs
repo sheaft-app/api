@@ -2,8 +2,10 @@
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using Sheaft.Application.Extensions;
 using Sheaft.Application.Interfaces;
 using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Application.Interfaces.Mediatr;
@@ -62,7 +64,7 @@ namespace Sheaft.Mediatr.Legal.Commands
                 request.Owner.Address.Country
             );
 
-            var legal = await _context.GetByIdAsync<BusinessLegal>(request.LegalId, token);
+            var legal = await _context.Set<BusinessLegal>().SingleAsync(e => e.Id == request.LegalId, token);
 
             legal.SetKind(request.Kind);
             legal.SetValidation(request.Validation);

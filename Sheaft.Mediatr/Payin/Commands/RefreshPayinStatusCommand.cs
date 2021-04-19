@@ -2,6 +2,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Sheaft.Application.Interfaces;
@@ -45,7 +46,7 @@ namespace Sheaft.Mediatr.Payin.Commands
 
         public async Task<Result> Handle(RefreshPayinStatusCommand request, CancellationToken token)
         {
-            var payin = await _context.GetSingleAsync<Domain.Payin>(c => c.Identifier == request.Identifier, token);
+            var payin = await _context.Payins.SingleOrDefaultAsync(c => c.Identifier == request.Identifier, token);
             if (payin.Status == TransactionStatus.Succeeded 
                 || payin.Status == TransactionStatus.Failed 
                 || payin.Status == TransactionStatus.Cancelled)
@@ -74,9 +75,6 @@ namespace Sheaft.Mediatr.Payin.Commands
                         _mediatr.Post(new ConfirmOrderCommand(request.RequestUser) {OrderId = payin.Order.Id});
                         break;
                 }
-                
-                if(payin.Order.Donation > 0)
-                    _mediatr.Schedule(new CreateDonationCommand(request.RequestUser){OrderId = payin.Order.Id}, TimeSpan.FromDays(1));
             }
 
             return Success();

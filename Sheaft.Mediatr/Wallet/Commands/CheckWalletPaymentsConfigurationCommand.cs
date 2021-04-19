@@ -2,6 +2,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Sheaft.Application.Interfaces;
@@ -40,9 +41,8 @@ namespace Sheaft.Mediatr.Wallet.Commands
 
         public async Task<Result> Handle(CheckWalletPaymentsConfigurationCommand request, CancellationToken token)
         {
-            var wallet =
-                await _context.FindSingleAsync<Domain.Wallet>(
-                    c => c.User.Id == request.UserId && c.Kind == WalletKind.Payments, token);
+            var wallet = await _context.Wallets
+                .FirstOrDefaultAsync(c => c.User.Id == request.UserId && c.Kind == WalletKind.Payments, token);
             if (wallet == null)
             {
                 var walletResult = await _mediatr.Process(new CreateWalletPaymentsCommand(request.RequestUser)

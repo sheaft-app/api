@@ -1,6 +1,8 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
+using Sheaft.Application.Extensions;
 using Sheaft.Application.Interfaces;
 using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Domain.Enum;
@@ -22,7 +24,7 @@ namespace Sheaft.Mediatr.Donation.EventHandlers
         public async Task Handle(DomainEventNotification<DonationFailedEvent> notification, CancellationToken token)
         {
             var donationEvent = notification.DomainEvent;
-            var donation = await _context.GetByIdAsync<Domain.Donation>(donationEvent.DonationId, token);
+            var donation = await _context.Donations.SingleAsync(e => e.Id == donationEvent.DonationId, token);
             if (donation.Status != TransactionStatus.Failed)
                 return;
 

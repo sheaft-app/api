@@ -2,6 +2,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
@@ -46,7 +47,7 @@ namespace Sheaft.Mediatr.Agreement.Commands
 
         public async Task<Result> Handle(RefuseAgreementCommand request, CancellationToken token)
         {
-            var entity = await _context.GetByIdAsync<Domain.Agreement>(request.AgreementId, token);
+            var entity = await _context.Agreements.SingleAsync(e => e.Id == request.AgreementId, token);
             if(request.RequestUser.IsInRole(_roleOptions.Producer.Value) && entity.Delivery.Producer.Id != request.RequestUser.Id)
                 return Failure(MessageKind.Forbidden);
             

@@ -2,8 +2,10 @@
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using Sheaft.Application.Extensions;
 using Sheaft.Application.Interfaces;
 using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Application.Interfaces.Mediatr;
@@ -45,7 +47,7 @@ namespace Sheaft.Mediatr.Bank.Commands
 
         public async Task<Result> Handle(UpdateBankAccountCommand request, CancellationToken token)
         {
-            var bankAccount = await _context.GetByIdAsync<BankAccount>(request.BankAccountId, token);
+            var bankAccount = await _context.BankAccounts.SingleAsync(e => e.Id == request.BankAccountId, token);
 
             var address = request.Address != null
                 ? new BankAddress(request.Address.Line1, request.Address.Line2, request.Address.Zipcode,

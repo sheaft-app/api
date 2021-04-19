@@ -1,7 +1,9 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Sheaft.Application.Extensions;
 using Sheaft.Application.Interfaces;
 using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Application.Mailings;
@@ -27,7 +29,7 @@ namespace Sheaft.Mediatr.Product.EventHandlers
         public async Task Handle(DomainEventNotification<ProductImportFailedEvent> notification, CancellationToken token)
         {
             var productEvent = notification.DomainEvent;
-            var job = await _context.GetByIdAsync<Domain.Job>(productEvent.JobId, token);
+            var job = await _context.Jobs.SingleAsync(e => e.Id == productEvent.JobId, token);
             await _signalrService.SendNotificationToGroupAsync(job.User.Id, nameof(ProductImportFailedEvent), new { JobId = job.Id, UserId = job.User.Id });
 
             var url = $"{_configuration.GetValue<string>("Portal:url")}/#/jobs/{job.Id}";

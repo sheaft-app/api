@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Sheaft.Application.Interfaces;
@@ -44,7 +45,8 @@ namespace Sheaft.Mediatr.Document.Commands
 
         public async Task<Result> Handle(UpdateDocumentCommand request, CancellationToken token)
         {
-            var legal = await _context.GetSingleAsync<Domain.Legal>(r => r.Documents.Any(d => d.Id == request.DocumentId), token);
+            var legal = await _context.Legals
+                .SingleOrDefaultAsync(r => r.Documents.Any(d => d.Id == request.DocumentId), token);
             var document = legal.Documents.FirstOrDefault(c => c.Id == request.DocumentId);
             if (document.Kind != request.Kind && legal.Documents.Any(d => d.Kind == request.Kind))
                 return Failure(MessageKind.Document_CannotUpdate_Another_Document_With_Type_Exists);

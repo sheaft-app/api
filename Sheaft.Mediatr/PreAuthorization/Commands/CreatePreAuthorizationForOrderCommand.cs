@@ -1,10 +1,13 @@
 using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
+using Sheaft.Application.Extensions;
 using Sheaft.Application.Interfaces.Business;
 using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Application.Interfaces.Mediatr;
@@ -59,10 +62,10 @@ namespace Sheaft.Mediatr.PreAuthorization.Commands
             if (!checkResult.Succeeded)
                 return Failure<Guid>(checkResult);
 
-            var order = await _context.GetByIdAsync<Domain.Order>(request.OrderId, token);
+            var order = await _context.Orders.SingleAsync(e => e.Id == request.OrderId, token);
             using (var transaction = await _context.BeginTransactionAsync(token))
             {
-                var card = await _context.FindSingleAsync<Domain.Card>(c => c.Identifier == request.CardIdentifier, token);
+                var card = await _context.Cards.SingleOrDefaultAsync(c => c.Identifier == request.CardIdentifier, token);
                 if (card == null)
                 {
                     card = new Domain.Card(Guid.NewGuid(), request.CardIdentifier,

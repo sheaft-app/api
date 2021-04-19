@@ -1,6 +1,7 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Sheaft.Application.Interfaces;
 using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Domain;
@@ -22,7 +23,7 @@ namespace Sheaft.Mediatr.Producer.EventHandlers
         public async Task Handle(DomainEventNotification<ProducerDocumentsNotValidatedEvent> notification, CancellationToken token)
         {
             var producerEvent = notification.DomainEvent;
-            var legal = await _context.GetSingleAsync<BusinessLegal>(c => c.User.Id == producerEvent.ProducerId, token);
+            var legal = await _context.Set<BusinessLegal>().SingleOrDefaultAsync(c => c.User.Id == producerEvent.ProducerId, token);
             await _emailService.SendEmailAsync(
                "support@sheaft.com",
                "Support",

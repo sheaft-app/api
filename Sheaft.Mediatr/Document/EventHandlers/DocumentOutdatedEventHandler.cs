@@ -2,6 +2,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Sheaft.Application.Interfaces;
 using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Domain;
@@ -24,7 +25,8 @@ namespace Sheaft.Mediatr.Document.EventHandlers
         public async Task Handle(DomainEventNotification<DocumentOutdatedEvent> notification, CancellationToken token)
         {
             var docEvent = notification.DomainEvent;
-            var legal = await _context.GetSingleAsync<BusinessLegal>(l => l.Documents.Any(d => d.Id == docEvent.DocumentId), token);
+            var legal = await _context.Set<BusinessLegal>()
+                .SingleOrDefaultAsync(l => l.Documents.Any(d => d.Id == docEvent.DocumentId), token);
             var document = legal.Documents.FirstOrDefault(d => d.Id == docEvent.DocumentId);
             if (document.Status != DocumentStatus.OutOfDate)
                 return;

@@ -4,8 +4,10 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using Sheaft.Application.Extensions;
 using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Application.Interfaces.Mediatr;
 using Sheaft.Application.Models;
@@ -40,7 +42,7 @@ namespace Sheaft.Mediatr.DeliveryClosing.Commands
         {
             using (var transaction = await _context.BeginTransactionAsync(token))
             {
-                var entity = await _context.GetByIdAsync<Domain.DeliveryMode>(request.DeliveryId, token);
+                var entity = await _context.DeliveryModes.SingleAsync(e => e.Id == request.DeliveryId, token);
                 var existingClosingIds = entity.Closings?.Select(c => c.Id)?.ToList() ?? new List<Guid>();
                 
                 var closingIdsToRemove = existingClosingIds.Except(request.Closings?.Where(c => c.Id.HasValue)?.Select(c => c.Id.Value) ?? new List<Guid>()).ToList();

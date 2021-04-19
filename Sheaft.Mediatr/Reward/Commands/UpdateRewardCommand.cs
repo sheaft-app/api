@@ -5,6 +5,7 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using Sheaft.Application.Extensions;
 using Sheaft.Application.Interfaces;
 using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Application.Interfaces.Mediatr;
@@ -45,7 +46,7 @@ namespace Sheaft.Mediatr.Reward.Commands
 
         public async Task<Result> Handle(UpdateRewardCommand request, CancellationToken token)
         {
-            var entity = await _context.GetByIdAsync<Domain.Reward>(request.RewardId, token);
+            var entity = await _context.Rewards.SingleAsync(e => e.Id == request.RewardId, token);
 
             entity.SetName(request.Name);
             entity.SetDescription(request.Description);
@@ -64,10 +65,10 @@ namespace Sheaft.Mediatr.Reward.Commands
 
             if (entity.Level.Id != request.LevelId)
             {
-                var oldLevel = await _context.GetByIdAsync<Domain.Level>(entity.Level.Id, token);
+                var oldLevel = await _context.Levels.SingleAsync(e => e.Id == entity.Level.Id, token);
                 oldLevel.RemoveReward(entity);
 
-                var newLevel = await _context.GetByIdAsync<Domain.Level>(request.LevelId, token);
+                var newLevel = await _context.Levels.SingleAsync(e => e.Id == request.LevelId, token);
                 newLevel.AddReward(entity);
             }
 

@@ -1,6 +1,8 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
+using Sheaft.Application.Extensions;
 using Sheaft.Application.Interfaces;
 using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Domain.Events.Product;
@@ -22,7 +24,7 @@ namespace Sheaft.Mediatr.Product.EventHandlers
             CancellationToken token)
         {
             var productEvent = notification.DomainEvent;
-            var job = await _context.GetByIdAsync<Domain.Job>(productEvent.JobId, token);
+            var job = await _context.Jobs.SingleAsync(e => e.Id == productEvent.JobId, token);
             await _signalrService.SendNotificationToGroupAsync(job.User.Id, nameof(ProductImportProcessingEvent),
                 new {JobId = job.Id, UserId = job.User.Id});
         }

@@ -1,6 +1,7 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
@@ -47,7 +48,7 @@ namespace Sheaft.Mediatr.Legal.Commands
 
         public async Task<Result> Handle(RefreshLegalValidationCommand request, CancellationToken token)
         {
-            var legal = await _context.GetSingleAsync<Domain.Legal>(b => b.User.Identifier == request.Identifier, token);
+            var legal = await _context.Legals.SingleOrDefaultAsync(b => b.User.Identifier == request.Identifier, token);
             var validation = LegalValidation.NotSpecified;
             if (legal is BusinessLegal)
             {

@@ -2,8 +2,10 @@
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using Sheaft.Application.Extensions;
 using Sheaft.Application.Interfaces;
 using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Application.Interfaces.Mediatr;
@@ -36,7 +38,7 @@ namespace Sheaft.Mediatr.Order.Commands
 
         public async Task<Result> Handle(ExpireOrderCommand request, CancellationToken token)
         {
-            var order = await _context.GetByIdAsync<Domain.Order>(request.OrderId, token);
+            var order = await _context.Orders.SingleAsync(e => e.Id == request.OrderId, token);
             order.SetStatus(OrderStatus.Expired);
 
             await _context.SaveChangesAsync(token);

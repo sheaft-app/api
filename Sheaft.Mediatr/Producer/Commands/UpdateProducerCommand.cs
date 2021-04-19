@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
+using Sheaft.Application.Extensions;
 using Sheaft.Application.Interfaces;
 using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Application.Interfaces.Mediatr;
@@ -69,7 +70,7 @@ namespace Sheaft.Mediatr.Producer.Commands
 
         public async Task<Result> Handle(UpdateProducerCommand request, CancellationToken token)
         {
-            var producer = await _context.GetByIdAsync<Domain.Producer>(request.ProducerId, token);
+            var producer = await _context.Producers.SingleAsync(e => e.Id == request.ProducerId, token);
             if(producer.Id != request.RequestUser.Id)
                 return Failure(MessageKind.Forbidden);
 
@@ -102,7 +103,7 @@ namespace Sheaft.Mediatr.Producer.Commands
 
             if (request.Tags != null)
             {
-                var tags = await _context.FindAsync<Domain.Tag>(t => request.Tags.Contains(t.Id), token);
+                var tags = await _context.Tags.Where(t => request.Tags.Contains(t.Id)).ToListAsync(token);
                 producer.SetTags(tags);
             }
 

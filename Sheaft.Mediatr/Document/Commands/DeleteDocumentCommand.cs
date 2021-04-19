@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Sheaft.Application.Interfaces;
@@ -36,8 +37,8 @@ namespace Sheaft.Mediatr.Document.Commands
 
         public async Task<Result> Handle(DeleteDocumentCommand request, CancellationToken token)
         {
-            var legal = await _context.GetSingleAsync<Domain.Legal>(r => r.Documents.Any(d => d.Id == request.DocumentId),
-                token);
+            var legal = await _context.Legals
+                .SingleOrDefaultAsync(r => r.Documents.Any(d => d.Id == request.DocumentId), token);
             legal.DeleteDocument(request.DocumentId);
 
             await _context.SaveChangesAsync(token);

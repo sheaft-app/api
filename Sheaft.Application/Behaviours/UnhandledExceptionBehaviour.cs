@@ -59,8 +59,16 @@ namespace Sheaft.Application.Behaviours
             }
             catch (InvalidOperationException invalidOperation)
             {
+                if (invalidOperation.Source == "Microsoft.EntityFrameworkCore" &&
+                    invalidOperation.Message.StartsWith("Enumerator failed to MoveNextAsync"))
+                {
+                    _logger.LogWarning(invalidOperation, $"Entity not found while processing {type}");
+                    throw SheaftException.NotFound(invalidOperation);
+                }
+
                 _logger.LogError(invalidOperation,
                     $"Invalid operation error on executing {type} : {invalidOperation.Message}");
+
                 throw SheaftException.Unexpected(invalidOperation);
             }
             catch (Exception e)

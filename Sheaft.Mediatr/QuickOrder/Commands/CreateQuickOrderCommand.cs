@@ -7,6 +7,7 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using Sheaft.Application.Extensions;
 using Sheaft.Application.Interfaces;
 using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Application.Interfaces.Mediatr;
@@ -45,7 +46,7 @@ namespace Sheaft.Mediatr.QuickOrder.Commands
 
         public async Task<Result<Guid>> Handle(CreateQuickOrderCommand request, CancellationToken token)
         {
-            var store = await _context.GetByIdAsync<Domain.User>(request.UserId, token);
+            var store = await _context.Users.SingleAsync(e => e.Id == request.UserId, token);
 
             var productIds = request.Products.Select(p => p.Id).ToList();
             var agreements = await _context.Set<Domain.Agreement>()

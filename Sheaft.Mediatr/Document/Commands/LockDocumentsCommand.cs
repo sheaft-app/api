@@ -3,8 +3,10 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using Sheaft.Application.Extensions;
 using Sheaft.Application.Interfaces;
 using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Application.Interfaces.Mediatr;
@@ -38,7 +40,7 @@ namespace Sheaft.Mediatr.Document.Commands
 
         public async Task<Result> Handle(LockDocumentsCommand request, CancellationToken token)
         {
-            var legal = await _context.GetSingleAsync<Domain.Legal>(r => r.Id == request.LegalId, token);
+            var legal = await _context.Legals.SingleAsync(e => e.Id == request.LegalId, token);
             var success = true;
             foreach (var document in legal.Documents.Where(d =>
                 d.Status == DocumentStatus.UnLocked || d.Status == DocumentStatus.Created))

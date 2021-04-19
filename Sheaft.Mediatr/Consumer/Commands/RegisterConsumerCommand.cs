@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
@@ -55,9 +56,8 @@ namespace Sheaft.Mediatr.Consumer.Commands
         {
             using (var transaction = await _context.BeginTransactionAsync(token))
             {
-                var consumer =
-                    await _context.FindSingleAsync<Domain.Consumer>(
-                        r => r.Id == request.ConsumerId || r.Email == request.Email, token);
+                var consumer = await _context.Consumers
+                    .FirstOrDefaultAsync(r => r.Id == request.ConsumerId || r.Email == request.Email, token);
                 if (consumer != null)
                     return Failure<Guid>(MessageKind.Register_User_AlreadyExists);
 

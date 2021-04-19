@@ -26,18 +26,15 @@ namespace Sheaft.Infrastructure.Persistence
 {
     public partial class AppDbContext : DbContext, IAppDbContext
     {
-        private readonly IStringLocalizer<MessageResources> _localizer;
         private readonly ISheaftMediatr _mediatr;
         private readonly bool _isAdminContext;
 
         public AppDbContext(
             DbContextOptions<AppDbContext> options,
-            IStringLocalizer<MessageResources> localizer,
             ISheaftMediatr mediatr,
             IConfiguration configuration)
             : base(options)
         {
-            _localizer = localizer;
             _mediatr = mediatr;
             _isAdminContext = configuration.GetValue<bool?>("IsAdminContext") ?? false;
         }
@@ -70,6 +67,10 @@ namespace Sheaft.Infrastructure.Persistence
         public DbSet<Tag> Tags { get; set; }
         public DbSet<Transfer> Transfers { get; set; }
         public DbSet<User> Users { get; set; }
+        public DbSet<Store> Stores { get; set; }
+        public DbSet<Producer> Producers { get; set; }
+        public DbSet<Consumer> Consumers { get; set; }
+        public DbSet<Business> Businesses { get; set; }
         public DbSet<Wallet> Wallets { get; set; }
         public DbSet<Withholding> Withholdings { get; set; }
 
@@ -81,204 +82,6 @@ namespace Sheaft.Infrastructure.Persistence
         public DbSet<DepartmentUserPoints> DepartmentUserPoints { get; set; }
         public DbSet<RegionUserPoints> RegionUserPoints { get; set; }
         public DbSet<CountryUserPoints> CountryUserPoints { get; set; }
-
-        public async Task<T> GetByIdAsync<T>(Guid id, CancellationToken token, bool asNoTracking = false)
-            where T : class, IIdEntity
-        {
-            var query = Set<T>().Where(c => c.Id == id);
-            if (asNoTracking)
-                query = query.AsNoTracking();
-
-            var item = await query.SingleOrDefaultAsync(token);
-            if (item == null)
-            {
-                var message = GetExceptionDefaultMessage<T>(MessageKind.NotFound, id);
-                throw SheaftException.NotFound(message.Key, message.Value);
-            }
-
-            return item;
-        }
-
-        public async Task<T> FindByIdAsync<T>(Guid id, CancellationToken token, bool asNoTracking = false)
-            where T : class, IIdEntity
-        {
-            var query = Set<T>().Where(c => c.Id == id);
-            if (asNoTracking)
-                query = query.AsNoTracking();
-
-            return await query.SingleOrDefaultAsync(token);
-        }
-
-        public async Task<IEnumerable<T>> GetByIdsAsync<T>(IEnumerable<Guid> ids, CancellationToken token,
-            bool asNoTracking = false) where T : class, IIdEntity
-        {
-            var query = Set<T>().Where(c => ids.Contains(c.Id));
-            if (asNoTracking)
-                query = query.AsNoTracking();
-
-            var items = await query.ToListAsync(token);
-            if (items?.Any() != true)
-            {
-                var message = GetExceptionDefaultMessage<T>(MessageKind.NotFound, ids);
-                throw SheaftException.NotFound(message.Key, message.Value);
-            }
-
-            if (items.Count != ids.Count())
-            {
-                var message = GetExceptionDefaultMessage<T>(MessageKind.NotFound, ids.Except(items.Select(i => i.Id)));
-                throw SheaftException.NotFound(message.Key, message.Value);
-            }
-
-            return items;
-        }
-
-        public async Task<IEnumerable<T>> FindByIdsAsync<T>(IEnumerable<Guid> ids, CancellationToken token,
-            bool asNoTracking = false) where T : class, IIdEntity
-        {
-            var query = Set<T>().Where(c => ids.Contains(c.Id));
-            if (asNoTracking)
-                query = query.AsNoTracking();
-
-            var items = await query.ToListAsync(token);
-            if (items?.Any() != true)
-                return new List<T>();
-
-            return items;
-        }
-
-        public async Task<IEnumerable<T>> GetAsync<T>(Expression<Func<T, bool>> where, CancellationToken token,
-            bool asNoTracking = false) where T : class
-        {
-            var query = Set<T>().AsQueryable();
-            if (where != null)
-                query = query.Where(where);
-
-            if (asNoTracking)
-                query = query.AsNoTracking();
-
-            var items = await query.ToListAsync(token);
-            if (items?.Any() != true)
-            {
-                var message = GetExceptionDefaultMessage<T>(MessageKind.NotFound);
-                throw SheaftException.NotFound(message.Key, message.Value);
-            }
-
-            return items;
-        }
-
-        public async Task<IEnumerable<T>> GetAsync<T>(CancellationToken token, bool asNoTracking = false)
-            where T : class
-        {
-            return await GetAsync<T>(null, token, asNoTracking);
-        }
-
-        public async Task<IEnumerable<T>> FindAsync<T>(Expression<Func<T, bool>> where, CancellationToken token,
-            bool asNoTracking = false) where T : class
-        {
-            var query = Set<T>().AsQueryable();
-            if (where != null)
-                query = query.Where(where);
-
-            if (asNoTracking)
-                query = query.AsNoTracking();
-
-            var items = await query.ToListAsync(token);
-            if (items?.Any() != true)
-                return new List<T>();
-
-            return items;
-        }
-
-        public async Task<IEnumerable<T>> FindAsync<T>(CancellationToken token, bool asNoTracking = false)
-            where T : class
-        {
-            return await FindAsync<T>(null, token, asNoTracking);
-        }
-
-        public async Task<T> GetSingleAsync<T>(Expression<Func<T, bool>> where, CancellationToken token,
-            bool asNoTracking = false) where T : class
-        {
-            var query = Set<T>().AsQueryable();
-            if (where != null)
-                query = query.Where(where);
-
-            if (asNoTracking)
-                query = query.AsNoTracking();
-
-            var item = await query.SingleOrDefaultAsync(token);
-            if (item == null)
-            {
-                var message = GetExceptionDefaultMessage<T>(MessageKind.NotFound);
-                throw SheaftException.NotFound(message.Key, message.Value);
-            }
-
-            return item;
-        }
-
-        public async Task<T> FindSingleAsync<T>(Expression<Func<T, bool>> where, CancellationToken token,
-            bool asNoTracking = false) where T : class
-        {
-            var query = Set<T>().AsQueryable();
-            if (where != null)
-                query = query.Where(where);
-
-            if (asNoTracking)
-                query = query.AsNoTracking();
-
-            return await query.SingleOrDefaultAsync(token);
-        }
-
-        public async Task<bool> AnyAsync<T>(Expression<Func<T, bool>> where, CancellationToken token,
-            bool asNoTracking = false) where T : class
-        {
-            var query = Set<T>().AsQueryable();
-            if (where != null)
-                query = query.Where(where);
-
-            if (asNoTracking)
-                query = query.AsNoTracking();
-
-            return await query.AnyAsync(token);
-        }
-
-        public async Task<bool> AnyAsync<T>(CancellationToken token, bool asNoTracking = false)
-            where T : class
-        {
-            return await AnyAsync<T>(null, token, asNoTracking);
-        }
-
-        public async Task EnsureNotExists<T>(Guid id, CancellationToken token, bool asNoTracking = false)
-            where T : class, IIdEntity
-        {
-            var query = Set<T>().Where(c => c.Id == id);
-            if (asNoTracking)
-                query = query.AsNoTracking();
-
-            var result = await query.SingleOrDefaultAsync(token);
-            if (result != null)
-            {
-                var message = GetExceptionDefaultMessage<T>(MessageKind.AlreadyExists, id);
-                throw SheaftException.AlreadyExists(message.Key, message.Value);
-            }
-        }
-
-        public async Task EnsureNotExists<T>(Expression<Func<T, bool>> where, CancellationToken token,
-            bool asNoTracking = false) where T : class, IIdEntity
-        {
-            var query = Set<T>().AsQueryable();
-            if (where != null)
-                query = query.Where(where);
-
-            if (asNoTracking)
-                query = query.AsNoTracking();
-
-            var result = await query.ToListAsync(token);
-            if (result.Any())
-            {
-                var message = GetExceptionDefaultMessage<T>(MessageKind.AlreadyExists);
-                throw SheaftException.AlreadyExists(message.Key, message.Value);
-            }
-        }
 
         public override int SaveChanges()
         {
@@ -328,40 +131,6 @@ namespace Sheaft.Infrastructure.Persistence
         public void Migrate()
         {
             Database.Migrate();
-        }
-
-        private KeyValuePair<MessageKind, string> GetExceptionDefaultMessage<T>(MessageKind kind, Guid id)
-            where T : class, IIdEntity
-        {
-            var type = typeof(T);
-            var resource = $"{_localizer[type.Name, type.Name]} ({id})";
-            return new KeyValuePair<MessageKind, string>(kind, resource);
-        }
-
-        private KeyValuePair<MessageKind, string> GetExceptionDefaultMessage<T>(MessageKind kind)
-            where T : class
-        {
-            var type = typeof(T);
-            var resource = $"{_localizer[type.Name, type.Name]}";
-            return new KeyValuePair<MessageKind, string>(kind, resource);
-        }
-
-        private KeyValuePair<MessageKind, string> GetExceptionDefaultMessage<T>(MessageKind kind, IEnumerable<Guid> ids)
-            where T : class
-        {
-            var type = typeof(T);
-            var identifiers = string.Empty;
-
-            foreach (var id in ids)
-            {
-                if (identifiers.Length > 0)
-                    identifiers += ", ";
-
-                identifiers += id.ToString("N");
-            }
-
-            var resource = $"{_localizer[type.Name, type.Name]} ({identifiers})";
-            return new KeyValuePair<MessageKind, string>(kind, resource);
         }
 
         private void UpdateRelatedData()

@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Application.Interfaces.Mediatr;
@@ -40,8 +41,9 @@ namespace Sheaft.Mediatr.Catalog.Commands
         public async Task<Result> Handle(UpdateCatalogCommand request, CancellationToken token)
         {
             var catalogs =
-                await _context.GetAsync<Domain.Catalog>(
-                    c => c.Producer.Id == request.RequestUser.Id, token);
+                await _context.Catalogs
+                    .Where(c => c.Producer.Id == request.RequestUser.Id)
+                    .ToListAsync(token);
             
             var entity = catalogs.Single(c => c.Id == request.CatalogId);
             if(!request.IsDefault && entity.Kind == CatalogKind.Consumers)
