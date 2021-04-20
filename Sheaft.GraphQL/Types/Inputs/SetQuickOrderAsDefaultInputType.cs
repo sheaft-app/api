@@ -13,7 +13,7 @@ namespace Sheaft.GraphQL.Types.Inputs
                 .Type<IdType>();
             
             descriptor.Field(c => c.QuickOrderId)
-                .Name("Id")
+                .Name("id")
                 .Type<NonNullType<IdType>>();
         }
     }

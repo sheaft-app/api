@@ -13,7 +13,7 @@ namespace Sheaft.GraphQL.Types.Inputs
                 .Type<PictureSourceInputType>();
 
             descriptor.Field(c => c.UserId)
-                .Name("Id")
+                .Name("id")
                 .Type<NonNullType<IdType>>();
         }
     }

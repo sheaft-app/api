@@ -10,7 +10,7 @@ namespace Sheaft.GraphQL.Types.Inputs
         {
             descriptor.Name("UpdateOrCreateDeliveryClosingInput");
             descriptor.Field(c => c.DeliveryId)
-                .Name("Id")
+                .Name("id")
                 .Type<NonNullType<IdType>>();
             descriptor.Field(c => c.Closing)
                 .Type<NonNullType<UpdateOrCreateClosingInputType>>();

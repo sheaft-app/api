@@ -9,7 +9,7 @@ namespace Sheaft.GraphQL.Types.Inputs
         {
             descriptor.Name("DeleteReturnableInput");
             descriptor.Field(c => c.ReturnableId)
-                .Name("Id")
+                .Name("id")
                 .Type<NonNullType<IdType>>();
         }
     }

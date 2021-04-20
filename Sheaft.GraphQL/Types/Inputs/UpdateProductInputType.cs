@@ -24,7 +24,7 @@ namespace Sheaft.GraphQL.Types.Inputs
             descriptor.Field(c => c.Weight);
 
             descriptor.Field(c => c.ProductId)
-                .Name("Id")
+                .Name("id")
                 .Type<NonNullType<IdType>>();
 
             descriptor.Field(c => c.Name)

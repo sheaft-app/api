@@ -8,7 +8,7 @@ namespace Sheaft.GraphQL.Types.Inputs
         protected override void Configure(IInputObjectTypeDescriptor<ProductPriceInputDto> descriptor)
         {
             descriptor.Name("ProductPriceInput");
-            descriptor.Field(c => c.ProductId).Name("Id").Type<NonNullType<IdType>>();
+            descriptor.Field(c => c.ProductId).Name("id").Type<NonNullType<IdType>>();
             descriptor.Field(c => c.WholeSalePricePerUnit);
         }
     }

@@ -10,7 +10,7 @@ namespace Sheaft.GraphQL.Types.Inputs
             descriptor.Name("ResetOrderInput");
             
             descriptor.Field(c => c.OrderId)
-                .Name("Id")
+                .Name("id")
                 .Type<NonNullType<IdType>>();
         }
     }

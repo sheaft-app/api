@@ -10,11 +10,11 @@ namespace Sheaft.GraphQL.Types.Inputs
         {
             descriptor.Name("UpdateOrderInput");
             descriptor.Field(c => c.OrderId)
-                .Name("Id")
+                .Name("id")
                 .Type<NonNullType<IdType>>();
             
             descriptor.Field(c => c.UserId)
-                .Name("UserId")
+                .Name("userId")
                 .Type<IdType>();
 
             descriptor.Field(c => c.Donation);

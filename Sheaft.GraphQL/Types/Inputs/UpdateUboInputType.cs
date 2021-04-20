@@ -10,7 +10,7 @@ namespace Sheaft.GraphQL.Types.Inputs
         {
             descriptor.Name("UpdateUboInput");
             descriptor.Field(c => c.UboId)
-                .Name("Id")
+                .Name("id")
                 .Type<NonNullType<IdType>>();
 
             descriptor.Field(c => c.FirstName);

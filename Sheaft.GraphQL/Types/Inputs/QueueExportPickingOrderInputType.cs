@@ -4,7 +4,7 @@ using Sheaft.Mediatr.PickingOrders.Commands;
 
 namespace Sheaft.GraphQL.Types.Inputs
 {
-    public class ExportPickingOrdersInputType : SheaftInputType<QueueExportPickingOrderCommand>
+    public class QueueExportPickingOrderInputType : SheaftInputType<QueueExportPickingOrderCommand>
     {
         protected override void Configure(IInputObjectTypeDescriptor<QueueExportPickingOrderCommand> descriptor)
         {

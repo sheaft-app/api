@@ -18,7 +18,7 @@ namespace Sheaft.GraphQL.Types.Inputs
             descriptor.Field(c => c.LockOrderHoursBeforeDelivery);
 
             descriptor.Field(c => c.DeliveryModeId)
-                .Name("Id")
+                .Name("id")
                 .Type<NonNullType<IdType>>();
 
             descriptor.Field(c => c.Address)

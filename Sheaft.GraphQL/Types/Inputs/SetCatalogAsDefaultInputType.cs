@@ -10,7 +10,7 @@ namespace Sheaft.GraphQL.Types.Inputs
             descriptor.Name("SetCatalogAsDefaultInput");
             
             descriptor.Field(c => c.CatalogId)
-                .Name("Id")
+                .Name("id")
                 .Type<NonNullType<IdType>>();
         }
     }

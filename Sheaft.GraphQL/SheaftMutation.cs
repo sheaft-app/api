@@ -386,12 +386,12 @@ namespace Sheaft.GraphQL
             return userQueries.GetUser(input.UserId, CurrentUser);
         }
 
-        public async Task<bool> AddPictureToUserProfileAsync(AddPictureToUserCommand input)
+        public async Task<bool> AddPictureToUserAsync(AddPictureToUserCommand input)
         {
             return await ExecuteAsync(input, Token);
         }
 
-        public async Task<bool> RemoveUserProfilePicturesAsync(RemoveUserPicturesCommand input)
+        public async Task<bool> RemoveUserPicturesAsync(RemoveUserPicturesCommand input)
         {
             return await ExecuteAsync(input, Token);
         }
@@ -507,6 +507,15 @@ namespace Sheaft.GraphQL
                 await ExecuteAsync<UpdateOrCreateDeliveryClosingCommand, Guid>(
                     input, Token);
             return closingQueries.GetClosing(result, CurrentUser);
+        }
+
+        public async Task<IQueryable<ClosingDto>> UpdateOrCreateDeliveryClosingsAsync(
+            UpdateOrCreateDeliveryClosingsCommand input, [Service] IDeliveryClosingQueries closingQueries)
+        {
+            var result =
+                await ExecuteAsync<UpdateOrCreateDeliveryClosingsCommand, IEnumerable<Guid>>(
+                    input, Token);
+            return closingQueries.GetClosings(input.DeliveryId, CurrentUser).Where(c => result.Contains(c.Id));
         }
 
         public async Task<bool> DeleteBusinessClosingsAsync(DeleteBusinessClosingsCommand input)

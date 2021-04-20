@@ -12,7 +12,7 @@ namespace Sheaft.GraphQL.Types.Inputs
             
             descriptor.Field(c => c.Percent);
             descriptor.Field(c => c.CatalogId)
-                .Name("Id")
+                .Name("id")
                 .Type<NonNullType<IdType>>();
         }
     }

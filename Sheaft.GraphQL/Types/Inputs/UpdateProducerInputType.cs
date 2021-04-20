@@ -20,7 +20,7 @@ namespace Sheaft.GraphQL.Types.Inputs
             descriptor.Field(c => c.Website);
 
             descriptor.Field(c => c.ProducerId)
-                .Name("Id")
+                .Name("id")
                 .Type<NonNullType<IdType>>();
 
             descriptor.Field(c => c.Address)

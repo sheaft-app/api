@@ -13,7 +13,7 @@ namespace Sheaft.GraphQL.Types.Inputs
                 .Type<NonNullType<ListType<ProductPriceInputType>>>();
 
             descriptor.Field(c => c.CatalogId)
-                .Name("Id")
+                .Name("id")
                 .Type<NonNullType<IdType>>();
         }
     }

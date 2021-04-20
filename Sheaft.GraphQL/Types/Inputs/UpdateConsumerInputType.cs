@@ -28,7 +28,7 @@ namespace Sheaft.GraphQL.Types.Inputs
                 .Type<NonNullType<StringType>>();
 
             descriptor.Field(c => c.ConsumerId)
-                .Name("Id")
+                .Name("id")
                 .Type<NonNullType<IdType>>();
         }
     }

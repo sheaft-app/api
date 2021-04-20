@@ -14,7 +14,7 @@ namespace Sheaft.GraphQL.Types.Inputs
             descriptor.Field(c => c.WholeSalePrice);
 
             descriptor.Field(c => c.ReturnableId)
-                .Name("Id")
+                .Name("id")
                 .Type<NonNullType<IdType>>();
 
             descriptor.Field(c => c.Name)

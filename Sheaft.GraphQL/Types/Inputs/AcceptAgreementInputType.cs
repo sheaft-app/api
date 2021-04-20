@@ -10,7 +10,7 @@ namespace Sheaft.GraphQL.Types.Inputs
         {
             descriptor.Name("AcceptAgreementInput");
             descriptor.Field(c => c.AgreementId)
-                .Name("Id")
+                .Name("id")
                 .Type<NonNullType<IdType>>();
 
             descriptor.Field(c => c.SelectedHours)

@@ -11,7 +11,7 @@ namespace Sheaft.GraphQL.Types.Inputs
             descriptor.Name("PayOrderInput");
             
             descriptor.Field(c => c.OrderId)
-                .Name("Id")
+                .Name("id")
                 .Type<NonNullType<IdType>>();
         }
     }
