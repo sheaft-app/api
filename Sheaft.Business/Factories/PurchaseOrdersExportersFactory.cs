@@ -16,11 +16,13 @@ namespace Sheaft.Business.Factories
     public class PurchaseOrdersExportersFactory : IPurchaseOrdersExportersFactory
     {
         private readonly IAppDbContext _context;
+        private readonly Func<string, IPurchaseOrdersFileExporter> _resolver;
         private readonly ExportersOptions _options;
 
-        public PurchaseOrdersExportersFactory(IAppDbContext context, IOptions<ExportersOptions> options)
+        public PurchaseOrdersExportersFactory(IAppDbContext context, IOptions<ExportersOptions> options, Func<string, IPurchaseOrdersFileExporter> resolver)
         {
             _context = context;
+            _resolver = resolver;
             _options = options.Value;
         }
 
@@ -37,16 +39,9 @@ namespace Sheaft.Business.Factories
             return InstanciateExporter(requestUser, setting?.Value ?? _options.PurchaseOrdersExporter);
         }
 
-        private static IPurchaseOrdersFileExporter InstanciateExporter(RequestUser requestUser, string typename)
+        private IPurchaseOrdersFileExporter InstanciateExporter(RequestUser requestUser, string typename)
         {
-            var type = Type.GetType(typename);
-            if (type == null)
-                throw new ArgumentException($"Invalid typename configured for user: {requestUser.Id} purchase orders exporter.");
-
-            if (!(Activator.CreateInstance(type) is IPurchaseOrdersFileExporter exporter))
-                throw new ArgumentException($"Invalid type used {type.FullName} for purchase orders exporter.");
-
-            return exporter;
+            return _resolver.Invoke(typename);
         }
     }
 }

@@ -62,6 +62,7 @@ using Sheaft.Mediatr.Order.Queries;
 using Sheaft.Mediatr.Payin.Queries;
 using Sheaft.Mediatr.Payout.Queries;
 using Sheaft.Mediatr.Producer.Queries;
+using Sheaft.Mediatr.Product.Commands;
 using Sheaft.Mediatr.Product.Queries;
 using Sheaft.Mediatr.PurchaseOrder.Queries;
 using Sheaft.Mediatr.QuickOrder.Queries;
@@ -160,7 +161,7 @@ namespace Sheaft.Web.Manage
                     .Build();
             });
 
-            services.AddAutoMapper(new []{typeof(ProductProfile).Assembly, typeof(ProductViewProfile).Assembly});
+            services.AddAutoMapper(typeof(ProductProfile).Assembly, typeof(ProductViewProfile).Assembly, typeof(CreateProductProfile).Assembly);
 
             services.Configure<KestrelServerOptions>(options =>
             {

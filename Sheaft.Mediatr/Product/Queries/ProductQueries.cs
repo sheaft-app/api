@@ -194,9 +194,10 @@ namespace Sheaft.Mediatr.Product.Queries
 
             if (currentUser.IsInRole(_roleOptions.Store.Value))
                     return _context.Agreements
-                        .Where(c => c.Store.Id == currentUser.Id)
+                        .Where(c => c.Store.Id == currentUser.Id && c.Catalog.Kind == CatalogKind.Stores)
                         .SelectMany(a => a.Catalog.Products)
                         .Select(c => c.Product)
+                        .Distinct()
                         .ProjectTo<ProductDto>(_configurationProvider);
 
             return _context.Products
@@ -218,9 +219,10 @@ namespace Sheaft.Mediatr.Product.Queries
 
                 if (hasAgreement)
                     return _context.Agreements
-                        .Where(c => c.Store.Id == currentUser.Id && c.Delivery.Producer.Id == producerId)
+                        .Where(c => c.Store.Id == currentUser.Id && c.Delivery.Producer.Id == producerId && c.Catalog.Kind == CatalogKind.Stores)
                         .SelectMany(a => a.Catalog.Products)
                         .Select(c => c.Product)
+                        .Distinct()
                         .ProjectTo<ProductDto>(_configurationProvider);
 
                 return _context.Products

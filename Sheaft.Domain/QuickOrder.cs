@@ -43,7 +43,7 @@ namespace Sheaft.Domain
         public void SetName(string name)
         {
             if (string.IsNullOrWhiteSpace(name))
-                throw new ValidationException(MessageKind.QuickOrder_Name_Required);
+                throw SheaftException.Validation(MessageKind.QuickOrder_Name_Required);
 
             Name = name;
         }
@@ -77,6 +77,9 @@ namespace Sheaft.Domain
 
         public void AddOrUpdateProduct(CatalogProduct catalogProduct, int quantity)
         {
+            if (Products == null)
+                _products = new List<QuickOrderProduct>();
+            
             var productLine = _products.SingleOrDefault(p => p.CatalogProduct.Product.Id == catalogProduct.Product.Id);
             if (productLine != null)
             {
@@ -87,11 +90,22 @@ namespace Sheaft.Domain
             _products.Add(new QuickOrderProduct(catalogProduct, quantity)); 
         }
 
+        public void RemoveProduct(QuickOrderProduct product)
+        {
+            if (Products == null)
+                throw SheaftException.NotFound();
+
+            _products.Remove(product);
+        }
+
         public void RemoveProduct(Guid productId)
         {
+            if (Products == null)
+                throw SheaftException.NotFound();
+            
             var productLine = _products.SingleOrDefault(p => p.CatalogProduct.Product.Id == productId);
             if (productLine == null)
-                throw new ValidationException(MessageKind.QuickOrder_CannotRemoveProduct_Product_NotFound);
+                throw SheaftException.Validation(MessageKind.QuickOrder_CannotRemoveProduct_Product_NotFound);
 
             _products.Remove(productLine);
         }

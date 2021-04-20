@@ -9,8 +9,10 @@ namespace Sheaft.GraphQL.Types.Inputs
         {
             descriptor.Name("SetDeliveryModesAvailabilityInput");
             descriptor.Field(c => c.DeliveryModeIds)
-                .Name("Ids")
+                .Name("ids")
                 .Type<NonNullType<ListType<IdType>>>();
+
+            descriptor.Field(c => c.Available);
         }
     }
 }

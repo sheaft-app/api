@@ -120,17 +120,17 @@ namespace Sheaft.Mediatr.Product.Commands
                         c => c.Producer.Id == entity.Producer.Id && c.Kind == CatalogKind.Consumers, token);
 
                     if (request.VisibleToConsumers.Value)
-                        consumerCatalog.AddOrUpdateProduct(entity, request.WholeSalePricePerUnit.Value);
+                        entity.AddOrUpdateCatalogPrice(consumerCatalog, request.WholeSalePricePerUnit.Value);
                     else if (consumerCatalog.Products.Any(pc => pc.Product.Id == entity.Id))
-                        _context.Remove(consumerCatalog.RemoveProduct(entity.Id));
+                        entity.RemoveFromCatalog(consumerCatalog.Id);
 
                     var storeCatalog = await _context.Catalogs.SingleOrDefaultAsync(
                         c => c.Producer.Id == entity.Producer.Id && c.Kind == CatalogKind.Stores, token);
 
                     if (request.VisibleToStores.Value)
-                        storeCatalog.AddOrUpdateProduct(entity, request.WholeSalePricePerUnit.Value);
+                        entity.AddOrUpdateCatalogPrice(storeCatalog, request.WholeSalePricePerUnit.Value);
                     else if (storeCatalog.Products.Any(pc => pc.Product.Id == entity.Id))
-                        _context.Remove(storeCatalog.RemoveProduct(entity.Id));
+                        entity.RemoveFromCatalog(storeCatalog.Id);
                 }
 
                 if (!request.VisibleToConsumers.HasValue || !request.VisibleToStores.HasValue)
@@ -139,14 +139,13 @@ namespace Sheaft.Mediatr.Product.Commands
                     var catalogIds = productCatalogs.Select(pc => pc.Id);
                     var catalogToRemoveIds = catalogIds.Except(request.Catalogs.Select(c => c.CatalogId));
                     foreach (var catalog in productCatalogs.Where(pc => catalogToRemoveIds.Contains(pc.Id)))
-                        _context.Remove(catalog.RemoveProduct(entity.Id));
+                        entity.RemoveFromCatalog(catalog.Id);
 
                     foreach (var catalogPrice in request.Catalogs)
                     {
-                        var catalog =
-                            entity.CatalogsPrices.FirstOrDefault(c => c.Catalog.Id == catalogPrice.CatalogId)?.Catalog ??
+                        var catalog = entity.CatalogsPrices.FirstOrDefault(c => c.Catalog.Id == catalogPrice.CatalogId)?.Catalog ??
                             await _context.Catalogs.SingleAsync(e => e.Id == catalogPrice.CatalogId, token);
-                        catalog.AddOrUpdateProduct(entity, request.WholeSalePricePerUnit.Value);
+                        entity.AddOrUpdateCatalogPrice(catalog, request.WholeSalePricePerUnit.Value);
                     }
                 }
 

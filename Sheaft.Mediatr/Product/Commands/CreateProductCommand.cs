@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using AutoMapper;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -19,6 +20,13 @@ using Sheaft.Mediatr.Producer.Commands;
 
 namespace Sheaft.Mediatr.Product.Commands
 {
+    public class CreateProductProfile: Profile
+    {
+        public CreateProductProfile()
+        {
+            CreateMap<ImportedProductDto, CreateProductCommand>();
+        }    
+    }
     public class CreateProductCommand : Command<Guid>
     {
         protected CreateProductCommand()
@@ -125,7 +133,7 @@ namespace Sheaft.Mediatr.Product.Commands
                         var consumerCatalog = await _context.Catalogs.SingleOrDefaultAsync(
                             c => c.Producer.Id == entity.Producer.Id && c.Kind == CatalogKind.Consumers, token);
 
-                        consumerCatalog.AddOrUpdateProduct(entity, request.WholeSalePricePerUnit.Value);
+                        entity.AddOrUpdateCatalogPrice(consumerCatalog, request.WholeSalePricePerUnit.Value);
                     }
 
                     if (request.VisibleToStores.Value)
@@ -133,7 +141,7 @@ namespace Sheaft.Mediatr.Product.Commands
                         var storeCatalog = await _context.Catalogs.SingleOrDefaultAsync(
                             c => c.Producer.Id == entity.Producer.Id && c.Kind == CatalogKind.Stores, token);
 
-                        storeCatalog.AddOrUpdateProduct(entity, request.WholeSalePricePerUnit.Value);
+                        entity.AddOrUpdateCatalogPrice(storeCatalog, request.WholeSalePricePerUnit.Value);
                     }
                 }
 
@@ -142,7 +150,7 @@ namespace Sheaft.Mediatr.Product.Commands
                     foreach (var catalogPrice in request.Catalogs)
                     {
                         var catalog = await _context.Catalogs.SingleAsync(e => e.Id == catalogPrice.CatalogId, token);
-                        catalog.AddOrUpdateProduct(entity, catalogPrice.WholeSalePricePerUnit);
+                        entity.AddOrUpdateCatalogPrice(catalog, catalogPrice.WholeSalePricePerUnit);
                     }
                 }
 

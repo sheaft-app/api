@@ -50,7 +50,11 @@ namespace Sheaft.Mediatr.Product.Commands
         public async Task<Result<Guid>> Handle(QueueImportProductsCommand request, CancellationToken token)
         {
             var producer = await _context.Producers.SingleAsync(e => e.Id == request.ProducerId, token);
-            var entity = new Domain.Job(Guid.NewGuid(), JobKind.ImportProducts, $"Import produits", producer);
+            
+            var command = new ImportProductsCommand(request.RequestUser)
+                {JobId = Guid.NewGuid(), NotifyOnUpdates = request.NotifyOnUpdates};
+            
+            var entity = new Domain.Job(command.JobId, JobKind.ImportProducts, $"Import produits", producer, command);
 
             var response =
                 await _blobService.UploadImportProductsFileAsync(request.ProducerId, entity.Id, request.FileStream, token);
@@ -60,8 +64,7 @@ namespace Sheaft.Mediatr.Product.Commands
             await _context.AddAsync(entity, token);
             await _context.SaveChangesAsync(token);
 
-            _mediatr.Post(new ImportProductsCommand(request.RequestUser)
-                {JobId = entity.Id, NotifyOnUpdates = request.NotifyOnUpdates});
+            _mediatr.Post(command);
             return Success(entity.Id);
         }
     }

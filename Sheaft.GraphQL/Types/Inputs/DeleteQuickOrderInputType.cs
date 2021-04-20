@@ -10,7 +10,7 @@ namespace Sheaft.GraphQL.Types.Inputs
             descriptor.Name("DeleteQuickOrdersInput");
             
             descriptor.Field(c => c.QuickOrderIds)
-                .Name("Ids")
+                .Name("ids")
                 .Type<NonNullType<ListType<IdType>>>();
         }
     }

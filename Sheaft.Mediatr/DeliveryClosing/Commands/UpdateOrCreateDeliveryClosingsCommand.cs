@@ -48,8 +48,9 @@ namespace Sheaft.Mediatr.DeliveryClosing.Commands
             {
                 var entity = await _context.DeliveryModes.SingleAsync(e => e.Id == request.DeliveryId, token);
                 var existingClosingIds = entity.Closings?.Select(c => c.Id)?.ToList() ?? new List<Guid>();
-                
-                var closingIdsToRemove = existingClosingIds.Except(request.Closings?.Where(c => c.Id.HasValue)?.Select(c => c.Id.Value) ?? new List<Guid>()).ToList();
+
+                var requestClosings = request.Closings?.ToList() ?? new List<ClosingInputDto>();
+                var closingIdsToRemove = existingClosingIds.Except(requestClosings.Where(c => c.Id.HasValue)?.Select(c => c.Id.Value) ?? new List<Guid>()).ToList();
                 if (closingIdsToRemove.Any())
                 {
                     entity.RemoveClosings(closingIdsToRemove);
@@ -57,7 +58,7 @@ namespace Sheaft.Mediatr.DeliveryClosing.Commands
                 }
 
                 var ids = new List<Guid>();
-                foreach (var closing in request.Closings)
+                foreach (var closing in requestClosings)
                 {
                     var result =
                         await _mediatr.Process(

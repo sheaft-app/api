@@ -16,11 +16,13 @@ namespace Sheaft.Business.Factories
     public class TransactionsExportersFactory : ITransactionsExportersFactory
     {
         private readonly IAppDbContext _context;
+        private readonly Func<string, ITransactionsFileExporter> _resolver;
         private readonly ExportersOptions _options;
 
-        public TransactionsExportersFactory(IAppDbContext context, IOptions<ExportersOptions> options)
+        public TransactionsExportersFactory(IAppDbContext context, IOptions<ExportersOptions> options, Func<string, ITransactionsFileExporter> resolver)
         {
             _context = context;
+            _resolver = resolver;
             _options = options.Value;
         }
 
@@ -37,16 +39,9 @@ namespace Sheaft.Business.Factories
             return InstanciateExporter(requestUser, setting?.Value ?? _options.TransactionsExporter);
         }
 
-        private static ITransactionsFileExporter InstanciateExporter(RequestUser requestUser, string typename)
+        private ITransactionsFileExporter InstanciateExporter(RequestUser requestUser, string typename)
         {
-            var type = Type.GetType(typename);
-            if (type == null)
-                throw new ArgumentException($"Invalid typename configured for user: {requestUser.Id} transactions exporter.");
-
-            if (!(Activator.CreateInstance(type) is ITransactionsFileExporter exporter))
-                throw new ArgumentException($"Invalid type used {type.FullName} for transactions exporter.");
-
-            return exporter;
+            return _resolver.Invoke(typename);
         }
     }
 }

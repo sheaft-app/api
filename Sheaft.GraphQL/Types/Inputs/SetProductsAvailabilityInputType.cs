@@ -12,7 +12,7 @@ namespace Sheaft.GraphQL.Types.Inputs
             descriptor.Field(c => c.Available);
 
             descriptor.Field(c => c.ProductIds)
-                .Name("Ids")
+                .Name("ids")
                 .Type<NonNullType<ListType<IdType>>>();
         }
     }

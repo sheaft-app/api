@@ -58,12 +58,15 @@ namespace Sheaft.Mediatr.PurchaseOrder.Commands
             if(sender.Id != request.RequestUser.Id)
                 return Failure<Guid>(MessageKind.Forbidden);
 
-            var entity = new Domain.Job(Guid.NewGuid(), JobKind.ExportUserTransactions, $"Export Commandes", sender);
+            var command = new ExportTransactionsCommand(request.RequestUser)
+                {JobId = Guid.NewGuid(), From = request.From, To = request.To};
+            
+            var entity = new Domain.Job(command.JobId, JobKind.ExportUserTransactions, $"Export Commandes", sender, command);
 
             await _context.AddAsync(entity, token);
             await _context.SaveChangesAsync(token);
 
-            _mediatr.Post(new ExportTransactionsCommand(request.RequestUser) {JobId = entity.Id, From = request.From, To = request.To});
+            _mediatr.Post(command);
             
             _logger.LogInformation($"User PurchaseOrders export successfully initiated by {request.UserId}");
 

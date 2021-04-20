@@ -9,7 +9,7 @@ namespace Sheaft.GraphQL.Types.Inputs
         {
             descriptor.Name("WithdrawnPurchaseOrdersInput");
             descriptor.Field(c => c.PurchaseOrderIds)
-                .Name("Ids")
+                .Name("ids")
                 .Type<NonNullType<ListType<IdType>>>();
 
             descriptor.Field(c => c.Reason);

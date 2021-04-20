@@ -58,20 +58,16 @@ namespace Sheaft.Mediatr.Job.Commands
             switch (entity.Kind)
             {
                 case JobKind.ExportPickingOrders:
-                    var exportPickingOrderCommand = JsonConvert.DeserializeObject<ExportPickingOrderCommand>(entity.Command);
-                    _mediatr.Post(new ExportPickingOrderCommand(request.RequestUser) { JobId = exportPickingOrderCommand.JobId, PurchaseOrderIds = exportPickingOrderCommand.PurchaseOrderIds });
+                    _mediatr.Post(entity.GetCommand<ExportPickingOrderCommand>());
                     break;
                 case JobKind.ExportUserData:
-                    var exportUserDataCommand = JsonConvert.DeserializeObject<ExportUserDataCommand>(entity.Command);
-                    _mediatr.Post(new ExportUserDataCommand(request.RequestUser) { JobId = exportUserDataCommand.JobId });
+                    _mediatr.Post(entity.GetCommand<ExportUserDataCommand>());
                     break;
                 case JobKind.ImportProducts:
-                    var importProductsCommand = JsonConvert.DeserializeObject<ImportProductsCommand>(entity.Command);
-                    _mediatr.Post(new ImportProductsCommand(request.RequestUser) { JobId = importProductsCommand.JobId });
+                    _mediatr.Post(entity.GetCommand<ImportProductsCommand>());
                     break;
                 case JobKind.ExportUserTransactions:
-                    var exportTransactionsCommand = JsonConvert.DeserializeObject<ExportTransactionsCommand>(entity.Command);
-                    _mediatr.Post(new ExportTransactionsCommand(request.RequestUser) { JobId = exportTransactionsCommand.JobId, From = exportTransactionsCommand.From, To = exportTransactionsCommand.To});
+                    _mediatr.Post(entity.GetCommand<ExportTransactionsCommand>());
                     break;
             }
             

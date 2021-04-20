@@ -55,6 +55,7 @@ using Sheaft.Mediatr.PayinRefund.Commands;
 using Sheaft.Mediatr.Payout.Commands;
 using Sheaft.Mediatr.PreAuthorization.Commands;
 using Sheaft.Mediatr.Producer.Commands;
+using Sheaft.Mediatr.Product.Commands;
 using Sheaft.Mediatr.PurchaseOrder.Commands;
 using Sheaft.Mediatr.Store.Commands;
 using Sheaft.Mediatr.Transfer.Commands;
@@ -206,7 +207,7 @@ namespace Sheaft.Web.Jobs
                     };
                 });
 
-            services.AddAutoMapper(typeof(ProductProfile).Assembly);
+            services.AddAutoMapper(typeof(ProductProfile).Assembly, typeof(CreateProductProfile).Assembly);
             services.AddMediatR(typeof(RefreshPayinStatusCommand).Assembly);
 
             services.AddMemoryCache();

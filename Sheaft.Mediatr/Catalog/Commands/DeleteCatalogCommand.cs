@@ -41,14 +41,9 @@ namespace Sheaft.Mediatr.Catalog.Commands
 
         public async Task<Result> Handle(DeleteCatalogCommand request, CancellationToken token)
         {
-            var catalogs =
+            var entity =
                 await _context.Catalogs
-                    .Where(c => c.Producer.Id == request.RequestUser.Id)
-                    .ToListAsync(token);
-
-            var entity = catalogs.Single(c => c.Id == request.CatalogId);
-            if (entity.IsDefault)
-                return Failure(MessageKind.Validation);
+                    .SingleOrDefaultAsync(c => c.Id == request.CatalogId, token);
 
             var agreements = await _context.Agreements
                 .Where(a => a.Catalog != null && a.Catalog.Id == entity.Id)
@@ -57,8 +52,12 @@ namespace Sheaft.Mediatr.Catalog.Commands
             if (agreements.Any(a => a.Status == AgreementStatus.Accepted))
                 return Failure(MessageKind.Validation);
 
+            foreach (var catalogProduct in entity.Products.ToList())
+                entity.RemoveProduct(catalogProduct.Product.Id);
+
             _context.Remove(entity);
             await _context.SaveChangesAsync(token);
+            
             return Success();
         }
     }

@@ -15,7 +15,7 @@ namespace Sheaft.Domain
         {
         }
 
-        public Job(Guid id, JobKind kind, string name, User user)
+        public Job(Guid id, JobKind kind, string name, User user, object command)
         {
             if (string.IsNullOrWhiteSpace(name))
                 throw new ValidationException(MessageKind.Job_Name_Required);
@@ -29,6 +29,7 @@ namespace Sheaft.Domain
             Status = ProcessStatus.Waiting;
             Kind = kind;
             DomainEvents = new List<DomainEvent>();
+            SetCommand(command);
         }
 
         public Guid Id { get; private set; }
@@ -148,7 +149,7 @@ namespace Sheaft.Domain
             Message = message;
         }
 
-        public void SetCommand<T>(T command)
+        public void SetCommand<T>(T command) where T:class
         {
             if (command == null)
                 throw new ValidationException(MessageKind.Job_Command_Required);

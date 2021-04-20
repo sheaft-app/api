@@ -742,7 +742,7 @@
     <value>L'unité de conditionnement du produit est invalide à la ligne {0}</value>
   </data>
   <data name="CreateProduct_Reference_AlreadyExists" xml:space="preserve">
-    <value>La référence du produit à la ligne {0} existe déjà dans votre catalogue</value>
+    <value>La référence {0} existe déjà dans votre catalogue</value>
   </data>
   <data name="ImportProduct_Missing_Tab" xml:space="preserve">
     <value>Le fichier d'import est invalide, il manque un onglet </value>

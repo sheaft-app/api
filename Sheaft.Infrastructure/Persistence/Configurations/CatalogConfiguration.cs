@@ -27,7 +27,7 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
             entity.Property(o => o.Name).IsRequired();
             
             entity.HasOne(c => c.Producer).WithMany().HasForeignKey("ProducerUid").OnDelete(DeleteBehavior.Cascade).IsRequired();
-            entity.HasMany(c => c.Products).WithOne(c => c.Catalog).HasForeignKey("CatalogUid").OnDelete(DeleteBehavior.Cascade).IsRequired();
+            entity.HasMany(c => c.Products).WithOne(c => c.Catalog).HasForeignKey("CatalogUid").OnDelete(DeleteBehavior.NoAction).IsRequired();
             
             var products = entity.Metadata.FindNavigation(nameof(Catalog.Products));
             products.SetPropertyAccessMode(PropertyAccessMode.Field);

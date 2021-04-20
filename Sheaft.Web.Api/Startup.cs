@@ -81,6 +81,7 @@ using Sheaft.Mediatr.Payin.Queries;
 using Sheaft.Mediatr.Payout.Queries;
 using Sheaft.Mediatr.PreAuthorization.Queries;
 using Sheaft.Mediatr.Producer.Queries;
+using Sheaft.Mediatr.Product.Commands;
 using Sheaft.Mediatr.Product.Queries;
 using Sheaft.Mediatr.PurchaseOrder.Queries;
 using Sheaft.Mediatr.QuickOrder.Queries;
@@ -276,7 +277,7 @@ namespace Sheaft.Web.Api
                 }
             });
 
-            services.AddAutoMapper(typeof(ProductProfile).Assembly);
+            services.AddAutoMapper(typeof(ProductProfile).Assembly, typeof(CreateProductProfile).Assembly);
             services.AddMediatR(new List<Assembly>() { typeof(RegisterStoreCommand).Assembly }.ToArray());
             services.AddHttpClient();
 

@@ -48,10 +48,6 @@ namespace Sheaft.Mediatr.Product.Commands
             var entity = await _context.Products.SingleAsync(e => e.Id == request.ProductId, token);
             if(entity.Producer.Id != request.RequestUser.Id)
                 return Failure(MessageKind.Forbidden);
-
-            if (entity.CatalogsPrices != null && entity.CatalogsPrices.Any())
-                foreach (var catalogProduct in entity.CatalogsPrices.ToList())
-                    entity.RemoveFromCatalog(catalogProduct.Catalog.Id);
             
             _context.Remove(entity);
             await _context.SaveChangesAsync(token);

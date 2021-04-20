@@ -16,11 +16,13 @@ namespace Sheaft.Business.Factories
     public class ProductsImporterFactory : IProductsImporterFactory
     {
         private readonly IAppDbContext _context;
+        private readonly Func<string, IProductsFileImporter> _resolver;
         private readonly ImportersOptions _options;
 
-        public ProductsImporterFactory(IAppDbContext context, IOptions<ImportersOptions> options)
+        public ProductsImporterFactory(IAppDbContext context, IOptions<ImportersOptions> options, Func<string, IProductsFileImporter> resolver)
         {
             _context = context;
+            _resolver = resolver;
             _options = options.Value;
         }
 
@@ -37,16 +39,9 @@ namespace Sheaft.Business.Factories
             return InstanciateImporter(requestUser, setting?.Value ?? _options.ProductsImporter);
         }
 
-        private static IProductsFileImporter InstanciateImporter(RequestUser requestUser, string typename)
+        private IProductsFileImporter InstanciateImporter(RequestUser requestUser, string typename)
         {
-            var type = Type.GetType(typename);
-            if (type == null)
-                throw new ArgumentException($"Invalid typename configured for user: {requestUser.Id} product importer.");
-
-            if (!(Activator.CreateInstance(type) is IProductsFileImporter importer))
-                throw new ArgumentException($"Invalid type used {type.FullName} for product importer.");
-
-            return importer;
+            return _resolver.Invoke(typename);
         }
     }
 }

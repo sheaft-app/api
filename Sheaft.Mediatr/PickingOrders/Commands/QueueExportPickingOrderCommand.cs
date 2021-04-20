@@ -72,15 +72,17 @@ namespace Sheaft.Mediatr.PickingOrders.Commands
                     return Failure<Guid>(result);
             }
 
-            var entity = new Domain.Job(Guid.NewGuid(), JobKind.ExportPickingOrders,
+            var command = new ExportPickingOrderCommand(request.RequestUser)
+                {JobId = Guid.NewGuid(), PurchaseOrderIds = request.PurchaseOrderIds};
+
+            var entity = new Domain.Job(command.JobId, JobKind.ExportPickingOrders,
                 request.Name ?? $"Export bon préparation",
-                producer);
+                producer, command);
 
             await _context.AddAsync(entity, token);
             await _context.SaveChangesAsync(token);
 
-            _mediatr.Post(new ExportPickingOrderCommand(request.RequestUser)
-                {JobId = entity.Id, PurchaseOrderIds = request.PurchaseOrderIds});
+            _mediatr.Post(command);
 
             return Success(entity.Id);
         }

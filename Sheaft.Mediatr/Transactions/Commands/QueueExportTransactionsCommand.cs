@@ -57,12 +57,14 @@ namespace Sheaft.Mediatr.Transactions.Commands
             if(sender.Id != request.RequestUser.Id)
                 return Failure<Guid>(MessageKind.Forbidden);
 
-            var entity = new Domain.Job(Guid.NewGuid(), JobKind.ExportUserTransactions, $"Export Virements", sender);
+            var command = new ExportTransactionsCommand(request.RequestUser)
+                {JobId = Guid.NewGuid(), From = request.From, To = request.To};
+            var entity = new Domain.Job(command.JobId, JobKind.ExportUserTransactions, $"Export Virements", sender, command);
 
             await _context.AddAsync(entity, token);
             await _context.SaveChangesAsync(token);
 
-            _mediatr.Post(new ExportTransactionsCommand(request.RequestUser) {JobId = entity.Id, From = request.From, To = request.To});
+            _mediatr.Post(command);
             
             _logger.LogInformation($"User Transactions export successfully initiated by {request.UserId}");
 

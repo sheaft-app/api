@@ -5,6 +5,7 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Sheaft.Core;
+using Sheaft.Core.Enums;
 using Sheaft.Core.Exceptions;
 using Sheaft.Domain;
 
@@ -47,7 +48,7 @@ namespace Sheaft.Application.Behaviours
                 _logger.LogError(dbUpdate, $"DbUpdate error on executing {type} : {dbUpdate.Message}");
 
                 if (dbUpdate.InnerException != null &&
-                    dbUpdate.InnerException.Message.Contains("Cannot insert duplicate key row in object"))
+                    dbUpdate.InnerException.Message.Contains("duplicate key row"))
                     throw SheaftException.AlreadyExists(dbUpdate);
 
                 throw SheaftException.BadRequest(dbUpdate);

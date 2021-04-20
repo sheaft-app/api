@@ -1,9 +1,15 @@
-﻿using MediatR;
+﻿using System;
+using MediatR;
 using Sheaft.Core;
 using Sheaft.Domain;
 
 namespace Sheaft.Application.Interfaces.Mediatr
 {
+    public interface IJobCommand : ICommand
+    {
+        public Guid JobId { get; }
+    }
+    
     public interface ICommand : IRequest<Result>, ITrackedUser
     {
         void SetRequestUser(RequestUser user);
