@@ -7,9 +7,7 @@ namespace Sheaft.GraphQL.Types.Inputs
     {
         protected override void Configure(IInputObjectTypeDescriptor<CreateBusinessOrderCommand> descriptor)
         {
-            descriptor.Name("CreatePurchaseOrderInput");
-            descriptor.Field(c => c.UserId)
-                .Name("id");
+            descriptor.Name("CreatePurchaseOrdersInput");
 
             descriptor.Field(c => c.ProducersExpectedDeliveries)
                 .Type<ListType<ProducerExpectedDeliveryInputType>>();

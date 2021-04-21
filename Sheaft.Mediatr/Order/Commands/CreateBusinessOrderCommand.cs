@@ -95,7 +95,7 @@ namespace Sheaft.Mediatr.Order.Commands
                 var cartProducts = new List<Tuple<Domain.Product, Guid, int>>();
                 var deliveryIds = request.ProducersExpectedDeliveries.Select(p => p.DeliveryModeId);
                 var agreements = await _context.Agreements
-                    .Where(a => deliveryIds.Contains(a.Delivery.Id))
+                    .Where(a => deliveryIds.Contains(a.Delivery.Id) && a.Status == AgreementStatus.Accepted)
                     .ToListAsync(token);
                 foreach (var product in products)
                 {
