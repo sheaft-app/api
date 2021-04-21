@@ -10,6 +10,7 @@ using Newtonsoft.Json;
 using Sheaft.Application.Interfaces;
 using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Application.Interfaces.Mediatr;
+using Sheaft.Application.Models;
 using Sheaft.Core;
 using Sheaft.Core.Enums;
 using Sheaft.Domain;
@@ -79,7 +80,7 @@ namespace Sheaft.Mediatr.Consumer.Commands
                 var resultImage = await _mediatr.Process(new UpdateUserPreviewCommand(request.RequestUser)
                 {
                     UserId = consumer.Id,
-                    Picture = request.Picture,
+                    Picture = new PictureSourceDto{Resized = request.Picture},
                     SkipAuthUpdate = true
                 }, token);
 

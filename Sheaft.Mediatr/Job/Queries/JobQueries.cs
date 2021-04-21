@@ -46,14 +46,14 @@ namespace Sheaft.Mediatr.Job.Queries
         public IQueryable<JobDto> GetJob(Guid jobId, RequestUser currentUser)
         {
             return _context.Jobs
-                    .Where(c => c.Id == jobId && c.User.Id == currentUser.Id)
+                    .Where(c => c.Id == jobId && c.User.Id == currentUser.Id && !c.Archived)
                     .ProjectTo<JobDto>(_configurationProvider);
         }
 
         public IQueryable<JobDto> GetJobs(RequestUser currentUser)
         {
             return _context.Jobs
-                    .Where(c => c.User.Id == currentUser.Id)
+                    .Where(c => c.User.Id == currentUser.Id && !c.Archived)
                     .ProjectTo<JobDto>(_configurationProvider);
         }
     }

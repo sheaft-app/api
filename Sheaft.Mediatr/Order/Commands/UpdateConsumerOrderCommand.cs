@@ -36,6 +36,12 @@ namespace Sheaft.Mediatr.Order.Commands
         public DonationKind Donation { get; set; }
         public IEnumerable<ResourceIdQuantityInputDto> Products { get; set; }
         public IEnumerable<ProducerExpectedDeliveryInputDto> ProducersExpectedDeliveries { get; set; }
+
+        public override void SetRequestUser(RequestUser user)
+        {
+            base.SetRequestUser(user);            
+            UserId = user.IsAuthenticated ? user.Id : (Guid?) null;
+        }
     }
 
     public class UpdateConsumerOrderCommandHandler : CommandsHandler,

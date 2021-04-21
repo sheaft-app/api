@@ -9,6 +9,7 @@ using Sheaft.Application.Extensions;
 using Sheaft.Application.Interfaces;
 using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Application.Interfaces.Mediatr;
+using Sheaft.Application.Models;
 using Sheaft.Core;
 using Sheaft.Core.Enums;
 using Sheaft.Core.Exceptions;
@@ -29,8 +30,7 @@ namespace Sheaft.Mediatr.User.Commands
         }
 
         public Guid UserId { get; set; }
-        public string Picture { get; set; }
-        public string OriginalPicture { get; set; }
+        public PictureSourceDto Picture { get; set; }
         public bool SkipAuthUpdate { get; set; }
     }
 
@@ -56,7 +56,7 @@ namespace Sheaft.Mediatr.User.Commands
                 return Failure<string>(MessageKind.Forbidden);
 
             var resultImage =
-                await _imageService.HandleUserPictureAsync(entity, request.Picture, request.OriginalPicture, token);
+                await _imageService.HandleUserPictureAsync(entity, request.Picture.Resized, request.Picture.Original, token);
             if (!resultImage.Succeeded)
                 return Failure<string>(resultImage);
 
