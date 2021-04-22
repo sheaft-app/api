@@ -115,8 +115,8 @@ namespace Sheaft.GraphQL.Types
                 .UseSelection();
 
             descriptor.Field(c => c.AcceptAgreementAsync(default, default))
-                .Argument("input", c => c.Type<NonNullType<AcceptAgreementInputType>>())
-                .Name("acceptAgreement")
+                .Argument("input", c => c.Type<NonNullType<ListType<AcceptAgreementsInputType>>>())
+                .Name("acceptAgreements")
                 .Authorize(Policies.STORE_OR_PRODUCER)
                 .Type<NonNullType<AgreementType>>()
                 .UseSingleOrDefault()

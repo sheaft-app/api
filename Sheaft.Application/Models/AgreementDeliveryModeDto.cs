@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using Sheaft.Domain.Enum;
 
 namespace Sheaft.Application.Models
@@ -9,7 +11,6 @@ namespace Sheaft.Application.Models
         public DeliveryKind Kind { get; set; }
         public DateTimeOffset CreatedOn { get; set; }
         public DateTimeOffset? UpdatedOn { get; set; }
-        public DateTimeOffset? RemovedOn { get; set; }
         public int LockOrderHoursBeforeDelivery { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }

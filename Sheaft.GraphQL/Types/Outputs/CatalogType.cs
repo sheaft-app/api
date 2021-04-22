@@ -13,7 +13,7 @@ namespace Sheaft.GraphQL.Types.Outputs
             descriptor.Field(c => c.CreatedOn);
             descriptor.Field(c => c.UpdatedOn);
             descriptor.Field(c => c.ProductsCount);
-            descriptor.Field(c => c.IsAvailable);
+            descriptor.Field(c => c.Available);
             descriptor.Field(c => c.IsDefault);
 
             descriptor.Field(c => c.Products)

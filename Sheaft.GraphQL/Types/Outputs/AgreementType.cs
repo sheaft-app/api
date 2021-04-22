@@ -21,11 +21,10 @@ namespace Sheaft.GraphQL.Types.Outputs
                 .Type<NonNullType<AgreementDeliveryModeType>>();
 
             descriptor.Field(c => c.SelectedHours)
-                .Type<ListType<TimeSlotType>>()
-                .UseFiltering<TimeSlotFilterType>();
+                .Type<ListType<TimeSlotType>>();
             
             descriptor.Field(c => c.Catalog)
-                .Type<CatalogType>();
+                .Type<AgreementCatalogType>();
         }
     }
 }
