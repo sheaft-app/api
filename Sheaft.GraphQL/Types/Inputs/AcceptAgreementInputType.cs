@@ -13,8 +13,8 @@ namespace Sheaft.GraphQL.Types.Inputs
                 .Name("id")
                 .Type<NonNullType<IdType>>();
 
-            descriptor.Field(c => c.SelectedHours)
-                .Type<ListType<TimeSlotGroupInputType>>();
+            descriptor.Field(c => c.DeliveryId)
+                .Type<IdType>();
 
             descriptor.Field(c => c.CatalogId)
                 .Type<IdType>();

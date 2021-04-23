@@ -1,5 +1,6 @@
 ﻿using HotChocolate.Types;
 using Sheaft.Application.Models;
+using Sheaft.GraphQL.Enums;
 using Sheaft.GraphQL.Filters;
 
 namespace Sheaft.GraphQL.Types.Outputs
@@ -16,12 +17,15 @@ namespace Sheaft.GraphQL.Types.Outputs
 
             descriptor.Field(c => c.Store)
                 .Type<NonNullType<UserType>>();
+            
+            descriptor.Field(c => c.Producer)
+                .Type<NonNullType<UserType>>();
+            
+            descriptor.Field(c => c.CreatedByKind)
+                .Type<NonNullType<ProfileKindEnumType>>();
 
             descriptor.Field(c => c.Delivery)
-                .Type<NonNullType<AgreementDeliveryModeType>>();
-
-            descriptor.Field(c => c.SelectedHours)
-                .Type<ListType<TimeSlotType>>();
+                .Type<AgreementDeliveryModeType>();
             
             descriptor.Field(c => c.Catalog)
                 .Type<AgreementCatalogType>();

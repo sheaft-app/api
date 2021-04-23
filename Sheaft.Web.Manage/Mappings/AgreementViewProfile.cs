@@ -8,11 +8,8 @@ namespace Sheaft.Web.Manage.Mappings
     {
         public AgreementViewProfile()
         {
-            CreateMap<Domain.Agreement, AgreementViewModel>()
-                   .ForMember(c => c.Store, opt => opt.MapFrom(o => o.Store))
-                   .ForMember(c => c.Delivery, opt => opt.MapFrom(o => o.Delivery))
-                   .ForMember(c => c.SelectedHours, opt => opt.MapFrom(o => o.SelectedHours));
-
+            CreateMap<Domain.Agreement, AgreementViewModel>();
+            
             CreateMap<AgreementViewModel, AgreementDto>();
             CreateMap<AgreementDto, AgreementViewModel>();
         }

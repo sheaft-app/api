@@ -12,64 +12,68 @@ namespace Sheaft.Domain
 {
     public class Agreement : IEntity, IHasDomainEvent
     {
-        private List<TimeSlotHour> _selectedHours;
-
         protected Agreement()
         {
         }
 
-        public Agreement(Guid id, Store store, DeliveryMode delivery, User createdBy, IEnumerable<TimeSlotHour> deliveryHours)
+        public Agreement(Guid id, Store store, Producer producer, ProfileKind createdByKind, DeliveryMode delivery = null)
         {
             Id = id;
-            Delivery = delivery;
             Store = store;
-            CreatedBy = createdBy;
+            CreatedByKind = createdByKind;
+            Delivery = delivery;
+            Producer = producer;
             
-            if(CreatedBy.Id == store.Id)
+            if(CreatedByKind == ProfileKind.Store)
                 Status = AgreementStatus.WaitingForProducerApproval;
             else
+            {
                 Status = AgreementStatus.WaitingForStoreApproval;
+                if (delivery == null)
+                    throw SheaftException.Validation();
+            }
 
-            SetSelectedHours(deliveryHours);
-            DomainEvents = new List<DomainEvent> {new AgreementCreatedEvent(Id)};
+            DomainEvents = new List<DomainEvent> {new AgreementCreatedEvent(Id, createdByKind)};
         }
 
         public Guid Id { get; private set; }
         public AgreementStatus Status { get; set; }
+        public ProfileKind CreatedByKind { get; private set; }
         public DateTimeOffset CreatedOn { get; private set; }
         public DateTimeOffset? UpdatedOn { get; private set; }
         public DateTimeOffset? RemovedOn { get; private set; }
         public string Reason { get; private set; }
         public virtual DeliveryMode Delivery { get; private set; }
         public virtual Store Store { get; private set; }
-        public virtual User CreatedBy { get; private set; }
+        public virtual Producer Producer { get; private set; }
         public virtual Catalog Catalog { get; private set; }
-        public virtual IReadOnlyCollection<TimeSlotHour> SelectedHours => _selectedHours?.AsReadOnly();
         public List<DomainEvent> DomainEvents { get; } = new List<DomainEvent>();
 
-        public void SetSelectedHours(IEnumerable<TimeSlotHour> selectedHours)
-        {
-            _selectedHours = new List<TimeSlotHour>();
-            foreach (var selectedHour in selectedHours)
-            {
-                var openingHours = Delivery.OpeningHours.FirstOrDefault(o => o.Day == selectedHour.Day && o.From == selectedHour.From && o.To == selectedHour.To);
-                if (openingHours == null)
-                    throw new ValidationException(MessageKind.Agreement_SelectedHour_NotFoundInDeliveryOpeningHours);
-
-                _selectedHours.Add(new TimeSlotHour(openingHours.Day, openingHours.From, openingHours.To));
-            }
-        }
-
-        public void AcceptAgreement()
+        public void AcceptAgreement(DeliveryMode delivery, ProfileKind acceptedByKind)
         {
             if (Status != AgreementStatus.WaitingForProducerApproval && Status != AgreementStatus.WaitingForStoreApproval)
-                throw new ValidationException(MessageKind.Agreement_CannotBeAccepted_NotInWaitingStatus);
+                throw SheaftException.Validation(MessageKind.Agreement_CannotBeAccepted_NotInWaitingStatus);
+
+            if(Status == AgreementStatus.WaitingForProducerApproval && acceptedByKind != ProfileKind.Producer)
+                throw SheaftException.Validation();
+            
+            if(Status == AgreementStatus.WaitingForStoreApproval && acceptedByKind != ProfileKind.Store)
+                throw SheaftException.Validation();
+            
+            if(Delivery != null && delivery != null && Delivery.Id != delivery.Id)
+                throw SheaftException.Validation();
+
+            if(delivery != null)
+                Delivery = delivery;
+            
+            if(Delivery?.Id == null)
+                throw SheaftException.Validation();
 
             Status = AgreementStatus.Accepted;
-            DomainEvents.Add(new AgreementAcceptedEvent(Id));
+            DomainEvents.Add(new AgreementAcceptedEvent(Id, acceptedByKind));
         }
 
-        public void CancelAgreement(string reason)
+        public void CancelAgreement(string reason, ProfileKind cancelledByKind)
         {
             if (Status == AgreementStatus.Cancelled)
                 throw new ValidationException(MessageKind.Agreement_CannotBeCancelled_AlreadyCancelled);
@@ -79,22 +83,28 @@ namespace Sheaft.Domain
 
             Status = AgreementStatus.Cancelled;
             Reason = reason;
-            DomainEvents.Add(new AgreementCancelledEvent(Id));
+            DomainEvents.Add(new AgreementCancelledEvent(Id, cancelledByKind));
         }
 
-        public void RefuseAgreement(string reason)
+        public void RefuseAgreement(string reason, ProfileKind refusedByKind)
         {
             if (Status != AgreementStatus.WaitingForProducerApproval && Status != AgreementStatus.WaitingForStoreApproval)
                 throw new ValidationException(MessageKind.Agreement_CannotBeRefused_NotInWaitingStatus);
 
+            if(Status == AgreementStatus.WaitingForProducerApproval && refusedByKind != ProfileKind.Producer)
+                throw SheaftException.Validation();
+            
+            if(Status == AgreementStatus.WaitingForStoreApproval && refusedByKind != ProfileKind.Store)
+                throw SheaftException.Validation();
+            
             Status = AgreementStatus.Refused;
             Reason = reason;
-            DomainEvents.Add(new AgreementRefusedEvent(Id));
+            DomainEvents.Add(new AgreementRefusedEvent(Id, refusedByKind));
         }
 
         public void Reset()
         {
-            if (CreatedBy.Kind == ProfileKind.Producer)
+            if (CreatedByKind == ProfileKind.Producer)
                 Status = AgreementStatus.WaitingForStoreApproval;
             else
                 Status = AgreementStatus.WaitingForProducerApproval;

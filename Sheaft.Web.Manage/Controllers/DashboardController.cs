@@ -46,7 +46,7 @@ namespace Sheaft.Web.Manage.Controllers
                     .CountAsync(c => !c.RemovedOn.HasValue && c.Id == requestUser.Id, token);
                 ViewBag.Agreements = await _context.Agreements.CountAsync(
                     c => !c.RemovedOn.HasValue &&
-                         (c.Delivery.Producer.Id == requestUser.Id || c.Store.Id == requestUser.Id), token);
+                         (c.Producer.Id == requestUser.Id || c.Store.Id == requestUser.Id), token);
                 ViewBag.DeliveryModes =
                     await _context.DeliveryModes.CountAsync(
                         c => !c.RemovedOn.HasValue && c.Producer.Id == requestUser.Id, token);

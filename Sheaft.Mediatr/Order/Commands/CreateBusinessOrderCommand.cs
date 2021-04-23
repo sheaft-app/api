@@ -101,7 +101,7 @@ namespace Sheaft.Mediatr.Order.Commands
                 Result<IEnumerable<Guid>> catalogResult = null;
                 foreach (var product in products)
                 {
-                    var agreement = agreements.SingleOrDefault(a => a.Delivery.Producer.Id == product.Producer.Id);
+                    var agreement = agreements.SingleOrDefault(a => a.Producer.Id == product.Producer.Id);
                     if (agreement?.Catalog == null)
                     {
                         catalogResult = Failure<IEnumerable<Guid>>(MessageKind.NotFound);

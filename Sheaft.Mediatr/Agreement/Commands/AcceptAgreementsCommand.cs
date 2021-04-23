@@ -28,7 +28,7 @@ namespace Sheaft.Mediatr.Agreement.Commands
 
         public IEnumerable<Guid> AgreementIds { get; set; }
         public Guid? CatalogId { get; set; }
-        public IEnumerable<TimeSlotGroupDto> SelectedHours { get; set; }
+        public Guid? DeliveryId { get; set; }
     }
 
     public class AcceptAgreementsCommandsHandler : CommandsHandler,
@@ -57,7 +57,7 @@ namespace Sheaft.Mediatr.Agreement.Commands
                         {
                             AgreementId = agreementId, 
                             CatalogId = request.CatalogId,
-                            SelectedHours = request.SelectedHours
+                            DeliveryId = request.DeliveryId
                         }, token);
                     
                     if (!result.Succeeded)

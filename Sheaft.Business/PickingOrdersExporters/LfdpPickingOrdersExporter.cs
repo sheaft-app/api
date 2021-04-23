@@ -52,7 +52,7 @@ namespace Sheaft.Business.PickingOrdersExporters
                     var clients = await _context.Agreements
                         .Where(u =>
                             !u.RemovedOn.HasValue
-                            && u.Delivery.Producer.Id == user.Id
+                            && u.Producer.Id == user.Id
                             && u.Delivery.Kind == DeliveryKind.ProducerToStore
                             && u.Delivery.OpeningHours.Any(oh => oh.Day == storeDeliveryDay.Key))
                         .Select(c => new KeyValuePair<Guid,string>(c.Store.Id, c.Store.Name))

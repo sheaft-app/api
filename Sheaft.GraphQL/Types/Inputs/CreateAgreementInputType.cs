@@ -9,13 +9,14 @@ namespace Sheaft.GraphQL.Types.Inputs
         protected override void Configure(IInputObjectTypeDescriptor<CreateAgreementCommand> descriptor)
         {
             descriptor.Name("CreateAgreementInput");
-            descriptor.Field(c => c.DeliveryModeId)
-                .Type<NonNullType<IdType>>();
 
-            descriptor.Field(c => c.SelectedHours)
-                .Type<ListType<TimeSlotGroupInputType>>();
+            descriptor.Field(c => c.DeliveryId)
+                .Type<IdType>();
 
             descriptor.Field(c => c.StoreId)
+                .Type<NonNullType<IdType>>();
+            
+            descriptor.Field(c => c.ProducerId)
                 .Type<NonNullType<IdType>>();
 
             descriptor.Field(c => c.CatalogId)

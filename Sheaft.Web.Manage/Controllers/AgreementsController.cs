@@ -50,7 +50,7 @@ namespace Sheaft.Web.Manage.Controllers
                 if (requestUser.IsInRole(_roleOptions.Store.Value))
                     query = query.Where(p => p.Store.Id == requestUser.Id);
                 else
-                    query = query.Where(p => p.Delivery.Producer.Id == requestUser.Id);
+                    query = query.Where(p => p.Producer.Id == requestUser.Id);
             }
 
             if (status != null)

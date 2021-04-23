@@ -33,7 +33,7 @@ namespace Sheaft.Mediatr.Agreement.Commands
 
         public Guid AgreementId { get; set; }
         public Guid? CatalogId { get; set; }
-        public IEnumerable<TimeSlotGroupDto> SelectedHours { get; set; }
+        public Guid? DeliveryId { get; set; }
     }
 
     public class AcceptAgreementCommandsHandler : CommandsHandler,
@@ -54,22 +54,24 @@ namespace Sheaft.Mediatr.Agreement.Commands
         public async Task<Result> Handle(AcceptAgreementCommand request, CancellationToken token)
         {
             var entity = await _context.Agreements.SingleAsync(e => e.Id == request.AgreementId, token);
-            if(request.RequestUser.IsInRole(_roleOptions.Producer.Value) && entity.Delivery.Producer.Id != request.RequestUser.Id)
+            if(request.RequestUser.IsInRole(_roleOptions.Producer.Value) && entity.Producer.Id != request.RequestUser.Id)
                 return Failure(MessageKind.Forbidden);
             
             if(request.RequestUser.IsInRole(_roleOptions.Store.Value) && entity.Store.Id != request.RequestUser.Id)
                 return Failure(MessageKind.Forbidden);
 
-            entity.AcceptAgreement();
+            var alreadyAcceptedAgreement =
+                await _context.Agreements.SingleOrDefaultAsync(
+                    a => a.Id != request.AgreementId && a.Status == AgreementStatus.Accepted, token);
+            if (alreadyAcceptedAgreement != null)
+                return Failure(MessageKind.AlreadyExists);
 
-            var selectedHours = new List<TimeSlotHour>();
-            if (request.SelectedHours != null && request.SelectedHours.Any())
-            {
-                foreach (var sh in request.SelectedHours)
-                    selectedHours.AddRange(sh.Days.Select(d => new TimeSlotHour(d, sh.From, sh.To)));
+            Domain.DeliveryMode delivery = null;
+            if (request.DeliveryId.HasValue)
+                delivery = await _context.DeliveryModes.SingleAsync(e => e.Id == request.DeliveryId, token);
 
-                entity.SetSelectedHours(selectedHours);
-            }
+            var currentUser = await _context.Users.SingleAsync(c => c.Id == request.RequestUser.Id, token);
+            entity.AcceptAgreement(delivery, currentUser.Kind);
             
             if (request.CatalogId.HasValue && entity.Catalog?.Id != request.CatalogId.Value)
             {
@@ -78,7 +80,7 @@ namespace Sheaft.Mediatr.Agreement.Commands
             }
             else if (!request.CatalogId.HasValue && entity.Catalog?.Id == null)
             {
-                var catalog = await _context.Catalogs.SingleOrDefaultAsync(c => c.IsDefault && c.Kind == CatalogKind.Stores && c.Producer.Id == entity.Delivery.Producer.Id, token);
+                var catalog = await _context.Catalogs.SingleOrDefaultAsync(c => c.IsDefault && c.Kind == CatalogKind.Stores && c.Producer.Id == entity.Producer.Id, token);
                 entity.AssignCatalog(catalog);
             }
 

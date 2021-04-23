@@ -50,14 +50,37 @@ namespace Sheaft.Mediatr.DeliveryMode.Queries
             IEnumerable<DeliveryKind> kinds, DateTimeOffset currentDate, RequestUser currentUser,
             CancellationToken token)
         {
-            var producers = new List<ProducerDeliveriesDto>();
-            var deliveriesMode = await _context.DeliveryModes
+            var deliveriesModes = await _context.DeliveryModes
                 .Where(d =>
                     d.Available
                     && producerIds.Contains(d.Producer.Id)
                     && kinds.Contains(d.Kind))
                 .ToListAsync(token);
 
+            return await GetProducersDeliveriesAsync(producerIds, currentDate, deliveriesModes, token);
+        }
+
+        public async Task<IEnumerable<ProducerDeliveriesDto>> GetStoreDeliveriesForProducersAsync(Guid storeId,
+            IEnumerable<Guid> producerIds, IEnumerable<DeliveryKind> kinds, DateTimeOffset currentDate,
+            RequestUser currentUser, CancellationToken token)
+        {
+            var deliveriesModes = await _context.Agreements
+                .Where(d =>
+                    d.Delivery.Available
+                    && producerIds.Contains(d.Producer.Id)
+                    && d.Store.Id == storeId
+                    && d.Status == AgreementStatus.Accepted
+                    && kinds.Contains(d.Delivery.Kind))
+                .Select(d => d.Delivery)
+                .ToListAsync(token);
+
+            return await GetProducersDeliveriesAsync(producerIds, currentDate, deliveriesModes, token);
+        }
+
+        private async Task<IEnumerable<ProducerDeliveriesDto>> GetProducersDeliveriesAsync(IEnumerable<Guid> producerIds, DateTimeOffset currentDate,
+            IEnumerable<Domain.DeliveryMode> deliveriesMode, CancellationToken token)
+        {
+            var producers = new List<ProducerDeliveriesDto>();
             var deliveriesProducerIds = deliveriesMode.Select(c => c.Producer.Id).Distinct();
             var producerDistinctIds = producerIds.Distinct();
             if (deliveriesProducerIds.Count() != producerDistinctIds.Count())
@@ -88,55 +111,6 @@ namespace Sheaft.Mediatr.DeliveryMode.Queries
             }
 
             if (deliveriesMode.All(dm => !dm.MaxPurchaseOrdersPerTimeSlot.HasValue))
-                return producers;
-
-            return await GetNotCapedProducersDeliveriesAsync(producers, token);
-        }
-
-        public async Task<IEnumerable<ProducerDeliveriesDto>> GetStoreDeliveriesForProducersAsync(Guid storeId,
-            IEnumerable<Guid> producerIds, IEnumerable<DeliveryKind> kinds, DateTimeOffset currentDate,
-            RequestUser currentUser, CancellationToken token)
-        {
-            var producers = new List<ProducerDeliveriesDto>();
-            var agreements = await _context.Agreements
-                .Where(d =>
-                    d.Delivery.Available
-                    && producerIds.Contains(d.Delivery.Producer.Id)
-                    && d.Store.Id == storeId
-                    && d.Status == AgreementStatus.Accepted
-                    && kinds.Contains(d.Delivery.Kind))
-                .ToListAsync(token);
-
-            var agreementProducerIds = agreements.Select(c => c.Delivery.Producer.Id).Distinct();
-            var producerDistinctIds = producerIds.Distinct();
-            if (agreementProducerIds.Count() != producerDistinctIds.Count())
-            {
-                var notFoundProducerIds = agreementProducerIds.Except(producerDistinctIds);
-                var notFoundProducers = await _context.Producers
-                        .Where(c => notFoundProducerIds.Contains(c.Id))
-                        .ToListAsync(token);
-
-                producers.AddRange(notFoundProducers.Select(c => new ProducerDeliveriesDto
-                    {Id = c.Id, Name = c.Name, Deliveries = null}));
-            }
-
-            foreach (var agreementGroups in agreements.GroupBy(c => c.Delivery.Producer.Id))
-            {
-                var deliveries = new List<DeliveryDto>();
-                var producer = new ProducerDeliveriesDto
-                {
-                    Id = agreementGroups.Key,
-                    Name = agreementGroups.First().Delivery.Producer.Name
-                };
-
-                foreach (var agreement in agreementGroups)
-                    deliveries.Add(GetDeliveriesForHours(currentDate, agreement.Delivery, agreement.SelectedHours));
-
-                producer.Deliveries = deliveries;
-                producers.Add(producer);
-            }
-
-            if (agreements.Select(a => a.Delivery).All(dm => !dm.MaxPurchaseOrdersPerTimeSlot.HasValue))
                 return producers;
 
             return await GetNotCapedProducersDeliveriesAsync(producers, token);

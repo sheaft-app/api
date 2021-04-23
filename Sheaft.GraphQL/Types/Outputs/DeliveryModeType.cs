@@ -27,8 +27,7 @@ namespace Sheaft.GraphQL.Types.Outputs
                 .Type<NonNullType<UserType>>();
 
             descriptor.Field(c => c.OpeningHours)
-                .Type<ListType<TimeSlotType>>()
-                .UseFiltering<TimeSlotFilterType>();
+                .Type<ListType<TimeSlotType>>();
             
             descriptor.Field(c => c.Closings)
                 .Type<ListType<ClosingType>>();

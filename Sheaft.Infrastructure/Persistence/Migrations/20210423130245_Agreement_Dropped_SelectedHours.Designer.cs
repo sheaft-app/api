@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Sheaft.Domain.Enum;
 using Sheaft.Infrastructure.Persistence;
@@ -10,9 +11,10 @@ using Sheaft.Infrastructure.Persistence;
 namespace Sheaft.Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20210423130245_Agreement_Dropped_SelectedHours")]
+    partial class Agreement_Dropped_SelectedHours
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -461,9 +463,6 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                     b.Property<long>("OrderUid")
                         .HasColumnType("bigint");
 
-                    b.Property<bool>("Processed")
-                        .HasColumnType("bit");
-
                     b.Property<string>("Reference")
                         .HasColumnType("nvarchar(max)");
 
@@ -769,9 +768,6 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                     b.Property<int>("LinesCount")
                         .HasColumnType("int");
 
-                    b.Property<bool>("Processed")
-                        .HasColumnType("bit");
-
                     b.Property<int>("ProductsCount")
                         .HasColumnType("int");
 
@@ -993,9 +989,6 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                     b.Property<long>("OrderUid")
                         .HasColumnType("bigint");
 
-                    b.Property<bool>("Processed")
-                        .HasColumnType("bit");
-
                     b.Property<string>("Reference")
                         .HasColumnType("nvarchar(max)");
 
@@ -1127,9 +1120,6 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                     b.Property<int>("Kind")
                         .HasColumnType("int");
 
-                    b.Property<bool>("Processed")
-                        .HasColumnType("bit");
-
                     b.Property<string>("Reference")
                         .HasColumnType("nvarchar(max)");
 
@@ -1200,9 +1190,6 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
 
                     b.Property<long?>("PreAuthorizedPayinUid")
                         .HasColumnType("bigint");
-
-                    b.Property<bool>("Processed")
-                        .HasColumnType("bit");
 
                     b.Property<string>("Reference")
                         .HasColumnType("nvarchar(max)");
@@ -1859,9 +1846,6 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                     b.Property<int>("Kind")
                         .HasColumnType("int");
 
-                    b.Property<bool>("Processed")
-                        .HasColumnType("bit");
-
                     b.Property<string>("Reference")
                         .HasColumnType("nvarchar(max)");
 
@@ -2246,9 +2230,6 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                     b.Property<long?>("PayoutUid")
                         .HasColumnType("bigint");
 
-                    b.Property<bool>("Processed")
-                        .HasColumnType("bit");
-
                     b.Property<long>("PurchaseOrderUid")
                         .HasColumnType("bigint");
 
@@ -2498,9 +2479,6 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
 
                     b.Property<long?>("PayoutUid")
                         .HasColumnType("bigint");
-
-                    b.Property<bool>("Processed")
-                        .HasColumnType("bit");
 
                     b.Property<string>("Reference")
                         .HasColumnType("nvarchar(max)");
