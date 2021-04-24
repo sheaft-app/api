@@ -19,7 +19,8 @@ namespace Sheaft.Domain
         {
         }
 
-        public PurchaseOrder(Guid id, string reference, PurchaseOrderStatus status, Producer producer, Order order)
+        public PurchaseOrder(Guid id, string reference, PurchaseOrderStatus status, Producer producer, Order order,
+            bool skipNotification)
         {
             if (producer == null)
                 throw SheaftException.Validation(MessageKind.PurchaseOrder_Vendor_Required);
@@ -27,8 +28,8 @@ namespace Sheaft.Domain
             Id = id;
 
             _products = new List<PurchaseOrderProduct>();
-            DomainEvents = new List<DomainEvent> {new PurchaseOrderCreatedEvent(Id)};
-
+            DomainEvents = new List<DomainEvent>();
+            
             SetSender(order.User);
             SetVendor(producer);
 
@@ -37,7 +38,7 @@ namespace Sheaft.Domain
             SetComment(delivery.Comment);
 
             SetReference(reference);
-            SetStatus(status, false);
+            SetStatus(status, skipNotification);
 
             var orderProducts = order.Products.Where(p => p.Producer.Id == producer.Id);
             foreach (var orderProduct in orderProducts)
@@ -88,6 +89,10 @@ namespace Sheaft.Domain
         {
             switch (newStatus)
             {
+                case PurchaseOrderStatus.Waiting:
+                    if(!skipNotification) 
+                        DomainEvents.Add(new PurchaseOrderCreatedEvent(Id));
+                    break;
                 case PurchaseOrderStatus.Accepted:
                     if (Status != PurchaseOrderStatus.Waiting)
                         throw SheaftException.Validation(MessageKind.PurchaseOrder_CannotAccept_NotIn_WaitingStatus);

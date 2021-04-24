@@ -77,12 +77,12 @@ namespace Sheaft.Domain
             User = user;
         }
 
-        public PurchaseOrder AddPurchaseOrder(string reference, Producer producer)
+        public PurchaseOrder AddPurchaseOrder(string reference, Producer producer, bool requestSkipNotification)
         {
             if (PurchaseOrders == null)
                 _purchaseOrders = new List<PurchaseOrder>();
 
-            var purchaseOrder = new PurchaseOrder(Guid.NewGuid(), reference, PurchaseOrderStatus.Waiting, producer, this);
+            var purchaseOrder = new PurchaseOrder(Guid.NewGuid(), reference, PurchaseOrderStatus.Waiting, producer, this, requestSkipNotification);
             _purchaseOrders.Add(purchaseOrder);
 
             return purchaseOrder;

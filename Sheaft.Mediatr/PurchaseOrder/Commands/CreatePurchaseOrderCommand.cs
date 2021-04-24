@@ -60,7 +60,7 @@ namespace Sheaft.Mediatr.PurchaseOrder.Commands
             if (!resultIdentifier.Succeeded)
                 return Failure<Guid>(resultIdentifier);
 
-            var purchaseOrder = order.AddPurchaseOrder(resultIdentifier.Data, producer);
+            var purchaseOrder = order.AddPurchaseOrder(resultIdentifier.Data, producer, request.SkipNotification);
             await _context.SaveChangesAsync(token);
 
             if (delivery.DeliveryMode.MaxPurchaseOrdersPerTimeSlot.HasValue)
