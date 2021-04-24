@@ -73,6 +73,9 @@ namespace Sheaft.GraphQL.Types.Outputs
 
             descriptor.Field(c => c.CatalogsPrices)
                 .Type<ListType<CatalogPriceType>>();
+
+            descriptor.Field(c => c.Pictures)
+                .Type<ListType<PictureType>>();
         }
     }
 }
