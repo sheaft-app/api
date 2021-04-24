@@ -18,7 +18,8 @@ namespace Sheaft.Domain
 
             var oh = GetOpeningHour(mode, expectedDeliveryDate);
             From = oh.From;
-            To = oh.To;        }
+            To = oh.To;        
+        }
 
         public DateTimeOffset ExpectedDeliveryDate { get; private set; }
         public TimeSpan From { get; private set; }
@@ -26,9 +27,6 @@ namespace Sheaft.Domain
 
         public void SetExpectedDate(DateTimeOffset date)
         {
-            if (date < DateTimeOffset.UtcNow)
-                throw new ValidationException(MessageKind.ExpectedDelivery_ExpectedDate_CannotBe_BeforeNow, date.ToString("dd/MM/yyyy"));
-
             ExpectedDeliveryDate = date;
         }
 
