@@ -13,6 +13,7 @@ using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Application.Interfaces.Mediatr;
 using Sheaft.Application.Models;
 using Sheaft.Core;
+using Sheaft.Core.Enums;
 using Sheaft.Core.Exceptions;
 using Sheaft.Domain;
 using Sheaft.Domain.Enum;
@@ -57,7 +58,6 @@ namespace Sheaft.Mediatr.QuickOrder.Commands
         public async Task<Result<Guid>> Handle(CreateQuickOrderCommand request, CancellationToken token)
         {
             var store = await _context.Users.SingleAsync(e => e.Id == request.UserId, token);
-
             var productIds = request.Products.Select(p => p.Id).ToList();
             var agreements = await _context.Set<Domain.Agreement>()
                 .Where(a => a.Store.Id == store.Id && a.Catalog.Products.Any(p => productIds.Contains(p.Product.Id)))
@@ -67,6 +67,7 @@ namespace Sheaft.Mediatr.QuickOrder.Commands
                 .ToListAsync(token);
 
             var catalogProducts = new Dictionary<CatalogProduct, int>();
+            Result<Guid> result = null;
             foreach (var productId in productIds)
             {
                 var quantity = request.Products.Where(p => p.Id == productId).Sum(p => p.Quantity);
@@ -76,12 +77,16 @@ namespace Sheaft.Mediatr.QuickOrder.Commands
                         .SelectMany(c => c.Products)
                         .FirstOrDefault(cp => cp.Product.Id == productId);
 
-                if (catalogProduct == null)
-                    throw SheaftException.NotFound();
-
-                catalogProducts.Add(catalogProduct, quantity);
+                if (catalogProduct != null)
+                    catalogProducts.Add(catalogProduct, quantity);
+                
+                result = Failure<Guid>(MessageKind.NotFound);
+                break;
             }
 
+            if (result is {Succeeded: false})
+                return result;
+            
             var quickOrder = new Domain.QuickOrder(Guid.NewGuid(), request.Name, catalogProducts, store);
 
             await _context.AddAsync(quickOrder, token);

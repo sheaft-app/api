@@ -40,14 +40,24 @@ namespace Sheaft.Mediatr.QuickOrder.Commands
 
         public async Task<Result> Handle(DeleteQuickOrdersCommand request, CancellationToken token)
         {
-            foreach (var id in request.QuickOrderIds)
+            using (var transaction = await _context.BeginTransactionAsync(token))
             {
-                var result = await _mediatr.Process(new DeleteQuickOrderCommand(request.RequestUser) {QuickOrderId = id}, token);
-                if (!result.Succeeded)
-                    return Failure(result);
-            }
+                Result result = null;
+                foreach (var id in request.QuickOrderIds)
+                {
+                    result =
+                        await _mediatr.Process(new DeleteQuickOrderCommand(request.RequestUser) {QuickOrderId = id},
+                            token);
+                    if (!result.Succeeded)
+                        break;
+                }
 
-            return Success();
+                if (result is {Succeeded: false})
+                    return result;
+
+                await transaction.CommitAsync(token);
+                return Success();
+            }
         }
     }
 }

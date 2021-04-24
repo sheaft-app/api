@@ -40,15 +40,19 @@ namespace Sheaft.Mediatr.Catalog.Commands
         {
             using (var transaction = await _context.BeginTransactionAsync(token))
             {
+                Result result = null;
                 foreach (var id in request.CatalogIds)
                 {
-                    var result = await _mediatr.Process(
+                    result = await _mediatr.Process(
                         new SetCatalogAvailabilityCommand(request.RequestUser)
                             {CatalogId = id, IsAvailable = request.Available}, token);
 
                     if (!result.Succeeded)
-                        throw result.Exception;
+                        break;
                 }
+
+                if (result is {Succeeded: false})
+                    return result;
 
                 await transaction.CommitAsync(token);
             }

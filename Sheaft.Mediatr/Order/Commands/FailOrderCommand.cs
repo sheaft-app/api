@@ -44,7 +44,11 @@ namespace Sheaft.Mediatr.Order.Commands
         public async Task<Result> Handle(FailOrderCommand request, CancellationToken token)
         {
             var order = await _context.Orders.SingleAsync(e => e.Id == request.OrderId, token);
+            if (order.Processed)
+                return Success();
+            
             order.SetStatus(OrderStatus.Refused);
+            order.SetAsProcessed();
             
             await _context.SaveChangesAsync(token);
             return Success();

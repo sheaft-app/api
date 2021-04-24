@@ -97,18 +97,26 @@ namespace Sheaft.Mediatr.Order.Commands
                 var agreements = await _context.Agreements
                     .Where(a => deliveryIds.Contains(a.Delivery.Id) && a.Status == AgreementStatus.Accepted)
                     .ToListAsync(token);
+
+                Result<IEnumerable<Guid>> catalogResult = null;
                 foreach (var product in products)
                 {
                     var agreement = agreements.SingleOrDefault(a => a.Delivery.Producer.Id == product.Producer.Id);
                     if (agreement?.Catalog == null)
-                        throw SheaftException.Validation();
+                    {
+                        catalogResult = Failure<IEnumerable<Guid>>(MessageKind.NotFound);
+                        break;
+                    }
 
-                    if (!agreement.Catalog.Products.Any(p => p.Product.Id == product.Id))
+                    if (agreement.Catalog.Products.All(p => p.Product.Id != product.Id))
                         invalidProductIds.Add(product.Id.ToString("N"));
 
                     cartProducts.Add(new Tuple<Domain.Product, Guid, int>(product, agreement.Catalog.Id,
                         request.Products.Where(p => p.Id == product.Id).Sum(c => c.Quantity)));
                 }
+
+                if (catalogResult is {Succeeded: false})
+                    return catalogResult;
 
                 if (invalidProductIds.Any())
                     return Failure<IEnumerable<Guid>>(MessageKind.Order_CannotCreate_Some_Products_NotAvailable,
@@ -118,6 +126,7 @@ namespace Sheaft.Mediatr.Order.Commands
                     ? await _context.DeliveryModes.Where(d => deliveryIds.Contains(d.Id)).ToListAsync(token)
                     : new List<Domain.DeliveryMode>();
                 var cartDeliveries = new List<Tuple<Domain.DeliveryMode, DateTimeOffset, string>>();
+                Result<IEnumerable<Guid>> deliveryResult = null;
                 foreach (var delivery in deliveries)
                 {
                     var cartDelivery =
@@ -126,18 +135,28 @@ namespace Sheaft.Mediatr.Order.Commands
                     if (delivery.Closings.Any(c =>
                         cartDelivery.ExpectedDeliveryDate >= c.ClosedFrom &&
                         cartDelivery.ExpectedDeliveryDate <= c.ClosedTo))
-                        return Failure<IEnumerable<Guid>>(MessageKind.Order_CannotCreate_Delivery_Closed, delivery.Name,
+                    {
+                        deliveryResult = Failure<IEnumerable<Guid>>(MessageKind.Order_CannotCreate_Delivery_Closed,
+                            delivery.Name,
                             delivery.Producer.Name);
+                        break;
+                    }
 
                     if (delivery.Producer.Closings.Any(c =>
                         cartDelivery.ExpectedDeliveryDate >= c.ClosedFrom &&
                         cartDelivery.ExpectedDeliveryDate <= c.ClosedTo))
-                        return Failure<IEnumerable<Guid>>(MessageKind.Order_CannotCreate_Producer_Closed,
+                    {
+                        deliveryResult = Failure<IEnumerable<Guid>>(MessageKind.Order_CannotCreate_Producer_Closed,
                             delivery.Producer.Name);
+                        break;
+                    }
 
                     cartDeliveries.Add(new Tuple<Domain.DeliveryMode, DateTimeOffset, string>(delivery,
                         cartDelivery.ExpectedDeliveryDate, cartDelivery.Comment));
                 }
+
+                if (deliveryResult is {Succeeded: false})
+                    return deliveryResult;
 
                 if (!cartDeliveries.Any())
                     return Failure<IEnumerable<Guid>>(MessageKind.Order_CannotCreate_Deliveries_Required);
@@ -150,7 +169,7 @@ namespace Sheaft.Mediatr.Order.Commands
                     _pspOptions.FixedAmount, _pspOptions.Percent, _pspOptions.VatPercent, user);
 
                 order.SetDeliveries(cartDeliveries);
-                order.SetStatus(OrderStatus.Validated);
+                order.SetStatus(OrderStatus.Confirmed);
 
                 var validatedDeliveries = await _deliveryService.ValidateCapedDeliveriesAsync(order.Deliveries, token);
                 if (!validatedDeliveries.Succeeded)
@@ -165,7 +184,7 @@ namespace Sheaft.Mediatr.Order.Commands
                 await _context.AddAsync(order, token);
                 await _context.SaveChangesAsync(token);
 
-                var purchaseOrderIds = new List<Guid>();
+                var purchaseOrderIds = new List<Result<Guid>>();
                 var producerIds = order.Products.Select(p => p.Producer.Id).Distinct();
                 foreach (var producerId in producerIds)
                 {
@@ -176,11 +195,11 @@ namespace Sheaft.Mediatr.Order.Commands
                         SkipNotification = true
                     }, token);
 
-                    if (!result.Succeeded)
-                        return Failure<IEnumerable<Guid>>(result);
-
-                    purchaseOrderIds.Add(result.Data);
+                    purchaseOrderIds.Add(result);
                 }
+
+                if (purchaseOrderIds.Any(r => !r.Succeeded))
+                    return Failure<IEnumerable<Guid>>(purchaseOrderIds.First(r => !r.Succeeded));
 
                 await _context.SaveChangesAsync(token);
                 await transaction.CommitAsync(token);
@@ -190,7 +209,7 @@ namespace Sheaft.Mediatr.Order.Commands
                     CreatedOn = DateTimeOffset.UtcNow, Kind = PointKind.PurchaseOrder, UserId = order.User.Id
                 });
 
-                return Success(purchaseOrderIds.AsEnumerable());
+                return Success(purchaseOrderIds.Select(p => p.Data));
             }
         }
     }

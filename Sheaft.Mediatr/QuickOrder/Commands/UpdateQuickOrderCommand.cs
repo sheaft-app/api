@@ -13,6 +13,7 @@ using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Application.Interfaces.Mediatr;
 using Sheaft.Application.Models;
 using Sheaft.Core;
+using Sheaft.Core.Enums;
 using Sheaft.Core.Exceptions;
 using Sheaft.Domain;
 
@@ -67,7 +68,8 @@ namespace Sheaft.Mediatr.QuickOrder.Commands
                 var productToRemoveIds = productIds.Except(existingProductIds);
                 foreach (var productToRemoveId in productToRemoveIds)
                     entity.RemoveProduct(productToRemoveId);
-                
+
+                Result result = null;
                 foreach (var productId in productIds)
                 {
                     var quantity = request.Products.Where(p => p.Id == productId).Sum(p => p.Quantity);
@@ -77,11 +79,15 @@ namespace Sheaft.Mediatr.QuickOrder.Commands
                             .SelectMany(c => c.Products)
                             .FirstOrDefault(cp => cp.Product.Id == productId);
 
-                    if (catalogProduct == null)
-                        throw SheaftException.NotFound();
+                    if (catalogProduct != null)
+                        entity.AddOrUpdateProduct(catalogProduct, quantity);
 
-                    entity.AddOrUpdateProduct(catalogProduct, quantity);
+                    result = Failure(MessageKind.NotFound);
+                    break;
                 }
+
+                if (result is {Succeeded: false})
+                    return result;
             }
 
             await _context.SaveChangesAsync(token);

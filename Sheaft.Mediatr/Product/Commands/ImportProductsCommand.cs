@@ -65,31 +65,35 @@ namespace Sheaft.Mediatr.Product.Commands
                 var startResult =
                     await _mediatr.Process(new StartJobCommand(request.RequestUser) {JobId = job.Id}, token);
                 if (!startResult.Succeeded)
-                    throw startResult.Exception;
+                    return startResult;
 
                 if (request.NotifyOnUpdates)
                     _mediatr.Post(new ProductImportProcessingEvent(job.Id));
 
                 var fileDataResult = await _blobService.DownloadImportProductsFileAsync(job.User.Id, job.Id, token);
                 if (!fileDataResult.Succeeded)
-                    throw fileDataResult.Exception;
+                    return fileDataResult;
 
                 var productsImporter = await _productsImporterFactory.GetImporterAsync(request.RequestUser, token);
                 
                 var tags = await _context.Tags.ToListAsync(token);
                 var productsResult = await productsImporter.ImportAsync(fileDataResult.Data, tags.Select(t => new KeyValuePair<Guid, string>(t.Id, t.Name)), token);
-                if(!productsResult.Succeeded)
-                    throw productsResult.Exception;
+                if (!productsResult.Succeeded)
+                    return productsResult;
 
                 using (var transaction = await _context.BeginTransactionAsync(token))
                 {
+                    Result productResult = null;
                     foreach (var product in productsResult.Data)
                     {
                         var command = _mapper.Map(product, new CreateProductCommand(request.RequestUser){SkipUpdateProducerTags = true});
-                        var productResult = await _mediatr.Process(command, token);
+                        productResult = await _mediatr.Process(command, token);
                         if (!productResult.Succeeded)
-                            throw productResult.Exception;
+                            break;
                     }
+
+                    if (productResult is {Succeeded: false})
+                        return productResult;
                     
                     await _context.SaveChangesAsync(token);
                     await transaction.CommitAsync(token);
@@ -100,7 +104,7 @@ namespace Sheaft.Mediatr.Product.Commands
 
                 var result = await _mediatr.Process(new CompleteJobCommand(request.RequestUser) {JobId = job.Id}, token);
                 if (!result.Succeeded)
-                    throw result.Exception;
+                    return result;
 
                 if (request.NotifyOnUpdates)
                     _mediatr.Post(new ProductImportSucceededEvent(job.Id));

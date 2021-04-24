@@ -40,6 +40,7 @@ namespace Sheaft.Domain
         public bool SecureModeNeeded { get; private set; }
         public string SecureModeRedirectUrl { get; private set; }
         public string SecureModeReturnURL { get; private set; }
+        public bool Processed { get; set; }
         public virtual Order Order { get; private set; }
         public virtual Card Card { get; private set; }
         public virtual PreAuthorizedPayin PreAuthorizedPayin { get; private set; }
@@ -64,12 +65,13 @@ namespace Sheaft.Domain
         {
             switch (status)
             {
-                case PreAuthorizationStatus.Failed:
+                /*case PreAuthorizationStatus.Failed:
                     DomainEvents.Add(new PreAuthorizationFailedEvent(Id));
                     break;
                 case PreAuthorizationStatus.Succeeded:
                     DomainEvents.Add(new PreAuthorizationSucceededEvent(Id));
                     break;
+                    */
             }
             
             Status = status;
@@ -113,6 +115,14 @@ namespace Sheaft.Domain
                 return;
 
             SecureModeRedirectUrl = secureModeRedirectUrl;
+        }
+
+        public void SetAsProcessed()
+        {
+            if (Processed)
+                throw SheaftException.Conflict();
+            
+            Processed = true;
         }
 
         public List<DomainEvent> DomainEvents { get; } = new List<DomainEvent>();

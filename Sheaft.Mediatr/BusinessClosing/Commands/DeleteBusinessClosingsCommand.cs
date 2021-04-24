@@ -42,15 +42,19 @@ namespace Sheaft.Mediatr.BusinessClosing.Commands
         {
             using (var transaction = await _context.BeginTransactionAsync(token))
             {
+                Result result = null;
                 foreach (var closingId in request.ClosingIds)
                 {
-                    var result = await _mediatr.Process(
+                    result = await _mediatr.Process(
                         new DeleteBusinessClosingCommand(request.RequestUser)
                             {ClosingId = closingId}, token);
-                    
-                    if (!result.Succeeded)
-                        return Failure(result);
+
+                    if (!result.Succeeded) 
+                        break;
                 }
+
+                if (result is {Succeeded: false})
+                    return result;
 
                 await transaction.CommitAsync(token);
                 return Success();

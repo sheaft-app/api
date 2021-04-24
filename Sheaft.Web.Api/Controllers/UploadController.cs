@@ -71,6 +71,7 @@ namespace Sheaft.Web.Api.Controllers
                             {
                                 ProducerId = CurrentUser.Id, FileName = formFile.FileName, FileStream = stream.ToArray()
                             }, token);
+                        
                         if (!result.Succeeded)
                             return BadRequest(result);
 

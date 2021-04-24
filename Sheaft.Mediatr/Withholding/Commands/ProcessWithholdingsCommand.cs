@@ -52,14 +52,18 @@ namespace Sheaft.Mediatr.Withholding.Commands
             if (!payout.Withholdings.Any())
                 return Failure(MessageKind.Withholding_Cannot_Process_Payout_No_Withholdings);
 
+            Result result = null;
             foreach (var withholding in payout.Withholdings)
             {
-                var result =
+                result =
                     await _mediatr.Process(
                         new ProcessWithholdingCommand(request.RequestUser) {WithholdingId = withholding.Id}, token);
                 if (!result.Succeeded)
-                    throw result.Exception;
+                    break;
             }
+
+            if (result is {Succeeded: false})
+                return result;
 
             return Success();
         }

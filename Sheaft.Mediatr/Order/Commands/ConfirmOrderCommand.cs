@@ -55,10 +55,14 @@ namespace Sheaft.Mediatr.Order.Commands
             if(order.User == null)
                 throw SheaftException.BadRequest(MessageKind.Order_CannotCreate_User_Required);
 
+            if (order.Processed)
+                return Success(order.PurchaseOrders.Select(po => po.Id));
+
             using (var transaction = await _context.BeginTransactionAsync(token))
             {
-                var purchaseOrderIds = new List<Guid>();
-                order.SetStatus(OrderStatus.Validated);
+                var purchaseOrderIds = new List<Result<Guid>>();
+                order.SetStatus(OrderStatus.Confirmed);
+                order.SetAsProcessed();
 
                 var producerIds = order.Products.Select(p => p.Producer.Id).Distinct();
                 foreach (var producerId in producerIds)
@@ -70,12 +74,13 @@ namespace Sheaft.Mediatr.Order.Commands
                         SkipNotification = true
                     }, token);
 
-                    if (!result.Succeeded)
-                        return Failure<IEnumerable<Guid>>(result);
-
-                    purchaseOrderIds.Add(result.Data);
+                    purchaseOrderIds.Add(result);
                 }
+                
+                if(purchaseOrderIds.Any(p => !p.Succeeded))
+                    return Failure<IEnumerable<Guid>>(purchaseOrderIds.First(p => !p.Succeeded));
 
+                await _context.SaveChangesAsync(token);
                 await transaction.CommitAsync(token);
 
                 var preAuthorization = await _context.PreAuthorizations.SingleOrDefaultAsync(p =>
@@ -96,7 +101,7 @@ namespace Sheaft.Mediatr.Order.Commands
                     CreatedOn = DateTimeOffset.UtcNow, Kind = PointKind.PurchaseOrder, UserId = order.User.Id
                 });
 
-                return Success(purchaseOrderIds.AsEnumerable());
+                return Success(purchaseOrderIds.Select(p => p.Data));
             }
         }
     }

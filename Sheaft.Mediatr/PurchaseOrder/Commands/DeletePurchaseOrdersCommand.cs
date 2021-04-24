@@ -42,14 +42,18 @@ namespace Sheaft.Mediatr.PurchaseOrder.Commands
         {
             using (var transaction = await _context.BeginTransactionAsync(token))
             {
+                Result result = null;
                 foreach (var purchaseOrderId in request.PurchaseOrderIds)
                 {
-                    var result =
+                    result =
                         await _mediatr.Process(
                             new DeletePurchaseOrderCommand(request.RequestUser) {PurchaseOrderId = purchaseOrderId}, token);
                     if (!result.Succeeded)
-                        return Failure(result);
+                        break;
                 }
+
+                if (result is {Succeeded: false})
+                    return result;
 
                 await transaction.CommitAsync(token);
                 return Success();

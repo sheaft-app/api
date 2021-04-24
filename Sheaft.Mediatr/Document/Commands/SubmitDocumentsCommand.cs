@@ -21,8 +21,8 @@ namespace Sheaft.Mediatr.Document.Commands
     {
         protected SubmitDocumentsCommand()
         {
-            
         }
+
         [JsonConstructor]
         public SubmitDocumentsCommand(RequestUser requestUser) : base(requestUser)
         {
@@ -45,19 +45,19 @@ namespace Sheaft.Mediatr.Document.Commands
         public async Task<Result> Handle(SubmitDocumentsCommand request, CancellationToken token)
         {
             var legal = await _context.Legals.SingleAsync(e => e.Id == request.LegalId, token);
-            var success = true;
+            Result result = null;
             foreach (var document in legal.Documents.Where(d => d.Status == DocumentStatus.Locked))
             {
-                var result = await _mediatr.Process(new SubmitDocumentCommand(request.RequestUser)
-                {
-                    DocumentId = document.Id
-                }, token);
-
+                result = await _mediatr.Process(
+                    new SubmitDocumentCommand(request.RequestUser) {DocumentId = document.Id}, token);
                 if (!result.Succeeded)
-                    success = false;
+                    break;
             }
 
-            return success ? Success() : Failure(MessageKind.BadRequest);
+            if (result is {Succeeded: false})
+                return result;
+
+            return Success();
         }
     }
 }

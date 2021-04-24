@@ -17,8 +17,8 @@ namespace Sheaft.Mediatr.DeliveryMode.Commands
     {
         protected SetDeliveryModesAvailabilityCommand()
         {
-            
         }
+
         [JsonConstructor]
         public SetDeliveryModesAvailabilityCommand(RequestUser requestUser) : base(requestUser)
         {
@@ -43,14 +43,19 @@ namespace Sheaft.Mediatr.DeliveryMode.Commands
         {
             using (var transaction = await _context.BeginTransactionAsync(token))
             {
+                Result result = null;
                 foreach (var id in request.DeliveryModeIds)
                 {
-                    var result = await _mediatr.Process(
+                    result = await _mediatr.Process(
                         new SetDeliveryModeAvailabilityCommand(request.RequestUser)
                             {DeliveryModeId = id, Available = request.Available}, token);
+
                     if (!result.Succeeded)
-                        return Failure(result);
+                        break;
                 }
+
+                if (result is {Succeeded: false})
+                    return result;
 
                 await transaction.CommitAsync(token);
                 return Success();

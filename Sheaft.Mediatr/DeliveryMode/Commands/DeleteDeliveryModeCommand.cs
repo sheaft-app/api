@@ -24,8 +24,8 @@ namespace Sheaft.Mediatr.DeliveryMode.Commands
     {
         protected DeleteDeliveryModeCommand()
         {
-            
         }
+
         [JsonConstructor]
         public DeleteDeliveryModeCommand(RequestUser requestUser) : base(requestUser)
         {
@@ -48,7 +48,7 @@ namespace Sheaft.Mediatr.DeliveryMode.Commands
         public async Task<Result> Handle(DeleteDeliveryModeCommand request, CancellationToken token)
         {
             var entity = await _context.DeliveryModes.SingleAsync(e => e.Id == request.DeliveryModeId, token);
-            if(entity.Producer.Id != request.RequestUser.Id)
+            if (entity.Producer.Id != request.RequestUser.Id)
                 return Failure(MessageKind.Forbidden);
 
             var agreements =
@@ -63,15 +63,20 @@ namespace Sheaft.Mediatr.DeliveryMode.Commands
 
             using (var transaction = await _context.BeginTransactionAsync(token))
             {
+                Result result = null;
                 foreach (var agreement in agreements)
                 {
-                    var result =
+                    result =
                         await _mediatr.Process(
                             new DeleteAgreementCommand(request.RequestUser) {AgreementId = agreement.Id}, token);
+
                     if (!result.Succeeded)
-                        return Failure(result);
+                        break;
                 }
-                
+
+                if (result is {Succeeded: false})
+                    return result;
+
                 foreach (var orderDelivery in orderDeliveries.ToList())
                     _context.Remove(orderDelivery);
 

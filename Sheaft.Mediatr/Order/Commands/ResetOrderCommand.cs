@@ -58,9 +58,7 @@ namespace Sheaft.Mediatr.Order.Commands
                 return Failure(MessageKind.BadRequest);
 
             foreach (var pendingPayin in pendingPayins)
-            {
                 pendingPayin.SetStatus(TransactionStatus.Cancelled);
-            }
             
             var pendingPreAuthorizations = await _context.PreAuthorizations
                 .Where(p => p.Order.Id == request.OrderId)
@@ -70,9 +68,7 @@ namespace Sheaft.Mediatr.Order.Commands
                 return Failure(MessageKind.BadRequest);
 
             foreach (var pendingPreAuthorization in pendingPreAuthorizations)
-            {
                 pendingPreAuthorization.SetStatus(PreAuthorizationStatus.Cancelled);
-            }
                 
             order.SetStatus(OrderStatus.Created);
             await _context.SaveChangesAsync(token);

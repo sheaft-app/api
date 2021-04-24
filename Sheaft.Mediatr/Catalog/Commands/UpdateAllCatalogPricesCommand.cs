@@ -45,9 +45,7 @@ namespace Sheaft.Mediatr.Catalog.Commands
                 .ToListAsync(token);
 
             foreach (var catalogProductPrice in catalogProductsPrice)
-            {
                 catalogProductPrice.UpdatePrice(request.Percent);
-            }
 
             await _context.SaveChangesAsync(token);
             return Success();

@@ -4,6 +4,7 @@ using System.Linq;
 using Sheaft.Core.Exceptions;
 using Sheaft.Domain.Common;
 using Sheaft.Domain.Enum;
+using Sheaft.Domain.Events.Order;
 using Sheaft.Domain.Interop;
 
 namespace Sheaft.Domain
@@ -64,6 +65,7 @@ namespace Sheaft.Domain
         public decimal Donation { get; private set; }
         public decimal FeesPrice { get; private set; }
         public decimal DonationFeesPrice { get; private set; }
+        public bool Processed { get; set; }
         public virtual User User { get; private set; }
         public virtual IReadOnlyCollection<OrderProduct> Products => _products?.AsReadOnly();
         public virtual IReadOnlyCollection<OrderDelivery> Deliveries => _deliveries?.AsReadOnly();
@@ -77,12 +79,12 @@ namespace Sheaft.Domain
             User = user;
         }
 
-        public PurchaseOrder AddPurchaseOrder(string reference, Producer producer, bool requestSkipNotification)
+        public PurchaseOrder AddPurchaseOrder(string reference, Producer producer)
         {
             if (PurchaseOrders == null)
                 _purchaseOrders = new List<PurchaseOrder>();
 
-            var purchaseOrder = new PurchaseOrder(Guid.NewGuid(), reference, PurchaseOrderStatus.Waiting, producer, this, requestSkipNotification);
+            var purchaseOrder = new PurchaseOrder(Guid.NewGuid(), reference, PurchaseOrderStatus.Waiting, producer, this);
             _purchaseOrders.Add(purchaseOrder);
 
             return purchaseOrder;
@@ -90,7 +92,7 @@ namespace Sheaft.Domain
 
         public void SetStatus(OrderStatus status)
         {
-            if (Status == OrderStatus.Refused || Status == OrderStatus.Validated)
+            if (Status == OrderStatus.Refused || Status == OrderStatus.Confirmed)
                 return;
             
             switch (status)
@@ -102,8 +104,15 @@ namespace Sheaft.Domain
                     ExpiredOn = DateTimeOffset.UtcNow;
                     break;
                 case OrderStatus.Validated:
+                    ExpiredOn = null;
+                    break;
                 case OrderStatus.Refused:
                     ExpiredOn = null;
+                    DomainEvents.Add(new OrderRefusedEvent(Id));
+                    break;
+                case OrderStatus.Confirmed:
+                    ExpiredOn = null;
+                    DomainEvents.Add(new OrderConfirmedEvent(Id));
                     break;
             }
 
@@ -131,9 +140,7 @@ namespace Sheaft.Domain
                 _deliveries = new List<OrderDelivery>();
 
             foreach (var orderDelivery in orderDeliveries)
-            {
-                _deliveries.Add(new OrderDelivery(orderDelivery.Item1, orderDelivery.Item2, orderDelivery.Item3));            
-            }
+                _deliveries.Add(new OrderDelivery(orderDelivery.Item1, orderDelivery.Item2, orderDelivery.Item3));     
         }
 
         public void SetDonation(DonationKind kind)
@@ -184,7 +191,7 @@ namespace Sheaft.Domain
         }
 
         public List<DomainEvent> DomainEvents { get; } = new List<DomainEvent>();
-        
+
         private class FeesDto
         {
             public decimal FeesPrice { get; set; }
@@ -258,6 +265,14 @@ namespace Sheaft.Domain
         {
             var fees = (feesPercent * total) + feesFixedAmount;
             return fees + fees * feesVatPercent;
+        }
+
+        public void SetAsProcessed()
+        {
+            if (Processed)
+                throw SheaftException.Conflict();
+            
+            Processed = true;
         }
     }
 }

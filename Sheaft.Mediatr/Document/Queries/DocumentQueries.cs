@@ -11,6 +11,7 @@ using Sheaft.Application.Interfaces;
 using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Application.Interfaces.Queries;
 using Sheaft.Application.Models;
+using Sheaft.Core.Exceptions;
 using Sheaft.Domain;
 
 namespace Sheaft.Mediatr.Document.Queries
@@ -64,7 +65,7 @@ namespace Sheaft.Mediatr.Document.Queries
                     {
                         var result = await _blobService.DownloadDocumentPageAsync(document.Id, page.Id, legal.User.Id, token);
                         if (!result.Succeeded)
-                            continue;
+                            throw SheaftException.Unexpected(result.Exception, result.Message, result.Params);
 
                         var zipArchiveEntry = archive.CreateEntry(page.Filename + page.Extension, CompressionLevel.Optimal);
                         using (var zipStream = zipArchiveEntry.Open())

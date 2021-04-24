@@ -50,16 +50,20 @@ namespace Sheaft.Mediatr.ProfileInformation.Commands
         {
             using (var transaction = await _context.BeginTransactionAsync(token))
             {
+                Result result = null;
                 foreach (var pictureId in request.PictureIds)
                 {
-                    var result =
+                    result =
                         await _mediatr.Process(
                             new RemoveUserPictureCommand(request.RequestUser)
                                 {PictureId = pictureId, UserId = request.UserId}, token);
 
                     if (!result.Succeeded)
-                        return result;
+                        break;
                 }
+
+                if (result is {Succeeded: false})
+                    return result;
 
                 await transaction.CommitAsync(token);
             }

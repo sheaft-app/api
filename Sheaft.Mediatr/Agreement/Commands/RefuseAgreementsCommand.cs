@@ -43,14 +43,19 @@ namespace Sheaft.Mediatr.Agreement.Commands
         {
             using (var transaction = await _context.BeginTransactionAsync(token))
             {
+                Result result = null;
                 foreach (var agreementId in request.AgreementIds)
                 {
-                    var result = await _mediatr.Process(
+                    result = await _mediatr.Process(
                         new RefuseAgreementCommand(request.RequestUser) {AgreementId = agreementId, Reason = request.Reason},
                         token);
+
                     if (!result.Succeeded)
-                        return Failure(result);
+                        break;
                 }
+
+                if (result is {Succeeded: false})
+                    return result;
 
                 await transaction.CommitAsync(token);
                 return Success();

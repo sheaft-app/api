@@ -40,9 +40,7 @@ namespace Sheaft.Business.PickingOrdersExporters
         {
             var products = new List<LightProduct>();
             foreach (var purchaseOrder in purchaseOrders)
-            {
                 products.AddRange(purchaseOrder.Products.Select(GetLightProduct));
-            }
 
             var subsetOrders = purchaseOrders.Select(o => new LightOrder
             {
@@ -92,12 +90,8 @@ namespace Sheaft.Business.PickingOrdersExporters
             WriteTitleRow(worksheet, clientColumn);
 
             if (columnToHide.Any())
-            {
                 foreach (var col in columnToHide)
-                {
                     worksheet.Column(col).Hidden = true;
-                }
-            }
 
             var range = worksheet.Cells[1, 1, lastRow, clientColumn];
 

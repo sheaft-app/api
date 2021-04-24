@@ -49,9 +49,8 @@ namespace Sheaft.Mediatr.PayinRefund.Commands
         {
             var payinRefund = await _context.Set<Domain.PayinRefund>()
                 .SingleOrDefaultAsync(c => c.Identifier == request.Identifier, token);
-            if (payinRefund.Status == TransactionStatus.Succeeded || 
-                payinRefund.Status == TransactionStatus.Failed ||
-                payinRefund.Status == TransactionStatus.Cancelled)
+            
+            if (payinRefund.Processed)
                 return Success();
 
             var pspResult = await _pspService.GetRefundAsync(payinRefund.Identifier, token);
@@ -61,6 +60,7 @@ namespace Sheaft.Mediatr.PayinRefund.Commands
             payinRefund.SetStatus(pspResult.Data.Status);
             payinRefund.SetResult(pspResult.Data.ResultCode, pspResult.Data.ResultMessage);
             payinRefund.SetExecutedOn(pspResult.Data.ProcessedOn);
+            payinRefund.SetAsProcessed();
 
             await _context.SaveChangesAsync(token);
             return Success();

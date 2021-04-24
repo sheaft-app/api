@@ -75,13 +75,9 @@ namespace Sheaft.Mediatr.DeliveryMode.Commands
 
             var openingHours = new List<TimeSlotHour>();
             if (request.OpeningHours != null)
-            {
                 foreach (var oh in request.OpeningHours)
-                {
                     openingHours.AddRange(oh.Days.Select(c => new TimeSlotHour(c, oh.From, oh.To)));
-                }
-            }
-
+            
             var producer = await _context.Producers.SingleAsync(e => e.Id == request.ProducerId, token);
             var entity = new Domain.DeliveryMode(Guid.NewGuid(), request.Kind, producer, request.Available,
                 deliveryModeAddress, openingHours, request.Name, request.Description);

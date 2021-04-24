@@ -51,9 +51,7 @@ namespace Sheaft.Mediatr.Payin.Commands
         public async Task<Result> Handle(RefreshPayinStatusCommand request, CancellationToken token)
         {
             var payin = await _context.Payins.SingleOrDefaultAsync(c => c.Identifier == request.Identifier, token);
-            if (payin.Status == TransactionStatus.Succeeded 
-                || payin.Status == TransactionStatus.Failed 
-                || payin.Status == TransactionStatus.Cancelled)
+            if (payin.Processed)
                 return Success();
 
             var pspResult = await _pspService.GetPayinAsync(payin.Identifier, token);
@@ -63,24 +61,9 @@ namespace Sheaft.Mediatr.Payin.Commands
             payin.SetStatus(pspResult.Data.Status);
             payin.SetResult(pspResult.Data.ResultCode, pspResult.Data.ResultMessage);
             payin.SetExecutedOn(pspResult.Data.ProcessedOn);
+            payin.SetAsProcessed();
 
             await _context.SaveChangesAsync(token);
-
-            //TO REMOVE 1 MONTH AFTER RELEASE
-            if (payin.Kind == TransactionKind.WebPayin)
-            {
-                switch (payin.Status)
-                {
-                    case TransactionStatus.Failed:
-                        _mediatr.Post(new FailOrderCommand(request.RequestUser)
-                            {OrderId = payin.Order.Id});
-                        break;
-                    case TransactionStatus.Succeeded:
-                        _mediatr.Post(new ConfirmOrderCommand(request.RequestUser) {OrderId = payin.Order.Id});
-                        break;
-                }
-            }
-
             return Success();
         }
     }

@@ -48,6 +48,7 @@ namespace Sheaft.Mediatr.Declaration.Commands
         {
             var legal = await _context.Set<BusinessLegal>()
                 .SingleOrDefaultAsync(c => c.Declaration.Identifier == request.Identifier, token);
+            
             var pspResult = await _pspService.GetDeclarationAsync(legal.Declaration.Identifier, token);
             if (!pspResult.Succeeded)
                 return Failure(pspResult);

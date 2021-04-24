@@ -17,8 +17,8 @@ namespace Sheaft.Mediatr.Job.Commands
     {
         protected RetryJobsCommand()
         {
-            
         }
+
         [JsonConstructor]
         public RetryJobsCommand(RequestUser requestUser) : base(requestUser)
         {
@@ -43,12 +43,16 @@ namespace Sheaft.Mediatr.Job.Commands
         {
             using (var transaction = await _context.BeginTransactionAsync(token))
             {
+                Result result = null;
                 foreach (var jobId in request.JobIds)
                 {
-                    var result = await _mediatr.Process(new RetryJobCommand(request.RequestUser) {JobId = jobId}, token);
+                    result = await _mediatr.Process(new RetryJobCommand(request.RequestUser) {JobId = jobId}, token);
                     if (!result.Succeeded)
-                        return Failure(result);
+                        break;
                 }
+
+                if (result is {Succeeded: false})
+                    return result;
 
                 await transaction.CommitAsync(token);
                 return Success();

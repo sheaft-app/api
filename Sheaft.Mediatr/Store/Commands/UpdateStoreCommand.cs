@@ -110,9 +110,7 @@ namespace Sheaft.Mediatr.Store.Commands
             {
                 var openingHours = new List<TimeSlotHour>();
                 foreach (var oh in request.OpeningHours)
-                {
                     openingHours.AddRange(oh.Days.Select(c => new TimeSlotHour(c, oh.From, oh.To)));
-                }
 
                 store.SetOpeningHours(openingHours);
             }

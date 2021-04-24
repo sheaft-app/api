@@ -12,16 +12,16 @@ using Sheaft.Core.Enums;
 using Sheaft.Domain;
 using Sheaft.Domain.Enum;
 
-namespace Sheaft.Mediatr.Donation.Commands
+namespace Sheaft.Mediatr.Withholding.Commands
 {
-    public class RefreshDonationStatusCommand : Command
+    public class RefreshWithholdingStatusCommand : Command
     {
-        protected RefreshDonationStatusCommand()
+        protected RefreshWithholdingStatusCommand()
         {
             
         }
         [JsonConstructor]
-        public RefreshDonationStatusCommand(RequestUser requestUser, string identifier)
+        public RefreshWithholdingStatusCommand(RequestUser requestUser, string identifier)
             : base(requestUser)
         {
             Identifier = identifier;
@@ -30,38 +30,38 @@ namespace Sheaft.Mediatr.Donation.Commands
         public string Identifier { get; set; }
     }
 
-    public class RefreshDonationStatusCommandHandler : CommandsHandler,
-        IRequestHandler<RefreshDonationStatusCommand, Result>
+    public class RefreshWithholdingStatusCommandHandler : CommandsHandler,
+        IRequestHandler<RefreshWithholdingStatusCommand, Result>
     {
         private readonly IPspService _pspService;
 
-        public RefreshDonationStatusCommandHandler(
+        public RefreshWithholdingStatusCommandHandler(
             ISheaftMediatr mediatr,
             IAppDbContext context,
             IPspService pspService,
-            ILogger<RefreshDonationStatusCommandHandler> logger)
+            ILogger<RefreshWithholdingStatusCommandHandler> logger)
             : base(mediatr, context, logger)
         {
             _pspService = pspService;
         }
 
-        public async Task<Result> Handle(RefreshDonationStatusCommand request,
+        public async Task<Result> Handle(RefreshWithholdingStatusCommand request,
             CancellationToken token)
         {
-            var donation = await _context.Donations
+            var withholding = await _context.Withholdings
                 .SingleOrDefaultAsync(c => c.Identifier == request.Identifier, token);
             
-            if (donation.Processed)
-                return Success(donation.Status);
+            if (withholding.Processed)
+                return Success(withholding.Status);
 
-            var pspResult = await _pspService.GetTransferAsync(donation.Identifier, token);
+            var pspResult = await _pspService.GetTransferAsync(withholding.Identifier, token);
             if (!pspResult.Succeeded)
                 return Failure(pspResult);
 
-            donation.SetStatus(pspResult.Data.Status);
-            donation.SetResult(pspResult.Data.ResultCode, pspResult.Data.ResultMessage);
-            donation.SetExecutedOn(pspResult.Data.ProcessedOn);
-            donation.SetAsProcessed();
+            withholding.SetStatus(pspResult.Data.Status);
+            withholding.SetResult(pspResult.Data.ResultCode, pspResult.Data.ResultMessage);
+            withholding.SetExecutedOn(pspResult.Data.ProcessedOn);
+            withholding.SetAsProcessed();
 
             await _context.SaveChangesAsync(token);
             return Success();

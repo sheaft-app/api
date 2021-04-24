@@ -10,9 +10,7 @@ namespace Sheaft.Web.Common
         public static void AddScopedDynamic<TInterface>(this IServiceCollection services, IEnumerable<Type> types)
         {
             foreach (var type in types)
-            {
                 services.AddScoped(type);
-            }
             
             services.AddScoped<Func<string, TInterface>>(serviceProvider => processor =>
             {

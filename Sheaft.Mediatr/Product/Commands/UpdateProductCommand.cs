@@ -138,6 +138,7 @@ namespace Sheaft.Mediatr.Product.Commands
                     var productCatalogs = entity.CatalogsPrices.Select(p => p.Catalog);
                     var catalogIds = productCatalogs.Select(pc => pc.Id);
                     var catalogToRemoveIds = catalogIds.Except(request.Catalogs.Select(c => c.CatalogId));
+                    
                     foreach (var catalog in productCatalogs.Where(pc => catalogToRemoveIds.Contains(pc.Id)))
                         entity.RemoveFromCatalog(catalog.Id);
 

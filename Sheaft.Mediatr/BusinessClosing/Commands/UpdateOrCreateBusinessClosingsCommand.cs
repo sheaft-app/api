@@ -58,7 +58,7 @@ namespace Sheaft.Mediatr.BusinessClosing.Commands
                     await _context.SaveChangesAsync(token);
                 }
 
-                var ids = new List<Guid>();
+                var ids = new List<Result<Guid>>();
                 if (request.Closings != null)
                 {
                     foreach (var closing in request.Closings)
@@ -68,15 +68,15 @@ namespace Sheaft.Mediatr.BusinessClosing.Commands
                                 new UpdateOrCreateBusinessClosingCommand(request.RequestUser)
                                     {UserId = request.UserId, Closing = closing}, token);
 
-                        if (!result.Succeeded)
-                            throw result.Exception;
-
-                        ids.Add(result.Data);
+                        ids.Add(result);
                     }
+
+                    if (ids.Any(r => !r.Succeeded))
+                        return Failure<IEnumerable<Guid>>(ids.First(r => !r.Succeeded));
                 }
 
                 await transaction.CommitAsync(token);
-                return Success<IEnumerable<Guid>>(ids);
+                return Success(ids.Select(r => r.Data));
             }
         }
     }

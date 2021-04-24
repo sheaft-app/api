@@ -66,7 +66,7 @@ namespace Sheaft.Mediatr.Document.Commands
             }
 
             if (results.Any(r => !r.Succeeded))
-                return Failure(MessageKind.Document_Errors_On_Submit);
+                return results.First(r => !r.Succeeded);
 
             var result = await _pspService.SubmitDocumentAsync(document, legal.User.Identifier, token);
             if (!result.Succeeded)

@@ -12,7 +12,7 @@ namespace Sheaft.Domain
         }
 
         public ExpectedOrderDelivery(DeliveryMode mode, DateTimeOffset expectedDeliveryDate)
-            : base(mode, expectedDeliveryDate, true)
+            : base(mode, expectedDeliveryDate)
         {
         }
     }

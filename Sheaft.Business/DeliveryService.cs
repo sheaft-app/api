@@ -48,6 +48,7 @@ namespace Sheaft.Business
             if (!results.Succeeded)
                 return Failure<bool>(results.Exception);
 
+            var result = Success(true);
             foreach (var orderDelivery in orderDeliveries)
             {
                 var delivery = results.Data.FirstOrDefault(d => d.DeliveryId == orderDelivery.Id
@@ -61,18 +62,19 @@ namespace Sheaft.Business
                                                                 && d.From == orderDelivery.ExpectedDelivery.From
                                                                 && d.To == orderDelivery.ExpectedDelivery.To);
 
-                if (delivery == null)
+                if (delivery == null || delivery.Count < orderDelivery.DeliveryMode.MaxPurchaseOrdersPerTimeSlot)
                     continue;
 
-                if (delivery.Count >= orderDelivery.DeliveryMode.MaxPurchaseOrdersPerTimeSlot)
-                    return Failure<bool>(new ValidationException(
-                        MessageKind.Order_CannotPay_Delivery_Max_PurchaseOrders_Reached,
-                        orderDelivery.DeliveryMode.Producer.Name,
-                        $"le {orderDelivery.ExpectedDelivery.ExpectedDeliveryDate:dd/MM/yyyy} entre {orderDelivery.ExpectedDelivery.From:hh\\hmm} et {orderDelivery.ExpectedDelivery.To:hh\\hmm}",
-                        orderDelivery.DeliveryMode.MaxPurchaseOrdersPerTimeSlot));
+                result = Failure<bool>(new ValidationException(
+                    MessageKind.Order_CannotPay_Delivery_Max_PurchaseOrders_Reached,
+                    orderDelivery.DeliveryMode.Producer.Name,
+                    $"le {orderDelivery.ExpectedDelivery.ExpectedDeliveryDate:dd/MM/yyyy} entre {orderDelivery.ExpectedDelivery.From:hh\\hmm} et {orderDelivery.ExpectedDelivery.To:hh\\hmm}",
+                    orderDelivery.DeliveryMode.MaxPurchaseOrdersPerTimeSlot));
+                
+                break;
             }
 
-            return Success(true);
+            return result;
         }
     }
 }

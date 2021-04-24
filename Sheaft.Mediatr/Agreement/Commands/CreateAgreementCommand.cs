@@ -55,9 +55,7 @@ namespace Sheaft.Mediatr.Agreement.Commands
             if (request.SelectedHours != null && request.SelectedHours.Any())
             {
                 foreach (var sh in request.SelectedHours)
-                {
                     selectedHours.AddRange(sh.Days.Select(d => new TimeSlotHour(d, sh.From, sh.To)));
-                }
             }
 
             var entity = new Domain.Agreement(Guid.NewGuid(), store, delivery, currentUser, selectedHours);

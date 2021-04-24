@@ -47,14 +47,19 @@ namespace Sheaft.Business
             if (!order.Deliveries.Any())
                 return Failure(MessageKind.Order_CannotPay_Deliveries_Required);
 
+            Result result = null;
             foreach (var delivery in order.Deliveries)
             {
                 if (delivery.DeliveryMode.Closings.Any(c =>
                     DateTimeOffset.Now >= c.ClosedFrom && DateTimeOffset.UtcNow <= c.ClosedTo))
                 {
-                    return Failure(MessageKind.Order_CannotCreate_Delivery_Closed, delivery.DeliveryMode.Name);
+                    result = Failure(MessageKind.Order_CannotCreate_Delivery_Closed, delivery.DeliveryMode.Name);
+                    break;
                 }
             }
+
+            if (result is {Succeeded: false})
+                return result;
 
             var validatedDeliveries = await _deliveryService.ValidateCapedDeliveriesAsync(order.Deliveries, token);
             if (!validatedDeliveries.Succeeded)
@@ -77,21 +82,28 @@ namespace Sheaft.Business
                 : new List<Domain.DeliveryMode>();
 
             var cartDeliveries = new List<Tuple<Domain.DeliveryMode, DateTimeOffset, string>>();
+            Result<List<Tuple<Domain.DeliveryMode, DateTimeOffset, string>>> result = null;
             foreach (var delivery in deliveries)
             {
                 if (delivery.Closings.Any(
                     c => DateTimeOffset.Now >= c.ClosedFrom && DateTimeOffset.UtcNow <= c.ClosedTo))
-                    return Failure<List<Tuple<Domain.DeliveryMode, DateTimeOffset, string>>>(
+                {
+                    result = Failure<List<Tuple<Domain.DeliveryMode, DateTimeOffset, string>>>(
                         MessageKind.Order_CannotCreate_Delivery_Closed, delivery.Name);
+                    
+                    break;
+                }
 
                 var cartDelivery = producersExpectedDeliveries.FirstOrDefault(ped => ped.DeliveryModeId == delivery.Id);
                 if (delivery.Closings.Any(c =>
                     cartDelivery.ExpectedDeliveryDate >= c.ClosedFrom &&
                     cartDelivery.ExpectedDeliveryDate <= c.ClosedTo))
                 {
-                    return Failure<List<Tuple<Domain.DeliveryMode, DateTimeOffset, string>>>(
+                    result = Failure<List<Tuple<Domain.DeliveryMode, DateTimeOffset, string>>>(
                         MessageKind.Order_CannotCreate_Delivery_Closed, delivery.Name,
                         delivery.Producer.Name);
+                    
+                    break;
                 }
 
                 if (cartProducts.Any(p => p.Item1.Producer.Id == delivery.Producer.Id && p.Item1.Producer.Closings.Any(
@@ -99,13 +111,18 @@ namespace Sheaft.Business
                         cartDelivery.ExpectedDeliveryDate >= c.ClosedFrom &&
                         cartDelivery.ExpectedDeliveryDate <= c.ClosedTo)))
                 {
-                    return Failure<List<Tuple<Domain.DeliveryMode, DateTimeOffset, string>>>(
+                    result = Failure<List<Tuple<Domain.DeliveryMode, DateTimeOffset, string>>>(
                         MessageKind.Order_CannotCreate_Producer_Closed, delivery.Producer.Name);
+
+                    break;
                 }
 
                 cartDeliveries.Add(new Tuple<Domain.DeliveryMode, DateTimeOffset, string>(delivery,
                     cartDelivery.ExpectedDeliveryDate, cartDelivery.Comment));
             }
+            
+            if (result is {Succeeded: false})
+                return result;
 
             return Success(cartDeliveries);
         }
@@ -122,16 +139,23 @@ namespace Sheaft.Business
 
             var cartProducts = new List<Tuple<Domain.Product, Guid, int>>();
             var products = await _context.Products.Where(p => productIds.Contains(p.Id)).ToListAsync(token);
+            Result<List<Tuple<Domain.Product, Guid, int>>> result = null;
             foreach (var product in products)
             {
                 var catalog = product.CatalogsPrices.Select(p => p.Catalog).SingleOrDefault(p =>
                     !p.RemovedOn.HasValue && p.Kind == CatalogKind.Consumers && p.IsDefault && p.Available);
                 if (catalog == null)
-                    return Failure<List<Tuple<Domain.Product, Guid, int>>>(MessageKind.NotFound);
+                {
+                    result = Failure<List<Tuple<Domain.Product, Guid, int>>>(MessageKind.NotFound);
+                    break;
+                }
 
                 cartProducts.Add(new Tuple<Domain.Product, Guid, int>(product, catalog.Id,
                     productsQuantities.Where(p => p.Id == product.Id).Sum(c => c.Quantity)));
             }
+            
+            if (result is {Succeeded: false})
+                return result;
 
             return Success(cartProducts);
         }

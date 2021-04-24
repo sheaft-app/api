@@ -4,16 +4,14 @@ using Sheaft.Domain.Common;
 
 namespace Sheaft.Domain.Events.Order
 {
-    public class ConfirmOrderFailedEvent : DomainEvent
+    public class OrderConfirmedEvent : DomainEvent
     {
         [JsonConstructor]
-        public ConfirmOrderFailedEvent(Guid orderId, string message)
+        public OrderConfirmedEvent(Guid orderId)
         {
             OrderId = orderId;
-            Message = message;
         }
 
         public Guid OrderId { get; }
-        public string Message { get; }
     }
 }

@@ -60,7 +60,7 @@ namespace Sheaft.Mediatr.PurchaseOrder.Commands
             if (!resultIdentifier.Succeeded)
                 return Failure<Guid>(resultIdentifier);
 
-            var purchaseOrder = order.AddPurchaseOrder(resultIdentifier.Data, producer, request.SkipNotification);
+            var purchaseOrder = order.AddPurchaseOrder(resultIdentifier.Data, producer);
             await _context.SaveChangesAsync(token);
 
             if (delivery.DeliveryMode.MaxPurchaseOrdersPerTimeSlot.HasValue)
@@ -70,7 +70,7 @@ namespace Sheaft.Mediatr.PurchaseOrder.Commands
 
             if (delivery.DeliveryMode.AutoAcceptRelatedPurchaseOrder)
                 _mediatr.Post(new AcceptPurchaseOrderCommand(request.RequestUser)
-                    {PurchaseOrderId = purchaseOrder.Id, SkipNotification = request.SkipNotification});
+                    {PurchaseOrderId = purchaseOrder.Id, SkipNotification = false});
 
             return Success(purchaseOrder.Id);
         }

@@ -57,7 +57,7 @@ namespace Sheaft.Mediatr.DeliveryClosing.Commands
                     await _context.SaveChangesAsync(token);
                 }
 
-                var ids = new List<Guid>();
+                var ids = new List<Result<Guid>>();
                 foreach (var closing in requestClosings)
                 {
                     var result =
@@ -65,14 +65,14 @@ namespace Sheaft.Mediatr.DeliveryClosing.Commands
                             new UpdateOrCreateDeliveryClosingCommand(request.RequestUser)
                                 {DeliveryId = request.DeliveryId, Closing = closing}, token);
 
-                    if (!result.Succeeded)
-                        throw result.Exception;
-
-                    ids.Add(result.Data);
+                    ids.Add(result);
                 }
 
+                if (ids.Any(r => !r.Succeeded))
+                    return Failure<IEnumerable<Guid>>(ids.First(r => !r.Succeeded));
+
                 await transaction.CommitAsync(token);
-                return Success<IEnumerable<Guid>>(ids);
+                return Success<IEnumerable<Guid>>(ids.Select(r => r.Data));
             }
         }
     }

@@ -52,11 +52,9 @@ namespace Sheaft.Mediatr.Producer.Commands
                 .ToListAsync(token);
             
             foreach (var product in products)
-            {
                 product.SetVat(0);
-                await _context.SaveChangesAsync(token);
-            }
 
+            await _context.SaveChangesAsync(token);
             return Success();
         }
     }

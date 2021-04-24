@@ -50,12 +50,7 @@ namespace Sheaft.Mediatr.Donation.Commands
             while (donationIds.Any())
             {
                 foreach (var donationId in donationIds)
-                {
-                    _mediatr.Post(new CheckDonationCommand(request.RequestUser)
-                    {
-                        DonationId = donationId
-                    });
-                }
+                    _mediatr.Post(new CheckDonationCommand(request.RequestUser) {DonationId = donationId});
 
                 skip += take;
                 donationIds = await GetNextDonationIdsAsync(skip, take, token);
@@ -67,7 +62,7 @@ namespace Sheaft.Mediatr.Donation.Commands
         private async Task<IEnumerable<Guid>> GetNextDonationIdsAsync(int skip, int take, CancellationToken token)
         {
             return await _context.Donations
-                .Where(c => c.Status == TransactionStatus.Waiting || c.Status == TransactionStatus.Created)
+                .Where(c => !c.Processed && (c.Status == TransactionStatus.Waiting || c.Status == TransactionStatus.Created))
                 .OrderBy(c => c.CreatedOn)
                 .Select(c => c.Id)
                 .Skip(skip)

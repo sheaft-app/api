@@ -11,12 +11,12 @@ using Sheaft.Domain;
 
 namespace Sheaft.Mediatr.Catalog.Commands
 {
-    public class DeleteCatalogsCommand: Command
+    public class DeleteCatalogsCommand : Command
     {
         protected DeleteCatalogsCommand()
         {
-            
         }
+
         public DeleteCatalogsCommand(RequestUser requestUser) : base(requestUser)
         {
         }
@@ -39,15 +39,19 @@ namespace Sheaft.Mediatr.Catalog.Commands
         {
             using (var transaction = await _context.BeginTransactionAsync(token))
             {
+                Result result = null;
                 foreach (var catalogId in request.CatalogIds)
                 {
-                    var result =
+                    result =
                         await _mediatr.Process(new DeleteCatalogCommand(request.RequestUser) {CatalogId = catalogId},
                             token);
 
                     if (!result.Succeeded)
-                        throw result.Exception;
+                        break;
                 }
+
+                if (result is {Succeeded: false})
+                    return result;
 
                 await transaction.CommitAsync(token);
                 return Success();

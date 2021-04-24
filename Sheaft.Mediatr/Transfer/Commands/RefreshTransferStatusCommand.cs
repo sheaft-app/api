@@ -11,6 +11,8 @@ using Sheaft.Core;
 using Sheaft.Core.Enums;
 using Sheaft.Domain;
 using Sheaft.Domain.Enum;
+using Sheaft.Mediatr.Donation.Commands;
+using Sheaft.Mediatr.Withholding.Commands;
 
 namespace Sheaft.Mediatr.Transfer.Commands
 {
@@ -49,26 +51,29 @@ namespace Sheaft.Mediatr.Transfer.Commands
         {
             var transfer =
                 await _context.Transfers.SingleOrDefaultAsync(c => c.Identifier == request.Identifier, token);
-            if (transfer != null)
-                return await HandleTransferStatusAsync(request, transfer, token);
 
-            var donation =
-                await _context.Donations.SingleOrDefaultAsync(c => c.Identifier == request.Identifier, token);
-            if (donation != null)
-                return await HandleDonationStatusAsync(request, donation, token);
+            if (transfer == null)
+            {
+                var donation =
+                    await _context.Donations.SingleOrDefaultAsync(c => c.Identifier == request.Identifier, token);
+                if (donation != null)
+                {
+                    _mediatr.Post(new RefreshDonationStatusCommand(request.RequestUser, request.Identifier));
+                    return Success();
+                }
 
-            var withholding =
-                await _context.Withholdings.SingleOrDefaultAsync(c => c.Identifier == request.Identifier, token);
-            if (withholding != null)
-                return await HandleWithholdingStatusAsync(request, withholding, token);
+                var withholding =
+                    await _context.Withholdings.SingleOrDefaultAsync(c => c.Identifier == request.Identifier, token);
+                if (withholding != null)
+                {
+                    _mediatr.Post(new RefreshWithholdingStatusCommand(request.RequestUser, request.Identifier));
+                    return Success();
+                }
 
-            return Failure(MessageKind.Unexpected);
-        }
-
-        private async Task<Result> HandleTransferStatusAsync(RefreshTransferStatusCommand request,
-            Domain.Transfer transfer, CancellationToken token)
-        {
-            if (transfer.Status == TransactionStatus.Succeeded || transfer.Status == TransactionStatus.Failed || transfer.Status == TransactionStatus.Cancelled)
+                return Failure(MessageKind.NotFound);
+            }
+            
+            if (transfer.Processed)
                 return Success();
 
             var pspResult = await _pspService.GetTransferAsync(transfer.Identifier, token);
@@ -78,42 +83,7 @@ namespace Sheaft.Mediatr.Transfer.Commands
             transfer.SetStatus(pspResult.Data.Status);
             transfer.SetResult(pspResult.Data.ResultCode, pspResult.Data.ResultMessage);
             transfer.SetExecutedOn(pspResult.Data.ProcessedOn);
-
-            await _context.SaveChangesAsync(token);
-            return Success();
-        }
-
-        private async Task<Result> HandleDonationStatusAsync(RefreshTransferStatusCommand request,
-            Domain.Donation donation, CancellationToken token)
-        {
-            if (donation.Status == TransactionStatus.Succeeded || donation.Status == TransactionStatus.Failed)
-                return Success();
-
-            var pspResult = await _pspService.GetTransferAsync(donation.Identifier, token);
-            if (!pspResult.Succeeded)
-                return Failure(pspResult);
-
-            donation.SetStatus(pspResult.Data.Status);
-            donation.SetResult(pspResult.Data.ResultCode, pspResult.Data.ResultMessage);
-            donation.SetExecutedOn(pspResult.Data.ProcessedOn);
-
-            await _context.SaveChangesAsync(token);
-            return Success();
-        }
-
-        private async Task<Result> HandleWithholdingStatusAsync(RefreshTransferStatusCommand request,
-            Domain.Withholding withholding, CancellationToken token)
-        {
-            if (withholding.Status == TransactionStatus.Succeeded || withholding.Status == TransactionStatus.Failed)
-                return Success();
-
-            var pspResult = await _pspService.GetTransferAsync(withholding.Identifier, token);
-            if (!pspResult.Succeeded)
-                return Failure(pspResult);
-
-            withholding.SetStatus(pspResult.Data.Status);
-            withholding.SetResult(pspResult.Data.ResultCode, pspResult.Data.ResultMessage);
-            withholding.SetExecutedOn(pspResult.Data.ProcessedOn);
+            transfer.SetAsProcessed();
 
             await _context.SaveChangesAsync(token);
             return Success();

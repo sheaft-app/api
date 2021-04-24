@@ -17,8 +17,8 @@ namespace Sheaft.Mediatr.Product.Commands
     {
         protected DeleteProductsCommand()
         {
-            
         }
+
         [JsonConstructor]
         public DeleteProductsCommand(RequestUser requestUser) : base(requestUser)
         {
@@ -42,13 +42,18 @@ namespace Sheaft.Mediatr.Product.Commands
         {
             using (var transaction = await _context.BeginTransactionAsync(token))
             {
+                Result result = null;
                 foreach (var id in request.ProductIds)
                 {
-                    var result = await _mediatr.Process(new DeleteProductCommand(request.RequestUser) {ProductId = id}, token);
+                    result = await _mediatr.Process(new DeleteProductCommand(request.RequestUser) {ProductId = id},
+                        token);
                     if (!result.Succeeded)
-                        return Failure(result);
+                        break;
                 }
 
+                if (result is {Succeeded: false})
+                    return result;
+                
                 await transaction.CommitAsync(token);
                 return Success();
             }

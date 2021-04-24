@@ -101,9 +101,7 @@ namespace Sheaft.Web.Api.Authorize
                                 {
                                     var jarr = (JArray)userInfo.role;
                                     foreach (var content in jarr.ToList())
-                                    {
                                         roles.Add((string)content);
-                                    }
                                 }
 
                                 uClaims.AddRange(roles.Select(r => new Claim(JwtClaimTypes.Role, r)));
@@ -161,9 +159,7 @@ namespace Sheaft.Web.Api.Authorize
 
             // Invoke all handlers.
             foreach (var handler in handlers)
-            {
                 await handler.HandleAsync(authContext);
-            }
 
             // Check the context, by default success is when all requirements have been met.
             return _evaluator.Evaluate(authContext);

@@ -14,9 +14,7 @@ namespace Sheaft.Web.Signalr.Hubs
         {
             var roles = Context.User.Claims.Where(c => c.Type == ClaimTypes.Role);
             foreach (var role in roles)
-            {
                 await Groups.AddToGroupAsync(Context.ConnectionId, role.Value);
-            }
 
             await base.OnConnectedAsync();
         }

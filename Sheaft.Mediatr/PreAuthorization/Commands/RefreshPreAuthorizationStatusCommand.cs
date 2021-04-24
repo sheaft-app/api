@@ -49,9 +49,8 @@ namespace Sheaft.Mediatr.PreAuthorization.Commands
         {
             var preAuthorization = await _context.PreAuthorizations.
                 SingleOrDefaultAsync(c => c.Identifier == request.Identifier, token);
-            if ((preAuthorization.Status == PreAuthorizationStatus.Succeeded && preAuthorization.PaymentStatus == PaymentStatus.Validated) ||
-                preAuthorization.Status == PreAuthorizationStatus.Failed || 
-                preAuthorization.Status == PreAuthorizationStatus.Cancelled)
+            
+            if (preAuthorization.Processed)
                 return Success(preAuthorization.Status);
 
             var pspResult = await _pspService.GetPreAuthorizationAsync(preAuthorization.Identifier, token);
@@ -60,6 +59,7 @@ namespace Sheaft.Mediatr.PreAuthorization.Commands
 
             preAuthorization.SetStatus(pspResult.Data.Status);
             preAuthorization.SetResult(pspResult.Data.ResultCode, pspResult.Data.ResultMessage);
+            preAuthorization.SetAsProcessed();
 
             await _context.SaveChangesAsync(token);
 

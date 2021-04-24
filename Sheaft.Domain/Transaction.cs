@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Sheaft.Core.Exceptions;
 using Sheaft.Domain.Common;
 using Sheaft.Domain.Enum;
 using Sheaft.Domain.Interop;
@@ -34,8 +35,17 @@ namespace Sheaft.Domain
         public string Reference { get; protected set; }
         public decimal Debited { get; protected set; }
         public decimal Credited { get; protected set; }
+        public bool Processed { get; protected set; }
         public virtual User Author { get; private set; }
 
+        public void SetAsProcessed()
+        {
+            if (Processed)
+                throw SheaftException.Conflict();
+            
+            Processed = true;
+        }
+        
         public void SetExecutedOn(DateTimeOffset? executedOn)
         {
             if (ExecutedOn.HasValue)
