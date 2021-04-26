@@ -16,12 +16,15 @@ namespace Sheaft.Application.Mailings
         public DateTimeOffset CreatedOn { get; set; }
         public Guid OrderId { get; set; }
         public string MyOrdersUrl { get; set; }
+        public decimal Donation { get; set; }
+        public decimal Fees { get; set; }
         public IEnumerable<ProducerMailerModel> Producers { get; set; }
     }
 
     public class ProducerMailerModel
     {
         public string Name { get; set; }
+        public AddressDto Address { get; set; }
         public ExpectedOrderDeliveryDto Delivery { get; set; }
         public IEnumerable<ProductMailerModel> Products { get; set; }
         public decimal WholeSalePrice { get; set; }

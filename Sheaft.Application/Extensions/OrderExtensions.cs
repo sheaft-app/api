@@ -2,6 +2,7 @@ using System.Linq;
 using Newtonsoft.Json;
 using Sheaft.Application.Mailings;
 using Sheaft.Application.Models;
+using Sheaft.Core;
 using Sheaft.Domain;
 
 namespace Sheaft.Application.Extensions
@@ -17,6 +18,7 @@ namespace Sheaft.Application.Extensions
                     Delivery =
                         GetDelivery(order.Deliveries.FirstOrDefault(d => d.DeliveryMode.Producer.Id == o.Key.Id)),
                     Name = o.Key.Name,
+                    Address = GetAddress(order.Deliveries.FirstOrDefault(d => d.DeliveryMode.Producer.Id == o.Key.Id)),
                     VatPrice = o.Sum(p => p.TotalVatPrice),
                     OnSalePrice = o.Sum(p => p.TotalOnSalePrice),
                     WholeSalePrice = o.Sum(p => p.TotalWholeSalePrice),
@@ -42,7 +44,20 @@ namespace Sheaft.Application.Extensions
                 TotalPrice = order.TotalPrice,
                 MyOrdersUrl = url,
                 OnSalePrice = order.TotalOnSalePrice,
-                WholeSalePrice = order.TotalWholeSalePrice
+                WholeSalePrice = order.TotalWholeSalePrice,
+                Donation = order.Donation,
+                Fees = order.FeesPrice - order.DonationFeesPrice
+            };
+        }
+
+        private static AddressDto GetAddress(OrderDelivery delivery)
+        {
+            return new AddressDto
+            {
+                Line1 = delivery.DeliveryMode.Address.Line1,
+                Line2 = delivery.DeliveryMode.Address.Line2,
+                Zipcode = delivery.DeliveryMode.Address.Zipcode,
+                City = delivery.DeliveryMode.Address.City,
             };
         }
 
@@ -50,6 +65,7 @@ namespace Sheaft.Application.Extensions
         {
             return new ExpectedOrderDeliveryDto
             {
+                ExpectedDeliveryDate = orderDelivery.ExpectedDelivery.ExpectedDeliveryDate,
                 Day = orderDelivery.ExpectedDelivery.ExpectedDeliveryDate.DayOfWeek,
                 From = orderDelivery.ExpectedDelivery.From,
                 To = orderDelivery.ExpectedDelivery.To

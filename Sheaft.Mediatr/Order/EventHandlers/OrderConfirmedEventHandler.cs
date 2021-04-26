@@ -1,4 +1,6 @@
-﻿using System.Threading;
+﻿using System;
+using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -32,13 +34,15 @@ namespace Sheaft.Mediatr.Order.EventHandlers
             await _signalrService.SendNotificationToUserAsync(order.Id, nameof(OrderConfirmedEvent),
                 order.GetOrderNotifModelAsString());
 
+            var orderId = order.PurchaseOrders.Count() == 1 ? order.PurchaseOrders.FirstOrDefault()?.Id : (Guid?)null; 
+            
             await _emailService.SendTemplatedEmailAsync(
                 order.User.Email,
                 order.User.Name,
-                $"Votre commande de {order.TotalPrice}€ est confirmée",
+                $"{order.User.Name}, votre commande de {order.TotalPrice}€ a été prise en compte",
                 nameof(OrderConfirmedEvent),
                 order.GetTemplateData(
-                    $"{_configuration.GetValue<string>("Portal:url")}/#/my-orders/{order.Id}"),
+                    $"{_configuration.GetValue<string>("Portal:url")}/#/my-orders{(orderId.HasValue ? $"/{orderId.Value:N}" : string.Empty)}"),
                 true,
                 token);
         }
