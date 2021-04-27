@@ -62,7 +62,7 @@ namespace Sheaft.Mediatr.Agreement.Commands
 
             var alreadyAcceptedAgreement =
                 await _context.Agreements.SingleOrDefaultAsync(
-                    a => a.Id != request.AgreementId && a.Status == AgreementStatus.Accepted, token);
+                    a => a.Id != request.AgreementId && a.Producer.Id == entity.Producer.Id && a.Store.Id == entity.Store.Id && a.Status == AgreementStatus.Accepted, token);
             if (alreadyAcceptedAgreement != null)
                 return Failure(MessageKind.AlreadyExists);
 
