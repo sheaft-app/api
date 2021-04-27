@@ -14,7 +14,7 @@ using Sheaft.Domain.Views;
 
 namespace Sheaft.Application.Interfaces.Infrastructure
 {
-    public interface IAppDbContext : IDisposable, IAsyncDisposable, IInfrastructure<IServiceProvider>, IDbContextDependencies, IDbSetCache, IDbContextPoolable, IResettableService
+    public interface IAppDbContext : IDisposable, IAsyncDisposable, IInfrastructure<IServiceProvider>
     {
         public DbSet<TEntity> Set<TEntity>()
             where TEntity : class;
@@ -36,7 +36,7 @@ namespace Sheaft.Application.Interfaces.Infrastructure
         DbSet<Domain.Returnable> Returnables { get; set; }
         DbSet<Domain.Payin> Payins { get; set; }
         DbSet<Domain.Payout> Payouts { get; set; }
-        public DbSet<PreAuthorization> PreAuthorizations { get; set; }
+        DbSet<PreAuthorization> PreAuthorizations { get; set; }
         DbSet<Domain.Product> Products { get; set; }
         DbSet<Domain.QuickOrder> QuickOrders { get; set; }
         DbSet<Refund> Refunds { get; set; }

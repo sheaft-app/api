@@ -65,8 +65,8 @@ namespace Sheaft.Web.Api.Authorize
                 List<UserClaim> userClaims = null;
                 using (var ms = new MemoryStream(cachedUser))
                 {
-                    var formatter = new BinaryFormatter();
-                    userClaims = (List<UserClaim>)formatter.Deserialize(ms);
+                    userClaims = 
+                        await System.Text.Json.JsonSerializer.DeserializeAsync<List<UserClaim>>(ms);
                 }
 
                 claims.AddRange(userClaims.Select(c => new Claim(c.ClaimType, c.ClaimValue, c.ClaimValueType, c.ClaimIssuer, c.ClaimOriginalIssuer, subClaim.Subject)));
@@ -127,20 +127,14 @@ namespace Sheaft.Web.Api.Authorize
 
                             uClaims.Add(new Claim(JwtClaimTypes.EmailVerified, userInfo.email_verified.ToString().ToLower(), null, subClaim?.Issuer, subClaim?.OriginalIssuer, subClaim?.Subject));
 
-                            byte[] buffer;
-                            using (var ms = new MemoryStream())
+                            var buffer = System.Text.Json.JsonSerializer.SerializeToUtf8Bytes(uClaims.Select(c => new UserClaim
                             {
-                                var formatter = new BinaryFormatter();
-                                formatter.Serialize(ms, uClaims.Select(c => new UserClaim
-                                {
-                                    ClaimIssuer = c.Issuer,
-                                    ClaimOriginalIssuer = c.OriginalIssuer,
-                                    ClaimType = c.Type,
-                                    ClaimValue = c.Value,
-                                    ClaimValueType = c.ValueType
-                                }).ToList());
-                                buffer = ms.ToArray();
-                            }
+                                ClaimIssuer = c.Issuer,
+                                ClaimOriginalIssuer = c.OriginalIssuer,
+                                ClaimType = c.Type,
+                                ClaimValue = c.Value,
+                                ClaimValueType = c.ValueType
+                            }).ToList());
 
                             claims.AddRange(uClaims);
 

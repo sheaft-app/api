@@ -359,7 +359,7 @@ namespace Sheaft.Web.Api
             services.AddScoped<IAmazonSimpleEmailService, AmazonSimpleEmailServiceClient>(_ => new AmazonSimpleEmailServiceClient(mailerConfig.ApiId, mailerConfig.ApiKey, RegionEndpoint.EUCentral1));
 
             services.AddScoped<IRazorLightEngine>(_ => {
-                var rootDir = System.IO.Path.GetDirectoryName(Assembly.GetExecutingAssembly().CodeBase);
+                var rootDir = System.IO.Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
                 return new RazorLightEngineBuilder()
                 .UseFileSystemProject($"{rootDir.Replace("file:\\", string.Empty).Replace("file:", string.Empty)}/Mailings/Templates")
                 .UseMemoryCachingProvider()
