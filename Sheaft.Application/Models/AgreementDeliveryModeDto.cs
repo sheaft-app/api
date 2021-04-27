@@ -15,6 +15,5 @@ namespace Sheaft.Application.Models
         public string Name { get; set; }
         public string Description { get; set; }
         public AddressDto Address { get; set; }
-        public IEnumerable<TimeSlotDto> OpeningHours { get; set; }
     }
 }

@@ -9,6 +9,7 @@ using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Application.Interfaces.Queries;
 using Sheaft.Application.Models;
 using Sheaft.Domain;
+using Sheaft.Domain.Enum;
 using Sheaft.Options;
 
 namespace Sheaft.Mediatr.Agreement.Queries
@@ -50,14 +51,14 @@ namespace Sheaft.Mediatr.Agreement.Queries
             if (currentUser.IsInRole(_roleOptions.Store.Value))
             {
                 return _context.Agreements
-                        .Where(c => c.Store.Id == currentUser.Id)
+                        .Where(c => c.Store.Id == currentUser.Id && c.Status != AgreementStatus.Cancelled && c.Status != AgreementStatus.Refused)
                         .ProjectTo<AgreementDto>(_configurationProvider);
             }
 
             if (currentUser.IsInRole(_roleOptions.Producer.Value))
             {
                 return _context.Agreements
-                        .Where(c => c.Producer.Id == currentUser.Id)
+                        .Where(c => c.Producer.Id == currentUser.Id && c.Status != AgreementStatus.Cancelled && c.Status != AgreementStatus.Refused)
                         .ProjectTo<AgreementDto>(_configurationProvider);
             }
 
@@ -69,7 +70,7 @@ namespace Sheaft.Mediatr.Agreement.Queries
             if (currentUser.IsInRole(_roleOptions.Producer.Value))
             {
                 return _context.Agreements
-                        .Where(c => c.Store.Id == storeId && c.Producer.Id == currentUser.Id)
+                        .Where(c => c.Store.Id == storeId && c.Producer.Id == currentUser.Id && c.Status != AgreementStatus.Cancelled && c.Status != AgreementStatus.Refused)
                         .ProjectTo<AgreementDto>(_configurationProvider);
             }
 
@@ -81,7 +82,7 @@ namespace Sheaft.Mediatr.Agreement.Queries
             if (currentUser.IsInRole(_roleOptions.Store.Value))
             {
                 return _context.Agreements
-                        .Where(c => c.Store.Id == currentUser.Id && c.Producer.Id == producerId)
+                        .Where(c => c.Store.Id == currentUser.Id && c.Producer.Id == producerId && c.Status != AgreementStatus.Cancelled && c.Status != AgreementStatus.Refused)
                         .ProjectTo<AgreementDto>(_configurationProvider);
             }
 
