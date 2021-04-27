@@ -9,9 +9,8 @@
     <PackageReference Include="Hangfire.AspNetCore" Version="1.7.22" />
     <PackageReference Include="Hangfire.Core" Version="1.7.22" />
     <PackageReference Include="Hangfire.SqlServer" Version="1.7.22" />
-    <PackageReference Include="HotChocolate" Version="10.5.5" />
-    <PackageReference Include="HotChocolate.AspNetCore" Version="10.5.5" />
-    <PackageReference Include="HotChocolate.Server" Version="10.5.5" />
+    <PackageReference Include="HotChocolate" Version="11.2.2" />
+    <PackageReference Include="HotChocolate.AspNetCore" Version="11.2.2" />
     <PackageReference Include="IdentityServer4.AccessTokenValidation" Version="3.0.1" />
     <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="8.1.1" />
     <PackageReference Include="MediatR.Extensions.Microsoft.DependencyInjection" Version="9.0.0" />
@@ -22,7 +21,7 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer.NetTopologySuite" Version="5.0.5" />
     <PackageReference Include="Microsoft.Extensions.Caching.SqlServer" Version="5.0.1" />
     <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="5.0.0" />
-    <PackageReference Include="Microsoft.Spatial" Version="7.6.4" />
+    <PackageReference Include="Microsoft.Spatial" Version="7.8.3" />
     <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.10.9" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="5.0.2" />
     <PackageReference Include="NewRelic.Agent" Version="8.39.2" />

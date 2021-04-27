@@ -1,4 +1,4 @@
-﻿using HotChocolate.Types.Filters;
+﻿using HotChocolate.Data.Filters;
 using Sheaft.Application.Models;
 
 namespace Sheaft.GraphQL.Filters
@@ -9,9 +9,9 @@ namespace Sheaft.GraphQL.Filters
         {
             descriptor.Name("QuickOrderFilter");
             descriptor.BindFieldsExplicitly();
-            descriptor.Filter(c => c.Id).AllowEquals();
-            descriptor.Filter(c => c.IsDefault).AllowEquals();
-            descriptor.Filter(c => c.Name).AllowContains();
+            descriptor.Field(c => c.Id);
+            descriptor.Field(c => c.IsDefault);
+            descriptor.Field(c => c.Name);
         }
     }
 }

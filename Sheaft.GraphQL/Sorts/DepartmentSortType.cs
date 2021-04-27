@@ -1,4 +1,4 @@
-﻿using HotChocolate.Types.Sorting;
+﻿using HotChocolate.Data.Sorting;
 using Sheaft.Application.Models;
 
 namespace Sheaft.GraphQL.Sorts
@@ -9,7 +9,7 @@ namespace Sheaft.GraphQL.Sorts
         {
             descriptor.Name("DepartmentSort");
             descriptor.BindFieldsExplicitly();
-            descriptor.Sortable(c => c.Code);
+            descriptor.Field(c => c.Code);
         }
     }
 }

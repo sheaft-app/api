@@ -1,4 +1,4 @@
-﻿using HotChocolate.Types.Sorting;
+﻿using HotChocolate.Data.Sorting;
 using Sheaft.Application.Models;
 
 namespace Sheaft.GraphQL.Sorts
@@ -9,11 +9,11 @@ namespace Sheaft.GraphQL.Sorts
         {
             descriptor.Name("PurchaseOrderSort");
             descriptor.BindFieldsExplicitly();
-            descriptor.Sortable(c => c.Reference);
-            descriptor.Sortable(c => c.Status);
-            descriptor.Sortable(c => c.CreatedOn);
-            descriptor.Sortable(c => c.TotalWholeSalePrice);
-            descriptor.Sortable(c => c.TotalOnSalePrice);
+            descriptor.Field(c => c.Reference);
+            descriptor.Field(c => c.Status);
+            descriptor.Field(c => c.CreatedOn);
+            descriptor.Field(c => c.TotalWholeSalePrice);
+            descriptor.Field(c => c.TotalOnSalePrice);
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿using HotChocolate.Types.Filters;
+﻿using HotChocolate.Data.Filters;
 using Sheaft.Application.Models;
 
 namespace Sheaft.GraphQL.Filters

@@ -1,4 +1,4 @@
-﻿using HotChocolate.Types.Filters;
+﻿using HotChocolate.Data.Filters;
 using Sheaft.Application.Models;
 
 namespace Sheaft.GraphQL.Filters
@@ -9,22 +9,10 @@ namespace Sheaft.GraphQL.Filters
         {
             descriptor.Name("DeliveryHourFilter");
             descriptor.BindFieldsExplicitly();
-            descriptor.Filter(c => c.Day).AllowIn();
-
-            descriptor.Filter(c => c.From).AllowGreaterThan();
-            descriptor.Filter(c => c.From).AllowGreaterThanOrEquals();
-            descriptor.Filter(c => c.From).AllowLowerThan();
-            descriptor.Filter(c => c.From).AllowLowerThanOrEquals();
-
-            descriptor.Filter(c => c.To).AllowGreaterThan();
-            descriptor.Filter(c => c.To).AllowGreaterThanOrEquals();
-            descriptor.Filter(c => c.To).AllowLowerThan();
-            descriptor.Filter(c => c.To).AllowLowerThanOrEquals();
-
-            descriptor.Filter(c => c.ExpectedDeliveryDate).AllowGreaterThan();
-            descriptor.Filter(c => c.ExpectedDeliveryDate).AllowGreaterThanOrEquals();
-            descriptor.Filter(c => c.ExpectedDeliveryDate).AllowLowerThan();
-            descriptor.Filter(c => c.ExpectedDeliveryDate).AllowLowerThanOrEquals();
+            descriptor.Field(c => c.Day);
+            descriptor.Field(c => c.From);
+            descriptor.Field(c => c.To);
+            descriptor.Field(c => c.ExpectedDeliveryDate);
         }
     }
 }

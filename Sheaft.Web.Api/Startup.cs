@@ -40,6 +40,7 @@ using System.Globalization;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Reflection;
+using System.Threading.Tasks;
 using Sheaft.Application.Behaviours;
 using Sheaft.Application.Interfaces.Business;
 using Sheaft.Application.Interfaces.Factories;
@@ -222,8 +223,10 @@ namespace Sheaft.Web.Api
                 });
                 options.AddPolicy(Policies.ANONYMOUS_OR_CONNECTED, builder =>
                 {
-                    builder.RequireAssertion(c => !c.User.Identity.IsAuthenticated || c.User.Identity.IsAuthenticated);
+                    builder.RequireAssertion(c => c.User.Identity is not {IsAuthenticated: true} || c.User.Identity.IsAuthenticated);
                 });
+                
+                options.DefaultPolicy = options.GetPolicy(Policies.ANONYMOUS_OR_CONNECTED);
             });
 
             services.Configure<KestrelServerOptions>(options => options.AllowSynchronousIO = true);
@@ -282,7 +285,7 @@ namespace Sheaft.Web.Api
             services.AddHttpClient();
 
             var databaseConfig = appDatabaseSettings.Get<AppDatabaseOptions>();
-            services.AddDbContext<IAppDbContext, AppDbContext>(options =>
+            services.AddPooledDbContextFactory<AppDbContext>(options =>
             {
                 options.UseLazyLoadingProxies();
                 options.UseSqlServer(databaseConfig.ConnectionString, x =>
@@ -290,7 +293,9 @@ namespace Sheaft.Web.Api
                     x.UseNetTopologySuite();
                     x.MigrationsHistoryTable("AppMigrationTable", "ef");
                 });
-            }, ServiceLifetime.Scoped);
+            });
+
+            services.AddScoped<IAppDbContext>(c => c.GetRequiredService<IDbContextFactory<AppDbContext>>().CreateDbContext());
 
             services.AddScoped<IIdentifierService, IdentifierService>();
             services.AddScoped<IBlobService, BlobService>();
@@ -376,15 +381,17 @@ namespace Sheaft.Web.Api
             services.AddTransient(typeof(IPipelineBehavior<,>), typeof(PerformanceBehaviour<,>));
             services.AddTransient(typeof(IPipelineBehavior<,>), typeof(LoggingBehaviour<,>));
 
-            services.AddGraphQL(sp => SchemaBuilder.New()
-                .AddServices(sp)
-                .AddAuthorizeDirectiveType()
-                .ModifyOptions(c => c.DefaultBindingBehavior = BindingBehavior.Explicit)
-                .AddMutationType<SheaftMutationType>()
+            services.AddMemoryCache();
+            
+            services.AddGraphQLServer()
+                .AddAuthorization()
                 .AddQueryType<SheaftQueryType>()
-                .BindClrType<TimeSpan, SheaftTimeSpanType>()
+                .AddMutationType<SheaftMutationType>()
+                .AddFiltering()
+                .AddSorting()
+                .AddProjections()
                 .RegisterGraphQlTypes()
-                .Create(), new QueryExecutionOptions { IncludeExceptionDetails = true });
+                .ModifyOptions(c => c.DefaultBindingBehavior = BindingBehavior.Explicit);
 
             services.AddErrorFilter<SheaftErrorFilter>();
 
@@ -436,8 +443,7 @@ namespace Sheaft.Web.Api
                 });
             });
 
-            services.AddMvc(option => option.EnableEndpointRouting = false)
-                .SetCompatibilityVersion(CompatibilityVersion.Latest);
+            services.AddMvc(option => option.EnableEndpointRouting = true);
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IConfiguration configuration)
@@ -454,7 +460,7 @@ namespace Sheaft.Web.Api
 
             using (var serviceScope = app.ApplicationServices.GetRequiredService<IServiceScopeFactory>().CreateScope())
             {
-                var context = serviceScope.ServiceProvider.GetService<IAppDbContext>();
+                var context = serviceScope.ServiceProvider.GetRequiredService<IAppDbContext>();
                 if (!context.AllMigrationsApplied())
                 {
                     context.Migrate();
@@ -547,20 +553,20 @@ namespace Sheaft.Web.Api
 
             app.UseSerilogRequestLogging();
 
+            app.UseRouting();
+            
             app.UseAuthentication();
             app.UseAuthorization();
 
             app.UseIpRateLimiting();
-
-            app.UseMvc(endpoints =>
-            {
-                endpoints.MapRoute(
-                    name: "default",
-                    template: "{controller=Home}/{action=Index}/{id?}");
-            });
-
             app.UseWebSockets();
-            app.UseGraphQL("/graphql");
+            
+            app.UseEndpoints(endpoints =>
+            {
+                endpoints.MapControllers();
+                endpoints.MapGraphQL()
+                    .RequireAuthorization(Policies.ANONYMOUS_OR_CONNECTED);
+            });
         }
     }
 }

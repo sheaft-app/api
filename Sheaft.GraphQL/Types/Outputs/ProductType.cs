@@ -40,7 +40,7 @@ namespace Sheaft.GraphQL.Types.Outputs
             
             descriptor.Field("currentUserHasRatedProduct")
                 .Type<NonNullType<BooleanType>>()
-                .Resolver(async c =>
+                .Resolve(async c =>
                 {
                     var user = GetRequestUser(c.ContextData);
                     if (!user.IsAuthenticated)

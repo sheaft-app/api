@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Localization;
@@ -26,17 +27,13 @@ namespace Sheaft.Infrastructure.Persistence
 {
     public partial class AppDbContext : DbContext, IAppDbContext
     {
-        private readonly ISheaftMediatr _mediatr;
-        private readonly bool _isAdminContext;
+        private ISheaftMediatr _mediatr => this.GetService<ISheaftMediatr>();
+        private bool _isAdminContext => this.GetService<IConfiguration>().GetValue<bool?>("IsAdminContext") ?? false;
 
         public AppDbContext(
-            DbContextOptions<AppDbContext> options,
-            ISheaftMediatr mediatr,
-            IConfiguration configuration)
+            DbContextOptions<AppDbContext> options)
             : base(options)
         {
-            _mediatr = mediatr;
-            _isAdminContext = configuration.GetValue<bool?>("IsAdminContext") ?? false;
         }
         
         public DbSet<Agreement> Agreements { get; set; }

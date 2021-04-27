@@ -6,12 +6,11 @@
 
     <ItemGroup>
       <PackageReference Include="AutoMapper" Version="10.1.1" />
-      <PackageReference Include="HotChocolate.Abstractions" Version="10.5.5" />
-      <PackageReference Include="HotChocolate.AspNetCore.Authorization" Version="10.5.5" />
-      <PackageReference Include="HotChocolate.Types" Version="10.5.5" />
-      <PackageReference Include="HotChocolate.Types.Filters" Version="10.5.5" />
-      <PackageReference Include="HotChocolate.Types.Selections" Version="10.5.5" />
-      <PackageReference Include="HotChocolate.Types.Sorting" Version="10.5.5" />
+      <PackageReference Include="HotChocolate.Abstractions" Version="11.2.2" />
+      <PackageReference Include="HotChocolate.AspNetCore.Authorization" Version="11.2.2" />
+      <PackageReference Include="HotChocolate.Data" Version="11.2.2" />
+      <PackageReference Include="HotChocolate.Data.EntityFramework" Version="11.2.2" />
+      <PackageReference Include="HotChocolate.Types" Version="11.2.2" />
       <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.2.0" />
       <PackageReference Include="Microsoft.Extensions.Localization.Abstractions" Version="5.0.5" />
       <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="5.0.0" />
@@ -20,6 +19,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\Sheaft.Domain\Sheaft.Domain.csproj" />
+      <ProjectReference Include="..\Sheaft.Infrastructure\Sheaft.Infrastructure.csproj" />
       <ProjectReference Include="..\Sheaft.Localization\Sheaft.Localization.csproj" />
       <ProjectReference Include="..\Sheaft.Mediatr\Sheaft.Mediatr.csproj" />
     </ItemGroup>

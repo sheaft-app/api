@@ -1,4 +1,4 @@
-﻿using HotChocolate.Types.Filters;
+﻿using HotChocolate.Data.Filters;
 using Sheaft.Application.Models;
 
 namespace Sheaft.GraphQL.Filters
@@ -9,9 +9,8 @@ namespace Sheaft.GraphQL.Filters
         {
             descriptor.Name("DeliveryModeFilter");
             descriptor.BindFieldsExplicitly();
-            descriptor.Filter(c => c.Id).AllowEquals();
-            descriptor.Filter(c => c.Kind).AllowIn();
-            descriptor.Filter(c => c.Kind).AllowNotIn();
+            descriptor.Field(c => c.Id);
+            descriptor.Field(c => c.Kind);
         }
     }
 }

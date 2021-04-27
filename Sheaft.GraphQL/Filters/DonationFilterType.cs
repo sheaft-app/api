@@ -1,4 +1,4 @@
-﻿using HotChocolate.Types.Filters;
+﻿using HotChocolate.Data.Filters;
 using Sheaft.Application.Models;
 
 namespace Sheaft.GraphQL.Filters
@@ -9,12 +9,10 @@ namespace Sheaft.GraphQL.Filters
         {
             descriptor.Name("DonationFilter");
             descriptor.BindFieldsExplicitly();
-            descriptor.Filter(c => c.Id).AllowEquals();
-            descriptor.Filter(c => c.Status).AllowIn();
-            descriptor.Filter(c => c.CreatedOn).AllowGreaterThanOrEquals();
-            descriptor.Filter(c => c.CreatedOn).AllowLowerThanOrEquals();
-            descriptor.Filter(c => c.UpdatedOn).AllowGreaterThanOrEquals();
-            descriptor.Filter(c => c.UpdatedOn).AllowLowerThanOrEquals();
+            descriptor.Field(c => c.Id);
+            descriptor.Field(c => c.Status);
+            descriptor.Field(c => c.CreatedOn);
+            descriptor.Field(c => c.UpdatedOn);
         }
     }
 }

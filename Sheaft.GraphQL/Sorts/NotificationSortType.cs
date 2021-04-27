@@ -1,4 +1,4 @@
-﻿using HotChocolate.Types.Sorting;
+﻿using HotChocolate.Data.Sorting;
 using Sheaft.Application.Models;
 
 namespace Sheaft.GraphQL.Sorts
@@ -9,7 +9,7 @@ namespace Sheaft.GraphQL.Sorts
         {
             descriptor.Name("NotificationSort");
             descriptor.BindFieldsExplicitly();
-            descriptor.Sortable(c => c.CreatedOn);
+            descriptor.Field(c => c.CreatedOn);
         }
     }
 }

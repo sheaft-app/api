@@ -1,4 +1,4 @@
-﻿using HotChocolate.Types.Sorting;
+﻿using HotChocolate.Data.Sorting;
 using Sheaft.Application.Models;
 
 namespace Sheaft.GraphQL.Sorts
@@ -9,8 +9,8 @@ namespace Sheaft.GraphQL.Sorts
         {
             descriptor.Name("DeliveryHourSort");
             descriptor.BindFieldsExplicitly();
-            descriptor.Sortable(c => c.Day);
-            descriptor.Sortable(c => c.ExpectedDeliveryDate);
+            descriptor.Field(c => c.Day);
+            descriptor.Field(c => c.ExpectedDeliveryDate);
         }
     }
 }

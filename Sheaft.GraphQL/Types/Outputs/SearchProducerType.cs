@@ -7,7 +7,7 @@ namespace Sheaft.GraphQL.Types.Outputs
     {
         protected override void Configure(IObjectTypeDescriptor<ProducerDto> descriptor)
         {
-            descriptor.Name("SearchProducerDto");
+            descriptor.Name("SearchProducerType");
 
             descriptor.Field(c => c.Id).Type<NonNullType<IdType>>();
             descriptor.Field(c => c.Phone);

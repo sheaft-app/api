@@ -1,13 +1,12 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using HotChocolate;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Localization;
-using Microsoft.Extensions.Logging;
 using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Core.Enums;
 using Sheaft.Core.Exceptions;
 using Sheaft.Domain;
-using Sheaft.Domain.Enum;
 using Sheaft.Localization;
 
 namespace Sheaft.GraphQL.Common
@@ -32,17 +31,20 @@ namespace Sheaft.GraphQL.Common
 
         public IError OnError(IError error)
         {
-            error = error.AddExtension("RequestIdentifier", _httpContextAccessor.HttpContext.TraceIdentifier);
             var message = "Une erreur inattendue est survenue.";
+            var extensions = error.Extensions.ToDictionary(pair => pair.Key, pair => pair.Value);
+            
+            extensions.Add("RequestIdentifier", _httpContextAccessor.HttpContext.TraceIdentifier);
 
             var kind = ExceptionKind.Unexpected;
             var exception = error.Exception;
+            string code = null;
 
             var statusCode = 400;
             if (error.Exception != null && error.Exception is SheaftException exc)
             {
                 exception = exc;
-                error = error.WithCode(exc.Kind.ToString("G"));
+                code = exc.Kind.ToString("G");
 
                 if (exc.Error.HasValue)
                     message = _localizer[exc.Error.Value.ToString("G"), exc.Params ?? new object[] { }];
@@ -52,8 +54,8 @@ namespace Sheaft.GraphQL.Common
                 message = message != "Une erreur inattendue est survenue."
                     ? message
                     : _localizer[exc.Kind.ToString("G")];
-                error = error.AddExtension(exc.Kind.ToString("G"), message);
-                error = error.WithMessage(message);
+                
+                extensions.Add(exc.Kind.ToString("G"), message);
 
                 switch (exc.Kind)
                 {
@@ -78,10 +80,6 @@ namespace Sheaft.GraphQL.Common
                     case ExceptionKind.Unexpected:
                         statusCode = 500;
                         break;
-                    case ExceptionKind.TooManyRetries:
-                    case ExceptionKind.BadRequest:
-                    case ExceptionKind.Validation:
-                    case ExceptionKind.AlreadyExists:
                     default:
                         statusCode = 400;
                         break;
@@ -90,7 +88,7 @@ namespace Sheaft.GraphQL.Common
             else
             {
                 statusCode = 400;
-                error = error.WithMessage(message);
+                code = MessageKind.BadRequest.ToString("G");
             }
 
             if (error.Code == "AUTH_NOT_AUTHORIZED")
@@ -98,13 +96,14 @@ namespace Sheaft.GraphQL.Common
                 statusCode = 401;
                 kind = ExceptionKind.Unauthorized;
                 message = _localizer[ExceptionKind.Unauthorized.ToString("G")];
-                error = error.WithCode(ExceptionKind.Unauthorized.ToString("G"));
-                error = error.WithMessage(message);
-
-                error = error.AddExtension(ExceptionKind.Unauthorized.ToString("G"), message);
+                code = ExceptionKind.Unauthorized.ToString("G");
+                extensions.Add(ExceptionKind.Unauthorized.ToString("G"), message);
             }
 
-            error = error.AddExtension("StatusCode", statusCode);
+            extensions.Add("StatusCode", statusCode);
+            error = error.WithExtensions(extensions);
+            error = error.WithCode(code);
+            error = error.WithMessage(message);
 
             NewRelic.Api.Agent.NewRelic.SetTransactionName("StatusCode", statusCode.ToString());
 
@@ -123,7 +122,9 @@ namespace Sheaft.GraphQL.Common
                 {"ExceptionMessage", message},
             };
 
-            NewRelic.Api.Agent.NewRelic.NoticeError(exception, parameters);
+            if(exception != null)
+                NewRelic.Api.Agent.NewRelic.NoticeError(exception, parameters);
+            
             return error;
         }
     }

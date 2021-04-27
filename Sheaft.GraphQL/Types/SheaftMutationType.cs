@@ -27,7 +27,7 @@ namespace Sheaft.GraphQL.Types
                 .UsePaging<PurchaseOrderType>()
                 .UseFiltering<PurchaseOrderFilterType>()
                 .UseSorting<PurchaseOrderSortType>()
-                .UseSelection();
+                .UseProjection();
 
             descriptor.Field(c => c.CompletePurchaseOrdersAsync(default, default))
                 .Argument("input", c => c.Type<NonNullType<CompletePurchaseOrdersInputType>>())
@@ -37,7 +37,7 @@ namespace Sheaft.GraphQL.Types
                 .UsePaging<PurchaseOrderType>()
                 .UseFiltering<PurchaseOrderFilterType>()
                 .UseSorting<PurchaseOrderSortType>()
-                .UseSelection();
+                .UseProjection();
 
             descriptor.Field(c => c.DeliverPurchaseOrdersAsync(default, default))
                 .Argument("input", c => c.Type<NonNullType<DeliverPurchaseOrdersInputType>>())
@@ -47,7 +47,7 @@ namespace Sheaft.GraphQL.Types
                 .UsePaging<PurchaseOrderType>()
                 .UseFiltering<PurchaseOrderFilterType>()
                 .UseSorting<PurchaseOrderSortType>()
-                .UseSelection();
+                .UseProjection();
 
             descriptor.Field(c => c.ProcessPurchaseOrdersAsync(default, default))
                 .Argument("input", c => c.Type<NonNullType<ProcessPurchaseOrdersInputType>>())
@@ -57,7 +57,7 @@ namespace Sheaft.GraphQL.Types
                 .UsePaging<PurchaseOrderType>()
                 .UseFiltering<PurchaseOrderFilterType>()
                 .UseSorting<PurchaseOrderSortType>()
-                .UseSelection();
+                .UseProjection();
 
             descriptor.Field(c => c.ShipPurchaseOrdersAsync(default, default))
                 .Argument("input", c => c.Type<NonNullType<ShipPurchaseOrdersInputType>>())
@@ -67,7 +67,7 @@ namespace Sheaft.GraphQL.Types
                 .UsePaging<PurchaseOrderType>()
                 .UseFiltering<PurchaseOrderFilterType>()
                 .UseSorting<PurchaseOrderSortType>()
-                .UseSelection();
+                .UseProjection();
 
             descriptor.Field(c => c.RefusePurchaseOrdersAsync(default, default))
                 .Argument("input", c => c.Type<NonNullType<RefusePurchaseOrdersInputType>>())
@@ -77,7 +77,7 @@ namespace Sheaft.GraphQL.Types
                 .UsePaging<PurchaseOrderType>()
                 .UseFiltering<PurchaseOrderFilterType>()
                 .UseSorting<PurchaseOrderSortType>()
-                .UseSelection();
+                .UseProjection();
 
             descriptor.Field(c => c.CancelPurchaseOrdersAsync(default, default))
                 .Argument("input", c => c.Type<NonNullType<CancelPurchaseOrdersInputType>>())
@@ -87,7 +87,7 @@ namespace Sheaft.GraphQL.Types
                 .UsePaging<PurchaseOrderType>()
                 .UseFiltering<PurchaseOrderFilterType>()
                 .UseSorting<PurchaseOrderSortType>()
-                .UseSelection();
+                .UseProjection();
             
             descriptor.Field(c => c.WithdrawnPurchaseOrdersAsync(default, default))
                 .Argument("input", c => c.Type<NonNullType<WithdrawnPurchaseOrdersInputType>>())
@@ -97,7 +97,7 @@ namespace Sheaft.GraphQL.Types
                 .UsePaging<PurchaseOrderType>()
                 .UseFiltering<PurchaseOrderFilterType>()
                 .UseSorting<PurchaseOrderSortType>()
-                .UseSelection();
+                .UseProjection();
 
             descriptor.Field(c => c.DeletePurchaseOrdersAsync(default))
                 .Argument("input", c => c.Type<NonNullType<DeletePurchaseOrdersInputType>>())
@@ -112,7 +112,7 @@ namespace Sheaft.GraphQL.Types
                 .Authorize(Policies.STORE_OR_PRODUCER)
                 .Type<NonNullType<AgreementType>>()
                 .UseSingleOrDefault()
-                .UseSelection();
+                .UseProjection();
 
             descriptor.Field(c => c.AcceptAgreementAsync(default, default))
                 .Argument("input", c => c.Type<NonNullType<AcceptAgreementsInputType>>())
@@ -121,7 +121,7 @@ namespace Sheaft.GraphQL.Types
                 .UsePaging<AgreementType>()
                 .UseFiltering<AgreementFilterType>()
                 .UseSorting<AgreementSortType>()
-                .UseSelection();
+                .UseProjection();
             
             descriptor.Field(c => c.AssignCatalogToAgreementAsync(default, default))
                 .Argument("input", c => c.Type<NonNullType<AssignCatalogToAgreementInputType>>())
@@ -129,7 +129,7 @@ namespace Sheaft.GraphQL.Types
                 .Authorize(Policies.PRODUCER)
                 .Type<NonNullType<AgreementType>>()
                 .UseSingleOrDefault()
-                .UseSelection();
+                .UseProjection();
 
             descriptor.Field(c => c.RefuseAgreementsAsync(default, default))
                 .Argument("input", c => c.Type<NonNullType<RefuseAgreementsInputType>>())
@@ -139,7 +139,7 @@ namespace Sheaft.GraphQL.Types
                 .UsePaging<AgreementType>()
                 .UseFiltering<AgreementFilterType>()
                 .UseSorting<AgreementSortType>()
-                .UseSelection();
+                .UseProjection();
 
             descriptor.Field(c => c.CancelAgreementsAsync(default, default))
                 .Argument("input", c => c.Type<NonNullType<CancelAgreementsInputType>>())
@@ -149,7 +149,7 @@ namespace Sheaft.GraphQL.Types
                 .UsePaging<AgreementType>()
                 .UseFiltering<AgreementFilterType>()
                 .UseSorting<AgreementSortType>()
-                .UseSelection();
+                .UseProjection();
 
             //JOBS
             descriptor.Field(c => c.PauseJobsAsync(default, default))
@@ -160,7 +160,7 @@ namespace Sheaft.GraphQL.Types
                 .UsePaging<JobType>()
                 .UseFiltering<JobFilterType>()
                 .UseSorting<JobSortType>()
-                .UseSelection();
+                .UseProjection();
 
             descriptor.Field(c => c.ResumeJobsAsync(default, default))
                 .Argument("input", c => c.Type<NonNullType<ResumeJobsInputType>>())
@@ -170,7 +170,7 @@ namespace Sheaft.GraphQL.Types
                 .UsePaging<JobType>()
                 .UseFiltering<JobFilterType>()
                 .UseSorting<JobSortType>()
-                .UseSelection();
+                .UseProjection();
 
             descriptor.Field(c => c.RetryJobsAsync(default, default))
                 .Argument("input", c => c.Type<NonNullType<RetryJobsInputType>>())
@@ -180,7 +180,7 @@ namespace Sheaft.GraphQL.Types
                 .UsePaging<JobType>()
                 .UseFiltering<JobFilterType>()
                 .UseSorting<JobSortType>()
-                .UseSelection();
+                .UseProjection();
 
             descriptor.Field(c => c.CancelJobsAsync(default, default))
                 .Argument("input", c => c.Type<NonNullType<CancelJobsInputType>>())
@@ -190,7 +190,7 @@ namespace Sheaft.GraphQL.Types
                 .UsePaging<JobType>()
                 .UseFiltering<JobFilterType>()
                 .UseSorting<JobSortType>()
-                .UseSelection();
+                .UseProjection();
 
             descriptor.Field(c => c.ArchiveJobsAsync(default, default))
                 .Argument("input", c => c.Type<NonNullType<ArchiveJobsInputType>>())
@@ -200,7 +200,7 @@ namespace Sheaft.GraphQL.Types
                 .UsePaging<JobType>()
                 .UseFiltering<JobFilterType>()
                 .UseSorting<JobSortType>()
-                .UseSelection();
+                .UseProjection();
 
             //PRODUCTS
             descriptor.Field(c => c.CreateProductAsync(default, default))
@@ -209,7 +209,7 @@ namespace Sheaft.GraphQL.Types
                 .Authorize(Policies.PRODUCER)
                 .Type<NonNullType<ProductType>>()
                 .UseSingleOrDefault()
-                .UseSelection();
+                .UseProjection();
 
             descriptor.Field(c => c.UpdateProductAsync(default, default))
                 .Argument("input", c => c.Type<NonNullType<UpdateProductInputType>>())
@@ -217,7 +217,7 @@ namespace Sheaft.GraphQL.Types
                 .Authorize(Policies.PRODUCER)
                 .Type<NonNullType<ProductType>>()
                 .UseSingleOrDefault()
-                .UseSelection();
+                .UseProjection();
 
             descriptor.Field(c => c.UpdateProductPictureAsync(default, default))
                 .Argument("input", c => c.Type<NonNullType<UpdateProductPictureInputType>>())
@@ -225,7 +225,7 @@ namespace Sheaft.GraphQL.Types
                 .Authorize(Policies.PRODUCER)
                 .Type<NonNullType<ProductType>>()
                 .UseSingleOrDefault()
-                .UseSelection();
+                .UseProjection();
 
             descriptor.Field(c => c.SetProductsAvailabilityAsync(default, default))
                 .Argument("input", c => c.Type<NonNullType<SetProductsAvailabilityInputType>>())
@@ -235,7 +235,7 @@ namespace Sheaft.GraphQL.Types
                 .UsePaging<ProductType>()
                 .UseFiltering<ProductFilterType>()
                 .UseSorting<SearchProductSortType>()
-                .UseSelection();
+                .UseProjection();
 
             descriptor.Field(c => c.DeleteProductsAsync(default))
                 .Argument("input", c => c.Type<NonNullType<DeleteProductsInputType>>())
@@ -249,7 +249,7 @@ namespace Sheaft.GraphQL.Types
                 .Authorize(Policies.REGISTERED)
                 .Type<NonNullType<ProductType>>()
                 .UseSingleOrDefault()
-                .UseSelection();
+                .UseProjection();
 
             descriptor.Field(c => c.AddPictureToProductAsync(default))
                 .Argument("input", c => c.Type<NonNullType<AddPictureToProductInputType>>())
@@ -270,7 +270,7 @@ namespace Sheaft.GraphQL.Types
                 .Authorize(Policies.PRODUCER)
                 .Type<NonNullType<DeliveryModeType>>()
                 .UseSingleOrDefault()
-                .UseSelection();
+                .UseProjection();
 
             descriptor.Field(c => c.UpdateDeliveryModeAsync(default, default))
                 .Argument("input", c => c.Type<NonNullType<UpdateDeliveryModeInputType>>())
@@ -278,7 +278,7 @@ namespace Sheaft.GraphQL.Types
                 .Authorize(Policies.PRODUCER)
                 .Type<NonNullType<DeliveryModeType>>()
                 .UseSingleOrDefault()
-                .UseSelection();
+                .UseProjection();
 
             descriptor.Field(c => c.DeleteDeliveryModeAsync(default))
                 .Argument("input", c => c.Type<NonNullType<DeleteDeliveryModeInputType>>())
@@ -294,7 +294,7 @@ namespace Sheaft.GraphQL.Types
                 .UsePaging<DeliveryModeType>()
                 .UseFiltering<DeliveryModeFilterType>()
                 .UseSorting<DeliveryModeSortType>()
-                .UseSelection();
+                .UseProjection();
 
             //RETURNABLE
             descriptor.Field(c => c.CreateReturnableAsync(default, default))
@@ -303,14 +303,14 @@ namespace Sheaft.GraphQL.Types
                 .Authorize(Policies.PRODUCER)
                 .Type<NonNullType<ReturnableType>>()
                 .UseSingleOrDefault()
-                .UseSelection();
+                .UseProjection();
 
             descriptor.Field(c => c.UpdateReturnableAsync(default, default))
                 .Argument("input", c => c.Type<NonNullType<UpdateReturnableInputType>>())
                 .Authorize(Policies.PRODUCER)
                 .Type<NonNullType<ReturnableType>>()
                 .UseSingleOrDefault()
-                .UseSelection();
+                .UseProjection();
 
             descriptor.Field(c => c.DeleteReturnableAsync(default))
                 .Argument("input", c => c.Type<NonNullType<DeleteReturnableInputType>>())
@@ -322,14 +322,12 @@ namespace Sheaft.GraphQL.Types
             descriptor.Field(c => c.CreateOrderAsync(default, default))
                 .Argument("input", c => c.Type<NonNullType<CreateConsumerOrderInputType>>())
                 .Name("createOrder")
-                .Authorize(Policies.ANONYMOUS_OR_CONNECTED)
                 .Type<NonNullType<OrderType>>()
                 .UseSingleOrDefault();
 
             descriptor.Field(c => c.UpdateOrderAsync(default, default))
                 .Argument("input", c => c.Type<NonNullType<UpdateConsumerOrderInputType>>())
                 .Name("updateOrder")
-                .Authorize(Policies.ANONYMOUS_OR_CONNECTED)
                 .Type<NonNullType<OrderType>>()
                 .UseSingleOrDefault();
 
@@ -339,7 +337,7 @@ namespace Sheaft.GraphQL.Types
                 .Authorize(Policies.CONSUMER)
                 .Type<NonNullType<WebPayinType>>()
                 .UseSingleOrDefault()
-                .UseSelection();
+                .UseProjection();
             
             descriptor.Field(c => c.ResetOrderAsync(default, default))
                 .Argument("input", c => c.Type<NonNullType<ResetOrderInputType>>())
@@ -347,7 +345,7 @@ namespace Sheaft.GraphQL.Types
                 .Authorize(Policies.CONSUMER)
                 .Type<NonNullType<OrderType>>()
                 .UseSingleOrDefault()
-                .UseSelection();
+                .UseProjection();
 
             descriptor.Field(c => c.CreateBusinessOrderAsync(default, default))
                 .Argument("input", c => c.Type<NonNullType<CreateBusinessOrderInputType>>())
@@ -357,7 +355,7 @@ namespace Sheaft.GraphQL.Types
                 .UsePaging<PurchaseOrderType>()
                 .UseFiltering<PurchaseOrderFilterType>()
                 .UseSorting<PurchaseOrderSortType>()
-                .UseSelection();
+                .UseProjection();
 
             //QUICKORDER
             descriptor.Field(c => c.CreateQuickOrderAsync(default, default))
@@ -366,7 +364,7 @@ namespace Sheaft.GraphQL.Types
                 .Authorize(Policies.STORE)
                 .Type<NonNullType<QuickOrderType>>()
                 .UseSingleOrDefault()
-                .UseSelection();
+                .UseProjection();
 
             descriptor.Field(c => c.SetDefaultQuickOrderAsync(default, default))
                 .Argument("input", c => c.Type<NonNullType<SetQuickOrderAsDefaultInputType>>())
@@ -374,7 +372,7 @@ namespace Sheaft.GraphQL.Types
                 .Authorize(Policies.STORE)
                 .Type<NonNullType<QuickOrderType>>()
                 .UseSingleOrDefault()
-                .UseSelection();
+                .UseProjection();
 
             descriptor.Field(c => c.UpdateQuickOrderAsync(default, default))
                 .Argument("input", c => c.Type<NonNullType<UpdateQuickOrderInputType>>())
@@ -382,7 +380,7 @@ namespace Sheaft.GraphQL.Types
                 .Authorize(Policies.STORE)
                 .Type<NonNullType<QuickOrderType>>()
                 .UseSingleOrDefault()
-                .UseSelection();
+                .UseProjection();
 
             descriptor.Field(c => c.DeleteQuickOrdersAsync(default))
                 .Argument("input", c => c.Type<NonNullType<DeleteQuickOrdersInputType>>())
@@ -397,7 +395,7 @@ namespace Sheaft.GraphQL.Types
                 .Authorize(Policies.REGISTERED)
                 .Type<NonNullType<UserType>>()
                 .UseSingleOrDefault()
-                .UseSelection();
+                .UseProjection();
             
             descriptor.Field(c => c.AddPictureToUserAsync(default))
                 .Argument("input", c => c.Type<NonNullType<AddPictureToUserInputType>>())
@@ -424,7 +422,7 @@ namespace Sheaft.GraphQL.Types
                 .Authorize(Policies.REGISTERED)
                 .Type<NonNullType<JobType>>()
                 .UseSingleOrDefault()
-                .UseSelection();
+                .UseProjection();
 
             descriptor.Field(c => c.ExportPickingOrdersAsync(default, default))
                 .Argument("input", c => c.Type<NonNullType<QueueExportPickingOrderInputType>>())
@@ -432,7 +430,7 @@ namespace Sheaft.GraphQL.Types
                 .Authorize(Policies.PRODUCER)
                 .Type<NonNullType<JobType>>()
                 .UseSingleOrDefault()
-                .UseSelection();
+                .UseProjection();
 
             descriptor.Field(c => c.ExportPurchaseOrdersAsync(default, default))
                 .Argument("input", c => c.Type<NonNullType<QueueExportPurchaseOrdersInputType>>())
@@ -440,7 +438,7 @@ namespace Sheaft.GraphQL.Types
                 .Authorize(Policies.PRODUCER)
                 .Type<NonNullType<JobType>>()
                 .UseSingleOrDefault()
-                .UseSelection();
+                .UseProjection();
 
             descriptor.Field(c => c.ExportTransactionsAsync(default, default))
                 .Argument("input", c => c.Type<NonNullType<QueueExportTransactionsInputType>>())
@@ -448,7 +446,7 @@ namespace Sheaft.GraphQL.Types
                 .Authorize(Policies.PRODUCER)
                 .Type<NonNullType<JobType>>()
                 .UseSingleOrDefault()
-                .UseSelection();
+                .UseProjection();
 
             //NOTIFICATIONS
             descriptor.Field(c => c.MarkMyNotificationsAsReadAsync())
@@ -462,7 +460,7 @@ namespace Sheaft.GraphQL.Types
                 .Authorize(Policies.REGISTERED)
                 .Type<NonNullType<NotificationType>>()
                 .UseSingleOrDefault()
-                .UseSelection();
+                .UseProjection();
 
             //PRODUCER
             descriptor.Field(c => c.RegisterProducerAsync(default, default))
@@ -471,7 +469,7 @@ namespace Sheaft.GraphQL.Types
                 .Authorize(Policies.AUTHENTICATED)
                 .Type<NonNullType<ProducerType>>()
                 .UseSingleOrDefault()
-                .UseSelection();
+                .UseProjection();
 
             descriptor.Field(c => c.UpdateProducerAsync(default, default))
                 .Argument("input", c => c.Type<NonNullType<UpdateProducerInputType>>())
@@ -479,7 +477,7 @@ namespace Sheaft.GraphQL.Types
                 .Authorize(Policies.PRODUCER)
                 .Type<NonNullType<ProducerType>>()
                 .UseSingleOrDefault()
-                .UseSelection();
+                .UseProjection();
 
             //STORE
             descriptor.Field(c => c.RegisterStoreAsync(default, default))
@@ -488,7 +486,7 @@ namespace Sheaft.GraphQL.Types
                 .Authorize(Policies.AUTHENTICATED)
                 .Type<NonNullType<StoreType>>()
                 .UseSingleOrDefault()
-                .UseSelection();
+                .UseProjection();
 
             descriptor.Field(c => c.UpdateStoreAsync(default, default))
                 .Argument("input", c => c.Type<NonNullType<UpdateStoreInputType>>())
@@ -496,7 +494,7 @@ namespace Sheaft.GraphQL.Types
                 .Authorize(Policies.STORE)
                 .Type<NonNullType<StoreType>>()
                 .UseSingleOrDefault()
-                .UseSelection();
+                .UseProjection();
 
             //CONSUMER
             descriptor.Field(c => c.RegisterConsumerAsync(default, default))
@@ -505,7 +503,7 @@ namespace Sheaft.GraphQL.Types
                 .Authorize(Policies.AUTHENTICATED)
                 .Type<NonNullType<ConsumerType>>()
                 .UseSingleOrDefault()
-                .UseSelection();
+                .UseProjection();
 
             descriptor.Field(c => c.UpdateConsumerAsync(default, default))
                 .Argument("input", c => c.Type<NonNullType<UpdateConsumerInputType>>())
@@ -513,7 +511,7 @@ namespace Sheaft.GraphQL.Types
                 .Authorize(Policies.CONSUMER)
                 .Type<NonNullType<ConsumerType>>()
                 .UseSingleOrDefault()
-                .UseSelection();
+                .UseProjection();
 
             //LEGALS
             descriptor.Field(c => c.CreateBusinessLegalsAsync(default, default))
@@ -522,7 +520,7 @@ namespace Sheaft.GraphQL.Types
                 .Authorize(Policies.PRODUCER)
                 .Type<NonNullType<BusinessLegalType>>()
                 .UseSingleOrDefault()
-                .UseSelection();
+                .UseProjection();
 
             descriptor.Field(c => c.UpdateBusinessLegalsAsync(default, default))
                 .Argument("input", c => c.Type<NonNullType<UpdateBusinessLegalsInputType>>())
@@ -530,7 +528,7 @@ namespace Sheaft.GraphQL.Types
                 .Authorize(Policies.PRODUCER)
                 .Type<NonNullType<BusinessLegalType>>()
                 .UseSingleOrDefault()
-                .UseSelection();
+                .UseProjection();
 
             descriptor.Field(c => c.CreateConsumerLegalsAsync(default, default))
                 .Argument("input", c => c.Type<NonNullType<CreateConsumerLegalsInputType>>())
@@ -538,7 +536,7 @@ namespace Sheaft.GraphQL.Types
                 .Authorize(Policies.CONSUMER)
                 .Type<NonNullType<ConsumerLegalType>>()
                 .UseSingleOrDefault()
-                .UseSelection();
+                .UseProjection();
 
             descriptor.Field(c => c.UpdateConsumerLegalsAsync(default, default))
                 .Argument("input", c => c.Type<NonNullType<UpdateConsumerLegalsInputType>>())
@@ -546,7 +544,7 @@ namespace Sheaft.GraphQL.Types
                 .Authorize(Policies.CONSUMER)
                 .Type<NonNullType<ConsumerLegalType>>()
                 .UseSingleOrDefault()
-                .UseSelection();
+                .UseProjection();
             
             //CLOSINGS
             
@@ -556,7 +554,7 @@ namespace Sheaft.GraphQL.Types
                 .Authorize(Policies.OWNER)
                 .Type<NonNullType<ListType<ClosingType>>>()
                 .UsePaging<ClosingType>()
-                .UseSelection();
+                .UseProjection();
             
             descriptor.Field(c => c.UpdateOrCreateBusinessClosingAsync(default, default))
                 .Argument("input", c => c.Type<NonNullType<UpdateOrCreateBusinessClosingInputType>>())
@@ -564,7 +562,7 @@ namespace Sheaft.GraphQL.Types
                 .Authorize(Policies.OWNER)
                 .Type<NonNullType<ClosingType>>()
                 .UseSingleOrDefault()
-                .UseSelection();
+                .UseProjection();
             
             descriptor.Field(c => c.UpdateOrCreateDeliveryClosingAsync(default, default))
                 .Argument("input", c => c.Type<NonNullType<UpdateOrCreateDeliveryClosingInputType>>())
@@ -572,7 +570,7 @@ namespace Sheaft.GraphQL.Types
                 .Authorize(Policies.OWNER)
                 .Type<NonNullType<ClosingType>>()
                 .UseSingleOrDefault()
-                .UseSelection();
+                .UseProjection();
             
             descriptor.Field(c => c.UpdateOrCreateDeliveryClosingsAsync(default, default))
                 .Argument("input", c => c.Type<NonNullType<UpdateOrCreateDeliveryClosingsInputType>>())
@@ -580,7 +578,7 @@ namespace Sheaft.GraphQL.Types
                 .Authorize(Policies.OWNER)
                 .Type<NonNullType<ListType<ClosingType>>>()
                 .UsePaging<ClosingType>()
-                .UseSelection();
+                .UseProjection();
             
             descriptor.Field(c => c.DeleteBusinessClosingsAsync(default))
                 .Argument("input", c => c.Type<NonNullType<DeleteBusinessClosingsInputType>>())
@@ -602,7 +600,7 @@ namespace Sheaft.GraphQL.Types
                 .Authorize(Policies.OWNER)
                 .Type<NonNullType<CatalogType>>()
                 .UseSingleOrDefault()
-                .UseSelection();
+                .UseProjection();
             
             descriptor.Field(c => c.UpdateCatalogAsync(default, default))
                 .Argument("input", c => c.Type<NonNullType<UpdateCatalogInputType>>())
@@ -610,7 +608,7 @@ namespace Sheaft.GraphQL.Types
                 .Authorize(Policies.OWNER)
                 .Type<NonNullType<CatalogType>>()
                 .UseSingleOrDefault()
-                .UseSelection();
+                .UseProjection();
             
             descriptor.Field(c => c.DeleteCatalogsAsync(default))
                 .Argument("input", c => c.Type<NonNullType<DeleteCatalogsInputType>>())
@@ -624,7 +622,7 @@ namespace Sheaft.GraphQL.Types
                 .Authorize(Policies.OWNER)
                 .Type<NonNullType<CatalogType>>()
                 .UseSingleOrDefault()
-                .UseSelection();
+                .UseProjection();
             
             descriptor.Field(c => c.RemoveProductsFromCatalogAsync(default, default))
                 .Argument("input", c => c.Type<NonNullType<RemoveProductsFromCatalogInputType>>())
@@ -632,7 +630,7 @@ namespace Sheaft.GraphQL.Types
                 .Authorize(Policies.OWNER)
                 .Type<NonNullType<CatalogType>>()
                 .UseSingleOrDefault()
-                .UseSelection();
+                .UseProjection();
             
             descriptor.Field(c => c.CloneCatalogAsync(default, default))
                 .Argument("input", c => c.Type<NonNullType<CloneCatalogInputType>>())
@@ -640,7 +638,7 @@ namespace Sheaft.GraphQL.Types
                 .Authorize(Policies.OWNER)
                 .Type<NonNullType<CatalogType>>()
                 .UseSingleOrDefault()
-                .UseSelection();
+                .UseProjection();
             
             descriptor.Field(c => c.UpdateAllCatalogPricesAsync(default, default))
                 .Argument("input", c => c.Type<NonNullType<UpdateAllCatalogPricesInputType>>())
@@ -648,7 +646,7 @@ namespace Sheaft.GraphQL.Types
                 .Authorize(Policies.OWNER)
                 .Type<NonNullType<CatalogType>>()
                 .UseSingleOrDefault()
-                .UseSelection();
+                .UseProjection();
             
             descriptor.Field(c => c.UpdateCatalogPricesAsync(default, default))
                 .Argument("input", c => c.Type<NonNullType<UpdateCatalogPricesInputType>>())
@@ -656,7 +654,7 @@ namespace Sheaft.GraphQL.Types
                 .Authorize(Policies.OWNER)
                 .Type<NonNullType<CatalogType>>()
                 .UseSingleOrDefault()
-                .UseSelection();
+                .UseProjection();
             
             descriptor.Field(c => c.SetCatalogAsDefaultAsync(default, default))
                 .Argument("input", c => c.Type<NonNullType<SetCatalogAsDefaultInputType>>())
@@ -664,7 +662,7 @@ namespace Sheaft.GraphQL.Types
                 .Authorize(Policies.OWNER)
                 .Type<NonNullType<CatalogType>>()
                 .UseSingleOrDefault()
-                .UseSelection();
+                .UseProjection();
             
             descriptor.Field(c => c.SetCatalogsAvailabilityAsync(default, default))
                 .Argument("input", c => c.Type<NonNullType<SetCatalogsAvailabilityInputType>>())
@@ -672,7 +670,7 @@ namespace Sheaft.GraphQL.Types
                 .Authorize(Policies.OWNER)
                 .Type<NonNullType<ListType<CatalogType>>>()
                 .UseSingleOrDefault()
-                .UseSelection();
+                .UseProjection();
             
             //PreAuhtorization
             
@@ -682,7 +680,7 @@ namespace Sheaft.GraphQL.Types
                 .Authorize(Policies.CONSUMER)
                 .Type<NonNullType<PreAuthorizationType>>()
                 .UseSingleOrDefault()
-                .UseSelection();
+                .UseProjection();
 
             descriptor.Field(c => c.CreateCardRegistration())
                 .Name("createCardRegistration")

@@ -1,4 +1,4 @@
-﻿using HotChocolate.Types.Filters;
+﻿using HotChocolate.Data.Filters;
 using Sheaft.Application.Models;
 
 namespace Sheaft.GraphQL.Filters
@@ -9,14 +9,8 @@ namespace Sheaft.GraphQL.Filters
         {
             descriptor.Name("RatingFilter");
             descriptor.BindFieldsExplicitly();
-            descriptor.Filter(c => c.Value).AllowGreaterThan();
-            descriptor.Filter(c => c.Value).AllowNotGreaterThanOrEquals();
-            descriptor.Filter(c => c.Value).AllowLowerThan();
-            descriptor.Filter(c => c.Value).AllowLowerThanOrEquals();
-            descriptor.Filter(c => c.CreatedOn).AllowGreaterThan();
-            descriptor.Filter(c => c.CreatedOn).AllowNotGreaterThanOrEquals();
-            descriptor.Filter(c => c.CreatedOn).AllowLowerThan();
-            descriptor.Filter(c => c.CreatedOn).AllowLowerThanOrEquals();
+            descriptor.Field(c => c.Value);
+            descriptor.Field(c => c.CreatedOn);
         }
     }
 }

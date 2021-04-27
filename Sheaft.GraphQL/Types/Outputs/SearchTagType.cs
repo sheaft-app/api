@@ -7,7 +7,7 @@ namespace Sheaft.GraphQL.Types.Outputs
     {
         protected override void Configure(IObjectTypeDescriptor<TagDto> descriptor)
         {
-            descriptor.Name("SearchTagDto");
+            descriptor.Name("SearchTagType");
 
             descriptor.Field(c => c.Name)
                 .Type<NonNullType<StringType>>();

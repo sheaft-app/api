@@ -1,4 +1,4 @@
-﻿using HotChocolate.Types.Filters;
+﻿using HotChocolate.Data.Filters;
 using Sheaft.Application.Models;
 
 namespace Sheaft.GraphQL.Filters
@@ -9,9 +9,9 @@ namespace Sheaft.GraphQL.Filters
         {
             descriptor.Name("OrderFilter");
             descriptor.BindFieldsExplicitly();
-            descriptor.Filter(c => c.Id).AllowEquals();
-            descriptor.Filter(c => c.Status).AllowIn();
-            descriptor.Filter(c => c.PurchaseOrdersCount).AllowEquals();
+            descriptor.Field(c => c.Id);
+            descriptor.Field(c => c.Status);
+            descriptor.Field(c => c.PurchaseOrdersCount);
         }
     }
 }

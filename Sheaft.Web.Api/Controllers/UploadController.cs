@@ -16,7 +16,6 @@ using Sheaft.Mediatr.Product.Commands;
 
 namespace Sheaft.Web.Api.Controllers
 {
-    [Microsoft.AspNetCore.Authorization.Authorize]
     [ApiController]
     [Route("upload")]
     public class UploadController : Controller

@@ -1,5 +1,6 @@
-﻿using HotChocolate.Types.Sorting;
+﻿using HotChocolate.Data.Sorting;
 using Sheaft.Application.Models;
+using Sheaft.Domain;
 
 namespace Sheaft.GraphQL.Sorts
 {
@@ -9,8 +10,8 @@ namespace Sheaft.GraphQL.Sorts
         {
             descriptor.Name("AgreementSort");
             descriptor.BindFieldsExplicitly();
-            descriptor.Sortable(c => c.Status);
-            descriptor.Sortable(c => c.CreatedOn);
+            descriptor.Field(c => c.Status);
+            descriptor.Field(c => c.CreatedOn);
         }
     }
 }
