@@ -8,13 +8,10 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
     {
         public void Configure(EntityTypeBuilder<OrderDelivery> entity)
         {
-            entity.Property<long>("OrderUid");
-            entity.Property<long?>("DeliveryModeUid");
-
-            entity.HasKey("OrderUid", "Id");
+            entity.HasKey(c => new {c.OrderId, c.DeliveryModeId});
 
             entity.OwnsOne(c => c.ExpectedDelivery);
-            entity.HasOne(c => c.DeliveryMode).WithMany().HasForeignKey("DeliveryModeUid").OnDelete(DeleteBehavior.NoAction);
+            entity.HasOne(c => c.DeliveryMode).WithMany().HasForeignKey(c =>c.DeliveryModeId).OnDelete(DeleteBehavior.NoAction);
 
             entity.ToTable("OrderDeliveries");
         }

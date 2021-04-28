@@ -79,7 +79,7 @@ namespace Sheaft.Mediatr.WebPayin.Commands
 
                 order.SetStatus(OrderStatus.Waiting);
 
-                var wallet = await _context.Wallets.SingleOrDefaultAsync(c => c.User.Id == order.User.Id, token);
+                var wallet = await _context.Wallets.SingleOrDefaultAsync(c => c.UserId == order.UserId, token);
                 if (order.TotalOnSalePrice < 1)
                     return Failure<Guid>(MessageKind.Order_Total_CannotBe_LowerThan, 1);
 
@@ -88,7 +88,7 @@ namespace Sheaft.Mediatr.WebPayin.Commands
                 await _context.AddAsync(webPayin, token);
                 await _context.SaveChangesAsync(token);
 
-                var legal = await _context.Legals.SingleOrDefaultAsync(c => c.Owner.Id == order.User.Id, token);
+                var legal = await _context.Legals.SingleOrDefaultAsync(c => c.UserId == order.UserId, token);
                 var result = await _pspService.CreateWebPayinAsync(webPayin, legal.Owner, token);
                 if (!result.Succeeded)
                     return Failure<Guid>(result.Exception);

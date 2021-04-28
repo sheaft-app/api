@@ -42,7 +42,7 @@ namespace Sheaft.Mediatr.Declaration.Commands
         public async Task<Result> Handle(UnLockDeclarationCommand request, CancellationToken token)
         {
             var legal = await _context.Set<BusinessLegal>()
-                .SingleOrDefaultAsync(r => r.Declaration.Id == request.DeclarationId, token);
+                .SingleOrDefaultAsync(r => r.DeclarationId == request.DeclarationId, token);
             legal.Declaration.SetStatus(DeclarationStatus.UnLocked);
 
             await _context.SaveChangesAsync(token);

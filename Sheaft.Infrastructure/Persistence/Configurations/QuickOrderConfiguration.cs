@@ -15,9 +15,6 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
 
         public void Configure(EntityTypeBuilder<QuickOrder> entity)
         {
-            entity.Property<long>("Uid");
-            entity.Property<long>("UserUid");
-
             entity.Property(c => c.CreatedOn);
             entity.Property(c => c.UpdatedOn).IsConcurrencyToken();
             
@@ -26,20 +23,15 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
 
             entity.Property(c => c.Name).IsRequired();
 
-            entity.HasMany(o => o.Products).WithOne().HasForeignKey("QuickOrderUid").OnDelete(DeleteBehavior.Cascade).IsRequired();
-            entity.HasOne(c => c.User).WithMany().HasForeignKey("UserUid").OnDelete(DeleteBehavior.Cascade).IsRequired();
+            entity.HasMany(o => o.Products).WithOne().HasForeignKey(c=>c.QuickOrderId).OnDelete(DeleteBehavior.Cascade).IsRequired();
+            entity.HasOne(c => c.User).WithMany().HasForeignKey(c=>c.UserId).OnDelete(DeleteBehavior.Cascade).IsRequired();
 
             entity.Ignore(c => c.DomainEvents);
 
             var products = entity.Metadata.FindNavigation(nameof(QuickOrder.Products));
             products.SetPropertyAccessMode(PropertyAccessMode.Field);
 
-            entity.HasKey("Uid");
-
-            entity.HasIndex(c => c.Id).IsUnique();
-            entity.HasIndex("UserUid");
-            entity.HasIndex("Uid", "Id", "UserUid", "RemovedOn");
-
+            entity.HasKey(c=>c.Id);
             entity.ToTable("QuickOrders");
         }
     }

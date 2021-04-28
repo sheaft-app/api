@@ -8,8 +8,6 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
     {
         public void Configure(EntityTypeBuilder<Region> entity)
         {
-            entity.Property<long>("Uid");
-
             entity.Property(c => c.UpdatedOn).IsConcurrencyToken();
 
             entity.Property(c => c.Name).IsRequired();
@@ -20,11 +18,8 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
             entity.Property(c => c.Points).HasDefaultValue(0);
             entity.Property(c => c.Position).HasDefaultValue(0);
 
-            entity.HasKey("Uid");
-
-            entity.HasIndex(c => c.Id).IsUnique();
+            entity.HasKey(c=>c.Id);
             entity.HasIndex(c => c.Code).IsUnique();
-            entity.HasIndex("Uid", "Id");
 
             entity.ToTable("Regions");
         }

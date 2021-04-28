@@ -498,7 +498,7 @@ namespace Sheaft.Web.Api
                     context.SaveChanges();
                 }
 
-                if (context.BankAccounts.FirstOrDefault(c => c.User.Id == admin.Id) == null)
+                if (context.BankAccounts.FirstOrDefault(c => c.UserId == admin.Id) == null)
                 {
                     var bankAccount = new BankAccount(Guid.NewGuid(), "Dons", "Sheaft", configuration.GetValue<string>("Psp:Bank:Iban"), configuration.GetValue<string>("Psp:Bank:Bic"),
                         new BankAddress(

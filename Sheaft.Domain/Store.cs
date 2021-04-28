@@ -10,13 +10,13 @@ namespace Sheaft.Domain
     public class Store : Business, IHasDomainEvent
     {
         private List<StoreTag> _tags;
-        private List<TimeSlotHour> _openingHours;
+        private List<OpeningHours> _openingHours;
 
         protected Store()
         {
         }
 
-        public Store(Guid id, string name, string firstname, string lastname, string email, UserAddress address, IEnumerable<TimeSlotHour> openingHours = null, bool openForBusiness = true, string phone = null)
+        public Store(Guid id, string name, string firstname, string lastname, string email, UserAddress address, IEnumerable<OpeningHours> openingHours = null, bool openForBusiness = true, string phone = null)
             : base(id, ProfileKind.Store, name, firstname, lastname, email, address, openForBusiness, phone)
         {
             SetOpeningHours(openingHours);
@@ -24,15 +24,15 @@ namespace Sheaft.Domain
         }
 
         public virtual IReadOnlyCollection<StoreTag> Tags => _tags?.AsReadOnly();
-        public virtual IReadOnlyCollection<TimeSlotHour> OpeningHours => _openingHours?.AsReadOnly();
+        public virtual IReadOnlyCollection<OpeningHours> OpeningHours => _openingHours?.AsReadOnly();
 
-        public void SetOpeningHours(IEnumerable<TimeSlotHour> openingHours)
+        public void SetOpeningHours(IEnumerable<OpeningHours> openingHours)
         {
             if (openingHours == null)
                 return;
 
             if (OpeningHours == null)
-                _openingHours = new List<TimeSlotHour>();
+                _openingHours = new List<OpeningHours>();
 
             _openingHours = openingHours.ToList();
         }

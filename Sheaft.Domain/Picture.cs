@@ -30,6 +30,8 @@ namespace Sheaft.Domain
         public ProfilePicture(Guid id, string url) : base(id, url)
         {
         }
+
+        public Guid UserId { get; private set; }
     }
 
     public class ProductPicture : Picture
@@ -41,5 +43,7 @@ namespace Sheaft.Domain
         public ProductPicture(Guid id, string url) : base(id, url)
         {
         }
+
+        public Guid ProductId { get; private set; }
     }
 }

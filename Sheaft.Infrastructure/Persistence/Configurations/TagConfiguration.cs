@@ -15,8 +15,6 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
 
         public void Configure(EntityTypeBuilder<Tag> entity)
         {
-            entity.Property<long>("Uid");
-
             entity.Property(c => c.CreatedOn);
             entity.Property(c => c.UpdatedOn).IsConcurrencyToken();
             
@@ -25,11 +23,7 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
 
             entity.Property(c => c.Name).IsRequired();
 
-            entity.HasKey("Uid");
-
-            entity.HasIndex(c => c.Id).IsUnique();
-            entity.HasIndex("Uid", "Id", "RemovedOn");
-
+            entity.HasKey(c=>c.Id);
             entity.ToTable("Tags");
         }
     }

@@ -43,7 +43,7 @@ namespace Sheaft.Mediatr.Job.Commands
         {
             var entity =
                 await _context.Jobs.SingleOrDefaultAsync(a => a.Id == request.JobId && a.RemovedOn.HasValue, token);
-            if(entity.User.Id != request.RequestUser.Id)
+            if(entity.UserId != request.RequestUser.Id)
                 throw SheaftException.Forbidden();
 
             _context.Restore(entity);

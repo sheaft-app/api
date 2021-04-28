@@ -15,9 +15,6 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
 
         public void Configure(EntityTypeBuilder<Order> entity)
         {
-            entity.Property<long>("Uid");
-            entity.Property<long?>("UserUid");
-
             entity.Property(c => c.CreatedOn);
             entity.Property(c => c.UpdatedOn).IsConcurrencyToken();
             
@@ -49,10 +46,10 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
             entity.Property(o => o.FeesVatPercent).HasColumnType("decimal(10,2)").HasDefaultValue(0);
             entity.Property(o => o.DonationFeesPrice).HasColumnType("decimal(10,2)");
 
-            entity.HasMany(c => c.Products).WithOne().HasForeignKey("OrderUid").OnDelete(DeleteBehavior.Cascade).IsRequired();
-            entity.HasMany(c => c.Deliveries).WithOne().HasForeignKey("OrderUid").OnDelete(DeleteBehavior.Cascade);
-            entity.HasMany(c => c.PurchaseOrders).WithOne().HasForeignKey("OrderUid").OnDelete(DeleteBehavior.NoAction).IsRequired();
-            entity.HasOne(c => c.User).WithMany().HasForeignKey("UserUid").OnDelete(DeleteBehavior.Cascade);
+            entity.HasMany(c => c.Products).WithOne().HasForeignKey(c =>c.OrderId).OnDelete(DeleteBehavior.Cascade).IsRequired();
+            entity.HasMany(c => c.Deliveries).WithOne().HasForeignKey(c =>c.OrderId).OnDelete(DeleteBehavior.Cascade);
+            entity.HasMany(c => c.PurchaseOrders).WithOne().HasForeignKey(c =>c.OrderId).OnDelete(DeleteBehavior.NoAction).IsRequired();
+            entity.HasOne(c => c.User).WithMany().HasForeignKey(c =>c.UserId).OnDelete(DeleteBehavior.Cascade);
 
             entity.Ignore(c => c.DomainEvents);
 
@@ -65,11 +62,7 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
             var deliveries = entity.Metadata.FindNavigation(nameof(Order.Deliveries));
             deliveries.SetPropertyAccessMode(PropertyAccessMode.Field);
 
-            entity.HasKey("Uid");
-
-            entity.HasIndex(c => c.Id).IsUnique();
-            entity.HasIndex("UserUid");
-            entity.HasIndex("Uid", "Id", "UserUid", "RemovedOn");
+            entity.HasKey(c =>c.Id);
             entity.ToTable("Orders");
         }
     }

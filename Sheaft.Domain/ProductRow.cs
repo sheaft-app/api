@@ -49,7 +49,7 @@ namespace Sheaft.Domain
 
         protected ProductRow(Product product, Guid catalogId, int quantity)
         {
-            var productPrice = product.CatalogsPrices.Single(p => p.Catalog.Id == catalogId);
+            var productPrice = product.CatalogsPrices.Single(p => p.CatalogId == catalogId);
             
             UnitWholeSalePrice = productPrice.WholeSalePricePerUnit;
             UnitOnSalePrice = productPrice.OnSalePricePerUnit;

@@ -43,7 +43,7 @@ namespace Sheaft.Mediatr.Catalog.Commands
         {
             var productIds = request.Prices.Select(p => p.ProductId);
             var catalogProductsPrice = await _context.Set<CatalogProduct>()
-                .Where(c => c.Catalog.Id == request.CatalogId && !c.Catalog.RemovedOn.HasValue && productIds.Contains(c.Product.Id))
+                .Where(c => c.CatalogId == request.CatalogId && !c.Catalog.RemovedOn.HasValue && productIds.Contains(c.Product.Id))
                 .Include(c => c.Product)
                 .ToListAsync(token);
 

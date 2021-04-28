@@ -64,12 +64,12 @@ namespace Sheaft.Mediatr.PayinRefund.Commands
                 return Failure<Guid>(MessageKind.NotFound);
 
             if (payin.Refunds != null && payin.Refunds.Any(c =>
-                c.PurchaseOrder.Id == purchaseOrder.Id && c.Status == TransactionStatus.Succeeded))
+                c.PurchaseOrderId == purchaseOrder.Id && c.Status == TransactionStatus.Succeeded))
                 return Failure<Guid>(MessageKind
                     .PayinRefund_CannotCreate_PurchaseOrderRefund_PayinRefund_AlreadyProcessed);
 
             if (payin.Refunds != null && payin.Refunds.Any(c =>
-                c.PurchaseOrder.Id == purchaseOrder.Id && c.Status != TransactionStatus.Failed))
+                c.PurchaseOrderId == purchaseOrder.Id && c.Status != TransactionStatus.Failed))
                 return Failure<Guid>(
                     MessageKind.PayinRefund_CannotCreate_PurchaseOrderRefund_Pending_PayinRefund);
 

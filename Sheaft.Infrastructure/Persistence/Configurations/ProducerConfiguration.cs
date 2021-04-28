@@ -8,14 +8,11 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
     {
         public void Configure(EntityTypeBuilder<Producer> entity)
         {
-            entity.HasMany(c => c.Tags).WithOne().HasForeignKey("ProducerUid").OnDelete(DeleteBehavior.Cascade);
+            entity.HasMany(c => c.Tags).WithOne().HasForeignKey(c=>c.ProducerId).OnDelete(DeleteBehavior.Cascade);
 
             var businessTags = entity.Metadata.FindNavigation(nameof(Producer.Tags));
             businessTags.SetPropertyAccessMode(PropertyAccessMode.Field);
 
-            entity.HasMany<DeliveryMode>().WithOne(c => c.Producer).HasForeignKey("ProducerUid").OnDelete(DeleteBehavior.Cascade).IsRequired();
-            entity.HasMany<Returnable>().WithOne(c => c.Producer).HasForeignKey("ProducerUid").OnDelete(DeleteBehavior.Cascade).IsRequired();
-            
             entity.Ignore(c => c.DomainEvents);
         }
     }

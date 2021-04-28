@@ -54,15 +54,15 @@ namespace Sheaft.Mediatr.Agreement.Commands
         public async Task<Result> Handle(AcceptAgreementCommand request, CancellationToken token)
         {
             var entity = await _context.Agreements.SingleAsync(e => e.Id == request.AgreementId, token);
-            if(request.RequestUser.IsInRole(_roleOptions.Producer.Value) && entity.Producer.Id != request.RequestUser.Id)
+            if(request.RequestUser.IsInRole(_roleOptions.Producer.Value) && entity.ProducerId != request.RequestUser.Id)
                 return Failure(MessageKind.Forbidden);
             
-            if(request.RequestUser.IsInRole(_roleOptions.Store.Value) && entity.Store.Id != request.RequestUser.Id)
+            if(request.RequestUser.IsInRole(_roleOptions.Store.Value) && entity.StoreId != request.RequestUser.Id)
                 return Failure(MessageKind.Forbidden);
 
             var alreadyAcceptedAgreement =
                 await _context.Agreements.SingleOrDefaultAsync(
-                    a => a.Id != request.AgreementId && a.Producer.Id == entity.Producer.Id && a.Store.Id == entity.Store.Id && a.Status == AgreementStatus.Accepted, token);
+                    a => a.Id != request.AgreementId && a.ProducerId == entity.ProducerId && a.StoreId == entity.StoreId && a.Status == AgreementStatus.Accepted, token);
             if (alreadyAcceptedAgreement != null)
                 return Failure(MessageKind.AlreadyExists);
 
@@ -73,14 +73,14 @@ namespace Sheaft.Mediatr.Agreement.Commands
             var currentUser = await _context.Users.SingleAsync(c => c.Id == request.RequestUser.Id, token);
             entity.AcceptAgreement(delivery, currentUser.Kind);
             
-            if (request.CatalogId.HasValue && entity.Catalog?.Id != request.CatalogId.Value)
+            if (request.CatalogId.HasValue && entity.CatalogId != request.CatalogId.Value)
             {
                 var catalog = await _context.Catalogs.SingleAsync(e => e.Id == request.CatalogId.Value, token);
                 entity.AssignCatalog(catalog);
             }
-            else if (!request.CatalogId.HasValue && entity.Catalog?.Id == null)
+            else if (!request.CatalogId.HasValue)
             {
-                var catalog = await _context.Catalogs.SingleOrDefaultAsync(c => c.IsDefault && c.Kind == CatalogKind.Stores && c.Producer.Id == entity.Producer.Id, token);
+                var catalog = await _context.Catalogs.SingleOrDefaultAsync(c => c.IsDefault && c.Kind == CatalogKind.Stores && c.ProducerId == entity.ProducerId, token);
                 entity.AssignCatalog(catalog);
             }
 

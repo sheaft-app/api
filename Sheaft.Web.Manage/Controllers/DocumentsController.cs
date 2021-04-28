@@ -51,7 +51,7 @@ namespace Sheaft.Web.Manage.Controllers
                 throw SheaftException.NotFound();
 
             ViewBag.Kind = entity.Kind;
-            ViewBag.UserId = entity.Owner.Id;
+            ViewBag.UserId = entity.UserId;
             ViewBag.LegalId = entity.Id;
 
             return View(new DocumentViewModel());
@@ -86,7 +86,7 @@ namespace Sheaft.Web.Manage.Controllers
                 throw SheaftException.NotFound();
 
             ViewBag.Kind = entity.Kind;
-            ViewBag.UserId = entity.Owner.Id;
+            ViewBag.UserId = entity.UserId;
             ViewBag.LegalId = entity.Id;
 
             var document = entity.Documents.FirstOrDefault(d => d.Id == id);
@@ -122,7 +122,7 @@ namespace Sheaft.Web.Manage.Controllers
                 throw SheaftException.NotFound();
 
             ViewBag.Kind = entity.Kind;
-            ViewBag.UserId = entity.Owner.Id;
+            ViewBag.UserId = entity.UserId;
 
             var document = entity.Documents.FirstOrDefault(d => d.Id == documentId);
             return View(document);

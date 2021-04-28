@@ -67,10 +67,10 @@ namespace Sheaft.Mediatr.PreAuthorization.Commands
             {
                 case PreAuthorizationStatus.Failed:
                     _mediatr.Post(new FailOrderCommand(request.RequestUser)
-                        {OrderId = preAuthorization.Order.Id});
+                        {OrderId = preAuthorization.OrderId});
                     break;
                 case PreAuthorizationStatus.Succeeded:
-                    _mediatr.Post(new ConfirmOrderCommand(request.RequestUser) {OrderId = preAuthorization.Order.Id});
+                    _mediatr.Post(new ConfirmOrderCommand(request.RequestUser) {OrderId = preAuthorization.OrderId});
                     break;
             }
 

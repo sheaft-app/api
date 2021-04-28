@@ -45,7 +45,7 @@ namespace Sheaft.Mediatr.DeliveryMode.Commands
         public async Task<Result> Handle(SetDeliveryModeAvailabilityCommand request, CancellationToken token)
         {
             var entity = await _context.DeliveryModes.SingleAsync(e => e.Id == request.DeliveryModeId, token);
-            if(entity.Producer.Id != request.RequestUser.Id)
+            if(entity.ProducerId != request.RequestUser.Id)
                 return Failure(MessageKind.Forbidden);
 
             entity.SetAvailability(request.Available);

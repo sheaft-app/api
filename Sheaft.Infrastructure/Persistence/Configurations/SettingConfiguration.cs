@@ -8,14 +8,10 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
     {
         public void Configure(EntityTypeBuilder<Setting> entity)
         {
-            entity.Property<long>("Uid");
-
             entity.Property(c => c.Name).IsRequired();
             
-            entity.HasKey("Uid");
-            entity.HasIndex(c => c.Id).IsUnique();
+            entity.HasKey(c=>c.Id);
             entity.HasIndex(c => c.Kind).IsUnique();
-            entity.HasIndex("Uid", "Id");
             entity.ToTable("Settings");
         }
     }

@@ -94,7 +94,7 @@ namespace Sheaft.Web.Manage.Controllers
                 IsActive = entity.IsActive,
                 Name = entity.Name,
                 Owner = entity.Owner,
-                OwnerId = entity.User.Id,
+                OwnerId = entity.UserId,
                 Address = new AddressViewModel
                 {
                     Line1 = entity.Line1,

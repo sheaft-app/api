@@ -50,7 +50,7 @@ namespace Sheaft.Mediatr.Region.Commands
             region.SetPoints(request.Points);
             region.SetPosition(request.Position);
             var consumersCount = await _context.Users.OfType<Domain.Consumer>()
-                .CountAsync(u => !u.RemovedOn.HasValue && u.Address.Department.Region.Id == request.RegionId, token);
+                .CountAsync(u => !u.RemovedOn.HasValue && u.Address.Department.RegionId == request.RegionId, token);
 
             region.SetConsumersCount(consumersCount);
 

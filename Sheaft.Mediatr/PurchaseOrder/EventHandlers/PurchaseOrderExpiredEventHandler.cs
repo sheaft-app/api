@@ -37,7 +37,7 @@ namespace Sheaft.Mediatr.PurchaseOrder.EventHandlers
 
         private async Task NotifyConsumerAsync(Domain.PurchaseOrder purchaseOrder, CancellationToken token)
         {
-            await _signalrService.SendNotificationToUserAsync(purchaseOrder.Sender.Id,
+            await _signalrService.SendNotificationToUserAsync(purchaseOrder.SenderId,
                 nameof(PurchaseOrderExpiredEvent),
                 purchaseOrder.GetPurchaseNotifModelAsString());
 
@@ -54,7 +54,7 @@ namespace Sheaft.Mediatr.PurchaseOrder.EventHandlers
 
         private async Task NotifyProducerAsync(Domain.PurchaseOrder purchaseOrder, CancellationToken token)
         {
-            await _signalrService.SendNotificationToGroupAsync(purchaseOrder.Vendor.Id, "PurchaseOrderWithdrawnEvent",
+            await _signalrService.SendNotificationToGroupAsync(purchaseOrder.VendorId, "PurchaseOrderWithdrawnEvent",
                 purchaseOrder.GetPurchaseNotifModelAsString());
 
             var url = $"{_configuration.GetValue<string>("Portal:url")}/#/purchase-orders/{purchaseOrder.Id}";

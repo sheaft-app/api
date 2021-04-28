@@ -51,7 +51,7 @@ namespace Sheaft.Mediatr.Catalog.Commands
 
                 var catalogProducts =
                     await _context.Products
-                        .Where(p => p.CatalogsPrices.Any(cp => cp.Catalog.Id == request.CatalogId))
+                        .Where(p => p.CatalogsPrices.Any(cp => cp.CatalogId == request.CatalogId))
                         .ToListAsync(token);
 
                 var products = catalogProducts.Select(p =>
@@ -59,7 +59,7 @@ namespace Sheaft.Mediatr.Catalog.Commands
                     {
                         ProductId = p.Id,
                         WholeSalePricePerUnit =
-                            p.CatalogsPrices.Single(c => c.Catalog.Id == request.CatalogId).WholeSalePricePerUnit *
+                            p.CatalogsPrices.Single(c => c.CatalogId == request.CatalogId).WholeSalePricePerUnit *
                             (1 + request.Percent ?? 0)
                     });
 

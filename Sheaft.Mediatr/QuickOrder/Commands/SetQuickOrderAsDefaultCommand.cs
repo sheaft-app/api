@@ -50,7 +50,7 @@ namespace Sheaft.Mediatr.QuickOrder.Commands
 
         public async Task<Result> Handle(SetQuickOrderAsDefaultCommand request, CancellationToken token)
         {
-            var quickOrders = await _context.QuickOrders.Where(c => c.User.Id == request.UserId).ToListAsync(token);
+            var quickOrders = await _context.QuickOrders.Where(c => c.UserId == request.UserId).ToListAsync(token);
             var entity = quickOrders.FirstOrDefault(qo => qo.Id == request.QuickOrderId);
             if (entity == null)
                 return Failure(SheaftException.NotFound());

@@ -5,7 +5,6 @@ namespace Sheaft.Web.Manage.Models
 {
     public class OwnerViewModel
     {
-        public Guid Id { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public string Email { get; set; }

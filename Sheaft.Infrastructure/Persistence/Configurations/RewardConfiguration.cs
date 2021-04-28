@@ -15,11 +15,6 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
 
         public void Configure(EntityTypeBuilder<Reward> entity)
         {
-            entity.Property<long>("Uid");
-            entity.Property<long>("LevelUid");
-            entity.Property<long>("DepartmentUid");
-            entity.Property<long?>("WinnerUid");
-
             entity.Property(c => c.CreatedOn);
             entity.Property(c => c.UpdatedOn).IsConcurrencyToken();
             
@@ -28,16 +23,10 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
 
             entity.Property(c => c.Name).IsRequired();
 
-            entity.HasOne(c => c.Department).WithMany().HasForeignKey("DepartmentUid").OnDelete(DeleteBehavior.NoAction).IsRequired();
-            entity.HasOne(c => c.Winner).WithMany().HasForeignKey("WinnerUid").OnDelete(DeleteBehavior.NoAction);
+            entity.HasOne(c => c.Department).WithMany().HasForeignKey(c=>c.DepartmentId).OnDelete(DeleteBehavior.NoAction).IsRequired();
+            entity.HasOne(c => c.Winner).WithMany().HasForeignKey(c=>c.WinnerId).OnDelete(DeleteBehavior.NoAction);
 
-            entity.HasKey("Uid");
-
-            entity.HasIndex(c => c.Id).IsUnique();
-            entity.HasIndex("LevelUid");
-            entity.HasIndex("DepartmentUid");
-            entity.HasIndex("Uid", "Id", "DepartmentUid", "LevelUid");
-
+            entity.HasKey(c=>c.Id);
             entity.ToTable("Rewards");
         }
     }

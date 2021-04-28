@@ -27,20 +27,20 @@ namespace Sheaft.Mediatr.Notification.Queries
         public IQueryable<NotificationDto> GetNotification(Guid id, RequestUser currentUser)
         {
             return _context.Notifications
-                .Where(c => c.Id == id && c.User.Id == currentUser.Id)
+                .Where(c => c.Id == id && c.UserId == currentUser.Id)
                 .ProjectTo<NotificationDto>(_configurationProvider);
         }
 
         public async Task<int> GetUnreadNotificationsCount(RequestUser currentUser, CancellationToken token)
         {
             return await _context.Notifications
-                .CountAsync(c => c.Unread && c.User.Id == currentUser.Id, token);
+                .CountAsync(c => c.Unread && c.UserId == currentUser.Id, token);
         }
 
         public IQueryable<NotificationDto> GetNotifications(RequestUser currentUser)
         {
             return _context.Notifications
-                .Where(c => c.User.Id == currentUser.Id)
+                .Where(c => c.UserId == currentUser.Id)
                 .ProjectTo<NotificationDto>(_configurationProvider);
         }
     }

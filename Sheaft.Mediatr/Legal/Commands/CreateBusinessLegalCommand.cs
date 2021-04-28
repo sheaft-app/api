@@ -63,7 +63,7 @@ namespace Sheaft.Mediatr.Legal.Commands
                 request.VatIdentifier,
                 new LegalAddress(request.Address.Line1, request.Address.Line2, request.Address.Zipcode,
                     request.Address.City, request.Address.Country),
-                new Owner(business.Id,
+                new Owner(
                     request.Owner.FirstName,
                     request.Owner.LastName,
                     request.Owner.Email,

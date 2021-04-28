@@ -16,9 +16,6 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
 
         public void Configure(EntityTypeBuilder<Returnable> entity)
         {
-            entity.Property<long>("Uid");
-            entity.Property<long>("ProducerUid");
-
             entity.Property(c => c.CreatedOn);
             entity.Property(c => c.UpdatedOn).IsConcurrencyToken();
             
@@ -33,12 +30,7 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
             entity.Property(o => o.WholeSalePrice).HasColumnType("decimal(10,2)");
             entity.Property(o => o.Vat).HasColumnType("decimal(10,2)");
 
-            entity.HasKey("Uid");
-
-            entity.HasIndex(c => c.Id).IsUnique();
-            entity.HasIndex("ProducerUid");
-            entity.HasIndex("Uid", "Id", "RemovedOn");
-
+            entity.HasKey(c=>c.Id);
             entity.ToTable("Returnables");
         }
     }

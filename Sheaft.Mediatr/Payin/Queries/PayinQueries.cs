@@ -23,14 +23,14 @@ namespace Sheaft.Mediatr.Payin.Queries
         public IQueryable<PayinDto> GetPayin(string identifier, RequestUser currentUser)
         {
             return _context.Payins
-                    .Where(c => c.Identifier == identifier && c.Author.Id == currentUser.Id)
+                    .Where(c => c.Identifier == identifier && c.AuthorId == currentUser.Id)
                     .ProjectTo<PayinDto>(_configurationProvider);
         }
 
         public IQueryable<PayinDto> GetPayin(Guid id, RequestUser currentUser)
         {
             return _context.Payins
-                    .Where(c => c.Id == id && c.Author.Id == currentUser.Id)
+                    .Where(c => c.Id == id && c.AuthorId == currentUser.Id)
                     .ProjectTo<PayinDto>(_configurationProvider);
         }
         
@@ -38,7 +38,7 @@ namespace Sheaft.Mediatr.Payin.Queries
         {
             return _context.Payins
                 .OfType<Domain.WebPayin>()
-                .Where(c => c.Id == id && c.Author.Id == currentUser.Id)
+                .Where(c => c.Id == id && c.AuthorId == currentUser.Id)
                 .ProjectTo<WebPayinDto>(_configurationProvider);
         }
         
@@ -46,7 +46,7 @@ namespace Sheaft.Mediatr.Payin.Queries
         {
             return _context.Payins
                 .OfType<Domain.PreAuthorizedPayin>()
-                .Where(c => c.Id == id && c.Author.Id == currentUser.Id)
+                .Where(c => c.Id == id && c.AuthorId == currentUser.Id)
                 .ProjectTo<PayinDto>(_configurationProvider);
         }
     }

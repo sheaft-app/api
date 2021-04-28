@@ -32,14 +32,14 @@ namespace Sheaft.Mediatr.Agreement.Queries
             if (currentUser.IsInRole(_roleOptions.Store.Value))
             {
                 return _context.Agreements
-                        .Where(c => c.Id == id && c.Store.Id == currentUser.Id)
+                        .Where(c => c.Id == id && c.StoreId == currentUser.Id)
                         .ProjectTo<AgreementDto>(_configurationProvider);
             }
 
             if (currentUser.IsInRole(_roleOptions.Producer.Value))
             {
                 return _context.Agreements
-                        .Where(c => c.Id == id && c.Producer.Id == currentUser.Id)
+                        .Where(c => c.Id == id && c.ProducerId == currentUser.Id)
                         .ProjectTo<AgreementDto>(_configurationProvider);
             }
 
@@ -51,14 +51,14 @@ namespace Sheaft.Mediatr.Agreement.Queries
             if (currentUser.IsInRole(_roleOptions.Store.Value))
             {
                 return _context.Agreements
-                        .Where(c => c.Store.Id == currentUser.Id && c.Status != AgreementStatus.Cancelled && c.Status != AgreementStatus.Refused)
+                        .Where(c => c.StoreId == currentUser.Id && c.Status != AgreementStatus.Cancelled && c.Status != AgreementStatus.Refused)
                         .ProjectTo<AgreementDto>(_configurationProvider);
             }
 
             if (currentUser.IsInRole(_roleOptions.Producer.Value))
             {
                 return _context.Agreements
-                        .Where(c => c.Producer.Id == currentUser.Id && c.Status != AgreementStatus.Cancelled && c.Status != AgreementStatus.Refused)
+                        .Where(c => c.ProducerId == currentUser.Id && c.Status != AgreementStatus.Cancelled && c.Status != AgreementStatus.Refused)
                         .ProjectTo<AgreementDto>(_configurationProvider);
             }
 
@@ -70,7 +70,7 @@ namespace Sheaft.Mediatr.Agreement.Queries
             if (currentUser.IsInRole(_roleOptions.Producer.Value))
             {
                 return _context.Agreements
-                        .Where(c => c.Store.Id == storeId && c.Producer.Id == currentUser.Id && c.Status != AgreementStatus.Cancelled && c.Status != AgreementStatus.Refused)
+                        .Where(c => c.StoreId == storeId && c.ProducerId == currentUser.Id && c.Status != AgreementStatus.Cancelled && c.Status != AgreementStatus.Refused)
                         .ProjectTo<AgreementDto>(_configurationProvider);
             }
 
@@ -82,7 +82,7 @@ namespace Sheaft.Mediatr.Agreement.Queries
             if (currentUser.IsInRole(_roleOptions.Store.Value))
             {
                 return _context.Agreements
-                        .Where(c => c.Store.Id == currentUser.Id && c.Producer.Id == producerId && c.Status != AgreementStatus.Cancelled && c.Status != AgreementStatus.Refused)
+                        .Where(c => c.StoreId == currentUser.Id && c.ProducerId == producerId && c.Status != AgreementStatus.Cancelled && c.Status != AgreementStatus.Refused)
                         .ProjectTo<AgreementDto>(_configurationProvider);
             }
 

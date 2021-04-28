@@ -49,7 +49,7 @@ namespace Sheaft.Web.Manage.Controllers
             var requestUser = await GetRequestUserAsync(token);
             if (requestUser.IsImpersonating)
             {
-                query = query.Where(p => p.Producer.Id == requestUser.Id);
+                query = query.Where(p => p.ProducerId == requestUser.Id);
             }
 
             var entities = await query
@@ -269,7 +269,7 @@ namespace Sheaft.Web.Manage.Controllers
         private async Task<List<ReturnableViewModel>> GetReturnables(RequestUser requestUser, CancellationToken token)
         {
             return await _context.Returnables
-                .Where(c => c.Producer.Id == requestUser.Id && !c.RemovedOn.HasValue)
+                .Where(c => c.ProducerId == requestUser.Id && !c.RemovedOn.HasValue)
                 .ProjectTo<ReturnableViewModel>(_configurationProvider)
                 .ToListAsync(token);
         }

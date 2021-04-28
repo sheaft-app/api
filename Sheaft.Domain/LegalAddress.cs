@@ -1,4 +1,5 @@
-﻿using Sheaft.Domain.Enum;
+﻿using System;
+using Sheaft.Domain.Enum;
 
 namespace Sheaft.Domain
 {

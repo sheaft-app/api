@@ -19,6 +19,7 @@ namespace Sheaft.Domain
             Id = id;
             Description = description;
             Producer = producer;
+            ProducerId = producer.Id;
             Kind = kind;
 
             SetName(name);
@@ -37,6 +38,7 @@ namespace Sheaft.Domain
         public decimal Vat { get; private set; }
         public decimal VatPrice { get; private set; }
         public decimal OnSalePrice { get; private set; }
+        public Guid ProducerId { get; private set; }
         public virtual Producer Producer { get; private set; }
 
         public void SetWholeSalePrice(decimal newPrice)

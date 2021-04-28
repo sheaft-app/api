@@ -66,11 +66,12 @@ namespace Sheaft.Domain
 
         public BusinessLegal SetLegals(LegalKind kind, string name, string email, string siret, string vatIdentifier, LegalAddress address, Owner owner)
         {
-            if (Legal != null)
+            if (LegalId.HasValue)
                 throw SheaftException.AlreadyExists();
 
             var legals = new BusinessLegal(Guid.NewGuid(),this, kind, name, email, siret, vatIdentifier, address, owner);
             Legal = legals;
+            LegalId = legals.Id;
 
             return legals;
         }

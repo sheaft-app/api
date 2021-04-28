@@ -24,6 +24,7 @@ namespace Sheaft.Domain
             SetName(name);
             SetAsDefault();
             User = user;
+            UserId = user.Id;
 
             DomainEvents = new List<DomainEvent>();
             _products = new List<QuickOrderProduct>();
@@ -37,6 +38,7 @@ namespace Sheaft.Domain
         public DateTimeOffset CreatedOn { get; private set; }
         public DateTimeOffset? UpdatedOn { get; private set; }
         public DateTimeOffset? RemovedOn { get; private set; }
+        public Guid UserId { get; private set; }
         public virtual User User { get; private set; }
         public virtual IEnumerable<QuickOrderProduct> Products => _products?.AsReadOnly();
 
@@ -80,7 +82,7 @@ namespace Sheaft.Domain
             if (Products == null)
                 _products = new List<QuickOrderProduct>();
             
-            var productLine = _products.SingleOrDefault(p => p.CatalogProduct.Product.Id == catalogProduct.Product.Id);
+            var productLine = _products.SingleOrDefault(p => p.CatalogProduct.ProductId == catalogProduct.ProductId);
             if (productLine != null)
             {
                 productLine.SetQuantity(quantity);
@@ -103,7 +105,7 @@ namespace Sheaft.Domain
             if (Products == null)
                 throw SheaftException.NotFound();
             
-            var productLine = _products.SingleOrDefault(p => p.CatalogProduct.Product.Id == productId);
+            var productLine = _products.SingleOrDefault(p => p.CatalogProduct.ProductId == productId);
             if (productLine == null)
                 throw SheaftException.Validation(MessageKind.QuickOrder_CannotRemoveProduct_Product_NotFound);
 

@@ -47,7 +47,7 @@ namespace Sheaft.Mediatr.DeliveryClosing.Commands
         public async Task<Result<Guid>> Handle(UpdateOrCreateDeliveryClosingCommand request, CancellationToken token)
         {
             var entity = await _context.DeliveryModes.SingleAsync(e => e.Id == request.DeliveryId, token);
-            if(entity.Producer.Id != request.RequestUser.Id)
+            if(entity.ProducerId != request.RequestUser.Id)
                 return Failure<Guid>(MessageKind.Forbidden);
 
             Guid closingId;

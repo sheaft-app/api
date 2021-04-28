@@ -91,7 +91,7 @@ namespace Sheaft.Mediatr.Legal.Commands
             if (string.IsNullOrWhiteSpace(legal.User.Identifier))
             {
                 var userResult = await _mediatr.Process(
-                    new CheckBusinessLegalConfigurationCommand(request.RequestUser) {UserId = legal.User.Id}, token);
+                    new CheckBusinessLegalConfigurationCommand(request.RequestUser) {UserId = legal.UserId}, token);
                 if (!userResult.Succeeded)
                     return Failure(userResult);
             }

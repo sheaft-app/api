@@ -25,8 +25,8 @@ namespace Sheaft.Mediatr.Product.EventHandlers
         {
             var productEvent = notification.DomainEvent;
             var job = await _context.Jobs.SingleAsync(e => e.Id == productEvent.JobId, token);
-            await _signalrService.SendNotificationToGroupAsync(job.User.Id, nameof(ProductImportProcessingEvent),
-                new {JobId = job.Id, UserId = job.User.Id});
+            await _signalrService.SendNotificationToGroupAsync(job.UserId, nameof(ProductImportProcessingEvent),
+                new {JobId = job.Id, UserId = job.UserId});
         }
     }
 }

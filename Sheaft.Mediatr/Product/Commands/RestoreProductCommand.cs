@@ -45,13 +45,13 @@ namespace Sheaft.Mediatr.Product.Commands
             var entity =
                 await _context.Products.SingleOrDefaultAsync(a => a.Id == request.ProductId && a.RemovedOn.HasValue, token);
             
-            if(entity.Producer.Id != request.RequestUser.Id)
+            if(entity.ProducerId != request.RequestUser.Id)
                 throw SheaftException.Forbidden();
                 
             _context.Restore(entity);
             await _context.SaveChangesAsync(token);
             
-            _mediatr.Post(new UpdateProducerProductsCommand(request.RequestUser) {ProducerId = entity.Producer.Id});
+            _mediatr.Post(new UpdateProducerProductsCommand(request.RequestUser) {ProducerId = entity.ProducerId});
             return Success();
         }
     }

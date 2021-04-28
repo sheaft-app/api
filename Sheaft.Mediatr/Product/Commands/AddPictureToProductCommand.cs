@@ -49,7 +49,7 @@ namespace Sheaft.Mediatr.Product.Commands
         public async Task<Result> Handle(AddPictureToProductCommand request, CancellationToken token)
         {
             var entity = await _context.Products.SingleAsync(e => e.Id == request.ProductId, token);
-            if(entity.Producer.Id != request.RequestUser.Id)
+            if(entity.ProducerId != request.RequestUser.Id)
                 return Failure(MessageKind.Forbidden);
             
             var id = Guid.NewGuid();

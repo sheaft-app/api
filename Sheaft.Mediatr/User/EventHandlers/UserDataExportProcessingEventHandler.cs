@@ -25,8 +25,8 @@ namespace Sheaft.Mediatr.User.EventHandlers
         {
             var userEvent = notification.DomainEvent;
             var job = await _context.Jobs.SingleAsync(e => e.Id == userEvent.JobId, token);
-            await _signalrService.SendNotificationToUserAsync(job.User.Id, nameof(UserDataExportProcessingEvent),
-                new {JobId = userEvent.JobId, UserId = job.User.Id});
+            await _signalrService.SendNotificationToUserAsync(job.UserId, nameof(UserDataExportProcessingEvent),
+                new {JobId = userEvent.JobId, UserId = job.UserId});
         }
     }
 }

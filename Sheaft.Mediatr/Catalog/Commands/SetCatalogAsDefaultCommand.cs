@@ -43,7 +43,7 @@ namespace Sheaft.Mediatr.Catalog.Commands
         {
             var catalogs =
                 await _context.Catalogs
-                    .Where(c => c.Producer.Id == request.RequestUser.Id)
+                    .Where(c => c.ProducerId == request.RequestUser.Id)
                     .ToListAsync(token);
             
             var entity = catalogs.Single(c => c.Id == request.CatalogId);

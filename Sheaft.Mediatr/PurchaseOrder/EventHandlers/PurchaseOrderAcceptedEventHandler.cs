@@ -29,7 +29,7 @@ namespace Sheaft.Mediatr.PurchaseOrder.EventHandlers
         {
             var orderEvent = notification.DomainEvent;
             var purchaseOrder = await _context.PurchaseOrders.SingleAsync(e => e.Id == orderEvent.PurchaseOrderId, token);
-            await _signalrService.SendNotificationToUserAsync(purchaseOrder.Sender.Id, nameof(PurchaseOrderAcceptedEvent), purchaseOrder.GetPurchaseNotifModelAsString());
+            await _signalrService.SendNotificationToUserAsync(purchaseOrder.SenderId, nameof(PurchaseOrderAcceptedEvent), purchaseOrder.GetPurchaseNotifModelAsString());
 
             var email = purchaseOrder.Sender.Email;
             var name = purchaseOrder.Sender.Name;

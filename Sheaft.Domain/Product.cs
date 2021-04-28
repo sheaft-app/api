@@ -28,6 +28,7 @@ namespace Sheaft.Domain
         {
             Id = id;
             Producer = producer ?? throw new ValidationException(MessageKind.Product_Producer_Required);
+            ProducerId = producer.Id;
 
             SetName(name);
             SetReference(reference);
@@ -59,6 +60,10 @@ namespace Sheaft.Domain
         public bool Available { get; private set; }
         public int RatingsCount { get; set; }
         public decimal? Rating { get; set; }
+
+        public Guid? ReturnableId { get; private set; }
+
+        public Guid ProducerId { get; private set; }
         public virtual Returnable Returnable { get; private set; }
         public virtual Producer Producer { get; private set; }
         public virtual IReadOnlyCollection<ProductTag> Tags => _tags?.AsReadOnly();
@@ -151,7 +156,7 @@ namespace Sheaft.Domain
             if (Ratings == null)
                 _ratings = new List<Rating>();
 
-            if (_ratings.Any(r => r.User.Id == user.Id))
+            if (_ratings.Any(r => r.UserId == user.Id))
                 throw new ValidationException(MessageKind.Product_CannotRate_AlreadyRated);
 
             _ratings.Add(new Rating(Guid.NewGuid(), value, user, comment));
@@ -160,10 +165,8 @@ namespace Sheaft.Domain
 
         public void SetReturnable(Returnable returnable)
         {
-            if (Returnable != null && Returnable.Id == returnable?.Id)
-                return;
-
             Returnable = returnable;
+            ReturnableId = returnable?.Id;
         }
 
         public void SetConditioning(ConditioningKind conditioning, decimal quantity,
@@ -240,9 +243,9 @@ namespace Sheaft.Domain
             if (CatalogsPrices == null)
                 _catalogsPrices = new List<CatalogProduct>();
 
-            var existingCatalogPrice = _catalogsPrices.SingleOrDefault(c => c.Catalog.Id == catalog.Id);
+            var existingCatalogPrice = _catalogsPrices.SingleOrDefault(c => c.CatalogId == catalog.Id);
             if (existingCatalogPrice == null)
-                _catalogsPrices.Add(new CatalogProduct(this, catalog, wholeSalePricePerUnit));
+                _catalogsPrices.Add(new CatalogProduct(Guid.NewGuid(), this, catalog, wholeSalePricePerUnit));
             else
                 existingCatalogPrice.SetWholeSalePricePerUnit(wholeSalePricePerUnit);
             
@@ -254,7 +257,7 @@ namespace Sheaft.Domain
             if (CatalogsPrices == null || !CatalogsPrices.Any())
                 throw SheaftException.NotFound();
 
-            var existingCatalogPrice = _catalogsPrices.SingleOrDefault(c => c.Catalog.Id == catalogId);
+            var existingCatalogPrice = _catalogsPrices.SingleOrDefault(c => c.CatalogId == catalogId);
             if (existingCatalogPrice == null)
                 throw SheaftException.NotFound();
 

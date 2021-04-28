@@ -57,7 +57,7 @@ namespace Sheaft.Mediatr.Order.Commands
             if (order.Status == OrderStatus.Waiting)
             {
                 var pendingPayins = await _context.Payins
-                    .Where(t => t.Order.Id == request.OrderId)
+                    .Where(t => t.OrderId == request.OrderId)
                     .ToListAsync(token);
 
                 if (pendingPayins.Any(pt => pt.Status == TransactionStatus.Created || pt.Status == TransactionStatus.Waiting))

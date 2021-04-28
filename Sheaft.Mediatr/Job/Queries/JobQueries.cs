@@ -31,7 +31,7 @@ namespace Sheaft.Mediatr.Job.Queries
                 !r.Archived &&
                 r.Kind == JobKind.ImportProducts &&
                 (r.Status == ProcessStatus.Paused || r.Status == ProcessStatus.Processing || r.Status == ProcessStatus.Waiting) &&
-                r.User.Id == producerId, token);
+                r.UserId == producerId, token);
         }
 
         public Task<bool> HasPickingOrdersExportsInProgressAsync(Guid producerId, RequestUser currentUser, CancellationToken token)
@@ -40,20 +40,20 @@ namespace Sheaft.Mediatr.Job.Queries
                 !r.Archived &&
                 r.Kind == JobKind.ExportPickingOrders &&
                 (r.Status == ProcessStatus.Paused || r.Status == ProcessStatus.Processing || r.Status == ProcessStatus.Waiting) &&
-                r.User.Id == producerId, token);
+                r.UserId == producerId, token);
         }
 
         public IQueryable<JobDto> GetJob(Guid jobId, RequestUser currentUser)
         {
             return _context.Jobs
-                    .Where(c => c.Id == jobId && c.User.Id == currentUser.Id && !c.Archived)
+                    .Where(c => c.Id == jobId && c.UserId == currentUser.Id && !c.Archived)
                     .ProjectTo<JobDto>(_configurationProvider);
         }
 
         public IQueryable<JobDto> GetJobs(RequestUser currentUser)
         {
             return _context.Jobs
-                    .Where(c => c.User.Id == currentUser.Id && !c.Archived)
+                    .Where(c => c.UserId == currentUser.Id && !c.Archived)
                     .ProjectTo<JobDto>(_configurationProvider);
         }
     }

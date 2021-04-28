@@ -23,14 +23,14 @@ namespace Sheaft.Mediatr.Card.Queries
         public IQueryable<CardDto> GetCard(Guid id, RequestUser currentUser)
         {
             return _context.Cards
-                .Where(c => c.Id == id && c.User.Id == currentUser.Id)
+                .Where(c => c.Id == id && c.UserId == currentUser.Id)
                 .ProjectTo<CardDto>(_configurationProvider);
         }
 
         public IQueryable<CardDto> GetCards(RequestUser currentUser)
         {
             return _context.Cards
-                .Where(c => c.User.Id == currentUser.Id)
+                .Where(c => c.UserId == currentUser.Id)
                 .ProjectTo<CardDto>(_configurationProvider);
         }
     }

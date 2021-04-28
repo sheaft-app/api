@@ -20,8 +20,8 @@ namespace Sheaft.Mediatr.Legal.Commands
     {
         protected CreateConsumerLegalCommand()
         {
-            
         }
+
         [JsonConstructor]
         public CreateConsumerLegalCommand(RequestUser requestUser) : base(requestUser)
         {
@@ -55,7 +55,7 @@ namespace Sheaft.Mediatr.Legal.Commands
         public async Task<Result<Guid>> Handle(CreateConsumerLegalCommand request, CancellationToken token)
         {
             var consumer = await _context.Consumers.SingleAsync(e => e.Id == request.UserId, token);
-            var legals = consumer.SetLegals(new Owner(consumer.Id,
+            var legals = consumer.SetLegals(new Owner(
                 request.FirstName,
                 request.LastName,
                 request.Email,
@@ -69,7 +69,7 @@ namespace Sheaft.Mediatr.Legal.Commands
                 request.Nationality,
                 request.CountryOfResidence
             ));
-               
+
             await _context.SaveChangesAsync(token);
 
             if (string.IsNullOrWhiteSpace(consumer.Identifier))

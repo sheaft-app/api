@@ -21,22 +21,26 @@ namespace Sheaft.Domain
             : base(id, kind, creditedWallet.User)
         {
             Order = order;
+            OrderId = order.Id;
             Fees = order.FeesPrice;
             Debited = order.TotalPrice;
             CreditedWallet = creditedWallet;
+            CreditedWalletId = creditedWallet.Id;
             Reference = "SHEAFT";
 
             DomainEvents = new List<DomainEvent>();
             _refunds = new List<PayinRefund>();
         }
 
+        public Guid CreditedWalletId { get; private set; }
+        public Guid OrderId { get; private set; }
         public virtual Wallet CreditedWallet { get; private set; }
         public virtual Order Order { get; private set; }
         public virtual IReadOnlyCollection<PayinRefund> Refunds => _refunds.AsReadOnly();
         
         public void AddRefund(PayinRefund refund)
         {
-            if (Refunds != null && Refunds.Any(r => r.PurchaseOrder.Id == refund.PurchaseOrder.Id && r.Status == TransactionStatus.Succeeded))
+            if (Refunds != null && Refunds.Any(r => r.PurchaseOrderId == refund.PurchaseOrderId && r.Status == TransactionStatus.Succeeded))
                 throw new ValidationException(MessageKind.Payin_CannotAdd_Refund_PurchaseOrderRefund_AlreadySucceeded);
 
             _refunds.Add(refund);

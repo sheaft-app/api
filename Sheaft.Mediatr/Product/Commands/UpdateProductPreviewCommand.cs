@@ -50,7 +50,7 @@ namespace Sheaft.Mediatr.Product.Commands
         public async Task<Result<string>> Handle(UpdateProductPreviewCommand request, CancellationToken token)
         {
             var entity = await _context.Products.SingleAsync(e => e.Id == request.ProductId, token);
-            if(entity.Producer.Id != request.RequestUser.Id)
+            if(entity.ProducerId != request.RequestUser.Id)
                 return Failure<string>(MessageKind.Forbidden);
 
             var resultImage =

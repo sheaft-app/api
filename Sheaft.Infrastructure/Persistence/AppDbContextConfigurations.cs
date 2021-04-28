@@ -135,6 +135,13 @@ namespace Sheaft.Infrastructure.Persistence
             modelBuilder.ApplyConfiguration(new CatalogProductConfiguration());
             modelBuilder.ApplyConfiguration(new PreAuthorizationConfiguration(_isAdminContext));
             modelBuilder.ApplyConfiguration(new PreAuthorizedPayinConfiguration());
+            modelBuilder.ApplyConfiguration(new DeclarationConfiguration());
+            modelBuilder.ApplyConfiguration(new UboConfiguration());
+            modelBuilder.ApplyConfiguration(new OpeningHoursConfiguration());
+            modelBuilder.ApplyConfiguration(new DeliveryHoursConfiguration());
+            modelBuilder.ApplyConfiguration(new DocumentConfiguration());
+            modelBuilder.ApplyConfiguration(new PageConfiguration());
+            modelBuilder.ApplyConfiguration(new UserPointConfiguration());
         }
     }
 }

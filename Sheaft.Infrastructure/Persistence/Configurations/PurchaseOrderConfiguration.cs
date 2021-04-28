@@ -15,11 +15,6 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
 
         public void Configure(EntityTypeBuilder<PurchaseOrder> entity)
         {
-            entity.Property<long>("Uid");
-            entity.Property<long>("OrderUid");
-            entity.Property<long>("PurchaseOrderVendorUid");
-            entity.Property<long>("PurchaseOrderSenderUid");
-
             entity.Property(c => c.CreatedOn);
             entity.Property(c => c.UpdatedOn).IsConcurrencyToken();
             
@@ -43,14 +38,13 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
             entity.Property(o => o.TotalProductVatPrice).HasColumnType("decimal(10,2)");
             entity.Property(o => o.TotalProductWholeSalePrice).HasColumnType("decimal(10,2)");
 
-            entity.HasMany(o => o.Products).WithOne().HasForeignKey("PurchaseOrderUid").OnDelete(DeleteBehavior.Cascade).IsRequired();
+            entity.HasMany(o => o.Products).WithOne().HasForeignKey(c=>c.PurchaseOrderId).OnDelete(DeleteBehavior.Cascade).IsRequired();
 
-            entity.HasOne(c => c.Vendor).WithOne().HasForeignKey<PurchaseOrder>("PurchaseOrderVendorUid").OnDelete(DeleteBehavior.Cascade).IsRequired();
-            entity.HasOne(c => c.Sender).WithOne().HasForeignKey<PurchaseOrder>("PurchaseOrderSenderUid").OnDelete(DeleteBehavior.Cascade).IsRequired();
+            entity.HasOne(c => c.Vendor).WithOne().HasForeignKey<PurchaseOrder>(c=>c.VendorId).OnDelete(DeleteBehavior.Cascade).IsRequired();
+            entity.HasOne(c => c.Sender).WithOne().HasForeignKey<PurchaseOrder>(c=>c.SenderId).OnDelete(DeleteBehavior.Cascade).IsRequired();
             entity.OwnsOne(c => c.ExpectedDelivery, cb =>
             {
                 cb.OwnsOne(ca => ca.Address);
-                cb.ToTable("ExpectedDeliveries");
             });
 
             entity.Ignore(c => c.DomainEvents);
@@ -58,14 +52,9 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
             var products = entity.Metadata.FindNavigation(nameof(PurchaseOrder.Products));
             products.SetPropertyAccessMode(PropertyAccessMode.Field);
 
-            entity.HasKey("Uid");
+            entity.HasKey(c=>c.Id);
 
-            entity.HasIndex(c => c.Id).IsUnique();
-            entity.HasIndex("PurchaseOrderVendorUid", "Reference").IsUnique();
-            entity.HasIndex("OrderUid");
-            entity.HasIndex("PurchaseOrderVendorUid");
-            entity.HasIndex("PurchaseOrderSenderUid");
-            entity.HasIndex("OrderUid", "Uid", "Id", "PurchaseOrderVendorUid", "PurchaseOrderSenderUid", "RemovedOn");
+            entity.HasIndex(c=> new {PurchaseOrderVendorId = c.VendorId, c.Reference}).IsUnique();
             entity.ToTable("PurchaseOrders");
         }
     }

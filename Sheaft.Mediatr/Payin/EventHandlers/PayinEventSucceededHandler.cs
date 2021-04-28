@@ -36,7 +36,7 @@ namespace Sheaft.Mediatr.Payin.EventHandlers
                 return;
 
             var payinData = GetObject(payin);
-            await _signalrService.SendNotificationToUserAsync(payin.Author.Id, nameof(PayinSucceededEvent), payinData);
+            await _signalrService.SendNotificationToUserAsync(payin.AuthorId, nameof(PayinSucceededEvent), payinData);
             return;
 
             await _emailService.SendTemplatedEmailAsync(
@@ -58,8 +58,8 @@ namespace Sheaft.Mediatr.Payin.EventHandlers
                 CreatedOn = payin.Order.CreatedOn, 
                 ProductsCount = payin.Order.ProductsCount, 
                 Reference = payin.Order.Reference, 
-                OrderId = payin.Order.Id, 
-                MyOrdersUrl = $"{_configuration.GetValue<string>("Portal:url")}/#/my-orders/{payin.Order.Id:N}"
+                OrderId = payin.OrderId, 
+                MyOrdersUrl = $"{_configuration.GetValue<string>("Portal:url")}/#/my-orders/{payin.OrderId:N}"
             };
         }
     }

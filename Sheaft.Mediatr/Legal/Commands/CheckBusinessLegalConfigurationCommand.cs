@@ -44,7 +44,7 @@ namespace Sheaft.Mediatr.Legal.Commands
 
         public async Task<Result> Handle(CheckBusinessLegalConfigurationCommand request, CancellationToken token)
         {
-            var legal = await _context.Set<BusinessLegal>().SingleOrDefaultAsync(b => b.User.Id == request.UserId, token);
+            var legal = await _context.Set<BusinessLegal>().SingleOrDefaultAsync(b => b.UserId == request.UserId, token);
             if (string.IsNullOrWhiteSpace(legal.User.Identifier))
             {
                 var userResult = await _pspService.CreateBusinessAsync(legal, token);

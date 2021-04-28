@@ -50,10 +50,10 @@ namespace Sheaft.Mediatr.Agreement.Commands
         public async Task<Result> Handle(ResetAgreementStatusToCommand request, CancellationToken token)
         {
             var entity = await _context.Agreements.SingleOrDefaultAsync(a => a.Id == request.AgreementId, token);
-            if(request.RequestUser.IsInRole(_roleOptions.Producer.Value) && entity.Producer.Id != request.RequestUser.Id)
+            if(request.RequestUser.IsInRole(_roleOptions.Producer.Value) && entity.ProducerId != request.RequestUser.Id)
                 return Failure(MessageKind.Forbidden);
             
-            if(request.RequestUser.IsInRole(_roleOptions.Store.Value) && entity.Store.Id != request.RequestUser.Id)
+            if(request.RequestUser.IsInRole(_roleOptions.Store.Value) && entity.StoreId != request.RequestUser.Id)
                 return Failure(MessageKind.Forbidden);
 
             entity.Reset();

@@ -45,13 +45,13 @@ namespace Sheaft.Mediatr.DeliveryMode.Commands
             var entity =
                 await _context.DeliveryModes.SingleOrDefaultAsync(a => a.Id == request.DeliveryModeId && a.RemovedOn.HasValue,
                     token);
-            if(entity.Producer.Id != request.RequestUser.Id)
+            if(entity.ProducerId != request.RequestUser.Id)
                 throw SheaftException.Forbidden();
 
             _context.Restore(entity);            
             await _context.SaveChangesAsync(token);
             
-            _mediatr.Post(new UpdateProducerAvailabilityCommand(request.RequestUser) {ProducerId = entity.Producer.Id});
+            _mediatr.Post(new UpdateProducerAvailabilityCommand(request.RequestUser) {ProducerId = entity.ProducerId});
             return Success();
         }
     }

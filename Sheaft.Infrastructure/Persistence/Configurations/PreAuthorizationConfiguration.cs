@@ -15,11 +15,6 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
 
         public void Configure(EntityTypeBuilder<PreAuthorization> entity)
         {
-            entity.Property<long>("Uid");
-            entity.Property<long>("OrderUid");
-            entity.Property<long>("CardUid");
-            entity.Property<long?>("PreAuthorizedPayinUid");
-            
             entity.Property(c => c.CreatedOn);
             entity.Property(c => c.UpdatedOn).IsConcurrencyToken();
             
@@ -29,21 +24,15 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
             entity.Property(o => o.Debited).HasColumnType("decimal(10,2)");
             entity.Property(o => o.Remaining).HasColumnType("decimal(10,2)");
 
-            entity.HasOne(c => c.Order).WithMany().HasForeignKey("OrderUid").OnDelete(DeleteBehavior.NoAction).IsRequired();
-            entity.HasOne(c => c.Card).WithMany().HasForeignKey("CardUid").OnDelete(DeleteBehavior.Cascade).IsRequired();
-            entity.HasOne(c => c.PreAuthorizedPayin).WithOne().HasForeignKey<PreAuthorization>("PreAuthorizedPayinUid").OnDelete(DeleteBehavior.NoAction);
+            entity.HasOne(c => c.Order).WithMany().HasForeignKey(c=>c.OrderId).OnDelete(DeleteBehavior.NoAction).IsRequired();
+            entity.HasOne(c => c.Card).WithMany().HasForeignKey(c=>c.CardId).OnDelete(DeleteBehavior.Cascade).IsRequired();
+            entity.HasOne(c => c.PreAuthorizedPayin).WithOne().HasForeignKey<PreAuthorization>(c=>c.PreAuthorizedPayinId).OnDelete(DeleteBehavior.NoAction);
 
-            entity.HasKey("Uid");
+            entity.HasKey(c=>c.Id);
 
             entity.Ignore(c => c.DomainEvents);
-            
-            entity.HasIndex(c => c.Id).IsUnique();
             entity.HasIndex(c => c.Identifier);
-            entity.HasIndex("OrderUid");
-            entity.HasIndex("CardUid");
-            entity.HasIndex("PreAuthorizedPayinUid");
-            entity.HasIndex("Uid", "Id", "OrderUid", "CardUid", "RemovedOn");
-
+            
             entity.ToTable("PreAuthorizations");
         }
     }

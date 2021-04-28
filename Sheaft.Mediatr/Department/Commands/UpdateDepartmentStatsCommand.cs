@@ -55,7 +55,7 @@ namespace Sheaft.Mediatr.Department.Commands
             department.SetPoints(request.Points);
             department.SetPosition(request.Position);
             var consumersCount = await _context.Users.OfType<Domain.Consumer>()
-                .CountAsync(u => !u.RemovedOn.HasValue && u.Address.Department.Id == request.DepartmentId, token);
+                .CountAsync(u => !u.RemovedOn.HasValue && u.Address.DepartmentId == request.DepartmentId, token);
 
             department.SetConsumersCount(consumersCount);
 

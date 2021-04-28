@@ -38,14 +38,14 @@ namespace Sheaft.Web.Manage.Controllers
         {
             var entity = await _context.Legals
                 .OfType<BusinessLegal>()
-                .Where(c => c.Declaration.Id == id)
+                .Where(c => c.DeclarationId == id)
                 .ProjectTo<BusinessLegalViewModel>(_configurationProvider)
                 .SingleOrDefaultAsync(token);
 
             if (entity == null)
                 throw SheaftException.NotFound();
 
-            ViewBag.UserId = entity.Owner.Id;
+            ViewBag.UserId = entity.UserId;
             ViewBag.LegalId = entity.Id;
 
             return View(entity.Declaration);

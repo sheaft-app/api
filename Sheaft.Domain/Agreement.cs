@@ -19,9 +19,12 @@ namespace Sheaft.Domain
         public Agreement(Guid id, Store store, Producer producer, ProfileKind createdByKind, DeliveryMode delivery = null)
         {
             Id = id;
+            StoreId = store.Id;
             Store = store;
             CreatedByKind = createdByKind;
+            DeliveryId = delivery?.Id;
             Delivery = delivery;
+            ProducerId = producer.Id;
             Producer = producer;
             
             if(CreatedByKind == ProfileKind.Store)
@@ -43,6 +46,10 @@ namespace Sheaft.Domain
         public DateTimeOffset? UpdatedOn { get; private set; }
         public DateTimeOffset? RemovedOn { get; private set; }
         public string Reason { get; private set; }
+        public Guid? DeliveryId { get; private set; }
+        public Guid StoreId { get; private set; }
+        public Guid ProducerId { get; private set; }
+        public Guid CatalogId { get; private set; }
         public virtual DeliveryMode Delivery { get; private set; }
         public virtual Store Store { get; private set; }
         public virtual Producer Producer { get; private set; }
@@ -60,13 +67,16 @@ namespace Sheaft.Domain
             if(Status == AgreementStatus.WaitingForStoreApproval && acceptedByKind != ProfileKind.Store)
                 throw SheaftException.Validation();
             
-            if(Delivery != null && delivery != null && Delivery.Id != delivery.Id)
+            if(DeliveryId.HasValue && delivery != null && DeliveryId != delivery.Id)
                 throw SheaftException.Validation();
 
-            if(delivery != null)
+            if (delivery != null)
+            {
+                DeliveryId = delivery.Id;
                 Delivery = delivery;
-            
-            if(Delivery?.Id == null)
+            }
+
+            if(!DeliveryId.HasValue)
                 throw SheaftException.Validation();
 
             Status = AgreementStatus.Accepted;
@@ -120,6 +130,7 @@ namespace Sheaft.Domain
             if(!catalog.Available)
                 throw SheaftException.Validation();
 
+            CatalogId = catalog.Id;
             Catalog = catalog;
         }
     }

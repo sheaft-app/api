@@ -48,7 +48,7 @@ namespace Sheaft.Mediatr.Producer.Commands
                 return Failure(MessageKind.BadRequest);
 
             var products = await _context.Products
-                .Where(p => p.Producer.Id == producer.Id)
+                .Where(p => p.ProducerId == producer.Id)
                 .ToListAsync(token);
             
             foreach (var product in products)

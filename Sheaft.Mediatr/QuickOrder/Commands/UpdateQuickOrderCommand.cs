@@ -57,13 +57,13 @@ namespace Sheaft.Mediatr.QuickOrder.Commands
             {
                 var productIds = request.Products.Select(p => p.Id).ToList();
                 var agreements = await _context.Set<Domain.Agreement>()
-                    .Where(a => a.Store.Id == entity.User.Id && a.Catalog.Products.Any(p => productIds.Contains(p.Product.Id)))
+                    .Where(a => a.StoreId == entity.UserId && a.Catalog.Products.Any(p => productIds.Contains(p.ProductId)))
                     .Include(a => a.Catalog)
                     .ThenInclude(c => c.Products)
                     .ThenInclude(c => c.Product)
                     .ToListAsync(token);
 
-                var existingProductIds = entity.Products.Select(p => p.CatalogProduct.Product.Id);
+                var existingProductIds = entity.Products.Select(p => p.CatalogProduct.ProductId);
                 
                 var productToRemoveIds = productIds.Except(existingProductIds);
                 foreach (var productToRemoveId in productToRemoveIds)
@@ -74,10 +74,10 @@ namespace Sheaft.Mediatr.QuickOrder.Commands
                 {
                     var quantity = request.Products.Where(p => p.Id == productId).Sum(p => p.Quantity);
                     var catalogProduct =
-                        agreements.Where(a => a.Catalog.Products.Any(p => p.Product.Id == productId))
+                        agreements.Where(a => a.Catalog.Products.Any(p => p.ProductId == productId))
                             .Select(a => a.Catalog)
                             .SelectMany(c => c.Products)
-                            .FirstOrDefault(cp => cp.Product.Id == productId);
+                            .FirstOrDefault(cp => cp.ProductId == productId);
 
                     if (catalogProduct != null)
                         entity.AddOrUpdateProduct(catalogProduct, quantity);

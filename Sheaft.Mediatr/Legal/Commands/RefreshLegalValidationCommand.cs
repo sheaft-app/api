@@ -77,7 +77,7 @@ namespace Sheaft.Mediatr.Legal.Commands
             if (validation == LegalValidation.Regular && legal.User.Kind == ProfileKind.Producer)
                 _mediatr.Post(new CreateWithholdingCommand(request.RequestUser)
                 {
-                    UserId = legal.User.Id,
+                    UserId = legal.UserId,
                     Amount = _pspOptions.ProducerFees
                 });
 

@@ -75,7 +75,7 @@ namespace Sheaft.Mediatr.Leaderboard.Queries
             if (departement?.Region == null)
                 return null;
 
-            return _mapper.Map<UserPositionDto>(await _dapper.GetUserPositionInRegionAsync(userId, departement.Region.Id));
+            return _mapper.Map<UserPositionDto>(await _dapper.GetUserPositionInRegionAsync(userId, departement.RegionId));
         }
 
         public async Task<UserPositionDto> UserPositionInCountryAsync(Guid userId, RequestUser currentUser, CancellationToken token)

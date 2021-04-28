@@ -16,10 +16,15 @@ namespace Sheaft.Domain
             : base(id, TransactionKind.RefundPayin, purchaseOrder.TotalOnSalePrice, transaction.CreditedWallet, transaction.Author)
         {
             Credited = transaction.Debited;
+            PurchaseOrder = purchaseOrder;
+            PurchaseOrderId = purchaseOrder.Id;
             Payin = transaction;
+            PayinId = transaction.Id;
             DomainEvents = new List<DomainEvent>();
         }
 
+        public Guid PayinId { get; private set; }
+        public Guid PurchaseOrderId { get; private set; }
         public virtual Payin Payin { get; private set; }
         public virtual PurchaseOrder PurchaseOrder { get; private set; }
 

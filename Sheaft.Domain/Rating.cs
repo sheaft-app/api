@@ -27,6 +27,7 @@ namespace Sheaft.Domain
             Value = value;
             Comment = comment;
             User = user;
+            UserId = user.Id;
         }
 
         public Guid Id { get; private set; }
@@ -34,6 +35,8 @@ namespace Sheaft.Domain
         public DateTimeOffset? UpdatedOn { get; private set; }
         public decimal Value { get; private set; }
         public string Comment { get; private set; }
+        public Guid ProductId { get; private set; }
+        public Guid UserId { get; private set; }
         public virtual User User { get; private set; }
     }
 }

@@ -1,4 +1,5 @@
-﻿using System.Text.RegularExpressions;
+﻿using System;
+using System.Text.RegularExpressions;
 using Sheaft.Domain.Enum;
 
 namespace Sheaft.Domain
@@ -24,6 +25,7 @@ namespace Sheaft.Domain
 
         public double? Longitude { get; private set; }
         public double? Latitude { get; private set; }
+        public Guid DepartmentId { get; set; }
         public virtual Department Department { get; private set; }
 
         public static string GetDepartmentCode(string code)

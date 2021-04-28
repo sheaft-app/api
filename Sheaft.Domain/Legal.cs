@@ -22,6 +22,7 @@ namespace Sheaft.Domain
             Kind = kind;
             Owner = owner;
             User = user;
+            UserId = user.Id;
         }
 
         public Guid Id { get; private set; }
@@ -29,8 +30,9 @@ namespace Sheaft.Domain
         public DateTimeOffset? UpdatedOn { get; private set; }
         public LegalKind Kind { get; protected set; }
         public LegalValidation Validation { get; protected set; }
+        public Guid UserId { get; private set; }
+        public Owner Owner { get; private set; }
         public virtual User User { get; private set; }
-        public virtual Owner Owner { get; private set; }
         public virtual IReadOnlyCollection<Document> Documents => _documents?.AsReadOnly();
 
         public Document AddDocument(DocumentKind kind, string name)

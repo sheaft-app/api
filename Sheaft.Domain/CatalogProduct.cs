@@ -14,13 +14,17 @@ namespace Sheaft.Domain
         {
         }
 
-        public CatalogProduct(Product product, Catalog catalog, decimal wholeSalePrice)
+        public CatalogProduct(Guid id, Product product, Catalog catalog, decimal wholeSalePrice)
         {
+            Id = id;
             Product = product;
+            ProductId = product.Id;
             Catalog = catalog;
+            CatalogId = catalog.Id;
             SetWholeSalePricePerUnit(wholeSalePrice);
         }
-
+        
+        public Guid Id { get; private set; }
         public DateTimeOffset CreatedOn { get; }
         public DateTimeOffset? UpdatedOn { get; }
         public decimal OnSalePrice { get; private set; }
@@ -29,6 +33,8 @@ namespace Sheaft.Domain
         public decimal WholeSalePricePerUnit { get; private set; }
         public decimal VatPricePerUnit { get; private set; }
         public decimal OnSalePricePerUnit { get; private set; }
+        public Guid CatalogId { get; private set; }
+        public Guid ProductId { get; private set; }
         public virtual Product Product { get; }
         public virtual Catalog Catalog { get; }
 

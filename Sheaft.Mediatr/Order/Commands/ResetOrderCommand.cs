@@ -44,14 +44,14 @@ namespace Sheaft.Mediatr.Order.Commands
         public async Task<Result> Handle(ResetOrderCommand request, CancellationToken token)
         {
             var order = await _context.Orders.SingleAsync(e => e.Id == request.OrderId, token);
-            if (order.User.Id != request.RequestUser.Id)
+            if (order.UserId != request.RequestUser.Id)
                 return Failure(MessageKind.Forbidden);
             
             if (order.Status != OrderStatus.Refused && order.Status != OrderStatus.Waiting && order.Status != OrderStatus.Expired)
                 return Failure(MessageKind.BadRequest);
 
             var pendingPayins = await _context.Payins
-                .Where(p => p.Order.Id == request.OrderId)
+                .Where(p => p.OrderId == request.OrderId)
                 .ToListAsync(token);
 
             if (pendingPayins.Any(p => p.Status == TransactionStatus.Succeeded))
@@ -61,7 +61,7 @@ namespace Sheaft.Mediatr.Order.Commands
                 pendingPayin.SetStatus(TransactionStatus.Cancelled);
             
             var pendingPreAuthorizations = await _context.PreAuthorizations
-                .Where(p => p.Order.Id == request.OrderId)
+                .Where(p => p.OrderId == request.OrderId)
                 .ToListAsync(token);
 
             if (pendingPreAuthorizations.Any(p => p.Status == PreAuthorizationStatus.Succeeded))

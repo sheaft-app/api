@@ -61,7 +61,7 @@ namespace Sheaft.Mediatr.PurchaseOrder.Commands
         public async Task<Result> Handle(ExportPurchaseOrdersCommand request, CancellationToken token)
         {
             var job = await _context.Jobs.SingleAsync(e => e.Id == request.JobId, token);
-            if (job.User.Id != request.RequestUser.Id)
+            if (job.UserId != request.RequestUser.Id)
                 return Failure(MessageKind.Forbidden);
 
             try
@@ -74,7 +74,7 @@ namespace Sheaft.Mediatr.PurchaseOrder.Commands
                 _mediatr.Post(new PurchaseOrdersExportProcessingEvent(job.Id));
 
                 var purchaseOrdersQuery = _context.Set<Domain.PurchaseOrder>().Where(o =>
-                    o.Vendor.Id == request.RequestUser.Id
+                    o.VendorId == request.RequestUser.Id
                     && o.CreatedOn >= request.From
                     && o.CreatedOn <= request.To);
 
@@ -85,14 +85,14 @@ namespace Sheaft.Mediatr.PurchaseOrder.Commands
                 if (!purchaseOrdersExportResult.Succeeded)
                     throw purchaseOrdersExportResult.Exception;
 
-                var response = await _blobService.UploadUserPurchaseOrdersFileAsync(job.User.Id, job.Id,
+                var response = await _blobService.UploadUserPurchaseOrdersFileAsync(job.UserId, job.Id,
                     $"Commandes{request.From:dd-MM-yyyy}_{request.To:dd-MM-yyyy}.{purchaseOrdersExportResult.Data.Extension}", purchaseOrdersExportResult.Data.Data, token);
                 if (!response.Succeeded)
                     throw response.Exception;
 
                 _mediatr.Post(new PurchaseOrdersExportSucceededEvent(job.Id));
 
-                _logger.LogInformation($"PurchaseOrders for user {job.User.Id} successfully exported");
+                _logger.LogInformation($"PurchaseOrders for user {job.UserId} successfully exported");
                 return await _mediatr.Process(
                     new CompleteJobCommand(request.RequestUser) {JobId = job.Id, FileUrl = response.Data}, token);
             }

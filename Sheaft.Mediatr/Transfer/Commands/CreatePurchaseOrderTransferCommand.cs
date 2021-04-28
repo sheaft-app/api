@@ -54,7 +54,7 @@ namespace Sheaft.Mediatr.Transfer.Commands
                 return Failure<Guid>(MessageKind.Transfer_CannotCreate_PurchaseOrder_Invalid_Status);
 
             var pendingTransfers = await _context.Transfers
-                .Where(t => t.PurchaseOrder.Id == request.PurchaseOrderId)
+                .Where(t => t.PurchaseOrderId == request.PurchaseOrderId)
                 .ToListAsync(token);
             
             if (pendingTransfers.Any(pt => pt.Status == TransactionStatus.Succeeded))
@@ -65,15 +65,15 @@ namespace Sheaft.Mediatr.Transfer.Commands
 
             var checkResult =
                 await _mediatr.Process(
-                    new CheckProducerConfigurationCommand(request.RequestUser) {ProducerId = purchaseOrder.Vendor.Id},
+                    new CheckProducerConfigurationCommand(request.RequestUser) {ProducerId = purchaseOrder.VendorId},
                     token);
             if (!checkResult.Succeeded)
                 return Failure<Guid>(checkResult);
 
             var debitedWallet =
-                await _context.Wallets.SingleOrDefaultAsync(c => c.User.Id == purchaseOrder.Sender.Id, token);
+                await _context.Wallets.SingleOrDefaultAsync(c => c.UserId == purchaseOrder.SenderId, token);
             var creditedWallet =
-                await _context.Wallets.SingleOrDefaultAsync(c => c.User.Id == purchaseOrder.Vendor.Id, token);
+                await _context.Wallets.SingleOrDefaultAsync(c => c.UserId == purchaseOrder.VendorId, token);
 
             using (var transaction = await _context.BeginTransactionAsync(token))
             {

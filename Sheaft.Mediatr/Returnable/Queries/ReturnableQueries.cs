@@ -24,14 +24,14 @@ namespace Sheaft.Mediatr.Returnable.Queries
         public IQueryable<ReturnableDto> GetReturnable(Guid id, RequestUser currentUser)
         {
             return _context.Returnables
-                .Where(c => c.Id == id && c.Producer.Id == currentUser.Id)
+                .Where(c => c.Id == id && c.ProducerId == currentUser.Id)
                 .ProjectTo<ReturnableDto>(_configurationProvider);
         }
 
         public IQueryable<ReturnableDto> GetReturnables(RequestUser currentUser)
         {
             return _context.Returnables
-                .Where(c => c.Producer.Id == currentUser.Id)
+                .Where(c => c.ProducerId == currentUser.Id)
                 .ProjectTo<ReturnableDto>(_configurationProvider);
         }
     }

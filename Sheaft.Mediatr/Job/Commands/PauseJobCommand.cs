@@ -44,7 +44,7 @@ namespace Sheaft.Mediatr.Job.Commands
             CancellationToken token)
         {
             var entity = await _context.Jobs.SingleAsync(e => e.Id == request.JobId, token);
-            if(entity.User.Id != request.RequestUser.Id)
+            if(entity.UserId != request.RequestUser.Id)
                 throw SheaftException.Forbidden();
 
             entity.PauseJob();

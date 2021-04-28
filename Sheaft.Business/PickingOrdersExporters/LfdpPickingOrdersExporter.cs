@@ -41,7 +41,7 @@ namespace Sheaft.Business.PickingOrdersExporters
                 var products = await _context.Products
                     .Where(p =>
                         !p.RemovedOn.HasValue
-                        && p.Producer.Id == user.Id)
+                        && p.ProducerId == user.Id)
                     .OrderBy(p => p.Name)
                     .ToListAsync(token);
 
@@ -52,10 +52,10 @@ namespace Sheaft.Business.PickingOrdersExporters
                     var clients = await _context.Agreements
                         .Where(u =>
                             !u.RemovedOn.HasValue
-                            && u.Producer.Id == user.Id
+                            && u.ProducerId == user.Id
                             && u.Delivery.Kind == DeliveryKind.ProducerToStore
-                            && u.Delivery.OpeningHours.Any(oh => oh.Day == storeDeliveryDay.Key))
-                        .Select(c => new KeyValuePair<Guid,string>(c.Store.Id, c.Store.Name))
+                            && u.Delivery.DeliveryHours.Any(oh => oh.Day == storeDeliveryDay.Key))
+                        .Select(c => new KeyValuePair<Guid,string>(c.StoreId, c.Store.Name))
                         .OrderBy(c => c.Value)
                         .ToListAsync(token);
 
@@ -156,7 +156,7 @@ namespace Sheaft.Business.PickingOrdersExporters
                 foreach (var client in clients)
                 {
                     var current = 0;
-                    var order = purchaseOrders.FirstOrDefault(o => o.Sender.Id == client.Key);
+                    var order = purchaseOrders.FirstOrDefault(o => o.SenderId == client.Key);
                     var productOrder = order?.Products.FirstOrDefault(op => op.Id == product.Id);
 
                     current += productOrder?.Quantity ?? 0;

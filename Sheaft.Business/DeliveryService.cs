@@ -34,8 +34,8 @@ namespace Sheaft.Business
             var results = await _tableService.GetCapingDeliveriesInfosAsync(
                 orderDeliveries.Where(d => d.DeliveryMode.MaxPurchaseOrdersPerTimeSlot.HasValue).Select(d =>
                     new Tuple<Guid, Guid, DeliveryHourDto>(
-                        d.DeliveryMode.Producer.Id,
-                        d.DeliveryMode.Id,
+                        d.DeliveryMode.ProducerId,
+                        d.DeliveryModeId,
                         new DeliveryHourDto
                         {
                             Day = d.ExpectedDelivery.ExpectedDeliveryDate.DayOfWeek,

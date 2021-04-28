@@ -38,7 +38,7 @@ namespace Sheaft.Web.Manage.Controllers
         {
             var entity = await _context.Legals
                 .AsNoTracking()
-                .Where(c => c.User.Id == userId)
+                .Where(c => c.UserId == userId)
                 .SingleOrDefaultAsync(token);
 
             if (entity.Kind != LegalKind.Natural)
@@ -94,7 +94,7 @@ namespace Sheaft.Web.Manage.Controllers
 
             return View(new BusinessLegalViewModel
             {
-                Owner = new OwnerViewModel {Id = userId}
+                Owner = new OwnerViewModel()
             });
         }
 
@@ -104,7 +104,7 @@ namespace Sheaft.Web.Manage.Controllers
         {
             var result = await _mediatr.Process(new CreateBusinessLegalCommand(await GetRequestUserAsync(token))
             {
-                UserId = model.Owner.Id,
+                UserId = model.UserId,
                 Name = model.Name,
                 Email = model.Email,
                 Address = _mapper.Map<AddressDto>(model.Address),
@@ -142,7 +142,7 @@ namespace Sheaft.Web.Manage.Controllers
             return View(new ConsumerLegalViewModel
             {
                 Kind = LegalKind.Natural,
-                Owner = new OwnerViewModel {Id = userId}
+                Owner = new OwnerViewModel( )
             });
         }
 
@@ -152,7 +152,7 @@ namespace Sheaft.Web.Manage.Controllers
         {
             var result = await _mediatr.Process(new CreateConsumerLegalCommand(await GetRequestUserAsync(token))
             {
-                UserId = model.Owner.Id,
+                UserId = model.UserId,
                 Email = model.Owner.Email,
                 FirstName = model.Owner.FirstName,
                 LastName = model.Owner.LastName,

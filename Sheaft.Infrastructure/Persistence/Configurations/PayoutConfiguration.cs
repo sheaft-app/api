@@ -15,11 +15,6 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
 
         public void Configure(EntityTypeBuilder<Payout> entity)
         {
-            entity.Property<long>("Uid");
-            entity.Property<long>("AuthorUid");
-            entity.Property<long>("DebitedWalletUid");
-            entity.Property<long>("BankAccountUid");
-
             entity.Property(o => o.Fees).HasColumnType("decimal(10,2)");
             entity.Property(o => o.Credited).HasColumnType("decimal(10,2)");
             entity.Property(o => o.Debited).HasColumnType("decimal(10,2)");
@@ -30,11 +25,11 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
             if(!_isAdmin)
                 entity.HasQueryFilter(p => !p.RemovedOn.HasValue);
 
-            entity.HasOne(c => c.Author).WithMany().HasForeignKey("AuthorUid").OnDelete(DeleteBehavior.NoAction).IsRequired();
-            entity.HasOne(c => c.DebitedWallet).WithMany().HasForeignKey("DebitedWalletUid").OnDelete(DeleteBehavior.NoAction).IsRequired();
-            entity.HasOne(c => c.BankAccount).WithMany().HasForeignKey("BankAccountUid").OnDelete(DeleteBehavior.NoAction).IsRequired();
-            entity.HasMany(c => c.Transfers).WithOne(c => c.Payout).HasForeignKey("PayoutUid").OnDelete(DeleteBehavior.NoAction);
-            entity.HasMany(c => c.Withholdings).WithOne(c => c.Payout).HasForeignKey("PayoutUid").OnDelete(DeleteBehavior.NoAction);
+            entity.HasOne(c => c.Author).WithMany().HasForeignKey(c =>c.AuthorId).OnDelete(DeleteBehavior.NoAction).IsRequired();
+            entity.HasOne(c => c.DebitedWallet).WithMany().HasForeignKey(c =>c.DebitedWalletId).OnDelete(DeleteBehavior.NoAction).IsRequired();
+            entity.HasOne(c => c.BankAccount).WithMany().HasForeignKey(c =>c.BankAccountId).OnDelete(DeleteBehavior.NoAction).IsRequired();
+            entity.HasMany(c => c.Transfers).WithOne(c => c.Payout).HasForeignKey(c =>c.PayoutId).OnDelete(DeleteBehavior.NoAction);
+            entity.HasMany(c => c.Withholdings).WithOne(c => c.Payout).HasForeignKey(c =>c.PayoutId).OnDelete(DeleteBehavior.NoAction);
 
             entity.Ignore(c => c.DomainEvents);
 
@@ -44,15 +39,9 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
             var withholdings = entity.Metadata.FindNavigation(nameof(Payout.Withholdings));
             withholdings.SetPropertyAccessMode(PropertyAccessMode.Field);
 
-            entity.HasKey("Uid");
-
-            entity.HasIndex(c => c.Id).IsUnique();
+            entity.HasKey(c => c.Id);
             entity.HasIndex(c => c.Identifier);
-            entity.HasIndex("AuthorUid");
-            entity.HasIndex("BankAccountUid");
-            entity.HasIndex("DebitedWalletUid");
-            entity.HasIndex("Uid", "Id", "AuthorUid", "BankAccountUid", "DebitedWalletUid", "RemovedOn");
-
+            
             entity.ToTable("Payouts");
         }
     }

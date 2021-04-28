@@ -53,7 +53,7 @@ namespace Sheaft.Mediatr.Ubo.Commands
         public async Task<Result<Guid>> Handle(CreateUboCommand request, CancellationToken token)
         {
             var legal = await _context.Set<BusinessLegal>()
-                .SingleOrDefaultAsync(c => c.Declaration.Id == request.DeclarationId, token);
+                .SingleOrDefaultAsync(c => c.DeclarationId == request.DeclarationId, token);
             var ubo = new Domain.Ubo(Guid.NewGuid(),
                 request.FirstName,
                 request.LastName,

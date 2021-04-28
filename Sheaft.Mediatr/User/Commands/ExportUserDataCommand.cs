@@ -53,7 +53,7 @@ namespace Sheaft.Mediatr.User.Commands
         public async Task<Result> Handle(ExportUserDataCommand request, CancellationToken token)
         {
             var job = await _context.Jobs.SingleAsync(e => e.Id == request.JobId, token);
-            if(job.User.Id != request.RequestUser.Id)
+            if(job.UserId != request.RequestUser.Id)
                 return Failure(MessageKind.Forbidden);
 
             try
@@ -71,14 +71,14 @@ namespace Sheaft.Mediatr.User.Commands
                         await CreateExcelUserDataFileAsync(package, job.User, token);
                     }
 
-                    var response = await _blobService.UploadRgpdFileAsync(job.User.Id, job.Id,
+                    var response = await _blobService.UploadRgpdFileAsync(job.UserId, job.Id,
                         $"RGPD_{job.CreatedOn:dd-MM-yyyy}.xlsx", stream.ToArray(), token);
                     if (!response.Succeeded)
                         throw response.Exception;
 
                     _mediatr.Post(new UserDataExportSucceededEvent(job.Id));
 
-                    _logger.LogInformation($"RGPD data for user {job.User.Id} successfully exported");
+                    _logger.LogInformation($"RGPD data for user {job.UserId} successfully exported");
                     return await _mediatr.Process(
                         new CompleteJobCommand(request.RequestUser) {JobId = job.Id, FileUrl = response.Data}, token);
                 }
@@ -152,7 +152,7 @@ namespace Sheaft.Mediatr.User.Commands
             ordersWorksheet.Cells[3, 8].Value = "Quantité";
             ordersWorksheet.Cells[3, 9].Value = "Prix TTC";
 
-            var orders = await _context.PurchaseOrders.Where(o => o.Sender.Id == user.Id).ToListAsync(token);
+            var orders = await _context.PurchaseOrders.Where(o => o.SenderId == user.Id).ToListAsync(token);
             var i = 4;
             foreach (var order in orders)
             {
@@ -191,11 +191,11 @@ namespace Sheaft.Mediatr.User.Commands
             ratingsWorksheet.Cells[2, 5].Value = "Commentaire";
 
             var productsRated =
-                await _context.Products.Where(o => o.Ratings.Any(r => r.User.Id == user.Id)).ToListAsync(token);
+                await _context.Products.Where(o => o.Ratings.Any(r => r.UserId == user.Id)).ToListAsync(token);
             var i = 3;
             foreach (var product in productsRated)
             {
-                foreach (var rating in product.Ratings.Where(r => r.User.Id == user.Id))
+                foreach (var rating in product.Ratings.Where(r => r.UserId == user.Id))
                 {
                     ratingsWorksheet.Cells[i, 1].Value = product.Name;
                     ratingsWorksheet.Cells[i, 2].Value = product.Producer.Name;

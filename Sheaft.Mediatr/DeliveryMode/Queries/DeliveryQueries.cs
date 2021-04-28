@@ -35,14 +35,14 @@ namespace Sheaft.Mediatr.DeliveryMode.Queries
         public IQueryable<DeliveryModeDto> GetDelivery(Guid id, RequestUser currentUser)
         {
             return _context.DeliveryModes
-                .Where(c => c.Id == id && c.Producer.Id == currentUser.Id)
+                .Where(c => c.Id == id && c.ProducerId == currentUser.Id)
                 .ProjectTo<DeliveryModeDto>(_configurationProvider);
         }
 
         public IQueryable<DeliveryModeDto> GetDeliveries(RequestUser currentUser)
         {
             return _context.DeliveryModes
-                .Where(c => c.Producer.Id == currentUser.Id)
+                .Where(c => c.ProducerId == currentUser.Id)
                 .ProjectTo<DeliveryModeDto>(_configurationProvider);
         }
 
@@ -53,7 +53,7 @@ namespace Sheaft.Mediatr.DeliveryMode.Queries
             var deliveriesModes = await _context.DeliveryModes
                 .Where(d =>
                     d.Available
-                    && producerIds.Contains(d.Producer.Id)
+                    && producerIds.Contains(d.ProducerId)
                     && kinds.Contains(d.Kind))
                 .ToListAsync(token);
 
@@ -67,8 +67,8 @@ namespace Sheaft.Mediatr.DeliveryMode.Queries
             var deliveriesModes = await _context.Agreements
                 .Where(d =>
                     d.Delivery.Available
-                    && producerIds.Contains(d.Producer.Id)
-                    && d.Store.Id == storeId
+                    && producerIds.Contains(d.ProducerId)
+                    && d.StoreId == storeId
                     && d.Status == AgreementStatus.Accepted
                     && kinds.Contains(d.Delivery.Kind))
                 .Select(d => d.Delivery)
@@ -81,7 +81,7 @@ namespace Sheaft.Mediatr.DeliveryMode.Queries
             IEnumerable<Domain.DeliveryMode> deliveriesMode, CancellationToken token)
         {
             var producers = new List<ProducerDeliveriesDto>();
-            var deliveriesProducerIds = deliveriesMode.Select(c => c.Producer.Id).Distinct();
+            var deliveriesProducerIds = deliveriesMode.Select(c => c.ProducerId).Distinct();
             var producerDistinctIds = producerIds.Distinct();
             if (deliveriesProducerIds.Count() != producerDistinctIds.Count())
             {
@@ -94,7 +94,7 @@ namespace Sheaft.Mediatr.DeliveryMode.Queries
                     {Id = c.Id, Name = c.Name, Deliveries = null}));
             }
 
-            foreach (var deliveriesGroup in deliveriesMode.GroupBy(c => c.Producer.Id))
+            foreach (var deliveriesGroup in deliveriesMode.GroupBy(c => c.ProducerId))
             {
                 var deliveries = new List<DeliveryDto>();
                 var producer = new ProducerDeliveriesDto
@@ -104,7 +104,7 @@ namespace Sheaft.Mediatr.DeliveryMode.Queries
                 };
 
                 foreach (var deliveryMode in deliveriesGroup)
-                    deliveries.Add(GetDeliveriesForHours(currentDate, deliveryMode, deliveryMode.OpeningHours));
+                    deliveries.Add(GetDeliveriesForHours(currentDate, deliveryMode, deliveryMode.DeliveryHours));
 
                 producer.Deliveries = deliveries;
                 producers.Add(producer);

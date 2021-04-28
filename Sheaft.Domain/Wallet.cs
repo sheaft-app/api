@@ -16,6 +16,7 @@ namespace Sheaft.Domain
             Name = name;
             Kind = kind;
             User = user;
+            UserId = user.Id;
         }
 
         public Guid Id { get; private set; }
@@ -27,6 +28,7 @@ namespace Sheaft.Domain
         public string Name { get; private set; }
         public WalletKind Kind { get; private set; }
         public decimal Balance { get; private set; }
+        public Guid UserId { get; private set; }
         public virtual User User { get; private set; }
 
         public void SetName(string name)

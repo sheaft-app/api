@@ -8,11 +8,14 @@ namespace Sheaft.Domain
         {
         }
 
-        public Department(Guid id, string code, string name)
+        public Department(Guid id, string code, string name, Region region)
         {
             Id = id;
             Code = code;
             Name = name;
+
+            Region = region;
+            RegionId = region.Id;
         }
 
         public Guid Id { get; private set; }
@@ -25,6 +28,8 @@ namespace Sheaft.Domain
         public int StoresCount { get; private set; }
         public int ConsumersCount { get; private set; }
         public int? RequiredProducers { get; private set; }
+        public Guid RegionId { get; private set; }
+        public Guid? LevelId { get; private set; }
         public virtual Region Region { get; private set; }
         public virtual Level Level { get; private set; }
 

@@ -62,7 +62,7 @@ namespace Sheaft.Mediatr.Transactions.Commands
         public async Task<Result> Handle(ExportTransactionsCommand request, CancellationToken token)
         {
             var job = await _context.Jobs.SingleAsync(e => e.Id == request.JobId, token);
-            if (job.User.Id != request.RequestUser.Id)
+            if (job.UserId != request.RequestUser.Id)
                 return Failure(MessageKind.Forbidden);
 
             try
@@ -75,7 +75,7 @@ namespace Sheaft.Mediatr.Transactions.Commands
                 _mediatr.Post(new TransactionsExportProcessingEvent(job.Id));
 
                 var transactionsQuery = _context.Set<Transaction>().Where(o =>
-                    o.Author.Id == request.RequestUser.Id
+                    o.AuthorId == request.RequestUser.Id
                     && o.Status == TransactionStatus.Succeeded
                     && o.ExecutedOn.HasValue && o.ExecutedOn.Value >= request.From
                     && o.ExecutedOn.HasValue && o.ExecutedOn.Value <= request.To);
@@ -87,14 +87,14 @@ namespace Sheaft.Mediatr.Transactions.Commands
                 if (!transactionsExportResult.Succeeded)
                     throw transactionsExportResult.Exception;
 
-                var response = await _blobService.UploadUserTransactionsFileAsync(job.User.Id, job.Id,
+                var response = await _blobService.UploadUserTransactionsFileAsync(job.UserId, job.Id,
                     $"Virements_{request.From:dd-MM-yyyy}_{request.To:dd-MM-yyyy}.{transactionsExportResult.Data.Extension}", transactionsExportResult.Data.Data, token);
                 if (!response.Succeeded)
                     throw response.Exception;
 
                 _mediatr.Post(new TransactionsExportSucceededEvent(job.Id));
 
-                _logger.LogInformation($"Transactions for user {job.User.Id} successfully exported");
+                _logger.LogInformation($"Transactions for user {job.UserId} successfully exported");
                 return await _mediatr.Process(
                     new CompleteJobCommand(request.RequestUser) {JobId = job.Id, FileUrl = response.Data}, token);
             }

@@ -1,4 +1,6 @@
-﻿namespace Sheaft.Domain
+﻿using System;
+
+namespace Sheaft.Domain
 {
     public class PurchaseOrderProduct : ProductRow
     {
@@ -10,5 +12,7 @@
             : base(product)
         {
         }
+
+        public Guid PurchaseOrderId { get; private set; }
     }
 }

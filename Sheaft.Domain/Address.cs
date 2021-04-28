@@ -1,4 +1,5 @@
-﻿using Sheaft.Core.Enums;
+﻿using System;
+using Sheaft.Core.Enums;
 using Sheaft.Core.Exceptions;
 using Sheaft.Domain.Enum;
 
@@ -20,7 +21,7 @@ namespace Sheaft.Domain
 
             if (string.IsNullOrWhiteSpace(city))
                 throw new ValidationException(MessageKind.Address_City_Required);
-
+            
             Line1 = line1;
             Line2 = line2;
             City = city;

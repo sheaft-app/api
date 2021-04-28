@@ -32,7 +32,7 @@ namespace Sheaft.Mediatr.Catalog.Queries
             if (currentUser.IsInRole(_roleOptions.Owner.Value))
             {
                 return _context.Set<Domain.Catalog>()
-                    .Where(b => b.Producer.Id == currentUser.Id && b.Id == id)
+                    .Where(b => b.ProducerId == currentUser.Id && b.Id == id)
                     .ProjectTo<CatalogDto>(_configurationProvider);
             }
             
@@ -46,12 +46,12 @@ namespace Sheaft.Mediatr.Catalog.Queries
             if (currentUser.IsInRole(_roleOptions.Owner.Value))
             {
                 return _context.Set<Domain.CatalogProduct>()
-                    .Where(c => c.Catalog.Id == id && c.Catalog.Producer.Id == currentUser.Id)
+                    .Where(c => c.CatalogId == id && c.Catalog.ProducerId == currentUser.Id)
                     .ProjectTo<CatalogProductDto>(_configurationProvider);
             }
             
             return _context.Set<Domain.CatalogProduct>()
-                .Where(c => c.Catalog.Id == id)
+                .Where(c => c.CatalogId == id)
                 .ProjectTo<CatalogProductDto>(_configurationProvider);
         }
 
@@ -60,7 +60,7 @@ namespace Sheaft.Mediatr.Catalog.Queries
             if (currentUser.IsInRole(_roleOptions.Owner.Value))
             {
                 return _context.Set<Domain.Catalog>()
-                    .Where(b => b.Producer.Id == currentUser.Id)
+                    .Where(b => b.ProducerId == currentUser.Id)
                     .ProjectTo<CatalogDto>(_configurationProvider);
             }
             

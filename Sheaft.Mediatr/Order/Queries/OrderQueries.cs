@@ -27,11 +27,11 @@ namespace Sheaft.Mediatr.Order.Queries
         {
             if (currentUser.IsAuthenticated)
                 return _context.Orders
-                    .Where(c => c.Id == id && c.User.Id == currentUser.Id)
+                    .Where(c => c.Id == id && c.UserId == currentUser.Id)
                     .ProjectTo<OrderDto>(_configurationProvider);
 
             return _context.Orders
-                .Where(c => c.Id == id && c.Status == OrderStatus.Created && c.User == null)
+                .Where(c => c.Id == id && c.Status == OrderStatus.Created && !c.UserId.HasValue)
                 .ProjectTo<OrderDto>(_configurationProvider);
         }
 
@@ -39,7 +39,7 @@ namespace Sheaft.Mediatr.Order.Queries
         {
             if (currentUser.IsAuthenticated)
                 return _context.Orders
-                    .Where(o => o.User.Id == currentUser.Id)
+                    .Where(o => o.UserId == currentUser.Id)
                     .ProjectTo<OrderDto>(_configurationProvider);
 
             return new List<OrderDto>().AsQueryable();
@@ -49,7 +49,7 @@ namespace Sheaft.Mediatr.Order.Queries
         {
             if (currentUser.IsAuthenticated)
                 return _context.Orders
-                    .Where(c => c.User.Id == currentUser.Id && c.Status == OrderStatus.Created)
+                    .Where(c => c.UserId == currentUser.Id && c.Status == OrderStatus.Created)
                     .OrderBy(c => c.CreatedOn)
                     .ProjectTo<OrderDto>(_configurationProvider);
 

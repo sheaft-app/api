@@ -53,7 +53,7 @@ namespace Sheaft.Mediatr.PurchaseOrder.Commands
         {
             var producer = await _context.Producers.SingleAsync(e => e.Id == request.ProducerId, token);
             var order = await _context.Orders.SingleAsync(e => e.Id == request.OrderId, token);
-            var delivery = order.Deliveries.FirstOrDefault(d => d.DeliveryMode.Producer.Id == producer.Id);
+            var delivery = order.Deliveries.FirstOrDefault(d => d.DeliveryMode.ProducerId == producer.Id);
 
             var resultIdentifier =
                 await _identifierService.GetNextPurchaseOrderReferenceAsync(request.ProducerId, token);

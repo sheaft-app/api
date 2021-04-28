@@ -24,6 +24,7 @@ namespace Sheaft.Domain
         {
             Id = id;
             User = user;
+            UserId = user?.Id;
             FeesFixedAmount = fixedAmount;
             FeesPercent = percent;
             FeesVatPercent = vatPercent;
@@ -65,7 +66,8 @@ namespace Sheaft.Domain
         public decimal Donation { get; private set; }
         public decimal FeesPrice { get; private set; }
         public decimal DonationFeesPrice { get; private set; }
-        public bool Processed { get; set; }
+        public bool Processed { get; private set; }
+        public Guid? UserId { get; private set; }
         public virtual User User { get; private set; }
         public virtual IReadOnlyCollection<OrderProduct> Products => _products?.AsReadOnly();
         public virtual IReadOnlyCollection<OrderDelivery> Deliveries => _deliveries?.AsReadOnly();

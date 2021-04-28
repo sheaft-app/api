@@ -61,7 +61,7 @@ namespace Sheaft.Mediatr.DeliveryMode.Commands
         public async Task<Result> Handle(UpdateDeliveryModeCommand request, CancellationToken token)
         {
             var entity = await _context.DeliveryModes.SingleAsync(e => e.Id == request.DeliveryModeId, token);
-            if(entity.Producer.Id != request.RequestUser.Id)
+            if(entity.ProducerId != request.RequestUser.Id)
                 return Failure(MessageKind.Forbidden);
 
             entity.SetName(request.Name);
@@ -79,11 +79,11 @@ namespace Sheaft.Mediatr.DeliveryMode.Commands
 
             if (request.OpeningHours != null)
             {
-                var openingHours = new List<TimeSlotHour>();
+                var openingHours = new List<DeliveryHours>();
                 foreach (var oh in request.OpeningHours)
-                    openingHours.AddRange(oh.Days.Select(c => new TimeSlotHour(c, oh.From, oh.To)));
+                    openingHours.AddRange(oh.Days.Select(c => new DeliveryHours(c, oh.From, oh.To)));
 
-                entity.SetOpeningHours(openingHours);
+                entity.SetDeliveryHours(openingHours);
             }
 
             await _context.SaveChangesAsync(token);
@@ -95,7 +95,7 @@ namespace Sheaft.Mediatr.DeliveryMode.Commands
             if (!result.Succeeded)
                 return Failure(result);
             
-            _mediatr.Post(new UpdateProducerAvailabilityCommand(request.RequestUser) {ProducerId = entity.Producer.Id});
+            _mediatr.Post(new UpdateProducerAvailabilityCommand(request.RequestUser) {ProducerId = entity.ProducerId});
             return Success();
         }
     }

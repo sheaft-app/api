@@ -46,7 +46,7 @@ namespace Sheaft.Mediatr.Wallet.Commands
         public async Task<Result> Handle(CheckWalletPaymentsConfigurationCommand request, CancellationToken token)
         {
             var wallet = await _context.Wallets
-                .FirstOrDefaultAsync(c => c.User.Id == request.UserId && c.Kind == WalletKind.Payments, token);
+                .FirstOrDefaultAsync(c => c.UserId == request.UserId && c.Kind == WalletKind.Payments, token);
             if (wallet == null)
             {
                 var walletResult = await _mediatr.Process(new CreateWalletPaymentsCommand(request.RequestUser)

@@ -10,6 +10,7 @@ namespace Sheaft.Web.Manage.Models
         public LegalKind Kind { get; set; }
         public LegalValidation Validation { get; set; }
         public OwnerViewModel Owner { get; set; }
+        public Guid UserId { get; set; }
         public IEnumerable<DocumentViewModel> Documents { get; set; }
     }
 }

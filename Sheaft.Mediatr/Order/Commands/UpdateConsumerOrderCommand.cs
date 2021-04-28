@@ -62,10 +62,10 @@ namespace Sheaft.Mediatr.Order.Commands
         public async Task<Result> Handle(UpdateConsumerOrderCommand request, CancellationToken token)
         {
             var entity = await _context.Orders.SingleAsync(e => e.Id == request.OrderId, token);
-            if (entity.User != null && entity.User.Id != request.RequestUser.Id)
+            if (entity.User != null && entity.UserId != request.RequestUser.Id)
                 return Failure(MessageKind.Forbidden);
             
-            if(entity.User != null && request.UserId.HasValue && request.UserId.Value != entity.User.Id)
+            if(entity.User != null && request.UserId.HasValue && request.UserId.Value != entity.UserId)
                 return Failure(MessageKind.Conflict);
 
             if (entity.User == null && request.UserId.HasValue && request.UserId != Guid.Empty)

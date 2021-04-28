@@ -60,16 +60,16 @@ namespace Sheaft.Mediatr.Reward.Commands
             entity.SetContact(request.Contact);
             entity.SetUrl(request.Url);
 
-            if (entity.Department.Id != request.DepartmentId)
+            if (entity.DepartmentId != request.DepartmentId)
             {
                 var department =
                     await _context.Departments.SingleOrDefaultAsync(d => d.Id == request.DepartmentId, token);
                 entity.SetDepartment(department);
             }
 
-            if (entity.Level.Id != request.LevelId)
+            if (entity.LevelId != request.LevelId)
             {
-                var oldLevel = await _context.Levels.SingleAsync(e => e.Id == entity.Level.Id, token);
+                var oldLevel = await _context.Levels.SingleAsync(e => e.Id == entity.LevelId, token);
                 oldLevel.RemoveReward(entity);
 
                 var newLevel = await _context.Levels.SingleAsync(e => e.Id == request.LevelId, token);

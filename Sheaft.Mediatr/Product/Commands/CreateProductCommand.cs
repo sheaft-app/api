@@ -88,7 +88,7 @@ namespace Sheaft.Mediatr.Product.Commands
             {
                 var existingEntity =
                     await _context.Products.AnyAsync(
-                        p => p.Reference == reference && p.Producer.Id == request.ProducerId, token);
+                        p => p.Reference == reference && p.ProducerId == request.ProducerId, token);
                 if (existingEntity)
                     return Failure<Guid>(MessageKind.CreateProduct_Reference_AlreadyExists, reference);
             }
@@ -131,7 +131,7 @@ namespace Sheaft.Mediatr.Product.Commands
                     if (request.VisibleToConsumers.Value)
                     {
                         var consumerCatalog = await _context.Catalogs.SingleOrDefaultAsync(
-                            c => c.Producer.Id == entity.Producer.Id && c.Kind == CatalogKind.Consumers, token);
+                            c => c.ProducerId == entity.ProducerId && c.Kind == CatalogKind.Consumers, token);
 
                         entity.AddOrUpdateCatalogPrice(consumerCatalog, request.WholeSalePricePerUnit.Value);
                     }
@@ -139,7 +139,7 @@ namespace Sheaft.Mediatr.Product.Commands
                     if (request.VisibleToStores.Value)
                     {
                         var storeCatalog = await _context.Catalogs.SingleOrDefaultAsync(
-                            c => c.Producer.Id == entity.Producer.Id && c.Kind == CatalogKind.Stores, token);
+                            c => c.ProducerId == entity.ProducerId && c.Kind == CatalogKind.Stores, token);
 
                         entity.AddOrUpdateCatalogPrice(storeCatalog, request.WholeSalePricePerUnit.Value);
                     }

@@ -47,7 +47,7 @@ namespace Sheaft.Mediatr.Declaration.Commands
         public async Task<Result> Handle(SubmitDeclarationCommand request, CancellationToken token)
         {
             var legal = await _context.Set<BusinessLegal>()
-                .SingleOrDefaultAsync(r => r.Declaration.Id == request.DeclarationId, token);
+                .SingleOrDefaultAsync(r => r.DeclarationId == request.DeclarationId, token);
             if (legal.Declaration.Status != DeclarationStatus.Locked)
                 return Failure(MessageKind.Declaration_CannotSubmit_NotLocked);
 

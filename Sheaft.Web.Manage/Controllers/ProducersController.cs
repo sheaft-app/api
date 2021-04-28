@@ -73,8 +73,8 @@ namespace Sheaft.Web.Manage.Controllers
             if (entity == null)
                 throw SheaftException.NotFound();
 
-            ViewBag.LegalsId = (await _context.Legals.FirstOrDefaultAsync(c => c.User.Id == id, token))?.Id;
-            ViewBag.BankAccountId = (await _context.BankAccounts.FirstOrDefaultAsync(c => c.User.Id == id, token))?.Id;
+            ViewBag.LegalsId = (await _context.Legals.FirstOrDefaultAsync(c => c.UserId == id, token))?.Id;
+            ViewBag.BankAccountId = (await _context.BankAccounts.FirstOrDefaultAsync(c => c.UserId == id, token))?.Id;
 
             ViewBag.Tags = await GetTags(token);
             return View(entity);
@@ -112,9 +112,9 @@ namespace Sheaft.Web.Manage.Controllers
 
             if (!result.Succeeded)
             {
-                ViewBag.LegalsId = (await _context.Legals.FirstOrDefaultAsync(c => c.User.Id == model.Id, token))?.Id;
+                ViewBag.LegalsId = (await _context.Legals.FirstOrDefaultAsync(c => c.UserId == model.Id, token))?.Id;
                 ViewBag.BankAccountId =
-                    (await _context.BankAccounts.FirstOrDefaultAsync(c => c.User.Id == model.Id, token))?.Id;
+                    (await _context.BankAccounts.FirstOrDefaultAsync(c => c.UserId == model.Id, token))?.Id;
                 ViewBag.Tags = await GetTags(token);
 
                 ModelState.AddModelError("", result.Exception.Message);

@@ -32,14 +32,14 @@ namespace Sheaft.Domain
             SetSender(order.User);
             SetVendor(producer);
 
-            var delivery = order.Deliveries.FirstOrDefault(d => d.DeliveryMode.Producer.Id == producer.Id);
+            var delivery = order.Deliveries.FirstOrDefault(d => d.DeliveryMode.ProducerId == producer.Id);
             SetExpectedDelivery(delivery.DeliveryMode, delivery.ExpectedDelivery.ExpectedDeliveryDate);
             SetComment(delivery.Comment);
 
             SetReference(reference);
             SetStatus(status, true);
 
-            var orderProducts = order.Products.Where(p => p.Producer.Id == producer.Id);
+            var orderProducts = order.Products.Where(p => p.ProducerId == producer.Id);
             foreach (var orderProduct in orderProducts)
                 AddProduct(orderProduct);
         }
@@ -69,6 +69,9 @@ namespace Sheaft.Domain
         public decimal TotalOnSalePrice { get; private set; }
         public decimal TotalWeight { get; private set; }
         public PurchaseOrderStatus Status { get; private set; }
+        public Guid OrderId { get; private set; }
+        public Guid SenderId { get; private set; }
+        public Guid VendorId { get; private set; }
         public virtual PurchaseOrderSender Sender { get; private set; }
         public virtual ExpectedPurchaseOrderDelivery ExpectedDelivery { get; private set; }
         public virtual PurchaseOrderVendor Vendor { get; private set; }
@@ -235,11 +238,13 @@ namespace Sheaft.Domain
         public void SetSender(User sender)
         {
             Sender = new PurchaseOrderSender(sender);
+            SenderId = Sender.Id;
         }
 
         public void SetVendor(Producer vendor)
         {
             Vendor = new PurchaseOrderVendor(vendor);
+            VendorId = Vendor.Id;
         }
 
         private void SetExpectedDelivery(DeliveryMode delivery, DateTimeOffset expectedDate)

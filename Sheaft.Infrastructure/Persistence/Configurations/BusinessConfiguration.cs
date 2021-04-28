@@ -11,7 +11,7 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
             var closings = entity.Metadata.FindNavigation(nameof(Domain.Business.Closings));
             closings.SetPropertyAccessMode(PropertyAccessMode.Field);
             
-            entity.HasMany(c => c.Closings).WithOne().HasForeignKey("BusinessUid").OnDelete(DeleteBehavior.Cascade).IsRequired();
+            entity.HasMany(c => c.Closings).WithOne().HasForeignKey(c => c.BusinessId).OnDelete(DeleteBehavior.Cascade).IsRequired();
         }
     }
 }

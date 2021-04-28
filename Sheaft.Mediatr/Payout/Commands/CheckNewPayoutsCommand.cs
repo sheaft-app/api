@@ -72,7 +72,7 @@ namespace Sheaft.Mediatr.Payout.Commands
                             && t.CreditedWallet.User.Legal.Validation == LegalValidation.Regular
                             && (t.Payout == null || t.Payout.Status == TransactionStatus.Failed)
                             && t.PurchaseOrder.Status == PurchaseOrderStatus.Delivered)
-                .Select(t => new {ProducerId = t.CreditedWallet.User.Id, TransferId = t.Id})
+                .Select(t => new {ProducerId = t.CreditedWallet.UserId, TransferId = t.Id})
                 .OrderBy(c => c.ProducerId)
                 .Skip(skip)
                 .Take(take)

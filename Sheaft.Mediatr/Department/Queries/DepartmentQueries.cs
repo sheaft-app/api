@@ -36,7 +36,7 @@ namespace Sheaft.Mediatr.Department.Queries
         public IQueryable<DepartmentDto> GetRegionDepartments(Guid regionId, RequestUser currentUser)
         {
             return _context.Departments
-                    .Where(d => d.Region.Id == regionId)
+                    .Where(d => d.RegionId == regionId)
                     .ProjectTo<DepartmentDto>(_configurationProvider);
         }
     }

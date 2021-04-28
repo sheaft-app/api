@@ -31,7 +31,7 @@ namespace Sheaft.Mediatr.PurchaseOrder.EventHandlers
             var orderEvent = notification.DomainEvent;
             var purchaseOrder = await _context.PurchaseOrders.SingleAsync(e => e.Id == orderEvent.PurchaseOrderId, token);
             
-            await _signalrService.SendNotificationToGroupAsync(purchaseOrder.Vendor.Id, nameof(PurchaseOrderWithdrawnedEvent), purchaseOrder.GetPurchaseNotifModelAsString());
+            await _signalrService.SendNotificationToGroupAsync(purchaseOrder.VendorId, nameof(PurchaseOrderWithdrawnedEvent), purchaseOrder.GetPurchaseNotifModelAsString());
 
             await _emailService.SendTemplatedEmailAsync(
                 purchaseOrder.Sender.Email,

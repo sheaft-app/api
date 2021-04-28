@@ -45,7 +45,7 @@ namespace Sheaft.Web.Manage.Controllers
             var requestUser = await GetRequestUserAsync(token);
             if (requestUser.IsImpersonating)
             {
-                query = query.Where(p => p.Producer.Id == requestUser.Id);
+                query = query.Where(p => p.ProducerId == requestUser.Id);
             }
 
             var entities = await query

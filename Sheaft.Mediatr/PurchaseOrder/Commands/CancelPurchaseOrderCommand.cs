@@ -53,7 +53,7 @@ namespace Sheaft.Mediatr.PurchaseOrder.Commands
         public async Task<Result> Handle(CancelPurchaseOrderCommand request, CancellationToken token)
         {
             var purchaseOrder = await _context.PurchaseOrders.SingleAsync(e => e.Id == request.PurchaseOrderId, token);
-            if (purchaseOrder.Vendor.Id != request.RequestUser.Id && purchaseOrder.Sender.Id != request.RequestUser.Id)
+            if (purchaseOrder.VendorId != request.RequestUser.Id && purchaseOrder.Sender.Id != request.RequestUser.Id)
                 return Failure(MessageKind.Forbidden);
 
             purchaseOrder.Cancel(request.Reason, request.SkipNotification);
@@ -63,16 +63,16 @@ namespace Sheaft.Mediatr.PurchaseOrder.Commands
             var order = await _context.Orders
                 .SingleOrDefaultAsync(o => o.PurchaseOrders.Any(po => po.Id == purchaseOrder.Id), token);
             
-            var delivery = order.Deliveries.FirstOrDefault(d => d.DeliveryMode.Producer.Id == purchaseOrder.Vendor.Id);
+            var delivery = order.Deliveries.FirstOrDefault(d => d.DeliveryMode.ProducerId == purchaseOrder.VendorId);
             if (delivery.DeliveryMode.MaxPurchaseOrdersPerTimeSlot.HasValue)
-                await _tableService.DecreaseProducerDeliveryCountAsync(delivery.DeliveryMode.Producer.Id,
-                    delivery.DeliveryMode.Id, purchaseOrder.ExpectedDelivery.ExpectedDeliveryDate,
+                await _tableService.DecreaseProducerDeliveryCountAsync(delivery.DeliveryMode.ProducerId,
+                    delivery.DeliveryModeId, purchaseOrder.ExpectedDelivery.ExpectedDeliveryDate,
                     purchaseOrder.ExpectedDelivery.From, purchaseOrder.ExpectedDelivery.To,
                     delivery.DeliveryMode.MaxPurchaseOrdersPerTimeSlot.Value, token);
 
             var hasPayins = await _context.Payins.AnyAsync(p =>
                 (p.Status == TransactionStatus.Succeeded || p.Status == TransactionStatus.Waiting)
-                & p.Order.Id == order.Id, token);
+                & p.OrderId == order.Id, token);
 
             if(hasPayins)
                 _mediatr.Schedule(new CreatePayinRefundCommand(request.RequestUser) {PurchaseOrderId = purchaseOrder.Id},

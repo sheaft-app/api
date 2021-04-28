@@ -22,14 +22,14 @@ select
      , CAST(cp.OnSalePrice as float) as product_onSalePrice
      , CAST(p.Rating as float) as product_rating
      , p.RatingsCount as product_ratings_count
-     , case when pa.Uid is not null then cast(1 as bit) else cast(0 as bit) end as product_returnable
+     , case when pa.Id is not null then cast(1 as bit) else cast(0 as bit) end as product_returnable
      , r.Id as producer_id
      , r.Name as producer_name
      , r.Name as partialProducerName
      , r.Email as producer_email
      , r.Phone as producer_phone
-     , ra.Zipcode as producer_zipcode
-     , ra.City as producer_city
+     , r.Address_Zipcode as producer_zipcode
+     , r.Address_City as producer_city
      , p.Picture as product_image
      , p.Available as product_available
      , case when sum(case when c.Kind = 1 and c.Available = 1 then 1 end) > 0 then cast(1 as bit) else cast(0 as bit) end as product_searchable
@@ -42,17 +42,16 @@ select
      , app.InlineMax(app.InlineMax(app.InlineMax(p.UpdatedOn, r.UpdatedOn), t.UpdatedOn), p.CreatedOn) as last_update
      , case when (app.InlineMax(p.RemovedOn, r.RemovedOn)) is not null then 1 else 0 end as removed
      , '[' + STRING_AGG('"' + LOWER(t.Name) + '"', ',') + ']' as product_tags
-     , ra.Longitude as producer_longitude
-     , ra.Latitude as producer_latitude
-     , geography::STGeomFromText('POINT('+convert(varchar(20),ra.Longitude)+' '+convert(varchar(20),ra.Latitude)+')',4326) as producer_geolocation
+     , r.Address_Longitude as producer_longitude
+     , r.Address_Latitude as producer_latitude
+     , geography::STGeomFromText('POINT('+convert(varchar(20),r.Address_Longitude)+' '+convert(varchar(20),r.Address_Latitude)+')',4326) as producer_geolocation
 from app.Products p
-         join app.Users r on r.Uid = p.ProducerUid and r.Kind = 0
-         join app.UserAddresses ra on r.Uid = ra.UserUid
-         left join app.CatalogProducts cp on cp.ProductUid = p.Uid
-         left join app.Catalogs c on c.Uid = cp.CatalogUid
-         left join app.ProductTags pt on p.Uid = pt.ProductUid
-         left join app.Returnables pa on pa.Uid = p.ReturnableUid
-         left join app.Tags t on t.Uid = pt.TagUid
+         join app.Users r on r.Id = p.ProducerId and r.Kind = 0
+         left join app.CatalogProducts cp on cp.ProductId = p.Id
+         left join app.Catalogs c on c.Id = cp.CatalogId
+         left join app.ProductTags pt on p.Id = pt.ProductId
+         left join app.Returnables pa on pa.Id = p.ReturnableId
+         left join app.Tags t on t.Id = pt.TagId
 group by
     p.Id,
     p.Name,
@@ -65,7 +64,7 @@ group by
     CAST(cp.OnSalePrice as float),
     CAST(p.Rating as float),
     p.RatingsCount,
-    case when pa.Uid is not null then cast(1 as bit) else cast(0 as bit) end,
+    case when pa.Id is not null then cast(1 as bit) else cast(0 as bit) end,
     r.Id,
     r.Name,
     r.Email,
@@ -79,10 +78,10 @@ group by
     r.Id,
     r.Phone,
     p.Available,
-    ra.Zipcode,
-    ra.City,
-    ra.Longitude,
-    ra.Latitude,
+    r.Address_Zipcode,
+    r.Address_City,
+    r.Address_Longitude,
+    r.Address_Latitude,
     p.CreatedOn,
     p.UpdatedOn,
     p.RemovedOn,

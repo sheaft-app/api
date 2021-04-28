@@ -8,13 +8,16 @@ namespace Sheaft.Domain
     {
         protected QuickOrderProduct() { }
 
-        public QuickOrderProduct(CatalogProduct product, int quantity = 0)
+        public QuickOrderProduct(CatalogProduct catalogProduct, int quantity = 0)
         {
-            CatalogProduct = product;
+            CatalogProduct = catalogProduct;
+            CatalogProductId = catalogProduct.Id;
             Quantity = quantity;
         }
 
         public int? Quantity { get; private set; }
+        public Guid CatalogProductId { get; private set; }
+        public Guid QuickOrderId { get; private set; }
         public virtual CatalogProduct CatalogProduct { get; private set; }
 
         public void SetQuantity(int? quantity)

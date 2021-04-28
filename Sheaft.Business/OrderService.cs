@@ -41,7 +41,7 @@ namespace Sheaft.Business
             if (order.User == null)
                 return Failure(MessageKind.Order_CannotPay_User_Required);
 
-            if (order.User.Id != requestUser.Id)
+            if (order.UserId != requestUser.Id)
                 return Failure(MessageKind.Forbidden);
 
             if (!order.Deliveries.Any())
@@ -106,7 +106,7 @@ namespace Sheaft.Business
                     break;
                 }
 
-                if (cartProducts.Any(p => p.Item1.Producer.Id == delivery.Producer.Id && p.Item1.Producer.Closings.Any(
+                if (cartProducts.Any(p => p.Item1.ProducerId == delivery.ProducerId && p.Item1.Producer.Closings.Any(
                     c =>
                         cartDelivery.ExpectedDeliveryDate >= c.ClosedFrom &&
                         cartDelivery.ExpectedDeliveryDate <= c.ClosedTo)))

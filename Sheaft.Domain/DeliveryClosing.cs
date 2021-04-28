@@ -15,7 +15,8 @@ namespace Sheaft.Domain
         {
             Reason = reason;
         }
-        
+
+        public Guid DeliveryModeId { get; private set; }
         public string Reason { get; private set; }
 
         public void SetReason(string reason)

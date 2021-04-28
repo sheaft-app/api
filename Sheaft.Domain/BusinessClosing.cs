@@ -13,7 +13,8 @@ namespace Sheaft.Domain
         {
             Reason = reason;
         }
-        
+
+        public Guid BusinessId { get; private set; }
         public string Reason { get; private set; }
 
         public void SetReason(string reason)

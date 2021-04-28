@@ -165,12 +165,12 @@ namespace Sheaft.Mediatr.Product.Queries
             if (currentUser.IsInRole(_roleOptions.Store.Value))
             {
                 var hasAgreement = await _context.Agreements
-                    .Where(c => c.Store.Id == currentUser.Id && c.Catalog.Products.Any(p => p.Product.Id == id))
+                    .Where(c => c.StoreId == currentUser.Id && c.Catalog.Products.Any(p => p.ProductId == id))
                     .AnyAsync(token);
 
                 if (hasAgreement)
                     return _context.Agreements
-                        .Where(c => c.Store.Id == currentUser.Id && c.Catalog.Products.Any(p => p.Product.Id == id))
+                        .Where(c => c.StoreId == currentUser.Id && c.Catalog.Products.Any(p => p.ProductId == id))
                         .SelectMany(a => a.Catalog.Products)
                         .Select(c => c.Product)
                         .ProjectTo<ProductDto>(_configurationProvider);
@@ -189,12 +189,12 @@ namespace Sheaft.Mediatr.Product.Queries
         {
             if (currentUser.IsInRole(_roleOptions.Producer.Value))
                 return _context.Products
-                    .Where(c => c.Producer.Id == currentUser.Id)
+                    .Where(c => c.ProducerId == currentUser.Id)
                     .ProjectTo<ProductDto>(_configurationProvider);
 
             if (currentUser.IsInRole(_roleOptions.Store.Value))
                     return _context.Agreements
-                        .Where(c => c.Store.Id == currentUser.Id && c.Catalog.Kind == CatalogKind.Stores && c.Status == AgreementStatus.Accepted)
+                        .Where(c => c.StoreId == currentUser.Id && c.Catalog.Kind == CatalogKind.Stores && c.Status == AgreementStatus.Accepted)
                         .SelectMany(a => a.Catalog.Products)
                         .Select(c => c.Product)
                         .ProjectTo<ProductDto>(_configurationProvider);
@@ -207,36 +207,36 @@ namespace Sheaft.Mediatr.Product.Queries
         {
             if (currentUser.IsInRole(_roleOptions.Admin.Value) || currentUser.IsInRole(_roleOptions.Support.Value))
                 return _context.Products
-                    .Where(p => p.Producer.Id == producerId)
+                    .Where(p => p.ProducerId == producerId)
                     .ProjectTo<ProductDto>(_configurationProvider);
 
             if (currentUser.IsInRole(_roleOptions.Store.Value))
             {
                 var hasAgreement = await _context.Agreements
-                    .Where(c => c.Store.Id == currentUser.Id && c.Producer.Id == producerId && c.Status == AgreementStatus.Accepted)
+                    .Where(c => c.StoreId == currentUser.Id && c.ProducerId == producerId && c.Status == AgreementStatus.Accepted)
                     .AnyAsync(token);
 
                 if (hasAgreement)
                     return _context.Agreements
-                        .Where(c => c.Store.Id == currentUser.Id && c.Producer.Id == producerId && c.Catalog.Kind == CatalogKind.Stores && c.Status == AgreementStatus.Accepted)
+                        .Where(c => c.StoreId == currentUser.Id && c.ProducerId == producerId && c.Catalog.Kind == CatalogKind.Stores && c.Status == AgreementStatus.Accepted)
                         .SelectMany(a => a.Catalog.Products)
                         .Select(c => c.Product)
                         .ProjectTo<ProductDto>(_configurationProvider);
 
                 return _context.Products
-                    .Where(p => p.Producer.Id == producerId && p.CatalogsPrices.Any(cp => cp.Catalog.Kind == CatalogKind.Stores && cp.Catalog.Available && cp.Catalog.IsDefault))
+                    .Where(p => p.ProducerId == producerId && p.CatalogsPrices.Any(cp => cp.Catalog.Kind == CatalogKind.Stores && cp.Catalog.Available && cp.Catalog.IsDefault))
                     .ProjectTo<ProductDto>(_configurationProvider);
             }
 
             return _context.Products
-                .Where(p => p.Producer.Id == producerId && p.CatalogsPrices.Any(cp => cp.Catalog.Kind == CatalogKind.Consumers))
+                .Where(p => p.ProducerId == producerId && p.CatalogsPrices.Any(cp => cp.Catalog.Kind == CatalogKind.Consumers))
                 .ProjectTo<ProductDto>(_configurationProvider);
         }
 
         public async Task<bool> ProductIsRatedByUserAsync(Guid id, Guid userId, RequestUser user,
             CancellationToken token)
         {
-            return await _context.Products.AnyAsync(p => p.Id == id && p.Ratings.Any(r => r.User.Id == userId),
+            return await _context.Products.AnyAsync(p => p.Id == id && p.Ratings.Any(r => r.UserId == userId),
                 token);
         }
 

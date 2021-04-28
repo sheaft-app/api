@@ -52,23 +52,23 @@ namespace Sheaft.Mediatr.Agreement.Commands
         public async Task<Result> Handle(CancelAgreementCommand request, CancellationToken token)
         {
             var entity = await _context.Agreements.SingleAsync(e => e.Id == request.AgreementId, token);
-            if(request.RequestUser.IsInRole(_roleOptions.Producer.Value) && entity.Producer.Id != request.RequestUser.Id)
+            if(request.RequestUser.IsInRole(_roleOptions.Producer.Value) && entity.ProducerId != request.RequestUser.Id)
                 return Failure(MessageKind.Forbidden);
             
-            if(request.RequestUser.IsInRole(_roleOptions.Store.Value) && entity.Store.Id != request.RequestUser.Id)
+            if(request.RequestUser.IsInRole(_roleOptions.Store.Value) && entity.StoreId != request.RequestUser.Id)
                 return Failure(MessageKind.Forbidden);
             
             var currentUser = await _context.Users.SingleAsync(c => c.Id == request.RequestUser.Id, token);
             entity.CancelAgreement(request.Reason, currentUser.Kind);
 
             var quickOrders = await _context.QuickOrders
-                .Where(qo => qo.Products.Any(qop => qop.CatalogProduct.Catalog.Id == entity.Catalog.Id) &&
-                             qo.User.Id == entity.Store.Id)
+                .Where(qo => qo.Products.Any(qop => qop.CatalogProduct.CatalogId == entity.CatalogId) &&
+                             qo.UserId == entity.StoreId)
                 .ToListAsync(token);
 
             foreach (var quickOrder in quickOrders)
             {
-                var products = quickOrder.Products.Where(p => p.CatalogProduct.Catalog.Id == entity.Catalog.Id).ToList();
+                var products = quickOrder.Products.Where(p => p.CatalogProduct.CatalogId == entity.CatalogId).ToList();
                 foreach (var product in products)
                     quickOrder.RemoveProduct(product);
             }

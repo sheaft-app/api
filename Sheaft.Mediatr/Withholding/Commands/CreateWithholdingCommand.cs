@@ -49,7 +49,7 @@ namespace Sheaft.Mediatr.Withholding.Commands
         public async Task<Result<Guid>> Handle(CreateWithholdingCommand request, CancellationToken token)
         {
             var debitedWallet = await _context.Wallets
-                .SingleOrDefaultAsync(c => c.User.Id == request.UserId, token);
+                .SingleOrDefaultAsync(c => c.UserId == request.UserId, token);
             var creditedWallet = await _context.Wallets
                 .SingleOrDefaultAsync(c => c.Identifier == _pspOptions.DocumentWalletId, token);
 

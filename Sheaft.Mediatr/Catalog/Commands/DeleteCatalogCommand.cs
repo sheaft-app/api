@@ -46,14 +46,14 @@ namespace Sheaft.Mediatr.Catalog.Commands
                     .SingleOrDefaultAsync(c => c.Id == request.CatalogId, token);
 
             var agreements = await _context.Agreements
-                .Where(a => a.Catalog != null && a.Catalog.Id == entity.Id)
+                .Where(a => a.Catalog != null && a.CatalogId == entity.Id)
                 .ToListAsync(token);
 
             if (agreements.Any(a => a.Status == AgreementStatus.Accepted))
                 return Failure(MessageKind.Validation);
 
             foreach (var catalogProduct in entity.Products.ToList())
-                entity.RemoveProduct(catalogProduct.Product.Id);
+                entity.RemoveProduct(catalogProduct.ProductId);
 
             _context.Remove(entity);
             await _context.SaveChangesAsync(token);

@@ -37,6 +37,7 @@ namespace Sheaft.Domain
         public string Name { get; private set; }
         public string ResultCode { get; private set; }
         public string ResultMessage { get; private set; }
+        public Guid LegalId { get; private set; }
         public virtual IReadOnlyCollection<Page> Pages => _pages?.AsReadOnly();
 
         public void SetIdentifier(string identifier)

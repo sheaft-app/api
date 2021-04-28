@@ -16,8 +16,6 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
 
         public void Configure(EntityTypeBuilder<User> entity)
         {
-            entity.Property<long>("Uid");
-
             entity.Property(c => c.UpdatedOn).IsConcurrencyToken();
             
             if(!_isAdmin)
@@ -38,23 +36,12 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
 
             entity.OwnsOne(c => c.Address, cb =>
             {
-                cb.Property<long>("DepartmentUid");
-                cb.HasOne(c => c.Department).WithMany().HasForeignKey("DepartmentUid");
-
-                cb.ToTable("UserAddresses");
+                cb.HasOne(c => c.Department).WithMany().HasForeignKey(c => c.DepartmentId);
             });
 
-            entity.OwnsMany(c => c.Points, p =>
-            {
-                p.Property<long>("Uid");
-                p.HasKey("Uid");
-                p.HasIndex(c => c.Id).IsUnique();
-                p.ToTable("UserPoints");
-            });
-
-            entity.HasMany(c => c.Settings).WithOne().HasForeignKey("UserUid").OnDelete(DeleteBehavior.Cascade).IsRequired();
-            entity.HasMany(c => c.Pictures).WithOne().HasForeignKey("UserUid").OnDelete(DeleteBehavior.Cascade).IsRequired();
-            entity.HasMany<Sponsoring>().WithOne(c => c.Sponsor).HasForeignKey("SponsorUid").OnDelete(DeleteBehavior.NoAction).IsRequired();
+            entity.HasMany(c => c.Points).WithOne().HasForeignKey(c => c.UserId).OnDelete(DeleteBehavior.Cascade);
+            entity.HasMany(c => c.Settings).WithOne().HasForeignKey(c=>c.UserId).OnDelete(DeleteBehavior.Cascade).IsRequired();
+            entity.HasMany(c => c.Pictures).WithOne().HasForeignKey(c=>c.UserId).OnDelete(DeleteBehavior.Cascade).IsRequired();
 
             var settings = entity.Metadata.FindNavigation(nameof(User.Settings));
             settings.SetPropertyAccessMode(PropertyAccessMode.Field);
@@ -65,12 +52,9 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
             var pictures = entity.Metadata.FindNavigation(nameof(User.Pictures));
             pictures.SetPropertyAccessMode(PropertyAccessMode.Field);
             
-            entity.HasKey("Uid");
-
-            entity.HasIndex(c => c.Id).IsUnique();
+            entity.HasKey(c=>c.Id);
             entity.HasIndex(c => c.Email).IsUnique();
             entity.HasIndex(c => c.Identifier);
-            entity.HasIndex("Uid", "Id", "RemovedOn");
 
             entity.ToTable("Users");
         }

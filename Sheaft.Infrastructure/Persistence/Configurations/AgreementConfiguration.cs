@@ -15,12 +15,6 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
 
         public void Configure(EntityTypeBuilder<Agreement> entity)
         {
-            entity.Property<long>("Uid");
-            entity.Property<long>("StoreUid");
-            entity.Property<long>("ProducerUid");
-            entity.Property<long?>("DeliveryModeUid");
-            entity.Property<long?>("CatalogUid");
-
             entity.Property(c => c.CreatedOn);
             entity.Property(c => c.UpdatedOn).IsConcurrencyToken();
 
@@ -29,21 +23,29 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
 
             entity.Ignore(c => c.DomainEvents);
 
-            entity.HasOne(c => c.Delivery).WithMany().HasForeignKey("DeliveryModeUid").OnDelete(DeleteBehavior.NoAction);
-            entity.HasOne(c => c.Store).WithMany().HasForeignKey("StoreUid").OnDelete(DeleteBehavior.NoAction)
+            entity.HasOne(c => c.Delivery)
+                .WithMany()
+                .HasForeignKey(c => c.DeliveryId)
+                .OnDelete(DeleteBehavior.NoAction);
+            
+            entity.HasOne(c => c.Store)
+                .WithMany()
+                .HasForeignKey(c => c.StoreId)
+                .OnDelete(DeleteBehavior.NoAction)
                 .IsRequired();
-            entity.HasOne(c => c.Producer).WithMany().HasForeignKey("ProducerUid").OnDelete(DeleteBehavior.Cascade)
+            
+            entity.HasOne(c => c.Producer)
+                .WithMany()
+                .HasForeignKey(c => c.ProducerId)
+                .OnDelete(DeleteBehavior.Cascade)
                 .IsRequired();
-            entity.HasOne(c => c.Catalog).WithMany().HasForeignKey("CatalogUid").OnDelete(DeleteBehavior.NoAction);
+            
+            entity.HasOne(c => c.Catalog)
+                .WithMany()
+                .HasForeignKey(c => c.CatalogId)
+                .OnDelete(DeleteBehavior.NoAction);
 
-            entity.HasKey("Uid");
-
-            entity.HasIndex(c => c.Id).IsUnique();
-            entity.HasIndex("StoreUid");
-            entity.HasIndex("ProducerUid");
-            entity.HasIndex("CatalogUid");
-            entity.HasIndex("Uid", "Id", "StoreUid", "ProducerUid", "DeliveryModeUid", "CatalogUid", "RemovedOn");
-
+            entity.HasKey(c => c.Id);
             entity.ToTable("Agreements");
         }
     }

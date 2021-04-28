@@ -8,8 +8,6 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
     {
         public void Configure(EntityTypeBuilder<PurchaseOrderProduct> entity)
         {
-            entity.Property<long>("PurchaseOrderUid");
-
             entity.Property(c => c.Quantity).IsConcurrencyToken();
 
             entity.Property(o => o.TotalWholeSalePrice).HasColumnType("decimal(10,2)");
@@ -38,8 +36,7 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
             entity.Property(o => o.TotalProductVatPrice).HasColumnType("decimal(10,2)");
             entity.Property(o => o.TotalProductWholeSalePrice).HasColumnType("decimal(10,2)");
 
-            entity.HasKey("PurchaseOrderUid", "Id");
-
+            entity.HasKey(c=> new {c.PurchaseOrderId, c.Id});
             entity.ToTable("PurchaseOrderProducts");
         }
     }

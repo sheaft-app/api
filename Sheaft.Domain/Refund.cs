@@ -21,9 +21,11 @@ namespace Sheaft.Domain
             : base(id, kind, author)
         {
             DebitedWallet = debitedWallet;
+            DebitedWalletId = debitedWallet.Id;
             Debited = debited;
         }
 
+        public Guid DebitedWalletId { get; private set; }
         public virtual Wallet DebitedWallet { get; private set; }
     }
 }

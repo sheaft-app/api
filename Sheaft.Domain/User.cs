@@ -11,7 +11,7 @@ namespace Sheaft.Domain
 {
     public abstract class User : IEntity
     {
-        private List<Points> _points;
+        private List<UserPoint> _points;
         private List<UserSetting> _settings;
         private List<ProfilePicture> _pictures;
 
@@ -30,7 +30,7 @@ namespace Sheaft.Domain
             SetFirstname(firstname);
             SetLastname(lastname);
 
-            _points = new List<Points>();
+            _points = new List<UserPoint>();
             _settings = new List<UserSetting>();
             
             RefreshPoints();
@@ -56,9 +56,10 @@ namespace Sheaft.Domain
         public string Facebook { get; private set; }
         public string Twitter { get; private set; }
         public string Instagram { get; private set; }
+        public Guid? LegalId { get; protected set; }
         public virtual UserAddress Address { get; private set; }
         public virtual Legal Legal { get; protected set; }
-        public virtual IReadOnlyCollection<Points> Points => _points.AsReadOnly();
+        public virtual IReadOnlyCollection<UserPoint> Points => _points.AsReadOnly();
         public virtual IReadOnlyCollection<UserSetting> Settings => _settings.AsReadOnly();
         public virtual IReadOnlyCollection<ProfilePicture> Pictures => _pictures?.AsReadOnly();
 
@@ -227,12 +228,12 @@ namespace Sheaft.Domain
             SetAddress("Anonymous", null, Address.Zipcode, "Anonymous", Address.Country, Address.Department);
         }
 
-        public Points AddPoints(PointKind kind, int quantity, DateTimeOffset? createdOn = null)
+        public UserPoint AddPoints(PointKind kind, int quantity, DateTimeOffset? createdOn = null)
         {
             if (Points == null)
-                _points = new List<Points>();
+                _points = new List<UserPoint>();
 
-            var points = new Points(Guid.NewGuid(), kind, quantity, createdOn ?? DateTimeOffset.UtcNow);
+            var points = new UserPoint(Guid.NewGuid(), kind, quantity, createdOn ?? DateTimeOffset.UtcNow);
             _points.Add(points);
             RefreshPoints();
 
@@ -256,7 +257,7 @@ namespace Sheaft.Domain
 
         public UserSetting GetSetting(Guid id)
         {
-            return Settings?.SingleOrDefault(s => s.Setting.Id == id);
+            return Settings?.SingleOrDefault(s => s.SettingId == id);
         }
 
         public void AddSetting(Setting setting, string value)
@@ -275,7 +276,7 @@ namespace Sheaft.Domain
             if (Settings == null)
                 throw SheaftException.NotFound();
 
-            var setting = _settings.SingleOrDefault(s => s.Setting.Id == settingId);
+            var setting = _settings.SingleOrDefault(s => s.SettingId == settingId);
             if(setting == null)
                 throw SheaftException.NotFound();
 
@@ -287,7 +288,7 @@ namespace Sheaft.Domain
             if (Settings == null)
                 throw SheaftException.NotFound();
 
-            var setting = _settings.SingleOrDefault(s => s.Setting.Id == settingId);
+            var setting = _settings.SingleOrDefault(s => s.SettingId == settingId);
             if(setting == null)
                 throw SheaftException.NotFound();
 

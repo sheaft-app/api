@@ -48,9 +48,9 @@ namespace Queries.Delivery.Tests
                 new Producer(Guid.Parse("3b5c008bb6a24f5c8cc8258b9e33105f"), "prod1", "fa", "la", "test@email.com", new UserAddress("x", null, "x", "x", CountryIsoCode.FR, null)),
                 available,
                 new DeliveryAddress("x", null, "x", "x", CountryIsoCode.FR, null, null),
-                new List<TimeSlotHour>
+                new List<DeliveryHours>
                 {
-                    new TimeSlotHour(DayOfWeek.Wednesday, TimeSpan.FromHours(8), TimeSpan.FromHours(12))
+                    new DeliveryHours(DayOfWeek.Wednesday, TimeSpan.FromHours(8), TimeSpan.FromHours(12))
                 },
                 "delivery1"), token);
 
@@ -85,7 +85,7 @@ namespace Queries.Delivery.Tests
                 new Producer(producerId, "prod1", "fa", "la", "test@email.com", new UserAddress("x", null, "x", "x", CountryIsoCode.FR, null)),
                 true,
                 new DeliveryAddress("x", null, "x", "x", CountryIsoCode.FR, null, null),
-                new List<TimeSlotHour> { new TimeSlotHour(DayOfWeek.Wednesday, TimeSpan.FromHours(8), TimeSpan.FromHours(12)) },
+                new List<DeliveryHours> { new DeliveryHours(DayOfWeek.Wednesday, TimeSpan.FromHours(8), TimeSpan.FromHours(12)) },
                 "delivery1");
 
             delivery.SetLockOrderHoursBeforeDelivery(orderLockInHours);
@@ -130,9 +130,9 @@ namespace Queries.Delivery.Tests
                             new Producer(producerId, "prod1", "fa", "la", "test@email.com", new UserAddress("x", null, "x", "x", CountryIsoCode.FR, null)),
                             true,
                             new DeliveryAddress("x", null, "x", "x", CountryIsoCode.FR, null, null),
-                            new List<TimeSlotHour> {
-                    new TimeSlotHour(DayOfWeek.Wednesday, TimeSpan.FromHours(8), TimeSpan.FromHours(12)),
-                    new TimeSlotHour(DayOfWeek.Saturday, TimeSpan.FromHours(10), TimeSpan.FromHours(16))
+                            new List<DeliveryHours> {
+                    new DeliveryHours(DayOfWeek.Wednesday, TimeSpan.FromHours(8), TimeSpan.FromHours(12)),
+                    new DeliveryHours(DayOfWeek.Saturday, TimeSpan.FromHours(10), TimeSpan.FromHours(16))
                             },
                             "delivery1");
 
@@ -179,7 +179,7 @@ namespace Queries.Delivery.Tests
                 new Producer(producerId, "prod1", "fa", "la", "test@email.com", new UserAddress("x", null, "x", "x", CountryIsoCode.FR, null)),
                 true,
                 new DeliveryAddress("x", null, "x", "x", CountryIsoCode.FR, null, null),
-                new List<TimeSlotHour> { new TimeSlotHour(DayOfWeek.Wednesday, TimeSpan.FromHours(8), TimeSpan.FromHours(12)) },
+                new List<DeliveryHours> { new DeliveryHours(DayOfWeek.Wednesday, TimeSpan.FromHours(8), TimeSpan.FromHours(12)) },
                 "delivery1");
 
             entity1.SetLockOrderHoursBeforeDelivery(orderLockInHours);
@@ -191,7 +191,7 @@ namespace Queries.Delivery.Tests
                 new Producer(producerId, "prod1", "fa", "la", "test@email.com", new UserAddress("x", null, "x", "x", CountryIsoCode.FR, null)),
                 true,
                 new DeliveryAddress("x", null, "x", "x", CountryIsoCode.FR, null, null),
-                new List<TimeSlotHour> { new TimeSlotHour(DayOfWeek.Friday, TimeSpan.FromHours(16), TimeSpan.FromHours(18)) },
+                new List<DeliveryHours> { new DeliveryHours(DayOfWeek.Friday, TimeSpan.FromHours(16), TimeSpan.FromHours(18)) },
                 "delivery2");
 
             entity2.SetLockOrderHoursBeforeDelivery(orderLockInHours);
@@ -270,9 +270,9 @@ namespace Queries.Delivery.Tests
                 new Producer(producerId, "prod1", "fa", "la", "test@email.com", new UserAddress("x", null, "x", "x", CountryIsoCode.FR, null)),
                 true,
                 new DeliveryAddress("x", null, "x", "x", CountryIsoCode.FR, null, null),
-                new List<TimeSlotHour>
+                new List<DeliveryHours>
                 {
-                    new TimeSlotHour(DayOfWeek.Friday, TimeSpan.FromHours(from), TimeSpan.FromHours(to))
+                    new DeliveryHours(DayOfWeek.Friday, TimeSpan.FromHours(from), TimeSpan.FromHours(to))
                 },
                 "delivery1");
 
@@ -343,9 +343,9 @@ namespace Queries.Delivery.Tests
                 new Producer(producerId, "prod1", "fa", "la", "test@email.com", new UserAddress("x", null, "x", "x", CountryIsoCode.FR, null)),
                 true,
                 new DeliveryAddress("x", null, "x", "x", CountryIsoCode.FR, null, null),
-                new List<TimeSlotHour>
+                new List<DeliveryHours>
                 {
-                    new TimeSlotHour(DayOfWeek.Friday, TimeSpan.FromHours(from), TimeSpan.FromHours(to))
+                    new DeliveryHours(DayOfWeek.Friday, TimeSpan.FromHours(from), TimeSpan.FromHours(to))
                 },
                 "delivery1");
 

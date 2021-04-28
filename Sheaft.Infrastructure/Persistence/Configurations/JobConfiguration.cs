@@ -15,9 +15,6 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
 
         public void Configure(EntityTypeBuilder<Job> entity)
         {
-            entity.Property<long>("Uid");
-            entity.Property<long>("UserUid");
-
             entity.Property(c => c.CreatedOn);
             entity.Property(c => c.UpdatedOn).IsConcurrencyToken();
             
@@ -28,16 +25,11 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
             entity.Property(c => c.Status).IsRequired();
             entity.Property(c => c.Kind).IsRequired();
 
-            entity.HasOne(o => o.User).WithMany().HasForeignKey("UserUid").OnDelete(DeleteBehavior.Cascade).IsRequired();
+            entity.HasOne(o => o.User).WithMany().HasForeignKey(c =>c.UserId).OnDelete(DeleteBehavior.Cascade).IsRequired();
 
             entity.Ignore(c => c.DomainEvents);
             
-            entity.HasKey("Uid");
-
-            entity.HasIndex(c => c.Id).IsUnique();
-            entity.HasIndex("UserUid");
-            entity.HasIndex("Uid", "Id", "UserUid", "RemovedOn");
-
+            entity.HasKey(c =>c.Id);
             entity.ToTable("Jobs");
         }
     }

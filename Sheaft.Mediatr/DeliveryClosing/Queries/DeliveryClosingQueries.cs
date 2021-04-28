@@ -33,7 +33,7 @@ namespace Sheaft.Mediatr.DeliveryClosing.Queries
             if (currentUser.IsInRole(_roleOptions.Owner.Value))
             {
                 return _context.Set<Domain.DeliveryMode>()
-                    .Where(b => b.Producer.Id == currentUser.Id && b.Closings.Any(c => c.Id == id))
+                    .Where(b => b.ProducerId == currentUser.Id && b.Closings.Any(c => c.Id == id))
                     .Select(b => b.Closings.SingleOrDefault(c => c.Id == id))
                     .ProjectTo<ClosingDto>(_configurationProvider);
             }
@@ -48,7 +48,7 @@ namespace Sheaft.Mediatr.DeliveryClosing.Queries
             if (currentUser.IsInRole(_roleOptions.Owner.Value))
             {
                 return _context.Set<Domain.DeliveryMode>()
-                    .Where(b => b.Producer.Id != currentUser.Id || !deliveryId.HasValue || b.Id == deliveryId.Value)
+                    .Where(b => b.ProducerId != currentUser.Id || !deliveryId.HasValue || b.Id == deliveryId.Value)
                     .SelectMany(b => b.Closings.Where(c => c.ClosedTo > DateTimeOffset.UtcNow))
                     .ProjectTo<ClosingDto>(_configurationProvider);
             }

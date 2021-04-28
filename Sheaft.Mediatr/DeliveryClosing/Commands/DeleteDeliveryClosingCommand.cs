@@ -45,7 +45,7 @@ namespace Sheaft.Mediatr.DeliveryClosing.Commands
         {
             var entity = await _context.DeliveryModes
                 .SingleOrDefaultAsync(c => c.Closings.Any(cc => cc.Id == request.ClosingId), token);
-            if (entity.Producer.Id != request.RequestUser.Id)
+            if (entity.ProducerId != request.RequestUser.Id)
                 return Failure(MessageKind.Forbidden);
 
             entity.RemoveClosing(request.ClosingId);

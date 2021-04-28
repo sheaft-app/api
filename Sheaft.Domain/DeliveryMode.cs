@@ -10,14 +10,15 @@ namespace Sheaft.Domain
 {
     public class DeliveryMode : IEntity, IHasDomainEvent
     {
-        private List<TimeSlotHour> _openingHours;
+        private List<DeliveryHours> _deliveryHours;
         private List<DeliveryClosing> _closings;
 
         protected DeliveryMode()
         {
         }
 
-        public DeliveryMode(Guid id, DeliveryKind kind, Producer producer, bool available, DeliveryAddress address, IEnumerable<TimeSlotHour> openingHours, string name, string description = null)
+        public DeliveryMode(Guid id, DeliveryKind kind, Producer producer, bool available, DeliveryAddress address,
+            IEnumerable<DeliveryHours> openingHours, string name, string description = null)
         {
             Id = id;
             Name = name;
@@ -26,8 +27,9 @@ namespace Sheaft.Domain
 
             Address = address;
             Producer = producer;
+            ProducerId = producer.Id;
 
-            SetOpeningHours(openingHours);
+            SetDeliveryHours(openingHours);
             SetAvailability(available);
             DomainEvents = new List<DomainEvent>();
         }
@@ -45,13 +47,14 @@ namespace Sheaft.Domain
         public bool AutoAcceptRelatedPurchaseOrder { get; private set; }
         public bool AutoCompleteRelatedPurchaseOrder { get; private set; }
         public virtual DeliveryAddress Address { get; private set; }
+        public Guid ProducerId { get; private set; }
         public virtual Producer Producer { get; private set; }
-        public virtual IReadOnlyCollection<TimeSlotHour> OpeningHours => _openingHours?.AsReadOnly(); 
-        public virtual IReadOnlyCollection<DeliveryClosing> Closings => _closings?.AsReadOnly(); 
+        public virtual IReadOnlyCollection<DeliveryHours> DeliveryHours => _deliveryHours?.AsReadOnly();
+        public virtual IReadOnlyCollection<DeliveryClosing> Closings => _closings?.AsReadOnly();
 
-        public void SetOpeningHours(IEnumerable<TimeSlotHour> openingHours)
+        public void SetDeliveryHours(IEnumerable<DeliveryHours> deliveryHours)
         {
-            _openingHours = openingHours.ToList();
+            _deliveryHours = deliveryHours.ToList();
         }
 
         public void SetLockOrderHoursBeforeDelivery(int? lockOrderHoursBeforeDelivery)
@@ -59,7 +62,8 @@ namespace Sheaft.Domain
             LockOrderHoursBeforeDelivery = lockOrderHoursBeforeDelivery;
         }
 
-        public void SetAddress(string line1, string line2, string zipcode, string city, CountryIsoCode country, double? longitude = null, double? latitude = null)
+        public void SetAddress(string line1, string line2, string zipcode, string city, CountryIsoCode country,
+            double? longitude = null, double? latitude = null)
         {
             Address = new DeliveryAddress(line1, line2, zipcode, city, country, longitude, latitude);
         }
@@ -109,7 +113,7 @@ namespace Sheaft.Domain
 
             return closing;
         }
-        
+
         public void RemoveClosings(IEnumerable<Guid> ids)
         {
             foreach (var id in ids)
@@ -119,13 +123,12 @@ namespace Sheaft.Domain
         public void RemoveClosing(Guid id)
         {
             var closing = _closings.SingleOrDefault(r => r.Id == id);
-            if(closing == null)
+            if (closing == null)
                 throw SheaftException.NotFound();
-            
+
             _closings.Remove(closing);
         }
 
         public List<DomainEvent> DomainEvents { get; } = new List<DomainEvent>();
-
     }
 }

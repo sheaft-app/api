@@ -18,12 +18,17 @@ namespace Sheaft.Domain
             Fees = 0;
             Debited = amount;
             CreditedWallet = creditedWallet;
+            CreditedWalletId = creditedWallet.Id;
             DebitedWallet = debitedWallet;
+            DebitedWalletId = debitedWallet.Id;
             Credited = Debited;
             Reference = "WITHHOLDING";
             DomainEvents = new List<DomainEvent>();
         }
-
+        
+        public Guid CreditedWalletId { get; private set; }
+        public Guid DebitedWalletId { get; private set; }
+        public Guid? PayoutId { get; private set; }
         public virtual Wallet CreditedWallet { get; private set; }
         public virtual Wallet DebitedWallet { get; private set; }
         public virtual Payout Payout { get; private set; }

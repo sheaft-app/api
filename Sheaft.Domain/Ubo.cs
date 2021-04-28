@@ -27,8 +27,9 @@ namespace Sheaft.Domain
         public string Identifier { get; private set; }
         public DateTimeOffset BirthDate { get; private set; }
         public CountryIsoCode Nationality { get; private set; }
-        public virtual UboAddress Address { get; private set; }
-        public virtual BirthAddress BirthPlace { get; private set; }
+        public Guid DeclarationId { get; set; }
+        public UboAddress Address { get; private set; }
+        public BirthAddress BirthPlace { get; private set; }
 
         public void SetIdentifier(string identifier)
         {

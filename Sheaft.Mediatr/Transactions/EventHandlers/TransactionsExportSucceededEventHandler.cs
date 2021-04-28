@@ -26,8 +26,8 @@ namespace Sheaft.Mediatr.Transactions.EventHandlers
         {
             var pickingOrderEvent = notification.DomainEvent;
             var job = await _context.Jobs.SingleAsync(e => e.Id == pickingOrderEvent.JobId, token);
-            await _signalrService.SendNotificationToGroupAsync(job.User.Id, nameof(TransactionsExportSucceededEvent),
-                new {JobId = job.Id, Name = job.Name, UserId = job.User.Id, Url = job.File});
+            await _signalrService.SendNotificationToGroupAsync(job.UserId, nameof(TransactionsExportSucceededEvent),
+                new {JobId = job.Id, Name = job.Name, UserId = job.UserId, Url = job.File});
 
             await _emailService.SendTemplatedEmailAsync(
                 job.User.Email,

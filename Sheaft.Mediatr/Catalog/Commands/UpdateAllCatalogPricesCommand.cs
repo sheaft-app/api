@@ -40,7 +40,7 @@ namespace Sheaft.Mediatr.Catalog.Commands
         public async Task<Result> Handle(UpdateAllCatalogPricesCommand request, CancellationToken token)
         {
             var catalogProductsPrice = await _context.Set<CatalogProduct>()
-                .Where(c => c.Catalog.Id == request.CatalogId && !c.Catalog.RemovedOn.HasValue)
+                .Where(c => c.CatalogId == request.CatalogId && !c.Catalog.RemovedOn.HasValue)
                 .Include(c => c.Product)
                 .ToListAsync(token);
 

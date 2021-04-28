@@ -47,7 +47,7 @@ namespace Sheaft.Mediatr.Returnable.Commands
             _context.Remove(entity);
 
             var products = await _context.Products
-                .Where(p => p.Returnable != null && p.Returnable.Id == entity.Id)
+                .Where(p => p.ReturnableId == entity.Id)
                 .ToListAsync(token);
 
             foreach (var product in products)

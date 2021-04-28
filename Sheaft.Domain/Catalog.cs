@@ -21,6 +21,7 @@ namespace Sheaft.Domain
             Name = name;
             Kind = kind;
             Producer = producer;
+            ProducerId = producer.Id;
         }
 
         public Guid Id { get; }
@@ -31,6 +32,7 @@ namespace Sheaft.Domain
         public CatalogKind Kind { get; private set; }
         public bool Available { get; private set; }
         public bool IsDefault { get; private set; }
+        public Guid ProducerId { get; private set; }
         public virtual Producer Producer { get; private set; }
         public virtual IReadOnlyCollection<CatalogProduct> Products => _products?.AsReadOnly();
 
@@ -55,7 +57,7 @@ namespace Sheaft.Domain
             if (Products == null)
                 throw SheaftException.NotFound();
 
-            var product = _products.SingleOrDefault(p => p.Product.Id == productId);
+            var product = _products.SingleOrDefault(p => p.ProductId == productId);
             if (product == null)
                 throw SheaftException.NotFound();
 
@@ -69,11 +71,11 @@ namespace Sheaft.Domain
             if (Products == null)
                 _products = new List<CatalogProduct>();
 
-            var existingProductPrice = _products.SingleOrDefault(p => p.Product.Id == product.Id);
+            var existingProductPrice = _products.SingleOrDefault(p => p.ProductId == product.Id);
             if (existingProductPrice != null)
                 existingProductPrice.SetWholeSalePricePerUnit(wholeSalePrice);
             else
-                _products.Add(new CatalogProduct(product, this, wholeSalePrice));
+                _products.Add(new CatalogProduct(Guid.NewGuid(), product, this, wholeSalePrice));
 
             product.RefreshCatalogs();
         }
