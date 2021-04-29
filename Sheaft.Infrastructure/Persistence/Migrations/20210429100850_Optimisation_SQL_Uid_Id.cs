@@ -4517,11 +4517,6 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                 table: "Catalogs");
 
             migrationBuilder.DropColumn(
-                name: "RemovedOn",
-                schema: "app",
-                table: "Catalogs");
-
-            migrationBuilder.DropColumn(
                 name: "Uid",
                 schema: "app",
                 table: "CatalogProducts");

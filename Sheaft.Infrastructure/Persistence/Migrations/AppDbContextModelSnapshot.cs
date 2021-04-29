@@ -131,6 +131,9 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                         .IsConcurrencyToken()
                         .HasColumnType("datetimeoffset");
 
+                    b.Property<DateTimeOffset?>("RemovedOn")
+                        .HasColumnType("datetimeoffset");
+
                     b.HasKey("Id");
 
                     b.HasIndex("ProducerId");

@@ -63,6 +63,7 @@ namespace Sheaft.GraphQL.Common
                         statusCode = 409;
                         break;
                     case ExceptionKind.Forbidden:
+                    case ExceptionKind.Unauthorized:
                         statusCode = 403;
                         break;
                     case ExceptionKind.Gone:
@@ -74,7 +75,7 @@ namespace Sheaft.GraphQL.Common
                     case ExceptionKind.NotFound:
                         statusCode = 404;
                         break;
-                    case ExceptionKind.Unauthorized:
+                    case ExceptionKind.Unauthenticated:
                         statusCode = 401;
                         break;
                     case ExceptionKind.Unexpected:
@@ -91,13 +92,22 @@ namespace Sheaft.GraphQL.Common
                 code = MessageKind.BadRequest.ToString("G");
             }
 
-            if (error.Code == "AUTH_NOT_AUTHORIZED")
+            if (error.Code == "AUTH_NOT_AUTHENTICATED")
             {
                 statusCode = 401;
-                kind = ExceptionKind.Unauthorized;
-                message = _localizer[ExceptionKind.Unauthorized.ToString("G")];
-                code = ExceptionKind.Unauthorized.ToString("G");
-                extensions.Add(ExceptionKind.Unauthorized.ToString("G"), message);
+                kind = ExceptionKind.Unauthenticated;
+                message = _localizer[ExceptionKind.Unauthenticated.ToString("G")];
+                code = ExceptionKind.Unauthenticated.ToString("G");
+                extensions.Add(ExceptionKind.Unauthenticated.ToString("G"), message);
+            }
+
+            if (error.Code == "AUTH_NOT_AUTHORIZED")
+            {
+                statusCode = 403;
+                kind = ExceptionKind.Forbidden;
+                message = _localizer[ExceptionKind.Forbidden.ToString("G")];
+                code = ExceptionKind.Forbidden.ToString("G");
+                extensions.Add(ExceptionKind.Forbidden.ToString("G"), message);
             }
 
             extensions.Add("StatusCode", statusCode);

@@ -81,10 +81,10 @@ namespace Sheaft.Web.Api.Authorize
                 _httpClient.BaseAddress = new Uri(_authOptions.Value.Url);
 
                 _accessor.HttpContext.Request.Headers.TryGetValue("Authorization", out StringValues bearer);
-                if (bearer.Count > 1)
+                if (bearer.Any())
                 {
                     var tokens = bearer[0].Split(" ");
-                    if (tokens.Length == 2)
+                    if (tokens.Count(t => !string.IsNullOrWhiteSpace(t)) == 2)
                     {
                         _httpClient.SetToken(tokens[0], tokens[1]);
                         var request = await _httpClient.GetAsync("/connect/userinfo");

@@ -1670,5 +1670,11 @@ namespace Sheaft.Localization.Resources {
                 return ResourceManager.GetString("Order_CannotPay_Delivery_Max_PurchaseOrders_Reached", resourceCulture);
             }
         }
+        
+        internal static string Unauthenticated {
+            get {
+                return ResourceManager.GetString("Unauthenticated", resourceCulture);
+            }
+        }
     }
 }

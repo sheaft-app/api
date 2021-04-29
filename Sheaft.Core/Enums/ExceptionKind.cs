@@ -6,6 +6,7 @@
         BadRequest,
         Conflict,
         Unauthorized,
+        Unauthenticated,
         Forbidden,
         Locked,
         NotFound,

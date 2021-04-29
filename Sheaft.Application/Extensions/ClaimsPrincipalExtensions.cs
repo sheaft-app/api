@@ -63,7 +63,7 @@ namespace Sheaft.Application.Extensions
                 return new List<string>();
 
             var userClaims = user.FindAll(JwtClaimTypes.Role);
-            return userClaims.Select(uc => uc.Value)?.ToList();
+            return userClaims.Select(uc => uc.Value)?.Distinct().ToList();
         }
 
         public static RequestUser ToIdentityUser(this ClaimsPrincipal user, string requestId, Impersonification impersonification = null)
