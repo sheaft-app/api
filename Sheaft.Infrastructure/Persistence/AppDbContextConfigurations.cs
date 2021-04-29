@@ -98,8 +98,6 @@ namespace Sheaft.Infrastructure.Persistence
             modelBuilder.ApplyConfiguration(new OrderDeliveryConfiguration());
             modelBuilder.ApplyConfiguration(new PurchaseOrderConfiguration(_isAdminContext));
             modelBuilder.ApplyConfiguration(new PurchaseOrderProductConfiguration());
-            modelBuilder.ApplyConfiguration(new PurchaseOrderVendorConfiguration());
-            modelBuilder.ApplyConfiguration(new PurchaseOrderSenderConfiguration());
             modelBuilder.ApplyConfiguration(new QuickOrderConfiguration(_isAdminContext));
             modelBuilder.ApplyConfiguration(new QuickOrderProductConfiguration());
             modelBuilder.ApplyConfiguration(new ProductConfiguration(_isAdminContext));

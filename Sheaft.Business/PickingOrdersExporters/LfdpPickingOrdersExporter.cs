@@ -35,7 +35,7 @@ namespace Sheaft.Business.PickingOrdersExporters
             {
                 var purchaseOrders = await purchaseOrdersQuery.ToListAsync(token);
                 var storeDeliveryDays = purchaseOrders
-                    .Where(po => po.Sender.Kind == ProfileKind.Store)
+                    .Where(po => po.SenderInfo.Kind == ProfileKind.Store)
                     .GroupBy(po => po.ExpectedDelivery.ExpectedDeliveryDate.DayOfWeek);
 
                 var products = await _context.Products
@@ -65,14 +65,14 @@ namespace Sheaft.Business.PickingOrdersExporters
                 }
 
                 var consumerDeliveryDays = purchaseOrders
-                    .Where(po => po.Sender.Kind == ProfileKind.Consumer)
+                    .Where(po => po.SenderInfo.Kind == ProfileKind.Consumer)
                     .GroupBy(po => po.ExpectedDelivery.ExpectedDeliveryDate.DayOfWeek)
                     .ToList();
 
                 if (consumerDeliveryDays.Any())
                 {
                     var clients = consumerDeliveryDays
-                        .SelectMany(cpo => cpo.Select(c => new KeyValuePair<Guid, string>(c.Sender.Id, $"{c.Sender.Name} ({c.Reference})")))
+                        .SelectMany(cpo => cpo.Select(c => new KeyValuePair<Guid, string>(c.ClientId, $"{c.SenderInfo.Name} ({c.Reference})")))
                         .OrderBy(c => c.Value)
                         .ToList();
                     
@@ -156,7 +156,7 @@ namespace Sheaft.Business.PickingOrdersExporters
                 foreach (var client in clients)
                 {
                     var current = 0;
-                    var order = purchaseOrders.FirstOrDefault(o => o.SenderId == client.Key);
+                    var order = purchaseOrders.FirstOrDefault(o => o.ClientId == client.Key);
                     var productOrder = order?.Products.FirstOrDefault(op => op.Id == product.Id);
 
                     current += productOrder?.Quantity ?? 0;

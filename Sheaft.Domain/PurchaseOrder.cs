@@ -70,11 +70,11 @@ namespace Sheaft.Domain
         public decimal TotalWeight { get; private set; }
         public PurchaseOrderStatus Status { get; private set; }
         public Guid OrderId { get; private set; }
-        public Guid SenderId { get; private set; }
-        public Guid VendorId { get; private set; }
-        public virtual PurchaseOrderSender Sender { get; private set; }
+        public Guid ProducerId { get; private set; }
+        public Guid ClientId { get; private set; }
+        public PurchaseOrderSender SenderInfo { get; private set; }
+        public PurchaseOrderVendor VendorInfo { get; private set; }
         public virtual ExpectedPurchaseOrderDelivery ExpectedDelivery { get; private set; }
-        public virtual PurchaseOrderVendor Vendor { get; private set; }
         public virtual IReadOnlyCollection<PurchaseOrderProduct> Products => _products?.AsReadOnly();
 
         public void SetReference(string newReference)
@@ -93,7 +93,7 @@ namespace Sheaft.Domain
                     if (Status != PurchaseOrderStatus.Waiting)
                         throw SheaftException.Validation(MessageKind.PurchaseOrder_CannotAccept_NotIn_WaitingStatus);
 
-                    if (Sender.Kind == ProfileKind.Consumer && CreatedOn.AddDays(5) < DateTimeOffset.UtcNow)
+                    if (SenderInfo.Kind == ProfileKind.Consumer && CreatedOn.AddDays(5) < DateTimeOffset.UtcNow)
                         throw SheaftException.Validation();
                     
                     AcceptedOn = DateTimeOffset.UtcNow;
@@ -237,14 +237,14 @@ namespace Sheaft.Domain
 
         public void SetSender(User sender)
         {
-            Sender = new PurchaseOrderSender(sender);
-            SenderId = Sender.Id;
+            ClientId = sender.Id;
+            SenderInfo = new PurchaseOrderSender(sender);
         }
 
         public void SetVendor(Producer vendor)
         {
-            Vendor = new PurchaseOrderVendor(vendor);
-            VendorId = Vendor.Id;
+            ProducerId = vendor.Id;
+            VendorInfo = new PurchaseOrderVendor(vendor);
         }
 
         private void SetExpectedDelivery(DeliveryMode delivery, DateTimeOffset expectedDate)

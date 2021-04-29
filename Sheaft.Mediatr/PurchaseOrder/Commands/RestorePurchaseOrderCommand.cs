@@ -44,7 +44,7 @@ namespace Sheaft.Mediatr.PurchaseOrder.Commands
             var purchaseOrder =
                 await _context.PurchaseOrders.SingleOrDefaultAsync(a => a.Id == request.PurchaseOrderId && a.RemovedOn.HasValue,
                     token);
-            if(purchaseOrder.VendorId != request.RequestUser.Id && purchaseOrder.SenderId != request.RequestUser.Id)
+            if(purchaseOrder.ProducerId != request.RequestUser.Id && purchaseOrder.ClientId != request.RequestUser.Id)
                 throw SheaftException.Forbidden();
 
             _context.Restore(purchaseOrder);

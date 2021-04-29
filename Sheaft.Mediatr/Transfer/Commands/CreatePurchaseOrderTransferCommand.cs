@@ -65,15 +65,15 @@ namespace Sheaft.Mediatr.Transfer.Commands
 
             var checkResult =
                 await _mediatr.Process(
-                    new CheckProducerConfigurationCommand(request.RequestUser) {ProducerId = purchaseOrder.VendorId},
+                    new CheckProducerConfigurationCommand(request.RequestUser) {ProducerId = purchaseOrder.ProducerId},
                     token);
             if (!checkResult.Succeeded)
                 return Failure<Guid>(checkResult);
 
             var debitedWallet =
-                await _context.Wallets.SingleOrDefaultAsync(c => c.UserId == purchaseOrder.SenderId, token);
+                await _context.Wallets.SingleOrDefaultAsync(c => c.UserId == purchaseOrder.ClientId, token);
             var creditedWallet =
-                await _context.Wallets.SingleOrDefaultAsync(c => c.UserId == purchaseOrder.VendorId, token);
+                await _context.Wallets.SingleOrDefaultAsync(c => c.UserId == purchaseOrder.ProducerId, token);
 
             using (var transaction = await _context.BeginTransactionAsync(token))
             {

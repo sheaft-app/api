@@ -48,9 +48,9 @@ namespace Sheaft.Web.Manage.Controllers
             if (requestUser.IsImpersonating)
             {
                 if (requestUser.IsInRole(_roleOptions.Producer.Value))
-                    query = query.Where(p => p.VendorId == requestUser.Id);
+                    query = query.Where(p => p.ProducerId == requestUser.Id);
                 else
-                    query = query.Where(p => p.SenderId == requestUser.Id);
+                    query = query.Where(p => p.ClientId == requestUser.Id);
             }
 
             if (status != null)

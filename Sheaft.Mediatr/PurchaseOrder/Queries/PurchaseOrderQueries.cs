@@ -29,7 +29,7 @@ namespace Sheaft.Mediatr.PurchaseOrder.Queries
         public IQueryable<PurchaseOrderDto> MyPurchaseOrders(RequestUser currentUser)
         {
             return _context.PurchaseOrders
-                .Where(c => c.SenderId == currentUser.Id)
+                .Where(c => c.ClientId == currentUser.Id)
                 .ProjectTo<PurchaseOrderDto>(_configurationProvider);
         }
 
@@ -38,12 +38,12 @@ namespace Sheaft.Mediatr.PurchaseOrder.Queries
             if (currentUser.IsInRole(_roleOptions.Producer.Value))
             {
                 return _context.PurchaseOrders
-                    .Where(c => c.Id == id && c.VendorId == currentUser.Id)
+                    .Where(c => c.Id == id && c.ProducerId == currentUser.Id)
                     .ProjectTo<PurchaseOrderDto>(_configurationProvider);
             }
 
             return _context.PurchaseOrders
-                .Where(c => c.Id == id && c.SenderId == currentUser.Id)
+                .Where(c => c.Id == id && c.ClientId == currentUser.Id)
                 .ProjectTo<PurchaseOrderDto>(_configurationProvider);
         }
 
@@ -52,12 +52,12 @@ namespace Sheaft.Mediatr.PurchaseOrder.Queries
             if (currentUser.IsInRole(_roleOptions.Producer.Value))
             {
                 return _context.PurchaseOrders
-                    .Where(c => c.VendorId == currentUser.Id)
+                    .Where(c => c.ProducerId == currentUser.Id)
                     .ProjectTo<PurchaseOrderDto>(_configurationProvider);
             }
 
             return _context.PurchaseOrders
-                .Where(c => c.SenderId == currentUser.Id)
+                .Where(c => c.ClientId == currentUser.Id)
                 .ProjectTo<PurchaseOrderDto>(_configurationProvider);
         }
     }

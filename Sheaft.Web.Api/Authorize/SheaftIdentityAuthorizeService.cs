@@ -59,6 +59,9 @@ namespace Sheaft.Web.Api.Authorize
             var claims = user.Claims.ToList();
             var subClaim = claims.FirstOrDefault(c => c.Type == JwtClaimTypes.Subject);
 
+            // Create a tracking context from the authorization inputs.
+            var authContext = _contextFactory.CreateContext(requirements, _accessor.HttpContext.User, resource);
+
             var cachedUser = user.Identity.IsAuthenticated ? await _cache.GetAsync(user.Identity.Name) : null;
             if (cachedUser != null)
             {
@@ -78,7 +81,7 @@ namespace Sheaft.Web.Api.Authorize
                 _httpClient.BaseAddress = new Uri(_authOptions.Value.Url);
 
                 _accessor.HttpContext.Request.Headers.TryGetValue("Authorization", out StringValues bearer);
-                if (bearer.Any())
+                if (bearer.Count > 1)
                 {
                     var tokens = bearer[0].Split(" ");
                     if (tokens.Length == 2)
@@ -140,14 +143,17 @@ namespace Sheaft.Web.Api.Authorize
 
                             await _cache.SetAsync(userInfo.sub, buffer, new DistributedCacheEntryOptions { AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(_cacheOptions.Value.CacheExpirationInMinutes ?? 5), SlidingExpiration = TimeSpan.FromMinutes(_cacheOptions.Value.CacheExpirationInMinutes ?? 5) });
                             _accessor.HttpContext.User = new ClaimsPrincipal(new ClaimsIdentity(claims, user.Identity.AuthenticationType, JwtClaimTypes.Subject, JwtClaimTypes.Role));
+                            
+                            // Create a tracking context from the authorization inputs.
+                            authContext = _contextFactory.CreateContext(requirements, _accessor.HttpContext.User, resource);
+                        }
+                        else
+                        {
+                            authContext.Fail();
                         }
                     }
                 }
             }
-
-            // Create a tracking context from the authorization inputs.
-            var authContext = _contextFactory.CreateContext(requirements, _accessor.HttpContext.User, resource);
-
             // By default this returns an IEnumerable<IAuthorizationHandlers> from DI.
             var handlers = await _handlers.GetHandlersAsync(authContext);
 

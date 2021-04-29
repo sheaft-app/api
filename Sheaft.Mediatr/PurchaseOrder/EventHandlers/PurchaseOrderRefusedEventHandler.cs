@@ -30,12 +30,12 @@ namespace Sheaft.Mediatr.PurchaseOrder.EventHandlers
             var orderEvent = notification.DomainEvent;
             var purchaseOrder = await _context.PurchaseOrders.SingleAsync(e => e.Id == orderEvent.PurchaseOrderId, token);
             
-            await _signalrService.SendNotificationToUserAsync(purchaseOrder.SenderId, nameof(PurchaseOrderRefusedEvent), purchaseOrder.GetPurchaseNotifModelAsString());
+            await _signalrService.SendNotificationToUserAsync(purchaseOrder.ClientId, nameof(PurchaseOrderRefusedEvent), purchaseOrder.GetPurchaseNotifModelAsString());
 
             await _emailService.SendTemplatedEmailAsync(
-                purchaseOrder.Sender.Email,
-                purchaseOrder.Sender.Name,
-                $"Votre commande a été annulée par {purchaseOrder.Vendor.Name}",
+                purchaseOrder.SenderInfo.Email,
+                purchaseOrder.SenderInfo.Name,
+                $"Votre commande a été annulée par {purchaseOrder.VendorInfo.Name}",
                 nameof(PurchaseOrderRefusedEvent),
                 purchaseOrder.GetTemplateData($"{_configuration.GetValue<string>("Portal:url")}/#/my-orders/{purchaseOrder.Id}"),
                 true,

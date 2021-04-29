@@ -45,7 +45,7 @@ namespace Sheaft.Mediatr.PurchaseOrder.Commands
         public async Task<Result> Handle(ProcessPurchaseOrderCommand request, CancellationToken token)
         {
             var purchaseOrder = await _context.PurchaseOrders.SingleAsync(e => e.Id == request.PurchaseOrderId, token);
-            if(purchaseOrder.VendorId != request.RequestUser.Id)
+            if(purchaseOrder.ProducerId != request.RequestUser.Id)
                 return Failure(MessageKind.Forbidden);
             
             purchaseOrder.Process(request.SkipNotification);

@@ -34,12 +34,12 @@ namespace Sheaft.Mediatr.PurchaseOrder.EventHandlers
         {
             var orderEvent = notification.DomainEvent;
             var purchaseOrder = await _context.PurchaseOrders.SingleAsync(e => e.Id == orderEvent.PurchaseOrderId, token);
-            await _signalrService.SendNotificationToUserAsync(purchaseOrder.VendorId, "PurchaseOrderReceivedEvent", purchaseOrder.GetPurchaseNotifModelAsString());
+            await _signalrService.SendNotificationToUserAsync(purchaseOrder.ProducerId, "PurchaseOrderReceivedEvent", purchaseOrder.GetPurchaseNotifModelAsString());
 
             await _emailService.SendTemplatedEmailAsync(
-                purchaseOrder.Vendor.Email,
-                purchaseOrder.Vendor.Name,
-                $"{purchaseOrder.Sender.Name} a envoyé une commande pour le {purchaseOrder.ExpectedDelivery.ExpectedDeliveryDate:dd/MM/yyyy}",
+                purchaseOrder.VendorInfo.Email,
+                purchaseOrder.VendorInfo.Name,
+                $"{purchaseOrder.SenderInfo.Name} a envoyé une commande pour le {purchaseOrder.ExpectedDelivery.ExpectedDeliveryDate:dd/MM/yyyy}",
                 "PurchaseOrderReceivedEvent",
                 purchaseOrder.GetTemplateData($"{_configuration.GetValue<string>("Portal:url")}/#/purchase-orders/{purchaseOrder.Id}"),
                 true,

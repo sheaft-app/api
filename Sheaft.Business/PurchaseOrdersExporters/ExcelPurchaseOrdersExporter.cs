@@ -73,10 +73,10 @@ namespace Sheaft.Business.PurchaseOrdersExporters
             foreach (var purchaseOrder in purchaseOrders)
             {
                 purchaseOrdersWorksheet.Cells[i, 1].Value = purchaseOrder.CreatedOn.ToString("dd/MM/yyyy");
-                purchaseOrdersWorksheet.Cells[i, 2].Value = purchaseOrder.Sender.Name;
-                purchaseOrdersWorksheet.Cells[i, 3].Value = purchaseOrder.Sender.Email;
-                purchaseOrdersWorksheet.Cells[i, 4].Value = purchaseOrder.Sender.Phone;
-                purchaseOrdersWorksheet.Cells[i, 5].Value = purchaseOrder.Sender.Address;
+                purchaseOrdersWorksheet.Cells[i, 2].Value = purchaseOrder.SenderInfo.Name;
+                purchaseOrdersWorksheet.Cells[i, 3].Value = purchaseOrder.SenderInfo.Email;
+                purchaseOrdersWorksheet.Cells[i, 4].Value = purchaseOrder.SenderInfo.Phone;
+                purchaseOrdersWorksheet.Cells[i, 5].Value = purchaseOrder.SenderInfo.Address;
                 purchaseOrdersWorksheet.Cells[i, 6].Value = purchaseOrder.Reference;
                 purchaseOrdersWorksheet.Cells[i, 7].Value = purchaseOrder.TotalWholeSalePrice;
                 purchaseOrdersWorksheet.Cells[i, 8].Value = purchaseOrder.TotalVatPrice;

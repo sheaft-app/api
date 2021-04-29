@@ -49,7 +49,7 @@ namespace Sheaft.Mediatr.User.Commands
                 return Failure(MessageKind.Forbidden);
 
             var hasActiveOrders = await _context.PurchaseOrders.AnyAsync(
-                o => (o.VendorId == entity.Id || o.SenderId == entity.Id) && (int) o.Status < 6, token);
+                o => (o.ProducerId == entity.Id || o.ClientId == entity.Id) && (int) o.Status < 6, token);
             if (hasActiveOrders)
                 return Failure(MessageKind.Consumer_CannotBeDeleted_HasActiveOrders);
 

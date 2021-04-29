@@ -152,14 +152,14 @@ namespace Sheaft.Mediatr.User.Commands
             ordersWorksheet.Cells[3, 8].Value = "Quantité";
             ordersWorksheet.Cells[3, 9].Value = "Prix TTC";
 
-            var orders = await _context.PurchaseOrders.Where(o => o.SenderId == user.Id).ToListAsync(token);
+            var orders = await _context.PurchaseOrders.Where(o => o.ClientId == user.Id).ToListAsync(token);
             var i = 4;
             foreach (var order in orders)
             {
                 foreach (var product in order.Products)
                 {
                     ordersWorksheet.Cells[i, 1].Value = order.Reference;
-                    ordersWorksheet.Cells[i, 2].Value = order.Vendor.Name;
+                    ordersWorksheet.Cells[i, 2].Value = order.VendorInfo.Name;
                     ordersWorksheet.Cells[i, 3].Value = order.Status.ToString("G");
                     ordersWorksheet.Cells[i, 4].Value = order.CreatedOn.ToString("dd/MM/yyyy");
                     ordersWorksheet.Cells[i, 5].Value =

@@ -56,7 +56,6 @@ namespace Sheaft.Domain
         public string Facebook { get; private set; }
         public string Twitter { get; private set; }
         public string Instagram { get; private set; }
-        public Guid? LegalId { get; protected set; }
         public virtual UserAddress Address { get; private set; }
         public virtual Legal Legal { get; protected set; }
         public virtual IReadOnlyCollection<UserPoint> Points => _points.AsReadOnly();

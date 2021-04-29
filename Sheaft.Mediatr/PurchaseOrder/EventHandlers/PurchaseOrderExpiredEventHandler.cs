@@ -37,13 +37,13 @@ namespace Sheaft.Mediatr.PurchaseOrder.EventHandlers
 
         private async Task NotifyConsumerAsync(Domain.PurchaseOrder purchaseOrder, CancellationToken token)
         {
-            await _signalrService.SendNotificationToUserAsync(purchaseOrder.SenderId,
+            await _signalrService.SendNotificationToUserAsync(purchaseOrder.ClientId,
                 nameof(PurchaseOrderExpiredEvent),
                 purchaseOrder.GetPurchaseNotifModelAsString());
 
             await _emailService.SendTemplatedEmailAsync(
-                purchaseOrder.Sender.Email,
-                purchaseOrder.Sender.Name,
+                purchaseOrder.SenderInfo.Email,
+                purchaseOrder.SenderInfo.Name,
                 $"Votre commande a expirée",
                 nameof(PurchaseOrderExpiredEvent),
                 purchaseOrder.GetTemplateData(
@@ -54,13 +54,13 @@ namespace Sheaft.Mediatr.PurchaseOrder.EventHandlers
 
         private async Task NotifyProducerAsync(Domain.PurchaseOrder purchaseOrder, CancellationToken token)
         {
-            await _signalrService.SendNotificationToGroupAsync(purchaseOrder.VendorId, "PurchaseOrderWithdrawnEvent",
+            await _signalrService.SendNotificationToGroupAsync(purchaseOrder.ProducerId, "PurchaseOrderWithdrawnEvent",
                 purchaseOrder.GetPurchaseNotifModelAsString());
 
             var url = $"{_configuration.GetValue<string>("Portal:url")}/#/purchase-orders/{purchaseOrder.Id}";
             await _emailService.SendTemplatedEmailAsync(
-                purchaseOrder.Vendor.Email,
-                purchaseOrder.Vendor.Name,
+                purchaseOrder.VendorInfo.Email,
+                purchaseOrder.VendorInfo.Name,
                 $"Votre commande a expirée",
                 nameof(PurchaseOrderExpiredEvent),
                 purchaseOrder.GetTemplateData(url),

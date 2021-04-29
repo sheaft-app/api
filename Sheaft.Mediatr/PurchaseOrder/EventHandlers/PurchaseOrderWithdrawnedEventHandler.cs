@@ -31,21 +31,21 @@ namespace Sheaft.Mediatr.PurchaseOrder.EventHandlers
             var orderEvent = notification.DomainEvent;
             var purchaseOrder = await _context.PurchaseOrders.SingleAsync(e => e.Id == orderEvent.PurchaseOrderId, token);
             
-            await _signalrService.SendNotificationToGroupAsync(purchaseOrder.VendorId, nameof(PurchaseOrderWithdrawnedEvent), purchaseOrder.GetPurchaseNotifModelAsString());
+            await _signalrService.SendNotificationToGroupAsync(purchaseOrder.ProducerId, nameof(PurchaseOrderWithdrawnedEvent), purchaseOrder.GetPurchaseNotifModelAsString());
 
             await _emailService.SendTemplatedEmailAsync(
-                purchaseOrder.Sender.Email,
-                purchaseOrder.Sender.Name,
-                $"Votre commande pour {purchaseOrder.Vendor.Name} prévue pour le {purchaseOrder.ExpectedDelivery.ExpectedDeliveryDate:dd/MM/yyyy} a bien été annulée",
+                purchaseOrder.SenderInfo.Email,
+                purchaseOrder.SenderInfo.Name,
+                $"Votre commande pour {purchaseOrder.VendorInfo.Name} prévue pour le {purchaseOrder.ExpectedDelivery.ExpectedDeliveryDate:dd/MM/yyyy} a bien été annulée",
                 nameof(PurchaseOrderWithdrawnedEvent),
                 purchaseOrder.GetTemplateData($"{_configuration.GetValue<string>("Portal:url")}/#/my-orders/{purchaseOrder.Id}"),
                 true,
                 token);
             
             await _emailService.SendTemplatedEmailAsync(
-                purchaseOrder.Vendor.Email,
-                purchaseOrder.Vendor.Name,
-                $"{purchaseOrder.Sender.Name} a annulé sa commande pour le {purchaseOrder.ExpectedDelivery.ExpectedDeliveryDate:dd/MM/yyyy}",
+                purchaseOrder.VendorInfo.Email,
+                purchaseOrder.VendorInfo.Name,
+                $"{purchaseOrder.SenderInfo.Name} a annulé sa commande pour le {purchaseOrder.ExpectedDelivery.ExpectedDeliveryDate:dd/MM/yyyy}",
                 nameof(PurchaseOrderWithdrawnedEvent),
                 purchaseOrder.GetTemplateData($"{_configuration.GetValue<string>("Portal:url")}/#/purchase-orders/{purchaseOrder.Id}"),
                 true,

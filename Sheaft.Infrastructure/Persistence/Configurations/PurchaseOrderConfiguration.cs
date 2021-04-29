@@ -1,3 +1,4 @@
+using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Sheaft.Domain;
@@ -14,7 +15,7 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
         }
 
         public void Configure(EntityTypeBuilder<PurchaseOrder> entity)
-        {
+        { 
             entity.Property(c => c.CreatedOn);
             entity.Property(c => c.UpdatedOn).IsConcurrencyToken();
             
@@ -40,8 +41,16 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
 
             entity.HasMany(o => o.Products).WithOne().HasForeignKey(c=>c.PurchaseOrderId).OnDelete(DeleteBehavior.Cascade).IsRequired();
 
-            entity.HasOne(c => c.Vendor).WithOne().HasForeignKey<PurchaseOrder>(c=>c.VendorId).OnDelete(DeleteBehavior.Cascade).IsRequired();
-            entity.HasOne(c => c.Sender).WithOne().HasForeignKey<PurchaseOrder>(c=>c.SenderId).OnDelete(DeleteBehavior.Cascade).IsRequired();
+            entity.OwnsOne(c => c.VendorInfo, c =>
+            {
+                c.Property(e => e.Name).IsRequired();
+                c.Property(e => e.Email).IsRequired();
+            });
+            entity.OwnsOne(c => c.SenderInfo, c =>
+            {
+                c.Property(e => e.Name).IsRequired();
+                c.Property(e => e.Email).IsRequired();
+            });
             entity.OwnsOne(c => c.ExpectedDelivery, cb =>
             {
                 cb.OwnsOne(ca => ca.Address);
@@ -54,7 +63,7 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
 
             entity.HasKey(c=>c.Id);
 
-            entity.HasIndex(c=> new {PurchaseOrderVendorId = c.VendorId, c.Reference}).IsUnique();
+            entity.HasIndex(c=> new {c.ProducerId, c.Reference}).IsUnique();
             entity.ToTable("PurchaseOrders");
         }
     }

@@ -46,7 +46,7 @@ namespace Sheaft.Mediatr.PurchaseOrder.Commands
         public async Task<Result> Handle(AcceptPurchaseOrderCommand request, CancellationToken token)
         {
             var purchaseOrder = await _context.PurchaseOrders.SingleAsync(e => e.Id == request.PurchaseOrderId, token);
-            if(purchaseOrder.VendorId != request.RequestUser.Id)
+            if(purchaseOrder.ProducerId != request.RequestUser.Id)
                 return Failure(MessageKind.Forbidden);
             
             purchaseOrder.Accept(request.SkipNotification);
@@ -56,7 +56,7 @@ namespace Sheaft.Mediatr.PurchaseOrder.Commands
             var order = await _context.Orders.SingleAsync(
                 o => o.PurchaseOrders.Any(po => po.Id == purchaseOrder.Id),
                 token);
-            var delivery = order.Deliveries.FirstOrDefault(d => d.DeliveryMode.ProducerId == purchaseOrder.Vendor.Id);
+            var delivery = order.Deliveries.FirstOrDefault(d => d.DeliveryMode.ProducerId == purchaseOrder.ProducerId);
             if (delivery.DeliveryMode.AutoCompleteRelatedPurchaseOrder)
                 _mediatr.Post(new CompletePurchaseOrderCommand(request.RequestUser)
                     {PurchaseOrderId = purchaseOrder.Id, SkipNotification = request.SkipNotification});

@@ -216,7 +216,7 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                         .HasColumnType("datetimeoffset");
 
                     b.Property<string>("Identifier")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<DateTimeOffset?>("ProcessedOn")
                         .HasColumnType("datetimeoffset");
@@ -1423,6 +1423,9 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                     b.Property<DateTimeOffset?>("AcceptedOn")
                         .HasColumnType("datetimeoffset");
 
+                    b.Property<Guid>("ClientId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<string>("Comment")
                         .HasColumnType("nvarchar(max)");
 
@@ -1445,6 +1448,9 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                     b.Property<Guid>("OrderId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<Guid>("ProducerId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<int>("ProductsCount")
                         .HasColumnType("int");
 
@@ -1460,9 +1466,6 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
 
                     b.Property<int>("ReturnablesCount")
                         .HasColumnType("int");
-
-                    b.Property<Guid>("SenderId")
-                        .HasColumnType("uniqueidentifier");
 
                     b.Property<int>("Status")
                         .HasColumnType("int");
@@ -1501,20 +1504,11 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                         .IsConcurrencyToken()
                         .HasColumnType("datetimeoffset");
 
-                    b.Property<Guid>("VendorId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.HasKey("Id");
 
                     b.HasIndex("OrderId");
 
-                    b.HasIndex("SenderId")
-                        .IsUnique();
-
-                    b.HasIndex("VendorId")
-                        .IsUnique();
-
-                    b.HasIndex("VendorId", "Reference")
+                    b.HasIndex("ProducerId", "Reference")
                         .IsUnique();
 
                     b.ToTable("PurchaseOrders");
@@ -1606,68 +1600,6 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                     b.HasKey("PurchaseOrderId", "Id");
 
                     b.ToTable("PurchaseOrderProducts");
-                });
-
-            modelBuilder.Entity("Sheaft.Domain.PurchaseOrderSender", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Address")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Email")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("Kind")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Phone")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Picture")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("PurchaseOrderSenders");
-                });
-
-            modelBuilder.Entity("Sheaft.Domain.PurchaseOrderVendor", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Address")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Email")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("Kind")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Phone")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Picture")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("PurchaseOrderVendors");
                 });
 
             modelBuilder.Entity("Sheaft.Domain.QuickOrder", b =>
@@ -2241,9 +2173,6 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                     b.Property<string>("LastName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<Guid?>("LegalId")
-                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -3369,18 +3298,6 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
-                    b.HasOne("Sheaft.Domain.PurchaseOrderSender", "Sender")
-                        .WithOne()
-                        .HasForeignKey("Sheaft.Domain.PurchaseOrder", "SenderId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Sheaft.Domain.PurchaseOrderVendor", "Vendor")
-                        .WithOne()
-                        .HasForeignKey("Sheaft.Domain.PurchaseOrder", "VendorId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.OwnsOne("Sheaft.Domain.ExpectedPurchaseOrderDelivery", "ExpectedDelivery", b1 =>
                         {
                             b1.Property<Guid>("PurchaseOrderId")
@@ -3451,11 +3368,77 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                             b1.Navigation("Address");
                         });
 
+                    b.OwnsOne("Sheaft.Domain.PurchaseOrderSender", "SenderInfo", b1 =>
+                        {
+                            b1.Property<Guid>("PurchaseOrderId")
+                                .HasColumnType("uniqueidentifier");
+
+                            b1.Property<string>("Address")
+                                .HasColumnType("nvarchar(max)");
+
+                            b1.Property<string>("Email")
+                                .IsRequired()
+                                .HasColumnType("nvarchar(max)");
+
+                            b1.Property<int>("Kind")
+                                .HasColumnType("int");
+
+                            b1.Property<string>("Name")
+                                .IsRequired()
+                                .HasColumnType("nvarchar(max)");
+
+                            b1.Property<string>("Phone")
+                                .HasColumnType("nvarchar(max)");
+
+                            b1.Property<string>("Picture")
+                                .HasColumnType("nvarchar(max)");
+
+                            b1.HasKey("PurchaseOrderId");
+
+                            b1.ToTable("PurchaseOrders");
+
+                            b1.WithOwner()
+                                .HasForeignKey("PurchaseOrderId");
+                        });
+
+                    b.OwnsOne("Sheaft.Domain.PurchaseOrderVendor", "VendorInfo", b1 =>
+                        {
+                            b1.Property<Guid>("PurchaseOrderId")
+                                .HasColumnType("uniqueidentifier");
+
+                            b1.Property<string>("Address")
+                                .HasColumnType("nvarchar(max)");
+
+                            b1.Property<string>("Email")
+                                .IsRequired()
+                                .HasColumnType("nvarchar(max)");
+
+                            b1.Property<int>("Kind")
+                                .HasColumnType("int");
+
+                            b1.Property<string>("Name")
+                                .IsRequired()
+                                .HasColumnType("nvarchar(max)");
+
+                            b1.Property<string>("Phone")
+                                .HasColumnType("nvarchar(max)");
+
+                            b1.Property<string>("Picture")
+                                .HasColumnType("nvarchar(max)");
+
+                            b1.HasKey("PurchaseOrderId");
+
+                            b1.ToTable("PurchaseOrders");
+
+                            b1.WithOwner()
+                                .HasForeignKey("PurchaseOrderId");
+                        });
+
                     b.Navigation("ExpectedDelivery");
 
-                    b.Navigation("Sender");
+                    b.Navigation("SenderInfo");
 
-                    b.Navigation("Vendor");
+                    b.Navigation("VendorInfo");
                 });
 
             modelBuilder.Entity("Sheaft.Domain.PurchaseOrderProduct", b =>

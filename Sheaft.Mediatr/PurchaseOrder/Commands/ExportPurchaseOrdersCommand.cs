@@ -74,7 +74,7 @@ namespace Sheaft.Mediatr.PurchaseOrder.Commands
                 _mediatr.Post(new PurchaseOrdersExportProcessingEvent(job.Id));
 
                 var purchaseOrdersQuery = _context.Set<Domain.PurchaseOrder>().Where(o =>
-                    o.VendorId == request.RequestUser.Id
+                    o.ProducerId == request.RequestUser.Id
                     && o.CreatedOn >= request.From
                     && o.CreatedOn <= request.To);
 

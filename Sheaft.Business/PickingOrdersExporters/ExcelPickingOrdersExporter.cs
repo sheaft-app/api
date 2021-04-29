@@ -46,8 +46,8 @@ namespace Sheaft.Business.PickingOrdersExporters
             {
                 Reference = o.Reference,
                 ExpectedDeliveryDate = o.ExpectedDelivery.ExpectedDeliveryDate.ToString("dd/MM/yyyy"),
-                SenderId = o.Sender.Id,
-                SenderName = o.Sender.Name,
+                SenderId = o.ClientId,
+                SenderName = o.SenderInfo.Name,
                 Products = o.Products.Select(GetLightProduct)
             });
 

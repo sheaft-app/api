@@ -85,8 +85,8 @@ namespace Sheaft.Business.TransactionsExporters
                 foreach (var transfer in payout.Transfers)
                 {
                     payoutsWorksheet.Cells[i, 3].Value = transfer.PurchaseOrder.Reference;
-                    payoutsWorksheet.Cells[i, 4].Value = transfer.PurchaseOrder.Sender.Name;
-                    payoutsWorksheet.Cells[i, 5].Value = transfer.PurchaseOrder.Sender.Email;
+                    payoutsWorksheet.Cells[i, 4].Value = transfer.PurchaseOrder.SenderInfo.Name;
+                    payoutsWorksheet.Cells[i, 5].Value = transfer.PurchaseOrder.SenderInfo.Email;
                     payoutsWorksheet.Cells[i, 6].Value = transfer.PurchaseOrder.ExpectedDelivery.ExpectedDeliveryDate;
                     payoutsWorksheet.Cells[i, 7].Value = transfer.PurchaseOrder.TotalWholeSalePrice;
                     payoutsWorksheet.Cells[i, 8].Value = transfer.PurchaseOrder.TotalOnSalePrice;
