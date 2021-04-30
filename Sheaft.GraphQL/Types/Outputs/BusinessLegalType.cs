@@ -11,7 +11,7 @@ namespace Sheaft.GraphQL.Types.Outputs
             descriptor.Field(c => c.Kind);
             descriptor.Field(c => c.Validation);
             descriptor.Field(c => c.Email);
-            descriptor.Field(c => c.Address).Type<AddressType>();
+            descriptor.Field(c => c.Address).Type<UserAddressType>();
             descriptor.Field(c => c.UboDeclaration).Type<UboDeclarationType>();
             descriptor.Field(c => c.Owner).Type<OwnerType>();
         }

@@ -17,7 +17,7 @@ namespace Sheaft.GraphQL.Types.Outputs
             descriptor.Field(c => c.Name);
 
             descriptor.Field(c => c.Address)
-                .Type<AddressType>();
+                .Type<UserAddressType>();
         }
     }
 }

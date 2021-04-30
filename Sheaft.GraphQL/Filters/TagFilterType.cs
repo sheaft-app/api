@@ -1,11 +1,12 @@
 ﻿using HotChocolate.Data.Filters;
 using Sheaft.Application.Models;
+using Sheaft.Domain;
 
 namespace Sheaft.GraphQL.Filters
 {
-    public class TagFilterType : FilterInputType<TagDto>
+    public class TagFilterType : FilterInputType<Tag>
     {
-        protected override void Configure(IFilterInputTypeDescriptor<TagDto> descriptor)
+        protected override void Configure(IFilterInputTypeDescriptor<Tag> descriptor)
         {
             descriptor.Name("TagFilter");
             descriptor.BindFieldsExplicitly();

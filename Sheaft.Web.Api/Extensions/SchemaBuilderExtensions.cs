@@ -11,7 +11,7 @@ namespace Sheaft.Web.Api.Extensions
     {
         public static IRequestExecutorBuilder RegisterGraphQlTypes(this IRequestExecutorBuilder services)
         {
-            var types = typeof(AddressType).Assembly.GetExportedTypes()
+            var types = typeof(UserAddressType).Assembly.GetExportedTypes()
                 .Where(t => 
                     !t.IsGenericType &&
                     (t.Namespace.Contains(nameof(GraphQL.Enums))

@@ -1,11 +1,12 @@
 ﻿using HotChocolate.Data.Filters;
 using Sheaft.Application.Models;
+using Sheaft.Domain;
 
 namespace Sheaft.GraphQL.Filters
 {
-    public class AgreementFilterType : FilterInputType<AgreementDto>
+    public class AgreementFilterType : FilterInputType<Agreement>
     {
-        protected override void Configure(IFilterInputTypeDescriptor<AgreementDto> descriptor)
+        protected override void Configure(IFilterInputTypeDescriptor<Agreement> descriptor)
         {
             descriptor.Name("AgreementFilter");
             descriptor.BindFieldsExplicitly();

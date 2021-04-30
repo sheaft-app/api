@@ -17,7 +17,7 @@ namespace Sheaft.GraphQL.Common
         private readonly ICurrentUserService _currentUserService;
         private readonly IHttpContextAccessor _httpContextAccessor;
 
-        private RequestUser CurrentUser => _currentUserService.GetCurrentUserInfo().Data;
+        //private RequestUser CurrentUser => _currentUserService.GetCurrentUserInfo().Data;
 
         public SheaftErrorFilter(
             ICurrentUserService currentUserService,
@@ -124,9 +124,9 @@ namespace Sheaft.GraphQL.Common
             var parameters = new Dictionary<string, object>
             {
                 {"RequestId", _httpContextAccessor.HttpContext.TraceIdentifier},
-                {"UserIdentifier", CurrentUser.Id.ToString("N")},
-                {"IsAuthenticated", CurrentUser.IsAuthenticated.ToString()},
-                {"Roles", string.Join(";", CurrentUser.Roles)},
+                // {"UserIdentifier", CurrentUser.Id.ToString("N")},
+                // {"IsAuthenticated", CurrentUser.IsAuthenticated.ToString()},
+                // {"Roles", string.Join(";", CurrentUser.Roles)},
                 {"StatusCode", statusCode},
                 {"ExceptionKind", kind},
                 {"ExceptionMessage", message},

@@ -1,13 +1,16 @@
 ﻿using HotChocolate.Types;
 using Sheaft.Application.Models;
 using Sheaft.Application.Security;
+using Sheaft.Domain;
 
 namespace Sheaft.GraphQL.Types.Outputs
 {
-    public class UserType : SheaftOutputType<UserDto>
+    public class UserType : SheaftOutputType<User>
     {
-        protected override void Configure(IObjectTypeDescriptor<UserDto> descriptor)
+        protected override void Configure(IObjectTypeDescriptor<User> descriptor)
         {
+            base.Configure(descriptor);
+
             descriptor.Field(c => c.Id).Type<NonNullType<IdType>>();
             descriptor.Field(c => c.Kind);
             descriptor.Field(c => c.Picture);
@@ -30,8 +33,8 @@ namespace Sheaft.GraphQL.Types.Outputs
             descriptor.Field(c => c.LastName)
                 .Type<NonNullType<StringType>>();
 
-            descriptor.Field(c => c.Address)
-                .Type<NonNullType<AddressType>>();
+            // descriptor.Field(c => c.Address)
+            //     .Type<NonNullType<AddressType>>();
             
             descriptor.Field(c => c.Summary);
             descriptor.Field(c => c.Description);

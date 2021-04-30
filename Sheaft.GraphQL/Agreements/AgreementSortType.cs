@@ -4,9 +4,9 @@ using Sheaft.Domain;
 
 namespace Sheaft.GraphQL.Sorts
 {
-    public class AgreementSortType : SortInputType<AgreementDto>
+    public class AgreementSortType : SortInputType<Agreement>
     {
-        protected override void Configure(ISortInputTypeDescriptor<AgreementDto> descriptor)
+        protected override void Configure(ISortInputTypeDescriptor<Agreement> descriptor)
         {
             descriptor.Name("AgreementSort");
             descriptor.BindFieldsExplicitly();

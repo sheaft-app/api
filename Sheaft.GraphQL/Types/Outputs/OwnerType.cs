@@ -21,7 +21,7 @@ namespace Sheaft.GraphQL.Types.Outputs
                 .Type<NonNullType<CountryIsoCodeEnumType>>();
 
             descriptor.Field(c => c.Address)
-                .Type<AddressType>();
+                .Type<UserAddressType>();
         }
     }
 }

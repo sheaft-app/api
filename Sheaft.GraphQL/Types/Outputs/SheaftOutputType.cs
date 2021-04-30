@@ -11,6 +11,12 @@ namespace Sheaft.GraphQL.Types.Outputs
 {
     public abstract class SheaftOutputType<T> : ObjectType<T>
     {
+        protected override void Configure(IObjectTypeDescriptor<T> descriptor)
+        {
+            base.Configure(descriptor);
+            descriptor.BindFieldsExplicitly();
+        }
+
         protected RequestUser GetRequestUser(IResolverContext context)
         {
             return GetRequestUser(context.ContextData);

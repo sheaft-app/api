@@ -11,15 +11,15 @@ namespace Sheaft.GraphQL.Types.Inputs
 {
     public abstract class SheaftInputType<T> : InputObjectType<T>
     {
-        protected RequestUser GetRequestUser(IResolverContext context)
-        {
-            return GetRequestUser(context.ContextData);
-        }
-        protected RequestUser GetRequestUser(IDictionary<string, object> contextData)
-        {
-            var userDatas = (ClaimsPrincipal)contextData.FirstOrDefault(c => c.Key == nameof(ClaimsPrincipal)).Value;
-            var httpDatas = (HttpContext)contextData.FirstOrDefault(c => c.Key == nameof(HttpContext)).Value;
-            return userDatas.ToIdentityUser(httpDatas.TraceIdentifier);
-        }
+        // protected RequestUser GetRequestUser(IResolverContext context)
+        // {
+        //     return GetRequestUser(context.ContextData);
+        // }
+        // protected RequestUser GetRequestUser(IDictionary<string, object> contextData)
+        // {
+        //     var userDatas = (ClaimsPrincipal)contextData.FirstOrDefault(c => c.Key == nameof(ClaimsPrincipal)).Value;
+        //     var httpDatas = (HttpContext)contextData.FirstOrDefault(c => c.Key == nameof(HttpContext)).Value;
+        //     return userDatas.ToIdentityUser(httpDatas.TraceIdentifier);
+        // }
     }
 }

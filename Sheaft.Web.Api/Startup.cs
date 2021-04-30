@@ -57,7 +57,19 @@ using Sheaft.Business.PurchaseOrdersExporters;
 using Sheaft.Business.TransactionsExporters;
 using Sheaft.Domain;
 using Sheaft.Domain.Enum;
+using Sheaft.GraphQL;
+using Sheaft.GraphQL.BusinessClosings;
+using Sheaft.GraphQL.Catalogs;
 using Sheaft.GraphQL.Common;
+using Sheaft.GraphQL.DataLoaders;
+using Sheaft.GraphQL.DeliveryModes;
+using Sheaft.GraphQL.OpeningHours;
+using Sheaft.GraphQL.Producers;
+using Sheaft.GraphQL.Products;
+using Sheaft.GraphQL.ProfilePictures;
+using Sheaft.GraphQL.Ratings;
+using Sheaft.GraphQL.Returnables;
+using Sheaft.GraphQL.Tags;
 using Sheaft.GraphQL.Types.Outputs;
 using Sheaft.Infrastructure.Persistence.Extensions;
 using Sheaft.Mediatr;
@@ -382,16 +394,43 @@ namespace Sheaft.Web.Api
             services.AddTransient(typeof(IPipelineBehavior<,>), typeof(LoggingBehaviour<,>));
 
             services.AddMemoryCache();
-            
+
             services.AddGraphQLServer()
                 .AddAuthorization()
-                .AddQueryType<SheaftQueryType>()
-                .AddMutationType<SheaftMutationType>()
+                .AddQueryType(c => c.Name("Query"))
+                .AddTypeExtension<Sheaft.GraphQL.Agreements.AgreementQueries>()
                 .AddFiltering()
                 .AddSorting()
-                .AddProjections()
-                .RegisterGraphQlTypes()
-                .ModifyOptions(c => c.DefaultBindingBehavior = BindingBehavior.Explicit);
+                .EnableRelaySupport()
+                //.RegisterGraphQlTypes();
+                .AddType<UserType>()
+                .AddType<UserAddressType>()
+                .AddType<AgreementType>()
+                .AddType<DeliveryType>()
+                .AddType<ProducerType>()
+                .AddType<StoreType>()
+                .AddType<CatalogType>()
+                .AddType<DeliveryClosingType>()
+                .AddType<BusinessClosingType>()
+                .AddType<ProfilePictureType>()
+                .AddType<ProductPictureType>()
+                .AddType<TagType>()
+                .AddType<ProductType>()
+                .AddType<ReturnableType>()
+                .AddType<RatingType>()
+                .AddDataLoader<AgreementsByIdBatchDataLoader>()
+                .AddDataLoader<BusinessClosingsByIdBatchDataLoader>()
+                .AddDataLoader<CatalogsByIdBatchDataLoader>()
+                .AddDataLoader<DeliveryModesByIdBatchDataLoader>()
+                .AddDataLoader<OpeningHoursByIdBatchDataLoader>()
+                .AddDataLoader<ProducersByIdBatchDataLoader>()
+                .AddDataLoader<ProfilePicturesByIdBatchDataLoader>()
+                .AddDataLoader<StoresByIdBatchDataLoader>()
+                .AddDataLoader<ReturnablesByIdBatchDataLoader>()
+                .AddDataLoader<ProductPicturesByIdBatchDataLoader>()
+                .AddDataLoader<ProductsByIdBatchDataLoader>()
+                .AddDataLoader<RatingsByIdBatchDataLoader>()
+                .AddDataLoader<TagsByIdBatchDataLoader>();
 
             services.AddErrorFilter<SheaftErrorFilter>();
 

@@ -1,81 +1,239 @@
-﻿using HotChocolate.Types;
-using HotChocolate.Types.Relay;
-using Sheaft.Application.Interfaces.Queries;
-using Sheaft.Application.Models;
-using Sheaft.Application.Security;
-using Sheaft.GraphQL.Filters;
-using Sheaft.GraphQL.Sorts;
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using HotChocolate;
+using HotChocolate.Resolvers;
+using HotChocolate.Types;
+using Microsoft.EntityFrameworkCore;
+using Sheaft.Application.Interfaces.Infrastructure;
+using Sheaft.Domain;
+using Sheaft.GraphQL.Producers;
+using Sheaft.GraphQL.Products;
+using Sheaft.GraphQL.ProfilePictures;
+using Sheaft.GraphQL.Ratings;
+using Sheaft.GraphQL.Returnables;
+using Sheaft.GraphQL.Tags;
+using Sheaft.Infrastructure.Persistence;
 
 namespace Sheaft.GraphQL.Types.Outputs
 {
-    public class ProductType : SheaftOutputType<ProductDto>
+    public class ProductType : SheaftOutputType<Product>
     {
-        protected override void Configure(IObjectTypeDescriptor<ProductDto> descriptor)
+        protected override void Configure(IObjectTypeDescriptor<Product> descriptor)
         {
-            descriptor.Field(c => c.Id).Type<NonNullType<IdType>>();
-            descriptor.Field(c => c.CreatedOn);
-            descriptor.Field(c => c.Vat);
-            descriptor.Field(c => c.Available);
-            descriptor.Field(c => c.RatingsCount);
-            descriptor.Field(c => c.QuantityPerUnit);
-            descriptor.Field(c => c.Unit);
-            descriptor.Field(c => c.Conditioning);
-            descriptor.Field(c => c.UpdatedOn);
-            descriptor.Field(c => c.Description);
-            descriptor.Field(c => c.Weight);
-            descriptor.Field(c => c.Rating);
-            descriptor.Field(c => c.Picture);
-            descriptor.Field(c => c.ImageLarge);
-            descriptor.Field(c => c.ImageMedium);
-            descriptor.Field(c => c.ImageSmall);
-            descriptor.Field(c => c.IsReturnable);
-            descriptor.Field(c => c.VisibleToConsumers);
-            descriptor.Field(c => c.VisibleToStores);
-            descriptor.Field(c => c.VatPricePerUnit);
-            descriptor.Field(c => c.OnSalePricePerUnit);
-            descriptor.Field(c => c.WholeSalePricePerUnit);
-            descriptor.Field(c => c.OnSalePrice);
-            descriptor.Field(c => c.WholeSalePrice);
-            descriptor.Field(c => c.VatPrice);
-            
-            descriptor.Field("currentUserHasRatedProduct")
+            base.Configure(descriptor);
+
+            descriptor
+                .ImplementsNode()
+                .IdField(c => c.Id)
+                .ResolveNode((ctx, id) =>
+                    ctx.DataLoader<ProductsByIdBatchDataLoader>().LoadAsync(id, ctx.RequestAborted));
+
+            descriptor
+                .Field(c => c.Name)
+                .Name("name")
+                .Type<NonNullType<StringType>>();
+
+            descriptor
+                .Field(c => c.Reference)
+                .Name("reference")
+                .Type<NonNullType<StringType>>();
+
+            descriptor
+                .Field(c => c.CreatedOn)
+                .Name("createdOn");
+
+            descriptor
+                .Field(c => c.UpdatedOn)
+                .Name("updatedOn");
+
+            descriptor
+                .Field(c => c.Vat)
+                .Name("vat");
+
+            descriptor
+                .Field(c => c.Available)
+                .Name("available");
+
+            descriptor
+                .Field(c => c.RatingsCount)
+                .Name("ratingsCount");
+
+            descriptor
+                .Field(c => c.QuantityPerUnit)
+                .Name("quantityPerUnit");
+
+            descriptor
+                .Field(c => c.Unit)
+                .Name("unit");
+
+            descriptor
+                .Field(c => c.Conditioning)
+                .Name("conditioning");
+
+            descriptor
+                .Field(c => c.Description)
+                .Name("description");
+
+            descriptor
+                .Field(c => c.Weight)
+                .Name("weight");
+
+            descriptor
+                .Field(c => c.Rating)
+                .Name("rating");
+
+            descriptor
+                .Field(c => c.Picture)
+                .Name("picture");
+
+            // descriptor
+            //     .Field("imageLarge");
+            //
+            // descriptor
+            //     .Field("imageMedium");
+            //
+            // descriptor
+            //     .Field("imageSmall");
+            //
+            // descriptor
+            //     .Field("isReturnable");
+            //
+            // descriptor
+            //     .Field("visibleToConsumers");
+            //
+            // descriptor
+            //     .Field("visibleToStores");
+
+            // descriptor
+            //     .Field(c => c.VatPricePerUnit)
+            //     .Name("vatPricePerUnit");
+            //
+            // descriptor
+            //     .Field(c => c.OnSalePricePerUnit)
+            //     .Name("onSalePricePerUnit");
+            //
+            // descriptor
+            //     .Field(c => c.WholeSalePricePerUnit)
+            //     .Name("wholeSalePricePerUnit");
+            //
+            // descriptor
+            //     .Field(c => c.OnSalePrice)
+            //     .Name("onSalePrice");
+            //
+            // descriptor
+            //     .Field(c => c.WholeSalePrice)
+            //     .Name("wholeSalePrice");
+            //
+            // descriptor
+            //     .Field(c => c.VatPrice)
+            //     .Name("vatPrice");
+
+            // descriptor
+            //     .Field(c => c.CatalogsPrices)
+            //     .Name("catalogPrices")
+            //     .Type<ListType<CatalogPriceType>>();
+
+            descriptor
+                .Field("currentUserHasRatedProduct")
                 .Type<NonNullType<BooleanType>>()
-                .Resolve(async c =>
-                {
-                    var user = GetRequestUser(c.ContextData);
-                    if (!user.IsAuthenticated)
-                        return false;
+                .UseDbContext<AppDbContext>()
+                .ResolveWith<ProductResolvers>(c => c.ProductIsRatedByUser(default, default, default!, default));
 
-                    return await c.Service<IProductQueries>().ProductIsRatedByUserAsync(c.Parent<ProductDto>().Id, user.Id, user, c.RequestAborted);
-                });
-
-            descriptor.Field(c => c.Name)
-                .Type<NonNullType<StringType>>();
-
-            descriptor.Field(c => c.Reference)
-                .Type<NonNullType<StringType>>();
-
-            descriptor.Field(c => c.Returnable)
+            descriptor
+                .Field(c => c.Returnable)
+                .Name("returnable")
+                .ResolveWith<ProductResolvers>(c => c.GetReturnable(default!, default!, default))
                 .Type<ReturnableType>();
 
-            descriptor.Field(c => c.Producer)
-                .Type<NonNullType<UserType>>();
+            descriptor
+                .Field(c => c.Producer)
+                .Name("producer")
+                .ResolveWith<ProductResolvers>(c => c.GetProducer(default!, default!, default))
+                .Type<ProducerType>();
+
+            descriptor
+                .Field(c => c.Tags)
+                .Name("tags")
+                .UseDbContext<AppDbContext>()
+                .ResolveWith<ProductResolvers>(c => c.GetTags(default!, default!, default!, default))
+                .Type<ListType<TagType>>();
+
+            descriptor
+                .Field(c => c.Ratings)
+                .Name("ratings")
+                .UseDbContext<AppDbContext>()
+                .ResolveWith<ProductResolvers>(c => c.GetRatings(default!, default!, default, default))
+                .Type<ListType<RatingType>>();
+
+            descriptor
+                .Field(c => c.Pictures)
+                .Name("pictures")
+                .UseDbContext<AppDbContext>()
+                .ResolveWith<ProductResolvers>(c => c.GetPictures(default!, default!, default, default))
+                .Type<ListType<ProfilePictureType>>();
+        }
+
+        private class ProductResolvers
+        {
+            public Task<bool> ProductIsRatedByUser(Product product, [ScopedService] AppDbContext context,
+                [Service] ICurrentUserService currentUserService, CancellationToken token)
+            {
+                var currentUserResult = currentUserService.GetCurrentUserInfo();
+                if (!currentUserResult.Succeeded)
+                    return null;
+
+                return context.Set<Rating>()
+                    .AnyAsync(r => r.ProductId == product.Id && r.UserId == currentUserResult.Data.Id, token);
+            }
+
+            public async Task<IEnumerable<ProductPicture>> GetPictures(Product product, [ScopedService] AppDbContext context,
+                ProductPicturesByIdBatchDataLoader picturesDataLoader, CancellationToken token)
+            {
+                var picturesId = await context.Set<ProductPicture>()
+                    .Where(p => p.ProductId == product.Id)
+                    .Select(p => p.Id)
+                    .ToListAsync(token);
+
+                return await picturesDataLoader.LoadAsync(picturesId, token);
+            }
+
+            public async Task<IEnumerable<Tag>> GetTags(Product product, [ScopedService] AppDbContext context,
+                TagsByIdBatchDataLoader tagsDataLoader, CancellationToken token)
+            {
+                var tagsId = await context.Set<ProductTag>()
+                    .Where(p => p.ProductId == product.Id)
+                    .Select(p => p.TagId)
+                    .ToListAsync(token);
+
+                return await tagsDataLoader.LoadAsync(tagsId, token);
+            }
+
+            public async Task<IEnumerable<Rating>> GetRatings(Product product, [ScopedService] AppDbContext context,
+                RatingsByIdBatchDataLoader ratingsDataLoader, CancellationToken token)
+            {
+                var ratingsId = await context.Set<Rating>()
+                    .Where(p => p.ProductId == product.Id)
+                    .Select(p => p.Id)
+                    .ToListAsync(token);
+
+                return await ratingsDataLoader.LoadAsync(ratingsId, token);
+            }
+
+            public Task<Producer> GetProducer(Product product, ProducersByIdBatchDataLoader producersDataLoader, CancellationToken token)
+            {
+                return producersDataLoader.LoadAsync(product.ProducerId, token);
+            }
+
+            public Task<Returnable> GetReturnable(Product product, ReturnablesByIdBatchDataLoader returnablesDataLoader, CancellationToken token)
+            {
+                if (!product.ReturnableId.HasValue)
+                    return null;
                 
-            descriptor.Field(c => c.Tags)
-                .Type<ListType<TagType>>()
-                .UseFiltering<TagFilterType>();
+                return returnablesDataLoader.LoadAsync(product.ReturnableId.Value, token);
+            }
 
-            descriptor.Field(c => c.Ratings)
-                .Type<ListType<RatingType>>()
-                .UseSorting<RatingSortType>()
-                .UseFiltering<RatingFilterType>()
-                .UsePaging<RatingType>();
-
-            descriptor.Field(c => c.CatalogsPrices)
-                .Type<ListType<CatalogPriceType>>();
-
-            descriptor.Field(c => c.Pictures)
-                .Type<ListType<PictureType>>();
         }
     }
 }

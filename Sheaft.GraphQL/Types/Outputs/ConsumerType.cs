@@ -17,7 +17,7 @@ namespace Sheaft.GraphQL.Types.Outputs
 
             descriptor.Field(c => c.Address)
                 .Authorize(Policies.REGISTERED)
-                .Type<AddressType>();
+                .Type<UserAddressType>();
 
             descriptor.Field(c => c.FirstName)
                 .Type<NonNullType<StringType>>();
