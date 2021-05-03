@@ -13,7 +13,7 @@ namespace Sheaft.Tests.Common
 {
     public static class ContextHelper
     {
-        public static IAppDbContext GetInMemoryContext()
+        public static AppDbContext GetInMemoryContext()
         {
             var options = new DbContextOptionsBuilder<AppDbContext>()
                 .UseInMemoryDatabase(Guid.NewGuid().ToString("N"))

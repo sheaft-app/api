@@ -1,7 +1,7 @@
 ﻿using HotChocolate.Data.Sorting;
 using Sheaft.Application.Models;
 
-namespace Sheaft.GraphQL.Sorts
+namespace Sheaft.GraphQL.DeliveryModes
 {
     public class DeliveryModeSortType : SortInputType<DeliveryModeDto>
     {

@@ -1,23 +1,46 @@
 ﻿using HotChocolate.Types;
 using Sheaft.Application.Models;
+using Sheaft.Domain;
 
 namespace Sheaft.GraphQL.Types.Outputs
 {
-    public class ExpectedPurchaseOrderDeliveryType : ObjectType<ExpectedPurchaseOrderDeliveryDto>
+    public class ExpectedPurchaseOrderDeliveryType : SheaftOutputType<ExpectedPurchaseOrderDelivery>
     {
-        protected override void Configure(IObjectTypeDescriptor<ExpectedPurchaseOrderDeliveryDto> descriptor)
+        protected override void Configure(IObjectTypeDescriptor<ExpectedPurchaseOrderDelivery> descriptor)
         {
-            descriptor.Field(c => c.ExpectedDeliveryDate);
-            descriptor.Field(c => c.DeliveryStartedOn);
-            descriptor.Field(c => c.DeliveredOn);
-            descriptor.Field(c => c.Day);
-            descriptor.Field(c => c.From);
-            descriptor.Field(c => c.To);
-            descriptor.Field(c => c.Kind);
-            descriptor.Field(c => c.Name);
+            base.Configure(descriptor);
+            
+            descriptor
+                .Field(c => c.ExpectedDeliveryDate)
+                .Name("expectedDeliveryDate");
+                
+            descriptor
+                .Field(c => c.DeliveryStartedOn)
+                .Name("deliveryStartedOn");
+                
+            descriptor
+                .Field(c => c.DeliveredOn)
+                .Name("deliveredOn");
+                
+            descriptor
+                .Field(c => c.From)
+                .Name("from");
+                
+            descriptor
+                .Field(c => c.To)
+                .Name("to");
+                
+            descriptor
+                .Field(c => c.Kind)
+                .Name("kind");
+                
+            descriptor
+                .Field(c => c.Name)
+                .Name("name");
 
-            descriptor.Field(c => c.Address)
-                .Type<UserAddressType>();
+            descriptor
+                .Field(c => c.Address)
+                .Name("address");
         }
     }
 }

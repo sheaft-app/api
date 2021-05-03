@@ -31,7 +31,7 @@ namespace Sheaft.Application.Behaviours
                 ["UserEmail"] = request.RequestUser.Email,
                 ["UserName"] = request.RequestUser.Name,
                 ["Roles"] = string.Join(';', request.RequestUser.Roles),
-                ["IsAuthenticated"] = request.RequestUser.IsAuthenticated.ToString(),
+                ["IsAuthenticated"] = request.RequestUser.IsAuthenticated().ToString(),
                 ["Command"] = requestName,
                 ["Data"] = JsonConvert.SerializeObject(request),
             }))

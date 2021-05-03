@@ -1,6 +1,4 @@
 ﻿using HotChocolate.Types;
-using Sheaft.Application.Models;
-using Sheaft.GraphQL.Enums;
 using Sheaft.Mediatr.Legal.Commands;
 
 namespace Sheaft.GraphQL.Types.Inputs
@@ -22,8 +20,7 @@ namespace Sheaft.GraphQL.Types.Inputs
                 .Name("id")
                 .Type<NonNullType<IdType>>();
 
-            descriptor.Field(c => c.Kind)
-                .Type<NonNullType<LegalKindEnumType>>();
+            descriptor.Field(c => c.Kind);
 
             descriptor.Field(c => c.Owner)
                 .Type<NonNullType<CreateOwnerInputType>>();

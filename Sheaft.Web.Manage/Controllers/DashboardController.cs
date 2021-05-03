@@ -37,7 +37,7 @@ namespace Sheaft.Web.Manage.Controllers
             //ViewBag.Levels = await _context.Levels.CountAsync(c => !c.RemovedOn.HasValue, token);
             //ViewBag.Rewards = await _context.Rewards.CountAsync(c => !c.RemovedOn.HasValue, token);
 
-            if (requestUser.IsImpersonating)
+            if (requestUser.IsImpersonating())
             {
                 ViewBag.Products = await _context.Products.CountAsync(c => c.ProducerId == requestUser.Id, token);
                 ViewBag.Stores = await _context.Users.OfType<Store>()

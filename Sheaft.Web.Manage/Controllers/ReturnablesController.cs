@@ -42,7 +42,7 @@ namespace Sheaft.Web.Manage.Controllers
             var query = _context.Returnables.AsNoTracking();
 
             var requestUser = await GetRequestUserAsync(token);
-            if (requestUser.IsImpersonating)
+            if (requestUser.IsImpersonating())
             {
                 query = query.Where(p => p.ProducerId == requestUser.Id);
             }
@@ -64,7 +64,7 @@ namespace Sheaft.Web.Manage.Controllers
         public async Task<IActionResult> Add(CancellationToken token)
         {
             var requestUser = await GetRequestUserAsync(token);
-            if (!requestUser.IsImpersonating)
+            if (!requestUser.IsImpersonating())
                 return RedirectToAction("Impersonate", "Account");
 
             return View(new ReturnableViewModel());
@@ -75,7 +75,7 @@ namespace Sheaft.Web.Manage.Controllers
         public async Task<IActionResult> Add(ReturnableViewModel model, CancellationToken token)
         {
             var requestUser = await GetRequestUserAsync(token);
-            if (!requestUser.IsImpersonating)
+            if (!requestUser.IsImpersonating())
             {
                 ModelState.AddModelError("", "You must impersonate producer to create it.");
                 return View(model);

@@ -7,8 +7,15 @@ namespace Sheaft.GraphQL.Types.Outputs
     {
         protected override void Configure(IObjectTypeDescriptor<CountryPointsDto> descriptor)
         {
-            descriptor.Field(c => c.Points);
-            descriptor.Field(c => c.Users);
+            base.Configure(descriptor);
+            
+            descriptor
+                .Field(c => c.Points)
+                .Name("points");
+                
+            descriptor
+                .Field(c => c.Users)
+                .Name("users");
         }
     }
 }

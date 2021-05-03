@@ -7,23 +7,23 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Sheaft.Application.Interfaces;
+using Microsoft.AspNetCore.Http;
 using Sheaft.Application.Interfaces.Infrastructure;
-using Sheaft.Application.Interfaces.Queries;
 using Sheaft.Application.Models;
 using Sheaft.Core;
 using Sheaft.Domain;
 using Sheaft.Domain.Enum;
-using Sheaft.Infrastructure.Services;
-using Sheaft.Mediatr.DeliveryMode.Queries;
+using Sheaft.GraphQL.Agreements;
+using Sheaft.GraphQL.DeliveryModes;
+using Sheaft.Infrastructure.Persistence;
 
 namespace Queries.Delivery.Tests
 {
     [TestClass]
     public class GetProducerDeliveries
     {
-        private IAppDbContext _context;
-        private IDeliveryQueries _queries;
+        private AppDbContext _context;
+        private DeliveryModeQueries _queries;
         private Mock<ITableService> _capingMock;
 
         [TestInitialize]
@@ -31,7 +31,7 @@ namespace Queries.Delivery.Tests
         {
             _capingMock = new Mock<ITableService>();
             _context = ContextHelper.GetInMemoryContext();
-            _queries = new DeliveryQueries(_context, _capingMock.Object, null);
+            _queries = new DeliveryModeQueries(Mock.Of<ICurrentUserService>(), Mock.Of<IHttpContextAccessor>(), _capingMock.Object, null);
         }
 
         [TestMethod]
@@ -57,11 +57,11 @@ namespace Queries.Delivery.Tests
             await _context.SaveChangesAsync(token);
 
             //test
-            var results = await _queries.GetProducersDeliveriesAsync(
+            var results = await _queries.GetNextDeliveries(
                 new List<Guid> { Guid.Parse(producerId) }, 
                 new List<DeliveryKind> { DeliveryKind.Farm }, 
-                DateTime.UtcNow, 
-                null, 
+                // DateTime.UtcNow,
+                _context, 
                 token);
 
             //assert
@@ -94,11 +94,11 @@ namespace Queries.Delivery.Tests
             await _context.SaveChangesAsync(token);
 
             //test
-            var results = await _queries.GetProducersDeliveriesAsync(
+            var results = await _queries.GetNextDeliveries(
                 new List<Guid> { producerId },
                 new List<DeliveryKind> { DeliveryKind.Farm },
-                currentDate,
-                null,
+                // currentDate,
+                _context,
                 token);
 
             //assert
@@ -141,11 +141,11 @@ namespace Queries.Delivery.Tests
             await _context.SaveChangesAsync(token);
 
             //test
-            var results = await _queries.GetProducersDeliveriesAsync(
+            var results = await _queries.GetNextDeliveries(
                 new List<Guid> { producerId },
                 new List<DeliveryKind> { DeliveryKind.Farm },
-                currentDate,
-                null,
+                // currentDate,
+                _context,
                 token);
 
             //assert
@@ -200,11 +200,11 @@ namespace Queries.Delivery.Tests
             await _context.SaveChangesAsync(token);
 
             //test
-            var results = await _queries.GetProducersDeliveriesAsync(
+            var results = await _queries.GetNextDeliveries(
                 new List<Guid> { producerId },
                 new List<DeliveryKind> { DeliveryKind.Farm, DeliveryKind.Market },
-                currentDate,
-                null,
+                // currentDate,
+                _context,
                 token);
 
             //assert
@@ -282,11 +282,11 @@ namespace Queries.Delivery.Tests
             await _context.SaveChangesAsync(token);
 
             //test
-            var results = await _queries.GetProducersDeliveriesAsync(
+            var results = await _queries.GetNextDeliveries(
                 new List<Guid> { producerId },
                 new List<DeliveryKind> { DeliveryKind.Farm },
-                expectedDeliveryDate.AddDays(-1),
-                null,
+                // expectedDeliveryDate.AddDays(-1),
+                _context,
                 token);
 
             //assert
@@ -355,11 +355,11 @@ namespace Queries.Delivery.Tests
             await _context.SaveChangesAsync(token);
 
             //test
-            var results = await _queries.GetProducersDeliveriesAsync(
+            var results = await _queries.GetNextDeliveries(
                 new List<Guid> { producerId },
                 new List<DeliveryKind> { DeliveryKind.Farm },
-                expectedDeliveryDate.AddDays(-1),
-                null,
+                // expectedDeliveryDate.AddDays(-1),
+                _context,
                 token);
 
             //assert

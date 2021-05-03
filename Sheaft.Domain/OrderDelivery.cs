@@ -11,7 +11,7 @@ namespace Sheaft.Domain
 
         public OrderDelivery(DeliveryMode delivery, DateTimeOffset expectedDeliveryDate, string comment = null)
         {
-            Id = delivery.Id;
+            Id = Guid.NewGuid();
             DeliveryMode = delivery;
             DeliveryModeId = delivery.Id;
             Comment = comment;
@@ -22,7 +22,7 @@ namespace Sheaft.Domain
         public string Comment { get; private set; }
         public Guid OrderId { get; private set; }
         public Guid DeliveryModeId { get; private set; }
-        public virtual ExpectedOrderDelivery ExpectedDelivery { get; private set; }
+        public ExpectedOrderDelivery ExpectedDelivery { get; private set; }
         public virtual DeliveryMode DeliveryMode { get; private set; }
     }
 }

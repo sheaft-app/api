@@ -29,7 +29,7 @@ namespace Sheaft.Mediatr.Order.Commands
         [JsonConstructor]
         public CreateConsumerOrderCommand(RequestUser requestUser) : base(requestUser)
         {
-            UserId = requestUser.IsAuthenticated ? requestUser.Id : (Guid?) null;
+            UserId = requestUser.IsAuthenticated() ? requestUser.Id : (Guid?) null;
         }
 
         public Guid? UserId { get; set; }
@@ -40,7 +40,7 @@ namespace Sheaft.Mediatr.Order.Commands
         public override void SetRequestUser(RequestUser user)
         {
             base.SetRequestUser(user);
-            UserId = user.IsAuthenticated ? user.Id : (Guid?) null;
+            UserId = user.IsAuthenticated() ? user.Id : (Guid?) null;
         }
     }
 

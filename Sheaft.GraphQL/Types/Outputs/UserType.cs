@@ -1,7 +1,10 @@
-﻿using HotChocolate.Types;
+﻿using HotChocolate.Resolvers;
+using HotChocolate.Types;
 using Sheaft.Application.Models;
 using Sheaft.Application.Security;
 using Sheaft.Domain;
+using Sheaft.GraphQL.Tags;
+using Sheaft.GraphQL.Users;
 
 namespace Sheaft.GraphQL.Types.Outputs
 {
@@ -11,37 +14,42 @@ namespace Sheaft.GraphQL.Types.Outputs
         {
             base.Configure(descriptor);
 
-            descriptor.Field(c => c.Id).Type<NonNullType<IdType>>();
-            descriptor.Field(c => c.Kind);
-            descriptor.Field(c => c.Picture);
-            descriptor.Field(c => c.CreatedOn);
-            descriptor.Field(c => c.UpdatedOn);
-
-            descriptor.Field(c => c.Name)
-                .Type<NonNullType<StringType>>();
+            descriptor
+                .ImplementsNode()
+                .IdField(c => c.Id)
+                .ResolveNode((ctx, id) => 
+                    ctx.DataLoader<UsersByIdBatchDataLoader>().LoadAsync(id, ctx.RequestAborted));
             
-            descriptor.Field(c => c.Phone)
-                .Authorize(Policies.REGISTERED);
+            descriptor
+                .Field(c => c.Kind)
+                .Name("kind");
+                
+            descriptor
+                .Field(c => c.Picture)
+                .Name("picture");
+                
+            descriptor
+                .Field(c => c.CreatedOn)
+                .Name("createdOn");
+                
+            descriptor
+                .Field(c => c.UpdatedOn)
+                .Name("updatedOn");
 
-            descriptor.Field(c => c.Email)
-                .Authorize(Policies.REGISTERED)
+            descriptor
+                .Field(c => c.Name)
+                .Name("name")
                 .Type<NonNullType<StringType>>();
 
-            descriptor.Field(c => c.FirstName)
+            descriptor
+                .Field(c => c.FirstName)
+                .Name("firstName")
                 .Type<NonNullType<StringType>>();
 
-            descriptor.Field(c => c.LastName)
+            descriptor
+                .Field(c => c.LastName)
+                .Name("lastName")
                 .Type<NonNullType<StringType>>();
-
-            // descriptor.Field(c => c.Address)
-            //     .Type<NonNullType<AddressType>>();
-            
-            descriptor.Field(c => c.Summary);
-            descriptor.Field(c => c.Description);
-            descriptor.Field(c => c.Facebook);
-            descriptor.Field(c => c.Twitter);
-            descriptor.Field(c => c.Instagram);
-            descriptor.Field(c => c.Website);
         }
     }
 }

@@ -2,10 +2,6 @@
 using Amazon.SimpleEmail;
 using AspNetCoreRateLimit;
 using Hangfire;
-using HotChocolate;
-using HotChocolate.AspNetCore;
-using HotChocolate.Execution.Configuration;
-using HotChocolate.Types;
 using IdentityModel;
 using MangoPay.SDK;
 using MediatR;
@@ -29,7 +25,6 @@ using Newtonsoft.Json;
 using RazorLight;
 using Serilog;
 using Serilog.Events;
-using Sheaft.GraphQL.Types;
 using Sheaft.Infrastructure.Persistence;
 using Sheaft.Infrastructure.Services;
 using Sheaft.Web.Api.Authorize;
@@ -40,13 +35,11 @@ using System.Globalization;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Reflection;
-using System.Threading.Tasks;
 using Sheaft.Application.Behaviours;
 using Sheaft.Application.Interfaces.Business;
 using Sheaft.Application.Interfaces.Factories;
 using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Application.Interfaces.Mediatr;
-using Sheaft.Application.Interfaces.Queries;
 using Sheaft.Application.Mappings;
 using Sheaft.Application.Security;
 using Sheaft.Business;
@@ -58,54 +51,10 @@ using Sheaft.Business.TransactionsExporters;
 using Sheaft.Domain;
 using Sheaft.Domain.Enum;
 using Sheaft.GraphQL;
-using Sheaft.GraphQL.BusinessClosings;
-using Sheaft.GraphQL.Catalogs;
-using Sheaft.GraphQL.Common;
-using Sheaft.GraphQL.DataLoaders;
-using Sheaft.GraphQL.DeliveryModes;
-using Sheaft.GraphQL.OpeningHours;
-using Sheaft.GraphQL.Producers;
-using Sheaft.GraphQL.Products;
-using Sheaft.GraphQL.ProfilePictures;
-using Sheaft.GraphQL.Ratings;
-using Sheaft.GraphQL.Returnables;
-using Sheaft.GraphQL.Tags;
-using Sheaft.GraphQL.Types.Outputs;
 using Sheaft.Infrastructure.Persistence.Extensions;
 using Sheaft.Mediatr;
-using Sheaft.Mediatr.Agreement.Queries;
-using Sheaft.Mediatr.BusinessClosing.Queries;
-using Sheaft.Mediatr.Card.Queries;
-using Sheaft.Mediatr.Catalog.Queries;
-using Sheaft.Mediatr.Consumer.Queries;
-using Sheaft.Mediatr.Country.Queries;
-using Sheaft.Mediatr.DeliveryClosing.Queries;
-using Sheaft.Mediatr.DeliveryMode.Queries;
-using Sheaft.Mediatr.Department.Queries;
-using Sheaft.Mediatr.Document.Queries;
-using Sheaft.Mediatr.Donation.Queries;
-using Sheaft.Mediatr.Job.Queries;
-using Sheaft.Mediatr.Leaderboard.Queries;
-using Sheaft.Mediatr.Legal.Queries;
-using Sheaft.Mediatr.Nationality.Queries;
-using Sheaft.Mediatr.Notification.Queries;
-using Sheaft.Mediatr.Order.Queries;
-using Sheaft.Mediatr.Payin.Queries;
-using Sheaft.Mediatr.Payout.Queries;
-using Sheaft.Mediatr.PreAuthorization.Queries;
-using Sheaft.Mediatr.Producer.Queries;
 using Sheaft.Mediatr.Product.Commands;
-using Sheaft.Mediatr.Product.Queries;
-using Sheaft.Mediatr.PurchaseOrder.Queries;
-using Sheaft.Mediatr.QuickOrder.Queries;
-using Sheaft.Mediatr.Region.Queries;
-using Sheaft.Mediatr.Returnable.Queries;
 using Sheaft.Mediatr.Store.Commands;
-using Sheaft.Mediatr.Store.Queries;
-using Sheaft.Mediatr.Tag.Queries;
-using Sheaft.Mediatr.Transfer.Queries;
-using Sheaft.Mediatr.User.Queries;
-using Sheaft.Mediatr.Withholding.Queries;
 using Sheaft.Options;
 using Sheaft.Web.Api.Extensions;
 
@@ -332,38 +281,6 @@ namespace Sheaft.Web.Api
             services.AddScoped<IPurchaseOrdersExportersFactory, PurchaseOrdersExportersFactory>();
             services.AddScoped<ITransactionsExportersFactory, TransactionsExportersFactory>();
             
-            services.AddScoped<IAgreementQueries, AgreementQueries>();
-            services.AddScoped<IProducerQueries, ProducerQueries>();
-            services.AddScoped<IStoreQueries, StoreQueries>();
-            services.AddScoped<IDeliveryQueries, DeliveryQueries>();
-            services.AddScoped<IDepartmentQueries, DepartmentQueries>();
-            services.AddScoped<IJobQueries, JobQueries>();
-            services.AddScoped<ILeaderboardQueries, LeaderboardQueries>();
-            services.AddScoped<INotificationQueries, NotificationQueries>();
-            services.AddScoped<IReturnableQueries, ReturnableQueries>();
-            services.AddScoped<IProductQueries, ProductQueries>();
-            services.AddScoped<IPurchaseOrderQueries, PurchaseOrderQueries>();
-            services.AddScoped<IQuickOrderQueries, QuickOrderQueries>();
-            services.AddScoped<IRegionQueries, RegionQueries>();
-            services.AddScoped<ITagQueries, TagQueries>();
-            services.AddScoped<IConsumerQueries, ConsumerQueries>();
-            services.AddScoped<IUserQueries, UserQueries>();
-            services.AddScoped<INationalityQueries, NationalityQueries>();
-            services.AddScoped<ICountryQueries, CountryQueries>();
-            services.AddScoped<IOrderQueries, OrderQueries>();
-            services.AddScoped<IPayinQueries, PayinQueries>();
-            services.AddScoped<IDocumentQueries, DocumentQueries>();
-            services.AddScoped<ILegalQueries, LegalQueries>();
-            services.AddScoped<IBusinessClosingQueries, BusinessClosingQueries>();
-            services.AddScoped<IDeliveryClosingQueries, DeliveryClosingQueries>();
-            services.AddScoped<ITransferQueries, TransferQueries>();
-            services.AddScoped<IPayoutQueries, PayoutQueries>();
-            services.AddScoped<IDonationQueries, DonationQueries>();
-            services.AddScoped<IWithholdingQueries, WithholdingQueries>();
-            services.AddScoped<ICatalogQueries, CatalogQueries>();
-            services.AddScoped<IPreAuthorizationQueries, PreAuthorizationQueries>();
-            services.AddScoped<ICardQueries, CardQueries>();
-            
             services.AddScoped<ISheaftMediatr, SheaftMediatr>();
             services.AddScoped<ISheaftDispatcher, SheaftDispatcher>();
 
@@ -398,39 +315,14 @@ namespace Sheaft.Web.Api
             services.AddGraphQLServer()
                 .AddAuthorization()
                 .AddQueryType(c => c.Name("Query"))
-                .AddTypeExtension<Sheaft.GraphQL.Agreements.AgreementQueries>()
+                .AddMutationType(c => c.Name("Mutation"))
+                .RegisterGraphQlTypes()
+                .RegisterGraphQlQueries()
+                .RegisterGraphQlMutations()
+                .RegisterGraphQlDataLoaders()
                 .AddFiltering()
                 .AddSorting()
-                .EnableRelaySupport()
-                //.RegisterGraphQlTypes();
-                .AddType<UserType>()
-                .AddType<UserAddressType>()
-                .AddType<AgreementType>()
-                .AddType<DeliveryType>()
-                .AddType<ProducerType>()
-                .AddType<StoreType>()
-                .AddType<CatalogType>()
-                .AddType<DeliveryClosingType>()
-                .AddType<BusinessClosingType>()
-                .AddType<ProfilePictureType>()
-                .AddType<ProductPictureType>()
-                .AddType<TagType>()
-                .AddType<ProductType>()
-                .AddType<ReturnableType>()
-                .AddType<RatingType>()
-                .AddDataLoader<AgreementsByIdBatchDataLoader>()
-                .AddDataLoader<BusinessClosingsByIdBatchDataLoader>()
-                .AddDataLoader<CatalogsByIdBatchDataLoader>()
-                .AddDataLoader<DeliveryModesByIdBatchDataLoader>()
-                .AddDataLoader<OpeningHoursByIdBatchDataLoader>()
-                .AddDataLoader<ProducersByIdBatchDataLoader>()
-                .AddDataLoader<ProfilePicturesByIdBatchDataLoader>()
-                .AddDataLoader<StoresByIdBatchDataLoader>()
-                .AddDataLoader<ReturnablesByIdBatchDataLoader>()
-                .AddDataLoader<ProductPicturesByIdBatchDataLoader>()
-                .AddDataLoader<ProductsByIdBatchDataLoader>()
-                .AddDataLoader<RatingsByIdBatchDataLoader>()
-                .AddDataLoader<TagsByIdBatchDataLoader>();
+                .EnableRelaySupport();
 
             services.AddErrorFilter<SheaftErrorFilter>();
 

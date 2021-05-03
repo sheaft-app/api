@@ -65,7 +65,7 @@ namespace Sheaft.Business
             if (!validatedDeliveries.Succeeded)
                 return Failure<Guid>(validatedDeliveries.Exception);
 
-            var invalidProductIds = await GetConsumerInvalidProductIds(order.Products.Select(p => p.Id), token);
+            var invalidProductIds = await GetConsumerInvalidProductIds(order.Products.Select(p => p.ProductId), token);
             if (invalidProductIds.Any())
                 return Failure(MessageKind.Order_CannotPay_Some_Products_NotAvailable,
                     string.Join(";", invalidProductIds));

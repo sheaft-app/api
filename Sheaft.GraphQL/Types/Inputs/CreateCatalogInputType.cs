@@ -1,6 +1,4 @@
 using HotChocolate.Types;
-using Sheaft.Application.Models;
-using Sheaft.GraphQL.Enums;
 using Sheaft.Mediatr.Catalog.Commands;
 
 namespace Sheaft.GraphQL.Types.Inputs

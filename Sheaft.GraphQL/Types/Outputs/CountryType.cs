@@ -1,18 +1,32 @@
-﻿using HotChocolate.Types;
+﻿using HotChocolate.Resolvers;
+using HotChocolate.Types;
 using Sheaft.Application.Models;
+using Sheaft.Domain;
+using Sheaft.GraphQL.Catalogs;
+using Sheaft.GraphQL.Countries;
 
 namespace Sheaft.GraphQL.Types.Outputs
 {
-    public class CountryType : SheaftOutputType<CountryDto>
+    public class CountryType : SheaftOutputType<Country>
     {
-        protected override void Configure(IObjectTypeDescriptor<CountryDto> descriptor)
+        protected override void Configure(IObjectTypeDescriptor<Country> descriptor)
         {
-            descriptor.Field(c => c.Id).Type<NonNullType<IdType>>();
+            base.Configure(descriptor);
 
-            descriptor.Field(c => c.Name)
+            descriptor
+                .ImplementsNode()
+                .IdField(c => c.Id)
+                .ResolveNode((ctx, id) =>
+                    ctx.DataLoader<CountriesByIdBatchDataLoader>().LoadAsync(id, ctx.RequestAborted));
+            
+            descriptor
+                .Field(c => c.Name)
+                .Name("name")
                 .Type<NonNullType<StringType>>();
 
-            descriptor.Field(c => c.Code)
+            descriptor
+                .Field(c => c.Alpha2)
+                .Name("code")
                 .Type<NonNullType<StringType>>();
         }
     }

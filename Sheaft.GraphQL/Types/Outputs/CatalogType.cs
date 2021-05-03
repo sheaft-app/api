@@ -8,13 +8,12 @@ using HotChocolate.Types;
 using Microsoft.EntityFrameworkCore;
 using Sheaft.Domain;
 using Sheaft.GraphQL.Catalogs;
-using Sheaft.GraphQL.Enums;
 using Sheaft.GraphQL.Products;
 using Sheaft.Infrastructure.Persistence;
 
 namespace Sheaft.GraphQL.Types.Outputs
 {
-    public class CatalogType : ObjectType<Catalog>
+    public class CatalogType : SheaftOutputType<Catalog>
     {
         protected override void Configure(IObjectTypeDescriptor<Catalog> descriptor)
         {
@@ -33,8 +32,7 @@ namespace Sheaft.GraphQL.Types.Outputs
 
             descriptor
                 .Field(c => c.Kind)
-                .Name("kind")
-                .Type<NonNullType<CatalogKindEnumType>>();
+                .Name("kind");
 
             descriptor
                 .Field(c => c.CreatedOn)
@@ -54,23 +52,23 @@ namespace Sheaft.GraphQL.Types.Outputs
 
             descriptor
                 .Field(c => c.Products)
-                .Name("products")
+                .Name("productsPrices")
                 .UseDbContext<AppDbContext>()
-                .ResolveWith<CatalogResolvers>(c => c.GetProducts(default, default, default, default))
+                .ResolveWith<CatalogResolvers>(c => c.GetCatalogProducts(default, default, default, default))
                 .Type<ListType<ProductType>>();
         }
 
         private class CatalogResolvers
         {
-            public async Task<IEnumerable<Product>> GetProducts(Catalog catalog, [ScopedService] AppDbContext context,
-                ProductsByIdBatchDataLoader productsDataLoader, CancellationToken token)
+            public async Task<IEnumerable<CatalogProduct>> GetCatalogProducts(Catalog catalog, [ScopedService] AppDbContext context,
+                CatalogProductsByIdBatchDataLoader catalogProductsDataLoader, CancellationToken token)
             {
-                var productsId = await context.Set<CatalogProduct>()
+                var catalogProductsId = await context.Set<CatalogProduct>()
                     .Where(cp => cp.CatalogId == catalog.Id)
-                    .Select(cp => cp.ProductId)
+                    .Select(cp => cp.Id)
                     .ToListAsync(token);
 
-                return await productsDataLoader.LoadAsync(productsId, token);
+                return await catalogProductsDataLoader.LoadAsync(catalogProductsId, token);
             }
         }
     }

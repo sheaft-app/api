@@ -291,7 +291,7 @@ namespace Sheaft.Business.PickingOrdersExporters
         {
             return new LightProduct
             {
-                Id = p.Id,
+                Id = p.ProductId,
                 Name = $"{p.Name}{(p.UnitWeight.HasValue && p.UnitWeight > 0 ? " " + p.UnitWeight.Value : "")}",
                 Reference = p.Reference,
                 Quantity = p.Quantity

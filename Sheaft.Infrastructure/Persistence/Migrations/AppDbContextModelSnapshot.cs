@@ -127,11 +127,11 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                     b.Property<Guid>("ProducerId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<DateTimeOffset?>("UpdatedOn")
-                        .IsConcurrencyToken()
+                    b.Property<DateTimeOffset?>("RemovedOn")
                         .HasColumnType("datetimeoffset");
 
-                    b.Property<DateTimeOffset?>("RemovedOn")
+                    b.Property<DateTimeOffset?>("UpdatedOn")
+                        .IsConcurrencyToken()
                         .HasColumnType("datetimeoffset");
 
                     b.HasKey("Id");
@@ -788,6 +788,9 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                     b.Property<int>("ProductsCount")
                         .HasColumnType("int");
 
+                    b.Property<int>("PurchaseOrdersCount")
+                        .HasColumnType("int");
+
                     b.Property<string>("Reference")
                         .HasColumnType("nvarchar(max)");
 
@@ -849,38 +852,46 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
 
             modelBuilder.Entity("Sheaft.Domain.OrderDelivery", b =>
                 {
-                    b.Property<Guid>("OrderId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("DeliveryModeId")
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Comment")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid>("Id")
+                    b.Property<Guid>("DeliveryModeId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.HasKey("OrderId", "DeliveryModeId");
+                    b.Property<Guid>("OrderId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
 
                     b.HasIndex("DeliveryModeId");
+
+                    b.HasIndex("OrderId", "DeliveryModeId")
+                        .IsUnique();
 
                     b.ToTable("OrderDeliveries");
                 });
 
             modelBuilder.Entity("Sheaft.Domain.OrderProduct", b =>
                 {
-                    b.Property<Guid>("OrderId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<Guid>("OrderId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<Guid>("ProducerId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("ProductId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<int>("Quantity")
@@ -954,9 +965,12 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                     b.Property<decimal>("Vat")
                         .HasColumnType("decimal(10,2)");
 
-                    b.HasKey("OrderId", "Id");
+                    b.HasKey("Id");
 
                     b.HasIndex("ProducerId");
+
+                    b.HasIndex("OrderId", "ProductId")
+                        .IsUnique();
 
                     b.ToTable("OrderProducts");
                 });
@@ -1519,15 +1533,19 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
 
             modelBuilder.Entity("Sheaft.Domain.PurchaseOrderProduct", b =>
                 {
-                    b.Property<Guid>("PurchaseOrderId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("ProductId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("PurchaseOrderId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<int>("Quantity")
                         .IsConcurrencyToken()
@@ -1600,7 +1618,10 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                     b.Property<decimal>("Vat")
                         .HasColumnType("decimal(10,2)");
 
-                    b.HasKey("PurchaseOrderId", "Id");
+                    b.HasKey("Id");
+
+                    b.HasIndex("PurchaseOrderId", "ProductId")
+                        .IsUnique();
 
                     b.ToTable("PurchaseOrderProducts");
                 });
@@ -1643,7 +1664,8 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
 
             modelBuilder.Entity("Sheaft.Domain.QuickOrderProduct", b =>
                 {
-                    b.Property<Guid>("QuickOrderId")
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid>("CatalogProductId")
@@ -1653,9 +1675,15 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                         .IsConcurrencyToken()
                         .HasColumnType("int");
 
-                    b.HasKey("QuickOrderId", "CatalogProductId");
+                    b.Property<Guid>("QuickOrderId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
 
                     b.HasIndex("CatalogProductId");
+
+                    b.HasIndex("QuickOrderId", "CatalogProductId")
+                        .IsUnique();
 
                     b.ToTable("QuickOrderProducts");
                 });
@@ -3078,10 +3106,7 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
 
                     b.OwnsOne("Sheaft.Domain.ExpectedOrderDelivery", "ExpectedDelivery", b1 =>
                         {
-                            b1.Property<Guid>("OrderDeliveryOrderId")
-                                .HasColumnType("uniqueidentifier");
-
-                            b1.Property<Guid>("OrderDeliveryDeliveryModeId")
+                            b1.Property<Guid>("OrderDeliveryId")
                                 .HasColumnType("uniqueidentifier");
 
                             b1.Property<DateTimeOffset>("ExpectedDeliveryDate")
@@ -3093,12 +3118,12 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                             b1.Property<TimeSpan>("To")
                                 .HasColumnType("time");
 
-                            b1.HasKey("OrderDeliveryOrderId", "OrderDeliveryDeliveryModeId");
+                            b1.HasKey("OrderDeliveryId");
 
                             b1.ToTable("OrderDeliveries");
 
                             b1.WithOwner()
-                                .HasForeignKey("OrderDeliveryOrderId", "OrderDeliveryDeliveryModeId");
+                                .HasForeignKey("OrderDeliveryId");
                         });
 
                     b.Navigation("DeliveryMode");

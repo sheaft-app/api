@@ -1,7 +1,7 @@
 using HotChocolate.Resolvers;
 using HotChocolate.Types;
 using Sheaft.Domain;
-using Sheaft.GraphQL.ProfilePictures;
+using Sheaft.GraphQL.Products;
 
 namespace Sheaft.GraphQL.Types.Outputs
 {

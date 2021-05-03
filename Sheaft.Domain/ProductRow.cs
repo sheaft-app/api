@@ -20,7 +20,7 @@ namespace Sheaft.Domain
             UnitWeight = product.UnitWeight;
             Vat = product.Vat;
 
-            Id = product.Id;
+            Id = Guid.NewGuid();
             Name = product.Name;
             Reference = product.Reference;
 
@@ -45,6 +45,8 @@ namespace Sheaft.Domain
             TotalVatPrice = product.TotalVatPrice;
             TotalWholeSalePrice = product.TotalWholeSalePrice;
             TotalOnSalePrice = product.TotalOnSalePrice;
+            
+            ProductId = product.ProductId;
         }
 
         protected ProductRow(Product product, Guid catalogId, int quantity)
@@ -57,7 +59,7 @@ namespace Sheaft.Domain
             UnitWeight = product.Weight;
             Vat = product.Vat;
 
-            Id = product.Id;
+            Id = Guid.NewGuid();
             Name = product.Name;
             Reference = product.Reference;
 
@@ -66,6 +68,8 @@ namespace Sheaft.Domain
             ReturnableVatPrice = product.Returnable?.VatPrice;
             ReturnableWholeSalePrice = product.Returnable?.WholeSalePrice;
             ReturnableOnSalePrice = product.Returnable?.OnSalePrice;
+
+            ProductId = product.Id;
 
             SetQuantity(quantity);
         }
@@ -101,6 +105,7 @@ namespace Sheaft.Domain
         public decimal TotalWholeSalePrice { get; private set; }
         public decimal TotalVatPrice { get; private set; }
         public decimal TotalOnSalePrice { get; private set; }
+        public Guid ProductId { get; private set; }
 
         protected void RefreshLine()
         {

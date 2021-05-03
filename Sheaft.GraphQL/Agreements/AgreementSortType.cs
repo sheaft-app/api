@@ -1,8 +1,7 @@
 ﻿using HotChocolate.Data.Sorting;
-using Sheaft.Application.Models;
 using Sheaft.Domain;
 
-namespace Sheaft.GraphQL.Sorts
+namespace Sheaft.GraphQL.Agreements
 {
     public class AgreementSortType : SortInputType<Agreement>
     {
@@ -12,6 +11,9 @@ namespace Sheaft.GraphQL.Sorts
             descriptor.BindFieldsExplicitly();
             descriptor.Field(c => c.Status);
             descriptor.Field(c => c.CreatedOn);
+            descriptor.Field(c => c.CreatedByKind);
+            descriptor.Field(c => c.Producer);
+            descriptor.Field(c => c.Store);
         }
     }
 }

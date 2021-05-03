@@ -1,7 +1,7 @@
 ﻿using HotChocolate.Data.Filters;
 using Sheaft.Application.Models;
 
-namespace Sheaft.GraphQL.Filters
+namespace Sheaft.GraphQL.DeliveryModes
 {
     public class DeliveryModeFilterType : FilterInputType<DeliveryModeDto>
     {

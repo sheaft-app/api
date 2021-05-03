@@ -260,7 +260,7 @@ namespace Sheaft.Domain
             if (product == null)
                 throw SheaftException.Validation(MessageKind.PurchaseOrder_CannotAddProduct_Product_NotFound);
 
-            var productLine = _products.SingleOrDefault(p => p.Id == product.Id);
+            var productLine = _products.SingleOrDefault(p => p.ProductId == product.ProductId);
             if (productLine != null)
                 _products.Remove(productLine);
 

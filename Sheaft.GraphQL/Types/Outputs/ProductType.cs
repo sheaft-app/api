@@ -6,11 +6,13 @@ using HotChocolate;
 using HotChocolate.Resolvers;
 using HotChocolate.Types;
 using Microsoft.EntityFrameworkCore;
+using Sheaft.Application.Extensions;
 using Sheaft.Application.Interfaces.Infrastructure;
+using Sheaft.Core;
 using Sheaft.Domain;
+using Sheaft.GraphQL.Catalogs;
 using Sheaft.GraphQL.Producers;
 using Sheaft.GraphQL.Products;
-using Sheaft.GraphQL.ProfilePictures;
 using Sheaft.GraphQL.Ratings;
 using Sheaft.GraphQL.Returnables;
 using Sheaft.GraphQL.Tags;
@@ -88,52 +90,72 @@ namespace Sheaft.GraphQL.Types.Outputs
                 .Field(c => c.Picture)
                 .Name("picture");
 
-            // descriptor
-            //     .Field("imageLarge");
-            //
-            // descriptor
-            //     .Field("imageMedium");
-            //
-            // descriptor
-            //     .Field("imageSmall");
-            //
-            // descriptor
-            //     .Field("isReturnable");
-            //
-            // descriptor
-            //     .Field("visibleToConsumers");
-            //
-            // descriptor
-            //     .Field("visibleToStores");
+            descriptor
+                .Field("imageLarge")
+                .Resolve(c => PictureExtensions.GetPictureUrl(c.Parent<Product>().Id, c.Parent<Product>().Picture, PictureSize.LARGE))
+                .Type<StringType>();
 
-            // descriptor
-            //     .Field(c => c.VatPricePerUnit)
-            //     .Name("vatPricePerUnit");
-            //
-            // descriptor
-            //     .Field(c => c.OnSalePricePerUnit)
-            //     .Name("onSalePricePerUnit");
-            //
-            // descriptor
-            //     .Field(c => c.WholeSalePricePerUnit)
-            //     .Name("wholeSalePricePerUnit");
-            //
-            // descriptor
-            //     .Field(c => c.OnSalePrice)
-            //     .Name("onSalePrice");
-            //
-            // descriptor
-            //     .Field(c => c.WholeSalePrice)
-            //     .Name("wholeSalePrice");
-            //
-            // descriptor
-            //     .Field(c => c.VatPrice)
-            //     .Name("vatPrice");
+            descriptor
+                .Field("imageMedium")
+                .Resolve(c => PictureExtensions.GetPictureUrl(c.Parent<Product>().Id, c.Parent<Product>().Picture, PictureSize.MEDIUM))
+                .Type<StringType>();
 
-            // descriptor
-            //     .Field(c => c.CatalogsPrices)
-            //     .Name("catalogPrices")
-            //     .Type<ListType<CatalogPriceType>>();
+            descriptor
+                .Field("imageSmall")
+                .Resolve(c => PictureExtensions.GetPictureUrl(c.Parent<Product>().Id, c.Parent<Product>().Picture, PictureSize.SMALL))
+                .Type<StringType>();
+
+            descriptor
+                .Field("isReturnable")
+                .Resolve(c => c.Parent<Product>().ReturnableId.HasValue)
+                .Type<BooleanType>();
+
+            descriptor
+                .Field("visibleToConsumers")
+                .Resolve(c => true)
+                .Type<BooleanType>();
+
+            descriptor
+                .Field("visibleToStores")
+                .Resolve(c => true)
+                .Type<BooleanType>();
+
+            descriptor
+                .Field("vatPricePerUnit")
+                .Resolve(c => 0m)
+                .Type<DecimalType>();
+
+            descriptor
+                .Field("onSalePricePerUnit")
+                .Resolve(c => 0m)
+                .Type<DecimalType>();
+
+            descriptor
+                .Field("wholeSalePricePerUnit")
+                .Resolve(c => 0m)
+                .Type<DecimalType>();
+
+            descriptor
+                .Field("onSalePrice")
+                .Resolve(c => 0m)
+                .Type<DecimalType>();
+
+            descriptor
+                .Field("wholeSalePrice")
+                .Resolve(c => 0m)
+                .Type<DecimalType>();
+
+            descriptor
+                .Field("vatPrice")
+                .Resolve(c => 0m)
+                .Type<DecimalType>();
+
+            descriptor
+                .Field(c => c.CatalogsPrices)
+                .Name("catalogPrices")
+                .UseDbContext<AppDbContext>()
+                .ResolveWith<ProductResolvers>(c => c.GetProductCatalogs(default, default, default, default))
+                .Type<ListType<CatalogProductType>>();
 
             descriptor
                 .Field("currentUserHasRatedProduct")
@@ -172,7 +194,7 @@ namespace Sheaft.GraphQL.Types.Outputs
                 .Name("pictures")
                 .UseDbContext<AppDbContext>()
                 .ResolveWith<ProductResolvers>(c => c.GetPictures(default!, default!, default, default))
-                .Type<ListType<ProfilePictureType>>();
+                .Type<ListType<ProductPictureType>>();
         }
 
         private class ProductResolvers
@@ -188,7 +210,8 @@ namespace Sheaft.GraphQL.Types.Outputs
                     .AnyAsync(r => r.ProductId == product.Id && r.UserId == currentUserResult.Data.Id, token);
             }
 
-            public async Task<IEnumerable<ProductPicture>> GetPictures(Product product, [ScopedService] AppDbContext context,
+            public async Task<IEnumerable<ProductPicture>> GetPictures(Product product,
+                [ScopedService] AppDbContext context,
                 ProductPicturesByIdBatchDataLoader picturesDataLoader, CancellationToken token)
             {
                 var picturesId = await context.Set<ProductPicture>()
@@ -197,6 +220,18 @@ namespace Sheaft.GraphQL.Types.Outputs
                     .ToListAsync(token);
 
                 return await picturesDataLoader.LoadAsync(picturesId, token);
+            }
+
+            public async Task<IEnumerable<CatalogProduct>> GetProductCatalogs(Product product,
+                [ScopedService] AppDbContext context, CatalogProductsByIdBatchDataLoader catalogProductsDataLoader,
+                CancellationToken token)
+            {
+                var catalogProductsId = await context.Set<CatalogProduct>()
+                    .Where(cp => cp.ProductId == product.Id)
+                    .Select(cp => cp.Id)
+                    .ToListAsync(token);
+
+                return await catalogProductsDataLoader.LoadAsync(catalogProductsId, token);
             }
 
             public async Task<IEnumerable<Tag>> GetTags(Product product, [ScopedService] AppDbContext context,
@@ -221,19 +256,20 @@ namespace Sheaft.GraphQL.Types.Outputs
                 return await ratingsDataLoader.LoadAsync(ratingsId, token);
             }
 
-            public Task<Producer> GetProducer(Product product, ProducersByIdBatchDataLoader producersDataLoader, CancellationToken token)
+            public Task<Producer> GetProducer(Product product, ProducersByIdBatchDataLoader producersDataLoader,
+                CancellationToken token)
             {
                 return producersDataLoader.LoadAsync(product.ProducerId, token);
             }
 
-            public Task<Returnable> GetReturnable(Product product, ReturnablesByIdBatchDataLoader returnablesDataLoader, CancellationToken token)
+            public Task<Returnable> GetReturnable(Product product, ReturnablesByIdBatchDataLoader returnablesDataLoader,
+                CancellationToken token)
             {
                 if (!product.ReturnableId.HasValue)
                     return null;
-                
+
                 return returnablesDataLoader.LoadAsync(product.ReturnableId.Value, token);
             }
-
         }
     }
 }

@@ -20,8 +20,8 @@ namespace Sheaft.Mediatr.User.Commands
     {
         protected GenerateUserCodeCommand()
         {
-            
         }
+        
         [JsonConstructor]
         public GenerateUserCodeCommand(RequestUser requestUser) : base(requestUser)
         {

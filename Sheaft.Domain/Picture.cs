@@ -11,7 +11,7 @@ namespace Sheaft.Domain
         
         protected Picture(Guid id, string url)
         {
-            Id = Id;
+            Id = id;
             Url = url;
         }
 
@@ -19,31 +19,5 @@ namespace Sheaft.Domain
         public DateTimeOffset CreatedOn { get; private set; }
         public DateTimeOffset? UpdatedOn { get; private set; }
         public string Url { get; private set; }
-    }
-
-    public class ProfilePicture : Picture
-    {
-        protected ProfilePicture()
-        {
-        }
-        
-        public ProfilePicture(Guid id, string url) : base(id, url)
-        {
-        }
-
-        public Guid UserId { get; private set; }
-    }
-
-    public class ProductPicture : Picture
-    {
-        protected ProductPicture()
-        {
-        }
-        
-        public ProductPicture(Guid id, string url) : base(id, url)
-        {
-        }
-
-        public Guid ProductId { get; private set; }
     }
 }

@@ -1,0 +1,287 @@
+using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using HotChocolate;
+using HotChocolate.AspNetCore.Authorization;
+using HotChocolate.Data;
+using HotChocolate.Types;
+using HotChocolate.Types.Relay;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Azure.Search;
+using Microsoft.Azure.Search.Models;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
+using Newtonsoft.Json;
+using Sheaft.Application.Extensions;
+using Sheaft.Application.Interfaces.Infrastructure;
+using Sheaft.Application.Models;
+using Sheaft.Application.Security;
+using Sheaft.Domain;
+using Sheaft.Domain.Enum;
+using Sheaft.GraphQL.Types.Inputs;
+using Sheaft.GraphQL.Types.Outputs;
+using Sheaft.Infrastructure.Persistence;
+using Sheaft.Options;
+
+namespace Sheaft.GraphQL.Products
+{
+    [ExtendObjectType(Name = "Query")]
+    public class ProductQueries : SheaftQuery
+    {
+        private readonly ISearchIndexClient _indexClient;
+        private readonly RoleOptions _roleOptions;
+
+        public ProductQueries(
+            ICurrentUserService currentUserService,
+            IOptionsSnapshot<SearchOptions> searchOptions,
+            IOptionsSnapshot<RoleOptions> roleOptions,
+            ISearchServiceClient searchServiceClient,
+            IHttpContextAccessor httpContextAccessor)
+            : base(currentUserService, httpContextAccessor)
+        {
+            _roleOptions = roleOptions.Value;
+            _indexClient = searchServiceClient.Indexes.GetClient(searchOptions.Value.Indexes.Products);
+        }
+
+        [GraphQLName("product")]
+        [GraphQLType(typeof(ProductType))]
+        [UseDbContext(typeof(AppDbContext))]
+        [UseSingleOrDefault]
+        public async Task<IQueryable<Product>> Get([ID] Guid id, [ScopedService] AppDbContext context,
+            CancellationToken token)
+        {
+            SetLogTransaction(id);
+            if (CurrentUser.IsInRole(_roleOptions.Store.Value))
+            {
+                var hasAgreement = await context.Agreements
+                    .Where(c => c.StoreId == CurrentUser.Id && c.Catalog.Products.Any(p => p.ProductId == id))
+                    .AnyAsync(token);
+
+                if (hasAgreement)
+                    return context.Agreements
+                        .Where(c => c.StoreId == CurrentUser.Id && c.Catalog.Products.Any(p => p.ProductId == id))
+                        .SelectMany(a => a.Catalog.Products)
+                        .Select(c => c.Product);
+
+                return context.Products
+                    .Where(p => p.Id == id && p.CatalogsPrices.Any(cp =>
+                        cp.Catalog.Kind == CatalogKind.Stores && cp.Catalog.Available && cp.Catalog.IsDefault));
+            }
+
+            return context.Products
+                .Where(c => c.Id == id);
+        }
+
+        [GraphQLName("products")]
+        [GraphQLType(typeof(ListType<ProductType>))]
+        [UseDbContext(typeof(AppDbContext))]
+        [Authorize(Policy = Policies.PRODUCER)]
+        [UsePaging]
+        [UseFiltering]
+        [UseSorting]
+        public IQueryable<Product> GetAll([ScopedService] AppDbContext context)
+        {
+            SetLogTransaction();
+            if (CurrentUser.IsInRole(_roleOptions.Producer.Value))
+                return context.Products
+                    .Where(c => c.ProducerId == CurrentUser.Id);
+
+            if (CurrentUser.IsInRole(_roleOptions.Store.Value))
+                return context.Agreements
+                    .Where(c => c.StoreId == CurrentUser.Id && c.Catalog.Kind == CatalogKind.Stores &&
+                                c.Status == AgreementStatus.Accepted)
+                    .SelectMany(a => a.Catalog.Products)
+                    .Select(c => c.Product);
+
+            return context.Products;
+        }
+
+        [GraphQLName("producerProducts")]
+        [GraphQLType(typeof(ListType<ProductType>))]
+        [UseDbContext(typeof(AppDbContext))]
+        [UsePaging]
+        [UseFiltering]
+        [UseSorting]
+        public async Task<IQueryable<Product>> GetProducerProducts([ID] Guid producerId,
+            [ScopedService] AppDbContext context, CancellationToken token)
+        {
+            if (CurrentUser.IsInRole(_roleOptions.Admin.Value) || CurrentUser.IsInRole(_roleOptions.Support.Value))
+                return context.Products
+                    .Where(p => p.ProducerId == producerId);
+
+            if (CurrentUser.IsInRole(_roleOptions.Store.Value))
+            {
+                var hasAgreement = await context.Agreements
+                    .Where(c => c.StoreId == CurrentUser.Id && c.ProducerId == producerId &&
+                                c.Status == AgreementStatus.Accepted)
+                    .AnyAsync(token);
+
+                if (hasAgreement)
+                    return context.Agreements
+                        .Where(c => c.StoreId == CurrentUser.Id && c.ProducerId == producerId &&
+                                    c.Catalog.Kind == CatalogKind.Stores && c.Status == AgreementStatus.Accepted)
+                        .SelectMany(a => a.Catalog.Products)
+                        .Select(c => c.Product);
+
+                return context.Products
+                    .Where(p => p.ProducerId == producerId && p.CatalogsPrices.Any(cp =>
+                        cp.Catalog.Kind == CatalogKind.Stores && cp.Catalog.Available && cp.Catalog.IsDefault));
+            }
+
+            return context.Products
+                .Where(p => p.ProducerId == producerId &&
+                            p.CatalogsPrices.Any(cp => cp.Catalog.Kind == CatalogKind.Consumers));
+        }
+
+        [GraphQLName("searchProducts")]
+        [GraphQLType(typeof(ListType<ProductsSearchDtoType>))]
+        public async Task<ProductsSearchDto> SearchAsync(
+            [GraphQLType(typeof(SearchProductsInputType))] [GraphQLName("input")] SearchProductsDto terms,
+            CancellationToken token)
+        {
+            var sp = new SearchParameters()
+            {
+                SearchMode = SearchMode.Any,
+                Top = terms.Take,
+                Skip = (terms.Page - 1) * terms.Take,
+                SearchFields = new List<string> {"partialProductName"},
+                Select = new List<string>()
+                {
+                    "product_id", "product_name", "product_onSalePricePerUnit", "product_onSalePrice", "product_rating",
+                    "product_ratings_count", "product_image", "product_tags", "producer_id", "producer_name",
+                    "producer_email", "producer_phone", "producer_zipcode", "producer_city", "producer_longitude",
+                    "producer_latitude", "product_returnable", "product_unit", "product_quantityPerUnit",
+                    "product_conditioning", "product_available"
+                },
+                IncludeTotalResultCount = true,
+                HighlightFields = new List<string>(),
+                HighlightPreTag = "<b>",
+                HighlightPostTag = "</b>"
+            };
+
+            if (!string.IsNullOrWhiteSpace(terms.Sort))
+            {
+                if (terms.Sort.Contains("producer_geolocation") && terms.Longitude.HasValue && terms.Latitude.HasValue)
+                {
+                    sp.OrderBy = new List<string>()
+                    {
+                        $"geo.distance(producer_geolocation, geography'POINT({terms.Longitude.Value.ToString(new CultureInfo("en-US"))} {terms.Latitude.Value.ToString(new CultureInfo("en-US"))})')"
+                    };
+                }
+                else if (!terms.Sort.Contains("producer_geolocation"))
+                {
+                    sp.OrderBy = new List<string>() {terms.Sort};
+                }
+            }
+
+            var filter = "removed eq 0 and product_searchable eq true";
+            if (terms.ProducerId.HasValue)
+                filter += $" and producer_id eq '{terms.ProducerId.Value.ToString("D").ToLowerInvariant()}'";
+            if (terms.Tags != null)
+            {
+                foreach (var tag in terms.Tags)
+                {
+                    filter += " and ";
+                    filter += $"product_tags/any(p: p eq '{tag.ToLowerInvariant()}')";
+                }
+            }
+
+            if (terms.Longitude.HasValue && terms.Latitude.HasValue)
+            {
+                filter += " and ";
+                filter +=
+                    $"geo.distance(producer_geolocation, geography'POINT({terms.Longitude.Value.ToString(new CultureInfo("en-US"))} {terms.Latitude.Value.ToString(new CultureInfo("en-US"))})') le {terms.MaxDistance ?? 200}";
+            }
+
+            sp.Filter = filter;
+
+            var results = await _indexClient.Documents.SearchAsync(terms.Text, sp, cancellationToken: token);
+            var searchResults = new List<SearchProduct>();
+            foreach (var result in results.Results)
+            {
+                var json = JsonConvert.SerializeObject(result.Document, Formatting.None);
+                var myobject = JsonConvert.DeserializeObject<SearchProduct>(json);
+                searchResults.Add(myobject);
+            }
+
+            return new ProductsSearchDto
+            {
+                Count = results.Count ?? 0,
+                Products = searchResults?.Select(p => new SearchProductDto
+                {
+                    Id = p.Product_id,
+                    Name = p.Product_name,
+                    ImageSmall = p.Product_image != null
+                        ? p.Product_image.EndsWith(".jpg") ? p.Product_image : p.Product_image + "_small.jpg"
+                        : string.Empty,
+                    ImageMedium = p.Product_image != null
+                        ? p.Product_image.EndsWith(".jpg") ? p.Product_image : p.Product_image + "_medium.jpg"
+                        : string.Empty,
+                    ImageLarge = p.Product_image != null
+                        ? p.Product_image.EndsWith(".jpg") ? p.Product_image : p.Product_image + "_large.jpg"
+                        : string.Empty,
+                    Picture = p.Product_image != null
+                        ? p.Product_image.EndsWith(".jpg") ? p.Product_image : p.Product_image + "_medium.jpg"
+                        : string.Empty,
+                    OnSalePrice = p.Product_onSalePrice ?? 0,
+                    OnSalePricePerUnit = p.Product_onSalePricePerUnit ?? 0,
+                    QuantityPerUnit = p.Product_quantityPerUnit ?? 0,
+                    Rating = p.Product_rating,
+                    IsReturnable = p.Product_returnable ?? false,
+                    RatingsCount = p.Product_ratings_count,
+                    Available = p.Product_available ?? true,
+                    Tags = p.Product_tags?.Select(t => new TagDto {Name = t}) ?? new List<TagDto>(),
+                    Unit = !string.IsNullOrWhiteSpace(p.Product_unit)
+                        ? Enum.Parse<UnitKind>(p.Product_unit.ToLowerInvariant(), true)
+                        : UnitKind.NotSpecified,
+                    Conditioning = !string.IsNullOrWhiteSpace(p.Product_conditioning)
+                        ? Enum.Parse<ConditioningKind>(p.Product_conditioning, true)
+                        : ConditioningKind.Not_Specified,
+                    Producer = new UserDto
+                    {
+                        Id = p.Producer_id,
+                        Name = p.Producer_name,
+                        Email = p.Producer_email,
+                        Phone = p.Producer_phone,
+                        Address = new AddressDto
+                        {
+                            City = p.Producer_city,
+                            Latitude = p.Producer_latitude,
+                            Longitude = p.Producer_longitude,
+                            Zipcode = p.Producer_zipcode
+                        }
+                    }
+                }) ?? new List<SearchProductDto>()
+            };
+        }
+
+        private class SearchProduct
+        {
+            public Guid Product_id { get; set; }
+            public string Product_name { get; set; }
+            public decimal? Product_onSalePrice { get; set; }
+            public decimal? Product_onSalePricePerUnit { get; set; }
+            public decimal? Product_rating { get; set; }
+            public decimal? Product_quantityPerUnit { get; set; }
+            public string Product_unit { get; set; }
+            public int Product_ratings_count { get; set; }
+            public string Product_image { get; set; }
+            public IEnumerable<string> Product_tags { get; set; }
+            public Guid Producer_id { get; set; }
+            public string Producer_name { get; set; }
+            public string Producer_zipcode { get; set; }
+            public string Producer_city { get; set; }
+            public string Producer_email { get; set; }
+            public string Producer_phone { get; set; }
+            public double Producer_longitude { get; set; }
+            public double Producer_latitude { get; set; }
+            public bool? Product_returnable { get; set; }
+            public bool? Product_available { get; set; }
+            public string Product_conditioning { get; set; }
+            public string Product_weight { get; set; }
+        }
+    }
+}

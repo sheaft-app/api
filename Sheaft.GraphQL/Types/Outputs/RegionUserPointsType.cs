@@ -1,6 +1,12 @@
-﻿using HotChocolate.Types;
+﻿using System.Threading;
+using System.Threading.Tasks;
+using HotChocolate;
+using HotChocolate.Resolvers;
+using HotChocolate.Types;
+using Microsoft.EntityFrameworkCore;
 using Sheaft.Application.Models;
-using Sheaft.GraphQL.Enums;
+using Sheaft.Domain;
+using Sheaft.Infrastructure.Persistence;
 
 namespace Sheaft.GraphQL.Types.Outputs
 {
@@ -8,13 +14,40 @@ namespace Sheaft.GraphQL.Types.Outputs
     {
         protected override void Configure(IObjectTypeDescriptor<RegionUserPointsDto> descriptor)
         {
-            descriptor.Field(c => c.Name);
-            descriptor.Field(c => c.Points);
-            descriptor.Field(c => c.Position);
-            descriptor.Field(c => c.RegionId).Type<NonNullType<IdType>>();
-            descriptor.Field(c => c.UserId).Type<NonNullType<IdType>>();
-            descriptor.Field(c => c.Kind).Type<NonNullType<ProfileKindEnumType>>();
-            descriptor.Field(c => c.Picture);
+            base.Configure(descriptor);
+            
+            descriptor
+                .Field(c => c.Points)
+                .Name("points");
+
+            descriptor
+                .Field(c => c.Position)
+                .Name("position");
+
+            descriptor
+                .Field("user")
+                .UseDbContext<AppDbContext>()
+                .ResolveWith<RegionUserResolvers>(c => c.GetUser(default, default, default));
+
+            descriptor
+                .Field("department")
+                .UseDbContext<AppDbContext>()
+                .ResolveWith<RegionUserResolvers>(c => c.GetRegion(default, default, default));
+        }
+
+        private class RegionUserResolvers
+        {
+            public Task<User> GetUser(RegionUserPointsDto regionUser, [ScopedService] AppDbContext context,
+                CancellationToken token)
+            {
+                return context.Users.SingleOrDefaultAsync(u => u.Id == regionUser.UserId, token);
+            }
+            
+            public Task<Region> GetRegion(RegionUserPointsDto regionUser, [ScopedService] AppDbContext context,
+                CancellationToken token)
+            {
+                return context.Regions.SingleOrDefaultAsync(u => u.Id == regionUser.RegionId, token);
+            }
         }
     }
 }

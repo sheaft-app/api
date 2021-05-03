@@ -15,6 +15,7 @@ namespace Sheaft.Domain
             Quantity = quantity;
         }
 
+        public Guid Id { get; private set; }
         public int? Quantity { get; private set; }
         public Guid CatalogProductId { get; private set; }
         public Guid QuickOrderId { get; private set; }

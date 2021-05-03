@@ -1,8 +1,7 @@
 ﻿using HotChocolate.Data.Filters;
-using Sheaft.Application.Models;
 using Sheaft.Domain;
 
-namespace Sheaft.GraphQL.Filters
+namespace Sheaft.GraphQL.Agreements
 {
     public class AgreementFilterType : FilterInputType<Agreement>
     {
@@ -12,6 +11,9 @@ namespace Sheaft.GraphQL.Filters
             descriptor.BindFieldsExplicitly();
             descriptor.Field(c => c.Id);
             descriptor.Field(c => c.Status);
+            descriptor.Field(c => c.Store);
+            descriptor.Field(c => c.Producer);
+            descriptor.Field(c => c.CreatedByKind);
         }
     }
 }

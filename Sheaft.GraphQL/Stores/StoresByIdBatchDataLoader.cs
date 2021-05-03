@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore;
 using Sheaft.Domain;
 using Sheaft.Infrastructure.Persistence;
 
-namespace Sheaft.GraphQL.DataLoaders
+namespace Sheaft.GraphQL.Stores
 {
     public class StoresByIdBatchDataLoader : BatchDataLoader<Guid, Store>
     {

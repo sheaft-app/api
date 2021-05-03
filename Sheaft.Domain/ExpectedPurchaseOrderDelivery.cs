@@ -21,7 +21,7 @@ namespace Sheaft.Domain
         public DeliveryKind Kind { get; private set; }
         public DateTimeOffset? DeliveryStartedOn { get; private set; }
         public DateTimeOffset? DeliveredOn { get; private set; }
-        public virtual ExpectedAddress Address { get; private set; }
+        public ExpectedAddress Address { get; private set; }
 
         public void SetDeliveredDate(DateTimeOffset date)
         {

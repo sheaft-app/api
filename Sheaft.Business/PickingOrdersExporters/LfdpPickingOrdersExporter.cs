@@ -157,7 +157,7 @@ namespace Sheaft.Business.PickingOrdersExporters
                 {
                     var current = 0;
                     var order = purchaseOrders.FirstOrDefault(o => o.ClientId == client.Key);
-                    var productOrder = order?.Products.FirstOrDefault(op => op.Id == product.Id);
+                    var productOrder = order?.Products.FirstOrDefault(op => op.ProductId == product.Id);
 
                     current += productOrder?.Quantity ?? 0;
                     total += current;

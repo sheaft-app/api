@@ -63,6 +63,7 @@ namespace Sheaft.Domain
         public int ReturnablesCount { get; private set; }
         public int LinesCount { get; private set; }
         public int ProductsCount { get; private set; }
+        public int PurchaseOrdersCount { get; private set; }
         public decimal Donation { get; private set; }
         public decimal FeesPrice { get; private set; }
         public decimal DonationFeesPrice { get; private set; }
@@ -88,7 +89,8 @@ namespace Sheaft.Domain
 
             var purchaseOrder = new PurchaseOrder(Guid.NewGuid(), reference, PurchaseOrderStatus.Waiting, producer, this);
             _purchaseOrders.Add(purchaseOrder);
-
+            
+            PurchaseOrdersCount = _purchaseOrders.Count;
             return purchaseOrder;
         }
 

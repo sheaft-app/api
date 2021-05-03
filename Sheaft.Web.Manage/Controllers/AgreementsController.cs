@@ -45,7 +45,7 @@ namespace Sheaft.Web.Manage.Controllers
             var query = _context.Agreements.AsNoTracking();
 
             var requestUser = await GetRequestUserAsync(token);
-            if (requestUser.IsImpersonating)
+            if (requestUser.IsImpersonating())
             {
                 if (requestUser.IsInRole(_roleOptions.Store.Value))
                     query = query.Where(p => p.StoreId == requestUser.Id);

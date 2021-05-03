@@ -51,7 +51,7 @@ namespace Sheaft.Business
             var result = Success(true);
             foreach (var orderDelivery in orderDeliveries)
             {
-                var delivery = results.Data.FirstOrDefault(d => d.DeliveryId == orderDelivery.Id
+                var delivery = results.Data.FirstOrDefault(d => d.DeliveryId == orderDelivery.DeliveryModeId
                                                                 && d.ExpectedDate.Year == orderDelivery.ExpectedDelivery
                                                                     .ExpectedDeliveryDate.Year
                                                                 && d.ExpectedDate.Month ==

@@ -1,16 +1,21 @@
 ﻿using HotChocolate.Types;
-using Sheaft.Application.Models;
-using Sheaft.GraphQL.Enums;
+using Sheaft.Domain;
 
 namespace Sheaft.GraphQL.Types.Outputs
 {
-    public class BirthAddressType : ObjectType<BirthAddressDto>
+    public class BirthAddressType : SheaftOutputType<BirthAddress>
     {
-        protected override void Configure(IObjectTypeDescriptor<BirthAddressDto> descriptor)
+        protected override void Configure(IObjectTypeDescriptor<BirthAddress> descriptor)
         {
-            descriptor.Field(c => c.City);
-            descriptor.Field(c => c.Country)
-                .Type<NonNullType<CountryIsoCodeEnumType>>();
+            base.Configure(descriptor);
+            
+            descriptor
+                .Field(c => c.City)
+                .Name("city");
+                
+            descriptor
+                .Field(c => c.Country)
+                .Name("country");
         }
     }
 }

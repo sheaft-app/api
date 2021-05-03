@@ -16,6 +16,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Sheaft.GraphQL\Sheaft.GraphQL.csproj" />
     <ProjectReference Include="..\Sheaft.Infrastructure.Tests\Sheaft.Infrastructure.Tests.csproj" />
     <ProjectReference Include="..\Sheaft.Mediatr\Sheaft.Mediatr.csproj" />
   </ItemGroup>

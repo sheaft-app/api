@@ -45,8 +45,8 @@ namespace Sheaft.Domain
         public Impersonification ImpersonifiedBy { get; set;}
         public string RequestId { get; set;}
 
-        public bool IsAuthenticated => Id != Guid.Empty;
-        public bool IsImpersonating => ImpersonifiedBy != null;
+        public bool IsAuthenticated() => Id != Guid.Empty;
+        public bool IsImpersonating() => ImpersonifiedBy != null;
     }
 
     public class Impersonification

@@ -68,9 +68,6 @@ namespace Sheaft.Application.Extensions
 
         public static RequestUser ToIdentityUser(this ClaimsPrincipal user, string requestId, Impersonification impersonification = null)
         {
-            var email = user.Claims?.FirstOrDefault(c => c.Type == JwtClaimTypes.Email)?.Value;
-            var name = user.Claims?.FirstOrDefault(c => c.Type == JwtClaimTypes.Name)?.Value;
-
             return new RequestUser(user.TryGetUserId(), user.GetName(), user.GetEmail(), user.GetRoles(), requestId, impersonification);
         }
     }

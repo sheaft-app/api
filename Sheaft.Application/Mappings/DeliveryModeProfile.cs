@@ -12,7 +12,6 @@ namespace Sheaft.Application.Mappings
             CreateMap<Domain.DeliveryMode, DeliveryModeDto>()
                 .ForMember(c => c.Closings,
                     opt => opt.MapFrom(e => e.Closings.Where(c => c.ClosedTo > DateTimeOffset.UtcNow)));
-            CreateMap<Domain.DeliveryMode, AgreementDeliveryModeDto>();
         }
     }
 }

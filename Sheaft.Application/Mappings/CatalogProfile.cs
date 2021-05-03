@@ -9,7 +9,6 @@ namespace Sheaft.Application.Mappings
         public CatalogProfile()
         {
             CreateMap<Catalog, CatalogDto>();
-            CreateMap<Catalog, AgreementCatalogDto>();
             
             CreateMap<CatalogProduct, CatalogProductDto>()
                 .ForMember(c => c.Id, opt => opt.MapFrom(e => e.ProductId))

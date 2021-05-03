@@ -1,30 +1,89 @@
-﻿using HotChocolate.Types;
-using Sheaft.Application.Models;
-using Sheaft.GraphQL.Enums;
+﻿using System;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using HotChocolate;
+using HotChocolate.Resolvers;
+using HotChocolate.Types;
+using Microsoft.EntityFrameworkCore;
+using Sheaft.Domain;
+using Sheaft.GraphQL.Catalogs;
+using Sheaft.GraphQL.Donations;
+using Sheaft.GraphQL.Tags;
+using Sheaft.GraphQL.Users;
+using Sheaft.Infrastructure.Persistence;
 
 namespace Sheaft.GraphQL.Types.Outputs
 {
-    public class DonationType : SheaftOutputType<DonationDto>
+    public class DonationType : SheaftOutputType<Donation>
     {
-        protected override void Configure(IObjectTypeDescriptor<DonationDto> descriptor)
+        protected override void Configure(IObjectTypeDescriptor<Donation> descriptor)
         {
-            descriptor.Field(c => c.Id).Type<NonNullType<IdType>>();
-            descriptor.Field(c => c.Status);
-            descriptor.Field(c => c.Fees);
-            descriptor.Field(c => c.Debited);
-            descriptor.Field(c => c.Reference);
-            descriptor.Field(c => c.CreatedOn);
-            descriptor.Field(c => c.UpdatedOn);
-            descriptor.Field(c => c.ExecutedOn);
+            base.Configure(descriptor);
 
-            descriptor.Field(c => c.Kind)
-                .Type<NonNullType<TransactionKindEnumType>>();
+            descriptor
+                .ImplementsNode()
+                .IdField(c => c.Id)
+                .ResolveNode((ctx, id) =>
+                    ctx.DataLoader<DonationsByIdBatchDataLoader>().LoadAsync(id, ctx.RequestAborted));
 
-            descriptor.Field(c => c.Status)
-                .Type<NonNullType<TransactionStatusEnumType>>();
-            
-            descriptor.Field(c => c.CreditedUser)
-                .Type<NonNullType<UserType>>();
+            descriptor
+                .Field(c => c.Status)
+                .Name("status");
+
+            descriptor
+                .Field(c => c.Fees)
+                .Name("fees");
+
+            descriptor
+                .Field(c => c.Debited)
+                .Name("debited");
+
+            descriptor
+                .Field(c => c.Reference)
+                .Name("reference");
+
+            descriptor
+                .Field(c => c.CreatedOn)
+                .Name("createdOn");
+
+            descriptor
+                .Field(c => c.UpdatedOn)
+                .Name("updatedOn");
+
+            descriptor
+                .Field(c => c.ExecutedOn)
+                .Name("executedOn");
+
+            descriptor
+                .Field(c => c.Kind)
+                .Name("kind");
+
+            descriptor
+                .Field(c => c.Status)
+                .Name("status");
+
+            descriptor
+                .Field("creditedUser")
+                .UseDbContext<AppDbContext>()
+                .ResolveWith<DonationResolvers>(c => c.GetUser(default, default, default, default));
+        }
+
+        private class DonationResolvers
+        {
+            public async Task<User> GetUser(Donation donation, [ScopedService] AppDbContext context,
+                UsersByIdBatchDataLoader usersDataLoader, CancellationToken token)
+            {
+                var userId = await context.Wallets
+                    .Where(u => u.Id == donation.CreditedWalletId)
+                    .Select(u => u.UserId)
+                    .SingleOrDefaultAsync(token);
+
+                if (userId == Guid.Empty)
+                    return null;
+
+                return await usersDataLoader.LoadAsync(userId, token);
+            }
         }
     }
 }

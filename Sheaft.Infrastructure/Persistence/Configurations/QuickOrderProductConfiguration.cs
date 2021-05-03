@@ -12,7 +12,8 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
 
             entity.HasOne(c => c.CatalogProduct).WithMany().HasForeignKey(c=>c.CatalogProductId).OnDelete(DeleteBehavior.NoAction).IsRequired();
 
-            entity.HasKey(c=> new {c.QuickOrderId, c.CatalogProductId});
+            entity.HasKey(c => c.Id);
+            entity.HasIndex(c=> new {c.QuickOrderId, c.CatalogProductId}).IsUnique();
             entity.ToTable("QuickOrderProducts");
         }
     }

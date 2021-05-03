@@ -46,7 +46,7 @@ namespace Sheaft.Domain
         public bool Available { get; private set; }
         public bool AutoAcceptRelatedPurchaseOrder { get; private set; }
         public bool AutoCompleteRelatedPurchaseOrder { get; private set; }
-        public virtual DeliveryAddress Address { get; private set; }
+        public DeliveryAddress Address { get; private set; }
         public Guid ProducerId { get; private set; }
         public virtual Producer Producer { get; private set; }
         public virtual IReadOnlyCollection<DeliveryHours> DeliveryHours => _deliveryHours?.AsReadOnly();

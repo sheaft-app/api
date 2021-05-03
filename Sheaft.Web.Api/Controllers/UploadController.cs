@@ -46,7 +46,7 @@ namespace Sheaft.Web.Api.Controllers
             currentTransaction.AddCustomAttribute("RequestIdentifier",
                 _httpContextAccessor.HttpContext.TraceIdentifier);
             currentTransaction.AddCustomAttribute("UserIdentifier", CurrentUser.Id.ToString("N"));
-            currentTransaction.AddCustomAttribute("IsAuthenticated", CurrentUser.IsAuthenticated);
+            currentTransaction.AddCustomAttribute("IsAuthenticated", CurrentUser.IsAuthenticated());
             currentTransaction.AddCustomAttribute("Roles", string.Join(";", CurrentUser.Roles));
 
             try

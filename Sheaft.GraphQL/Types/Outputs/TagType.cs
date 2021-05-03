@@ -1,7 +1,6 @@
 ﻿using HotChocolate.Resolvers;
 using HotChocolate.Types;
 using Sheaft.Domain;
-using Sheaft.GraphQL.Enums;
 using Sheaft.GraphQL.Tags;
 
 namespace Sheaft.GraphQL.Types.Outputs
@@ -39,6 +38,10 @@ namespace Sheaft.GraphQL.Types.Outputs
                 .Name("picture");
 
             descriptor
+                .Field(c => c.Kind)
+                .Name("kind");
+
+            descriptor
                 .Field(c => c.Icon)
                 .Name("icon");
 
@@ -46,11 +49,6 @@ namespace Sheaft.GraphQL.Types.Outputs
                 .Field(c => c.Name)
                 .Name("name")
                 .Type<NonNullType<StringType>>();
-
-            descriptor
-                .Field(c => c.Kind)
-                .Name("kind")
-                .Type<NonNullType<TagKindEnumType>>();
         }
     }
 }

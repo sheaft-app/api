@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -8,11 +9,11 @@ using HotChocolate.Types;
 using Microsoft.EntityFrameworkCore;
 using Sheaft.Application.Security;
 using Sheaft.Domain;
-using Sheaft.GraphQL.BusinessClosings;
-using Sheaft.GraphQL.Filters;
+using Sheaft.GraphQL.Business;
+using Sheaft.GraphQL.Catalogs;
 using Sheaft.GraphQL.Producers;
-using Sheaft.GraphQL.ProfilePictures;
 using Sheaft.GraphQL.Tags;
+using Sheaft.GraphQL.Users;
 using Sheaft.Infrastructure.Persistence;
 
 namespace Sheaft.GraphQL.Types.Outputs
@@ -50,15 +51,6 @@ namespace Sheaft.GraphQL.Types.Outputs
             descriptor
                 .Field(c => c.UpdatedOn)
                 .Name("updatedOn");
-
-            descriptor.Field("vatIdentifier")
-                .Resolve((ctx, token) => ((BusinessLegal) ctx.Parent<Producer>().Legal)?.VatIdentifier)
-                .Authorize(Policies.OWNER)
-                .Type<NonNullType<StringType>>();
-
-            descriptor.Field("siret").Resolve((ctx, token) => ((BusinessLegal) ctx.Parent<Producer>().Legal)?.Siret)
-                .Authorize(Policies.OWNER)
-                .Type<NonNullType<StringType>>();
 
             descriptor
                 .Field(c => c.Name)
@@ -116,12 +108,25 @@ namespace Sheaft.GraphQL.Types.Outputs
                 .Type<NonNullType<UserAddressType>>();
 
             descriptor
+                .Field("vatIdentifier")
+                .Authorize(Policies.OWNER)
+                .UseDbContext<AppDbContext>()
+                .ResolveWith<ProducerResolvers>(c => c.GetLegalsVatIdentifier(default!, default!, default!, default))
+                .Type<NonNullType<StringType>>();
+
+            descriptor
+                .Field("siret")
+                .Authorize(Policies.OWNER)
+                .UseDbContext<AppDbContext>()
+                .ResolveWith<ProducerResolvers>(c => c.GetLegalsSiret(default!, default!, default!, default))
+                .Type<NonNullType<StringType>>();
+            
+            descriptor
                 .Field(c => c.Tags)
                 .Name("tags")
                 .UseDbContext<AppDbContext>()
                 .ResolveWith<ProducerResolvers>(c => c.GetTags(default!, default!, default!, default))
-                .Type<ListType<TagType>>()
-                .UseFiltering<TagFilterType>();
+                .Type<ListType<TagType>>();
 
             descriptor
                 .Field(c => c.Closings)
@@ -140,6 +145,34 @@ namespace Sheaft.GraphQL.Types.Outputs
 
         private class ProducerResolvers
         {
+            public async Task<string> GetLegalsVatIdentifier(Producer producer, [ScopedService] AppDbContext context,
+                BusinessLegalsByIdBatchDataLoader legalsDataLoader, CancellationToken token)
+            {
+                var legalId = await context.Legals
+                    .Where(c => c.UserId == producer.Id)
+                    .Select(c => c.Id)
+                    .SingleOrDefaultAsync(token);
+
+                if (legalId == Guid.Empty)
+                    return null;
+                
+                return (await legalsDataLoader.LoadAsync(legalId, token)).VatIdentifier;
+            }
+            
+            public async Task<string> GetLegalsSiret(Producer producer, [ScopedService] AppDbContext context,
+                BusinessLegalsByIdBatchDataLoader legalsDataLoader, CancellationToken token)
+            {
+                var legalId = await context.Legals
+                    .Where(c => c.UserId == producer.Id)
+                    .Select(c => c.Id)
+                    .SingleOrDefaultAsync(token);
+
+                if (legalId == Guid.Empty)
+                    return null;
+                
+                return (await legalsDataLoader.LoadAsync(legalId, token)).Siret;
+            }
+            
             public async Task<IEnumerable<Tag>> GetTags(Producer producer, [ScopedService] AppDbContext context,
                 TagsByIdBatchDataLoader tagsDataLoader, CancellationToken token)
             {
@@ -151,7 +184,8 @@ namespace Sheaft.GraphQL.Types.Outputs
                 return await tagsDataLoader.LoadAsync(tagsId, token);
             }
 
-            public async Task<IEnumerable<BusinessClosing>> GetClosings(Producer producer, [ScopedService] AppDbContext context,
+            public async Task<IEnumerable<BusinessClosing>> GetClosings(Producer producer,
+                [ScopedService] AppDbContext context,
                 BusinessClosingsByIdBatchDataLoader closingsDataLoader, CancellationToken token)
             {
                 var closingsId = await context.Set<BusinessClosing>()
@@ -162,7 +196,8 @@ namespace Sheaft.GraphQL.Types.Outputs
                 return await closingsDataLoader.LoadAsync(closingsId, token);
             }
 
-            public async Task<IEnumerable<ProfilePicture>> GetPictures(Producer producer, [ScopedService] AppDbContext context,
+            public async Task<IEnumerable<ProfilePicture>> GetPictures(Producer producer,
+                [ScopedService] AppDbContext context,
                 ProfilePicturesByIdBatchDataLoader picturesDataLoader, CancellationToken token)
             {
                 var picturesId = await context.Set<ProfilePicture>()

@@ -1,6 +1,4 @@
 ﻿using HotChocolate.Types;
-using Sheaft.Application.Models;
-using Sheaft.GraphQL.Enums;
 using Sheaft.Mediatr.Document.Commands;
 
 namespace Sheaft.GraphQL.Types.Inputs
@@ -15,8 +13,7 @@ namespace Sheaft.GraphQL.Types.Inputs
             descriptor.Field(c => c.LegalId)
                 .Type<NonNullType<IdType>>();
 
-            descriptor.Field(c => c.Kind)
-                .Type<NonNullType<DocumentKindEnumType>>();
+            descriptor.Field(c => c.Kind);
         }
     }
 }

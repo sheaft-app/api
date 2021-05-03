@@ -37,7 +37,7 @@ namespace Sheaft.GraphQL.Agreements
         [UseDbContext(typeof(AppDbContext))]
         [Authorize(Policy = Policies.STORE_OR_PRODUCER)]
         [UseSingleOrDefault]
-        public IQueryable<Agreement> GetAgreement([ID("input")]Guid id, [ScopedService] AppDbContext context)
+        public IQueryable<Agreement> Get([ID] Guid id, [ScopedService] AppDbContext context)
         {
             SetLogTransaction(id);
             
@@ -63,7 +63,7 @@ namespace Sheaft.GraphQL.Agreements
         [UsePaging]
         [UseFiltering]
         [UseSorting]
-        public IQueryable<Agreement> GetAgreements([ScopedService] AppDbContext context)
+        public IQueryable<Agreement> GetAll([ScopedService] AppDbContext context)
         {
             SetLogTransaction();
             if (CurrentUser.IsInRole(_roleOptions.Store.Value))

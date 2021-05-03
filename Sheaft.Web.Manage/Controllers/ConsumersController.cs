@@ -46,7 +46,7 @@ namespace Sheaft.Web.Manage.Controllers
             var query = _context.Users.OfType<Consumer>().AsNoTracking();
 
             var requestUser = await GetRequestUserAsync(token);
-            if (requestUser.IsImpersonating)
+            if (requestUser.IsImpersonating())
                 query = query.Where(p => p.Id == requestUser.Id);
 
             var entities = await query

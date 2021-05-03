@@ -1,6 +1,5 @@
 ﻿using HotChocolate.Types;
 using Sheaft.Domain;
-using Sheaft.GraphQL.Enums;
 
 namespace Sheaft.GraphQL.Types.Outputs
 {
@@ -36,7 +35,6 @@ namespace Sheaft.GraphQL.Types.Outputs
             
             descriptor
                 .Field(c => c.Country)
-                .Type<NonNullType<CountryIsoCodeEnumType>>()
                 .Name("country");
         }
     }

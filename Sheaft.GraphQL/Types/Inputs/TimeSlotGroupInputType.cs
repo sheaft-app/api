@@ -1,6 +1,5 @@
 ﻿using HotChocolate.Types;
 using Sheaft.Application.Models;
-using Sheaft.GraphQL.Enums;
 
 namespace Sheaft.GraphQL.Types.Inputs
 {
@@ -12,8 +11,7 @@ namespace Sheaft.GraphQL.Types.Inputs
             descriptor.Field(c => c.From);
             descriptor.Field(c => c.To);
 
-            descriptor.Field(c => c.Days)
-                .Type<NonNullType<ListType<DayOfWeekEnumType>>>();
+            descriptor.Field(c => c.Days);
         }
     }
 }
