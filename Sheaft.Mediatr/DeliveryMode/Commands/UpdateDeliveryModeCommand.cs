@@ -17,6 +17,7 @@ using Sheaft.Core.Enums;
 using Sheaft.Core.Exceptions;
 using Sheaft.Domain;
 using Sheaft.Domain.Enum;
+using Sheaft.Infrastructure.Persistence;
 using Sheaft.Mediatr.DeliveryClosing.Commands;
 using Sheaft.Mediatr.Producer.Commands;
 
@@ -52,9 +53,9 @@ namespace Sheaft.Mediatr.DeliveryMode.Commands
     {
         public UpdateDeliveryModeCommandHandler(
             ISheaftMediatr mediatr,
-            IAppDbContext context,
+            IDbContextFactory<AppDbContext> context,
             ILogger<UpdateDeliveryModeCommandHandler> logger)
-            : base(mediatr, context, logger)
+            : base(mediatr, context.CreateDbContext(), logger)
         {
         }
 

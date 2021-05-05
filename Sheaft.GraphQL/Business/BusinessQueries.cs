@@ -43,11 +43,11 @@ namespace Sheaft.GraphQL.Business
         [UsePaging]
         [UseFiltering]
         [UseSorting]
-        public IQueryable<BusinessClosing> GetAll([ID] Guid businessId, [ScopedService] AppDbContext context)
+        public IQueryable<BusinessClosing> GetAll([ScopedService] AppDbContext context)
         {
             SetLogTransaction();
             return context.Set<BusinessClosing>()
-                .Where(d => d.BusinessId == businessId);
+                .Where(d => d.BusinessId == CurrentUser.Id);
         }
     }
 }

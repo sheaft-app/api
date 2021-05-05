@@ -15,6 +15,7 @@ using Sheaft.Application.Models;
 using Sheaft.Core;
 using Sheaft.Domain;
 using Sheaft.Domain.Enum;
+using Sheaft.Infrastructure.Persistence;
 using Sheaft.Mediatr.DeliveryClosing.Commands;
 using Sheaft.Mediatr.Producer.Commands;
 
@@ -57,9 +58,9 @@ namespace Sheaft.Mediatr.DeliveryMode.Commands
     {
         public CreateDeliveryModeCommandHandler(
             ISheaftMediatr mediatr,
-            IAppDbContext context,
+            IDbContextFactory<AppDbContext> context,
             ILogger<CreateDeliveryModeCommandHandler> logger)
-            : base(mediatr, context, logger)
+            : base(mediatr, context.CreateDbContext(), logger)
         {
         }
 

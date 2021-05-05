@@ -35,6 +35,7 @@ using System.Globalization;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Reflection;
+using HotChocolate.Types;
 using Sheaft.Application.Behaviours;
 using Sheaft.Application.Interfaces.Business;
 using Sheaft.Application.Interfaces.Factories;
@@ -266,7 +267,11 @@ namespace Sheaft.Web.Api
             services.AddScoped<IPspService, PspService>();
             services.AddScoped<ITableService, TableService>();
             services.AddScoped<IAuthService, AuthService>();
+            
             services.AddSingleton<ICurrentUserService, CurrentUserService>();
+            services.AddSingleton<ISheaftMediatr, SheaftMediatr>();
+            services.AddSingleton<ISheaftDispatcher, SheaftDispatcher>();
+            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             
             services.AddScoped<IDeliveryService, DeliveryService>();
             services.AddScoped<IOrderService, OrderService>();
@@ -281,9 +286,6 @@ namespace Sheaft.Web.Api
             services.AddScoped<IPurchaseOrdersExportersFactory, PurchaseOrdersExportersFactory>();
             services.AddScoped<ITransactionsExportersFactory, TransactionsExportersFactory>();
             
-            services.AddScoped<ISheaftMediatr, SheaftMediatr>();
-            services.AddScoped<ISheaftDispatcher, SheaftDispatcher>();
-
             services.AddScoped<IDapperContext, DapperContext>();
 
             var searchConfig = searchSettings.Get<SearchOptions>();
@@ -302,8 +304,6 @@ namespace Sheaft.Web.Api
 
             var storageConfig = storageSettings.Get<StorageOptions>();
             services.AddSingleton<CloudStorageAccount>(CloudStorageAccount.Parse(storageConfig.ConnectionString));
-
-            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             
             services.AddTransient(typeof(IPipelineBehavior<,>), typeof(UnhandledExceptionBehaviour<,>));
             services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehaviour<,>));

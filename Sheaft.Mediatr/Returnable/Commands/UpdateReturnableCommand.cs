@@ -11,6 +11,7 @@ using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Application.Interfaces.Mediatr;
 using Sheaft.Core;
 using Sheaft.Domain;
+using Sheaft.Infrastructure.Persistence;
 
 namespace Sheaft.Mediatr.Returnable.Commands
 {
@@ -37,7 +38,7 @@ namespace Sheaft.Mediatr.Returnable.Commands
     {
         public UpdateReturnableCommandHandler(
             ISheaftMediatr mediatr,
-            IAppDbContext context,
+            IDbContextFactory<AppDbContext> context,
             ILogger<UpdateReturnableCommandHandler> logger)
             : base(mediatr, context, logger)
         {
