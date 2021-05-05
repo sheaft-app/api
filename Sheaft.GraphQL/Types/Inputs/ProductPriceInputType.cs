@@ -1,5 +1,6 @@
 using HotChocolate.Types;
 using Sheaft.Application.Models;
+using Sheaft.Domain;
 
 namespace Sheaft.GraphQL.Types.Inputs
 {
@@ -7,9 +8,18 @@ namespace Sheaft.GraphQL.Types.Inputs
     {
         protected override void Configure(IInputObjectTypeDescriptor<ProductPriceInputDto> descriptor)
         {
+            base.Configure(descriptor);
+
             descriptor.Name("ProductPriceInput");
-            descriptor.Field(c => c.ProductId).Name("id").Type<NonNullType<IdType>>();
-            descriptor.Field(c => c.WholeSalePricePerUnit);
+            
+            descriptor
+                .Field(c => c.ProductId)
+                .Name("id")
+                .ID(nameof(Product));
+            
+            descriptor
+                .Field(c => c.WholeSalePricePerUnit)
+                .Name("wholeSalePricePerUnit");
         }
     }
 }

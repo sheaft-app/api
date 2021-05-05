@@ -4,6 +4,7 @@ using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using HotChocolate;
+using HotChocolate.AspNetCore.Authorization;
 using HotChocolate.Data;
 using HotChocolate.Types;
 using IdentityModel.Client;
@@ -14,6 +15,7 @@ using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Application.Models;
+using Sheaft.Application.Security;
 using Sheaft.Domain;
 using Sheaft.GraphQL.Types.Outputs;
 using Sheaft.Infrastructure.Persistence;
@@ -51,15 +53,21 @@ namespace Sheaft.GraphQL.Users
         public IQueryable<User> Get([ScopedService] AppDbContext context)
         {
             SetLogTransaction(CurrentUser.Id);
+            
+            if (!CurrentUser.IsAuthenticated())
+                return null;
+            
             return context.Users
                 .Where(c => c.Id == CurrentUser.Id);
         }
 
         [GraphQLName("freshdeskToken")]
         [GraphQLType(typeof(StringType))]
+        [Authorize(Policy = Policies.AUTHENTICATED)]
         public async Task<string> GetFreshdeskToken()
         {
             SetLogTransaction(CurrentUser.Id);
+            
             if (!CurrentUser.IsAuthenticated())
                 return null;
             

@@ -116,7 +116,7 @@ namespace Sheaft.Web.Manage.Controllers
             var entity = await _context.Users.OfType<Consumer>().SingleOrDefaultAsync(c => c.Id == id, token);
             var name = entity.Name;
 
-            var result = await _mediatr.Process(new RemoveUserCommand(await GetRequestUserAsync(token))
+            var result = await _mediatr.Process(new DeleteUserCommand(await GetRequestUserAsync(token))
             {
                 UserId = id
             }, token);

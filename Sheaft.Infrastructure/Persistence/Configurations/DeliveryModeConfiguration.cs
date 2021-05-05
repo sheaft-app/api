@@ -17,6 +17,7 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
         {
             entity.Property(c => c.CreatedOn);
             entity.Property(c => c.UpdatedOn).IsConcurrencyToken();
+            entity.Property(c => c.Name).UseCollation("Latin1_general_CI_AI");
             
             if(!_isAdmin)
                 entity.HasQueryFilter(p => !p.RemovedOn.HasValue);

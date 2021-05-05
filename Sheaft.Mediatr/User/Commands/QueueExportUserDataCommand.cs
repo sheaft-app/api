@@ -26,9 +26,16 @@ namespace Sheaft.Mediatr.User.Commands
         [JsonConstructor]
         public QueueExportUserDataCommand(RequestUser requestUser) : base(requestUser)
         {
+            UserId = requestUser.Id;
         }
 
         public Guid UserId { get; set; }
+
+        public override void SetRequestUser(RequestUser user)
+        {
+            base.SetRequestUser(user);
+            UserId = user.Id;
+        }
     }
 
     public class QueueExportUserDataCommandHandler : CommandsHandler,

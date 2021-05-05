@@ -10,6 +10,8 @@ namespace Sheaft.GraphQL.Types.Outputs
         {
             base.Configure(descriptor);
 
+            descriptor.Name("SirenBusiness");
+            
             descriptor
                 .Field(c => c.Siren)
                 .Name("siren");

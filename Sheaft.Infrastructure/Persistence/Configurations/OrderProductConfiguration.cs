@@ -20,7 +20,7 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
             entity.Property(o => o.Vat).HasColumnType("decimal(10,2)");
             entity.Property(o => o.TotalWeight).HasColumnType("decimal(10,2)");
 
-            entity.Property(o => o.Name).IsRequired();
+            entity.Property(o => o.Name).UseCollation("Latin1_general_CI_AI").IsRequired();
             entity.Property(o => o.Reference).IsRequired();
 
             entity.Property(o => o.ReturnableVat).HasColumnType("decimal(10,2)");

@@ -8,7 +8,7 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
     {
         public void Configure(EntityTypeBuilder<Country> entity)
         {
-            entity.Property(o => o.Name).IsRequired();
+            entity.Property(o => o.Name).UseCollation("Latin1_general_CI_AI").IsRequired();
             entity.Property(o => o.Alpha2).IsRequired();
 
             entity.HasKey(c => c.Id);

@@ -128,7 +128,7 @@ namespace Sheaft.Web.Manage.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete(Guid id, CancellationToken token)
         {
-            var result = await _mediatr.Process(new RemoveUserCommand(await GetRequestUserAsync(token))
+            var result = await _mediatr.Process(new DeleteUserCommand(await GetRequestUserAsync(token))
             {
                 UserId = id
             }, token);

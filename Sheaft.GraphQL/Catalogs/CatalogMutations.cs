@@ -11,6 +11,7 @@ using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Application.Interfaces.Mediatr;
 using Sheaft.Application.Security;
 using Sheaft.Domain;
+using Sheaft.GraphQL.Types.Inputs;
 using Sheaft.GraphQL.Types.Outputs;
 using Sheaft.Mediatr.Catalog.Commands;
 
@@ -30,7 +31,9 @@ namespace Sheaft.GraphQL.Catalogs
         [GraphQLName("createCatalog")]
         [Authorize(Policy = Policies.PRODUCER)]
         [GraphQLType(typeof(CatalogType))]
-        public async Task<Catalog> CreateCatalogAsync([GraphQLName("input")] CreateCatalogCommand input,
+        public async Task<Catalog> CreateCatalogAsync(
+            [GraphQLType(typeof(CreateCatalogInputType))] [GraphQLName("input")]
+            CreateCatalogCommand input,
             CatalogsByIdBatchDataLoader catalogsDataLoader, CancellationToken token)
         {
             var result = await ExecuteAsync<CreateCatalogCommand, Guid>(input, token);
@@ -40,7 +43,9 @@ namespace Sheaft.GraphQL.Catalogs
         [GraphQLName("updateCatalog")]
         [Authorize(Policy = Policies.PRODUCER)]
         [GraphQLType(typeof(CatalogType))]
-        public async Task<Catalog> UpdateCatalogAsync([GraphQLName("input")] UpdateCatalogCommand input,
+        public async Task<Catalog> UpdateCatalogAsync(
+            [GraphQLType(typeof(UpdateCatalogInputType))] [GraphQLName("input")]
+            UpdateCatalogCommand input,
             CatalogsByIdBatchDataLoader catalogsDataLoader, CancellationToken token)
         {
             await ExecuteAsync(input, token);
@@ -50,7 +55,9 @@ namespace Sheaft.GraphQL.Catalogs
         [GraphQLName("deleteCatalog")]
         [Authorize(Policy = Policies.PRODUCER)]
         [GraphQLType(typeof(CatalogType))]
-        public async Task<bool> DeleteCatalogsAsync([GraphQLName("input")] DeleteCatalogsCommand input,
+        public async Task<bool> DeleteCatalogsAsync(
+            [GraphQLType(typeof(DeleteCatalogsInputType))] [GraphQLName("input")]
+            DeleteCatalogsCommand input,
             CancellationToken token)
         {
             return await ExecuteAsync(input, token);
@@ -60,7 +67,8 @@ namespace Sheaft.GraphQL.Catalogs
         [Authorize(Policy = Policies.PRODUCER)]
         [GraphQLType(typeof(CatalogType))]
         public async Task<Catalog> AddOrUpdateProductsToCatalogAsync(
-            [GraphQLName("input")] AddOrUpdateProductsToCatalogCommand input,
+            [GraphQLType(typeof(AddOrUpdateProductsToCatalogInputType))] [GraphQLName("input")]
+            AddOrUpdateProductsToCatalogCommand input,
             CatalogsByIdBatchDataLoader catalogsDataLoader, CancellationToken token)
         {
             await ExecuteAsync(input, token);
@@ -71,7 +79,8 @@ namespace Sheaft.GraphQL.Catalogs
         [Authorize(Policy = Policies.PRODUCER)]
         [GraphQLType(typeof(CatalogType))]
         public async Task<Catalog> RemoveProductsFromCatalogAsync(
-            [GraphQLName("input")] RemoveProductsFromCatalogCommand input,
+            [GraphQLType(typeof(RemoveProductsFromCatalogInputType))] [GraphQLName("input")]
+            RemoveProductsFromCatalogCommand input,
             CatalogsByIdBatchDataLoader catalogsDataLoader, CancellationToken token)
         {
             await ExecuteAsync(input, token);
@@ -81,7 +90,8 @@ namespace Sheaft.GraphQL.Catalogs
         [GraphQLName("cloneCatalog")]
         [Authorize(Policy = Policies.PRODUCER)]
         [GraphQLType(typeof(CatalogType))]
-        public async Task<Catalog> CloneCatalogAsync([GraphQLName("input")] CloneCatalogCommand input,
+        public async Task<Catalog> CloneCatalogAsync([GraphQLType(typeof(CloneCatalogInputType))] [GraphQLName("input")]
+            CloneCatalogCommand input,
             CatalogsByIdBatchDataLoader catalogsDataLoader, CancellationToken token)
         {
             var result = await ExecuteAsync<CloneCatalogCommand, Guid>(input, token);
@@ -92,7 +102,8 @@ namespace Sheaft.GraphQL.Catalogs
         [Authorize(Policy = Policies.PRODUCER)]
         [GraphQLType(typeof(CatalogType))]
         public async Task<Catalog> UpdateAllCatalogPricesAsync(
-            [GraphQLName("input")] UpdateAllCatalogPricesCommand input,
+            [GraphQLType(typeof(UpdateAllCatalogPricesInputType))] [GraphQLName("input")]
+            UpdateAllCatalogPricesCommand input,
             CatalogsByIdBatchDataLoader catalogsDataLoader, CancellationToken token)
         {
             await ExecuteAsync(input, token);
@@ -102,7 +113,9 @@ namespace Sheaft.GraphQL.Catalogs
         [GraphQLName("updateCatalogPrices")]
         [Authorize(Policy = Policies.PRODUCER)]
         [GraphQLType(typeof(CatalogType))]
-        public async Task<Catalog> UpdateCatalogPricesAsync([GraphQLName("input")] UpdateCatalogPricesCommand input,
+        public async Task<Catalog> UpdateCatalogPricesAsync(
+            [GraphQLType(typeof(UpdateCatalogPricesInputType))] [GraphQLName("input")]
+            UpdateCatalogPricesCommand input,
             CatalogsByIdBatchDataLoader catalogsDataLoader, CancellationToken token)
         {
             await ExecuteAsync(input, token);
@@ -112,7 +125,9 @@ namespace Sheaft.GraphQL.Catalogs
         [GraphQLName("setCatalogAsDefault")]
         [Authorize(Policy = Policies.PRODUCER)]
         [GraphQLType(typeof(CatalogType))]
-        public async Task<Catalog> SetCatalogAsDefaultAsync([GraphQLName("input")] SetCatalogAsDefaultCommand input,
+        public async Task<Catalog> SetCatalogAsDefaultAsync(
+            [GraphQLType(typeof(SetCatalogAsDefaultInputType))] [GraphQLName("input")]
+            SetCatalogAsDefaultCommand input,
             CatalogsByIdBatchDataLoader catalogsDataLoader, CancellationToken token)
         {
             await ExecuteAsync(input, token);
@@ -123,7 +138,8 @@ namespace Sheaft.GraphQL.Catalogs
         [Authorize(Policy = Policies.PRODUCER)]
         [GraphQLType(typeof(ListType<CatalogType>))]
         public async Task<IEnumerable<Catalog>> SetCatalogsAvailabilityAsync(
-            [GraphQLName("input")] SetCatalogsAvailabilityCommand input,
+            [GraphQLType(typeof(SetCatalogsAvailabilityInputType))] [GraphQLName("input")]
+            SetCatalogsAvailabilityCommand input,
             CatalogsByIdBatchDataLoader catalogsDataLoader, CancellationToken token)
         {
             await ExecuteAsync(input, token);

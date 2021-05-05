@@ -8,6 +8,8 @@ namespace Sheaft.GraphQL.Types.Outputs
         protected override void Configure(IObjectTypeDescriptor<DeliveryDto> descriptor)
         {
             base.Configure(descriptor);
+
+            descriptor.Name("Delivery");
             
             descriptor.Field(c => c.Id)
                 .Name("id")

@@ -321,8 +321,8 @@ namespace Sheaft.Web.Api
                 .RegisterGraphQlMutations()
                 .RegisterGraphQlDataLoaders()
                 .AddFiltering()
-                .AddSorting()
-                .EnableRelaySupport();
+                .AddSorting();
+                //.EnableRelaySupport();
 
             services.AddErrorFilter<SheaftErrorFilter>();
 

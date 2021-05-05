@@ -1,4 +1,5 @@
 using HotChocolate.Types;
+using Sheaft.Domain;
 using Sheaft.Mediatr.Catalog.Commands;
 
 namespace Sheaft.GraphQL.Types.Inputs
@@ -7,10 +8,14 @@ namespace Sheaft.GraphQL.Types.Inputs
     {
         protected override void Configure(IInputObjectTypeDescriptor<DeleteCatalogsCommand> descriptor)
         {
+            base.Configure(descriptor);
+
             descriptor.Name("DeleteCatalogsInput");
-            descriptor.Field(c => c.CatalogIds)
+            
+            descriptor
+                .Field(c => c.CatalogIds)
                 .Name("ids")
-                .Type<NonNullType<ListType<IdType>>>();
+                .ID(nameof(Catalog));
         }
     }
 }

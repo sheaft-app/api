@@ -25,6 +25,7 @@ namespace Sheaft.Mediatr.Legal.Commands
         [JsonConstructor]
         public CreateConsumerLegalCommand(RequestUser requestUser) : base(requestUser)
         {
+            UserId = requestUser.Id;
         }
 
         public Guid UserId { get; set; }
@@ -35,6 +36,12 @@ namespace Sheaft.Mediatr.Legal.Commands
         public CountryIsoCode Nationality { get; set; }
         public CountryIsoCode CountryOfResidence { get; set; }
         public AddressDto Address { get; set; }
+
+        public override void SetRequestUser(RequestUser user)
+        {
+            base.SetRequestUser(user);
+            UserId = user.Id;
+        }
     }
 
     public class CreateConsumerLegalCommandHandler : CommandsHandler,

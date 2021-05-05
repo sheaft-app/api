@@ -1,4 +1,5 @@
 using HotChocolate.Types;
+using Sheaft.Domain;
 using Sheaft.Mediatr.ProfileInformation.Commands;
 
 namespace Sheaft.GraphQL.Types.Inputs
@@ -7,13 +8,17 @@ namespace Sheaft.GraphQL.Types.Inputs
     {
         protected override void Configure(IInputObjectTypeDescriptor<RemoveUserPicturesCommand> descriptor)
         {
+            base.Configure(descriptor);
+
             descriptor.Name("RemoveUserPicturesInput");
+            
             descriptor.Field(c => c.PictureIds)
-                .Type<NonNullType<ListType<IdType>>>();
+                .Name("pictureIds")
+                .ID(nameof(ProfilePicture));
 
             descriptor.Field(c => c.UserId)
                 .Name("id")
-                .Type<NonNullType<IdType>>();
+                .ID(nameof(User));
         }
     }
 }

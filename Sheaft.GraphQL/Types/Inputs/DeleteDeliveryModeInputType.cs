@@ -1,4 +1,5 @@
 using HotChocolate.Types;
+using Sheaft.Domain;
 using Sheaft.Mediatr.DeliveryMode.Commands;
 
 namespace Sheaft.GraphQL.Types.Inputs
@@ -7,10 +8,14 @@ namespace Sheaft.GraphQL.Types.Inputs
     {
         protected override void Configure(IInputObjectTypeDescriptor<DeleteDeliveryModeCommand> descriptor)
         {
+            base.Configure(descriptor);
+
             descriptor.Name("DeleteDeliveryModeInput");
-            descriptor.Field(c => c.DeliveryModeId)
+            
+            descriptor
+                .Field(c => c.DeliveryModeId)
                 .Name("id")
-                .Type<NonNullType<IdType>>();
+                .ID(nameof(DeliveryMode));
         }
     }
 }

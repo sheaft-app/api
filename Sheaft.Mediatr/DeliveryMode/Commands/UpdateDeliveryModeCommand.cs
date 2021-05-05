@@ -40,7 +40,7 @@ namespace Sheaft.Mediatr.DeliveryMode.Commands
         public int? MaxPurchaseOrdersPerTimeSlot { get; set; }
         public int? LockOrderHoursBeforeDelivery { get; set; }
         public AddressDto Address { get; set; }
-        public IEnumerable<TimeSlotGroupDto> OpeningHours { get; set; }
+        public IEnumerable<TimeSlotGroupDto> DeliveryHours { get; set; }
         public bool Available { get; set; }
         public bool AutoAcceptRelatedPurchaseOrder { get; set; }
         public bool AutoCompleteRelatedPurchaseOrder { get; set; }
@@ -77,10 +77,10 @@ namespace Sheaft.Mediatr.DeliveryMode.Commands
                 entity.SetAddress(request.Address.Line1, request.Address.Line2, request.Address.Zipcode,
                     request.Address.City, request.Address.Country, request.Address.Longitude, request.Address.Latitude);
 
-            if (request.OpeningHours != null)
+            if (request.DeliveryHours != null)
             {
                 var openingHours = new List<DeliveryHours>();
-                foreach (var oh in request.OpeningHours)
+                foreach (var oh in request.DeliveryHours)
                     openingHours.AddRange(oh.Days.Select(c => new DeliveryHours(c, oh.From, oh.To)));
 
                 entity.SetDeliveryHours(openingHours);

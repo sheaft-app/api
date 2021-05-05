@@ -1,4 +1,5 @@
 using HotChocolate.Types;
+using Sheaft.Domain;
 using Sheaft.Mediatr.PurchaseOrder.Commands;
 
 namespace Sheaft.GraphQL.Types.Inputs
@@ -7,10 +8,14 @@ namespace Sheaft.GraphQL.Types.Inputs
     {
         protected override void Configure(IInputObjectTypeDescriptor<CompletePurchaseOrdersCommand> descriptor)
         {
+            base.Configure(descriptor);
+
             descriptor.Name("CompletePurchaseOrdersInput");
-            descriptor.Field(c => c.PurchaseOrderIds)
+            
+            descriptor
+                .Field(c => c.PurchaseOrderIds)
                 .Name("ids")
-                .Type<NonNullType<ListType<IdType>>>();
+                .ID(nameof(PurchaseOrder));
         }
     }
 }

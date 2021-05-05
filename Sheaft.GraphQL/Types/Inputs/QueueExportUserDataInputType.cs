@@ -1,4 +1,5 @@
 using HotChocolate.Types;
+using Sheaft.Domain;
 using Sheaft.Mediatr.User.Commands;
 
 namespace Sheaft.GraphQL.Types.Inputs
@@ -7,10 +8,14 @@ namespace Sheaft.GraphQL.Types.Inputs
     {
         protected override void Configure(IInputObjectTypeDescriptor<QueueExportUserDataCommand> descriptor)
         {
+            base.Configure(descriptor);
+
             descriptor.Name("ExportUserDataInput");
-            descriptor.Field(c => c.UserId)
+            
+            descriptor
+                .Field(c => c.UserId)
                 .Name("id")
-                .Type<NonNullType<IdType>>();
+                .ID(nameof(User));
         }
     }
 }

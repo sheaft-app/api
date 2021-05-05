@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using NetTopologySuite.Geometries;
 using Sheaft.Infrastructure.Persistence;
 
 namespace Sheaft.Infrastructure.Persistence.Migrations
@@ -122,7 +123,8 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(max)")
+                        .UseCollation("Latin1_general_CI_AI");
 
                     b.Property<Guid>("ProducerId")
                         .HasColumnType("uniqueidentifier");
@@ -199,7 +201,8 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(max)")
+                        .UseCollation("Latin1_general_CI_AI");
 
                     b.HasKey("Id");
 
@@ -331,7 +334,8 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("Name")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(max)")
+                        .UseCollation("Latin1_general_CI_AI");
 
                     b.Property<Guid>("ProducerId")
                         .HasColumnType("uniqueidentifier");
@@ -371,7 +375,8 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(max)")
+                        .UseCollation("Latin1_general_CI_AI");
 
                     b.Property<int>("Points")
                         .ValueGeneratedOnAdd()
@@ -566,7 +571,8 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(max)")
+                        .UseCollation("Latin1_general_CI_AI");
 
                     b.Property<string>("Queue")
                         .HasColumnType("nvarchar(max)");
@@ -689,7 +695,8 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Content")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(max)")
+                        .UseCollation("Latin1_general_CI_AI");
 
                     b.Property<DateTimeOffset>("CreatedOn")
                         .HasColumnType("datetimeoffset");
@@ -883,7 +890,8 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(max)")
+                        .UseCollation("Latin1_general_CI_AI");
 
                     b.Property<Guid>("OrderId")
                         .HasColumnType("uniqueidentifier");
@@ -1312,7 +1320,8 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(max)")
+                        .UseCollation("Latin1_general_CI_AI");
 
                     b.Property<string>("Picture")
                         .HasColumnType("nvarchar(max)");
@@ -1539,7 +1548,8 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(max)")
+                        .UseCollation("Latin1_general_CI_AI");
 
                     b.Property<Guid>("ProductId")
                         .HasColumnType("uniqueidentifier");
@@ -1643,7 +1653,8 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(max)")
+                        .UseCollation("Latin1_general_CI_AI");
 
                     b.Property<DateTimeOffset?>("RemovedOn")
                         .HasColumnType("datetimeoffset");
@@ -1807,7 +1818,8 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(max)")
+                        .UseCollation("Latin1_general_CI_AI");
 
                     b.Property<int>("Points")
                         .ValueGeneratedOnAdd()
@@ -2032,7 +2044,8 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(max)")
+                        .UseCollation("Latin1_general_CI_AI");
 
                     b.Property<string>("Picture")
                         .HasColumnType("nvarchar(max)");
@@ -2207,7 +2220,8 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(max)")
+                        .UseCollation("Latin1_general_CI_AI");
 
                     b.Property<string>("Phone")
                         .HasColumnType("nvarchar(max)");
@@ -2893,6 +2907,9 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                             b1.Property<string>("Line2")
                                 .HasColumnType("nvarchar(max)");
 
+                            b1.Property<Point>("Location")
+                                .HasColumnType("geography");
+
                             b1.Property<double?>("Longitude")
                                 .HasColumnType("float");
 
@@ -3413,7 +3430,8 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
 
                             b1.Property<string>("Name")
                                 .IsRequired()
-                                .HasColumnType("nvarchar(max)");
+                                .HasColumnType("nvarchar(max)")
+                                .UseCollation("Latin1_general_CI_AI");
 
                             b1.Property<string>("Phone")
                                 .HasColumnType("nvarchar(max)");
@@ -3446,7 +3464,8 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
 
                             b1.Property<string>("Name")
                                 .IsRequired()
-                                .HasColumnType("nvarchar(max)");
+                                .HasColumnType("nvarchar(max)")
+                                .UseCollation("Latin1_general_CI_AI");
 
                             b1.Property<string>("Phone")
                                 .HasColumnType("nvarchar(max)");
@@ -3741,6 +3760,9 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
 
                             b1.Property<string>("Line2")
                                 .HasColumnType("nvarchar(max)");
+
+                            b1.Property<Point>("Location")
+                                .HasColumnType("geography");
 
                             b1.Property<double?>("Longitude")
                                 .HasColumnType("float");

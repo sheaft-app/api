@@ -11,7 +11,7 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
         {
             entity.Property(c => c.UpdatedOn).IsConcurrencyToken();
 
-            entity.Property(c => c.Name).IsRequired();
+            entity.Property(c => c.Name).UseCollation("Latin1_general_CI_AI").IsRequired();
             entity.Property(c => c.Code).IsRequired();
             entity.Property(c => c.ProducersCount).HasDefaultValue(0);
             entity.Property(c => c.StoresCount).HasDefaultValue(0);

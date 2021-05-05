@@ -1,4 +1,5 @@
 using HotChocolate.Types;
+using Sheaft.Domain;
 using Sheaft.Mediatr.Order.Commands;
 
 namespace Sheaft.GraphQL.Types.Inputs
@@ -7,11 +8,14 @@ namespace Sheaft.GraphQL.Types.Inputs
     {
         protected override void Configure(IInputObjectTypeDescriptor<ResetOrderCommand> descriptor)
         {
+            base.Configure(descriptor);
+
             descriptor.Name("ResetOrderInput");
-            
-            descriptor.Field(c => c.OrderId)
+
+            descriptor
+                .Field(c => c.OrderId)
                 .Name("id")
-                .Type<NonNullType<IdType>>();
+                .ID(nameof(Order));
         }
     }
 }

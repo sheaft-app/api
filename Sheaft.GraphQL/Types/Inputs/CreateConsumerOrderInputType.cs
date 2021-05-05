@@ -8,13 +8,22 @@ namespace Sheaft.GraphQL.Types.Inputs
     {
         protected override void Configure(IInputObjectTypeDescriptor<CreateConsumerOrderCommand> descriptor)
         {
-            descriptor.Name("CreateOrderInput");
-            descriptor.Field(c => c.Donation);
+            base.Configure(descriptor);
 
-            descriptor.Field(c => c.ProducersExpectedDeliveries)
+            descriptor.Name("CreateOrderInput");
+            
+            descriptor
+                .Field(c => c.Donation)
+                .Name("donation");
+
+            descriptor
+                .Field(c => c.ProducersExpectedDeliveries)
+                .Name("producersExpectedDeliveries")
                 .Type<ListType<ProducerExpectedDeliveryInputType>>();
 
-            descriptor.Field(c => c.Products)
+            descriptor
+                .Field(c => c.Products)
+                .Name("products")
                 .Type<NonNullType<ListType<ResourceIdQuantityInputType>>>();
         }
     }

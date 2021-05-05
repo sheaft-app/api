@@ -1,4 +1,5 @@
 using HotChocolate.Types;
+using Sheaft.Domain;
 using Sheaft.Mediatr.QuickOrder.Commands;
 
 namespace Sheaft.GraphQL.Types.Inputs
@@ -7,14 +8,14 @@ namespace Sheaft.GraphQL.Types.Inputs
     {
         protected override void Configure(IInputObjectTypeDescriptor<SetQuickOrderAsDefaultCommand> descriptor)
         {
+            base.Configure(descriptor);
+
             descriptor.Name("SetQuickOrderAsDefaultInput");
-            
-            descriptor.Field(c => c.UserId)
-                .Type<IdType>();
-            
-            descriptor.Field(c => c.QuickOrderId)
+
+            descriptor
+                .Field(c => c.QuickOrderId)
                 .Name("id")
-                .Type<NonNullType<IdType>>();
+                .ID(nameof(QuickOrder));
         }
     }
 }

@@ -22,7 +22,7 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
             if(!_isAdmin)
                 entity.HasQueryFilter(p => !p.RemovedOn.HasValue);
 
-            entity.Property(o => o.Name).IsRequired();
+            entity.Property(o => o.Name).UseCollation("Latin1_general_CI_AI").IsRequired();
             
             entity.HasOne(c => c.Producer).WithMany().HasForeignKey(c => c.ProducerId).OnDelete(DeleteBehavior.Cascade).IsRequired();
             entity.HasMany(c => c.Products).WithOne(c => c.Catalog).HasForeignKey(c => c.CatalogId).OnDelete(DeleteBehavior.NoAction).IsRequired();

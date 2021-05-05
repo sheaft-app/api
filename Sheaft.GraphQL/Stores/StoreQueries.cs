@@ -1,26 +1,22 @@
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using HotChocolate;
-using HotChocolate.AspNetCore.Authorization;
 using HotChocolate.Data;
 using HotChocolate.Types;
 using HotChocolate.Types.Relay;
 using IdentityModel.Client;
 using Microsoft.AspNetCore.Http;
-using Microsoft.Azure.Search;
-using Microsoft.Azure.Search.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
-using Newtonsoft.Json;
+using NetTopologySuite.Geometries;
 using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Application.Models;
-using Sheaft.Application.Security;
 using Sheaft.Domain;
+using Sheaft.Domain.Common;
 using Sheaft.GraphQL.Types.Inputs;
 using Sheaft.GraphQL.Types.Outputs;
 using Sheaft.Infrastructure.Persistence;
@@ -31,29 +27,20 @@ namespace Sheaft.GraphQL.Stores
     [ExtendObjectType(Name = "Query")]
     public class StoreQueries : SheaftQuery
     {
-        private readonly ISearchIndexClient _storesIndex;
         private readonly HttpClient _httpClient;
         private readonly SireneOptions _sireneOptions;
-        private readonly SearchOptions _searchOptions;
-        
         public StoreQueries(
-            IHttpClientFactory httpClientFactory,
             ICurrentUserService currentUserService,
             IOptionsSnapshot<SireneOptions> sireneOptions,
-            IOptionsSnapshot<SearchOptions> searchOptions,
-            ISearchServiceClient searchServiceClient,
+            IHttpClientFactory httpClientFactory,
             IHttpContextAccessor httpContextAccessor)
-            :base(currentUserService, httpContextAccessor)
+            : base(currentUserService, httpContextAccessor)
         {
-
             _sireneOptions = sireneOptions.Value;
-            _searchOptions = searchOptions.Value;
 
             _httpClient = httpClientFactory.CreateClient("sirene");
             _httpClient.BaseAddress = new Uri(_sireneOptions.Url);
             _httpClient.SetToken(_sireneOptions.Scheme, _sireneOptions.ApiKey);
-
-            _storesIndex = searchServiceClient.Indexes.GetClient(_searchOptions.Indexes.Stores);
         }
 
         [GraphQLName("store")]
@@ -63,107 +50,72 @@ namespace Sheaft.GraphQL.Stores
         public IQueryable<Store> Get([ID] Guid id, [ScopedService] AppDbContext context)
         {
             SetLogTransaction(id);
-            return context.Stores.Where(c => c.Id == id);
+            return context.Stores
+                .Where(c => c.Id == id);
+        }
+
+        [GraphQLName("suggestStores")]
+        [UseDbContext(typeof(AppDbContext))]
+        [GraphQLType(typeof(ListType<UserType>))]
+        public async Task<IEnumerable<User>> SuggestStoresAsync(
+            [GraphQLType(typeof(SearchTermsInputType))] [GraphQLName("input")]
+            SearchTermsDto terms,
+            [ScopedService] AppDbContext context, CancellationToken token)
+        {
+            var query = context.Stores.AsQueryable();
+            if (!string.IsNullOrWhiteSpace(terms.Text))
+                query = query.Where(c => c.Name.Contains(terms.Text));
+
+            return await query.ToListAsync(token);
         }
 
         [GraphQLName("searchStores")]
         [UseDbContext(typeof(AppDbContext))]
-        [GraphQLType(typeof(ListType<ProducersSearchDtoType>))]
-        [Authorize(Policy = Policies.PRODUCER)]
-        public async Task<StoresSearchDto> SearchStoresAsync(
-            [GraphQLType(typeof(SearchTermsInputType))] [GraphQLName("input")] SearchTermsDto terms, 
-            [ScopedService] AppDbContext context, CancellationToken token)
+        [GraphQLType(typeof(StoresSearchDtoType))]
+        public async Task<StoresSearchDto> SearchAsync(
+            [GraphQLType(typeof(SearchTermsInputType))] [GraphQLName("input")]
+            SearchTermsDto terms,
+            [ScopedService] AppDbContext context,
+            CancellationToken token)
         {
-            var sp = new SearchParameters()
-            {
-                SearchMode = SearchMode.Any,
-                Top = terms.Take,
-                Skip = (terms.Page - 1) * terms.Take,
-                SearchFields = new List<string> { "partialStoreName" },
-                Select = new List<string>()
-                    {
-                        "store_id", "store_name", "store_email", "store_phone",  "store_picture", "store_tags", "store_line1", "store_line2", "store_zipcode", "store_city", "store_longitude", "store_latitude"
-                    },
-                IncludeTotalResultCount = true,
-                HighlightFields = new List<string>() { "store_name" },
-                HighlightPreTag = "<b>",
-                HighlightPostTag = "</b>"
-            };
+            var query = context.Stores.AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(terms.Text))
+                query = query.Where(p => p.Name.Contains(terms.Text));
+
+            if (terms.Tags != null && terms.Tags.Any())
+                query = query.Where(p => p.Tags.Any(t => terms.Tags.Contains(t.Tag.Name)));
 
             var producer = await context.Producers.SingleAsync(e => e.Id == CurrentUser.Id, token);
+            Point currentPosition = null;
+            if (producer.Address?.Latitude != null && producer.Address?.Longitude != null)
+            {
+                currentPosition =
+                    LocationProvider.CreatePoint(producer.Address.Latitude.Value, producer.Address.Longitude.Value);
+                query = query.Where(p => p.Address.Location.Distance(currentPosition) < 200000);
+            }
+
+            var count = await query.CountAsync(token);
+
             if (!string.IsNullOrWhiteSpace(terms.Sort))
             {
-                if (terms.Sort.Contains("store_geolocation"))
-                {
-                    sp.OrderBy = new List<string>() { $"geo.distance(store_geolocation, geography'POINT({producer.Address.Longitude.Value.ToString(new CultureInfo("en-US"))} {producer.Address.Latitude.Value.ToString(new CultureInfo("en-US"))})')" };
-                }
-                else if (!terms.Sort.Contains("store_geolocation"))
-                {
-                    sp.OrderBy = new List<string>() { terms.Sort };
-                }
+                if (terms.Sort.Contains("store_geolocation") && currentPosition != null)
+                    query = query.OrderBy(p => p.Address.Location.Distance(currentPosition));
+                else
+                    query = query.OrderBy(p => p.Name);
             }
+            else
+                query = query.OrderBy(p => p.Name);
 
-            var filter = "removed eq 0";
-            if (terms.Tags != null)
-            {
-                foreach (var tag in terms.Tags)
-                {
-                    filter += " and ";
-                    filter += $"store_tags/any(p: p eq '{tag.ToLowerInvariant()}')";
-                }
-            }
+            query = query.Skip(((terms.Page ?? 1) - 1) * terms.Take ?? 20);
+            query = query.Take(terms.Take ?? 20);
 
-            filter += " and ";
-            filter += $"geo.distance(store_geolocation, geography'POINT({producer.Address.Longitude.Value.ToString(new CultureInfo("en-US"))} {producer.Address.Latitude.Value.ToString(new CultureInfo("en-US"))})') le {terms.MaxDistance ?? 200}";
-
-            sp.Filter = filter;
-
-            var results = await _storesIndex.Documents.SearchAsync(terms.Text, sp, cancellationToken: token);
-            var searchResults = new List<SearchStore>();
-            foreach (var result in results.Results)
-            {
-                var json = JsonConvert.SerializeObject(result.Document, Formatting.None);
-                searchResults.Add(JsonConvert.DeserializeObject<SearchStore>(json));
-            }
-
+            var results = await query.ToListAsync(token);
             return new StoresSearchDto
             {
-                Count = results.Count ?? 0,
-                Stores = searchResults?.Select(p => new StoreDto
-                {
-                    Id = p.Store_id,
-                    Name = p.Store_name,
-                    Email = p.Store_email,
-                    Phone = p.Store_phone,
-                    Picture = p.Store_picture != null ? p.Store_picture : string.Empty,
-                    Tags = p.Store_tags?.Select(t => new TagDto { Name = t }) ?? new List<TagDto>(),
-                    Address = new AddressDto
-                    {
-                        Line1 = p.Store_line1,
-                        Line2 = p.Store_line2,
-                        City = p.Store_city,
-                        Latitude = p.Store_latitude,
-                        Longitude = p.Store_longitude,
-                        Zipcode = p.Store_zipcode
-                    }
-                }) ?? new List<StoreDto>()
+                Count = count,
+                Stores = results
             };
-        }
-
-        private class SearchStore
-        {
-            public Guid Store_id { get; set; }
-            public string Store_name { get; set; }
-            public string Store_line1 { get; set; }
-            public string Store_line2 { get; set; }
-            public string Store_zipcode { get; set; }
-            public string Store_city { get; set; }
-            public string Store_email { get; set; }
-            public string Store_phone { get; set; }
-            public double Store_longitude { get; set; }
-            public double Store_latitude { get; set; }
-            public string Store_picture { get; set; }
-            public IEnumerable<string> Store_tags { get; set; }
         }
     }
 }

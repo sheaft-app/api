@@ -8,6 +8,8 @@ namespace Sheaft.GraphQL.Types.Outputs
         protected override void Configure(IObjectTypeDescriptor<UserPositionDto> descriptor)
         {
             base.Configure(descriptor);
+
+            descriptor.Name("UserPosition");
             
             descriptor
                 .Field(c => c.Points)

@@ -21,7 +21,7 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
             if (!_isAdmin)
                 entity.HasQueryFilter(p => !p.RemovedOn.HasValue);
 
-            entity.Property(o => o.Name).IsRequired();
+            entity.Property(o => o.Name).UseCollation("Latin1_general_CI_AI").IsRequired();
             entity.Property(o => o.Reference).IsRequired();
             entity.Property(o => o.QuantityPerUnit).HasColumnType("decimal(10,3)");
             entity.Property(o => o.Vat).HasColumnType("decimal(10,2)");

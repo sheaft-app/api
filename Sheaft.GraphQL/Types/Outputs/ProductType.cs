@@ -2,12 +2,14 @@
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Amazon.Auth.AccessControlPolicy;
 using HotChocolate;
 using HotChocolate.Resolvers;
 using HotChocolate.Types;
 using Microsoft.EntityFrameworkCore;
 using Sheaft.Application.Extensions;
 using Sheaft.Application.Interfaces.Infrastructure;
+using Sheaft.Application.Security;
 using Sheaft.Core;
 using Sheaft.Domain;
 using Sheaft.GraphQL.Catalogs;
@@ -16,6 +18,7 @@ using Sheaft.GraphQL.Products;
 using Sheaft.GraphQL.Ratings;
 using Sheaft.GraphQL.Returnables;
 using Sheaft.GraphQL.Tags;
+using Sheaft.GraphQL.Users;
 using Sheaft.Infrastructure.Persistence;
 
 namespace Sheaft.GraphQL.Types.Outputs
@@ -113,11 +116,13 @@ namespace Sheaft.GraphQL.Types.Outputs
             descriptor
                 .Field("visibleToConsumers")
                 .Resolve(c => true)
+                .Authorize(Policies.PRODUCER)
                 .Type<BooleanType>();
 
             descriptor
                 .Field("visibleToStores")
                 .Resolve(c => true)
+                .Authorize(Policies.PRODUCER)
                 .Type<BooleanType>();
 
             descriptor
@@ -187,7 +192,9 @@ namespace Sheaft.GraphQL.Types.Outputs
                 .Name("ratings")
                 .UseDbContext<AppDbContext>()
                 .ResolveWith<ProductResolvers>(c => c.GetRatings(default!, default!, default, default))
-                .Type<ListType<RatingType>>();
+                .Type<ListType<RatingType>>()
+                .UsePaging()
+                .UseSorting();
 
             descriptor
                 .Field(c => c.Pictures)

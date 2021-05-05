@@ -11,6 +11,7 @@ using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Application.Interfaces.Mediatr;
 using Sheaft.Application.Security;
 using Sheaft.Domain;
+using Sheaft.GraphQL.Types.Inputs;
 using Sheaft.GraphQL.Types.Outputs;
 using Sheaft.Mediatr.BusinessClosing.Commands;
 using Sheaft.Mediatr.Legal.Commands;
@@ -32,7 +33,8 @@ namespace Sheaft.GraphQL.Business
         [Authorize(Policy = Policies.STORE_OR_PRODUCER)]
         [GraphQLType(typeof(BusinessLegalType))]
         public async Task<BusinessLegal> CreateBusinessLegalsAsync(
-            [GraphQLName("input")] CreateBusinessLegalCommand input,
+            [GraphQLType(typeof(CreateBusinessLegalInputType))] [GraphQLName("input")]
+            CreateBusinessLegalCommand input,
             BusinessLegalsByIdBatchDataLoader legalsDataLoader, CancellationToken token)
         {
             var result = await ExecuteAsync<CreateBusinessLegalCommand, Guid>(input, token);
@@ -43,7 +45,8 @@ namespace Sheaft.GraphQL.Business
         [Authorize(Policy = Policies.STORE_OR_PRODUCER)]
         [GraphQLType(typeof(BusinessLegalType))]
         public async Task<BusinessLegal> UpdateBusinessLegalsAsync(
-            [GraphQLName("input")] UpdateBusinessLegalCommand input,
+            [GraphQLType(typeof(UpdateBusinessLegalsInputType))] [GraphQLName("input")]
+            UpdateBusinessLegalCommand input,
             BusinessLegalsByIdBatchDataLoader legalsDataLoader, CancellationToken token)
         {
             await ExecuteAsync(input, token);
@@ -54,7 +57,8 @@ namespace Sheaft.GraphQL.Business
         [Authorize(Policy = Policies.STORE_OR_PRODUCER)]
         [GraphQLType(typeof(BusinessClosingType))]
         public async Task<BusinessClosing> UpdateOrCreateBusinessClosingAsync(
-            [GraphQLName("input")] UpdateOrCreateBusinessClosingCommand input,
+            [GraphQLType(typeof(UpdateOrCreateBusinessClosingInputType))] [GraphQLName("input")]
+            UpdateOrCreateBusinessClosingCommand input,
             BusinessClosingsByIdBatchDataLoader businessClosingsDataLoader, CancellationToken token)
         {
             var result =
@@ -66,7 +70,8 @@ namespace Sheaft.GraphQL.Business
         [Authorize(Policy = Policies.STORE_OR_PRODUCER)]
         [GraphQLType(typeof(ListType<BusinessClosingType>))]
         public async Task<IEnumerable<BusinessClosing>> UpdateOrCreateBusinessClosingsAsync(
-            [GraphQLName("input")] UpdateOrCreateBusinessClosingsCommand input,
+            [GraphQLType(typeof(UpdateOrCreateBusinessClosingsInputType))] [GraphQLName("input")]
+            UpdateOrCreateBusinessClosingsCommand input,
             BusinessClosingsByIdBatchDataLoader businessClosingsDataLoader, CancellationToken token)
         {
             var result =
@@ -76,7 +81,9 @@ namespace Sheaft.GraphQL.Business
 
         [GraphQLName("deleteBusinessClosings")]
         [Authorize(Policy = Policies.STORE_OR_PRODUCER)]
-        public async Task<bool> DeleteBusinessClosingsAsync([GraphQLName("input")] DeleteBusinessClosingsCommand input,
+        public async Task<bool> DeleteBusinessClosingsAsync(
+            [GraphQLType(typeof(DeleteBusinessClosingsCommand))] [GraphQLName("input")]
+            DeleteBusinessClosingsCommand input,
             CancellationToken token)
         {
             return await ExecuteAsync(input, token);

@@ -19,7 +19,7 @@ namespace Sheaft.Domain
         private List<ProductPicture> _pictures;
         private List<CatalogProduct> _catalogsPrices;
 
-        protected Product()
+        public Product()
         {
         }
 
@@ -58,8 +58,8 @@ namespace Sheaft.Domain
         public ConditioningKind Conditioning { get; private set; }
         public decimal Vat { get; private set; }
         public bool Available { get; private set; }
-        public int RatingsCount { get; set; }
-        public decimal? Rating { get; set; }
+        public int RatingsCount { get; private set; }
+        public decimal? Rating { get; private set; }
 
         public Guid? ReturnableId { get; private set; }
 

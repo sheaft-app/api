@@ -7,6 +7,10 @@ namespace Sheaft.GraphQL.Types.Outputs
     {
         protected override void Configure(IObjectTypeDescriptor<DeliveryHourDto> descriptor)
         {
+            base.Configure(descriptor);
+
+            descriptor.Name("DeliveryHour");
+
             descriptor
                 .Field(c => c.ExpectedDeliveryDate)
                 .Name("expectedDeliveryDate");

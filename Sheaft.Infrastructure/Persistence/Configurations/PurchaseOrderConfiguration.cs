@@ -43,12 +43,12 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
 
             entity.OwnsOne(c => c.VendorInfo, c =>
             {
-                c.Property(e => e.Name).IsRequired();
+                c.Property(e => e.Name).UseCollation("Latin1_general_CI_AI").IsRequired();
                 c.Property(e => e.Email).IsRequired();
             });
             entity.OwnsOne(c => c.SenderInfo, c =>
             {
-                c.Property(e => e.Name).IsRequired();
+                c.Property(e => e.Name).UseCollation("Latin1_general_CI_AI").IsRequired();
                 c.Property(e => e.Email).IsRequired();
             });
             entity.OwnsOne(c => c.ExpectedDelivery, cb =>

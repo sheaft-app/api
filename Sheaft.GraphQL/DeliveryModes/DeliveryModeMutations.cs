@@ -11,6 +11,7 @@ using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Application.Interfaces.Mediatr;
 using Sheaft.Application.Security;
 using Sheaft.Domain;
+using Sheaft.GraphQL.Types.Inputs;
 using Sheaft.GraphQL.Types.Outputs;
 using Sheaft.Mediatr.DeliveryClosing.Commands;
 using Sheaft.Mediatr.DeliveryMode.Commands;
@@ -27,40 +28,48 @@ namespace Sheaft.GraphQL.DeliveryModes
             : base(mediator, currentUserService, httpContextAccessor)
         {
         }
-        
+
         [GraphQLName("createDeliveryMode")]
         [Authorize(Policy = Policies.PRODUCER)]
         [GraphQLType(typeof(DeliveryModeType))]
-        public async Task<DeliveryMode> CreateDeliveryModeAsync([GraphQLName("input")] CreateDeliveryModeCommand input,
+        public async Task<DeliveryMode> CreateDeliveryModeAsync(
+            [GraphQLType(typeof(CreateDeliveryModeInputType))] [GraphQLName("input")]
+            CreateDeliveryModeCommand input,
             DeliveryModesByIdBatchDataLoader deliveriesDataLoader, CancellationToken token)
         {
             var result = await ExecuteAsync<CreateDeliveryModeCommand, Guid>(input, token);
             return await deliveriesDataLoader.LoadAsync(result, token);
         }
-        
+
         [GraphQLName("updateDeliveryMode")]
         [Authorize(Policy = Policies.PRODUCER)]
         [GraphQLType(typeof(DeliveryModeType))]
-        public async Task<DeliveryMode> UpdateDeliveryModeAsync([GraphQLName("input")] UpdateDeliveryModeCommand input,
+        public async Task<DeliveryMode> UpdateDeliveryModeAsync(
+            [GraphQLType(typeof(UpdateDeliveryModeInputType))] [GraphQLName("input")]
+            UpdateDeliveryModeCommand input,
             DeliveryModesByIdBatchDataLoader deliveriesDataLoader, CancellationToken token)
         {
             await ExecuteAsync(input, token);
             return await deliveriesDataLoader.LoadAsync(input.DeliveryModeId, token);
         }
-        
+
         [GraphQLName("setDeliveryModesAvailability")]
         [Authorize(Policy = Policies.PRODUCER)]
         [GraphQLType(typeof(ListType<DeliveryModeType>))]
-        public async Task<IEnumerable<DeliveryMode>> SetDeliveryModesAvailabilityAsync([GraphQLName("input")] SetDeliveryModesAvailabilityCommand input, 
+        public async Task<IEnumerable<DeliveryMode>> SetDeliveryModesAvailabilityAsync(
+            [GraphQLType(typeof(SetDeliveryModesAvailabilityInputType))] [GraphQLName("input")]
+            SetDeliveryModesAvailabilityCommand input,
             DeliveryModesByIdBatchDataLoader deliveriesDataLoader, CancellationToken token)
         {
             await ExecuteAsync(input, token);
             return await deliveriesDataLoader.LoadAsync(input.DeliveryModeIds.ToList(), token);
         }
-        
+
         [GraphQLName("deleteDeliveryMode")]
         [Authorize(Policy = Policies.PRODUCER)]
-        public async Task<bool> DeleteDeliveryModeAsync([GraphQLName("input")] DeleteDeliveryModeCommand input, CancellationToken token)
+        public async Task<bool> DeleteDeliveryModeAsync(
+            [GraphQLType(typeof(DeleteDeliveryModeInputType))] [GraphQLName("input")]
+            DeleteDeliveryModeCommand input, CancellationToken token)
         {
             return await ExecuteAsync(input, token);
         }
@@ -69,7 +78,8 @@ namespace Sheaft.GraphQL.DeliveryModes
         [Authorize(Policy = Policies.PRODUCER)]
         [GraphQLType(typeof(DeliveryClosingType))]
         public async Task<DeliveryClosing> UpdateOrCreateDeliveryClosingAsync(
-            [GraphQLName("input")] UpdateOrCreateDeliveryClosingCommand input,
+            [GraphQLType(typeof(UpdateOrCreateDeliveryClosingInputType))] [GraphQLName("input")]
+            UpdateOrCreateDeliveryClosingCommand input,
             DeliveryClosingsByIdBatchDataLoader businessClosingsDataLoader, CancellationToken token)
         {
             var result =
@@ -81,7 +91,8 @@ namespace Sheaft.GraphQL.DeliveryModes
         [Authorize(Policy = Policies.PRODUCER)]
         [GraphQLType(typeof(ListType<DeliveryClosingType>))]
         public async Task<IEnumerable<DeliveryClosing>> UpdateOrCreateDeliveryClosingsAsync(
-            [GraphQLName("input")] UpdateOrCreateDeliveryClosingsCommand input,
+            [GraphQLType(typeof(UpdateOrCreateDeliveryClosingsInputType))] [GraphQLName("input")]
+            UpdateOrCreateDeliveryClosingsCommand input,
             DeliveryClosingsByIdBatchDataLoader businessClosingsDataLoader, CancellationToken token)
         {
             var result =
@@ -91,7 +102,9 @@ namespace Sheaft.GraphQL.DeliveryModes
 
         [GraphQLName("deleteDeliveryClosings")]
         [Authorize(Policy = Policies.PRODUCER)]
-        public async Task<bool> DeleteDeliveryClosingsAsync([GraphQLName("input")] DeleteDeliveryClosingsCommand input,
+        public async Task<bool> DeleteDeliveryClosingsAsync(
+            [GraphQLType(typeof(DeleteDeliveryClosingsInputType))] [GraphQLName("input")]
+            DeleteDeliveryClosingsCommand input,
             CancellationToken token)
         {
             return await ExecuteAsync(input, token);

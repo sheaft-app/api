@@ -50,6 +50,11 @@ namespace Sheaft.GraphQL.Types.Outputs
                 .Field(c => c.LastName)
                 .Name("lastName")
                 .Type<NonNullType<StringType>>();
+            
+            descriptor
+                .Field(c => c.Address)
+                .Name("address")
+                .Type<NonNullType<UserAddressType>>();
         }
     }
 }

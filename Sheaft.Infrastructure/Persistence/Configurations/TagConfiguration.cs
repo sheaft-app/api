@@ -21,7 +21,7 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
             if(!_isAdmin)
                 entity.HasQueryFilter(p => !p.RemovedOn.HasValue);
 
-            entity.Property(c => c.Name).IsRequired();
+            entity.Property(c => c.Name).UseCollation("Latin1_general_CI_AI").IsRequired();
 
             entity.HasKey(c=>c.Id);
             entity.ToTable("Tags");

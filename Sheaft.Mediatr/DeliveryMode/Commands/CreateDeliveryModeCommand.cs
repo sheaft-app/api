@@ -38,7 +38,7 @@ namespace Sheaft.Mediatr.DeliveryMode.Commands
         public DeliveryKind Kind { get; set; }
         public int? LockOrderHoursBeforeDelivery { get; set; }
         public AddressDto Address { get; set; }
-        public IEnumerable<TimeSlotGroupDto> OpeningHours { get; set; }
+        public IEnumerable<TimeSlotGroupDto> DeliveryHours { get; set; }
         public int? MaxPurchaseOrdersPerTimeSlot { get; set; }
         public bool Available { get; set; }
         public bool AutoAcceptRelatedPurchaseOrder { get; set; }
@@ -74,8 +74,8 @@ namespace Sheaft.Mediatr.DeliveryMode.Commands
             }
 
             var openingHours = new List<DeliveryHours>();
-            if (request.OpeningHours != null)
-                foreach (var oh in request.OpeningHours)
+            if (request.DeliveryHours != null)
+                foreach (var oh in request.DeliveryHours)
                     openingHours.AddRange(oh.Days.Select(c => new DeliveryHours(c, oh.From, oh.To)));
             
             var producer = await _context.Producers.SingleAsync(e => e.Id == request.ProducerId, token);

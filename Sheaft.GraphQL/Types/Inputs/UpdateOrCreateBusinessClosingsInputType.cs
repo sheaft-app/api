@@ -1,5 +1,6 @@
 using HotChocolate.Types;
 using Sheaft.Application.Models;
+using Sheaft.Domain;
 using Sheaft.Mediatr.BusinessClosing.Commands;
 
 namespace Sheaft.GraphQL.Types.Inputs
@@ -8,12 +9,19 @@ namespace Sheaft.GraphQL.Types.Inputs
     {
         protected override void Configure(IInputObjectTypeDescriptor<UpdateOrCreateBusinessClosingsCommand> descriptor)
         {
+            base.Configure(descriptor);
+
             descriptor.Name("UpdateOrCreateBusinessClosingsInput");
-            descriptor.Field(c => c.UserId)
+            
+            descriptor
+                .Field(c => c.UserId)
                 .Name("id")
-                .Type<NonNullType<IdType>>();
-            descriptor.Field(c => c.Closings)
-                .Type<NonNullType<ListType<UpdateOrCreateClosingInputType>>>();
+                .ID(nameof(User));
+            
+            descriptor
+                .Field(c => c.Closings)
+                .Name("closings")
+                .Type<NonNullType<ListType<BusinessClosingInputType>>>();
         }
     }
 }

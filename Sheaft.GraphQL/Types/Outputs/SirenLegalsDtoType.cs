@@ -8,6 +8,8 @@ namespace Sheaft.GraphQL.Types.Outputs
         protected override void Configure(IObjectTypeDescriptor<SirenLegalsDto> descriptor)
         {
             base.Configure(descriptor);
+
+            descriptor.Name("SirenLegals");
             
             descriptor
                 .Field(c => c.NomUniteLegale)

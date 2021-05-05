@@ -8,6 +8,8 @@ namespace Sheaft.GraphQL.Types.Outputs
         protected override void Configure(IObjectTypeDescriptor<AddressDto> descriptor)
         {
             base.Configure(descriptor);
+
+            descriptor.Name("Address");
             
             descriptor
                 .Field(c => c.Line1)

@@ -7,8 +7,11 @@ using HotChocolate;
 using HotChocolate.Resolvers;
 using HotChocolate.Types;
 using Microsoft.EntityFrameworkCore;
+using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Application.Security;
 using Sheaft.Domain;
+using Sheaft.Domain.Enum;
+using Sheaft.GraphQL.Agreements;
 using Sheaft.GraphQL.Business;
 using Sheaft.GraphQL.Catalogs;
 using Sheaft.GraphQL.Stores;
@@ -33,11 +36,6 @@ namespace Sheaft.GraphQL.Types.Outputs
             descriptor
                 .Field(c => c.Picture)
                 .Name("picture");
-
-            descriptor
-                .Field(c => c.OpenForNewBusiness)
-                .Name("openForNewBusiness")
-                .Authorize(Policies.STORE_OR_PRODUCER);
 
             descriptor
                 .Field(c => c.CreatedOn)
@@ -98,23 +96,13 @@ namespace Sheaft.GraphQL.Types.Outputs
                 .Name("website");
 
             descriptor
+                .Field(c => c.OpenForNewBusiness)
+                .Name("openForNewBusiness");
+            
+            descriptor
                 .Field(c => c.Address)
                 .Name("address")
                 .Type<NonNullType<UserAddressType>>();
-
-            descriptor
-                .Field("vatIdentifier")
-                .Authorize(Policies.OWNER)
-                .UseDbContext<AppDbContext>()
-                .ResolveWith<StoreResolvers>(c => c.GetLegalsVatIdentifier(default!, default!, default!, default))
-                .Type<NonNullType<StringType>>();
-
-            descriptor
-                .Field("siret")
-                .Authorize(Policies.OWNER)
-                .UseDbContext<AppDbContext>()
-                .ResolveWith<StoreResolvers>(c => c.GetLegalsSiret(default!, default!, default!, default))
-                .Type<NonNullType<StringType>>();
             
             descriptor
                 .Field(c => c.Tags)
@@ -143,36 +131,34 @@ namespace Sheaft.GraphQL.Types.Outputs
                 .UseDbContext<AppDbContext>()
                 .ResolveWith<StoreResolvers>(c => c.GetPictures(default!, default!, default!, default))
                 .Type<ListType<ProfilePictureType>>();
+            
+            descriptor
+                .Field("agreement")
+                .Authorize(Policies.PRODUCER)
+                .UseDbContext<AppDbContext>()
+                .ResolveWith<StoreResolvers>(c => c.GetCurrentAgreement(default!, default!,  default!, default!, default))
+                .Type<AgreementType>();
         }
 
         private class StoreResolvers
         {
-            public async Task<string> GetLegalsVatIdentifier(Store store, [ScopedService] AppDbContext context,
-                BusinessLegalsByIdBatchDataLoader legalsDataLoader, CancellationToken token)
+            public async Task<Agreement> GetCurrentAgreement(Store store, 
+                [ScopedService] AppDbContext context, [Service] ICurrentUserService currentUserService,
+                AgreementsByIdBatchDataLoader agreementsDataLoader, CancellationToken token)
             {
-                var legalId = await context.Legals
-                    .Where(c => c.UserId == store.Id)
-                    .Select(c => c.Id)
-                    .SingleOrDefaultAsync(token);
-
-                if (legalId == Guid.Empty)
+                var currentUser = currentUserService.GetCurrentUserInfo();
+                if (!currentUser.Succeeded)
                     return null;
                 
-                return (await legalsDataLoader.LoadAsync(legalId, token)).VatIdentifier;
-            }
-            
-            public async Task<string> GetLegalsSiret(Store store, [ScopedService] AppDbContext context,
-                BusinessLegalsByIdBatchDataLoader legalsDataLoader, CancellationToken token)
-            {
-                var legalId = await context.Legals
-                    .Where(c => c.UserId == store.Id)
-                    .Select(c => c.Id)
+                var agreementId = await context.Agreements
+                    .Where(p => p.StoreId == store.Id && p.ProducerId == currentUser.Data.Id && p.Status != AgreementStatus.Cancelled && p.Status != AgreementStatus.Refused)
+                    .Select(p => p.Id)
                     .SingleOrDefaultAsync(token);
 
-                if (legalId == Guid.Empty)
+                if (agreementId == Guid.Empty)
                     return null;
-                
-                return (await legalsDataLoader.LoadAsync(legalId, token)).Siret;
+
+                return await agreementsDataLoader.LoadAsync(agreementId, token);
             }
             
             public async Task<IEnumerable<Tag>> GetTags(Store store, [ScopedService] AppDbContext context,

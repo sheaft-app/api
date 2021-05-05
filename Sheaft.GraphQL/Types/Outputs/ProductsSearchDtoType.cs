@@ -9,6 +9,8 @@ namespace Sheaft.GraphQL.Types.Outputs
         {
             base.Configure(descriptor);
 
+            descriptor.Name("ProductsSearch");
+            
             descriptor
                 .Field(c => c.Count)
                 .Name("count");
@@ -16,7 +18,7 @@ namespace Sheaft.GraphQL.Types.Outputs
             descriptor
                 .Field(c => c.Products)
                 .Name("products")
-                .Type<ListType<SearchProductDtoType>>();
+                .Type<ListType<ProductType>>();
         }
     }
 }

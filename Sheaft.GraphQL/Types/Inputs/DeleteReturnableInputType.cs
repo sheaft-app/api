@@ -1,4 +1,5 @@
 using HotChocolate.Types;
+using Sheaft.Domain;
 using Sheaft.Mediatr.Returnable.Commands;
 
 namespace Sheaft.GraphQL.Types.Inputs
@@ -7,10 +8,14 @@ namespace Sheaft.GraphQL.Types.Inputs
     {
         protected override void Configure(IInputObjectTypeDescriptor<DeleteReturnableCommand> descriptor)
         {
+            base.Configure(descriptor);
+
             descriptor.Name("DeleteReturnableInput");
-            descriptor.Field(c => c.ReturnableId)
+
+            descriptor
+                .Field(c => c.ReturnableId)
                 .Name("id")
-                .Type<NonNullType<IdType>>();
+                .ID(nameof(Returnable));
         }
     }
 }

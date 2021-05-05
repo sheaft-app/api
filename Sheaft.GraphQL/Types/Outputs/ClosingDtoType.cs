@@ -9,6 +9,8 @@ namespace Sheaft.GraphQL.Types.Outputs
         {
             base.Configure(descriptor);
 
+            descriptor.Name("Closing");
+            
             descriptor.Field(c => c.Id)
                 .Name("id")
                 .Type<NonNullType<IdType>>();

@@ -15,6 +15,8 @@ namespace Sheaft.GraphQL.Types.Outputs
         {
             base.Configure(descriptor);
             
+            descriptor.Name("DepartmentPoints");
+
             descriptor
                 .Field(c => c.Points)
                 .Name("points");

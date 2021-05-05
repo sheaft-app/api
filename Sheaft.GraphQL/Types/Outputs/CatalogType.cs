@@ -9,6 +9,7 @@ using Microsoft.EntityFrameworkCore;
 using Sheaft.Domain;
 using Sheaft.GraphQL.Catalogs;
 using Sheaft.GraphQL.Products;
+using Sheaft.GraphQL.Users;
 using Sheaft.Infrastructure.Persistence;
 
 namespace Sheaft.GraphQL.Types.Outputs
@@ -56,6 +57,13 @@ namespace Sheaft.GraphQL.Types.Outputs
                 .UseDbContext<AppDbContext>()
                 .ResolveWith<CatalogResolvers>(c => c.GetCatalogProducts(default, default, default, default))
                 .Type<ListType<ProductType>>();
+            
+            descriptor
+                .Field(c => c.Producer)
+                .Name("producer")
+                .UseDbContext<AppDbContext>()
+                .ResolveWith<CatalogResolvers>(c => c.GetProducer(default, default, default))
+                .Type<UserType>();
         }
 
         private class CatalogResolvers
@@ -69,6 +77,11 @@ namespace Sheaft.GraphQL.Types.Outputs
                     .ToListAsync(token);
 
                 return await catalogProductsDataLoader.LoadAsync(catalogProductsId, token);
+            }
+            
+            public Task<User> GetProducer(Catalog catalog, UsersByIdBatchDataLoader producersDataLoader, CancellationToken token)
+            {
+                return producersDataLoader.LoadAsync(catalog.ProducerId, token);
             }
         }
     }

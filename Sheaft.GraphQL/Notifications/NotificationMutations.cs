@@ -10,6 +10,7 @@ using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Application.Interfaces.Mediatr;
 using Sheaft.Application.Security;
 using Sheaft.Domain;
+using Sheaft.GraphQL.Types.Inputs;
 using Sheaft.Mediatr.Notification.Commands;
 
 namespace Sheaft.GraphQL.Notifications
@@ -21,10 +22,10 @@ namespace Sheaft.GraphQL.Notifications
             ISheaftMediatr mediator,
             ICurrentUserService currentUserService,
             IHttpContextAccessor httpContextAccessor)
-            :base(mediator, currentUserService, httpContextAccessor)
+            : base(mediator, currentUserService, httpContextAccessor)
         {
         }
-        
+
         [GraphQLName("markNotificationsAsRead")]
         [Authorize(Policy = Policies.REGISTERED)]
         [GraphQLType(typeof(DateType))]
@@ -34,11 +35,13 @@ namespace Sheaft.GraphQL.Notifications
             await ExecuteAsync(input, token);
             return input.ReadBefore;
         }
-        
+
         [GraphQLName("markNotificationAsRead")]
         [Authorize(Policy = Policies.REGISTERED)]
         [GraphQLType(typeof(NotificationType))]
-        public async Task<Notification> MarkNotificationAsReadAsync([GraphQLName("input")] MarkUserNotificationAsReadCommand input,
+        public async Task<Notification> MarkNotificationAsReadAsync(
+            [GraphQLType(typeof(MarkUserNotificationAsReadInputType))] [GraphQLName("input")]
+            MarkUserNotificationAsReadCommand input,
             NotificationsByIdBatchDataLoader notificationQueries, CancellationToken token)
         {
             await ExecuteAsync(input, token);

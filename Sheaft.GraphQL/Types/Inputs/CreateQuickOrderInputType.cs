@@ -8,11 +8,21 @@ namespace Sheaft.GraphQL.Types.Inputs
     {
         protected override void Configure(IInputObjectTypeDescriptor<CreateQuickOrderCommand> descriptor)
         {
-            descriptor.Name("CreateQuickOrderInput");
-            descriptor.Field(c => c.Description);
-            descriptor.Field(c => c.Products);
+            base.Configure(descriptor);
 
-            descriptor.Field(c => c.Name)
+            descriptor.Name("CreateQuickOrderInput");
+            
+            descriptor
+                .Field(c => c.Description)
+                .Name("description");
+            
+            descriptor
+                .Field(c => c.Products)
+                .Name("products");
+
+            descriptor
+                .Field(c => c.Name)
+                .Name("name")
                 .Type<NonNullType<StringType>>();
         }
     }

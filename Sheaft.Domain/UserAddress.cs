@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Text.RegularExpressions;
+using NetTopologySuite.Geometries;
+using Sheaft.Domain.Common;
 using Sheaft.Domain.Enum;
 
 namespace Sheaft.Domain
@@ -21,11 +23,15 @@ namespace Sheaft.Domain
             Department = department;
             Longitude = longitude;
             Latitude = latitude;
+
+            if (latitude.HasValue && longitude.HasValue)
+                Location = LocationProvider.CreatePoint(latitude.Value, longitude.Value);
         }
 
         public double? Longitude { get; private set; }
         public double? Latitude { get; private set; }
         public Guid DepartmentId { get; set; }
+        public Point Location { get; private set; }
         public virtual Department Department { get; private set; }
 
         public static string GetDepartmentCode(string code)

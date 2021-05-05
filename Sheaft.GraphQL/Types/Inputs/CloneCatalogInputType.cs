@@ -1,5 +1,6 @@
 using HotChocolate.Types;
 using Sheaft.Application.Models;
+using Sheaft.Domain;
 using Sheaft.Mediatr.Catalog.Commands;
 
 namespace Sheaft.GraphQL.Types.Inputs
@@ -8,14 +9,22 @@ namespace Sheaft.GraphQL.Types.Inputs
     {
         protected override void Configure(IInputObjectTypeDescriptor<CloneCatalogCommand> descriptor)
         {
+            base.Configure(descriptor);
+
             descriptor.Name("CloneCatalogInput");
-            descriptor.Field(c => c.Name);
 
-            descriptor.Field(c => c.CatalogId)
+            descriptor
+                .Field(c => c.CatalogId)
                 .Name("id")
-                .Type<NonNullType<IdType>>();
+                .ID(nameof(Catalog));
+            
+            descriptor
+                .Field(c => c.Name)
+                .Name("name");
 
-            descriptor.Field(c => c.Percent);
+            descriptor
+                .Field(c => c.Percent)
+                .Name("percent");
         }
     }
 }

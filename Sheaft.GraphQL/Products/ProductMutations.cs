@@ -12,6 +12,7 @@ using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Application.Interfaces.Mediatr;
 using Sheaft.Application.Security;
 using Sheaft.Domain;
+using Sheaft.GraphQL.Types.Inputs;
 using Sheaft.GraphQL.Types.Outputs;
 using Sheaft.Mediatr.Product.Commands;
 
@@ -31,7 +32,9 @@ namespace Sheaft.GraphQL.Products
         [GraphQLName("createProduct")]
         [Authorize(Policy = Policies.PRODUCER)]
         [GraphQLType(typeof(ProductType))]
-        public async Task<Product> CreateProductAsync([GraphQLName("input")] CreateProductCommand input,
+        public async Task<Product> CreateProductAsync(
+            [GraphQLType(typeof(CreateProductInputType))] [GraphQLName("input")]
+            CreateProductCommand input,
             ProductsByIdBatchDataLoader productsDataLoader, CancellationToken token)
         {
             var result = await ExecuteAsync<CreateProductCommand, Guid>(input, token);
@@ -41,7 +44,9 @@ namespace Sheaft.GraphQL.Products
         [GraphQLName("updateProduct")]
         [Authorize(Policy = Policies.PRODUCER)]
         [GraphQLType(typeof(ProductType))]
-        public async Task<Product> UpdateProductAsync([GraphQLName("input")] UpdateProductCommand input,
+        public async Task<Product> UpdateProductAsync(
+            [GraphQLType(typeof(UpdateProductInputType))] [GraphQLName("input")]
+            UpdateProductCommand input,
             ProductsByIdBatchDataLoader productsDataLoader, CancellationToken token)
         {
             await ExecuteAsync(input, token);
@@ -51,7 +56,8 @@ namespace Sheaft.GraphQL.Products
         [GraphQLName("rateProduct")]
         [Authorize(Policy = Policies.PRODUCER)]
         [GraphQLType(typeof(ProductType))]
-        public async Task<Product> RateProductAsync([GraphQLName("input")] RateProductCommand input,
+        public async Task<Product> RateProductAsync([GraphQLType(typeof(RateProductInputType))] [GraphQLName("input")]
+            RateProductCommand input,
             ProductsByIdBatchDataLoader productsDataLoader, CancellationToken token)
         {
             await ExecuteAsync(input, token);
@@ -61,7 +67,9 @@ namespace Sheaft.GraphQL.Products
         [GraphQLName("updateProductPicture")]
         [Authorize(Policy = Policies.PRODUCER)]
         [GraphQLType(typeof(ProductType))]
-        public async Task<Product> UpdateProductPictureAsync([GraphQLName("input")] UpdateProductPreviewCommand input,
+        public async Task<Product> UpdateProductPictureAsync(
+            [GraphQLType(typeof(UpdateProductPictureInputType))] [GraphQLName("input")]
+            UpdateProductPreviewCommand input,
             ProductsByIdBatchDataLoader productsDataLoader, CancellationToken token)
         {
             await ExecuteAsync<UpdateProductPreviewCommand, string>(input, token);
@@ -72,7 +80,8 @@ namespace Sheaft.GraphQL.Products
         [Authorize(Policy = Policies.PRODUCER)]
         [GraphQLType(typeof(ListType<ProductType>))]
         public async Task<IEnumerable<Product>> SetProductsAvailabilityAsync(
-            [GraphQLName("input")] SetProductsAvailabilityCommand input,
+            [GraphQLType(typeof(SetProductsAvailabilityInputType))] [GraphQLName("input")]
+            SetProductsAvailabilityCommand input,
             ProductsByIdBatchDataLoader productsDataLoader, CancellationToken token)
         {
             await ExecuteAsync(input, token);
@@ -81,7 +90,9 @@ namespace Sheaft.GraphQL.Products
 
         [GraphQLName("deleteProducts")]
         [Authorize(Policy = Policies.PRODUCER)]
-        public async Task<bool> DeleteProductsAsync([GraphQLName("input")] DeleteProductsCommand input,
+        public async Task<bool> DeleteProductsAsync(
+            [GraphQLType(typeof(DeleteProductsInputType))] [GraphQLName("input")]
+            DeleteProductsCommand input,
             CancellationToken token)
         {
             return await ExecuteAsync(input, token);
@@ -89,7 +100,9 @@ namespace Sheaft.GraphQL.Products
 
         [GraphQLName("addPictureToProduct")]
         [Authorize(Policy = Policies.PRODUCER)]
-        public async Task<bool> AddPictureToProductAsync([GraphQLName("input")] AddPictureToProductCommand input,
+        public async Task<bool> AddPictureToProductAsync(
+            [GraphQLType(typeof(AddPictureToProductInputType))] [GraphQLName("input")]
+            AddPictureToProductCommand input,
             CancellationToken token)
         {
             return await ExecuteAsync(input, token);
@@ -97,7 +110,9 @@ namespace Sheaft.GraphQL.Products
 
         [GraphQLName("removeProductPictures")]
         [Authorize(Policy = Policies.PRODUCER)]
-        public async Task<bool> RemoveProductPicturesAsync([GraphQLName("input")] RemoveProductPicturesCommand input,
+        public async Task<bool> RemoveProductPicturesAsync(
+            [GraphQLType(typeof(RemoveProductPicturesInputType))] [GraphQLName("input")]
+            RemoveProductPicturesCommand input,
             CancellationToken token)
         {
             return await ExecuteAsync(input, token);

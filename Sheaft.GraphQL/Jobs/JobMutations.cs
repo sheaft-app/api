@@ -10,6 +10,7 @@ using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Application.Interfaces.Mediatr;
 using Sheaft.Application.Security;
 using Sheaft.Domain;
+using Sheaft.GraphQL.Types.Inputs;
 using Sheaft.GraphQL.Types.Outputs;
 using Sheaft.Mediatr.Job.Commands;
 
@@ -29,7 +30,9 @@ namespace Sheaft.GraphQL.Jobs
         [GraphQLName("resumeJobs")]
         [Authorize(Policy = Policies.REGISTERED)]
         [GraphQLType(typeof(ListType<JobType>))]
-        public async Task<IEnumerable<Job>> ResumeJobsAsync([GraphQLName("input")] ResumeJobsCommand input,
+        public async Task<IEnumerable<Job>> ResumeJobsAsync(
+            [GraphQLType(typeof(ResumeJobsInputType))] [GraphQLName("input")]
+            ResumeJobsCommand input,
             JobsByIdBatchDataLoader jobsDataLoader, CancellationToken token)
         {
             await ExecuteAsync(input, token);
@@ -39,7 +42,9 @@ namespace Sheaft.GraphQL.Jobs
         [GraphQLName("pauseJobs")]
         [Authorize(Policy = Policies.REGISTERED)]
         [GraphQLType(typeof(ListType<JobType>))]
-        public async Task<IEnumerable<Job>> PauseJobsAsync([GraphQLName("input")] PauseJobsCommand input,
+        public async Task<IEnumerable<Job>> PauseJobsAsync(
+            [GraphQLType(typeof(PauseJobsInputType))] [GraphQLName("input")]
+            PauseJobsCommand input,
             JobsByIdBatchDataLoader jobsDataLoader, CancellationToken token)
         {
             await ExecuteAsync(input, token);
@@ -49,7 +54,9 @@ namespace Sheaft.GraphQL.Jobs
         [GraphQLName("retryJobs")]
         [Authorize(Policy = Policies.REGISTERED)]
         [GraphQLType(typeof(ListType<JobType>))]
-        public async Task<IEnumerable<Job>> RetryJobsAsync([GraphQLName("input")] RetryJobsCommand input,
+        public async Task<IEnumerable<Job>> RetryJobsAsync(
+            [GraphQLType(typeof(RetryJobsInputType))] [GraphQLName("input")]
+            RetryJobsCommand input,
             JobsByIdBatchDataLoader jobsDataLoader, CancellationToken token)
         {
             await ExecuteAsync(input, token);
@@ -59,7 +66,9 @@ namespace Sheaft.GraphQL.Jobs
         [GraphQLName("cancelJobs")]
         [Authorize(Policy = Policies.REGISTERED)]
         [GraphQLType(typeof(ListType<JobType>))]
-        public async Task<IEnumerable<Job>> CancelJobsAsync([GraphQLName("input")] CancelJobsCommand input,
+        public async Task<IEnumerable<Job>> CancelJobsAsync(
+            [GraphQLType(typeof(CancelJobsInputType))] [GraphQLName("input")]
+            CancelJobsCommand input,
             JobsByIdBatchDataLoader jobsDataLoader, CancellationToken token)
         {
             await ExecuteAsync(input, token);
@@ -69,7 +78,9 @@ namespace Sheaft.GraphQL.Jobs
         [GraphQLName("archiveJobs")]
         [Authorize(Policy = Policies.REGISTERED)]
         [GraphQLType(typeof(ListType<JobType>))]
-        public async Task<IEnumerable<Job>> ArchiveJobsAsync([GraphQLName("input")] ArchiveJobsCommand input,
+        public async Task<IEnumerable<Job>> ArchiveJobsAsync(
+            [GraphQLType(typeof(ArchiveJobsInputType))] [GraphQLName("input")]
+            ArchiveJobsCommand input,
             JobsByIdBatchDataLoader jobsDataLoader, CancellationToken token)
         {
             await ExecuteAsync(input, token);

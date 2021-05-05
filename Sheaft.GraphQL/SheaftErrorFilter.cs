@@ -79,6 +79,11 @@ namespace Sheaft.GraphQL
                         break;
                 }
             }
+            else if (error.Exception != null && error.Exception is GraphQLException e)
+            {
+                exception = e;
+                message = e.Message;
+            }
             else
             {
                 statusCode = 400;
@@ -102,6 +107,9 @@ namespace Sheaft.GraphQL
                 code = ExceptionKind.Forbidden.ToString("G");
                 extensions.Add(ExceptionKind.Forbidden.ToString("G"), message);
             }
+
+            if (exception != null)
+                extensions.Add("StackTrace", exception.StackTrace);
 
             extensions.Add("StatusCode", statusCode);
             error = error.WithExtensions(extensions);

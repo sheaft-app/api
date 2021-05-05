@@ -8,6 +8,8 @@ namespace Sheaft.GraphQL.Types.Outputs
         protected override void Configure(IObjectTypeDescriptor<StoresSearchDto> descriptor)
         {
             base.Configure(descriptor);
+
+            descriptor.Name("StoresSearch");
             
             descriptor
                 .Field(c => c.Count)
@@ -16,7 +18,7 @@ namespace Sheaft.GraphQL.Types.Outputs
             descriptor
                 .Field(c => c.Stores)
                 .Name("stores")
-                .Type<ListType<SearchStoreDtoType>>();
+                .Type<ListType<StoreType>>();
         }
     }
 }

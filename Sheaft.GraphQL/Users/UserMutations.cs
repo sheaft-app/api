@@ -8,6 +8,7 @@ using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Application.Interfaces.Mediatr;
 using Sheaft.Application.Security;
 using Sheaft.Domain;
+using Sheaft.GraphQL.Types.Inputs;
 using Sheaft.GraphQL.Types.Outputs;
 using Sheaft.Mediatr.ProfileInformation.Commands;
 using Sheaft.Mediatr.User.Commands;
@@ -28,43 +29,49 @@ namespace Sheaft.GraphQL.Users
         [GraphQLName("generateSponsoringCode")]
         [GraphQLType(typeof(StringType))]
         [Authorize(Policy = Policies.REGISTERED)]
-        public async Task<string> GeneratedSponsoringCode([GraphQLName("input")] GenerateUserCodeCommand input, CancellationToken token)
+        public async Task<string> GeneratedSponsoringCode(CancellationToken token)
         {
-            return await ExecuteAsync<GenerateUserCodeCommand, string>(input, token);
+            return await ExecuteAsync<GenerateUserCodeCommand, string>(new GenerateUserCodeCommand(CurrentUser), token);
         }
-        
+
         [GraphQLName("updateUserPicture")]
         [Authorize(Policy = Policies.REGISTERED)]
         [GraphQLType(typeof(UserType))]
-        public async Task<User> UpdateUserPictureAsync([GraphQLName("input")] UpdateUserPreviewCommand input,
+        public async Task<User> UpdateUserPictureAsync(
+            [GraphQLType(typeof(UpdateUserPictureInputType))] [GraphQLName("input")]
+            UpdateUserPreviewCommand input,
             UsersByIdBatchDataLoader usersDataLoader, CancellationToken token)
         {
             await ExecuteAsync<UpdateUserPreviewCommand, string>(input, token);
             return await usersDataLoader.LoadAsync(input.UserId, token);
         }
-        
+
         [GraphQLName("addPictureToUser")]
         [Authorize(Policy = Policies.REGISTERED)]
         [GraphQLType(typeof(BooleanType))]
-        public async Task<bool> AddPictureToUserAsync([GraphQLName("input")] AddPictureToUserCommand input, CancellationToken token)
+        public async Task<bool> AddPictureToUserAsync(
+            [GraphQLType(typeof(AddPictureToUserInputType))] [GraphQLName("input")]
+            AddPictureToUserCommand input, CancellationToken token)
         {
             return await ExecuteAsync(input, token);
         }
-        
+
         [GraphQLName("removeUserPictures")]
         [Authorize(Policy = Policies.REGISTERED)]
         [GraphQLType(typeof(BooleanType))]
-        public async Task<bool> RemoveUserPicturesAsync([GraphQLName("input")] RemoveUserPicturesCommand input, CancellationToken token)
+        public async Task<bool> RemoveUserPicturesAsync(
+            [GraphQLType(typeof(RemoveUserPicturesInputType))] [GraphQLName("input")]
+            RemoveUserPicturesCommand input, CancellationToken token)
         {
             return await ExecuteAsync(input, token);
         }
-        
+
         [GraphQLName("closeAccount")]
         [Authorize(Policy = Policies.REGISTERED)]
         [GraphQLType(typeof(BooleanType))]
-        public async Task<bool> RemoveUserAsync([GraphQLName("input")] RemoveUserCommand input, CancellationToken token)
+        public async Task<bool> RemoveUserAsync(CancellationToken token)
         {
-            return await ExecuteAsync(input, token);
+            return await ExecuteAsync(new DeleteUserCommand(CurrentUser), token);
         }
     }
 }

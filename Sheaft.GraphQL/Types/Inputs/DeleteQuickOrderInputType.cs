@@ -1,4 +1,5 @@
 using HotChocolate.Types;
+using Sheaft.Domain;
 using Sheaft.Mediatr.QuickOrder.Commands;
 
 namespace Sheaft.GraphQL.Types.Inputs
@@ -7,11 +8,14 @@ namespace Sheaft.GraphQL.Types.Inputs
     {
         protected override void Configure(IInputObjectTypeDescriptor<DeleteQuickOrdersCommand> descriptor)
         {
+            base.Configure(descriptor);
+
             descriptor.Name("DeleteQuickOrdersInput");
             
-            descriptor.Field(c => c.QuickOrderIds)
+            descriptor
+                .Field(c => c.QuickOrderIds)
                 .Name("ids")
-                .Type<NonNullType<ListType<IdType>>>();
+                .ID(nameof(QuickOrder));
         }
     }
 }

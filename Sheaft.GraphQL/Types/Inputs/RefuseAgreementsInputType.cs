@@ -1,4 +1,5 @@
 using HotChocolate.Types;
+using Sheaft.Domain;
 using Sheaft.Mediatr.Agreement.Commands;
 
 namespace Sheaft.GraphQL.Types.Inputs
@@ -7,12 +8,18 @@ namespace Sheaft.GraphQL.Types.Inputs
     {
         protected override void Configure(IInputObjectTypeDescriptor<RefuseAgreementsCommand> descriptor)
         {
-            descriptor.Name("RefuseAgreementsInput");
-            descriptor.Field(c => c.AgreementIds)
-                .Name("ids")
-                .Type<NonNullType<ListType<IdType>>>();
+            base.Configure(descriptor);
 
-            descriptor.Field(c => c.Reason);
+            descriptor.Name("RefuseAgreementsInput");
+            
+            descriptor
+                .Field(c => c.AgreementIds)
+                .Name("ids")
+                .ID(nameof(Agreement));
+
+            descriptor
+                .Field(c => c.Reason)
+                .Name("reason");
         }
     }
 }

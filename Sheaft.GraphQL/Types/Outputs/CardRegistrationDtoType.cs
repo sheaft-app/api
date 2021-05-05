@@ -8,6 +8,8 @@ namespace Sheaft.GraphQL.Types.Outputs
         protected override void Configure(IObjectTypeDescriptor<CardRegistrationDto> descriptor)
         {
             base.Configure(descriptor);
+
+            descriptor.Name("CardRegistration");
             
             descriptor
                 .Field(c => c.Identifier)

@@ -13,6 +13,8 @@ namespace Sheaft.GraphQL.Types.Outputs
         protected override void Configure(IObjectTypeDescriptor<RegionPointsDto> descriptor)
         {
             base.Configure(descriptor);
+
+            descriptor.Name("RegionPoints");
             
             descriptor
                 .Field(c => c.Points)

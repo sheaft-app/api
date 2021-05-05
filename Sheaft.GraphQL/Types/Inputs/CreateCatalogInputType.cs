@@ -7,11 +7,21 @@ namespace Sheaft.GraphQL.Types.Inputs
     {
         protected override void Configure(IInputObjectTypeDescriptor<CreateCatalogCommand> descriptor)
         {
-            descriptor.Name("CreateCatalogInput");
-            descriptor.Field(c => c.Name);
+            base.Configure(descriptor);
 
-            descriptor.Field(c => c.IsAvailable);
-            descriptor.Field(c => c.IsDefault);
+            descriptor.Name("CreateCatalogInput");
+            
+            descriptor
+                .Field(c => c.Name)
+                .Name("name");
+
+            descriptor
+                .Field(c => c.IsAvailable)
+                .Name("isAvailable");
+            
+            descriptor
+                .Field(c => c.IsDefault)
+                .Name("isDefault");
         }
     }
 }

@@ -8,6 +8,8 @@ namespace Sheaft.GraphQL.Types.Outputs
         protected override void Configure(IObjectTypeDescriptor<SirenAddressDto> descriptor)
         {
             base.Configure(descriptor);
+
+            descriptor.Name("SirenAddress");
             
             descriptor
                 .Field("line1")
