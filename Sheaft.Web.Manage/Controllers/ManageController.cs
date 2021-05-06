@@ -13,6 +13,7 @@ using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Application.Interfaces.Mediatr;
 using Sheaft.Domain;
 using Sheaft.Domain.Enum;
+using Sheaft.Infrastructure.Persistence;
 using Sheaft.Options;
 using Sheaft.Web.Manage.Extensions;
 using Sheaft.Web.Manage.Models;
@@ -21,11 +22,11 @@ namespace Sheaft.Web.Manage.Controllers
 {
     public class ManageController : Controller
     {
-        protected readonly IAppDbContext _context;
         protected readonly IMapper _mapper;
         protected readonly ISheaftMediatr _mediatr;
         protected readonly RoleOptions _roleOptions;
         protected readonly IConfigurationProvider _configurationProvider;
+        protected readonly IAppDbContext _context;
 
         public ManageController(
             IAppDbContext context,

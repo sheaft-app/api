@@ -22,10 +22,9 @@ namespace Sheaft.GraphQL.Business
     public class BusinessMutations : SheaftMutation
     {
         public BusinessMutations(
-            ISheaftMediatr mediator,
             ICurrentUserService currentUserService,
             IHttpContextAccessor httpContextAccessor)
-            : base(mediator, currentUserService, httpContextAccessor)
+            : base(currentUserService, httpContextAccessor)
         {
         }
 
@@ -34,10 +33,10 @@ namespace Sheaft.GraphQL.Business
         [GraphQLType(typeof(BusinessLegalType))]
         public async Task<BusinessLegal> CreateBusinessLegalsAsync(
             [GraphQLType(typeof(CreateBusinessLegalInputType))] [GraphQLName("input")]
-            CreateBusinessLegalCommand input,
+            CreateBusinessLegalCommand input, [Service] ISheaftMediatr mediatr,
             BusinessLegalsByIdBatchDataLoader legalsDataLoader, CancellationToken token)
         {
-            var result = await ExecuteAsync<CreateBusinessLegalCommand, Guid>(input, token);
+            var result = await ExecuteAsync<CreateBusinessLegalCommand, Guid>(mediatr, input, token);
             return await legalsDataLoader.LoadAsync(result, token);
         }
 
@@ -46,10 +45,10 @@ namespace Sheaft.GraphQL.Business
         [GraphQLType(typeof(BusinessLegalType))]
         public async Task<BusinessLegal> UpdateBusinessLegalsAsync(
             [GraphQLType(typeof(UpdateBusinessLegalsInputType))] [GraphQLName("input")]
-            UpdateBusinessLegalCommand input,
+            UpdateBusinessLegalCommand input, [Service] ISheaftMediatr mediatr,
             BusinessLegalsByIdBatchDataLoader legalsDataLoader, CancellationToken token)
         {
-            await ExecuteAsync(input, token);
+            await ExecuteAsync(mediatr, input, token);
             return await legalsDataLoader.LoadAsync(input.LegalId, token);
         }
 
@@ -58,11 +57,11 @@ namespace Sheaft.GraphQL.Business
         [GraphQLType(typeof(BusinessClosingType))]
         public async Task<BusinessClosing> UpdateOrCreateBusinessClosingAsync(
             [GraphQLType(typeof(UpdateOrCreateBusinessClosingInputType))] [GraphQLName("input")]
-            UpdateOrCreateBusinessClosingCommand input,
+            UpdateOrCreateBusinessClosingCommand input, [Service] ISheaftMediatr mediatr,
             BusinessClosingsByIdBatchDataLoader businessClosingsDataLoader, CancellationToken token)
         {
             var result =
-                await ExecuteAsync<UpdateOrCreateBusinessClosingCommand, Guid>(input, token);
+                await ExecuteAsync<UpdateOrCreateBusinessClosingCommand, Guid>(mediatr, input, token);
             return await businessClosingsDataLoader.LoadAsync(result, token);
         }
 
@@ -71,11 +70,11 @@ namespace Sheaft.GraphQL.Business
         [GraphQLType(typeof(ListType<BusinessClosingType>))]
         public async Task<IEnumerable<BusinessClosing>> UpdateOrCreateBusinessClosingsAsync(
             [GraphQLType(typeof(UpdateOrCreateBusinessClosingsInputType))] [GraphQLName("input")]
-            UpdateOrCreateBusinessClosingsCommand input,
+            UpdateOrCreateBusinessClosingsCommand input, [Service] ISheaftMediatr mediatr,
             BusinessClosingsByIdBatchDataLoader businessClosingsDataLoader, CancellationToken token)
         {
             var result =
-                await ExecuteAsync<UpdateOrCreateBusinessClosingsCommand, IEnumerable<Guid>>(input, token);
+                await ExecuteAsync<UpdateOrCreateBusinessClosingsCommand, IEnumerable<Guid>>(mediatr, input, token);
             return await businessClosingsDataLoader.LoadAsync(result.ToList(), token);
         }
 
@@ -83,10 +82,10 @@ namespace Sheaft.GraphQL.Business
         [Authorize(Policy = Policies.STORE_OR_PRODUCER)]
         public async Task<bool> DeleteBusinessClosingsAsync(
             [GraphQLType(typeof(DeleteBusinessClosingsCommand))] [GraphQLName("input")]
-            DeleteBusinessClosingsCommand input,
+            DeleteBusinessClosingsCommand input, [Service] ISheaftMediatr mediatr,
             CancellationToken token)
         {
-            return await ExecuteAsync(input, token);
+            return await ExecuteAsync(mediatr, input, token);
         }
     }
 }

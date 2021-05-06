@@ -19,10 +19,9 @@ namespace Sheaft.GraphQL.Producers
     public class ProducerMutations : SheaftMutation
     {
         public ProducerMutations(
-            ISheaftMediatr mediator,
             ICurrentUserService currentUserService,
             IHttpContextAccessor httpContextAccessor)
-            : base(mediator, currentUserService, httpContextAccessor)
+            : base(currentUserService, httpContextAccessor)
         {
         }
 
@@ -31,10 +30,10 @@ namespace Sheaft.GraphQL.Producers
         [GraphQLType(typeof(ProducerType))]
         public async Task<Producer> RegisterProducerAsync(
             [GraphQLType(typeof(RegisterProducerInputType))] [GraphQLName("input")]
-            RegisterProducerCommand input,
+            RegisterProducerCommand input, [Service] ISheaftMediatr mediatr,
             ProducersByIdBatchDataLoader producersDataLoader, CancellationToken token)
         {
-            var result = await ExecuteAsync<RegisterProducerCommand, Guid>(input, token);
+            var result = await ExecuteAsync<RegisterProducerCommand, Guid>(mediatr, input, token);
             return await producersDataLoader.LoadAsync(result, token);
         }
 
@@ -43,10 +42,10 @@ namespace Sheaft.GraphQL.Producers
         [GraphQLType(typeof(ProducerType))]
         public async Task<Producer> UpdateProducerAsync(
             [GraphQLType(typeof(UpdateProducerInputType))] [GraphQLName("input")]
-            UpdateProducerCommand input,
+            UpdateProducerCommand input, [Service] ISheaftMediatr mediatr,
             ProducersByIdBatchDataLoader producersDataLoader, CancellationToken token)
         {
-            await ExecuteAsync(input, token);
+            await ExecuteAsync(mediatr, input, token);
             return await producersDataLoader.LoadAsync(input.ProducerId, token);
         }
     }

@@ -4,10 +4,12 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Sheaft.Application.Interfaces;
 using Sheaft.Application.Interfaces.Infrastructure;
+using Microsoft.EntityFrameworkCore;
 using Sheaft.Application.Interfaces.Mediatr;
 using Sheaft.Core;
 using Sheaft.Core.Enums;
-using Sheaft.Infrastructure.Persistence;
+using Sheaft.Application.Interfaces.Infrastructure;
+using Microsoft.EntityFrameworkCore;
 
 namespace Sheaft.Mediatr
 {
@@ -15,28 +17,15 @@ namespace Sheaft.Mediatr
     {
         protected readonly ILogger _logger;
         protected readonly ISheaftMediatr _mediatr;
-        private readonly IDbContextFactory<AppDbContext> _contextFactory;
-        
-        private AppDbContext _innerContext;
-
-        protected AppDbContext _context
-        {
-            get
-            {
-                if (_innerContext == null)
-                    _innerContext = _contextFactory.CreateDbContext();
-
-                return _innerContext;
-            }
-        }
+        protected IAppDbContext _context;
 
         protected CommandsHandler(
             ISheaftMediatr mediatr,
-            IDbContextFactory<AppDbContext> contextFactory,
+            IAppDbContext context,
             ILogger logger)
         {
             _mediatr = mediatr;
-            _contextFactory = contextFactory;
+            _context = context;
             _logger = logger;
         }
 

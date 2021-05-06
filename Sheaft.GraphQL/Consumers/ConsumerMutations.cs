@@ -20,10 +20,9 @@ namespace Sheaft.GraphQL.Consumers
     public class ConsumerMutations : SheaftMutation
     {
         public ConsumerMutations(
-            ISheaftMediatr mediator,
             ICurrentUserService currentUserService,
             IHttpContextAccessor httpContextAccessor)
-            : base(mediator, currentUserService, httpContextAccessor)
+            : base(currentUserService, httpContextAccessor)
         {
         }
 
@@ -32,10 +31,10 @@ namespace Sheaft.GraphQL.Consumers
         [GraphQLType(typeof(ConsumerType))]
         public async Task<Consumer> RegisterConsumerAsync(
             [GraphQLType(typeof(RegisterConsumerInputType))] [GraphQLName("input")]
-            RegisterConsumerCommand input,
+            RegisterConsumerCommand input, [Service] ISheaftMediatr mediatr,
             ConsumersByIdBatchDataLoader storesDataLoader, CancellationToken token)
         {
-            var result = await ExecuteAsync<RegisterConsumerCommand, Guid>(input, token);
+            var result = await ExecuteAsync<RegisterConsumerCommand, Guid>(mediatr, input, token);
             return await storesDataLoader.LoadAsync(result, token);
         }
 
@@ -44,10 +43,10 @@ namespace Sheaft.GraphQL.Consumers
         [GraphQLType(typeof(ConsumerType))]
         public async Task<Consumer> UpdateConsumerAsync(
             [GraphQLType(typeof(UpdateConsumerInputType))] [GraphQLName("input")]
-            UpdateConsumerCommand input,
+            UpdateConsumerCommand input, [Service] ISheaftMediatr mediatr,
             ConsumersByIdBatchDataLoader storesDataLoader, CancellationToken token)
         {
-            await ExecuteAsync(input, token);
+            await ExecuteAsync(mediatr, input, token);
             return await storesDataLoader.LoadAsync(input.ConsumerId, token);
         }
 
@@ -56,10 +55,10 @@ namespace Sheaft.GraphQL.Consumers
         [GraphQLType(typeof(ConsumerLegalType))]
         public async Task<ConsumerLegal> CreateConsumerLegalsAsync(
             [GraphQLType(typeof(CreateConsumerLegalsInputType))] [GraphQLName("input")]
-            CreateConsumerLegalCommand input,
+            CreateConsumerLegalCommand input, [Service] ISheaftMediatr mediatr,
             ConsumerLegalsByIdBatchDataLoader legalsDataLoader, CancellationToken token)
         {
-            var result = await ExecuteAsync<CreateConsumerLegalCommand, Guid>(input, token);
+            var result = await ExecuteAsync<CreateConsumerLegalCommand, Guid>(mediatr, input, token);
             return await legalsDataLoader.LoadAsync(result, token);
         }
 
@@ -68,10 +67,10 @@ namespace Sheaft.GraphQL.Consumers
         [GraphQLType(typeof(ConsumerLegalType))]
         public async Task<ConsumerLegal> UpdateConsumerLegalsAsync(
             [GraphQLType(typeof(UpdateConsumerLegalsInputType))] [GraphQLName("input")]
-            UpdateConsumerLegalCommand input,
+            UpdateConsumerLegalCommand input, [Service] ISheaftMediatr mediatr,
             ConsumerLegalsByIdBatchDataLoader legalsDataLoader, CancellationToken token)
         {
-            await ExecuteAsync(input, token);
+            await ExecuteAsync(mediatr, input, token);
             return await legalsDataLoader.LoadAsync(input.LegalId, token);
         }
     }

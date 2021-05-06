@@ -21,10 +21,9 @@ namespace Sheaft.GraphQL.Agreements
     public class AgreementMutations : SheaftMutation
     {
         public AgreementMutations(
-            ISheaftMediatr mediator,
             ICurrentUserService currentUserService,
             IHttpContextAccessor httpContextAccessor)
-            : base(mediator, currentUserService, httpContextAccessor)
+            : base(currentUserService, httpContextAccessor)
         {
         }
 
@@ -33,10 +32,10 @@ namespace Sheaft.GraphQL.Agreements
         [GraphQLType(typeof(AgreementType))]
         public async Task<Agreement> CreateAgreementAsync(
             [GraphQLType(typeof(CreateAgreementInputType))] [GraphQLName("input")]
-            CreateAgreementCommand input,
+            CreateAgreementCommand input, [Service] ISheaftMediatr mediatr,
             AgreementsByIdBatchDataLoader dataLoader, CancellationToken token)
         {
-            var result = await ExecuteAsync<CreateAgreementCommand, Guid>(input, token);
+            var result = await ExecuteAsync<CreateAgreementCommand, Guid>(mediatr, input, token);
             return await dataLoader.LoadAsync(result, token);
         }
 
@@ -45,10 +44,10 @@ namespace Sheaft.GraphQL.Agreements
         [GraphQLType(typeof(ListType<AgreementType>))]
         public async Task<IEnumerable<Agreement>> AcceptAgreementsAsync(
             [GraphQLType(typeof(AcceptAgreementsInputType))] [GraphQLName("input")]
-            AcceptAgreementsCommand input,
+            AcceptAgreementsCommand input, [Service] ISheaftMediatr mediatr,
             AgreementsByIdBatchDataLoader dataLoader, CancellationToken token)
         {
-            await ExecuteAsync(input, token);
+            await ExecuteAsync(mediatr, input, token);
             return await dataLoader.LoadAsync(input.AgreementIds.ToList(), token);
         }
 
@@ -57,10 +56,10 @@ namespace Sheaft.GraphQL.Agreements
         [GraphQLType(typeof(AgreementType))]
         public async Task<Agreement> AssignCatalogToAgreementAsync(
             [GraphQLType(typeof(AssignCatalogToAgreementInputType))] [GraphQLName("input")]
-            AssignCatalogToAgreementCommand input,
+            AssignCatalogToAgreementCommand input, [Service] ISheaftMediatr mediatr,
             AgreementsByIdBatchDataLoader dataLoader, CancellationToken token)
         {
-            await ExecuteAsync(input, token);
+            await ExecuteAsync(mediatr, input, token);
             return await dataLoader.LoadAsync(input.AgreementId, token);
         }
 
@@ -69,10 +68,10 @@ namespace Sheaft.GraphQL.Agreements
         [GraphQLType(typeof(ListType<AgreementType>))]
         public async Task<IEnumerable<Agreement>> CancelAgreementsAsync(
             [GraphQLType(typeof(CancelAgreementsInputType))] [GraphQLName("input")]
-            CancelAgreementsCommand input,
+            CancelAgreementsCommand input, [Service] ISheaftMediatr mediatr,
             AgreementsByIdBatchDataLoader dataLoader, CancellationToken token)
         {
-            await ExecuteAsync(input, token);
+            await ExecuteAsync(mediatr, input, token);
             return await dataLoader.LoadAsync(input.AgreementIds.ToList(), token);
         }
 
@@ -81,10 +80,10 @@ namespace Sheaft.GraphQL.Agreements
         [GraphQLType(typeof(ListType<AgreementType>))]
         public async Task<IEnumerable<Agreement>> RefuseAgreementsAsync(
             [GraphQLType(typeof(RefuseAgreementsInputType))] [GraphQLName("input")]
-            RefuseAgreementsCommand input,
+            RefuseAgreementsCommand input, [Service] ISheaftMediatr mediatr,
             AgreementsByIdBatchDataLoader dataLoader, CancellationToken token)
         {
-            await ExecuteAsync(input, token);
+            await ExecuteAsync(mediatr, input, token);
             return await dataLoader.LoadAsync(input.AgreementIds.ToList(), token);
         }
     }

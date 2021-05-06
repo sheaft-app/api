@@ -13,42 +13,39 @@ namespace Sheaft.GraphQL
 {
     public abstract class SheaftMutation
     {
-        protected readonly ISheaftMediatr _mediator;
         protected readonly ICurrentUserService _currentUserService;
         protected readonly IHttpContextAccessor _httpContextAccessor;
         
         protected RequestUser CurrentUser => _currentUserService.GetCurrentUserInfo().Data;
         
         protected SheaftMutation(
-            ISheaftMediatr mediator,
             ICurrentUserService currentUserService,
             IHttpContextAccessor httpContextAccessor)
         {
-            _mediator = mediator;
             _currentUserService = currentUserService;
             _httpContextAccessor = httpContextAccessor;
         }
        
-        protected async Task<bool> ExecuteAsync<T>(T input, CancellationToken token,
+        protected async Task<bool> ExecuteAsync<T>(ISheaftMediatr mediator, T input, CancellationToken token,
             [CallerMemberName] string memberName = null) where T : ICommand
         {
             SetLogTransaction(input, typeof(T).Name);
         
             input.SetRequestUser(CurrentUser);
-            var result = await _mediator.Process(input, token);
+            var result = await mediator.Process(input, token);
             if (result.Succeeded)
                 return true;
             
             throw new SheaftException(result);
         }
         
-        protected async Task<TU> ExecuteAsync<T, TU>(T input, CancellationToken token,
+        protected async Task<TU> ExecuteAsync<T, TU>(ISheaftMediatr mediator, T input, CancellationToken token,
             [CallerMemberName] string memberName = null) where T : ICommand<TU>
         {
             SetLogTransaction(input, typeof(T).Name);
         
             input.SetRequestUser(CurrentUser);
-            var result = await _mediator.Process(input, token);
+            var result = await mediator.Process(input, token);
             if (result.Succeeded)
                 return result.Data;
         

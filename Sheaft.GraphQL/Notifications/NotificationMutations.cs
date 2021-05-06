@@ -19,20 +19,19 @@ namespace Sheaft.GraphQL.Notifications
     public class NotificationMutations : SheaftMutation
     {
         public NotificationMutations(
-            ISheaftMediatr mediator,
             ICurrentUserService currentUserService,
             IHttpContextAccessor httpContextAccessor)
-            : base(mediator, currentUserService, httpContextAccessor)
+            : base(currentUserService, httpContextAccessor)
         {
         }
 
         [GraphQLName("markNotificationsAsRead")]
         [Authorize(Policy = Policies.REGISTERED)]
         [GraphQLType(typeof(DateType))]
-        public async Task<DateTimeOffset> MarkMyNotificationsAsReadAsync(CancellationToken token)
+        public async Task<DateTimeOffset> MarkMyNotificationsAsReadAsync([Service] ISheaftMediatr mediatr, CancellationToken token)
         {
             var input = new MarkUserNotificationsAsReadCommand(CurrentUser) {ReadBefore = DateTimeOffset.UtcNow};
-            await ExecuteAsync(input, token);
+            await ExecuteAsync(mediatr, input, token);
             return input.ReadBefore;
         }
 
@@ -41,10 +40,10 @@ namespace Sheaft.GraphQL.Notifications
         [GraphQLType(typeof(NotificationType))]
         public async Task<Notification> MarkNotificationAsReadAsync(
             [GraphQLType(typeof(MarkUserNotificationAsReadInputType))] [GraphQLName("input")]
-            MarkUserNotificationAsReadCommand input,
+            MarkUserNotificationAsReadCommand input, [Service] ISheaftMediatr mediatr,
             NotificationsByIdBatchDataLoader notificationQueries, CancellationToken token)
         {
-            await ExecuteAsync(input, token);
+            await ExecuteAsync(mediatr, input, token);
             return await notificationQueries.LoadAsync(input.NotificationId, token);
         }
     }

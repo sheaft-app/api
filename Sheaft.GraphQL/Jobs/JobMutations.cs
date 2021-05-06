@@ -20,10 +20,9 @@ namespace Sheaft.GraphQL.Jobs
     public class JobMutations : SheaftMutation
     {
         public JobMutations(
-            ISheaftMediatr mediator,
             ICurrentUserService currentUserService,
             IHttpContextAccessor httpContextAccessor)
-            : base(mediator, currentUserService, httpContextAccessor)
+            : base(currentUserService, httpContextAccessor)
         {
         }
 
@@ -32,10 +31,10 @@ namespace Sheaft.GraphQL.Jobs
         [GraphQLType(typeof(ListType<JobType>))]
         public async Task<IEnumerable<Job>> ResumeJobsAsync(
             [GraphQLType(typeof(ResumeJobsInputType))] [GraphQLName("input")]
-            ResumeJobsCommand input,
+            ResumeJobsCommand input, [Service] ISheaftMediatr mediatr,
             JobsByIdBatchDataLoader jobsDataLoader, CancellationToken token)
         {
-            await ExecuteAsync(input, token);
+            await ExecuteAsync(mediatr, input, token);
             return await jobsDataLoader.LoadAsync(input.JobIds.ToList(), token);
         }
 
@@ -44,10 +43,10 @@ namespace Sheaft.GraphQL.Jobs
         [GraphQLType(typeof(ListType<JobType>))]
         public async Task<IEnumerable<Job>> PauseJobsAsync(
             [GraphQLType(typeof(PauseJobsInputType))] [GraphQLName("input")]
-            PauseJobsCommand input,
+            PauseJobsCommand input, [Service] ISheaftMediatr mediatr,
             JobsByIdBatchDataLoader jobsDataLoader, CancellationToken token)
         {
-            await ExecuteAsync(input, token);
+            await ExecuteAsync(mediatr, input, token);
             return await jobsDataLoader.LoadAsync(input.JobIds.ToList(), token);
         }
 
@@ -56,10 +55,10 @@ namespace Sheaft.GraphQL.Jobs
         [GraphQLType(typeof(ListType<JobType>))]
         public async Task<IEnumerable<Job>> RetryJobsAsync(
             [GraphQLType(typeof(RetryJobsInputType))] [GraphQLName("input")]
-            RetryJobsCommand input,
+            RetryJobsCommand input, [Service] ISheaftMediatr mediatr,
             JobsByIdBatchDataLoader jobsDataLoader, CancellationToken token)
         {
-            await ExecuteAsync(input, token);
+            await ExecuteAsync(mediatr, input, token);
             return await jobsDataLoader.LoadAsync(input.JobIds.ToList(), token);
         }
 
@@ -68,10 +67,10 @@ namespace Sheaft.GraphQL.Jobs
         [GraphQLType(typeof(ListType<JobType>))]
         public async Task<IEnumerable<Job>> CancelJobsAsync(
             [GraphQLType(typeof(CancelJobsInputType))] [GraphQLName("input")]
-            CancelJobsCommand input,
+            CancelJobsCommand input, [Service] ISheaftMediatr mediatr,
             JobsByIdBatchDataLoader jobsDataLoader, CancellationToken token)
         {
-            await ExecuteAsync(input, token);
+            await ExecuteAsync(mediatr, input, token);
             return await jobsDataLoader.LoadAsync(input.JobIds.ToList(), token);
         }
 
@@ -80,10 +79,10 @@ namespace Sheaft.GraphQL.Jobs
         [GraphQLType(typeof(ListType<JobType>))]
         public async Task<IEnumerable<Job>> ArchiveJobsAsync(
             [GraphQLType(typeof(ArchiveJobsInputType))] [GraphQLName("input")]
-            ArchiveJobsCommand input,
+            ArchiveJobsCommand input, [Service] ISheaftMediatr mediatr,
             JobsByIdBatchDataLoader jobsDataLoader, CancellationToken token)
         {
-            await ExecuteAsync(input, token);
+            await ExecuteAsync(mediatr, input, token);
             return await jobsDataLoader.LoadAsync(input.JobIds.ToList(), token);
         }
     }

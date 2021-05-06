@@ -22,10 +22,9 @@ namespace Sheaft.GraphQL.Products
     public class ProductMutations : SheaftMutation
     {
         public ProductMutations(
-            ISheaftMediatr mediator,
             ICurrentUserService currentUserService,
             IHttpContextAccessor httpContextAccessor)
-            : base(mediator, currentUserService, httpContextAccessor)
+            : base(currentUserService, httpContextAccessor)
         {
         }
 
@@ -34,10 +33,10 @@ namespace Sheaft.GraphQL.Products
         [GraphQLType(typeof(ProductType))]
         public async Task<Product> CreateProductAsync(
             [GraphQLType(typeof(CreateProductInputType))] [GraphQLName("input")]
-            CreateProductCommand input,
+            CreateProductCommand input, [Service] ISheaftMediatr mediatr,
             ProductsByIdBatchDataLoader productsDataLoader, CancellationToken token)
         {
-            var result = await ExecuteAsync<CreateProductCommand, Guid>(input, token);
+            var result = await ExecuteAsync<CreateProductCommand, Guid>(mediatr, input, token);
             return await productsDataLoader.LoadAsync(result, token);
         }
 
@@ -46,10 +45,10 @@ namespace Sheaft.GraphQL.Products
         [GraphQLType(typeof(ProductType))]
         public async Task<Product> UpdateProductAsync(
             [GraphQLType(typeof(UpdateProductInputType))] [GraphQLName("input")]
-            UpdateProductCommand input,
+            UpdateProductCommand input, [Service] ISheaftMediatr mediatr,
             ProductsByIdBatchDataLoader productsDataLoader, CancellationToken token)
         {
-            await ExecuteAsync(input, token);
+            await ExecuteAsync(mediatr, input, token);
             return await productsDataLoader.LoadAsync(input.ProductId, token);
         }
 
@@ -57,10 +56,10 @@ namespace Sheaft.GraphQL.Products
         [Authorize(Policy = Policies.PRODUCER)]
         [GraphQLType(typeof(ProductType))]
         public async Task<Product> RateProductAsync([GraphQLType(typeof(RateProductInputType))] [GraphQLName("input")]
-            RateProductCommand input,
+            RateProductCommand input, [Service] ISheaftMediatr mediatr,
             ProductsByIdBatchDataLoader productsDataLoader, CancellationToken token)
         {
-            await ExecuteAsync(input, token);
+            await ExecuteAsync(mediatr, input, token);
             return await productsDataLoader.LoadAsync(input.ProductId, token);
         }
 
@@ -69,10 +68,10 @@ namespace Sheaft.GraphQL.Products
         [GraphQLType(typeof(ProductType))]
         public async Task<Product> UpdateProductPictureAsync(
             [GraphQLType(typeof(UpdateProductPictureInputType))] [GraphQLName("input")]
-            UpdateProductPreviewCommand input,
+            UpdateProductPreviewCommand input, [Service] ISheaftMediatr mediatr,
             ProductsByIdBatchDataLoader productsDataLoader, CancellationToken token)
         {
-            await ExecuteAsync<UpdateProductPreviewCommand, string>(input, token);
+            await ExecuteAsync<UpdateProductPreviewCommand, string>(mediatr, input, token);
             return await productsDataLoader.LoadAsync(input.ProductId, token);
         }
 
@@ -81,10 +80,10 @@ namespace Sheaft.GraphQL.Products
         [GraphQLType(typeof(ListType<ProductType>))]
         public async Task<IEnumerable<Product>> SetProductsAvailabilityAsync(
             [GraphQLType(typeof(SetProductsAvailabilityInputType))] [GraphQLName("input")]
-            SetProductsAvailabilityCommand input,
+            SetProductsAvailabilityCommand input, [Service] ISheaftMediatr mediatr,
             ProductsByIdBatchDataLoader productsDataLoader, CancellationToken token)
         {
-            await ExecuteAsync(input, token);
+            await ExecuteAsync(mediatr, input, token);
             return await productsDataLoader.LoadAsync(input.ProductIds.ToList(), token);
         }
 
@@ -92,30 +91,30 @@ namespace Sheaft.GraphQL.Products
         [Authorize(Policy = Policies.PRODUCER)]
         public async Task<bool> DeleteProductsAsync(
             [GraphQLType(typeof(DeleteProductsInputType))] [GraphQLName("input")]
-            DeleteProductsCommand input,
+            DeleteProductsCommand input, [Service] ISheaftMediatr mediatr,
             CancellationToken token)
         {
-            return await ExecuteAsync(input, token);
+            return await ExecuteAsync(mediatr, input, token);
         }
 
         [GraphQLName("addPictureToProduct")]
         [Authorize(Policy = Policies.PRODUCER)]
         public async Task<bool> AddPictureToProductAsync(
             [GraphQLType(typeof(AddPictureToProductInputType))] [GraphQLName("input")]
-            AddPictureToProductCommand input,
+            AddPictureToProductCommand input, [Service] ISheaftMediatr mediatr,
             CancellationToken token)
         {
-            return await ExecuteAsync(input, token);
+            return await ExecuteAsync(mediatr, input, token);
         }
 
         [GraphQLName("removeProductPictures")]
         [Authorize(Policy = Policies.PRODUCER)]
         public async Task<bool> RemoveProductPicturesAsync(
             [GraphQLType(typeof(RemoveProductPicturesInputType))] [GraphQLName("input")]
-            RemoveProductPicturesCommand input,
+            RemoveProductPicturesCommand input, [Service] ISheaftMediatr mediatr,
             CancellationToken token)
         {
-            return await ExecuteAsync(input, token);
+            return await ExecuteAsync(mediatr, input, token);
         }
     }
 }

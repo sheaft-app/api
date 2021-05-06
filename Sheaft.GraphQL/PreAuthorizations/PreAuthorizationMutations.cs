@@ -21,19 +21,18 @@ namespace Sheaft.GraphQL.PreAuthorizations
     public class PreAuthorizationMutations : SheaftMutation
     {
         public PreAuthorizationMutations(
-            ISheaftMediatr mediator,
             ICurrentUserService currentUserService,
             IHttpContextAccessor httpContextAccessor)
-            : base(mediator, currentUserService, httpContextAccessor)
+            : base(currentUserService, httpContextAccessor)
         {
         }
 
         [GraphQLName("createCardRegistration")]
         [Authorize(Policy = Policies.CONSUMER)]
         [GraphQLType(typeof(CardRegistrationDtoType))]
-        public async Task<CardRegistrationDto> CreateCardRegistration(CancellationToken token)
+        public async Task<CardRegistrationDto> CreateCardRegistration([Service] ISheaftMediatr mediatr, CancellationToken token)
         {
-            return await ExecuteAsync<CreateCardRegistrationCommand, CardRegistrationDto>(
+            return await ExecuteAsync<CreateCardRegistrationCommand, CardRegistrationDto>(mediatr,
                 new CreateCardRegistrationCommand(CurrentUser), token);
         }
 
@@ -42,13 +41,13 @@ namespace Sheaft.GraphQL.PreAuthorizations
         [GraphQLType(typeof(PreAuthorizationType))]
         public async Task<PreAuthorization> CreatePreAuthorization(
             [GraphQLType(typeof(CreatePreAuthorizationForOrderInputType))] [GraphQLName("input")]
-            CreatePreAuthorizationForOrderCommand input,
+            CreatePreAuthorizationForOrderCommand input, [Service] ISheaftMediatr mediatr,
             PreAuthorizationsByIdBatchDataLoader preAuthorizationsDataLoader, CancellationToken token)
         {
             input.IpAddress = _httpContextAccessor.HttpContext.Connection.RemoteIpAddress.ToString();
             input.BrowserInfo.AcceptHeader = _httpContextAccessor.HttpContext.Request.Headers["Accept"];
 
-            var result = await ExecuteAsync<CreatePreAuthorizationForOrderCommand, Guid>(input, token);
+            var result = await ExecuteAsync<CreatePreAuthorizationForOrderCommand, Guid>(mediatr, input, token);
             return await preAuthorizationsDataLoader.LoadAsync(result, token);
         }
     }

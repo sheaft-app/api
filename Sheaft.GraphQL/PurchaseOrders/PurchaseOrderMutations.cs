@@ -21,10 +21,9 @@ namespace Sheaft.GraphQL.PurchaseOrders
     public class PurchaseOrderMutations : SheaftMutation
     {
         public PurchaseOrderMutations(
-            ISheaftMediatr mediator,
             ICurrentUserService currentUserService,
             IHttpContextAccessor httpContextAccessor)
-            : base(mediator, currentUserService, httpContextAccessor)
+            : base(currentUserService, httpContextAccessor)
         {
         }
 
@@ -33,10 +32,10 @@ namespace Sheaft.GraphQL.PurchaseOrders
         [GraphQLType(typeof(ListType<PurchaseOrderType>))]
         public async Task<IEnumerable<PurchaseOrder>> AcceptPurchaseOrdersAsync(
             [GraphQLType(typeof(AcceptPurchaseOrdersInputType))] [GraphQLName("input")]
-            AcceptPurchaseOrdersCommand input,
+            AcceptPurchaseOrdersCommand input, [Service] ISheaftMediatr mediatr,
             PurchaseOrdersByIdBatchDataLoader purchaseOrdersDataLoader, CancellationToken token)
         {
-            await ExecuteAsync(input, token);
+            await ExecuteAsync(mediatr, input, token);
             return await purchaseOrdersDataLoader.LoadAsync(input.PurchaseOrderIds.ToList(), token);
         }
 
@@ -45,10 +44,10 @@ namespace Sheaft.GraphQL.PurchaseOrders
         [GraphQLType(typeof(ListType<PurchaseOrderType>))]
         public async Task<IEnumerable<PurchaseOrder>> ShipPurchaseOrdersAsync(
             [GraphQLType(typeof(ShipPurchaseOrdersInputType))] [GraphQLName("input")]
-            ShipPurchaseOrdersCommand input,
+            ShipPurchaseOrdersCommand input, [Service] ISheaftMediatr mediatr,
             PurchaseOrdersByIdBatchDataLoader purchaseOrdersDataLoader, CancellationToken token)
         {
-            await ExecuteAsync(input, token);
+            await ExecuteAsync(mediatr, input, token);
             return await purchaseOrdersDataLoader.LoadAsync(input.PurchaseOrderIds.ToList(), token);
         }
 
@@ -57,10 +56,10 @@ namespace Sheaft.GraphQL.PurchaseOrders
         [GraphQLType(typeof(ListType<PurchaseOrderType>))]
         public async Task<IEnumerable<PurchaseOrder>> DeliverPurchaseOrdersAsync(
             [GraphQLType(typeof(DeliverPurchaseOrdersInputType))] [GraphQLName("input")]
-            DeliverPurchaseOrdersCommand input,
+            DeliverPurchaseOrdersCommand input, [Service] ISheaftMediatr mediatr,
             PurchaseOrdersByIdBatchDataLoader purchaseOrdersDataLoader, CancellationToken token)
         {
-            await ExecuteAsync(input, token);
+            await ExecuteAsync(mediatr, input, token);
             return await purchaseOrdersDataLoader.LoadAsync(input.PurchaseOrderIds.ToList(), token);
         }
 
@@ -69,10 +68,10 @@ namespace Sheaft.GraphQL.PurchaseOrders
         [GraphQLType(typeof(ListType<PurchaseOrderType>))]
         public async Task<IEnumerable<PurchaseOrder>> ProcessPurchaseOrdersAsync(
             [GraphQLType(typeof(ProcessPurchaseOrdersInputType))] [GraphQLName("input")]
-            ProcessPurchaseOrdersCommand input,
+            ProcessPurchaseOrdersCommand input, [Service] ISheaftMediatr mediatr,
             PurchaseOrdersByIdBatchDataLoader purchaseOrdersDataLoader, CancellationToken token)
         {
-            await ExecuteAsync(input, token);
+            await ExecuteAsync(mediatr, input, token);
             return await purchaseOrdersDataLoader.LoadAsync(input.PurchaseOrderIds.ToList(), token);
         }
 
@@ -81,10 +80,10 @@ namespace Sheaft.GraphQL.PurchaseOrders
         [GraphQLType(typeof(ListType<PurchaseOrderType>))]
         public async Task<IEnumerable<PurchaseOrder>> CompletePurchaseOrdersAsync(
             [GraphQLType(typeof(CompletePurchaseOrdersInputType))] [GraphQLName("input")]
-            CompletePurchaseOrdersCommand input,
+            CompletePurchaseOrdersCommand input, [Service] ISheaftMediatr mediatr,
             PurchaseOrdersByIdBatchDataLoader purchaseOrdersDataLoader, CancellationToken token)
         {
-            await ExecuteAsync(input, token);
+            await ExecuteAsync(mediatr, input, token);
             return await purchaseOrdersDataLoader.LoadAsync(input.PurchaseOrderIds.ToList(), token);
         }
 
@@ -93,10 +92,10 @@ namespace Sheaft.GraphQL.PurchaseOrders
         [GraphQLType(typeof(ListType<PurchaseOrderType>))]
         public async Task<IEnumerable<PurchaseOrder>> CancelPurchaseOrdersAsync(
             [GraphQLType(typeof(CancelPurchaseOrdersInputType))] [GraphQLName("input")]
-            CancelPurchaseOrdersCommand input,
+            CancelPurchaseOrdersCommand input, [Service] ISheaftMediatr mediatr,
             PurchaseOrdersByIdBatchDataLoader purchaseOrdersDataLoader, CancellationToken token)
         {
-            await ExecuteAsync(input, token);
+            await ExecuteAsync(mediatr, input, token);
             return await purchaseOrdersDataLoader.LoadAsync(input.PurchaseOrderIds.ToList(), token);
         }
 
@@ -105,10 +104,10 @@ namespace Sheaft.GraphQL.PurchaseOrders
         [GraphQLType(typeof(ListType<PurchaseOrderType>))]
         public async Task<IEnumerable<PurchaseOrder>> WithdrawnPurchaseOrdersAsync(
             [GraphQLType(typeof(WithdrawnPurchaseOrdersInputType))] [GraphQLName("input")]
-            WithdrawnPurchaseOrdersCommand input,
+            WithdrawnPurchaseOrdersCommand input, [Service] ISheaftMediatr mediatr,
             PurchaseOrdersByIdBatchDataLoader purchaseOrdersDataLoader, CancellationToken token)
         {
-            await ExecuteAsync(input, token);
+            await ExecuteAsync(mediatr, input, token);
             return await purchaseOrdersDataLoader.LoadAsync(input.PurchaseOrderIds.ToList(), token);
         }
 
@@ -117,10 +116,10 @@ namespace Sheaft.GraphQL.PurchaseOrders
         [GraphQLType(typeof(ListType<PurchaseOrderType>))]
         public async Task<IEnumerable<PurchaseOrder>> RefusePurchaseOrdersAsync(
             [GraphQLType(typeof(RefusePurchaseOrdersInputType))] [GraphQLName("input")]
-            RefusePurchaseOrdersCommand input,
+            RefusePurchaseOrdersCommand input, [Service] ISheaftMediatr mediatr,
             PurchaseOrdersByIdBatchDataLoader purchaseOrdersDataLoader, CancellationToken token)
         {
-            await ExecuteAsync(input, token);
+            await ExecuteAsync(mediatr, input, token);
             return await purchaseOrdersDataLoader.LoadAsync(input.PurchaseOrderIds.ToList(), token);
         }
 
@@ -128,9 +127,10 @@ namespace Sheaft.GraphQL.PurchaseOrders
         [Authorize(Policy = Policies.PRODUCER)]
         public async Task<bool> DeletePurchaseOrdersAsync(
             [GraphQLType(typeof(DeletePurchaseOrdersInputType))] [GraphQLName("input")]
-            DeletePurchaseOrdersCommand input, CancellationToken token)
+            DeletePurchaseOrdersCommand input, [Service] ISheaftMediatr mediatr,
+            CancellationToken token)
         {
-            return await ExecuteAsync(input, token);
+            return await ExecuteAsync(mediatr, input, token);
         }
     }
 }

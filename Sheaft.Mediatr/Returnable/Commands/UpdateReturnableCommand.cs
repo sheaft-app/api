@@ -8,10 +8,12 @@ using Newtonsoft.Json;
 using Sheaft.Application.Extensions;
 using Sheaft.Application.Interfaces;
 using Sheaft.Application.Interfaces.Infrastructure;
+using Microsoft.EntityFrameworkCore;
 using Sheaft.Application.Interfaces.Mediatr;
 using Sheaft.Core;
 using Sheaft.Domain;
-using Sheaft.Infrastructure.Persistence;
+using Sheaft.Application.Interfaces.Infrastructure;
+using Microsoft.EntityFrameworkCore;
 
 namespace Sheaft.Mediatr.Returnable.Commands
 {
@@ -38,7 +40,7 @@ namespace Sheaft.Mediatr.Returnable.Commands
     {
         public UpdateReturnableCommandHandler(
             ISheaftMediatr mediatr,
-            IDbContextFactory<AppDbContext> context,
+            IAppDbContext context,
             ILogger<UpdateReturnableCommandHandler> logger)
             : base(mediatr, context, logger)
         {

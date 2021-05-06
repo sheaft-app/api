@@ -15,6 +15,7 @@ using Sheaft.Application.Interfaces.Mediatr;
 using Sheaft.Core.Exceptions;
 using Sheaft.Domain;
 using Sheaft.Domain.Enum;
+using Sheaft.Infrastructure.Persistence;
 using Sheaft.Mediatr.Document.Commands;
 using Sheaft.Mediatr.Page.Commands;
 using Sheaft.Options;

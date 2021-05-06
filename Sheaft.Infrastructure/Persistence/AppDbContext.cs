@@ -2,26 +2,17 @@
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
-using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Localization;
-using Microsoft.Extensions.Options;
-using Sheaft.Application.Interfaces;
 using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Application.Interfaces.Mediatr;
-using Sheaft.Core.Enums;
-using Sheaft.Core.Exceptions;
 using Sheaft.Domain;
 using Sheaft.Domain.Common;
-using Sheaft.Domain.Enum;
 using Sheaft.Domain.Interop;
 using Sheaft.Domain.Views;
-using Sheaft.Localization;
 
 namespace Sheaft.Infrastructure.Persistence
 {

@@ -23,10 +23,9 @@ namespace Sheaft.GraphQL.Exports
     public class ExportMutations : SheaftMutation
     {
         public ExportMutations(
-            ISheaftMediatr mediator,
             ICurrentUserService currentUserService,
             IHttpContextAccessor httpContextAccessor)
-            : base(mediator, currentUserService, httpContextAccessor)
+            : base(currentUserService, httpContextAccessor)
         {
         }
 
@@ -35,10 +34,10 @@ namespace Sheaft.GraphQL.Exports
         [GraphQLType(typeof(JobType))]
         public async Task<Job> ExportPickingOrdersAsync(
             [GraphQLType(typeof(QueueExportPickingOrderInputType))] [GraphQLName("input")]
-            QueueExportPickingOrderCommand input,
+            QueueExportPickingOrderCommand input, [Service] ISheaftMediatr mediatr,
             JobsByIdBatchDataLoader jobsDataLoader, CancellationToken token)
         {
-            var result = await ExecuteAsync<QueueExportPickingOrderCommand, Guid>(input, token);
+            var result = await ExecuteAsync<QueueExportPickingOrderCommand, Guid>(mediatr, input, token);
             return await jobsDataLoader.LoadAsync(result, token);
         }
 
@@ -47,11 +46,11 @@ namespace Sheaft.GraphQL.Exports
         [GraphQLType(typeof(JobType))]
         public async Task<Job> ExportPurchaseOrdersAsync(
             [GraphQLType(typeof(QueueExportPurchaseOrdersInputType))] [GraphQLName("input")]
-            QueueExportPurchaseOrdersCommand input,
+            QueueExportPurchaseOrdersCommand input, [Service] ISheaftMediatr mediatr,
             JobsByIdBatchDataLoader jobsDataLoader, CancellationToken token)
         {
             var result =
-                await ExecuteAsync<QueueExportPurchaseOrdersCommand, Guid>(input, token);
+                await ExecuteAsync<QueueExportPurchaseOrdersCommand, Guid>(mediatr, input, token);
             return await jobsDataLoader.LoadAsync(result, token);
         }
 
@@ -60,19 +59,19 @@ namespace Sheaft.GraphQL.Exports
         [GraphQLType(typeof(JobType))]
         public async Task<Job> ExportTransactionsAsync(
             [GraphQLType(typeof(QueueExportTransactionsInputType))] [GraphQLName("input")]
-            QueueExportTransactionsCommand input,
+            QueueExportTransactionsCommand input, [Service] ISheaftMediatr mediatr,
             JobsByIdBatchDataLoader jobsDataLoader, CancellationToken token)
         {
-            var result = await ExecuteAsync<QueueExportTransactionsCommand, Guid>(input, token);
+            var result = await ExecuteAsync<QueueExportTransactionsCommand, Guid>(mediatr, input, token);
             return await jobsDataLoader.LoadAsync(result, token);
         }
 
         [GraphQLName("exportUserData")]
         [Authorize(Policy = Policies.REGISTERED)]
         [GraphQLType(typeof(JobType))]
-        public async Task<Job> ExportUserDataAsync(JobsByIdBatchDataLoader jobsDataLoader, CancellationToken token)
+        public async Task<Job> ExportUserDataAsync([Service] ISheaftMediatr mediatr, JobsByIdBatchDataLoader jobsDataLoader, CancellationToken token)
         {
-            var result = await ExecuteAsync<QueueExportUserDataCommand, Guid>(new QueueExportUserDataCommand(CurrentUser), token);
+            var result = await ExecuteAsync<QueueExportUserDataCommand, Guid>(mediatr, new QueueExportUserDataCommand(CurrentUser), token);
             return await jobsDataLoader.LoadAsync(result, token);
         }
     }

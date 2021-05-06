@@ -248,8 +248,6 @@ namespace Sheaft.Domain
                 _catalogsPrices.Add(new CatalogProduct(Guid.NewGuid(), this, catalog, wholeSalePricePerUnit));
             else
                 existingCatalogPrice.SetWholeSalePricePerUnit(wholeSalePricePerUnit);
-            
-            RefreshCatalogs();
         }
 
         public void RemoveFromCatalog(Guid catalogId)
@@ -262,15 +260,8 @@ namespace Sheaft.Domain
                 throw SheaftException.NotFound();
 
             _catalogsPrices.Remove(existingCatalogPrice);
-            RefreshCatalogs();
         }
 
         public List<DomainEvent> DomainEvents { get; } = new List<DomainEvent>();
-
-        //Needed to update the UpdateOn column in SQL to be processed by azure search indexer
-        public void RefreshCatalogs()
-        {
-            UpdatedOn = DateTimeOffset.Now;
-        }
     }
 }

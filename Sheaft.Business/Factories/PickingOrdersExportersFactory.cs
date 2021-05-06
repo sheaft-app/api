@@ -9,19 +9,20 @@ using Sheaft.Application.Interfaces.Factories;
 using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Domain;
 using Sheaft.Domain.Enum;
+using Sheaft.Infrastructure.Persistence;
 using Sheaft.Options;
 
 namespace Sheaft.Business.Factories
 {
     public class PickingOrdersExportersFactory : IPickingOrdersExportersFactory
     {
-        private readonly IAppDbContext _context;
+        private readonly AppDbContext _context;
         private readonly Func<string, IPickingOrdersFileExporter> _resolver;
         private readonly ExportersOptions _options;
 
-        public PickingOrdersExportersFactory(IAppDbContext context, IOptions<ExportersOptions> options, Func<string, IPickingOrdersFileExporter> resolver)
+        public PickingOrdersExportersFactory(IDbContextFactory<AppDbContext> context, IOptions<ExportersOptions> options, Func<string, IPickingOrdersFileExporter> resolver)
         {
-            _context = context;
+            _context = context.CreateDbContext();
             _resolver = resolver;
             _options = options.Value;
         }

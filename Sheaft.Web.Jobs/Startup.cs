@@ -266,6 +266,16 @@ namespace Sheaft.Web.Jobs
             services.AddOptions();
 
             var databaseConfig = appDatabaseSettings.Get<AppDatabaseOptions>();
+            services.AddPooledDbContextFactory<AppDbContext>(options =>
+            {
+                options.UseLazyLoadingProxies();
+                options.UseSqlServer(databaseConfig.ConnectionString, x =>
+                {
+                    x.UseNetTopologySuite();
+                    x.MigrationsHistoryTable("AppMigrationTable", "ef");
+                });
+            });
+
             services.AddDbContext<IAppDbContext, AppDbContext>(options =>
             {
                 options.UseLazyLoadingProxies();
@@ -274,7 +284,7 @@ namespace Sheaft.Web.Jobs
                     x.UseNetTopologySuite();
                     x.MigrationsHistoryTable("AppMigrationTable", "ef");
                 });
-            }, ServiceLifetime.Scoped);
+            });
 
             var pspOptions = pspSettings.Get<PspOptions>();
             services.AddScoped<MangoPayApi>(_ => new MangoPayApi

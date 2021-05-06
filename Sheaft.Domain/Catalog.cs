@@ -39,12 +39,6 @@ namespace Sheaft.Domain
         public void SetIsAvailable(bool isAvailable)
         {
             Available = isAvailable;
-
-            if (Products == null)
-                return;
-
-            foreach (var product in Products)
-                product.Product.RefreshCatalogs();
         }
 
         public void SetIsDefault(bool isDefault)
@@ -62,7 +56,6 @@ namespace Sheaft.Domain
                 throw SheaftException.NotFound();
 
             _products.Remove(product);
-            product.Product.RefreshCatalogs();
             return product;
         }
 
@@ -76,8 +69,6 @@ namespace Sheaft.Domain
                 existingProductPrice.SetWholeSalePricePerUnit(wholeSalePrice);
             else
                 _products.Add(new CatalogProduct(Guid.NewGuid(), product, this, wholeSalePrice));
-
-            product.RefreshCatalogs();
         }
     }
 }

@@ -17,6 +17,7 @@ using Sheaft.Application.Interfaces.Mediatr;
 using Sheaft.Application.Models;
 using Sheaft.Core.Exceptions;
 using Sheaft.Domain;
+using Sheaft.Infrastructure.Persistence;
 using Sheaft.Mediatr.Product.Commands;
 using Sheaft.Options;
 using Sheaft.Web.Manage.Models;

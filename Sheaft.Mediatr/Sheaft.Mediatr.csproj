@@ -7,7 +7,6 @@
     <ItemGroup>
       <ProjectReference Include="..\Sheaft.Application\Sheaft.Application.csproj" />
       <ProjectReference Include="..\Sheaft.Domain\Sheaft.Domain.csproj" />
-      <ProjectReference Include="..\Sheaft.Infrastructure\Sheaft.Infrastructure.csproj" />
       <ProjectReference Include="..\Sheaft.Options\Sheaft.Options.csproj" />
     </ItemGroup>
 

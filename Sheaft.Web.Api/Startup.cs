@@ -257,7 +257,15 @@ namespace Sheaft.Web.Api
                 });
             });
 
-            services.AddScoped<IAppDbContext>(c => c.GetRequiredService<IDbContextFactory<AppDbContext>>().CreateDbContext());
+            services.AddDbContext<IAppDbContext, AppDbContext>(options =>
+            {
+                options.UseLazyLoadingProxies();
+                options.UseSqlServer(databaseConfig.ConnectionString, x =>
+                {
+                    x.UseNetTopologySuite();
+                    x.MigrationsHistoryTable("AppMigrationTable", "ef");
+                });
+            });
 
             services.AddScoped<IIdentifierService, IdentifierService>();
             services.AddScoped<IBlobService, BlobService>();
@@ -268,9 +276,10 @@ namespace Sheaft.Web.Api
             services.AddScoped<ITableService, TableService>();
             services.AddScoped<IAuthService, AuthService>();
             
+            services.AddScoped<ISheaftMediatr, SheaftMediatr>();
+            services.AddScoped<ISheaftDispatcher, SheaftDispatcher>();
+            
             services.AddSingleton<ICurrentUserService, CurrentUserService>();
-            services.AddSingleton<ISheaftMediatr, SheaftMediatr>();
-            services.AddSingleton<ISheaftDispatcher, SheaftDispatcher>();
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             
             services.AddScoped<IDeliveryService, DeliveryService>();
@@ -391,7 +400,9 @@ namespace Sheaft.Web.Api
 
             using (var serviceScope = app.ApplicationServices.GetRequiredService<IServiceScopeFactory>().CreateScope())
             {
-                var context = serviceScope.ServiceProvider.GetRequiredService<IAppDbContext>();
+                var contextFactory = serviceScope.ServiceProvider.GetRequiredService<IDbContextFactory<AppDbContext>>();
+                var context = contextFactory.CreateDbContext();
+                
                 if (!context.AllMigrationsApplied())
                 {
                     context.Migrate();

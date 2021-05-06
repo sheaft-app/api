@@ -21,10 +21,9 @@ namespace Sheaft.GraphQL.Catalogs
     public class CatalogMutations : SheaftMutation
     {
         public CatalogMutations(
-            ISheaftMediatr mediator,
             ICurrentUserService currentUserService,
             IHttpContextAccessor httpContextAccessor)
-            : base(mediator, currentUserService, httpContextAccessor)
+            : base(currentUserService, httpContextAccessor)
         {
         }
 
@@ -33,10 +32,10 @@ namespace Sheaft.GraphQL.Catalogs
         [GraphQLType(typeof(CatalogType))]
         public async Task<Catalog> CreateCatalogAsync(
             [GraphQLType(typeof(CreateCatalogInputType))] [GraphQLName("input")]
-            CreateCatalogCommand input,
+            CreateCatalogCommand input, [Service] ISheaftMediatr mediatr,
             CatalogsByIdBatchDataLoader catalogsDataLoader, CancellationToken token)
         {
-            var result = await ExecuteAsync<CreateCatalogCommand, Guid>(input, token);
+            var result = await ExecuteAsync<CreateCatalogCommand, Guid>(mediatr, input, token);
             return await catalogsDataLoader.LoadAsync(result, token);
         }
 
@@ -45,10 +44,10 @@ namespace Sheaft.GraphQL.Catalogs
         [GraphQLType(typeof(CatalogType))]
         public async Task<Catalog> UpdateCatalogAsync(
             [GraphQLType(typeof(UpdateCatalogInputType))] [GraphQLName("input")]
-            UpdateCatalogCommand input,
+            UpdateCatalogCommand input, [Service] ISheaftMediatr mediatr,
             CatalogsByIdBatchDataLoader catalogsDataLoader, CancellationToken token)
         {
-            await ExecuteAsync(input, token);
+            await ExecuteAsync(mediatr, input, token);
             return await catalogsDataLoader.LoadAsync(input.CatalogId, token);
         }
 
@@ -57,10 +56,10 @@ namespace Sheaft.GraphQL.Catalogs
         [GraphQLType(typeof(CatalogType))]
         public async Task<bool> DeleteCatalogsAsync(
             [GraphQLType(typeof(DeleteCatalogsInputType))] [GraphQLName("input")]
-            DeleteCatalogsCommand input,
+            DeleteCatalogsCommand input, [Service] ISheaftMediatr mediatr,
             CancellationToken token)
         {
-            return await ExecuteAsync(input, token);
+            return await ExecuteAsync(mediatr, input, token);
         }
 
         [GraphQLName("addOrUpdateProductsToCatalog")]
@@ -68,10 +67,10 @@ namespace Sheaft.GraphQL.Catalogs
         [GraphQLType(typeof(CatalogType))]
         public async Task<Catalog> AddOrUpdateProductsToCatalogAsync(
             [GraphQLType(typeof(AddOrUpdateProductsToCatalogInputType))] [GraphQLName("input")]
-            AddOrUpdateProductsToCatalogCommand input,
+            AddOrUpdateProductsToCatalogCommand input, [Service] ISheaftMediatr mediatr,
             CatalogsByIdBatchDataLoader catalogsDataLoader, CancellationToken token)
         {
-            await ExecuteAsync(input, token);
+            await ExecuteAsync(mediatr, input, token);
             return await catalogsDataLoader.LoadAsync(input.CatalogId, token);
         }
 
@@ -80,10 +79,10 @@ namespace Sheaft.GraphQL.Catalogs
         [GraphQLType(typeof(CatalogType))]
         public async Task<Catalog> RemoveProductsFromCatalogAsync(
             [GraphQLType(typeof(RemoveProductsFromCatalogInputType))] [GraphQLName("input")]
-            RemoveProductsFromCatalogCommand input,
+            RemoveProductsFromCatalogCommand input, [Service] ISheaftMediatr mediatr,
             CatalogsByIdBatchDataLoader catalogsDataLoader, CancellationToken token)
         {
-            await ExecuteAsync(input, token);
+            await ExecuteAsync(mediatr, input, token);
             return await catalogsDataLoader.LoadAsync(input.CatalogId, token);
         }
 
@@ -91,10 +90,10 @@ namespace Sheaft.GraphQL.Catalogs
         [Authorize(Policy = Policies.PRODUCER)]
         [GraphQLType(typeof(CatalogType))]
         public async Task<Catalog> CloneCatalogAsync([GraphQLType(typeof(CloneCatalogInputType))] [GraphQLName("input")]
-            CloneCatalogCommand input,
+            CloneCatalogCommand input, [Service] ISheaftMediatr mediatr,
             CatalogsByIdBatchDataLoader catalogsDataLoader, CancellationToken token)
         {
-            var result = await ExecuteAsync<CloneCatalogCommand, Guid>(input, token);
+            var result = await ExecuteAsync<CloneCatalogCommand, Guid>(mediatr, input, token);
             return await catalogsDataLoader.LoadAsync(input.CatalogId, token);
         }
 
@@ -103,10 +102,10 @@ namespace Sheaft.GraphQL.Catalogs
         [GraphQLType(typeof(CatalogType))]
         public async Task<Catalog> UpdateAllCatalogPricesAsync(
             [GraphQLType(typeof(UpdateAllCatalogPricesInputType))] [GraphQLName("input")]
-            UpdateAllCatalogPricesCommand input,
+            UpdateAllCatalogPricesCommand input, [Service] ISheaftMediatr mediatr,
             CatalogsByIdBatchDataLoader catalogsDataLoader, CancellationToken token)
         {
-            await ExecuteAsync(input, token);
+            await ExecuteAsync(mediatr, input, token);
             return await catalogsDataLoader.LoadAsync(input.CatalogId, token);
         }
 
@@ -115,10 +114,10 @@ namespace Sheaft.GraphQL.Catalogs
         [GraphQLType(typeof(CatalogType))]
         public async Task<Catalog> UpdateCatalogPricesAsync(
             [GraphQLType(typeof(UpdateCatalogPricesInputType))] [GraphQLName("input")]
-            UpdateCatalogPricesCommand input,
+            UpdateCatalogPricesCommand input, [Service] ISheaftMediatr mediatr,
             CatalogsByIdBatchDataLoader catalogsDataLoader, CancellationToken token)
         {
-            await ExecuteAsync(input, token);
+            await ExecuteAsync(mediatr, input, token);
             return await catalogsDataLoader.LoadAsync(input.CatalogId, token);
         }
 
@@ -127,10 +126,10 @@ namespace Sheaft.GraphQL.Catalogs
         [GraphQLType(typeof(CatalogType))]
         public async Task<Catalog> SetCatalogAsDefaultAsync(
             [GraphQLType(typeof(SetCatalogAsDefaultInputType))] [GraphQLName("input")]
-            SetCatalogAsDefaultCommand input,
+            SetCatalogAsDefaultCommand input, [Service] ISheaftMediatr mediatr,
             CatalogsByIdBatchDataLoader catalogsDataLoader, CancellationToken token)
         {
-            await ExecuteAsync(input, token);
+            await ExecuteAsync(mediatr, input, token);
             return await catalogsDataLoader.LoadAsync(input.CatalogId, token);
         }
 
@@ -139,10 +138,10 @@ namespace Sheaft.GraphQL.Catalogs
         [GraphQLType(typeof(ListType<CatalogType>))]
         public async Task<IEnumerable<Catalog>> SetCatalogsAvailabilityAsync(
             [GraphQLType(typeof(SetCatalogsAvailabilityInputType))] [GraphQLName("input")]
-            SetCatalogsAvailabilityCommand input,
+            SetCatalogsAvailabilityCommand input, [Service] ISheaftMediatr mediatr,
             CatalogsByIdBatchDataLoader catalogsDataLoader, CancellationToken token)
         {
-            await ExecuteAsync(input, token);
+            await ExecuteAsync(mediatr, input, token);
             return await catalogsDataLoader.LoadAsync(input.CatalogIds.ToList(), token);
         }
     }

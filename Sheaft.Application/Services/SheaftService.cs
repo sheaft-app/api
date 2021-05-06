@@ -10,7 +10,7 @@ namespace Sheaft.Application.Services
     {
         protected readonly ILogger _logger;
 
-        public SheaftService(ILogger logger)
+        protected SheaftService(ILogger logger)
         {
             _logger = logger;
         }

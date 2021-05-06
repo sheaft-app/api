@@ -19,10 +19,9 @@ namespace Sheaft.GraphQL.Stores
     public class StoreMutations : SheaftMutation
     {
         public StoreMutations(
-            ISheaftMediatr mediator,
             ICurrentUserService currentUserService,
             IHttpContextAccessor httpContextAccessor)
-            : base(mediator, currentUserService, httpContextAccessor)
+            : base(currentUserService, httpContextAccessor)
         {
         }
 
@@ -30,10 +29,10 @@ namespace Sheaft.GraphQL.Stores
         [Authorize(Policy = Policies.UNREGISTERED)]
         [GraphQLType(typeof(StoreType))]
         public async Task<Store> RegisterStoreAsync([GraphQLType(typeof(RegisterStoreInputType))] [GraphQLName("input")]
-            RegisterStoreCommand input,
+            RegisterStoreCommand input, [Service] ISheaftMediatr mediatr,
             StoresByIdBatchDataLoader storesDataLoader, CancellationToken token)
         {
-            var result = await ExecuteAsync<RegisterStoreCommand, Guid>(input, token);
+            var result = await ExecuteAsync<RegisterStoreCommand, Guid>(mediatr, input, token);
             return await storesDataLoader.LoadAsync(result, token);
         }
 
@@ -41,10 +40,10 @@ namespace Sheaft.GraphQL.Stores
         [Authorize(Policy = Policies.STORE)]
         [GraphQLType(typeof(StoreType))]
         public async Task<Store> UpdateStoreAsync([GraphQLType(typeof(UpdateStoreInputType))] [GraphQLName("input")]
-            UpdateStoreCommand input,
+            UpdateStoreCommand input, [Service] ISheaftMediatr mediatr,
             StoresByIdBatchDataLoader storesDataLoader, CancellationToken token)
         {
-            await ExecuteAsync(input, token);
+            await ExecuteAsync(mediatr, input, token);
             return await storesDataLoader.LoadAsync(input.StoreId, token);
         }
     }

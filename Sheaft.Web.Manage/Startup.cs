@@ -16,6 +16,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Sheaft.Infrastructure.Persistence;
+using Microsoft.EntityFrameworkCore;
 using Sheaft.Infrastructure.Services;
 using Microsoft.Azure.Search;
 using Hangfire;
@@ -140,6 +141,16 @@ namespace Sheaft.Web.Manage
             });
 
             var databaseConfig = databaseSettings.Get<AppDatabaseOptions>();
+            services.AddPooledDbContextFactory<AppDbContext>(options =>
+            {
+                options.UseLazyLoadingProxies();
+                options.UseSqlServer(databaseConfig.ConnectionString, x =>
+                {
+                    x.UseNetTopologySuite();
+                    x.MigrationsHistoryTable("AppMigrationTable", "ef");
+                });
+            });
+
             services.AddDbContext<IAppDbContext, AppDbContext>(options =>
             {
                 options.UseLazyLoadingProxies();
@@ -148,7 +159,7 @@ namespace Sheaft.Web.Manage
                     x.UseNetTopologySuite();
                     x.MigrationsHistoryTable("AppMigrationTable", "ef");
                 });
-            }, ServiceLifetime.Scoped);
+            });
 
             var mailerConfig = mailerSettings.Get<MailerOptions>();
             services.AddScoped<IAmazonSimpleEmailService, AmazonSimpleEmailServiceClient>(_ => new AmazonSimpleEmailServiceClient(mailerConfig.ApiId, mailerConfig.ApiKey, RegionEndpoint.EUCentral1));

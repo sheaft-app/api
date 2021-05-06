@@ -14,20 +14,21 @@ using Sheaft.Core;
 using Sheaft.Core.Enums;
 using Sheaft.Domain;
 using Sheaft.Domain.Enum;
+using Sheaft.Infrastructure.Persistence;
 
 namespace Sheaft.Business
 {
     public class OrderService : SheaftService, IOrderService
     {
-        private readonly IAppDbContext _context;
+        private readonly AppDbContext _context;
         private readonly IDeliveryService _deliveryService;
 
         public OrderService(
-            IAppDbContext context,
+            IDbContextFactory<AppDbContext> context,
             IDeliveryService deliveryService,
             ILogger<OrderService> logger) : base(logger)
         {
-            _context = context;
+            _context = context.CreateDbContext();
             _deliveryService = deliveryService;
         }
 

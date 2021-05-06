@@ -10,12 +10,14 @@ using Newtonsoft.Json;
 using Sheaft.Application.Extensions;
 using Sheaft.Application.Interfaces;
 using Sheaft.Application.Interfaces.Infrastructure;
+using Microsoft.EntityFrameworkCore;
 using Sheaft.Application.Interfaces.Mediatr;
 using Sheaft.Application.Models;
 using Sheaft.Core;
 using Sheaft.Domain;
 using Sheaft.Domain.Enum;
-using Sheaft.Infrastructure.Persistence;
+using Sheaft.Application.Interfaces.Infrastructure;
+using Microsoft.EntityFrameworkCore;
 using Sheaft.Mediatr.DeliveryClosing.Commands;
 using Sheaft.Mediatr.Producer.Commands;
 
@@ -58,9 +60,9 @@ namespace Sheaft.Mediatr.DeliveryMode.Commands
     {
         public CreateDeliveryModeCommandHandler(
             ISheaftMediatr mediatr,
-            IDbContextFactory<AppDbContext> context,
+            IAppDbContext context,
             ILogger<CreateDeliveryModeCommandHandler> logger)
-            : base(mediatr, context.CreateDbContext(), logger)
+            : base(mediatr, context, logger)
         {
         }
 

@@ -19,10 +19,9 @@ namespace Sheaft.GraphQL.Returnables
     public class ReturnableMutations : SheaftMutation
     {
         public ReturnableMutations(
-            ISheaftMediatr mediator,
             ICurrentUserService currentUserService,
             IHttpContextAccessor httpContextAccessor)
-            : base(mediator, currentUserService, httpContextAccessor)
+            : base(currentUserService, httpContextAccessor)
         {
         }
 
@@ -31,10 +30,10 @@ namespace Sheaft.GraphQL.Returnables
         [GraphQLType(typeof(ReturnableType))]
         public async Task<Returnable> CreateReturnableAsync(
             [GraphQLType(typeof(CreateReturnableInputType))] [GraphQLName("input")]
-            CreateReturnableCommand input,
+            CreateReturnableCommand input, [Service] ISheaftMediatr mediatr,
             ReturnablesByIdBatchDataLoader returnablesDataLoader, CancellationToken token)
         {
-            var result = await ExecuteAsync<CreateReturnableCommand, Guid>(input, token);
+            var result = await ExecuteAsync<CreateReturnableCommand, Guid>(mediatr, input, token);
             return await returnablesDataLoader.LoadAsync(result, token);
         }
 
@@ -43,10 +42,10 @@ namespace Sheaft.GraphQL.Returnables
         [GraphQLType(typeof(ReturnableType))]
         public async Task<Returnable> UpdateReturnableAsync(
             [GraphQLType(typeof(UpdateReturnableInputType))] [GraphQLName("input")]
-            UpdateReturnableCommand input,
+            UpdateReturnableCommand input, [Service] ISheaftMediatr mediatr,
             ReturnablesByIdBatchDataLoader returnablesDataLoader, CancellationToken token)
         {
-            await ExecuteAsync(input, token);
+            await ExecuteAsync(mediatr, input, token);
             return await returnablesDataLoader.LoadAsync(input.ReturnableId, token);
         }
 
@@ -54,9 +53,10 @@ namespace Sheaft.GraphQL.Returnables
         [Authorize(Policy = Policies.PRODUCER)]
         public async Task<bool> DeleteReturnableAsync(
             [GraphQLType(typeof(DeleteReturnableInputType))] [GraphQLName("input")]
-            DeleteReturnableCommand input, CancellationToken token)
+            DeleteReturnableCommand input, [Service] ISheaftMediatr mediatr,
+            CancellationToken token)
         {
-            return await ExecuteAsync(input, token);
+            return await ExecuteAsync(mediatr, input, token);
         }
     }
 }

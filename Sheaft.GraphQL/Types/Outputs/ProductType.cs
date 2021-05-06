@@ -91,6 +91,7 @@ namespace Sheaft.GraphQL.Types.Outputs
 
             descriptor
                 .Field(c => c.Picture)
+                .Resolve(c => PictureExtensions.GetPictureUrl(c.Parent<Product>().Id, c.Parent<Product>().Picture, PictureSize.MEDIUM))
                 .Name("picture");
 
             descriptor

@@ -8,7 +8,7 @@ namespace Sheaft.Infrastructure.Persistence.Extensions
 {
     public static class DbContextExtension
     {
-        public static bool AllMigrationsApplied(this IAppDbContext context)
+        public static bool AllMigrationsApplied(this AppDbContext context)
         {
             var applied = context.GetService<IHistoryRepository>()
                 .GetAppliedMigrations()
