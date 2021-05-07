@@ -35,7 +35,6 @@ namespace Sheaft.GraphQL.Countries
         [GraphQLName("countries")]
         [GraphQLType(typeof(ListType<CountryType>))]
         [UseDbContext(typeof(QueryDbContext))]
-        [UsePaging]
         [UseFiltering]
         [UseSorting]
         public IQueryable<Country> GetAll([ScopedService] QueryDbContext context)

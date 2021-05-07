@@ -53,7 +53,7 @@ namespace Sheaft.GraphQL.Products
         }
 
         [GraphQLName("rateProduct")]
-        [Authorize(Policy = Policies.PRODUCER)]
+        [Authorize(Policy = Policies.REGISTERED)]
         [GraphQLType(typeof(ProductType))]
         public async Task<Product> RateProductAsync([GraphQLType(typeof(RateProductInputType))] [GraphQLName("input")]
             RateProductCommand input, [Service] ISheaftMediatr mediatr,

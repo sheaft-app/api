@@ -97,7 +97,6 @@ namespace Sheaft.GraphQL.DeliveryModes
         [GraphQLName("nextProducersDeliveries")]
         [GraphQLType(typeof(ListType<ProducerDeliveriesDtoType>))]
         [UseDbContext(typeof(QueryDbContext))]
-        [Authorize(Policy = Policies.STORE_OR_PRODUCER)]
         public async Task<IEnumerable<ProducerDeliveriesDto>> GetNextDeliveries([ID(nameof(Producer))]IEnumerable<Guid> ids, IEnumerable<DeliveryKind> kinds, [ScopedService] QueryDbContext context, CancellationToken token)
         {
             SetLogTransaction();

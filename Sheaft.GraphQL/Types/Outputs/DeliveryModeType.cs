@@ -76,7 +76,7 @@ namespace Sheaft.GraphQL.Types.Outputs
                 .Name("producer")
                 .UseDbContext<QueryDbContext>()
                 .ResolveWith<DeliveryResolvers>(c => c.GetProducer(default, default, default))
-                .Type<NonNullType<UserType>>();
+                .Type<NonNullType<ProducerType>>();
 
             descriptor
                 .Field(c => c.DeliveryHours)

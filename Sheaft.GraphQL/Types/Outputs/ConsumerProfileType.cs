@@ -21,11 +21,12 @@ namespace Sheaft.GraphQL.Types.Outputs
         {
             base.Configure(descriptor);
 
+            descriptor.Name("ConsumerProfile");
+            
             descriptor
-                .ImplementsNode()
-                .IdField(c => c.Id)
-                .ResolveNode((ctx, id) =>
-                    ctx.DataLoader<ConsumersByIdBatchDataLoader>().LoadAsync(id, ctx.RequestAborted));
+                .Field(c => c.Id)
+                .Name("id")
+                .ID(nameof(Consumer));
             
             descriptor
                 .Field(c => c.Address)

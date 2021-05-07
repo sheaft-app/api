@@ -24,6 +24,18 @@ namespace Sheaft.GraphQL.Business
         {
         }
 
+        [GraphQLName("businessLegals")]
+        [GraphQLType(typeof(BusinessLegalType))]
+        [UseDbContext(typeof(QueryDbContext))]
+        [Authorize(Policy = Policies.STORE_OR_PRODUCER)]
+        [UseSingleOrDefault]
+        public IQueryable<BusinessLegal> GetLegals([ScopedService] QueryDbContext context)
+        {
+            SetLogTransaction();
+            return context.Set<BusinessLegal>()
+                .Where(d => d.UserId == CurrentUser.Id);
+        }
+
         [GraphQLName("businessClosing")]
         [GraphQLType(typeof(BusinessClosingType))]
         [UseDbContext(typeof(QueryDbContext))]

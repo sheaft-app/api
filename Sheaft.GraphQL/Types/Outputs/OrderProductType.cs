@@ -94,7 +94,7 @@ namespace Sheaft.GraphQL.Types.Outputs
                 .Field(c => c.Producer)
                 .Name("producer")
                 .ResolveWith<OrderProductResolvers>(c=> c.GetProducer(default, default, default))
-                .Type<NonNullType<UserType>>();
+                .Type<NonNullType<ProducerType>>();
 
             descriptor
                 .Field(c => c.ProductId)

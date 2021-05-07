@@ -35,7 +35,6 @@ namespace Sheaft.GraphQL.Regions
         [GraphQLName("regions")]
         [GraphQLType(typeof(ListType<RegionType>))]
         [UseDbContext(typeof(QueryDbContext))]
-        [UsePaging]
         [UseFiltering]
         [UseSorting]
         public IQueryable<Region> GetAll([ScopedService] QueryDbContext context)

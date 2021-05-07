@@ -36,7 +36,6 @@ namespace Sheaft.GraphQL.Departments
         [GraphQLName("departments")]
         [GraphQLType(typeof(ListType<DepartmentType>))]
         [UseDbContext(typeof(QueryDbContext))]
-        [UsePaging]
         [UseFiltering]
         [UseSorting]
         public IQueryable<Department> GetAll([ScopedService] QueryDbContext context)

@@ -1,27 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using HotChocolate;
-using HotChocolate.Resolvers;
 using HotChocolate.Types;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
-using Sheaft.Application.Extensions;
-using Sheaft.Application.Interfaces.Infrastructure;
-using Sheaft.Application.Security;
 using Sheaft.Domain;
-using Sheaft.Domain.Enum;
-using Sheaft.GraphQL.Agreements;
 using Sheaft.GraphQL.Business;
-using Sheaft.GraphQL.Catalogs;
-using Sheaft.GraphQL.Producers;
-using Sheaft.GraphQL.Products;
-using Sheaft.GraphQL.Tags;
 using Sheaft.GraphQL.Users;
 using Sheaft.Infrastructure.Persistence;
-using Sheaft.Options;
 
 namespace Sheaft.GraphQL.Types.Outputs
 {
@@ -31,11 +18,12 @@ namespace Sheaft.GraphQL.Types.Outputs
         {
             base.Configure(descriptor);
 
+            descriptor.Name("ProducerProfile");
+            
             descriptor
-                .ImplementsNode()
-                .IdField(c => c.Id)
-                .ResolveNode((ctx, id) =>
-                    ctx.DataLoader<ProducersByIdBatchDataLoader>().LoadAsync(id, ctx.RequestAborted));
+                .Field(c => c.Id)
+                .Name("id")
+                .ID(nameof(Producer));
 
             descriptor
                 .Field(c => c.Picture)

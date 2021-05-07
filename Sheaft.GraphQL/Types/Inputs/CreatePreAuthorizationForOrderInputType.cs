@@ -15,7 +15,7 @@ namespace Sheaft.GraphQL.Types.Inputs
 
             descriptor
                 .Field(c => c.OrderId)
-                .Name("orderId")
+                .Name("id")
                 .ID(nameof(Order));
 
             descriptor

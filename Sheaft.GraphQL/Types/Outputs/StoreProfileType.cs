@@ -27,11 +27,12 @@ namespace Sheaft.GraphQL.Types.Outputs
         {
             base.Configure(descriptor);
 
+            descriptor.Name("StoreProfile");
+            
             descriptor
-                .ImplementsNode()
-                .IdField(c => c.Id)
-                .ResolveNode((ctx, id) =>
-                    ctx.DataLoader<StoresByIdBatchDataLoader>().LoadAsync(id, ctx.RequestAborted));
+                .Field(c => c.Id)
+                .Name("id")
+                .ID(nameof(Store));
 
             descriptor
                 .Field(c => c.Picture)
