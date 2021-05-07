@@ -26,10 +26,10 @@ namespace Sheaft.GraphQL.QuickOrders
 
         [GraphQLName("quickOrder")]
         [GraphQLType(typeof(QuickOrderType))]
-        [UseDbContext(typeof(AppDbContext))]
+        [UseDbContext(typeof(QueryDbContext))]
         [Authorize(Policy = Policies.STORE)]
         [UseSingleOrDefault]
-        public IQueryable<QuickOrder> Get([ID] Guid id, [ScopedService] AppDbContext context)
+        public IQueryable<QuickOrder> Get([ID] Guid id, [ScopedService] QueryDbContext context)
         {
             SetLogTransaction(id);
             return context.QuickOrders
@@ -38,12 +38,12 @@ namespace Sheaft.GraphQL.QuickOrders
         
         [GraphQLName("quickOrders")]
         [GraphQLType(typeof(ListType<QuickOrderType>))]
-        [UseDbContext(typeof(AppDbContext))]
+        [UseDbContext(typeof(QueryDbContext))]
         [Authorize(Policy = Policies.STORE)]
         [UsePaging]
         [UseFiltering]
         [UseSorting]
-        public IQueryable<QuickOrder> GetAll([ScopedService] AppDbContext context)
+        public IQueryable<QuickOrder> GetAll([ScopedService] QueryDbContext context)
         {
             SetLogTransaction();
             return context.QuickOrders

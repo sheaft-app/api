@@ -10,7 +10,6 @@ namespace Sheaft.Domain
 {
     public abstract class Business : User
     {
-        private List<BusinessClosing> _closings;
         protected Business()
         {
         }
@@ -23,10 +22,12 @@ namespace Sheaft.Domain
             
             SetOpenForNewBusiness(openForBusiness);
             SetAddress(address);
+
+            Closings = new List<BusinessClosing>();
         }
 
         public bool OpenForNewBusiness { get; private set; }
-        public virtual IReadOnlyCollection<BusinessClosing> Closings => _closings?.AsReadOnly(); 
+        public virtual ICollection<BusinessClosing> Closings { get; private set; }
 
         public void SetName(string name)
         {
@@ -38,15 +39,12 @@ namespace Sheaft.Domain
             OpenForNewBusiness = openForNewBusiness;
         }
 
-        public BusinessClosing AddClosing(DateTimeOffset from, DateTimeOffset to, string reason = null)
+        public void AddClosing(BusinessClosing closing)
         {
             if (Closings == null)
-                _closings = new List<BusinessClosing>();
+                Closings = new List<BusinessClosing>();
 
-            var closing = new BusinessClosing(Guid.NewGuid(), from, to, reason);
-            _closings.Add(closing);
-
-            return closing;
+            Closings.Add(closing);
         }
         
         public void RemoveClosings(IEnumerable<Guid> ids)
@@ -57,11 +55,11 @@ namespace Sheaft.Domain
 
         public void RemoveClosing(Guid id)
         {
-            var closing = _closings.SingleOrDefault(r => r.Id == id);
+            var closing = Closings.SingleOrDefault(r => r.Id == id);
             if(closing == null)
                 throw SheaftException.NotFound();
             
-            _closings.Remove(closing);
+            Closings.Remove(closing);
         }
 
         public BusinessLegal SetLegals(LegalKind kind, string name, string email, string siret, string vatIdentifier, LegalAddress address, Owner owner)

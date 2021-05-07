@@ -10,8 +10,6 @@ namespace Sheaft.Domain
 {
     public class QuickOrder : IEntity, IHasDomainEvent
     {
-        private List<QuickOrderProduct> _products;
-
         protected QuickOrder() { }
 
         public QuickOrder(Guid id, string name, IDictionary<CatalogProduct, int> products, User user)
@@ -27,7 +25,7 @@ namespace Sheaft.Domain
             UserId = user.Id;
 
             DomainEvents = new List<DomainEvent>();
-            _products = new List<QuickOrderProduct>();
+            Products = new List<QuickOrderProduct>();
             AddProducts(products);
         }
 
@@ -40,7 +38,7 @@ namespace Sheaft.Domain
         public DateTimeOffset? RemovedOn { get; private set; }
         public Guid UserId { get; private set; }
         public virtual User User { get; private set; }
-        public virtual IEnumerable<QuickOrderProduct> Products => _products?.AsReadOnly();
+        public virtual ICollection<QuickOrderProduct> Products { get; private set; }
 
         public void SetName(string name)
         {
@@ -80,16 +78,16 @@ namespace Sheaft.Domain
         public void AddOrUpdateProduct(CatalogProduct catalogProduct, int quantity)
         {
             if (Products == null)
-                _products = new List<QuickOrderProduct>();
+                Products = new List<QuickOrderProduct>();
             
-            var productLine = _products.SingleOrDefault(p => p.CatalogProduct.ProductId == catalogProduct.ProductId);
+            var productLine = Products.SingleOrDefault(p => p.CatalogProduct.ProductId == catalogProduct.ProductId);
             if (productLine != null)
             {
                 productLine.SetQuantity(quantity);
                 return;
             }
 
-            _products.Add(new QuickOrderProduct(catalogProduct, quantity)); 
+            Products.Add(new QuickOrderProduct(catalogProduct, quantity)); 
         }
 
         public void RemoveProduct(QuickOrderProduct product)
@@ -97,7 +95,7 @@ namespace Sheaft.Domain
             if (Products == null)
                 throw SheaftException.NotFound();
 
-            _products.Remove(product);
+            Products.Remove(product);
         }
 
         public void RemoveProduct(Guid productId)
@@ -105,13 +103,14 @@ namespace Sheaft.Domain
             if (Products == null)
                 throw SheaftException.NotFound();
             
-            var productLine = _products.SingleOrDefault(p => p.CatalogProduct.ProductId == productId);
+            var productLine = Products.SingleOrDefault(p => p.CatalogProduct.ProductId == productId);
             if (productLine == null)
                 throw SheaftException.Validation(MessageKind.QuickOrder_CannotRemoveProduct_Product_NotFound);
 
-            _products.Remove(productLine);
+            Products.Remove(productLine);
         }
 
         public List<DomainEvent> DomainEvents { get; } = new List<DomainEvent>();
+        public byte[] RowVersion { get; private set; }
     }
 }

@@ -74,21 +74,21 @@ namespace Sheaft.GraphQL.Types.Outputs
             descriptor
                 .Field(c => c.Producer)
                 .Name("producer")
-                .UseDbContext<AppDbContext>()
+                .UseDbContext<QueryDbContext>()
                 .ResolveWith<DeliveryResolvers>(c => c.GetProducer(default, default, default))
                 .Type<NonNullType<UserType>>();
 
             descriptor
                 .Field(c => c.DeliveryHours)
                 .Name("deliveryHours")
-                .UseDbContext<AppDbContext>()
+                .UseDbContext<QueryDbContext>()
                 .ResolveWith<DeliveryResolvers>(c => c.GetDeliveryHours(default, default, default, default))
                 .Type<ListType<DeliveryHoursType>>();
 
             descriptor
                 .Field(c => c.Closings)
                 .Name("closings")
-                .UseDbContext<AppDbContext>()
+                .UseDbContext<QueryDbContext>()
                 .ResolveWith<DeliveryResolvers>(c => c.GetDeliveryClosings(default, default, default, default))
                 .Type<ListType<DeliveryClosingType>>();
         }
@@ -96,7 +96,7 @@ namespace Sheaft.GraphQL.Types.Outputs
         private class DeliveryResolvers
         {
             public async Task<IEnumerable<DeliveryHours>> GetDeliveryHours(DeliveryMode delivery,
-                [ScopedService] AppDbContext context, DeliveryHoursByIdBatchDataLoader deliveryHoursDataLoader,
+                [ScopedService] QueryDbContext context, DeliveryHoursByIdBatchDataLoader deliveryHoursDataLoader,
                 CancellationToken token)
             {
                 var deliveryHoursId = await context.Set<DeliveryHours>()
@@ -107,7 +107,7 @@ namespace Sheaft.GraphQL.Types.Outputs
                 return await deliveryHoursDataLoader.LoadAsync(deliveryHoursId, token);
             }
             public async Task<IEnumerable<DeliveryClosing>> GetDeliveryClosings(DeliveryMode delivery,
-                [ScopedService] AppDbContext context, DeliveryClosingsByIdBatchDataLoader deliveryClosingsDataLoader,
+                [ScopedService] QueryDbContext context, DeliveryClosingsByIdBatchDataLoader deliveryClosingsDataLoader,
                 CancellationToken token)
             {
                 var deliveryHoursId = await context.Set<DeliveryClosing>()

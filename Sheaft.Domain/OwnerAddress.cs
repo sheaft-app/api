@@ -12,5 +12,7 @@ namespace Sheaft.Domain
             : base(line1, line2, zipcode, city, country)
         {
         }
+
+        public byte[] RowVersion { get; private set; }
     }
 }

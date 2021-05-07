@@ -24,7 +24,7 @@ namespace Sheaft.GraphQL.Types.Outputs
 
             descriptor
                 .ImplementsNode()
-                .IdField(c => c.Id)
+                .IdField(c => c.CatalogProduct.ProductId)
                 .ResolveNode((ctx, id) =>
                     ctx.DataLoader<QuickOrderProductsByIdBatchDataLoader>().LoadAsync(id, ctx.RequestAborted));
             

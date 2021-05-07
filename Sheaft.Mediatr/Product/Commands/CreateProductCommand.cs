@@ -125,9 +125,6 @@ namespace Sheaft.Mediatr.Product.Commands
                 var tags = await _context.Tags.Where(t => request.Tags.Contains(t.Id)).ToListAsync(token);
                 entity.SetTags(tags);
 
-                await _context.AddAsync(entity, token);
-                await _context.SaveChangesAsync(token);
-
                 if (request.VisibleToConsumers.HasValue && request.VisibleToStores.HasValue)
                 {
                     if (request.VisibleToConsumers.Value)
@@ -155,6 +152,9 @@ namespace Sheaft.Mediatr.Product.Commands
                         entity.AddOrUpdateCatalogPrice(catalog, catalogPrice.WholeSalePricePerUnit);
                     }
                 }
+                
+                await _context.AddAsync(entity, token);
+                await _context.SaveChangesAsync(token);
 
                 var imageResult = await _mediatr.Process(
                     new UpdateProductPreviewCommand(request.RequestUser)

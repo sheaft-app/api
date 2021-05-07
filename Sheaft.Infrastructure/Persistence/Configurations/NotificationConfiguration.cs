@@ -9,7 +9,7 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
         public void Configure(EntityTypeBuilder<Notification> entity)
         {
             entity.Property(c => c.CreatedOn);
-            entity.Property(c => c.UpdatedOn).IsConcurrencyToken();
+            entity.Property(c => c.UpdatedOn);
             entity.Property(c => c.Content).UseCollation("Latin1_general_CI_AI");
             
             entity.HasOne(c => c.User).WithMany().HasForeignKey(c =>c.UserId).OnDelete(DeleteBehavior.NoAction).IsRequired();

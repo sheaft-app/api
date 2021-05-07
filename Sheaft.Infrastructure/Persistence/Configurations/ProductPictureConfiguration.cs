@@ -9,7 +9,7 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
         public void Configure(EntityTypeBuilder<ProductPicture> entity)
         {
             entity.Property(c => c.CreatedOn);
-            entity.Property(c => c.UpdatedOn).IsConcurrencyToken();
+            entity.Property(c => c.UpdatedOn);
 
             entity.HasKey(c => c.Id);
             entity.ToTable("ProductPictures");

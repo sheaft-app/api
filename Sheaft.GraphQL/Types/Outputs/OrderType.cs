@@ -141,19 +141,19 @@ namespace Sheaft.GraphQL.Types.Outputs
 
             descriptor.Field(c => c.Products)
                 .Name("products")
-                .UseDbContext<AppDbContext>()
+                .UseDbContext<QueryDbContext>()
                 .ResolveWith<OrderResolvers>(c => c.GetProducts(default, default, default, default))
                 .Type<ListType<OrderProductType>>();
 
             descriptor.Field(c => c.Deliveries)
                 .Name("deliveries")
-                .UseDbContext<AppDbContext>()
+                .UseDbContext<QueryDbContext>()
                 .ResolveWith<OrderResolvers>(c => c.GetDeliveries(default, default, default, default))
                 .Type<ListType<OrderDeliveryType>>();
 
             descriptor.Field(c => c.PurchaseOrders)
                 .Name("purchaseOrders")
-                .UseDbContext<AppDbContext>()
+                .UseDbContext<QueryDbContext>()
                 .ResolveWith<OrderResolvers>(c => c.GetPurchaseOrders(default, default, default, default))
                 .Type<ListType<OrderDeliveryType>>();
         }
@@ -174,7 +174,7 @@ namespace Sheaft.GraphQL.Types.Outputs
                 return usersDataLoader.LoadAsync(order.UserId.Value, token);
             }
 
-            public async Task<IEnumerable<OrderProduct>> GetProducts(Order order, [ScopedService] AppDbContext context,
+            public async Task<IEnumerable<OrderProduct>> GetProducts(Order order, [ScopedService] QueryDbContext context,
                 OrderProductsByIdBatchDataLoader orderProductsDataLoader, CancellationToken token)
             {
                 var productsId = await context.Set<OrderProduct>()
@@ -186,7 +186,7 @@ namespace Sheaft.GraphQL.Types.Outputs
             }
 
             public async Task<IEnumerable<OrderDelivery>> GetDeliveries(Order order,
-                [ScopedService] AppDbContext context, OrderDeliveriesByIdBatchDataLoader orderDeliveriesDataLoader,
+                [ScopedService] QueryDbContext context, OrderDeliveriesByIdBatchDataLoader orderDeliveriesDataLoader,
                 CancellationToken token)
             {
                 var deliveriesId = await context.Set<OrderDelivery>()
@@ -198,7 +198,7 @@ namespace Sheaft.GraphQL.Types.Outputs
             }
 
             public async Task<IEnumerable<PurchaseOrder>> GetPurchaseOrders(Order order,
-                [ScopedService] AppDbContext context, PurchaseOrdersByIdBatchDataLoader purchaseOrdersDataLoader,
+                [ScopedService] QueryDbContext context, PurchaseOrdersByIdBatchDataLoader purchaseOrdersDataLoader,
                 CancellationToken token)
             {
                 var purchaseOrdersId = await context.PurchaseOrders

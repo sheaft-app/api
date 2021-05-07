@@ -11,8 +11,6 @@ namespace Sheaft.Domain
 {
     public abstract class Payin : Transaction, IHasDomainEvent
     {
-        private List<PayinRefund> _refunds;
-
         protected Payin()
         {
         }
@@ -29,21 +27,21 @@ namespace Sheaft.Domain
             Reference = "SHEAFT";
 
             DomainEvents = new List<DomainEvent>();
-            _refunds = new List<PayinRefund>();
+            Refunds = new List<PayinRefund>();
         }
 
         public Guid CreditedWalletId { get; private set; }
         public Guid OrderId { get; private set; }
         public virtual Wallet CreditedWallet { get; private set; }
         public virtual Order Order { get; private set; }
-        public virtual IReadOnlyCollection<PayinRefund> Refunds => _refunds.AsReadOnly();
+        public virtual ICollection<PayinRefund> Refunds  { get; private set; }
         
         public void AddRefund(PayinRefund refund)
         {
             if (Refunds != null && Refunds.Any(r => r.PurchaseOrderId == refund.PurchaseOrderId && r.Status == TransactionStatus.Succeeded))
                 throw new ValidationException(MessageKind.Payin_CannotAdd_Refund_PurchaseOrderRefund_AlreadySucceeded);
 
-            _refunds.Add(refund);
+            Refunds.Add(refund);
         }
 
         //TO REMOVE 1 MONTH AFTER RELEASE

@@ -16,11 +16,12 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
         public void Configure(EntityTypeBuilder<Order> entity)
         {
             entity.Property(c => c.CreatedOn);
-            entity.Property(c => c.UpdatedOn).IsConcurrencyToken();
-            
-            if(!_isAdmin)
+            entity.Property(c => c.UpdatedOn);
+            entity.Property(c => c.RowVersion).IsRowVersion();
+
+            if (!_isAdmin)
                 entity.HasQueryFilter(p => !p.RemovedOn.HasValue);
-            
+
             entity.Property(c => c.Donation).HasColumnName("Donate");
             entity.Property(c => c.DonationFeesPrice).HasColumnName("InternalFeesPrice");
 
@@ -46,23 +47,16 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
             entity.Property(o => o.FeesVatPercent).HasColumnType("decimal(10,2)").HasDefaultValue(0);
             entity.Property(o => o.DonationFeesPrice).HasColumnType("decimal(10,2)");
 
-            entity.HasMany(c => c.Products).WithOne().HasForeignKey(c =>c.OrderId).OnDelete(DeleteBehavior.Cascade).IsRequired();
-            entity.HasMany(c => c.Deliveries).WithOne().HasForeignKey(c =>c.OrderId).OnDelete(DeleteBehavior.Cascade);
-            entity.HasMany(c => c.PurchaseOrders).WithOne().HasForeignKey(c =>c.OrderId).OnDelete(DeleteBehavior.NoAction).IsRequired();
-            entity.HasOne(c => c.User).WithMany().HasForeignKey(c =>c.UserId).OnDelete(DeleteBehavior.Cascade);
+            entity.HasMany(c => c.Products).WithOne().HasForeignKey(c => c.OrderId).OnDelete(DeleteBehavior.Cascade)
+                .IsRequired();
+            entity.HasMany(c => c.Deliveries).WithOne().HasForeignKey(c => c.OrderId).OnDelete(DeleteBehavior.Cascade);
+            entity.HasMany(c => c.PurchaseOrders).WithOne().HasForeignKey(c => c.OrderId)
+                .OnDelete(DeleteBehavior.NoAction).IsRequired();
+            entity.HasOne(c => c.User).WithMany().HasForeignKey(c => c.UserId).OnDelete(DeleteBehavior.Cascade);
 
             entity.Ignore(c => c.DomainEvents);
 
-            var purchaseOrders = entity.Metadata.FindNavigation(nameof(Order.PurchaseOrders));
-            purchaseOrders.SetPropertyAccessMode(PropertyAccessMode.Field);
-            
-            var products = entity.Metadata.FindNavigation(nameof(Order.Products));
-            products.SetPropertyAccessMode(PropertyAccessMode.Field);
-            
-            var deliveries = entity.Metadata.FindNavigation(nameof(Order.Deliveries));
-            deliveries.SetPropertyAccessMode(PropertyAccessMode.Field);
-
-            entity.HasKey(c =>c.Id);
+            entity.HasKey(c => c.Id);
             entity.ToTable("Orders");
         }
     }

@@ -26,10 +26,10 @@ namespace Sheaft.GraphQL.Donations
 
         [GraphQLName("donation")]
         [GraphQLType(typeof(DonationType))]
-        [UseDbContext(typeof(AppDbContext))]
+        [UseDbContext(typeof(QueryDbContext))]
         [Authorize(Policy = Policies.REGISTERED)]
         [UseSingleOrDefault]
-        public IQueryable<Donation> Get([ID] Guid id, [ScopedService] AppDbContext context)
+        public IQueryable<Donation> Get([ID] Guid id, [ScopedService] QueryDbContext context)
         {
             SetLogTransaction(id);
             return context.Donations
@@ -38,12 +38,12 @@ namespace Sheaft.GraphQL.Donations
         
         [GraphQLName("donations")]
         [GraphQLType(typeof(ListType<DonationType>))]
-        [UseDbContext(typeof(AppDbContext))]
+        [UseDbContext(typeof(QueryDbContext))]
         [Authorize(Policy = Policies.REGISTERED)]
         [UsePaging]
         [UseFiltering]
         [UseSorting]
-        public IQueryable<Donation> GetAll([ScopedService] AppDbContext context)
+        public IQueryable<Donation> GetAll([ScopedService] QueryDbContext context)
         {
             SetLogTransaction();
             return context.Donations

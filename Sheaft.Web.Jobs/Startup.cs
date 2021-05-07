@@ -266,7 +266,7 @@ namespace Sheaft.Web.Jobs
             services.AddOptions();
 
             var databaseConfig = appDatabaseSettings.Get<AppDatabaseOptions>();
-            services.AddPooledDbContextFactory<AppDbContext>(options =>
+            services.AddPooledDbContextFactory<QueryDbContext>(options =>
             {
                 options.UseLazyLoadingProxies();
                 options.UseSqlServer(databaseConfig.ConnectionString, x =>
@@ -276,7 +276,7 @@ namespace Sheaft.Web.Jobs
                 });
             });
 
-            services.AddDbContext<IAppDbContext, AppDbContext>(options =>
+            services.AddDbContext<IAppDbContext, WriterDbContext>(options =>
             {
                 options.UseLazyLoadingProxies();
                 options.UseSqlServer(databaseConfig.ConnectionString, x =>

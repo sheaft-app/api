@@ -26,10 +26,10 @@ namespace Sheaft.GraphQL.PreAuthorizations
 
         [GraphQLName("preAuthorization")]
         [GraphQLType(typeof(PreAuthorizationType))]
-        [UseDbContext(typeof(AppDbContext))]
+        [UseDbContext(typeof(QueryDbContext))]
         [Authorize(Policy = Policies.CONSUMER)]
         [UseSingleOrDefault]
-        public IQueryable<PreAuthorization> Get([ID] Guid id, [ScopedService] AppDbContext context)
+        public IQueryable<PreAuthorization> Get([ID] Guid id, [ScopedService] QueryDbContext context)
         {
             SetLogTransaction(id);
             return context.PreAuthorizations

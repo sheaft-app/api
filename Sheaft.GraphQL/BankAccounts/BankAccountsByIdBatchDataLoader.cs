@@ -13,10 +13,10 @@ namespace Sheaft.GraphQL.BankAccounts
 {
     public class BankAccountsByIdBatchDataLoader : BatchDataLoader<Guid, BankAccount>
     {
-        private readonly IDbContextFactory<AppDbContext> _contextFactory;
+        private readonly IDbContextFactory<QueryDbContext> _contextFactory;
 
         public BankAccountsByIdBatchDataLoader(
-            IDbContextFactory<AppDbContext> contextFactory,
+            IDbContextFactory<QueryDbContext> contextFactory,
             IBatchScheduler batchScheduler,
             DataLoaderOptions<Guid> options = null)
             : base(batchScheduler, options)

@@ -24,9 +24,9 @@ namespace Sheaft.GraphQL.Nationalities
 
         [GraphQLName("nationality")]
         [GraphQLType(typeof(NationalityType))]
-        [UseDbContext(typeof(AppDbContext))]
+        [UseDbContext(typeof(QueryDbContext))]
         [UseSingleOrDefault]
-        public IQueryable<Nationality> Get([ID] Guid id, [ScopedService] AppDbContext context)
+        public IQueryable<Nationality> Get([ID] Guid id, [ScopedService] QueryDbContext context)
         {
             SetLogTransaction(id);
             return context.Nationalities.Where(n => n.Id == id);
@@ -34,11 +34,11 @@ namespace Sheaft.GraphQL.Nationalities
         
         [GraphQLName("nationalities")]
         [GraphQLType(typeof(ListType<NationalityType>))]
-        [UseDbContext(typeof(AppDbContext))]
+        [UseDbContext(typeof(QueryDbContext))]
         [UsePaging]
         [UseFiltering]
         [UseSorting]
-        public IQueryable<Nationality> GetAll([ScopedService] AppDbContext context)
+        public IQueryable<Nationality> GetAll([ScopedService] QueryDbContext context)
         {
             SetLogTransaction();
             return context.Nationalities;

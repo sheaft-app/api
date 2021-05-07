@@ -24,9 +24,9 @@ namespace Sheaft.GraphQL.Regions
 
         [GraphQLName("region")]
         [GraphQLType(typeof(RegionType))]
-        [UseDbContext(typeof(AppDbContext))]
+        [UseDbContext(typeof(QueryDbContext))]
         [UseSingleOrDefault]
-        public IQueryable<Region> Get([ID]Guid id, [ScopedService] AppDbContext context)
+        public IQueryable<Region> Get([ID]Guid id, [ScopedService] QueryDbContext context)
         {
             SetLogTransaction(id);
             return context.Regions.Where(c => c.Id == id);
@@ -34,11 +34,11 @@ namespace Sheaft.GraphQL.Regions
         
         [GraphQLName("regions")]
         [GraphQLType(typeof(ListType<RegionType>))]
-        [UseDbContext(typeof(AppDbContext))]
+        [UseDbContext(typeof(QueryDbContext))]
         [UsePaging]
         [UseFiltering]
         [UseSorting]
-        public IQueryable<Region> GetAll([ScopedService] AppDbContext context)
+        public IQueryable<Region> GetAll([ScopedService] QueryDbContext context)
         {
             SetLogTransaction();
             return context.Regions;

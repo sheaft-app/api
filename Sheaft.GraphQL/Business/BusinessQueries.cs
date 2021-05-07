@@ -26,10 +26,10 @@ namespace Sheaft.GraphQL.Business
 
         [GraphQLName("businessClosing")]
         [GraphQLType(typeof(BusinessClosingType))]
-        [UseDbContext(typeof(AppDbContext))]
+        [UseDbContext(typeof(QueryDbContext))]
         [Authorize(Policy = Policies.STORE_OR_PRODUCER)]
         [UseSingleOrDefault]
-        public IQueryable<BusinessClosing> Get([ID] Guid id, [ScopedService] AppDbContext context)
+        public IQueryable<BusinessClosing> Get([ID] Guid id, [ScopedService] QueryDbContext context)
         {
             SetLogTransaction(id);
             return context.Set<BusinessClosing>()
@@ -38,12 +38,12 @@ namespace Sheaft.GraphQL.Business
         
         [GraphQLName("businessClosings")]
         [GraphQLType(typeof(ListType<BusinessClosingType>))]
-        [UseDbContext(typeof(AppDbContext))]
+        [UseDbContext(typeof(QueryDbContext))]
         [Authorize(Policy = Policies.STORE_OR_PRODUCER)]
         [UsePaging]
         [UseFiltering]
         [UseSorting]
-        public IQueryable<BusinessClosing> GetAll([ScopedService] AppDbContext context)
+        public IQueryable<BusinessClosing> GetAll([ScopedService] QueryDbContext context)
         {
             SetLogTransaction();
             return context.Set<BusinessClosing>()

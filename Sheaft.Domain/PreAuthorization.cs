@@ -132,5 +132,6 @@ namespace Sheaft.Domain
         }
 
         public List<DomainEvent> DomainEvents { get; } = new List<DomainEvent>();
+        public byte[] RowVersion { get; private set; }
     }
 }

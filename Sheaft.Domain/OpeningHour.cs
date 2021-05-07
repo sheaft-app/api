@@ -2,10 +2,11 @@
 using Sheaft.Core.Enums;
 using Sheaft.Core.Exceptions;
 using Sheaft.Domain.Enum;
+using Sheaft.Domain.Interop;
 
 namespace Sheaft.Domain
 {
-    public abstract class TimeSlotHour
+    public abstract class TimeSlotHour : IIdEntity, ITrackCreation, ITrackUpdate
     {
         protected TimeSlotHour()
         {
@@ -27,7 +28,9 @@ namespace Sheaft.Domain
             To = to;
         }
 
-        public Guid Id { get; set; }
+        public Guid Id { get; private set; }
+        public DateTimeOffset CreatedOn { get; private set; }
+        public DateTimeOffset? UpdatedOn { get; private set; }
         public DayOfWeek Day { get; private set; }
         public TimeSpan From { get; private set; }
         public TimeSpan To { get; private set; }

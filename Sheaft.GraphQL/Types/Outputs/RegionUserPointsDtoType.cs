@@ -28,24 +28,24 @@ namespace Sheaft.GraphQL.Types.Outputs
 
             descriptor
                 .Field("user")
-                .UseDbContext<AppDbContext>()
+                .UseDbContext<QueryDbContext>()
                 .ResolveWith<RegionUserResolvers>(c => c.GetUser(default, default, default));
 
             descriptor
                 .Field("department")
-                .UseDbContext<AppDbContext>()
+                .UseDbContext<QueryDbContext>()
                 .ResolveWith<RegionUserResolvers>(c => c.GetRegion(default, default, default));
         }
 
         private class RegionUserResolvers
         {
-            public Task<User> GetUser(RegionUserPointsDto regionUser, [ScopedService] AppDbContext context,
+            public Task<User> GetUser(RegionUserPointsDto regionUser, [ScopedService] QueryDbContext context,
                 CancellationToken token)
             {
                 return context.Users.SingleOrDefaultAsync(u => u.Id == regionUser.UserId, token);
             }
             
-            public Task<Region> GetRegion(RegionUserPointsDto regionUser, [ScopedService] AppDbContext context,
+            public Task<Region> GetRegion(RegionUserPointsDto regionUser, [ScopedService] QueryDbContext context,
                 CancellationToken token)
             {
                 return context.Regions.SingleOrDefaultAsync(u => u.Id == regionUser.RegionId, token);

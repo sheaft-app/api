@@ -46,22 +46,25 @@ namespace Sheaft.GraphQL.Products
 
         [GraphQLName("product")]
         [GraphQLType(typeof(ProductType))]
-        [UseDbContext(typeof(AppDbContext))]
+        [UseDbContext(typeof(QueryDbContext))]
         [UseSingleOrDefault]
-        public async Task<IQueryable<Product>> Get([ID] Guid id, [ScopedService] AppDbContext context,
+        public async Task<IQueryable<Product>> Get([ID] Guid id, [ScopedService] QueryDbContext context,
             CancellationToken token)
         {
             SetLogTransaction(id);
             if (CurrentUser.IsInRole(_roleOptions.Store.Value))
             {
                 var hasAgreement = await context.Agreements
-                    .Where(c => c.StoreId == CurrentUser.Id && c.Catalog.Products.Any(p => p.ProductId == id))
+                    .Where(c => c.StoreId == CurrentUser.Id && c.Status == AgreementStatus.Accepted &&
+                                c.Catalog.Products.Any(p => p.ProductId == id))
                     .AnyAsync(token);
 
                 if (hasAgreement)
                     return context.Agreements
-                        .Where(c => c.StoreId == CurrentUser.Id && c.Catalog.Products.Any(p => p.ProductId == id))
+                        .Where(c => c.StoreId == CurrentUser.Id && c.Status == AgreementStatus.Accepted &&
+                                    c.Catalog.Products.Any(p => p.ProductId == id))
                         .SelectMany(a => a.Catalog.Products)
+                        .Where(c => !c.Product.RemovedOn.HasValue)
                         .Select(c => c.Product);
 
                 return context.Products
@@ -75,26 +78,40 @@ namespace Sheaft.GraphQL.Products
 
         [GraphQLName("products")]
         [GraphQLType(typeof(ListType<ProductType>))]
-        [UseDbContext(typeof(AppDbContext))]
-        [Authorize(Policy = Policies.PRODUCER)]
+        [UseDbContext(typeof(QueryDbContext))]
+        [Authorize(Policy = Policies.STORE_OR_PRODUCER)]
         [UsePaging]
         [UseFiltering]
         [UseSorting]
-        public IQueryable<Product> GetAll([ScopedService] AppDbContext context)
+        public async Task<IQueryable<Product>> GetAll([ScopedService] QueryDbContext context, CancellationToken token)
         {
             SetLogTransaction();
-            
+            if (CurrentUser.IsInRole(_roleOptions.Store.Value))
+            {
+                var hasAgreements = await context.Agreements
+                    .AnyAsync(c => c.StoreId == CurrentUser.Id && c.Status == AgreementStatus.Accepted, token);
+
+                if (hasAgreements)
+                    return context.Agreements
+                        .Where(c => c.StoreId == CurrentUser.Id && c.Status == AgreementStatus.Accepted)
+                        .SelectMany(a => a.Catalog.Products)
+                        .Where(c => !c.Product.RemovedOn.HasValue)
+                        .Select(c => c.Product);                
+
+                return new List<Product>().AsQueryable();
+            }
+
             return context.Products
                 .Where(c => c.ProducerId == CurrentUser.Id);
         }
 
         [GraphQLName("searchProducts")]
-        [UseDbContext(typeof(AppDbContext))]
+        [UseDbContext(typeof(QueryDbContext))]
         [GraphQLType(typeof(ProductsSearchDtoType))]
         public async Task<ProductsSearchDto> SearchAsync(
             [GraphQLType(typeof(SearchProductsInputType))] [GraphQLName("input")]
             SearchProductsDto terms,
-            [ScopedService] AppDbContext context,
+            [ScopedService] QueryDbContext context,
             CancellationToken token)
         {
             var query = context.Products

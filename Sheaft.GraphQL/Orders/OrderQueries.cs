@@ -28,9 +28,9 @@ namespace Sheaft.GraphQL.Orders
 
         [GraphQLName("order")]
         [GraphQLType(typeof(OrderType))]
-        [UseDbContext(typeof(AppDbContext))]
+        [UseDbContext(typeof(QueryDbContext))]
         [UseSingleOrDefault]
-        public IQueryable<Order> Get([ID] Guid id, [ScopedService] AppDbContext context)
+        public IQueryable<Order> Get([ID] Guid id, [ScopedService] QueryDbContext context)
         {
             SetLogTransaction(id);
             if (CurrentUser.IsAuthenticated())
@@ -43,10 +43,10 @@ namespace Sheaft.GraphQL.Orders
 
         [GraphQLName("currentOrder")]
         [GraphQLType(typeof(OrderType))]
-        [UseDbContext(typeof(AppDbContext))]
+        [UseDbContext(typeof(QueryDbContext))]
         [Authorize(Policy = Policies.REGISTERED)]
         [UseSingleOrDefault]
-        public IQueryable<Order> Get([ScopedService] AppDbContext context)
+        public IQueryable<Order> Get([ScopedService] QueryDbContext context)
         {
             SetLogTransaction();
             if (CurrentUser.IsAuthenticated())
@@ -59,12 +59,12 @@ namespace Sheaft.GraphQL.Orders
         
         [GraphQLName("orders")]
         [GraphQLType(typeof(ListType<OrderType>))]
-        [UseDbContext(typeof(AppDbContext))]
+        [UseDbContext(typeof(QueryDbContext))]
         [Authorize(Policy = Policies.REGISTERED)]
         [UsePaging]
         [UseFiltering]
         [UseSorting]
-        public IQueryable<Order> GetAll([ScopedService] AppDbContext context)
+        public IQueryable<Order> GetAll([ScopedService] QueryDbContext context)
         {
             SetLogTransaction();
 

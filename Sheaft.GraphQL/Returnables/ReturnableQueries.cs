@@ -26,10 +26,10 @@ namespace Sheaft.GraphQL.Returnables
 
         [GraphQLName("returnable")]
         [GraphQLType(typeof(ReturnableType))]
-        [UseDbContext(typeof(AppDbContext))]
+        [UseDbContext(typeof(QueryDbContext))]
         [Authorize(Policy = Policies.PRODUCER)]
         [UseSingleOrDefault]
-        public IQueryable<Returnable> Get([ID] Guid id, [ScopedService] AppDbContext context)
+        public IQueryable<Returnable> Get([ID] Guid id, [ScopedService] QueryDbContext context)
         {
             SetLogTransaction(id);
             return context.Returnables.Where(c => c.Id == id);
@@ -37,12 +37,12 @@ namespace Sheaft.GraphQL.Returnables
         
         [GraphQLName("returnables")]
         [GraphQLType(typeof(ListType<ReturnableType>))]
-        [UseDbContext(typeof(AppDbContext))]
+        [UseDbContext(typeof(QueryDbContext))]
         [Authorize(Policy = Policies.PRODUCER)]
         [UsePaging]
         [UseFiltering]
         [UseSorting]
-        public IQueryable<Returnable> GetAll([ScopedService] AppDbContext context)
+        public IQueryable<Returnable> GetAll([ScopedService] QueryDbContext context)
         {
             SetLogTransaction();
             return context.Returnables.Where(c => c.ProducerId == CurrentUser.Id);

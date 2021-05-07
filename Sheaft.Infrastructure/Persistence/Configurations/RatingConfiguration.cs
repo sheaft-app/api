@@ -9,13 +9,15 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
         public void Configure(EntityTypeBuilder<Rating> entity)
         {
             entity.Property(c => c.CreatedOn);
-            entity.Property(c => c.UpdatedOn).IsConcurrencyToken();
-            
+            entity.Property(c => c.UpdatedOn);
+            entity.Property(c => c.RowVersion).IsRowVersion();
+
             entity.Property(c => c.Value).IsRequired().HasColumnType("decimal(10,2)");
 
-            entity.HasOne(c => c.User).WithMany().HasForeignKey(c=>c.UserId).OnDelete(DeleteBehavior.NoAction).IsRequired();
-            
-            entity.HasKey(c=>c.Id);
+            entity.HasOne(c => c.User).WithMany().HasForeignKey(c => c.UserId).OnDelete(DeleteBehavior.NoAction)
+                .IsRequired();
+
+            entity.HasKey(c => c.Id);
             entity.ToTable("Ratings");
         }
     }

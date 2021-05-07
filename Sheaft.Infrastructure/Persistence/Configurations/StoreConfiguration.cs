@@ -14,12 +14,6 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
             entity.HasMany(c => c.Tags).WithOne().HasForeignKey(c=>c.StoreId).OnDelete(DeleteBehavior.Cascade);
 
             entity.Ignore(c => c.DomainEvents);
-            
-            var businessTags = entity.Metadata.FindNavigation(nameof(Store.Tags));
-            businessTags.SetPropertyAccessMode(PropertyAccessMode.Field);
-
-            var businessHours = entity.Metadata.FindNavigation(nameof(Store.OpeningHours));
-            businessHours.SetPropertyAccessMode(PropertyAccessMode.Field);
         }
     }
 }

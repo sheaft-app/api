@@ -13,10 +13,10 @@ namespace Sheaft.GraphQL.Nationalities
 {
     public class NationalitiesByIdBatchDataLoader : BatchDataLoader<Guid, Nationality>
     {
-        private readonly IDbContextFactory<AppDbContext> _contextFactory;
+        private readonly IDbContextFactory<QueryDbContext> _contextFactory;
 
         public NationalitiesByIdBatchDataLoader(
-            IDbContextFactory<AppDbContext> contextFactory,
+            IDbContextFactory<QueryDbContext> contextFactory,
             IBatchScheduler batchScheduler,
             DataLoaderOptions<Guid> options = null)
             : base(batchScheduler, options)

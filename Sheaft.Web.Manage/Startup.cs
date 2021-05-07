@@ -141,7 +141,7 @@ namespace Sheaft.Web.Manage
             });
 
             var databaseConfig = databaseSettings.Get<AppDatabaseOptions>();
-            services.AddPooledDbContextFactory<AppDbContext>(options =>
+            services.AddPooledDbContextFactory<QueryDbContext>(options =>
             {
                 options.UseLazyLoadingProxies();
                 options.UseSqlServer(databaseConfig.ConnectionString, x =>
@@ -151,7 +151,7 @@ namespace Sheaft.Web.Manage
                 });
             });
 
-            services.AddDbContext<IAppDbContext, AppDbContext>(options =>
+            services.AddDbContext<IAppDbContext, WriterDbContext>(options =>
             {
                 options.UseLazyLoadingProxies();
                 options.UseSqlServer(databaseConfig.ConnectionString, x =>

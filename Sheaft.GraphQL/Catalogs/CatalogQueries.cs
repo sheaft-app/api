@@ -32,10 +32,10 @@ namespace Sheaft.GraphQL.Catalogs
 
         [GraphQLName("catalog")]
         [GraphQLType(typeof(CatalogType))]
-        [UseDbContext(typeof(AppDbContext))]
+        [UseDbContext(typeof(QueryDbContext))]
         [Authorize(Policy = Policies.REGISTERED)]
         [UseSingleOrDefault]
-        public IQueryable<Catalog> Get([ID] Guid id, [ScopedService] AppDbContext context)
+        public IQueryable<Catalog> Get([ID] Guid id, [ScopedService] QueryDbContext context)
         {
             SetLogTransaction(id);
             return context.Set<Domain.Catalog>()
@@ -44,12 +44,12 @@ namespace Sheaft.GraphQL.Catalogs
         
         [GraphQLName("catalogs")]
         [GraphQLType(typeof(ListType<CatalogType>))]
-        [UseDbContext(typeof(AppDbContext))]
+        [UseDbContext(typeof(QueryDbContext))]
         [Authorize(Policy = Policies.PRODUCER)]
         [UsePaging]
         [UseFiltering]
         [UseSorting]
-        public IQueryable<Catalog> GetAll([ScopedService] AppDbContext context)
+        public IQueryable<Catalog> GetAll([ScopedService] QueryDbContext context)
         {
             SetLogTransaction();
             return context.Set<Domain.Catalog>()

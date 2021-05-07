@@ -13,10 +13,10 @@ namespace Sheaft.GraphQL.PreAuthorizations
 {
     public class PreAuthorizationsByIdBatchDataLoader : BatchDataLoader<Guid, PreAuthorization>
     {
-        private readonly IDbContextFactory<AppDbContext> _contextFactory;
+        private readonly IDbContextFactory<QueryDbContext> _contextFactory;
 
         public PreAuthorizationsByIdBatchDataLoader(
-            IDbContextFactory<AppDbContext> contextFactory,
+            IDbContextFactory<QueryDbContext> contextFactory,
             IBatchScheduler batchScheduler,
             DataLoaderOptions<Guid> options = null)
             : base(batchScheduler, options)

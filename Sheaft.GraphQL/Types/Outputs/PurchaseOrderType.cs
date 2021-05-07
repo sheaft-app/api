@@ -123,7 +123,7 @@ namespace Sheaft.GraphQL.Types.Outputs
             descriptor
                 .Field(c => c.Products)
                 .Name("products")
-                .UseDbContext<AppDbContext>()
+                .UseDbContext<QueryDbContext>()
                 .ResolveWith<PurchaseOrderResolvers>(c => c.GetProducts(default, default, default, default))
                 .Type<NonNullType<ListType<PurchaseOrderProductType>>>();
         }
@@ -159,7 +159,7 @@ namespace Sheaft.GraphQL.Types.Outputs
             }
 
             public async Task<IEnumerable<PurchaseOrderProduct>> GetProducts(PurchaseOrder purchaseOrder,
-                [ScopedService] AppDbContext context,
+                [ScopedService] QueryDbContext context,
                 PurchaseOrderProductsByIdBatchDataLoader purchaseOrderProductsDataLoader, CancellationToken token)
             {
                 var productsId = await context.Set<PurchaseOrderProduct>()

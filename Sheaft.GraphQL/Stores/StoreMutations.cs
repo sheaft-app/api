@@ -26,7 +26,7 @@ namespace Sheaft.GraphQL.Stores
         }
 
         [GraphQLName("registerStore")]
-        [Authorize(Policy = Policies.UNREGISTERED)]
+        [Authorize(Policy = Policies.AUTHENTICATED)]
         [GraphQLType(typeof(StoreType))]
         public async Task<Store> RegisterStoreAsync([GraphQLType(typeof(RegisterStoreInputType))] [GraphQLName("input")]
             RegisterStoreCommand input, [Service] ISheaftMediatr mediatr,

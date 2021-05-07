@@ -9,7 +9,8 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
         public void Configure(EntityTypeBuilder<CatalogProduct> entity)
         {
             entity.Property(c => c.CreatedOn);
-            entity.Property(c => c.UpdatedOn).IsConcurrencyToken();
+            entity.Property(c => c.UpdatedOn);
+            entity.Property(c => c.RowVersion).IsRowVersion();
             
             entity.Property(o => o.VatPricePerUnit).HasColumnType("decimal(10,2)");
             entity.Property(o => o.OnSalePricePerUnit).HasColumnType("decimal(10,2)");

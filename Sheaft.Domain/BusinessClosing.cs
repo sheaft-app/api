@@ -8,14 +8,16 @@ namespace Sheaft.Domain
         {
         }
 
-        public BusinessClosing(Guid id, DateTimeOffset from, DateTimeOffset to, string reason = null)
+        public BusinessClosing(Business business, Guid id, DateTimeOffset from, DateTimeOffset to, string reason = null)
             : base(id, from, to)
         {
             Reason = reason;
+            BusinessId = business.Id;
         }
 
         public Guid BusinessId { get; private set; }
         public string Reason { get; private set; }
+        public byte[] RowVersion { get; private set; }
 
         public void SetReason(string reason)
         {

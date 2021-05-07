@@ -20,15 +20,15 @@ namespace Sheaft.Business
 {
     public class OrderService : SheaftService, IOrderService
     {
-        private readonly AppDbContext _context;
+        private readonly IAppDbContext _context;
         private readonly IDeliveryService _deliveryService;
 
         public OrderService(
-            IDbContextFactory<AppDbContext> context,
+            IAppDbContext context,
             IDeliveryService deliveryService,
             ILogger<OrderService> logger) : base(logger)
         {
-            _context = context.CreateDbContext();
+            _context = context;
             _deliveryService = deliveryService;
         }
 
@@ -75,9 +75,9 @@ namespace Sheaft.Business
         }
 
         public async Task<Result<List<Tuple<Domain.DeliveryMode, DateTimeOffset, string>>>> GetCartDeliveriesAsync(
-            IEnumerable<ProducerExpectedDeliveryInputDto> producersExpectedDeliveries, IEnumerable<Guid> deliveryIds,
-            IEnumerable<Tuple<Domain.Product, Guid, int>> cartProducts, CancellationToken token)
+            IEnumerable<ProducerExpectedDeliveryInputDto> producersExpectedDeliveries, IEnumerable<Tuple<Domain.Product, Guid, int>> cartProducts, CancellationToken token)
         {
+            var deliveryIds = producersExpectedDeliveries?.Select(c => c.DeliveryModeId)?.ToList() ?? new List<Guid>();
             var deliveries = deliveryIds.Any()
                 ? await _context.DeliveryModes.Where(d => deliveryIds.Contains(d.Id)).ToListAsync(token)
                 : new List<Domain.DeliveryMode>();
@@ -128,10 +128,10 @@ namespace Sheaft.Business
             return Success(cartDeliveries);
         }
 
-        public async Task<Result<List<Tuple<Domain.Product, Guid, int>>>> GetCartProductsAsync(
-            IEnumerable<Guid> productIds, IEnumerable<ResourceIdQuantityInputDto> productsQuantities,
+        public async Task<Result<List<Tuple<Domain.Product, Guid, int>>>> GetCartProductsAsync(IEnumerable<ResourceIdQuantityInputDto> productsQuantities,
             CancellationToken token)
         {
+            var productIds = productsQuantities?.Select(c => c.Id)?.ToList() ?? new List<Guid>();
             var invalidProductIds = await GetConsumerInvalidProductIds(productIds, token);
             if (invalidProductIds.Any())
                 return Failure<List<Tuple<Domain.Product, Guid, int>>>(

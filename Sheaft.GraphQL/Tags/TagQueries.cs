@@ -24,9 +24,9 @@ namespace Sheaft.GraphQL.Tags
 
         [GraphQLName("tag")]
         [GraphQLType(typeof(TagType))]
-        [UseDbContext(typeof(AppDbContext))]
+        [UseDbContext(typeof(QueryDbContext))]
         [UseSingleOrDefault]
-        public IQueryable<Tag> Get([ID] Guid id, [ScopedService] AppDbContext context)
+        public IQueryable<Tag> Get([ID] Guid id, [ScopedService] QueryDbContext context)
         {
             SetLogTransaction(id);
             return context.Tags.Where(t => t.Id == id);
@@ -34,11 +34,11 @@ namespace Sheaft.GraphQL.Tags
         
         [GraphQLName("tags")]
         [GraphQLType(typeof(ListType<TagType>))]
-        [UseDbContext(typeof(AppDbContext))]
+        [UseDbContext(typeof(QueryDbContext))]
         [UsePaging]
         [UseFiltering]
         [UseSorting]
-        public IQueryable<Tag> GetAll([ScopedService] AppDbContext context)
+        public IQueryable<Tag> GetAll([ScopedService] QueryDbContext context)
         {
             SetLogTransaction();
             return context.Tags;

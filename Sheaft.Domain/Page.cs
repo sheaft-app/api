@@ -21,6 +21,7 @@ namespace Sheaft.Domain
         public string Extension { get; private set; }
         public long Size { get; private set; }
         public Guid DocumentId { get; private set; }
+        public byte[] RowVersion { get; private set; }
 
         public void SetUploaded()
         {

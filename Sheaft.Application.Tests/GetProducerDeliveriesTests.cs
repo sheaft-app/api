@@ -22,7 +22,7 @@ namespace Queries.Delivery.Tests
     [TestClass]
     public class GetProducerDeliveries
     {
-        private AppDbContext _context;
+        private QueryDbContext _context;
         private DeliveryModeQueries _queries;
         private Mock<ITableService> _capingMock;
 

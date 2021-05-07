@@ -39,6 +39,7 @@ namespace Sheaft.Domain
         public bool Processed { get; protected set; }
         public Guid AuthorId { get; private set; }
         public virtual User Author { get; private set; }
+        public byte[] RowVersion { get; private set; }
 
         public void SetAsProcessed()
         {

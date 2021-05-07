@@ -20,13 +20,13 @@ namespace Sheaft.Business.PickingOrdersExporters
 {
     public class LfdpPickingOrdersExporter : SheaftService, IPickingOrdersFileExporter
     {
-        private readonly AppDbContext _context;
+        private readonly IAppDbContext _context;
 
         public LfdpPickingOrdersExporter(
-            IDbContextFactory<AppDbContext> context,
+            IAppDbContext context,
             ILogger<LfdpPickingOrdersExporter> logger) : base(logger)
         {
-            _context = context.CreateDbContext();
+            _context = context;
         }
 
         public async Task<Result<ResourceExportDto>> ExportAsync(RequestUser user,

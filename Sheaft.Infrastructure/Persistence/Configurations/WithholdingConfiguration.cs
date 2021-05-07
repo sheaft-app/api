@@ -20,20 +20,24 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
             entity.Property(o => o.Debited).HasColumnType("decimal(10,2)");
 
             entity.Property(c => c.CreatedOn);
-            entity.Property(c => c.UpdatedOn).IsConcurrencyToken();
-            
-            if(!_isAdmin)
+            entity.Property(c => c.UpdatedOn);
+            entity.Property(c => c.RowVersion).IsRowVersion();
+
+            if (!_isAdmin)
                 entity.HasQueryFilter(p => !p.RemovedOn.HasValue);
 
-            entity.HasOne(c => c.Author).WithMany().HasForeignKey(c=>c.AuthorId).OnDelete(DeleteBehavior.NoAction).IsRequired();
-            entity.HasOne(c => c.CreditedWallet).WithMany().HasForeignKey(c=>c.CreditedWalletId).OnDelete(DeleteBehavior.NoAction).IsRequired();
-            entity.HasOne(c => c.DebitedWallet).WithMany().HasForeignKey(c=>c.DebitedWalletId).OnDelete(DeleteBehavior.NoAction).IsRequired();
+            entity.HasOne(c => c.Author).WithMany().HasForeignKey(c => c.AuthorId).OnDelete(DeleteBehavior.NoAction)
+                .IsRequired();
+            entity.HasOne(c => c.CreditedWallet).WithMany().HasForeignKey(c => c.CreditedWalletId)
+                .OnDelete(DeleteBehavior.NoAction).IsRequired();
+            entity.HasOne(c => c.DebitedWallet).WithMany().HasForeignKey(c => c.DebitedWalletId)
+                .OnDelete(DeleteBehavior.NoAction).IsRequired();
 
             entity.Ignore(c => c.DomainEvents);
-            
-            entity.HasKey(c=>c.Id);
+
+            entity.HasKey(c => c.Id);
             entity.HasIndex(c => c.Identifier);
-            
+
             entity.ToTable("Withholdings");
         }
     }

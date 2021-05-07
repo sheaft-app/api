@@ -58,7 +58,7 @@ namespace Sheaft.GraphQL.Types.Outputs
             descriptor
                 .Field(c => c.Products)
                 .Name("products")
-                .UseDbContext<AppDbContext>()
+                .UseDbContext<QueryDbContext>()
                 .ResolveWith<QuickOrderResolvers>(c => c.GetProducts(default, default, default, default));
         }
 
@@ -71,7 +71,7 @@ namespace Sheaft.GraphQL.Types.Outputs
             }
             
             public async Task<IEnumerable<QuickOrderProduct>> GetProducts(QuickOrder quickOrder, 
-                [ScopedService] AppDbContext context, 
+                [ScopedService] QueryDbContext context, 
                 QuickOrderProductsByIdBatchDataLoader quickOrderProductsDataLoader, CancellationToken token)
             {
                 var productsId = await context.Set<QuickOrderProduct>()

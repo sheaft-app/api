@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -12,6 +13,7 @@ using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Application.Security;
 using Sheaft.Core;
 using Sheaft.Domain;
+using Sheaft.Domain.Enum;
 using Sheaft.GraphQL.Catalogs;
 using Sheaft.GraphQL.Producers;
 using Sheaft.GraphQL.Products;
@@ -91,22 +93,30 @@ namespace Sheaft.GraphQL.Types.Outputs
 
             descriptor
                 .Field(c => c.Picture)
-                .Resolve(c => PictureExtensions.GetPictureUrl(c.Parent<Product>().Id, c.Parent<Product>().Picture, PictureSize.MEDIUM))
+                .Resolve(c =>
+                    PictureExtensions.GetPictureUrl(c.Parent<Product>().Id, c.Parent<Product>().Picture,
+                        PictureSize.MEDIUM))
                 .Name("picture");
 
             descriptor
                 .Field("imageLarge")
-                .Resolve(c => PictureExtensions.GetPictureUrl(c.Parent<Product>().Id, c.Parent<Product>().Picture, PictureSize.LARGE))
+                .Resolve(c =>
+                    PictureExtensions.GetPictureUrl(c.Parent<Product>().Id, c.Parent<Product>().Picture,
+                        PictureSize.LARGE))
                 .Type<StringType>();
 
             descriptor
                 .Field("imageMedium")
-                .Resolve(c => PictureExtensions.GetPictureUrl(c.Parent<Product>().Id, c.Parent<Product>().Picture, PictureSize.MEDIUM))
+                .Resolve(c =>
+                    PictureExtensions.GetPictureUrl(c.Parent<Product>().Id, c.Parent<Product>().Picture,
+                        PictureSize.MEDIUM))
                 .Type<StringType>();
 
             descriptor
                 .Field("imageSmall")
-                .Resolve(c => PictureExtensions.GetPictureUrl(c.Parent<Product>().Id, c.Parent<Product>().Picture, PictureSize.SMALL))
+                .Resolve(c =>
+                    PictureExtensions.GetPictureUrl(c.Parent<Product>().Id, c.Parent<Product>().Picture,
+                        PictureSize.SMALL))
                 .Type<StringType>();
 
             descriptor
@@ -116,57 +126,66 @@ namespace Sheaft.GraphQL.Types.Outputs
 
             descriptor
                 .Field("visibleToConsumers")
-                .Resolve(c => true)
+                .UseDbContext<QueryDbContext>()
+                .ResolveWith<ProductResolvers>(c => c.GetProductVisibleToConsumers(default, default, default))
                 .Authorize(Policies.PRODUCER)
                 .Type<BooleanType>();
 
             descriptor
                 .Field("visibleToStores")
-                .Resolve(c => true)
+                .UseDbContext<QueryDbContext>()
+                .ResolveWith<ProductResolvers>(c => c.GetProductVisibleToStores(default, default, default))
                 .Authorize(Policies.PRODUCER)
                 .Type<BooleanType>();
 
             descriptor
                 .Field("vatPricePerUnit")
-                .Resolve(c => 0m)
+                .UseDbContext<QueryDbContext>()
+                .ResolveWith<ProductResolvers>(c => c.GetProductVatPricePerUnit(default, default, default, default))
                 .Type<DecimalType>();
 
             descriptor
                 .Field("onSalePricePerUnit")
-                .Resolve(c => 0m)
+                .UseDbContext<QueryDbContext>()
+                .ResolveWith<ProductResolvers>(c => c.GetProductOnSalePricePerUnit(default, default, default, default))
                 .Type<DecimalType>();
 
             descriptor
                 .Field("wholeSalePricePerUnit")
-                .Resolve(c => 0m)
+                .UseDbContext<QueryDbContext>()
+                .ResolveWith<ProductResolvers>(c =>
+                    c.GetProductWholeSalePricePerUnit(default, default, default, default))
                 .Type<DecimalType>();
 
             descriptor
                 .Field("onSalePrice")
-                .Resolve(c => 0m)
+                .UseDbContext<QueryDbContext>()
+                .ResolveWith<ProductResolvers>(c => c.GetProductOnSalePrice(default, default, default, default))
                 .Type<DecimalType>();
 
             descriptor
                 .Field("wholeSalePrice")
-                .Resolve(c => 0m)
+                .UseDbContext<QueryDbContext>()
+                .ResolveWith<ProductResolvers>(c => c.GetProductWholeSalePrice(default, default, default, default))
                 .Type<DecimalType>();
 
             descriptor
                 .Field("vatPrice")
-                .Resolve(c => 0m)
+                .UseDbContext<QueryDbContext>()
+                .ResolveWith<ProductResolvers>(c => c.GetProductVatPrice(default, default, default, default))
                 .Type<DecimalType>();
 
             descriptor
                 .Field(c => c.CatalogsPrices)
                 .Name("catalogPrices")
-                .UseDbContext<AppDbContext>()
+                .UseDbContext<QueryDbContext>()
                 .ResolveWith<ProductResolvers>(c => c.GetProductCatalogs(default, default, default, default))
                 .Type<ListType<CatalogProductType>>();
 
             descriptor
                 .Field("currentUserHasRatedProduct")
                 .Type<NonNullType<BooleanType>>()
-                .UseDbContext<AppDbContext>()
+                .UseDbContext<QueryDbContext>()
                 .ResolveWith<ProductResolvers>(c => c.ProductIsRatedByUser(default, default, default!, default));
 
             descriptor
@@ -184,14 +203,14 @@ namespace Sheaft.GraphQL.Types.Outputs
             descriptor
                 .Field(c => c.Tags)
                 .Name("tags")
-                .UseDbContext<AppDbContext>()
+                .UseDbContext<QueryDbContext>()
                 .ResolveWith<ProductResolvers>(c => c.GetTags(default!, default!, default!, default))
                 .Type<ListType<TagType>>();
 
             descriptor
                 .Field(c => c.Ratings)
                 .Name("ratings")
-                .UseDbContext<AppDbContext>()
+                .UseDbContext<QueryDbContext>()
                 .ResolveWith<ProductResolvers>(c => c.GetRatings(default!, default!, default, default))
                 .Type<ListType<RatingType>>()
                 .UsePaging()
@@ -200,14 +219,14 @@ namespace Sheaft.GraphQL.Types.Outputs
             descriptor
                 .Field(c => c.Pictures)
                 .Name("pictures")
-                .UseDbContext<AppDbContext>()
+                .UseDbContext<QueryDbContext>()
                 .ResolveWith<ProductResolvers>(c => c.GetPictures(default!, default!, default, default))
                 .Type<ListType<ProductPictureType>>();
         }
 
         private class ProductResolvers
         {
-            public Task<bool> ProductIsRatedByUser(Product product, [ScopedService] AppDbContext context,
+            public Task<bool> ProductIsRatedByUser(Product product, [ScopedService] QueryDbContext context,
                 [Service] ICurrentUserService currentUserService, CancellationToken token)
             {
                 var currentUserResult = currentUserService.GetCurrentUserInfo();
@@ -219,7 +238,7 @@ namespace Sheaft.GraphQL.Types.Outputs
             }
 
             public async Task<IEnumerable<ProductPicture>> GetPictures(Product product,
-                [ScopedService] AppDbContext context,
+                [ScopedService] QueryDbContext context,
                 ProductPicturesByIdBatchDataLoader picturesDataLoader, CancellationToken token)
             {
                 var picturesId = await context.Set<ProductPicture>()
@@ -231,7 +250,7 @@ namespace Sheaft.GraphQL.Types.Outputs
             }
 
             public async Task<IEnumerable<CatalogProduct>> GetProductCatalogs(Product product,
-                [ScopedService] AppDbContext context, CatalogProductsByIdBatchDataLoader catalogProductsDataLoader,
+                [ScopedService] QueryDbContext context, CatalogProductsByIdBatchDataLoader catalogProductsDataLoader,
                 CancellationToken token)
             {
                 var catalogProductsId = await context.Set<CatalogProduct>()
@@ -242,7 +261,7 @@ namespace Sheaft.GraphQL.Types.Outputs
                 return await catalogProductsDataLoader.LoadAsync(catalogProductsId, token);
             }
 
-            public async Task<IEnumerable<Tag>> GetTags(Product product, [ScopedService] AppDbContext context,
+            public async Task<IEnumerable<Tag>> GetTags(Product product, [ScopedService] QueryDbContext context,
                 TagsByIdBatchDataLoader tagsDataLoader, CancellationToken token)
             {
                 var tagsId = await context.Set<ProductTag>()
@@ -253,7 +272,7 @@ namespace Sheaft.GraphQL.Types.Outputs
                 return await tagsDataLoader.LoadAsync(tagsId, token);
             }
 
-            public async Task<IEnumerable<Rating>> GetRatings(Product product, [ScopedService] AppDbContext context,
+            public async Task<IEnumerable<Rating>> GetRatings(Product product, [ScopedService] QueryDbContext context,
                 RatingsByIdBatchDataLoader ratingsDataLoader, CancellationToken token)
             {
                 var ratingsId = await context.Set<Rating>()
@@ -277,6 +296,126 @@ namespace Sheaft.GraphQL.Types.Outputs
                     return null;
 
                 return returnablesDataLoader.LoadAsync(product.ReturnableId.Value, token);
+            }
+
+            public Task<bool> GetProductVisibleToConsumers(Product product,
+                [ScopedService] QueryDbContext context, CancellationToken token)
+            {
+                return context.Set<CatalogProduct>()
+                    .AnyAsync(
+                        cp => cp.ProductId == product.Id && cp.Catalog.Kind == CatalogKind.Consumers &&
+                              cp.Catalog.Available, token);
+            }
+
+            public Task<bool> GetProductVisibleToStores(Product product, [ScopedService] QueryDbContext context,
+                CancellationToken token)
+            {
+                return context.Set<CatalogProduct>()
+                    .AnyAsync(
+                        cp => cp.ProductId == product.Id && cp.Catalog.Kind == CatalogKind.Stores &&
+                              cp.Catalog.Available, token);
+            }
+
+            public async Task<decimal> GetProductVatPricePerUnit(Product product, [ScopedService] QueryDbContext context,
+                CatalogProductsByIdBatchDataLoader dataLoader, CancellationToken token)
+            {
+                var catalogProductId = await context.Set<CatalogProduct>()
+                    .Where(cp =>
+                        cp.ProductId == product.Id && cp.Catalog.Kind == CatalogKind.Consumers &&
+                        cp.Catalog.Available)
+                    .Select(c => c.Id)
+                    .FirstOrDefaultAsync(token);
+
+                if (catalogProductId == Guid.Empty)
+                    return 0m;
+
+                var catalogProduct = await dataLoader.LoadAsync(catalogProductId, token);
+                return catalogProduct.VatPricePerUnit;
+            }
+
+            public async Task<decimal> GetProductWholeSalePricePerUnit(Product product, [ScopedService] QueryDbContext context,
+                CatalogProductsByIdBatchDataLoader dataLoader, CancellationToken token)
+            {
+                var catalogProductId = await context.Set<CatalogProduct>()
+                    .Where(cp =>
+                        cp.ProductId == product.Id && cp.Catalog.Kind == CatalogKind.Consumers &&
+                        cp.Catalog.Available)
+                    .Select(c => c.Id)
+                    .FirstOrDefaultAsync(token);
+
+                if (catalogProductId == Guid.Empty)
+                    return 0m;
+
+                var catalogProduct = await dataLoader.LoadAsync(catalogProductId, token);
+                return catalogProduct.WholeSalePricePerUnit;
+            }
+
+            public async Task<decimal> GetProductOnSalePricePerUnit(Product product, [ScopedService] QueryDbContext context,
+                CatalogProductsByIdBatchDataLoader dataLoader, CancellationToken token)
+            {
+                var catalogProductId = await context.Set<CatalogProduct>()
+                    .Where(cp =>
+                        cp.ProductId == product.Id && cp.Catalog.Kind == CatalogKind.Consumers &&
+                        cp.Catalog.Available)
+                    .Select(c => c.Id)
+                    .FirstOrDefaultAsync(token);
+
+                if (catalogProductId == Guid.Empty)
+                    return 0m;
+
+                var catalogProduct = await dataLoader.LoadAsync(catalogProductId, token);
+                return catalogProduct.OnSalePricePerUnit;
+            }
+
+            public async Task<decimal> GetProductVatPrice(Product product, [ScopedService] QueryDbContext context,
+                CatalogProductsByIdBatchDataLoader dataLoader, CancellationToken token)
+            {
+                var catalogProductId = await context.Set<CatalogProduct>()
+                    .Where(cp =>
+                        cp.ProductId == product.Id && cp.Catalog.Kind == CatalogKind.Consumers &&
+                        cp.Catalog.Available)
+                    .Select(c => c.Id)
+                    .FirstOrDefaultAsync(token);
+
+                if (catalogProductId == Guid.Empty)
+                    return 0m;
+
+                var catalogProduct = await dataLoader.LoadAsync(catalogProductId, token);
+                return catalogProduct.VatPrice;
+            }
+
+            public async Task<decimal> GetProductWholeSalePrice(Product product, [ScopedService] QueryDbContext context,
+                CatalogProductsByIdBatchDataLoader dataLoader, CancellationToken token)
+            {
+                var catalogProductId = await context.Set<CatalogProduct>()
+                    .Where(cp =>
+                        cp.ProductId == product.Id && cp.Catalog.Kind == CatalogKind.Consumers &&
+                        cp.Catalog.Available)
+                    .Select(c => c.Id)
+                    .FirstOrDefaultAsync(token);
+
+                if (catalogProductId == Guid.Empty)
+                    return 0m;
+
+                var catalogProduct = await dataLoader.LoadAsync(catalogProductId, token);
+                return catalogProduct.WholeSalePrice;
+            }
+
+            public async Task<decimal> GetProductOnSalePrice(Product product, [ScopedService] QueryDbContext context,
+                CatalogProductsByIdBatchDataLoader dataLoader, CancellationToken token)
+            {
+                var catalogProductId = await context.Set<CatalogProduct>()
+                    .Where(cp =>
+                        cp.ProductId == product.Id && cp.Catalog.Kind == CatalogKind.Consumers &&
+                        cp.Catalog.Available)
+                    .Select(c => c.Id)
+                    .FirstOrDefaultAsync(token);
+
+                if (catalogProductId == Guid.Empty)
+                    return 0m;
+
+                var catalogProduct = await dataLoader.LoadAsync(catalogProductId, token);
+                return catalogProduct.OnSalePrice;
             }
         }
     }

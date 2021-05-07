@@ -38,5 +38,6 @@ namespace Sheaft.Domain
         public Guid ProductId { get; private set; }
         public Guid UserId { get; private set; }
         public virtual User User { get; private set; }
+        public byte[] RowVersion { get; private set; }
     }
 }

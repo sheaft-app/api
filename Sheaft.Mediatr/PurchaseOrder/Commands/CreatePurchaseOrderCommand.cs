@@ -64,7 +64,7 @@ namespace Sheaft.Mediatr.PurchaseOrder.Commands
 
             var purchaseOrder = order.AddPurchaseOrder(resultIdentifier.Data, producer);
             await _context.SaveChangesAsync(token);
-
+            
             if (delivery.DeliveryMode.MaxPurchaseOrdersPerTimeSlot.HasValue)
                 await _tableService.IncreaseProducerDeliveryCountAsync(producer.Id, delivery.DeliveryModeId,
                     purchaseOrder.ExpectedDelivery.ExpectedDeliveryDate, purchaseOrder.ExpectedDelivery.From,

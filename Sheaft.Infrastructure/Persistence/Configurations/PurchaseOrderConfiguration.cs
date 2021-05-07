@@ -15,11 +15,12 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
         }
 
         public void Configure(EntityTypeBuilder<PurchaseOrder> entity)
-        { 
+        {
             entity.Property(c => c.CreatedOn);
-            entity.Property(c => c.UpdatedOn).IsConcurrencyToken();
-            
-            if(!_isAdmin)
+            entity.Property(c => c.UpdatedOn);
+            entity.Property(c => c.RowVersion).IsRowVersion();
+
+            if (!_isAdmin)
                 entity.HasQueryFilter(p => !p.RemovedOn.HasValue);
 
             entity.Property(o => o.Reference).IsRequired();
@@ -39,7 +40,8 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
             entity.Property(o => o.TotalProductVatPrice).HasColumnType("decimal(10,2)");
             entity.Property(o => o.TotalProductWholeSalePrice).HasColumnType("decimal(10,2)");
 
-            entity.HasMany(o => o.Products).WithOne().HasForeignKey(c=>c.PurchaseOrderId).OnDelete(DeleteBehavior.Cascade).IsRequired();
+            entity.HasMany(o => o.Products).WithOne().HasForeignKey(c => c.PurchaseOrderId)
+                .OnDelete(DeleteBehavior.Cascade).IsRequired();
 
             entity.OwnsOne(c => c.VendorInfo, c =>
             {
@@ -51,19 +53,12 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
                 c.Property(e => e.Name).UseCollation("Latin1_general_CI_AI").IsRequired();
                 c.Property(e => e.Email).IsRequired();
             });
-            entity.OwnsOne(c => c.ExpectedDelivery, cb =>
-            {
-                cb.OwnsOne(ca => ca.Address);
-            });
+            entity.OwnsOne(c => c.ExpectedDelivery, cb => { cb.OwnsOne(ca => ca.Address); });
 
             entity.Ignore(c => c.DomainEvents);
-            
-            var products = entity.Metadata.FindNavigation(nameof(PurchaseOrder.Products));
-            products.SetPropertyAccessMode(PropertyAccessMode.Field);
 
-            entity.HasKey(c=>c.Id);
-
-            entity.HasIndex(c=> new {c.ProducerId, c.Reference}).IsUnique();
+            entity.HasKey(c => c.Id);
+            entity.HasIndex(c => new {c.ProducerId, c.Reference}).IsUnique();
             entity.ToTable("PurchaseOrders");
         }
     }

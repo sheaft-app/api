@@ -60,8 +60,11 @@ namespace Sheaft.Mediatr.Product.Commands
             if (!resultImage.Succeeded)
                 return Failure<string>(resultImage);
 
-            entity.SetPicture(resultImage.Data);
-            await _context.SaveChangesAsync(token);
+            if (entity.Picture != resultImage.Data)
+            {
+                entity.SetPicture(resultImage.Data);
+                await _context.SaveChangesAsync(token);
+            }
 
             return Success(resultImage.Data);
         }

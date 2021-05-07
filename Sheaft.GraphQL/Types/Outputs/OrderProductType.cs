@@ -1,11 +1,7 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
-using HotChocolate.Resolvers;
 using HotChocolate.Types;
-using Sheaft.Application.Models;
 using Sheaft.Domain;
-using Sheaft.GraphQL.Catalogs;
-using Sheaft.GraphQL.Orders;
 using Sheaft.GraphQL.Producers;
 
 namespace Sheaft.GraphQL.Types.Outputs
@@ -15,12 +11,6 @@ namespace Sheaft.GraphQL.Types.Outputs
         protected override void Configure(IObjectTypeDescriptor<OrderProduct> descriptor)
         {
             base.Configure(descriptor);
-
-            descriptor
-                .ImplementsNode()
-                .IdField(c => c.Id)
-                .ResolveNode((ctx, id) =>
-                    ctx.DataLoader<OrderProductsByIdBatchDataLoader>().LoadAsync(id, ctx.RequestAborted));
             
             descriptor
                 .Field(c => c.Quantity)
@@ -105,6 +95,11 @@ namespace Sheaft.GraphQL.Types.Outputs
                 .Name("producer")
                 .ResolveWith<OrderProductResolvers>(c=> c.GetProducer(default, default, default))
                 .Type<NonNullType<UserType>>();
+
+            descriptor
+                .Field(c => c.ProductId)
+                .Name("id")
+                .ID(nameof(Product));
         }
 
         private class OrderProductResolvers

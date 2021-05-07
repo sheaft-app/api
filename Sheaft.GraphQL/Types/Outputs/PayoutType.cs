@@ -61,7 +61,7 @@ namespace Sheaft.GraphQL.Types.Outputs
                 
             descriptor
                 .Field("debitedUser")
-                .UseDbContext<AppDbContext>()
+                .UseDbContext<QueryDbContext>()
                 .ResolveWith<PayoutResolvers>(c => c.GetUser(default, default, default, default))
                 .Type<NonNullType<UserType>>();
                 
@@ -74,7 +74,7 @@ namespace Sheaft.GraphQL.Types.Outputs
 
         private class PayoutResolvers
         {
-            public async Task<User> GetUser(Payout payout, [ScopedService] AppDbContext context, UsersByIdBatchDataLoader usersDataLoader, CancellationToken token)
+            public async Task<User> GetUser(Payout payout, [ScopedService] QueryDbContext context, UsersByIdBatchDataLoader usersDataLoader, CancellationToken token)
             {
                 var userId = await context.Wallets
                     .Where(w => w.Id == payout.DebitedWalletId)

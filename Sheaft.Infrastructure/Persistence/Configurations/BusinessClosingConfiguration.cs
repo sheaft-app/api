@@ -9,9 +9,10 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
         public void Configure(EntityTypeBuilder<BusinessClosing> entity)
         {
             entity.Property(c => c.CreatedOn);
-            entity.Property(c => c.UpdatedOn).IsConcurrencyToken();
-            
-            entity.HasKey(c=> c.Id);
+            entity.Property(c => c.UpdatedOn);
+            entity.Property(c => c.RowVersion).IsRowVersion();
+
+            entity.HasKey(c => c.Id);
             entity.ToTable("BusinessClosings");
         }
     }

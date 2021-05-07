@@ -1,5 +1,6 @@
 ﻿using HotChocolate.Types;
 using Sheaft.Application.Models;
+using Sheaft.Domain;
 
 namespace Sheaft.GraphQL.Types.Outputs
 {
@@ -14,7 +15,7 @@ namespace Sheaft.GraphQL.Types.Outputs
             descriptor
                 .Field(c => c.Id)
                 .Name("id")
-                .Type<NonNullType<IdType>>();
+                .ID(nameof(Producer));
 
             descriptor
                 .Field(c => c.Name)

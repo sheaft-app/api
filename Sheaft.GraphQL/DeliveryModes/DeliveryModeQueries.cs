@@ -42,10 +42,10 @@ namespace Sheaft.GraphQL.DeliveryModes
 
         [GraphQLName("delivery")]
         [GraphQLType(typeof(DeliveryModeType))]
-        [UseDbContext(typeof(AppDbContext))]
+        [UseDbContext(typeof(QueryDbContext))]
         [Authorize(Policy = Policies.PRODUCER)]
         [UseSingleOrDefault]
-        public IQueryable<DeliveryMode> Get([ID] Guid id, [ScopedService] AppDbContext context)
+        public IQueryable<DeliveryMode> Get([ID] Guid id, [ScopedService] QueryDbContext context)
         {
             SetLogTransaction(id);
             
@@ -55,12 +55,12 @@ namespace Sheaft.GraphQL.DeliveryModes
         
         [GraphQLName("deliveries")]
         [GraphQLType(typeof(ListType<DeliveryModeType>))]
-        [UseDbContext(typeof(AppDbContext))]
+        [UseDbContext(typeof(QueryDbContext))]
         [Authorize(Policy = Policies.STORE_OR_PRODUCER)]
         [UsePaging]
         [UseFiltering]
         [UseSorting]
-        public IQueryable<DeliveryMode> GetAll([ScopedService] AppDbContext context)
+        public IQueryable<DeliveryMode> GetAll([ScopedService] QueryDbContext context)
         {
             SetLogTransaction();
             
@@ -70,10 +70,10 @@ namespace Sheaft.GraphQL.DeliveryModes
 
         [GraphQLName("deliveryClosing")]
         [GraphQLType(typeof(DeliveryClosingType))]
-        [UseDbContext(typeof(AppDbContext))]
+        [UseDbContext(typeof(QueryDbContext))]
         [Authorize(Policy = Policies.STORE_OR_PRODUCER)]
         [UseSingleOrDefault]
-        public IQueryable<DeliveryClosing> GetClosing([ID] Guid id, [ScopedService] AppDbContext context)
+        public IQueryable<DeliveryClosing> GetClosing([ID] Guid id, [ScopedService] QueryDbContext context)
         {
             SetLogTransaction(id);
             return context.Set<DeliveryClosing>()
@@ -82,12 +82,12 @@ namespace Sheaft.GraphQL.DeliveryModes
         
         [GraphQLName("deliveryClosings")]
         [GraphQLType(typeof(ListType<DeliveryClosingType>))]
-        [UseDbContext(typeof(AppDbContext))]
+        [UseDbContext(typeof(QueryDbContext))]
         [Authorize(Policy = Policies.STORE_OR_PRODUCER)]
         [UsePaging]
         [UseFiltering]
         [UseSorting]
-        public IQueryable<DeliveryClosing> GetClosings([ID] Guid deliveryId, [ScopedService] AppDbContext context)
+        public IQueryable<DeliveryClosing> GetClosings([ID] Guid deliveryId, [ScopedService] QueryDbContext context)
         {
             SetLogTransaction();
             return context.Set<DeliveryClosing>()
@@ -96,12 +96,9 @@ namespace Sheaft.GraphQL.DeliveryModes
         
         [GraphQLName("nextProducersDeliveries")]
         [GraphQLType(typeof(ListType<ProducerDeliveriesDtoType>))]
-        [UseDbContext(typeof(AppDbContext))]
+        [UseDbContext(typeof(QueryDbContext))]
         [Authorize(Policy = Policies.STORE_OR_PRODUCER)]
-        [UsePaging]
-        [UseFiltering]
-        [UseSorting]
-        public async Task<IEnumerable<ProducerDeliveriesDto>> GetNextDeliveries(IEnumerable<Guid> producerIds, IEnumerable<DeliveryKind> kinds, [ScopedService] AppDbContext context, CancellationToken token)
+        public async Task<IEnumerable<ProducerDeliveriesDto>> GetNextDeliveries([ID(nameof(Producer))]IEnumerable<Guid> ids, IEnumerable<DeliveryKind> kinds, [ScopedService] QueryDbContext context, CancellationToken token)
         {
             SetLogTransaction();
 
@@ -111,7 +108,7 @@ namespace Sheaft.GraphQL.DeliveryModes
                 deliveriesModes = await context.Agreements
                     .Where(d =>
                         d.Delivery.Available
-                        && producerIds.Contains(d.ProducerId)
+                        && ids.Contains(d.ProducerId)
                         && d.StoreId == CurrentUser.Id
                         && d.Status == AgreementStatus.Accepted
                         && kinds.Contains(d.Delivery.Kind))
@@ -123,15 +120,15 @@ namespace Sheaft.GraphQL.DeliveryModes
                 deliveriesModes = await context.DeliveryModes
                     .Where(d =>
                         d.Available
-                        && producerIds.Contains(d.ProducerId)
+                        && ids.Contains(d.ProducerId)
                         && kinds.Contains(d.Kind))
                     .ToListAsync(token);
             }
 
-            return await GetProducersDeliveriesAsync(context, producerIds, DateTimeOffset.UtcNow, deliveriesModes, token);
+            return await GetProducersDeliveriesAsync(context, ids, DateTimeOffset.UtcNow, deliveriesModes, token);
         }
 
-        private async Task<IEnumerable<ProducerDeliveriesDto>> GetProducersDeliveriesAsync(AppDbContext context, IEnumerable<Guid> producerIds, DateTimeOffset currentDate,
+        private async Task<IEnumerable<ProducerDeliveriesDto>> GetProducersDeliveriesAsync(QueryDbContext context, IEnumerable<Guid> producerIds, DateTimeOffset currentDate,
             IEnumerable<Domain.DeliveryMode> deliveriesMode, CancellationToken token)
         {
             var producers = new List<ProducerDeliveriesDto>();
@@ -170,7 +167,7 @@ namespace Sheaft.GraphQL.DeliveryModes
             return await GetNotCapedProducersDeliveriesAsync(context, producers, token);
         }
 
-        private async Task<IEnumerable<ProducerDeliveriesDto>> GetNotCapedProducersDeliveriesAsync(AppDbContext context,
+        private async Task<IEnumerable<ProducerDeliveriesDto>> GetNotCapedProducersDeliveriesAsync(QueryDbContext context,
             IEnumerable<ProducerDeliveriesDto> producersDeliveries, CancellationToken token)
         {
             var deliveryModeIds = producersDeliveries.SelectMany(c => c.Deliveries.Select(d => d.Id));
@@ -242,7 +239,7 @@ namespace Sheaft.GraphQL.DeliveryModes
         }
 
         private DeliveryDto GetDeliveriesForHours(DateTimeOffset currentDate, DeliveryMode deliveryMode,
-            IReadOnlyCollection<TimeSlotHour> openingHours)
+            ICollection<DeliveryHours> openingHours)
         {
             return new DeliveryDto
             {
@@ -277,8 +274,8 @@ namespace Sheaft.GraphQL.DeliveryModes
 
         private IEnumerable<DeliveryHourDto> GetAvailableDeliveryHours(IEnumerable<TimeSlotHour> openingHours,
             DateTimeOffset currentDate, int? lockOrderHoursBeforeDelivery,
-            IReadOnlyCollection<BusinessClosing> producerClosings,
-            IReadOnlyCollection<DeliveryClosing> deliveryClosings)
+            ICollection<BusinessClosing> producerClosings,
+            ICollection<DeliveryClosing> deliveryClosings)
         {
             var list = new List<DeliveryHourDto>();
             foreach (var openingHour in openingHours.OrderBy(oh => oh.Day))
@@ -305,8 +302,8 @@ namespace Sheaft.GraphQL.DeliveryModes
 
         private DeliveryHourDto GetDeliveryHourIfMatch(TimeSlotHour openingHour,
             DateTimeOffset currentDate, int? lockOrderHoursBeforeDelivery, int diff,
-            IReadOnlyCollection<BusinessClosing> producerClosings,
-            IReadOnlyCollection<DeliveryClosing> deliveryClosings)
+            ICollection<BusinessClosing> producerClosings,
+            ICollection<DeliveryClosing> deliveryClosings)
         {
             var targetDate = new DateTime(currentDate.Year, currentDate.Month, currentDate.Day, openingHour.From.Hours,
                 openingHour.From.Minutes, openingHour.From.Seconds).AddDays(diff);

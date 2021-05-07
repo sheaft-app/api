@@ -8,7 +8,8 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
     {
         public void Configure(EntityTypeBuilder<QuickOrderProduct> entity)
         {
-            entity.Property(c => c.Quantity).IsConcurrencyToken();
+            entity.Property(c => c.Quantity);
+            entity.Property(c => c.RowVersion).IsRowVersion();
 
             entity.HasOne(c => c.CatalogProduct).WithMany().HasForeignKey(c=>c.CatalogProductId).OnDelete(DeleteBehavior.NoAction).IsRequired();
 

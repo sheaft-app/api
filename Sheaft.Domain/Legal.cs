@@ -10,8 +10,6 @@ namespace Sheaft.Domain
 {
     public abstract class Legal : IIdEntity, ITrackCreation, ITrackUpdate
     {
-        private List<Document> _documents;
-
         protected Legal()
         {
         }
@@ -23,6 +21,8 @@ namespace Sheaft.Domain
             Owner = owner;
             User = user;
             UserId = user.Id;
+
+            Documents = new List<Document>();
         }
 
         public Guid Id { get; private set; }
@@ -33,26 +33,27 @@ namespace Sheaft.Domain
         public Guid UserId { get; private set; }
         public Owner Owner { get; private set; }
         public virtual User User { get; private set; }
-        public virtual IReadOnlyCollection<Document> Documents => _documents?.AsReadOnly();
+        public virtual ICollection<Document> Documents { get; private set; }
+        public byte[] RowVersion { get; private set; }
 
         public Document AddDocument(DocumentKind kind, string name)
         {
             if (Documents == null)
-                _documents = new List<Document>();
+                Documents = new List<Document>();
 
             var document = new Document(Guid.NewGuid(), kind, name);
-            _documents.Add(document);
+            Documents.Add(document);
 
             return document;
         }
 
         public void DeleteDocument(Guid id)
         {
-            var document = _documents.FirstOrDefault(d => d.Id == id);
+            var document = Documents.FirstOrDefault(d => d.Id == id);
             if (document == null)
                 throw new ValidationException(MessageKind.Document_CannotDelete_NotFound);
 
-            _documents.Remove(document);
+            Documents.Remove(document);
         }
 
         public virtual void SetKind(LegalKind kind)

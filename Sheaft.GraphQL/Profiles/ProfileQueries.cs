@@ -25,9 +25,9 @@ namespace Sheaft.GraphQL.Users
         [GraphQLName("myProducerProfile")]
         [GraphQLType(typeof(ProducerProfileType))]
         [Authorize(Policy = Policies.PRODUCER)]
-        [UseDbContext(typeof(AppDbContext))]
+        [UseDbContext(typeof(QueryDbContext))]
         [UseSingleOrDefault]
-        public IQueryable<Producer> GetProducerProfile([ScopedService] AppDbContext context)
+        public IQueryable<Producer> GetProducerProfile([ScopedService] QueryDbContext context)
         {
             SetLogTransaction(CurrentUser.Id);
             
@@ -41,9 +41,9 @@ namespace Sheaft.GraphQL.Users
         [GraphQLName("myStoreProfile")]
         [GraphQLType(typeof(StoreProfileType))]
         [Authorize(Policy = Policies.STORE)]
-        [UseDbContext(typeof(AppDbContext))]
+        [UseDbContext(typeof(QueryDbContext))]
         [UseSingleOrDefault]
-        public IQueryable<Store> GetStoreProfile([ScopedService] AppDbContext context)
+        public IQueryable<Store> GetStoreProfile([ScopedService] QueryDbContext context)
         {
             SetLogTransaction(CurrentUser.Id);
             
@@ -57,9 +57,9 @@ namespace Sheaft.GraphQL.Users
         [GraphQLName("myConsumerProfile")]
         [GraphQLType(typeof(ConsumerProfileType))]
         [Authorize(Policy = Policies.CONSUMER)]
-        [UseDbContext(typeof(AppDbContext))]
+        [UseDbContext(typeof(QueryDbContext))]
         [UseSingleOrDefault]
-        public IQueryable<Consumer> GetConsumerProfile([ScopedService] AppDbContext context)
+        public IQueryable<Consumer> GetConsumerProfile([ScopedService] QueryDbContext context)
         {
             SetLogTransaction(CurrentUser.Id);
             

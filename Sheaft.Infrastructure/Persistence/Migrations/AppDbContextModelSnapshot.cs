@@ -9,7 +9,7 @@ using Sheaft.Infrastructure.Persistence;
 
 namespace Sheaft.Infrastructure.Persistence.Migrations
 {
-    [DbContext(typeof(AppDbContext))]
+    [DbContext(typeof(QueryDbContext))]
     partial class AppDbContextModelSnapshot : ModelSnapshot
     {
         protected override void BuildModel(ModelBuilder modelBuilder)
@@ -48,6 +48,11 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                     b.Property<DateTimeOffset?>("RemovedOn")
                         .HasColumnType("datetimeoffset");
 
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
+
                     b.Property<int>("Status")
                         .HasColumnType("int");
 
@@ -55,7 +60,6 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTimeOffset?>("UpdatedOn")
-                        .IsConcurrencyToken()
                         .HasColumnType("datetimeoffset");
 
                     b.HasKey("Id");
@@ -92,8 +96,12 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                     b.Property<string>("Reason")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTimeOffset?>("UpdatedOn")
+                    b.Property<byte[]>("RowVersion")
                         .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
+
+                    b.Property<DateTimeOffset?>("UpdatedOn")
                         .HasColumnType("datetimeoffset");
 
                     b.HasKey("Id");
@@ -132,8 +140,12 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                     b.Property<DateTimeOffset?>("RemovedOn")
                         .HasColumnType("datetimeoffset");
 
-                    b.Property<DateTimeOffset?>("UpdatedOn")
+                    b.Property<byte[]>("RowVersion")
                         .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
+
+                    b.Property<DateTimeOffset?>("UpdatedOn")
                         .HasColumnType("datetimeoffset");
 
                     b.HasKey("Id");
@@ -164,8 +176,12 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                     b.Property<Guid>("ProductId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<DateTimeOffset?>("UpdatedOn")
+                    b.Property<byte[]>("RowVersion")
                         .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
+
+                    b.Property<DateTimeOffset?>("UpdatedOn")
                         .HasColumnType("datetimeoffset");
 
                     b.Property<decimal>("VatPrice")
@@ -267,8 +283,12 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                     b.Property<string>("Reason")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTimeOffset?>("UpdatedOn")
+                    b.Property<byte[]>("RowVersion")
                         .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
+
+                    b.Property<DateTimeOffset?>("UpdatedOn")
                         .HasColumnType("datetimeoffset");
 
                     b.HasKey("Id");
@@ -284,6 +304,9 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<DateTimeOffset>("CreatedOn")
+                        .HasColumnType("datetimeoffset");
+
                     b.Property<int>("Day")
                         .HasColumnType("int");
 
@@ -295,6 +318,9 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
 
                     b.Property<TimeSpan>("To")
                         .HasColumnType("time");
+
+                    b.Property<DateTimeOffset?>("UpdatedOn")
+                        .HasColumnType("datetimeoffset");
 
                     b.HasKey("Id");
 
@@ -343,8 +369,12 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                     b.Property<DateTimeOffset?>("RemovedOn")
                         .HasColumnType("datetimeoffset");
 
-                    b.Property<DateTimeOffset?>("UpdatedOn")
+                    b.Property<byte[]>("RowVersion")
                         .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
+
+                    b.Property<DateTimeOffset?>("UpdatedOn")
                         .HasColumnType("datetimeoffset");
 
                     b.HasKey("Id");
@@ -405,7 +435,6 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                         .HasDefaultValue(0);
 
                     b.Property<DateTimeOffset?>("UpdatedOn")
-                        .IsConcurrencyToken()
                         .HasColumnType("datetimeoffset");
 
                     b.HasKey("Id");
@@ -450,11 +479,15 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                     b.Property<string>("ResultMessage")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
+
                     b.Property<int>("Status")
                         .HasColumnType("int");
 
                     b.Property<DateTimeOffset?>("UpdatedOn")
-                        .IsConcurrencyToken()
                         .HasColumnType("datetimeoffset");
 
                     b.HasKey("Id");
@@ -520,11 +553,15 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                     b.Property<string>("ResultMessage")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
+
                     b.Property<int>("Status")
                         .HasColumnType("int");
 
                     b.Property<DateTimeOffset?>("UpdatedOn")
-                        .IsConcurrencyToken()
                         .HasColumnType("datetimeoffset");
 
                     b.HasKey("Id");
@@ -583,6 +620,11 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                     b.Property<int?>("Retried")
                         .HasColumnType("int");
 
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
+
                     b.Property<DateTimeOffset?>("StartedOn")
                         .HasColumnType("datetimeoffset");
 
@@ -590,7 +632,6 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                         .HasColumnType("int");
 
                     b.Property<DateTimeOffset?>("UpdatedOn")
-                        .IsConcurrencyToken()
                         .HasColumnType("datetimeoffset");
 
                     b.Property<Guid>("UserId")
@@ -615,8 +656,12 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                     b.Property<int>("Kind")
                         .HasColumnType("int");
 
-                    b.Property<DateTimeOffset?>("UpdatedOn")
+                    b.Property<byte[]>("RowVersion")
                         .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
+
+                    b.Property<DateTimeOffset?>("UpdatedOn")
                         .HasColumnType("datetimeoffset");
 
                     b.Property<Guid>("UserId")
@@ -658,7 +703,6 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                         .HasColumnType("int");
 
                     b.Property<DateTimeOffset?>("UpdatedOn")
-                        .IsConcurrencyToken()
                         .HasColumnType("datetimeoffset");
 
                     b.HasKey("Id");
@@ -711,7 +755,6 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                         .HasColumnType("bit");
 
                     b.Property<DateTimeOffset?>("UpdatedOn")
-                        .IsConcurrencyToken()
                         .HasColumnType("datetimeoffset");
 
                     b.Property<Guid>("UserId")
@@ -730,6 +773,9 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<DateTimeOffset>("CreatedOn")
+                        .HasColumnType("datetimeoffset");
+
                     b.Property<int>("Day")
                         .HasColumnType("int");
 
@@ -741,6 +787,9 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
 
                     b.Property<TimeSpan>("To")
                         .HasColumnType("time");
+
+                    b.Property<DateTimeOffset?>("UpdatedOn")
+                        .HasColumnType("datetimeoffset");
 
                     b.HasKey("Id");
 
@@ -807,6 +856,11 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                     b.Property<int>("ReturnablesCount")
                         .HasColumnType("int");
 
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
+
                     b.Property<int>("Status")
                         .HasColumnType("int");
 
@@ -844,7 +898,6 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                         .HasColumnType("decimal(10,2)");
 
                     b.Property<DateTimeOffset?>("UpdatedOn")
-                        .IsConcurrencyToken()
                         .HasColumnType("datetimeoffset");
 
                     b.Property<Guid?>("UserId")
@@ -866,11 +919,22 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                     b.Property<string>("Comment")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<DateTimeOffset>("CreatedOn")
+                        .HasColumnType("datetimeoffset");
+
                     b.Property<Guid>("DeliveryModeId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid>("OrderId")
                         .HasColumnType("uniqueidentifier");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
+
+                    b.Property<DateTimeOffset?>("UpdatedOn")
+                        .HasColumnType("datetimeoffset");
 
                     b.HasKey("Id");
 
@@ -888,6 +952,9 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<DateTimeOffset>("CreatedOn")
+                        .HasColumnType("datetimeoffset");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)")
@@ -903,7 +970,6 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<int>("Quantity")
-                        .IsConcurrencyToken()
                         .HasColumnType("int");
 
                     b.Property<string>("Reference")
@@ -927,6 +993,11 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
 
                     b.Property<int>("ReturnablesCount")
                         .HasColumnType("int");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
 
                     b.Property<decimal>("TotalOnSalePrice")
                         .HasColumnType("decimal(10,2)");
@@ -970,6 +1041,9 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                     b.Property<decimal>("UnitWholeSalePrice")
                         .HasColumnType("decimal(10,2)");
 
+                    b.Property<DateTimeOffset?>("UpdatedOn")
+                        .HasColumnType("datetimeoffset");
+
                     b.Property<decimal>("Vat")
                         .HasColumnType("decimal(10,2)");
 
@@ -1002,11 +1076,15 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
+
                     b.Property<long>("Size")
                         .HasColumnType("bigint");
 
                     b.Property<DateTimeOffset?>("UpdatedOn")
-                        .IsConcurrencyToken()
                         .HasColumnType("datetimeoffset");
 
                     b.Property<DateTimeOffset?>("UploadedOn")
@@ -1070,11 +1148,15 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                     b.Property<string>("ResultMessage")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
+
                     b.Property<int>("Status")
                         .HasColumnType("int");
 
                     b.Property<DateTimeOffset?>("UpdatedOn")
-                        .IsConcurrencyToken()
                         .HasColumnType("datetimeoffset");
 
                     b.HasKey("Id");
@@ -1117,8 +1199,12 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                     b.Property<DateTimeOffset?>("RemovedOn")
                         .HasColumnType("datetimeoffset");
 
-                    b.Property<DateTimeOffset?>("UpdatedOn")
+                    b.Property<byte[]>("RowVersion")
                         .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
+
+                    b.Property<DateTimeOffset?>("UpdatedOn")
                         .HasColumnType("datetimeoffset");
 
                     b.Property<Guid>("UserId")
@@ -1186,11 +1272,15 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                     b.Property<string>("ResultMessage")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
+
                     b.Property<int>("Status")
                         .HasColumnType("int");
 
                     b.Property<DateTimeOffset?>("UpdatedOn")
-                        .IsConcurrencyToken()
                         .HasColumnType("datetimeoffset");
 
                     b.HasKey("Id");
@@ -1254,6 +1344,11 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                     b.Property<string>("ResultMessage")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
+
                     b.Property<bool>("SecureModeNeeded")
                         .HasColumnType("bit");
 
@@ -1267,7 +1362,6 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                         .HasColumnType("int");
 
                     b.Property<DateTimeOffset?>("UpdatedOn")
-                        .IsConcurrencyToken()
                         .HasColumnType("datetimeoffset");
 
                     b.HasKey("Id");
@@ -1350,11 +1444,15 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                     b.Property<Guid?>("ReturnableId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
+
                     b.Property<int>("Unit")
                         .HasColumnType("int");
 
                     b.Property<DateTimeOffset?>("UpdatedOn")
-                        .IsConcurrencyToken()
                         .HasColumnType("datetimeoffset");
 
                     b.Property<decimal>("Vat")
@@ -1386,7 +1484,6 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTimeOffset?>("UpdatedOn")
-                        .IsConcurrencyToken()
                         .HasColumnType("datetimeoffset");
 
                     b.Property<string>("Url")
@@ -1424,7 +1521,6 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                         .HasColumnType("datetimeoffset");
 
                     b.Property<DateTimeOffset?>("UpdatedOn")
-                        .IsConcurrencyToken()
                         .HasColumnType("datetimeoffset");
 
                     b.Property<string>("Url")
@@ -1493,6 +1589,11 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                     b.Property<int>("ReturnablesCount")
                         .HasColumnType("int");
 
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
+
                     b.Property<int>("Status")
                         .HasColumnType("int");
 
@@ -1527,7 +1628,6 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                         .HasColumnType("decimal(10,2)");
 
                     b.Property<DateTimeOffset?>("UpdatedOn")
-                        .IsConcurrencyToken()
                         .HasColumnType("datetimeoffset");
 
                     b.HasKey("Id");
@@ -1546,6 +1646,9 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<DateTimeOffset>("CreatedOn")
+                        .HasColumnType("datetimeoffset");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)")
@@ -1558,7 +1661,6 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<int>("Quantity")
-                        .IsConcurrencyToken()
                         .HasColumnType("int");
 
                     b.Property<string>("Reference")
@@ -1582,6 +1684,11 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
 
                     b.Property<int>("ReturnablesCount")
                         .HasColumnType("int");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
 
                     b.Property<decimal>("TotalOnSalePrice")
                         .HasColumnType("decimal(10,2)");
@@ -1625,6 +1732,9 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                     b.Property<decimal>("UnitWholeSalePrice")
                         .HasColumnType("decimal(10,2)");
 
+                    b.Property<DateTimeOffset?>("UpdatedOn")
+                        .HasColumnType("datetimeoffset");
+
                     b.Property<decimal>("Vat")
                         .HasColumnType("decimal(10,2)");
 
@@ -1659,8 +1769,12 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                     b.Property<DateTimeOffset?>("RemovedOn")
                         .HasColumnType("datetimeoffset");
 
-                    b.Property<DateTimeOffset?>("UpdatedOn")
+                    b.Property<byte[]>("RowVersion")
                         .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
+
+                    b.Property<DateTimeOffset?>("UpdatedOn")
                         .HasColumnType("datetimeoffset");
 
                     b.Property<Guid>("UserId")
@@ -1682,12 +1796,22 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                     b.Property<Guid>("CatalogProductId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<DateTimeOffset>("CreatedOn")
+                        .HasColumnType("datetimeoffset");
+
                     b.Property<int?>("Quantity")
-                        .IsConcurrencyToken()
                         .HasColumnType("int");
 
                     b.Property<Guid>("QuickOrderId")
                         .HasColumnType("uniqueidentifier");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
+
+                    b.Property<DateTimeOffset?>("UpdatedOn")
+                        .HasColumnType("datetimeoffset");
 
                     b.HasKey("Id");
 
@@ -1714,8 +1838,12 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                     b.Property<Guid>("ProductId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<DateTimeOffset?>("UpdatedOn")
+                    b.Property<byte[]>("RowVersion")
                         .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
+
+                    b.Property<DateTimeOffset?>("UpdatedOn")
                         .HasColumnType("datetimeoffset");
 
                     b.Property<Guid>("UserId")
@@ -1781,11 +1909,15 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                     b.Property<string>("ResultMessage")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
+
                     b.Property<int>("Status")
                         .HasColumnType("int");
 
                     b.Property<DateTimeOffset?>("UpdatedOn")
-                        .IsConcurrencyToken()
                         .HasColumnType("datetimeoffset");
 
                     b.HasKey("Id");
@@ -1845,7 +1977,6 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                         .HasDefaultValue(0);
 
                     b.Property<DateTimeOffset?>("UpdatedOn")
-                        .IsConcurrencyToken()
                         .HasColumnType("datetimeoffset");
 
                     b.HasKey("Id");
@@ -1886,8 +2017,12 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                     b.Property<DateTimeOffset?>("RemovedOn")
                         .HasColumnType("datetimeoffset");
 
-                    b.Property<DateTimeOffset?>("UpdatedOn")
+                    b.Property<byte[]>("RowVersion")
                         .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
+
+                    b.Property<DateTimeOffset?>("UpdatedOn")
                         .HasColumnType("datetimeoffset");
 
                     b.Property<decimal>("Vat")
@@ -1943,8 +2078,12 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                     b.Property<DateTimeOffset?>("RemovedOn")
                         .HasColumnType("datetimeoffset");
 
-                    b.Property<DateTimeOffset?>("UpdatedOn")
+                    b.Property<byte[]>("RowVersion")
                         .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
+
+                    b.Property<DateTimeOffset?>("UpdatedOn")
                         .HasColumnType("datetimeoffset");
 
                     b.Property<string>("Url")
@@ -2053,8 +2192,12 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                     b.Property<DateTimeOffset?>("RemovedOn")
                         .HasColumnType("datetimeoffset");
 
-                    b.Property<DateTimeOffset?>("UpdatedOn")
+                    b.Property<byte[]>("RowVersion")
                         .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
+
+                    b.Property<DateTimeOffset?>("UpdatedOn")
                         .HasColumnType("datetimeoffset");
 
                     b.HasKey("Id");
@@ -2119,11 +2262,15 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                     b.Property<string>("ResultMessage")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
+
                     b.Property<int>("Status")
                         .HasColumnType("int");
 
                     b.Property<DateTimeOffset?>("UpdatedOn")
-                        .IsConcurrencyToken()
                         .HasColumnType("datetimeoffset");
 
                     b.HasKey("Id");
@@ -2232,6 +2379,11 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                     b.Property<DateTimeOffset?>("RemovedOn")
                         .HasColumnType("datetimeoffset");
 
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
+
                     b.Property<string>("SponsorshipCode")
                         .HasColumnType("nvarchar(max)");
 
@@ -2247,7 +2399,6 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTimeOffset?>("UpdatedOn")
-                        .IsConcurrencyToken()
                         .HasColumnType("datetimeoffset");
 
                     b.Property<string>("Website")
@@ -2530,8 +2681,12 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                     b.Property<DateTimeOffset?>("RemovedOn")
                         .HasColumnType("datetimeoffset");
 
-                    b.Property<DateTimeOffset?>("UpdatedOn")
+                    b.Property<byte[]>("RowVersion")
                         .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
+
+                    b.Property<DateTimeOffset?>("UpdatedOn")
                         .HasColumnType("datetimeoffset");
 
                     b.Property<Guid>("UserId")
@@ -2600,11 +2755,15 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                     b.Property<string>("ResultMessage")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
+
                     b.Property<int>("Status")
                         .HasColumnType("int");
 
                     b.Property<DateTimeOffset?>("UpdatedOn")
-                        .IsConcurrencyToken()
                         .HasColumnType("datetimeoffset");
 
                     b.HasKey("Id");
@@ -3034,6 +3193,11 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                             b1.Property<int>("Nationality")
                                 .HasColumnType("int");
 
+                            b1.Property<byte[]>("RowVersion")
+                                .IsConcurrencyToken()
+                                .ValueGeneratedOnAddOrUpdate()
+                                .HasColumnType("rowversion");
+
                             b1.HasKey("LegalId");
 
                             b1.ToTable("Legals");
@@ -3057,6 +3221,11 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
 
                                     b2.Property<string>("Line2")
                                         .HasColumnType("nvarchar(max)");
+
+                                    b2.Property<byte[]>("RowVersion")
+                                        .IsConcurrencyToken()
+                                        .ValueGeneratedOnAddOrUpdate()
+                                        .HasColumnType("rowversion");
 
                                     b2.Property<string>("Zipcode")
                                         .HasColumnType("nvarchar(max)");
@@ -3888,6 +4057,12 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
 
                             b1.Property<string>("Zipcode")
                                 .HasColumnType("nvarchar(max)");
+
+                            b1.Property<byte[]>("_TableSharingConcurrencyTokenConvention_RowVersion")
+                                .IsConcurrencyToken()
+                                .ValueGeneratedOnAddOrUpdate()
+                                .HasColumnType("rowversion")
+                                .HasColumnName("RowVersion");
 
                             b1.HasKey("BusinessLegalId");
 

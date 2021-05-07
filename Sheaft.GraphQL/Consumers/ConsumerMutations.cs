@@ -27,7 +27,7 @@ namespace Sheaft.GraphQL.Consumers
         }
 
         [GraphQLName("registerConsumer")]
-        [Authorize(Policy = Policies.UNREGISTERED)]
+        [Authorize(Policy = Policies.AUTHENTICATED)]
         [GraphQLType(typeof(ConsumerType))]
         public async Task<Consumer> RegisterConsumerAsync(
             [GraphQLType(typeof(RegisterConsumerInputType))] [GraphQLName("input")]

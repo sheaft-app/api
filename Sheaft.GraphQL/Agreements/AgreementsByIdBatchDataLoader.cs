@@ -13,10 +13,10 @@ namespace Sheaft.GraphQL.Agreements
 {
     public class AgreementsByIdBatchDataLoader : BatchDataLoader<Guid, Agreement>
     {
-        private readonly IDbContextFactory<AppDbContext> _contextFactory;
+        private readonly IDbContextFactory<QueryDbContext> _contextFactory;
         
         public AgreementsByIdBatchDataLoader(
-            IDbContextFactory<AppDbContext> contextFactory,
+            IDbContextFactory<QueryDbContext> contextFactory,
             IBatchScheduler batchScheduler,
             DataLoaderOptions<Guid> options = null)
             : base(batchScheduler, options)

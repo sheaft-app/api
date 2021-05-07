@@ -247,7 +247,7 @@ namespace Sheaft.Web.Api
             services.AddHttpClient();
 
             var databaseConfig = appDatabaseSettings.Get<AppDatabaseOptions>();
-            services.AddPooledDbContextFactory<AppDbContext>(options =>
+            services.AddPooledDbContextFactory<QueryDbContext>(options =>
             {
                 options.UseLazyLoadingProxies();
                 options.UseSqlServer(databaseConfig.ConnectionString, x =>
@@ -257,7 +257,7 @@ namespace Sheaft.Web.Api
                 });
             });
 
-            services.AddDbContext<IAppDbContext, AppDbContext>(options =>
+            services.AddDbContext<IAppDbContext, WriterDbContext>(options =>
             {
                 options.UseLazyLoadingProxies();
                 options.UseSqlServer(databaseConfig.ConnectionString, x =>
@@ -400,9 +400,7 @@ namespace Sheaft.Web.Api
 
             using (var serviceScope = app.ApplicationServices.GetRequiredService<IServiceScopeFactory>().CreateScope())
             {
-                var contextFactory = serviceScope.ServiceProvider.GetRequiredService<IDbContextFactory<AppDbContext>>();
-                var context = contextFactory.CreateDbContext();
-                
+                var context = serviceScope.ServiceProvider.GetRequiredService<IAppDbContext>();
                 if (!context.AllMigrationsApplied())
                 {
                     context.Migrate();

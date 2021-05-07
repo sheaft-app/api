@@ -16,13 +16,13 @@ namespace Sheaft.Business.Factories
 {
     public class TransactionsExportersFactory : ITransactionsExportersFactory
     {
-        private readonly AppDbContext _context;
+        private readonly IAppDbContext _context;
         private readonly Func<string, ITransactionsFileExporter> _resolver;
         private readonly ExportersOptions _options;
 
-        public TransactionsExportersFactory(IDbContextFactory<AppDbContext> context, IOptions<ExportersOptions> options, Func<string, ITransactionsFileExporter> resolver)
+        public TransactionsExportersFactory(IAppDbContext context, IOptions<ExportersOptions> options, Func<string, ITransactionsFileExporter> resolver)
         {
-            _context = context.CreateDbContext();
+            _context = context;
             _resolver = resolver;
             _options = options.Value;
         }

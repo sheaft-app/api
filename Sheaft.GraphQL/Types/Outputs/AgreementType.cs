@@ -36,28 +36,28 @@ namespace Sheaft.GraphQL.Types.Outputs
             descriptor
                 .Field(c => c.Store)
                 .Name("store")
-                .UseDbContext<AppDbContext>()
+                .UseDbContext<QueryDbContext>()
                 .ResolveWith<AgreementResolvers>(c => c.GetStore(default!, default!, default))
                 .Type<NonNullType<StoreType>>();
             
             descriptor
                 .Field(c => c.Producer)
                 .Name("producer")
-                .UseDbContext<AppDbContext>()
+                .UseDbContext<QueryDbContext>()
                 .ResolveWith<AgreementResolvers>(c => c.GetProducer(default!, default, default))
                 .Type<NonNullType<ProducerType>>();
 
             descriptor
                 .Field(c => c.Delivery)
                 .Name("delivery")
-                .UseDbContext<AppDbContext>()
+                .UseDbContext<QueryDbContext>()
                 .ResolveWith<AgreementResolvers>(c => c.GetDelivery(default, default, default))
                 .Type<DeliveryModeType>();
             
             descriptor
                 .Field(c => c.Catalog)
                 .Name("catalog")
-                .UseDbContext<AppDbContext>()
+                .UseDbContext<QueryDbContext>()
                 .ResolveWith<AgreementResolvers>(c => c.GetCatalog(default, default, default))
                 .Type<CatalogType>();
         }

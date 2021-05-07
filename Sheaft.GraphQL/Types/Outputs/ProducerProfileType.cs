@@ -113,21 +113,21 @@ namespace Sheaft.GraphQL.Types.Outputs
             descriptor
                 .Field(c => c.Legal)
                 .Name("legals")
-                .UseDbContext<AppDbContext>()
+                .UseDbContext<QueryDbContext>()
                 .ResolveWith<ProducerProfileResolvers>(c => c.GetLegals(default!, default!, default!, default))
                 .Type<ListType<BusinessLegalType>>();
             
             descriptor
                 .Field(c => c.Closings)
                 .Name("closings")
-                .UseDbContext<AppDbContext>()
+                .UseDbContext<QueryDbContext>()
                 .ResolveWith<ProducerProfileResolvers>(c => c.GetClosings(default!, default!, default!, default))
                 .Type<ListType<BusinessClosingType>>();
 
             descriptor
                 .Field(c => c.Pictures)
                 .Name("pictures")
-                .UseDbContext<AppDbContext>()
+                .UseDbContext<QueryDbContext>()
                 .ResolveWith<ProducerProfileResolvers>(c => c.GetPictures(default!, default!, default!, default))
                 .Type<ListType<ProfilePictureType>>();
         }
@@ -135,7 +135,7 @@ namespace Sheaft.GraphQL.Types.Outputs
         private class ProducerProfileResolvers
         {
             public async Task<BusinessLegal> GetLegals(Producer producer,
-                [ScopedService] AppDbContext context,
+                [ScopedService] QueryDbContext context,
                 BusinessLegalsByIdBatchDataLoader businessLegalsDataLoader, CancellationToken token)
             {
                 var legalId = await context.Legals.OfType<BusinessLegal>()
@@ -147,7 +147,7 @@ namespace Sheaft.GraphQL.Types.Outputs
             }
             
             public async Task<IEnumerable<BusinessClosing>> GetClosings(Producer producer,
-                [ScopedService] AppDbContext context,
+                [ScopedService] QueryDbContext context,
                 BusinessClosingsByIdBatchDataLoader closingsDataLoader, CancellationToken token)
             {
                 var closingsId = await context.Set<BusinessClosing>()
@@ -159,7 +159,7 @@ namespace Sheaft.GraphQL.Types.Outputs
             }
 
             public async Task<IEnumerable<ProfilePicture>> GetPictures(Producer producer,
-                [ScopedService] AppDbContext context,
+                [ScopedService] QueryDbContext context,
                 ProfilePicturesByIdBatchDataLoader picturesDataLoader, CancellationToken token)
             {
                 var picturesId = await context.Set<ProfilePicture>()

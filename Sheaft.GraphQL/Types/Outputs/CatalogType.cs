@@ -54,21 +54,21 @@ namespace Sheaft.GraphQL.Types.Outputs
             descriptor
                 .Field(c => c.Products)
                 .Name("productsPrices")
-                .UseDbContext<AppDbContext>()
+                .UseDbContext<QueryDbContext>()
                 .ResolveWith<CatalogResolvers>(c => c.GetCatalogProducts(default, default, default, default))
                 .Type<ListType<ProductType>>();
             
             descriptor
                 .Field(c => c.Producer)
                 .Name("producer")
-                .UseDbContext<AppDbContext>()
+                .UseDbContext<QueryDbContext>()
                 .ResolveWith<CatalogResolvers>(c => c.GetProducer(default, default, default))
                 .Type<UserType>();
         }
 
         private class CatalogResolvers
         {
-            public async Task<IEnumerable<CatalogProduct>> GetCatalogProducts(Catalog catalog, [ScopedService] AppDbContext context,
+            public async Task<IEnumerable<CatalogProduct>> GetCatalogProducts(Catalog catalog, [ScopedService] QueryDbContext context,
                 CatalogProductsByIdBatchDataLoader catalogProductsDataLoader, CancellationToken token)
             {
                 var catalogProductsId = await context.Set<CatalogProduct>()

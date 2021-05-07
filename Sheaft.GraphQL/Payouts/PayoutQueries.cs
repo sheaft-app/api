@@ -26,10 +26,10 @@ namespace Sheaft.GraphQL.Payouts
 
         [GraphQLName("payout")]
         [GraphQLType(typeof(PayoutType))]
-        [UseDbContext(typeof(AppDbContext))]
+        [UseDbContext(typeof(QueryDbContext))]
         [Authorize(Policy = Policies.STORE_OR_PRODUCER)]
         [UseSingleOrDefault]
-        public IQueryable<Payout> Get([ID] Guid id, [ScopedService] AppDbContext context)
+        public IQueryable<Payout> Get([ID] Guid id, [ScopedService] QueryDbContext context)
         {
             SetLogTransaction(id);
             return context.Payouts
@@ -38,12 +38,12 @@ namespace Sheaft.GraphQL.Payouts
         
         [GraphQLName("payouts")]
         [GraphQLType(typeof(ListType<PayoutType>))]
-        [UseDbContext(typeof(AppDbContext))]
+        [UseDbContext(typeof(QueryDbContext))]
         [Authorize(Policy = Policies.STORE_OR_PRODUCER)]
         [UsePaging]
         [UseFiltering]
         [UseSorting]
-        public IQueryable<Payout> GetAll([ScopedService] AppDbContext context)
+        public IQueryable<Payout> GetAll([ScopedService] QueryDbContext context)
         {
             SetLogTransaction();
             return context.Payouts

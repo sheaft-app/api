@@ -16,7 +16,7 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
         public void Configure(EntityTypeBuilder<Level> entity)
         {
             entity.Property(c => c.CreatedOn);
-            entity.Property(c => c.UpdatedOn).IsConcurrencyToken();
+            entity.Property(c => c.UpdatedOn);
             
             if(!_isAdmin)
                 entity.HasQueryFilter(p => !p.RemovedOn.HasValue);
@@ -24,9 +24,6 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
             entity.Property(o => o.Name).IsRequired();
 
             entity.HasMany(c => c.Rewards).WithOne(c => c.Level).HasForeignKey(c =>c.LevelId).OnDelete(DeleteBehavior.Cascade).IsRequired();
-
-            var rewards = entity.Metadata.FindNavigation(nameof(Level.Rewards));
-            rewards.SetPropertyAccessMode(PropertyAccessMode.Field);
 
             entity.HasKey(c =>c.Id);
             entity.ToTable("Levels");

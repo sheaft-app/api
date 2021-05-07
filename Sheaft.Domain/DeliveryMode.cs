@@ -10,9 +10,6 @@ namespace Sheaft.Domain
 {
     public class DeliveryMode : IEntity, IHasDomainEvent
     {
-        private List<DeliveryHours> _deliveryHours;
-        private List<DeliveryClosing> _closings;
-
         protected DeliveryMode()
         {
         }
@@ -31,6 +28,10 @@ namespace Sheaft.Domain
 
             SetDeliveryHours(openingHours);
             SetAvailability(available);
+
+            Closings = new List<DeliveryClosing>();
+            DeliveryHours = new List<DeliveryHours>();
+            
             DomainEvents = new List<DomainEvent>();
         }
 
@@ -49,12 +50,12 @@ namespace Sheaft.Domain
         public DeliveryAddress Address { get; private set; }
         public Guid ProducerId { get; private set; }
         public virtual Producer Producer { get; private set; }
-        public virtual IReadOnlyCollection<DeliveryHours> DeliveryHours => _deliveryHours?.AsReadOnly();
-        public virtual IReadOnlyCollection<DeliveryClosing> Closings => _closings?.AsReadOnly();
+        public virtual ICollection<DeliveryHours> DeliveryHours { get; private set; }
+        public virtual ICollection<DeliveryClosing> Closings  { get; private set; }
 
         public void SetDeliveryHours(IEnumerable<DeliveryHours> deliveryHours)
         {
-            _deliveryHours = deliveryHours.ToList();
+            DeliveryHours = deliveryHours.ToList();
         }
 
         public void SetLockOrderHoursBeforeDelivery(int? lockOrderHoursBeforeDelivery)
@@ -103,15 +104,12 @@ namespace Sheaft.Domain
             MaxPurchaseOrdersPerTimeSlot = maxPurchaseOrdersPerTimeSlot;
         }
 
-        public DeliveryClosing AddClosing(DateTimeOffset from, DateTimeOffset to, string reason = null)
+        public void AddClosing(DeliveryClosing closing)
         {
             if (Closings == null)
-                _closings = new List<DeliveryClosing>();
+                Closings = new List<DeliveryClosing>();
 
-            var closing = new DeliveryClosing(Guid.NewGuid(), from, to, reason);
-            _closings.Add(closing);
-
-            return closing;
+            Closings.Add(closing);
         }
 
         public void RemoveClosings(IEnumerable<Guid> ids)
@@ -122,13 +120,14 @@ namespace Sheaft.Domain
 
         public void RemoveClosing(Guid id)
         {
-            var closing = _closings.SingleOrDefault(r => r.Id == id);
+            var closing = Closings.SingleOrDefault(r => r.Id == id);
             if (closing == null)
                 throw SheaftException.NotFound();
 
-            _closings.Remove(closing);
+            Closings.Remove(closing);
         }
 
         public List<DomainEvent> DomainEvents { get; } = new List<DomainEvent>();
+        public byte[] RowVersion { get; private set; }
     }
 }

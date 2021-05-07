@@ -10,9 +10,6 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
         {
             entity.HasMany(c => c.Tags).WithOne().HasForeignKey(c=>c.ProducerId).OnDelete(DeleteBehavior.Cascade);
 
-            var businessTags = entity.Metadata.FindNavigation(nameof(Producer.Tags));
-            businessTags.SetPropertyAccessMode(PropertyAccessMode.Field);
-
             entity.Ignore(c => c.DomainEvents);
         }
     }

@@ -12,10 +12,10 @@ namespace Sheaft.GraphQL.DeliveryModes
 {
     public class DeliveryHoursByIdBatchDataLoader : BatchDataLoader<Guid, Domain.DeliveryHours>
     {
-        private readonly IDbContextFactory<AppDbContext> _contextFactory;
+        private readonly IDbContextFactory<QueryDbContext> _contextFactory;
 
         public DeliveryHoursByIdBatchDataLoader(
-            IDbContextFactory<AppDbContext> contextFactory,
+            IDbContextFactory<QueryDbContext> contextFactory,
             IBatchScheduler batchScheduler,
             DataLoaderOptions<Guid> options = null)
             : base(batchScheduler, options)

@@ -65,13 +65,13 @@ namespace Sheaft.GraphQL.Types.Outputs
 
             descriptor
                 .Field("creditedUser")
-                .UseDbContext<AppDbContext>()
+                .UseDbContext<QueryDbContext>()
                 .ResolveWith<DonationResolvers>(c => c.GetUser(default, default, default, default));
         }
 
         private class DonationResolvers
         {
-            public async Task<User> GetUser(Donation donation, [ScopedService] AppDbContext context,
+            public async Task<User> GetUser(Donation donation, [ScopedService] QueryDbContext context,
                 UsersByIdBatchDataLoader usersDataLoader, CancellationToken token)
             {
                 var userId = await context.Wallets

@@ -8,6 +8,6 @@ namespace Sheaft.Application.Interfaces.Business
 {
     public interface IDeliveryService
     {
-        Task<Result<bool>> ValidateCapedDeliveriesAsync(IReadOnlyCollection<OrderDelivery> orderDeliveries, CancellationToken token);
+        Task<Result<bool>> ValidateCapedDeliveriesAsync(ICollection<OrderDelivery> orderDeliveries, CancellationToken token);
     }
 }

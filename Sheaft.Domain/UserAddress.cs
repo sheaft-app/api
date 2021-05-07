@@ -30,7 +30,7 @@ namespace Sheaft.Domain
 
         public double? Longitude { get; private set; }
         public double? Latitude { get; private set; }
-        public Guid DepartmentId { get; set; }
+        public Guid DepartmentId { get; private set; }
         public Point Location { get; private set; }
         public virtual Department Department { get; private set; }
 
@@ -55,11 +55,6 @@ namespace Sheaft.Domain
                 return code.Substring(0, 2);
             
             return null;
-        }
-
-        public override string ToString()
-        {
-            return $"{Line1}\n{Line2}\n{Zipcode},{City}";
         }
     }
 }

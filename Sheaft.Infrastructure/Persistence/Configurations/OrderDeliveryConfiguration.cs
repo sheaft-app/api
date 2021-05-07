@@ -9,6 +9,7 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
         public void Configure(EntityTypeBuilder<OrderDelivery> entity)
         {
             entity.HasKey(c => c.Id);
+            entity.Property(c => c.RowVersion).IsRowVersion();
             entity.HasIndex(c => new {c.OrderId, c.DeliveryModeId}).IsUnique();
 
             entity.OwnsOne(c => c.ExpectedDelivery);

@@ -13,10 +13,10 @@ namespace Sheaft.GraphQL.Consumers
 {
     public class ConsumersByIdBatchDataLoader : BatchDataLoader<Guid, Consumer>
     {
-        private readonly IDbContextFactory<AppDbContext> _contextFactory;
+        private readonly IDbContextFactory<QueryDbContext> _contextFactory;
 
         public ConsumersByIdBatchDataLoader(
-            IDbContextFactory<AppDbContext> contextFactory,
+            IDbContextFactory<QueryDbContext> contextFactory,
             IBatchScheduler batchScheduler,
             DataLoaderOptions<Guid> options = null)
             : base(batchScheduler, options)

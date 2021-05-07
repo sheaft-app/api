@@ -24,9 +24,9 @@ namespace Sheaft.GraphQL.Withholdings
 
         [GraphQLName("withholding")]
         [GraphQLType(typeof(WithholdingType))]
-        [UseDbContext(typeof(AppDbContext))]
+        [UseDbContext(typeof(QueryDbContext))]
         [UseSingleOrDefault]
-        public IQueryable<Withholding> Get([ID] Guid id, [ScopedService] AppDbContext context)
+        public IQueryable<Withholding> Get([ID] Guid id, [ScopedService] QueryDbContext context)
         {
             SetLogTransaction(id);
             return context.Withholdings
@@ -35,11 +35,11 @@ namespace Sheaft.GraphQL.Withholdings
         
         [GraphQLName("withholdings")]
         [GraphQLType(typeof(ListType<WithholdingType>))]
-        [UseDbContext(typeof(AppDbContext))]
+        [UseDbContext(typeof(QueryDbContext))]
         [UsePaging]
         [UseFiltering]
         [UseSorting]
-        public IQueryable<Withholding> GetAll([ScopedService] AppDbContext context)
+        public IQueryable<Withholding> GetAll([ScopedService] QueryDbContext context)
         {
             SetLogTransaction();
             return context.Withholdings

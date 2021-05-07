@@ -21,6 +21,10 @@ namespace Sheaft.GraphQL.Types.Outputs
             descriptor
                 .Field(c => c.To)
                 .Name("to");
+            
+            descriptor
+                .Field("day")
+                .Resolve(c => c.Parent<ExpectedOrderDelivery>().ExpectedDeliveryDate.Day);
         }
     }
 }

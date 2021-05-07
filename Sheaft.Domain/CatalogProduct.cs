@@ -35,8 +35,9 @@ namespace Sheaft.Domain
         public decimal OnSalePricePerUnit { get; private set; }
         public Guid CatalogId { get; private set; }
         public Guid ProductId { get; private set; }
-        public virtual Product Product { get; }
-        public virtual Catalog Catalog { get; }
+        public virtual Product Product { get; private set; }
+        public virtual Catalog Catalog { get; private set; }
+        public byte[] RowVersion { get; private set; }
 
         public void SetWholeSalePricePerUnit(decimal newPrice)
         {

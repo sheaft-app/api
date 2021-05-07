@@ -97,7 +97,7 @@ namespace Sheaft.Mediatr.Order.Commands
                 var cartProducts = new List<Tuple<Domain.Product, Guid, int>>();
                 var deliveryIds = request.ProducersExpectedDeliveries.Select(p => p.DeliveryModeId);
                 var agreements = await _context.Agreements
-                    .Where(a => a.DeliveryId.HasValue && deliveryIds.Contains(a.DeliveryId.Value) && a.Status == AgreementStatus.Accepted)
+                    .Where(a => a.StoreId == request.UserId && a.DeliveryId.HasValue && deliveryIds.Contains(a.DeliveryId.Value) && a.Status == AgreementStatus.Accepted)
                     .ToListAsync(token);
 
                 Result<IEnumerable<Guid>> catalogResult = null;
@@ -203,7 +203,6 @@ namespace Sheaft.Mediatr.Order.Commands
                 if (purchaseOrderIds.Any(r => !r.Succeeded))
                     return Failure<IEnumerable<Guid>>(purchaseOrderIds.First(r => !r.Succeeded));
 
-                await _context.SaveChangesAsync(token);
                 await transaction.CommitAsync(token);
 
                 _mediatr.Post(new CreateUserPointsCommand(request.RequestUser)

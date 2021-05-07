@@ -10,8 +10,6 @@ namespace Sheaft.Domain
 {
     public class Document : IIdEntity, ITrackCreation, ITrackUpdate, IHasDomainEvent
     {
-        private List<Page> _pages;
-
         protected Document()
         {
         }
@@ -23,7 +21,7 @@ namespace Sheaft.Domain
             Kind = kind;
             Status = DocumentStatus.UnLocked;
 
-            _pages = new List<Page>();
+            Pages = new List<Page>();
             DomainEvents = new List<DomainEvent>();
         }
 
@@ -38,7 +36,7 @@ namespace Sheaft.Domain
         public string ResultCode { get; private set; }
         public string ResultMessage { get; private set; }
         public Guid LegalId { get; private set; }
-        public virtual IReadOnlyCollection<Page> Pages => _pages?.AsReadOnly();
+        public virtual ICollection<Page> Pages { get; private set; }
 
         public void SetIdentifier(string identifier)
         {
@@ -72,9 +70,9 @@ namespace Sheaft.Domain
         public void AddPage(Page page)
         {
             if (Pages == null)
-                _pages = new List<Page>();
+                Pages = new List<Page>();
 
-            _pages.Add(page);
+            Pages.Add(page);
         }
 
         public void SetProcessedOn(DateTimeOffset? processedOn)
@@ -104,9 +102,10 @@ namespace Sheaft.Domain
                 return;
 
             var page = Pages.FirstOrDefault(p => p.Id == pageId);
-            _pages.Remove(page);
+            Pages.Remove(page);
         }
 
         public List<DomainEvent> DomainEvents { get; } = new List<DomainEvent>();
+        public byte[] RowVersion { get; private set; }
     }
 }

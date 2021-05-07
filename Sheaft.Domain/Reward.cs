@@ -38,6 +38,7 @@ namespace Sheaft.Domain
         public virtual User Winner { get; private set; }
         public virtual Department Department { get; private set; }
         public virtual Level Level { get; private set; }
+        public byte[] RowVersion { get; private set; }
 
         public void SetName(string name)
         {

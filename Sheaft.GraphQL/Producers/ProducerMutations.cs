@@ -26,7 +26,7 @@ namespace Sheaft.GraphQL.Producers
         }
 
         [GraphQLName("registerProducer")]
-        [Authorize(Policy = Policies.UNREGISTERED)]
+        [Authorize(Policy = Policies.AUTHENTICATED)]
         [GraphQLType(typeof(ProducerType))]
         public async Task<Producer> RegisterProducerAsync(
             [GraphQLType(typeof(RegisterProducerInputType))] [GraphQLName("input")]

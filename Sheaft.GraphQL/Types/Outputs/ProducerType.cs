@@ -115,35 +115,35 @@ namespace Sheaft.GraphQL.Types.Outputs
             descriptor
                 .Field(c => c.Tags)
                 .Name("tags")
-                .UseDbContext<AppDbContext>()
+                .UseDbContext<QueryDbContext>()
                 .ResolveWith<ProducerResolvers>(c => c.GetTags(default!, default!, default!, default))
                 .Type<ListType<TagType>>();
 
             descriptor
                 .Field(c => c.Closings)
                 .Name("closings")
-                .UseDbContext<AppDbContext>()
+                .UseDbContext<QueryDbContext>()
                 .ResolveWith<ProducerResolvers>(c => c.GetClosings(default!, default!, default!, default))
                 .Type<ListType<BusinessClosingType>>();
 
             descriptor
                 .Field(c => c.Pictures)
                 .Name("pictures")
-                .UseDbContext<AppDbContext>()
+                .UseDbContext<QueryDbContext>()
                 .ResolveWith<ProducerResolvers>(c => c.GetPictures(default!, default!, default!, default))
                 .Type<ListType<ProfilePictureType>>();
             
             descriptor
                 .Field("agreement")
                 .Authorize(Policies.STORE)
-                .UseDbContext<AppDbContext>()
+                .UseDbContext<QueryDbContext>()
                 .ResolveWith<ProducerResolvers>(c => c.GetCurrentAgreement(default!, default!, default!, default!, default))
                 .Type<AgreementType>();
             
             descriptor
                 .Field("products")
                 .Authorize(Policies.STORE_OR_CONSUMER)
-                .UseDbContext<AppDbContext>()
+                .UseDbContext<QueryDbContext>()
                 .ResolveWith<ProducerResolvers>(c => c.GetProducts(default!, default!, default!, default, default!, default))
                 .Type<ListType<ProductType>>();
         }
@@ -151,7 +151,7 @@ namespace Sheaft.GraphQL.Types.Outputs
         private class ProducerResolvers
         {
             public async Task<IEnumerable<Product>> GetProducts(Producer producer, 
-                [ScopedService] AppDbContext context, 
+                [ScopedService] QueryDbContext context, 
                 [Service] ICurrentUserService currentUserService, 
                 [Service] IOptionsSnapshot<RoleOptions> roleOptions,
                 ProductsByIdBatchDataLoader productsDataLoader, CancellationToken token)
@@ -173,6 +173,7 @@ namespace Sheaft.GraphQL.Types.Outputs
                             .Where(c => c.StoreId == currentUser.Data.Id && c.ProducerId == producer.Id &&
                                         c.Catalog.Kind == CatalogKind.Stores && c.Status == AgreementStatus.Accepted)
                             .SelectMany(a => a.Catalog.Products)
+                            .Where(c => !c.Product.RemovedOn.HasValue)
                             .Select(c => c.ProductId)
                             .ToListAsync(token);
                     else
@@ -194,7 +195,7 @@ namespace Sheaft.GraphQL.Types.Outputs
             }
             
             public async Task<Agreement> GetCurrentAgreement(Producer producer, 
-                [ScopedService] AppDbContext context, [Service] ICurrentUserService currentUserService,
+                [ScopedService] QueryDbContext context, [Service] ICurrentUserService currentUserService,
                 AgreementsByIdBatchDataLoader agreementsDataLoader, CancellationToken token)
             {
                 var currentUser = currentUserService.GetCurrentUserInfo();
@@ -212,7 +213,7 @@ namespace Sheaft.GraphQL.Types.Outputs
                 return await agreementsDataLoader.LoadAsync(agreementId, token);
             }
             
-            public async Task<IEnumerable<Tag>> GetTags(Producer producer, [ScopedService] AppDbContext context,
+            public async Task<IEnumerable<Tag>> GetTags(Producer producer, [ScopedService] QueryDbContext context,
                 TagsByIdBatchDataLoader tagsDataLoader, CancellationToken token)
             {
                 var tagsId = await context.Set<ProducerTag>()
@@ -224,7 +225,7 @@ namespace Sheaft.GraphQL.Types.Outputs
             }
 
             public async Task<IEnumerable<BusinessClosing>> GetClosings(Producer producer,
-                [ScopedService] AppDbContext context,
+                [ScopedService] QueryDbContext context,
                 BusinessClosingsByIdBatchDataLoader closingsDataLoader, CancellationToken token)
             {
                 var closingsId = await context.Set<BusinessClosing>()
@@ -236,7 +237,7 @@ namespace Sheaft.GraphQL.Types.Outputs
             }
 
             public async Task<IEnumerable<ProfilePicture>> GetPictures(Producer producer,
-                [ScopedService] AppDbContext context,
+                [ScopedService] QueryDbContext context,
                 ProfilePicturesByIdBatchDataLoader picturesDataLoader, CancellationToken token)
             {
                 var picturesId = await context.Set<ProfilePicture>()

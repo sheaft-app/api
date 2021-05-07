@@ -2,10 +2,11 @@
 using Sheaft.Core.Enums;
 using Sheaft.Core.Exceptions;
 using Sheaft.Domain.Enum;
+using Sheaft.Domain.Interop;
 
 namespace Sheaft.Domain
 {
-    public class UserPoint
+    public class UserPoint: IIdEntity, ITrackCreation
     {
         protected UserPoint()
         {

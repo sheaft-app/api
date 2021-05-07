@@ -20,7 +20,8 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
             entity.Property(o => o.Debited).HasColumnType("decimal(10,2)");
 
             entity.Property(c => c.CreatedOn);
-            entity.Property(c => c.UpdatedOn).IsConcurrencyToken();
+            entity.Property(c => c.UpdatedOn);
+entity.Property(c => c.RowVersion).IsRowVersion();
             
             if(!_isAdmin)
                 entity.HasQueryFilter(p => !p.RemovedOn.HasValue);
@@ -32,12 +33,6 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
             entity.HasMany(c => c.Withholdings).WithOne(c => c.Payout).HasForeignKey(c =>c.PayoutId).OnDelete(DeleteBehavior.NoAction);
 
             entity.Ignore(c => c.DomainEvents);
-
-            var transfers = entity.Metadata.FindNavigation(nameof(Payout.Transfers));
-            transfers.SetPropertyAccessMode(PropertyAccessMode.Field);
-
-            var withholdings = entity.Metadata.FindNavigation(nameof(Payout.Withholdings));
-            withholdings.SetPropertyAccessMode(PropertyAccessMode.Field);
 
             entity.HasKey(c => c.Id);
             entity.HasIndex(c => c.Identifier);

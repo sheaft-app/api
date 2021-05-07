@@ -30,6 +30,7 @@ namespace Sheaft.Domain
         public bool IsActive { get; private set; }
         public Guid UserId { get; private set; }
         public virtual User User { get; private set; }
+        public byte[] RowVersion { get; private set; }
 
         public void SetIdentifier(string identifier)
         {

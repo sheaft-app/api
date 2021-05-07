@@ -8,7 +8,8 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
     {
         public void Configure(EntityTypeBuilder<PurchaseOrderProduct> entity)
         {
-            entity.Property(c => c.Quantity).IsConcurrencyToken();
+            entity.Property(c => c.Quantity);
+            entity.Property(c => c.RowVersion).IsRowVersion();
 
             entity.Property(o => o.TotalWholeSalePrice).HasColumnType("decimal(10,2)");
             entity.Property(o => o.TotalVatPrice).HasColumnType("decimal(10,2)");

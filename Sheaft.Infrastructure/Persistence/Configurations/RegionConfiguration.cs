@@ -8,7 +8,7 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
     {
         public void Configure(EntityTypeBuilder<Region> entity)
         {
-            entity.Property(c => c.UpdatedOn).IsConcurrencyToken();
+            entity.Property(c => c.UpdatedOn);
 
             entity.Property(c => c.Name).UseCollation("Latin1_general_CI_AI").IsRequired();
             entity.Property(c => c.Code).IsRequired();

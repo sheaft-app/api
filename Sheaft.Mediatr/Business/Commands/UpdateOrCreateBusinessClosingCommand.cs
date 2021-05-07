@@ -64,8 +64,13 @@ namespace Sheaft.Mediatr.BusinessClosing.Commands
             }
             else
             {
-                var result = entity.AddClosing(request.Closing.From, request.Closing.To, request.Closing.Reason);
-                closingId = result.Id;
+                var closing = new Domain.BusinessClosing(entity, Guid.NewGuid(), request.Closing.From,
+                    request.Closing.To, request.Closing.Reason);
+
+                await _context.AddAsync(closing, token);
+                
+                entity.AddClosing(closing);
+                closingId = closing.Id;
             }
 
             await _context.SaveChangesAsync(token);

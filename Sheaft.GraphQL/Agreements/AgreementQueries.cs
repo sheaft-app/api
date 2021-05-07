@@ -34,10 +34,10 @@ namespace Sheaft.GraphQL.Agreements
 
         [GraphQLName("agreement")]
         [GraphQLType(typeof(AgreementType))]
-        [UseDbContext(typeof(AppDbContext))]
+        [UseDbContext(typeof(QueryDbContext))]
         [Authorize(Policy = Policies.STORE_OR_PRODUCER)]
         [UseSingleOrDefault]
-        public IQueryable<Agreement> Get([ID] Guid id, [ScopedService] AppDbContext context)
+        public IQueryable<Agreement> Get([ID] Guid id, [ScopedService] QueryDbContext context)
         {
             SetLogTransaction(id);
             
@@ -58,12 +58,12 @@ namespace Sheaft.GraphQL.Agreements
         
         [GraphQLName("agreements")]
         [GraphQLType(typeof(ListType<AgreementType>))]
-        [UseDbContext(typeof(AppDbContext))]
+        [UseDbContext(typeof(QueryDbContext))]
         [Authorize(Policy = Policies.STORE_OR_PRODUCER)]
         [UsePaging]
         [UseFiltering]
         [UseSorting]
-        public IQueryable<Agreement> GetAll([ScopedService] AppDbContext context)
+        public IQueryable<Agreement> GetAll([ScopedService] QueryDbContext context)
         {
             SetLogTransaction();
             if (CurrentUser.IsInRole(_roleOptions.Store.Value))

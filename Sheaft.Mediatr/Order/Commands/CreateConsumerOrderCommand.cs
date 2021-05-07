@@ -65,14 +65,11 @@ namespace Sheaft.Mediatr.Order.Commands
 
         public async Task<Result<Guid>> Handle(CreateConsumerOrderCommand request, CancellationToken token)
         {
-            var productIds = request.Products.Select(p => p.Id);
-            var cartProductsResult = await _orderService.GetCartProductsAsync(productIds, request.Products, token);
+            var cartProductsResult = await _orderService.GetCartProductsAsync(request.Products, token);
             if (!cartProductsResult.Succeeded)
                 return Failure<Guid>(cartProductsResult);
 
-            var deliveryIds = request.ProducersExpectedDeliveries?.Select(p => p.DeliveryModeId) ?? new List<Guid>();
             var cartDeliveriesResult = await _orderService.GetCartDeliveriesAsync(request.ProducersExpectedDeliveries,
-                deliveryIds,
                 cartProductsResult.Data, token);
             if (!cartDeliveriesResult.Succeeded)
                 return Failure<Guid>(cartDeliveriesResult);
@@ -84,7 +81,6 @@ namespace Sheaft.Mediatr.Order.Commands
                 _pspOptions.FixedAmount,
                 _pspOptions.Percent, _pspOptions.VatPercent, user);
 
-            order.SetProducts(cartProductsResult.Data);
             order.SetDeliveries(cartDeliveriesResult.Data);
 
             await _context.AddAsync(order, token);

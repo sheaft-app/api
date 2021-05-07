@@ -40,6 +40,7 @@ namespace Sheaft.Domain
         public decimal OnSalePrice { get; private set; }
         public Guid ProducerId { get; private set; }
         public virtual Producer Producer { get; private set; }
+        public byte[] RowVersion { get; private set; }
 
         public void SetWholeSalePrice(decimal newPrice)
         {

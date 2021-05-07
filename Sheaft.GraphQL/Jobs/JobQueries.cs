@@ -31,10 +31,10 @@ namespace Sheaft.GraphQL.Jobs
 
         [GraphQLName("job")]
         [GraphQLType(typeof(JobType))]
-        [UseDbContext(typeof(AppDbContext))]
+        [UseDbContext(typeof(QueryDbContext))]
         [Authorize(Policy = Policies.REGISTERED)]
         [UseSingleOrDefault]
-        public IQueryable<Job> Get([ID] Guid id, [ScopedService] AppDbContext context)
+        public IQueryable<Job> Get([ID] Guid id, [ScopedService] QueryDbContext context)
         {
             SetLogTransaction(id);
             return context.Jobs
@@ -43,12 +43,12 @@ namespace Sheaft.GraphQL.Jobs
 
         [GraphQLName("jobs")]
         [GraphQLType(typeof(ListType<JobType>))]
-        [UseDbContext(typeof(AppDbContext))]
+        [UseDbContext(typeof(QueryDbContext))]
         [Authorize(Policy = Policies.REGISTERED)]
         [UsePaging]
         [UseFiltering]
         [UseSorting]
-        public IQueryable<Job> GetAll([ScopedService] AppDbContext context)
+        public IQueryable<Job> GetAll([ScopedService] QueryDbContext context)
         {
             SetLogTransaction();
             return context.Jobs
@@ -57,9 +57,9 @@ namespace Sheaft.GraphQL.Jobs
 
         [GraphQLName("hasPendingJobs")]
         [GraphQLType(typeof(BooleanType))]
-        [UseDbContext(typeof(AppDbContext))]
+        [UseDbContext(typeof(QueryDbContext))]
         [Authorize(Policy = Policies.REGISTERED)]
-        public async Task<bool> Get(IEnumerable<JobKind> kinds, [ScopedService] AppDbContext context, CancellationToken token)
+        public async Task<bool> Get(IEnumerable<JobKind> kinds, [ScopedService] QueryDbContext context, CancellationToken token)
         {
             if (kinds == null)
                 kinds = new List<JobKind>();

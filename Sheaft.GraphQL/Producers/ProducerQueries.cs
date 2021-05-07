@@ -47,9 +47,9 @@ namespace Sheaft.GraphQL.Producers
 
         [GraphQLName("producer")]
         [GraphQLType(typeof(ProducerType))]
-        [UseDbContext(typeof(AppDbContext))]
+        [UseDbContext(typeof(QueryDbContext))]
         [UseSingleOrDefault]
-        public IQueryable<Producer> Get([ID] Guid id, [ScopedService] AppDbContext context)
+        public IQueryable<Producer> Get([ID] Guid id, [ScopedService] QueryDbContext context)
         {
             SetLogTransaction(id);
             return context.Producers
@@ -57,12 +57,12 @@ namespace Sheaft.GraphQL.Producers
         }
 
         [GraphQLName("suggestProducers")]
-        [UseDbContext(typeof(AppDbContext))]
+        [UseDbContext(typeof(QueryDbContext))]
         [GraphQLType(typeof(ListType<ProducerType>))]
         public async Task<IEnumerable<Producer>> SuggestProducersAsync(
             [GraphQLType(typeof(SearchTermsInputType))] [GraphQLName("input")]
             SearchTermsDto terms,
-            [ScopedService] AppDbContext context, CancellationToken token)
+            [ScopedService] QueryDbContext context, CancellationToken token)
         {
             var query = context.Producers.Where(c => c.HasProducts);
             if (!string.IsNullOrWhiteSpace(terms.Text))
@@ -72,12 +72,12 @@ namespace Sheaft.GraphQL.Producers
         }
 
         [GraphQLName("searchProducers")]
-        [UseDbContext(typeof(AppDbContext))]
+        [UseDbContext(typeof(QueryDbContext))]
         [GraphQLType(typeof(ProducersSearchDtoType))]
         public async Task<ProducersSearchDto> SearchAsync(
             [GraphQLType(typeof(SearchTermsInputType))] [GraphQLName("input")]
             SearchTermsDto terms,
-            [ScopedService] AppDbContext context,
+            [ScopedService] QueryDbContext context,
             CancellationToken token)
         {
             var query = context.Catalogs
@@ -98,9 +98,9 @@ namespace Sheaft.GraphQL.Producers
                 query = query.Where(p => p.Producer.Address.Location.Distance(currentPosition) < 200000);
             }
 
-            var finalQuery = query.Select(c => c.Producer).Distinct();
+            var producersId = await query.Select(c => c.Producer.Id).Distinct().ToListAsync(token);
 
-            var count = await finalQuery.CountAsync(token);
+            var finalQuery = context.Producers.Where(p => producersId.Contains(p.Id));
 
             if (!string.IsNullOrWhiteSpace(terms.Sort))
             {
@@ -118,7 +118,7 @@ namespace Sheaft.GraphQL.Producers
             var results = await finalQuery.ToListAsync(token);
             return new ProducersSearchDto
             {
-                Count = count,
+                Count = producersId.Count,
                 Producers = results
             };
         }

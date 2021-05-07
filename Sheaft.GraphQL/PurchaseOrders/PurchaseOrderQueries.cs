@@ -33,10 +33,10 @@ namespace Sheaft.GraphQL.PurchaseOrders
 
         [GraphQLName("purchaseOrder")]
         [GraphQLType(typeof(PurchaseOrderType))]
-        [UseDbContext(typeof(AppDbContext))]
+        [UseDbContext(typeof(QueryDbContext))]
         [Authorize(Policy = Policies.REGISTERED)]
         [UseSingleOrDefault]
-        public IQueryable<PurchaseOrder> Get([ID] Guid id, [ScopedService] AppDbContext context)
+        public IQueryable<PurchaseOrder> Get([ID] Guid id, [ScopedService] QueryDbContext context)
         {
             SetLogTransaction(id);
             if (CurrentUser.IsInRole(_roleOptions.Producer.Value))
@@ -51,12 +51,12 @@ namespace Sheaft.GraphQL.PurchaseOrders
         
         [GraphQLName("purchaseOrders")]
         [GraphQLType(typeof(ListType<PurchaseOrderType>))]
-        [UseDbContext(typeof(AppDbContext))]
+        [UseDbContext(typeof(QueryDbContext))]
         [Authorize(Policy = Policies.REGISTERED)]
         [UsePaging]
         [UseFiltering]
         [UseSorting]
-        public IQueryable<PurchaseOrder> GetAll([ScopedService] AppDbContext context)
+        public IQueryable<PurchaseOrder> GetAll([ScopedService] QueryDbContext context)
         {
             SetLogTransaction();
             if (CurrentUser.IsInRole(_roleOptions.Producer.Value))

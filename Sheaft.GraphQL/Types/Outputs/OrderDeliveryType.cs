@@ -19,7 +19,7 @@ namespace Sheaft.GraphQL.Types.Outputs
 
             descriptor
                 .ImplementsNode()
-                .IdField(c => c.Id)
+                .IdField(c => c.DeliveryModeId)
                 .ResolveNode((ctx, id) =>
                     ctx.DataLoader<OrderDeliveriesByIdBatchDataLoader>().LoadAsync(id, ctx.RequestAborted));
             

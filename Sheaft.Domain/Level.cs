@@ -10,8 +10,6 @@ namespace Sheaft.Domain
 {
     public class Level : IEntity
     {
-        private List<Reward> _rewards;
-
         protected Level()
         {
         }
@@ -21,7 +19,8 @@ namespace Sheaft.Domain
 
             Id = id;
             RequiredPoints = requiredPoints;
-
+            Rewards = new List<Reward>();
+            
             SetName(name);
         }
 
@@ -31,14 +30,14 @@ namespace Sheaft.Domain
         public DateTimeOffset? RemovedOn { get; private set; }
         public string Name { get; private set; }
         public int RequiredPoints { get; private set; }
-        public virtual IReadOnlyCollection<Reward> Rewards => _rewards?.AsReadOnly();
+        public virtual ICollection<Reward> Rewards { get; private set; }
 
         public void SetRewards(IEnumerable<Reward> rewards)
         {
-            if (!Rewards.Any())
-                _rewards = new List<Reward>();
+            if (Rewards == null)
+                Rewards = new List<Reward>();
 
-            _rewards.Clear();
+            Rewards.Clear();
 
             if (rewards != null && rewards.Any())
                 AddRewards(rewards);
@@ -54,18 +53,15 @@ namespace Sheaft.Domain
 
         public void AddReward(Reward reward)
         {
-            if (!Rewards.Any())
-                _rewards = new List<Reward>();
+            if (Rewards == null)
+                Rewards = new List<Reward>();
 
-            _rewards.Add(reward);
+            Rewards.Add(reward);
         }
 
         public void RemoveReward(Reward reward)
         {
-            if (!Rewards.Any())
-                _rewards = new List<Reward>();
-
-            _rewards.Remove(reward);
+            Rewards.Remove(reward);
         }
 
         public void SetName(string name)

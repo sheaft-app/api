@@ -13,10 +13,10 @@ namespace Sheaft.GraphQL.Catalogs
 {
     public class CatalogsByIdBatchDataLoader : BatchDataLoader<Guid, Catalog>
     {
-        private readonly IDbContextFactory<AppDbContext> _contextFactory;
+        private readonly IDbContextFactory<QueryDbContext> _contextFactory;
 
         public CatalogsByIdBatchDataLoader(
-            IDbContextFactory<AppDbContext> contextFactory,
+            IDbContextFactory<QueryDbContext> contextFactory,
             IBatchScheduler batchScheduler,
             DataLoaderOptions<Guid> options = null)
             : base(batchScheduler, options)

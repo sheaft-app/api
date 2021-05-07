@@ -9,8 +9,6 @@ namespace Sheaft.Domain
 {
     public class Catalog : IEntity
     {
-        private List<CatalogProduct> _products;
-
         protected Catalog()
         {
         }
@@ -22,6 +20,7 @@ namespace Sheaft.Domain
             Kind = kind;
             Producer = producer;
             ProducerId = producer.Id;
+            Products = new List<CatalogProduct>();
         }
 
         public Guid Id { get; }
@@ -34,7 +33,8 @@ namespace Sheaft.Domain
         public bool IsDefault { get; private set; }
         public Guid ProducerId { get; private set; }
         public virtual Producer Producer { get; private set; }
-        public virtual IReadOnlyCollection<CatalogProduct> Products => _products?.AsReadOnly();
+        public virtual ICollection<CatalogProduct> Products { get; private set; }
+        public byte[] RowVersion { get; private set; }
 
         public void SetIsAvailable(bool isAvailable)
         {
@@ -51,24 +51,24 @@ namespace Sheaft.Domain
             if (Products == null)
                 throw SheaftException.NotFound();
 
-            var product = _products.SingleOrDefault(p => p.ProductId == productId);
+            var product = Products.SingleOrDefault(p => p.ProductId == productId);
             if (product == null)
                 throw SheaftException.NotFound();
 
-            _products.Remove(product);
+            Products.Remove(product);
             return product;
         }
 
         public void AddOrUpdateProduct(Product product, decimal wholeSalePrice)
         {
             if (Products == null)
-                _products = new List<CatalogProduct>();
+                Products = new List<CatalogProduct>();
 
-            var existingProductPrice = _products.SingleOrDefault(p => p.ProductId == product.Id);
+            var existingProductPrice = Products.SingleOrDefault(p => p.ProductId == product.Id);
             if (existingProductPrice != null)
                 existingProductPrice.SetWholeSalePricePerUnit(wholeSalePrice);
             else
-                _products.Add(new CatalogProduct(Guid.NewGuid(), product, this, wholeSalePrice));
+                Products.Add(new CatalogProduct(Guid.NewGuid(), product, this, wholeSalePrice));
         }
     }
 }

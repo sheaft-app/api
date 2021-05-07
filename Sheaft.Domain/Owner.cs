@@ -30,6 +30,7 @@ namespace Sheaft.Domain
         public CountryIsoCode Nationality { get; private set; }
         public CountryIsoCode CountryOfResidence { get; private set; }
         public OwnerAddress Address { get; private set; }
+        public byte[] RowVersion { get; private set; }
 
         public void SetEmail(string email)
         {

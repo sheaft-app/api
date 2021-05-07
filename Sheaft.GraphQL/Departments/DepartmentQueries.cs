@@ -24,9 +24,9 @@ namespace Sheaft.GraphQL.Departments
 
         [GraphQLName("department")]
         [GraphQLType(typeof(DepartmentType))]
-        [UseDbContext(typeof(AppDbContext))]
+        [UseDbContext(typeof(QueryDbContext))]
         [UseSingleOrDefault]
-        public IQueryable<Department> Get([ID] Guid id, [ScopedService] AppDbContext context)
+        public IQueryable<Department> Get([ID] Guid id, [ScopedService] QueryDbContext context)
         {
             SetLogTransaction(id);
             return context.Departments
@@ -35,11 +35,11 @@ namespace Sheaft.GraphQL.Departments
         
         [GraphQLName("departments")]
         [GraphQLType(typeof(ListType<DepartmentType>))]
-        [UseDbContext(typeof(AppDbContext))]
+        [UseDbContext(typeof(QueryDbContext))]
         [UsePaging]
         [UseFiltering]
         [UseSorting]
-        public IQueryable<Department> GetAll([ScopedService] AppDbContext context)
+        public IQueryable<Department> GetAll([ScopedService] QueryDbContext context)
         {
             SetLogTransaction();
             return context.Departments;

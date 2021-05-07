@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Linq;
 using Sheaft.Domain.Enum;
+using Sheaft.Domain.Interop;
 
 namespace Sheaft.Domain
 {
-    public abstract class ProductRow
+    public abstract class ProductRow: IIdEntity, ITrackCreation, ITrackUpdate
     {
         private const int DIGITS_COUNT = 2;
 
@@ -81,6 +82,8 @@ namespace Sheaft.Domain
         }
 
         public Guid Id { get; private set; }
+        public DateTimeOffset CreatedOn { get; private set; }
+        public DateTimeOffset? UpdatedOn { get; private set; }
         public string Name { get; private set; }
         public string Reference { get; private set; }
         public int Quantity { get; private set; }
@@ -106,6 +109,7 @@ namespace Sheaft.Domain
         public decimal TotalVatPrice { get; private set; }
         public decimal TotalOnSalePrice { get; private set; }
         public Guid ProductId { get; private set; }
+        public byte[] RowVersion { get; private set; }
 
         protected void RefreshLine()
         {

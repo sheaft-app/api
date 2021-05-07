@@ -29,10 +29,10 @@ namespace Sheaft.GraphQL.Notifications
 
         [GraphQLName("notification")]
         [GraphQLType(typeof(NotificationType))]
-        [UseDbContext(typeof(AppDbContext))]
+        [UseDbContext(typeof(QueryDbContext))]
         [Authorize(Policy = Policies.REGISTERED)]
         [UseSingleOrDefault]
-        public IQueryable<Notification> Get([ID] Guid id, [ScopedService] AppDbContext context)
+        public IQueryable<Notification> Get([ID] Guid id, [ScopedService] QueryDbContext context)
         {
             SetLogTransaction(id);
             return context.Notifications
@@ -41,12 +41,12 @@ namespace Sheaft.GraphQL.Notifications
 
         [GraphQLName("notifications")]
         [GraphQLType(typeof(ListType<NotificationType>))]
-        [UseDbContext(typeof(AppDbContext))]
+        [UseDbContext(typeof(QueryDbContext))]
         [Authorize(Policy = Policies.REGISTERED)]
         [UsePaging]
         [UseFiltering]
         [UseSorting]
-        public IQueryable<Notification> GetAll([ScopedService] AppDbContext context)
+        public IQueryable<Notification> GetAll([ScopedService] QueryDbContext context)
         {
             SetLogTransaction();
             return context.Notifications
@@ -55,9 +55,9 @@ namespace Sheaft.GraphQL.Notifications
 
         [GraphQLName("unreadNotificationsCount")]
         [GraphQLType(typeof(IntType))]
-        [UseDbContext(typeof(AppDbContext))]
+        [UseDbContext(typeof(QueryDbContext))]
         [Authorize(Policy = Policies.REGISTERED)]
-        public async Task<int> UnreadCount([ScopedService] AppDbContext context, CancellationToken token)
+        public async Task<int> UnreadCount([ScopedService] QueryDbContext context, CancellationToken token)
         {
             SetLogTransaction();
             return await context.Notifications

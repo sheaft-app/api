@@ -13,10 +13,10 @@ namespace Sheaft.GraphQL.Withholdings
 {
     public class WithholdingsByIdBatchDataLoader : BatchDataLoader<Guid, Withholding>
     {
-        private readonly IDbContextFactory<AppDbContext> _contextFactory;
+        private readonly IDbContextFactory<QueryDbContext> _contextFactory;
 
         public WithholdingsByIdBatchDataLoader(
-            IDbContextFactory<AppDbContext> contextFactory,
+            IDbContextFactory<QueryDbContext> contextFactory,
             IBatchScheduler batchScheduler,
             DataLoaderOptions<Guid> options = null)
             : base(batchScheduler, options)

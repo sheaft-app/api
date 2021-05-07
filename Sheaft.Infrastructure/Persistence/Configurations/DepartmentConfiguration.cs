@@ -9,7 +9,7 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
     {
         public void Configure(EntityTypeBuilder<Department> entity)
         {
-            entity.Property(c => c.UpdatedOn).IsConcurrencyToken();
+            entity.Property(c => c.UpdatedOn);
 
             entity.Property(c => c.Name).UseCollation("Latin1_general_CI_AI").IsRequired();
             entity.Property(c => c.Code).IsRequired();
@@ -19,8 +19,10 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
             entity.Property(c => c.Points).HasDefaultValue(0);
             entity.Property(c => c.Position).HasDefaultValue(0);
 
-            entity.HasOne(c => c.Region).WithMany().HasForeignKey(c =>c.RegionId).OnDelete(DeleteBehavior.Cascade).IsRequired();
-            entity.HasOne(c => c.Level).WithMany().HasForeignKey(c =>c.LevelId).OnDelete(DeleteBehavior.NoAction).IsRequired();
+            entity.HasOne(c => c.Region).WithMany().HasForeignKey(c => c.RegionId).OnDelete(DeleteBehavior.Cascade)
+                .IsRequired();
+            entity.HasOne(c => c.Level).WithMany().HasForeignKey(c => c.LevelId).OnDelete(DeleteBehavior.NoAction)
+                .IsRequired();
 
             entity.HasKey(c => c.Id);
 

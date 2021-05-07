@@ -75,13 +75,11 @@ namespace Sheaft.Mediatr.Order.Commands
                 entity.AssignToUser(user);
             }
 
-            var productIds = request.Products.Select(p => p.Id);
-            var cartProductsResult = await _orderService.GetCartProductsAsync(productIds, request.Products, token);
+            var cartProductsResult = await _orderService.GetCartProductsAsync(request.Products, token);
             if (!cartProductsResult.Succeeded)
                 return Failure<Guid>(cartProductsResult);
 
-            var deliveryIds = request.ProducersExpectedDeliveries?.Select(p => p.DeliveryModeId) ?? new List<Guid>();
-            var cartDeliveriesResult = await _orderService.GetCartDeliveriesAsync(request.ProducersExpectedDeliveries, deliveryIds,
+            var cartDeliveriesResult = await _orderService.GetCartDeliveriesAsync(request.ProducersExpectedDeliveries,
                 cartProductsResult.Data, token);
             if (!cartDeliveriesResult.Succeeded)
                 return Failure<Guid>(cartDeliveriesResult);

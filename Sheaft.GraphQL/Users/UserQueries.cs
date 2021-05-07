@@ -48,9 +48,9 @@ namespace Sheaft.GraphQL.Users
 
         [GraphQLName("me")]
         [GraphQLType(typeof(UserType))]
-        [UseDbContext(typeof(AppDbContext))]
+        [UseDbContext(typeof(QueryDbContext))]
         [UseSingleOrDefault]
-        public IQueryable<User> Get([ScopedService] AppDbContext context)
+        public IQueryable<User> Get([ScopedService] QueryDbContext context)
         {
             SetLogTransaction(CurrentUser.Id);
             
@@ -84,7 +84,7 @@ namespace Sheaft.GraphQL.Users
 
         [GraphQLName("siretInfo")]
         [GraphQLType(typeof(SirenBusinessDtoType))]
-        [UseDbContext(typeof(AppDbContext))]
+        [UseDbContext(typeof(QueryDbContext))]
         [UseSingleOrDefault]
         public async Task<SirenBusinessDto> RetrieveSiretInfosAsync(string siret, CancellationToken token)
         {

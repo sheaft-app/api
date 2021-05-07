@@ -104,7 +104,7 @@ namespace Sheaft.GraphQL.Types.Outputs
             descriptor
                 .Field(c => c.Legal)
                 .Name("legals")
-                .UseDbContext<AppDbContext>()
+                .UseDbContext<QueryDbContext>()
                 .ResolveWith<ConsumerProfileResolvers>(c => c.GetLegals(default!, default!, default!, default))
                 .Type<ListType<ConsumerLegalType>>();
         }
@@ -112,7 +112,7 @@ namespace Sheaft.GraphQL.Types.Outputs
         private class ConsumerProfileResolvers
         {
             public async Task<ConsumerLegal> GetLegals(Consumer consumer,
-                [ScopedService] AppDbContext context,
+                [ScopedService] QueryDbContext context,
                 ConsumerLegalsByIdBatchDataLoader consumerLegalsDataLoader, CancellationToken token)
             {
                 var legalId = await context.Legals.OfType<ConsumerLegal>()

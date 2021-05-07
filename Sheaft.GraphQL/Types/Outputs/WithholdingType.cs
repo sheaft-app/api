@@ -64,14 +64,14 @@ namespace Sheaft.GraphQL.Types.Outputs
 
             descriptor
                 .Field("creditedUser")
-                .UseDbContext<AppDbContext>()
+                .UseDbContext<QueryDbContext>()
                 .ResolveWith<WithholdingResolvers>(c => c.GetUser(default, default, default, default))
                 .Type<NonNullType<UserType>>();
         }
 
         private class WithholdingResolvers
         {
-            public async Task<User> GetUser(Withholding withholding, [ScopedService] AppDbContext context,
+            public async Task<User> GetUser(Withholding withholding, [ScopedService] QueryDbContext context,
                 UsersByIdBatchDataLoader usersDataLoader, CancellationToken token)
             {
                 var userId = await context.Wallets

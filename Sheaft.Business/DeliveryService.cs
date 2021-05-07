@@ -26,7 +26,7 @@ namespace Sheaft.Business
             _tableService = tableService;
         }
 
-        public async Task<Result<bool>> ValidateCapedDeliveriesAsync(IReadOnlyCollection<OrderDelivery> orderDeliveries, CancellationToken token)
+        public async Task<Result<bool>> ValidateCapedDeliveriesAsync(ICollection<OrderDelivery> orderDeliveries, CancellationToken token)
         {
             if (orderDeliveries.All(d => !d.DeliveryMode.MaxPurchaseOrdersPerTimeSlot.HasValue))
                 return Success(true);

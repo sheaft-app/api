@@ -45,9 +45,9 @@ namespace Sheaft.GraphQL.Stores
 
         [GraphQLName("store")]
         [GraphQLType(typeof(StoreType))]
-        [UseDbContext(typeof(AppDbContext))]
+        [UseDbContext(typeof(QueryDbContext))]
         [UseSingleOrDefault]
-        public IQueryable<Store> Get([ID] Guid id, [ScopedService] AppDbContext context)
+        public IQueryable<Store> Get([ID] Guid id, [ScopedService] QueryDbContext context)
         {
             SetLogTransaction(id);
             return context.Stores
@@ -55,12 +55,12 @@ namespace Sheaft.GraphQL.Stores
         }
 
         [GraphQLName("suggestStores")]
-        [UseDbContext(typeof(AppDbContext))]
+        [UseDbContext(typeof(QueryDbContext))]
         [GraphQLType(typeof(ListType<UserType>))]
         public async Task<IEnumerable<User>> SuggestStoresAsync(
             [GraphQLType(typeof(SearchTermsInputType))] [GraphQLName("input")]
             SearchTermsDto terms,
-            [ScopedService] AppDbContext context, CancellationToken token)
+            [ScopedService] QueryDbContext context, CancellationToken token)
         {
             var query = context.Stores.AsQueryable();
             if (!string.IsNullOrWhiteSpace(terms.Text))
@@ -70,12 +70,12 @@ namespace Sheaft.GraphQL.Stores
         }
 
         [GraphQLName("searchStores")]
-        [UseDbContext(typeof(AppDbContext))]
+        [UseDbContext(typeof(QueryDbContext))]
         [GraphQLType(typeof(StoresSearchDtoType))]
         public async Task<StoresSearchDto> SearchAsync(
             [GraphQLType(typeof(SearchTermsInputType))] [GraphQLName("input")]
             SearchTermsDto terms,
-            [ScopedService] AppDbContext context,
+            [ScopedService] QueryDbContext context,
             CancellationToken token)
         {
             var query = context.Stores.AsQueryable();

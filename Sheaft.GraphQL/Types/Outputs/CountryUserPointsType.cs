@@ -20,13 +20,13 @@ namespace Sheaft.GraphQL.Types.Outputs
 
             descriptor
                 .Field("user")
-                .UseDbContext<AppDbContext>()
+                .UseDbContext<QueryDbContext>()
                 .ResolveWith<CountryUserResolvers>(c => c.GetUser(default, default, default));
         }
 
         private class CountryUserResolvers
         {
-            public Task<User> GetUser(CountryUserPointsDto countryUser, [ScopedService] AppDbContext context,
+            public Task<User> GetUser(CountryUserPointsDto countryUser, [ScopedService] QueryDbContext context,
                 CancellationToken token)
             {
                 return context.Users.SingleOrDefaultAsync(u => u.Id == countryUser.UserId, token);

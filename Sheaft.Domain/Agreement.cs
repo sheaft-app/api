@@ -55,6 +55,7 @@ namespace Sheaft.Domain
         public virtual Producer Producer { get; private set; }
         public virtual Catalog Catalog { get; private set; }
         public List<DomainEvent> DomainEvents { get; } = new List<DomainEvent>();
+        public byte[] RowVersion { get; private set; }
 
         public void AcceptAgreement(DeliveryMode delivery, ProfileKind acceptedByKind)
         {
