@@ -26,11 +26,11 @@ namespace Sheaft.Domain
             Producer = producer;
             ProducerId = producer.Id;
 
-            SetDeliveryHours(openingHours);
-            SetAvailability(available);
-
             Closings = new List<DeliveryClosing>();
             DeliveryHours = new List<DeliveryHours>();
+            
+            SetDeliveryHours(openingHours);
+            SetAvailability(available);
             
             DomainEvents = new List<DomainEvent>();
         }
@@ -55,6 +55,9 @@ namespace Sheaft.Domain
 
         public void SetDeliveryHours(IEnumerable<DeliveryHours> deliveryHours)
         {
+            if (DeliveryHours == null)
+                DeliveryHours = new List<DeliveryHours>();
+            
             DeliveryHours = deliveryHours.ToList();
         }
 

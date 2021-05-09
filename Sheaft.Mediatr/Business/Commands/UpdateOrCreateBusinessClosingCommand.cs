@@ -28,10 +28,17 @@ namespace Sheaft.Mediatr.BusinessClosing.Commands
         [JsonConstructor]
         public UpdateOrCreateBusinessClosingCommand(RequestUser requestUser) : base(requestUser)
         {
+            UserId = requestUser.Id;
         }
 
         public Guid UserId { get; set; }
         public ClosingInputDto Closing { get; set; }
+
+        public override void SetRequestUser(RequestUser user)
+        {
+            base.SetRequestUser(user);
+            UserId = user.Id;
+        }
     }
 
     public class UpdateOrCreateBusinessClosingCommandHandler : CommandsHandler,

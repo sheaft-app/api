@@ -135,14 +135,14 @@ namespace Sheaft.GraphQL.Types.Outputs
             
             descriptor
                 .Field("agreement")
-                .Authorize(Policies.STORE)
+                .Authorize(Policies.STORE_OR_PRODUCER)
                 .UseDbContext<QueryDbContext>()
                 .ResolveWith<ProducerResolvers>(c => c.GetCurrentAgreement(default!, default!, default!, default!, default))
                 .Type<AgreementType>();
             
             descriptor
                 .Field("products")
-                .Authorize(Policies.STORE_OR_CONSUMER)
+                .Authorize(Policies.REGISTERED)
                 .UseDbContext<QueryDbContext>()
                 .ResolveWith<ProducerResolvers>(c => c.GetProducts(default!, default!, default!, default, default!, default))
                 .Type<ListType<ProductType>>();
