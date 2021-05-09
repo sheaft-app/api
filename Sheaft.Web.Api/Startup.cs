@@ -253,6 +253,7 @@ namespace Sheaft.Web.Api
                 options.UseSqlServer(databaseConfig.ConnectionString, x =>
                 {
                     x.UseNetTopologySuite();
+                    x.CommandTimeout(60);
                     x.MigrationsHistoryTable("AppMigrationTable", "ef");
                 });
             });
@@ -400,88 +401,95 @@ namespace Sheaft.Web.Api
 
             using (var serviceScope = app.ApplicationServices.GetRequiredService<IServiceScopeFactory>().CreateScope())
             {
-                var context = serviceScope.ServiceProvider.GetRequiredService<IAppDbContext>();
+                var contextFactory = serviceScope.ServiceProvider.GetRequiredService<IDbContextFactory<QueryDbContext>>();
+                var context = contextFactory.CreateDbContext();
+                
                 if (!context.AllMigrationsApplied())
                 {
-                    context.Migrate();
+                    context.Database.Migrate();
                 }
 
-                var adminId = configuration.GetValue<Guid>("Users:admin:id");
-                var admin = context.Users.FirstOrDefault(u => u.Id == adminId);
-                if (admin == null)
+                if (configuration.GetValue<bool?>("InsertDevData") ?? true)
                 {
-                    var firstname = configuration.GetValue<string>("Users:admin:firstname");
-                    var lastname = configuration.GetValue<string>("Users:admin:lastname");
-                    var email = configuration.GetValue<string>("Users:admin:email");
+                    var adminId = configuration.GetValue<Guid>("Users:admin:id");
+                    var admin = context.Users.FirstOrDefault(u => u.Id == adminId);
+                    if (admin == null)
+                    {
+                        var firstname = configuration.GetValue<string>("Users:admin:firstname");
+                        var lastname = configuration.GetValue<string>("Users:admin:lastname");
+                        var email = configuration.GetValue<string>("Users:admin:email");
 
-                    admin = new Admin(adminId, $"{firstname} {lastname}", firstname, lastname, email);
-                    admin.SetIdentifier(configuration.GetValue<string>("Psp:UserId"));
-                    context.Add(admin);
-                    context.SaveChanges();
-                }
+                        admin = new Admin(adminId, $"{firstname} {lastname}", firstname, lastname, email);
+                        admin.SetIdentifier(configuration.GetValue<string>("Psp:UserId"));
+                        context.Add(admin);
+                        context.SaveChanges();
+                    }
 
-                var donationWalletId = configuration.GetValue<string>("Psp:WalletId");
-                if (context.Wallets.FirstOrDefault(u => u.Identifier == donationWalletId) == null)
-                {
-                    var donationWallet = new Wallet(Guid.NewGuid(), "Donation", WalletKind.Donations, admin);
-                    donationWallet.SetIdentifier(donationWalletId);
-                    context.Add(donationWallet);
-                    context.SaveChanges();
-                }
+                    var donationWalletId = configuration.GetValue<string>("Psp:WalletId");
+                    if (context.Wallets.FirstOrDefault(u => u.Identifier == donationWalletId) == null)
+                    {
+                        var donationWallet = new Wallet(Guid.NewGuid(), "Donation", WalletKind.Donations, admin);
+                        donationWallet.SetIdentifier(donationWalletId);
+                        context.Add(donationWallet);
+                        context.SaveChanges();
+                    }
 
-                var documentWalletId = configuration.GetValue<string>("Psp:DocumentWalletId");
-                if (context.Wallets.FirstOrDefault(u => u.Identifier == documentWalletId) == null)
-                {
-                    var documentWallet = new Wallet(Guid.NewGuid(), "Document", WalletKind.Documents, admin);
-                    documentWallet.SetIdentifier(documentWalletId);
-                    context.Add(documentWallet);
-                    context.SaveChanges();
-                }
+                    var documentWalletId = configuration.GetValue<string>("Psp:DocumentWalletId");
+                    if (context.Wallets.FirstOrDefault(u => u.Identifier == documentWalletId) == null)
+                    {
+                        var documentWallet = new Wallet(Guid.NewGuid(), "Document", WalletKind.Documents, admin);
+                        documentWallet.SetIdentifier(documentWalletId);
+                        context.Add(documentWallet);
+                        context.SaveChanges();
+                    }
 
-                if (context.BankAccounts.FirstOrDefault(c => c.UserId == admin.Id) == null)
-                {
-                    var bankAccount = new BankAccount(Guid.NewGuid(), "Dons", "Sheaft", configuration.GetValue<string>("Psp:Bank:Iban"), configuration.GetValue<string>("Psp:Bank:Bic"),
-                        new BankAddress(
-                            configuration.GetValue<string>("Psp:Bank:Address:Line1"),
-                            configuration.GetValue<string>("Psp:Bank:Address:Line2"),
-                            configuration.GetValue<string>("Psp:Bank:Address:Zipcode"),
-                            configuration.GetValue<string>("Psp:Bank:Address:City"),
-                            configuration.GetValue<CountryIsoCode>("Psp:Bank:Address:Country")), admin);
+                    if (context.BankAccounts.FirstOrDefault(c => c.UserId == admin.Id) == null)
+                    {
+                        var bankAccount = new BankAccount(Guid.NewGuid(), "Dons", "Sheaft",
+                            configuration.GetValue<string>("Psp:Bank:Iban"),
+                            configuration.GetValue<string>("Psp:Bank:Bic"),
+                            new BankAddress(
+                                configuration.GetValue<string>("Psp:Bank:Address:Line1"),
+                                configuration.GetValue<string>("Psp:Bank:Address:Line2"),
+                                configuration.GetValue<string>("Psp:Bank:Address:Zipcode"),
+                                configuration.GetValue<string>("Psp:Bank:Address:City"),
+                                configuration.GetValue<CountryIsoCode>("Psp:Bank:Address:Country")), admin);
 
-                    bankAccount.SetIdentifier(configuration.GetValue<string>("Psp:Bank:Id"));
-                    context.Add(bankAccount);
-                    context.SaveChanges();
-                }
+                        bankAccount.SetIdentifier(configuration.GetValue<string>("Psp:Bank:Id"));
+                        context.Add(bankAccount);
+                        context.SaveChanges();
+                    }
 
-                var supportId = configuration.GetValue<Guid>("Users:support:id");
-                if (context.Users.FirstOrDefault(u => u.Id == supportId) == null)
-                {
-                    var firstname = configuration.GetValue<string>("Users:support:firstname");
-                    var lastname = configuration.GetValue<string>("Users:support:lastname");
-                    var email = configuration.GetValue<string>("Users:support:email");
+                    var supportId = configuration.GetValue<Guid>("Users:support:id");
+                    if (context.Users.FirstOrDefault(u => u.Id == supportId) == null)
+                    {
+                        var firstname = configuration.GetValue<string>("Users:support:firstname");
+                        var lastname = configuration.GetValue<string>("Users:support:lastname");
+                        var email = configuration.GetValue<string>("Users:support:email");
 
-                    context.Add(new Support(supportId, $"{firstname} {lastname}", firstname, lastname, email));
-                    context.SaveChanges();
-                }
+                        context.Add(new Support(supportId, $"{firstname} {lastname}", firstname, lastname, email));
+                        context.SaveChanges();
+                    }
 
-                var settingsEnum = Enum.GetValues(typeof(SettingKind)).Cast<SettingKind>().ToList();
-                var settings = context.Settings.ToList();
-                var missingSettings = settingsEnum.Except(settings.Select(s => s.Kind));
-                foreach (var missingSetting in missingSettings)
-                {
-                    context.Add(new Setting(Guid.NewGuid(), missingSetting.ToString("G"), missingSetting));
-                    context.SaveChanges();
-                }
-                
-                var removedSettings = settings.Select(s => s.Kind).Except(settingsEnum);
-                foreach (var removedSetting in removedSettings)
-                {
-                    var setting = settings.FirstOrDefault(s => s.Kind == removedSetting);
-                    if (setting == null)
-                        continue;
-                    
-                    context.Remove(setting);
-                    context.SaveChanges();
+                    var settingsEnum = Enum.GetValues(typeof(SettingKind)).Cast<SettingKind>().ToList();
+                    var settings = context.Settings.ToList();
+                    var missingSettings = settingsEnum.Except(settings.Select(s => s.Kind));
+                    foreach (var missingSetting in missingSettings)
+                    {
+                        context.Add(new Setting(Guid.NewGuid(), missingSetting.ToString("G"), missingSetting));
+                        context.SaveChanges();
+                    }
+
+                    var removedSettings = settings.Select(s => s.Kind).Except(settingsEnum);
+                    foreach (var removedSetting in removedSettings)
+                    {
+                        var setting = settings.FirstOrDefault(s => s.Kind == removedSetting);
+                        if (setting == null)
+                            continue;
+
+                        context.Remove(setting);
+                        context.SaveChanges();
+                    }
                 }
             }
 
