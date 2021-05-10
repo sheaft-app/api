@@ -13,7 +13,6 @@ using Sheaft.Application.Security;
 using Sheaft.Domain;
 using Sheaft.GraphQL.Types.Inputs;
 using Sheaft.GraphQL.Types.Outputs;
-using Sheaft.Mediatr.DeliveryClosing.Commands;
 using Sheaft.Mediatr.DeliveryMode.Commands;
 
 namespace Sheaft.GraphQL.DeliveryModes

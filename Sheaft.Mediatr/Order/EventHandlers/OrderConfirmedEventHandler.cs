@@ -10,6 +10,7 @@ using Sheaft.Application.Interfaces.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Domain.Events.Order;
+using Sheaft.Mailing.Extensions;
 
 namespace Sheaft.Mediatr.Order.EventHandlers
 {

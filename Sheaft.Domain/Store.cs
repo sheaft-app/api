@@ -30,7 +30,7 @@ namespace Sheaft.Domain
             if (openingHours == null)
                 return;
 
-            if (OpeningHours == null)
+            if (OpeningHours == null || OpeningHours.Any())
                 OpeningHours = new List<OpeningHours>();
 
             OpeningHours = openingHours.ToList();
@@ -41,7 +41,7 @@ namespace Sheaft.Domain
             if (tags == null)
                 return;
 
-            if (Tags == null)
+            if (Tags == null || Tags.Any())
                 Tags = new List<StoreTag>();
 
             Tags = tags.Select(t => new StoreTag(t)).ToList();

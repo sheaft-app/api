@@ -7,15 +7,13 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using Sheaft.Application.Extensions;
 using Sheaft.Application.Interfaces.Infrastructure;
-using Microsoft.EntityFrameworkCore;
 using Sheaft.Application.Interfaces.Mediatr;
 using Sheaft.Application.Models;
 using Sheaft.Core;
 using Sheaft.Domain;
 
-namespace Sheaft.Mediatr.DeliveryClosing.Commands
+namespace Sheaft.Mediatr.DeliveryMode.Commands
 {
     public class UpdateOrCreateDeliveryClosingsCommand : Command<IEnumerable<Guid>>
     {

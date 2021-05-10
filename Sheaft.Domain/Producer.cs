@@ -30,7 +30,7 @@ namespace Sheaft.Domain
             if (tags == null)
                 return;
 
-            if (Tags == null)
+            if (Tags == null || Tags.Any())
                 Tags = new List<ProducerTag>();
 
             Tags = tags.Select(t => new ProducerTag(t)).ToList();

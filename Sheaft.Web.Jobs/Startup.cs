@@ -3,11 +3,9 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
-using System.Reflection;
 using System.Threading;
 using Amazon;
 using Amazon.SimpleEmail;
-using AutoMapper;
 using Hangfire;
 using Hangfire.Dashboard;
 using Hangfire.SqlServer;
@@ -28,11 +26,10 @@ using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Logging;
 using NewRelic.LogEnrichers.Serilog;
 using Newtonsoft.Json;
-using RazorLight;
+using Razor.Templating.Core;
 using Serilog;
 using Serilog.Events;
 using Sheaft.Application.Behaviours;
-using Sheaft.Application.Interfaces;
 using Sheaft.Application.Interfaces.Business;
 using Sheaft.Application.Interfaces.Factories;
 using Sheaft.Application.Interfaces.Infrastructure;
@@ -220,14 +217,6 @@ namespace Sheaft.Web.Jobs
             var mailerConfig = mailerSettings.Get<MailerOptions>();
             services.AddScoped<IAmazonSimpleEmailService, AmazonSimpleEmailServiceClient>(_ => new AmazonSimpleEmailServiceClient(mailerConfig.ApiId, mailerConfig.ApiKey, RegionEndpoint.EUCentral1));
 
-            services.AddScoped<IRazorLightEngine>(_ => {
-                var rootDir = System.IO.Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-                return new RazorLightEngineBuilder()
-                .UseFileSystemProject($"{rootDir.Replace("file:\\", string.Empty).Replace("file:", string.Empty)}/Mailings/Templates")
-                .UseMemoryCachingProvider()
-                .Build();
-            });
-
             services.AddScoped<IIdentifierService, IdentifierService>();
             services.AddScoped<IBlobService, BlobService>();
             services.AddScoped<IEmailService, EmailService>();
@@ -334,6 +323,7 @@ namespace Sheaft.Web.Jobs
                 config.AddSerilog(dispose: true);
             });
 
+            services.AddRazorTemplating();
             services.AddHangfireServer();
             services.AddMvc();
         }
@@ -371,6 +361,7 @@ namespace Sheaft.Web.Jobs
             });
 
             RecuringJobs.Register(routineOptions.Value);
+            RazorTemplateEngine.Initialize();
         }
     }
 

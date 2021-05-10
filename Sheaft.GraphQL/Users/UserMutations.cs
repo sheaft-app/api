@@ -10,7 +10,6 @@ using Sheaft.Application.Security;
 using Sheaft.Domain;
 using Sheaft.GraphQL.Types.Inputs;
 using Sheaft.GraphQL.Types.Outputs;
-using Sheaft.Mediatr.ProfileInformation.Commands;
 using Sheaft.Mediatr.User.Commands;
 
 namespace Sheaft.GraphQL.Users

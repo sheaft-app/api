@@ -1,7 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Drawing;
-using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -9,13 +7,7 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using OfficeOpenXml;
-using OfficeOpenXml.Style;
-using Sheaft.Application.Extensions;
-using Sheaft.Application.Interfaces;
 using Sheaft.Application.Interfaces.Factories;
-using Sheaft.Application.Interfaces.Infrastructure;
-using Microsoft.EntityFrameworkCore;
 using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Application.Interfaces.Mediatr;
 using Sheaft.Core;
@@ -24,7 +16,7 @@ using Sheaft.Domain.Events.PickingOrder;
 using Sheaft.Mediatr.Job.Commands;
 using Sheaft.Mediatr.PurchaseOrder.Commands;
 
-namespace Sheaft.Mediatr.PickingOrders.Commands
+namespace Sheaft.Mediatr.PickingOrder.Commands
 {
     public class ExportPickingOrderCommand : Command
     {

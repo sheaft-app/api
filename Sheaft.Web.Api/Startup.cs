@@ -22,7 +22,6 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Logging;
 using NewRelic.LogEnrichers.Serilog;
 using Newtonsoft.Json;
-using RazorLight;
 using Serilog;
 using Serilog.Events;
 using Sheaft.Infrastructure.Persistence;
@@ -35,7 +34,7 @@ using System.Globalization;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Reflection;
-using HotChocolate.Types;
+using Razor.Templating.Core;
 using Sheaft.Application.Behaviours;
 using Sheaft.Application.Interfaces.Business;
 using Sheaft.Application.Interfaces.Factories;
@@ -304,14 +303,6 @@ namespace Sheaft.Web.Api
             var mailerConfig = mailerSettings.Get<MailerOptions>();
             services.AddScoped<IAmazonSimpleEmailService, AmazonSimpleEmailServiceClient>(_ => new AmazonSimpleEmailServiceClient(mailerConfig.ApiId, mailerConfig.ApiKey, RegionEndpoint.EUCentral1));
 
-            services.AddScoped<IRazorLightEngine>(_ => {
-                var rootDir = System.IO.Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-                return new RazorLightEngineBuilder()
-                .UseFileSystemProject($"{rootDir.Replace("file:\\", string.Empty).Replace("file:", string.Empty)}/Mailings/Templates")
-                .UseMemoryCachingProvider()
-                .Build();
-            });
-
             var storageConfig = storageSettings.Get<StorageOptions>();
             services.AddSingleton<CloudStorageAccount>(CloudStorageAccount.Parse(storageConfig.ConnectionString));
             
@@ -384,6 +375,7 @@ namespace Sheaft.Web.Api
                 });
             });
 
+            services.AddRazorTemplating();
             services.AddMvc(option => option.EnableEndpointRouting = true);
         }
 
@@ -515,6 +507,8 @@ namespace Sheaft.Web.Api
                 endpoints.MapGraphQL()
                     .RequireAuthorization(Policies.ANONYMOUS_OR_CONNECTED);
             });
+            
+            RazorTemplateEngine.Initialize();
         }
     }
 }

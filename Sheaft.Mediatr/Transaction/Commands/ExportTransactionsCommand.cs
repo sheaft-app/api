@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -9,23 +6,17 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using OfficeOpenXml;
-using Sheaft.Application.Extensions;
-using Sheaft.Application.Interfaces;
 using Sheaft.Application.Interfaces.Factories;
-using Sheaft.Application.Interfaces.Infrastructure;
-using Microsoft.EntityFrameworkCore;
 using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Application.Interfaces.Mediatr;
 using Sheaft.Core;
 using Sheaft.Core.Enums;
-using Sheaft.Core.Exceptions;
 using Sheaft.Domain;
 using Sheaft.Domain.Enum;
 using Sheaft.Domain.Events.Transactions;
 using Sheaft.Mediatr.Job.Commands;
 
-namespace Sheaft.Mediatr.Transactions.Commands
+namespace Sheaft.Mediatr.Transaction.Commands
 {
     public class ExportTransactionsCommand : Command
     {
@@ -76,7 +67,7 @@ namespace Sheaft.Mediatr.Transactions.Commands
 
                 _mediatr.Post(new TransactionsExportProcessingEvent(job.Id));
 
-                var transactionsQuery = _context.Set<Transaction>().Where(o =>
+                var transactionsQuery = _context.Set<Domain.Transaction>().Where(o =>
                     o.AuthorId == request.RequestUser.Id
                     && o.Status == TransactionStatus.Succeeded
                     && o.ExecutedOn.HasValue && o.ExecutedOn.Value >= request.From

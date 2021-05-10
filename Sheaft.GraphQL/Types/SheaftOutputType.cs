@@ -1,13 +1,6 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Security.Claims;
-using HotChocolate.Resolvers;
-using HotChocolate.Types;
-using Microsoft.AspNetCore.Http;
-using Sheaft.Application.Extensions;
-using Sheaft.Domain;
+﻿using HotChocolate.Types;
 
-namespace Sheaft.GraphQL.Types.Outputs
+namespace Sheaft.GraphQL.Types
 {
     public abstract class SheaftOutputType<T> : ObjectType<T>
     {

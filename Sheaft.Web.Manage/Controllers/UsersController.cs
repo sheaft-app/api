@@ -17,7 +17,7 @@ using Sheaft.Domain;
 using Sheaft.Domain.Enum;
 using Sheaft.Infrastructure.Persistence;
 using Sheaft.Mediatr.Setting.Commands;
-using Sheaft.Mediatr.UserSetting.Commands;
+using Sheaft.Mediatr.User.Commands;
 using Sheaft.Options;
 using Sheaft.Web.Manage.Models;
 

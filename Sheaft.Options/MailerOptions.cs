@@ -7,6 +7,7 @@
         public string ApiKey { get; set; }
         public MailerUser Sender { get; set; }
         public string Bounces { get; set; }
+        public bool SkipSending { get; set; } = false;
     }
 
     public class MailerUser

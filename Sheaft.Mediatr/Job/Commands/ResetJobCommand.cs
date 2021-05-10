@@ -14,9 +14,9 @@ using Sheaft.Core;
 using Sheaft.Core.Exceptions;
 using Sheaft.Domain;
 using Sheaft.Domain.Enum;
-using Sheaft.Mediatr.PickingOrders.Commands;
+using Sheaft.Mediatr.PickingOrder.Commands;
 using Sheaft.Mediatr.Product.Commands;
-using Sheaft.Mediatr.Transactions.Commands;
+using Sheaft.Mediatr.Transaction.Commands;
 using Sheaft.Mediatr.User.Commands;
 
 namespace Sheaft.Mediatr.Job.Commands

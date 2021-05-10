@@ -10,7 +10,7 @@ using Sheaft.Domain;
 using Sheaft.GraphQL.Types.Outputs;
 using Sheaft.Infrastructure.Persistence;
 
-namespace Sheaft.GraphQL.Users
+namespace Sheaft.GraphQL.Profiles
 {
     [ExtendObjectType(Name = "Query")]
     public class ProfileQueries : SheaftQuery

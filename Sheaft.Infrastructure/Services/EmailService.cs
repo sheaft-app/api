@@ -5,7 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Amazon.SimpleEmail;
 using Amazon.SimpleEmail.Model;
-using RazorLight;
+using Razor.Templating.Core;
 using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Application.Services;
 using Sheaft.Core;
@@ -17,18 +17,15 @@ namespace Sheaft.Infrastructure.Services
 {
     public class EmailService : SheaftService, IEmailService
     {
-        private readonly IRazorLightEngine _templateEngine;
         private readonly IAmazonSimpleEmailService _mailer;
         private readonly MailerOptions _mailerOptions;
 
         public EmailService(
-            IRazorLightEngine templateEngine,
             IOptionsSnapshot<MailerOptions> mailerOptions,
-            ILogger<EmailService> logger,
-            IAmazonSimpleEmailService mailer)
+            IAmazonSimpleEmailService mailer,
+            ILogger<EmailService> logger)
             : base(logger)
         {
-            _templateEngine = templateEngine;
             _mailerOptions = mailerOptions.Value;
             _mailer = mailer;
         }
@@ -49,12 +46,15 @@ namespace Sheaft.Infrastructure.Services
                 Subject = new Content(subject)
             };
 
-            var content = await _templateEngine.CompileRenderAsync($"{templateId}.cshtml", data);
+            var content = await RazorTemplateEngine.RenderAsync($"~/Templates/{templateId}.cshtml", data);
             if (isHtml)
                 msg.Message.Body = new Body {Html = new Content(content)};
             else
                 msg.Message.Body = new Body {Text = new Content(content)};
 
+            if (_mailerOptions.SkipSending)
+                return Success();
+            
             var response = await _mailer.SendEmailAsync(msg, token);
             if ((int) response.HttpStatusCode >= 400)
                 return Failure(MessageKind.EmailProvider_SendEmail_Failure,
@@ -84,6 +84,9 @@ namespace Sheaft.Infrastructure.Services
                 else
                     msg.Message.Body = new Body {Text = new Content(content)};
 
+                if (_mailerOptions.SkipSending)
+                    return Success();
+                
                 var response = await _mailer.SendEmailAsync(msg, token);
                 if ((int) response.HttpStatusCode >= 400)
                     return Failure(MessageKind.EmailProvider_SendEmail_Failure,

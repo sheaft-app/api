@@ -15,7 +15,7 @@ using Sheaft.Core.Enums;
 using Sheaft.Core.Exceptions;
 using Sheaft.Domain;
 using Sheaft.Domain.Enum;
-using Sheaft.Mediatr.Transactions.Commands;
+using Sheaft.Mediatr.Transaction.Commands;
 
 namespace Sheaft.Mediatr.PurchaseOrder.Commands
 {

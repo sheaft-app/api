@@ -20,7 +20,6 @@ using Sheaft.Domain;
 using Sheaft.Domain.Enum;
 using Sheaft.Application.Interfaces.Infrastructure;
 using Microsoft.EntityFrameworkCore;
-using Sheaft.Mediatr.DeliveryClosing.Commands;
 using Sheaft.Mediatr.Producer.Commands;
 
 namespace Sheaft.Mediatr.DeliveryMode.Commands

@@ -2,14 +2,10 @@
 using System.Threading.Tasks;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using Sheaft.Application.Extensions;
-using Sheaft.Application.Interfaces;
-using Sheaft.Application.Interfaces.Infrastructure;
-using Microsoft.EntityFrameworkCore;
 using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Domain.Events.Transactions;
 
-namespace Sheaft.Mediatr.Transactions.EventHandlers
+namespace Sheaft.Mediatr.Transaction.EventHandlers
 {
     public class TransactionsExportProcessingEventHandler : EventsHandler,
         INotificationHandler<DomainEventNotification<TransactionsExportProcessingEvent>>

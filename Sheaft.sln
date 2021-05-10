@@ -54,6 +54,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sheaft.Core", "Sheaft.Core\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sheaft.Business", "Sheaft.Business\Sheaft.Business.csproj", "{F06B3458-4413-480D-9EFF-194815E0DFAB}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sheaft.Mailing", "Sheaft.Mailing\Sheaft.Mailing.csproj", "{E01D58A0-877B-4F67-B20B-7C726BFF1CC3}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -132,6 +134,10 @@ Global
 		{F06B3458-4413-480D-9EFF-194815E0DFAB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F06B3458-4413-480D-9EFF-194815E0DFAB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F06B3458-4413-480D-9EFF-194815E0DFAB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E01D58A0-877B-4F67-B20B-7C726BFF1CC3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E01D58A0-877B-4F67-B20B-7C726BFF1CC3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E01D58A0-877B-4F67-B20B-7C726BFF1CC3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E01D58A0-877B-4F67-B20B-7C726BFF1CC3}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

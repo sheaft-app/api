@@ -13,7 +13,7 @@ using Sheaft.Application.Security;
 using Sheaft.Domain;
 using Sheaft.GraphQL.Types.Inputs;
 using Sheaft.GraphQL.Types.Outputs;
-using Sheaft.Mediatr.BusinessClosing.Commands;
+using Sheaft.Mediatr.Business.Commands;
 using Sheaft.Mediatr.Legal.Commands;
 
 namespace Sheaft.GraphQL.Business

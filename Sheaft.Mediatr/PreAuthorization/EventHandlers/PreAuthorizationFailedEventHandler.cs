@@ -7,9 +7,10 @@ using Sheaft.Application.Extensions;
 using Sheaft.Application.Interfaces.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Sheaft.Application.Interfaces.Infrastructure;
-using Sheaft.Application.Mailings;
 using Sheaft.Domain.Enum;
 using Sheaft.Domain.Events.Agreement;
+using Sheaft.Domain.Events.PreAuthorization;
+using Sheaft.Mailing;
 
 namespace Sheaft.Mediatr.PreAuthorization.EventHandlers
 {

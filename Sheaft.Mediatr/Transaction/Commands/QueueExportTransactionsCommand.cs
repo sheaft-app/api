@@ -5,18 +5,14 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using Sheaft.Application.Extensions;
-using Sheaft.Application.Interfaces;
 using Sheaft.Application.Interfaces.Infrastructure;
-using Microsoft.EntityFrameworkCore;
 using Sheaft.Application.Interfaces.Mediatr;
 using Sheaft.Core;
 using Sheaft.Core.Enums;
-using Sheaft.Core.Exceptions;
 using Sheaft.Domain;
 using Sheaft.Domain.Enum;
 
-namespace Sheaft.Mediatr.Transactions.Commands
+namespace Sheaft.Mediatr.Transaction.Commands
 {
     public class QueueExportTransactionsCommand : Command<Guid>
     {

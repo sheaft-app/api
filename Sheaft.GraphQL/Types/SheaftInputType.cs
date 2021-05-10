@@ -1,6 +1,6 @@
 ﻿using HotChocolate.Types;
 
-namespace Sheaft.GraphQL.Types.Inputs
+namespace Sheaft.GraphQL.Types
 {
     public abstract class SheaftInputType<T> : InputObjectType<T>
     {

@@ -12,9 +12,9 @@ using Sheaft.Domain;
 using Sheaft.GraphQL.Jobs;
 using Sheaft.GraphQL.Types.Inputs;
 using Sheaft.GraphQL.Types.Outputs;
-using Sheaft.Mediatr.PickingOrders.Commands;
+using Sheaft.Mediatr.PickingOrder.Commands;
 using Sheaft.Mediatr.PurchaseOrder.Commands;
-using Sheaft.Mediatr.Transactions.Commands;
+using Sheaft.Mediatr.Transaction.Commands;
 using Sheaft.Mediatr.User.Commands;
 
 namespace Sheaft.GraphQL.Exports

@@ -6,18 +6,14 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using Sheaft.Application.Extensions;
-using Sheaft.Application.Interfaces.Infrastructure;
-using Microsoft.EntityFrameworkCore;
 using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Application.Interfaces.Mediatr;
 using Sheaft.Core;
 using Sheaft.Core.Enums;
 using Sheaft.Domain;
 using Sheaft.Domain.Enum;
-using Sheaft.Mediatr.Donation.Commands;
 
-namespace Sheaft.Mediatr.PreAuthorizedPayin.Commands
+namespace Sheaft.Mediatr.Payin.Commands
 {
     public class CreatePreAuthorizedPayinCommand : Command<Guid>
     {

@@ -16,13 +16,11 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Sheaft.Infrastructure.Persistence;
-using Microsoft.EntityFrameworkCore;
 using Sheaft.Infrastructure.Services;
 using Microsoft.Azure.Search;
 using Hangfire;
 using Newtonsoft.Json;
 using Amazon.SimpleEmail;
-using RazorLight;
 using Amazon;
 using MediatR;
 using Serilog;
@@ -164,14 +162,6 @@ namespace Sheaft.Web.Manage
             var mailerConfig = mailerSettings.Get<MailerOptions>();
             services.AddScoped<IAmazonSimpleEmailService, AmazonSimpleEmailServiceClient>(_ => new AmazonSimpleEmailServiceClient(mailerConfig.ApiId, mailerConfig.ApiKey, RegionEndpoint.EUCentral1));
 
-            services.AddScoped<IRazorLightEngine>(_ => {
-                var rootDir = System.IO.Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-                return new RazorLightEngineBuilder()
-                .UseFileSystemProject($"{rootDir.Replace("file:\\", string.Empty).Replace("file:", string.Empty)}/Mailings/Templates")
-                .UseMemoryCachingProvider()
-                .Build();
-            });
-
             var authConfig = authSettings.Get<AuthOptions>();
 
             JwtSecurityTokenHandler.DefaultMapInboundClaims = false;
@@ -289,6 +279,7 @@ namespace Sheaft.Web.Manage
                     opts.SupportedUICultures = supportedCultures;
                 });
 
+            services.AddRazorTemplating();
             services.AddLogging(config =>
             {
                 config.AddSerilog(dispose: true);

@@ -11,6 +11,7 @@ using Microsoft.EntityFrameworkCore;
 using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Domain.Enum;
 using Sheaft.Domain.Events.Agreement;
+using Sheaft.Mailing.Extensions;
 
 namespace Sheaft.Mediatr.Agreement.EventHandlers
 {
@@ -58,13 +59,13 @@ namespace Sheaft.Mediatr.Agreement.EventHandlers
             }
 
             var eventName = nameof(AgreementAcceptedEvent).Replace("Event", $"{subEventName}Event");
-            await _signalrService.SendNotificationToGroupAsync(id, eventName, agreement.GetNotificationContent(_configuration, targetName));
+            await _signalrService.SendNotificationToGroupAsync(id, eventName, agreement.GetNotificationContent(_configuration.GetValue<string>("Portal:url"), targetName));
             await _emailService.SendTemplatedEmailAsync(
                 email,
                 name,
                 $"{targetName} a accepté de commercer avec vous",
                 nameof(AgreementAcceptedEvent),
-                agreement.GetNotificationData(_configuration, targetName),
+                agreement.GetNotificationData(_configuration.GetValue<string>("Portal:url"), targetName),
                 true,
                 token);
         }

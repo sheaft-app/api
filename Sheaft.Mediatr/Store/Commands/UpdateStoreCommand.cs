@@ -20,7 +20,6 @@ using Sheaft.Core.Exceptions;
 using Sheaft.Domain;
 using Sheaft.Domain.Enum;
 using Sheaft.Mediatr.Auth.Commands;
-using Sheaft.Mediatr.BusinessClosing.Commands;
 using Sheaft.Mediatr.User.Commands;
 using Sheaft.Options;
 

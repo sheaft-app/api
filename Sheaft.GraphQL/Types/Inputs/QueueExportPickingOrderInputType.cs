@@ -1,7 +1,7 @@
 ﻿using HotChocolate.Types;
 using Sheaft.Application.Models;
 using Sheaft.Domain;
-using Sheaft.Mediatr.PickingOrders.Commands;
+using Sheaft.Mediatr.PickingOrder.Commands;
 
 namespace Sheaft.GraphQL.Types.Inputs
 {

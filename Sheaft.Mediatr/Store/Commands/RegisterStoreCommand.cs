@@ -18,7 +18,6 @@ using Sheaft.Core.Enums;
 using Sheaft.Domain;
 using Sheaft.Mediatr.Auth.Commands;
 using Sheaft.Mediatr.Legal.Commands;
-using Sheaft.Mediatr.Sponsor.Commands;
 using Sheaft.Mediatr.User.Commands;
 using Sheaft.Options;
 

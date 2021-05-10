@@ -5,6 +5,7 @@ using HotChocolate.Execution.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Sheaft.GraphQL;
+using Sheaft.GraphQL.Types;
 using Sheaft.GraphQL.Types.Outputs;
 
 namespace Sheaft.Web.Api.Extensions
