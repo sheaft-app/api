@@ -9,6 +9,8 @@ using Newtonsoft.Json;
 using Sheaft.Application.Extensions;
 using Sheaft.Application.Interfaces;
 using Sheaft.Application.Interfaces.Infrastructure;
+using Microsoft.EntityFrameworkCore;
+using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Application.Interfaces.Mediatr;
 using Sheaft.Core;
 using Sheaft.Domain;
@@ -53,7 +55,7 @@ namespace Sheaft.Mediatr.PurchaseOrder.Commands
         {
             var producer = await _context.Producers.SingleAsync(e => e.Id == request.ProducerId, token);
             var order = await _context.Orders.SingleAsync(e => e.Id == request.OrderId, token);
-            var delivery = order.Deliveries.FirstOrDefault(d => d.DeliveryMode.Producer.Id == producer.Id);
+            var delivery = order.Deliveries.FirstOrDefault(d => d.DeliveryMode.ProducerId == producer.Id);
 
             var resultIdentifier =
                 await _identifierService.GetNextPurchaseOrderReferenceAsync(request.ProducerId, token);
@@ -62,9 +64,9 @@ namespace Sheaft.Mediatr.PurchaseOrder.Commands
 
             var purchaseOrder = order.AddPurchaseOrder(resultIdentifier.Data, producer);
             await _context.SaveChangesAsync(token);
-
+            
             if (delivery.DeliveryMode.MaxPurchaseOrdersPerTimeSlot.HasValue)
-                await _tableService.IncreaseProducerDeliveryCountAsync(producer.Id, delivery.Id,
+                await _tableService.IncreaseProducerDeliveryCountAsync(producer.Id, delivery.DeliveryModeId,
                     purchaseOrder.ExpectedDelivery.ExpectedDeliveryDate, purchaseOrder.ExpectedDelivery.From,
                     purchaseOrder.ExpectedDelivery.To, delivery.DeliveryMode.MaxPurchaseOrdersPerTimeSlot.Value, token);
 

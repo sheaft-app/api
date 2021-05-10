@@ -19,7 +19,7 @@
     {
         @Html.AntiForgeryToken()
         @Html.ValidationSummary(true, "", new { @class = "text-danger" })
-        @Html.HiddenFor(model => model.Owner.Id)
+        @Html.HiddenFor(model => model.UserId)
         <br />
 
         <div class="row">
@@ -125,7 +125,7 @@
         </div>
 
         <br />
-        <a asp-controller="Users" asp-action="Edit" asp-route-id="@Model.Owner.Id" class="btn btn-light">
+        <a asp-controller="Users" asp-action="Edit" asp-route-id="@Model.UserId" class="btn btn-light">
             Cancel
         </a>
         <button type="submit" class="btn btn-success">

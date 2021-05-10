@@ -5,6 +5,8 @@ using Microsoft.EntityFrameworkCore;
 using Sheaft.Application.Extensions;
 using Sheaft.Application.Interfaces;
 using Sheaft.Application.Interfaces.Infrastructure;
+using Microsoft.EntityFrameworkCore;
+using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Domain.Events.PurchaseOrder;
 
 namespace Sheaft.Mediatr.PurchaseOrder.EventHandlers
@@ -25,7 +27,7 @@ namespace Sheaft.Mediatr.PurchaseOrder.EventHandlers
         {
             var orderEvent = notification.DomainEvent;
             var purchaseOrder = await _context.PurchaseOrders.SingleAsync(e => e.Id == orderEvent.PurchaseOrderId, token);
-            await _signalrService.SendNotificationToUserAsync(purchaseOrder.Sender.Id,
+            await _signalrService.SendNotificationToUserAsync(purchaseOrder.ClientId,
                 nameof(PurchaseOrderProcessingEvent), purchaseOrder.GetPurchaseNotifModelAsString());
         }
     }

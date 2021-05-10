@@ -8,6 +8,7 @@ using Newtonsoft.Json;
 using Sheaft.Application.Extensions;
 using Sheaft.Application.Interfaces;
 using Sheaft.Application.Interfaces.Infrastructure;
+using Microsoft.EntityFrameworkCore;
 using Sheaft.Application.Interfaces.Mediatr;
 using Sheaft.Core;
 using Sheaft.Domain;
@@ -44,7 +45,7 @@ namespace Sheaft.Mediatr.Producer.Commands
         {
             var producer = await _context.Producers.SingleAsync(e => e.Id == request.ProducerId, token);            
             producer.CanDirectSell = await _context.DeliveryModes.AnyAsync(
-                c => !c.RemovedOn.HasValue && c.Producer.Id == producer.Id &&
+                c => !c.RemovedOn.HasValue && c.ProducerId == producer.Id &&
                      (c.Kind == DeliveryKind.Collective || c.Kind == DeliveryKind.Farm ||
                       c.Kind == DeliveryKind.Market), token);
             

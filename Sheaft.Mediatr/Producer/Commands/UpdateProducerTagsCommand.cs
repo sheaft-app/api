@@ -9,6 +9,7 @@ using Newtonsoft.Json;
 using Sheaft.Application.Extensions;
 using Sheaft.Application.Interfaces;
 using Sheaft.Application.Interfaces.Infrastructure;
+using Microsoft.EntityFrameworkCore;
 using Sheaft.Application.Interfaces.Mediatr;
 using Sheaft.Core;
 using Sheaft.Domain;
@@ -44,7 +45,7 @@ namespace Sheaft.Mediatr.Producer.Commands
         {
             var producer = await _context.Producers.SingleAsync(e => e.Id == request.ProducerId, token);
 
-            var productTags = await _context.Products.Where(p => p.Producer.Id == producer.Id).SelectMany(p => p.Tags)
+            var productTags = await _context.Products.Where(p => p.ProducerId == producer.Id).SelectMany(p => p.Tags)
                 .Select(p => p.Tag).Distinct().ToListAsync(token);
             producer.SetTags(productTags);
 

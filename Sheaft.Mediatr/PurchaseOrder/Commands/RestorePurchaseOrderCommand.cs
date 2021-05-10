@@ -7,6 +7,7 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Sheaft.Application.Interfaces;
 using Sheaft.Application.Interfaces.Infrastructure;
+using Microsoft.EntityFrameworkCore;
 using Sheaft.Application.Interfaces.Mediatr;
 using Sheaft.Core;
 using Sheaft.Core.Exceptions;
@@ -44,7 +45,7 @@ namespace Sheaft.Mediatr.PurchaseOrder.Commands
             var purchaseOrder =
                 await _context.PurchaseOrders.SingleOrDefaultAsync(a => a.Id == request.PurchaseOrderId && a.RemovedOn.HasValue,
                     token);
-            if(purchaseOrder.Vendor.Id != request.RequestUser.Id && purchaseOrder.Sender.Id != request.RequestUser.Id)
+            if(purchaseOrder.ProducerId != request.RequestUser.Id && purchaseOrder.ClientId != request.RequestUser.Id)
                 throw SheaftException.Forbidden();
 
             _context.Restore(purchaseOrder);

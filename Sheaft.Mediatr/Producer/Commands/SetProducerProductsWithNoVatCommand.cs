@@ -9,6 +9,7 @@ using Newtonsoft.Json;
 using Sheaft.Application.Extensions;
 using Sheaft.Application.Interfaces;
 using Sheaft.Application.Interfaces.Infrastructure;
+using Microsoft.EntityFrameworkCore;
 using Sheaft.Application.Interfaces.Mediatr;
 using Sheaft.Core;
 using Sheaft.Core.Enums;
@@ -48,7 +49,7 @@ namespace Sheaft.Mediatr.Producer.Commands
                 return Failure(MessageKind.BadRequest);
 
             var products = await _context.Products
-                .Where(p => p.Producer.Id == producer.Id)
+                .Where(p => p.ProducerId == producer.Id)
                 .ToListAsync(token);
             
             foreach (var product in products)

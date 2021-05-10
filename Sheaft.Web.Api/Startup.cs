@@ -2,10 +2,6 @@
 using Amazon.SimpleEmail;
 using AspNetCoreRateLimit;
 using Hangfire;
-using HotChocolate;
-using HotChocolate.AspNetCore;
-using HotChocolate.Execution.Configuration;
-using HotChocolate.Types;
 using IdentityModel;
 using MangoPay.SDK;
 using MediatR;
@@ -29,7 +25,6 @@ using Newtonsoft.Json;
 using RazorLight;
 using Serilog;
 using Serilog.Events;
-using Sheaft.GraphQL.Types;
 using Sheaft.Infrastructure.Persistence;
 using Sheaft.Infrastructure.Services;
 using Sheaft.Web.Api.Authorize;
@@ -40,12 +35,12 @@ using System.Globalization;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Reflection;
+using HotChocolate.Types;
 using Sheaft.Application.Behaviours;
 using Sheaft.Application.Interfaces.Business;
 using Sheaft.Application.Interfaces.Factories;
 using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Application.Interfaces.Mediatr;
-using Sheaft.Application.Interfaces.Queries;
 using Sheaft.Application.Mappings;
 using Sheaft.Application.Security;
 using Sheaft.Business;
@@ -56,43 +51,11 @@ using Sheaft.Business.PurchaseOrdersExporters;
 using Sheaft.Business.TransactionsExporters;
 using Sheaft.Domain;
 using Sheaft.Domain.Enum;
-using Sheaft.GraphQL.Common;
-using Sheaft.GraphQL.Types.Outputs;
+using Sheaft.GraphQL;
 using Sheaft.Infrastructure.Persistence.Extensions;
 using Sheaft.Mediatr;
-using Sheaft.Mediatr.Agreement.Queries;
-using Sheaft.Mediatr.BusinessClosing.Queries;
-using Sheaft.Mediatr.Card.Queries;
-using Sheaft.Mediatr.Catalog.Queries;
-using Sheaft.Mediatr.Consumer.Queries;
-using Sheaft.Mediatr.Country.Queries;
-using Sheaft.Mediatr.DeliveryClosing.Queries;
-using Sheaft.Mediatr.DeliveryMode.Queries;
-using Sheaft.Mediatr.Department.Queries;
-using Sheaft.Mediatr.Document.Queries;
-using Sheaft.Mediatr.Donation.Queries;
-using Sheaft.Mediatr.Job.Queries;
-using Sheaft.Mediatr.Leaderboard.Queries;
-using Sheaft.Mediatr.Legal.Queries;
-using Sheaft.Mediatr.Nationality.Queries;
-using Sheaft.Mediatr.Notification.Queries;
-using Sheaft.Mediatr.Order.Queries;
-using Sheaft.Mediatr.Payin.Queries;
-using Sheaft.Mediatr.Payout.Queries;
-using Sheaft.Mediatr.PreAuthorization.Queries;
-using Sheaft.Mediatr.Producer.Queries;
 using Sheaft.Mediatr.Product.Commands;
-using Sheaft.Mediatr.Product.Queries;
-using Sheaft.Mediatr.PurchaseOrder.Queries;
-using Sheaft.Mediatr.QuickOrder.Queries;
-using Sheaft.Mediatr.Region.Queries;
-using Sheaft.Mediatr.Returnable.Queries;
 using Sheaft.Mediatr.Store.Commands;
-using Sheaft.Mediatr.Store.Queries;
-using Sheaft.Mediatr.Tag.Queries;
-using Sheaft.Mediatr.Transfer.Queries;
-using Sheaft.Mediatr.User.Queries;
-using Sheaft.Mediatr.Withholding.Queries;
 using Sheaft.Options;
 using Sheaft.Web.Api.Extensions;
 
@@ -222,8 +185,10 @@ namespace Sheaft.Web.Api
                 });
                 options.AddPolicy(Policies.ANONYMOUS_OR_CONNECTED, builder =>
                 {
-                    builder.RequireAssertion(c => !c.User.Identity.IsAuthenticated || c.User.Identity.IsAuthenticated);
+                    builder.RequireAssertion(c => c.User.Identity is not {IsAuthenticated: true} || c.User.Identity.IsAuthenticated);
                 });
+                
+                options.DefaultPolicy = options.GetPolicy(Policies.ANONYMOUS_OR_CONNECTED);
             });
 
             services.Configure<KestrelServerOptions>(options => options.AllowSynchronousIO = true);
@@ -282,7 +247,18 @@ namespace Sheaft.Web.Api
             services.AddHttpClient();
 
             var databaseConfig = appDatabaseSettings.Get<AppDatabaseOptions>();
-            services.AddDbContext<IAppDbContext, AppDbContext>(options =>
+            services.AddPooledDbContextFactory<QueryDbContext>(options =>
+            {
+                options.UseLazyLoadingProxies();
+                options.UseSqlServer(databaseConfig.ConnectionString, x =>
+                {
+                    x.UseNetTopologySuite();
+                    x.CommandTimeout(60);
+                    x.MigrationsHistoryTable("AppMigrationTable", "ef");
+                });
+            });
+
+            services.AddDbContext<IAppDbContext, WriterDbContext>(options =>
             {
                 options.UseLazyLoadingProxies();
                 options.UseSqlServer(databaseConfig.ConnectionString, x =>
@@ -290,7 +266,7 @@ namespace Sheaft.Web.Api
                     x.UseNetTopologySuite();
                     x.MigrationsHistoryTable("AppMigrationTable", "ef");
                 });
-            }, ServiceLifetime.Scoped);
+            });
 
             services.AddScoped<IIdentifierService, IdentifierService>();
             services.AddScoped<IBlobService, BlobService>();
@@ -300,7 +276,12 @@ namespace Sheaft.Web.Api
             services.AddScoped<IPspService, PspService>();
             services.AddScoped<ITableService, TableService>();
             services.AddScoped<IAuthService, AuthService>();
+            
+            services.AddScoped<ISheaftMediatr, SheaftMediatr>();
+            services.AddScoped<ISheaftDispatcher, SheaftDispatcher>();
+            
             services.AddSingleton<ICurrentUserService, CurrentUserService>();
+            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             
             services.AddScoped<IDeliveryService, DeliveryService>();
             services.AddScoped<IOrderService, OrderService>();
@@ -315,41 +296,6 @@ namespace Sheaft.Web.Api
             services.AddScoped<IPurchaseOrdersExportersFactory, PurchaseOrdersExportersFactory>();
             services.AddScoped<ITransactionsExportersFactory, TransactionsExportersFactory>();
             
-            services.AddScoped<IAgreementQueries, AgreementQueries>();
-            services.AddScoped<IProducerQueries, ProducerQueries>();
-            services.AddScoped<IStoreQueries, StoreQueries>();
-            services.AddScoped<IDeliveryQueries, DeliveryQueries>();
-            services.AddScoped<IDepartmentQueries, DepartmentQueries>();
-            services.AddScoped<IJobQueries, JobQueries>();
-            services.AddScoped<ILeaderboardQueries, LeaderboardQueries>();
-            services.AddScoped<INotificationQueries, NotificationQueries>();
-            services.AddScoped<IReturnableQueries, ReturnableQueries>();
-            services.AddScoped<IProductQueries, ProductQueries>();
-            services.AddScoped<IPurchaseOrderQueries, PurchaseOrderQueries>();
-            services.AddScoped<IQuickOrderQueries, QuickOrderQueries>();
-            services.AddScoped<IRegionQueries, RegionQueries>();
-            services.AddScoped<ITagQueries, TagQueries>();
-            services.AddScoped<IConsumerQueries, ConsumerQueries>();
-            services.AddScoped<IUserQueries, UserQueries>();
-            services.AddScoped<INationalityQueries, NationalityQueries>();
-            services.AddScoped<ICountryQueries, CountryQueries>();
-            services.AddScoped<IOrderQueries, OrderQueries>();
-            services.AddScoped<IPayinQueries, PayinQueries>();
-            services.AddScoped<IDocumentQueries, DocumentQueries>();
-            services.AddScoped<ILegalQueries, LegalQueries>();
-            services.AddScoped<IBusinessClosingQueries, BusinessClosingQueries>();
-            services.AddScoped<IDeliveryClosingQueries, DeliveryClosingQueries>();
-            services.AddScoped<ITransferQueries, TransferQueries>();
-            services.AddScoped<IPayoutQueries, PayoutQueries>();
-            services.AddScoped<IDonationQueries, DonationQueries>();
-            services.AddScoped<IWithholdingQueries, WithholdingQueries>();
-            services.AddScoped<ICatalogQueries, CatalogQueries>();
-            services.AddScoped<IPreAuthorizationQueries, PreAuthorizationQueries>();
-            services.AddScoped<ICardQueries, CardQueries>();
-            
-            services.AddScoped<ISheaftMediatr, SheaftMediatr>();
-            services.AddScoped<ISheaftDispatcher, SheaftDispatcher>();
-
             services.AddScoped<IDapperContext, DapperContext>();
 
             var searchConfig = searchSettings.Get<SearchOptions>();
@@ -359,7 +305,7 @@ namespace Sheaft.Web.Api
             services.AddScoped<IAmazonSimpleEmailService, AmazonSimpleEmailServiceClient>(_ => new AmazonSimpleEmailServiceClient(mailerConfig.ApiId, mailerConfig.ApiKey, RegionEndpoint.EUCentral1));
 
             services.AddScoped<IRazorLightEngine>(_ => {
-                var rootDir = System.IO.Path.GetDirectoryName(Assembly.GetExecutingAssembly().CodeBase);
+                var rootDir = System.IO.Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
                 return new RazorLightEngineBuilder()
                 .UseFileSystemProject($"{rootDir.Replace("file:\\", string.Empty).Replace("file:", string.Empty)}/Mailings/Templates")
                 .UseMemoryCachingProvider()
@@ -368,23 +314,25 @@ namespace Sheaft.Web.Api
 
             var storageConfig = storageSettings.Get<StorageOptions>();
             services.AddSingleton<CloudStorageAccount>(CloudStorageAccount.Parse(storageConfig.ConnectionString));
-
-            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             
             services.AddTransient(typeof(IPipelineBehavior<,>), typeof(UnhandledExceptionBehaviour<,>));
             services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehaviour<,>));
             services.AddTransient(typeof(IPipelineBehavior<,>), typeof(PerformanceBehaviour<,>));
             services.AddTransient(typeof(IPipelineBehavior<,>), typeof(LoggingBehaviour<,>));
 
-            services.AddGraphQL(sp => SchemaBuilder.New()
-                .AddServices(sp)
-                .AddAuthorizeDirectiveType()
-                .ModifyOptions(c => c.DefaultBindingBehavior = BindingBehavior.Explicit)
-                .AddMutationType<SheaftMutationType>()
-                .AddQueryType<SheaftQueryType>()
-                .BindClrType<TimeSpan, SheaftTimeSpanType>()
+            services.AddMemoryCache();
+
+            services.AddGraphQLServer()
+                .AddAuthorization()
+                .AddQueryType(c => c.Name("Query"))
+                .AddMutationType(c => c.Name("Mutation"))
                 .RegisterGraphQlTypes()
-                .Create(), new QueryExecutionOptions { IncludeExceptionDetails = true });
+                .RegisterGraphQlQueries()
+                .RegisterGraphQlMutations()
+                .RegisterGraphQlDataLoaders()
+                .AddFiltering()
+                .AddSorting();
+                //.EnableRelaySupport();
 
             services.AddErrorFilter<SheaftErrorFilter>();
 
@@ -436,8 +384,7 @@ namespace Sheaft.Web.Api
                 });
             });
 
-            services.AddMvc(option => option.EnableEndpointRouting = false)
-                .SetCompatibilityVersion(CompatibilityVersion.Latest);
+            services.AddMvc(option => option.EnableEndpointRouting = true);
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IConfiguration configuration)
@@ -454,88 +401,95 @@ namespace Sheaft.Web.Api
 
             using (var serviceScope = app.ApplicationServices.GetRequiredService<IServiceScopeFactory>().CreateScope())
             {
-                var context = serviceScope.ServiceProvider.GetService<IAppDbContext>();
+                var contextFactory = serviceScope.ServiceProvider.GetRequiredService<IDbContextFactory<QueryDbContext>>();
+                var context = contextFactory.CreateDbContext();
+                
                 if (!context.AllMigrationsApplied())
                 {
-                    context.Migrate();
+                    context.Database.Migrate();
                 }
 
-                var adminId = configuration.GetValue<Guid>("Users:admin:id");
-                var admin = context.Users.FirstOrDefault(u => u.Id == adminId);
-                if (admin == null)
+                if (configuration.GetValue<bool?>("InsertDevData") ?? true)
                 {
-                    var firstname = configuration.GetValue<string>("Users:admin:firstname");
-                    var lastname = configuration.GetValue<string>("Users:admin:lastname");
-                    var email = configuration.GetValue<string>("Users:admin:email");
+                    var adminId = configuration.GetValue<Guid>("Users:admin:id");
+                    var admin = context.Users.FirstOrDefault(u => u.Id == adminId);
+                    if (admin == null)
+                    {
+                        var firstname = configuration.GetValue<string>("Users:admin:firstname");
+                        var lastname = configuration.GetValue<string>("Users:admin:lastname");
+                        var email = configuration.GetValue<string>("Users:admin:email");
 
-                    admin = new Admin(adminId, $"{firstname} {lastname}", firstname, lastname, email);
-                    admin.SetIdentifier(configuration.GetValue<string>("Psp:UserId"));
-                    context.Add(admin);
-                    context.SaveChanges();
-                }
+                        admin = new Admin(adminId, $"{firstname} {lastname}", firstname, lastname, email);
+                        admin.SetIdentifier(configuration.GetValue<string>("Psp:UserId"));
+                        context.Add(admin);
+                        context.SaveChanges();
+                    }
 
-                var donationWalletId = configuration.GetValue<string>("Psp:WalletId");
-                if (context.Wallets.FirstOrDefault(u => u.Identifier == donationWalletId) == null)
-                {
-                    var donationWallet = new Wallet(Guid.NewGuid(), "Donation", WalletKind.Donations, admin);
-                    donationWallet.SetIdentifier(donationWalletId);
-                    context.Add(donationWallet);
-                    context.SaveChanges();
-                }
+                    var donationWalletId = configuration.GetValue<string>("Psp:WalletId");
+                    if (context.Wallets.FirstOrDefault(u => u.Identifier == donationWalletId) == null)
+                    {
+                        var donationWallet = new Wallet(Guid.NewGuid(), "Donation", WalletKind.Donations, admin);
+                        donationWallet.SetIdentifier(donationWalletId);
+                        context.Add(donationWallet);
+                        context.SaveChanges();
+                    }
 
-                var documentWalletId = configuration.GetValue<string>("Psp:DocumentWalletId");
-                if (context.Wallets.FirstOrDefault(u => u.Identifier == documentWalletId) == null)
-                {
-                    var documentWallet = new Wallet(Guid.NewGuid(), "Document", WalletKind.Documents, admin);
-                    documentWallet.SetIdentifier(documentWalletId);
-                    context.Add(documentWallet);
-                    context.SaveChanges();
-                }
+                    var documentWalletId = configuration.GetValue<string>("Psp:DocumentWalletId");
+                    if (context.Wallets.FirstOrDefault(u => u.Identifier == documentWalletId) == null)
+                    {
+                        var documentWallet = new Wallet(Guid.NewGuid(), "Document", WalletKind.Documents, admin);
+                        documentWallet.SetIdentifier(documentWalletId);
+                        context.Add(documentWallet);
+                        context.SaveChanges();
+                    }
 
-                if (context.BankAccounts.FirstOrDefault(c => c.User.Id == admin.Id) == null)
-                {
-                    var bankAccount = new BankAccount(Guid.NewGuid(), "Dons", "Sheaft", configuration.GetValue<string>("Psp:Bank:Iban"), configuration.GetValue<string>("Psp:Bank:Bic"),
-                        new BankAddress(
-                            configuration.GetValue<string>("Psp:Bank:Address:Line1"),
-                            configuration.GetValue<string>("Psp:Bank:Address:Line2"),
-                            configuration.GetValue<string>("Psp:Bank:Address:Zipcode"),
-                            configuration.GetValue<string>("Psp:Bank:Address:City"),
-                            configuration.GetValue<CountryIsoCode>("Psp:Bank:Address:Country")), admin);
+                    if (context.BankAccounts.FirstOrDefault(c => c.UserId == admin.Id) == null)
+                    {
+                        var bankAccount = new BankAccount(Guid.NewGuid(), "Dons", "Sheaft",
+                            configuration.GetValue<string>("Psp:Bank:Iban"),
+                            configuration.GetValue<string>("Psp:Bank:Bic"),
+                            new BankAddress(
+                                configuration.GetValue<string>("Psp:Bank:Address:Line1"),
+                                configuration.GetValue<string>("Psp:Bank:Address:Line2"),
+                                configuration.GetValue<string>("Psp:Bank:Address:Zipcode"),
+                                configuration.GetValue<string>("Psp:Bank:Address:City"),
+                                configuration.GetValue<CountryIsoCode>("Psp:Bank:Address:Country")), admin);
 
-                    bankAccount.SetIdentifier(configuration.GetValue<string>("Psp:Bank:Id"));
-                    context.Add(bankAccount);
-                    context.SaveChanges();
-                }
+                        bankAccount.SetIdentifier(configuration.GetValue<string>("Psp:Bank:Id"));
+                        context.Add(bankAccount);
+                        context.SaveChanges();
+                    }
 
-                var supportId = configuration.GetValue<Guid>("Users:support:id");
-                if (context.Users.FirstOrDefault(u => u.Id == supportId) == null)
-                {
-                    var firstname = configuration.GetValue<string>("Users:support:firstname");
-                    var lastname = configuration.GetValue<string>("Users:support:lastname");
-                    var email = configuration.GetValue<string>("Users:support:email");
+                    var supportId = configuration.GetValue<Guid>("Users:support:id");
+                    if (context.Users.FirstOrDefault(u => u.Id == supportId) == null)
+                    {
+                        var firstname = configuration.GetValue<string>("Users:support:firstname");
+                        var lastname = configuration.GetValue<string>("Users:support:lastname");
+                        var email = configuration.GetValue<string>("Users:support:email");
 
-                    context.Add(new Support(supportId, $"{firstname} {lastname}", firstname, lastname, email));
-                    context.SaveChanges();
-                }
+                        context.Add(new Support(supportId, $"{firstname} {lastname}", firstname, lastname, email));
+                        context.SaveChanges();
+                    }
 
-                var settingsEnum = Enum.GetValues(typeof(SettingKind)).Cast<SettingKind>().ToList();
-                var settings = context.Settings.ToList();
-                var missingSettings = settingsEnum.Except(settings.Select(s => s.Kind));
-                foreach (var missingSetting in missingSettings)
-                {
-                    context.Add(new Setting(Guid.NewGuid(), missingSetting.ToString("G"), missingSetting));
-                    context.SaveChanges();
-                }
-                
-                var removedSettings = settings.Select(s => s.Kind).Except(settingsEnum);
-                foreach (var removedSetting in removedSettings)
-                {
-                    var setting = settings.FirstOrDefault(s => s.Kind == removedSetting);
-                    if (setting == null)
-                        continue;
-                    
-                    context.Remove(setting);
-                    context.SaveChanges();
+                    var settingsEnum = Enum.GetValues(typeof(SettingKind)).Cast<SettingKind>().ToList();
+                    var settings = context.Settings.ToList();
+                    var missingSettings = settingsEnum.Except(settings.Select(s => s.Kind));
+                    foreach (var missingSetting in missingSettings)
+                    {
+                        context.Add(new Setting(Guid.NewGuid(), missingSetting.ToString("G"), missingSetting));
+                        context.SaveChanges();
+                    }
+
+                    var removedSettings = settings.Select(s => s.Kind).Except(settingsEnum);
+                    foreach (var removedSetting in removedSettings)
+                    {
+                        var setting = settings.FirstOrDefault(s => s.Kind == removedSetting);
+                        if (setting == null)
+                            continue;
+
+                        context.Remove(setting);
+                        context.SaveChanges();
+                    }
                 }
             }
 
@@ -547,20 +501,20 @@ namespace Sheaft.Web.Api
 
             app.UseSerilogRequestLogging();
 
+            app.UseRouting();
+            
             app.UseAuthentication();
             app.UseAuthorization();
 
             app.UseIpRateLimiting();
-
-            app.UseMvc(endpoints =>
-            {
-                endpoints.MapRoute(
-                    name: "default",
-                    template: "{controller=Home}/{action=Index}/{id?}");
-            });
-
             app.UseWebSockets();
-            app.UseGraphQL("/graphql");
+            
+            app.UseEndpoints(endpoints =>
+            {
+                endpoints.MapControllers();
+                endpoints.MapGraphQL()
+                    .RequireAuthorization(Policies.ANONYMOUS_OR_CONNECTED);
+            });
         }
     }
 }

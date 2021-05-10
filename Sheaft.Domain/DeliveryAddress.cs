@@ -1,4 +1,6 @@
-﻿using Sheaft.Domain.Enum;
+﻿using NetTopologySuite.Geometries;
+using Sheaft.Domain.Common;
+using Sheaft.Domain.Enum;
 
 namespace Sheaft.Domain
 {
@@ -13,9 +15,13 @@ namespace Sheaft.Domain
         {
             Longitude = longitude;
             Latitude = latitude;
+
+            if (latitude.HasValue && longitude.HasValue)
+                Location = LocationProvider.CreatePoint(latitude.Value, longitude.Value);
         }
 
         public double? Longitude { get; private set; }
         public double? Latitude { get; private set; }
+        public Point Location { get; private set; }
     }
 }

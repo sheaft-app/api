@@ -5,6 +5,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Sheaft.Application.Interfaces.Infrastructure;
+using Microsoft.EntityFrameworkCore;
+using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Application.Interfaces.Mediatr;
 using Sheaft.Core;
 using Sheaft.Domain;
@@ -67,10 +69,10 @@ namespace Sheaft.Mediatr.PreAuthorization.Commands
             {
                 case PreAuthorizationStatus.Failed:
                     _mediatr.Post(new FailOrderCommand(request.RequestUser)
-                        {OrderId = preAuthorization.Order.Id});
+                        {OrderId = preAuthorization.OrderId});
                     break;
                 case PreAuthorizationStatus.Succeeded:
-                    _mediatr.Post(new ConfirmOrderCommand(request.RequestUser) {OrderId = preAuthorization.Order.Id});
+                    _mediatr.Post(new ConfirmOrderCommand(request.RequestUser) {OrderId = preAuthorization.OrderId});
                     break;
             }
 

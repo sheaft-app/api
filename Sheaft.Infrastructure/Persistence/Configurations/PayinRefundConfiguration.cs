@@ -8,15 +8,9 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
     {
         public void Configure(EntityTypeBuilder<PayinRefund> entity)
         {
-            entity.Property<long>("PayinUid");
-            entity.Property<long>("PurchaseOrderUid");
-
-            entity.HasOne(c => c.PurchaseOrder).WithMany().HasForeignKey("PurchaseOrderUid").OnDelete(DeleteBehavior.NoAction).IsRequired();
+            entity.HasOne(c => c.PurchaseOrder).WithMany().HasForeignKey(c =>c.PurchaseOrderId).OnDelete(DeleteBehavior.NoAction).IsRequired();
 
             entity.Ignore(c => c.DomainEvents);
-            
-            entity.HasIndex("PayinUid");
-            entity.HasIndex("PurchaseOrderUid");
         }
     }
 }

@@ -9,32 +9,31 @@ namespace Sheaft.Domain
 {
     public class Store : Business, IHasDomainEvent
     {
-        private List<StoreTag> _tags;
-        private List<TimeSlotHour> _openingHours;
-
         protected Store()
         {
         }
 
-        public Store(Guid id, string name, string firstname, string lastname, string email, UserAddress address, IEnumerable<TimeSlotHour> openingHours = null, bool openForBusiness = true, string phone = null)
+        public Store(Guid id, string name, string firstname, string lastname, string email, UserAddress address, IEnumerable<OpeningHours> openingHours = null, bool openForBusiness = true, string phone = null)
             : base(id, ProfileKind.Store, name, firstname, lastname, email, address, openForBusiness, phone)
         {
+            Tags = new List<StoreTag>();
+            OpeningHours = new List<OpeningHours>();
             SetOpeningHours(openingHours);
             DomainEvents = new List<DomainEvent>{new StoreRegisteredEvent(Id)};
         }
 
-        public virtual IReadOnlyCollection<StoreTag> Tags => _tags?.AsReadOnly();
-        public virtual IReadOnlyCollection<TimeSlotHour> OpeningHours => _openingHours?.AsReadOnly();
+        public virtual IReadOnlyCollection<StoreTag> Tags { get; private set; }
+        public virtual IReadOnlyCollection<OpeningHours> OpeningHours { get; private set; }
 
-        public void SetOpeningHours(IEnumerable<TimeSlotHour> openingHours)
+        public void SetOpeningHours(IEnumerable<OpeningHours> openingHours)
         {
             if (openingHours == null)
                 return;
 
             if (OpeningHours == null)
-                _openingHours = new List<TimeSlotHour>();
+                OpeningHours = new List<OpeningHours>();
 
-            _openingHours = openingHours.ToList();
+            OpeningHours = openingHours.ToList();
         }
 
         public void SetTags(IEnumerable<Tag> tags)
@@ -42,10 +41,10 @@ namespace Sheaft.Domain
             if (tags == null)
                 return;
 
-            if (!Tags.Any())
-                _tags = new List<StoreTag>();
+            if (Tags == null)
+                Tags = new List<StoreTag>();
 
-            _tags = tags.Select(t => new StoreTag(t)).ToList();
+            Tags = tags.Select(t => new StoreTag(t)).ToList();
         }
 
         public List<DomainEvent> DomainEvents { get; } = new List<DomainEvent>();

@@ -8,20 +8,12 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
     {
         public void Configure(EntityTypeBuilder<Store> entity)
         {
-            entity.OwnsMany(c => c.OpeningHours, cb =>
-            {
-                cb.ToTable("StoreOpeningHours");
-            });
+            entity.HasMany(c => c.OpeningHours).WithOne().HasForeignKey(c => c.StoreId)
+                .OnDelete(DeleteBehavior.Cascade);
 
-            entity.HasMany(c => c.Tags).WithOne().HasForeignKey("StoreUid").OnDelete(DeleteBehavior.Cascade).IsRequired();
+            entity.HasMany(c => c.Tags).WithOne().HasForeignKey(c=>c.StoreId).OnDelete(DeleteBehavior.Cascade);
 
             entity.Ignore(c => c.DomainEvents);
-            
-            var businessTags = entity.Metadata.FindNavigation(nameof(Store.Tags));
-            businessTags.SetPropertyAccessMode(PropertyAccessMode.Field);
-
-            var businessHours = entity.Metadata.FindNavigation(nameof(Store.OpeningHours));
-            businessHours.SetPropertyAccessMode(PropertyAccessMode.Field);
         }
     }
 }

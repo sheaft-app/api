@@ -10,7 +10,7 @@ using Sheaft.Infrastructure.Persistence;
 
 namespace Sheaft.Infrastructure.Persistence.Migrations
 {
-    [DbContext(typeof(AppDbContext))]
+    [DbContext(typeof(QueryDbContext))]
     [Migration("20210223200416_Add_Closings")]
     partial class Add_Closings
     {

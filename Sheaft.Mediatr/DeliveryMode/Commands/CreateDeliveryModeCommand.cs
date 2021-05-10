@@ -10,11 +10,14 @@ using Newtonsoft.Json;
 using Sheaft.Application.Extensions;
 using Sheaft.Application.Interfaces;
 using Sheaft.Application.Interfaces.Infrastructure;
+using Microsoft.EntityFrameworkCore;
 using Sheaft.Application.Interfaces.Mediatr;
 using Sheaft.Application.Models;
 using Sheaft.Core;
 using Sheaft.Domain;
 using Sheaft.Domain.Enum;
+using Sheaft.Application.Interfaces.Infrastructure;
+using Microsoft.EntityFrameworkCore;
 using Sheaft.Mediatr.DeliveryClosing.Commands;
 using Sheaft.Mediatr.Producer.Commands;
 
@@ -38,7 +41,7 @@ namespace Sheaft.Mediatr.DeliveryMode.Commands
         public DeliveryKind Kind { get; set; }
         public int? LockOrderHoursBeforeDelivery { get; set; }
         public AddressDto Address { get; set; }
-        public IEnumerable<TimeSlotGroupDto> OpeningHours { get; set; }
+        public IEnumerable<TimeSlotGroupDto> DeliveryHours { get; set; }
         public int? MaxPurchaseOrdersPerTimeSlot { get; set; }
         public bool Available { get; set; }
         public bool AutoAcceptRelatedPurchaseOrder { get; set; }
@@ -73,10 +76,10 @@ namespace Sheaft.Mediatr.DeliveryMode.Commands
                     request.Address.Latitude);
             }
 
-            var openingHours = new List<TimeSlotHour>();
-            if (request.OpeningHours != null)
-                foreach (var oh in request.OpeningHours)
-                    openingHours.AddRange(oh.Days.Select(c => new TimeSlotHour(c, oh.From, oh.To)));
+            var openingHours = new List<DeliveryHours>();
+            if (request.DeliveryHours != null)
+                foreach (var oh in request.DeliveryHours)
+                    openingHours.AddRange(oh.Days.Select(c => new DeliveryHours(c, oh.From, oh.To)));
             
             var producer = await _context.Producers.SingleAsync(e => e.Id == request.ProducerId, token);
             var entity = new Domain.DeliveryMode(Guid.NewGuid(), request.Kind, producer, request.Available,

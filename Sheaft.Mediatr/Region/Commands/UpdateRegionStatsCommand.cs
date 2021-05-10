@@ -8,6 +8,7 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Sheaft.Application.Interfaces;
 using Sheaft.Application.Interfaces.Infrastructure;
+using Microsoft.EntityFrameworkCore;
 using Sheaft.Application.Interfaces.Mediatr;
 using Sheaft.Core;
 using Sheaft.Domain;
@@ -50,7 +51,7 @@ namespace Sheaft.Mediatr.Region.Commands
             region.SetPoints(request.Points);
             region.SetPosition(request.Position);
             var consumersCount = await _context.Users.OfType<Domain.Consumer>()
-                .CountAsync(u => !u.RemovedOn.HasValue && u.Address.Department.Region.Id == request.RegionId, token);
+                .CountAsync(u => !u.RemovedOn.HasValue && u.Address.Department.RegionId == request.RegionId, token);
 
             region.SetConsumersCount(consumersCount);
 

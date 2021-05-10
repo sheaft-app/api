@@ -8,17 +8,16 @@ namespace Sheaft.Application.Mappings
     {
         public CatalogProfile()
         {
-            CreateMap<Catalog, CatalogDto>()
-                .ForMember(c => c.IsAvailable, opt => opt.MapFrom(e => e.Available));
-
+            CreateMap<Catalog, CatalogDto>();
+            
             CreateMap<CatalogProduct, CatalogProductDto>()
-                .ForMember(c => c.Id, opt => opt.MapFrom(e => e.Product.Id))
+                .ForMember(c => c.Id, opt => opt.MapFrom(e => e.ProductId))
                 .ForMember(c => c.Name, opt => opt.MapFrom(e => e.Product.Name))
                 .ForMember(c => c.Reference, opt => opt.MapFrom(e => e.Product.Reference))
                 .ForMember(c => c.AddedTo, opt => opt.MapFrom(e => e.CreatedOn));
 
             CreateMap<CatalogProduct, CatalogPriceDto>()
-                .ForMember(c => c.Id, opt => opt.MapFrom(e => e.Catalog.Id))
+                .ForMember(c => c.Id, opt => opt.MapFrom(e => e.CatalogId))
                 .ForMember(c => c.Name, opt => opt.MapFrom(e => e.Catalog.Name))
                 .ForMember(c => c.AddedTo, opt => opt.MapFrom(e => e.CreatedOn));
         }

@@ -7,6 +7,7 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Sheaft.Application.Interfaces;
 using Sheaft.Application.Interfaces.Infrastructure;
+using Microsoft.EntityFrameworkCore;
 using Sheaft.Application.Interfaces.Mediatr;
 using Sheaft.Core;
 using Sheaft.Core.Exceptions;
@@ -43,7 +44,7 @@ namespace Sheaft.Mediatr.Job.Commands
         {
             var entity =
                 await _context.Jobs.SingleOrDefaultAsync(a => a.Id == request.JobId && a.RemovedOn.HasValue, token);
-            if(entity.User.Id != request.RequestUser.Id)
+            if(entity.UserId != request.RequestUser.Id)
                 throw SheaftException.Forbidden();
 
             _context.Restore(entity);

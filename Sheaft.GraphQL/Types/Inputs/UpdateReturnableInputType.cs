@@ -1,5 +1,6 @@
 ﻿using HotChocolate.Types;
 using Sheaft.Application.Models;
+using Sheaft.Domain;
 using Sheaft.Mediatr.Returnable.Commands;
 
 namespace Sheaft.GraphQL.Types.Inputs
@@ -8,16 +9,28 @@ namespace Sheaft.GraphQL.Types.Inputs
     {
         protected override void Configure(IInputObjectTypeDescriptor<UpdateReturnableCommand> descriptor)
         {
+            base.Configure(descriptor);
+
             descriptor.Name("UpdateReturnableInput");
-            descriptor.Field(c => c.Description);
-            descriptor.Field(c => c.Vat);
-            descriptor.Field(c => c.WholeSalePrice);
+            
+            descriptor
+                .Field(c => c.Description)
+                .Name("description");
+                
+            descriptor
+                .Field(c => c.Vat)
+                .Name("vat");
+                
+            descriptor
+                .Field(c => c.WholeSalePrice)
+                .Name("wholeSalePrice");
 
             descriptor.Field(c => c.ReturnableId)
                 .Name("id")
-                .Type<NonNullType<IdType>>();
+                .ID(nameof(Returnable));
 
             descriptor.Field(c => c.Name)
+                .Name("name")
                 .Type<NonNullType<StringType>>();
         }
     }

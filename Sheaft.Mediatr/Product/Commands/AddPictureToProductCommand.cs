@@ -8,6 +8,8 @@ using Newtonsoft.Json;
 using Sheaft.Application.Extensions;
 using Sheaft.Application.Interfaces;
 using Sheaft.Application.Interfaces.Infrastructure;
+using Microsoft.EntityFrameworkCore;
+using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Application.Interfaces.Mediatr;
 using Sheaft.Core;
 using Sheaft.Core.Enums;
@@ -49,7 +51,7 @@ namespace Sheaft.Mediatr.Product.Commands
         public async Task<Result> Handle(AddPictureToProductCommand request, CancellationToken token)
         {
             var entity = await _context.Products.SingleAsync(e => e.Id == request.ProductId, token);
-            if(entity.Producer.Id != request.RequestUser.Id)
+            if(entity.ProducerId != request.RequestUser.Id)
                 return Failure(MessageKind.Forbidden);
             
             var id = Guid.NewGuid();

@@ -9,6 +9,8 @@ using Newtonsoft.Json;
 using Sheaft.Application.Extensions;
 using Sheaft.Application.Interfaces;
 using Sheaft.Application.Interfaces.Infrastructure;
+using Microsoft.EntityFrameworkCore;
+using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Application.Interfaces.Mediatr;
 using Sheaft.Core;
 using Sheaft.Core.Enums;
@@ -64,12 +66,12 @@ namespace Sheaft.Mediatr.PayinRefund.Commands
                 return Failure<Guid>(MessageKind.NotFound);
 
             if (payin.Refunds != null && payin.Refunds.Any(c =>
-                c.PurchaseOrder.Id == purchaseOrder.Id && c.Status == TransactionStatus.Succeeded))
+                c.PurchaseOrderId == purchaseOrder.Id && c.Status == TransactionStatus.Succeeded))
                 return Failure<Guid>(MessageKind
                     .PayinRefund_CannotCreate_PurchaseOrderRefund_PayinRefund_AlreadyProcessed);
 
             if (payin.Refunds != null && payin.Refunds.Any(c =>
-                c.PurchaseOrder.Id == purchaseOrder.Id && c.Status != TransactionStatus.Failed))
+                c.PurchaseOrderId == purchaseOrder.Id && c.Status != TransactionStatus.Failed))
                 return Failure<Guid>(
                     MessageKind.PayinRefund_CannotCreate_PurchaseOrderRefund_Pending_PayinRefund);
 

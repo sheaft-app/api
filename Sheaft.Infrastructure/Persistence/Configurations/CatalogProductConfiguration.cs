@@ -8,12 +8,9 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
     {
         public void Configure(EntityTypeBuilder<CatalogProduct> entity)
         {
-            entity.Property<long>("Uid");
-            entity.Property<long>("CatalogUid");
-            entity.Property<long>("ProductUid");
-
             entity.Property(c => c.CreatedOn);
-            entity.Property(c => c.UpdatedOn).IsConcurrencyToken();
+            entity.Property(c => c.UpdatedOn);
+            entity.Property(c => c.RowVersion).IsRowVersion();
             
             entity.Property(o => o.VatPricePerUnit).HasColumnType("decimal(10,2)");
             entity.Property(o => o.OnSalePricePerUnit).HasColumnType("decimal(10,2)");
@@ -22,8 +19,6 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
             entity.Property(o => o.OnSalePrice).HasColumnType("decimal(10,2)");
             entity.Property(o => o.WholeSalePrice).HasColumnType("decimal(10,2)");
             
-            entity.HasKey("Uid");
-            entity.HasIndex("CatalogUid", "ProductUid").IsUnique();
             entity.ToTable("CatalogProducts");
         }
     }

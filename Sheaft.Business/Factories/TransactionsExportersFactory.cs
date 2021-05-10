@@ -9,6 +9,7 @@ using Sheaft.Application.Interfaces.Factories;
 using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Domain;
 using Sheaft.Domain.Enum;
+using Sheaft.Infrastructure.Persistence;
 using Sheaft.Options;
 
 namespace Sheaft.Business.Factories

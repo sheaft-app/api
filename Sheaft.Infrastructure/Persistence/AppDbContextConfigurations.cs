@@ -5,9 +5,9 @@ using Sheaft.Infrastructure.Persistence.Configurations;
 
 namespace Sheaft.Infrastructure.Persistence
 {
-    public partial class AppDbContext
+    public partial class QueryDbContext
     {
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        protected void OnModelCreating(ModelBuilder modelBuilder, bool isAdminContext)
         {
             modelBuilder.HasDefaultSchema("app");
 
@@ -78,63 +78,82 @@ namespace Sheaft.Infrastructure.Persistence
             modelBuilder.Entity<BusinessLegal>().HasBaseType<Legal>();
             modelBuilder.Entity<ConsumerLegal>().HasBaseType<Legal>();
 
-            modelBuilder.ApplyConfiguration(new UserConfiguration(_isAdminContext));
+            modelBuilder.ApplyConfiguration(new UserConfiguration(isAdminContext));
             modelBuilder.ApplyConfiguration(new BusinessConfiguration());
             modelBuilder.ApplyConfiguration(new ProducerConfiguration());
             modelBuilder.ApplyConfiguration(new ProducerTagConfiguration());
             modelBuilder.ApplyConfiguration(new StoreConfiguration());
             modelBuilder.ApplyConfiguration(new StoreTagConfiguration());
             modelBuilder.ApplyConfiguration(new ConsumerConfiguration());
-            modelBuilder.ApplyConfiguration(new AgreementConfiguration(_isAdminContext));
-            modelBuilder.ApplyConfiguration(new DeliveryModeConfiguration(_isAdminContext));
+            modelBuilder.ApplyConfiguration(new AgreementConfiguration(isAdminContext));
+            modelBuilder.ApplyConfiguration(new DeliveryModeConfiguration(isAdminContext));
             modelBuilder.ApplyConfiguration(new DepartmentConfiguration());
-            modelBuilder.ApplyConfiguration(new JobConfiguration(_isAdminContext));
-            modelBuilder.ApplyConfiguration(new LevelConfiguration(_isAdminContext));
-            modelBuilder.ApplyConfiguration(new RewardConfiguration(_isAdminContext));
+            modelBuilder.ApplyConfiguration(new JobConfiguration(isAdminContext));
+            modelBuilder.ApplyConfiguration(new LevelConfiguration(isAdminContext));
+            modelBuilder.ApplyConfiguration(new RewardConfiguration(isAdminContext));
             modelBuilder.ApplyConfiguration(new NotificationConfiguration());
-            modelBuilder.ApplyConfiguration(new ReturnableConfiguration(_isAdminContext));
-            modelBuilder.ApplyConfiguration(new OrderConfiguration(_isAdminContext));
+            modelBuilder.ApplyConfiguration(new ReturnableConfiguration(isAdminContext));
+            modelBuilder.ApplyConfiguration(new OrderConfiguration(isAdminContext));
             modelBuilder.ApplyConfiguration(new OrderProductConfiguration());
             modelBuilder.ApplyConfiguration(new OrderDeliveryConfiguration());
-            modelBuilder.ApplyConfiguration(new PurchaseOrderConfiguration(_isAdminContext));
+            modelBuilder.ApplyConfiguration(new PurchaseOrderConfiguration(isAdminContext));
             modelBuilder.ApplyConfiguration(new PurchaseOrderProductConfiguration());
-            modelBuilder.ApplyConfiguration(new PurchaseOrderVendorConfiguration());
-            modelBuilder.ApplyConfiguration(new PurchaseOrderSenderConfiguration());
-            modelBuilder.ApplyConfiguration(new QuickOrderConfiguration(_isAdminContext));
+            modelBuilder.ApplyConfiguration(new QuickOrderConfiguration(isAdminContext));
             modelBuilder.ApplyConfiguration(new QuickOrderProductConfiguration());
-            modelBuilder.ApplyConfiguration(new ProductConfiguration(_isAdminContext));
+            modelBuilder.ApplyConfiguration(new ProductConfiguration(isAdminContext));
             modelBuilder.ApplyConfiguration(new ProductTagConfiguration());
             modelBuilder.ApplyConfiguration(new RatingConfiguration());
             modelBuilder.ApplyConfiguration(new RegionConfiguration());
             modelBuilder.ApplyConfiguration(new SponsoringConfiguration());
-            modelBuilder.ApplyConfiguration(new TagConfiguration(_isAdminContext));
-            modelBuilder.ApplyConfiguration(new PaymentMethodConfiguration(_isAdminContext));
+            modelBuilder.ApplyConfiguration(new TagConfiguration(isAdminContext));
+            modelBuilder.ApplyConfiguration(new PaymentMethodConfiguration(isAdminContext));
             modelBuilder.ApplyConfiguration(new BankAccountConfiguration());
             modelBuilder.ApplyConfiguration(new CardConfiguration());
-            modelBuilder.ApplyConfiguration(new WalletConfiguration(_isAdminContext));
-            modelBuilder.ApplyConfiguration(new PayinConfiguration(_isAdminContext));
+            modelBuilder.ApplyConfiguration(new WalletConfiguration(isAdminContext));
+            modelBuilder.ApplyConfiguration(new PayinConfiguration(isAdminContext));
             modelBuilder.ApplyConfiguration(new WebPayinConfiguration());
-            modelBuilder.ApplyConfiguration(new TransferConfiguration(_isAdminContext));
-            modelBuilder.ApplyConfiguration(new PayoutConfiguration(_isAdminContext));
-            modelBuilder.ApplyConfiguration(new RefundConfiguration(_isAdminContext));
+            modelBuilder.ApplyConfiguration(new TransferConfiguration(isAdminContext));
+            modelBuilder.ApplyConfiguration(new PayoutConfiguration(isAdminContext));
+            modelBuilder.ApplyConfiguration(new RefundConfiguration(isAdminContext));
             modelBuilder.ApplyConfiguration(new PayinRefundConfiguration());
             modelBuilder.ApplyConfiguration(new CountryConfiguration());
             modelBuilder.ApplyConfiguration(new NationalityConfiguration());
             modelBuilder.ApplyConfiguration(new LegalConfiguration());
             modelBuilder.ApplyConfiguration(new ConsumerLegalConfiguration());
             modelBuilder.ApplyConfiguration(new BusinessLegalConfiguration());
-            modelBuilder.ApplyConfiguration(new DonationConfiguration(_isAdminContext));
-            modelBuilder.ApplyConfiguration(new WithholdingConfiguration(_isAdminContext));
+            modelBuilder.ApplyConfiguration(new DonationConfiguration(isAdminContext));
+            modelBuilder.ApplyConfiguration(new WithholdingConfiguration(isAdminContext));
             modelBuilder.ApplyConfiguration(new DeliveryClosingConfiguration());
             modelBuilder.ApplyConfiguration(new BusinessClosingConfiguration());
             modelBuilder.ApplyConfiguration(new ProfilePictureConfiguration());
             modelBuilder.ApplyConfiguration(new ProductPictureConfiguration());
             modelBuilder.ApplyConfiguration(new UserSettingConfiguration());
             modelBuilder.ApplyConfiguration(new SettingConfiguration());
-            modelBuilder.ApplyConfiguration(new CatalogConfiguration(_isAdminContext));
+            modelBuilder.ApplyConfiguration(new CatalogConfiguration(isAdminContext));
             modelBuilder.ApplyConfiguration(new CatalogProductConfiguration());
-            modelBuilder.ApplyConfiguration(new PreAuthorizationConfiguration(_isAdminContext));
+            modelBuilder.ApplyConfiguration(new PreAuthorizationConfiguration(isAdminContext));
             modelBuilder.ApplyConfiguration(new PreAuthorizedPayinConfiguration());
+            modelBuilder.ApplyConfiguration(new DeclarationConfiguration());
+            modelBuilder.ApplyConfiguration(new UboConfiguration());
+            modelBuilder.ApplyConfiguration(new OpeningHoursConfiguration());
+            modelBuilder.ApplyConfiguration(new DeliveryHoursConfiguration());
+            modelBuilder.ApplyConfiguration(new DocumentConfiguration());
+            modelBuilder.ApplyConfiguration(new PageConfiguration());
+            modelBuilder.ApplyConfiguration(new UserPointConfiguration());
+        }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            OnModelCreating(modelBuilder, false);
+        }
+    }
+
+    public partial class WriterDbContext
+    {
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            OnModelCreating(modelBuilder, _isAdminContext);
         }
     }
 }

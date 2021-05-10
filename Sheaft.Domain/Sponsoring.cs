@@ -22,11 +22,16 @@ namespace Sheaft.Domain
                 throw new ValidationException(MessageKind.Sponsoring_Sponsored_Required);
 
             Sponsor = sponsor;
+            SponsorId = sponsor.Id;
             Sponsored = sponsored;
+            SponsoredId = sponsored.Id;
+            
             DomainEvents = new List<DomainEvent>{new UserSponsoredEvent(sponsor.Id, sponsored.Id)};
         }
 
         public DateTimeOffset CreatedOn { get; private set; }
+        public Guid SponsorId { get; private set; }
+        public Guid SponsoredId { get; private set; }
         public virtual User Sponsor { get; private set; }
         public virtual User Sponsored { get; private set; }
         public List<DomainEvent> DomainEvents { get; } = new List<DomainEvent>();

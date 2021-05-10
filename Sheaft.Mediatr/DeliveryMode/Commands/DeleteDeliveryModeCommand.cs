@@ -9,6 +9,7 @@ using Newtonsoft.Json;
 using Sheaft.Application.Extensions;
 using Sheaft.Application.Interfaces;
 using Sheaft.Application.Interfaces.Infrastructure;
+using Microsoft.EntityFrameworkCore;
 using Sheaft.Application.Interfaces.Mediatr;
 using Sheaft.Core;
 using Sheaft.Core.Enums;
@@ -48,17 +49,17 @@ namespace Sheaft.Mediatr.DeliveryMode.Commands
         public async Task<Result> Handle(DeleteDeliveryModeCommand request, CancellationToken token)
         {
             var entity = await _context.DeliveryModes.SingleAsync(e => e.Id == request.DeliveryModeId, token);
-            if (entity.Producer.Id != request.RequestUser.Id)
+            if (entity.ProducerId != request.RequestUser.Id)
                 return Failure(MessageKind.Forbidden);
 
             var agreements =
-                await _context.Agreements.Where(a => a.Delivery.Id == entity.Id).ToListAsync(token);
+                await _context.Agreements.Where(a => a.DeliveryId == entity.Id).ToListAsync(token);
             if (agreements.Any(a => a.Status == AgreementStatus.Accepted))
                 return Failure(MessageKind.DeliveryMode_CannotRemove_With_Active_Agreements, entity.Name,
                     agreements.Count(a => a.Status == AgreementStatus.Accepted));
 
             var orderDeliveries = await _context.Set<OrderDelivery>()
-                .Where(o => o.DeliveryMode.Id == entity.Id)
+                .Where(o => o.DeliveryModeId == entity.Id)
                 .ToListAsync(token);
 
             using (var transaction = await _context.BeginTransactionAsync(token))

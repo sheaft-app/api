@@ -25,7 +25,7 @@ namespace Sheaft.Domain
 
         public ConsumerLegal SetLegals(Owner owner)
         {
-            if (Legal != null)
+            if (Legal?.Id != null)
                 throw SheaftException.AlreadyExists();
 
             var legals = new ConsumerLegal(Guid.NewGuid(),this, owner);

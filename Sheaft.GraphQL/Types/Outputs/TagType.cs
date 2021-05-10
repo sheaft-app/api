@@ -1,23 +1,53 @@
-﻿using HotChocolate.Types;
-using Sheaft.Application.Models;
-using Sheaft.GraphQL.Enums;
+﻿using HotChocolate.Resolvers;
+using HotChocolate.Types;
+using Sheaft.Domain;
+using Sheaft.GraphQL.Tags;
 
 namespace Sheaft.GraphQL.Types.Outputs
 {
-    public class TagType : SheaftOutputType<TagDto>
+    public class TagType : SheaftOutputType<Tag>
     {
-        protected override void Configure(IObjectTypeDescriptor<TagDto> descriptor)
+        protected override void Configure(IObjectTypeDescriptor<Tag> descriptor)
         {
-            descriptor.Field(c => c.Id).Type<NonNullType<IdType>>();
-            descriptor.Field(c => c.CreatedOn);
-            descriptor.Field(c => c.UpdatedOn);
-            descriptor.Field(c => c.Kind).Type<NonNullType<TagKindEnumType>>();
-            descriptor.Field(c => c.Description);
-            descriptor.Field(c => c.Available);
-            descriptor.Field(c => c.Picture);
-            descriptor.Field(c => c.Icon);
+            base.Configure(descriptor);
 
-            descriptor.Field(c => c.Name)
+            descriptor
+                .ImplementsNode()
+                .IdField(c => c.Id)
+                .ResolveNode((ctx, id) => 
+                    ctx.DataLoader<TagsByIdBatchDataLoader>().LoadAsync(id, ctx.RequestAborted));
+
+            descriptor
+                .Field(c => c.CreatedOn)
+                .Name("createdOn");
+
+            descriptor
+                .Field(c => c.UpdatedOn)
+                .Name("updatedOn");
+
+            descriptor
+                .Field(c => c.Description)
+                .Name("description");
+
+            descriptor
+                .Field(c => c.Available)
+                .Name("available");
+
+            descriptor
+                .Field(c => c.Picture)
+                .Name("picture");
+
+            descriptor
+                .Field(c => c.Kind)
+                .Name("kind");
+
+            descriptor
+                .Field(c => c.Icon)
+                .Name("icon");
+
+            descriptor
+                .Field(c => c.Name)
+                .Name("name")
                 .Type<NonNullType<StringType>>();
         }
     }

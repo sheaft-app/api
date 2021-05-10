@@ -10,7 +10,7 @@ using Sheaft.Infrastructure.Persistence;
 
 namespace Sheaft.Infrastructure.Persistence.Migrations
 {
-    [DbContext(typeof(AppDbContext))]
+    [DbContext(typeof(QueryDbContext))]
     [Migration("20210222155333_User_ProfileInformation")]
     partial class User_ProfileInformation
     {

@@ -59,14 +59,17 @@ namespace Sheaft.Web.Api.Authorize
             var claims = user.Claims.ToList();
             var subClaim = claims.FirstOrDefault(c => c.Type == JwtClaimTypes.Subject);
 
+            // Create a tracking context from the authorization inputs.
+            var authContext = _contextFactory.CreateContext(requirements, _accessor.HttpContext.User, resource);
+
             var cachedUser = user.Identity.IsAuthenticated ? await _cache.GetAsync(user.Identity.Name) : null;
             if (cachedUser != null)
             {
                 List<UserClaim> userClaims = null;
                 using (var ms = new MemoryStream(cachedUser))
                 {
-                    var formatter = new BinaryFormatter();
-                    userClaims = (List<UserClaim>)formatter.Deserialize(ms);
+                    userClaims = 
+                        await System.Text.Json.JsonSerializer.DeserializeAsync<List<UserClaim>>(ms);
                 }
 
                 claims.AddRange(userClaims.Select(c => new Claim(c.ClaimType, c.ClaimValue, c.ClaimValueType, c.ClaimIssuer, c.ClaimOriginalIssuer, subClaim.Subject)));
@@ -81,7 +84,7 @@ namespace Sheaft.Web.Api.Authorize
                 if (bearer.Any())
                 {
                     var tokens = bearer[0].Split(" ");
-                    if (tokens.Length == 2)
+                    if (tokens.Count(t => !string.IsNullOrWhiteSpace(t)) == 2)
                     {
                         _httpClient.SetToken(tokens[0], tokens[1]);
                         var request = await _httpClient.GetAsync("/connect/userinfo");
@@ -127,33 +130,30 @@ namespace Sheaft.Web.Api.Authorize
 
                             uClaims.Add(new Claim(JwtClaimTypes.EmailVerified, userInfo.email_verified.ToString().ToLower(), null, subClaim?.Issuer, subClaim?.OriginalIssuer, subClaim?.Subject));
 
-                            byte[] buffer;
-                            using (var ms = new MemoryStream())
+                            var buffer = System.Text.Json.JsonSerializer.SerializeToUtf8Bytes(uClaims.Select(c => new UserClaim
                             {
-                                var formatter = new BinaryFormatter();
-                                formatter.Serialize(ms, uClaims.Select(c => new UserClaim
-                                {
-                                    ClaimIssuer = c.Issuer,
-                                    ClaimOriginalIssuer = c.OriginalIssuer,
-                                    ClaimType = c.Type,
-                                    ClaimValue = c.Value,
-                                    ClaimValueType = c.ValueType
-                                }).ToList());
-                                buffer = ms.ToArray();
-                            }
+                                ClaimIssuer = c.Issuer,
+                                ClaimOriginalIssuer = c.OriginalIssuer,
+                                ClaimType = c.Type,
+                                ClaimValue = c.Value,
+                                ClaimValueType = c.ValueType
+                            }).ToList());
 
                             claims.AddRange(uClaims);
 
                             await _cache.SetAsync(userInfo.sub, buffer, new DistributedCacheEntryOptions { AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(_cacheOptions.Value.CacheExpirationInMinutes ?? 5), SlidingExpiration = TimeSpan.FromMinutes(_cacheOptions.Value.CacheExpirationInMinutes ?? 5) });
                             _accessor.HttpContext.User = new ClaimsPrincipal(new ClaimsIdentity(claims, user.Identity.AuthenticationType, JwtClaimTypes.Subject, JwtClaimTypes.Role));
+                            
+                            // Create a tracking context from the authorization inputs.
+                            authContext = _contextFactory.CreateContext(requirements, _accessor.HttpContext.User, resource);
+                        }
+                        else
+                        {
+                            authContext.Fail();
                         }
                     }
                 }
             }
-
-            // Create a tracking context from the authorization inputs.
-            var authContext = _contextFactory.CreateContext(requirements, _accessor.HttpContext.User, resource);
-
             // By default this returns an IEnumerable<IAuthorizationHandlers> from DI.
             var handlers = await _handlers.GetHandlersAsync(authContext);
 

@@ -14,6 +14,7 @@ using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Application.Interfaces.Mediatr;
 using Sheaft.Core.Exceptions;
 using Sheaft.Domain.Enum;
+using Sheaft.Infrastructure.Persistence;
 using Sheaft.Mediatr.PurchaseOrder.Commands;
 using Sheaft.Options;
 using Sheaft.Web.Manage.Models;
@@ -45,12 +46,12 @@ namespace Sheaft.Web.Manage.Controllers
             var query = _context.PurchaseOrders.AsNoTracking();
 
             var requestUser = await GetRequestUserAsync(token);
-            if (requestUser.IsImpersonating)
+            if (requestUser.IsImpersonating())
             {
                 if (requestUser.IsInRole(_roleOptions.Producer.Value))
-                    query = query.Where(p => p.Vendor.Id == requestUser.Id);
+                    query = query.Where(p => p.ProducerId == requestUser.Id);
                 else
-                    query = query.Where(p => p.Sender.Id == requestUser.Id);
+                    query = query.Where(p => p.ClientId == requestUser.Id);
             }
 
             if (status != null)
@@ -74,7 +75,7 @@ namespace Sheaft.Web.Manage.Controllers
         public async Task<IActionResult> Edit(Guid id, CancellationToken token)
         {
             var requestUser = await GetRequestUserAsync(token);
-            if (!requestUser.IsImpersonating)
+            if (!requestUser.IsImpersonating())
                 return RedirectToAction("Impersonate", "Account");
 
             var entity = await _context.PurchaseOrders
@@ -94,7 +95,7 @@ namespace Sheaft.Web.Manage.Controllers
         public async Task<IActionResult> Accept(Guid id, CancellationToken token)
         {
             var requestUser = await GetRequestUserAsync(token);
-            if (!requestUser.IsImpersonating || !requestUser.IsInRole("PRODUCER"))
+            if (!requestUser.IsImpersonating() || !requestUser.IsInRole("PRODUCER"))
                 return RedirectToAction("Impersonate", "Account");
 
             var result = await _mediatr.Process(new AcceptPurchaseOrderCommand(requestUser)
@@ -114,7 +115,7 @@ namespace Sheaft.Web.Manage.Controllers
         public async Task<IActionResult> Refuse(Guid id, CancellationToken token)
         {
             var requestUser = await GetRequestUserAsync(token);
-            if (!requestUser.IsImpersonating || !requestUser.IsInRole("PRODUCER"))
+            if (!requestUser.IsImpersonating() || !requestUser.IsInRole("PRODUCER"))
                 return RedirectToAction("Impersonate", "Account");
 
             var result = await _mediatr.Process(new RefusePurchaseOrderCommand(requestUser)
@@ -134,7 +135,7 @@ namespace Sheaft.Web.Manage.Controllers
         public async Task<IActionResult> Cancel(Guid id, CancellationToken token)
         {
             var requestUser = await GetRequestUserAsync(token);
-            if (!requestUser.IsImpersonating || !requestUser.IsInRole("PRODUCER") || !requestUser.IsInRole("CONSUMER"))
+            if (!requestUser.IsImpersonating() || !requestUser.IsInRole("PRODUCER") || !requestUser.IsInRole("CONSUMER"))
                 return RedirectToAction("Impersonate", "Account");
 
             var result = await _mediatr.Process(new CancelPurchaseOrderCommand(requestUser)
@@ -154,7 +155,7 @@ namespace Sheaft.Web.Manage.Controllers
         public async Task<IActionResult> Process(Guid id, CancellationToken token)
         {
             var requestUser = await GetRequestUserAsync(token);
-            if (!requestUser.IsImpersonating || !requestUser.IsInRole("PRODUCER"))
+            if (!requestUser.IsImpersonating() || !requestUser.IsInRole("PRODUCER"))
                 return RedirectToAction("Impersonate", "Account");
 
             var result = await _mediatr.Process(new ProcessPurchaseOrderCommand(requestUser)
@@ -174,7 +175,7 @@ namespace Sheaft.Web.Manage.Controllers
         public async Task<IActionResult> Complete(Guid id, CancellationToken token)
         {
             var requestUser = await GetRequestUserAsync(token);
-            if (!requestUser.IsImpersonating || !requestUser.IsInRole("PRODUCER"))
+            if (!requestUser.IsImpersonating() || !requestUser.IsInRole("PRODUCER"))
                 return RedirectToAction("Impersonate", "Account");
 
             var result = await _mediatr.Process(new CompletePurchaseOrderCommand(requestUser)
@@ -194,7 +195,7 @@ namespace Sheaft.Web.Manage.Controllers
         public async Task<IActionResult> Deliver(Guid id, CancellationToken token)
         {
             var requestUser = await GetRequestUserAsync(token);
-            if (!requestUser.IsImpersonating || !requestUser.IsInRole("PRODUCER"))
+            if (!requestUser.IsImpersonating() || !requestUser.IsInRole("PRODUCER"))
                 return RedirectToAction("Impersonate", "Account");
 
             var result = await _mediatr.Process(new DeliverPurchaseOrderCommand(requestUser)

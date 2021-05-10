@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Linq;
 using Sheaft.Domain.Enum;
+using Sheaft.Domain.Interop;
 
 namespace Sheaft.Domain
 {
-    public abstract class ProductRow
+    public abstract class ProductRow: IIdEntity, ITrackCreation, ITrackUpdate
     {
         private const int DIGITS_COUNT = 2;
 
@@ -20,7 +21,7 @@ namespace Sheaft.Domain
             UnitWeight = product.UnitWeight;
             Vat = product.Vat;
 
-            Id = product.Id;
+            Id = Guid.NewGuid();
             Name = product.Name;
             Reference = product.Reference;
 
@@ -45,11 +46,13 @@ namespace Sheaft.Domain
             TotalVatPrice = product.TotalVatPrice;
             TotalWholeSalePrice = product.TotalWholeSalePrice;
             TotalOnSalePrice = product.TotalOnSalePrice;
+            
+            ProductId = product.ProductId;
         }
 
         protected ProductRow(Product product, Guid catalogId, int quantity)
         {
-            var productPrice = product.CatalogsPrices.Single(p => p.Catalog.Id == catalogId);
+            var productPrice = product.CatalogsPrices.Single(p => p.CatalogId == catalogId);
             
             UnitWholeSalePrice = productPrice.WholeSalePricePerUnit;
             UnitOnSalePrice = productPrice.OnSalePricePerUnit;
@@ -57,7 +60,7 @@ namespace Sheaft.Domain
             UnitWeight = product.Weight;
             Vat = product.Vat;
 
-            Id = product.Id;
+            Id = Guid.NewGuid();
             Name = product.Name;
             Reference = product.Reference;
 
@@ -66,6 +69,8 @@ namespace Sheaft.Domain
             ReturnableVatPrice = product.Returnable?.VatPrice;
             ReturnableWholeSalePrice = product.Returnable?.WholeSalePrice;
             ReturnableOnSalePrice = product.Returnable?.OnSalePrice;
+
+            ProductId = product.Id;
 
             SetQuantity(quantity);
         }
@@ -77,6 +82,8 @@ namespace Sheaft.Domain
         }
 
         public Guid Id { get; private set; }
+        public DateTimeOffset CreatedOn { get; private set; }
+        public DateTimeOffset? UpdatedOn { get; private set; }
         public string Name { get; private set; }
         public string Reference { get; private set; }
         public int Quantity { get; private set; }
@@ -101,6 +108,8 @@ namespace Sheaft.Domain
         public decimal TotalWholeSalePrice { get; private set; }
         public decimal TotalVatPrice { get; private set; }
         public decimal TotalOnSalePrice { get; private set; }
+        public Guid ProductId { get; private set; }
+        public byte[] RowVersion { get; private set; }
 
         protected void RefreshLine()
         {

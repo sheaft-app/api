@@ -13,13 +13,13 @@ namespace Sheaft.Tests.Common
 {
     public static class ContextHelper
     {
-        public static IAppDbContext GetInMemoryContext()
+        public static QueryDbContext GetInMemoryContext()
         {
-            var options = new DbContextOptionsBuilder<AppDbContext>()
+            var options = new DbContextOptionsBuilder<QueryDbContext>()
                 .UseInMemoryDatabase(Guid.NewGuid().ToString("N"))
                 .Options;
 
-            return new AppDbContext(options, Mock.Of<ISheaftMediatr>(), Mock.Of<IConfiguration>());
+            return new QueryDbContext(options);
         }
     }
 }

@@ -32,6 +32,7 @@ namespace Sheaft.Domain
         public string Picture { get; private set; }
         public string Icon { get; private set; }
         public bool Available { get; private set; }
+        public byte[] RowVersion { get; private set; }
 
         public void SetName(string name)
         {

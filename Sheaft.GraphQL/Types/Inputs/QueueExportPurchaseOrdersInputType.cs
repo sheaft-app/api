@@ -8,9 +8,17 @@ namespace Sheaft.GraphQL.Types.Inputs
     {
         protected override void Configure(IInputObjectTypeDescriptor<QueueExportPurchaseOrdersCommand> descriptor)
         {
+            base.Configure(descriptor);
+
             descriptor.Name("ExportPurchaseOrdersInput");
-            descriptor.Field(c => c.From);
-            descriptor.Field(c => c.To);
+            
+            descriptor
+                .Field(c => c.From)
+                .Name("from");
+                
+            descriptor
+                .Field(c => c.To)
+                .Name("to");
         }
     }
 }

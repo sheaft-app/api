@@ -9,7 +9,7 @@ using Sheaft.Infrastructure.Persistence;
 
 namespace Sheaft.Infrastructure.Persistence.Migrations
 {
-    [DbContext(typeof(AppDbContext))]
+    [DbContext(typeof(QueryDbContext))]
     [Migration("20201108211137_Producer_NotSubjectToVat")]
     partial class Producer_NotSubjectToVat
     {

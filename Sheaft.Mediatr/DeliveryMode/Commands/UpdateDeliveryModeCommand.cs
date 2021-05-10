@@ -10,6 +10,7 @@ using Newtonsoft.Json;
 using Sheaft.Application.Extensions;
 using Sheaft.Application.Interfaces;
 using Sheaft.Application.Interfaces.Infrastructure;
+using Microsoft.EntityFrameworkCore;
 using Sheaft.Application.Interfaces.Mediatr;
 using Sheaft.Application.Models;
 using Sheaft.Core;
@@ -17,6 +18,8 @@ using Sheaft.Core.Enums;
 using Sheaft.Core.Exceptions;
 using Sheaft.Domain;
 using Sheaft.Domain.Enum;
+using Sheaft.Application.Interfaces.Infrastructure;
+using Microsoft.EntityFrameworkCore;
 using Sheaft.Mediatr.DeliveryClosing.Commands;
 using Sheaft.Mediatr.Producer.Commands;
 
@@ -40,7 +43,7 @@ namespace Sheaft.Mediatr.DeliveryMode.Commands
         public int? MaxPurchaseOrdersPerTimeSlot { get; set; }
         public int? LockOrderHoursBeforeDelivery { get; set; }
         public AddressDto Address { get; set; }
-        public IEnumerable<TimeSlotGroupDto> OpeningHours { get; set; }
+        public IEnumerable<TimeSlotGroupDto> DeliveryHours { get; set; }
         public bool Available { get; set; }
         public bool AutoAcceptRelatedPurchaseOrder { get; set; }
         public bool AutoCompleteRelatedPurchaseOrder { get; set; }
@@ -61,7 +64,7 @@ namespace Sheaft.Mediatr.DeliveryMode.Commands
         public async Task<Result> Handle(UpdateDeliveryModeCommand request, CancellationToken token)
         {
             var entity = await _context.DeliveryModes.SingleAsync(e => e.Id == request.DeliveryModeId, token);
-            if(entity.Producer.Id != request.RequestUser.Id)
+            if(entity.ProducerId != request.RequestUser.Id)
                 return Failure(MessageKind.Forbidden);
 
             entity.SetName(request.Name);
@@ -77,13 +80,13 @@ namespace Sheaft.Mediatr.DeliveryMode.Commands
                 entity.SetAddress(request.Address.Line1, request.Address.Line2, request.Address.Zipcode,
                     request.Address.City, request.Address.Country, request.Address.Longitude, request.Address.Latitude);
 
-            if (request.OpeningHours != null)
+            if (request.DeliveryHours != null)
             {
-                var openingHours = new List<TimeSlotHour>();
-                foreach (var oh in request.OpeningHours)
-                    openingHours.AddRange(oh.Days.Select(c => new TimeSlotHour(c, oh.From, oh.To)));
+                var openingHours = new List<DeliveryHours>();
+                foreach (var oh in request.DeliveryHours)
+                    openingHours.AddRange(oh.Days.Select(c => new DeliveryHours(c, oh.From, oh.To)));
 
-                entity.SetOpeningHours(openingHours);
+                entity.SetDeliveryHours(openingHours);
             }
 
             await _context.SaveChangesAsync(token);
@@ -95,7 +98,7 @@ namespace Sheaft.Mediatr.DeliveryMode.Commands
             if (!result.Succeeded)
                 return Failure(result);
             
-            _mediatr.Post(new UpdateProducerAvailabilityCommand(request.RequestUser) {ProducerId = entity.Producer.Id});
+            _mediatr.Post(new UpdateProducerAvailabilityCommand(request.RequestUser) {ProducerId = entity.ProducerId});
             return Success();
         }
     }

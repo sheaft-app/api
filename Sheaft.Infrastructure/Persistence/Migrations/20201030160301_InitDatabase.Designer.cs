@@ -9,7 +9,7 @@ using Sheaft.Infrastructure.Persistence;
 
 namespace Sheaft.Infrastructure.Persistence.Migrations
 {
-    [DbContext(typeof(AppDbContext))]
+    [DbContext(typeof(QueryDbContext))]
     [Migration("20201030160301_InitDatabase")]
     partial class InitDatabase
     {

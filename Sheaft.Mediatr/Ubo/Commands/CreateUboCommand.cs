@@ -7,6 +7,8 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Sheaft.Application.Interfaces;
 using Sheaft.Application.Interfaces.Infrastructure;
+using Microsoft.EntityFrameworkCore;
+using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Application.Interfaces.Mediatr;
 using Sheaft.Application.Models;
 using Sheaft.Core;
@@ -53,7 +55,7 @@ namespace Sheaft.Mediatr.Ubo.Commands
         public async Task<Result<Guid>> Handle(CreateUboCommand request, CancellationToken token)
         {
             var legal = await _context.Set<BusinessLegal>()
-                .SingleOrDefaultAsync(c => c.Declaration.Id == request.DeclarationId, token);
+                .SingleOrDefaultAsync(c => c.DeclarationId == request.DeclarationId, token);
             var ubo = new Domain.Ubo(Guid.NewGuid(),
                 request.FirstName,
                 request.LastName,

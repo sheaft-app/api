@@ -14,6 +14,7 @@ using Sheaft.Core;
 using Sheaft.Core.Enums;
 using Sheaft.Domain;
 using Sheaft.Domain.Enum;
+using Sheaft.Infrastructure.Persistence;
 
 namespace Sheaft.Business
 {
@@ -41,7 +42,7 @@ namespace Sheaft.Business
             if (order.User == null)
                 return Failure(MessageKind.Order_CannotPay_User_Required);
 
-            if (order.User.Id != requestUser.Id)
+            if (order.UserId != requestUser.Id)
                 return Failure(MessageKind.Forbidden);
 
             if (!order.Deliveries.Any())
@@ -65,7 +66,7 @@ namespace Sheaft.Business
             if (!validatedDeliveries.Succeeded)
                 return Failure<Guid>(validatedDeliveries.Exception);
 
-            var invalidProductIds = await GetConsumerInvalidProductIds(order.Products.Select(p => p.Id), token);
+            var invalidProductIds = await GetConsumerInvalidProductIds(order.Products.Select(p => p.ProductId), token);
             if (invalidProductIds.Any())
                 return Failure(MessageKind.Order_CannotPay_Some_Products_NotAvailable,
                     string.Join(";", invalidProductIds));
@@ -74,9 +75,9 @@ namespace Sheaft.Business
         }
 
         public async Task<Result<List<Tuple<Domain.DeliveryMode, DateTimeOffset, string>>>> GetCartDeliveriesAsync(
-            IEnumerable<ProducerExpectedDeliveryInputDto> producersExpectedDeliveries, IEnumerable<Guid> deliveryIds,
-            IEnumerable<Tuple<Domain.Product, Guid, int>> cartProducts, CancellationToken token)
+            IEnumerable<ProducerExpectedDeliveryInputDto> producersExpectedDeliveries, IEnumerable<Tuple<Domain.Product, Guid, int>> cartProducts, CancellationToken token)
         {
+            var deliveryIds = producersExpectedDeliveries?.Select(c => c.DeliveryModeId)?.ToList() ?? new List<Guid>();
             var deliveries = deliveryIds.Any()
                 ? await _context.DeliveryModes.Where(d => deliveryIds.Contains(d.Id)).ToListAsync(token)
                 : new List<Domain.DeliveryMode>();
@@ -106,7 +107,7 @@ namespace Sheaft.Business
                     break;
                 }
 
-                if (cartProducts.Any(p => p.Item1.Producer.Id == delivery.Producer.Id && p.Item1.Producer.Closings.Any(
+                if (cartProducts.Any(p => p.Item1.ProducerId == delivery.ProducerId && p.Item1.Producer.Closings.Any(
                     c =>
                         cartDelivery.ExpectedDeliveryDate >= c.ClosedFrom &&
                         cartDelivery.ExpectedDeliveryDate <= c.ClosedTo)))
@@ -127,10 +128,10 @@ namespace Sheaft.Business
             return Success(cartDeliveries);
         }
 
-        public async Task<Result<List<Tuple<Domain.Product, Guid, int>>>> GetCartProductsAsync(
-            IEnumerable<Guid> productIds, IEnumerable<ResourceIdQuantityInputDto> productsQuantities,
+        public async Task<Result<List<Tuple<Domain.Product, Guid, int>>>> GetCartProductsAsync(IEnumerable<ResourceIdQuantityInputDto> productsQuantities,
             CancellationToken token)
         {
+            var productIds = productsQuantities?.Select(c => c.Id)?.ToList() ?? new List<Guid>();
             var invalidProductIds = await GetConsumerInvalidProductIds(productIds, token);
             if (invalidProductIds.Any())
                 return Failure<List<Tuple<Domain.Product, Guid, int>>>(

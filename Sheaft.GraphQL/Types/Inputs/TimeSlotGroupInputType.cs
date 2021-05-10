@@ -1,6 +1,5 @@
 ﻿using HotChocolate.Types;
 using Sheaft.Application.Models;
-using Sheaft.GraphQL.Enums;
 
 namespace Sheaft.GraphQL.Types.Inputs
 {
@@ -8,12 +7,21 @@ namespace Sheaft.GraphQL.Types.Inputs
     {
         protected override void Configure(IInputObjectTypeDescriptor<TimeSlotGroupDto> descriptor)
         {
-            descriptor.Name("TimeSlotGroupInput");
-            descriptor.Field(c => c.From);
-            descriptor.Field(c => c.To);
+            base.Configure(descriptor);
 
-            descriptor.Field(c => c.Days)
-                .Type<NonNullType<ListType<DayOfWeekEnumType>>>();
+            descriptor.Name("TimeSlotGroupInput");
+            
+            descriptor
+                .Field(c => c.From)
+                .Name("from");
+            
+            descriptor
+                .Field(c => c.To)
+                .Name("to");
+
+            descriptor
+                .Field(c => c.Days)
+                .Name("days");
         }
     }
 }

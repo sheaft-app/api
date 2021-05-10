@@ -8,6 +8,7 @@ using Newtonsoft.Json;
 using Sheaft.Application.Extensions;
 using Sheaft.Application.Interfaces;
 using Sheaft.Application.Interfaces.Infrastructure;
+using Microsoft.EntityFrameworkCore;
 using Sheaft.Application.Interfaces.Mediatr;
 using Sheaft.Core;
 using Sheaft.Core.Enums;
@@ -44,7 +45,7 @@ namespace Sheaft.Mediatr.PurchaseOrder.Commands
         public async Task<Result> Handle(DeletePurchaseOrderCommand request, CancellationToken token)
         {
             var purchaseOrder = await _context.PurchaseOrders.SingleAsync(e => e.Id == request.PurchaseOrderId, token);
-            if(purchaseOrder.Vendor.Id != request.RequestUser.Id && purchaseOrder.Sender.Id != request.RequestUser.Id)
+            if(purchaseOrder.ProducerId != request.RequestUser.Id && purchaseOrder.ClientId != request.RequestUser.Id)
                 return Failure(MessageKind.Forbidden);
 
             _context.Remove(purchaseOrder);

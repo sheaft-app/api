@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Application.Interfaces.Mediatr;
 using Sheaft.Core.Exceptions;
+using Sheaft.Infrastructure.Persistence;
 using Sheaft.Mediatr.Setting.Commands;
 using Sheaft.Options;
 using Sheaft.Web.Manage.Models;

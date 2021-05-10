@@ -8,9 +8,8 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
     {
         public void Configure(EntityTypeBuilder<PurchaseOrderProduct> entity)
         {
-            entity.Property<long>("PurchaseOrderUid");
-
-            entity.Property(c => c.Quantity).IsConcurrencyToken();
+            entity.Property(c => c.Quantity);
+            entity.Property(c => c.RowVersion).IsRowVersion();
 
             entity.Property(o => o.TotalWholeSalePrice).HasColumnType("decimal(10,2)");
             entity.Property(o => o.TotalVatPrice).HasColumnType("decimal(10,2)");
@@ -22,7 +21,7 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
             entity.Property(o => o.Vat).HasColumnType("decimal(10,2)");
             entity.Property(o => o.TotalWeight).HasColumnType("decimal(10,2)");
 
-            entity.Property(o => o.Name).IsRequired();
+            entity.Property(o => o.Name).UseCollation("Latin1_general_CI_AI").IsRequired();
             entity.Property(o => o.Reference).IsRequired();
 
             entity.Property(o => o.ReturnableVat).HasColumnType("decimal(10,2)");
@@ -38,8 +37,9 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
             entity.Property(o => o.TotalProductVatPrice).HasColumnType("decimal(10,2)");
             entity.Property(o => o.TotalProductWholeSalePrice).HasColumnType("decimal(10,2)");
 
-            entity.HasKey("PurchaseOrderUid", "Id");
-
+            entity.HasKey(c => c.Id);
+            entity.HasIndex(c=> new {c.PurchaseOrderId, c.ProductId}).IsUnique();
+            
             entity.ToTable("PurchaseOrderProducts");
         }
     }

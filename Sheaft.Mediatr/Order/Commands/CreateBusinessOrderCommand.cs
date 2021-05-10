@@ -11,6 +11,8 @@ using Newtonsoft.Json;
 using Sheaft.Application.Extensions;
 using Sheaft.Application.Interfaces.Business;
 using Sheaft.Application.Interfaces.Infrastructure;
+using Microsoft.EntityFrameworkCore;
+using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Application.Interfaces.Mediatr;
 using Sheaft.Application.Models;
 using Sheaft.Core;
@@ -95,23 +97,23 @@ namespace Sheaft.Mediatr.Order.Commands
                 var cartProducts = new List<Tuple<Domain.Product, Guid, int>>();
                 var deliveryIds = request.ProducersExpectedDeliveries.Select(p => p.DeliveryModeId);
                 var agreements = await _context.Agreements
-                    .Where(a => deliveryIds.Contains(a.Delivery.Id) && a.Status == AgreementStatus.Accepted)
+                    .Where(a => a.StoreId == request.UserId && a.DeliveryId.HasValue && deliveryIds.Contains(a.DeliveryId.Value) && a.Status == AgreementStatus.Accepted)
                     .ToListAsync(token);
 
                 Result<IEnumerable<Guid>> catalogResult = null;
                 foreach (var product in products)
                 {
-                    var agreement = agreements.SingleOrDefault(a => a.Delivery.Producer.Id == product.Producer.Id);
+                    var agreement = agreements.SingleOrDefault(a => a.ProducerId == product.ProducerId);
                     if (agreement?.Catalog == null)
                     {
                         catalogResult = Failure<IEnumerable<Guid>>(MessageKind.NotFound);
                         break;
                     }
 
-                    if (agreement.Catalog.Products.All(p => p.Product.Id != product.Id))
+                    if (agreement.Catalog.Products.All(p => p.ProductId != product.Id))
                         invalidProductIds.Add(product.Id.ToString("N"));
 
-                    cartProducts.Add(new Tuple<Domain.Product, Guid, int>(product, agreement.Catalog.Id,
+                    cartProducts.Add(new Tuple<Domain.Product, Guid, int>(product, agreement.CatalogId,
                         request.Products.Where(p => p.Id == product.Id).Sum(c => c.Quantity)));
                 }
 
@@ -185,7 +187,7 @@ namespace Sheaft.Mediatr.Order.Commands
                 await _context.SaveChangesAsync(token);
 
                 var purchaseOrderIds = new List<Result<Guid>>();
-                var producerIds = order.Products.Select(p => p.Producer.Id).Distinct();
+                var producerIds = order.Products.Select(p => p.ProducerId).Distinct();
                 foreach (var producerId in producerIds)
                 {
                     var result = await _mediatr.Process(new CreatePurchaseOrderCommand(request.RequestUser)
@@ -201,12 +203,11 @@ namespace Sheaft.Mediatr.Order.Commands
                 if (purchaseOrderIds.Any(r => !r.Succeeded))
                     return Failure<IEnumerable<Guid>>(purchaseOrderIds.First(r => !r.Succeeded));
 
-                await _context.SaveChangesAsync(token);
                 await transaction.CommitAsync(token);
 
                 _mediatr.Post(new CreateUserPointsCommand(request.RequestUser)
                 {
-                    CreatedOn = DateTimeOffset.UtcNow, Kind = PointKind.PurchaseOrder, UserId = order.User.Id
+                    CreatedOn = DateTimeOffset.UtcNow, Kind = PointKind.PurchaseOrder, UserId = order.UserId.Value
                 });
 
                 return Success(purchaseOrderIds.Select(p => p.Data));

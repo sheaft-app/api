@@ -11,10 +11,6 @@ namespace Sheaft.Domain
 {
     public abstract class User : IEntity
     {
-        private List<Points> _points;
-        private List<UserSetting> _settings;
-        private List<ProfilePicture> _pictures;
-
         protected User()
         {
         }
@@ -30,8 +26,9 @@ namespace Sheaft.Domain
             SetFirstname(firstname);
             SetLastname(lastname);
 
-            _points = new List<Points>();
-            _settings = new List<UserSetting>();
+            Points = new List<UserPoint>();
+            Settings = new List<UserSetting>();
+            Pictures = new List<ProfilePicture>();
             
             RefreshPoints();
         }
@@ -56,11 +53,12 @@ namespace Sheaft.Domain
         public string Facebook { get; private set; }
         public string Twitter { get; private set; }
         public string Instagram { get; private set; }
-        public virtual UserAddress Address { get; private set; }
+        public UserAddress Address { get; private set; }
         public virtual Legal Legal { get; protected set; }
-        public virtual IReadOnlyCollection<Points> Points => _points.AsReadOnly();
-        public virtual IReadOnlyCollection<UserSetting> Settings => _settings.AsReadOnly();
-        public virtual IReadOnlyCollection<ProfilePicture> Pictures => _pictures?.AsReadOnly();
+        public virtual ICollection<UserPoint> Points  { get; private set; }
+        public virtual ICollection<UserSetting> Settings { get; private set; }
+        public virtual ICollection<ProfilePicture> Pictures { get; private set; }
+        public byte[] RowVersion { get; private set; }
 
         public void SetSummary(string summary)
         {
@@ -112,22 +110,22 @@ namespace Sheaft.Domain
         
         public ProfilePicture AddPicture(ProfilePicture picture)
         {
-            _pictures ??= new List<ProfilePicture>();
-            _pictures.Add(picture);
+            Pictures ??= new List<ProfilePicture>();
+            Pictures.Add(picture);
 
             return picture;
         }
         
         public void RemovePicture(Guid id)
         {
-            if (_pictures == null || _pictures.Any())
+            if (Pictures == null || Pictures.Any())
                 throw SheaftException.NotFound();
 
-            var existingPicture = _pictures.FirstOrDefault(p => p.Id == id);
+            var existingPicture = Pictures.FirstOrDefault(p => p.Id == id);
             if (existingPicture == null)
                 throw SheaftException.NotFound();
             
-            _pictures.Remove(existingPicture);
+            Pictures.Remove(existingPicture);
         }
         
         public void SetFirstname(string firstname)
@@ -227,13 +225,13 @@ namespace Sheaft.Domain
             SetAddress("Anonymous", null, Address.Zipcode, "Anonymous", Address.Country, Address.Department);
         }
 
-        public Points AddPoints(PointKind kind, int quantity, DateTimeOffset? createdOn = null)
+        public UserPoint AddPoints(PointKind kind, int quantity, DateTimeOffset? createdOn = null)
         {
             if (Points == null)
-                _points = new List<Points>();
+                Points = new List<UserPoint>();
 
-            var points = new Points(Guid.NewGuid(), kind, quantity, createdOn ?? DateTimeOffset.UtcNow);
-            _points.Add(points);
+            var points = new UserPoint(Guid.NewGuid(), kind, quantity, createdOn ?? DateTimeOffset.UtcNow);
+            Points.Add(points);
             RefreshPoints();
 
             return points;
@@ -241,7 +239,7 @@ namespace Sheaft.Domain
 
         private void RefreshPoints()
         {
-            TotalPoints = _points.Sum(c => c.Quantity);
+            TotalPoints = Points.Sum(c => c.Quantity);
         }
 
         public void Restore()
@@ -256,18 +254,18 @@ namespace Sheaft.Domain
 
         public UserSetting GetSetting(Guid id)
         {
-            return Settings?.SingleOrDefault(s => s.Setting.Id == id);
+            return Settings?.SingleOrDefault(s => s.SettingId == id);
         }
 
         public void AddSetting(Setting setting, string value)
         {
             if (Settings == null)
-                _settings = new List<UserSetting>();
+                Settings = new List<UserSetting>();
 
-            if (_settings.Any(s => s.Setting.Kind == setting.Kind))
+            if (Settings.Any(s => s.Setting.Kind == setting.Kind))
                 throw SheaftException.AlreadyExists();
             
-            _settings.Add(new UserSetting(setting, value));
+            Settings.Add(new UserSetting(setting, value));
         }
 
         public void EditSetting(Guid settingId, string value)
@@ -275,7 +273,7 @@ namespace Sheaft.Domain
             if (Settings == null)
                 throw SheaftException.NotFound();
 
-            var setting = _settings.SingleOrDefault(s => s.Setting.Id == settingId);
+            var setting = Settings.SingleOrDefault(s => s.SettingId == settingId);
             if(setting == null)
                 throw SheaftException.NotFound();
 
@@ -287,11 +285,11 @@ namespace Sheaft.Domain
             if (Settings == null)
                 throw SheaftException.NotFound();
 
-            var setting = _settings.SingleOrDefault(s => s.Setting.Id == settingId);
+            var setting = Settings.SingleOrDefault(s => s.SettingId == settingId);
             if(setting == null)
                 throw SheaftException.NotFound();
 
-            _settings.Remove(setting);
+            Settings.Remove(setting);
         }
     }
 

@@ -8,7 +8,7 @@ namespace Sheaft.Infrastructure.Persistence.Extensions
 {
     public static class DbContextExtension
     {
-        public static bool AllMigrationsApplied(this IAppDbContext context)
+        public static bool AllMigrationsApplied(this QueryDbContext context)
         {
             var applied = context.GetService<IHistoryRepository>()
                 .GetAppliedMigrations()
@@ -17,7 +17,7 @@ namespace Sheaft.Infrastructure.Persistence.Extensions
             var total = context.GetService<IMigrationsAssembly>()
                 .Migrations
                 .Select(m => m.Key);
-
+            
             return !total.Except(applied).Any();
         }
     }

@@ -10,7 +10,7 @@ using Sheaft.Infrastructure.Persistence;
 
 namespace Sheaft.Infrastructure.Persistence.Migrations
 {
-    [DbContext(typeof(AppDbContext))]
+    [DbContext(typeof(QueryDbContext))]
     [Migration("20210313191249_Add_Address_PurchaseOrder_User")]
     partial class Add_Address_PurchaseOrder_User
     {

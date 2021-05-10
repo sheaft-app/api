@@ -1,6 +1,5 @@
 ﻿using HotChocolate.Types;
 using Sheaft.Application.Models;
-using Sheaft.GraphQL.Enums;
 
 namespace Sheaft.GraphQL.Types.Inputs
 {
@@ -8,12 +7,16 @@ namespace Sheaft.GraphQL.Types.Inputs
     {
         protected override void Configure(IInputObjectTypeDescriptor<BirthAddressDto> descriptor)
         {
+            base.Configure(descriptor);
+
             descriptor.Name("BirthAddressInput");
+            
             descriptor.Field(c => c.City)
+                .Name("city")
                 .Type<NonNullType<StringType>>();
 
             descriptor.Field(c => c.Country)
-                .Type<NonNullType<CountryIsoCodeEnumType>>();
+                .Name("country");
         }
     }
 }

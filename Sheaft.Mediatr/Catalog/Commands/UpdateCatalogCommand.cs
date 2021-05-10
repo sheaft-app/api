@@ -6,6 +6,7 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Sheaft.Application.Interfaces.Infrastructure;
+using Microsoft.EntityFrameworkCore;
 using Sheaft.Application.Interfaces.Mediatr;
 using Sheaft.Core;
 using Sheaft.Core.Enums;
@@ -46,7 +47,7 @@ namespace Sheaft.Mediatr.Catalog.Commands
         {
             var catalogs =
                 await _context.Catalogs
-                    .Where(c => c.Producer.Id == request.RequestUser.Id)
+                    .Where(c => c.ProducerId == request.RequestUser.Id)
                     .ToListAsync(token);
             
             var entity = catalogs.Single(c => c.Id == request.CatalogId);

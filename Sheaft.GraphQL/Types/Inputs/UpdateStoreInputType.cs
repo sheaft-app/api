@@ -1,5 +1,6 @@
 ﻿using HotChocolate.Types;
 using Sheaft.Application.Models;
+using Sheaft.Domain;
 using Sheaft.Mediatr.Store.Commands;
 
 namespace Sheaft.GraphQL.Types.Inputs
@@ -8,41 +9,84 @@ namespace Sheaft.GraphQL.Types.Inputs
     {
         protected override void Configure(IInputObjectTypeDescriptor<UpdateStoreCommand> descriptor)
         {
+            base.Configure(descriptor);
+
             descriptor.Name("UpdateStoreInput");
-            descriptor.Field(c => c.OpenForNewBusiness);
-            descriptor.Field(c => c.OpeningHours);
-            descriptor.Field(c => c.Phone);
-            descriptor.Field(c => c.Picture);
-            descriptor.Field(c => c.Summary);
-            descriptor.Field(c => c.Description);
-            descriptor.Field(c => c.Facebook);
-            descriptor.Field(c => c.Twitter);
-            descriptor.Field(c => c.Instagram);
-            descriptor.Field(c => c.Website);
-
-            descriptor.Field(c => c.StoreId)
+            
+            descriptor
+                .Field(c => c.OpenForNewBusiness)
+                .Name("openForNewBusiness");
+                
+            descriptor
+                .Field(c => c.Phone)
+                .Name("phone");
+                
+            descriptor
+                .Field(c => c.Picture)
+                .Name("picture");
+                
+            descriptor
+                .Field(c => c.Summary)
+                .Name("summary");
+                
+            descriptor
+                .Field(c => c.Description)
+                .Name("description");
+                
+            descriptor
+                .Field(c => c.Facebook)
+                .Name("facebook");
+                
+            descriptor
+                .Field(c => c.Twitter)
+                .Name("twitter");
+                
+            descriptor
+                .Field(c => c.Instagram)
+                .Name("instagram");
+                
+            descriptor
+                .Field(c => c.Website)
+                .Name("website");
+                
+            descriptor
+                .Field(c => c.StoreId)
                 .Name("id")
-                .Type<NonNullType<IdType>>();
+                .ID(nameof(Store));
 
-            descriptor.Field(c => c.Address)
+            descriptor
+                .Field(c => c.Address)
+                .Name("address")
                 .Type<NonNullType<AddressInputType>>();
 
-            descriptor.Field(c => c.Email)
+            descriptor
+                .Field(c => c.Email)
+                .Name("email")
                 .Type<NonNullType<StringType>>();
 
-            descriptor.Field(c => c.Name)
+            descriptor
+                .Field(c => c.Name)
+                .Name("name")
                 .Type<NonNullType<StringType>>();
 
-            descriptor.Field(c => c.FirstName)
+            descriptor
+                .Field(c => c.FirstName)
+                .Name("firstName")
                 .Type<NonNullType<StringType>>();
 
-            descriptor.Field(c => c.LastName)
+            descriptor
+                .Field(c => c.LastName)
+                .Name("lastName")
                 .Type<NonNullType<StringType>>();
 
-            descriptor.Field(c => c.Tags)
-                .Type<ListType<IdType>>();
+            descriptor
+                .Field(c => c.Tags)
+                .Name("tags")
+                .ID(nameof(Tag));
 
-            descriptor.Field(c => c.OpeningHours)
+            descriptor
+                .Field(c => c.OpeningHours)
+                .Name("openingHours")
                 .Type<ListType<TimeSlotGroupInputType>>();
         }
     }

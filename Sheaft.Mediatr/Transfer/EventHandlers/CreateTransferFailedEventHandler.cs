@@ -5,6 +5,8 @@ using Microsoft.EntityFrameworkCore;
 using Sheaft.Application.Extensions;
 using Sheaft.Application.Interfaces;
 using Sheaft.Application.Interfaces.Infrastructure;
+using Microsoft.EntityFrameworkCore;
+using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Domain.Events.Transfer;
 
 namespace Sheaft.Mediatr.Transfer.EventHandlers
@@ -28,7 +30,7 @@ namespace Sheaft.Mediatr.Transfer.EventHandlers
                 "support@sheaft.com",
                 "Support",
                 $"La création du transfert pour la commande {purchaseOrder.Reference} a échoué",
-                $"La création du transfert de {purchaseOrder.TotalOnSalePrice}€ pour la commande {purchaseOrder.Reference} de {purchaseOrder.Vendor.Name} a échoué.",
+                $"La création du transfert de {purchaseOrder.TotalOnSalePrice}€ pour la commande {purchaseOrder.Reference} de {purchaseOrder.VendorInfo.Name} a échoué.",
                 false,
                 token);
         }

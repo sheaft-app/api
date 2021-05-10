@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFramework>net5.0</TargetFramework>
 
     <IsPackable>false</IsPackable>
 
@@ -16,6 +16,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Sheaft.GraphQL\Sheaft.GraphQL.csproj" />
     <ProjectReference Include="..\Sheaft.Infrastructure.Tests\Sheaft.Infrastructure.Tests.csproj" />
     <ProjectReference Include="..\Sheaft.Mediatr\Sheaft.Mediatr.csproj" />
   </ItemGroup>

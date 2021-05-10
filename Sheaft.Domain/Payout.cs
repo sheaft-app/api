@@ -9,9 +9,6 @@ namespace Sheaft.Domain
 {
     public class Payout : Transaction, IHasDomainEvent
     {
-        private List<Transfer> _transfers;
-        private List<Withholding> _withholdings;
-
         protected Payout()
         {
         }
@@ -21,20 +18,24 @@ namespace Sheaft.Domain
             : base(id, TransactionKind.Payout, debitedWallet.User)
         {
             BankAccount = bankAccount;
+            BankAccountId = bankAccount.Id;
             Debited = transfers.Sum(t => t.Credited) - withholdings.Sum(w => w.Debited);
             Fees = 0;
             DebitedWallet = debitedWallet;
+            DebitedWalletId = debitedWallet.Id;
             Reference = "SHEAFT";
 
             DomainEvents = new List<DomainEvent>();
-            _withholdings = withholdings.ToList();
-            _transfers = transfers.ToList();
+            Withholdings = withholdings.ToList();
+            Transfers = transfers.ToList();
         }
 
+        public Guid BankAccountId { get; private set; }
+        public Guid DebitedWalletId { get; private set; }
         public virtual Wallet DebitedWallet { get; private set; }
         public virtual BankAccount BankAccount { get; private set; }
-        public virtual IReadOnlyCollection<Transfer> Transfers => _transfers?.AsReadOnly();
-        public virtual IReadOnlyCollection<Withholding> Withholdings => _withholdings?.AsReadOnly();
+        public virtual ICollection<Transfer> Transfers { get; private set; }
+        public virtual ICollection<Withholding> Withholdings { get; private set; }
 
         public override void SetStatus(TransactionStatus status)
         {

@@ -8,6 +8,8 @@ using Newtonsoft.Json;
 using Sheaft.Application.Extensions;
 using Sheaft.Application.Interfaces;
 using Sheaft.Application.Interfaces.Infrastructure;
+using Microsoft.EntityFrameworkCore;
+using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Application.Interfaces.Mediatr;
 using Sheaft.Application.Models;
 using Sheaft.Core;
@@ -78,7 +80,7 @@ namespace Sheaft.Mediatr.Legal.Commands
             if (string.IsNullOrWhiteSpace(legal.User.Identifier))
             {
                 var userResult = await _mediatr.Process(
-                    new CheckConsumerLegalConfigurationCommand(request.RequestUser) {UserId = legal.User.Id}, token);
+                    new CheckConsumerLegalConfigurationCommand(request.RequestUser) {UserId = legal.UserId}, token);
                 if (!userResult.Succeeded)
                     return Failure(userResult);
             }

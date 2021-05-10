@@ -12,8 +12,6 @@ namespace Sheaft.Domain
 {
     public class Declaration : IIdEntity, ITrackCreation, ITrackUpdate, IHasDomainEvent
     {
-        private List<Ubo> _ubos;
-
         protected Declaration()
         {
         }
@@ -23,6 +21,7 @@ namespace Sheaft.Domain
             Id = id;
             Status = DeclarationStatus.UnLocked;
             DomainEvents = new List<DomainEvent>();
+            Ubos = new List<Ubo>();
         }
 
         public Guid Id { get; private set; }
@@ -33,33 +32,33 @@ namespace Sheaft.Domain
         public DeclarationStatus Status { get; private set; }
         public string ReasonCode { get; private set; }
         public string ReasonMessage { get; private set; }
-        public virtual IReadOnlyCollection<Ubo> Ubos => _ubos?.AsReadOnly();
+        public virtual ICollection<Ubo> Ubos { get; private set; }
 
         public void AddUbo(Ubo ubo)
         {
             if (Ubos == null)
-                _ubos = new List<Ubo>();
+                Ubos = new List<Ubo>();
 
-            var existingUbo = _ubos.FirstOrDefault(u => u.Id == ubo.Id);
+            var existingUbo = Ubos.SingleOrDefault(u => u.Id == ubo.Id);
             if (existingUbo != null)
                 throw new ValidationException(MessageKind.Ubo_CannotAdd_AlreadyExists);
 
-            _ubos.Add(ubo);
+            Ubos.Add(ubo);
         }
 
         public void RemoveUbo(Guid id)
         {
-            var existingUbo = _ubos.FirstOrDefault(u => u.Id == id);
-            if(existingUbo == null)
+            var existingUbo = Ubos.SingleOrDefault(u => u.Id == id);
+            if (existingUbo == null)
                 throw new ValidationException(MessageKind.Ubo_CannotRemove_NotFound);
 
-            _ubos.Remove(existingUbo);
+            Ubos.Remove(existingUbo);
         }
 
         public void SetStatus(DeclarationStatus status)
         {
             Status = status;
-            
+
             switch (Status)
             {
                 case DeclarationStatus.Incomplete:

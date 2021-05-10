@@ -26,6 +26,7 @@ namespace Sheaft.Domain
             Id = id;
             Name = name;
             User = user;
+            UserId = user.Id;
             Status = ProcessStatus.Waiting;
             Kind = kind;
             DomainEvents = new List<DomainEvent>();
@@ -47,6 +48,7 @@ namespace Sheaft.Domain
         public DateTimeOffset? CompletedOn { get; private set; }
         public bool Archived { get; private set; }
         public int? Retried { get; private set; }
+        public Guid UserId { get; private set; }
         public virtual User User { get; private set; }
 
         public void StartJob()
@@ -175,5 +177,6 @@ namespace Sheaft.Domain
         }
 
         public List<DomainEvent> DomainEvents { get; } = new List<DomainEvent>();
+        public byte[] RowVersion { get; private set; }
     }
 }

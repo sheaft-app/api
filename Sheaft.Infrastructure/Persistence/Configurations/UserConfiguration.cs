@@ -16,14 +16,13 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
 
         public void Configure(EntityTypeBuilder<User> entity)
         {
-            entity.Property<long>("Uid");
+            entity.Property(c => c.UpdatedOn);
+            entity.Property(c => c.RowVersion).IsRowVersion();
 
-            entity.Property(c => c.UpdatedOn).IsConcurrencyToken();
-            
-            if(!_isAdmin)
+            if (!_isAdmin)
                 entity.HasQueryFilter(p => !p.RemovedOn.HasValue);
 
-            entity.Property(c => c.Name).IsRequired();
+            entity.Property(c => c.Name).UseCollation("Latin1_general_CI_AI").IsRequired();
             entity.Property(c => c.Email).IsRequired();
             entity.Property(c => c.FirstName).IsRequired();
             entity.Property(c => c.LastName).IsRequired();
@@ -36,41 +35,18 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
                 .HasValue<Admin>(ProfileKind.Admin)
                 .HasValue<Support>(ProfileKind.Support);
 
-            entity.OwnsOne(c => c.Address, cb =>
-            {
-                cb.Property<long>("DepartmentUid");
-                cb.HasOne(c => c.Department).WithMany().HasForeignKey("DepartmentUid");
+            entity.OwnsOne(c => c.Address,
+                cb => { cb.HasOne(c => c.Department).WithMany().HasForeignKey(c => c.DepartmentId); });
 
-                cb.ToTable("UserAddresses");
-            });
+            entity.HasMany(c => c.Points).WithOne().HasForeignKey(c => c.UserId).OnDelete(DeleteBehavior.Cascade);
+            entity.HasMany(c => c.Settings).WithOne().HasForeignKey(c => c.UserId).OnDelete(DeleteBehavior.Cascade)
+                .IsRequired();
+            entity.HasMany(c => c.Pictures).WithOne().HasForeignKey(c => c.UserId).OnDelete(DeleteBehavior.Cascade)
+                .IsRequired();
 
-            entity.OwnsMany(c => c.Points, p =>
-            {
-                p.Property<long>("Uid");
-                p.HasKey("Uid");
-                p.HasIndex(c => c.Id).IsUnique();
-                p.ToTable("UserPoints");
-            });
-
-            entity.HasMany(c => c.Settings).WithOne().HasForeignKey("UserUid").OnDelete(DeleteBehavior.Cascade).IsRequired();
-            entity.HasMany(c => c.Pictures).WithOne().HasForeignKey("UserUid").OnDelete(DeleteBehavior.Cascade).IsRequired();
-            entity.HasMany<Sponsoring>().WithOne(c => c.Sponsor).HasForeignKey("SponsorUid").OnDelete(DeleteBehavior.NoAction).IsRequired();
-
-            var settings = entity.Metadata.FindNavigation(nameof(User.Settings));
-            settings.SetPropertyAccessMode(PropertyAccessMode.Field);
-            
-            var points = entity.Metadata.FindNavigation(nameof(User.Points));
-            points.SetPropertyAccessMode(PropertyAccessMode.Field);
-            
-            var pictures = entity.Metadata.FindNavigation(nameof(User.Pictures));
-            pictures.SetPropertyAccessMode(PropertyAccessMode.Field);
-            
-            entity.HasKey("Uid");
-
-            entity.HasIndex(c => c.Id).IsUnique();
+            entity.HasKey(c => c.Id);
             entity.HasIndex(c => c.Email).IsUnique();
             entity.HasIndex(c => c.Identifier);
-            entity.HasIndex("Uid", "Id", "RemovedOn");
 
             entity.ToTable("Users");
         }

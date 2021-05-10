@@ -26,7 +26,7 @@ namespace Sheaft.Business
             _tableService = tableService;
         }
 
-        public async Task<Result<bool>> ValidateCapedDeliveriesAsync(IReadOnlyCollection<OrderDelivery> orderDeliveries, CancellationToken token)
+        public async Task<Result<bool>> ValidateCapedDeliveriesAsync(ICollection<OrderDelivery> orderDeliveries, CancellationToken token)
         {
             if (orderDeliveries.All(d => !d.DeliveryMode.MaxPurchaseOrdersPerTimeSlot.HasValue))
                 return Success(true);
@@ -34,8 +34,8 @@ namespace Sheaft.Business
             var results = await _tableService.GetCapingDeliveriesInfosAsync(
                 orderDeliveries.Where(d => d.DeliveryMode.MaxPurchaseOrdersPerTimeSlot.HasValue).Select(d =>
                     new Tuple<Guid, Guid, DeliveryHourDto>(
-                        d.DeliveryMode.Producer.Id,
-                        d.DeliveryMode.Id,
+                        d.DeliveryMode.ProducerId,
+                        d.DeliveryModeId,
                         new DeliveryHourDto
                         {
                             Day = d.ExpectedDelivery.ExpectedDeliveryDate.DayOfWeek,
@@ -51,7 +51,7 @@ namespace Sheaft.Business
             var result = Success(true);
             foreach (var orderDelivery in orderDeliveries)
             {
-                var delivery = results.Data.FirstOrDefault(d => d.DeliveryId == orderDelivery.Id
+                var delivery = results.Data.FirstOrDefault(d => d.DeliveryId == orderDelivery.DeliveryModeId
                                                                 && d.ExpectedDate.Year == orderDelivery.ExpectedDelivery
                                                                     .ExpectedDeliveryDate.Year
                                                                 && d.ExpectedDate.Month ==

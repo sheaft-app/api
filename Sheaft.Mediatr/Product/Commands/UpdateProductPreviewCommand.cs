@@ -8,6 +8,8 @@ using Newtonsoft.Json;
 using Sheaft.Application.Extensions;
 using Sheaft.Application.Interfaces;
 using Sheaft.Application.Interfaces.Infrastructure;
+using Microsoft.EntityFrameworkCore;
+using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Application.Interfaces.Mediatr;
 using Sheaft.Application.Models;
 using Sheaft.Core;
@@ -50,7 +52,7 @@ namespace Sheaft.Mediatr.Product.Commands
         public async Task<Result<string>> Handle(UpdateProductPreviewCommand request, CancellationToken token)
         {
             var entity = await _context.Products.SingleAsync(e => e.Id == request.ProductId, token);
-            if(entity.Producer.Id != request.RequestUser.Id)
+            if(entity.ProducerId != request.RequestUser.Id)
                 return Failure<string>(MessageKind.Forbidden);
 
             var resultImage =
@@ -58,8 +60,11 @@ namespace Sheaft.Mediatr.Product.Commands
             if (!resultImage.Succeeded)
                 return Failure<string>(resultImage);
 
-            entity.SetPicture(resultImage.Data);
-            await _context.SaveChangesAsync(token);
+            if (entity.Picture != resultImage.Data)
+            {
+                entity.SetPicture(resultImage.Data);
+                await _context.SaveChangesAsync(token);
+            }
 
             return Success(resultImage.Data);
         }

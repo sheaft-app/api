@@ -10,7 +10,7 @@ using Sheaft.Infrastructure.Persistence;
 
 namespace Sheaft.Infrastructure.Persistence.Migrations
 {
-    [DbContext(typeof(AppDbContext))]
+    [DbContext(typeof(QueryDbContext))]
     [Migration("20210406175646_Add_QuickOrder_CatalogProduct")]
     partial class Add_QuickOrder_CatalogProduct
     {

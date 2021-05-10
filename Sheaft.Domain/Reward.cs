@@ -32,9 +32,13 @@ namespace Sheaft.Domain
         public string Phone { get; private set; }
         public string Url { get; private set; }
 
-        public virtual Consumer Winner { get; private set; }
+        public Guid? WinnerId { get; private set; }
+        public Guid DepartmentId { get; private set; }
+        public Guid LevelId { get; private set; }
+        public virtual User Winner { get; private set; }
         public virtual Department Department { get; private set; }
         public virtual Level Level { get; private set; }
+        public byte[] RowVersion { get; private set; }
 
         public void SetName(string name)
         {
@@ -92,14 +96,16 @@ namespace Sheaft.Domain
             Url = url;
         }
 
-        public void AssignRewardToUser(Consumer user)
+        public void AssignRewardToUser(User user)
         {
             Winner = user;
+            WinnerId = user.Id;
         }
 
         public void SetDepartment(Department department)
         {
             Department = department;
+            DepartmentId = department.Id;
         }
     }
 }

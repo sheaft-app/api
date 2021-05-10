@@ -26,15 +26,14 @@ namespace Sheaft.Domain
         public string Email { get; private set; }
         public string Siret { get; private set; }
         public string VatIdentifier { get; private set; }
-        public virtual LegalAddress Address { get; private set; }
+        public Guid? DeclarationId { get; private set; }
+        public LegalAddress Address { get; private set; }
         public virtual Declaration Declaration { get; private set; }
 
         public void SetDeclaration()
         {
-            if (Declaration != null)
-                Declaration = null;
-
             Declaration = new Declaration(Guid.NewGuid());
+            DeclarationId = Declaration.Id;
         }
 
         public void SetSiret(string siret)

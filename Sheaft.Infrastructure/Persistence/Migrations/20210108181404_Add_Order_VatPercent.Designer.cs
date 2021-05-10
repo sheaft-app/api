@@ -9,7 +9,7 @@ using Sheaft.Infrastructure.Persistence;
 
 namespace Sheaft.Infrastructure.Persistence.Migrations
 {
-    [DbContext(typeof(AppDbContext))]
+    [DbContext(typeof(QueryDbContext))]
     [Migration("20210108181404_Add_Order_VatPercent")]
     partial class Add_Order_VatPercent
     {

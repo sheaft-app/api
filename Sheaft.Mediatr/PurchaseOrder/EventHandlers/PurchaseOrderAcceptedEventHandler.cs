@@ -6,6 +6,8 @@ using Microsoft.Extensions.Configuration;
 using Sheaft.Application.Extensions;
 using Sheaft.Application.Interfaces;
 using Sheaft.Application.Interfaces.Infrastructure;
+using Microsoft.EntityFrameworkCore;
+using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Domain.Events.PurchaseOrder;
 
 namespace Sheaft.Mediatr.PurchaseOrder.EventHandlers
@@ -29,16 +31,16 @@ namespace Sheaft.Mediatr.PurchaseOrder.EventHandlers
         {
             var orderEvent = notification.DomainEvent;
             var purchaseOrder = await _context.PurchaseOrders.SingleAsync(e => e.Id == orderEvent.PurchaseOrderId, token);
-            await _signalrService.SendNotificationToUserAsync(purchaseOrder.Sender.Id, nameof(PurchaseOrderAcceptedEvent), purchaseOrder.GetPurchaseNotifModelAsString());
+            await _signalrService.SendNotificationToUserAsync(purchaseOrder.ClientId, nameof(PurchaseOrderAcceptedEvent), purchaseOrder.GetPurchaseNotifModelAsString());
 
-            var email = purchaseOrder.Sender.Email;
-            var name = purchaseOrder.Sender.Name;
+            var email = purchaseOrder.SenderInfo.Email;
+            var name = purchaseOrder.SenderInfo.Name;
             var url = $"{_configuration.GetValue<string>("Portal:url")}/#/my-orders/{purchaseOrder.Id}";
 
             await _emailService.SendTemplatedEmailAsync(
                 email,
                 name,
-                $"{purchaseOrder.Vendor.Name} a accepté votre commande",
+                $"{purchaseOrder.VendorInfo.Name} a accepté votre commande",
                 nameof(PurchaseOrderAcceptedEvent),
                 purchaseOrder.GetTemplateData(url),
                 true,

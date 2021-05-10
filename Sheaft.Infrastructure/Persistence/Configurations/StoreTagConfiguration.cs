@@ -8,13 +8,9 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
     {
         public void Configure(EntityTypeBuilder<StoreTag> entity)
         {
-            entity.Property<long>("StoreUid");
-            entity.Property<long>("TagUid");
+            entity.HasOne(c => c.Tag).WithMany().HasForeignKey(c=>c.TagId).OnDelete(DeleteBehavior.Cascade).IsRequired();
 
-            entity.HasOne(c => c.Tag).WithMany().HasForeignKey("TagUid").OnDelete(DeleteBehavior.Cascade).IsRequired();
-
-            entity.HasKey("StoreUid", "TagUid");
-
+            entity.HasKey(c=> new {c.StoreId, c.TagId});
             entity.ToTable("StoreTags");
         }
     }

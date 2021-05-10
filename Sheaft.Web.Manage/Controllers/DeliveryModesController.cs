@@ -13,6 +13,7 @@ using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Application.Interfaces.Mediatr;
 using Sheaft.Application.Models;
 using Sheaft.Core.Exceptions;
+using Sheaft.Infrastructure.Persistence;
 using Sheaft.Mediatr.DeliveryMode.Commands;
 using Sheaft.Options;
 using Sheaft.Web.Manage.Models;
@@ -43,9 +44,9 @@ namespace Sheaft.Web.Manage.Controllers
             var query = _context.DeliveryModes.AsNoTracking();
 
             var requestUser = await GetRequestUserAsync(token);
-            if (requestUser.IsImpersonating)
+            if (requestUser.IsImpersonating())
             {
-                query = query.Where(p => p.Producer.Id == requestUser.Id);
+                query = query.Where(p => p.ProducerId == requestUser.Id);
             }
 
             var entities = await query

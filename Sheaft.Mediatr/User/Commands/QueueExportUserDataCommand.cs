@@ -8,6 +8,7 @@ using Newtonsoft.Json;
 using Sheaft.Application.Extensions;
 using Sheaft.Application.Interfaces;
 using Sheaft.Application.Interfaces.Infrastructure;
+using Microsoft.EntityFrameworkCore;
 using Sheaft.Application.Interfaces.Mediatr;
 using Sheaft.Core;
 using Sheaft.Core.Enums;
@@ -26,9 +27,16 @@ namespace Sheaft.Mediatr.User.Commands
         [JsonConstructor]
         public QueueExportUserDataCommand(RequestUser requestUser) : base(requestUser)
         {
+            UserId = requestUser.Id;
         }
 
         public Guid UserId { get; set; }
+
+        public override void SetRequestUser(RequestUser user)
+        {
+            base.SetRequestUser(user);
+            UserId = user.Id;
+        }
     }
 
     public class QueueExportUserDataCommandHandler : CommandsHandler,

@@ -7,15 +7,37 @@ namespace Sheaft.GraphQL.Types.Inputs
     {
         protected override void Configure(IInputObjectTypeDescriptor<OwnerInputDto> descriptor)
         {
-            descriptor.Name("CreateOwnerInput");
-            descriptor.Field(c => c.FirstName);
-            descriptor.Field(c => c.LastName);
-            descriptor.Field(c => c.Email);
-            descriptor.Field(c => c.BirthDate);
-            descriptor.Field(c => c.Nationality);
-            descriptor.Field(c => c.CountryOfResidence);
+            base.Configure(descriptor);
 
-            descriptor.Field(c => c.Address)
+            descriptor.Name("CreateOwnerInput");
+            
+            descriptor
+                .Field(c => c.FirstName)
+                .Name("firstName");
+                
+            descriptor
+                .Field(c => c.LastName)
+                .Name("lastName");
+                
+            descriptor
+                .Field(c => c.Email)
+                .Name("email");
+                
+            descriptor
+                .Field(c => c.BirthDate)
+                .Name("birthDate");
+                
+            descriptor
+                .Field(c => c.Nationality)
+                .Name("nationality");
+                
+            descriptor
+                .Field(c => c.CountryOfResidence)
+                .Name("countryOfResidence");
+
+            descriptor
+                .Field(c => c.Address)
+                .Name("address")
                 .Type<NonNullType<AddressInputType>>();
         }
     }

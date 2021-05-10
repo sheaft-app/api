@@ -1,5 +1,6 @@
 ﻿using HotChocolate.Types;
 using Sheaft.Application.Models;
+using Sheaft.Domain;
 using Sheaft.Mediatr.Product.Commands;
 
 namespace Sheaft.GraphQL.Types.Inputs
@@ -8,12 +9,18 @@ namespace Sheaft.GraphQL.Types.Inputs
     {
         protected override void Configure(IInputObjectTypeDescriptor<AddPictureToProductCommand> descriptor)
         {
+            base.Configure(descriptor);
+            
             descriptor.Name("AddPictureToProductInput");
-            descriptor.Field(c => c.ProductId)
+            
+            descriptor
+                .Field(c => c.ProductId)
                 .Name("id")
-                .Type<NonNullType<IdType>>();
+                .ID(nameof(Product));
 
-            descriptor.Field(c => c.Picture);
+            descriptor
+                .Field(c => c.Picture)
+                .Name("picture");
         }
     }
 }

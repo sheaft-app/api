@@ -7,6 +7,9 @@ using Microsoft.Extensions.Configuration;
 using Sheaft.Application.Extensions;
 using Sheaft.Application.Interfaces;
 using Sheaft.Application.Interfaces.Infrastructure;
+using Microsoft.EntityFrameworkCore;
+using Sheaft.Application.Interfaces.Infrastructure;
+using Sheaft.Domain.Enum;
 using Sheaft.Domain.Events.Agreement;
 
 namespace Sheaft.Mediatr.Agreement.EventHandlers
@@ -37,19 +40,19 @@ namespace Sheaft.Mediatr.Agreement.EventHandlers
             var id = Guid.Empty;
 
             var subEventName = string.Empty;
-            if (agreement.CreatedBy.Id == agreement.Delivery.Producer.Id)
+            if (agreementEvent.RequestedByKind == ProfileKind.Producer)
             {
-                email = agreement.Delivery.Producer.Email;
-                name = agreement.Delivery.Producer.Name;
+                email = agreement.Producer.Email;
+                name = agreement.Producer.Name;
                 targetName = agreement.Store.Name;
-                id = agreement.Delivery.Producer.Id;
+                id = agreement.Producer.Id;
                 subEventName = "ByStore";
             }
             else
             {
                 email = agreement.Store.Email;
                 name = agreement.Store.Name;
-                targetName = agreement.Delivery.Producer.Name;
+                targetName = agreement.Producer.Name;
                 id = agreement.Store.Id;
                 subEventName = "ByProducer";
             }

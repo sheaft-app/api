@@ -46,8 +46,8 @@ namespace Sheaft.Business.PickingOrdersExporters
             {
                 Reference = o.Reference,
                 ExpectedDeliveryDate = o.ExpectedDelivery.ExpectedDeliveryDate.ToString("dd/MM/yyyy"),
-                SenderId = o.Sender.Id,
-                SenderName = o.Sender.Name,
+                SenderId = o.ClientId,
+                SenderName = o.SenderInfo.Name,
                 Products = o.Products.Select(GetLightProduct)
             });
 
@@ -291,7 +291,7 @@ namespace Sheaft.Business.PickingOrdersExporters
         {
             return new LightProduct
             {
-                Id = p.Id,
+                Id = p.ProductId,
                 Name = $"{p.Name}{(p.UnitWeight.HasValue && p.UnitWeight > 0 ? " " + p.UnitWeight.Value : "")}",
                 Reference = p.Reference,
                 Quantity = p.Quantity

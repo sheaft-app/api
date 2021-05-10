@@ -16,24 +16,30 @@ namespace Sheaft.Domain
             : base(id, TransactionKind.Donation, debitedWallet.User)
         {
             Order = order;
+            OrderId = order.Id;
             Fees = 0;
             Debited = Math.Round(order.Donation - order.DonationFeesPrice, 2);
             CreditedWallet = creditedWallet;
+            CreditedWalletId = creditedWallet.Id;
             DebitedWallet = debitedWallet;
+            DebitedWalletId = debitedWallet.Id;
             Credited = Debited;
             Reference = "DONATION";
             DomainEvents = new List<DomainEvent>();
         }
 
+        public Guid CreditedWalletId { get; private set; }
+        public Guid DebitedWalletId { get; private set; }
+        public Guid OrderId { get; private set; }
         public virtual Wallet CreditedWallet { get; private set; }
         public virtual Wallet DebitedWallet { get; private set; }
         public virtual Order Order { get; private set; }
-        
+
 
         public override void SetStatus(TransactionStatus status)
         {
             base.SetStatus(status);
-            
+
             switch (Status)
             {
                 case TransactionStatus.Failed:

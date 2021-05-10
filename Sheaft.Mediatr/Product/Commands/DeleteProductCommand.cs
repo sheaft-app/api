@@ -9,6 +9,7 @@ using Newtonsoft.Json;
 using Sheaft.Application.Extensions;
 using Sheaft.Application.Interfaces;
 using Sheaft.Application.Interfaces.Infrastructure;
+using Microsoft.EntityFrameworkCore;
 using Sheaft.Application.Interfaces.Mediatr;
 using Sheaft.Core;
 using Sheaft.Core.Enums;
@@ -46,13 +47,13 @@ namespace Sheaft.Mediatr.Product.Commands
         public async Task<Result> Handle(DeleteProductCommand request, CancellationToken token)
         {
             var entity = await _context.Products.SingleAsync(e => e.Id == request.ProductId, token);
-            if(entity.Producer.Id != request.RequestUser.Id)
+            if(entity.ProducerId != request.RequestUser.Id)
                 return Failure(MessageKind.Forbidden);
             
             _context.Remove(entity);
             await _context.SaveChangesAsync(token);
             
-            _mediatr.Post(new UpdateProducerProductsCommand(request.RequestUser) {ProducerId = entity.Producer.Id});
+            _mediatr.Post(new UpdateProducerProductsCommand(request.RequestUser) {ProducerId = entity.ProducerId});
             return Success();
         }
     }

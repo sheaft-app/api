@@ -11,7 +11,6 @@ namespace Sheaft.Domain
 
         protected PurchaseOrderUser(User user)
         {
-            Id = user.Id;
             Name = user.Name;
             Kind = user.Kind;
             Email = user.Email;
@@ -20,7 +19,6 @@ namespace Sheaft.Domain
             Address = user.Address?.ToString();
         }
 
-        public Guid Id { get; private set; }
         public ProfileKind Kind { get; private set; }
         public string Name { get; private set; }
         public string Email { get; private set; }

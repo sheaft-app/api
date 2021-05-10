@@ -16,6 +16,7 @@ using Sheaft.Application.Interfaces.Mediatr;
 using Sheaft.Application.Models;
 using Sheaft.Core.Exceptions;
 using Sheaft.Domain;
+using Sheaft.Infrastructure.Persistence;
 using Sheaft.Mediatr.Store.Commands;
 using Sheaft.Mediatr.User.Commands;
 using Sheaft.Options;
@@ -47,7 +48,7 @@ namespace Sheaft.Web.Manage.Controllers
             var query = _context.Users.OfType<Store>().AsNoTracking();
 
             var requestUser = await GetRequestUserAsync(token);
-            if (requestUser.IsImpersonating)
+            if (requestUser.IsImpersonating())
                 query = query.Where(p => p.Id == requestUser.Id);
 
             var entities = await query
@@ -73,7 +74,7 @@ namespace Sheaft.Web.Manage.Controllers
             if (entity == null)
                 throw SheaftException.NotFound();
 
-            ViewBag.LegalsId = (await _context.Legals.FirstOrDefaultAsync(c => c.User.Id == id, token))?.Id;
+            ViewBag.LegalsId = (await _context.Legals.FirstOrDefaultAsync(c => c.UserId == id, token))?.Id;
             ViewBag.Tags = await GetTags(token);
             return View(entity);
         }
@@ -111,7 +112,7 @@ namespace Sheaft.Web.Manage.Controllers
 
             if (!result.Succeeded)
             {
-                ViewBag.LegalsId = (await _context.Legals.FirstOrDefaultAsync(c => c.User.Id == model.Id, token))?.Id;
+                ViewBag.LegalsId = (await _context.Legals.FirstOrDefaultAsync(c => c.UserId == model.Id, token))?.Id;
                 ViewBag.Tags = await GetTags(token);
 
                 ModelState.AddModelError("", result.Exception.Message);
@@ -125,7 +126,7 @@ namespace Sheaft.Web.Manage.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete(Guid id, CancellationToken token)
         {
-            var result = await _mediatr.Process(new RemoveUserCommand(await GetRequestUserAsync(token))
+            var result = await _mediatr.Process(new DeleteUserCommand(await GetRequestUserAsync(token))
             {
                 UserId = id
             }, token);

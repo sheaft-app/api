@@ -13,6 +13,7 @@ using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Application.Interfaces.Mediatr;
 using Sheaft.Core.Exceptions;
 using Sheaft.Domain.Enum;
+using Sheaft.Infrastructure.Persistence;
 using Sheaft.Mediatr.Job.Commands;
 using Sheaft.Options;
 using Sheaft.Web.Manage.Models;
@@ -44,8 +45,8 @@ namespace Sheaft.Web.Manage.Controllers
             var query = _context.Jobs.AsNoTracking();
 
             var requestUser = await GetRequestUserAsync(token);
-            if (requestUser.IsImpersonating)
-                query = query.Where(p => p.User.Id == requestUser.Id);
+            if (requestUser.IsImpersonating())
+                query = query.Where(p => p.UserId == requestUser.Id);
 
             if (status != null)
                 query = query.Where(j => j.Status == status);

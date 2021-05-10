@@ -11,7 +11,7 @@ namespace Sheaft.Application.Models
         public CatalogKind Kind { get; set; }
         public DateTimeOffset CreatedOn { get; set; }
         public DateTimeOffset? UpdatedOn { get; set; }
-        public bool IsAvailable { get; set; }
+        public bool Available { get; set; }
         public bool IsDefault { get; set; }
         public int ProductsCount { get; set; }
         public IEnumerable<CatalogProductDto> Products { get; set; }

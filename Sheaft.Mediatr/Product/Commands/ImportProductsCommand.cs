@@ -11,6 +11,8 @@ using Newtonsoft.Json;
 using Sheaft.Application.Extensions;
 using Sheaft.Application.Interfaces.Factories;
 using Sheaft.Application.Interfaces.Infrastructure;
+using Microsoft.EntityFrameworkCore;
+using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Application.Interfaces.Mediatr;
 using Sheaft.Core;
 using Sheaft.Domain;
@@ -70,7 +72,7 @@ namespace Sheaft.Mediatr.Product.Commands
                 if (request.NotifyOnUpdates)
                     _mediatr.Post(new ProductImportProcessingEvent(job.Id));
 
-                var fileDataResult = await _blobService.DownloadImportProductsFileAsync(job.User.Id, job.Id, token);
+                var fileDataResult = await _blobService.DownloadImportProductsFileAsync(job.UserId, job.Id, token);
                 if (!fileDataResult.Succeeded)
                     return fileDataResult;
 
@@ -100,7 +102,7 @@ namespace Sheaft.Mediatr.Product.Commands
                 }
 
                 _mediatr.Post(new UpdateProducerTagsCommand(request.RequestUser)
-                    {ProducerId = job.User.Id});
+                    {ProducerId = job.UserId});
 
                 var result = await _mediatr.Process(new CompleteJobCommand(request.RequestUser) {JobId = job.Id}, token);
                 if (!result.Succeeded)

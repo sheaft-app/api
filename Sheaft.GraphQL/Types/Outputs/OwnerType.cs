@@ -1,27 +1,43 @@
 ﻿using HotChocolate.Types;
 using Sheaft.Application.Models;
-using Sheaft.GraphQL.Enums;
+using Sheaft.Domain;
 
 namespace Sheaft.GraphQL.Types.Outputs
 {
-    public class OwnerType : ObjectType<OwnerDto>
+    public class OwnerType : SheaftOutputType<Owner>
     {
-        protected override void Configure(IObjectTypeDescriptor<OwnerDto> descriptor)
+        protected override void Configure(IObjectTypeDescriptor<Owner> descriptor)
         {
-            descriptor.Field(c => c.Id).Type<IdType>();
-            descriptor.Field(c => c.FirstName);
-            descriptor.Field(c => c.LastName);
-            descriptor.Field(c => c.Email);
-            descriptor.Field(c => c.BirthDate);
-
-            descriptor.Field(c => c.CountryOfResidence)
-                .Type<NonNullType<CountryIsoCodeEnumType>>();
-
-            descriptor.Field(c => c.Nationality)
-                .Type<NonNullType<CountryIsoCodeEnumType>>();
-
-            descriptor.Field(c => c.Address)
-                .Type<AddressType>();
+            base.Configure(descriptor);
+            
+            descriptor
+                .Field(c => c.FirstName)
+                .Name("firstName");
+                
+            descriptor
+                .Field(c => c.LastName)
+                .Name("lastName");
+                
+            descriptor
+                .Field(c => c.Email)
+                .Name("email");
+                
+            descriptor
+                .Field(c => c.BirthDate)
+                .Name("birthDate");
+                
+            descriptor
+                .Field(c => c.CountryOfResidence)
+                .Name("countryOfResidence");
+                
+            descriptor
+                .Field(c => c.Nationality)
+                .Name("nationality");
+                
+            descriptor
+                .Field(c => c.Address)
+                .Name("address")
+                .Type<OwnerAddressType>();
         }
     }
 }

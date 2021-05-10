@@ -8,6 +8,8 @@ using Newtonsoft.Json;
 using Sheaft.Application.Extensions;
 using Sheaft.Application.Interfaces;
 using Sheaft.Application.Interfaces.Infrastructure;
+using Microsoft.EntityFrameworkCore;
+using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Application.Interfaces.Mediatr;
 using Sheaft.Application.Models;
 using Sheaft.Core;
@@ -63,7 +65,7 @@ namespace Sheaft.Mediatr.Legal.Commands
                 request.VatIdentifier,
                 new LegalAddress(request.Address.Line1, request.Address.Line2, request.Address.Zipcode,
                     request.Address.City, request.Address.Country),
-                new Owner(business.Id,
+                new Owner(
                     request.Owner.FirstName,
                     request.Owner.LastName,
                     request.Owner.Email,

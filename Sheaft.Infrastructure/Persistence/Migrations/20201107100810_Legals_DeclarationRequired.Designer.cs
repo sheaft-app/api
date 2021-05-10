@@ -9,7 +9,7 @@ using Sheaft.Infrastructure.Persistence;
 
 namespace Sheaft.Infrastructure.Persistence.Migrations
 {
-    [DbContext(typeof(AppDbContext))]
+    [DbContext(typeof(QueryDbContext))]
     [Migration("20201107100810_Legals_DeclarationRequired")]
     partial class Legals_DeclarationRequired
     {

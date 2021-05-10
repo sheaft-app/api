@@ -1,5 +1,6 @@
 ﻿using HotChocolate.Types;
 using Sheaft.Application.Models;
+using Sheaft.Domain;
 using Sheaft.Mediatr.Legal.Commands;
 
 namespace Sheaft.GraphQL.Types.Inputs
@@ -8,19 +9,42 @@ namespace Sheaft.GraphQL.Types.Inputs
     {
         protected override void Configure(IInputObjectTypeDescriptor<UpdateConsumerLegalCommand> descriptor)
         {
+            base.Configure(descriptor);
+
             descriptor.Name("UpdateConsumerLegalInput");
-            descriptor.Field(c => c.LegalId)
+            
+            descriptor
+                .Field(c => c.LegalId)
                 .Name("id")
-                .Type<NonNullType<IdType>>();
+                .ID(nameof(ConsumerLegal));
 
-            descriptor.Field(c => c.FirstName);
-            descriptor.Field(c => c.LastName);
-            descriptor.Field(c => c.Email);
-            descriptor.Field(c => c.BirthDate);
-            descriptor.Field(c => c.Nationality);
-            descriptor.Field(c => c.CountryOfResidence);
+            descriptor
+                .Field(c => c.FirstName)
+                .Name("firstName");
+                
+            descriptor
+                .Field(c => c.LastName)
+                .Name("lastName");
+                
+            descriptor
+                .Field(c => c.Email)
+                .Name("email");
+                
+            descriptor
+                .Field(c => c.BirthDate)
+                .Name("birthDate");
+                
+            descriptor
+                .Field(c => c.Nationality)
+                .Name("nationality");
+                
+            descriptor
+                .Field(c => c.CountryOfResidence)
+                .Name("countryOfResidence");
 
-            descriptor.Field(c => c.Address)
+            descriptor
+                .Field(c => c.Address)
+                .Name("address")
                 .Type<NonNullType<AddressInputType>>();
         }
     }

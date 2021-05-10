@@ -121,7 +121,7 @@
     <value>Une erreur est survenue</value>
   </data>
   <data name="Unauthorized" xml:space="preserve">
-    <value>Vous devez être connecté pour accéder à la ressource</value>
+    <value>Vous n'avez pas les droits suffisant pour accéder à la ressource</value>
   </data>
   <data name="Forbidden" xml:space="preserve">
     <value>Vous n'êtes pas autorisé à accéder à la ressource</value>
@@ -929,5 +929,8 @@
   </data>
   <data name="Order_CannotPay_Delivery_Max_PurchaseOrders_Reached" xml:space="preserve">
     <value>La plage horaire de récupération ({1}) sélectionnée n'est plus disponible, le producteur {0} a atteint le maximum de commandes ({2}) configuré pour cette date. Veuillez revenir en arrière pour en sélectionner une nouvelle.</value>
+  </data>
+  <data name="Unauthenticated" xml:space="preserve">
+    <value>Vous devez être connecté pour accéder à cette ressource</value>
   </data>
 </root>

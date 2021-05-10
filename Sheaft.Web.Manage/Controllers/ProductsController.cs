@@ -17,6 +17,7 @@ using Sheaft.Application.Interfaces.Mediatr;
 using Sheaft.Application.Models;
 using Sheaft.Core.Exceptions;
 using Sheaft.Domain;
+using Sheaft.Infrastructure.Persistence;
 using Sheaft.Mediatr.Product.Commands;
 using Sheaft.Options;
 using Sheaft.Web.Manage.Models;
@@ -47,9 +48,9 @@ namespace Sheaft.Web.Manage.Controllers
             var query = _context.Products.AsNoTracking();
 
             var requestUser = await GetRequestUserAsync(token);
-            if (requestUser.IsImpersonating)
+            if (requestUser.IsImpersonating())
             {
-                query = query.Where(p => p.Producer.Id == requestUser.Id);
+                query = query.Where(p => p.ProducerId == requestUser.Id);
             }
 
             var entities = await query
@@ -69,7 +70,7 @@ namespace Sheaft.Web.Manage.Controllers
         public async Task<IActionResult> Add(CancellationToken token)
         {
             var requestUser = await GetRequestUserAsync(token);
-            if (!requestUser.IsImpersonating)
+            if (!requestUser.IsImpersonating())
                 return RedirectToAction("Impersonate", "Account");
 
             ViewBag.Tags = await GetTags(token);
@@ -83,7 +84,7 @@ namespace Sheaft.Web.Manage.Controllers
         public async Task<IActionResult> Add(ProductViewModel model, IFormFile picture, CancellationToken token)
         {
             var requestUser = await GetRequestUserAsync(token);
-            if (!requestUser.IsImpersonating)
+            if (!requestUser.IsImpersonating())
             {
                 ViewBag.Tags = await GetTags(token);
                 ViewBag.Returnables = await GetReturnables(requestUser, token);
@@ -136,7 +137,7 @@ namespace Sheaft.Web.Manage.Controllers
         public async Task<IActionResult> Edit(Guid id, CancellationToken token)
         {
             var requestUser = await GetRequestUserAsync(token);
-            if (!requestUser.IsImpersonating)
+            if (!requestUser.IsImpersonating())
                 return RedirectToAction("Impersonate", "Account");
 
             var entity = await _context.Products
@@ -159,7 +160,7 @@ namespace Sheaft.Web.Manage.Controllers
         public async Task<IActionResult> Edit(ProductViewModel model, IFormFile picture, CancellationToken token)
         {
             var requestUser = await GetRequestUserAsync(token);
-            if (!requestUser.IsImpersonating)
+            if (!requestUser.IsImpersonating())
             {
                 ViewBag.Tags = await GetTags(token);
                 ViewBag.Returnables = await GetReturnables(requestUser, token);
@@ -269,7 +270,7 @@ namespace Sheaft.Web.Manage.Controllers
         private async Task<List<ReturnableViewModel>> GetReturnables(RequestUser requestUser, CancellationToken token)
         {
             return await _context.Returnables
-                .Where(c => c.Producer.Id == requestUser.Id && !c.RemovedOn.HasValue)
+                .Where(c => c.ProducerId == requestUser.Id && !c.RemovedOn.HasValue)
                 .ProjectTo<ReturnableViewModel>(_configurationProvider)
                 .ToListAsync(token);
         }

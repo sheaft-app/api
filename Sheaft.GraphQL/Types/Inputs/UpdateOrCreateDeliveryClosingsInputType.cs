@@ -1,4 +1,5 @@
 using HotChocolate.Types;
+using Sheaft.Domain;
 using Sheaft.Mediatr.DeliveryClosing.Commands;
 
 namespace Sheaft.GraphQL.Types.Inputs
@@ -7,12 +8,19 @@ namespace Sheaft.GraphQL.Types.Inputs
     {
         protected override void Configure(IInputObjectTypeDescriptor<UpdateOrCreateDeliveryClosingsCommand> descriptor)
         {
+            base.Configure(descriptor);
+
             descriptor.Name("UpdateOrCreateDeliveryClosingsInput");
-            descriptor.Field(c => c.DeliveryId)
+            
+            descriptor
+                .Field(c => c.DeliveryId)
                 .Name("id")
-                .Type<NonNullType<IdType>>();
-            descriptor.Field(c => c.Closings)
-                .Type<NonNullType<ListType<UpdateOrCreateClosingInputType>>>();
+                .ID(nameof(DeliveryMode));
+            
+            descriptor
+                .Field(c => c.Closings)
+                .Name("closings")
+                .Type<NonNullType<ListType<DeliveryClosingInputType>>>();
         }
     }
 }

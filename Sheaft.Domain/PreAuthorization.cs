@@ -18,8 +18,10 @@ namespace Sheaft.Domain
         {
             Id = id;
             Order = order;
+            OrderId = order.Id;
             Debited = order.TotalPrice;
             Card = card;
+            CardId = card.Id;
             SecureModeReturnURL = secureModeReturnUrl;
             Reference = $"SHFT{DateTime.UtcNow.ToString("DDMMYY")}";
         }
@@ -40,17 +42,21 @@ namespace Sheaft.Domain
         public bool SecureModeNeeded { get; private set; }
         public string SecureModeRedirectUrl { get; private set; }
         public string SecureModeReturnURL { get; private set; }
-        public bool Processed { get; set; }
+        public bool Processed { get; private set; }
+        public Guid OrderId { get; private set; }
+        public Guid CardId { get; private set; }
+        public Guid? PreAuthorizedPayinId { get; private set; }
         public virtual Order Order { get; private set; }
         public virtual Card Card { get; private set; }
         public virtual PreAuthorizedPayin PreAuthorizedPayin { get; private set; }
 
         public void SetPreAuthorizedPayin(PreAuthorizedPayin payin)
         {
-            if(PreAuthorizedPayin != null && (PreAuthorizedPayin.Status == TransactionStatus.Succeeded || PreAuthorizedPayin.Status == TransactionStatus.Created))
+            if(PreAuthorizedPayinId.HasValue && (PreAuthorizedPayin.Status == TransactionStatus.Succeeded || PreAuthorizedPayin.Status == TransactionStatus.Created))
                 throw SheaftException.Conflict();
             
             PreAuthorizedPayin = payin;
+            PreAuthorizedPayinId = payin.Id;
         }
         
         public void SetIdentifier(string identifier)
@@ -126,5 +132,6 @@ namespace Sheaft.Domain
         }
 
         public List<DomainEvent> DomainEvents { get; } = new List<DomainEvent>();
+        public byte[] RowVersion { get; private set; }
     }
 }

@@ -1,33 +1,93 @@
-﻿using HotChocolate.Types;
-using Sheaft.Application.Models;
-using Sheaft.GraphQL.Enums;
+﻿using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using HotChocolate;
+using HotChocolate.Resolvers;
+using HotChocolate.Types;
+using Microsoft.EntityFrameworkCore;
+using Sheaft.Domain;
+using Sheaft.GraphQL.BankAccounts;
+using Sheaft.GraphQL.Catalogs;
+using Sheaft.GraphQL.Payouts;
+using Sheaft.GraphQL.Tags;
+using Sheaft.GraphQL.Users;
+using Sheaft.Infrastructure.Persistence;
 
 namespace Sheaft.GraphQL.Types.Outputs
 {
-    public class PayoutType : SheaftOutputType<PayoutDto>
+    public class PayoutType : SheaftOutputType<Payout>
     {
-        protected override void Configure(IObjectTypeDescriptor<PayoutDto> descriptor)
+        protected override void Configure(IObjectTypeDescriptor<Payout> descriptor)
         {
-            descriptor.Field(c => c.Id).Type<NonNullType<IdType>>();
-            descriptor.Field(c => c.Status);
-            descriptor.Field(c => c.Fees);
-            descriptor.Field(c => c.Debited);
-            descriptor.Field(c => c.Reference);
-            descriptor.Field(c => c.CreatedOn);
-            descriptor.Field(c => c.UpdatedOn);
-            descriptor.Field(c => c.ExecutedOn);
+            base.Configure(descriptor);
 
-            descriptor.Field(c => c.Kind)
-                .Type<NonNullType<TransactionKindEnumType>>();
-
-            descriptor.Field(c => c.Status)
-                .Type<NonNullType<TransactionStatusEnumType>>();
-
-            descriptor.Field(c => c.DebitedUser)
-                .Type<NonNullType<UserType>>();
+            descriptor
+                .ImplementsNode()
+                .IdField(c => c.Id)
+                .ResolveNode((ctx, id) => 
+                    ctx.DataLoader<PayoutsByIdBatchDataLoader>().LoadAsync(id, ctx.RequestAborted));
             
-            descriptor.Field(c => c.BankAccount)
+            descriptor
+                .Field(c => c.Status)
+                .Name("status");
+                
+            descriptor
+                .Field(c => c.Debited)
+                .Name("debited");
+                
+            descriptor
+                .Field(c => c.Reference)
+                .Name("reference");
+                
+            descriptor
+                .Field(c => c.CreatedOn)
+                .Name("createdOn");
+                
+            descriptor
+                .Field(c => c.UpdatedOn)
+                .Name("updatedOn");
+                
+            descriptor
+                .Field(c => c.ExecutedOn)
+                .Name("executedOn");
+                
+            descriptor
+                .Field(c => c.Kind)
+                .Name("kind");
+                
+            descriptor
+                .Field(c => c.Status)
+                .Name("status");
+                
+            descriptor
+                .Field("debitedUser")
+                .UseDbContext<QueryDbContext>()
+                .ResolveWith<PayoutResolvers>(c => c.GetUser(default, default, default, default))
+                .Type<NonNullType<UserType>>();
+                
+            descriptor
+                .Field(c => c.BankAccount)
+                .Name("bankAccount")
+                .ResolveWith<PayoutResolvers>(c => c.GetBankAccount(default, default, default))
                 .Type<NonNullType<BankAccountType>>();
+        }
+
+        private class PayoutResolvers
+        {
+            public async Task<User> GetUser(Payout payout, [ScopedService] QueryDbContext context, UsersByIdBatchDataLoader usersDataLoader, CancellationToken token)
+            {
+                var userId = await context.Wallets
+                    .Where(w => w.Id == payout.DebitedWalletId)
+                    .Select(w => w.UserId)
+                    .SingleAsync(token);
+
+                return await usersDataLoader.LoadAsync(userId, token);
+            }
+            
+            public Task<BankAccount> GetBankAccount(Payout payout, BankAccountsByIdBatchDataLoader bankAccountsDataLoader, CancellationToken token)
+            {
+                return bankAccountsDataLoader.LoadAsync(payout.BankAccountId, token);
+            }
         }
     }
 }

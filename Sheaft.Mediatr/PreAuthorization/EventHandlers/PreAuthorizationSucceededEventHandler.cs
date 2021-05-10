@@ -5,6 +5,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Sheaft.Application.Extensions;
 using Sheaft.Application.Interfaces.Infrastructure;
+using Microsoft.EntityFrameworkCore;
+using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Application.Mailings;
 using Sheaft.Domain.Enum;
 using Sheaft.Domain.Events.Agreement;
@@ -35,7 +37,7 @@ namespace Sheaft.Mediatr.PreAuthorization.EventHandlers
 
             var preAuthorizationData = GetObject(preAuthorization);
             
-            await _signalrService.SendNotificationToUserAsync(preAuthorization.Order.User.Id, nameof(PreAuthorizationSucceededEvent), preAuthorizationData);
+            await _signalrService.SendNotificationToUserAsync(preAuthorization.Order.UserId.Value, nameof(PreAuthorizationSucceededEvent), preAuthorizationData);
             await _emailService.SendTemplatedEmailAsync(
                 preAuthorization.Order.User.Email,
                 preAuthorization.Order.User.Name,
@@ -55,8 +57,8 @@ namespace Sheaft.Mediatr.PreAuthorization.EventHandlers
                 CreatedOn = preAuthorization.Order.CreatedOn, 
                 ProductsCount = preAuthorization.Order.ProductsCount, 
                 Reference = preAuthorization.Order.Reference, 
-                OrderId = preAuthorization.Order.Id, 
-                MyOrdersUrl = $"{_configuration.GetValue<string>("Portal:url")}/#/my-orders/{preAuthorization.Order.Id:N}"
+                OrderId = preAuthorization.OrderId, 
+                MyOrdersUrl = $"{_configuration.GetValue<string>("Portal:url")}/#/my-orders/{preAuthorization.OrderId:N}"
             };
         }
     }

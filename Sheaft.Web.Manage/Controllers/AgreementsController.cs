@@ -14,6 +14,7 @@ using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Application.Interfaces.Mediatr;
 using Sheaft.Core.Exceptions;
 using Sheaft.Domain.Enum;
+using Sheaft.Infrastructure.Persistence;
 using Sheaft.Mediatr.Agreement.Commands;
 using Sheaft.Options;
 using Sheaft.Web.Manage.Models;
@@ -45,12 +46,12 @@ namespace Sheaft.Web.Manage.Controllers
             var query = _context.Agreements.AsNoTracking();
 
             var requestUser = await GetRequestUserAsync(token);
-            if (requestUser.IsImpersonating)
+            if (requestUser.IsImpersonating())
             {
                 if (requestUser.IsInRole(_roleOptions.Store.Value))
-                    query = query.Where(p => p.Store.Id == requestUser.Id);
+                    query = query.Where(p => p.StoreId == requestUser.Id);
                 else
-                    query = query.Where(p => p.Delivery.Producer.Id == requestUser.Id);
+                    query = query.Where(p => p.ProducerId == requestUser.Id);
             }
 
             if (status != null)

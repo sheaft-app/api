@@ -8,18 +8,11 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
     {
         public void Configure(EntityTypeBuilder<DeliveryClosing> entity)
         {
-            entity.Property<long>("Uid");
-            entity.Property<long>("DeliveryModeUid");
-
             entity.Property(c => c.CreatedOn);
-            entity.Property(c => c.UpdatedOn).IsConcurrencyToken();
+            entity.Property(c => c.UpdatedOn);
+            entity.Property(c => c.RowVersion).IsRowVersion();
 
-            entity.HasKey("Uid");
-
-            entity.HasIndex(c => c.Id).IsUnique();
-            entity.HasIndex("DeliveryModeUid");
-            entity.HasIndex("Uid", "Id", "DeliveryModeUid");
-
+            entity.HasKey(c => c.Id);
             entity.ToTable("DeliveryClosings");
         }
     }

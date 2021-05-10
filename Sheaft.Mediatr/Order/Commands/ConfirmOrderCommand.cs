@@ -10,6 +10,7 @@ using Newtonsoft.Json;
 using Sheaft.Application.Extensions;
 using Sheaft.Application.Interfaces;
 using Sheaft.Application.Interfaces.Infrastructure;
+using Microsoft.EntityFrameworkCore;
 using Sheaft.Application.Interfaces.Mediatr;
 using Sheaft.Core;
 using Sheaft.Core.Enums;
@@ -84,7 +85,7 @@ namespace Sheaft.Mediatr.Order.Commands
                 await transaction.CommitAsync(token);
 
                 var preAuthorization = await _context.PreAuthorizations.SingleOrDefaultAsync(p =>
-                    p.Order.Id == order.Id && p.Status == PreAuthorizationStatus.Succeeded &&
+                    p.OrderId == order.Id && p.Status == PreAuthorizationStatus.Succeeded &&
                     p.PaymentStatus == PaymentStatus.Validated, token);
 
                 if (preAuthorization != null)
@@ -98,7 +99,7 @@ namespace Sheaft.Mediatr.Order.Commands
 
                 _mediatr.Post(new CreateUserPointsCommand(request.RequestUser)
                 {
-                    CreatedOn = DateTimeOffset.UtcNow, Kind = PointKind.PurchaseOrder, UserId = order.User.Id
+                    CreatedOn = DateTimeOffset.UtcNow, Kind = PointKind.PurchaseOrder, UserId = order.UserId.Value
                 });
 
                 return Success(purchaseOrderIds.Select(p => p.Data));

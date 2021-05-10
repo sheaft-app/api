@@ -14,6 +14,7 @@ using Sheaft.Application.Interfaces.Mediatr;
 using Sheaft.Application.Models;
 using Sheaft.Core.Exceptions;
 using Sheaft.Domain;
+using Sheaft.Infrastructure.Persistence;
 using Sheaft.Mediatr.Declaration.Commands;
 using Sheaft.Mediatr.Ubo.Commands;
 using Sheaft.Options;
@@ -38,14 +39,14 @@ namespace Sheaft.Web.Manage.Controllers
         {
             var entity = await _context.Legals
                 .OfType<BusinessLegal>()
-                .Where(c => c.Declaration.Id == id)
+                .Where(c => c.DeclarationId == id)
                 .ProjectTo<BusinessLegalViewModel>(_configurationProvider)
                 .SingleOrDefaultAsync(token);
 
             if (entity == null)
                 throw SheaftException.NotFound();
 
-            ViewBag.UserId = entity.Owner.Id;
+            ViewBag.UserId = entity.UserId;
             ViewBag.LegalId = entity.Id;
 
             return View(entity.Declaration);

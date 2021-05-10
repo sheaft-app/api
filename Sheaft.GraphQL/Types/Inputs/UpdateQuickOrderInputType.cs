@@ -1,5 +1,6 @@
 ﻿using HotChocolate.Types;
 using Sheaft.Application.Models;
+using Sheaft.Domain;
 using Sheaft.Mediatr.QuickOrder.Commands;
 
 namespace Sheaft.GraphQL.Types.Inputs
@@ -8,17 +9,27 @@ namespace Sheaft.GraphQL.Types.Inputs
     {
         protected override void Configure(IInputObjectTypeDescriptor<UpdateQuickOrderCommand> descriptor)
         {
+            base.Configure(descriptor);
+
             descriptor.Name("UpdateQuickOrderInput");
-            descriptor.Field(c => c.Description);
+            
+            descriptor
+                .Field(c => c.Description)
+                .Name("description");
 
-            descriptor.Field(c => c.QuickOrderId)
+            descriptor
+                .Field(c => c.QuickOrderId)
                 .Name("id")
-                .Type<NonNullType<IdType>>();
+                .ID(nameof(QuickOrder));
 
-            descriptor.Field(c => c.Name)
+            descriptor
+                .Field(c => c.Name)
+                .Name("name")
                 .Type<NonNullType<StringType>>();
             
-            descriptor.Field(c => c.Products)
+            descriptor
+                .Field(c => c.Products)
+                .Name("products")
                 .Type<ListType<ResourceIdQuantityInputType>>();
         }
     }

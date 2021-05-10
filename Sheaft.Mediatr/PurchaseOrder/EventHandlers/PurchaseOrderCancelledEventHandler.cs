@@ -6,6 +6,8 @@ using Microsoft.Extensions.Configuration;
 using Sheaft.Application.Extensions;
 using Sheaft.Application.Interfaces;
 using Sheaft.Application.Interfaces.Infrastructure;
+using Microsoft.EntityFrameworkCore;
+using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Domain.Enum;
 using Sheaft.Domain.Events.PurchaseOrder;
 
@@ -31,13 +33,13 @@ namespace Sheaft.Mediatr.PurchaseOrder.EventHandlers
             var orderEvent = notification.DomainEvent;
             var purchaseOrder = await _context.PurchaseOrders.SingleAsync(e => e.Id == orderEvent.PurchaseOrderId, token);
             
-            await _signalrService.SendNotificationToUserAsync(purchaseOrder.Sender.Id, nameof(PurchaseOrderCancelledEvent),
+            await _signalrService.SendNotificationToUserAsync(purchaseOrder.ClientId, nameof(PurchaseOrderCancelledEvent),
                 purchaseOrder.GetPurchaseNotifModelAsString());
 
             await _emailService.SendTemplatedEmailAsync(
-                purchaseOrder.Sender.Email,
-                purchaseOrder.Sender.Name,
-                $"{purchaseOrder.Vendor.Name} a annulé votre commande pour le {purchaseOrder.ExpectedDelivery.ExpectedDeliveryDate:dd/MM/yyyy}",
+                purchaseOrder.SenderInfo.Email,
+                purchaseOrder.SenderInfo.Name,
+                $"{purchaseOrder.VendorInfo.Name} a annulé votre commande pour le {purchaseOrder.ExpectedDelivery.ExpectedDeliveryDate:dd/MM/yyyy}",
                 nameof(PurchaseOrderCancelledEvent),
                 purchaseOrder.GetTemplateData(
                     $"{_configuration.GetValue<string>("Portal:url")}/#/my-orders/{purchaseOrder.Id}"),
@@ -45,9 +47,9 @@ namespace Sheaft.Mediatr.PurchaseOrder.EventHandlers
                 token);
             
             await _emailService.SendTemplatedEmailAsync(
-                purchaseOrder.Vendor.Email,
-                purchaseOrder.Vendor.Name,
-                $"La commande de {purchaseOrder.Sender.Name} pour le {purchaseOrder.ExpectedDelivery.ExpectedDeliveryDate:dd/MM/yyyy} a bien été annulée",
+                purchaseOrder.VendorInfo.Email,
+                purchaseOrder.VendorInfo.Name,
+                $"La commande de {purchaseOrder.SenderInfo.Name} pour le {purchaseOrder.ExpectedDelivery.ExpectedDeliveryDate:dd/MM/yyyy} a bien été annulée",
                 nameof(PurchaseOrderCancelledEvent),
                 purchaseOrder.GetTemplateData(
                     $"{_configuration.GetValue<string>("Portal:url")}/#/purchase-orders/{purchaseOrder.Id}"),

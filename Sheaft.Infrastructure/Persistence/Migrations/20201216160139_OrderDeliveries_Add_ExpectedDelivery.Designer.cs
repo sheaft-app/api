@@ -9,7 +9,7 @@ using Sheaft.Infrastructure.Persistence;
 
 namespace Sheaft.Infrastructure.Persistence.Migrations
 {
-    [DbContext(typeof(AppDbContext))]
+    [DbContext(typeof(QueryDbContext))]
     [Migration("20201216160139_OrderDeliveries_Add_ExpectedDelivery")]
     partial class OrderDeliveries_Add_ExpectedDelivery
     {

@@ -40,7 +40,7 @@ namespace Sheaft.Domain
                 throw new ValidationException(MessageKind.ExpectedDelivery_ExpectedDate_DeliveryRemoved, delivery.Name,
                     expectedDeliveryDate.ToString("dd/MM/yyyy"));
 
-            var oh = delivery.OpeningHours.FirstOrDefault(o =>
+            var oh = delivery.DeliveryHours.FirstOrDefault(o =>
                 o.Day == expectedDeliveryDate.DayOfWeek && o.From <= expectedDeliveryDate.TimeOfDay &&
                 o.To >= expectedDeliveryDate.TimeOfDay);
             if (oh == null)

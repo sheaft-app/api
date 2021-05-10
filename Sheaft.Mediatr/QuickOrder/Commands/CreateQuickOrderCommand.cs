@@ -10,6 +10,7 @@ using Newtonsoft.Json;
 using Sheaft.Application.Extensions;
 using Sheaft.Application.Interfaces;
 using Sheaft.Application.Interfaces.Infrastructure;
+using Microsoft.EntityFrameworkCore;
 using Sheaft.Application.Interfaces.Mediatr;
 using Sheaft.Application.Models;
 using Sheaft.Core;
@@ -60,7 +61,7 @@ namespace Sheaft.Mediatr.QuickOrder.Commands
             var store = await _context.Users.SingleAsync(e => e.Id == request.UserId, token);
             var productIds = request.Products.Select(p => p.Id).ToList();
             var agreements = await _context.Set<Domain.Agreement>()
-                .Where(a => a.Store.Id == store.Id && a.Catalog.Products.Any(p => productIds.Contains(p.Product.Id)))
+                .Where(a => a.StoreId == store.Id && a.Catalog.Products.Any(p => productIds.Contains(p.ProductId)))
                 .Include(a => a.Catalog)
                     .ThenInclude(c => c.Products)
                         .ThenInclude(c => c.Product)

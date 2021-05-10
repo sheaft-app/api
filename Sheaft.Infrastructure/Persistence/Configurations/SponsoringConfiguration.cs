@@ -8,15 +8,13 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
     {
         public void Configure(EntityTypeBuilder<Sponsoring> entity)
         {
-            entity.Property<long>("SponsoredUid");
-            entity.Property<long>("SponsorUid");
-            
-            entity.HasOne(c => c.Sponsored).WithMany().HasForeignKey("SponsoredUid").OnDelete(DeleteBehavior.NoAction).IsRequired();
+            entity.HasOne(c => c.Sponsored).WithMany().HasForeignKey(c=>c.SponsoredId).OnDelete(DeleteBehavior.NoAction).IsRequired();
+            entity.HasOne(c => c.Sponsor).WithMany().HasForeignKey(c=>c.SponsorId).OnDelete(DeleteBehavior.NoAction).IsRequired();
 
             entity.Ignore(c => c.DomainEvents);
 
-            entity.HasKey("SponsorUid", "SponsoredUid");
-
+            entity.HasKey(c=> new {c.SponsorId, c.SponsoredId});
+            
             entity.ToTable("Sponsorings");
         }
     }

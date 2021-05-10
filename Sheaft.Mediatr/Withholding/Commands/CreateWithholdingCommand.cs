@@ -8,6 +8,7 @@ using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Sheaft.Application.Interfaces;
 using Sheaft.Application.Interfaces.Infrastructure;
+using Microsoft.EntityFrameworkCore;
 using Sheaft.Application.Interfaces.Mediatr;
 using Sheaft.Core;
 using Sheaft.Domain;
@@ -49,7 +50,7 @@ namespace Sheaft.Mediatr.Withholding.Commands
         public async Task<Result<Guid>> Handle(CreateWithholdingCommand request, CancellationToken token)
         {
             var debitedWallet = await _context.Wallets
-                .SingleOrDefaultAsync(c => c.User.Id == request.UserId, token);
+                .SingleOrDefaultAsync(c => c.UserId == request.UserId, token);
             var creditedWallet = await _context.Wallets
                 .SingleOrDefaultAsync(c => c.Identifier == _pspOptions.DocumentWalletId, token);
 

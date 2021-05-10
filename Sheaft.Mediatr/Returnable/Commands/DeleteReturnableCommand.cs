@@ -9,6 +9,7 @@ using Newtonsoft.Json;
 using Sheaft.Application.Extensions;
 using Sheaft.Application.Interfaces;
 using Sheaft.Application.Interfaces.Infrastructure;
+using Microsoft.EntityFrameworkCore;
 using Sheaft.Application.Interfaces.Mediatr;
 using Sheaft.Core;
 using Sheaft.Domain;
@@ -47,7 +48,7 @@ namespace Sheaft.Mediatr.Returnable.Commands
             _context.Remove(entity);
 
             var products = await _context.Products
-                .Where(p => p.Returnable != null && p.Returnable.Id == entity.Id)
+                .Where(p => p.ReturnableId == entity.Id)
                 .ToListAsync(token);
 
             foreach (var product in products)

@@ -8,7 +8,7 @@ namespace Sheaft.Application.Extensions
     {
         public static PurchaseOrderMailerModel GetTemplateData(this Domain.PurchaseOrder purchaseOrder, string url)
         {
-            var senderName = purchaseOrder.Sender.Name;
+            var senderName = purchaseOrder.SenderInfo.Name;
             var lines = purchaseOrder.Products.Select(o => new PurchaseOrderLineMailerModel 
             { 
                 Line_Name = o.Name, 
@@ -22,7 +22,7 @@ namespace Sheaft.Application.Extensions
                 Lines = lines, 
                 SenderName = senderName,
                 Reference = purchaseOrder.Reference, 
-                VendorName = purchaseOrder.Vendor.Name,
+                VendorName = purchaseOrder.VendorInfo.Name,
                 CreatedOn = purchaseOrder.CreatedOn,
                 ExpectedDeliveryDate = purchaseOrder.ExpectedDelivery.ExpectedDeliveryDate,
                 TotalOnSalePrice = purchaseOrder.TotalOnSalePrice, 
@@ -48,8 +48,8 @@ namespace Sheaft.Application.Extensions
                 PurchaseOrderId = purchaseOrder.Id,
                 Status = purchaseOrder.Status,
                 Reference = purchaseOrder.Reference,
-                VendorName = purchaseOrder.Vendor.Name,
-                SenderName = purchaseOrder.Sender.Name,
+                VendorName = purchaseOrder.VendorInfo.Name,
+                SenderName = purchaseOrder.SenderInfo.Name,
                 CreatedOn = purchaseOrder.CreatedOn,
                 TotalOnSalePrice = purchaseOrder.TotalOnSalePrice,
                 TotalWholeSalePrice = purchaseOrder.TotalWholeSalePrice,

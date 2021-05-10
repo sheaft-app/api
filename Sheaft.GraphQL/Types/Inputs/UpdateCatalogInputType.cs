@@ -1,5 +1,6 @@
 using HotChocolate.Types;
 using Sheaft.Application.Models;
+using Sheaft.Domain;
 using Sheaft.Mediatr.Catalog.Commands;
 
 namespace Sheaft.GraphQL.Types.Inputs
@@ -8,15 +9,26 @@ namespace Sheaft.GraphQL.Types.Inputs
     {
         protected override void Configure(IInputObjectTypeDescriptor<UpdateCatalogCommand> descriptor)
         {
+            base.Configure(descriptor);
+
             descriptor.Name("UpdateCatalogInput");
-            descriptor.Field(c => c.Name);
+            
+            descriptor
+                .Field(c => c.Name)
+                .Name("name");
 
-            descriptor.Field(c => c.CatalogId)
+            descriptor
+                .Field(c => c.CatalogId)
                 .Name("id")
-                .Type<NonNullType<IdType>>();
+                .ID(nameof(Catalog));
 
-            descriptor.Field(c => c.IsAvailable);
-            descriptor.Field(c => c.IsDefault);
+            descriptor
+                .Field(c => c.IsAvailable)
+                .Name("isAvailable");
+            
+            descriptor
+                .Field(c => c.IsDefault)
+                .Name("isDefault");
         }
     }
 }

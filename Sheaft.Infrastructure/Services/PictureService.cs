@@ -136,7 +136,7 @@ namespace Sheaft.Infrastructure.Services
                         new PngEncoder
                             {CompressionLevel = PngCompressionLevel.BestCompression, IgnoreMetadata = true}, token);
 
-                    return await _blobService.UploadProductPictureAsync(product.Producer.Id, product.Id, pictureId, blobStream.ToArray(), token);
+                    return await _blobService.UploadProductPictureAsync(product.ProducerId, product.Id, pictureId, blobStream.ToArray(), token);
                 }
             }
         }
@@ -187,19 +187,19 @@ namespace Sheaft.Infrastructure.Services
             var originalBytes = await RetrievePictureBytesAsync(originalPicture);
             if (originalBytes != null)
                 using (Image image = Image.Load(originalBytes))
-                    await UploadProductOriginalPreviewAsync(image, entity.Producer.Id, entity.Id, token);
+                    await UploadProductOriginalPreviewAsync(image, entity.ProducerId, entity.Id, token);
             
             using (Image image = Image.Load(bytes))
             {
-                await UploadProductPreviewAsync(image, entity.Producer.Id, entity.Id, PictureSize.SMALL,
+                await UploadProductPreviewAsync(image, entity.ProducerId, entity.Id, PictureSize.SMALL,
                     _pictureOptions.Product.Small.Width, _pictureOptions.Product.Small.Height, token,
                     quality: _pictureOptions.Product.Small.Quality);
                 
-                await UploadProductPreviewAsync(image, entity.Producer.Id, entity.Id, PictureSize.MEDIUM,
+                await UploadProductPreviewAsync(image, entity.ProducerId, entity.Id, PictureSize.MEDIUM,
                     _pictureOptions.Product.Medium.Width, _pictureOptions.Product.Medium.Height, token,
                     quality: _pictureOptions.Product.Medium.Quality);
                 
-                return await UploadProductPreviewAsync(image, entity.Producer.Id, entity.Id, PictureSize.LARGE,
+                return await UploadProductPreviewAsync(image, entity.ProducerId, entity.Id, PictureSize.LARGE,
                     _pictureOptions.Product.Large.Width, _pictureOptions.Product.Large.Height, token,
                     quality: _pictureOptions.Product.Large.Quality);
             }

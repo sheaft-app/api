@@ -15,6 +15,7 @@ using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Application.Interfaces.Mediatr;
 using Sheaft.Core.Exceptions;
 using Sheaft.Domain;
+using Sheaft.Infrastructure.Persistence;
 using Sheaft.Mediatr.Consumer.Commands;
 using Sheaft.Mediatr.User.Commands;
 using Sheaft.Options;
@@ -46,7 +47,7 @@ namespace Sheaft.Web.Manage.Controllers
             var query = _context.Users.OfType<Consumer>().AsNoTracking();
 
             var requestUser = await GetRequestUserAsync(token);
-            if (requestUser.IsImpersonating)
+            if (requestUser.IsImpersonating())
                 query = query.Where(p => p.Id == requestUser.Id);
 
             var entities = await query
@@ -116,7 +117,7 @@ namespace Sheaft.Web.Manage.Controllers
             var entity = await _context.Users.OfType<Consumer>().SingleOrDefaultAsync(c => c.Id == id, token);
             var name = entity.Name;
 
-            var result = await _mediatr.Process(new RemoveUserCommand(await GetRequestUserAsync(token))
+            var result = await _mediatr.Process(new DeleteUserCommand(await GetRequestUserAsync(token))
             {
                 UserId = id
             }, token);

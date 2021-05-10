@@ -1,4 +1,5 @@
 using HotChocolate.Types;
+using Sheaft.Domain;
 using Sheaft.Mediatr.Job.Commands;
 
 namespace Sheaft.GraphQL.Types.Inputs
@@ -7,10 +8,14 @@ namespace Sheaft.GraphQL.Types.Inputs
     {
         protected override void Configure(IInputObjectTypeDescriptor<ResumeJobsCommand> descriptor)
         {
+            base.Configure(descriptor);
+
             descriptor.Name("ResumeJobsInput");
-            descriptor.Field(c => c.JobIds)
+
+            descriptor
+                .Field(c => c.JobIds)
                 .Name("ids")
-                .Type<NonNullType<ListType<IdType>>>();
+                .ID(nameof(Job));
         }
     }
 }

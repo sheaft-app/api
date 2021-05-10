@@ -12,9 +12,6 @@ namespace Sheaft.Domain
     public class Order : IEntity, IHasDomainEvent
     {
         private const int DIGITS_COUNT = 2;
-        private List<OrderProduct> _products;
-        private List<OrderDelivery> _deliveries;
-        private List<PurchaseOrder> _purchaseOrders;
 
         protected Order()
         {
@@ -24,14 +21,17 @@ namespace Sheaft.Domain
         {
             Id = id;
             User = user;
+            UserId = user?.Id;
             FeesFixedAmount = fixedAmount;
             FeesPercent = percent;
             FeesVatPercent = vatPercent;
             DonationKind = kind;
             Status = OrderStatus.Created;
 
-            _products = new List<OrderProduct>();
-            _deliveries = new List<OrderDelivery>();
+            Products = new List<OrderProduct>();
+            Deliveries = new List<OrderDelivery>();
+            PurchaseOrders = new List<PurchaseOrder>();
+            
             DomainEvents = new List<DomainEvent>();
 
             SetProducts(orderProducts);
@@ -62,14 +62,16 @@ namespace Sheaft.Domain
         public int ReturnablesCount { get; private set; }
         public int LinesCount { get; private set; }
         public int ProductsCount { get; private set; }
+        public int PurchaseOrdersCount { get; private set; }
         public decimal Donation { get; private set; }
         public decimal FeesPrice { get; private set; }
         public decimal DonationFeesPrice { get; private set; }
-        public bool Processed { get; set; }
+        public bool Processed { get; private set; }
+        public Guid? UserId { get; private set; }
         public virtual User User { get; private set; }
-        public virtual IReadOnlyCollection<OrderProduct> Products => _products?.AsReadOnly();
-        public virtual IReadOnlyCollection<OrderDelivery> Deliveries => _deliveries?.AsReadOnly();
-        public virtual IReadOnlyCollection<PurchaseOrder> PurchaseOrders => _purchaseOrders?.AsReadOnly();
+        public virtual ICollection<OrderProduct> Products{ get; private set; }
+        public virtual ICollection<OrderDelivery> Deliveries { get; private set; }
+        public virtual ICollection<PurchaseOrder> PurchaseOrders{ get; private set; }
 
         public void AssignToUser(User user)
         {
@@ -82,11 +84,12 @@ namespace Sheaft.Domain
         public PurchaseOrder AddPurchaseOrder(string reference, Producer producer)
         {
             if (PurchaseOrders == null)
-                _purchaseOrders = new List<PurchaseOrder>();
+                PurchaseOrders = new List<PurchaseOrder>();
 
             var purchaseOrder = new PurchaseOrder(Guid.NewGuid(), reference, PurchaseOrderStatus.Waiting, producer, this);
-            _purchaseOrders.Add(purchaseOrder);
-
+            PurchaseOrders.Add(purchaseOrder);
+            
+            PurchaseOrdersCount = PurchaseOrders.Count;
             return purchaseOrder;
         }
 
@@ -122,13 +125,13 @@ namespace Sheaft.Domain
         public void SetProducts(IEnumerable<Tuple<Product, Guid, int>> orderProducts)
         {
             if (Products == null || Products.Any())
-                _products = new List<OrderProduct>();
+                Products = new List<OrderProduct>();
 
             foreach (var orderProduct in orderProducts)
             {
                 var product = new OrderProduct(orderProduct.Item1, orderProduct.Item2, orderProduct.Item3);
                 if(product.Quantity > 0)
-                    _products.Add(product);
+                    Products.Add(product);
             }
 
             RefreshOrder();
@@ -137,10 +140,10 @@ namespace Sheaft.Domain
         public void SetDeliveries(IEnumerable<Tuple<DeliveryMode, DateTimeOffset, string>> orderDeliveries)
         {
             if (Deliveries != null)
-                _deliveries = new List<OrderDelivery>();
+                Deliveries = new List<OrderDelivery>();
 
             foreach (var orderDelivery in orderDeliveries)
-                _deliveries.Add(new OrderDelivery(orderDelivery.Item1, orderDelivery.Item2, orderDelivery.Item3));     
+                Deliveries.Add(new OrderDelivery(orderDelivery.Item1, orderDelivery.Item2, orderDelivery.Item3));     
         }
 
         public void SetDonation(DonationKind kind)
@@ -159,18 +162,18 @@ namespace Sheaft.Domain
 
         private void RefreshOrder()
         {
-            TotalProductWholeSalePrice = Math.Round(_products.Sum(p => p.TotalWholeSalePrice), DIGITS_COUNT);
-            TotalProductVatPrice = Math.Round(_products.Sum(p => p.TotalVatPrice), DIGITS_COUNT);
+            TotalProductWholeSalePrice = Math.Round(Products.Sum(p => p.TotalWholeSalePrice), DIGITS_COUNT);
+            TotalProductVatPrice = Math.Round(Products.Sum(p => p.TotalVatPrice), DIGITS_COUNT);
             TotalProductOnSalePrice = Math.Round(TotalProductWholeSalePrice + TotalProductVatPrice, DIGITS_COUNT);
 
-            TotalWeight = Math.Round(_products.Where(p => p.TotalWeight.HasValue).Sum(p => p.TotalWeight) ?? 0, DIGITS_COUNT);
+            TotalWeight = Math.Round(Products.Where(p => p.TotalWeight.HasValue).Sum(p => p.TotalWeight) ?? 0, DIGITS_COUNT);
 
-            LinesCount = _products.Count;
-            ProductsCount = _products.Sum(p => p.Quantity);
-            ReturnablesCount = _products.Sum(p => p.ReturnablesCount);
+            LinesCount = Products.Count;
+            ProductsCount = Products.Sum(p => p.Quantity);
+            ReturnablesCount = Products.Sum(p => p.ReturnablesCount);
 
-            TotalReturnableWholeSalePrice = Math.Round(_products.Sum(p => p.ReturnablesCount > 0 ? p.TotalReturnableWholeSalePrice.Value : 0), DIGITS_COUNT);
-            TotalReturnableVatPrice = Math.Round(_products.Sum(p => p.ReturnablesCount > 0 ? p.TotalReturnableVatPrice.Value : 0), DIGITS_COUNT);
+            TotalReturnableWholeSalePrice = Math.Round(Products.Sum(p => p.ReturnablesCount > 0 ? p.TotalReturnableWholeSalePrice.Value : 0), DIGITS_COUNT);
+            TotalReturnableVatPrice = Math.Round(Products.Sum(p => p.ReturnablesCount > 0 ? p.TotalReturnableVatPrice.Value : 0), DIGITS_COUNT);
             TotalReturnableOnSalePrice = Math.Round(TotalReturnableWholeSalePrice + TotalReturnableVatPrice, DIGITS_COUNT);
 
             TotalWholeSalePrice = TotalProductWholeSalePrice + TotalReturnableWholeSalePrice;
@@ -191,6 +194,7 @@ namespace Sheaft.Domain
         }
 
         public List<DomainEvent> DomainEvents { get; } = new List<DomainEvent>();
+        public byte[] RowVersion { get; private set; }
 
         private class FeesDto
         {

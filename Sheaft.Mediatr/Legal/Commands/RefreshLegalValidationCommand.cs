@@ -7,6 +7,8 @@ using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Sheaft.Application.Interfaces;
 using Sheaft.Application.Interfaces.Infrastructure;
+using Microsoft.EntityFrameworkCore;
+using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Application.Interfaces.Mediatr;
 using Sheaft.Core;
 using Sheaft.Domain;
@@ -77,7 +79,7 @@ namespace Sheaft.Mediatr.Legal.Commands
             if (validation == LegalValidation.Regular && legal.User.Kind == ProfileKind.Producer)
                 _mediatr.Post(new CreateWithholdingCommand(request.RequestUser)
                 {
-                    UserId = legal.User.Id,
+                    UserId = legal.UserId,
                     Amount = _pspOptions.ProducerFees
                 });
 

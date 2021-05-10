@@ -13,10 +13,10 @@ namespace Sheaft.Application.Interfaces.Business
         Task<Result> ValidateConsumerOrderAsync(Guid orderId, RequestUser requestUser, CancellationToken token);
 
         Task<Result<List<Tuple<Domain.DeliveryMode, DateTimeOffset, string>>>> GetCartDeliveriesAsync(
-            IEnumerable<ProducerExpectedDeliveryInputDto> producersExpectedDeliveries, IEnumerable<Guid> deliveryIds,
+            IEnumerable<ProducerExpectedDeliveryInputDto> producersExpectedDeliveries,
             IEnumerable<Tuple<Domain.Product, Guid, int>> cartProducts, CancellationToken token);
 
-        Task<Result<List<Tuple<Domain.Product, Guid, int>>>> GetCartProductsAsync(IEnumerable<Guid> productIds,
+        Task<Result<List<Tuple<Domain.Product, Guid, int>>>> GetCartProductsAsync(
             IEnumerable<ResourceIdQuantityInputDto> productsQuantities, CancellationToken token);
     }
 }

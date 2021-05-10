@@ -10,6 +10,7 @@ using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Sheaft.Application.Interfaces;
 using Sheaft.Application.Interfaces.Infrastructure;
+using Microsoft.EntityFrameworkCore;
 using Sheaft.Application.Interfaces.Mediatr;
 using Sheaft.Application.Models;
 using Sheaft.Core;
@@ -87,10 +88,10 @@ namespace Sheaft.Mediatr.Store.Commands
                     department, request.Address.Longitude, request.Address.Latitude)
                 : null;
 
-            var openingHours = new List<TimeSlotHour>();
+            var openingHours = new List<OpeningHours>();
             if (request.OpeningHours != null)
                 foreach (var oh in request.OpeningHours)
-                    openingHours.AddRange(oh.Days.Select(c => new TimeSlotHour(c, oh.From, oh.To)));
+                    openingHours.AddRange(oh.Days.Select(c => new OpeningHours(c, oh.From, oh.To)));
 
             store = new Domain.Store(request.StoreId, request.Name, request.FirstName, request.LastName,
                 request.Email,

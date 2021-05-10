@@ -1,15 +1,34 @@
-﻿using HotChocolate.Types;
-using Sheaft.Application.Models;
+﻿using HotChocolate.Resolvers;
+using HotChocolate.Types;
+using Sheaft.Domain;
+using Sheaft.GraphQL.Catalogs;
+using Sheaft.GraphQL.Consumers;
 
 namespace Sheaft.GraphQL.Types.Outputs
 {
-    public class ConsumerLegalType : SheaftOutputType<ConsumerLegalDto>
+    public class ConsumerLegalType : SheaftOutputType<ConsumerLegal>
     {
-        protected override void Configure(IObjectTypeDescriptor<ConsumerLegalDto> descriptor)
+        protected override void Configure(IObjectTypeDescriptor<ConsumerLegal> descriptor)
         {
-            descriptor.Field(c => c.Id).Type<NonNullType<IdType>>();
-            descriptor.Field(c => c.Validation);
-            descriptor.Field(c => c.Owner).Type<OwnerType>();
+            base.Configure(descriptor);
+
+            descriptor
+                .ImplementsNode()
+                .IdField(c => c.Id)
+                .ResolveNode((ctx, id) =>
+                    ctx.DataLoader<ConsumerLegalsByIdBatchDataLoader>().LoadAsync(id, ctx.RequestAborted));
+            
+            descriptor
+                .Field(c => c.Kind)
+                .Name("kind");
+                
+            descriptor
+                .Field(c => c.Validation)
+                .Name("validation");
+                
+            descriptor
+                .Field(c => c.Owner)
+                .Name("owner");
         }
     }
 }

@@ -12,9 +12,10 @@ namespace Sheaft.Application.Models
         public DateTimeOffset? UpdatedOn { get; set; }
         public DateTimeOffset? RemovedOn { get; set; }
         public string Reason { get; set; }
-        public AgreementDeliveryModeDto Delivery { get; set; }
+        public DeliveryModeDto Delivery { get; set; }
         public UserDto Store { get; set; }
+        public UserDto Producer { get; set; }
+        public ProfileKind CreatedByKind { get; set; }
         public CatalogDto Catalog { get; set; }
-        public IEnumerable<TimeSlotDto> SelectedHours { get; set; }
     }
 }

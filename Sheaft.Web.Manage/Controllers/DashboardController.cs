@@ -10,6 +10,7 @@ using Sheaft.Application.Interfaces;
 using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Application.Interfaces.Mediatr;
 using Sheaft.Domain;
+using Sheaft.Infrastructure.Persistence;
 using Sheaft.Options;
 
 namespace Sheaft.Web.Manage.Controllers
@@ -37,43 +38,43 @@ namespace Sheaft.Web.Manage.Controllers
             //ViewBag.Levels = await _context.Levels.CountAsync(c => !c.RemovedOn.HasValue, token);
             //ViewBag.Rewards = await _context.Rewards.CountAsync(c => !c.RemovedOn.HasValue, token);
 
-            if (requestUser.IsImpersonating)
+            if (requestUser.IsImpersonating())
             {
-                ViewBag.Products = await _context.Products.CountAsync(c => c.Producer.Id == requestUser.Id, token);
+                ViewBag.Products = await _context.Products.CountAsync(c => c.ProducerId == requestUser.Id, token);
                 ViewBag.Stores = await _context.Users.OfType<Store>()
                     .CountAsync(c => !c.RemovedOn.HasValue && c.Id == requestUser.Id, token);
                 ViewBag.Producers = await _context.Users.OfType<Producer>()
                     .CountAsync(c => !c.RemovedOn.HasValue && c.Id == requestUser.Id, token);
                 ViewBag.Agreements = await _context.Agreements.CountAsync(
                     c => !c.RemovedOn.HasValue &&
-                         (c.Delivery.Producer.Id == requestUser.Id || c.Store.Id == requestUser.Id), token);
+                         (c.ProducerId == requestUser.Id || c.StoreId == requestUser.Id), token);
                 ViewBag.DeliveryModes =
                     await _context.DeliveryModes.CountAsync(
-                        c => !c.RemovedOn.HasValue && c.Producer.Id == requestUser.Id, token);
+                        c => !c.RemovedOn.HasValue && c.ProducerId == requestUser.Id, token);
                 ViewBag.Jobs =
-                    await _context.Jobs.CountAsync(c => !c.RemovedOn.HasValue && c.User.Id == requestUser.Id, token);
+                    await _context.Jobs.CountAsync(c => !c.RemovedOn.HasValue && c.UserId == requestUser.Id, token);
                 ViewBag.Returnables =
-                    await _context.Returnables.CountAsync(c => !c.RemovedOn.HasValue && c.Producer.Id == requestUser.Id,
+                    await _context.Returnables.CountAsync(c => !c.RemovedOn.HasValue && c.ProducerId == requestUser.Id,
                         token);
                 ViewBag.PurchaseOrders = await _context.PurchaseOrders.CountAsync(
-                    c => !c.RemovedOn.HasValue && (c.Vendor.Id == requestUser.Id || c.Sender.Id == requestUser.Id),
+                    c => !c.RemovedOn.HasValue && (c.ProducerId == requestUser.Id || c.ClientId == requestUser.Id),
                     token);
                 ViewBag.Orders =
-                    await _context.Orders.CountAsync(c => !c.RemovedOn.HasValue && c.User.Id == requestUser.Id, token);
+                    await _context.Orders.CountAsync(c => !c.RemovedOn.HasValue && c.UserId == requestUser.Id, token);
                 ViewBag.Payins =
-                    await _context.Payins.CountAsync(c => !c.RemovedOn.HasValue && c.Author.Id == requestUser.Id,
+                    await _context.Payins.CountAsync(c => !c.RemovedOn.HasValue && c.AuthorId == requestUser.Id,
                         token);
                 ViewBag.Transfers =
-                    await _context.Transfers.CountAsync(c => !c.RemovedOn.HasValue && c.Author.Id == requestUser.Id,
+                    await _context.Transfers.CountAsync(c => !c.RemovedOn.HasValue && c.AuthorId == requestUser.Id,
                         token);
                 ViewBag.Payouts =
-                    await _context.Payouts.CountAsync(c => !c.RemovedOn.HasValue && c.Author.Id == requestUser.Id,
+                    await _context.Payouts.CountAsync(c => !c.RemovedOn.HasValue && c.AuthorId == requestUser.Id,
                         token);
                 ViewBag.Donations =
-                    await _context.Donations.CountAsync(c => !c.RemovedOn.HasValue && c.Author.Id == requestUser.Id,
+                    await _context.Donations.CountAsync(c => !c.RemovedOn.HasValue && c.AuthorId == requestUser.Id,
                         token);
                 ViewBag.Withholdings =
-                    await _context.Withholdings.CountAsync(c => !c.RemovedOn.HasValue && c.Author.Id == requestUser.Id,
+                    await _context.Withholdings.CountAsync(c => !c.RemovedOn.HasValue && c.AuthorId == requestUser.Id,
                         token);
             }
             else

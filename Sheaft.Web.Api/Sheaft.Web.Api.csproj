@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
   <PropertyGroup>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFramework>net5.0</TargetFramework>
     <UserSecretsId>3b20e46e-a22a-4d4c-baab-379c31f04a48</UserSecretsId>
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
   </PropertyGroup>
@@ -9,27 +9,26 @@
     <PackageReference Include="Hangfire.AspNetCore" Version="1.7.22" />
     <PackageReference Include="Hangfire.Core" Version="1.7.22" />
     <PackageReference Include="Hangfire.SqlServer" Version="1.7.22" />
-    <PackageReference Include="HotChocolate" Version="10.5.5" />
-    <PackageReference Include="HotChocolate.AspNetCore" Version="10.5.5" />
-    <PackageReference Include="HotChocolate.Server" Version="10.5.5" />
+    <PackageReference Include="HotChocolate" Version="11.2.2" />
+    <PackageReference Include="HotChocolate.AspNetCore" Version="11.2.2" />
     <PackageReference Include="IdentityServer4.AccessTokenValidation" Version="3.0.1" />
     <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="8.1.1" />
     <PackageReference Include="MediatR.Extensions.Microsoft.DependencyInjection" Version="9.0.0" />
-    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="3.1.10" />
-    <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="3.1.10" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="5.0.5" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="5.0.5" />
     <PackageReference Include="Microsoft.Azure.Search.Data" Version="10.1.0" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Proxies" Version="3.1.10" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer.NetTopologySuite" Version="3.1.10" />
-    <PackageReference Include="Microsoft.Extensions.Caching.SqlServer" Version="3.1.10" />
-    <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="3.1.10" />
-    <PackageReference Include="Microsoft.Spatial" Version="7.6.4" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Proxies" Version="5.0.5" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer.NetTopologySuite" Version="5.0.5" />
+    <PackageReference Include="Microsoft.Extensions.Caching.SqlServer" Version="5.0.1" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="5.0.0" />
+    <PackageReference Include="Microsoft.Spatial" Version="7.8.3" />
     <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.10.9" />
-    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="3.1.4" />
-    <PackageReference Include="NewRelic.Agent" Version="8.39.1" />
-    <PackageReference Include="NewRelic.Agent.Api" Version="8.39.1" />
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="5.0.2" />
+    <PackageReference Include="NewRelic.Agent" Version="8.39.2" />
+    <PackageReference Include="NewRelic.Agent.Api" Version="8.39.2" />
     <PackageReference Include="NewRelic.LogEnrichers.Serilog" Version="1.0.1" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="3.1.10">
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="5.0.5">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>

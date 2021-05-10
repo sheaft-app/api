@@ -8,18 +8,10 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
     {
         public void Configure(EntityTypeBuilder<ProductPicture> entity)
         {
-            entity.Property<long>("Uid");
-            entity.Property<long>("ProductUid");
-
             entity.Property(c => c.CreatedOn);
-            entity.Property(c => c.UpdatedOn).IsConcurrencyToken();
+            entity.Property(c => c.UpdatedOn);
 
-            entity.HasKey("Uid");
-
-            entity.HasIndex(c => c.Id).IsUnique();
-            entity.HasIndex("ProductUid");
-            entity.HasIndex("Uid", "Id", "ProductUid");
-
+            entity.HasKey(c => c.Id);
             entity.ToTable("ProductPictures");
         }
     }

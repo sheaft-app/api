@@ -1,4 +1,5 @@
 using HotChocolate.Types;
+using Sheaft.Domain;
 using Sheaft.Mediatr.Notification.Commands;
 
 namespace Sheaft.GraphQL.Types.Inputs
@@ -7,10 +8,14 @@ namespace Sheaft.GraphQL.Types.Inputs
     {
         protected override void Configure(IInputObjectTypeDescriptor<MarkUserNotificationAsReadCommand> descriptor)
         {
+            base.Configure(descriptor);
+
             descriptor.Name("MarkUserNotificationAsReadInput");
-            descriptor.Field(c => c.NotificationId)
+            
+            descriptor
+                .Field(c => c.NotificationId)
                 .Name("id")
-                .Type<NonNullType<IdType>>();
+                .ID(nameof(Notification));
         }
     }
 }

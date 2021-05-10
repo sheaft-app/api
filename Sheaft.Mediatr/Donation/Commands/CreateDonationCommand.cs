@@ -10,6 +10,8 @@ using Newtonsoft.Json;
 using Sheaft.Application.Extensions;
 using Sheaft.Application.Interfaces;
 using Sheaft.Application.Interfaces.Infrastructure;
+using Microsoft.EntityFrameworkCore;
+using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Application.Interfaces.Mediatr;
 using Sheaft.Core;
 using Sheaft.Core.Enums;
@@ -56,10 +58,10 @@ namespace Sheaft.Mediatr.Donation.Commands
         {
             var order = await _context.Orders.SingleAsync(e => e.Id == request.OrderId, token);
             var orderPayin = await _context.Payins
-                .SingleOrDefaultAsync(c => c.Order.Id == order.Id && c.Status == TransactionStatus.Succeeded, token);
+                .SingleOrDefaultAsync(c => c.OrderId == order.Id && c.Status == TransactionStatus.Succeeded, token);
 
             var pendingDonations = await _context.Donations
-                .Where(t => t.Order.Id == request.OrderId)
+                .Where(t => t.OrderId == request.OrderId)
                 .ToListAsync(token);
 
             if (pendingDonations.Any(pt => pt.Status == TransactionStatus.Succeeded))

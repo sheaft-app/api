@@ -8,6 +8,7 @@ using Newtonsoft.Json;
 using Sheaft.Application.Extensions;
 using Sheaft.Application.Interfaces;
 using Sheaft.Application.Interfaces.Infrastructure;
+using Microsoft.EntityFrameworkCore;
 using Sheaft.Application.Interfaces.Mediatr;
 using Sheaft.Core;
 using Sheaft.Core.Enums;
@@ -47,7 +48,7 @@ namespace Sheaft.Mediatr.Notification.Commands
             if (!notification.Unread)
                 return Success();
             
-            if(notification.User.Id != request.RequestUser.Id)
+            if(notification.UserId != request.RequestUser.Id)
                 return Failure(MessageKind.Forbidden);
 
             notification.SetAsRead();

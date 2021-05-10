@@ -12,6 +12,7 @@ using Sheaft.Application.Interfaces;
 using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Application.Interfaces.Mediatr;
 using Sheaft.Core.Exceptions;
+using Sheaft.Infrastructure.Persistence;
 using Sheaft.Mediatr.Returnable.Commands;
 using Sheaft.Options;
 using Sheaft.Web.Manage.Models;
@@ -42,9 +43,9 @@ namespace Sheaft.Web.Manage.Controllers
             var query = _context.Returnables.AsNoTracking();
 
             var requestUser = await GetRequestUserAsync(token);
-            if (requestUser.IsImpersonating)
+            if (requestUser.IsImpersonating())
             {
-                query = query.Where(p => p.Producer.Id == requestUser.Id);
+                query = query.Where(p => p.ProducerId == requestUser.Id);
             }
 
             var entities = await query
@@ -64,7 +65,7 @@ namespace Sheaft.Web.Manage.Controllers
         public async Task<IActionResult> Add(CancellationToken token)
         {
             var requestUser = await GetRequestUserAsync(token);
-            if (!requestUser.IsImpersonating)
+            if (!requestUser.IsImpersonating())
                 return RedirectToAction("Impersonate", "Account");
 
             return View(new ReturnableViewModel());
@@ -75,7 +76,7 @@ namespace Sheaft.Web.Manage.Controllers
         public async Task<IActionResult> Add(ReturnableViewModel model, CancellationToken token)
         {
             var requestUser = await GetRequestUserAsync(token);
-            if (!requestUser.IsImpersonating)
+            if (!requestUser.IsImpersonating())
             {
                 ModelState.AddModelError("", "You must impersonate producer to create it.");
                 return View(model);

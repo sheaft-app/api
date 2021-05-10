@@ -6,6 +6,8 @@ using Microsoft.Extensions.Configuration;
 using Sheaft.Application.Extensions;
 using Sheaft.Application.Interfaces;
 using Sheaft.Application.Interfaces.Infrastructure;
+using Microsoft.EntityFrameworkCore;
+using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Application.Mailings;
 using Sheaft.Domain.Enum;
 using Sheaft.Domain.Events.Payin;
@@ -35,7 +37,7 @@ namespace Sheaft.Mediatr.Payin.EventHandlers
                 return;
 
             var payinData = GetObject(payin);
-            await _signalrService.SendNotificationToUserAsync(payin.Author.Id, nameof(PayinFailedEvent), payinData);
+            await _signalrService.SendNotificationToUserAsync(payin.AuthorId, nameof(PayinFailedEvent), payinData);
             await _emailService.SendTemplatedEmailAsync(
                 payin.Order.User.Email,
                 payin.Order.User.Name,
@@ -55,8 +57,8 @@ namespace Sheaft.Mediatr.Payin.EventHandlers
                 CreatedOn = payin.Order.CreatedOn, 
                 ProductsCount = payin.Order.ProductsCount, 
                 Reference = payin.Order.Reference, 
-                OrderId = payin.Order.Id, 
-                MyOrdersUrl = $"{_configuration.GetValue<string>("Portal:url")}/#/my-orders/{payin.Order.Id:N}"
+                OrderId = payin.OrderId, 
+                MyOrdersUrl = $"{_configuration.GetValue<string>("Portal:url")}/#/my-orders/{payin.OrderId:N}"
             };
         }
     }

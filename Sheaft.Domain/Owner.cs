@@ -6,15 +6,14 @@ using Sheaft.Domain.Interop;
 
 namespace Sheaft.Domain
 {
-    public class Owner : IIdEntity
+    public class Owner
     {
         protected Owner()
         {
         }
 
-        public Owner(Guid id, string firstname, string lastname, string email, DateTimeOffset birthdate, OwnerAddress address, CountryIsoCode nationality, CountryIsoCode countryOfResidence)
+        public Owner(string firstname, string lastname, string email, DateTimeOffset birthdate, OwnerAddress address, CountryIsoCode nationality, CountryIsoCode countryOfResidence)
         {
-            Id = id;
             SetFirstname(firstname);
             SetLastname(lastname);
             SetEmail(email);
@@ -24,14 +23,14 @@ namespace Sheaft.Domain
             SetCountryOfResidence(countryOfResidence);
         }
 
-        public Guid Id { get; private set; }
         public string FirstName { get; private set; }
         public string LastName { get; private set; }
         public string Email { get; private set; }
         public DateTimeOffset BirthDate { get; private set; }
         public CountryIsoCode Nationality { get; private set; }
         public CountryIsoCode CountryOfResidence { get; private set; }
-        public virtual OwnerAddress Address { get; private set; }
+        public OwnerAddress Address { get; private set; }
+        public byte[] RowVersion { get; private set; }
 
         public void SetEmail(string email)
         {

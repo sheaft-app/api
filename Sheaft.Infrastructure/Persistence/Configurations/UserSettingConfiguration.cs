@@ -8,13 +8,11 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
     {
         public void Configure(EntityTypeBuilder<UserSetting> entity)
         {
-            entity.Property<long>("UserUid");
-            entity.Property<long>("SettingUid");
             entity.Property(c => c.Value).IsRequired();
             
-            entity.HasKey("UserUid", "SettingUid");
+            entity.HasKey(c=> new {c.UserId, c.SettingId});
 
-            entity.HasOne(c => c.Setting).WithMany().HasForeignKey("SettingUid").OnDelete(DeleteBehavior.Cascade).IsRequired();
+            entity.HasOne(c => c.Setting).WithMany().HasForeignKey(c=>c.SettingId).OnDelete(DeleteBehavior.Cascade).IsRequired();
             
             entity.ToTable("UserSettings");
         }

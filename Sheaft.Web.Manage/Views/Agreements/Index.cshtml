@@ -41,11 +41,11 @@
             {
                 <tr>
                     <th scope="row">
-                        @entity.Delivery.Producer.Name
+                        @entity.Producer.Name
 
                         @if (!imperonatingId.HasValue)
                         {
-                            @using (Html.BeginForm("ImpersonateById", "Account", new { id = entity.Delivery.Producer.Id }, FormMethod.Post, true, new { @class = "form d-inline" }))
+                            @using (Html.BeginForm("ImpersonateById", "Account", new { id = entity.Producer.Id }, FormMethod.Post, true, new { @class = "form d-inline" }))
                             {
                                 <button type="submit" class="btn btn-info">
                                     <i class="fa fa-user-secret"></i>

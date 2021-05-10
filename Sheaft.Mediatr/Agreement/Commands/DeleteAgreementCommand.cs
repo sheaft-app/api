@@ -10,6 +10,7 @@ using Newtonsoft.Json;
 using Sheaft.Application.Extensions;
 using Sheaft.Application.Interfaces;
 using Sheaft.Application.Interfaces.Infrastructure;
+using Microsoft.EntityFrameworkCore;
 using Sheaft.Application.Interfaces.Mediatr;
 using Sheaft.Core;
 using Sheaft.Core.Enums;
@@ -52,28 +53,27 @@ namespace Sheaft.Mediatr.Agreement.Commands
         {
             var entity = await _context.Agreements.SingleAsync(e => e.Id == request.AgreementId, token);
             if (request.RequestUser.IsInRole(_roleOptions.Producer.Value) &&
-                entity.Delivery.Producer.Id != request.RequestUser.Id)
+                entity.ProducerId != request.RequestUser.Id)
                 return Failure(MessageKind.Forbidden);
 
-            if (request.RequestUser.IsInRole(_roleOptions.Store.Value) && entity.Store.Id != request.RequestUser.Id)
+            if (request.RequestUser.IsInRole(_roleOptions.Store.Value) && entity.StoreId != request.RequestUser.Id)
                 return Failure(MessageKind.Forbidden);
 
             _context.Remove(entity);
 
             var quickOrders = await _context.QuickOrders
-                .Where(qo => qo.Products.Any(qop => qop.CatalogProduct.Catalog.Id == entity.Catalog.Id) &&
-                             qo.User.Id == entity.Store.Id)
+                .Where(qo => qo.Products.Any(qop => qop.CatalogProduct.CatalogId == entity.CatalogId) &&
+                             qo.UserId == entity.StoreId)
                 .ToListAsync(token);
 
             foreach (var quickOrder in quickOrders)
             {
-                var products = quickOrder.Products.Where(p => p.CatalogProduct.Catalog.Id == entity.Catalog.Id).ToList();
+                var products = quickOrder.Products.Where(p => p.CatalogProduct.CatalogId == entity.CatalogId).ToList();
                 foreach (var product in products)
                     quickOrder.RemoveProduct(product);
             }
 
             await _context.SaveChangesAsync(token);
-
             return Success();
         }
     }

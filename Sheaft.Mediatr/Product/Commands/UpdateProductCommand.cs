@@ -9,6 +9,8 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Sheaft.Application.Extensions;
 using Sheaft.Application.Interfaces.Infrastructure;
+using Microsoft.EntityFrameworkCore;
+using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Application.Interfaces.Mediatr;
 using Sheaft.Application.Models;
 using Sheaft.Core;
@@ -71,14 +73,14 @@ namespace Sheaft.Mediatr.Product.Commands
             using (var transaction = await _context.BeginTransactionAsync(token))
             {
                 var entity = await _context.Products.SingleAsync(p => p.Id == request.ProductId, token);
-                if (entity.Producer.Id != request.RequestUser.Id)
+                if (entity.ProducerId != request.RequestUser.Id)
                     return Failure(MessageKind.Forbidden);
 
                 var reference = request.Reference;
                 if (!string.IsNullOrWhiteSpace(reference) && reference != entity.Reference)
                 {
                     var existingEntity = await _context.Products.AnyAsync(
-                        p => p.Reference == reference && p.Producer.Id == entity.Producer.Id, token);
+                        p => p.Reference == reference && p.ProducerId == entity.ProducerId, token);
                     if (existingEntity)
                         return Failure(MessageKind.CreateProduct_Reference_AlreadyExists, reference);
                 }
@@ -86,7 +88,7 @@ namespace Sheaft.Mediatr.Product.Commands
                 if (string.IsNullOrWhiteSpace(reference))
                 {
                     var resultIdentifier =
-                        await _identifierService.GetNextProductReferenceAsync(entity.Producer.Id, token);
+                        await _identifierService.GetNextProductReferenceAsync(entity.ProducerId, token);
                     if (!resultIdentifier.Succeeded)
                         return Failure(resultIdentifier);
 
@@ -117,19 +119,19 @@ namespace Sheaft.Mediatr.Product.Commands
                 if (request.VisibleToConsumers.HasValue && request.VisibleToStores.HasValue)
                 {
                     var consumerCatalog = await _context.Catalogs.SingleOrDefaultAsync(
-                        c => c.Producer.Id == entity.Producer.Id && c.Kind == CatalogKind.Consumers, token);
+                        c => c.ProducerId == entity.ProducerId && c.Kind == CatalogKind.Consumers, token);
 
                     if (request.VisibleToConsumers.Value)
                         entity.AddOrUpdateCatalogPrice(consumerCatalog, request.WholeSalePricePerUnit.Value);
-                    else if (consumerCatalog.Products.Any(pc => pc.Product.Id == entity.Id))
+                    else if (consumerCatalog.Products.Any(pc => pc.ProductId == entity.Id))
                         entity.RemoveFromCatalog(consumerCatalog.Id);
 
                     var storeCatalog = await _context.Catalogs.SingleOrDefaultAsync(
-                        c => c.Producer.Id == entity.Producer.Id && c.Kind == CatalogKind.Stores, token);
+                        c => c.ProducerId == entity.ProducerId && c.Kind == CatalogKind.Stores, token);
 
                     if (request.VisibleToStores.Value)
                         entity.AddOrUpdateCatalogPrice(storeCatalog, request.WholeSalePricePerUnit.Value);
-                    else if (storeCatalog.Products.Any(pc => pc.Product.Id == entity.Id))
+                    else if (storeCatalog.Products.Any(pc => pc.ProductId == entity.Id))
                         entity.RemoveFromCatalog(storeCatalog.Id);
                 }
 
@@ -144,7 +146,7 @@ namespace Sheaft.Mediatr.Product.Commands
 
                     foreach (var catalogPrice in request.Catalogs)
                     {
-                        var catalog = entity.CatalogsPrices.FirstOrDefault(c => c.Catalog.Id == catalogPrice.CatalogId)?.Catalog ??
+                        var catalog = entity.CatalogsPrices.FirstOrDefault(c => c.CatalogId == catalogPrice.CatalogId)?.Catalog ??
                             await _context.Catalogs.SingleAsync(e => e.Id == catalogPrice.CatalogId, token);
                         entity.AddOrUpdateCatalogPrice(catalog, request.WholeSalePricePerUnit.Value);
                     }
@@ -164,7 +166,7 @@ namespace Sheaft.Mediatr.Product.Commands
 
                 await transaction.CommitAsync(token);
 
-                _mediatr.Post(new UpdateProducerTagsCommand(request.RequestUser) {ProducerId = entity.Producer.Id});
+                _mediatr.Post(new UpdateProducerTagsCommand(request.RequestUser) {ProducerId = entity.ProducerId});
                 return Success();
             }
         }

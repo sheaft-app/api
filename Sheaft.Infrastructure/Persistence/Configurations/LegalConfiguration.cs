@@ -9,48 +9,29 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
     {
         public void Configure(EntityTypeBuilder<Legal> entity)
         {
-            entity.Property<long>("Uid");
-            entity.Property<long>("UserUid");
-
             entity.Property(c => c.CreatedOn);
-            entity.Property(c => c.UpdatedOn).IsConcurrencyToken();
-            
-            entity.OwnsOne(c => c.Owner, e => {
-                e.OwnsOne(a => a.Address);
-            });
+            entity.Property(c => c.UpdatedOn);
+            entity.Property(c => c.RowVersion).IsRowVersion();
 
-            entity.OwnsMany(c => c.Documents, d => {
-                d.Property(c => c.CreatedOn);
-                d.Property(c => c.UpdatedOn).IsConcurrencyToken();
-
-                d.OwnsMany(c => c.Pages, cb =>
+            entity.OwnsOne(c => c.Owner, e =>
+            {
+                e.Property(c => c.RowVersion).IsRowVersion();
+                e.OwnsOne(a => a.Address, a =>
                 {
-                    cb.Property(o => o.Filename).IsRequired();
-                    cb.HasIndex(c => c.Id).IsUnique();
-
-                    cb.ToTable("DocumentPages");
+                    a.Property(ad => ad.RowVersion).IsRowVersion();
                 });
-                
-                d.Ignore(c => c.DomainEvents);
-
-                d.HasIndex(c => c.Id).IsUnique();
-                d.HasIndex(c => c.Identifier);
-
-                d.ToTable("Documents");
             });
 
-            entity.HasOne(c => c.User).WithOne(u => u.Legal).HasForeignKey<Legal>("UserUid").OnDelete(DeleteBehavior.Cascade).IsRequired();
+            entity.HasOne(c => c.User).WithOne(c => c.Legal).HasForeignKey<Legal>(c => c.UserId)
+                .OnDelete(DeleteBehavior.Cascade).IsRequired();
+            entity.HasMany(c => c.Documents).WithOne().HasForeignKey(c => c.LegalId).OnDelete(DeleteBehavior.Cascade)
+                .IsRequired();
 
             entity.HasDiscriminator<UserKind>("UserKind")
                 .HasValue<ConsumerLegal>(UserKind.Consumer)
                 .HasValue<BusinessLegal>(UserKind.Business);
 
-            entity.HasKey("Uid");
-
-            entity.HasIndex(c => c.Id).IsUnique();
-            entity.HasIndex("Uid", "Id");
-            entity.HasIndex("UserUid");
-
+            entity.HasKey(c => c.Id);
             entity.ToTable("Legals");
         }
     }

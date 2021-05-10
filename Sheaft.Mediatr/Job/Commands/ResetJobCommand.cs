@@ -8,6 +8,7 @@ using Newtonsoft.Json;
 using Sheaft.Application.Extensions;
 using Sheaft.Application.Interfaces;
 using Sheaft.Application.Interfaces.Infrastructure;
+using Microsoft.EntityFrameworkCore;
 using Sheaft.Application.Interfaces.Mediatr;
 using Sheaft.Core;
 using Sheaft.Core.Exceptions;
@@ -47,7 +48,7 @@ namespace Sheaft.Mediatr.Job.Commands
         public async Task<Result> Handle(ResetJobCommand request, CancellationToken token)
         {
             var entity = await _context.Jobs.SingleAsync(e => e.Id == request.JobId, token);
-            if(entity.User.Id != request.RequestUser.Id)
+            if(entity.UserId != request.RequestUser.Id)
                 throw SheaftException.Forbidden();
 
             entity.ResetJob();

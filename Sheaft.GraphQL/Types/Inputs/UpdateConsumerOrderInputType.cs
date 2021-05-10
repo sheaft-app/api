@@ -1,5 +1,6 @@
 ﻿using HotChocolate.Types;
 using Sheaft.Application.Models;
+using Sheaft.Domain;
 using Sheaft.Mediatr.Order.Commands;
 
 namespace Sheaft.GraphQL.Types.Inputs
@@ -8,21 +9,32 @@ namespace Sheaft.GraphQL.Types.Inputs
     {
         protected override void Configure(IInputObjectTypeDescriptor<UpdateConsumerOrderCommand> descriptor)
         {
+            base.Configure(descriptor);
+
             descriptor.Name("UpdateOrderInput");
-            descriptor.Field(c => c.OrderId)
-                .Name("id")
-                .Type<NonNullType<IdType>>();
             
-            descriptor.Field(c => c.UserId)
+            descriptor
+                .Field(c => c.OrderId)
+                .Name("id")
+                .ID(nameof(Order));
+            
+            descriptor
+                .Field(c => c.UserId)
                 .Name("userId")
-                .Type<IdType>();
+                .ID(nameof(User));
 
-            descriptor.Field(c => c.Donation);
+            descriptor
+                .Field(c => c.Donation)
+                .Name("donation");
 
-            descriptor.Field(c => c.ProducersExpectedDeliveries)
+            descriptor
+                .Field(c => c.ProducersExpectedDeliveries)
+                .Name("deliveries")
                 .Type<ListType<ProducerExpectedDeliveryInputType>>();
 
-            descriptor.Field(c => c.Products)
+            descriptor
+                .Field(c => c.Products)
+                .Name("products")
                 .Type<NonNullType<ListType<ResourceIdQuantityInputType>>>();
         }
     }

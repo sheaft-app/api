@@ -16,9 +16,9 @@ namespace Sheaft.Application.Extensions
                 .Select(o => new ProducerMailerModel
                 {
                     Delivery =
-                        GetDelivery(order.Deliveries.FirstOrDefault(d => d.DeliveryMode.Producer.Id == o.Key.Id)),
+                        GetDelivery(order.Deliveries.FirstOrDefault(d => d.DeliveryMode.ProducerId == o.Key.Id)),
                     Name = o.Key.Name,
-                    Address = GetAddress(order.Deliveries.FirstOrDefault(d => d.DeliveryMode.Producer.Id == o.Key.Id)),
+                    Address = GetAddress(order.Deliveries.FirstOrDefault(d => d.DeliveryMode.ProducerId == o.Key.Id)),
                     VatPrice = o.Sum(p => p.TotalVatPrice),
                     OnSalePrice = o.Sum(p => p.TotalOnSalePrice),
                     WholeSalePrice = o.Sum(p => p.TotalWholeSalePrice),

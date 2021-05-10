@@ -3,7 +3,6 @@ using System.Globalization;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Reflection;
-using AutoMapper;
 using IdentityModel;
 using MangoPay.SDK;
 using Microsoft.AspNetCore.Authorization;
@@ -17,6 +16,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Sheaft.Infrastructure.Persistence;
+using Microsoft.EntityFrameworkCore;
 using Sheaft.Infrastructure.Services;
 using Microsoft.Azure.Search;
 using Hangfire;
@@ -35,7 +35,6 @@ using Sheaft.Application.Interfaces.Business;
 using Sheaft.Application.Interfaces.Factories;
 using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Application.Interfaces.Mediatr;
-using Sheaft.Application.Interfaces.Queries;
 using Sheaft.Application.Mappings;
 using Sheaft.Business;
 using Sheaft.Business.Factories;
@@ -44,35 +43,8 @@ using Sheaft.Business.ProductsImporters;
 using Sheaft.Business.PurchaseOrdersExporters;
 using Sheaft.Business.TransactionsExporters;
 using Sheaft.Mediatr;
-using Sheaft.Mediatr.Agreement.Queries;
-using Sheaft.Mediatr.BusinessClosing.Queries;
-using Sheaft.Mediatr.Consumer.Queries;
-using Sheaft.Mediatr.Country.Queries;
-using Sheaft.Mediatr.DeliveryClosing.Queries;
-using Sheaft.Mediatr.DeliveryMode.Queries;
-using Sheaft.Mediatr.Department.Queries;
-using Sheaft.Mediatr.Document.Queries;
-using Sheaft.Mediatr.Donation.Queries;
-using Sheaft.Mediatr.Job.Queries;
-using Sheaft.Mediatr.Leaderboard.Queries;
-using Sheaft.Mediatr.Legal.Queries;
-using Sheaft.Mediatr.Nationality.Queries;
-using Sheaft.Mediatr.Notification.Queries;
-using Sheaft.Mediatr.Order.Queries;
-using Sheaft.Mediatr.Payin.Queries;
-using Sheaft.Mediatr.Payout.Queries;
-using Sheaft.Mediatr.Producer.Queries;
 using Sheaft.Mediatr.Product.Commands;
-using Sheaft.Mediatr.Product.Queries;
-using Sheaft.Mediatr.PurchaseOrder.Queries;
-using Sheaft.Mediatr.QuickOrder.Queries;
-using Sheaft.Mediatr.Region.Queries;
-using Sheaft.Mediatr.Returnable.Queries;
 using Sheaft.Mediatr.Store.Commands;
-using Sheaft.Mediatr.Tag.Queries;
-using Sheaft.Mediatr.Transfer.Queries;
-using Sheaft.Mediatr.User.Queries;
-using Sheaft.Mediatr.Withholding.Queries;
 using Sheaft.Options;
 using Sheaft.Web.Manage.Mappings;
 
@@ -169,7 +141,7 @@ namespace Sheaft.Web.Manage
             });
 
             var databaseConfig = databaseSettings.Get<AppDatabaseOptions>();
-            services.AddDbContext<IAppDbContext, AppDbContext>(options =>
+            services.AddPooledDbContextFactory<QueryDbContext>(options =>
             {
                 options.UseLazyLoadingProxies();
                 options.UseSqlServer(databaseConfig.ConnectionString, x =>
@@ -177,13 +149,23 @@ namespace Sheaft.Web.Manage
                     x.UseNetTopologySuite();
                     x.MigrationsHistoryTable("AppMigrationTable", "ef");
                 });
-            }, ServiceLifetime.Scoped);
+            });
+
+            services.AddDbContext<IAppDbContext, WriterDbContext>(options =>
+            {
+                options.UseLazyLoadingProxies();
+                options.UseSqlServer(databaseConfig.ConnectionString, x =>
+                {
+                    x.UseNetTopologySuite();
+                    x.MigrationsHistoryTable("AppMigrationTable", "ef");
+                });
+            });
 
             var mailerConfig = mailerSettings.Get<MailerOptions>();
             services.AddScoped<IAmazonSimpleEmailService, AmazonSimpleEmailServiceClient>(_ => new AmazonSimpleEmailServiceClient(mailerConfig.ApiId, mailerConfig.ApiKey, RegionEndpoint.EUCentral1));
 
             services.AddScoped<IRazorLightEngine>(_ => {
-                var rootDir = System.IO.Path.GetDirectoryName(Assembly.GetExecutingAssembly().CodeBase);
+                var rootDir = System.IO.Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
                 return new RazorLightEngineBuilder()
                 .UseFileSystemProject($"{rootDir.Replace("file:\\", string.Empty).Replace("file:", string.Empty)}/Mailings/Templates")
                 .UseMemoryCachingProvider()

@@ -8,7 +8,7 @@ namespace Sheaft.Application.Mappings
     {
         public PointsProfile()
         {
-            CreateMap<Points, PointsDto>();
+            CreateMap<UserPoint, PointsDto>();
         }
     }
 }

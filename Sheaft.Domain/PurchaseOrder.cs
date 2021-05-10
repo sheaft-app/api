@@ -13,7 +13,6 @@ namespace Sheaft.Domain
     public class PurchaseOrder : IEntity, IHasDomainEvent
     {
         private const int DIGITS_COUNT = 2;
-        private List<PurchaseOrderProduct> _products;
 
         protected PurchaseOrder()
         {
@@ -26,20 +25,20 @@ namespace Sheaft.Domain
 
             Id = id;
 
-            _products = new List<PurchaseOrderProduct>();
+            Products = new List<PurchaseOrderProduct>();
             DomainEvents = new List<DomainEvent>{new PurchaseOrderCreatedEvent(Id)};
             
             SetSender(order.User);
             SetVendor(producer);
 
-            var delivery = order.Deliveries.FirstOrDefault(d => d.DeliveryMode.Producer.Id == producer.Id);
+            var delivery = order.Deliveries.FirstOrDefault(d => d.DeliveryMode.ProducerId == producer.Id);
             SetExpectedDelivery(delivery.DeliveryMode, delivery.ExpectedDelivery.ExpectedDeliveryDate);
             SetComment(delivery.Comment);
 
             SetReference(reference);
             SetStatus(status, true);
 
-            var orderProducts = order.Products.Where(p => p.Producer.Id == producer.Id);
+            var orderProducts = order.Products.Where(p => p.ProducerId == producer.Id);
             foreach (var orderProduct in orderProducts)
                 AddProduct(orderProduct);
         }
@@ -61,18 +60,21 @@ namespace Sheaft.Domain
         public decimal TotalProductWholeSalePrice { get; private set; }
         public decimal TotalProductVatPrice { get; private set; }
         public decimal TotalProductOnSalePrice { get; private set; }
-        public decimal TotalReturnableOnSalePrice { get; set; }
-        public decimal TotalReturnableWholeSalePrice { get; set; }
-        public decimal TotalReturnableVatPrice { get; set; }
+        public decimal TotalReturnableOnSalePrice { get; private set; }
+        public decimal TotalReturnableWholeSalePrice { get; private set; }
+        public decimal TotalReturnableVatPrice { get; private set; }
         public decimal TotalWholeSalePrice { get; private set; }
         public decimal TotalVatPrice { get; private set; }
         public decimal TotalOnSalePrice { get; private set; }
         public decimal TotalWeight { get; private set; }
         public PurchaseOrderStatus Status { get; private set; }
-        public virtual PurchaseOrderSender Sender { get; private set; }
+        public Guid OrderId { get; private set; }
+        public Guid ProducerId { get; private set; }
+        public Guid ClientId { get; private set; }
+        public PurchaseOrderSender SenderInfo { get; private set; }
+        public PurchaseOrderVendor VendorInfo { get; private set; }
         public virtual ExpectedPurchaseOrderDelivery ExpectedDelivery { get; private set; }
-        public virtual PurchaseOrderVendor Vendor { get; private set; }
-        public virtual IReadOnlyCollection<PurchaseOrderProduct> Products => _products?.AsReadOnly();
+        public virtual ICollection<PurchaseOrderProduct> Products  { get; private set; }
 
         public void SetReference(string newReference)
         {
@@ -90,7 +92,7 @@ namespace Sheaft.Domain
                     if (Status != PurchaseOrderStatus.Waiting)
                         throw SheaftException.Validation(MessageKind.PurchaseOrder_CannotAccept_NotIn_WaitingStatus);
 
-                    if (Sender.Kind == ProfileKind.Consumer && CreatedOn.AddDays(5) < DateTimeOffset.UtcNow)
+                    if (SenderInfo.Kind == ProfileKind.Consumer && CreatedOn.AddDays(5) < DateTimeOffset.UtcNow)
                         throw SheaftException.Validation();
                     
                     AcceptedOn = DateTimeOffset.UtcNow;
@@ -234,12 +236,14 @@ namespace Sheaft.Domain
 
         public void SetSender(User sender)
         {
-            Sender = new PurchaseOrderSender(sender);
+            ClientId = sender.Id;
+            SenderInfo = new PurchaseOrderSender(sender);
         }
 
         public void SetVendor(Producer vendor)
         {
-            Vendor = new PurchaseOrderVendor(vendor);
+            ProducerId = vendor.Id;
+            VendorInfo = new PurchaseOrderVendor(vendor);
         }
 
         private void SetExpectedDelivery(DeliveryMode delivery, DateTimeOffset expectedDate)
@@ -255,32 +259,32 @@ namespace Sheaft.Domain
             if (product == null)
                 throw SheaftException.Validation(MessageKind.PurchaseOrder_CannotAddProduct_Product_NotFound);
 
-            var productLine = _products.SingleOrDefault(p => p.Id == product.Id);
+            var productLine = Products.SingleOrDefault(p => p.ProductId == product.ProductId);
             if (productLine != null)
-                _products.Remove(productLine);
+                Products.Remove(productLine);
 
-            _products.Add(new PurchaseOrderProduct(product));
+            Products.Add(new PurchaseOrderProduct(product));
             RefreshOrder();
         }
 
         private void RefreshOrder()
         {
-            TotalProductWholeSalePrice = Math.Round(_products.Sum(p => p.TotalWholeSalePrice), DIGITS_COUNT);
-            TotalProductVatPrice = Math.Round(_products.Sum(p => p.TotalVatPrice), DIGITS_COUNT);
+            TotalProductWholeSalePrice = Math.Round(Products.Sum(p => p.TotalWholeSalePrice), DIGITS_COUNT);
+            TotalProductVatPrice = Math.Round(Products.Sum(p => p.TotalVatPrice), DIGITS_COUNT);
             TotalProductOnSalePrice = Math.Round(TotalProductWholeSalePrice + TotalProductVatPrice, DIGITS_COUNT);
 
-            TotalWeight = Math.Round(_products.Where(p => p.TotalWeight.HasValue).Sum(p => p.TotalWeight) ?? 0,
+            TotalWeight = Math.Round(Products.Where(p => p.TotalWeight.HasValue).Sum(p => p.TotalWeight) ?? 0,
                 DIGITS_COUNT);
 
-            LinesCount = _products.Count;
-            ProductsCount = _products.Sum(p => p.Quantity);
-            ReturnablesCount = _products.Sum(p => p.ReturnablesCount);
+            LinesCount = Products.Count;
+            ProductsCount = Products.Sum(p => p.Quantity);
+            ReturnablesCount = Products.Sum(p => p.ReturnablesCount);
 
             TotalReturnableWholeSalePrice =
-                Math.Round(_products.Sum(p => p.ReturnablesCount > 0 ? p.TotalReturnableWholeSalePrice.Value : 0),
+                Math.Round(Products.Sum(p => p.ReturnablesCount > 0 ? p.TotalReturnableWholeSalePrice.Value : 0),
                     DIGITS_COUNT);
             TotalReturnableVatPrice =
-                Math.Round(_products.Sum(p => p.ReturnablesCount > 0 ? p.TotalReturnableVatPrice.Value : 0),
+                Math.Round(Products.Sum(p => p.ReturnablesCount > 0 ? p.TotalReturnableVatPrice.Value : 0),
                     DIGITS_COUNT);
             TotalReturnableOnSalePrice =
                 Math.Round(TotalReturnableWholeSalePrice + TotalReturnableVatPrice, DIGITS_COUNT);
@@ -291,6 +295,6 @@ namespace Sheaft.Domain
         }
 
         public List<DomainEvent> DomainEvents { get; } = new List<DomainEvent>();
-
+        public byte[] RowVersion { get; private set; }
     }
 }

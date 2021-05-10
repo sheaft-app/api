@@ -14,12 +14,7 @@ namespace Sheaft.Domain
         private const int DESCRIPTION_MAXLENGTH = 500;
         private const int DIGITS_COUNT = 2;
 
-        private List<ProductTag> _tags;
-        private List<Rating> _ratings;
-        private List<ProductPicture> _pictures;
-        private List<CatalogProduct> _catalogsPrices;
-
-        protected Product()
+        public Product()
         {
         }
 
@@ -28,14 +23,15 @@ namespace Sheaft.Domain
         {
             Id = id;
             Producer = producer ?? throw new ValidationException(MessageKind.Product_Producer_Required);
+            ProducerId = producer.Id;
 
             SetName(name);
             SetReference(reference);
             SetConditioning(conditioning, quantityPerUnit, unit);
 
-            _tags = new List<ProductTag>();
-            _ratings = new List<Rating>();
-            _catalogsPrices = new List<CatalogProduct>();
+            Tags = new List<ProductTag>();
+            Ratings = new List<Rating>();
+            CatalogsPrices = new List<CatalogProduct>();
 
             DomainEvents = new List<DomainEvent>();
 
@@ -57,14 +53,18 @@ namespace Sheaft.Domain
         public ConditioningKind Conditioning { get; private set; }
         public decimal Vat { get; private set; }
         public bool Available { get; private set; }
-        public int RatingsCount { get; set; }
-        public decimal? Rating { get; set; }
+        public int RatingsCount { get; private set; }
+        public decimal? Rating { get; private set; }
+
+        public Guid? ReturnableId { get; private set; }
+
+        public Guid ProducerId { get; private set; }
         public virtual Returnable Returnable { get; private set; }
         public virtual Producer Producer { get; private set; }
-        public virtual IReadOnlyCollection<ProductTag> Tags => _tags?.AsReadOnly();
-        public virtual IReadOnlyCollection<Rating> Ratings => _ratings?.AsReadOnly();
-        public virtual IReadOnlyCollection<ProductPicture> Pictures => _pictures?.AsReadOnly();
-        public virtual IReadOnlyCollection<CatalogProduct> CatalogsPrices => _catalogsPrices?.AsReadOnly();
+        public virtual ICollection<ProductTag> Tags  { get; private set; }
+        public virtual ICollection<Rating> Ratings { get; private set; }
+        public virtual ICollection<ProductPicture> Pictures { get; private set; }
+        public virtual ICollection<CatalogProduct> CatalogsPrices  { get; private set; }
 
         public void SetReference(string reference)
         {
@@ -90,9 +90,9 @@ namespace Sheaft.Domain
         public void SetTags(IEnumerable<Tag> tags)
         {
             if (Tags == null)
-                _tags = new List<ProductTag>();
+                Tags = new List<ProductTag>();
 
-            _tags.Clear();
+            Tags.Clear();
 
             if (tags?.Any() == true)
                 AddTags(tags);
@@ -149,21 +149,19 @@ namespace Sheaft.Domain
         public void AddRating(User user, decimal value, string comment)
         {
             if (Ratings == null)
-                _ratings = new List<Rating>();
+                Ratings = new List<Rating>();
 
-            if (_ratings.Any(r => r.User.Id == user.Id))
+            if (Ratings.Any(r => r.UserId == user.Id))
                 throw new ValidationException(MessageKind.Product_CannotRate_AlreadyRated);
 
-            _ratings.Add(new Rating(Guid.NewGuid(), value, user, comment));
+            Ratings.Add(new Rating(Guid.NewGuid(), value, user, comment));
             RefreshRatings();
         }
 
         public void SetReturnable(Returnable returnable)
         {
-            if (Returnable != null && Returnable.Id == returnable?.Id)
-                return;
-
             Returnable = returnable;
+            ReturnableId = returnable?.Id;
         }
 
         public void SetConditioning(ConditioningKind conditioning, decimal quantity,
@@ -194,9 +192,9 @@ namespace Sheaft.Domain
         public void AddPicture(ProductPicture picture)
         {
             if (Pictures == null)
-                _pictures = new List<ProductPicture>();
+                Pictures = new List<ProductPicture>();
 
-            _pictures.Add(picture);
+            Pictures.Add(picture);
         }
 
         public void RemovePicture(Guid id)
@@ -208,7 +206,7 @@ namespace Sheaft.Domain
             if (existingPicture == null)
                 throw SheaftException.NotFound();
 
-            _pictures.Remove(existingPicture);
+            Pictures.Remove(existingPicture);
         }
 
         private void RefreshPrices()
@@ -223,10 +221,10 @@ namespace Sheaft.Domain
         private void AddTags(IEnumerable<Tag> tags)
         {
             if (Tags == null)
-                _tags = new List<ProductTag>();
+                Tags = new List<ProductTag>();
 
             foreach (var tag in tags)
-                _tags.Add(new ProductTag(tag));
+                Tags.Add(new ProductTag(tag));
         }
 
         private void RefreshRatings()
@@ -238,15 +236,13 @@ namespace Sheaft.Domain
         public void AddOrUpdateCatalogPrice(Catalog catalog, decimal wholeSalePricePerUnit)
         {
             if (CatalogsPrices == null)
-                _catalogsPrices = new List<CatalogProduct>();
+                CatalogsPrices = new List<CatalogProduct>();
 
-            var existingCatalogPrice = _catalogsPrices.SingleOrDefault(c => c.Catalog.Id == catalog.Id);
+            var existingCatalogPrice = CatalogsPrices.SingleOrDefault(c => c.CatalogId == catalog.Id);
             if (existingCatalogPrice == null)
-                _catalogsPrices.Add(new CatalogProduct(this, catalog, wholeSalePricePerUnit));
+                CatalogsPrices.Add(new CatalogProduct(Guid.NewGuid(), this, catalog, wholeSalePricePerUnit));
             else
                 existingCatalogPrice.SetWholeSalePricePerUnit(wholeSalePricePerUnit);
-            
-            RefreshCatalogs();
         }
 
         public void RemoveFromCatalog(Guid catalogId)
@@ -254,20 +250,14 @@ namespace Sheaft.Domain
             if (CatalogsPrices == null || !CatalogsPrices.Any())
                 throw SheaftException.NotFound();
 
-            var existingCatalogPrice = _catalogsPrices.SingleOrDefault(c => c.Catalog.Id == catalogId);
+            var existingCatalogPrice = CatalogsPrices.SingleOrDefault(c => c.CatalogId == catalogId);
             if (existingCatalogPrice == null)
                 throw SheaftException.NotFound();
 
-            _catalogsPrices.Remove(existingCatalogPrice);
-            RefreshCatalogs();
+            CatalogsPrices.Remove(existingCatalogPrice);
         }
 
         public List<DomainEvent> DomainEvents { get; } = new List<DomainEvent>();
-
-        //Needed to update the UpdateOn column in SQL to be processed by azure search indexer
-        public void RefreshCatalogs()
-        {
-            UpdatedOn = DateTimeOffset.Now;
-        }
+        public byte[] RowVersion { get; private set; }
     }
 }

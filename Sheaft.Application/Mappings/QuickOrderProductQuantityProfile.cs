@@ -9,7 +9,7 @@ namespace Sheaft.Application.Mappings
         public QuickOrderProductQuantityProfile()
         {
             CreateMap<QuickOrderProduct, QuickOrderProductQuantityDto>()
-                .ForMember(d => d.Id, opt => opt.MapFrom(r => r.CatalogProduct.Product.Id))
+                .ForMember(d => d.Id, opt => opt.MapFrom(r => r.CatalogProduct.ProductId))
                 .ForMember(d => d.Reference, opt => opt.MapFrom(r => r.CatalogProduct.Product.Reference))
                 .ForMember(d => d.Name, opt => opt.MapFrom(r => r.CatalogProduct.Product.Name))
                 .ForMember(d => d.Returnable, opt => opt.MapFrom(r => r.CatalogProduct.Product.Returnable))

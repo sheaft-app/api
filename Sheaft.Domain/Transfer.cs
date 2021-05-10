@@ -16,14 +16,22 @@ namespace Sheaft.Domain
             : base(id, TransactionKind.Transfer, debitedWallet.User)
         {
             PurchaseOrder = purchaseOrder;
-            Debited = PurchaseOrder.TotalWholeSalePrice;
-            Credited = PurchaseOrder.TotalWholeSalePrice;
+            PurchaseOrderId = purchaseOrder.Id;
+            Debited = purchaseOrder.TotalWholeSalePrice;
+            Credited = purchaseOrder.TotalWholeSalePrice;
             CreditedWallet = creditedWallet;
+            CreditedWalletId = creditedWallet.Id;
             DebitedWallet = debitedWallet;
+            DebitedWalletId = debitedWallet.Id;
             Reference = "SHEAFT";
+            
             DomainEvents = new List<DomainEvent>();
         }
-
+        
+        public Guid PurchaseOrderId { get; private set; }
+        public Guid CreditedWalletId { get; private set; }
+        public Guid DebitedWalletId { get; private set; }
+        public Guid? PayoutId { get; private set; }
         public virtual PurchaseOrder PurchaseOrder { get; private set; }
         public virtual Wallet CreditedWallet { get; private set; }
         public virtual Wallet DebitedWallet { get; private set; }

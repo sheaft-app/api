@@ -3,19 +3,19 @@ using AutoMapper.QueryableExtensions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System;
 using System.IO;
+using System.IO.Compression;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Sheaft.Application.Interfaces;
 using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Application.Interfaces.Mediatr;
-using Sheaft.Application.Interfaces.Queries;
 using Sheaft.Core.Exceptions;
+using Sheaft.Domain;
 using Sheaft.Domain.Enum;
+using Sheaft.Infrastructure.Persistence;
 using Sheaft.Mediatr.Document.Commands;
 using Sheaft.Mediatr.Page.Commands;
 using Sheaft.Options;
@@ -25,18 +25,18 @@ namespace Sheaft.Web.Manage.Controllers
 {
     public class DocumentsController : ManageController
     {
-        private readonly IDocumentQueries _documentQueries;
+        private readonly IBlobService _blobService;
 
         public DocumentsController(
             IAppDbContext context,
             IMapper mapper,
+            IBlobService blobService,
             ISheaftMediatr mediatr,
-            IDocumentQueries documentQueries,
             IOptionsSnapshot<RoleOptions> roleOptions,
             IConfigurationProvider configurationProvider)
             : base(context, mapper, roleOptions, mediatr, configurationProvider)
         {
-            _documentQueries = documentQueries;
+            _blobService = blobService;
         }
 
         [HttpGet]
@@ -51,7 +51,7 @@ namespace Sheaft.Web.Manage.Controllers
                 throw SheaftException.NotFound();
 
             ViewBag.Kind = entity.Kind;
-            ViewBag.UserId = entity.Owner.Id;
+            ViewBag.UserId = entity.UserId;
             ViewBag.LegalId = entity.Id;
 
             return View(new DocumentViewModel());
@@ -86,7 +86,7 @@ namespace Sheaft.Web.Manage.Controllers
                 throw SheaftException.NotFound();
 
             ViewBag.Kind = entity.Kind;
-            ViewBag.UserId = entity.Owner.Id;
+            ViewBag.UserId = entity.UserId;
             ViewBag.LegalId = entity.Id;
 
             var document = entity.Documents.FirstOrDefault(d => d.Id == id);
@@ -122,7 +122,7 @@ namespace Sheaft.Web.Manage.Controllers
                 throw SheaftException.NotFound();
 
             ViewBag.Kind = entity.Kind;
-            ViewBag.UserId = entity.Owner.Id;
+            ViewBag.UserId = entity.UserId;
 
             var document = entity.Documents.FirstOrDefault(d => d.Id == documentId);
             return View(document);
@@ -216,7 +216,7 @@ namespace Sheaft.Web.Manage.Controllers
             if (entity == null)
                 throw SheaftException.NotFound();
 
-            var data = await _documentQueries.DownloadDocumentAsync(id, await GetRequestUserAsync(token), token);
+            var data = await DownloadDocumentAsync(id, await GetRequestUserAsync(token), token);
             return File(data, "application/octet-stream", entity.Name + ".zip");
         }
 
@@ -233,7 +233,7 @@ namespace Sheaft.Web.Manage.Controllers
                 throw SheaftException.NotFound();
 
             var page = entity.Pages.Single(p => p.Id == pageId);
-            var data = await _documentQueries.DownloadDocumentPageAsync(documentId, pageId, await GetRequestUserAsync(token),
+            var data = await DownloadDocumentPageAsync(documentId, pageId, await GetRequestUserAsync(token),
                 token);
 
             return File(data, "application/octet-stream", page.FileName + page.Extension);
@@ -274,6 +274,53 @@ namespace Sheaft.Web.Manage.Controllers
                 return RedirectToAction("EditLegalBusiness", "Legals", new {entity.Id});
 
             return RedirectToAction("EditLegalConsumer", "Legals", new {entity.Id});
+        }
+        public async Task<byte[]> DownloadDocumentAsync(Guid documentId, RequestUser currentUser, CancellationToken token)
+        {
+            var legal = await _context.Legals
+                    .SingleOrDefaultAsync(l => l.Documents.Any(d => d.Id == documentId), token);
+
+            var document = legal.Documents.FirstOrDefault(d => d.Id == documentId);
+            if (document == null)
+                return null;
+
+            byte[] archiveFile;
+            using (var archiveStream = new MemoryStream())
+            {
+                using (var archive = new ZipArchive(archiveStream, ZipArchiveMode.Create, true))
+                {
+                    foreach (var page in document.Pages)
+                    {
+                        var result = await _blobService.DownloadDocumentPageAsync(document.Id, page.Id, legal.User.Id, token);
+                        if (!result.Succeeded)
+                            throw SheaftException.Unexpected(result.Exception, result.Message, result.Params);
+
+                        var zipArchiveEntry = archive.CreateEntry(page.Filename + page.Extension, CompressionLevel.Optimal);
+                        using (var zipStream = zipArchiveEntry.Open())
+                            await zipStream.WriteAsync(result.Data, 0, result.Data.Length, token);
+                    }
+                }
+
+                archiveFile = archiveStream.ToArray();
+            }
+
+            return archiveFile;
+        }
+
+        public async Task<byte[]> DownloadDocumentPageAsync(Guid documentId, Guid pageId, RequestUser currentUser, CancellationToken token)
+        {
+            var legal = await _context.Legals
+                    .SingleOrDefaultAsync(l => l.Documents.Any(d => d.Id == documentId), token);
+
+            var document = legal.Documents.FirstOrDefault(d => d.Id == documentId);
+            if (document == null)
+                return null;
+
+            var result = await _blobService.DownloadDocumentPageAsync(document.Id, pageId, legal.User.Id, token);
+            if (!result.Succeeded)
+                return null;
+
+            return result.Data;
         }
     }
 }

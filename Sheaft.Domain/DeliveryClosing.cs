@@ -10,13 +10,16 @@ namespace Sheaft.Domain
         {
         }
 
-        public DeliveryClosing(Guid id, DateTimeOffset from, DateTimeOffset to, string reason = null)
+        public DeliveryClosing(DeliveryMode delivery, Guid id, DateTimeOffset from, DateTimeOffset to, string reason = null)
             : base(id, from, to)
         {
             Reason = reason;
+            DeliveryModeId = delivery.Id;
         }
-        
+
+        public Guid DeliveryModeId { get; private set; }
         public string Reason { get; private set; }
+        public byte[] RowVersion { get; private set; }
 
         public void SetReason(string reason)
         {

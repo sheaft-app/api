@@ -9,6 +9,8 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Sheaft.Application.Interfaces;
 using Sheaft.Application.Interfaces.Infrastructure;
+using Microsoft.EntityFrameworkCore;
+using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Application.Interfaces.Mediatr;
 using Sheaft.Core;
 using Sheaft.Core.Enums;
@@ -51,13 +53,13 @@ namespace Sheaft.Mediatr.Payout.Commands
         public async Task<Result<Guid>> Handle(CreatePayoutCommand request, CancellationToken token)
         {
             var producerLegals =
-                await _context.Set<BusinessLegal>().SingleOrDefaultAsync(c => c.User.Id == request.ProducerId, token);
+                await _context.Set<BusinessLegal>().SingleOrDefaultAsync(c => c.UserId == request.ProducerId, token);
             if (producerLegals.Validation != LegalValidation.Regular)
                 return Failure<Guid>(SheaftException.BadRequest(MessageKind.Payout_CannotCreate_User_NotValidated));
 
-            var wallet = await _context.Wallets.SingleOrDefaultAsync(c => c.User.Id == request.ProducerId, token);
+            var wallet = await _context.Wallets.SingleOrDefaultAsync(c => c.UserId == request.ProducerId, token);
             var bankAccount =
-                await _context.BankAccounts.SingleOrDefaultAsync(c => c.User.Id == request.ProducerId && c.IsActive,
+                await _context.BankAccounts.SingleOrDefaultAsync(c => c.UserId == request.ProducerId && c.IsActive,
                     token);
 
             var transfers = await _context.Transfers
@@ -68,8 +70,8 @@ namespace Sheaft.Mediatr.Payout.Commands
 
             var pendingWithholdings = await _context.Withholdings
                 .Where(c =>
-                    c.DebitedWallet.User.Id == request.ProducerId && c.Status == TransactionStatus.Waiting &&
-                    (c.Payout == null || c.Payout.Status == TransactionStatus.Failed))
+                    c.DebitedWallet.UserId == request.ProducerId && c.Status == TransactionStatus.Waiting &&
+                    (!c.PayoutId.HasValue || c.Payout.Status == TransactionStatus.Failed))
                 .ToListAsync(token);
             var withholdings = new List<Domain.Withholding>();
             var amount = transfers.Sum(t => t.Credited);

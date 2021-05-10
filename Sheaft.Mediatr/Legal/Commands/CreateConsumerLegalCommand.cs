@@ -8,6 +8,8 @@ using Newtonsoft.Json;
 using Sheaft.Application.Extensions;
 using Sheaft.Application.Interfaces;
 using Sheaft.Application.Interfaces.Infrastructure;
+using Microsoft.EntityFrameworkCore;
+using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Application.Interfaces.Mediatr;
 using Sheaft.Application.Models;
 using Sheaft.Core;
@@ -20,11 +22,12 @@ namespace Sheaft.Mediatr.Legal.Commands
     {
         protected CreateConsumerLegalCommand()
         {
-            
         }
+
         [JsonConstructor]
         public CreateConsumerLegalCommand(RequestUser requestUser) : base(requestUser)
         {
+            UserId = requestUser.Id;
         }
 
         public Guid UserId { get; set; }
@@ -35,6 +38,12 @@ namespace Sheaft.Mediatr.Legal.Commands
         public CountryIsoCode Nationality { get; set; }
         public CountryIsoCode CountryOfResidence { get; set; }
         public AddressDto Address { get; set; }
+
+        public override void SetRequestUser(RequestUser user)
+        {
+            base.SetRequestUser(user);
+            UserId = user.Id;
+        }
     }
 
     public class CreateConsumerLegalCommandHandler : CommandsHandler,
@@ -55,7 +64,7 @@ namespace Sheaft.Mediatr.Legal.Commands
         public async Task<Result<Guid>> Handle(CreateConsumerLegalCommand request, CancellationToken token)
         {
             var consumer = await _context.Consumers.SingleAsync(e => e.Id == request.UserId, token);
-            var legals = consumer.SetLegals(new Owner(consumer.Id,
+            var legals = consumer.SetLegals(new Owner(
                 request.FirstName,
                 request.LastName,
                 request.Email,
@@ -69,7 +78,7 @@ namespace Sheaft.Mediatr.Legal.Commands
                 request.Nationality,
                 request.CountryOfResidence
             ));
-               
+
             await _context.SaveChangesAsync(token);
 
             if (string.IsNullOrWhiteSpace(consumer.Identifier))

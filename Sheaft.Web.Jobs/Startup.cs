@@ -221,7 +221,7 @@ namespace Sheaft.Web.Jobs
             services.AddScoped<IAmazonSimpleEmailService, AmazonSimpleEmailServiceClient>(_ => new AmazonSimpleEmailServiceClient(mailerConfig.ApiId, mailerConfig.ApiKey, RegionEndpoint.EUCentral1));
 
             services.AddScoped<IRazorLightEngine>(_ => {
-                var rootDir = System.IO.Path.GetDirectoryName(Assembly.GetExecutingAssembly().CodeBase);
+                var rootDir = System.IO.Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
                 return new RazorLightEngineBuilder()
                 .UseFileSystemProject($"{rootDir.Replace("file:\\", string.Empty).Replace("file:", string.Empty)}/Mailings/Templates")
                 .UseMemoryCachingProvider()
@@ -266,7 +266,7 @@ namespace Sheaft.Web.Jobs
             services.AddOptions();
 
             var databaseConfig = appDatabaseSettings.Get<AppDatabaseOptions>();
-            services.AddDbContext<IAppDbContext, AppDbContext>(options =>
+            services.AddPooledDbContextFactory<QueryDbContext>(options =>
             {
                 options.UseLazyLoadingProxies();
                 options.UseSqlServer(databaseConfig.ConnectionString, x =>
@@ -274,7 +274,17 @@ namespace Sheaft.Web.Jobs
                     x.UseNetTopologySuite();
                     x.MigrationsHistoryTable("AppMigrationTable", "ef");
                 });
-            }, ServiceLifetime.Scoped);
+            });
+
+            services.AddDbContext<IAppDbContext, WriterDbContext>(options =>
+            {
+                options.UseLazyLoadingProxies();
+                options.UseSqlServer(databaseConfig.ConnectionString, x =>
+                {
+                    x.UseNetTopologySuite();
+                    x.MigrationsHistoryTable("AppMigrationTable", "ef");
+                });
+            });
 
             var pspOptions = pspSettings.Get<PspOptions>();
             services.AddScoped<MangoPayApi>(_ => new MangoPayApi

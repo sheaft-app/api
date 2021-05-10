@@ -17,6 +17,7 @@ namespace Sheaft.Domain
             Kind = kind;
             IsActive = true;
             User = user;
+            UserId = user.Id;
         }
 
         public Guid Id { get; private set; }
@@ -27,7 +28,9 @@ namespace Sheaft.Domain
         public string Name { get; private set; }
         public PaymentKind Kind { get; private set; }
         public bool IsActive { get; private set; }
+        public Guid UserId { get; private set; }
         public virtual User User { get; private set; }
+        public byte[] RowVersion { get; private set; }
 
         public void SetIdentifier(string identifier)
         {

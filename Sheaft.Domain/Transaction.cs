@@ -18,6 +18,7 @@ namespace Sheaft.Domain
             Id = id;
             Kind = kind;
             Author = author;
+            AuthorId = author.Id;
             Status = TransactionStatus.Waiting;
         }
 
@@ -36,7 +37,9 @@ namespace Sheaft.Domain
         public decimal Debited { get; protected set; }
         public decimal Credited { get; protected set; }
         public bool Processed { get; protected set; }
+        public Guid AuthorId { get; private set; }
         public virtual User Author { get; private set; }
+        public byte[] RowVersion { get; private set; }
 
         public void SetAsProcessed()
         {
