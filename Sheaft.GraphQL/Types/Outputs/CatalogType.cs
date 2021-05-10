@@ -53,10 +53,10 @@ namespace Sheaft.GraphQL.Types.Outputs
 
             descriptor
                 .Field(c => c.Products)
-                .Name("productsPrices")
+                .Name("prices")
                 .UseDbContext<QueryDbContext>()
                 .ResolveWith<CatalogResolvers>(c => c.GetCatalogProducts(default, default, default, default))
-                .Type<ListType<ProductType>>();
+                .Type<ListType<CatalogProductType>>();
             
             descriptor
                 .Field(c => c.Producer)
@@ -72,7 +72,7 @@ namespace Sheaft.GraphQL.Types.Outputs
                 CatalogProductsByIdBatchDataLoader catalogProductsDataLoader, CancellationToken token)
             {
                 var catalogProductsId = await context.Set<CatalogProduct>()
-                    .Where(cp => cp.CatalogId == catalog.Id)
+                    .Where(cp => cp.CatalogId == catalog.Id && !cp.Product.RemovedOn.HasValue)
                     .Select(cp => cp.Id)
                     .ToListAsync(token);
 

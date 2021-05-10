@@ -27,10 +27,10 @@ entity.Property(c => c.RowVersion).IsRowVersion();
             if(!_isAdmin)
                 entity.HasQueryFilter(p => !p.RemovedOn.HasValue);
 
-            entity.HasOne(c => c.Author).WithMany().HasForeignKey(c =>c.AuthorId).OnDelete(DeleteBehavior.NoAction).IsRequired();
-            entity.HasOne(c => c.CreditedWallet).WithMany().HasForeignKey(c =>c.CreditedWalletId).OnDelete(DeleteBehavior.NoAction).IsRequired();
-            entity.HasOne(c => c.Order).WithMany().HasForeignKey(c =>c.OrderId).OnDelete(DeleteBehavior.NoAction).IsRequired();
-            entity.HasMany(c => c.Refunds).WithOne(c => c.Payin).HasForeignKey(c =>c.PayinId).OnDelete(DeleteBehavior.NoAction).IsRequired();
+            entity.HasOne(c => c.Author).WithMany().HasForeignKey(c =>c.AuthorId).OnDelete(DeleteBehavior.NoAction);
+            entity.HasOne(c => c.CreditedWallet).WithMany().HasForeignKey(c =>c.CreditedWalletId).OnDelete(DeleteBehavior.NoAction);
+            entity.HasOne(c => c.Order).WithMany().HasForeignKey(c =>c.OrderId).OnDelete(DeleteBehavior.NoAction);
+            entity.HasMany(c => c.Refunds).WithOne(c => c.Payin).HasForeignKey(c =>c.PayinId).OnDelete(DeleteBehavior.NoAction);
             
             entity.Ignore(c => c.DomainEvents);
 

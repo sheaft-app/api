@@ -51,7 +51,7 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
                 .IsRequired();
             entity.HasMany(c => c.Deliveries).WithOne().HasForeignKey(c => c.OrderId).OnDelete(DeleteBehavior.Cascade);
             entity.HasMany(c => c.PurchaseOrders).WithOne().HasForeignKey(c => c.OrderId)
-                .OnDelete(DeleteBehavior.NoAction).IsRequired();
+                .OnDelete(DeleteBehavior.NoAction);
             entity.HasOne(c => c.User).WithMany().HasForeignKey(c => c.UserId).OnDelete(DeleteBehavior.Cascade);
 
             entity.Ignore(c => c.DomainEvents);

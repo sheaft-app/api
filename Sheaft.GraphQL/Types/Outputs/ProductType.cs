@@ -177,14 +177,14 @@ namespace Sheaft.GraphQL.Types.Outputs
 
             descriptor
                 .Field(c => c.CatalogsPrices)
-                .Name("catalogPrices")
+                .Name("catalogs")
                 .UseDbContext<QueryDbContext>()
                 .ResolveWith<ProductResolvers>(c => c.GetProductCatalogs(default, default, default, default))
                 .Type<ListType<CatalogProductType>>();
 
             descriptor
                 .Field("currentUserHasRatedProduct")
-                .Type<NonNullType<BooleanType>>()
+                .Type<BooleanType>()
                 .UseDbContext<QueryDbContext>()
                 .ResolveWith<ProductResolvers>(c => c.ProductIsRatedByUser(default, default, default!, default));
 
@@ -254,7 +254,7 @@ namespace Sheaft.GraphQL.Types.Outputs
                 CancellationToken token)
             {
                 var catalogProductsId = await context.Set<CatalogProduct>()
-                    .Where(cp => cp.ProductId == product.Id)
+                    .Where(cp => cp.ProductId == product.Id && !cp.Catalog.RemovedOn.HasValue)
                     .Select(cp => cp.Id)
                     .ToListAsync(token);
 
@@ -265,7 +265,7 @@ namespace Sheaft.GraphQL.Types.Outputs
                 TagsByIdBatchDataLoader tagsDataLoader, CancellationToken token)
             {
                 var tagsId = await context.Set<ProductTag>()
-                    .Where(p => p.ProductId == product.Id)
+                    .Where(p => p.ProductId == product.Id && !p.Tag.RemovedOn.HasValue)
                     .Select(p => p.TagId)
                     .ToListAsync(token);
 

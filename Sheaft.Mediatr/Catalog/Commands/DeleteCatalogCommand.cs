@@ -54,7 +54,7 @@ namespace Sheaft.Mediatr.Catalog.Commands
                 return Failure(MessageKind.Validation);
 
             foreach (var catalogProduct in entity.Products.ToList())
-                entity.RemoveProduct(catalogProduct.ProductId);
+                catalogProduct.Product.RemoveFromCatalog(entity.Id);
 
             _context.Remove(entity);
             await _context.SaveChangesAsync(token);

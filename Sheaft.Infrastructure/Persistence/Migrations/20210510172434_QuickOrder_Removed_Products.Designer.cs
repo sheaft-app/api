@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using NetTopologySuite.Geometries;
 using Sheaft.Infrastructure.Persistence;
@@ -10,9 +11,10 @@ using Sheaft.Infrastructure.Persistence;
 namespace Sheaft.Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(QueryDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20210510172434_QuickOrder_Removed_Products")]
+    partial class QuickOrder_Removed_Products
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1793,7 +1795,7 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("CatalogProductId")
+                    b.Property<Guid?>("CatalogProductId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTimeOffset>("CreatedOn")
@@ -1818,7 +1820,8 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                     b.HasIndex("CatalogProductId");
 
                     b.HasIndex("QuickOrderId", "CatalogProductId")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasFilter("[CatalogProductId] IS NOT NULL");
 
                     b.ToTable("QuickOrderProducts");
                 });
@@ -3682,13 +3685,12 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                     b.HasOne("Sheaft.Domain.CatalogProduct", "CatalogProduct")
                         .WithMany()
                         .HasForeignKey("CatalogProductId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.NoAction);
 
                     b.HasOne("Sheaft.Domain.QuickOrder", null)
                         .WithMany("Products")
                         .HasForeignKey("QuickOrderId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("CatalogProduct");

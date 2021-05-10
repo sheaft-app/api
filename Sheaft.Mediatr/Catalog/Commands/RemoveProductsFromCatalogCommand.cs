@@ -47,7 +47,17 @@ namespace Sheaft.Mediatr.Catalog.Commands
             
             foreach (var product in products)
                 product.RemoveFromCatalog(request.CatalogId);
-
+            
+            // var quickOrders = await _context.QuickOrders
+            //     .Where(qo => qo.Products.Any(qop => !qop.CatalogProductId))
+            //     .Include(qo => qo.Products)
+            //     .ToListAsync(token);
+            //
+            // foreach (var quickOrder in quickOrders)
+            // {
+            //     quickOrder.RemoveUnboundProducts();
+            // }
+            
             await _context.SaveChangesAsync(token);
             return Success();
         }

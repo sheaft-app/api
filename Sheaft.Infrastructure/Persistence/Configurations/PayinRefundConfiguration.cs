@@ -8,7 +8,7 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
     {
         public void Configure(EntityTypeBuilder<PayinRefund> entity)
         {
-            entity.HasOne(c => c.PurchaseOrder).WithMany().HasForeignKey(c =>c.PurchaseOrderId).OnDelete(DeleteBehavior.NoAction).IsRequired();
+            entity.HasOne(c => c.PurchaseOrder).WithMany().HasForeignKey(c =>c.PurchaseOrderId).OnDelete(DeleteBehavior.NoAction);
 
             entity.Ignore(c => c.DomainEvents);
         }

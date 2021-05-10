@@ -17,11 +17,16 @@ namespace Sheaft.GraphQL.Types.Inputs
 
             descriptor
                 .Field(c => c.IsAvailable)
-                .Name("isAvailable");
+                .Name("available");
             
             descriptor
                 .Field(c => c.IsDefault)
                 .Name("isDefault");
+            
+            descriptor
+                .Field(c => c.Products)
+                .Name("products")
+                .Type<ListType<ProductPriceInputType>>();
         }
     }
 }

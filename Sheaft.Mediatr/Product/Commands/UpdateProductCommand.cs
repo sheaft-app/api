@@ -148,7 +148,7 @@ namespace Sheaft.Mediatr.Product.Commands
                     {
                         var catalog = entity.CatalogsPrices.FirstOrDefault(c => c.CatalogId == catalogPrice.CatalogId)?.Catalog ??
                             await _context.Catalogs.SingleAsync(e => e.Id == catalogPrice.CatalogId, token);
-                        entity.AddOrUpdateCatalogPrice(catalog, request.WholeSalePricePerUnit.Value);
+                        entity.AddOrUpdateCatalogPrice(catalog, catalogPrice.WholeSalePricePerUnit);
                     }
                 }
 

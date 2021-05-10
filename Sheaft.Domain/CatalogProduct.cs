@@ -23,10 +23,10 @@ namespace Sheaft.Domain
             CatalogId = catalog.Id;
             SetWholeSalePricePerUnit(wholeSalePrice);
         }
-        
+
         public Guid Id { get; private set; }
-        public DateTimeOffset CreatedOn { get; }
-        public DateTimeOffset? UpdatedOn { get; }
+        public DateTimeOffset CreatedOn { get; private set; }
+        public DateTimeOffset? UpdatedOn { get; private set; }
         public decimal OnSalePrice { get; private set; }
         public decimal WholeSalePrice { get; private set; }
         public decimal VatPrice { get; private set; }

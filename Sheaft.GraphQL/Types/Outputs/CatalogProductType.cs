@@ -43,6 +43,10 @@ namespace Sheaft.GraphQL.Types.Outputs
             descriptor
                 .Field(c => c.VatPrice)
                 .Name("vatPrice");
+            
+            descriptor
+                .Field(c => c.CreatedOn)
+                .Name("addedOn");
 
             descriptor
                 .Field(c => c.Catalog)

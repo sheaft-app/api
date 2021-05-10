@@ -25,7 +25,7 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
             entity.Property(c => c.Name).UseCollation("Latin1_general_CI_AI").IsRequired();
 
             entity.HasMany(o => o.Products).WithOne().HasForeignKey(c => c.QuickOrderId)
-                .OnDelete(DeleteBehavior.Cascade).IsRequired();
+                .OnDelete(DeleteBehavior.NoAction).IsRequired();
             entity.HasOne(c => c.User).WithMany().HasForeignKey(c => c.UserId).OnDelete(DeleteBehavior.Cascade)
                 .IsRequired();
 

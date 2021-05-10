@@ -25,7 +25,7 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
             entity.Property(c => c.Name).IsRequired();
 
             entity.HasOne(c => c.Department).WithMany().HasForeignKey(c => c.DepartmentId)
-                .OnDelete(DeleteBehavior.NoAction).IsRequired();
+                .OnDelete(DeleteBehavior.NoAction);
             entity.HasOne(c => c.Winner).WithMany().HasForeignKey(c => c.WinnerId).OnDelete(DeleteBehavior.NoAction);
 
             entity.HasKey(c => c.Id);

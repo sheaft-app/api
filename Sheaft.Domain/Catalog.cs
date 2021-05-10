@@ -46,29 +46,33 @@ namespace Sheaft.Domain
             IsDefault = isDefault;
         }
 
-        public CatalogProduct RemoveProduct(Guid productId)
+        // public void RemoveProducts(IEnumerable<Guid> productIds)
+        // {
+        //     if (Products == null)
+        //         throw SheaftException.NotFound();
+        //     
+        //     foreach (var productToRemove in Products.Where(p => productIds.Contains(p.ProductId)).ToList())
+        //         Products.Remove(productToRemove);
+        // }
+        //
+        // public void AddOrUpdateProduct(Product product, decimal wholeSalePrice)
+        // {
+        //     if (Products == null)
+        //         Products = new List<CatalogProduct>();
+        //
+        //     var existingProductPrice = Products.SingleOrDefault(p => p.ProductId == product.Id);
+        //     if (existingProductPrice != null)
+        //         existingProductPrice.SetWholeSalePricePerUnit(wholeSalePrice);
+        //     else
+        //         Products.Add(new CatalogProduct(Guid.NewGuid(), product, this, wholeSalePrice));
+        // }
+
+        public void SetName(string name)
         {
-            if (Products == null)
-                throw SheaftException.NotFound();
-
-            var product = Products.SingleOrDefault(p => p.ProductId == productId);
-            if (product == null)
-                throw SheaftException.NotFound();
-
-            Products.Remove(product);
-            return product;
-        }
-
-        public void AddOrUpdateProduct(Product product, decimal wholeSalePrice)
-        {
-            if (Products == null)
-                Products = new List<CatalogProduct>();
-
-            var existingProductPrice = Products.SingleOrDefault(p => p.ProductId == product.Id);
-            if (existingProductPrice != null)
-                existingProductPrice.SetWholeSalePricePerUnit(wholeSalePrice);
-            else
-                Products.Add(new CatalogProduct(Guid.NewGuid(), product, this, wholeSalePrice));
+            if (string.IsNullOrEmpty(name))
+                throw SheaftException.Validation();
+            
+            Name = name;
         }
     }
 }
