@@ -1,18 +1,19 @@
 #See https://aka.ms/containerfastmode to understand how Visual Studio uses this Dockerfile to build your images for faster debugging.
 
-FROM mcr.microsoft.com/dotnet/core/aspnet:3.1-buster-slim AS base
+FROM mcr.microsoft.com/dotnet/core/aspnet:5.0-buster-slim AS base
 WORKDIR /app
 ENV ASPNETCORE_URLS=https://*:5008;http://*:5007
 ENV ASPNETCORE_HTTPS_PORT=5008
 EXPOSE 5008
 EXPOSE 5007
 
-FROM mcr.microsoft.com/dotnet/core/sdk:3.1-buster AS build
+FROM mcr.microsoft.com/dotnet/core/sdk:5.0-buster AS build
 WORKDIR /src
 COPY ["Sheaft.Web.Manage/Sheaft.Web.Manage.csproj", "Sheaft.Web.Manage/"]
 COPY ["Sheaft.Web.Common/Sheaft.Web.Common.csproj", "Sheaft.Web.Common/"]
 COPY ["Sheaft.Application/Sheaft.Application.csproj", "Sheaft.Application/"]
 COPY ["Sheaft.Domain/Sheaft.Domain.csproj", "Sheaft.Domain/"]
+COPY ["Sheaft.Mailing/Sheaft.Mailing.csproj", "Sheaft.Mailing/"]
 COPY ["Sheaft.Infrastructure/Sheaft.Infrastructure.csproj", "Sheaft.Infrastructure/"]
 COPY ["Sheaft.Localization/Sheaft.Localization.csproj", "Sheaft.Localization/"]
 RUN dotnet restore "Sheaft.Web.Manage/Sheaft.Web.Manage.csproj"
