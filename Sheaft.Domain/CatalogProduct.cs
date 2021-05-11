@@ -78,7 +78,7 @@ namespace Sheaft.Domain
 
         public void UpdatePrice(decimal percent)
         {
-            SetWholeSalePricePerUnit(WholeSalePricePerUnit * 1 + percent);
+            SetWholeSalePricePerUnit(WholeSalePricePerUnit * (1 + percent / 100));
         }
     }
 }

@@ -93,10 +93,10 @@ namespace Sheaft.GraphQL.Catalogs
             CatalogsByIdBatchDataLoader catalogsDataLoader, CancellationToken token)
         {
             var result = await ExecuteAsync<CloneCatalogCommand, Guid>(mediatr, input, token);
-            return await catalogsDataLoader.LoadAsync(input.CatalogId, token);
+            return await catalogsDataLoader.LoadAsync(result, token);
         }
 
-        [GraphQLName("updateCatalogAllPrices")]
+        [GraphQLName("updateCatalogPrices")]
         [Authorize(Policy = Policies.PRODUCER)]
         [GraphQLType(typeof(CatalogType))]
         public async Task<Catalog> UpdateAllCatalogPricesAsync(

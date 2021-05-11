@@ -49,7 +49,8 @@ namespace Sheaft.Mediatr.Catalog.Commands
 
                 var entity = new Domain.Catalog(catalog.Producer, catalog.Kind, Guid.NewGuid(), request.Name);
                 await _context.AddAsync(entity, token);
-
+                await _context.SaveChangesAsync(token);
+                
                 var catalogProducts =
                     await _context.Products
                         .Where(p => p.CatalogsPrices.Any(cp => cp.CatalogId == request.CatalogId))
@@ -61,7 +62,7 @@ namespace Sheaft.Mediatr.Catalog.Commands
                         ProductId = p.Id,
                         WholeSalePricePerUnit =
                             p.CatalogsPrices.Single(c => c.CatalogId == request.CatalogId).WholeSalePricePerUnit *
-                            (1 + request.Percent ?? 0)
+                            (1 + (request.Percent / 100) ?? 0)
                     });
 
                 var result =
