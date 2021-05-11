@@ -184,22 +184,23 @@ namespace Sheaft.Infrastructure.Services
             if (bytes == null)
                 return Success(entity.Picture);
 
+            var pictureId = Guid.NewGuid();
             var originalBytes = await RetrievePictureBytesAsync(originalPicture);
             if (originalBytes != null)
                 using (Image image = Image.Load(originalBytes))
-                    await UploadProductOriginalPreviewAsync(image, entity.ProducerId, entity.Id, token);
+                    await UploadProductOriginalPreviewAsync(image, entity.ProducerId, entity.Id, pictureId, token);
             
             using (Image image = Image.Load(bytes))
             {
-                await UploadProductPreviewAsync(image, entity.ProducerId, entity.Id, PictureSize.SMALL,
+                await UploadProductPreviewAsync(image, entity.ProducerId, entity.Id, pictureId, PictureSize.SMALL,
                     _pictureOptions.Product.Small.Width, _pictureOptions.Product.Small.Height, token,
                     quality: _pictureOptions.Product.Small.Quality);
                 
-                await UploadProductPreviewAsync(image, entity.ProducerId, entity.Id, PictureSize.MEDIUM,
+                await UploadProductPreviewAsync(image, entity.ProducerId, entity.Id, pictureId, PictureSize.MEDIUM,
                     _pictureOptions.Product.Medium.Width, _pictureOptions.Product.Medium.Height, token,
                     quality: _pictureOptions.Product.Medium.Quality);
                 
-                return await UploadProductPreviewAsync(image, entity.ProducerId, entity.Id, PictureSize.LARGE,
+                return await UploadProductPreviewAsync(image, entity.ProducerId, entity.Id, pictureId,PictureSize.LARGE,
                     _pictureOptions.Product.Large.Width, _pictureOptions.Product.Large.Height, token,
                     quality: _pictureOptions.Product.Large.Quality);
             }
@@ -211,7 +212,7 @@ namespace Sheaft.Infrastructure.Services
             return category?.Picture;
         }
 
-        private async Task<Result<string>> UploadProductPreviewAsync(Image image, Guid userId, Guid productId,
+        private async Task<Result<string>> UploadProductPreviewAsync(Image image, Guid userId, Guid productId, Guid pictureId,
             string size, int width, int height, CancellationToken token,
             ResizeMode mode = ResizeMode.Max, int quality = 100)
         {
@@ -227,18 +228,19 @@ namespace Sheaft.Infrastructure.Services
                     new PngEncoder {CompressionLevel = PngCompressionLevel.BestCompression, IgnoreMetadata = true},
                     token);
 
-                return await _blobService.UploadProductPreviewAsync(userId, productId, size, blobStream.ToArray(), token);
+                return await _blobService.UploadProductPreviewAsync(userId, productId, pictureId, size, blobStream.ToArray(), token);
             }
         }
 
-        private async Task<Result<string>> UploadProductOriginalPreviewAsync(Image image, Guid userId, Guid productId, CancellationToken token)
+        private async Task<Result<string>> UploadProductOriginalPreviewAsync(Image image, Guid producerId,
+            Guid productId, Guid pictureId, CancellationToken token)
         {
             using (var blobStream = new MemoryStream())
             {
                 await image.SaveAsync(blobStream,
                     new PngEncoder {CompressionLevel = PngCompressionLevel.BestCompression, IgnoreMetadata = true},
                     token);
-                return await _blobService.UploadProductPreviewAsync(userId, productId, PictureSize.ORIGINAL,
+                return await _blobService.UploadProductPreviewAsync(producerId, productId, pictureId, PictureSize.ORIGINAL,
                     blobStream.ToArray(), token);
             }
         }

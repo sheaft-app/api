@@ -12,7 +12,7 @@ namespace Sheaft.Application.Extensions
             if (image.EndsWith(".jpg") || image.EndsWith(".jpeg") || image.EndsWith(".png"))
                 return image;
 
-            return image.EndsWith($"{pictureId:N}") ? $"{image}_{size}.png" : $"{image}_{size}.jpg";
+            return $"{image}_{size}.png";
         }
     }
 }
