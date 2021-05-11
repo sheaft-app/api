@@ -1,10 +1,13 @@
-﻿using HotChocolate.Resolvers;
+﻿using HotChocolate;
+using HotChocolate.Resolvers;
 using HotChocolate.Types;
-using Sheaft.Application.Models;
-using Sheaft.Application.Security;
+using HotChocolate.Types.Relay;
+using Microsoft.Extensions.Options;
+using Sheaft.Application.Extensions;
+using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Domain;
-using Sheaft.GraphQL.Tags;
 using Sheaft.GraphQL.Users;
+using Sheaft.Options;
 
 namespace Sheaft.GraphQL.Types.Outputs
 {
@@ -19,6 +22,11 @@ namespace Sheaft.GraphQL.Types.Outputs
                 .IdField(c => c.Id)
                 .ResolveNode((ctx, id) => 
                     ctx.DataLoader<UsersByIdBatchDataLoader>().LoadAsync(id, ctx.RequestAborted));
+
+            descriptor
+                .Field("profileId")
+                .ResolveWith<UserResolvers>(c => c.GetUserProfileId(default, default, default, default))
+                .Type<IdType>();
             
             descriptor
                 .Field(c => c.Kind)
@@ -55,6 +63,27 @@ namespace Sheaft.GraphQL.Types.Outputs
                 .Field(c => c.Address)
                 .Name("address")
                 .Type<NonNullType<UserAddressType>>();
+        }
+
+        private class UserResolvers
+        {
+            public string GetUserProfileId(User user, [Service] IOptionsSnapshot<RoleOptions> roleOptions,[Service] ICurrentUserService currentUserService, [Service] IIdSerializer serializer)
+            {
+                var userResult = currentUserService.GetCurrentUserInfo();
+                if (!userResult.Succeeded)
+                    return null;
+
+                if (userResult.Data.IsInRole(roleOptions.Value.Producer.Value))
+                    return serializer.Serialize("Query", nameof(Producer), user.Id);
+                
+                if (userResult.Data.IsInRole(roleOptions.Value.Store.Value))
+                    return serializer.Serialize("Query", nameof(Store), user.Id);
+                
+                if (userResult.Data.IsInRole(roleOptions.Value.Consumer.Value))
+                    return serializer.Serialize("Query", nameof(Consumer), user.Id);
+
+                return null;
+            }
         }
     }
 }
