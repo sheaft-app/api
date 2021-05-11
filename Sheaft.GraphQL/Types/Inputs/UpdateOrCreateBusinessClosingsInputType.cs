@@ -14,11 +14,6 @@ namespace Sheaft.GraphQL.Types.Inputs
             descriptor.Name("UpdateOrCreateBusinessClosingsInput");
             
             descriptor
-                .Field(c => c.UserId)
-                .Name("id")
-                .ID(nameof(User));
-            
-            descriptor
                 .Field(c => c.Closings)
                 .Name("closings")
                 .Type<NonNullType<ListType<BusinessClosingInputType>>>();

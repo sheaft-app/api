@@ -40,7 +40,7 @@ namespace Sheaft.GraphQL.Agreements
         }
 
         [GraphQLName("acceptAgreements")]
-        [Authorize(Policy = Policies.PRODUCER)]
+        [Authorize(Policy = Policies.STORE_OR_PRODUCER)]
         [GraphQLType(typeof(ListType<AgreementType>))]
         public async Task<IEnumerable<Agreement>> AcceptAgreementsAsync(
             [GraphQLType(typeof(AcceptAgreementsInputType))] [GraphQLName("input")]
