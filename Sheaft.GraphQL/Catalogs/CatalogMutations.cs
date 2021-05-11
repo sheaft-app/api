@@ -108,18 +108,6 @@ namespace Sheaft.GraphQL.Catalogs
             return await catalogsDataLoader.LoadAsync(input.CatalogId, token);
         }
 
-        [GraphQLName("updateCatalogPrices")]
-        [Authorize(Policy = Policies.PRODUCER)]
-        [GraphQLType(typeof(CatalogType))]
-        public async Task<Catalog> UpdateCatalogPricesAsync(
-            [GraphQLType(typeof(UpdateCatalogPricesInputType))] [GraphQLName("input")]
-            UpdateCatalogPricesCommand input, [Service] ISheaftMediatr mediatr,
-            CatalogsByIdBatchDataLoader catalogsDataLoader, CancellationToken token)
-        {
-            await ExecuteAsync(mediatr, input, token);
-            return await catalogsDataLoader.LoadAsync(input.CatalogId, token);
-        }
-
         [GraphQLName("setCatalogAsDefault")]
         [Authorize(Policy = Policies.PRODUCER)]
         [GraphQLType(typeof(CatalogType))]
