@@ -180,7 +180,7 @@ namespace Sheaft.GraphQL.Types.Outputs
                 .Name("catalogs")
                 .UseDbContext<QueryDbContext>()
                 .ResolveWith<ProductResolvers>(c => c.GetProductCatalogs(default, default, default, default))
-                .Type<ListType<CatalogProductType>>();
+                .Type<ListType<CatalogPriceType>>();
 
             descriptor
                 .Field("currentUserHasRatedProduct")

@@ -51,9 +51,8 @@ namespace Sheaft.GraphQL.Catalogs
             return await catalogsDataLoader.LoadAsync(input.CatalogId, token);
         }
 
-        [GraphQLName("deleteCatalog")]
+        [GraphQLName("deleteCatalogs")]
         [Authorize(Policy = Policies.PRODUCER)]
-        [GraphQLType(typeof(CatalogType))]
         public async Task<bool> DeleteCatalogsAsync(
             [GraphQLType(typeof(DeleteCatalogsInputType))] [GraphQLName("input")]
             DeleteCatalogsCommand input, [Service] ISheaftMediatr mediatr,

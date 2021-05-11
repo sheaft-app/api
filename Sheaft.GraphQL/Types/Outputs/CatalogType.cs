@@ -53,10 +53,10 @@ namespace Sheaft.GraphQL.Types.Outputs
 
             descriptor
                 .Field(c => c.Products)
-                .Name("prices")
+                .Name("products")
                 .UseDbContext<QueryDbContext>()
                 .ResolveWith<CatalogResolvers>(c => c.GetCatalogProducts(default, default, default, default))
-                .Type<ListType<CatalogProductType>>();
+                .Type<ListType<ProductPriceType>>();
             
             descriptor
                 .Field(c => c.Producer)

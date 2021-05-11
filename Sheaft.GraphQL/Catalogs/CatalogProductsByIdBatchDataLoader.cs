@@ -29,6 +29,8 @@ namespace Sheaft.GraphQL.Catalogs
         {
             return await _contextFactory.CreateDbContext().Set<Domain.CatalogProduct>()
                 .Where(u => keys.Contains(u.Id))
+                .Include(c => c.Product)
+                .Include(c => c.Catalog)
                 .ToDictionaryAsync(c => c.Id, token);
         }
     }
