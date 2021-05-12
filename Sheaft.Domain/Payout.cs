@@ -27,11 +27,16 @@ namespace Sheaft.Domain
 
             DomainEvents = new List<DomainEvent>();
             Withholdings = withholdings.ToList();
+            WithholdingsCount = Withholdings?.Count ?? 0;
+            
             Transfers = transfers.ToList();
+            TransfersCount = Transfers?.Count ?? 0;
         }
 
         public Guid BankAccountId { get; private set; }
         public Guid DebitedWalletId { get; private set; }
+        public int TransfersCount { get; private set; }
+        public int WithholdingsCount { get; private set; }
         public virtual Wallet DebitedWallet { get; private set; }
         public virtual BankAccount BankAccount { get; private set; }
         public virtual ICollection<Transfer> Transfers { get; private set; }

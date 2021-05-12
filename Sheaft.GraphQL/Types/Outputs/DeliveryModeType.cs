@@ -65,6 +65,14 @@ namespace Sheaft.GraphQL.Types.Outputs
             descriptor
                 .Field(c => c.Description)
                 .Name("description");
+            
+            descriptor
+                .Field(c => c.DeliveryHoursCount)
+                .Name("deliveryHoursCount");
+            
+            descriptor
+                .Field(c => c.ClosingsCount)
+                .Name("closingsCount");
 
             descriptor
                 .Field(c => c.Address)

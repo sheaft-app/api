@@ -37,6 +37,7 @@ namespace Sheaft.Domain
         public DateTimeOffset? UpdatedOn { get; private set; }
         public DateTimeOffset? RemovedOn { get; private set; }
         public Guid UserId { get; private set; }
+        public int ProductsCount { get; private set; }
         public virtual User User { get; private set; }
         public virtual ICollection<QuickOrderProduct> Products { get; private set; }
 
@@ -87,7 +88,8 @@ namespace Sheaft.Domain
                 return;
             }
 
-            Products.Add(new QuickOrderProduct(catalogProduct, quantity)); 
+            Products.Add(new QuickOrderProduct(catalogProduct, quantity));
+            ProductsCount = Products?.Count ?? 0;
         }
 
         public void RemoveProduct(QuickOrderProduct product)
@@ -96,6 +98,7 @@ namespace Sheaft.Domain
                 throw SheaftException.NotFound();
 
             Products.Remove(product);
+            ProductsCount = Products?.Count ?? 0;
         }
 
         public void RemoveProduct(Guid productId)
@@ -108,6 +111,7 @@ namespace Sheaft.Domain
                 throw SheaftException.Validation(MessageKind.QuickOrder_CannotRemoveProduct_Product_NotFound);
 
             Products.Remove(productLine);
+            ProductsCount = Products?.Count ?? 0;
         }
 
         public List<DomainEvent> DomainEvents { get; } = new List<DomainEvent>();

@@ -32,6 +32,7 @@ namespace Sheaft.Domain
         public DeclarationStatus Status { get; private set; }
         public string ReasonCode { get; private set; }
         public string ReasonMessage { get; private set; }
+        public int UbosCount { get; private set; }
         public virtual ICollection<Ubo> Ubos { get; private set; }
 
         public void AddUbo(Ubo ubo)
@@ -44,6 +45,7 @@ namespace Sheaft.Domain
                 throw new ValidationException(MessageKind.Ubo_CannotAdd_AlreadyExists);
 
             Ubos.Add(ubo);
+            UbosCount = Ubos?.Count ?? 0;
         }
 
         public void RemoveUbo(Guid id)
@@ -53,6 +55,7 @@ namespace Sheaft.Domain
                 throw new ValidationException(MessageKind.Ubo_CannotRemove_NotFound);
 
             Ubos.Remove(existingUbo);
+            UbosCount = Ubos?.Count ?? 0;
         }
 
         public void SetStatus(DeclarationStatus status)

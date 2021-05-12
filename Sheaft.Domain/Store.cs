@@ -22,6 +22,8 @@ namespace Sheaft.Domain
             DomainEvents = new List<DomainEvent>{new StoreRegisteredEvent(Id)};
         }
 
+        public int TagsCount { get; private set; }
+        public int OpeningHoursCount { get; private set; }
         public virtual IReadOnlyCollection<StoreTag> Tags { get; private set; }
         public virtual IReadOnlyCollection<OpeningHours> OpeningHours { get; private set; }
 
@@ -34,6 +36,7 @@ namespace Sheaft.Domain
                 OpeningHours = new List<OpeningHours>();
 
             OpeningHours = openingHours.ToList();
+            OpeningHoursCount = OpeningHours?.Count ?? 0;
         }
 
         public void SetTags(IEnumerable<Tag> tags)
@@ -45,6 +48,7 @@ namespace Sheaft.Domain
                 Tags = new List<StoreTag>();
 
             Tags = tags.Select(t => new StoreTag(t)).ToList();
+            TagsCount = Tags?.Count ?? 0;
         }
 
         public List<DomainEvent> DomainEvents { get; } = new List<DomainEvent>();

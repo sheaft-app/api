@@ -73,7 +73,7 @@ namespace Sheaft.GraphQL.Types.Outputs
                 .Field(c => c.LastName)
                 .Name("lastName")
                 .Type<NonNullType<StringType>>();
-            
+
             descriptor
                 .Field(c => c.Name)
                 .Name("name")
@@ -102,16 +102,36 @@ namespace Sheaft.GraphQL.Types.Outputs
             descriptor
                 .Field(c => c.Website)
                 .Name("website");
-            
+
             descriptor
                 .Field(c => c.OpenForNewBusiness)
                 .Name("openForNewBusiness");
 
             descriptor
+                .Field(c => c.ClosingsCount)
+                .Name("closingsCount");
+
+            descriptor
+                .Field(c => c.TagsCount)
+                .Name("tagsCount");
+
+            descriptor
+                .Field(c => c.PicturesCount)
+                .Name("picturesCount");
+
+            descriptor
+                .Field("productsCount")
+                .ResolveWith<ProducerResolvers>(c => c.GetProductsCount(default!, default!, default, default, default));
+
+            descriptor
+                .Field(c => c.HasProducts)
+                .Name("hasProducts");
+
+            descriptor
                 .Field(c => c.Address)
                 .Name("address")
                 .Type<NonNullType<UserAddressType>>();
-            
+
             descriptor
                 .Field(c => c.Tags)
                 .Name("tags")
@@ -132,27 +152,29 @@ namespace Sheaft.GraphQL.Types.Outputs
                 .UseDbContext<QueryDbContext>()
                 .ResolveWith<ProducerResolvers>(c => c.GetPictures(default!, default!, default!, default))
                 .Type<ListType<ProfilePictureType>>();
-            
+
             descriptor
                 .Field("agreement")
                 .Authorize(Policies.STORE_OR_PRODUCER)
                 .UseDbContext<QueryDbContext>()
-                .ResolveWith<ProducerResolvers>(c => c.GetCurrentAgreement(default!, default!, default!, default!, default))
+                .ResolveWith<ProducerResolvers>(c =>
+                    c.GetCurrentAgreement(default!, default!, default!, default!, default))
                 .Type<AgreementType>();
-            
+
             descriptor
                 .Field("products")
                 .Authorize(Policies.REGISTERED)
                 .UseDbContext<QueryDbContext>()
-                .ResolveWith<ProducerResolvers>(c => c.GetProducts(default!, default!, default!, default, default!, default))
+                .ResolveWith<ProducerResolvers>(c =>
+                    c.GetProducts(default!, default!, default!, default, default!, default))
                 .Type<ListType<ProductType>>();
         }
 
         private class ProducerResolvers
         {
-            public async Task<IEnumerable<Product>> GetProducts(Producer producer, 
-                [ScopedService] QueryDbContext context, 
-                [Service] ICurrentUserService currentUserService, 
+            public async Task<IEnumerable<Product>> GetProducts(Producer producer,
+                [ScopedService] QueryDbContext context,
+                [Service] ICurrentUserService currentUserService,
                 [Service] IOptionsSnapshot<RoleOptions> roleOptions,
                 ProductsByIdBatchDataLoader productsDataLoader, CancellationToken token)
             {
@@ -178,32 +200,71 @@ namespace Sheaft.GraphQL.Types.Outputs
                             .ToListAsync(token);
                     else
                         productsId = await context.Products
-                        .Where(p => p.ProducerId == producer.Id && p.CatalogsPrices.Any(cp =>
-                            cp.Catalog.Kind == CatalogKind.Stores && cp.Catalog.Available && cp.Catalog.IsDefault))
-                        .Select(p => p.Id)
-                        .ToListAsync(token);
+                            .Where(p => p.ProducerId == producer.Id && p.CatalogsPrices.Any(cp =>
+                                cp.Catalog.Kind == CatalogKind.Stores && cp.Catalog.Available && cp.Catalog.IsDefault))
+                            .Select(p => p.Id)
+                            .ToListAsync(token);
                 }
                 else
                 {
                     productsId = await context.Products
-                        .Where(p => p.ProducerId == producer.Id && p.CatalogsPrices.Any(cp => cp.Catalog.Kind == CatalogKind.Consumers && cp.Catalog.Available))
+                        .Where(p => p.ProducerId == producer.Id && p.CatalogsPrices.Any(cp =>
+                            cp.Catalog.Kind == CatalogKind.Consumers && cp.Catalog.Available))
                         .Select(p => p.Id)
                         .ToListAsync(token);
                 }
 
                 return await productsDataLoader.LoadAsync(productsId, token);
             }
-            
-            public async Task<Agreement> GetCurrentAgreement(Producer producer, 
+
+            public async Task<int> GetProductsCount(Producer producer,
+                [ScopedService] QueryDbContext context,
+                [Service] ICurrentUserService currentUserService,
+                [Service] IOptionsSnapshot<RoleOptions> roleOptions,
+                CancellationToken token)
+            {
+                var currentUser = currentUserService.GetCurrentUserInfo();
+                if (!currentUser.Succeeded)
+                    return 0;
+
+                if (currentUser.Data.IsInRole(roleOptions.Value.Store.Value))
+                {
+                    var hasAgreement = await context.Agreements
+                        .Where(c => c.StoreId == currentUser.Data.Id && c.ProducerId == producer.Id &&
+                                    c.Status == AgreementStatus.Accepted)
+                        .AnyAsync(token);
+
+                    if (hasAgreement)
+                        return await context.Agreements
+                            .Where(c => c.StoreId == currentUser.Data.Id && c.ProducerId == producer.Id &&
+                                        c.Catalog.Kind == CatalogKind.Stores && c.Status == AgreementStatus.Accepted)
+                            .SelectMany(a => a.Catalog.Products)
+                            .Where(c => !c.Product.RemovedOn.HasValue)
+                            .CountAsync(token);
+
+                    return await context.Products
+                        .CountAsync(p => p.ProducerId == producer.Id && p.CatalogsPrices.Any(cp =>
+                                cp.Catalog.Kind == CatalogKind.Stores && cp.Catalog.Available && cp.Catalog.IsDefault),
+                            token);
+                }
+
+                return await context.Products
+                    .CountAsync(
+                        p => p.ProducerId == producer.Id && p.CatalogsPrices.Any(cp =>
+                            cp.Catalog.Kind == CatalogKind.Consumers && cp.Catalog.Available), token);
+            }
+
+            public async Task<Agreement> GetCurrentAgreement(Producer producer,
                 [ScopedService] QueryDbContext context, [Service] ICurrentUserService currentUserService,
                 AgreementsByIdBatchDataLoader agreementsDataLoader, CancellationToken token)
             {
                 var currentUser = currentUserService.GetCurrentUserInfo();
                 if (!currentUser.Succeeded)
                     return null;
-                
+
                 var agreementId = await context.Agreements
-                    .Where(p => p.ProducerId == producer.Id && p.StoreId == currentUser.Data.Id && p.Status != AgreementStatus.Cancelled && p.Status != AgreementStatus.Refused)
+                    .Where(p => p.ProducerId == producer.Id && p.StoreId == currentUser.Data.Id &&
+                                p.Status != AgreementStatus.Cancelled && p.Status != AgreementStatus.Refused)
                     .Select(p => p.Id)
                     .SingleOrDefaultAsync(token);
 
@@ -212,7 +273,7 @@ namespace Sheaft.GraphQL.Types.Outputs
 
                 return await agreementsDataLoader.LoadAsync(agreementId, token);
             }
-            
+
             public async Task<IEnumerable<Tag>> GetTags(Producer producer, [ScopedService] QueryDbContext context,
                 TagsByIdBatchDataLoader tagsDataLoader, CancellationToken token)
             {

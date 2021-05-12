@@ -50,6 +50,8 @@ namespace Sheaft.Domain
         public DeliveryAddress Address { get; private set; }
         public Guid ProducerId { get; private set; }
         public virtual Producer Producer { get; private set; }
+        public int DeliveryHoursCount { get; private set; }
+        public int ClosingsCount { get; private set; }
         public virtual ICollection<DeliveryHours> DeliveryHours { get; private set; }
         public virtual ICollection<DeliveryClosing> Closings  { get; private set; }
 
@@ -59,6 +61,7 @@ namespace Sheaft.Domain
                 DeliveryHours = new List<DeliveryHours>();
             
             DeliveryHours = deliveryHours.ToList();
+            DeliveryHoursCount = DeliveryHours?.Count ?? 0;
         }
 
         public void SetLockOrderHoursBeforeDelivery(int? lockOrderHoursBeforeDelivery)
@@ -113,6 +116,7 @@ namespace Sheaft.Domain
                 Closings = new List<DeliveryClosing>();
 
             Closings.Add(closing);
+            ClosingsCount = Closings?.Count ?? 0;
         }
 
         public void RemoveClosings(IEnumerable<Guid> ids)
@@ -128,6 +132,7 @@ namespace Sheaft.Domain
                 throw SheaftException.NotFound();
 
             Closings.Remove(closing);
+            ClosingsCount = Closings?.Count ?? 0;
         }
 
         public List<DomainEvent> DomainEvents { get; } = new List<DomainEvent>();

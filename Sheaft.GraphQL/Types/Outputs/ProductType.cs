@@ -66,6 +66,14 @@ namespace Sheaft.GraphQL.Types.Outputs
             descriptor
                 .Field(c => c.RatingsCount)
                 .Name("ratingsCount");
+            
+            descriptor
+                .Field(c => c.PicturesCount)
+                .Name("picturesCount");
+            
+            descriptor
+                .Field(c => c.CatalogsPricesCount)
+                .Name("catalogsCount");
 
             descriptor
                 .Field(c => c.QuantityPerUnit)

@@ -27,6 +27,7 @@ namespace Sheaft.Domain
         }
 
         public bool OpenForNewBusiness { get; private set; }
+        public int ClosingsCount { get; private set; }
         public virtual ICollection<BusinessClosing> Closings { get; private set; }
 
         public void SetName(string name)
@@ -45,6 +46,7 @@ namespace Sheaft.Domain
                 Closings = new List<BusinessClosing>();
 
             Closings.Add(closing);
+            ClosingsCount = Closings?.Count ?? 0;
         }
         
         public void RemoveClosings(IEnumerable<Guid> ids)
@@ -60,6 +62,7 @@ namespace Sheaft.Domain
                 throw SheaftException.NotFound();
             
             Closings.Remove(closing);
+            ClosingsCount = Closings?.Count ?? 0;
         }
 
         public BusinessLegal SetLegals(LegalKind kind, string name, string email, string siret, string vatIdentifier, LegalAddress address, Owner owner)

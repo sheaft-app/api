@@ -62,6 +62,7 @@ namespace Sheaft.Domain
         public int ReturnablesCount { get; private set; }
         public int LinesCount { get; private set; }
         public int ProductsCount { get; private set; }
+        public int DeliveriesCount { get; private set; }
         public int PurchaseOrdersCount { get; private set; }
         public decimal Donation { get; private set; }
         public decimal FeesPrice { get; private set; }
@@ -139,11 +140,13 @@ namespace Sheaft.Domain
 
         public void SetDeliveries(IEnumerable<Tuple<DeliveryMode, DateTimeOffset, string>> orderDeliveries)
         {
-            if (Deliveries != null)
+            if (Deliveries == null || Deliveries.Any())
                 Deliveries = new List<OrderDelivery>();
 
             foreach (var orderDelivery in orderDeliveries)
-                Deliveries.Add(new OrderDelivery(orderDelivery.Item1, orderDelivery.Item2, orderDelivery.Item3));     
+                Deliveries.Add(new OrderDelivery(orderDelivery.Item1, orderDelivery.Item2, orderDelivery.Item3));
+
+            DeliveriesCount = Deliveries?.Count ?? 0;
         }
 
         public void SetDonation(DonationKind kind)

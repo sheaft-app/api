@@ -54,6 +54,9 @@ namespace Sheaft.Domain
         public string Twitter { get; private set; }
         public string Instagram { get; private set; }
         public UserAddress Address { get; private set; }
+        public int PointsCount { get; private set; }
+        public int SettingsCount { get; private set; }
+        public int PicturesCount { get; private set; }
         public virtual Legal Legal { get; protected set; }
         public virtual ICollection<UserPoint> Points  { get; private set; }
         public virtual ICollection<UserSetting> Settings { get; private set; }
@@ -108,12 +111,11 @@ namespace Sheaft.Domain
             Instagram = instagram;
         }
         
-        public ProfilePicture AddPicture(ProfilePicture picture)
+        public void AddPicture(ProfilePicture picture)
         {
             Pictures ??= new List<ProfilePicture>();
             Pictures.Add(picture);
-
-            return picture;
+            PicturesCount = Pictures?.Count ?? 0;
         }
         
         public void RemovePicture(Guid id)
@@ -126,6 +128,7 @@ namespace Sheaft.Domain
                 throw SheaftException.NotFound();
             
             Pictures.Remove(existingPicture);
+            PicturesCount = Pictures?.Count ?? 0;
         }
         
         public void SetFirstname(string firstname)
@@ -225,7 +228,7 @@ namespace Sheaft.Domain
             SetAddress("Anonymous", null, Address.Zipcode, "Anonymous", Address.Country, Address.Department);
         }
 
-        public UserPoint AddPoints(PointKind kind, int quantity, DateTimeOffset? createdOn = null)
+        public void AddPoints(PointKind kind, int quantity, DateTimeOffset? createdOn = null)
         {
             if (Points == null)
                 Points = new List<UserPoint>();
@@ -233,13 +236,12 @@ namespace Sheaft.Domain
             var points = new UserPoint(Guid.NewGuid(), kind, quantity, createdOn ?? DateTimeOffset.UtcNow);
             Points.Add(points);
             RefreshPoints();
-
-            return points;
         }
 
         private void RefreshPoints()
         {
             TotalPoints = Points.Sum(c => c.Quantity);
+            PointsCount = Points?.Count ?? 0;
         }
 
         public void Restore()
@@ -266,6 +268,7 @@ namespace Sheaft.Domain
                 throw SheaftException.AlreadyExists();
             
             Settings.Add(new UserSetting(setting, value));
+            SettingsCount = Settings?.Count ?? 0;
         }
 
         public void EditSetting(Guid settingId, string value)
@@ -290,6 +293,7 @@ namespace Sheaft.Domain
                 throw SheaftException.NotFound();
 
             Settings.Remove(setting);
+            SettingsCount = Settings?.Count ?? 0;
         }
     }
 
