@@ -50,6 +50,10 @@ namespace Sheaft.GraphQL.Types.Outputs
             descriptor
                 .Field(c => c.IsDefault)
                 .Name("isDefault");
+            
+            descriptor
+                .Field(c => c.ProductsCount)
+                .Name("productsCount");
 
             descriptor
                 .Field(c => c.Products)

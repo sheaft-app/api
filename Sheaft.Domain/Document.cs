@@ -36,6 +36,7 @@ namespace Sheaft.Domain
         public string ResultCode { get; private set; }
         public string ResultMessage { get; private set; }
         public Guid LegalId { get; private set; }
+        public int PagesCount { get; private set; }
         public virtual ICollection<Page> Pages { get; private set; }
 
         public void SetIdentifier(string identifier)
@@ -73,6 +74,7 @@ namespace Sheaft.Domain
                 Pages = new List<Page>();
 
             Pages.Add(page);
+            PagesCount = Pages?.Count ?? 0;
         }
 
         public void SetProcessedOn(DateTimeOffset? processedOn)
@@ -103,6 +105,7 @@ namespace Sheaft.Domain
 
             var page = Pages.FirstOrDefault(p => p.Id == pageId);
             Pages.Remove(page);
+            PagesCount = Pages?.Count ?? 0;
         }
 
         public List<DomainEvent> DomainEvents { get; } = new List<DomainEvent>();

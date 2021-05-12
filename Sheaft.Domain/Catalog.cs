@@ -33,6 +33,7 @@ namespace Sheaft.Domain
         public bool IsDefault { get; private set; }
         public Guid ProducerId { get; private set; }
         public virtual Producer Producer { get; private set; }
+        public int ProductsCount { get; private set; }
         public virtual ICollection<CatalogProduct> Products { get; private set; }
         public byte[] RowVersion { get; private set; }
 
@@ -46,33 +47,22 @@ namespace Sheaft.Domain
             IsDefault = isDefault;
         }
 
-        // public void RemoveProducts(IEnumerable<Guid> productIds)
-        // {
-        //     if (Products == null)
-        //         throw SheaftException.NotFound();
-        //     
-        //     foreach (var productToRemove in Products.Where(p => productIds.Contains(p.ProductId)).ToList())
-        //         Products.Remove(productToRemove);
-        // }
-        //
-        // public void AddOrUpdateProduct(Product product, decimal wholeSalePrice)
-        // {
-        //     if (Products == null)
-        //         Products = new List<CatalogProduct>();
-        //
-        //     var existingProductPrice = Products.SingleOrDefault(p => p.ProductId == product.Id);
-        //     if (existingProductPrice != null)
-        //         existingProductPrice.SetWholeSalePricePerUnit(wholeSalePrice);
-        //     else
-        //         Products.Add(new CatalogProduct(Guid.NewGuid(), product, this, wholeSalePrice));
-        // }
-
         public void SetName(string name)
         {
             if (string.IsNullOrEmpty(name))
                 throw SheaftException.Validation();
             
             Name = name;
+        }
+
+        public void IncreaseProductsCount()
+        {
+            ProductsCount++;
+        }
+
+        public void DecreaseProductsCount()
+        {
+            ProductsCount--;
         }
     }
 }

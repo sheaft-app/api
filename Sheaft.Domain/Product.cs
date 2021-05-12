@@ -54,6 +54,9 @@ namespace Sheaft.Domain
         public decimal Vat { get; private set; }
         public bool Available { get; private set; }
         public int RatingsCount { get; private set; }
+        public int TagsCount { get; private set; }
+        public int PicturesCount { get; private set; }
+        public int CatalogsPricesCount { get; private set; }
         public decimal? Rating { get; private set; }
 
         public Guid? ReturnableId { get; private set; }
@@ -225,6 +228,8 @@ namespace Sheaft.Domain
 
             foreach (var tag in tags)
                 Tags.Add(new ProductTag(tag));
+
+            TagsCount = Tags?.Count ?? 0;
         }
 
         private void RefreshRatings()
@@ -243,6 +248,8 @@ namespace Sheaft.Domain
                 CatalogsPrices.Add(new CatalogProduct(Guid.NewGuid(), this, catalog, wholeSalePricePerUnit));
             else
                 existingCatalogPrice.SetWholeSalePricePerUnit(wholeSalePricePerUnit);
+
+            CatalogsPricesCount = CatalogsPrices?.Count ?? 0;
         }
 
         public void RemoveFromCatalog(Guid catalogId)
@@ -255,6 +262,9 @@ namespace Sheaft.Domain
                 throw SheaftException.NotFound();
 
             CatalogsPrices.Remove(existingCatalogPrice);
+            CatalogsPricesCount = CatalogsPrices?.Count ?? 0;
+            
+            existingCatalogPrice.Catalog.DecreaseProductsCount();
         }
 
         public List<DomainEvent> DomainEvents { get; } = new List<DomainEvent>();

@@ -23,6 +23,7 @@ namespace Sheaft.Domain
         public bool HasProducts { get; set; }
         public bool CanDirectSell { get; set; }
         public bool NotSubjectToVat { get; private set; }
+        public int TagsCount { get; private set; }
         public virtual ICollection<ProducerTag> Tags { get; private set; }
 
         public void SetTags(IEnumerable<Tag> tags)
@@ -34,6 +35,7 @@ namespace Sheaft.Domain
                 Tags = new List<ProducerTag>();
 
             Tags = tags.Select(t => new ProducerTag(t)).ToList();
+            TagsCount = Tags?.Count ?? 0;
         }
 
         public void SetNotSubjectToVat(bool notSubjectToVat)

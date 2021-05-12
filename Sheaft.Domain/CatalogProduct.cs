@@ -22,6 +22,8 @@ namespace Sheaft.Domain
             Catalog = catalog;
             CatalogId = catalog.Id;
             SetWholeSalePricePerUnit(wholeSalePrice);
+            
+            catalog.IncreaseProductsCount();
         }
 
         public Guid Id { get; private set; }

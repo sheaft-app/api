@@ -32,6 +32,7 @@ namespace Sheaft.Domain
 
         public Guid CreditedWalletId { get; private set; }
         public Guid OrderId { get; private set; }
+        public int RefundsCount { get; private set; }
         public virtual Wallet CreditedWallet { get; private set; }
         public virtual Order Order { get; private set; }
         public virtual ICollection<PayinRefund> Refunds  { get; private set; }
@@ -41,26 +42,11 @@ namespace Sheaft.Domain
             if (Refunds != null && Refunds.Any(r => r.PurchaseOrderId == refund.PurchaseOrderId && r.Status == TransactionStatus.Succeeded))
                 throw new ValidationException(MessageKind.Payin_CannotAdd_Refund_PurchaseOrderRefund_AlreadySucceeded);
 
+            if (Refunds == null)
+                Refunds = new List<PayinRefund>();
+            
             Refunds.Add(refund);
-        }
-
-        //TO REMOVE 1 MONTH AFTER RELEASE
-        public override void SetStatus(TransactionStatus status)
-        {
-            base.SetStatus(status);
-
-            if (Kind == TransactionKind.WebPayin)
-            {
-                switch (Status)
-                {
-                    case TransactionStatus.Failed:
-                        DomainEvents.Add(new PayinFailedEvent(Id));
-                        break;
-                    case TransactionStatus.Succeeded:
-                        DomainEvents.Add(new PayinSucceededEvent(Id));
-                        break;
-                }
-            }
+            RefundsCount = Refunds?.Count ?? 0;
         }
 
         public List<DomainEvent> DomainEvents { get; } = new List<DomainEvent>();
