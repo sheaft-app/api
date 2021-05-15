@@ -250,7 +250,7 @@ namespace Sheaft.Infrastructure.Services
             if (string.IsNullOrWhiteSpace(picture))
                 return null;
 
-            if (!picture.StartsWith("http") && !picture.StartsWith("https"))
+            if (!picture.StartsWith("http"))
             {
                 var base64Data = picture.StartsWith("data:image")
                     ? Regex.Match(picture, @"data:image/(?<type>.+?),(?<data>.+)").Groups["data"].Value
@@ -258,8 +258,7 @@ namespace Sheaft.Infrastructure.Services
                 return Convert.FromBase64String(base64Data);
             }
 
-            if ((picture.StartsWith("http") || picture.StartsWith("https")) &&
-                !picture.Contains("sheaft.com"))
+            if (picture.StartsWith("http") && !picture.Contains("sheaft.com"))
             {
                 using (var response = await _httpClient.GetAsync(picture))
                     return await response.Content.ReadAsByteArrayAsync();

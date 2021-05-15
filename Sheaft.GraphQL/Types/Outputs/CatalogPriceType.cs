@@ -21,6 +21,10 @@ namespace Sheaft.GraphQL.Types.Outputs
                 .Resolve(c => c.Parent<CatalogProduct>().Catalog.Name);
             
             descriptor
+                .Field("kind")
+                .Resolve(c => c.Parent<CatalogProduct>().Catalog.Kind);
+            
+            descriptor
                 .Field(c => c.VatPricePerUnit)
                 .Name("vatPricePerUnit");
                 

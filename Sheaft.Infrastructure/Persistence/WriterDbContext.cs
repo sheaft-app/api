@@ -90,7 +90,7 @@ namespace Sheaft.Infrastructure.Persistence
                 if (entry.Entity is ITrackCreation)
                 {
                     var createdOnProperty = entry.Property("CreatedOn");
-                    if ((DateTimeOffset) createdOnProperty.CurrentValue == default)
+                    if ((DateTimeOffset) createdOnProperty.CurrentValue == default && entry.State != EntityState.Deleted)
                     {
                         entry.State = EntityState.Added;
                         createdOnProperty.CurrentValue = DateTimeOffset.UtcNow;
