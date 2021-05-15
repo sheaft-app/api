@@ -259,7 +259,7 @@ namespace Sheaft.Infrastructure.Services
             }
 
             if ((picture.StartsWith("http") || picture.StartsWith("https")) &&
-                !picture.StartsWith($"{_storageOptions.ContentScheme}://{_storageOptions.ContentHostname}"))
+                !picture.Contains("sheaft.com"))
             {
                 using (var response = await _httpClient.GetAsync(picture))
                     return await response.Content.ReadAsByteArrayAsync();
