@@ -114,7 +114,8 @@ namespace Sheaft.GraphQL.DeliveryModes
                     .Select(d => d.Delivery)
                     .ToListAsync(token);
             }
-            else
+            
+            if(!deliveriesModes.Any())
             {
                 deliveriesModes = await context.DeliveryModes
                     .Where(d =>
