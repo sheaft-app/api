@@ -70,8 +70,7 @@ namespace Sheaft.Mediatr.Agreement.Commands
             foreach (var quickOrder in quickOrders)
             {
                 var products = quickOrder.Products.Where(p => p.CatalogProduct.CatalogId == entity.CatalogId).ToList();
-                foreach (var product in products)
-                    quickOrder.RemoveProduct(product);
+                _context.RemoveRange(products);
             }
 
             await _context.SaveChangesAsync(token);
