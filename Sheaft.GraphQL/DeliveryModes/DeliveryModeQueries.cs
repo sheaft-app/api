@@ -159,7 +159,7 @@ namespace Sheaft.GraphQL.DeliveryModes
                 producer.Deliveries = deliveries;
                 producers.Add(producer);
             }
-
+            
             if (deliveriesMode.All(dm => !dm.MaxPurchaseOrdersPerTimeSlot.HasValue))
                 return producers;
 
@@ -296,7 +296,7 @@ namespace Sheaft.GraphQL.DeliveryModes
                     list.AddRange(results);
             }
 
-            return list;
+            return list.OrderBy(l => l.ExpectedDeliveryDate);
         }
 
         private DeliveryHourDto GetDeliveryHourIfMatch(TimeSlotHour openingHour,

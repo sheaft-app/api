@@ -62,11 +62,6 @@ namespace Sheaft.Mediatr.Agreement.Commands
                 var catalog = await _context.Catalogs.SingleAsync(e => e.Id == request.CatalogId.Value, token);
                 entity.AssignCatalog(catalog);
             }
-            else
-            {
-                var catalog = await _context.Catalogs.SingleAsync(c => c.IsDefault && c.Kind == CatalogKind.Stores && c.ProducerId == producer.Id, token);
-                entity.AssignCatalog(catalog);
-            }
 
             await _context.AddAsync(entity, token);
             await _context.SaveChangesAsync(token);

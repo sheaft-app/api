@@ -269,8 +269,8 @@ namespace Sheaft.Domain
 
         private void RefreshOrder()
         {
-            TotalProductWholeSalePrice = Math.Round(Products.Sum(p => p.TotalWholeSalePrice), DIGITS_COUNT);
-            TotalProductVatPrice = Math.Round(Products.Sum(p => p.TotalVatPrice), DIGITS_COUNT);
+            TotalProductWholeSalePrice = Math.Round(Products.Sum(p => p.TotalProductWholeSalePrice), DIGITS_COUNT);
+            TotalProductVatPrice = Math.Round(Products.Sum(p => p.TotalProductVatPrice), DIGITS_COUNT);
             TotalProductOnSalePrice = Math.Round(TotalProductWholeSalePrice + TotalProductVatPrice, DIGITS_COUNT);
 
             TotalWeight = Math.Round(Products.Where(p => p.TotalWeight.HasValue).Sum(p => p.TotalWeight) ?? 0,

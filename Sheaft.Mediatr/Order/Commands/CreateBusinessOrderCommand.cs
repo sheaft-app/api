@@ -104,7 +104,7 @@ namespace Sheaft.Mediatr.Order.Commands
                 foreach (var product in products)
                 {
                     var agreement = agreements.SingleOrDefault(a => a.ProducerId == product.ProducerId);
-                    if (agreement?.Catalog == null)
+                    if (agreement?.CatalogId == null)
                     {
                         catalogResult = Failure<IEnumerable<Guid>>(MessageKind.NotFound);
                         break;
@@ -113,7 +113,7 @@ namespace Sheaft.Mediatr.Order.Commands
                     if (agreement.Catalog.Products.All(p => p.ProductId != product.Id))
                         invalidProductIds.Add(product.Id.ToString("N"));
 
-                    cartProducts.Add(new Tuple<Domain.Product, Guid, int>(product, agreement.CatalogId,
+                    cartProducts.Add(new Tuple<Domain.Product, Guid, int>(product, agreement.CatalogId.Value,
                         request.Products.Where(p => p.Id == product.Id).Sum(c => c.Quantity)));
                 }
 

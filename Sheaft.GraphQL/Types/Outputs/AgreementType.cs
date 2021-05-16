@@ -84,7 +84,10 @@ namespace Sheaft.GraphQL.Types.Outputs
             
             public Task<Catalog> GetCatalog(Agreement agreement, CatalogsByIdBatchDataLoader catalogsDataLoader, CancellationToken token)
             {
-                return catalogsDataLoader.LoadAsync(agreement.CatalogId, token);
+                if (!agreement.CatalogId.HasValue)
+                    return null;
+                
+                return catalogsDataLoader.LoadAsync(agreement.CatalogId.Value, token);
             }
         }
     }

@@ -79,7 +79,7 @@ namespace Sheaft.GraphQL.Products
         [GraphQLName("products")]
         [GraphQLType(typeof(ListType<ProductType>))]
         [UseDbContext(typeof(QueryDbContext))]
-        [Authorize(Policy = Policies.STORE_OR_PRODUCER)]
+        [Authorize(Policy = Policies.PRODUCER)]
         [UsePaging]
         [UseFiltering]
         [UseSorting]
@@ -96,13 +96,39 @@ namespace Sheaft.GraphQL.Products
                         .Where(c => c.StoreId == CurrentUser.Id && c.Status == AgreementStatus.Accepted)
                         .SelectMany(a => a.Catalog.Products)
                         .Where(c => !c.Product.RemovedOn.HasValue)
-                        .Select(c => c.Product);                
+                        .Select(c => c.Product);
 
                 return new List<Product>().AsQueryable();
             }
 
             return context.Products
                 .Where(c => c.ProducerId == CurrentUser.Id);
+        }
+
+        [GraphQLName("storeOrderableProducts")]
+        [GraphQLType(typeof(ListType<CatalogProductType>))]
+        [UseDbContext(typeof(QueryDbContext))]
+        [Authorize(Policy = Policies.STORE)]
+        [UsePaging]
+        [UseFiltering]
+        [UseSorting]
+        public async Task<IQueryable<CatalogProduct>> GetStoreOrderableProducts([ScopedService] QueryDbContext context,
+            CancellationToken token)
+        {
+            SetLogTransaction();
+
+            var hasAgreements = await context.Agreements
+                .AnyAsync(c => c.StoreId == CurrentUser.Id && c.Status == AgreementStatus.Accepted, token);
+
+            if (hasAgreements)
+                return context.Agreements
+                    .Where(c => c.StoreId == CurrentUser.Id && c.Status == AgreementStatus.Accepted)
+                    .SelectMany(a => a.Catalog.Products)
+                    .Where(c => !c.Product.RemovedOn.HasValue)
+                    .Select(c => c)
+                    .Include(c => c.Product);
+
+            return new List<CatalogProduct>().AsQueryable();
         }
 
         [GraphQLName("searchProducts")]

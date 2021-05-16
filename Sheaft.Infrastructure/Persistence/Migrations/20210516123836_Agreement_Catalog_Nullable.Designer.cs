@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using NetTopologySuite.Geometries;
 using Sheaft.Infrastructure.Persistence;
@@ -10,9 +11,10 @@ using Sheaft.Infrastructure.Persistence;
 namespace Sheaft.Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(QueryDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20210516123836_Agreement_Catalog_Nullable")]
+    partial class Agreement_Catalog_Nullable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

@@ -1,4 +1,7 @@
+using System;
 using HotChocolate.Types;
+using Sheaft.Application.Extensions;
+using Sheaft.Core;
 using Sheaft.Domain;
 
 namespace Sheaft.GraphQL.Types.Outputs
@@ -23,6 +26,10 @@ namespace Sheaft.GraphQL.Types.Outputs
             descriptor
                 .Field("reference")
                 .Resolve(c => c.Parent<CatalogProduct>().Product.Reference);
+            
+            descriptor
+                .Field("picture")
+                .Resolve(c => PictureExtensions.GetPictureUrl(Guid.Empty, c.Parent<CatalogProduct>().Product.Picture, PictureSize.MEDIUM));
             
             descriptor
                 .Field(c => c.VatPricePerUnit)

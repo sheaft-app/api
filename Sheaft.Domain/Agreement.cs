@@ -49,7 +49,7 @@ namespace Sheaft.Domain
         public Guid? DeliveryId { get; private set; }
         public Guid StoreId { get; private set; }
         public Guid ProducerId { get; private set; }
-        public Guid CatalogId { get; private set; }
+        public Guid? CatalogId { get; private set; }
         public virtual DeliveryMode Delivery { get; private set; }
         public virtual Store Store { get; private set; }
         public virtual Producer Producer { get; private set; }
