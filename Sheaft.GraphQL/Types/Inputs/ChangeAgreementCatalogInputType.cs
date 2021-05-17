@@ -5,13 +5,13 @@ using Sheaft.Mediatr.Agreement.Commands;
 
 namespace Sheaft.GraphQL.Types.Inputs
 {
-    public class AssignCatalogToAgreementInputType : SheaftInputType<AssignCatalogToAgreementCommand>
+    public class ChangeAgreementCatalogInputType : SheaftInputType<ChangeAgreementCatalogCommand>
     {
-        protected override void Configure(IInputObjectTypeDescriptor<AssignCatalogToAgreementCommand> descriptor)
+        protected override void Configure(IInputObjectTypeDescriptor<ChangeAgreementCatalogCommand> descriptor)
         {
             base.Configure(descriptor);
 
-            descriptor.Name("AssignCatalogToAgreementInput");
+            descriptor.Name("ChangeAgreementCatalogInput");
             
             descriptor
                 .Field(c => c.CatalogId)

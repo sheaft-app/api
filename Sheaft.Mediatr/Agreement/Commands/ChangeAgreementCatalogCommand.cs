@@ -8,25 +8,23 @@ using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Sheaft.Application.Extensions;
 using Sheaft.Application.Interfaces.Infrastructure;
-using Microsoft.EntityFrameworkCore;
 using Sheaft.Application.Interfaces.Mediatr;
 using Sheaft.Core;
 using Sheaft.Core.Enums;
-using Sheaft.Core.Exceptions;
 using Sheaft.Domain;
 using Sheaft.Domain.Enum;
 using Sheaft.Options;
 
 namespace Sheaft.Mediatr.Agreement.Commands
 {
-    public class AssignCatalogToAgreementCommand : Command
+    public class ChangeAgreementCatalogCommand : Command
     {
-        protected AssignCatalogToAgreementCommand()
+        protected ChangeAgreementCatalogCommand()
         {
         }
 
         [JsonConstructor]
-        public AssignCatalogToAgreementCommand(RequestUser requestUser) : base(requestUser)
+        public ChangeAgreementCatalogCommand(RequestUser requestUser) : base(requestUser)
         {
         }
 
@@ -34,32 +32,31 @@ namespace Sheaft.Mediatr.Agreement.Commands
         public Guid CatalogId { get; set; }
     }
 
-    public class AssignCatalogToAgreementCommandHandler : CommandsHandler,
-        IRequestHandler<AssignCatalogToAgreementCommand, Result>
+    public class ChangeAgreementCatalogCommandHandler : CommandsHandler,
+        IRequestHandler<ChangeAgreementCatalogCommand, Result>
     {
         private readonly RoleOptions _roleOptions;
         
-        public AssignCatalogToAgreementCommandHandler(
+        public ChangeAgreementCatalogCommandHandler(
             ISheaftMediatr mediatr,
             IAppDbContext context,
             IOptionsSnapshot<RoleOptions> roleOptions,
-            ILogger<AssignCatalogToAgreementCommandHandler> logger)
+            ILogger<ChangeAgreementCatalogCommandHandler> logger)
             : base(mediatr, context, logger)
         {
             _roleOptions = roleOptions.Value;
         }
 
-        public async Task<Result> Handle(AssignCatalogToAgreementCommand request, CancellationToken token)
+        public async Task<Result> Handle(ChangeAgreementCatalogCommand request, CancellationToken token)
         {
             var entity = await _context.Agreements.SingleAsync(e => e.Id == request.AgreementId, token);
-            if(request.RequestUser.IsInRole(_roleOptions.Producer.Value) && entity.ProducerId != request.RequestUser.Id)
-                return Failure(MessageKind.Forbidden);
-            
-            if(request.RequestUser.IsInRole(_roleOptions.Store.Value) && entity.StoreId != request.RequestUser.Id)
+            if(entity.ProducerId != request.RequestUser.Id)
                 return Failure(MessageKind.Forbidden);
 
-            var catalog = await _context.Catalogs.SingleAsync(c => c.IsDefault && c.Kind == CatalogKind.Stores && c.ProducerId == entity.ProducerId, token);
-            entity.AssignCatalog(catalog);
+            var catalog = await _context.Catalogs.SingleAsync(c => c.Id == request.CatalogId, token);
+            entity.ChangeCatalog(catalog);
+            
+            //TODO update quickorder products
 
             await _context.SaveChangesAsync(token);
             return Success();

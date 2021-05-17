@@ -51,12 +51,24 @@ namespace Sheaft.GraphQL.Agreements
             return await dataLoader.LoadAsync(input.AgreementIds.ToList(), token);
         }
 
-        [GraphQLName("assignCatalogToAgreement")]
+        [GraphQLName("changeAgreementCatalog")]
         [Authorize(Policy = Policies.PRODUCER)]
         [GraphQLType(typeof(AgreementType))]
-        public async Task<Agreement> AssignCatalogToAgreementAsync(
-            [GraphQLType(typeof(AssignCatalogToAgreementInputType))] [GraphQLName("input")]
-            AssignCatalogToAgreementCommand input, [Service] ISheaftMediatr mediatr,
+        public async Task<Agreement> ChangeAgreementCatalogAsync(
+            [GraphQLType(typeof(ChangeAgreementCatalogInputType))] [GraphQLName("input")]
+            ChangeAgreementCatalogCommand input, [Service] ISheaftMediatr mediatr,
+            AgreementsByIdBatchDataLoader dataLoader, CancellationToken token)
+        {
+            await ExecuteAsync(mediatr, input, token);
+            return await dataLoader.LoadAsync(input.AgreementId, token);
+        }
+
+        [GraphQLName("changeAgreementDelivery")]
+        [Authorize(Policy = Policies.PRODUCER)]
+        [GraphQLType(typeof(AgreementType))]
+        public async Task<Agreement> ChangeAgreementDeliveryAsync(
+            [GraphQLType(typeof(ChangeAgreementDeliveryInputType))] [GraphQLName("input")]
+            ChangeAgreementDeliveryCommand input, [Service] ISheaftMediatr mediatr,
             AgreementsByIdBatchDataLoader dataLoader, CancellationToken token)
         {
             await ExecuteAsync(mediatr, input, token);

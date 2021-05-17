@@ -60,7 +60,7 @@ namespace Sheaft.Mediatr.Agreement.Commands
             if (request.CatalogId.HasValue)
             {
                 var catalog = await _context.Catalogs.SingleAsync(e => e.Id == request.CatalogId.Value, token);
-                entity.AssignCatalog(catalog);
+                entity.ChangeCatalog(catalog);
             }
 
             await _context.AddAsync(entity, token);

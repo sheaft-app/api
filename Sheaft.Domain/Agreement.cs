@@ -123,16 +123,19 @@ namespace Sheaft.Domain
             Reason = null;
         }
 
-        public void AssignCatalog(Catalog catalog)
+        public void ChangeCatalog(Catalog catalog)
         {
             if (catalog.Kind == CatalogKind.Consumers)
                 throw SheaftException.Validation();
             
-            if(!catalog.Available)
-                throw SheaftException.Validation();
-
             CatalogId = catalog.Id;
             Catalog = catalog;
+        }
+
+        public void ChangeDelivery(DeliveryMode deliveryMode)
+        {
+            DeliveryId = deliveryMode.Id;
+            Delivery = deliveryMode;
         }
     }
 }
