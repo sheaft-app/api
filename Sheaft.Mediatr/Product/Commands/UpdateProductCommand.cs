@@ -26,8 +26,8 @@ namespace Sheaft.Mediatr.Product.Commands
     {
         protected UpdateProductCommand()
         {
-            
         }
+
         [JsonConstructor]
         public UpdateProductCommand(RequestUser requestUser) : base(requestUser)
         {
@@ -105,7 +105,8 @@ namespace Sheaft.Mediatr.Product.Commands
 
                 if (request.ReturnableId.HasValue)
                 {
-                    var returnable = await _context.Returnables.SingleAsync(e => e.Id == request.ReturnableId.Value, token);
+                    var returnable =
+                        await _context.Returnables.SingleAsync(e => e.Id == request.ReturnableId.Value, token);
                     entity.SetReturnable(returnable);
                 }
                 else
@@ -116,40 +117,19 @@ namespace Sheaft.Mediatr.Product.Commands
                 var tags = await _context.Tags.Where(t => request.Tags.Contains(t.Id)).ToListAsync(token);
                 entity.SetTags(tags);
 
-                if (request.VisibleToConsumers.HasValue && request.VisibleToStores.HasValue)
+                var productCatalogs = entity.CatalogsPrices.Select(p => p.Catalog);
+                var catalogIds = productCatalogs.Select(pc => pc.Id);
+                var catalogToRemoveIds = catalogIds.Except(request.Catalogs.Select(c => c.CatalogId));
+
+                foreach (var catalog in productCatalogs.Where(pc => catalogToRemoveIds.Contains(pc.Id)))
+                    entity.RemoveFromCatalog(catalog.Id);
+
+                foreach (var catalogPrice in request.Catalogs)
                 {
-                    var consumerCatalog = await _context.Catalogs.SingleOrDefaultAsync(
-                        c => c.ProducerId == entity.ProducerId && c.Kind == CatalogKind.Consumers, token);
-
-                    if (request.VisibleToConsumers.Value)
-                        entity.AddOrUpdateCatalogPrice(consumerCatalog, request.WholeSalePricePerUnit.Value);
-                    else if (consumerCatalog.Products.Any(pc => pc.ProductId == entity.Id))
-                        entity.RemoveFromCatalog(consumerCatalog.Id);
-
-                    var storeCatalog = await _context.Catalogs.SingleOrDefaultAsync(
-                        c => c.ProducerId == entity.ProducerId && c.Kind == CatalogKind.Stores, token);
-
-                    if (request.VisibleToStores.Value)
-                        entity.AddOrUpdateCatalogPrice(storeCatalog, request.WholeSalePricePerUnit.Value);
-                    else if (storeCatalog.Products.Any(pc => pc.ProductId == entity.Id))
-                        entity.RemoveFromCatalog(storeCatalog.Id);
-                }
-
-                if (!request.VisibleToConsumers.HasValue || !request.VisibleToStores.HasValue)
-                {
-                    var productCatalogs = entity.CatalogsPrices.Select(p => p.Catalog);
-                    var catalogIds = productCatalogs.Select(pc => pc.Id);
-                    var catalogToRemoveIds = catalogIds.Except(request.Catalogs.Select(c => c.CatalogId));
-                    
-                    foreach (var catalog in productCatalogs.Where(pc => catalogToRemoveIds.Contains(pc.Id)))
-                        entity.RemoveFromCatalog(catalog.Id);
-
-                    foreach (var catalogPrice in request.Catalogs)
-                    {
-                        var catalog = entity.CatalogsPrices.FirstOrDefault(c => c.CatalogId == catalogPrice.CatalogId)?.Catalog ??
-                            await _context.Catalogs.SingleAsync(e => e.Id == catalogPrice.CatalogId, token);
-                        entity.AddOrUpdateCatalogPrice(catalog, catalogPrice.WholeSalePricePerUnit);
-                    }
+                    var catalog = entity.CatalogsPrices.FirstOrDefault(c => c.CatalogId == catalogPrice.CatalogId)
+                                      ?.Catalog ??
+                                  await _context.Catalogs.SingleAsync(e => e.Id == catalogPrice.CatalogId, token);
+                    entity.AddOrUpdateCatalogPrice(catalog, catalogPrice.WholeSalePricePerUnit);
                 }
 
                 await _context.SaveChangesAsync(token);
