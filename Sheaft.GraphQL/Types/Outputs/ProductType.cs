@@ -133,18 +133,9 @@ namespace Sheaft.GraphQL.Types.Outputs
                 .Type<BooleanType>();
 
             descriptor
-                .Field("visibleToConsumers")
-                .UseDbContext<QueryDbContext>()
-                .ResolveWith<ProductResolvers>(c => c.GetProductVisibleToConsumers(default, default, default))
-                .Authorize(Policies.PRODUCER)
-                .Type<BooleanType>();
-
-            descriptor
-                .Field("visibleToStores")
-                .UseDbContext<QueryDbContext>()
-                .ResolveWith<ProductResolvers>(c => c.GetProductVisibleToStores(default, default, default))
-                .Authorize(Policies.PRODUCER)
-                .Type<BooleanType>();
+                .Field("visibleTo")
+                .Resolve(c => c.Parent<Product>().VisibleTo)
+                .Authorize(Policies.PRODUCER);
 
             descriptor
                 .Field("vatPricePerUnit")
@@ -304,24 +295,6 @@ namespace Sheaft.GraphQL.Types.Outputs
                     return null;
 
                 return returnablesDataLoader.LoadAsync(product.ReturnableId.Value, token);
-            }
-
-            public Task<bool> GetProductVisibleToConsumers(Product product,
-                [ScopedService] QueryDbContext context, CancellationToken token)
-            {
-                return context.Set<CatalogProduct>()
-                    .AnyAsync(
-                        cp => cp.ProductId == product.Id && cp.Catalog.Kind == CatalogKind.Consumers &&
-                              cp.Catalog.Available, token);
-            }
-
-            public Task<bool> GetProductVisibleToStores(Product product, [ScopedService] QueryDbContext context,
-                CancellationToken token)
-            {
-                return context.Set<CatalogProduct>()
-                    .AnyAsync(
-                        cp => cp.ProductId == product.Id && cp.Catalog.Kind == CatalogKind.Stores &&
-                              cp.Catalog.Available, token);
             }
 
             public async Task<decimal> GetProductVatPricePerUnit(Product product, [ScopedService] QueryDbContext context,

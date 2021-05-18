@@ -23,10 +23,6 @@ namespace Sheaft.Application.Mappings
                     opt => opt.MapFrom(r => PictureExtensions.GetPictureUrl(r.Id, r.Picture, PictureSize.MEDIUM)))
                 .ForMember(d => d.ImageSmall,
                     opt => opt.MapFrom(r => PictureExtensions.GetPictureUrl(r.Id, r.Picture, PictureSize.SMALL)))
-                .ForMember(d => d.VisibleToConsumers,
-                    opt => opt.MapFrom(p => p.CatalogsPrices.Any(cp => cp.Catalog.Kind == CatalogKind.Consumers)))
-                .ForMember(d => d.VisibleToStores,
-                    opt => opt.MapFrom(p => p.CatalogsPrices.Any(cp => cp.Catalog.Kind == CatalogKind.Stores)))
                 .ForMember(d => d.WholeSalePricePerUnit,
                     opt => opt.MapFrom(p => p.CatalogsPrices.OrderByDescending(cp => cp.Catalog.Kind).FirstOrDefault().WholeSalePricePerUnit))
                 .ForMember(d => d.VatPricePerUnit,

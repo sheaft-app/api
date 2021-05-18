@@ -154,11 +154,9 @@ namespace Sheaft.GraphQL.Types.Outputs
                 .Type<BooleanType>();
 
             descriptor
-                .Field("visibleToConsumers")
-                .UseDbContext<QueryDbContext>()
-                .ResolveWith<CatalogProductResolvers>(c => c.GetProductVisibleToConsumers(default, default, default))
-                .Authorize(Policies.PRODUCER)
-                .Type<BooleanType>();
+                .Field("visibleTo")
+                .Resolve(c => c.Parent<CatalogProduct>().Product.VisibleTo)
+                .Authorize(Policies.PRODUCER);
 
             descriptor
                 .Field("returnable")
@@ -171,13 +169,6 @@ namespace Sheaft.GraphQL.Types.Outputs
                 .UseDbContext<QueryDbContext>()
                 .ResolveWith<CatalogProductResolvers>(c => c.GetProducer(default, default, default))
                 .Type<NonNullType<ProducerType>>();
-
-            descriptor
-                .Field("visibleToStores")
-                .UseDbContext<QueryDbContext>()
-                .ResolveWith<CatalogProductResolvers>(c => c.GetProductVisibleToStores(default, default, default))
-                .Authorize(Policies.PRODUCER)
-                .Type<BooleanType>();
 
             descriptor
                 .Field("currentUserHasRatedProduct")
@@ -266,36 +257,6 @@ namespace Sheaft.GraphQL.Types.Outputs
                     return null;
 
                 return returnablesDataLoader.LoadAsync(product.Product.ReturnableId.Value, token);
-            }
-
-            public Task<bool> GetProductVisibleToConsumers(CatalogProduct product,
-                [ScopedService] QueryDbContext context, CancellationToken token)
-            {
-                return context.Set<CatalogProduct>()
-                    .AnyAsync(
-                        cp => cp.ProductId == product.ProductId && cp.Catalog.Kind == CatalogKind.Consumers &&
-                              cp.Catalog.Available, token);
-            }
-
-            public Task<bool> GetProductVisibleToStores(CatalogProduct product, [ScopedService] QueryDbContext context,
-                CancellationToken token)
-            {
-                return context.Set<CatalogProduct>()
-                    .AnyAsync(
-                        cp => cp.ProductId == product.ProductId && cp.Catalog.Kind == CatalogKind.Stores &&
-                              cp.Catalog.Available, token);
-            }
-            
-            public Task<Catalog> GetCatalog(CatalogProduct catalogProduct,
-                CatalogsByIdBatchDataLoader catalogsDataLoader, CancellationToken token)
-            {
-                return catalogsDataLoader.LoadAsync(catalogProduct.CatalogId, token);
-            }
-            
-            public Task<Product> GetProduct(CatalogProduct catalogProduct,
-                ProductsByIdBatchDataLoader productsDataLoader, CancellationToken token)
-            {
-                return productsDataLoader.LoadAsync(catalogProduct.ProductId, token);
             }
         }
     }

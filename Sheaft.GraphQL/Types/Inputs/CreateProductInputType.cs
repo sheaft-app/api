@@ -23,18 +23,6 @@ namespace Sheaft.GraphQL.Types.Inputs
                 .Name("available");
                 
             descriptor
-                .Field(c => c.VisibleToStores)
-                .Name("visibleToStores");
-                
-            descriptor
-                .Field(c => c.VisibleToConsumers)
-                .Name("visibleToConsumers");
-                
-            descriptor
-                .Field(c => c.WholeSalePricePerUnit)
-                .Name("wholeSalePricePerUnit");
-                
-            descriptor
                 .Field(c => c.Description)
                 .Name("description");
                 

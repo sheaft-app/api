@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Sheaft.Domain;
+using Sheaft.Domain.Enum;
 
 namespace Sheaft.Infrastructure.Persistence.Configurations
 {
@@ -29,6 +30,7 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
             entity.Property(o => o.Weight).HasColumnType("decimal(10,2)");
             entity.Property(o => o.Rating).HasColumnType("decimal(10,2)");
             entity.Property(o => o.RatingsCount).HasDefaultValue(0);
+            entity.Property(o => o.VisibleTo).HasDefaultValue(VisibleToKind.None);
 
             entity.HasOne(c => c.Returnable)
                 .WithMany()
