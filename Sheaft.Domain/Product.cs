@@ -57,6 +57,7 @@ namespace Sheaft.Domain
         public int TagsCount { get; private set; }
         public int PicturesCount { get; private set; }
         public int CatalogsPricesCount { get; private set; }
+        public VisibleToKind VisibleTo { get; private set; }
         public decimal? Rating { get; private set; }
 
         public Guid? ReturnableId { get; private set; }
@@ -250,6 +251,7 @@ namespace Sheaft.Domain
                 existingCatalogPrice.SetWholeSalePricePerUnit(wholeSalePricePerUnit);
 
             CatalogsPricesCount = CatalogsPrices?.Count ?? 0;
+            UpdateVisibleToOnAddCatalog(catalog);
         }
 
         public void RemoveFromCatalog(Guid catalogId)
@@ -265,9 +267,60 @@ namespace Sheaft.Domain
             CatalogsPricesCount = CatalogsPrices?.Count ?? 0;
             
             existingCatalogPrice.Catalog.DecreaseProductsCount();
+            
+            UpdateVisibleToOnRemoveCatalog(existingCatalogPrice);
         }
 
         public List<DomainEvent> DomainEvents { get; } = new List<DomainEvent>();
         public byte[] RowVersion { get; private set; }
+        
+
+        private void UpdateVisibleToOnAddCatalog(Catalog catalog)
+        {
+            if (catalog.Kind == CatalogKind.Consumers && VisibleTo == VisibleToKind.None)
+            {
+                VisibleTo = VisibleToKind.Consumers;
+            }
+
+            if (catalog.Kind == CatalogKind.Consumers && VisibleTo == VisibleToKind.Stores)
+            {
+                VisibleTo = VisibleToKind.All;
+            }
+
+            if (catalog.Kind == CatalogKind.Stores && VisibleTo == VisibleToKind.None)
+            {
+                VisibleTo = VisibleToKind.Stores;
+            }
+
+            if (catalog.Kind == CatalogKind.Stores && VisibleTo == VisibleToKind.Consumers)
+            {
+                VisibleTo = VisibleToKind.All;
+            }
+        }
+
+        private void UpdateVisibleToOnRemoveCatalog(CatalogProduct? existingCatalogPrice)
+        {
+            if (existingCatalogPrice.Catalog.Kind == CatalogKind.Consumers && VisibleTo == VisibleToKind.All)
+            {
+                VisibleTo = VisibleToKind.Stores;
+            }
+
+            if (existingCatalogPrice.Catalog.Kind == CatalogKind.Consumers && VisibleTo == VisibleToKind.Consumers)
+            {
+                VisibleTo = VisibleToKind.None;
+            }
+
+            if (existingCatalogPrice.Catalog.Kind == CatalogKind.Stores && VisibleTo == VisibleToKind.All &&
+                CatalogsPricesCount < 2)
+            {
+                VisibleTo = VisibleToKind.Consumers;
+            }
+
+            if (existingCatalogPrice.Catalog.Kind == CatalogKind.Stores && VisibleTo == VisibleToKind.Stores &&
+                CatalogsPricesCount < 1)
+            {
+                VisibleTo = VisibleToKind.None;
+            }
+        }
     }
 }

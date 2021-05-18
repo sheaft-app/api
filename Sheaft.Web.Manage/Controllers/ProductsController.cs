@@ -116,9 +116,7 @@ namespace Sheaft.Web.Manage.Controllers
                 Unit = model.Unit,
                 Conditioning = model.Conditioning,
                 Vat = model.Vat,
-                Weight = model.Weight,
-                VisibleToStores = model.VisibleToStores,
-                VisibleToConsumers = model.VisibleToConsumers,
+                Weight = model.Weight
             }, token);
 
             if (!result.Succeeded)
@@ -192,10 +190,7 @@ namespace Sheaft.Web.Manage.Controllers
                 Conditioning = model.Conditioning,
                 Unit = model.Unit,
                 Vat = model.Vat,
-                Weight = model.Weight,
-                WholeSalePricePerUnit = model.WholeSalePricePerUnit,
-                VisibleToStores = model.VisibleToStores,
-                VisibleToConsumers = model.VisibleToConsumers,
+                Weight = model.Weight
             }, token);
 
             if (!result.Succeeded)
