@@ -44,28 +44,6 @@ namespace Sheaft.GraphQL.Users
             return await usersDataLoader.LoadAsync(input.UserId, token);
         }
 
-        [GraphQLName("addPictureToUser")]
-        [Authorize(Policy = Policies.REGISTERED)]
-        [GraphQLType(typeof(BooleanType))]
-        public async Task<bool> AddPictureToUserAsync(
-            [GraphQLType(typeof(AddPictureToUserInputType))] [GraphQLName("input")]
-            AddPictureToUserCommand input, [Service] ISheaftMediatr mediatr,
-            CancellationToken token)
-        {
-            return await ExecuteAsync(mediatr, input, token);
-        }
-
-        [GraphQLName("removeUserPictures")]
-        [Authorize(Policy = Policies.REGISTERED)]
-        [GraphQLType(typeof(BooleanType))]
-        public async Task<bool> RemoveUserPicturesAsync(
-            [GraphQLType(typeof(RemoveUserPicturesInputType))] [GraphQLName("input")]
-            RemoveUserPicturesCommand input, [Service] ISheaftMediatr mediatr,
-            CancellationToken token)
-        {
-            return await ExecuteAsync(mediatr, input, token);
-        }
-
         [GraphQLName("closeAccount")]
         [Authorize(Policy = Policies.REGISTERED)]
         [GraphQLType(typeof(BooleanType))]

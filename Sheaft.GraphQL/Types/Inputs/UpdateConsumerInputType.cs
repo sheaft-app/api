@@ -64,6 +64,10 @@ namespace Sheaft.GraphQL.Types.Inputs
                 .Field(c => c.ConsumerId)
                 .Name("id")
                 .ID(nameof(Consumer));
+
+            descriptor.Field(c => c.Pictures)
+                .Name("pictures")
+                .Type<ListType<PictureInputType>>();
         }
     }
 }

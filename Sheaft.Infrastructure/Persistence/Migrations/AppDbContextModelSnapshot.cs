@@ -1495,6 +1495,7 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                         .HasColumnType("decimal(10,2)");
 
                     b.Property<int>("VisibleTo")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("int")
                         .HasDefaultValue(-1);
 
@@ -1519,6 +1520,9 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
 
                     b.Property<DateTimeOffset>("CreatedOn")
                         .HasColumnType("datetimeoffset");
+
+                    b.Property<int>("Position")
+                        .HasColumnType("int");
 
                     b.Property<Guid>("ProductId")
                         .HasColumnType("uniqueidentifier");
@@ -1559,6 +1563,9 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
 
                     b.Property<DateTimeOffset>("CreatedOn")
                         .HasColumnType("datetimeoffset");
+
+                    b.Property<int>("Position")
+                        .HasColumnType("int");
 
                     b.Property<DateTimeOffset?>("UpdatedOn")
                         .HasColumnType("datetimeoffset");

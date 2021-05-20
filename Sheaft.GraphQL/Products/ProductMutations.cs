@@ -63,18 +63,6 @@ namespace Sheaft.GraphQL.Products
             return await productsDataLoader.LoadAsync(input.ProductId, token);
         }
 
-        [GraphQLName("updateProductPicture")]
-        [Authorize(Policy = Policies.PRODUCER)]
-        [GraphQLType(typeof(ProductType))]
-        public async Task<Product> UpdateProductPictureAsync(
-            [GraphQLType(typeof(UpdateProductPictureInputType))] [GraphQLName("input")]
-            UpdateProductPreviewCommand input, [Service] ISheaftMediatr mediatr,
-            ProductsByIdBatchDataLoader productsDataLoader, CancellationToken token)
-        {
-            await ExecuteAsync<UpdateProductPreviewCommand, string>(mediatr, input, token);
-            return await productsDataLoader.LoadAsync(input.ProductId, token);
-        }
-
         [GraphQLName("setProductsAvailability")]
         [Authorize(Policy = Policies.PRODUCER)]
         [GraphQLType(typeof(ListType<ProductType>))]
@@ -92,26 +80,6 @@ namespace Sheaft.GraphQL.Products
         public async Task<bool> DeleteProductsAsync(
             [GraphQLType(typeof(DeleteProductsInputType))] [GraphQLName("input")]
             DeleteProductsCommand input, [Service] ISheaftMediatr mediatr,
-            CancellationToken token)
-        {
-            return await ExecuteAsync(mediatr, input, token);
-        }
-
-        [GraphQLName("addPictureToProduct")]
-        [Authorize(Policy = Policies.PRODUCER)]
-        public async Task<bool> AddPictureToProductAsync(
-            [GraphQLType(typeof(AddPictureToProductInputType))] [GraphQLName("input")]
-            AddPictureToProductCommand input, [Service] ISheaftMediatr mediatr,
-            CancellationToken token)
-        {
-            return await ExecuteAsync(mediatr, input, token);
-        }
-
-        [GraphQLName("removeProductPictures")]
-        [Authorize(Policy = Policies.PRODUCER)]
-        public async Task<bool> RemoveProductPicturesAsync(
-            [GraphQLType(typeof(RemoveProductPicturesInputType))] [GraphQLName("input")]
-            RemoveProductPicturesCommand input, [Service] ISheaftMediatr mediatr,
             CancellationToken token)
         {
             return await ExecuteAsync(mediatr, input, token);

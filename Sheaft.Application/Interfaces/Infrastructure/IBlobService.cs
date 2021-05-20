@@ -11,12 +11,11 @@ namespace Sheaft.Application.Interfaces.Infrastructure
         Task<Result<string>> UploadRgpdFileAsync(Guid userId, Guid jobId, string filename, byte[] data, CancellationToken token);
         Task<Result> UploadImportProductsFileAsync(Guid userId, Guid jobId, byte[] data, CancellationToken token);
         Task<Result<byte[]>> DownloadImportProductsFileAsync(Guid userId, Guid jobId, CancellationToken token);
-        Task<Result<string>> UploadUserPreviewAsync(Guid userId, string size, byte[] data, CancellationToken token);
-        Task<Result<string>> UploadProfilePictureAsync(Guid userId, Guid pictureId, byte[] data, CancellationToken token);
+        Task<Result<string>> UploadUserProfileAsync(Guid userId, byte[] data, CancellationToken token);
+        Task<Result<string>> UploadUserPictureAsync(Guid userId, Guid pictureId, string size, byte[] data, CancellationToken token);
         Task<Result<string>> UploadTagIconAsync(Guid tagId, byte[] data, CancellationToken token);
         Task<Result<string>> UploadTagPictureAsync(Guid tagId, byte[] data, CancellationToken token);
-        Task<Result<string>> UploadProductPictureAsync(Guid userId, Guid productId, Guid pictureId, byte[] data, CancellationToken token);
-        Task<Result<string>> UploadProductPreviewAsync(Guid userId, Guid productId, Guid pictureId, string size, byte[] toArray, CancellationToken token);
+        Task<Result<string>> UploadProductPictureAsync(Guid userId, Guid productId, Guid pictureId, string size, byte[] toArray, CancellationToken token);
         Task<Result> CleanUserStorageAsync(Guid userId, CancellationToken token);
         Task<Result<string>> UploadDepartmentsProgressAsync(byte[] data, CancellationToken token);
         Task<Result<byte[]>> DownloadDocumentPageAsync(Guid documentId, Guid pageId, Guid userId, CancellationToken token);

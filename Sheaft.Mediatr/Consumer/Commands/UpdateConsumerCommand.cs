@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
@@ -46,47 +47,71 @@ namespace Sheaft.Mediatr.Consumer.Commands
         public string Facebook { get; set; }
         public string Twitter { get; set; }
         public string Instagram { get; set; }
+        public IEnumerable<PictureInputDto> Pictures { get; set; }
     }
 
     public class UpdateConsumerCommandHandler : CommandsHandler,
         IRequestHandler<UpdateConsumerCommand, Result>
     {
+        private readonly IPictureService _imageService;
         private readonly RoleOptions _roleOptions;
 
         public UpdateConsumerCommandHandler(
             ISheaftMediatr mediatr,
             IAppDbContext context,
+            IPictureService imageService,
             ILogger<UpdateConsumerCommandHandler> logger,
             IOptionsSnapshot<RoleOptions> roleOptions)
             : base(mediatr, context, logger)
         {
+            _imageService = imageService;
             _roleOptions = roleOptions.Value;
         }
 
         public async Task<Result> Handle(UpdateConsumerCommand request, CancellationToken token)
         {
-            var consumer = await _context.Consumers.SingleAsync(e => e.Id == request.ConsumerId, token);
-            if(consumer.Id != request.RequestUser.Id)
+            var entity = await _context.Consumers.SingleAsync(e => e.Id == request.ConsumerId, token);
+            if(entity.Id != request.RequestUser.Id)
                 return Failure(MessageKind.Forbidden);
 
-            consumer.SetEmail(request.Email);
-            consumer.SetPhone(request.Phone);
-            consumer.SetFirstname(request.FirstName);
-            consumer.SetLastname(request.LastName);
+            entity.SetEmail(request.Email);
+            entity.SetPhone(request.Phone);
+            entity.SetFirstname(request.FirstName);
+            entity.SetLastname(request.LastName);
             
-            consumer.SetSummary(request.Summary);
-            consumer.SetDescription(request.Description);
-            consumer.SetFacebook(request.Facebook);
-            consumer.SetTwitter(request.Twitter);
-            consumer.SetWebsite(request.Website);
-            consumer.SetInstagram(request.Instagram);
+            entity.SetSummary(request.Summary);
+            entity.SetDescription(request.Description);
+            entity.SetFacebook(request.Facebook);
+            entity.SetTwitter(request.Twitter);
+            entity.SetWebsite(request.Website);
+            entity.SetInstagram(request.Instagram);
+            
+            if (request.Pictures != null && request.Pictures.Any())
+            {
+                entity.ClearPictures();
+                    
+                var result = Success<string>();
+                foreach (var picture in request.Pictures)
+                {
+                    var id = Guid.NewGuid();
+                    result = await _imageService.HandleUserPictureAsync(entity, id, picture.Data, token);
+                    if (!result.Succeeded)
+                        break;
 
+                    if (!string.IsNullOrWhiteSpace(result.Data))
+                        entity.AddPicture(new ProfilePicture(id, result.Data, picture.Position));
+                }
+
+                if (!result.Succeeded)
+                    return Failure(result);
+            }
+            
             await _context.SaveChangesAsync(token);
 
             var resultImage = await _mediatr.Process(new UpdateUserPreviewCommand(request.RequestUser)
             {
-                UserId = consumer.Id,
-                Picture = new PictureSourceDto{Resized = request.Picture},
+                UserId = entity.Id,
+                Picture = request.Picture,
                 SkipAuthUpdate = true
             }, token);
 
@@ -95,14 +120,14 @@ namespace Sheaft.Mediatr.Consumer.Commands
 
             var authResult = await _mediatr.Process(new UpdateAuthUserCommand(request.RequestUser)
             {
-                Email = consumer.Email,
-                FirstName = consumer.FirstName,
-                LastName = consumer.LastName,
-                Name = consumer.Name,
-                Phone = consumer.Phone,
-                Picture = consumer.Picture,
+                Email = entity.Email,
+                FirstName = entity.FirstName,
+                LastName = entity.LastName,
+                Name = entity.Name,
+                Phone = entity.Phone,
+                Picture = entity.Picture,
                 Roles = new List<Guid> {_roleOptions.Consumer.Id},
-                UserId = consumer.Id
+                UserId = entity.Id
             }, token);
 
             if (!authResult.Succeeded)

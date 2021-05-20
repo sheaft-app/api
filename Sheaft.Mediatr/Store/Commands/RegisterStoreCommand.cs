@@ -110,7 +110,7 @@ namespace Sheaft.Mediatr.Store.Commands
                 var resultImage = await _mediatr.Process(new UpdateUserPreviewCommand(request.RequestUser)
                 {
                     UserId = store.Id,
-                    Picture = new PictureSourceDto{Resized = request.Picture},
+                    Picture = request.Picture,
                     SkipAuthUpdate = true
                 }, token);
 

@@ -36,8 +36,6 @@ namespace Sheaft.Mediatr.Product.Commands
         public Guid ProductId { get; set; }
         public string Reference { get; set; }
         public string Name { get; set; }
-        public string Picture { get; set; }
-        public string OriginalPicture { get; set; }
         public decimal QuantityPerUnit { get; set; }
         public UnitKind Unit { get; set; }
         public ConditioningKind Conditioning { get; set; }
@@ -47,21 +45,25 @@ namespace Sheaft.Mediatr.Product.Commands
         public bool? Available { get; set; }
         public Guid? ReturnableId { get; set; }
         public IEnumerable<Guid> Tags { get; set; }
+        public IEnumerable<PictureInputDto> Pictures { get; set; }
         public IEnumerable<CatalogPriceInputDto> Catalogs { get; set; }
     }
 
     public class UpdateProductCommandHandler : CommandsHandler,
         IRequestHandler<UpdateProductCommand, Result>
     {
+        private readonly IPictureService _imageService;
         private readonly IIdentifierService _identifierService;
 
         public UpdateProductCommandHandler(
             ISheaftMediatr mediatr,
             IAppDbContext context,
+            IPictureService imageService,
             IIdentifierService identifierService,
             ILogger<UpdateProductCommandHandler> logger)
             : base(mediatr, context, logger)
         {
+            _imageService = imageService;
             _identifierService = identifierService;
         }
 
@@ -128,19 +130,27 @@ namespace Sheaft.Mediatr.Product.Commands
                                   await _context.Catalogs.SingleAsync(e => e.Id == catalogPrice.CatalogId, token);
                     entity.AddOrUpdateCatalogPrice(catalog, catalogPrice.WholeSalePricePerUnit);
                 }
-
-                await _context.SaveChangesAsync(token);
-
-                var imageResult = await _mediatr.Process(
-                    new UpdateProductPreviewCommand(request.RequestUser)
+                
+                if (request.Pictures != null && request.Pictures.Any())
+                {
+                    entity.ClearPictures();
+                    
+                    var result = Success<string>();
+                    foreach (var picture in request.Pictures)
                     {
-                        ProductId = entity.Id,
-                        Picture = new PictureSourceDto {Resized = request.Picture, Original = request.OriginalPicture}
-                    }, token);
+                        var id = Guid.NewGuid();
+                        result = await _imageService.HandleProductPictureAsync(entity, id, picture.Data, token);
+                        if (!result.Succeeded)
+                            break;
 
-                if (!imageResult.Succeeded)
-                    return Failure(imageResult);
+                        entity.AddPicture(new ProductPicture(id, result.Data, picture.Position));
+                    }
 
+                    if (!result.Succeeded)
+                        return Failure(result);
+                }
+                
+                await _context.SaveChangesAsync(token);
                 await transaction.CommitAsync(token);
 
                 _mediatr.Post(new UpdateProducerTagsCommand(request.RequestUser) {ProducerId = entity.ProducerId});

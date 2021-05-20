@@ -27,14 +27,6 @@ namespace Sheaft.GraphQL.Types.Inputs
                 .ID(nameof(Returnable));
                 
             descriptor
-                .Field(c => c.OriginalPicture)
-                .Name("originalPicture");
-                
-            descriptor
-                .Field(c => c.Picture)
-                .Name("picture");
-                
-            descriptor
                 .Field(c => c.QuantityPerUnit)
                 .Name("quantityPerUnit");
                 
@@ -78,6 +70,10 @@ namespace Sheaft.GraphQL.Types.Inputs
                 .Field(c => c.Catalogs)
                 .Name("catalogs")
                 .Type<ListType<CatalogPriceInputType>>();
+
+            descriptor.Field(c => c.Pictures)
+                .Name("pictures")
+                .Type<ListType<PictureInputType>>();
         }
     }
 }

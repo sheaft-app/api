@@ -88,6 +88,10 @@ namespace Sheaft.GraphQL.Types.Inputs
                 .Field(c => c.OpeningHours)
                 .Name("openingHours")
                 .Type<ListType<TimeSlotGroupInputType>>();
+
+            descriptor.Field(c => c.Pictures)
+                .Name("pictures")
+                .Type<ListType<PictureInputType>>();
         }
     }
 }

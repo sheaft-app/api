@@ -27,10 +27,6 @@ namespace Sheaft.GraphQL.Types.Inputs
                 .Name("description");
                 
             descriptor
-                .Field(c => c.OriginalPicture)
-                .Name("originalPicture");
-                
-            descriptor
                 .Field(c => c.QuantityPerUnit)
                 .Name("quantityPerUnit");
                 
@@ -53,10 +49,6 @@ namespace Sheaft.GraphQL.Types.Inputs
             descriptor.Field(c => c.Name)
                 .Name("name")
                 .Type<NonNullType<StringType>>();
-
-            descriptor.Field(c => c.Picture)
-                .Name("picture")
-                .Type<PictureSourceInputType>();
             
             descriptor.Field(c => c.Catalogs)
                 .Name("catalogs")
@@ -69,6 +61,10 @@ namespace Sheaft.GraphQL.Types.Inputs
             descriptor.Field(c => c.Tags)
                 .Name("tags")
                 .ID(nameof(Tag));
+
+            descriptor.Field(c => c.Pictures)
+                .Name("pictures")
+                .Type<ListType<PictureInputType>>();
 
         }
     }
