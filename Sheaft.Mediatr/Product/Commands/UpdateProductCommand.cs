@@ -133,17 +133,29 @@ namespace Sheaft.Mediatr.Product.Commands
                 
                 if (request.Pictures != null && request.Pictures.Any())
                 {
+                    var pictures = entity.Pictures.ToList();
                     entity.ClearPictures();
                     
                     var result = Success<string>();
-                    foreach (var picture in request.Pictures)
+                    foreach (var picture in request.Pictures.OrderBy(p => p.Position))
                     {
-                        var id = Guid.NewGuid();
-                        result = await _imageService.HandleProductPictureAsync(entity, id, picture.Data, token);
-                        if (!result.Succeeded)
-                            break;
+                        var existingPicture =
+                            picture.Id.HasValue ? pictures.SingleOrDefault(c => c.Id == picture.Id.Value) : null;
 
-                        entity.AddPicture(new ProductPicture(id, result.Data, picture.Position));
+                        if (existingPicture != null)
+                        {
+                            existingPicture.SetPosition(picture.Position);
+                            entity.AddPicture(existingPicture);
+                        }
+                        else
+                        {
+                            var id = Guid.NewGuid();
+                            result = await _imageService.HandleProductPictureAsync(entity, id, picture.Data, token);
+                            if (!result.Succeeded)
+                                break;
+
+                            entity.AddPicture(new ProductPicture(id, result.Data, picture.Position));
+                        }
                     }
 
                     if (!result.Succeeded)

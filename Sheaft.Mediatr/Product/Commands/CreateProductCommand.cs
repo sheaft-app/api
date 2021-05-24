@@ -135,11 +135,10 @@ namespace Sheaft.Mediatr.Product.Commands
                 await _context.AddAsync(entity, token);
                 await _context.SaveChangesAsync(token);
 
-                if (request.Pictures != null)
+                if (request.Pictures != null && request.Pictures.Any())
                 {
-                    var orderedPictures = request.Pictures.OrderBy(p => p.Position);
                     var result = Success<string>();
-                    foreach (var picture in orderedPictures)
+                    foreach (var picture in request.Pictures.OrderBy(p => p.Position))
                     {
                         var id = Guid.NewGuid();
                         result = await _imageService.HandleProductPictureAsync(entity, id, picture.Data, token);

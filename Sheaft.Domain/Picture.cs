@@ -30,5 +30,13 @@ namespace Sheaft.Domain
         {
             Position--;
         }
+
+        public void SetPosition(int picturePosition)
+        {
+            if (picturePosition < 0)
+                return;
+            
+            Position = picturePosition;
+        }
     }
 }
