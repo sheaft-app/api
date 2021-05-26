@@ -21,6 +21,9 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                 type: "int",
                 nullable: false,
                 defaultValue: 0);
+
+            migrationBuilder.Sql(
+                "insert into app.ProductPictures (Id, CreatedOn, Url, Position, ProductId)  select newid(), getutcdate(), Picture, 0, Id from app.products");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
