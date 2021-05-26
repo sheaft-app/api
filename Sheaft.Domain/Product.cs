@@ -101,15 +101,7 @@ namespace Sheaft.Domain
             if (tags?.Any() == true)
                 AddTags(tags);
         }
-
-        public void SetPicture(string picture)
-        {
-            if (picture == null)
-                return;
-
-            Picture = picture;
-        }
-
+        
         public void SetWeight(decimal? newWeight)
         {
             if (!newWeight.HasValue)
@@ -198,19 +190,15 @@ namespace Sheaft.Domain
             if (Pictures == null)
                 Pictures = new List<ProductPicture>();
 
+            if(Pictures.Any(p => p.Position == picture.Position))
+                foreach (var productPicture in Pictures.Where(p => p.Position >= picture.Position))
+                    productPicture.IncreasePosition();
+            
             Pictures.Add(picture);
-        }
+            if (picture.Position == 0)
+                Picture = picture.Url;
 
-        public void RemovePicture(Guid id)
-        {
-            if (Pictures == null || !Pictures.Any())
-                throw SheaftException.NotFound();
-
-            var existingPicture = Pictures.FirstOrDefault(p => p.Id == id);
-            if (existingPicture == null)
-                throw SheaftException.NotFound();
-
-            Pictures.Remove(existingPicture);
+            PicturesCount = Pictures.Count;
         }
 
         private void RefreshPrices()
@@ -321,6 +309,12 @@ namespace Sheaft.Domain
             {
                 VisibleTo = VisibleToKind.None;
             }
+        }
+
+        public void ClearPictures()
+        {
+            if (Pictures == null || Pictures.Any())
+                Pictures = new List<ProductPicture>();
         }
     }
 }

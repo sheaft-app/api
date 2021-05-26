@@ -32,7 +32,7 @@ namespace Sheaft.Mediatr.User.Commands
         }
 
         public Guid UserId { get; set; }
-        public PictureSourceDto Picture { get; set; }
+        public string Picture { get; set; }
         public bool SkipAuthUpdate { get; set; }
     }
 
@@ -58,10 +58,10 @@ namespace Sheaft.Mediatr.User.Commands
                 return Failure<string>(MessageKind.Forbidden);
 
             var resultImage =
-                await _imageService.HandleUserPictureAsync(entity, request.Picture.Resized, request.Picture.Original, token);
+                await _imageService.HandleUserProfileAsync(entity, request.Picture, token);
             if (!resultImage.Succeeded)
                 return Failure<string>(resultImage);
-
+            
             entity.SetPicture(resultImage.Data);
             await _context.SaveChangesAsync(token);
 

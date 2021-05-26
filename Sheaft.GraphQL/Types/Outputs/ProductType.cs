@@ -242,6 +242,7 @@ namespace Sheaft.GraphQL.Types.Outputs
             {
                 var picturesId = await context.Set<ProductPicture>()
                     .Where(p => p.ProductId == product.Id)
+                    .OrderBy(p => p.Position)
                     .Select(p => p.Id)
                     .ToListAsync(token);
 

@@ -63,6 +63,12 @@ namespace Sheaft.Domain
         public virtual ICollection<ProfilePicture> Pictures { get; private set; }
         public byte[] RowVersion { get; private set; }
 
+        public void ClearPictures()
+        {
+            if (Pictures == null || Pictures.Any())
+                Pictures = new List<ProfilePicture>();
+        }
+        
         public void SetSummary(string summary)
         {
             if (summary == null)

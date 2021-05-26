@@ -8,9 +8,6 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using Sheaft.Application.Extensions;
-using Sheaft.Application.Interfaces.Infrastructure;
-using Microsoft.EntityFrameworkCore;
 using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Application.Interfaces.Mediatr;
 using Sheaft.Application.Models;
@@ -22,19 +19,20 @@ using Sheaft.Mediatr.Producer.Commands;
 
 namespace Sheaft.Mediatr.Product.Commands
 {
-    public class CreateProductProfile: Profile
+    public class CreateProductProfile : Profile
     {
         public CreateProductProfile()
         {
             CreateMap<ImportedProductDto, CreateProductCommand>();
-        }    
+        }
     }
+
     public class CreateProductCommand : Command<Guid>
     {
         protected CreateProductCommand()
         {
-            
         }
+
         [JsonConstructor]
         public CreateProductCommand(RequestUser requestUser) : base(requestUser)
         {
@@ -44,8 +42,6 @@ namespace Sheaft.Mediatr.Product.Commands
         public Guid ProducerId { get; set; }
         public string Reference { get; set; }
         public string Name { get; set; }
-        public string Picture { get; set; }
-        public string OriginalPicture { get; set; }
         public decimal QuantityPerUnit { get; set; }
         public UnitKind Unit { get; set; }
         public ConditioningKind Conditioning { get; set; }
@@ -55,6 +51,7 @@ namespace Sheaft.Mediatr.Product.Commands
         public bool? Available { get; set; }
         public Guid? ReturnableId { get; set; }
         public IEnumerable<Guid> Tags { get; set; }
+        public IEnumerable<PictureInputDto> Pictures { get; set; }
         public bool SkipUpdateProducerTags { get; set; } = false;
         public IEnumerable<CatalogPriceInputDto> Catalogs { get; set; }
 
@@ -68,15 +65,18 @@ namespace Sheaft.Mediatr.Product.Commands
     public class CreateProductCommandHandler : CommandsHandler,
         IRequestHandler<CreateProductCommand, Result<Guid>>
     {
+        private readonly IPictureService _imageService;
         private readonly IIdentifierService _identifierService;
 
         public CreateProductCommandHandler(
             ISheaftMediatr mediatr,
             IAppDbContext context,
+            IPictureService imageService,
             IIdentifierService identifierService,
             ILogger<CreateProductCommandHandler> logger)
             : base(mediatr, context, logger)
         {
+            _imageService = imageService;
             _identifierService = identifierService;
         }
 
@@ -115,7 +115,8 @@ namespace Sheaft.Mediatr.Product.Commands
 
                 if (request.ReturnableId.HasValue)
                 {
-                    var returnable = await _context.Returnables.SingleAsync(e => e.Id == request.ReturnableId.Value, token);
+                    var returnable =
+                        await _context.Returnables.SingleAsync(e => e.Id == request.ReturnableId.Value, token);
                     entity.SetReturnable(returnable);
                 }
 
@@ -134,16 +135,25 @@ namespace Sheaft.Mediatr.Product.Commands
                 await _context.AddAsync(entity, token);
                 await _context.SaveChangesAsync(token);
 
-                var imageResult = await _mediatr.Process(
-                    new UpdateProductPreviewCommand(request.RequestUser)
+                if (request.Pictures != null && request.Pictures.Any())
+                {
+                    var result = Success<string>();
+                    foreach (var picture in request.Pictures.OrderBy(p => p.Position))
                     {
-                        ProductId = entity.Id,
-                        Picture = new PictureSourceDto {Resized = request.Picture, Original = request.OriginalPicture}
-                    }, token);
+                        var id = Guid.NewGuid();
+                        result = await _imageService.HandleProductPictureAsync(entity, id, picture.Data, token);
+                        if (!result.Succeeded)
+                            break;
 
-                if (!imageResult.Succeeded)
-                    return Failure<Guid>(imageResult);
+                        if (!string.IsNullOrWhiteSpace(result.Data))
+                            entity.AddPicture(new ProductPicture(id, result.Data, picture.Position));
+                    }
 
+                    if (!result.Succeeded)
+                        return Failure<Guid>(result);
+                }
+
+                await _context.SaveChangesAsync(token);
                 await transaction.CommitAsync(token);
 
                 if (!request.SkipUpdateProducerTags)

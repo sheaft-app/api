@@ -1,5 +1,8 @@
-﻿using HotChocolate.Resolvers;
+﻿using System;
+using HotChocolate.Resolvers;
 using HotChocolate.Types;
+using Sheaft.Application.Extensions;
+using Sheaft.Core;
 using Sheaft.Domain;
 using Sheaft.GraphQL.Users;
 
@@ -17,8 +20,18 @@ namespace Sheaft.GraphQL.Types.Outputs
                 .ResolveNode((ctx, id) => ctx.DataLoader<ProfilePicturesByIdBatchDataLoader>().LoadAsync(id, ctx.RequestAborted));
                 
             descriptor
-                .Field(c => c.Url)
-                .Name("url");
+                .Field(c => c.Position)
+                .Name("position");
+            
+            descriptor
+                .Field(c => PictureExtensions.GetPictureUrl(Guid.Empty, c.Url, PictureSize.LARGE))
+                .Name("large");
+            descriptor
+                .Field(c => PictureExtensions.GetPictureUrl(Guid.Empty, c.Url, PictureSize.MEDIUM))
+                .Name("medium");
+            descriptor
+                .Field(c => PictureExtensions.GetPictureUrl(Guid.Empty, c.Url, PictureSize.SMALL))
+                .Name("small");
         }
     }
 }

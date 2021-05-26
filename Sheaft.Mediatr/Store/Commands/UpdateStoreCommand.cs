@@ -54,56 +54,60 @@ namespace Sheaft.Mediatr.Store.Commands
         public bool OpenForNewBusiness { get; set; }
         public AddressDto Address { get; set; }
         public IEnumerable<Guid> Tags { get; set; }
+        public IEnumerable<PictureInputDto> Pictures { get; set; }
         public IEnumerable<TimeSlotGroupDto> OpeningHours { get; set; }
     }
 
     public class UpdateStoreCommandHandler : CommandsHandler,
         IRequestHandler<UpdateStoreCommand, Result>
     {
+        private readonly IPictureService _imageService;
         private readonly RoleOptions _roleOptions;
 
         public UpdateStoreCommandHandler(
             IAppDbContext context,
             ISheaftMediatr mediatr,
+            IPictureService imageService,
             ILogger<UpdateStoreCommandHandler> logger,
             IOptionsSnapshot<RoleOptions> roleOptions)
             : base(mediatr, context, logger)
         {
+            _imageService = imageService;
             _roleOptions = roleOptions.Value;
         }
 
         public async Task<Result> Handle(UpdateStoreCommand request, CancellationToken token)
         {
-            var store = await _context.Stores.SingleAsync(e => e.Id == request.StoreId, token);
-            if(store.Id != request.RequestUser.Id)
+            var entity = await _context.Stores.SingleAsync(e => e.Id == request.StoreId, token);
+            if(entity.Id != request.RequestUser.Id)
                 return Failure(MessageKind.Forbidden);
 
-            store.SetName(request.Name);
-            store.SetFirstname(request.FirstName);
-            store.SetLastname(request.LastName);
-            store.SetEmail(request.Email);
-            store.SetProfileKind(request.Kind);
-            store.SetPhone(request.Phone);
-            store.SetOpenForNewBusiness(request.OpenForNewBusiness);
+            entity.SetName(request.Name);
+            entity.SetFirstname(request.FirstName);
+            entity.SetLastname(request.LastName);
+            entity.SetEmail(request.Email);
+            entity.SetProfileKind(request.Kind);
+            entity.SetPhone(request.Phone);
+            entity.SetOpenForNewBusiness(request.OpenForNewBusiness);
             
-            store.SetSummary(request.Summary);
-            store.SetDescription(request.Description);
-            store.SetFacebook(request.Facebook);
-            store.SetTwitter(request.Twitter);
-            store.SetWebsite(request.Website);
-            store.SetInstagram(request.Instagram);
+            entity.SetSummary(request.Summary);
+            entity.SetDescription(request.Description);
+            entity.SetFacebook(request.Facebook);
+            entity.SetTwitter(request.Twitter);
+            entity.SetWebsite(request.Website);
+            entity.SetInstagram(request.Instagram);
 
             var departmentCode = UserAddress.GetDepartmentCode(request.Address.Zipcode);
             var department = await _context.Departments.SingleOrDefaultAsync(d => d.Code == departmentCode, token);
 
-            store.SetAddress(request.Address.Line1, request.Address.Line2, request.Address.Zipcode,
+            entity.SetAddress(request.Address.Line1, request.Address.Line2, request.Address.Zipcode,
                 request.Address.City, request.Address.Country, department, request.Address.Longitude,
                 request.Address.Latitude);
 
             if (request.Tags != null)
             {
                 var tags = await _context.Tags.Where(t => request.Tags.Contains(t.Id)).ToListAsync(token);
-                store.SetTags(tags);
+                entity.SetTags(tags);
             }
 
             if (request.OpeningHours != null)
@@ -112,15 +116,35 @@ namespace Sheaft.Mediatr.Store.Commands
                 foreach (var oh in request.OpeningHours)
                     openingHours.AddRange(oh.Days.Select(c => new OpeningHours(c, oh.From, oh.To)));
 
-                store.SetOpeningHours(openingHours);
+                entity.SetOpeningHours(openingHours);
             }
 
+            if (request.Pictures != null && request.Pictures.Any())
+            {
+                entity.ClearPictures();
+                    
+                var result = Success<string>();
+                foreach (var picture in request.Pictures)
+                {
+                    var id = Guid.NewGuid();
+                    result = await _imageService.HandleUserPictureAsync(entity, id, picture.Data, token);
+                    if (!result.Succeeded)
+                        break;
+
+                    if (!string.IsNullOrWhiteSpace(result.Data))
+                        entity.AddPicture(new ProfilePicture(id, result.Data, picture.Position));
+                }
+
+                if (!result.Succeeded)
+                    return Failure(result);
+            }
+            
             await _context.SaveChangesAsync(token);
             
             var resultImage = await _mediatr.Process(new UpdateUserPreviewCommand(request.RequestUser)
             {
-                UserId = store.Id,
-                Picture = new PictureSourceDto{Resized = request.Picture},
+                UserId = entity.Id,
+                Picture = request.Picture,
                 SkipAuthUpdate = true
             }, token);
 
@@ -130,14 +154,14 @@ namespace Sheaft.Mediatr.Store.Commands
             var roles = new List<Guid> {_roleOptions.Owner.Id, _roleOptions.Store.Id};
             var authResult = await _mediatr.Process(new UpdateAuthUserCommand(request.RequestUser)
             {
-                Email = store.Email,
-                FirstName = store.FirstName,
-                LastName = store.LastName,
-                Name = store.Name,
-                Phone = store.Phone,
-                Picture = store.Picture,
+                Email = entity.Email,
+                FirstName = entity.FirstName,
+                LastName = entity.LastName,
+                Name = entity.Name,
+                Phone = entity.Phone,
+                Picture = entity.Picture,
                 Roles = roles,
-                UserId = store.Id
+                UserId = entity.Id
             }, token);
 
             if (!authResult.Succeeded)

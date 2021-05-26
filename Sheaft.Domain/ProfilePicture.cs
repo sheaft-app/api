@@ -8,7 +8,7 @@ namespace Sheaft.Domain
         {
         }
         
-        public ProfilePicture(Guid id, string url) : base(id, url)
+        public ProfilePicture(Guid id, string url, int position) : base(id, url, position)
         {
         }
 

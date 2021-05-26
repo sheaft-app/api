@@ -9,15 +9,34 @@ namespace Sheaft.Domain
         {
         }
         
-        protected Picture(Guid id, string url)
+        protected Picture(Guid id, string url, int position)
         {
             Id = id;
             Url = url;
+            Position = position;
         }
 
         public Guid Id { get; private set; }
         public DateTimeOffset CreatedOn { get; private set; }
         public DateTimeOffset? UpdatedOn { get; private set; }
         public string Url { get; private set; }
+        public int Position { get; private set; }
+        
+        public void IncreasePosition()
+        {
+            Position++;
+        }
+        public void DecreasePosition()
+        {
+            Position--;
+        }
+
+        public void SetPosition(int picturePosition)
+        {
+            if (picturePosition < 0)
+                return;
+            
+            Position = picturePosition;
+        }
     }
 }

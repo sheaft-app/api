@@ -78,6 +78,10 @@ namespace Sheaft.GraphQL.Types.Inputs
                 .Field(c => c.LastName)
                 .Name("lastName")
                 .Type<NonNullType<StringType>>();
+
+            descriptor.Field(c => c.Pictures)
+                .Name("pictures")
+                .Type<ListType<ProfilePictureInputType>>();
         }
     }
 }

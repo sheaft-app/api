@@ -15,8 +15,7 @@ namespace Sheaft.GraphQL.Types.Inputs
             
             descriptor
                 .Field(c => c.Picture)
-                .Name("picture")
-                .Type<PictureSourceInputType>();
+                .Name("picture");
 
             descriptor
                 .Field(c => c.UserId)
