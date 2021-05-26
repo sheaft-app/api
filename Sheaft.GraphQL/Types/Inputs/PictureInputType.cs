@@ -5,13 +5,13 @@ using Sheaft.Mediatr.Product.Commands;
 
 namespace Sheaft.GraphQL.Types.Inputs
 {
-    public class PictureInputType : SheaftInputType<PictureInputDto>
+    public class ProductPictureInputType : SheaftInputType<PictureInputDto>
     {
         protected override void Configure(IInputObjectTypeDescriptor<PictureInputDto> descriptor)
         {
             base.Configure(descriptor);
             
-            descriptor.Name("PictureInput");
+            descriptor.Name("ProductPictureInput");
 
             descriptor
                 .Field(c => c.Id)

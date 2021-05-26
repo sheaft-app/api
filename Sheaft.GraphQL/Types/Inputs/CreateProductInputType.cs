@@ -64,7 +64,7 @@ namespace Sheaft.GraphQL.Types.Inputs
 
             descriptor.Field(c => c.Pictures)
                 .Name("pictures")
-                .Type<ListType<PictureInputType>>();
+                .Type<ListType<ProductPictureInputType>>();
 
         }
     }
