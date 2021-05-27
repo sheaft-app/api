@@ -163,7 +163,6 @@ namespace Sheaft.GraphQL.Types.Outputs
 
             descriptor
                 .Field("products")
-                .Authorize(Policies.REGISTERED)
                 .UseDbContext<QueryDbContext>()
                 .ResolveWith<ProducerResolvers>(c =>
                     c.GetProducts(default!, default!, default!, default, default!, default))
