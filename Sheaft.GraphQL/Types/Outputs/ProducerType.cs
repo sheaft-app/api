@@ -32,6 +32,8 @@ namespace Sheaft.GraphQL.Types.Outputs
         {
             base.Configure(descriptor);
 
+            descriptor.Name("Producer");
+            
             descriptor
                 .ImplementsNode()
                 .IdField(c => c.Id)

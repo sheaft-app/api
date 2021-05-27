@@ -52,26 +52,6 @@ namespace Sheaft.GraphQL.Products
             CancellationToken token)
         {
             SetLogTransaction(id);
-            if (CurrentUser.IsInRole(_roleOptions.Store.Value))
-            {
-                var hasAgreement = await context.Agreements
-                    .Where(c => c.StoreId == CurrentUser.Id && c.Status == AgreementStatus.Accepted &&
-                                c.Catalog.Products.Any(p => p.ProductId == id))
-                    .AnyAsync(token);
-
-                if (hasAgreement)
-                    return context.Agreements
-                        .Where(c => c.StoreId == CurrentUser.Id && c.Status == AgreementStatus.Accepted &&
-                                    c.Catalog.Products.Any(p => p.ProductId == id))
-                        .SelectMany(a => a.Catalog.Products)
-                        .Where(c => !c.Product.RemovedOn.HasValue)
-                        .Select(c => c.Product);
-
-                return context.Products
-                    .Where(p => p.Id == id && p.CatalogsPrices.Any(cp =>
-                        cp.Catalog.Kind == CatalogKind.Stores && cp.Catalog.Available && cp.Catalog.IsDefault));
-            }
-
             return context.Products
                 .Where(c => c.Id == id);
         }

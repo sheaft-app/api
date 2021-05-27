@@ -15,6 +15,7 @@ using Sheaft.GraphQL.Agreements;
 using Sheaft.GraphQL.Business;
 using Sheaft.GraphQL.Catalogs;
 using Sheaft.GraphQL.Producers;
+using Sheaft.GraphQL.Products;
 using Sheaft.GraphQL.Stores;
 using Sheaft.GraphQL.Tags;
 using Sheaft.GraphQL.Users;
@@ -27,6 +28,8 @@ namespace Sheaft.GraphQL.Types.Outputs
         protected override void Configure(IObjectTypeDescriptor<Store> descriptor)
         {
             base.Configure(descriptor);
+            
+            descriptor.Name("Store");
 
             descriptor
                 .ImplementsNode()
@@ -150,11 +153,16 @@ namespace Sheaft.GraphQL.Types.Outputs
                 .Type<ListType<ProfilePictureType>>();
             
             descriptor
-                .Field(c => c.Pictures)
-                .Name("producers")
+                .Field("producers")
                 .UseDbContext<QueryDbContext>()
                 .ResolveWith<StoreResolvers>(c => c.GetProducers(default!, default!, default!, default))
                 .Type<ListType<ProducerType>>();
+            
+            descriptor
+                .Field("products")
+                .UseDbContext<QueryDbContext>()
+                .ResolveWith<StoreResolvers>(c => c.GetProducts(default!, default!, default!, default))
+                .Type<ListType<ProductType>>();
             
             descriptor
                 .Field("agreement")
@@ -166,7 +174,6 @@ namespace Sheaft.GraphQL.Types.Outputs
 
         private class StoreResolvers
         {
-            
             public async Task<IEnumerable<Producer>> GetProducers(Store store,
                 [ScopedService] QueryDbContext context,
                 ProducersByIdBatchDataLoader producersDataLoader, 
@@ -179,6 +186,20 @@ namespace Sheaft.GraphQL.Types.Outputs
                     .ToListAsync(token);
 
                 return await producersDataLoader.LoadAsync(producerIds, token);
+            }
+            
+            public async Task<IEnumerable<Product>> GetProducts(Store store,
+                [ScopedService] QueryDbContext context,
+                ProductsByIdBatchDataLoader productsDataLoader, 
+                CancellationToken token)
+            {
+                var productIds = await context.Agreements
+                    .Where(c => c.StoreId == store.Id &&
+                                c.Status == AgreementStatus.Accepted)
+                    .SelectMany(a => a.Catalog.Products.Select(p => p.ProductId))
+                    .ToListAsync(token);
+
+                return await productsDataLoader.LoadAsync(productIds, token);
             }
             
             public async Task<Agreement> GetCurrentAgreement(Store store, 
