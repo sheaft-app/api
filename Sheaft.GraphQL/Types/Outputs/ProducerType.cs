@@ -18,6 +18,7 @@ using Sheaft.GraphQL.Business;
 using Sheaft.GraphQL.Catalogs;
 using Sheaft.GraphQL.Producers;
 using Sheaft.GraphQL.Products;
+using Sheaft.GraphQL.Stores;
 using Sheaft.GraphQL.Tags;
 using Sheaft.GraphQL.Users;
 using Sheaft.Infrastructure.Persistence;
@@ -167,6 +168,13 @@ namespace Sheaft.GraphQL.Types.Outputs
                 .ResolveWith<ProducerResolvers>(c =>
                     c.GetProducts(default!, default!, default!, default, default!, default))
                 .Type<ListType<ProductType>>();
+            
+            descriptor
+                .Field("stores")
+                .UseDbContext<QueryDbContext>()
+                .ResolveWith<ProducerResolvers>(c =>
+                    c.GetStores(default!, default!, default!, default))
+                .Type<ListType<StoreType>>();
         }
 
         private class ProducerResolvers
@@ -214,6 +222,19 @@ namespace Sheaft.GraphQL.Types.Outputs
                 }
 
                 return await productsDataLoader.LoadAsync(productsId, token);
+            }
+            
+            public async Task<IEnumerable<Store>> GetStores(Producer producer,
+                [ScopedService] QueryDbContext context,
+                StoresByIdBatchDataLoader storesDataLoader, CancellationToken token)
+            {
+                var storeIds = await context.Agreements
+                    .Where(c => c.ProducerId == producer.Id &&
+                                c.Status == AgreementStatus.Accepted)
+                    .Select(a => a.StoreId)
+                    .ToListAsync(token);
+
+                return await storesDataLoader.LoadAsync(storeIds, token);
             }
 
             public async Task<int> GetProductsCount(Producer producer,

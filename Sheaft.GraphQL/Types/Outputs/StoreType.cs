@@ -14,6 +14,7 @@ using Sheaft.Domain.Enum;
 using Sheaft.GraphQL.Agreements;
 using Sheaft.GraphQL.Business;
 using Sheaft.GraphQL.Catalogs;
+using Sheaft.GraphQL.Producers;
 using Sheaft.GraphQL.Stores;
 using Sheaft.GraphQL.Tags;
 using Sheaft.GraphQL.Users;
@@ -149,6 +150,13 @@ namespace Sheaft.GraphQL.Types.Outputs
                 .Type<ListType<ProfilePictureType>>();
             
             descriptor
+                .Field(c => c.Pictures)
+                .Name("producers")
+                .UseDbContext<QueryDbContext>()
+                .ResolveWith<StoreResolvers>(c => c.GetProducers(default!, default!, default!, default))
+                .Type<ListType<ProducerType>>();
+            
+            descriptor
                 .Field("agreement")
                 .Authorize(Policies.PRODUCER)
                 .UseDbContext<QueryDbContext>()
@@ -158,6 +166,21 @@ namespace Sheaft.GraphQL.Types.Outputs
 
         private class StoreResolvers
         {
+            
+            public async Task<IEnumerable<Producer>> GetProducers(Store store,
+                [ScopedService] QueryDbContext context,
+                ProducersByIdBatchDataLoader producersDataLoader, 
+                CancellationToken token)
+            {
+                var producerIds = await context.Agreements
+                    .Where(c => c.StoreId == store.Id &&
+                                c.Status == AgreementStatus.Accepted)
+                    .Select(a => a.ProducerId)
+                    .ToListAsync(token);
+
+                return await producersDataLoader.LoadAsync(producerIds, token);
+            }
+            
             public async Task<Agreement> GetCurrentAgreement(Store store, 
                 [ScopedService] QueryDbContext context, [Service] ICurrentUserService currentUserService,
                 AgreementsByIdBatchDataLoader agreementsDataLoader, CancellationToken token)
