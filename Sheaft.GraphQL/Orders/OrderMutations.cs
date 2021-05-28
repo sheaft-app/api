@@ -41,7 +41,6 @@ namespace Sheaft.GraphQL.Orders
         }
 
         [GraphQLName("updateConsumerOrder")]
-        [Authorize(Policy = Policies.CONSUMER)]
         [GraphQLType(typeof(OrderType))]
         public async Task<Order> UpdateOrderAsync(
             [GraphQLType(typeof(UpdateConsumerOrderInputType))] [GraphQLName("input")]
