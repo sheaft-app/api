@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -119,7 +120,7 @@ namespace Sheaft.GraphQL.Types.Outputs
                 CancellationToken token)
             {
                 var deliveryHoursId = await context.Set<DeliveryClosing>()
-                    .Where(d => d.DeliveryModeId == delivery.Id)
+                    .Where(d => d.DeliveryModeId == delivery.Id && d.ClosedTo > DateTimeOffset.UtcNow)
                     .Select(d => d.Id)
                     .ToListAsync(token);
 

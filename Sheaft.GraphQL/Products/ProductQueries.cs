@@ -120,12 +120,7 @@ namespace Sheaft.GraphQL.Products
             [ScopedService] QueryDbContext context,
             CancellationToken token)
         {
-            var query = context.Products
-                .Where(c => c.Available
-                            && c.Producer.CanDirectSell
-                            && c.CatalogsPrices.Any(cp =>
-                                cp.Catalog.Kind == CatalogKind.Consumers && cp.Catalog.Available));
-
+            var query = context.ConsumerProducts.AsQueryable();
             if (!string.IsNullOrWhiteSpace(terms.Text))
                 query = query.Where(p => p.Name.Contains(terms.Text));
 
@@ -133,21 +128,31 @@ namespace Sheaft.GraphQL.Products
                 query = query.Where(p => p.ProducerId == terms.ProducerId.Value);
 
             if (terms.Tags != null && terms.Tags.Any())
-                query = query.Where(p => p.Tags.Any(t => terms.Tags.Contains(t.Tag.Name)));
+            {
+                foreach (var tag in terms.Tags)
+                {
+                    query = query.Where(p => p.Tags.Contains(tag));
+                }
+            }
 
             Point currentPosition = null;
             if (terms.Longitude.HasValue && terms.Latitude.HasValue)
             {
                 currentPosition = LocationProvider.CreatePoint(terms.Latitude.Value, terms.Longitude.Value);
-                query = query.Where(p => p.Producer.Address.Location.Distance(currentPosition) < 200000);
+                query = query.Where(p => p.Location.Distance(currentPosition) < 200000);
             }
 
             var count = await query.CountAsync(token);
-
+            
             if (!string.IsNullOrWhiteSpace(terms.Sort))
             {
-                if (terms.Sort.Contains("producer_geolocation") && currentPosition != null)
-                    query = query.OrderBy(p => p.Producer.Address.Location.Distance(currentPosition));
+                var sort = terms.Sort.ToLowerInvariant();
+                if (sort.Contains("producer_geolocation") && currentPosition != null)
+                    query = query.OrderBy(p => p.Location.Distance(currentPosition));
+                else if (sort.Contains("price") && sort.Contains("asc"))
+                    query = query.OrderBy(p => p.OnSalePricePerUnit);
+                else if (sort.Contains("price") && sort.Contains("desc"))
+                    query = query.OrderByDescending(p => p.OnSalePricePerUnit);
                 else
                     query = query.OrderBy(p => p.Name);
             }
@@ -157,12 +162,17 @@ namespace Sheaft.GraphQL.Products
             query = query.Skip(((terms.Page ?? 1) - 1) * terms.Take ?? 20);
             query = query.Take(terms.Take ?? 20);
 
-            var results = await query.ToListAsync(token);
+            var results = await query
+                .Select(p => p.Id)
+                .ToListAsync(token);
+
+            var products = await context.Products.Where(p => results.Contains(p.Id)).ToListAsync(token);
+            var orderedProducts = results.Select(result => products.SingleOrDefault(p => p.Id == result)).ToList();
 
             return new ProductsSearchDto
             {
                 Count = count,
-                Products = results
+                Products = orderedProducts
             };
         }
     }

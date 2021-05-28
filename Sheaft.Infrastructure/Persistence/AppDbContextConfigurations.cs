@@ -13,6 +13,12 @@ namespace Sheaft.Infrastructure.Persistence
 
             base.OnModelCreating(modelBuilder);
 
+            modelBuilder.Entity<ConsumerProduct>(eb =>
+            {
+                eb.HasNoKey();
+                eb.ToView("ConsumerProducts");
+            });
+            
             modelBuilder.Entity<DepartmentProducers>(eb =>
             {
                 eb.HasNoKey();

@@ -168,7 +168,7 @@ namespace Sheaft.GraphQL.Types.Outputs
                 BusinessClosingsByIdBatchDataLoader closingsDataLoader, CancellationToken token)
             {
                 var closingsId = await context.Set<BusinessClosing>()
-                    .Where(p => p.BusinessId == store.Id)
+                    .Where(p => p.BusinessId == store.Id && p.ClosedTo > DateTimeOffset.UtcNow)
                     .Select(p => p.Id)
                     .ToListAsync(token);
 

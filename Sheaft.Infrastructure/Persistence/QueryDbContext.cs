@@ -47,6 +47,7 @@ namespace Sheaft.Infrastructure.Persistence
         public DbSet<Wallet> Wallets { get; set; }
         public DbSet<Withholding> Withholdings { get; set; }
 
+        public DbSet<ConsumerProduct> ConsumerProducts { get; set; }
         public DbSet<DepartmentProducers> DepartmentProducers { get; set; }
         public DbSet<DepartmentStores> DepartmentStores { get; set; }
         public DbSet<CountryPoints> CountryPoints { get; set; }

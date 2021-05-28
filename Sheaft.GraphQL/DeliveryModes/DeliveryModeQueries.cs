@@ -91,7 +91,7 @@ namespace Sheaft.GraphQL.DeliveryModes
         {
             SetLogTransaction();
             return context.Set<DeliveryClosing>()
-                .Where(d => d.DeliveryModeId == deliveryId);
+                .Where(d => d.DeliveryModeId == deliveryId && d.ClosedTo > DateTimeOffset.UtcNow);
         }
         
         [GraphQLName("nextProducersDeliveries")]

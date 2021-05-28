@@ -59,7 +59,7 @@ namespace Sheaft.GraphQL.Business
         {
             SetLogTransaction();
             return context.Set<BusinessClosing>()
-                .Where(d => d.BusinessId == CurrentUser.Id);
+                .Where(d => d.BusinessId == CurrentUser.Id && d.ClosedTo > DateTimeOffset.UtcNow);
         }
     }
 }
