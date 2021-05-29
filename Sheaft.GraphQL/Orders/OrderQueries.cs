@@ -45,14 +45,14 @@ namespace Sheaft.GraphQL.Orders
         [GraphQLType(typeof(OrderType))]
         [UseDbContext(typeof(QueryDbContext))]
         [Authorize(Policy = Policies.REGISTERED)]
-        [UseSingleOrDefault]
+        [UseFirstOrDefault]
         public IQueryable<Order> Get([ScopedService] QueryDbContext context)
         {
             SetLogTransaction();
             if (CurrentUser.IsAuthenticated())
                 return context.Orders
                     .Where(c => c.UserId == CurrentUser.Id && c.Status == OrderStatus.Created)
-                    .OrderBy(c => c.CreatedOn);
+                    .OrderByDescending(c => c.CreatedOn);
 
             return new List<Order>().AsQueryable();
         }

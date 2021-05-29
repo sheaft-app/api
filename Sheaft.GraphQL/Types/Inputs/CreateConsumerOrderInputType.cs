@@ -1,5 +1,6 @@
 ﻿using HotChocolate.Types;
 using Sheaft.Application.Models;
+using Sheaft.Domain;
 using Sheaft.Mediatr.Order.Commands;
 
 namespace Sheaft.GraphQL.Types.Inputs
@@ -15,10 +16,15 @@ namespace Sheaft.GraphQL.Types.Inputs
             descriptor
                 .Field(c => c.Donation)
                 .Name("donation");
+            
+            descriptor
+                .Field(c => c.UserId)
+                .Name("userId")
+                .ID(nameof(User));
 
             descriptor
                 .Field(c => c.ProducersExpectedDeliveries)
-                .Name("producersExpectedDeliveries")
+                .Name("deliveries")
                 .Type<ListType<ProducerExpectedDeliveryInputType>>();
 
             descriptor

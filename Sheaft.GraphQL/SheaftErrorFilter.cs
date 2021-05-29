@@ -88,6 +88,7 @@ namespace Sheaft.GraphQL
             {
                 statusCode = 400;
                 code = MessageKind.BadRequest.ToString("G");
+                message = error.Message;
             }
 
             if (error.Code == "AUTH_NOT_AUTHENTICATED")
