@@ -159,7 +159,7 @@ namespace Sheaft.GraphQL.Types.Outputs
                 .Name("purchaseOrders")
                 .UseDbContext<QueryDbContext>()
                 .ResolveWith<OrderResolvers>(c => c.GetPurchaseOrders(default, default, default, default))
-                .Type<ListType<OrderDeliveryType>>();
+                .Type<ListType<PurchaseOrderType>>();
         }
 
         private class OrderResolvers

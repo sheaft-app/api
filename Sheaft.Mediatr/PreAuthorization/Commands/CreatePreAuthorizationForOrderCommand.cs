@@ -16,6 +16,7 @@ using Sheaft.Application.Interfaces.Mediatr;
 using Sheaft.Application.Models;
 using Sheaft.Core;
 using Sheaft.Domain;
+using Sheaft.Domain.Enum;
 using Sheaft.Mediatr.Consumer.Commands;
 using Sheaft.Options;
 
@@ -98,6 +99,8 @@ namespace Sheaft.Mediatr.PreAuthorization.Commands
                 preAuthorization.SetDebited(result.Data.Debited);
                 preAuthorization.SetResult(result.Data.ResultCode, result.Data.ResultMessage);
                 preAuthorization.SetSecureModeRedirectUrl(result.Data.SecureModeRedirectUrl);
+                
+                order.SetStatus(OrderStatus.Validated);
                 
                 await _context.SaveChangesAsync(token);
                 await transaction.CommitAsync(token);
