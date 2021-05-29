@@ -1,5 +1,6 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
+using HotChocolate.Types.Relay;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -18,39 +19,48 @@ namespace Sheaft.Mediatr.PurchaseOrder.EventHandlers
         INotificationHandler<DomainEventNotification<PurchaseOrderWithdrawnedEvent>>
     {
         private readonly IConfiguration _configuration;
+        private readonly IIdSerializer _idSerializer;
 
         public PurchaseOrderWithdrawnedEventHandler(
             IConfiguration configuration,
             IAppDbContext context,
+            IIdSerializer idSerializer,
             IEmailService emailService,
             ISignalrService signalrService)
             : base(context, emailService, signalrService)
         {
             _configuration = configuration;
+            _idSerializer = idSerializer;
         }
 
-        public async Task Handle(DomainEventNotification<PurchaseOrderWithdrawnedEvent> notification, CancellationToken token)
+        public async Task Handle(DomainEventNotification<PurchaseOrderWithdrawnedEvent> notification,
+            CancellationToken token)
         {
             var orderEvent = notification.DomainEvent;
-            var purchaseOrder = await _context.PurchaseOrders.SingleAsync(e => e.Id == orderEvent.PurchaseOrderId, token);
-            
-            await _signalrService.SendNotificationToGroupAsync(purchaseOrder.ProducerId, nameof(PurchaseOrderWithdrawnedEvent), purchaseOrder.GetPurchaseNotifModelAsString());
+            var purchaseOrder =
+                await _context.PurchaseOrders.SingleAsync(e => e.Id == orderEvent.PurchaseOrderId, token);
+
+            var purchaseOrderIdentifier = _idSerializer.Serialize("Query", nameof(PurchaseOrder), purchaseOrder.Id);
+            await _signalrService.SendNotificationToGroupAsync(purchaseOrder.ProducerId,
+                nameof(PurchaseOrderWithdrawnedEvent), purchaseOrder.GetPurchaseNotifModelAsString(purchaseOrderIdentifier));
 
             await _emailService.SendTemplatedEmailAsync(
                 purchaseOrder.SenderInfo.Email,
                 purchaseOrder.SenderInfo.Name,
                 $"Votre commande pour {purchaseOrder.VendorInfo.Name} prévue pour le {purchaseOrder.ExpectedDelivery.ExpectedDeliveryDate:dd/MM/yyyy} a bien été annulée",
                 nameof(PurchaseOrderWithdrawnedEvent),
-                purchaseOrder.GetTemplateData($"{_configuration.GetValue<string>("Portal:url")}/#/my-orders/{purchaseOrder.Id}"),
+                purchaseOrder.GetTemplateData(purchaseOrderIdentifier,
+                    $"{_configuration.GetValue<string>("Portal:url")}/#/my-orders/{purchaseOrderIdentifier}"),
                 true,
                 token);
-            
+
             await _emailService.SendTemplatedEmailAsync(
                 purchaseOrder.VendorInfo.Email,
                 purchaseOrder.VendorInfo.Name,
                 $"{purchaseOrder.SenderInfo.Name} a annulé sa commande pour le {purchaseOrder.ExpectedDelivery.ExpectedDeliveryDate:dd/MM/yyyy}",
                 nameof(PurchaseOrderWithdrawnedEvent),
-                purchaseOrder.GetTemplateData($"{_configuration.GetValue<string>("Portal:url")}/#/purchase-orders/{purchaseOrder.Id}"),
+                purchaseOrder.GetTemplateData(purchaseOrderIdentifier, 
+                    $"{_configuration.GetValue<string>("Portal:url")}/#/purchase-orders/{purchaseOrderIdentifier}"),
                 true,
                 token);
         }

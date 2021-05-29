@@ -1,5 +1,6 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
+using HotChocolate.Types.Relay;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -57,8 +58,7 @@ namespace Sheaft.Mediatr.Payin.EventHandlers
                 CreatedOn = payin.Order.CreatedOn, 
                 ProductsCount = payin.Order.ProductsCount, 
                 Reference = payin.Order.Reference, 
-                OrderId = payin.OrderId, 
-                MyOrdersUrl = $"{_configuration.GetValue<string>("Portal:url")}/#/my-orders/{payin.OrderId:N}"
+                MyOrdersUrl = $"{_configuration.GetValue<string>("Portal:url")}/#/my-orders/"
             };
         }
     }

@@ -34,6 +34,7 @@ using System.Globalization;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Reflection;
+using HotChocolate.Types.Relay;
 using Razor.Templating.Core;
 using Sheaft.Application.Behaviours;
 using Sheaft.Application.Interfaces.Business;
@@ -284,6 +285,8 @@ namespace Sheaft.Web.Api
             
             services.AddScoped<IDeliveryService, DeliveryService>();
             services.AddScoped<IOrderService, OrderService>();
+            
+            services.AddScoped<IIdSerializer, IdSerializer>();
             
             services.AddScopedDynamic<IProductsFileImporter>(typeof(ExcelProductsImporter).Assembly.GetTypes().Where(t => t.GetInterfaces().Contains(typeof(IProductsFileImporter))));
             services.AddScopedDynamic<IPickingOrdersFileExporter>(typeof(ExcelPickingOrdersExporter).Assembly.GetTypes().Where(t => t.GetInterfaces().Contains(typeof(IPickingOrdersFileExporter))));

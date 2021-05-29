@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using HotChocolate.Types.Relay;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -18,15 +19,18 @@ namespace Sheaft.Mediatr.Order.EventHandlers
         INotificationHandler<DomainEventNotification<OrderConfirmedEvent>>
     {
         private readonly IConfiguration _configuration;
+        private readonly IIdSerializer _idSerializer;
 
         public OrderConfirmedEventHandler(
             IAppDbContext context,
             IEmailService emailService,
             IConfiguration configuration,
+            IIdSerializer idSerializer,
             ISignalrService signalrService)
             : base(context, emailService, signalrService)
         {
             _configuration = configuration;
+            _idSerializer = idSerializer;
         }
 
         public async Task Handle(DomainEventNotification<OrderConfirmedEvent> notification, CancellationToken token)
@@ -34,18 +38,18 @@ namespace Sheaft.Mediatr.Order.EventHandlers
             var orderEvent = notification.DomainEvent;
             var order = await _context.Orders.SingleAsync(e => e.Id == orderEvent.OrderId, token);
             
-            await _signalrService.SendNotificationToUserAsync(order.Id, nameof(OrderConfirmedEvent),
-                order.GetOrderNotifModelAsString());
+            var purchaseOrderId = order.PurchaseOrders.Count() == 1 ? order.PurchaseOrders.FirstOrDefault()?.Id : (Guid?)null; 
 
-            var orderId = order.PurchaseOrders.Count() == 1 ? order.PurchaseOrders.FirstOrDefault()?.Id : (Guid?)null; 
-            
+            await _signalrService.SendNotificationToUserAsync(order.UserId.Value, nameof(OrderConfirmedEvent),
+                order.GetOrderNotifModelAsString(purchaseOrderId.HasValue ? _idSerializer.Serialize("Query", nameof(PurchaseOrder), purchaseOrderId): null));
+
             await _emailService.SendTemplatedEmailAsync(
                 order.User.Email,
                 order.User.Name,
                 $"{order.User.Name}, votre commande de {order.TotalPrice}€ a été prise en compte",
                 nameof(OrderConfirmedEvent),
-                order.GetTemplateData(
-                    $"{_configuration.GetValue<string>("Portal:url")}/#/my-orders{(orderId.HasValue ? $"/{orderId.Value:N}" : string.Empty)}"),
+                order.GetTemplateData(_idSerializer.Serialize("Query", nameof(Order), orderEvent.OrderId),
+                    $"{_configuration.GetValue<string>("Portal:url")}/#/my-orders{(purchaseOrderId.HasValue ? $"/{_idSerializer.Serialize("Query", nameof(PurchaseOrder), purchaseOrderId.Value)}" : string.Empty)}"),
                 true,
                 token);
         }

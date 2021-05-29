@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
+using HotChocolate.Types.Relay;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -19,15 +20,18 @@ namespace Sheaft.Mediatr.Agreement.EventHandlers
         INotificationHandler<DomainEventNotification<AgreementCreatedEvent>>
     {
         private readonly IConfiguration _configuration;
+        private readonly IIdSerializer _idSerializer;
 
         public AgreementCreatedEventHandler(
             IConfiguration configuration,
             IAppDbContext context,
             IEmailService emailService,
+            IIdSerializer idSerializer,
             ISignalrService signalrService)
             : base(context, emailService, signalrService)
         {
             _configuration = configuration;
+            _idSerializer = idSerializer;
         }
 
         public async Task Handle(DomainEventNotification<AgreementCreatedEvent> notification, CancellationToken token)
@@ -58,13 +62,13 @@ namespace Sheaft.Mediatr.Agreement.EventHandlers
             }
 
             var eventName = nameof(AgreementCreatedEvent).Replace("Event", $"{subEventName}Event");
-            await _signalrService.SendNotificationToGroupAsync(id, eventName, agreement.GetNotificationContent(_configuration.GetValue<string>("Portal:url"), targetName));
+            await _signalrService.SendNotificationToGroupAsync(id, eventName, agreement.GetNotificationContent(_idSerializer.Serialize("Query", nameof(Agreement), agreement.Id), _configuration.GetValue<string>("Portal:url"), targetName));
             await _emailService.SendTemplatedEmailAsync(
                 email,
                 name,
                 $"{targetName} souhaiterait commercer avec vous",
                 nameof(AgreementCreatedEvent),
-                agreement.GetNotificationContent(_configuration.GetValue<string>("Portal:url"), targetName),
+                agreement.GetNotificationContent(_idSerializer.Serialize("Query", nameof(Agreement), agreement.Id), _configuration.GetValue<string>("Portal:url"), targetName),
                 true,
                 token);
         }

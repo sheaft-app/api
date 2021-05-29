@@ -19,5 +19,6 @@ namespace Sheaft.Mailing
         public TimeSpan ExpectedTo { get; set; }
         public string Address { get; set; }
         public string Reason { get; set; }
+        public string Id { get; set; }
     }
 }

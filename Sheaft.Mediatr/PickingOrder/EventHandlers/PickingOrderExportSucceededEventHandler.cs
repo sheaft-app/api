@@ -1,5 +1,6 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
+using HotChocolate.Types.Relay;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Sheaft.Application.Interfaces.Infrastructure;
@@ -11,12 +12,16 @@ namespace Sheaft.Mediatr.PickingOrder.EventHandlers
     public class PickingOrderExportSucceededEventHandler : EventsHandler,
         INotificationHandler<DomainEventNotification<PickingOrderExportSucceededEvent>>
     {
+        private readonly IIdSerializer _idSerializer;
+
         public PickingOrderExportSucceededEventHandler(
             IAppDbContext context,
+            IIdSerializer idSerializer,
             IEmailService emailService,
             ISignalrService signalrService)
             : base(context, emailService, signalrService)
         {
+            _idSerializer = idSerializer;
         }
 
         public async Task Handle(DomainEventNotification<PickingOrderExportSucceededEvent> notification,
@@ -24,8 +29,11 @@ namespace Sheaft.Mediatr.PickingOrder.EventHandlers
         {
             var pickingOrderEvent = notification.DomainEvent;
             var job = await _context.Jobs.SingleAsync(e => e.Id == pickingOrderEvent.JobId, token);
+            
+            var jobIdentifier = _idSerializer.Serialize("Query", nameof(Job), job.Id);
+            
             await _signalrService.SendNotificationToGroupAsync(job.UserId, nameof(PickingOrderExportSucceededEvent),
-                new {JobId = job.Id, Name = job.Name, UserId = job.UserId, Url = job.File});
+                new {JobId = jobIdentifier, Name = job.Name, UserId = job.UserId, Url = job.File});
 
             await _emailService.SendTemplatedEmailAsync(
                 job.User.Email,

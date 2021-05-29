@@ -13,7 +13,7 @@ namespace Sheaft.Mailing
         public decimal OnSalePrice { get; set; }
         public int ProductsCount { get; set; }
         public DateTimeOffset CreatedOn { get; set; }
-        public Guid OrderId { get; set; }
+        public string OrderId { get; set; }
         public string MyOrdersUrl { get; set; }
         public decimal Donation { get; set; }
         public decimal Fees { get; set; }

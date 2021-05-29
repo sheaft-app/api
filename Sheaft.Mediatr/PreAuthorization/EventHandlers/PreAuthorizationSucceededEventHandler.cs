@@ -58,8 +58,7 @@ namespace Sheaft.Mediatr.PreAuthorization.EventHandlers
                 CreatedOn = preAuthorization.Order.CreatedOn, 
                 ProductsCount = preAuthorization.Order.ProductsCount, 
                 Reference = preAuthorization.Order.Reference, 
-                OrderId = preAuthorization.OrderId, 
-                MyOrdersUrl = $"{_configuration.GetValue<string>("Portal:url")}/#/my-orders/{preAuthorization.OrderId:N}"
+                MyOrdersUrl = $"{_configuration.GetValue<string>("Portal:url")}/#/my-orders/"
             };
         }
     }

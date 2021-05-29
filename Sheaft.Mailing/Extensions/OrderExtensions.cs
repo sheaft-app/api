@@ -7,7 +7,7 @@ namespace Sheaft.Mailing.Extensions
 {
     public static class OrderExtensions
     {
-        public static OrderSummaryMailerModel GetTemplateData(this Domain.Order order, string url)
+        public static OrderSummaryMailerModel GetTemplateData(this Domain.Order order, string orderId, string url)
         {
             var producers = order.Products
                 .GroupBy(p => p.Producer)
@@ -36,7 +36,7 @@ namespace Sheaft.Mailing.Extensions
                 CreatedOn = order.CreatedOn,
                 Producers = producers,
                 ProductsCount = order.Products.Count,
-                OrderId = order.Id,
+                OrderId = orderId,
                 SenderKind = order.User.Kind,
                 SenderName = order.User.Name,
                 TotalPrice = order.TotalPrice,
@@ -79,16 +79,16 @@ namespace Sheaft.Mailing.Extensions
             };
         }
 
-        public static string GetOrderNotifModelAsString(this Domain.Order order)
+        public static string GetOrderNotifModelAsString(this Domain.Order order, string purchaseOrderId)
         {
-            return JsonConvert.SerializeObject(GetOrderNotifModel(order));
+            return JsonConvert.SerializeObject(GetOrderNotifModel(order, purchaseOrderId));
         }
 
-        public static object GetOrderNotifModel(this Domain.Order order)
+        public static object GetOrderNotifModel(this Domain.Order order, string purchaseOrderId)
         {
             return new
             {
-                PurchaseOrderId = order.Id,
+                PurchaseOrderId = purchaseOrderId,
                 Status = order.Status,
                 Reference = order.Reference,
                 CreatedOn = order.CreatedOn,

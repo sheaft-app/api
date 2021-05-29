@@ -16,6 +16,7 @@
       <PackageReference Include="EPPlus" Version="4.5.3.3" />
       <PackageReference Include="FluentValidation" Version="10.0.4" />
       <PackageReference Include="Hangfire.Core" Version="1.7.22" />
+      <PackageReference Include="HotChocolate.Types" Version="11.2.2" />
       <PackageReference Include="IdentityModel" Version="5.1.0" />
       <PackageReference Include="JWT" Version="8.2.0" />
       <PackageReference Include="MediatR" Version="9.0.0" />

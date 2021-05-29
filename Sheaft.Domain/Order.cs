@@ -113,7 +113,6 @@ namespace Sheaft.Domain
                     break;
                 case OrderStatus.Refused:
                     ExpiredOn = null;
-                    DomainEvents.Add(new OrderRefusedEvent(Id));
                     break;
                 case OrderStatus.Confirmed:
                     ExpiredOn = null;

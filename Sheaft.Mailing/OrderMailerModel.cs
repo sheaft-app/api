@@ -10,7 +10,6 @@ namespace Sheaft.Mailing
         public DateTimeOffset CreatedOn { get; set; }
         public int ProductsCount { get; set; }
         public string Reference { get; set; }
-        public Guid OrderId { get; set; }
         public string MyOrdersUrl { get; set; }
     }
 }

@@ -5,7 +5,7 @@ namespace Sheaft.Mailing.Extensions
 {
     public static class PurchaseOrderExtensions
     {
-        public static PurchaseOrderMailerModel GetTemplateData(this Domain.PurchaseOrder purchaseOrder, string url)
+        public static PurchaseOrderMailerModel GetTemplateData(this Domain.PurchaseOrder purchaseOrder, string purchaseOrderId, string url)
         {
             var senderName = purchaseOrder.SenderInfo.Name;
             var lines = purchaseOrder.Products.Select(o => new PurchaseOrderLineMailerModel 
@@ -18,6 +18,7 @@ namespace Sheaft.Mailing.Extensions
             var address = purchaseOrder.ExpectedDelivery.Address;
             return new PurchaseOrderMailerModel 
             { 
+                Id = purchaseOrderId,
                 Lines = lines, 
                 SenderName = senderName,
                 Reference = purchaseOrder.Reference, 
@@ -35,16 +36,16 @@ namespace Sheaft.Mailing.Extensions
             };
         }
 
-        public static string GetPurchaseNotifModelAsString(this Domain.PurchaseOrder purchaseOrder)
+        public static string GetPurchaseNotifModelAsString(this Domain.PurchaseOrder purchaseOrder, string purchaseOrderId)
         {
-            return JsonConvert.SerializeObject(GetPurchaseNotifModel(purchaseOrder));
+            return JsonConvert.SerializeObject(GetPurchaseNotifModel(purchaseOrder, purchaseOrderId));
         }
 
-        public static object GetPurchaseNotifModel(this Domain.PurchaseOrder purchaseOrder)
+        public static object GetPurchaseNotifModel(this Domain.PurchaseOrder purchaseOrder, string purchaseOrderId)
         {
             return new
             {
-                PurchaseOrderId = purchaseOrder.Id,
+                PurchaseOrderId = purchaseOrderId,
                 Status = purchaseOrder.Status,
                 Reference = purchaseOrder.Reference,
                 VendorName = purchaseOrder.VendorInfo.Name,

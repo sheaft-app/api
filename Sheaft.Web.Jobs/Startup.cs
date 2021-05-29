@@ -9,6 +9,7 @@ using Amazon.SimpleEmail;
 using Hangfire;
 using Hangfire.Dashboard;
 using Hangfire.SqlServer;
+using HotChocolate.Types.Relay;
 using IdentityModel;
 using MangoPay.SDK;
 using MediatR;
@@ -229,6 +230,8 @@ namespace Sheaft.Web.Jobs
             
             services.AddScoped<IDeliveryService, DeliveryService>();
             services.AddScoped<IOrderService, OrderService>();
+
+            services.AddScoped<IIdSerializer, IdSerializer>();
             
             services.AddScopedDynamic<IProductsFileImporter>(typeof(ExcelProductsImporter).Assembly.GetTypes().Where(t => t.GetInterfaces().Contains(typeof(IProductsFileImporter))));
             services.AddScopedDynamic<IPickingOrdersFileExporter>(typeof(ExcelPickingOrdersExporter).Assembly.GetTypes().Where(t => t.GetInterfaces().Contains(typeof(IPickingOrdersFileExporter))));
