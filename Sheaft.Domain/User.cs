@@ -239,7 +239,7 @@ namespace Sheaft.Domain
             if (Points == null)
                 Points = new List<UserPoint>();
 
-            var points = new UserPoint(Guid.NewGuid(), kind, quantity, createdOn ?? DateTimeOffset.UtcNow);
+            var points = new UserPoint(this, Guid.NewGuid(), kind, quantity, createdOn ?? DateTimeOffset.UtcNow);
             Points.Add(points);
             RefreshPoints();
         }
