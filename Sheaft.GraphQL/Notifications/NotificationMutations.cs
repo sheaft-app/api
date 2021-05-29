@@ -27,7 +27,7 @@ namespace Sheaft.GraphQL.Notifications
 
         [GraphQLName("markNotificationsAsRead")]
         [Authorize(Policy = Policies.REGISTERED)]
-        [GraphQLType(typeof(DateType))]
+        [GraphQLType(typeof(DateTimeType))]
         public async Task<DateTimeOffset> MarkMyNotificationsAsReadAsync([Service] ISheaftMediatr mediatr, CancellationToken token)
         {
             var input = new MarkUserNotificationsAsReadCommand(CurrentUser) {ReadBefore = DateTimeOffset.UtcNow};
