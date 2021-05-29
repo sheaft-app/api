@@ -100,7 +100,7 @@ namespace Sheaft.Mediatr.PreAuthorization.Commands
                 preAuthorization.SetResult(result.Data.ResultCode, result.Data.ResultMessage);
                 preAuthorization.SetSecureModeRedirectUrl(result.Data.SecureModeRedirectUrl);
                 
-                order.SetStatus(OrderStatus.Validated);
+                order.SetStatus(OrderStatus.Waiting);
                 
                 await _context.SaveChangesAsync(token);
                 await transaction.CommitAsync(token);

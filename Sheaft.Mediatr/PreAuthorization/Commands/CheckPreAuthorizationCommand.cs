@@ -19,8 +19,8 @@ namespace Sheaft.Mediatr.PreAuthorization.Commands
     {
         protected CheckPreAuthorizationCommand()
         {
-            
         }
+
         [JsonConstructor]
         public CheckPreAuthorizationCommand(RequestUser requestUser) : base(requestUser)
         {
@@ -42,16 +42,16 @@ namespace Sheaft.Mediatr.PreAuthorization.Commands
 
         public async Task<Result> Handle(CheckPreAuthorizationCommand request, CancellationToken token)
         {
-            var preAuthorization = await _context.PreAuthorizations.SingleAsync(e => e.Id == request.PreAuthorizationId, token);
-            if (preAuthorization.Status == PreAuthorizationStatus.Succeeded && preAuthorization.PaymentStatus == PaymentStatus.Waiting)
-            {
-                var result = await _mediatr.Process(
-                    new RefreshPreAuthorizationStatusCommand(request.RequestUser, preAuthorization.Identifier),
-                    token);
-                if (!result.Succeeded)
-                    return Failure(result);
-            }
-            
+            var preAuthorization =
+                await _context.PreAuthorizations.SingleAsync(e => e.Id == request.PreAuthorizationId, token);
+
+            var result = await _mediatr.Process(
+                new RefreshPreAuthorizationStatusCommand(request.RequestUser, preAuthorization.Identifier),
+                token);
+
+            if (!result.Succeeded)
+                return Failure(result);
+
             return Success();
         }
     }
