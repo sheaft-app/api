@@ -18,7 +18,6 @@ namespace Sheaft.Domain
             IEnumerable<DeliveryHours> openingHours, string name, string description = null)
         {
             Id = id;
-            Name = name;
             Kind = kind;
             Description = description;
 
@@ -29,6 +28,7 @@ namespace Sheaft.Domain
             Closings = new List<DeliveryClosing>();
             DeliveryHours = new List<DeliveryHours>();
             
+            SetName(name);
             SetDeliveryHours(openingHours);
             SetAvailability(available);
             
@@ -97,6 +97,9 @@ namespace Sheaft.Domain
 
         public void SetName(string name)
         {
+            if (string.IsNullOrWhiteSpace(name))
+                throw SheaftException.Validation();
+            
             Name = name;
         }
 
