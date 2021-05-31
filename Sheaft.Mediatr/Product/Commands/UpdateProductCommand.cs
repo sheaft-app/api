@@ -131,11 +131,11 @@ namespace Sheaft.Mediatr.Product.Commands
                     entity.AddOrUpdateCatalogPrice(catalog, catalogPrice.WholeSalePricePerUnit);
                 }
                 
+                var pictures = entity.Pictures.ToList();
+                entity.ClearPictures();
+                
                 if (request.Pictures != null && request.Pictures.Any())
                 {
-                    var pictures = entity.Pictures.ToList();
-                    entity.ClearPictures();
-                    
                     var result = Success<string>();
                     foreach (var picture in request.Pictures.OrderBy(p => p.Position))
                     {
