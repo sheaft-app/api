@@ -11,6 +11,7 @@
       <PackageReference Include="HotChocolate.Data" Version="11.2.2" />
       <PackageReference Include="HotChocolate.Data.EntityFramework" Version="11.2.2" />
       <PackageReference Include="HotChocolate.Types" Version="11.2.2" />
+      <PackageReference Include="HotChocolate.Types.Scalars.Upload" Version="11.2.2" />
       <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.2.0" />
       <PackageReference Include="Microsoft.Extensions.Localization.Abstractions" Version="5.0.5" />
       <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="5.0.0" />

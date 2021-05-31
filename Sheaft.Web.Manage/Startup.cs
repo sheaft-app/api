@@ -22,6 +22,7 @@ using Hangfire;
 using Newtonsoft.Json;
 using Amazon.SimpleEmail;
 using Amazon;
+using HotChocolate.Types.Relay;
 using MediatR;
 using Serilog;
 using Serilog.Events;
@@ -244,6 +245,8 @@ namespace Sheaft.Web.Manage
             
             services.AddScoped<IDeliveryService, DeliveryService>();
             services.AddScoped<IOrderService, OrderService>();
+            
+            services.AddSingleton<IIdSerializer, IdSerializer>();
             
             services.AddScopedDynamic<IProductsFileImporter>(typeof(ExcelProductsImporter).Assembly.GetTypes().Where(t => t.GetInterfaces().Contains(typeof(IProductsFileImporter))));
             services.AddScopedDynamic<IPickingOrdersFileExporter>(typeof(ExcelPickingOrdersExporter).Assembly.GetTypes().Where(t => t.GetInterfaces().Contains(typeof(IPickingOrdersFileExporter))));

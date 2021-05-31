@@ -231,7 +231,7 @@ namespace Sheaft.Web.Jobs
             services.AddScoped<IDeliveryService, DeliveryService>();
             services.AddScoped<IOrderService, OrderService>();
 
-            services.AddScoped<IIdSerializer, IdSerializer>();
+            services.AddSingleton<IIdSerializer, IdSerializer>();
             
             services.AddScopedDynamic<IProductsFileImporter>(typeof(ExcelProductsImporter).Assembly.GetTypes().Where(t => t.GetInterfaces().Contains(typeof(IProductsFileImporter))));
             services.AddScopedDynamic<IPickingOrdersFileExporter>(typeof(ExcelPickingOrdersExporter).Assembly.GetTypes().Where(t => t.GetInterfaces().Contains(typeof(IPickingOrdersFileExporter))));

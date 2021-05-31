@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -18,14 +19,17 @@ using NetTopologySuite.Geometries;
 using Newtonsoft.Json;
 using Sheaft.Application.Extensions;
 using Sheaft.Application.Interfaces.Infrastructure;
+using Sheaft.Application.Interfaces.Mediatr;
 using Sheaft.Application.Models;
 using Sheaft.Application.Security;
 using Sheaft.Domain;
 using Sheaft.Domain.Common;
 using Sheaft.Domain.Enum;
+using Sheaft.GraphQL.Jobs;
 using Sheaft.GraphQL.Types.Inputs;
 using Sheaft.GraphQL.Types.Outputs;
 using Sheaft.Infrastructure.Persistence;
+using Sheaft.Mediatr.Product.Commands;
 using Sheaft.Options;
 
 namespace Sheaft.GraphQL.Products
@@ -174,6 +178,28 @@ namespace Sheaft.GraphQL.Products
                 Count = count,
                 Products = orderedProducts
             };
+        }
+
+        [GraphQLName("importProducts")]
+        [Authorize(Policy = Policies.PRODUCER)]
+        [GraphQLType(typeof(JobType))]
+        public async Task<Job> ImportProducts(IFile file, [Service] ISheaftMediatr mediatr, 
+            JobsByIdBatchDataLoader jobsDataLoader, CancellationToken token)
+        {
+            using (var stream = file.OpenReadStream())
+            {
+                using (var content = new MemoryStream())
+                {
+                    await stream.CopyToAsync(content, token);
+                    var input = new QueueImportProductsCommand(CurrentUser)
+                    {
+                        ProducerId = CurrentUser.Id, FileName = file.Name, FileStream = content.ToArray()
+                    };
+
+                    var result = await mediatr.Process(input, token);
+                    return await jobsDataLoader.LoadAsync(result.Data, token);
+                }
+            }
         }
     }
 }

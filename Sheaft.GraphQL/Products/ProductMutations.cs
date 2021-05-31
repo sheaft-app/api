@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -12,6 +13,7 @@ using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Application.Interfaces.Mediatr;
 using Sheaft.Application.Security;
 using Sheaft.Domain;
+using Sheaft.GraphQL.Jobs;
 using Sheaft.GraphQL.Types.Inputs;
 using Sheaft.GraphQL.Types.Outputs;
 using Sheaft.Mediatr.Product.Commands;
@@ -61,18 +63,6 @@ namespace Sheaft.GraphQL.Products
         {
             await ExecuteAsync(mediatr, input, token);
             return await productsDataLoader.LoadAsync(input.ProductId, token);
-        }
-
-        [GraphQLName("setProductsAvailability")]
-        [Authorize(Policy = Policies.PRODUCER)]
-        [GraphQLType(typeof(ListType<ProductType>))]
-        public async Task<IEnumerable<Product>> SetProductsAvailabilityAsync(
-            [GraphQLType(typeof(SetProductsAvailabilityInputType))] [GraphQLName("input")]
-            SetProductsAvailabilityCommand input, [Service] ISheaftMediatr mediatr,
-            ProductsByIdBatchDataLoader productsDataLoader, CancellationToken token)
-        {
-            await ExecuteAsync(mediatr, input, token);
-            return await productsDataLoader.LoadAsync(input.ProductIds.ToList(), token);
         }
 
         [GraphQLName("deleteProducts")]
