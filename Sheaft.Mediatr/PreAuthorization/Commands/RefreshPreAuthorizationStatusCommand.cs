@@ -60,18 +60,22 @@ namespace Sheaft.Mediatr.PreAuthorization.Commands
                 return Failure<PreAuthorizationStatus>(pspResult);
 
             preAuthorization.SetStatus(pspResult.Data.Status);
+            preAuthorization.SetPaymentStatus(pspResult.Data.PaymentStatus);
             preAuthorization.SetResult(pspResult.Data.ResultCode, pspResult.Data.ResultMessage);
-            preAuthorization.SetAsProcessed();
 
+            if(preAuthorization.PaymentStatus != PaymentStatus.Waiting)
+                preAuthorization.SetAsProcessed();
+            
             await _context.SaveChangesAsync(token);
 
-            switch (preAuthorization.Status)
+            switch (preAuthorization.PaymentStatus)
             {
-                case PreAuthorizationStatus.Failed:
+                case PaymentStatus.Cancelled:
+                case PaymentStatus.Expired:
                     _mediatr.Post(new FailOrderCommand(request.RequestUser)
                         {OrderId = preAuthorization.OrderId});
                     break;
-                case PreAuthorizationStatus.Succeeded:
+                case PaymentStatus.Validated:
                     _mediatr.Post(new ConfirmOrderCommand(request.RequestUser) {OrderId = preAuthorization.OrderId});
                     break;
             }
