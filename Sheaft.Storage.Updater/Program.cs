@@ -19,10 +19,10 @@ namespace Sheaft.Storage.Updater
             var success = true;
             await foreach (var blob in containerClient.GetBlobsAsync(prefix: "users", cancellationToken: CancellationToken.None))
             {
-                if (blob.Name.Contains("/profile/") || !blob.Name.Contains(".jpg")) 
+                if (blob.Name.Contains("/profile/") || !blob.Name.Contains(".png")) 
                     continue;
                 
-                var destBlob = containerClient.GetBlobClient(blob.Name.Replace(".jpg", ".png"));
+                var destBlob = containerClient.GetBlobClient(blob.Name.Replace(".png", ".jpg"));
                 var copy = await destBlob.StartCopyFromUriAsync(new Uri(containerClient.Uri + "/" + blob.Name),
                     cancellationToken: CancellationToken.None);
                 var copyResponse = await copy.WaitForCompletionAsync();
@@ -35,10 +35,10 @@ namespace Sheaft.Storage.Updater
             
             await foreach (var blob in containerClient.GetBlobsAsync(prefix: "products", cancellationToken: CancellationToken.None))
             {
-                if (!blob.Name.Contains(".jpg")) 
+                if (!blob.Name.Contains(".png")) 
                     continue;
                 
-                var destBlob = containerClient.GetBlobClient(blob.Name.Replace(".jpg", ".png"));
+                var destBlob = containerClient.GetBlobClient(blob.Name.Replace(".png", ".jpg"));
                 var copy = await destBlob.StartCopyFromUriAsync(new Uri(containerClient.Uri + "/" + blob.Name),
                     cancellationToken: CancellationToken.None);
                 var copyResponse = await copy.WaitForCompletionAsync();
@@ -51,10 +51,10 @@ namespace Sheaft.Storage.Updater
             
             await foreach (var blob in containerClient.GetBlobsAsync(prefix: "tags", cancellationToken: CancellationToken.None))
             {
-                if (!blob.Name.Contains(".jpg")) 
+                if (!blob.Name.Contains(".png")) 
                     continue;
                 
-                var destBlob = containerClient.GetBlobClient(blob.Name.Replace(".jpg", ".png"));
+                var destBlob = containerClient.GetBlobClient(blob.Name.Replace(".png", ".jpg"));
                 var copy = await destBlob.StartCopyFromUriAsync(new Uri(containerClient.Uri + "/" + blob.Name),
                     cancellationToken: CancellationToken.None);
                 var copyResponse = await copy.WaitForCompletionAsync();

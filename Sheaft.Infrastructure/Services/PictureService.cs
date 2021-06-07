@@ -16,7 +16,9 @@ using Sheaft.Core;
 using Sheaft.Domain;
 using Sheaft.Domain.Enum;
 using Sheaft.Options;
+using SixLabors.ImageSharp.Formats.Jpeg;
 using SixLabors.ImageSharp.Formats.Png;
+using SixLabors.ImageSharp.Processing.Processors.Transforms;
 
 namespace Sheaft.Infrastructure.Services
 {
@@ -40,7 +42,8 @@ namespace Sheaft.Infrastructure.Services
             _blobService = blobService;
         }
 
-        public async Task<Result<string>> HandleUserPictureAsync(User entity, Guid pictureId, string picture, CancellationToken token)
+        public async Task<Result<string>> HandleUserPictureAsync(User entity, Guid pictureId, string picture,
+            CancellationToken token)
         {
             var bytes = await RetrievePictureBytesAsync(picture);
             if (bytes == null)
@@ -64,15 +67,8 @@ namespace Sheaft.Infrastructure.Services
             {
                 using (var blobStream = new MemoryStream())
                 {
-                    await image.Clone(context => context.Resize(new ResizeOptions
-                    {
-                        Mode = ResizeMode.Max,
-                        Size = new Size(128, 128),
-                        Compand = true,
-                        Sampler = KnownResamplers.Lanczos3
-                    })).SaveAsync(blobStream,
-                        new PngEncoder {CompressionLevel = PngCompressionLevel.DefaultCompression, IgnoreMetadata = true},
-                        token);
+                    await image.SaveAsync(blobStream,
+                        new JpegEncoder {Quality = 100}, token);
 
                     return await _blobService.UploadUserProfileAsync(entity.Id, blobStream.ToArray(), token);
                 }
@@ -90,8 +86,7 @@ namespace Sheaft.Infrastructure.Services
                 using (var blobStream = new MemoryStream())
                 {
                     await image.SaveAsync(blobStream,
-                        new PngEncoder
-                            {CompressionLevel = PngCompressionLevel.DefaultCompression, IgnoreMetadata = true}, token);
+                        new JpegEncoder {Quality = 100}, token);
 
                     return await _blobService.UploadTagPictureAsync(tag.Id, blobStream.ToArray(), token);
                 }
@@ -109,8 +104,7 @@ namespace Sheaft.Infrastructure.Services
                 using (var blobStream = new MemoryStream())
                 {
                     await image.SaveAsync(blobStream,
-                        new PngEncoder
-                            {CompressionLevel = PngCompressionLevel.DefaultCompression, IgnoreMetadata = true}, token);
+                        new JpegEncoder {Quality = 100}, token);
 
                     return await _blobService.UploadTagIconAsync(tag.Id, blobStream.ToArray(), token);
                 }
@@ -129,12 +123,15 @@ namespace Sheaft.Infrastructure.Services
 
             using (Image image = Image.Load(bytes))
             {
-                await UploadProductPreviewAsync(image, entity.ProducerId, entity.Id, pictureId, PictureSize.SMALL, token);
-                await UploadProductPreviewAsync(image, entity.ProducerId, entity.Id, pictureId, PictureSize.MEDIUM, token);
-                return await UploadProductPreviewAsync(image, entity.ProducerId, entity.Id, pictureId, PictureSize.LARGE, token);
+                await UploadProductPreviewAsync(image, entity.ProducerId, entity.Id, pictureId, PictureSize.SMALL,
+                    token);
+                await UploadProductPreviewAsync(image, entity.ProducerId, entity.Id, pictureId, PictureSize.MEDIUM,
+                    token);
+                return await UploadProductPreviewAsync(image, entity.ProducerId, entity.Id, pictureId,
+                    PictureSize.LARGE, token);
             }
         }
-        
+
         private string GetDefaultProductPicture(IEnumerable<Tag> tags)
         {
             var category = tags.FirstOrDefault(t => t.Kind == TagKind.Category);
@@ -147,87 +144,57 @@ namespace Sheaft.Infrastructure.Services
         {
             using (var blobStream = new MemoryStream())
             {
-                var width = image.Width;
-                var height = image.Height;
+                var width = image.Width < _pictureOptions.User.Large.Width ? image.Width : _pictureOptions.User.Large.Width;
+                var quality = _pictureOptions.User.Large.Quality;
 
                 switch (size)
                 {
                     case PictureSize.MEDIUM:
-                        var mediumDivider = GetDivider(2, width, height, _pictureOptions.User.Medium.Width, _pictureOptions.User.Medium.Height);
-                        width /= mediumDivider;
-                        height /= mediumDivider;
+                        width = image.Width < _pictureOptions.User.Medium.Width ? image.Width : _pictureOptions.User.Medium.Width;
+                        quality = _pictureOptions.User.Medium.Quality;
                         break;
                     case PictureSize.SMALL:
-                        var smallDivider = GetDivider(4, width, height, _pictureOptions.User.Small.Width, _pictureOptions.User.Small.Height);
-                        width /= smallDivider;
-                        height /= smallDivider;
+                        width = image.Width < _pictureOptions.User.Small.Width ? image.Width : _pictureOptions.User.Small.Width;
+                        quality = _pictureOptions.User.Small.Quality;
                         break;
                 }
 
-                await image.Clone(context => context.Resize(new ResizeOptions
-                {
-                    Mode = ResizeMode.Max,
-                    Size = new Size(width, height),
-                    Compand = true,
-                    Sampler = KnownResamplers.Lanczos3
-                })).SaveAsync(blobStream,
-                    new PngEncoder {CompressionLevel = PngCompressionLevel.DefaultCompression, IgnoreMetadata = true},
-                    token);
-
+                await image.Clone(context => context.Resize(width, 0, true))
+                    .SaveAsync(blobStream,
+                        new JpegEncoder {Quality = quality }, token);
+                
                 return await _blobService.UploadUserPictureAsync(userId, pictureId, size,
                     blobStream.ToArray(), token);
             }
         }
-        
+
         private async Task<Result<string>> UploadProductPreviewAsync(Image image, Guid userId, Guid productId,
             Guid pictureId, string size, CancellationToken token)
         {
             using (var blobStream = new MemoryStream())
             {
-                var width = image.Width;
-                var height = image.Height;
+                var width = image.Width < _pictureOptions.Product.Large.Width ? image.Width : _pictureOptions.Product.Large.Width;
+                var quality = _pictureOptions.Product.Large.Quality;
 
                 switch (size)
                 {
                     case PictureSize.MEDIUM:
-                        var mediumDivider = GetDivider(2, width, height, _pictureOptions.Product.Medium.Width, _pictureOptions.Product.Medium.Height);
-                        width /= mediumDivider;
-                        height /= mediumDivider;
+                        width = image.Width < _pictureOptions.Product.Medium.Width ? image.Width : _pictureOptions.Product.Medium.Width;
+                        quality = _pictureOptions.Product.Medium.Quality;
                         break;
                     case PictureSize.SMALL:
-                        var smallDivider = GetDivider(4, width, height, _pictureOptions.Product.Small.Width, _pictureOptions.Product.Small.Height);
-                        width /= smallDivider;
-                        height /= smallDivider;
+                        width = image.Width < _pictureOptions.Product.Small.Width ? image.Width : _pictureOptions.Product.Small.Width;
+                        quality = _pictureOptions.Product.Small.Quality;
                         break;
                 }
 
-                await image.Clone(context => context.Resize(new ResizeOptions
-                {
-                    Mode = ResizeMode.Max,
-                    Size = new Size(width, height),
-                    Compand = true,
-                    Sampler = KnownResamplers.Lanczos3
-                })).SaveAsync(blobStream,
-                    new PngEncoder {CompressionLevel = PngCompressionLevel.DefaultCompression, IgnoreMetadata = true},
-                    token);
+                await image.Clone(context => context.Resize(width, 0, true))
+                    .SaveAsync(blobStream,
+                        new JpegEncoder {Quality = quality }, token);
 
                 return await _blobService.UploadProductPictureAsync(userId, productId, pictureId, size,
                     blobStream.ToArray(), token);
             }
-        }
-
-        private int GetDivider(int mediumDivider, int width, int height, int minWidth, int minHeight)
-        {
-            while (mediumDivider > 1)
-            {
-                if (width / mediumDivider < minWidth &&
-                    height / mediumDivider < minHeight)
-                    mediumDivider--;
-                else
-                    break;
-            }
-
-            return mediumDivider;
         }
 
         private async Task<byte[]> RetrievePictureBytesAsync(string picture)

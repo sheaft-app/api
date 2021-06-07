@@ -30,7 +30,7 @@ namespace Sheaft.Infrastructure.Services
                 new BlobContainerClient(_storageOptions.ConnectionString, _storageOptions.Containers.Pictures);
             await containerClient.CreateIfNotExistsAsync(cancellationToken: token);
 
-            var blobClient = containerClient.GetBlobClient($"users/{userId:N}/profile/{Guid.NewGuid():N}.png");
+            var blobClient = containerClient.GetBlobClient($"users/{userId:N}/profile/{Guid.NewGuid():N}.jpg");
             await blobClient.DeleteIfExistsAsync(cancellationToken: token);
 
             using (var ms = new MemoryStream(data))
@@ -52,7 +52,7 @@ namespace Sheaft.Infrastructure.Services
             using (var ms = new MemoryStream(data))
                 await blobClient.UploadAsync(ms, token);
 
-            return Success(GetBlobUri(blobClient, _storageOptions.Containers.Pictures).Split($"_{size}.png")[0]);
+            return Success(GetBlobUri(blobClient, _storageOptions.Containers.Pictures).Split($"_{size}.jpg")[0]);
         }
 
         public async Task<Result<string>> UploadTagPictureAsync(Guid tagId, byte[] data, CancellationToken token)
@@ -61,7 +61,7 @@ namespace Sheaft.Infrastructure.Services
                 new BlobContainerClient(_storageOptions.ConnectionString, _storageOptions.Containers.Pictures);
             await containerClient.CreateIfNotExistsAsync(cancellationToken: token);
 
-            var blobClient = containerClient.GetBlobClient($"tags/{tagId:N}/pictures/{Guid.NewGuid():N}.png");
+            var blobClient = containerClient.GetBlobClient($"tags/{tagId:N}/pictures/{Guid.NewGuid():N}.jpg");
             await blobClient.DeleteIfExistsAsync(cancellationToken: token);
 
             using (var ms = new MemoryStream(data))
@@ -76,7 +76,7 @@ namespace Sheaft.Infrastructure.Services
                 new BlobContainerClient(_storageOptions.ConnectionString, _storageOptions.Containers.Pictures);
             await containerClient.CreateIfNotExistsAsync(cancellationToken: token);
 
-            var blobClient = containerClient.GetBlobClient($"tags/{tagId:N}/icons/{Guid.NewGuid():N}.png");
+            var blobClient = containerClient.GetBlobClient($"tags/{tagId:N}/icons/{Guid.NewGuid():N}.jpg");
             await blobClient.DeleteIfExistsAsync(cancellationToken: token);
 
             using (var ms = new MemoryStream(data))
@@ -96,7 +96,7 @@ namespace Sheaft.Infrastructure.Services
             using (var ms = new MemoryStream(data))
                 await blobClient.UploadAsync(ms, token);
 
-            return Success(GetBlobUri(blobClient, _storageOptions.Containers.Pictures).Split($"_{size}.png")[0]);
+            return Success(GetBlobUri(blobClient, _storageOptions.Containers.Pictures).Split($"_{size}.jpg")[0]);
         }
 
         public async Task<Result> CleanUserStorageAsync(Guid userId, CancellationToken token)
@@ -366,7 +366,7 @@ namespace Sheaft.Infrastructure.Services
                 new BlobContainerClient(_storageOptions.ConnectionString, _storageOptions.Containers.Pictures);
             await containerClient.CreateIfNotExistsAsync(cancellationToken: token);
 
-            var blobClient = containerClient.GetBlobClient($"users/{userId:N}/profile/pictures/{pictureId}.png");
+            var blobClient = containerClient.GetBlobClient($"users/{userId:N}/profile/pictures/{pictureId}.jpg");
             await blobClient.DeleteIfExistsAsync(cancellationToken: token);
 
             using (var ms = new MemoryStream(data))
@@ -420,12 +420,12 @@ namespace Sheaft.Infrastructure.Services
 
         private string GetProductPictureUrl(Guid userId, Guid productId, Guid pictureId, string size = null)
         {
-            return $"users/{userId:N}/products/{productId:N}/{pictureId:N}{(string.IsNullOrWhiteSpace(size) ? string.Empty : $"_{size}")}.png";
+            return $"users/{userId:N}/products/{productId:N}/{pictureId:N}{(string.IsNullOrWhiteSpace(size) ? string.Empty : $"_{size}")}.jpg";
         }
 
         private string GetUserPictureUrl(Guid userId, Guid pictureId, string size = null)
         {
-            return $"users/{userId:N}/pictures/{pictureId:N}{(string.IsNullOrWhiteSpace(size) ? string.Empty : $"_{size}")}.png";
+            return $"users/{userId:N}/pictures/{pictureId:N}{(string.IsNullOrWhiteSpace(size) ? string.Empty : $"_{size}")}.jpg";
         }
     }
 }
