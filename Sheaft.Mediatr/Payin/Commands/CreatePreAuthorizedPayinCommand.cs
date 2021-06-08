@@ -48,8 +48,7 @@ namespace Sheaft.Mediatr.Payin.Commands
         {
             var preAuthorization = await _context.PreAuthorizations.SingleAsync(e => e.Id == request.PreAuthorizationId, token);
             if (preAuthorization.Status != PreAuthorizationStatus.Succeeded 
-                && preAuthorization.PaymentStatus != PaymentStatus.Validated 
-                && preAuthorization.Order.Status != OrderStatus.Validated 
+                && preAuthorization.Order.Status != OrderStatus.Confirmed 
                 && !preAuthorization.Order.PurchaseOrders.Any(po =>
                     po.AcceptedOn.HasValue 
                     && !po.DroppedOn.HasValue))

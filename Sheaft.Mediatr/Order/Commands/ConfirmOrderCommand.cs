@@ -80,8 +80,7 @@ namespace Sheaft.Mediatr.Order.Commands
                 await transaction.CommitAsync(token);
 
                 var preAuthorization = await _context.PreAuthorizations.SingleOrDefaultAsync(p =>
-                    p.OrderId == order.Id && p.Status == PreAuthorizationStatus.Succeeded &&
-                    p.PaymentStatus == PaymentStatus.Validated, token);
+                    p.OrderId == order.Id && p.Status == PreAuthorizationStatus.Succeeded, token);
 
                 if (preAuthorization != null)
                 {
