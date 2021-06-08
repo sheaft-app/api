@@ -31,15 +31,19 @@ namespace Sheaft.GraphQL.Producers
     {
         private readonly HttpClient _httpClient;
         private readonly SireneOptions _sireneOptions;
+        private readonly SearchOptions _searchOptions;
+
         public ProducerQueries(
             ICurrentUserService currentUserService,
             IOptionsSnapshot<SireneOptions> sireneOptions,
+            IOptionsSnapshot<SearchOptions> searchOptions,
             IHttpClientFactory httpClientFactory,
             IHttpContextAccessor httpContextAccessor)
             : base(currentUserService, httpContextAccessor)
         {
             _sireneOptions = sireneOptions.Value;
-
+            _searchOptions = searchOptions.Value;
+            
             _httpClient = httpClientFactory.CreateClient("sirene");
             _httpClient.BaseAddress = new Uri(_sireneOptions.Url);
             _httpClient.SetToken(_sireneOptions.Scheme, _sireneOptions.ApiKey);
@@ -95,7 +99,7 @@ namespace Sheaft.GraphQL.Producers
             {
                 currentPosition =
                     LocationProvider.CreatePoint(store.Address.Latitude.Value, store.Address.Longitude.Value);
-                query = query.Where(p => p.Producer.Address.Location.Distance(currentPosition) < 200000);
+                query = query.Where(p => p.Producer.Address.Location.Distance(currentPosition) < _searchOptions.ProducersDistance);
             }
 
             var producersId = await query.Select(c => c.Producer.Id).Distinct().ToListAsync(token);

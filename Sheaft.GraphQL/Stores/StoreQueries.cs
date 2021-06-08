@@ -29,14 +29,18 @@ namespace Sheaft.GraphQL.Stores
     {
         private readonly HttpClient _httpClient;
         private readonly SireneOptions _sireneOptions;
+        private readonly SearchOptions _searchOptions;
+
         public StoreQueries(
             ICurrentUserService currentUserService,
             IOptionsSnapshot<SireneOptions> sireneOptions,
+            IOptionsSnapshot<SearchOptions> searchOptions,
             IHttpClientFactory httpClientFactory,
             IHttpContextAccessor httpContextAccessor)
             : base(currentUserService, httpContextAccessor)
         {
             _sireneOptions = sireneOptions.Value;
+            _searchOptions = searchOptions.Value;
 
             _httpClient = httpClientFactory.CreateClient("sirene");
             _httpClient.BaseAddress = new Uri(_sireneOptions.Url);
@@ -92,7 +96,7 @@ namespace Sheaft.GraphQL.Stores
             {
                 currentPosition =
                     LocationProvider.CreatePoint(producer.Address.Latitude.Value, producer.Address.Longitude.Value);
-                query = query.Where(p => p.Address.Location.Distance(currentPosition) < 200000);
+                query = query.Where(p => p.Address.Location.Distance(currentPosition) < _searchOptions.StoresDistance);
             }
 
             var count = await query.CountAsync(token);

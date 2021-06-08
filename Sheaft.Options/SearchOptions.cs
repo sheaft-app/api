@@ -8,6 +8,9 @@
         public string Name { get; set; }
         public Indexes Indexes { get; set; }
         public Suggesters Suggesters { get; set; }
+        public int ProductsDistance { get; set; } = 1000000;
+        public int StoresDistance { get; set; } = 300000;
+        public int ProducersDistance { get; set; } = 300000;
     }
 
     public class Indexes

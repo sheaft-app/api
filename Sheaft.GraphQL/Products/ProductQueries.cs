@@ -38,14 +38,17 @@ namespace Sheaft.GraphQL.Products
     public class ProductQueries : SheaftQuery
     {
         private readonly RoleOptions _roleOptions;
+        private readonly SearchOptions _searchOptions;
 
         public ProductQueries(
             ICurrentUserService currentUserService,
             IOptionsSnapshot<RoleOptions> roleOptions,
+            IOptionsSnapshot<SearchOptions> searchOptions,
             IHttpContextAccessor httpContextAccessor)
             : base(currentUserService, httpContextAccessor)
         {
             _roleOptions = roleOptions.Value;
+            _searchOptions = searchOptions.Value;
         }
 
         [GraphQLName("product")]
@@ -134,16 +137,14 @@ namespace Sheaft.GraphQL.Products
             if (terms.Tags != null && terms.Tags.Any())
             {
                 foreach (var tag in terms.Tags)
-                {
                     query = query.Where(p => p.Tags.Contains(tag));
-                }
             }
 
             Point currentPosition = null;
             if (terms.Longitude.HasValue && terms.Latitude.HasValue)
             {
                 currentPosition = LocationProvider.CreatePoint(terms.Latitude.Value, terms.Longitude.Value);
-                query = query.Where(p => p.Location.Distance(currentPosition) < 200000);
+                query = query.Where(p => p.Location.Distance(currentPosition) < _searchOptions.ProductsDistance);
             }
 
             var count = await query.CountAsync(token);

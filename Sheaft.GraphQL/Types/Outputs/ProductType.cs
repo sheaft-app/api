@@ -205,7 +205,7 @@ namespace Sheaft.GraphQL.Types.Outputs
                 .UseDbContext<QueryDbContext>()
                 .ResolveWith<ProductResolvers>(c => c.GetTags(default!, default!, default!, default))
                 .Type<ListType<TagType>>();
-
+            
             descriptor
                 .Field(c => c.Ratings)
                 .Name("ratings")
