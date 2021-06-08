@@ -31,6 +31,7 @@ namespace Sheaft.GraphQL.Types.Outputs
 
             descriptor
                 .Field("kind")
+                .Type<EnumType<LegalKind>>()
                 .Resolver(c =>
                 {
                     switch (c.Parent<SirenBusinessDto>().UniteLegale?.CategorieJuridiqueUniteLegale)

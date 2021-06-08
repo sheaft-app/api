@@ -84,15 +84,13 @@ namespace Sheaft.GraphQL.Users
 
         [GraphQLName("siretInfo")]
         [GraphQLType(typeof(SirenBusinessDtoType))]
-        [UseDbContext(typeof(QueryDbContext))]
-        [UseSingleOrDefault]
         public async Task<SirenBusinessDto> RetrieveSiretInfosAsync(string siret, CancellationToken token)
         {
             var result = await _httpClient.GetAsync(string.Format(_sireneOptions.SearchSiretUrl, siret), token);
             if (!result.IsSuccessStatusCode)
                 return null;
 
-            var content = await result.Content.ReadAsStringAsync();
+            var content = await result.Content.ReadAsStringAsync(token);
             var contentObj = JsonConvert.DeserializeObject<SirenBusinessResult>(content);
             return contentObj.Etablissement;
         }
