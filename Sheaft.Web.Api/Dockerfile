@@ -17,6 +17,10 @@ COPY ["Sheaft.Domain/Sheaft.Domain.csproj", "Sheaft.Domain/"]
 COPY ["Sheaft.Mailing/Sheaft.Mailing.csproj", "Sheaft.Mailing/"]
 COPY ["Sheaft.Infrastructure/Sheaft.Infrastructure.csproj", "Sheaft.Infrastructure/"]
 COPY ["Sheaft.Localization/Sheaft.Localization.csproj", "Sheaft.Localization/"]
+COPY ["Sheaft.Mediatr/Sheaft.Mediatr.csproj", "Sheaft.Mediatr/"]
+COPY ["Sheaft.Business/Sheaft.Business.csproj", "Sheaft.Business/"]
+COPY ["Sheaft.Core/Sheaft.Core.csproj", "Sheaft.Core/"]
+COPY ["Sheaft.Options/Sheaft.Options.csproj", "Sheaft.Options/"]
 RUN dotnet restore "Sheaft.Web.Api/Sheaft.Web.Api.csproj"
 COPY . .
 WORKDIR "/src/Sheaft.Web.Api"
