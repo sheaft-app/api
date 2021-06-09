@@ -22,7 +22,7 @@ namespace Sheaft.GraphQL.Orders
         public OrderQueries(
             ICurrentUserService currentUserService,
             IHttpContextAccessor httpContextAccessor)
-            :base(currentUserService, httpContextAccessor)
+            : base(currentUserService, httpContextAccessor)
         {
         }
 
@@ -41,6 +41,19 @@ namespace Sheaft.GraphQL.Orders
                 .Where(c => c.Id == id && c.Status == OrderStatus.Created && !c.UserId.HasValue);
         }
 
+        [GraphQLName("orderFromTransaction")]
+        [GraphQLType(typeof(OrderType))]
+        [UseDbContext(typeof(QueryDbContext))]
+        [UseSingleOrDefault]
+        public IQueryable<Order> Get(string identifier, [ScopedService] QueryDbContext context)
+        {
+            SetLogTransaction(identifier);
+            
+            return context.PreAuthorizations
+                .Where(p => p.Identifier == identifier)
+                .Select(p => p.Order);
+        }
+
         [GraphQLName("currentOrder")]
         [GraphQLType(typeof(OrderType))]
         [UseDbContext(typeof(QueryDbContext))]
@@ -56,7 +69,7 @@ namespace Sheaft.GraphQL.Orders
 
             return new List<Order>().AsQueryable();
         }
-        
+
         [GraphQLName("orders")]
         [GraphQLType(typeof(ListType<OrderType>))]
         [UseDbContext(typeof(QueryDbContext))]

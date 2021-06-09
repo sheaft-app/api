@@ -52,34 +52,25 @@ namespace Sheaft.Domain
 
         public void SetPreAuthorizedPayin(PreAuthorizedPayin payin)
         {
-            if(PreAuthorizedPayinId.HasValue && (PreAuthorizedPayin.Status == TransactionStatus.Succeeded || PreAuthorizedPayin.Status == TransactionStatus.Created))
+            if (PreAuthorizedPayinId.HasValue && (PreAuthorizedPayin.Status == TransactionStatus.Succeeded ||
+                                                  PreAuthorizedPayin.Status == TransactionStatus.Created))
                 throw SheaftException.Conflict();
-            
+
             PreAuthorizedPayin = payin;
             PreAuthorizedPayinId = payin.Id;
         }
-        
+
         public void SetIdentifier(string identifier)
         {
             if (identifier == null)
                 return;
 
             Identifier = identifier;
+            SecureModeReturnURL += $"?preAuthorizationId={Identifier}";
         }
 
         public void SetStatus(PreAuthorizationStatus status)
         {
-            switch (status)
-            {
-                /*case PreAuthorizationStatus.Failed:
-                    DomainEvents.Add(new PreAuthorizationFailedEvent(Id));
-                    break;
-                case PreAuthorizationStatus.Succeeded:
-                    DomainEvents.Add(new PreAuthorizationSucceededEvent(Id));
-                    break;
-                    */
-            }
-            
             Status = status;
         }
 
@@ -127,7 +118,7 @@ namespace Sheaft.Domain
         {
             if (Processed)
                 throw SheaftException.Conflict();
-            
+
             Processed = true;
         }
 
