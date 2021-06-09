@@ -90,12 +90,7 @@ namespace Sheaft.Mediatr.Order.Commands
                         PreAuthorizationId = preAuthorization.Id
                     }, TimeSpan.FromMinutes(diff.TotalMinutes));
                 }
-
-                _mediatr.Post(new CreateUserPointsCommand(request.RequestUser)
-                {
-                    CreatedOn = DateTimeOffset.UtcNow, Kind = PointKind.PurchaseOrder, UserId = order.UserId.Value
-                });
-
+                
                 return Success(purchaseOrderIds.Select(p => p.Data));
             }
         }
