@@ -1,7 +1,6 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Amazon.SimpleEmail;
 using HotChocolate;
 using HotChocolate.AspNetCore.Authorization;
 using HotChocolate.Types;
@@ -11,6 +10,7 @@ using Sheaft.Application.Interfaces.Mediatr;
 using Sheaft.Application.Security;
 using Sheaft.Domain;
 using Sheaft.GraphQL.Types.Inputs;
+using Sheaft.GraphQL.Types.Outputs;
 using Sheaft.Mediatr.Notification.Commands;
 
 namespace Sheaft.GraphQL.Notifications
