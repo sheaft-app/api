@@ -58,7 +58,7 @@ namespace Sheaft.Mediatr.Payin.Commands
                 || preAuthorization.ExpirationDate < DateTimeOffset.UtcNow)
                 return Failure<Guid>(MessageKind.Unexpected);
 
-            var wallet = await _context.Wallets.SingleOrDefaultAsync(c => c.UserId == request.RequestUser.Id, token);
+            var wallet = await _context.Wallets.SingleOrDefaultAsync(c => c.UserId == preAuthorization.Order.UserId, token);
             if (preAuthorization.Order.TotalOnSalePrice < 1)
                 return Failure<Guid>(MessageKind.Order_Total_CannotBe_LowerThan, 1);
 

@@ -88,7 +88,7 @@ namespace Sheaft.Mediatr.Order.Commands
                     _mediatr.Schedule(new CreatePreAuthorizedPayinCommand(request.RequestUser)
                     {
                         PreAuthorizationId = preAuthorization.Id
-                    }, TimeSpan.FromHours(diff.TotalHours));
+                    }, TimeSpan.FromMinutes(diff.TotalMinutes));
                 }
 
                 _mediatr.Post(new CreateUserPointsCommand(request.RequestUser)

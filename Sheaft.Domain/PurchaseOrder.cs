@@ -133,6 +133,7 @@ namespace Sheaft.Domain
                         throw SheaftException.Validation(MessageKind.PurchaseOrder_CannotCancel_AlreadyIn_DeliveredStatus);
                     if (Status == PurchaseOrderStatus.Expired)
                         throw SheaftException.Validation();
+                    
                     DroppedOn = DateTimeOffset.UtcNow;
 
                     if (!skipNotification)
@@ -148,6 +149,7 @@ namespace Sheaft.Domain
                         throw SheaftException.Validation(MessageKind.PurchaseOrder_CannotCancel_AlreadyIn_DeliveredStatus);
                     if (Status == PurchaseOrderStatus.Expired)
                         throw SheaftException.Validation();
+                    
                     DroppedOn = DateTimeOffset.UtcNow;
 
                     if (!skipNotification)
@@ -161,6 +163,7 @@ namespace Sheaft.Domain
                         throw SheaftException.Validation(MessageKind.PurchaseOrder_CannotRefuse_AlreadyIn_RefusedStatus);
                     if (Status == PurchaseOrderStatus.Delivered)
                         throw SheaftException.Validation(MessageKind.PurchaseOrder_CannotRefuse_AlreadyIn_DeliveredStatus);
+                    
                     DroppedOn = DateTimeOffset.UtcNow;
 
                     if (!skipNotification)
@@ -170,6 +173,8 @@ namespace Sheaft.Domain
                 case PurchaseOrderStatus.Expired:
                     if(Status != PurchaseOrderStatus.Waiting)
                         throw SheaftException.Validation();
+                    
+                    DroppedOn = DateTimeOffset.UtcNow;
                     
                     if (!skipNotification)
                         DomainEvents.Add(new PurchaseOrderExpiredEvent(Id));

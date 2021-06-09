@@ -66,7 +66,7 @@ namespace Sheaft.Mediatr.PreAuthorization.Commands
         private async Task<IEnumerable<Guid>> GetNextPreAuthorizationIdsAsync(int skip, int take, CancellationToken token)
         {
             return await _context.PreAuthorizations
-                .Where(c => !c.Processed && c.Status == PreAuthorizationStatus.Created)
+                .Where(c => !c.Processed && c.Status == PreAuthorizationStatus.Created || c.Status == PreAuthorizationStatus.Succeeded)
                 .OrderBy(c => c.CreatedOn)
                 .Select(c => c.Id)
                 .Skip(skip)

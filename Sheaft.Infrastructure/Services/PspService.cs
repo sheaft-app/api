@@ -783,7 +783,7 @@ namespace Sheaft.Infrastructure.Services
                     preAuthorization.PreAuthorizedPayin.Author.Identifier,
                     new Money
                     {
-                        Amount = preAuthorization.Debited.GetAmount(),
+                        Amount = preAuthorization.PreAuthorizedPayin.Debited.GetAmount(),
                         Currency = CurrencyIso.EUR
                     },
                     new Money
@@ -794,7 +794,7 @@ namespace Sheaft.Infrastructure.Services
                     preAuthorization.PreAuthorizedPayin.CreditedWallet.Identifier,
                     preAuthorization.Identifier)
                 {
-                    Tag = $"Id='{preAuthorization.Id}'"
+                    Tag = $"Id='{preAuthorization.PreAuthorizedPayin.Id}'"
                 });
 
             return Success(new PspPaymentResultDto

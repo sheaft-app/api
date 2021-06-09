@@ -58,7 +58,7 @@ namespace Sheaft.Mediatr.Donation.Commands
         {
             var order = await _context.Orders.SingleAsync(e => e.Id == request.OrderId, token);
             var orderPayin = await _context.Payins
-                .SingleOrDefaultAsync(c => c.OrderId == order.Id && c.Status == TransactionStatus.Succeeded, token);
+                .SingleAsync(c => c.OrderId == order.Id && c.Status == TransactionStatus.Succeeded, token);
 
             var pendingDonations = await _context.Donations
                 .Where(t => t.OrderId == request.OrderId)

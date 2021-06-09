@@ -74,7 +74,7 @@ namespace Sheaft.Mediatr.PurchaseOrder.Commands
             
             var hasPayins = await _context.Payins.AnyAsync(p =>
                 (p.Status == TransactionStatus.Succeeded || p.Status == TransactionStatus.Waiting)
-                & p.OrderId == order.Id, token);
+                && p.OrderId == order.Id, token);
 
             if(hasPayins)
                 _mediatr.Schedule(new CreatePayinRefundCommand(request.RequestUser) {PurchaseOrderId = purchaseOrder.Id}, TimeSpan.FromDays(1));
