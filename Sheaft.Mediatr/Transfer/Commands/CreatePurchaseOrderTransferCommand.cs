@@ -55,6 +55,13 @@ namespace Sheaft.Mediatr.Transfer.Commands
             if (purchaseOrder.Status != PurchaseOrderStatus.Delivered)
                 return Failure<Guid>(MessageKind.Transfer_CannotCreate_PurchaseOrder_Invalid_Status);
 
+            var orderPayins = await _context.Payins
+                .Where(o => o.OrderId == purchaseOrder.OrderId)
+                .ToListAsync(token);
+
+            if (orderPayins.All(op => op.Status != TransactionStatus.Succeeded))
+                return Failure<Guid>(MessageKind.BadRequest);
+            
             var pendingTransfers = await _context.Transfers
                 .Where(t => t.PurchaseOrderId == request.PurchaseOrderId)
                 .ToListAsync(token);

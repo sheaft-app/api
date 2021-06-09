@@ -67,7 +67,7 @@ namespace Sheaft.Mediatr.Agreement.EventHandlers
             await _emailService.SendTemplatedEmailAsync(
                 email,
                 name,
-                $"{targetName} a accepté de commercer avec vous",
+                $"{targetName} a accepté votre partenariat",
                 nameof(AgreementAcceptedEvent),
                 agreement.GetNotificationData(_idSerializer.Serialize("Query", nameof(Agreement), agreement.Id), _configuration.GetValue<string>("Portal:url"), targetName),
                 true,

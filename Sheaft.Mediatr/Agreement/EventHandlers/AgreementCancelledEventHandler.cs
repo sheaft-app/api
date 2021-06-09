@@ -67,7 +67,7 @@ namespace Sheaft.Mediatr.Agreement.EventHandlers
             await _emailService.SendTemplatedEmailAsync(
                 email,
                 name,
-                $"{targetName} a annulé votre accord commercial",
+                $"{targetName} a annulé votre partenariat",
                 nameof(AgreementCancelledEvent),
                 agreement.GetNotificationData(_idSerializer.Serialize("Query", nameof(Agreement), agreement.Id), _configuration.GetValue<string>("Portal:url"), targetName),
                 true,

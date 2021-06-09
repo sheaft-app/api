@@ -54,7 +54,7 @@ namespace Sheaft.Mediatr.Payin.Commands
                     && !po.DroppedOn.HasValue))
                 return Success<Guid>();
             
-            if(preAuthorization.PreAuthorizedPayin != null
+            if(preAuthorization.PreAuthorizedPayin != null && (preAuthorization.PreAuthorizedPayin.Status == TransactionStatus.Waiting || preAuthorization.PreAuthorizedPayin.Status == TransactionStatus.Succeeded)
                 || preAuthorization.ExpirationDate < DateTimeOffset.UtcNow)
                 return Failure<Guid>(MessageKind.Unexpected);
 
