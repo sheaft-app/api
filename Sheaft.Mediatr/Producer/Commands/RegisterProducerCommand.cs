@@ -16,7 +16,9 @@ using Sheaft.Application.Models;
 using Sheaft.Core;
 using Sheaft.Core.Enums;
 using Sheaft.Domain;
+using Sheaft.Domain.Enum;
 using Sheaft.Mediatr.Auth.Commands;
+using Sheaft.Mediatr.Catalog.Commands;
 using Sheaft.Mediatr.Legal.Commands;
 using Sheaft.Mediatr.User.Commands;
 using Sheaft.Options;
@@ -27,8 +29,8 @@ namespace Sheaft.Mediatr.Producer.Commands
     {
         protected RegisterProducerCommand()
         {
-            
         }
+
         [JsonConstructor]
         public RegisterProducerCommand(RequestUser requestUser) : base(requestUser)
         {
@@ -73,7 +75,9 @@ namespace Sheaft.Mediatr.Producer.Commands
 
         public async Task<Result<Guid>> Handle(RegisterProducerCommand request, CancellationToken token)
         {
-            var producer = await _context.Producers.SingleOrDefaultAsync(r => r.Id == request.ProducerId || r.Email == request.Email, token);
+            var producer =
+                await _context.Producers.SingleOrDefaultAsync(
+                    r => r.Id == request.ProducerId || r.Email == request.Email, token);
             if (producer != null)
                 return Failure<Guid>(MessageKind.Register_User_AlreadyExists);
 
@@ -85,7 +89,7 @@ namespace Sheaft.Mediatr.Producer.Commands
                     request.Address.City,
                     request.Address.Country, department, request.Address.Longitude, request.Address.Latitude)
                 : null;
-            
+
             producer = new Domain.Producer(request.ProducerId, request.Name, request.FirstName, request.LastName,
                 request.Email,
                 address, request.OpenForNewBusiness, request.Phone);
@@ -142,6 +146,30 @@ namespace Sheaft.Mediatr.Producer.Commands
 
                 if (!result.Succeeded)
                     return result;
+
+                var catalogConsumerResult = await _mediatr.Process(new CreateCatalogCommand(request.RequestUser)
+                {
+                    Kind = CatalogKind.Consumers,
+                    Name = "Catalogue Consommateurs",
+                    IsAvailable = true,
+                    IsDefault = true,
+                    Products = new List<ProductPriceInputDto>()
+                }, token);
+                
+                if (!catalogConsumerResult.Succeeded)
+                    return catalogConsumerResult;
+                
+                var catalogStoreResult = await _mediatr.Process(new CreateCatalogCommand(request.RequestUser)
+                {
+                    Kind = CatalogKind.Stores,
+                    Name = "Catalogue Professionnels",
+                    IsAvailable = true,
+                    IsDefault = true,
+                    Products = new List<ProductPriceInputDto>()
+                }, token);
+                
+                if (!catalogStoreResult.Succeeded)
+                    return catalogStoreResult;
 
                 await transaction.CommitAsync(token);
 
