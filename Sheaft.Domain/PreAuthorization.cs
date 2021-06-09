@@ -79,6 +79,11 @@ namespace Sheaft.Domain
             PaymentStatus = paymentStatus;
         }
 
+        public void SetSecureModeNeeded(bool needed)
+        {
+            SecureModeNeeded = needed;
+        }
+
         public void SetExpirationDate(DateTimeOffset? expirationDate)
         {
             if (!expirationDate.HasValue)

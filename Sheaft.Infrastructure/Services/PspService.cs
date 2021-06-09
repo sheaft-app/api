@@ -523,6 +523,7 @@ namespace Sheaft.Infrastructure.Services
                 Debited = result.DebitedFunds.Amount.GetAmount(),
                 Remaining = result.RemainingFunds.Amount.GetAmount(),
                 SecureModeRedirectUrl = result.SecureModeRedirectURL,
+                SecureModeNeeded = result.SecureModeNeeded
             });
         }
 

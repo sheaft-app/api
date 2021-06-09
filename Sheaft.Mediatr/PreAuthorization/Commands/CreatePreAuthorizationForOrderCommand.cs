@@ -99,6 +99,7 @@ namespace Sheaft.Mediatr.PreAuthorization.Commands
                 preAuthorization.SetDebited(result.Data.Debited);
                 preAuthorization.SetResult(result.Data.ResultCode, result.Data.ResultMessage);
                 preAuthorization.SetSecureModeRedirectUrl(result.Data.SecureModeRedirectUrl);
+                preAuthorization.SetSecureModeNeeded(result.Data.SecureModeNeeded);
                 
                 order.SetStatus(OrderStatus.Validated);
                 

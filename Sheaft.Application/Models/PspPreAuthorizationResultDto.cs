@@ -11,6 +11,7 @@ namespace Sheaft.Application.Models
         public string ResultMessage { get; set; }
         public decimal Remaining { get; set; }
         public decimal Debited { get; set; }
+        public bool SecureModeNeeded { get; set; }
         public DateTimeOffset? ExpirationDate { get; set; }
         public string SecureModeRedirectUrl { get; set; }
     }

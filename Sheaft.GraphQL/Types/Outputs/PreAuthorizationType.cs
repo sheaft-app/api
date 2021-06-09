@@ -35,6 +35,10 @@ namespace Sheaft.GraphQL.Types.Outputs
             descriptor
                 .Field(c => c.SecureModeRedirectUrl)
                 .Name("secureModeRedirectURL");
+            
+            descriptor
+                .Field(c => c.SecureModeNeeded)
+                .Name("secureModeNeeded");
 
             descriptor
                 .Field(c => c.Order)
