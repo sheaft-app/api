@@ -82,15 +82,17 @@ namespace Sheaft.Mediatr.Order.Commands
                 var preAuthorization = await _context.PreAuthorizations.SingleOrDefaultAsync(p =>
                     p.OrderId == order.Id && p.Status == PreAuthorizationStatus.Succeeded, token);
 
-                if (preAuthorization != null)
-                {
-                    TimeSpan diff = preAuthorization.ExpirationDate.Value.AddDays(-2) - DateTimeOffset.Now;
-                    _mediatr.Schedule(new CreatePreAuthorizedPayinCommand(request.RequestUser)
-                    {
-                        PreAuthorizationId = preAuthorization.Id
-                    }, TimeSpan.FromMinutes(diff.TotalMinutes));
-                }
+                if (preAuthorization == null) 
+                    return Success(purchaseOrderIds.Select(p => p.Data));
                 
+                var expirationDate = preAuthorization.ExpirationDate ?? preAuthorization.CreatedOn.AddDays(7);
+                var diff = expirationDate.AddDays(-2) - DateTimeOffset.Now;
+                    
+                _mediatr.Schedule(new CreatePreAuthorizedPayinCommand(request.RequestUser)
+                {
+                    PreAuthorizationId = preAuthorization.Id
+                }, TimeSpan.FromMinutes(diff.TotalMinutes));
+
                 return Success(purchaseOrderIds.Select(p => p.Data));
             }
         }
