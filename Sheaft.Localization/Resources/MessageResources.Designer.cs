@@ -1676,5 +1676,17 @@ namespace Sheaft.Localization.Resources {
                 return ResourceManager.GetString("Unauthenticated", resourceCulture);
             }
         }
+        
+        internal static string Catalogs {
+            get {
+                return ResourceManager.GetString("Catalogs", resourceCulture);
+            }
+        }
+        
+        internal static string Catalogs_CannotRemove_Consumers {
+            get {
+                return ResourceManager.GetString("Catalogs_CannotRemove_Consumers", resourceCulture);
+            }
+        }
     }
 }

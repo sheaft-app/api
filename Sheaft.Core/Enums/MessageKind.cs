@@ -288,5 +288,7 @@
         Withholding_Cannot_Process_Pending = 106101,
         Withholding_Cannot_Process_Already_Succeeded = 106102,
         Withholding_Cannot_Process_Payout_No_Withholdings = 106103,
+        Catalogs = 107000,
+        Catalogs_CannotRemove_Consumers
     }
 }

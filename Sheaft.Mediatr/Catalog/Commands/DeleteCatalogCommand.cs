@@ -46,6 +46,9 @@ namespace Sheaft.Mediatr.Catalog.Commands
                 await _context.Catalogs
                     .SingleOrDefaultAsync(c => c.Id == request.CatalogId, token);
 
+            if (entity.Kind == CatalogKind.Consumers)
+                return Failure(MessageKind.Catalogs_CannotRemove_Consumers);
+
             var agreements = await _context.Agreements
                 .Where(a => a.Catalog != null && a.CatalogId == entity.Id)
                 .ToListAsync(token);
