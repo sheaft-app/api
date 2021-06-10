@@ -2,6 +2,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using HotChocolate.Types.Relay;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -33,21 +34,24 @@ namespace Sheaft.Mediatr.Producer.Commands
         IRequestHandler<GenerateProducersFileCommand, Result>
     {
         private readonly IBlobService _blobService;
+        private readonly IIdSerializer _idSerializer;
 
         public GenerateProducersFileCommandHandler(
             IAppDbContext context,
             ISheaftMediatr mediatr,
             IBlobService blobService,
+            IIdSerializer idSerializer,
             ILogger<GenerateProducersFileCommandHandler> logger)
             : base(mediatr, context, logger)
         {
             _blobService = blobService;
+            _idSerializer = idSerializer;
         }
 
         public async Task<Result> Handle(GenerateProducersFileCommand request, CancellationToken token)
         {
             var producers = await _context.Producers.ToListAsync(token);
-            var prods = producers.Select(p => new ProducerListItem(p));
+            var prods = producers.Select(p => new ProducerListItem(p, _idSerializer));
 
             var result = await _blobService.UploadProducersListAsync(
                 Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(prods,
@@ -65,10 +69,10 @@ namespace Sheaft.Mediatr.Producer.Commands
 
         internal class ProducerListItem
         {
-            internal ProducerListItem(Domain.Producer user)
+            internal ProducerListItem(Domain.Producer user, IIdSerializer serializer)
             {
                 Address = new AddressItem(user.Address);
-                Id = user.Id.ToString("N");
+                Id = serializer.Serialize("Query", nameof(Producer), user.Id);
                 Name = user.Name;
                 Picture = user.Picture;
                 HasProducts = user.HasProducts;
