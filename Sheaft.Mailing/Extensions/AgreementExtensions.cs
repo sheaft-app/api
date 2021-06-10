@@ -19,7 +19,7 @@ namespace Sheaft.Mailing.Extensions
                 Reason = agreement.Reason,
                 AgreementId = agreementId, 
                 CreatedOn = agreement.CreatedOn, 
-                PortalUrl = $"{url}/#/agreements/{agreement.Id}" 
+                PortalUrl = $"{url}/#/agreements/{agreementId}" 
             };
         }
     }

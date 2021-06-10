@@ -39,17 +39,17 @@ namespace Sheaft.Mediatr.Order.EventHandlers
             var order = await _context.Orders.SingleAsync(e => e.Id == orderEvent.OrderId, token);
             
             var purchaseOrderId = order.PurchaseOrders.Count() == 1 ? order.PurchaseOrders.FirstOrDefault()?.Id : (Guid?)null; 
-
+            var purchaseOrderIdentifier = purchaseOrderId.HasValue ? _idSerializer.Serialize("Query", nameof(PurchaseOrder), purchaseOrderId): string.Empty;
             await _signalrService.SendNotificationToUserAsync(order.UserId.Value, nameof(OrderConfirmedEvent),
-                order.GetOrderNotifModelAsString(purchaseOrderId.HasValue ? _idSerializer.Serialize("Query", nameof(PurchaseOrder), purchaseOrderId): null));
+                order.GetOrderNotifModelAsString(purchaseOrderIdentifier));
 
             await _emailService.SendTemplatedEmailAsync(
                 order.User.Email,
                 order.User.Name,
-                $"{order.User.Name}, votre commande de {order.TotalPrice}€ a été prise en compte",
+                $"Votre commande de {order.TotalPrice}€ a été prise en compte",
                 nameof(OrderConfirmedEvent),
                 order.GetTemplateData(_idSerializer.Serialize("Query", nameof(Order), orderEvent.OrderId),
-                    $"{_configuration.GetValue<string>("Portal:url")}/#/my-orders{(purchaseOrderId.HasValue ? $"/{_idSerializer.Serialize("Query", nameof(PurchaseOrder), purchaseOrderId.Value)}" : string.Empty)}"),
+                    $"{_configuration.GetValue<string>("Portal:url")}/#/my-orders/{purchaseOrderIdentifier}"),
                 true,
                 token);
         }
