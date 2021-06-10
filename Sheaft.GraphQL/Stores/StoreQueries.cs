@@ -82,7 +82,7 @@ namespace Sheaft.GraphQL.Stores
             [ScopedService] QueryDbContext context,
             CancellationToken token)
         {
-            var query = context.Stores.AsQueryable();
+            var query = context.Stores.Where(c => c.OpenForNewBusiness);
 
             if (!string.IsNullOrWhiteSpace(terms.Text))
                 query = query.Where(p => p.Name.Contains(terms.Text));

@@ -85,7 +85,7 @@ namespace Sheaft.GraphQL.Producers
             CancellationToken token)
         {
             var query = context.Catalogs
-                .Where(c => c.Kind == CatalogKind.Stores && c.Available);
+                .Where(c => c.Kind == CatalogKind.Stores && c.Available && c.Producer.OpenForNewBusiness);
 
             if (!string.IsNullOrWhiteSpace(terms.Text))
                 query = query.Where(p => p.Producer.Name.Contains(terms.Text));
