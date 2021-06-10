@@ -68,12 +68,8 @@ namespace Sheaft.Mediatr.PurchaseOrder.Commands
 
             try
             {
-                var startResult =
-                    await _mediatr.Process(new StartJobCommand(request.RequestUser) {JobId = job.Id}, token);
-                if (!startResult.Succeeded)
-                    throw startResult.Exception;
-
-                _mediatr.Post(new PurchaseOrdersExportProcessingEvent(job.Id));
+                job.StartJob(new PurchaseOrdersExportProcessingEvent(job.Id));
+                await _context.SaveChangesAsync(token);
 
                 var purchaseOrdersQuery = _context.Set<Domain.PurchaseOrder>().Where(o =>
                     o.ProducerId == request.RequestUser.Id
@@ -92,18 +88,18 @@ namespace Sheaft.Mediatr.PurchaseOrder.Commands
                 if (!response.Succeeded)
                     throw response.Exception;
 
-                _mediatr.Post(new PurchaseOrdersExportSucceededEvent(job.Id));
+                job.SetDownloadUrl(response.Data);
+                job.CompleteJob(new PurchaseOrdersExportSucceededEvent(job.Id));
 
-                _logger.LogInformation($"PurchaseOrders for user {job.UserId} successfully exported");
-                return await _mediatr.Process(
-                    new CompleteJobCommand(request.RequestUser) {JobId = job.Id, FileUrl = response.Data}, token);
+                await _context.SaveChangesAsync(token);
+                return Success();
             }
             catch (Exception e)
             {
-                _mediatr.Post(new PurchaseOrdersExportFailedEvent(job.Id));
-                return await _mediatr.Process(
-                    new FailJobCommand(request.RequestUser) {JobId = job.Id, Reason = e.Message},
-                    token);
+                job.FailJob(e.Message, new PurchaseOrdersExportFailedEvent(job.Id));
+                await _context.SaveChangesAsync(token);
+                
+                return Failure(MessageKind.JobFailure);
             }
         }
     }

@@ -15,6 +15,7 @@
         Unexpected = 1010,
         AlreadyExists = 1011,
         Success = 1012,
+        JobFailure = 1013,
 
         //entities
         Address = 2000,

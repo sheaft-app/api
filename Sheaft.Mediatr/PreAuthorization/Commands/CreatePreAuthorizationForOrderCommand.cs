@@ -89,7 +89,7 @@ namespace Sheaft.Mediatr.PreAuthorization.Commands
 
                 var result = await _pspService.CreatePreAuthorizationAsync(preAuthorization, request.IpAddress, request.BrowserInfo, token);
                 if (!result.Succeeded)
-                    return Failure<Guid>(result.Exception);
+                    return Failure<Guid>(result);
 
                 preAuthorization.SetIdentifier(result.Data.Identifier);
                 preAuthorization.SetStatus(result.Data.Status);

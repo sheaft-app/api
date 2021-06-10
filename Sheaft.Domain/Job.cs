@@ -51,7 +51,7 @@ namespace Sheaft.Domain
         public Guid UserId { get; private set; }
         public virtual User User { get; private set; }
 
-        public void StartJob()
+        public void StartJob(DomainEvent @event = null)
         {
             if(StartedOn.HasValue)
                 throw new ValidationException(MessageKind.Job_CannotStart_Has_StartedOnDate);
@@ -61,6 +61,9 @@ namespace Sheaft.Domain
 
             StartedOn = DateTimeOffset.UtcNow;
             Status = ProcessStatus.Processing;
+            
+            if(@event != null)
+                DomainEvents.Add(@event);
         }
 
         public void SetName(string name)
@@ -79,7 +82,7 @@ namespace Sheaft.Domain
             File = url;
         }
 
-        public void RetryJob()
+        public void RetryJob(DomainEvent @event = null)
         {
             if (Status != ProcessStatus.Cancelled && Status != ProcessStatus.Failed)
                 throw new ValidationException(MessageKind.Job_CannotRetry_NotIn_CanncelledOrFailedStatus);
@@ -87,47 +90,65 @@ namespace Sheaft.Domain
             StartedOn = null;
             Retried = Retried.HasValue ? Retried + 1 : 1;
             Status = ProcessStatus.Waiting;
+            
+            if(@event != null)
+                DomainEvents.Add(@event);
         }
 
-        public void PauseJob()
+        public void PauseJob(DomainEvent @event = null)
         {
             if (!StartedOn.HasValue || Status != ProcessStatus.Processing)
                 throw new ValidationException(MessageKind.Job_CannotPause_NotIn_ProcessingStatus);
 
             Status = ProcessStatus.Paused;
+            
+            if(@event != null)
+                DomainEvents.Add(@event);
         }
 
-        public void ArchiveJob()
+        public void ArchiveJob(DomainEvent @event = null)
         {
             if (Status != ProcessStatus.Done && Status != ProcessStatus.Failed && Status != ProcessStatus.Cancelled)
                 throw new ValidationException(MessageKind.Job_CannotArchive_NotIn_TerminatedStatus);
 
             Archived = true;
+            
+            if(@event != null)
+                DomainEvents.Add(@event);
         }
 
-        public void UnarchiveJob()
+        public void UnarchiveJob(DomainEvent @event = null)
         {
             Archived = false;
+            
+            if(@event != null)
+                DomainEvents.Add(@event);
         }
 
-        public void ResumeJob()
+        public void ResumeJob(DomainEvent @event = null)
         {
             if (!StartedOn.HasValue || Status != ProcessStatus.Paused)
                 throw new ValidationException(MessageKind.Job_CannotResume_NotIn_PausedStatus);
 
             Status = ProcessStatus.Processing;
+            
+            if(@event != null)
+                DomainEvents.Add(@event);
         }
 
-        public void CompleteJob()
+        public void CompleteJob(DomainEvent @event = null)
         {
             if (!StartedOn.HasValue || Status != ProcessStatus.Processing)
                 throw new ValidationException(MessageKind.Job_CannotComplete_NotIn_ProcessingStatus);
 
             CompletedOn = DateTimeOffset.UtcNow;
             Status = ProcessStatus.Done;
+            
+            if(@event != null)
+                DomainEvents.Add(@event);
         }
 
-        public void CancelJob(string message)
+        public void CancelJob(string message, DomainEvent @event = null)
         {
             if (Status == ProcessStatus.Done)
                 throw new ValidationException(MessageKind.Job_CannotCancel_AlreadyDone);
@@ -137,9 +158,12 @@ namespace Sheaft.Domain
 
             Status = ProcessStatus.Cancelled;
             Message = message;
+            
+            if(@event != null)
+                DomainEvents.Add(@event);
         }
 
-        public void FailJob(string message)
+        public void FailJob(string message, DomainEvent @event = null)
         {
             if (Status == ProcessStatus.Done)
                 throw new ValidationException(MessageKind.Job_CannotFail_AlreadyDone);
@@ -149,6 +173,9 @@ namespace Sheaft.Domain
 
             Status = ProcessStatus.Failed;
             Message = message;
+            
+            if(@event != null)
+                DomainEvents.Add(@event);
         }
 
         public void SetCommand<T>(T command) where T:class

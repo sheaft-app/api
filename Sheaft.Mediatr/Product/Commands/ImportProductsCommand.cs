@@ -15,6 +15,7 @@ using Microsoft.EntityFrameworkCore;
 using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Application.Interfaces.Mediatr;
 using Sheaft.Core;
+using Sheaft.Core.Enums;
 using Sheaft.Domain;
 using Sheaft.Domain.Events.Product;
 using Sheaft.Mediatr.Job.Commands;
@@ -64,13 +65,8 @@ namespace Sheaft.Mediatr.Product.Commands
 
             try
             {
-                var startResult =
-                    await _mediatr.Process(new StartJobCommand(request.RequestUser) {JobId = job.Id}, token);
-                if (!startResult.Succeeded)
-                    return startResult;
-
-                if (request.NotifyOnUpdates)
-                    _mediatr.Post(new ProductImportProcessingEvent(job.Id));
+                job.CompleteJob(request.NotifyOnUpdates ? new ProductImportProcessingEvent(job.Id) : null);
+                await _context.SaveChangesAsync(token);
 
                 var fileDataResult = await _blobService.DownloadImportProductsFileAsync(job.UserId, job.Id, token);
                 if (!fileDataResult.Succeeded)
@@ -101,25 +97,20 @@ namespace Sheaft.Mediatr.Product.Commands
                     await transaction.CommitAsync(token);
                 }
 
+                job.CompleteJob(request.NotifyOnUpdates ? new ProductImportSucceededEvent(job.Id) : null);
+                await _context.SaveChangesAsync(token);
+                
                 _mediatr.Post(new UpdateProducerTagsCommand(request.RequestUser)
                     {ProducerId = job.UserId});
 
-                var result = await _mediatr.Process(new CompleteJobCommand(request.RequestUser) {JobId = job.Id}, token);
-                if (!result.Succeeded)
-                    return result;
-
-                if (request.NotifyOnUpdates)
-                    _mediatr.Post(new ProductImportSucceededEvent(job.Id));
-
-                return result;
+                return Success();
             }
             catch (Exception e)
             {
-                if (request.NotifyOnUpdates)
-                    _mediatr.Post(new ProductImportFailedEvent(job.Id));
-
-                return await _mediatr.Process(new FailJobCommand(request.RequestUser) {JobId = job.Id, Reason = e.Message},
-                    token);
+                job.FailJob(e.Message, request.NotifyOnUpdates ? new ProductImportFailedEvent(job.Id) : null);
+                await _context.SaveChangesAsync(token);
+                
+                return Failure(MessageKind.JobFailure);
             }
         }
     }

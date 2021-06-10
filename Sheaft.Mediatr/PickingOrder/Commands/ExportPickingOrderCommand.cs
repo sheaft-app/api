@@ -11,6 +11,7 @@ using Sheaft.Application.Interfaces.Factories;
 using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Application.Interfaces.Mediatr;
 using Sheaft.Core;
+using Sheaft.Core.Enums;
 using Sheaft.Domain;
 using Sheaft.Domain.Events.PickingOrder;
 using Sheaft.Mediatr.Job.Commands;
@@ -57,12 +58,9 @@ namespace Sheaft.Mediatr.PickingOrder.Commands
 
             try
             {
-                var startResult =
-                    await _mediatr.Process(new StartJobCommand(request.RequestUser) {JobId = job.Id}, token);
-                if (!startResult.Succeeded)
-                    throw startResult.Exception;
-
-                _mediatr.Post(new PickingOrderExportProcessingEvent(job.Id));
+                job.StartJob(new PickingOrderExportProcessingEvent(job.Id));
+                await _context.SaveChangesAsync(token);
+                
                 var exporter = await _pickingOrdersExportersFactory.GetExporterAsync(request.RequestUser, token);
                 
                 var purchaseOrdersQuery = _context.PurchaseOrders
@@ -82,16 +80,19 @@ namespace Sheaft.Mediatr.PickingOrder.Commands
                     token);
                 if (!result.Succeeded)
                     throw result.Exception;
+                
+                job.SetDownloadUrl(response.Data);
+                job.CompleteJob(new PickingOrderExportSucceededEvent(job.Id));
 
-                _mediatr.Post(new PickingOrderExportSucceededEvent(job.Id));
-                return await _mediatr.Process(
-                    new CompleteJobCommand(request.RequestUser) {JobId = job.Id, FileUrl = response.Data}, token);
+                await _context.SaveChangesAsync(token);
+                return Success();
             }
             catch (Exception e)
             {
-                _mediatr.Post(new PickingOrderExportFailedEvent(job.Id));
-                return await _mediatr.Process(
-                    new FailJobCommand(request.RequestUser) {JobId = request.JobId, Reason = e.Message}, token);
+                job.FailJob(e.Message, new PickingOrderExportFailedEvent(job.Id));
+                await _context.SaveChangesAsync(token);
+                
+                return Failure(MessageKind.JobFailure);
             }
         }
     }

@@ -11,6 +11,7 @@ using Sheaft.Application.Interfaces.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Sheaft.Application.Interfaces.Mediatr;
 using Sheaft.Core;
+using Sheaft.Core.Enums;
 using Sheaft.Core.Exceptions;
 using Sheaft.Domain;
 
@@ -54,7 +55,7 @@ namespace Sheaft.Mediatr.QuickOrder.Commands
             var quickOrders = await _context.QuickOrders.Where(c => c.UserId == request.UserId).ToListAsync(token);
             var entity = quickOrders.FirstOrDefault(qo => qo.Id == request.QuickOrderId);
             if (entity == null)
-                return Failure(SheaftException.NotFound());
+                return Failure(MessageKind.NotFound);
             
             entity.SetAsDefault();
 

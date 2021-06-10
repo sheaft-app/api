@@ -71,7 +71,7 @@ namespace Sheaft.Mediatr.Payin.Commands
                 {
                     var referenceResult = await _identifierService.GetNextOrderReferenceAsync(token);
                     if (!referenceResult.Succeeded)
-                        return Failure<Guid>(referenceResult.Exception);
+                        return Failure<Guid>(referenceResult);
 
                     order.SetReference(referenceResult.Data);
                 }
@@ -90,7 +90,7 @@ namespace Sheaft.Mediatr.Payin.Commands
                 var legal = await _context.Legals.SingleOrDefaultAsync(c => c.UserId == order.UserId, token);
                 var result = await _pspService.CreateWebPayinAsync(webPayin, legal.Owner, token);
                 if (!result.Succeeded)
-                    return Failure<Guid>(result.Exception);
+                    return Failure<Guid>(result);
 
                 webPayin.SetResult(result.Data.ResultCode, result.Data.ResultMessage);
                 webPayin.SetIdentifier(result.Data.Identifier);

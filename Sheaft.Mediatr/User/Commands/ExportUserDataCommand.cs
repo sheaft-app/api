@@ -60,11 +60,8 @@ namespace Sheaft.Mediatr.User.Commands
 
             try
             {
-                var startResult = await _mediatr.Process(new StartJobCommand(request.RequestUser) {JobId = job.Id}, token);
-                if (!startResult.Succeeded)
-                    throw startResult.Exception;
-
-                _mediatr.Post(new UserDataExportProcessingEvent(job.Id));
+                job.StartJob(new UserDataExportProcessingEvent(job.Id));
+                await _context.SaveChangesAsync(token);
 
                 using (var stream = new MemoryStream())
                 {
@@ -77,19 +74,20 @@ namespace Sheaft.Mediatr.User.Commands
                         $"RGPD_{job.CreatedOn:dd-MM-yyyy}.xlsx", stream.ToArray(), token);
                     if (!response.Succeeded)
                         throw response.Exception;
+                    
+                    job.SetDownloadUrl(response.Data);
+                    job.CompleteJob(new UserDataExportSucceededEvent(job.Id));
 
-                    _mediatr.Post(new UserDataExportSucceededEvent(job.Id));
-
-                    _logger.LogInformation($"RGPD data for user {job.UserId} successfully exported");
-                    return await _mediatr.Process(
-                        new CompleteJobCommand(request.RequestUser) {JobId = job.Id, FileUrl = response.Data}, token);
+                    await _context.SaveChangesAsync(token);
+                    return Success();
                 }
             }
             catch (Exception e)
             {
-                _mediatr.Post(new UserDataExportFailedEvent(job.Id));
-                return await _mediatr.Process(new FailJobCommand(request.RequestUser) {JobId = job.Id, Reason = e.Message},
-                    token);
+                job.FailJob(e.Message, new UserDataExportFailedEvent(job.Id));
+                await _context.SaveChangesAsync(token);
+                
+                return Failure(MessageKind.JobFailure);
             }
         }
 

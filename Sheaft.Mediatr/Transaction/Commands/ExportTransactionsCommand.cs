@@ -60,12 +60,8 @@ namespace Sheaft.Mediatr.Transaction.Commands
 
             try
             {
-                var startResult =
-                    await _mediatr.Process(new StartJobCommand(request.RequestUser) {JobId = job.Id}, token);
-                if (!startResult.Succeeded)
-                    throw startResult.Exception;
-
-                _mediatr.Post(new TransactionsExportProcessingEvent(job.Id));
+                job.StartJob(new TransactionsExportProcessingEvent(job.Id));
+                await _context.SaveChangesAsync(token);
 
                 var transactionsQuery = _context.Set<Domain.Transaction>().Where(o =>
                     o.AuthorId == request.RequestUser.Id
@@ -84,19 +80,19 @@ namespace Sheaft.Mediatr.Transaction.Commands
                     $"Virements_{request.From:dd-MM-yyyy}_{request.To:dd-MM-yyyy}.{transactionsExportResult.Data.Extension}", transactionsExportResult.Data.Data, token);
                 if (!response.Succeeded)
                     throw response.Exception;
+                
+                job.SetDownloadUrl(response.Data);
+                job.CompleteJob(new TransactionsExportSucceededEvent(job.Id));
 
-                _mediatr.Post(new TransactionsExportSucceededEvent(job.Id));
-
-                _logger.LogInformation($"Transactions for user {job.UserId} successfully exported");
-                return await _mediatr.Process(
-                    new CompleteJobCommand(request.RequestUser) {JobId = job.Id, FileUrl = response.Data}, token);
+                await _context.SaveChangesAsync(token);
+                return Success();
             }
             catch (Exception e)
             {
-                _mediatr.Post(new TransactionsExportFailedEvent(job.Id));
-                return await _mediatr.Process(
-                    new FailJobCommand(request.RequestUser) {JobId = job.Id, Reason = e.Message},
-                    token);
+                job.FailJob(e.Message, new TransactionsExportFailedEvent(job.Id));
+                await _context.SaveChangesAsync(token);
+                
+                return Failure(MessageKind.JobFailure);
             }
         }
     }
