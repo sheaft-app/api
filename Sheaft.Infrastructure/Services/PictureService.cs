@@ -132,7 +132,7 @@ namespace Sheaft.Infrastructure.Services
             }
         }
 
-        private string GetDefaultProductPicture(IEnumerable<Tag> tags)
+        public string GetDefaultProductPicture(IEnumerable<Tag> tags)
         {
             var category = tags.FirstOrDefault(t => t.Kind == TagKind.Category);
             return category?.Picture;

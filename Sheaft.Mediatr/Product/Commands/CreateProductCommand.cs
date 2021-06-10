@@ -152,6 +152,11 @@ namespace Sheaft.Mediatr.Product.Commands
                     if (!result.Succeeded)
                         return Failure<Guid>(result);
                 }
+                else
+                {
+                    var picture = _imageService.GetDefaultProductPicture(tags);
+                    entity.AddPicture(new ProductPicture(Guid.NewGuid(), picture, 0));
+                }
 
                 await _context.SaveChangesAsync(token);
                 await transaction.CommitAsync(token);

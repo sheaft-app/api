@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Sheaft.Core;
+using Sheaft.Domain;
 
 namespace Sheaft.Application.Interfaces.Infrastructure
 {
@@ -12,5 +14,6 @@ namespace Sheaft.Application.Interfaces.Infrastructure
         Task<Result<string>> HandleProductPictureAsync(Domain.Product product, Guid pictureId, string picture, CancellationToken token);
         Task<Result<string>> HandleTagPictureAsync(Domain.Tag tag, string picture, CancellationToken token);
         Task<Result<string>> HandleTagIconAsync(Domain.Tag tag, string icon, CancellationToken token);
+        string GetDefaultProductPicture(IEnumerable<Tag> tags);
     }
 }
