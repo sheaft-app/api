@@ -45,6 +45,7 @@ namespace Sheaft.Mediatr.Order.Commands
         {
             var order = await _context.Orders.SingleAsync(e => e.Id == request.OrderId, token);
             order.SetStatus(OrderStatus.Expired);
+            order.SetAsProcessed();
 
             await _context.SaveChangesAsync(token);
             return Success();

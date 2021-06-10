@@ -69,7 +69,7 @@ namespace Sheaft.Mediatr.Order.Commands
         private async Task<IEnumerable<Guid>> GetNextOrderIdsAsync(int skip, int take, CancellationToken token)
         {
             return await _context.Orders
-                .Where(c => c.Status == OrderStatus.Waiting || c.Status == OrderStatus.Created)
+                .Where(c => !c.Processed && (c.Status == OrderStatus.Waiting || c.Status == OrderStatus.Created))
                 .OrderBy(c => c.CreatedOn)
                 .Select(c => c.Id)
                 .Skip(skip)

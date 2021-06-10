@@ -61,6 +61,7 @@ namespace Sheaft.Mediatr.PreAuthorization.Commands
 
             preAuthorization.SetStatus(pspResult.Data.Status);
             preAuthorization.SetPaymentStatus(pspResult.Data.PaymentStatus);
+            preAuthorization.SetExpirationDate(pspResult.Data.ExpirationDate);
             preAuthorization.SetResult(pspResult.Data.ResultCode, pspResult.Data.ResultMessage);
 
             if(preAuthorization.Status != PreAuthorizationStatus.Created)
