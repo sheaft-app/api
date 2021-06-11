@@ -36,5 +36,10 @@ namespace Sheaft.Domain
         public string Zipcode { get; private set; }
         public string City { get; private set; }
         public CountryIsoCode Country { get; private set; }
+        
+        public override string ToString()
+        {
+            return $"{Line1}\n{(!string.IsNullOrWhiteSpace(Line2) ? Line2 + "\n" : "")}{Zipcode} {City}";
+        }
     }
 }
