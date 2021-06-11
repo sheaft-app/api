@@ -150,15 +150,10 @@ namespace Sheaft.Web.Jobs
             var rolesOptions = roleSettings.Get<RoleOptions>();
             services.AddAuthorization(options =>
             {
-                options.AddPolicy("Admin", o =>
+                options.AddPolicy("AdminOrSupport", o =>
                 {
                     o.RequireAuthenticatedUser();
-                    o.RequireRole(rolesOptions.Admin.Value);
-                });
-                options.AddPolicy("Support", o =>
-                {
-                    o.RequireAuthenticatedUser();
-                    o.RequireRole(rolesOptions.Support.Value);
+                    o.RequireRole(rolesOptions.Admin.Value, rolesOptions.Support.Value);
                 });
                 options.FallbackPolicy = new AuthorizationPolicyBuilder()
                     .RequireAuthenticatedUser()
@@ -353,16 +348,21 @@ namespace Sheaft.Web.Jobs
             app.UseAuthentication();
             app.UseAuthorization();
 
+            app.UseHangfireServer();
+            app.UseHangfireDashboard();
+            
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapHangfireDashboard("", new DashboardOptions
-                {
-                    AppPath = Configuration.GetValue<string>("Portal:Url"),
-                    Authorization = new List<IDashboardAuthorizationFilter> { new MyAuthorizationFilter() }
-                });
-                endpoints.MapControllerRoute("default", "{controller=Home}/{action=Index}/{id?}");
+                endpoints.MapControllerRoute(
+                    name: "default",
+                    pattern: "{controller=Home}/{action=Index}/{id?}");
+                endpoints.MapHangfireDashboard("/hangfire", new DashboardOptions()
+                    {
+                        Authorization = new List<IDashboardAuthorizationFilter> { }
+                    })
+                    .RequireAuthorization("AdminOrSupport");
             });
-
+            
             RecuringJobs.Register(routineOptions.Value);
             RazorTemplateEngine.Initialize();
         }
