@@ -54,8 +54,8 @@ namespace Sheaft.Business.PickingOrdersExporters
                         .Where(u =>
                             !u.RemovedOn.HasValue
                             && u.ProducerId == user.Id
-                            && u.Delivery.Kind == DeliveryKind.ProducerToStore
-                            && u.Delivery.DeliveryHours.Any(oh => oh.Day == storeDeliveryDay.Key))
+                            && u.DeliveryMode.Kind == DeliveryKind.ProducerToStore
+                            && u.DeliveryMode.DeliveryHours.Any(oh => oh.Day == storeDeliveryDay.Key))
                         .Select(c => new KeyValuePair<Guid,string>(c.StoreId, c.Store.Name))
                         .OrderBy(c => c.Value)
                         .ToListAsync(token);

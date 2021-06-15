@@ -24,9 +24,9 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
 
             entity.Ignore(c => c.DomainEvents);
 
-            entity.HasOne(c => c.Delivery)
-                .WithMany()
-                .HasForeignKey(c => c.DeliveryId)
+            entity.HasOne(c => c.DeliveryMode)
+                .WithMany(a => a.Agreements)
+                .HasForeignKey(c => c.DeliveryModeId)
                 .OnDelete(DeleteBehavior.NoAction);
 
             entity.HasOne(c => c.Store)

@@ -32,6 +32,7 @@ namespace Sheaft.GraphQL.Types.Outputs
             descriptor.Field(c => c.UpdatedOn).Name("updatedOn");
             descriptor.Field(c => c.Status).Name("status");
             descriptor.Field(c => c.Reason).Name("reason");
+            descriptor.Field(c => c.Position).Name("position");
 
             descriptor
                 .Field(c => c.Store)
@@ -48,7 +49,7 @@ namespace Sheaft.GraphQL.Types.Outputs
                 .Type<NonNullType<ProducerType>>();
 
             descriptor
-                .Field(c => c.Delivery)
+                .Field(c => c.DeliveryMode)
                 .Name("delivery")
                 .UseDbContext<QueryDbContext>()
                 .ResolveWith<AgreementResolvers>(c => c.GetDelivery(default, default, default))
@@ -64,25 +65,29 @@ namespace Sheaft.GraphQL.Types.Outputs
 
         private class AgreementResolvers
         {
-            public Task<Store> GetStore(Agreement agreement, StoresByIdBatchDataLoader storesDataLoader, CancellationToken token)
+            public Task<Store> GetStore(Agreement agreement, StoresByIdBatchDataLoader storesDataLoader,
+                CancellationToken token)
             {
                 return storesDataLoader.LoadAsync(agreement.StoreId, token);
             }
-            
-            public Task<DeliveryMode> GetDelivery(Agreement agreement, DeliveryModesByIdBatchDataLoader deliveriesDataLoader, CancellationToken token)
+
+            public Task<DeliveryMode> GetDelivery(Agreement agreement,
+                DeliveryModesByIdBatchDataLoader deliveriesDataLoader, CancellationToken token)
             {
-                if (!agreement.DeliveryId.HasValue)
+                if (!agreement.DeliveryModeId.HasValue)
                     return null;
-                
-                return deliveriesDataLoader.LoadAsync(agreement.DeliveryId.Value, token);
+
+                return deliveriesDataLoader.LoadAsync(agreement.DeliveryModeId.Value, token);
             }
-            
-            public Task<Producer> GetProducer(Agreement agreement, ProducersByIdBatchDataLoader producersDataLoader, CancellationToken token)
+
+            public Task<Producer> GetProducer(Agreement agreement, ProducersByIdBatchDataLoader producersDataLoader,
+                CancellationToken token)
             {
                 return producersDataLoader.LoadAsync(agreement.ProducerId, token);
             }
-            
-            public Task<Catalog> GetCatalog(Agreement agreement, CatalogsByIdBatchDataLoader catalogsDataLoader, CancellationToken token)
+
+            public Task<Catalog> GetCatalog(Agreement agreement, CatalogsByIdBatchDataLoader catalogsDataLoader,
+                CancellationToken token)
             {
                 if (!agreement.CatalogId.HasValue)
                     return null;

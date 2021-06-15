@@ -7,8 +7,8 @@ using HotChocolate;
 using HotChocolate.Resolvers;
 using HotChocolate.Types;
 using Microsoft.EntityFrameworkCore;
-using Sheaft.Application.Models;
 using Sheaft.Domain;
+using Sheaft.GraphQL.Agreements;
 using Sheaft.GraphQL.DeliveryModes;
 using Sheaft.GraphQL.Producers;
 using Sheaft.Infrastructure.Persistence;
@@ -100,10 +100,29 @@ namespace Sheaft.GraphQL.Types.Outputs
                 .UseDbContext<QueryDbContext>()
                 .ResolveWith<DeliveryResolvers>(c => c.GetDeliveryClosings(default, default, default, default))
                 .Type<ListType<DeliveryClosingType>>();
+
+            descriptor
+                .Field(c => c.Agreements)
+                .Name("agreements")
+                .UseDbContext<QueryDbContext>()
+                .ResolveWith<DeliveryResolvers>(c => c.GetAgreements(default, default, default, default))
+                .Type<ListType<AgreementType>>();
         }
 
         private class DeliveryResolvers
         {
+            public async Task<IEnumerable<Agreement>> GetAgreements(DeliveryMode delivery,
+                [ScopedService] QueryDbContext context, AgreementsByIdBatchDataLoader agreementsDataLoader,
+                CancellationToken token)
+            {
+                var agreementsId = await context.Set<Agreement>()
+                    .Where(d => d.DeliveryModeId == delivery.Id)
+                    .Select(d => d.Id)
+                    .ToListAsync(token);
+
+                return await agreementsDataLoader.LoadAsync(agreementsId, token);
+            }
+
             public async Task<IEnumerable<DeliveryHours>> GetDeliveryHours(DeliveryMode delivery,
                 [ScopedService] QueryDbContext context, DeliveryHoursByIdBatchDataLoader deliveryHoursDataLoader,
                 CancellationToken token)
@@ -115,6 +134,7 @@ namespace Sheaft.GraphQL.Types.Outputs
 
                 return await deliveryHoursDataLoader.LoadAsync(deliveryHoursId, token);
             }
+
             public async Task<IEnumerable<DeliveryClosing>> GetDeliveryClosings(DeliveryMode delivery,
                 [ScopedService] QueryDbContext context, DeliveryClosingsByIdBatchDataLoader deliveryClosingsDataLoader,
                 CancellationToken token)

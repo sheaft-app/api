@@ -60,6 +60,10 @@ namespace Sheaft.GraphQL.Types.Inputs
             descriptor.Field(c => c.Closings)
                 .Name("closings")
                 .Type<ListType<DeliveryClosingInputType>>();
+
+            descriptor.Field(c => c.Agreements)
+                .Name("agreements")
+                .Type<ListType<AgreementPositionInputType>>();
         }
     }
 }
