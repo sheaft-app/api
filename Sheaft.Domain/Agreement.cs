@@ -22,13 +22,15 @@ namespace Sheaft.Domain
             StoreId = store.Id;
             Store = store;
             CreatedByKind = createdByKind;
-            DeliveryId = delivery?.Id;
-            Delivery = delivery;
+            DeliveryModeId = delivery?.Id;
+            DeliveryMode = delivery;
             ProducerId = producer.Id;
             Producer = producer;
-            
-            if(CreatedByKind == ProfileKind.Store)
+
+            if (CreatedByKind == ProfileKind.Store)
+            {
                 Status = AgreementStatus.WaitingForProducerApproval;
+            }
             else
             {
                 Status = AgreementStatus.WaitingForStoreApproval;
@@ -46,20 +48,22 @@ namespace Sheaft.Domain
         public DateTimeOffset? UpdatedOn { get; private set; }
         public DateTimeOffset? RemovedOn { get; private set; }
         public string Reason { get; private set; }
-        public Guid? DeliveryId { get; private set; }
+        public int? Position { get; private set; }
         public Guid StoreId { get; private set; }
         public Guid ProducerId { get; private set; }
+        public Guid? DeliveryModeId { get; private set; }
         public Guid? CatalogId { get; private set; }
-        public virtual DeliveryMode Delivery { get; private set; }
         public virtual Store Store { get; private set; }
         public virtual Producer Producer { get; private set; }
+        public virtual DeliveryMode DeliveryMode { get; private set; }
         public virtual Catalog Catalog { get; private set; }
         public List<DomainEvent> DomainEvents { get; } = new List<DomainEvent>();
         public byte[] RowVersion { get; private set; }
 
         public void AcceptAgreement(DeliveryMode delivery, ProfileKind acceptedByKind)
         {
-            if (Status != AgreementStatus.WaitingForProducerApproval && Status != AgreementStatus.WaitingForStoreApproval)
+            if (Status != AgreementStatus.WaitingForProducerApproval &&
+                Status != AgreementStatus.WaitingForStoreApproval)
                 throw SheaftException.Validation(MessageKind.Agreement_CannotBeAccepted_NotInWaitingStatus);
 
             if(Status == AgreementStatus.WaitingForProducerApproval && acceptedByKind != ProfileKind.Producer)
@@ -67,17 +71,14 @@ namespace Sheaft.Domain
             
             if(Status == AgreementStatus.WaitingForStoreApproval && acceptedByKind != ProfileKind.Store)
                 throw SheaftException.Validation();
-            
-            if(DeliveryId.HasValue && delivery != null && DeliveryId != delivery.Id)
+
+            if (DeliveryModeId.HasValue && delivery != null && DeliveryModeId != delivery.Id)
                 throw SheaftException.Validation();
 
             if (delivery != null)
-            {
-                DeliveryId = delivery.Id;
-                Delivery = delivery;
-            }
+                ChangeDelivery(delivery);
 
-            if(!DeliveryId.HasValue)
+            if (!DeliveryModeId.HasValue)
                 throw SheaftException.Validation();
 
             Status = AgreementStatus.Accepted;
@@ -93,22 +94,25 @@ namespace Sheaft.Domain
                 throw new ValidationException(MessageKind.Agreement_CannotBeCancelled_AlreadyRefused);
 
             Status = AgreementStatus.Cancelled;
+            Position = null;
             Reason = reason;
             DomainEvents.Add(new AgreementCancelledEvent(Id, cancelledByKind));
         }
 
         public void RefuseAgreement(string reason, ProfileKind refusedByKind)
         {
-            if (Status != AgreementStatus.WaitingForProducerApproval && Status != AgreementStatus.WaitingForStoreApproval)
+            if (Status != AgreementStatus.WaitingForProducerApproval &&
+                Status != AgreementStatus.WaitingForStoreApproval)
                 throw new ValidationException(MessageKind.Agreement_CannotBeRefused_NotInWaitingStatus);
 
-            if(Status == AgreementStatus.WaitingForProducerApproval && refusedByKind != ProfileKind.Producer)
+            if (Status == AgreementStatus.WaitingForProducerApproval && refusedByKind != ProfileKind.Producer)
                 throw SheaftException.Validation();
             
             if(Status == AgreementStatus.WaitingForStoreApproval && refusedByKind != ProfileKind.Store)
                 throw SheaftException.Validation();
-            
+
             Status = AgreementStatus.Refused;
+            Position = null;
             Reason = reason;
             DomainEvents.Add(new AgreementRefusedEvent(Id, refusedByKind));
         }
@@ -121,6 +125,7 @@ namespace Sheaft.Domain
                 Status = AgreementStatus.WaitingForProducerApproval;
 
             Reason = null;
+            Position = null;
         }
 
         public void ChangeCatalog(Catalog catalog)
@@ -134,8 +139,14 @@ namespace Sheaft.Domain
 
         public void ChangeDelivery(DeliveryMode deliveryMode)
         {
-            DeliveryId = deliveryMode.Id;
-            Delivery = deliveryMode;
+            DeliveryModeId = deliveryMode.Id;
+            DeliveryMode = deliveryMode;
+            Position = deliveryMode.Agreements.Count(a => a.Position.HasValue);
+        }
+
+        public void SetPosition(int position)
+        {
+            Position = position;
         }
     }
 }

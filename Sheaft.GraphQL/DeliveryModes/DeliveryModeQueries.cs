@@ -106,12 +106,12 @@ namespace Sheaft.GraphQL.DeliveryModes
             {
                 deliveriesModes = await context.Agreements
                     .Where(d =>
-                        d.Delivery.Available
+                        d.DeliveryMode.Available
                         && ids.Contains(d.ProducerId)
                         && d.StoreId == CurrentUser.Id
                         && d.Status == AgreementStatus.Accepted
-                        && kinds.Contains(d.Delivery.Kind))
-                    .Select(d => d.Delivery)
+                        && kinds.Contains(d.DeliveryMode.Kind))
+                    .Select(d => d.DeliveryMode)
                     .ToListAsync(token);
             }
             

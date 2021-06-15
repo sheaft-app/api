@@ -47,6 +47,7 @@ namespace Sheaft.Mediatr.DeliveryMode.Commands
         public bool AutoAcceptRelatedPurchaseOrder { get; set; }
         public bool AutoCompleteRelatedPurchaseOrder { get; set; }
         public IEnumerable<ClosingInputDto> Closings { get; set; }
+        public IEnumerable<AgreementPositionDto> Agreements { get; set; }
     }
 
     public class UpdateDeliveryModeCommandHandler : CommandsHandler,
@@ -86,6 +87,29 @@ namespace Sheaft.Mediatr.DeliveryMode.Commands
                     openingHours.AddRange(oh.Days.Select(c => new DeliveryHours(c, oh.From, oh.To)));
 
                 entity.SetDeliveryHours(openingHours);
+            }
+
+            if (request.Agreements != null && request.Agreements.Any())
+            {
+                if (request.Agreements.Select(c => c.Id).Distinct().Count() != entity.Agreements.Select(c => c.Id).Distinct().Count())
+                    return Failure(MessageKind.Validation);
+
+                Result agreementsResult = null;
+                foreach (var requestAgreement in request.Agreements)
+                {
+                    var agreement = entity.Agreements.SingleOrDefault(a => a.Id == requestAgreement.Id);
+                    if (agreement != null)
+                    {
+                        agreement.SetPosition(requestAgreement.Position);
+                        continue;
+                    }
+                    
+                    agreementsResult = Failure(MessageKind.NotFound);
+                    break;
+                }
+
+                if (agreementsResult is {Succeeded: false})
+                    return agreementsResult;
             }
 
             await _context.SaveChangesAsync(token);

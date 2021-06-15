@@ -53,7 +53,7 @@ namespace Sheaft.Mediatr.DeliveryMode.Commands
                 return Failure(MessageKind.Forbidden);
 
             var agreements =
-                await _context.Agreements.Where(a => a.DeliveryId == entity.Id).ToListAsync(token);
+                await _context.Agreements.Where(a => a.DeliveryModeId == entity.Id).ToListAsync(token);
             if (agreements.Any(a => a.Status == AgreementStatus.Accepted))
                 return Failure(MessageKind.DeliveryMode_CannotRemove_With_Active_Agreements, entity.Name,
                     agreements.Count(a => a.Status == AgreementStatus.Accepted));

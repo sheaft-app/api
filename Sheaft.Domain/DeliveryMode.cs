@@ -54,6 +54,7 @@ namespace Sheaft.Domain
         public int ClosingsCount { get; private set; }
         public virtual ICollection<DeliveryHours> DeliveryHours { get; private set; }
         public virtual ICollection<DeliveryClosing> Closings  { get; private set; }
+        public virtual ICollection<Agreement> Agreements { get; private set; }
 
         public void SetDeliveryHours(IEnumerable<DeliveryHours> deliveryHours)
         {
