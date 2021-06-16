@@ -5,6 +5,7 @@ namespace Sheaft.Application.Models
 {
     public class ExpectedPurchaseOrderDeliveryDto
     {
+        public Guid Id { get; set; }
         public DateTimeOffset ExpectedDeliveryDate { get; set; }
         public DateTimeOffset? DeliveryStartedOn { get; set; }
         public DateTimeOffset? DeliveredOn { get; set; }

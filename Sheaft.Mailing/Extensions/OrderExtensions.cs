@@ -72,10 +72,10 @@ namespace Sheaft.Mailing.Extensions
         {
             return new ExpectedOrderDeliveryMailerModel
             {
-                ExpectedDeliveryDate = orderDelivery.ExpectedDelivery.ExpectedDeliveryDate,
-                Day = orderDelivery.ExpectedDelivery.ExpectedDeliveryDate.DayOfWeek,
-                From = orderDelivery.ExpectedDelivery.From,
-                To = orderDelivery.ExpectedDelivery.To
+                ExpectedDeliveryDate = orderDelivery.ExpectedDeliveryDate,
+                Day = orderDelivery.Day,
+                From = orderDelivery.From,
+                To = orderDelivery.To
             };
         }
 

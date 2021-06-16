@@ -1,22 +1,25 @@
-﻿using HotChocolate.Types;
-using Sheaft.Application.Models;
+﻿using HotChocolate.Resolvers;
+using HotChocolate.Types;
 using Sheaft.Domain;
+using Sheaft.GraphQL.PurchaseOrders;
 
 namespace Sheaft.GraphQL.Types.Outputs
 {
-    public class ExpectedPurchaseOrderDeliveryType : SheaftOutputType<ExpectedPurchaseOrderDelivery>
+    public class PurchaseOrderDeliveryType : SheaftOutputType<PurchaseOrderDelivery>
     {
-        protected override void Configure(IObjectTypeDescriptor<ExpectedPurchaseOrderDelivery> descriptor)
+        protected override void Configure(IObjectTypeDescriptor<PurchaseOrderDelivery> descriptor)
         {
             base.Configure(descriptor);
             
             descriptor
+                .ImplementsNode()
+                .IdField(c => c.Id)
+                .ResolveNode((ctx, id) =>
+                    ctx.DataLoader<PurchaseOrderDeliveriesByIdBatchDataLoader>().LoadAsync(id, ctx.RequestAborted));
+            
+            descriptor
                 .Field(c => c.ExpectedDeliveryDate)
                 .Name("expectedDeliveryDate");
-                
-            descriptor
-                .Field(c => c.DeliveryStartedOn)
-                .Name("deliveryStartedOn");
                 
             descriptor
                 .Field(c => c.DeliveredOn)
@@ -27,8 +30,8 @@ namespace Sheaft.GraphQL.Types.Outputs
                 .Name("from");
 
             descriptor
-                .Field("day")
-                .Resolve(c => c.Parent<ExpectedPurchaseOrderDelivery>().ExpectedDeliveryDate.Day);
+                .Field(c => c.Day)
+                .Name("day");
                 
             descriptor
                 .Field(c => c.To)

@@ -4,10 +4,8 @@ using HotChocolate.Resolvers;
 using HotChocolate.Types;
 using Sheaft.Application.Models;
 using Sheaft.Domain;
-using Sheaft.GraphQL.Catalogs;
 using Sheaft.GraphQL.DeliveryModes;
 using Sheaft.GraphQL.Orders;
-using Sheaft.Infrastructure.Persistence;
 
 namespace Sheaft.GraphQL.Types.Outputs
 {
@@ -19,7 +17,7 @@ namespace Sheaft.GraphQL.Types.Outputs
 
             descriptor
                 .ImplementsNode()
-                .IdField(c => c.DeliveryModeId)
+                .IdField(c => c.Id)
                 .ResolveNode((ctx, id) =>
                     ctx.DataLoader<OrderDeliveriesByIdBatchDataLoader>().LoadAsync(id, ctx.RequestAborted));
             
@@ -34,9 +32,9 @@ namespace Sheaft.GraphQL.Types.Outputs
                 .Type<NonNullType<DeliveryModeType>>();
 
             descriptor
-                .Field(c => c.ExpectedDelivery)
-                .Name("expectedDelivery")
-                .Type<NonNullType<ExpectedOrderDeliveryType>>();
+                .Field("expectedDelivery")
+                .ResolveWith<OrderDeliveryResolvers>(c => c.GetExpectedDelivery(default))
+                .Type<NonNullType<ExpectedDeliveryType>>();
         }
 
         private class OrderDeliveryResolvers
@@ -45,6 +43,17 @@ namespace Sheaft.GraphQL.Types.Outputs
                 DeliveryModesByIdBatchDataLoader deliveryModesDataLoader, CancellationToken token)
             {
                 return deliveryModesDataLoader.LoadAsync(orderDelivery.DeliveryModeId, token);
+            }
+            
+            public Task<ExpectedDeliveryDto> GetExpectedDelivery(OrderDelivery orderDelivery)
+            {
+                return Task.FromResult(new ExpectedDeliveryDto()
+                {
+                    From = orderDelivery.From,
+                    To = orderDelivery.To,
+                    Day = orderDelivery.Day,
+                    ExpectedDeliveryDate = orderDelivery.ExpectedDeliveryDate,
+                });
             }
         }
     }

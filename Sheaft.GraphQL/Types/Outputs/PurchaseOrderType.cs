@@ -104,9 +104,11 @@ namespace Sheaft.GraphQL.Types.Outputs
                 .Type<NonNullType<StringType>>();
 
             descriptor
-                .Field(c => c.ExpectedDelivery)
+                .Field(c => c.Delivery)
                 .Name("expectedDelivery")
-                .Type<NonNullType<ExpectedPurchaseOrderDeliveryType>>();
+                .UseDbContext<QueryDbContext>()
+                .ResolveWith<PurchaseOrderResolvers>(c => c.GetDelivery(default, default, default, default))
+                .Type<NonNullType<PurchaseOrderDeliveryType>>();
 
             descriptor
                 .Field(c => c.SenderInfo)
@@ -168,6 +170,18 @@ namespace Sheaft.GraphQL.Types.Outputs
                     .ToListAsync(token);
 
                 return await purchaseOrderProductsDataLoader.LoadAsync(productsId, token);
+            }
+
+            public async Task<PurchaseOrderDelivery> GetDelivery(PurchaseOrder purchaseOrder,
+                [ScopedService] QueryDbContext context,
+                PurchaseOrderDeliveriesByIdBatchDataLoader purchaseOrderDeliveriesDataLoader, CancellationToken token)
+            {
+                var purchaseOrderDeliveryId = await context.Set<PurchaseOrderDelivery>()
+                    .Where(p => p.PurchaseOrderId == purchaseOrder.Id)
+                    .Select(c => c.Id)
+                    .SingleAsync(token);
+                
+                return await purchaseOrderDeliveriesDataLoader.LoadAsync(purchaseOrderDeliveryId, token);
             }
         }
     }

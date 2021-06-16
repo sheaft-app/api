@@ -12,9 +12,7 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
             entity.Property(c => c.RowVersion).IsRowVersion();
             entity.HasIndex(c => new {c.OrderId, c.DeliveryModeId}).IsUnique();
 
-            entity.OwnsOne(c => c.ExpectedDelivery);
             entity.HasOne(c => c.DeliveryMode).WithMany().HasForeignKey(c =>c.DeliveryModeId).OnDelete(DeleteBehavior.NoAction);
-
             entity.ToTable("OrderDeliveries");
         }
     }

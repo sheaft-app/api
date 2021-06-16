@@ -38,10 +38,10 @@ namespace Sheaft.Business
                         d.DeliveryModeId,
                         new DeliveryHourDto
                         {
-                            Day = d.ExpectedDelivery.ExpectedDeliveryDate.DayOfWeek,
-                            ExpectedDeliveryDate = d.ExpectedDelivery.ExpectedDeliveryDate,
-                            From = d.ExpectedDelivery.From,
-                            To = d.ExpectedDelivery.To,
+                            Day = d.Day,
+                            ExpectedDeliveryDate = d.ExpectedDeliveryDate,
+                            From = d.From,
+                            To = d.To,
                         })
                 ), token);
 
@@ -52,15 +52,13 @@ namespace Sheaft.Business
             foreach (var orderDelivery in orderDeliveries)
             {
                 var delivery = results.Data.FirstOrDefault(d => d.DeliveryId == orderDelivery.DeliveryModeId
-                                                                && d.ExpectedDate.Year == orderDelivery.ExpectedDelivery
-                                                                    .ExpectedDeliveryDate.Year
+                                                                && d.ExpectedDate.Year == orderDelivery.ExpectedDeliveryDate.Year
                                                                 && d.ExpectedDate.Month ==
-                                                                orderDelivery.ExpectedDelivery.ExpectedDeliveryDate
+                                                                orderDelivery.ExpectedDeliveryDate
                                                                     .Month
-                                                                && d.ExpectedDate.Day == orderDelivery.ExpectedDelivery
-                                                                    .ExpectedDeliveryDate.Day
-                                                                && d.From == orderDelivery.ExpectedDelivery.From
-                                                                && d.To == orderDelivery.ExpectedDelivery.To);
+                                                                && d.ExpectedDate.Day == orderDelivery.ExpectedDeliveryDate.Day
+                                                                && d.From == orderDelivery.From
+                                                                && d.To == orderDelivery.To);
 
                 if (delivery == null || delivery.Count < orderDelivery.DeliveryMode.MaxPurchaseOrdersPerTimeSlot)
                     continue;
@@ -68,7 +66,7 @@ namespace Sheaft.Business
                 result = Failure<bool>(new ValidationException(
                     MessageKind.Order_CannotPay_Delivery_Max_PurchaseOrders_Reached,
                     orderDelivery.DeliveryMode.Producer.Name,
-                    $"le {orderDelivery.ExpectedDelivery.ExpectedDeliveryDate:dd/MM/yyyy} entre {orderDelivery.ExpectedDelivery.From:hh\\hmm} et {orderDelivery.ExpectedDelivery.To:hh\\hmm}",
+                    $"le {orderDelivery.ExpectedDeliveryDate:dd/MM/yyyy} entre {orderDelivery.From:hh\\hmm} et {orderDelivery.To:hh\\hmm}",
                     orderDelivery.DeliveryMode.MaxPurchaseOrdersPerTimeSlot));
                 
                 break;

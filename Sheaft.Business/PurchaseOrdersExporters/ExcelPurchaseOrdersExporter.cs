@@ -81,9 +81,9 @@ namespace Sheaft.Business.PurchaseOrdersExporters
                 purchaseOrdersWorksheet.Cells[i, 7].Value = purchaseOrder.TotalWholeSalePrice;
                 purchaseOrdersWorksheet.Cells[i, 8].Value = purchaseOrder.TotalVatPrice;
                 purchaseOrdersWorksheet.Cells[i, 9].Value = purchaseOrder.TotalOnSalePrice;
-                purchaseOrdersWorksheet.Cells[i, 10].Value = purchaseOrder.DeliveredOn.HasValue
+                purchaseOrdersWorksheet.Cells[i, 10].Value = !purchaseOrder.Delivery.DeliveredOn.HasValue
                     ? "En attente"
-                    : purchaseOrder.DeliveredOn.Value.ToString("dd/MM/yyyy");
+                    : purchaseOrder.Delivery.DeliveredOn.Value.ToString("dd/MM/yyyy");
                 
                 purchaseOrdersWorksheet.Cells[i, 1, i + purchaseOrder.Products.Count - 1, 1].Merge = true;
                 purchaseOrdersWorksheet.Cells[i, 2, i + purchaseOrder.Products.Count - 1, 2].Merge = true;

@@ -4,9 +4,9 @@ using Sheaft.Domain;
 
 namespace Sheaft.GraphQL.Types.Outputs
 {
-    public class ExpectedOrderDeliveryType : SheaftOutputType<ExpectedOrderDelivery>
+    public class ExpectedDeliveryType : SheaftOutputType<ExpectedDeliveryDto>
     {
-        protected override void Configure(IObjectTypeDescriptor<ExpectedOrderDelivery> descriptor)
+        protected override void Configure(IObjectTypeDescriptor<ExpectedDeliveryDto> descriptor)
         {
             base.Configure(descriptor);
             
@@ -23,8 +23,8 @@ namespace Sheaft.GraphQL.Types.Outputs
                 .Name("to");
             
             descriptor
-                .Field("day")
-                .Resolve(c => c.Parent<ExpectedOrderDelivery>().ExpectedDeliveryDate.Day);
+                .Field(c => c.Day)
+                .Name("day");
         }
     }
 }

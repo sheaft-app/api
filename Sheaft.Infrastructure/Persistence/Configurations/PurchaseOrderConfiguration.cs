@@ -53,8 +53,8 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
                 c.Property(e => e.Name).UseCollation("Latin1_general_CI_AI").IsRequired();
                 c.Property(e => e.Email).IsRequired();
             });
-            entity.OwnsOne(c => c.ExpectedDelivery, cb => { cb.OwnsOne(ca => ca.Address); });
-
+            
+            entity.HasOne(c => c.Delivery).WithOne().HasForeignKey<PurchaseOrderDelivery>(c => c.PurchaseOrderId);
             entity.Ignore(c => c.DomainEvents);
 
             entity.HasKey(c => c.Id);

@@ -45,7 +45,7 @@ namespace Sheaft.Business.PickingOrdersExporters
             var subsetOrders = purchaseOrders.Select(o => new LightOrder
             {
                 Reference = o.Reference,
-                ExpectedDeliveryDate = o.ExpectedDelivery.ExpectedDeliveryDate.ToString("dd/MM/yyyy"),
+                ExpectedDeliveryDate = o.Delivery.ExpectedDeliveryDate.ToString("dd/MM/yyyy"),
                 SenderId = o.ClientId,
                 SenderName = o.SenderInfo.Name,
                 Products = o.Products.Select(GetLightProduct)
