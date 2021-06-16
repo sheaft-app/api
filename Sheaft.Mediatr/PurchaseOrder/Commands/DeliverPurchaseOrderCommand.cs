@@ -55,7 +55,7 @@ namespace Sheaft.Mediatr.PurchaseOrder.Commands
 
             await _context.SaveChangesAsync(token);
 
-            var dateDiff = purchaseOrder.ExpectedDelivery.ExpectedDeliveryDate.AddDays(7) - DateTime.UtcNow;
+            var dateDiff = purchaseOrder.Delivery.ExpectedDeliveryDate.AddDays(7) - DateTime.UtcNow;
             _mediatr.Schedule(new CreatePurchaseOrderTransferCommand(request.RequestUser) {PurchaseOrderId = purchaseOrder.Id},
                 TimeSpan.FromDays(dateDiff.TotalDays));
 

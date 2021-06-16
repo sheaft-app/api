@@ -31,8 +31,8 @@ namespace Sheaft.Domain
             SetSender(order.User);
             SetVendor(producer);
 
-            var delivery = order.Deliveries.FirstOrDefault(d => d.DeliveryMode.ProducerId == producer.Id);
-            SetExpectedDelivery(delivery.DeliveryMode, delivery.ExpectedDelivery.ExpectedDeliveryDate);
+            var delivery = order.Deliveries.Single(d => d.DeliveryMode.ProducerId == producer.Id);
+            Delivery = new PurchaseOrderDelivery(delivery);
             SetComment(delivery.Comment);
 
             SetReference(reference);
@@ -49,7 +49,6 @@ namespace Sheaft.Domain
         public DateTimeOffset? RemovedOn { get; private set; }
         public DateTimeOffset? AcceptedOn { get; private set; }
         public DateTimeOffset? CompletedOn { get; private set; }
-        public DateTimeOffset? DeliveredOn { get; private set; }
         public DateTimeOffset? DroppedOn { get; private set; }
         public string Reference { get; private set; }
         public string Reason { get; private set; }
@@ -73,7 +72,7 @@ namespace Sheaft.Domain
         public Guid ClientId { get; private set; }
         public PurchaseOrderSender SenderInfo { get; private set; }
         public PurchaseOrderVendor VendorInfo { get; private set; }
-        public virtual ExpectedPurchaseOrderDelivery ExpectedDelivery { get; private set; }
+        public virtual PurchaseOrderDelivery Delivery { get; private set; }
         public virtual ICollection<PurchaseOrderProduct> Products  { get; private set; }
 
         public void SetReference(string newReference)
@@ -116,13 +115,14 @@ namespace Sheaft.Domain
                     if (Status != PurchaseOrderStatus.Completed)
                         throw SheaftException.Validation(MessageKind.PurchaseOrder_CannotShip_NotIn_CompletedStatus);
 
+                    Delivery.StartDelivery();
                     break;
                 case PurchaseOrderStatus.Delivered:
                     if (Status != PurchaseOrderStatus.Completed && Status != PurchaseOrderStatus.Shipping)
                         throw SheaftException.Validation(MessageKind
                             .PurchaseOrder_CannotDeliver_NotIn_CompletedOrShippingStatus);
 
-                    DeliveredOn = DateTimeOffset.UtcNow;
+                    Delivery.CompleteDelivery();
                     break;
                 case PurchaseOrderStatus.Cancelled:
                     if (Status == PurchaseOrderStatus.Cancelled)
@@ -197,7 +197,6 @@ namespace Sheaft.Domain
         public void Deliver(bool skipNotification)
         {
             SetStatus(PurchaseOrderStatus.Delivered, skipNotification);
-            ExpectedDelivery.SetDeliveredDate(DateTimeOffset.UtcNow);
         }
 
         public void Cancel(string reason, bool skipNotification)
@@ -249,11 +248,6 @@ namespace Sheaft.Domain
         {
             ProducerId = vendor.Id;
             VendorInfo = new PurchaseOrderVendor(vendor);
-        }
-
-        private void SetExpectedDelivery(DeliveryMode delivery, DateTimeOffset expectedDate)
-        {
-            ExpectedDelivery = new ExpectedPurchaseOrderDelivery(delivery, expectedDate);
         }
 
         private void AddProduct(ProductRow product)

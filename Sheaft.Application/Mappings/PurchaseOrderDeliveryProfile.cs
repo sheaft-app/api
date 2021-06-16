@@ -4,11 +4,11 @@ using Sheaft.Domain;
 
 namespace Sheaft.Application.Mappings
 {
-    public class ExpectedOrderDeliveryProfile : Profile
+    public class PurchaseOrderDeliveryProfile : Profile
     {
-        public ExpectedOrderDeliveryProfile()
+        public PurchaseOrderDeliveryProfile()
         {
-            CreateMap<ExpectedOrderDelivery, ExpectedOrderDeliveryDto>()
+            CreateMap<PurchaseOrderDelivery, ExpectedPurchaseOrderDeliveryDto>()
                  .ForMember(d => d.Day, opt => opt.MapFrom(r => r.ExpectedDeliveryDate.DayOfWeek));
         }
     }

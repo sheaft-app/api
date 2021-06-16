@@ -163,7 +163,7 @@ namespace Sheaft.Mediatr.User.Commands
                     ordersWorksheet.Cells[i, 3].Value = order.Status.ToString("G");
                     ordersWorksheet.Cells[i, 4].Value = order.CreatedOn.ToString("dd/MM/yyyy");
                     ordersWorksheet.Cells[i, 5].Value =
-                        order.ExpectedDelivery.ExpectedDeliveryDate.ToString("dd/MM/yyyy");
+                        order.Delivery.ExpectedDeliveryDate.ToString("dd/MM/yyyy");
                     ordersWorksheet.Cells[i, 6].Value = order.TotalOnSalePrice;
 
                     ordersWorksheet.Cells[i, 7].Value = product.Name;

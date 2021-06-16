@@ -68,8 +68,8 @@ namespace Sheaft.Mediatr.PurchaseOrder.Commands
             var delivery = order.Deliveries.FirstOrDefault(d => d.DeliveryMode.ProducerId == purchaseOrder.ProducerId);
             if (delivery.DeliveryMode.MaxPurchaseOrdersPerTimeSlot.HasValue)
                 await _tableService.DecreaseProducerDeliveryCountAsync(delivery.DeliveryMode.ProducerId,
-                    delivery.DeliveryModeId, purchaseOrder.ExpectedDelivery.ExpectedDeliveryDate,
-                    purchaseOrder.ExpectedDelivery.From, purchaseOrder.ExpectedDelivery.To,
+                    delivery.DeliveryModeId, purchaseOrder.Delivery.ExpectedDeliveryDate,
+                    purchaseOrder.Delivery.From, purchaseOrder.Delivery.To,
                     delivery.DeliveryMode.MaxPurchaseOrdersPerTimeSlot.Value, token);
             
             var hasPayins = await _context.Payins.AnyAsync(p =>

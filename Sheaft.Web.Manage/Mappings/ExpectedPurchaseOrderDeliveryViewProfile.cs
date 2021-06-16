@@ -9,9 +9,6 @@ namespace Sheaft.Web.Manage.Mappings
     {
         public ExpectedPurchaseOrderDeliveryViewProfile()
         {
-            CreateMap<ExpectedPurchaseOrderDelivery, ExpectedPurchaseOrderDeliveryViewModel>()
-                 .ForMember(d => d.Day, opt => opt.MapFrom(r => r.ExpectedDeliveryDate.DayOfWeek));
-            
             CreateMap<ExpectedPurchaseOrderDeliveryDto, ExpectedPurchaseOrderDeliveryViewModel>();
             CreateMap<ExpectedPurchaseOrderDeliveryViewModel, ExpectedPurchaseOrderDeliveryDto>();
         }

@@ -15,7 +15,7 @@ namespace Sheaft.Mailing.Extensions
                 Line_Price = o.TotalOnSalePrice 
             }).ToList();
 
-            var address = purchaseOrder.ExpectedDelivery.Address;
+            var address = purchaseOrder.Delivery.Address;
             return new PurchaseOrderMailerModel 
             { 
                 Id = purchaseOrderId,
@@ -24,13 +24,13 @@ namespace Sheaft.Mailing.Extensions
                 Reference = purchaseOrder.Reference, 
                 VendorName = purchaseOrder.VendorInfo.Name,
                 CreatedOn = purchaseOrder.CreatedOn,
-                ExpectedDeliveryDate = purchaseOrder.ExpectedDelivery.ExpectedDeliveryDate,
+                ExpectedDeliveryDate = purchaseOrder.Delivery.ExpectedDeliveryDate,
                 TotalOnSalePrice = purchaseOrder.TotalOnSalePrice, 
                 TotalWholeSalePrice = purchaseOrder.TotalWholeSalePrice, 
                 PurchaseOrderUrl = url,
                 VatPrice = purchaseOrder.TotalVatPrice,
-                ExpectedFrom = purchaseOrder.ExpectedDelivery.From,
-                ExpectedTo = purchaseOrder.ExpectedDelivery.To,
+                ExpectedFrom = purchaseOrder.Delivery.From,
+                ExpectedTo = purchaseOrder.Delivery.To,
                 Address = address != null ? $"{address.Line1} {address.Line2} {address.Zipcode} {address.City}" : null,
                 Reason = purchaseOrder.Reason
             };
@@ -53,7 +53,7 @@ namespace Sheaft.Mailing.Extensions
                 CreatedOn = purchaseOrder.CreatedOn,
                 TotalOnSalePrice = purchaseOrder.TotalOnSalePrice,
                 TotalWholeSalePrice = purchaseOrder.TotalWholeSalePrice,
-                ExpectedDeliveryDate = purchaseOrder.ExpectedDelivery.ExpectedDeliveryDate
+                ExpectedDeliveryDate = purchaseOrder.Delivery.ExpectedDeliveryDate
             };
         }
     }

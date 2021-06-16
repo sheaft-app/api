@@ -58,7 +58,7 @@ namespace Sheaft.Mediatr.PurchaseOrder.Commands
 
             if (order.Donation > 0)
             {
-                var dateDiff = purchaseOrder.ExpectedDelivery.ExpectedDeliveryDate.AddDays(7) - DateTime.UtcNow;
+                var dateDiff = purchaseOrder.Delivery.ExpectedDeliveryDate.AddDays(7) - DateTime.UtcNow;
                 _mediatr.Schedule(new CreateDonationCommand(request.RequestUser) {OrderId = order.Id},
                     TimeSpan.FromDays(dateDiff.TotalDays));
             }
