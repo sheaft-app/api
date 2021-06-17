@@ -285,6 +285,7 @@ namespace Sheaft.Web.Api
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             
             services.AddScoped<IDeliveryService, DeliveryService>();
+            services.AddScoped<IDeliveryBatchService, DeliveryBatchService>();
             services.AddScoped<IOrderService, OrderService>();
             
             services.AddScopedDynamic<IProductsFileImporter>(typeof(ExcelProductsImporter).Assembly.GetTypes().Where(t => t.GetInterfaces().Contains(typeof(IProductsFileImporter))));
