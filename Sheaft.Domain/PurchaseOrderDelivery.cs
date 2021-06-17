@@ -45,6 +45,7 @@ namespace Sheaft.Domain
         public DayOfWeek Day { get; private set; }
         public TimeSpan From { get; private set; }
         public TimeSpan To { get; private set; }
+        public string ReceptionedBy { get; private set; }
         public ExpectedAddress Address { get; private set; }
         public Guid DeliveryModeId { get; private set; }
         public Guid PurchaseOrderId { get; private set; }
