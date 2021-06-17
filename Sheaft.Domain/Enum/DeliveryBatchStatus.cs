@@ -1,13 +1,11 @@
 namespace Sheaft.Domain.Enum
 {
-    public enum DeliveryStatus
+    public enum DeliveryBatchStatus
     {
         Waiting,
-        Ready,
         InProgress,
-        Delivered,
+        Completed,
         Postponed,
-        Skipped,
         Cancelled
     }
 }
