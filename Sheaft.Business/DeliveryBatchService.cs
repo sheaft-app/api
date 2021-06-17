@@ -26,7 +26,7 @@ namespace Sheaft.Business
             _contextFactory = contextFactory;
         }
 
-        public async Task<IEnumerable<AvailableDeliveryBatchDto>> GetAvailableDeliveryBatchsAsync(Guid producerId, bool includeProcessingPurchaseOrders,
+        public async Task<IEnumerable<AvailableDeliveryBatchDto>> GetAvailableDeliveryBatchesAsync(Guid producerId, bool includeProcessingPurchaseOrders,
             CancellationToken token)
         {
             var purchaseOrders = await _contextFactory.CreateDbContext().PurchaseOrders
@@ -39,38 +39,43 @@ namespace Sheaft.Business
                 .ToListAsync(token);
 
             var availableDeliveryBatchs = new List<AvailableDeliveryBatchDto>();
-            foreach (var groupedPurchaseOrder in purchaseOrders.GroupBy(po => po.Delivery.ExpectedDeliveryDate))
+            foreach (var groupedPurchaseOrderByDeliveryMode in purchaseOrders.GroupBy(po => po.Delivery.DeliveryModeId))
             {
-                var delivery = groupedPurchaseOrder.First().Delivery;
-                var deliveryBatch = new AvailableDeliveryBatchDto
+                foreach (var groupedPurchaseOrderByDate in groupedPurchaseOrderByDeliveryMode
+                    .GroupBy(p => p.Delivery.ExpectedDeliveryDate))
                 {
-                    Day = delivery.Day,
-                    From = delivery.From,
-                    To = delivery.To,
-                    Name = delivery.Name,
-                    ExpectedDeliveryDate = delivery.ExpectedDeliveryDate,
-                    PurchaseOrders = new List<AvailablePurchaseOrderDto>()
-                };
-                foreach (var purchaseOrder in groupedPurchaseOrder)
-                {
-                    deliveryBatch.PurchaseOrders.Add(new AvailablePurchaseOrderDto
+                    var delivery = groupedPurchaseOrderByDeliveryMode.First().Delivery;
+                    var deliveryBatch = new AvailableDeliveryBatchDto
                     {
-                        Id = purchaseOrder.Id,
-                        Status = purchaseOrder.Status,
-                        Address = purchaseOrder.Delivery.Address?.ToString() ?? purchaseOrder.SenderInfo.Address,
-                        Client = purchaseOrder.SenderInfo.Name,
-                        Reference = purchaseOrder.Reference,
-                        LinesCount = purchaseOrder.LinesCount,
-                        ProductsCount = purchaseOrder.ProductsCount,
-                        ReturnablesCount = purchaseOrder.ReturnablesCount,
-                        TotalOnSalePrice = purchaseOrder.TotalOnSalePrice,
-                        TotalWholeSalePrice = purchaseOrder.TotalWholeSalePrice,
-                        TotalWeight = purchaseOrder.TotalWeight,
-                    });
-                }
+                        Day = delivery.Day,
+                        From = delivery.From,
+                        To = delivery.To,
+                        Name = delivery.Name,
+                        ExpectedDeliveryDate = delivery.ExpectedDeliveryDate,
+                        PurchaseOrders = new List<AvailablePurchaseOrderDto>()
+                    };
+                    
+                    foreach (var purchaseOrder in groupedPurchaseOrderByDeliveryMode)
+                    {
+                        deliveryBatch.PurchaseOrders.Add(new AvailablePurchaseOrderDto
+                        {
+                            Id = purchaseOrder.Id,
+                            Status = purchaseOrder.Status,
+                            Address = purchaseOrder.Delivery.Address?.ToString() ?? purchaseOrder.SenderInfo.Address,
+                            Client = purchaseOrder.SenderInfo.Name,
+                            Reference = purchaseOrder.Reference,
+                            LinesCount = purchaseOrder.LinesCount,
+                            ProductsCount = purchaseOrder.ProductsCount,
+                            ReturnablesCount = purchaseOrder.ReturnablesCount,
+                            TotalOnSalePrice = purchaseOrder.TotalOnSalePrice,
+                            TotalWholeSalePrice = purchaseOrder.TotalWholeSalePrice,
+                            TotalWeight = purchaseOrder.TotalWeight,
+                        });
+                    }
 
-                deliveryBatch.PurchaseOrdersCount = deliveryBatch.PurchaseOrders.Count;
-                availableDeliveryBatchs.Add(deliveryBatch);
+                    deliveryBatch.PurchaseOrdersCount = deliveryBatch.PurchaseOrders.Count;
+                    availableDeliveryBatchs.Add(deliveryBatch);
+                }
             }
 
             return availableDeliveryBatchs;

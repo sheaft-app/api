@@ -8,7 +8,7 @@ namespace Sheaft.Application.Interfaces.Business
 {
     public interface IDeliveryBatchService
     {
-        Task<IEnumerable<AvailableDeliveryBatchDto>> GetAvailableDeliveryBatchsAsync(Guid producerId, bool includeProcessingPurchaseOrders,
+        Task<IEnumerable<AvailableDeliveryBatchDto>> GetAvailableDeliveryBatchesAsync(Guid producerId, bool includeProcessingPurchaseOrders,
             CancellationToken token);
     }
 }

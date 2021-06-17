@@ -29,14 +29,14 @@ namespace Sheaft.GraphQL.DeliveryBatchs
             _deliveryBatchService = deliveryBatchService;
         }
         
-        [GraphQLName("getAvailableDeliveryBatchs")]
+        [GraphQLName("availableDeliveryBatches")]
         [GraphQLType(typeof(ListType<AvailableDeliveryBatchDtoType>))]
         [UseDbContext(typeof(QueryDbContext))]
         [Authorize(Policy = Policies.PRODUCER)]
-        public async Task<IEnumerable<AvailableDeliveryBatchDto>> GetAvailableDeliveryBatch(bool includeProcessingPurchaseOrders, [ScopedService] QueryDbContext context, CancellationToken token)
+        public async Task<IEnumerable<AvailableDeliveryBatchDto>> GetAvailableDeliveryBatches(bool includeProcessingPurchaseOrders, [ScopedService] QueryDbContext context, CancellationToken token)
         {
             SetLogTransaction();
-            return await _deliveryBatchService.GetAvailableDeliveryBatchsAsync(CurrentUser.Id, includeProcessingPurchaseOrders, token);
+            return await _deliveryBatchService.GetAvailableDeliveryBatchesAsync(CurrentUser.Id, includeProcessingPurchaseOrders, token);
         }
     }
 }
