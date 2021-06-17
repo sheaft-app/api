@@ -244,6 +244,7 @@ namespace Sheaft.Web.Manage
             services.AddScoped<ICurrentUserService, CurrentUserService>();
             
             services.AddScoped<IDeliveryService, DeliveryService>();
+            services.AddScoped<IDeliveryBatchService, DeliveryBatchService>();
             services.AddScoped<IOrderService, OrderService>();
             
             services.AddSingleton<IIdSerializer, IdSerializer>();
