@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Sheaft.Core.Exceptions;
+using Sheaft.Domain.Common;
 using Sheaft.Domain.Enum;
 using Sheaft.Domain.Interop;
 
@@ -17,6 +18,7 @@ namespace Sheaft.Domain
         {
             Id = id;
             AssignedTo = assignedTo;
+            AssignedToId = assignedTo.Id;
             Status = DeliveryBatchStatus.Waiting;
         }
 
@@ -34,8 +36,11 @@ namespace Sheaft.Domain
         public TimeSpan To { get; private set; }
         public DateTimeOffset? StartedOn { get; private set; }
         public DateTimeOffset? CompletedOn { get; private set; }
-        public User AssignedTo { get; private set; }
+        public Guid AssignedToId { get; private set; }
+        public virtual User AssignedTo { get; private set; }
         public virtual ICollection<PurchaseOrderDelivery> Deliveries { get; private set; }
+        public byte[] RowVersion { get; set; }
+        public List<DomainEvent> DomainEvents { get; } = new List<DomainEvent>();
 
         public void StartBatch()
         {

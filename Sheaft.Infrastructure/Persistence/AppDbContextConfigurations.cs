@@ -147,6 +147,7 @@ namespace Sheaft.Infrastructure.Persistence
             modelBuilder.ApplyConfiguration(new PageConfiguration());
             modelBuilder.ApplyConfiguration(new UserPointConfiguration());
             modelBuilder.ApplyConfiguration(new PurchaseOrderDeliveryConfiguration());
+            modelBuilder.ApplyConfiguration(new DeliveryBatchConfiguration(isAdminContext));
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

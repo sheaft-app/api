@@ -28,11 +28,25 @@ namespace Sheaft.GraphQL.Types.Outputs
                 .Field(c => c.CreatedByKind)
                 .Name("createdByKind");
             
-            descriptor.Field(c => c.CreatedOn).Name("createdOn");
-            descriptor.Field(c => c.UpdatedOn).Name("updatedOn");
-            descriptor.Field(c => c.Status).Name("status");
-            descriptor.Field(c => c.Reason).Name("reason");
-            descriptor.Field(c => c.Position).Name("position");
+            descriptor
+                .Field(c => c.CreatedOn)
+                .Name("createdOn");
+            
+            descriptor
+                .Field(c => c.UpdatedOn)
+                .Name("updatedOn");
+            
+            descriptor
+                .Field(c => c.Status)
+                .Name("status");
+            
+            descriptor
+                .Field(c => c.Reason)
+                .Name("reason");
+            
+            descriptor
+                .Field(c => c.Position)
+                .Name("position");
 
             descriptor
                 .Field(c => c.Store)

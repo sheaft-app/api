@@ -54,7 +54,7 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
                 c.Property(e => e.Email).IsRequired();
             });
             
-            entity.HasOne(c => c.Delivery).WithOne().HasForeignKey<PurchaseOrderDelivery>(c => c.PurchaseOrderId);
+            entity.HasOne(c => c.Delivery).WithOne(c => c.PurchaseOrder).HasForeignKey<PurchaseOrderDelivery>(c => c.PurchaseOrderId);
             entity.Ignore(c => c.DomainEvents);
 
             entity.HasKey(c => c.Id);

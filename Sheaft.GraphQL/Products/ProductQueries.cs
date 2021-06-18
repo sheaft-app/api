@@ -55,7 +55,7 @@ namespace Sheaft.GraphQL.Products
         [GraphQLType(typeof(ProductType))]
         [UseDbContext(typeof(QueryDbContext))]
         [UseSingleOrDefault]
-        public async Task<IQueryable<Product>> Get([ID] Guid id, [ScopedService] QueryDbContext context,
+        public IQueryable<Product> Get([ID] Guid id, [ScopedService] QueryDbContext context,
             CancellationToken token)
         {
             SetLogTransaction(id);
