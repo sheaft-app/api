@@ -70,6 +70,7 @@ namespace Sheaft.Business
                             TotalOnSalePrice = purchaseOrder.TotalOnSalePrice,
                             TotalWholeSalePrice = purchaseOrder.TotalWholeSalePrice,
                             TotalWeight = purchaseOrder.TotalWeight,
+                            DeliveryId = purchaseOrder.Delivery.Id
                         });
                     }
 

@@ -26,13 +26,22 @@ namespace Sheaft.Domain
             Id = id;
 
             Products = new List<PurchaseOrderProduct>();
-            DomainEvents = new List<DomainEvent>{new PurchaseOrderCreatedEvent(Id)};
-            
+            DomainEvents = new List<DomainEvent> {new PurchaseOrderCreatedEvent(Id)};
+
             SetSender(order.User);
             SetVendor(producer);
 
             var delivery = order.Deliveries.Single(d => d.DeliveryMode.ProducerId == producer.Id);
-            Delivery = new PurchaseOrderDelivery(delivery);
+            var address = (int) delivery.DeliveryMode.Kind <= 4
+                ? new ExpectedAddress(delivery.DeliveryMode.Address.Line1, delivery.DeliveryMode.Address.Line2,
+                    delivery.DeliveryMode.Address.Zipcode, delivery.DeliveryMode.Address.City,
+                    delivery.DeliveryMode.Address.Country, delivery.DeliveryMode.Address.Longitude,
+                    delivery.DeliveryMode.Address.Latitude)
+                : new ExpectedAddress(order.User.Address.Line1, order.User.Address.Line2, order.User.Address.Zipcode,
+                    order.User.Address.City, order.User.Address.Country, order.User.Address.Longitude,
+                    order.User.Address.Latitude);
+
+            Delivery = new PurchaseOrderDelivery(delivery, address, order.User.Name);
             SetComment(delivery.Comment);
 
             SetReference(reference);
@@ -73,7 +82,7 @@ namespace Sheaft.Domain
         public PurchaseOrderSender SenderInfo { get; private set; }
         public PurchaseOrderVendor VendorInfo { get; private set; }
         public virtual PurchaseOrderDelivery Delivery { get; private set; }
-        public virtual ICollection<PurchaseOrderProduct> Products  { get; private set; }
+        public virtual ICollection<PurchaseOrderProduct> Products { get; private set; }
 
         public void SetReference(string newReference)
         {
@@ -93,7 +102,7 @@ namespace Sheaft.Domain
 
                     if (SenderInfo.Kind == ProfileKind.Consumer && CreatedOn.AddDays(5) < DateTimeOffset.UtcNow)
                         throw SheaftException.Validation();
-                    
+
                     AcceptedOn = DateTimeOffset.UtcNow;
                     Status = PurchaseOrderStatus.Processing;
 
@@ -103,7 +112,8 @@ namespace Sheaft.Domain
                     return;
                 case PurchaseOrderStatus.Completed:
                     if (Status != PurchaseOrderStatus.Processing)
-                        throw SheaftException.Validation(MessageKind.PurchaseOrder_CannotComplete_NotIn_ProcessingStatus);
+                        throw SheaftException.Validation(
+                            MessageKind.PurchaseOrder_CannotComplete_NotIn_ProcessingStatus);
 
                     CompletedOn = DateTimeOffset.UtcNow;
 
@@ -124,14 +134,17 @@ namespace Sheaft.Domain
                     break;
                 case PurchaseOrderStatus.Cancelled:
                     if (Status == PurchaseOrderStatus.Cancelled)
-                        throw SheaftException.Validation(MessageKind.PurchaseOrder_CannotCancel_AlreadyIn_CancelledStatus);
+                        throw SheaftException.Validation(MessageKind
+                            .PurchaseOrder_CannotCancel_AlreadyIn_CancelledStatus);
                     if (Status == PurchaseOrderStatus.Refused)
-                        throw SheaftException.Validation(MessageKind.PurchaseOrder_CannotCancel_AlreadyIn_RefusedStatus);
+                        throw SheaftException.Validation(MessageKind
+                            .PurchaseOrder_CannotCancel_AlreadyIn_RefusedStatus);
                     if (Status == PurchaseOrderStatus.Delivered)
-                        throw SheaftException.Validation(MessageKind.PurchaseOrder_CannotCancel_AlreadyIn_DeliveredStatus);
+                        throw SheaftException.Validation(MessageKind
+                            .PurchaseOrder_CannotCancel_AlreadyIn_DeliveredStatus);
                     if (Status == PurchaseOrderStatus.Expired)
                         throw SheaftException.Validation();
-                    
+
                     DroppedOn = DateTimeOffset.UtcNow;
 
                     if (!skipNotification)
@@ -142,12 +155,14 @@ namespace Sheaft.Domain
                     if (Status == PurchaseOrderStatus.Withdrawned)
                         throw SheaftException.Validation();
                     if (Status == PurchaseOrderStatus.Refused)
-                        throw SheaftException.Validation(MessageKind.PurchaseOrder_CannotCancel_AlreadyIn_RefusedStatus);
+                        throw SheaftException.Validation(MessageKind
+                            .PurchaseOrder_CannotCancel_AlreadyIn_RefusedStatus);
                     if (Status == PurchaseOrderStatus.Delivered)
-                        throw SheaftException.Validation(MessageKind.PurchaseOrder_CannotCancel_AlreadyIn_DeliveredStatus);
+                        throw SheaftException.Validation(MessageKind
+                            .PurchaseOrder_CannotCancel_AlreadyIn_DeliveredStatus);
                     if (Status == PurchaseOrderStatus.Expired)
                         throw SheaftException.Validation();
-                    
+
                     DroppedOn = DateTimeOffset.UtcNow;
 
                     if (!skipNotification)
@@ -156,24 +171,27 @@ namespace Sheaft.Domain
                     break;
                 case PurchaseOrderStatus.Refused:
                     if (Status == PurchaseOrderStatus.Cancelled)
-                        throw SheaftException.Validation(MessageKind.PurchaseOrder_CannotRefuse_AlreadyIn_CancelledStatus);
+                        throw SheaftException.Validation(MessageKind
+                            .PurchaseOrder_CannotRefuse_AlreadyIn_CancelledStatus);
                     if (Status == PurchaseOrderStatus.Refused)
-                        throw SheaftException.Validation(MessageKind.PurchaseOrder_CannotRefuse_AlreadyIn_RefusedStatus);
+                        throw SheaftException.Validation(MessageKind
+                            .PurchaseOrder_CannotRefuse_AlreadyIn_RefusedStatus);
                     if (Status == PurchaseOrderStatus.Delivered)
-                        throw SheaftException.Validation(MessageKind.PurchaseOrder_CannotRefuse_AlreadyIn_DeliveredStatus);
-                    
+                        throw SheaftException.Validation(MessageKind
+                            .PurchaseOrder_CannotRefuse_AlreadyIn_DeliveredStatus);
+
                     DroppedOn = DateTimeOffset.UtcNow;
 
                     if (!skipNotification)
                         DomainEvents.Add(new PurchaseOrderRefusedEvent(Id));
                     break;
-                
+
                 case PurchaseOrderStatus.Expired:
-                    if(Status != PurchaseOrderStatus.Waiting)
+                    if (Status != PurchaseOrderStatus.Waiting)
                         throw SheaftException.Validation();
-                    
+
                     DroppedOn = DateTimeOffset.UtcNow;
-                    
+
                     if (!skipNotification)
                         DomainEvents.Add(new PurchaseOrderExpiredEvent(Id));
                     break;
@@ -203,7 +221,7 @@ namespace Sheaft.Domain
             SetStatus(PurchaseOrderStatus.Cancelled, skipNotification);
             Reason = reason;
         }
-        
+
         public void Withdrawn(string reason, bool skipNotification)
         {
             SetStatus(PurchaseOrderStatus.Withdrawned, skipNotification);

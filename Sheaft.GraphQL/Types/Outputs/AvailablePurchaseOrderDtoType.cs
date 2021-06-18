@@ -54,6 +54,11 @@ namespace Sheaft.GraphQL.Types.Outputs
             descriptor
                 .Field(c => c.TotalWholeSalePrice)
                 .Name("totalWholeSalePrice");
+
+            descriptor
+                .Field(c => c.DeliveryId)
+                .ID(nameof(PurchaseOrderDelivery))
+                .Name("deliveryId");
         }
     }
 }

@@ -14,19 +14,26 @@ namespace Sheaft.Domain
         {
         }
 
-        public DeliveryBatch(Guid id, User assignedTo)
+        public DeliveryBatch(Guid id, string name, DateTimeOffset scheduledOn, TimeSpan from, TimeSpan to, User assignedTo, List<PurchaseOrderDelivery> purchaseOrderDeliveries = null)
         {
             Id = id;
+            Name = name;
+            ScheduledOn = scheduledOn;
+            Day = scheduledOn.DayOfWeek;
+            From = from;
+            To = to;
             AssignedTo = assignedTo;
             AssignedToId = assignedTo.Id;
             Status = DeliveryBatchStatus.Waiting;
+            
+            SetDeliveries(purchaseOrderDeliveries);
         }
 
         public Guid Id { get; private set; }
-
         public DateTimeOffset CreatedOn { get; private set; }
         public DateTimeOffset? UpdatedOn { get; private set; }
         public DateTimeOffset? RemovedOn { get; private set; }
+        public string Name { get; set; }
         public DeliveryBatchStatus Status { get; private set; }
         public int ProductsCount { get; private set; }
         public int DeliveriesCount { get; private set; }
@@ -42,6 +49,14 @@ namespace Sheaft.Domain
         public byte[] RowVersion { get; set; }
         public List<DomainEvent> DomainEvents { get; } = new List<DomainEvent>();
 
+        public void SetName(string name)
+        {
+            if (string.IsNullOrWhiteSpace(name))
+                return;
+
+            Name = name;
+        }
+        
         public void StartBatch()
         {
             StartedOn ??= DateTimeOffset.UtcNow;
@@ -62,7 +77,10 @@ namespace Sheaft.Domain
 
         public void PostponeBatch(DateTimeOffset rescheduledOn, TimeSpan from, TimeSpan to)
         {
-            if(Status != DeliveryBatchStatus.Waiting && Status != DeliveryBatchStatus.Postponed)
+            if(Status != DeliveryBatchStatus.Waiting && Status != DeliveryBatchStatus.Postponed && Status != DeliveryBatchStatus.InProgress)
+                throw SheaftException.Validation();
+            
+            if(Status == DeliveryBatchStatus.InProgress && Deliveries.Any(d => d.Status == DeliveryStatus.Delivered))
                 throw SheaftException.Validation();
             
             ScheduledOn = rescheduledOn;
@@ -74,7 +92,7 @@ namespace Sheaft.Domain
                 delivery.PostponeDelivery();
         }
 
-        public void SetDeliveries(IEnumerable<PurchaseOrderDelivery> deliveries, bool postponed = false)
+        public void SetDeliveries(IEnumerable<PurchaseOrderDelivery> deliveries)
         {
             if (Deliveries == null || Deliveries.Any())
                 Deliveries = new List<PurchaseOrderDelivery>();
@@ -83,9 +101,9 @@ namespace Sheaft.Domain
             foreach (var delivery in deliveries.OrderBy(d => d.Position))
             {
                 delivery.SetPosition(positionCounter);
-                if(!postponed)
+                if(!delivery.DeliveryBatchId.HasValue)
                     delivery.SetAsReady();
-                else
+                else if(delivery.DeliveryBatchId != Id)
                     delivery.PostponeDelivery();
                 
                 Deliveries.Add(delivery);

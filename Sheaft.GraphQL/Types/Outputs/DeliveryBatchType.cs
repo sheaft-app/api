@@ -27,6 +27,10 @@ namespace Sheaft.GraphQL.Types.Outputs
                     ctx.DataLoader<DeliveryBatchesByIdBatchDataLoader>().LoadAsync(id, ctx.RequestAborted));
             
             descriptor
+                .Field(c => c.Name)
+                .Name("name");
+            
+            descriptor
                 .Field(c => c.Status)
                 .Name("status");
             

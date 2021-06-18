@@ -10,34 +10,30 @@ namespace Sheaft.Domain
         {
         }
 
-        public PurchaseOrderDelivery(OrderDelivery delivery)
+        public PurchaseOrderDelivery(OrderDelivery delivery, ExpectedAddress address, string client)
         {
             Id = Guid.NewGuid();
             Name = delivery.DeliveryMode.Name;
             Kind = delivery.DeliveryMode.Kind;
             Status = DeliveryStatus.Waiting;
+            Client = client;
 
             ExpectedDeliveryDate = delivery.ExpectedDeliveryDate;
             From = delivery.From;
             To = delivery.To;
             Day = delivery.Day;
 
-            Address = delivery.DeliveryMode.Address != null
-                ? new ExpectedAddress(delivery.DeliveryMode.Address.Line1, delivery.DeliveryMode.Address.Line2,
-                    delivery.DeliveryMode.Address.Zipcode, delivery.DeliveryMode.Address.City,
-                    delivery.DeliveryMode.Address.Country, delivery.DeliveryMode.Address.Longitude,
-                    delivery.DeliveryMode.Address.Latitude)
-                : null;
+            Address = address;
 
             DeliveryModeId = delivery.DeliveryMode.Id;
             DeliveryMode = delivery.DeliveryMode;
         }
 
         public Guid Id { get; private set; }
-
         public DateTimeOffset CreatedOn { get; private set; }
         public DateTimeOffset? UpdatedOn { get; private set; }
         public string Name { get; private set; }
+        public string Client { get; private set; }
         public DeliveryKind Kind { get; private set; }
         public DeliveryStatus Status { get; private set; }
         public DateTimeOffset? DeliveredOn { get; private set; }
