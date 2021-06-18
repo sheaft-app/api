@@ -48,6 +48,10 @@ namespace Sheaft.GraphQL.Types.Outputs
             descriptor
                 .Field(c => c.Address)
                 .Name("address");
+
+            descriptor
+                .Field(c => c.Position)
+                .Name("position");
         }
     }
 }

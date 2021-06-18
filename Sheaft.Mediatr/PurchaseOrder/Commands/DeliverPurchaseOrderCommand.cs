@@ -14,6 +14,7 @@ using Sheaft.Core;
 using Sheaft.Core.Enums;
 using Sheaft.Core.Exceptions;
 using Sheaft.Domain;
+using Sheaft.Domain.Enum;
 using Sheaft.Mediatr.Transfer.Commands;
 
 namespace Sheaft.Mediatr.PurchaseOrder.Commands
@@ -32,6 +33,7 @@ namespace Sheaft.Mediatr.PurchaseOrder.Commands
 
         public Guid PurchaseOrderId { get; set; }
         public bool SkipNotification { get; set; }
+        public string ReceptionedBy { get; set; }
     }
 
     public class DeliverPurchaseOrderCommandHandler : CommandsHandler,
@@ -51,13 +53,16 @@ namespace Sheaft.Mediatr.PurchaseOrder.Commands
             if(purchaseOrder.ProducerId != request.RequestUser.Id)
                 return Failure(MessageKind.Forbidden);
             
-            purchaseOrder.Deliver(request.SkipNotification);
-
+            purchaseOrder.Deliver(request.ReceptionedBy, request.SkipNotification);
             await _context.SaveChangesAsync(token);
 
-            var dateDiff = purchaseOrder.Delivery.ExpectedDeliveryDate.AddDays(7) - DateTime.UtcNow;
-            _mediatr.Schedule(new CreatePurchaseOrderTransferCommand(request.RequestUser) {PurchaseOrderId = purchaseOrder.Id},
-                TimeSpan.FromDays(dateDiff.TotalDays));
+            if (purchaseOrder.SenderInfo.Kind == ProfileKind.Consumer)
+            {
+                var dateDiff = purchaseOrder.Delivery.ExpectedDeliveryDate.AddDays(7) - DateTime.UtcNow;
+                _mediatr.Schedule(
+                    new CreatePurchaseOrderTransferCommand(request.RequestUser) {PurchaseOrderId = purchaseOrder.Id},
+                    TimeSpan.FromDays(dateDiff.TotalDays));
+            }
 
             return Success();
         }

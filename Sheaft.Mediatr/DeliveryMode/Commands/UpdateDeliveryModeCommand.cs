@@ -95,12 +95,14 @@ namespace Sheaft.Mediatr.DeliveryMode.Commands
                     return Failure(MessageKind.Validation);
 
                 Result agreementsResult = null;
-                foreach (var requestAgreement in request.Agreements)
+                var positionCount = 0;
+                foreach (var requestAgreement in request.Agreements.OrderBy(a => a.Position))
                 {
                     var agreement = entity.Agreements.SingleOrDefault(a => a.Id == requestAgreement.Id);
                     if (agreement != null)
                     {
-                        agreement.SetPosition(requestAgreement.Position);
+                        agreement.SetPosition(positionCount);
+                        positionCount++;
                         continue;
                     }
                     

@@ -45,10 +45,15 @@ namespace Sheaft.Domain
         public DayOfWeek Day { get; private set; }
         public TimeSpan From { get; private set; }
         public TimeSpan To { get; private set; }
+        public int? Position { get; private set; }
+        public string ReceptionedBy { get; private set; }
         public ExpectedAddress Address { get; private set; }
         public Guid DeliveryModeId { get; private set; }
         public Guid PurchaseOrderId { get; private set; }
+        public Guid? DeliveryBatchId { get; private set; }
         public virtual DeliveryMode DeliveryMode { get; private set; }
+        public virtual PurchaseOrder PurchaseOrder { get; private set; }
+        public virtual DeliveryBatch DeliveryBatch { get; private set; }
 
         public void SetAsReady()
         {
@@ -60,8 +65,9 @@ namespace Sheaft.Domain
             Status = DeliveryStatus.InProgress;
         }
 
-        public void CompleteDelivery()
+        public void CompleteDelivery(string receptionedBy)
         {
+            ReceptionedBy = receptionedBy;
             DeliveredOn = DateTimeOffset.UtcNow;
             Status = DeliveryStatus.Delivered;
         }
@@ -69,6 +75,16 @@ namespace Sheaft.Domain
         public void CancelDelivery()
         {
             Status = DeliveryStatus.Cancelled;
+        }
+
+        public void SetPosition(int position)
+        {
+            Position = position;
+        }
+
+        public void SkipDelivery()
+        {
+            Status = DeliveryStatus.Skipped;
         }
 
         public void PostponeDelivery()

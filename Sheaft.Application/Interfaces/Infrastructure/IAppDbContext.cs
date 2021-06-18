@@ -23,6 +23,7 @@ namespace Sheaft.Application.Interfaces.Infrastructure
         DbSet<Domain.Card> Cards { get; set; }
         DbSet<Domain.Catalog> Catalogs { get; set; }
         DbSet<Domain.Country> Countries { get; set; }
+        DbSet<DeliveryBatch> DeliveryBatches { get; set; }
         DbSet<Domain.DeliveryMode> DeliveryModes { get; set; }
         DbSet<Domain.Department> Departments { get; set; }
         DbSet<Domain.Donation> Donations { get; set; }

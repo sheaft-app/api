@@ -121,8 +121,6 @@ namespace Sheaft.Domain
                     if (Status != PurchaseOrderStatus.Completed && Status != PurchaseOrderStatus.Shipping)
                         throw SheaftException.Validation(MessageKind
                             .PurchaseOrder_CannotDeliver_NotIn_CompletedOrShippingStatus);
-
-                    Delivery.CompleteDelivery();
                     break;
                 case PurchaseOrderStatus.Cancelled:
                     if (Status == PurchaseOrderStatus.Cancelled)
@@ -194,9 +192,10 @@ namespace Sheaft.Domain
             SetStatus(PurchaseOrderStatus.Shipping, skipNotification);
         }
 
-        public void Deliver(bool skipNotification)
+        public void Deliver(string receptionedBy, bool skipNotification)
         {
             SetStatus(PurchaseOrderStatus.Delivered, skipNotification);
+            Delivery.CompleteDelivery(receptionedBy);
         }
 
         public void Cancel(string reason, bool skipNotification)
