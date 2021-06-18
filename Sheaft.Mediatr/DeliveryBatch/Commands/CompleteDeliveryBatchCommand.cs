@@ -18,6 +18,7 @@ using Sheaft.Domain;
 using Sheaft.Domain.Enum;
 using Sheaft.Application.Interfaces.Infrastructure;
 using Microsoft.EntityFrameworkCore;
+using Sheaft.Core.Enums;
 using Sheaft.Mediatr.Producer.Commands;
 
 namespace Sheaft.Mediatr.DeliveryMode.Commands
@@ -49,6 +50,13 @@ namespace Sheaft.Mediatr.DeliveryMode.Commands
 
         public async Task<Result> Handle(CompleteDeliveryBatchCommand request, CancellationToken token)
         {
+            var deliveryBatch = await _context.DeliveryBatches.SingleOrDefaultAsync(c => c.Id == request.Id, token);
+            if (deliveryBatch == null)
+                return Failure(MessageKind.NotFound);
+
+            deliveryBatch.CompleteBatch();
+            await _context.SaveChangesAsync(token);
+
             return Success();
         }
     }
