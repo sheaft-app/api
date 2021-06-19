@@ -38,7 +38,6 @@ namespace Sheaft.Mediatr.DeliveryMode.Commands
         public string Name { get; set; }
         public DateTimeOffset ScheduledOn { get; set; }
         public TimeSpan From { get; set; }
-        public TimeSpan To { get; set; }
         public Guid ProducerId { get; set; }
         public IEnumerable<PurchaseOrderDeliveryPositionDto> Deliveries { get; set; }
 
@@ -85,7 +84,7 @@ namespace Sheaft.Mediatr.DeliveryMode.Commands
             }
             
             var user = await _context.Users.SingleAsync(u => u.Id == request.ProducerId, token);
-            var deliveryBatch = new DeliveryBatch(Guid.NewGuid(), name, request.ScheduledOn, request.From, request.To, user,
+            var deliveryBatch = new DeliveryBatch(Guid.NewGuid(), name, request.ScheduledOn, request.From, user,
                 purchaseOrders.Select(po => po.Delivery).ToList());
 
             await _context.AddAsync(deliveryBatch, token);

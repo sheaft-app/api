@@ -5,7 +5,6 @@ namespace Sheaft.Domain.Enum
         Waiting,
         InProgress,
         Completed,
-        Postponed,
         Cancelled
     }
 }

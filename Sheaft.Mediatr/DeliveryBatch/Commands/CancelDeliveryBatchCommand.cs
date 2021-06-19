@@ -23,41 +23,39 @@ using Sheaft.Mediatr.Producer.Commands;
 
 namespace Sheaft.Mediatr.DeliveryMode.Commands
 {
-    public class PostponeDeliveryBatchCommand : Command
+    public class CancelDeliveryBatchCommand : Command
     {
-        protected PostponeDeliveryBatchCommand()
+        protected CancelDeliveryBatchCommand()
         {
         }
         
         [JsonConstructor]
-        public PostponeDeliveryBatchCommand(RequestUser requestUser) : base(requestUser)
+        public CancelDeliveryBatchCommand(RequestUser requestUser) : base(requestUser)
         {
         }
 
         public Guid Id { get; set; }
-        public DateTimeOffset ScheduledOn { get; set; }
-        public TimeSpan From { get; set; }
         public string Reason { get; set; }
     }
 
-    public class PostponeDeliveryBatchCommandHandler : CommandsHandler,
-        IRequestHandler<PostponeDeliveryBatchCommand, Result>
+    public class CancelDeliveryBatchCommandHandler : CommandsHandler,
+        IRequestHandler<CancelDeliveryBatchCommand, Result>
     {
-        public PostponeDeliveryBatchCommandHandler(
+        public CancelDeliveryBatchCommandHandler(
             ISheaftMediatr mediatr,
             IAppDbContext context,
-            ILogger<PostponeDeliveryBatchCommandHandler> logger)
+            ILogger<CancelDeliveryBatchCommandHandler> logger)
             : base(mediatr, context, logger)
         {
         }
 
-        public async Task<Result> Handle(PostponeDeliveryBatchCommand request, CancellationToken token)
+        public async Task<Result> Handle(CancelDeliveryBatchCommand request, CancellationToken token)
         {
             var deliveryBatch = await _context.DeliveryBatches.SingleOrDefaultAsync(c => c.Id == request.Id, token);
             if (deliveryBatch == null)
                 return Failure(MessageKind.NotFound);
 
-            deliveryBatch.PostponeBatch(request.ScheduledOn, request.From, request.Reason);
+            deliveryBatch.CancelBatch(request.Reason);
             await _context.SaveChangesAsync(token);
 
             return Success();

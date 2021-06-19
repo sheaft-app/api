@@ -50,7 +50,7 @@ namespace Sheaft.Mediatr.PurchaseOrder.Commands
             if(purchaseOrder.ProducerId != request.RequestUser.Id)
                 return Failure(MessageKind.Forbidden);
             
-            purchaseOrder.Ship(request.SkipNotification);
+            purchaseOrder.Delivery.StartDelivery();
 
             await _context.SaveChangesAsync(token);
             return Success();

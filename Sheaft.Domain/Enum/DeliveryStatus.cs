@@ -7,7 +7,6 @@ namespace Sheaft.Domain.Enum
         InProgress,
         Delivered,
         Postponed,
-        Skipped,
-        Cancelled
+        Skipped
     }
 }

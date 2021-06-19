@@ -21,43 +21,41 @@ using Microsoft.EntityFrameworkCore;
 using Sheaft.Core.Enums;
 using Sheaft.Mediatr.Producer.Commands;
 
-namespace Sheaft.Mediatr.DeliveryMode.Commands
+namespace Sheaft.Mediatr.PurchaseOrderDelivery.Commands
 {
-    public class PostponeDeliveryBatchCommand : Command
+    public class StartPurchaseOrderDeliveryCommand : Command
     {
-        protected PostponeDeliveryBatchCommand()
-        {
-        }
-        
-        [JsonConstructor]
-        public PostponeDeliveryBatchCommand(RequestUser requestUser) : base(requestUser)
+        protected StartPurchaseOrderDeliveryCommand()
         {
         }
 
-        public Guid Id { get; set; }
-        public DateTimeOffset ScheduledOn { get; set; }
-        public TimeSpan From { get; set; }
-        public string Reason { get; set; }
+        [JsonConstructor]
+        public StartPurchaseOrderDeliveryCommand(RequestUser requestUser) : base(requestUser)
+        {
+        }
+
+        public Guid PurchaseOrderDeliveryId { get; set; }
     }
 
-    public class PostponeDeliveryBatchCommandHandler : CommandsHandler,
-        IRequestHandler<PostponeDeliveryBatchCommand, Result>
+    public class StartPurchaseOrderDeliveryCommandHandler : CommandsHandler,
+        IRequestHandler<StartPurchaseOrderDeliveryCommand, Result>
     {
-        public PostponeDeliveryBatchCommandHandler(
+        public StartPurchaseOrderDeliveryCommandHandler(
             ISheaftMediatr mediatr,
             IAppDbContext context,
-            ILogger<PostponeDeliveryBatchCommandHandler> logger)
+            ILogger<StartPurchaseOrderDeliveryCommandHandler> logger)
             : base(mediatr, context, logger)
         {
         }
 
-        public async Task<Result> Handle(PostponeDeliveryBatchCommand request, CancellationToken token)
+        public async Task<Result> Handle(StartPurchaseOrderDeliveryCommand request, CancellationToken token)
         {
-            var deliveryBatch = await _context.DeliveryBatches.SingleOrDefaultAsync(c => c.Id == request.Id, token);
-            if (deliveryBatch == null)
+            var purchaseOrderDelivery = await _context.Set<Domain.PurchaseOrderDelivery>()
+                .SingleOrDefaultAsync(c => c.Id == request.PurchaseOrderDeliveryId, token);
+            if (purchaseOrderDelivery == null)
                 return Failure(MessageKind.NotFound);
 
-            deliveryBatch.PostponeBatch(request.ScheduledOn, request.From, request.Reason);
+            purchaseOrderDelivery.StartDelivery();
             await _context.SaveChangesAsync(token);
 
             return Success();

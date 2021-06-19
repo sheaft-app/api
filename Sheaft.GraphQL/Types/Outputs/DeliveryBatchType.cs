@@ -8,6 +8,7 @@ using HotChocolate.Types;
 using Microsoft.EntityFrameworkCore;
 using Sheaft.Domain;
 using Sheaft.GraphQL.DeliveryBatchs;
+using Sheaft.GraphQL.PurchaseOrderDeliveries;
 using Sheaft.GraphQL.PurchaseOrders;
 using Sheaft.GraphQL.Users;
 using Sheaft.Infrastructure.Persistence;
@@ -71,8 +72,8 @@ namespace Sheaft.GraphQL.Types.Outputs
                 .Name("from");
             
             descriptor
-                .Field(c => c.To)
-                .Name("to");
+                .Field(c => c.Reason)
+                .Name("reason");
             
             descriptor
                 .Field("assignedTo")

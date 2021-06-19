@@ -22,8 +22,8 @@ namespace Sheaft.GraphQL.Types.Inputs
                 .Name("from");
             
             descriptor
-                .Field(c => c.To)
-                .Name("to");
+                .Field(c => c.Reason)
+                .Name("reason");
             
             descriptor
                 .Field(c => c.ScheduledOn)

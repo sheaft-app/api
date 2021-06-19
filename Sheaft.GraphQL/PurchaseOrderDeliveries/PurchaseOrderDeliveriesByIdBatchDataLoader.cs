@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore;
 using Sheaft.Domain;
 using Sheaft.Infrastructure.Persistence;
 
-namespace Sheaft.GraphQL.PurchaseOrders
+namespace Sheaft.GraphQL.PurchaseOrderDeliveries
 {
     public class PurchaseOrderDeliveriesByIdBatchDataLoader : BatchDataLoader<Guid, PurchaseOrderDelivery>
     {
