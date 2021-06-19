@@ -92,6 +92,18 @@ namespace Sheaft.GraphQL.DeliveryBatchs
             return await deliveryBatchesDataLoader.LoadAsync(input.Id, token);
         }
 
+        [GraphQLName("cancelDeliveryBatch")]
+        [Authorize(Policy = Policies.PRODUCER)]
+        [GraphQLType(typeof(DeliveryBatchType))]
+        public async Task<DeliveryBatch> CancelDeliveryModeAsync(
+            [GraphQLType(typeof(CancelDeliveryBatchInputType))] [GraphQLName("input")]
+            CancelDeliveryBatchCommand input, [Service] ISheaftMediatr mediatr,
+            DeliveryBatchesByIdBatchDataLoader deliveryBatchesDataLoader, CancellationToken token)
+        {
+            await ExecuteAsync(mediatr, input, token);
+            return await deliveryBatchesDataLoader.LoadAsync(input.Id, token);
+        }
+
         [GraphQLName("deleteDeliveryBatch")]
         [Authorize(Policy = Policies.PRODUCER)]
         [GraphQLType(typeof(BooleanType))]

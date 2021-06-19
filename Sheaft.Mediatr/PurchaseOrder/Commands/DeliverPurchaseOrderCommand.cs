@@ -34,6 +34,7 @@ namespace Sheaft.Mediatr.PurchaseOrder.Commands
         public Guid PurchaseOrderId { get; set; }
         public bool SkipNotification { get; set; }
         public string ReceptionedBy { get; set; }
+        public string Comment { get; set; }
     }
 
     public class DeliverPurchaseOrderCommandHandler : CommandsHandler,
@@ -53,7 +54,7 @@ namespace Sheaft.Mediatr.PurchaseOrder.Commands
             if(purchaseOrder.ProducerId != request.RequestUser.Id)
                 return Failure(MessageKind.Forbidden);
             
-            purchaseOrder.Deliver(request.ReceptionedBy, request.SkipNotification);
+            purchaseOrder.Delivery.CompleteDelivery(request.ReceptionedBy, request.Comment);
             await _context.SaveChangesAsync(token);
 
             if (purchaseOrder.SenderInfo.Kind == ProfileKind.Consumer)

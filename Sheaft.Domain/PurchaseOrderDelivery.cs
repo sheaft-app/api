@@ -1,4 +1,5 @@
 ﻿using System;
+using Sheaft.Core.Exceptions;
 using Sheaft.Domain.Enum;
 using Sheaft.Domain.Interop;
 
@@ -36,6 +37,7 @@ namespace Sheaft.Domain
         public string Client { get; private set; }
         public DeliveryKind Kind { get; private set; }
         public DeliveryStatus Status { get; private set; }
+        public DateTimeOffset? StartedOn { get; private set; }
         public DateTimeOffset? DeliveredOn { get; private set; }
         public DateTimeOffset ExpectedDeliveryDate { get; private set; }
         public DayOfWeek Day { get; private set; }
@@ -43,6 +45,7 @@ namespace Sheaft.Domain
         public TimeSpan To { get; private set; }
         public int? Position { get; private set; }
         public string ReceptionedBy { get; private set; }
+        public string Comment { get; private set; }
         public ExpectedAddress Address { get; private set; }
         public Guid DeliveryModeId { get; private set; }
         public Guid PurchaseOrderId { get; private set; }
@@ -53,24 +56,33 @@ namespace Sheaft.Domain
 
         public void SetAsReady()
         {
+            if (Status != DeliveryStatus.Waiting)
+                throw SheaftException.Validation();
+            
             Status = DeliveryStatus.Ready;
         }
 
         public void StartDelivery()
         {
+            if (Status != DeliveryStatus.Ready && Status != DeliveryStatus.Waiting)
+                throw SheaftException.Validation();
+            
+            StartedOn = DateTimeOffset.UtcNow;
             Status = DeliveryStatus.InProgress;
+            PurchaseOrder.SetStatus(PurchaseOrderStatus.Shipping, true);
         }
 
-        public void CompleteDelivery(string receptionedBy)
+        public void CompleteDelivery(string receptionedBy, string comment)
         {
+            if (Status is DeliveryStatus.Delivered)
+                throw SheaftException.Validation();
+            
             ReceptionedBy = receptionedBy;
+            Comment = comment;
+            StartedOn ??= DateTimeOffset.UtcNow;
             DeliveredOn = DateTimeOffset.UtcNow;
             Status = DeliveryStatus.Delivered;
-        }
-
-        public void CancelDelivery()
-        {
-            Status = DeliveryStatus.Cancelled;
+            PurchaseOrder.SetStatus(PurchaseOrderStatus.Delivered, true);
         }
 
         public void SetPosition(int position)
@@ -80,11 +92,17 @@ namespace Sheaft.Domain
 
         public void SkipDelivery()
         {
+            if (Status is DeliveryStatus.Delivered)
+                throw SheaftException.Validation();
+            
             Status = DeliveryStatus.Skipped;
         }
 
         public void PostponeDelivery()
         {
+            if (Status is DeliveryStatus.Delivered)
+                throw SheaftException.Validation();
+            
             Status = DeliveryStatus.Postponed;
         }
     }

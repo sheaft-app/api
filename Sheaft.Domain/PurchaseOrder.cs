@@ -92,7 +92,7 @@ namespace Sheaft.Domain
             Reference = newReference;
         }
 
-        private void SetStatus(PurchaseOrderStatus newStatus, bool skipNotification)
+        internal void SetStatus(PurchaseOrderStatus newStatus, bool skipNotification)
         {
             switch (newStatus)
             {
@@ -125,7 +125,6 @@ namespace Sheaft.Domain
                     if (Status != PurchaseOrderStatus.Completed)
                         throw SheaftException.Validation(MessageKind.PurchaseOrder_CannotShip_NotIn_CompletedStatus);
 
-                    Delivery.StartDelivery();
                     break;
                 case PurchaseOrderStatus.Delivered:
                     if (Status != PurchaseOrderStatus.Completed && Status != PurchaseOrderStatus.Shipping)
@@ -203,17 +202,6 @@ namespace Sheaft.Domain
         public void SetComment(string comment)
         {
             Comment = comment;
-        }
-
-        public void Ship(bool skipNotification)
-        {
-            SetStatus(PurchaseOrderStatus.Shipping, skipNotification);
-        }
-
-        public void Deliver(string receptionedBy, bool skipNotification)
-        {
-            SetStatus(PurchaseOrderStatus.Delivered, skipNotification);
-            Delivery.CompleteDelivery(receptionedBy);
         }
 
         public void Cancel(string reason, bool skipNotification)

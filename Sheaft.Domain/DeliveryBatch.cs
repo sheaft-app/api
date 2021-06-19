@@ -14,14 +14,13 @@ namespace Sheaft.Domain
         {
         }
 
-        public DeliveryBatch(Guid id, string name, DateTimeOffset scheduledOn, TimeSpan from, TimeSpan to, User assignedTo, List<PurchaseOrderDelivery> purchaseOrderDeliveries = null)
+        public DeliveryBatch(Guid id, string name, DateTimeOffset scheduledOn, TimeSpan from, User assignedTo, List<PurchaseOrderDelivery> purchaseOrderDeliveries = null)
         {
             Id = id;
             Name = name;
             ScheduledOn = scheduledOn;
             Day = scheduledOn.DayOfWeek;
             From = from;
-            To = to;
             AssignedTo = assignedTo;
             AssignedToId = assignedTo.Id;
             Status = DeliveryBatchStatus.Waiting;
@@ -40,9 +39,10 @@ namespace Sheaft.Domain
         public DateTimeOffset ScheduledOn { get; private set; }
         public DayOfWeek Day { get; private set; }
         public TimeSpan From { get; private set; }
-        public TimeSpan To { get; private set; }
         public DateTimeOffset? StartedOn { get; private set; }
         public DateTimeOffset? CompletedOn { get; private set; }
+        public DateTimeOffset? CancelledOn { get; private set; }
+        public string Reason { get; private set; }
         public Guid AssignedToId { get; private set; }
         public virtual User AssignedTo { get; private set; }
         public virtual ICollection<PurchaseOrderDelivery> Deliveries { get; private set; }
@@ -59,11 +59,12 @@ namespace Sheaft.Domain
         
         public void StartBatch()
         {
+            Reason = null;
             StartedOn ??= DateTimeOffset.UtcNow;
             Status = DeliveryBatchStatus.InProgress;
             
-            foreach (var delivery in Deliveries.Where(d => d.Status != DeliveryStatus.Delivered))
-                delivery.StartDelivery();
+            foreach (var delivery in Deliveries)
+                delivery.SetAsReady();
         }
 
         public void CompleteBatch()
@@ -75,20 +76,30 @@ namespace Sheaft.Domain
             Status = DeliveryBatchStatus.Completed;
         }
 
-        public void PostponeBatch(DateTimeOffset rescheduledOn, TimeSpan from, TimeSpan to)
+        public void CancelBatch(string reason)
         {
-            if(Status != DeliveryBatchStatus.Waiting && Status != DeliveryBatchStatus.Postponed && Status != DeliveryBatchStatus.InProgress)
+            if(Status is DeliveryBatchStatus.Completed or DeliveryBatchStatus.Cancelled)
                 throw SheaftException.Validation();
+
+            foreach (var delivery in Deliveries.Where(d => d.Status != DeliveryStatus.Delivered).ToList())
+                Deliveries.Remove(delivery);
             
-            if(Status == DeliveryBatchStatus.InProgress && Deliveries.Any(d => d.Status == DeliveryStatus.Delivered))
+            CancelledOn = DateTimeOffset.UtcNow;
+            Reason = reason;
+            Status = DeliveryBatchStatus.Cancelled;
+        }
+
+        public void PostponeBatch(DateTimeOffset rescheduledOn, TimeSpan from, string reason)
+        {
+            if(Status != DeliveryBatchStatus.Waiting)
                 throw SheaftException.Validation();
-            
+
+            StartedOn = null;
             ScheduledOn = rescheduledOn;
             From = from;
-            To = to;
-            
-            Status = DeliveryBatchStatus.Postponed;
-            foreach (var delivery in Deliveries.Where(d => d.Status != DeliveryStatus.Delivered))
+            Reason = reason;
+            Status = DeliveryBatchStatus.Waiting;
+            foreach (var delivery in Deliveries)
                 delivery.PostponeDelivery();
         }
 
@@ -101,14 +112,11 @@ namespace Sheaft.Domain
             foreach (var delivery in deliveries.OrderBy(d => d.Position))
             {
                 delivery.SetPosition(positionCounter);
-                if(!delivery.DeliveryBatchId.HasValue)
-                    delivery.SetAsReady();
-                else if(delivery.DeliveryBatchId != Id)
-                    delivery.PostponeDelivery();
-                
                 Deliveries.Add(delivery);
-
                 positionCounter++;
+                
+                if(delivery.DeliveryBatchId.HasValue && delivery.DeliveryBatchId != Id)
+                    delivery.PostponeDelivery();
             }
 
             DeliveriesCount = Deliveries.Count;
