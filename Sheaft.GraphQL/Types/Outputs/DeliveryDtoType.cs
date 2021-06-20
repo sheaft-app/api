@@ -10,7 +10,7 @@ namespace Sheaft.GraphQL.Types.Outputs
         {
             base.Configure(descriptor);
 
-            descriptor.Name("Delivery");
+            descriptor.Name("ExpectedDelivery");
             
             descriptor.Field(c => c.Id)
                 .Name("id")

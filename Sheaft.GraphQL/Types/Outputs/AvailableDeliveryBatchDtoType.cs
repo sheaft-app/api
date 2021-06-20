@@ -20,10 +20,6 @@ namespace Sheaft.GraphQL.Types.Outputs
         protected override void Configure(IObjectTypeDescriptor<AvailableDeliveryBatchDto> descriptor)
         {
             base.Configure(descriptor);
-
-            descriptor
-                .Field(c => c.Name)
-                .Name("name");
             
             descriptor
                 .Field(c => c.Day)
@@ -46,9 +42,13 @@ namespace Sheaft.GraphQL.Types.Outputs
                 .Name("purchaseOrdersCount");
             
             descriptor
-                .Field(c => c.PurchaseOrders)
-                .Name("purchaseOrders")
-                .Type<ListType<AvailablePurchaseOrderDtoType>>();
+                .Field(c => c.ClientsCount)
+                .Name("clientsCount");
+            
+            descriptor
+                .Field(c => c.Clients)
+                .Name("clients")
+                .Type<ListType<AvailableClientDeliveryDtoType>>();
         }
     }
 }

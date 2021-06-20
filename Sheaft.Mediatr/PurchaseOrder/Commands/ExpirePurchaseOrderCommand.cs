@@ -52,7 +52,7 @@ namespace Sheaft.Mediatr.PurchaseOrder.Commands
             }
             
             if (purchaseOrder.Status == PurchaseOrderStatus.Waiting 
-                && purchaseOrder.Delivery.ExpectedDeliveryDate < DateTimeOffset.UtcNow)
+                && purchaseOrder.ExpectedDelivery.ExpectedDeliveryDate < DateTimeOffset.UtcNow)
             {
                 purchaseOrder.Expire(
                     "La commande n'a pas été acceptée avant la date de réception choisie.",

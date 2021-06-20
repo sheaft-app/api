@@ -37,7 +37,7 @@ namespace Sheaft.Business.PickingOrdersExporters
                 var purchaseOrders = await purchaseOrdersQuery.ToListAsync(token);
                 var storeDeliveryDays = purchaseOrders
                     .Where(po => po.SenderInfo.Kind == ProfileKind.Store)
-                    .GroupBy(po => po.Delivery.ExpectedDeliveryDate.DayOfWeek);
+                    .GroupBy(po => po.ExpectedDelivery.ExpectedDeliveryDate.DayOfWeek);
 
                 var products = await _context.Products
                     .Where(p =>
@@ -67,7 +67,7 @@ namespace Sheaft.Business.PickingOrdersExporters
 
                 var consumerDeliveryDays = purchaseOrders
                     .Where(po => po.SenderInfo.Kind == ProfileKind.Consumer)
-                    .GroupBy(po => po.Delivery.ExpectedDeliveryDate.DayOfWeek)
+                    .GroupBy(po => po.ExpectedDelivery.ExpectedDeliveryDate.DayOfWeek)
                     .ToList();
 
                 if (consumerDeliveryDays.Any())

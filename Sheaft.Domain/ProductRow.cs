@@ -46,11 +46,37 @@ namespace Sheaft.Domain
             TotalVatPrice = product.TotalVatPrice;
             TotalWholeSalePrice = product.TotalWholeSalePrice;
             TotalOnSalePrice = product.TotalOnSalePrice;
-            
+
+            RowKind = product.RowKind;
             ProductId = product.ProductId;
         }
+        
+        protected ProductRow(ProductRow product, int quantity, ModificationKind rowKind)
+        {
+            UnitWholeSalePrice = product.UnitWholeSalePrice;
+            UnitOnSalePrice = product.UnitOnSalePrice;
+            UnitVatPrice = product.UnitVatPrice;
+            UnitWeight = product.UnitWeight;
+            Vat = product.Vat;
 
-        protected ProductRow(Product product, Guid catalogId, int quantity)
+            Id = Guid.NewGuid();
+            Name = product.Name;
+            Reference = product.Reference;
+
+            ReturnableName = product.ReturnableName;
+            ReturnableVat = product.ReturnableVat;
+            ReturnableVatPrice = product.ReturnableVatPrice;
+            ReturnableWholeSalePrice = product.ReturnableWholeSalePrice;
+            ReturnableOnSalePrice = product.ReturnableOnSalePrice;
+            ReturnablesCount = product.ReturnablesCount;
+
+            RowKind = rowKind;
+
+            ProductId = product.ProductId;
+            SetQuantity(quantity);
+        }
+
+        protected ProductRow(Product product, Guid catalogId, int quantity, ModificationKind rowKind)
         {
             var productPrice = product.CatalogsPrices.Single(p => p.CatalogId == catalogId);
             
@@ -70,8 +96,8 @@ namespace Sheaft.Domain
             ReturnableWholeSalePrice = product.Returnable?.WholeSalePrice;
             ReturnableOnSalePrice = product.Returnable?.OnSalePrice;
 
+            RowKind = rowKind;
             ProductId = product.Id;
-
             SetQuantity(quantity);
         }
 
@@ -110,6 +136,7 @@ namespace Sheaft.Domain
         public decimal TotalOnSalePrice { get; private set; }
         public Guid ProductId { get; private set; }
         public byte[] RowVersion { get; private set; }
+        public ModificationKind RowKind { get; set; }
 
         protected void RefreshLine()
         {

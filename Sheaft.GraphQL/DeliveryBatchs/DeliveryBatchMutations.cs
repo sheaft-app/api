@@ -18,6 +18,7 @@ using Sheaft.Domain;
 using Sheaft.GraphQL.Types.Inputs;
 using Sheaft.GraphQL.Types.Outputs;
 using Sheaft.Infrastructure.Persistence;
+using Sheaft.Mediatr.DeliveryBatch.Commands;
 using Sheaft.Mediatr.DeliveryMode.Commands;
 
 namespace Sheaft.GraphQL.DeliveryBatchs

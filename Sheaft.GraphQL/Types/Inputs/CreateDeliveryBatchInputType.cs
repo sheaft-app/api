@@ -1,4 +1,5 @@
 using HotChocolate.Types;
+using Sheaft.Mediatr.DeliveryBatch.Commands;
 using Sheaft.Mediatr.DeliveryMode.Commands;
 
 namespace Sheaft.GraphQL.Types.Inputs
@@ -26,7 +27,7 @@ namespace Sheaft.GraphQL.Types.Inputs
             descriptor
                 .Field(c => c.Deliveries)
                 .Name("deliveries")
-                .Type<NonNullType<ListType<PurchaseOrderDeliveryPositionDtoInputType>>>();
+                .Type<NonNullType<ListType<ClientDeliveryPositionDtoInputType>>>();
         }
     }
 }

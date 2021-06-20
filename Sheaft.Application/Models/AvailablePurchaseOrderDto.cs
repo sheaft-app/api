@@ -16,6 +16,6 @@ namespace Sheaft.Application.Models
         public int ReturnablesCount { get; set; }
         public string Client { get; set; }
         public string Address { get; set; }
-        public Guid DeliveryId { get; set; }
+        public Guid ClientId { get; set; }
     }
 }

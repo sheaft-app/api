@@ -41,7 +41,8 @@ namespace Sheaft.Domain
                     order.User.Address.City, order.User.Address.Country, order.User.Address.Longitude,
                     order.User.Address.Latitude);
 
-            Delivery = new PurchaseOrderDelivery(delivery, address, order.User.Name);
+            ExpectedDelivery = new ExpectedPurchaseOrderDelivery(delivery, address);
+            
             SetComment(delivery.Comment);
 
             SetReference(reference);
@@ -79,9 +80,10 @@ namespace Sheaft.Domain
         public Guid OrderId { get; private set; }
         public Guid ProducerId { get; private set; }
         public Guid ClientId { get; private set; }
+        public Guid? DeliveryId { get; private set; }
         public PurchaseOrderSender SenderInfo { get; private set; }
         public PurchaseOrderVendor VendorInfo { get; private set; }
-        public virtual PurchaseOrderDelivery Delivery { get; private set; }
+        public virtual ExpectedPurchaseOrderDelivery ExpectedDelivery { get; private set; }
         public virtual ICollection<PurchaseOrderProduct> Products { get; private set; }
 
         public void SetReference(string newReference)
@@ -122,7 +124,7 @@ namespace Sheaft.Domain
 
                     break;
                 case PurchaseOrderStatus.Shipping:
-                    if (Status != PurchaseOrderStatus.Completed)
+                    if (Status != PurchaseOrderStatus.Completed && Status != PurchaseOrderStatus.Postponed)
                         throw SheaftException.Validation(MessageKind.PurchaseOrder_CannotShip_NotIn_CompletedStatus);
 
                     break;
@@ -194,6 +196,12 @@ namespace Sheaft.Domain
                     if (!skipNotification)
                         DomainEvents.Add(new PurchaseOrderExpiredEvent(Id));
                     break;
+
+                case PurchaseOrderStatus.Postponed:
+                    if (Status != PurchaseOrderStatus.Completed && Status != PurchaseOrderStatus.Shipping && Status != PurchaseOrderStatus.Postponed)
+                        throw SheaftException.Validation();
+                    
+                    break;
             }
 
             Status = newStatus;
@@ -253,6 +261,22 @@ namespace Sheaft.Domain
         {
             ProducerId = vendor.Id;
             VendorInfo = new PurchaseOrderVendor(vendor);
+        }
+
+        public void ModifyProductQuantity(ProductRow product, int quantity, ModificationKind modificationKind)
+        {
+            if (Status == PurchaseOrderStatus.Delivered)
+                throw SheaftException.Validation();
+
+            if (product == null)
+                throw SheaftException.Validation(MessageKind.PurchaseOrder_CannotAddProduct_Product_NotFound);
+
+            var productLine = Products.SingleOrDefault(p => p.ProductId == product.ProductId);
+            if (productLine == null)
+                throw SheaftException.NotFound();
+            
+            Products.Add(new PurchaseOrderProduct(product, quantity, modificationKind));
+            RefreshOrder();
         }
 
         private void AddProduct(ProductRow product)

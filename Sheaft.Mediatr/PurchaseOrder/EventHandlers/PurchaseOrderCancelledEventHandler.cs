@@ -48,7 +48,7 @@ namespace Sheaft.Mediatr.PurchaseOrder.EventHandlers
             await _emailService.SendTemplatedEmailAsync(
                 purchaseOrder.SenderInfo.Email,
                 purchaseOrder.SenderInfo.Name,
-                $"{purchaseOrder.VendorInfo.Name} a annulé votre commande pour le {purchaseOrder.Delivery.ExpectedDeliveryDate:dd/MM/yyyy}",
+                $"{purchaseOrder.VendorInfo.Name} a annulé votre commande pour le {purchaseOrder.ExpectedDelivery.ExpectedDeliveryDate:dd/MM/yyyy}",
                 nameof(PurchaseOrderCancelledEvent),
                 purchaseOrder.GetTemplateData(purchaseOrderIdentifier, 
                     $"{_configuration.GetValue<string>("Portal:url")}/#/my-orders/{purchaseOrderIdentifier}"),
@@ -58,7 +58,7 @@ namespace Sheaft.Mediatr.PurchaseOrder.EventHandlers
             await _emailService.SendTemplatedEmailAsync(
                 purchaseOrder.VendorInfo.Email,
                 purchaseOrder.VendorInfo.Name,
-                $"La commande de {purchaseOrder.SenderInfo.Name} pour le {purchaseOrder.Delivery.ExpectedDeliveryDate:dd/MM/yyyy} a bien été annulée",
+                $"La commande de {purchaseOrder.SenderInfo.Name} pour le {purchaseOrder.ExpectedDelivery.ExpectedDeliveryDate:dd/MM/yyyy} a bien été annulée",
                 nameof(PurchaseOrderCancelledEvent),
                 purchaseOrder.GetTemplateData(purchaseOrderIdentifier, 
                     $"{_configuration.GetValue<string>("Portal:url")}/#/purchase-orders/{purchaseOrderIdentifier}"),

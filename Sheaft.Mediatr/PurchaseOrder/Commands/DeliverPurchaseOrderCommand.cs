@@ -54,12 +54,20 @@ namespace Sheaft.Mediatr.PurchaseOrder.Commands
             if(purchaseOrder.ProducerId != request.RequestUser.Id)
                 return Failure(MessageKind.Forbidden);
             
-            purchaseOrder.Delivery.CompleteDelivery(request.ReceptionedBy, request.Comment);
+            if((int)purchaseOrder.ExpectedDelivery.Kind > 4)
+                return Failure(MessageKind.Validation);
+
+            var producer = await _context.Producers.SingleAsync(p => p.Id == purchaseOrder.ProducerId, token);
+            var user = await _context.Users.SingleAsync(p => p.Id == purchaseOrder.ClientId, token);
+            var delivery = new Domain.Delivery(producer, purchaseOrder.ExpectedDelivery.Kind, purchaseOrder.ExpectedDelivery.ExpectedDeliveryDate, purchaseOrder.ExpectedDelivery.Address, user.Id, user.Name, new []{purchaseOrder}, 0);
+            delivery.CompleteDelivery(user.Name, null);
+            
+            await _context.AddAsync(delivery, token);
             await _context.SaveChangesAsync(token);
 
             if (purchaseOrder.SenderInfo.Kind == ProfileKind.Consumer)
             {
-                var dateDiff = purchaseOrder.Delivery.ExpectedDeliveryDate.AddDays(7) - DateTime.UtcNow;
+                var dateDiff = purchaseOrder.ExpectedDelivery.ExpectedDeliveryDate.AddDays(7) - DateTime.UtcNow;
                 _mediatr.Schedule(
                     new CreatePurchaseOrderTransferCommand(request.RequestUser) {PurchaseOrderId = purchaseOrder.Id},
                     TimeSpan.FromDays(dateDiff.TotalDays));

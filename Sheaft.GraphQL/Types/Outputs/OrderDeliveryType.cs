@@ -34,7 +34,7 @@ namespace Sheaft.GraphQL.Types.Outputs
             descriptor
                 .Field("expectedDelivery")
                 .ResolveWith<OrderDeliveryResolvers>(c => c.GetExpectedDelivery(default))
-                .Type<NonNullType<ExpectedDeliveryType>>();
+                .Type<NonNullType<ExpectedDeliveryDtoType>>();
         }
 
         private class OrderDeliveryResolvers

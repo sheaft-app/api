@@ -30,6 +30,11 @@ namespace Sheaft.GraphQL.Types.Outputs
             descriptor
                 .Field(c => c.Client)
                 .Name("client");
+            
+            descriptor
+                .Field(c => c.ClientId)
+                .Name("clientId")
+                .ID(nameof(User));
 
             descriptor
                 .Field(c => c.LinesCount)
@@ -54,11 +59,6 @@ namespace Sheaft.GraphQL.Types.Outputs
             descriptor
                 .Field(c => c.TotalWholeSalePrice)
                 .Name("totalWholeSalePrice");
-
-            descriptor
-                .Field(c => c.DeliveryId)
-                .ID(nameof(PurchaseOrderDelivery))
-                .Name("deliveryId");
         }
     }
 }

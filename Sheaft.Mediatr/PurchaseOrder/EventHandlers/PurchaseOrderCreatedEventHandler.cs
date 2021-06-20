@@ -52,7 +52,7 @@ namespace Sheaft.Mediatr.PurchaseOrder.EventHandlers
             await _emailService.SendTemplatedEmailAsync(
                 purchaseOrder.VendorInfo.Email,
                 purchaseOrder.VendorInfo.Name,
-                $"{purchaseOrder.SenderInfo.Name} a envoyé une commande pour le {purchaseOrder.Delivery.ExpectedDeliveryDate:dd/MM/yyyy}",
+                $"{purchaseOrder.SenderInfo.Name} a envoyé une commande pour le {purchaseOrder.ExpectedDelivery.ExpectedDeliveryDate:dd/MM/yyyy}",
                 "PurchaseOrderReceivedEvent",
                 purchaseOrder.GetTemplateData(purchaseOrderIdentifier,
                     $"{_configuration.GetValue<string>("Portal:url")}/#/purchase-orders/{purchaseOrderIdentifier}"),

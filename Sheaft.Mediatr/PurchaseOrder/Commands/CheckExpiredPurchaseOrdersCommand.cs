@@ -66,7 +66,7 @@ namespace Sheaft.Mediatr.PurchaseOrder.Commands
         private async Task<IEnumerable<Guid>> GetNextPurchaseOrderIdsAsync(int skip, int take, CancellationToken token)
         {
             return await _context.PurchaseOrders
-                .Where(c => c.Status == PurchaseOrderStatus.Waiting && (c.CreatedOn.AddDays(3) < DateTimeOffset.UtcNow || c.Delivery.ExpectedDeliveryDate < DateTimeOffset.UtcNow))
+                .Where(c => c.Status == PurchaseOrderStatus.Waiting && (c.CreatedOn.AddDays(3) < DateTimeOffset.UtcNow || c.ExpectedDelivery.ExpectedDeliveryDate < DateTimeOffset.UtcNow))
                 .OrderBy(c => c.CreatedOn)
                 .Select(c => c.Id)
                 .Skip(skip)

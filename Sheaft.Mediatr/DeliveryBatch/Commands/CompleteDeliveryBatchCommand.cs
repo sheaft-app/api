@@ -21,7 +21,7 @@ using Microsoft.EntityFrameworkCore;
 using Sheaft.Core.Enums;
 using Sheaft.Mediatr.Producer.Commands;
 
-namespace Sheaft.Mediatr.DeliveryMode.Commands
+namespace Sheaft.Mediatr.DeliveryBatch.Commands
 {
     public class CompleteDeliveryBatchCommand : Command
     {

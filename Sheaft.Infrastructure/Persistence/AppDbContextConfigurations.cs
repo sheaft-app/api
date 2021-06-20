@@ -146,7 +146,7 @@ namespace Sheaft.Infrastructure.Persistence
             modelBuilder.ApplyConfiguration(new DocumentConfiguration());
             modelBuilder.ApplyConfiguration(new PageConfiguration());
             modelBuilder.ApplyConfiguration(new UserPointConfiguration());
-            modelBuilder.ApplyConfiguration(new PurchaseOrderDeliveryConfiguration());
+            modelBuilder.ApplyConfiguration(new DeliveryConfiguration());
             modelBuilder.ApplyConfiguration(new DeliveryBatchConfiguration(isAdminContext));
         }
 
