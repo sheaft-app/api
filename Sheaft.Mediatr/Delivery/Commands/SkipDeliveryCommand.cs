@@ -21,43 +21,41 @@ using Microsoft.EntityFrameworkCore;
 using Sheaft.Core.Enums;
 using Sheaft.Mediatr.Producer.Commands;
 
-namespace Sheaft.Mediatr.PurchaseOrderDelivery.Commands
+namespace Sheaft.Mediatr.Delivery.Commands
 {
-    public class CompletePurchaseOrderDeliveryCommand : Command
+    public class SkipDeliveryCommand : Command
     {
-        protected CompletePurchaseOrderDeliveryCommand()
+        protected SkipDeliveryCommand()
         {
         }
 
         [JsonConstructor]
-        public CompletePurchaseOrderDeliveryCommand(RequestUser requestUser) : base(requestUser)
+        public SkipDeliveryCommand(RequestUser requestUser) : base(requestUser)
         {
         }
 
-        public Guid PurchaseOrderDeliveryId { get; set; }
-        public string ReceptionedBy { get; set; }
-        public string Comment { get; set; }
+        public Guid DeliveryId { get; set; }
     }
 
-    public class CompletePurchaseOrderDeliveryCommandHandler : CommandsHandler,
-        IRequestHandler<CompletePurchaseOrderDeliveryCommand, Result>
+    public class SkipDeliveryCommandHandler : CommandsHandler,
+        IRequestHandler<SkipDeliveryCommand, Result>
     {
-        public CompletePurchaseOrderDeliveryCommandHandler(
+        public SkipDeliveryCommandHandler(
             ISheaftMediatr mediatr,
             IAppDbContext context,
-            ILogger<CompletePurchaseOrderDeliveryCommandHandler> logger)
+            ILogger<SkipDeliveryCommandHandler> logger)
             : base(mediatr, context, logger)
         {
         }
 
-        public async Task<Result> Handle(CompletePurchaseOrderDeliveryCommand request, CancellationToken token)
+        public async Task<Result> Handle(SkipDeliveryCommand request, CancellationToken token)
         {
-            var purchaseOrderDelivery = await _context.Set<Domain.PurchaseOrderDelivery>()
-                .SingleOrDefaultAsync(c => c.Id == request.PurchaseOrderDeliveryId, token);
+            var purchaseOrderDelivery = await _context.Set<Domain.Delivery>()
+                .SingleOrDefaultAsync(c => c.Id == request.DeliveryId, token);
             if (purchaseOrderDelivery == null)
                 return Failure(MessageKind.NotFound);
 
-            purchaseOrderDelivery.CompleteDelivery(request.ReceptionedBy, request.Comment);
+            purchaseOrderDelivery.SkipDelivery();
             await _context.SaveChangesAsync(token);
 
             return Success();

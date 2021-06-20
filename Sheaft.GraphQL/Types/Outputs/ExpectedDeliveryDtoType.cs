@@ -1,10 +1,9 @@
 ﻿using HotChocolate.Types;
 using Sheaft.Application.Models;
-using Sheaft.Domain;
 
 namespace Sheaft.GraphQL.Types.Outputs
 {
-    public class ExpectedDeliveryType : SheaftOutputType<ExpectedDeliveryDto>
+    public class ExpectedDeliveryDtoType : SheaftOutputType<ExpectedDeliveryDto>
     {
         protected override void Configure(IObjectTypeDescriptor<ExpectedDeliveryDto> descriptor)
         {

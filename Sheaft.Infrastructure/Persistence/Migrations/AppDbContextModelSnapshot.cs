@@ -271,6 +271,69 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                     b.ToTable("Declarations");
                 });
 
+            modelBuilder.Entity("Sheaft.Domain.Delivery", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Client")
+                        .HasColumnType("nvarchar(max)")
+                        .UseCollation("Latin1_general_CI_AI");
+
+                    b.Property<Guid>("ClientId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Comment")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTimeOffset>("CreatedOn")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<DateTimeOffset?>("DeliveredOn")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<Guid?>("DeliveryBatchId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("Kind")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("Position")
+                        .HasColumnType("int");
+
+                    b.Property<Guid>("ProducerId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("PurchaseOrdersCount")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ReceptionedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTimeOffset>("ScheduledOn")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<DateTimeOffset?>("StartedOn")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<DateTimeOffset?>("UpdatedOn")
+                        .HasColumnType("datetimeoffset");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ClientId");
+
+                    b.HasIndex("DeliveryBatchId");
+
+                    b.HasIndex("ProducerId");
+
+                    b.ToTable("Deliveries");
+                });
+
             modelBuilder.Entity("Sheaft.Domain.DeliveryBatch", b =>
                 {
                     b.Property<Guid>("Id")
@@ -302,6 +365,9 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("ProductsCount")
+                        .HasColumnType("int");
+
+                    b.Property<int>("PurchaseOrdersCount")
                         .HasColumnType("int");
 
                     b.Property<string>("Reason")
@@ -1090,6 +1156,9 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                     b.Property<int>("ReturnablesCount")
                         .HasColumnType("int");
 
+                    b.Property<int>("RowKind")
+                        .HasColumnType("int");
+
                     b.Property<byte[]>("RowVersion")
                         .IsConcurrencyToken()
                         .ValueGeneratedOnAddOrUpdate()
@@ -1682,6 +1751,9 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                     b.Property<DateTimeOffset>("CreatedOn")
                         .HasColumnType("datetimeoffset");
 
+                    b.Property<Guid?>("DeliveryId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<DateTimeOffset?>("DroppedOn")
                         .HasColumnType("datetimeoffset")
                         .HasColumnName("WithdrawnOn");
@@ -1754,84 +1826,14 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("DeliveryId");
+
                     b.HasIndex("OrderId");
 
                     b.HasIndex("ProducerId", "Reference")
                         .IsUnique();
 
                     b.ToTable("PurchaseOrders");
-                });
-
-            modelBuilder.Entity("Sheaft.Domain.PurchaseOrderDelivery", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Client")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Comment")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTimeOffset>("CreatedOn")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<int>("Day")
-                        .HasColumnType("int");
-
-                    b.Property<DateTimeOffset?>("DeliveredOn")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<Guid?>("DeliveryBatchId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("DeliveryModeId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTimeOffset>("ExpectedDeliveryDate")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<TimeSpan>("From")
-                        .HasColumnType("time");
-
-                    b.Property<int>("Kind")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Name")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int?>("Position")
-                        .HasColumnType("int");
-
-                    b.Property<Guid>("PurchaseOrderId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("ReceptionedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTimeOffset?>("StartedOn")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<int>("Status")
-                        .HasColumnType("int");
-
-                    b.Property<TimeSpan>("To")
-                        .HasColumnType("time");
-
-                    b.Property<DateTimeOffset?>("UpdatedOn")
-                        .HasColumnType("datetimeoffset");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("DeliveryBatchId");
-
-                    b.HasIndex("DeliveryModeId");
-
-                    b.HasIndex("PurchaseOrderId")
-                        .IsUnique();
-
-                    b.ToTable("PurchaseOrderDeliveries");
                 });
 
             modelBuilder.Entity("Sheaft.Domain.PurchaseOrderProduct", b =>
@@ -1877,6 +1879,9 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                         .HasColumnType("decimal(10,2)");
 
                     b.Property<int>("ReturnablesCount")
+                        .HasColumnType("int");
+
+                    b.Property<int>("RowKind")
                         .HasColumnType("int");
 
                     b.Property<byte[]>("RowVersion")
@@ -3261,6 +3266,64 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                     b.Navigation("Product");
                 });
 
+            modelBuilder.Entity("Sheaft.Domain.Delivery", b =>
+                {
+                    b.HasOne("Sheaft.Domain.User", null)
+                        .WithMany()
+                        .HasForeignKey("ClientId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("Sheaft.Domain.DeliveryBatch", "DeliveryBatch")
+                        .WithMany("Deliveries")
+                        .HasForeignKey("DeliveryBatchId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("Sheaft.Domain.Producer", null)
+                        .WithMany()
+                        .HasForeignKey("ProducerId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.OwnsOne("Sheaft.Domain.ExpectedAddress", "Address", b1 =>
+                        {
+                            b1.Property<Guid>("DeliveryId")
+                                .HasColumnType("uniqueidentifier");
+
+                            b1.Property<string>("City")
+                                .HasColumnType("nvarchar(max)");
+
+                            b1.Property<int>("Country")
+                                .HasColumnType("int");
+
+                            b1.Property<double?>("Latitude")
+                                .HasColumnType("float");
+
+                            b1.Property<string>("Line1")
+                                .HasColumnType("nvarchar(max)");
+
+                            b1.Property<string>("Line2")
+                                .HasColumnType("nvarchar(max)");
+
+                            b1.Property<double?>("Longitude")
+                                .HasColumnType("float");
+
+                            b1.Property<string>("Zipcode")
+                                .HasColumnType("nvarchar(max)");
+
+                            b1.HasKey("DeliveryId");
+
+                            b1.ToTable("Deliveries");
+
+                            b1.WithOwner()
+                                .HasForeignKey("DeliveryId");
+                        });
+
+                    b.Navigation("Address");
+
+                    b.Navigation("DeliveryBatch");
+                });
+
             modelBuilder.Entity("Sheaft.Domain.DeliveryBatch", b =>
                 {
                     b.HasOne("Sheaft.Domain.User", "AssignedTo")
@@ -3734,11 +3797,94 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
 
             modelBuilder.Entity("Sheaft.Domain.PurchaseOrder", b =>
                 {
+                    b.HasOne("Sheaft.Domain.Delivery", null)
+                        .WithMany("PurchaseOrders")
+                        .HasForeignKey("DeliveryId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
                     b.HasOne("Sheaft.Domain.Order", null)
                         .WithMany("PurchaseOrders")
                         .HasForeignKey("OrderId")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
+
+                    b.OwnsOne("Sheaft.Domain.ExpectedPurchaseOrderDelivery", "ExpectedDelivery", b1 =>
+                        {
+                            b1.Property<Guid>("PurchaseOrderId")
+                                .HasColumnType("uniqueidentifier");
+
+                            b1.Property<int>("Day")
+                                .HasColumnType("int");
+
+                            b1.Property<Guid>("DeliveryModeId")
+                                .HasColumnType("uniqueidentifier");
+
+                            b1.Property<DateTimeOffset>("ExpectedDeliveryDate")
+                                .HasColumnType("datetimeoffset");
+
+                            b1.Property<TimeSpan>("From")
+                                .HasColumnType("time");
+
+                            b1.Property<int>("Kind")
+                                .HasColumnType("int");
+
+                            b1.Property<string>("Name")
+                                .HasColumnType("nvarchar(max)");
+
+                            b1.Property<TimeSpan>("To")
+                                .HasColumnType("time");
+
+                            b1.HasKey("PurchaseOrderId");
+
+                            b1.HasIndex("DeliveryModeId");
+
+                            b1.ToTable("PurchaseOrders");
+
+                            b1.HasOne("Sheaft.Domain.DeliveryMode", null)
+                                .WithMany()
+                                .HasForeignKey("DeliveryModeId")
+                                .OnDelete(DeleteBehavior.NoAction)
+                                .IsRequired();
+
+                            b1.WithOwner()
+                                .HasForeignKey("PurchaseOrderId");
+
+                            b1.OwnsOne("Sheaft.Domain.ExpectedAddress", "Address", b2 =>
+                                {
+                                    b2.Property<Guid>("ExpectedPurchaseOrderDeliveryPurchaseOrderId")
+                                        .HasColumnType("uniqueidentifier");
+
+                                    b2.Property<string>("City")
+                                        .HasColumnType("nvarchar(max)");
+
+                                    b2.Property<int>("Country")
+                                        .HasColumnType("int");
+
+                                    b2.Property<double?>("Latitude")
+                                        .HasColumnType("float");
+
+                                    b2.Property<string>("Line1")
+                                        .HasColumnType("nvarchar(max)");
+
+                                    b2.Property<string>("Line2")
+                                        .HasColumnType("nvarchar(max)");
+
+                                    b2.Property<double?>("Longitude")
+                                        .HasColumnType("float");
+
+                                    b2.Property<string>("Zipcode")
+                                        .HasColumnType("nvarchar(max)");
+
+                                    b2.HasKey("ExpectedPurchaseOrderDeliveryPurchaseOrderId");
+
+                                    b2.ToTable("PurchaseOrders");
+
+                                    b2.WithOwner()
+                                        .HasForeignKey("ExpectedPurchaseOrderDeliveryPurchaseOrderId");
+                                });
+
+                            b1.Navigation("Address");
+                        });
 
                     b.OwnsOne("Sheaft.Domain.PurchaseOrderSender", "SenderInfo", b1 =>
                         {
@@ -3808,71 +3954,11 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                                 .HasForeignKey("PurchaseOrderId");
                         });
 
+                    b.Navigation("ExpectedDelivery");
+
                     b.Navigation("SenderInfo");
 
                     b.Navigation("VendorInfo");
-                });
-
-            modelBuilder.Entity("Sheaft.Domain.PurchaseOrderDelivery", b =>
-                {
-                    b.HasOne("Sheaft.Domain.DeliveryBatch", "DeliveryBatch")
-                        .WithMany("Deliveries")
-                        .HasForeignKey("DeliveryBatchId")
-                        .OnDelete(DeleteBehavior.NoAction);
-
-                    b.HasOne("Sheaft.Domain.DeliveryMode", "DeliveryMode")
-                        .WithMany()
-                        .HasForeignKey("DeliveryModeId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
-                    b.HasOne("Sheaft.Domain.PurchaseOrder", "PurchaseOrder")
-                        .WithOne("Delivery")
-                        .HasForeignKey("Sheaft.Domain.PurchaseOrderDelivery", "PurchaseOrderId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.OwnsOne("Sheaft.Domain.ExpectedAddress", "Address", b1 =>
-                        {
-                            b1.Property<Guid>("PurchaseOrderDeliveryId")
-                                .HasColumnType("uniqueidentifier");
-
-                            b1.Property<string>("City")
-                                .HasColumnType("nvarchar(max)");
-
-                            b1.Property<int>("Country")
-                                .HasColumnType("int");
-
-                            b1.Property<double?>("Latitude")
-                                .HasColumnType("float");
-
-                            b1.Property<string>("Line1")
-                                .HasColumnType("nvarchar(max)");
-
-                            b1.Property<string>("Line2")
-                                .HasColumnType("nvarchar(max)");
-
-                            b1.Property<double?>("Longitude")
-                                .HasColumnType("float");
-
-                            b1.Property<string>("Zipcode")
-                                .HasColumnType("nvarchar(max)");
-
-                            b1.HasKey("PurchaseOrderDeliveryId");
-
-                            b1.ToTable("PurchaseOrderDeliveries");
-
-                            b1.WithOwner()
-                                .HasForeignKey("PurchaseOrderDeliveryId");
-                        });
-
-                    b.Navigation("Address");
-
-                    b.Navigation("DeliveryBatch");
-
-                    b.Navigation("DeliveryMode");
-
-                    b.Navigation("PurchaseOrder");
                 });
 
             modelBuilder.Entity("Sheaft.Domain.PurchaseOrderProduct", b =>
@@ -4324,6 +4410,11 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                     b.Navigation("Ubos");
                 });
 
+            modelBuilder.Entity("Sheaft.Domain.Delivery", b =>
+                {
+                    b.Navigation("PurchaseOrders");
+                });
+
             modelBuilder.Entity("Sheaft.Domain.DeliveryBatch", b =>
                 {
                     b.Navigation("Deliveries");
@@ -4387,8 +4478,6 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
 
             modelBuilder.Entity("Sheaft.Domain.PurchaseOrder", b =>
                 {
-                    b.Navigation("Delivery");
-
                     b.Navigation("Products");
                 });
 

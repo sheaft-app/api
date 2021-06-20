@@ -1,4 +1,5 @@
 ﻿using System;
+using Sheaft.Domain.Enum;
 
 namespace Sheaft.Domain
 {
@@ -9,7 +10,7 @@ namespace Sheaft.Domain
         }
 
         public OrderProduct(Product product, Guid catalogId, int quantity)
-            : base(product, catalogId, quantity)
+            : base(product, catalogId, quantity, ModificationKind.Order)
         {
             Producer = product.Producer;
             ProducerId = product.Producer.Id;

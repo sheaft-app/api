@@ -23,11 +23,11 @@ using Sheaft.Options;
 namespace Sheaft.GraphQL.PurchaseOrderDeliveries
 {
     [ExtendObjectType(Name = "Query")]
-    public class PurchaseOrderDeliveryQueries : SheaftQuery
+    public class DeliveryQueries : SheaftQuery
     {
         private readonly RoleOptions _roleOptions;
 
-        public PurchaseOrderDeliveryQueries(
+        public DeliveryQueries(
             IOptionsSnapshot<RoleOptions> roleOptions,
             ICurrentUserService currentUserService,
             IHttpContextAccessor httpContextAccessor)
@@ -36,37 +36,37 @@ namespace Sheaft.GraphQL.PurchaseOrderDeliveries
             _roleOptions = roleOptions.Value;
         }
 
-        [GraphQLName("purchaseOrderDelivery")]
-        [GraphQLType(typeof(PurchaseOrderDeliveryType))]
+        [GraphQLName("delivery")]
+        [GraphQLType(typeof(DeliveryType))]
         [Authorize(Policy = Policies.REGISTERED)]
         [UseDbContext(typeof(QueryDbContext))]
         [UseSingleOrDefault]
-        public IQueryable<PurchaseOrderDelivery> GetPurchaseOrderDelivery([ID] Guid id,
+        public IQueryable<Delivery> GetPurchaseOrderDelivery([ID] Guid id,
             [ScopedService] QueryDbContext context)
         {
             SetLogTransaction(CurrentUser.Id);
             
-            return context.Set<PurchaseOrderDelivery>()
+            return context.Set<Delivery>()
                 .Where(c => c.Id == id);
         }
 
-        [GraphQLName("purchaseOrderDeliveries")]
-        [GraphQLType(typeof(ListType<PurchaseOrderDeliveryType>))]
+        [GraphQLName("deliveries")]
+        [GraphQLType(typeof(ListType<DeliveryType>))]
         [UseDbContext(typeof(QueryDbContext))]
         [Authorize(Policy = Policies.REGISTERED)]
         [UsePaging]
         [UseFiltering]
         [UseSorting]
-        public IQueryable<PurchaseOrderDelivery> GetAll([ScopedService] QueryDbContext context, CancellationToken token)
+        public IQueryable<Delivery> GetAll([ScopedService] QueryDbContext context, CancellationToken token)
         {
             SetLogTransaction();
 
             if (CurrentUser.IsInRole(_roleOptions.Producer.Value))
-                return context.Set<PurchaseOrderDelivery>()
-                    .Where(c => c.PurchaseOrder.ProducerId == CurrentUser.Id);
+                return context.Set<Delivery>()
+                    .Where(c => c.ProducerId == CurrentUser.Id);
             
-            return context.Set<PurchaseOrderDelivery>()
-                .Where(c => c.PurchaseOrder.ClientId == CurrentUser.Id);
+            return context.Set<Delivery>()
+                .Where(c => c.ClientId == CurrentUser.Id);
         }
     }
 }

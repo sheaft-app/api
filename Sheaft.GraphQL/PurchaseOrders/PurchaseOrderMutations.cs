@@ -39,18 +39,6 @@ namespace Sheaft.GraphQL.PurchaseOrders
             return await purchaseOrdersDataLoader.LoadAsync(input.PurchaseOrderIds.ToList(), token);
         }
 
-        [GraphQLName("shipPurchaseOrders")]
-        [Authorize(Policy = Policies.PRODUCER)]
-        [GraphQLType(typeof(ListType<PurchaseOrderType>))]
-        public async Task<IEnumerable<PurchaseOrder>> ShipPurchaseOrdersAsync(
-            [GraphQLType(typeof(ShipPurchaseOrdersInputType))] [GraphQLName("input")]
-            ShipPurchaseOrdersCommand input, [Service] ISheaftMediatr mediatr,
-            PurchaseOrdersByIdBatchDataLoader purchaseOrdersDataLoader, CancellationToken token)
-        {
-            await ExecuteAsync(mediatr, input, token);
-            return await purchaseOrdersDataLoader.LoadAsync(input.PurchaseOrderIds.ToList(), token);
-        }
-
         [GraphQLName("deliverPurchaseOrders")]
         [Authorize(Policy = Policies.PRODUCER)]
         [GraphQLType(typeof(ListType<PurchaseOrderType>))]

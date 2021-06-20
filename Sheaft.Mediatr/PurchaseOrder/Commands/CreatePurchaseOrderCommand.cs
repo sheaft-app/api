@@ -67,8 +67,8 @@ namespace Sheaft.Mediatr.PurchaseOrder.Commands
             
             if (delivery.DeliveryMode.MaxPurchaseOrdersPerTimeSlot.HasValue)
                 await _tableService.IncreaseProducerDeliveryCountAsync(producer.Id, delivery.DeliveryModeId,
-                    purchaseOrder.Delivery.ExpectedDeliveryDate, purchaseOrder.Delivery.From,
-                    purchaseOrder.Delivery.To, delivery.DeliveryMode.MaxPurchaseOrdersPerTimeSlot.Value, token);
+                    purchaseOrder.ExpectedDelivery.ExpectedDeliveryDate, purchaseOrder.ExpectedDelivery.From,
+                    purchaseOrder.ExpectedDelivery.To, delivery.DeliveryMode.MaxPurchaseOrdersPerTimeSlot.Value, token);
 
             if (delivery.DeliveryMode.AutoAcceptRelatedPurchaseOrder)
                 _mediatr.Post(new AcceptPurchaseOrderCommand(request.RequestUser)

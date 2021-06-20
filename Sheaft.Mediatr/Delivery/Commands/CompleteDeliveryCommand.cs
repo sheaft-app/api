@@ -21,41 +21,43 @@ using Microsoft.EntityFrameworkCore;
 using Sheaft.Core.Enums;
 using Sheaft.Mediatr.Producer.Commands;
 
-namespace Sheaft.Mediatr.PurchaseOrderDelivery.Commands
+namespace Sheaft.Mediatr.Delivery.Commands
 {
-    public class StartPurchaseOrderDeliveryCommand : Command
+    public class CompleteDeliveryCommand : Command
     {
-        protected StartPurchaseOrderDeliveryCommand()
+        protected CompleteDeliveryCommand()
         {
         }
 
         [JsonConstructor]
-        public StartPurchaseOrderDeliveryCommand(RequestUser requestUser) : base(requestUser)
+        public CompleteDeliveryCommand(RequestUser requestUser) : base(requestUser)
         {
         }
 
-        public Guid PurchaseOrderDeliveryId { get; set; }
+        public Guid DeliveryId { get; set; }
+        public string ReceptionedBy { get; set; }
+        public string Comment { get; set; }
     }
 
-    public class StartPurchaseOrderDeliveryCommandHandler : CommandsHandler,
-        IRequestHandler<StartPurchaseOrderDeliveryCommand, Result>
+    public class CompleteDeliveryCommandHandler : CommandsHandler,
+        IRequestHandler<CompleteDeliveryCommand, Result>
     {
-        public StartPurchaseOrderDeliveryCommandHandler(
+        public CompleteDeliveryCommandHandler(
             ISheaftMediatr mediatr,
             IAppDbContext context,
-            ILogger<StartPurchaseOrderDeliveryCommandHandler> logger)
+            ILogger<CompleteDeliveryCommandHandler> logger)
             : base(mediatr, context, logger)
         {
         }
 
-        public async Task<Result> Handle(StartPurchaseOrderDeliveryCommand request, CancellationToken token)
+        public async Task<Result> Handle(CompleteDeliveryCommand request, CancellationToken token)
         {
-            var purchaseOrderDelivery = await _context.Set<Domain.PurchaseOrderDelivery>()
-                .SingleOrDefaultAsync(c => c.Id == request.PurchaseOrderDeliveryId, token);
+            var purchaseOrderDelivery = await _context.Set<Domain.Delivery>()
+                .SingleOrDefaultAsync(c => c.Id == request.DeliveryId, token);
             if (purchaseOrderDelivery == null)
                 return Failure(MessageKind.NotFound);
 
-            purchaseOrderDelivery.StartDelivery();
+            purchaseOrderDelivery.CompleteDelivery(request.ReceptionedBy, request.Comment);
             await _context.SaveChangesAsync(token);
 
             return Success();

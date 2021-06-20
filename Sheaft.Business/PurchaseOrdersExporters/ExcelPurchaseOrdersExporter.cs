@@ -40,14 +40,14 @@ namespace Sheaft.Business.PurchaseOrdersExporters
         {
             var purchaseOrdersWorksheet = package.Workbook.Worksheets.Add("Commandes");
 
-            purchaseOrdersWorksheet.Cells[1, 1, 1, 20].Value = $"Vos commandes du {from:dd-MM-yyyy} au {to:dd-MM-yyyy}";
-            purchaseOrdersWorksheet.Cells[1, 1, 1, 20].Merge = true;
+            purchaseOrdersWorksheet.Cells[1, 1, 1, 17].Value = $"Vos commandes du {from:dd-MM-yyyy} au {to:dd-MM-yyyy}";
+            purchaseOrdersWorksheet.Cells[1, 1, 1, 17].Merge = true;
 
-            purchaseOrdersWorksheet.Cells[2, 1, 2, 12].Value = "Information des commandes";
-            purchaseOrdersWorksheet.Cells[2, 1, 2, 12].Merge = true;
+            purchaseOrdersWorksheet.Cells[2, 1, 2, 9].Value = "Information des commandes";
+            purchaseOrdersWorksheet.Cells[2, 1, 2, 9].Merge = true;
 
-            purchaseOrdersWorksheet.Cells[2, 13, 2, 20].Value = "Détails des produits";
-            purchaseOrdersWorksheet.Cells[2, 13, 2, 20].Merge = true;
+            purchaseOrdersWorksheet.Cells[2, 10, 2, 17].Value = "Détails des produits";
+            purchaseOrdersWorksheet.Cells[2, 10, 2, 17].Merge = true;
 
             purchaseOrdersWorksheet.Cells[3, 1].Value = "Date de commande";
             purchaseOrdersWorksheet.Cells[3, 2].Value = "Nom client";
@@ -58,15 +58,14 @@ namespace Sheaft.Business.PurchaseOrdersExporters
             purchaseOrdersWorksheet.Cells[3, 7].Value = "Total commande HT";
             purchaseOrdersWorksheet.Cells[3, 8].Value = "Total commande TVA";
             purchaseOrdersWorksheet.Cells[3, 9].Value = "Total commande TTC";
-            purchaseOrdersWorksheet.Cells[3, 10].Value = "Date de livraison";
-            purchaseOrdersWorksheet.Cells[3, 11].Value = "Référence du produit";
-            purchaseOrdersWorksheet.Cells[3, 12].Value = "Nom du produit";
-            purchaseOrdersWorksheet.Cells[3, 13].Value = "Quantité";
-            purchaseOrdersWorksheet.Cells[3, 14].Value = "Prix unitaire (HT)";
-            purchaseOrdersWorksheet.Cells[3, 15].Value = "Prix unitaire (TTC)";
-            purchaseOrdersWorksheet.Cells[3, 16].Value = "TVA";
-            purchaseOrdersWorksheet.Cells[3, 17].Value = "Total produit HT";
-            purchaseOrdersWorksheet.Cells[3, 18].Value = "Total produit TTC";
+            purchaseOrdersWorksheet.Cells[3, 10].Value = "Référence du produit";
+            purchaseOrdersWorksheet.Cells[3, 11].Value = "Nom du produit";
+            purchaseOrdersWorksheet.Cells[3, 12].Value = "Quantité";
+            purchaseOrdersWorksheet.Cells[3, 13].Value = "Prix unitaire (HT)";
+            purchaseOrdersWorksheet.Cells[3, 14].Value = "Prix unitaire (TTC)";
+            purchaseOrdersWorksheet.Cells[3, 15].Value = "TVA";
+            purchaseOrdersWorksheet.Cells[3, 16].Value = "Total produit HT";
+            purchaseOrdersWorksheet.Cells[3, 17].Value = "Total produit TTC";
 
             var i = 4;
             
@@ -81,23 +80,20 @@ namespace Sheaft.Business.PurchaseOrdersExporters
                 purchaseOrdersWorksheet.Cells[i, 7].Value = purchaseOrder.TotalWholeSalePrice;
                 purchaseOrdersWorksheet.Cells[i, 8].Value = purchaseOrder.TotalVatPrice;
                 purchaseOrdersWorksheet.Cells[i, 9].Value = purchaseOrder.TotalOnSalePrice;
-                purchaseOrdersWorksheet.Cells[i, 10].Value = !purchaseOrder.Delivery.DeliveredOn.HasValue
-                    ? "En attente"
-                    : purchaseOrder.Delivery.DeliveredOn.Value.ToString("dd/MM/yyyy");
                 
                 purchaseOrdersWorksheet.Cells[i, 1, i + purchaseOrder.Products.Count - 1, 1].Merge = true;
                 purchaseOrdersWorksheet.Cells[i, 2, i + purchaseOrder.Products.Count - 1, 2].Merge = true;
                 
                 foreach (var product in purchaseOrder.Products)
                 {
-                    purchaseOrdersWorksheet.Cells[i, 11].Value = product.Reference;
-                    purchaseOrdersWorksheet.Cells[i, 12].Value = product.Name;
-                    purchaseOrdersWorksheet.Cells[i, 13].Value = product.Quantity;
-                    purchaseOrdersWorksheet.Cells[i, 14].Value = product.UnitWholeSalePrice;
-                    purchaseOrdersWorksheet.Cells[i, 15].Value = product.UnitOnSalePrice;
-                    purchaseOrdersWorksheet.Cells[i, 16].Value = product.Vat;
-                    purchaseOrdersWorksheet.Cells[i, 17].Value = product.TotalWholeSalePrice;
-                    purchaseOrdersWorksheet.Cells[i, 18].Value = product.TotalOnSalePrice;
+                    purchaseOrdersWorksheet.Cells[i, 10].Value = product.Reference;
+                    purchaseOrdersWorksheet.Cells[i, 11].Value = product.Name;
+                    purchaseOrdersWorksheet.Cells[i, 12].Value = product.Quantity;
+                    purchaseOrdersWorksheet.Cells[i, 13].Value = product.UnitWholeSalePrice;
+                    purchaseOrdersWorksheet.Cells[i, 14].Value = product.UnitOnSalePrice;
+                    purchaseOrdersWorksheet.Cells[i, 15].Value = product.Vat;
+                    purchaseOrdersWorksheet.Cells[i, 16].Value = product.TotalWholeSalePrice;
+                    purchaseOrdersWorksheet.Cells[i, 17].Value = product.TotalOnSalePrice;
                     i++;
                 }
             }

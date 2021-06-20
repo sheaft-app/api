@@ -14,6 +14,7 @@ using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Application.Models;
 using Sheaft.Application.Security;
 using Sheaft.Domain;
+using Sheaft.Domain.Enum;
 using Sheaft.GraphQL.Types.Outputs;
 using Sheaft.Infrastructure.Persistence;
 
@@ -58,7 +59,7 @@ namespace Sheaft.GraphQL.DeliveryBatchs
             SetLogTransaction();
 
             return context.DeliveryBatches
-                .Where(c => c.AssignedToId == CurrentUser.Id);
+                .Where(c => c.AssignedToId == CurrentUser.Id && c.Status != DeliveryBatchStatus.Cancelled);
         }
 
         [GraphQLName("availableDeliveryBatches")]
