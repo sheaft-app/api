@@ -20,7 +20,7 @@ using Sheaft.GraphQL.Types.Outputs;
 using Sheaft.Infrastructure.Persistence;
 using Sheaft.Options;
 
-namespace Sheaft.GraphQL.PurchaseOrderDeliveries
+namespace Sheaft.GraphQL.Deliveries
 {
     [ExtendObjectType(Name = "Query")]
     public class DeliveryQueries : SheaftQuery

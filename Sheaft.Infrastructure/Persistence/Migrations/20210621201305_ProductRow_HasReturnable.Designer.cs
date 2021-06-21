@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using NetTopologySuite.Geometries;
 using Sheaft.Infrastructure.Persistence;
@@ -10,9 +11,10 @@ using Sheaft.Infrastructure.Persistence;
 namespace Sheaft.Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(QueryDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20210621201305_ProductRow_HasReturnable")]
+    partial class ProductRow_HasReturnable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -305,7 +307,7 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                     b.Property<Guid>("ProducerId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<int>("ProductsToDeliverCount")
+                    b.Property<int>("ProductsCount")
                         .HasColumnType("int");
 
                     b.Property<int>("PurchaseOrdersCount")
@@ -315,12 +317,6 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("ReturnablesCount")
-                        .HasColumnType("int");
-
-                    b.Property<int>("ReturnedProductsCount")
-                        .HasColumnType("int");
-
-                    b.Property<int>("ReturnedReturnablesCount")
                         .HasColumnType("int");
 
                     b.Property<DateTimeOffset>("ScheduledOn")
@@ -376,7 +372,7 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("ProductsToDeliverCount")
+                    b.Property<int>("ProductsCount")
                         .HasColumnType("int");
 
                     b.Property<int>("PurchaseOrdersCount")
@@ -389,12 +385,6 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                         .HasColumnType("datetimeoffset");
 
                     b.Property<int>("ReturnablesCount")
-                        .HasColumnType("int");
-
-                    b.Property<int>("ReturnedProductsCount")
-                        .HasColumnType("int");
-
-                    b.Property<int>("ReturnedReturnablesCount")
                         .HasColumnType("int");
 
                     b.Property<byte[]>("RowVersion")
@@ -666,7 +656,7 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                     b.Property<DateTimeOffset>("CreatedOn")
                         .HasColumnType("datetimeoffset");
 
-                    b.Property<Guid>("DeliveryId")
+                    b.Property<Guid?>("DeliveryId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<int>("Kind")
@@ -3605,10 +3595,8 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
             modelBuilder.Entity("Sheaft.Domain.DeliveryReturnable", b =>
                 {
                     b.HasOne("Sheaft.Domain.Delivery", null)
-                        .WithMany("ReturnedReturnables")
-                        .HasForeignKey("DeliveryId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .WithMany("Returnables")
+                        .HasForeignKey("DeliveryId");
                 });
 
             modelBuilder.Entity("Sheaft.Domain.Department", b =>
@@ -4626,7 +4614,7 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
 
                     b.Navigation("PurchaseOrders");
 
-                    b.Navigation("ReturnedReturnables");
+                    b.Navigation("Returnables");
                 });
 
             modelBuilder.Entity("Sheaft.Domain.DeliveryBatch", b =>

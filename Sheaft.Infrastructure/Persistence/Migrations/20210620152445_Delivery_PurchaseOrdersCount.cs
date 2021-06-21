@@ -15,13 +15,13 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                 defaultValue: 0);
 
             migrationBuilder.Sql(@"
-            update app.deliveries
-            set PurchaseOrdersCount = res.cc 
-            from (
-            select d.Id as pId, count(po.Id) as cc from app.Deliveries d 
-            join app.PurchaseOrders po on po.DeliveryId = d.Id
-            group by d.Id) res
-            where Id = res.pId");
+                update app.deliveries
+                set PurchaseOrdersCount = res.cc 
+                from (
+                select d.Id as pId, count(po.Id) as cc from app.Deliveries d 
+                join app.PurchaseOrders po on po.DeliveryId = d.Id
+                group by d.Id) res
+                where Id = res.pId");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)

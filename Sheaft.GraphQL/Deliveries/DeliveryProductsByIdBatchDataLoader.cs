@@ -11,11 +11,11 @@ using Sheaft.Infrastructure.Persistence;
 
 namespace Sheaft.GraphQL.Deliveries
 {
-    public class DeliveriesByIdBatchDataLoader : BatchDataLoader<Guid, Delivery>
+    public class DeliveryProductsByIdBatchDataLoader : BatchDataLoader<Guid, DeliveryProduct>
     {
         private readonly IDbContextFactory<QueryDbContext> _contextFactory;
 
-        public DeliveriesByIdBatchDataLoader(
+        public DeliveryProductsByIdBatchDataLoader(
             IDbContextFactory<QueryDbContext> contextFactory,
             IBatchScheduler batchScheduler,
             DataLoaderOptions<Guid> options = null)
@@ -24,11 +24,11 @@ namespace Sheaft.GraphQL.Deliveries
             _contextFactory = contextFactory;
         }
 
-        protected override async Task<IReadOnlyDictionary<Guid, Delivery>> LoadBatchAsync(
+        protected override async Task<IReadOnlyDictionary<Guid, DeliveryProduct>> LoadBatchAsync(
             IReadOnlyList<Guid> keys,
             CancellationToken token)
         {
-            return await _contextFactory.CreateDbContext().Deliveries
+            return await _contextFactory.CreateDbContext().Set<DeliveryProduct>()
                 .Where(u => keys.Contains(u.Id))
                 .ToDictionaryAsync(c => c.Id, token);
         }

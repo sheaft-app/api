@@ -8,8 +8,7 @@ using HotChocolate.Types;
 using Microsoft.EntityFrameworkCore;
 using Sheaft.Application.Models;
 using Sheaft.Domain;
-using Sheaft.GraphQL.Catalogs;
-using Sheaft.GraphQL.PurchaseOrderDeliveries;
+using Sheaft.GraphQL.Deliveries;
 using Sheaft.GraphQL.PurchaseOrders;
 using Sheaft.Infrastructure.Persistence;
 

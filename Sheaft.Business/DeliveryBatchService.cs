@@ -54,6 +54,7 @@ namespace Sheaft.Business
                     {
                         deliveryBatch ??= new AvailableDeliveryBatchDto
                         {
+                            Name = purchaseOrder.ExpectedDelivery.Name,
                             Day = purchaseOrder.ExpectedDelivery.Day,
                             From = purchaseOrder.ExpectedDelivery.From,
                             To = purchaseOrder.ExpectedDelivery.To,

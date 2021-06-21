@@ -24,6 +24,16 @@ namespace Sheaft.GraphQL.Types.Inputs
             descriptor
                 .Field(c => c.Comment)
                 .Name("comment");
+
+            descriptor
+                .Field(c => c.ReturnedProducts)
+                .Name("returnedProducts")
+                .Type<ListType<ReturnedProductDtoInputType>>();
+
+            descriptor
+                .Field(c => c.ReturnedReturnables)
+                .Name("returnedReturnables")
+                .Type<ListType<ReturnedReturnableDtoInputType>>();
         }
     }
 }

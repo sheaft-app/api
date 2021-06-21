@@ -7,7 +7,7 @@ using HotChocolate.Resolvers;
 using HotChocolate.Types;
 using Microsoft.EntityFrameworkCore;
 using Sheaft.Domain;
-using Sheaft.GraphQL.PurchaseOrderDeliveries;
+using Sheaft.GraphQL.Deliveries;
 using Sheaft.GraphQL.PurchaseOrders;
 using Sheaft.Infrastructure.Persistence;
 
@@ -69,12 +69,35 @@ namespace Sheaft.GraphQL.Types.Outputs
             descriptor
                 .Field(c => c.PurchaseOrdersCount)
                 .Name("purchaseOrdersCount");
+            
+            descriptor
+                .Field(c => c.ReturnablesCount)
+                .Name("returnablesCount");
+            
+            descriptor
+                .Field(c => c.ProductsToDeliverCount)
+                .Name("productsToDeliverCount");
+            
+            descriptor
+                .Field(c => c.ReturnedProductsCount)
+                .Name("returnedProductsCount");
+            
+            descriptor
+                .Field(c => c.ReturnedReturnablesCount)
+                .Name("returnedReturnablesCount");
 
             descriptor
                 .Field("purchaseOrders")
                 .UseDbContext<QueryDbContext>()
                 .ResolveWith<DeliveryResolvers>(c => c.GetPurchaseOrders(default, default, default, default))
                 .Type<ListType<PurchaseOrderType>>();
+
+            descriptor
+                .Field(c => c.Products)
+                .Name("products")
+                .UseDbContext<QueryDbContext>()
+                .ResolveWith<DeliveryResolvers>(c => c.GetProducts(default, default, default, default))
+                .Type<ListType<DeliveryProductType>>();
         }
 
         private class DeliveryResolvers
@@ -88,6 +111,18 @@ namespace Sheaft.GraphQL.Types.Outputs
                     .ToListAsync(token);
                 
                 return await purchaseOrdersBatchDataLoader.LoadAsync(purchaseOrderIds, token);
+            }
+
+            public async Task<IEnumerable<DeliveryProduct>> GetProducts(Delivery delivery,
+                [ScopedService] QueryDbContext context,
+                DeliveryProductsByIdBatchDataLoader deliveryProductsDataLoader, CancellationToken token)
+            {
+                var productsId = await context.Set<DeliveryProduct>()
+                    .Where(p => p.DeliveryId == delivery.Id)
+                    .Select(p => p.Id)
+                    .ToListAsync(token);
+
+                return await deliveryProductsDataLoader.LoadAsync(productsId, token);
             }
         }
     }

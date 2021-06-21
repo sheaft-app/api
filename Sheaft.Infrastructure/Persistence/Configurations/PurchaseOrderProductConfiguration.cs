@@ -38,8 +38,6 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
             entity.Property(o => o.TotalProductWholeSalePrice).HasColumnType("decimal(10,2)");
 
             entity.HasKey(c => c.Id);
-            entity.HasIndex(c=> new {c.PurchaseOrderId, c.ProductId}).IsUnique();
-            
             entity.ToTable("PurchaseOrderProducts");
         }
     }
