@@ -83,6 +83,7 @@ namespace Sheaft.Domain
         public Guid? DeliveryId { get; private set; }
         public PurchaseOrderSender SenderInfo { get; private set; }
         public PurchaseOrderVendor VendorInfo { get; private set; }
+        public virtual Delivery Delivery { get; private set; }
         public virtual ExpectedPurchaseOrderDelivery ExpectedDelivery { get; private set; }
         public virtual ICollection<PurchaseOrderProduct> Products { get; private set; }
 

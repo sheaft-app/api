@@ -4,6 +4,7 @@ namespace Sheaft.Domain.Enum
     {
         Order,
         Preparation,
+        Deliver,
         Missing,
         Broken,
         Improper

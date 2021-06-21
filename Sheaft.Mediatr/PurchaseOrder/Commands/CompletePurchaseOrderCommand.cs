@@ -63,6 +63,16 @@ namespace Sheaft.Mediatr.PurchaseOrder.Commands
                     TimeSpan.FromDays(dateDiff.TotalDays));
             }
 
+            if ((int) purchaseOrder.ExpectedDelivery.Kind <= 4)
+            {
+                var producer = await _context.Producers.SingleAsync(p => p.Id == purchaseOrder.ProducerId, token);
+                var user = await _context.Users.SingleAsync(p => p.Id == purchaseOrder.ClientId, token);
+                var delivery = new Domain.Delivery(producer, purchaseOrder.ExpectedDelivery.Kind, purchaseOrder.ExpectedDelivery.ExpectedDeliveryDate, purchaseOrder.ExpectedDelivery.Address, user.Id, user.Name, new []{purchaseOrder}, 0);
+                delivery.SetAsReady();
+            
+                await _context.AddAsync(delivery, token);
+            }
+
             await _context.SaveChangesAsync(token);
             return Success();
         }

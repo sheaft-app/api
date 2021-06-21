@@ -16,7 +16,7 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
             
             entity.OwnsOne(o => o.Address);
             
-            entity.HasMany(c => c.PurchaseOrders).WithOne()
+            entity.HasMany(c => c.PurchaseOrders).WithOne(c => c.Delivery)
                 .HasForeignKey(c => c.DeliveryId).OnDelete(DeleteBehavior.SetNull);
 
             entity.HasOne<Producer>().WithMany()
