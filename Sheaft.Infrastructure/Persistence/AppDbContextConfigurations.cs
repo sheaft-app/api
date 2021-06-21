@@ -148,6 +148,8 @@ namespace Sheaft.Infrastructure.Persistence
             modelBuilder.ApplyConfiguration(new UserPointConfiguration());
             modelBuilder.ApplyConfiguration(new DeliveryConfiguration());
             modelBuilder.ApplyConfiguration(new DeliveryBatchConfiguration(isAdminContext));
+            modelBuilder.ApplyConfiguration(new DeliveryProductConfiguration());
+            modelBuilder.ApplyConfiguration(new DeliveryReturnableConfiguration());
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

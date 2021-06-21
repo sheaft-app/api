@@ -12,7 +12,7 @@ using Sheaft.GraphQL.Types.Inputs;
 using Sheaft.GraphQL.Types.Outputs;
 using Sheaft.Mediatr.Delivery.Commands;
 
-namespace Sheaft.GraphQL.PurchaseOrderDeliveries
+namespace Sheaft.GraphQL.Deliveries
 {
     [ExtendObjectType(Name = "Mutation")]
     public class DeliveryMutations : SheaftMutation

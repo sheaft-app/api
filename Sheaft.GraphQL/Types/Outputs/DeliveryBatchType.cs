@@ -7,9 +7,8 @@ using HotChocolate.Resolvers;
 using HotChocolate.Types;
 using Microsoft.EntityFrameworkCore;
 using Sheaft.Domain;
+using Sheaft.GraphQL.Deliveries;
 using Sheaft.GraphQL.DeliveryBatchs;
-using Sheaft.GraphQL.PurchaseOrderDeliveries;
-using Sheaft.GraphQL.PurchaseOrders;
 using Sheaft.GraphQL.Users;
 using Sheaft.Infrastructure.Persistence;
 
@@ -60,12 +59,24 @@ namespace Sheaft.GraphQL.Types.Outputs
                 .Name("purchaseOrdersCount");
             
             descriptor
-                .Field(c => c.ProductsCount)
-                .Name("productsCount");
-            
-            descriptor
                 .Field(c => c.DeliveriesCount)
                 .Name("deliveriesCount");
+            
+            descriptor
+                .Field(c => c.ReturnablesCount)
+                .Name("returnablesCount");
+            
+            descriptor
+                .Field(c => c.ProductsToDeliverCount)
+                .Name("productsToDeliverCount");
+            
+            descriptor
+                .Field(c => c.ReturnedProductsCount)
+                .Name("returnedProductsCount");
+            
+            descriptor
+                .Field(c => c.ReturnedReturnablesCount)
+                .Name("returnedReturnablesCount");
             
             descriptor
                 .Field(c => c.Day)

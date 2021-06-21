@@ -57,7 +57,7 @@ namespace Sheaft.Mediatr.PurchaseOrder.Commands
             if((int)purchaseOrder.ExpectedDelivery.Kind > 4)
                 return Failure(MessageKind.Validation);
 
-            purchaseOrder.Delivery.CompleteDelivery(request.ReceptionedBy, request.Comment);
+            purchaseOrder.Delivery.CompleteDelivery();
             await _context.SaveChangesAsync(token);
 
             if (purchaseOrder.SenderInfo.Kind == ProfileKind.Consumer)

@@ -171,12 +171,12 @@ namespace Sheaft.Domain
 
             TotalWeight = Math.Round(Products.Where(p => p.TotalWeight.HasValue).Sum(p => p.TotalWeight) ?? 0, DIGITS_COUNT);
 
-            LinesCount = Products.Count;
+            LinesCount = Products.Select(p => p.Id).Distinct().Count();
             ProductsCount = Products.Sum(p => p.Quantity);
-            ReturnablesCount = Products.Sum(p => p.ReturnablesCount);
-
-            TotalReturnableWholeSalePrice = Math.Round(Products.Sum(p => p.ReturnablesCount > 0 ? p.TotalReturnableWholeSalePrice.Value : 0), DIGITS_COUNT);
-            TotalReturnableVatPrice = Math.Round(Products.Sum(p => p.ReturnablesCount > 0 ? p.TotalReturnableVatPrice.Value : 0), DIGITS_COUNT);
+            ReturnablesCount = Products.Where(p => p.HasReturnable).Sum(p => p.Quantity);
+            
+            TotalReturnableWholeSalePrice = Math.Round(Products.Sum(p => p.HasReturnable ? p.TotalReturnableWholeSalePrice.Value : 0), DIGITS_COUNT);
+            TotalReturnableVatPrice = Math.Round(Products.Sum(p => p.HasReturnable ? p.TotalReturnableVatPrice.Value : 0), DIGITS_COUNT);
             TotalReturnableOnSalePrice = Math.Round(TotalReturnableWholeSalePrice + TotalReturnableVatPrice, DIGITS_COUNT);
 
             TotalWholeSalePrice = TotalProductWholeSalePrice + TotalReturnableWholeSalePrice;

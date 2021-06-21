@@ -35,8 +35,11 @@ namespace Sheaft.Domain
         public DateTimeOffset? RemovedOn { get; private set; }
         public string Name { get; set; }
         public DeliveryBatchStatus Status { get; private set; }
-        public int ProductsCount { get; private set; }
+        public int ProductsToDeliverCount { get; private set; }
         public int DeliveriesCount { get; private set; }
+        public int ReturnablesCount { get; private set; }
+        public int ReturnedReturnablesCount { get; private set; }
+        public int ReturnedProductsCount { get; private set; }
         public int PurchaseOrdersCount { get; private set; }
         public DateTimeOffset ScheduledOn { get; private set; }
         public DayOfWeek Day { get; private set; }
@@ -136,8 +139,11 @@ namespace Sheaft.Domain
         internal void Refresh()
         {
             DeliveriesCount = Deliveries.Count;
-            ProductsCount = Deliveries.Sum(d => d.PurchaseOrders.Sum(po => po.ProductsCount));
-            PurchaseOrdersCount = Deliveries.Sum(d => d.PurchaseOrders.Count);
+            ReturnablesCount = Deliveries.Sum(d => d.ReturnablesCount);
+            ProductsToDeliverCount = Deliveries.Sum(d => d.ProductsToDeliverCount);
+            PurchaseOrdersCount = Deliveries.Sum(d => d.PurchaseOrdersCount);
+            ReturnedProductsCount = Deliveries.Sum(d => d.ReturnedProductsCount);
+            ReturnedReturnablesCount = Deliveries.Sum(d => d.ReturnedReturnablesCount);
         }
 
         public void RemoveDelivery(Delivery delivery)

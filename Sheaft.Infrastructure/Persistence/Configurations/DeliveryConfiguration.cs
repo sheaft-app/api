@@ -18,6 +18,12 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
             
             entity.HasMany(c => c.PurchaseOrders).WithOne(c => c.Delivery)
                 .HasForeignKey(c => c.DeliveryId).OnDelete(DeleteBehavior.SetNull);
+            
+            entity.HasMany(c => c.Products).WithOne()
+                .HasForeignKey(c => c.DeliveryId).OnDelete(DeleteBehavior.Cascade);
+            
+            entity.HasMany(c => c.ReturnedReturnables).WithOne()
+                .HasForeignKey(c => c.DeliveryId).OnDelete(DeleteBehavior.Cascade);
 
             entity.HasOne<Producer>().WithMany()
                 .HasForeignKey(c => c.ProducerId).OnDelete(DeleteBehavior.NoAction);
