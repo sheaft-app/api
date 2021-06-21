@@ -22,6 +22,10 @@ namespace Sheaft.GraphQL.Types.Outputs
             base.Configure(descriptor);
             
             descriptor
+                .Field(c => c.Name)
+                .Name("name");
+            
+            descriptor
                 .Field(c => c.Day)
                 .Name("day");
             

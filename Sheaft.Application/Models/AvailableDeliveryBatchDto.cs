@@ -5,6 +5,7 @@ namespace Sheaft.Application.Models
 {
     public class AvailableDeliveryBatchDto
     {
+        public string Name { get; set; }
         public DateTimeOffset ExpectedDeliveryDate { get; set; }
         public TimeSpan From { get; set; }
         public TimeSpan To { get; set; }
