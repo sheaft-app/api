@@ -88,7 +88,10 @@ namespace Sheaft.Domain
 
         public void StartDelivery()
         {
-            if (Status != DeliveryStatus.Ready && Status != DeliveryStatus.Waiting)
+            if (Status != DeliveryStatus.Ready && Status != DeliveryStatus.Waiting && Status != DeliveryStatus.Postponed)
+                throw SheaftException.Validation();
+
+            if(DeliveryBatch != null && DeliveryBatch.Status != DeliveryBatchStatus.InProgress)
                 throw SheaftException.Validation();
 
             StartedOn = DateTimeOffset.UtcNow;
