@@ -106,8 +106,13 @@ namespace Sheaft.GraphQL.Types.Outputs
             descriptor
                 .Field(c => c.ExpectedDelivery)
                 .Name("expectedDelivery")
-                .ResolveWith<PurchaseOrderResolvers>(c => c.GetDelivery(default, default, default))
                 .Type<NonNullType<ExpectedPurchaseOrderDeliveryType>>();
+
+            descriptor
+                .Field(c => c.Delivery)
+                .Name("delivery")
+                .ResolveWith<PurchaseOrderResolvers>(c => c.GetDelivery(default, default, default))
+                .Type<DeliveryType>();
 
             descriptor
                 .Field(c => c.SenderInfo)

@@ -59,7 +59,7 @@ namespace Sheaft.Mediatr.DeliveryBatch.Commands
             if (purchaseOrders.Any(po => po.Status == PurchaseOrderStatus.Delivered))
                 return Failure<Guid>(MessageKind.Validation);
 
-            if (purchaseOrders.Any(po => (int)po.ExpectedDelivery.Kind <= 4))
+            if (purchaseOrders.Any(po => (int) po.ExpectedDelivery.Kind <= 4))
                 return Failure<Guid>(MessageKind.Validation);
 
             var name = GetDeliveryBatchName(request, purchaseOrders);
@@ -82,10 +82,14 @@ namespace Sheaft.Mediatr.DeliveryBatch.Commands
 
                 if (delivery.PurchaseOrders.Count == assignedPurchaseOrders.Count)
                 {
-                    if(delivery.DeliveryBatch.ScheduledOn != request.ScheduledOn)
-                        delivery.PostponeDelivery();
-                    
-                    delivery.DeliveryBatch.RemoveDelivery(delivery);
+                    if (delivery.DeliveryBatch != null)
+                    {
+                        if (delivery.DeliveryBatch.ScheduledOn != request.ScheduledOn)
+                            delivery.PostponeDelivery();
+
+                        delivery.DeliveryBatch.RemoveDelivery(delivery);
+                    }
+
                     deliveries.Add(delivery);
 
                     foreach (var assignedPurchaseOrder in assignedPurchaseOrders)
@@ -98,12 +102,13 @@ namespace Sheaft.Mediatr.DeliveryBatch.Commands
                 {
                     delivery.RemovePurchaseOrders(assignedPurchaseOrders);
 
-                    var newDelivery = new Domain.Delivery(producer, delivery.Kind, request.ScheduledOn, delivery.Address,
+                    var newDelivery = new Domain.Delivery(producer, delivery.Kind, request.ScheduledOn,
+                        delivery.Address,
                         delivery.ClientId, delivery.Client, assignedPurchaseOrders, delivery.Position);
 
-                    if(delivery.DeliveryBatch.ScheduledOn != request.ScheduledOn)
+                    if (delivery.DeliveryBatch != null && delivery.DeliveryBatch.ScheduledOn != request.ScheduledOn)
                         newDelivery.PostponeDelivery();
-                    
+
                     deliveries.Add(newDelivery);
                 }
             }
