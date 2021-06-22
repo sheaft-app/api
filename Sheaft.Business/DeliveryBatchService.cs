@@ -33,6 +33,7 @@ namespace Sheaft.Business
                     (po.Status == PurchaseOrderStatus.Completed || includeProcessingPurchaseOrders &&
                         po.Status == PurchaseOrderStatus.Processing)
                     && po.ProducerId == producerId
+                    && !po.DeliveryId.HasValue
                     && po.ExpectedDelivery.Kind == DeliveryKind.ProducerToStore)
                 .ToListAsync(token);
 
