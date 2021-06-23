@@ -103,7 +103,8 @@ namespace Sheaft.Business
                             ReturnablesCount = purchaseOrder.ReturnablesCount,
                             TotalOnSalePrice = purchaseOrder.TotalOnSalePrice,
                             TotalWholeSalePrice = purchaseOrder.TotalWholeSalePrice,
-                            TotalWeight = purchaseOrder.TotalWeight
+                            TotalWeight = purchaseOrder.TotalWeight,
+                            ExpectedDeliveryDate = purchaseOrder.ExpectedDelivery.ExpectedDeliveryDate
                         });
                     }
 

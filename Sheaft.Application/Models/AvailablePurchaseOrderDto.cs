@@ -17,5 +17,6 @@ namespace Sheaft.Application.Models
         public string Client { get; set; }
         public string Address { get; set; }
         public Guid ClientId { get; set; }
+        public DateTimeOffset ExpectedDeliveryDate { get; set; }
     }
 }

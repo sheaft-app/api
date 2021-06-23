@@ -59,6 +59,10 @@ namespace Sheaft.GraphQL.Types.Outputs
             descriptor
                 .Field(c => c.TotalWholeSalePrice)
                 .Name("totalWholeSalePrice");
+
+            descriptor
+                .Field(c => c.ExpectedDeliveryDate)
+                .Name("expectedDeliveryDate");
         }
     }
 }
