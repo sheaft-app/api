@@ -46,6 +46,8 @@ using Sheaft.Mediatr.Product.Commands;
 using Sheaft.Mediatr.Store.Commands;
 using Sheaft.Options;
 using Sheaft.Web.Manage.Mappings;
+using WkHtmlToPdfDotNet;
+using WkHtmlToPdfDotNet.Contracts;
 
 namespace Sheaft.Web.Manage
 {
@@ -215,7 +217,6 @@ namespace Sheaft.Web.Manage
                 });
             });
 
-            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             services.AddHttpClient();
 
             var pspOptions = pspSettings.Get<PspOptions>();
@@ -241,13 +242,16 @@ namespace Sheaft.Web.Manage
             services.AddScoped<IPspService, PspService>();
             services.AddScoped<ITableService, TableService>();
             services.AddScoped<IAuthService, AuthService>();
-            services.AddScoped<ICurrentUserService, CurrentUserService>();
+            services.AddScoped<IPdfGenerator, PdfGenerator>();
             
             services.AddScoped<IDeliveryService, DeliveryService>();
             services.AddScoped<IDeliveryBatchService, DeliveryBatchService>();
             services.AddScoped<IOrderService, OrderService>();
             
+            services.AddSingleton(typeof(IConverter), new SynchronizedConverter(new PdfTools()));
             services.AddSingleton<IIdSerializer, IdSerializer>();
+            services.AddSingleton<ICurrentUserService, CurrentUserService>();
+            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             
             services.AddScopedDynamic<IProductsFileImporter>(typeof(ExcelProductsImporter).Assembly.GetTypes().Where(t => t.GetInterfaces().Contains(typeof(IProductsFileImporter))));
             services.AddScopedDynamic<IPickingOrdersFileExporter>(typeof(ExcelPickingOrdersExporter).Assembly.GetTypes().Where(t => t.GetInterfaces().Contains(typeof(IPickingOrdersFileExporter))));

@@ -8,6 +8,7 @@ using HotChocolate.Types;
 using Microsoft.EntityFrameworkCore;
 using Sheaft.Application.Models;
 using Sheaft.Domain;
+using Sheaft.Domain.Extensions;
 using Sheaft.GraphQL.Deliveries;
 using Sheaft.GraphQL.PurchaseOrders;
 using Sheaft.Infrastructure.Persistence;
@@ -99,9 +100,8 @@ namespace Sheaft.GraphQL.Types.Outputs
                 .Name("productsCount");
 
             descriptor
-                .Field(c => c.Reference)
-                .Name("reference")
-                .Type<NonNullType<StringType>>();
+                .Field("reference")
+                .Resolve((ctx, token) => ctx.Parent<PurchaseOrder>().Reference.AsPurchaseOrderIdentifier());
 
             descriptor
                 .Field(c => c.ExpectedDelivery)

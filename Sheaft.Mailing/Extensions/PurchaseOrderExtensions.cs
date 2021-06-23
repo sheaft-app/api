@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using Newtonsoft.Json;
+using Sheaft.Domain.Extensions;
 
 namespace Sheaft.Mailing.Extensions
 {
@@ -21,7 +22,7 @@ namespace Sheaft.Mailing.Extensions
                 Id = purchaseOrderId,
                 Lines = lines, 
                 SenderName = senderName,
-                Reference = purchaseOrder.Reference, 
+                Reference = purchaseOrder.Reference.AsPurchaseOrderIdentifier(), 
                 VendorName = purchaseOrder.VendorInfo.Name,
                 CreatedOn = purchaseOrder.CreatedOn,
                 ExpectedDeliveryDate = purchaseOrder.ExpectedDelivery.ExpectedDeliveryDate,

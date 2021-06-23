@@ -90,7 +90,6 @@ namespace Sheaft.Mailing.Extensions
             {
                 PurchaseOrderId = purchaseOrderId,
                 Status = order.Status,
-                Reference = order.Reference,
                 CreatedOn = order.CreatedOn,
                 TotalPrice = order.TotalPrice,
                 TotalOnSalePrice = order.TotalOnSalePrice,

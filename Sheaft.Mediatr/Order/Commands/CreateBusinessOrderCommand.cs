@@ -177,12 +177,6 @@ namespace Sheaft.Mediatr.Order.Commands
                 if (!validatedDeliveries.Succeeded)
                     return Failure<IEnumerable<Guid>>(validatedDeliveries);
 
-                var referenceResult = await _identifierService.GetNextOrderReferenceAsync(token);
-                if (!referenceResult.Succeeded)
-                    return Failure<IEnumerable<Guid>>(referenceResult);
-
-                order.SetReference(referenceResult.Data);
-
                 await _context.AddAsync(order, token);
                 await _context.SaveChangesAsync(token);
 

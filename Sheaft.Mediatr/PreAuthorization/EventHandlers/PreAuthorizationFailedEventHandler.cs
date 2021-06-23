@@ -11,6 +11,7 @@ using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Domain.Enum;
 using Sheaft.Domain.Events.Agreement;
 using Sheaft.Domain.Events.PreAuthorization;
+using Sheaft.Domain.Extensions;
 using Sheaft.Mailing;
 
 namespace Sheaft.Mediatr.PreAuthorization.EventHandlers
@@ -58,7 +59,6 @@ namespace Sheaft.Mediatr.PreAuthorization.EventHandlers
                 TotalPrice = preAuthorization.Order.TotalPrice, 
                 CreatedOn = preAuthorization.Order.CreatedOn, 
                 ProductsCount = preAuthorization.Order.ProductsCount, 
-                Reference = preAuthorization.Order.Reference, 
                 MyOrdersUrl = $"{_configuration.GetValue<string>("Portal:url")}/#/my-orders/"
             };
         }

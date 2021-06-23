@@ -44,7 +44,6 @@ namespace Sheaft.Domain
         public DateTimeOffset? ExpiredOn { get; private set; }
         public OrderStatus Status { get; private set; }
         public DonationKind DonationKind { get; private set; }
-        public string Reference { get; private set; }
         public decimal TotalProductWholeSalePrice { get; private set; }
         public decimal TotalProductVatPrice { get; private set; }
         public decimal TotalProductOnSalePrice { get; private set; }
@@ -82,7 +81,7 @@ namespace Sheaft.Domain
             User = user;
         }
 
-        public PurchaseOrder AddPurchaseOrder(string reference, Producer producer)
+        public PurchaseOrder AddPurchaseOrder(int reference, Producer producer)
         {
             if (PurchaseOrders == null)
                 PurchaseOrders = new List<PurchaseOrder>();
@@ -153,14 +152,6 @@ namespace Sheaft.Domain
         {
             DonationKind = kind;
             RefreshFees();
-        }
-
-        public void SetReference(string reference)
-        {
-            if (reference == null)
-                return;
-
-            Reference = reference;
         }
 
         private void RefreshOrder()

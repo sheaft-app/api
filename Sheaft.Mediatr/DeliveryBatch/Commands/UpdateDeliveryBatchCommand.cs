@@ -37,12 +37,16 @@ namespace Sheaft.Mediatr.DeliveryBatch.Commands
     public class UpdateDeliveryBatchCommandHandler : CommandsHandler,
         IRequestHandler<UpdateDeliveryBatchCommand, Result>
     {
+        private readonly IIdentifierService _identifierService;
+
         public UpdateDeliveryBatchCommandHandler(
             ISheaftMediatr mediatr,
             IAppDbContext context,
+            IIdentifierService identifierService,
             ILogger<UpdateDeliveryBatchCommandHandler> logger)
             : base(mediatr, context, logger)
         {
+            _identifierService = identifierService;
         }
 
         public async Task<Result> Handle(UpdateDeliveryBatchCommand request, CancellationToken token)
@@ -63,14 +67,14 @@ namespace Sheaft.Mediatr.DeliveryBatch.Commands
             }
 
             var currentPosition = 0;
-            foreach (var clientDelivery in request.Deliveries.OrderByDescending(d => d.Position))
+            foreach (var clientDelivery in request.Deliveries.OrderBy(d => d.Position))
             {
                 var delivery = deliveryBatch.Deliveries.SingleOrDefault(d => d.ClientId == clientDelivery.ClientId);
                 var purchaseOrders = await _context.PurchaseOrders
                     .Where(p => clientDelivery.PurchaseOrderIds.Contains(p.Id))
                     .ToListAsync(token);
                 
-                if(purchaseOrders.Any(po => po.Status != PurchaseOrderStatus.Completed && po.Status != PurchaseOrderStatus.Postponed))
+                if(purchaseOrders.Any(po => po.Status != PurchaseOrderStatus.Completed && po.Status != PurchaseOrderStatus.Shipping))
                     throw SheaftException.Validation();
                 
                 if(purchaseOrders.Any(po => (int)po.ExpectedDelivery.Kind <= 4))
@@ -80,7 +84,12 @@ namespace Sheaft.Mediatr.DeliveryBatch.Commands
                 {
                     var order = purchaseOrders.First();
                     var user = await _context.Users.SingleAsync(u => u.Id == order.ClientId, token);
-                    delivery = new Domain.Delivery((Domain.Producer) deliveryBatch.AssignedTo,
+                    
+                    var identifier = await _identifierService.GetNextDeliveryReferenceAsync(deliveryBatch.AssignedTo.Id, token);
+                    if (!identifier.Succeeded)
+                        return Failure(identifier);
+                        
+                    delivery = new Domain.Delivery(identifier.Data, (Domain.Producer)deliveryBatch.AssignedTo,
                         order.ExpectedDelivery.Kind,
                         deliveryBatch.ScheduledOn, order.ExpectedDelivery.Address, user.Id, user.Name, purchaseOrders,
                         currentPosition);
@@ -89,6 +98,17 @@ namespace Sheaft.Mediatr.DeliveryBatch.Commands
                 }
                 else
                 {
+                    var existingPurchaseOrderIds = delivery.PurchaseOrders.Select(po => po.Id);
+                    var newPurchaseOrderIds = purchaseOrders.Select(po => po.Id);
+                    var purchaseOrderIdsToRemove = existingPurchaseOrderIds.Except(newPurchaseOrderIds).ToList();
+                    if (purchaseOrderIdsToRemove.Any())
+                    {
+                        var purchaseOrdersToRemove =
+                            delivery.PurchaseOrders.Where(po => purchaseOrderIdsToRemove.Contains(po.Id));
+                        
+                        delivery.RemovePurchaseOrders(purchaseOrdersToRemove);
+                    }
+
                     foreach (var purchaseOrder in purchaseOrders)
                     {
                         var existingPurchaseOrder =

@@ -7,6 +7,7 @@ using HotChocolate.Resolvers;
 using HotChocolate.Types;
 using Microsoft.EntityFrameworkCore;
 using Sheaft.Domain;
+using Sheaft.Domain.Extensions;
 using Sheaft.GraphQL.Deliveries;
 using Sheaft.GraphQL.PurchaseOrders;
 using Sheaft.Infrastructure.Persistence;
@@ -18,6 +19,8 @@ namespace Sheaft.GraphQL.Types.Outputs
         protected override void Configure(IObjectTypeDescriptor<Delivery> descriptor)
         {
             base.Configure(descriptor);
+            
+            descriptor.Name("Delivery");
             
             descriptor
                 .ImplementsNode()
@@ -44,6 +47,10 @@ namespace Sheaft.GraphQL.Types.Outputs
             descriptor
                 .Field(c => c.Client)
                 .Name("client");
+            
+            descriptor
+                .Field("reference")
+                .Resolve((ctx, token) => ctx.Parent<Delivery>().Reference.AsDeliveryIdentifier());
             
             descriptor
                 .Field(c => c.ClientId)
@@ -73,6 +80,14 @@ namespace Sheaft.GraphQL.Types.Outputs
             descriptor
                 .Field(c => c.ReturnablesCount)
                 .Name("returnablesCount");
+            
+            descriptor
+                .Field(c => c.DeliveryFormUrl)
+                .Name("deliveryFormUrl");
+            
+            descriptor
+                .Field(c => c.DeliveryReceiptUrl)
+                .Name("deliveryReceiptUrl");
             
             descriptor
                 .Field(c => c.ProductsToDeliverCount)

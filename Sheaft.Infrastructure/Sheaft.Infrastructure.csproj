@@ -9,6 +9,7 @@
       <PackageReference Include="Azure.Storage.Blobs" Version="12.8.1" />
       <PackageReference Include="Dapper" Version="2.0.78" />
       <PackageReference Include="Hangfire.Core" Version="1.7.22" />
+      <PackageReference Include="Haukcode.WkHtmlToPdfDotNet" Version="1.5.8" />
       <PackageReference Include="IdentityModel" Version="5.1.0" />
       <PackageReference Include="mangopay2-sdk" Version="2.3.0" />
       <PackageReference Include="MediatR" Version="9.0.0" />
@@ -22,6 +23,7 @@
       </PackageReference>
       <PackageReference Include="Microsoft.Extensions.Http" Version="5.0.0" />
       <PackageReference Include="Microsoft.Extensions.Localization.Abstractions" Version="5.0.5" />
+      <PackageReference Include="MimeKit" Version="2.13.0" />
       <PackageReference Include="Powell.CouponCode" Version="1.0.3" />
       <PackageReference Include="Razor.Templating.Core" Version="1.5.0" />
       <PackageReference Include="SixLabors.ImageSharp" Version="1.0.3" />

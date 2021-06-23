@@ -59,5 +59,17 @@ namespace Sheaft.GraphQL.Deliveries
             await ExecuteAsync(mediatr, input, token);
             return await dataLoader.LoadAsync(input.DeliveryId, token);
         }
+
+        [GraphQLName("rejectDelivery")]
+        [Authorize(Policy = Policies.PRODUCER)]
+        [GraphQLType(typeof(DeliveryType))]
+        public async Task<Delivery> RejectDelivery(
+            [GraphQLType(typeof(RejectDeliveryInputType))] [GraphQLName("input")]
+            RejectDeliveryCommand input, [Service] ISheaftMediatr mediatr,
+            DeliveriesByIdBatchDataLoader dataLoader, CancellationToken token)
+        {
+            await ExecuteAsync(mediatr, input, token);
+            return await dataLoader.LoadAsync(input.DeliveryId, token);
+        }
     }
 }

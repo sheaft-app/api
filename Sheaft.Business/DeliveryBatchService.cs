@@ -9,6 +9,7 @@ using Sheaft.Application.Interfaces.Business;
 using Sheaft.Application.Models;
 using Sheaft.Application.Services;
 using Sheaft.Domain.Enum;
+using Sheaft.Domain.Extensions;
 using Sheaft.Infrastructure.Persistence;
 
 namespace Sheaft.Business
@@ -97,7 +98,7 @@ namespace Sheaft.Business
                                       purchaseOrder.SenderInfo.Address,
                             Client = purchaseOrder.SenderInfo.Name,
                             ClientId = purchaseOrder.ClientId,
-                            Reference = purchaseOrder.Reference,
+                            Reference = purchaseOrder.Reference.AsPurchaseOrderIdentifier(),
                             LinesCount = purchaseOrder.LinesCount,
                             ProductsCount = purchaseOrder.ProductsCount,
                             ReturnablesCount = purchaseOrder.ReturnablesCount,

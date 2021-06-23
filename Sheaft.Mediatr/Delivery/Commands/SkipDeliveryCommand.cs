@@ -50,12 +50,12 @@ namespace Sheaft.Mediatr.Delivery.Commands
 
         public async Task<Result> Handle(SkipDeliveryCommand request, CancellationToken token)
         {
-            var purchaseOrderDelivery = await _context.Set<Domain.Delivery>()
+            var delivery = await _context.Deliveries
                 .SingleOrDefaultAsync(c => c.Id == request.DeliveryId, token);
-            if (purchaseOrderDelivery == null)
+            if (delivery == null)
                 return Failure(MessageKind.NotFound);
 
-            purchaseOrderDelivery.SkipDelivery();
+            delivery.SkipDelivery();
             await _context.SaveChangesAsync(token);
 
             return Success();

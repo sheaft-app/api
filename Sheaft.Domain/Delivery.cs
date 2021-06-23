@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using Sheaft.Core.Exceptions;
+using Sheaft.Domain.Common;
 using Sheaft.Domain.Enum;
+using Sheaft.Domain.Events.Delivery;
 using Sheaft.Domain.Interop;
 
 namespace Sheaft.Domain
@@ -13,7 +15,7 @@ namespace Sheaft.Domain
         {
         }
 
-        public Delivery(Producer producer, DeliveryKind kind, DateTimeOffset scheduledOn, ExpectedAddress address,
+        public Delivery(int identifier, Producer producer, DeliveryKind kind, DateTimeOffset scheduledOn, ExpectedAddress address,
             Guid clientId, string clientName, IEnumerable<PurchaseOrder> purchaseOrders, int? position)
         {
             Id = Guid.NewGuid();
@@ -39,6 +41,7 @@ namespace Sheaft.Domain
         public DateTimeOffset ScheduledOn { get; private set; }
         public DateTimeOffset? StartedOn { get; private set; }
         public DateTimeOffset? DeliveredOn { get; private set; }
+        public DateTimeOffset? RejectedOn { get; private set; }
         public int? Position { get; private set; }
         public string ReceptionedBy { get; private set; }
         public string Comment { get; private set; }
@@ -48,6 +51,8 @@ namespace Sheaft.Domain
         public int ReturnablesCount { get; private set; }
         public int ReturnedProductsCount { get; private set; }
         public int ReturnedReturnablesCount { get; private set; }
+        public string DeliveryFormUrl { get; private set; }
+        public string DeliveryReceiptUrl { get; private set; }
         public Guid? DeliveryBatchId { get; private set; }
         public Guid ProducerId { get; private set; }
         public Guid ClientId { get; private set; }
@@ -55,6 +60,9 @@ namespace Sheaft.Domain
         public virtual ICollection<PurchaseOrder> PurchaseOrders { get; private set; }
         public virtual ICollection<DeliveryProduct> Products { get; private set; }
         public virtual ICollection<DeliveryReturnable> ReturnedReturnables { get; private set; }
+        public byte[] RowVersion { get; set; }
+        public List<DomainEvent> DomainEvents { get; } = new List<DomainEvent>();
+        public int Reference { get; set; }
 
         public void SetReturnedReturnables(IEnumerable<KeyValuePair<Returnable, int>> returnables)
         {
@@ -63,7 +71,7 @@ namespace Sheaft.Domain
                 ReturnedReturnables = new List<DeliveryReturnable>();
                 return;
             }
-            
+
             if (ReturnedReturnables == null)
                 ReturnedReturnables = new List<DeliveryReturnable>();
 
@@ -76,16 +84,16 @@ namespace Sheaft.Domain
                 var returnable = ReturnedReturnables.SingleOrDefault(r => r.ReturnableId == returnableToRemove);
                 ReturnedReturnables.Remove(returnable);
             }
-            
+
             foreach (var returnable in returnables)
             {
                 var existingReturnable = ReturnedReturnables.SingleOrDefault(r => r.ReturnableId == returnable.Key.Id);
-                if(existingReturnable != null)
+                if (existingReturnable != null)
                     existingReturnable.SetQuantity(returnable.Value);
                 else
                     ReturnedReturnables.Add(new DeliveryReturnable(returnable.Key, returnable.Value));
             }
-            
+
             Refresh();
         }
 
@@ -93,7 +101,7 @@ namespace Sheaft.Domain
         {
             if (Status != DeliveryStatus.Waiting)
                 throw SheaftException.Validation();
-            
+
             if (purchaseOrders == null || !purchaseOrders.Any())
                 return;
 
@@ -107,17 +115,18 @@ namespace Sheaft.Domain
             {
                 var groupedProduct = groupedPurchaseOrderProduct.First();
                 var quantity = groupedPurchaseOrderProduct.Sum(p => p.Quantity);
-                var existingProduct = Products.FirstOrDefault(p => p.ProductId == groupedProduct.ProductId && p.RowKind == ModificationKind.Deliver);
+                var existingProduct = Products.FirstOrDefault(p =>
+                    p.ProductId == groupedProduct.ProductId && p.RowKind == ModificationKind.Deliver);
                 if (existingProduct != null)
                 {
                     existingProduct.AddQuantity(quantity);
                     if (existingProduct.Quantity <= 0)
                         Products.Remove(existingProduct);
                 }
-                else if(quantity > 0)
-                    Products.Add(new DeliveryProduct(groupedProduct, quantity, ModificationKind.Deliver));
+                else if (quantity > 0)
+                    Products.Add(new DeliveryProduct(groupedProduct, quantity, ModificationKind.Deliver, groupedProduct.PurchaseOrderId));
             }
-            
+
             Refresh();
         }
 
@@ -125,27 +134,28 @@ namespace Sheaft.Domain
         {
             if (Status != DeliveryStatus.Waiting)
                 throw SheaftException.Validation();
-            
+
             if (PurchaseOrders == null)
                 throw SheaftException.NotFound();
 
             foreach (var purchaseOrder in purchaseOrders)
                 PurchaseOrders.Remove(purchaseOrder);
-            
+
             var purchaseOrderProducts = purchaseOrders.SelectMany(p => p.Products).GroupBy(p => p.ProductId);
             foreach (var groupedPurchaseOrderProduct in purchaseOrderProducts)
             {
                 var groupedProduct = groupedPurchaseOrderProduct.First();
-                var existingProduct = Products.FirstOrDefault(p => p.ProductId == groupedProduct.ProductId && p.RowKind == ModificationKind.Deliver);
-                if (existingProduct == null) 
+                var existingProduct = Products.FirstOrDefault(p =>
+                    p.ProductId == groupedProduct.ProductId && p.RowKind == ModificationKind.Deliver);
+                if (existingProduct == null)
                     continue;
-                
+
                 var quantity = groupedPurchaseOrderProduct.Sum(p => p.Quantity);
                 existingProduct.RemoveQuantity(quantity);
                 if (existingProduct.Quantity <= 0)
                     Products.Remove(existingProduct);
             }
-            
+
             Refresh();
         }
 
@@ -156,8 +166,11 @@ namespace Sheaft.Domain
 
             StartedOn = null;
             DeliveredOn = null;
+            DeliveryFormUrl = null;
+            DeliveryReceiptUrl = null;
 
             Status = DeliveryStatus.Ready;
+            DomainEvents.Add(new DeliveryReadyEvent(Id));
         }
 
         public void StartDelivery()
@@ -165,7 +178,7 @@ namespace Sheaft.Domain
             if (Status != DeliveryStatus.Ready && Status != DeliveryStatus.Waiting)
                 throw SheaftException.Validation();
 
-            if(DeliveryBatch != null && DeliveryBatch.Status != DeliveryBatchStatus.InProgress)
+            if (DeliveryBatch != null && DeliveryBatch.Status != DeliveryBatchStatus.InProgress)
                 throw SheaftException.Validation();
 
             StartedOn = DateTimeOffset.UtcNow;
@@ -174,9 +187,27 @@ namespace Sheaft.Domain
 
             foreach (var purchaseOrder in PurchaseOrders)
                 purchaseOrder.SetStatus(PurchaseOrderStatus.Shipping, true);
+
+            DomainEvents.Add(new DeliveryStartedEvent(Id));
         }
 
-        public void CompleteDelivery(IEnumerable<Tuple<DeliveryProduct, int, ModificationKind>> returnedProducts = null, IEnumerable<KeyValuePair<Returnable, int>> returnedReturnables = null, string receptionedBy = null, string comment = null)
+        public void RejectDelivery(string comment)
+        {
+            if (Status != DeliveryStatus.InProgress)
+                throw SheaftException.Validation();
+
+            if (DeliveryBatch != null && DeliveryBatch.Status != DeliveryBatchStatus.InProgress)
+                throw SheaftException.Validation();
+
+            Comment = comment;
+            RejectedOn = DateTimeOffset.UtcNow;
+            Status = DeliveryStatus.Rejected;
+            DomainEvents.Add(new DeliveryRejectedEvent(Id));
+        }
+
+        public void CompleteDelivery(IEnumerable<Tuple<DeliveryProduct, int, ModificationKind>> returnedProducts = null,
+            IEnumerable<KeyValuePair<Returnable, int>> returnedReturnables = null, string receptionedBy = null,
+            string comment = null)
         {
             if (Status is DeliveryStatus.Delivered)
                 throw SheaftException.Validation();
@@ -199,11 +230,13 @@ namespace Sheaft.Domain
                 }
             }
 
-            if(returnedReturnables != null && returnedReturnables.Any())
+            if (returnedReturnables != null && returnedReturnables.Any())
                 SetReturnedReturnables(returnedReturnables);
 
             foreach (var purchaseOrder in PurchaseOrders)
                 purchaseOrder.SetStatus(PurchaseOrderStatus.Delivered, true);
+
+            DomainEvents.Add(new DeliveryCompletedEvent(Id));
         }
 
         public void SetPosition(int position)
@@ -225,20 +258,31 @@ namespace Sheaft.Domain
                 throw SheaftException.Validation();
 
             Status = DeliveryStatus.Waiting;
-
-            foreach (var purchaseOrder in PurchaseOrders)
-                purchaseOrder.SetStatus(PurchaseOrderStatus.Postponed, true);
+            DomainEvents.Add(new DeliveryPostponedEvent(Id));
         }
 
         private void Refresh()
         {
             ReturnedReturnablesCount = ReturnedReturnables?.Sum(p => p.Quantity) ?? 0;
             ReturnedProductsCount = Products.Where(p => p.RowKind != ModificationKind.Deliver).Sum(p => p.Quantity);
-            ReturnablesCount = Products.Where(p => p.RowKind == ModificationKind.Deliver && p.HasReturnable).Sum(p => p.Quantity);
+            ReturnablesCount = Products.Where(p => p.RowKind == ModificationKind.Deliver && p.HasReturnable)
+                .Sum(p => p.Quantity);
             ProductsToDeliverCount = Products.Where(p => p.RowKind == ModificationKind.Deliver).Sum(p => p.Quantity);
             PurchaseOrdersCount = PurchaseOrders.Count;
-            
+
             DeliveryBatch?.Refresh();
+        }
+
+        public void SetFormUrl(string url)
+        {
+            DeliveryFormUrl = url;
+            DomainEvents.Add(new DeliveryFormGeneratedEvent(Id));
+        }
+
+        public void SetReceiptUrl(string url)
+        {
+            DeliveryReceiptUrl = url;
+            DomainEvents.Add(new DeliveryReceiptGeneratedEvent(Id));
         }
     }
 }

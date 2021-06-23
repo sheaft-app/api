@@ -2,6 +2,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 using Sheaft.Core;
+using Sheaft.Core.Enums;
 
 namespace Sheaft.Application.Interfaces.Infrastructure
 {
@@ -24,5 +25,10 @@ namespace Sheaft.Application.Interfaces.Infrastructure
         Task<Result<string>> UploadProducersListAsync(byte[] data, CancellationToken token);
         Task<Result<string>> UploadUserTransactionsFileAsync(Guid userId, Guid jobId, string filename, byte[] data, CancellationToken token);
         Task<Result<string>> UploadUserPurchaseOrdersFileAsync(Guid userId, Guid jobId, string filename, byte[] data, CancellationToken token);
+        Task<Result<string>> UploadProducerDeliveryReceiptAsync(Guid producerId, Guid deliveryId, string filenameWithExtension, byte[] data, CancellationToken token);
+        Task<Result<string>> UploadProducerDeliveryFormAsync(Guid producerId, Guid deliveryId, string filenameWithExtension, byte[] data, CancellationToken token);
+        Task<Result<byte[]>> DownloadDeliveryFormAsync(string deliveryFormUrl, CancellationToken token);
+        Task<Result<string>> UploadProducerDeliveryBatchAsync(Guid producerId, Guid deliveryBatchId, string filenameWithExtension, byte[] data, CancellationToken token);
+        Task<Result<byte[]>> DownloadDeliveryBatchFormsAsync(string deliveryDeliveryFormsUrl, CancellationToken token);
     }
 }

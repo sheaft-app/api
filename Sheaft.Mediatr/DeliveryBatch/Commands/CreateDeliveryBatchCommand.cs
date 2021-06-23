@@ -45,12 +45,16 @@ namespace Sheaft.Mediatr.DeliveryBatch.Commands
     public class CreateDeliveryBatchCommandHandler : CommandsHandler,
         IRequestHandler<CreateDeliveryBatchCommand, Result<Guid>>
     {
+        private readonly IIdentifierService _identifierService;
+
         public CreateDeliveryBatchCommandHandler(
             ISheaftMediatr mediatr,
             IAppDbContext context,
+            IIdentifierService identifierService,
             ILogger<CreateDeliveryBatchCommandHandler> logger)
             : base(mediatr, context, logger)
         {
+            _identifierService = identifierService;
         }
 
         public async Task<Result<Guid>> Handle(CreateDeliveryBatchCommand request, CancellationToken token)
@@ -102,7 +106,11 @@ namespace Sheaft.Mediatr.DeliveryBatch.Commands
                 {
                     delivery.RemovePurchaseOrders(assignedPurchaseOrders);
 
-                    var newDelivery = new Domain.Delivery(producer, delivery.Kind, request.ScheduledOn,
+                    var identifier = await _identifierService.GetNextDeliveryReferenceAsync(producer.Id, token);
+                    if (!identifier.Succeeded)
+                        return Failure<Guid>(identifier);
+                    
+                    var newDelivery = new Domain.Delivery(identifier.Data, producer, delivery.Kind, request.ScheduledOn,
                         delivery.Address,
                         delivery.ClientId, delivery.Client, assignedPurchaseOrders, delivery.Position);
 
@@ -134,7 +142,11 @@ namespace Sheaft.Mediatr.DeliveryBatch.Commands
                     while (deliveries.Any(d => d.Position == position))
                         position++;
 
-                    var delivery = new Domain.Delivery(producer, order.ExpectedDelivery.Kind, request.ScheduledOn,
+                    var identifier = await _identifierService.GetNextDeliveryReferenceAsync(producer.Id, token);
+                    if (!identifier.Succeeded)
+                        return Failure<Guid>(identifier);
+                    
+                    var delivery = new Domain.Delivery(identifier.Data, producer, order.ExpectedDelivery.Kind, request.ScheduledOn,
                         order.ExpectedDelivery.Address, userAgreement.User.Id, userAgreement.User.Name,
                         purchaseOrderGrouped.ToList(), position);
 

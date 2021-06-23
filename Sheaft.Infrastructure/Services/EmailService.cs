@@ -1,12 +1,15 @@
 ﻿using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System.Collections.Generic;
+using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using Amazon.SimpleEmail;
 using Amazon.SimpleEmail.Model;
+using MimeKit;
 using Razor.Templating.Core;
 using Sheaft.Application.Interfaces.Infrastructure;
+using Sheaft.Application.Models;
 using Sheaft.Application.Services;
 using Sheaft.Core;
 using Sheaft.Core.Enums;
@@ -56,6 +59,41 @@ namespace Sheaft.Infrastructure.Services
                 return Success();
             
             var response = await _mailer.SendEmailAsync(msg, token);
+            if ((int) response.HttpStatusCode >= 400)
+                return Failure(MessageKind.EmailProvider_SendEmail_Failure,
+                    string.Join(";", response.ResponseMetadata.Metadata));
+
+            return Success();
+        }
+
+        public async Task<Result> SendTemplatedEmailAsync<T>(string toEmail, string toName, string subject,
+            string templateId, T data, IEnumerable<EmailAttachmentDto> attachments, bool isHtml, CancellationToken token)
+        {
+            var msg = new SendRawEmailRequest();
+            using (var messageStream = new MemoryStream())
+            {
+                var message = new MimeMessage();
+                
+                var content = await RazorTemplateEngine.RenderAsync($"~/Templates/{templateId}.cshtml", data);
+                var builder = isHtml ? new BodyBuilder {HtmlBody = content} : new BodyBuilder {TextBody = content};
+
+                message.To.Add(new MailboxAddress(toName, toEmail));
+                message.From.Add(new MailboxAddress(_mailerOptions.Sender.Name, _mailerOptions.Sender.Email));
+                message.Subject = subject;
+
+                foreach (var attachment in attachments)
+                    builder.Attachments.Add(attachment.Name, attachment.Content);
+               
+                message.Body = builder.ToMessageBody();
+                await message.WriteToAsync(messageStream, token);
+
+                msg.RawMessage = new RawMessage() {Data = messageStream};
+            }
+            
+            if (_mailerOptions.SkipSending)
+                return Success();
+            
+            var response = await _mailer.SendRawEmailAsync(msg, token);
             if ((int) response.HttpStatusCode >= 400)
                 return Failure(MessageKind.EmailProvider_SendEmail_Failure,
                     string.Join(";", response.ResponseMetadata.Metadata));

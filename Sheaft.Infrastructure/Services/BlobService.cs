@@ -132,6 +132,12 @@ namespace Sheaft.Infrastructure.Services
             if (!response.Succeeded)
                 return response;
 
+            response = await CleanContainerFolderStorageAsync(_storageOptions.Containers.Deliveries, $"users/{userId:N}",
+                token);
+            
+            if (!response.Succeeded)
+                return response;
+
             return Success();
         }
 
@@ -268,7 +274,7 @@ namespace Sheaft.Infrastructure.Services
                 BlobName = blobClient.Name,
                 Resource = "b",
                 StartsOn = DateTimeOffset.UtcNow.AddHours(-1),
-                ExpiresOn = DateTimeOffset.UtcNow.AddDays(30)
+                ExpiresOn = DateTimeOffset.UtcNow.AddYears(10)
             };
 
             sasBuilder.SetPermissions(BlobSasPermissions.Read);
@@ -295,12 +301,133 @@ namespace Sheaft.Infrastructure.Services
                 BlobName = blobClient.Name,
                 Resource = "b",
                 StartsOn = DateTimeOffset.UtcNow.AddHours(-1),
-                ExpiresOn = DateTimeOffset.UtcNow.AddDays(30)
+                ExpiresOn = DateTimeOffset.UtcNow.AddYears(10)
             };
 
             sasBuilder.SetPermissions(BlobSasPermissions.Read);
 
             return Success(GetBlobSasUri(blobClient, sasBuilder, _storageOptions.Containers.PurchaseOrders));
+        }
+
+        public async Task<Result<string>> UploadProducerDeliveryReceiptAsync(Guid producerId, Guid deliveryId, string filenameWithExtension, byte[] data, CancellationToken token)
+        {
+            var containerClient =
+                new BlobContainerClient(_storageOptions.ConnectionString, _storageOptions.Containers.Deliveries);
+            await containerClient.CreateIfNotExistsAsync(cancellationToken: token);
+
+            var blobClient = containerClient.GetBlobClient($"users/{producerId:N}/{deliveryId:N}/receipts/{filenameWithExtension}");
+            await blobClient.DeleteIfExistsAsync(cancellationToken: token);
+
+            using (var ms = new MemoryStream(data))
+                await blobClient.UploadAsync(ms, token);
+
+            var sasBuilder = new BlobSasBuilder()
+            {
+                BlobContainerName = _storageOptions.Containers.Deliveries,
+                BlobName = blobClient.Name,
+                Resource = "b",
+                StartsOn = DateTimeOffset.UtcNow.AddHours(-1),
+                ExpiresOn = DateTimeOffset.UtcNow.AddYears(10)
+            };
+
+            sasBuilder.SetPermissions(BlobSasPermissions.Read);
+            return Success(GetBlobSasUri(blobClient, sasBuilder, _storageOptions.Containers.Deliveries));
+        }
+
+        public async Task<Result<string>> UploadProducerDeliveryFormAsync(Guid producerId, Guid deliveryId, string filenameWithExtension, byte[] data, CancellationToken token)
+        {
+            var containerClient =
+                new BlobContainerClient(_storageOptions.ConnectionString, _storageOptions.Containers.Deliveries);
+            await containerClient.CreateIfNotExistsAsync(cancellationToken: token);
+
+            var blobClient = containerClient.GetBlobClient($"users/{producerId:N}/{deliveryId:N}/forms/{filenameWithExtension}");
+            await blobClient.DeleteIfExistsAsync(cancellationToken: token);
+
+            using (var ms = new MemoryStream(data))
+                await blobClient.UploadAsync(ms, token);
+
+            var sasBuilder = new BlobSasBuilder()
+            {
+                BlobContainerName = _storageOptions.Containers.Deliveries,
+                BlobName = blobClient.Name,
+                Resource = "b",
+                StartsOn = DateTimeOffset.UtcNow.AddHours(-1),
+                ExpiresOn = DateTimeOffset.UtcNow.AddYears(10)
+            };
+
+            sasBuilder.SetPermissions(BlobSasPermissions.Read);
+            return Success(GetBlobSasUri(blobClient, sasBuilder, _storageOptions.Containers.Deliveries));
+        }
+
+        public async Task<Result<byte[]>> DownloadDeliveryFormAsync(string deliveryFormUrl, CancellationToken token)
+        {
+            var containerClient =
+                new BlobContainerClient(_storageOptions.ConnectionString, _storageOptions.Containers.Deliveries);
+            
+            await containerClient.CreateIfNotExistsAsync(cancellationToken: token);
+
+            var uri = new UriBuilder
+            {
+                Scheme = _storageOptions.ContentScheme,
+                Host = _storageOptions.ContentHostname,
+                Path = _storageOptions.Containers.Deliveries
+            }.ToString();
+            
+            var blobClient = containerClient.GetBlobClient(deliveryFormUrl.Replace(uri, "").Split('?')[0]);
+            using (var stream = new MemoryStream())
+            {
+                await blobClient.DownloadToAsync(stream, token);
+                stream.Position = 0;
+                return Success(stream.ToArray());
+            }
+        }
+
+        public async Task<Result<byte[]>> DownloadDeliveryBatchFormsAsync(string deliveryFormUrl, CancellationToken token)
+        {
+            var containerClient =
+                new BlobContainerClient(_storageOptions.ConnectionString, _storageOptions.Containers.DeliveryBatches);
+            
+            await containerClient.CreateIfNotExistsAsync(cancellationToken: token);
+
+            var uri = new UriBuilder
+            {
+                Scheme = _storageOptions.ContentScheme,
+                Host = _storageOptions.ContentHostname,
+                Path = _storageOptions.Containers.DeliveryBatches
+            }.ToString();
+            
+            var blobClient = containerClient.GetBlobClient(deliveryFormUrl.Replace(uri, "").Split('?')[0]);
+            using (var stream = new MemoryStream())
+            {
+                await blobClient.DownloadToAsync(stream, token);
+                stream.Position = 0;
+                return Success(stream.ToArray());
+            }
+        }
+
+        public async Task<Result<string>> UploadProducerDeliveryBatchAsync(Guid producerId, Guid deliveryBatchId, string filenameWithExtension, byte[] data, CancellationToken token)
+        {
+            var containerClient =
+                new BlobContainerClient(_storageOptions.ConnectionString, _storageOptions.Containers.DeliveryBatches);
+            await containerClient.CreateIfNotExistsAsync(cancellationToken: token);
+
+            var blobClient = containerClient.GetBlobClient($"users/{producerId:N}/{deliveryBatchId:N}/{filenameWithExtension}");
+            await blobClient.DeleteIfExistsAsync(cancellationToken: token);
+
+            using (var ms = new MemoryStream(data))
+                await blobClient.UploadAsync(ms, token);
+
+            var sasBuilder = new BlobSasBuilder()
+            {
+                BlobContainerName = _storageOptions.Containers.DeliveryBatches,
+                BlobName = blobClient.Name,
+                Resource = "b",
+                StartsOn = DateTimeOffset.UtcNow.AddHours(-1),
+                ExpiresOn = DateTimeOffset.UtcNow.AddYears(10)
+            };
+
+            sasBuilder.SetPermissions(BlobSasPermissions.Read);
+            return Success(GetBlobSasUri(blobClient, sasBuilder, _storageOptions.Containers.DeliveryBatches));
         }
 
         public async Task<Result<string>> UploadPickingOrderFileAsync(Guid userId, Guid jobId, string filename,

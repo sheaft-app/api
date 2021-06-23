@@ -29,14 +29,16 @@
         public string Documents { get; set; } = "documents";
         public string Transactions { get; set; } = "transactions";
         public string PurchaseOrders { get; set; } = "purchaseorders";
+        public string Deliveries { get; set; } = "deliveries";
+        public string DeliveryBatches { get; set; } = "deliverybatches";
     }
     public class StorageTables
     {
-        public string OrdersReferences { get; set; } = "orders";
         public string PurchaseOrdersReferences { get; set; } = "purchaseorders";
         public string ProductsReferences { get; set; } = "products";
         public string SponsoringCodes { get; set; } = "sponsoring";
         public string CapingDeliveries { get; set; } = "capingdeliveries";
+        public string Deliveries { get; set; } = "deliveries";
     }
 
     public class StorageQueues

@@ -296,6 +296,12 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                     b.Property<Guid?>("DeliveryBatchId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<string>("DeliveryFormUrl")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("DeliveryReceiptUrl")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<int>("Kind")
                         .HasColumnType("int");
 
@@ -314,6 +320,12 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                     b.Property<string>("ReceptionedBy")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("Reference")
+                        .HasColumnType("int");
+
+                    b.Property<DateTimeOffset?>("RejectedOn")
+                        .HasColumnType("datetimeoffset");
+
                     b.Property<int>("ReturnablesCount")
                         .HasColumnType("int");
 
@@ -322,6 +334,11 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
 
                     b.Property<int>("ReturnedReturnablesCount")
                         .HasColumnType("int");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
 
                     b.Property<DateTimeOffset>("ScheduledOn")
                         .HasColumnType("datetimeoffset");
@@ -341,7 +358,8 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
 
                     b.HasIndex("DeliveryBatchId");
 
-                    b.HasIndex("ProducerId");
+                    b.HasIndex("ProducerId", "Reference")
+                        .IsUnique();
 
                     b.ToTable("Deliveries");
                 });
@@ -369,6 +387,9 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
 
                     b.Property<int>("DeliveriesCount")
                         .HasColumnType("int");
+
+                    b.Property<string>("DeliveryFormsUrl")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<TimeSpan>("From")
                         .HasColumnType("time");
@@ -570,6 +591,9 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                         .UseCollation("Latin1_general_CI_AI");
 
                     b.Property<Guid>("ProductId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("PurchaseOrderId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<int>("Quantity")
@@ -1187,9 +1211,6 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
 
                     b.Property<int>("PurchaseOrdersCount")
                         .HasColumnType("int");
-
-                    b.Property<string>("Reference")
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTimeOffset?>("RemovedOn")
                         .HasColumnType("datetimeoffset");
@@ -1964,9 +1985,8 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                     b.Property<string>("Reason")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Reference")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<int>("Reference")
+                        .HasColumnType("int");
 
                     b.Property<DateTimeOffset?>("RemovedOn")
                         .HasColumnType("datetimeoffset");

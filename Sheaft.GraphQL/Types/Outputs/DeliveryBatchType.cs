@@ -47,6 +47,10 @@ namespace Sheaft.GraphQL.Types.Outputs
                 .Name("createdOn");
             
             descriptor
+                .Field(c => c.DeliveryFormsUrl)
+                .Name("deliveryFormsUrl");
+            
+            descriptor
                 .Field(c => c.UpdatedOn)
                 .Name("updatedOn");
             

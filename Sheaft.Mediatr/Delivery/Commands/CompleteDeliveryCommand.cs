@@ -55,7 +55,7 @@ namespace Sheaft.Mediatr.Delivery.Commands
 
         public async Task<Result> Handle(CompleteDeliveryCommand request, CancellationToken token)
         {
-            var delivery = await _context.Set<Domain.Delivery>()
+            var delivery = await _context.Deliveries
                 .Include(d => d.Products)
                 .SingleOrDefaultAsync(c => c.Id == request.DeliveryId, token);
 
@@ -90,8 +90,9 @@ namespace Sheaft.Mediatr.Delivery.Commands
                 .ToList();
 
             delivery.CompleteDelivery(returnedProducts, returnedReturnables, request.ReceptionedBy, request.Comment);
-
             await _context.SaveChangesAsync(token);
+            
+            _mediatr.Post(new GenerateDeliveryFormCommand(request.RequestUser){DeliveryId = delivery.Id});
             return Success();
         }
     }
