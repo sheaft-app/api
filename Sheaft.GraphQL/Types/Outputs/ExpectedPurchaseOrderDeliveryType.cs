@@ -14,6 +14,10 @@ namespace Sheaft.GraphQL.Types.Outputs
                 .Name("expectedDeliveryDate");
                 
             descriptor
+                .Field(c => c.Name)
+                .Name("name");
+                
+            descriptor
                 .Field(c => c.From)
                 .Name("from");
                 
