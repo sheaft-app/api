@@ -59,6 +59,8 @@ using Sheaft.Mediatr.Product.Commands;
 using Sheaft.Mediatr.Store.Commands;
 using Sheaft.Options;
 using Sheaft.Web.Api.Extensions;
+using WkHtmlToPdfDotNet;
+using WkHtmlToPdfDotNet.Contracts;
 
 namespace Sheaft.Web.Api
 {
@@ -277,10 +279,12 @@ namespace Sheaft.Web.Api
             services.AddScoped<IPspService, PspService>();
             services.AddScoped<ITableService, TableService>();
             services.AddScoped<IAuthService, AuthService>();
+            services.AddScoped<IPdfGenerator, PdfGenerator>();
             
             services.AddScoped<ISheaftMediatr, SheaftMediatr>();
             services.AddScoped<ISheaftDispatcher, SheaftDispatcher>();
             
+            services.AddSingleton(typeof(IConverter), new SynchronizedConverter(new PdfTools()));
             services.AddSingleton<ICurrentUserService, CurrentUserService>();
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             

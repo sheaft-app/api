@@ -11,7 +11,6 @@ namespace Sheaft.Domain.Enum
         Refused,
         Cancelled,
         Withdrawned,
-        Expired,
-        Postponed
+        Expired
     }
 }

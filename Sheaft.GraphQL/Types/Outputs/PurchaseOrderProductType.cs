@@ -94,6 +94,10 @@ namespace Sheaft.GraphQL.Types.Outputs
                 .Field(c => c.Reference)
                 .Name("reference")
                 .Type<NonNullType<StringType>>();
+            
+            descriptor
+                .Field(c => c.HasReturnable)
+                .Name("isReturnable");
         }
     }
 }

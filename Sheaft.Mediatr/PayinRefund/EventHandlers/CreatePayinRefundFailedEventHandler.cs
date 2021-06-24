@@ -30,8 +30,8 @@ namespace Sheaft.Mediatr.PayinRefund.EventHandlers
             await _emailService.SendEmailAsync(
                "support@sheaft.com",
                "Support",
-               $"La création du transfert pour le remboursement du paiement de l'order {order.Reference} pour {order.User.Name} a échouée",
-               $"La création du transfert pour le remboursement du paiement de l'order {order.Reference} pour {order.User.Name}({order.User.Email}) a échouée à plus de 3 reprises, le remboursement du paiement est mis en supsend, veuillez traiter manuellement la demande.",
+               $"La création du transfert pour le remboursement du paiement de l'order pour {order.User.Name} a échouée",
+               $"La création du transfert pour le remboursement du paiement de l'order pour {order.User.Name}({order.User.Email}) a échouée à plus de 3 reprises, le remboursement du paiement est mis en supsend, veuillez traiter manuellement la demande.",
                false,
                token);
         }

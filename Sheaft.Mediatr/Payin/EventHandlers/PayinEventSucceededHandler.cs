@@ -11,6 +11,7 @@ using Microsoft.EntityFrameworkCore;
 using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Domain.Enum;
 using Sheaft.Domain.Events.Payin;
+using Sheaft.Domain.Extensions;
 using Sheaft.Mailing;
 
 namespace Sheaft.Mediatr.Payin.EventHandlers
@@ -60,7 +61,6 @@ namespace Sheaft.Mediatr.Payin.EventHandlers
                 TotalPrice = payin.Order.TotalPrice, 
                 CreatedOn = payin.Order.CreatedOn, 
                 ProductsCount = payin.Order.ProductsCount, 
-                Reference = payin.Order.Reference, 
                 MyOrdersUrl = $"{_configuration.GetValue<string>("Portal:url")}/#/my-orders/"
             };
         }

@@ -37,12 +37,16 @@ namespace Sheaft.Mediatr.PurchaseOrder.Commands
     public class CompletePurchaseOrderCommandHandler : CommandsHandler,
         IRequestHandler<CompletePurchaseOrderCommand, Result>
     {
+        private readonly IIdentifierService _identifierService;
+
         public CompletePurchaseOrderCommandHandler(
             IAppDbContext context,
             ISheaftMediatr mediatr,
+            IIdentifierService identifierService,
             ILogger<CompletePurchaseOrderCommandHandler> logger)
             : base(mediatr, context, logger)
         {
+            _identifierService = identifierService;
         }
 
         public async Task<Result> Handle(CompletePurchaseOrderCommand request, CancellationToken token)
@@ -67,7 +71,12 @@ namespace Sheaft.Mediatr.PurchaseOrder.Commands
             {
                 var producer = await _context.Producers.SingleAsync(p => p.Id == purchaseOrder.ProducerId, token);
                 var user = await _context.Users.SingleAsync(p => p.Id == purchaseOrder.ClientId, token);
-                var delivery = new Domain.Delivery(producer, purchaseOrder.ExpectedDelivery.Kind, purchaseOrder.ExpectedDelivery.ExpectedDeliveryDate, purchaseOrder.ExpectedDelivery.Address, user.Id, user.Name, new []{purchaseOrder}, 0);
+                
+                var identifier = await _identifierService.GetNextDeliveryReferenceAsync(producer.Id, token);
+                if (!identifier.Succeeded)
+                    return Failure(identifier);
+                
+                var delivery = new Domain.Delivery(identifier.Data, producer, purchaseOrder.ExpectedDelivery.Kind, purchaseOrder.ExpectedDelivery.ExpectedDeliveryDate, purchaseOrder.ExpectedDelivery.Address, user.Id, user.Name, new []{purchaseOrder}, 0);
                 delivery.SetAsReady();
             
                 await _context.AddAsync(delivery, token);

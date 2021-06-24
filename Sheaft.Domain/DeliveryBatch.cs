@@ -4,11 +4,12 @@ using System.Linq;
 using Sheaft.Core.Exceptions;
 using Sheaft.Domain.Common;
 using Sheaft.Domain.Enum;
+using Sheaft.Domain.Events.DeliveryBatch;
 using Sheaft.Domain.Interop;
 
 namespace Sheaft.Domain
 {
-    public class DeliveryBatch : IIdEntity, ITrackCreation, ITrackUpdate, ITrackRemove
+    public class DeliveryBatch : IIdEntity, ITrackCreation, ITrackUpdate, ITrackRemove, IHasDomainEvent
     {
         protected DeliveryBatch()
         {
@@ -48,6 +49,7 @@ namespace Sheaft.Domain
         public DateTimeOffset? CompletedOn { get; private set; }
         public DateTimeOffset? CancelledOn { get; private set; }
         public string Reason { get; private set; }
+        public string DeliveryFormsUrl { get; private set; }
         public Guid AssignedToId { get; private set; }
         public virtual User AssignedTo { get; private set; }
         public virtual ICollection<Delivery> Deliveries { get; private set; }
@@ -70,15 +72,19 @@ namespace Sheaft.Domain
 
             foreach (var delivery in Deliveries)
                 delivery.SetAsReady();
+
+            DomainEvents.Add(new DeliveryBatchStartedEvent(Id));
         }
 
         public void CompleteBatch()
         {
-            if (Deliveries.Any(d => d.Status != DeliveryStatus.Delivered))
+            if (Deliveries.Any(d => d.Status != DeliveryStatus.Delivered && d.Status != DeliveryStatus.Rejected))
                 throw SheaftException.Validation();
 
             CompletedOn = DateTimeOffset.UtcNow;
             Status = DeliveryBatchStatus.Completed;
+            
+            DomainEvents.Add(new DeliveryBatchCompletedEvent(Id));
         }
 
         public void CancelBatch(string reason)
@@ -86,15 +92,17 @@ namespace Sheaft.Domain
             if (Status is DeliveryBatchStatus.Completed or DeliveryBatchStatus.Cancelled)
                 throw SheaftException.Validation();
 
+            CancelledOn = DateTimeOffset.UtcNow;
+            Reason = reason;
+            Status = DeliveryBatchStatus.Cancelled;
+            
             foreach (var delivery in Deliveries.Where(d => d.Status != DeliveryStatus.Delivered).ToList())
             {
                 var purchaseOrders = delivery.PurchaseOrders.Where(po => po.Status != PurchaseOrderStatus.Delivered);
                 delivery.RemovePurchaseOrders(purchaseOrders);
             }
 
-            CancelledOn = DateTimeOffset.UtcNow;
-            Reason = reason;
-            Status = DeliveryBatchStatus.Cancelled;
+            DomainEvents.Add(new DeliveryBatchCancelledEvent(Id));
         }
 
         public void PostponeBatch(DateTimeOffset rescheduledOn, TimeSpan from, string reason)
@@ -109,6 +117,8 @@ namespace Sheaft.Domain
             Status = DeliveryBatchStatus.Waiting;
             foreach (var delivery in Deliveries)
                 delivery.PostponeDelivery();
+            
+            DomainEvents.Add(new DeliveryBatchPostponedEvent(Id));
         }
 
         public void AddDelivery(Delivery delivery)
@@ -158,6 +168,12 @@ namespace Sheaft.Domain
 
             if (DeliveriesCount < 1)
                 Status = DeliveryBatchStatus.Cancelled;
+        }
+
+        public void SetDeliveryFormsUrl(string url)
+        {
+            DeliveryFormsUrl = url;
+            DomainEvents.Add(new DeliveryBatchFormsGeneratedEvent(Id));
         }
     }
 }

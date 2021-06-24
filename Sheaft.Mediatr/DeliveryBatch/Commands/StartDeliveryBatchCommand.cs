@@ -19,6 +19,8 @@ using Sheaft.Domain.Enum;
 using Sheaft.Application.Interfaces.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Sheaft.Core.Enums;
+using Sheaft.Domain.Events.DeliveryBatch;
+using Sheaft.Mediatr.Delivery.Commands;
 using Sheaft.Mediatr.Producer.Commands;
 
 namespace Sheaft.Mediatr.DeliveryBatch.Commands
@@ -28,7 +30,7 @@ namespace Sheaft.Mediatr.DeliveryBatch.Commands
         protected StartDeliveryBatchCommand()
         {
         }
-        
+
         [JsonConstructor]
         public StartDeliveryBatchCommand(RequestUser requestUser) : base(requestUser)
         {
@@ -55,8 +57,28 @@ namespace Sheaft.Mediatr.DeliveryBatch.Commands
                 return Failure(MessageKind.NotFound);
 
             deliveryBatch.StartBatch();
+
+            Result result = null;
+            foreach (var delivery in deliveryBatch.Deliveries)
+            {
+                result = await _mediatr.Process(
+                    new GenerateDeliveryFormCommand(request.RequestUser) {DeliveryId = delivery.Id}, token);
+
+                if (!result.Succeeded)
+                    break;
+            }
+
+            if (result is {Succeeded: false})
+                return Failure(result);
+
             await _context.SaveChangesAsync(token);
 
+            foreach (var delivery in deliveryBatch.Deliveries)
+                _mediatr.Post(new GenerateDeliveryReceiptCommand(request.RequestUser) {DeliveryId = delivery.Id});
+
+            _mediatr.Post(new GenerateDeliveryBatchFormsCommand(request.RequestUser)
+                {DeliveryBatchId = deliveryBatch.Id});
+            
             return Success();
         }
     }

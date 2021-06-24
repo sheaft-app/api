@@ -13,6 +13,8 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
         public void Configure(EntityTypeBuilder<Delivery> entity)
         {
             entity.Property(c => c.Client).UseCollation("Latin1_general_CI_AI");
+            entity.Property(c => c.RowVersion).IsRowVersion();
+            entity.Ignore(c => c.DomainEvents);
             
             entity.OwnsOne(o => o.Address);
             
@@ -32,6 +34,7 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
                 .HasForeignKey(c => c.ClientId).OnDelete(DeleteBehavior.NoAction);
 
             entity.HasKey(c => c.Id);
+            entity.HasIndex(c => new {c.ProducerId, c.Reference}).IsUnique();
             entity.ToTable("Deliveries");
         }
     }

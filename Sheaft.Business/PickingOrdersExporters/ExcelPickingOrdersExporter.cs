@@ -14,6 +14,7 @@ using Sheaft.Application.Models;
 using Sheaft.Application.Services;
 using Sheaft.Core;
 using Sheaft.Domain;
+using Sheaft.Domain.Extensions;
 
 namespace Sheaft.Business.PickingOrdersExporters
 {
@@ -44,7 +45,7 @@ namespace Sheaft.Business.PickingOrdersExporters
 
             var subsetOrders = purchaseOrders.Select(o => new LightOrder
             {
-                Reference = o.Reference,
+                Reference = o.Reference.AsPurchaseOrderIdentifier(),
                 ExpectedDeliveryDate = o.ExpectedDelivery.ExpectedDeliveryDate.ToString("dd/MM/yyyy"),
                 SenderId = o.ClientId,
                 SenderName = o.SenderInfo.Name,

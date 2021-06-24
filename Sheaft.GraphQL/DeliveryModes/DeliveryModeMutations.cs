@@ -72,7 +72,7 @@ namespace Sheaft.GraphQL.DeliveryModes
             return await ExecuteAsync(mediatr, input, token);
         }
 
-        [GraphQLName("updateOrCreateDeliveryClosing")]
+        [GraphQLName("updateOrCreateDeliveryModeClosing")]
         [Authorize(Policy = Policies.PRODUCER)]
         [GraphQLType(typeof(DeliveryClosingType))]
         public async Task<DeliveryClosing> UpdateOrCreateDeliveryClosingAsync(
@@ -85,7 +85,7 @@ namespace Sheaft.GraphQL.DeliveryModes
             return await businessClosingsDataLoader.LoadAsync(result, token);
         }
 
-        [GraphQLName("updateOrCreateDeliveryClosings")]
+        [GraphQLName("updateOrCreateDeliveryModeClosings")]
         [Authorize(Policy = Policies.PRODUCER)]
         [GraphQLType(typeof(ListType<DeliveryClosingType>))]
         public async Task<IEnumerable<DeliveryClosing>> UpdateOrCreateDeliveryClosingsAsync(
@@ -98,7 +98,7 @@ namespace Sheaft.GraphQL.DeliveryModes
             return await businessClosingsDataLoader.LoadAsync(result.ToList(), token);
         }
 
-        [GraphQLName("deleteDeliveryClosings")]
+        [GraphQLName("deleteDeliveryModeClosings")]
         [Authorize(Policy = Policies.PRODUCER)]
         public async Task<bool> DeleteDeliveryClosingsAsync(
             [GraphQLType(typeof(DeleteDeliveryClosingsInputType))] [GraphQLName("input")]

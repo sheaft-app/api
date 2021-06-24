@@ -12,33 +12,15 @@ using Sheaft.Domain.Events.Declaration;
 
 namespace Sheaft.Mediatr.Declaration.EventHandlers
 {
-    public class DeclarationEventsHandler : EventsHandler,
-        INotificationHandler<DomainEventNotification<DeclarationIncompleteEvent>>,
-        INotificationHandler<DomainEventNotification<DeclarationRefusedEvent>>,
-        INotificationHandler<DomainEventNotification<DeclarationValidatedEvent>>
+    public class DeclarationRefusedEventHandler : EventsHandler,
+        INotificationHandler<DomainEventNotification<DeclarationRefusedEvent>>
     {
-        public DeclarationEventsHandler(
+        public DeclarationRefusedEventHandler(
             IAppDbContext context,
             IEmailService emailService,
             ISignalrService signalrService)
             : base(context, emailService, signalrService)
         {
-        }
-
-        public async Task Handle(DomainEventNotification<DeclarationIncompleteEvent> notification, CancellationToken token)
-        {
-            var declarationEvent = notification.DomainEvent;
-            var legal = await _context.Set<BusinessLegal>().SingleOrDefaultAsync(l => l.DeclarationId == declarationEvent.DeclarationId, token);
-            if (legal.Declaration.Status != DeclarationStatus.Incomplete)
-                return;
-
-            await _emailService.SendEmailAsync(
-               "support@sheaft.com",
-               "Support",
-               $"Déclaration UBO du producteur {legal.User.Name} incomplète",
-               $"La déclaration d'ubo du producteur {legal.User.Name} ({legal.User.Email}) est incomplète. Raison: {legal.Declaration.ReasonCode}-{legal.Declaration.ReasonMessage}.",
-               false,
-               token);
         }
 
         public async Task Handle(DomainEventNotification<DeclarationRefusedEvent> notification, CancellationToken token)
@@ -55,11 +37,6 @@ namespace Sheaft.Mediatr.Declaration.EventHandlers
                $"La déclaration d'ubo du producteur {legal.User.Name} ({legal.User.Email}) a été refusée. Raison: {legal.Declaration.ReasonCode}-{legal.Declaration.ReasonMessage}.",
                false,
                token);
-        }
-
-        public Task Handle(DomainEventNotification<DeclarationValidatedEvent> notification, CancellationToken token)
-        {
-            return Task.CompletedTask;
         }
     }
 }

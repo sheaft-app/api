@@ -84,7 +84,11 @@ namespace Sheaft.GraphQL.Types.Outputs
             descriptor
                 .Field(c => c.TotalProductOnSalePrice)
                 .Name("totalProductOnSalePrice");
-
+            
+            descriptor
+                .Field(c => c.HasReturnable)
+                .Name("isReturnable");
+            
             descriptor
                 .Field(c => c.Name)
                 .Name("name")

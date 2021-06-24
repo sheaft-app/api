@@ -8,6 +8,7 @@ using HotChocolate.Resolvers;
 using HotChocolate.Types;
 using Microsoft.EntityFrameworkCore;
 using Sheaft.Domain;
+using Sheaft.Domain.Extensions;
 using Sheaft.GraphQL.Catalogs;
 using Sheaft.GraphQL.Orders;
 using Sheaft.GraphQL.PurchaseOrders;
@@ -44,10 +45,6 @@ namespace Sheaft.GraphQL.Types.Outputs
             descriptor
                 .Field(c => c.UpdatedOn)
                 .Name("updatedOn");
-
-            descriptor
-                .Field(c => c.Reference)
-                .Name("reference");
 
             descriptor
                 .Field(c => c.TotalWholeSalePrice)

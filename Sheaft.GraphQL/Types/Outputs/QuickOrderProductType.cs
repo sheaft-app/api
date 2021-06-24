@@ -60,6 +60,10 @@ namespace Sheaft.GraphQL.Types.Outputs
                 .Type<NonNullType<StringType>>()
                 .Resolve(c => c.Parent<QuickOrderProduct>().CatalogProduct.Product.Reference);
 
+            descriptor
+                .Field("isReturnable")
+                .Resolve(c => c.Parent<QuickOrderProduct>().CatalogProduct.Product.ReturnableId.HasValue);
+            
             descriptor.Field("returnable")
                 .Type<ReturnableType>()
                 .ResolveWith<QuickOrderProductResolvers>(c => 

@@ -18,7 +18,7 @@ namespace Sheaft.Domain
         {
         }
 
-        public PurchaseOrder(Guid id, string reference, PurchaseOrderStatus status, Producer producer, Order order)
+        public PurchaseOrder(Guid id, int reference, PurchaseOrderStatus status, Producer producer, Order order)
         {
             if (producer == null)
                 throw SheaftException.Validation(MessageKind.PurchaseOrder_Vendor_Required);
@@ -60,7 +60,7 @@ namespace Sheaft.Domain
         public DateTimeOffset? AcceptedOn { get; private set; }
         public DateTimeOffset? CompletedOn { get; private set; }
         public DateTimeOffset? DroppedOn { get; private set; }
-        public string Reference { get; private set; }
+        public int Reference { get; private set; }
         public string Reason { get; private set; }
         public string Comment { get; private set; }
         public int LinesCount { get; private set; }
@@ -87,11 +87,8 @@ namespace Sheaft.Domain
         public virtual ExpectedPurchaseOrderDelivery ExpectedDelivery { get; private set; }
         public virtual ICollection<PurchaseOrderProduct> Products { get; private set; }
 
-        public void SetReference(string newReference)
+        public void SetReference(int newReference)
         {
-            if (string.IsNullOrWhiteSpace(newReference))
-                throw SheaftException.Validation(MessageKind.PurchaseOrder_Reference_Required);
-
             Reference = newReference;
         }
 
@@ -111,7 +108,6 @@ namespace Sheaft.Domain
 
                     if (!skipNotification)
                         DomainEvents.Add(new PurchaseOrderAcceptedEvent(Id));
-
                     return;
                 case PurchaseOrderStatus.Completed:
                     if (Status != PurchaseOrderStatus.Processing)
@@ -122,12 +118,10 @@ namespace Sheaft.Domain
 
                     if (!skipNotification)
                         DomainEvents.Add(new PurchaseOrderCompletedEvent(Id));
-
                     break;
                 case PurchaseOrderStatus.Shipping:
-                    if (Status != PurchaseOrderStatus.Completed && Status != PurchaseOrderStatus.Postponed)
+                    if (Status != PurchaseOrderStatus.Completed)
                         throw SheaftException.Validation(MessageKind.PurchaseOrder_CannotShip_NotIn_CompletedStatus);
-
                     break;
                 case PurchaseOrderStatus.Delivered:
                     if (Status != PurchaseOrderStatus.Completed && Status != PurchaseOrderStatus.Shipping)
@@ -151,7 +145,6 @@ namespace Sheaft.Domain
 
                     if (!skipNotification)
                         DomainEvents.Add(new PurchaseOrderCancelledEvent(Id));
-
                     break;
                 case PurchaseOrderStatus.Withdrawned:
                     if (Status == PurchaseOrderStatus.Withdrawned)
@@ -169,7 +162,6 @@ namespace Sheaft.Domain
 
                     if (!skipNotification)
                         DomainEvents.Add(new PurchaseOrderWithdrawnedEvent(Id));
-
                     break;
                 case PurchaseOrderStatus.Refused:
                     if (Status == PurchaseOrderStatus.Cancelled)
@@ -187,7 +179,6 @@ namespace Sheaft.Domain
                     if (!skipNotification)
                         DomainEvents.Add(new PurchaseOrderRefusedEvent(Id));
                     break;
-
                 case PurchaseOrderStatus.Expired:
                     if (Status != PurchaseOrderStatus.Waiting)
                         throw SheaftException.Validation();
@@ -196,12 +187,6 @@ namespace Sheaft.Domain
 
                     if (!skipNotification)
                         DomainEvents.Add(new PurchaseOrderExpiredEvent(Id));
-                    break;
-
-                case PurchaseOrderStatus.Postponed:
-                    if (Status != PurchaseOrderStatus.Completed && Status != PurchaseOrderStatus.Shipping && Status != PurchaseOrderStatus.Postponed)
-                        throw SheaftException.Validation();
-                    
                     break;
             }
 

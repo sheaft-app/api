@@ -21,6 +21,8 @@ namespace Sheaft.GraphQL.Types.Outputs
         {
             base.Configure(descriptor);
 
+            descriptor.Name("DeliveryMode");
+
             descriptor
                 .ImplementsNode()
                 .IdField(c => c.Id)
