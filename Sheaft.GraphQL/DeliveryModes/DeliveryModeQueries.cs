@@ -40,7 +40,7 @@ namespace Sheaft.GraphQL.DeliveryModes
             _roleOptions = roleOptions.Value;
         }
 
-        [GraphQLName("delivery")]
+        [GraphQLName("deliveryMode")]
         [GraphQLType(typeof(DeliveryModeType))]
         [UseDbContext(typeof(QueryDbContext))]
         [Authorize(Policy = Policies.PRODUCER)]
@@ -53,7 +53,7 @@ namespace Sheaft.GraphQL.DeliveryModes
                 .Where(c => c.ProducerId == CurrentUser.Id && c.Id == id);
         }
         
-        [GraphQLName("deliveries")]
+        [GraphQLName("deliveryModes")]
         [GraphQLType(typeof(ListType<DeliveryModeType>))]
         [UseDbContext(typeof(QueryDbContext))]
         [Authorize(Policy = Policies.STORE_OR_PRODUCER)]
@@ -68,7 +68,7 @@ namespace Sheaft.GraphQL.DeliveryModes
                 .Where(c => c.ProducerId == CurrentUser.Id);
         }
 
-        [GraphQLName("deliveryClosing")]
+        [GraphQLName("deliveryModeClosing")]
         [GraphQLType(typeof(DeliveryClosingType))]
         [UseDbContext(typeof(QueryDbContext))]
         [Authorize(Policy = Policies.STORE_OR_PRODUCER)]
@@ -80,7 +80,7 @@ namespace Sheaft.GraphQL.DeliveryModes
                 .Where(d => d.Id == id);
         }
         
-        [GraphQLName("deliveryClosings")]
+        [GraphQLName("deliveryModeClosings")]
         [GraphQLType(typeof(ListType<DeliveryClosingType>))]
         [UseDbContext(typeof(QueryDbContext))]
         [Authorize(Policy = Policies.STORE_OR_PRODUCER)]
