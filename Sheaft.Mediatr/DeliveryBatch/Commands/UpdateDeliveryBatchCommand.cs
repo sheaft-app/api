@@ -55,6 +55,9 @@ namespace Sheaft.Mediatr.DeliveryBatch.Commands
             if (deliveryBatch == null)
                 return Failure(MessageKind.NotFound);
 
+            if (deliveryBatch.Status == DeliveryBatchStatus.Completed)
+                return Failure(MessageKind.Validation);
+            
             var clientIds = request.Deliveries.Select(d => d.ClientId);
             var existingClientIds = deliveryBatch.Deliveries.Select(d => d.ClientId);
 
