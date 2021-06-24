@@ -49,12 +49,6 @@ namespace Sheaft.Mediatr.User.Commands
 
             await _context.AddAsync(new Sponsoring(sponsor, user), token);
             await _context.SaveChangesAsync(token);
-
-            _mediatr.Post(new CreateUserPointsCommand(request.RequestUser)
-            {
-                Kind = PointKind.Sponsoring,
-                UserId = sponsor.Id
-            });
             
             return Success();
         }

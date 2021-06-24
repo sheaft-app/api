@@ -60,11 +60,6 @@ namespace Sheaft.Mediatr.Product.Commands
             entity.AddRating(user, request.Value, request.Comment);
             await _context.SaveChangesAsync(token);
 
-            _mediatr.Post(new CreateUserPointsCommand(request.RequestUser)
-            {
-                CreatedOn = DateTimeOffset.UtcNow, Kind = PointKind.RateProduct, UserId = request.UserId
-            });
-
             return Success();
         }
     }

@@ -9,7 +9,7 @@ using Sheaft.Domain.Interop;
 
 namespace Sheaft.Domain
 {
-    public class DeliveryBatch : IIdEntity, ITrackCreation, ITrackUpdate, ITrackRemove
+    public class DeliveryBatch : IIdEntity, ITrackCreation, ITrackUpdate, ITrackRemove, IHasDomainEvent
     {
         protected DeliveryBatch()
         {
@@ -92,16 +92,16 @@ namespace Sheaft.Domain
             if (Status is DeliveryBatchStatus.Completed or DeliveryBatchStatus.Cancelled)
                 throw SheaftException.Validation();
 
+            CancelledOn = DateTimeOffset.UtcNow;
+            Reason = reason;
+            Status = DeliveryBatchStatus.Cancelled;
+            
             foreach (var delivery in Deliveries.Where(d => d.Status != DeliveryStatus.Delivered).ToList())
             {
                 var purchaseOrders = delivery.PurchaseOrders.Where(po => po.Status != PurchaseOrderStatus.Delivered);
                 delivery.RemovePurchaseOrders(purchaseOrders);
             }
 
-            CancelledOn = DateTimeOffset.UtcNow;
-            Reason = reason;
-            Status = DeliveryBatchStatus.Cancelled;
-            
             DomainEvents.Add(new DeliveryBatchCancelledEvent(Id));
         }
 

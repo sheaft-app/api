@@ -69,7 +69,12 @@ namespace Sheaft.Infrastructure.Services
         public async Task<Result> SendTemplatedEmailAsync<T>(string toEmail, string toName, string subject,
             string templateId, T data, IEnumerable<EmailAttachmentDto> attachments, bool isHtml, CancellationToken token)
         {
-            var msg = new SendRawEmailRequest();
+            var msg = new SendRawEmailRequest
+            {
+                Source = $"{_mailerOptions.Sender.Name}<{_mailerOptions.Sender.Email}>",
+                Destinations = new List<string> {$"=?UTF-8?B?{toName.Base64Encode()}?= <{toEmail}>"}
+            };
+            
             using (var messageStream = new MemoryStream())
             {
                 var message = new MimeMessage();

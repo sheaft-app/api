@@ -12,6 +12,7 @@ using Sheaft.Core;
 using Sheaft.Domain;
 using Sheaft.Domain.Enum;
 using Sheaft.Domain.Events.Delivery;
+using Sheaft.Domain.Extensions;
 
 namespace Sheaft.Mediatr.Delivery.Commands
 {
@@ -67,7 +68,7 @@ namespace Sheaft.Mediatr.Delivery.Commands
             if (!result.Succeeded)
                 return Failure(result);
             
-            var resultUrl = await _blobService.UploadProducerDeliveryReceiptAsync(delivery.ProducerId, delivery.Id, $"Réception {delivery.Client} du {delivery.ScheduledOn:dd/MM/yyyy}.pdf",  result.Data, token);
+            var resultUrl = await _blobService.UploadProducerDeliveryReceiptAsync(delivery.ProducerId, delivery.Id, $"Reception_{delivery.Reference.AsDeliveryIdentifier()}.pdf",  result.Data, token);
             if (!resultUrl.Succeeded)
                 return Failure(resultUrl);
             

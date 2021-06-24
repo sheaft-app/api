@@ -65,7 +65,7 @@ namespace Sheaft.Mediatr.DeliveryBatch.Commands
             var outputDocument = new PdfDocument();
             foreach (var delivery in deliveryBatch.Deliveries)
             {
-                var blobResult = await _blobService.DownloadDeliveryFormAsync(delivery.DeliveryFormUrl, token);
+                var blobResult = await _blobService.DownloadDeliveryAsync(delivery.DeliveryFormUrl, token);
                 if (!blobResult.Succeeded)
                     throw SheaftException.BadRequest(blobResult.Exception);
 
@@ -79,6 +79,8 @@ namespace Sheaft.Mediatr.DeliveryBatch.Commands
                     }
                 }
             }
+
+            outputDocument.Info.Subject = $"{deliveryBatch.Name} du {deliveryBatch.ScheduledOn:yyyyMMdd}";
 
             using (var stream = new MemoryStream())
             {

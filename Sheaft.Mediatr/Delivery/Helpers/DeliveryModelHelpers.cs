@@ -28,7 +28,7 @@ namespace Sheaft.Mediatr.Delivery.Commands
                 PurchaseOrders = purchaseOrders,
                 ReturnedProducts = returnedProducts,
                 ReturnedReturnables = returnedReturnables,
-                DeliveredOn = delivery.DeliveredOn,
+                DeliveredOn = delivery.DeliveredOn ?? delivery.ScheduledOn,
                 ScheduledOn = delivery.ScheduledOn,
                 ReceptionnedBy = delivery.ReceptionedBy,
                 Comment = delivery.Comment,

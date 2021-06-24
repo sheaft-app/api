@@ -65,7 +65,7 @@
 </div>
 </div>
 <div style="padding:15px 0px">
-    <p>Date de livraison: <strong>@Model.DeliveredOn.Value.ToString("dd/MM/yyyy")</strong></p>
+    <p>Date de livraison: <strong>@(Model.DeliveredOn.HasValue ? Model.DeliveredOn.Value.ToString("dd/MM/yyyy") : Model.ScheduledOn.ToString("dd/MM/yyyy"))</strong></p>
 </div>
 <table cellpadding="0" cellspacing="0" align="center" width="100%" role="module" data-type="columns" style="border-collapse:collapse; padding:15px 0px 0px 0px;" bgcolor="#FFFFFF">
     <thead>

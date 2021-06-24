@@ -5,6 +5,7 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Application.Models;
+using Sheaft.Domain.Enum;
 using Sheaft.Domain.Events.DeliveryBatch;
 using Sheaft.Mailing;
 
@@ -29,7 +30,7 @@ namespace Sheaft.Mediatr.DeliveryBatch.EventHandlers
         {
             var @event = notification.DomainEvent;
             var deliveryBatch = await _context.DeliveryBatches.SingleAsync(d => d.Id == @event.DeliveryBatchId, token);
-            if (string.IsNullOrWhiteSpace(deliveryBatch.DeliveryFormsUrl))
+            if (string.IsNullOrWhiteSpace(deliveryBatch.DeliveryFormsUrl) || deliveryBatch.Status == DeliveryBatchStatus.Cancelled)
                 return;
             
             await _signalrService.SendNotificationToUserAsync(deliveryBatch.AssignedToId, nameof(DeliveryBatchFormsGeneratedEvent),
@@ -55,7 +56,7 @@ namespace Sheaft.Mediatr.DeliveryBatch.EventHandlers
                     new EmailAttachmentDto
                     {
                         Content = fileResult.Data,
-                        Name = $"{deliveryBatch.Name} - {deliveryBatch.ScheduledOn:dd/MM/yyyy}.pdf"
+                        Name = $"{deliveryBatch.Name}_{deliveryBatch.ScheduledOn:yyyyMMdd}.pdf"
                     }
                 },
                 true,

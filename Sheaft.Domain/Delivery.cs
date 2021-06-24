@@ -9,13 +9,14 @@ using Sheaft.Domain.Interop;
 
 namespace Sheaft.Domain
 {
-    public class Delivery : IIdEntity, ITrackCreation, ITrackUpdate
+    public class Delivery : IIdEntity, ITrackCreation, ITrackUpdate, IHasDomainEvent
     {
         protected Delivery()
         {
         }
 
-        public Delivery(int identifier, Producer producer, DeliveryKind kind, DateTimeOffset scheduledOn, ExpectedAddress address,
+        public Delivery(int reference, Producer producer, DeliveryKind kind, DateTimeOffset scheduledOn,
+            ExpectedAddress address,
             Guid clientId, string clientName, IEnumerable<PurchaseOrder> purchaseOrders, int? position)
         {
             Id = Guid.NewGuid();
@@ -29,6 +30,7 @@ namespace Sheaft.Domain
             Address = address;
             ProducerId = producer.Id;
 
+            Reference = reference;
             AddPurchaseOrders(purchaseOrders);
         }
 
@@ -99,7 +101,8 @@ namespace Sheaft.Domain
 
         public void AddPurchaseOrders(IEnumerable<PurchaseOrder> purchaseOrders)
         {
-            if (Status != DeliveryStatus.Waiting)
+            if (DeliveryBatch == null && Status != DeliveryStatus.Waiting || DeliveryBatch != null &&
+                DeliveryBatch.Status != DeliveryBatchStatus.Cancelled && Status != DeliveryStatus.Waiting)
                 throw SheaftException.Validation();
 
             if (purchaseOrders == null || !purchaseOrders.Any())
@@ -124,7 +127,8 @@ namespace Sheaft.Domain
                         Products.Remove(existingProduct);
                 }
                 else if (quantity > 0)
-                    Products.Add(new DeliveryProduct(groupedProduct, quantity, ModificationKind.Deliver, groupedProduct.PurchaseOrderId));
+                    Products.Add(new DeliveryProduct(groupedProduct, quantity, ModificationKind.Deliver,
+                        groupedProduct.PurchaseOrderId));
             }
 
             Refresh();
@@ -132,7 +136,8 @@ namespace Sheaft.Domain
 
         public void RemovePurchaseOrders(IEnumerable<PurchaseOrder> purchaseOrders)
         {
-            if (Status != DeliveryStatus.Waiting)
+            if (DeliveryBatch == null && Status != DeliveryStatus.Waiting || DeliveryBatch != null &&
+                DeliveryBatch.Status != DeliveryBatchStatus.Cancelled && Status != DeliveryStatus.Waiting)
                 throw SheaftException.Validation();
 
             if (PurchaseOrders == null)

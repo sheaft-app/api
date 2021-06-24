@@ -11,6 +11,7 @@ using Sheaft.Core;
 using Sheaft.Domain;
 using Sheaft.Domain.Enum;
 using Sheaft.Domain.Events.Delivery;
+using Sheaft.Domain.Extensions;
 
 namespace Sheaft.Mediatr.Delivery.Commands
 {
@@ -67,14 +68,13 @@ namespace Sheaft.Mediatr.Delivery.Commands
                 return Failure(result);
 
             var resultUrl = await _blobService.UploadProducerDeliveryFormAsync(delivery.ProducerId, delivery.Id,
-                $"Livraison {delivery.Client} du {delivery.ScheduledOn:dd/MM/yyyy}.pdf", result.Data, token);
+                $"{delivery.Reference.AsDeliveryIdentifier()}.pdf", result.Data, token);
             if (!resultUrl.Succeeded)
                 return Failure(resultUrl);
 
             delivery.SetFormUrl(resultUrl.Data);
             await _context.SaveChangesAsync(token);
             
-            _mediatr.Post(new DeliveryFormGeneratedEvent(delivery.Id));
             return Success();
         }
     }
