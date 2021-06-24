@@ -28,4 +28,27 @@ namespace Sheaft.GraphQL.Types.Inputs
                 .Type<NonNullType<ListType<ClientDeliveryPositionDtoInputType>>>();
         }
     }
+    public class SetNextDeliveryInputType : SheaftInputType<SetNextDeliveryCommand>
+    {
+        protected override void Configure(IInputObjectTypeDescriptor<SetNextDeliveryCommand> descriptor)
+        {
+            base.Configure(descriptor);
+
+            descriptor.Name("SetNextDeliveryInput");
+
+            descriptor
+                .Field(c => c.DeliveryBatchId)
+                .ID(nameof(DeliveryBatch))
+                .Name("deliveryBatchId");
+            
+            descriptor
+                .Field(c => c.DeliveryId)
+                .ID(nameof(Delivery))
+                .Name("deliveryId");
+
+            descriptor
+                .Field(c => c.StartDelivery)
+                .Name("autostartDelivery");
+        }
+    }
 }
