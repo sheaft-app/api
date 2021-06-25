@@ -64,16 +64,21 @@ namespace Sheaft.Domain
             Name = name;
         }
 
-        public void StartBatch()
+        public void SetBatchReady()
         {
             Reason = null;
-            StartedOn ??= DateTimeOffset.UtcNow;
-            Status = DeliveryBatchStatus.InProgress;
+            StartedOn = null;
+            Status = DeliveryBatchStatus.Ready;
 
             foreach (var delivery in Deliveries)
                 delivery.SetAsReady();
+        }
 
-            DomainEvents.Add(new DeliveryBatchStartedEvent(Id));
+        public void StartBatch()
+        {
+            Reason = null;
+            StartedOn = DateTimeOffset.UtcNow;
+            Status = DeliveryBatchStatus.InProgress;
         }
 
         public void CompleteBatch()
@@ -83,8 +88,6 @@ namespace Sheaft.Domain
 
             CompletedOn = DateTimeOffset.UtcNow;
             Status = DeliveryBatchStatus.Completed;
-            
-            DomainEvents.Add(new DeliveryBatchCompletedEvent(Id));
         }
 
         public void CancelBatch(string reason)
@@ -96,25 +99,27 @@ namespace Sheaft.Domain
             Reason = reason;
             Status = DeliveryBatchStatus.Cancelled;
             
-            foreach (var delivery in Deliveries.Where(d => d.Status != DeliveryStatus.Delivered).ToList())
+            foreach (var delivery in Deliveries.Where(d => d.Status != DeliveryStatus.Delivered && d.Status != DeliveryStatus.Rejected).ToList())
             {
                 var purchaseOrders = delivery.PurchaseOrders.Where(po => po.Status != PurchaseOrderStatus.Delivered);
                 delivery.RemovePurchaseOrders(purchaseOrders);
             }
-
-            DomainEvents.Add(new DeliveryBatchCancelledEvent(Id));
         }
 
         public void PostponeBatch(DateTimeOffset rescheduledOn, TimeSpan from, string reason)
         {
-            if (Status != DeliveryBatchStatus.Waiting)
+            if (Status != DeliveryBatchStatus.Waiting && Status != DeliveryBatchStatus.Ready && Status != DeliveryBatchStatus.InProgress)
                 throw SheaftException.Validation();
 
+            if (Deliveries.Any(d => d.Status == DeliveryStatus.Delivered || d.Status == DeliveryStatus.Rejected))
+                throw SheaftException.Validation();
+
+            Status = Status == DeliveryBatchStatus.InProgress ? DeliveryBatchStatus.Ready : Status;
             StartedOn = null;
             ScheduledOn = rescheduledOn;
             From = from;
             Reason = reason;
-            Status = DeliveryBatchStatus.Waiting;
+            
             foreach (var delivery in Deliveries)
                 delivery.PostponeDelivery();
             

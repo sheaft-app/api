@@ -25,39 +25,59 @@ using Sheaft.Mediatr.Producer.Commands;
 
 namespace Sheaft.Mediatr.DeliveryBatch.Commands
 {
-    public class StartDeliveryBatchCommand : Command
+    public class SetDeliveryBatchAsReadyCommand : Command
     {
-        protected StartDeliveryBatchCommand()
+        protected SetDeliveryBatchAsReadyCommand()
         {
         }
 
         [JsonConstructor]
-        public StartDeliveryBatchCommand(RequestUser requestUser) : base(requestUser)
+        public SetDeliveryBatchAsReadyCommand(RequestUser requestUser) : base(requestUser)
         {
         }
 
         public Guid Id { get; set; }
     }
 
-    public class StartDeliveryBatchCommandHandler : CommandsHandler,
-        IRequestHandler<StartDeliveryBatchCommand, Result>
+    public class SetDeliveryBatchAsReadyCommandHandler : CommandsHandler,
+        IRequestHandler<SetDeliveryBatchAsReadyCommand, Result>
     {
-        public StartDeliveryBatchCommandHandler(
+        public SetDeliveryBatchAsReadyCommandHandler(
             ISheaftMediatr mediatr,
             IAppDbContext context,
-            ILogger<StartDeliveryBatchCommandHandler> logger)
+            ILogger<SetDeliveryBatchAsReadyCommandHandler> logger)
             : base(mediatr, context, logger)
         {
         }
 
-        public async Task<Result> Handle(StartDeliveryBatchCommand request, CancellationToken token)
+        public async Task<Result> Handle(SetDeliveryBatchAsReadyCommand request, CancellationToken token)
         {
             var deliveryBatch = await _context.DeliveryBatches.SingleOrDefaultAsync(c => c.Id == request.Id, token);
             if (deliveryBatch == null)
                 return Failure(MessageKind.NotFound);
 
-            deliveryBatch.StartBatch();
+            deliveryBatch.SetBatchReady();
+
+            Result result = null;
+            foreach (var delivery in deliveryBatch.Deliveries)
+            {
+                result = await _mediatr.Process(
+                    new GenerateDeliveryFormCommand(request.RequestUser) {DeliveryId = delivery.Id}, token);
+
+                if (!result.Succeeded)
+                    break;
+            }
+
+            if (result is {Succeeded: false})
+                return Failure(result);
+
             await _context.SaveChangesAsync(token);
+            
+            _mediatr.Post(new GenerateDeliveryBatchFormsCommand(request.RequestUser)
+                {DeliveryBatchId = deliveryBatch.Id});
+
+            foreach (var delivery in deliveryBatch.Deliveries)
+                _mediatr.Post(new GenerateDeliveryReceiptCommand(request.RequestUser) {DeliveryId = delivery.Id});
             
             return Success();
         }

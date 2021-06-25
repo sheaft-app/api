@@ -36,7 +36,7 @@ namespace Sheaft.GraphQL.DeliveryBatchs
         [GraphQLName("createDeliveryBatch")]
         [Authorize(Policy = Policies.PRODUCER)]
         [GraphQLType(typeof(DeliveryBatchType))]
-        public async Task<DeliveryBatch> CreateDeliveryModeAsync(
+        public async Task<DeliveryBatch> CreateDeliveryBatchAsync(
             [GraphQLType(typeof(CreateDeliveryBatchInputType))] [GraphQLName("input")]
             CreateDeliveryBatchCommand input, [Service] ISheaftMediatr mediatr,
             DeliveryBatchesByIdBatchDataLoader deliveryBatchesDataLoader, CancellationToken token)
@@ -48,7 +48,7 @@ namespace Sheaft.GraphQL.DeliveryBatchs
         [GraphQLName("updateDeliveryBatch")]
         [Authorize(Policy = Policies.PRODUCER)]
         [GraphQLType(typeof(DeliveryBatchType))]
-        public async Task<DeliveryBatch> UpdateDeliveryModeAsync(
+        public async Task<DeliveryBatch> UpdateDeliveryBatchAsync(
             [GraphQLType(typeof(UpdateDeliveryBatchInputType))] [GraphQLName("input")]
             UpdateDeliveryBatchCommand input, [Service] ISheaftMediatr mediatr,
             DeliveryBatchesByIdBatchDataLoader deliveryBatchesDataLoader, CancellationToken token)
@@ -69,10 +69,22 @@ namespace Sheaft.GraphQL.DeliveryBatchs
             return await deliveryBatchesDataLoader.LoadAsync(input.DeliveryBatchId, token);
         }
 
+        [GraphQLName("setDeliveryBatchAsReady")]
+        [Authorize(Policy = Policies.PRODUCER)]
+        [GraphQLType(typeof(DeliveryBatchType))]
+        public async Task<DeliveryBatch> SetDeliveryBatchAsReadyAsync(
+            [GraphQLType(typeof(SetDeliveryBatchAsReadyInputType))] [GraphQLName("input")]
+            SetDeliveryBatchAsReadyCommand input, [Service] ISheaftMediatr mediatr,
+            DeliveryBatchesByIdBatchDataLoader deliveryBatchesDataLoader, CancellationToken token)
+        {
+            await ExecuteAsync(mediatr, input, token);
+            return await deliveryBatchesDataLoader.LoadAsync(input.Id, token);
+        }
+
         [GraphQLName("startDeliveryBatch")]
         [Authorize(Policy = Policies.PRODUCER)]
         [GraphQLType(typeof(DeliveryBatchType))]
-        public async Task<DeliveryBatch> StartDeliveryModeAsync(
+        public async Task<DeliveryBatch> StartDeliveryBatchAsync(
             [GraphQLType(typeof(StartDeliveryBatchInputType))] [GraphQLName("input")]
             StartDeliveryBatchCommand input, [Service] ISheaftMediatr mediatr,
             DeliveryBatchesByIdBatchDataLoader deliveryBatchesDataLoader, CancellationToken token)
@@ -84,7 +96,7 @@ namespace Sheaft.GraphQL.DeliveryBatchs
         [GraphQLName("completeDeliveryBatch")]
         [Authorize(Policy = Policies.PRODUCER)]
         [GraphQLType(typeof(DeliveryBatchType))]
-        public async Task<DeliveryBatch> CompleteDeliveryModeAsync(
+        public async Task<DeliveryBatch> CompleteDeliveryBatchAsync(
             [GraphQLType(typeof(CompleteDeliveryBatchInputType))] [GraphQLName("input")]
             CompleteDeliveryBatchCommand input, [Service] ISheaftMediatr mediatr,
             DeliveryBatchesByIdBatchDataLoader deliveryBatchesDataLoader, CancellationToken token)
@@ -96,7 +108,7 @@ namespace Sheaft.GraphQL.DeliveryBatchs
         [GraphQLName("postponeDeliveryBatch")]
         [Authorize(Policy = Policies.PRODUCER)]
         [GraphQLType(typeof(DeliveryBatchType))]
-        public async Task<DeliveryBatch> PostponeDeliveryModeAsync(
+        public async Task<DeliveryBatch> PostponeDeliveryBatchAsync(
             [GraphQLType(typeof(PostponeDeliveryBatchInputType))] [GraphQLName("input")]
             PostponeDeliveryBatchCommand input, [Service] ISheaftMediatr mediatr,
             DeliveryBatchesByIdBatchDataLoader deliveryBatchesDataLoader, CancellationToken token)
@@ -108,23 +120,13 @@ namespace Sheaft.GraphQL.DeliveryBatchs
         [GraphQLName("cancelDeliveryBatch")]
         [Authorize(Policy = Policies.PRODUCER)]
         [GraphQLType(typeof(DeliveryBatchType))]
-        public async Task<DeliveryBatch> CancelDeliveryModeAsync(
+        public async Task<DeliveryBatch> CancelDeliveryBatchAsync(
             [GraphQLType(typeof(CancelDeliveryBatchInputType))] [GraphQLName("input")]
             CancelDeliveryBatchCommand input, [Service] ISheaftMediatr mediatr,
             DeliveryBatchesByIdBatchDataLoader deliveryBatchesDataLoader, CancellationToken token)
         {
             await ExecuteAsync(mediatr, input, token);
             return await deliveryBatchesDataLoader.LoadAsync(input.Id, token);
-        }
-
-        [GraphQLName("deleteDeliveryBatch")]
-        [Authorize(Policy = Policies.PRODUCER)]
-        [GraphQLType(typeof(BooleanType))]
-        public async Task<bool> DeleteDeliveryModeAsync(
-            [GraphQLType(typeof(DeleteDeliveryBatchInputType))] [GraphQLName("input")]
-            DeleteDeliveryBatchCommand input, [Service] ISheaftMediatr mediatr, CancellationToken token)
-        {
-            return await ExecuteAsync(mediatr, input, token);
         }
     }
 }

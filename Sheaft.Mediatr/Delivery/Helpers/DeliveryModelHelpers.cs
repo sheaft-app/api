@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Sheaft.Domain;
@@ -11,7 +12,7 @@ namespace Sheaft.Mediatr.Delivery.Commands
     {
         public static DeliveryFormMailerModel GetDeliveryFormModel(Domain.Producer producer, string producerSiret, Domain.User client, string clientSiret, Domain.Delivery delivery)
         {
-            var purchaseOrders = GetPurchaseOrders(delivery.PurchaseOrders, delivery.Products);
+            var purchaseOrders = GetPurchaseOrders(delivery.PurchaseOrders);
             var returnedProducts = delivery.Products
                 .Where(p => p.RowKind != ModificationKind.Deliver)
                 .Select(p => GetProductModel(p))
@@ -26,6 +27,7 @@ namespace Sheaft.Mediatr.Delivery.Commands
                 Producer = GetUserModel(producer, producerSiret),
                 Client = GetUserModel(client, clientSiret),
                 PurchaseOrders = purchaseOrders,
+                Products = delivery.Products.Select(p => GetProductModel(p)).ToList(),
                 ReturnedProducts = returnedProducts,
                 ReturnedReturnables = returnedReturnables,
                 DeliveredOn = delivery.DeliveredOn ?? delivery.ScheduledOn,
@@ -39,26 +41,22 @@ namespace Sheaft.Mediatr.Delivery.Commands
         }
 
         private static List<DeliveryPurchaseOrderMailerModel> GetPurchaseOrders(
-            ICollection<Domain.PurchaseOrder> purchaseOrders, ICollection<DeliveryProduct> products)
+            ICollection<Domain.PurchaseOrder> purchaseOrders)
         {
             var results = new List<DeliveryPurchaseOrderMailerModel>();
             foreach (var purchaseOrder in purchaseOrders)
             {
-                var purchaseOrderProducts = products
-                    .Where(p => p.PurchaseOrderId == purchaseOrder.Id && p.RowKind == ModificationKind.Deliver)
+                var purchaseOrderProducts = purchaseOrder.Products
+                    .Where(p => p.RowKind == ModificationKind.Deliver)
                     .ToList();
 
+                var products = purchaseOrder.Products.GroupBy(p => p.ProductId);
                 results.Add(new DeliveryPurchaseOrderMailerModel
                 {
                     Reference = purchaseOrder.Reference.AsPurchaseOrderIdentifier(),
                     CreatedOn = purchaseOrder.CreatedOn,
-                    Products = purchaseOrderProducts
-                        .Select(p => GetProductModel(p))
-                        .ToList(),
-                    Returnables = purchaseOrderProducts
-                        .Where(p => p.HasReturnable)
-                        .Select(p => GetReturnableModel(p))
-                        .ToList(),
+                    Products = GetProductsModel(products),
+                    Returnables = GetReturnablesModel(products),
                     TotalWholeSalePrice = purchaseOrder.TotalWholeSalePrice,
                     TotalVatPrice = purchaseOrder.TotalVatPrice,
                     TotalOnSalePrice = purchaseOrder.TotalOnSalePrice,
@@ -66,6 +64,30 @@ namespace Sheaft.Mediatr.Delivery.Commands
             }
 
             return results;
+        }
+
+        private static List<DeliveryProductMailerModel> GetProductsModel(
+            IEnumerable<IGrouping<Guid, ProductRow>> groupedProducts)
+        {
+            var products = new List<DeliveryProductMailerModel>();
+            foreach (var groupedProduct in groupedProducts)
+            {
+                var product = groupedProduct.First();
+                products.Add(new DeliveryProductMailerModel()
+                {
+                    Name = product.Name,
+                    Quantity = product.Quantity,
+                    Reference = product.Reference,
+                    RowKind = ModificationKind.Deliver,
+                    Vat = product.Vat,
+                    TotalVatPrice = groupedProduct.Sum(po => po.TotalVatPrice),
+                    TotalWholeSalePrice = groupedProduct.Sum(po => po.TotalWholeSalePrice),
+                    TotalOnSalePrice = groupedProduct.Sum(po => po.TotalOnSalePrice),
+                    UnitWholeSalePrice = product.UnitWholeSalePrice
+                });
+            }
+
+            return products;
         }
 
         private static DeliveryProductMailerModel GetProductModel(DeliveryProduct p)
@@ -84,18 +106,26 @@ namespace Sheaft.Mediatr.Delivery.Commands
             };
         }
 
-        private static DeliveryReturnableMailerModel GetReturnableModel(DeliveryProduct p)
+        private static List<DeliveryReturnableMailerModel> GetReturnablesModel(
+            IEnumerable<IGrouping<Guid, ProductRow>> groupedProducts)
         {
-            return new DeliveryReturnableMailerModel()
+            var products = new List<DeliveryReturnableMailerModel>();
+            foreach (var groupedProduct in groupedProducts)
             {
-                Name = p.ReturnableName,
-                Quantity = p.Quantity,
-                UnitWholeSalePrice = p.ReturnableWholeSalePrice ?? 0,
-                Vat = p.Vat,
-                TotalVatPrice = p.TotalVatPrice,
-                TotalOnSalePrice = p.TotalReturnableOnSalePrice ?? 0,
-                TotalWholeSalePrice = p.TotalReturnableWholeSalePrice ?? 0,
-            };
+                var product = groupedProduct.First();
+                products.Add(new DeliveryReturnableMailerModel()
+                {
+                    Name = product.Name,
+                    Quantity = product.Quantity,
+                    Vat = product.Vat,
+                    TotalVatPrice = groupedProduct.Sum(po => po.TotalVatPrice),
+                    TotalWholeSalePrice = groupedProduct.Sum(po => po.TotalWholeSalePrice),
+                    TotalOnSalePrice = groupedProduct.Sum(po => po.TotalOnSalePrice),
+                    UnitWholeSalePrice = product.UnitWholeSalePrice
+                });
+            }
+
+            return products;
         }
 
         private static DeliveryReturnableMailerModel GetReturnedReturnableModel(DeliveryReturnable p)

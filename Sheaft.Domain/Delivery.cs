@@ -127,8 +127,7 @@ namespace Sheaft.Domain
                         Products.Remove(existingProduct);
                 }
                 else if (quantity > 0)
-                    Products.Add(new DeliveryProduct(groupedProduct, quantity, ModificationKind.Deliver,
-                        groupedProduct.PurchaseOrderId));
+                    Products.Add(new DeliveryProduct(groupedProduct, quantity, ModificationKind.Deliver));
             }
 
             Refresh();
@@ -175,7 +174,6 @@ namespace Sheaft.Domain
             DeliveryReceiptUrl = null;
 
             Status = DeliveryStatus.Ready;
-            DomainEvents.Add(new DeliveryReadyEvent(Id));
         }
 
         public void StartDelivery()
@@ -192,8 +190,6 @@ namespace Sheaft.Domain
 
             foreach (var purchaseOrder in PurchaseOrders)
                 purchaseOrder.SetStatus(PurchaseOrderStatus.Shipping, true);
-
-            DomainEvents.Add(new DeliveryStartedEvent(Id));
         }
 
         public void RejectDelivery(string comment)
@@ -207,7 +203,6 @@ namespace Sheaft.Domain
             Comment = comment;
             RejectedOn = DateTimeOffset.UtcNow;
             Status = DeliveryStatus.Rejected;
-            DomainEvents.Add(new DeliveryRejectedEvent(Id));
         }
 
         public void CompleteDelivery(IEnumerable<Tuple<DeliveryProduct, int, ModificationKind>> returnedProducts = null,
@@ -240,8 +235,6 @@ namespace Sheaft.Domain
 
             foreach (var purchaseOrder in PurchaseOrders)
                 purchaseOrder.SetStatus(PurchaseOrderStatus.Delivered, true);
-
-            DomainEvents.Add(new DeliveryCompletedEvent(Id));
         }
 
         public void SetPosition(int position)
@@ -259,11 +252,10 @@ namespace Sheaft.Domain
 
         public void PostponeDelivery()
         {
-            if (Status is DeliveryStatus.Delivered)
+            if (Status is DeliveryStatus.Delivered || Status is DeliveryStatus.Rejected)
                 throw SheaftException.Validation();
 
-            Status = DeliveryStatus.Waiting;
-            DomainEvents.Add(new DeliveryPostponedEvent(Id));
+            Status = Status != DeliveryStatus.Waiting ? DeliveryStatus.Ready : Status;
         }
 
         private void Refresh()

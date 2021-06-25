@@ -8,6 +8,7 @@ namespace Sheaft.Mailing
         public DeliveryUserMailerModel Producer { get; set; }
         public DeliveryUserMailerModel Client { get; set; }
         public List<DeliveryPurchaseOrderMailerModel> PurchaseOrders { get; set; }
+        public List<DeliveryProductMailerModel> Products { get; set; }
         public DateTimeOffset ScheduledOn { get; set; }
         public string ReceptionnedBy { get; set; }
         public string Comment { get; set; }

@@ -44,6 +44,15 @@
 <div style="padding:15px 0px">
     <p>Date de livraison: <strong>@Model.ScheduledOn.ToString("dd/MM/yyyy")</strong></p>
 </div>
+<div style="padding:15px 0px">
+    <p>Commandes</p>
+    <ul>
+        @foreach (var order in Model.PurchaseOrders)
+        {
+            <li>@order.Reference du @order.CreatedOn.ToString("dd/MM/yyyy")</li>
+        }
+    </ul>
+</div>
 <table cellpadding="0" cellspacing="0" align="center" width="100%" role="module" data-type="columns" style="border-collapse:collapse; padding:15px 0px 0px 0px;" bgcolor="#FFFFFF">
     <thead>
     <tr style="background-color: #009688;color: #ffffff;text-align: left;">
@@ -53,19 +62,13 @@
     </tr>
     </thead>
     <tbody>
-    @foreach (var item in Model.PurchaseOrders)
+    @foreach (var product in Model.Products)
     {
-    <tr style="text-align: left;">
-            <th colspan="3" style="padding:15px 5px;">Commande @item.Reference du @item.CreatedOn.ToString("dd/MM/yyyy")</th>
-        </tr>
-        @foreach (var product in item.Products)
-        {
             <tr >
                 <td style="padding: 10px 15px;vertical-align: center;">@product.Name</td>
                 <td style="padding: 10px 15px;vertical-align: center; text-align: right;">@product.Quantity</td>
                 <td style="padding: 10px 15px;vertical-align: center; text-align: right;"></td>
             </tr>
-        }
     }
     <tr style="border:none;">
         <td colspan="3" style="border:none;padding: 10px;"></td>

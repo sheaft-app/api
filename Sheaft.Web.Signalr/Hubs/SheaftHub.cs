@@ -23,9 +23,7 @@ namespace Sheaft.Web.Signalr.Hubs
         {
             var roles = Context.User.Claims.Where(c => c.Type == ClaimTypes.Role);
             foreach(var role in roles)
-            {
                 await Groups.RemoveFromGroupAsync(Context.ConnectionId, role.Value);
-            }
 
             await base.OnDisconnectedAsync(exception);
         }
