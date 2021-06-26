@@ -35,34 +35,34 @@
     <h1>Bon de livraison <strong>(@Model.Identifier)</strong></h1>
 </div>
 <div style="display: flex; justify-content: space-between">
-<div style="text-align: left;">
-    <strong>@Model.Producer.Name</strong><br/>
-    @Model.Producer.Email<br/>
-    @Model.Producer.Phone<br/>
-    @Model.Producer.Siret<br/>
+    <div style="text-align: left;">
+        <strong>@Model.Producer.Name</strong><br/>
+        @Model.Producer.Email<br/>
+        @Model.Producer.Phone<br/>
+        @Model.Producer.Siret<br/>
 
-    @Model.Producer.Address.Line1<br/>
-    @if (!string.IsNullOrWhiteSpace(@Model.Producer.Address.Line2))
-    {
-        @Model.Producer.Address.Line2<br/>
-    }
-    @Model.Producer.Address.Zipcode<br/>
-    @Model.Producer.Address.City<br/>
-</div>
-<div style="text-align: right;">
-    <strong>@Model.Client.Name</strong><br/>
-    @Model.Client.Email<br/>
-    @Model.Client.Phone<br/>
-    @Model.Client.Siret<br/>
+        @Model.Producer.Address.Line1<br/>
+        @if (!string.IsNullOrWhiteSpace(@Model.Producer.Address.Line2))
+        {
+            @Model.Producer.Address.Line2<br/>
+        }
+        @Model.Producer.Address.Zipcode<br/>
+        @Model.Producer.Address.City<br/>
+    </div>
+    <div style="text-align: right;">
+        <strong>@Model.Client.Name</strong><br/>
+        @Model.Client.Email<br/>
+        @Model.Client.Phone<br/>
+        @Model.Client.Siret<br/>
 
-    @Model.Client.Address.Line1<br/>
-    @if (!string.IsNullOrWhiteSpace(@Model.Client.Address.Line2))
-    {
-        @Model.Client.Address.Line2<br/>
-    }
-    @Model.Client.Address.Zipcode<br/>
-    @Model.Client.Address.City<br/>
-</div>
+        @Model.Client.Address.Line1<br/>
+        @if (!string.IsNullOrWhiteSpace(@Model.Client.Address.Line2))
+        {
+            @Model.Client.Address.Line2<br/>
+        }
+        @Model.Client.Address.Zipcode<br/>
+        @Model.Client.Address.City<br/>
+    </div>
 </div>
 <div style="padding:15px 0px">
     <p>Date de livraison: <strong>@(Model.DeliveredOn.HasValue ? Model.DeliveredOn.Value.ToString("dd/MM/yyyy") : Model.ScheduledOn.ToString("dd/MM/yyyy"))</strong></p>
@@ -80,7 +80,7 @@
     <tbody>
     @foreach (var item in Model.PurchaseOrders)
     {
-    <tr style="text-align: left;">
+        <tr style="text-align: left;">
             <th colspan="5" style="padding:15px 5px;">Commande @item.Reference du @item.CreatedOn.ToString("dd/MM/yyyy")</th>
         </tr>
         @foreach (var product in item.Products)
@@ -98,8 +98,8 @@
     {
         @foreach (var productGrouping in Model.ReturnedProducts.GroupBy(p => p.RowKind))
         {
-    <tr style="text-align: left;">
-                <th colspan="5" style="padding:15px 5px;">Produits (@productGrouping.Key.ToEnumString())s</th>
+            <tr style="text-align: left;">
+                <th colspan="5" style="padding:15px 5px;">Produits @productGrouping.Key.ToEnumString()s</th>
             </tr>
             @foreach (var product in productGrouping)
             {
@@ -147,12 +147,20 @@
     <tr style="border:none;">
         <td colspan="5" style="border:none;padding: 10px;"></td>
     </tr>
-    <tr style="border:none;">
-        <td colspan="5" style="border:none; padding:10px 0px;"><strong>Remarques :</strong></td>
-    </tr>
-    <tr>
-        <td colspan="5"><div style="min-height: 100px;border: #dddddd solid 1px">@Model.Comment</div></td>
-    </tr>
+    </tbody>
+</table>
+<table cellpadding="0" cellspacing="0" align="center" width="100%" role="module" data-type="columns" style="border-collapse:collapse; padding:15px 0px 0px 0px;" bgcolor="#FFFFFF">
+    <tbody>
+     <tr style="border:none;">
+            <td style="border:none; padding:10px 0px;">
+                <strong>Remarques :</strong>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <div style="min-height: 120px;border: #dddddd solid 1px; margin: 10px;">@Model.Comment</div>
+            </td>
+        </tr>
     </tbody>
 </table>
 </body>

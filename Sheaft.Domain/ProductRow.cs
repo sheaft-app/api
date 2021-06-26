@@ -25,6 +25,7 @@ namespace Sheaft.Domain
             Name = product.Name;
             Reference = product.Reference;
 
+            ReturnableId = product.ReturnableId;
             ReturnableName = product.ReturnableName;
             ReturnableVat = product.ReturnableVat;
             ReturnableVatPrice = product.ReturnableVatPrice;
@@ -32,7 +33,6 @@ namespace Sheaft.Domain
             ReturnableOnSalePrice = product.ReturnableOnSalePrice;
             HasReturnable = product.ReturnableWholeSalePrice.HasValue;
 
-            Quantity = product.Quantity;
             TotalWeight = product.TotalWeight;
 
             TotalProductVatPrice = product.TotalProductVatPrice;
@@ -48,7 +48,9 @@ namespace Sheaft.Domain
             TotalOnSalePrice = product.TotalOnSalePrice;
 
             RowKind = product.RowKind;
+            Quantity = product.Quantity;
             ProductId = product.ProductId;
+            HasReturnable = ReturnableId.HasValue;
         }
         
         protected ProductRow(ProductRow product, int quantity, ModificationKind rowKind)
@@ -63,6 +65,7 @@ namespace Sheaft.Domain
             Name = product.Name;
             Reference = product.Reference;
 
+            ReturnableId = product.ReturnableId;
             ReturnableName = product.ReturnableName;
             ReturnableVat = product.ReturnableVat;
             ReturnableVatPrice = product.ReturnableVatPrice;
@@ -71,8 +74,9 @@ namespace Sheaft.Domain
             HasReturnable = product.ReturnableWholeSalePrice.HasValue;
 
             RowKind = rowKind;
-
             ProductId = product.ProductId;
+            HasReturnable = ReturnableId.HasValue;
+            
             SetQuantity(quantity);
         }
 
@@ -90,6 +94,7 @@ namespace Sheaft.Domain
             Name = product.Name;
             Reference = product.Reference;
 
+            ReturnableId = product.ReturnableId;
             ReturnableName = product.Returnable?.Name;
             ReturnableVat = product.Returnable?.Vat;
             ReturnableVatPrice = product.Returnable?.VatPrice;
@@ -98,12 +103,18 @@ namespace Sheaft.Domain
 
             RowKind = rowKind;
             ProductId = product.Id;
+            HasReturnable = ReturnableId.HasValue;
+            
             SetQuantity(quantity);
         }
 
         private void SetQuantity(int quantity)
         {
             Quantity = quantity;
+            
+            if (RowKind is ModificationKind.Broken or ModificationKind.Improper or ModificationKind.Missing)
+                Quantity = -Quantity;
+            
             RefreshLine();
         }
 
@@ -123,6 +134,7 @@ namespace Sheaft.Domain
         public decimal TotalProductOnSalePrice { get; private set; }
         public decimal? TotalWeight { get; private set; }
         public bool HasReturnable { get; private set; }
+        public Guid? ReturnableId { get; private set; }
         public string ReturnableName { get; private set; }
         public decimal? ReturnableOnSalePrice { get; private set; }
         public decimal? ReturnableWholeSalePrice { get; private set; }
@@ -143,8 +155,6 @@ namespace Sheaft.Domain
             TotalProductVatPrice = Math.Round(Quantity * UnitVatPrice, DIGITS_COUNT);
             TotalProductWholeSalePrice = Math.Round(Quantity * UnitWholeSalePrice, DIGITS_COUNT);
             TotalProductOnSalePrice = Math.Round(TotalProductVatPrice + TotalProductWholeSalePrice, DIGITS_COUNT);
-
-            HasReturnable = ReturnableWholeSalePrice.HasValue;
 
             TotalReturnableVatPrice = HasReturnable ? Math.Round(Quantity * ReturnableVatPrice.Value, DIGITS_COUNT) : (decimal?)null;
             TotalReturnableWholeSalePrice = HasReturnable ? Math.Round(Quantity * ReturnableWholeSalePrice.Value, DIGITS_COUNT) : (decimal?)null;

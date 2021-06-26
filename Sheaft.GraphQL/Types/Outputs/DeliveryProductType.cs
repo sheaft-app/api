@@ -90,6 +90,11 @@ namespace Sheaft.GraphQL.Types.Outputs
                 .Name("isReturnable");
             
             descriptor
+                .Field(c => c.ReturnableId)
+                .ID(nameof(Returnable))
+                .Name("returnableId");
+            
+            descriptor
                 .Field(c => c.Name)
                 .Name("name")
                 .Type<NonNullType<StringType>>();

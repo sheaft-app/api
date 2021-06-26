@@ -64,11 +64,11 @@
     <tbody>
     @foreach (var product in Model.Products)
     {
-            <tr >
-                <td style="padding: 10px 15px;vertical-align: center;">@product.Name</td>
-                <td style="padding: 10px 15px;vertical-align: center; text-align: right;">@product.Quantity</td>
-                <td style="padding: 10px 15px;vertical-align: center; text-align: right;"></td>
-            </tr>
+        <tr >
+            <td style="padding: 10px 15px;vertical-align: center;">@product.Name</td>
+            <td style="padding: 10px 15px;vertical-align: center; text-align: right;">@product.Quantity</td>
+            <td style="padding: 10px 15px;vertical-align: center; text-align: right;"></td>
+        </tr>
     }
     <tr style="border:none;">
         <td colspan="3" style="border:none;padding: 10px;"></td>
@@ -76,12 +76,21 @@
     <tr style="border:none;">
         <td colspan="3" style="border:none; padding:10px 0px;">Réceptionnée par :</td>
     </tr>
-    <tr style="border:none;">
-        <td colspan="3" style="border:none; padding:10px 0px;"><strong>Remarques :</strong></td>
-    </tr>
-    <tr>
-        <td colspan="3"><div style="min-height: 100px;border: #dddddd solid 1px">@Model.Comment</div></td>
-    </tr>
+    </tbody>
+</table>
+
+<table cellpadding="0" cellspacing="0" align="center" width="100%" role="module" data-type="columns" style="border-collapse:collapse; padding:15px 0px 0px 0px;" bgcolor="#FFFFFF">
+    <tbody>
+     <tr style="border:none;">
+            <td style="border:none; padding:10px 0px;">
+                <strong>Remarques :</strong>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <div style="min-height: 120px;border: #dddddd solid 1px; margin: 10px;">@Model.Comment</div>
+            </td>
+        </tr>
     </tbody>
 </table>
 </body>

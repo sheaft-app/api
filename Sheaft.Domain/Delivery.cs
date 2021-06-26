@@ -248,6 +248,8 @@ namespace Sheaft.Domain
                 throw SheaftException.Validation();
 
             Status = DeliveryStatus.Skipped;
+            foreach (var purchaseOrder in PurchaseOrders)
+                purchaseOrder.SetStatus(PurchaseOrderStatus.Completed, true);
         }
 
         public void PostponeDelivery()
@@ -256,6 +258,8 @@ namespace Sheaft.Domain
                 throw SheaftException.Validation();
 
             Status = Status != DeliveryStatus.Waiting ? DeliveryStatus.Ready : Status;
+            foreach (var purchaseOrder in PurchaseOrders)
+                purchaseOrder.SetStatus(PurchaseOrderStatus.Completed, true);
         }
 
         private void Refresh()

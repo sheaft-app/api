@@ -12,10 +12,9 @@ namespace Sheaft.GraphQL.Types.Outputs
             base.Configure(descriptor);
 
             descriptor
-                .ImplementsNode()
-                .IdField(c => c.Id)
-                .ResolveNode((ctx, id) =>
-                    ctx.DataLoader<PurchaseOrderProductsByIdBatchDataLoader>().LoadAsync(id, ctx.RequestAborted));
+                .Field(c => c.ProductId)
+                .Name("id")
+                .ID(nameof(Product));
             
             descriptor
                 .Field(c => c.Quantity)

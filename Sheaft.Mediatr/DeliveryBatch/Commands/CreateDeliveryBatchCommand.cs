@@ -73,7 +73,6 @@ namespace Sheaft.Mediatr.DeliveryBatch.Commands
             var purchaseOrderIds = request.Deliveries.SelectMany(d => d.PurchaseOrderIds);
             var purchaseOrdersDeliveries =
                 await _context.Deliveries.Where(d => d.PurchaseOrders.Any(po => purchaseOrderIds.Contains(po.Id)))
-                    .Include(d => d.DeliveryBatch)
                     .Include(d => d.PurchaseOrders)
                     .ToListAsync(token);
 
@@ -86,13 +85,8 @@ namespace Sheaft.Mediatr.DeliveryBatch.Commands
 
                 if (delivery.PurchaseOrders.Count == assignedPurchaseOrders.Count)
                 {
-                    if (delivery.DeliveryBatch != null)
-                    {
-                        if (delivery.DeliveryBatch.ScheduledOn != request.ScheduledOn)
-                            delivery.PostponeDelivery();
-
-                        delivery.DeliveryBatch.RemoveDelivery(delivery);
-                    }
+                    if (delivery.DeliveryBatchId.HasValue && delivery.DeliveryBatch.ScheduledOn != request.ScheduledOn)
+                        delivery.PostponeDelivery();
 
                     deliveries.Add(delivery);
 
@@ -109,7 +103,7 @@ namespace Sheaft.Mediatr.DeliveryBatch.Commands
                     var identifier = await _identifierService.GetNextDeliveryReferenceAsync(producer.Id, token);
                     if (!identifier.Succeeded)
                         return Failure<Guid>(identifier);
-                    
+
                     var newDelivery = new Domain.Delivery(identifier.Data, producer, delivery.Kind, request.ScheduledOn,
                         delivery.Address,
                         delivery.ClientId, delivery.Client, assignedPurchaseOrders, delivery.Position);
@@ -145,8 +139,9 @@ namespace Sheaft.Mediatr.DeliveryBatch.Commands
                     var identifier = await _identifierService.GetNextDeliveryReferenceAsync(producer.Id, token);
                     if (!identifier.Succeeded)
                         return Failure<Guid>(identifier);
-                    
-                    var delivery = new Domain.Delivery(identifier.Data, producer, order.ExpectedDelivery.Kind, request.ScheduledOn,
+
+                    var delivery = new Domain.Delivery(identifier.Data, producer, order.ExpectedDelivery.Kind,
+                        request.ScheduledOn,
                         order.ExpectedDelivery.Address, userAgreement.User.Id, userAgreement.User.Name,
                         purchaseOrderGrouped.ToList(), position);
 

@@ -17,6 +17,10 @@ namespace Sheaft.GraphQL.Types.Inputs
                 .Field(c => c.Id)
                 .ID(nameof(DeliveryBatch))
                 .Name("id");
+
+            descriptor
+                .Field(c => c.ReschedulePendingDeliveriesOn)
+                .Name("reschedulePendingDeliveriesOn");
         }
     }
 }

@@ -38,8 +38,8 @@ namespace Sheaft.Mediatr.Delivery.Commands
         public Guid DeliveryId { get; set; }
         public string ReceptionedBy { get; set; }
         public string Comment { get; set; }
-        public IEnumerable<ReturnedProductDto> ReturnedProducts { get; set; }
-        public IEnumerable<ReturnedReturnableDto> ReturnedReturnables { get; set; }
+        public IEnumerable<ReturnedProductDto> ReturnedProducts { get; set; } = new List<ReturnedProductDto>();
+        public IEnumerable<ReturnedReturnableDto> ReturnedReturnables { get; set; } = new List<ReturnedReturnableDto>();
     }
 
     public class CompleteDeliveryCommandHandler : CommandsHandler,
@@ -62,37 +62,45 @@ namespace Sheaft.Mediatr.Delivery.Commands
             if (delivery == null)
                 return Failure(MessageKind.NotFound);
 
-            var returnedProductIds = request.ReturnedProducts.Select(p => p.ProductId);
-            var products = delivery.Products.Where(p =>
-                    returnedProductIds.Contains(p.ProductId) && p.RowKind == ModificationKind.Deliver)
-                .ToList();
-
-            if (products.Count() != returnedProductIds.Count())
-                throw SheaftException.NotFound();
-
-            var returnedProducts = products.Select(p =>
+            var returnedProducts = new List<Tuple<DeliveryProduct, int, ModificationKind>>();
+            if (request.ReturnedProducts != null)
             {
-                var product = request.ReturnedProducts.Single(pr => pr.ProductId == p.ProductId);
-                return new Tuple<DeliveryProduct, int, ModificationKind>(p, product.Quantity, product.Kind);
-            }).ToList();
+                var returnedProductIds = request.ReturnedProducts.Select(p => p.ProductId);
+                var products = delivery.Products.Where(p =>
+                        returnedProductIds.Contains(p.ProductId) && p.RowKind == ModificationKind.Deliver)
+                    .ToList();
 
-            var returnableIds = request.ReturnedReturnables.Select(r => r.ReturnableId);
-            var returnables = await _context.Returnables
-                .Where(r => returnableIds.Contains(r.Id))
-                .ToListAsync(token);
+                if (products.Count() != returnedProductIds.Count())
+                    throw SheaftException.NotFound();
 
-            if (returnables.Count() != returnableIds.Count())
-                throw SheaftException.NotFound();
+                returnedProducts = products.Select(p =>
+                {
+                    var product = request.ReturnedProducts.Single(pr => pr.ProductId == p.ProductId);
+                    return new Tuple<DeliveryProduct, int, ModificationKind>(p, product.Quantity, product.Kind);
+                }).ToList();
+            }
 
-            var returnedReturnables = returnables.Select(r =>
-                    new KeyValuePair<Domain.Returnable, int>(r,
-                        request.ReturnedReturnables.Single(re => re.ReturnableId == r.Id).Quantity))
-                .ToList();
+            var returnedReturnables = new List<KeyValuePair<Domain.Returnable, int>>();
+            if (request.ReturnedReturnables != null)
+            {
+                var returnableIds = request.ReturnedReturnables.Select(r => r.ReturnableId);
+                var returnables = await _context.Returnables
+                    .Where(r => returnableIds.Contains(r.Id))
+                    .ToListAsync(token);
+
+                if (returnables.Count() != returnableIds.Count())
+                    throw SheaftException.NotFound();
+
+                returnedReturnables = returnables.Select(r =>
+                        new KeyValuePair<Domain.Returnable, int>(r,
+                            request.ReturnedReturnables.Single(re => re.ReturnableId == r.Id).Quantity))
+                    .ToList();
+            }
 
             delivery.CompleteDelivery(returnedProducts, returnedReturnables, request.ReceptionedBy, request.Comment);
             await _context.SaveChangesAsync(token);
-            
-            _mediatr.Post(new GenerateDeliveryFormCommand(request.RequestUser){DeliveryId = delivery.Id});
+
+            _mediatr.Post(new GenerateDeliveryFormCommand(request.RequestUser) {DeliveryId = delivery.Id});
             return Success();
         }
     }

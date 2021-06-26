@@ -84,10 +84,14 @@ namespace Sheaft.Mediatr.DeliveryBatch.Commands
                 _mediatr.Post(new DeliveryBatchPostponedEvent(result.Data));
             }
 
-            deliveryBatch.CompleteBatch();
+            if (!deliveryBatch.Deliveries.Any() || deliveryBatch.Deliveries.Sum(d => d.PurchaseOrdersCount) < 1)
+                deliveryBatch.CancelBatch("Livraisons replanifiées");
+            else
+                deliveryBatch.CompleteBatch(pendingDeliveries.Any());
+
             await _context.SaveChangesAsync(token);
 
-            if (!pendingDeliveries.Any())
+            if (deliveryBatch.Status == DeliveryBatchStatus.Partial || deliveryBatch.Status == DeliveryBatchStatus.Completed)
                 _mediatr.Post(new GenerateDeliveryBatchFormsCommand(request.RequestUser)
                     {DeliveryBatchId = deliveryBatch.Id});
 

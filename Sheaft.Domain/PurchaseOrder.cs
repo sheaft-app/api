@@ -110,11 +110,11 @@ namespace Sheaft.Domain
                         DomainEvents.Add(new PurchaseOrderAcceptedEvent(Id));
                     return;
                 case PurchaseOrderStatus.Completed:
-                    if (Status != PurchaseOrderStatus.Processing)
+                    if (Status != PurchaseOrderStatus.Processing && Status != PurchaseOrderStatus.Shipping && Status != PurchaseOrderStatus.Completed)
                         throw SheaftException.Validation(
                             MessageKind.PurchaseOrder_CannotComplete_NotIn_ProcessingStatus);
 
-                    CompletedOn = DateTimeOffset.UtcNow;
+                    CompletedOn ??= DateTimeOffset.UtcNow;
 
                     if (!skipNotification)
                         DomainEvents.Add(new PurchaseOrderCompletedEvent(Id));

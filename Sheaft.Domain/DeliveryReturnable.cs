@@ -18,12 +18,12 @@ namespace Sheaft.Domain
             Id = Guid.NewGuid();
             Kind = returnable.Kind;
             Name = returnable.Name;
-            UnitWholeSalePrice = returnable.WholeSalePrice;
             Vat = returnable.Vat;
             UnitVatPrice = returnable.VatPrice;
+            UnitWholeSalePrice = returnable.WholeSalePrice;
             UnitOnSalePrice = returnable.OnSalePrice;
             ReturnableId = returnable.Id;
-            Quantity = quantity;
+            Quantity = -quantity;
             
             RefreshLine();
         }
@@ -56,9 +56,9 @@ namespace Sheaft.Domain
 
         private void RefreshLine()
         {
-            TotalVatPrice = Math.Round(TotalVatPrice * Quantity, DIGITS_COUNT);
-            TotalWholeSalePrice = Math.Round(TotalWholeSalePrice * Quantity, DIGITS_COUNT);
-            TotalOnSalePrice = Math.Round(TotalVatPrice + TotalWholeSalePrice, DIGITS_COUNT);
+            TotalVatPrice = Math.Round(UnitVatPrice * Quantity, DIGITS_COUNT);
+            TotalWholeSalePrice = Math.Round(UnitWholeSalePrice * Quantity, DIGITS_COUNT);
+            TotalOnSalePrice = Math.Round(UnitWholeSalePrice * Quantity, DIGITS_COUNT);
         }
     }
 }

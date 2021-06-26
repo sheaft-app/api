@@ -81,13 +81,13 @@ namespace Sheaft.Domain
             Status = DeliveryBatchStatus.InProgress;
         }
 
-        public void CompleteBatch()
+        public void CompleteBatch(bool partial = false)
         {
             if (Deliveries.Any(d => d.Status != DeliveryStatus.Delivered && d.Status != DeliveryStatus.Rejected))
                 throw SheaftException.Validation();
 
             CompletedOn = DateTimeOffset.UtcNow;
-            Status = DeliveryBatchStatus.Completed;
+            Status = partial ? DeliveryBatchStatus.Partial : DeliveryBatchStatus.Completed;
         }
 
         public void CancelBatch(string reason)
@@ -166,9 +166,7 @@ namespace Sheaft.Domain
             if (Deliveries == null)
                 throw SheaftException.NotFound();
 
-            delivery.RemovePurchaseOrders(delivery.PurchaseOrders);
             Deliveries.Remove(delivery);
-            
             Refresh();
 
             if (DeliveriesCount < 1)
