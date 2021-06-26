@@ -119,7 +119,7 @@ namespace Sheaft.Domain
                 var groupedProduct = groupedPurchaseOrderProduct.First();
                 var quantity = groupedPurchaseOrderProduct.Sum(p => p.Quantity);
                 var existingProduct = Products.FirstOrDefault(p =>
-                    p.ProductId == groupedProduct.ProductId && p.RowKind == ModificationKind.Deliver);
+                    p.ProductId == groupedProduct.ProductId && p.RowKind == ModificationKind.ToDeliver);
                 if (existingProduct != null)
                 {
                     existingProduct.AddQuantity(quantity);
@@ -127,7 +127,7 @@ namespace Sheaft.Domain
                         Products.Remove(existingProduct);
                 }
                 else if (quantity > 0)
-                    Products.Add(new DeliveryProduct(groupedProduct, quantity, ModificationKind.Deliver));
+                    Products.Add(new DeliveryProduct(groupedProduct, quantity, ModificationKind.ToDeliver));
             }
 
             Refresh();
@@ -150,7 +150,7 @@ namespace Sheaft.Domain
             {
                 var groupedProduct = groupedPurchaseOrderProduct.First();
                 var existingProduct = Products.FirstOrDefault(p =>
-                    p.ProductId == groupedProduct.ProductId && p.RowKind == ModificationKind.Deliver);
+                    p.ProductId == groupedProduct.ProductId && p.RowKind == ModificationKind.ToDeliver);
                 if (existingProduct == null)
                     continue;
 
@@ -265,10 +265,10 @@ namespace Sheaft.Domain
         private void Refresh()
         {
             ReturnedReturnablesCount = ReturnedReturnables?.Sum(p => p.Quantity) ?? 0;
-            ReturnedProductsCount = Products.Where(p => p.RowKind != ModificationKind.Deliver).Sum(p => p.Quantity);
-            ReturnablesCount = Products.Where(p => p.RowKind == ModificationKind.Deliver && p.HasReturnable)
+            ReturnedProductsCount = Products.Where(p => p.RowKind != ModificationKind.ToDeliver).Sum(p => p.Quantity);
+            ReturnablesCount = Products.Where(p => p.RowKind == ModificationKind.ToDeliver && p.HasReturnable)
                 .Sum(p => p.Quantity);
-            ProductsToDeliverCount = Products.Where(p => p.RowKind == ModificationKind.Deliver).Sum(p => p.Quantity);
+            ProductsToDeliverCount = Products.Where(p => p.RowKind == ModificationKind.ToDeliver).Sum(p => p.Quantity);
             PurchaseOrdersCount = PurchaseOrders.Count;
 
             DeliveryBatch?.Refresh();

@@ -10,7 +10,7 @@ namespace Sheaft.Domain
         }
 
         public OrderProduct(Product product, Guid catalogId, int quantity)
-            : base(product, catalogId, quantity, ModificationKind.Order)
+            : base(product, catalogId, quantity)
         {
             Producer = product.Producer;
             ProducerId = product.Producer.Id;

@@ -67,7 +67,7 @@ namespace Sheaft.Mediatr.Delivery.Commands
             {
                 var returnedProductIds = request.ReturnedProducts.Select(p => p.ProductId);
                 var products = delivery.Products.Where(p =>
-                        returnedProductIds.Contains(p.ProductId) && p.RowKind == ModificationKind.Deliver)
+                        returnedProductIds.Contains(p.ProductId) && p.RowKind == ModificationKind.ToDeliver)
                     .ToList();
 
                 if (products.Count() != returnedProductIds.Count())

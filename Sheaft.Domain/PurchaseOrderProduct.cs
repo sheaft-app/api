@@ -14,8 +14,8 @@ namespace Sheaft.Domain
         {
         }
 
-        public PurchaseOrderProduct(ProductRow product, int quantity, ModificationKind kind)
-            : base(product, quantity, kind)
+        public PurchaseOrderProduct(ProductRow product, int quantity)
+            : base(product, quantity)
         {
         }
 

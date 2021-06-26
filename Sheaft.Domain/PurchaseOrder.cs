@@ -249,22 +249,6 @@ namespace Sheaft.Domain
             VendorInfo = new PurchaseOrderVendor(vendor);
         }
 
-        public void ModifyProductQuantity(ProductRow product, int quantity, ModificationKind modificationKind)
-        {
-            if (Status == PurchaseOrderStatus.Delivered)
-                throw SheaftException.Validation();
-
-            if (product == null)
-                throw SheaftException.Validation(MessageKind.PurchaseOrder_CannotAddProduct_Product_NotFound);
-
-            var productLine = Products.SingleOrDefault(p => p.ProductId == product.ProductId);
-            if (productLine == null)
-                throw SheaftException.NotFound();
-            
-            Products.Add(new PurchaseOrderProduct(product, quantity, modificationKind));
-            RefreshOrder();
-        }
-
         private void AddProduct(ProductRow product)
         {
             if (Status != PurchaseOrderStatus.Waiting)

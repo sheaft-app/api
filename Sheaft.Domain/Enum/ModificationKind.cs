@@ -2,9 +2,7 @@ namespace Sheaft.Domain.Enum
 {
     public enum ModificationKind
     {
-        Order,
-        Preparation,
-        Deliver,
+        ToDeliver,
         Missing,
         Broken,
         Improper
@@ -16,18 +14,14 @@ namespace Sheaft.Domain.Enum
         {
             switch (kind)
             {
+                case ModificationKind.ToDeliver:
+                    return "à livrer";
                 case ModificationKind.Broken:
                     return "cassé";
-                case ModificationKind.Deliver:
-                    return "livré";
                 case ModificationKind.Improper:
                     return "non conforme";
                 case ModificationKind.Missing:
                     return "manquant";
-                case ModificationKind.Order:
-                    return "commandé";
-                case ModificationKind.Preparation:
-                    return "préparé";
                 default:
                     return "";
             }

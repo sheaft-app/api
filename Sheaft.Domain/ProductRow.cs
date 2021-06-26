@@ -47,13 +47,12 @@ namespace Sheaft.Domain
             TotalWholeSalePrice = product.TotalWholeSalePrice;
             TotalOnSalePrice = product.TotalOnSalePrice;
 
-            RowKind = product.RowKind;
             Quantity = product.Quantity;
             ProductId = product.ProductId;
             HasReturnable = ReturnableId.HasValue;
         }
         
-        protected ProductRow(ProductRow product, int quantity, ModificationKind rowKind)
+        protected ProductRow(ProductRow product, int quantity)
         {
             UnitWholeSalePrice = product.UnitWholeSalePrice;
             UnitOnSalePrice = product.UnitOnSalePrice;
@@ -73,14 +72,13 @@ namespace Sheaft.Domain
             ReturnableOnSalePrice = product.ReturnableOnSalePrice;
             HasReturnable = product.ReturnableWholeSalePrice.HasValue;
 
-            RowKind = rowKind;
             ProductId = product.ProductId;
             HasReturnable = ReturnableId.HasValue;
             
             SetQuantity(quantity);
         }
 
-        protected ProductRow(Product product, Guid catalogId, int quantity, ModificationKind rowKind)
+        protected ProductRow(Product product, Guid catalogId, int quantity)
         {
             var productPrice = product.CatalogsPrices.Single(p => p.CatalogId == catalogId);
             
@@ -101,7 +99,6 @@ namespace Sheaft.Domain
             ReturnableWholeSalePrice = product.Returnable?.WholeSalePrice;
             ReturnableOnSalePrice = product.Returnable?.OnSalePrice;
 
-            RowKind = rowKind;
             ProductId = product.Id;
             HasReturnable = ReturnableId.HasValue;
             
@@ -111,10 +108,6 @@ namespace Sheaft.Domain
         private void SetQuantity(int quantity)
         {
             Quantity = quantity;
-            
-            if (RowKind is ModificationKind.Broken or ModificationKind.Improper or ModificationKind.Missing)
-                Quantity = -Quantity;
-            
             RefreshLine();
         }
 
@@ -148,7 +141,6 @@ namespace Sheaft.Domain
         public decimal TotalOnSalePrice { get; private set; }
         public Guid ProductId { get; private set; }
         public byte[] RowVersion { get; private set; }
-        public ModificationKind RowKind { get; set; }
 
         protected void RefreshLine()
         {

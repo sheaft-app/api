@@ -14,7 +14,7 @@ namespace Sheaft.Mediatr.Delivery.Commands
         {
             var purchaseOrders = GetPurchaseOrders(delivery.PurchaseOrders);
             var returnedProducts = delivery.Products
-                .Where(p => p.RowKind != ModificationKind.Deliver)
+                .Where(p => p.RowKind != ModificationKind.ToDeliver)
                 .Select(p => GetProductModel(p))
                 .ToList();
             var returnedReturnables = delivery.ReturnedReturnables
@@ -74,7 +74,7 @@ namespace Sheaft.Mediatr.Delivery.Commands
                     Name = product.Name,
                     Quantity = product.Quantity,
                     Reference = product.Reference,
-                    RowKind = ModificationKind.Deliver,
+                    RowKind = ModificationKind.ToDeliver,
                     Vat = product.Vat,
                     TotalVatPrice = groupedProduct.Sum(po => po.TotalVatPrice),
                     TotalWholeSalePrice = groupedProduct.Sum(po => po.TotalWholeSalePrice),
