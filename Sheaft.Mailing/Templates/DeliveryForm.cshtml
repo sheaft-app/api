@@ -93,6 +93,16 @@
                 <td style="padding: 10px 15px;vertical-align: center; text-align: right;">@product.TotalWholeSalePrice</td>
             </tr>
         }
+        @foreach (var returnable in item.Returnables)
+        {
+            <tr >
+                <td style="padding: 10px 15px;vertical-align: center;">@returnable.Name</td>
+                <td style="padding: 10px 15px;vertical-align: center; text-align: right;">@returnable.Quantity</td>
+                <td style="padding: 10px 15px;vertical-align: center; text-align: right;">@returnable.UnitWholeSalePrice</td>
+                <td style="padding: 10px 15px;vertical-align: center; text-align: right;">@returnable.Vat</td>
+                <td style="padding: 10px 15px;vertical-align: center; text-align: right;">@returnable.TotalWholeSalePrice</td>
+            </tr>
+        }
     }
     @if (Model.ReturnedProducts.Any())
     {

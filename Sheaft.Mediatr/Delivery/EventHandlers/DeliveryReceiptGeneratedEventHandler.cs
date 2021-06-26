@@ -47,7 +47,7 @@ namespace Sheaft.Mediatr.Delivery.EventHandlers
                 return;
 
             await _signalrService.SendNotificationToUserAsync(delivery.ClientId, nameof(DeliveryReceiptGeneratedEvent),
-                new {Url = delivery.DeliveryFormUrl});
+                new {Url = delivery.DeliveryReceiptUrl});
 
             var client = await _context.Users.SingleAsync(u => u.Id == delivery.ClientId, token);
             var producer = await _context.Producers.SingleAsync(u => u.Id == delivery.ProducerId, token);

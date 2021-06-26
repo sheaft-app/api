@@ -46,10 +46,6 @@ namespace Sheaft.Mediatr.Delivery.Commands
             var results = new List<DeliveryPurchaseOrderMailerModel>();
             foreach (var purchaseOrder in purchaseOrders)
             {
-                var purchaseOrderProducts = purchaseOrder.Products
-                    .Where(p => p.RowKind == ModificationKind.Deliver)
-                    .ToList();
-
                 var products = purchaseOrder.Products.GroupBy(p => p.ProductId);
                 results.Add(new DeliveryPurchaseOrderMailerModel
                 {
@@ -109,23 +105,26 @@ namespace Sheaft.Mediatr.Delivery.Commands
         private static List<DeliveryReturnableMailerModel> GetReturnablesModel(
             IEnumerable<IGrouping<Guid, ProductRow>> groupedProducts)
         {
-            var products = new List<DeliveryReturnableMailerModel>();
+            var returnables = new List<DeliveryReturnableMailerModel>();
             foreach (var groupedProduct in groupedProducts)
             {
                 var product = groupedProduct.First();
-                products.Add(new DeliveryReturnableMailerModel()
+                if (!product.HasReturnable)
+                    continue;
+                
+                returnables.Add(new DeliveryReturnableMailerModel()
                 {
-                    Name = product.Name,
+                    Name = product.ReturnableName,
                     Quantity = product.Quantity,
-                    Vat = product.Vat,
-                    TotalVatPrice = groupedProduct.Sum(po => po.TotalVatPrice),
-                    TotalWholeSalePrice = groupedProduct.Sum(po => po.TotalWholeSalePrice),
-                    TotalOnSalePrice = groupedProduct.Sum(po => po.TotalOnSalePrice),
-                    UnitWholeSalePrice = product.UnitWholeSalePrice
+                    Vat = product.ReturnableVat ?? 0,
+                    TotalVatPrice = groupedProduct.Sum(po => po.TotalReturnableVatPrice ?? 0),
+                    TotalWholeSalePrice = groupedProduct.Sum(po => po.TotalReturnableWholeSalePrice ?? 0),
+                    TotalOnSalePrice = groupedProduct.Sum(po => po.TotalReturnableOnSalePrice ?? 0),
+                    UnitWholeSalePrice = product.ReturnableWholeSalePrice ?? 0
                 });
             }
 
-            return products;
+            return returnables;
         }
 
         private static DeliveryReturnableMailerModel GetReturnedReturnableModel(DeliveryReturnable p)
