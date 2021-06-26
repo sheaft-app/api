@@ -73,10 +73,10 @@ namespace Sheaft.Mediatr.Delivery.Commands
                 if (products.Count() != returnedProductIds.Count())
                     throw SheaftException.NotFound();
 
-                returnedProducts = products.Select(p =>
+                returnedProducts = request.ReturnedProducts.Select(p =>
                 {
-                    var product = request.ReturnedProducts.Single(pr => pr.ProductId == p.ProductId);
-                    return new Tuple<DeliveryProduct, int, ModificationKind>(p, product.Quantity, product.Kind);
+                    var product = products.Single(pr => pr.ProductId == p.ProductId);
+                    return new Tuple<DeliveryProduct, int, ModificationKind>(product, p.Quantity, p.Kind);
                 }).ToList();
             }
 
