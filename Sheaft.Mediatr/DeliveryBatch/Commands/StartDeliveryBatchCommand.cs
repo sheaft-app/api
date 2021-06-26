@@ -37,6 +37,7 @@ namespace Sheaft.Mediatr.DeliveryBatch.Commands
         }
 
         public Guid Id { get; set; }
+        public bool StartFirstDelivery { get; set; }
     }
 
     public class StartDeliveryBatchCommandHandler : CommandsHandler,
@@ -57,8 +58,13 @@ namespace Sheaft.Mediatr.DeliveryBatch.Commands
                 return Failure(MessageKind.NotFound);
 
             deliveryBatch.StartBatch();
-            await _context.SaveChangesAsync(token);
+            if (request.StartFirstDelivery)
+            {
+                var delivery = deliveryBatch.Deliveries.OrderBy(d => d.Position).First();
+                delivery.StartDelivery();
+            }
             
+            await _context.SaveChangesAsync(token);
             return Success();
         }
     }
