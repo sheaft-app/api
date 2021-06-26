@@ -110,7 +110,7 @@ namespace Sheaft.Domain
                         DomainEvents.Add(new PurchaseOrderAcceptedEvent(Id));
                     return;
                 case PurchaseOrderStatus.Completed:
-                    if (Status != PurchaseOrderStatus.Processing && Status != PurchaseOrderStatus.Shipping && Status != PurchaseOrderStatus.Completed)
+                    if (Status != PurchaseOrderStatus.Processing && Status != PurchaseOrderStatus.Completed)
                         throw SheaftException.Validation(
                             MessageKind.PurchaseOrder_CannotComplete_NotIn_ProcessingStatus);
 
@@ -119,12 +119,8 @@ namespace Sheaft.Domain
                     if (!skipNotification)
                         DomainEvents.Add(new PurchaseOrderCompletedEvent(Id));
                     break;
-                case PurchaseOrderStatus.Shipping:
-                    if (Status != PurchaseOrderStatus.Completed)
-                        throw SheaftException.Validation(MessageKind.PurchaseOrder_CannotShip_NotIn_CompletedStatus);
-                    break;
                 case PurchaseOrderStatus.Delivered:
-                    if (Status != PurchaseOrderStatus.Completed && Status != PurchaseOrderStatus.Shipping)
+                    if (Status != PurchaseOrderStatus.Completed)
                         throw SheaftException.Validation(MessageKind
                             .PurchaseOrder_CannotDeliver_NotIn_CompletedOrShippingStatus);
                     break;

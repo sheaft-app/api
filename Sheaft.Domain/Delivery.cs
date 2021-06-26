@@ -187,9 +187,6 @@ namespace Sheaft.Domain
             StartedOn = DateTimeOffset.UtcNow;
             DeliveredOn = null;
             Status = DeliveryStatus.InProgress;
-
-            foreach (var purchaseOrder in PurchaseOrders)
-                purchaseOrder.SetStatus(PurchaseOrderStatus.Shipping, true);
         }
 
         public void RejectDelivery(string comment)

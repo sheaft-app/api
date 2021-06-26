@@ -77,7 +77,7 @@ namespace Sheaft.Mediatr.DeliveryBatch.Commands
                     .Where(p => clientDelivery.PurchaseOrderIds.Contains(p.Id))
                     .ToListAsync(token);
                 
-                if(purchaseOrders.Any(po => po.Status != PurchaseOrderStatus.Completed && po.Status != PurchaseOrderStatus.Shipping))
+                if(purchaseOrders.Any(po => po.Status != PurchaseOrderStatus.Completed))
                     throw SheaftException.Validation();
                 
                 if(purchaseOrders.Any(po => (int)po.ExpectedDelivery.Kind <= 4))
