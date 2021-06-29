@@ -51,9 +51,10 @@ namespace Sheaft.Mediatr.Product.Commands
                 return Failure(MessageKind.Forbidden);
             
             _context.Remove(entity);
+            
+            entity.Producer.DecreaseProductsCount();
             await _context.SaveChangesAsync(token);
             
-            _mediatr.Post(new UpdateProducerProductsCommand(request.RequestUser) {ProducerId = entity.ProducerId});
             return Success();
         }
     }

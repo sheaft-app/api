@@ -23,6 +23,7 @@ namespace Sheaft.Application.Interfaces.Infrastructure
         Task<Result> UploadDocumentPageAsync(Guid documentId, Guid pageId, byte[] data, Guid userId, CancellationToken token);
         Task<Result> DeleteDocumentPageAsync(Guid documentId, Guid pageId, Guid userId, CancellationToken token);
         Task<Result<string>> UploadProducersListAsync(byte[] data, CancellationToken token);
+        Task<Result<string>> UploadStoresListAsync(byte[] data, CancellationToken token);
         Task<Result<string>> UploadUserTransactionsFileAsync(Guid userId, Guid jobId, string filename, byte[] data, CancellationToken token);
         Task<Result<string>> UploadUserPurchaseOrdersFileAsync(Guid userId, Guid jobId, string filename, byte[] data, CancellationToken token);
         Task<Result<string>> UploadProducerDeliveryReceiptAsync(Guid producerId, Guid deliveryId, string filenameWithExtension, byte[] data, CancellationToken token);

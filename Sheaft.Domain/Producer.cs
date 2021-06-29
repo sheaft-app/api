@@ -20,8 +20,8 @@ namespace Sheaft.Domain
             DomainEvents = new List<DomainEvent>{new ProducerRegisteredEvent(Id)};
         }
 
-        public bool HasProducts { get; set; }
-        public bool CanDirectSell { get; set; }
+        public int ProductsCount { get; private set; }
+        public bool CanDirectSell { get; private set; }
         public bool NotSubjectToVat { get; private set; }
         public int TagsCount { get; private set; }
         public virtual ICollection<ProducerTag> Tags { get; private set; }
@@ -44,5 +44,22 @@ namespace Sheaft.Domain
         }
 
         public List<DomainEvent> DomainEvents { get; } = new List<DomainEvent>();
+
+        public void IncreaseProductsCount()
+        {
+            ProductsCount++;
+        }
+        
+        public void DecreaseProductsCount()
+        {
+            ProductsCount--;
+            if (ProductsCount < 0)
+                ProductsCount = 0;
+        }
+
+        public void SetCanDirectSell(bool canDirectSell)
+        {
+            CanDirectSell = canDirectSell;
+        }
     }
 }

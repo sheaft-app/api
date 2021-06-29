@@ -68,7 +68,7 @@ namespace Sheaft.GraphQL.Producers
             SearchTermsDto terms,
             [ScopedService] QueryDbContext context, CancellationToken token)
         {
-            var query = context.Producers.Where(c => c.HasProducts);
+            var query = context.Producers.Where(c => c.ProductsCount > 0);
             if (!string.IsNullOrWhiteSpace(terms.Text))
                 query = query.Where(c => c.Name.Contains(terms.Text));
 

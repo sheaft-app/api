@@ -48,11 +48,11 @@ namespace Sheaft.Mediatr.Product.Commands
             
             if(entity.ProducerId != request.RequestUser.Id)
                 throw SheaftException.Forbidden();
-                
+
+            entity.Producer.IncreaseProductsCount();
             _context.Restore(entity);
             await _context.SaveChangesAsync(token);
             
-            _mediatr.Post(new UpdateProducerProductsCommand(request.RequestUser) {ProducerId = entity.ProducerId});
             return Success();
         }
     }

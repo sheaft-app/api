@@ -81,6 +81,8 @@ namespace Sheaft.Domain
             if (!DeliveryModeId.HasValue)
                 throw SheaftException.Validation();
 
+            Store.IncreaseProducersCount();
+            
             Status = AgreementStatus.Accepted;
             DomainEvents.Add(new AgreementAcceptedEvent(Id, acceptedByKind));
         }
@@ -96,6 +98,8 @@ namespace Sheaft.Domain
             Status = AgreementStatus.Cancelled;
             Position = null;
             Reason = reason;
+            
+            Store.DecreaseProducersCount();
             DomainEvents.Add(new AgreementCancelledEvent(Id, cancelledByKind));
         }
 

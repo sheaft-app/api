@@ -12,6 +12,7 @@ using Sheaft.Application.Interfaces.Mediatr;
 using Sheaft.Core;
 using Sheaft.Core.Exceptions;
 using Sheaft.Domain;
+using Sheaft.Domain.Enum;
 using Sheaft.Mediatr.Producer.Commands;
 
 namespace Sheaft.Mediatr.DeliveryMode.Commands
@@ -49,10 +50,12 @@ namespace Sheaft.Mediatr.DeliveryMode.Commands
             if(entity.ProducerId != request.RequestUser.Id)
                 throw SheaftException.Forbidden();
 
-            _context.Restore(entity);            
-            await _context.SaveChangesAsync(token);
+            _context.Restore(entity);    
             
-            _mediatr.Post(new UpdateProducerAvailabilityCommand(request.RequestUser) {ProducerId = entity.ProducerId});
+            if (entity.Kind is DeliveryKind.Collective or DeliveryKind.Farm or DeliveryKind.Market)
+                entity.Producer.SetCanDirectSell(true);
+            
+            await _context.SaveChangesAsync(token);
             return Success();
         }
     }

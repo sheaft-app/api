@@ -114,16 +114,19 @@ namespace Sheaft.Mediatr.DeliveryMode.Commands
                     return agreementsResult;
             }
 
+            if (entity.Kind is DeliveryKind.Collective or DeliveryKind.Farm or DeliveryKind.Market)
+                entity.Producer.SetCanDirectSell(true);
+            
             await _context.SaveChangesAsync(token);
             
             var result =
                 await _mediatr.Process(
                     new UpdateOrCreateDeliveryClosingsCommand(request.RequestUser)
                         {DeliveryId = entity.Id, Closings = request.Closings}, token);
+            
             if (!result.Succeeded)
                 return Failure(result);
-            
-            _mediatr.Post(new UpdateProducerAvailabilityCommand(request.RequestUser) {ProducerId = entity.ProducerId});
+
             return Success();
         }
     }

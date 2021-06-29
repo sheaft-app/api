@@ -88,6 +88,9 @@ namespace Sheaft.Mediatr.DeliveryMode.Commands
             entity.SetAutoCompleteRelatedPurchaseOrders(request.AutoCompleteRelatedPurchaseOrder);
             entity.SetMaxPurchaseOrdersPerTimeSlot(request.MaxPurchaseOrdersPerTimeSlot);
 
+            if (entity.Kind is DeliveryKind.Collective or DeliveryKind.Farm or DeliveryKind.Market)
+                producer.SetCanDirectSell(true);
+            
             await _context.AddAsync(entity, token);
             await _context.SaveChangesAsync(token);
             
@@ -98,7 +101,6 @@ namespace Sheaft.Mediatr.DeliveryMode.Commands
             if (!result.Succeeded)
                 return Failure<Guid>(result);
             
-            _mediatr.Post(new UpdateProducerAvailabilityCommand(request.RequestUser) {ProducerId = entity.Producer.Id});
             return Success(entity.Id);
         }
     }
