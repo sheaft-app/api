@@ -127,8 +127,8 @@ namespace Sheaft.GraphQL.Types.Outputs
                 .ResolveWith<ProducerResolvers>(c => c.GetProductsCount(default!, default!, default, default, default));
 
             descriptor
-                .Field(c => c.HasProducts)
-                .Name("hasProducts");
+                .Field(c => c.ProductsCount)
+                .Name("productsCount");
 
             descriptor
                 .Field(c => c.Address)

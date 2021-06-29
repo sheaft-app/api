@@ -4,7 +4,7 @@ namespace Sheaft.Web.Api.Controllers
 {
     public class HomeController : Controller
     {
-        public IActionResult Index()
+        public IActionResult Index(string id)
         {
             return Ok("");
         }

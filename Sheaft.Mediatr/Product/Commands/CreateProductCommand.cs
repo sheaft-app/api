@@ -158,15 +158,14 @@ namespace Sheaft.Mediatr.Product.Commands
                     entity.AddPicture(new ProductPicture(Guid.NewGuid(), picture, 0));
                 }
 
+                producer.IncreaseProductsCount();
+                
                 await _context.SaveChangesAsync(token);
                 await transaction.CommitAsync(token);
 
                 if (!request.SkipUpdateProducerTags)
                     _mediatr.Post(new UpdateProducerTagsCommand(request.RequestUser)
                         {ProducerId = request.ProducerId});
-
-                _mediatr.Post(new UpdateProducerProductsCommand(request.RequestUser)
-                    {ProducerId = request.ProducerId});
 
                 return Success(entity.Id);
             }

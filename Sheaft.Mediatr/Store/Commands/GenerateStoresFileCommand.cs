@@ -16,45 +16,45 @@ using Sheaft.Application.Interfaces.Mediatr;
 using Sheaft.Core;
 using Sheaft.Domain;
 
-namespace Sheaft.Mediatr.Producer.Commands
+namespace Sheaft.Mediatr.Store.Commands
 {
-    public class GenerateProducersFileCommand : Command
+    public class GenerateStoresFileCommand : Command
     {
-        protected GenerateProducersFileCommand()
+        protected GenerateStoresFileCommand()
         {
             
         }
         [JsonConstructor]
-        public GenerateProducersFileCommand(RequestUser requestUser) : base(requestUser)
+        public GenerateStoresFileCommand(RequestUser requestUser) : base(requestUser)
         {
         }
     }
 
-    public class GenerateProducersFileCommandHandler : CommandsHandler,
-        IRequestHandler<GenerateProducersFileCommand, Result>
+    public class GenerateStoresFileCommandHandler : CommandsHandler,
+        IRequestHandler<GenerateStoresFileCommand, Result>
     {
         private readonly IBlobService _blobService;
         private readonly IIdSerializer _idSerializer;
 
-        public GenerateProducersFileCommandHandler(
+        public GenerateStoresFileCommandHandler(
             IAppDbContext context,
             ISheaftMediatr mediatr,
             IBlobService blobService,
             IIdSerializer idSerializer,
-            ILogger<GenerateProducersFileCommandHandler> logger)
+            ILogger<GenerateStoresFileCommandHandler> logger)
             : base(mediatr, context, logger)
         {
             _blobService = blobService;
             _idSerializer = idSerializer;
         }
 
-        public async Task<Result> Handle(GenerateProducersFileCommand request, CancellationToken token)
+        public async Task<Result> Handle(GenerateStoresFileCommand request, CancellationToken token)
         {
-            var producers = await _context.Producers.ToListAsync(token);
-            var prods = producers.Select(p => new ProducerListItem(p, _idSerializer));
+            var stores = await _context.Stores.ToListAsync(token);
+            var strs = stores.Select(p => new StoreListItem(p, _idSerializer));
 
-            var result = await _blobService.UploadProducersListAsync(
-                Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(prods,
+            var result = await _blobService.UploadStoresListAsync(
+                Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(strs,
                     new JsonSerializerSettings
                     {
                         NullValueHandling = NullValueHandling.Ignore,
@@ -67,23 +67,23 @@ namespace Sheaft.Mediatr.Producer.Commands
             return Success();
         }
 
-        internal class ProducerListItem
+        internal class StoreListItem
         {
-            internal ProducerListItem(Domain.Producer user, IIdSerializer serializer)
+            internal StoreListItem(Domain.Store user, IIdSerializer serializer)
             {
                 Address = new AddressItem(user.Address);
-                Id = serializer.Serialize("Query", nameof(Producer), user.Id);
+                Id = serializer.Serialize("Query", nameof(Store), user.Id);
                 Name = user.Name;
                 Picture = user.Picture;
-                HasProducts = user.ProductsCount > 0;
-                Products = user.ProductsCount;
+                HasProducers = user.ProducersCount > 0;
+                Producers = user.ProducersCount;
             }
 
             public string Id { get; set; }
             public string Name { get; set; }
             public string Picture { get; set; }
-            public bool HasProducts { get; set; }
-            public int Products { get; set; }
+            public bool HasProducers { get; set; }
+            public int Producers { get; set; }
             public AddressItem Address { get; set; }
         }
 

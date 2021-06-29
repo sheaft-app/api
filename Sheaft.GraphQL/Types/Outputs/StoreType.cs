@@ -125,6 +125,10 @@ namespace Sheaft.GraphQL.Types.Outputs
                 .Type<NonNullType<UserAddressType>>();
             
             descriptor
+                .Field(c => c.ProducersCount)
+                .Name("producersCount");
+            
+            descriptor
                 .Field(c => c.Tags)
                 .Name("tags")
                 .UseDbContext<QueryDbContext>()

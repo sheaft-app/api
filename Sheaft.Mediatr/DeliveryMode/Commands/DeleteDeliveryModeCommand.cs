@@ -82,11 +82,18 @@ namespace Sheaft.Mediatr.DeliveryMode.Commands
                     _context.Remove(orderDelivery);
 
                 _context.Remove(entity);
+                
+                var canDirectSell = await _context.DeliveryModes.AnyAsync(
+                    c => !c.RemovedOn.HasValue && c.ProducerId == entity.ProducerId &&
+                         (c.Kind == DeliveryKind.Collective || c.Kind == DeliveryKind.Farm ||
+                          c.Kind == DeliveryKind.Market), token);
+
+                entity.Producer.SetCanDirectSell(canDirectSell);
+                
                 await _context.SaveChangesAsync(token);
                 await transaction.CommitAsync(token);
             }
-
-            _mediatr.Post(new UpdateProducerAvailabilityCommand(request.RequestUser) {ProducerId = entity.Producer.Id});
+            
             return Success();
         }
     }

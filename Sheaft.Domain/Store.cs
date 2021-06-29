@@ -23,10 +23,22 @@ namespace Sheaft.Domain
         }
 
         public int TagsCount { get; private set; }
+        public int ProducersCount { get; private set; }
         public int OpeningHoursCount { get; private set; }
         public virtual IReadOnlyCollection<StoreTag> Tags { get; private set; }
         public virtual IReadOnlyCollection<OpeningHours> OpeningHours { get; private set; }
 
+        public void IncreaseProducersCount()
+        {
+            ProducersCount++;
+        }
+        
+        public void DecreaseProducersCount()
+        {
+            ProducersCount--;
+            if (ProducersCount < 0)
+                ProducersCount = 0;
+        }
         public void SetOpeningHours(IEnumerable<OpeningHours> openingHours)
         {
             if (openingHours == null)

@@ -417,6 +417,10 @@ namespace Sheaft.Web.Jobs
                 mediatr.Execute(nameof(GenerateProducersFileCommand), new GenerateProducersFileCommand(new RequestUser("037e7e93c73f4406a4e31994d8686b7c", Guid.NewGuid().ToString("N"), null)), CancellationToken.None),
                     options.CheckProducersFileCron);
 
+            RecurringJob.AddOrUpdate<SheaftDispatcher>("6757cf27f6bd491292014902a84a11ae", mediatr =>
+                mediatr.Execute(nameof(GenerateStoresFileCommand), new GenerateStoresFileCommand(new RequestUser("037e7e93c73f4406a4e31994d8686b7c", Guid.NewGuid().ToString("N"), null)), CancellationToken.None),
+                    options.CheckStoresFileCron);
+
             RecurringJob.AddOrUpdate<SheaftDispatcher>("41739516c21a48dc907b429a96cd0edd", mediatr =>
                     mediatr.Execute(nameof(CheckExpiredPurchaseOrdersCommand), new CheckExpiredPurchaseOrdersCommand(new RequestUser("037e7e93c73f4406a4e31994d8686b7c", Guid.NewGuid().ToString("N"), null)), CancellationToken.None),
                 options.CheckExpiredPurchaseOrdersCron);

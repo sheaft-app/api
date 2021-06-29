@@ -26,6 +26,7 @@
         public string PickingOrders { get; set; } = "pickingorders";
         public string Progress { get; set; } = "progress";
         public string Producers { get; set; } = "producers";
+        public string Stores { get; set; } = "stores";
         public string Documents { get; set; } = "documents";
         public string Transactions { get; set; } = "transactions";
         public string PurchaseOrders { get; set; } = "purchaseorders";

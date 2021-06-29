@@ -10,7 +10,8 @@ namespace Sheaft.Options
         public string CheckPayinsCron { get; set; } = "*/15 * * * *";
         public string CheckZonesProgressCron { get; set; } = "0 0 * * *";
         public string CheckZonesFileCron { get; set; } = "30 0 * * *";
-        public string CheckProducersFileCron { get; set; } = "45 0 * * *";
+        public string CheckProducersFileCron { get; set; } = "40 0 * * *";
+        public string CheckStoresFileCron { get; set; } = "50 0 * * *";
         public string CheckOrdersCron { get; set; } = "0 1 * * *";
         public string CheckTransfersCron { get; set; } = "0 2 * * *";
         public string CheckPayoutsCron { get; set; } = "0 3 * * *";

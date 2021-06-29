@@ -25,7 +25,7 @@ namespace Sheaft.GraphQL
         public IError OnError(IError error)
         {
             var message = "Une erreur inattendue est survenue.";
-            var extensions = error.Extensions.ToDictionary(pair => pair.Key, pair => pair.Value);
+            var extensions = error.Extensions?.ToDictionary(pair => pair.Key, pair => pair.Value) ?? new Dictionary<string, object?>();
             
             extensions.Add("RequestIdentifier", _httpContextAccessor.HttpContext.TraceIdentifier);
 
