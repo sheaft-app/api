@@ -21,7 +21,6 @@
     <ItemGroup>
       <ProjectReference Include="..\Sheaft.Domain\Sheaft.Domain.csproj" />
       <ProjectReference Include="..\Sheaft.Infrastructure\Sheaft.Infrastructure.csproj" />
-      <ProjectReference Include="..\Sheaft.Localization\Sheaft.Localization.csproj" />
       <ProjectReference Include="..\Sheaft.Mediatr\Sheaft.Mediatr.csproj" />
     </ItemGroup>
 
