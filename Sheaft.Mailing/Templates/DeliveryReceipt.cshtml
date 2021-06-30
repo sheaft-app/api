@@ -35,11 +35,23 @@
     <h1>Bon de réception <strong>(@Model.Identifier)</strong></h1>
 </div>
 <div style="display: flex; justify-content: space-between">
-<div style="text-align: left;">
-    <strong>@Model.Producer.Name</strong><br/>
-    @Model.Producer.Email<br/>
-    @Model.Producer.Phone<br/>
-</div>
+    <div style="text-align: left;">
+        <strong>@Model.Producer.Name</strong><br/>
+        @Model.Producer.Email<br/>
+        @Model.Producer.Phone<br/><br/>
+        @Model.Producer.Address.Line1<br/>
+        @if (!string.IsNullOrWhiteSpace(@Model.Producer.Address.Line2))
+        {
+            @Model.Producer.Address.Line2<br/>
+        }
+        @Model.Producer.Address.Zipcode<br/>
+        @Model.Producer.Address.City<br/>
+    </div>
+    <div style="text-align: right;">
+        <strong>@Model.Client.Name</strong><br/>
+        @Model.Client.Email<br/>
+        @Model.Client.Phone<br/>
+    </div>
 </div>
 <div style="padding:15px 0px">
     <p>Date de livraison: <strong>@Model.ScheduledOn.ToString("dd/MM/yyyy")</strong></p>
@@ -81,16 +93,16 @@
 
 <table cellpadding="0" cellspacing="0" align="center" width="100%" role="module" data-type="columns" style="border-collapse:collapse; padding:15px 0px 0px 0px;" bgcolor="#FFFFFF">
     <tbody>
-     <tr style="border:none;">
-            <td style="border:none; padding:10px 0px;">
-                <strong>Remarques :</strong>
-            </td>
-        </tr>
-        <tr>
-            <td>
-                <div style="min-height: 120px;border: #dddddd solid 1px; margin: 10px;">@Model.Comment</div>
-            </td>
-        </tr>
+    <tr style="border:none;">
+        <td style="border:none; padding:10px 0px;">
+            <strong>Remarques :</strong>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <div style="min-height: 120px;border: #dddddd solid 1px; margin: 10px;">@Model.Comment</div>
+        </td>
+    </tr>
     </tbody>
 </table>
 </body>
