@@ -20,6 +20,7 @@ using Sheaft.Application.Interfaces.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Sheaft.Core.Enums;
 using Sheaft.Core.Exceptions;
+using Sheaft.Mediatr.DeliveryBatch.Commands;
 using Sheaft.Mediatr.Producer.Commands;
 
 namespace Sheaft.Mediatr.Delivery.Commands
@@ -69,7 +70,7 @@ namespace Sheaft.Mediatr.Delivery.Commands
                     .Where(r => r.Quantity > 0)
                     .Select(p => p.ProductId)
                     .Distinct();
-                
+
                 var products = delivery.Products
                     .Where(p => returnedProductIds.Contains(p.ProductId) && p.RowKind == ModificationKind.ToDeliver)
                     .ToList();
@@ -80,10 +81,10 @@ namespace Sheaft.Mediatr.Delivery.Commands
                 returnedProducts = request.ReturnedProducts
                     .Where(r => r.Quantity > 0)
                     .Select(p =>
-                {
-                    var product = products.Single(pr => pr.ProductId == p.ProductId);
-                    return new Tuple<DeliveryProduct, int, ModificationKind>(product, p.Quantity, p.Kind);
-                }).ToList();
+                    {
+                        var product = products.Single(pr => pr.ProductId == p.ProductId);
+                        return new Tuple<DeliveryProduct, int, ModificationKind>(product, p.Quantity, p.Kind);
+                    }).ToList();
             }
 
             var returnedReturnables = new List<KeyValuePair<Domain.Returnable, int>>();
@@ -93,7 +94,7 @@ namespace Sheaft.Mediatr.Delivery.Commands
                     .Where(r => r.Quantity > 0)
                     .Select(r => r.ReturnableId)
                     .Distinct();
-                
+
                 var returnables = await _context.Returnables
                     .Where(r => returnableIds.Contains(r.Id))
                     .ToListAsync(token);
@@ -111,6 +112,17 @@ namespace Sheaft.Mediatr.Delivery.Commands
             await _context.SaveChangesAsync(token);
 
             _mediatr.Post(new GenerateDeliveryFormCommand(request.RequestUser) {DeliveryId = delivery.Id});
+
+            if (delivery.DeliveryBatchId.HasValue && delivery.DeliveryBatch.Deliveries.All(d =>
+                d.Status is DeliveryStatus.Delivered or DeliveryStatus.Rejected))
+            {
+                var result = await _mediatr.Process(new CompleteDeliveryBatchCommand(request.RequestUser)
+                    {Id = delivery.DeliveryBatchId.Value}, token);
+
+                if (!result.Succeeded)
+                    return Failure(result);
+            }
+
             return Success();
         }
     }

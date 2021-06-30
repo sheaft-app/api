@@ -91,7 +91,7 @@ namespace Sheaft.Mediatr.DeliveryBatch.Commands
 
             await _context.SaveChangesAsync(token);
 
-            if (deliveryBatch.Status == DeliveryBatchStatus.Partial || deliveryBatch.Status == DeliveryBatchStatus.Completed)
+            if (deliveryBatch.Status is DeliveryBatchStatus.Partial or DeliveryBatchStatus.Completed)
                 _mediatr.Post(new GenerateDeliveryBatchFormsCommand(request.RequestUser)
                     {DeliveryBatchId = deliveryBatch.Id});
 
