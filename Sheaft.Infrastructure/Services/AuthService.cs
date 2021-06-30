@@ -42,7 +42,7 @@ namespace Sheaft.Infrastructure.Services
                 new StringContent(JsonConvert.SerializeObject(user), Encoding.UTF8, "application/json"), token);
 
             if (!oidcResult.IsSuccessStatusCode)
-                return Failure(new Exception(await oidcResult.Content.ReadAsStringAsync().ConfigureAwait(false)));
+                return Failure("Une erreur est survenue pendant la mise à jour du profil sur le serveur d'identité", await oidcResult.Content.ReadAsStringAsync().ConfigureAwait(false));
 
             return Success();
         }
@@ -53,7 +53,7 @@ namespace Sheaft.Infrastructure.Services
                 new StringContent(JsonConvert.SerializeObject(user), Encoding.UTF8, "application/json"), token);
 
             if (!oidcResult.IsSuccessStatusCode)
-                return Failure(new Exception(await oidcResult.Content.ReadAsStringAsync().ConfigureAwait(false)));
+                return Failure("Une erreur est survenue pendant le chargement de l'image sur le serveur d'identité", await oidcResult.Content.ReadAsStringAsync().ConfigureAwait(false));
 
             return Success();
         }
@@ -63,7 +63,7 @@ namespace Sheaft.Infrastructure.Services
             var oidcResult =
                 await _httpClient.DeleteAsync(string.Format(_authOptions.Actions.Delete, userId.ToString("N")), token);
             if (!oidcResult.IsSuccessStatusCode)
-                return Failure(MessageKind.Oidc_DeleteProfile_Error,
+                return Failure("Une erreur est survenue pendant la suppression de l'utilisateur sur le serveur d'identité.",
                     await oidcResult.Content.ReadAsStringAsync());
 
             return Success();

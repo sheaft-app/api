@@ -17,7 +17,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Localization;
 using Microsoft.Azure.Cosmos.Table;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -288,21 +287,6 @@ namespace Sheaft.Web.Jobs
                     ClientPassword = pspOptions.ApiKey
                 }
             });
-
-            services.AddLocalization(ops => ops.ResourcesPath = "Resources");
-            services.Configure<RequestLocalizationOptions>(
-                opts =>
-                {
-                    var supportedCultures = new List<CultureInfo>
-                    {
-                        new CultureInfo("en"),
-                        new CultureInfo("fr")
-                    };
-
-                    opts.DefaultRequestCulture = new RequestCulture("en", "fr");
-                    opts.SupportedCultures = supportedCultures;
-                    opts.SupportedUICultures = supportedCultures;
-                });
 
             var jobsDatabaseConfig = jobsDatabaseSettings.Get<JobsDatabaseOptions>();
             services.AddHangfire(configuration =>

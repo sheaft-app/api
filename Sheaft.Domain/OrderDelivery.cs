@@ -42,8 +42,7 @@ namespace Sheaft.Domain
         public void SetExpectedDate(DateTimeOffset date)
         {
             if (date < DateTimeOffset.UtcNow)
-                throw new ValidationException(MessageKind.ExpectedDelivery_ExpectedDate_CannotBe_BeforeNow,
-                    date.ToString("dd/MM/yyyy"));
+                throw SheaftException.Validation("La date de livraison ne peut pas être inférieure à la date du jour.");
 
             ExpectedDeliveryDate = date;
             Day = ExpectedDeliveryDate.DayOfWeek;
@@ -52,20 +51,17 @@ namespace Sheaft.Domain
         protected TimeSlotHour GetOpeningHour(DeliveryMode delivery, DateTimeOffset expectedDeliveryDate)
         {
             if (delivery.RemovedOn.HasValue)
-                throw new ValidationException(MessageKind.ExpectedDelivery_ExpectedDate_DeliveryRemoved, delivery.Name,
-                    expectedDeliveryDate.ToString("dd/MM/yyyy"));
+                throw SheaftException.Validation("Ce mode de livraison n'existe plus.");
 
             var oh = delivery.DeliveryHours.FirstOrDefault(o =>
                 o.Day == expectedDeliveryDate.DayOfWeek && o.From <= expectedDeliveryDate.TimeOfDay &&
                 o.To >= expectedDeliveryDate.TimeOfDay);
             if (oh == null)
-                throw new ValidationException(MessageKind.ExpectedDelivery_ExpectedDate_NotIn_DeliveryOpeningHours,
-                    delivery.Name, expectedDeliveryDate.ToString("dd/MM/yyyy"));
+                throw SheaftException.Validation("La date selectionnée ne correspond à aucune plage horaire du mode de livraison.");
 
             if (delivery.LockOrderHoursBeforeDelivery.HasValue &&
                 expectedDeliveryDate.AddHours(-delivery.LockOrderHoursBeforeDelivery.Value) < DateTime.UtcNow)
-                throw new ValidationException(MessageKind.ExpectedDelivery_ExpectedDate_OrdersLocked, delivery.Name,
-                    expectedDeliveryDate.ToString("dd/MM/yyyy"));
+                throw SheaftException.Validation($"La date selectionnée se situe après la limite de {delivery.LockOrderHoursBeforeDelivery.Value}h avant le début de la livraison.");
 
             return oh;
         }

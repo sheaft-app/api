@@ -49,7 +49,7 @@ namespace Sheaft.Mediatr.Catalog.Commands
             
             var entity = catalogs.Single(c => c.Id == request.CatalogId);
             if(entity.Kind != CatalogKind.Stores)
-                return Failure(MessageKind.Validation);
+                return Failure("Vous ne pouvez pas assigner un catalogue pour particulier comme catalogue par défaut.");
             
             entity.SetIsDefault(true);
 

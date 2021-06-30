@@ -54,7 +54,7 @@ namespace Sheaft.Mediatr.DeliveryBatch.Commands
         {
             var deliveryBatch = await _context.DeliveryBatches.SingleOrDefaultAsync(c => c.Id == request.Id, token);
             if (deliveryBatch == null)
-                return Failure(MessageKind.NotFound);
+                return Failure("La tournée de livraison est introuvable.");
 
             deliveryBatch.SetBatchReady();
 

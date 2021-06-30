@@ -37,7 +37,7 @@ namespace Sheaft.Infrastructure.Services
             using (var ms = new MemoryStream(data))
                 await blobClient.UploadAsync(ms, token);
 
-            return Success(GetBlobUri(blobClient, _storageOptions.Containers.Pictures));
+            return Success<string>(GetBlobUri(blobClient, _storageOptions.Containers.Pictures));
         }
 
         public async Task<Result<string>> UploadUserPictureAsync(Guid userId, Guid pictureId, string size, byte[] data,
@@ -53,7 +53,7 @@ namespace Sheaft.Infrastructure.Services
             using (var ms = new MemoryStream(data))
                 await blobClient.UploadAsync(ms, token);
 
-            return Success(GetBlobUri(blobClient, _storageOptions.Containers.Pictures).Split($"_{size}.jpg")[0]);
+            return Success<string>(GetBlobUri(blobClient, _storageOptions.Containers.Pictures).Split($"_{size}.jpg")[0]);
         }
 
         public async Task<Result<string>> UploadTagPictureAsync(Guid tagId, byte[] data, CancellationToken token)
@@ -68,7 +68,7 @@ namespace Sheaft.Infrastructure.Services
             using (var ms = new MemoryStream(data))
                 await blobClient.UploadAsync(ms, token);
 
-            return Success(GetBlobUri(blobClient, _storageOptions.Containers.Pictures));
+            return Success<string>(GetBlobUri(blobClient, _storageOptions.Containers.Pictures));
         }
 
         public async Task<Result<string>> UploadTagIconAsync(Guid tagId, byte[] data, CancellationToken token)
@@ -83,7 +83,7 @@ namespace Sheaft.Infrastructure.Services
             using (var ms = new MemoryStream(data))
                 await blobClient.UploadAsync(ms, token);
 
-            return Success(GetBlobUri(blobClient, _storageOptions.Containers.Pictures));
+            return Success<string>(GetBlobUri(blobClient, _storageOptions.Containers.Pictures));
         }
 
         public async Task<Result<string>> UploadProductPictureAsync(Guid userId, Guid productId, Guid pictureId, string size, byte[] data, CancellationToken token)
@@ -97,7 +97,7 @@ namespace Sheaft.Infrastructure.Services
             using (var ms = new MemoryStream(data))
                 await blobClient.UploadAsync(ms, token);
 
-            return Success(GetBlobUri(blobClient, _storageOptions.Containers.Pictures).Split($"_{size}.jpg")[0]);
+            return Success<string>(GetBlobUri(blobClient, _storageOptions.Containers.Pictures).Split($"_{size}.jpg")[0]);
         }
 
         public async Task<Result> CleanUserStorageAsync(Guid userId, CancellationToken token)
@@ -162,7 +162,7 @@ namespace Sheaft.Infrastructure.Services
             {
                 var response = await blobClient.UploadAsync(ms, token);
                 if (response.GetRawResponse().Status >= 400)
-                    return Failure();
+                    return Failure(response.GetRawResponse().ReasonPhrase);
             }
 
             return Success();
@@ -214,7 +214,7 @@ namespace Sheaft.Infrastructure.Services
             {
                 var response = await blobClient.UploadAsync(ms, token);
                 if (response.GetRawResponse().Status >= 400)
-                    return Failure();
+                    return Failure(response.GetRawResponse().ReasonPhrase);
             }
 
             return Success();
@@ -230,7 +230,7 @@ namespace Sheaft.Infrastructure.Services
             var blobClient = containerClient.GetBlobClient($"users/{userId:N}/documents/{documentId:N}/{pageId:N}");
             var response = await blobClient.DeleteIfExistsAsync(cancellationToken: token);
             if (!response.Value)
-                return Failure();
+                return Failure(response.GetRawResponse().ReasonPhrase);
 
             return Success();
         }
@@ -259,7 +259,7 @@ namespace Sheaft.Infrastructure.Services
 
             sasBuilder.SetPermissions(BlobSasPermissions.Read);
 
-            return Success(GetBlobSasUri(blobClient, sasBuilder, _storageOptions.Containers.Rgpd));
+            return Success<string>(GetBlobSasUri(blobClient, sasBuilder, _storageOptions.Containers.Rgpd));
         }
 
         public async Task<Result<string>> UploadUserTransactionsFileAsync(Guid userId, Guid jobId, string filename, byte[] data,
@@ -286,7 +286,7 @@ namespace Sheaft.Infrastructure.Services
 
             sasBuilder.SetPermissions(BlobSasPermissions.Read);
 
-            return Success(GetBlobSasUri(blobClient, sasBuilder, _storageOptions.Containers.Transactions));
+            return Success<string>(GetBlobSasUri(blobClient, sasBuilder, _storageOptions.Containers.Transactions));
         }
 
         public async Task<Result<string>> UploadUserPurchaseOrdersFileAsync(Guid userId, Guid jobId, string filename, byte[] data,
@@ -313,7 +313,7 @@ namespace Sheaft.Infrastructure.Services
 
             sasBuilder.SetPermissions(BlobSasPermissions.Read);
 
-            return Success(GetBlobSasUri(blobClient, sasBuilder, _storageOptions.Containers.PurchaseOrders));
+            return Success<string>(GetBlobSasUri(blobClient, sasBuilder, _storageOptions.Containers.PurchaseOrders));
         }
 
         public async Task<Result<string>> UploadProducerDeliveryReceiptAsync(Guid producerId, Guid deliveryId, string filenameWithExtension, byte[] data, CancellationToken token)
@@ -338,7 +338,7 @@ namespace Sheaft.Infrastructure.Services
             };
 
             sasBuilder.SetPermissions(BlobSasPermissions.Read);
-            return Success(GetBlobSasUri(blobClient, sasBuilder, _storageOptions.Containers.Deliveries));
+            return Success<string>(GetBlobSasUri(blobClient, sasBuilder, _storageOptions.Containers.Deliveries));
         }
 
         public async Task<Result<string>> UploadProducerDeliveryFormAsync(Guid producerId, Guid deliveryId, string filenameWithExtension, byte[] data, CancellationToken token)
@@ -363,7 +363,7 @@ namespace Sheaft.Infrastructure.Services
             };
 
             sasBuilder.SetPermissions(BlobSasPermissions.Read);
-            return Success(GetBlobSasUri(blobClient, sasBuilder, _storageOptions.Containers.Deliveries));
+            return Success<string>(GetBlobSasUri(blobClient, sasBuilder, _storageOptions.Containers.Deliveries));
         }
 
         public async Task<Result<byte[]>> DownloadDeliveryAsync(string deliveryFormUrl, CancellationToken token)
@@ -461,7 +461,7 @@ namespace Sheaft.Infrastructure.Services
             };
 
             sasBuilder.SetPermissions(BlobSasPermissions.Read);
-            return Success(GetBlobSasUri(blobClient, sasBuilder, _storageOptions.Containers.DeliveryBatches));
+            return Success<string>(GetBlobSasUri(blobClient, sasBuilder, _storageOptions.Containers.DeliveryBatches));
         }
 
         public async Task<Result<string>> UploadPickingOrderFileAsync(Guid userId, Guid jobId, string filename,
@@ -488,7 +488,7 @@ namespace Sheaft.Infrastructure.Services
 
             sasBuilder.SetPermissions(BlobSasPermissions.Read);
 
-            return Success(GetBlobSasUri(blobClient, sasBuilder, _storageOptions.Containers.PickingOrders));
+            return Success<string>(GetBlobSasUri(blobClient, sasBuilder, _storageOptions.Containers.PickingOrders));
         }
 
         public async Task<Result<string>> UploadDepartmentsProgressAsync(byte[] data, CancellationToken token)
@@ -503,7 +503,7 @@ namespace Sheaft.Infrastructure.Services
             using (var ms = new MemoryStream(data))
                 await blobClient.UploadAsync(ms, token);
 
-            return Success(blobClient.Uri.ToString());
+            return Success<string>(blobClient.Uri.ToString());
         }
 
         public async Task<Result<string>> UploadProducersListAsync(byte[] data, CancellationToken token)
@@ -518,7 +518,7 @@ namespace Sheaft.Infrastructure.Services
             using (var ms = new MemoryStream(data))
                 await blobClient.UploadAsync(ms, token);
 
-            return Success(blobClient.Uri.ToString());
+            return Success<string>(blobClient.Uri.ToString());
         }
 
         public async Task<Result<string>> UploadStoresListAsync(byte[] data, CancellationToken token)
@@ -533,7 +533,7 @@ namespace Sheaft.Infrastructure.Services
             using (var ms = new MemoryStream(data))
                 await blobClient.UploadAsync(ms, token);
 
-            return Success(blobClient.Uri.ToString());
+            return Success<string>(blobClient.Uri.ToString());
         }
 
         public async Task<Result<string>> UploadProfilePictureAsync(Guid userId, Guid pictureId, byte[] data, CancellationToken token)
@@ -548,7 +548,7 @@ namespace Sheaft.Infrastructure.Services
             using (var ms = new MemoryStream(data))
                 await blobClient.UploadAsync(ms, token);
 
-            return Success(GetBlobUri(blobClient, _storageOptions.Containers.Pictures));
+            return Success<string>(GetBlobUri(blobClient, _storageOptions.Containers.Pictures));
         }
 
         private async Task<Result> CleanContainerFolderStorageAsync(string container, string folder,
@@ -561,14 +561,17 @@ namespace Sheaft.Infrastructure.Services
                 return Success();
 
             var success = true;
+            string reason = null;
             await foreach (var blob in containerClient.GetBlobsAsync(prefix: folder, cancellationToken: token))
             {
                 var response = await containerClient.DeleteBlobAsync(blob.Name, cancellationToken: token);
-                if (response.Status >= 400)
+                if (response.Status >= 400){
                     success = false;
+                    reason = response.ReasonPhrase;
+                }
             }
 
-            return success ? Success() : Failure();
+            return success ? Success() : Failure(reason);
         }
 
         private string SanitizeFileName(string filename)

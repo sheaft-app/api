@@ -50,7 +50,7 @@ namespace Sheaft.Domain
         public void SetName(string name)
         {
             if (string.IsNullOrEmpty(name))
-                throw SheaftException.Validation();
+                throw SheaftException.Validation("Le nom du catalogue est requis.");
             
             Name = name;
         }

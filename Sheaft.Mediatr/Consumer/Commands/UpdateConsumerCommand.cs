@@ -72,7 +72,7 @@ namespace Sheaft.Mediatr.Consumer.Commands
         {
             var entity = await _context.Consumers.SingleAsync(e => e.Id == request.ConsumerId, token);
             if(entity.Id != request.RequestUser.Id)
-                return Failure(MessageKind.Forbidden);
+                return Failure("Vous n'êtes pas authorisé à accéder à cette ressource.");
 
             entity.SetEmail(request.Email);
             entity.SetPhone(request.Phone);

@@ -60,7 +60,7 @@ namespace Sheaft.Mediatr.Delivery.Commands
                 .SingleOrDefaultAsync(c => c.Id == request.DeliveryId, token);
 
             if (delivery == null)
-                return Failure(MessageKind.NotFound);
+                return Failure("La livraison est introuvable.");
 
             var returnedProducts = new List<Tuple<DeliveryProduct, int, ModificationKind>>();
             if (request.ReturnedProducts != null)
@@ -71,7 +71,7 @@ namespace Sheaft.Mediatr.Delivery.Commands
                     .ToList();
 
                 if (products.Count() != returnedProductIds.Count())
-                    throw SheaftException.NotFound();
+                    return Failure("Certains produits retournés ne font pas partit de la livraison.");
 
                 returnedProducts = request.ReturnedProducts.Select(p =>
                 {
@@ -89,7 +89,7 @@ namespace Sheaft.Mediatr.Delivery.Commands
                     .ToListAsync(token);
 
                 if (returnables.Count() != returnableIds.Count())
-                    throw SheaftException.NotFound();
+                    return Failure("Certaines consignes sont introuvables.");
 
                 returnedReturnables = returnables.Select(r =>
                         new KeyValuePair<Domain.Returnable, int>(r,

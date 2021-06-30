@@ -42,7 +42,7 @@ namespace Sheaft.Domain
 
             var existingUbo = Ubos.SingleOrDefault(u => u.Id == ubo.Id);
             if (existingUbo != null)
-                throw new ValidationException(MessageKind.Ubo_CannotAdd_AlreadyExists);
+                throw SheaftException.Validation("Impossible d'ajouter l'UBO, il existe déjà.");
 
             Ubos.Add(ubo);
             UbosCount = Ubos?.Count ?? 0;
@@ -52,7 +52,7 @@ namespace Sheaft.Domain
         {
             var existingUbo = Ubos.SingleOrDefault(u => u.Id == id);
             if (existingUbo == null)
-                throw new ValidationException(MessageKind.Ubo_CannotRemove_NotFound);
+                throw SheaftException.Validation("Impossible de supprimer l'UBO, il est introuvable.");
 
             Ubos.Remove(existingUbo);
             UbosCount = Ubos?.Count ?? 0;

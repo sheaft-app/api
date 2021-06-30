@@ -43,12 +43,15 @@ namespace Sheaft.Mediatr.User.Commands
 
         public async Task<Result> Handle(RestoreUserCommand request, CancellationToken token)
         {
-            var entity = await _context.Users.FirstOrDefaultAsync(c => c.Id == request.UserId, token);
-            if (entity == null || !entity.RemovedOn.HasValue)
-                return Failure(MessageKind.NotFound);
+            var entity = await _context.Users.SingleOrDefaultAsync(c => c.Id == request.UserId, token);
+            if (entity == null)
+                return Failure("Utilisateur introuvable.");
+
+            if (!entity.RemovedOn.HasValue)
+                return Success();
             
             if(entity.Id != request.RequestUser.Id)
-                return Failure(MessageKind.Forbidden);
+                return Failure<string>("Vous n'êtes pas autorisé à accéder à cette ressource.");
 
             entity.Restore();
             await _context.SaveChangesAsync(token);

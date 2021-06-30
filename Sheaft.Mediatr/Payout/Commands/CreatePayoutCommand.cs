@@ -55,7 +55,7 @@ namespace Sheaft.Mediatr.Payout.Commands
             var producerLegals =
                 await _context.Set<BusinessLegal>().SingleOrDefaultAsync(c => c.UserId == request.ProducerId, token);
             if (producerLegals.Validation != LegalValidation.Regular)
-                return Failure<Guid>(MessageKind.Payout_CannotCreate_User_NotValidated);
+                return Failure<Guid>("Impossible de créer un virement, l'utilisateur n'est pas vérifié.");
 
             var wallet = await _context.Wallets.SingleOrDefaultAsync(c => c.UserId == request.ProducerId, token);
             var bankAccount =

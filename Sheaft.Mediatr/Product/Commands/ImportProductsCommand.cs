@@ -110,7 +110,7 @@ namespace Sheaft.Mediatr.Product.Commands
                 job.FailJob(e.Message, request.NotifyOnUpdates ? new ProductImportFailedEvent(job.Id) : null);
                 await _context.SaveChangesAsync(token);
                 
-                return Failure(MessageKind.JobFailure);
+                return Failure("Une erreur est survenue pendant l'import des produits.");
             }
         }
     }

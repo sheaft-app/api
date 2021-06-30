@@ -61,10 +61,10 @@ namespace Sheaft.Mediatr.DeliveryBatch.Commands
         {
             var purchaseOrders = await GetPurchaseOrdersAsync(request, token);
             if (purchaseOrders.Any(po => po.Status == PurchaseOrderStatus.Delivered))
-                return Failure<Guid>(MessageKind.Validation);
+                return Failure<Guid>("Certaines commandes ont déjà été livrées.");
 
             if (purchaseOrders.Any(po => (int) po.ExpectedDelivery.Kind <= 4))
-                return Failure<Guid>(MessageKind.Validation);
+                return Failure<Guid>("Impossible d'ajouter des commandes qui sont à récupérer par le client.");
 
             var name = GetDeliveryBatchName(request, purchaseOrders);
             var producer = await _context.Producers.SingleAsync(p => p.Id == request.ProducerId, token);

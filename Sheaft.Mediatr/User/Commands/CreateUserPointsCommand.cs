@@ -55,7 +55,7 @@ namespace Sheaft.Mediatr.User.Commands
         public async Task<Result> Handle(CreateUserPointsCommand request, CancellationToken token)
         {
             if (!_scoringOptions.Points.TryGetValue(request.Kind.ToString("G"), out int quantity))
-                return Failure(MessageKind.Points_Scoring_Matching_ActionPoints_NotFound);
+                return Failure("Impossible de trouver un matching de point valide pour le type spécifié.");
 
             var user = await _context.Users.SingleAsync(e => e.Id == request.UserId, token);
             user.AddPoints(request.Kind, quantity, DateTimeOffset.UtcNow);

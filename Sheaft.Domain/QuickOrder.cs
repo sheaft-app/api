@@ -15,7 +15,7 @@ namespace Sheaft.Domain
         public QuickOrder(Guid id, string name, IDictionary<CatalogProduct, int> products, User user)
         {
             if (user == null)
-                throw new ValidationException(MessageKind.QuickOrder_User_Required);
+                SheaftException.Validation("Impossible de créer la commande rapide, l'utilisateur est requis.");
 
             Id = id;
 
@@ -44,7 +44,7 @@ namespace Sheaft.Domain
         public void SetName(string name)
         {
             if (string.IsNullOrWhiteSpace(name))
-                throw SheaftException.Validation(MessageKind.QuickOrder_Name_Required);
+                throw SheaftException.Validation("Le nom est requis.");
 
             Name = name;
         }
@@ -92,23 +92,14 @@ namespace Sheaft.Domain
             ProductsCount = Products?.Count ?? 0;
         }
 
-        public void RemoveProduct(QuickOrderProduct product)
-        {
-            if (Products == null)
-                throw SheaftException.NotFound();
-
-            Products.Remove(product);
-            ProductsCount = Products?.Count ?? 0;
-        }
-
         public void RemoveProduct(Guid productId)
         {
             if (Products == null)
-                throw SheaftException.NotFound();
+                throw SheaftException.NotFound("Cette commande rapide ne contient aucun produits.");
             
             var productLine = Products.SingleOrDefault(p => p.CatalogProduct.ProductId == productId);
             if (productLine == null)
-                throw SheaftException.Validation(MessageKind.QuickOrder_CannotRemoveProduct_Product_NotFound);
+                throw SheaftException.Validation("Impossible de supprimer le produit de la commande rapide, il est introuvable.");
 
             Products.Remove(productLine);
             ProductsCount = Products?.Count ?? 0;
@@ -116,13 +107,5 @@ namespace Sheaft.Domain
 
         public List<DomainEvent> DomainEvents { get; } = new List<DomainEvent>();
         public byte[] RowVersion { get; private set; }
-
-        // public void RemoveUnboundProducts()
-        // {
-        //     var products = Products.Where(p => !p.CatalogProductId.HasValue).ToList();
-        //     foreach (var product in products)
-        //         Products.Remove(product);
-        //     
-        // }
     }
 }

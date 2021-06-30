@@ -15,13 +15,13 @@ namespace Sheaft.Domain
         public Rating(Guid id, decimal value, User user, string comment = null)
         {
             if (user == null)
-                throw new ValidationException(MessageKind.Rating_User_Required);
+                throw SheaftException.Validation("L'utilisateur est requis.");
 
             if (value > 5)
-                throw new ValidationException(MessageKind.Rating_CannotBe_GreatherThan, 5);
+                throw SheaftException.Validation("La note ne peut être supérieure à 5.");
 
             if (value < 0)
-                throw new ValidationException(MessageKind.Rating_CannotBe_LowerThan, 0);
+                throw SheaftException.Validation("La note ne peut être inférieure à 0.");
 
             Id = id;
             Value = value;

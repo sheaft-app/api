@@ -56,7 +56,7 @@ namespace Sheaft.Mediatr.User.Commands
         {
             var entity = await _context.Users.SingleAsync(e => e.Id == request.UserId, token);
             if(entity.Id != request.RequestUser.Id)
-                return Failure(MessageKind.Forbidden);
+                return Failure("Vous n'êtes pas autorisé à accéder à cette ressource.");
             
             var roles = new List<Guid>();
             if (request.Roles.Contains(_roleOptions.Producer.Value))

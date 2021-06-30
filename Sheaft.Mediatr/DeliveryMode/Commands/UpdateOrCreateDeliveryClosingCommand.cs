@@ -45,14 +45,14 @@ namespace Sheaft.Mediatr.DeliveryMode.Commands
         {
             var entity = await _context.DeliveryModes.SingleAsync(e => e.Id == request.DeliveryId, token);
             if(entity.ProducerId != request.RequestUser.Id)
-                return Failure<Guid>(MessageKind.Forbidden);
+                return Failure<Guid>("Vous n'êtes pas autorisé à accéder à cette ressource.");
 
             Guid closingId;
             if (request.Closing.Id.HasValue)
             {
                 var closing = entity.Closings.SingleOrDefault(c => c.Id == request.Closing.Id);
                 if (closing == null)
-                return Failure<Guid>(MessageKind.NotFound);
+                    return Failure<Guid>("Le créneau de fermeture est introuvable.");
 
                 closing.ChangeClosedDates(request.Closing.From, request.Closing.To);
                 closing.SetReason(request.Closing.Reason);

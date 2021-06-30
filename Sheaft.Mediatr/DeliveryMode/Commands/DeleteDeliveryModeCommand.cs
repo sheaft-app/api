@@ -50,13 +50,13 @@ namespace Sheaft.Mediatr.DeliveryMode.Commands
         {
             var entity = await _context.DeliveryModes.SingleAsync(e => e.Id == request.DeliveryModeId, token);
             if (entity.ProducerId != request.RequestUser.Id)
-                return Failure(MessageKind.Forbidden);
+                return Failure("Vous n'êtes pas autorisé à accéder à cette ressource.");
 
             var agreements =
                 await _context.Agreements.Where(a => a.DeliveryModeId == entity.Id).ToListAsync(token);
             if (agreements.Any(a => a.Status == AgreementStatus.Accepted))
-                return Failure(MessageKind.DeliveryMode_CannotRemove_With_Active_Agreements, entity.Name,
-                    agreements.Count(a => a.Status == AgreementStatus.Accepted));
+                return Failure(
+                    $"Impossible de supprimer ce mode de livraison, {agreements.Count(a => a.Status == AgreementStatus.Accepted)} partenariats y sont rattaché");
 
             var orderDeliveries = await _context.Set<OrderDelivery>()
                 .Where(o => o.DeliveryModeId == entity.Id)
@@ -82,18 +82,18 @@ namespace Sheaft.Mediatr.DeliveryMode.Commands
                     _context.Remove(orderDelivery);
 
                 _context.Remove(entity);
-                
+
                 var canDirectSell = await _context.DeliveryModes.AnyAsync(
                     c => !c.RemovedOn.HasValue && c.ProducerId == entity.ProducerId &&
                          (c.Kind == DeliveryKind.Collective || c.Kind == DeliveryKind.Farm ||
                           c.Kind == DeliveryKind.Market), token);
 
                 entity.Producer.SetCanDirectSell(canDirectSell);
-                
+
                 await _context.SaveChangesAsync(token);
                 await transaction.CommitAsync(token);
             }
-            
+
             return Success();
         }
     }

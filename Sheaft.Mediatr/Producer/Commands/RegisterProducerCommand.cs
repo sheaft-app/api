@@ -79,7 +79,7 @@ namespace Sheaft.Mediatr.Producer.Commands
                 await _context.Producers.SingleOrDefaultAsync(
                     r => r.Id == request.ProducerId || r.Email == request.Email, token);
             if (producer != null)
-                return Failure<Guid>(MessageKind.Register_User_AlreadyExists);
+                return Failure<Guid>("Un compte existe déjà avec ces informations.");
 
             var departmentCode = UserAddress.GetDepartmentCode(request.Address.Zipcode);
             var department = await _context.Departments.SingleOrDefaultAsync(d => d.Code == departmentCode, token);

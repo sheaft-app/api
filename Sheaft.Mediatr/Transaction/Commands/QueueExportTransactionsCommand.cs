@@ -52,7 +52,7 @@ namespace Sheaft.Mediatr.Transaction.Commands
         {
             var sender = await _context.Users.SingleAsync(e => e.Id == request.UserId, token);
             if(sender.Id != request.RequestUser.Id)
-                return Failure<Guid>(MessageKind.Forbidden);
+                return Failure<Guid>("Vous n'êtes pas autorisé à accéder à cette ressource.");
 
             var command = new ExportTransactionsCommand(request.RequestUser)
                 {JobId = Guid.NewGuid(), From = request.From, To = request.To};
@@ -62,9 +62,6 @@ namespace Sheaft.Mediatr.Transaction.Commands
             await _context.SaveChangesAsync(token);
 
             _mediatr.Post(command);
-            
-            _logger.LogInformation($"User Transactions export successfully initiated by {request.UserId}");
-
             return Success(entity.Id);
         }
     }

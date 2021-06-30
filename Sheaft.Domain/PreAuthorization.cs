@@ -52,9 +52,11 @@ namespace Sheaft.Domain
 
         public void SetPreAuthorizedPayin(PreAuthorizedPayin payin)
         {
-            if (PreAuthorizedPayinId.HasValue && (PreAuthorizedPayin.Status == TransactionStatus.Succeeded ||
-                                                  PreAuthorizedPayin.Status == TransactionStatus.Created))
-                throw SheaftException.Conflict();
+            if (PreAuthorizedPayinId.HasValue && PreAuthorizedPayin.Status == TransactionStatus.Succeeded)
+                throw SheaftException.Validation("Ce prépaiement possède déjà un virement validé.");
+            
+            if (PreAuthorizedPayinId.HasValue && PreAuthorizedPayin.Status == TransactionStatus.Created)
+                throw SheaftException.Validation("Ce prépaiement possède déjà un virement en cours.");
 
             PreAuthorizedPayin = payin;
             PreAuthorizedPayinId = payin.Id;
@@ -122,7 +124,7 @@ namespace Sheaft.Domain
         public void SetAsProcessed()
         {
             if (Processed)
-                throw SheaftException.Conflict();
+                throw SheaftException.Conflict("Ce prépaiement a déjà été traité.");
 
             Processed = true;
         }

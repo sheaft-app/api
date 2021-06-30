@@ -1,7 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Localization;
 using Moq;
-using Sheaft.Localization;
 using System;
 using Microsoft.Extensions.Configuration;
 using Sheaft.Application.Interfaces;

@@ -53,10 +53,10 @@ namespace Sheaft.Mediatr.DeliveryBatch.Commands
         {
             var deliveryBatch = await _context.DeliveryBatches.SingleOrDefaultAsync(c => c.Id == request.Id, token);
             if (deliveryBatch == null)
-                return Failure(MessageKind.NotFound);
+                return Failure("La tournée de livraison est introuvable.");
 
             if (deliveryBatch.Status != DeliveryBatchStatus.Waiting)
-                return Failure(MessageKind.Validation);
+                return Failure("Impossible de modifier une livraison qui n'est pas en attente.");
             
             var clientIds = request.Deliveries.Select(d => d.ClientId);
             var existingClientIds = deliveryBatch.Deliveries.Select(d => d.ClientId);
@@ -78,10 +78,10 @@ namespace Sheaft.Mediatr.DeliveryBatch.Commands
                     .ToListAsync(token);
                 
                 if(purchaseOrders.Any(po => po.Status != PurchaseOrderStatus.Completed))
-                    throw SheaftException.Validation();
+                    throw SheaftException.Validation("Certaines commandes ne sont pas prête.");
                 
                 if(purchaseOrders.Any(po => (int)po.ExpectedDelivery.Kind <= 4))
-                    throw SheaftException.Validation();
+                    throw SheaftException.Validation("Certaines commandes doivent être récupérée et non livrée.");
 
                 if (delivery == null)
                 {

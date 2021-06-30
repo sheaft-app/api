@@ -34,7 +34,7 @@ namespace Sheaft.Mediatr
             return Result.Success();
         }
 
-        protected Result Success(MessageKind message, params object[] objs)
+        protected Result Success(string message, params object[] objs)
         {
             return Result.Success(message, objs);
         }
@@ -44,12 +44,12 @@ namespace Sheaft.Mediatr
             return Failure(result.Exception, result.Message, result.Params);
         }
 
-        protected Result Failure(MessageKind message, params object[] objs)
+        protected Result Failure(string message, params object[] objs)
         {
             return Failure(null, message, objs);
         }
 
-        protected Result Failure(Exception exception, MessageKind message, params object[] objs)
+        protected Result Failure(Exception exception, string message, params object[] objs)
         {
             return Result.Failure(message, exception, objs);
         }
@@ -64,7 +64,7 @@ namespace Sheaft.Mediatr
             return Result<T>.Success(result);
         }
 
-        protected Result<T> Success<T>(T result, MessageKind message, params object[] objs)
+        protected Result<T> Success<T>(T result, string message, params object[] objs)
         {
             return Result<T>.Success(result, message, objs);
         }
@@ -74,12 +74,12 @@ namespace Sheaft.Mediatr
             return Failure<T>(result.Exception, result.Message, result.Params);
         }
 
-        protected Result<T> Failure<T>(MessageKind message, params object[] objs)
+        protected Result<T> Failure<T>(string message, params object[] objs)
         {
             return Failure<T>(null, message, objs);
         }
 
-        protected Result<T> Failure<T>(Exception exception, MessageKind message, params object[] objs)
+        protected Result<T> Failure<T>(Exception exception, string message, params object[] objs)
         {
             return Result<T>.Failure(default(T), message, exception, objs);
         }

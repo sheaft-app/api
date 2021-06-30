@@ -40,7 +40,7 @@ namespace Sheaft.Domain
         public void AddRefund(PayinRefund refund)
         {
             if (Refunds != null && Refunds.Any(r => r.PurchaseOrderId == refund.PurchaseOrderId && r.Status == TransactionStatus.Succeeded))
-                throw new ValidationException(MessageKind.Payin_CannotAdd_Refund_PurchaseOrderRefund_AlreadySucceeded);
+                throw SheaftException.Validation("Impossible d'ajouter un remboursement à ce paiement, il a déjà été remboursé.");
 
             if (Refunds == null)
                 Refunds = new List<PayinRefund>();

@@ -37,7 +37,7 @@ namespace Sheaft.Domain
         public void SetName(string name)
         {
             if (string.IsNullOrWhiteSpace(name))
-                throw new ValidationException(MessageKind.Tag_Name_Required);
+                throw SheaftException.Validation("Le nom est requis.");
 
             Name = name;
         }

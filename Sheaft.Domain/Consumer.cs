@@ -26,7 +26,7 @@ namespace Sheaft.Domain
         public ConsumerLegal SetLegals(Owner owner)
         {
             if (Legal?.Id != null)
-                throw SheaftException.AlreadyExists();
+                throw SheaftException.AlreadyExists("Les informations légales de cet utilisateur existent déjà.");
 
             var legals = new ConsumerLegal(Guid.NewGuid(),this, owner);
             Legal = legals;

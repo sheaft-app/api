@@ -65,11 +65,11 @@ namespace Sheaft.Mediatr.Donation.Commands
                 .ToListAsync(token);
 
             if (pendingDonations.Any(pt => pt.Status == TransactionStatus.Succeeded))
-                return Failure<Guid>(MessageKind.Donation_CannotCreate_AlreadySucceeded);
+                return Failure<Guid>("Impossible de créer un virement pour le don, un virement a déjà été effectué.");
 
             if (pendingDonations.Any(pt =>
                 pt.Status == TransactionStatus.Created || pt.Status == TransactionStatus.Waiting))
-                return Failure<Guid>(MessageKind.Donation_CannotCreate_PendingDonation);
+                return Failure<Guid>("Impossible de créer un virement pour le don, un virement est déjà en attente.");
 
             var sheaftWallet = await _context.Wallets
                 .SingleOrDefaultAsync(c => c.Identifier == _pspOptions.WalletId, token);

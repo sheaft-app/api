@@ -14,7 +14,7 @@ namespace Sheaft.Domain
         public ProducerTag(Tag tag)
         {
             if (tag == null)
-                throw new ValidationException(MessageKind.User_TagNotFound);
+                throw SheaftException.Validation("Le tag pour le producteur est introuvable.");
 
             Tag = tag;
             TagId = tag.Id;

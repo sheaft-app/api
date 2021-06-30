@@ -56,7 +56,7 @@ namespace Sheaft.Mediatr.Transaction.Commands
         {
             var job = await _context.Jobs.SingleAsync(e => e.Id == request.JobId, token);
             if (job.UserId != request.RequestUser.Id)
-                return Failure(MessageKind.Forbidden);
+                return Failure("Vous n'êtes pas autorisé à accéder à cette ressource.");
 
             try
             {
@@ -92,7 +92,7 @@ namespace Sheaft.Mediatr.Transaction.Commands
                 job.FailJob(e.Message, new TransactionsExportFailedEvent(job.Id));
                 await _context.SaveChangesAsync(token);
                 
-                return Failure(MessageKind.JobFailure);
+                return Failure("Une erreur est survenue pendant l'export des transactions.");
             }
         }
     }

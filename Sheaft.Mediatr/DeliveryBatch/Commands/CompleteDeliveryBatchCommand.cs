@@ -54,14 +54,14 @@ namespace Sheaft.Mediatr.DeliveryBatch.Commands
         {
             var deliveryBatch = await _context.DeliveryBatches.SingleOrDefaultAsync(c => c.Id == request.Id, token);
             if (deliveryBatch == null)
-                return Failure(MessageKind.NotFound);
+                return Failure("La tournée de livraison est introuvable.");
 
             var pendingDeliveries = deliveryBatch.Deliveries
                 .Where(d => d.Status != DeliveryStatus.Delivered && d.Status != DeliveryStatus.Rejected)
                 .ToList();
 
             if (pendingDeliveries.Any() && !request.ReschedulePendingDeliveriesOn.HasValue)
-                return Failure(MessageKind.Validation);
+                return Failure("La tournée de livraison contient encore des livraisons en attente, vous devez spécifier une date de replanification.");
 
             if (pendingDeliveries.Any())
             {

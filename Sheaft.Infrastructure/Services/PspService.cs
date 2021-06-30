@@ -61,7 +61,7 @@ namespace Sheaft.Infrastructure.Services
         public async Task<Result<string>> CreateConsumerAsync(ConsumerLegal consumerLegal, CancellationToken token)
         {
             if (!string.IsNullOrWhiteSpace(consumerLegal.User.Identifier))
-                return Failure<string>(MessageKind.PsP_CannotCreate_User_User_Exists);
+                return Failure<string>("Impossible de créer le consommateur, l'utilisateur existe déjà.");
 
             await EnsureAccessTokenIsValidAsync(token);
 
@@ -78,13 +78,13 @@ namespace Sheaft.Infrastructure.Services
                     Tag = $"Id='{consumerLegal.Id}'"
                 });
 
-            return Success(result.Id);
+            return Success<string>(result.Id);
         }
 
         public async Task<Result<string>> UpdateConsumerAsync(ConsumerLegal consumerLegal, CancellationToken token)
         {
             if (string.IsNullOrWhiteSpace(consumerLegal.User.Identifier))
-                return Failure<string>(MessageKind.PsP_CannotUpdate_User_User_Not_Exists);
+                return Failure<string>("Impossible de mettre à jour l'utilisateur, l'identifiant est requis.");
 
             await EnsureAccessTokenIsValidAsync(token);
 
@@ -101,13 +101,13 @@ namespace Sheaft.Infrastructure.Services
                     Tag = $"Id='{consumerLegal.Id}'"
                 }, consumerLegal.User.Identifier);
 
-            return Success(result.Id);
+            return Success<string>(result.Id);
         }
 
         public async Task<Result<string>> CreateBusinessAsync(BusinessLegal businessLegal, CancellationToken token)
         {
             if (!string.IsNullOrWhiteSpace(businessLegal.User.Identifier))
-                return Failure<string>(MessageKind.PsP_CannotCreate_User_User_Exists);
+                return Failure<string>("Impossible de créer l'utilisateur, l'identifiant existe déjà.");
 
             await EnsureAccessTokenIsValidAsync(token);
 
@@ -129,13 +129,13 @@ namespace Sheaft.Infrastructure.Services
                     Tag = $"Id='{businessLegal.Id}'"
                 });
 
-            return Success(result.Id);
+            return Success<string>(result.Id);
         }
 
         public async Task<Result<string>> UpdateBusinessAsync(BusinessLegal businessLegal, CancellationToken token)
         {
             if (string.IsNullOrWhiteSpace(businessLegal.User.Identifier))
-                return Failure<string>(MessageKind.PsP_CannotUpdate_User_User_Not_Exists);
+                return Failure<string>("Impossible de mettre à jour l'utilisateur, l'identifiant est requis.");
 
             await EnsureAccessTokenIsValidAsync(token);
 
@@ -157,16 +157,16 @@ namespace Sheaft.Infrastructure.Services
                     Tag = $"Id='{businessLegal.Id}'"
                 }, businessLegal.User.Identifier);
 
-            return Success(result.Id);
+            return Success<string>(result.Id);
         }
 
         public async Task<Result<string>> CreateWalletAsync(Wallet wallet, CancellationToken token)
         {
             if (string.IsNullOrWhiteSpace(wallet.User.Identifier))
-                return Failure<string>(MessageKind.PsP_CannotCreate_Wallet_User_Not_Exists);
+                return Failure<string>("Impossible de créer le wallet, l'utilisateur est requis.");
 
             if (!string.IsNullOrWhiteSpace(wallet.Identifier))
-                return Failure<string>(MessageKind.PsP_CannotCreate_Wallet_Wallet_Exists);
+                return Failure<string>("Impossible de créer le wallet, l'identifiant existe déjà.");
 
             await EnsureAccessTokenIsValidAsync(token);
 
@@ -179,16 +179,16 @@ namespace Sheaft.Infrastructure.Services
                     Tag = $"Id='{wallet.Id}'"
                 });
 
-            return Success(result.Id);
+            return Success<string>(result.Id);
         }
 
         public async Task<Result<string>> CreateBankIbanAsync(BankAccount payment, CancellationToken token)
         {
             if (string.IsNullOrWhiteSpace(payment.User.Identifier))
-                return Failure<string>(MessageKind.PsP_CannotCreate_Bank_User_Not_Exists);
+                return Failure<string>("Impossible de créer le compte en banque, l'utilisateur est requis.");
 
             if (!string.IsNullOrWhiteSpace(payment.Identifier) && payment.Identifier.Length > 0)
-                return Failure<string>(MessageKind.PsP_CannotCreate_Bank_Already_Exists);
+                return Failure<string>("Impossible de créer le compte en banque, l'identifiant existe déjà.");
 
             await EnsureAccessTokenIsValidAsync(token);
 
@@ -210,16 +210,16 @@ namespace Sheaft.Infrastructure.Services
                     Tag = $"Id='{payment.Id}'"
                 });
 
-            return Success(result.Id);
+            return Success<string>(result.Id);
         }
 
         public async Task<Result<bool>> UpdateBankIbanAsync(BankAccount payment, bool isActive, CancellationToken token)
         {
             if (string.IsNullOrWhiteSpace(payment.User.Identifier))
-                return Failure<bool>(MessageKind.PsP_CannotUpdate_Bank_User_Not_Exists);
+                return Failure<bool>("Impossible de mettre à jour le compte en banque, l'utilisateur est requis.");
 
             if (string.IsNullOrWhiteSpace(payment.Identifier))
-                return Failure<bool>(MessageKind.PsP_CannotUpdate_Bank_Not_Exists);
+                return Failure<bool>("Impossible de mettre à jour le compte en banque, l'identifiant est requis.");
 
             await EnsureAccessTokenIsValidAsync(token);
 
@@ -236,7 +236,7 @@ namespace Sheaft.Infrastructure.Services
             CancellationToken token)
         {
             if (string.IsNullOrWhiteSpace(user.Identifier))
-                return Failure<PspCardRegistrationResultDto>(MessageKind.PsP_CannotCreate_Card_User_Not_Exists);
+                return Failure<PspCardRegistrationResultDto>("Impossible de créer la carte, l'utilisateur est requis.");
 
             await EnsureAccessTokenIsValidAsync(token);
             var result =
@@ -257,10 +257,10 @@ namespace Sheaft.Infrastructure.Services
             CancellationToken token)
         {
             if (string.IsNullOrWhiteSpace(userIdentifier))
-                return Failure<PspDocumentResultDto>(MessageKind.PsP_CannotCreate_Document_User_Not_Exists);
+                return Failure<PspDocumentResultDto>("Impossible de créer le document, l'utilisateur est requis.");
 
             if (!string.IsNullOrWhiteSpace(document.Identifier))
-                return Failure<PspDocumentResultDto>(MessageKind.PsP_CannotCreate_Document_Document_Exists);
+                return Failure<PspDocumentResultDto>("Impossible de créer le document, l'identifiant existe déjà.");
 
             await EnsureAccessTokenIsValidAsync(token);
 
@@ -282,7 +282,7 @@ namespace Sheaft.Infrastructure.Services
             byte[] bytes, CancellationToken token)
         {
             if (string.IsNullOrWhiteSpace(document.Identifier))
-                return Failure<bool>(MessageKind.PsP_CannotCreate_DocumentPage_Document_Not_Exists);
+                return Failure<bool>("Impossible d'ajouter la page au document, l'identifiant est requis.");
 
             await EnsureAccessTokenIsValidAsync(token);
 
@@ -294,10 +294,10 @@ namespace Sheaft.Infrastructure.Services
             CancellationToken token)
         {
             if (string.IsNullOrWhiteSpace(userIdentifier))
-                return Failure<PspDocumentResultDto>(MessageKind.PsP_CannotSubmit_Document_User_Not_Exists);
+                return Failure<PspDocumentResultDto>("Impossible d'envoyer le document, l'utilisateur est requis.");
 
             if (string.IsNullOrWhiteSpace(document.Identifier))
-                return Failure<PspDocumentResultDto>(MessageKind.PsP_CannotSubmit_Document_Document_Not_Exists);
+                return Failure<PspDocumentResultDto>("Impossible d'envoyer le document, l'identifiant est requis.");
 
             await EnsureAccessTokenIsValidAsync(token);
 
@@ -321,7 +321,7 @@ namespace Sheaft.Infrastructure.Services
             User business, CancellationToken token)
         {
             if (string.IsNullOrWhiteSpace(business.Identifier))
-                return Failure<PspDeclarationResultDto>(MessageKind.PsP_CannotCreate_Declaration_User_Not_Exists);
+                return Failure<PspDeclarationResultDto>("Impossible de créer la déclaration, l'utilisateur est requis.");
 
             await EnsureAccessTokenIsValidAsync(token);
 
@@ -343,7 +343,7 @@ namespace Sheaft.Infrastructure.Services
             User business, CancellationToken token)
         {
             if (string.IsNullOrWhiteSpace(declaration.Identifier))
-                return Failure<PspDeclarationResultDto>(MessageKind.PsP_CannotSubmit_Declaration_Not_Exists);
+                return Failure<PspDeclarationResultDto>("Impossible d'envoyer la déclaration, l'identifiant est requis.");
 
             await EnsureAccessTokenIsValidAsync(token);
 
@@ -376,7 +376,7 @@ namespace Sheaft.Infrastructure.Services
             CancellationToken token)
         {
             if (string.IsNullOrWhiteSpace(declaration.Identifier))
-                return Failure<string>(MessageKind.PsP_CannotAddUbo_Declaration_Not_Exists);
+                return Failure<string>("Impossible d'ajouter l'ubo, l'identifiant de déclaration est requis.");
 
             await EnsureAccessTokenIsValidAsync(token);
 
@@ -394,17 +394,17 @@ namespace Sheaft.Infrastructure.Services
                 business.Identifier,
                 declaration.Identifier);
 
-            return Success(result.Id);
+            return Success<string>(result.Id);
         }
 
         public async Task<Result<bool>> UpdateUboAsync(Ubo ubo, Declaration declaration, User business,
             CancellationToken token)
         {
             if (string.IsNullOrWhiteSpace(declaration.Identifier))
-                return Failure<bool>(MessageKind.PsP_CannotUpdateUbo_Declaration_Not_Exists);
+                return Failure<bool>("Impossible de mettre à jour l'ubo, l'identifiant de déclaration est requis.");
 
             if (string.IsNullOrWhiteSpace(ubo.Identifier))
-                return Failure<bool>(MessageKind.PsP_CannotUpdateUbo_Ubo_Not_Exists);
+                return Failure<bool>("Impossible de mettre à jour l'ubo, l'identifiant est requis.");
 
             await EnsureAccessTokenIsValidAsync(token);
 
@@ -421,58 +421,6 @@ namespace Sheaft.Infrastructure.Services
                 ubo.Identifier);
 
             return Success(true);
-        }
-
-        public async Task<Result<PspWebPaymentResultDto>> CreateWebPayinAsync(WebPayin transaction, Owner owner,
-            CancellationToken token)
-        {
-            if (string.IsNullOrWhiteSpace(transaction.Author.Identifier))
-                return Failure<PspWebPaymentResultDto>(MessageKind.PsP_CannotCreate_WebPayin_Author_Not_Exists);
-
-            if (string.IsNullOrWhiteSpace(transaction.CreditedWallet.Identifier))
-                return Failure<PspWebPaymentResultDto>(MessageKind.PsP_CannotCreate_WebPayin_CreditedWallet_Not_Exists);
-
-            await EnsureAccessTokenIsValidAsync(token);
-
-            var result = await _api.PayIns.CreateCardWebAsync(GetIdempotencyKey(transaction.Id),
-                new PayInCardWebPostDTO(
-                    transaction.Author.Identifier,
-                    new Money
-                    {
-                        Amount = transaction.Debited.GetAmount(),
-                        Currency = CurrencyIso.EUR
-                    },
-                    new Money
-                    {
-                        Amount = transaction.Fees.GetAmount(),
-                        Currency = CurrencyIso.EUR
-                    },
-                    transaction.CreditedWallet.Identifier,
-                    _pspOptions.ReturnUrl,
-                    CultureCode.FR,
-                    CardType.CB_VISA_MASTERCARD,
-                    transaction.Reference)
-                {
-                    SecureMode = SecureMode.DEFAULT,
-                    TemplateURLOptionsCard = new TemplateURLOptionsCard
-                    {
-                        PAYLINEV2 = _pspOptions.PaymentUrl
-                    },
-                    Tag = $"Id='{transaction.Id}'"
-                });
-
-            return Success(new PspWebPaymentResultDto
-            {
-                Credited = result.CreditedFunds.Amount.GetAmount(),
-                ProcessedOn = result.ExecutionDate,
-                Identifier = result.Id,
-                RedirectUrl = result.RedirectURL,
-                ResultCode = result.ResultCode,
-                ResultMessage = PspExtensions.GetOperationMessage(result.ResultCode, result.ResultMessage),
-                Debited = result.DebitedFunds.Amount.GetAmount(),
-                Fees = result.Fees.Amount.GetAmount(),
-                Status = result.Status.GetTransactionStatus()
-            });
         }
 
         public async Task<Result<PspPreAuthorizationResultDto>> CreatePreAuthorizationAsync(
@@ -589,13 +537,13 @@ namespace Sheaft.Infrastructure.Services
         public async Task<Result<PspPaymentResultDto>> CreatePayoutAsync(Payout transaction, CancellationToken token)
         {
             if (string.IsNullOrWhiteSpace(transaction.Author.Identifier))
-                return Failure<PspPaymentResultDto>(MessageKind.PsP_CannotCreate_Payout_Author_Not_Exists);
+                return Failure<PspPaymentResultDto>("Impossible de créer le virement psp, l'auteur est requis.");
 
             if (string.IsNullOrWhiteSpace(transaction.DebitedWallet.Identifier))
-                return Failure<PspPaymentResultDto>(MessageKind.PsP_CannotCreate_Payout_DebitedWallet_Not_Exists);
+                return Failure<PspPaymentResultDto>("Impossible de créer le virement psp, le wallet débité est requis.");
 
             if (string.IsNullOrWhiteSpace(transaction.BankAccount.Identifier))
-                return Failure<PspPaymentResultDto>(MessageKind.PsP_CannotCreate_Payout_BankAccount_Not_Exists);
+                return Failure<PspPaymentResultDto>("Impossible de créer le virement psp, l'identifiant du compte bancaire est requis.");
 
             await EnsureAccessTokenIsValidAsync(token);
 
@@ -637,10 +585,10 @@ namespace Sheaft.Infrastructure.Services
             CancellationToken token)
         {
             if (string.IsNullOrWhiteSpace(transaction.Author.Identifier))
-                return Failure<PspPaymentResultDto>(MessageKind.PsP_CannotRefund_Payin_Author_Not_Exists);
+                return Failure<PspPaymentResultDto>("Impossible de créer le remboursement du paiement psp, l'auteur est requis.");
 
             if (string.IsNullOrWhiteSpace(transaction.Payin.Identifier))
-                return Failure<PspPaymentResultDto>(MessageKind.PsP_CannotRefund_Payin_PayinIdentifier_Missing);
+                return Failure<PspPaymentResultDto>("Impossible de créer le remboursement du paiement psp, l'identifiant est requis.");
 
             await EnsureAccessTokenIsValidAsync(token);
 
@@ -770,11 +718,10 @@ namespace Sheaft.Infrastructure.Services
         public async Task<Result<PspPaymentResultDto>> CreatePreAuthorizedPayinAsync(PreAuthorization preAuthorization, CancellationToken token)
         {
             if (string.IsNullOrWhiteSpace(preAuthorization.PreAuthorizedPayin.Author.Identifier))
-                return Failure<PspPaymentResultDto>(MessageKind.PsP_CannotCreate_WebPayin_Author_Not_Exists);
+                return Failure<PspPaymentResultDto>("Impossible de créer la pré-authorisation psp, l'auteur est requis.");
 
             if (string.IsNullOrWhiteSpace(preAuthorization.PreAuthorizedPayin.CreditedWallet.Identifier))
-                return Failure<PspPaymentResultDto>(MessageKind
-                    .PsP_CannotCreate_WebPayin_CreditedWallet_Not_Exists);
+                return Failure<PspPaymentResultDto>("Impossible de créer la pré-authorisation psp, le wallet crédité est requis.");
 
             await EnsureAccessTokenIsValidAsync(token);
 
@@ -815,13 +762,13 @@ namespace Sheaft.Infrastructure.Services
             string debitedWalletIdentifier, CancellationToken token)
         {
             if (string.IsNullOrWhiteSpace(author))
-                return Failure<PspPaymentResultDto>(MessageKind.PsP_CannotCreate_Transfer_Author_Not_Exists);
+                return Failure<PspPaymentResultDto>("Impossible de créer le transfer psp, l'auteur est requis.");
 
             if (string.IsNullOrWhiteSpace(creditedWalletIdentifier))
-                return Failure<PspPaymentResultDto>(MessageKind.PsP_CannotCreate_Transfer_CreditedWallet_Not_Exists);
+                return Failure<PspPaymentResultDto>("Impossible de créer le transfer psp, le wallet crédité est requis.");
 
             if (string.IsNullOrWhiteSpace(debitedWalletIdentifier))
-                return Failure<PspPaymentResultDto>(MessageKind.PsP_CannotCreate_Transfer_DebitedWallet_Not_Exists);
+                return Failure<PspPaymentResultDto>("Impossible de créer le transfer psp, le wallet débité est requis.");
 
             await EnsureAccessTokenIsValidAsync(token);
 

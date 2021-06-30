@@ -16,10 +16,10 @@ namespace Sheaft.Domain
         public Sponsoring(User sponsor, User sponsored)
         {
             if(sponsor == null)
-                throw new ValidationException(MessageKind.Sponsoring_Sponsor_Required);
+                throw SheaftException.Validation("Le sponsor est requis.");
 
             if(sponsored == null)
-                throw new ValidationException(MessageKind.Sponsoring_Sponsored_Required);
+                throw SheaftException.Validation("Le sponsorisé est requis.");
 
             Sponsor = sponsor;
             SponsorId = sponsor.Id;

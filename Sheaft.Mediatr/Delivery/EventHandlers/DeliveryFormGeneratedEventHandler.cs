@@ -46,15 +46,15 @@ namespace Sheaft.Mediatr.Delivery.EventHandlers
             if (delivery.Status != DeliveryStatus.Delivered || delivery.DeliveryBatch is {Status: DeliveryBatchStatus.Cancelled})
                 return;
 
-            await _signalrService.SendNotificationToUserAsync(delivery.ClientId, nameof(DeliveryFormGeneratedEvent),
-                new {Url = delivery.DeliveryFormUrl});
-
             var client = await _context.Users.SingleAsync(u => u.Id == delivery.ClientId, token);
             var producer = await _context.Producers.SingleAsync(u => u.Id == delivery.ProducerId, token);
 
             var blobResult = await _blobService.DownloadDeliveryAsync(delivery.DeliveryFormUrl, token);
             if (!blobResult.Succeeded)
                 throw SheaftException.BadRequest(blobResult.Exception);
+            
+            await _signalrService.SendNotificationToUserAsync(delivery.ClientId, nameof(DeliveryFormGeneratedEvent),
+                new {Url = delivery.DeliveryFormUrl});
             
             await _emailService.SendTemplatedEmailAsync(
                 client.Email,

@@ -54,7 +54,7 @@ namespace Sheaft.Infrastructure.Services
                 return Failure<string>(uuid.Exception);
 
             var identifier = GenerateEanIdentifier(uuid.Data, 13);
-            return Success(identifier);
+            return Success<string>(identifier);
         }
 
         public async Task<Result<string>> GetNextSponsoringCode(CancellationToken token)
@@ -106,7 +106,7 @@ namespace Sheaft.Infrastructure.Services
                 }
             } while (concurrentUpdateError);
 
-            return Success(code);
+            return Success<string>(code);
         }
 
         private static string GenerateEanIdentifier(long value, int length)

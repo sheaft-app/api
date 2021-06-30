@@ -54,17 +54,17 @@ namespace Sheaft.Mediatr.Agreement.Commands
             var entity = await _context.Agreements.SingleAsync(e => e.Id == request.AgreementId, token);
             if (request.RequestUser.IsInRole(_roleOptions.Producer.Value) &&
                 entity.ProducerId != request.RequestUser.Id)
-                return Failure(MessageKind.Forbidden);
+                return Failure("Vous n'êtes pas authorisé à accéder à cette ressource.");
 
             if (request.RequestUser.IsInRole(_roleOptions.Store.Value) && entity.StoreId != request.RequestUser.Id)
-                return Failure(MessageKind.Forbidden);
+                return Failure("Vous n'êtes pas authorisé à accéder à cette ressource.");
 
             var alreadyAcceptedAgreement =
                 await _context.Agreements.SingleOrDefaultAsync(
                     a => a.Id != request.AgreementId && a.ProducerId == entity.ProducerId &&
                          a.StoreId == entity.StoreId && a.Status == AgreementStatus.Accepted, token);
             if (alreadyAcceptedAgreement != null)
-                return Failure(MessageKind.AlreadyExists);
+                return Failure("Vous possédez déjà un partenariat actif.");
 
             Domain.DeliveryMode delivery = null;
             if (request.DeliveryId.HasValue)

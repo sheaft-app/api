@@ -47,7 +47,7 @@ namespace Sheaft.Mediatr.Product.Commands
                 await _context.Products.SingleOrDefaultAsync(a => a.Id == request.ProductId && a.RemovedOn.HasValue, token);
             
             if(entity.ProducerId != request.RequestUser.Id)
-                throw SheaftException.Forbidden();
+                return Failure("Vous n'êtes pas autorisé à accéder à cette ressource.");
 
             entity.Producer.IncreaseProductsCount();
             _context.Restore(entity);

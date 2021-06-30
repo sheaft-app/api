@@ -18,10 +18,10 @@ namespace Sheaft.Domain
         public Job(Guid id, JobKind kind, string name, User user, object command)
         {
             if (string.IsNullOrWhiteSpace(name))
-                throw new ValidationException(MessageKind.Job_Name_Required);
+                throw SheaftException.Validation("Le nom de la tâche est requis.");
 
             if (user == null)
-                throw new ValidationException(MessageKind.Job_User_Required);
+                throw SheaftException.Validation("L'utilisateur rattaché à la tâche est requis.");
 
             Id = id;
             Name = name;
@@ -54,10 +54,10 @@ namespace Sheaft.Domain
         public void StartJob(DomainEvent @event = null)
         {
             if(StartedOn.HasValue)
-                throw new ValidationException(MessageKind.Job_CannotStart_Has_StartedOnDate);
+                throw SheaftException.Validation("Cette tâche est déjà en cours d'execution.");
 
             if (Status != ProcessStatus.Waiting)
-                throw new ValidationException(MessageKind.Job_CannotStart_NotIn_WaitingStatus);
+                throw SheaftException.Validation("Cette tâche n'est pas en attente.");
 
             StartedOn = DateTimeOffset.UtcNow;
             Status = ProcessStatus.Processing;
@@ -85,7 +85,7 @@ namespace Sheaft.Domain
         public void RetryJob(DomainEvent @event = null)
         {
             if (Status != ProcessStatus.Cancelled && Status != ProcessStatus.Failed)
-                throw new ValidationException(MessageKind.Job_CannotRetry_NotIn_CanncelledOrFailedStatus);
+                throw SheaftException.Validation("Impossible de reinitialiser cette tâche, elle n'est pas annulée ou en erreur.");
 
             StartedOn = null;
             Retried = Retried.HasValue ? Retried + 1 : 1;
@@ -98,7 +98,7 @@ namespace Sheaft.Domain
         public void PauseJob(DomainEvent @event = null)
         {
             if (!StartedOn.HasValue || Status != ProcessStatus.Processing)
-                throw new ValidationException(MessageKind.Job_CannotPause_NotIn_ProcessingStatus);
+                throw SheaftException.Validation("Impossible de mettre en pause cette tâche, elle n'est pas en cours d'execution.");
 
             Status = ProcessStatus.Paused;
             
@@ -109,7 +109,8 @@ namespace Sheaft.Domain
         public void ArchiveJob(DomainEvent @event = null)
         {
             if (Status != ProcessStatus.Done && Status != ProcessStatus.Failed && Status != ProcessStatus.Cancelled)
-                throw new ValidationException(MessageKind.Job_CannotArchive_NotIn_TerminatedStatus);
+                throw SheaftException.Validation(
+                    "Impossible d'archiver cette tâche, elle n'est pas terminé, en erreur ou annulée.");
 
             Archived = true;
             
@@ -128,7 +129,7 @@ namespace Sheaft.Domain
         public void ResumeJob(DomainEvent @event = null)
         {
             if (!StartedOn.HasValue || Status != ProcessStatus.Paused)
-                throw new ValidationException(MessageKind.Job_CannotResume_NotIn_PausedStatus);
+                throw SheaftException.Validation("Impossible de reprendre l'execution de cette tâche, elle n'est pas en pause.");
 
             Status = ProcessStatus.Processing;
             
@@ -139,7 +140,7 @@ namespace Sheaft.Domain
         public void CompleteJob(DomainEvent @event = null)
         {
             if (!StartedOn.HasValue || Status != ProcessStatus.Processing)
-                throw new ValidationException(MessageKind.Job_CannotComplete_NotIn_ProcessingStatus);
+                throw SheaftException.Validation("Impossible de terminer cette tâche, elle n'est pas en cours d'execution.");
 
             CompletedOn = DateTimeOffset.UtcNow;
             Status = ProcessStatus.Done;
@@ -151,10 +152,10 @@ namespace Sheaft.Domain
         public void CancelJob(string message, DomainEvent @event = null)
         {
             if (Status == ProcessStatus.Done)
-                throw new ValidationException(MessageKind.Job_CannotCancel_AlreadyDone);
+                throw SheaftException.Validation("Impossible d'annuler cette tâche, elle est déjà terminée.");
 
             if (Status == ProcessStatus.Cancelled)
-                throw new ValidationException(MessageKind.Job_CannotCancel_AlreadyCancelled);
+                throw SheaftException.Validation("Impossible d'annuler cette tâche, elle est déjà annulée.");
 
             Status = ProcessStatus.Cancelled;
             Message = message;
@@ -166,10 +167,10 @@ namespace Sheaft.Domain
         public void FailJob(string message, DomainEvent @event = null)
         {
             if (Status == ProcessStatus.Done)
-                throw new ValidationException(MessageKind.Job_CannotFail_AlreadyDone);
+                throw SheaftException.Validation("Impossible d'indiquer cette tâche en erreur, elle est déjà terminée.");
 
             if (Status == ProcessStatus.Cancelled)
-                throw new ValidationException(MessageKind.Job_CannotFail_AlreadyCancelled);
+                throw SheaftException.Validation("Impossible d'indiquer cette tâche en erreur, elle est déjà annulée.");
 
             Status = ProcessStatus.Failed;
             Message = message;
@@ -181,7 +182,7 @@ namespace Sheaft.Domain
         public void SetCommand<T>(T command) where T:class
         {
             if (command == null)
-                throw new ValidationException(MessageKind.Job_Command_Required);
+                throw SheaftException.Validation("La commande à executer par cette tâche est requise.");
 
             Command = JsonConvert.SerializeObject(command);
         }

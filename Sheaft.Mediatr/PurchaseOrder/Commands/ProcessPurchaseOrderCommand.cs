@@ -47,7 +47,7 @@ namespace Sheaft.Mediatr.PurchaseOrder.Commands
         {
             var purchaseOrder = await _context.PurchaseOrders.SingleAsync(e => e.Id == request.PurchaseOrderId, token);
             if(purchaseOrder.ProducerId != request.RequestUser.Id)
-                return Failure(MessageKind.Forbidden);
+                return Failure("Vous n'êtes pas autorisé à accéder à cette ressource.");
             
             purchaseOrder.Process(request.SkipNotification);
 

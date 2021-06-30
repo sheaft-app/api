@@ -56,7 +56,7 @@ namespace Sheaft.Mediatr.Document.Commands
             {
                 var legal = await _context.Legals.SingleAsync(e => e.Id == request.LegalId, token);
                 if (legal.Documents.Any(d => d.Kind == request.Kind))
-                    return Failure<Guid>(MessageKind.Document_CannotCreate_Type_Already_Present);
+                    return Failure<Guid>("Impossible de créer ce document, un document de ce type existe déjà.");
 
                 var document = legal.AddDocument(request.Kind, request.Name);
                 await _context.SaveChangesAsync(token);

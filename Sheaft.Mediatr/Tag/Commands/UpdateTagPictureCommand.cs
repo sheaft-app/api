@@ -57,7 +57,7 @@ namespace Sheaft.Mediatr.Tag.Commands
             entity.SetPicture(resultImage.Data);
             await _context.SaveChangesAsync(token);
 
-            return Success(resultImage.Data);
+            return Success<string>(resultImage.Data);
         }
     }
 }

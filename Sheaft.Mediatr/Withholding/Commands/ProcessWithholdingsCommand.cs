@@ -48,10 +48,10 @@ namespace Sheaft.Mediatr.Withholding.Commands
         {
             var payout = await _context.Payouts.SingleAsync(e => e.Id == request.PayoutId, token);
             if (payout.Status != TransactionStatus.Succeeded)
-                return Failure(MessageKind.Withholding_Cannot_Process_Already_Succeeded);
+                return Failure("Impossible de traiter les retenues sur ce virement, il n'est pas validé.");
 
             if (!payout.Withholdings.Any())
-                return Failure(MessageKind.Withholding_Cannot_Process_Payout_No_Withholdings);
+                return Failure("Impossible de traiter les retenues sur ce virement, il n'en contient pas.");
 
             Result result = null;
             foreach (var withholding in payout.Withholdings)

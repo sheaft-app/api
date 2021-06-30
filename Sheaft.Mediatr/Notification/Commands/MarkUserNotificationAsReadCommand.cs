@@ -49,7 +49,7 @@ namespace Sheaft.Mediatr.Notification.Commands
                 return Success();
             
             if(notification.UserId != request.RequestUser.Id)
-                return Failure(MessageKind.Forbidden);
+                return Failure("Vous n'êtes pas autorisé à accéder à cette ressource.");
 
             notification.SetAsRead();
 

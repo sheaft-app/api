@@ -15,13 +15,13 @@ namespace Sheaft.Domain
         protected TimeSlotHour(DayOfWeek day, TimeSpan from, TimeSpan to)
         {
             if (from >= TimeSpan.FromDays(1))
-                throw new ValidationException(MessageKind.TimeSlot_From_CannotBe_GreaterOrEqualThan, 24);
+                throw SheaftException.Validation("L'heure de début ne peut pas être supérieure à 24 heures.");
 
             if (to > TimeSpan.FromDays(1))
-                throw new ValidationException(MessageKind.TimeSlot_To_CannotBe_GreaterOrEqualThan, 24);
+                throw SheaftException.Validation("L'heure de fin ne peut pas être supérieure à 24 heures.");
 
             if (from >= to)
-                throw new ValidationException(MessageKind.TimeSlot_From_CannotBe_GreaterOrEqualThan_To);
+                throw SheaftException.Validation("L'heure de début ne peut pas être supérieur à l'heure de fin.");
 
             Day = day;
             From = from;

@@ -16,8 +16,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sheaft.Domain.Tests", "Shea
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{A9BE9E26-29B4-4367-A158-EBE041AC4853}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sheaft.Localization", "Sheaft.Localization\Sheaft.Localization.csproj", "{1913096F-23D6-4F69-8A18-7DF08D958610}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sheaft.Web.Api", "Sheaft.Web.Api\Sheaft.Web.Api.csproj", "{B18EBFB5-49D2-4D44-B021-5A000E7F0C38}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sheaft.Web.Manage", "Sheaft.Web.Manage\Sheaft.Web.Manage.csproj", "{632E1BF1-7028-4022-8E8E-2E07D1AE1E3F}"
@@ -70,10 +68,6 @@ Global
 		{36CE2F47-6A12-4033-85FC-6BBC40F159DE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{36CE2F47-6A12-4033-85FC-6BBC40F159DE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{36CE2F47-6A12-4033-85FC-6BBC40F159DE}.Release|Any CPU.Build.0 = Release|Any CPU
-		{1913096F-23D6-4F69-8A18-7DF08D958610}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{1913096F-23D6-4F69-8A18-7DF08D958610}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{1913096F-23D6-4F69-8A18-7DF08D958610}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{1913096F-23D6-4F69-8A18-7DF08D958610}.Release|Any CPU.Build.0 = Release|Any CPU
 		{B18EBFB5-49D2-4D44-B021-5A000E7F0C38}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{B18EBFB5-49D2-4D44-B021-5A000E7F0C38}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B18EBFB5-49D2-4D44-B021-5A000E7F0C38}.Release|Any CPU.ActiveCfg = Release|Any CPU

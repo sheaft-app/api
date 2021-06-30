@@ -45,7 +45,7 @@ namespace Sheaft.Mediatr.Job.Commands
             var entity =
                 await _context.Jobs.SingleOrDefaultAsync(a => a.Id == request.JobId && a.RemovedOn.HasValue, token);
             if(entity.UserId != request.RequestUser.Id)
-                throw SheaftException.Forbidden();
+                return Failure("Vous n'êtes pas autorisé à accéder à cette ressource.");
 
             _context.Restore(entity);
 

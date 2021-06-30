@@ -51,7 +51,7 @@ namespace Sheaft.Mediatr.Declaration.Commands
             var legal = await _context.Set<BusinessLegal>()
                 .SingleOrDefaultAsync(r => r.DeclarationId == request.DeclarationId, token);
             if (legal.Declaration.Status != DeclarationStatus.Locked)
-                return Failure(MessageKind.Declaration_CannotSubmit_NotLocked);
+                return Failure("Impossible d'envoyer la déclaration, elle doit être vérouillée avant l'envoi.");
 
             if (string.IsNullOrWhiteSpace(legal.Declaration.Identifier))
             {

@@ -39,7 +39,7 @@ namespace Sheaft.Domain
         public void SetSiret(string siret)
         {
             if (siret.IsNotNullAndIsEmptyOrWhiteSpace())
-                throw new ValidationException(MessageKind.Legal_Siret_Required);
+                throw SheaftException.Validation("Le numéro de SIRET est requis.");
 
             Siret = siret;
         }
@@ -47,7 +47,7 @@ namespace Sheaft.Domain
         public void SetVatIdentifier(string vatNumber)
         {
             if (vatNumber.IsNotNullAndIsEmptyOrWhiteSpace())
-                throw new ValidationException(MessageKind.Legal_Vat_Required);
+                throw SheaftException.Validation("Le numéro de TVA est requis.");
 
             VatIdentifier = vatNumber;
         }
@@ -55,7 +55,7 @@ namespace Sheaft.Domain
         public override void SetKind(LegalKind kind)
         {
             if (kind == LegalKind.Natural)
-                throw new ValidationException(MessageKind.Legal_Kind_Cannot_Be_Natural);
+                throw SheaftException.Validation("Une statut légal d'une société ne peut pas être de type personnel.");
 
             base.SetKind(kind);
         }
@@ -68,7 +68,7 @@ namespace Sheaft.Domain
         public void SetEmail(string email)
         {
             if (string.IsNullOrWhiteSpace(email))
-                throw new ValidationException(MessageKind.Legal_Email_Required);
+                throw SheaftException.Validation("L'email de contact de l'entreprise est requis.");
 
             Email = email;
         }
@@ -76,7 +76,7 @@ namespace Sheaft.Domain
         public void SetName(string name)
         {
             if (string.IsNullOrWhiteSpace(name))
-                throw new ValidationException(MessageKind.Legal_Name_Required);
+                throw SheaftException.Validation("Le nom de l'entreprise est requis.");
 
             Name = name;
         }

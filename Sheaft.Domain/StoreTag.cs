@@ -14,7 +14,7 @@ namespace Sheaft.Domain
         public StoreTag(Tag tag)
         {
             if (tag == null)
-                throw new ValidationException(MessageKind.User_TagNotFound);
+                throw SheaftException.Validation("Le tag du magasin est introuvable.");
 
             Tag = tag;
             TagId = tag.Id;

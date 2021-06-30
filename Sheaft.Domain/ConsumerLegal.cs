@@ -19,7 +19,7 @@ namespace Sheaft.Domain
         public override void SetKind(LegalKind kind)
         {
             if (kind != LegalKind.Natural)
-                throw new ValidationException(MessageKind.Legal_Kind_Must_Be_Natural);
+                throw SheaftException.Validation("Le statut légal de l'entité doit être de type personnel.");
 
             base.SetKind(kind);
         }

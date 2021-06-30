@@ -43,7 +43,7 @@ namespace Sheaft.Mediatr.Business.Commands
         {
             var entity = await _context.Businesses.SingleAsync(c => c.Closings.Any(cc => cc.Id == request.ClosingId), token);
             if(entity.Id != request.RequestUser.Id)
-                return Failure(MessageKind.Forbidden);
+                return Failure("Vous n'êtes pas authorisé à accéder à cette ressource.");
 
             entity.RemoveClosing(request.ClosingId);
             await _context.SaveChangesAsync(token);

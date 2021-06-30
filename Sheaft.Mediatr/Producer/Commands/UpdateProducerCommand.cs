@@ -75,7 +75,7 @@ namespace Sheaft.Mediatr.Producer.Commands
         {
             var entity = await _context.Producers.SingleAsync(e => e.Id == request.ProducerId, token);
             if(entity.Id != request.RequestUser.Id)
-                return Failure(MessageKind.Forbidden);
+                return Failure("Vous n'êtes pas autorisé à accéder à cette ressource.");
 
             entity.SetName(request.Name);
             entity.SetFirstname(request.FirstName);

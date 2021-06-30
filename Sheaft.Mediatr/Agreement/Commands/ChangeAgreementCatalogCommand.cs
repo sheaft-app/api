@@ -51,13 +51,11 @@ namespace Sheaft.Mediatr.Agreement.Commands
         {
             var entity = await _context.Agreements.SingleAsync(e => e.Id == request.AgreementId, token);
             if(entity.ProducerId != request.RequestUser.Id)
-                return Failure(MessageKind.Forbidden);
+                return Failure("Vous n'êtes pas authorisé à accéder à cette ressource.");
 
             var catalog = await _context.Catalogs.SingleAsync(c => c.Id == request.CatalogId, token);
             entity.ChangeCatalog(catalog);
             
-            //TODO update quickorder products
-
             await _context.SaveChangesAsync(token);
             return Success();
         }

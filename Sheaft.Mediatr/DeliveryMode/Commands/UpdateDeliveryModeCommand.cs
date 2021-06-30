@@ -65,7 +65,7 @@ namespace Sheaft.Mediatr.DeliveryMode.Commands
         {
             var entity = await _context.DeliveryModes.SingleAsync(e => e.Id == request.DeliveryModeId, token);
             if(entity.ProducerId != request.RequestUser.Id)
-                return Failure(MessageKind.Forbidden);
+                return Failure("Vous n'êtes pas autorisé à accéder à cette ressource.");
 
             entity.SetName(request.Name);
             entity.SetAvailability(request.Available);
@@ -92,26 +92,15 @@ namespace Sheaft.Mediatr.DeliveryMode.Commands
             if (request.Agreements != null && request.Agreements.Any())
             {
                 if (request.Agreements.Select(c => c.Id).Distinct().Count() != entity.Agreements.Select(c => c.Id).Distinct().Count())
-                    return Failure(MessageKind.Validation);
+                    return Failure("Vous ne pouvez pas modifier les partenariats rattachés à ce mode de livraison, vous devez directement mettre à jour le partenariat.");
 
-                Result agreementsResult = null;
                 var positionCount = 0;
                 foreach (var requestAgreement in request.Agreements.OrderBy(a => a.Position))
                 {
-                    var agreement = entity.Agreements.SingleOrDefault(a => a.Id == requestAgreement.Id);
-                    if (agreement != null)
-                    {
-                        agreement.SetPosition(positionCount);
-                        positionCount++;
-                        continue;
-                    }
-                    
-                    agreementsResult = Failure(MessageKind.NotFound);
-                    break;
+                    var agreement = entity.Agreements.Single(a => a.Id == requestAgreement.Id);
+                    agreement.SetPosition(positionCount);
+                    positionCount++;
                 }
-
-                if (agreementsResult is {Succeeded: false})
-                    return agreementsResult;
             }
 
             if (entity.Kind is DeliveryKind.Collective or DeliveryKind.Farm or DeliveryKind.Market)

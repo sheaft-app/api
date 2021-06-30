@@ -55,7 +55,7 @@ namespace Sheaft.Mediatr.User.Commands
         {
             var entity = await _context.Users.SingleAsync(e => e.Id == request.UserId, token);
             if(entity.Id != request.RequestUser.Id)
-                return Failure<string>(MessageKind.Forbidden);
+                return Failure<string>("Vous n'êtes pas autorisé à accéder à cette ressource.");
 
             var resultImage =
                 await _imageService.HandleUserProfileAsync(entity, request.Picture, token);
@@ -66,7 +66,7 @@ namespace Sheaft.Mediatr.User.Commands
             await _context.SaveChangesAsync(token);
 
             if (request.SkipAuthUpdate)
-                return Success(resultImage.Data);
+                return Success<string>(resultImage.Data);
 
             var result = await _mediatr.Process(new UpdateAuthUserPictureCommand(request.RequestUser)
             {
@@ -77,7 +77,7 @@ namespace Sheaft.Mediatr.User.Commands
             if (!result.Succeeded)
                 return Failure<string>(result);
 
-            return Success(resultImage.Data);
+            return Success<string>(resultImage.Data);
         }
     }
 }

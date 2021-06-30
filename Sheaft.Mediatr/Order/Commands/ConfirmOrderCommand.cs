@@ -49,7 +49,7 @@ namespace Sheaft.Mediatr.Order.Commands
         {
             var order = await _context.Orders.SingleAsync(e => e.Id == request.OrderId, token);
             if(order.User == null)
-                throw SheaftException.BadRequest(MessageKind.Order_CannotCreate_User_Required);
+                throw SheaftException.BadRequest("Impossible de confirmer le panier, l'utilisateur est requis.");
             
             if (order.Processed)
                 return Success(order.PurchaseOrders.Select(po => po.Id));

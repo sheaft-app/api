@@ -99,7 +99,7 @@ namespace Sheaft.Domain
         public void SetName(string name)
         {
             if (string.IsNullOrWhiteSpace(name))
-                throw SheaftException.Validation();
+                throw SheaftException.Validation("Le nom du mode de livraison est requis.");
             
             Name = name;
         }
@@ -133,7 +133,7 @@ namespace Sheaft.Domain
         {
             var closing = Closings.SingleOrDefault(r => r.Id == id);
             if (closing == null)
-                throw SheaftException.NotFound();
+                throw SheaftException.NotFound("La plage de fermeture pour ce mode de livraison est introuvable.");
 
             Closings.Remove(closing);
             ClosingsCount = Closings?.Count ?? 0;

@@ -47,14 +47,14 @@ namespace Sheaft.Mediatr.Catalog.Commands
                     .SingleOrDefaultAsync(c => c.Id == request.CatalogId, token);
 
             if (entity.Kind == CatalogKind.Consumers)
-                return Failure(MessageKind.Catalogs_CannotRemove_Consumers);
+                return Failure("Impossible de supprimer le catalogue pour les particuliers, désactivez-le.");
 
             var agreements = await _context.Agreements
                 .Where(a => a.Catalog != null && a.CatalogId == entity.Id)
                 .ToListAsync(token);
 
             if (agreements.Any(a => a.Status == AgreementStatus.Accepted))
-                return Failure(MessageKind.Validation);
+                return Failure("Impossible de supprimer ce catalogue, certains partenariat y sont rattaché.");
 
             foreach (var catalogProduct in entity.Products.ToList())
                 catalogProduct.Product.RemoveFromCatalog(entity.Id);

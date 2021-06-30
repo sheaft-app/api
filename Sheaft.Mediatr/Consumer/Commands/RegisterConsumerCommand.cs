@@ -70,7 +70,7 @@ namespace Sheaft.Mediatr.Consumer.Commands
                 var consumer = await _context.Consumers
                     .FirstOrDefaultAsync(r => r.Id == request.ConsumerId || r.Email == request.Email, token);
                 if (consumer != null)
-                    return Failure<Guid>(MessageKind.Register_User_AlreadyExists);
+                    return Failure<Guid>("Un compte existe déjà avec ces informations.");
 
                 consumer = new Domain.Consumer(request.ConsumerId, request.Email, request.FirstName, request.LastName,
                     request.Phone);

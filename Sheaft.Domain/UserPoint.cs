@@ -15,7 +15,7 @@ namespace Sheaft.Domain
         public UserPoint(User user, Guid id, PointKind kind, int quantity, DateTimeOffset createdOn)
         {
             if (quantity < 0)
-                throw new ValidationException(MessageKind.Points_Quantity_CannotBe_LowerThan, 0);
+                throw SheaftException.Validation("Le nombre de point doit être supérieur à 0.");
 
             Id = id;
             Kind = kind;

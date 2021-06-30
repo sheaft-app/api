@@ -47,7 +47,7 @@ namespace Sheaft.Mediatr.Donation.Commands
         {
             var donation = await _context.Donations.SingleAsync(e => e.Id == request.DonationId, token);
             if (donation.Status != TransactionStatus.Created && donation.Status != TransactionStatus.Waiting)
-                return Failure(MessageKind.BadRequest);
+                return Failure("Le virement du don est dans un état invalide.");
 
             var result =
                 await _mediatr.Process(new RefreshDonationStatusCommand(request.RequestUser, donation.Identifier),
