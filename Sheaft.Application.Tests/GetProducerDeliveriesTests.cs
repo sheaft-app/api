@@ -8,6 +8,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Options;
 using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Application.Models;
 using Sheaft.Core;
@@ -16,6 +17,7 @@ using Sheaft.Domain.Enum;
 using Sheaft.GraphQL.Agreements;
 using Sheaft.GraphQL.DeliveryModes;
 using Sheaft.Infrastructure.Persistence;
+using Sheaft.Options;
 
 namespace Queries.Delivery.Tests
 {
@@ -25,13 +27,20 @@ namespace Queries.Delivery.Tests
         private QueryDbContext _context;
         private DeliveryModeQueries _queries;
         private Mock<ITableService> _capingMock;
+        private Mock<ICurrentUserService> _currentUserService;
+        private Mock<IOptionsSnapshot<RoleOptions>> _roleOptions;
 
         [TestInitialize]
         public void Initialize()
         {
             _capingMock = new Mock<ITableService>();
             _context = ContextHelper.GetInMemoryContext();
-            _queries = new DeliveryModeQueries(Mock.Of<ICurrentUserService>(), Mock.Of<IHttpContextAccessor>(), _capingMock.Object, null);
+            _currentUserService = new Mock<ICurrentUserService>();
+            _roleOptions = new Mock<IOptionsSnapshot<RoleOptions>>();
+
+            _roleOptions.Setup(c => c.Value).Returns(new RoleOptions(){Store = new RoleDefinition(){Value = "STORE"}});
+            
+            _queries = new DeliveryModeQueries(_currentUserService.Object, Mock.Of<IHttpContextAccessor>(), _capingMock.Object, _roleOptions.Object);
         }
 
         [TestMethod]
@@ -41,6 +50,8 @@ namespace Queries.Delivery.Tests
         public async Task Should_Return_No_Deliveries(string producerId, bool available, DeliveryKind kind)
         {
             var token = CancellationToken.None;
+            
+            _currentUserService.Setup(c => c.GetCurrentUserInfo()).Returns(Result<RequestUser>.Success(new RequestUser()));
 
             await _context.AddAsync(new DeliveryMode(
                 Guid.NewGuid(),
@@ -78,6 +89,8 @@ namespace Queries.Delivery.Tests
             var token = CancellationToken.None;
             var currentDate = new DateTime(year, month, day, hour, minute, second);
             var producerId = Guid.NewGuid();
+            
+            _currentUserService.Setup(c => c.GetCurrentUserInfo()).Returns(Result<RequestUser>.Success(new RequestUser()));
 
             var delivery = new DeliveryMode(
                 Guid.NewGuid(),
@@ -97,9 +110,9 @@ namespace Queries.Delivery.Tests
             var results = await _queries.GetNextDeliveries(
                 new List<Guid> { producerId },
                 new List<DeliveryKind> { DeliveryKind.Farm },
-                // currentDate,
                 _context,
-                token);
+                token,
+                currentDate);
 
             //assert
             var deliveryHoursResults = results
@@ -113,16 +126,18 @@ namespace Queries.Delivery.Tests
         }
 
         [TestMethod]
-        [DataRow(0, 2020, 1, 1, 7, 59, 59, 1, 8, 4, 11)]
-        [DataRow(0, 2020, 1, 1, 8, 0, 0, 8, 15, 4, 11)]
-        [DataRow(24, 2019, 12, 31, 8, 0, 0, 8, 15, 4, 11)]
-        [DataRow(24, 2019, 12, 31, 7, 0, 0, 1, 8, 4, 11)]
-        [DataRow(0, 2020, 1, 8, 8, 0, 0, 15, 22, 11, 18)]
+        [DataRow(0, 2020, 1, 1, 7, 59, 59, 1, 4, 8, 11)]
+        [DataRow(0, 2020, 1, 1, 8, 0, 0, 4, 8, 11, 15)]
+        [DataRow(24, 2019, 12, 31, 8, 0, 0, 4, 8, 11, 15)]
+        [DataRow(24, 2019, 12, 31, 7, 0, 0, 1, 4, 8, 11)]
+        [DataRow(0, 2020, 1, 8, 8, 0, 0, 11, 15, 18, 22)]
         public async Task Should_Return_Multiple_Days_DeliveryHours(int orderLockInHours, int year, int month, int day, int hour, int minute, int second, int expectedFirstDay, int expectedSecondDay, int expectedThirdDay, int expectedLastDay)
         {
             var token = CancellationToken.None;
             var currentDate = new DateTime(year, month, day, hour, minute, second);
             var producerId = Guid.NewGuid();
+
+            _currentUserService.Setup(c => c.GetCurrentUserInfo()).Returns(Result<RequestUser>.Success(new RequestUser()));
 
             var entity = new DeliveryMode(
                             Guid.NewGuid(),
@@ -144,9 +159,9 @@ namespace Queries.Delivery.Tests
             var results = await _queries.GetNextDeliveries(
                 new List<Guid> { producerId },
                 new List<DeliveryKind> { DeliveryKind.Farm },
-                // currentDate,
                 _context,
-                token);
+                token,
+                currentDate);
 
             //assert
             var deliveryHoursResults = results
@@ -173,10 +188,17 @@ namespace Queries.Delivery.Tests
             var currentDate = new DateTime(year, month, day, hour, minute, second);
             var producerId = Guid.NewGuid();
 
+            _currentUserService.Setup(c => c.GetCurrentUserInfo()).Returns(Result<RequestUser>.Success(new RequestUser()));
+
+            var producer = new Producer(producerId, "prod1", "fa", "la", "test@email.com",
+                new UserAddress("x", null, "x", "x", CountryIsoCode.FR, null));
+
+            await _context.AddAsync(producer, token);
+            
             var entity1 = new DeliveryMode(
                 Guid.NewGuid(),
                 DeliveryKind.Farm,
-                new Producer(producerId, "prod1", "fa", "la", "test@email.com", new UserAddress("x", null, "x", "x", CountryIsoCode.FR, null)),
+                producer,
                 true,
                 new DeliveryAddress("x", null, "x", "x", CountryIsoCode.FR, null, null),
                 new List<DeliveryHours> { new DeliveryHours(DayOfWeek.Wednesday, TimeSpan.FromHours(8), TimeSpan.FromHours(12)) },
@@ -188,7 +210,7 @@ namespace Queries.Delivery.Tests
             var entity2 = new DeliveryMode(
                 Guid.NewGuid(),
                 DeliveryKind.Market,
-                new Producer(producerId, "prod1", "fa", "la", "test@email.com", new UserAddress("x", null, "x", "x", CountryIsoCode.FR, null)),
+                producer,
                 true,
                 new DeliveryAddress("x", null, "x", "x", CountryIsoCode.FR, null, null),
                 new List<DeliveryHours> { new DeliveryHours(DayOfWeek.Friday, TimeSpan.FromHours(16), TimeSpan.FromHours(18)) },
@@ -203,9 +225,9 @@ namespace Queries.Delivery.Tests
             var results = await _queries.GetNextDeliveries(
                 new List<Guid> { producerId },
                 new List<DeliveryKind> { DeliveryKind.Farm, DeliveryKind.Market },
-                // currentDate,
                 _context,
-                token);
+                token,
+                currentDate);
 
             //assert
             var deliveriesResults = results
@@ -229,6 +251,8 @@ namespace Queries.Delivery.Tests
         [DataRow(5, 3, 2021, 1, 1, 8, 12)]
         public async Task Should_Return_Deliveries_With_Capings(int maxPurchaseOrders, int currentOrders, int year, int month, int day, int from, int to)
         {
+            _currentUserService.Setup(c => c.GetCurrentUserInfo()).Returns(Result<RequestUser>.Success(new RequestUser()));
+            
             var deliveryId = Guid.NewGuid();
             var producerId = Guid.NewGuid();
             var expectedDeliveryDate = new DateTimeOffset(year, month, day, 0, 0, 0, TimeSpan.FromHours(0));
@@ -285,9 +309,9 @@ namespace Queries.Delivery.Tests
             var results = await _queries.GetNextDeliveries(
                 new List<Guid> { producerId },
                 new List<DeliveryKind> { DeliveryKind.Farm },
-                // expectedDeliveryDate.AddDays(-1),
                 _context,
-                token);
+                token,
+                expectedDeliveryDate.AddDays(-1));
 
             //assert
             var deliveriesResults = results
@@ -302,6 +326,8 @@ namespace Queries.Delivery.Tests
         [DataRow(5, 5, 2021, 1, 1, 8, 12)]
         public async Task Should_Return_No_Deliveries_With_Capings(int maxPurchaseOrders, int currentOrders, int year, int month, int day, int from, int to)
         {
+            _currentUserService.Setup(c => c.GetCurrentUserInfo()).Returns(Result<RequestUser>.Success(new RequestUser()));
+
             var deliveryId = Guid.NewGuid();
             var producerId = Guid.NewGuid();
             var expectedDeliveryDate = new DateTimeOffset(year, month, day, 0, 0, 0, TimeSpan.FromHours(0));
@@ -358,9 +384,9 @@ namespace Queries.Delivery.Tests
             var results = await _queries.GetNextDeliveries(
                 new List<Guid> { producerId },
                 new List<DeliveryKind> { DeliveryKind.Farm },
-                // expectedDeliveryDate.AddDays(-1),
                 _context,
-                token);
+                token,
+                expectedDeliveryDate.AddDays(-1));
 
             //assert
             var deliveriesResults = results

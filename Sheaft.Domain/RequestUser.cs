@@ -17,12 +17,12 @@ namespace Sheaft.Domain
         }
 
         public RequestUser(string requestId, Impersonification impersonification = null) : this(Guid.Empty, "Anonymous",
-            null, null, requestId, impersonification)
+            null, new List<string>{"ANONYMOUS"}, requestId, impersonification)
         {
         }
 
         public RequestUser(string name, string requestId, Impersonification impersonification = null) : this(Guid.Empty,
-            name, null, null, requestId, impersonification)
+            name, null, new List<string>{"ANONYMOUS"}, requestId, impersonification)
         {
         }
 
