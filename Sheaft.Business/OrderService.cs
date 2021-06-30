@@ -40,13 +40,13 @@ namespace Sheaft.Business
                 return Failure("Ce panier a déjà été validé.");
 
             if (order.User == null)
-                return Failure("Impossible de payer ce panier, l'utilisateur est requis.");
+                return Failure("Impossible de valider ce panier, il doit être rattaché à un compte.");
 
             if (order.UserId != requestUser.Id)
-                return Failure("Vous n'avez pas l'authorisation d'accéder à ce panier.");
+                return Failure("Vous n'avez pas l'autorisation d'accéder à ce panier.");
 
             if (!order.Deliveries.Any())
-                return Failure("Le panier requiert la selection d'un créneau de récupération.");
+                return Failure("Le panier requiert la sélection d'un créneau de récupération.");
 
             Result result = null;
             foreach (var delivery in order.Deliveries)
@@ -54,7 +54,7 @@ namespace Sheaft.Business
                 if (delivery.DeliveryMode.Closings.Any(c =>
                     DateTimeOffset.Now >= c.ClosedFrom && DateTimeOffset.UtcNow <= c.ClosedTo))
                 {
-                    result = Failure($"Le créneau {delivery.DeliveryMode.Name} est fermé à la date selectionnée.");
+                    result = Failure($"Le créneau {delivery.DeliveryMode.Name} du producteur {delivery.DeliveryMode.Producer.Name} est fermé à la date sélectionnée.");
                     break;
                 }
             }
@@ -90,7 +90,7 @@ namespace Sheaft.Business
                     c => DateTimeOffset.Now >= c.ClosedFrom && DateTimeOffset.UtcNow <= c.ClosedTo))
                 {
                     result = Failure<List<Tuple<Domain.DeliveryMode, DateTimeOffset, string>>>(
-                        $"Le créneau {delivery.Name} est fermé à la date selectionnée.");
+                        $"Le créneau {delivery.Name} du producteur {delivery.Producer.Name} est fermé à la date sélectionnée.");
 
                     break;
                 }
@@ -101,7 +101,7 @@ namespace Sheaft.Business
                     cartDelivery.ExpectedDeliveryDate <= c.ClosedTo))
                 {
                     result = Failure<List<Tuple<Domain.DeliveryMode, DateTimeOffset, string>>>(
-                        $"Le créneau {delivery.Name} est fermé à la date selectionnée.");
+                        $"Le créneau {delivery.Name} du producteur {delivery.Producer.Name} est fermé à la date sélectionnée.");
 
                     break;
                 }
@@ -146,7 +146,7 @@ namespace Sheaft.Business
                     !p.RemovedOn.HasValue && p.Kind == CatalogKind.Consumers && p.IsDefault && p.Available);
                 if (catalog == null)
                 {
-                    result = Failure<List<Tuple<Domain.Product, Guid, int>>>($"Le produit n'est pas disponible à la vente pour les particuliers.");
+                    result = Failure<List<Tuple<Domain.Product, Guid, int>>>($"Le produit {product.Name} n'est plus disponible à la vente.");
                     break;
                 }
 

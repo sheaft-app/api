@@ -105,7 +105,7 @@ namespace Sheaft.Domain
             SetQuantity(quantity);
         }
 
-        private void SetQuantity(int quantity)
+        protected virtual void SetQuantity(int quantity)
         {
             Quantity = quantity;
             RefreshLine();
@@ -116,7 +116,7 @@ namespace Sheaft.Domain
         public DateTimeOffset? UpdatedOn { get; private set; }
         public string Name { get; private set; }
         public string Reference { get; private set; }
-        public int Quantity { get; private set; }
+        public int Quantity { get; protected set; }
         public decimal Vat { get; private set; }
         public decimal UnitWholeSalePrice { get; private set; }
         public decimal UnitVatPrice { get; private set; }
