@@ -67,7 +67,8 @@ namespace Sheaft.Mediatr.Delivery.Commands
             {
                 var returnedProductIds = request.ReturnedProducts
                     .Where(r => r.Quantity > 0)
-                    .Select(p => p.ProductId);
+                    .Select(p => p.ProductId)
+                    .Distinct();
                 
                 var products = delivery.Products
                     .Where(p => returnedProductIds.Contains(p.ProductId) && p.RowKind == ModificationKind.ToDeliver)
@@ -90,7 +91,8 @@ namespace Sheaft.Mediatr.Delivery.Commands
             {
                 var returnableIds = request.ReturnedReturnables
                     .Where(r => r.Quantity > 0)
-                    .Select(r => r.ReturnableId);
+                    .Select(r => r.ReturnableId)
+                    .Distinct();
                 
                 var returnables = await _context.Returnables
                     .Where(r => returnableIds.Contains(r.Id))
