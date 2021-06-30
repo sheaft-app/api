@@ -65,15 +65,20 @@ namespace Sheaft.Mediatr.Delivery.Commands
             var returnedProducts = new List<Tuple<DeliveryProduct, int, ModificationKind>>();
             if (request.ReturnedProducts != null)
             {
-                var returnedProductIds = request.ReturnedProducts.Select(p => p.ProductId);
-                var products = delivery.Products.Where(p =>
-                        returnedProductIds.Contains(p.ProductId) && p.RowKind == ModificationKind.ToDeliver)
+                var returnedProductIds = request.ReturnedProducts
+                    .Where(r => r.Quantity > 0)
+                    .Select(p => p.ProductId);
+                
+                var products = delivery.Products
+                    .Where(p => returnedProductIds.Contains(p.ProductId) && p.RowKind == ModificationKind.ToDeliver)
                     .ToList();
 
                 if (products.Count() != returnedProductIds.Count())
-                    return Failure("Certains produits retournés ne font pas partit de la livraison.");
+                    return Failure("Certains produits retournés ne font pas partie de la livraison.");
 
-                returnedProducts = request.ReturnedProducts.Select(p =>
+                returnedProducts = request.ReturnedProducts
+                    .Where(r => r.Quantity > 0)
+                    .Select(p =>
                 {
                     var product = products.Single(pr => pr.ProductId == p.ProductId);
                     return new Tuple<DeliveryProduct, int, ModificationKind>(product, p.Quantity, p.Kind);
@@ -83,7 +88,10 @@ namespace Sheaft.Mediatr.Delivery.Commands
             var returnedReturnables = new List<KeyValuePair<Domain.Returnable, int>>();
             if (request.ReturnedReturnables != null)
             {
-                var returnableIds = request.ReturnedReturnables.Select(r => r.ReturnableId);
+                var returnableIds = request.ReturnedReturnables
+                    .Where(r => r.Quantity > 0)
+                    .Select(r => r.ReturnableId);
+                
                 var returnables = await _context.Returnables
                     .Where(r => returnableIds.Contains(r.Id))
                     .ToListAsync(token);
