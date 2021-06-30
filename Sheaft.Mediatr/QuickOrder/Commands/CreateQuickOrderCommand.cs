@@ -79,9 +79,12 @@ namespace Sheaft.Mediatr.QuickOrder.Commands
                         .FirstOrDefault(cp => cp.Product.Id == productId);
 
                 if (catalogProduct != null)
+                {
                     catalogProducts.Add(catalogProduct, quantity);
-                
-                result = Failure<Guid>(MessageKind.NotFound);
+                    continue;
+                }
+
+                result = Failure<Guid>("Le produit n'est pas disponible dans vos partenariats.");
                 break;
             }
 

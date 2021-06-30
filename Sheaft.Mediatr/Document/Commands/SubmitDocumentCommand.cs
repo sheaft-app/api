@@ -55,7 +55,7 @@ namespace Sheaft.Mediatr.Document.Commands
                 .SingleOrDefaultAsync(r => r.Documents.Any(d => d.Id == request.DocumentId), token);
             var document = legal.Documents.FirstOrDefault(c => c.Id == request.DocumentId);
             if (document.Status != DocumentStatus.Locked)
-                return Failure(MessageKind.Document_CannotSubmit_NotLocked);
+                return Failure("Impossible d'envoyer le document, il doit être vérouillé avant l'envoi.");
 
             var results = new List<Result>();
             foreach (var page in document.Pages.Where(p => !p.UploadedOn.HasValue))

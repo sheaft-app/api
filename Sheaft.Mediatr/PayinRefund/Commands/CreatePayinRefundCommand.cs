@@ -55,7 +55,7 @@ namespace Sheaft.Mediatr.PayinRefund.Commands
             if (purchaseOrder.Status != PurchaseOrderStatus.Cancelled &&
                 purchaseOrder.Status != PurchaseOrderStatus.Withdrawned &&
                 purchaseOrder.Status != PurchaseOrderStatus.Refused)
-                return Failure<Guid>(MessageKind.PayinRefund_CannotCreate_Payin_PurchaseOrder_Invalid_Status);
+                return Failure<Guid>("Impossible de créer un remboursement pour le paiement, la commande n'est pas dans un état valide");
 
             var orderPayins = await _context.Payins
                 .Where(p => p.Order.PurchaseOrders.Any(po => po.Id == purchaseOrder.Id))
@@ -63,17 +63,15 @@ namespace Sheaft.Mediatr.PayinRefund.Commands
 
             var payin = orderPayins.FirstOrDefault(p => p.Status == TransactionStatus.Succeeded);
             if (payin == null)
-                return Failure<Guid>(MessageKind.NotFound);
+                return Failure<Guid>("Le paiement validé est introuvable.");
 
             if (payin.Refunds != null && payin.Refunds.Any(c =>
                 c.PurchaseOrderId == purchaseOrder.Id && c.Status == TransactionStatus.Succeeded))
-                return Failure<Guid>(MessageKind
-                    .PayinRefund_CannotCreate_PurchaseOrderRefund_PayinRefund_AlreadyProcessed);
+                return Failure<Guid>("Impossible de créer un remboursement pour la commande, un remboursement a déjà été validé.");
 
             if (payin.Refunds != null && payin.Refunds.Any(c =>
                 c.PurchaseOrderId == purchaseOrder.Id && c.Status != TransactionStatus.Failed))
-                return Failure<Guid>(
-                    MessageKind.PayinRefund_CannotCreate_PurchaseOrderRefund_Pending_PayinRefund);
+                return Failure<Guid>("Impossible de créer un remboursement pour la commande, un remboursement est déjà en attente.");
 
             using (var transaction = await _context.BeginTransactionAsync(token))
             {

@@ -30,7 +30,7 @@ namespace Sheaft.Business.ProductsImporters
             
             var worksheet = package.Workbook.Worksheets.FirstOrDefault();
             if (worksheet == null)
-                return Task.FromResult(Failure<IEnumerable<ImportedProductDto>>(new ValidationException(MessageKind.ImportProduct_Missing_Tab)));
+                return Task.FromResult(Failure<IEnumerable<ImportedProductDto>>("Le fichier ne contient pas d'onglets."));
 
             var productsToImport = new List<ImportedProductDto>();
             for (var i = 2; i <= worksheet.Dimension.Rows; i++)
@@ -49,8 +49,7 @@ namespace Sheaft.Business.ProductsImporters
         {
             var nameStr = worksheet.Cells[i, 2].GetValue<string>();
             if (string.IsNullOrWhiteSpace(nameStr))
-                return Failure<ImportedProductDto>(
-                    new ValidationException(MessageKind.CreateProduct_Name_Required_Line, i));
+                return Failure<ImportedProductDto>($"Le produit à la ligne {i} requiert un nom.");
 
             var createProductCommand = new ImportedProductDto
             {
@@ -75,15 +74,13 @@ namespace Sheaft.Business.ProductsImporters
 
             if (!decimal.TryParse(wholeSalePriceStr, NumberStyles.Any, new CultureInfo("en-US"),
                 out decimal wholeSalePrice))
-                return Failure<ImportedProductDto>(
-                    new ValidationException(MessageKind.CreateProduct_WholeSalePrice_Invalid_Line, i));
+                return Failure<ImportedProductDto>($"Le produit à la ligne {i} possède un prix invalide.");
             else
                 createProductCommand.WholeSalePricePerUnit = wholeSalePrice;
 
             if (!decimal.TryParse(vatStr, NumberStyles.Any, new CultureInfo("en-US"), out decimal vat) ||
                 (vat != 5.5m && vat != 10m && vat != 20m))
-                return Failure<ImportedProductDto>(new ValidationException(MessageKind.CreateProduct_Vat_Invalid_Line,
-                    i));
+                return Failure<ImportedProductDto>($"Le produit à la ligne {i} possède une TVA invalide.");
             else
                 createProductCommand.Vat = vat;
 
@@ -92,8 +89,7 @@ namespace Sheaft.Business.ProductsImporters
 
             if (!decimal.TryParse(quantityPerUnitStr, NumberStyles.Any, new CultureInfo("en-US"),
                 out decimal qtyPerUnit))
-                return Failure<ImportedProductDto>(
-                    new ValidationException(MessageKind.CreateProduct_QtyPerUnit_Invalid_Line, i));
+                return Failure<ImportedProductDto>($"Le produit à la ligne {i} possède une quantité invalide.");
             else
                 createProductCommand.QuantityPerUnit = qtyPerUnit;
 
@@ -125,7 +121,7 @@ namespace Sheaft.Business.ProductsImporters
             if (createProductCommand.Conditioning == ConditioningKind.Bulk)
             {
                 if (!Enum.TryParse(unitKindStr, true, out UnitKind unitKind))
-                    return Failure<ImportedProductDto>(new ValidationException(MessageKind.CreateProduct_UnitKind_Invalid_Line, i));
+                    return Failure<ImportedProductDto>($"Le produit à la ligne {i} possède type d'unité invalide.");
                 
                 createProductCommand.Unit = unitKind;
             }

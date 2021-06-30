@@ -20,7 +20,7 @@ namespace Sheaft.Domain
             Method = method;
             User = user;
             UserId = user.Id;
-            Content = content ?? throw new ValidationException(MessageKind.Notification_Require_Content);
+            Content = content ?? throw SheaftException.Validation("Le contenu de la notification est requis.");
             Unread = true;
         }
 

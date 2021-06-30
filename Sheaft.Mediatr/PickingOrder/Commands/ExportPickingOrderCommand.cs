@@ -92,7 +92,7 @@ namespace Sheaft.Mediatr.PickingOrder.Commands
                 job.FailJob(e.Message, new PickingOrderExportFailedEvent(job.Id));
                 await _context.SaveChangesAsync(token);
                 
-                return Failure(MessageKind.JobFailure);
+                return Failure("Une erreur est survenue pendant le traitement de la tâche.");
             }
         }
     }

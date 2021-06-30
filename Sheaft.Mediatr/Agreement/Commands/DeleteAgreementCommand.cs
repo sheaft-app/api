@@ -54,10 +54,10 @@ namespace Sheaft.Mediatr.Agreement.Commands
             var entity = await _context.Agreements.SingleAsync(e => e.Id == request.AgreementId, token);
             if (request.RequestUser.IsInRole(_roleOptions.Producer.Value) &&
                 entity.ProducerId != request.RequestUser.Id)
-                return Failure(MessageKind.Forbidden);
+                return Failure("Vous n'êtes pas authorisé à accéder à cette ressource.");
 
             if (request.RequestUser.IsInRole(_roleOptions.Store.Value) && entity.StoreId != request.RequestUser.Id)
-                return Failure(MessageKind.Forbidden);
+                return Failure("Vous n'êtes pas authorisé à accéder à cette ressource.");
 
             _context.Remove(entity);
 
@@ -70,7 +70,7 @@ namespace Sheaft.Mediatr.Agreement.Commands
             {
                 var products = quickOrder.Products.Where(p => p.CatalogProduct.CatalogId == entity.CatalogId).ToList();
                 foreach (var product in products)
-                    quickOrder.RemoveProduct(product);
+                    quickOrder.RemoveProduct(product.CatalogProduct.ProductId);
             }
 
             await _context.SaveChangesAsync(token);

@@ -30,8 +30,8 @@ namespace Sheaft.Mediatr.Order.Commands
     {
         protected CreateBusinessOrderCommand()
         {
-            
         }
+
         [JsonConstructor]
         public CreateBusinessOrderCommand(RequestUser requestUser) : base(requestUser)
         {
@@ -72,6 +72,10 @@ namespace Sheaft.Mediatr.Order.Commands
 
         public async Task<Result<IEnumerable<Guid>>> Handle(CreateBusinessOrderCommand request, CancellationToken token)
         {
+            var user = await _context.Users.SingleAsync(e => e.Id == request.UserId, token);
+            if (user.Id != request.RequestUser.Id)
+                return Failure<IEnumerable<Guid>>("Vous n'êtes pas autorisé à accéder à cette ressource.");
+            
             using (var transaction = await _context.BeginTransactionAsync(token))
             {
                 var productIds = request.Products.Select(p => p.Id);
@@ -91,13 +95,14 @@ namespace Sheaft.Mediatr.Order.Commands
                     .ToList();
 
                 if (invalidProductIds.Any())
-                    return Failure<IEnumerable<Guid>>(MessageKind.Order_CannotCreate_Some_Products_NotAvailable,
-                        string.Join(";", invalidProductIds));
+                    return Failure<IEnumerable<Guid>>(
+                        $"Certains produits ne sont pas disponible : {string.Join(";", invalidProductIds)}");
 
                 var cartProducts = new List<Tuple<Domain.Product, Guid, int>>();
                 var deliveryIds = request.ProducersExpectedDeliveries.Select(p => p.DeliveryModeId);
                 var agreements = await _context.Agreements
-                    .Where(a => a.StoreId == request.UserId && a.DeliveryModeId.HasValue && deliveryIds.Contains(a.DeliveryModeId.Value) && a.Status == AgreementStatus.Accepted)
+                    .Where(a => a.StoreId == request.UserId && a.DeliveryModeId.HasValue &&
+                                deliveryIds.Contains(a.DeliveryModeId.Value) && a.Status == AgreementStatus.Accepted)
                     .ToListAsync(token);
 
                 Result<IEnumerable<Guid>> catalogResult = null;
@@ -106,7 +111,7 @@ namespace Sheaft.Mediatr.Order.Commands
                     var agreement = agreements.SingleOrDefault(a => a.ProducerId == product.ProducerId);
                     if (agreement?.CatalogId == null)
                     {
-                        catalogResult = Failure<IEnumerable<Guid>>(MessageKind.NotFound);
+                        catalogResult = Failure<IEnumerable<Guid>>("Ce produit n'est pas disponible dans votre partenariat.");
                         break;
                     }
 
@@ -121,8 +126,7 @@ namespace Sheaft.Mediatr.Order.Commands
                     return catalogResult;
 
                 if (invalidProductIds.Any())
-                    return Failure<IEnumerable<Guid>>(MessageKind.Order_CannotCreate_Some_Products_NotAvailable,
-                        string.Join(";", invalidProductIds));
+                    return Failure<IEnumerable<Guid>>($"Certains produits ne sont pas disponible : {string.Join(";", invalidProductIds)}");
 
                 var deliveries = deliveryIds.Any()
                     ? await _context.DeliveryModes.Where(d => deliveryIds.Contains(d.Id)).ToListAsync(token)
@@ -138,9 +142,7 @@ namespace Sheaft.Mediatr.Order.Commands
                         cartDelivery.ExpectedDeliveryDate >= c.ClosedFrom &&
                         cartDelivery.ExpectedDeliveryDate <= c.ClosedTo))
                     {
-                        deliveryResult = Failure<IEnumerable<Guid>>(MessageKind.Order_CannotCreate_Delivery_Closed,
-                            delivery.Name,
-                            delivery.Producer.Name);
+                        deliveryResult = Failure<IEnumerable<Guid>>($"Le créneau {delivery.Name} du producteur {delivery.Producer.Name} est fermé à la date selectionnée");
                         break;
                     }
 
@@ -148,8 +150,7 @@ namespace Sheaft.Mediatr.Order.Commands
                         cartDelivery.ExpectedDeliveryDate >= c.ClosedFrom &&
                         cartDelivery.ExpectedDeliveryDate <= c.ClosedTo))
                     {
-                        deliveryResult = Failure<IEnumerable<Guid>>(MessageKind.Order_CannotCreate_Producer_Closed,
-                            delivery.Producer.Name);
+                        deliveryResult = Failure<IEnumerable<Guid>>($"Le producteur {delivery.Producer.Name} est fermé à la date selectionnée");
                         break;
                     }
 
@@ -161,11 +162,7 @@ namespace Sheaft.Mediatr.Order.Commands
                     return deliveryResult;
 
                 if (!cartDeliveries.Any())
-                    return Failure<IEnumerable<Guid>>(MessageKind.Order_CannotCreate_Deliveries_Required);
-
-                var user = await _context.Users.SingleAsync(e => e.Id == request.UserId, token);
-                if (user.Id != request.RequestUser.Id)
-                    return Failure<IEnumerable<Guid>>(MessageKind.Forbidden);
+                    return Failure<IEnumerable<Guid>>("Les crénaux de livraisons doivent être selectionnés.");
 
                 var order = new Domain.Order(Guid.NewGuid(), DonationKind.None, cartProducts,
                     _pspOptions.FixedAmount, _pspOptions.Percent, _pspOptions.VatPercent, user);

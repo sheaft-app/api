@@ -26,7 +26,8 @@ namespace Sheaft.Business
             _tableService = tableService;
         }
 
-        public async Task<Result<bool>> ValidateCapedDeliveriesAsync(ICollection<OrderDelivery> orderDeliveries, CancellationToken token)
+        public async Task<Result<bool>> ValidateCapedDeliveriesAsync(ICollection<OrderDelivery> orderDeliveries,
+            CancellationToken token)
         {
             if (orderDeliveries.All(d => !d.DeliveryMode.MaxPurchaseOrdersPerTimeSlot.HasValue))
                 return Success(true);
@@ -52,23 +53,22 @@ namespace Sheaft.Business
             foreach (var orderDelivery in orderDeliveries)
             {
                 var delivery = results.Data.FirstOrDefault(d => d.DeliveryId == orderDelivery.DeliveryModeId
-                                                                && d.ExpectedDate.Year == orderDelivery.ExpectedDeliveryDate.Year
+                                                                && d.ExpectedDate.Year ==
+                                                                orderDelivery.ExpectedDeliveryDate.Year
                                                                 && d.ExpectedDate.Month ==
                                                                 orderDelivery.ExpectedDeliveryDate
                                                                     .Month
-                                                                && d.ExpectedDate.Day == orderDelivery.ExpectedDeliveryDate.Day
+                                                                && d.ExpectedDate.Day ==
+                                                                orderDelivery.ExpectedDeliveryDate.Day
                                                                 && d.From == orderDelivery.From
                                                                 && d.To == orderDelivery.To);
 
                 if (delivery == null || delivery.Count < orderDelivery.DeliveryMode.MaxPurchaseOrdersPerTimeSlot)
                     continue;
 
-                result = Failure<bool>(new ValidationException(
-                    MessageKind.Order_CannotPay_Delivery_Max_PurchaseOrders_Reached,
-                    orderDelivery.DeliveryMode.Producer.Name,
-                    $"le {orderDelivery.ExpectedDeliveryDate:dd/MM/yyyy} entre {orderDelivery.From:hh\\hmm} et {orderDelivery.To:hh\\hmm}",
-                    orderDelivery.DeliveryMode.MaxPurchaseOrdersPerTimeSlot));
-                
+                result = Failure<bool>(
+                    $"Le nombre maximum de {orderDelivery.DeliveryMode.MaxPurchaseOrdersPerTimeSlot} commandes a été atteins pour le producteur {orderDelivery.DeliveryMode.Producer.Name} pour la date du {orderDelivery.ExpectedDeliveryDate:dd/MM/yyyy} entre {orderDelivery.From:hh\\hmm} et {orderDelivery.To:hh\\hmm}");
+
                 break;
             }
 

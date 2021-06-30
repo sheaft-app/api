@@ -53,7 +53,7 @@ namespace Sheaft.Mediatr.Delivery.Commands
             var delivery = await _context.Deliveries
                 .SingleOrDefaultAsync(c => c.Id == request.DeliveryId, token);
             if (delivery == null)
-                return Failure(MessageKind.NotFound);
+                return Failure("La livraison est introuvable.");
 
             delivery.SkipDelivery();
             await _context.SaveChangesAsync(token);

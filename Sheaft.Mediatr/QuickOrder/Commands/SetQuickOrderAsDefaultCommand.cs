@@ -55,7 +55,7 @@ namespace Sheaft.Mediatr.QuickOrder.Commands
             var quickOrders = await _context.QuickOrders.Where(c => c.UserId == request.UserId).ToListAsync(token);
             var entity = quickOrders.FirstOrDefault(qo => qo.Id == request.QuickOrderId);
             if (entity == null)
-                return Failure(MessageKind.NotFound);
+                return Failure("La commande rapide est introuvable.");
             
             entity.SetAsDefault();
 

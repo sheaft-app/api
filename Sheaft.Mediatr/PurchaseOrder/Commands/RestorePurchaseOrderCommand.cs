@@ -46,7 +46,7 @@ namespace Sheaft.Mediatr.PurchaseOrder.Commands
                 await _context.PurchaseOrders.SingleOrDefaultAsync(a => a.Id == request.PurchaseOrderId && a.RemovedOn.HasValue,
                     token);
             if(purchaseOrder.ProducerId != request.RequestUser.Id && purchaseOrder.ClientId != request.RequestUser.Id)
-                throw SheaftException.Forbidden();
+                return Failure("Vous n'êtes pas autorisé à accéder à cette ressource.");
 
             _context.Restore(purchaseOrder);
             await _context.SaveChangesAsync(token);

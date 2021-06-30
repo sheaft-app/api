@@ -22,7 +22,7 @@ namespace Sheaft.Domain
             decimal quantityPerUnit, Producer producer)
         {
             Id = id;
-            Producer = producer ?? throw new ValidationException(MessageKind.Product_Producer_Required);
+            Producer = producer ?? throw SheaftException.Validation("Le producteur du produit est requis.");
             ProducerId = producer.Id;
 
             SetName(name);
@@ -73,7 +73,7 @@ namespace Sheaft.Domain
         public void SetReference(string reference)
         {
             if (string.IsNullOrWhiteSpace(reference))
-                throw new ValidationException(MessageKind.Product_Reference_Required);
+                throw SheaftException.Validation("La référence est requise.");
 
             Reference = reference;
         }
@@ -81,7 +81,7 @@ namespace Sheaft.Domain
         public void SetName(string name)
         {
             if (string.IsNullOrWhiteSpace(name))
-                throw new ValidationException(MessageKind.Product_Name_Required);
+                throw SheaftException.Validation("Le nom est requis.");
 
             Name = name;
         }
@@ -108,7 +108,7 @@ namespace Sheaft.Domain
                 return;
 
             if (newWeight <= 0)
-                throw new ValidationException(MessageKind.Product_Weight_CannotBe_LowerOrEqualThan, 0);
+                throw SheaftException.Validation("Le poids ne peut être inférieur à 0.");
 
             Weight = Math.Round(newWeight.Value, DIGITS_COUNT);
         }
@@ -119,13 +119,13 @@ namespace Sheaft.Domain
                 newVat = 0;
 
             if (!newVat.HasValue)
-                throw new ValidationException(MessageKind.Product_Vat_Required);
+                throw SheaftException.Validation("La TVA est requise.");
 
             if (newVat < 0)
-                throw new ValidationException(MessageKind.Product_Vat_CannotBe_LowerThan, 0);
+                throw SheaftException.Validation("La TVA ne peut être inférieure à 0%.");
 
             if (newVat > 100)
-                throw new ValidationException(MessageKind.Product_Vat_CannotBe_GreaterThan, 100);
+                throw SheaftException.Validation("La TVA ne peut être supérieure à 100%.");
 
             Vat = newVat.Value;
             RefreshPrices();
@@ -137,7 +137,7 @@ namespace Sheaft.Domain
                 return;
 
             if (!string.IsNullOrWhiteSpace(newDescription) && newDescription.Length > DESCRIPTION_MAXLENGTH)
-                throw new ValidationException(MessageKind.Product_Description_TooLong, DESCRIPTION_MAXLENGTH);
+                throw SheaftException.Validation($"La description ne peut pas dépasser {DESCRIPTION_MAXLENGTH} caractères.");
 
             Description = newDescription;
         }
@@ -148,7 +148,7 @@ namespace Sheaft.Domain
                 Ratings = new List<Rating>();
 
             if (Ratings.Any(r => r.UserId == user.Id))
-                throw new ValidationException(MessageKind.Product_CannotRate_AlreadyRated);
+                throw SheaftException.Validation("Vous avez déjà noté ce produit.");
 
             Ratings.Add(new Rating(Guid.NewGuid(), value, user, comment));
             RefreshRatings();
@@ -164,7 +164,7 @@ namespace Sheaft.Domain
             UnitKind unit = UnitKind.NotSpecified)
         {
             if (conditioning == ConditioningKind.Not_Specified)
-                throw new ValidationException(MessageKind.Product_Conditioning_Required);
+                throw SheaftException.Validation("Le conditionnement est requis.");
 
             if (conditioning != ConditioningKind.Bulk)
                 unit = UnitKind.NotSpecified;
@@ -173,10 +173,10 @@ namespace Sheaft.Domain
                 quantity = 1;
 
             if (quantity <= 0)
-                throw new ValidationException(MessageKind.Product_QuantityPerUnit_CannotBe_LowerOrEqualThan, 0);
+                throw SheaftException.Validation("La quantité par conditionnement ne peut pas être inférieure à 0.");
 
             if (conditioning == ConditioningKind.Bulk && unit == UnitKind.NotSpecified)
-                throw new ValidationException(MessageKind.Product_BulkConditioning_Requires_Unit_ToBe_Specified);
+                throw SheaftException.Validation("L'unité du type de conditionnement est requis.");
 
             Conditioning = conditioning;
             QuantityPerUnit = quantity;
@@ -245,11 +245,11 @@ namespace Sheaft.Domain
         public void RemoveFromCatalog(Guid catalogId)
         {
             if (CatalogsPrices == null || !CatalogsPrices.Any())
-                throw SheaftException.NotFound();
+                throw SheaftException.NotFound("Ce produit appartient à aucun catalogue.");
 
             var existingCatalogPrice = CatalogsPrices.SingleOrDefault(c => c.CatalogId == catalogId);
             if (existingCatalogPrice == null)
-                throw SheaftException.NotFound();
+                throw SheaftException.NotFound("Ce produit n'est pas présent dans le catalogue.");
 
             CatalogsPrices.Remove(existingCatalogPrice);
             CatalogsPricesCount = CatalogsPrices?.Count ?? 0;

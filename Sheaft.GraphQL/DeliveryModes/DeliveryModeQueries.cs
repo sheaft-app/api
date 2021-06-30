@@ -97,7 +97,7 @@ namespace Sheaft.GraphQL.DeliveryModes
         [GraphQLName("nextProducersDeliveries")]
         [GraphQLType(typeof(ListType<ProducerDeliveriesDtoType>))]
         [UseDbContext(typeof(QueryDbContext))]
-        public async Task<IEnumerable<ProducerDeliveriesDto>> GetNextDeliveries([ID(nameof(Producer))]IEnumerable<Guid> ids, IEnumerable<DeliveryKind> kinds, [ScopedService] QueryDbContext context, CancellationToken token)
+        public async Task<IEnumerable<ProducerDeliveriesDto>> GetNextDeliveries([ID(nameof(Producer))]IEnumerable<Guid> ids, IEnumerable<DeliveryKind> kinds, [ScopedService] QueryDbContext context, CancellationToken token, DateTimeOffset? currentDate = null)
         {
             SetLogTransaction();
 
@@ -125,7 +125,7 @@ namespace Sheaft.GraphQL.DeliveryModes
                     .ToListAsync(token);
             }
 
-            return await GetProducersDeliveriesAsync(context, ids, DateTimeOffset.UtcNow, deliveriesModes, token);
+            return await GetProducersDeliveriesAsync(context, ids, currentDate ?? DateTimeOffset.UtcNow, deliveriesModes, token);
         }
 
         private async Task<IEnumerable<ProducerDeliveriesDto>> GetProducersDeliveriesAsync(QueryDbContext context, IEnumerable<Guid> producerIds, DateTimeOffset currentDate,

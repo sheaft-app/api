@@ -55,7 +55,7 @@ namespace Sheaft.Mediatr.Catalog.Commands
 
                 var entity = catalogs.Single(c => c.Id == request.CatalogId);
                 if (!request.IsDefault && entity.Kind == CatalogKind.Consumers)
-                    return Failure(MessageKind.Validation);
+                    return Failure("Impossible de désassigner ce catalogue particulier comme catalogue par défaut.");
 
                 entity.SetIsAvailable(request.IsAvailable);
                 entity.SetName(request.Name);
@@ -74,7 +74,7 @@ namespace Sheaft.Mediatr.Catalog.Commands
                     }
 
                     if (catalogs.Where(c => c.Kind == CatalogKind.Stores).All(c => !c.IsDefault))
-                        return Failure(MessageKind.Validation);
+                        return Failure("Au moins un catalogue professionel doit être défini par défaut.");
                 }
 
                 var existingProductIds = entity.Products.Select(c => c.ProductId).ToList();

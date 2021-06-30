@@ -53,13 +53,13 @@ namespace Sheaft.Mediatr.User.Commands
         {
             var entity = await _context.Users.FirstOrDefaultAsync(c => c.Id == request.UserId, token);
             if (entity == null)
-                return Failure<string>(MessageKind.NotFound);
+                return Failure<string>("L'utilisateur est introuvable.");
 
-            if (!entity.RemovedOn.HasValue)
-                return Success(request.Reason);
-            
             if(entity.Id != request.RequestUser.Id)
-                return Failure<string>(MessageKind.Forbidden);
+                return Failure<string>("Vous n'êtes pas autorisé à accéder à cette ressource.");
+            
+            if (!entity.RemovedOn.HasValue)
+                return Success<string>(request.Reason);
 
             await _blobService.CleanUserStorageAsync(request.UserId, token);
 
@@ -74,7 +74,7 @@ namespace Sheaft.Mediatr.User.Commands
             entity.Close();
             await _context.SaveChangesAsync(token);
 
-            return Success(request.Reason);
+            return Success<string>(request.Reason);
         }
     }
 }

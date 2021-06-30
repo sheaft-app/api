@@ -63,11 +63,12 @@ namespace Sheaft.Mediatr.DeliveryBatch.Commands
             var deliveryBatch = await _context.DeliveryBatches.SingleAsync(d => d.Id == request.DeliveryBatchId, token);
 
             var outputDocument = new PdfDocument();
+            Result<byte[]> blobResult = null;
             foreach (var delivery in deliveryBatch.Deliveries)
             {
-                var blobResult = await _blobService.DownloadDeliveryAsync(delivery.DeliveryFormUrl, token);
+                blobResult = await _blobService.DownloadDeliveryAsync(delivery.DeliveryFormUrl, token);
                 if (!blobResult.Succeeded)
-                    throw SheaftException.BadRequest(blobResult.Exception);
+                    break;
 
                 using (var stream = new MemoryStream(blobResult.Data))
                 {
@@ -80,6 +81,9 @@ namespace Sheaft.Mediatr.DeliveryBatch.Commands
                 }
             }
 
+            if (!blobResult.Succeeded)
+                return Failure(blobResult);
+
             outputDocument.Info.Subject = $"{deliveryBatch.Name} du {deliveryBatch.ScheduledOn:yyyyMMdd}";
 
             using (var stream = new MemoryStream())
@@ -89,7 +93,7 @@ namespace Sheaft.Mediatr.DeliveryBatch.Commands
                     deliveryBatch.Id, $"{deliveryBatch.Name}_{deliveryBatch.ScheduledOn:yyyyMMdd}.pdf", stream.ToArray(), token);
 
                 if (!result.Succeeded)
-                    throw SheaftException.BadRequest(result.Exception);
+                    return Failure(result);
 
                 deliveryBatch.SetDeliveryFormsUrl(result.Data);
                 await _context.SaveChangesAsync(token);

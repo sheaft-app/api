@@ -127,11 +127,11 @@ namespace Sheaft.Domain
         public void RemovePicture(Guid id)
         {
             if (Pictures == null || Pictures.Any())
-                throw SheaftException.NotFound();
+                throw SheaftException.NotFound("Cet utilisateur ne contient aucune images.");
 
             var existingPicture = Pictures.FirstOrDefault(p => p.Id == id);
             if (existingPicture == null)
-                throw SheaftException.NotFound();
+                throw SheaftException.NotFound("L'image est introuvable.");
             
             Pictures.Remove(existingPicture);
             PicturesCount = Pictures?.Count ?? 0;
@@ -140,7 +140,7 @@ namespace Sheaft.Domain
         public void SetFirstname(string firstname)
         {
             if (string.IsNullOrWhiteSpace(firstname))
-                throw new ValidationException(MessageKind.User_Firstname_Required);
+                throw SheaftException.Validation("Le prénom est requis.");
 
             FirstName = firstname;
 
@@ -151,7 +151,7 @@ namespace Sheaft.Domain
         public void SetLastname(string lastname)
         {
             if (string.IsNullOrWhiteSpace(lastname))
-                throw new ValidationException(MessageKind.User_Lastname_Required);
+                throw SheaftException.Validation("Le nom est requis.");
 
             LastName = lastname;
 
@@ -172,7 +172,7 @@ namespace Sheaft.Domain
         protected void SetUserName(string name)
         {
             if (name.IsNotNullAndIsEmptyOrWhiteSpace())
-                throw new ValidationException(MessageKind.User_Name_Required);
+                throw SheaftException.Validation("Le nom d'utilisateur est requis.");
 
             Name = name;
         }
@@ -188,7 +188,7 @@ namespace Sheaft.Domain
         public void SetEmail(string email)
         {
             if (email.IsNotNullAndIsEmptyOrWhiteSpace())
-                throw new ValidationException(MessageKind.User_Email_Required);
+                throw SheaftException.Validation("L'email est requis.");
 
             Email = email;
         }
@@ -271,7 +271,7 @@ namespace Sheaft.Domain
                 Settings = new List<UserSetting>();
 
             if (Settings.Any(s => s.Setting.Kind == setting.Kind))
-                throw SheaftException.AlreadyExists();
+                throw SheaftException.AlreadyExists("Le paramètre existe déjà.");
             
             Settings.Add(new UserSetting(setting, value));
             SettingsCount = Settings?.Count ?? 0;
@@ -280,11 +280,11 @@ namespace Sheaft.Domain
         public void EditSetting(Guid settingId, string value)
         {
             if (Settings == null)
-                throw SheaftException.NotFound();
+                throw SheaftException.NotFound("Aucun paramètre trouvé.");
 
             var setting = Settings.SingleOrDefault(s => s.SettingId == settingId);
             if(setting == null)
-                throw SheaftException.NotFound();
+                throw SheaftException.NotFound("Le paramètre est introuvable.");
 
             setting.SetValue(value);
         }
@@ -292,11 +292,11 @@ namespace Sheaft.Domain
         public void RemoveSetting(Guid settingId)
         {
             if (Settings == null)
-                throw SheaftException.NotFound();
+                throw SheaftException.NotFound("Aucun paramètre trouvé.");
 
             var setting = Settings.SingleOrDefault(s => s.SettingId == settingId);
             if(setting == null)
-                throw SheaftException.NotFound();
+                throw SheaftException.NotFound("Le paramètre est introuvable.");
 
             Settings.Remove(setting);
             SettingsCount = Settings?.Count ?? 0;

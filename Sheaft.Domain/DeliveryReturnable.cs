@@ -48,7 +48,7 @@ namespace Sheaft.Domain
         public void SetQuantity(int quantity)
         {
             if(quantity < 0)
-                throw SheaftException.Validation();
+                throw SheaftException.Validation("La quantité de consigne retournée ne peut pas être négative.");
             
             Quantity = quantity;
             RefreshLine();

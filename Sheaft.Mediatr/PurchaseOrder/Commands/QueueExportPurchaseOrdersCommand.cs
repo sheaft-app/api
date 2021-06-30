@@ -57,7 +57,7 @@ namespace Sheaft.Mediatr.PurchaseOrder.Commands
         {
             var sender = await _context.Users.SingleAsync(e => e.Id == request.UserId, token);
             if(sender.Id != request.RequestUser.Id)
-                return Failure<Guid>(MessageKind.Forbidden);
+                return Failure<Guid>("Vous n'êtes pas autorisé à accéder à cette ressource.");
 
             var command = new ExportTransactionsCommand(request.RequestUser)
                 {JobId = Guid.NewGuid(), From = request.From, To = request.To};

@@ -55,7 +55,7 @@ namespace Sheaft.Mediatr.Notification.Commands
         public async Task<Result> Handle(MarkUserNotificationsAsReadCommand request, CancellationToken token)
         {
             var result = await _dapperContext.SetNotificationAsReadAsync(request.UserId, request.ReadBefore, token);
-            return result ? Success() : Failure(MessageKind.BadRequest);
+            return result ? Success() : Failure("Une erreur est survenue pendant le marquage des notifications comme lues.");
         }
     }
 }

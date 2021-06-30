@@ -58,10 +58,10 @@ namespace Sheaft.Mediatr.User.Commands
         {
             var entity = await _context.Users.SingleAsync(e => e.Id == request.UserId, token);
             if(entity.Id != request.RequestUser.Id)
-                return Failure<string>(MessageKind.Forbidden);
+                return Failure<string>("Vous n'êtes pas autorisé à accéder à cette ressource.");
 
             if (!string.IsNullOrWhiteSpace(entity.SponsorshipCode))
-                return Success(entity.SponsorshipCode);
+                return Success<string>(entity.SponsorshipCode);
 
             var result = await _identifierService.GetNextSponsoringCode(token);
             if (!result.Succeeded)
@@ -70,7 +70,7 @@ namespace Sheaft.Mediatr.User.Commands
             entity.SetSponsoringCode(result.Data);
 
             await _context.SaveChangesAsync(token);
-            return Success(entity.SponsorshipCode);
+            return Success<string>(entity.SponsorshipCode);
         }
     }
 }

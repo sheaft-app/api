@@ -72,7 +72,7 @@ namespace Sheaft.Mediatr.Transfer.Commands
                     return Success();
                 }
 
-                return Failure(MessageKind.NotFound);
+                return Failure($"Le transfert {request.Identifier} est introuvable.");
             }
             
             if (transfer.Processed)

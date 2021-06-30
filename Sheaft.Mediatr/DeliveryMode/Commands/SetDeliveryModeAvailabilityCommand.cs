@@ -47,7 +47,7 @@ namespace Sheaft.Mediatr.DeliveryMode.Commands
         {
             var entity = await _context.DeliveryModes.SingleAsync(e => e.Id == request.DeliveryModeId, token);
             if(entity.ProducerId != request.RequestUser.Id)
-                return Failure(MessageKind.Forbidden);
+                return Failure("Vous n'êtes pas autorisé à accéder à cette ressource.");
 
             entity.SetAvailability(request.Available);
 

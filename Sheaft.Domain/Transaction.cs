@@ -44,7 +44,7 @@ namespace Sheaft.Domain
         public void SetAsProcessed()
         {
             if (Processed)
-                throw SheaftException.Conflict();
+                throw SheaftException.Conflict("Cette transaction a déjà été traitée.");
             
             Processed = true;
         }

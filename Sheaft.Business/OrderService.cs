@@ -37,16 +37,16 @@ namespace Sheaft.Business
         {
             var order = await _context.Orders.SingleAsync(e => e.Id == orderId, token);
             if (order.Status != OrderStatus.Created)
-                return Failure(MessageKind.AlreadyExists);
+                return Failure("Ce panier a déjà été validé.");
 
             if (order.User == null)
-                return Failure(MessageKind.Order_CannotPay_User_Required);
+                return Failure("Impossible de payer ce panier, l'utilisateur est requis.");
 
             if (order.UserId != requestUser.Id)
-                return Failure(MessageKind.Forbidden);
+                return Failure("Vous n'avez pas l'authorisation d'accéder à ce panier.");
 
             if (!order.Deliveries.Any())
-                return Failure(MessageKind.Order_CannotPay_Deliveries_Required);
+                return Failure("Le panier requiert la selection d'un créneau de récupération.");
 
             Result result = null;
             foreach (var delivery in order.Deliveries)
@@ -54,7 +54,7 @@ namespace Sheaft.Business
                 if (delivery.DeliveryMode.Closings.Any(c =>
                     DateTimeOffset.Now >= c.ClosedFrom && DateTimeOffset.UtcNow <= c.ClosedTo))
                 {
-                    result = Failure(MessageKind.Order_CannotCreate_Delivery_Closed, delivery.DeliveryMode.Name);
+                    result = Failure($"Le créneau {delivery.DeliveryMode.Name} est fermé à la date selectionnée.");
                     break;
                 }
             }
@@ -68,14 +68,14 @@ namespace Sheaft.Business
 
             var invalidProductIds = await GetConsumerInvalidProductIds(order.Products.Select(p => p.ProductId), token);
             if (invalidProductIds.Any())
-                return Failure(MessageKind.Order_CannotPay_Some_Products_NotAvailable,
-                    string.Join(";", invalidProductIds));
+                return Failure($"Certains produits ne sont pas disponibles : {string.Join(';', invalidProductIds)}");
 
             return Success();
         }
 
         public async Task<Result<List<Tuple<Domain.DeliveryMode, DateTimeOffset, string>>>> GetCartDeliveriesAsync(
-            IEnumerable<ProducerExpectedDeliveryInputDto> producersExpectedDeliveries, IEnumerable<Tuple<Domain.Product, Guid, int>> cartProducts, CancellationToken token)
+            IEnumerable<ProducerExpectedDeliveryInputDto> producersExpectedDeliveries,
+            IEnumerable<Tuple<Domain.Product, Guid, int>> cartProducts, CancellationToken token)
         {
             var deliveryIds = producersExpectedDeliveries?.Select(c => c.DeliveryModeId)?.ToList() ?? new List<Guid>();
             var deliveries = deliveryIds.Any()
@@ -90,8 +90,8 @@ namespace Sheaft.Business
                     c => DateTimeOffset.Now >= c.ClosedFrom && DateTimeOffset.UtcNow <= c.ClosedTo))
                 {
                     result = Failure<List<Tuple<Domain.DeliveryMode, DateTimeOffset, string>>>(
-                        MessageKind.Order_CannotCreate_Delivery_Closed, delivery.Name);
-                    
+                        $"Le créneau {delivery.Name} est fermé à la date selectionnée.");
+
                     break;
                 }
 
@@ -101,9 +101,8 @@ namespace Sheaft.Business
                     cartDelivery.ExpectedDeliveryDate <= c.ClosedTo))
                 {
                     result = Failure<List<Tuple<Domain.DeliveryMode, DateTimeOffset, string>>>(
-                        MessageKind.Order_CannotCreate_Delivery_Closed, delivery.Name,
-                        delivery.Producer.Name);
-                    
+                        $"Le créneau {delivery.Name} est fermé à la date selectionnée.");
+
                     break;
                 }
 
@@ -113,7 +112,7 @@ namespace Sheaft.Business
                         cartDelivery.ExpectedDeliveryDate <= c.ClosedTo)))
                 {
                     result = Failure<List<Tuple<Domain.DeliveryMode, DateTimeOffset, string>>>(
-                        MessageKind.Order_CannotCreate_Producer_Closed, delivery.Producer.Name);
+                        $"Le producteur {delivery.Producer.Name} est fermé à la date selectionnée.");
 
                     break;
                 }
@@ -121,22 +120,22 @@ namespace Sheaft.Business
                 cartDeliveries.Add(new Tuple<Domain.DeliveryMode, DateTimeOffset, string>(delivery,
                     cartDelivery.ExpectedDeliveryDate, cartDelivery.Comment));
             }
-            
+
             if (result is {Succeeded: false})
                 return result;
 
             return Success(cartDeliveries);
         }
 
-        public async Task<Result<List<Tuple<Domain.Product, Guid, int>>>> GetCartProductsAsync(IEnumerable<ResourceIdQuantityInputDto> productsQuantities,
+        public async Task<Result<List<Tuple<Domain.Product, Guid, int>>>> GetCartProductsAsync(
+            IEnumerable<ResourceIdQuantityInputDto> productsQuantities,
             CancellationToken token)
         {
             var productIds = productsQuantities?.Select(c => c.Id)?.ToList() ?? new List<Guid>();
             var invalidProductIds = await GetConsumerInvalidProductIds(productIds, token);
             if (invalidProductIds.Any())
                 return Failure<List<Tuple<Domain.Product, Guid, int>>>(
-                    MessageKind.Order_CannotCreate_Some_Products_NotAvailable,
-                    string.Join(";", invalidProductIds));
+                    $"Certains produits ne sont pas disponibles : {string.Join(';', invalidProductIds)}");
 
             var cartProducts = new List<Tuple<Domain.Product, Guid, int>>();
             var products = await _context.Products.Where(p => productIds.Contains(p.Id)).ToListAsync(token);
@@ -147,14 +146,14 @@ namespace Sheaft.Business
                     !p.RemovedOn.HasValue && p.Kind == CatalogKind.Consumers && p.IsDefault && p.Available);
                 if (catalog == null)
                 {
-                    result = Failure<List<Tuple<Domain.Product, Guid, int>>>(MessageKind.NotFound);
+                    result = Failure<List<Tuple<Domain.Product, Guid, int>>>($"Le produit n'est pas disponible à la vente pour les particuliers.");
                     break;
                 }
 
                 cartProducts.Add(new Tuple<Domain.Product, Guid, int>(product, catalog.Id,
                     productsQuantities.Where(p => p.Id == product.Id).Sum(c => c.Quantity)));
             }
-            
+
             if (result is {Succeeded: false})
                 return result;
 
@@ -174,7 +173,7 @@ namespace Sheaft.Business
                             || !p.Producer.CanDirectSell)
                 .Select(p => p.Id.ToString("N"))
                 .ToList();
-            
+
             return invalidProductIds;
         }
     }

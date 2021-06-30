@@ -84,7 +84,7 @@ namespace Sheaft.Domain
         public void CompleteBatch(bool partial = false)
         {
             if (Deliveries.Any(d => d.Status != DeliveryStatus.Delivered && d.Status != DeliveryStatus.Rejected))
-                throw SheaftException.Validation();
+                throw SheaftException.Validation("La tournée contient des livraisons en cours.");
 
             CompletedOn = DateTimeOffset.UtcNow;
             Status = partial ? DeliveryBatchStatus.Partial : DeliveryBatchStatus.Completed;
@@ -92,8 +92,11 @@ namespace Sheaft.Domain
 
         public void CancelBatch(string reason)
         {
-            if (Status is DeliveryBatchStatus.Completed or DeliveryBatchStatus.Cancelled)
-                throw SheaftException.Validation();
+            if (Status is DeliveryBatchStatus.Completed)
+                throw SheaftException.Validation("La tournée est déjà terminée.");
+                
+            if (Status is DeliveryBatchStatus.Cancelled)
+                throw SheaftException.Validation("La tournée est déjà annulée.");
 
             CancelledOn = DateTimeOffset.UtcNow;
             Reason = reason;
@@ -109,10 +112,10 @@ namespace Sheaft.Domain
         public void PostponeBatch(DateTimeOffset rescheduledOn, TimeSpan from, string reason)
         {
             if (Status != DeliveryBatchStatus.Waiting && Status != DeliveryBatchStatus.Ready && Status != DeliveryBatchStatus.InProgress)
-                throw SheaftException.Validation();
+                throw SheaftException.Validation("La tournée doit être en attente, prête ou en cours pour la décaler.");
 
             if (Deliveries.Any(d => d.Status == DeliveryStatus.Delivered || d.Status == DeliveryStatus.Rejected))
-                throw SheaftException.Validation();
+                throw SheaftException.Validation("La tournée contient déjà des livraisons terminées ou refusées, veuillez compléter la tournée en précisant une nouvelle date.");
 
             Status = Status == DeliveryBatchStatus.InProgress ? DeliveryBatchStatus.Ready : Status;
             StartedOn = null;
@@ -164,7 +167,7 @@ namespace Sheaft.Domain
         public void RemoveDelivery(Delivery delivery)
         {
             if (Deliveries == null)
-                throw SheaftException.NotFound();
+                throw SheaftException.NotFound("Cette tournée ne contient pas de livraisons.");
 
             Deliveries.Remove(delivery);
             Refresh();

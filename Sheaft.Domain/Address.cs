@@ -14,13 +14,13 @@ namespace Sheaft.Domain
         protected Address(string line1, string line2, string zipcode, string city, CountryIsoCode country)
         {
             if (string.IsNullOrWhiteSpace(line1))
-                throw new ValidationException(MessageKind.Address_Line1_Required);
+                throw SheaftException.Validation("La ligne d'adresse est requise.");
 
             if (string.IsNullOrWhiteSpace(zipcode))
-                throw new ValidationException(MessageKind.Address_Zipcode_Required);
+                throw SheaftException.Validation("Le code postal est requis.");
 
             if (string.IsNullOrWhiteSpace(city))
-                throw new ValidationException(MessageKind.Address_City_Required);
+                throw SheaftException.Validation("La ville est requise.");
             
             Line1 = line1;
             Line2 = line2;

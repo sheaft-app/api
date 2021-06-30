@@ -35,7 +35,7 @@ namespace Sheaft.Domain
         public void SetEmail(string email)
         {
             if (string.IsNullOrWhiteSpace(email))
-                throw new ValidationException(MessageKind.Owner_Email_Required);
+                throw SheaftException.Validation("L'email du représentant légal est requis.");
 
             Email = email;
         }
@@ -43,7 +43,7 @@ namespace Sheaft.Domain
         public void SetFirstname(string firstName)
         {
             if (string.IsNullOrWhiteSpace(firstName))
-                throw new ValidationException(MessageKind.Owner_Firstname_Required);
+                throw SheaftException.Validation("Le prénom du représentant légal est requis.");
 
             FirstName = firstName;
         }
@@ -51,7 +51,7 @@ namespace Sheaft.Domain
         public void SetLastname(string lastName)
         {
             if (string.IsNullOrWhiteSpace(lastName))
-                throw new ValidationException(MessageKind.Owner_Lastname_Required);
+                throw SheaftException.Validation("Le nom du représentant légal est requis.");
 
             LastName = lastName;
         }
@@ -59,7 +59,7 @@ namespace Sheaft.Domain
         public void SetBirthDate(DateTimeOffset birthdate)
         {
             if (birthdate.Year < 1900)
-                throw new ValidationException(MessageKind.Owner_Birthdate_Required);
+                throw SheaftException.Validation("La date de naissance du représentant légal est requise.");
 
             BirthDate = birthdate;
         }
@@ -67,7 +67,7 @@ namespace Sheaft.Domain
         public void SetCountryOfResidence(CountryIsoCode countryOfResidence)
         {
             if (countryOfResidence == CountryIsoCode.NotSpecified)
-                throw new ValidationException(MessageKind.Owner_CountryOfResidence_Required);
+                throw SheaftException.Validation("Le pays de résidence du représentant légal est requis.");
 
             CountryOfResidence = countryOfResidence;
         }
@@ -75,7 +75,7 @@ namespace Sheaft.Domain
         public void SetNationality(CountryIsoCode nationality)
         {
             if (nationality == CountryIsoCode.NotSpecified)
-                throw new ValidationException(MessageKind.Owner_Nationality_Required);
+                throw SheaftException.Validation("La nationalité du représentant légal est requise.");
 
             Nationality = nationality;
         }
@@ -83,7 +83,7 @@ namespace Sheaft.Domain
         public void SetAddress(OwnerAddress address)
         {
             if (address == null)
-                throw new ValidationException(MessageKind.Owner_Address_Required);
+                throw SheaftException.Validation("L'adresse du représentant légal est requise.");
 
             Address = address;
         }

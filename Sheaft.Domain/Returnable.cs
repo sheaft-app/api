@@ -44,8 +44,8 @@ namespace Sheaft.Domain
 
         public void SetWholeSalePrice(decimal newPrice)
         {
-            if (newPrice < 0)
-                throw new ValidationException(MessageKind.Returnable_WholeSalePrice_CannotBe_LowerThan, 0);
+            if (newPrice <= 0)
+                throw SheaftException.Validation("Le prix doit être supérieur à 0€.");
 
             WholeSalePrice = Math.Round(newPrice, DIGITS_COUNT);
             RefreshPrices();
@@ -54,10 +54,10 @@ namespace Sheaft.Domain
         public void SetVat(decimal newVat)
         {
             if (newVat < 0)
-                throw new ValidationException(MessageKind.Returnable_Vat_CannotBe_LowerThan, 0);
+                throw SheaftException.Validation("La TVA doit être supérieure à 0%.");
 
             if (newVat > 100)
-                throw new ValidationException(MessageKind.Returnable_Vat_CannotBe_GreaterThan, 100);
+                throw SheaftException.Validation("La TVA doit être inférieure à 100%.");
 
             Vat = newVat;
             RefreshPrices();
@@ -66,7 +66,7 @@ namespace Sheaft.Domain
         public void SetName(string name)
         {
             if (string.IsNullOrWhiteSpace(name))
-                throw new ValidationException(MessageKind.Returnable_Name_Required);
+                throw SheaftException.Validation("Le nom est requis.");
 
             Name = name;
         }

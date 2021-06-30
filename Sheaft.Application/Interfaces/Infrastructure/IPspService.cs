@@ -22,7 +22,6 @@ namespace Sheaft.Application.Interfaces.Infrastructure
         Task<Result<string>> CreateBusinessAsync(BusinessLegal user, CancellationToken token);
         Task<Result<string>> UpdateBusinessAsync(BusinessLegal businessLegal, CancellationToken token);
         Task<Result<string>> CreateWalletAsync(Domain.Wallet wallet,  CancellationToken token);
-        Task<Result<PspWebPaymentResultDto>> CreateWebPayinAsync(WebPayin transaction, Owner owner, CancellationToken token);
         Task<Result<PspPaymentResultDto>> RefundPayinAsync(Domain.PayinRefund transaction, CancellationToken token);
         Task<Result<PspDocumentResultDto>> SubmitDocumentAsync(Domain.Document document, string userIdentifier, CancellationToken token);
         Task<Result<PspDeclarationResultDto>> CreateUboDeclarationAsync(Domain.Declaration declaration, Domain.User business, CancellationToken token);

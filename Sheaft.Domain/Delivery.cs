@@ -101,9 +101,9 @@ namespace Sheaft.Domain
 
         public void AddPurchaseOrders(IEnumerable<PurchaseOrder> purchaseOrders)
         {
-            if (DeliveryBatch == null && Status != DeliveryStatus.Waiting || DeliveryBatch != null &&
-                DeliveryBatch.Status != DeliveryBatchStatus.Cancelled && Status != DeliveryStatus.Waiting)
-                throw SheaftException.Validation();
+            if (Status != DeliveryStatus.Waiting)
+                throw SheaftException.Validation(
+                    "Impossible de modifier les commandes d'une livraison qui n'est pas en attente");
 
             if (purchaseOrders == null || !purchaseOrders.Any())
                 return;
@@ -135,12 +135,12 @@ namespace Sheaft.Domain
 
         public void RemovePurchaseOrders(IEnumerable<PurchaseOrder> purchaseOrders)
         {
-            if (DeliveryBatch == null && Status != DeliveryStatus.Waiting || DeliveryBatch != null &&
-                DeliveryBatch.Status != DeliveryBatchStatus.Cancelled && Status != DeliveryStatus.Waiting)
-                throw SheaftException.Validation();
+            if (Status != DeliveryStatus.Waiting)
+                throw SheaftException.Validation(
+                    "Impossible de modifier les commandes d'une livraison qui n'est pas en attente");
 
             if (PurchaseOrders == null)
-                throw SheaftException.NotFound();
+                throw SheaftException.NotFound("Cette livraison ne contient pas de commandes.");
 
             foreach (var purchaseOrder in purchaseOrders)
                 PurchaseOrders.Remove(purchaseOrder);
@@ -166,7 +166,7 @@ namespace Sheaft.Domain
         public void SetAsReady()
         {
             if (Status != DeliveryStatus.Waiting)
-                throw SheaftException.Validation();
+                throw SheaftException.Validation("La livraison n'est pas en attente.");
 
             StartedOn = null;
             DeliveredOn = null;
@@ -179,10 +179,10 @@ namespace Sheaft.Domain
         public void StartDelivery()
         {
             if (Status != DeliveryStatus.Ready && Status != DeliveryStatus.Waiting)
-                throw SheaftException.Validation();
+                throw SheaftException.Validation("La livraison n'est pas prête.");
 
             if (DeliveryBatch != null && DeliveryBatch.Status != DeliveryBatchStatus.InProgress)
-                throw SheaftException.Validation();
+                throw SheaftException.Validation("La tournée de livraison n'est pas en cours.");
 
             StartedOn = DateTimeOffset.UtcNow;
             DeliveredOn = null;
@@ -192,10 +192,10 @@ namespace Sheaft.Domain
         public void RejectDelivery(string comment)
         {
             if (Status != DeliveryStatus.InProgress)
-                throw SheaftException.Validation();
+                throw SheaftException.Validation("La livraison n'est pas en cours.");
 
             if (DeliveryBatch != null && DeliveryBatch.Status != DeliveryBatchStatus.InProgress)
-                throw SheaftException.Validation();
+                throw SheaftException.Validation("La tournée de livraison n'est pas en cours.");
 
             Comment = comment;
             RejectedOn = DateTimeOffset.UtcNow;
@@ -207,7 +207,7 @@ namespace Sheaft.Domain
             string comment = null)
         {
             if (Status is DeliveryStatus.Delivered)
-                throw SheaftException.Validation();
+                throw SheaftException.Validation("La livraison est déjà validée.");
 
             ReceptionedBy = receptionedBy;
             Comment = comment;
@@ -221,7 +221,7 @@ namespace Sheaft.Domain
                 {
                     var product = Products.FirstOrDefault(p => p.ProductId == productReturned.Item1.ProductId);
                     if (product == null)
-                        throw SheaftException.NotFound();
+                        throw SheaftException.NotFound("Le produit retourné est introuvable dans la liste des produits livrés.");
 
                     Products.Add(new DeliveryProduct(product, productReturned.Item2, productReturned.Item3));
                 }
@@ -242,7 +242,7 @@ namespace Sheaft.Domain
         public void SkipDelivery()
         {
             if (Status is DeliveryStatus.Delivered)
-                throw SheaftException.Validation();
+                throw SheaftException.Validation("La livraison est déjà validée.");
 
             Status = DeliveryStatus.Skipped;
             foreach (var purchaseOrder in PurchaseOrders)
@@ -251,8 +251,11 @@ namespace Sheaft.Domain
 
         public void PostponeDelivery()
         {
-            if (Status is DeliveryStatus.Delivered || Status is DeliveryStatus.Rejected)
-                throw SheaftException.Validation();
+            if (Status is DeliveryStatus.Delivered)
+                throw SheaftException.Validation("La livraison est déjà validée.");
+
+            if (Status is DeliveryStatus.Rejected)
+                throw SheaftException.Validation("La livraison a déjà été refusée.");
 
             Status = Status != DeliveryStatus.Waiting ? DeliveryStatus.Ready : Status;
             foreach (var purchaseOrder in PurchaseOrders)

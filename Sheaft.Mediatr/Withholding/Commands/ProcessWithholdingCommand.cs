@@ -55,7 +55,7 @@ namespace Sheaft.Mediatr.Withholding.Commands
                 return Success();
 
             if (withholding.Status != TransactionStatus.Failed && withholding.Status != TransactionStatus.Waiting)
-                return Failure(MessageKind.Withholding_Cannot_Process_Pending);
+                return Failure("Impossible de créer la retenue sur le virement, un virement est déjà en attente.");
 
             using (var transaction = await _context.BeginTransactionAsync(token))
             {

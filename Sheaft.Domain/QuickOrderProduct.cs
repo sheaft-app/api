@@ -27,8 +27,8 @@ namespace Sheaft.Domain
 
         public void SetQuantity(int? quantity)
         {
-            if (quantity.HasValue && quantity <= 0)
-                throw new ValidationException(MessageKind.QuickOrder_ProductQuantity_CannotBe_LowerOrEqualThan, 0);
+            if (quantity is < 0)
+                throw SheaftException.Validation("La quantité du produit doit être supérieur ou égale à 0.");
 
             Quantity = quantity;
         }

@@ -45,7 +45,7 @@ namespace Sheaft.Mediatr.User.Commands
             var user = await _context.Users.SingleAsync(e => e.Id == request.UserId, token);
             var sponsor = await _context.Users.SingleOrDefaultAsync(u => u.SponsorshipCode == request.Code, token);
             if (sponsor == null)
-                return Failure(MessageKind.Register_User_SponsorCode_NotFound);
+                return Failure("Le sponsor est introuvable.");
 
             await _context.AddAsync(new Sponsoring(sponsor, user), token);
             await _context.SaveChangesAsync(token);

@@ -9,7 +9,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -271,21 +270,6 @@ namespace Sheaft.Web.Manage
 
             services.AddOptions();
             services.AddControllersWithViews();
-
-            services.AddLocalization(ops => ops.ResourcesPath = "Resources");
-            services.Configure<RequestLocalizationOptions>(
-                opts =>
-                {
-                    var supportedCultures = new List<CultureInfo>
-                    {
-                        new CultureInfo("en"),
-                        new CultureInfo("fr")
-                    };
-
-                    opts.DefaultRequestCulture = new RequestCulture("en", "fr");
-                    opts.SupportedCultures = supportedCultures;
-                    opts.SupportedUICultures = supportedCultures;
-                });
 
             services.AddRazorTemplating();
             services.AddLogging(config =>

@@ -5,7 +5,8 @@ namespace Sheaft.Domain.Enum
         ToDeliver,
         Missing,
         Broken,
-        Improper
+        Improper,
+        Excess
     }
 
     public static class ModificationKindOverrides
@@ -22,6 +23,8 @@ namespace Sheaft.Domain.Enum
                     return "non conforme";
                 case ModificationKind.Missing:
                     return "manquant";
+                case ModificationKind.Excess:
+                    return "en surplu";
                 default:
                     return "";
             }

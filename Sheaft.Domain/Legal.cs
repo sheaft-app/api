@@ -51,7 +51,7 @@ namespace Sheaft.Domain
         {
             var document = Documents.FirstOrDefault(d => d.Id == id);
             if (document == null)
-                throw new ValidationException(MessageKind.Document_CannotDelete_NotFound);
+                throw SheaftException.Validation("Impossible de supprimer le document, il est introuvable.");
 
             Documents.Remove(document);
         }

@@ -21,7 +21,7 @@ namespace Sheaft.Domain
         public PurchaseOrder(Guid id, int reference, PurchaseOrderStatus status, Producer producer, Order order)
         {
             if (producer == null)
-                throw SheaftException.Validation(MessageKind.PurchaseOrder_Vendor_Required);
+                throw SheaftException.Validation("Impossible de créer la commande, le vendeur est requis.");
 
             Id = id;
 
@@ -98,10 +98,10 @@ namespace Sheaft.Domain
             {
                 case PurchaseOrderStatus.Accepted:
                     if (Status != PurchaseOrderStatus.Waiting)
-                        throw SheaftException.Validation(MessageKind.PurchaseOrder_CannotAccept_NotIn_WaitingStatus);
+                        throw SheaftException.Validation("Impossible d'accepter la commande, elle n'est plus en attente.");
 
-                    if (SenderInfo.Kind == ProfileKind.Consumer && CreatedOn.AddDays(5) < DateTimeOffset.UtcNow)
-                        throw SheaftException.Validation();
+                    if (SenderInfo.Kind == ProfileKind.Consumer && CreatedOn.AddDays(3) < DateTimeOffset.UtcNow)
+                        throw SheaftException.Validation("Impossible d'accepter la commande, le délai de 72h est écoulé.");
 
                     AcceptedOn = DateTimeOffset.UtcNow;
                     Status = PurchaseOrderStatus.Processing;
@@ -110,9 +110,8 @@ namespace Sheaft.Domain
                         DomainEvents.Add(new PurchaseOrderAcceptedEvent(Id));
                     return;
                 case PurchaseOrderStatus.Completed:
-                    if (Status != PurchaseOrderStatus.Processing && Status != PurchaseOrderStatus.Completed)
-                        throw SheaftException.Validation(
-                            MessageKind.PurchaseOrder_CannotComplete_NotIn_ProcessingStatus);
+                    if (Status != PurchaseOrderStatus.Processing)
+                        throw SheaftException.Validation("La commande doit être en préparation pour pouvoir être complétée.");
 
                     CompletedOn ??= DateTimeOffset.UtcNow;
 
@@ -121,21 +120,17 @@ namespace Sheaft.Domain
                     break;
                 case PurchaseOrderStatus.Delivered:
                     if (Status != PurchaseOrderStatus.Completed)
-                        throw SheaftException.Validation(MessageKind
-                            .PurchaseOrder_CannotDeliver_NotIn_CompletedOrShippingStatus);
+                        throw SheaftException.Validation("La commande doit être en prête pour pouvoir être livrée.");
                     break;
                 case PurchaseOrderStatus.Cancelled:
                     if (Status == PurchaseOrderStatus.Cancelled)
-                        throw SheaftException.Validation(MessageKind
-                            .PurchaseOrder_CannotCancel_AlreadyIn_CancelledStatus);
+                        throw SheaftException.Validation("La commande a déjà été annulée.");
                     if (Status == PurchaseOrderStatus.Refused)
-                        throw SheaftException.Validation(MessageKind
-                            .PurchaseOrder_CannotCancel_AlreadyIn_RefusedStatus);
+                        throw SheaftException.Validation("La commande a déjà été refusée.");
                     if (Status == PurchaseOrderStatus.Delivered)
-                        throw SheaftException.Validation(MessageKind
-                            .PurchaseOrder_CannotCancel_AlreadyIn_DeliveredStatus);
+                        throw SheaftException.Validation("La commande a déjà été livrée.");
                     if (Status == PurchaseOrderStatus.Expired)
-                        throw SheaftException.Validation();
+                        throw SheaftException.Validation("La commande est expirée.");
 
                     DroppedOn = DateTimeOffset.UtcNow;
 
@@ -144,15 +139,13 @@ namespace Sheaft.Domain
                     break;
                 case PurchaseOrderStatus.Withdrawned:
                     if (Status == PurchaseOrderStatus.Withdrawned)
-                        throw SheaftException.Validation();
+                        throw SheaftException.Validation("La commande a déjà été annulée.");
                     if (Status == PurchaseOrderStatus.Refused)
-                        throw SheaftException.Validation(MessageKind
-                            .PurchaseOrder_CannotCancel_AlreadyIn_RefusedStatus);
+                        throw SheaftException.Validation("La commande a déjà été refusée.");
                     if (Status == PurchaseOrderStatus.Delivered)
-                        throw SheaftException.Validation(MessageKind
-                            .PurchaseOrder_CannotCancel_AlreadyIn_DeliveredStatus);
+                        throw SheaftException.Validation("La commande a déjà été livrée.");
                     if (Status == PurchaseOrderStatus.Expired)
-                        throw SheaftException.Validation();
+                        throw SheaftException.Validation("La commande est expirée.");
 
                     DroppedOn = DateTimeOffset.UtcNow;
 
@@ -161,14 +154,13 @@ namespace Sheaft.Domain
                     break;
                 case PurchaseOrderStatus.Refused:
                     if (Status == PurchaseOrderStatus.Cancelled)
-                        throw SheaftException.Validation(MessageKind
-                            .PurchaseOrder_CannotRefuse_AlreadyIn_CancelledStatus);
+                        throw SheaftException.Validation("La commande a déjà été annulée.");
                     if (Status == PurchaseOrderStatus.Refused)
-                        throw SheaftException.Validation(MessageKind
-                            .PurchaseOrder_CannotRefuse_AlreadyIn_RefusedStatus);
+                        throw SheaftException.Validation("La commande a déjà été refusée.");
                     if (Status == PurchaseOrderStatus.Delivered)
-                        throw SheaftException.Validation(MessageKind
-                            .PurchaseOrder_CannotRefuse_AlreadyIn_DeliveredStatus);
+                        throw SheaftException.Validation("La commande a déjà été livrée.");
+                    if (Status == PurchaseOrderStatus.Expired)
+                        throw SheaftException.Validation("La commande est expirée.");
 
                     DroppedOn = DateTimeOffset.UtcNow;
 
@@ -177,7 +169,7 @@ namespace Sheaft.Domain
                     break;
                 case PurchaseOrderStatus.Expired:
                     if (Status != PurchaseOrderStatus.Waiting)
-                        throw SheaftException.Validation();
+                        throw SheaftException.Validation("La commande ne peut pas être expirée, elle doit être en attente.");
 
                     DroppedOn = DateTimeOffset.UtcNow;
 
@@ -248,10 +240,10 @@ namespace Sheaft.Domain
         private void AddProduct(ProductRow product)
         {
             if (Status != PurchaseOrderStatus.Waiting)
-                throw SheaftException.Validation(MessageKind.PurchaseOrder_CannotAddProduct_NotIn_WaitingStatus);
+                throw SheaftException.Validation("Impossible d'ajouter un produit, la commande n'est plus en attente.");
 
             if (product == null)
-                throw SheaftException.Validation(MessageKind.PurchaseOrder_CannotAddProduct_Product_NotFound);
+                throw SheaftException.Validation("Impossible d'ajouter le produit, il est introuvable.");
 
             var productLine = Products.SingleOrDefault(p => p.ProductId == product.ProductId);
             if (productLine != null)

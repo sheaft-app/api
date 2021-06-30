@@ -64,10 +64,10 @@ namespace Sheaft.Mediatr.Order.Commands
         {
             var entity = await _context.Orders.SingleAsync(e => e.Id == request.OrderId, token);
             if (entity.User != null && entity.UserId != request.RequestUser.Id)
-                return Failure(MessageKind.Forbidden);
+                return Failure("Vous n'êtes pas autorisé à accéder à cette ressource.");
             
             if(entity.User != null && request.UserId.HasValue && request.UserId.Value != entity.UserId)
-                return Failure(MessageKind.Conflict);
+                return Failure("Ce panier est déjà rattaché à un autre utilisateur.");
 
             if (entity.User == null && request.UserId.HasValue && request.UserId != Guid.Empty)
             {

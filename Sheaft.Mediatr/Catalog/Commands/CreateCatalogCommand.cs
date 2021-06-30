@@ -65,7 +65,7 @@ namespace Sheaft.Mediatr.Catalog.Commands
                         .ToListAsync(token);
 
                 if (request.Kind == CatalogKind.Consumers && catalogs.Any(c => c.Kind == CatalogKind.Consumers))
-                    return Failure<Guid>(MessageKind.AlreadyExists);
+                    return Failure<Guid>("Le catalogue pour les particuliers existe déjà.");
 
                 var producer = await _context.Producers.SingleAsync(e => e.Id == request.ProducerId, token);
                 var entity = new Domain.Catalog(producer, request.Kind, Guid.NewGuid(), request.Name);

@@ -56,11 +56,11 @@ namespace Sheaft.Mediatr.DeliveryBatch.Commands
         {
             var deliveryBatch = await _context.DeliveryBatches.SingleOrDefaultAsync(c => c.Id == request.DeliveryBatchId, token);
             if (deliveryBatch == null)
-                return Failure(MessageKind.NotFound);
+                return Failure("La tournée de livraison est introuvable.");
 
             var nextDelivery = deliveryBatch.Deliveries.SingleOrDefault(d => d.Id == request.DeliveryId);
             if (nextDelivery == null)
-                return Failure(MessageKind.NotFound);
+                return Failure("La livraison est introuvable dans la tournée.");
             
             var undeliveredDeliveries = deliveryBatch.Deliveries.Where(d => d.Status != DeliveryStatus.Delivered)
                 .OrderBy(d => d.Position);

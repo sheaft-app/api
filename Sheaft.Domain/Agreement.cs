@@ -35,7 +35,7 @@ namespace Sheaft.Domain
             {
                 Status = AgreementStatus.WaitingForStoreApproval;
                 if (delivery == null)
-                    throw SheaftException.Validation();
+                    throw SheaftException.Validation("Le mode de livraison est requis pour créer un partenariat avec un magasin.");
             }
 
             DomainEvents = new List<DomainEvent> {new AgreementCreatedEvent(Id, createdByKind)};
@@ -64,22 +64,19 @@ namespace Sheaft.Domain
         {
             if (Status != AgreementStatus.WaitingForProducerApproval &&
                 Status != AgreementStatus.WaitingForStoreApproval)
-                throw SheaftException.Validation(MessageKind.Agreement_CannotBeAccepted_NotInWaitingStatus);
+                throw SheaftException.Validation("Le partenariat ne peut pas être accepté, il n'est en attente d'acceptation.");
 
             if(Status == AgreementStatus.WaitingForProducerApproval && acceptedByKind != ProfileKind.Producer)
-                throw SheaftException.Validation();
+                throw SheaftException.Validation("Le partenariat doit être accepté par le producteur.");
             
             if(Status == AgreementStatus.WaitingForStoreApproval && acceptedByKind != ProfileKind.Store)
-                throw SheaftException.Validation();
-
-            if (DeliveryModeId.HasValue && delivery != null && DeliveryModeId != delivery.Id)
-                throw SheaftException.Validation();
+                throw SheaftException.Validation("Le partenariat doit être accepté par le magasin.");
 
             if (delivery != null)
                 ChangeDelivery(delivery);
 
             if (!DeliveryModeId.HasValue)
-                throw SheaftException.Validation();
+                throw SheaftException.Validation("Le partenariat doit avoir un mode de livraison rattaché.");
 
             Store.IncreaseProducersCount();
             
@@ -90,10 +87,10 @@ namespace Sheaft.Domain
         public void CancelAgreement(string reason, ProfileKind cancelledByKind)
         {
             if (Status == AgreementStatus.Cancelled)
-                throw new ValidationException(MessageKind.Agreement_CannotBeCancelled_AlreadyCancelled);
+                throw SheaftException.Validation("Le partenariat est déjà annulé.");
 
             if (Status == AgreementStatus.Refused)
-                throw new ValidationException(MessageKind.Agreement_CannotBeCancelled_AlreadyRefused);
+                throw SheaftException.Validation("Le partenariat est déjà refusé.");
 
             Status = AgreementStatus.Cancelled;
             Position = null;
@@ -107,13 +104,13 @@ namespace Sheaft.Domain
         {
             if (Status != AgreementStatus.WaitingForProducerApproval &&
                 Status != AgreementStatus.WaitingForStoreApproval)
-                throw new ValidationException(MessageKind.Agreement_CannotBeRefused_NotInWaitingStatus);
+                throw SheaftException.Validation("Le partenariat n'est pas en attente d'acceptation.");
 
             if (Status == AgreementStatus.WaitingForProducerApproval && refusedByKind != ProfileKind.Producer)
-                throw SheaftException.Validation();
+                throw SheaftException.Validation("Le partenariat ne peut être refusé que par le producteur.");
             
             if(Status == AgreementStatus.WaitingForStoreApproval && refusedByKind != ProfileKind.Store)
-                throw SheaftException.Validation();
+                throw SheaftException.Validation("Le partenariat ne peut être refusé que par le magasin.");
 
             Status = AgreementStatus.Refused;
             Position = null;
@@ -135,7 +132,7 @@ namespace Sheaft.Domain
         public void ChangeCatalog(Catalog catalog)
         {
             if (catalog.Kind == CatalogKind.Consumers)
-                throw SheaftException.Validation();
+                throw SheaftException.Validation("Impossible d'assigner un catalogue particulier à un partenariat.");
             
             CatalogId = catalog.Id;
             Catalog = catalog;

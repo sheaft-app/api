@@ -57,28 +57,29 @@ namespace Sheaft.Infrastructure.Services
 
             if (_mailerOptions.SkipSending)
                 return Success();
-            
+
             var response = await _mailer.SendEmailAsync(msg, token);
             if ((int) response.HttpStatusCode >= 400)
-                return Failure(MessageKind.EmailProvider_SendEmail_Failure,
-                    string.Join(";", response.ResponseMetadata.Metadata));
+                return Failure("Une erreur est survenue pendant l'envoi de l'email.",
+                    response.ResponseMetadata.Metadata);
 
             return Success();
         }
 
         public async Task<Result> SendTemplatedEmailAsync<T>(string toEmail, string toName, string subject,
-            string templateId, T data, IEnumerable<EmailAttachmentDto> attachments, bool isHtml, CancellationToken token)
+            string templateId, T data, IEnumerable<EmailAttachmentDto> attachments, bool isHtml,
+            CancellationToken token)
         {
             var msg = new SendRawEmailRequest
             {
                 Source = $"{_mailerOptions.Sender.Name}<{_mailerOptions.Sender.Email}>",
                 Destinations = new List<string> {$"=?UTF-8?B?{toName.Base64Encode()}?= <{toEmail}>"}
             };
-            
+
             using (var messageStream = new MemoryStream())
             {
                 var message = new MimeMessage();
-                
+
                 var content = await RazorTemplateEngine.RenderAsync($"~/Templates/{templateId}.cshtml", data);
                 var builder = isHtml ? new BodyBuilder {HtmlBody = content} : new BodyBuilder {TextBody = content};
 
@@ -88,20 +89,20 @@ namespace Sheaft.Infrastructure.Services
 
                 foreach (var attachment in attachments)
                     builder.Attachments.Add(attachment.Name, attachment.Content);
-               
+
                 message.Body = builder.ToMessageBody();
                 await message.WriteToAsync(messageStream, token);
 
                 msg.RawMessage = new RawMessage() {Data = messageStream};
             }
-            
+
             if (_mailerOptions.SkipSending)
                 return Success();
-            
+
             var response = await _mailer.SendRawEmailAsync(msg, token);
             if ((int) response.HttpStatusCode >= 400)
-                return Failure(MessageKind.EmailProvider_SendEmail_Failure,
-                    string.Join(";", response.ResponseMetadata.Metadata));
+                return Failure("Une erreur est survenue pendant l'envoi de l'email avec pièce jointe.",
+                    response.ResponseMetadata.Metadata);
 
             return Success();
         }
@@ -109,33 +110,33 @@ namespace Sheaft.Infrastructure.Services
         public async Task<Result> SendEmailAsync(string toEmail, string toName, string subject, string content,
             bool isHtml, CancellationToken token)
         {
-                var msg = new SendEmailRequest();
-                msg.Destination = new Destination
-                {
-                    ToAddresses = new List<string> {$"=?UTF-8?B?{toName.Base64Encode()}?= <{toEmail}>"}
-                };
+            var msg = new SendEmailRequest();
+            msg.Destination = new Destination
+            {
+                ToAddresses = new List<string> {$"=?UTF-8?B?{toName.Base64Encode()}?= <{toEmail}>"}
+            };
 
-                msg.Source = $"{_mailerOptions.Sender.Name}<{_mailerOptions.Sender.Email}>";
-                msg.ReturnPath = _mailerOptions.Bounces;
-                msg.Message = new Message
-                {
-                    Subject = new Content(subject)
-                };
+            msg.Source = $"{_mailerOptions.Sender.Name}<{_mailerOptions.Sender.Email}>";
+            msg.ReturnPath = _mailerOptions.Bounces;
+            msg.Message = new Message
+            {
+                Subject = new Content(subject)
+            };
 
-                if (isHtml)
-                    msg.Message.Body = new Body {Html = new Content(content)};
-                else
-                    msg.Message.Body = new Body {Text = new Content(content)};
+            if (isHtml)
+                msg.Message.Body = new Body {Html = new Content(content)};
+            else
+                msg.Message.Body = new Body {Text = new Content(content)};
 
-                if (_mailerOptions.SkipSending)
-                    return Success();
-                
-                var response = await _mailer.SendEmailAsync(msg, token);
-                if ((int) response.HttpStatusCode >= 400)
-                    return Failure(MessageKind.EmailProvider_SendEmail_Failure,
-                        string.Join(";", response.ResponseMetadata.Metadata));
-
+            if (_mailerOptions.SkipSending)
                 return Success();
+
+            var response = await _mailer.SendEmailAsync(msg, token);
+            if ((int) response.HttpStatusCode >= 400)
+                return Failure("Une erreur est survenue pendant l'envoi de l'email.",
+                    response.ResponseMetadata.Metadata);
+
+            return Success();
         }
     }
 }

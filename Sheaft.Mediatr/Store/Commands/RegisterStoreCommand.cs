@@ -75,7 +75,7 @@ namespace Sheaft.Mediatr.Store.Commands
         {
             var store = await _context.Stores.SingleOrDefaultAsync(r => r.Id == request.StoreId || r.Email == request.Email, token);
             if (store != null)
-                return Failure<Guid>(MessageKind.Register_User_AlreadyExists);
+                return Failure<Guid>("Un compte existe déjà avec ces informations.");
 
             var departmentCode = UserAddress.GetDepartmentCode(request.Address.Zipcode);
             var department =

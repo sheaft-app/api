@@ -47,7 +47,7 @@ namespace Sheaft.Infrastructure.Services
         {
             var bytes = await RetrievePictureBytesAsync(picture);
             if (bytes == null)
-                return Success(picture);
+                return Success<string>(picture);
 
             using (var image = Image.Load(bytes))
             {
@@ -61,7 +61,7 @@ namespace Sheaft.Infrastructure.Services
         {
             var bytes = await RetrievePictureBytesAsync(picture);
             if (bytes == null)
-                return Success(picture);
+                return Success<string>(picture);
 
             using (Image image = Image.Load(bytes))
             {
@@ -79,7 +79,7 @@ namespace Sheaft.Infrastructure.Services
         {
             var bytes = await RetrievePictureBytesAsync(picture);
             if (bytes == null)
-                return Success(picture);
+                return Success<string>(picture);
 
             using (var image = Image.Load(bytes))
             {
@@ -97,7 +97,7 @@ namespace Sheaft.Infrastructure.Services
         {
             var bytes = await RetrievePictureBytesAsync(picture);
             if (bytes == null)
-                return Success(picture);
+                return Success<string>(picture);
 
             using (var image = Image.Load(bytes))
             {
@@ -115,11 +115,11 @@ namespace Sheaft.Infrastructure.Services
             CancellationToken token)
         {
             if (string.IsNullOrWhiteSpace(picture) && string.IsNullOrWhiteSpace(entity.Picture))
-                return Success(GetDefaultProductPicture(entity.Tags?.Select(t => t.Tag)));
+                return Success<string>(GetDefaultProductPicture(entity.Tags?.Select(t => t.Tag)));
 
             var bytes = await RetrievePictureBytesAsync(picture);
             if (bytes == null)
-                return Success(picture);
+                return Success<string>(picture);
 
             using (Image image = Image.Load(bytes))
             {

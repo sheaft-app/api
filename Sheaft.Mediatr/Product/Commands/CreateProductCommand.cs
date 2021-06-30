@@ -89,7 +89,7 @@ namespace Sheaft.Mediatr.Product.Commands
                     await _context.Products.AnyAsync(
                         p => p.Reference == reference && p.ProducerId == request.ProducerId, token);
                 if (existingEntity)
-                    return Failure<Guid>(MessageKind.CreateProduct_Reference_AlreadyExists, reference);
+                    return Failure<Guid>($"Un produit existe déjà avec la référence {reference}.");
             }
             else
             {

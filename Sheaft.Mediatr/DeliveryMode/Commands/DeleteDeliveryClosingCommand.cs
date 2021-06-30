@@ -44,7 +44,7 @@ namespace Sheaft.Mediatr.DeliveryMode.Commands
             var entity = await _context.DeliveryModes
                 .SingleOrDefaultAsync(c => c.Closings.Any(cc => cc.Id == request.ClosingId), token);
             if (entity.ProducerId != request.RequestUser.Id)
-                return Failure(MessageKind.Forbidden);
+                return Failure("Vous n'êtes pas autorisé à accéder à cette ressource.");
 
             entity.RemoveClosing(request.ClosingId);
             await _context.SaveChangesAsync(token);

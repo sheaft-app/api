@@ -73,7 +73,7 @@ namespace Sheaft.Mediatr.Product.Commands
             {
                 var entity = await _context.Products.SingleAsync(p => p.Id == request.ProductId, token);
                 if (entity.ProducerId != request.RequestUser.Id)
-                    return Failure(MessageKind.Forbidden);
+                    return Failure("Vous n'êtes pas autorisé à accéder à cette ressource.");
 
                 var reference = request.Reference;
                 if (!string.IsNullOrWhiteSpace(reference) && reference != entity.Reference)
@@ -81,7 +81,7 @@ namespace Sheaft.Mediatr.Product.Commands
                     var existingEntity = await _context.Products.AnyAsync(
                         p => p.Reference == reference && p.ProducerId == entity.ProducerId, token);
                     if (existingEntity)
-                        return Failure(MessageKind.CreateProduct_Reference_AlreadyExists, reference);
+                        return Failure($"Un produit existe déjà avec la référence {reference}.");
                 }
 
                 if (string.IsNullOrWhiteSpace(reference))

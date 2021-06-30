@@ -54,12 +54,12 @@ namespace Sheaft.Mediatr.User.Commands
         {
             var entity = await _context.Users.SingleAsync(e => e.Id == request.UserId, token);
             if(entity.Id != request.RequestUser.Id)
-                return Failure(MessageKind.Forbidden);
+                return Failure("Vous n'êtes pas autorisé à accéder à cette ressource.");
 
             var hasActiveOrders = await _context.PurchaseOrders.AnyAsync(
                 o => (o.ProducerId == entity.Id || o.ClientId == entity.Id) && (int) o.Status < 6, token);
             if (hasActiveOrders)
-                return Failure(MessageKind.Consumer_CannotBeDeleted_HasActiveOrders);
+                return Failure("Impossible de supprimer votre compte, vous avez des commandes en cours.");
 
             _context.Remove(entity);
             await _context.SaveChangesAsync(token);

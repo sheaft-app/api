@@ -53,7 +53,7 @@ namespace Sheaft.Mediatr.Agreement.Commands
         {
             var entity = await _context.Agreements.SingleAsync(e => e.Id == request.AgreementId, token);
             if(entity.ProducerId != request.RequestUser.Id)
-                return Failure(MessageKind.Forbidden);
+                return Failure("Vous n'êtes pas authorisé à accéder à cette ressource.");
             
             var deliveryMode = await _context.DeliveryModes.SingleAsync(c => c.Id == request.DeliveryId, token);
             entity.ChangeDelivery(deliveryMode);

@@ -53,24 +53,24 @@ namespace Sheaft.Mediatr.Transfer.Commands
         {
             var purchaseOrder = await _context.PurchaseOrders.SingleAsync(e => e.Id == request.PurchaseOrderId, token);
             if (purchaseOrder.Status != PurchaseOrderStatus.Delivered)
-                return Failure<Guid>(MessageKind.Transfer_CannotCreate_PurchaseOrder_Invalid_Status);
+                return Failure<Guid>("Impossible de créer un transfert pour la commande, elle n'est pas livrée.");
 
             var orderPayins = await _context.Payins
                 .Where(o => o.OrderId == purchaseOrder.OrderId)
                 .ToListAsync(token);
 
             if (orderPayins.All(op => op.Status != TransactionStatus.Succeeded))
-                return Failure<Guid>(MessageKind.BadRequest);
+                return Failure<Guid>("Impossible de créer un transfert pour la commande, le paiement du panier n'est pas validé.");
             
             var pendingTransfers = await _context.Transfers
                 .Where(t => t.PurchaseOrderId == request.PurchaseOrderId)
                 .ToListAsync(token);
             
             if (pendingTransfers.Any(pt => pt.Status == TransactionStatus.Succeeded))
-                return Failure<Guid>(MessageKind.Transfer_CannotCreate_AlreadyProcessed);
+                return Failure<Guid>("Impossible de créer un transfert pour la commande, un transfert a déjà été validé.");
 
             if (pendingTransfers.Any(pt => pt.Status == TransactionStatus.Created || pt.Status == TransactionStatus.Waiting))
-                return Failure<Guid>(MessageKind.Transfer_CannotCreate_Pending_Transfer);
+                return Failure<Guid>("Impossible de créer un transfert pour la commande, un transfert est déjà en attente.");
 
             var checkResult =
                 await _mediatr.Process(

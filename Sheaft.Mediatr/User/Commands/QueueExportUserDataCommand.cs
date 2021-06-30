@@ -54,7 +54,7 @@ namespace Sheaft.Mediatr.User.Commands
         {
             var sender = await _context.Users.SingleAsync(e => e.Id == request.UserId, token);
             if(sender.Id != request.RequestUser.Id)
-                return Failure<Guid>(MessageKind.Forbidden);
+                return Failure<Guid>("Vous n'êtes pas autorisé à accéder à cette ressource.");
 
             var command = new ExportUserDataCommand(request.RequestUser) {JobId = Guid.NewGuid()};
             var entity = new Domain.Job(command.JobId, JobKind.ExportUserData, $"Export RGPD", sender, command);
@@ -63,8 +63,6 @@ namespace Sheaft.Mediatr.User.Commands
             await _context.SaveChangesAsync(token);
 
             _mediatr.Post(command);
-            _logger.LogInformation($"User RGPD data export successfully initiated by {request.UserId}");
-
             return Success(entity.Id);
         }
     }

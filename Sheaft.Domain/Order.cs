@@ -76,7 +76,7 @@ namespace Sheaft.Domain
         public void AssignToUser(User user)
         {
             if (User != null)
-                throw SheaftException.Conflict();
+                throw SheaftException.Conflict("Un utilisateur est déjà assigné à ce panier.");
             
             User = user;
         }
@@ -268,7 +268,7 @@ namespace Sheaft.Domain
         public void SetAsProcessed()
         {
             if (Processed)
-                throw SheaftException.Conflict();
+                throw SheaftException.Conflict("Ce panier a déjà été traité.");
             
             Processed = true;
         }

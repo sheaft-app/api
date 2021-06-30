@@ -55,7 +55,7 @@ namespace Sheaft.Mediatr.Document.Commands
                 .SingleOrDefaultAsync(r => r.Documents.Any(d => d.Id == request.DocumentId), token);
             var document = legal.Documents.FirstOrDefault(c => c.Id == request.DocumentId);
             if (document.Kind != request.Kind && legal.Documents.Any(d => d.Kind == request.Kind))
-                return Failure(MessageKind.Document_CannotUpdate_Another_Document_With_Type_Exists);
+                return Failure("Impossible de mettre à jour le type du document, un document avec ce nouveau type existe déjà.");
 
             document.SetKind(request.Kind);
             document.SetName(request.Name);

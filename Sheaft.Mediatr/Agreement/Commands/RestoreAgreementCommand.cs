@@ -54,10 +54,10 @@ namespace Sheaft.Mediatr.Agreement.Commands
                 await _context.Agreements.SingleOrDefaultAsync(a => a.Id == request.AgreementId && a.RemovedOn.HasValue, token);
             
             if(request.RequestUser.IsInRole(_roleOptions.Producer.Value) && entity.ProducerId != request.RequestUser.Id)
-                return Failure(MessageKind.Forbidden);
+                return Failure("Vous n'êtes pas authorisé à accéder à cette ressource.");
             
             if(request.RequestUser.IsInRole(_roleOptions.Store.Value) && entity.StoreId != request.RequestUser.Id)
-                return Failure(MessageKind.Forbidden);
+                return Failure("Vous n'êtes pas authorisé à accéder à cette ressource.");
 
             _context.Restore(entity);
             await _context.SaveChangesAsync(token);
