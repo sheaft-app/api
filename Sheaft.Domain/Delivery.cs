@@ -223,7 +223,7 @@ namespace Sheaft.Domain
                     if (product == null)
                         throw SheaftException.NotFound($"Le produit {productReturned.Item1.Name} retourné est introuvable dans la liste des produits livrés.");
 
-                    if(product.Quantity < productReturned.Item2)
+                    if(productReturned.Item3 != ModificationKind.Excess && product.Quantity < productReturned.Item2)
                         throw SheaftException.NotFound($"Le produit {productReturned.Item1.Name} possède une quantité retournée supérieure à la quantité livrée.");
                     
                     Products.Add(new DeliveryProduct(product, productReturned.Item2, productReturned.Item3));
