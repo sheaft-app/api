@@ -151,11 +151,6 @@ namespace Sheaft.Web.Jobs
             var rolesOptions = roleSettings.Get<RoleOptions>();
             services.AddAuthorization(options =>
             {
-                options.AddPolicy("AdminOrSupport", o =>
-                {
-                    o.RequireAuthenticatedUser();
-                    o.RequireRole(rolesOptions.Admin.Value, rolesOptions.Support.Value);
-                });
                 options.FallbackPolicy = new AuthorizationPolicyBuilder()
                     .RequireAuthenticatedUser()
                     .RequireRole(rolesOptions.Admin.Value, rolesOptions.Support.Value)
@@ -316,7 +311,7 @@ namespace Sheaft.Web.Jobs
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IOptionsSnapshot<RoutineOptions> routineOptions)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IOptionsSnapshot<RoutineOptions> routineOptions, IOptionsSnapshot<RoleOptions> roleOptions)
         {
             if (env.IsDevelopment())
             {
@@ -345,11 +340,11 @@ namespace Sheaft.Web.Jobs
                 endpoints.MapControllerRoute(
                     name: "default",
                     pattern: "{controller=Home}/{action=Index}/{id?}");
+                
                 endpoints.MapHangfireDashboard("/hangfire", new DashboardOptions()
                     {
-                        Authorization = new List<IDashboardAuthorizationFilter> { }
-                    })
-                    .RequireAuthorization("AdminOrSupport");
+                        Authorization = new List<IDashboardAuthorizationFilter> { new MyAuthorizationFilter(roleOptions)}
+                    });
             });
             
             RecuringJobs.Register(routineOptions.Value);
